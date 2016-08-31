@@ -70,7 +70,7 @@
 }
 @font-face {
     font-family: 'VentiCF-Bold';
-    src: url('../fonts/VentiCF-Bold.eot?#iefix') format('embedded-opentype'), url('../fonts/VentiCF-Bold.otf') format('opentype'),  url('../fonts/VentiCF-Bold.woff') format('woff'), url('../fonts/VentiCF-Bold.ttf') format('truetype'), url('../fonts/VentiCF-Bold.svg#VentiCF-Bold') format('svg');
+    src: url('../fonts/VentiCF-Bold.eot?#iefix') format('embedded-opentype'), url('../fonts/VentiCF-Bold.otf') format('opentype'), url('../fonts/VentiCF-Bold.woff') format('woff'), url('../fonts/VentiCF-Bold.ttf') format('truetype'), url('../fonts/VentiCF-Bold.svg#VentiCF-Bold') format('svg');
     font-weight: normal;
     font-style: normal;
 }
@@ -523,7 +523,7 @@ input[type="checkbox"] {
     font-size: 0;
     clear: both;
 }
-.centered-checkbox .checkboxOff,.centered-checkbox .checkboxOn {
+.centered-checkbox .checkboxOff, .centered-checkbox .checkboxOn {
     margin-left: 0;
     display: inline-block;
     vertical-align: top;
@@ -5068,7 +5068,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     padding: 10px;
     width: 276px;
 }
-
 /* Site update dialog */
 .site-update-available .warning-header {
     color: #000;
@@ -5097,7 +5096,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .site-update-available .release-info {
     color: #ccc;
-    font-family: "source_sans_prosemibold",Arial;
+    font-family: "source_sans_prosemibold", Arial;
     font-size: 13px;
 }
 .site-update-available .warning-button.update:hover {
@@ -5106,7 +5105,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .site-update-available .warning-button.update:hover span {
     color: #27b700;
 }
-
 .top-search-bl {
     float: right;
     height: 24px;
@@ -7108,6 +7106,14 @@ table {
 .fm-back-button {
     display: none;
 }
+.fm-header-buttons {
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-size: 0;
+    white-space: nowrap;
+    background-color: #f2f2f2;
+}
 .fm-breadcrumbs-block, .fm-share-breadcrumbs-block, .fm-dialog-breadcrumbs-bl {
     float: left;
     height: 36px;
@@ -7116,18 +7122,14 @@ table {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-}
-.long-path .fm-breadcrumbs-block {
-    max-width: -webkit-calc(100% - 230px);
-    max-width: -moz-calc(100% - 230px);
-    max-width: calc(100% - 230px);
-    height: 38px;
+    font-size: 0;
+    white-space: nowrap;
 }
 .fm-breadcrumbs, a.fm-breadcrumbs, .fm-share-breadcrumbs, a.fm-share-breadcrumbs {
     display: block;
     height: 24px;
     padding: 0 15px 0 0px;
-    float: left;
+    display: inline-block;
 }
 .fm-breadcrumbs:first-child .right-arrow-bg span {
     display: none;
@@ -7166,6 +7168,13 @@ table {
     padding: 0 0 0 42px;
     display: block;
     height: 24px;
+    overflow: hidden;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    display: inline-block;
+}
+.fm-breadcrumbs .right-arrow-bg.short-foldername {
+    max-width: 110px;
 }
 .deactivated .fm-breadcrumbs .right-arrow-bg {
     cursor: default;
@@ -8272,15 +8281,15 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .add-contact-hidden, .share-message-hidden, .feedback-hidden, .cancel-hidden, .feedback-dialog .feedback-dialog-hidden {
     position: absolute;
     height: auto;
-    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -moz-opacity: 0;
     -khtml-opacity: 0;
     opacity: 0;
 }
 .share-message-scrolling {
     padding: 6px 0 5px 0;
-    line-height:0;
-    font-size:0;
+    line-height: 0;
+    font-size: 0;
 }
 .add-user-textarea, .share-message-textarea {
     height: 39px;
@@ -8442,7 +8451,6 @@ color: white;
     min-height: 20px;
     left: 200px;
     top: 200px;
-
 }
 .dragger-content {
     min-height: 20px;
@@ -8606,7 +8614,6 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     line-height: 24px;
     padding: 0 0 10px;
 }
-
 .fm-dialog.network-testing {
     width: 512px;
 }
@@ -8627,7 +8634,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 .dlkey-dialog .decryption-key input {
     text-indent: 36px;
 }
-.fm-dialog.network-testing  {
+.fm-dialog.network-testing {
     margin: -115px 0 0 -256px;
 }
 .fm-dialog.rename-dialog {
@@ -11905,6 +11912,7 @@ table {
 .st-main-block .jspPane, .main-scroll-block .jspPane {
     min-height: 100%;
     min-width: 980px;
+    width: 100% !important;
     position: relative;
 }
 .st-main-block .notification-popup .jspPane, .main-scroll-block .notification-popup .jspPane {
@@ -16240,7 +16248,7 @@ span.browsers-update {
     width: 257px;
 }
 .chrome-app-button {
-    background-image: url(../images/mega/chrome-app_v2.png);
+    background-image: url(../images/mega/chrome-app_v3.png);
     background-position: center -157px;
     background-repeat: no-repeat;
 }
@@ -16248,18 +16256,18 @@ span.browsers-update {
     width: 260px;
     height: 60px;
     margin: 38px auto 26px auto;
-    background-image: url(../images/mega/chrome-app_v2.png);
+    background-image: url(../images/mega/chrome-app_v3.png);
     background-position: -230px top;
     background-repeat: no-repeat;
 }
 .chrome-app-scr {
-    background-image: url(../images/mega/chrome-app_v2.png);
+    background-image: url(../images/mega/chrome-app_v3.png);
     background-position: center -155px;
     background-repeat: no-repeat;
     cursor: pointer;
     display: block;
     height: 418px;
-    margin: 30px auto -26px auto;
+    margin: 30px auto -33px auto;
     width: 700px;
 }
 .chrome-version-info {
@@ -16502,7 +16510,7 @@ a.manual-install-link {
     margin: 10px 10px 0 10px;
     cursor: pointer;
     padding: 0 15px 0 70px;
-    background-image: url(../images/mega/chrome-app_v2.png);
+    background-image: url(../images/mega/chrome-app_v3.png);
     background-repeat: no-repeat;
     background-position: -644px 8px;
     -moz-box-sizing: border-box;
@@ -21272,14 +21280,13 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .pro-only .expiry-date-select {
     cursor: default;
-    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     -moz-opacity: 0.3;
     -khtml-opacity: 0.3;
     opacity: 0.3;
     -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.5);
     box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.5);
 }
-
 /* Style for datepicker dialog (override existing jQuery UI ones) */
 .ui-datepicker {
     width: 17em;
@@ -21361,9 +21368,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 #ui-datepicker-div {
     width: auto;
 }
-#ui-datepicker-div .ui-state-default.ui-state-active,
-#ui-datepicker-div .ui-widget-content .ui-state-default.ui-state-active,
-#ui-datepicker-div .ui-widget-header .ui-state-default.ui-state-active {
+#ui-datepicker-div .ui-state-default.ui-state-active, #ui-datepicker-div .ui-widget-content .ui-state-default.ui-state-active, #ui-datepicker-div .ui-widget-header .ui-state-default.ui-state-active {
     background: #777;
     border: medium none;
     border-radius: 3px;
@@ -21372,21 +21377,18 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     letter-spacing: 0;
 }
 #ui-datepicker-div a.ui-state-default.ui-state-hover {
-  background: #777 none repeat scroll 0 0;
-  border: medium none;
-  border-radius: 3px;
-  color: #fff;
-  font-size: 14px;
-  letter-spacing: 0;
+    background: #777 none repeat scroll 0 0;
+    border: medium none;
+    border-radius: 3px;
+    color: #fff;
+    font-size: 14px;
+    letter-spacing: 0;
 }
-#ui-datepicker-div td span,
-#ui-datepicker-div td a {
+#ui-datepicker-div td span, #ui-datepicker-div td a {
     padding: 7px 0.2em;
     text-align: center;
 }
-#ui-datepicker-div .ui-state-default,
-#ui-datepicker-div .ui-widget-content .ui-state-default,
-#ui-datepicker-div .ui-widget-header .ui-state-default {
+#ui-datepicker-div .ui-state-default, #ui-datepicker-div .ui-widget-content .ui-state-default, #ui-datepicker-div .ui-widget-header .ui-state-default {
     background: none;
     border: medium none;
     color: #777;
@@ -21461,9 +21463,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     margin-top: 5px;
     text-transform: uppercase;
 }
-#ui-datepicker-div .ui-state-disabled,
-#ui-datepicker-div .ui-widget-content .ui-state-disabled,
-#ui-datepicker-div .ui-widget-header .ui-state-disabled {
+#ui-datepicker-div .ui-state-disabled, #ui-datepicker-div .ui-widget-content .ui-state-disabled, #ui-datepicker-div .ui-widget-header .ui-state-disabled {
     color: #999;
     font-family: "source_sans_prolight";
     font-size: 12px;
@@ -21485,7 +21485,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     top: 6px;
     width: 24px;
 }
-
 /* New style radio buttons */
 .fm-links-export-options {
     margin-top: 10px;
@@ -21621,8 +21620,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     color: #D90007;
 }
 .fm-expiry-dropdown {
-  display: block;
-  position: relative;
+    display: block;
+    position: relative;
 }
 .expiry-date .fm-links-dropdown {
     float: right;
@@ -22233,7 +22232,6 @@ a.top-login-forgot-pass {
 .pro-register-scroll {
     overflow: hidden;
 }
-
 .pro-register-dialog p {
     font-size: 15px;
     line-height: 24px;
@@ -25384,9 +25382,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=10);
 .help2 img[alt="small"] {
     max-width: 50%;
 }
-
 table.speed-table {
-     -moz-border-bottom-colors: none;
+    -moz-border-bottom-colors: none;
     -moz-border-left-colors: none;
     -moz-border-right-colors: none;
     -moz-border-top-colors: none;
@@ -25420,20 +25417,18 @@ table.speed-table {
     padding-top: 6px;
     width: 100%;
 }
-
 /* Network Test Dialog Region */
 
-.speed-table th, .speed-table td{
+.speed-table th, .speed-table td {
     text-align: right;
 }
-.speed-table th:first-child, .speed-table td:first-child{
+.speed-table th:first-child, .speed-table td:first-child {
     text-align: left;
 }
-.speed-table td{
+.speed-table td {
     color: #666;
     padding-top: 4px;
 }
-
 .copyrights-dispute-bottom {
     background-color: #FAFAFA;
     margin-top: 24px;
@@ -25464,12 +25459,9 @@ table.speed-table {
     box-sizing: border-box;
     padding: 0 20px 10px 20px;
 }
-
-
-.fm-expiry-dropdown .fm-link-select-label{
+.fm-expiry-dropdown .fm-link-select-label {
     margin-left: 0px;
 }
-
 .pro-only-feature {
     color: #ff3333;
 }
@@ -25487,7 +25479,7 @@ table.speed-table {
     padding: 3px 13px 4px 13px;
     position: relative;
     top: -3px;
-        -webkit-transition: box-shadow 200ms ease-in-out;
+    -webkit-transition: box-shadow 200ms ease-in-out;
     -moz-transition: box-shadow 200ms ease-in-out;
     -o-transition: box-shadow 200ms ease-in-out;
     -ms-transition: box-shadow 200ms ease-in-out;
@@ -25541,17 +25533,14 @@ table.speed-table {
     right: 0;
     top: 0;
 }
-
 .fm-dialog.copy-dialog .share-dialog-permissions {
     margin-top: 12px;
     float: left;
 }
-
 .perfectScrollbarContainer {
     position: relative;
 }
-.perfectScrollbarContainer.ps-container > .ps-scrollbar-y-rail,
-    .perfectScrollbarContainer.ps-container:hover > .ps-scrollbar-y-rail {
+.perfectScrollbarContainer.ps-container > .ps-scrollbar-y-rail,  .perfectScrollbarContainer.ps-container:hover > .ps-scrollbar-y-rail {
     background-color: transparent !important;
     opacity: 1;
 }
@@ -25565,7 +25554,6 @@ table.speed-table {
     -ms-transition: opacity 100ms ease-in-out;
     transition: opacity 100ms ease-in-out;
     cursor: pointer;
-
 }
 .perfectScrollbarContainer.ps-container > .ps-scrollbar-y-rail:hover > .ps-scrollbar-y {
     opacity: 0.5 !important;

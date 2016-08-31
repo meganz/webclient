@@ -57,7 +57,7 @@
 	var React = __webpack_require__(2);
 	var ReactDOM = __webpack_require__(154);
 	var ConversationsUI = __webpack_require__(155);
-	var ChatRoom = __webpack_require__(176);
+	var ChatRoom = __webpack_require__(172);
 
 	var chatui;
 	var webSocketsSupport = typeof WebSocket !== 'undefined';
@@ -433,18 +433,37 @@
 	        updateMyConnectionStatus();
 
 	        self.chats.forEach(function (v, k) {
-	            if (v.state !== ChatRoom.STATE.LEFT) {
-	                v.setState(ChatRoom.STATE.INITIALIZED, true);
-	            }
+	            v.setState(ChatRoom.STATE.INITIALIZED, true);
 	        });
 	    });
 
 	    this.karere.bind("onUsersJoined", function (e, eventData) {
+	        if (eventData.newUsers[self.karere.getJid()]) {
+
+	            var iAmFirstToJoin = true;
+	            Object.keys(eventData.currentUsers).forEach(function (k) {
+	                if (k.indexOf(self.karere.getBareJid()) !== -1) {
+	                    iAmFirstToJoin = false;
+	                    return false;
+	                }
+	            });
+	            if (iAmFirstToJoin) {
+	                var room = self.chats[eventData.roomJid];
+
+	                if (room) {}
+	            }
+	        }
 	        return self._onUsersUpdate("joined", e, eventData);
 	    });
 
 	    this.karere.bind("onUsersLeft", function (e, eventData) {
 	        return self._onUsersUpdate("left", e, eventData);
+	    });
+	    this.karere.bind("onUsersUpdatedDone", function (e, eventObject) {
+	        var room = self.chats[eventObject.getRoomJid()];
+	        if (room && room.state == ChatRoom.STATE.JOINING) {
+	            room.setState(ChatRoom.STATE.PLUGINS_PAUSED);
+	        }
 	    });
 
 	    this.karere.bind("onChatMessage", function () {
@@ -466,11 +485,6 @@
 	            self.karere._myPresence = presence;
 	            self.connect().done(function () {
 	                self.karere.setPresence(presence, undefined, localStorage.megaChatPresenceMtime);
-
-	                Object.keys(self.plugins.chatdIntegration.chatd.shards).forEach(function (k) {
-	                    var shard = self.plugins.chatdIntegration.chatd.shards[k];
-	                    shard.reconnect();
-	                });
 	            });
 	            return true;
 	        } else {
@@ -478,10 +492,6 @@
 	                self.karere.setPresence(presence, undefined, localStorage.megaChatPresenceMtime);
 	                self.karere.connectionRetryManager.resetConnectionRetries();
 	                self.karere.disconnect();
-	                Object.keys(self.plugins.chatdIntegration.chatd.shards).forEach(function (k) {
-	                    var shard = self.plugins.chatdIntegration.chatd.shards[k];
-	                    shard.disconnect();
-	                });
 	            } else {
 	                self.karere.connectionRetryManager.resetConnectionRetries();
 	                self.karere.setPresence(presence, undefined, localStorage.megaChatPresenceMtime);
@@ -489,7 +499,7 @@
 	        }
 	    });
 
-	    $(window).unbind('hashchange.megaChat' + this.instanceId);
+	    $(window).unbind('hashchange.megaChat');
 	    var lastOpenedRoom = null;
 	    $(window).bind('hashchange.megaChat' + this.instanceId, function () {
 	        var room = self.getCurrentRoom();
@@ -538,28 +548,24 @@
 	        }
 	    };
 
+	    if (!appContainer) {
+	        $(window).rebind('hashchange.delayedChatUiInit', function () {
+	            appContainer = document.querySelector('.section.conversations');
+	            if (appContainer) {
+	                initAppUI();
+	                $(window).unbind('hashchange.delayedChatUiInit');
+	            }
+	        });
+	    } else {
+	        initAppUI();
+	    }
+
 	    if (self.is_initialized) {
 	        self.destroy().always(function () {
 	            self.init();
 	        });
 
 	        return;
-	    } else {
-	        if (!appContainer) {
-	            $(window).rebind('hashchange.delayedChatUiInit', function () {
-	                if (typeof $.leftPaneResizable === 'undefined' || !fminitialized) {
-
-	                    return;
-	                }
-	                appContainer = document.querySelector('.section.conversations');
-	                if (appContainer) {
-	                    initAppUI();
-	                    $(window).unbind('hashchange.delayedChatUiInit');
-	                }
-	            });
-	        } else {
-	            initAppUI();
-	        }
 	    }
 	    self.is_initialized = true;
 
@@ -700,6 +706,8 @@
 	    }
 
 	    if (eventObject.isEmptyMessage() && !eventObject.getMeta().attachments) {
+	        self.logger.debug("Empty message, MegaChat will not process it: ", eventObject);
+
 	        return;
 	    } else {
 	        self.logger.debug("MegaChat is now processing incoming message: ", eventObject);
@@ -785,10 +793,6 @@
 
 	Chat.prototype.destroy = function (isLogout) {
 	    var self = this;
-
-	    if (self.is_initialized === false) {
-	        return;
-	    }
 
 	    self.karere.destroying = true;
 	    self.trigger('onDestroy', [isLogout]);
@@ -1201,6 +1205,10 @@
 
 	    self.logger.debug("removed: ", u);
 
+	    var room = self.getPrivateRoom(u);
+	    if (room) {
+	        room.destroy(true);
+	    }
 	    this.karere.unsubscribe(megaChat.getJidFromNodeId(u), self.getMyXMPPPassword());
 
 	    self.renderMyStatus();
@@ -1313,7 +1321,7 @@
 
 	            sortedConversations.sort(mega.utils.sortObjFn("lastActivity", -1));
 
-	            if (sortedConversations.length > 0) {
+	            if (sortedConversations.length > 1) {
 	                var room = sortedConversations[0];
 	                room.setActive();
 	                room.show();
@@ -1353,7 +1361,7 @@
 	Chat.prototype._destroyAllChatsFromChatd = function () {
 	    var self = this;
 
-	    asyncApiReq({ 'a': 'mcf', 'v': Chatd.VERSION }).done(function (r) {
+	    asyncApiReq({ 'a': 'mcf' }).done(function (r) {
 	        r.c.forEach(function (chatRoomMeta) {
 	            if (chatRoomMeta.g === 1) {
 	                console.error("Destroying: ", chatRoomMeta.id, chatRoomMeta.g, chatRoomMeta.u);
@@ -1362,16 +1370,14 @@
 	                        api_req({
 	                            a: 'mcr',
 	                            id: chatRoomMeta.id,
-	                            u: u.u,
-	                            v: Chatd.VERSION
+	                            u: u.u
 	                        });
 	                    }
 	                });
 	                api_req({
 	                    a: 'mcr',
 	                    id: chatRoomMeta.id,
-	                    u: u_handle,
-	                    v: Chatd.VERSION
+	                    u: u_handle
 	                });
 	            }
 	        });
@@ -5740,7 +5746,7 @@
 	  return element;
 	};
 
-	ReactElement.makeElement = function (type, config, children) {
+	ReactElement.createElement = function (type, config, children) {
 	  var propName;
 
 	  // Reserved names are extracted
@@ -5791,7 +5797,7 @@
 	};
 
 	ReactElement.createFactory = function (type) {
-	  var factory = ReactElement.makeElement.bind(null, type);
+	  var factory = ReactElement.createElement.bind(null, type);
 	  // Expose the type on the factory and the prototype so that it can be
 	  // easily accessed on elements. E.g. `<Foo />.type === Foo`.
 	  // This should not be named `constructor` since this may not be the function
@@ -8728,13 +8734,9 @@
 
 	var ReactEmptyComponentInjection = {
 	  injectEmptyComponent: function (component) {
-	    placeholderElement = ReactElement.makeElement(component);
+	    placeholderElement = ReactElement.createElement(component);
 	  }
 	};
-
-	function registerNullComponentID() {
-	  ReactEmptyComponentRegistry.registerNullComponentID(this._rootNodeID);
-	}
 
 	var ReactEmptyComponent = function (instantiate) {
 	  this._currentElement = null;
@@ -8744,7 +8746,7 @@
 	assign(ReactEmptyComponent.prototype, {
 	  construct: function (element) {},
 	  mountComponent: function (rootID, transaction, context) {
-	    transaction.getReactMountReady().enqueue(registerNullComponentID, this);
+	    ReactEmptyComponentRegistry.registerNullComponentID(rootID);
 	    this._rootNodeID = rootID;
 	    return ReactReconciler.mountComponent(this._renderedComponent, rootID, transaction, context);
 	  },
@@ -18255,7 +18257,7 @@
 
 	'use strict';
 
-	module.exports = '0.14.8';
+	module.exports = '0.14.7';
 
 /***/ },
 /* 143 */
@@ -18546,7 +18548,7 @@
 	var assign = __webpack_require__(39);
 	var onlyChild = __webpack_require__(152);
 
-	var createElement = ReactElement.makeElement;
+	var createElement = ReactElement.createElement;
 	var createFactory = ReactElement.createFactory;
 	var cloneElement = ReactElement.cloneElement;
 
@@ -18996,7 +18998,7 @@
 	    // succeed and there will likely be errors in render.
 
 
-	    var element = ReactElement.makeElement.apply(this, arguments);
+	    var element = ReactElement.createElement.apply(this, arguments);
 
 	    // The result can be nullish if a mock or a custom function is used.
 	    // TODO: Drop this when these are no longer allowed as the type argument.
@@ -19021,7 +19023,7 @@
 	  },
 
 	  createFactory: function (type) {
-	    var validatedFactory = ReactElementValidator.makeElement.bind(null, type);
+	    var validatedFactory = ReactElementValidator.createElement.bind(null, type);
 	    // Legacy hook TODO: Warn if this is accessed
 	    validatedFactory.type = type;
 
@@ -19195,13 +19197,12 @@
 	var React = __webpack_require__(2);
 	var ReactDOM = __webpack_require__(154);
 	var utils = __webpack_require__(156);
-	var PerfectScrollbar = __webpack_require__(158).PerfectScrollbar;
 	var RenderDebugger = __webpack_require__(157).RenderDebugger;
 	var MegaRenderMixin = __webpack_require__(157).MegaRenderMixin;
-	var ButtonsUI = __webpack_require__(159);
-	var DropdownsUI = __webpack_require__(160);
-	var ContactsUI = __webpack_require__(161);
-	var ConversationPanelUI = __webpack_require__(163);
+	var ButtonsUI = __webpack_require__(158);
+	var DropdownsUI = __webpack_require__(159);
+	var ContactsUI = __webpack_require__(160);
+	var ConversationPanelUI = __webpack_require__(162);
 
 	var ConversationsListItem = React.createClass({
 	    displayName: "ConversationsListItem",
@@ -19219,6 +19220,7 @@
 	        self.props.chatRoom.removeChangeListener(self.chatRoomChangeListener);
 	    },
 	    render: function render() {
+
 	        var classString = "";
 
 	        var megaChat = this.props.chatRoom.megaChat;
@@ -19297,28 +19299,15 @@
 	                { className: lastMsgDivClasses },
 	                renderableSummary
 	            );
-
-	            var timestamp = lastMessage.delay;
-	            var curTimeMarker;
-	            var msgDate = new Date(timestamp * 1000);
-	            var iso = msgDate.toISOString();
-	            if (todayOrYesterday(iso)) {
-
-	                curTimeMarker = time2lastSeparator(iso) + ", " + msgDate.getHours() + ":" + msgDate.getMinutes();
-	            } else {
-
-	                curTimeMarker = acc_time2date(timestamp, true);
-	            }
-
 	            lastMessageDatetimeDiv = React.makeElement(
 	                "div",
 	                { className: "date-time" },
-	                curTimeMarker
+	                unixtimeToTimeString(lastMessage.delay)
 	            );
 	        } else {
 	            var lastMsgDivClasses = "conversation-message";
 
-	            var emptyMessage = ChatdIntegration.mcfHasFinishedPromise.state() !== 'resolved' || chatRoom.messagesBuff.messagesHistoryIsLoading() || chatRoom.messagesBuff.joined === false ? localStorage.megaChatPresence !== 'unavailable' ? l[7006] : "" : l[8000];
+	            var emptyMessage = megaChat.plugins.chatdIntegration.mcfHasFinishedPromise.state() !== 'resolved' || chatRoom.messagesBuff.messagesHistoryIsLoading() || chatRoom.messagesBuff.joined === false ? l[7006] : l[8000];
 
 	            lastMessageDiv = React.makeElement(
 	                "div",
@@ -19401,6 +19390,30 @@
 	            this.conversationClicked(activeCallSession.room, e);
 	        }
 	    },
+	    handleWindowResize: function handleWindowResize() {
+
+	        var contentPanelConversations = document.querySelector('.content-panel.conversations');
+	        if (!contentPanelConversations || !contentPanelConversations.parentNode || !contentPanelConversations.parentNode.parentNode || !contentPanelConversations.parentNode.parentNode.parentNode) {
+
+	            return;
+	        }
+	        var $container = $(contentPanelConversations.parentNode.parentNode.parentNode);
+	        var $jsp = $container.data('jsp');
+
+	        if ($jsp) {
+	            $jsp.reinitialise();
+	        }
+	    },
+	    componentDidMount: function componentDidMount() {
+	        window.addEventListener('resize', this.handleWindowResize);
+	        this.handleWindowResize();
+	    },
+	    componentWillUnmount: function componentWillUnmount() {
+	        window.removeEventListener('resize', this.handleWindowResize);
+	    },
+	    componentDidUpdate: function componentDidUpdate() {
+	        this.handleWindowResize();
+	    },
 	    render: function render() {
 	        var self = this;
 
@@ -19438,13 +19451,12 @@
 	        sortedConversations.sort(mega.utils.sortObjFn("lastActivity", -1));
 
 	        sortedConversations.forEach(function (chatRoom) {
-	            var contact;
 	            if (!chatRoom || !chatRoom.roomJid) {
 	                return;
 	            }
 
 	            if (chatRoom.type === "private") {
-	                contact = chatRoom.getParticipantsExceptMe()[0];
+	                var contact = chatRoom.getParticipantsExceptMe()[0];
 	                if (!contact) {
 	                    return;
 	                }
@@ -19461,7 +19473,6 @@
 	            currConvsList.push(React.makeElement(ConversationsListItem, {
 	                key: chatRoom.roomJid.split("@")[0],
 	                chatRoom: chatRoom,
-	                contact: contact,
 	                messages: chatRoom.messagesBuff,
 	                megaChat: megaChat,
 	                onConversationClicked: function onConversationClicked(e) {
@@ -19515,7 +19526,7 @@
 	                    return;
 	                }
 
-	                var $typeArea = $('.messages-textarea:visible:first');
+	                var $typeArea = $('.messages-textarea:visible');
 	                moveCursortoToEnd($typeArea);
 	                e.megaChatHandled = true;
 	                $typeArea.triggerHandler(e);
@@ -19525,7 +19536,7 @@
 	            }
 	        });
 
-	        $(document).rebind('mouseup.megaChatTextAreaFocus', function (e) {
+	        $(document).rebind('click.megaChatTextAreaFocus', function (e) {
 
 	            if (e.megaChatHandled) {
 	                return;
@@ -19540,12 +19551,11 @@
 	                    return;
 	                }
 
-	                var $typeArea = $('.messages-textarea:visible:first');
-	                if ($typeArea.size() === 1 && !$typeArea.is(":focus")) {
-	                    $typeArea.focus();
-	                    e.megaChatHandled = true;
-	                    moveCursortoToEnd($typeArea[0]);
-	                }
+	                var $typeArea = $('.messages-textarea:visible');
+	                $typeArea.focus();
+	                e.megaChatHandled = true;
+	                moveCursortoToEnd($typeArea);
+	                return false;
 	            }
 	        });
 
@@ -19558,11 +19568,10 @@
 	                self.setState({
 	                    'leftPaneWidth': mega.config.get('leftPaneWidth')
 	                });
-	                $('.jspVerticalBar:visible').addClass('hiden-when-dragging');
-	                $('.jScrollPaneContainer:visible').trigger('forceResize');
-	            }, 75);
+	            }, 500);
 	            lPane.width(mega.config.get('leftPaneWidth'));
 	            $('.fm-tree-panel', lPane).width(mega.config.get('leftPaneWidth'));
+	            $('.jScrollPaneContainer', lPane).trigger('forceResize');
 	        });
 
 	        $.leftPaneResizableChat = new FMResizablePane(lPane, $.leftPaneResizable.options);
@@ -19580,18 +19589,10 @@
 	            } else {
 	                $('.left-pane-drag-handle').css('cursor', 'we-resize');
 	            }
-
-	            $('.jspVerticalBar:visible').addClass('hiden-when-dragging');
 	        });
 
 	        $($.leftPaneResizableChat).on('resizestop', function () {
 	            $('.fm-left-panel').width(lPane.width());
-
-	            $('.jScrollPaneContainer:visible').trigger('forceResize');
-
-	            setTimeout(function () {
-	                $('.hiden-when-dragging').removeClass('hiden-when-dragging');
-	            }, 100);
 	        });
 
 	        this.handleWindowResize();
@@ -19662,11 +19663,11 @@
 	                    "div",
 	                    { className: "fm-tree-panel manual-tree-panel-scroll-management", style: leftPanelStyles },
 	                    React.makeElement(
-	                        PerfectScrollbar,
+	                        utils.JScrollPane,
 	                        { style: leftPanelStyles },
 	                        React.makeElement(
 	                            "div",
-	                            { className: "content-panel conversations" + (window.location.hash.indexOf("/chat") !== -1 ? " active" : "") },
+	                            { className: "content-panel conversations" },
 	                            React.makeElement(ConversationsList, { chats: this.props.megaChat.chats, megaChat: this.props.megaChat, contacts: this.props.contacts })
 	                        )
 	                    )
@@ -19732,17 +19733,13 @@
 	    displayName: "JScrollPane",
 
 	    mixins: [MegaRenderMixin],
-	    getDefaultProps: function getDefaultProps() {
-	        return {
-	            className: "jScrollPaneContainer",
-	            requiresUpdateOnResize: true
-	        };
-	    },
 	    componentDidMount: function componentDidMount() {
 	        var self = this;
 	        var $elem = $(ReactDOM.findDOMNode(self));
 
 	        $elem.height('100%');
+
+	        self.setWidthHeightIfEmpty();
 
 	        $elem.find('.jspContainer').replaceWith(function () {
 	            var $children = $elem.find('.jspPane').children();
@@ -19762,10 +19759,6 @@
 	        }, self.props.options);
 
 	        $elem.jScrollPane(options);
-
-	        if (self.props.onFirstInit) {
-	            self.props.onFirstInit($elem.data('jsp'), $elem);
-	        }
 	        $elem.rebind('jsp-will-scroll-y.jsp' + self.getUniqueId(), function (e) {
 	            if ($elem.attr('data-scroll-disabled') === "true") {
 	                e.preventDefault();
@@ -19775,16 +19768,8 @@
 	            }
 	        });
 
-	        $elem.rebind('jsp-user-scroll-y.jsp' + self.getUniqueId(), function (e, scrollPositionY, isAtTop, isAtBottom) {
-	            if (self.props.onUserScroll) {
-	                if ($(e.target).is($elem)) {
-	                    self.props.onUserScroll($elem.data('jsp'), $elem, e, scrollPositionY, isAtTop, isAtBottom);
-	                }
-	            }
-	        });
-
-	        $elem.rebind('forceResize.jsp' + self.getUniqueId(), function (e, forced, scrollPositionYPerc, scrollToElement) {
-	            self.onResize(forced, scrollPositionYPerc, scrollToElement);
+	        $elem.rebind('forceResize.jsp' + self.getUniqueId(), function (e, forced, scrollPositionYPerc) {
+	            self.onResize(forced, scrollPositionYPerc);
 	        });
 	        $(window).rebind('resize.jsp' + self.getUniqueId(), self.onResize);
 	        self.onResize();
@@ -19795,13 +19780,17 @@
 
 	        $(window).unbind('resize.jsp' + this.getUniqueId());
 	    },
-	    eventuallyReinitialise: function eventuallyReinitialise(forced, scrollPositionYPerc, scrollToElement) {
+	    setWidthHeightIfEmpty: function setWidthHeightIfEmpty() {
+	        var $elem = $(ReactDOM.findDOMNode(this));
+
+	        if (!$elem.width() && $elem.parent().outerWidth()) {
+	            $elem.width($elem.parent().outerWidth());
+	        }
+	    },
+	    eventuallyReinitialise: function eventuallyReinitialise(forced, scrollPositionYPerc) {
 	        var self = this;
 
 	        if (!self.isMounted()) {
-	            return;
-	        }
-	        if (!self.isComponentVisible()) {
 	            return;
 	        }
 
@@ -19810,53 +19799,33 @@
 	        var currHeights = [$('.jspPane', $elem).outerHeight(), $elem.outerHeight()];
 
 	        if (forced || self._lastHeights != currHeights) {
-
 	            self._lastHeights = currHeights;
-
-	            self._doReinit(scrollPositionYPerc, scrollToElement, currHeights, forced, $elem);
-	        }
-	    },
-	    _doReinit: function _doReinit(scrollPositionYPerc, scrollToElement, currHeights, forced, $elem) {
-	        var self = this;
-
-	        if (!self.isMounted()) {
-	            return;
-	        }
-	        if (!self.isComponentVisible()) {
-	            return;
-	        }
-
-	        self._lastHeights = currHeights;
-	        var $jsp = $elem.data('jsp');
-	        if ($jsp) {
-	            $jsp.reinitialise();
-
-	            var manualReinitialiseControl = false;
-	            if (self.props.onReinitialise) {
-	                manualReinitialiseControl = self.props.onReinitialise($jsp, $elem, forced, scrollPositionYPerc, scrollToElement);
-	            }
-
-	            if (manualReinitialiseControl === false) {
+	            var $jsp = $elem.data('jsp');
+	            if ($jsp) {
 	                if (scrollPositionYPerc) {
 
 	                    if (scrollPositionYPerc === -1) {
-	                        $jsp.scrollToBottom();
+	                        $elem.one('jsp-initialised', function () {
+	                            $jsp.scrollToBottom();
+	                        });
 	                    } else {
-	                        $jsp.scrollToPercentY(scrollPositionYPerc, false);
+	                        $elem.one('jsp-initialised', function () {
+	                            $jsp.scrollToPercentY(scrollPositionYPerc, false);
+	                        });
 	                    }
-	                } else if (scrollToElement) {
-	                    $jsp.scrollToElement(scrollToElement);
 	                }
+	                $jsp.reinitialise();
 	            }
 	        }
 	    },
-	    onResize: function onResize(forced, scrollPositionYPerc, scrollToElement) {
-	        if (forced && forced.originalEvent) {
-	            forced = true;
-	            scrollPositionYPerc = undefined;
+	    onResize: function onResize(forced, scrollPositionYPerc) {
+	        if (!this.isMounted()) {
+	            return;
 	        }
 
-	        this.eventuallyReinitialise(forced, scrollPositionYPerc, scrollToElement);
+	        this.setWidthHeightIfEmpty();
+
+	        this.eventuallyReinitialise(forced, scrollPositionYPerc);
 	    },
 	    componentDidUpdate: function componentDidUpdate() {
 	        this.onResize();
@@ -19864,7 +19833,7 @@
 	    render: function render() {
 	        return React.makeElement(
 	            "div",
-	            _extends({}, this.props, { onResize: this.onResize }),
+	            _extends({ className: this.props.className + " jScrollPaneContainer" }, this.props, { onResize: this.onResize }),
 	            React.makeElement(
 	                "div",
 	                { className: "jspContainer" },
@@ -19924,8 +19893,7 @@
 
 	var ReactDOM = __webpack_require__(154);
 
-	// copied from Facebook's shallowEqual, used in PureRenderMixin, because it was defined as a _private_ module and
-	// adapted to be a bit more optimal for functions...
+	// copied from Facebook's shallowEqual, used in PureRenderMixin, because it was defined as a _private_ module
 	function shallowEqual(objA, objB) {
 	    if (objA === objB) {
 	        return true;
@@ -19933,25 +19901,9 @@
 	    var key;
 	    // Test for A's keys different from B.
 	    for (key in objA) {
-	        if (key === "children") {
-	            // skip!
-	            continue;
-	        }
-	        if (objA.hasOwnProperty(key)) {
-	            if (!objB.hasOwnProperty(key)) {
-	                return false;
-	            }
-	            else if (objA[key] !== objB[key]) {
-	                // handle/match functions code
-	                if (typeof(objA[key]) === 'function' && typeof(objB[key]) === 'function') {
-	                    if (objA[key].toString() !== objB[key].toString()) {
-	                        return false;
-	                    }
-	                }
-	                else {
-	                    return false;
-	                }
-	            }
+	        if (objA.hasOwnProperty(key) &&
+	            (!objB.hasOwnProperty(key) || objA[key] !== objB[key])) {
+	            return false;
 	        }
 	    }
 	    // Test for B's keys missing from A.
@@ -19963,7 +19915,7 @@
 	    return true;
 	}
 
-	window.shallowEqual = shallowEqual;
+
 
 	var MAX_ALLOWED_DEBOUNCED_UPDATES = 1;
 	var DEBOUNCED_UPDATE_TIMEOUT = 40;
@@ -19985,6 +19937,7 @@
 	window.megaRenderMixinId = window.megaRenderMixinId ? window.megaRenderMixinId : 0;
 
 	var MegaRenderMixin = {
+	    //inViewport: false,
 	    getReactId: function() {
 	        return this._reactInternalInstance._rootNodeID;
 	    },
@@ -20021,10 +19974,8 @@
 	    },
 	    componentDidMount: function() {
 
-	        if (this.props.requiresUpdateOnResize) {
-	            $(window).rebind('resize.megaRenderMixing' + this.getUniqueId(), this.onResizeDoUpdate);
-	        }
-	        // window.addEventListener('hashchange', this.onHashChangeDoUpdate);
+	        $(window).rebind('resize.megaRenderMixing' + this.getUniqueId(), this.onResizeDoUpdate);
+	        window.addEventListener('hashchange', this.onHashChangeDoUpdate);
 
 	        // init on data structure change events
 	        if (this.props) {
@@ -20045,59 +19996,28 @@
 	        //);
 	        //
 	        //this.requiresLazyRendering();
-
-	        this._isMounted = true;
 	    },
 	    findDOMNode: function() {
-	        if (this.domNode) {
-	            // injected by RenderTo and ModalDialogs
-	            return this.domNode;
-	        }
-
 	        return ReactDOM.findDOMNode(this);
 	    },
 	    componentWillUnmount: function() {
-	        if (this.props.requiresUpdateOnResize) {
-	            $(window).unbind('resize.megaRenderMixing' + this.getUniqueId());
-	        }
+	        $(window).unbind('resize.megaRenderMixing' + this.getUniqueId());
+	        window.removeEventListener('hashchange', this.onHashChangeDoUpdate);
 
-	        // window.removeEventListener('hashchange', this.onHashChangeDoUpdate);
-
-	        this._isMounted = false;
+	        //$(window).unbind('DOMContentLoaded.lazyRenderer' + this.getUniqueId());
+	        //$(window).unbind('load.lazyRenderer' + this.getUniqueId());
+	        //$(window).unbind('resize.lazyRenderer' + this.getUniqueId());
+	        //$(window).unbind('hashchange.lazyRenderer' + this.getUniqueId());
+	        //$(window).unbind('scroll.lazyRenderer' + this.getUniqueId());
 	    },
 	    isComponentVisible: function() {
 	        var domNode = $(this.findDOMNode());
 
-	        // ._isMounted is faster then .isMounted() or any other operation
-	        if (!this._isMounted) {
-	            return false;
-	        }
-	        // offsetParent should NOT trigger a reflow/repaint
-	        if (!this.props.hideable && (!domNode || domNode[0].offsetParent === null)) {
-	            return false;
-	        }
 	        if (!domNode.is(":visible")) {
 	            return false;
 	        }
 	        if (!verge.inX(domNode[0]) && !verge.inY(domNode[0])) {
 	            return false;
-	        }
-	        return true;
-	    },
-	    /**
-	     * Lightweight version of .isComponentVisible
-	     * @returns {bool}
-	     */
-	    isComponentEventuallyVisible: function() {
-	        var domNode = this.findDOMNode();
-
-	        // ._isMounted is faster then .isMounted() or any other operation
-	        if (!this._isMounted) {
-	            return false;
-	        }
-	        // offsetParent should NOT trigger a reflow/repaint
-	        if (!this.props.hideable && (!domNode || domNode.offsetParent === null)) {
-	            return false
 	        }
 	        return true;
 	    },
@@ -20110,10 +20030,7 @@
 	        if (!self._wasRendered || (self._wasRendered && !self.isMounted())) {
 	            return;
 	        }
-	        if (!self._isMounted) {
-	            return;
-	        }
-	        if (!self.isComponentEventuallyVisible()) {
+	        if (!self.isComponentVisible()) {
 	            return;
 	        }
 
@@ -20148,21 +20065,20 @@
 
 	        this.eventuallyUpdate();
 	    },
-	    // onHashChangeDoUpdate: function() {
-	    //     if (!this.isMounted() || this._pendingForceUpdate === true) {
-	    //         return;
-	    //     }
-	    //
-	    //     this.eventuallyUpdate();
-	    // },
+	    onHashChangeDoUpdate: function() {
+	        if (!this.isMounted() || this._pendingForceUpdate === true) {
+	            return;
+	        }
+
+	        this.eventuallyUpdate();
+	    },
 	    _recurseAddListenersIfNeeded: function(idx, map, depth) {
 	        var self = this;
 	        depth = depth ? depth : 0;
 
 
 	        if (typeof map._dataChangeIndex !== "undefined") {
-	            var cacheKey = this.getReactId() + "_" + map._dataChangeTrackedId + "_" + "_" + this.getElementName() +
-	                            "_" + idx;
+	            var cacheKey = this.getReactId() + "_" + map._dataChangeTrackedId + "_" + "_" + this.getElementName() + "_" + idx;
 	            if (map.addChangeListener && !_propertyTrackChangesVars._listenersMap[cacheKey]) {
 	                _propertyTrackChangesVars._listenersMap[cacheKey] = map.addChangeListener(function () {
 	                    self.onPropOrStateUpdated(map, idx);
@@ -20191,40 +20107,25 @@
 	        var dataChangeHistory = _propertyTrackChangesVars._dataChangedHistory;
 
 	        if (!v && v === rv) { // null, undefined, false is ok
-	            // console.error('r === rv, !v', k, referenceMap, map);
+	            //console.error('r === rv, !v', k, referenceMap, map);
 	            return false; // continue/skip
 	        }
-	        if (!rv && v) { // null, undefined, false is ok
-	            return true;
-	        }
 
-	        if (v === null && rv !== null) {
-	            return true;
-	        }
-	        else if (v === null && rv === null) {
-	            return false;
-	        }
-	        
 	        if (typeof v._dataChangeIndex !== "undefined") {
-	            var cacheKey = this.getReactId() + "_" + v._dataChangeTrackedId + "_" + "_" + this.getElementName() +
-	                                "_" + idx;
+	            var cacheKey = this.getReactId() + "_" + v._dataChangeTrackedId + "_" + "_" + this.getElementName() + "_" + idx;
 
 	            if (dataChangeHistory[cacheKey] !== v._dataChangeIndex) {
-	                if (window.RENDER_DEBUG) {
-	                    console.error(
-	                        "changed: ", self.getElementName(), cacheKey, v._dataChangeTrackedId, v._dataChangeIndex, v
-	                    );
-	                }
+	                if (window.RENDER_DEBUG) console.error("changed: ", self.getElementName(), cacheKey, v._dataChangeTrackedId, v._dataChangeIndex, v);
 	                foundChanges = true;
 	                dataChangeHistory[cacheKey] = v._dataChangeIndex;
 	            } else {
-	                // console.error("NOT changed: ", k, v._dataChangeTrackedId, v._dataChangeIndex, v);
+	                //console.error("NOT changed: ", k, v._dataChangeTrackedId, v._dataChangeIndex, v);
 	            }
 	        } else if (typeof v === "object" && v !== null && depth <= MAX_TRACK_CHANGES_RECURSIVE_DEPTH) {
 	            if (self._recursiveSearchForDataChanges(idx, v, rv, depth + 1) === true) {
 	                foundChanges = true;
 	            } else {
-	                // console.error("NOT (recursive) changed: ", k, v);
+	                //console.error("NOT (recursive) changed: ", k, v);
 	            }
 	        } else if (v && v.forEach && depth < MAX_TRACK_CHANGES_RECURSIVE_DEPTH) {
 	            v.forEach(function(v, k) {
@@ -20234,7 +20135,7 @@
 	                }
 	            });
 	        } else {
-	            // console.error("NOT tracked/changed: ", k, v);
+	            //console.error("NOT tracked/changed: ", k, v);
 	        }
 	        return foundChanges;
 	    },
@@ -20252,41 +20153,15 @@
 	            this._wasRendered = true;
 	            return true; // first time render, always render the first time
 	        }
-	        // quick lookup for children
+	        // quick lookup
 	        if (
-	            idx === "p_children"
-	        ) {
-	            // found a list of children nodes
-	            if (map.map && referenceMap.map) {
-	                var oldKeys = map.map(function(child) { return child.key; });
-	                var newKeys = referenceMap.map(function(child) { return child.key; });
-	                if (!shallowEqual(oldKeys, newKeys)) {
-	                    return true;
-	                }
-	            }
-	            else if (
-	                (!map && referenceMap) ||
-	                (map && !referenceMap)
-	            ) {
-	                return true;
-	            }
-	            else if (
-	                map.$$typeof && referenceMap.$$typeof
-	            ) {
-	                if (
-	                    !shallowEqual(map.props, referenceMap.props) ||
-	                    !shallowEqual(map.state, referenceMap.state)
-	                ) {
-	                    return true;
-	                }
-
-	            }
-	            // found a single node
-	        }
-	        else if (
 	            (map && !referenceMap) ||
 	            (!map && referenceMap) ||
 	            (map && referenceMap && !shallowEqual(map, referenceMap))
+	        ) {
+	            return true;
+	        }  else if (
+	            map.children && referenceMap.children && !shallowEqual(map.children.length, referenceMap.children.length)
 	        ) {
 	            return true;
 	        }
@@ -20304,75 +20179,26 @@
 	    },
 	    shouldComponentUpdate: function(nextProps, nextState) {
 	        var shouldRerender = false;
-
-	        if (
-	            !this.isMounted() ||
-	            this._pendingForceUpdate === true ||
-	            this._updatesDisabled === true
-	        ) {
-	            if (window.RENDER_DEBUG) {
-	                console.error(
-	                    "shouldUpdate? No.", "F1", this.getElementName(), this.props, nextProps, this.state, nextState
-	                );
-	            }
-	            return false;
-	        }
-
-	        // component specific control of the React lifecycle
-	        if (this.specificShouldComponentUpdate) {
-	            var r = this.specificShouldComponentUpdate(nextProps, nextState);
-	            if (r === false) {
-	                if (window.RENDER_DEBUG) {
-	                    console.error(
-	                        "shouldUpdate? No.", "F2", this.getElementName(), this.props, nextProps, this.state, nextState
-	                    );
-	                }
-	                return false;
-	            }
-	            else if (r === true) {
-	                return true;
-	            }
-	        }
-
-	        if (!this.isComponentEventuallyVisible()) {
-	            if (window.RENDER_DEBUG) {
-	                console.error(
-	                    "shouldUpdate? No.", "FVis", this.getElementName(), this.props, nextProps, this.state, nextState
-	                );
-	            }
+	        if (!this.isMounted() || this._pendingForceUpdate === true || this._updatesDisabled === true) {
 	            return false;
 	        }
 
 	        if (this.props !== null) {
 	            shouldRerender = this._recursiveSearchForDataChanges("p", nextProps, this.props);
 	        }
-	        if (shouldRerender === false) {
-	            if (window.RENDER_DEBUG) {
-	                console.error(
-	                    "shouldUpdate? No.", "F3", this.getElementName(), this.props, nextProps, this.state, nextState
-	                );
-	            }
-	        }
 	        if (shouldRerender === false && this.state !== null) {
 	            shouldRerender = this._recursiveSearchForDataChanges("s", nextState, this.state);
 	        }
 
 
-
-
-	        if (window.RENDER_DEBUG) {
-	            if (shouldRerender) {
-	                // debugger;
-	            }
-	            console.error("shouldRerender?",
-	                shouldRerender,
-	                "rendered: ", this.getElementName(),
-	                "owner: ", this.getOwnerElement() ? this.getOwnerElement()._reactInternalInstance.getName() : "none",
-	                "props:", this.props,
-	                "nextProps:", this.props,
-	                "state:", this.state
-	            );
-	        }
+	        if (window.RENDER_DEBUG) console.error("shouldRerender?",
+	            shouldRerender,
+	            "rendered: ", this.getElementName(),
+	            "owner: ", this.getOwnerElement() ? this.getOwnerElement()._reactInternalInstance.getName() : "none",
+	            "props:", this.props,
+	            "nextProps:", this.props,
+	            "state:", this.state
+	        );
 
 
 	        if (shouldRerender === true) { // (eventually) add listeners to newly added data structures
@@ -20381,12 +20207,6 @@
 	            }
 	            if (this.state) {
 	                this._recurseAddListenersIfNeeded("s", this.state);
-	            }
-	        } else {
-	            if (window.RENDER_DEBUG) {
-	                console.error(
-	                    "shouldUpdate? No.", "F4", this.getElementName(), this.props, nextProps, this.state, nextState
-	                );
 	            }
 	        }
 
@@ -20411,6 +20231,26 @@
 	        }
 	        return rootElement === this ? null : rootElement;
 	    },
+	    //requiresLazyRendering: function() {
+	    //    var domNode = this.findDOMNode();
+	    //    var wasInViewPort = this.inViewport;
+	    //
+	    //    if (domNode) {
+	    //        this.inViewport = elementInViewport2(domNode);
+	    //    }
+	    //    else {
+	    //        this.inViewport = false;
+	    //    }
+	    //
+	    //    if (wasInViewPort !== this.inViewport) {
+	    //        if (!this.inViewport) {
+	    //            $(domNode).css({'visibility': 'hidden'});
+	    //        }
+	    //        else {
+	    //            $(domNode).css({'visibility': 'visible'});
+	    //        }
+	    //    }
+	    //},
 	    getOwnerElement: function() {
 	        var owner = this._reactInternalInstance._currentElement._owner;
 	        if (owner) {
@@ -20420,26 +20260,13 @@
 	        }
 	    },
 	    safeForceUpdate: function() {
-	        try {
-	            if (this._isMounted && this.isMounted()) {
-	                var benchmarkRender;
-	                if (window.RENDER_DEBUG) {
-	                    benchmarkRender =  unixtime();
-	                }
-	                this.forceUpdate();
-	                if (window.RENDER_DEBUG) {
-	                    var o = this.getOwnerElement() ? this.getOwnerElement()._reactInternalInstance.getName() : "none";
-	                    console.error("safeForceUpdate", unixtime() - benchmarkRender,
-	                        "rendered: ", this.getElementName(),
-	                        "owner: ", o,
-	                        "props:", this.props,
-	                        "state:", this.state
-	                    );
-	                }
+	        var self = this;
+	        
+	        setTimeout(function() {
+	            if (self.isMounted()) {
+	                self.forceUpdate();
 	            }
-	        } catch (e) {
-	            console.error("safeForceUpdate: ", e);
-	        }
+	        }, 0);
 	    }
 	};
 
@@ -20474,240 +20301,6 @@
 
 /***/ },
 /* 158 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-	var React = __webpack_require__(2);
-	var ReactDOM = __webpack_require__(154);
-
-	var MegaRenderMixin = __webpack_require__(157).MegaRenderMixin;
-
-	var PerfectScrollbar = React.createClass({
-	    displayName: "PerfectScrollbar",
-
-	    mixins: [MegaRenderMixin],
-	    isUserScroll: true,
-	    getDefaultProps: function getDefaultProps() {
-	        return {
-	            className: "perfectScrollbarContainer",
-	            requiresUpdateOnResize: true
-	        };
-	    },
-	    componentDidMount: function componentDidMount() {
-	        var self = this;
-	        var $elem = $(ReactDOM.findDOMNode(self));
-
-	        $elem.height('100%');
-
-	        var options = $.extend({}, {}, self.props.options);
-
-	        Ps.initialize($elem[0], options);
-
-	        if (self.props.onFirstInit) {
-	            self.props.onFirstInit(self, $elem);
-	        }
-
-	        $(document).rebind('ps-scroll-y.ps' + self.getUniqueId(), function (e) {
-	            if ($elem.attr('data-scroll-disabled') === "true") {
-	                e.stopPropagation();
-	                e.preventDefault();
-	                e.originalEvent.stopPropagation();
-	                e.originalEvent.preventDefault();
-	                return false;
-	            }
-	            if (self.props.onUserScroll && self.isUserScroll === true && $elem.is(e.target)) {
-	                self.props.onUserScroll(self, $elem, e);
-	            }
-	        });
-
-	        $elem.rebind('disable-scroll.ps' + self.getUniqueId(), function (e) {
-	            Ps.destroy($elem[0]);
-	        });
-	        $elem.rebind('enable-scroll.ps' + self.getUniqueId(), function (e) {
-	            Ps.initialize($elem[0], options);
-	        });
-	        $elem.rebind('forceResize.ps' + self.getUniqueId(), function (e, forced, scrollPositionYPerc, scrollToElement) {
-	            self.onResize(forced, scrollPositionYPerc, scrollToElement);
-	        });
-	        self.onResize();
-	    },
-	    componentWillUnmount: function componentWillUnmount() {
-	        var $elem = $(ReactDOM.findDOMNode(this));
-	        $(document).unbind('ps-scroll-y.ps' + this.getUniqueId());
-	    },
-	    eventuallyReinitialise: function eventuallyReinitialise(forced, scrollPositionYPerc, scrollToElement) {
-	        var self = this;
-
-	        if (!self.isMounted()) {
-	            return;
-	        }
-	        if (!self.isComponentEventuallyVisible()) {
-	            return;
-	        }
-
-	        var $elem = $(self.findDOMNode());
-
-	        if (forced || self._currHeight != self.getContentHeight()) {
-	            self._currHeight = self.getContentHeight();
-	            self._doReinit(scrollPositionYPerc, scrollToElement, forced, $elem);
-	        }
-	    },
-	    _doReinit: function _doReinit(scrollPositionYPerc, scrollToElement, forced, $elem) {
-	        var self = this;
-
-	        if (!self.isMounted()) {
-	            return;
-	        }
-	        if (!self.isComponentEventuallyVisible()) {
-	            return;
-	        }
-
-	        self.isUserScroll = false;
-	        Ps.update($elem[0]);
-	        self.isUserScroll = true;
-
-	        var manualReinitialiseControl = false;
-	        if (self.props.onReinitialise) {
-	            manualReinitialiseControl = self.props.onReinitialise(self, $elem, forced, scrollPositionYPerc, scrollToElement);
-	        }
-
-	        if (manualReinitialiseControl === false) {
-	            if (scrollPositionYPerc) {
-	                if (scrollPositionYPerc === -1) {
-	                    self.scrollToBottom(true);
-	                } else {
-	                    self.scrollToPercentY(scrollPositionYPerc, true);
-	                }
-	            } else if (scrollToElement) {
-	                self.scrollToElement(scrollToElement, true);
-	            }
-	        }
-	    },
-	    scrollToBottom: function scrollToBottom(skipReinitialised) {
-	        var $elem = $(this.findDOMNode());
-	        $elem[0].scrollTop = this.getScrollHeight();
-	        this.isUserScroll = false;
-	        Ps.update($elem[0]);
-	        this.isUserScroll = true;
-
-	        if (!skipReinitialised) {
-	            this.reinitialised(true);
-	        }
-	    },
-	    reinitialise: function reinitialise(skipReinitialised) {
-	        var $elem = $(this.findDOMNode());
-	        this.isUserScroll = false;
-	        Ps.update($elem[0]);
-	        this.isUserScroll = true;
-
-	        if (!skipReinitialised) {
-	            this.reinitialised(true);
-	        }
-	    },
-	    getScrollHeight: function getScrollHeight() {
-	        var $elem = $(this.findDOMNode());
-	        var outerHeightContainer = $elem.children(":first").outerHeight();
-	        var outerHeightScrollable = $elem.outerHeight();
-
-	        var res = outerHeightContainer - outerHeightScrollable;
-
-	        if (res <= 0) {
-
-	            return this._lastKnownScrollHeight ? this._lastKnownScrollHeight : 0;
-	        }
-	        this._lastKnownScrollHeight = res;
-	        return res;
-	    },
-	    getContentHeight: function getContentHeight() {
-	        var $elem = $(this.findDOMNode());
-	        return $elem.children(":first").outerHeight();
-	    },
-	    isAtTop: function isAtTop() {
-	        return this.findDOMNode().scrollTop === 0;
-	    },
-	    isAtBottom: function isAtBottom() {
-	        return this.findDOMNode().scrollTop === this.getScrollHeight();
-	    },
-	    getScrolledPercentY: function getScrolledPercentY() {
-	        var $elem = $(this.findDOMNode());
-	        return 100 / this.getScrollHeight() * $elem[0].scrollTop;
-	    },
-	    getScrollPositionY: function getScrollPositionY() {
-	        var $elem = $(this.findDOMNode());
-	        return $elem[0].scrollTop;
-	    },
-	    scrollToPercentY: function scrollToPercentY(posPerc, skipReinitialised) {
-	        var $elem = $(this.findDOMNode());
-	        var targetPx = 100 / this.getScrollHeight() * posPerc;
-	        if ($elem[0].scrollTop !== targetPx) {
-	            $elem[0].scrollTop = targetPx;
-	            this.isUserScroll = false;
-	            Ps.update($elem[0]);
-	            this.isUserScroll = true;
-	            if (!skipReinitialised) {
-	                this.reinitialised(true);
-	            }
-	        }
-	    },
-	    scrollToY: function scrollToY(posY, skipReinitialised) {
-	        var $elem = $(this.findDOMNode());
-	        if ($elem[0].scrollTop !== posY) {
-	            $elem[0].scrollTop = posY;
-	            this.isUserScroll = false;
-	            Ps.update($elem[0]);
-	            this.isUserScroll = true;
-	            if (!skipReinitialised) {
-	                this.reinitialised(true);
-	            }
-	        }
-	    },
-	    scrollToElement: function scrollToElement(element, skipReinitialised) {
-	        var $elem = $(this.findDOMNode());
-	        $elem[0].scrollTop = element.offsetTop;
-	        this.isUserScroll = false;
-	        Ps.update($elem[0]);
-	        this.isUserScroll = true;
-
-	        if (!skipReinitialised) {
-	            this.reinitialised(true);
-	        }
-	    },
-	    reinitialised: function reinitialised(forced) {
-	        if (this.props.onReinitialise) {
-	            this.props.onReinitialise(this, $(this.findDOMNode()), forced ? forced : false);
-	        }
-	    },
-	    onResize: function onResize(forced, scrollPositionYPerc, scrollToElement) {
-	        if (forced && forced.originalEvent) {
-	            forced = true;
-	            scrollPositionYPerc = undefined;
-	        }
-
-	        this.eventuallyReinitialise(forced, scrollPositionYPerc, scrollToElement);
-	    },
-	    componentDidUpdate: function componentDidUpdate() {
-	        if (this.props.requiresUpdateOnResize) {
-	            this.onResize(true);
-	        }
-	    },
-	    render: function render() {
-	        return React.makeElement(
-	            "div",
-	            _extends({}, this.props, { onResize: this.onResize }),
-	            this.props.children
-	        );
-	    }
-	});
-
-	module.exports = {
-	    PerfectScrollbar: PerfectScrollbar
-	};
-
-/***/ },
-/* 159 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -20773,27 +20366,17 @@
 
 	        return React.Children.map(this.props.children, function (child) {
 	            return React.cloneElement(child, {
-	                active: self.state.focused,
+	                active: this.state.focused,
 	                closeDropdown: function closeDropdown() {
 	                    self.setState({ 'focused': false });
 	                },
 	                onActiveChange: function onActiveChange(newVal) {
 	                    var $element = $(self.findDOMNode());
-	                    var $scrollables = $element.parents('.jScrollPaneContainer, .perfectScrollbarContainer');
-	                    if ($scrollables.size() > 0) {
-	                        if (newVal === true) {
-
-	                            $scrollables.attr('data-scroll-disabled', true);
-	                            $scrollables.filter('.perfectScrollbarContainer').each(function (k, element) {
-	                                Ps.disable(element);
-	                            });
-	                        } else {
-
-	                            $scrollables.removeAttr('data-scroll-disabled');
-	                            $scrollables.filter('.perfectScrollbarContainer').each(function (k, element) {
-	                                Ps.enable(element);
-	                            });
-	                        }
+	                    var $scrollables = $element.parents('.jScrollPaneContainer');
+	                    if (newVal === true) {
+	                        $scrollables.attr('data-scroll-disabled', true);
+	                    } else {
+	                        $scrollables.removeAttr('data-scroll-disabled');
 	                    }
 	                    if (child.props.onActiveChange) {
 	                        child.props.onActiveChange.call(this, newVal);
@@ -20815,7 +20398,6 @@
 	            document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
 
 	            $(window).unbind('hashchange.button' + this.getUniqueId());
-	            this.forceUpdate();
 	        }
 	    },
 	    onClick: function onClick(e) {
@@ -20882,7 +20464,7 @@
 	};
 
 /***/ },
-/* 160 */
+/* 159 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -20893,34 +20475,16 @@
 	var utils = __webpack_require__(156);
 	var MegaRenderMixin = __webpack_require__(157).MegaRenderMixin;
 	var RenderDebugger = __webpack_require__(157).RenderDebugger;
-	var ContactsUI = __webpack_require__(161);
-	var EMOJILIST = __webpack_require__(162);
-	var PerfectScrollbar = __webpack_require__(158).PerfectScrollbar;
+	var ContactsUI = __webpack_require__(160);
+	var EMOJILIST = __webpack_require__(161);
 
 	var Dropdown = React.createClass({
 	    displayName: "Dropdown",
 
 	    mixins: [MegaRenderMixin],
-	    getDefaultProps: function getDefaultProps() {
-	        return {
-	            requiresUpdateOnResize: true
-	        };
-	    },
 	    componentWillUpdate: function componentWillUpdate(nextProps, nextState) {
 	        if (this.props.active != nextProps.active) {
 	            this.onActiveChange(nextProps.active);
-	        }
-	    },
-	    specificShouldComponentUpdate: function specificShouldComponentUpdate(nextProps, nextState) {
-	        if (this.props.active != nextProps.active) {
-	            return true;
-	        } else if (this.props.focused != nextProps.focused) {
-	            return true;
-	        } else if (this.state && this.state.active != nextState.active) {
-	            return true;
-	        } else {
-
-	            return undefined;
 	        }
 	    },
 	    onActiveChange: function onActiveChange(newVal) {
@@ -20934,6 +20498,7 @@
 	        if (this.props.active === true) {
 	            if (this.getOwnerElement()) {
 	                var $element = $(this.popupElement);
+	                var parentDomNode = $element.closest('.button');
 	                var positionToElement = $('.button.active:visible');
 	                var offsetLeft = 0;
 	                var $container = $element.closest('.jspPane:first');
@@ -20943,7 +20508,6 @@
 	                }
 
 	                $element.css('margin-left', '');
-
 	                $element.position({
 	                    of: positionToElement,
 	                    my: self.props.positionMy ? self.props.positionMy : "center top",
@@ -20988,19 +20552,6 @@
 	            this.onActiveChange(false);
 	        }
 	    },
-	    renderChildren: function renderChildren() {
-	        var self = this;
-
-	        return React.Children.map(this.props.children, function (child) {
-	            if (child) {
-	                return React.cloneElement(child, {
-	                    active: self.props.active || self.state.active
-	                });
-	            } else {
-	                return null;
-	            }
-	        }.bind(this));
-	    },
 	    render: function render() {
 	        var classes = "dropdown body " + (!this.props.noArrow ? "dropdown-arrow up-arrow" : "") + " " + this.props.className;
 
@@ -21034,7 +20585,7 @@
 	                    "div",
 	                    null,
 	                    !this.props.noArrow ? React.makeElement("i", { className: "dropdown-white-arrow" }) : null,
-	                    this.renderChildren()
+	                    this.props.children
 	                )
 	            );
 	        }
@@ -21045,23 +20596,6 @@
 	    displayName: "DropdownContactsSelector",
 
 	    mixins: [MegaRenderMixin],
-	    getDefaultProps: function getDefaultProps() {
-	        return {
-	            requiresUpdateOnResize: true
-	        };
-	    },
-	    specificShouldComponentUpdate: function specificShouldComponentUpdate(nextProps, nextState) {
-	        if (this.props.active != nextProps.active) {
-	            return true;
-	        } else if (this.props.focused != nextProps.focused) {
-	            return true;
-	        } else if (this.state && this.state.active != nextState.active) {
-	            return true;
-	        } else {
-
-	            return undefined;
-	        }
-	    },
 	    render: function render() {
 	        var _this = this;
 
@@ -21069,28 +20603,26 @@
 
 	        return React.makeElement(
 	            Dropdown,
-	            { className: "popup contacts-search " + this.props.className,
-	                active: this.props.active,
-	                closeDropdown: this.props.closeDropdown,
-	                ref: "dropdown",
-	                positionMy: this.props.positionMy,
-	                positionAt: this.props.positionAt
+	            { className: "popup contacts-search " + this.props.className, active: this.props.active, closeDropdown: this.props.closeDropdown, ref: "dropdown",
+	                positionMy: this.props.positionMy, positionAt: this.props.positionAt
 	            },
-	            React.makeElement(ContactsUI.ContactPickerWidget, {
-	                active: this.props.active,
-	                className: "popup contacts-search",
-	                contacts: this.props.contacts,
-	                megaChat: this.props.megaChat,
-	                exclude: this.props.exclude,
-	                multiple: this.props.multiple,
-	                onSelectDone: this.props.onSelectDone,
-	                multipleSelectedButtonLabel: this.props.multipleSelectedButtonLabel,
-	                singleSelectedButtonLabel: this.props.singleSelectedButtonLabel,
-	                nothingSelectedButtonLabel: this.props.nothingSelectedButtonLabel,
-	                onClick: function onClick(contact, e) {
-	                    _this.props.onClick(contact, e);
-	                    _this.props.closeDropdown();
-	                } })
+	            React.makeElement(
+	                "div",
+	                { className: "popup contacts-search" },
+	                React.makeElement(ContactsUI.ContactPickerWidget, {
+	                    contacts: this.props.contacts,
+	                    megaChat: this.props.megaChat,
+	                    exclude: this.props.exclude,
+	                    multiple: this.props.multiple,
+	                    onSelectDone: this.props.onSelectDone,
+	                    multipleSelectedButtonLabel: this.props.multipleSelectedButtonLabel,
+	                    singleSelectedButtonLabel: this.props.singleSelectedButtonLabel,
+	                    nothingSelectedButtonLabel: this.props.nothingSelectedButtonLabel,
+	                    onClick: function onClick(contact, e) {
+	                        _this.props.onClick(contact, e);
+	                        _this.props.closeDropdown();
+	                    } })
+	            )
 	        );
 	    }
 	});
@@ -21099,11 +20631,6 @@
 	    displayName: "DropdownItem",
 
 	    mixins: [MegaRenderMixin],
-	    getDefaultProps: function getDefaultProps() {
-	        return {
-	            requiresUpdateOnResize: true
-	        };
-	    },
 	    getInitialState: function getInitialState() {
 	        return { 'isClicked': false };
 	    },
@@ -21168,18 +20695,13 @@
 	    displayName: "DropdownEmojiSelector",
 
 	    mixins: [MegaRenderMixin],
-	    getDefaultProps: function getDefaultProps() {
-	        return {
-	            'requiresUpdateOnResize': true,
-	            'hideable': true
-	        };
-	    },
 	    getInitialState: function getInitialState() {
 	        return {
 	            'previewEmoji': null,
 	            'searchValue': '',
 	            'browsingCategory': false,
-	            'isActive': false
+	            'isActive': false,
+	            'visibleEmojis': [].concat(Object.keys(EMOJILIST.EMOJI_CATEGORIES["PEOPLE"]))
 	        };
 	    },
 	    onSearchChange: function onSearchChange(e) {
@@ -21188,14 +20710,64 @@
 	            searchValue: e.target.value,
 	            browsingCategory: false
 	        });
-	        self.refs.scrollableArea.scrollToY(0);
+	        $('.popup-scroll-area.emoji-one:visible').data('jsp').scrollTo(0);
 	    },
-	    onUserScroll: function onUserScroll($ps, elem, e) {
-	        if (this.state.browsingCategory) {
-	            var $cat = $('.emoji-category-container[data-category-name="' + this.state.browsingCategory + '"]');
-	            if (!elementInViewport($cat)) {
-	                this.setState({ 'browsingCategory': false });
-	            }
+	    componentDidUpdate: function componentDidUpdate() {
+	        var self = this;
+	        var $element = $('.popup.emoji-one:visible');
+
+	        $('.popup-scroll-area.emoji-one', $element).rebind('jsp-user-scroll-y.emojis', function (e, pos) {
+	            self.rerender();
+	        });
+	    },
+	    _getVisibleEmojis: function _getVisibleEmojis() {
+	        var self = this;
+
+	        var $element = $('.popup-header.emoji-one:visible').parent();
+
+	        if (!$element.is(":visible")) {
+	            return false;
+	        }
+
+	        var $jsp = $('.popup-scroll-area.emoji-one', $element).data("jsp");
+	        var pos = 0;
+
+	        if ($jsp) {
+	            pos = $jsp.getContentPositionY();
+	        }
+
+	        var emojiHeight = 42;
+	        var emojiWidth = 42;
+	        var emojiContainerWidth = 336;
+	        var jspHeight = 420;
+	        var bufferRows = 6;
+	        var emojisPerRow = Math.floor(emojiContainerWidth / (emojiWidth - 5));
+	        var visibleEmojiRows = Math.floor(jspHeight / emojiHeight);
+
+	        var emojiList = EMOJILIST.ORDERED_EMOJIS;
+	        if (self.state.searchValue && self.state.searchValue.length > 0) {
+	            emojiList = [];
+	            EMOJILIST.ORDERED_EMOJIS.forEach(function (v) {
+	                if (v.toLowerCase().indexOf(self.state.searchValue.toLowerCase()) > -1) {
+	                    emojiList.push(v);
+	                }
+	            });
+	        }
+
+	        var firstEmojiNumber = Math.max(0, Math.ceil(pos / emojiHeight * emojisPerRow) - Math.floor(bufferRows * emojisPerRow));
+	        var lastEmojiNumber = firstEmojiNumber + Math.ceil(emojisPerRow * (visibleEmojiRows + bufferRows));
+
+	        var inViewport = emojiList.slice(Math.max(0, firstEmojiNumber - 1), lastEmojiNumber + 1);
+
+	        return inViewport;
+	    },
+	    rerender: function rerender() {
+	        var self = this;
+
+	        var inViewport = self._getVisibleEmojis();
+
+	        if (self.state.visibleEmojis.join(",") != inViewport.join(",")) {
+	            self.setState({ 'visibleEmojis': inViewport });
 	        }
 	    },
 	    render: function render() {
@@ -21236,6 +20808,11 @@
 	            }
 
 	            var emojis = [];
+	            var visibleEmojis = this._getVisibleEmojis();
+	            if (visibleEmojis === false) {
+	                visibleEmojis = self.state.visibleEmojis;
+	            }
+
 	            var searchValue = self.state.searchValue;
 
 	            Object.keys(EMOJILIST.EMOJI_CATEGORIES).forEach(function (categoryName) {
@@ -21248,46 +20825,54 @@
 	                    }
 	                    var meta = EMOJILIST.EMOJIS[slug];
 
-	                    curCategoryEmojis.push(React.makeElement(
-	                        "div",
-	                        {
-	                            "data-emoji": slug,
-	                            className: "button square-button emoji-one", key: categoryName + "_" + slug,
-	                            onMouseEnter: function onMouseEnter(e) {
-	                                if (self.mouseEnterTimer) {
-	                                    clearTimeout(self.mouseEnterTimer);
-	                                }
-
-	                                e.stopPropagation();
-	                                e.preventDefault();
-
-	                                self.mouseEnterTimer = setTimeout(function () {
-	                                    self.setState({ 'previewEmoji': slug });
-	                                }, 250);
-	                            },
-	                            onMouseLeave: function onMouseLeave(e) {
-	                                if (self.mouseEnterTimer) {
-	                                    clearTimeout(self.mouseEnterTimer);
-	                                }
-	                                e.stopPropagation();
-	                                e.preventDefault();
-
-	                                self.setState({ 'previewEmoji': null });
-	                            },
-	                            onClick: function onClick(e) {
-	                                if (self.props.onClick) {
-	                                    self.props.onClick(e, slug, meta);
-	                                }
-	                            }
-	                        },
-	                        React.makeElement(
-	                            "span",
+	                    if (visibleEmojis.indexOf(slug) > -1) {
+	                        curCategoryEmojis.push(React.makeElement(
+	                            "div",
 	                            {
-	                                className: "emojione-" + meta[0],
-	                                title: ":" + slug + ":" },
-	                            meta[1]
-	                        )
-	                    ));
+	                                "data-emoji": slug,
+	                                className: "button square-button emoji-one", key: categoryName + "_" + slug,
+	                                onMouseEnter: function onMouseEnter(e) {
+	                                    if (self.mouseEnterTimer) {
+	                                        clearTimeout(self.mouseEnterTimer);
+	                                    }
+
+	                                    e.stopPropagation();
+	                                    e.preventDefault();
+
+	                                    self.mouseEnterTimer = setTimeout(function () {
+	                                        self.setState({ 'previewEmoji': slug });
+	                                    }, 250);
+	                                },
+	                                onMouseLeave: function onMouseLeave(e) {
+	                                    if (self.mouseEnterTimer) {
+	                                        clearTimeout(self.mouseEnterTimer);
+	                                    }
+	                                    e.stopPropagation();
+	                                    e.preventDefault();
+
+	                                    self.setState({ 'previewEmoji': null });
+	                                },
+	                                onClick: function onClick(e) {
+	                                    if (self.props.onClick) {
+	                                        self.props.onClick(e, slug, meta);
+	                                    }
+	                                }
+	                            },
+	                            React.makeElement(
+	                                "span",
+	                                {
+	                                    className: "emojione-" + meta[0],
+	                                    title: ":" + slug + ":" },
+	                                meta[1]
+	                            )
+	                        ));
+	                    } else {
+	                        curCategoryEmojis.push(React.makeElement("div", {
+	                            "data-emoji": slug,
+	                            className: "button square-button emoji-one placeholder",
+	                            key: categoryName + "_" + slug + "_pl"
+	                        }));
+	                    }
 	                });
 
 	                if (curCategoryEmojis.length > 0) {
@@ -21336,8 +20921,7 @@
 	                            e.preventDefault();
 
 	                            self.setState({ browsingCategory: categoryName, searchValue: '' });
-
-	                            self.refs.scrollableArea.scrollToElement($('.emoji-category-container[data-category-name="' + categoryName + '"]:visible')[0]);
+	                            $('.popup-scroll-area.emoji-one:visible').data('jsp').scrollToElement($('.emoji-category-container[data-category-name="' + categoryName + '"]:visible'), true, true);
 	                        }
 	                    },
 	                    React.makeElement("i", { className: "small-icon " + categoryIcons[categoryName] })
@@ -21362,12 +20946,11 @@
 	                    )
 	                ),
 	                React.makeElement(
-	                    PerfectScrollbar,
+	                    utils.JScrollPane,
 	                    {
-	                        className: "popup-scroll-area emoji-one perfectScrollbarContainer",
+	                        className: "popup-scroll-area emoji-one",
 	                        searchValue: this.state.searchValue,
-	                        onUserScroll: this.onUserScroll,
-	                        ref: "scrollableArea"
+	                        browsingCategory: this.state.browsingCategory
 	                    },
 	                    React.makeElement(
 	                        "div",
@@ -21387,20 +20970,14 @@
 
 	        return React.makeElement(
 	            Dropdown,
-	            _extends({
-	                className: "popup emoji-one" }, self.props, { ref: "dropdown",
-	                onActiveChange: function onActiveChange(newValue) {
+	            _extends({ className: "popup emoji-one" }, self.props, { ref: "dropdown", onActiveChange: function onActiveChange(newValue) {
 
 	                    if (newValue === false) {
 	                        self.setState(self.getInitialState());
 	                    } else {
 	                        self.setState({ 'isActive': true });
 	                    }
-	                },
-	                searchValue: self.state.searchValue,
-	                browsingCategory: self.state.browsingCategory,
-	                previewEmoji: self.state.previewEmoji
-	            }),
+	                } }),
 	            popupContents
 	        );
 	    }
@@ -21414,7 +20991,7 @@
 	};
 
 /***/ },
-/* 161 */
+/* 160 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -21582,48 +21159,6 @@
 	            'dropdownIconClasses': "tiny-icon grey-down-arrow"
 	        };
 	    },
-	    specificShouldComponentUpdate: function specificShouldComponentUpdate(nextProps, nextState) {
-	        var self = this;
-
-	        var foundKeys = Object.keys(self.props);
-	        removeValue(foundKeys, 'dropdowns', true);
-
-	        var shouldUpdate = undefined;
-	        foundKeys.forEach(function (k) {
-	            if (typeof shouldUpdate === 'undefined') {
-	                if (!shallowEqual(nextProps[k], self.props[k])) {
-	                    shouldUpdate = false;
-	                } else {
-	                    shouldUpdate = true;
-	                }
-	            }
-	        });
-
-	        if (!shouldUpdate) {
-
-	            if (!shallowEqual(nextState, self.state)) {
-	                shouldUpdate = false;
-	            } else {
-	                shouldUpdate = true;
-	            }
-	        }
-	        if (!shouldUpdate && self.state.props.dropdowns && nextProps.state.dropdowns) {
-
-	            if (self.state.props.dropdowns.map && nextProps.state.dropdowns.map) {
-	                var oldKeys = self.state.props.dropdowns.map(function (child) {
-	                    return child.key;
-	                });
-	                var newKeys = nextProps.state.dropdowns.map(function (child) {
-	                    return child.key;
-	                });
-	                if (!shallowEqual(oldKeys, newKeys)) {
-	                    shouldUpdate = true;
-	                }
-	            }
-	        }
-
-	        return shouldUpdate;
-	    },
 	    render: function render() {
 	        var self = this;
 
@@ -21637,10 +21172,10 @@
 
 	        var contextMenu;
 	        if (!this.props.noContextMenu) {
-	            var ButtonsUI = __webpack_require__(159);
-	            var DropdownsUI = __webpack_require__(160);
+	            var ButtonsUI = __webpack_require__(158);
+	            var DropdownsUI = __webpack_require__(159);
 
-	            var moreDropdowns = this.props.dropdowns ? $.extend([], this.props.dropdowns) : [];
+	            var moreDropdowns = this.props.dropdowns ? this.props.dropdowns : [];
 
 	            if (contact.c === 1) {
 	                if (moreDropdowns.length > 0) {
@@ -21686,8 +21221,7 @@
 	                    if (self.props.onDoubleClick) {
 	                        self.props.onDoubleClick(contact, e);
 	                    }
-	                },
-	                style: self.props.style
+	                }
 	            },
 	            React.makeElement(ContactPresence, { contact: contact, className: this.props.presenceClassName }),
 	            React.makeElement(Avatar, { contact: contact, className: "small-rounded-avatar" }),
@@ -21818,7 +21352,7 @@
 	            }
 
 	            var selectedClass = "";
-	            if (self.state.selected && self.state.selected.indexOf(v.u) !== -1) {
+	            if (self.state.selected && self.state.selected.indexOf(v.h) !== -1) {
 	                selectedClass = "selected";
 	            }
 	            contacts.push(React.makeElement(ContactCard, {
@@ -21837,8 +21371,8 @@
 	                        $(document).trigger('closeDropdowns');
 
 	                        var sel = self.state.selected;
-	                        if (sel.indexOf(contact.u) === -1) {
-	                            sel.push(contact.u);
+	                        if (sel.indexOf(contact.h) === -1) {
+	                            sel.push(contact.h);
 	                        }
 
 	                        if (self.props.onSelectDone) {
@@ -21856,10 +21390,10 @@
 	                        if (!sel) {
 	                            sel = [];
 	                        }
-	                        if (self.state.selected.indexOf(contact.u) > -1) {
-	                            removeValue(sel, contact.u, false);
+	                        if (self.state.selected.indexOf(contact.h) > -1) {
+	                            removeValue(sel, contact.h, false);
 	                        } else {
-	                            sel.push(contact.u);
+	                            sel.push(contact.h);
 	                        }
 
 	                        self.setState({ 'selected': sel });
@@ -21900,7 +21434,7 @@
 
 	        return React.makeElement(
 	            "div",
-	            { className: this.props.className },
+	            null,
 	            React.makeElement(
 	                "div",
 	                { className: "contacts-search-header " + this.props.headerClasses },
@@ -21937,7 +21471,7 @@
 	};
 
 /***/ },
-/* 162 */
+/* 161 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -21975,17 +21509,15 @@
 	        "scream": ["1F631", "&#x1F631;"],
 	        "relieved": ["1F60C", "&#x1F60C;"],
 	        "dizzy_face": ["1F635", "&#x1F635;"],
-	        "confused": ["1f621", "&#x1f621;"],
 	        "slight_frown": ["1F641", "&#x1F641;"],
 	        "confounded": ["1F616", "&#x1F616;"],
-	        "angry": ["1f620", "&#x1f620;"],
+	        "angry": ["1F61E", "&#x1F61E;"],
 	        "kissing_smiling_eyes": ["1F619", "&#x1F619;"],
 	        "triumph": ["1F624", "&#x1F624;"],
 	        "neutral_face": ["1F610", "&#x1F610;"],
 	        "laughing": ["1F606", "&#x1F606;"],
 	        "hushed": ["1F62F", "&#x1F62F;"],
 	        "disappointed_relieved": ["1F625", "&#x1F625;"],
-	        "anguished": ["1F627", "&#x1F627;"],
 	        "weary": ["1F629", "&#x1F629;"],
 	        "flushed": ["1F633", "&#x1F633;"],
 	        "unamused": ["1F612", "&#x1F612;"],
@@ -22805,7 +22337,7 @@
 	};
 
 /***/ },
-/* 163 */
+/* 162 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -22815,52 +22347,43 @@
 	var utils = __webpack_require__(156);
 	var RenderDebugger = __webpack_require__(157).RenderDebugger;
 	var MegaRenderMixin = __webpack_require__(157).MegaRenderMixin;
-	var ButtonsUI = __webpack_require__(159);
-	var ModalDialogsUI = __webpack_require__(164);
-	var DropdownsUI = __webpack_require__(160);
-	var ContactsUI = __webpack_require__(161);
+	var ButtonsUI = __webpack_require__(158);
+	var ModalDialogsUI = __webpack_require__(163);
+	var DropdownsUI = __webpack_require__(159);
+	var ContactsUI = __webpack_require__(160);
 	var ConversationsUI = __webpack_require__(155);
-	var TypingAreaUI = __webpack_require__(167);
-	var WhosTyping = __webpack_require__(168).WhosTyping;
-	var getMessageString = __webpack_require__(169).getMessageString;
-	var PerfectScrollbar = __webpack_require__(158).PerfectScrollbar;
-	var ParticipantsList = __webpack_require__(170).ParticipantsList;
+	var TypingAreaUI = __webpack_require__(166);
+	var getMessageString = __webpack_require__(167).getMessageString;
 
-	var GenericConversationMessage = __webpack_require__(171).GenericConversationMessage;
-	var AlterParticipantsConversationMessage = __webpack_require__(173).AlterParticipantsConversationMessage;
-	var TruncatedMessage = __webpack_require__(174).TruncatedMessage;
-	var PrivilegeChange = __webpack_require__(175).PrivilegeChange;
+	var GenericConversationMessage = __webpack_require__(168).GenericConversationMessage;
+	var AlterParticipantsConversationMessage = __webpack_require__(170).AlterParticipantsConversationMessage;
+	var TruncatedMessage = __webpack_require__(171).TruncatedMessage;
 
 	var ConversationRightArea = React.createClass({
 	    displayName: "ConversationRightArea",
 
-	    mixins: [MegaRenderMixin],
-	    getDefaultProps: function getDefaultProps() {
-	        return {
-	            'requiresUpdateOnResize': true
-	        };
-	    },
-	    allContactsInChat: function allContactsInChat(participants) {
+	    mixins: [MegaRenderMixin, RenderDebugger],
+	    componentDidUpdate: function componentDidUpdate() {
 	        var self = this;
-	        if (participants.length === 0) {
-	            return false;
+	        if (!self.isMounted()) {
+	            return;
 	        }
 
-	        var currentContacts = self.props.contacts;
-	        var foundNonMembers = 0;
-	        currentContacts.forEach(function (u, k) {
-	            if (u.c === 1) {
-	                if (participants.indexOf(k) === -1) {
-	                    foundNonMembers++;
-	                }
-	            }
-	        });
+	        var $node = $(self.findDOMNode());
 
-	        if (foundNonMembers > 0) {
-	            return false;
-	        } else {
-	            return true;
+	        var fitHeight = $('.chat-contacts-list .jspPane', $node).height();
+
+	        if (fitHeight === 0) {
+	            return;
 	        }
+
+	        var maxHeight = $('.chat-right-pad', $node).innerHeight() - $('.buttons-block', $node).innerHeight();
+
+	        if (maxHeight < fitHeight) {
+	            fitHeight = Math.max(maxHeight, 48);
+	        }
+
+	        $('.chat-contacts-list', $node).height(fitHeight);
 	    },
 	    render: function render() {
 	        var self = this;
@@ -22870,22 +22393,17 @@
 
 	            return null;
 	        }
-	        var contactJid;
-	        var contact;
-	        var contacts = room.getParticipantsExceptMe();
-	        if (contacts && contacts.length > 0) {
-	            contactJid = contacts[0];
-	            contact = room.megaChat.getContactFromJid(contactJid);
-	        } else {
-	            contact = {};
-	        }
+	        var contactJid = room.getParticipantsExceptMe()[0];
+	        var contact = room.megaChat.getContactFromJid(contactJid);
 
-	        if (!room.isCurrentlyActive && !self._wasAppendedEvenOnce) {
+	        if (!contact) {
+
 	            return null;
 	        }
-	        self._wasAppendedEvenOnce = true;
 
-	        var myPresence = room.megaChat.xmppPresenceToCssClass(M.u[u_handle].presence);
+	        if (!room.isCurrentlyActive) {
+	            return null;
+	        }
 
 	        var startAudioCallButton = React.makeElement(
 	            "div",
@@ -22931,15 +22449,97 @@
 	            endCallButton = null;
 	        }
 
+	        var contactsList = [];
+
+	        var contacts = room.type === "group" ? room.members && Object.keys(room.members).length > 0 ? Object.keys(room.members) : room.getContactParticipantsExceptMe() : room.getContactParticipantsExceptMe();
+
+	        contacts.forEach(function (contactHash) {
+	            var contact = M.u[contactHash];
+	            if (contact && contactHash != u_handle) {
+	                var dropdowns = [];
+	                var privilege = null;
+
+	                var dropdownIconClasses = "small-icon tiny-icon grey-down-arrow";
+
+	                if (room.type === "group" && room.members) {
+	                    var removeParticipantButton = React.makeElement(DropdownsUI.DropdownItem, {
+	                        key: "remove", icon: "rounded-stop", label: __(l[8867]), onClick: function onClick() {
+	                            $(room).trigger('onRemoveUserRequest', [contactHash]);
+	                        } });
+
+	                    if (room.iAmOperator()) {
+
+	                        dropdowns.push(React.makeElement(
+	                            "div",
+	                            { key: "setPermLabel", className: "dropdown-items-info" },
+	                            __(l[8868])
+	                        ));
+
+	                        dropdowns.push(React.makeElement(DropdownsUI.DropdownItem, {
+	                            key: "privReadOnly", icon: "eye-icon",
+	                            className: "tick-item " + (room.members[contactHash] === 0 ? "active" : ""),
+	                            label: __(l[8873]), onClick: function onClick() {
+	                                if (room.members[contactHash] !== 0) {
+	                                    $(room).trigger('alterUserPrivilege', [contactHash, 0]);
+	                                }
+	                            } }));
+
+	                        dropdowns.push(React.makeElement(DropdownsUI.DropdownItem, {
+	                            key: "privFullAcc", icon: "conversation-icon",
+	                            className: "tick-item " + (room.members[contactHash] === 2 ? "active" : ""),
+	                            label: __(l[8874]), onClick: function onClick() {
+	                                if (room.members[contactHash] !== 2) {
+	                                    $(room).trigger('alterUserPrivilege', [contactHash, 2]);
+	                                }
+	                            } }));
+
+	                        dropdowns.push(React.makeElement(DropdownsUI.DropdownItem, {
+	                            key: "privOperator", icon: "cogwheel-icon",
+<<<<<<< HEAD
+	                            label: __(l[8875]),
+=======
+	                            label: __("Moderator"),
+>>>>>>> 6bc3f3a01a36a153bf44fa58cf3eefa088bafde5
+	                            className: "tick-item " + (room.members[contactHash] === 3 ? "active" : ""),
+	                            onClick: function onClick() {
+	                                if (room.members[contactHash] !== 3) {
+	                                    $(room).trigger('alterUserPrivilege', [contactHash, 3]);
+	                                }
+	                            } }));
+	                    } else if (room.members[u_handle] === 2) {} else if (room.members[u_handle] === 1) {} else if (room.isReadOnly()) {} else {}
+
+	                    if (room.members[contactHash] === 3) {
+	                        dropdownIconClasses = "small-icon cogwheel-icon";
+	                    } else if (room.members[contactHash] === 2) {
+	                        dropdownIconClasses = "small-icon conversation-icon";
+	                    } else if (room.members[contactHash] === 0) {
+	                        dropdownIconClasses = "small-icon eye-icon";
+	                    } else {}
+	                    dropdowns.push(removeParticipantButton);
+	                }
+
+	                contactsList.push(React.makeElement(ContactsUI.ContactCard, {
+	                    key: contact.u,
+	                    contact: contact,
+	                    megaChat: room.megaChat,
+	                    className: "right-chat-contact-card",
+	                    dropdownPositionMy: "right top",
+	                    dropdownPositionAt: "right bottom",
+	                    dropdowns: dropdowns,
+	                    dropdownDisabled: !room.iAmOperator(),
+	                    dropdownButtonClasses: room.type == "group" ? "button icon-dropdown" : "default-white-button tiny-button",
+	                    dropdownIconClasses: dropdownIconClasses
+	                }));
+	            }
+	        });
+
 	        var isReadOnlyElement = null;
 
 	        if (room.isReadOnly()) {}
 	        var excludedParticipants = room.type === "group" ? room.members && Object.keys(room.members).length > 0 ? Object.keys(room.members) : room.getContactParticipants() : room.getContactParticipants();
 
-	        removeValue(excludedParticipants, u_handle, false);
-
 	        var dontShowTruncateButton = false;
-	        if (myPresence === 'offline' || !room.iAmOperator() || room.isReadOnly() || room.messagesBuff.messages.length === 0 || room.messagesBuff.messages.length === 1 && room.messagesBuff.messages.getItem(0).dialogType === "truncated") {
+	        if (!room.iAmOperator() || room.messagesBuff.messages.length === 0 || room.messagesBuff.messages.length === 1 && room.messagesBuff.messages.getItem(0).dialogType === "truncated") {
 	            dontShowTruncateButton = true;
 	        }
 
@@ -22973,8 +22573,19 @@
 	                    { className: "chat-right-pad" },
 	                    isReadOnlyElement,
 	                    membersHeader,
-	                    React.makeElement(ParticipantsList, { chatRoom: room, members: room.members,
-	                        isCurrentlyActive: room.isCurrentlyActive }),
+	                    React.makeElement(
+	                        "div",
+	                        { className: "chat-contacts-list" },
+	                        React.makeElement(
+	                            utils.JScrollPane,
+	                            { chatRoom: room },
+	                            React.makeElement(
+	                                "div",
+	                                { className: "chat-contacts-list-inner" },
+	                                contactsList
+	                            )
+	                        )
+	                    ),
 	                    React.makeElement(
 	                        "div",
 	                        { className: "buttons-block" },
@@ -22987,7 +22598,7 @@
 	                                icon: "rounded-grey-plus",
 	                                label: __(l[8007]),
 	                                contacts: this.props.contacts,
-	                                disabled: !(!self.allContactsInChat(excludedParticipants) && !room.isReadOnly() && room.iAmOperator()) || myPresence === 'offline'
+	                                disabled: !(excludedParticipants.length !== this.props.contacts.length && !room.isReadOnly() && room.iAmOperator())
 	                            },
 	                            React.makeElement(DropdownsUI.DropdownContactsSelector, {
 	                                contacts: this.props.contacts,
@@ -23000,7 +22611,6 @@
 	                                multipleSelectedButtonLabel: __(l[8869]),
 	                                nothingSelectedButtonLabel: __(l[8870]),
 	                                onSelectDone: this.props.onAddParticipantSelected,
-	                                disabled: myPresence === 'offline',
 	                                positionMy: "center top",
 	                                positionAt: "left bottom"
 	                            })
@@ -23011,7 +22621,7 @@
 	                                className: "link-button dropdown-element",
 	                                icon: "rounded-grey-up-arrow",
 	                                label: __(l[6834] + "..."),
-	                                disabled: room.isReadOnly() || myPresence === 'offline'
+	                                disabled: room.isReadOnly()
 	                            },
 	                            React.makeElement(
 	                                DropdownsUI.Dropdown,
@@ -23038,9 +22648,15 @@
 	                                    }
 	                                } },
 	                            React.makeElement("i", { className: "small-icon rounded-stop" }),
+<<<<<<< HEAD
 	                            __(l[8871])
 	                        ) : null,
-	                        myPresence !== 'offline' && room.type === "group" && !room.stateIsLeftOrLeaving() ? React.makeElement(
+	                        room.type === "group" ? React.makeElement(
+=======
+	                            __("Clear chat history")
+	                        ) : null,
+	                        room.type === "group" && !room.stateIsLeftOrLeaving() ? React.makeElement(
+>>>>>>> 6bc3f3a01a36a153bf44fa58cf3eefa088bafde5
 	                            "div",
 	                            { className: "link-button red", onClick: function onClick() {
 	                                    if (self.props.onLeaveClicked) {
@@ -23049,6 +22665,8 @@
 	                                } },
 	                            React.makeElement("i", { className: "small-icon rounded-stop" }),
 	                            l[8633]
+<<<<<<< HEAD
+=======
 	                        ) : null,
 	                        room.type === "group" && room.stateIsLeftOrLeaving() ? React.makeElement(
 	                            "div",
@@ -23059,6 +22677,7 @@
 	                                } },
 	                            React.makeElement("i", { className: "small-icon rounded-stop" }),
 	                            l[148]
+>>>>>>> 6bc3f3a01a36a153bf44fa58cf3eefa088bafde5
 	                        ) : null
 	                    )
 	                )
@@ -23136,7 +22755,6 @@
 	            } else if (!!$(document).fullScreen() && room.isCurrentlyActive) {
 	                self.setState({ fullScreenModeEnabled: true });
 	            }
-	            self.forceUpdate();
 	        });
 
 	        var $localMediaDisplay = $('.call.local-video, .call.local-audio', $container);
@@ -23467,24 +23085,33 @@
 	            localVideoIsMinimized: false,
 	            isFullscreenModeEnabled: false,
 	            mouseOverDuringCall: false,
+	            currentlyTyping: [],
 	            attachCloudDialog: false,
 	            messagesToggledInCall: false,
 	            sendContactDialog: false,
 	            confirmDeleteDialog: false,
-	            messageToBeDeleted: null,
-	            editing: false
+	            messageToBeDeleted: null
 	        };
 	    },
 
 	    uploadFromComputer: function uploadFromComputer() {
 	        $('#fileselect3').trigger('click');
 	    },
-	    refreshUI: function refreshUI() {
+	    refreshUI: function refreshUI(scrollToBottom) {
 	        var self = this;
 	        var room = self.props.chatRoom;
 
 	        if (!self.props.chatRoom.isCurrentlyActive) {
 	            return;
+	        }
+
+	        var $jsp = self.$messages.data("jsp");
+	        if ($jsp) {
+	            var perc = $jsp.getPercentScrolledY();
+	            self.$messages.trigger('forceResize', [true, scrollToBottom ? self.lastScrollPositionPerc ? self.lastScrollPositionPerc : -1 : perc]);
+	            if (scrollToBottom) {
+	                self.lastScrollPositionPerc = 1;
+	            }
 	        }
 
 	        room.renderContactTree();
@@ -23494,45 +23121,29 @@
 	        room.trigger('RefreshUI');
 	    },
 
-	    onMouseMove: SoonFc(function (e) {
+	    onMouseMove: function onMouseMove(e) {
 	        var self = this;
 	        var chatRoom = self.props.chatRoom;
 	        if (self.isMounted()) {
 	            chatRoom.trigger("onChatIsFocused");
 	        }
-	    }, 150),
+	    },
 
-	    handleKeyDown: SoonFc(function (e) {
+	    handleKeyDown: function handleKeyDown(e) {
 	        var self = this;
 	        var chatRoom = self.props.chatRoom;
 	        if (self.isMounted() && chatRoom.isActive()) {
 	            chatRoom.trigger("onChatIsFocused");
 	        }
-	    }, 150),
+	    },
 	    componentDidMount: function componentDidMount() {
 	        var self = this;
 	        window.addEventListener('resize', self.handleWindowResize);
 	        window.addEventListener('keydown', self.handleKeyDown);
 
-	        self.props.chatRoom.rebind('call-ended.jspHistory call-declined.jspHistory', function (e, eventData) {
-	            self.callJustEnded = true;
-	        });
+	        var $container = $(ReactDOM.findDOMNode(self));
 
-	        self.eventuallyInit();
-	    },
-	    eventuallyInit: function eventuallyInit(doResize) {
-	        var self = this;
-
-	        if (self.initialised) {
-	            return;
-	        }
-	        var $container = $(self.findDOMNode());
-
-	        if ($container.length > 0) {
-	            self.initialised = true;
-	        }
-
-	        self.$messages = $('.messages.scroll-area > .perfectScrollbarContainer', $container);
+	        self.$messages = $('.messages.scroll-area > .jScrollPaneContainer', $container);
 
 	        var droppableConfig = {
 	            tolerance: 'pointer',
@@ -23554,6 +23165,45 @@
 	        self.lastScrollHeight = 0;
 	        self.lastUpdatedScrollHeight = 0;
 
+	        self.$messages.rebind('jsp-user-scroll-y.conversationsPanel' + self.props.chatRoom.roomJid, function (e, scrollPositionY, isAtTop, isAtBottom) {
+	            var $jsp = self.$messages.data("jsp");
+
+	            if (self.lastScrollPosition === scrollPositionY || self.scrolledToBottom !== 1) {
+	                return;
+	            }
+
+	            if (scrollPositionY < 350 && !isAtBottom && self.$messages.is(":visible")) {
+	                if (self.lastUpdatedScrollHeight !== $jsp.getContentHeight() && !self.props.chatRoom.messagesBuff.messagesHistoryIsLoading() && self.props.chatRoom.messagesBuff.haveMoreHistory()) {
+	                    self.props.chatRoom.messagesBuff.retrieveChatHistory();
+	                    self.forceUpdate();
+	                    self.lastUpdatedScrollHeight = $jsp.getContentHeight();
+	                }
+	            }
+
+	            if (isAtBottom) {
+	                self.lastScrolledToBottom = true;
+	            } else {
+	                self.lastScrolledToBottom = false;
+	            }
+
+	            self.lastScrollHeight = $jsp.getContentHeight();
+	            self.lastScrollPosition = scrollPositionY;
+	            self.lastScrollPositionPerc = $jsp.getPercentScrolledY();
+	        });
+
+	        self.$messages.rebind('jsp-initialised.conversationsPanel' + self.props.chatRoom.roomJid, function (e) {
+	            var $jsp = self.$messages.data("jsp");
+
+	            if (self.lastScrolledToBottom === true) {
+	                $jsp.scrollToBottom();
+	                self.lastScrollPositionPerc = 1;
+	            } else {
+	                var prevPosY = $jsp.getContentHeight() - self.lastScrollHeight + self.lastScrollPosition;
+
+	                $jsp.scrollToY(prevPosY);
+	            }
+	        });
+
 	        var room = self.props.chatRoom;
 
 	        $(document).unbind("fullscreenchange.megaChat_" + room.roomJid).bind("fullscreenchange.megaChat_" + room.roomJid, function () {
@@ -23562,12 +23212,8 @@
 	            } else if (!!$(document).fullScreen() && room.isCurrentlyActive) {
 	                self.setState({ isFullscreenModeEnabled: true });
 	            }
-	            self.forceUpdate();
 	        });
-
-	        if (doResize !== false) {
-	            self.handleWindowResize();
-	        }
+	        self.handleWindowResize();
 	    },
 	    componentWillMount: function componentWillMount() {
 	        var self = this;
@@ -23576,6 +23222,49 @@
 
 	        $(chatRoom.messagesBuff).rebind('onHistoryFinished.cp', function () {
 	            self.eventuallyUpdate();
+	        });
+
+	        megaChat.karere.bind("onComposingMessage." + chatRoom.roomJid, function (e, eventObject) {
+	            if (!self.isMounted()) {
+	                return;
+	            }
+	            if (Karere.getNormalizedFullJid(eventObject.getFromJid()) === megaChat.karere.getJid()) {
+	                return;
+	            }
+
+	            var room = megaChat.chats[eventObject.getRoomJid()];
+	            if (room.roomJid == chatRoom.roomJid) {
+	                var currentlyTyping = self.state.currentlyTyping;
+	                currentlyTyping.push(megaChat.getContactFromJid(Karere.getNormalizedBareJid(eventObject.getFromJid())).u);
+	                currentlyTyping = array_unique(currentlyTyping);
+	                self.setState({
+	                    currentlyTyping: currentlyTyping
+	                });
+	            }
+	        });
+
+	        megaChat.karere.rebind("onPausedMessage." + chatRoom.roomJid, function (e, eventObject) {
+	            var room = megaChat.chats[eventObject.getRoomJid()];
+
+	            if (!self.isMounted()) {
+	                return;
+	            }
+	            if (Karere.getNormalizedFullJid(eventObject.getFromJid()) === megaChat.karere.getJid()) {
+	                return;
+	            }
+
+	            if (room.roomJid === chatRoom.roomJid) {
+	                var currentlyTyping = self.state.currentlyTyping;
+	                var u_h = megaChat.getContactFromJid(Karere.getNormalizedBareJid(eventObject.getFromJid())).u;
+
+	                if (currentlyTyping.indexOf(u_h) > -1) {
+	                    removeValue(currentlyTyping, u_h);
+	                    self.setState({
+	                        currentlyTyping: currentlyTyping
+	                    });
+	                    self.forceUpdate();
+	                }
+	            }
 	        });
 	    },
 	    componentWillUnmount: function componentWillUnmount() {
@@ -23586,66 +23275,27 @@
 	        window.removeEventListener('resize', self.handleWindowResize);
 	        window.removeEventListener('keydown', self.handleKeyDown);
 	        $(document).unbind("fullscreenchange.megaChat_" + chatRoom.roomJid);
+
+	        megaChat.karere.bind("onComposingMessage." + chatRoom.roomJid);
+	        megaChat.karere.unbind("onPausedMessage." + chatRoom.roomJid);
 	    },
-	    componentDidUpdate: function componentDidUpdate(prevProps, prevState) {
+	    componentDidUpdate: function componentDidUpdate() {
 	        var self = this;
 	        var room = this.props.chatRoom;
 
-	        self.eventuallyInit(false);
-
 	        room.megaChat.updateSectionUnreadCount();
 
-	        var $node = $(self.findDOMNode());
-
-	        if (self.loadingShown) {
-	            $('.js-messages-loading', $node).removeClass('hidden');
-	        } else {
-	            $('.js-messages-loading', $node).addClass('hidden');
-	        }
 	        self.handleWindowResize();
-
-	        if (prevState.messagesToggledInCall !== self.state.messagesToggledInCall || self.callJustEnded) {
-	            if (self.callJustEnded) {
-	                self.callJustEnded = false;
-	            }
-	            self.$messages.trigger('forceResize', [true, 1]);
-	            Soon(function () {
-	                self.messagesListScrollable.scrollToBottom(true);
-	            });
-	        }
-
-	        if (prevProps.isActive === false && self.props.isActive === true) {
-	            var $typeArea = $('.messages-textarea:visible:first', $node);
-	            if ($typeArea.size() === 1) {
-	                $typeArea.focus();
-	                moveCursortoToEnd($typeArea[0]);
-	            }
-	        }
-
-	        if (prevState.editing === false && self.state.editing !== false) {
-	            if (self.messagesListScrollable) {
-	                self.messagesListScrollable.reinitialise(false);
-
-	                Soon(function () {
-	                    if (self.editDomElement && self.editDomElement.size() === 1) {
-	                        self.messagesListScrollable.scrollToElement(self.editDomElement[0], false);
-	                    }
-	                });
-	            }
-	        }
 	    },
 	    handleWindowResize: function handleWindowResize(e, scrollToBottom) {
 	        var $container = $(ReactDOM.findDOMNode(this));
 	        var self = this;
 
-	        self.eventuallyInit(false);
-
-	        if (!self.isMounted() || !self.$messages || !self.isComponentEventuallyVisible()) {
+	        if (!self.props.chatRoom.isCurrentlyActive || !self.isMounted() || !self.$messages) {
 	            return;
 	        }
 
 	        var scrollBlockHeight = $('.chat-content-block', $container).outerHeight() - $('.call-block', $container).outerHeight() - $('.chat-textarea-block', $container).outerHeight();
-
 	        if (scrollBlockHeight != self.$messages.outerHeight()) {
 	            self.$messages.css('height', scrollBlockHeight);
 	            $('.messages.main-pad', self.$messages).css('min-height', scrollBlockHeight);
@@ -23653,94 +23303,17 @@
 	        } else {
 	            self.refreshUI(scrollToBottom);
 	        }
+
+	        if (!self.scrolledToBottom) {
+	            var $messagesPad = $('.messages.main-pad', self.$messages);
+	            if ($messagesPad.outerHeight() - 1 > $messagesPad.parent().parent().parent().outerHeight()) {
+	                self.scrolledToBottom = 1;
+	                self.$messages.data("jsp").scrollToBottom();
+	            }
+	        }
 	    },
 	    isActive: function isActive() {
 	        return document.hasFocus() && this.$messages && this.$messages.is(":visible");
-	    },
-	    onMessagesScrollReinitialise: function onMessagesScrollReinitialise(ps, $elem, forced, scrollPositionYPerc, scrollToElement) {
-	        var self = this;
-	        var chatRoom = self.props.chatRoom;
-	        var mb = chatRoom.messagesBuff;
-
-	        if (self.isRetrievingHistoryViaScrollPull || mb.isRetrievingHistory) {
-	            return;
-	        }
-
-	        if (forced) {
-	            if (!scrollPositionYPerc && !scrollToElement) {
-	                if (self.scrolledToBottom && !self.editDomElement) {
-	                    ps.scrollToBottom(true);
-	                    return true;
-	                }
-	            } else {
-
-	                return;
-	            }
-	        }
-
-	        if (self.isComponentEventuallyVisible()) {
-	            if (self.scrolledToBottom && !self.editDomElement) {
-	                ps.scrollToBottom(true);
-	                return true;
-	            }
-	            if (self.lastScrollPosition !== ps.getScrollPositionY() && !self.editDomElement) {
-	                ps.scrollToY(self.lastScrollPosition, true);
-	                return true;
-	            }
-	        }
-	    },
-	    onMessagesScrollUserScroll: function onMessagesScrollUserScroll(ps, $elem, e) {
-	        var self = this;
-
-	        var scrollPositionY = ps.getScrollPositionY();
-	        var isAtTop = ps.isAtTop();
-	        var isAtBottom = ps.isAtBottom();
-
-	        if (isAtBottom === true) {
-	            self.scrolledToBottom = true;
-	        } else {
-	            self.scrolledToBottom = false;
-	        }
-	        if (isAtTop || ps.getScrollHeight() < 80) {
-	            var chatRoom = self.props.chatRoom;
-	            var mb = chatRoom.messagesBuff;
-	            if (mb.haveMoreHistory() && !self.isRetrievingHistoryViaScrollPull) {
-	                mb.retrieveChatHistory();
-	                self.isRetrievingHistoryViaScrollPull = true;
-	                self.lastScrollPosition = scrollPositionY;
-
-	                self.lastContentHeightBeforeHist = ps.getScrollHeight();
-	                $(mb).unbind('onHistoryFinished.pull');
-	                $(mb).one('onHistoryFinished.pull', function () {
-	                    setTimeout(function () {
-
-	                        self.isRetrievingHistoryViaScrollPull = false;
-	                        self.justFinishedRetrievingHistory = false;
-
-	                        self.justFinishedRetrievingHistory = false;
-	                        var prevPosY = ps.getScrollHeight() - self.lastContentHeightBeforeHist + self.lastScrollPosition;
-
-	                        delete self.lastContentHeightBeforeHist;
-
-	                        self.lastScrollPosition = prevPosY;
-
-	                        ps.scrollToY(prevPosY, true);
-	                        self.forceUpdate();
-	                    }, 1000);
-	                });
-	            }
-	        }
-
-	        if (self.lastScrollPosition !== ps.getScrollPositionY()) {
-	            self.lastScrollPosition = ps.getScrollPositionY();
-	        }
-	    },
-	    specificShouldComponentUpdate: function specificShouldComponentUpdate() {
-	        if (this.isRetrievingHistoryViaScrollPull && this.loadingShown || this.props.chatRoom.messagesBuff.messagesHistoryIsLoading() && this.loadingShown || !this.props.chatRoom.isCurrentlyActive) {
-	            return false;
-	        } else {
-	            return undefined;
-	        }
 	    },
 	    render: function render() {
 	        var self = this;
@@ -23749,19 +23322,8 @@
 	        if (!room || !room.roomJid) {
 	            return null;
 	        }
-
-	        if (!room.isCurrentlyActive && !self._wasAppendedEvenOnce) {
-	            return null;
-	        }
-	        self._wasAppendedEvenOnce = true;
-
-	        var contacts = room.getParticipantsExceptMe();
-	        var contactJid;
-	        var contact;
-	        if (contacts && contacts.length > 0) {
-	            contactJid = contacts[0];
-	            contact = room.megaChat.getContactFromJid(contactJid);
-	        }
+	        var contactJid = room.getParticipantsExceptMe()[0];
+	        var contact = room.megaChat.getContactFromJid(contactJid);
 
 	        var conversationPanelClasses = "conversation-panel";
 
@@ -23769,18 +23331,25 @@
 	            conversationPanelClasses += " hidden";
 	        }
 
-	        var avatarMeta = contact ? generateAvatarMeta(contact.u) : {};
+	        if (!contact) {
+	            return null;
+	        }
+	        var avatarMeta = generateAvatarMeta(contact.u);
 	        var contactName = avatarMeta.fullName;
 
 	        var messagesList = [];
 
-	        if (self.isRetrievingHistoryViaScrollPull && !self.loadingShown || self.props.chatRoom.messagesBuff.messagesHistoryIsLoading() === true || self.props.chatRoom.messagesBuff.joined === false || self.props.chatRoom.messagesBuff.joined === true && self.props.chatRoom.messagesBuff.haveMessages === true && self.props.chatRoom.messagesBuff.messagesHistoryIsLoading() === true) {
-	            if (localStorage.megaChatPresence !== 'unavailable') {
-	                self.loadingShown = true;
-	            }
-	        } else if (self.props.chatRoom.messagesBuff.joined === true && (self.props.chatRoom.messagesBuff.messages.length === 0 || !self.props.chatRoom.messagesBuff.haveMoreHistory())) {
-	            delete self.loadingShown;
-	            var headerText = self.props.chatRoom.messagesBuff.messages.length === 0 ? __(l[8002]) : __(l[8002]);
+	        if (self.props.messagesBuff.messagesHistoryIsLoading() === true || self.props.messagesBuff.joined === false || self.props.messagesBuff.joined === true && self.props.messagesBuff.haveMessages === true && self.props.messagesBuff.messagesHistoryIsLoading() === true) {
+	            var loadingStyles = {
+	                top: self.$messages ? self.$messages.outerHeight() / 2 : "50%"
+	            };
+	            messagesList.push(React.makeElement(
+	                "div",
+	                { className: "loading-spinner light active manual-management", key: "loadingSpinner", style: loadingStyles },
+	                React.makeElement("div", { className: "main-loader" })
+	            ));
+	        } else if (self.props.messagesBuff.joined === true && (self.props.messagesBuff.messages.length === 0 || !self.props.messagesBuff.haveMoreHistory())) {
+	            var headerText = self.props.messagesBuff.messages.length === 0 ? __(l[8002]) : __(l[8002]);
 
 	            headerText = headerText.replace("%s", "<span>" + htmlentities(contactName) + "</span>");
 
@@ -23810,8 +23379,6 @@
 	                    )
 	                )
 	            ));
-	        } else {
-	            delete self.loadingShown;
 	        }
 	        var lastTimeMarker;
 	        var lastMessageFrom = null;
@@ -23819,7 +23386,7 @@
 	        var lastMessageState = null;
 	        var grouped = false;
 
-	        self.props.chatRoom.messagesBuff.messages.forEach(function (v, k) {
+	        self.props.messagesBuff.messages.forEach(function (v, k) {
 	            if (!v.protocol && v.revoked !== true) {
 	                var shouldRender = true;
 	                if (v.isManagement && v.isManagement() === true && v.isRenderableManagement() === false) {
@@ -23827,15 +23394,7 @@
 	                }
 
 	                var timestamp = v.delay;
-	                var curTimeMarker;
-	                var iso = new Date(timestamp * 1000).toISOString();
-	                if (todayOrYesterday(iso)) {
-
-	                    curTimeMarker = time2lastSeparator(iso);
-	                } else {
-
-	                    curTimeMarker = acc_time2date(timestamp, true);
-	                }
+	                var curTimeMarker = time2lastSeparator(new Date(timestamp * 1000).toISOString());
 	                var currentState = v.getState ? v.getState() : null;
 
 	                if (shouldRender === true && curTimeMarker && lastTimeMarker !== curTimeMarker) {
@@ -23861,7 +23420,7 @@
 	                        }
 	                    }
 
-	                    if ((v instanceof KarereEventObjects.OutgoingMessage || v instanceof Message) && v.keyid !== 0) {
+	                    if (v instanceof KarereEventObjects.OutgoingMessage || v instanceof Message) {
 
 	                        if (!lastMessageFrom || userId && lastMessageFrom === userId) {
 	                            if (timestamp - lastGroupedMessageTimeStamp < 5 * 60) {
@@ -23893,6 +23452,7 @@
 	                    if (v.dialogType === 'alterParticipants') {
 	                        messageInstance = React.makeElement(AlterParticipantsConversationMessage, {
 	                            message: v,
+	                            chatRoom: room,
 	                            key: v.messageId,
 	                            contact: M.u[v.userId],
 	                            grouped: grouped
@@ -23900,13 +23460,7 @@
 	                    } else if (v.dialogType === 'truncated') {
 	                        messageInstance = React.makeElement(TruncatedMessage, {
 	                            message: v,
-	                            key: v.messageId,
-	                            contact: M.u[v.userId],
-	                            grouped: grouped
-	                        });
-	                    } else if (v.dialogType === 'privilegeChange') {
-	                        messageInstance = React.makeElement(PrivilegeChange, {
-	                            message: v,
+	                            chatRoom: room,
 	                            key: v.messageId,
 	                            contact: M.u[v.userId],
 	                            grouped: grouped
@@ -23915,14 +23469,9 @@
 
 	                    messagesList.push(messageInstance);
 	                } else {
-	                    if (!v.chatRoom) {
-
-	                        v.chatRoom = room;
-	                    }
-
 	                    messagesList.push(React.makeElement(GenericConversationMessage, {
 	                        message: v,
-	                        state: v.state,
+	                        chatRoom: room,
 	                        key: v.messageId,
 	                        contact: contact,
 	                        grouped: grouped,
@@ -23930,16 +23479,16 @@
 	                            self.onResizeDoUpdate();
 	                        },
 	                        onEditStarted: function onEditStarted($domElement) {
-	                            self.editDomElement = $domElement;
-	                            self.setState({ 'editing': v });
-	                            self.forceUpdate();
+	                            var $jsp = self.$messages.data('jsp');
+	                            setTimeout(function () {
+	                                $jsp.scrollToElement($domElement);
+	                            }, 90);
 	                        },
 	                        onEditDone: function onEditDone(messageContents) {
-	                            self.editDomElement = null;
-
 	                            var currentContents = v.textContents ? v.textContents : v.contents;
 	                            if (messageContents === false || messageContents === currentContents) {
-	                                self.messagesListScrollable.scrollToBottom(true);
+	                                var $jsp = self.$messages.data('jsp');
+	                                $jsp.scrollToBottom();
 	                                self.lastScrollPositionPerc = 1;
 	                            } else if (messageContents) {
 	                                room.megaChat.plugins.chatdIntegration.updateMessage(room, v.internalId ? v.internalId : v.orderValue, messageContents);
@@ -23961,7 +23510,8 @@
 
 	                                $(v).trigger('onChange', [v, "textContents", "", messageContents]);
 
-	                                self.messagesListScrollable.scrollToBottom(true);
+	                                var $jsp = self.$messages.data('jsp');
+	                                $jsp.scrollToBottom();
 	                                self.lastScrollPositionPerc = 1;
 	                            } else if (messageContents.length === 0) {
 
@@ -23970,20 +23520,61 @@
 	                                    'messageToBeDeleted': v
 	                                });
 	                            }
-
-	                            self.setState({ 'editing': false });
 	                        },
 	                        onDeleteClicked: function onDeleteClicked(e, msg) {
 	                            self.setState({
 	                                'confirmDeleteDialog': true,
 	                                'messageToBeDeleted': msg
 	                            });
-	                            self.forceUpdate();
 	                        }
 	                    }));
 	                }
 	            }
 	        });
+
+	        var typingElement;
+
+	        if (self.state.currentlyTyping.length > 0) {
+	            var names = self.state.currentlyTyping.map(function (u_h) {
+	                var avatarMeta = generateAvatarMeta(u_h);
+	                return avatarMeta.fullName.split(" ")[0];
+	            });
+
+	            var namesDisplay = "";
+	            var areMultipleUsersTyping = false;
+
+	            if (names.length > 1) {
+	                areMultipleUsersTyping = true;
+	                namesDisplay = [names.splice(0, names.length - 1).join(", "), names[0]];
+	            } else {
+	                areMultipleUsersTyping = false;
+	                namesDisplay = [names[0]];
+	            }
+
+	            var msg;
+	            if (areMultipleUsersTyping === true) {
+	                msg = __(l[8872]).replace("%1", namesDisplay[0]).replace("%2", namesDisplay[1]);
+	            } else {
+	                msg = __(l[8629]).replace("%1", namesDisplay[0]);
+	            }
+
+	            typingElement = React.makeElement(
+	                "div",
+	                { className: "typing-block" },
+	                React.makeElement(
+	                    "div",
+	                    { className: "typing-text" },
+	                    msg
+	                ),
+	                React.makeElement(
+	                    "div",
+	                    { className: "typing-bounce" },
+	                    React.makeElement("div", { className: "typing-bounce1" }),
+	                    React.makeElement("div", { className: "typing-bounce2" }),
+	                    React.makeElement("div", { className: "typing-bounce3" })
+	                )
+	            );
+	        } else {}
 
 	        var attachCloudDialog = null;
 	        if (self.state.attachCloudDialog === true) {
@@ -24044,16 +23635,13 @@
 	                        if (!msg) {
 	                            return;
 	                        }
-	                        var chatdint = room.megaChat.plugins.chatdIntegration;
 	                        if (msg.getState() === Message.STATE.SENT || msg.getState() === Message.STATE.DELIVERED || msg.getState() === Message.STATE.NOT_SENT) {
-	                            chatdint.deleteMessage(room, msg.internalId ? msg.internalId : msg.orderValue);
+	                            room.megaChat.plugins.chatdIntegration.deleteMessage(room, msg.internalId ? msg.internalId : msg.orderValue);
 	                        } else if (msg.getState() === Message.STATE.NOT_SENT_EXPIRED) {
-	                            chatdint.discardMessage(room, msg.internalId ? msg.internalId : msg.orderValue);
+	                            room.megaChat.plugins.chatdIntegration.discardMessage(room, msg.internalId ? msg.internalId : msg.orderValue);
 	                        }
 
 	                        msg.message = "";
-	                        msg.contents = "";
-	                        msg.messageHtml = "";
 	                        msg.deleted = true;
 
 	                        self.setState({
@@ -24073,8 +23661,8 @@
 	                    React.makeElement(GenericConversationMessage, {
 	                        className: "dialog-wrapper",
 	                        message: self.state.messageToBeDeleted,
-	                        hideActionButtons: true,
-	                        initTextScrolling: true
+	                        chatRoom: room,
+	                        hideActionButtons: true
 	                    })
 	                )
 	            );
@@ -24087,7 +23675,11 @@
 	                {
 	                    megaChat: room.megaChat,
 	                    chatRoom: room,
+<<<<<<< HEAD
 	                    title: __(l[8871]),
+=======
+	                    title: __("Clear chat history"),
+>>>>>>> 6bc3f3a01a36a153bf44fa58cf3eefa088bafde5
 	                    name: "truncate-conversation",
 	                    onClose: function onClose() {
 	                        self.setState({ 'truncateDialog': false });
@@ -24108,11 +23700,14 @@
 	                                asyncApiReq({
 	                                    a: 'mct',
 	                                    id: room.chatId,
-	                                    m: lastChatMessageId,
-	                                    v: Chatd.VERSION
+	                                    m: lastChatMessageId
 	                                }).fail(function (r) {
 	                                    if (r === -2) {
+<<<<<<< HEAD
 	                                        msgDialog('warninga', l[135], __(l[8880]));
+=======
+	                                        msgDialog('warninga', l[135], __("You don't have the permission to clear the history of this conversation."));
+>>>>>>> 6bc3f3a01a36a153bf44fa58cf3eefa088bafde5
 	                                    }
 	                                });
 	                            }
@@ -24129,7 +23724,11 @@
 	                    React.makeElement(
 	                        "div",
 	                        { className: "dialog secondary-header" },
+<<<<<<< HEAD
 	                        __(l[8881])
+=======
+	                        __("Are you sure you want to clear the history of this conversation?")
+>>>>>>> 6bc3f3a01a36a153bf44fa58cf3eefa088bafde5
 	                    )
 	                )
 	            );
@@ -24139,8 +23738,6 @@
 	        if (additionalClass.length === 0 && self.state.messagesToggledInCall && room.callSession && room.callSession.isActive()) {
 	            additionalClass = " small-block";
 	        }
-
-	        var myPresence = room.megaChat.xmppPresenceToCssClass(M.u[u_handle].presence);
 
 	        return React.makeElement(
 	            "div",
@@ -24152,7 +23749,6 @@
 	                    chatRoom: this.props.chatRoom,
 	                    contacts: self.props.contacts,
 	                    megaChat: this.props.chatRoom.megaChat,
-	                    messagesBuff: room.messagesBuff,
 	                    onAttachFromComputerClicked: function onAttachFromComputerClicked() {
 	                        self.uploadFromComputer();
 	                    },
@@ -24160,10 +23756,15 @@
 	                        self.setState({ 'truncateDialog': true });
 	                    },
 	                    onLeaveClicked: function onLeaveClicked() {
-	                        room.leave(true);
+	                        room.members[u_handle] = 0;
+	                        room.trackDataChange();
+<<<<<<< HEAD
+=======
+	                        $(room).trigger('onLeaveChatRequested');
 	                    },
 	                    onCloseClicked: function onCloseClicked() {
 	                        room.destroy();
+>>>>>>> 6bc3f3a01a36a153bf44fa58cf3eefa088bafde5
 	                    },
 	                    onAttachFromCloudClicked: function onAttachFromCloudClicked() {
 	                        self.setState({ 'attachCloudDialog': true });
@@ -24184,7 +23785,6 @@
 	                    chatRoom: this.props.chatRoom,
 	                    contacts: self.props.contacts,
 	                    megaChat: this.props.chatRoom.megaChat,
-	                    unreadCount: this.props.chatRoom.messagesBuff.getUnreadCount(),
 	                    onMessagesToggle: function onMessagesToggle(isActive) {
 	                        self.setState({
 	                            'messagesToggledInCall': isActive
@@ -24235,23 +23835,17 @@
 	                        "div",
 	                        { className: "messages scroll-area" },
 	                        React.makeElement(
-	                            PerfectScrollbar,
-	                            {
-	                                onFirstInit: function onFirstInit(ps, node) {
-	                                    ps.scrollToBottom(true);
-	                                    self.scrolledToBottom = 1;
-	                                },
-	                                onReinitialise: self.onMessagesScrollReinitialise,
-	                                onUserScroll: self.onMessagesScrollUserScroll,
-	                                className: "js-messages-scroll-area perfectScrollbarContainer",
-	                                messagesToggledInCall: self.state.messagesToggledInCall,
-	                                ref: function ref(_ref) {
-	                                    return self.messagesListScrollable = _ref;
+	                            utils.JScrollPane,
+	                            { options: {
+	                                    enableKeyboardNavigation: false,
+	                                    showArrows: true,
+	                                    arrowSize: 5,
+	                                    animateDuration: 70,
+	                                    animateScroll: false,
+	                                    maintainPosition: false
 	                                },
 	                                chatRoom: self.props.chatRoom,
-	                                messagesBuff: self.props.chatRoom.messagesBuff,
-	                                editDomElement: self.state.editDomElement,
-	                                confirmDeleteDialog: self.state.confirmDeleteDialog
+	                                messagesToggledInCall: self.state.messagesToggledInCall
 	                            },
 	                            React.makeElement(
 	                                "div",
@@ -24259,16 +23853,6 @@
 	                                React.makeElement(
 	                                    "div",
 	                                    { className: "messages content-area" },
-	                                    React.makeElement(
-	                                        "div",
-	                                        { className: "loading-spinner js-messages-loading light manual-management",
-	                                            key: "loadingSpinner", style: { top: "50%" } },
-	                                        React.makeElement("div", { className: "main-loader", style: {
-	                                                'position': 'fixed',
-	                                                'top': '50%',
-	                                                'left': '50%'
-	                                            } })
-	                                    ),
 	                                    messagesList
 	                                )
 	                            )
@@ -24277,7 +23861,7 @@
 	                    React.makeElement(
 	                        "div",
 	                        { className: "chat-textarea-block" },
-	                        React.makeElement(WhosTyping, { chatRoom: room }),
+	                        typingElement,
 	                        React.makeElement(
 	                            TypingAreaUI.TypingArea,
 	                            {
@@ -24311,7 +23895,7 @@
 	                                                return false;
 	                                            }
 
-	                                            if (contact && contact.u === u_handle && unixtime() - message.delay < MESSAGE_NOT_EDITABLE_TIMEOUT && !message.requiresManualRetry && !message.deleted && (!message.type || message instanceof KarereEventObjects.OutgoingMessage) && (!message.isManagement || !message.isManagement())) {
+	                                            if (contact && contact.u === u_handle && unixtime() - message.delay < MESSAGE_NOT_EDITABLE_TIMEOUT && !message.requiresManualRetry && !message.deleted && !message.type && (!message.isManagement || !message.isManagement())) {
 	                                                foundMessage = message;
 	                                            }
 	                                        }
@@ -24325,9 +23909,9 @@
 	                                        return true;
 	                                    }
 	                                },
-	                                onResized: function onResized() {
+	                                onUpdate: function onUpdate() {
 	                                    self.handleWindowResize();
-	                                    $('.js-messages-scroll-area', self.findDOMNode()).trigger('forceResize', [true]);
+	                                    $('.jScrollPaneContainer', self.findDOMNode()).trigger('forceResize');
 	                                },
 	                                onConfirm: function onConfirm(messageContents) {
 	                                    if (messageContents && messageContents.length > 0) {
@@ -24340,7 +23924,7 @@
 	                                {
 	                                    className: "popup-button",
 	                                    icon: "small-icon grey-medium-plus",
-	                                    disabled: room.isReadOnly() || myPresence === 'offline'
+	                                    disabled: room.isReadOnly()
 	                                },
 	                                React.makeElement(
 	                                    DropdownsUI.Dropdown,
@@ -24402,18 +23986,19 @@
 	        self.props.conversations.forEach(function (chatRoom) {
 	            var otherParticipants = chatRoom.getParticipantsExceptMe();
 
-	            var contact;
-	            if (otherParticipants && otherParticipants.length > 0) {
-	                contact = megaChat.getContactFromJid(otherParticipants[0]);
+	            if (!otherParticipants || otherParticipants.length === 0) {
+	                return;
 	            }
+
+	            var contact = megaChat.getContactFromJid(otherParticipants[0]);
 
 	            conversations.push(React.makeElement(ConversationPanel, {
 	                chatRoom: chatRoom,
-	                isActive: chatRoom.isCurrentlyActive,
-	                messagesBuff: chatRoom.messagesBuff,
 	                contacts: M.u,
 	                contact: contact,
-	                key: chatRoom.roomJid
+	                messagesBuff: chatRoom.messagesBuff,
+	                key: chatRoom.roomJid,
+	                chat: self.props.megaChat
 	            }));
 	        });
 
@@ -24421,7 +24006,7 @@
 	            var contactsList = [];
 	            var contactsListOffline = [];
 
-	            var hadLoaded = ChatdIntegration.mcfHasFinishedPromise.state() === 'resolved';
+	            var hadLoaded = megaChat.plugins.chatdIntegration.mcfHasFinishedPromise.state() === 'resolved';
 
 	            if (hadLoaded) {
 	                self.props.contacts.forEach(function (contact) {
@@ -24432,8 +24017,7 @@
 	                    if (contact.c === 1) {
 	                        var pres = self.props.megaChat.xmppPresenceToCssClass(contact.presence);
 
-	                        (pres === "offline" ? contactsListOffline : contactsList).push(React.makeElement(ContactsUI.ContactCard, { contact: contact, megaChat: self.props.megaChat,
-	                            key: contact.u }));
+	                        (pres === "offline" ? contactsListOffline : contactsList).push(React.makeElement(ContactsUI.ContactCard, { contact: contact, megaChat: self.props.megaChat, key: contact.u }));
 	                    }
 	                });
 	            }
@@ -24485,7 +24069,7 @@
 	};
 
 /***/ },
-/* 164 */
+/* 163 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -24494,10 +24078,10 @@
 	var ReactDOM = __webpack_require__(154);
 	var utils = __webpack_require__(156);
 	var MegaRenderMixin = __webpack_require__(157).MegaRenderMixin;
-	var Tooltips = __webpack_require__(165);
-	var Forms = __webpack_require__(166);
+	var Tooltips = __webpack_require__(164);
+	var Forms = __webpack_require__(165);
 
-	var ContactsUI = __webpack_require__(161);
+	var ContactsUI = __webpack_require__(160);
 
 	var ExtraFooterElement = React.createClass({
 	    displayName: "ExtraFooterElement",
@@ -24510,12 +24094,6 @@
 	    displayName: "ModalDialog",
 
 	    mixins: [MegaRenderMixin],
-	    getDefaultProps: function getDefaultProps() {
-	        return {
-	            'hideable': true
-	        };
-	    },
-
 	    componentDidMount: function componentDidMount() {
 	        var self = this;
 	        $(document.body).addClass('overlayed');
@@ -24549,13 +24127,6 @@
 
 	        if (self.props.onClose) {
 	            self.props.onClose(self);
-	        }
-	    },
-	    onPopupDidMount: function onPopupDidMount(elem) {
-	        this.domNode = elem;
-	        if (this.props.popupDidMount) {
-
-	            this.props.popupDidMount(elem);
 	        }
 	    },
 	    render: function render() {
@@ -24611,7 +24182,7 @@
 
 	        return React.makeElement(
 	            utils.RenderTo,
-	            { element: document.body, className: classes, popupDidMount: this.onPopupDidMount },
+	            { element: document.body, className: classes },
 	            React.makeElement(
 	                "div",
 	                null,
@@ -24636,12 +24207,6 @@
 	    displayName: "BrowserCol",
 
 	    mixins: [MegaRenderMixin],
-	    getDefaultProps: function getDefaultProps() {
-	        return {
-	            'hideable': true
-	        };
-	    },
-
 	    render: function render() {
 	        var self = this;
 
@@ -24669,12 +24234,6 @@
 	    displayName: "BrowserEntries",
 
 	    mixins: [MegaRenderMixin],
-	    getDefaultProps: function getDefaultProps() {
-	        return {
-	            'hideable': true
-	        };
-	    },
-
 	    getInitialState: function getInitialState() {
 	        return {
 	            'selected': []
@@ -24753,7 +24312,7 @@
 	                    React.makeElement(
 	                        Tooltips.Handler,
 	                        { className: "transfer-filtype-icon " + fileIcon(node) },
-	                        " "
+	                        " "
 	                    ),
 	                    React.makeElement(
 	                        Tooltips.Contents,
@@ -24808,7 +24367,7 @@
 	        });
 	        return React.makeElement(
 	            utils.JScrollPane,
-	            { className: "fm-dialog-grid-scroll", selected: this.state.selected },
+	            { className: "fm-dialog-grid-scroll" },
 	            React.makeElement(
 	                "table",
 	                { className: "grid-table fm-dialog-table" },
@@ -24828,8 +24387,7 @@
 	    getDefaultProps: function getDefaultProps() {
 	        return {
 	            'selectLabel': __("Attach"),
-	            'cancelLabel': __("Cancel"),
-	            'hideable': true
+	            'cancelLabel': __("Cancel")
 	        };
 	    },
 	    getInitialState: function getInitialState() {
@@ -24906,9 +24464,6 @@
 	    onAttachClicked: function onAttachClicked() {
 	        this.props.onAttachClicked();
 	    },
-	    onPopupDidMount: function onPopupDidMount(elem) {
-	        this.domNode = elem;
-	    },
 	    render: function render() {
 	        var self = this;
 
@@ -24962,7 +24517,6 @@
 	                onClose: function onClose() {
 	                    self.props.onClose(self);
 	                },
-	                popupDidMount: self.onPopupDidMount,
 	                buttons: [{
 	                    "label": self.props.selectLabel,
 	                    "key": "select",
@@ -25026,8 +24580,7 @@
 	    getDefaultProps: function getDefaultProps() {
 	        return {
 	            'selectLabel': __("Send"),
-	            'cancelLabel': __("Cancel"),
-	            'hideable': true
+	            'cancelLabel': __("Cancel")
 	        };
 	    },
 	    getInitialState: function getInitialState() {
@@ -25113,8 +24666,7 @@
 	    getDefaultProps: function getDefaultProps() {
 	        return {
 	            'confirmLabel': __("Continue"),
-	            'cancelLabel': __("Cancel"),
-	            'hideable': true
+	            'cancelLabel': __("Cancel")
 	        };
 	    },
 	    getInitialState: function getInitialState() {
@@ -25207,7 +24759,7 @@
 	};
 
 /***/ },
-/* 165 */
+/* 164 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -25221,11 +24773,6 @@
 	    displayName: "Handler",
 
 	    mixins: [MegaRenderMixin],
-	    getDefaultProps: function getDefaultProps() {
-	        return {
-	            'hideable': true
-	        };
-	    },
 	    render: function render() {
 	        var classes = "tooltip-handler" + (this.props.className ? " " + this.props.className : "");
 	        return React.makeElement(
@@ -25240,11 +24787,6 @@
 	    displayName: "Contents",
 
 	    mixins: [MegaRenderMixin],
-	    getDefaultProps: function getDefaultProps() {
-	        return {
-	            'hideable': true
-	        };
-	    },
 	    render: function render() {
 	        var className = 'tooltip-contents dropdown body tooltip ' + (this.props.className ? this.props.className : "");
 
@@ -25270,11 +24812,6 @@
 	    getInitialState: function getInitialState() {
 	        return {
 	            'active': false
-	        };
-	    },
-	    getDefaultProps: function getDefaultProps() {
-	        return {
-	            'hideable': true
 	        };
 	    },
 	    componentDidUpdate: function componentDidUpdate(oldProps, oldState) {
@@ -25404,7 +24941,7 @@
 	};
 
 /***/ },
-/* 166 */
+/* 165 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -25473,7 +25010,7 @@
 	};
 
 /***/ },
-/* 167 */
+/* 166 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -25483,25 +25020,19 @@
 	var utils = __webpack_require__(156);
 	var RenderDebugger = __webpack_require__(157).RenderDebugger;
 	var MegaRenderMixin = __webpack_require__(157).MegaRenderMixin;
-	var ButtonsUI = __webpack_require__(159);
-	var ModalDialogsUI = __webpack_require__(164);
-	var DropdownsUI = __webpack_require__(160);
-	var ContactsUI = __webpack_require__(161);
+	var ButtonsUI = __webpack_require__(158);
+	var ModalDialogsUI = __webpack_require__(163);
+	var DropdownsUI = __webpack_require__(159);
+	var ContactsUI = __webpack_require__(160);
 	var ConversationsUI = __webpack_require__(155);
 
 	var TypingArea = React.createClass({
 	    displayName: "TypingArea",
 
 	    mixins: [MegaRenderMixin, RenderDebugger],
-	    getDefaultProps: function getDefaultProps() {
-	        return {
-	            'textareaMaxHeight': 100
-	        };
-	    },
 	    getInitialState: function getInitialState() {
 	        return {
-	            typedMessage: this.props.initialText ? this.props.initialText : "",
-	            textareaHeight: 20
+	            typedMessage: this.props.initialText ? this.props.initialText : ""
 	        };
 	    },
 	    onEmojiClicked: function onEmojiClicked(e, slug, meta) {
@@ -25552,39 +25083,27 @@
 	            self.stoppedTyping();
 	        }, 2000);
 	    },
-	    triggerOnUpdate: function triggerOnUpdate(forced) {
-	        var self = this;
-	        if (!self.props.onUpdate || !self.isMounted()) {
+	    triggerOnUpdate: function triggerOnUpdate() {
+	        if (!this.props.onUpdate || !this.isMounted()) {
 	            return;
 	        }
 
-	        var shouldTriggerUpdate = forced ? forced : false;
-
-	        if (!shouldTriggerUpdate && self.state.typedMessage != self.lastTypedMessage) {
-	            self.lastTypedMessage = self.state.typedMessage;
+	        var shouldTriggerUpdate = false;
+	        if (this.state.typedMessage != this.lastTypedMessage) {
+	            this.lastTypedMessage = this.state.typedMessage;
 	            shouldTriggerUpdate = true;
 	        }
-
 	        if (!shouldTriggerUpdate) {
 	            var $container = $(ReactDOM.findDOMNode(this));
 	            var $textarea = $('.chat-textarea:visible textarea:visible', $container);
-	            if (!self._lastTextareaHeight || self._lastTextareaHeight !== $textarea.height()) {
-	                self._lastTextareaHeight = $textarea.height();
+	            if (!this._lastTextareaHeight || this._lastTextareaHeight !== $textarea.height()) {
+	                this._lastTextareaHeight = $textarea.height();
 	                shouldTriggerUpdate = true;
-	                if (self.props.onResized) {
-	                    self.props.onResized();
-	                }
 	            }
 	        }
 
 	        if (shouldTriggerUpdate) {
-	            if (self.onUpdateThrottling) {
-	                clearTimeout(self.onUpdateThrottling);
-	            }
-
-	            self.onUpdateThrottling = setTimeout(function () {
-	                self.props.onUpdate();
-	            }, 70);
+	            this.props.onUpdate();
 	        }
 	    },
 	    stoppedTyping: function stoppedTyping() {
@@ -25612,7 +25131,7 @@
 	    onCancelClicked: function onCancelClicked(e) {
 	        var self = this;
 	        self.setState({ typedMessage: "" });
-	        self.onConfirmTrigger(false);
+	        self.props.onConfirm(false);
 	        self.triggerOnUpdate();
 	    },
 	    onSaveClicked: function onSaveClicked(e) {
@@ -25623,10 +25142,10 @@
 	        }
 
 	        var $container = $(ReactDOM.findDOMNode(self));
-	        var val = $.trim($('.chat-textarea:visible textarea:visible', $container).val());
+	        var val = $('.chat-textarea:visible textarea:visible', $container).val();
 
-	        if (val.length > 0) {
-	            if (self.onConfirmTrigger(val) !== true) {
+	        if ($.trim(val).length > 0) {
+	            if (self.props.onConfirm(val) !== true) {
 	                self.setState({ typedMessage: "" });
 	            }
 	            self.triggerOnUpdate();
@@ -25635,19 +25154,6 @@
 
 	            self.onCancelClicked(e);
 	        }
-	    },
-	    onConfirmTrigger: function onConfirmTrigger(val) {
-	        var result = this.props.onConfirm(val);
-
-	        if (val !== false && result !== false) {
-
-	            var $node = $(this.findDOMNode());
-	            var $textareaScrollBlock = $('.textarea-scroll', $node);
-	            var jsp = $textareaScrollBlock.data('jsp');
-	            jsp.scrollToY(0);
-	            $('.jspPane', $textareaScrollBlock).css({ 'top': 0 });
-	        }
-	        return result;
 	    },
 	    onTypeAreaKeyDown: function onTypeAreaKeyDown(e) {
 	        if (this.props.disabled) {
@@ -25659,35 +25165,15 @@
 	        var self = this;
 	        var key = e.keyCode || e.which;
 	        var element = e.target;
-	        var val = $.trim(element.value);
+	        var val = element.value;
 
 	        if (key === 13 && !e.shiftKey && !e.ctrlKey && !e.altKey) {
 
-	            if (self.onConfirmTrigger(val) !== true) {
+	            if (self.props.onConfirm(val) !== true) {
 	                self.setState({ typedMessage: "" });
 	            }
 	            self.stoppedTyping();
 	            e.preventDefault();
-	            e.stopPropagation();
-	            return;
-	        }
-	    },
-	    onTypeAreaKeyUp: function onTypeAreaKeyUp(e) {
-	        if (this.props.disabled) {
-	            e.preventDefault();
-	            e.stopPropagation();
-	            return;
-	        }
-
-	        var self = this;
-	        var key = e.keyCode || e.which;
-	        var element = e.target;
-	        var val = $.trim(element.value);
-
-	        if (key === 13 && !e.shiftKey && !e.ctrlKey && !e.altKey) {
-
-	            e.preventDefault();
-	            e.stopPropagation();
 	            return;
 	        } else if (key === 13) {
 	            if ($.trim(val).length === 0) {
@@ -25710,8 +25196,6 @@
 	                return;
 	            }
 	        }
-
-	        self.updateScroll(true);
 	    },
 	    onTypeAreaBlur: function onTypeAreaBlur(e) {
 	        if (this.props.disabled) {
@@ -25721,6 +25205,8 @@
 	        }
 
 	        var self = this;
+
+	        self.stoppedTyping();
 	    },
 	    onTypeAreaChange: function onTypeAreaChange(e) {
 	        if (this.props.disabled) {
@@ -25728,18 +25214,14 @@
 	            e.stopPropagation();
 	            return;
 	        }
+
 	        var self = this;
 
-	        if (self.state.typedMessage !== e.target.value) {
-	            self.setState({ typedMessage: e.target.value });
-	            self.forceUpdate();
-	        }
+	        self.setState({ typedMessage: e.target.value });
 
-	        if ($.trim(e.target.value).length > 0) {
+	        if ($.trim(e.target.value).length) {
 	            self.typing();
 	        }
-
-	        self.updateScroll(true);
 	    },
 	    focusTypeArea: function focusTypeArea() {
 	        if (this.props.disabled) {
@@ -25749,7 +25231,6 @@
 	        var $container = $(ReactDOM.findDOMNode(this));
 	        if ($('.chat-textarea:visible textarea:visible', $container).length > 0) {
 	            if (!$('.chat-textarea:visible textarea:visible', $container).is(":focus")) {
-
 	                moveCursortoToEnd($('.chat-textarea:visible textarea', $container)[0]);
 	            }
 	        }
@@ -25759,17 +25240,11 @@
 	        window.addEventListener('resize', self.handleWindowResize);
 
 	        var $container = $(ReactDOM.findDOMNode(this));
-
-	        self._lastTextareaHeight = 20;
-	        if (self.props.initialText) {
-	            self.lastTypedMessage = this.props.initialText;
-	        }
-
-	        var $container = $(self.findDOMNode());
-	        $('.jScrollPaneContainer', $container).rebind('forceResize.typingArea' + self.getUniqueId(), function () {
-	            self.updateScroll(false);
+	        initTextareaScrolling($('.chat-textarea-scroll textarea', $container), 100, true);
+	        $('.chat-textarea-scroll textarea', $container).rebind('autoresized.typingArea', function () {
+	            self.handleWindowResize();
 	        });
-	        self.triggerOnUpdate(true);
+	        self.triggerOnUpdate();
 	    },
 	    componentWillUnmount: function componentWillUnmount() {
 	        var self = this;
@@ -25789,129 +25264,6 @@
 
 	            self.handleWindowResize();
 	        }
-	        if (!this.scrollingInitialised) {
-	            this.initScrolling();
-	        } else {
-	            this.updateScroll();
-	        }
-	    },
-	    initScrolling: function initScrolling() {
-	        var self = this;
-	        self.scrollingInitialised = true;
-	        var $node = $(self.findDOMNode());
-	        var $textarea = $('textarea:first', $node);
-	        var $textareaClone = $('message-preview', $node);
-	        self.textareaLineHeight = parseInt($textarea.css('line-height'));
-	        var $textareaScrollBlock = $('.textarea-scroll', $node);
-	        $textareaScrollBlock.jScrollPane({
-	            enableKeyboardNavigation: false,
-	            showArrows: true,
-	            arrowSize: 5,
-	            animateScroll: false,
-	            maintainPosition: false
-	        });
-	    },
-	    updateScroll: function updateScroll(keyEvents) {
-	        var self = this;
-
-	        if (!self.isComponentEventuallyVisible()) {
-	            return;
-	        }
-
-	        var $node = $(self.findDOMNode());
-
-	        var $textarea = $('textarea:first', $node);
-	        var $textareaClone = $('.message-preview', $node);
-	        var textareaMaxHeight = self.props.textareaMaxHeight;
-	        var $textareaScrollBlock = $('.textarea-scroll', $node);
-
-	        var textareaContent = $textarea.val();
-	        var cursorPosition = self.getCursorPosition($textarea[0]);
-	        var $textareaCloneSpan;
-
-	        var viewLimitTop = 0;
-	        var scrPos = 0;
-	        var viewRatio = 0;
-
-	        textareaContent = '<span>' + textareaContent.substr(0, cursorPosition) + '</span>' + textareaContent.substr(cursorPosition, textareaContent.length);
-
-	        if (keyEvents && self.lastContent === textareaContent && self.lastPosition === cursorPosition) {
-	            return;
-	        } else {
-	            self.lastContent = textareaContent;
-	            self.lastPosition = cursorPosition;
-	            textareaContent = textareaContent.replace(/\n/g, '<br />');
-	            $textareaClone.html(textareaContent + '<br />');
-	        }
-
-	        var textareaCloneHeight = $textareaClone.height();
-	        $textarea.height(textareaCloneHeight);
-	        $textareaCloneSpan = $textareaClone.children('span');
-	        var textareaCloneSpanHeight = $textareaCloneSpan.height();
-
-	        var jsp = $textareaScrollBlock.data('jsp');
-
-	        if (!jsp) {
-	            $textareaScrollBlock.jScrollPane({
-	                enableKeyboardNavigation: false, showArrows: true, arrowSize: 5, animateScroll: false
-	            });
-	            var textareaWasFocused = $textarea.is(":focus");
-	            jsp = $textareaScrollBlock.data('jsp');
-
-	            if (textareaWasFocused) {
-	                moveCursortoToEnd($('textarea:first', $node)[0]);
-	            }
-	        }
-
-	        scrPos = jsp ? $textareaScrollBlock.find('.jspPane').position().top : 0;
-	        viewRatio = Math.round(textareaCloneSpanHeight + scrPos);
-
-	        $textareaScrollBlock.height(Math.min(textareaCloneHeight, textareaMaxHeight));
-
-	        jsp.reinitialise();
-
-	        if (textareaCloneHeight > textareaMaxHeight && textareaCloneSpanHeight < textareaMaxHeight) {
-	            jsp.scrollToY(0);
-	        } else if (viewRatio > self.textareaLineHeight || viewRatio < viewLimitTop) {
-	            if (textareaCloneSpanHeight > 0 && jsp && textareaCloneSpanHeight > textareaMaxHeight) {
-	                jsp.scrollToY(textareaCloneSpanHeight - self.textareaLineHeight);
-	            } else if (jsp) {
-	                jsp.scrollToY(0);
-	            }
-	        }
-
-	        if (textareaCloneHeight < textareaMaxHeight) {
-	            $textareaScrollBlock.addClass('noscroll');
-	        } else {
-	            $textareaScrollBlock.removeClass('noscroll');
-	        }
-	        if (textareaCloneHeight !== self.state.textareaHeight) {
-	            self.setState({
-	                'textareaHeight': textareaCloneHeight
-	            });
-	            if (self.props.onResized) {
-	                self.props.onResized();
-	            }
-	        } else {
-	            self.handleWindowResize();
-	        }
-	    },
-	    getCursorPosition: function getCursorPosition(el) {
-	        var pos = 0;
-	        if ('selectionStart' in el) {
-	            pos = el.selectionStart;
-	        } else if ('selection' in document) {
-	            el.focus();
-	            var sel = document.selection.createRange(),
-	                selLength = document.selection.createRange().text.length;
-
-	            sel.moveStart('character', -el.value.length);
-	            pos = sel.text.length - selLength;
-	        }
-	        return pos;
-	    },
-	    onTypeAreaSelect: function onTypeAreaSelect(e) {
-	        this.updateScroll(true);
 	    },
 	    handleWindowResize: function handleWindowResize(e, scrollToBottom) {
 	        var self = this;
@@ -25922,9 +25274,6 @@
 	            return;
 	        }
 
-	        if (e) {
-	            self.updateScroll(false);
-	        }
 	        self.triggerOnUpdate();
 	    },
 	    isActive: function isActive() {
@@ -25952,21 +25301,12 @@
 	                onClick: self.onCancelClicked,
 	                label: __(l[1718]) })];
 	        }
-
-	        var textareaStyles = {
-	            height: self.state.textareaHeight
-	        };
-
-	        var textareaScrollBlockStyles = {
-	            height: Math.min(self.state.textareaHeight, self.props.textareaMaxHeight)
-	        };
-
 	        return React.makeElement(
 	            "div",
 	            { className: "typingarea-component" + self.props.className },
 	            React.makeElement(
 	                "div",
-	                { className: "chat-textarea " + self.props.className },
+	                { className: "chat-textarea" },
 	                React.makeElement("i", { className: self.props.iconClass ? self.props.iconClass : "small-icon conversations" }),
 	                React.makeElement(
 	                    "div",
@@ -25988,19 +25328,15 @@
 	                ),
 	                React.makeElement(
 	                    "div",
-	                    { className: "chat-textarea-scroll textarea-scroll jScrollPaneContainer",
-	                        style: textareaScrollBlockStyles },
+	                    { className: "chat-textarea-scroll textarea-scroll" },
 	                    React.makeElement("textarea", {
 	                        className: messageTextAreaClasses,
 	                        placeholder: __(l[8009]),
-	                        onKeyUp: self.onTypeAreaKeyUp,
 	                        onKeyDown: self.onTypeAreaKeyDown,
 	                        onBlur: self.onTypeAreaBlur,
 	                        onChange: self.onTypeAreaChange,
-	                        onSelect: self.onTypeAreaSelect,
 	                        value: self.state.typedMessage,
 	                        ref: "typearea",
-	                        style: textareaStyles,
 	                        disabled: room.pubCu25519KeyIsMissing === true || this.props.disabled ? true : false,
 	                        readOnly: room.pubCu25519KeyIsMissing === true || this.props.disabled ? true : false
 	                    }),
@@ -26017,150 +25353,7 @@
 	};
 
 /***/ },
-/* 168 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	var React = __webpack_require__(2);
-	var ReactDOM = __webpack_require__(154);
-	var MegaRenderMixin = __webpack_require__(157).MegaRenderMixin;
-
-	var WhosTyping = React.createClass({
-	    displayName: "WhosTyping",
-
-	    mixins: [MegaRenderMixin],
-	    getInitialState: function getInitialState() {
-	        return {
-	            currentlyTyping: []
-	        };
-	    },
-	    componentWillMount: function componentWillMount() {
-	        var self = this;
-	        var chatRoom = self.props.chatRoom;
-	        var megaChat = self.props.chatRoom.megaChat;
-
-	        megaChat.karere.bind("onComposingMessage.whosTyping" + chatRoom.roomJid, function (e, eventObject) {
-	            if (!self.isMounted()) {
-	                return;
-	            }
-	            if (Karere.getNormalizedFullJid(eventObject.getFromJid()) === megaChat.karere.getJid()) {
-	                return;
-	            }
-
-	            var room = megaChat.chats[eventObject.getRoomJid()];
-	            if (room.roomJid == chatRoom.roomJid) {
-	                var currentlyTyping = self.state.currentlyTyping;
-	                var u_h = megaChat.getContactFromJid(Karere.getNormalizedBareJid(eventObject.getFromJid())).u;
-
-	                if (u_h === u_handle) {
-
-	                    return;
-	                }
-
-	                currentlyTyping.push(u_h);
-	                currentlyTyping = array_unique(currentlyTyping);
-	                self.setState({
-	                    currentlyTyping: currentlyTyping
-	                });
-	                self.forceUpdate();
-	            }
-	        });
-
-	        megaChat.karere.rebind("onPausedMessage.whosTyping" + chatRoom.roomJid, function (e, eventObject) {
-	            var room = megaChat.chats[eventObject.getRoomJid()];
-
-	            if (!self.isMounted()) {
-	                return;
-	            }
-	            if (Karere.getNormalizedFullJid(eventObject.getFromJid()) === megaChat.karere.getJid()) {
-	                return;
-	            }
-
-	            if (room.roomJid === chatRoom.roomJid) {
-	                var currentlyTyping = self.state.currentlyTyping;
-	                var u_h = megaChat.getContactFromJid(Karere.getNormalizedBareJid(eventObject.getFromJid())).u;
-	                if (u_h === u_handle) {
-
-	                    return;
-	                }
-
-	                if (currentlyTyping.indexOf(u_h) > -1) {
-	                    removeValue(currentlyTyping, u_h);
-	                    self.setState({
-	                        currentlyTyping: currentlyTyping
-	                    });
-	                    self.forceUpdate();
-	                }
-	            }
-	        });
-	    },
-	    componentWillUnmount: function componentWillUnmount() {
-	        var self = this;
-	        var chatRoom = self.props.chatRoom;
-	        var megaChat = chatRoom.megaChat;
-
-	        megaChat.karere.bind("onComposingMessage." + chatRoom.roomJid);
-	        megaChat.karere.unbind("onPausedMessage." + chatRoom.roomJid);
-	    },
-	    render: function render() {
-	        var self = this;
-
-	        var typingElement = null;
-
-	        if (self.state.currentlyTyping.length > 0) {
-	            var names = self.state.currentlyTyping.map(function (u_h) {
-	                var avatarMeta = generateAvatarMeta(u_h);
-	                return avatarMeta.fullName.split(" ")[0];
-	            });
-
-	            var namesDisplay = "";
-	            var areMultipleUsersTyping = false;
-
-	            if (names.length > 1) {
-	                areMultipleUsersTyping = true;
-	                namesDisplay = [names.splice(0, names.length - 1).join(", "), names[0]];
-	            } else {
-	                areMultipleUsersTyping = false;
-	                namesDisplay = [names[0]];
-	            }
-
-	            var msg;
-	            if (areMultipleUsersTyping === true) {
-	                msg = __(l[8872]).replace("%1", namesDisplay[0]).replace("%2", namesDisplay[1]);
-	            } else {
-	                msg = __(l[8629]).replace("%1", namesDisplay[0]);
-	            }
-
-	            typingElement = React.makeElement(
-	                "div",
-	                { className: "typing-block" },
-	                React.makeElement(
-	                    "div",
-	                    { className: "typing-text" },
-	                    msg
-	                ),
-	                React.makeElement(
-	                    "div",
-	                    { className: "typing-bounce" },
-	                    React.makeElement("div", { className: "typing-bounce1" }),
-	                    React.makeElement("div", { className: "typing-bounce2" }),
-	                    React.makeElement("div", { className: "typing-bounce3" })
-	                )
-	            );
-	        } else {}
-
-	        return typingElement;
-	    }
-
-	});
-
-	module.exports = {
-	    WhosTyping: WhosTyping
-	};
-
-/***/ },
-/* 169 */
+/* 167 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -26196,297 +25389,17 @@
 	};
 
 /***/ },
-/* 170 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	var React = __webpack_require__(2);
-	var ReactDOM = __webpack_require__(154);
-	var MegaRenderMixin = __webpack_require__(157).MegaRenderMixin;
-	var ButtonsUI = __webpack_require__(159);
-	var ModalDialogsUI = __webpack_require__(164);
-	var DropdownsUI = __webpack_require__(160);
-	var ContactsUI = __webpack_require__(161);
-	var PerfectScrollbar = __webpack_require__(158).PerfectScrollbar;
-
-	var ParticipantsList = React.createClass({
-	    displayName: "ParticipantsList",
-
-	    mixins: [MegaRenderMixin],
-	    getDefaultProps: function getDefaultProps() {
-	        return {
-	            'requiresUpdateOnResize': true,
-	            'contactCardHeight': 49
-
-	        };
-	    },
-	    getInitialState: function getInitialState() {
-	        return {
-	            'scrollPositionY': 0,
-	            'scrollHeight': 49 * 4
-	        };
-	    },
-	    onUserScroll: function onUserScroll() {
-	        var scrollPosY = this.refs.contactsListScroll.getScrollPositionY();
-	        if (this.state.scrollPositionY !== scrollPosY) {
-	            this.setState({
-	                'scrollPositionY': scrollPosY
-	            });
-	        }
-	    },
-	    componentDidUpdate: function componentDidUpdate() {
-	        var self = this;
-	        if (!self.isMounted()) {
-	            return;
-	        }
-
-	        var $node = $(self.findDOMNode());
-
-	        var scrollHeight;
-	        var fitHeight = scrollHeight = self.refs.contactsListScroll.getContentHeight();
-	        if (fitHeight === 0) {
-
-	            return null;
-	        }
-
-	        var $parentContainer = $node.closest('.chat-right-pad');
-	        var maxHeight = $parentContainer.outerHeight(true) - $('.buttons-block', $parentContainer).outerHeight(true) - $('.chat-right-head', $parentContainer).outerHeight(true);
-
-	        if (fitHeight < $('.buttons-block', $parentContainer).outerHeight(true)) {
-	            fitHeight = Math.max(fitHeight, 48);
-	        } else if (maxHeight < fitHeight) {
-	            fitHeight = Math.max(maxHeight, 48);
-	        }
-
-	        var $contactsList = $('.chat-contacts-list', $parentContainer);
-
-	        if ($contactsList.height() !== fitHeight + 4) {
-	            $('.chat-contacts-list', $parentContainer).height(fitHeight + 4);
-	            self.refs.contactsListScroll.eventuallyReinitialise(true);
-	        }
-
-	        if (self.state.scrollHeight !== fitHeight) {
-	            self.setState({ 'scrollHeight': fitHeight });
-	        }
-	        self.onUserScroll();
-	    },
-	    render: function render() {
-	        var self = this;
-	        var room = this.props.chatRoom;
-
-	        if (!room || !room.roomJid) {
-
-	            return null;
-	        }
-	        var contactJid;
-	        var contact;
-	        var contacts = room.getParticipantsExceptMe();
-	        if (contacts && contacts.length > 0) {
-	            contactJid = contacts[0];
-	            contact = room.megaChat.getContactFromJid(contactJid);
-	        } else {
-	            contact = {};
-	        }
-
-	        return React.makeElement(
-	            "div",
-	            { className: "chat-contacts-list" },
-	            React.makeElement(
-	                PerfectScrollbar,
-	                {
-	                    chatRoom: room,
-	                    members: room.members,
-	                    ref: "contactsListScroll",
-	                    onUserScroll: self.onUserScroll,
-	                    requiresUpdateOnResize: true
-	                },
-	                React.makeElement(ParticipantsListInner, {
-	                    chatRoom: room, members: room.members,
-	                    scrollPositionY: self.state.scrollPositionY,
-	                    scrollHeight: self.state.scrollHeight
-	                })
-	            )
-	        );
-	    }
-	});
-
-	var ParticipantsListInner = React.createClass({
-	    displayName: "ParticipantsListInner",
-
-	    mixins: [MegaRenderMixin],
-	    getDefaultProps: function getDefaultProps() {
-	        return {
-	            'requiresUpdateOnResize': true,
-	            'contactCardHeight': 49,
-	            'scrollPositionY': 0,
-	            'scrollHeight': 49 * 4
-
-	        };
-	    },
-	    getInitialState: function getInitialState() {
-	        return {};
-	    },
-	    render: function render() {
-	        var self = this;
-	        var room = this.props.chatRoom;
-
-	        if (!room || !room.roomJid) {
-
-	            return null;
-	        }
-	        if (!room.isCurrentlyActive) {
-
-	            return false;
-	        }
-	        var contactJid;
-	        var contact;
-	        var contacts = room.getParticipantsExceptMe();
-	        if (contacts && contacts.length > 0) {
-	            contactJid = contacts[0];
-	            contact = room.megaChat.getContactFromJid(contactJid);
-	        } else {
-	            contact = {};
-	        }
-
-	        var myPresence = room.megaChat.xmppPresenceToCssClass(M.u[u_handle].presence);
-
-	        var contactsList = [];
-
-	        contacts = room.type === "group" ? room.members && Object.keys(room.members).length > 0 ? Object.keys(room.members) : room.getContactParticipantsExceptMe() : room.getContactParticipantsExceptMe();
-
-	        removeValue(contacts, u_handle, true);
-
-	        var firstVisibleUserNum = Math.floor(self.props.scrollPositionY / self.props.contactCardHeight);
-	        var visibleUsers = Math.ceil(self.props.scrollHeight / self.props.contactCardHeight);
-	        var lastVisibleUserNum = firstVisibleUserNum + visibleUsers;
-
-	        var contactListInnerStyles = {
-	            'height': contacts.length * self.props.contactCardHeight
-	        };
-
-	        if (room.type === "group" && !room.stateIsLeftOrLeaving()) {
-	            contacts.unshift(u_handle);
-	            contactListInnerStyles.height += self.props.contactCardHeight;
-	        }
-
-	        var i = 0;
-	        contacts.forEach(function (contactHash) {
-	            var contact = M.u[contactHash];
-	            if (contact) {
-	                if (i < firstVisibleUserNum || i > lastVisibleUserNum) {
-	                    i++;
-	                    return;
-	                }
-	                var dropdowns = [];
-	                var privilege = null;
-
-	                var dropdownIconClasses = "small-icon tiny-icon grey-down-arrow";
-
-	                if (room.type === "group" && room.members && myPresence !== 'offline') {
-	                    var removeParticipantButton = React.makeElement(DropdownsUI.DropdownItem, {
-	                        key: "remove", icon: "rounded-stop", label: __(l[8867]), onClick: function onClick() {
-	                            $(room).trigger('onRemoveUserRequest', [contactHash]);
-	                        } });
-
-	                    if (room.iAmOperator() || contactHash === u_handle) {
-
-	                        dropdowns.push(React.makeElement(
-	                            "div",
-	                            { key: "setPermLabel", className: "dropdown-items-info" },
-	                            __(l[8868])
-	                        ));
-
-	                        dropdowns.push(React.makeElement(DropdownsUI.DropdownItem, {
-	                            key: "privOperator", icon: "cogwheel-icon",
-	                            label: __(l[8875]),
-	                            className: "tick-item " + (room.members[contactHash] === 3 ? "active" : ""),
-	                            disabled: myPresence === 'offline' || contactHash === u_handle,
-	                            onClick: function onClick() {
-	                                if (room.members[contactHash] !== 3) {
-	                                    $(room).trigger('alterUserPrivilege', [contactHash, 3]);
-	                                }
-	                            } }));
-
-	                        dropdowns.push(React.makeElement(DropdownsUI.DropdownItem, {
-	                            key: "privFullAcc", icon: "conversation-icon",
-	                            className: "tick-item " + (room.members[contactHash] === 2 ? "active" : ""),
-	                            disabled: myPresence === 'offline' || contactHash === u_handle,
-	                            label: __(l[8874]), onClick: function onClick() {
-	                                if (room.members[contactHash] !== 2) {
-	                                    $(room).trigger('alterUserPrivilege', [contactHash, 2]);
-	                                }
-	                            } }));
-
-	                        dropdowns.push(React.makeElement(DropdownsUI.DropdownItem, {
-	                            key: "privReadOnly", icon: "eye-icon",
-	                            className: "tick-item " + (room.members[contactHash] === 0 ? "active" : ""),
-	                            disabled: myPresence === 'offline' || contactHash === u_handle,
-	                            label: __(l[8873]), onClick: function onClick() {
-	                                if (room.members[contactHash] !== 0) {
-	                                    $(room).trigger('alterUserPrivilege', [contactHash, 0]);
-	                                }
-	                            } }));
-	                    } else if (room.members[u_handle] === 2) {} else if (room.members[u_handle] === 1) {} else if (room.isReadOnly()) {} else {}
-
-	                    if (room.members[contactHash] === 3) {
-	                        dropdownIconClasses = "small-icon cogwheel-icon";
-	                    } else if (room.members[contactHash] === 2) {
-	                        dropdownIconClasses = "small-icon conversation-icon";
-	                    } else if (room.members[contactHash] === 0) {
-	                        dropdownIconClasses = "small-icon eye-icon";
-	                    } else {}
-
-	                    if (contactHash !== u_handle) {
-	                        dropdowns.push(removeParticipantButton);
-	                    }
-	                }
-
-	                contactsList.push(React.makeElement(ContactsUI.ContactCard, {
-	                    key: contact.u,
-	                    contact: contact,
-	                    megaChat: room.megaChat,
-	                    className: "right-chat-contact-card",
-	                    dropdownPositionMy: "right top",
-	                    dropdownPositionAt: "right bottom",
-	                    dropdowns: dropdowns,
-	                    dropdownDisabled: !room.iAmOperator() || contactHash === u_handle,
-	                    dropdownButtonClasses: room.type == "group" && myPresence !== 'offline' ? "button icon-dropdown" : "default-white-button tiny-button",
-	                    dropdownIconClasses: dropdownIconClasses,
-	                    style: {
-	                        width: 234,
-	                        position: 'absolute',
-	                        top: i * self.props.contactCardHeight
-	                    }
-	                }));
-
-	                i++;
-	            }
-	        });
-
-	        return React.makeElement(
-	            "div",
-	            { className: "chat-contacts-list-inner", style: contactListInnerStyles },
-	            contactsList
-	        );
-	    }
-	});
-	module.exports = {
-	    ParticipantsList: ParticipantsList
-	};
-
-/***/ },
-/* 171 */
+/* 168 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	var React = __webpack_require__(2);
 	var utils = __webpack_require__(156);
-	var getMessageString = __webpack_require__(169).getMessageString;
-	var ConversationMessageMixin = __webpack_require__(172).ConversationMessageMixin;
-	var ContactsUI = __webpack_require__(161);
-	var TypingAreaUI = __webpack_require__(167);
+	var getMessageString = __webpack_require__(167).getMessageString;
+	var ConversationMessageMixin = __webpack_require__(169).ConversationMessageMixin;
+	var ContactsUI = __webpack_require__(160);
+	var TypingAreaUI = __webpack_require__(166);
 
 	var MESSAGE_NOT_EDITABLE_TIMEOUT = window.MESSAGE_NOT_EDITABLE_TIMEOUT = 60 * 60;
 
@@ -26514,6 +25427,14 @@
 	                    self.props.onEditStarted($generic);
 	                }
 	            }
+
+	            if (self.scrollToElementAfterUpdate === true) {
+	                var $jsp = self.getParentJsp();
+	                if ($jsp) {
+	                    $jsp.scrollToElement($(self.findDOMNode()));
+	                }
+	                self.scrollToElementAfterUpdate = false;
+	            }
 	        } else if (self.isMounted() && self.state.editing === false && oldState.editing === true) {
 	            if (self.props.onUpdate) {
 	                self.props.onUpdate();
@@ -26522,21 +25443,14 @@
 	        var $node = $(self.findDOMNode());
 	        $node.rebind('onEditRequest.genericMessage', function (e) {
 	            if (self.state.editing === false) {
+	                self.scrollToElementAfterUpdate = true;
 	                self.setState({ 'editing': true });
-
-	                Soon(function () {
-	                    var $generic = $(self.findDOMNode());
-	                    var $textarea = $('textarea', $generic);
-	                    if ($textarea.size() > 0 && !$textarea.is(":focus")) {
-	                        $textarea.focus();
-	                        moveCursortoToEnd($textarea[0]);
-	                    }
-	                });
 	            }
 	        });
 	    },
 	    componentWillUnmount: function componentWillUnmount() {
 	        var self = this;
+	        $(document).unbind('keyup.megaChatEditTextareaClose' + self.props.chatRoom.roomJid);
 	        var $node = $(self.findDOMNode());
 	        $node.unbind('onEditRequest.genericMessage');
 	    },
@@ -26553,7 +25467,7 @@
 	    doCancelRetry: function doCancelRetry(e, msg) {
 	        e.preventDefault(e);
 	        e.stopPropagation(e);
-	        var chatRoom = this.props.message.chatRoom;
+	        var chatRoom = this.props.chatRoom;
 
 	        chatRoom.messagesBuff.messages.removeByKey(msg.messageId);
 
@@ -26563,7 +25477,7 @@
 	        var self = this;
 	        e.preventDefault(e);
 	        e.stopPropagation(e);
-	        var chatRoom = this.props.message.chatRoom;
+	        var chatRoom = this.props.chatRoom;
 	        this.doCancelRetry(e, msg);
 	        chatRoom._sendMessageToTransport(msg).done(function (internalId) {
 	            msg.internalId = internalId;
@@ -26575,8 +25489,8 @@
 	        var self = this;
 
 	        var message = this.props.message;
-	        var megaChat = this.props.message.chatRoom.megaChat;
-	        var chatRoom = this.props.message.chatRoom;
+	        var megaChat = this.props.chatRoom.megaChat;
+	        var chatRoom = this.props.chatRoom;
 	        var contact = self.getContact();
 	        var timestampInt = self.getTimestamp();
 	        var timestamp = self.getTimestampAsString();
@@ -26766,7 +25680,7 @@
 	                                        React.makeElement(DropdownsUI.DropdownItem, { icon: 'grey-cloud', label: __(l[8005]),
 	                                            onClick: addToCloudDrive }),
 	                                        React.makeElement('hr', null),
-	                                        React.makeElement(DropdownsUI.DropdownItem, { icon: 'red-cross', label: __(l[8909]), className: 'red',
+	                                        React.makeElement(DropdownsUI.DropdownItem, { icon: 'red-cross', label: __("Revoke"), className: 'red',
 	                                            onClick: function onClick() {
 	                                                chatRoom.revokeAttachment(v);
 	                                            } })
@@ -27094,6 +26008,34 @@
 	                        )
 	                    );
 	                } else if (textContents.substr && textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.REVOKE_ATTACHMENT) {
+	                    var foundRevokedNode = null;
+
+	                    var revokedNode = textContents.substr(2, textContents.length);
+
+	                    if (chatRoom.attachments.exists(revokedNode)) {
+	                        chatRoom.attachments[revokedNode].forEach(function (obj) {
+	                            var messageId = obj.messageId;
+	                            var attachedMsg = chatRoom.messagesBuff.messages[messageId];
+
+	                            if (!attachedMsg) {
+	                                return;
+	                            }
+
+	                            if (attachedMsg.orderValue < message.orderValue) {
+	                                try {
+	                                    var attachments = JSON.parse(attachedMsg.textContents.substr(2, attachedMsg.textContents.length));
+	                                    attachments.forEach(function (node) {
+	                                        if (node.h === revokedNode) {
+	                                            foundRevokedNode = node;
+	                                        }
+	                                    });
+	                                } catch (e) {}
+	                                attachedMsg.seen = true;
+	                                attachedMsg.revoked = true;
+	                                obj.revoked = true;
+	                            }
+	                        });
+	                    }
 
 	                    return null;
 	                } else {
@@ -27102,11 +26044,7 @@
 	                }
 	            } else {
 
-	                if (message instanceof KarereEventObjects.OutgoingMessage) {
-	                    if (message.contents === "") {
-	                        message.deleted = true;
-	                    }
-	                } else if (message.textContents === "") {
+	                if (message.textContents === "") {
 	                    message.deleted = true;
 	                }
 	                var messageActionButtons = null;
@@ -27177,10 +26115,12 @@
 	                    messageDisplayBlock = React.makeElement(TypingAreaUI.TypingArea, {
 	                        iconClass: 'small-icon writing-pen textarea-icon',
 	                        initialText: message.textContents ? message.textContents : message.contents,
-	                        chatRoom: self.props.message.chatRoom,
+	                        chatRoom: self.props.chatRoom,
 	                        showButtons: true,
 	                        className: 'edit-typing-area',
 	                        onUpdate: function onUpdate() {
+	                            self.safeForceUpdate();
+
 	                            if (self.props.onUpdate) {
 	                                self.props.onUpdate();
 	                            }
@@ -27189,9 +26129,7 @@
 	                            self.setState({ 'editing': false });
 
 	                            if (self.props.onEditDone) {
-	                                Soon(function () {
-	                                    self.props.onEditDone(messageContents);
-	                                });
+	                                self.props.onEditDone(messageContents);
 	                            }
 
 	                            return true;
@@ -27211,18 +26149,10 @@
 	                    if (message.updated > 0) {
 	                        textMessage = textMessage + " <em>" + __(l[8887]) + "</em>";
 	                    }
-	                    if (self.props.initTextScrolling) {
-	                        messageDisplayBlock = React.makeElement(
-	                            utils.JScrollPane,
-	                            { className: 'message text-block scroll' },
-	                            React.makeElement('div', { className: 'message text-scroll', dangerouslySetInnerHTML: { __html: textMessage } })
-	                        );
-	                    } else {
-	                        messageDisplayBlock = React.makeElement('div', { className: 'message text-block', dangerouslySetInnerHTML: { __html: textMessage } });
-	                    }
+	                    messageDisplayBlock = React.makeElement('div', { className: 'message text-block', dangerouslySetInnerHTML: { __html: textMessage } });
 	                }
 	                if (!message.deleted) {
-	                    if (contact && contact.u === u_handle && unixtime() - message.delay < MESSAGE_NOT_EDITABLE_TIMEOUT && self.state.editing !== true && chatRoom.isReadOnly() === false && !message.requiresManualRetry) {
+	                    if (contact && contact.u === u_handle && unixtime() - message.delay < MESSAGE_NOT_EDITABLE_TIMEOUT && self.state.editing !== true && !message.requiresManualRetry) {
 	                        messageActionButtons = React.makeElement(
 	                            ButtonsUI.Button,
 	                            {
@@ -27282,7 +26212,7 @@
 	        } else if (message.type) {
 	            textMessage = getMessageString(message.type);
 	            if (!textMessage) {
-	                console.error("Message with type: ", message.type, " - no text string defined. Message: ", message);
+	                console.error("Message with type: ", message.type, "does not have a text string defined. Message: ", message);
 	                debugger;
 	                throw new Error("boom");
 	            }
@@ -27365,8 +26295,7 @@
 
 	            return React.makeElement(
 	                'div',
-	                { className: message.messageId + " message body" + additionalClasses,
-	                    'data-id': "id" + message.messageId },
+	                { className: message.messageId + " message body" + additionalClasses, 'data-id': "id" + message.messageId },
 	                React.makeElement(
 	                    'div',
 	                    { className: 'feedback round-icon-block' },
@@ -27393,7 +26322,7 @@
 	};
 
 /***/ },
-/* 172 */
+/* 169 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -27408,12 +26337,17 @@
 	    onAfterRenderWasTriggered: false,
 	    componentWillMount: function componentWillMount() {
 	        var self = this;
-	        var chatRoom = self.props.message.chatRoom;
+	        var chatRoom = self.props.chatRoom;
 	        var megaChat = chatRoom.megaChat;
+	        megaChat.chats.addChangeListener(function () {
+	            if (self.isMounted()) {
+	                self.forceUpdate();
+	            }
+	        });
 	    },
 	    getContact: function getContact() {
 	        var message = this.props.message;
-	        var megaChat = this.props.message.chatRoom.megaChat;
+	        var megaChat = this.props.chatRoom.megaChat;
 
 	        var contact;
 	        if (message.authorContact) {
@@ -27466,7 +26400,7 @@
 	    },
 	    componentDidUpdate: function componentDidUpdate() {
 	        var self = this;
-	        var chatRoom = self.props.message.chatRoom;
+	        var chatRoom = self.props.chatRoom;
 	        var megaChat = chatRoom.megaChat;
 
 	        if (!self.onAfterRenderWasTriggered) {
@@ -27489,7 +26423,7 @@
 	};
 
 /***/ },
-/* 173 */
+/* 170 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -27498,9 +26432,9 @@
 	var ReactDOM = __webpack_require__(154);
 	var utils = __webpack_require__(156);
 	var MegaRenderMixin = __webpack_require__(157).MegaRenderMixin;
-	var ContactsUI = __webpack_require__(161);
-	var ConversationMessageMixin = __webpack_require__(172).ConversationMessageMixin;
-	var getMessageString = __webpack_require__(169).getMessageString;
+	var ContactsUI = __webpack_require__(160);
+	var ConversationMessageMixin = __webpack_require__(169).ConversationMessageMixin;
+	var getMessageString = __webpack_require__(167).getMessageString;
 
 	var AlterParticipantsConversationMessage = React.createClass({
 	    displayName: "AlterParticipantsConversationMessage",
@@ -27512,8 +26446,8 @@
 	        var cssClasses = "message body";
 
 	        var message = this.props.message;
-	        var megaChat = this.props.message.chatRoom.megaChat;
-	        var chatRoom = this.props.message.chatRoom;
+	        var megaChat = this.props.chatRoom.megaChat;
+	        var chatRoom = this.props.chatRoom;
 	        var contact = self.getContact();
 	        var timestampInt = self.getTimestamp();
 	        var timestamp = self.getTimestampAsString();
@@ -27544,7 +26478,7 @@
 	            var avatar = React.makeElement(ContactsUI.Avatar, { contact: otherContact, className: "message small-rounded-avatar" });
 	            var otherDisplayName = otherContact.u === u_handle ? __(l[8885]) : generateAvatarMeta(otherContact.u).fullName;
 
-	            var text = __(l[8907]).replace("%s", '<strong className="dark-grey-txt">' + htmlentities(displayName) + '</strong>');
+	            var text = __("Joined the group chat by invitation from %s").replace("%s", '<strong className="dark-grey-txt">' + htmlentities(displayName) + '</strong>');
 
 	            messages.push(React.makeElement(
 	                "div",
@@ -27576,9 +26510,9 @@
 
 	            var text;
 	            if (otherContact.u === contact.u) {
-	                text = __(l[8908]);
+	                text = __("Had left the group chat");
 	            } else {
-	                text = __(l[8906]).replace("%s", '<strong className="dark-grey-txt">' + htmlentities(displayName) + '</strong>');
+	                text = __("Was removed from the group chat by %s").replace("%s", '<strong className="dark-grey-txt">' + htmlentities(displayName) + '</strong>');
 	            }
 
 	            messages.push(React.makeElement(
@@ -27594,7 +26528,21 @@
 	                        otherDisplayName
 	                    ),
 	                    datetime,
+<<<<<<< HEAD
+	                    React.makeElement(
+	                        "div",
+	                        { className: "message text-block" },
+	                        "__(\"Was removed from the group chat by %s\").replace(\"%s\", '",
+	                        React.makeElement(
+	                            "strong",
+	                            { className: "dark-grey-txt" },
+	                            displayName
+	                        ),
+	                        "')"
+	                    )
+=======
 	                    React.makeElement("div", { className: "message text-block", dangerouslySetInnerHTML: { __html: text } })
+>>>>>>> 6bc3f3a01a36a153bf44fa58cf3eefa088bafde5
 	                )
 	            ));
 	        });
@@ -27612,7 +26560,7 @@
 	};
 
 /***/ },
-/* 174 */
+/* 171 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -27621,9 +26569,9 @@
 	var ReactDOM = __webpack_require__(154);
 	var utils = __webpack_require__(156);
 	var MegaRenderMixin = __webpack_require__(157).MegaRenderMixin;
-	var ContactsUI = __webpack_require__(161);
-	var ConversationMessageMixin = __webpack_require__(172).ConversationMessageMixin;
-	var getMessageString = __webpack_require__(169).getMessageString;
+	var ContactsUI = __webpack_require__(160);
+	var ConversationMessageMixin = __webpack_require__(169).ConversationMessageMixin;
+	var getMessageString = __webpack_require__(167).getMessageString;
 
 	var TruncatedMessage = React.createClass({
 	    displayName: "TruncatedMessage",
@@ -27635,8 +26583,8 @@
 	        var cssClasses = "message body";
 
 	        var message = this.props.message;
-	        var megaChat = this.props.message.chatRoom.megaChat;
-	        var chatRoom = this.props.message.chatRoom;
+	        var megaChat = this.props.chatRoom.megaChat;
+	        var chatRoom = this.props.chatRoom;
 	        var contact = self.getContact();
 	        var timestampInt = self.getTimestamp();
 	        var timestamp = self.getTimestampAsString();
@@ -27689,7 +26637,7 @@
 	                React.makeElement(
 	                    "div",
 	                    { className: "message text-block" },
-	                    __(l[8905])
+	                    __("History has been cleared.")
 	                )
 	            )
 	        );
@@ -27701,109 +26649,14 @@
 	};
 
 /***/ },
-/* 175 */
+/* 172 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
+	var utils = __webpack_require__(173);
 	var React = __webpack_require__(2);
-	var ReactDOM = __webpack_require__(154);
-	var utils = __webpack_require__(156);
-	var MegaRenderMixin = __webpack_require__(157).MegaRenderMixin;
-	var ContactsUI = __webpack_require__(161);
-	var ConversationMessageMixin = __webpack_require__(172).ConversationMessageMixin;
-	var getMessageString = __webpack_require__(169).getMessageString;
-
-	var PrivilegeChange = React.createClass({
-	    displayName: "PrivilegeChange",
-
-	    mixins: [ConversationMessageMixin],
-
-	    render: function render() {
-	        var self = this;
-	        var cssClasses = "message body";
-
-	        var message = this.props.message;
-	        var megaChat = this.props.message.chatRoom.megaChat;
-	        var chatRoom = this.props.message.chatRoom;
-	        var contact = self.getContact();
-	        var timestampInt = self.getTimestamp();
-	        var timestamp = self.getTimestampAsString();
-
-	        var datetime = React.makeElement(
-	            "div",
-	            { className: "message date-time",
-	                title: time2date(timestampInt) },
-	            timestamp
-	        );
-
-	        var displayName;
-	        if (contact) {
-	            displayName = contact.u === u_handle ? __(l[8885]) : generateAvatarMeta(contact.u).fullName;
-	        } else {
-	            displayName = contact;
-	        }
-
-	        var messages = [];
-
-	        var otherContact = M.u[message.meta.targetUserId] ? M.u[message.meta.targetUserId] : {
-	            'u': message.meta.targetUserId,
-	            'h': message.meta.targetUserId,
-	            'c': 0
-	        };
-
-	        var avatar = React.makeElement(ContactsUI.Avatar, { contact: otherContact, className: "message small-rounded-avatar" });
-	        var otherDisplayName = otherContact.u === u_handle ? __(l[8885]) : generateAvatarMeta(otherContact.u).fullName;
-
-	        var newPrivilegeText = "";
-	        if (message.meta.privilege === 3) {
-	            newPrivilegeText = l[8875];
-	        } else if (message.meta.privilege === 2) {
-	            newPrivilegeText = l[8874];
-	        } else if (message.meta.privilege === 0) {
-	            newPrivilegeText = l[8873];
-	        }
-
-	        var text = __(l[8915]).replace("%s1", '<strong className="dark-grey-txt">' + htmlentities(newPrivilegeText) + '</strong>').replace("%s2", '<strong className="dark-grey-txt">' + htmlentities(displayName) + '</strong>');
-
-	        messages.push(React.makeElement(
-	            "div",
-	            { className: "message body", "data-id": "id" + message.messageId, key: message.messageId },
-	            avatar,
-	            React.makeElement(
-	                "div",
-	                { className: "message content-area small-info-txt" },
-	                React.makeElement(
-	                    "div",
-	                    { className: "message user-card-name" },
-	                    otherDisplayName
-	                ),
-	                datetime,
-	                React.makeElement("div", { className: "message text-block", dangerouslySetInnerHTML: { __html: text } })
-	            )
-	        ));
-
-	        return React.makeElement(
-	            "div",
-	            null,
-	            messages
-	        );
-	    }
-	});
-
-	module.exports = {
-	    PrivilegeChange: PrivilegeChange
-	};
-
-/***/ },
-/* 176 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	var utils = __webpack_require__(177);
-	var React = __webpack_require__(2);
-	var ConversationPanelUI = __webpack_require__(163);
+	var ConversationPanelUI = __webpack_require__(162);
 
 	var ChatRoom = function ChatRoom(megaChat, roomJid, type, users, ctime, lastActivity, chatId, chatShard, chatdUrl) {
 	    var self = this;
@@ -27865,7 +26718,7 @@
 	    this.isCurrentlyActive = false;
 
 	    this.bind('onStateChange', function (e, oldState, newState) {
-	        self.logger.debug("Will change state from: ", ChatRoom.stateToText(oldState), " to ", ChatRoom.stateToText(newState));
+	        self.logger.log("Will change state from: ", ChatRoom.stateToText(oldState), " to ", ChatRoom.stateToText(newState));
 
 	        var resetStateToReady = function resetStateToReady() {
 	            if (self.state != ChatRoom.STATE.LEFT && self.state != ChatRoom.STATE.READY) {
@@ -27899,13 +26752,30 @@
 
 	                    var pres = self.megaChat.karere.getPresence(contact);
 
+	                    if (pres && pres != "offline" && self.encryptionHandler && self.encryptionHandler.state !== 3) {
+
+	                        var othersJid = self.getParticipantsExceptMe()[0];
+	                        var data = {
+	                            currentMpencState: self.encryptionHandler.state,
+	                            currentKarereState: self.megaChat.karere.getConnectionState(),
+	                            myPresence: self.megaChat.karere.getPresence(self.megaChat.karere.getJid()),
+	                            otherUsersPresence: self.megaChat.karere.getPresence(othersJid),
+	                            callIsActive: self.callSession ? constStateToText(CallSession.STATE, self.callSession.state) : null,
+	                            queuedMessagesCount: self._messagesQueue.length,
+	                            opQueueErrorRetriesCount: self.encryptionOpQueue._error_retries
+	                        };
+
+	                        srvlog("Timed out initialising mpenc.", data, true);
+	                        self.logger.error("Timed out initialising mpenc.", data);
+	                    }
+
 	                    self.setState(ChatRoom.STATE.PLUGINS_READY);
 	                }
 	            });
 	        } else if (newState === ChatRoom.STATE.JOINING) {} else if (newState === ChatRoom.STATE.READY) {}
 	    });
 
-	    self.rebind('onMessagesBuffAppend.lastActivity', function (e, msg) {
+	    self.bind('onAfterRenderMessage', function (e, msg) {
 	        var ts = msg.delay ? msg.delay : msg.ts;
 	        if (!ts) {
 	            return;
@@ -28223,14 +27093,12 @@
 	    }
 	};
 
-	ChatRoom.prototype.leave = function (triggerLeaveRequest) {
+	ChatRoom.prototype.leave = function (notifyOtherDevices) {
 	    var self = this;
 
 	    self._leaving = true;
 
-	    self.members[u_handle] = 0;
-
-	    if (triggerLeaveRequest) {
+	    if (notifyOtherDevices === true) {
 	        if (self.type == "group") {
 	            $(self).trigger('onLeaveChatRequested');
 	        } else {
@@ -28240,25 +27108,18 @@
 	    }
 
 	    if (self.roomJid.indexOf("@") != -1) {
-	        if (self.state !== ChatRoom.STATE.LEFT) {
-	            self.setState(ChatRoom.STATE.LEAVING);
-
-	            return self.megaChat.karere.leaveChat(self.roomJid).done(function () {
-	                self.setState(ChatRoom.STATE.LEFT);
-	            });
-	        } else {
-	            return;
-	        }
+	        self.setState(ChatRoom.STATE.LEAVING);
+	        return self.megaChat.karere.leaveChat(self.roomJid).done(function () {
+	            self.setState(ChatRoom.STATE.LEFT);
+	        });
 	    } else {
 	        self.setState(ChatRoom.STATE.LEFT);
 	    }
 
 	    self.megaChat.refreshConversations();
-
-	    self.trackDataChange();
 	};
 
-	ChatRoom.prototype.destroy = function (notifyOtherDevices, noRedirect) {
+	ChatRoom.prototype.destroy = function (notifyOtherDevices) {
 	    var self = this;
 
 	    self.megaChat.trigger('onRoomDestroy', [self]);
@@ -28276,9 +27137,7 @@
 
 	        mc.chats.remove(roomJid);
 
-	        if (!noRedirect) {
-	            window.location = '#fm/chat';
-	        }
+	        window.location = '#fm/chat';
 	    });
 	};
 
@@ -28396,6 +27255,8 @@
 	    self.messagesBuff.messages.push(message);
 
 	    self.shownMessages[message.messageId] = true;
+
+	    self.trackDataChange();
 	};
 
 	ChatRoom.prototype.getNavElement = function () {
@@ -28431,7 +27292,6 @@
 	    var messageId = megaChat.karere.generateMessageId(self.roomJid, JSON.stringify([message, meta]));
 
 	    var eventObject = new KarereEventObjects.OutgoingMessage(self.roomJid, megaChat.karere.getJid(), "groupchat", messageId, message, meta, unixtime(), KarereEventObjects.OutgoingMessage.STATE.NOT_SENT, self.roomJid);
-	    eventObject.chatRoom = self;
 
 	    eventObject.textContents = message;
 
@@ -28439,7 +27299,6 @@
 
 	    self._sendMessageToTransport(eventObject).done(function (internalId) {
 	        eventObject.internalId = internalId;
-	        eventObject.orderValue = internalId;
 	    });
 	};
 
@@ -28470,7 +27329,7 @@
 
 	    users.forEach(function (uh) {
 	        nodeids.forEach(function (nodeId) {
-	            promises.push(asyncApiReq({ 'a': 'mcga', 'n': nodeId, 'u': uh, 'id': self.chatId, 'v': Chatd.VERSION }));
+	            promises.push(asyncApiReq({ 'a': 'mcga', 'n': nodeId, 'u': uh, 'id': self.chatId }));
 	        });
 	    });
 
@@ -28559,14 +27418,10 @@
 
 	    users.forEach(function (uh) {
 	        allPromises.push(asyncApiReq({
-	            'a': 'mcra', 'n': node.h, 'u': uh, 'id': self.chatId,
-	            'v': Chatd.VERSION
+	            'a': 'mcra', 'n': node.h, 'u': uh, 'id': self.chatId
 	        }));
 	    });
-	    MegaPromise.allDone(allPromises).done(function (r) {
-	        if (r && r[0] && r[0][0] && r[0][0] < 0) {
-	            msgDialog('warninga', __("Revoke attachment"), __("Could not revoke access to attachment, error code: %s.").replace("%s", r[0][0]));
-	        }
+	    MegaPromise.allDone(allPromises).done(function () {
 
 	        self.sendMessage(Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT + Message.MANAGEMENT_MESSAGE_TYPES.REVOKE_ATTACHMENT + node.h);
 	    }).always(function () {
@@ -28584,7 +27439,6 @@
 	    $.each(self.messagesBuff.messages, function (k, v) {
 	        if (v.messageId === messageId) {
 	            found = v;
-
 	            return false;
 	        }
 	    });
@@ -28620,16 +27474,13 @@
 	ChatRoom.prototype.recover = function () {
 	    var self = this;
 
-	    self.callRequest = null;
-	    var $startChatPromise;
-	    if (self.state !== ChatRoom.STATE.LEFT) {
-	        self.setState(ChatRoom.STATE.JOINING, true);
-	        $startChatPromise = self.megaChat.karere.startChat([], self.type, self.roomJid.split("@")[0], self.type === "private" ? false : undefined);
+	    self.logger.warn('recovering room: ', self.roomJid, self);
 
-	        self.megaChat.trigger("onRoomCreated", [self]);
-	    } else {
-	        $startChatPromise = MegaPromise.reject();
-	    }
+	    self.callRequest = null;
+	    self.setState(ChatRoom.STATE.JOINING, true);
+	    var $startChatPromise = self.megaChat.karere.startChat([], self.type, self.roomJid.split("@")[0], self.type === "private" ? false : undefined);
+
+	    self.megaChat.trigger("onRoomCreated", [self]);
 
 	    return $startChatPromise;
 	};
@@ -28711,7 +27562,7 @@
 	module.exports = ChatRoom;
 
 /***/ },
-/* 177 */
+/* 173 */
 /***/ function(module, exports) {
 
 	'use strict';

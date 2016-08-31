@@ -199,3 +199,19 @@
     padding: 0 0 10px 0;
 }
 /* End of Limited available bandwidth dialog */
+
+
+.fm-dialog.chat-rename-dialog {
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%);
+}
+
+.chat-rename-dialog input {
+    padding-left: 10px;
+    width: 440px;
+}
+
+.chat-rename-dialog .rename-input-bl {
+    margin-bottom: 10px;
+}

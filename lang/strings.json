@@ -14282,5 +14282,109 @@
     "9056": {
         "text": "Please do not enter any URL into the Copyrighted work field, if you need to add more URLs please click on Add another URL.",
         "context": "An error message which is shown when submitting a copyright notice and a URL is mistakenly inserted into the \"Copyrighted work claimed to have been infringed\" field."
+    },
+    "9057": {
+        "text": "The file you are about to add is older than the copy already on record, do you want to replace the file?",
+        "context": "A dialog message asking the user to confirm they want to replace the file."
+    },
+    "9058": {
+        "text": "Replace file",
+        "context": "A dialog title. This dialog is shown before replacing an existing file."
+    },
+    "9059": {
+        "text": "No, rename it as %1",
+        "context": "A dialog button label. This button renames the file with a different name instead of replacing the existing file. Please keep the %1 placeholder which will be replaced with the filename."
+    },
+    "9060": {
+        "text": "Auto-replace file if a newly uploaded file has the same name\r\n\r\n",
+        "context": "Title for a setting\/option on the settings page to replace a file within a directory (rather than rename) if another file with the same name is uploaded to the same directory"
+    },
+    "9061": {
+        "text": "Encrypt",
+        "context": "The text of a button. This button will encrypt a link with a password."
+    },
+    "9062": {
+        "text": "Show PRO options",
+        "context": "This is the text of a button. The button will reveal more options on the Export Link dialog which are usable if the user has purchased a PRO plan."
+    },
+    "9063": {
+        "text": "Set password protection",
+        "context": "This is a title label on the Export Link dialog. The title covers the section where the user can password protect a public link."
+    },
+    "9064": {
+        "text": "Hide options",
+        "context": "This is a button on the Export Link dialog. This hides the extra options that are currently visible and simplifies the look of the dialog."
+    },
+    "9065": {
+        "text": "This feature is not supported in your browser. Try Firefox or Chrome.",
+        "context": "An error message. This is shown when there is no browser support currently for an advanced function and the feature will not work. It recommends they try one of the more modern browsers."
+    },
+    "9066": {
+        "text": "The passwords are not the same, please check that you entered them correctly.",
+        "context": "An error message on the Export Link dialog. This is shown when they have entered the password and confirmation password but the passwords do not match."
+    },
+    "9067": {
+        "text": "Please use a stronger password.",
+        "context": "An error message on the Export Link dialog. This is shown when the user has entered a weak password that is a short length or that could be guessed easily in a dictionary attack."
+    },
+    "9068": {
+        "text": "The link could not be decoded, please check the link is correct and try again.",
+        "context": "An error on the Password Decrypt dialog."
+    },
+    "9069": {
+        "text": "The algorithm this link was encrypted with is not supported.",
+        "context": "An error on the Password Decrypt dialog. Part of the link may have been corrupted so the program does not know how to decrypt the link. Alternatively another client may have used a newer algorithm to encrypt the link and it is not supported on this client."
+    },
+    "9070": {
+        "text": "Enter decryption password",
+        "context": "This dialog title is used on the Password Decrypt dialog."
+    },
+    "9071": {
+        "text": "To access this link, you will need its password.",
+        "context": "This dialog message is used on the Password Decrypt dialog. The link is a password protected link so the user needs to enter the password to decrypt the link."
+    },
+    "9072": {
+        "text": "If you do not have the password, contact the creator of the link.",
+        "context": "This dialog message is used on the Password Decrypt dialog as an instruction for the user."
+    },
+    "9073": {
+        "text": "Enter the password",
+        "context": "This placeholder text is used on the Password Decrypt dialog as an instruction for the user."
+    },
+    "9074": {
+        "text": "Enter a strong password",
+        "context": "This input placeholder text is used on the Export Link dialog with the password protect feature. It is used as an instruction for the user."
+    },
+    "9075": {
+        "text": "Retype the password",
+        "context": "This input placeholder text is used on the Export Link dialog with the password protect feature. It is used as an instruction for the user that they need to retype the first password they entered as a confirmation that they typed everything correctly and didn't make a typo."
+    },
+    "9076": {
+        "text": "The link could not be decrypted. The password could be incorrect, or the data was corrupted or modified. Check the link and try entering the password again.",
+        "context": "An error message on the Password Decrypt dialog."
+    },
+    "9077": {
+        "text": "Decrypted",
+        "context": "The button text on the Password Decrypt dialog when the link has been successfully decrypted."
+    },
+    "9078": {
+        "text": "Encrypting",
+        "context": "The button text on the Export Link dialog when the process to start encrypting the link has begun."
+    },
+    "9079": {
+        "text": "Encrypted",
+        "context": "The button text on the Export Link dialog to indicate that the link has been encrypted successfully."
+    },
+    "9080": {
+        "text": "Rename Group",
+        "context": "The title of a menu button which allows users to rename a group chat."
+    },
+    "9081": {
+        "text": "Changed group chat name to %s",
+        "context": "A hint message in a group chat to indicate the group chat name is changed to a new one. Please keep %s when translating this string which will be replaced with the name at runtime."
+    },
+    "9082": {
+        "text": "This account has not completed the registration process yet. First check your email, click on the Activate Account button and reconfirm your chosen password.",
+        "context": "An error dialog message which is shown when the user tries to log in to their account they created, but they haven't clicked the confirmation link in their email yet."
     }
 }

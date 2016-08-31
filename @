@@ -1,0 +1,22 @@
+encode API handler.
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+#
+# Committer: vincent <guoy@vinents-MacBook-Pro.local>
+#
+# On branch group-chat2
+# Your branch is up-to-date with 'origin/group-chat2'.
+#
+# Changes to be committed:
+#	modified:   js/chat/chatd.js
+#
+# Untracked files:
+#	js/chat/bundle_bk.js
+#	js/chat/chatd.js.bk
+#	js/chat/plugins/chatdIntegration.js.bk
+#	js/chat/strongvelope.js.bk
+#	test/chat/strongvelope_transcripts_test_bk.js
+#	test/chat/strongvelope_workflow_test.js.bk
+#	test/chat/transcripts/legacy_messages.json
+#	test/chat/transcripts/legacy_messages_2.json
+#

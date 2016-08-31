@@ -38,7 +38,7 @@ var blogpostnum;
 var blogmonth = false;
 var blogsearch = false;
 
-function init_blog_callback() {
+function blog_bind_search() {
     $('#blog_searchinput').bind('focus', function(e) {
         if (e.target.value === l[102]) {
             e.target.value = '';
@@ -54,6 +54,10 @@ function init_blog_callback() {
             blog_search();
         }
     });
+}
+
+function init_blog_callback() {
+    blog_bind_search();
     if (page === 'blogarticle') {
         init_blogarticle();
     }
@@ -64,28 +68,27 @@ function init_blog_callback() {
 
 function init_blog() {
     if (blogposts) {
+        return init_blog_callback();
+    }
+
+    loadingDialog.show();
+    CMS.watch('blog', function(nodeId) {
+        blogposts = null;
+        if (d) {
+            console.error("CMS Blog", "update");
+        }
+        init_blog();
+    });
+
+    CMS.get('blog', function(err, data) {
+        if (err) {
+            return alert("Error fetching the blog data");
+        }
+
+        blogposts = data.object;
+        loadingDialog.hide();
         init_blog_callback();
-    }
-    else {
-        loadingDialog.show();
-        CMS.watch('blog', function(nodeId) {
-            blogposts = null;
-            if (d) {
-                console.error("CMS Blog", "update");
-            }
-            init_blog();
-        });
-
-        CMS.get('blog', function(err, data) {
-            if (err) {
-                return alert("Error fetching the blog data");
-            }
-
-            blogposts = data.object;
-            loadingDialog.hide();
-            init_blog_callback();
-        });
-    }
+    });
 }
 
 function blog_load() {

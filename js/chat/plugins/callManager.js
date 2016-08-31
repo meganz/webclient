@@ -923,6 +923,7 @@ var CallManager = function(megaChat) {
             } else {
                 self.logger.error("Error initializing webRTC support:", e);
             }
+            megaChat.rtcError = e;
         }
     });
 
@@ -1382,7 +1383,15 @@ CallManager.prototype.startCall = function(chatRoom, mediaOptions) {
     CallManager.assert(participants.length > 0, "No participants.");
 
     if (!chatRoom.megaChat.rtc) {
-        msgDialog('warninga', 'Error', l[7211]);
+        if (chatRoom.megaChat.rtcError && chatRoom.megaChat.rtcError instanceof RtcSession.NotSupportedError) {
+            msgDialog('warninga', 'Error', l[7211]);
+        }
+        else {
+            var errorMsg = chatRoom.megaChat.rtcError ? (
+                chatRoom.megaChat.rtcError.toString() + "\n" + chatRoom.megaChat.rtcError.stack
+            ) : l[1679];
+            msgDialog('warninga', 'Error', l[1657] + ":\n" + errorMsg + "\n" + errorMsg);
+        }
         return;
     }
     if (chatRoom._conv_ended === true) {

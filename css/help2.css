@@ -852,10 +852,10 @@
     margin: 4px 20px 25px 2px;
 }
 #help2-main .first-support-block {
-  height: 200px;
-  padding-top: 40px;
-  border-top: 1px solid #e8e8e8;
-  margin: 20px auto 0;
+    border-top: 1px solid #e8e8e8;
+    height: 200px;
+    margin: 0 auto;
+    padding-top: 40px;
 }
 #help2-main .search-support-block {
   height: 100px;

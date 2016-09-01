@@ -359,7 +359,7 @@ __help2_templates.search = function(context, data) {
   return (out);
 }
 
-__help2_templates.sections = function(context, data) {
+__help2_templates.section = function(context, data) {
   var out = "";
   var galleryHtml = context.galleryHtml;
   var tags = context.tags;

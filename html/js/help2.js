@@ -106,7 +106,6 @@ var Help = (function() {
             var $searchForm = $(".support-search-container");
             var $getStartTitle = $(".getstart-title-section", $container);
 
-
             if ($this.is('.close')) {
                 $('.support-search-heading').removeClass('hidden');
                 $('.support-search-heading-close').addClass('hidden');
@@ -433,6 +432,10 @@ var Help = (function() {
 
         $container.find('form').rebind('submit', function(e) {
             e.preventDefault();
+            
+            // Log search submitted
+            api_req({ a: 'log', e: 99619, m: 'Help2 regular search feature used' });
+            
             document.location.href = url("search", $(this).find('input[type="text"]').val());
         });
 
@@ -445,6 +448,10 @@ var Help = (function() {
                 },
                 appendTo: $this.parent().parent(),
                 select: function(event, ui) {
+                    
+                    // Log autocomplete item in search clicked
+                    api_req({ a: 'log', e: 99620, m: 'Help2 autocomplete search feature used' });
+                    
                     document.location.href = ui.item.url;
                 }
             });
@@ -995,6 +1002,10 @@ var Help = (function() {
                     login_next = url;
                     url = "#login";
                 }
+                
+                // Log that they clicked on the panel
+                api_req({ a: 'log', e: 99621, m: 'Help2 client selection panel used' });
+                
                 document.location.href = url;
             }
         });
@@ -1007,6 +1018,10 @@ var Help = (function() {
             return false;
         });
 
+        // FAQ items logging
+        $('#help2-main .popular-question-items a').rebind('click', function() {
+            api_req({ a: 'log', e: 99622, m: 'Help2 FAQ item selected' });
+        });
 
         // Image Gallery Interaction
         $('.instructions .image-instruction-control, .gallery-dot-navigation li, .bullet-number', '#help2-main')
@@ -1040,7 +1055,6 @@ var Help = (function() {
             $this.prev().addClass('selected-bullet');
         });
 
-
         $instructions.rebind('mouseleave', function() {
             var $this = $(this);
             var $cnt = $this.parents('.container');
@@ -1051,7 +1065,6 @@ var Help = (function() {
                 $this.prev().removeClass('selected-bullet');
             }
         });
-
 
         // Adding and removing active state to instructions and bullet point on Hover for bulletpoints
         var $bullet = $('#help2-main .instructions .bullet-number');

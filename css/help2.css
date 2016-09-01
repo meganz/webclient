@@ -1299,8 +1299,8 @@
   float: left;
   position: relative;
 }
-#help2-main .support-updatedate {
-
+#help2-main .related-articles .related-articles-title {
+    float: none;
 }
 #help2-main .support-viewcount-result,
 #help2-main .support-updatedate-result {
@@ -1592,6 +1592,9 @@
     display: block;
     top: 10px;
     left: 0;
+}
+#help2-main .related-articles-list .related-bullet-point {
+    top: 8px;
 }
 #help2-main .clear {
   display: block;
@@ -2090,15 +2093,17 @@
   -o-transition-timing-function: ease; /* Opera */
 }
 #help2-main .related-articles-list li {
-  font-family: 'source_sans_proregular';
-  font-size: 13px;
-  color: #666;
-  letter-spacing: 0.2px;
-  cursor: pointer;
-  margin-right: 12px;
-  line-height: 18px;
-  margin-bottom: 20px;
-  text-align: left;
+    color: #666;
+    cursor: pointer;
+    font-family: "source_sans_proregular";
+    font-size: 13px;
+    letter-spacing: 0.2px;
+    line-height: 18px;
+    margin-bottom: 22px;
+    margin-right: 12px;
+    padding-bottom: 20px;
+    position: relative;
+    text-align: left;
 }
 #help2-main ul {
   list-style: none;

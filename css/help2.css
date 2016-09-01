@@ -770,9 +770,10 @@
   z-index: 999;
   border-top: none;
 }
-#help2-main .search-section-header  .popular-question-title {
-  color: #444;
-  font-size: 36px;
+#help2-main .search-section-header .popular-question-title {
+    color: #444;
+    font-size: 36px;
+    padding-bottom: 30px;
 }
 #help2-main .search-section-header .popular-question-items li {
     color: #666;
@@ -783,8 +784,9 @@
     line-height: 18px;
     margin-bottom: 22px;
     margin-right: 12px;
+    padding-bottom: 22px;
+    position: relative;
     text-align: left;
-    padding-bottom: 0px;
 }
 #help2-main .search-section-header .popular-question-items a,
 #help2-main .popular-question-items a {

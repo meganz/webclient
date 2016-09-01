@@ -88,7 +88,7 @@ var support = (function() {
         extraData = '';
         if (window.helpOrigin) {
             supportSubjects = {8: 'Improve help section'};
-            extraData = "\nLanguage:" + getCurrentLanguage() + "\nQuestion: " + window.helpOrigin + "\n\n";
+            extraData = "\nLanguage:" + lang + "\nQuestion: " + window.helpOrigin + "\n\n";
 
             delete window.helpOrigin;
         }

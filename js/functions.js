@@ -238,6 +238,21 @@ var Soon = is_chrome_firefox ? mozRunAsync : function(callback) {
     }, 20);
 };
 
+/**
+ *  Delays the execution of a function
+ *
+ *  Wraps a function to execute at most once
+ *  in a 100 ms time period. Useful to wrap
+ *  expensive jQuery events (for instance scrolling
+ *  events).
+ *
+ *  All argument and *this* is passed to the callback
+ *  after the 100ms (default)
+ *
+ *  @param {Function} func  Function to wrap
+ *  @param {Number}   ms    Timeout
+ *  @returns {Function} wrapped function
+ */
 function SoonFc(func, ms) {
     return function __soonfc() {
         var self = this,
@@ -5128,6 +5143,7 @@ mega.utils.chrome110ZoomLevelNotification = function() {
 
     }
 };
+mBroadcaster.once('zoomLevelCheck', mega.utils.chrome110ZoomLevelNotification);
 
 
 /**
@@ -5137,42 +5153,8 @@ mega.utils.chrome110ZoomLevelNotification = function() {
  *  @returns {String}   The text without any HTML markups
  */
 function strip_tags(html) {
-    return $('<div>').safeHTML(html).text();
+    return String(html).replace(/<\/?\w[^>]*?>/g, '');
 }
-
-/**
- * Returns the current language in which the current user
- * runs MEGA
- *
- * @returns {String}  Two letters language code
- */
-function getCurrentLanguage() {
-    return $('body').attr('class').split(/\s+/).filter(function(klass) {
-        return klass.length === 2;
-    })[0];
-}
-
-$.fn.rotate = function AnimateRotate(finalAngle, initialAngle, time) {
-    return this.each(function() {
-        var $this = $(this);
-
-        // we use a pseudo object for the animation
-        $({deg: initialAngle || 0}).animate({deg: finalAngle}, {
-            duration: time || 1000,
-            step: function(now) {
-                // in the step-callback (that is fired each step of the animation),
-                // you can use the `now` paramter which contains the current
-                // animation-position (`initalAngle` up to `finalAngle`)
-                $this.css({
-                    transform: 'rotate(' + now + 'deg)'
-                });
-            }
-        });
-    });
-};
-
-
-mBroadcaster.once('zoomLevelCheck', mega.utils.chrome110ZoomLevelNotification);
 
 
 var debounce = function(func, execAsap) {

@@ -1696,7 +1696,7 @@ else if (!b_u)
         'dev': {f:'html/dev.html', n: 'dev', j:0},
         'dev_js': {f:'html/js/dev.js', n: 'dev_js', j:1},
         'sdkterms': {f:'html/sdkterms.html', n: 'sdkterms', j:0},
-        'gallery': { f: 'html/gallery.tpl', n: 'gallery', j: 0},
+        'gallery': {f:'html/gallery.tpl', n: 'gallery', j:0},
         'help_goback': {f:'html/help2_goback.tpl', n: 'help_goback', j:0},
         'help_sidebar_tags': {f:'html/help2_sidebar_tags.tpl', n: 'help_sidebar_tags', j:0},
         'help_section': {f:'html/help2_sections.tpl', n: 'help_section', j:0},

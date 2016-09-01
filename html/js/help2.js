@@ -1,10 +1,21 @@
-/* jshint ignore:start */
+function evalscript_url(code, ready) {
+    var url = mObjectURL([code], 'text/javascript');
+    mCreateElement('script', {
+        type: 'text/javascript',
+        async: false,
+        src: url,
+    }, 'head').onload = ready;
+    return url;
+}
+
 /**
  *  Simple template engine
  *  https://github.com/snoguchi/simple-template.js
  */
-function compileTemplate(s, context, arg) {
-    var code = 'var out = "";';
+window.__templates = {};
+function compileTemplate(s, context, next) {
+    var id   = 'f' + mRandomToken().replace(/[^0-9a-z]/ig, '');
+    var code = 'window.__templates["' + id + '"] = function(context, data) {  var out = "";';
     var token = s.split('%>');
 
     for (var key in context) {
@@ -30,10 +41,11 @@ function compileTemplate(s, context, arg) {
             }
         }
     }
-    code += 'return (out);';
-    return new Function('context', 'data', code).bind(null, context);
+    code += 'return (out); }';
+    evalscript_url(code, function() {
+        next(window.__templates[id].bind(null, context));
+    });
 }
-/* jshint ignore:end */
 
 /**
  *  Delayed - Delays the execution of a function
@@ -124,7 +136,7 @@ var Help = (function() {
             e.preventDefault();
             document.location.hash = getPreviousUrl(data);
         });
-        $('.support-go-back-heading').text(getPreviousUrl(data) === url('welcome') ? 'Support Centre' : 'Go Back');
+        $('.support-go-back-heading').text(getPreviousUrl(data) === url('welcome') ? l[9096] : l[9102]);
 
         var buttons = $('.support-search,.support-go-back');
         buttons.rebind('mouseover', function() {
@@ -298,10 +310,12 @@ var Help = (function() {
         }
 
         // Compile all templates
+        var toload = 0;
         Object.keys(pages).filter(function(page) {
             return page.match(/^help_|gallery/);
         }).map(function(page) {
-            tpl[page.replace(/^help_/, '')] = compileTemplate(pages[page], {
+            ++toload;
+            compileTemplate(pages[page], {
                 // We share url (function), tpl (our templates)
                 // and clients (all our data) to *all* of our
                 // templates
@@ -313,14 +327,19 @@ var Help = (function() {
                 tpl: tpl,
                 clients: clients,
                 popularQuestions: popularQuestions,
+            }, function(fnc) {
+                loadingDialog.show();
+                tpl[page.replace(/^help_/, '')] = fnc;
+                if (--toload === 0) {
+                    loadingDialog.hide();
+                    titles = array_unique(titles);
+                    if (doRender) {
+                        ns.render();
+                    }
+                }
             });
         });
 
-        titles = array_unique(titles);
-
-        if (doRender) {
-            ns.render();
-        }
     }
     // }}}
 

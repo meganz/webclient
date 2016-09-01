@@ -1,52 +1,3 @@
-function evalscript_url(code, ready) {
-    var url = mObjectURL([code], 'text/javascript');
-    mCreateElement('script', {
-        type: 'text/javascript',
-        async: false,
-        src: url,
-    }, 'head').onload = ready;
-    return url;
-}
-
-/**
- *  Simple template engine
- *  https://github.com/snoguchi/simple-template.js
- */
-window.__templates = {};
-function compileTemplate(s, context, next) {
-    var id   = 'f' + mRandomToken().replace(/[^0-9a-z]/ig, '');
-    var code = 'window.__templates["' + id + '"] = function(context, data) {  var out = "";';
-    var token = s.split('%>');
-
-    for (var key in context) {
-        if (context.hasOwnProperty(key)) {
-            code += 'var '  + key + ' = context.' + key + ";\n";
-        }
-    }
-
-    for (var i = 0, len = token.length; i < len; i++) {
-        var tmp = token[i].split('<%');
-        if (tmp[0]) {
-            var literal = tmp[0].replace(/\n/g, '\\n')
-                .replace(/\r/g, '\\r').replace(/\"/g, '\\"');
-            code += 'out+="' + literal + '";' + "\n";
-        }
-        if (tmp[1]) {
-            if (tmp[1].charAt(0) === '=') {
-                code += 'out+=escapeHTML(' + tmp[1].slice(1) + ');' + "\n";
-            } else if (tmp[1].charAt(0) === '!') {
-                code += 'out+=CMS.html(' + tmp[1].slice(1) + ');' + "\n";
-            } else {
-                code += tmp[1] + "\n";
-            }
-        }
-    }
-    code += 'return (out); }';
-    evalscript_url(code, function() {
-        next(window.__templates[id].bind(null, context));
-    });
-}
-
 /**
  *  Delayed - Delays the execution of a function
  *
@@ -310,12 +261,8 @@ var Help = (function() {
         }
 
         // Compile all templates
-        var toload = 0;
-        Object.keys(pages).filter(function(page) {
-            return page.match(/^help_|gallery/);
-        }).map(function(page) {
-            ++toload;
-            compileTemplate(pages[page], {
+        Object.keys(__help2_templates).filter(function(code) {
+            tpl[code] = __help2_templates[code].bind(null, {
                 // We share url (function), tpl (our templates)
                 // and clients (all our data) to *all* of our
                 // templates
@@ -327,18 +274,13 @@ var Help = (function() {
                 tpl: tpl,
                 clients: clients,
                 popularQuestions: popularQuestions,
-            }, function(fnc) {
-                loadingDialog.show();
-                tpl[page.replace(/^help_/, '')] = fnc;
-                if (--toload === 0) {
-                    loadingDialog.hide();
-                    titles = array_unique(titles);
-                    if (doRender) {
-                        ns.render();
-                    }
-                }
             });
         });
+        
+        titles = array_unique(titles);
+        if (doRender) {
+            ns.render();
+        }
 
     }
     // }}}

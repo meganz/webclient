@@ -252,7 +252,6 @@ var TypingArea = React.createClass({
 
         var self = this;
 
-        self.stoppedTyping();
     },
     onTypeAreaChange: function (e) {
         if (this.props.disabled) {
@@ -260,14 +259,14 @@ var TypingArea = React.createClass({
             e.stopPropagation();
             return;
         }
-
         var self = this;
 
         if (self.state.typedMessage !== e.target.value) {
             self.setState({typedMessage: e.target.value});
+            self.forceUpdate();
         }
 
-        if ($.trim(e.target.value).length) {
+        if ($.trim(e.target.value).length > 0) {
             self.typing();
         }
 
@@ -285,6 +284,7 @@ var TypingArea = React.createClass({
         var $container = $(ReactDOM.findDOMNode(this));
         if ($('.chat-textarea:visible textarea:visible', $container).length > 0) {
             if (!$('.chat-textarea:visible textarea:visible', $container).is(":focus")) {
+
                 moveCursortoToEnd($('.chat-textarea:visible textarea', $container)[0]);
             }
         }
@@ -352,7 +352,7 @@ var TypingArea = React.createClass({
         var self = this;
 
         // DONT update if not visible...
-        if (!self.isComponentVisible()) {
+        if (!self.isComponentEventuallyVisible()) {
             return;
         }
 
@@ -363,13 +363,11 @@ var TypingArea = React.createClass({
         var $textareaClone = $('.message-preview', $node);
         var textareaMaxHeight = self.props.textareaMaxHeight;
         var $textareaScrollBlock = $('.textarea-scroll', $node);
-        $textareaScrollBlock.jScrollPane(
-            {enableKeyboardNavigation: false, showArrows: true, arrowSize: 5, animateScroll: false});
 
         var textareaContent = $textarea.val();
         var cursorPosition = self.getCursorPosition($textarea[0]);
         var $textareaCloneSpan;
-        var jsp = $textareaScrollBlock.data('jsp');
+
         var viewLimitTop = 0;
         var scrPos = 0;
         var viewRatio = 0;
@@ -398,6 +396,23 @@ var TypingArea = React.createClass({
         $textarea.height(textareaCloneHeight);
         $textareaCloneSpan = $textareaClone.children('span');
         var textareaCloneSpanHeight = $textareaCloneSpan.height();
+
+        var jsp = $textareaScrollBlock.data('jsp');
+
+        if (!jsp) {
+            $textareaScrollBlock.jScrollPane(
+                {
+                    enableKeyboardNavigation: false, showArrows: true, arrowSize: 5, animateScroll: false
+                }
+            );
+            var textareaWasFocused = $textarea.is(":focus");
+            jsp = $textareaScrollBlock.data('jsp');
+
+            if (textareaWasFocused) {
+                moveCursortoToEnd($('textarea:first', $node)[0]);
+            }
+        }
+
         scrPos = jsp ? $textareaScrollBlock.find('.jspPane').position().top : 0;
         viewRatio = Math.round(textareaCloneSpanHeight + scrPos);
 
@@ -520,7 +535,7 @@ var TypingArea = React.createClass({
         };
 
         return <div className={"typingarea-component" + self.props.className}>
-            <div className="chat-textarea">
+            <div className={"chat-textarea " + self.props.className}>
                 <i className={self.props.iconClass ? self.props.iconClass : "small-icon conversations"}></i>
                 <div className="chat-textarea-buttons">
                     <ButtonsUI.Button

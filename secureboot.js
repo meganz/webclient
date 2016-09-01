@@ -8,6 +8,7 @@ var maintenance = false;
 var androidsplash = false;
 var silent_loading = false;
 var cookiesDisabled = false;
+var storageQuotaError = false;
 var lastactive = new Date().getTime();
 var URL = window.URL || window.webkitURL;
 var seqno = Math.ceil(Math.random()*1000000000);
@@ -32,6 +33,7 @@ var is_chrome_firefox = document.location.protocol === 'chrome:'
     && document.location.host === 'mega' || document.location.protocol === 'mega:';
 var is_extension = is_chrome_firefox || is_electron || document.location.href.substr(0,19) == 'chrome-extension://';
 var is_mobile = m = isMobile();
+var is_ios = is_mobile && (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1);
 
 function isMobile()
 {
@@ -46,9 +48,15 @@ function geoStaticpath(eu)
     if (!eu) {
         try {
             if (!sessionStorage.skipcdn) {
-                var cc = 'FR DE NL ES PT DK CH IT UK GB NO SE FI PL CZ SK AT GR RO HU IE TR VA MC SM LI AD JE GG UA BG LT LV EE AX IS MA DZ LY TN EG RU BY HR SI AL ME RS KO EU FO CY IL LB SY SA JO IQ BA CV PS EH GI GL IM LU MK SJ BF BI BJ BW CF CG CM DJ ER ET GA GH GM GN GN GW KE KM LR LS MG ZA AE ML MR MT MU MV MW MZ NA NE QA RW SD SS SL SZ TD TG TZ UG YE ZA ZM ZR ZW';
+                var cc_eu = 'FR DE NL ES PT DK CH IT UK GB NO SE FI PL CZ SK AT GR RO HU IE TR VA MC SM LI AD JE GG UA BG LT LV EE AX IS MA DZ LY TN EG RU BY HR SI AL ME RS KO EU FO CY IL LB SY SA JO IQ BA CV PS EH GI GL IM LU MK SJ BF BI BJ BW CF CG CM DJ ER ET GA GH GM GN GN GW KE KM LR LS MG ZA AE ML MR MT MU MV MW MZ NA NE QA RW SD SS SL SZ TD TG TZ UG YE ZA ZM ZR ZW';
+				var cc_na = 'US CA MX AG BS BB BZ CR CO CU DO GD GT GY HT HN JM NI PA KN LC VC SR TT VE IS GL AI BL VG PR VI VE CO EC CL BR BO PY UY AR GY SR PE GF FK';
+				var cc_nz = 'NZ AU FJ NC';
                 var cm = String(document.cookie).match(/geoip\s*\=\s*([A-Z]{2})/);
-                if (cm && cm[1] && cc.indexOf(cm[1]) == -1)
+				if (cm && cm[1] && cc_na.indexOf(cm[1]) > -1)
+                    return 'https://na.static.mega.co.nz/3/';
+				else if (cm && cm[1] && cc_nz.indexOf(cm[1]) > -1)
+                    return 'https://nz.static.mega.co.nz/3/';
+				else if (cm && cm[1] && cc_eu.indexOf(cm[1]) == -1)
                     return 'https://g.cdn1.mega.co.nz/3/';
             }
         } catch(e) {
@@ -199,10 +207,17 @@ if (!b_u) try
             throw new Error('SecurityError: DOM Exception 18');
         }
         d = !!localStorage.d;
+        jj = localStorage.jj;
+        dd = localStorage.dd;
+        // Write test
+        localStorage['$!--foo'] = Array(100).join(",");
+        delete localStorage['$!--foo'];
     }
     catch (ex) {
+        storageQuotaError = (ex.code === 22);
         cookiesDisabled = ex.code && ex.code === DOMException.SECURITY_ERR
-            || ex.message === 'SecurityError: DOM Exception 18';
+            || ex.message === 'SecurityError: DOM Exception 18'
+            || storageQuotaError;
 
         if (!cookiesDisabled) {
             throw ex;
@@ -212,9 +227,7 @@ if (!b_u) try
         // We could either show the user a message about the issue and let him
         // enable cookies, or rather setup a tiny polyfill so that they can use
         // the site even in such case, even though this solution has side effects.
-        delete window.localStorage;
-        Object.defineProperty(window, 'localStorage', {
-            value: Object.create({}, {
+        tmp = Object.create({}, {
                 length:     { get: function() { return Object.keys(this).length; }},
                 key:        { value: function(pos) { return Object.keys(this)[pos]; }},
                 removeItem: { value: function(key) { delete this[key]; }},
@@ -235,13 +248,25 @@ if (!b_u) try
                         });
                     }
                 }
-            })
-        });
-        Object.defineProperty(window, 'sessionStorage', {
-            value: localStorage
-        });
+            });
+
+        try {
+            delete window.localStorage;
+            Object.defineProperty(window, 'localStorage', { value: tmp });
+            Object.defineProperty(window, 'sessionStorage', { value: tmp });
+        }
+        catch (e) {
+            if (!is_mobile) {
+                throw ex;
+            }
+        }
+        tmp = undefined;
+
         if (location.host !== 'mega.nz' && !is_karma) {
-            localStorage.jj = localStorage.dd = localStorage.d = 1;
+            dd = d = 1;
+            if (!is_mobile) {
+                jj = 1;
+            }
         }
         setTimeout(function() {
             console.warn('Apparently you have Cookies disabled, ' +
@@ -252,26 +277,34 @@ if (!b_u) try
 
     var contenterror = 0;
     var nocontentcheck = false;
-    if (localStorage.dd || is_karma) {
+
+    if (!is_extension && (window.dd || location.host !== 'mega.nz')) {
+
         nocontentcheck = true;
         var devhost = window.location.host;
         // handle subdirs
         var pathSuffix = window.location.pathname;
         pathSuffix = pathSuffix.split("/").slice(0, -1).join("/");
         // set the staticpath for debug mode
-        localStorage.staticpath = window.location.protocol + "//" + devhost + pathSuffix + "/";
-        // localStorage.staticpath = location.protocol + "//" + location.host + location.pathname.replace(/[^/]+$/,'');
-        if (localStorage.d) {
-            console.debug('StaticPath set to "' + localStorage.staticpath + '"');
+        staticpath = window.location.protocol + "//" + devhost + pathSuffix + "/";
+        if (window.d) {
+            console.debug('StaticPath set to "' + staticpath + '"');
         }
     }
-    staticpath = localStorage.staticpath || geoStaticpath();
+    else {
+        staticpath = localStorage.staticpath;
+    }
+    staticpath = staticpath || geoStaticpath();
     apipath = localStorage.apipath || 'https://eu.api.mega.co.nz/';
 }
 catch(e) {
     if (!m || !cookiesDisabled) {
         var extraInfo = '';
-        if (cookiesDisabled) {
+        if (storageQuotaError) {
+            extraInfo = "\n\nTip: We've detected this issue is likely caused by " +
+                "browsing in private mode, please try turning it off.";
+        }
+        else if (cookiesDisabled) {
             extraInfo = "\n\nTip: We've detected this issue is likely related to " +
                 "having Cookies disabled, please check your browser settings.";
         }
@@ -864,10 +897,7 @@ function siteLoadError(error, filename) {
 }
 
 
-if (location.hash.substr(1, 1) === '!') {
-    m = false;
-}
-else if (m || (typeof localStorage !== 'undefined' && localStorage.mobile))
+if (m || (typeof localStorage !== 'undefined' && localStorage.mobile))
 {
     var tag=document.createElement('meta');
     tag.name = "viewport";
@@ -908,10 +938,38 @@ else if (m || (typeof localStorage !== 'undefined' && localStorage.mobile))
     m=true;
 }
 
+if (location.hash.substr(1, 1) === '!') {
+    m = false;
+}
+
+if (is_ios) {
+    tmp = document.querySelector('meta[name="apple-itunes-app"]');
+    if (tmp) {
+        tmp.setAttribute('content',
+            'app-id=706857885, app-argument=mega://' + window.location.hash);
+    }
+
+    // http://whatsmyuseragent.com/Devices/iPhone-User-Agent-Strings
+    // http://www.enterpriseios.com/wiki/Complete_List_of_iOS_User_Agent_Strings
+    tmp = ua.match(/(?:iphone|cpu) os (\d+)[\._](\d+)/);
+    if (tmp) {
+        var rev = tmp.pop();
+        tmp = tmp.pop();
+
+        console.log('Found iOS ' + tmp + '.' + rev);
+
+        is_ios = parseInt(tmp);
+        if (!is_ios) {
+            // Huh?
+            is_ios = true;
+        }
+    }
+    tmp = undefined;
+}
+
 if (m)
 {
     var app,mobileblog,android,intent, ios9;
-    var ios;
     var link = document.createElement('link');
     link.setAttribute('rel', 'stylesheet');
     link.type = 'text/css';
@@ -940,7 +998,7 @@ if (m)
                 intent = 'intent://' + location.hash + '/#Intent;scheme=mega;package=mega.privacy.android.app;end';
             }
         }
-        if (intent) {
+        if (intent && !mobileblog) {
             document.location = intent;
         }
     }
@@ -949,27 +1007,10 @@ if (m)
         app='http://appworld.blackberry.com/webstore/content/46810890/';
         document.body.className = 'blackberry full-mode supported';
     }
-    else if (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1)
+    else if (is_ios)
     {
-        app = document.querySelector('meta[name="apple-itunes-app"]');
-        if (app) {
-            app.setAttribute('content',
-                'app-id=706857885, app-argument=mega://' + window.location.hash);
-        }
-
-        // http://whatsmyuseragent.com/Devices/iPhone-User-Agent-Strings
-        // http://www.enterpriseios.com/wiki/Complete_List_of_iOS_User_Agent_Strings
         app='https://itunes.apple.com/app/mega/id706857885';
         document.body.className = 'ios full-mode supported';
-
-        var ver = ua.match(/(?:iphone|cpu) os (\d+)[\._](\d+)/);
-        if (ver) {
-            var rev = ver.pop();
-            ver = ver.pop();
-            // Check for iOS 9.0+
-            ios9 = (ver > 8);
-        }
-        ios = 1;
     }
     else document.body.className = 'another-os full-mode unsupported';
 
@@ -1009,7 +1050,7 @@ if (m)
                 }, 2500);
             }
         }
-        else if (ios9) {
+        else if (is_ios > 8) {
             setTimeout(function() {
                 if (confirm('Do you already have the MEGA app installed?')) {
                     document.location = 'mega://' + window.location.hash;
@@ -1033,7 +1074,7 @@ if (m)
         if (ua.indexOf('chrome') > -1) {
             window.location = 'mega://' + window.location.hash.substr(i);
         }
-        else if (ios9) {
+        else if (is_ios > 8) {
             setTimeout(function() {
                 if (confirm('Do you already have the MEGA app installed?')) {
                     document.location = 'mega://' + window.location.hash;
@@ -1052,7 +1093,8 @@ if (m)
     if (mobileblog)
     {
         document.body.innerHTML = '';
-        mCreateElement('script', {type: 'text/javascript'}, 'head').src = '/blog.js';
+        mCreateElement('script', {type: 'text/javascript'}, 'head')
+            .src = ((location.host === 'mega.nz') ? '/blog.js' : 'html/js/blog.js');
     }
 }
 else if (page == '#android')
@@ -1061,8 +1103,8 @@ else if (page == '#android')
 }
 else if (!b_u)
 {
-    d = localStorage.d || 0;
-    var jj = localStorage.jj || 0;
+    d = window.d || 0;
+    jj = window.jj || 0;
     var onBetaW = location.hostname === 'beta.mega.nz' || location.hostname.indexOf("developers.") === 0;
     var languages = {'en':['en','en-'],'es':['es','es-'],'fr':['fr','fr-'],'de':['de','de-'],'it':['it','it-'],'nl':['nl','nl-'],'pt':['pt'],'br':['pt-br'],'se':['sv'],'fi':['fi'],'pl':['pl'],'cz':['cz','cs','cz-'],'sk':['sk','sk-'],'sl':['sl','sl-'],'hu':['hu','hu-'],'jp':['ja'],'cn':['zh','zh-cn'],'ct':['zh-hk','zh-sg','zh-tw'],'kr':['ko'],'ru':['ru','ru-mo'],'ar':['ar','ar-'],'he':['he'],'id':['id'],'sg':[],'tr':['tr','tr-'],'ro':['ro','ro-'],'uk':['||'],'sr':['||'],'th':['||'],'fa':['||'],'bg':['bg'],'tl':['en-ph'],'vi':['vn', 'vi']};
 
@@ -1079,7 +1121,7 @@ else if (!b_u)
         };
     })(console);
 
-    Object.defineProperty(window, "__cd_v", { value : 27, writable : false });
+    Object.defineProperty(window, "__cd_v", { value : 28, writable : false });
 
     // Do not report exceptions if this build is older than 20 days
     var exTimeLeft = ((buildVersion.timestamp + (20 * 86400)) * 1000) > Date.now();
@@ -1156,7 +1198,13 @@ else if (!b_u)
                 // loading the site, this should only happen on some fancy
                 // browsers other than what we use during development, and
                 // hopefully they'll report it back to us for troubleshoot
-                return siteLoadError(dump.m, url);
+                if (url || ln !== 1) {
+                    siteLoadError(dump.m, url + ':' + ln);
+                }
+                else {
+                    console.error(dump.m, arguments);
+                }
+                return;
             }
 
             if (~dump.m.indexOf('took +10s'))
@@ -1439,6 +1487,7 @@ else if (!b_u)
         // Other
         jsl.push({f:'js/vendor/autolinker.js', n: 'autolinker_js', j:1,w:1});
         jsl.push({f:'js/vendor/moment.js', n: 'moment_js', j:1,w:1});
+        jsl.push({f:'js/vendor/perfect-scrollbar.js', n: 'ps_js', j:1,w:1});
 
         // Google Import Contacts
         jsl.push({f:'js/gContacts.js', n: 'gcontacts_js', j:1,w:3});
@@ -1562,7 +1611,9 @@ else if (!b_u)
         jsl.push({f:'css/chat-common.css', n: 'chat_common_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/chat-emojione.css', n: 'chat_emojione_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/vendor/perfect-scrollbar.css', n: 'vendor_ps_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/media-print.css', n: 'media_print_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/help2.css', n: 'help_css', j:2,w:5,c:1,d:1,cache:1});
 
         jsl.push({f:'js/useravatar.js', n: 'contact_avatar_js', j:1,w:3});
         jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
@@ -1618,6 +1669,7 @@ else if (!b_u)
         'download_js': {f:'html/js/download.js', n: 'download_js', j:1},
         'download_mobile': {f:'html/download-mobile.html', n: 'download', j: 0},
         'mobile_css': {f:'css/mobile-app-new.css', n: 'mobile_css', j:2,w:30,c:1,d:1,m:1},
+        'network_js': {f:'js/network-testing.js', n: 'network_js', j:1},
         'dispute': {f:'html/dispute.html', n: 'dispute', j:0},
         'disputenotice': {f:'html/disputenotice.html', n: 'disputenotice', j:0},
         'disputenotice_js': {f:'html/js/disputenotice.js', n: 'disputenotice_js', j:1},
@@ -1627,6 +1679,7 @@ else if (!b_u)
         'privacy': {f:'html/privacy.html', n: 'privacy', j:0},
         'mega': {f:'html/mega.html', n: 'mega', j:0},
         'terms': {f:'html/terms.html', n: 'terms', j:0},
+        'general': {f:'html/general.html', n: 'general', j:0},
         'backup': {f:'html/backup.html', n: 'backup', j:0},
         'backup_js': {f:'html/js/backup.js', n: 'backup_js', j:1},
         'cancel': {f:'html/cancel.html', n: 'cancel', j:0},
@@ -1643,7 +1696,18 @@ else if (!b_u)
         'dev': {f:'html/dev.html', n: 'dev', j:0},
         'dev_js': {f:'html/js/dev.js', n: 'dev_js', j:1},
         'sdkterms': {f:'html/sdkterms.html', n: 'sdkterms', j:0},
-        'help_js': {f:'html/js/help.js', n: 'help_js', j:1},
+        'gallery': {f:'html/gallery.tpl', n: 'gallery', j:0},
+        'help_goback': {f:'html/help2_goback.tpl', n: 'help_goback', j:0},
+        'help_sidebar_tags': {f:'html/help2_sidebar_tags.tpl', n: 'help_sidebar_tags', j:0},
+        'help_section': {f:'html/help2_sections.tpl', n: 'help_section', j:0},
+        'help_welcome': {f:'html/help2_welcome.tpl', n: 'help_welcome', j:0},
+        'help_header': {f:'html/help2_header.tpl', n: 'help_header', j:0},
+        'help_clients': {f:'html/help2_clients.tpl', n: 'help_clients', j:0},
+        'help_listing': {f:'html/help2_listing.tpl', n: 'help_listing', j:0},
+        'help_search': {f:'html/help2_search.tpl', n: 'help_search', j:0},
+        'help_client_index': {f:'html/help2_client_index.tpl', n: 'help_client_index', j:0},
+        'lunr_js': {f:'js/vendor/elasticlunr.js', n: 'lunr_js', j:1},
+        'help_js': {f:'html/js/help2.js', n: 'help_js', j:1},
         'sync': {f:'html/sync.html', n: 'sync', j:0},
         'sync_js': {f:'html/js/sync.js', n: 'sync_js', j:1},
         'cms_snapshot_js': {f:'js/cmsSnapshot.js', n: 'cms_snapshot_js', j:1},
@@ -1666,6 +1730,7 @@ else if (!b_u)
         'about': ['about'],
         'sourcecode': ['sourcecode'],
         'terms': ['terms'],
+        'general': ['general'],
         'credits': ['credits'],
         'backup': ['backup','backup_js','filesaver'],
         'recovery': ['recovery','recovery_js'],
@@ -1692,7 +1757,12 @@ else if (!b_u)
         'dev': ['dev','dev_js','sdkterms'],
         'sdk': ['dev','dev_js','sdkterms'],
         'doc': ['dev','dev_js','sdkterms'],
-        'help': ['help_js'],
+        'help': [
+            'help_section', 'help_welcome', 'help_header',
+            'help_clients', 'help_listing', 'help_client_index', 'help_search',
+            'help_goback', 'help_sidebar_tags', 'gallery',
+            'lunr_js', 'help_js'
+        ],
         'recover': ['reset', 'reset_js'],
         'redeem': ['redeem', 'redeem_js'],
         'plugin': ['chrome', 'chrome_js', 'firefox', 'firefox_js'],
@@ -2183,9 +2253,9 @@ else if (!b_u)
             '</div>';
 
     var u_storage, loginresponse, u_sid, dl_res;
-    u_storage = init_storage( localStorage.sid ? localStorage : sessionStorage );
+    u_storage = is_mobile ? {} : init_storage(localStorage.sid ? localStorage : sessionStorage);
 
-    if (!is_mobile && (u_sid = u_storage.sid))
+    if ((u_sid = u_storage.sid))
     {
         loginresponse = true;
         var lxhr = getxhr();
@@ -2277,9 +2347,10 @@ else if (!b_u)
             dl_res= false;
             boot_done();
         };
-
+		var esid='';
+		if (u_storage.sid) esid = u_storage.sid;
         dlxhr.open("POST", apipath + 'cs?id=0' + mega.urlParams(), true);
-        dlxhr.send(JSON.stringify([{ 'a': 'g', p: page.substr(1,8), 'ad': showAd() }]));
+        dlxhr.send(JSON.stringify([{ 'a': 'g', p: page.substr(1,8), 'ad': showAd(),'esid':esid }]));
     }
 }
 

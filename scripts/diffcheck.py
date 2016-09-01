@@ -371,7 +371,7 @@ def reduce_validator(file_line_mapping, **extra):
             continue
 
         # Ignore this specific file types
-        if file_extension in ['.json','.py','.sh', '.svg', '.css', '.html']:
+        if file_extension in ['.json','.py','.sh', '.svg', '.css', '.html', '.tpl']:
             continue
 
         # If .min.js is in the filename (most basic detection), then log it and move onto the next file
@@ -636,7 +636,6 @@ def main(base, target, norules, branch):
             print('WARNING: {} authors have contributed in this branch, '
                   'consider squashing your commits only\n         by manually running '
                   '"git rebase -i --autosquash develop", unless they do not care.'.format(authors))
-        sys.exit(1)
 
     print('\nEverything seems Ok.')
 

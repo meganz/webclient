@@ -32,7 +32,7 @@ copyright.validateEmail = function(email) {
  */
 copyright.validateUrl = function(url) {
     url = copyright.decodeURIm(url);
-    handles = copyright.getHandles(url);
+    var handles = copyright.getHandles(url);
     return Object.keys(handles).length;
 };
 
@@ -58,7 +58,7 @@ copyright.getHandles = function(data) {
  * Iteratively remove any %% stuff from the data
  * @param {String} data The data string to decode
  * @return {String} the decoded data
- */ 
+ */
 copyright.decodeURIm = function(data) {
     for (var lmt = 7 ; --lmt && /%[a-f\d]{2}/i.test(data) ; )
     {
@@ -70,10 +70,10 @@ copyright.decodeURIm = function(data) {
     }
 
     while (~data.indexOf('%25')) {
-        data = data.replace('%25','%','g');
+        data = data.replace(/%25/g, '%');
     }
 
-    return data.replace('%21','!','g');
+    return data.replace(/%21/g, '!');
 };
 
 /**
@@ -172,7 +172,20 @@ copyright.init_cn = function() {
                     proceed = false;
                     msgDialog('warninga', l[135], escapeHTML(l[7686]));
                     $(e).addClass("red");
-                    $(e).click(function(){$(e).removeClass("red")});
+                    $(e).rebind('click', function() {
+                        $(this).unbind('click').removeClass("red");
+                    });
+                    return false;
+                }
+
+                if (copyright.validateUrl(cval)) {
+                    proceed = false;
+                    msgDialog('warninga', l[135], escapeHTML(l[9056]));
+                    $(copyrightwork[i])
+                        .addClass("red")
+                        .rebind('click', function() {
+                            $(this).unbind('click').removeClass("red");
+                        });
                     return false;
                 }
 

@@ -280,7 +280,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
 
     manualTrackChangesOnStructure(self, true);
 
-    self._parent = chatRoom;
+    // self._parent = chatRoom;
 
     var chatRoomId = chatRoom.roomJid.split("@")[0];
 
@@ -384,7 +384,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
     self.chatd.rebind('onMessageStore.messagesBuff' + chatRoomId, function(e, eventData) {
         var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
 
-        if (chatRoom.roomJid === self.chatRoom.roomJid) {
+        if (chatRoom && chatRoom.roomJid === self.chatRoom.roomJid) {
             self.haveMessages = true;
 
             var msgObject = new Message(chatRoom,
@@ -408,11 +408,6 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                 self.lastDeliveredMessageRetrieved = true;
             }
 
-            var cacheKey = chatRoom.chatId + "_" + eventData.messageId;
-            // if the message has already been decrypted, then just bail.
-            if (self.chatRoom.megaChat.plugins.chatdIntegration._processedMessages[cacheKey]) {
-                return;
-            }
             self.messages.push(msgObject);
             if (eventData.pendingid) {
                 var foundMessage = self.getByInternalId(eventData.pendingid);
@@ -526,11 +521,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                             chatRoom,
                             editedMessage
                         );
-
-
-                        // chatRoom.messagesBuff.messages.removeByKey(eventData.messageId);
-                        //
-                        // chatRoom.messagesBuff.messages.push(editedMessage, true);
+                        
                         chatRoom.messagesBuff.messages.replace(editedMessage.messageId, editedMessage);
 
                         if (decrypted.type === strongvelope.MESSAGE_TYPES.TRUNCATE) {
@@ -604,8 +595,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                     }
                 );
 
-                self.messages.removeByKey(foundMessage.messageId);
-                self.messages.push(confirmedMessage);
+                self.messages.replace(foundMessage.messageId, confirmedMessage);
 
                 if (foundMessage.textContents) {
                     self.chatRoom.megaChat.plugins.chatdIntegration._parseMessage(chatRoom, confirmedMessage);
@@ -719,8 +709,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                             decrypted.payload = "";
                         }
                         outgoingMessage.contents = decrypted.payload;
-                        chatRoom.messagesBuff.messages.removeByKey(eventData.messageId);
-                        chatRoom.messagesBuff.messages.push(outgoingMessage);
+                        chatRoom.messagesBuff.messages.replace(eventData.messageId, outgoingMessage);
 
                         chatRoom.megaChat.plugins.chatdIntegration._parseMessage(
                             chatRoom, chatRoom.messagesBuff.messages[eventData.messageId]

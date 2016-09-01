@@ -244,7 +244,7 @@
         "context": ""
     },
     "129": {
-        "text": "Upgrade to Pro",
+        "text": "Upgrade to PRO",
         "context": "Pro refers to the name of the storage & bandwidth packeges we sell to our users. This can be translated to something localized, however it should always be the same throughout all other texts"
     },
     "135": {
@@ -476,7 +476,7 @@
         "context": "message with checkbox for dialog not to be shown again."
     },
     "230": {
-        "text": "Upgrade to Pro",
+        "text": "Upgrade to PRO",
         "context": ""
     },
     "231": {
@@ -620,7 +620,7 @@
         "context": ""
     },
     "398": {
-        "text": "Pro Membership",
+        "text": "PRO Membership",
         "context": ""
     },
     "399": {
@@ -1560,7 +1560,7 @@
         "context": "Please make sure you apply the correct tags [B],[\/B], [A], & [\/A] - including backslash in the closing tag (\/)."
     },
     "872": {
-        "text": "Pro",
+        "text": "PRO",
         "context": "Description of the premium service which gives you more storage space & bandwidth quota"
     },
     "873": {
@@ -1712,7 +1712,7 @@
         "context": ""
     },
     "924": {
-        "text": "Do you have any question about [A]Pro accounts?[\/A]",
+        "text": "Do you have any question about [A]PRO accounts?[\/A]",
         "context": ""
     },
     "925": {
@@ -1964,7 +1964,7 @@
         "context": "Warning message in a dialog that asks for confirmation before deleting something."
     },
     "1008": {
-        "text": "Pro bandwidth quota exceeded.",
+        "text": "PRO bandwidth quota exceeded.",
         "context": "Pro refers to the paid membership, which is often \"Pro\" in the same language. "
     },
     "1009": {
@@ -2076,11 +2076,11 @@
         "context": "PayPal is the name of a popular payment processor"
     },
     "1040": {
-        "text": "Please log in to activate your Pro membership.",
+        "text": "Please log in to activate your PRO membership.",
         "context": ""
     },
     "1041": {
-        "text": "Please create an account to activate your Pro membership.",
+        "text": "Please create an account to activate your PRO membership.",
         "context": ""
     },
     "1042": {
@@ -2104,11 +2104,11 @@
         "context": ""
     },
     "1047": {
-        "text": "Welcome to MEGA Pro",
+        "text": "Welcome to MEGA PRO",
         "context": ""
     },
     "1048": {
-        "text": "Your Pro membership has been activated. Enjoy!",
+        "text": "Your PRO membership has been activated. Enjoy!",
         "context": ""
     },
     "1049": {
@@ -2412,7 +2412,7 @@
         "context": ""
     },
     "1148": {
-        "text": "[A]Get 2 months free[\/A] if you purchase a one-year Pro plan.",
+        "text": "[A]Get 2 months free[\/A] if you purchase a one-year PRO plan.",
         "context": ""
     },
     "1149": {
@@ -2424,7 +2424,7 @@
         "context": ""
     },
     "1151": {
-        "text": "Take full advantage of MEGA with a [A]Pro account[\/A]",
+        "text": "Take full advantage of MEGA with a [A]PRO account[\/A]",
         "context": ""
     },
     "1153": {
@@ -2548,7 +2548,7 @@
         "context": ""
     },
     "1186": {
-        "text": "You can conveniently purchase your MEGA Pro membership from one of our authorized resellers below:",
+        "text": "You can conveniently purchase your MEGA PRO membership from one of our authorized resellers below:",
         "context": ""
     },
     "1187": {
@@ -2852,7 +2852,7 @@
         "context": "Button to retry a certain action"
     },
     "1367": {
-        "text": "Get 50 GB for free, or sign up for one of our Pro packages and get up to 4 TB of encrypted storage starting at \u20ac8.33 per month.",
+        "text": "Get 50 GB for free, or sign up for one of our PRO packages and get up to 4 TB of encrypted storage starting at \u20ac8.33 per month.",
         "context": ""
     },
     "1368": {
@@ -4400,7 +4400,7 @@
         "context": "caption of the download button to download the Chrome extension for MEGA"
     },
     "1915": {
-        "text": "Warning: only click the above button if you trust the [A]Chrome web store[\/A]. Alternatively, you can manually download & install the extension below.",
+        "text": "Warning: only click the above button if you trust the [A]Chrome Web Store[\/A]. Alternatively, you can manually download & install the extension below.",
         "context": ""
     },
     "1916": {
@@ -4456,7 +4456,7 @@
         "context": "When a user attempt to download a file larger than 1GB using Firefox, he will be prompted with a dialog asking him to install our browser extension with this text."
     },
     "1933": {
-        "text": "To download files larger than  1GB, please install MEGAsync, Google Chrome or Opera.",
+        "text": "To download files larger than 1GB, please install MEGAsync, Google Chrome or Opera.",
         "context": ""
     },
     "1934": {
@@ -4468,20 +4468,20 @@
         "context": ""
     },
     "1936": {
-        "text": "You can still [A]export[\/A] your master key now if you have an active MEGA session in any other browser on this or any other computer. If you don't, you can no longer decrypt your existing account, but you can start a new one under the same e-mail address by selecting NO.",
-        "context": ""
+        "text": "You can still [A]export[\/A] your Recovery Key now if you have an active MEGA session in any other browser on this or any other computer. If you don't, you can no longer decrypt your existing account, but you can start a new one under the same e-mail address by selecting NO.",
+        "context": "Explanation of how the user can still get a copy of their master encryption key (now renamed \"Recovery Key\") if they are still logged in anywhere. Otherwise they can't unlock their account."
     },
     "1937": {
-        "text": "Do you have a backup of your master key?",
-        "context": ""
+        "text": "Do you have a backup of your Recovery Key?",
+        "context": "A question asking if the user has made a copy of their master encryption key (now renamed \"Recovery Key\")"
     },
     "1938": {
         "text": "Great!",
         "context": "Headline when the user chose YES"
     },
     "1939": {
-        "text": "Please enter you e-mail address below. You will receive a recovery link that will allow you to submit your master key and reset your password.",
-        "context": ""
+        "text": "Please enter your e-mail address below. You will receive a recovery link that will allow you to submit your Recovery Key and reset your password.",
+        "context": "Instructions for the user to tell them what to do next so that they can use their master encryption key (now renamed \"Recovery Key\") to reset their password."
     },
     "1940": {
         "text": "Send",
@@ -4492,8 +4492,8 @@
         "context": "Headline if the user chose NO"
     },
     "1942": {
-        "text": "Due to our end-to-end encryption paradigm, you will not be able to access your data without either your password or a [A]backup[\/A] of your master key.",
-        "context": ""
+        "text": "Due to our end-to-end encryption paradigm, you will not be able to access your data without either your password or a [A]backup[\/A] of your Recovery Key.",
+        "context": "Instructions explaining that we have encrypted a user's data, and so we can't help them unless they remember their password or have a backup\/copy of their master encryption key (now renamed \"Recovery Key\")"
     },
     "1943": {
         "text": "You can park your existing account and start a fresh one under the same e-mail address. In the event that you recall your parked account's password, please contact [A]support@mega.nz[\/A] for recovery assistance. Your data will be retained for at least 60 days.",
@@ -4504,8 +4504,8 @@
         "context": "Error message when the user attempts to start the recovery procedure while he has an active ephemeral session open."
     },
     "1945": {
-        "text": "You are currently logged in with the account [X]. If you can't remember your current password and you would like to change your password, please export its master key, then log out and try again.",
-        "context": "the [X] variable will be replaced by the system with the user's e-mail address."
+        "text": "You are currently logged in with the account [X]. If you can't remember your current password and you would like to change your password, please export its Recovery Key, then log out and try again.",
+        "context": "the [X] variable will be replaced by the system with the user's e-mail address. This string asks the user to export their master encryption key (now renamed \"Recovery Key\")"
     },
     "1946": {
         "text": "Please check the e-mail address and try again.",
@@ -4516,16 +4516,16 @@
         "context": "Headline for parking an account (basically restarting from scratch)"
     },
     "1948": {
-        "text": "You have lost your password and cannot provide a previously exported master key? Unfortunately, due to MEGA's use of strong cryptography, the loss of your master key renders all of your data unreadable. If you proceed, you will start a fresh account under your existing e-mail address. Your old account will remain parked for at least 60 days and can be recovered by contacting [A]support@mega.nz[\/A] in the event that you still recall your password.",
-        "context": ""
+        "text": "You have lost your password and cannot provide a previously exported Recovery Key? Unfortunately, due to MEGA's use of strong cryptography, the loss of your Recovery Key renders all of your data unreadable. If you proceed, you will start a fresh account under your existing e-mail address. Your old account will remain parked for at least 60 days and can be recovered by contacting [A]support@mega.nz[\/A] in the event that you still recall your password.",
+        "context": "Explanation explaining that without their password or their master encryption key (now renamed \"Recovery Key\"), the user can't unlock their account."
     },
     "1949": {
         "text": "Choose new password",
         "context": ""
     },
     "1950": {
-        "text": "I acknowledge that I am starting a fresh, empty account and that I will lose all data in my present account unless I recall my password or locate an exported master key.",
-        "context": "Label text of a checkbox to ensure that the user is aware that the data of his current account will be lost when proceeding."
+        "text": "I acknowledge that I am starting a fresh, empty account and that I will lose all data in my present account unless I recall my password or locate an exported Recovery Key.",
+        "context": "Label text of a checkbox to ensure that the user is aware that the data of his current account will be lost when proceeding unless they remember their password or have their master encryption key (now renamed \"Recovery Key\")"
     },
     "1951": {
         "text": "Start new account",
@@ -4548,16 +4548,16 @@
         "context": "Headline of the password reset recovery procedure"
     },
     "1956": {
-        "text": "Please provide your previously exported master key. You can still export it from any MEGA session that you may have open in another browser or on another computer.",
-        "context": ""
+        "text": "Please provide your previously exported Recovery Key. You can still export it from any MEGA session that you may have open in another browser or on another computer.",
+        "context": "Asking the user to provide their master encryption key (now renamed \"Recovery Key\") to unlock their account. It also informs them that its possible to get a copy of their key if they are still logged in anywhere."
     },
     "1957": {
-        "text": "If you don't have your master key, you can [A]park[\/A] your existing account and start over.",
-        "context": ""
+        "text": "If you don't have your Recovery Key, you can [A]park[\/A] your existing account and start over.",
+        "context": "Text to explain that if the user is missing their master encryption key (now renamed \"Recovery Key\") then they can attempt a 'park account' option, which will throw away their old account and make a new one"
     },
     "1958": {
-        "text": "Use master key text file",
-        "context": "Header above the file selector where the user can select the backup of his master key file"
+        "text": "Use Recovery Key text file",
+        "context": "Header for a file selector where the user can select the backup of his master encryption key file (Now renamed to 'Recovery Key')"
     },
     "1959": {
         "text": "Select key file",
@@ -4576,8 +4576,8 @@
         "context": "Caption of the button to validate the new password that the user has chosen"
     },
     "1963": {
-        "text": "It seems that the master key that you provided is incorrect.",
-        "context": ""
+        "text": "It seems that the Recovery Key that you provided is incorrect.",
+        "context": "An error text informing the user that their master encryption key (now renamed \"Recovery Key\") that they provided was not correct"
     },
     "1964": {
         "text": "Are you sure you provided the correct key?",
@@ -4604,8 +4604,8 @@
         "context": ""
     },
     "1970": {
-        "text": "Or enter your master key here",
-        "context": "caption of the text field that the user can paste his master key into instead of selecting the key file"
+        "text": "Or enter your Recovery Key here",
+        "context": "caption of the text field that the user can paste his master encryption key (now renamed \"Recovery Key\") into instead of selecting the key file"
     },
     "1971": {
         "text": "You cannot use the account recovery procedure while being logged in. Please log out and try again.",
@@ -4616,8 +4616,8 @@
         "context": "Error message when the user selected a file that is not a valid key file."
     },
     "1973": {
-        "text": "The file you selected is too large. Please make sure you select the file containing your 22-character master key.",
-        "context": ""
+        "text": "The file you selected is too large. Please make sure you select the file containing your 22-character Recovery Key.",
+        "context": "Warning the user to pick the file they exported from Mega earlier, containing their master encryption key (now renamed \"Recovery Key\")"
     },
     "1974": {
         "text": "Please confirm that you are aware that all your data will be deleted.",
@@ -4632,12 +4632,12 @@
         "context": ""
     },
     "1977": {
-        "text": "Invalid master key",
-        "context": "Headline of an error message when the user supplied an invalid key for the account he's trying to recover."
+        "text": "Invalid Recovery Key",
+        "context": "Headline of an error message when the user supplied an invalid master encryption key (now renamed \"Recovery Key\") for the account he's trying to recover."
     },
     "1978": {
-        "text": "The key you supplied does not match this account. Please make sure you use the correct master key and try again.",
-        "context": ""
+        "text": "The Recovery Key you supplied does not match this account. Please make sure you use the correct Recovery Key and try again.",
+        "context": "The master encryption key (now renamed \"Recovery Key\") that the user tried to use to unlock their account was not correct. They need to find and use the correct one."
     },
     "1979": {
         "text": "Account blocked",
@@ -4656,32 +4656,32 @@
         "context": ""
     },
     "1983": {
-        "text": "Your password unlocks your master key",
-        "context": "Short text that explains that your master key is encrypted with your password (so the encryption hinges of your password)"
+        "text": "Your password unlocks your Recovery Key",
+        "context": "Short text that explains that your master encryption key (now renamed \"Recovery Key\") is encrypted with your password (so the encryption hinges of your password)"
     },
     "1984": {
-        "text": "Your data is only readable through a chain of decryption operations that begins with your master encryption key, which we store encrypted with your password. This means that if you lose your password, your master key can no longer be decrypted, and you can no longer decrypt your data.",
-        "context": "More detailed explanation."
+        "text": "Your data is only readable through a chain of decryption operations that begins with your master encryption key (Recovery Key), which we store encrypted with your password. This means that if you lose your password, your Recovery Key can no longer be decrypted, and you can no longer decrypt your data.",
+        "context": "Detailed explanation of how the master encryption key (now renamed \"Recovery Key\") works, and why it is important to remember your password."
     },
     "1985": {
-        "text": "Exporting the master key and keeping it in a secure location enables you to set a new password without data loss.",
-        "context": ""
+        "text": "Exporting the Recovery Key and keeping it in a secure location enables you to set a new password without data loss.",
+        "context": "Explanation of why it is good to keep a backup of your master encryption key (now renamed \"Recovery Key\")"
     },
     "1986": {
         "text": "An external attacker cannot gain access to your account with just your key. A password reset requires both the key and access to your e-mail.",
         "context": ""
     },
     "1987": {
-        "text": "Save master key as text file",
-        "context": "Headline above the export button"
+        "text": "Save Recovery Key as text file",
+        "context": "Headline above the export button for the master encryption key (Now renamed to \"Recovery Key\")"
     },
     "1988": {
         "text": "Save file",
         "context": "Caption of the export button"
     },
     "1989": {
-        "text": "Copy master key to clipboard",
-        "context": "Or the user can copy paste his 22 character master key from a text field to his clipboard"
+        "text": "Copy Recovery Key to clipboard",
+        "context": "A title of an action that lets the user copy his 22 character master encryption key (now renamed to \"Recovery Key\") from a text field to his clipboard"
     },
     "1990": {
         "text": "Copy",
@@ -4704,8 +4704,8 @@
         "context": "Help section answer. Please put the [A] & [\/A] tag appropriately in the translation."
     },
     "1998": {
-        "text": "If you are positively sure that you will never lose your password, there is no need to back up your master key. If you do decide to make a [A]backup[\/A], however, please ensure that you keep it in a safe location: Anyone with access to your backed up key and your e-mail account will be able to reset your password and gain access to your data.",
-        "context": "Help section answer. Please make sure you put the [A] & [\/A] tags appropriately in the translation."
+        "text": "If you are positively sure that you will never lose your password, there is no need to back up your Recovery Key. If you do decide to make a [A]backup[\/A], however, please ensure that you keep it in a safe location: Anyone with access to your backed up Recovery Key and your e-mail account will be able to reset your password and gain access to your data.",
+        "context": "Help section answer. Please make sure you put the [A] & [\/A] tags appropriately in the translation. This item explains why your master encryption key (now renamed \"Recovery Key\") is important, and that a backup needs to be kept safe."
     },
     "2001": {
         "text": "Do you want to upload your files to a new session?",
@@ -6176,7 +6176,7 @@
         "context": "Message shown on the app's start animation to explain what MEGA ACCESS means"
     },
     "5834": {
-        "text": "MEGA is a secure cloud storage service with 50 GB free storage space.\r\n\r\nInside the app you can upgrade your storage space & bandwidth quota by subscribing to MEGA Pro with a monthly or yearly subscription.\r\nSubscriptions are \u20ac9.99 (US$10.99) per month or \u20ac99.99 (US$119.99) per year.\r\nThis subscription gives you 500 GB of storage space and 1000 GB of bandwidth per month.\r\nSubscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. You can switch off the automatic renewal of your MEGA Pro subscription no later than 24 hours before your next subscription payment is due via your iTunes account settings page. To manage your subscriptions, simply click on the App Store icon on your handset, sign in with your Apple ID at the bottom of the page (if you haven't already done so) and then click View\r\nID. You'll be taken to your account page where you can scroll down to Manage App Subscriptions. From here, you can select your\r\nMEGA Pro subscription and view your scheduled renewal date, choose a different subscription package or toggle the on-off switch to\r\noff to disable the auto-renewal of your subscription.\r\n\r\nTerms of Service:\r\nhttps:\/\/mega.nz\/ios_terms.html\r\nPrivacy policy:\r\nhttps:\/\/mega.nz\/ios_privacy.html",
+        "text": "MEGA is a secure cloud storage service with 50 GB free storage space.\r\n\r\nInside the app you can upgrade your storage space & bandwidth quota by subscribing to MEGA PRO with a monthly or yearly subscription.\r\nSubscriptions are \u20ac9.99 (US$10.99) per month or \u20ac99.99 (US$119.99) per year.\r\nThis subscription gives you 500 GB of storage space and 1000 GB of bandwidth per month.\r\nSubscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. You can switch off the automatic renewal of your MEGA PRO subscription no later than 24 hours before your next subscription payment is due via your iTunes account settings page. To manage your subscriptions, simply click on the App Store icon on your handset, sign in with your Apple ID at the bottom of the page (if you haven't already done so) and then click View\r\nID. You'll be taken to your account page where you can scroll down to Manage App Subscriptions. From here, you can select your\r\nMEGA PRO subscription and view your scheduled renewal date, choose a different subscription package or toggle the on-off switch to\r\noff to disable the auto-renewal of your subscription.\r\n\r\nTerms of Service:\r\nhttps:\/\/mega.nz\/ios_terms.html\r\nPrivacy policy:\r\nhttps:\/\/mega.nz\/ios_privacy.html",
         "context": "MEGA description. Please adjust the new line position accordingly"
     },
     "5835": {
@@ -6476,7 +6476,7 @@
         "context": ""
     },
     "5929": {
-        "text": "You are significantly over your allowed storage allocation, and your uploads have been disabled. Please ensure you are on the correct MEGA Pro plan, or contact support@mega.nz.",
+        "text": "You are significantly over your allowed storage allocation, and your uploads have been disabled. Please ensure you are on the correct MEGA PRO plan, or contact support@mega.nz.",
         "context": ""
     },
     "5931": {
@@ -8316,7 +8316,7 @@
         "context": "Asks the user to choose their plan renewal period e.g. 1 month or 1 year."
     },
     "6978": {
-        "text": "[A]Get 2 months free[\/A] if you subscribe to a one-year Pro plan.",
+        "text": "[A]Get 2 months free[\/A] if you subscribe to a one-year PRO plan.",
         "context": "Tells the user they can get a discount if they pay for a whole year in advance."
     },
     "6979": {
@@ -8684,11 +8684,11 @@
         "context": "Information on the over bandwidth quota dialog."
     },
     "7099": {
-        "text": "You have utilized %1 of data transfer in the last 6 hours, which took you over our current limit. To circumvent this limit, you can [A]upgrade to Pro[\/A], which will give you your own bandwidth package and also ample extra storage space. ",
+        "text": "You have utilized %1 of data transfer in the last 6 hours, which took you over our current limit. To circumvent this limit, you can [A]upgrade to PRO[\/A], which will give you your own bandwidth package and also ample extra storage space. ",
         "context": "Information on the over bandwidth quota dialog.\r\n\r\n%1 is the amount of bandwidth they have used e.g. 532 MB."
     },
     "7100": {
-        "text": "Please upgrade to Pro to continue immediately, or wait %1 to continue for free. ",
+        "text": "Please upgrade to PRO to continue immediately, or wait %1 to continue for free. ",
         "context": "Information on the over bandwidth quota dialog.\r\n\r\n%1 is the number of minutes they need to wait."
     },
     "7101": {
@@ -8988,7 +8988,7 @@
         "context": "upload to. Then choose a file which is not an Image, an Audio or a Video"
     },
     "7183": {
-        "text": "You can be a Pro user!\r\nDo you want to upgrade your account?",
+        "text": "You can be a PRO user!\r\nDo you want to upgrade your account?",
         "context": "Message to promote Pro accounts"
     },
     "7184": {
@@ -9604,7 +9604,7 @@
         "context": "Label for any 'From' button, link, text, title, etc. For example \"From 9,99 \u20ac\/month\"- (String as short as possible)."
     },
     "7344": {
-        "text": "Get 2 months free if you subscribe to a one-year Pro plan",
+        "text": "Get 2 months free if you subscribe to a one-year PRO plan",
         "context": "Label to indicate the user that he obtains 2 free months with a one-year Pro plan subscription."
     },
     "7345": {
@@ -9680,7 +9680,7 @@
         "context": "Label for 'Recurring' payments - (String as short as possible)."
     },
     "7363": {
-        "text": "You can be a Pro user!",
+        "text": "You can be a PRO user!",
         "context": "Label for the dialog shown randomly when a user logs into a free account, notifying the user the possibility of upgrade the account - (String as short as possible)."
     },
     "7364": {
@@ -9832,8 +9832,8 @@
         "context": "A title for the main menu and footer which will link to the open source page containing Mega's source code."
     },
     "7412": {
-        "text": "Backup master key",
-        "context": "The is a button on the Account page which takes a user to the #backup page where they can backup\/save their master encryption key."
+        "text": "Backup Recovery Key",
+        "context": "This a button on the Account page which takes a user to the #backup page where they can backup\/save their master encryption key (Now renamed to \"Recovery Key\")."
     },
     "7413": {
         "text": "You already have a contact with that email address",
@@ -12212,8 +12212,8 @@
         "context": "Open the whole blog post"
     },
     "8513": {
-        "text": "MEGA is a secure cloud storage service that gives you 50 GB free storage space. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\r\n\r\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.\r\n\r\nThe encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Master Key backed up) or you will lose access to your stored files.\r\n\r\nInside the app you can upgrade your storage space and bandwidth quota with a monthly or yearly subscription.\r\n\r\nPRO LITE subscription: \u20ac4.99 (US$4.99) per month or \u20ac49.99 (US$49.99) per year gives you 200 GB of storage space and 1 TB of bandwidth per month.\r\nPRO I subscription: \u20ac9.99 (US$9.99) per month or \u20ac99.99 (US$99.99) per year gives you 500 GB of storage space and 2 TB of bandwidth per month.\r\nPRO II subscription: \u20ac19.99 (US$19.99) per month or \u20ac199.99 (US$199.99) per year gives you 2 TB of storage space and 4 TB of bandwidth per month.\r\nPRO III subscription: \u20ac29.99 (US$29.99) per month or \u20ac299.99 (US$299.99) per year gives you 4 TB of storage space and 8 TB of bandwidth per month.\r\n\r\nFor more info, please check our website:\r\nMobile https:\/\/mega.nz\/mobile_terms.html\thttps:\/\/mega.nz\/mobile_privacy.html\r\nDesktop - https:\/\/mega.nz\/\r\n\r\nNote: For desktop access to your files MEGA needs to use HTML5 compatible browsers to handle our advanced features. We recommend Mozilla Firefox and Google Chrome. However the mobile versions of browsers cannot access the Mega cloud storage system.",
-        "context": "General description of MEGA shown on the apps stores in Android, iOS and Windows Phone. KEEP \"\n\" AND \"\t\"."
+        "text": "MEGA is a secure cloud storage service that gives you 50 GB free storage space. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\r\n\r\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.\r\n\r\nThe encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Recovery Key backed up) or you will lose access to your stored files.\r\n\r\nInside the app you can upgrade your storage space and bandwidth quota with a monthly or yearly subscription.\r\n\r\nPRO LITE subscription: \u20ac4.99 (US$4.99) per month or \u20ac49.99 (US$49.99) per year gives you 200 GB of storage space and 1 TB of bandwidth per month.\r\nPRO I subscription: \u20ac9.99 (US$9.99) per month or \u20ac99.99 (US$99.99) per year gives you 500 GB of storage space and 2 TB of bandwidth per month.\r\nPRO II subscription: \u20ac19.99 (US$19.99) per month or \u20ac199.99 (US$199.99) per year gives you 2 TB of storage space and 4 TB of bandwidth per month.\r\nPRO III subscription: \u20ac29.99 (US$29.99) per month or \u20ac299.99 (US$299.99) per year gives you 4 TB of storage space and 8 TB of bandwidth per month.\r\n\r\nFor more info, please check our website:\r\nMobile - https:\/\/mega.nz\/mobile_terms.html\thttps:\/\/mega.nz\/mobile_privacy.html\r\nDesktop - https:\/\/mega.nz\/\r\n\r\nNote: For desktop access to your files MEGA needs to use HTML5 compatible browsers to handle our advanced features. We recommend Mozilla Firefox and Google Chrome. However the mobile versions of browsers cannot access the MEGA cloud storage system.",
+        "context": "IMPORTANT: Master Key has been renamed to Recovery Key.\r\n\r\nGeneral description of MEGA shown on the apps stores in Android, iOS and Windows Phone. KEEP \"\r\n\" AND \"\t\"."
     },
     "8514": {
         "text": "Subscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. You can switch off the automatic renewal of your MEGA PRO subscription no later than 24 hours before your next subscription payment is due via your iTunes account settings page. To manage your subscriptions, simply click on the App Store icon on your handset, sign in with your Apple ID at the bottom of the page (if you haven't already done so) and then click View ID. You'll be taken to your account page where you can scroll down to Manage App Subscriptions. From there, you can select your MEGA PRO subscription and view your scheduled renewal date, choose a different subscription package or toggle the on-off switch to off to disable the auto-renewal of your subscription.",
@@ -12680,8 +12680,8 @@
         "context": "A subject in our help system about how to recover their account if they forget their password."
     },
     "8639": {
-        "text": "Transfer Speed Issue",
-        "context": "Message subject in our help system"
+        "text": "Transfer Issue",
+        "context": "Message subject in our help system (We have removed the word Speed)"
     },
     "8640": {
         "text": "Contact\/Sharing Issue",
@@ -13832,7 +13832,7 @@
         "context": "Warning header. Informs user that bandwidth is limited for current membership plan."
     },
     "8944": {
-        "text": "Your transfer may be interrupted.[BR]\r\n[S]Get a pro account[\/S] for increased bandwidth quota.",
+        "text": "Your transfer may be interrupted.[BR]\r\n[S]Get a PRO account[\/S] for increased bandwidth quota.",
         "context": "Informs user that bandwidth is limited for current membership plan. User can buy PRO plan to increase bandwidth quota.\r\n\r\nPlease leave [BR], [S], [\/S] as it is."
     },
     "8945": {
@@ -13870,5 +13870,609 @@
     "8953": {
         "text": "Set an expiry date",
         "context": "A label for the Get Link dialog when there is no expiry time currently set for the link. This lets them set an expiry date for the link so it will no longer be available after this date."
+    },
+    "8954": {
+        "text": "Get a PRO account",
+        "context": "a button to ask user to upgrade their account to PRO."
+    },
+    "8955": {
+        "text": "Delete account",
+        "context": "A button in the My Account section where the user can permanently delete his account."
+    },
+    "8956": {
+        "text": "Open location",
+        "context": "An option in the sliding panel to open the folder which contains the file selected after performing a search."
+    },
+    "8957": {
+        "text": "Servers are too busy. Please wait.",
+        "context": "message when a request cannot be performed because the servers are busy"
+    },
+    "8958": {
+        "text": "Free Account",
+        "context": "A label in the My Account section to show the user's account type."
+    },
+    "8959": {
+        "text": "PRO Lite Account",
+        "context": "A label in the My Account section to show the user's account type."
+    },
+    "8960": {
+        "text": "Pro I Account",
+        "context": "A label in the My Account section to show the user's account type."
+    },
+    "8961": {
+        "text": "Pro II Account",
+        "context": "A label in the My Account section to show the user's account type."
+    },
+    "8962": {
+        "text": "Pro III Account",
+        "context": "A label in the My Account section to show the user's account type."
+    },
+    "8963": {
+        "text": "Backup your Recovery Key",
+        "context": "Title of the screen to backup the master key"
+    },
+    "8964": {
+        "text": "Your password unlocks your Recovery Key",
+        "context": "Subtitle of the screen to backup the master key"
+    },
+    "8965": {
+        "text": "Copy the Recovery Key to clipboard or save it as text file",
+        "context": "Sentence to inform the user the available actions in the screen to backup the master key"
+    },
+    "8966": {
+        "text": "The Recovery Key has been successfully copied",
+        "context": "Alert message when the master key (now named Recovery Key) has been successfully copied to the ClipBoard"
+    },
+    "8967": {
+        "text": "YES",
+        "context": "A positive button to perform a general action."
+    },
+    "8968": {
+        "text": "NO",
+        "context": "A negative button to perform a general action."
+    },
+    "8969": {
+        "text": "Forgot password?",
+        "context": "An option to reset the password."
+    },
+    "8970": {
+        "text": "If you have a backup of your Recovery Key, you can reset your password by selecting YES. No data will be lost.",
+        "context": "First paragraph of the screen when the password has been forgotten"
+    },
+    "8971": {
+        "text": "You can still export your Recovery Key now if you have an active MEGA session in any other browser on this or any other computer. If you don't, you can no longer decrypt your existing account, but you can start a new one under the same e-mail address by selecting NO.",
+        "context": "Second paragraph of the screen when the password has been forgotten"
+    },
+    "8972": {
+        "text": "If you don't, you can still export your Recovery Key now in this MEGA session. Please, go back and backup your recovery key.",
+        "context": "Second paragraph of the screen when the password has been forgotten and the user is still logged in"
+    },
+    "8973": {
+        "text": "Do you have a backup of your Recovery Key?",
+        "context": "Sentence to ask to the user if he has the master key in the screen when the password has been forgotten"
+    },
+    "8974": {
+        "text": "email goes here",
+        "context": "A hint message where the user can write his e-mail."
+    },
+    "8975": {
+        "text": "Please enter you e-mail address below. You will receive a recovery link that will allow you to submit your Recovery Key and reset your password.",
+        "context": "Text of the alert message to ask for the link to reset the pass with the MK"
+    },
+    "8976": {
+        "text": "Recovery Key goes here",
+        "context": "Hint of the text when the user can write his master key"
+    },
+    "8977": {
+        "text": "If you delete your account you will permanently lose all the data stored in the cloud. You will not be able to undo this action.",
+        "context": "Text shown in the alert dialog to confirm the cancellation of an account"
+    },
+    "8978": {
+        "text": "password goes here",
+        "context": "A hint message where the user can write his password."
+    },
+    "8979": {
+        "text": "This is the last step to cancel your account. You will permanently lose all the data stored in the cloud. Please enter your password below.",
+        "context": "Text shown in the last alert dialog to confirm the cancellation of an account"
+    },
+    "8980": {
+        "text": "Email verification",
+        "context": "An alert dialog title to inform the user that they have to check their email."
+    },
+    "8981": {
+        "text": "Please check your email to proceed.",
+        "context": "Text of the alert dialog to inform the user that have to check the email"
+    },
+    "8982": {
+        "text": "An error occurred, please try again.",
+        "context": "Text of the alert dialog to inform the user when an error occurs when cancelling the account"
+    },
+    "8983": {
+        "text": "You must be logged in to perform this action.",
+        "context": "Alert to inform the user that have to be logged in to perform the action"
+    },
+    "8984": {
+        "text": "Incorrect",
+        "context": "An error when the user leaves the password field empty."
+    },
+    "8985": {
+        "text": "You must be logged out to perform this action.",
+        "context": "Alert to inform the user that have to be logged out to perform the action"
+    },
+    "8986": {
+        "text": "Please enter your Recovery Key below.",
+        "context": "Text of the dialog to write MK after opening the recovery link"
+    },
+    "8987": {
+        "text": "Password changed!",
+        "context": "An alert message when the password has been correctly changed."
+    },
+    "8988": {
+        "text": "Park",
+        "context": "A button to park an account."
+    },
+    "8989": {
+        "text": "Oops!",
+        "context": "The title of the screen to park an account."
+    },
+    "8990": {
+        "text": "Due to our end-to-end encryption paradigm, you will not be able to access your data without either your password or a backup of your Recovery Key.",
+        "context": "First paragraph of the screen to park an account"
+    },
+    "8991": {
+        "text": "You can park your existing account and start a fresh one under the same e-mail address. Your data will be retained for at least 60 days. In case that you recall your parked account's password, please contact support@mega.nz",
+        "context": "Second paragraph of the screen to park an account"
+    },
+    "8992": {
+        "text": "Please enter you e-mail address below. You will receive a recovery link that will allow you to park your account.",
+        "context": "Text of the dialog message to ask for the link to park the account"
+    },
+    "8993": {
+        "text": "This is the last step to park your account, please enter your new password. Your data will be retained for at least 60 days. If you do recall your parked account's password, please contact support@mega.nz",
+        "context": "Text shown in the last alert dialog to park an account"
+    },
+    "8994": {
+        "text": "Enter new password",
+        "context": "A screen title in the screen where the user will write their new password after opening the recovery link."
+    },
+    "8995": {
+        "text": "Your Recovery Key is going to be used to reset your password. Please, enter your new password.",
+        "context": "Text of the alert after opening the recovery link to reset pass being logged."
+    },
+    "8996": {
+        "text": "You will receive a recovery link that will allow you to reset your password. Please check your email to proceed.",
+        "context": "Text of the alert dialog to inform the user that have to check the email after clicking the option forgot pass"
+    },
+    "8997": {
+        "text": "Upgrade now",
+        "context": "A button to upgrade the user's account to a PRO account."
+    },
+    "8998": {
+        "text": "Error when changing the account data.",
+        "context": "Message when an error ocurred when changing an user attribute"
+    },
+    "8999": {
+        "text": "Your account data has been correctly updated.",
+        "context": "Message when an user attribute has been changed successfully"
+    },
+    "9000": {
+        "text": "Error. This email address is already in use.",
+        "context": "Error shown when the user tries to change his mail to one that is already used"
+    },
+    "9001": {
+        "text": "This is the last step to change your email. Please enter your password below.",
+        "context": "Text shown in the last alert dialog to change the email associated to an account"
+    },
+    "9002": {
+        "text": "Change email",
+        "context": "The title of the alert dialog to change the email associated to an account."
+    },
+    "9003": {
+        "text": "Your email has been correctly updated.",
+        "context": "Message when the user email has been changed successfully"
+    },
+    "9004": {
+        "text": "Take full advantage of your MEGA account by upgrading to PRO.",
+        "context": "Text of the warning when the user is running out of space"
+    },
+    "9005": {
+        "text": "Edit profile picture",
+        "context": "A title of a sliding panel where the user can choose the option to edit their profile picture."
+    },
+    "9006": {
+        "text": "Choose picture",
+        "context": "An option to change the avatar by choosing an existing picture."
+    },
+    "9007": {
+        "text": "Delete picture",
+        "context": "An option to delete the existing avatar."
+    },
+    "9008": {
+        "text": "The key you supplied does not match this account. Please make sure you use the correct Recovery Key and try again.",
+        "context": "Alert when the user introduces his master key to reset pass incorrectly"
+    },
+    "9009": {
+        "text": "Invalid Recovery Key",
+        "context": "An alert title where the user provided the incorrect Recovery Key."
+    },
+    "9010": {
+        "text": "No pictures uploaded",
+        "context": "A message that indicates that no pictures have been uploaded to the Camera Uploads section."
+    },
+    "9011": {
+        "text": "Recovering info\u2026",
+        "context": "A message shown while the app is waiting for a request."
+    },
+    "9012": {
+        "text": "Your new email address needs to be validated. Please check your email to proceed.",
+        "context": "Text of the alert dialog to inform the user that have to check the email to validate his new email"
+    },
+    "9013": {
+        "text": "Your picture profile will be deleted. Do you want to proceed?",
+        "context": "Confirmation before deleting the avatar of the user's profile"
+    },
+    "9014": {
+        "text": "(PRO ONLY)",
+        "context": "An alert dialog for the Get Link feature."
+    },
+    "9015": {
+        "text": "Edit link",
+        "context": "An option of the sliding panel to edit the link of a node."
+    },
+    "9016": {
+        "text": "%d reinvite requests sent successfully.",
+        "context": "success message when reinviting multiple contacts. Please leave %d as it is."
+    },
+    "9017": {
+        "text": "%d requests deleted successfully.",
+        "context": "success message when reinviting multiple contacts. Please leave %d as it is."
+    },
+    "9018": {
+        "text": "%1$d requests successfully deleted but %2$d requests were not deleted.",
+        "context": "error message when removing multiple contacts requests. If there are multiple contact request removed, and some of them returned an error (but others went OK). %1$d (the format is important) is the number of contact requests successfully removed. And %2$d (the format is important) is the number of contact requests removed ending with error."
+    },
+    "9019": {
+        "text": "Do you want to delete the invitation request to %s?",
+        "context": "confirmation message before removing a contact request. Leave %s as it is please."
+    },
+    "9020": {
+        "text": "Do you want to delete these %d invitation requests?",
+        "context": "confirmation message before removing multiple contact request. Leave %d as it is please."
+    },
+    "9021": {
+        "text": "%d replies sent.",
+        "context": "success message when replying to multiple received request. Please leave %d as it is"
+    },
+    "9022": {
+        "text": "%1$d replies successfully sent but %2$d were not sent.",
+        "context": "error message when replying to multiple received request. If there are multiple contact request replied, and some of them returned an error (but others went OK). %1$d (the format is important) is the number of successful contact requests replied. And %2$d (the format is important) is the number of contact requests replies ending with error."
+    },
+    "9023": {
+        "text": "request",
+        "context": "An invitation request in the Contacts section."
+    },
+    "9024": {
+        "text": "requests",
+        "context": "Invitation requests in the Contacts section."
+    },
+    "9025": {
+        "text": "Remove shares?",
+        "context": "A confirmation message before removing the outgoing shares of a folder."
+    },
+    "9026": {
+        "text": "Are you sure you want to leave this share?",
+        "context": "An alert message which is shown when the user taps on the leave share action for a single inshare."
+    },
+    "9027": {
+        "text": "Are you sure you want to leave these shares?",
+        "context": "An alert message which is shown when the user taps on the leave share action after selecting multiple inshares."
+    },
+    "9028": {
+        "text": "Saved in Photos",
+        "context": "A success message which is shown when you save a photo in the Photos app."
+    },
+    "9029": {
+        "text": "If you have misspelled your email address, correct it and click 'Resend'.",
+        "context": "A hint shown at the bottom of the Send Signup Link dialog to tell users they can edit the provided email."
+    },
+    "9030": {
+        "text": "Upon completion, click [S]Send[\/S] to send your network connection report to our support team.",
+        "context": "Help message in our Network Connection helper. The word Send (its translation) must be capitalised  and within \"[S]\" and \"[\/S]\"."
+    },
+    "9031": {
+        "text": "Server",
+        "context": "Header of a table, representing the server (machine) that the network test went to"
+    },
+    "9032": {
+        "text": "Ping",
+        "context": "Header of a table, indicating the network Ping time."
+    },
+    "9033": {
+        "text": "Avg. Speed",
+        "context": "Header of table (Avg is a short word for Average. Try to keep the word short if possible)"
+    },
+    "9034": {
+        "text": "Progress",
+        "context": "Header of table indicating how the network test is progressing."
+    },
+    "9035": {
+        "text": "This dialog will show you the speed of your connection to our servers.",
+        "context": "Help text in our Network Diagnostics tool"
+    },
+    "9036": {
+        "text": " Please paste a file link below and click on [S]Test[\/S].",
+        "context": "Help text in our Network Diagnostics tool. Please leave the [S] and [\/S] around the translation for Test (which is the name of the button they need to click)"
+    },
+    "9037": {
+        "text": "Test",
+        "context": "Text for a button that initiates a network speed test"
+    },
+    "9038": {
+        "text": "Paste File URL",
+        "context": "Placeholder text for input"
+    },
+    "9039": {
+        "text": "Folder links are not yet supported",
+        "context": "Small text to make clear the Network Diagnostic tools do not support folder links at the moment."
+    },
+    "9040": {
+        "text": "offline",
+        "context": "This is used on the Contacts page to indicate the user's status is currently offline."
+    },
+    "9041": {
+        "text": "You have not selected a default download location for your files.\r\n\r\nTo proceed with the download, please select a destination folder or go to settings in order to set up your default download location.",
+        "context": "Message of the dialog displayed when a user want to download some nodes and the app doesn't have configured a default download location. Asks the user to select a location for this download or configure a default location."
+    },
+    "9042": {
+        "text": "Could not download the folder link. Please try again.",
+        "context": "A dialog message which is displayed when the process\/request to download a folder link fails."
+    },
+    "9043": {
+        "text": "Import failed",
+        "context": "The title of a dialog which is displayed when process\/request to import a node fails."
+    },
+    "9044": {
+        "text": "Could not import the folder link. Please try again.",
+        "context": "A dialog message which is displayed when the process\/request to import a folder link fails."
+    },
+    "9045": {
+        "text": "The associated user account has been terminated due to multiple violations of our Terms of Service.",
+        "context": "An error message which is shown when you open a file\/folder link (or other shared resource) and it's no longer available because the the associated user account has been terminated due to multiple violations of our Terms of Service."
+    },
+    "9046": {
+        "text": "The account confirmation link that you are using is incomplete. Please check the link length and be sure that you have copied the entire link then try again.",
+        "context": "A dialog message which is displayed when a user tries to confirm a MEGA account but the confirm link is incomplete because it has less characters than it should. This is probably because the user hasn't copied and pasted the entire link."
+    },
+    "9047": {
+        "text": "The link you are using for a new signup is not valid.",
+        "context": "A warning dialog message which is shown when the user tries to make a new account registration using an invalid (#newsignup) link."
+    },
+    "9048": {
+        "text": "The provided key is invalid. Please check that the key is correct or ask the creator of the link again.",
+        "context": "A dialog message which is shown after a user provided a decryption key for a public link and the key was invalid."
+    },
+    "9049": {
+        "text": "You have attempted to log in too many times. Please wait until %@ and try again.",
+        "context": "An error message which is shown when there have been too many attempts to log in."
+    },
+    "9050": {
+        "text": "Please check your email and click the link to confirm your account.",
+        "context": "An error message which is shown when trying to login to an account that is not validated."
+    },
+    "9051": {
+        "text": "Your account has not been confirmed yet.",
+        "context": "A dialog message which is shown when the user is trying to login and the account has not been confirmed yet."
+    },
+    "9052": {
+        "text": "You have attempted to log in too many times. Please wait until {0} and try again.",
+        "context": "A dialog message which is shown when the user is trying to login and has made several failed attempts.\r\nPreserve the {0} code because is for including the exact time the user has to wait until."
+    },
+    "9053": {
+        "text": "MEGA accesses your microphone when you capture a video inside the app.",
+        "context": "The microphone usage description. To protect user privacy, Apple requires a string explaining why the microphone will be accessed."
+    },
+    "9054": {
+        "text": "MEGA accesses your camera when you capture a video or photo inside the app.",
+        "context": "The camera usage description. To protect user privacy, Apple requires a string explaining why the camera will be accessed."
+    },
+    "9055": {
+        "text": "MEGA accesses your photos or\/and videos when you select some of them to upload or when you have enabled the Camera Uploads.",
+        "context": "The photo library usage description. To protect user privacy Apple requires a string explaining why this will be accessed."
+    },
+    "9056": {
+        "text": "Please do not enter any URL into the Copyrighted work field, if you need to add more URLs please click on Add another URL.",
+        "context": "An error message which is shown when submitting a copyright notice and a URL is mistakenly inserted into the \"Copyrighted work claimed to have been infringed\" field."
+    },
+    "9057": {
+        "text": "The file you are about to add is older than the copy already on record, do you want to replace the file?",
+        "context": "A dialog message asking the user to confirm they want to replace the file."
+    },
+    "9058": {
+        "text": "Replace file",
+        "context": "A dialog title. This dialog is shown before replacing an existing file."
+    },
+    "9059": {
+        "text": "No, rename it as %1",
+        "context": "A dialog button label. This button renames the file with a different name instead of replacing the existing file. Please keep the %1 placeholder which will be replaced with the filename."
+    },
+    "9060": {
+        "text": "Auto-replace file if a newly uploaded file has the same name\r\n\r\n",
+        "context": "Title for a setting\/option on the settings page to replace a file within a directory (rather than rename) if another file with the same name is uploaded to the same directory"
+    },
+    "9061": {
+        "text": "Encrypt",
+        "context": "The text of a button. This button will encrypt a link with a password."
+    },
+    "9062": {
+        "text": "Show PRO options",
+        "context": "This is the text of a button. The button will reveal more options on the Export Link dialog which are usable if the user has purchased a PRO plan."
+    },
+    "9063": {
+        "text": "Set password protection",
+        "context": "This is a title label on the Export Link dialog. The title covers the section where the user can password protect a public link."
+    },
+    "9064": {
+        "text": "Hide options",
+        "context": "This is a button on the Export Link dialog. This hides the extra options that are currently visible and simplifies the look of the dialog."
+    },
+    "9065": {
+        "text": "This feature is not supported in your browser. Try Firefox or Chrome.",
+        "context": "An error message. This is shown when there is no browser support currently for an advanced function and the feature will not work. It recommends they try one of the more modern browsers."
+    },
+    "9066": {
+        "text": "The passwords are not the same, please check that you entered them correctly.",
+        "context": "An error message on the Export Link dialog. This is shown when they have entered the password and confirmation password but the passwords do not match."
+    },
+    "9067": {
+        "text": "Please use a stronger password.",
+        "context": "An error message on the Export Link dialog. This is shown when the user has entered a weak password that is a short length or that could be guessed easily in a dictionary attack."
+    },
+    "9068": {
+        "text": "The link could not be decoded, please check the link is correct and try again.",
+        "context": "An error on the Password Decrypt dialog."
+    },
+    "9069": {
+        "text": "The algorithm this link was encrypted with is not supported.",
+        "context": "An error on the Password Decrypt dialog. Part of the link may have been corrupted so the program does not know how to decrypt the link. Alternatively another client may have used a newer algorithm to encrypt the link and it is not supported on this client."
+    },
+    "9070": {
+        "text": "Enter decryption password",
+        "context": "This dialog title is used on the Password Decrypt dialog."
+    },
+    "9071": {
+        "text": "To access this link, you will need its password.",
+        "context": "This dialog message is used on the Password Decrypt dialog. The link is a password protected link so the user needs to enter the password to decrypt the link."
+    },
+    "9072": {
+        "text": "If you do not have the password, contact the creator of the link.",
+        "context": "This dialog message is used on the Password Decrypt dialog as an instruction for the user."
+    },
+    "9073": {
+        "text": "Enter the password",
+        "context": "This placeholder text is used on the Password Decrypt dialog as an instruction for the user."
+    },
+    "9074": {
+        "text": "Enter a strong password",
+        "context": "This input placeholder text is used on the Export Link dialog with the password protect feature. It is used as an instruction for the user."
+    },
+    "9075": {
+        "text": "Retype the password",
+        "context": "This input placeholder text is used on the Export Link dialog with the password protect feature. It is used as an instruction for the user that they need to retype the first password they entered as a confirmation that they typed everything correctly and didn't make a typo."
+    },
+    "9076": {
+        "text": "The link could not be decrypted. The password could be incorrect, or the data was corrupted or modified. Check the link and try entering the password again.",
+        "context": "An error message on the Password Decrypt dialog."
+    },
+    "9077": {
+        "text": "Decrypted",
+        "context": "The button text on the Password Decrypt dialog when the link has been successfully decrypted."
+    },
+    "9078": {
+        "text": "Encrypting",
+        "context": "The button text on the Export Link dialog when the process to start encrypting the link has begun."
+    },
+    "9079": {
+        "text": "Encrypted",
+        "context": "The button text on the Export Link dialog to indicate that the link has been encrypted successfully."
+    },
+    "9080": {
+        "text": "Rename Group",
+        "context": "The title of a menu button which allows users to rename a group chat."
+    },
+    "9081": {
+        "text": "Changed group chat name to %s",
+        "context": "A hint message in a group chat to indicate the group chat name is changed to a new one. Please keep %s when translating this string which will be replaced with the name at runtime."
+    },
+    "9082": {
+        "text": "This account has not completed the registration process yet. First check your email, click on the Activate Account button and reconfirm your chosen password.",
+        "context": "An error dialog message which is shown when the user tries to log in to their account they created, but they haven't clicked the confirmation link in their email yet."
+    },
+    "9083": {
+        "text": "Your purchase of a MEGA subscription has failed because you have already purchased this item.",
+        "context": "The message in a dialog which is displayed when a user has already purchased an item from the store."
+    },
+    "9084": {
+        "text": "Already purchased",
+        "context": "A title of the dialog which is displayed when a user has already purchased an item from the store."
+    },
+    "9085": {
+        "text": "Your purchase of a MEGA subscription has failed or has been cancelled. Please try again or contact Windows Store support.",
+        "context": "A message in a dialog which is displayed when a user tries to purchase an item from the store and the process failed."
+    },
+    "9086": {
+        "text": "Purchase failed or cancelled",
+        "context": "The title of a dialog which is displayed when a user tries to purchase an item from the store but the purchase failed."
+    },
+    "9087": {
+        "text": "Your MEGA subcription purchase has succeeded.",
+        "context": "A message in a dialog which is displayed when a user has successfully purchased an item from the store."
+    },
+    "9088": {
+        "text": "Purchase succeeded",
+        "context": "A title of a dialog which is displayed when a user has purchased an item from the store."
+    },
+    "9089": {
+        "text": "Your puchase of a MEGA subscription has not passed validation at our licence server. On restart of this app we will retry to validate your subscription licences. Please contact MEGA support if the error continues.",
+        "context": "A message in a dialog which is displayed when validation of the in app purchase has failed at the MEGA License server."
+    },
+    "9090": {
+        "text": "Purchase validation failed",
+        "context": "A title of a dialog which is displayed when the validation of the in app purchase has failed at the MEGA licence server."
+    },
+    "9091": {
+        "text": "Validating...",
+        "context": "A progress indicator message when validating a purchase receipt."
+    },
+    "9092": {
+        "text": "In app purchase",
+        "context": "A label for any 'In app purchase' (IAP) button, link, text, title, etc."
+    },
+    "9093": {
+        "text": "You can add multiple people at once with e-mail addresses separated by commas",
+        "context": "Invite dialog default info text, below input box and above Send button."
+    },
+    "9094": {
+        "text": "Frequently Asked Questions",
+        "context": "A title for the commonly asked questions in the Help section of the site."
+    },
+    "9095": {
+        "text": "How can we help you today?",
+        "context": "A title for the main page of the Help section of the site. A casual question about how Mega can help the user"
+    },
+    "9096": {
+        "text": "Support Centre",
+        "context": "A button for going back to the Support Centre, the main page of the Help section of the site."
+    },
+    "9097": {
+        "text": "Articles",
+        "context": "A title for a list of help content articles."
+    },
+    "9098": {
+        "text": "We can't find what you are after",
+        "context": "A message which is displayed when the search query does not return any results"
+    },
+    "9099": {
+        "text": "Please try your search again or contact our support team directly",
+        "context": "A message which is displayed when the search query does not return any results."
+    },
+    "9100": {
+        "text": "Email Support",
+        "context": "A button to contact MEGA support via email."
+    },
+    "9101": {
+        "text": "If you can't find what you are looking for, please contact our support team for direct assistance.",
+        "context": "A message for the Get Support section informing the user to contact MEGA support if they can't find the help they need."
+    },
+    "9102": {
+        "text": "Go Back",
+        "context": "A button in the Help section to take the user back to a previous screen on the website."
+    },
+    "9103": {
+        "text": "Copy the link below to share the article.",
+        "context": "Body for dialog with a link to share an article of our help section"
+    },
+    "9104": {
+        "text": "Share the Article",
+        "context": "Title for dialog"
     }
 }

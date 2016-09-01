@@ -460,7 +460,9 @@
                 }
             };
             loadingDialog.show();
-            sendsignuplink(accountData.name, accountData.email, accountData.password, ctx, true);
+
+            var email = $('input', $dialog).val().trim() || accountData.email;
+            sendsignuplink(accountData.name, email, accountData.password, ctx, true);
         });
 
         fm_showoverlay();

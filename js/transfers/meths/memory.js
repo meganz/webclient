@@ -90,12 +90,19 @@
             }
             else if (is_mobile) {
                 if (page === 'download') {
-                    blob = myURL.createObjectURL(blob);
+                    var sblob = myURL.createObjectURL(blob);
                     $('body')
                         .addClass('download-complete')
                         .find('.download-progress')
                         .rebind('click', function() {
-                            window.open(blob, '_blank');
+                            if (navigator.userAgent.match(/CriOS/i)) {
+                                var reader = new FileReader();
+                                reader.onload = function(e) {
+                                    window.open(reader.result, '_blank');
+                                };
+                                return reader.readAsDataURL(blob);
+                            }
+                            window.open(sblob, '_blank');
                             return false;
                         });
                     $('.mobile.download-speed, .mobile.download-percents').text('');

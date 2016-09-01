@@ -3,11 +3,12 @@ var support = (function() {
     var minLetters = 30;
     var ns = {};
     var $textarea;
-    var $button;    
+    var $button;
     var $subject;
     var $window = $(window);
     var headerHeight;
     var bottomHeight;
+    var extraData = '';
 
     function resizeHandler() {
         if (!$textarea.is(':visible')) {
@@ -22,7 +23,7 @@ var support = (function() {
     function submit() {
         var opts = {
             a: 'sse', // send support email
-            m: $.trim($textarea.val()), // message
+            m: $.trim($textarea.val() + extraData), // message
             t: $subject.find('.active').data('value') // type
         };
         if (opts.m.replace(/\s+/g, '').length <= minLetters) {
@@ -83,6 +84,14 @@ var support = (function() {
             6: l[8641],     // MEGAsync Issue
             7: l[8642],     // Missing / Invisible Data
         };
+
+        extraData = '';
+        if (window.helpOrigin) {
+            supportSubjects = {8: 'Improve help section'};
+            extraData = "\nLanguage:" + getCurrentLanguage() + "\nQuestion: " + window.helpOrigin + "\n\n";
+
+            delete window.helpOrigin;
+        }
         
         for (var i in supportSubjects) {
             if (supportSubjects.hasOwnProperty(i)) {
@@ -96,9 +105,15 @@ var support = (function() {
         }
         
         $subject.find('.default-select-scroll').safeHTML(html);
-        bindDropdownEvents($subject, 1);
+        bindDropdownEvents($subject);
         $window.rebind('resize.support-textarea', resizeHandler);
         $button = $('.support a').rebind('click', submit);
+
+        if (typeof window.onsupport === "function") {
+            window.onsupport($textarea.parents('.support'));
+            window.onsupport = null;
+        }
+
         resizeHandler();
     };
 

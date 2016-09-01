@@ -77,7 +77,7 @@ function mainScroll() {
         verticalDragMinHeight: 150,
         enableKeyboardNavigation: true
     });
-    $('.main-scroll-block').unbind('jsp-scroll-y');
+    $('.main-scroll-block').unbind('jsp-scroll-y.menu');
     jScrollFade('.main-scroll-block');
     if (page === 'doc' || page.substr(0, 4) === 'help' || page === 'cpage' || page === 'sdk' || page === 'dev') {
         scrollMenu();
@@ -101,6 +101,7 @@ function scrollMenu() {
     });
 }
 
+
 function init_page() {
 
     /*if (page.substr(0, 8) == 'redirect') {
@@ -114,6 +115,37 @@ function init_page() {
         if (M.transferFromMegaCoNz() === false) {
             return false;
         }
+    }
+
+    if (page.substr(0, 1) === '!' && page.length > 1) {
+        var ar = page.substr(1, page.length - 1).split('!');
+        if (ar[0]) {
+            dlid = ar[0].replace(/[^\w-]+/g, "");
+        }
+
+        dlkey = false;
+        if (ar[1]) {
+            dlkey = ar[1].replace(/[^\w-]+/g, "");
+        }
+
+        if (mega.utils.hasPendingTransfers()) {
+            page = 'download';
+
+            if ($.lastSeenFilelink === location.hash) {
+                return;
+            }
+
+            mega.utils.abortTransfers()
+                .done(function() {
+                    location.reload();
+                })
+                .fail(function() {
+                    location.hash = $.lastSeenFilelink;
+                });
+
+            return;
+        }
+        $.lastSeenFilelink = location.hash;
     }
 
     if (!u_type) {
@@ -161,22 +193,9 @@ function init_page() {
     if (!page.match(/^(blog|help|corporate|page_)/)) {
         $('.top-head').remove();
     }
-    $('#loading:visible').hide();
+    $('#loading').hide();
     if (window.loadingDialog) {
         loadingDialog.hide();
-    }
-
-    page = page.replace('%21', '!').replace('%21', '!');
-
-    if (page.substr(0, 1) == '!' && page.length > 1) {
-        dlkey = false;
-        var ar = page.substr(1, page.length - 1).split('!');
-        if (ar[0]) {
-            dlid = ar[0].replace(/[^\w-]+/g, "");
-        }
-        if (ar[1]) {
-            dlkey = ar[1].replace(/[^\w-]+/g, "");
-        }
     }
 
     // If they recently tried to redeem their voucher but were not logged in or registered then direct them to the
@@ -186,21 +205,27 @@ function init_page() {
     }
 
     var wasFolderlink = pfid;
+    var oldPFKey = pfkey;
     if (page.substr(0, 2) == 'F!' && page.length > 2) {
         var ar = page.substr(2, page.length - 1).split('!');
+
+        pfid = false;
         if (ar[0]) {
             pfid = ar[0].replace(/[^\w-]+/g, "");
         }
+
+        pfkey = false;
         if (ar[1]) {
             pfkey = ar[1].replace(/[^\w-]+/g, "");
         }
-        // TODO: Rename pfid, pfkey, and pfhandle around our codebase
+
         pfhandle = false;
         if (ar[2]) {
             pfhandle = ar[2].replace(/[^\w-]+/g, "");
         }
+
         n_h = pfid;
-        if (!flhashchange) {
+        if (!flhashchange || pfkey !== oldPFKey) {
             if (pfkey) {
                 api_setfolder(n_h);
                 if (waitxhr) {
@@ -220,6 +245,10 @@ function init_page() {
         }
         else {
             page = 'fm';
+        }
+
+        if (fminitialized) {
+            M.currentdirid = undefined;
         }
     }
     else if (!flhashchange || page !== 'fm/transfers') {
@@ -265,11 +294,11 @@ function init_page() {
     }
 
     var fmwasinitialized = !!fminitialized;
-    if (((u_type === 0 || u_type === 3) || pfid || folderlink) && (!flhashchange || !pfid)) {
+    if (((u_type === 0 || u_type === 3) || pfid || folderlink) && (!flhashchange || !pfid || pfkey !== oldPFKey)) {
 
         if (is_fm()) {
             // switch between FM & folderlinks (completely reinitialize)
-            if ((!pfid && folderlink) || (pfid && folderlink === 0)) {
+            if ((!pfid && folderlink) || (pfid && folderlink === 0) || pfkey !== oldPFKey) {
 
                 // re-initialize waitd connection when switching.
                 if (!pfid && folderlink && u_sid) {
@@ -572,6 +601,7 @@ function init_page() {
         }
     }
     else if (page.substr(0, 4) == 'help') {
+        return Help.render();
         function doRenderHelp() {
             if (window.helpTemplate) {
                 parsepage(window.helpTemplate);
@@ -698,11 +728,14 @@ function init_page() {
         });
         return;
     }
-    else if (page == 'sourcecode') {
+    else if (page === 'sourcecode') {
         parsepage(pages['sourcecode']);
     }
-    else if (page == 'terms') {
+    else if (page === 'terms') {
         parsepage(pages['terms']);
+    }
+    else if (page === 'general') {
+        parsepage(pages['general']);
     }
     else if (page == 'takedown') {
         parsepage(pages['takedown']);
@@ -1567,7 +1600,9 @@ function topmenuUI() {
     });
 
     $('.top-menu-popup .top-menu-item').rebind('click', function () {
-
+        if ($('.light-overlay').is(':visible')) {
+            loadingInitDialog.hide();
+        }
         $('.top-menu-popup').removeClass('active');
         $('.top-menu-icon').removeClass('active');
 
@@ -1637,6 +1672,9 @@ function topmenuUI() {
         }
         else if (className.indexOf('terms') > -1) {
             document.location.hash = 'terms';
+        }
+        else if (className.indexOf('general') > -1) {
+            document.location.hash = 'general';
         }
         else if (className.indexOf('privacypolicy') > -1) {
             document.location.hash = 'privacy';
@@ -1890,7 +1928,7 @@ function parsetopmenu() {
 window.onhashchange = function() {
     var tpage = document.location.hash;
 
-    if (typeof gifSlider !== 'undefined') {
+    if (typeof gifSlider !== 'undefined' && tpage.substr(0, 2) !== '#!') {
         gifSlider.clear();
     }
 

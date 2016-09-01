@@ -2408,9 +2408,13 @@ function api_getsid2(res, ctx) {
     if (typeof res === 'number') {
 
         if (res === ETOOMANY) {
-
             api_getsid.etoomany = Date.now();
             api_getsid.warning();
+        }
+        
+        // Check for incomplete registration
+        else if (res === EINCOMPLETE) {
+            msgDialog('warningb', l[882], l[9082]); // This account has not completed the registration process yet...
         }
     }
     else if (typeof res === 'object') {
@@ -4193,14 +4197,13 @@ function crypto_processkey(me, master_aes, file) {
                         if (window.d) {
                             debugger;
                         }
-                        return;
                     }
                     k = decKey;
                 }
             }
             else {
                 logger.error("Received invalid key length (" + k.length + "): " + file.h);
-                return;
+                k = null;
             }
         }
         else {
@@ -4213,16 +4216,13 @@ function crypto_processkey(me, master_aes, file) {
                     }
                     else {
                         logger.debug("Corrupt key for node " + file.h);
-                        return;
                     }
                 } catch (e) {
                     logger.error('Intercepted an exception. To not lose it, here it is: ' + e);
-                    return;
                 }
             }
             else {
                 logger.debug("Received RSA key, but have no public key published: " + file.h);
-                return;
             }
         }
 
@@ -4230,10 +4230,10 @@ function crypto_processkey(me, master_aes, file) {
             logger.warn('Missing attribute for node "%s"', file.h, file);
         }
 
-        var ab = file.a && base64_to_ab(file.a);
+        var ab = k && file.a && base64_to_ab(file.a);
         var o = ab && dec_attr(ab, k);
 
-        if (typeof o === 'object') {
+        if (o && typeof o === 'object') {
             if (typeof o.n === 'string') {
                 if (file.h) {
                     u_nodekeys[file.h] = k;

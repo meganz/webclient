@@ -320,8 +320,6 @@ var Chat = function() {
 
 makeObservable(Chat);
 
-
-
 /**
  * Initialize the MegaChat (also will connect to the XMPP)
  */
@@ -578,19 +576,6 @@ Chat.prototype.init = function() {
         }
     };
 
-    if (!appContainer) {
-       $(window).rebind('hashchange.delayedChatUiInit', function() {
-           appContainer = document.querySelector('.section.conversations');
-           if (appContainer) {
-               initAppUI();
-               $(window).unbind('hashchange.delayedChatUiInit');
-           }
-       });
-    }
-    else {
-        initAppUI();
-    }
-
 
     if (self.is_initialized) {
         self.destroy()
@@ -599,6 +584,25 @@ Chat.prototype.init = function() {
             });
 
         return;
+    }
+    else {
+        if (!appContainer) {
+            $(window).rebind('hashchange.delayedChatUiInit', function() {
+                if (typeof($.leftPaneResizable) === 'undefined' || !fminitialized) {
+                    // delay the chat init a bit more! specially for the case of a user getting from #pro -> #fm, which
+                    // for some unknown reason, stopped working and delayed the init of $.leftPaneResizable
+                    return;
+                }
+                appContainer = document.querySelector('.section.conversations');
+                if (appContainer) {
+                    initAppUI();
+                    $(window).unbind('hashchange.delayedChatUiInit');
+                }
+            });
+        }
+        else {
+            initAppUI();
+        }
     }
     self.is_initialized = true;
 
@@ -772,8 +776,6 @@ Chat.prototype._onChatMessage = function(e, eventObject) {
 
     // ignore empty messages (except attachments)
     if (eventObject.isEmptyMessage() && !eventObject.getMeta().attachments) {
-        self.logger.debug("Empty message, MegaChat will not process it: ", eventObject);
-
         return;
     }
     else {
@@ -1539,11 +1541,6 @@ Chat.prototype.processRemovedUser = function(u) {
 
     self.logger.debug("removed: ", u);
 
-
-    var room = self.getPrivateRoom(u);
-    if (room) {
-        room.destroy(true);
-    }
     this.karere.unsubscribe(megaChat.getJidFromNodeId(u), self.getMyXMPPPassword());
 
     self.renderMyStatus();
@@ -1697,7 +1694,7 @@ Chat.prototype.renderListing = function() {
 
             sortedConversations.sort(mega.utils.sortObjFn("lastActivity", -1));
 
-            if (sortedConversations.length > 1) {
+            if (sortedConversations.length > 0) {
                 var room = sortedConversations[0];
                 room.setActive();
                 room.show();

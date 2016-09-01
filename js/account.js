@@ -1227,7 +1227,7 @@ function checkUserLogin() {
                         else {
                             logger.error('Unexpected exception!', e);
                             setTimeout(function() { throw e; }, 4);
-                            debugger;
+                            // debugger;
                         }
                         res = EINTERNAL;
                     }

@@ -1419,10 +1419,13 @@ makeMetaAware(Karere);
 
 
 
+        if (message.getElementsByTagName("error").length > 0) {
+            return true;
+        }
         // XEP-0085 - Chat State Notifications
         // Because they can be embedded into other tags, we will trigger one additional event here...and if some of the
         // event handlers tried to stop the propagation, then we will stop the on$StanzaType triggering.
-        if (message.getElementsByTagName("active").length > 0) {
+        else if (message.getElementsByTagName("active").length > 0) {
             if (!self._triggerEvent("ActiveMessage", eventData)) {
                 return true;  // always return true, because of how Strophe.js handlers work.
             }
@@ -1806,19 +1809,10 @@ makeMetaAware(Karere);
      */
     Karere.prototype.sendComposingPaused = function(toJid) {
         var self = this;
-        self.sendRawMessage(
+        return self.sendRawMessage(
             toJid,
             toJid.indexOf("conference.") === -1 ? "chat" : "groupchat",
             Karere._$chatState('paused')
-        );
-
-        return $.when(
-            self.sendIsActive(toJid),
-            self.sendRawMessage(
-                toJid,
-                toJid.indexOf("conference.") === -1 ? "chat" : "groupchat",
-                Karere._$chatState('paused')
-            )
         );
     };
 

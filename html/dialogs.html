@@ -109,7 +109,81 @@
     </div>
 </div>
 
+<div class="fm-dialog share-help filled-input hidden">
+    <div class="fm-dialog-header">
+        <div class="fm-dialog-title">[$9104]</div>
+        <div class="fm-dialog-close"></div>
+        <div class="clear"></div>
+    </div>
+    <div class="fm-dialog-body">
+        <div class="wrapper">
+            <div class="instruction-message">
+                [$9103]
+            </div>
+        </div>
+        <div class="fm-dialog-new-folder-input">
+            <div class="fm-dialog-input-clear"></div>
+            <div class="fm-dialog-new-folder-pad decryption-key">
+                <input name="dialog-new-folder" type="text" placeholder="[$9038]" autofocus readonly="readonly"/>
+            </div>
+        </div>
+        <div class="default-dialog-bottom">
+            <div class="fm-dialog-chrome-clipboard">
+                <div id="chromeclipboard1" class="selectable"></div>
+            </div>
+            <div class="fm-dialog-button copy-to-clipboard"><span>[$63]</span></div>
+            <div class="clear"></div>
+        </div>
+    </div>
+</div>
 
+<div class="fm-dialog network-testing filled-input hidden">
+    <div class="fm-dialog-header">
+        <div class="fm-dialog-title">[$8806]</div>
+        <div class="fm-dialog-close"></div>
+        <div class="clear"></div>
+    </div>
+    <div class="fm-dialog-body">
+        <div class="wrapper">
+            <div class="instruction-message">
+                [$9035]<br/><br/>
+                [$9036]
+            </div>
+            <div class="instruction-message hidden">
+                [$9030]
+            </div>
+            <div class="fm-dialog-new-folder-input">
+                <div class="fm-dialog-input-clear"></div>
+                <div class="fm-dialog-new-folder-pad decryption-key">
+                    <input name="dialog-new-folder" type="text" placeholder="[$9038]" autofocus/>
+                </div>
+                <small>[$9039]</small>
+            </div>
+            <table class="hidden speed-table">
+                <thead>
+                    <tr>
+                        <th>[$9031]</th>
+                        <th>[$9032]</th>
+                        <th>[$9033]</th>
+                        <th>[$9034]</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="server"></td>
+                        <td class="ping"></td>
+                        <td class="avg"></td>
+                        <td class="progress"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="default-dialog-bottom">
+            <div class="fm-dialog-new-folder-button disabled"><span>[$9037]</span></div>
+            <div class="create-folder-button-cancel dialog"><span>[$82]</span></div>
+        </div>
+    </div>
+</div>
 
 <div class="fm-dialog create-folder-dialog filled-input hidden">
     <div class="fm-dialog-close"></div>
@@ -170,6 +244,7 @@
                 </div>
             </div>
          </div>
+         <div class="reg-success-txtb">[$9029]</div>
      </div>
   </div>
 
@@ -198,9 +273,10 @@
     <!--Header-->
     <div class="fm-dialog-header">
         <!-- Please add "active" classname to necessary "copy-dialog-txt" block !-->
-        <div class="fm-dialog-title">[$63]
+        <div class="fm-dialog-title">
+            <span class="copy-operation-txt">[$63]</span>
             <span class="copy-dialog-txt cloud-drive">([$1687])</span>
-            <span class="copy-dialog-txt shared-with-me">(Shared with me)</span>
+            <span class="copy-dialog-txt shared-with-me">([$5589])</span>
             <span class="copy-dialog-txt conversations">(Send to Conversations)</span>
         </div>
         <div class="fm-dialog-close"></div>
@@ -214,7 +290,7 @@
         </div>
         <div class="copy-dialog-button cloud-drive"></div>
         <div class="copy-dialog-button shared-with-me"></div>
-        <div class="copy-dialog-button conversations hidden"></div>
+        <!--div class="copy-dialog-button conversations hidden"></div-->
         <div class="clear"></div>
         <div class="dialog-sorting-menu hidden">
             <div class="context-menu-section">
@@ -303,6 +379,16 @@
         </div>
         <div class="fm-dialog-button dialog-cancel-button">
             <span>[$82]</span>
+        </div>
+
+        <div class="permissions-menu hidden">
+            <div class="permissions-menu-arrow"></div>
+            <div class="permissions-menu-item read-only active"><span></span>[$7534]</div>
+            <div class="permissions-menu-item read-and-write"><span></span>[$56]</div>
+            <div class="permissions-menu-item full-access"><span></span>[$57]</div>
+        </div>
+        <div class="share-dialog-permissions read-only hidden">
+            <span></span>[$7534]
         </div>
         <div class="clear"></div>
     </div>
@@ -2349,7 +2435,7 @@
         <!-- [$8944]. We need to replace: [BR] by <br />, [S] by <span>, [/S] by </span  !-->
         <p class="dialog p-after-icon">
             Your transfer may be interrupted.
-            <br /><a class="red">Get a pro account</a> for increased bandwidth quota.</p>
+            <br /><a class="red">Get a PRO account</a> for increased bandwidth quota.</p>
 
         <div class="dialog big-buttons-block">
             <!-- [$8945] - Continue without account !-->

@@ -84,6 +84,7 @@
         <a class="context-menu-item move-up"><span class="context-menu-icon"></span>[$6864]</a>
         <a class="context-menu-item move-down"><span class="context-menu-icon"></span>[$6865]</a>
         <a class="context-menu-item transfer-clear"><span class="context-menu-icon"></span>[$103]</a>
+        <a class="context-menu-item network-diagnostic"><span class="context-menu-icon"></span>[$8806]</a>
     </div>
     <a class="context-menu-item select-all"><span class="context-menu-icon"></span>[$5550]</a>
 
@@ -344,81 +345,86 @@
                     <div class="clear"></div>
                 </div>
 
-                <!-- Please add "inactive" to "fm-files-view-icon" classname if buttons couldn't be clicked !-->
-                <a class="fm-files-view-icon block-view" title="[$5552.dqq]"></a>
-                <a class="fm-files-view-icon listing-view active" title="[$5553.dqq]"></a>
+                <div class="fm-header-buttons">
+                    <!-- Please add "inactive" to "fm-files-view-icon" classname if buttons couldn't be clicked !-->
+                    <a class="fm-files-view-icon block-view" title="[$5552.dqq]"></a>
+                    <a class="fm-files-view-icon listing-view active" title="[$5553.dqq]"></a>
 
-                <div class="fm-folder-upload">
-                    <span>[$98]</span>
-                    <input type="file" title="[$98.dqq]" id="fileselect2" webkitdirectory multiple />
-                </div>
+                    <div class="fm-folder-upload">
+                        <span>[$98]</span>
+                        <input type="file" title="[$98.dqq]" id="fileselect2" webkitdirectory multiple />
+                    </div>
 
-                <div class="fm-file-upload">
-                    <span>[$99]</span>
-                    <input type="file" title="[$99.dqq]" id="fileselect1" multiple />
-                </div>
+                    <div class="fm-file-upload">
+                        <span>[$99]</span>
+                        <input type="file" title="[$99.dqq]" id="fileselect1" multiple />
+                    </div>
 
-                <div class="fm-new-folder" title="[$5545.dqq]">
-                    <div class="create-folder-arrow"></div>
-                    <span>[$68]</span>
-                </div>
-                <div class="create-new-folder hidden">
-                    <div class="create-folder-pad">
-                        <div class="create-folder-size-icon full-size"></div>
-                        <div class="create-folder-input-bl">
-                            <input type="text" value="[$157]" placeholder="[$157]" autofocus/>
-                        </div>
-                        <a class="create-folder-button"><span>[$455]</span></a>
-                        <div class="clear"></div>
-                        <div class="create-folder-bottom">
-                            <div class="create-folder-button"><span>[$455]</span></div>
-                            <div class="create-folder-button-cancel popup"><span>[$82]</span></div>
+                    <div class="fm-new-folder" title="[$5545.dqq]">
+                        <div class="create-folder-arrow"></div>
+                        <span>[$68]</span>
+                    </div>
+
+                    <div class="create-new-folder hidden">
+                        <div class="create-folder-pad">
+                            <div class="create-folder-size-icon full-size"></div>
+                            <div class="create-folder-input-bl">
+                                <input type="text" value="[$157]" placeholder="[$157]" autofocus/>
+                            </div>
+                            <a class="create-folder-button"><span>[$455]</span></a>
                             <div class="clear"></div>
+                            <div class="create-folder-bottom">
+                                <div class="create-folder-button"><span>[$455]</span></div>
+                                <div class="create-folder-button-cancel popup"><span>[$82]</span></div>
+                                <div class="clear"></div>
+                            </div>
+                        </div>
+                        <div class="create-folder-loader hidden">
+                            <div class="cr-fountaing">
+                                <div class="fountaing-circle cr-fountaing_1"></div>
+                                <div class="fountaing-circle cr-fountaing_2"></div>
+                                <div class="fountaing-circle cr-fountaing_3"></div>
+                                <div class="fountaing-circle cr-fountaing_4"></div>
+                                <div class="fountaing-circle cr-fountaing_5"></div>
+                                <div class="fountaing-circle cr-fountaing_6"></div>
+                                <div class="fountaing-circle cr-fountaing_7"></div>
+                                <div class="fountaing-circle cr-fountaing_8"></div>
+                            </div>
                         </div>
                     </div>
-                    <div class="create-folder-loader hidden">
-                        <div class="cr-fountaing">
-                            <div class="fountaing-circle cr-fountaing_1"></div>
-                            <div class="fountaing-circle cr-fountaing_2"></div>
-                            <div class="fountaing-circle cr-fountaing_3"></div>
-                            <div class="fountaing-circle cr-fountaing_4"></div>
-                            <div class="fountaing-circle cr-fountaing_5"></div>
-                            <div class="fountaing-circle cr-fountaing_6"></div>
-                            <div class="fountaing-circle cr-fountaing_7"></div>
-                            <div class="fountaing-circle cr-fountaing_8"></div>
-                        </div>
+
+                    <div class="fm-add-user hidden">
+                        <div class="add-user-popup-arrow"></div>
+                        <span>[$101]</span>
                     </div>
-                </div>
 
+                    <div class="fm-clearbin-button hidden">
+                        <span>[$7741]</span>
+                    </div>
 
-                <div class="fm-add-user hidden">
-                    <div class="add-user-popup-arrow"></div>
-                    <span>[$101]</span>
-                </div>
+                    <div class="fm-import-to-cloudrive hidden">
+                        <span>[$1595]</span>
+                    </div>
 
-                <div class="fm-clearbin-button hidden">
-                    <span>[$7741]</span>
-                </div>
+                    <div class="fm-download-as-zip hidden">
+                        <span>[$864]</span>
+                    </div>
 
-                <div class="fm-import-to-cloudrive hidden">
-                    <span>[$1595]</span>
-                </div>
+                    <div class="search-files-result hidden">
+                        <span><span class="search-number">12</span> [$1392]</span>
+                        <div class="clear"></div>
+                    </div>
 
-                <div class="fm-download-as-zip hidden">
-                    <span>[$864]</span>
-                </div>
+                    <div class="search-messages-result last-button hidden">
+                        <span>[$6868]</span>
+                        <span class="search-number">5</span>
+                        <div class="clear"></div>
+                    </div>
 
-                <div class="search-files-result hidden">
-                    <span><span class="search-number">12</span> [$1392]</span>
-                    <div class="clear"></div>
-                </div>
-                <div class="search-messages-result last-button hidden">
-                    <span>[$6868]</span>
-                    <span class="search-number">5</span>
-                    <div class="clear"></div>
                 </div>
 
                 <div class="clear"></div>
+
             </div>
 
 
@@ -721,9 +727,13 @@
                         </div>
 
                         <div class="fm-share-folders">
-                            <a href="#fm">
+                            <a>
                                 <span>[$6775]</span>
                             </a>
+                        </div>
+
+                        <div class="fm-remove-contact red">
+                            <span>[$1001]</span>
                         </div>
 
                         <div class="clear"></div>
@@ -1161,6 +1171,7 @@
                             <div class="radio-txt">[$7230]</div>
                         </div>
                         <div class="clear"></div>
+                     
                     </div>
 
 
@@ -1314,11 +1325,23 @@
                                 </div>
 
                                 <div class="clear"></div>
+
                             </div>
+                                <!--Network Test-->
+                                <div class="account-bandwidth-txt" style="margin-top:25px;">[$8805]</div>
+                                <div class="default-button" id="network-testing-button">
+                                    <span> [$8806] </span>
+                                </div>
+                                <div class="clear"></div>
+                                <div class="account-italic-txt light">
+                                    <span>[$8808]</span>
+                                </div>
+                                <div class="clear"></div>
+                                <!--Network Test End-->
 
                             <!-- Use rad20 as next radio button to allow further rubsched options -->
-
                         </div>
+
 
 
 

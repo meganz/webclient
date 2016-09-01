@@ -841,10 +841,12 @@
   -webkit-column-gap: 30px;
 }
 #help2-main .popular-question-items li {
-  font-family: 'source_sans_proregular';
-  font-size: 14px;
-  color: #555;
-  padding-bottom: 18px;
+    font-family: 'source_sans_proregular';
+    font-size: 14px;
+    color: #555;
+    padding-bottom: 18px;
+    position: relative;
+    margin: 4px 20px 25px 2px;
 }
 #help2-main .first-support-block {
   height: 200px;
@@ -1579,13 +1581,14 @@
   margin: 8px 16px 0px 0px;
 }
 #help2-main .related-bullet-point {
-  width: 4px;
-  height: 4px;
-  background-color: #666;
-  border-radius: 14px;
-  position: relative;
-  display: block;
-  margin: 4px 20px 20px 2px;
+    width: 4px;
+    height: 4px;
+    background-color: #666;
+    border-radius: 14px;
+    position: absolute;
+    display: block;
+    top: 10px;
+    left: 0;
 }
 #help2-main .clear {
   display: block;

@@ -756,12 +756,6 @@
 #help2-main .popular-question-title{
   padding-top: 40px;
 }
-#help2-main .popular-question-block {
-  display: block;
-  margin-top: 10px;
-  border-top: 1px solid #eee;
-  height: 420px
-}
 #help2-main .search-section-header .popular-question-block {
   display: none;
   margin-left: 12%;
@@ -3552,8 +3546,10 @@ position: relative;
     padding: 8px 30px;
   }
   #help2-main .popular-question-block {
-    margin-top: 60px;
-    height: auto;
+    border-top: 1px solid #eee;
+    display: block;
+    margin-top: 10px;
+    overflow: auto;
   }
   #help2-main .popular-question-title {
     font-size: 36px;

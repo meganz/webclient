@@ -3618,6 +3618,7 @@
     "9102": "Geri D\u00f6n",
     "9103": "Makaleyi payla\u015fmak i\u00e7in a\u015fa\u011f\u0131daki ba\u011flant\u0131y\u0131 kopyalay\u0131n.",
     "9104": "Makaleyi Payla\u015f",
+    "9105": "Enter your search here...",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3798,6 +3799,7 @@
         "please-try-searching-again": 9099,
         "email-support": 9100,
         "contact-support-team-message": 9101,
-        "go-back": 9102
+        "go-back": 9102,
+        "enter-your-search-here": 9105
     }
 }

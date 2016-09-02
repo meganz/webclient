@@ -3618,6 +3618,7 @@
     "9102": "Zp\u011bt",
     "9103": "Zkop\u00edrujte n\u00ed\u017ee uveden\u00fd odkaz pro sd\u00edlen\u00ed \u010dl\u00e1nku.",
     "9104": "Sd\u00edlet \u010dl\u00e1nek",
+    "9105": "Enter your search here...",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3798,6 +3799,7 @@
         "please-try-searching-again": 9099,
         "email-support": 9100,
         "contact-support-team-message": 9101,
-        "go-back": 9102
+        "go-back": 9102,
+        "enter-your-search-here": 9105
     }
 }

@@ -721,7 +721,7 @@
     border-top: 1px solid #eee;
     display: block;
     margin-top: 10px;
-    overflow: auto;
+    overflow: hidden;
 }
 #help2-main .search-section-header .popular-question-title {
     color: #444;

@@ -13,7 +13,7 @@
                 <div class="support-search-container">
                     <form id="support-search" action="">
                         <input class="submit" type="submit" value="">
-                        <input class="search" type="text" placeholder="Enter your search here&#46;&#46;&#46;" value="<%= data.search || "" %>">
+                        <input class="search" type="text" placeholder="[$9105]" value="<%= data.search || "" %>">
                     </form>
                 </div>
                 <div class="mobile-search-block">

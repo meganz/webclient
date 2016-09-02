@@ -3618,6 +3618,7 @@
     "9102": "Go Back",
     "9103": "Copy the link below to share the article.",
     "9104": "Share the Article",
+    "9105": "Enter your search here...",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3798,6 +3799,7 @@
         "please-try-searching-again": 9099,
         "email-support": 9100,
         "contact-support-team-message": 9101,
-        "go-back": 9102
+        "go-back": 9102,
+        "enter-your-search-here": 9105
     }
 }

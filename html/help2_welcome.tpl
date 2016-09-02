@@ -9,7 +9,7 @@
                 <div class="support-search-container">
                     <form id="support-search" action="">
                         <input class="submit" type="submit" value="">
-                        <input class="search" type="text" placeholder="Enter your search here&#46;&#46;&#46;">
+                        <input class="search" type="text" placeholder="[$9105]">
                     </form>
                     <div class="search-suggestions-container hidden">
                         <ul class="search-suggestions-list">

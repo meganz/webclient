@@ -3618,6 +3618,7 @@
     "9102": "Bak\u00e5t",
     "9103": "Kopiera l\u00e4nken nedan f\u00f6r att dela artikeln. ",
     "9104": "Dela artikeln",
+    "9105": "Enter your search here...",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3798,6 +3799,7 @@
         "please-try-searching-again": 9099,
         "email-support": 9100,
         "contact-support-team-message": 9101,
-        "go-back": 9102
+        "go-back": 9102,
+        "enter-your-search-here": 9105
     }
 }

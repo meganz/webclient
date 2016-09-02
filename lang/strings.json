@@ -14474,5 +14474,9 @@
     "9104": {
         "text": "Share the Article",
         "context": "Title for dialog"
+    },
+    "9105": {
+        "text": "Enter your search here...",
+        "context": "The placeholder text in the search field of the help section."
     }
 }

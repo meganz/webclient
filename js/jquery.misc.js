@@ -165,3 +165,23 @@ $.fn.getCursorPosition = function() {
     }
     return pos;
 };
+
+// Based off http://stackoverflow.com/a/15191130
+$.fn.rotate = function AnimateRotate(finalAngle, initialAngle, time) {
+    return this.each(function() {
+        var $this = $(this);
+
+        // we use a pseudo object for the animation
+        $({deg: initialAngle || 0}).animate({deg: finalAngle}, {
+            duration: time || 1000,
+            step: function(now) {
+                // in the step-callback (that is fired each step of the animation),
+                // you can use the `now` paramter which contains the current
+                // animation-position (`initalAngle` up to `finalAngle`)
+                $this.css({
+                    transform: 'rotate(' + now + 'deg)'
+                });
+            }
+        });
+    });
+};

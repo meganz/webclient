@@ -1,77 +1,3 @@
-function evalscript_url(code, ready) {
-    var url = mObjectURL([code], 'text/javascript');
-    mCreateElement('script', {
-        type: 'text/javascript',
-        async: false,
-        src: url,
-    }, 'head').onload = ready;
-    return url;
-}
-
-/**
- *  Simple template engine
- *  https://github.com/snoguchi/simple-template.js
- */
-window.__templates = {};
-function compileTemplate(s, context, next) {
-    var id   = 'f' + mRandomToken().replace(/[^0-9a-z]/ig, '');
-    var code = 'window.__templates["' + id + '"] = function(context, data) {  var out = "";';
-    var token = s.split('%>');
-
-    for (var key in context) {
-        if (context.hasOwnProperty(key)) {
-            code += 'var '  + key + ' = context.' + key + ";\n";
-        }
-    }
-
-    for (var i = 0, len = token.length; i < len; i++) {
-        var tmp = token[i].split('<%');
-        if (tmp[0]) {
-            var literal = tmp[0].replace(/\n/g, '\\n')
-                .replace(/\r/g, '\\r').replace(/\"/g, '\\"');
-            code += 'out+="' + literal + '";' + "\n";
-        }
-        if (tmp[1]) {
-            if (tmp[1].charAt(0) === '=') {
-                code += 'out+=escapeHTML(' + tmp[1].slice(1) + ');' + "\n";
-            } else if (tmp[1].charAt(0) === '!') {
-                code += 'out+=CMS.html(' + tmp[1].slice(1) + ');' + "\n";
-            } else {
-                code += tmp[1] + "\n";
-            }
-        }
-    }
-    code += 'return (out); }';
-    evalscript_url(code, function() {
-        next(window.__templates[id].bind(null, context));
-    });
-}
-
-/**
- *  Delayed - Delays the execution of a function
- *
- *  Wraps a function to execute at most once
- *  in a 100 ms time period. Useful to wrap
- *  expensive jQuery events (for instance scrolling
- *  events).
- *
- *  All argument and *this* is passed to the callback
- *  after the 100ms (default)
- *
- *  @param {Function} fFunction     Function to wrap
- *  @param {Integer}  tTimeout      Timeout
- *  @returns {Function} wrapped function
- */
-function delayed(fFunction, tTimeout) {
-    var timeout;
-    return function() {
-        var args = Array.prototype.slice.call(arguments);
-        args.unshift(this);
-
-        clearTimeout(timeout);
-        timeout = setTimeout(fFunction.bind.apply(fFunction, args), tTimeout || 100);
-    };
-}
 
 var Help = (function() {
     var ns = {};
@@ -130,7 +56,7 @@ var Help = (function() {
         });
     }
 
-    tpl.goback_js = delayed(function(data) {
+    tpl.goback_js = SoonFc(function(data) {
 
         $('.support-go-back').rebind('click', function(e) {
             e.preventDefault();
@@ -146,7 +72,7 @@ var Help = (function() {
         });
 
         $('.support-search').rebind('click', function(e) {
-            
+
             e.preventDefault();
             var $this = $(this);
             var $container = $('#help2-main');
@@ -154,7 +80,6 @@ var Help = (function() {
             var $popularQuestions = $(".popular-question-block");
             var $searchForm = $(".support-search-container");
             var $getStartTitle = $(".getstart-title-section", $container);
-
 
             if ($this.is('.close')) {
                 $('.support-search-heading').removeClass('hidden');
@@ -174,7 +99,7 @@ var Help = (function() {
                 $popularQuestions.fadeIn(500);
                 $searchForm.fadeIn(400);
                 $getStartTitle.addClass('hidden');
-                
+
             }
         });
     }, 1);
@@ -183,17 +108,6 @@ var Help = (function() {
         return html.replace(/\[gallery:(\d+)\]/g, function(m, id) {
             return tpl.gallery(gallery[id]);
         });
-    }
-
-    function toArray(hash) {
-        var arr = [];
-        for (var key in hash) {
-            if (hash.hasOwnProperty(key)) {
-                arr.push(hash[key]);
-            }
-        }
-        
-        return arr;
     }
 
     function getPreviousUrl(data) {
@@ -213,7 +127,7 @@ var Help = (function() {
         });
     }
 
-    // loadHelpData {{{
+    // loadHelpData
     /**
      * Load Help2 data from the CMS. This function also
      * prepares all the data for searching (with elasticlunr full text
@@ -239,7 +153,7 @@ var Help = (function() {
         ready = true;
         clients = response.object;
 
-        // process each client {{{
+        // process each client
         clients.forEach(function(client, id) {
             if (client.popular) {
                 clients.splice(id, 1);
@@ -303,19 +217,15 @@ var Help = (function() {
                 });
             });
         });
-        // }}}
+        //
 
         for (var i = 0; i < popularQuestions.length; ++i) {
             popularQuestions[i] = articlesById[popularQuestions[i]];
         }
 
         // Compile all templates
-        var toload = 0;
-        Object.keys(pages).filter(function(page) {
-            return page.match(/^help_|gallery/);
-        }).map(function(page) {
-            ++toload;
-            compileTemplate(pages[page], {
+        Object.keys(__help2_templates).filter(function(code) {
+            tpl[code] = __help2_templates[code].bind(null, {
                 // We share url (function), tpl (our templates)
                 // and clients (all our data) to *all* of our
                 // templates
@@ -327,21 +237,16 @@ var Help = (function() {
                 tpl: tpl,
                 clients: clients,
                 popularQuestions: popularQuestions,
-            }, function(fnc) {
-                loadingDialog.show();
-                tpl[page.replace(/^help_/, '')] = fnc;
-                if (--toload === 0) {
-                    loadingDialog.hide();
-                    titles = array_unique(titles);
-                    if (doRender) {
-                        ns.render();
-                    }
-                }
             });
         });
 
+        titles = array_unique(titles);
+        if (doRender) {
+            ns.render();
+        }
+
     }
-    // }}}
+    //
 
     /**
      * Subscribe to changes from the CMS.
@@ -355,20 +260,15 @@ var Help = (function() {
      */
     CMS.get("help2.en", loadHelpData);
 
-    var setHash = delayed(function(hash) {
+    var setHash = SoonFc(function(hash) {
         if (hash !== document.location.hash) {
             history.pushState({}, "page 2", document.location.pathname + hash);
         }
     }, 1000);
 
 
-    function filterByTag(tag) {
-        clients.forEach(function(section) {
-        });
-    }
-
     function url() {
-        return '#help/' + Array.prototype.slice.call(arguments).join("/");
+        return '#help/' + toArray.apply(null, arguments).join("/");
     }
 
     function selectMenuItem($element, $elements) {
@@ -418,14 +318,15 @@ var Help = (function() {
         }
 
         // not found
-        return notFound();
+        notFound();
+        return false;
     }
 
     function filterContentByTag(tag) {
         var $tag = $('.tag-' + tag);
         var $container = $('#help2-main');
         var validTags = [];
-        
+
         if ($tag.is('.active')) {
             $tag.removeClass('active');
             allTags.splice(allTags.indexOf(tag), 1);
@@ -491,6 +392,10 @@ var Help = (function() {
 
         $container.find('form').rebind('submit', function(e) {
             e.preventDefault();
+            
+            // Log search submitted
+            api_req({ a: 'log', e: 99619, m: 'Help2 regular search feature used' });
+            
             document.location.href = url("search", $(this).find('input[type="text"]').val());
         });
 
@@ -503,6 +408,10 @@ var Help = (function() {
                 },
                 appendTo: $this.parent().parent(),
                 select: function(event, ui) {
+                    
+                    // Log autocomplete item in search clicked
+                    api_req({ a: 'log', e: 99620, m: 'Help2 autocomplete search feature used' });
+                    
                     document.location.href = ui.item.url;
                 }
             });
@@ -589,7 +498,7 @@ var Help = (function() {
             $this.parent().parent().children($headFeedBack).delay(200).fadeOut(300);
 
             $this.parent().siblings('.feedback-suggestions-list').delay(500).fadeIn(500, contentChanged);
-            
+
             $('.feedback-send').rebind('click', function() {
                 var data = {hash: $this.data('hash')};
                 $(this).parents('.feedback-suggestions-list').find('input,textarea')
@@ -611,12 +520,12 @@ var Help = (function() {
             $.post("https://cms2.mega.nz/feedback", {hash: $this.data('hash')});
             sent($this.parents('.article-feedback-container'));
         });
-        
+
         // When a radio button is clicked
         $radioButtons.rebind('click', function() {
             // Remove existing checked styles from the other radio buttons
             $radioButtons.removeClass('checked');
-            
+
             // Check just the selected radio button
             $(this).addClass('checked');
             $(this).find('input').prop('checked', true);
@@ -637,7 +546,7 @@ var Help = (function() {
         var $mobileDeviceBlock = $(".block-mobile-device", $container);
         var $mobileNavBlock = $(".mobile-block", $container);
         var timer;
-    
+
         $mobileNavBlock.rebind('mouseenter', function() {
             timer = setTimeout(function()   {
             $mobileDeviceBlock.fadeIn(300);
@@ -739,7 +648,11 @@ var Help = (function() {
 
         var $html = $('html,body');
 
-        $html.rebind('scroll', function() {
+        $html.rebind('scroll.help2', function() {
+            // TODO: write a cleanup function to be invoked when moving out of the #help section
+            if (String(location.hash).substr(0, 5) !== '#help') {
+                return $html.unbind('scroll.help2');
+            }
 
             if (($sideBar.hasClass('fixed')) && (($sideBar).is(":visible"))) {
                 $searchHeader.fadeOut(10);
@@ -748,7 +661,6 @@ var Help = (function() {
                 $searchHeader.fadeIn(300);
                 $cloneHeader.fadeOut(10);
             }
-
         });
 
 
@@ -760,7 +672,7 @@ var Help = (function() {
                     marginLeft: "8",
                     marginRight:"8"
                 }, 300, "easeOutQuart");
-                
+
             }, 300);
             })
             .rebind('mouseleave', function() {
@@ -769,7 +681,7 @@ var Help = (function() {
                     marginLeft: "16",
                     marginRight:"0"
                 }, 300, "easeOutQuart");
-                
+
             });
         } else {
             $searchContainer.rebind('mouseenter', function() {
@@ -778,7 +690,7 @@ var Help = (function() {
                     marginLeft: "8",
                     marginRight:"8"
                 }, 300, "easeOutQuart");
-            
+
             }, 300);
             })
             .rebind('mouseleave', function() {
@@ -787,7 +699,7 @@ var Help = (function() {
                     marginLeft: "16",
                     marginRight:"0"
                 }, 300, "easeOutQuart");
-                
+
             });
         }
     }
@@ -828,6 +740,9 @@ var Help = (function() {
             }
 
             client = getClient(args[1]);
+            if (!client) {
+                return;
+            }
 
             switch (args.length) {
             case 2:
@@ -941,8 +856,8 @@ var Help = (function() {
 
         document.location.href = url("welcome");
     }
-        
-    // getVisibleElement {{{
+
+    // getVisibleElement
     function getVisibleElement(positionY, args) {
 
         args = args.map(function($element) {
@@ -964,7 +879,7 @@ var Help = (function() {
 
         return args[0][0];
     }
-    // }}}
+    //
 
     function handleScroll() {
 
@@ -973,7 +888,6 @@ var Help = (function() {
         var menuHeight = $menu.height();
         var top   = $('.help-background-block').height();
         var $elements = $('.updateSelected:visible', $main);
-        var isBottomScrolling = false;
 
         $window.rebind('resize.help2', function() {
             if ($('#help2-main').length === 0) {
@@ -982,7 +896,7 @@ var Help = (function() {
             contentChanged();
         });
 
-        $('.main-scroll-block').rebind('jsp-scroll-y.help2', function checkScrolling(e, scrollPositionY) {
+        $('.main-scroll-block').rebind('jsp-scroll-y.help2', function(e, scrollPositionY, atTop, atBottom) {
 
             if ($('#help2-main').length === 0) {
                 return $('.main-scroll-block').unbind('jsp-scroll-y.help2');
@@ -1026,7 +940,7 @@ var Help = (function() {
             doRender = true;
             return;
         }
-    
+
         // reset all tags
         allTags = [];
         $currentQuestion = null;
@@ -1053,6 +967,10 @@ var Help = (function() {
                     login_next = url;
                     url = "#login";
                 }
+                
+                // Log that they clicked on the panel
+                api_req({ a: 'log', e: 99621, m: 'Help2 client selection panel used' });
+                
                 document.location.href = url;
             }
         });
@@ -1065,11 +983,15 @@ var Help = (function() {
             return false;
         });
 
+        // FAQ items logging
+        $('#help2-main .popular-question-items a').rebind('click', function() {
+            api_req({ a: 'log', e: 99622, m: 'Help2 FAQ item selected' });
+        });
 
         // Image Gallery Interaction
         $('.instructions .image-instruction-control, .gallery-dot-navigation li, .bullet-number', '#help2-main')
             .rebind('click', function() {
-           
+
                 var $this = $(this);
                 var $cnt = $this.parents('.container');
                 var id   = $this.data('photo');
@@ -1081,7 +1003,7 @@ var Help = (function() {
                 $cnt.find('.img-swap.img-active').removeClass('img-active');
                 $cnt.find('.bullet-number.selected-bullet').removeClass('selected-bullet');
                 $cnt.find('.image-instruction-control.active-instructions').removeClass('active-instructions');
-            
+
                 $cnt.find('.instruction-' + id).addClass('active-instructions');
                 $cnt.find('.bullet-' + id).addClass('selected-bullet');
                 $cnt.find('.dot-' + id).addClass('active-nav-dot').removeClass('nav-dots');
@@ -1098,7 +1020,6 @@ var Help = (function() {
             $this.prev().addClass('selected-bullet');
         });
 
-
         $instructions.rebind('mouseleave', function() {
             var $this = $(this);
             var $cnt = $this.parents('.container');
@@ -1109,7 +1030,6 @@ var Help = (function() {
                 $this.prev().removeClass('selected-bullet');
             }
         });
-
 
         // Adding and removing active state to instructions and bullet point on Hover for bulletpoints
         var $bullet = $('#help2-main .instructions .bullet-number');
@@ -1122,7 +1042,7 @@ var Help = (function() {
             var $this = $(this);
             var $cnt = $this.parents('.container');
 
-            
+
             if ($this.next().hasClass('active-instructions')) {
                 $this.addClass('selected-bullet');
             } else {

@@ -346,6 +346,13 @@ function init_page() {
         parsepage(pages['blogarticle']);
         init_blog();
     }
+
+    // Password protected link decryption dialog
+    else if (page.substr(0, 2) === 'P!' && page.length > 2) {
+
+        // Show the decryption dialog and pass in the current URL hash
+        exportPassword.decrypt.init(page);
+    }
     else if (page.substr(0, 6) == 'verify') {
         parsepage(pages['change_email']);
         emailchange.main();

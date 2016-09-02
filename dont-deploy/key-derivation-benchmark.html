@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Key derivation benchmark for mobile</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="../js/vendor/jquery-2.2.1.js"></script>
+        <script src="../js/vendor/asmcrypto.js"></script>
+        <script src="../js/ui/export.js"></script>
+        <script>
+            $(function() {
+
+                // Test algorithm (PBKDF2-HMAC-SHA512, 100,000 rounds)
+                var algorithm = 1;
+                var saltBytes = crypto.getRandomValues(new Uint8Array(32));
+                var passwordBytes = exportPassword.stringToByteArray('correct horse battery staple');
+
+                var startTimeAsmCrypto = new Date();
+
+                // Run asmCrypto first
+                exportPassword.deriveKeyWithAsmCrypto(algorithm, saltBytes, passwordBytes, function(derivedKeyBytes) {
+
+                    var endTime = new Date();
+                    var timeDifference = endTime - startTimeAsmCrypto;
+
+                    $('.resultAsmCrypto').text('asmCrypto ' + timeDifference + 'ms ' + derivedKeyBytes.join(','));
+
+                    var startTimeWebCrypto = new Date();
+
+                    // Run web Crypto
+                    exportPassword.deriveKeyWithWebCrypto(algorithm, saltBytes, passwordBytes, function(derivedKeyBytes) {
+
+                        var endTime = new Date();
+                        var timeDifference = endTime - startTimeWebCrypto;
+
+                        $('.resultWebCrypto').text('webCrypto ' + timeDifference + 'ms ' + derivedKeyBytes.join(','));
+                    });
+                });
+            });
+
+            /**
+
+            Desktop (Core i7 6500U < 3.1GHz):
+            - asmCrypto 1029ms (Firefox)
+            - webCrypto 235ms (Firefox)
+            - asmCrypto 1390ms (Chrome)
+            - webCrypto 121ms (Chrome)
+
+            Phone Moto G 3rd generation (Qualcomm Snapdragon 410, 1.4 GHz):
+            - asmCrypto 4496ms (Firefox)
+            - webCrypto 3252ms (Firefox)
+            - asmCrypto 8651ms (Chrome)
+            - webCrypto 1154ms (Chrome)
+
+            Phone Moto G 1st generation (Qualcomm Snapdragon 400, 1.2 GHz):
+            - asmCrypto 8119ms (Firefox)
+            - webCrypto 5403ms (Firefox)
+            - asmCrypto 13911ms (Chrome)
+            - webCrypto 1491ms (Chrome)
+
+            **/
+        </script>
+    </head>
+    <body>
+        <div class="resultAsmCrypto"></div>
+        <div class="resultWebCrypto"></div>
+    </body>
+</html>

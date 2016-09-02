@@ -479,7 +479,7 @@
 }
 .medium-icon.rocket {
     background-image: url(../images/mega/nw-fm-sprite_v19.svg);
-    background-position: -10px -10781px;
+    background-position: -10px -10780px;
 }
 .huge-white-icon.achivement {
     background-image: url(../images/mega/account-sprite.png);
@@ -632,4 +632,29 @@
 .semi-small-icon.exclamation-point {
     background-image: url(../images/mega/nw-fm-sprite_v19.svg);
     background-position: -15px -11404px;
+}
+.tiny-icon.membership-status {
+    background-image: url(../images/mega/top-sprite_v5.svg);
+    background-position: -10px -979px;
+    width: 16px;
+}
+.tiny-icon.membership-status.lite {
+    background-position: -10px -999px;
+}
+.tiny-icon.membership-status.pro1 {
+    background-position: -10px -1019px;
+}
+.tiny-icon.membership-status.pro2 {
+    background-position: -10px -1039px;
+}
+.tiny-icon.membership-status.pro3 {
+    background-position: -10px -1059px;
+}
+.semi-small-icon.grey-mega {
+    background-image: url(../images/mega/top-sprite_v5.svg);
+    background-position: -10px -326px;
+}
+.semi-small-icon.yellow-triangle {
+    background-image: url(../images/mega/top-sprite_v5.svg);
+    background-position: -10px -1266px;
 }

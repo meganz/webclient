@@ -69,9 +69,9 @@
     width: 24px;
     height: 11px;
     z-index: 123;
-    background-image: url(../images/mega/chat-static-sprite-v1.png);
+    background-image: url(../images/mega/top-login-sprite_v7.png);
     background-repeat: no-repeat;
-    background-position: 0px -72px;
+    background-position: 0 -2251px;
 }
 .dropdown-arrow .dropdown-white-arrow {
     display: block;
@@ -79,7 +79,7 @@
 .down-arrow .dropdown-white-arrow {
     top: auto;
     bottom: -11px;
-    background-position: -30px -78px;
+    background-position: -24px -2257px;
 }
 .left-arrow .dropdown-white-arrow {
     width: 11px;
@@ -87,7 +87,7 @@
     top: 50%;
     left: -11px;
     margin: -12px 0 0 0;
-    background-position: -1px -315px;
+    background-position: -8px -2284px;
 }
 .right-arrow .dropdown-white-arrow {
     width: 11px;
@@ -96,7 +96,7 @@
     left: auto;
     right: -11px;
     margin: -12px 0 0 0;
-    background-position: -22px -315px;
+    background-position: -29px -2284px;
 }
 .dropdown-item {
     height: 32px;
@@ -115,16 +115,15 @@
     white-space: nowrap;
     cursor: pointer;
 }
+.dropdown-item.mid-txt {
+    font-size: 14px;
+}
 .dropdown-item:hover {
     background-color: #AAAAAA;
     color: white;
 }
 .dropdown-item.tick-item {
     padding-right: 24px;
-}
-.dropdown-item.tick-item.active {
-    color: #333333;
-    font-family: 'source_sans_prosemibold';
 }
 .dropdown-item.tick-item.active:hover {
     color: white;
@@ -137,12 +136,12 @@
     right: 8px;
     top: 50%;
     margin: -4px 0 0 0;
-    background-image: url(../images/mega/new-chat-sprite-v3.svg);
+    background-image: url(../images/mega/top-login-sprite_v7.png);
     background-repeat: no-repeat;
-    background-position: -49px -627px;
+    background-position: -30px -1816px;
 }
 .dropdown-item.tick-item.active:hover::before {
-    background-position: -89px -627px;
+    background-position: -30px -1856px;
 }
 .dropdown-item.red {
     color: #E44C51;
@@ -254,7 +253,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 .dropdown.contact-preview {
     min-width: 238px;
     max-width: 320px;
-    position:fixed;
+    position: fixed;
 }
 .dropdown.contact-preview .contacts-info.body {
     padding: 2px 4px 4px 4px;
@@ -266,7 +265,13 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 .img-preview .dropdown.img-wrapper {
     width: 176px;
 }
-
 .dropdown.body.dropdown-arrow.wide-dropdown {
     margin-bottom: 16px;
+}
+.dropdown-item.active-tick::before {
+    position: absolute;
+    content: '';
+    width: 14px;
+    height: 14px;
+    background-image: url(../images/mega/top-login-sprite_v7.png);
 }

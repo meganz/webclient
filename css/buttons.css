@@ -73,7 +73,7 @@
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     border-radius: 4px;
-    line-height: 31px;
+    line-height: 32px;
     color: #333333;
     padding: 0 15px;
     min-width: 102px;
@@ -93,9 +93,6 @@
     white-space: nowrap;
 }
 .default-grey-button {
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
     color: white;
     background: rgb(170,170,170);
     background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2FhYWFhYSIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiM5OTk5OTkiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
@@ -121,7 +118,19 @@
     line-height: 35px;
     height: 36px;
 }
-.default-grey-button:before, .default-grey-button:after, .default-white-button::before, .default-white-button::after {
+.default-white-button.semi-small, .default-grey-button.semi-small {
+    line-height: 28px;
+    height: 28px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+}
+.default-grey-button.semi-small:before, .default-grey-button.semi-small:after, .default-white-button.semi-small::before, .default-white-button.semi-small::after {
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+}
+.default-grey-button::before, .default-grey-button::after, .default-white-button::before, .default-white-button::after {
     -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
     -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
     box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
@@ -162,6 +171,9 @@
 .default-white-button:not(.tiny-button) i {
     margin: 6px 6px 1px -5px;
     vertical-align: top;
+}
+.default-white-button.semi-small i {
+    margin: 5px 4px 1px -5px;
 }
 .red.default-white-button:hover {
     -webkit-box-shadow: 0px 0px 0px 4px rgba(217,0,7,0.2);

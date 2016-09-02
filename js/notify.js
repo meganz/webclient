@@ -37,7 +37,7 @@ var notify = {
 
         // Cache lookups
         notify.$popup = $('.top-head .notification-popup');
-        notify.$popupIcon = $('.top-head .cloud-popup-icon');
+        notify.$popupIcon = $('.top-head .top-icon.notification');
         notify.$popupNum = $('.top-head .notification-num');
 
         // Init event handler to open popup
@@ -142,7 +142,7 @@ var notify = {
         notify.countAndShowNewNotifications();
 
         // If the popup is open, re-render the notifications to show the latest one
-        if (notify.$popup.hasClass('active')) {
+        if (!notify.$popup.hasClass('hidden')) {
             notify.renderNotifications();
         }
     },
@@ -276,11 +276,11 @@ var notify = {
     initNotifyIconClickHandler: function() {
 
         // Add delegated event for when the notifications icon is clicked
-        $('.top-head').off('click', '.cloud-popup-icon');
-        $('.top-head').on('click', '.cloud-popup-icon', function() {
+        $('.top-head').off('click', '.top-icon.notification');
+        $('.top-head').on('click', '.top-icon.notification', function() {
 
             // If the popup is already open, then close it
-            if (notify.$popup.hasClass('active')) {
+            if (!notify.$popup.hasClass('hidden')) {
                 notify.closePopup();
             }
             else {
@@ -294,18 +294,14 @@ var notify = {
      * Opens the notification popup with notifications
      */
     openPopup: function() {
+        Soon(function() {
+            notify.$popup.removeClass('hidden');
+            notify.$popupIcon.addClass('active');
+            topPopupAlign(notify.$popupIcon, notify.$popup);
 
-        // Calculate the position of the notifications popup so it is centered beneath the notifications icon.
-        // This is dynamically calculated because sometimes the icon position can change depending on the top nav items.
-        var popupPosition = notify.$popupIcon.offset().left - 40;
-
-        // Set the position of the notifications popup and open it
-        notify.$popup.css('left', popupPosition + 'px');
-        notify.$popup.addClass('active');
-        notify.$popupIcon.addClass('active');
-
-        // Render and show notifications currently in list
-        notify.renderNotifications();
+            // Render and show notifications currently in list
+            notify.renderNotifications();
+        });
     },
 
     /**
@@ -317,10 +313,10 @@ var notify = {
     closePopup: function() {
 
         // Make sure it is actually visible (otherwise any call to $.hideTopMenu in index.js could trigger this
-        if ((notify.$popup !== null) && (notify.$popup.hasClass('active'))) {
+        if ((notify.$popup !== null) && (!notify.$popup.hasClass('hidden'))) {
 
             // Hide the popup
-            notify.$popup.removeClass('active');
+            notify.$popup.addClass('hidden');
             notify.$popupIcon.removeClass('active');
 
             // Mark all notifications as seen seeing the popup has been opened and they have been viewed
@@ -328,7 +324,7 @@ var notify = {
         }
         else {
             // Otherwise this call probably came from $.hideTopMenu in index.js so just hide the popup
-            notify.$popup.removeClass('active');
+            notify.$popup.addClass('hidden');
         }
     },
 

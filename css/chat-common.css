@@ -6,7 +6,16 @@
 }
 .section, .conversationsApp {
     width: 100%;
-    height: 100% !important;
+    height: 100%;
+}
+.section.conversations {
+    height: 100%;
+    height: -webkit-calc(100% -48px);
+    height: -moz-calc(100% - 48px);
+    height: calc(100% - 48px);
+}
+.section.conversations .fm-right-files-block {
+    height: 100%;
 }
 .nw-fm-tree-header.conversations .button {
     position: absolute;

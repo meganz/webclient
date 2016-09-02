@@ -3602,11 +3602,11 @@
     "9086": "N\u00e1kup zlyhal, alebo bol zru\u0161en\u00fd",
     "9087": "V\u00e1\u0161 n\u00e1kup MEGA predplatn\u00e9ho bol \u00faspe\u0161n\u00fd,",
     "9088": "N\u00e1kup \u00faspe\u0161n\u00fd",
-    "9089": "Your puchase of a MEGA subscription has not passed validation at our licence server. On restart of this app we will retry to validate your subscription licences. Please contact MEGA support if the error continues.",
+    "9089": "V\u00e1\u0161 n\u00e1kup MEGA predplatn\u00e9ho nepre\u0161iel overen\u00edm na na\u0161om licen\u010dnom serveri. Po re\u0161tarte tejto aplik\u00e1cie  sk\u00fasime va\u0161e predplatn\u00e9 overi\u0165 znovu. Pros\u00edm kontaktujte MEGA podporu, ak probl\u00e9m pretrv\u00e1va.",
     "9090": "Overenie n\u00e1kupu zlyhalo",
     "9091": "Overovanie...",
     "9092": "N\u00e1kupy v aplik\u00e1cii",
-    "9093": "You can add multiple people at once with e-mail addresses separated by commas",
+    "9093": "Prida\u0165 viac \u013eud\u00ed naraz m\u00f4\u017eete oddelen\u00edm viacero emailov\u00fdch adries \u010diarkami",
     "9094": "\u010casto Kladen\u00e9 Ot\u00e1zky",
     "9095": "Ako v\u00e1m dnes m\u00f4\u017eeme pom\u00f4c\u0165?",
     "9096": "Centrum podpory",
@@ -3614,10 +3614,11 @@
     "9098": "Nevieme n\u00e1js\u0165 to, \u010do v\u00e1s zauj\u00edma",
     "9099": "Pros\u00edm sk\u00faste znovu vyh\u013ead\u00e1vanie, alebo priamo kontaktujte n\u00e1\u0161 t\u00edm podpory ",
     "9100": "Emailov\u00e1 podpora",
-    "9101": "If you can&#039;t find what you are looking for, please contact our support team for direct assistance.",
+    "9101": "Pokia\u013e neviete n\u00e1js\u0165 to \u010do h\u013ead\u00e1te, pros\u00edm kontaktujte n\u00e1\u0161 team podpory pre priamu pomoc.",
     "9102": "\u00cds\u0165 sp\u00e4\u0165",
     "9103": "Pre zdie\u013eanie \u010dl\u00e1nku skop\u00edrujte odkaz ni\u017e\u0161ie.",
     "9104": "Zdie\u013ea\u0165 \u010dl\u00e1nok",
+    "9105": "Enter your search here...",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3798,6 +3799,7 @@
         "please-try-searching-again": 9099,
         "email-support": 9100,
         "contact-support-team-message": 9101,
-        "go-back": 9102
+        "go-back": 9102,
+        "enter-your-search-here": 9105
     }
 }

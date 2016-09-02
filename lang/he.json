@@ -3618,6 +3618,7 @@
     "9102": "\u05d7\u05d6\u05d5\u05e8",
     "9103": "\u05d4\u05e2\u05ea\u05e7 \u05d0\u05ea \u05d4\u05e7\u05d9\u05e9\u05d5\u05e8 \u05e2\u05dc \u05de\u05e0\u05ea \u05dc\u05e9\u05ea\u05e3 \u05d0\u05ea \u05d4\u05de\u05d0\u05de\u05e8.",
     "9104": "\u05e9\u05ea\u05e3 \u05d0\u05ea \u05d4\u05de\u05d0\u05de\u05e8",
+    "9105": "Enter your search here...",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3798,6 +3799,7 @@
         "please-try-searching-again": 9099,
         "email-support": 9100,
         "contact-support-team-message": 9101,
-        "go-back": 9102
+        "go-back": 9102,
+        "enter-your-search-here": 9105
     }
 }

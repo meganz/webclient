@@ -3618,6 +3618,7 @@
     "9102": "\u56de\u524d\u9801",
     "9103": "\u8907\u88fd\u4ee5\u4e0b\u9023\u7d50\u4ee5\u5206\u4eab\u6587\u7ae0\u3002",
     "9104": "\u5206\u4eab\u6587\u7ae0",
+    "9105": "Enter your search here...",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3798,6 +3799,7 @@
         "please-try-searching-again": 9099,
         "email-support": 9100,
         "contact-support-team-message": 9101,
-        "go-back": 9102
+        "go-back": 9102,
+        "enter-your-search-here": 9105
     }
 }

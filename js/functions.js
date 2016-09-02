@@ -5127,18 +5127,6 @@ mega.utils.chrome110ZoomLevelNotification = function() {
 };
 mBroadcaster.once('zoomLevelCheck', mega.utils.chrome110ZoomLevelNotification);
 
-
-/**
- *  strip_tags - Strip HTML tags from a string
- *
- *  @param {String} html    HTML code
- *  @returns {String}   The text without any HTML markups
- */
-function strip_tags(html) {
-    return String(html).replace(/<\/?\w[^>]*?>/g, '');
-}
-
-
 var debounce = function(func, execAsap) {
     var timeout;
 

@@ -30,6 +30,31 @@
     var fetching = {};
     var cmsBackoff = 0;
     var cmsFailures = 0;
+    // Internal cache, to avoid asking to the CMS
+    // server the same object _unless_ they have
+    // changed.
+    var cmsCache = {};
+
+    /**
+     *  Wrap any callback, caching it's result
+     *  to improve response time in the CMS.
+     *  It also listen for changes in the object,
+     *  thus invalidating the cache entry.
+     *
+     *  @param {String} id    Object ID
+     *  @param {Function} next  Callback to wrap
+     *  @returns {Function}   New callback function
+     */
+    function cacheCallback(id, next) {
+        return function(err, content) {
+            CMS.watch(id, function() {
+                // invalidate teh cache
+                delete cmsCache[id];
+            });
+            cmsCache[id] = [err, content];
+            next(err, content);
+        };
+    }
     
     function verify_cms_content(content, signature, objectId) {
         var hash  = asmCrypto.SHA256.bytes(content);
@@ -81,7 +106,7 @@
         if (as === "download") {
             mime = 0;
         }
-    
+
         if (verify_cms_content(content, signature, id)) {
             switch (mime) {
             case 3: // html
@@ -257,6 +282,13 @@
             curType = type;
             curCallback = callback;
         },
+
+        getAndWatch: function(type, callback) {
+            this.get(type, callback);
+            this.watch(type, function() {
+                this.get(type, callback);
+            });
+        },
     
         reRender: function(type, nodeId)
         {
@@ -287,7 +319,7 @@
                 loadingDialog.show();
                 CMS.get(target, function() {
                     loadingDialog.hide();
-                }, 'download');
+                }, false, 'download');
     
                 return false;
             });
@@ -318,22 +350,56 @@
             }
             return assets[id] ? assets[id] : IMAGE_PLACEHOLDER + "#" + id;
         },
-        get: function(id, next, as) {
+
+        index: function(index, callback) {
+            CMS.get(index, function(err, data) {
+                if (err) {
+                    return callback(err);
+                }
+
+                CMS.get(data.object[1], function(err) {
+                    if (err) {
+                        return callback(err);
+                    }
+
+                    var hash = {};
+                    var args = Array.prototype.slice.call(arguments);
+
+                    data.object[0].map(function(name, id) {
+                        hash[name] = args[id + 1];
+                    });
+
+                    callback(err, hash);
+                });
+            });
+        },
+
+        get: function(id, next, cache, as) {
             if (id instanceof Array) {
                 var step = steps(id.length, next);
                 for (var i in id) {
                     if (id.hasOwnProperty(i)) {
-                        this.get(id[i], step(i), as);
+                        this.get(id[i], step(i), cache, as);
                     }
                 }
                 return;
             }
             var isNew = false;
+            next = next || function() {};
+
+            if (cache) {
+                next = cacheCallback(id, next);
+                if (cmsCache[id]) {
+                    return next(cmsCache[id][0], cmsCache[id][1]);
+                }
+            }
+
+
             if (typeof fetching[id] === "undefined") {
                 isNew = true;
                 fetching[id] = [];
             }
-            next = next || function() {};
+
             fetching[id].push([next, as]);
             if (isNew) {
                 doRequest(id);

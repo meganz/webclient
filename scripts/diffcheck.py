@@ -123,13 +123,6 @@ def pick_files_to_test(file_line_mapping, extensions=None, exclude=None):
     if exclude is not None:
         files_to_test = [x for x in files_to_test if not exclude.match(x)]
 
-    temp = 'html\\js\\help2-views.js'
-    if temp in files_to_test:
-        files_to_test.remove(temp)
-    temp = 'html/js/help2-views.js'
-    if temp in files_to_test:
-        files_to_test.remove(temp)
-
     # logging.info(files_to_test)
     return files_to_test
 
@@ -400,7 +393,7 @@ def reduce_validator(file_line_mapping, **extra):
 
                 # If line length exceeded, log it and move onto the next file
                 if line_length > config.VALIDATOR_LINELEN_THRESHOLD:
-                    # fatal += 1
+                    fatal += 1
                     result.append('Found line too long in file {}, line {} (length {}). '
                                   'Please keep your lines under 120 characters.'
                                   .format(file_path, line_number, line_length))

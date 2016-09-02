@@ -86,9 +86,9 @@ function mainScroll() {
 
 function topMenuScroll() {
     $('.top-menu-scroll').jScrollPane({
-        enableKeyboardNavigation: false, 
-        showArrows: true, 
-        arrowSize: 5, 
+        enableKeyboardNavigation: false,
+        showArrows: true,
+        arrowSize: 5,
         animateScroll: true
     });
 }
@@ -1425,6 +1425,21 @@ function topmenuUI() {
         }
     });
 
+    $('.top-icon.achivements').rebind('click', function() {
+        loadingDialog.show();
+
+        M.accountData(function(account) {
+            loadingDialog.hide();
+
+            if (!account.maf) {
+                msgDialog('warningb', '', 'No achievements available for your account at this time, please try again later.');
+            }
+            else {
+                achivementsListDialog();
+            }
+        });
+    });
+
     $('.top-icon.menu, .top-icon.close').rebind('click', function (e) {
         if ($('.top-icon.menu').attr('class').indexOf('active') == -1) {
             $('.top-icon.menu').addClass('active');
@@ -1536,7 +1551,7 @@ function topmenuUI() {
                 warning = '';
                 if (perc > 100) {
                     perc = 100;
-                } 
+                }
                 else if (perc > 99) {
                     $parent.find('.membership-usage-bl.storage').addClass('exceeded');
                      warning = l[1010]
@@ -1545,7 +1560,7 @@ function topmenuUI() {
                         + ' <a href="#pro" class="upgradelink">'
                         + l[920]
                         + '</a>';
-                } 
+                }
                 else if (perc > 80) {
                     $parent.find('.membership-usage-bl.storage').addClass('going-out');
                     warning = l[1012]
@@ -1592,7 +1607,7 @@ function topmenuUI() {
 
                 if (perc > 100) {
                     perc = 100;
-                } 
+                }
                 else if (perc > 99) {
                     $parent.find('.membership-usage-bl.bandwidth').addClass('exceeded');
 
@@ -1613,7 +1628,7 @@ function topmenuUI() {
                             + l[920]
                             + '</a>';
                     }
-                } 
+                }
                 else if (perc > 80) {
                     $parent.find('.membership-usage-bl.bandwidth').addClass('going-out');
                     warning = l[1053]

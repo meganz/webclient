@@ -332,7 +332,7 @@ body.pro:after {
     background-image: url(../images/mega/new-start-full1@2x.png);
     background-size: 930px auto;
 }
-.top-login-full, .top-login-input-block, .top-login-warning-close, .top-login-warning-icon, .top-login-popup .top-login-warning-bott .checkboxOn, .top-login-popup .top-login-warning-bott .checkboxOff, .top-login-tooltip-arrow, .password-tooltip-arrow, .main-top-info-text, .login-register-input, .register-st2-button, .register-st2-button-arrow, .password-status-icon, .login-notification-icon, .top-login-forgot-pass, .login-forgot-password, .checkboxOn::after, .checkboxOff::after, .contains-value .top-search-clear, .account-history-drop-items.active, .account-warning-icon, .warning-gray-icon, .membership-arrow, .small-icon.membership {
+.top-login-full, .top-login-input-block, .top-login-warning-close, .top-login-warning-icon, .top-login-popup .top-login-warning-bott .checkboxOn, .top-login-popup .top-login-warning-bott .checkboxOff, .top-login-tooltip-arrow, .password-tooltip-arrow, .main-top-info-text, .login-register-input, .register-st2-button, .register-st2-button-arrow, .password-status-icon, .login-notification-icon, .top-login-forgot-pass, .login-forgot-password, .checkboxOn::after, .checkboxOff::after, .contains-value .top-clear-button, .account-history-drop-items.active, .account-warning-icon, .warning-gray-icon, .membership-arrow, .small-icon.membership, .dropdown-white-arrow, .dropdown-item.tick-item.active::before {
     background-image: url(../images/mega/top-login-sprite_v7@2x.png);
     background-size: 48px auto;
 }
@@ -464,7 +464,7 @@ body.pro:after {
     background-image: url(../images/mega/zoom-sprite@2x.png);
     background-size: 160px auto;
 }
-.dropdown-white-arrow, .huge-white-icon, .shared-link.small-icon {
+.huge-white-icon, .shared-link.small-icon {
     background-image: url(../images/mega/chat-static-sprite-v1@2x.png);
     background-size: 68px auto;
 }

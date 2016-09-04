@@ -375,6 +375,18 @@ function init_page() {
                 loadfm();
             }
         }
+
+        // Cleanup M.currentdirid switching from static pages <> fm
+        if (fminitialized) {
+            if (is_fm()) {
+                M.currentdirid = M.lastCurrentDirID;
+                delete M.lastCurrentDirID;
+            }
+            else if (M.currentdirid) {
+                M.lastCurrentDirID = M.currentdirid;
+                M.currentdirid = null;
+            }
+        }
     }
 
     if (page.substr(0, 10) == 'blogsearch') {

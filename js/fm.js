@@ -11140,13 +11140,34 @@ function invitationStatusDialog(close) {
     var locFmt = "Encourage your friend to register and install a MEGA app. As long as your friend uses the same email address as you've entered, you will receive your free [S]@@[/S] of storage space and [S]@@[/S] of transfer quota.".replace(/\[S\]/g, '<span>').replace(/\[\/S\]/g, '</span>');
     $('.hint', $dialog).safeHTML(locFmt, bytesToSize(maf[0], 0), bytesToSize(maf[1], 0));
 
-    $('.button.reinvite-all', $dialog).rebind('click', function() {
-        alert('TODO');
-        return false;
-    });
     $('.button.invite-more', $dialog).rebind('click', function() {
         closeDialog();
         inviteFriendDialog();
+        return false;
+    });
+
+    var reinvite = function(email, $row) {
+        email = String(email).trim();
+        var opc = M.findOutgoingPendingContactIdByEmail(email);
+
+        if (opc) {
+            M.reinvitePendingContactRequest(email);
+        }
+        else {
+            console.warn('No outgoing pending contact request for %s', email);
+        }
+
+        $('.date div', $row).fadeOut(700);
+    };
+    $('.button.reinvite-all', $dialog).rebind('click', function() {
+        $('.table-row', $table).each(function(idx, $row) {
+            $row = $($row);
+
+            if ($('.date div', $row).length) {
+                reinvite($('.email strong', $row).text(), $row);
+            }
+        });
+        $(this).addClass('hidden');
         return false;
     });
 
@@ -11197,8 +11218,9 @@ function invitationStatusDialog(close) {
             // Pending
 
             $('.date div', $tmpl).rebind('click', function() {
-                alert('TODO');
+                var $row = $(this).closest('.table-row');
 
+                reinvite($('.email strong', $row).text(), $row);
                 return false;
             });
         }

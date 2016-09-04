@@ -64,7 +64,9 @@ function parseHTML(markup, forbidStyle, doc, baseURI, isXML) {
     // Either we are not running the Firefox extension or the above parser
     // failed, in such case we try to mimic it using jQuery.parseHTML
     var fragment = doc.createDocumentFragment();
-    $.parseHTML(String(markup), doc)
+
+    markup = String(markup).replace(/(?!\<[a-z][^>]+)\son[a-z]+\s*=/gi, ' data-dummy=');
+    $.parseHTML(markup, doc)
         .forEach(function(node) {
             fragment.appendChild(node);
         });

@@ -209,7 +209,7 @@ function pagelogin() {
                 else {
                     $('.login-register-input.password').addClass('incorrect');
                     $('.login-register-input.email').addClass('incorrect');
-                    
+
                     // Check that there is not already a message dialog being shown, otherwise
                     // this generic one will override the other's more specific error message
                     if ($('#msgDialog').hasClass('hidden')) {
@@ -293,7 +293,11 @@ function init_login() {
     $('.login-register-input').rebind('click', function(e) {
         $(this).find('input').focus();
     });
-    document.getElementById('login-name2').focus()
+    document.getElementById('login-name2').focus();
+
+    if (is_chrome_firefox) {
+        Soon(mozLoginManager.fillForm.bind(mozLoginManager, 'login_form'));
+    }
 }
 
 function postlogin() {

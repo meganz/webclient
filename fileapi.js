@@ -1091,6 +1091,67 @@ function mozClearStartupCache() {
 	}
 })(self);
 
+const mozLoginManager = Object.freeze({
+	hostname: 'mega:',
+	realm: 'MEGAlogin',
+	nsLoginInfo: new Components.Constructor("@mozilla.org/login-manager/loginInfo;1", Ci.nsILoginInfo, "init"),
+
+	get login() {
+		var logins = Services.logins.findLogins({}, this.hostname, null, this.realm);
+		return logins.length && logins[0];
+	},
+
+	get prompter() {
+		var prompt = Cc["@mozilla.org/login-manager/prompter;1"].createInstance(Ci.nsILoginManagerPrompter);
+		prompt.init(window);
+		return prompt;
+	},
+
+	saveLogin: function(aUsername, aPassword, aUsernameField, aPasswordField) {
+		$('input[type=password').val('');
+
+		if (Services.logins.getLoginSavingEnabled(this.hostname)
+				&& Services.logins.getLoginSavingEnabled('https://mega.nz')) {
+
+			var oldLogin = this.login;
+			var loginInfo = new this.nsLoginInfo(this.hostname, null, this.realm,
+				aUsername, aPassword, aUsernameField || "", aPasswordField || "");
+
+			if (oldLogin) {
+				if (oldLogin.username === loginInfo.username) {
+					if (oldLogin.password !== loginInfo.password) {
+						this.prompter.promptToChangePassword(oldLogin, loginInfo);
+					}
+					else {
+						var propBag = Cc["@mozilla.org/hash-property-bag;1"].createInstance(Ci.nsIWritablePropertyBag);
+						propBag.setProperty("timeLastUsed", Date.now());
+						propBag.setProperty("timesUsedIncrement", 1);
+						Services.logins.modifyLogin(loginInfo, propBag);
+					}
+				}
+			}
+			else {
+				this.prompter.promptToSavePassword(loginInfo);
+			}
+		}
+	},
+
+	fillForm: function(aForm) {
+		if (typeof aForm === 'string') {
+			aForm = document.getElementById(aForm);
+		}
+
+		if (aForm) {
+			var login = this.login;
+
+			if (login) {
+				$('input[type=text]', aForm).val(login.username);
+				$('input[type=password]', aForm).val(login.password);
+			}
+		}
+	}
+});
+
 var mozMEGAExtensionVersion;
 var mozMEGAExtensionUpdateURL;
 try {

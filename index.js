@@ -1099,6 +1099,10 @@ function loginDialog(close) {
     });
     $('.top-login-popup').addClass('active');
     document.getElementById('login-name').focus()
+
+    if (is_chrome_firefox) {
+        Soon(mozLoginManager.fillForm.bind(mozLoginManager, 'form_login_header'));
+    }
 }
 
 function tooltiplogin() {

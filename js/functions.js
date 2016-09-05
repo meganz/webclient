@@ -4516,33 +4516,15 @@ function rand_range(a, b) {
  *
  */
 function passwordManager(form) {
-    if (navigator.mozGetUserMedia) {
+    if (is_chrome_firefox) {
         var creds = passwordManager.pickFormFields(form);
         if (creds) {
-            // prepare pwd to be stored encrypted
-            // format: "~:<keypw>:<userhash>"
-            var pwd = creds.pwd;
-
-            if (!passwordManager.getStoredCredentials(pwd)) {
-                var keypw = prepare_key_pw(pwd);
-                var pwaes = new sjcl.cipher.aes(keypw);
-                var hash = stringhash(creds.usr.toLowerCase(), pwaes);
-
-                pwd = '~:' + a32_to_base64(keypw) + ':' + hash;
-
-                $('#pmh_username').val(creds.usr);
-                $('#pmh_password').val(pwd);
-                $('#pwdmanhelper').submit();
-                Soon(function() {
-                    $('#pwdmanhelper input').val('');
-                    $(form).find('input').val('');
-                    $('iframe#dummyTestFrame').attr('src', 'about:blank');
-                });
-            }
+            mozLoginManager.saveLogin(creds.usr, creds.pwd);
         }
+        $(form).find('input').val('');
         return;
     }
-    if (is_chrome_firefox || typeof history !== "object") {
+    if (typeof history !== "object") {
         return false;
     }
     $(form).rebind('submit', function() {

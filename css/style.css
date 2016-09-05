@@ -178,7 +178,7 @@ a, a:link, a:visited, a:hover, a:active, a:focus img, a:focus img {
 .image-scale-hack {
     transform: rotate( .0001deg );
 }
-.clear {
+#help2 .clear {
     clear: both;
     margin: 0px;
     padding: 0px;
@@ -16835,6 +16835,9 @@ strong, b {
 }
 .resellers-link.first:hover {
     margin: 22px 0 22px 0;
+}
+.resellers-link.single {
+    margin-left: 3px;
 }
 .resellers-logo {
     display: block;

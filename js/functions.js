@@ -238,6 +238,21 @@ var Soon = is_chrome_firefox ? mozRunAsync : function(callback) {
     }, 20);
 };
 
+/**
+ *  Delays the execution of a function
+ *
+ *  Wraps a function to execute at most once
+ *  in a 100 ms time period. Useful to wrap
+ *  expensive jQuery events (for instance scrolling
+ *  events).
+ *
+ *  All argument and *this* is passed to the callback
+ *  after the 100ms (default)
+ *
+ *  @param {Function} func  Function to wrap
+ *  @param {Number}   ms    Timeout
+ *  @returns {Function} wrapped function
+ */
 function SoonFc(func, ms) {
     return function __soonfc() {
         var self = this,
@@ -898,6 +913,11 @@ function acc_time2date(unixtime, yearIsOptional) {
         result +=  th + ' ' + MyDate.getFullYear();
     }
     return result;
+}
+
+function humandate(unixtime) {
+    var date = new Date(unixtime * 1000);
+    return date.getDate() + ' ' + date_months[date.getMonth()] +  ' ' + date.getFullYear();
 }
 
 function time2last(timestamp) {
@@ -5123,8 +5143,18 @@ mega.utils.chrome110ZoomLevelNotification = function() {
 
     }
 };
-
 mBroadcaster.once('zoomLevelCheck', mega.utils.chrome110ZoomLevelNotification);
+
+
+/**
+ *  strip_tags - Strip HTML tags from a string
+ *
+ *  @param {String} html    HTML code
+ *  @returns {String}   The text without any HTML markups
+ */
+function strip_tags(html) {
+    return String(html).replace(/<\/?\w[^>]*?>/g, '');
+}
 
 
 var debounce = function(func, execAsap) {

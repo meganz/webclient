@@ -929,7 +929,7 @@ a.account-manage-button:hover {
     -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
     box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
     background-image: url(../images/mega/nw-fm-sprite_v19.svg);
-    background-position: -6px -10649px;
+    background-position: -6px -10648px;
     background-repeat: no-repeat;
 }
 .ui-slider .ui-slider-range {
@@ -1293,10 +1293,10 @@ input.radioOn, input.radioOff {
     font-size: 18px;
 }
 .resellers-content {
-    margin: 0 -20px 36px -12px;
+    margin: 20px 0 0 0;
 }
 .resellers-voucher-bl {
-    padding: 18px 0 14px 0;
+    padding: 18px 0;
 }
 .reset-pass .radio-txt {
     display: block;
@@ -3746,7 +3746,10 @@ label.iPhoneCheckLabelOff span {
     background-color: white;
 }
 /* New FM */
-.fm-tree-panel, .fm-left-menu.account + .nw-tree-panel-header + .fm-tree-panel, .fm-left-menu.dashboard + .nw-tree-panel-header + .fm-tree-panel {
+.fm-left-menu.account + .nw-tree-panel-header + .fm-tree-panel {
+    height: 100%;
+}
+.fm-tree-panel, .fm-left-menu.dashboard + .nw-tree-panel-header + .fm-tree-panel {
     height: -webkit-calc(100% - 48px);
     height: -moz-calc(100% - 48px);
     height: calc(100% - 48px);
@@ -10262,6 +10265,15 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
     line-height: 21px;
     padding: 4px 0 6px 0;
 }
+.fm-account-reseller .membership-big-txt {
+    font-size: 20px;
+    line-height: 21px;
+    padding: 21px 0 6px 0;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    height: 68px;
+}
 .membership-big-txt.name {
     padding: 16px 0 0 0;
     margin-right: 20px;
@@ -11484,7 +11496,7 @@ table {
     background-color: #FAFAFA;
     min-width: 740px;
 }
-.dashboard.content-block {
+.widgets.content-block {
     padding: 12px 24px 24px 12px;
     min-width: 740px;
     margin: 0 auto;

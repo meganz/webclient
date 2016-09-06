@@ -232,7 +232,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             });
         }
         else if (msg instanceof KarereEventObjects.OutgoingMessage) {
-            $(msg).bind("onChange.mbOnPush", function(msg, property, oldVal, newVal) {
+            $(msg).rebind("onChange.mbOnPush", function(msg, property, oldVal, newVal) {
                 if (property === "orderValue" || property === "delay") {
                     self.messages.reorder();
                 }
@@ -468,7 +468,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         if (eventData.state === "EDITED" || eventData.state === "TRUNCATED") {
             var timestamp = chatRoom.messagesBuff.messages[eventData.messageId].delay ?
                 chatRoom.messagesBuff.messages[eventData.messageId].delay : unixtime();
-
+            
             var editedMessage = new Message(
                 chatRoom,
                 self,
@@ -483,6 +483,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                     'sent': true
                 }
             );
+            var originalMessage = chatRoom.messagesBuff.messages[eventData.messageId];
 
             var _runDecryption = function() {
                 try
@@ -500,6 +501,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                                 decrypted.payload = "";
                             }
                             editedMessage.textContents = decrypted.payload;
+
                             if (decrypted.identity && decrypted.references) {
                                 editedMessage.references = decrypted.references;
                                 editedMessage.msgIdentity = decrypted.identity;
@@ -514,12 +516,13 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                             editedMessage.dialogType = 'truncated';
                             editedMessage.userId = decrypted.sender;
                         }
-                        chatRoom.messagesBuff.messages.replace(eventData.messageId, editedMessage);
 
                         chatRoom.megaChat.plugins.chatdIntegration._parseMessage(
-                            chatRoom, chatRoom.messagesBuff.messages[eventData.messageId]
+                            chatRoom,
+                            editedMessage
                         );
-
+                        
+                        chatRoom.messagesBuff.messages.replace(editedMessage.messageId, editedMessage);
 
                         if (decrypted.type === strongvelope.MESSAGE_TYPES.TRUNCATE) {
                             var messageKeys = chatRoom.messagesBuff.messages.keys();

@@ -157,7 +157,7 @@ Unless otherwise noted, they were released under a [MIT License].
 
 [MIT License]: <https://opensource.org/licenses/MIT>
 [Emscripten]: <http://emscripten.org/>
-[asmcrypto.js]: <https://github.com/vibornoff/asmcrypto.js/tree/a0ac7b98ad5401d595a78516c7591a4980799b08>
+[asmcrypto.js]: <https://github.com/meganz/asmcrypto.js>
 [autolinker.js]: <https://github.com/gregjacobs/Autolinker.js/tree/0.12.3/dist>
 [avatar.js]: <https://github.com/meganz/avatar-picker>
 [bitcoin-math.js]: <https://github.com/meganz/bitcoin-math>

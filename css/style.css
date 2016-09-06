@@ -8606,6 +8606,8 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     min-width: 440px;
     margin: -77px 0 0 -220px;
 }
+
+/* Decryption key dialog */
 .dlkey-dialog .wrapper, .fm-dialog.network-testing .wrapper {
     padding: 10px;
 }
@@ -8634,6 +8636,35 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 .dlkey-dialog .decryption-key input {
     text-indent: 36px;
 }
+
+/* Password decryption dialog */
+.password-dialog .wrapper {
+    margin-bottom: 20px;
+    padding: 10px;
+}
+.password-dialog .instruction-message {
+    color: #777;
+    line-height: 20px;
+    padding: 0 0 20px;
+}
+.password-dialog .decryption-password {
+    position: relative;
+}
+.password-dialog .decryption-password .icon {
+    background-image: url(../images/mega/dialogs-sprite_v11.svg);
+    background-position: -6px -5510px;
+    background-repeat: no-repeat;
+    height: 22px;
+    left: 13px;
+    opacity: 0.5;
+    position: absolute;
+    top: 5px;
+    width: 24px;
+}
+.password-dialog .decryption-password input {
+    text-indent: 36px;
+}
+
 .fm-dialog.network-testing {
     margin: -115px 0 0 -256px;
 }
@@ -8957,9 +8988,8 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     margin: -137px 0 0 -182px
 }
 .fm-dialog.password-dialog {
-    width: 604px;
-    min-height: 100px;
-    margin: -97px 0 0 -302px
+    margin: -121px 0 0 -250px;
+    width: 500px;
 }
 .fm-dialog.chat-confirm-dialog {
     width: 604px;
@@ -9770,9 +9800,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .export-link-text-pad {
     display: table-cell;
-    height: 106px;
     vertical-align: middle;
     width: 100%;
+    padding: 10px 0;
 }
 .export-link-txt {
     font-size: 14px;
@@ -9827,6 +9857,24 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     line-height: 24px;
     padding-left: 25px;
     vertical-align: top;
+}
+.password-protect-input input {
+    background-image: none;
+    padding: 0 35px 0 10px;
+}
+.password-protect-error {
+    color: #ff2a0b;
+    font-size: 13px;
+    height: 14px;
+    line-height: 14px;
+    margin-bottom: 10px;
+    margin-left: 2px;
+    margin-top: 10px;
+}
+.password-link-decrypt-error {
+    color: #ff2a0b;
+    font-size: 13px;
+    margin-top: 7px;
 }
 .copy-keys-button {
     display: block;
@@ -19741,22 +19789,6 @@ filter:progid:DXImageTransform.Microsoft.Alpha(opacity=90);
     background-position: center -860px;
     background-repeat: no-repeat
 }
-.password-dialog-icon {
-    font-size: 13px;
-    line-height: 21px;
-    padding-left: 90px;
-    background-image: url(../images/mega/encr-sprite_v1.png);
-    background-position: -10px -745px;
-    background-repeat: no-repeat;
-}
-.password-dialog p {
-    margin: 0;
-    padding: 0 0 9px 0;
-    color: #333333;
-}
-.password-dialog .fm-dialog-body {
-    padding: 14px 20px 14px 20px;
-}
 .ads-left-block, .ads-right-block, .products-left-block, .products-right-block {
     background-color: #d9d8d8;
     height: 100%;
@@ -21545,6 +21577,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
     box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
 }
+.separate-link-and-key.disabled {
+    opacity: 0.7;
+    pointer-events: none;
+}
 .button-separator {
     border-left: 2px solid #ebebeb;
     display: inline-block;
@@ -21589,13 +21625,35 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .link-handle.selected .text, .link-handle:hover .text, .link-decryption-key.selected .text, .link-decryption-key:hover .text, .link-handle-and-key.selected .text, .link-handle-and-key:hover .text {
     color: #f5a623;
 }
-.fm-links-dropdown, .fm-expiry-dropdown {
-    padding: 15px 0px 24px 24px;
-    float: left;
+.fm-links-dropdown, .fm-expiry-dropdown, .fm-links-dropdown, .fm-password-protect-dropdown {
+    float: none;
+    overflow: hidden;
+    padding: 15px 0 16px 24px;
     width: 590px;
+}
+.fm-expiry-dropdown {
+    padding-bottom: 17px;
+}
+.fm-password-protect-dropdown {
+    padding-top: 0;
+    position: relative;
 }
 .decryption-key .file-link-info.url, .public-handle .file-link-info.key {
     display: none;
+}
+.file-link-info-wrapper {
+    display: inline-block;
+    vertical-align: top;
+    width: 465px;
+}
+.file-link-info.password-protected-data {
+    display: block;
+    line-height: 21px;
+    padding-bottom: 2px;
+    padding-left: 5px;
+    padding-top: 2px;
+    text-align: justify;
+    word-wrap: break-word;
 }
 .file-link-block {
     background-color: #fff;
@@ -21614,10 +21672,24 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
+.file-link-block.password-protect-link {
+    height: auto;
+}
 .file-link-info-wrapper {
     display: inline-block;
     vertical-align: top;
     margin-left: 3px;
+}
+.password-protect-link .file-link-info-wrapper {
+    width: 465px;
+}
+.password-protect-link .icon {
+    margin-top: 0;
+    position: relative;
+    top: 5px;
+}
+.file-link-info.hidden {
+    display: none;
 }
 .key.file-link-info {
     color: #D90007;
@@ -25462,34 +25534,75 @@ table.speed-table {
     box-sizing: border-box;
     padding: 0 20px 10px 20px;
 }
-.fm-expiry-dropdown .fm-link-select-label {
-    margin-left: 0px;
+.fm-expiry-dropdown .fm-link-select-label, .fm-password-protect-dropdown .fm-link-select-label {
+    margin-left: 0;
+}
+.password-protect-inputs {
+    display: table;
+    margin-top: 14px;
+    width: 99%;
+}
+.password-protect-input-container {
+    display: table-cell;
+    position: relative;
+    width: 48%;
+}
+.password-protect-input-container .estimator-loading-icon {
+    background: rgba(0, 0, 0, 0) url("../images/mega/ajax-loader-gray.gif") no-repeat scroll 0 0 / 16px 16px;
+    display: none;
+    height: 16px;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    width: 16px;
+    z-index: 10;
+}
+.password-protect-input-container .estimator-loading-icon.loading {
+    display: block;
+}
+.password-protect-inputs .spacer {
+    width: 40px;
+}
+.password-protect-input {
+    background: #f6f6f6 none repeat scroll 0 0;
+    border: 0 none;
+    border-radius: 5px;
+    font-size: 13px;
+    line-height: 32px;
+    text-indent: 10px;
+    width: 100%;
+    z-index: 1;
+}
+.fm-dialog-button.encrypt-link-button {
+    display: inline-block;
+    float: none;
+    margin-left: -2px;
+    margin-top: -2px;
+}
+.fm-dialog-button.encrypt-link-button .encrypt-text,
+.fm-dialog-new-folder-button.decrypt-link-button .decrypt-text {
+    font-style: normal;
+}
+.fm-dialog-button.encrypt-link-button .encrypt-text.encrypted,
+.fm-dialog-new-folder-button.decrypt-link-button .decrypt-text.decrypted {
+    color: #7dd016;
+}
+.fm-dialog-button.encrypt-link-button .encryption-in-progress,
+.fm-dialog-new-folder-button.decrypt-link-button .decryption-in-progress {
+    background-image: url("../images/mega/loader-get-link-encryption.gif");
+    background-position: 0 0;
+    background-repeat: no-repeat;
+    display: inline-block;
+    height: 11px;
+    margin-left: 10px;
+    width: 16px;
+}
+.fm-dialog-button.encrypt-link-button .encryption-in-progress.hidden,
+.fm-dialog-new-folder-button.decrypt-link-button .decryption-in-progress.hidden {
+    display: none;
 }
 .pro-only-feature {
     color: #ff3333;
-}
-.export-links-dialog .get-pro.hidden {
-    display: none;
-}
-.export-links-dialog .get-pro {
-    background-color: #ff3333;
-    border-radius: 9px;
-    color: #fff;
-    cursor: pointer;
-    display: inline-block;
-    float: right;
-    font-size: 12px;
-    padding: 3px 13px 4px 13px;
-    position: relative;
-    top: -3px;
-    -webkit-transition: box-shadow 200ms ease-in-out;
-    -moz-transition: box-shadow 200ms ease-in-out;
-    -o-transition: box-shadow 200ms ease-in-out;
-    -ms-transition: box-shadow 200ms ease-in-out;
-    transition: box-shadow 200ms ease-in-out;
-}
-.export-links-dialog .get-pro:hover {
-    box-shadow: 0 0 0 3px rgba(255, 51, 51, 0.4);
 }
 .export-links-dialog .dialog-feature-toggle.hidden {
     display: none;
@@ -25502,6 +25615,7 @@ table.speed-table {
     display: inline-block;
     float: right;
     height: 20px;
+    margin-right: 3px;
     width: 36px;
 }
 .export-links-dialog .dialog-feature-toggle.toggle-on {
@@ -25518,14 +25632,46 @@ table.speed-table {
     margin-top: 2px;
     width: 14px;
 }
+.export-links-dialog .reveal-feature-toggle-container {
+    border-top: 1px solid #f2f2f2;
+    clear: both;
+    margin-left: 25px;
+    margin-right: 25px;
+    padding-top: 50px;
+    position: relative;
+}
 .export-links-dialog .reveal-feature-toggle {
-    font-family: 'source_sans_proregular';
-    font-size: 12px;
-    color: #777777;
-    text-decoration: underline;
-    margin-left: 22px;
-    margin-bottom: 20px;
+    color: #b2b2b2;
     cursor: pointer;
+    font-family: "source_sans_proregular";
+    font-size: 12px;
+    left: 0;
+    position: absolute;
+    top: 10px;
+}
+.export-links-dialog .get-pro.hidden {
+    display: none;
+}
+.export-links-dialog .get-pro {
+    background-color: #ff5555;
+    border-radius: 4px;
+    color: #fff;
+    cursor: pointer;
+    display: inline-block;
+    float: right;
+    font-size: 12px;
+    padding: 3px 13px 4px;
+    position: absolute;
+    right: 0;
+    top: 6px;
+    -webkit-transition: box-shadow 100ms ease-in-out;
+    -moz-transition: box-shadow 100ms ease-in-out;
+    -o-transition: box-shadow 100ms ease-in-out;
+    -ms-transition: box-shadow 100ms ease-in-out;
+    transition: box-shadow 100ms ease-in-out;
+}
+.export-links-dialog .get-pro:hover {
+    background-color: #ff4444;
 }
 .export-links-dialog .disabled-overlay {
     background: #fff none repeat scroll 0 0;
@@ -25536,6 +25682,32 @@ table.speed-table {
     right: 0;
     top: 0;
 }
+.export-links-dialog .fm-expiry-dropdown.disabled .disabled-overlay,
+.export-links-dialog .fm-password-protect-dropdown.disabled .disabled-overlay {
+    opacity: 0;
+}
+.export-links-dialog .fm-expiry-dropdown.disabled .dialog-feature-toggle,
+.export-links-dialog .fm-expiry-dropdown.disabled .dialog-feature-switch,
+.export-links-dialog .fm-password-protect-dropdown.disabled .dialog-feature-toggle,
+.export-links-dialog .fm-password-protect-dropdown.disabled .dialog-feature-switch {
+    cursor: default;
+}
+.export-links-dialog .password-strength.good1 {
+    color: #ff2a0b;
+}
+.export-links-dialog .password-strength.good2 {
+    color: #ffc926;
+}
+.export-links-dialog .password-strength.good3 {
+    color: #7ab148;
+}
+.export-links-dialog .password-strength.good4 {
+    color: #7dd016;
+}
+.export-links-dialog .password-strength.good5 {
+    color: #1DA1E9;
+}
+
 .fm-dialog.copy-dialog .share-dialog-permissions {
     margin-top: 12px;
     float: left;

@@ -12,7 +12,7 @@ Unless otherwise noted, they were released under a [MIT License].
 > git clone https://github.com/vibornoff/asmcrypto.js.git
 > git checkout a0ac7b98ad5401d595a78516c7591a4980799b08  (using fixes in master since last v0.0.10 release)
 > npm install
-> grunt --with="common,utils,exports,globals,aes,aes-ecb,aes-cbc,aes-ctr,aes-ccm,aes-gcm,aes-exports,aes-ecb-exports,aes-cbc-exports,aes-ctr-exports,aes-ccm-exports,aes-gcm-exports,hash,sha256,sha256-exports,sha512,sha512-exports,hmac,hmac-sha256,hmac-sha512,hmac-sha256-exports,hmac-sha512-exports,rng,rng-exports,rng-globals,bn,bn-exports,rsa,rsa-raw,rsa-keygen-exports,rsa-raw-exports" devel
+> grunt --with="common,utils,exports,globals,aes,aes-ecb,aes-cbc,aes-ctr,aes-ccm,aes-gcm,aes-exports,aes-ecb-exports,aes-cbc-exports,aes-ctr-exports,aes-ccm-exports,aes-gcm-exports,hash,sha256,sha256-exports,sha512,sha512-exports,hmac,hmac-sha256,hmac-sha512,hmac-sha256-exports,hmac-sha512-exports,pbkdf2,pbkdf2-hmac-sha512,pbkdf2-hmac-sha512-exports,rng,rng-exports,rng-globals,bn,bn-exports,rsa,rsa-raw,rsa-keygen-exports,rsa-raw-exports" devel
 > In our code special UTF-8 characters are removed for better SHA-256 hashing performance so a few comments were changed:
 > 1) Find and replace the special character '—' with a regular hyphen '-'.
 > 2) Find and replace the special character '²' with '^2'.

@@ -49,14 +49,14 @@ function geoStaticpath(eu)
         try {
             if (!sessionStorage.skipcdn) {
                 var cc_eu = 'FR DE NL ES PT DK CH IT UK GB NO SE FI PL CZ SK AT GR RO HU IE TR VA MC SM LI AD JE GG UA BG LT LV EE AX IS MA DZ LY TN EG RU BY HR SI AL ME RS KO EU FO CY IL LB SY SA JO IQ BA CV PS EH GI GL IM LU MK SJ BF BI BJ BW CF CG CM DJ ER ET GA GH GM GN GN GW KE KM LR LS MG ZA AE ML MR MT MU MV MW MZ NA NE QA RW SD SS SL SZ TD TG TZ UG YE ZA ZM ZR ZW';
-				var cc_na = 'US CA MX AG BS BB BZ CR CO CU DO GD GT GY HT HN JM NI PA KN LC VC SR TT VE IS GL AI BL VG PR VI VE CO EC CL BR BO PY UY AR GY SR PE GF FK';
-				var cc_nz = 'NZ AU FJ NC';
+                var cc_na = 'US CA MX AG BS BB BZ CR CO CU DO GD GT GY HT HN JM NI PA KN LC VC SR TT VE IS GL AI BL VG PR VI VE CO EC CL BR BO PY UY AR GY SR PE GF FK';
+                var cc_nz = 'NZ AU FJ NC';
                 var cm = String(document.cookie).match(/geoip\s*\=\s*([A-Z]{2})/);
-				if (cm && cm[1] && cc_na.indexOf(cm[1]) > -1)
+                if (cm && cm[1] && cc_na.indexOf(cm[1]) > -1)
                     return 'https://na.static.mega.co.nz/3/';
-				else if (cm && cm[1] && cc_nz.indexOf(cm[1]) > -1)
+                else if (cm && cm[1] && cc_nz.indexOf(cm[1]) > -1)
                     return 'https://nz.static.mega.co.nz/3/';
-				else if (cm && cm[1] && cc_eu.indexOf(cm[1]) == -1)
+                else if (cm && cm[1] && cc_eu.indexOf(cm[1]) == -1)
                     return 'https://g.cdn1.mega.co.nz/3/';
             }
         } catch(e) {
@@ -2335,8 +2335,8 @@ else if (!b_u)
             dl_res= false;
             boot_done();
         };
-		var esid='';
-		if (u_storage.sid) esid = u_storage.sid;
+        var esid='';
+        if (u_storage.sid) esid = u_storage.sid;
         dlxhr.open("POST", apipath + 'cs?id=0' + mega.urlParams(), true);
         dlxhr.send(JSON.stringify([{ 'a': 'g', p: page.substr(1,8), 'ad': showAd(),'esid':esid }]));
     }

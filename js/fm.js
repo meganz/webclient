@@ -6288,12 +6288,12 @@ function contextMenuUI(e, ll) {
         id = $(e.currentTarget).attr('id');
 
         if (id) {
-            
+
             // Contacts left panel click
             if (id.indexOf('contact_') !== -1) {
                 id = id.replace('contact_', '');
             }
-            
+
             // File manager left panel click
             else if (id.indexOf('treea_') !== -1) {
                 id = id.replace('treea_', '');
@@ -8589,6 +8589,14 @@ function closeDialog() {
     if ($('.fm-dialog.incoming-call-dialog').is(':visible') === true) {
         // managing dialogs should be done properly in the future, so that we won't need ^^ bad stuff like this one
         return false;
+    }
+
+    if ($.dialog === 'passwordlink-dialog') {
+        if (String(page).substr(0, 2) === 'P!') {
+            // do nothing while on the password-link page
+            return false;
+        }
+        $('.fm-dialog.password-dialog').addClass('hidden');
     }
 
     if ($.dialog === 'createfolder' && ($.copyDialog || $.moveDialog)) {

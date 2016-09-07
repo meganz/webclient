@@ -55,6 +55,58 @@
             next(err, content);
         };
     }
+
+    function readLength(bytes, i) {
+        var viewer = new DataView(bytes.slice(i, i + 4));
+        return viewer.getUint32(0);
+    }
+
+    function parse_pack(bytes) {
+        var mime;
+        var type;
+        var nameLen;
+        var name;
+        var content;
+        var e = 0;
+        var binary = new Uint8Array(bytes);
+        var hash = {};
+
+                
+        for (var i = 0; i < bytes.byteLength;) {
+            size = readLength(bytes, i);
+            i += 4; /* 4 bytes */
+
+            type = binary[i++];
+            nameLen = binary[i++];
+            name = ab_to_str(bytes.slice(i, nameLen + i));
+
+            i += nameLen;
+
+            content = bytes.slice(i, i + size);
+
+            switch (type) {
+            case 3:
+                hash[name] = {
+                    html: ab_to_str(content).replace(/(?:{|%7B)cmspath(?:%7D|})/g, CMS.getUrl()),
+                    mime: type
+                };
+                break;
+
+            case 2:
+                try {
+                    hash[name] = { object: JSON.parse(ab_to_str(content)), mime: type };
+                } catch (err) {
+                    /* invalid json, weird case */
+                    hash[name] = { object: {}, mime: type };
+                }
+                break;
+            }
+
+            i += size;
+        }
+
+        return hash;
+    }
     
     function verify_cms_content(content, signature, objectId) {
         var hash  = asmCrypto.SHA256.bytes(content);
@@ -129,6 +181,10 @@
                 }
                 next(false, { object: content, mime: mime});
                 return loaded(id);
+
+            case 5:
+                next(false, parse_pack(content));
+                break;
     
             default:
                 var io = new MemoryIO("temp", {});
@@ -357,7 +413,7 @@
                     return callback(err);
                 }
 
-                CMS.get(data.object[1], function(err) {
+                CMS.get(data.object, function(err) {
                     if (err) {
                         return callback(err);
                     }
@@ -365,8 +421,14 @@
                     var hash = {};
                     var args = Array.prototype.slice.call(arguments);
 
-                    data.object[0].map(function(name, id) {
-                        hash[name] = args[id + 1];
+                    args.shift();
+
+                    args.map(function(index) {
+                        for (var name in index) {
+                            if (index.hasOwnProperty(name)) {
+                                hash[name] = index[name];
+                            }
+                        }
                     });
 
                     callback(err, hash);

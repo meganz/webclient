@@ -791,6 +791,12 @@ var Help = (function() {
             return alert("Invalid response from the server");
         }
 
+        for (var name in blobs) {
+            if (blobs.hasOwnProperty(name)) {
+                blobs[name.replace(/\.[a-z]{2}$/, '')] = blobs[name];
+            }
+        }
+
         Data = blobs;
         titles = [];
         titles = blobs.help_search.object.map(function(entry) {

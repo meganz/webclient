@@ -1150,7 +1150,8 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
             asyncApiReq({
                 "a":"mcst",
                 "id":chatRoom.chatId,
-                "ct":btoa(topic)
+                "ct":btoa(topic),
+                "v": Chatd.VERSION
             });
         });
 

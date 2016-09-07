@@ -1535,7 +1535,8 @@ var ConversationPanel = React.createClass({
                             asyncApiReq({
                                 "a":"mcst",
                                 "id":self.props.chatRoom.chatId,
-                                "ct":base64urlencode(topic)
+                                "ct":base64urlencode(topic),
+                                "v": Chatd.VERSION
                             });
                         }
                     };

@@ -25734,3 +25734,10 @@ table.speed-table {
     opacity: 0.5 !important;
     background-color: rgb(102, 102, 102) !important;
 }
+
+body.megaChatDisabled .nw-fm-left-icon.conversations,
+body.megaChatDisabled .fm-start-conversation,
+body.megaChatDisabled .nw-contact-name .button.start-chat-button
+{
+    display: none;
+}

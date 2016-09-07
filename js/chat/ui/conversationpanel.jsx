@@ -177,7 +177,7 @@ var ConversationRightArea = React.createClass({
         //     myPresence === 'offline'
         // );
 
-        return <div className="chat-right-area">
+        return <div className="chat-right-area left-border">
             <div className="chat-right-area conversation-details-scroll">
                 <div className="chat-right-pad">
 

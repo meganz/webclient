@@ -5750,7 +5750,7 @@
 	  return element;
 	};
 
-	ReactElement.makeElement = function (type, config, children) {
+	ReactElement.createElement = function (type, config, children) {
 	  var propName;
 
 	  // Reserved names are extracted
@@ -5801,7 +5801,7 @@
 	};
 
 	ReactElement.createFactory = function (type) {
-	  var factory = ReactElement.makeElement.bind(null, type);
+	  var factory = ReactElement.createElement.bind(null, type);
 	  // Expose the type on the factory and the prototype so that it can be
 	  // easily accessed on elements. E.g. `<Foo />.type === Foo`.
 	  // This should not be named `constructor` since this may not be the function
@@ -8738,13 +8738,9 @@
 
 	var ReactEmptyComponentInjection = {
 	  injectEmptyComponent: function (component) {
-	    placeholderElement = ReactElement.makeElement(component);
+	    placeholderElement = ReactElement.createElement(component);
 	  }
 	};
-
-	function registerNullComponentID() {
-	  ReactEmptyComponentRegistry.registerNullComponentID(this._rootNodeID);
-	}
 
 	var ReactEmptyComponent = function (instantiate) {
 	  this._currentElement = null;
@@ -8754,7 +8750,7 @@
 	assign(ReactEmptyComponent.prototype, {
 	  construct: function (element) {},
 	  mountComponent: function (rootID, transaction, context) {
-	    transaction.getReactMountReady().enqueue(registerNullComponentID, this);
+	    ReactEmptyComponentRegistry.registerNullComponentID(rootID);
 	    this._rootNodeID = rootID;
 	    return ReactReconciler.mountComponent(this._renderedComponent, rootID, transaction, context);
 	  },
@@ -9748,7 +9744,6 @@
 	 */
 	var EventInterface = {
 	  type: null,
-	  target: null,
 	  // currentTarget is set when dispatching; no use in copying it here
 	  currentTarget: emptyFunction.thatReturnsNull,
 	  eventPhase: null,
@@ -9782,6 +9777,8 @@
 	  this.dispatchConfig = dispatchConfig;
 	  this.dispatchMarker = dispatchMarker;
 	  this.nativeEvent = nativeEvent;
+	  this.target = nativeEventTarget;
+	  this.currentTarget = nativeEventTarget;
 
 	  var Interface = this.constructor.Interface;
 	  for (var propName in Interface) {
@@ -9792,11 +9789,7 @@
 	    if (normalize) {
 	      this[propName] = normalize(nativeEvent);
 	    } else {
-	      if (propName === 'target') {
-	        this.target = nativeEventTarget;
-	      } else {
-	        this[propName] = nativeEvent[propName];
-	      }
+	      this[propName] = nativeEvent[propName];
 	    }
 	  }
 
@@ -13479,10 +13472,7 @@
 	      }
 	    });
 
-	    if (content) {
-	      nativeProps.children = content;
-	    }
-
+	    nativeProps.children = content;
 	    return nativeProps;
 	  }
 
@@ -18265,7 +18255,7 @@
 
 	'use strict';
 
-	module.exports = '0.14.8';
+	module.exports = '0.14.6';
 
 /***/ },
 /* 143 */
@@ -18556,7 +18546,7 @@
 	var assign = __webpack_require__(39);
 	var onlyChild = __webpack_require__(152);
 
-	var createElement = ReactElement.makeElement;
+	var createElement = ReactElement.createElement;
 	var createFactory = ReactElement.createFactory;
 	var cloneElement = ReactElement.cloneElement;
 
@@ -19006,7 +18996,7 @@
 	    // succeed and there will likely be errors in render.
 
 
-	    var element = ReactElement.makeElement.apply(this, arguments);
+	    var element = ReactElement.createElement.apply(this, arguments);
 
 	    // The result can be nullish if a mock or a custom function is used.
 	    // TODO: Drop this when these are no longer allowed as the type argument.
@@ -19031,7 +19021,7 @@
 	  },
 
 	  createFactory: function (type) {
-	    var validatedFactory = ReactElementValidator.makeElement.bind(null, type);
+	    var validatedFactory = ReactElementValidator.createElement.bind(null, type);
 	    // Legacy hook TODO: Warn if this is accessed
 	    validatedFactory.type = type;
 
@@ -22974,7 +22964,7 @@
 
 	        return React.makeElement(
 	            "div",
-	            { className: "chat-right-area" },
+	            { className: "chat-right-area left-border" },
 	            React.makeElement(
 	                "div",
 	                { className: "chat-right-area conversation-details-scroll" },

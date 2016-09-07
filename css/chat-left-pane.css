@@ -4,10 +4,10 @@
 	list-style-type: none;
 }
 .section.conversations .fm-left-panel {
-    height: -webkit-calc(100% +48px);
-    height: -moz-calc(100% + 48px);
-    height: calc(100% + 48px);
-    margin: -48px 0 0 0;
+    height: -webkit-calc(100% +36px);
+    height: -moz-calc(100% + 36px);
+    height: calc(100% + 36px);
+    margin: -36px 0 0 0;
 }
 .content-panel.conversations {
     background-image: url(../images/mega/nw-chat-bg.svg);

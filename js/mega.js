@@ -70,6 +70,7 @@ if (typeof loadingInitDialog === 'undefined') {
         }
         this.hide();
         $('.light-overlay').removeClass('hidden');
+        $('body').addClass('loading');
         $('.loading-spinner:not(.manual-management)').removeClass('hidden').addClass('init active');
         this.active = true;
     };
@@ -105,6 +106,7 @@ if (typeof loadingInitDialog === 'undefined') {
         this.active = false;
         this.progress = false;
         $('.light-overlay').addClass('hidden');
+        $('body').removeClass('loading');
         $('.loading-spinner:not(.manual-management)').addClass('hidden').removeClass('init active');
         $('.loading-info li').removeClass('loading loaded');
         $('.loader-progressbar').removeClass('active');

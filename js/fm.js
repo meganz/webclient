@@ -11897,17 +11897,6 @@ function fm_resize_handler() {
         'margin-left': ($('.fm-left-panel:visible').width() + $('.nw-fm-left-icons-panel').width()) + "px"
     });
 
-    if (M.currentrootid === 'shares') {
-        var shared_block_height = $('.shared-details-block').height() - $('.shared-top-details').height();
-
-        if (shared_block_height > 0) {
-            $('.shared-details-block .files-grid-view, .shared-details-block .fm-blocks-view').css({
-                'height': shared_block_height + "px",
-                'min-height': shared_block_height + "px"
-            });
-        }
-    }
-
     if (d) {
         console.timeEnd('fm_resize_handler');
     }

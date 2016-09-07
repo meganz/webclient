@@ -10,9 +10,9 @@
 }
 .section.conversations {
     height: 100%;
-    height: -webkit-calc(100% -48px);
-    height: -moz-calc(100% - 48px);
-    height: calc(100% - 48px);
+    height: -webkit-calc(100% -36px);
+    height: -moz-calc(100% - 36px);
+    height: calc(100% - 36px);
 }
 .section.conversations .fm-right-files-block {
     height: 100%;
@@ -20,7 +20,7 @@
 .nw-fm-tree-header.conversations .button {
     position: absolute;
     right: 12px;
-    top: 12px;
+    top: 6px;
     padding: 2px;
 }
 .conversation-panels, .conversation-panel {
@@ -38,6 +38,13 @@
     width: 256px;
     height: 100%;
     float: right;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    background-color: white;
+}
+.chat-right-area.left-border {
+    border-left: 1px solid rgba(0,0,0,0.1);
 }
 .chat-right-area .chat-right-area {
     float: none;

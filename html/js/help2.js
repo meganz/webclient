@@ -111,7 +111,14 @@ var Help = (function() {
 
     var setHash = SoonFc(function(hash) {
         if (hash !== document.location.hash) {
-            history.pushState({}, "page 2", document.location.pathname + hash);
+            try {
+                history.pushState({}, "page 2", document.location.pathname + hash);
+            }
+            catch (ex) {
+                // Fx Extension while using `mega:` protocol...
+                skipHashChange = true;
+                location.hash = hash;
+            }
         }
     }, 1000);
 
@@ -230,10 +237,10 @@ var Help = (function() {
 
         $container.find('form').rebind('submit', function(e) {
             e.preventDefault();
-            
+
             // Log search submitted
             api_req({ a: 'log', e: 99619, m: 'Help2 regular search feature used' });
-            
+
             document.location.href = url("search", $(this).find('input[type="text"]').val());
         });
 
@@ -246,12 +253,12 @@ var Help = (function() {
                 },
                 appendTo: $this.parent().parent(),
                 select: function(event, ui) {
-                    
+
                     // Log autocomplete item in search clicked
                     api_req({ a: 'log', e: 99620, m: 'Help2 autocomplete search feature used' });
 
                     $('.close-icon').trigger('click');
-                    
+
                     document.location.href = ui.item.url;
                 }
             });
@@ -636,7 +643,7 @@ var Help = (function() {
                 document.location.href = "#help/welcome";
                 return;
             }
-                
+
 
             parsepage(data.html);
 
@@ -864,10 +871,10 @@ var Help = (function() {
                     login_next = url;
                     url = "#login";
                 }
-                
+
                 // Log that they clicked on the panel
                 api_req({ a: 'log', e: 99621, m: 'Help2 client selection panel used' });
-                
+
                 document.location.href = url;
             }
         });
@@ -881,7 +888,7 @@ var Help = (function() {
         });
 
         // FAQ items logging
-        $('#help2-main .popular-question-items a').rebind('click', function() {
+        $('#help2-main .popular-question-items a').rebind('click.help2', function() {
             api_req({ a: 'log', e: 99622, m: 'Help2 FAQ item selected' });
         });
 

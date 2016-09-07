@@ -29,6 +29,7 @@ import argparse
 import os
 import sys
 import re
+import codecs
 import logging
 import tempfile
 import subprocess
@@ -321,6 +322,31 @@ def reduce_htmlhint(file_line_mapping, **extra):
     return re.sub('\n+', '\n', '\n\n'.join(result).rstrip()), 1
 
 
+def analyse_files_for_special_chars(filename, result):
+    """
+    Analyses a file for characters with unicode code >= 128.
+
+    :param filename: Name/path of file to analyse.
+    :return: True, if wide characters are found. False otherwise.
+    """
+    test_fail = False
+    try:
+        with codecs.open(filename, encoding='ascii') as fd:
+            fd.read()
+    except UnicodeDecodeError:
+        # We've got a special character we don't like.
+        with codecs.open(filename, encoding='utf8') as fd:
+            lines = fd.readlines()
+            for linenumber, line in enumerate(lines):
+                for column, character in enumerate(line):
+                    code = ord(character)
+                    if code >= 128:
+                        result.append('Found non-ASCII character {} at file {}, line {}, column {}'
+                                     .format(code, filename, linenumber, column))
+                        test_fail = True
+
+    return test_fail
+
 def inspectjs(file, ln, line, result):
     fatal = 0
     line = line.strip()
@@ -355,6 +381,7 @@ def reduce_validator(file_line_mapping, **extra):
     """
 
     exclude = ['vendor', 'asm', 'sjcl']
+    special_chars_exclude = ['secureboot']
     logging.info('Analyzing modified files ...')
     result = ['\nValidator output:\n=================']
     warning = 'This is a security product. Do not add unverifiable code to the repository!'
@@ -363,6 +390,11 @@ def reduce_validator(file_line_mapping, **extra):
     for filename, line_set in file_line_mapping.items():
         file_path = os.path.join(*filename)
         file_extension = os.path.splitext(file_path)[-1]
+
+        if not any([n in file_path for n in special_chars_exclude]):
+            if analyse_files_for_special_chars(file_path, result):
+                fatal += 1
+                break
 
         # Ignore known custom made files
         if file_path in config.VALIDATOR_IGNORE_FILES:

@@ -638,6 +638,7 @@ var exportPassword = {
             fm_showoverlay();
 
             // Show the dialog
+            $.dialog = 'passwordlink-dialog';
             this.$dialog.removeClass('hidden');
 
             // Reset state of dialog for future password link decryptions

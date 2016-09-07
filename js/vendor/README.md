@@ -120,6 +120,9 @@ Unless otherwise noted, they were released under a [MIT License].
 [notification.js]: A shim polyfill for adding notifications to browsers which offer limited support.
 
 ---
+[react-dom.js, react.js]: A declarative, efficient, and flexible JavaScript library for building user interfaces.
+
+---
 [smartcrop.js]: Content aware image cropping.
 
 > **This is a fork**, [Compare the changes](https://github.com/jwagner/smartcrop.js/compare/master...meganz:master)
@@ -183,6 +186,7 @@ Unless otherwise noted, they were released under a [MIT License].
 [nacl-fast.js]: <https://github.com/dchest/tweetnacl-js/tree/v0.13.1>
 [notification.js]: <https://github.com/MrSwitch/notification.js/tree/v0.0.1>
 [qrcode.js]: <https://github.com/jeromeetienne/jquery-qrcode/blob/2bad93deab2f0ec66451b0cc962d56fad6fba403/src/qrcode.js>
+[react-dom.js, react.js]: https://github.com/facebook/react/tree/v0.14.8
 [smartcrop.js]: <https://github.com/meganz/smartcrop.js>
 [zxcvbn.js]: <https://github.com/dropbox/zxcvbn/tree/1.0.1>
 [chat/strophe.light.js]: <https://github.com/strophe/strophejs/tree/30033f05eded0bb079e8c06a75045f195068d896>

@@ -20,6 +20,11 @@ var webpackConfigs = {
             filename: "js/chat/bundle.js"
         },
         devtool: "source-map",
+        externals: {
+            "jquery": "jQuery",
+            "react": "React",
+            "react-dom": "ReactDOM",
+        },
         module: {
             loaders: [
                 {test: /\.less$/, loader: "style!css!less"},
@@ -36,6 +41,7 @@ var webpackConfigs = {
         },
         plugins: [
             //new webpack.HotModuleReplacementPlugin(),
+            new webpack.BannerPlugin("React.makeElement = React['createElement'];", { raw: true }),
             new webpack.NoErrorsPlugin()
         ]
     },
@@ -55,7 +61,13 @@ var webpackConfigs = {
                 {test: /\.json$/, loader: "json"}
             ]
         },
+        externals: {
+            "jquery": "jQuery",
+            "react": "React",
+            "react-dom": "ReactDOM",
+        },
         plugins: [
+            new webpack.BannerPlugin("React.makeElement = React['createElement'];", { raw: true }),
             new webpack.DefinePlugin({
                 "process.env": {
                     NODE_ENV: JSON.stringify("production"),

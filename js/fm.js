@@ -6308,7 +6308,11 @@ function contextMenuUI(e, ll) {
 
         // In case that id belongs to contact, 11 char length
         if (id && (id.length === 11)) {
-            $(menuCMI).filter('.remove-item,.startchat-item,.startaudio-item,.startvideo-item').show();// transfer panel
+            flt = '.remove-item';
+            if (!window.megaChatIsDisabled) {
+                flt += ',.startchat-item,.startaudio-item,.startvideo-item';
+            }
+            $(menuCMI).filter(flt).show();
 
             $(menuCMI).filter('.startaudio-item,.startvideo-item').removeClass('disabled');
 

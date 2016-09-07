@@ -33,13 +33,19 @@
             });
         });
 
-        ion.sound({
+        sounds = {
             sounds: sounds,
             volume: self.options.soundsVolume,
             path: self.options.soundsPath,
             preload: self.options.soundsPreload,
             allow_cache: false
-        });
+        };
+        try {
+            ion.sound(sounds);
+        }
+        catch (ex) {
+            console.warn(ex);
+        }
 
         if (self.options.showFaviconCounter) {
             assert(Favico, 'Favico.js is missing.');

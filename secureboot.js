@@ -134,9 +134,11 @@ try {
                 status = val;
                 if (status) {
                     $(document.body).addClass("megaChatDisabled");
+                    $('.nw-fm-left-icon.conversations, .fm-start-conversation').addClass('hidden');
                 }
                 else {
                     $(document.body).removeClass("megaChatDisabled");
+                    $('.nw-fm-left-icon.conversations, .fm-start-conversation').removeClass('hidden');
                 }
             },
             get: function() {

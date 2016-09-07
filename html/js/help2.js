@@ -793,7 +793,7 @@ var Help = (function() {
 
         Data = blobs;
         titles = [];
-        titles = blobs.help_titles.object.map(function(entry) {
+        titles = blobs.help_search.object.map(function(entry) {
             entry.label = entry.title;
             entry.value = entry.title;
             entry.url   = "#help/client/" + entry.id;

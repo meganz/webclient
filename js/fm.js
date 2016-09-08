@@ -4696,7 +4696,7 @@ function gridUI() {
         return !!contextMenuUI(e, 6);
     });
 
-    $('.files-grid-view,.fm-empty-cloud').rebind('contextmenu', function(e) {
+    $('.files-grid-view, .fm-empty-cloud, .fm-empty-folder').rebind('contextmenu.fm', function(e) {
         $('.file-block').removeClass('ui-selected');
         $.selected = [];
         $.hideTopMenu();

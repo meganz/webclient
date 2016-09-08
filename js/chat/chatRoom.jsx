@@ -181,7 +181,14 @@ makeObservable(ChatRoom);
 /**
  * Room states
  *
- * @type {{INITIALIZED: number, JOINING: number, JOINED: number, WAITING_FOR_PARTICIPANTS: number, PARTICIPANTS_HAD_JOINED: number, READY: number, LEAVING: number, LEFT: number}}
+ * @type {{INITIALIZED: number,
+           JOINING: number,
+           JOINED: number,
+           WAITING_FOR_PARTICIPANTS: number,
+           PARTICIPANTS_HAD_JOINED: number,
+           READY: number,
+           LEAVING: number,
+           LEFT: number}}
  */
 ChatRoom.STATE = {
     'INITIALIZED': 5,
@@ -290,7 +297,10 @@ ChatRoom.prototype.setState = function(newState, isRecover) {
             (newState === ChatRoom.STATE.JOINING && isRecover) ||
             (newState === ChatRoom.STATE.INITIALIZED && isRecover) ||
             newState > self.state,
-            'Invalid state change. Current:' + ChatRoom.stateToText(self.state) +  "to" + ChatRoom.stateToText(newState)
+            'Invalid state change. Current:'
+            + ChatRoom.stateToText(self.state)
+            +  "to"
+            + ChatRoom.stateToText(newState)
         );
     }
 

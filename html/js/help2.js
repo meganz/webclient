@@ -599,7 +599,7 @@ var Help = (function() {
 
                 $('<div>').addClass('search-result-filter')
                     .append($('<div>').addClass('result-filter-icon'))
-                    .append($('<div>').addClass('result-filter-result').text(12))
+                    .append($('<div>').addClass('result-filter-result').text(article.ups))
                     .appendTo($footer);
 
                 article.tags.map(function(tag) {

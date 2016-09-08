@@ -42,10 +42,28 @@ copyright.validateUrl = function(url) {
  * @return {Object} hashset of handles
  */
 copyright.getHandles = function(data) {
+
     var handles = {};
+    var passwordLinkPattern = /(#P!)([\w-]+)\b/gi;
+
+    // Find the handles for any password protected link
+    data = data.replace(passwordLinkPattern, function(fullUrlHash, passwordLinkId, urlEncodedData) {
+
+        // Decode the Base64 URL encoded data and get the 6 bytes for the handle, then re-encode the handle to Base64
+        var bytes = exportPassword.base64UrlDecode(urlEncodedData);
+        var handle = bytes.subarray(2, 8);
+        var handleBase64 = exportPassword.base64UrlEncode(handle);
+
+        // Add the handle
+        handles[handleBase64] = 1;
+
+        // Remove the link so the bottom code doesn't detect it as well
+        return '';
+    });
+
     var p = /.(?:F?!|\w+\=)([\w-]{8})(?:!([\w-]+))?\b/gi;
 
-    (data.replace(/<\/?\w[^>]+>/g,'').replace(/\s+/g,'')+data).replace(p,function(a,id,key) {
+    (data.replace(/<\/?\w[^>]+>/g, '').replace(/\s+/g, '') + data).replace(p, function(a, id, key) {
         if (!handles[id]) {
             handles[id] = 1;
         }

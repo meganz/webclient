@@ -2003,10 +2003,10 @@ var directReseller = {
             // Must perform a country test, as Gary has a different url for Japan
             var country = utcResult['EUR']['cc'];
             var baseurl = 'https://mega.and1.tw/zh_tw/order_mega.php?';
-            if (typeof country !== 'undefined')
-            {
-                if (country.toLowerCase() === 'jp')
-                {
+
+            // Check that country is defined, as originally the API did not provide it
+            if (typeof country !== 'undefined') {
+                if (country.toLowerCase() === 'jp') {
                     baseurl = 'https://mega.and1.tw/jp/order_mega.php?';
                 }
             }

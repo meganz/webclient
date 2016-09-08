@@ -2535,6 +2535,30 @@ function MegaData()
         }
     };
 
+    /** Don't report `newmissingkeys` unless there are *new* missing keys */
+    this.checkNewMissingKeys = function() {
+        var result = true;
+
+        try {
+            var keys = Object.keys(missingkeys).sort();
+            var hash = MurmurHash3(JSON.stringify(keys));
+            var prop = u_handle + '_lastMissingKeysHash';
+            var oldh = parseInt(localStorage[prop]);
+
+            if (oldh !== hash) {
+                localStorage[prop] = hash;
+            }
+            else {
+                result = false;
+            }
+        }
+        catch (ex) {
+            console.error(ex);
+        }
+
+        return result;
+    };
+
     /**
      * Check existance of contact/pending contact
      *
@@ -6651,7 +6675,9 @@ function process_f(f, cb, retry)
                 process_f(f, cb, 1);
             }
             else {
-                if (cb) cb(!!newmissingkeys);
+                if (cb) {
+                    cb(newmissingkeys && M.checkNewMissingKeys());
+                }
             }
             if (d) console.timeEnd('process_f');
         }

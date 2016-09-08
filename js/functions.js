@@ -2430,22 +2430,7 @@ mSpawnWorker.prototype = {
 
             // Don't report `newmissingkeys` unless there are *new* missing keys
             if (job.newmissingkeys) {
-                try {
-                    var keys = Object.keys(u_nodekeys).sort();
-                    var hash = MurmurHash3(JSON.stringify(keys));
-                    var prop = u_handle + '_lastMissingKeysHash';
-                    var oldh = parseInt(localStorage[prop]);
-
-                    if (oldh !== hash) {
-                        localStorage[prop] = hash;
-                    }
-                    else {
-                        job.newmissingkeys = false;
-                    }
-                }
-                catch (ex) {
-                    console.error(ex);
-                }
+                job.newmissingkeys = M.checkNewMissingKeys();
             }
 
             delete this.jobs[reply.jid];

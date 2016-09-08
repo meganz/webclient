@@ -1198,7 +1198,7 @@ else if (!b_u)
                 // loading the site, this should only happen on some fancy
                 // browsers other than what we use during development, and
                 // hopefully they'll report it back to us for troubleshoot
-                if (url || ln !== 1) {
+                if ((url || ln !== 1) && dump.m.indexOf('Error: Blocked') < 0) {
                     siteLoadError(dump.m, url + ':' + ln);
                 }
                 else {

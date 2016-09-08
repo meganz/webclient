@@ -716,13 +716,15 @@ function initUI() {
             $.hideTopMenu(e);
         }
         var $target = $(e.target);
+        var exclude = '.upgradelink, .campaign-logo, .resellerbuy, .linkified, a.red';
 
         if ($target.attr('data-reactid') || $target.is('.chatlink')) {
             // chat can handle its own links..no need to return false on every "click" and "element" :O
             return;
         }
         if ($target.attr('type') !== 'file'
-                && !$target.is('.upgradelink, .campaign-logo, .resellerbuy, .linkified, a.red')) {
+                && !$target.is(exclude)
+                && !$target.parent().is(exclude)) {
             return false;
         }
     });
@@ -4231,6 +4233,10 @@ function accountUI() {
         });
 
         if (M.account.reseller) {
+            var email = 'resellers@mega.nz';
+
+            $('.resellerbuy').attr('href', 'mailto:' + email)
+                .find('span').text(l[9106].replace('%1', email));
 
             // Use 'All' or 'Last 10/100/250' for the dropdown text
             var buttonText = ($.voucherlimit === 'all') ? l[7557] : l['466a'].replace('[X]', $.voucherlimit);

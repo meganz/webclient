@@ -7589,7 +7589,7 @@ function Random_seed ( seed ) {
     if ( !is_buffer(seed) && !is_typed_array(seed) )
         throw new TypeError("bad seed type");
 
-    var bpos = seed.byteOffest || 0,
+    var bpos = seed.byteOffset || 0,
         blen = seed.byteLength || seed.length,
         buff = new Uint8Array( ( seed.buffer || seed ), bpos, blen );
 
@@ -10926,4 +10926,3 @@ exports.RSA_RAW = RSA_RAW;
 
 return exports;
 })( {}, function(){return this}() );
-//# sourceMappingURL=asmcrypto.js.map

@@ -6,19 +6,17 @@ Unless otherwise noted, they were released under a [MIT License].
 ---
 [asmcrypto.js]: asmCrypto - JavaScript Cryptographic Library with performance in mind.
 
+> **This is a fork**, [Compare the changes](https://github.com/vibornoff/asmcrypto.js/compare/master...meganz:master)
+>
 > NB: We are using a custom, unobfuscated build which was created using:
 > 
 > ```bash
-> git clone https://github.com/vibornoff/asmcrypto.js.git
-> git checkout a0ac7b98ad5401d595a78516c7591a4980799b08  (using fixes in master since last v0.0.10 release)
-> npm install
-> grunt --with="common,utils,exports,globals,aes,aes-ecb,aes-cbc,aes-ctr,aes-ccm,aes-gcm,aes-exports,aes-ecb-exports,aes-cbc-exports,aes-ctr-exports,aes-ccm-exports,aes-gcm-exports,hash,sha256,sha256-exports,sha512,sha512-exports,hmac,hmac-sha256,hmac-sha512,hmac-sha256-exports,hmac-sha512-exports,pbkdf2,pbkdf2-hmac-sha512,pbkdf2-hmac-sha512-exports,rng,rng-exports,rng-globals,bn,bn-exports,rsa,rsa-raw,rsa-keygen-exports,rsa-raw-exports" devel
-> In our code special UTF-8 characters are removed for better SHA-256 hashing performance so a few comments were changed:
-> 1) Find and replace the special character '—' with a regular hyphen '-'.
-> 2) Find and replace the special character '²' with '^2'.
-> 3) Find and replace the special character '×' with 'x'.
-> 4) Find and replace the special character '≤' with '<='.
+> git clone https://github.com/meganz/asmcrypto.js.git
+> cd asmcrypto.js
+> build.sh
 > ```
+>
+> If that doesn't creates an 1:1 copy, try `build.sh master` (that'll build the file from master, as opposed to latest tagged version)
 
 ---
 [autolinker.js]: Utility to Automatically Link URLs, Email Addresses, Phone Numbers, Twitter handles, and Hashtags in a given block of text/HTML.
@@ -159,7 +157,7 @@ Unless otherwise noted, they were released under a [MIT License].
 
 [MIT License]: <https://opensource.org/licenses/MIT>
 [Emscripten]: <http://emscripten.org/>
-[asmcrypto.js]: <https://github.com/vibornoff/asmcrypto.js/tree/a0ac7b98ad5401d595a78516c7591a4980799b08>
+[asmcrypto.js]: <https://github.com/meganz/asmcrypto.js>
 [autolinker.js]: <https://github.com/gregjacobs/Autolinker.js/tree/0.12.3/dist>
 [avatar.js]: <https://github.com/meganz/avatar-picker>
 [bitcoin-math.js]: <https://github.com/meganz/bitcoin-math>

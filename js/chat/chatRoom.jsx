@@ -43,7 +43,8 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
             chatdUrl: undefined,
             chatShard: undefined,
             members: {},
-            membersLoaded: false
+            membersLoaded: false,
+            topic: ""
         },
         true
     );
@@ -581,6 +582,10 @@ ChatRoom.prototype.getRoomTitle = function() {
         return self.megaChat.getContactNameFromJid(participants[0]);
     }
     else {
+        if (self.topic) {
+            return self.topic;
+        }
+
         var participants = self.members && Object.keys(self.members).length > 0 ? Object.keys(self.members) : [];
         var names = [];
         participants.forEach(function(contactHash) {

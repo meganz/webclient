@@ -326,8 +326,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
 
     self.chatd.rebind('onMessageLastReceived.messagesBuff' + chatRoomId, function(e, eventData) {
         var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
-
-        if (chatRoom.roomJid === self.chatRoom.roomJid) {
+        if (chatRoom && chatRoom.roomJid === self.chatRoom.roomJid) {
             self.setLastReceived(eventData.messageId);
         }
     });

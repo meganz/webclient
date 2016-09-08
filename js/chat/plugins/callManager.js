@@ -1394,9 +1394,6 @@ CallManager.prototype.startCall = function(chatRoom, mediaOptions) {
         }
         return;
     }
-    if (chatRoom._conv_ended === true) {
-        chatRoom._restartConversation();
-    }
 
     if (chatRoom.callSession && (chatRoom.callSession.isStarted() || chatRoom.callSession.isStarting())) {
         chatRoom.callSession.endCall();

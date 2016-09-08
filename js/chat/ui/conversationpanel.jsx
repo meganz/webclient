@@ -183,8 +183,11 @@ var ConversationRightArea = React.createClass({
 
                     {isReadOnlyElement}
                     {membersHeader}
-                    <ParticipantsList chatRoom={room} members={room.members}
-                                      isCurrentlyActive={room.isCurrentlyActive} />
+                    <ParticipantsList
+                        chatRoom={room}
+                        members={room.members}
+                        isCurrentlyActive={room.isCurrentlyActive}
+                    />
 
                     <div className="buttons-block">
                         {room.type !== "group" ? startAudioCallButton : null}
@@ -1483,6 +1486,7 @@ var ConversationPanel = React.createClass({
                 <div className="chat-content-block">
                     <ConversationRightArea
                         chatRoom={this.props.chatRoom}
+                        members={this.props.chatRoom.members}
                         contacts={self.props.contacts}
                         megaChat={this.props.chatRoom.megaChat}
                         messagesBuff={room.messagesBuff}

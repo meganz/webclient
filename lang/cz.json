@@ -3615,9 +3615,10 @@
     "9099": "Zkuste znovu hledat nebo se obra\u0165te p\u0159\u00edmo na n\u00e1\u0161 t\u00fdm podpory",
     "9100": "Podpora prost\u0159ednictv\u00edm e-mailu",
     "9101": "Pokud nem\u016f\u017eete nal\u00e9zt, co hled\u00e1te, obra\u0165te se na n\u00e1\u0161 t\u00fdm podpory pro p\u0159\u00edmou pomoc.",
-    "9102": "Go Back",
-    "9103": "Copy the link below to share the article.",
-    "9104": "Share the Article",
+    "9102": "Zp\u011bt",
+    "9103": "Zkop\u00edrujte n\u00ed\u017ee uveden\u00fd odkaz pro sd\u00edlen\u00ed \u010dl\u00e1nku.",
+    "9104": "Sd\u00edlet \u010dl\u00e1nek",
+    "9105": "Enter your search here...",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3798,6 +3799,7 @@
         "please-try-searching-again": 9099,
         "email-support": 9100,
         "contact-support-team-message": 9101,
-        "go-back": 9102
+        "go-back": 9102,
+        "enter-your-search-here": 9105
     }
 }

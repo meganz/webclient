@@ -1,69 +1,8 @@
-/* jshint ignore:start */
-/**
- *  Simple template engine
- *  https://github.com/snoguchi/simple-template.js
- */
-function compileTemplate(s, context, arg) {
-    var code = 'var out = "";';
-    var token = s.split('%>');
-
-    for (var key in context) {
-        if (context.hasOwnProperty(key)) {
-            code += 'var '  + key + ' = context.' + key + ";\n";
-        }
-    }
-
-    for (var i = 0, len = token.length; i < len; i++) {
-        var tmp = token[i].split('<%');
-        if (tmp[0]) {
-            var literal = tmp[0].replace(/\n/g, '\\n')
-                .replace(/\r/g, '\\r').replace(/\"/g, '\\"');
-            code += 'out+="' + literal + '";' + "\n";
-        }
-        if (tmp[1]) {
-            if (tmp[1].charAt(0) === '=') {
-                code += 'out+=escapeHTML(' + tmp[1].slice(1) + ');' + "\n";
-            } else if (tmp[1].charAt(0) === '!') {
-                code += 'out+=CMS.html(' + tmp[1].slice(1) + ');' + "\n";
-            } else {
-                code += tmp[1] + "\n";
-            }
-        }
-    }
-    code += 'return (out);';
-    return new Function('context', 'data', code).bind(null, context);
-}
-/* jshint ignore:end */
-
-/**
- *  Delayed - Delays the execution of a function
- *
- *  Wraps a function to execute at most once
- *  in a 100 ms time period. Useful to wrap
- *  expensive jQuery events (for instance scrolling
- *  events).
- *
- *  All argument and *this* is passed to the callback
- *  after the 100ms (default)
- *
- *  @param {Function} fFunction     Function to wrap
- *  @param {Integer}  tTimeout      Timeout
- *  @returns {Function} wrapped function
- */
-function delayed(fFunction, tTimeout) {
-    var timeout;
-    return function() {
-        var args = Array.prototype.slice.call(arguments);
-        args.unshift(this);
-
-        clearTimeout(timeout);
-        timeout = setTimeout(fFunction.bind.apply(fFunction, args), tTimeout || 100);
-    };
-}
 
 var Help = (function() {
     var ns = {};
     var clients = {};
+    var Data = {};
     var ready = false;
     var doRender = false;
     var idx;
@@ -77,7 +16,6 @@ var Help = (function() {
     var $currentQuestion = null;
 
 
-    var tpl = {};
     function tagUri(tag) {
         return tag.toLowerCase().replace(/[^a-z0-9]/g, '_');
     }
@@ -118,14 +56,7 @@ var Help = (function() {
         });
     }
 
-    tpl.goback_js = delayed(function(data) {
-
-        $('.support-go-back').rebind('click', function(e) {
-            e.preventDefault();
-            document.location.hash = getPreviousUrl(data);
-        });
-        $('.support-go-back-heading').text(getPreviousUrl(data) === url('welcome') ? 'Support Centre' : 'Go Back');
-
+    function searchAnimations() {
         var buttons = $('.support-search,.support-go-back');
         buttons.rebind('mouseover', function() {
             $(this).addClass('hover');
@@ -134,7 +65,7 @@ var Help = (function() {
         });
 
         $('.support-search').rebind('click', function(e) {
-            
+
             e.preventDefault();
             var $this = $(this);
             var $container = $('#help2-main');
@@ -142,7 +73,6 @@ var Help = (function() {
             var $popularQuestions = $(".popular-question-block");
             var $searchForm = $(".support-search-container");
             var $getStartTitle = $(".getstart-title-section", $container);
-
 
             if ($this.is('.close')) {
                 $('.support-search-heading').removeClass('hidden');
@@ -162,31 +92,9 @@ var Help = (function() {
                 $popularQuestions.fadeIn(500);
                 $searchForm.fadeIn(400);
                 $getStartTitle.addClass('hidden');
-                
+
             }
         });
-    }, 1);
-
-    function galleryHtml(html, gallery) {
-        return html.replace(/\[gallery:(\d+)\]/g, function(m, id) {
-            return tpl.gallery(gallery[id]);
-        });
-    }
-
-    function toArray(hash) {
-        var arr = [];
-        for (var key in hash) {
-            if (hash.hasOwnProperty(key)) {
-                arr.push(hash[key]);
-            }
-        }
-        
-        return arr;
-    }
-
-    function getPreviousUrl(data) {
-
-        return data.previous_url || getUrlParts().slice(0, 3).join('/');
     }
 
     function sortClients(client, clients) {
@@ -201,155 +109,22 @@ var Help = (function() {
         });
     }
 
-    // loadHelpData {{{
-    /**
-     * Load Help2 data from the CMS. This function also
-     * prepares all the data for searching (with elasticlunr full text
-     * search), compiles all the templates and prepare the suggestions
-     * for the search box.
-     *
-     * @param {Boolean} err      True if there was an invalid response from the server
-     * @param {Array}   response Question/Answer from the CMS
-     */
-    function loadHelpData(err, response) {
-        if (err) {
-            return alert("Invalid response from the server");
-        }
-        idx = { all: [] };
-        idx.search = elasticlunr(function() {
-            this.setRef('id');
-            this.addField('title', { boost: 10 });
-            this.addField('tags', { boost: 100 });
-            this.addField('body');
-        });
-        window.idx = idx;
-
-        ready = true;
-        clients = response.object;
-
-        // process each client {{{
-        clients.forEach(function(client, id) {
-            if (client.popular) {
-                clients.splice(id, 1);
-                popularQuestions = client.data;
-                return;
-            }
-
-            switch (client.url) {
-            case 'megasync':
-                switch (browserdetails().os) {
-                case 'Apple':
-                    client.big_icon = 'ios-megasync';
-                    break;
-                case 'Windows':
-                    client.big_icon = 'windows-megasync';
-                    break;
-                default:
-                    client.big_icon = 'linux-megasync';
-                    break;
-                }
-                break;
-            case 'webclient':
-                switch (browserdetails().os) {
-                case 'Apple':
-                    client.icon = 'ios-desktop';
-                    break;
-                case 'Windows':
-                    client.icon = 'windows-desktop';
-                    break;
-                default:
-                    client.icon = 'linux-desktop';
-                    break;
-                }
-                break;
-            }
-
-            client.sections.forEach(function(section) {
-                section.questions.forEach(function(question) {
-                    var data = {
-                        id: idx.all.length,
-                        url: url('client', client.url, section.url, question.url),
-                        client: client.name,
-                        client_url: client.url,
-                        title: question.question,
-                        body: strip_tags(question.answer).replace(/\[gallery:\d+\]/g, ''),
-                        tags: question.tags,
-                        ups: question.ups,
-                    };
-                    titles.push({
-                        label: question.question,
-                        value: question.question,
-                        client: client.name,
-                        url: data.url,
-                    });
-                    idx.all.push(data);
-                    idx.search.addDoc(data);
-                    question.full_url = data.url;
-                    question.client = client;
-                    question.section = section;
-                    articlesById[question.url] = question;
-                });
-            });
-        });
-        // }}}
-
-        for (var i = 0; i < popularQuestions.length; ++i) {
-            popularQuestions[i] = articlesById[popularQuestions[i]];
-        }
-
-        // Compile all templates
-        Object.keys(pages).filter(function(page) {
-            return page.match(/^help_|gallery/);
-        }).map(function(page) {
-            tpl[page.replace(/^help_/, '')] = compileTemplate(pages[page], {
-                // We share url (function), tpl (our templates)
-                // and clients (all our data) to *all* of our
-                // templates
-                galleryHtml: galleryHtml,
-                tags: tagsPerDocument,
-                tagUri: tagUri,
-                sortClients: sortClients,
-                url: url,
-                tpl: tpl,
-                clients: clients,
-                popularQuestions: popularQuestions,
-            });
-        });
-
-        titles = array_unique(titles);
-
-        if (doRender) {
-            ns.render();
-        }
-    }
-    // }}}
-
-    /**
-     * Subscribe to changes from the CMS.
-     */
-    CMS.watch('help2.en', function() {
-        CMS.get("help2.en", loadHelpData);
-    });
-
-    /**
-     * Get data from the CMS-server
-     */
-    CMS.get("help2.en", loadHelpData);
-
-    var setHash = delayed(function(hash) {
+    var setHash = SoonFc(function(hash) {
         if (hash !== document.location.hash) {
-            history.pushState({}, "page 2", document.location.pathname + hash);
+            try {
+                history.pushState({}, "page 2", document.location.pathname + hash);
+            }
+            catch (ex) {
+                // Fx Extension while using `mega:` protocol...
+                skipHashChange = true;
+                location.hash = hash;
+            }
         }
     }, 1000);
 
 
-    function filterByTag(tag) {
-        clients.forEach(function(section) {
-        });
-    }
-
     function url() {
-        return '#help/' + Array.prototype.slice.call(arguments).join("/");
+        return '#help/' + toArray.apply(null, arguments).join("/");
     }
 
     function selectMenuItem($element, $elements) {
@@ -399,14 +174,15 @@ var Help = (function() {
         }
 
         // not found
-        return notFound();
+        notFound();
+        return false;
     }
 
     function filterContentByTag(tag) {
         var $tag = $('.tag-' + tag);
         var $container = $('#help2-main');
         var validTags = [];
-        
+
         if ($tag.is('.active')) {
             $tag.removeClass('active');
             allTags.splice(allTags.indexOf(tag), 1);
@@ -414,7 +190,7 @@ var Help = (function() {
             $tag.addClass('active');
             allTags.push(tag);
         }
-        $('.content-by-tags,.content-by-tags-hide', $container).each(function() {
+        $('.content-by-tags', $container).each(function() {
             var $this = $(this);
             var tags  = $this.data('tags');
 
@@ -427,21 +203,10 @@ var Help = (function() {
             });
 
             if (!is) {
-                if ($this.is('.content-by-tags-hide')) {
-                    $this.addClass('gray-inactive');
-                } else {
-                    $this.hide();
-                }
-                $('*[data-to=\\#' + $this.attr('id')).addClass('gray-inactive');
+                $this.hide();
             } else {
-                $('*[data-to=\\#' + $this.attr('id')).removeClass('gray-inactive');
-                if ($this.is('.content-by-tags-hide')) {
-                    $this.removeClass('gray-inactive');
-                } else {
-                    $this.show();
-                }
+                $this.show();
                 validTags = validTags.concat(tags);
-
             }
         });
 
@@ -472,6 +237,10 @@ var Help = (function() {
 
         $container.find('form').rebind('submit', function(e) {
             e.preventDefault();
+
+            // Log search submitted
+            api_req({ a: 'log', e: 99619, m: 'Help2 regular search feature used' });
+
             document.location.href = url("search", $(this).find('input[type="text"]').val());
         });
 
@@ -484,6 +253,12 @@ var Help = (function() {
                 },
                 appendTo: $this.parent().parent(),
                 select: function(event, ui) {
+
+                    // Log autocomplete item in search clicked
+                    api_req({ a: 'log', e: 99620, m: 'Help2 autocomplete search feature used' });
+
+                    $('.close-icon').trigger('click');
+
                     document.location.href = ui.item.url;
                 }
             });
@@ -497,7 +272,6 @@ var Help = (function() {
                     .appendTo(ul);
             };
         });
-
 
         $('.support-tag', $container).rebind('click', function() {
             filterContentByTag($(this).data('tag'));
@@ -570,7 +344,7 @@ var Help = (function() {
             $this.parent().parent().children($headFeedBack).delay(200).fadeOut(300);
 
             $this.parent().siblings('.feedback-suggestions-list').delay(500).fadeIn(500, contentChanged);
-            
+
             $('.feedback-send').rebind('click', function() {
                 var data = {hash: $this.data('hash')};
                 $(this).parents('.feedback-suggestions-list').find('input,textarea')
@@ -592,12 +366,12 @@ var Help = (function() {
             $.post("https://cms2.mega.nz/feedback", {hash: $this.data('hash')});
             sent($this.parents('.article-feedback-container'));
         });
-        
+
         // When a radio button is clicked
         $radioButtons.rebind('click', function() {
             // Remove existing checked styles from the other radio buttons
             $radioButtons.removeClass('checked');
-            
+
             // Check just the selected radio button
             $(this).addClass('checked');
             $(this).find('input').prop('checked', true);
@@ -618,7 +392,7 @@ var Help = (function() {
         var $mobileDeviceBlock = $(".block-mobile-device", $container);
         var $mobileNavBlock = $(".mobile-block", $container);
         var timer;
-    
+
         $mobileNavBlock.rebind('mouseenter', function() {
             timer = setTimeout(function()   {
             $mobileDeviceBlock.fadeIn(300);
@@ -720,7 +494,11 @@ var Help = (function() {
 
         var $html = $('html,body');
 
-        $html.rebind('scroll', function() {
+        $html.rebind('scroll.help2', function() {
+            // TODO: write a cleanup function to be invoked when moving out of the #help section
+            if (String(location.hash).substr(0, 5) !== '#help') {
+                return $html.unbind('scroll.help2');
+            }
 
             if (($sideBar.hasClass('fixed')) && (($sideBar).is(":visible"))) {
                 $searchHeader.fadeOut(10);
@@ -729,8 +507,7 @@ var Help = (function() {
                 $searchHeader.fadeIn(300);
                 $cloneHeader.fadeOut(10);
             }
-
-        });
+        }).trigger('scroll');
 
 
         if ($searchContainer.hasClass('close')) {
@@ -741,7 +518,7 @@ var Help = (function() {
                     marginLeft: "8",
                     marginRight:"8"
                 }, 300, "easeOutQuart");
-                
+
             }, 300);
             })
             .rebind('mouseleave', function() {
@@ -750,7 +527,7 @@ var Help = (function() {
                     marginLeft: "16",
                     marginRight:"0"
                 }, 300, "easeOutQuart");
-                
+
             });
         } else {
             $searchContainer.rebind('mouseenter', function() {
@@ -759,7 +536,7 @@ var Help = (function() {
                     marginLeft: "8",
                     marginRight:"8"
                 }, 300, "easeOutQuart");
-            
+
             }, 300);
             })
             .rebind('mouseleave', function() {
@@ -768,7 +545,7 @@ var Help = (function() {
                     marginLeft: "16",
                     marginRight:"0"
                 }, 300, "easeOutQuart");
-                
+
             });
         }
     }
@@ -792,117 +569,136 @@ var Help = (function() {
                 return idx.all[result.ref];
             });
 
-            parsepage(tpl.search({
-                is_search: true,
-                hasResult : articles.length > 0,
-                search: args[1],
-                previous_url: url("welcome"),
-                articles: articles || [],
-            }));
+            parsepage(Data.help_search_tpl.html);
+
+            $('#help2-main .search').val(args[1]);
+
+            if (articles.lenght === 0) {
+                $('.search-404-block').show();
+                $('.main-search-pad').hide();
+            } else {
+                $('.search-404-block').hide();
+                $('.main-search-pad').show();
+            }
+
+            articles.reverse().map(function(article) {
+                var $article = $('<div>').addClass("search-result link content-by-tags")
+                    .data('href', "#help/client/" + article.id)
+                    .data('tags', article.tags.map(function(w) { return tagUri(w); }));
+
+                $('<div>').addClass('search-result-title')
+                    .text(article.title)
+                    .appendTo($article);
+
+                $('<div>').addClass('search-result-content')
+                    .text(article.body)
+                    .appendTo($article);
+
+                var $footer = $('<div>').addClass('search-result-footer')
+                    .appendTo($article);
+
+                $('<div>').addClass('search-result-filter')
+                    .append($('<div>').addClass('result-filter-icon'))
+                    .append($('<div>').addClass('result-filter-result').text(article.ups))
+                    .appendTo($footer);
+
+                article.tags.map(function(tag) {
+                    $('<div>').addClass('support-tag tag-' + tagUri(tag))
+                        .data('tag', tagUri(tag))
+                        .text(tag)
+                        .appendTo($footer);
+                });
+
+                $article.prependTo('.main-search-pad');
+
+            });
+
+            tagsPerDocument(articles).map(function(tag) {
+                $('<div>').addClass('tag-' + tag.tag)
+                    .addClass('support-tag real-time-filter')
+                    .data('tag', tag.tag)
+                    .text(tag.text + " " + tag.count)
+                    .appendTo('.sidebar-tags-container');
+            });
+
         },
         "client": function(args) {
-            var client;
             if (args[1] === 'mobile') {
                 args[1] = 'android';
                 document.location.href = url.apply(null, args);
                 return;
             }
 
-            client = getClient(args[1]);
+            args.shift();
+            var question = "";
+            if (args.length === 3) {
+                question = args.pop();
+            } else if (args.length !== 1) {
+                document.location.href = "#help/welcome";
+                return;
+            }
 
-            switch (args.length) {
-            case 2:
-                parsepage(tpl.section({
-                    show_devices: true,
-                    tpl: tpl,
-                    client: client,
-                    title: client.name,
-                    subtitle: client.description,
-                    previous_url: url("welcome"),
-                }));
+            var data = Data["help_" + args.join("_")];
+            if (!data) {
+                document.location.href = "#help/welcome";
+                return;
+            }
 
-                break;
 
-            case 3:
-            case 4:
-                var section;
-                client.sections.forEach(function(s) {
-                    if (s.url === args[2]) {
-                        section = s;
-                        return false;
+            parsepage(data.html);
+
+            $('.support-email-icon').rebind('click', function() {
+                var parts = document.location.href.split(/\//);
+                parts.pop();
+                parts.push($(this).parents('.support-article').attr('id'));
+                window.helpOrigin = parts.join('/');
+                var support = '#support';
+                if (!u_type) {
+                    login_next = support;
+                    support    = "#login";
+                }
+                document.location.href = support;
+            });
+
+            $('.support-link-icon').rebind('click', function() {
+                var parts = document.location.href.split(/\//);
+                parts.pop();
+                parts.push($(this).parents('.support-article').attr('id'));
+
+                var link   = parts.join('/');
+                var $input = $('.share-help').removeClass('hidden')
+                    .find('input').val(link)
+                    .focus().select();
+                $('.fm-dialog-close').rebind('click', function() {
+                    $('.share-help').addClass('hidden');
+                    fm_hideoverlay();
+                });
+                $('.copy-to-clipboard').rebind('click', function() {
+                    var success = true;
+                    if (is_chrome_firefox) {
+                        mozSetClipboard(link);
+                    } else {
+                        $('#chromeclipboard1').html(link);
+                        selectText('chromeclipboard1');
+                        success = document.execCommand('copy');
+                    }
+
+                    if (success) {
+                        showToast('clipboard', l[7654]);
                     }
                 });
+                fm_showoverlay();
+            });
 
-                if (!section) {
-                    return notFound();
-                }
-
-                parsepage(tpl.listing({
-                    base_url: url.apply(null, args.slice(0, 3)),
-                    client: client,
-                    title: section.name,
-                    articlesById: articlesById,
-                    subtitle: section.description,
-                    section: section,
-                    focus: focus,
-                    scrollTo: args[3],
-                }));
-
-                $('.support-email-icon').rebind('click', function() {
-                    var parts = document.location.href.split(/\//);
-                    parts.pop();
-                    parts.push($(this).parents('.support-article').attr('id'));
-                    window.helpOrigin = parts.join('/');
-                    var support = '#support';
-                    if (!u_type) {
-                        login_next = support;
-                        support    = "#login";
-                    }
-                    document.location.href = support;
+            if (question) {
+                $currentQuestion = $('#' + question);
+                Later(function() {
+                    scrollTo($currentQuestion);
                 });
-
-                $('.support-link-icon').rebind('click', function() {
-                    var parts = document.location.href.split(/\//);
-                    parts.pop();
-                    parts.push($(this).parents('.support-article').attr('id'));
-
-                    var link   = parts.join('/');
-                    var $input = $('.share-help').removeClass('hidden')
-                        .find('input').val(link)
-                        .focus().select();
-                    $('.fm-dialog-close').rebind('click', function() {
-                        $('.share-help').addClass('hidden');
-                        fm_hideoverlay();
-                    });
-                    $('.copy-to-clipboard').rebind('click', function() {
-                        var success = true;
-                        if (is_chrome_firefox) {
-                            mozSetClipboard(link);
-                        } else {
-                            $('#chromeclipboard1').html(link);
-                            selectText('chromeclipboard1');
-                            success = document.execCommand('copy');
-                        }
-
-                        if (success) {
-                            showToast('clipboard', l[7654]);
-                        }
-                    });
-                    fm_showoverlay();
-                });
-
-                if (args[3]) {
-                    $currentQuestion = $('#' + args[3]);
-                    Later(function() {
-                        scrollTo($currentQuestion);
-                    });
-                }
-
-                break;
             }
         },
-        "welcome": function welcome() {
-            parsepage(tpl.welcome({}));
+        "welcome": function welcome(args) {
+            parsepage(Data.help_index.html);
         }
     };
 
@@ -922,8 +718,8 @@ var Help = (function() {
 
         document.location.href = url("welcome");
     }
-        
-    // getVisibleElement {{{
+
+    // getVisibleElement
     function getVisibleElement(positionY, args) {
 
         args = args.map(function($element) {
@@ -945,7 +741,7 @@ var Help = (function() {
 
         return args[0][0];
     }
-    // }}}
+    //
 
     function handleScroll() {
 
@@ -954,7 +750,6 @@ var Help = (function() {
         var menuHeight = $menu.height();
         var top   = $('.help-background-block').height();
         var $elements = $('.updateSelected:visible', $main);
-        var isBottomScrolling = false;
 
         $window.rebind('resize.help2', function() {
             if ($('#help2-main').length === 0) {
@@ -963,7 +758,7 @@ var Help = (function() {
             contentChanged();
         });
 
-        $('.main-scroll-block').rebind('jsp-scroll-y.help2', function checkScrolling(e, scrollPositionY) {
+        $('.main-scroll-block').rebind('jsp-scroll-y.help2', function(e, scrollPositionY, atTop, atBottom) {
 
             if ($('#help2-main').length === 0) {
                 return $('.main-scroll-block').unbind('jsp-scroll-y.help2');
@@ -995,25 +790,67 @@ var Help = (function() {
             } else {
                 $menu.removeClass('fixed');
             }
-
-
         });
     }
 
+    CMS.index("help_en", function(err, blobs) {
+        if (err) {
+            return alert("Invalid response from the server");
+        }
+
+        for (var name in blobs) {
+            if (blobs.hasOwnProperty(name)) {
+                blobs[name.replace(/\.[a-z]{2}$/, '')] = blobs[name];
+            }
+        }
+
+        Data = blobs;
+        titles = [];
+        titles = blobs.help_search.object.map(function(entry) {
+            entry.label = entry.title;
+            entry.value = entry.title;
+            entry.url   = "#help/client/" + entry.id;
+            return entry;
+        });
+
+
+        idx = {
+            search: elasticlunr(function() {
+                this.setRef('pos');
+                this.addField('title', { boost: 10 });
+                this.addField('tags', { boost: 100 });
+                this.addField('body');
+            }),
+            all: Data.help_search.object
+        };
+
+        Data.help_search.object.map(function(obj, id) {
+            obj.pos = id;
+            obj.tags = obj.tags.split(/, /);
+            idx.search.addDoc(obj);
+        });
+
+        ready = true;
+        if (doRender) {
+            ns.render();
+            loadingDialog.hide();
+        }
+    });
+
 
     ns.render = function() {
+        // reset all tags
+
         if (!ready) {
-            loadingDialog.show();
             doRender = true;
+            loadingDialog.show();
             return;
         }
-    
-        // reset all tags
+
         allTags = [];
         $currentQuestion = null;
 
         doRouting();
-        loadingDialog.hide();
         topmenuUI();
         sidebars();
         mainScroll();
@@ -1022,7 +859,7 @@ var Help = (function() {
         searchBarInteraction();
         headerInteraction();
         directoryInteraction();
-
+        searchAnimations();
 
         $('#help2-main .link').rebind('click', function(e) {
             var $this = $(this);
@@ -1034,6 +871,10 @@ var Help = (function() {
                     login_next = url;
                     url = "#login";
                 }
+
+                // Log that they clicked on the panel
+                api_req({ a: 'log', e: 99621, m: 'Help2 client selection panel used' });
+
                 document.location.href = url;
             }
         });
@@ -1046,11 +887,15 @@ var Help = (function() {
             return false;
         });
 
+        // FAQ items logging
+        $('#help2-main .popular-question-items a').rebind('click.help2', function() {
+            api_req({ a: 'log', e: 99622, m: 'Help2 FAQ item selected' });
+        });
 
         // Image Gallery Interaction
         $('.instructions .image-instruction-control, .gallery-dot-navigation li, .bullet-number', '#help2-main')
             .rebind('click', function() {
-           
+
                 var $this = $(this);
                 var $cnt = $this.parents('.container');
                 var id   = $this.data('photo');
@@ -1062,7 +907,7 @@ var Help = (function() {
                 $cnt.find('.img-swap.img-active').removeClass('img-active');
                 $cnt.find('.bullet-number.selected-bullet').removeClass('selected-bullet');
                 $cnt.find('.image-instruction-control.active-instructions').removeClass('active-instructions');
-            
+
                 $cnt.find('.instruction-' + id).addClass('active-instructions');
                 $cnt.find('.bullet-' + id).addClass('selected-bullet');
                 $cnt.find('.dot-' + id).addClass('active-nav-dot').removeClass('nav-dots');
@@ -1079,7 +924,6 @@ var Help = (function() {
             $this.prev().addClass('selected-bullet');
         });
 
-
         $instructions.rebind('mouseleave', function() {
             var $this = $(this);
             var $cnt = $this.parents('.container');
@@ -1090,7 +934,6 @@ var Help = (function() {
                 $this.prev().removeClass('selected-bullet');
             }
         });
-
 
         // Adding and removing active state to instructions and bullet point on Hover for bulletpoints
         var $bullet = $('#help2-main .instructions .bullet-number');
@@ -1103,7 +946,7 @@ var Help = (function() {
             var $this = $(this);
             var $cnt = $this.parents('.container');
 
-            
+
             if ($this.next().hasClass('active-instructions')) {
                 $this.addClass('selected-bullet');
             } else {

@@ -12,7 +12,7 @@ var JinglePlugin = {
         this.callRequests = {};
         this.ice_config = {iceServers: []};
         this.pc_constraints = {};
-        if (RTC.browser === "firefox") {
+        if (RTC && RTC.browser === "firefox") {
             this.media_constraints = {
                 'offerToReceiveAudio': true,
                 'offerToReceiveVideo': true

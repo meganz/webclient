@@ -4696,7 +4696,7 @@ function gridUI() {
         return !!contextMenuUI(e, 6);
     });
 
-    $('.files-grid-view,.fm-empty-cloud').rebind('contextmenu', function(e) {
+    $('.files-grid-view, .fm-empty-cloud, .fm-empty-folder').rebind('contextmenu.fm', function(e) {
         $('.file-block').removeClass('ui-selected');
         $.selected = [];
         $.hideTopMenu();
@@ -6288,12 +6288,12 @@ function contextMenuUI(e, ll) {
         id = $(e.currentTarget).attr('id');
 
         if (id) {
-            
+
             // Contacts left panel click
             if (id.indexOf('contact_') !== -1) {
                 id = id.replace('contact_', '');
             }
-            
+
             // File manager left panel click
             else if (id.indexOf('treea_') !== -1) {
                 id = id.replace('treea_', '');
@@ -6308,7 +6308,11 @@ function contextMenuUI(e, ll) {
 
         // In case that id belongs to contact, 11 char length
         if (id && (id.length === 11)) {
-            $(menuCMI).filter('.remove-item,.startchat-item,.startaudio-item,.startvideo-item').show();// transfer panel
+            flt = '.remove-item';
+            if (!window.megaChatIsDisabled) {
+                flt += ',.startchat-item,.startaudio-item,.startvideo-item';
+            }
+            $(menuCMI).filter(flt).show();
 
             $(menuCMI).filter('.startaudio-item,.startvideo-item').removeClass('disabled');
 
@@ -8589,6 +8593,14 @@ function closeDialog() {
     if ($('.fm-dialog.incoming-call-dialog').is(':visible') === true) {
         // managing dialogs should be done properly in the future, so that we won't need ^^ bad stuff like this one
         return false;
+    }
+
+    if ($.dialog === 'passwordlink-dialog') {
+        if (String(page).substr(0, 2) === 'P!') {
+            // do nothing while on the password-link page
+            return false;
+        }
+        $('.fm-dialog.password-dialog').addClass('hidden');
     }
 
     if ($.dialog === 'createfolder' && ($.copyDialog || $.moveDialog)) {

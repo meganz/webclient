@@ -3615,9 +3615,10 @@
     "9099": "Por favor procure novamente ou contacte a nossa equipa de apoio directamente",
     "9100": "Apoio via Email",
     "9101": "Se voc\u00ea n\u00e3o consegue encontrar aquilo que procura, por favor contacte a nossa equipa de apoio para uma assist\u00eancia directa.",
-    "9102": "Go Back",
-    "9103": "Copy the link below to share the article.",
-    "9104": "Share the Article",
+    "9102": "Voltar",
+    "9103": "Copie a liga\u00e7\u00e3o abaixo para partilhar o artigo.",
+    "9104": "Partilhar o artigo",
+    "9105": "Enter your search here...",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3798,6 +3799,7 @@
         "please-try-searching-again": 9099,
         "email-support": 9100,
         "contact-support-team-message": 9101,
-        "go-back": 9102
+        "go-back": 9102,
+        "enter-your-search-here": 9105
     }
 }

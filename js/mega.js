@@ -2222,7 +2222,7 @@ function MegaData()
             else {
                 var n = M.d[a2[i]];
                 if (n && n.name) {
-                    name = htmlentities(n.name);
+                    name = n.name;
                 }
                 if (a2[i].length === 11) {
                     typeclass = 'contact';

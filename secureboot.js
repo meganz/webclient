@@ -49,14 +49,14 @@ function geoStaticpath(eu)
         try {
             if (!sessionStorage.skipcdn) {
                 var cc_eu = 'FR DE NL ES PT DK CH IT UK GB NO SE FI PL CZ SK AT GR RO HU IE TR VA MC SM LI AD JE GG UA BG LT LV EE AX IS MA DZ LY TN EG RU BY HR SI AL ME RS KO EU FO CY IL LB SY SA JO IQ BA CV PS EH GI GL IM LU MK SJ BF BI BJ BW CF CG CM DJ ER ET GA GH GM GN GN GW KE KM LR LS MG ZA AE ML MR MT MU MV MW MZ NA NE QA RW SD SS SL SZ TD TG TZ UG YE ZA ZM ZR ZW';
-				var cc_na = 'US CA MX AG BS BB BZ CR CO CU DO GD GT GY HT HN JM NI PA KN LC VC SR TT VE IS GL AI BL VG PR VI VE CO EC CL BR BO PY UY AR GY SR PE GF FK';
-				var cc_nz = 'NZ AU FJ NC';
+                var cc_na = 'US CA MX AG BS BB BZ CR CO CU DO GD GT GY HT HN JM NI PA KN LC VC SR TT VE IS GL AI BL VG PR VI VE CO EC CL BR BO PY UY AR GY SR PE GF FK';
+                var cc_nz = 'NZ AU FJ NC';
                 var cm = String(document.cookie).match(/geoip\s*\=\s*([A-Z]{2})/);
-				if (cm && cm[1] && cc_na.indexOf(cm[1]) > -1)
+                if (cm && cm[1] && cc_na.indexOf(cm[1]) > -1)
                     return 'https://na.static.mega.co.nz/3/';
-				else if (cm && cm[1] && cc_nz.indexOf(cm[1]) > -1)
+                else if (cm && cm[1] && cc_nz.indexOf(cm[1]) > -1)
                     return 'https://nz.static.mega.co.nz/3/';
-				else if (cm && cm[1] && cc_eu.indexOf(cm[1]) == -1)
+                else if (cm && cm[1] && cc_eu.indexOf(cm[1]) == -1)
                     return 'https://g.cdn1.mega.co.nz/3/';
             }
         } catch(e) {
@@ -1198,7 +1198,7 @@ else if (!b_u)
                 // loading the site, this should only happen on some fancy
                 // browsers other than what we use during development, and
                 // hopefully they'll report it back to us for troubleshoot
-                if (url || ln !== 1) {
+                if ((url || ln !== 1) && dump.m.indexOf('Error: Blocked') < 0) {
                     siteLoadError(dump.m, url + ':' + ln);
                 }
                 else {
@@ -1696,16 +1696,6 @@ else if (!b_u)
         'dev': {f:'html/dev.html', n: 'dev', j:0},
         'dev_js': {f:'html/js/dev.js', n: 'dev_js', j:1},
         'sdkterms': {f:'html/sdkterms.html', n: 'sdkterms', j:0},
-        'gallery': {f:'html/gallery.tpl', n: 'gallery', j:0},
-        'help_goback': {f:'html/help2_goback.tpl', n: 'help_goback', j:0},
-        'help_sidebar_tags': {f:'html/help2_sidebar_tags.tpl', n: 'help_sidebar_tags', j:0},
-        'help_section': {f:'html/help2_sections.tpl', n: 'help_section', j:0},
-        'help_welcome': {f:'html/help2_welcome.tpl', n: 'help_welcome', j:0},
-        'help_header': {f:'html/help2_header.tpl', n: 'help_header', j:0},
-        'help_clients': {f:'html/help2_clients.tpl', n: 'help_clients', j:0},
-        'help_listing': {f:'html/help2_listing.tpl', n: 'help_listing', j:0},
-        'help_search': {f:'html/help2_search.tpl', n: 'help_search', j:0},
-        'help_client_index': {f:'html/help2_client_index.tpl', n: 'help_client_index', j:0},
         'lunr_js': {f:'js/vendor/elasticlunr.js', n: 'lunr_js', j:1},
         'help_js': {f:'html/js/help2.js', n: 'help_js', j:1},
         'sync': {f:'html/sync.html', n: 'sync', j:0},
@@ -1758,9 +1748,6 @@ else if (!b_u)
         'sdk': ['dev','dev_js','sdkterms'],
         'doc': ['dev','dev_js','sdkterms'],
         'help': [
-            'help_section', 'help_welcome', 'help_header',
-            'help_clients', 'help_listing', 'help_client_index', 'help_search',
-            'help_goback', 'help_sidebar_tags', 'gallery',
             'lunr_js', 'help_js'
         ],
         'recover': ['reset', 'reset_js'],
@@ -2347,8 +2334,8 @@ else if (!b_u)
             dl_res= false;
             boot_done();
         };
-		var esid='';
-		if (u_storage.sid) esid = u_storage.sid;
+        var esid='';
+        if (u_storage.sid) esid = u_storage.sid;
         dlxhr.open("POST", apipath + 'cs?id=0' + mega.urlParams(), true);
         dlxhr.send(JSON.stringify([{ 'a': 'g', p: page.substr(1,8), 'ad': showAd(),'esid':esid }]));
     }

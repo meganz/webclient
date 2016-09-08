@@ -1114,7 +1114,7 @@ var proPage = {
             if ((gatewayId === 0) && (balanceFloat >= planPriceFloat)) {
 
                 // Show "Balance (x.xx)" if they have enough to purchase this plan
-                displayName = l[7108] + ' (' + balanceFloat.toFixed(2) + ' &euro;)';
+                displayName = l[7108] + ' (' + balanceFloat.toFixed(2) + ' \u20ac)';
             }
 
             // Create a radio button with icon for each payment gateway
@@ -1123,7 +1123,7 @@ var proPage = {
             $gateway.find('input').attr('id', gatewayName);
             $gateway.find('input').val(gatewayName);
             $gateway.find('.provider-icon').addClass(gatewayName);
-            $gateway.find('.provider-name').text(displayName).attr('title', htmlentities(displayName));
+            $gateway.find('.provider-name').text(displayName).prop('title', displayName);
 
             // Build the html
             gatewayHtml += $gateway.prop('outerHTML');

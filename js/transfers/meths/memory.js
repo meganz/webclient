@@ -131,7 +131,7 @@
 
         this.setCredentials = function(url, size, filename, chunks, sizes) {
             if (d) {
-                logger = new MegaLogger('MemoryIO', {}, dl.writer.logger);
+                logger = new MegaLogger('MemoryIO', {}, dl.writer && dl.writer.logger);
                 logger.info('MemoryIO Begin', dl_id, Array.prototype.slice.call(arguments));
             }
             if (size > MemoryIO.fileSizeLimit) {

@@ -238,6 +238,21 @@ var Soon = is_chrome_firefox ? mozRunAsync : function(callback) {
     }, 20);
 };
 
+/**
+ *  Delays the execution of a function
+ *
+ *  Wraps a function to execute at most once
+ *  in a 100 ms time period. Useful to wrap
+ *  expensive jQuery events (for instance scrolling
+ *  events).
+ *
+ *  All argument and *this* is passed to the callback
+ *  after the 100ms (default)
+ *
+ *  @param {Function} func  Function to wrap
+ *  @param {Number}   ms    Timeout
+ *  @returns {Function} wrapped function
+ */
 function SoonFc(func, ms) {
     return function __soonfc() {
         var self = this,
@@ -4501,33 +4516,15 @@ function rand_range(a, b) {
  *
  */
 function passwordManager(form) {
-    if (navigator.mozGetUserMedia) {
+    if (is_chrome_firefox) {
         var creds = passwordManager.pickFormFields(form);
         if (creds) {
-            // prepare pwd to be stored encrypted
-            // format: "~:<keypw>:<userhash>"
-            var pwd = creds.pwd;
-
-            if (!passwordManager.getStoredCredentials(pwd)) {
-                var keypw = prepare_key_pw(pwd);
-                var pwaes = new sjcl.cipher.aes(keypw);
-                var hash = stringhash(creds.usr.toLowerCase(), pwaes);
-
-                pwd = '~:' + a32_to_base64(keypw) + ':' + hash;
-
-                $('#pmh_username').val(creds.usr);
-                $('#pmh_password').val(pwd);
-                $('#pwdmanhelper').submit();
-                Soon(function() {
-                    $('#pwdmanhelper input').val('');
-                    $(form).find('input').val('');
-                    $('iframe#dummyTestFrame').attr('src', 'about:blank');
-                });
-            }
+            mozLoginManager.saveLogin(creds.usr, creds.pwd);
         }
+        $(form).find('input').val('');
         return;
     }
-    if (is_chrome_firefox || typeof history !== "object") {
+    if (typeof history !== "object") {
         return false;
     }
     $(form).rebind('submit', function() {
@@ -5128,52 +5125,7 @@ mega.utils.chrome110ZoomLevelNotification = function() {
 
     }
 };
-
-
-/**
- *  strip_tags - Strip HTML tags from a string
- *
- *  @param {String} html    HTML code
- *  @returns {String}   The text without any HTML markups
- */
-function strip_tags(html) {
-    return $('<div>').safeHTML(html).text();
-}
-
-/**
- * Returns the current language in which the current user
- * runs MEGA
- *
- * @returns {String}  Two letters language code
- */
-function getCurrentLanguage() {
-    return $('body').attr('class').split(/\s+/).filter(function(klass) {
-        return klass.length === 2;
-    })[0];
-}
-
-$.fn.rotate = function AnimateRotate(finalAngle, initialAngle, time) {
-    return this.each(function() {
-        var $this = $(this);
-
-        // we use a pseudo object for the animation
-        $({deg: initialAngle || 0}).animate({deg: finalAngle}, {
-            duration: time || 1000,
-            step: function(now) {
-                // in the step-callback (that is fired each step of the animation),
-                // you can use the `now` paramter which contains the current
-                // animation-position (`initalAngle` up to `finalAngle`)
-                $this.css({
-                    transform: 'rotate(' + now + 'deg)'
-                });
-            }
-        });
-    });
-};
-
-
 mBroadcaster.once('zoomLevelCheck', mega.utils.chrome110ZoomLevelNotification);
-
 
 var debounce = function(func, execAsap) {
     var timeout;

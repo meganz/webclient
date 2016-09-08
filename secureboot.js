@@ -1698,7 +1698,6 @@ else if (!b_u)
         'sdkterms': {f:'html/sdkterms.html', n: 'sdkterms', j:0},
         'lunr_js': {f:'js/vendor/elasticlunr.js', n: 'lunr_js', j:1},
         'help_js': {f:'html/js/help2.js', n: 'help_js', j:1},
-        'help_views_js': {f:'html/js/help2-views.js', n: 'help_views_js', j:1},
         'sync': {f:'html/sync.html', n: 'sync', j:0},
         'sync_js': {f:'html/js/sync.js', n: 'sync_js', j:1},
         'cms_snapshot_js': {f:'js/cmsSnapshot.js', n: 'cms_snapshot_js', j:1},
@@ -1749,7 +1748,7 @@ else if (!b_u)
         'sdk': ['dev','dev_js','sdkterms'],
         'doc': ['dev','dev_js','sdkterms'],
         'help': [
-            'lunr_js', 'help_js', 'help_views_js'
+            'lunr_js', 'help_js'
         ],
         'recover': ['reset', 'reset_js'],
         'redeem': ['redeem', 'redeem_js'],

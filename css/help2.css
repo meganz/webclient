@@ -2352,7 +2352,8 @@
     width: 20px;
     margin-top: 7px;
 }
-#help2-main .ios-desktop-icon, #help2-main .windows-desktop-icon, #help2-main .linux-desktop-icon {
+#help2-main .ios-desktop-icon, #help2-main .windows-desktop-icon, #help2-main .linux-desktop-icon,
+#help2-main .webclient-icon {
     background-image: url('../images/mega/help2/welcome_icons.png');
     background-position: -148px -430px;
     background-repeat: no-repeat;
@@ -3709,3 +3710,12 @@
 .share-help .fm-dialog-new-folder-pad {
     margin-right: 0;
 }
+/*
+#help2-main .selected-bullet {
+    background-color: #939DA3;
+}
+#help2-main .bullet-number {
+    background-color: #939DA3;
+    color: #939DA3;
+}
+*/

@@ -7237,6 +7237,81 @@ function get_pbkdf2_hmac_sha256_instance () {
     return pbkdf2_hmac_sha256_instance;
 }
 
+function pbkdf2_hmac_sha512_constructor ( options ) {
+    options = options || {};
+
+    if ( !( options.hmac instanceof hmac_sha512_constructor ) )
+        options.hmac = get_hmac_sha512_instance();
+
+    pbkdf2_constructor.call( this, options );
+
+    return this;
+}
+
+function pbkdf2_hmac_sha512_generate ( salt, count, length ) {
+    if ( this.result !== null )
+        throw new IllegalStateError("state must be reset before processing new data");
+
+    if ( !salt && !is_string(salt) )
+        throw new IllegalArgumentError("bad 'salt' value");
+
+    count = count || this.count;
+    length = length || this.length;
+
+    this.result = new Uint8Array(length);
+
+    var blocks = Math.ceil( length / this.hmac.HMAC_SIZE );
+
+    for ( var i = 1; i <= blocks; ++i ) {
+        var j = ( i - 1 ) * this.hmac.HMAC_SIZE;
+        var l = ( i < blocks ? 0 : length % this.hmac.HMAC_SIZE ) || this.hmac.HMAC_SIZE;
+
+        this.hmac.reset().process(salt);
+        this.hmac.hash.asm.pbkdf2_generate_block( this.hmac.hash.pos, this.hmac.hash.len, i, count, 0 );
+
+        this.result.set( this.hmac.hash.heap.subarray( 0, l ), j );
+    }
+
+    return this;
+}
+
+var pbkdf2_hmac_sha512_prototype = pbkdf2_hmac_sha512_constructor.prototype;
+pbkdf2_hmac_sha512_prototype.reset =   pbkdf2_reset;
+pbkdf2_hmac_sha512_prototype.generate = pbkdf2_hmac_sha512_generate;
+
+var pbkdf2_hmac_sha512_instance = null;
+
+function get_pbkdf2_hmac_sha512_instance () {
+    if ( pbkdf2_hmac_sha512_instance === null ) pbkdf2_hmac_sha512_instance = new pbkdf2_hmac_sha512_constructor();
+    return pbkdf2_hmac_sha512_instance;
+}
+
+/**
+ * PBKDF2-HMAC-SHA512 exports
+ */
+
+function pbkdf2_hmac_sha512_bytes ( password, salt, iterations, dklen ) {
+    if ( password === undefined ) throw new SyntaxError("password required");
+    if ( salt === undefined ) throw new SyntaxError("salt required");
+    return get_pbkdf2_hmac_sha512_instance().reset( { password: password } ).generate( salt, iterations, dklen ).result;
+}
+
+function pbkdf2_hmac_sha512_hex ( password, salt, iterations, dklen ) {
+    var result = pbkdf2_hmac_sha512_bytes( password, salt, iterations, dklen );
+    return bytes_to_hex(result);
+}
+
+function pbkdf2_hmac_sha512_base64 ( password, salt, iterations, dklen ) {
+    var result = pbkdf2_hmac_sha512_bytes( password, salt, iterations, dklen );
+    return bytes_to_base64(result);
+}
+
+exports.PBKDF2_HMAC_SHA512 = {
+    bytes: pbkdf2_hmac_sha512_bytes,
+    hex: pbkdf2_hmac_sha512_hex,
+    base64: pbkdf2_hmac_sha512_base64
+};
+
 /* ----------------------------------------------------------------------
  * Copyright (c) 2014 Artem S Vybornov
  *
@@ -7514,7 +7589,7 @@ function Random_seed ( seed ) {
     if ( !is_buffer(seed) && !is_typed_array(seed) )
         throw new TypeError("bad seed type");
 
-    var bpos = seed.byteOffest || 0,
+    var bpos = seed.byteOffset || 0,
         blen = seed.byteLength || seed.length,
         buff = new Uint8Array( ( seed.buffer || seed ), bpos, blen );
 
@@ -10851,4 +10926,3 @@ exports.RSA_RAW = RSA_RAW;
 
 return exports;
 })( {}, function(){return this}() );
-//# sourceMappingURL=asmcrypto.js.map

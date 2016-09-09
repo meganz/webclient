@@ -43,7 +43,8 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
             chatdUrl: undefined,
             chatShard: undefined,
             members: {},
-            membersLoaded: false
+            membersLoaded: false,
+            topic: ""
         },
         true
     );
@@ -93,47 +94,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
         self.logger.debug("Will change state from: ",
          ChatRoom.stateToText(oldState), " to ", ChatRoom.stateToText(newState));
 
-        var resetStateToReady = function() {
-            if (self.state != ChatRoom.STATE.LEFT && self.state != ChatRoom.STATE.READY) {
-                self.logger.warn("setting state to READY.");
-
-                self.setState(ChatRoom.STATE.READY);
-            }
-        };
-
-        if (newState === ChatRoom.STATE.PLUGINS_READY) {
-            resetStateToReady();
-        }
-        else if (newState === ChatRoom.STATE.JOINED) {
-            self.setState(ChatRoom.STATE.PLUGINS_WAIT);
-        }
-        else if (newState === ChatRoom.STATE.PLUGINS_WAIT) {
-            var $event = new $.Event("onPluginsWait");
-            self.megaChat.trigger($event, [self]);
-
-            if (!$event.isPropagationStopped()) {
-                self.setState(ChatRoom.STATE.PLUGINS_READY);
-            }
-        }
-        else if (newState === ChatRoom.STATE.PLUGINS_PAUSED) {
-            // allow plugins to hold the PLUGINS_WAIT state for MAX 5s
-            createTimeoutPromise(function() {
-                return self.state !== ChatRoom.STATE.PLUGINS_PAUSED && self.state !== ChatRoom.STATE.PLUGINS_WAIT
-            }, 100, self.options.pluginsReadyTimeout)
-                .fail(function() {
-                    if (self.state === ChatRoom.STATE.PLUGINS_WAIT || self.state === ChatRoom.STATE.PLUGINS_PAUSED) {
-                        self.logger.error("Plugins had timed out, setting state to PLUGINS_READY");
-
-                        var participants = self.getParticipantsExceptMe();
-                        var contact = participants[0];
-
-                        var pres = self.megaChat.karere.getPresence(contact);
-
-                        self.setState(ChatRoom.STATE.PLUGINS_READY);
-                    }
-                });
-        }
-        else if (newState === ChatRoom.STATE.JOINING) {
+        if (newState === ChatRoom.STATE.JOINING) {
         }
         else if (newState === ChatRoom.STATE.READY) {
         }
@@ -220,7 +181,14 @@ makeObservable(ChatRoom);
 /**
  * Room states
  *
- * @type {{INITIALIZED: number, JOINING: number, JOINED: number, WAITING_FOR_PARTICIPANTS: number, PARTICIPANTS_HAD_JOINED: number, PLUGINS_WAIT: number, PLUGINS_READY: number, READY: number, PLUGINS_PAUSED: number, LEAVING: number, LEFT: number}}
+ * @type {{INITIALIZED: number,
+           JOINING: number,
+           JOINED: number,
+           WAITING_FOR_PARTICIPANTS: number,
+           PARTICIPANTS_HAD_JOINED: number,
+           READY: number,
+           LEAVING: number,
+           LEFT: number}}
  */
 ChatRoom.STATE = {
     'INITIALIZED': 5,
@@ -228,8 +196,6 @@ ChatRoom.STATE = {
     'JOINED': 20,
 
     'READY': 150,
-
-    'PLUGINS_PAUSED': 175,
 
     'ENDED': 190,
 
@@ -328,12 +294,13 @@ ChatRoom.prototype.setState = function(newState, isRecover) {
         // only allow state changes to be increasing the .state value (5->10->....150...) with the exception when a
         // PLUGINS_PAUSED is the current or new state
         assert(
-            newState === ChatRoom.STATE.PLUGINS_PAUSED ||
-            self.state === ChatRoom.STATE.PLUGINS_PAUSED ||
             (newState === ChatRoom.STATE.JOINING && isRecover) ||
             (newState === ChatRoom.STATE.INITIALIZED && isRecover) ||
             newState > self.state,
-            'Invalid state change. Current:' + ChatRoom.stateToText(self.state) +  "to" + ChatRoom.stateToText(newState)
+            'Invalid state change. Current:'
+            + ChatRoom.stateToText(self.state)
+            +  "to"
+            + ChatRoom.stateToText(newState)
         );
     }
 
@@ -581,6 +548,10 @@ ChatRoom.prototype.getRoomTitle = function() {
         return self.megaChat.getContactNameFromJid(participants[0]);
     }
     else {
+        if (self.topic) {
+            return self.topic;
+        }
+
         var participants = self.members && Object.keys(self.members).length > 0 ? Object.keys(self.members) : [];
         var names = [];
         participants.forEach(function(contactHash) {
@@ -609,6 +580,7 @@ ChatRoom.prototype.leave = function(triggerLeaveRequest) {
 
 
     self.members[u_handle] = 0;
+    //self.trackDataChange();
 
 
     if (triggerLeaveRequest) {
@@ -886,9 +858,6 @@ ChatRoom.prototype.sendMessage = function(message, meta) {
     var megaChat = this.megaChat;
     meta = meta || {};
 
-    if (self._conv_ended === true) {
-        self._restartConversation();
-    }
     var messageId = megaChat.karere.generateMessageId(self.roomJid, JSON.stringify([message, meta]));
 
     var eventObject = new KarereEventObjects.OutgoingMessage(
@@ -1202,59 +1171,6 @@ ChatRoom.prototype.recover = function() {
     }
 
     return $startChatPromise;
-};
-
-ChatRoom.prototype._restartConversation = function() {
-    var self = this;
-
-    if (self._conv_ended === true) {
-        self._conv_ended = self._leaving = false;
-
-        self.setState(
-            ChatRoom.STATE.PLUGINS_WAIT
-        );
-
-        self.trigger('onConversationStarted');
-    }
-};
-
-ChatRoom.prototype._conversationEnded = function(userFullJid) {
-    var self = this;
-
-    if (self && self._leaving !== true) {
-        if (self.callSession) {
-            if (self.callSession.isStarted() || self.callSession.isStarting()) {
-                self.callSession.endCall();
-            }
-        }
-
-        self._conv_ended = true;
-
-        self.setState(ChatRoom.STATE.ENDED);
-
-        [self.$messages].forEach(function(k, v) {
-            $(k).addClass("conv-end")
-                .removeClass("conv-start");
-        });
-    }
-};
-
-ChatRoom.prototype._conversationStarted = function(userBareJid) {
-    var self = this;
-
-    if (self._conv_ended) {
-        if (Karere.getNormalizedBareJid(userBareJid) != self.megaChat.karere.getBareJid()) {
-            // the other user had joined, mark this conv as started again.
-            self._restartConversation();
-        }
-    }
-    else {
-        // i'd joined
-        self.trigger('onConversationStarted');
-    }
-
-
-    self.setState(ChatRoom.STATE.READY);
 };
 
 

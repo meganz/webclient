@@ -253,8 +253,10 @@ var NetworkTesting = (function() {
                     return $btnTest.trigger('click');
                 }
                 if (typeof res === "number") {
+                    var msg = res === EACCESS ? l[243] : l[8807];
+
                     $dialog.addClass('hidden');
-                    msgDialog('info', l[135], l[8807], null, function() {
+                    msgDialog('info', l[135], msg, null, function() {
                         // reset the dialog
                         ns.dialog();
                     });

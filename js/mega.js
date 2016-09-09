@@ -5752,7 +5752,9 @@ function execsc(actionPackets, callback) {
                     cr: crypto_makecr(actionPacket.n, [actionPacket.h], true)
                 });
 
-            M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
+            if (fminitialized) {
+                M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
+            }
         }
         else if (actionPacket.a === 't') {
             if (tparentid) {
@@ -5845,7 +5847,7 @@ function execsc(actionPackets, callback) {
             process_u(actionPacket.u);
 
             // Contact is deleted on remote computer, remove contact from contacts left panel
-            if (actionPacket.u[0].c === 0) {
+            if (fminitialized && actionPacket.u[0].c === 0) {
                 $('#contact_' + actionPacket.ou).remove();
 
                 $.each(actionPacket.u, function(k, v) {

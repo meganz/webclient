@@ -4678,6 +4678,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     margin: 6px 12px 0 13px;
     position: relative;
 }
+.top-menu-popup .top-icon {
+    margin-top: 12px;
+}
 .top-icon.menu.active {
     width: 230px;
 }
@@ -5148,7 +5151,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .fm-main {
     height: 100%;
     overflow: hidden;
-        background-color: #fafafa;
+    background-color: #fafafa;
 }
 .fm-left-panel {
     width: 256px;
@@ -5712,11 +5715,11 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     height: -moz-calc(100% - 303px);
     height: calc(100% - 303px);
 }
-.fm-right-files-block th::after,  .account.tab-content th::after {
-    content:'';
-    position:absolute;
+.fm-right-files-block th::after, .account.tab-content th::after {
+    content: '';
+    position: absolute;
     right: 0;
-    bottom:1px;
+    bottom: 1px;
     height: 20px;
     width: 1px;
     background-color: rgba(0,0,0,0.1);
@@ -5731,7 +5734,7 @@ th.grid-first-th {
 .grid-table.contacts td:first-child, .contacts-view .grid-table-header th:first-child {
     padding: 0 10px 0 16px;
 }
-.fm-right-files-block th:last-child::after,  .account.tab-content th:last-child::after {
+.fm-right-files-block th:last-child::after, .account.tab-content th:last-child::after {
     display: none;
 }
 .arrow.desc.grid-header-star, .arrow.asc.grid-header-star, .grid-header-star {
@@ -7054,25 +7057,43 @@ table {
     height: calc(100% - 24px);
     width: 100% !important;
 }
-.fm-right-files-block, .fm-right-account-block {
+.fm-right-files-block {
+    height: 100%;
+    height: -webkit-calc(100% -37px);
+    height: -moz-calc(100% - 37px);
+    height: calc(100% - 37px);
+    position: relative;
+}
+.fm-right-account-block, .fm-right-block.dashboard {
     height: 100%;
     height: -webkit-calc(100% -36px);
     height: -moz-calc(100% - 36px);
     height: calc(100% - 36px);
-    margin-left: 304px;
     position: relative;
+    margin-top: -1px;
 }
-.fm-right-header, .fm-tranfers-header {
+.fm-right-header {
     padding-right: 8px;
 }
+.fm-tranfers-header {
+    padding-right: 16px;
+}
 .fm-right-header, .new-notification-top, .fm-tranfers-header {
-    height: 36px;
+    height: 37px;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     white-space: nowrap;
     position: relative;
     background-color: #ffffff;
+}
+.fm-right-header .link-button, .fm-tranfers-header .link-button {
+    margin-top:8px;
+    font-size: 14px;
+
+}
+.fm-right-header .link-button > .small-icon {
+    margin-right: 6px;
 }
 .fm-back-button {
     display: none;
@@ -7088,7 +7109,7 @@ table {
 .fm-breadcrumbs-block, .fm-share-breadcrumbs-block, .fm-dialog-breadcrumbs-bl {
     float: left;
     height: 36px;
-    padding: 6px 0 0 4px;
+    padding: 7px 0 0 0;
     overflow: hidden;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -7134,7 +7155,7 @@ table {
     font-size: 14px;
     background-image: url(../images/mega/nw-fm-sprite_v19.svg);
     background-repeat: no-repeat;
-    background-position: 5px -1000px; 
+    background-position: 5px -1000px;
     cursor: pointer;
     padding: 0 0 0 38px;
     display: block;
@@ -7289,7 +7310,7 @@ table {
     height: 18px;
     display: block;
     float: right;
-    margin: 9px 10px 0 23px;
+    margin: 9px 11px 0 24px;
     background-image: url(../images/mega/nw-fm-sprite_v19.svg);
     background-repeat: no-repeat;
     -webkit-transition: opacity 200ms ease-in-out;
@@ -7593,7 +7614,7 @@ table {
     background-clip: padding-box;
     width: 360px;
     background-color: white;
-    margin: 46px 0 0 0;
+    margin: 40px 0 0 0;
     z-index: 900;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -7606,7 +7627,7 @@ table {
 .add-user-popup {
     max-width: 90%;
     z-index: 100;
-    margin: 94px 0 0 0;
+    margin: 76px 0 0 0;
     width: 400px;
 }
 .add-user-popup.dialog {
@@ -7655,6 +7676,9 @@ table {
     -moz-border-radius-bottomright: 7px;
     border-bottom-right-radius: 7px;
     padding-right: 12px;
+}
+.create-folder-bottom .default-white-button, .create-folder-bottom .default-grey-button, .default-dialog-bottom .default-white-button, .default-dialog-bottom .default-grey-button {
+    margin-top: 12px;
 }
 .create-folder-button {
     display: none !important;
@@ -10380,7 +10404,7 @@ table {
 }
 .grid-table-header {
     background-color: white;
-    position:relative;
+    position: relative;
 }
 .transfer-table-header th:first-child span {
     display: block;
@@ -10546,9 +10570,9 @@ table {
     background-position: -75px -238px;
 }
 .fm-account-top {
-    height: 48px;
+    height: 49px;
     background-color: #fafafa;
-    padding: 12px 0 0 22px;
+    padding: 13px 0 0 22px;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -11118,7 +11142,8 @@ table {
 /* Dashboard section */
 
 .widgets.content-block {
-    padding: 12px 24px 24px 12px;
+    padding: 13px 24px 24px 12px;
+    background-color: #fafafa;
     min-width: 740px;
     margin: 0 auto;
     max-width: 1064px;
@@ -19892,7 +19917,6 @@ span.incoming-call-name {
 }
 .shared-details-info-block {
     margin-left: 138px;
-    overflow: hidden;
 }
 .shared-details-pad {
     float: left;

@@ -42,7 +42,7 @@
             // List view mode
             '<table>' +
                 '<tr>' +
-                    '<td width="30">' +
+                    '<td width="50">' +
                         '<span class="grid-status-icon"></span>' +
                     '</td>' +
                     '<td>' +

@@ -4,6 +4,21 @@
 .button > i, .button > span {
     cursor: pointer;
 }
+.button input {
+    position:absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+    -moz-opacity: 0;
+    -khtml-opacity: 0;
+    opacity: 0;
+    z-index:1;
+    margin:0;
+    padding:0;
+    border:0;
+}
 .link-button {
     display: block;
     cursor: pointer;
@@ -14,6 +29,11 @@
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
     overflow: hidden;
+    position:relative;
+    text-align: left;
+}
+.link-button.right {
+    margin-left: 27px;
 }
 .link-button i, .button i, .default-white-button i {
     font-size: inherit;

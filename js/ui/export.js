@@ -633,6 +633,7 @@ var exportPassword = {
             var $closeButton = this.$dialog.find('.fm-dialog-close');
             var $decryptButton = this.$dialog.find('.decrypt-link-button');
             var $decryptButtonText = $decryptButton.find('.decrypt-text');
+            var $decryptInput = this.$dialog.find('.password-decrypt-input');
 
             // Show a background overlay
             fm_showoverlay();
@@ -653,6 +654,13 @@ var exportPassword = {
             $decryptButton.rebind('click', function() {
                 exportPassword.decrypt.decryptLink(page);
             });
+
+            // Listen for Enter key to fire decryption
+            $decryptInput.rebind('keyup', function(ev) {
+                if (ev.keyCode === 13) {
+                    exportPassword.decrypt.decryptLink(page);
+                }
+            });
         },
 
         /**
@@ -671,6 +679,12 @@ var exportPassword = {
             var password = $password.val();
             var urlEncodedInfo = page.replace('P!', '');
             var decodedBytes = null;
+
+            // If no password given...
+            if (!password) {
+                $errorLabel.text(l[970]);  // Please enter a valid password...
+                return false;
+            }
 
             // Hide previous errors
             $errorLabel.text('');

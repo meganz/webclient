@@ -462,11 +462,9 @@ var ConversationsApp = React.createClass({
     render: function() {
         var self = this;
 
-        //console.error("ConversationsApp render");
-
         var presence = self.props.megaChat.karere.getMyPresence();
 
-        var startChatIsDisabled = !presence || presence === "offline";
+        var startChatIsDisabled = !presence || presence === "offline" || presence === "unavailable";
 
 
         var leftPanelStyles = {};

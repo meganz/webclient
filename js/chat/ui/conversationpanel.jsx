@@ -1590,8 +1590,9 @@ var ConversationPanel = React.createClass({
                             <input type="text" name="newTopic"
                                    defaultValue={self.props.chatRoom.getRoomTitle()}
                                    value={self.state.renameDialogValue}
+                                   maxLength="30"
                                    onChange={(e) => {
-                                self.setState({'renameDialogValue': e.target.value});
+                                self.setState({'renameDialogValue': e.target.value.substr(0, 30)});
                             }} onKeyUp={(e) => {
                                 if (e.which === 13) {
                                     onEditSubmit(e);

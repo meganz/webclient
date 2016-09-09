@@ -14478,5 +14478,9 @@
     "9105": {
         "text": "Enter your search here...",
         "context": "The placeholder text in the search field of the help section."
+    },
+    "9106": {
+        "text": "Email %1 for assistance.",
+        "context": "A mailto link button. The %1 placeholder will be replaced with an email address."
     }
 }

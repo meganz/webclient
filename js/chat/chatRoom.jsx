@@ -582,8 +582,8 @@ ChatRoom.prototype.getRoomTitle = function() {
         return self.megaChat.getContactNameFromJid(participants[0]);
     }
     else {
-        if (self.topic) {
-            return self.topic;
+        if (self.topic && self.topic.substr) {
+            return self.topic.substr(0, 30);
         }
 
         var participants = self.members && Object.keys(self.members).length > 0 ? Object.keys(self.members) : [];

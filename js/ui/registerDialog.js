@@ -423,6 +423,7 @@
     function sendSignupLinkDialog(accountData) {
         var $dialog = $('.fm-dialog.registration-page-success').removeClass('hidden');
         var $button = $('.resend-email-button', $dialog);
+        var $closeButton = $('.fm-dialog-close', $dialog);
 
         $('input', $dialog).val(accountData.email);
 
@@ -455,6 +456,7 @@
                     else {
                         closeDialog();
                         fm_showoverlay();
+
                         $dialog.removeClass('hidden');
                     }
                 }
@@ -465,7 +467,35 @@
             sendsignuplink(accountData.name, email, accountData.password, ctx, true);
         });
 
+        $closeButton.rebind('click', function _click() {
+
+            // Check dialog type, styling determines which one is used
+            // When 'special' class is available resend dialog is shown
+            // Otherwise awaiting confirmation dialog is shown
+            if ($($dialog).hasClass('special')) {
+                msgDialog('confirmation', l[1334], l[5710], false, function(ev) {
+
+                    // Confirm abort registration
+                    if (ev) {
+                        delete localStorage.awaitingConfirmationAccount;
+                        window.location = '/';
+                    }
+                    else {
+                        // Restore the background overlay which was closed by the msgDialog function
+                        fm_showoverlay();
+                    }
+                });
+            }
+            else {
+                delete localStorage.awaitingConfirmationAccount;
+                window.location = '/';
+            }
+        });
+
         fm_showoverlay();
+
+        // Show dialog close button
+        $('.fm-dialog-header', $dialog).removeClass('hidden');
         $dialog.addClass('special').show();
     }
 

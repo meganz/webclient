@@ -837,7 +837,7 @@ var Help = (function() {
         }
     });
 
-
+    var helpAlreadyLogged;
     ns.render = function() {
         // reset all tags
 
@@ -860,6 +860,16 @@ var Help = (function() {
         headerInteraction();
         directoryInteraction();
         searchAnimations();
+
+        // Log that the help page has been viewed
+        if (!helpAlreadyLogged) {
+            helpAlreadyLogged = true;
+            api_req({
+                a: 'log',
+                e: 99332,
+                m: 'web help viewed'
+            });
+        }
 
         $('#help2-main .link').rebind('click', function(e) {
             var $this = $(this);

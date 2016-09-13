@@ -2188,7 +2188,7 @@ function MegaData()
             name = '';
             if (a2[i] === this.RootID) {
                 if (folderlink && M.d[this.RootID]) {
-                    name = htmlentities(M.d[this.RootID].name);
+                    name = M.d[this.RootID].name;
                     typeclass = 'folder';
                 }
                 else {
@@ -2343,9 +2343,6 @@ function MegaData()
         if (folderlink) {
             $('.fm-breadcrumbs:first').removeClass('folder').addClass('folder-link');
             $('.fm-breadcrumbs:first span').empty();
-            if (folderlink && name) {
-                $('.nw-tree-panel-header span').text(name);
-            }
         }
     };
 

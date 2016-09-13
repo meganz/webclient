@@ -7068,7 +7068,12 @@ function sectionUIopen(id) {
             headertxt = l[5915];
             break;
         case 'cloud-drive':
-            headertxt = l[5916];
+            if (folderlink) {
+                headertxt = Object(M.d[M.RootID]).name || '';
+            }
+            else {
+                headertxt = l[5916];
+            }
             break;
         case 'inbox':
             headertxt = l[949];
@@ -7078,9 +7083,7 @@ function sectionUIopen(id) {
             break;
     }
 
-    if (!folderlink) {
-        $('.fm-left-panel .nw-tree-panel-header span').text(headertxt);
-    }
+    $('.fm-left-panel .nw-tree-panel-header span').text(headertxt);
 
     {
         // required tricks to make the conversations work with the old UI HTML/css structure

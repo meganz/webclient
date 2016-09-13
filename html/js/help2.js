@@ -573,12 +573,12 @@ var Help = (function() {
 
             $('#help2-main .search').val(args[1]);
 
-            if (articles.lenght === 0) {
+            if (articles.length === 0) {
                 $('.search-404-block').show();
-                $('.main-search-pad').hide();
+                $('.main-search-pad,.sidebar-menu-container').hide();
             } else {
                 $('.search-404-block').hide();
-                $('.main-search-pad').show();
+                $('.main-search-pad,.sidebar-menu-container').show();
             }
 
             articles.reverse().map(function(article) {

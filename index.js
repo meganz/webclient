@@ -337,7 +337,7 @@ function init_page() {
                 mega.config.fetch();
             }
 
-            if (typeof mDB !== 'undefined' && !pfid && !flhashchange) {
+            if (typeof mDB !== 'undefined' && !pfid && (!flhashchange || page === 'fm')) {
                 mDBstart();
             }
             else {

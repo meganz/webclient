@@ -3620,6 +3620,8 @@
     "9104": "Dela artikeln",
     "9105": "Skriv in din s\u00f6kning h\u00e4r....",
     "9106": "Mejla %1 F\u00f6r assistans.",
+    "9107": "From {0:N} {1}\/month",
+    "9108": "Select Location",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3801,6 +3803,7 @@
         "email-support": 9100,
         "contact-support-team-message": 9101,
         "go-back": 9102,
-        "enter-your-search-here": 9105
+        "enter-your-search-here": 9105,
+        "select-location": 9108
     }
 }

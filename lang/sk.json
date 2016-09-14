@@ -3620,6 +3620,8 @@
     "9104": "Zdie\u013ea\u0165 \u010dl\u00e1nok",
     "9105": "Sem nap\u00ed\u0161te \u010do chcete vyh\u013eada\u0165...",
     "9106": "Pre pomoc po\u0161lite email na %1",
+    "9107": "From {0:N} {1}\/month",
+    "9108": "Select Location",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3801,6 +3803,7 @@
         "email-support": 9100,
         "contact-support-team-message": 9101,
         "go-back": 9102,
-        "enter-your-search-here": 9105
+        "enter-your-search-here": 9105,
+        "select-location": 9108
     }
 }

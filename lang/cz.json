@@ -3620,6 +3620,8 @@
     "9104": "Sd\u00edlet \u010dl\u00e1nek",
     "9105": "Sem zadejte sv\u00e9 hled\u00e1n\u00ed...",
     "9106": "Odeslat e-mail na %1 kv\u016fli pomoci.",
+    "9107": "From {0:N} {1}\/month",
+    "9108": "Select Location",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3801,6 +3803,7 @@
         "email-support": 9100,
         "contact-support-team-message": 9101,
         "go-back": 9102,
-        "enter-your-search-here": 9105
+        "enter-your-search-here": 9105,
+        "select-location": 9108
     }
 }

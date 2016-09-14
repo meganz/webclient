@@ -1153,7 +1153,7 @@
     "1970": "Ho\u1eb7c nh\u1eadp M\u00e3 Ph\u1ee5c H\u1ed3i \u1edf \u0111\u00e2y",
     "1971": "B\u1ea1n kh\u00f4ng th\u1ec3 d\u00f9ng th\u1ee7 t\u1ee5c kh\u00f4i ph\u1ee5c t\u00e0i kho\u1ea3n khi \u0111\u00e3 \u0111\u01b0\u1ee3c \u0111\u0103ng nh\u1eadp. Xin \u0111\u0103ng xu\u1ea5t v\u00e0 th\u1eed l\u1ea1i.",
     "1972": "T\u1ec7p m\u00e3-kh\u00f3a b\u1ea5t h\u1ee3p l\u1ec7",
-    "1973": "T\u1ec7p b\u1ea1n v\u1eeba ch\u1ecdn qu\u00e1 l\u1edbn. Xin ch\u1eafc ch\u1eafn t\u1ec7p b\u1ea1n v\u1eeba ch\u1ecdn ch\u1ec9 ch\u1ee9a m\u1ed9t \u0111\u1ed9c nh\u1ea5t m\u1ed9t m\u00e3-kh\u00f3a master d\u00e0i 22 k\u00fd t\u1ef1.",
+    "1973": "T\u1ec7p tin v\u1eeba ch\u1ecdn qu\u00e1 l\u1edbn. Xin ch\u1eafc r\u1eb1ng t\u1ec7p tin b\u1ea1n ch\u1ecdn c\u00f3 ch\u1ee9a m\u1ed9t d\u00e3y m\u00e3 kh\u00f3a d\u00e0i 22 k\u00fd t\u1ef1.",
     "1974": "Xin x\u00e1c nh\u1eadn r\u1eb1ng b\u1ea1n bi\u1ebft r\u1eb1ng t\u1ea5t c\u1ea3 d\u1eef li\u1ec7u c\u1ee7a b\u1ea1n s\u1ebd b\u1ecb x\u00f3a.",
     "1975": "T\u00e0i kho\u1ea3n \u0111\u00e3 \u0111\u01b0\u1ee3c thay m\u1edbi",
     "1976": "T\u00e0i kho\u1ea3n c\u0169 c\u1ee7a qu\u00fd kh\u00e1ch \u0111\u00e3 \u0111\u01b0\u1ee3c thay m\u1edbi m\u1edbi th\u00e0nh c\u00f4ng. Gi\u1edd qu\u00fd kh\u00e1ch c\u00f3 th\u1ec3 \u0111\u0103ng nh\u1eadp v\u00e0o v\u00e0o t\u00e0i kho\u1ea3n n\u00e0y.",
@@ -3587,7 +3587,7 @@
     "9071": "\u0110\u1ec3 truy c\u1eadp v\u00e0o \u0111\u01b0\u1eddng li\u00ean k\u1ebft n\u00e0y, ng\u01b0\u1eddi s\u1eed d\u1ee5ng c\u1ea7n ph\u1ea3i c\u00f3 m\u1eadt kh\u1ea9u gi\u1ea3i m\u00e3.",
     "9072": "N\u1ebfu b\u1ea1n kh\u00f4ng bi\u1ebft m\u1eadt kh\u1ea9u gi\u1ea3i m\u00e3. Li\u00ean h\u1ec7 v\u1edbi ch\u1ee7 s\u1edf h\u1eefu \u0111\u01b0\u1eddng li\u00ean k\u1ebft n\u00e0y.",
     "9073": "Nh\u1eadp m\u1eadt kh\u1ea9u gi\u1ea3i m\u00e3",
-    "9074": "Enter a strong password",
+    "9074": "T\u1ea1o m\u1ed9t m\u1eadt kh\u1ea9u an to\u00e0n",
     "9075": "Nh\u1eadp l\u1ea1i m\u1eadt kh\u1ea9u l\u1ea7n n\u1eefa",
     "9076": "The link could not be decrypted. The password could be incorrect, or the data was corrupted or modified. Check the link and try entering the password again.",
     "9077": "\u0110\u00e3 gi\u1ea3i m\u00e3",
@@ -3598,7 +3598,7 @@
     "9082": "This account has not completed the registration process yet. First check your email, click on the Activate Account button and reconfirm your chosen password.",
     "9083": "Giao d\u1ecbch muua h\u1ea1ng th\u00e0nh vi\u00ean MEGA b\u1ecb th\u1ea5t b\u1ea1i v\u00ec qu\u00fd kh\u00e1ch \u0111\u00e3 mua m\u1eb7t h\u00e0ng n\u00e0y r\u1ed3i.",
     "9084": "\u0110\u00e3 \u0111\u01b0\u1ee3c mua",
-    "9085": "Your purchase of a MEGA subscription has failed or has been cancelled. Please try again or contact Windows Store support.",
+    "9085": "Vi\u1ec7c thanh to\u00e1n giao d\u1ecbch cho t\u00e0i kho\u1ea3n MEGA c\u1ee7a qu\u00fd kh\u00e1ch b\u1ecb th\u1ea5t b\u1ea1i ho\u1eb7c b\u1ecb h\u1ee7y. Xin th\u1eed l\u1ea1i ho\u1eb7c li\u00ean l\u1ea1c v\u1edbi \u0111\u1ed9i tr\u1ee3 gi\u00fap t\u1eeb c\u1eeda h\u00e0ng Windows Store.",
     "9086": "Giao d\u1ecbch th\u1ea5t b\u1ea1i ho\u1eb7c b\u1ecb hu\u1ef7",
     "9087": "G\u00f3i h\u1ea1ng th\u00e0nh vi\u00ean MEGA \u0111\u00e3 \u0111\u01b0\u1ee3c thanh to\u00e1n th\u00e0nh c\u00f4ng.",
     "9088": "Mua h\u00e0ng th\u00e0nh c\u00f4ng",
@@ -3619,7 +3619,9 @@
     "9103": "Sao ch\u00e9p \u0111\u01b0\u1eddng li\u00ean k\u1ebft d\u01b0\u1edbi \u0111\u00e2y \u0111\u1ebb chia s\u1ebb b\u00e0i vi\u1ebft.",
     "9104": "Chia s\u1ebb B\u00e0i Vi\u1ebft",
     "9105": "Nh\u1eadp n\u1ed9i dung t\u00ecm ki\u1ebfm",
-    "9106": "Email %1 for assistance.",
+    "9106": "G\u1eedi email t\u1edbi %1 \u0111\u1ec3 nh\u1eadn tr\u1ee3 gi\u00fap.",
+    "9107": "From {0:N} {1}\/month",
+    "9108": "Select Location",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3801,6 +3803,7 @@
         "email-support": 9100,
         "contact-support-team-message": 9101,
         "go-back": 9102,
-        "enter-your-search-here": 9105
+        "enter-your-search-here": 9105,
+        "select-location": 9108
     }
 }

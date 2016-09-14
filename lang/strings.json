@@ -14482,5 +14482,13 @@
     "9106": {
         "text": "Email %1 for assistance.",
         "context": "A mailto link button. The %1 placeholder will be replaced with an email address."
+    },
+    "9107": {
+        "text": "From {0:N} {1}\/month",
+        "context": "A label for indicating the base price of a product or plan. For example \"From 9,99 \u20ac\/month\". Please keep the code {0:N} because is for including the price of the product at runtime. Please keep the code {1} because is for including the currency at runtime."
+    },
+    "9108": {
+        "text": "Select Location",
+        "context": "A context menu item. This lets the user select the location where they would like to move the file or folder to."
     }
 }

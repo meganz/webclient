@@ -2248,7 +2248,7 @@ function fmremove() {
                 }
             }
         });
-        $('.fm-dialog-button.notification-button').each(function(i, e) {
+        $('.default-white-button.notification-button').each(function(i, e) {
             if ($(e).text() === l[1018]) {
                 $(e).safeHTML('<span>@@</span>', l[83]);
             }
@@ -5112,7 +5112,7 @@ function handleResetSuccessDialogs(dialog, txt, dlgString) {
 
     $('.fm-dialog' + dialog + ' .reg-success-txt').text(txt);
 
-    $('.fm-dialog' + dialog + ' .fm-dialog-button').rebind('click', function() {
+    $('.fm-dialog' + dialog + ' .default-white-button').rebind('click', function() {
         $('.fm-dialog-overlay').addClass('hidden');
         $('body').removeClass('overlayed');
         $('.fm-dialog' + dialog).addClass('hidden');
@@ -5467,7 +5467,7 @@ function FMShortcuts() {
 
             // force remove, no confirmation
             if (e.ctrlKey || e.metaKey) {
-                $('#msgDialog:visible .fm-dialog-button.confirm').trigger('click');
+                $('#msgDialog:visible default-white-button.confirm').trigger('click');
             }
 
             return false;
@@ -7962,17 +7962,17 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
         $('#msgDialog').addClass('clear-bin-dialog');
         $('#msgDialog .icon').addClass('fm-bin-clear-icon');
         $('#msgDialog .fm-notifications-bottom')
-            .safeHTML('<div class="fm-dialog-button notification-button confirm"><span>@@</span></div>' +
-                '<div class="fm-dialog-button notification-button cancel"><span>@@</span></div>' +
+            .safeHTML('<div class="default-white-button right notification-button confirm"><span>@@</span></div>' +
+                '<div class="default-white-button right notification-button cancel"><span>@@</span></div>' +
                 '<div class="clear"></div>', l[1018], l[82]);
 
-        $('#msgDialog .fm-dialog-button').eq(0).bind('click', function() {
+        $('#msgDialog .default-white-button').eq(0).bind('click', function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(true);
             }
         });
-        $('#msgDialog .fm-dialog-button').eq(1).bind('click', function() {
+        $('#msgDialog .default-white-button').eq(1).bind('click', function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(false);
@@ -7982,17 +7982,17 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
     else if (type === 'delete-contact') {
         $('#msgDialog').addClass('delete-contact');
         $('#msgDialog .fm-notifications-bottom')
-            .safeHTML('<div class="fm-dialog-button notification-button confirm"><span>@@</span></div>' +
-                '<div class="fm-dialog-button notification-button cancel"><span>@@</span></div>' +
+            .safeHTML('<div class="default-white-button right notification-button confirm"><span>@@</span></div>' +
+                '<div class="default-white-button right notification-button cancel"><span>@@</span></div>' +
                 '<div class="clear"></div>', l[78], l[79]);
 
-        $('#msgDialog .fm-dialog-button').eq(0).bind('click', function() {
+        $('#msgDialog .default-white-button').eq(0).bind('click', function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(true);
             }
         });
-        $('#msgDialog .fm-dialog-button').eq(1).bind('click', function() {
+        $('#msgDialog .default-white-button').eq(1).bind('click', function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(false);
@@ -8002,17 +8002,17 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
     else if (type === 'warninga' || type === 'warningb' || type === 'info') {
         if (extraButton) {
             $('#msgDialog .fm-notifications-bottom')
-                .safeHTML('<div class="fm-dialog-button notification-button confirm"><span>@@</span></div>' +
-                    '<div class="fm-dialog-button notification-button cancel"><span>@@</span></div>' +
+                .safeHTML('<div class="default-white-button right notification-button confirm"><span>@@</span></div>' +
+                    '<div class="default-white-button right notification-button cancel"><span>@@</span></div>' +
                     '<div class="clear"></div>', l[81], extraButton);
 
-            $('#msgDialog .fm-dialog-button').eq(0).bind('click', function() {
+            $('#msgDialog .default-white-button').eq(0).bind('click', function() {
                 closeMsg();
                 if ($.warningCallback) {
                     $.warningCallback(false);
                 }
             });
-            $('#msgDialog .fm-dialog-button').eq(1).bind('click', function() {
+            $('#msgDialog .default-white-button').eq(1).bind('click', function() {
                 closeMsg();
                 if ($.warningCallback) {
                     $.warningCallback(true);
@@ -8021,10 +8021,10 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
         }
         else {
             $('#msgDialog .fm-notifications-bottom')
-                .safeHTML('<div class="fm-dialog-button notification-button"><span>@@</span></div>' +
+                .safeHTML('<div class="default-white-button right notification-button"><span>@@</span></div>' +
                     '<div class="clear"></div>', l[81]);
 
-            $('#msgDialog .fm-dialog-button').bind('click', function() {
+            $('#msgDialog .default-white-button').bind('click', function() {
                 closeMsg();
                 if ($.warningCallback) {
                     $.warningCallback(true);
@@ -8051,18 +8051,18 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
                         'id="confirmation-checkbox" class="checkboxOff">' +
                 '</div>' +
                 '<label for="export-checkbox" class="radio-txt">@@</label></div>' +
-                '<div class="fm-dialog-button notification-button confirm"><span>@@</span></div>' +
-                '<div class="fm-dialog-button notification-button cancel"><span>@@</span></div>' +
+                '<div class="default-white-button right notification-button confirm"><span>@@</span></div>' +
+                '<div class="default-white-button right notification-button cancel"><span>@@</span></div>' +
                 '<div class="clear"></div>', l[229], l[78], l[79]);
 
-        $('#msgDialog .fm-dialog-button').eq(0).bind('click', function() {
+        $('#msgDialog .default-white-button').eq(0).bind('click', function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(true);
             }
         });
 
-        $('#msgDialog .fm-dialog-button').eq(1).bind('click', function() {
+        $('#msgDialog .default-white-button').eq(1).bind('click', function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(false);
@@ -8102,7 +8102,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
             .addClass('hidden')
             .html('');
 
-        $('#msgDialog .fm-dialog-button').bind('click', function() {
+        $('#msgDialog .default-white-button').bind('click', function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(true);
@@ -8315,7 +8315,6 @@ function handleDialogContent(dialogTabClass, parentTag, newFolderButton, dialogP
     if (buttonLabel === l[1344]) {
         $('.fm-dialog.copy-dialog .share-dialog-permissions').removeClass('hidden');
         $('.dialog-newfolder-button').addClass('hidden');
-        $('.copy-dialog-button').addClass('hidden');
         $('.copy-operation-txt').text(l[1344]);
 
         $('.fm-dialog.copy-dialog .share-dialog-permissions')
@@ -8365,7 +8364,7 @@ function shareDialogContentCheck() {
     var dc = '.share-dialog',
         itemsNum = 0,
         newItemsNum = 0,
-        $btn = $('.fm-dialog-button.dialog-share-button');
+        $btn = $('.default-white-button.dialog-share-button');
     var $groupPermissionDropDown = $('.share-dialog .permissions-icon');
 
     newItemsNum = $(dc + ' .token-input-token-mega').length;
@@ -8834,7 +8833,7 @@ function initCopyrightsDialog(nodesToProcess) {
     $copyrightDialog.show();
 
     // Init click handler for 'I agree' / 'I disagree' buttons
-    $copyrightDialog.find('.fm-dialog-button').rebind('click', function() {
+    $copyrightDialog.find('.default-white-button').rebind('click', function() {
 
         // User disagrees with copyright warning
         if ($(this).hasClass('cancel')) {
@@ -9112,7 +9111,7 @@ function initShareDialog() {
         }
 
         if ($.changedPermissions.length > 0) {// Enable Done button
-            $('.fm-dialog-button.dialog-share-button').removeClass('disabled');
+            $('.default-white-button.dialog-share-button').removeClass('disabled');
         }
 
         $('.permissions-icon.active').removeClass('active');
@@ -10051,7 +10050,7 @@ function createFolderDialog(close)
         }
     });
 
-    $('.create-folder-dialog .fm-dialog-close, .create-folder-button-cancel.dialog').rebind('click', function() {
+    $('.create-folder-dialog .fm-dialog-close, .create-folder-dialog .create-folder-button-cancel').rebind('click', function() {
         createFolderDialog(1);
         $('.fm-dialog').removeClass('arrange-to-back');
         $('.create-folder-dialog input').val(l[157]);
@@ -12541,7 +12540,7 @@ var cancelSubscriptionDialog = {
     initCloseAndBackButtons: function() {
 
         // Close main dialog
-        this.$dialog.find('.fm-dialog-button.cancel, .fm-dialog-close').rebind('click', function() {
+        this.$dialog.find('.default-white-button.cancel, .fm-dialog-close').rebind('click', function() {
             cancelSubscriptionDialog.$dialog.addClass('hidden');
             cancelSubscriptionDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
         });

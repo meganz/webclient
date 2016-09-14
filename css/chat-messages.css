@@ -22,7 +22,6 @@
     position: relative;
     background-color: #fafafa;
     margin-right: 256px;
-    border-right: 1px solid rgba(0, 0, 0, 0.1);
 }
 .conversation-panel.group-chat .messages-block {
     height: -webkit-calc(100% - 48px);

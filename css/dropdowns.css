@@ -71,15 +71,15 @@
     z-index: 123;
     background-image: url(../images/mega/top-login-sprite_v7.png);
     background-repeat: no-repeat;
-    background-position: 0 -2251px;
+    background-position: 0 -2249px;
 }
-.dropdown-arrow .dropdown-white-arrow {
+.dropdown.dropdown-arrow:not(.dialog) .dropdown-white-arrow {
     display: block;
 }
 .down-arrow .dropdown-white-arrow {
     top: auto;
     bottom: -11px;
-    background-position: -24px -2257px;
+    background-position: -24px -2256px;
 }
 .left-arrow .dropdown-white-arrow {
     width: 11px;

@@ -3566,7 +3566,7 @@ mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
             clearInterval($.mTransferAnalysis);
             delete $.mTransferAnalysis;
         }
-        $('.transfer-panel-title').safeHTML(l[104]);
+        $('.transfer-panel-title').text('');
         dlmanager.dlRetryInterval = 3000;
     }
 

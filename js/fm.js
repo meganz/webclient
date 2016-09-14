@@ -869,18 +869,39 @@ function initUI() {
         }
     });
 
-    $('.nw-fm-left-icon').rebind('mouseover.nw-fm-left-icon', function() {
-        var tooltip = $(this).find('.nw-fm-left-tooltip');
+    $('.nw-fm-left-icon, .top-icon').rebind('mouseover.nw-fm-left-icon', function() {
+        var $this = $(this),
+            $tooltip = $this.find('.dark-tooltip'),
+            tooltipPos,
+            tooltipWidth,
+            buttonPos;
         if ($.liTooltipTimer)
             clearTimeout($.liTooltipTimer);
         $.liTooltipTimer = window.setTimeout(
             function() {
-                $(tooltip).addClass('hovered');
+                if ($tooltip.hasClass('top')) {
+                    tooltipWidth = $tooltip.outerWidth();
+                    buttonPos = $this.position().left;
+                    tooltipPos = buttonPos + $this.outerWidth()/2 - tooltipWidth/2;
+                    if ($('body').width() - (tooltipPos + tooltipWidth) > 0) {
+                        $tooltip.css({
+                            'left': tooltipPos,
+                            'right': 'auto'
+                        });
+                    }
+                    else {
+                        $tooltip.css({
+                            'left': 'auto',
+                            'right': 0
+                        });
+                    }
+                }
+                $tooltip.addClass('hovered');
             }, 1000);
     });
 
-    $('.nw-fm-left-icon').rebind('mouseout.nw-fm-left-icon', function() {
-        $(this).find('.nw-fm-left-tooltip').removeClass('hovered');
+    $('.nw-fm-left-icon, .top-icon').rebind('mouseout.nw-fm-left-icon', function() {
+        $(this).find('.dark-tooltip').removeClass('hovered');
         clearTimeout($.liTooltipTimer);
     });
 
@@ -1898,15 +1919,7 @@ function addContactUI() {
             $('.add-user-popup-button.add').addClass('disabled');
             $('.add-user-popup .nw-fm-dialog-title').text(l[71]);
 
-            var pos = $(window).width() - $this.offset().left - $d.outerWidth() + 2;
-
-            // Positioning, not less then 8px from right side
-            if (pos > 8) {
-                $d.css('right', pos + 'px');
-            }
-            else {
-                $d.css('right', 8 + 'px');
-            }
+            topPopupAlign(this, '.add-user-popup');
 
             initTextareaScrolling($('.add-user-textarea textarea'), 39);
             focusOnInput();
@@ -2756,12 +2769,7 @@ function createFolderUI() {
         if (c.indexOf('active') === -1) {
             b1.addClass('active');
             d1.removeClass('hidden');
-            var w1 = $(window).width() - $(this).offset().left - d1.outerWidth() + 2;
-            if (w1 > 8) {
-                d1.css('right', w1 + 'px');
-            } else {
-                d1.css('right', 8 + 'px');
-            }
+            topPopupAlign(this, '.dropdown.create-new-folder');
             $('.create-new-folder input').focus();
         }
         else {
@@ -2811,6 +2819,8 @@ function createFolderUI() {
 
         $('.fm-new-folder').addClass('active');
         $('.create-new-folder').removeClass('hidden');
+        topPopupAlign('.link-button.fm-new-folder', '.add-user-popup');
+
         createFolderDialog(1);
         $('.create-folder-dialog input').val(l[157]);
         $('.create-new-folder input').focus();
@@ -2975,9 +2985,23 @@ function notificationsUI(close)
     $.tresizer();
 }
 
+
 function dashboardUI() {
     $('.fm-right-files-block, .section.conversations, .fm-right-account-block').addClass('hidden');
     $('.fm-right-block.dashboard').removeClass('hidden');
+
+    // Hide backup widget is user already saved recovery key before
+    if (localStorage.recoverykey) {
+        $('.account.widget.recovery-key').addClass('hidden');
+    }
+    else {
+         $('.account.widget.recovery-key').removeClass('hidden');
+         // Button on dashboard to backup their master key
+        $('.backup-master-key').rebind('click', function() {
+            document.location.hash = 'backup';
+        });
+    }
+
     sectionUIopen('dashboard');
 
     // Show Membership plan
@@ -3236,6 +3260,7 @@ function dashboardUI() {
         // Fill rest of widgets
         dashboardUI.updateWidgets();
 
+        Soon(fm_resize_handler);
         initTreeScroll();
         initDashboardScroll();
     });
@@ -3293,10 +3318,12 @@ dashboardUI.updateChatWidget = function() {
     }
     if (allChats === 0) {
         $('.account.widget.text.chat').removeClass('hidden');
+        $('.account.icon-button.add-contacts').addClass('hidden');
         $('.account.data-table.chat').addClass('hidden');
     }
     else {
         $('.account.widget.text.chat').addClass('hidden');
+        $('.account.icon-button.add-contacts').removeClass('hidden');
         $('.account.data-table.chat').removeClass('hidden');
         $('.data-right-td.all-chats span').text(allChats);
         $('.data-right-td.group-chats span').text(groupChats);
@@ -3540,8 +3567,12 @@ function accountUI() {
         perc_c = perc;
         if (perc_c > 100)
             perc_c = 100;
-        if (perc > 99)
+        if (perc > 99) {
             $('.fm-account-blocks.storage').addClass('exceeded');
+        }
+        else if (perc > 80) {
+            $('.account.upgrade-account').removeClass('hidden');
+        }
 
         var deg =  230 * perc_c / 100;
 
@@ -4171,7 +4202,7 @@ function accountUI() {
             }, {
                 callback : function(res) {
                     if (res === u_handle) {
-                        $('.user-name').text(u_attr.firstname);
+                        $('.user-name').text(u_attr.name);
                     }
                 }
             });
@@ -5144,7 +5175,7 @@ function avatarDialog(close)
     $.dialog = 'avatar';
     $('.fm-dialog.avatar-dialog').removeClass('hidden');
     fm_showoverlay();
-    $('.avatar-body').html('<div id="avatarcrop"><div class="image-upload-and-crop-container"><div class="image-explorer-container empty"><div class="image-explorer-image-view"><img class="image-explorer-source"><div class="avatar-white-bg"></div><div class="image-explorer-mask circle-mask"></div><div class="image-explorer-drag-delegate"></div></div><div class="image-explorer-scale-slider-wrapper"><input class="image-explorer-scale-slider disabled" type="range" min="0" max="100" step="1" value="0" disabled=""></div></div><div class="fm-notifications-bottom"><input type="file" id="image-upload-and-crop-upload-field" class="image-upload-field" accept="image/jpeg, image/gif, image/png"><label for="image-upload-and-crop-upload-field" class="image-upload-field-replacement fm-account-change-avatar"><span>' + l[1016] + '</span></label><div class="fm-account-change-avatar" id="fm-change-avatar"><span>' + l[1017] + '</span></div><div  class="fm-account-change-avatar" id="fm-cancel-avatar"><span>Cancel</span></div><div class="clear"></div></div></div></div>');
+    $('.avatar-body').html('<div id="avatarcrop"><div class="image-upload-and-crop-container"><div class="image-explorer-container empty"><div class="image-explorer-image-view"><img class="image-explorer-source"><div class="avatar-white-bg"></div><div class="image-explorer-mask circle-mask"></div><div class="image-explorer-drag-delegate"></div></div><div class="image-explorer-scale-slider-wrapper"><input class="image-explorer-scale-slider disabled" type="range" min="0" max="100" step="1" value="0" disabled=""></div></div><div class="fm-notifications-bottom"><input type="file" id="image-upload-and-crop-upload-field" class="image-upload-field" accept="image/jpeg, image/gif, image/png"><label for="image-upload-and-crop-upload-field default-white-button right" class="image-upload-field-replacement fm-account-change-avatar  default-white-button right"><span>' + l[1016] + '</span></label><div class="fm-account-change-avatar  default-white-button right" id="fm-change-avatar"><span>' + l[1017] + '</span></div><div  class="fm-account-change-avatar  default-white-button right" id="fm-cancel-avatar"><span>Cancel</span></div><div class="clear"></div></div></div></div>');
     $('#fm-change-avatar').hide();
     $('#fm-cancel-avatar').hide();
     var imageCrop = new ImageUploadAndCrop($("#avatarcrop").find('.image-upload-and-crop-container'),
@@ -5212,16 +5243,7 @@ function gridUI() {
     };
 
     $.contactGridHeader = function() {
-        var headerColumn = '',
-            i = 0,
-            w = 0,
-            el = $('.files-grid-view.contacts-view .grid-table-header th');
-        while (i < el.length) {
-            if (i !== 0) {
-                w += $(el[i]).width();
-            }
-            i++;
-        }
+        var headerColumn = '';
         $('.files-grid-view.contacts-view .grid-scrolling-table tr:first-child td').each(function(i, e) {
             headerColumn = $('.files-grid-view.contacts-view .grid-table-header th').get(i);
             $(headerColumn).width($(e).width());
@@ -5230,16 +5252,7 @@ function gridUI() {
     };
 
     $.opcGridHeader = function() {
-        var headerColumn = '',
-            i = 0,
-            w = 0,
-            el = $('.sent-requests-grid .grid-table-header th');
-        while (i < el.length) {
-            if (i !== 0) {
-                w += $(el[i]).width();
-            }
-            i++;
-        }
+        var headerColumn = '';
         $('.sent-requests-grid .grid-scrolling-table tr:first-child td').each(function(i, e) {
             headerColumn = $('.sent-requests-grid .grid-table-header th').get(i);
             $(headerColumn).width($(e).width());
@@ -5248,16 +5261,7 @@ function gridUI() {
     };
 
     $.ipcGridHeader = function() {
-        var headerColumn = '',
-            i = 0,
-            w = 0,
-            el = $('.contact-requests-grid .grid-table-header th');
-        while (i < el.length) {
-            if (i !== 0) {
-                w += $(el[i]).width();
-            }
-            i++;
-        }
+        var headerColumn = '';
         $('.contact-requests-grid .grid-scrolling-table tr:first-child td').each(function(i, e) {
             headerColumn = $('.contact-requests-grid .grid-table-header th').get(i);
             $(headerColumn).width($(e).width());
@@ -5266,16 +5270,7 @@ function gridUI() {
     };
 
     $.sharedGridHeader = function() {
-        var el = $('.shared-grid-view .grid-table-header th'),
-            headerColumn = '',
-            i = 0,
-            w = 0;
-        while (i < el.length) {
-            if (i !== 0) {
-                w += $(el[i]).width();
-            }
-            i++;
-        }
+        var el = headerColumn = '';
         $('.shared-grid-view .grid-scrolling-table tr:first-child td').each(function(i, e) {
             headerColumn = $('.shared-grid-view .grid-table-header th').get(i);
             $(headerColumn).width($(e).width());
@@ -6640,7 +6635,7 @@ function transferPanelUI()
             $('.transfer-clear-completed').addClass('disabled');
             $('.transfer-table-header').hide();
             $('.transfer-panel-empty-txt').removeClass('hidden');
-            $('.transfer-panel-title').html(l[104]);
+            $('.transfer-panel-title').text('');
             $('.nw-fm-left-icon.transfers').removeClass('transfering').find('p').removeAttr('style');
             if (M.currentdirid === 'transfers') {
                 fm_tfsupdate();
@@ -7589,7 +7584,7 @@ function sectionUIopen(id) {
     $('.nw-fm-left-icon.' + tmpId).addClass('active');
     $('.content-panel.' + tmpId).addClass('active');
     $('.fm-left-menu').removeClass(
-        'cloud-drive folder-link shared-with-me rubbish-bin contacts conversations opc ipc inbox account dashboard'
+        'cloud-drive folder-link shared-with-me rubbish-bin contacts conversations opc ipc inbox account dashboard transfers'
     ).addClass(tmpId);
     $('.fm.fm-right-header, .fm-import-to-cloudrive, .fm-download-as-zip').addClass('hidden');
     $('.fm-import-to-cloudrive, .fm-download-as-zip').unbind('click');
@@ -11797,14 +11792,6 @@ function fm_resize_handler() {
 
     mega.utils.chrome110ZoomLevelNotification();
 
-    $('.transfer-scrolling-table').css({
-        'height': (
-             $('.fm-transfers-block').outerHeight()
-                - $('.transfer-table-header').outerHeight()
-                - $('.fm-tranfers-header').outerHeight()
-        ) + "px"
-    });
-
     // left panel resize logic
     /*
     var right_panel_margin = $('.fm-left-panel').outerWidth();
@@ -11853,27 +11840,13 @@ function fm_resize_handler() {
     else if (M.currentdirid && M.currentdirid.substr(0, 7) === 'account') {
         var $mainBlock = $('.fm-account-main');
 
-        if ($mainBlock.width() > 1675) {
-            $mainBlock.addClass('hi-width');
-        }
-        else if ($mainBlock.width() < 880) {
-            $mainBlock.addClass('low-width');
-        } else {
-            $mainBlock.removeClass('low-width hi-width');
-        }
-
-        initAccountScroll();
-    }
-    else if (M.currentdirid && M.currentdirid.substr(0, 7) === 'account') {
-        var $mainBlock = $('.fm-account-main');
+        $mainBlock.removeClass('low-width hi-width');
 
         if ($mainBlock.width() > 1675) {
             $mainBlock.addClass('hi-width');
         }
         else if ($mainBlock.width() < 880) {
             $mainBlock.addClass('low-width');
-        } else {
-            $mainBlock.removeClass('low-width hi-width');
         }
 
         initAccountScroll();
@@ -11881,13 +11854,16 @@ function fm_resize_handler() {
     else if (M.currentdirid && M.currentdirid.substr(0, 9) === 'dashboard') {
         var $mainBlock = $('.fm-right-block.dashboard');
 
+        $mainBlock.removeClass('ultra-low-width low-width hi-width');
+
         if ($mainBlock.width() > 1675) {
             $mainBlock.addClass('hi-width');
         }
-        else if ($mainBlock.width() < 880) {
+        else if ($mainBlock.width() < 880 && $mainBlock.width() > 698) {
             $mainBlock.addClass('low-width');
-        } else {
-            $mainBlock.removeClass('low-width hi-width');
+        }
+        else if ($mainBlock.width() < 698) {
+            $mainBlock.addClass('ultra-low-width');
         }
 
         initDashboardScroll();
@@ -12013,9 +11989,9 @@ function sharedFolderUI() {
                         + '</div>'
                     + '</div>'
                     + '<div class="shared-details-buttons">'
-                        + '<div class="fm-leave-share"><span>' + l[5866] + '</span></div>'
-                        + '<div class="fm-share-copy"><span>' + l[63] + '</span></div>'
-                        + '<div class="fm-share-download"><span class="fm-chatbutton-arrow">' + l[58] + '</span></div>'
+                        + '<div class="fm-leave-share default-white-button right small grey-txt"><span>' + l[5866] + '</span></div>'
+                        + '<div class="fm-share-copy default-white-button right small grey-txt"><span>' + l[63] + '</span></div>'
+                        + '<div class="fm-share-download default-white-button right small grey-txt"><span class="fm-chatbutton-arrow">' + l[58] + '</span></div>'
                         + '<div class="clear"></div>'
                     + '</div>'
                     + '<div class="clear"></div>'
@@ -12735,10 +12711,7 @@ function removeFromMultiInputDDL(dialog, item) {
                 }
                 else {
                     $self.addClass('focused-input');
-                    if ($input.val() === $input.attr('placeholder')) {
-                        $input.val('');
-                        $input.focus();
-                    }
+                    $input.focus();
                 }
             }); // END left panel header click
 
@@ -12781,9 +12754,9 @@ function removeFromMultiInputDDL(dialog, item) {
 
                 var $self = $(this);
 
-                if (($self.val() === $self.attr('placeholder')) || ($self.val() === '')) {
+                if ($self.val() === '') {
                     $self.parent('.nw-fm-tree-header').removeClass('focused-input filled-input');
-                    $self.val($self.attr('placeholder'));
+                    //$self.val($self.attr('placeholder'));
                 }
                 else {
                     $self.parent('.nw-fm-tree-header').removeClass('focused-input');

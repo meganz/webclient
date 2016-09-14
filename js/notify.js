@@ -36,7 +36,7 @@ var notify = {
     init: function() {
 
         // Cache lookups
-        notify.$popup = $('.top-head .notification-popup');
+        notify.$popup = $('.dropdown.popup.notification-popup');
         notify.$popupIcon = $('.top-head .top-icon.notification');
         notify.$popupNum = $('.top-head .notification-num');
 
@@ -297,7 +297,7 @@ var notify = {
         Soon(function() {
             notify.$popup.removeClass('hidden');
             notify.$popupIcon.addClass('active');
-            topPopupAlign(notify.$popupIcon, notify.$popup);
+            topPopupAlign('.top-icon.notification', notify.$popup, 40);
 
             // Render and show notifications currently in list
             notify.renderNotifications();

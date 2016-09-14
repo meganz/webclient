@@ -37,6 +37,7 @@ var alarm = {
         else {
             $container.removeClass('hidden').addClass('active');
             $dialog.removeClass('hidden');
+            topPopupAlign($container, $dialog, 40);
         }
     },
 
@@ -77,7 +78,7 @@ var alarm = {
                 Soon(function() {
                     $dialog.removeClass('hidden');
                     $container.addClass('active');
-                    topPopupAlign($container, dialog);
+                    topPopupAlign($container, dialog, 40);
                 });
             }
         });

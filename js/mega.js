@@ -935,9 +935,9 @@ function MegaData()
                         '</td>' +
                         '<td>' + ps + '</td>' +
                         '<td>' +
-                            '<div class="contact-request-button delete"><span>' + l[5858] + '</span></div>' +
-                            '<div class="contact-request-button accept"><span>' + l[5856] + '</span></div>' +
-                            '<div class="contact-request-button ignore"><span>' + l[5860] + '</span></div>' +
+                            '<div class="contact-request-button default-white-button grey-txt small right delete"><span>' + l[5858] + '</span></div>' +
+                            '<div class="contact-request-button default-white-button grey-txt small right accept"><span>' + l[5856] + '</span></div>' +
+                            '<div class="contact-request-button default-white-button grey-txt small right ignore"><span>' + l[5860] + '</span></div>' +
                             '<div class="contact-request-ignored"><span>' + l[5864] + '</span></div>' +
                             '<div class="clear"></div>' +
                         '</td>' +
@@ -1035,8 +1035,8 @@ function MegaData()
                                <div class="contact-email">' + htmlentities(opc[i].m) + '</div>\n\
                             </div>\n\
                         </div>\n\
-                        <div class="contact-request-button cancel ' + hideCancel + '"><span>' + l[156] + ' ' + l[738].toLowerCase() + '</span></div>\n\
-                        <div class="contact-request-button reinvite ' + hideReinvite + '"><span>' + l[5861] + '</span></div>\n\
+                        <div class="contact-request-button default-white-button grey-txt small right cancel ' + hideCancel + '"><span>' + l[156] + ' ' + l[738].toLowerCase() + '</span></div>\n\
+                        <div class="contact-request-button default-white-button grey-txt small right reinvite ' + hideReinvite + '"><span>' + l[5861] + '</span></div>\n\
                     </td>\n\
                 </tr>';
 
@@ -2967,7 +2967,7 @@ function MegaData()
                 u_attr.lastname = lastName;
                 u_attr.name = self.u[userId].name;
 
-                $('.user-name').text(u_attr.firstname);
+                $('.user-name').text(u_attr.name);
 
                 $('.membership-big-txt.name:visible').text(
                     u_attr.name

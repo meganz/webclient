@@ -42,9 +42,17 @@
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     background-color: white;
+    position:relative;
 }
-.chat-right-area.left-border {
-    border-left: 1px solid rgba(0,0,0,0.1);
+.chat-right-area::after {
+    content: '';
+    width: 1px;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-color: #e1e1e1;
+    position: absolute;
+    z-index: 1;
 }
 .chat-right-area .chat-right-area {
     float: none;
@@ -195,7 +203,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     left: auto;
     right: 34px;
     background-position: -11px -420px;
-    background-image: url(../images/mega/top-sprite_v3.svg);
+    background-image: url(../images/mega/top-sprite_v5.svg);
 }
 .fm-chat-popup-button {
     height: 32px;

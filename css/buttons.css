@@ -5,35 +5,49 @@
     cursor: pointer;
 }
 .button input {
-    position:absolute;
+    position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -moz-opacity: 0;
     -khtml-opacity: 0;
     opacity: 0;
-    z-index:1;
-    margin:0;
-    padding:0;
-    border:0;
+    z-index: 1;
+    margin: 0;
+    padding: 0;
+    border: 0;
 }
 .link-button {
     display: block;
     cursor: pointer;
     font-size: 13px;
-    line-height: 19px;
+    line-height: 20px;
     color: #777777;
     white-space: nowrap;
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
     overflow: hidden;
-    position:relative;
+    position: relative;
     text-align: left;
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
+}
+.link-button:hover {
+    color: #555555;
 }
 .link-button.right {
     margin-left: 27px;
+}
+.link-button.red {
+    color: #E44C51
+}
+.link-button.red:hover {
+    color: #D90007;
 }
 .link-button i, .button i, .default-white-button i {
     font-size: inherit;
@@ -145,6 +159,21 @@
     -webkit-border-radius: 3px;
     border-radius: 3px;
 }
+.default-white-button.small, .default-grey-button.small {
+    line-height: 24px;
+    height: 24px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+}
+.default-grey-button.small::before, .default-grey-button.small::after, .default-white-button.small::before, .default-white-button.small::after {
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+}
+.default-white-button.grey-txt, .default-white-button.grey-txt span {
+    color: #777777;
+}
 .default-grey-button.semi-small:before, .default-grey-button.semi-small:after, .default-white-button.semi-small::before, .default-white-button.semi-small::after {
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
@@ -191,6 +220,9 @@
 .default-white-button:not(.tiny-button) i {
     margin: 6px 6px 1px -5px;
     vertical-align: top;
+}
+.default-white-button.small i {
+    margin: 3px 3px 1px -5px;
 }
 .default-white-button.semi-small i {
     margin: 5px 4px 1px -5px;
@@ -258,19 +290,6 @@
     -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
     -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
     box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
-}
-.default-white-button.tiny-button::after {
-    content: '';
-    display: block;
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    padding: 4px;
-    -webkit-box-sizing: padding-box;
-    -moz-box-sizing: padding-box;
-    box-sizing: padding-box;
-    left: -4px;
-    top: -4px;
 }
 .default-white-button.tiny-button .tiny-icon {
     margin: 0 auto;

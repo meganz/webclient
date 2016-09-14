@@ -113,13 +113,14 @@ function scrollMenu() {
     });
 }
 
-function topPopupAlign(button, popup) {
+function topPopupAlign(button, popup, topPos) {
     var $button = $(button),
         $popup = $(popup),
         $popupArrow = $popup.find('.dropdown-white-arrow'),
         pageWidth,
         popupRightPos,
-        arrowRightPos;
+        arrowRightPos,
+        buttonTopPos;
 
     if ($button.length && $popup.length) {
         pageWidth = $('body').width();
@@ -128,6 +129,13 @@ function topPopupAlign(button, popup) {
             - $button.offset().left
             - $button.outerWidth()/2
             - $popup.outerWidth()/2;
+        if (topPos) {
+            $popup.css('top', topPos + 'px');
+        } else {
+            buttonTopPos = $button.offset().top + $button.outerHeight();
+            $popup.css('top', buttonTopPos + 13 + 'px');
+        }
+
 
         if (popupRightPos > 10) {
             $popup.css('right', popupRightPos + 'px');
@@ -1166,7 +1174,7 @@ function loginDialog(close) {
     });
     Soon(function() {
         $('.dropdown.top-login-popup').removeClass('hidden');
-        topPopupAlign('.top-login-button', '.dropdown.top-login-popup');
+        topPopupAlign('.top-login-button', '.dropdown.top-login-popup', 40);
         document.getElementById('login-name').focus();
     });
 }
@@ -1245,19 +1253,9 @@ function topmenuUI() {
 
     $('.fm-avatar').hide();
 
-    // If the 'firstname' property is set, display it
-    if (u_type == 3 && u_attr.firstname) {
-        $('.top-head .user-name').text(u_attr.firstname);
-        $('.top-head .user-name').show();
-    }
-
-    // Check for pages that do not have the 'firstname' property set e.g. #about
-    else if ((u_type == 3) && (!u_attr.firstname)
-            && (typeof u_attr.name === 'string') && (u_attr.name.indexOf(' ') != -1)) {
-
-        // Try get the first name from the full 'name' property and display
-        var nameParts = u_attr.name.split(' ');
-        $('.top-head .user-name').text(nameParts[0]);
+    // If the 'name' property is set, display it
+    if (u_type == 3 && u_attr.name) {
+        $('.top-head .user-name').text(u_attr.name);
         $('.top-head .user-name').show();
     }
 
@@ -1410,6 +1408,7 @@ function topmenuUI() {
             $('.membership-status-block').removeClass('active');
         }
         if (!e || ($(e.target).parents('.top-menu-popup').length == 0
+                && !$(e.target).hasClass('top-menu-popup')
                 && ((c && c.indexOf('top-icon menu') == -1) || !c))) {
             $('.top-menu-popup').addClass('hidden');
             $('.top-icon.menu').removeClass('active');
@@ -1498,7 +1497,7 @@ function topmenuUI() {
             Soon(function() {
                 $(this).addClass('active');
                 $('.top-user-status-popup').removeClass('hidden');
-                topPopupAlign('.activity-status-block', '.top-user-status-popup');
+                topPopupAlign('.activity-status-block', '.top-user-status-popup', 40);
             });
         }
         else {
@@ -1514,198 +1513,6 @@ function topmenuUI() {
                 .attr('class', $(this).find('.activity-status').attr('class'));
             $('.activity-status-block').removeClass('active');
             $('.top-user-status-popup').addClass('hidden');
-        }
-    });
-    $('.membership-status-block').rebind('click', function (e) {
-        $('.membership-popup .membership-main-block').addClass('hidden');
-        $('.membership-popup .membership-loading').removeClass('hidden');
-
-        if ($(this).attr('class').indexOf('active') == -1) {
-            $(this).addClass('active');
-            if (u_attr.p) {
-                $('.membership-popup').addClass('pro-popup');
-            } else {
-                $('.membership-popup').removeClass('pro-popup');
-            }
-            Soon(function() {
-                $('.membership-popup').removeClass('hidden');
-                topPopupAlign('.membership-status-block', '.membership-popup');
-            });
-
-            M.accountData(function (account) {
-
-                var perc, warning, perc_c;
-                var percent = {
-                    space: Math.min(100, Math.round(account.space_used / account.space * 100)),
-                    bw: Math.round((account.servbw_used + account.downbw_used) / account.bw * 100)
-                };
-
-
-                $('.membership-popup .membership-loading').addClass('hidden');
-                $('.membership-popup .membership-main-block').removeClass('hidden');
-                var $parent = $('.membership-popup');
-                $parent.find('.membership-usage-bl').removeClass('exceeded going-out');
-
-                if (u_attr.p) {
-                    var planNum = u_attr.p;
-                    var planName = getProPlan(planNum);
-
-                    $('.membership-popup.pro-popup .membership-icon').addClass('pro' + planNum);
-                    var $elm = $('.membership-popup.pro-popup .membership-icon-txt-bl .membership-medium-txt');
-                    if (account.stype !== 'S') {
-                        $elm.safeHTML('@@ <span class="red">@@</span>', l[987], time2date(account.expiry));
-                    }
-                    else if (Array.isArray(account.sgw)) {
-                        $elm.safeHTML('<span class="red">(@@)</span>', account.sgw.join(', '));
-                    }
-                    else {
-                        $elm.text('');
-                    }
-
-                    // Update current plan to PRO I, PRO II, PRO III or LITE in popup
-                    $('.membership-icon-pad .membership-big-txt.plan-txt').text(planName);
-                }
-                else {
-                    $('.membership-icon-pad .membership-big-txt.plan-txt').text('FREE');
-                    $('.membership-popup .upgrade-account').rebind('click', function () {
-                        document.location.hash = 'pro';
-                    });
-                }
-                if (account.balance
-                        && account.balance[0]
-                        && account.balance[0][0] > 0) {
-                    $parent.find('.membership-price-txt .membership-big-txt')
-                        .safeHTML('&euro; @@', account.balance[0][0]);
-                }
-                else {
-                    $parent.find('.membership-price-txt .membership-big-txt').html('&euro; 0.00');
-                }
-
-                // Storage chart
-                var perc = percent.space;
-                warning = '';
-                if (perc > 100) {
-                    perc = 100;
-                }
-                else if (perc > 99) {
-                    $parent.find('.membership-usage-bl.storage').addClass('exceeded');
-                     warning = l[1010]
-                        + '. '
-                        + l[1011]
-                        + ' <a href="#pro" class="upgradelink">'
-                        + l[920]
-                        + '</a>';
-                }
-                else if (perc > 80) {
-                    $parent.find('.membership-usage-bl.storage').addClass('going-out');
-                    warning = l[1012]
-                        + ' '
-                        + l[1013]
-                        + ' <a href="#pro"  class="upgradelink">'
-                        + l[920]
-                        + '</a>';
-                }
-                if (warning) {
-                    $parent.find('.storage .tiny-chart .chart-warning').safeHTML(warning);
-                }
-
-                var deg =  227 * perc / 100;
-                if (deg <= 180) {
-                    $parent.find('.storage .tiny-chart .main-chart.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
-                } else {
-                    $parent.find('.storage .tiny-chart .main-chart.left-chart span').css('transform', 'rotate(180deg)');
-                    $parent.find('.storage .tiny-chart .main-chart.right-chart span').css('transform', 'rotate(' + (deg - 180) + 'deg)');
-                }
-
-                var b1 = bytesToSize(account.space_used);
-                b1 = b1.split(' ');
-                b1[0] = Math.round(b1[0]) + ' ';
-                var b2 = bytesToSize(account.space);
-                b2 = b2.split(' ');
-                b2[0] = Math.round(b2[0]) + ' ';
-
-                // Maximum disk space
-                var b2 = bytesToSize(account.space);
-                b2 = b2.split(' ');
-                b2[0] = Math.round(b2[0]) + ' ';
-                $parent.find('.storage .tiny-chart .chart.data .pecents-txt').text((b2[0]));
-                $parent.find('.storage .tiny-chart .chart.data .gb-txt').text((b2[1]));
-                $parent.find('.storage .tiny-chart .chart.data .perc-txt').text(perc + '%');
-                $parent.find('.storage .tiny-chart .chart.data .size-txt').text(bytesToSize(account.space_used));
-                /* End of New Used Storage chart */
-
-
-                // Bandwidth
-                perc = percent.bw;
-                warning = '';
-                var waittime = '30 minutes';
-
-                if (perc > 100) {
-                    perc = 100;
-                }
-                else if (perc > 99) {
-                    $parent.find('.membership-usage-bl.bandwidth').addClass('exceeded');
-
-                    if (!u_attr.p) {
-                        warning = l[1054].replace('[X]',
-                                '<span class="green">' + waittime + '</span>')
-                            + ' '
-                            + l[1055]
-                            + ' <a href="#pro" class="upgradelink">'
-                            + l[920]
-                            + '</a>';
-                    }
-                    else {
-                        warning = l[1008]
-                            + ' '
-                            + l[1009]
-                            + ' <a href="#pro" class="upgradelink">'
-                            + l[920]
-                            + '</a>';
-                    }
-                }
-                else if (perc > 80) {
-                    $parent.find('.membership-usage-bl.bandwidth').addClass('going-out');
-                    warning = l[1053]
-                        + ' '
-                        + l[1009]
-                        + ' <a href="#pro"  class="upgradelink">'
-                        + l[920]
-                        + '</a>';
-                }
-                if (warning) {
-                    $parent.find('.bandwidth .tiny-chart .chart-warning').safeHTML(warning);
-                }
-
-                deg =  227 * perc / 100;
-                if (deg <= 180) {
-                    $parent.find('.bandwidth .tiny-chart .main-chart.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
-                } else {
-                    $parent.find('.bandwidth .tiny-chart .main-chart.left-chart span').css('transform', 'rotate(180deg)');
-                    $parent.find('.bandwidth .tiny-chart .main-chart.right-chart span').css('transform', 'rotate(' + (deg - 180) + 'deg)');
-                }
-
-                // Maximum bandwidth
-                var b1 = bytesToSize(account.servbw_used + account.downbw_used);
-                var b2 = bytesToSize(account.bw);
-                b2 = b2.split(' ');
-                b2[0] = Math.round(b2[0]) + ' ';
-                $parent.find('.bandwidth .tiny-chart .chart.data .size-txt').text((b1));
-                $parent.find('.bandwidth .tiny-chart .chart.data .pecents-txt').text((b2[0]));
-                $parent.find('.bandwidth .tiny-chart .chart.data .gb-txt').text((b2[1]));
-                $parent.find('.bandwidth .tiny-chart .chart.data .perc-txt').text(perc + '%');
-                /* End of New Used Bandwidth chart */
-
-
-                $('.membership-popup .mem-button').rebind('click', function (e) {
-                    document.location.hash = 'fm/account';
-                    $.hideTopMenu(e);
-                });
-            });
-        }
-        else {
-            $(this).removeClass('active');
-            $('.membership-popup').removeClass('pro-popup').addClass('hidden');
         }
     });
 
@@ -1893,6 +1700,12 @@ function topmenuUI() {
         }
     });
 
+    $('.top-head .logo').rebind('click', function () {
+        if (typeof loadingInitDialog === 'undefined' || !loadingInitDialog.active) {
+            document.location.hash =
+                typeof u_type !== 'undefined' && +u_type > 2 ? '#fm/dashboard' : '#start';
+        }
+    });
 
     if (!$('.fm-dialog.registration-page-success').hasClass('hidden')) {
         $('.fm-dialog.registration-page-success').addClass('hidden');

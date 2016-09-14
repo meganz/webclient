@@ -1,7 +1,7 @@
 /**
  * Various warning triangle popups from the top header. This covers
  * cases for over quota, ephemeral session, non activated accounts
- * after purchase and PRO plan expired warnings.
+ * after purchase, PRO plan expired warnings and site updates.
  */
 var alarm = {
 

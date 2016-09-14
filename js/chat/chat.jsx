@@ -860,12 +860,11 @@ Chat.prototype._onUsersUpdate = function(type, e, eventObject) {
                 self.chats[eventObject.getRoomJid()].setState(ChatRoom.STATE.LEFT);
             }
         }
-        else { // i'd joined
+        else {
+            // i'd joined
             room = self.chats[eventObject.getRoomJid()];
             if (room) {
-                if (room._conv_ended === true || typeof room._conv_ended === 'undefined') {
-                    room._conversationStarted(room.getParticipantsExceptMe()[0]);
-                }
+                room.setState(ChatRoom.STATE.READY);
             }
         }
     }

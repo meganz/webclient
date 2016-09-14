@@ -489,7 +489,9 @@ TransferQueue.prototype.pause = function(gid) {
         if (($.transferprogress || {})[gid]) {
             $.transferprogress[gid][2] = 0; // reset speed
         }
-        Soon(percent_megatitle);
+        if (page !== 'download') {
+            Soon(percent_megatitle);
+        }
     }
     else if (d) {
         if (!GlobalProgress[gid]) {

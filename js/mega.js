@@ -2210,7 +2210,7 @@ function MegaData()
             name = '';
             if (a2[i] === this.RootID) {
                 if (folderlink && M.d[this.RootID]) {
-                    name = htmlentities(M.d[this.RootID].name);
+                    name = M.d[this.RootID].name;
                     typeclass = 'folder';
                 }
                 else {
@@ -2244,7 +2244,7 @@ function MegaData()
             else {
                 var n = M.d[a2[i]];
                 if (n && n.name) {
-                    name = htmlentities(n.name);
+                    name = n.name;
                 }
                 if (a2[i].length === 11) {
                     typeclass = 'contact';
@@ -2365,9 +2365,6 @@ function MegaData()
         if (folderlink) {
             $('.fm-breadcrumbs:first').removeClass('folder').addClass('folder-link');
             $('.fm-breadcrumbs:first span').empty();
-            if (folderlink && name) {
-                $('.nw-tree-panel-header span').text(name);
-            }
         }
     };
 
@@ -2555,6 +2552,30 @@ function MegaData()
             if (M.h[n.hash].length == 0)
                 delete M.h[n.hash];
         }
+    };
+
+    /** Don't report `newmissingkeys` unless there are *new* missing keys */
+    this.checkNewMissingKeys = function() {
+        var result = true;
+
+        try {
+            var keys = Object.keys(missingkeys).sort();
+            var hash = MurmurHash3(JSON.stringify(keys));
+            var prop = u_handle + '_lastMissingKeysHash';
+            var oldh = parseInt(localStorage[prop]);
+
+            if (oldh !== hash) {
+                localStorage[prop] = hash;
+            }
+            else {
+                result = false;
+            }
+        }
+        catch (ex) {
+            console.error(ex);
+        }
+
+        return result;
     };
 
     /**
@@ -5898,7 +5919,9 @@ function execsc(actionPackets, callback) {
                     cr: crypto_makecr(actionPacket.n, [actionPacket.h], true)
                 });
 
-            M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
+            if (fminitialized) {
+                M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
+            }
         }
         else if (actionPacket.a === 't') {
             if (tparentid) {
@@ -5991,7 +6014,7 @@ function execsc(actionPackets, callback) {
             process_u(actionPacket.u);
 
             // Contact is deleted on remote computer, remove contact from contacts left panel
-            if (actionPacket.u[0].c === 0) {
+            if (fminitialized && actionPacket.u[0].c === 0) {
                 $('#contact_' + actionPacket.ou).remove();
 
                 $.each(actionPacket.u, function(k, v) {
@@ -6797,7 +6820,9 @@ function process_f(f, cb, retry)
                 process_f(f, cb, 1);
             }
             else {
-                if (cb) cb(!!newmissingkeys);
+                if (cb) {
+                    cb(newmissingkeys && M.checkNewMissingKeys());
+                }
             }
             if (d) console.timeEnd('process_f');
         }

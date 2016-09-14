@@ -137,7 +137,7 @@ var ParticipantsListInner = React.createClass({
             // destroyed
             return null;
         }
-        if (!room.isCurrentlyActive) {
+        if (!room.isCurrentlyActive && room._leaving !== true) {
             // save some memory/DOM
             return false;
         }

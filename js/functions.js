@@ -240,6 +240,21 @@ var Soon = is_chrome_firefox ? mozRunAsync : function(callback) {
     }, 20);
 };
 
+/**
+ *  Delays the execution of a function
+ *
+ *  Wraps a function to execute at most once
+ *  in a 100 ms time period. Useful to wrap
+ *  expensive jQuery events (for instance scrolling
+ *  events).
+ *
+ *  All argument and *this* is passed to the callback
+ *  after the 100ms (default)
+ *
+ *  @param {Function} func  Function to wrap
+ *  @param {Number}   ms    Timeout
+ *  @returns {Function} wrapped function
+ */
 function SoonFc(func, ms) {
     return function __soonfc() {
         var self = this,
@@ -911,6 +926,11 @@ function acc_time2date(unixtime, yearIsOptional) {
         result +=  th + ' ' + MyDate.getFullYear();
     }
     return result;
+}
+
+function humandate(unixtime) {
+    var date = new Date(unixtime * 1000);
+    return date.getDate() + ' ' + date_months[date.getMonth()] +  ' ' + date.getFullYear();
 }
 
 function time2last(timestamp) {
@@ -2438,22 +2458,7 @@ mSpawnWorker.prototype = {
 
             // Don't report `newmissingkeys` unless there are *new* missing keys
             if (job.newmissingkeys) {
-                try {
-                    var keys = Object.keys(u_nodekeys).sort();
-                    var hash = MurmurHash3(JSON.stringify(keys));
-                    var prop = u_handle + '_lastMissingKeysHash';
-                    var oldh = parseInt(localStorage[prop]);
-
-                    if (oldh !== hash) {
-                        localStorage[prop] = hash;
-                    }
-                    else {
-                        job.newmissingkeys = false;
-                    }
-                }
-                catch (ex) {
-                    console.error(ex);
-                }
+                job.newmissingkeys = M.checkNewMissingKeys();
             }
 
             delete this.jobs[reply.jid];
@@ -4562,33 +4567,15 @@ function rand_range(a, b) {
  *
  */
 function passwordManager(form) {
-    if (navigator.mozGetUserMedia) {
+    if (is_chrome_firefox) {
         var creds = passwordManager.pickFormFields(form);
         if (creds) {
-            // prepare pwd to be stored encrypted
-            // format: "~:<keypw>:<userhash>"
-            var pwd = creds.pwd;
-
-            if (!passwordManager.getStoredCredentials(pwd)) {
-                var keypw = prepare_key_pw(pwd);
-                var pwaes = new sjcl.cipher.aes(keypw);
-                var hash = stringhash(creds.usr.toLowerCase(), pwaes);
-
-                pwd = '~:' + a32_to_base64(keypw) + ':' + hash;
-
-                $('#pmh_username').val(creds.usr);
-                $('#pmh_password').val(pwd);
-                $('#pwdmanhelper').submit();
-                Soon(function() {
-                    $('#pwdmanhelper input').val('');
-                    $(form).find('input').val('');
-                    $('iframe#dummyTestFrame').attr('src', 'about:blank');
-                });
-            }
+            mozLoginManager.saveLogin(creds.usr, creds.pwd);
         }
+        $(form).find('input').val('');
         return;
     }
-    if (is_chrome_firefox || typeof history !== "object") {
+    if (typeof history !== "object") {
         return false;
     }
     $(form).rebind('submit', function() {
@@ -5189,9 +5176,7 @@ mega.utils.chrome110ZoomLevelNotification = function() {
 
     }
 };
-
 mBroadcaster.once('zoomLevelCheck', mega.utils.chrome110ZoomLevelNotification);
-
 
 var debounce = function(func, execAsap) {
     var timeout;

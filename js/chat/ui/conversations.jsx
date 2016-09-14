@@ -178,7 +178,12 @@ var ConversationsListItem = React.createClass({
             <li className={classString} id={id} data-room-jid={roomShortJid} data-jid={contactJid} onClick={this.props.onConversationClicked}>
                 <div className="user-card-name conversation-name">
                     {chatRoom.getRoomTitle()}
-                    <span className={"user-card-presence " + presenceClass}></span>
+                    {
+                        chatRoom.type === "private" ?
+                            <span className={"user-card-presence " + presenceClass}></span>
+                            :
+                            undefined
+                    }
                 </div>
                 {unreadDiv}
                 {inCallDiv}
@@ -457,11 +462,9 @@ var ConversationsApp = React.createClass({
     render: function() {
         var self = this;
 
-        //console.error("ConversationsApp render");
-
         var presence = self.props.megaChat.karere.getMyPresence();
 
-        var startChatIsDisabled = !presence || presence === "offline";
+        var startChatIsDisabled = !presence || presence === "offline" || presence === "unavailable";
 
 
         var leftPanelStyles = {};

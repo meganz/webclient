@@ -1114,7 +1114,7 @@ var proPage = {
             if ((gatewayId === 0) && (balanceFloat >= planPriceFloat)) {
 
                 // Show "Balance (x.xx)" if they have enough to purchase this plan
-                displayName = l[7108] + ' (' + balanceFloat.toFixed(2) + ' &euro;)';
+                displayName = l[7108] + ' (' + balanceFloat.toFixed(2) + ' \u20ac)';
             }
 
             // Create a radio button with icon for each payment gateway
@@ -1123,7 +1123,7 @@ var proPage = {
             $gateway.find('input').attr('id', gatewayName);
             $gateway.find('input').val(gatewayName);
             $gateway.find('.provider-icon').addClass(gatewayName);
-            $gateway.find('.provider-name').text(displayName).attr('title', htmlentities(displayName));
+            $gateway.find('.provider-name').text(displayName).prop('title', displayName);
 
             // Build the html
             gatewayHtml += $gateway.prop('outerHTML');
@@ -2000,7 +2000,17 @@ var directReseller = {
 
         // Gary at 6media
         if (provider === 1) {
-            window.location = 'http://mega.and1.tw/zh_tw/order_mega.php?' + params;
+            // Must perform a country test, as Gary has a different url for Japan
+            var country = utcResult['EUR']['cc'];
+            var baseurl = 'https://mega.and1.tw/zh_tw/order_mega.php?';
+
+            // Check that country is defined, as originally the API did not provide it
+            if (typeof country !== 'undefined') {
+                if (country.toLowerCase() === 'jp') {
+                    baseurl = 'https://mega.and1.tw/jp/order_mega.php?';
+                }
+            }
+            window.location =  baseurl + params;
         }
         // BWM Mediasoft
         else if (provider === 2) {

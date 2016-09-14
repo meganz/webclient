@@ -205,12 +205,38 @@
         $($.ddhelper).remove();
         $.ddhelper = undefined;
 
-        if (folderlink
-                || (M.currentdirid !== 'transfers'
-                    && M.currentdirid !== 'dashboard'
-                    && !M.chat &&
-                    (RightsbyID(M.currentdirid || '') | 0) < 1)) {
+        var target   = $(e.target);
+        var targetid = M.currentdirid || '';
 
+        if (targetid === 'shares') {
+            if (target.hasClass("nw-fm-tree-folder")) {
+                target = target.parent();
+            }
+            if (target.hasClass("nw-fm-tree-item")) {
+                targetid = target.attr('id').split('_').pop();
+            }
+            else {
+                target = target.closest('tr.folder.ui-droppable:visible');
+
+                if (target.length) {
+                    // Select the right-side folder
+                    target.click();
+
+                    targetid = target.attr('id');
+                }
+            }
+        }
+
+        if (
+            (
+                folderlink ||
+                (
+                    M.currentdirid !== 'transfers' &&
+                    (RightsbyID(targetid) | 0) < 1
+                )
+            ) &&
+            String(M.currentdirid).indexOf("chat/") === -1
+        ) {
             msgDialog('warningb', l[1676], l[1023]);
             return true;
         }
@@ -227,10 +253,12 @@
         else {
             $('span.nw-fm-tree-folder').css('background-color', '');
 
-            var target = $(e.target);
             if (target.hasClass("nw-fm-tree-folder")) {
                 var handle = target.parent().attr('id').split('_').pop();
                 $.onDroppedTreeFolder = M.d[handle] && handle;
+            }
+            else if (M.currentdirid === 'shares') {
+                $.onDroppedTreeFolder = M.d[targetid] && targetid;
             }
         }
 

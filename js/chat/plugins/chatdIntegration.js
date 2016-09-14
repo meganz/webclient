@@ -129,7 +129,8 @@ ChatdIntegration.prototype.retrieveChatsFromApi = function() {
                             'id': actionPacket.id,
                             'cs': actionPacket.cs,
                             'g': actionPacket.g,
-                            'u': clone(actionPacket.u)
+                            'u': clone(actionPacket.u),
+                            'ct': actionPacket.ct ? actionPacket.ct : null
                         };
                         mSDB.add('mcf', roomInfo);
                     }
@@ -279,7 +280,8 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
         'id': actionPacket.id,
         'cs': actionPacket.cs,
         'g': actionPacket.g,
-        'u': clone(actionPacket.u)
+        'u': clone(actionPacket.u),
+        'ct': actionPacket.ct ? actionPacket.ct : null
     };
 
     if (isMcf === false) {
@@ -379,6 +381,10 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
                 false
             );
             chatRoom = r[1];
+            if (actionPacket.ct) {
+                chatRoom.ct = actionPacket.ct;
+            }
+            self.decryptTopic(chatRoom);
             // handler of the same room was cached before, then restore the keys.
             if (self._cachedHandlers[roomJid]) {
                 chatRoom.protocolHandler.participantKeys = self._cachedHandlers[roomJid].participantKeys;
@@ -395,6 +401,9 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
             }
         }
         else {
+            chatRoom.ct = actionPacket.ct;
+            self.decryptTopic(chatRoom);
+
             if (!chatRoom.chatId) {
                 chatRoom.chatId = actionPacket.id;
                 chatRoom.chatShard = actionPacket.cs;
@@ -426,6 +435,9 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
                         else {
                             included.push(v.u);
                             chatRoom.members[v.u] = v.p;
+                            if (v.u === u_handle && v.p !== 0) {
+                                chatRoom.privateReadOnlyChat = false;
+                            }
                         }
                     });
 
@@ -957,11 +969,18 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
             });
 
             var hist = [];
+            var invitors = [];
             Object.keys(chatRoom.notDecryptedBuffer).forEach(function(k) {
                 var v = chatRoom.notDecryptedBuffer[k];
 
                 if (v) {
                     hist.push(v);
+                }
+                if (v.userId === strongvelope.COMMANDER) {
+                    var parsedMessage = strongvelope._parseMessageContent(v.message);
+                    if (parsedMessage) {
+                        invitors.push(parsedMessage.invitor);
+                    }
                 }
             });
 
@@ -983,7 +1002,6 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                                         v.payload = "";
                                     }
                                     chatRoom.messagesBuff.messages[messageId].textContents = v.payload;
-                                    delete chatRoom.notDecryptedBuffer[messageId];
                                     if (v.identity && v.references) {
                                         var mb = chatRoom.messagesBuff;
                                         mb.messages[messageId].references = v.references;
@@ -1017,15 +1035,22 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                                     };
                                     chatRoom.messagesBuff.messages[messageId].dialogType = "privilegeChange";
                                 }
+                                else if (v.type === strongvelope.MESSAGE_TYPES.TOPIC_CHANGE){
+                                    chatRoom.messagesBuff.messages[messageId].meta = {
+                                        userId: v.sender,
+                                        topic: v.payload
+                                    };
+                                    chatRoom.messagesBuff.messages[messageId].dialogType = "topicChange";
+                                }
                                 else if (v.type === strongvelope.MESSAGE_TYPES.GROUP_KEYED) {
                                     // this is a system message
                                     chatRoom.messagesBuff.messages[messageId].protocol = true;
-                                    delete chatRoom.notDecryptedBuffer[messageId];
                                 }
                                 else {
                                     self.logger.error("Could not decrypt: ", v);
                                 }
                                 self._parseMessage(chatRoom, chatRoom.messagesBuff.messages[messageId]);
+                                delete chatRoom.notDecryptedBuffer[messageId];
                             }
                             else {
                                 delete chatRoom.notDecryptedBuffer[messageId];
@@ -1040,13 +1065,13 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                 if (!chatRoom.protocolHandler) {
                     if (chatRoom.strongvelopeSetupPromises) {
                         chatRoom.strongvelopeSetupPromises.done(function() {
-                            ChatdIntegration._ensureKeysAreLoaded(hist)
+                            ChatdIntegration._ensureKeysAreLoaded(hist, invitors)
                                 .always(decryptMessages);
                         });
                     }
                 }
                 else {
-                    ChatdIntegration._ensureKeysAreLoaded(hist)
+                    ChatdIntegration._ensureKeysAreLoaded(hist, invitors)
                         .always(decryptMessages);
                 }
 
@@ -1062,13 +1087,44 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
         });
         $(chatRoom).rebind('onAddUserRequest.chatdInt', function(e, contactHashes) {
             contactHashes.forEach(function(h) {
-                asyncApiReq({
-                    "a":"mci",
-                    "id": chatRoom.chatId,
-                    "u": h,
-                    "p": 2,
-                    "v": Chatd.VERSION
-                });
+                if (chatRoom.topic) {
+                    var participants = chatRoom.protocolHandler.getTrackedParticipants();
+                    participants.add(h);
+
+                    var promises = [];
+                    promises.push(
+                        ChatdIntegration._ensureKeysAreLoaded(undefined, participants)
+                    );
+                    var _runInvitedWithTopic = function() {
+                        var topic = chatRoom.protocolHandler.embeddedEncryptTo(chatRoom.topic,
+                                                                               strongvelope.MESSAGE_TYPES.TOPIC_CHANGE,
+                                                                               participants);
+                        if (topic) {
+                            asyncApiReq({
+                                "a":"mci",
+                                "id":chatRoom.chatId,
+                                "u": h,
+                                "p": 2,
+                                "ct":base64urlencode(topic),
+                                "v": Chatd.VERSION
+                            });
+                        }
+                    };
+                    MegaPromise.allDone(promises).done(
+                        function () {
+                            _runInvitedWithTopic();
+                        }
+                    );
+                }
+                else {
+                    asyncApiReq({
+                        "a":"mci",
+                        "id": chatRoom.chatId,
+                        "u": h,
+                        "p": 2,
+                        "v": Chatd.VERSION
+                    });
+                }
             });
         });
 
@@ -1086,6 +1142,15 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                 "id": chatRoom.chatId,
                 "u": contactHash,
                 "p": newPriv,
+                "v": Chatd.VERSION
+            });
+        });
+
+        $(chatRoom).rebind('onTopicChange.chatdInt', function(e, contactHash, topic) {
+            asyncApiReq({
+                "a":"mcst",
+                "id":chatRoom.chatId,
+                "ct":btoa(topic),
                 "v": Chatd.VERSION
             });
         });
@@ -1139,6 +1204,13 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                                 };
                                 msg.dialogType = "privilegeChange";
 
+                            }
+                            else if (decrypted.type === strongvelope.MESSAGE_TYPES.TOPIC_CHANGE){
+                                chatRoom.messagesBuff.messages[msgObject.messageId].meta = {
+                                    userId: decrypted.sender,
+                                    topic: decrypted.payload
+                                };
+                                chatRoom.messagesBuff.messages[msgObject.messageId].dialogType = "topicChange";
                             }
                             else if (decrypted.type === strongvelope.MESSAGE_TYPES.GROUP_KEYED){
                                 chatRoom.messagesBuff.messages[msgObject.messageId].protocol = true;
@@ -1199,8 +1271,9 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                     u_privEd25519,
                     u_pubEd25519
                 );
-                chatRoom.protocolHandler.chatRoom = chatRoom;
 
+                chatRoom.protocolHandler.chatRoom = chatRoom;
+                self.decryptTopic(chatRoom);
                 self.join(chatRoom);
             })
             .fail(function() {
@@ -1215,6 +1288,33 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
 
 
 
+};
+
+ChatdIntegration.prototype.decryptTopic = function(chatRoom) {
+    var self = this;
+    if (chatRoom && chatRoom.ct && chatRoom.protocolHandler) {
+        var parsedMessage = strongvelope._parseMessageContent(base64urldecode(chatRoom.ct));
+
+        var promises = [];
+        promises.push(
+            ChatdIntegration._ensureKeysAreLoaded(undefined, [parsedMessage.invitor])
+        );
+        var _runTopicDecryption = function() {
+            try {
+                var decryptedCT = chatRoom.protocolHandler.decryptFrom(base64urldecode(chatRoom.ct));
+                if (decryptedCT) {
+                    chatRoom.topic = decryptedCT.payload;
+                }
+            } catch (e) {
+                self.logger.error("Could not decrypt topic: ", e);
+            }
+        };
+        MegaPromise.allDone(promises).done(
+            function () {
+                _runTopicDecryption();
+            }
+        );
+    }
 };
 
 /** chatd related commands **/
@@ -1311,14 +1411,7 @@ ChatdIntegration.prototype.sendMessage = function(chatRoom, messageObject) {
     var _runEncryption = function() {
 
         try {
-            var result;
-            if (chatRoom.type === "private") {
-                result = chatRoom.protocolHandler.encryptTo(messageContents, refids, participants[0]);
-            }
-            else {
-                result = chatRoom.protocolHandler.encryptTo(messageContents, refids);
-            }
-
+            var result = chatRoom.protocolHandler.encryptTo(messageContents, refids);
             if (result !== false) {
                 var keyid = chatRoom.protocolHandler.getKeyId();
 

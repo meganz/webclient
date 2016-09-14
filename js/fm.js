@@ -737,13 +737,15 @@ function initUI() {
             $.hideTopMenu(e);
         }
         var $target = $(e.target);
+        var exclude = '.upgradelink, .campaign-logo, .resellerbuy, .linkified, a.red';
 
         if ($target.attr('data-reactid') || $target.is('.chatlink')) {
             // chat can handle its own links..no need to return false on every "click" and "element" :O
             return;
         }
         if ($target.attr('type') !== 'file'
-                && !$target.is('.upgradelink, .campaign-logo, .resellerbuy, .linkified, a.red')) {
+                && !$target.is(exclude)
+                && !$target.parent().is(exclude)) {
             return false;
         }
     });
@@ -4741,6 +4743,10 @@ function accountUI() {
         });
 
         if (M.account.reseller) {
+            var email = 'resellers@mega.nz';
+
+            $('.resellerbuy').attr('href', 'mailto:' + email)
+                .find('span').text(l[9106].replace('%1', email));
 
             // Use 'All' or 'Last 10/100/250' for the dropdown text
             var buttonText = ($.voucherlimit === 'all') ? l[7557] : l['466a'].replace('[X]', $.voucherlimit);
@@ -5333,7 +5339,7 @@ function gridUI() {
         return !!contextMenuUI(e, 6);
     });
 
-    $('.files-grid-view,.fm-empty-cloud').rebind('contextmenu', function(e) {
+    $('.files-grid-view, .fm-empty-cloud, .fm-empty-folder').rebind('contextmenu.fm', function(e) {
         $('.file-block').removeClass('ui-selected');
         $.selected = [];
         $.hideTopMenu();
@@ -6939,7 +6945,11 @@ function contextMenuUI(e, ll) {
 
         // In case that id belongs to contact, 11 char length
         if (id && (id.length === 11)) {
-            $(menuCMI).filter('.remove-item,.startchat-item,.startaudio-item,.startvideo-item').show();// transfer panel
+            flt = '.remove-item';
+            if (!window.megaChatIsDisabled) {
+                flt += ',.startchat-item,.startaudio-item,.startvideo-item';
+            }
+            $(menuCMI).filter(flt).show();
 
             $(menuCMI).filter('.startaudio-item,.startvideo-item').removeClass('disabled');
 
@@ -7693,7 +7703,12 @@ function sectionUIopen(id) {
             headertxt = l[5915];
             break;
         case 'cloud-drive':
-            headertxt = l[5916];
+            if (folderlink) {
+                headertxt = Object(M.d[M.RootID]).name || '';
+            }
+            else {
+                headertxt = l[5916];
+            }
             break;
         case 'inbox':
             headertxt = l[949];
@@ -7703,9 +7718,7 @@ function sectionUIopen(id) {
             break;
     }
 
-    if (!folderlink) {
-        $('.fm-left-panel .nw-tree-panel-header span').text(headertxt);
-    }
+    $('.fm-left-panel .nw-tree-panel-header span').text(headertxt);
 
     {
         // required tricks to make the conversations work with the old UI HTML/css structure
@@ -9223,6 +9236,14 @@ function closeDialog() {
     if ($('.fm-dialog.incoming-call-dialog').is(':visible') === true) {
         // managing dialogs should be done properly in the future, so that we won't need ^^ bad stuff like this one
         return false;
+    }
+
+    if ($.dialog === 'passwordlink-dialog') {
+        if (String(page).substr(0, 2) === 'P!') {
+            // do nothing while on the password-link page
+            return false;
+        }
+        $('.fm-dialog.password-dialog').addClass('hidden');
     }
 
     if ($.dialog === 'createfolder' && ($.copyDialog || $.moveDialog)) {

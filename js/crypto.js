@@ -2408,9 +2408,13 @@ function api_getsid2(res, ctx) {
     if (typeof res === 'number') {
 
         if (res === ETOOMANY) {
-
             api_getsid.etoomany = Date.now();
             api_getsid.warning();
+        }
+        
+        // Check for incomplete registration
+        else if (res === EINCOMPLETE) {
+            msgDialog('warningb', l[882], l[9082]); // This account has not completed the registration process yet...
         }
     }
     else if (typeof res === 'object') {

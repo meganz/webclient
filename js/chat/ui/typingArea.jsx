@@ -372,9 +372,6 @@ var TypingArea = React.createClass({
         var scrPos = 0;
         var viewRatio = 0;
 
-        // Set textarea height according to  textarea clone height
-        textareaContent = '<span>'+textareaContent.substr(0, cursorPosition) +
-                          '</span>' + textareaContent.substr(cursorPosition, textareaContent.length);
 
 
         // try NOT to update the DOM twice if nothing had changed (and this is NOT a resize event).
@@ -388,6 +385,19 @@ var TypingArea = React.createClass({
         else {
             self.lastContent = textareaContent;
             self.lastPosition = cursorPosition;
+
+            // Set textarea height according to  textarea clone height
+            textareaContent = '@[!'+textareaContent.substr(0, cursorPosition) +
+                '!]@' + textareaContent.substr(cursorPosition, textareaContent.length);
+
+            // prevent self-xss
+            textareaContent = htmlentities(textareaContent);
+
+            // convert the cursor position/selection markers to html tags
+            textareaContent = textareaContent.replace(/@\[!/g, '<span>');
+            textareaContent = textareaContent.replace(/!\]@/g, '</span>');
+
+
             textareaContent = textareaContent.replace(/\n/g, '<br />');
             $textareaClone.html(textareaContent + '<br />');
         }

@@ -34,6 +34,9 @@ var flhashchange = false;
 
 var pro_json = '[[["N02zLAiWqRU",1,500,1024,1,"9.99","EUR"],["zqdkqTtOtGc",1,500,1024,12,"99.99","EUR"],["j-r9sea9qW4",2,2048,4096,1,"19.99","EUR"],["990PKO93JQU",2,2048,4096,12,"199.99","EUR"],["bG-i_SoVUd0",3,4096,8182,1,"29.99","EUR"],["e4dkakbTRWQ",3,4096,8182,12,"299.99","EUR"]]]';
 
+pages['placeholder'] = '((TOP))<div class="main-scroll-block"><div class="main-pad-block">' +
+                       '<div class="main-mid-pad new-bottom-pages"></div></div></div>';
+
 function startMega() {
     if (!window.M) {
         window.M = new MegaData();
@@ -77,7 +80,7 @@ function mainScroll() {
         verticalDragMinHeight: 150,
         enableKeyboardNavigation: true
     });
-    $('.main-scroll-block').unbind('jsp-scroll-y');
+    $('.main-scroll-block').unbind('jsp-scroll-y.menu');
     jScrollFade('.main-scroll-block');
     if (page === 'doc' || page.substr(0, 4) === 'help' || page === 'cpage' || page === 'sdk' || page === 'dev') {
         scrollMenu();
@@ -274,6 +277,9 @@ function init_page() {
                 u_n = pfid;
             }
             else {
+                // Insert placeholder page while waiting for user input
+                parsepage(pages['placeholder']);
+
                 return mKeyDialog(pfid, true)
                     .fail(function() {
                         location.hash = 'start';
@@ -329,6 +335,9 @@ function init_page() {
             delete localStorage.awaitingConfirmationAccount;
         }
         else {
+            // Insert placeholder page while waiting for user input
+            parsepage(pages['placeholder']);
+
             return mega.ui.sendSignupLinkDialog(acc);
         }
     }
@@ -368,7 +377,7 @@ function init_page() {
                 mega.config.fetch();
             }
 
-            if (typeof mDB !== 'undefined' && !pfid && !flhashchange) {
+            if (typeof mDB !== 'undefined' && !pfid && (!flhashchange || page === 'fm')) {
                 mDBstart();
             }
             else {
@@ -397,6 +406,16 @@ function init_page() {
         page = 'blog';
         parsepage(pages['blogarticle']);
         init_blog();
+    }
+
+    // Password protected link decryption dialog
+    else if (page.substr(0, 2) === 'P!' && page.length > 2) {
+
+        // Insert placeholder page while waiting for user input
+        parsepage(pages['placeholder']);
+
+        // Show the decryption dialog and pass in the current URL hash
+        exportPassword.decrypt.init(page);
     }
     else if (page.substr(0, 6) == 'verify') {
         parsepage(pages['change_email']);
@@ -657,6 +676,7 @@ function init_page() {
         }
     }
     else if (page.substr(0, 4) == 'help') {
+        return Help.render();
         function doRenderHelp() {
             if (window.helpTemplate) {
                 parsepage(window.helpTemplate);
@@ -783,11 +803,14 @@ function init_page() {
         });
         return;
     }
-    else if (page == 'sourcecode') {
+    else if (page === 'sourcecode') {
         parsepage(pages['sourcecode']);
     }
-    else if (page == 'terms') {
+    else if (page === 'terms') {
         parsepage(pages['terms']);
+    }
+    else if (page === 'general') {
+        parsepage(pages['general']);
     }
     else if (page == 'takedown') {
         parsepage(pages['takedown']);
@@ -1764,6 +1787,9 @@ function topmenuUI() {
         }
         else if (className.indexOf('terms') > -1) {
             document.location.hash = 'terms';
+        }
+        else if (className.indexOf('general') > -1) {
+            document.location.hash = 'general';
         }
         else if (className.indexOf('privacypolicy') > -1) {
             document.location.hash = 'privacy';

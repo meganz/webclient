@@ -188,6 +188,7 @@ function pagelogin() {
             }
             postLogin($('#login-name2').val(), $('#login-password2').val(), remember, function(r) {
                 loadingDialog.hide();
+
                 if (r === EBLOCKED) {
                     alert(l[730]);
                 }
@@ -208,10 +209,15 @@ function pagelogin() {
                 else {
                     $('.login-register-input.password').addClass('incorrect');
                     $('.login-register-input.email').addClass('incorrect');
-                    msgDialog('warninga', l[135], l[1130] + ' ' + l[969], false, function(e) {
-                        $('#login-password2').val('');
-                        $('#login-name2').select();
-                    });
+
+                    // Check that there is not already a message dialog being shown, otherwise
+                    // this generic one will override the other's more specific error message
+                    if ($('#msgDialog').hasClass('hidden')) {
+                        msgDialog('warninga', l[135], l[7431], false, function(e) {
+                            $('#login-password2').val('');
+                            $('#login-name2').select();
+                        });
+                    }
                 }
             });
         }
@@ -287,7 +293,11 @@ function init_login() {
     $('.login-register-input').rebind('click', function(e) {
         $(this).find('input').focus();
     });
-    document.getElementById('login-name2').focus()
+    document.getElementById('login-name2').focus();
+
+    if (is_chrome_firefox) {
+        Soon(mozLoginManager.fillForm.bind(mozLoginManager, 'login_form'));
+    }
 }
 
 function postlogin() {

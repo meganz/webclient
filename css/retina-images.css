@@ -445,7 +445,7 @@ body.pro:after {
     background-size: 240px auto;
 }
 .chrome-app-button, .chrome-app-logo, .chrome-app-scr, .chrome-download-button, a.chrome-download-button {
-    background-image: url(../images/mega/chrome-app_v2@2x.png);
+    background-image: url(../images/mega/chrome-app_v3@2x.png);
     background-size: 700px auto;
 }
 .chrome-app-button.new-app, .sync-button, .google-play-button, .ios-button, .ff-bott-button, .blackberry-button, .chrome-app-button, .win-phone-button, .products-top-arrow {
@@ -456,7 +456,7 @@ body.pro:after {
     background-image: url(../images/mega/mobile-sprite_v7@2x.png);
     background-size: 836px auto;
 }
-.backup-download-block, .recover-upload-block, .backup-notification-icon, .restore-uploading-status-icon, .login-register-input.fail, .reset-account-lock-image, .password-dialog-icon, .login-register-input.green-tick {
+.backup-download-block, .recover-upload-block, .backup-notification-icon, .restore-uploading-status-icon, .login-register-input.fail, .reset-account-lock-image, .login-register-input.green-tick {
     background-image: url(../images/mega/encr-sprite@2x_v1.png);
     background-size: 216px;
 }

@@ -49,14 +49,14 @@ function geoStaticpath(eu)
         try {
             if (!sessionStorage.skipcdn) {
                 var cc_eu = 'FR DE NL ES PT DK CH IT UK GB NO SE FI PL CZ SK AT GR RO HU IE TR VA MC SM LI AD JE GG UA BG LT LV EE AX IS MA DZ LY TN EG RU BY HR SI AL ME RS KO EU FO CY IL LB SY SA JO IQ BA CV PS EH GI GL IM LU MK SJ BF BI BJ BW CF CG CM DJ ER ET GA GH GM GN GN GW KE KM LR LS MG ZA AE ML MR MT MU MV MW MZ NA NE QA RW SD SS SL SZ TD TG TZ UG YE ZA ZM ZR ZW';
-				var cc_na = 'US CA MX AG BS BB BZ CR CO CU DO GD GT GY HT HN JM NI PA KN LC VC SR TT VE IS GL AI BL VG PR VI VE CO EC CL BR BO PY UY AR GY SR PE GF FK';
-				var cc_nz = 'NZ AU FJ NC';
+                var cc_na = 'US CA MX AG BS BB BZ CR CO CU DO GD GT GY HT HN JM NI PA KN LC VC SR TT VE IS GL AI BL VG PR VI VE CO EC CL BR BO PY UY AR GY SR PE GF FK';
+                var cc_nz = 'NZ AU FJ NC';
                 var cm = String(document.cookie).match(/geoip\s*\=\s*([A-Z]{2})/);
-				if (cm && cm[1] && cc_na.indexOf(cm[1]) > -1)
+                if (cm && cm[1] && cc_na.indexOf(cm[1]) > -1)
                     return 'https://na.static.mega.co.nz/3/';
-				else if (cm && cm[1] && cc_nz.indexOf(cm[1]) > -1)
+                else if (cm && cm[1] && cc_nz.indexOf(cm[1]) > -1)
                     return 'https://nz.static.mega.co.nz/3/';
-				else if (cm && cm[1] && cc_eu.indexOf(cm[1]) == -1)
+                else if (cm && cm[1] && cc_eu.indexOf(cm[1]) == -1)
                     return 'https://g.cdn1.mega.co.nz/3/';
             }
         } catch(e) {
@@ -277,9 +277,9 @@ if (!b_u) try
 
     var contenterror = 0;
     var nocontentcheck = false;
-    
+
     if (!is_extension && (window.dd || location.host !== 'mega.nz')) {
-        
+
         nocontentcheck = true;
         var devhost = window.location.host;
         // handle subdirs
@@ -1198,7 +1198,13 @@ else if (!b_u)
                 // loading the site, this should only happen on some fancy
                 // browsers other than what we use during development, and
                 // hopefully they'll report it back to us for troubleshoot
-                return siteLoadError(dump.m, url);
+                if ((url || ln !== 1) && dump.m.indexOf('Error: Blocked') < 0) {
+                    siteLoadError(dump.m, url + ':' + ln);
+                }
+                else {
+                    console.error(dump.m, arguments);
+                }
+                return;
             }
 
             if (~dump.m.indexOf('took +10s'))
@@ -1607,6 +1613,7 @@ else if (!b_u)
         jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/vendor/perfect-scrollbar.css', n: 'vendor_ps_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/media-print.css', n: 'media_print_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/help2.css', n: 'help_css', j:2,w:5,c:1,d:1,cache:1});
 
         jsl.push({f:'js/useravatar.js', n: 'contact_avatar_js', j:1,w:3});
         jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
@@ -1672,6 +1679,7 @@ else if (!b_u)
         'privacy': {f:'html/privacy.html', n: 'privacy', j:0},
         'mega': {f:'html/mega.html', n: 'mega', j:0},
         'terms': {f:'html/terms.html', n: 'terms', j:0},
+        'general': {f:'html/general.html', n: 'general', j:0},
         'backup': {f:'html/backup.html', n: 'backup', j:0},
         'backup_js': {f:'html/js/backup.js', n: 'backup_js', j:1},
         'cancel': {f:'html/cancel.html', n: 'cancel', j:0},
@@ -1688,7 +1696,8 @@ else if (!b_u)
         'dev': {f:'html/dev.html', n: 'dev', j:0},
         'dev_js': {f:'html/js/dev.js', n: 'dev_js', j:1},
         'sdkterms': {f:'html/sdkterms.html', n: 'sdkterms', j:0},
-        'help_js': {f:'html/js/help.js', n: 'help_js', j:1},
+        'lunr_js': {f:'js/vendor/elasticlunr.js', n: 'lunr_js', j:1},
+        'help_js': {f:'html/js/help2.js', n: 'help_js', j:1},
         'sync': {f:'html/sync.html', n: 'sync', j:0},
         'sync_js': {f:'html/js/sync.js', n: 'sync_js', j:1},
         'cms_snapshot_js': {f:'js/cmsSnapshot.js', n: 'cms_snapshot_js', j:1},
@@ -1711,6 +1720,7 @@ else if (!b_u)
         'about': ['about'],
         'sourcecode': ['sourcecode'],
         'terms': ['terms'],
+        'general': ['general'],
         'credits': ['credits'],
         'backup': ['backup','backup_js','filesaver'],
         'recovery': ['recovery','recovery_js'],
@@ -1737,7 +1747,9 @@ else if (!b_u)
         'dev': ['dev','dev_js','sdkterms'],
         'sdk': ['dev','dev_js','sdkterms'],
         'doc': ['dev','dev_js','sdkterms'],
-        'help': ['help_js'],
+        'help': [
+            'lunr_js', 'help_js'
+        ],
         'recover': ['reset', 'reset_js'],
         'redeem': ['redeem', 'redeem_js'],
         'plugin': ['chrome', 'chrome_js', 'firefox', 'firefox_js'],
@@ -2322,8 +2334,8 @@ else if (!b_u)
             dl_res= false;
             boot_done();
         };
-		var esid='';
-		if (u_storage.sid) esid = u_storage.sid;
+        var esid='';
+        if (u_storage.sid) esid = u_storage.sid;
         dlxhr.open("POST", apipath + 'cs?id=0' + mega.urlParams(), true);
         dlxhr.send(JSON.stringify([{ 'a': 'g', p: page.substr(1,8), 'ad': showAd(),'esid':esid }]));
     }

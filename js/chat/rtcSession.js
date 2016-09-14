@@ -243,9 +243,6 @@ function RtcSession(stropheConn, options) {
 
         self.trigger("unmuted", {info:info, sess: new SessWrapper(sess), peer: sess.peerjid});
     }).bind(self);
-
-    if (RTC.browser === 'firefox')
-        j.media_constraints.mandatory.MozDontOfferDataChannel = true;
 }
 //global variables
 RtcSession.gVolMon = null;

@@ -74,6 +74,10 @@
 	background-color: white;
 	border-color: white;
 }
+.conversations-pane li.active .offline.user-card-presence {
+	background-color: #185F80;
+	border-color: #185F80;
+}
 .unread-messages {
 	position: absolute;
 	right: 12px;

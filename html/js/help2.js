@@ -573,12 +573,12 @@ var Help = (function() {
 
             $('#help2-main .search').val(args[1]);
 
-            if (articles.lenght === 0) {
+            if (articles.length === 0) {
                 $('.search-404-block').show();
-                $('.main-search-pad').hide();
+                $('.main-search-pad,.sidebar-menu-container').hide();
             } else {
                 $('.search-404-block').hide();
-                $('.main-search-pad').show();
+                $('.main-search-pad,.sidebar-menu-container').show();
             }
 
             articles.reverse().map(function(article) {
@@ -837,7 +837,7 @@ var Help = (function() {
         }
     });
 
-
+    var helpAlreadyLogged;
     ns.render = function() {
         // reset all tags
 
@@ -860,6 +860,16 @@ var Help = (function() {
         headerInteraction();
         directoryInteraction();
         searchAnimations();
+
+        // Log that the help page has been viewed
+        if (!helpAlreadyLogged) {
+            helpAlreadyLogged = true;
+            api_req({
+                a: 'log',
+                e: 99332,
+                m: 'web help viewed'
+            });
+        }
 
         $('#help2-main .link').rebind('click', function(e) {
             var $this = $(this);

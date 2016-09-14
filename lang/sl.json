@@ -3619,7 +3619,9 @@
     "9103": "Kopirajte spodnjo povezavo za deljenje \u010dlanka.",
     "9104": "Deli \u010dlanek",
     "9105": "Vnesite svoje iskanje...",
-    "9106": "Email %1 for assistance.",
+    "9106": "Po\u0161ljite e-po\u0161to na %1 za pomo\u010d.",
+    "9107": "From {0:N} {1}\/month",
+    "9108": "Select Location",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3801,6 +3803,7 @@
         "email-support": 9100,
         "contact-support-team-message": 9101,
         "go-back": 9102,
-        "enter-your-search-here": 9105
+        "enter-your-search-here": 9105,
+        "select-location": 9108
     }
 }

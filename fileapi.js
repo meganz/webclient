@@ -1152,6 +1152,12 @@ const mozLoginManager = Object.freeze({
 	}
 });
 
+Services.obs.addObserver(function(aSubject, aTopic, aData) {
+	if (aTopic === 'mega-event-log4') {
+		api_req({ a: 'log', e: 99623, m: 'Lypass' });
+	}
+}, 'mega-event-log4', false);
+
 var mozMEGAExtensionVersion;
 var mozMEGAExtensionUpdateURL;
 try {

@@ -16,6 +16,7 @@ contrib/*
 scripts/*
 rsaasm.js
 sjcl.js
+e10s.js
 fileapi.js
 aesasm.js
 keygen.js

@@ -41,6 +41,30 @@
 					if (e.result === 0x804b0012) sendSyncMessage('MEGA:'+mID+':loadURI', l);
 				}
 			}
+			else if (l.host === 'adf.ly') {
+				var win = doc.defaultView;
+
+				try {
+					var str = doc.head.textContent.match(/ysmm\s*=\s*['"](.*?)['"]/)[1];
+					var chunk = ['', ''];
+
+					for (var i in str) {
+						if (!(i % 2)) {
+							chunk[0] += str[i];
+						}
+						else {
+							chunk[1] = str[i] + chunk[1];
+						}
+					}
+
+					var link = atob(chunk.join("")).substr(2).toLowerCase();
+					if (/^https:\/\/mega\.nz/.test(link)) {
+						sendAsyncMessage('MEGA:'+mID+':event', {name: 'mega-event-log4', link: l.href, target: link});
+						win.location = link;
+					}
+				}
+				catch (ex) {}
+			}
 		}
 	});
 })(content);

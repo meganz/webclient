@@ -275,7 +275,6 @@ var ConversationRightArea = React.createClass({
                         {endCallButton}
 
                         {
-                            room.type === "group" ?
                             <div className={"link-button red " + (dontShowTruncateButton ? "disabled" : "")}
                                  onClick={(e) => {
                                      if ($(e.target).closest('.disabled').size() > 0) {
@@ -287,7 +286,7 @@ var ConversationRightArea = React.createClass({
                             }}>
                                 <i className="small-icon rounded-stop"></i>
                                 {__(l[8871])}
-                            </div> : null
+                            </div>
                         }
                         { room.type === "group" ? (
                             <div className={"link-button red " + (

@@ -191,12 +191,13 @@ var Secureboot = function() {
                 groups.push(null);
                 size = 0;
             } else {
-                if (size > fileLimit) {
+                var fsize = fs.statSync(f.f)['size'];
+                if (size + fsize > fileLimit) {
                     size = 0;
                     groups.push(null);
                 }
                 groups.push(f.f);
-                size += fs.statSync(f.f)['size'];
+                size += fsize;
             }
         });
         groups.push(null);

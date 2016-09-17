@@ -143,14 +143,15 @@ Unless otherwise noted, they were released under a [MIT License].
 ---
 [chat/strophe.light.js]: Strophe.js is an XMPP library for JavaScript.
 
-> NB: We are using a custom build which was created using:
+> NB: This is the **light** version built as follow:
 > 
 > ```bash
 > git clone https://github.com/strophe/strophejs.git
 > cd strophejs
-> git checkout 30033f05eded0bb079e8c06a75045f195068d896
+> git checkout v1.2.8
 > npm install
 > make strophe.light.js
+> make check
 > ```
 
 ---

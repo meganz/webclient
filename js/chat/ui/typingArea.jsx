@@ -215,7 +215,20 @@ var TypingArea = React.createClass({
             return;
         }
         else if (key === 13) {
-            if ($.trim(val).length === 0) {
+            // Alt+Enter
+            if (e.altKey) {
+                var content = element.value;
+                var cursorPos = self.getCursorPosition(element);
+                content = content.substring(0, cursorPos) + "\n" + content.substring(
+                        cursorPos,
+                        content.length
+                    );
+
+                self.setState({typedMessage: content});
+                self.onUpdateCursorPosition = cursorPos + 1;
+                e.preventDefault();
+            }
+            else if ($.trim(val).length === 0) {
                 self.stoppedTyping();
                 e.preventDefault();
             }
@@ -330,6 +343,12 @@ var TypingArea = React.createClass({
         }
         else {
             this.updateScroll();
+        }
+        if (self.onUpdateCursorPosition) {
+            var $container = $(ReactDOM.findDOMNode(this));
+            var el = $('.chat-textarea:visible textarea:visible', $container)[0];
+            el.selectionStart = el.selectionEnd = self.onUpdateCursorPosition;
+            self.onUpdateCursorPosition = false;
         }
     },
     initScrolling: function() {

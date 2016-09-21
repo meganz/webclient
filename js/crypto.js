@@ -1809,7 +1809,7 @@ function api_cancel(q) {
     }
 }
 
-function api_init(channel, service) {
+function api_init(channel, service, sid) {
     if (apixs[channel]) {
         api_cancel(apixs[channel]);
     }
@@ -1825,7 +1825,7 @@ function api_init(channel, service) {
         failhandler: api_reqfailed, // request-level error handler
         backoff: 0,                 // timer backoff
         service: service,           // base URI component
-        sid: '',                    // sid URI component (optional)
+        sid: sid || '',             // sid URI component (optional)
         rawreq: false,
         setimmediate: false
     };
@@ -2044,11 +2044,15 @@ function api_reqfailed(c, e) {
         document.location.hash = 'login';
     }
     else if (c === 2 && e === ETOOMANY) {
-        if (typeof mDB !== 'undefined' && mDB) {
-            mDBreload();
+        loadfm.loaded = false;
+        loadfm.loading = false;
+
+        api_init(2, 'sc', u_sid && ('sid=' + u_sid));
+
+        if (typeof mDB === 'object' && mDB.drop) {
+            mFileManagerDB.exec('drop').always(mDBstart);
         }
         else {
-            loadfm.loading = false;
             loadfm(true);
         }
     }

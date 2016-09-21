@@ -2048,6 +2048,7 @@ function api_reqfailed(c, e) {
             mDBreload();
         }
         else {
+            loadfm.loading = false;
             loadfm(true);
         }
     }
@@ -2411,7 +2412,7 @@ function api_getsid2(res, ctx) {
             api_getsid.etoomany = Date.now();
             api_getsid.warning();
         }
-        
+
         // Check for incomplete registration
         else if (res === EINCOMPLETE) {
             msgDialog('warningb', l[882], l[9082]); // This account has not completed the registration process yet...

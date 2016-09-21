@@ -1809,7 +1809,7 @@ function api_cancel(q) {
     }
 }
 
-function api_init(channel, service, sid) {
+function api_init(channel, service) {
     if (apixs[channel]) {
         api_cancel(apixs[channel]);
     }
@@ -1825,7 +1825,7 @@ function api_init(channel, service, sid) {
         failhandler: api_reqfailed, // request-level error handler
         backoff: 0,                 // timer backoff
         service: service,           // base URI component
-        sid: sid || '',             // sid URI component (optional)
+        sid: '',                    // sid URI component (optional)
         rawreq: false,
         setimmediate: false
     };
@@ -2047,7 +2047,15 @@ function api_reqfailed(c, e) {
         loadfm.loaded = false;
         loadfm.loading = false;
 
-        api_init(2, 'sc', u_sid && ('sid=' + u_sid));
+        M.reset();
+        api_init(2, 'sc');
+
+        if (pfkey) {
+            api_setfolder(n_h);
+        }
+        else {
+            apixs[2].sid = 'sid=' + u_sid;
+        }
 
         if (typeof mDB === 'object' && mDB.drop) {
             mFileManagerDB.exec('drop').always(mDBstart);

@@ -1301,6 +1301,7 @@ var ConversationPanel = React.createClass({
                                 self.editDomElement = null;
 
                                 var currentContents = v.textContents ? v.textContents : v.contents;
+
                                 if (messageContents === false || messageContents === currentContents) {
                                     self.messagesListScrollable.scrollToBottom(true);
                                     self.lastScrollPositionPerc = 1;
@@ -1444,6 +1445,17 @@ var ConversationPanel = React.createClass({
                         'confirmDeleteDialog': false,
                         'messageToBeDeleted': false
                     });
+
+                    $(msg).trigger(
+                        'onChange',
+                        [
+                            msg,
+                            "deleted",
+                            false,
+                            true
+                        ]
+                    );
+
                 }}
             >
                 <div className="fm-dialog-content">

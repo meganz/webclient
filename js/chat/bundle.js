@@ -23965,6 +23965,7 @@
 	                            self.editDomElement = null;
 
 	                            var currentContents = v.textContents ? v.textContents : v.contents;
+
 	                            if (messageContents === false || messageContents === currentContents) {
 	                                self.messagesListScrollable.scrollToBottom(true);
 	                                self.lastScrollPositionPerc = 1;
@@ -24087,6 +24088,8 @@
 	                            'confirmDeleteDialog': false,
 	                            'messageToBeDeleted': false
 	                        });
+
+	                        $(msg).trigger('onChange', [msg, "deleted", false, true]);
 	                    }
 	                },
 	                React.makeElement(
@@ -26659,11 +26662,19 @@
 	                });
 	            }
 	        });
+	        $(self.props.message).rebind('onChange.GenericConversationMessage' + self.getUniqueId(), function () {
+	            Soon(function () {
+	                if (self.isMounted()) {
+	                    self.eventuallyUpdate();
+	                }
+	            });
+	        });
 	    },
 	    componentWillUnmount: function componentWillUnmount() {
 	        var self = this;
 	        var $node = $(self.findDOMNode());
 	        $node.unbind('onEditRequest.genericMessage');
+	        $(self.props.message).unbind('onChange.GenericConversationMessage' + self.getUniqueId());
 	    },
 	    doDelete: function doDelete(e, msg) {
 	        e.preventDefault(e);
@@ -27316,6 +27327,7 @@
 	                            if (self.props.onEditDone) {
 	                                Soon(function () {
 	                                    self.props.onEditDone(messageContents);
+	                                    self.forceUpdate();
 	                                });
 	                            }
 

@@ -380,7 +380,7 @@ var useravatar = (function() {
 
         if (!letters) {
             // XXX: not a known user?
-            letters = user.name && $.trim(user.name) || user.m || "\uFFFD";
+            letters = user.name2 && $.trim(user.name2) || user.u;
         }
 
         if (user && user.u) {
@@ -441,7 +441,7 @@ var useravatar = (function() {
 
         if (!letters) {
             // XXX: not a known user?
-            letters = user.name && $.trim(user.name) || user.m || "\uFFFD";
+            letters = user.name2 && $.trim(user.name2) || user.u;
         }
 
         return _letters(letters, user.u, className, element);

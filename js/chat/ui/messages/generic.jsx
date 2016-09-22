@@ -52,11 +52,19 @@ var GenericConversationMessage = React.createClass({
                 });
             }
         });
+        $(self.props.message).rebind('onChange.GenericConversationMessage' + self.getUniqueId(), function() {
+            Soon(function() {
+                if (self.isMounted()) {
+                    self.eventuallyUpdate();
+                }
+            });
+        });
     },
     componentWillUnmount: function() {
         var self = this;
         var $node = $(self.findDOMNode());
         $node.unbind('onEditRequest.genericMessage');
+        $(self.props.message).unbind('onChange.GenericConversationMessage' + self.getUniqueId());
     },
     doDelete: function(e, msg) {
         e.preventDefault(e);
@@ -727,7 +735,8 @@ var GenericConversationMessage = React.createClass({
                             if (self.props.onEditDone) {
                                 Soon(function() {
                                     self.props.onEditDone(messageContents);
-                                    });
+                                    self.forceUpdate();
+                                });
                             }
 
                             return true;

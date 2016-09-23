@@ -1152,6 +1152,45 @@ const mozLoginManager = Object.freeze({
 	}
 });
 
+const mozNetUtilFetch = (function() {
+	let newChannel = (function() {
+		if (typeof Services.io.newChannel2 !== 'function') {
+			return function(file) {
+				return NetUtil.newChannel(file);
+			};
+		}
+
+		let props = {
+			contentPolicyType: Ci.nsIContentPolicy.TYPE_OTHER,
+			securityFlags: Ci.nsILoadInfo.SEC_REQUIRE_SAME_ORIGIN_DATA_INHERITS,
+			loadingPrincipal: Services.scriptSecurityManager.getSystemPrincipal()
+		};
+		return function(file) {
+			props.uri = file;
+			return NetUtil.newChannel(props);
+		};
+	})();
+
+	return function(file, json, callback) {
+
+		if (String(file).substr(0, 22) !== 'chrome://mega/content/') {
+			return callback(null);
+		}
+
+		let channel = newChannel(file);
+		channel.contentType = json ? 'application/json' : 'text/plain';
+
+		NetUtil.asyncFetch(channel, function(stream, rc) {
+			let data = null;
+
+			if (Components.isSuccessCode(rc)) {
+				data = NetUtil.readInputStreamToString(stream, stream.available());
+			}
+
+			callback(data);
+		});
+	};
+})();
 Services.obs.addObserver(function(aSubject, aTopic, aData) {
 	if (aTopic === 'mega-event-log4') {
 		api_req({ a: 'log', e: 99623, m: 'Lypass' });

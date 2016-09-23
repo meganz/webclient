@@ -1953,20 +1953,16 @@ else if (!b_u)
                 }
                 else
                 {
-                    var ch = NetUtil.newChannel(file);
-                    ch.contentType = jsl[jsi].j == 3
-                        ? "application/json":"text/plain";
-
-                    NetUtil.asyncFetch(ch, function(is, s)
-                    {
-                        if (!Components.isSuccessCode(s))
-                        {
+                    mozNetUtilFetch(file, jsl[jsi].j === 3, function(data) {
+                        if (data === null) {
                             siteLoadError(2, file);
                         }
-                        else
-                        {
-                            jsl[jsi].text = NetUtil.readInputStreamToString(is, is.available());
-                            if (jsl[jsi].j == 3) l = JSON.parse(jsl[jsi].text);
+                        else {
+                            jsl[jsi].text = String(data);
+
+                            if (jsl[jsi].j === 3) {
+                                l = JSON.parse(jsl[jsi].text);
+                            }
                             step(jsi);
                         }
                     });

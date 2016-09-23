@@ -1988,7 +1988,7 @@ var exportExpiry = {
     UiExportLink.prototype.removeExportLinkIcon = function(nodeId) {
 
         // Remove link icon from list view
-        $('#' + nodeId + ' .own-data').removeClass('linked');
+        $('#' + nodeId).removeClass('linked').find('.own-data').removeClass('linked');
 
         // Remove link icon from grid view
         $('#' + nodeId + '.file-block').removeClass('linked');

@@ -21,7 +21,7 @@ var is_electron = false;
 if (typeof process !== 'undefined') {
     var mll = process.moduleLoadList || [];
 
-    if (mll.indexOf('NativeModule ATOM_SHELL_ASAR') !== -1) {
+    if (mll.indexOf('NativeModule ELECTRON_ASAR') !== -1) {
         is_electron = module;
         module = undefined; // prevent factory loaders from using the module
 

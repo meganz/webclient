@@ -2044,8 +2044,21 @@ function api_reqfailed(c, e) {
         document.location.hash = 'login';
     }
     else if (c === 2 && e === ETOOMANY) {
-        if (typeof mDB !== 'undefined' && mDB) {
-            mDBreload();
+        loadfm.loaded = false;
+        loadfm.loading = false;
+
+        M.reset();
+        api_init(2, 'sc');
+
+        if (pfkey) {
+            api_setfolder(n_h);
+        }
+        else {
+            apixs[2].sid = 'sid=' + u_sid;
+        }
+
+        if (typeof mDB === 'object' && mDB.drop) {
+            mFileManagerDB.exec('drop').always(mDBstart);
         }
         else {
             loadfm(true);
@@ -2411,7 +2424,7 @@ function api_getsid2(res, ctx) {
             api_getsid.etoomany = Date.now();
             api_getsid.warning();
         }
-        
+
         // Check for incomplete registration
         else if (res === EINCOMPLETE) {
             msgDialog('warningb', l[882], l[9082]); // This account has not completed the registration process yet...

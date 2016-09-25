@@ -1,6 +1,8 @@
 (function(window) {
 	"use strict";
 
+	Components.utils.import('resource://gre/modules/Services.jsm');
+
 	const webNav = docShell.QueryInterface(Components.interfaces.nsIWebNavigation);
 	const _hosts = {
 		"mega.co.nz" : 1,
@@ -40,6 +42,9 @@
 				{
 					if (e.result === 0x804b0012) sendSyncMessage('MEGA:'+mID+':loadURI', l);
 				}
+			}
+			else if (l.protocol === 'mega:' && Services.appinfo.processType === Services.appinfo.PROCESS_TYPE_CONTENT) {
+				sendSyncMessage('MEGA:'+mID+':loadURI', l.href);
 			}
 			else if (l.host === 'adf.ly') {
 				var win = doc.defaultView;

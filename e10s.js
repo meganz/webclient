@@ -43,8 +43,12 @@
 					if (e.result === 0x804b0012) sendSyncMessage('MEGA:'+mID+':loadURI', l);
 				}
 			}
-			else if (l.protocol === 'mega:' && Services.appinfo.processType === Services.appinfo.PROCESS_TYPE_CONTENT) {
-				sendSyncMessage('MEGA:'+mID+':loadURI', l.href);
+			else if (l.protocol === 'mega:'
+					&& Services.appinfo.processType
+					== Services.appinfo.PROCESS_TYPE_CONTENT
+					|| l.host === 'bug1305316.nz') {
+
+				sendSyncMessage('MEGA:'+mID+':loadURI', 'mega:' + (l.hash ? l.hash : ''));
 			}
 			else if (l.host === 'adf.ly') {
 				var win = doc.defaultView;

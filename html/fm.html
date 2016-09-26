@@ -1,92 +1,117 @@
-<div class="context-menu sorting-menu hidden" >
+<div class="dropdown body sorting-menu hidden" >
     <a class="contacts-sorting-by name">[$86]</a>
     <!--<a class="contacts-sorting-by active">Status</a>-->
     <a class="contacts-sorting-by shares">[$1348]</a>
     <!--<a class="contacts-sorting-by">Recent</a>-->
-    <div class="context-menu-divider"></div>
+    <hr />
     <a class="contacts-sorting-type asc">[$6773]</a>
     <a class="contacts-sorting-type desc">[$6774]</a>
 </div>
 
 <!-- Please add/remove "left-points-position/right-points-position/top-points-position/bottom-points-position" class to activate points and set its position !-->
-<div class="context-menu download hidden">
-    <span class="context-menu-item download-standart-item"><span class="context-menu-icon"></span>[$5928]</span>
-    <span class="context-menu-item zipdownload-item"><span class="context-menu-icon"></span>[$864]</span>
+<div class="dropdown body download context hidden">
+    <span class="dropdown-item download-standart-item"><i class="small-icon context standart-download"></i>[$5928]</span>
+    <span class="dropdown-item zipdownload-item"><i class="small-icon context download-as-zip"></i>[$864]</span>
 </div>
-<div class="context-menu files-menu hidden">
-    <div class="context-menu-section">
-        <a class="context-menu-item do-sort" data-by="ts"><span class="context-menu-icon"></span>Date Created</a>
-        <a class="context-menu-item do-sort" data-by="mtime"><span class="context-menu-icon"></span>Date Modified</a>
+<div class="dropdown body files-menu context hidden">
+    <div class="dropdown-section">
+        <a class="dropdown-item do-sort" data-by="ts"><i class="small-icon"></i>Date Created</a>
+        <a class="dropdown-item do-sort" data-by="mtime"><i class="small-icon"></i>Date Modified</a>
     </div>
-    <div class="context-menu-section">
-        <a class="context-menu-item preview-item"><span class="context-menu-icon"></span>[$1899]</a>
-        <a class="context-menu-item open-item"><span class="context-menu-icon"></span>[$865]</a>
-        <a class="context-menu-item properties-item"><span class="context-menu-icon"></span>[$6859]</a>
-        <a class="context-menu-item add-star-item"><span class="context-menu-icon"></span>[$5871]</a>
-        <a class="context-menu-item image-like-item"><span class="context-menu-icon"></span>[$5871]</a>
-        <div class="context-menu-divider"></div>
+    <div class="dropdown-section">
+        <a class="dropdown-item preview-item"><i class="small-icon context loupe"></i>[$1899]</a>
+        <a class="dropdown-item open-item"><i class="small-icon context open-folder"></i>[$865]</a>
+        <hr />
     </div>
-    <div class="context-menu-section">
-        <a class="context-menu-item download-item contains-submenu">
-            <span class="context-menu-icon"></span>[$58]...
+    <div class="dropdown-section">
+        <a class="dropdown-item properties-item"><i class="small-icon context info"></i>[$6859]</a>
+        <a class="dropdown-item add-star-item"><i class="small-icon context heart"></i>[$5871]</a>
+
+        <a class="dropdown-item colour-label-items contains-submenu">
+            <i class="small-icon context labels"></i>Label...
         </a>
-        <span class="context-submenu">
+        <span class="dropdown body submenu labels">
             <span>
-                <span class="context-menu-item download-standart-item"><span class="context-menu-icon"></span>[$5928]</span>
-                <span class="context-menu-item zipdownload-item"><span class="context-menu-icon"></span>[$864]</span>
+                <span class="dropdown-color-txt">Choose colour:</span>
+                <span class="dropdown-colour-item red-colour-label" data-label-id="1"></span>
+                <span class="dropdown-colour-item orange-colour-label" data-label-id="2"></span>
+                <span class="dropdown-colour-item yellow-colour-label" data-label-id="3"></span>
+                <span class="dropdown-colour-item green-colour-label" data-label-id="4"></span>
+                <span class="dropdown-colour-item blue-colour-label" data-label-id="5"></span>
+                <span class="dropdown-colour-item purple-colour-label" data-label-id="6"></span>
+                <span class="dropdown-colour-item grey-colour-label" data-label-id="7"></span>
+                <span class="clear"></span>
             </span>
         </span>
-        <a class="context-menu-item send-to-contact-item"><span class="context-menu-icon"></span>[$6860]</a>
-        <a class="context-menu-item getlink-item">
-            <span class="context-menu-icon"></span><span class="getlink-menu-text">[$59]</span>
-        </a>
-        <a class="context-menu-item removelink-item">
-            <span class="context-menu-icon"></span><span class="removelink-menu-text">[$6821]</span>
-        </a>
-        <a class="context-menu-item sh4r1ng-item"><span class="context-menu-icon"></span>[$60]</a>
-        <a class="context-menu-item shared-folder-item"><span class="context-menu-icon"></span>[$6775]</a>
-        <a class="context-menu-item permissions-item"><span class="context-menu-icon"></span>[$64]</a>
-        <div class="context-menu-divider"></div>
+
+        <a class="dropdown-item image-like-item">[$5871]</a>
+        <hr />
     </div>
-    <div class="context-menu-section">
-        <a class="context-menu-item startchat-item"><span class="context-menu-icon"></span>[$5885]</a>
-        <a class="context-menu-item startaudio-item"><span class="context-menu-icon"></span>[$5896]</a>
-        <a class="context-menu-item startvideo-item"><span class="context-menu-icon"></span>[$5897]</a>
-        <div class="context-menu-divider"></div>
+    <div class="dropdown-section">
+        <a class="dropdown-item download-item contains-submenu">
+            <i class="small-icon context download"></i>[$58]...
+        </a>
+        <span class="dropdown body submenu download">
+            <span>
+                <span class="dropdown-item download-standart-item"><i class="small-icon context standart-download"></i>[$5928]</span>
+                <span class="dropdown-item zipdownload-item"><i class="small-icon context download-as-zip"></i>[$864]</span>
+            </span>
+        </span>
+        <a class="dropdown-item send-to-contact-item"><i class="small-icon"></i>[$6860]</a>
+        <a class="dropdown-item getlink-item">
+            <i class="small-icon context get-link"></i>[$59]
+        </a>
+        <a class="dropdown-item removelink-item">
+            <i class="small-icon context remove-link"></i>[$6821]
+        </a>
+        <a class="dropdown-item sh4r1ng-item"><i class="small-icon context share"></i>[$60]</a>
+        <a class="dropdown-item shared-folder-item"><i class="small-icon context share"></i>[$6775]</a>
+        <a class="dropdown-item permissions-item"><i class="small-icon"></i>[$64]</a>
+        <hr />
     </div>
-    <div class="context-menu-section">
-        <a class="context-menu-item rename-item"><span class="context-menu-icon"></span>[$61]</a>
-        <a class="context-menu-item move-item contains-submenu">
-            <span class="context-menu-icon"></span>[$62]...
+    <div class="dropdown-section">
+        <a class="dropdown-item startchat-item"><i class="small-icon context conversation"></i>[$5885]</a>
+        <a class="dropdown-item startaudio-item"><i class="small-icon context handset"></i>[$5896]</a>
+        <a class="dropdown-item startvideo-item"><i class="small-icon context videocam"></i>[$5897]</a>
+        <hr />
+    </div>
+    <div class="dropdown-section">
+        <a class="dropdown-item rename-item"><i class="small-icon context writing-pen"></i>[$61]</a>
+        <a class="dropdown-item move-item contains-submenu">
+            <i class="small-icon context position-arrows"></i>[$62]...
         </a>
         <!--submenues goes here-->
-        <a class="context-menu-item copy-item"><span class="context-menu-icon"></span>[$63]</a>
-        <a class="context-menu-item import-item"><span class="context-menu-icon"></span>[$236]</a>
-        <a class="context-menu-item newfolder-item"><span class="context-menu-icon"></span>[$68]</a>
-        <a class="context-menu-item fileupload-item"><span class="context-menu-icon"></span>[$99]</a>
-        <input type="file" id="fileselect3" name="fileselect3" multiple class="hidden">
-        <a class="context-menu-item folderupload-item"><span class="context-menu-icon"></span>[$98]</a>
-        <input type="file" id="fileselect4" name="fileselect4" webkitdirectory multiple class="hidden" />
-        <a class="context-menu-item remove-item"><span class="context-menu-icon"></span>[$83]</a>
-        <a class="context-menu-item removeshare-item"><span class="context-menu-icon"></span>[$5866]</a>
-        <a class="context-menu-item clearbin-item"><span class="context-menu-icon"></span>[$7741]</a>
-        <a class="context-menu-item addcontact-item"><span class="context-menu-icon"></span>[$71]</a>
-        <a class="context-menu-item reply-item"><span class="context-menu-icon"></span>[$6861]</a>
-        <a class="context-menu-item reply-to-all"><span class="context-menu-icon"></span>[$6862]</a>
-        <a class="context-menu-item forward-item"><span class="context-menu-icon"></span>[$6863]</a>
-
-        <a class="context-menu-item canceltransfer-item"><span class="context-menu-icon"></span>[$103]</a>
-        <a class="context-menu-item transfer-pause"><span class="context-menu-icon"></span>[$1647]</a>
-        <a class="context-menu-item transfer-play"><span class="context-menu-icon"></span>[$1649]</a>
+        <a class="dropdown-item copy-item"><i class="small-icon context cloned-files"></i>[$63]</a>
+        <a class="dropdown-item import-item"><i class="small-icon context plus"></i>[$236]</a>
+        <hr />
      </div>
-     <div class="context-menu-section">
-        <div class="pause-item-divider hidden"></div>
-        <a class="context-menu-item move-up"><span class="context-menu-icon"></span>[$6864]</a>
-        <a class="context-menu-item move-down"><span class="context-menu-icon"></span>[$6865]</a>
-        <a class="context-menu-item transfer-clear"><span class="context-menu-icon"></span>[$103]</a>
-        <a class="context-menu-item network-diagnostic"><span class="context-menu-icon"></span>[$8806]</a>
+     <div class="dropdown-section">
+        <a class="dropdown-item newfolder-item"><i class="small-icon context plus"></i>[$68]</a>
+        <hr />
+     </div>
+     <div class="dropdown-section">
+        <a class="dropdown-item fileupload-item"><i class="small-icon context file-upload"></i>[$99]</a>
+        <input type="file" id="fileselect3" name="fileselect3" multiple class="hidden">
+        <a class="dropdown-item folderupload-item"><i class="small-icon context folder-upload"></i>[$98]</a>
+        <input type="file" id="fileselect4" name="fileselect4" webkitdirectory multiple class="hidden" />
+     </div>
+     <div class="dropdown-section">
+        <a class="dropdown-item remove-item"><i class="small-icon context remove-to-bin"></i>[$83]</a>
+        <a class="dropdown-item removeshare-item red"><i class="small-icon context leave-share"></i>[$5866]</a>
+        <a class="dropdown-item clearbin-item red"><i class="small-icon context red-cross"></i>[$7741]</a>
+        <a class="dropdown-item addcontact-item"><i class="small-icon context plus"></i>[$71]</a>
+
+        <a class="dropdown-item canceltransfer-item red"><i class="small-icon context red-cross"></i>[$103]</a>
+        <a class="dropdown-item transfer-pause"><i class="small-icon context pause"></i>[$1647]</a>
+        <a class="dropdown-item transfer-play"><i class="small-icon context play"></i>[$1649]</a>
+     </div>
+     <div class="dropdown-section">
+        <hr class="pause hidden" />
+        <a class="dropdown-item move-up"><i class="small-icon context move-up"></i>[$6864]</a>
+        <a class="dropdown-item move-down"><i class="small-icon context move-down"></i>[$6865]</a>
+        <a class="dropdown-item transfer-clear"><i class="small-icon context small-refresh"></i>[$103]</a>
+        <a class="dropdown-item network-diagnostic"><i class="small-icon context network-diagnostic"></i>[$8806]</a>
     </div>
-    <a class="context-menu-item select-all"><span class="context-menu-icon"></span>[$5550]</a>
 
 </div>
 
@@ -222,7 +247,7 @@
 
             <!--Sorting menu for each section. !-->
             <div class="nw-sorting-menu hidden">
-                <div class="context-menu-section sort-by">
+                <div class="dropdown-section sort-by">
                     <div class="sorting-menu-arrow"></div>
                     <div data-by="name" class="sorting-menu-item active">[$86]</div>
                     <div data-by="status" class="sorting-menu-item">[$89]</div>
@@ -231,7 +256,7 @@
                     <div data-by="fav" class="sorting-menu-item">[$5871]</div>
                     <div class="sorting-item-divider"></div>
                 </div>
-                <div class="context-menu-section">
+                <div class="dropdown-section">
                     <div class="sorting-menu-item active" data-dir="1">[$6773]</div>
                     <div class="sorting-menu-item" data-dir="-1">[$6774]</div>
                 </div>
@@ -239,9 +264,9 @@
 
             <div class="fm-start-chat-dropdown hidden">
               <div class="fm-start-chat-arrow"></div>
-              <div class="context-menu-item startchat-item"><span class="context-menu-icon"></span>[$5885]</div>
-              <div class="context-menu-item startaudio-item"><span class="context-menu-icon"></span>[$5896]</div>
-              <div class="context-menu-item startvideo-item"><span class="context-menu-icon"></span>[$5897]</div>
+              <div class="dropdown-item startchat-item"><i class="small-icon"></i>[$5885]</div>
+              <div class="dropdown-item startaudio-item"><i class="small-icon"></i>[$5896]</div>
+              <div class="dropdown-item startvideo-item"><i class="small-icon"></i>[$5897]</div>
             </div>
 
             <!-- Please add one of necessary classname: "folder-link"/"cloud-drive"/"shared-with-me"/"contacts"/"conversations"/"rubbish-bin" !-->
@@ -557,18 +582,18 @@
                 <div class="search-bottom-menu">
                     <div class="search-path-icon cloud-drive"></div>
                     <div class="search-path-txt">
-                        Cloud Drive
+                        [$164]
                     </div>
                     <div class="search-path-arrow"></div>
                     <div class="search-path-icon folder"></div>
                     <div class="search-path-txt">
-                        Folder
+                        [$1049]
                     </div>
                     <div class="search-path-arrow"></div>
                     <div class="search-path-icon text">
                     </div>
                     <div class="search-path-txt">
-                        Cloud Drive
+                        [$164]
                     </div>
                     <div class="clear"></div>
                 </div>
@@ -582,18 +607,18 @@
                 <div class="search-bottom-menu">
                     <div class="search-path-icon cloud-drive"></div>
                     <div class="search-path-txt">
-                        Cloud Drive
+                        [$164]
                     </div>
                     <div class="search-path-arrow"></div>
                     <div class="search-path-icon folder"></div>
                     <div class="search-path-txt">
-                        Folder
+                        [$1049]
                     </div>
                     <div class="search-path-arrow"></div>
                     <div class="search-path-icon text">
                     </div>
                     <div class="search-path-txt">
-                        Cloud Drive
+                        [$164]
                     </div>
                     <div class="clear"></div>
                 </div>
@@ -653,7 +678,7 @@
             <div class="shared-grid-view hidden">
                 <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table-header">
                     <tr>
-                        <th class="grid-first-th"><span class="grid-header-star"></span></th>
+                        <th class="grid-first-th"><span class="grid-header-star arrow fav"></span></th>
                         <th><div class="arrow name desc">[$86]</div></th>
                         <th><div class="arrow owner">[$5905]</div></th>
                         <th><div class="arrow access">[$5906]</div></th>
@@ -758,7 +783,7 @@
                     <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table-header">
                         <tbody>
                             <tr>
-                                <th class="grid-first-th"><span class="grid-header-star"></span></th>
+                                <th class="grid-first-th"><span class="grid-header-star arrow fav"></span></th>
                                 <th><div class="arrow name desc">[$86]</div></th>
                                 <th style="width: 270px;"><div class="arrow type">[$5906]</div></th>
                                 <th class="grid-url-header-nw"></th>

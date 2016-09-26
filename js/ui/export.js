@@ -2010,7 +2010,7 @@ var exportExpiry = {
             if (M.d[nodeId].fav === 1) {
 
                 // Remove favourite (star)
-                M.favourite(nodeId, true);
+                M.favourite(nodeId, 0);
             }
             self.addTakenDownIcon(nodeId);
         }

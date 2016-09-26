@@ -692,19 +692,19 @@ function initUI() {
         $('.fm-start-chat-dropdown').addClass('hidden').removeClass('active');
         $('.start-chat-button').removeClass('active');
         $('.nw-tree-panel-arrows').removeClass('active');
-        $('.context-menu-item.dropdown').removeClass('active');
+        $('.dropdown-item.dropdown').removeClass('active');
         $('.fm-tree-header').removeClass('dragover');
         $('.nw-fm-tree-item').removeClass('dragover');
         $('.nw-fm-tree-item.hovered').removeClass('hovered');
 
         // Set to default
-        a = $('.context-menu.files-menu,.context-menu.download');
+        a = $('.dropdown.body.files-menu,.dropdown.body.download');
         a.addClass('hidden');
-        b = a.find('.context-submenu');
+        b = a.find('.dropdown.body.submenu');
         b.attr('style', '');
         b.removeClass('active left-position overlap-right overlap-left mega-height');
         a.find('.disabled,.context-scrolling-block').removeClass('disabled context-scrolling-block');
-        a.find('.context-menu-item.contains-submenu.opened').removeClass('opened');
+        a.find('.dropdown-item.contains-submenu.opened').removeClass('opened');
 
         // Remove all sub-menues from context-menu move-item
         $('#csb_' + M.RootID).empty();
@@ -763,7 +763,7 @@ function initUI() {
         importFile();
     }
 
-    $('.context-menu').rebind('contextmenu', function(e) {
+    $('.dropdown.body').rebind('contextmenu', function(e) {
         if (!localStorage.contextmenu)
             e.preventDefault();
     });
@@ -905,8 +905,8 @@ function transferPanelContextMenu(target)
     var file;
     var tclear;
 
-    $('.context-menu.files-menu .context-menu-item').hide();
-    var menuitems = $('.context-menu.files-menu .context-menu-item');
+    $('.dropdown.body.files-menu .dropdown-item').hide();
+    var menuitems = $('.dropdown.body.files-menu .dropdown-item');
 
     menuitems.filter('.transfer-pause,.transfer-play,.move-up,.move-down,.transfer-clear')
         .show();
@@ -996,11 +996,11 @@ function transferPanelContextMenu(target)
 
     var parent = menuitems.parent();
     parent
-        .children('.context-menu-divider').hide().end()
-        .children('.pause-item-divider').show().end()
+        .children('hr').hide().end()
+        .children('hr.pause').show().end()
 
     if (parent.height() < 56) {
-        parent.find('.pause-item-divider').hide();
+        parent.find('hr.pause').hide();
     }
 }
 
@@ -1184,7 +1184,7 @@ function showTransferToast(t_type, t_length, isPaused) {
             $toast = $('.toast-notification.download');
             $second_toast = $('.toast-notification.upload');
             if (t_length > 1) {
-                nt_txt = l[7220].replace('XX',t_length);
+                nt_txt = l[12481].replace('%1', t_length);
             } else {
                 nt_txt = l[7222];
             }
@@ -1193,7 +1193,7 @@ function showTransferToast(t_type, t_length, isPaused) {
             $toast = $('.toast-notification.upload');
             $second_toast = $('.toast-notification.download');
             if (t_length > 1) {
-                nt_txt = l[7221].replace('XX',t_length);
+                nt_txt = l[12480].replace('%1', t_length);
             } else {
                 nt_txt = l[7223];
             }
@@ -2236,8 +2236,9 @@ function fmremove() {
             }
         });
         $('.fm-dialog-button.notification-button').each(function(i, e) {
-            if ($(e).text() === l[1018])
-                $(e).html('<span>'+l[83]+'</span>');
+            if ($(e).text() === l[1018]) {
+                $(e).safeHTML('<span>@@</span>', l[83]);
+            }
         });
     }
 
@@ -2360,49 +2361,54 @@ function fmremdupes(test)
 
 function initContextUI() {
 
-    var c = '.context-menu-item';
+    var c = '.dropdown-item';
 
-    $('.context-menu-section').off('mouseover', c);
-    $('.context-menu-section').on('mouseover', c, function() {
+    $('.dropdown-section').off('mouseover', c);
+    $('.dropdown-section').on('mouseover', c, function() {
 
         // is move... or download...
-        if ($(this).parent().parent().is('.context-submenu')) {
+        if ($(this).parent().parent().is('.dropdown.body.submenu')) {
 
             // if just item hide child context-submenu
             if (!$(this).is('.contains-submenu')) {
                 $(this).parent().children().removeClass('active opened');
-                $(this).parent().find('.context-submenu').addClass('hidden');
+                $(this).parent().find('.dropdown.body.submenu').removeClass('active');
             }
         }
 
         // Hide all submenues, for download and for move...
         else {
             if (!$(this).is('.contains-submenu')) {
-                $('.context-menu .context-submenu.active ').removeClass('active');
-                $('.context-menu .contains-submenu.opened').removeClass('opened');
-                $('.context-menu .context-submenu').addClass('hidden');
+                $('.dropdown.body.dropdown.body.submenu.active').removeClass('active');
+                $('.dropdown.body .contains-submenu.opened').removeClass('opened');
             }
         }
     });
 
-    $('.context-menu-section').off('mouseover', '.contains-submenu');
-    $('.context-menu-section').on('mouseover', '.contains-submenu', function() {
+    $('.dropdown-section').off('mouseover', '.contains-submenu');
+    $('.dropdown-section').on('mouseover', '.contains-submenu', function() {
+
+        var hideSubMenus = function(item) {
+            $('.dropdown.body ' + item).removeClass('opened')
+                .next().removeClass('active opened')
+                .next().find('.dropdown.body.submenu').removeClass('active');
+        };
 
         var $this = $(this),
             // situation when we have 2 contains-submenus in same context-submenu one near another
-            b = $this.closest('.context-submenu').find('.context-submenu,.contains-submenu').not($this.next()),
+            b = $this.closest('.dropdown.body.submenu').find('.dropdown.body.submenu,.contains-submenu').not($this.next()),
             a = $this.next(),// context-submenu
             pos = $this.offset(),
             menuPos,
             currentId;
 
         a.children().removeClass('active opened');
-        a.find('.context-submenu').addClass('hidden');
+        a.find('.dropdown.body.submenu').removeClass('active');
         a.find('.opened').removeClass('opened');
 
         if (b.length) {
             b.removeClass('active opened')
-                .find('.context-submenu').addClass('hidden');
+                .find('.dropdown.body.submenu').removeClass('active');
         }
 
         currentId = $this.attr('id');
@@ -2411,22 +2417,23 @@ function initContextUI() {
         }
 
         if ($this.is('.move-item')) {
-            $('.context-menu .download-item').removeClass('opened')
-                .next().removeClass('active opened')
-                .next().find('.context-submenu').addClass('hidden');
+            hideSubMenus('.download-item');
+            hideSubMenus('.colour-label-items');
         }
         if ($this.is('.download-item')) {
-            $('.context-menu .move-item').removeClass('opened')
-                .next().removeClass('active opened')
-                .next().find('.context-submenu').addClass('hidden');
+            hideSubMenus('.move-item');
+            hideSubMenus('.colour-label-items');
+        }
+        if ($this.is('.colour-label-items')) {
+            hideSubMenus('.move-item');
+            hideSubMenus('.download-item');
         }
         if (!$this.is('.opened')) {
             menuPos = reCalcMenuPosition($this, pos.left, pos.top, 'submenu'),
 
-            $this.next('.context-submenu')
+            $this.next('.dropdown.body.submenu')
                 .css({'top': menuPos.top})
-                .addClass('active')
-                .removeClass('hidden');
+                .addClass('active');
 
             $this.addClass('opened');
         }
@@ -2447,8 +2454,8 @@ function initContextUI() {
         }
     });
 
-    $('.context-menu.files-menu').off('click', '.folder-item');
-    $('.context-menu.files-menu').on('click', '.folder-item', function() {
+    $('.dropdown.body.files-menu').off('click', '.folder-item');
+    $('.dropdown.body.files-menu').on('click', '.folder-item', function() {
 
         var t = $(this).attr('id').replace('fi_', ''),
             n = [];
@@ -2478,8 +2485,6 @@ function initContextUI() {
     });
 
     $(c + '.getlink-item').rebind('click', function() {
-
-        var selectedNodeHandle;
 
         if (u_type === 0) {
             ephemeralDialog(l[1005]);
@@ -2631,16 +2636,23 @@ function initContextUI() {
     });
 
     $(c + '.add-star-item').rebind('click', function() {
+        var newFavState = Number(!M.isFavourite($.selected));
 
-        var delFavourite = M.isFavourite($.selected);
-
-        M.favourite($.selected, delFavourite);
+        M.favourite($.selected, newFavState);
 
         if (M.viewmode) {
             $('.file-block').removeClass('ui-selected');
         }
         else {
             $('.grid-table.fm tr').removeClass('ui-selected');
+        }
+    });
+
+    $('.labels .dropdown-colour-item').click(function() {
+        var labelId = parseInt(this.dataset.labelId);
+
+        if (labelId && (RightsbyID($.selected[0]) > 1)) {
+            M.colourLabeling($.selected, labelId);
         }
     });
 
@@ -2690,10 +2702,6 @@ function initContextUI() {
     $(c + '.transfer-pause').rebind('click', function() {
         $('.transfer-table tr.ui-selected').attrs('id').map(fm_tfspause);
         $('.transfer-table tr.ui-selected').removeClass('ui-selected');
-    });
-
-    $(c + '.select-all').rebind('click', function() {
-        selectionManager.select_all();
     });
 
     $(c + '.network-diagnostic').rebind('click', function() {
@@ -2981,7 +2989,7 @@ function accountUI() {
         $.transferClose();
     }
 
-    //Destroy jScrollings in select dropdowns
+    //Destroy jScrollings in select.dropdowns
     $('.fm-account-main .default-select-scroll').each(function(i, e) {
         $(e).parent().fadeOut(200).parent().removeClass('active');
         deleteScrollPanel(e, 'jsp');
@@ -3076,6 +3084,7 @@ function accountUI() {
 
             // Subscription
             if (account.stype == 'S') {
+
                 $('.fm-account-header.typetitle').text(l[434]);
                 if (account.scycle == '1 M') {
                     $('.membership-big-txt.type').text(l[748]);
@@ -3089,25 +3098,26 @@ function accountUI() {
 
                 // Get the date their subscription will renew
                 var timestamp = account.srenew[0];
-                var paymentType = htmlentities('(' + account.sgw.join(',') + ')');      // Credit card etc
+                var paymentType = (account.sgw.length > 0) ? account.sgw[0] : '';   // Credit Card etc
 
-                // Display the date their subscription will renew in format '14 March 2015 (credit card)'
+                // Display the date their subscription will renew if known
                 if (timestamp > 0) {
                     var date = new Date(timestamp * 1000);
-                    var dateString = l[6971] + ' ' + date.getDate() + ' ' + date_months[date.getMonth()] + ' ' + date.getFullYear();
-                    $('.membership-medium-txt.expiry').html(dateString + ' ' + paymentType);
+                    var dateString = l[6971] + ' ' + date.getDate() + ' ' + date_months[date.getMonth()] + ' '
+                                   + date.getFullYear();
+
+                    // Use format: 14 March 2015 - Credit Card
+                    paymentType = dateString + ' - ' + paymentType;
                 }
-                else {
-                    // Otherwise just show payment type
-                    $('.membership-medium-txt.expiry').html(paymentType);
-                }
+
+                // Otherwise just show payment type
+                $('.membership-medium-txt.expiry').text(paymentType);
 
                 // Check if there are any active subscriptions
                 // ccqns = Credit Card Query Number of Subscriptions
-                api_req({ a: 'ccqns' },
-                {
-                    callback : function(numOfSubscriptions, ctx)
-                    {
+                api_req({ a: 'ccqns' }, {
+                    callback : function(numOfSubscriptions, ctx) {
+
                         // If there is an active subscription
                         if (numOfSubscriptions > 0) {
 
@@ -3123,12 +3133,12 @@ function accountUI() {
             else if (account.stype == 'O') {
 
                 // one-time or cancelled subscription
-                $('.fm-account-header.typetitle').text(l[746]+':');
+                $('.fm-account-header.typetitle').text(l[746] + ':');
                 $('.membership-big-txt.type').text(l[751]);
-                $('.membership-medium-txt.expiry a').rebind('click', function() {
+                $('.membership-medium-txt.expiry').rebind('click', function() {
                     document.location = $(this).attr('href');
                 });
-                $('.membership-medium-txt.expiry a').html(l[987] + ' ' + time2date(account.expiry));
+                $('.membership-medium-txt.expiry').text(l[987] + ' ' + time2date(account.expiry));
                 $('.fm-account-blocks .btn-cancel').hide();
                 $('.subscription-bl').removeClass('active-subscription');
             }
@@ -3546,17 +3556,22 @@ function accountUI() {
         var html = '', sel = '';
         $('.default-select.country span').text(l[996]);
 
-        for (var country in isocountries) {
+        for (var country in isoCountries) {
+            if (!isoCountries.hasOwnProperty(country)) {
+                continue;
+            }
             if (u_attr.country && country == u_attr.country) {
                 sel = 'active';
-                $('.default-select.country span').text(isocountries[country]);
+                $('.default-select.country span').text(isoCountries[country]);
             }
             else {
                 sel = '';
             }
-            html += '<div class="default-dropdown-item ' + sel + '" data-value="' + country + '">' + isocountries[country] + '</div>';
+            html += '<div class="default-dropdown-item ' + sel + '" data-value="' + country + '">'
+                  +      isoCountries[country]
+                  + '</div>';
         }
-        $('.default-select.country .default-select-scroll').html(html);
+        $('.default-select.country .default-select-scroll').safeHTML(html);
 
         // Bind Dropdowns events
         bindDropdownEvents($('.fm-account-main .default-select'), 1);
@@ -4238,7 +4253,7 @@ function accountUI() {
             $('.resellerbuy').attr('href', 'mailto:' + email)
                 .find('span').text(l[9106].replace('%1', email));
 
-            // Use 'All' or 'Last 10/100/250' for the dropdown text
+            // Use 'All' or 'Last 10/100/250' for the.dropdown text
             var buttonText = ($.voucherlimit === 'all') ? l[7557] : l['466a'].replace('[X]', $.voucherlimit);
 
             $('.fm-account-button.reseller').removeClass('hidden');
@@ -4506,7 +4521,38 @@ function avatarDialog(close)
     $.dialog = 'avatar';
     $('.fm-dialog.avatar-dialog').removeClass('hidden');
     fm_showoverlay();
-    $('.avatar-body').html('<div id="avatarcrop"><div class="image-upload-and-crop-container"><div class="image-explorer-container empty"><div class="image-explorer-image-view"><img class="image-explorer-source"><div class="avatar-white-bg"></div><div class="image-explorer-mask circle-mask"></div><div class="image-explorer-drag-delegate"></div></div><div class="image-explorer-scale-slider-wrapper"><input class="image-explorer-scale-slider disabled" type="range" min="0" max="100" step="1" value="0" disabled=""></div></div><div class="fm-notifications-bottom"><input type="file" id="image-upload-and-crop-upload-field" class="image-upload-field" accept="image/jpeg, image/gif, image/png"><label for="image-upload-and-crop-upload-field" class="image-upload-field-replacement fm-account-change-avatar"><span>' + l[1016] + '</span></label><div class="fm-account-change-avatar" id="fm-change-avatar"><span>' + l[1017] + '</span></div><div  class="fm-account-change-avatar" id="fm-cancel-avatar"><span>Cancel</span></div><div class="clear"></div></div></div></div>');
+    $('.avatar-body').safeHTML(
+        '<div id="avatarcrop">' +
+            '<div class="image-upload-and-crop-container">' +
+                '<div class="image-explorer-container empty">' +
+                    '<div class="image-explorer-image-view">' +
+                        '<img class="image-explorer-source" />' +
+                        '<div class="avatar-white-bg"></div>' +
+                        '<div class="image-explorer-mask circle-mask"></div>' +
+                        '<div class="image-explorer-drag-delegate"></div>' +
+                    '</div>' +
+                    '<div class="image-explorer-scale-slider-wrapper">' +
+                        '<input class="image-explorer-scale-slider disabled" type="range" ' +
+                            'min="0" max="100" step="1" value="0" disabled="" />' +
+                    '</div>' +
+                '</div>' +
+                '<div class="fm-notifications-bottom">' +
+                    '<input type="file" id="image-upload-and-crop-upload-field" class="image-upload-field" ' +
+                        'accept="image/jpeg, image/gif, image/png" />' +
+                    '<label for="image-upload-and-crop-upload-field" ' +
+                        'class="image-upload-field-replacement fm-account-change-avatar">' +
+                        '<span>@@</span>' +
+                    '</label>' +
+                    '<div class="fm-account-change-avatar" id="fm-change-avatar">' +
+                        '<span>@@</span>' +
+                    '</div>' +
+                    '<div  class="fm-account-change-avatar" id="fm-cancel-avatar">' +
+                        '<span>@@</span>' +
+                    '</div>' +
+                    '<div class="clear"></div>' +
+                '</div>' +
+            '</div>' +
+        '</div>', l[1016], l[1017], l[82]);
     $('#fm-change-avatar').hide();
     $('#fm-cancel-avatar').hide();
     var imageCrop = new ImageUploadAndCrop($("#avatarcrop").find('.image-upload-and-crop-container'),
@@ -4712,10 +4758,22 @@ function gridUI() {
     // enable add star on first column click (make favorite)
     $('.grid-table.fm tr td:first-child').rebind('click', function() {
         var id = [$(this).parent().attr('id')];
-        M.favourite(id, $('.grid-table.fm #' + id[0] + ' .grid-status-icon').hasClass('star'));
+        var newFavState = Number(!M.isFavourite(id));
+        M.favourite(id, newFavState);
     });
 
-    $('.context-menu-item.do-sort').rebind('click', function() {
+    // enable add star on first column click (make favorite)
+    $('.grid-table.shared-with-me tr td:first-child').rebind('click', function() {
+        var id = [$(this).parent().attr('id')];
+        var newFavState = Number(!M.isFavourite(id));
+
+        // Handling favourites is allowed for full permissions shares only
+        if (RightsbyID(id) > 1) {
+            M.favourite(id, newFavState);
+        }
+    });
+
+    $('.dropdown-item.do-sort').rebind('click', function() {
         M.setLastColumn($(this).data('by'));
         M.doSort($(this).data('by'), -1);
         M.renderMain();
@@ -4724,11 +4782,38 @@ function gridUI() {
     $('.grid-table-header .arrow').rebind('click', function() {
         var c = $(this).attr('class');
         var d = 1;
-        if (c && c.indexOf('desc') > -1)
+        var pattern = '';
+
+        if (c && (c.indexOf('desc') > -1)) {
             d = -1;
+        }
 
         for (var e in M.sortRules) {
-            if (c && c.indexOf(e) > -1) {
+            if (c.indexOf(e) !== -1) {
+                M.doSort(e, d);
+                M.renderMain();
+                break;
+            }
+        }
+
+        // Stop bubbling
+        return false;
+    });
+
+    $('.grid-first-th').rebind('click', function() {
+        var c = $(this).children().first().attr('class');
+        var d = 1;
+        var pattern = '';
+
+        if (c && (c.indexOf('desc') > -1)) {
+            d = -1;
+        }
+
+        for (var e in M.sortRules) {
+            pattern = new RegExp('\\b' + e + '\\b');
+
+            // Search for the whole word, because of 'fav' and 'swm' cases
+            if (c && pattern.test(c)) {
                 M.doSort(e, d);
                 M.renderMain();
                 break;
@@ -5218,6 +5303,7 @@ var selectionManager;
 function UIkeyevents() {
     $(window).unbind('keydown.uikeyevents');
     $(window).bind('keydown.uikeyevents', function(e) {
+
         if (e.keyCode == 9 && !$(e.target).is("input,textarea,select")) {
             return false;
         }
@@ -5235,7 +5321,7 @@ function UIkeyevents() {
             return true;
         }
 
-        if (!is_fm() && (page !== 'login')) {
+        if (!is_fm() && (page !== 'login') && (page.substr(0, 3) !== 'pro')) {
             return true;
         }
 
@@ -5316,9 +5402,9 @@ function UIkeyevents() {
 
                 $target.addClass("ui-selected");
                 selectionManager.set_currently_selected($target);
-
             }
         }
+
         if ((e.keyCode == 38) && (s.length > 0) && ($.selectddUIgrid.indexOf('.grid-scrolling-table') > -1) && !$.dialog) {
 
             // up in grid
@@ -5398,9 +5484,13 @@ function UIkeyevents() {
         else if ((e.keyCode === 13) && ($.dialog === 'add-contact-popup')) {
             addNewContact($('.add-user-popup-button.add'));
         }
-
         else if ((e.keyCode === 13) && ($.dialog === 'rename')) {
             doRename();
+        }
+
+        // If the Esc key is pressed while the payment address dialog is visible, close it
+        else if ((e.keyCode === 27) && !$('.payment-address-dialog').hasClass('hidden')) {
+            addressDialog.closeDialog();
         }
         else if (e.keyCode == 27 && ($.copyDialog || $.moveDialog || $.copyrightsDialog)) {
             closeDialog();
@@ -6137,17 +6227,20 @@ function menuItems() {
         items['.rename-item'] = 1;
     }
 
-    if (RightsbyID($.selected[0]) > 0) {
+    if (((Object.keys($.selected)).length < 2)
+            && (RightsbyID($.selected[0]) > 1)) {
 
         items['.add-star-item'] = 1;
 
         if (M.isFavourite($.selected)) {
-            $('.add-star-item').html('<span class="context-menu-icon"></span>' + l[5872]);
+            $('.add-star-item').safeHTML('<i class="small-icon context broken-heart"></i>@@', l[5872]);
         }
         else {
-            $('.add-star-item').html('<span class="context-menu-icon"/></span>' + l[5871]);
-
+            $('.add-star-item').safeHTML('<i class="small-icon context heart"/></i>@@', l[5871]);
         }
+
+        items['.colour-label-items'] = 1;
+        M.colourLabelcmUpdate(M.d[$.selected[0]]);
     }
 
     selItem = M.d[$.selected[0]];
@@ -6195,12 +6288,13 @@ function menuItems() {
         exportLink = new mega.Share.ExportLink();
         isTakenDown = exportLink.isTakenDown($.selected);
 
-        // If any of selected items is taken donw remove actions from context menu
+        // If any of selected items is taken down remove actions from context menu
         if (isTakenDown) {
             delete items['.getlink-item'];
             delete items['.removelink-item'];
             delete items['.sh4r1ng-item'];
             delete items['.add-star-item'];
+            delete items['.colour-label-items'];
         }
     }
 
@@ -6217,6 +6311,7 @@ function menuItems() {
     if (folderlink) {
         delete items['.copy-item'];
         delete items['.add-star-item'];
+        delete items['.colour-label-items'];
         if (u_type) {
             items['.import-item'] = 1;
         }
@@ -6230,10 +6325,10 @@ function contextMenuUI(e, ll) {
     var v;
     var flt;
     var items = {};
-    var m = $('.context-menu.files-menu');
+    var m = $('.dropdown.body.files-menu');
 
-    // Selection of first child level ONLY of .context-menu-item in .context-menu
-    var menuCMI = '.context-menu.files-menu .context-menu-section > .context-menu-item';
+    // Selection of first child level ONLY of .dropdown-item in .dropdown.body
+    var menuCMI = '.dropdown.body.files-menu .dropdown-section > .dropdown-item';
     var currNodeClass = $(e.currentTarget).attr('class');
     var id = $(e.currentTarget).attr('id');
 
@@ -6249,7 +6344,7 @@ function contextMenuUI(e, ll) {
 
         // Enable upload item menu for clould-drive, don't show it for rubbish and rest of crew
         if (RightsbyID(M.currentdirid) && (M.currentrootid !== M.RubbishID)) {
-            $(menuCMI).filter('.context-menu-item').hide();
+            $(menuCMI).filter('.dropdown-item').hide();
             $(menuCMI).filter('.fileupload-item,.newfolder-item').show();
 
             if ((is_chrome_firefox & 2) || 'webkitdirectory' in document.createElement('input')) {
@@ -6262,8 +6357,8 @@ function contextMenuUI(e, ll) {
     }
     else if (ll === 3) {// we want just the download menu
         $(menuCMI).hide();
-        m = $('.context-menu.download');
-        menuCMI = '.context-menu.download .context-menu-item';
+        m = $('.dropdown.body.download');
+        menuCMI = '.dropdown.body.download .dropdown-item';
     }
     else if (ll === 4 || ll === 5) {// contactUI
         $(menuCMI).hide();
@@ -6283,8 +6378,8 @@ function contextMenuUI(e, ll) {
         }
     }
     else if (ll === 6) { // sort menu
-        $('.context-menu-item').hide();
-        $('.context-menu-item.do-sort').show();
+        $('.dropdown-item').hide();
+        $('.dropdown-item.do-sort').show();
     }
     else if (ll) {// Click on item
 
@@ -6328,8 +6423,6 @@ function contextMenuUI(e, ll) {
                 $(menuCMI).filter('.startvideo-item').addClass('disabled');
             }
 
-            // Remove select-all item from context menu
-            $(m).find('.select-all').remove();
         }
         else if (currNodeClass && (currNodeClass.indexOf('cloud-drive') > -1
                     || currNodeClass.indexOf('folder-link') > -1)) {
@@ -6381,6 +6474,7 @@ function contextMenuUI(e, ll) {
                 $(menuCMI).filter('.rename-item').hide();
                 $(menuCMI).filter('.copy-item').hide();
                 $(menuCMI).filter('.getlink-item').hide();
+                $(menuCMI).filter('.colour-label-items').hide();
             }
             else if (M.getNodeShare(id).down === 1) {
                 $(menuCMI).filter('.copy-item').hide();
@@ -6394,12 +6488,12 @@ function contextMenuUI(e, ll) {
         }
     }
     // This part of code is also executed when ll == 'undefined'
-    v = m.children($('.context-menu-section'));
+    v = m.children($('.dropdown-section'));
 
     // count all items inside section, and hide dividers if necessary
     v.each(function() {
-        var a = $(this).find('a.context-menu-item'),
-            b = $(this).find('.context-menu-divider'),
+        var a = $(this).find('a.dropdown-item'),
+            b = $(this).find('hr'),
             x = a.filter(function() {
                 return $(this).css('display') === 'none';
             });
@@ -6455,7 +6549,7 @@ function setContextMenuGetLinkText() {
     var removeLinkText = (numOfExistingPublicLinks > 1) ? l[8735] : l[6821];
 
     // Set the text for the 'Get/Update link/s' and 'Remove link/s' context menu items
-    var $contextMenu = $('.context-menu');
+    var $contextMenu = $('.dropdown.body');
     $contextMenu.find('.getlink-menu-text').text(getLinkText);
     $contextMenu.find('.removelink-menu-text').text(removeLinkText);
 }
@@ -6555,7 +6649,7 @@ function reCalcMenuPosition(m, x, y, ico)
         var pPos = m.position();
 
         var b = y + nmH - (nTop - tB);// bottom of submenu
-        var mP = m.closest('.context-submenu');
+        var mP = m.closest('.dropdown.body.submenu');
         var pT = 0, bT = 0, pE = 0;
         if (mP.length)
         {
@@ -6590,7 +6684,7 @@ function reCalcMenuPosition(m, x, y, ico)
     }
     else if (ico === 'submenu')// submenues
     {
-        var n = m.next('.context-submenu');
+        var n = m.next('.dropdown.body.submenu');
         var nmW = n.outerWidth();// margin not calculated
         var nmH = n.outerHeight();// margins not calculated
 
@@ -6697,7 +6791,7 @@ function setBordersRadius(m, c)
 function scrollMegaSubMenu(e)
 {
     var ey = e.pageY;
-    var c = $(e.target).closest('.context-submenu');
+    var c = $(e.target).closest('.dropdown.body.submenu');
     var pNode = c.children(':first')[0];
 
     if (typeof pNode !== 'undefined')
@@ -7820,41 +7914,31 @@ function fillShareDialogWithContent() {
     $.changedPermissions = [];// GLOBAL VAR, changed permissions shared dialog
     $.removedContactsFromShare = [];// GLOBAL VAR, removed contacts from a share
 
-    var user, email, name, shareRights, html,
-        selectedNodeHandle = $.selected[0],
-        shares = M.d[selectedNodeHandle].shares,
-        pendingShares = M.ps[selectedNodeHandle];
+    var pendingShares = {};
+    var nodeHandle    = String($.selected[0]);
+    var node          = M.getNodeByHandle(nodeHandle);
+    var userHandles   = M.getNodeShareUsers(node, 'EXP');
 
-    // List users that are already use item
-    for (var userHandle in shares) {
-        if (shares.hasOwnProperty(userHandle)) {
-
-            if (Object(M.u).hasOwnProperty(userHandle)) {
-                user = M.u[userHandle];
-                email = user.m;
-                name = M.getNameByHandle(userHandle);
-                shareRights = shares[userHandle].r;
-
-                generateShareDialogRow(name, email, shareRights, userHandle);
-            }
-        }
+    if (Object(M.ps).hasOwnProperty(nodeHandle)) {
+        pendingShares = Object(M.ps[nodeHandle]);
+        userHandles   = userHandles.concat(Object.keys(pendingShares));
     }
+    var seen = {};
 
-    // Pending contact requests (pcr)
-    if (pendingShares) {
-        for (var pcrHandle in pendingShares) {
-            if (pendingShares.hasOwnProperty(pcrHandle)) {
+    userHandles.forEach(function(handle) {
+        var user = M.getUser(handle) || Object(M.opc[handle]);
 
-                // Because it's pending, we don't have user information in M.u so we have to look in the pending contact request
-                if (M.opc[pendingShares[pcrHandle].p]) {
-                    var pendingContactRequest = M.opc[pendingShares[pcrHandle].p];
-
-                    // ToDo: take care of name attribute once available
-                    generateShareDialogRow(pendingContactRequest.m, pendingContactRequest.m, pendingShares[pcrHandle].r);
-                }
-            }
+        if (!user.m) {
+            console.warn('Unknown user "%s"!', handle);
         }
-    }
+        else if (!seen[user.m]) {
+            var name  = M.getNameByHandle(handle) || user.m;
+            var share = M.getNodeShare(node, handle) || Object(pendingShares[handle]);
+
+            generateShareDialogRow(name, user.m, share.r | 0, handle);
+            seen[user.m] = 1;
+        }
+    });
 }
 
 /**
@@ -7928,7 +8012,7 @@ function handleShareDialogContent() {
 
     $('.share-dialog-icon.permissions-icon')
         .removeClass('active full-access read-and-write')
-        .html('<span></span>' + l[55])
+        .safeHTML('<span></span>' + l[55])
         .addClass('read-only');
 
     // Update dialog title text
@@ -7942,7 +8026,7 @@ function handleShareDialogContent() {
  * updateDialogDropDownList
  *
  * Extract id from list of emails, preparing it for extrusion,
- * fill multi-input dropdown list with not used emails.
+ * fill multi-input.dropdown list with not used emails.
  * @param {String} dialog, multi-input dialog class name.
  */
 function updateDialogDropDownList(dialog) {
@@ -8078,7 +8162,7 @@ function initShareDialogMultiInputPlugin() {
             minChars: 1,
             accountHolder: (M.u[u_handle] || {}).m || '',
             scrollLocation: 'share',
-            // Exclude from dropdownlist only emails/names which exists in multi-input (tokens)
+            // Exclude from.dropdownlist only emails/names which exists in multi-input (tokens)
             excludeCurrent: true,
 
             onEmailCheck: function() {
@@ -8450,7 +8534,7 @@ function initShareDialog() {
             $itemPermLevel
                 .removeClass(currPermLevel[0])
                 .removeClass('active')
-                .html('<span></span>' + newPermLevel[1])
+                .safeHTML('<span></span>@@', newPermLevel[1])
                 .addClass(newPermLevel[0]);
         }
         else if ($groupPermLevel.length) {// Group permission change, .permissions-icon
@@ -8478,14 +8562,14 @@ function initShareDialog() {
             $groupPermLevel
                 .removeClass(currPermLevel[0])
                 .removeClass('active')
-                .html('<span></span>' + newPermLevel[1])
+                .safeHTML('<span></span>@@', newPermLevel[1])
                 .addClass(newPermLevel[0]);
 
             /*$('.share-dialog-contact-bl .share-dialog-permissions')
                 .removeClass('read-only')
                 .removeClass('read-and-write')
                 .removeClass('full-access')
-                .html('<span></span>' + newPermLevel[1])
+                .safeHTML('<span></span>@@', newPermLevel[1])
                 .addClass(newPermLevel[0]);*/
         }
 
@@ -9695,6 +9779,85 @@ browserDialog.isWeak = function() {
 /* jshint -W074 */
 function propertiesDialog(close) {
 
+    /*
+    * fillPropertiesContactList, Handles node properties/info dialog contact list content
+    *
+    * @param {Object} shares Node related shares
+    * @param {Object} pendingShares Node related pending shares
+    * @param {Number} totalSharesNum
+    */
+    var fillPropertiesContactList = function(shares, pendingShares, totalSharesNum) {
+
+        var DEFAULT_CONTACTS_NUMBER = 5;
+        var counter = 0;
+        var tmpStatus = '';
+        var onlinestatus = '';
+        var user;
+        var hiddenClass = '';
+        var $shareUsers = pd.find('.properties-body .properties-context-menu')
+                        .empty()
+                        .append('<div class="properties-context-arrow"></div>');
+        var shareUsersHtml = '';
+
+        // Add contacts with full contact relation
+        for (var userId in shares) {
+            if (shares.hasOwnProperty(userId)) {
+
+                if (++counter <= DEFAULT_CONTACTS_NUMBER) {
+                    hiddenClass = '';
+                }
+                else {
+                    hiddenClass = 'hidden';
+                }
+
+                if (M.u[userId]) {
+                    user = M.u[userId];
+                    tmpStatus = megaChatIsReady && megaChat.karere.getPresence(megaChat.getJidFromNodeId(user.u));
+                    onlinestatus = M.onlineStatusClass(tmpStatus);
+                    shareUsersHtml += '<div class="properties-context-item '
+                        + onlinestatus[1] + ' ' +  hiddenClass + '">'
+                        + '<div class="properties-contact-status"></div>'
+                        + '<span>' + htmlentities(user.name || user.m) + '</span>'
+                        + '</div>';
+                }
+            }
+        }
+
+        // Add outgoing pending contacts for node handle [n.h]
+        for (userId in pendingShares) {
+            if (pendingShares.hasOwnProperty(userId)) {
+
+                if (++counter <= DEFAULT_CONTACTS_NUMBER) {
+                    hiddenClass = '';
+                }
+                else {
+                    hiddenClass = 'hidden';
+                }
+
+                if (M.opc[userId]) {
+                    user = M.opc[userId];
+                    shareUsersHtml += '<div class="properties-context-item offline ' + hiddenClass + '">'
+                        + '<div class="properties-contact-status"></div>'
+                        + '<span>' + htmlentities(user.m) + '</span>'
+                        + '</div>';
+                }
+            }
+        }
+
+        var hiddenNum = totalSharesNum - DEFAULT_CONTACTS_NUMBER;
+        var repStr = l[10663];// '... and [X] more';
+
+        if (hiddenNum > 0) {
+            shareUsersHtml += '<div class="properties-context-item show-more">'
+                + '<span>...' + repStr.replace('[X]', hiddenNum) + '</span>'
+                + '</div>';
+        }
+
+        if (shareUsersHtml !== '') {
+            $shareUsers.append(shareUsersHtml);
+        }
+    };// END of fillPropertiesContactList function
+
     var pd = $('.fm-dialog.properties-dialog');
     var c = $('.properties-elements-counter span');
 
@@ -9744,6 +9907,7 @@ function propertiesDialog(close) {
 
     $('.properties-elements-counter span').text('');
     $('.fm-dialog.properties-dialog .properties-body').rebind('click', function() {
+
         // Clicking anywhere in the dialog will close the context-menu, if open
         var e = $('.fm-dialog.properties-dialog .file-settings-icon');
         if (e.hasClass('active'))
@@ -9859,38 +10023,26 @@ function propertiesDialog(close) {
             p.t6 = l[897] + ':';
             p.t7 = fm_contains(sfilecnt, sfoldercnt);
             if (pd.attr('class').indexOf('shared') > -1) {
-                var shares, susers, total = 0
-                shares = Object.keys(n.shares || {}).length
-                p.t8 = l[1036] + ':';
-                p.t9 = shares == 1 ? l[990] : l[989].replace("[X]", shares);
-                p.t11 = n.ts ? htmlentities(time2date(n.ts)) : '';
-                p.t10 = p.t11 ? l[896] : '';
-                $('.properties-elements-counter span').text(typeof n.r == "number" ? '' : shares);
-                susers = pd.find('.properties-body .properties-context-menu')
-                    .empty()
-                    .append('<div class="properties-context-arrow"></div>')
-                for (var u in n.shares) {
-                    if (M.u[u]) {
-                        var u = M.u[u]
-                        var onlinestatus = M.onlineStatusClass(megaChatIsReady && megaChat.karere.getPresence(megaChat.getJidFromNodeId(u.u)));
-                        if (++total <= 5)
-                            susers.append('<div class="properties-context-item ' + onlinestatus[1] + '">'
-                                + '<div class="properties-contact-status"></div>'
-                                + '<span>' + htmlentities(u.name || u.m) + '</span>'
-                                + '</div>');
-                    }
-                }
 
-                if (total > 5) {
-                    susers.append(
-                        '<div class="properties-context-item show-more">'
-                        + '<span>... and ' + (total - 5) + ' more</span>'
-                        + '</div>'
-                        );
-                }
+                var fullSharesNum = Object.keys(n.shares || {}).length;
+                var pendingSharesNum = Object.keys(M.ps[n.h] || {}).length;
+                var totalSharesNum = fullSharesNum + pendingSharesNum;
 
-                if (total == 0)
+                // In case that user doesn't share with other
+                // Or in case that more then one node is selected
+                // Do NOT show contact informations in property dialog
+                if ((totalSharesNum === 0) || ($.selected.length > 1)) {
                     p.hideContacts = true;
+                }
+                else {
+                    p.t8 = l[1036] + ':';
+                    p.t9 = (totalSharesNum === 1) ? l[990] : l[989].replace("[X]", totalSharesNum);
+                    p.t11 = n.ts ? htmlentities(time2date(n.ts)) : '';
+                    p.t10 = p.t11 ? l[896] : '';
+                    $('.properties-elements-counter span').text(typeof n.r === "number" ? '' : totalSharesNum);
+
+                    fillPropertiesContactList(n.shares, M.ps[n.h], totalSharesNum);
+                }
             }
             if (pd.attr('class').indexOf('shared-with-me') > -1) {
                 p.t3 = l[64];
@@ -9946,7 +10098,7 @@ function propertiesDialog(close) {
             $(this).addClass('active');
             $('.fm-dialog').addClass('arrange-to-front');
             $('.properties-dialog').addClass('arrange-to-back');
-            $('.context-menu').addClass('arrange-to-front');
+            $('.dropdown.body').addClass('arrange-to-front');
             e.currentTarget = $('#' + n.h)
             e.calculatePosition = true;
             $.selected = [n.h];
@@ -9963,7 +10115,7 @@ function propertiesDialog(close) {
     $(document).bind('MegaCloseDialog.Properties', __fsi_close);
     function __fsi_close() {
         pd.find('.file-settings-icon').removeClass('active');
-        $('.context-menu').removeClass('arrange-to-front');
+        $('.dropdown.body').removeClass('arrange-to-front');
         $('.properties-dialog').removeClass('arrange-to-back');
         $('.fm-dialog').removeClass('arrange-to-front');
         $.hideContextMenu();
@@ -9974,8 +10126,7 @@ function propertiesDialog(close) {
     }
 
     if (pd.attr('class').indexOf('shared') > -1) {
-        $('.contact-list-icon').unbind('click');
-        $('.contact-list-icon').bind('click', function() {
+        $('.contact-list-icon').rebind('click', function() {
             if ($(this).attr('class').indexOf('active') == -1) {
                 $(this).addClass('active');
                 $('.properties-context-menu').css({
@@ -9988,11 +10139,42 @@ function propertiesDialog(close) {
                 $(this).removeClass('active');
                 $('.properties-context-menu').fadeOut(200);
             }
+
+            return false;
         });
-        $('.properties-context-item').unbind('click');
-        $('.properties-context-item').bind('click', function() {
+
+        $('.properties-dialog').rebind('click', function() {
+            var $list = $('.contact-list-icon');
+            if ($list.attr('class').indexOf('active') !== -1) {
+                $list.removeClass('active');
+                $('.properties-context-menu').fadeOut(200);
+            }
+        });
+
+        // ToDo: Can we redirects to contacts page when user clicks?
+        $('.properties-context-item').rebind('click', function(e) {
             $('.contact-list-icon').removeClass('active');
             $('.properties-context-menu').fadeOut(200);
+        });
+
+        // Expands properties-context-menu so rest of contacts can be shown
+        // By default only 5 contacts is shown
+        $('.properties-context-item.show-more').rebind('click', function() {
+
+            // $('.properties-context-menu').fadeOut(200);
+            $('.properties-dialog .properties-context-item')
+                .remove('.show-more')
+                .removeClass('hidden');// un-hide rest of contacts
+
+            var $cli = $('.contact-list-icon');
+            $('.properties-context-menu').css({
+                'left': $cli.position().left + 8 + 'px',
+                'top': $cli.position().top - $('.properties-context-menu').outerHeight() - 8 + 'px',
+                'margin-left': '-' + $('.properties-context-menu').width() / 2 + 'px'
+            });
+            // $('.properties-context-menu').fadeIn(200);
+
+            return false;// Prevent bubbling
         });
     }
 
@@ -10557,14 +10739,18 @@ function fm_importflnodes(nodes)
             document.location.hash = 'fm';
 
             $(document).one('onInitContextUI', SoonFc(function(e) {
-                if (ASSERT(M.RootID != FLRootID, 'Unexpected openFolder on Import')) {
+                if (M.RootID === FLRootID) {
+                    // TODO: How to reproduce this?
+                    console.warn('Unable to complete import, apparnetly we did not reached the cloud.');
+                }
+                else {
                     if (d) console.log('Importing Nodes...', sel, $.onImportCopyNodes);
 
                     $.selected = sel;
                     $.mcImport = true;
 
                     // XXX: ...
-                    $('.context-menu-item.copy-item').click();
+                    $('.dropdown-item.copy-item').click();
                 }
             }));
         }).fail(function(aError) {
@@ -11015,7 +11201,7 @@ function contactUI() {
             e.preventDefault();
             e.stopPropagation(); // do not treat it as a regular click on the file
             // $(this).addClass('active');
-            $('.context-menu').addClass('arrange-to-front');
+            $('.dropdown.body').addClass('arrange-to-front');
             e.currentTarget = $(this);
             e.calculatePosition = true;
             $.selected = [location.hash.replace('#fm/', '')];
@@ -11229,7 +11415,7 @@ function FMResizablePane(element, opts) {
  *
  * Bind Custom select event
  *
- * @param {Selector} dropdowns, elements selector.
+ * @param {Selector}.dropdowns, elements selector.
  * @param {String} addition option for account page only. Allows to show "Show changes" notification
  *
  */
@@ -11246,7 +11432,7 @@ function bindDropdownEvents($dropdown, saveOption) {
                 $dropdown = $this.find('.default-select-dropdown'),
                 $activeDropdownItem = $this.find('.default-dropdown-item.active');
 
-            //Show Select dropdown
+            //Show Select.dropdown
             $('.active .default-select-dropdown').fadeOut(200);
             $this.addClass('active');
             $dropdown.css('margin-top', '0px');
@@ -11276,7 +11462,7 @@ function bindDropdownEvents($dropdown, saveOption) {
         if (!$this.hasClass('active')) {
             var $select = $(this).closest('.default-select');
 
-            //Select dropdown item
+            //Select.dropdown item
             $select.find('.default-dropdown-item').removeClass('active');
             $this.addClass('active');
             $select.find('span').text($this.text());
@@ -11427,24 +11613,20 @@ var cancelSubscriptionDialog = {
             api_req({ a: 'cccs', r: reason }, {
                 callback: function() {
 
-                    // Reset account cache and refetch all account data to display UI
-                    // (note potential race condition if cancellation callback wasn't received in 7500ms)
+                    // Hide loading dialog and cancel subscription button on account page
+                    loadingDialog.hide();
+                    cancelSubscriptionDialog.$accountPageCancelButton.hide();
+                    cancelSubscriptionDialog.$accountPageSubscriptionBlock.removeClass('active-subscription');
+
+                    // Show success dialog and refresh UI
+                    cancelSubscriptionDialog.$dialogSuccess.removeClass('hidden');
+                    cancelSubscriptionDialog.$backgroundOverlay.removeClass('hidden');
+                    cancelSubscriptionDialog.$backgroundOverlay.addClass('payment-dialog-overlay');
+                    cancelSubscriptionDialog.initCloseButtonSuccessDialog();
+
+                    // Reset account cache so all account data will be refetched and re-render the account page UI
                     M.account.lastupdate = 0;
-
-                    setTimeout(function() {
-
-                        // Hide loading dialog and cancel subscription button on account page
-                        loadingDialog.hide();
-                        cancelSubscriptionDialog.$accountPageCancelButton.hide();
-                        cancelSubscriptionDialog.$accountPageSubscriptionBlock.removeClass('active-subscription');
-
-                        // Show success dialog and refresh UI
-                        cancelSubscriptionDialog.$dialogSuccess.removeClass('hidden');
-                        cancelSubscriptionDialog.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
-                        cancelSubscriptionDialog.initCloseButtonSuccessDialog();
-                        accountUI();
-
-                    }, 7500);
+                    accountUI();
                 }
             });
         });

@@ -699,6 +699,13 @@
                                 || (aNode.p === 'contacts' && M.contactstatus(aHandle).ts));
                         }
                     }
+
+                    // Colour label
+                    if (aNode.lbl) {
+                        var colourLabel = M.getColourClassFromId(aNode.lbl);
+                        props.classNames.push('colour-label')
+                        props.classNames.push(colourLabel);
+                    }
                 }
 
                 return props;
@@ -752,6 +759,13 @@
 
                 if (avatar) {
                     props.avatar = parseHTML(avatar).firstChild;
+                }
+
+                // Colour label
+                if (aNode.lbl && (aNode.su !== u_handle)) {
+                    props.colourLabel = M.getColourClassFromId(aNode.lbl);
+                    props.classNames.push('colour-label')
+                    props.classNames.push(props.colourLabel);
                 }
 
                 return props;

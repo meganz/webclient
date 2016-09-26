@@ -917,6 +917,7 @@ function mozClearStartupCache() {
 
 (function __mozSecurityTraps(scope) {
 
+	let removeState;
 	const __cE = document.createElement;
 	const __cE_NS = document.createElementNS;
 	const __XHR_Open = XMLHttpRequest.prototype.open;
@@ -970,11 +971,11 @@ function mozClearStartupCache() {
 
 	XMLHttpRequest.prototype.open = function(meth, url)
 	{
-		var success = false;
+		let success = false, uri;
 
 		try
 		{
-			var uri = Services.io.newURI(url, null, null);
+			uri = Services.io.newURI(url, null, null);
 
 			if (/\.mega(?:\.co)?\.nz$/.test(uri.host)) {
 				__XHR_Open.apply(this, arguments);
@@ -993,6 +994,12 @@ function mozClearStartupCache() {
 				this.setRequestHeader('User-Agent', userAgent, false);
 			}
 			catch (e) {}
+
+			if (!scope.use_ssl && uri.asciiHost.endsWith('.userstorage.mega.co.nz')) {
+				if (removeState) {
+					removeState(uri);
+				}
+			}
 		}
 		else {
 			var err = new Error('Blocked XHR to ' + url);
@@ -1002,15 +1009,15 @@ function mozClearStartupCache() {
 	XMLHttpRequest.prototype = Object.freeze(XMLHttpRequest.prototype);
 
 	if ("nsISiteSecurityService" in Ci) {
-		mozRunAsync(function() {
+		removeState = (aURI) => {
 			var header = Ci.nsISiteSecurityService.HEADER_HSTS;
 			var flags = scope.Incognito ? Ci.nsISocketProvider.NO_PERMANENT_STORAGE : 0;
-			var hsts = mozSSService.isSecureHost(header, 'http://userstorage.mega.co.nz/', flags);
+			var hsts = mozSSService.isSecureHost(header, aURI.prePath, flags);
 			if (hsts) {
 				var uri = Services.io.newURI('https://mega.co.nz/', null, null);
 				mozSSService.removeState(header, uri, flags);
 			}
-		});
+		};
 	}
 
 })(self);

@@ -3248,9 +3248,14 @@ mega.utils.execCommandUsable = function() {
     var result;
 
     try {
-        result = document.execCommand('copy');
+        return document.queryCommandSupported("copy");
     }
-    catch (ex) {}
+    catch (ex) {
+        try {
+            result = document.execCommand('copy');
+        }
+        catch (ex) {}
+    }
 
     return result === false;
 };

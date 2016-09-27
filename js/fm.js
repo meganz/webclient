@@ -2479,8 +2479,6 @@ function initContextUI() {
 
     $(c + '.getlink-item').rebind('click', function() {
 
-        var selectedNodeHandle;
-
         if (u_type === 0) {
             ephemeralDialog(l[1005]);
         }

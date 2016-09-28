@@ -4363,6 +4363,7 @@
     "10656": "Customer service and other enquiries: [A]support@mega.nz[\/A]",
     "10657": "Mega Group",
     "10658": "The [A]Mega Terms of Service[\/A] apply to Mega Limited and its related companies, affiliates and resellers, including:",
+    "10659": "Postcode",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4576,6 +4577,7 @@
         "mega-group-contact-intro": 10655,
         "customer-service-and-enquiries": 10656,
         "mega-group": 10657,
-        "mega-terms-and-related-companies": 10658
+        "mega-terms-and-related-companies": 10658,
+        "postcode": 10659
     }
 }

@@ -17454,5 +17454,9 @@
     "10658": {
         "text": "The [A]Mega Terms of Service[\/A] apply to Mega Limited and its related companies, affiliates and resellers, including:",
         "context": "Text on the #general information page about the Terms of Service applying to the MEGA group of companies. Do not remove or modify the [A] tags but do replace the text inbetween. A list of companies and affiliates follows."
+    },
+    "10659": {
+        "text": "Postcode",
+        "context": "A postal code (also known as a ZIP code) for the purpose of sorting mail. This is a field on the payment form."
     }
 }

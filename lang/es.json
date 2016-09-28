@@ -4324,14 +4324,14 @@
     "10616": "Esto ha caducado.",
     "10617": "Las im\u00e1genes no son correctas.",
     "10618": "Escribe aqu\u00ed...",
-    "10619": "You will lose all data associated with this account. Are you sure you want to proceed?",
-    "10621": "If you can&#039;t access your email, please contact support@mega.nz.",
-    "10622": "Please enter your password to confirm that you want to close your account.",
-    "10623": "New email",
-    "10624": "Confirm new email",
-    "10625": "The new and the old email must not match",
-    "10626": "Emails do not match",
-    "10627": "Sessions closed",
+    "10619": "Perder\u00e1s todos los datos asociados con esta cuenta. \u00bfEstas seguro de que quieres continuar?",
+    "10621": "Si no puedes acceder a tu correo electr\u00f3nico, por favor contacta con support@mega.nz.",
+    "10622": "Por favor, introduce tu contrase\u00f1a para confirmar que quieres cerrar tu cuenta.",
+    "10623": "Nuevo correo electr\u00f3nico",
+    "10624": "Confirmar nuevo correo electr\u00f3nico",
+    "10625": "El correo electr\u00f3nico nuevo y el viejo no pueden coincidir",
+    "10626": "El correo electr\u00f3nico no coincide",
+    "10627": "Sesiones cerradas",
     "10628": "You are about to start a recurring subscription and your card will be re-billed monthly.",
     "10629": "You are about to start a recurring subscription and your card will be re-billed annually.",
     "10630": "For more detail on recurring payments, our refund policy, or how to cancel your subscription, please visit our [A]general information page[\/A].",
@@ -4347,7 +4347,7 @@
     "10640": "You will be charged %1 monthly.",
     "10641": "You will be charged %1 annually.",
     "10642": "You will be charged %1 one time.",
-    "10643": "Refunds",
+    "10643": "Reembolsos",
     "10644": "Unless otherwise provided by law or by a particular service offer, all purchases are final and non-refundable. If you believe that Mega has charged you in error, you must contact us within 90 days of such charge. No refunds will be given for any charges more than 90 days old. We reserve the right to issue refunds or credits at our sole discretion. If we issue a refund or credit, we are under no obligation to issue the same or similar refund in the future. This refund policy does not affect any statutory rights that may apply. If you have made a payment by mistake and have not used the subscription plan services, you must contact [A]support@mega.nz[\/A] within 24 hours. This will be acknowledged promptly and answered within 7 days.",
     "10645": "Account Cancellation",
     "10646": "You can cancel your account at [A]mega.nz\/#account[\/A].",
@@ -4363,6 +4363,7 @@
     "10656": "Customer service and other enquiries: [A]support@mega.nz[\/A]",
     "10657": "Mega Group",
     "10658": "The [A]Mega Terms of Service[\/A] apply to Mega Limited and its related companies, affiliates and resellers, including:",
+    "10659": "Postcode",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4576,6 +4577,7 @@
         "mega-group-contact-intro": 10655,
         "customer-service-and-enquiries": 10656,
         "mega-group": 10657,
-        "mega-terms-and-related-companies": 10658
+        "mega-terms-and-related-companies": 10658,
+        "postcode": 10659
     }
 }

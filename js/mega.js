@@ -3747,6 +3747,14 @@ function MegaData()
         }
     };
 
+    /**
+     * Delete node share.
+     * @param {String}  h    Node handle.
+     * @param {String}  u    User handle to remove the associated share
+     * @param {Boolean} okd  Whether API notified the node is no longer
+     *                       shared with anybody else and therefore the
+     *                       owner share key must be removed too.
+     */
     this.delNodeShare = function(h, u, okd) {
 
         if (this.d[h] && typeof this.d[h].shares !== 'undefined') {

@@ -2993,7 +2993,7 @@ function accountUI() {
     }
 
     M.accountData(function(account) {
-
+        
         var perc, warning, perc_c;
         var id = document.location.hash;
 
@@ -3074,6 +3074,7 @@ function accountUI() {
 
             // Subscription
             if (account.stype == 'S') {
+        
                 $('.fm-account-header.typetitle').text(l[434]);
                 if (account.scycle == '1 M') {
                     $('.membership-big-txt.type').text(l[748]);
@@ -3087,25 +3088,26 @@ function accountUI() {
 
                 // Get the date their subscription will renew
                 var timestamp = account.srenew[0];
-                var paymentType = htmlentities('(' + account.sgw.join(',') + ')');      // Credit card etc
+                var paymentType = (account.sgw.length > 0) ? account.sgw[0] : '';   // Credit Card etc
 
-                // Display the date their subscription will renew in format '14 March 2015 (credit card)'
+                // Display the date their subscription will renew if known
                 if (timestamp > 0) {
                     var date = new Date(timestamp * 1000);
-                    var dateString = l[6971] + ' ' + date.getDate() + ' ' + date_months[date.getMonth()] + ' ' + date.getFullYear();
-                    $('.membership-medium-txt.expiry').html(dateString + ' ' + paymentType);
+                    var dateString = l[6971] + ' ' + date.getDate() + ' ' + date_months[date.getMonth()] + ' '
+                                   + date.getFullYear();
+
+                    // Use format: 14 March 2015 - Credit Card
+                    paymentType = dateString + ' - ' + paymentType;
                 }
-                else {
-                    // Otherwise just show payment type
-                    $('.membership-medium-txt.expiry').html(paymentType);
-                }
+
+                // Otherwise just show payment type
+                $('.membership-medium-txt.expiry').text(paymentType);
 
                 // Check if there are any active subscriptions
                 // ccqns = Credit Card Query Number of Subscriptions
-                api_req({ a: 'ccqns' },
-                {
-                    callback : function(numOfSubscriptions, ctx)
-                    {
+                api_req({ a: 'ccqns' }, {
+                    callback : function(numOfSubscriptions, ctx) {
+
                         // If there is an active subscription
                         if (numOfSubscriptions > 0) {
 
@@ -3121,12 +3123,12 @@ function accountUI() {
             else if (account.stype == 'O') {
 
                 // one-time or cancelled subscription
-                $('.fm-account-header.typetitle').text(l[746]+':');
+                $('.fm-account-header.typetitle').text(l[746] + ':');
                 $('.membership-big-txt.type').text(l[751]);
-                $('.membership-medium-txt.expiry a').rebind('click', function() {
+                $('.membership-medium-txt.expiry').rebind('click', function() {
                     document.location = $(this).attr('href');
                 });
-                $('.membership-medium-txt.expiry a').html(l[987] + ' ' + time2date(account.expiry));
+                $('.membership-medium-txt.expiry').text(l[987] + ' ' + time2date(account.expiry));
                 $('.fm-account-blocks .btn-cancel').hide();
                 $('.subscription-bl').removeClass('active-subscription');
             }
@@ -3544,17 +3546,22 @@ function accountUI() {
         var html = '', sel = '';
         $('.default-select.country span').text(l[996]);
 
-        for (var country in isocountries) {
+        for (var country in isoCountries) {
+            if (!isoCountries.hasOwnProperty(country)) {
+                continue;
+            }
             if (u_attr.country && country == u_attr.country) {
                 sel = 'active';
-                $('.default-select.country span').text(isocountries[country]);
+                $('.default-select.country span').text(isoCountries[country]);
             }
             else {
                 sel = '';
             }
-            html += '<div class="default-dropdown-item ' + sel + '" data-value="' + country + '">' + isocountries[country] + '</div>';
+            html += '<div class="default-dropdown-item ' + sel + '" data-value="' + country + '">'
+                  +      isoCountries[country]
+                  + '</div>';
         }
-        $('.default-select.country .default-select-scroll').html(html);
+        $('.default-select.country .default-select-scroll').safeHTML(html);
 
         // Bind Dropdowns events
         bindDropdownEvents($('.fm-account-main .default-select'), 1);
@@ -5216,6 +5223,7 @@ var selectionManager;
 function UIkeyevents() {
     $(window).unbind('keydown.uikeyevents');
     $(window).bind('keydown.uikeyevents', function(e) {
+
         if (e.keyCode == 9 && !$(e.target).is("input,textarea,select")) {
             return false;
         }
@@ -5233,7 +5241,7 @@ function UIkeyevents() {
             return true;
         }
 
-        if (!is_fm() && (page !== 'login')) {
+        if (!is_fm() && (page !== 'login') && (page.substr(0, 3) !== 'pro')) {
             return true;
         }
 
@@ -5314,9 +5322,9 @@ function UIkeyevents() {
 
                 $target.addClass("ui-selected");
                 selectionManager.set_currently_selected($target);
-
             }
         }
+
         if ((e.keyCode == 38) && (s.length > 0) && ($.selectddUIgrid.indexOf('.grid-scrolling-table') > -1) && !$.dialog) {
 
             // up in grid
@@ -5396,9 +5404,13 @@ function UIkeyevents() {
         else if ((e.keyCode === 13) && ($.dialog === 'add-contact-popup')) {
             addNewContact($('.add-user-popup-button.add'));
         }
-
         else if ((e.keyCode === 13) && ($.dialog === 'rename')) {
             doRename();
+        }
+
+        // If the Esc key is pressed while the payment address dialog is visible, close it
+        else if ((e.keyCode === 27) && !$('.payment-address-dialog').hasClass('hidden')) {
+            addressDialog.closeDialog();
         }
         else if (e.keyCode == 27 && ($.copyDialog || $.moveDialog || $.copyrightsDialog)) {
             closeDialog();
@@ -11425,24 +11437,20 @@ var cancelSubscriptionDialog = {
             api_req({ a: 'cccs', r: reason }, {
                 callback: function() {
 
-                    // Reset account cache and refetch all account data to display UI
-                    // (note potential race condition if cancellation callback wasn't received in 7500ms)
+                    // Hide loading dialog and cancel subscription button on account page
+                    loadingDialog.hide();
+                    cancelSubscriptionDialog.$accountPageCancelButton.hide();
+                    cancelSubscriptionDialog.$accountPageSubscriptionBlock.removeClass('active-subscription');
+
+                    // Show success dialog and refresh UI
+                    cancelSubscriptionDialog.$dialogSuccess.removeClass('hidden');
+                    cancelSubscriptionDialog.$backgroundOverlay.removeClass('hidden');
+                    cancelSubscriptionDialog.$backgroundOverlay.addClass('payment-dialog-overlay');
+                    cancelSubscriptionDialog.initCloseButtonSuccessDialog();
+                    
+                    // Reset account cache so all account data will be refetched and re-render the account page UI
                     M.account.lastupdate = 0;
-
-                    setTimeout(function() {
-
-                        // Hide loading dialog and cancel subscription button on account page
-                        loadingDialog.hide();
-                        cancelSubscriptionDialog.$accountPageCancelButton.hide();
-                        cancelSubscriptionDialog.$accountPageSubscriptionBlock.removeClass('active-subscription');
-
-                        // Show success dialog and refresh UI
-                        cancelSubscriptionDialog.$dialogSuccess.removeClass('hidden');
-                        cancelSubscriptionDialog.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
-                        cancelSubscriptionDialog.initCloseButtonSuccessDialog();
-                        accountUI();
-
-                    }, 7500);
+                    accountUI();
                 }
             });
         });

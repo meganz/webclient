@@ -1617,7 +1617,7 @@ else if (!b_u)
 
         jsl.push({f:'js/useravatar.js', n: 'contact_avatar_js', j:1,w:3});
         jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
-        jsl.push({f:'js/countries.js', n: 'countries_js', j:1});
+        jsl.push({f:'js/states-countries.js', n: 'states_countries_js', j:1});
         jsl.push({f:'html/dialogs.html', n: 'dialogs', j:0,w:2});
         jsl.push({f:'js/vendor/int64.js', n: 'int64_js', j:1});
         jsl.push({f:'js/transfers/zip64.js', n: 'zip_js', j:1});

@@ -66,8 +66,11 @@
 						}
 					}
 
-					var link = atob(chunk.join("")).substr(2).toLowerCase();
-					if (/^https:\/\/mega\.nz/.test(link)) {
+					var link = atob(chunk.join("")).substr(2);
+					if (link.indexOf('redirecting/aHR0') > 0) {
+						link = atob(link.split('/').pop());
+					}
+					if (/^https:\/\/mega\.nz/.test(link.toLowerCase())) {
 						sendAsyncMessage('MEGA:'+mID+':event', {name: 'mega-event-log4', link: l.href, target: link});
 						win.location = link;
 					}

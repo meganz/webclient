@@ -287,7 +287,8 @@ function init_page() {
         closeDialog();
     }
 
-    if (localStorage.awaitingConfirmationAccount) {
+    // Do not show this dialog while entering into the downloads page
+    if (page.substr(0, 1) !== '!' && localStorage.awaitingConfirmationAccount) {
         var acc = JSON.parse(localStorage.awaitingConfirmationAccount);
 
         // if visiting a #confirm link, or they confirmed it elsewhere.
@@ -298,7 +299,12 @@ function init_page() {
             // Insert placeholder page while waiting for user input
             parsepage(pages['placeholder']);
 
-            return mega.ui.sendSignupLinkDialog(acc);
+            return mega.ui.sendSignupLinkDialog(acc, function() {
+                // The user clicked 'close', abort and start over...
+
+                delete localStorage.awaitingConfirmationAccount;
+                init_page();
+            });
         }
     }
 
@@ -337,7 +343,7 @@ function init_page() {
                 mega.config.fetch();
             }
 
-            if (typeof mDB !== 'undefined' && !pfid && !flhashchange) {
+            if (typeof mDB !== 'undefined' && !pfid && (!flhashchange || page === 'fm')) {
                 mDBstart();
             }
             else {

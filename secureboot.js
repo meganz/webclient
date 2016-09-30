@@ -21,7 +21,7 @@ var is_electron = false;
 if (typeof process !== 'undefined') {
     var mll = process.moduleLoadList || [];
 
-    if (mll.indexOf('NativeModule ATOM_SHELL_ASAR') !== -1) {
+    if (mll.indexOf('NativeModule ELECTRON_ASAR') !== -1) {
         is_electron = module;
         module = undefined; // prevent factory loaders from using the module
 
@@ -1436,7 +1436,7 @@ else if (!b_u)
     jsl.push({f:langFilepath, n: 'lang', j:3});
     jsl.push({f:'sjcl.js', n: 'sjcl_js', j:1});
     jsl.push({f:'js/vendor/jquery-2.2.1.js', n: 'jquery', j:1, w:10});
-    jsl.push({f:'js/vendor/jquery-ui-1.11.4.js', n: 'jqueryui_js', j:1, w:10});
+    jsl.push({f:'js/vendor/jquery-ui.js', n: 'jqueryui_js', j:1, w:10});
     jsl.push({f:'js/vendor/jquery.mousewheel.js', n: 'jquerymouse_js', j:1});
     jsl.push({f:'js/vendor/jquery.jscrollpane.js', n: 'jscrollpane_js', j:1});
     jsl.push({f:'js/jquery.misc.js', n: 'jquerymisc_js', j:1});
@@ -1617,7 +1617,7 @@ else if (!b_u)
 
         jsl.push({f:'js/useravatar.js', n: 'contact_avatar_js', j:1,w:3});
         jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
-        jsl.push({f:'js/countries.js', n: 'countries_js', j:1});
+        jsl.push({f:'js/states-countries.js', n: 'states_countries_js', j:1});
         jsl.push({f:'html/dialogs.html', n: 'dialogs', j:0,w:2});
         jsl.push({f:'js/vendor/int64.js', n: 'int64_js', j:1});
         jsl.push({f:'js/transfers/zip64.js', n: 'zip_js', j:1});

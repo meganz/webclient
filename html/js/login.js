@@ -165,6 +165,11 @@ function pagelogin() {
         if ($('.loginwarning-checkbox').hasClass('checkboxOn')) {
             localStorage.hideloginwarning = 1;
         }
+        var remember;
+        // XXX: Set remember on by default if confirming a freshly created account
+        if (confirmok || $('.login-check').hasClass('checkboxOn')) {
+            remember = 1;
+        }
 
         if (confirmok) {
             doConfirm($('#login-name2').val(), $('#login-password2').val(), function() {
@@ -182,10 +187,6 @@ function pagelogin() {
             });
         }
         else {
-            var remember;
-            if ($('.login-check').hasClass('checkboxOn')) {
-                remember = 1;
-            }
             postLogin($('#login-name2').val(), $('#login-password2').val(), remember, function(r) {
                 loadingDialog.hide();
 
@@ -237,6 +238,7 @@ function init_login() {
         $('.register-st2-button-arrow').text(l[1131]);
         $('.main-italic-header.login').text(l[1131]);
         $('.main-top-info-text').text(l[378]);
+        $('.login-check').addClass('hidden').next().addClass('hidden');
     }
     else {
         $('.register-st2-button').addClass('active');

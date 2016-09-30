@@ -23036,7 +23036,7 @@
 	                            )
 	                        ),
 	                        endCallButton,
-	                        room.type === "group" ? React.makeElement(
+	                        React.makeElement(
 	                            "div",
 	                            { className: "link-button red " + (dontShowTruncateButton ? "disabled" : ""),
 	                                onClick: function onClick(e) {
@@ -23049,7 +23049,7 @@
 	                                } },
 	                            React.makeElement("i", { className: "small-icon rounded-stop" }),
 	                            __(l[8871])
-	                        ) : null,
+	                        ),
 	                        room.type === "group" ? React.makeElement(
 	                            "div",
 	                            { className: "link-button red " + (myPresence === 'offline' || room.stateIsLeftOrLeaving() ? "disabled" : ""),
@@ -23965,6 +23965,7 @@
 	                            self.editDomElement = null;
 
 	                            var currentContents = v.textContents ? v.textContents : v.contents;
+
 	                            if (messageContents === false || messageContents === currentContents) {
 	                                self.messagesListScrollable.scrollToBottom(true);
 	                                self.lastScrollPositionPerc = 1;
@@ -24087,6 +24088,8 @@
 	                            'confirmDeleteDialog': false,
 	                            'messageToBeDeleted': false
 	                        });
+
+	                        $(msg).trigger('onChange', [msg, "deleted", false, true]);
 	                    }
 	                },
 	                React.makeElement(
@@ -24228,8 +24231,9 @@
 	                            React.makeElement("input", { type: "text", name: "newTopic",
 	                                defaultValue: self.props.chatRoom.getRoomTitle(),
 	                                value: self.state.renameDialogValue,
+	                                maxLength: "30",
 	                                onChange: function onChange(e) {
-	                                    self.setState({ 'renameDialogValue': e.target.value });
+	                                    self.setState({ 'renameDialogValue': e.target.value.substr(0, 30) });
 	                                }, onKeyUp: function onKeyUp(e) {
 	                                    if (e.which === 13) {
 	                                        onEditSubmit(e);
@@ -26658,11 +26662,19 @@
 	                });
 	            }
 	        });
+	        $(self.props.message).rebind('onChange.GenericConversationMessage' + self.getUniqueId(), function () {
+	            Soon(function () {
+	                if (self.isMounted()) {
+	                    self.eventuallyUpdate();
+	                }
+	            });
+	        });
 	    },
 	    componentWillUnmount: function componentWillUnmount() {
 	        var self = this;
 	        var $node = $(self.findDOMNode());
 	        $node.unbind('onEditRequest.genericMessage');
+	        $(self.props.message).unbind('onChange.GenericConversationMessage' + self.getUniqueId());
 	    },
 	    doDelete: function doDelete(e, msg) {
 	        e.preventDefault(e);
@@ -27315,6 +27327,7 @@
 	                            if (self.props.onEditDone) {
 	                                Soon(function () {
 	                                    self.props.onEditDone(messageContents);
+	                                    self.forceUpdate();
 	                                });
 	                            }
 
@@ -28381,8 +28394,8 @@
 	        var participants = self.getParticipantsExceptMe();
 	        return self.megaChat.getContactNameFromJid(participants[0]);
 	    } else {
-	        if (self.topic) {
-	            return self.topic;
+	        if (self.topic && self.topic.substr) {
+	            return self.topic.substr(0, 30);
 	        }
 
 	        var participants = self.members && Object.keys(self.members).length > 0 ? Object.keys(self.members) : [];

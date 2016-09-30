@@ -14767,10 +14767,6 @@
         "text": "How do I create an account on MEGA through the app?",
         "context": "Question\/Answer for \"How do I create an account on MEGA through the app?\"\nMore info at: https:\/\/mega.nz\/#help\/client\/android\/getting-started\/how-do-i-create-an-account-on-mega-through-the-app"
     },
-    "9946": {
-        "text": "NOTE: MEGA?s advanced encryption functions don?t work on mobile browsers so you need to use the Android app to access your MEGA cloud storage contents.",
-        "context": "Question\/Answer for \"How do I create an account on MEGA through the app?\"\nMore info at: https:\/\/mega.nz\/#help\/client\/android\/getting-started\/how-do-i-create-an-account-on-mega-through-the-app"
-    },
     "9947": {
         "text": "Where can I find your iOS app?",
         "context": "Question\/Answer for \"Where can I find your iOS app?\"\nMore info at: https:\/\/mega.nz\/#help\/client\/ios\/getting-started\/where-can-i-find-your-ios-app"
@@ -15135,10 +15131,6 @@
         "text": "If you are still logged into MEGA or have the original Recovery Key:",
         "context": "Question\/Answer for \"I have forgotten my password. Can I reset it?\"\nMore info at: https:\/\/mega.nz\/#help\/client\/webclient\/accounts-and-pro-accounts\/i-have-forgotten-my-password-can-i-reset-it"
     },
-    "10041": {
-        "text": "[A]If you aren?t logged in on another device and haven?t backed up your Recovery Key[\/A], your only options are:",
-        "context": "Question\/Answer for \"I have forgotten my password. Can I reset it?\"\nMore info at: https:\/\/mega.nz\/#help\/client\/webclient\/accounts-and-pro-accounts\/i-have-forgotten-my-password-can-i-reset-it"
-    },
     "10042": {
         "text": "Nominate a new account's password for your new empty account and ensure you save it at a secure place.",
         "context": "Question\/Answer for \"I have forgotten my password. Can I reset it?\"\nMore info at: https:\/\/mega.nz\/#help\/client\/webclient\/accounts-and-pro-accounts\/i-have-forgotten-my-password-can-i-reset-it"
@@ -15197,10 +15189,6 @@
     },
     "10056": {
         "text": "Will my Free \/ PRO account ever expire?",
-        "context": "Question\/Answer for \"Will my Free \/ PRO account ever expire?\"\nMore info at: https:\/\/mega.nz\/#help\/client\/webclient\/accounts-and-pro-accounts\/will-my-free-pro-account-ever-expire"
-    },
-    "10057": {
-        "text": "Your account won?t expire if you use it regularly - [A]we recommend you login at least every three months to keep the account active[\/A]. We will send several warnings to your registered email address before deactivating accounts that appear not used or abandoned, giving you the opportunity to react.",
         "context": "Question\/Answer for \"Will my Free \/ PRO account ever expire?\"\nMore info at: https:\/\/mega.nz\/#help\/client\/webclient\/accounts-and-pro-accounts\/will-my-free-pro-account-ever-expire"
     },
     "10058": {
@@ -15355,10 +15343,6 @@
         "text": "When you click to nominate Local Folder you can select any other location or drive again by clicking on the right PC path icon. On Windows click [A]Apply[\/A].",
         "context": "Question\/Answer for \"How to setup sync client? Can I specify which folder(s) to sync?\"\nMore info at: https:\/\/mega.nz\/#help\/client\/megasync\/syncing\/how-to-setup-sync-client-can-i-specify-which-folder-s-to-sync"
     },
-    "10107": {
-        "text": "[A]Warning: You can?t create multiple syncs on the same folders. For example if you nominated the entire Cloud Drive and your local folder (Full Sync) and then want to select an individual folder from Cloud Drive for another sync path with local device. You would get an error message ?The selected folder is already synced? as it was synced as a part of your Cloud Drive.",
-        "context": "Question\/Answer for \"How to setup sync client? Can I specify which folder(s) to sync?\"\nMore info at: https:\/\/mega.nz\/#help\/client\/megasync\/syncing\/how-to-setup-sync-client-can-i-specify-which-folder-s-to-sync"
-    },
     "10109": {
         "text": "Can I exclude specific folder(s) \/ file(s) when I sync?",
         "context": "Question\/Answer for \"Can I exclude specific folder(s) \/ file(s) when I sync?\"\nMore info at: https:\/\/mega.nz\/#help\/client\/megasync\/syncing\/can-i-exclude-specific-folder-s-file-s-when-i-sync"
@@ -15385,10 +15369,6 @@
     },
     "10116": {
         "text": "If you are experiencing [A]inconsistencies[\/A] between the synced folders:",
-        "context": "Question\/Answer for \"I can\u2019t use sync client, something is not working. What to do?\"\nMore info at: https:\/\/mega.nz\/#help\/client\/megasync\/general\/i-can-t-use-sync-client-something-is-not-working-what-to-do"
-    },
-    "10118": {
-        "text": "If you are editing some synced files (e.g. [A] MS-Word[\/A]  documents [B]on Windows[\/B]) it may occur that when you save your changes the updated file won't sync with the cloud. This is a problem related to an exclusive lock that the MS-Word program places against the file, that doesn?t let MEGA sync the file until you close Microsoft Word.",
         "context": "Question\/Answer for \"I can\u2019t use sync client, something is not working. What to do?\"\nMore info at: https:\/\/mega.nz\/#help\/client\/megasync\/general\/i-can-t-use-sync-client-something-is-not-working-what-to-do"
     },
     "10119": {
@@ -15515,10 +15495,6 @@
         "text": "How do you regulate transfer quota (bandwidth) utilisation?",
         "context": "Question\/Answer for \"How do you regulate transfer quota (bandwidth) utilisation?\"\nMore info at: https:\/\/mega.nz\/#help\/client\/webclient\/cloud-drive\/how-do-you-regulate-transfer-quota-bandwidth-utilisation"
     },
-    "10161": {
-        "text": "Our policy is not to impose any artificial restrictions on our users unless necessitated by infrastructure bottlenecks or other considerations. However, we do meter data transfer for your IP address, and we reserve the right to limit complimentary traffic utilisation for any reason (after which the file owner?s paid traffic quota will be depleted, followed by your own). For your convenience, interrupted transfers will resume automatically after a cool-down period or after new traffic quota become available.",
-        "context": "Question\/Answer for \"How do you regulate transfer quota (bandwidth) utilisation?\"\nMore info at: https:\/\/mega.nz\/#help\/client\/webclient\/cloud-drive\/how-do-you-regulate-transfer-quota-bandwidth-utilisation"
-    },
     "10162": {
         "text": "What is the upload speed limiting feature good for?",
         "context": "Question\/Answer for \"What is the upload speed limiting feature good for?\"\nMore info at: https:\/\/mega.nz\/#help\/client\/webclient\/cloud-drive\/what-is-the-upload-speed-limiting-feature-good-for"
@@ -15537,10 +15513,6 @@
     },
     "10166": {
         "text": "Can I upload data using FTP, SFTP, webDAV or similar?",
-        "context": "Question\/Answer for \" Can I upload data using FTP, SFTP, webDAV or similar?\"\nMore info at: https:\/\/mega.nz\/#help\/client\/webclient\/general\/can-i-upload-data-using-ftp-sftp-webdav-or-similar"
-    },
-    "10167": {
-        "text": "We cannot provide Drive Mapping, SFTP, FTP, AFP, SMB or webDAV service capability. None of these protocols can be supported due to MEGA?s client-side encryption.",
         "context": "Question\/Answer for \" Can I upload data using FTP, SFTP, webDAV or similar?\"\nMore info at: https:\/\/mega.nz\/#help\/client\/webclient\/general\/can-i-upload-data-using-ftp-sftp-webdav-or-similar"
     },
     "10168": {
@@ -15689,10 +15661,6 @@
     },
     "10205": {
         "text": "How can I share a folder?",
-        "context": "Question\/Answer for \"How can I share a folder?\"\nMore info at: https:\/\/mega.nz\/#help\/client\/ios\/contacts-and-sharing\/how-can-i-share-a-folder"
-    },
-    "10206": {
-        "text": "The shared folder will appear in [A]Shared Items ? Incoming[\/A] section of the contact?s account.",
         "context": "Question\/Answer for \"How can I share a folder?\"\nMore info at: https:\/\/mega.nz\/#help\/client\/ios\/contacts-and-sharing\/how-can-i-share-a-folder"
     },
     "10207": {
@@ -16159,10 +16127,6 @@
         "text": "Note: By logging out you will lose any files you downloaded to the Offline section.",
         "context": "Question\/Answer for \"I forgot the PIN passcode for the app, what can I do?\"\nMore info at: https:\/\/mega.nz\/#help\/client\/windowsphone\/accounts-pro-accounts\/i-forgot-the-pin-passcode-for-the-app-what-can-i-do"
     },
-    "10324": {
-        "text": "Then visit  [C] with your computer?s web browser and follow the recovery steps.",
-        "context": "Question\/Answer for \"I forgot my password, but I am still logged in. What can I do?\"\nMore info at: https:\/\/mega.nz\/#help\/client\/windowsphone\/accounts-pro-accounts\/i-forgot-my-password-but-i-am-still-logged-in-what-can-i-do"
-    },
     "10325": {
         "text": "Note: We strongly advise you to keep this file secure!",
         "context": "Question\/Answer for \"I forgot my password, but I am still logged in. What can I do?\"\nMore info at: https:\/\/mega.nz\/#help\/client\/windowsphone\/accounts-pro-accounts\/i-forgot-my-password-but-i-am-still-logged-in-what-can-i-do"
@@ -16223,10 +16187,6 @@
         "text": "How do I share a file or folder with a contact?",
         "context": "Question\/Answer for \"How do I share a file or folder with a contact?\"\nMore info at: https:\/\/mega.nz\/#help\/client\/android\/getting-started\/how-do-i-share-a-file-or-folder-with-a-contact"
     },
-    "10340": {
-        "text": "If you have created a new contact, depending if the invitee does or doesn?t have a MEGA account:",
-        "context": "Question\/Answer for \"How do I share a file or folder with a contact?\"\nMore info at: https:\/\/mega.nz\/#help\/client\/android\/getting-started\/how-do-i-share-a-file-or-folder-with-a-contact"
-    },
     "10341": {
         "text": "If the invitee doesn't have a MEGA account, they will receive an invitation to register to be able to access the shared data.",
         "context": "Question\/Answer for \"How do I share a file or folder with a contact?\"\nMore info at: https:\/\/mega.nz\/#help\/client\/android\/getting-started\/how-do-i-share-a-file-or-folder-with-a-contact"
@@ -16249,10 +16209,6 @@
     },
     "10346": {
         "text": "Creating an account on MEGA through the app",
-        "context": "Question\/Answer for \"Creating an account on MEGA through the app\"\nMore info at: https:\/\/mega.nz\/#help\/client\/windowsphone\/getting-started\/creating-an-account-on-mega-through-the-app"
-    },
-    "10347": {
-        "text": "Your account's security depends on the strength of your password. Passwords that are too short, too simple or consist of dictionary words are easily guessed. [A]Do not forget your password[\/A]. There is no recovery procedure for lost passwords unless you back up your Recovery Key. If you cannot remember your password and don?t have your Recovery Key backed up, you will no longer be able to access (decrypt) your stored data.[B]",
         "context": "Question\/Answer for \"Creating an account on MEGA through the app\"\nMore info at: https:\/\/mega.nz\/#help\/client\/windowsphone\/getting-started\/creating-an-account-on-mega-through-the-app"
     },
     "10348": {
@@ -16477,10 +16433,6 @@
     },
     "10403": {
         "text": "Download and install the official  [A]MEGA app from the Play Store[\/A].",
-        "context": "Question\/Answer for \"How can I create an account on MEGA through the app?\"\nMore info at: https:\/\/mega.nz\/#help\/client\/android\/accounts-pro-accounts\/how-can-i-create-an-account-on-mega-through-the-app"
-    },
-    "10404": {
-        "text": "[A]Do not forget your password as there is no recovery procedure for lost passwords unless you back up your Recovery Key[\/A]. If you cannot remember your password and don?t have your Recovery Key backed up you will no longer be able to access (decrypt) your stored data.",
         "context": "Question\/Answer for \"How can I create an account on MEGA through the app?\"\nMore info at: https:\/\/mega.nz\/#help\/client\/android\/accounts-pro-accounts\/how-can-i-create-an-account-on-mega-through-the-app"
     },
     "10405": {
@@ -17127,10 +17079,6 @@
         "text": "When you open the app click on the [A]Create Account[\/A] button.",
         "context": "Question\/Answer for \"How do I create an account on MEGA through the app?\"\nMore info at: https:\/\/mega.nz\/#help\/client\/android\/getting-started\/how-do-i-create-an-account-on-mega-through-the-app"
     },
-    "10576": {
-        "text": "Fill in your details and accept MEGA?s Terms of Service. Your account's security depends on the strength of your password. Passwords that are too short, too simple or consist of dictionary words are easily guessed.",
-        "context": "Question\/Answer for \"How do I create an account on MEGA through the app?\"\nMore info at: https:\/\/mega.nz\/#help\/client\/android\/getting-started\/how-do-i-create-an-account-on-mega-through-the-app"
-    },
     "10577": {
         "text": "[A]When you tap on Create Account, a confirmation email will be sent to the email address you have entered[\/A]. Look for the MEGA Activation email and tap on the [B]Activate Account[\/B] button.",
         "context": "Question\/Answer for \"How do I create an account on MEGA through the app?\"\nMore info at: https:\/\/mega.nz\/#help\/client\/android\/getting-started\/how-do-i-create-an-account-on-mega-through-the-app"
@@ -17217,10 +17165,6 @@
     },
     "10598": {
         "text": "When you open the app, click on the [A]Create Account[\/A] button.",
-        "context": "Question\/Answer for \"Creating an account on MEGA through the app\"\nMore info at: https:\/\/mega.nz\/#help\/client\/windowsphone\/getting-started\/creating-an-account-on-mega-through-the-app"
-    },
-    "10599": {
-        "text": "Fill the fields and accept the MEGA?s Terms of Service.",
         "context": "Question\/Answer for \"Creating an account on MEGA through the app\"\nMore info at: https:\/\/mega.nz\/#help\/client\/windowsphone\/getting-started\/creating-an-account-on-mega-through-the-app"
     },
     "10600": {

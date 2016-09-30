@@ -1963,8 +1963,6 @@ function MegaData()
 
     var icon = '<span class="context-menu-icon"></span>';
     var arrow = '<span class="context-top-arrow"></span><span class="context-bottom-arrow"></span>';
-    // divider & advanced
-    var adv = '<span class="context-menu-divider"></span><span class="context-menu-item advanced-item"><span class="context-menu-icon"></span>Select Location</span>';
 
     this.buildRootSubMenu = function() {
 
@@ -1981,9 +1979,17 @@ function MegaData()
         }
 
         html = '<span class="context-submenu" id="sm_move"><span id="csb_move">';
-        html += '<span class="context-menu-item cloud-item' + cs + '" id="fi_' + this.RootID + '">' + icon + 'Cloud Drive' + '</span>' + sm;
-        html += '<span class="context-menu-item remove-item" id="fi_' + this.RubbishID + '">' + icon + 'Rubbish Bin' + '</span>';
-        html += adv;
+        html += '<span class="context-menu-item cloud-item' + cs + '" id="fi_' + this.RootID + '">';
+        html +=     icon + l[1687];
+        html += '</span>' + sm;
+        html += '<span class="context-menu-item remove-item" id="fi_' + this.RubbishID + '">';
+        html +=     icon + l[5738];
+        html += '</span>';
+        html += '<span class="context-menu-divider"></span>'
+              + '<span class="context-menu-item advanced-item">'
+              +     '<span class="context-menu-icon"></span>'
+              +     l[9108]
+              + '</span>';
         html += arrow;
         html += '</span></span>';
 

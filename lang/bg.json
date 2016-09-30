@@ -4564,6 +4564,9 @@
         "customer-service-and-enquiries": 10656,
         "mega-group": 10657,
         "mega-terms-and-related-companies": 10658,
-        "postcode": 10659
+        "postcode": 10659,
+        "disable-future-hints": 10660,
+        "onboarding-contacts-hint": 10661,
+        "onboarding-chats-hint": 10662
     }
 }

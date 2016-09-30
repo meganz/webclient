@@ -345,10 +345,10 @@ copyright.init_cn = function() {
         }
     });
     var markup = '<OPTION value="0"></OPTION>';
-    for (var country in isocountries) {
-        if (isocountries.hasOwnProperty(country)) {
+    for (var country in isoCountries) {
+        if (isoCountries.hasOwnProperty(country)) {
             markup += '<option value="' + escapeHTML(country) + '">'
-                + escapeHTML(isocountries[country]) + '</option>';
+                + escapeHTML(isoCountries[country]) + '</option>';
         }
     }
     $('.select.country select').safeHTML(markup);

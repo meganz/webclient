@@ -75,7 +75,7 @@ Unless otherwise noted, they were released under a [MIT License].
 [jquery-2.2.1.js]: jQuery JavaScript Library.
 
 ---
-[jquery-ui-1.11.4.js]: jQuery-UI - jQuery User Interface library.
+[jquery-ui.js]: jQuery-UI - jQuery User Interface library.
 
 ---
 [jquery.fullscreen.js]: This jQuery plugin provides a simple to use mechanism to control the new fullscreen mode of modern browsers.
@@ -171,7 +171,7 @@ Unless otherwise noted, they were released under a [MIT License].
 [int64.js]: <https://github.com/meganz/node-int64>
 [ion.sound.js]: <https://github.com/meganz/ion.sound>
 [jquery-2.2.1.js]: <https://github.com/jquery/jquery/blob/2.2.1/dist/jquery.js>
-[jquery-ui-1.11.4.js]: <https://code.jquery.com/ui/1.11.4/jquery-ui.js>
+[jquery-ui.js]: <https://code.jquery.com/ui/1.12.1/jquery-ui.js>
 [jquery.fullscreen.js]: <https://github.com/kayahr/jquery-fullscreen-plugin/tree/5c95707f9ebf3d4962e9057b09cc43c10f11c3f4>
 [jquery.jscrollpane.js]: <https://github.com/meganz/jScrollPane>
 [jquery.mousewheel.js]: <https://github.com/meganz/jquery-mousewheel>

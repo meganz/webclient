@@ -17369,7 +17369,7 @@
     },
     "10651": {
         "text": "System Abuse",
-        "context": "The title of a section on the #general information page about what is considered system abuse."
+        "context": "The title of a section on the #general information page about what is considered system abuse. These are actions which take unfair advantage of the service such as opening multiple free accounts to get more than 50GB of free storage."
     },
     "10652": {
         "text": "In accordance with its Terms of Service, Mega will close accounts that are involved in any abuse of Mega's services, including actions such as:",
@@ -17402,5 +17402,17 @@
     "10659": {
         "text": "Postcode",
         "context": "A postal code (also known as a ZIP code) for the purpose of sorting mail. This is a field on the payment form."
+    },
+    "10660": {
+        "text": "Disable future hints",
+        "context": "When the onboarding tooltip is shown, the user can click\/toggle this checkbox to hide all current\/future onboarding hints\/tooltips."
+    },
+    "10661": {
+        "text": "You can [B]add and manage contacts[\/B] in the Contacts tab, then securely chat and share files using MEGAchat.",
+        "context": "Onboarding hint\/tooltip that would be shown to new users\/users with no contacts or only one contact."
+    },
+    "10662": {
+        "text": "Communicate securely with your family, friends and colleagues using our audio\/video and text chat with user-controlled end-to-end encryption.",
+        "context": "Onboarding hint\/tooltip that would be shown to new users\/users."
     }
 }

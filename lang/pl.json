@@ -4349,7 +4349,10 @@
     "10656": "Obs\u0142uga klienta i zapytania: [A]support@mega.nz[\/A]",
     "10657": "Grupa Mega",
     "10658": "[A]Regulamin us\u0142ugi Mega[\/A] dotyczy Mega Limited i firm powi\u0105zanych, w tym:",
-    "10659": "Postcode",
+    "10659": "Kod pocztowy",
+    "10660": "Zablokuj podpowiedzi",
+    "10661": "Mo\u017cesz [B]dodawa\u0107 i edytowa\u0107 kontakty[\/B] w zak\u0142adce Kontakty, a nast\u0119pnie bezpiecznie czatowa\u0107 i udost\u0119pnia\u0107 pliki korzystaj\u0105c z MEGAchat.",
+    "10662": "Komunikuj si\u0119 bezpiecznie z rodzin\u0105, przyjaci\u00f3\u0142mi i znajomymi korzystaj\u0105c z rozm\u00f3w audio\/video lub czatuj\u0105c. Wszystkie wiadomo\u015bci s\u0105 szyfrowane.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

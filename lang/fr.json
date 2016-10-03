@@ -4350,6 +4350,9 @@
     "10657": "Groupe Mega",
     "10658": "Les [A]Conditions G\u00e9n\u00e9rales d&#039;Utilisation de Mega[\/A] s&#039;applique pour Mega Limited et ses soci\u00e9t\u00e9s affili\u00e9es, filiales et revendeurs, y compris :",
     "10659": "Code Postal",
+    "10660": "D\u00e9sactiver les prochaines astuces",
+    "10661": "Vous pouvez [B]ajouter et g\u00e9rer des contacts[\/B] dans l&#039;onglet Contacts pour ensuite discuter et partager des fichiers en toute s\u00e9curit\u00e9 gr\u00e2ce \u00e0 MEGAchat.",
+    "10662": "\u00c9changez en toute s\u00e9curit\u00e9 avec votre famille, vos amis et vos coll\u00e8gues en utilisant notre solution de communication par messages texte, audio et vid\u00e9o avec le chiffrement de bout-en-bout contr\u00f4l\u00e9 par l&#039;utilisateur.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

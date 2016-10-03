@@ -476,7 +476,7 @@ body.pro:after {
     background-image: url(../images/mega/big-achivements@2x.png);
     background-size: 436px auto;
 }
-.logo, .languages-dialog .show-more-languages .round-arrow span, .top-icon::before, .notification-txt, .nw-bottom-copyrights, .nw-bottom-social, .top-login-warning-arrow, .main-top-info-text, .new-notification-icon, .feedback-button, .semi-small-icon.grey-mega, .semi-small-icon.yellow-triangle, .tiny-icon.membership-status {
+.logo, .languages-dialog .show-more-languages .round-arrow span, .top-head .top-icon::before, .notification-txt, .nw-bottom-copyrights, .nw-bottom-social, .top-login-warning-arrow, .main-top-info-text, .new-notification-icon, .feedback-button, .semi-small-icon.grey-mega, .semi-small-icon.yellow-triangle, .tiny-icon.membership-status {
     background-image: url(../images/mega/top-sprite_v1@2x.png);
     background-size: 38px auto;
 }

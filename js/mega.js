@@ -6589,7 +6589,7 @@ function createFolder(toid, name, ulparams) {
             if (typeof res !== 'number') {
                 $('.fm-new-folder').removeClass('active');
                 $('.create-new-folder').addClass('hidden');
-                $('.create-folder-input-bl input').val('');
+                $('.create-new-folder input').val('');
                 newnodes = [];
                 M.addNode(res.f[0]);
                 renderNew();

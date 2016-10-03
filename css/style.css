@@ -4701,7 +4701,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .top-menu-item.active {
     border-color: #FF333A;
 }
-.top-icon {
+.top-head .top-icon {
     height: 35px;
     float: right;
     padding: 6px 12px 0 13px;
@@ -4713,7 +4713,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .top-menu-popup .top-icon {
     margin-top: 12px;
 }
-.top-icon.menu {
+.top-head .top-icon.menu {
     -webkit-transition: all 200ms ease-in-out;
     -moz-transition: all 200ms ease-in-out;
     -o-transition: all 200ms ease-in-out;
@@ -4721,10 +4721,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     transition: all 200ms ease-in-out;
     width: 49px;
 }
-.top-icon.menu.active {
+.top-head .top-icon.menu.active {
     width: 256px;
 }
-.top-icon::before {
+.top-head .top-icon::before {
     content: '';
     width: 24px;
     height: 24px;
@@ -4741,7 +4741,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     -khtml-opacity: 0.8;
     opacity: 0.8;
 }
-.top-icon::after {
+.top-head .top-icon::after {
     content: '';
     width: 1px;
     height: 24px;
@@ -4750,44 +4750,44 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     top: 6px;
     margin: 0 0 0 -13px;
 }
-.top-icon:hover::before, .top-icon.active::before {
+.top-head .top-icon:hover::before, .top-head .top-icon.active::before {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
     -moz-opacity: 1;
     -khtml-opacity: 1;
     opacity: 1;
 }
-.top-icon.menu::before {
+.top-head .top-icon.menu::before {
     background-position: -6px -60px;
 }
-.top-icon.notification::before {
+.top-head .top-icon.notification::before {
     background-position: -7px -202px;
 }
-.top-icon.achivements::before {
+.top-head .top-icon.achivements::before {
     background-position: -7px -16px;
 }
-.top-icon.warning::before {
+.top-head .top-icon.warning::before {
     background-position: -7px -1196px;
 }
-.top-icon.warning.ephemeral-session::before {
+.top-head .top-icon.warning.ephemeral-session::before {
     background-position: -7px -1166px;
 }
-.top-icon.warning.over-quota::before {
+.top-head .top-icon.warning.over-quota::before {
     background-position: -7px -1136px;
 }
-.top-icon.close::before {
+.top-head .top-icon.close::before {
     background-position: -7px -1232px;
 }
-.top-icon.language::before {
+.top-head .top-icon.language::before {
     background-position: -7px -286px;
     float: left
 }
-.top-icon.language::after, .top-icon.close::after {
+.top-head .top-icon.language::after, .top-head .top-icon.close::after {
     display: none;
 }
-.top-icon.search, .top-icon.language {
+.top-head .top-icon.search, .top-head .top-icon.language {
     float: left;
 }
-.top-icon.search::before {
+.top-head .top-icon.search::before {
     background-position: -6px -474px;
 }
 .top-buttons {

@@ -2851,15 +2851,15 @@ function createFolderUI() {
 
 function doCreateFolderUI() {
 
-    if ($('.create-folder-input-bl input').val() === '') {
-        $('.create-folder-input-bl input').animate({backgroundColor: "#d22000"}, 150, function() {
-            $('.create-folder-input-bl input').animate({backgroundColor: "white"}, 350, function() {
-                $('.create-folder-input-bl input').focus();
+    if ($('.create-new-folder input').val() === '') {
+        $('.create-new-folder input').animate({backgroundColor: "#d22000"}, 150, function() {
+            $('.create-new-folder input').animate({backgroundColor: "white"}, 350, function() {
+                $('.create-new-folder input').focus();
             });
         });
     }
     else {
-        createFolder(M.currentdirid, $('.create-folder-input-bl input').val());
+        createFolder(M.currentdirid, $('.create-new-folder input').val());
     }
 }
 

@@ -255,6 +255,10 @@
 </div>
 
 <div class="fm-dialog registration-success registration-page-success hidden">
+     <div class="fm-dialog-header">
+        <div class="fm-dialog-close"></div>
+        <div class="clear"></div>
+     </div>
      <div class="reg-success-icon"></div>
      <div class="reg-success-normal">
          <div class="reg-success-header">[$8688]</div>
@@ -429,8 +433,8 @@
         <!-- Please add "active" classname to necessary "move-dialog-txt" block !-->
         <div class="fm-dialog-title">[$62]
             <span class="move-dialog-txt cloud-drive">([$1687])</span>
-            <span class="move-dialog-txt shared-with-me">(Shared with me)</span>
-            <span class="move-dialog-txt rubbish-bin">(Rubbish Bin)</span>
+            <span class="move-dialog-txt shared-with-me">([$5589])</span>
+            <span class="move-dialog-txt rubbish-bin">([$5738])</span>
         </div>
         <div class="fm-dialog-close"></div>
         <div class="clear"></div>
@@ -1502,7 +1506,7 @@
         </div>
     </div>
     <div class="feedback-result-pad hidden">
-        <div class="payment-rusult-header">Thank you for your feedback!</div>
+        <div class="payment-result-header">[$7004]</div>
         <div class="payment-result-icon"></div>
         <div class="feedback-result-button">[$148]</div>
     </div>
@@ -1619,7 +1623,7 @@
             <div class="payment-plan-txt">1 month <span>([$6965])</span></div>
         </div>
 
-        <div class="payment-plan-price">9.99&euro</div>
+        <div class="payment-plan-price">9.99&euro;</div>
         <div class="clear"></div>
 
         <div class="payment-half-block first">
@@ -1694,6 +1698,72 @@
     </div>
 </div>
 
+<div class="fm-dialog payment-address-dialog hidden">
+    <div class="btn-close-dialog"></div>
+    <div class="payment-address-dialog-body">
+
+        <div class="plan-icon pro1" >
+            <div class="reg-st3-membership-icon"></div>
+        </div>
+        <div class="payment-plan-info">
+            <div class="payment-plan-title">PRO I</div>
+            <div class="payment-plan-txt"><span class="duration">[$922]</span> <span class="recurring">([$6965])</span></div>
+        </div>
+
+        <div class="payment-plan-price"><span class="price">9.99</span> &euro;</div>
+        <div class="clear"></div>
+        
+        <div class="payment-note-first recurring">
+            <span class="duration">[$10628]</span> [$10630]
+        </div>
+        <div class="payment-note-first one-time hidden">[$10631]</div>
+
+        <div class="payment-half-block first">
+            <div class="payment-form-title">[$10632]:</div>
+            <div class="clear"></div>
+            <div class="fm-account-input">
+                <input class="first-name" type="text" value="" placeholder="[$1096]" tabindex="1">
+            </div>
+            <div class="fm-account-input">
+                <input class="address1" type="text" value="" placeholder="[$561] 1" tabindex="3">
+            </div>
+            <div class="fm-account-input">
+                <input class="city" type="text" value="" placeholder="[$565]" tabindex="5">
+            </div>
+            <select id="address-dialog-countries" class="countries" tabindex="6">
+                <option value="">[$481]</option>
+            </select>
+            <div class="fm-account-input code">
+                <input class="postcode" type="text" value="" placeholder="[$10659]" tabindex="7">
+            </div>
+            <div class="clear"></div>
+        </div>
+
+        <div class="payment-half-block second">
+            <div class="payment-icons">
+                <div class="payment-cc-icon visa"></div>
+                <div class="payment-cc-icon mastercard"></div>
+            </div>
+            <div class="fm-account-input">
+                <input class="last-name" type="text" value="" placeholder="[$1097]" tabindex="2">
+            </div>
+            <div class="fm-account-input">
+                <input class="address2" type="text" value="" placeholder="[$561] 2 ([$2028])" tabindex="4">
+            </div>
+            <select id="address-dialog-states" class="states" tabindex="8" disabled>
+                <option value="">[$7352]</option>
+            </select>
+            <div class="payment-buy-now">[$6190]</div>
+            <div class="error-message hidden">[$10633]</div>
+        </div>
+        <div class="clear"></div>
+        <div class="payment-note-second">
+            [$10634]<br>
+            [$10635]
+        </div>
+    </div>
+</div>
+
 <div class="payment-processing hidden">
     <div class="payment-animation-pad">
         <img class="payment-animation" alt="" />
@@ -1707,7 +1777,7 @@
         <span></span>
     </div>
     <div class="payment-result-pad">
-        <div class="payment-rusult-header">[$6961]!</div>
+        <div class="payment-result-header">[$6961]!</div>
         <div class="payment-result-txt">[$6962]</div>
         <div class="payment-result-icon"></div>
         <div class="payment-result-button">[$6690]</div>
@@ -1720,7 +1790,7 @@
         <span></span>
     </div>
     <div class="payment-result-pad">
-        <div class="payment-rusult-header">[$6949]</div>
+        <div class="payment-result-header">[$6949]</div>
         <div class="payment-result-txt">[$6950]</div>
         <div class="payment-result-icon"></div>
         <div class="payment-result-button">[$1472]</div>
@@ -1734,8 +1804,21 @@
         <span></span>
     </div>
     <div class="payment-result-pad">
-        <div class="payment-rusult-header">[$7983]</div>
+        <div class="payment-result-header">[$7983]</div>
         <div class="payment-result-txt">[$8755]</div>
+        <div class="payment-result-icon"></div>
+        <div class="payment-result-button">[$6690]</div>
+    </div>
+</div>
+
+<div class="payment-result pending alternate hidden">
+    <div class="payment-close">
+        <div class="payment-close-icon"></div>
+        <span></span>
+    </div>
+    <div class="payment-result-pad">
+        <div class="payment-result-header">[$7983]</div>
+        <div class="payment-result-txt">[$10636]</div>
         <div class="payment-result-icon"></div>
         <div class="payment-result-button">[$6690]</div>
     </div>

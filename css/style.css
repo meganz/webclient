@@ -13795,17 +13795,13 @@ h5.main-italic-header {
     -moz-column-width: 270px;
     column-width: 270px;
     display: inline-block;
-    padding-top: 5px;
-}
-.duration-options-list .payment-duration .membership-radio-label {
-    background: none;
-    cursor: pointer;
-    font-family: 'source_sans_proregular';
-    padding-left: 0;
-    position: relative;
 }
 .duration-options-list .payment-duration.template {
     display: none;
+}
+.duration-options-list:hover .membership-radio-label, .renewal-option:hover .membership-radio-label {
+    cursor: pointer;
+    font-family: "source_sans_prosemibold", sans-serif;
 }
 .payment-duration .save-money {
     background-color: #29c969;
@@ -13851,14 +13847,6 @@ h5.main-italic-header {
     line-height: 24px;
     color: #D90007;
     margin-top: -12px;
-}
-div.membership-bott-button {
-    height: 64px;
-    font-size: 23px;
-    line-height: 55px;
-    margin: 17px 0 32px 0;
-    min-width: 240px;
-    text-transform: uppercase;
 }
 .inactive .membership-bott-button:hover, .inactive .membership-bott-button {
     cursor: default;
@@ -13997,6 +13985,15 @@ body.key.ka .reg-st3-bandwidth, body.key.uk .reg-st3-bandwidth {
     left: 0;
 }
 /* PRO page step 2 */
+.membership-step2 .pro-gray-block {
+    margin-top: 8px;
+}
+.membership-step2 .register-st3-main-bl {
+    padding-top: 35px;
+}
+.membership-step2 .main-mid-pad:last-child {
+    padding: 0 20px;
+}
 .membership-step2 h3.main-italic-header {
     color: #555;
     font-size: 21px;
@@ -14054,16 +14051,55 @@ body.key.ka .reg-st3-bandwidth, body.key.uk .reg-st3-bandwidth {
 .membership-step2 .pro-gray-block {
     background-image: linear-gradient(-180deg, #fff 0%, #fafafa 100%);
 }
-.membership-step2 .reg-st3-membership-bl {
+.membership-step2 .register-st3-main-bl {
+    overflow: hidden;
+    padding-top: 35px;
+}
+.membership-step2 .right-block {
     float: right;
+    width: 234px;
+}
+.membership-step2 .reg-st3-membership-bl {
+    box-sizing: border-box;
+    float: none;
+    text-align: right;
+    width: 221px;
+    margin-left: 12px;
+    padding: 0;
+}
+.membership-step2 .subscription-instructions {
+    border: 1px solid #46b0da;
+    border-radius: 5px;
+    box-sizing: border-box;
+    color: #46b0da;
+    display: block;
+    font-size: 13px;
+    line-height: 1.31;
+    margin: 20px 0 0 12px;
+    padding: 14px;
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
+}
+.membership-step2 .subscription-instructions:hover {
+    background-color: #f7fdff;
+}
+.membership-step2 .subscription-instructions.hidden {
+    display: none;
 }
 .membership-step2 .membership-new-offer {
     display: none;
 }
 .membership-step2 .membership-radio-label {
+    background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
     color: #444;
+    cursor: pointer;
     font-family: "source_sans_proregular", sans-serif;
-    font-size: 14px;
+    font-size: 13px;
+    padding-left: 0;
+    position: relative;
 }
 .membership-step2 .membership-radio-label.checked {
     font-family: "source_sans_prosemibold", sans-serif;
@@ -14102,27 +14138,56 @@ body.key.ka .reg-st3-bandwidth, body.key.uk .reg-st3-bandwidth {
     top: -3px;
     width: 30px;
 }
+.membership-step2 .membership-st2-head.choose-renewal {
+    margin-top: 30px;
+    padding-bottom: 5px;
+}
+.membership-step2 .renewal-options-list {
+    -webkit-column-count: 2;
+    -moz-column-count: 2;
+    column-count: 2;
+    -webkit-column-width: 100px;
+    -moz-column-width: 100px;
+    column-width: 100px;
+    display: inline-block;
+    margin-top: 25px;
+}
+.membership-step2 .renewal-option .charge-information {
+    color: #939da3;
+    font-size: 13px;
+    letter-spacing: 0.2px;
+}
+.membership-step2 .charge-information .duration-text {
+    text-transform: lowercase;
+}
 .membership-step2 .payment-period {
     margin-top: 30px;
 }
 .membership-step2 .third-section {
     box-sizing: border-box;
-    margin: 40px auto 20px;
+    margin: 30px auto 40px;
     padding: 0 20px 10px 62px;
     position: relative;
     width: 980px;
 }
 .membership-step2 .membership-bott-button {
-    border: 4px solid #ff3333;
-    color: #ff3333;
+    background-color: #ff4444;
+    border: 1px solid #ff4444;
+    color: #fff;
     font-size: 16px;
-    line-height: 55px;
-    margin: 17px 0 0;
-    min-width: 220px;
+    height: 48px;
+    line-height: 48px;
+    margin: 0;
+    min-width: 222px;
     position: absolute;
-    right: 19px;
-    text-transform: uppercase;
-    top: 0;
+    right: 12px;
+    text-transform: capitalize;
+    top: 4px;
+}
+.membership-step2 .membership-bott-button:hover {
+    background-color: #fff;
+    border-color: #ff4444;
+    color: #ff4444;
 }
 .membership-step2 .payment-instructions {
     color: #555;
@@ -14132,10 +14197,11 @@ body.key.ka .reg-st3-bandwidth, body.key.uk .reg-st3-bandwidth {
 }
 .membership-step2 .payment-instructions .purchase {
     color: #ff4444;
+    text-transform: capitalize;
 }
 .membership-step2 .provider-show-more {
     display: table;
-    margin-top: 30px;
+    margin-top: 25px;
     width: 100%;
 }
 .membership-step2 .provider-show-more.hidden {
@@ -14175,7 +14241,7 @@ body.key.ka .reg-st3-bandwidth, body.key.uk .reg-st3-bandwidth {
 .membership-step2 .provider-details {
     display: inline-block;
     font-family: "source_sans_prosemibold", Helvetica, Arial, sans-serif;
-    font-size: 14px;
+    font-size: 13px;
     line-height: 26px;
     vertical-align: middle;
 }
@@ -14402,6 +14468,9 @@ body.key.ka .reg-st3-bandwidth, body.key.uk .reg-st3-bandwidth {
 .provider-icon.voucher {
     background-position: 0 -3900px;
 }
+.provider-icon.ecp {
+    background-position: 0 -3540px;
+}
 .provider-icon.wiretransfer {
     background-position: 0 -3960px;
 }
@@ -14447,11 +14516,12 @@ body.key.ka .reg-st3-bandwidth, body.key.uk .reg-st3-bandwidth {
     font-size: 16px;
 }
 .reg-st3-bott-title span.period {
-    color: #FF0008;
+    color: #ff0008;
     padding-left: 8px;
+    text-transform: lowercase;
 }
 .pro4 .reg-st3-bott-title span.period {
-    color: #FFA500;
+    color: #ffa500;
 }
 .free .right.reg-st3-bott-title {
     color: #6BB219;
@@ -22748,6 +22818,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
     top: 19px;
     width: 100px;
 }
+
 /* CC payment dialog */
 .fm-dialog.payment-dialog {
     border: 0 none;
@@ -22765,27 +22836,27 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 .payment-dialog .reg-st3-membership-icon {
     margin-top: 0;
 }
-.payment-plan-info {
+.payment-dialog .payment-plan-info {
     float: left;
     padding: 6px 0 0 15px;
 }
-.payment-plan-title, .payment-plan-price {
+.payment-dialog .payment-plan-title, .payment-dialog .payment-plan-price {
     font-size: 36px;
     line-height: 38px;
     font-family: 'source_sans_prolight', Arial;
 }
-.payment-plan-txt {
+.payment-dialog .payment-plan-txt {
     color: #9d9d9d;
     line-height: 21px;
 }
-.payment-plan-txt span {
+.payment-dialog .payment-plan-txt span {
     font-size: 13px;
 }
-.payment-plan-price {
+.payment-dialog .payment-plan-price {
     float: right;
     padding: 6px 10px 0 0;
 }
-.payment-half-block {
+.payment-dialog .payment-half-block {
     float: left;
     width: 50%;
     border-right: 2px solid #f7f7f7;
@@ -22795,13 +22866,13 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
     padding: 0 24px 12px 0;
     margin: 26px 0 0 0;
 }
-.payment-half-block.second {
+.payment-dialog .payment-half-block.second {
     border: 0;
     border-left: 2px solid #f7f7f7;
     padding: 0 0 12px 24px;
     margin: 26px -2px 0 -2px;
 }
-.payment-form-title {
+.payment-dialog .payment-form-title {
     font-family: 'source_sans_prosemibold', Arial;
 }
 .payment-dialog .fm-account-input {
@@ -22816,11 +22887,11 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 .payment-dialog .fm-account-input.code {
     margin-left: 175px;
 }
-.payment-cc {
+.payment-dialog .payment-cc {
     margin: 19px 0 0 0;
     height: 32px;
 }
-.payment-cc-icon {
+.payment-dialog .payment-cc-icon {
     float: left;
     border: 2px solid #ececec;
     width: 40px;
@@ -22837,10 +22908,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
     background-repeat: no-repeat;
     background-size: 27px auto;
 }
-.payment-cc-icon.mastercard {
+.payment-dialog .payment-cc-icon.mastercard {
     background-position: center -34px;
 }
-.payment-short-bl {
+.payment-dialog .payment-short-bl {
     float: left;
     width: 50%;
     padding-right: 7px;
@@ -22848,20 +22919,20 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
 }
-.payment-short-bl.second {
+.payment-dialog .payment-short-bl.second {
     padding: 0 0 0 7px;
 }
-.payment-short-bl.triplex {
+.payment-dialog .payment-short-bl.triplex {
     width: 33.333333%;
     padding-right: 7px;
 }
-.payment-short-bl.triplex.second {
+.payment-dialog .payment-short-bl.triplex.second {
     padding: 0 7px;
 }
-.payment-short-bl.triplex.third {
+.payment-dialog .payment-short-bl.triplex.third {
     padding: 0 0 0 7px;
 }
-.payment-short-bl .default-select {
+.payment-dialog .payment-short-bl .default-select {
     width: 100%;
     float: none;
     margin: 19px 0 0 0;
@@ -22869,16 +22940,16 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 .payment-dialog .account-select-txt:first-letter {
     text-transform: uppercase;
 }
-.payment-buy-now {
+.payment-dialog .payment-buy-now {
     margin: 19px 0 0 0;
     height: 32px;
-    border: 2px solid #D90007;
+    border: 1px solid #ff4444;
     -moz-border-radius: 6px;
     -webkit-border-radius: 6px;
     border-radius: 6px;
     cursor: pointer;
     background-color: white;
-    color: #D90007;
+    color: #ff4444;
     font-size: 14px;
     line-height: 28px;
     text-align: center;
@@ -22892,26 +22963,31 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
     -ms-transition: all 200ms ease-in-out;
     transition: all 200ms ease-in-out;
 }
-.payment-buy-now:hover {
+.payment-dialog .payment-buy-now:hover {
     color: white;
-    background-color: #D90007;
+    background-color: #ff4444;
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
 }
-.payment-half-block .fm-account-input input {
+.payment-dialog .payment-half-block .fm-account-input input {
     color: #000;
 }
-.payment-half-block .fm-account-input input::-webkit-input-placeholder {
- color: #888787;
+.payment-dialog .payment-half-block .fm-account-input input::-webkit-input-placeholder {
+    color: #888787;
 }
-.payment-half-block .fm-account-input input:-moz-placeholder {
- color: #888787;
- opacity: 1;
+.payment-dialog .payment-half-block .fm-account-input input:-moz-placeholder {
+    color: #888787;
+    opacity: 1;
 }
-.payment-half-block .fm-account-input input::-moz-placeholder {
- color: #888787;
- opacity: 1;
+.payment-dialog .payment-half-block .fm-account-input input::-moz-placeholder {
+    color: #888787;
+    opacity: 1;
 }
 .payment-half-block .fm-account-input input:-ms-input-placeholder {
- color: #888787;
+    color: #888787;
 }
 .payment-dialog.active .fm-account-input {
     background-color: rgba(0,0,0,0.05);
@@ -22922,21 +22998,392 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 .payment-dialog.active .fm-account-input.focused input {
     color: #000;
 }
-.payment-half-block .fm-account-input.focused input::-webkit-input-placeholder {
- color: #E5E5E5;
+.payment-dialog .payment-half-block .fm-account-input.focused input::-webkit-input-placeholder {
+    color: #E5E5E5;
 }
-.payment-half-block .fm-account-input.focused input:-moz-placeholder {
- color: #E5E5E5;
- opacity: 1;
+.payment-dialog .payment-half-block .fm-account-input.focused input:-moz-placeholder {
+    color: #E5E5E5;
+    opacity: 1;
 }
-.payment-half-block .fm-account-input.focused input::-moz-placeholder {
- color: #E5E5E5;
- opacity: 1;
+.payment-dialog .payment-half-block .fm-account-input.focused input::-moz-placeholder {
+    color: #E5E5E5;
+    opacity: 1;
 }
-.payment-half-block .fm-account-input.focused input:-ms-input-placeholder {
- color: #E5E5E5;
+.payment-dialog .payment-half-block .fm-account-input.focused input:-ms-input-placeholder {
+    color: #E5E5E5;
 }
 /* end of CC payment dialog */
+
+/* Credit card billing address dialog */
+.fm-dialog.payment-address-dialog {
+    border: 0 none;
+    border-radius: 6px;
+    margin: -272px 0 0 -311px;
+    width: 622px;
+}
+.payment-address-dialog-body {
+    padding: 30px 30px 10px 30px;
+}
+.payment-address-dialog .plan-icon {
+    float: left;
+}
+.payment-address-dialog .reg-st3-membership-icon {
+    margin-top: 0;
+}
+.payment-address-dialog .payment-plan-info {
+    float: left;
+    padding: 6px 0 0 15px;
+}
+.payment-address-dialog .payment-plan-title, .payment-address-dialog .payment-plan-price {
+    font-size: 36px;
+    line-height: 38px;
+    font-family: 'source_sans_prolight', Arial;
+}
+.payment-address-dialog .payment-icons {
+    position: absolute;
+    right: -5px;
+    top: -10px;
+}
+.payment-address-dialog .payment-plan-txt {
+    color: #9d9d9d;
+    font-size: 14px;
+    line-height: 21px;
+}
+.payment-address-dialog .payment-plan-txt span {
+    font-size: 13px;
+}
+.payment-address-dialog .payment-plan-price {
+    float: right;
+    padding: 6px 10px 0 0;
+}
+.payment-address-dialog .payment-half-block {
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    float: left;
+    margin: 26px 0 0;
+    padding: 0 7px 0 0;
+    width: 50%;
+}
+.payment-address-dialog .payment-half-block.second {
+    border: 0 none;
+    margin: 26px -2px 0;
+    padding: 15px 0 0 7px;
+    position: relative;
+}
+.payment-address-dialog .payment-note-first {
+    color: #666;
+    font-family: 'source_sans_proregular', sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    margin-top: 20px;
+}
+.payment-address-dialog .payment-note-first a {
+    color: #ff4444;
+    text-decoration: underline;
+}
+.payment-address-dialog .payment-note-second {
+    bottom: -90px;
+    color: #fff;
+    font-size: 14px;
+    left: 30px;
+    line-height: 28px;
+    position: absolute;
+    text-align: center;
+}
+.payment-address-dialog .payment-note-second a {
+    color: #fff;
+    text-decoration: underline;
+}
+.payment-address-dialog .payment-form-title {
+    color: #3d3d3d;
+    font-family: 'source_sans_prosemibold', Arial;
+    font-size: 12px;
+}
+
+/* Styling for jQueryUI selectmenu in use with address dialog */
+#address-dialog-states-button, #address-dialog-countries-button {
+    -moz-user-select: none;
+    background: #f6f6f6 none repeat scroll 0 0;
+    border: 1px solid #f2f2f2;
+    border-radius: 4px;
+    color: #888787;
+    cursor: pointer;
+    font-family: "source_sans_proregular",Arial;
+    font-size: 12px;
+    font-weight: normal;
+    line-height: normal;
+    margin-right: 0;
+    margin-top: 12px;
+    overflow: visible;
+    padding: 7px 13px 7px 9px;
+    position: relative;
+    text-align: left;
+    text-decoration: none;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+#address-dialog-states-button {
+    display: block;
+}
+#address-dialog-countries-button {
+    display: inline-block;
+    float: left;
+    width: 140px;
+}
+#address-dialog-states-button.ui-selectmenu-disabled {
+    cursor: initial;
+    opacity: 0.5;
+}
+#address-dialog-states-button.error,
+#address-dialog-countries-button.error {
+    border: 1px solid #ff4444;
+}
+#address-dialog-states-button .ui-icon, #address-dialog-countries-button .ui-icon {
+    background-image: url("../images/mega/nw-fm-sprite_v18.svg");
+    background-position: -21px -8367px;
+    background-repeat: no-repeat;
+    display: inline-block;
+    float: right;
+    height: 16px;
+    margin-top: 0;
+    overflow: hidden;
+    position: relative;
+    text-indent: -99999px;
+    vertical-align: middle;
+    width: 16px;
+}
+#address-dialog-states-button .ui-selectmenu-text, #address-dialog-countries-button .ui-selectmenu-text {
+    display: block;
+    margin-right: 20px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.ui-front {
+    z-index: 10000;     /* Display above the dialog */
+}
+.ui-selectmenu-menu {
+    padding: 0;
+    margin: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: none;
+}
+.ui-selectmenu-open {
+    display: block;
+}
+#address-dialog-states-menu, #address-dialog-countries-menu {
+    background: #fff none repeat scroll 0 0;
+    border: 1px solid rgba(0, 0, 0, 0.14);
+    border-radius: 4px;
+    color: #888787;
+    display: block;
+    font-family: "source_sans_proregular",Arial;
+    font-size: 12px;
+    list-style: outside none none;
+    margin: 0 0 0 -5px;
+    max-height: 200px;
+    outline: 0 none;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding-bottom: 1px;
+}
+#address-dialog-states-menu {
+    min-width: 283px;
+}
+#address-dialog-states-menu .ui-menu-item, #address-dialog-countries-menu .ui-menu-item {
+    background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
+    color: #888787;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: normal;
+    line-height: 28px;
+    list-style-image: none;
+    list-style-type: none;
+    margin: 0;
+    padding: 0 30px 0 10px;
+    text-align: left;
+}
+#address-dialog-states-menu .ui-menu-item.ui-state-disabled, #address-dialog-countries-menu .ui-menu-item.ui-state-disabled {
+    display: none;
+}
+#address-dialog-states-menu .ui-menu-item-wrapper, #address-dialog-countries-menu .ui-menu-item-wrapper {
+    padding: 3px 1em 3px 0.4em;
+    position: relative;
+}
+#address-dialog-states-menu .ui-state-active, #address-dialog-countries-menu .ui-state-active {
+    background-color: #f2f2f2;
+    border-radius: 4px;
+    margin: -1px;
+}
+/* End custom jQueryUI selectmenu styling */
+
+.payment-address-dialog .fm-account-input {
+    border-radius: 4px;
+    margin: 12px 0 0 0;
+    width: auto;
+}
+.payment-address-dialog .fm-account-input.error {
+    border: 1px solid #ff4444;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.payment-address-dialog .fm-account-input input {
+    font-size: 12px;
+    color: #848484;
+}
+.payment-address-dialog .fm-account-input.code {
+    margin-left: 175px;
+}
+.payment-address-dialog .default-select.error {
+    border: 1px solid #ff4444;
+    box-shadow: none;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.payment-address-dialog .payment-cc {
+    margin: 19px 0 0 0;
+    height: 32px;
+}
+.payment-address-dialog .payment-cc-icon {
+    float: left;
+    border: 2px solid #ececec;
+    width: 40px;
+    height: 25px;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    margin: 4px 5px 0 0px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    background-image: url(../images/mega/payment-icons@2x.png);
+    background-position: center 6px;
+    background-repeat: no-repeat;
+    background-size: 27px auto;
+}
+.payment-address-dialog .payment-cc-icon.mastercard {
+    background-position: center -34px;
+}
+.payment-address-dialog .payment-short-bl {
+    float: left;
+    width: 50%;
+    padding-right: 7px;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.payment-address-dialog .payment-short-bl.second {
+    padding: 0 0 0 7px;
+}
+.payment-address-dialog .payment-short-bl.triplex {
+    width: 33.333333%;
+    padding-right: 7px;
+}
+.payment-address-dialog .payment-short-bl.triplex.second {
+    padding: 0 7px;
+}
+.payment-address-dialog .payment-short-bl.triplex.third {
+    padding: 0 0 0 7px;
+}
+.payment-address-dialog .payment-short-bl .default-select {
+    width: 100%;
+    float: none;
+    margin: 19px 0 0 0;
+}
+.payment-address-dialog .account-select-txt:first-letter {
+    text-transform: uppercase;
+}
+.payment-address-dialog .payment-buy-now {
+    background-color: #ffeeee;
+    border: solid 1px #ff3333;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    color: #ff4444;
+    cursor: pointer;
+    font-size: 14px;
+    height: 32px;
+    line-height: 28px;
+    margin: 12px auto 0;
+    text-align: center;
+    text-transform: capitalize;
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+}
+.payment-address-dialog .error-message {
+    color: #ff4444;
+    margin-top: 5px;
+    text-align: center;
+}
+.payment-address-dialog .error-message.hidden {
+    display: block;
+    visibility: hidden;
+}
+.payment-address-dialog .payment-buy-now:hover {
+    border: solid 1px #ff3333;
+    background-color: #ff4444;
+    color: #fff;
+}
+.payment-address-dialog .payment-half-block .fm-account-input input {
+    color: #000;
+}
+.payment-address-dialog .payment-half-block .fm-account-input input::-webkit-input-placeholder {
+    color: #888787;
+}
+.payment-address-dialog .payment-half-block .fm-account-input input:-moz-placeholder {
+    color: #888787;
+    opacity: 1;
+}
+.payment-address-dialog .payment-half-block .fm-account-input input::-moz-placeholder {
+    color: #888787;
+    opacity: 1;
+}
+.payment-half-block .fm-account-input input:-ms-input-placeholder {
+    color: #888787;
+}
+.payment-address-dialog.active .fm-account-input {
+    background-color: rgba(0,0,0,0.05);
+}
+.payment-address-dialog.active .fm-account-input.focused {
+    background-color: rgba(0,0,0,0.1);
+}
+.payment-address-dialog.active .fm-account-input.focused input {
+    color: #000;
+}
+.payment-address-dialog .payment-half-block .fm-account-input.focused input::-webkit-input-placeholder {
+    color: #E5E5E5;
+}
+.payment-address-dialog .payment-half-block .fm-account-input.focused input:-moz-placeholder {
+    color: #E5E5E5;
+    opacity: 1;
+}
+.payment-address-dialog .payment-half-block .fm-account-input.focused input::-moz-placeholder {
+    color: #E5E5E5;
+    opacity: 1;
+}
+.payment-address-dialog .payment-half-block .fm-account-input.focused input:-ms-input-placeholder {
+    color: #E5E5E5;
+}
+.payment-address-dialog .default-dropdown-item.template {
+    display: none;
+}
+.payment-address-dialog .default-dropdown-item.hidden {
+    display: none;
+}
+.payment-address-dialog .states.disabled {
+    cursor: default;
+    opacity: 0.5;
+}
+/* End of Credit card billing address dialog */
 
 /* Voucher direct redeem dialog */
 .voucher-redeem-dialog .account-information {
@@ -23038,14 +23485,14 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 .feedback-result-pad {
     margin: -152px 0 0 0;
 }
-.payment-rusult-header, .payment-result-txt {
+.payment-result-header, .payment-result-txt {
     font-size: 32px;
     font-family: 'source_sans_prolight';
     line-height: 34px;
     color: white;
     padding-bottom: 17px;
 }
-.feedback-result-pad .payment-rusult-header {
+.feedback-result-pad .payment-result-header {
     padding-bottom: 45px;
 }
 .payment-result-txt {
@@ -23055,6 +23502,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 .payment-result.pending .payment-result-txt {
     margin: 0 auto;
     max-width: 700px;
+}
+.payment-result.pending .payment-result-txt > a {
+    color: #fff;
+    text-decoration: underline;
 }
 .failed .payment-result-txt {
     padding-bottom: 39px;

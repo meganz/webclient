@@ -581,6 +581,16 @@ function populate_l() {
     l[8952] = l[8952].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[9030] = l[9030].replace('[S]', '<strong>').replace('[/S]', '</strong>');
     l[9036] = l[9036].replace('[S]', '<strong>').replace('[/S]', '</strong>');
+    l[10631] = l[10631].replace('[A]', '<a href="#general" target="_blank">').replace('[/A]', '</a>');
+    l[10630] = l[10630].replace('[A]', '<a href="#general" target="_blank">').replace('[/A]', '</a>');
+    l[10634] = l[10634].replace('[A]', '<a href="#support" target="_blank">').replace('[/A]', '</a>');
+    l[10635] = l[10635].replace('[B]', '"<b>').replace('[/B]', '</b>"');
+    l[10636] = l[10636].replace('[A]', '<a href="mailto:support@mega.nz">').replace('[/A]', '</a>').replace('%1', 2);
+    l[10644] = l[10644].replace('[A]', '<a href="mailto:support@mega.nz">').replace('[/A]', '</a>');
+    l[10646] = l[10646].replace('[A]', '<a href="#account">').replace('[/A]', '</a>');
+    l[10650] = l[10650].replace('[A]', '<a href="#account">').replace('[/A]', '</a>');
+    l[10656] = l[10656].replace('[A]', '<a href="mailto:support@mega.nz">').replace('[/A]', '</a>');
+    l[10658] = l[10658].replace('[A]', '<a href="#terms">').replace('[/A]', '</a>');
 
     l['year'] = new Date().getFullYear();
     date_months = [
@@ -852,7 +862,7 @@ function browserdetails(useragent) {
 
 function countrydetails(isocode) {
     var cdetails = {
-        name: isocountries[isocode],
+        name: isoCountries[isocode],
         icon: isocode.toLowerCase() + '.gif'
     };
     return cdetails;
@@ -3314,9 +3324,14 @@ mega.utils.execCommandUsable = function() {
     var result;
 
     try {
-        result = document.execCommand('copy');
+        return document.queryCommandSupported("copy");
     }
-    catch (ex) {}
+    catch (ex) {
+        try {
+            result = document.execCommand('copy');
+        }
+        catch (ex) {}
+    }
 
     return result === false;
 };
@@ -5089,7 +5104,11 @@ function getGatewayName(gatewayId, gatewayOpt) {
         },
         15: {
             name: 'directreseller',
-            displayName: l[6952]
+            displayName: l[6952]    // Credit card
+        },
+        16: {
+            name: 'ecp',                    // E-Comprocessing
+            displayName: l[6952] + ' (ECP)' // Credit card (ECP)
         },
         999: {
             name: 'wiretransfer',

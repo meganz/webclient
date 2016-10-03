@@ -13,7 +13,20 @@ if [ "$current_branch" = "$target_branch" ]; then
     exit 1
 fi
 
-GIT_EDITOR='sed -i "2,\$s/pick/squash/"' git rebase -i --autosquash $target_branch
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    if which gsed >/dev/null; then
+        SED_BINARY="gsed"
+    else
+        echo "Found platform to be OSX, but gsed is missing. Please do install 'gsed'."
+        exit 1;
+    fi
+else
+    SED_BINARY="sed"
+fi
+
+
+SED_ARGS=' -i "2,\$s/pick/squash/"'
+GIT_EDITOR="$SED_BINARY$SED_ARGS"  git rebase -i --autosquash $target_branch
 
 if [ $? -ne 0 ]; then
     echo "Rebasing failed."

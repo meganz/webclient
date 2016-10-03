@@ -1247,8 +1247,7 @@ function topmenuUI() {
     $('.top-menu-item.refresh-item, .top-menu-divider.refresh').addClass('hidden');
     $('.activity-status-block .activity-status,.activity-status-block').hide();
     $('.membership-status-block i').attr('class', 'tiny-icon membership-status free');
-    $('.membership-status').hide();
-    $('.top-head .user-name').hide();
+    $('.membership-status, .top-head .user-name, .top-icon.achivements').hide();
 
     if (fminitialized) {
         $('.top-search-bl').removeClass('hidden');
@@ -1279,7 +1278,9 @@ function topmenuUI() {
         $('.create-account-button').hide();
         $('.membership-status-block').show();
         $('.top-icon.notification').show();
-        $('.top-icon.achivements').show();
+        if (u_attr.maf) {
+            $('.top-icon.achivements').show();
+        }
 
         // If a Lite/Pro plan has been purchased
         if (u_attr.p) {
@@ -1471,10 +1472,7 @@ function topmenuUI() {
         M.accountData(function(account) {
             loadingDialog.hide();
 
-            if (!account.maf) {
-                msgDialog('warningb', '', 'No achievements available for your account at this time, please try again later.');
-            }
-            else {
+            if (account.maf) {
                 achivementsListDialog();
             }
         });

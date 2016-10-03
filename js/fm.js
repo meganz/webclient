@@ -3340,13 +3340,14 @@ dashboardUI.updateChatWidget = function() {
     });
 };
 dashboardUI.updateCloudDataWidget = function() {
-    var file1 = 835;
-    var files = 833;
+    var file1   = 835;
+    var files   = 833;
     var folder1 = 834;
     var folders = 832;
-    var data = M.getDashboardData();
-    var locale = [files, folders, files, folders, folders, files, files];
-    var map = ['files', 'folders', 'rubbish', 'ishares', 'oshares', 'links', 'favs'];
+    var data    = M.getDashboardData();
+    var locale  = [files, folders, files, folders, folders, files, files];
+    var map     = ['files', 'folders', 'rubbish', 'ishares', 'oshares', 'links', 'favs'];
+    var intl    = typeof Intl !== 'undefined' && Intl.NumberFormat && new Intl.NumberFormat();
 
     $('.data-float-bl').find('.data-item')
         .each(function(idx, elm) {
@@ -3355,6 +3356,9 @@ dashboardUI.updateCloudDataWidget = function() {
 
             if (props.cnt === 1) {
                 str = l[(locale[idx] === files) ? file1 : folder1];
+            }
+            else if (intl) {
+                props.cnt = intl.format(props.cnt || 0);
             }
 
             elm.children[1].textContent = String(str).replace('[X]', props.cnt)
@@ -3396,7 +3400,7 @@ function accountUI() {
     }
 
     M.accountData(function(account) {
-        
+
         var perc, warning, perc_c;
         var id = document.location.hash;
 
@@ -3473,7 +3477,7 @@ function accountUI() {
 
             // Subscription
             if (account.stype == 'S') {
-        
+
                 $('.fm-account-header.typetitle').text(l[434]);
                 if (account.scycle == '1 M') {
                     $('.membership-big-txt.type').text(l[748]);
@@ -12631,7 +12635,7 @@ var cancelSubscriptionDialog = {
                     cancelSubscriptionDialog.$backgroundOverlay.removeClass('hidden');
                     cancelSubscriptionDialog.$backgroundOverlay.addClass('payment-dialog-overlay');
                     cancelSubscriptionDialog.initCloseButtonSuccessDialog();
-                    
+
                     // Reset account cache so all account data will be refetched and re-render the account page UI
                     M.account.lastupdate = 0;
                     accountUI();

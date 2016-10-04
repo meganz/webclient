@@ -4048,9 +4048,6 @@ function MegaData()
                 result = node.name;
             }
         }
-        else {
-            console.error('getNameByHandle: Unsupported handle "%s"', handle);
-        }
 
         return String(result);
     };

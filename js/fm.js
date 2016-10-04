@@ -2993,7 +2993,7 @@ function accountUI() {
     }
 
     M.accountData(function(account) {
-        
+
         var perc, warning, perc_c;
         var id = document.location.hash;
 
@@ -3074,7 +3074,7 @@ function accountUI() {
 
             // Subscription
             if (account.stype == 'S') {
-        
+
                 $('.fm-account-header.typetitle').text(l[434]);
                 if (account.scycle == '1 M') {
                     $('.membership-big-txt.type').text(l[748]);
@@ -7830,41 +7830,30 @@ function fillShareDialogWithContent() {
     $.changedPermissions = [];// GLOBAL VAR, changed permissions shared dialog
     $.removedContactsFromShare = [];// GLOBAL VAR, removed contacts from a share
 
-    var user, email, name, shareRights, html,
-        selectedNodeHandle = $.selected[0],
-        shares = M.d[selectedNodeHandle].shares,
-        pendingShares = M.ps[selectedNodeHandle];
+    var pendingShares = {};
+    var nodeHandle    = String($.selected[0]);
+    var node          = M.getNodeByHandle(nodeHandle);
+    var userHandles   = M.getNodeShareUsers(node, 'EXP');
 
-    // List users that are already use item
-    for (var userHandle in shares) {
-        if (shares.hasOwnProperty(userHandle)) {
-
-            if (Object(M.u).hasOwnProperty(userHandle)) {
-                user = M.u[userHandle];
-                email = user.m;
-                name = M.getNameByHandle(userHandle);
-                shareRights = shares[userHandle].r;
-
-                generateShareDialogRow(name, email, shareRights, userHandle);
-            }
-        }
+    if (Object(M.ps).hasOwnProperty(nodeHandle)) {
+        pendingShares = Object(M.ps[nodeHandle]);
+        userHandles   = userHandles.concat(Object.keys(pendingShares));
     }
+    userHandles = array_unique(userHandles);
 
-    // Pending contact requests (pcr)
-    if (pendingShares) {
-        for (var pcrHandle in pendingShares) {
-            if (pendingShares.hasOwnProperty(pcrHandle)) {
+    userHandles.forEach(function(handle) {
+        var user = M.getUser(handle) || Object(M.opc[handle]);
 
-                // Because it's pending, we don't have user information in M.u so we have to look in the pending contact request
-                if (M.opc[pendingShares[pcrHandle].p]) {
-                    var pendingContactRequest = M.opc[pendingShares[pcrHandle].p];
-
-                    // ToDo: take care of name attribute once available
-                    generateShareDialogRow(pendingContactRequest.m, pendingContactRequest.m, pendingShares[pcrHandle].r);
-                }
-            }
+        if (!user.m) {
+            console.warn('Unknown user "%s"!', handle);
         }
-    }
+        else {
+            var name  = M.getNameByHandle(handle) || user.m;
+            var share = M.getNodeShare(node, handle) || Object(pendingShares[handle]);
+
+            generateShareDialogRow(name, user.m, share.r | 0, handle);
+        }
+    });
 }
 
 /**
@@ -7938,7 +7927,7 @@ function handleShareDialogContent() {
 
     $('.share-dialog-icon.permissions-icon')
         .removeClass('active full-access read-and-write')
-        .html('<span></span>' + l[55])
+        .safeHTML('<span></span>' + l[55])
         .addClass('read-only');
 
     // Update dialog title text
@@ -11447,7 +11436,7 @@ var cancelSubscriptionDialog = {
                     cancelSubscriptionDialog.$backgroundOverlay.removeClass('hidden');
                     cancelSubscriptionDialog.$backgroundOverlay.addClass('payment-dialog-overlay');
                     cancelSubscriptionDialog.initCloseButtonSuccessDialog();
-                    
+
                     // Reset account cache so all account data will be refetched and re-render the account page UI
                     M.account.lastupdate = 0;
                     accountUI();

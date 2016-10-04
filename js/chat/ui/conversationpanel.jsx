@@ -275,7 +275,6 @@ var ConversationRightArea = React.createClass({
                         {endCallButton}
 
                         {
-                            room.type === "group" ?
                             <div className={"link-button red " + (dontShowTruncateButton ? "disabled" : "")}
                                  onClick={(e) => {
                                      if ($(e.target).closest('.disabled').size() > 0) {
@@ -287,7 +286,7 @@ var ConversationRightArea = React.createClass({
                             }}>
                                 <i className="small-icon rounded-stop"></i>
                                 {__(l[8871])}
-                            </div> : null
+                            </div>
                         }
                         { room.type === "group" ? (
                             <div className={"link-button red " + (
@@ -1302,6 +1301,7 @@ var ConversationPanel = React.createClass({
                                 self.editDomElement = null;
 
                                 var currentContents = v.textContents ? v.textContents : v.contents;
+
                                 if (messageContents === false || messageContents === currentContents) {
                                     self.messagesListScrollable.scrollToBottom(true);
                                     self.lastScrollPositionPerc = 1;
@@ -1445,6 +1445,17 @@ var ConversationPanel = React.createClass({
                         'confirmDeleteDialog': false,
                         'messageToBeDeleted': false
                     });
+
+                    $(msg).trigger(
+                        'onChange',
+                        [
+                            msg,
+                            "deleted",
+                            false,
+                            true
+                        ]
+                    );
+
                 }}
             >
                 <div className="fm-dialog-content">

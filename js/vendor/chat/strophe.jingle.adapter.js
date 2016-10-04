@@ -186,6 +186,9 @@ WebrtcApi.prototype.createUserMediaConstraints = function(um)
         if (!constraints.video) constraints.video = {mandatory: {}};// same behaviour as tru;
         constraints.video.mandatory.minFrameRate = fps;
     }
+    if (localStorage.fakeVideoDevice === '1') {
+        constraints.fake = true;
+    }
 	return constraints;
 }
 

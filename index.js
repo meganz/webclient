@@ -31,6 +31,7 @@ var register_txt = false;
 var login_next = false;
 var loggedout = false;
 var flhashchange = false;
+var avatars = {};
 
 var pro_json = '[[["N02zLAiWqRU",1,500,1024,1,"9.99","EUR"],["zqdkqTtOtGc",1,500,1024,12,"99.99","EUR"],["j-r9sea9qW4",2,2048,4096,1,"19.99","EUR"],["990PKO93JQU",2,2048,4096,12,"199.99","EUR"],["bG-i_SoVUd0",3,4096,8182,1,"29.99","EUR"],["e4dkakbTRWQ",3,4096,8182,12,"299.99","EUR"]]]';
 
@@ -287,7 +288,8 @@ function init_page() {
         closeDialog();
     }
 
-    if (localStorage.awaitingConfirmationAccount) {
+    // Do not show this dialog while entering into the downloads page
+    if (page.substr(0, 1) !== '!' && localStorage.awaitingConfirmationAccount) {
         var acc = JSON.parse(localStorage.awaitingConfirmationAccount);
 
         // if visiting a #confirm link, or they confirmed it elsewhere.
@@ -298,7 +300,12 @@ function init_page() {
             // Insert placeholder page while waiting for user input
             parsepage(pages['placeholder']);
 
-            return mega.ui.sendSignupLinkDialog(acc);
+            return mega.ui.sendSignupLinkDialog(acc, function() {
+                // The user clicked 'close', abort and start over...
+
+                delete localStorage.awaitingConfirmationAccount;
+                init_page();
+            });
         }
     }
 
@@ -1035,8 +1042,6 @@ function init_page() {
     loggedout = false;
     flhashchange = false;
 }
-
-var avatars = {};
 
 function loginDialog(close) {
     if (close) {

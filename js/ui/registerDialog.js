@@ -420,7 +420,12 @@
             });
     }
 
-    function sendSignupLinkDialog(accountData) {
+    /**
+     * Send Signup link dialog
+     * @param {Object} accountData The data entered by the user at registration
+     * @param {Function} onCloseCallback Optional callback to invoke on close
+     */
+    function sendSignupLinkDialog(accountData, onCloseCallback) {
         var $dialog = $('.fm-dialog.registration-page-success').removeClass('hidden');
         var $button = $('.resend-email-button', $dialog);
 
@@ -455,6 +460,7 @@
                     else {
                         closeDialog();
                         fm_showoverlay();
+
                         $dialog.removeClass('hidden');
                     }
                 }
@@ -464,6 +470,30 @@
             var email = $('input', $dialog).val().trim() || accountData.email;
             sendsignuplink(accountData.name, email, accountData.password, ctx, true);
         });
+
+        if (typeof onCloseCallback === 'function') {
+            // Show dialog close button
+            $('.fm-dialog-header', $dialog).removeClass('hidden');
+
+            $('.fm-dialog-close', $dialog).rebind('click', function _click() {
+
+                msgDialog('confirmation', l[1334], l[5710], false, function(ev) {
+
+                    // Confirm abort registration
+                    if (ev) {
+                        onCloseCallback();
+                    }
+                    else {
+                        // Restore the background overlay which was closed by the msgDialog function
+                        fm_showoverlay();
+                    }
+                });
+            });
+        }
+        else {
+            // Hide dialog close button
+            $('.fm-dialog-header', $dialog).addClass('hidden');
+        }
 
         fm_showoverlay();
         $dialog.addClass('special').show();

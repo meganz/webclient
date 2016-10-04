@@ -1963,8 +1963,6 @@ function MegaData()
 
     var icon = '<span class="context-menu-icon"></span>';
     var arrow = '<span class="context-top-arrow"></span><span class="context-bottom-arrow"></span>';
-    // divider & advanced
-    var adv = '<span class="context-menu-divider"></span><span class="context-menu-item advanced-item"><span class="context-menu-icon"></span>Select Location</span>';
 
     this.buildRootSubMenu = function() {
 
@@ -1981,9 +1979,17 @@ function MegaData()
         }
 
         html = '<span class="context-submenu" id="sm_move"><span id="csb_move">';
-        html += '<span class="context-menu-item cloud-item' + cs + '" id="fi_' + this.RootID + '">' + icon + 'Cloud Drive' + '</span>' + sm;
-        html += '<span class="context-menu-item remove-item" id="fi_' + this.RubbishID + '">' + icon + 'Rubbish Bin' + '</span>';
-        html += adv;
+        html += '<span class="context-menu-item cloud-item' + cs + '" id="fi_' + this.RootID + '">';
+        html +=     icon + l[1687];
+        html += '</span>' + sm;
+        html += '<span class="context-menu-item remove-item" id="fi_' + this.RubbishID + '">';
+        html +=     icon + l[5738];
+        html += '</span>';
+        html += '<span class="context-menu-divider"></span>'
+              + '<span class="context-menu-item advanced-item">'
+              +     '<span class="context-menu-icon"></span>'
+              +     l[9108]
+              + '</span>';
         html += arrow;
         html += '</span></span>';
 
@@ -3768,7 +3774,15 @@ function MegaData()
         }
     };
 
-    this.delNodeShare = function(h, u) {
+    /**
+     * Delete node share.
+     * @param {String}  h    Node handle.
+     * @param {String}  u    User handle to remove the associated share
+     * @param {Boolean} okd  Whether API notified the node is no longer
+     *                       shared with anybody else and therefore the
+     *                       owner share key must be removed too.
+     */
+    this.delNodeShare = function(h, u, okd) {
 
         if (this.d[h] && typeof this.d[h].shares !== 'undefined') {
             var a = 0;
@@ -3787,23 +3801,37 @@ function MegaData()
                     break;
                 }
             }
+
             if (a === 0) {
                 delete this.d[h].shares;
                 M.nodeAttr({ h: h, shares: undefined });
+
                 if (fminitialized) {
                     sharedUInode(h);
                 }
-                // XXX: Do not delete sharekeys for now...due some issue we've noticed
-                //     with missing keys...and let's see, what can go wrong doing this?
-                if (0) {
-                    delete u_sharekeys[h];
-                    if (typeof mDB === 'object') {
-                        mDBdel('ok', h);
-                    }
-                }
             }
+
             if (typeof mDB === 'object') {
                 mDBdel('s', h + '_' + u);
+            }
+        }
+
+        if (okd) {
+            // The node is no longer shared with anybody, ensure it's properly cleared..
+
+            var users = this.getNodeShareUsers(h, 'EXP');
+
+            if (users.length) {
+                console.error('The node "%s" still has shares on it!', h);
+
+                users.forEach(function(user) {
+                    M.delNodeShare(h, user);
+                });
+            }
+
+            delete u_sharekeys[h];
+            if (typeof mDB === 'object') {
+                mDBdel('ok', h);
             }
         }
     };
@@ -3934,6 +3962,62 @@ function MegaData()
             if (user instanceof MegaDataObject) {
                 user = user._data;
             }
+        }
+
+        if (!user && handle === u_handle) {
+            user = u_attr;
+        }
+
+        return user;
+    };
+
+    /**
+     * Retrieve an user object by its email
+     * @param {String} email The user's handle
+     * @return {Object} The user object, of false if not found
+     */
+    this.getUserByEmail = function(email) {
+        var user = false;
+
+        M.u.every(function(contact, u) {
+            if (M.u[u].m === email) {
+                // Found the user object
+                user = M.u[u];
+
+                if (user instanceof MegaDataObject) {
+                    user = user._data;
+                }
+                return false;
+            }
+            return true;
+        });
+
+        return user;
+    };
+
+    /**
+     * Retrieve an user object
+     * @param {String} str An email or handle
+     * @return {Object} The user object, of false if not found
+     */
+    this.getUser = function(str) {
+        var user = false;
+
+        if (typeof str !== 'string') {
+            // Check if it's an user object already..
+
+            if (Object(str).hasOwnProperty('u')) {
+                // Yup, likely.. let's see
+                user = this.getUserByHandle(str.u);
+            }
+        }
+        else if (str.length === 11) {
+            // It's an user handle
+            user = this.getUserByHandle(str);
+        }
+        else if (str.indexOf('@') > 0) {
+            // It's an email..
+            user = this.getUserByEmail(str);
         }
 
         return user;
@@ -5503,7 +5587,7 @@ function execsc(actionPackets, callback) {
             }
 
             // Full share
-            else if (actionPacket.a === 's') {
+            else if (actionPacket.a === 's' || actionPacket.a === 's2') {
 
                 // Used during share dialog removal of contact from share list
                 // Find out is this a full share delete
@@ -5519,8 +5603,18 @@ function execsc(actionPackets, callback) {
                     }
                 }
 
-                // Full share contains .h param
-                sharedUInode(actionPacket.h);
+                if (actionPacket.okd) {
+                    M.delNodeShare(actionPacket.n, actionPacket.u, actionPacket.okd);
+                }
+
+                if (actionPacket.a === 's2') {
+                    processPS([actionPacket]);
+                }
+
+                if (fminitialized) {
+                    // Full share contains .h param
+                    sharedUInode(actionPacket.h);
+                }
             }
 
             // Outgoing pending contact
@@ -5538,11 +5632,6 @@ function execsc(actionPackets, callback) {
                 processIPC([actionPacket]);
                 M.drawReceivedContactRequests([actionPacket]);
                 notify.notifyFromActionPacket(actionPacket);
-            }
-
-            // Pending shares
-            else if (actionPacket.a === 's2') {
-                processPS([actionPacket]);
             }
 
             // Export link (public handle)
@@ -5613,7 +5702,7 @@ function execsc(actionPackets, callback) {
                 }
                 // If access right are undefined then share is deleted
                 else if (typeof actionPacket.r === "undefined") {
-                    M.delNodeShare(actionPacket.n, actionPacket.u);
+                    M.delNodeShare(actionPacket.n, actionPacket.u, actionPacket.okd);
                 }
                 else {
                     var handle = actionPacket.n;

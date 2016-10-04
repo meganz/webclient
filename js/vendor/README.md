@@ -75,7 +75,7 @@ Unless otherwise noted, they were released under a [MIT License].
 [jquery-2.2.1.js]: jQuery JavaScript Library.
 
 ---
-[jquery-ui-1.11.4.js]: jQuery-UI - jQuery User Interface library.
+[jquery-ui.js]: jQuery-UI - jQuery User Interface library.
 
 ---
 [jquery.fullscreen.js]: This jQuery plugin provides a simple to use mechanism to control the new fullscreen mode of modern browsers.
@@ -146,14 +146,15 @@ Unless otherwise noted, they were released under a [MIT License].
 ---
 [chat/strophe.light.js]: Strophe.js is an XMPP library for JavaScript.
 
-> NB: We are using a custom build which was created using:
+> NB: This is the **light** version built as follow:
 > 
 > ```bash
 > git clone https://github.com/strophe/strophejs.git
 > cd strophejs
-> git checkout 30033f05eded0bb079e8c06a75045f195068d896
+> git checkout v1.2.8
 > npm install
 > make strophe.light.js
+> make check
 > ```
 
 ---
@@ -173,7 +174,7 @@ Unless otherwise noted, they were released under a [MIT License].
 [int64.js]: <https://github.com/meganz/node-int64>
 [ion.sound.js]: <https://github.com/meganz/ion.sound>
 [jquery-2.2.1.js]: <https://github.com/jquery/jquery/blob/2.2.1/dist/jquery.js>
-[jquery-ui-1.11.4.js]: <https://code.jquery.com/ui/1.11.4/jquery-ui.js>
+[jquery-ui.js]: <https://code.jquery.com/ui/1.12.1/jquery-ui.js>
 [jquery.fullscreen.js]: <https://github.com/kayahr/jquery-fullscreen-plugin/tree/5c95707f9ebf3d4962e9057b09cc43c10f11c3f4>
 [jquery.jscrollpane.js]: <https://github.com/meganz/jScrollPane>
 [jquery.mousewheel.js]: <https://github.com/meganz/jquery-mousewheel>
@@ -189,4 +190,4 @@ Unless otherwise noted, they were released under a [MIT License].
 [react-dom.js, react.js]: https://github.com/facebook/react/tree/v0.14.8
 [smartcrop.js]: <https://github.com/meganz/smartcrop.js>
 [zxcvbn.js]: <https://github.com/dropbox/zxcvbn/tree/1.0.1>
-[chat/strophe.light.js]: <https://github.com/strophe/strophejs/tree/30033f05eded0bb079e8c06a75045f195068d896>
+[chat/strophe.light.js]: <https://github.com/strophe/strophejs>

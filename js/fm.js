@@ -3084,7 +3084,7 @@ function dashboardUI() {
             maxStorage += bsqStorage;
 
             $('.button', $fsq).rebind('click', function() {
-                achivementsListDialog();
+                achievementsListDialog();
             });
             bsqStorage = Math.round(bsqStorage * 100 / maxStorage);
             $('.progress-bar.red', $fsq).css('width', bsqStorage + '%');
@@ -3619,9 +3619,9 @@ function accountUI() {
         $('.storage .chart.data .size-txt').text(bytesToSize(account.space_used));
 
 
-        /* achivements */
+        /* achievements */
         if (!account.maf) {
-            $('.fm-right-account-block').removeClass('active-achivements');
+            $('.fm-right-account-block').removeClass('active-achievements');
 
             $('.account.quota-txt.used-space')
                 .safeHTML('<span>@@</span> @@ @@',
@@ -3652,11 +3652,11 @@ function accountUI() {
             $('.account.progress-txt.inbox').text(bytesToSize(c[k[1]][0]));
         }
         else {
-            $('.fm-right-account-block').addClass('active-achivements');
+            $('.fm-right-account-block').addClass('active-achievements');
 
             // hide everything until seen on the api reply (maf)
-            $('.achivements-table .achivements-cell').addClass('hidden');
-            $('.achivements-block .progress-bar.dark-violet').css('width', '0%');
+            $('.achievements-table .achievements-cell').addClass('hidden');
+            $('.achievements-block .progress-bar.dark-violet').css('width', '0%');
             var $items = $('.account.progress-list.achievem .progress-item')
                 .not('.baseq').addClass('hidden');
             $items.find('.progress-indicator').removeClass('dark-violet active');
@@ -3664,7 +3664,7 @@ function accountUI() {
 
             var $achStorage = $('.account.progress-list.achievem.storage');
             var $achTransfer = $('.account.progress-list.achievem.transfer');
-            var $achTable = $('.account.data-block .achivements-table');
+            var $achTable = $('.account.data-block .achievements-table');
             var storageMaxValue = 0;
             var storageCurrentValue = 0;
             var transferMaxValue = 0;
@@ -3682,7 +3682,7 @@ function accountUI() {
                     if (selector) {
                         var base = (Object(data.rwds).length || 1);
                         var storageValue = (data[0] * base);
-                        var $cell = $('.' + selector, $achTable).closest('.achivements-cell');
+                        var $cell = $('.' + selector, $achTable).closest('.achievements-cell');
                         var $storageItem = $('.progress-item.' + selector, $achStorage).removeClass('hidden');
 
                         storageMaxValue += storageValue;
@@ -3768,19 +3768,19 @@ function accountUI() {
             // For free users only show base quota for storage and remove it for bandwidth.
             // For pro users replace base quota by pro quota
             if (u_attr.p) {
-                var $baseq = $('.achivements-block .data-block.storage .baseq');
+                var $baseq = $('.achievements-block .data-block.storage .baseq');
                 storageBaseQuota = account.space;
                 $('.progress-txt', $baseq).text(bytesToSize(storageBaseQuota, 0));
                 $('.progress-title', $baseq).text('PRO Quota');
 
                 transferBaseQuota = account.bw;
-                $baseq = $('.achivements-block .data-block.transfer .baseq');
+                $baseq = $('.achievements-block .data-block.transfer .baseq');
                 $('.progress-txt', $baseq).text(bytesToSize(transferBaseQuota, 0));
                 $('.progress-title', $baseq).text('PRO Quota');
             }
             else {
                 storageBaseQuota = maf.baseq;
-                $('.achivements-block .data-block.transfer .baseq').addClass('hidden');
+                $('.achievements-block .data-block.transfer .baseq').addClass('hidden');
             }
 
             storageMaxValue += storageBaseQuota;
@@ -3806,7 +3806,7 @@ function accountUI() {
             // TODO: l[]
             var quotaTxt = '[S]@@[/S] of @@'.replace('[S]', '<span>').replace('[/S]', '</span>');
 
-            var $achBlock = $('.account.achivements-block');
+            var $achBlock = $('.account.achievements-block');
             var $quotaTxt = $('.account.quota-txt.storage', $achBlock);
 
             $quotaTxt.safeHTML(quotaTxt,
@@ -3819,7 +3819,7 @@ function accountUI() {
                 bytesToSize(transferCurrentValue, 0),
                 bytesToSize(transferMaxValue, 0));
         }
-        /* End of No achivements */
+        /* End of No achievements */
 
         /* End of New Used space */
 
@@ -10812,12 +10812,12 @@ function achivementDialog(title, close) {
 }
 
 /**
- * Show achivements list dialog
+ * Show achievements list dialog
  * @param {String} close dialog parameter
  */
-function achivementsListDialog(close) {
-    var $dialog = $('.fm-dialog.achivements-list-dialog');
-    var $scrollBlock = $dialog.find('.achivements-scroll');
+function achievementsListDialog(close) {
+    var $dialog = $('.fm-dialog.achievements-list-dialog');
+    var $scrollBlock = $dialog.find('.achievements-scroll');
     var bodyHeight = $('body').height();
     var $contentBlock;
 
@@ -10827,12 +10827,12 @@ function achivementsListDialog(close) {
         $dialog.addClass('hidden');
         return true;
     }
-    $.dialog = 'achivements';
+    $.dialog = 'achievements';
 
-    $dialog.find('.fm-dialog-close').rebind('click', achivementsListDialog);
+    $dialog.find('.fm-dialog-close').rebind('click', achievementsListDialog);
 
     // hide everything until seen on the api reply (maf)
-    $('.achivements-cell', $dialog).addClass('hidden');
+    $('.achievements-cell', $dialog).addClass('hidden');
 
     var ach = mega.achievem;
     var maf = ach.prettify(M.account.maf);
@@ -10842,7 +10842,7 @@ function achivementsListDialog(close) {
             var data = maf[idx];
             var selector = ach.mapToElement[idx];
             if (selector) {
-                var $cell = $('.achivements-cell.' + selector, $dialog).removeClass('hidden');
+                var $cell = $('.achievements-cell.' + selector, $dialog).removeClass('hidden');
 
                 var locFmt = '[S]@@[/S] storage space'.replace('[S]', '<span>').replace('[/S]', '</span>');
                 $('.reward.storage .reward-txt', $cell)

@@ -1247,7 +1247,7 @@ function topmenuUI() {
     $('.top-menu-item.refresh-item, .top-menu-divider.refresh').addClass('hidden');
     $('.activity-status-block .activity-status,.activity-status-block').hide();
     $('.membership-status-block i').attr('class', 'tiny-icon membership-status free');
-    $('.membership-status, .top-head .user-name, .top-icon.achivements').hide();
+    $('.membership-status, .top-head .user-name, .top-icon.achievements').hide();
 
     if (fminitialized) {
         $('.top-search-bl').removeClass('hidden');
@@ -1279,7 +1279,7 @@ function topmenuUI() {
         $('.membership-status-block').show();
         $('.top-icon.notification').show();
         if (u_attr.maf) {
-            $('.top-icon.achivements').show();
+            $('.top-icon.achievements').show();
         }
 
         // If a Lite/Pro plan has been purchased
@@ -1348,7 +1348,7 @@ function topmenuUI() {
         $('.top-menu-item.pro-item span').text(l[129]);
         $('.membership-status-block').hide();
         $('.top-icon.notification').hide();
-        $('.top-icon.achivements').hide();
+        $('.top-icon.achievements').hide();
         $('.create-account-button').show();
         $('.create-account-button').rebind('click', function () {
             document.location.hash = 'register';
@@ -1466,14 +1466,14 @@ function topmenuUI() {
         }
     });
 
-    $('.top-icon.achivements').rebind('click', function() {
+    $('.top-icon.achievements').rebind('click', function() {
         loadingDialog.show();
 
         M.accountData(function(account) {
             loadingDialog.hide();
 
             if (account.maf) {
-                achivementsListDialog();
+                achievementsListDialog();
             }
         });
     });

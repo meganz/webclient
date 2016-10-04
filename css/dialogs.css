@@ -285,24 +285,24 @@
 /* End of Achivement dialog */
 
 
-/* Achivements list dialog */
-.fm-dialog.achivements-list-dialog {
+/* Achievements list dialog */
+.fm-dialog.achievements-list-dialog {
     width: 964px;
     margin: -354px 0 0 -482px;
     background-color: #f7f7f7;
 }
-.achivements-scroll .achivements-cell {
+.achievements-scroll .achievements-cell {
     display: table;
     width: auto;
     margin: 0 0 12px 0;
 }
-.achivements-scroll .achivements-cell.hidden {
+.achievements-scroll .achievements-cell.hidden {
     display: none;
 }
-.achivements-cell-body {
+.achievements-cell-body {
     display: table-row;
 }
-.achivements-list-dialog .achivement-full.info {
+.achievements-list-dialog .achivement-full.info {
     margin: 0;
     padding: 0 36px 0 0;
 }
@@ -333,12 +333,12 @@
     text-align: center;
     padding: 0 15px;
 }
-.achivements-scroll {
+.achievements-scroll {
     max-height: 666px;
     margin-top: 8px;
     overflow: hidden;
 }
-.achivements-list-dialog .acivements-content {
+.achievements-list-dialog .acivements-content {
     padding: 2px 24px 12px 24px;
 }
 .achivement-full.expires-txt {
@@ -359,7 +359,7 @@
 .achivement-dialog.right-block .reward-txt {
     margin: -4px 0 0 13px;
 }
-.achivements-cell-body .expires-txt {
+.achievements-cell-body .expires-txt {
     padding: 12px 0 0 0;
 }
 .achivement-dialog.status-block {
@@ -400,7 +400,7 @@
     -khtml-opacity: 0.5;
     opacity: 0.5;
 }
-/* End of Achivements list dialog */
+/* End of Achievements list dialog */
 
 /* Invite a friend dialog */
 .fm-dialog.invite-dialog {

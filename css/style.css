@@ -4762,7 +4762,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .top-head .top-icon.notification::before {
     background-position: -7px -202px;
 }
-.top-head .top-icon.achivements::before {
+.top-head .top-icon.achievements::before {
     background-position: -7px -16px;
 }
 .top-head .top-icon.warning::before {
@@ -10874,7 +10874,7 @@ table {
     top: 2px;
     display: none;
 }
-.active-achivements .medium-icon.rocket {
+.active-achievements .medium-icon.rocket {
     display: block;
 }
 .account.quota-txt span {
@@ -24721,10 +24721,10 @@ div.camera-bottom-txt {
 .account.used-space-block {
     padding-bottom: 20px;
 }
-.account.achivements-block, .active-achivements .account.used-space-block {
+.account.achievements-block, .active-achievements .account.used-space-block {
     display: none;
 }
-.active-achivements .account.achivements-block {
+.active-achievements .account.achievements-block {
     display: block;
 }
 .red-txt {
@@ -24751,7 +24751,7 @@ div.camera-bottom-txt {
 .account.progress-block.used-space, .used-space .account.progress-bar {
     height: 32px;
 }
-.achivements-table {
+.achievements-table {
     font-size: 0;
     width: -webkit-calc(100% + 24px);
     width: -moz-calc(100% + 24px);
@@ -24759,7 +24759,7 @@ div.camera-bottom-txt {
     margin-left: -24px;
     padding: 0 0 20px 0;
 }
-.achivements-cell {
+.achievements-cell {
     display: inline-block;
     vertical-align: top;
     margin: 24px 0 0 24px;
@@ -24774,16 +24774,16 @@ div.camera-bottom-txt {
     width: -moz-calc(50% -24px);
     width: calc(50% - 24px);
 }
-.low-width .achivements-cell {
+.low-width .achievements-cell {
     display: block;
     width: -webkit-calc(100% - 24px);
     width: -moz-calc(100% -24px);
     width: calc(100% - 24px);
 }
-.achivements-cell.hidden {
+.achievements-cell.hidden {
     display: none;
 }
-.achivements-cell::before, .achivements-cell::after, .account.widget.body::before, .account.widget.body::after {
+.achievements-cell::before, .achievements-cell::after, .account.widget.body::before, .account.widget.body::after {
     content: '';
     width: 100%;
     height: 100%;
@@ -24798,7 +24798,7 @@ div.camera-bottom-txt {
     border-radius: 4px;
     background-color: white;
 }
-.achivements-cell::after, .account.widget.body::after {
+.achievements-cell::after, .account.widget.body::after {
     -webkit-box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
     -moz-box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
     box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
@@ -24816,7 +24816,7 @@ div.camera-bottom-txt {
     box-sizing: border-box;
     z-index: 1;
 }
-.achivements-cell .huge-white-icon {
+.achievements-cell .huge-white-icon {
     position: absolute;
     left: 50%;
     top: -5px;

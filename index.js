@@ -1695,6 +1695,44 @@ function topmenuUI() {
         }
     });
 
+    // Hover tooltip for top-menu elements and sidebar icons
+    $('.nw-fm-left-icon, .top-icon').rebind('mouseover.nw-fm-left-icon', function() {
+        var $this    = $(this);
+        var $tooltip = $this.find('.dark-tooltip');
+        var tooltipPos;
+        var tooltipWidth;
+        var buttonPos;
+
+        if ($.liTooltipTimer) {
+            clearTimeout($.liTooltipTimer);
+        }
+        $.liTooltipTimer = window.setTimeout(
+            function() {
+                if ($tooltip.hasClass('top')) {
+                    tooltipWidth = $tooltip.outerWidth();
+                    buttonPos    = $this.position().left;
+                    tooltipPos   = buttonPos + $this.outerWidth() / 2 - tooltipWidth / 2;
+                    if ($('body').width() - (tooltipPos + tooltipWidth) > 0) {
+                        $tooltip.css({
+                            'left': tooltipPos,
+                            'right': 'auto'
+                        });
+                    }
+                    else {
+                        $tooltip.css({
+                            'left': 'auto',
+                            'right': 0
+                        });
+                    }
+                }
+                $tooltip.addClass('hovered');
+            }, 1000);
+    })
+    .rebind('mouseout.nw-fm-left-icon', function() {
+        $(this).find('.dark-tooltip').removeClass('hovered');
+        clearTimeout($.liTooltipTimer);
+    });
+
     $('.fm-avatar img, .user-name').rebind('click', function () {
         if ($('.fm-avatar img').attr('src').indexOf('blob:') > -1) {
             document.location.hash = 'fm/account';

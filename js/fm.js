@@ -661,6 +661,7 @@ function initUI() {
     transferPanelUI();
     UIkeyevents();
     addContactUI();
+    Soon(topmenuUI);
 
     $('.fm-files-view-icon').rebind('click', function() {
 
@@ -867,42 +868,6 @@ function initUI() {
                 break;
             }
         }
-    });
-
-    $('.nw-fm-left-icon, .top-icon').rebind('mouseover.nw-fm-left-icon', function() {
-        var $this = $(this),
-            $tooltip = $this.find('.dark-tooltip'),
-            tooltipPos,
-            tooltipWidth,
-            buttonPos;
-        if ($.liTooltipTimer)
-            clearTimeout($.liTooltipTimer);
-        $.liTooltipTimer = window.setTimeout(
-            function() {
-                if ($tooltip.hasClass('top')) {
-                    tooltipWidth = $tooltip.outerWidth();
-                    buttonPos = $this.position().left;
-                    tooltipPos = buttonPos + $this.outerWidth()/2 - tooltipWidth/2;
-                    if ($('body').width() - (tooltipPos + tooltipWidth) > 0) {
-                        $tooltip.css({
-                            'left': tooltipPos,
-                            'right': 'auto'
-                        });
-                    }
-                    else {
-                        $tooltip.css({
-                            'left': 'auto',
-                            'right': 0
-                        });
-                    }
-                }
-                $tooltip.addClass('hovered');
-            }, 1000);
-    });
-
-    $('.nw-fm-left-icon, .top-icon').rebind('mouseout.nw-fm-left-icon', function() {
-        $(this).find('.dark-tooltip').removeClass('hovered');
-        clearTimeout($.liTooltipTimer);
     });
 
     if (dlMethod.warn && !localStorage.browserDialog && !$.browserDialog)

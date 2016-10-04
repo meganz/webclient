@@ -1509,6 +1509,9 @@ else if (!b_u)
 
     // MEGA CHAT
     if ((location.host === 'mega.nz' || !megaChatIsDisabled) && !is_mobile) {
+        jsl.push({f:'js/vendor/react.js', n: 'react', j:1, w:10});
+        jsl.push({f:'js/vendor/react-dom.js', n: 'react-dom', j:1, w:1});
+
         jsl.push({f:'js/chat/strongvelope.js', n: 'strongvelope_js', j:1, w:1});
         jsl.push({f:'js/chat/rtcStats.js', n: 'rtcstats_js', j:1, w:1});
         jsl.push({f:'js/chat/rtcSession.js', n: 'rtcsession_js', j:1, w:1});

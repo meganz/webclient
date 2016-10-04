@@ -10,7 +10,6 @@ var DropdownsUI = require('./../../ui/dropdowns.jsx');
 var ContactsUI = require('./../ui/contacts.jsx');
 var ConversationPanelUI = require("./../ui/conversationpanel.jsx");
 
-
 var ConversationsListItem = React.createClass({
     mixins: [MegaRenderMixin, RenderDebugger],
     componentWillMount: function() {

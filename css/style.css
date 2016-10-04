@@ -7274,6 +7274,7 @@ table {
 }
 .fm-account-top .right-arrow-bg {
     font-size: 16px;
+    cursor: none;
 }
 .fm-breadcrumbs .right-arrow-bg.short-foldername {
     max-width: 110px;

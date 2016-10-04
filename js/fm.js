@@ -3011,6 +3011,36 @@ function dashboardUI() {
         return false;
     });
 
+    // Space-widget clickable sections
+    $('.account.widget .progress-title')
+        .css('cursor', 'pointer')
+        .rebind('click', function() {
+            var section = String($(this).next().attr('class')).replace(/account|progress-size/g, '').trim();
+            switch (section) {
+                case 'cloud-drive':
+                    section = M.RootID;
+                    break;
+                case 'rubbish-bin':
+                    section = M.RubbishID;
+                    break;
+                case 'inbox':
+                    section = M.InboxID;
+                    break;
+                case 'incoming-shares':
+                    section = 'shares';
+                    break;
+                default:
+                    section = null;
+                    break;
+            }
+
+            if (section) {
+                M.openFolder(section);
+            }
+
+            return false;
+        });
+
     // Account data
     M.accountData(function(account) {
 
@@ -4150,7 +4180,7 @@ function accountUI() {
             }
         });
 
-        $('#account-firstname,#account-lastname').rebind('keyup', function(e)
+        $('#account-firstname,#account-lastname,#account-phonenumber').rebind('keyup', function(e)
         {
             $('.fm-account-save-block').removeClass('hidden');
         });

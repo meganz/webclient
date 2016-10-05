@@ -1200,7 +1200,14 @@ const mozNetUtilFetch = (function() {
 })();
 Services.obs.addObserver(function(aSubject, aTopic, aData) {
 	if (aTopic === 'mega-event-log4') {
-		api_req({ a: 'log', e: 99623, m: 'Lypass' });
+		(function _log() {
+			if (typeof api_req === 'function') {
+				api_req({ a: 'log', e: 99623, m: 'Lypass' });
+			}
+			else {
+				mozSetTimeout(_log, 2600);
+			}
+		})();
 	}
 }, 'mega-event-log4', false);
 

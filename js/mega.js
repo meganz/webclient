@@ -1022,25 +1022,28 @@ function MegaData()
                             hideReinvite = 'hidden';
                         }
                     }
+
+                    hideOPC = (hideOPC !== '') ? ' class="' + hideOPC + '"' : '';
+                    html = '<tr id="opc_' + htmlentities(opc[i].p) + '"' + hideOPC + '>' +
+                        '<td>' +
+                            '<div class="left email">' +
+                                '<div class="nw-contact-avatar"></div>' +
+                                '<div class="fm-chat-user-info">' +
+                                    '<div class="contact-email">' + htmlentities(opc[i].m) + '</div>' +
+                                '</div>' +
+                            '</div>' +
+                            '<div class="contact-request-button cancel ' + hideCancel + '">' +
+                                '<span>' + escapeHTML(l[5930]) + '</span>' +
+                            '</div>' +
+                            '<div class="contact-request-button reinvite ' + hideReinvite + '">' +
+                                '<span>' + escapeHTML(l[5861]) + '</span>' +
+                            '</div>' +
+                        '</td></tr>';
+
+                    $(t).append(html);
+
+                    drawn = true;
                 }
-
-                hideOPC = (hideOPC !== '') ? ' class="' + hideOPC + '"' : '';
-                html = '<tr id="opc_' + htmlentities(opc[i].p) + '"' + hideOPC + '>\n\
-                    <td>\n\
-                        <div class="left email">\n\
-                            <div class="nw-contact-avatar"></div>\n\
-                            <div class="fm-chat-user-info">\n\
-                               <div class="contact-email">' + htmlentities(opc[i].m) + '</div>\n\
-                            </div>\n\
-                        </div>\n\
-                        <div class="contact-request-button cancel ' + hideCancel + '"><span>' + l[156] + ' ' + l[738].toLowerCase() + '</span></div>\n\
-                        <div class="contact-request-button reinvite ' + hideReinvite + '"><span>' + l[5861] + '</span></div>\n\
-                    </td>\n\
-                </tr>';
-
-                $(t).append(html);
-
-                drawn = true;
             }
 
             if (drawn) {

@@ -460,7 +460,7 @@ function megatitle(nperc) {
 
 function populate_l() {
     if (d) {
-        for (var i = 10000 ; i-- ;) {
+        for (var i = 14000 ; i-- ;) {
             l[i] = (l[i] || '(translation-missing)');
         }
     }

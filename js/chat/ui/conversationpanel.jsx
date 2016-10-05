@@ -1771,6 +1771,7 @@ var ConversationPanel = React.createClass({
                                 chatRoom={self.props.chatRoom}
                                 className="main-typing-area"
                                 disabled={room.isReadOnly()}
+                                persist={true}
                                 onUpEditPressed={() => {
                                     var foundMessage = false;
                                     room.messagesBuff.messages.keys().reverse().forEach(function(k) {

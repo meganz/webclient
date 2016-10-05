@@ -3,10 +3,12 @@
  *
  * @param name {String} this should be a unique name of the db table to be used for the storage (IndexedDBKVStorage
  * will automatically add the u_handle as a suffix, so no need to add that when passing the argument here)
+ * @param dbOpts {Object} Options to be passed to MegaDB
+ * @param syncMemcache {boolean} Sync memcache across tabs
  *
  * @constructor
  */
-var IndexedDBKVStorage = function(name, dbOpts) {
+var IndexedDBKVStorage = function(name, dbOpts, syncMemcache) {
     var self = this;
     self.name = name;
     self.db = null;
@@ -14,6 +16,7 @@ var IndexedDBKVStorage = function(name, dbOpts) {
     self.logger = new MegaLogger("IDBKVStorage[" + name + "]");
     self._memCache = {};
     self.dbOpts = dbOpts;
+    self.syncMemcache = syncMemcache;
 };
 
 
@@ -153,6 +156,21 @@ IndexedDBKVStorage.prototype._prefillMemCache = function() {
         delete self._cacheIsBeingPrefilled;
     });
 
+    if (self.syncMemcache) {
+        self._mListener = mBroadcaster.addListener('idbchange:' + self.name + "_" + u_handle, function (data) {
+            var k = data[0];
+            var v = data[1];
+            if (typeof(v) === 'undefined') {
+                delete self._memCache[k];
+            }
+            else {
+                self._memCache[k] = v;
+            }
+
+            self.trigger('onChange', [k, v]);
+        });
+    }
+
     return masterPromise;
 
 };
@@ -168,11 +186,13 @@ IndexedDBKVStorage.prototype._prefillMemCache = function() {
  * @returns {MegaPromise}
  */
 IndexedDBKVStorage.prototype.setItem = IndexedDBKVStorage._requiresDbConn(function __IDBKVSetItem(k, v) {
+    var self = this;
+    
     var promise = new MegaPromise();
 
-    this._memCache[k] = v;
+    self._memCache[k] = v;
 
-    this.db.addOrUpdate(
+    self.db.addOrUpdate(
         'kv',
         {
             'k': k,
@@ -180,6 +200,14 @@ IndexedDBKVStorage.prototype.setItem = IndexedDBKVStorage._requiresDbConn(functi
         }
     )
         .done(function __setItemDone() {
+            if (self.syncMemcache) {
+                watchdog.notify('idbchange', {
+                    name: self.name + "_" + u_handle,
+                    key: k,
+                    value: v
+                });
+            }
+
             promise.resolve([k, v]);
         })
         .fail(function __setItemFail() {
@@ -236,6 +264,14 @@ IndexedDBKVStorage.prototype.getItem = IndexedDBKVStorage._requiresDbConn(functi
 IndexedDBKVStorage.prototype.removeItem = IndexedDBKVStorage._requiresDbConn(function __IDBKVRemoveItem(k) {
     if (typeof(this._memCache[k]) !== 'undefined') {
         delete this._memCache[k];
+    }
+
+    if (this.syncMemcache) {
+        watchdog.notify('idbchange', {
+            name: this.name + "_" + u_handle,
+            key: k,
+            value: undefined
+        });
     }
 
     return this.db.remove(
@@ -340,3 +376,6 @@ IndexedDBKVStorage.prototype.eachPrefixItem = IndexedDBKVStorage._requiresDbConn
 
     return MegaPromise.resolve();
 });
+
+
+makeObservable(IndexedDBKVStorage);

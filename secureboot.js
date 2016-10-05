@@ -1536,6 +1536,7 @@ else if (!b_u)
         jsl.push({f:'js/chat/plugins/emoticonsFilter.js', n: 'emoticonsFilter_js', j:1, w:7});
         jsl.push({f:'js/chat/plugins/chatNotifications.js', n: 'chatnotifications_js', j:1, w:7});
         jsl.push({f:'js/chat/plugins/callFeedback.js', n: 'callfeedback_js', j:1, w:7});
+        jsl.push({f:'js/chat/plugins/persistedTypeArea.js', n: 'persistedTypeArea_js', j:1, w:1});
 
         jsl.push({f:'js/chat/karereEventObjects.js', n: 'keo_js', j:1, w:7});
         jsl.push({f:'js/connectionRetryManager.js', n: 'crm_js', j:1, w:7});

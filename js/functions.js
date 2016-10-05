@@ -4482,6 +4482,10 @@ var watchdog = Object.freeze({
                     megaChat.plugins.chatdIntegration.discardMessage(chatRoom, strg.data.messageId);
                 }
                 break;
+
+            case 'idbchange':
+                mBroadcaster.sendMessage('idbchange:' + strg.data.name, [strg.data.key, strg.data.value]);
+                break;
         }
 
         delete localStorage[ev.key];

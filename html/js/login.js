@@ -113,10 +113,16 @@ function doConfirm(email, password, callback) {
                     }
                     else if ((typeof res === 'number') && (res === -11)) {
                         if (u_type === 0) {// Ephemeral session
-                            alert("Logout or Create New Account from this ephemeral session and then re-try with account activation.");
+                            msgDialog(
+                                "warninga",
+                                "Account Activation Error",
+                                "There is two possible solutions for current account activation problem:\
+                                    1. Logout from this ephemeral session and then re-try with account activation using the same activation link,\
+                                    2. Create New Account from this ephemeral session and then re-try account activation using new activation link."
+                                    );
                         }
                         else {
-                            alert("Logout from account and then re-try with account activation.");
+                            msgDialog("warninga", "Account Activation Error", "Logout from account and then re-try with account activation using same activation link.");
                         }
                     }
                     else {
@@ -243,9 +249,12 @@ function init_login() {
         $('.login-page-create-new').addClass('hidden');
         $('.top-login-forgot-pass').addClass('hidden');
         $('.main-top-info-block').removeClass('hidden');
-        $('.register-st2-button-arrow').text(l[1131]);
-        $('.main-italic-header.login').text(l[1131]);
-        $('.main-top-info-text').text(l[378]);
+        // $('.register-st2-button-arrow').text(l[1131]);
+        $('.register-st2-button-arrow').text("Activate your account");
+        // $('.main-italic-header.login').text(l[1131]);
+        $('.main-italic-header.login').text("Activate your account");
+        // $('.main-top-info-text').text(l[378]);
+        $('.main-top-info-text').text("Please enter your password to activate your account.");
         $('.login-check').addClass('hidden').next().addClass('hidden');
     }
     else {

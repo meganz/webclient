@@ -9706,10 +9706,10 @@ browserDialog.isWeak = function() {
 function propertiesDialog(close) {
 
     /*
-    * fillPropertiesContactList, Handles properties contact list content
+    * fillPropertiesContactList, Handles node properties/info dialog contact list content
     *
-    * @param {Object} n Node shares
-    * @param {Object} pendingShares Node pending shares
+    * @param {Object} n Node related shares
+    * @param {Object} pendingShares Node related pending shares
     */
     var fillPropertiesContactList = function(n, pendingShares) {
 
@@ -9771,8 +9771,7 @@ function propertiesDialog(close) {
         }
 
         var hiddenNum = totalSharesNum - DEFAULT_CONTACTS_NUMBER;
-        // var repStr = l[10663];// 'and [X] more';
-        var repStr = 'and [X] more';
+        var repStr = l[10663];// '... and [X] more';
 
         susers.append(
             '<div class="properties-context-item show-more">'
@@ -9830,6 +9829,7 @@ function propertiesDialog(close) {
 
     $('.properties-elements-counter span').text('');
     $('.fm-dialog.properties-dialog .properties-body').rebind('click', function() {
+
         // Clicking anywhere in the dialog will close the context-menu, if open
         var e = $('.fm-dialog.properties-dialog .file-settings-icon');
         if (e.hasClass('active'))

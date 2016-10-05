@@ -436,8 +436,26 @@ if (b_u && !is_mobile) {
     document.location = 'update.html';
 }
 
-var ln = {}; ln.en = 'English'; ln.cn = '简体中文';  ln.ct = '中文繁體'; ln.ru = 'Pусский'; ln.es = 'Español'; ln.fr = 'Français'; ln.de = 'Deutsch'; ln.it = 'Italiano'; ln.br = 'Português Brasil'; ln.vi = 'Tiếng Việt'; ln.nl = 'Nederlands'; ln.kr = '한국어';   ln.ar = 'العربية'; ln.jp = '日本語'; ln.pt = 'Português'; ln.he = 'עברית'; ln.pl = 'Polski'; ln.sk = 'Slovenský'; ln.cz = 'Čeština'; ln.ro = 'Română'; ln.fi = 'Suomi'; ln.se = 'Svenska'; ln.hu = 'Magyar'; ln.sr = 'српски'; ln.sl = 'Slovenščina'; ln.tr = 'Türkçe';  ln.id = 'Bahasa Indonesia'; ln.uk = 'Українська'; ln.sr = 'српски'; ln.th = 'ภาษาไทย'; ln.bg = 'български'; ln.fa = 'فارسی '; ln.tl = 'Tagalog';
-var ln2 = {}; ln2.en = 'English'; ln2.cn = 'Chinese';  ln2.ct = 'Traditional Chinese'; ln2.ru = 'Russian'; ln2.es = 'Spanish'; ln2.fr = 'French'; ln2.de = 'German'; ln2.it = 'Italian'; ln2.br = 'Brazilian Portuguese'; ln2.vi = 'Vietnamese'; ln2.nl = 'Dutch'; ln2.kr = 'Korean';   ln2.ar = 'Arabic'; ln2.jp = 'Japanese'; ln2.pt = 'Portuguese'; ln2.he = 'Hebrew'; ln2.pl = 'Polish'; ln2.sk = 'Slovak'; ln2.cz = 'Czech'; ln2.ro = 'Romanian'; ln2.fi = 'Finnish'; ln2.se = 'Swedish'; ln2.hu = 'Hungarian'; ln2.sr = 'Serbian'; ln2.sl = 'Slovenian'; ln2.tr = 'Turkish'; ln2.id = 'Indonesian'; ln2.uk = 'Ukrainian'; ln2.sr = 'Serbian'; ln2.th = 'Thai'; ln2.bg = 'Bulgarian'; ln2.fa = 'Farsi'; ln2.tl = 'Tagalog';
+var ln = {};
+var ln2 = {};
+
+// Native language names
+ln.en = 'English'; ln.cn = '简体中文';  ln.ct = '中文繁體'; ln.ru = 'Pусский'; ln.es = 'Español';
+ln.fr = 'Français'; ln.de = 'Deutsch'; ln.it = 'Italiano'; ln.br = 'Português'; ln.vi = 'Tiếng Việt';
+ln.nl = 'Nederlands'; ln.kr = '한국어';   ln.ar = 'العربية'; ln.jp = '日本語'; ln.he = 'עברית';
+ln.pl = 'Polski'; ln.sk = 'Slovenský'; ln.cz = 'Čeština'; ln.ro = 'Română'; ln.fi = 'Suomi';
+ln.se = 'Svenska'; ln.hu = 'Magyar'; ln.sr = 'српски'; ln.sl = 'Slovenščina'; ln.tr = 'Türkçe';
+ln.id = 'Bahasa Indonesia'; ln.uk = 'Українська'; ln.sr = 'српски';
+ln.th = 'ภาษาไทย'; ln.bg = 'български'; ln.fa = 'فارسی '; ln.tl = 'Tagalog';
+
+// Language names in English
+ln2.en = 'English'; ln2.cn = 'Chinese';  ln2.ct = 'Traditional Chinese'; ln2.ru = 'Russian'; ln2.es = 'Spanish';
+ln2.fr = 'French'; ln2.de = 'German'; ln2.it = 'Italian'; ln2.br = 'Portuguese'; ln2.vi = 'Vietnamese';
+ln2.nl = 'Dutch'; ln2.kr = 'Korean';   ln2.ar = 'Arabic'; ln2.jp = 'Japanese'; ln2.he = 'Hebrew';
+ln2.pl = 'Polish'; ln2.sk = 'Slovak'; ln2.cz = 'Czech'; ln2.ro = 'Romanian'; ln2.fi = 'Finnish';
+ln2.se = 'Swedish'; ln2.hu = 'Hungarian'; ln2.sr = 'Serbian'; ln2.sl = 'Slovenian'; ln2.tr = 'Turkish';
+ln2.id = 'Indonesian'; ln2.uk = 'Ukrainian'; ln2.sr = 'Serbian'; ln2.th = 'Thai'; ln2.bg = 'Bulgarian';
+ln2.fa = 'Farsi'; ln2.tl = 'Tagalog';
 
 /**
  * Below is the asmCrypto SHA-256 library which was converted to a string so it can be run by the web worker which
@@ -1106,7 +1124,14 @@ else if (!b_u)
     d = window.d || 0;
     jj = window.jj || 0;
     var onBetaW = location.hostname === 'beta.mega.nz' || location.hostname.indexOf("developers.") === 0;
-    var languages = {'en':['en','en-'],'es':['es','es-'],'fr':['fr','fr-'],'de':['de','de-'],'it':['it','it-'],'nl':['nl','nl-'],'pt':['pt'],'br':['pt-br'],'se':['sv'],'fi':['fi'],'pl':['pl'],'cz':['cz','cs','cz-'],'sk':['sk','sk-'],'sl':['sl','sl-'],'hu':['hu','hu-'],'jp':['ja'],'cn':['zh','zh-cn'],'ct':['zh-hk','zh-sg','zh-tw'],'kr':['ko'],'ru':['ru','ru-mo'],'ar':['ar','ar-'],'he':['he'],'id':['id'],'sg':[],'tr':['tr','tr-'],'ro':['ro','ro-'],'uk':['||'],'sr':['||'],'th':['||'],'fa':['||'],'bg':['bg'],'tl':['en-ph'],'vi':['vn', 'vi']};
+    var languages = {
+        'en':['en','en-'], 'es':['es','es-'], 'fr':['fr','fr-'], 'de':['de','de-'], 'it':['it','it-'],
+        'nl':['nl','nl-'], 'br':['pt-br','pt'], 'se':['sv'], 'fi':['fi'], 'pl':['pl'], 'cz':['cz','cs','cz-'],
+        'sk':['sk','sk-'], 'sl':['sl','sl-'], 'hu':['hu','hu-'], 'jp':['ja'], 'cn':['zh','zh-cn'],
+        'ct':['zh-hk','zh-sg','zh-tw'], 'kr':['ko'], 'ru':['ru','ru-mo'], 'ar':['ar','ar-'], 'he':['he'],
+        'id':['id'], 'sg':[], 'tr':['tr','tr-'], 'ro':['ro','ro-'], 'uk':['||'], 'sr':['||'], 'th':['||'],
+        'fa':['||'], 'bg':['bg'], 'tl':['en-ph'], 'vi':['vn', 'vi']
+    };
 
     if (typeof console == "undefined") { this.console = { log: function() {}, error: function() {}}}
     if (d && !console.time) (function(c)
@@ -1509,6 +1534,9 @@ else if (!b_u)
 
     // MEGA CHAT
     if ((location.host === 'mega.nz' || !megaChatIsDisabled) && !is_mobile) {
+        jsl.push({f:'js/vendor/react.js', n: 'react', j:1, w:10});
+        jsl.push({f:'js/vendor/react-dom.js', n: 'react-dom', j:1, w:1});
+
         jsl.push({f:'js/chat/strongvelope.js', n: 'strongvelope_js', j:1, w:1});
         jsl.push({f:'js/chat/rtcStats.js', n: 'rtcstats_js', j:1, w:1});
         jsl.push({f:'js/chat/rtcSession.js', n: 'rtcsession_js', j:1, w:1});

@@ -19,7 +19,10 @@ var langDialog = {
         var $tierTwoLanguages = langDialog.$dialog.find('.tier-two-languages');
         
         // Main tier 1 languages that we support (based on usage analysis)
-        var tierOneLangCodes = ['es', 'en', 'br', 'ct', 'fr', 'de', 'ru', 'tr', 'it', 'pl', 'ar', 'nl', 'hu', 'cn', 'jp', 'kr', 'ro', 'he', 'se', 'id'];
+        var tierOneLangCodes = [
+            'es', 'en', 'br', 'ct', 'fr', 'de', 'ru', 'tr', 'it', 'ar',
+            'nl', 'hu', 'cn', 'jp', 'kr', 'ro', 'id', 'th', 'vi'
+        ];
 
         // Remove all the tier 1 languages and we have only the tier 2 languages remaining
         var allLangCodes = Object.keys(ln);
@@ -163,11 +166,7 @@ var langDialog = {
             // Update the template details
             $langHtml.attr('data-lang-code', langCode);
             $langHtml.find('.native-language-name').text(nativeName);
-
-            // Chrome/Safari not showing tooltip so use title text
-            if ('WebkitAppearance' in document.documentElement.style) {
-                $langHtml.attr('title', englishName);
-            }
+            $langHtml.attr('title', englishName);
 
             // If they have already chosen a language show it as selected
             if (langCode === lang) {

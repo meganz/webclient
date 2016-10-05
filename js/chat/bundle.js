@@ -249,7 +249,8 @@ React.makeElement = React['createElement'];
 	            'emoticonShortcutsFilter': EmoticonShortcutsFilter,
 	            'emoticonsFilter': EmoticonsFilter,
 	            'callFeedback': CallFeedback,
-	            'karerePing': KarerePing
+	            'karerePing': KarerePing,
+	            'persistedTypeArea': PersistedTypeArea
 	        },
 	        'chatNotificationOptions': {
 	            'textMessages': {
@@ -6621,6 +6622,7 @@ React.makeElement = React['createElement'];
 	                                chatRoom: self.props.chatRoom,
 	                                className: "main-typing-area",
 	                                disabled: room.isReadOnly(),
+	                                persist: true,
 	                                onUpEditPressed: function onUpEditPressed() {
 	                                    var foundMessage = false;
 	                                    room.messagesBuff.messages.keys().reverse().forEach(function (k) {
@@ -7836,8 +7838,10 @@ React.makeElement = React['createElement'];
 	        };
 	    },
 	    getInitialState: function getInitialState() {
+	        var initialText = this.props.initialText;
+
 	        return {
-	            typedMessage: this.props.initialText ? this.props.initialText : "",
+	            typedMessage: initialText ? initialText : "",
 	            textareaHeight: 20
 	        };
 	    },
@@ -7984,6 +7988,11 @@ React.makeElement = React['createElement'];
 	            jsp.scrollToY(0);
 	            $('.jspPane', $textareaScrollBlock).css({ 'top': 0 });
 	        }
+
+	        if (this.props.persist) {
+	            var megaChat = this.props.chatRoom.megaChat;
+	            megaChat.plugins.persistedTypeArea.removePersistedTypedValue(this.props.chatRoom);
+	        }
 	        return result;
 	    },
 	    onTypeAreaKeyDown: function onTypeAreaKeyDown(e) {
@@ -8076,6 +8085,17 @@ React.makeElement = React['createElement'];
 	            self.typing();
 	        }
 
+	        if (this.props.persist) {
+	            var megaChat = self.props.chatRoom.megaChat;
+	            if (megaChat.plugins.persistedTypeArea) {
+	                if ($.trim(e.target.value).length > 0) {
+	                    megaChat.plugins.persistedTypeArea.updatePersistedTypedValue(self.props.chatRoom, e.target.value);
+	                } else {
+	                    megaChat.plugins.persistedTypeArea.removePersistedTypedValue(self.props.chatRoom);
+	                }
+	            }
+	        }
+
 	        self.updateScroll(true);
 	    },
 	    focusTypeArea: function focusTypeArea() {
@@ -8107,6 +8127,32 @@ React.makeElement = React['createElement'];
 	            self.updateScroll(false);
 	        });
 	        self.triggerOnUpdate(true);
+	    },
+	    componentWillMount: function componentWillMount() {
+	        var self = this;
+	        var chatRoom = self.props.chatRoom;
+	        var megaChat = chatRoom.megaChat;
+	        var initialText = self.props.initialText;
+
+	        if (this.props.persist && megaChat.plugins.persistedTypeArea) {
+	            if (!initialText) {
+	                megaChat.plugins.persistedTypeArea.hasPersistedTypedValue(chatRoom).done(function () {
+	                    megaChat.plugins.persistedTypeArea.getPersistedTypedValue(chatRoom).done(function (r) {
+	                        if (self.state.typedMessage !== r) {
+	                            self.setState({
+	                                'typedMessage': r
+	                            });
+	                        }
+	                    });
+	                });
+	            }
+	            megaChat.plugins.persistedTypeArea.data.rebind('onChange.typingArea' + self.getUniqueId(), function (e, k, v) {
+	                if (chatRoom.roomJid.split("@")[0] == k) {
+	                    self.setState({ 'typedMessage': v ? v : "" });
+	                    self.triggerOnUpdate(true);
+	                }
+	            });
+	        }
 	    },
 	    componentWillUnmount: function componentWillUnmount() {
 	        var self = this;

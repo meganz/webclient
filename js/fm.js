@@ -7839,7 +7839,7 @@ function fillShareDialogWithContent() {
         pendingShares = Object(M.ps[nodeHandle]);
         userHandles   = userHandles.concat(Object.keys(pendingShares));
     }
-    userHandles = array_unique(userHandles);
+    var seen = {};
 
     userHandles.forEach(function(handle) {
         var user = M.getUser(handle) || Object(M.opc[handle]);
@@ -7847,11 +7847,12 @@ function fillShareDialogWithContent() {
         if (!user.m) {
             console.warn('Unknown user "%s"!', handle);
         }
-        else {
+        else if (!seen[user.m]) {
             var name  = M.getNameByHandle(handle) || user.m;
             var share = M.getNodeShare(node, handle) || Object(pendingShares[handle]);
 
             generateShareDialogRow(name, user.m, share.r | 0, handle);
+            seen[user.m] = 1;
         }
     });
 }

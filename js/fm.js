@@ -2993,7 +2993,7 @@ function accountUI() {
     }
 
     M.accountData(function(account) {
-        
+
         var perc, warning, perc_c;
         var id = document.location.hash;
 
@@ -3074,7 +3074,7 @@ function accountUI() {
 
             // Subscription
             if (account.stype == 'S') {
-        
+
                 $('.fm-account-header.typetitle').text(l[434]);
                 if (account.scycle == '1 M') {
                     $('.membership-big-txt.type').text(l[748]);
@@ -9715,9 +9715,7 @@ function propertiesDialog(close) {
     var fillPropertiesContactList = function(shares, pendingShares, totalSharesNum) {
 
         var DEFAULT_CONTACTS_NUMBER = 5;
-        var susers;
         var counter = 0;
-        var pendingShares = M.ps[n.h]
         var tmpStatus = '';
         var onlinestatus = '';
         var user;
@@ -9750,7 +9748,7 @@ function propertiesDialog(close) {
         }
 
         // Add outgoing pending contacts for node handle [n.h]
-        for (var userId in pendingShares) {
+        for (userId in pendingShares) {
             if (pendingShares.hasOwnProperty(userId)) {
 
                 if (++counter <= DEFAULT_CONTACTS_NUMBER) {
@@ -9780,7 +9778,7 @@ function propertiesDialog(close) {
                 + '</div>'
                 );
         }
-    }// END of fillPropertiesContactList function
+    };// END of fillPropertiesContactList function
 
     var pd = $('.fm-dialog.properties-dialog');
     var c = $('.properties-elements-counter span');
@@ -9948,7 +9946,7 @@ function propertiesDialog(close) {
             p.t7 = fm_contains(sfilecnt, sfoldercnt);
             if (pd.attr('class').indexOf('shared') > -1) {
 
-                var fullSharesNum = Object.keys(n.shares || {}).length; 
+                var fullSharesNum = Object.keys(n.shares || {}).length;
                 var pendingSharesNum = Object.keys(M.ps[n.h] || {}).length;
                 var totalSharesNum = fullSharesNum + pendingSharesNum;
 
@@ -9960,10 +9958,10 @@ function propertiesDialog(close) {
                 }
                 else {
                     p.t8 = l[1036] + ':';
-                    p.t9 = (totalSharesNum == 1) ? l[990] : l[989].replace("[X]", totalSharesNum);
+                    p.t9 = (totalSharesNum === 1) ? l[990] : l[989].replace("[X]", totalSharesNum);
                     p.t11 = n.ts ? htmlentities(time2date(n.ts)) : '';
                     p.t10 = p.t11 ? l[896] : '';
-                    $('.properties-elements-counter span').text(typeof n.r == "number" ? '' : totalSharesNum);
+                    $('.properties-elements-counter span').text(typeof n.r === "number" ? '' : totalSharesNum);
 
                     fillPropertiesContactList(n.shares, M.ps[n.h], totalSharesNum);
                 }
@@ -10075,7 +10073,7 @@ function propertiesDialog(close) {
             }
         });
 
-        // ToDo: Can we redirects to contacts page when user clicks? 
+        // ToDo: Can we redirects to contacts page when user clicks?
         $('.properties-context-item').rebind('click', function(e) {
             $('.contact-list-icon').removeClass('active');
             $('.properties-context-menu').fadeOut(200);
@@ -10085,7 +10083,7 @@ function propertiesDialog(close) {
         // By default only 5 contacts is shown
         $('.properties-context-item.show-more').rebind('click', function() {
 
-            // $('.properties-context-menu').fadeOut(200);            
+            // $('.properties-context-menu').fadeOut(200);
             $('.properties-dialog .properties-context-item')
                 .remove('.show-more')
                 .removeClass('hidden');// un-hide rest of contacts
@@ -11543,7 +11541,7 @@ var cancelSubscriptionDialog = {
                     cancelSubscriptionDialog.$backgroundOverlay.removeClass('hidden');
                     cancelSubscriptionDialog.$backgroundOverlay.addClass('payment-dialog-overlay');
                     cancelSubscriptionDialog.initCloseButtonSuccessDialog();
-                    
+
                     // Reset account cache so all account data will be refetched and re-render the account page UI
                     M.account.lastupdate = 0;
                     accountUI();

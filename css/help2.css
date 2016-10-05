@@ -1642,7 +1642,7 @@
     /* Internet Explorer 5.5+ */
     padding-top: 0;
     margin-bottom: 20px;
-    text-align: justify;
+    text-align: left;
 }
 #help2-main .support-article-info .support-image-instructions p, #help2-main .support-article-info .mobile-support-image-instructions p {
     font-family: 'source_sans_proregular';
@@ -2682,7 +2682,6 @@
 }
 #help2-main .support-go-back-heading {
     display: inline-block;
-    line-height: 14px;
     min-width: 50px;
     color: #fff;
 }

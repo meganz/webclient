@@ -277,21 +277,16 @@ a, a:link, a:visited, a:hover, a:active, a:focus img, a:focus img {
     float: left
 }
 .nlanguage-lnk, a.nlanguage-lnk, a.nlanguage-lnk:link, a.nlanguage-lnk:visited, a.nlanguage-lnk:hover, a.nlanguage-lnk:active {
-    border: 2px solid transparent;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
+    border: 2px solid #fff;
     border-radius: 4px;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
     box-sizing: border-box;
     color: #605f5d;
-    display: block;
+    cursor: pointer;
+    display: inline-block;
     font-size: 14px;
-    height: 28px;
-    line-height: 23px;
     padding: 0 10px;
     position: relative;
-    cursor: pointer;
+    width: 163px;
 }
 a.nlanguage-lnk:hover {
     border: 2px solid #D31A00;
@@ -323,14 +318,6 @@ a.nlanguage-lnk.language-template {
 .languages-dialog-body {
     padding: 10px 20px 10px 10px;
 }
-.languages-dialog .tier-one-languages, .languages-dialog .tier-two-languages {
-    -webkit-column-count: 4;
-    -moz-column-count: 4;
-    column-count: 4;
-    -webkit-column-width: 163px;
-    -moz-column-width: 163px;
-    column-width: 163px;
-}
 .languages-dialog .tier-one-languages {
     margin-top: 15px;
 }
@@ -338,6 +325,9 @@ a.nlanguage-lnk.language-template {
     display: none;
     margin-top: 20px;
     padding-bottom: 65px;
+}
+.languages-dialog .native-language-name {
+    line-height: 28px;
 }
 .languages-dialog .show-more-languages {
     cursor: pointer;

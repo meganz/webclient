@@ -9708,13 +9708,13 @@ function propertiesDialog(close) {
     /*
     * fillPropertiesContactList, Handles node properties/info dialog contact list content
     *
-    * @param {Object} n Node related shares
+    * @param {Object} shares Node related shares
     * @param {Object} pendingShares Node related pending shares
+    * @param {Number} totalSharesNum
     */
-    var fillPropertiesContactList = function(n, pendingShares) {
+    var fillPropertiesContactList = function(shares, pendingShares, totalSharesNum) {
 
         var DEFAULT_CONTACTS_NUMBER = 5;
-        var sharesNum;
         var susers;
         var counter = 0;
         var pendingShares = M.ps[n.h]
@@ -9727,8 +9727,8 @@ function propertiesDialog(close) {
                         .append('<div class="properties-context-arrow"></div>');
 
         // Add contacts with full contact relation
-        for (var userId in n.shares) {
-            if (n.shares.hasOwnProperty(userId)) {
+        for (var userId in shares) {
+            if (shares.hasOwnProperty(userId)) {
 
                 if (++counter <= DEFAULT_CONTACTS_NUMBER) {
                     hiddenClass = '';
@@ -9773,12 +9773,14 @@ function propertiesDialog(close) {
         var hiddenNum = totalSharesNum - DEFAULT_CONTACTS_NUMBER;
         var repStr = l[10663];// '... and [X] more';
 
-        susers.append(
-            '<div class="properties-context-item show-more">'
-            + '<span>...' + repStr.replace('[X]', hiddenNum) + '</span>'
-            + '</div>'
-            );
-    }
+        if (hiddenNum > 0) {
+            susers.append(
+                '<div class="properties-context-item show-more">'
+                + '<span>...' + repStr.replace('[X]', hiddenNum) + '</span>'
+                + '</div>'
+                );
+        }
+    }// END of fillPropertiesContactList function
 
     var pd = $('.fm-dialog.properties-dialog');
     var c = $('.properties-elements-counter span');
@@ -9944,9 +9946,11 @@ function propertiesDialog(close) {
         if (foldercnt) {
             p.t6 = l[897] + ':';
             p.t7 = fm_contains(sfilecnt, sfoldercnt);
-            // if ((pd.attr('class').indexOf('shared') > -1)
-            //         && ($.selected.length <= 1)) {
             if (pd.attr('class').indexOf('shared') > -1) {
+
+                var fullSharesNum = Object.keys(n.shares || {}).length; 
+                var pendingSharesNum = Object.keys(M.ps[n.h] || {}).length;
+                var totalSharesNum = fullSharesNum + pendingSharesNum;
 
                 // In case that user doesn't share with other
                 // Or in case that more then one node is selected
@@ -9955,17 +9959,13 @@ function propertiesDialog(close) {
                     p.hideContacts = true;
                 }
                 else {
-                    var fullSharesNum = Object.keys(n.shares || {}).length; 
-                    var pendingSharesNum = Object.keys(M.ps[n.h] || {}).length;
-                    var totalSharesNum = fullSharesNum + pendingSharesNum;
-
                     p.t8 = l[1036] + ':';
                     p.t9 = (totalSharesNum == 1) ? l[990] : l[989].replace("[X]", totalSharesNum);
                     p.t11 = n.ts ? htmlentities(time2date(n.ts)) : '';
                     p.t10 = p.t11 ? l[896] : '';
                     $('.properties-elements-counter span').text(typeof n.r == "number" ? '' : totalSharesNum);
 
-                    fillPropertiesContactList(n, M.ps[n.h]);
+                    fillPropertiesContactList(n.shares, M.ps[n.h], totalSharesNum);
                 }
             }
             if (pd.attr('class').indexOf('shared-with-me') > -1) {
@@ -10051,7 +10051,6 @@ function propertiesDialog(close) {
 
     if (pd.attr('class').indexOf('shared') > -1) {
         $('.contact-list-icon').rebind('click', function() {
-
             if ($(this).attr('class').indexOf('active') == -1) {
                 $(this).addClass('active');
                 $('.properties-context-menu').css({
@@ -10062,6 +10061,16 @@ function propertiesDialog(close) {
                 $('.properties-context-menu').fadeIn(200);
             } else {
                 $(this).removeClass('active');
+                $('.properties-context-menu').fadeOut(200);
+            }
+
+            return false;
+        });
+
+        $('.properties-dialog').rebind('click', function() {
+            var $list = $('.contact-list-icon');
+            if ($list.attr('class').indexOf('active') !== -1) {
+                $list.removeClass('active');
                 $('.properties-context-menu').fadeOut(200);
             }
         });

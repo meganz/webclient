@@ -1963,8 +1963,6 @@ function MegaData()
 
     var icon = '<span class="context-menu-icon"></span>';
     var arrow = '<span class="context-top-arrow"></span><span class="context-bottom-arrow"></span>';
-    // divider & advanced
-    var adv = '<span class="context-menu-divider"></span><span class="context-menu-item advanced-item"><span class="context-menu-icon"></span>Select Location</span>';
 
     this.buildRootSubMenu = function() {
 
@@ -1981,9 +1979,17 @@ function MegaData()
         }
 
         html = '<span class="context-submenu" id="sm_move"><span id="csb_move">';
-        html += '<span class="context-menu-item cloud-item' + cs + '" id="fi_' + this.RootID + '">' + icon + 'Cloud Drive' + '</span>' + sm;
-        html += '<span class="context-menu-item remove-item" id="fi_' + this.RubbishID + '">' + icon + 'Rubbish Bin' + '</span>';
-        html += adv;
+        html += '<span class="context-menu-item cloud-item' + cs + '" id="fi_' + this.RootID + '">';
+        html +=     icon + l[1687];
+        html += '</span>' + sm;
+        html += '<span class="context-menu-item remove-item" id="fi_' + this.RubbishID + '">';
+        html +=     icon + l[5738];
+        html += '</span>';
+        html += '<span class="context-menu-divider"></span>'
+              + '<span class="context-menu-item advanced-item">'
+              +     '<span class="context-menu-icon"></span>'
+              +     l[9108]
+              + '</span>';
         html += arrow;
         html += '</span></span>';
 
@@ -3956,6 +3962,62 @@ function MegaData()
             if (user instanceof MegaDataObject) {
                 user = user._data;
             }
+        }
+
+        if (!user && handle === u_handle) {
+            user = u_attr;
+        }
+
+        return user;
+    };
+
+    /**
+     * Retrieve an user object by its email
+     * @param {String} email The user's handle
+     * @return {Object} The user object, of false if not found
+     */
+    this.getUserByEmail = function(email) {
+        var user = false;
+
+        M.u.every(function(contact, u) {
+            if (M.u[u].m === email) {
+                // Found the user object
+                user = M.u[u];
+
+                if (user instanceof MegaDataObject) {
+                    user = user._data;
+                }
+                return false;
+            }
+            return true;
+        });
+
+        return user;
+    };
+
+    /**
+     * Retrieve an user object
+     * @param {String} str An email or handle
+     * @return {Object} The user object, of false if not found
+     */
+    this.getUser = function(str) {
+        var user = false;
+
+        if (typeof str !== 'string') {
+            // Check if it's an user object already..
+
+            if (Object(str).hasOwnProperty('u')) {
+                // Yup, likely.. let's see
+                user = this.getUserByHandle(str.u);
+            }
+        }
+        else if (str.length === 11) {
+            // It's an user handle
+            user = this.getUserByHandle(str);
+        }
+        else if (str.indexOf('@') > 0) {
+            // It's an email..
+            user = this.getUserByEmail(str);
         }
 
         return user;

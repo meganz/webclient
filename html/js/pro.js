@@ -2141,15 +2141,14 @@ var directReseller = {
 
         // Gary at 6media
         if (provider === 1) {
-            // Must perform a country test, as Gary has a different url for Japan
-            var country = utcResult['EUR']['cc'];
-            var baseurl = 'https://mega.and1.tw/zh_tw/order_mega.php?';
+            // Gary has a different urls for different countries, we modify the url based on
+            // where the API thinks we should go
+            var urlmod = utcResult['EUR']['urlmod'];
+            var baseurl = 'https://mega.and1.tw/';
 
             // Check that country is defined, as originally the API did not provide it
-            if (typeof country !== 'undefined') {
-                if (country.toLowerCase() === 'jp') {
-                    baseurl = 'https://mega.and1.tw/jp/order_mega.php?';
-                }
+            if (typeof urlmod !== 'undefined') {
+                baseurl += urlmod;
             }
             window.location =  baseurl + params;
         }

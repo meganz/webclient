@@ -33,8 +33,7 @@ echo "4. Applied $current_branch.diff"
 echo "---"
 
 rm $current_branch.diff
-git add .
 git status
 
-echo "5. Ready to commit and push with git push -u origin $current_branch-squashed"
+echo "5. Ready to add files, commit and push with 'git push -u origin $current_branch-squashed'"
 echo "---"

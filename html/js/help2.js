@@ -793,7 +793,7 @@ var Help = (function() {
         });
     }
 
-    CMS.index("help_en", function(err, blobs) {
+    CMS.index("help_" + lang, function(err, blobs) {
         if (err) {
             return alert("Invalid response from the server");
         }

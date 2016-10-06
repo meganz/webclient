@@ -4519,7 +4519,7 @@ function passwordManager(form) {
     if (is_chrome_firefox) {
         var creds = passwordManager.pickFormFields(form);
         if (creds) {
-            mozLoginManager.saveLogin(creds.usr, creds.pwd);
+            mozRunAsync(mozLoginManager.saveLogin.bind(mozLoginManager, creds.usr, creds.pwd));
         }
         $(form).find('input').val('');
         return;

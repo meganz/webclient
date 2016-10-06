@@ -983,6 +983,13 @@ if (is_ios) {
         }
     }
     tmp = undefined;
+
+    if (m) {
+        // Prevent Safari's copy&paste bug..
+        window.onhashchange = function() {
+            location.reload();
+        };
+    }
 }
 
 if (m)

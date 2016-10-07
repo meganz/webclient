@@ -3687,6 +3687,12 @@
     "10661": "Lahko [B]dodajate in urejate stike[\/B] v tabu Stiki, potem varno govorite in delite datoteke z njimi z uporabo MEGAchat.",
     "10662": "Varno komunicirajte s svojo dru\u017eino, prijatelji in kolegi z uporabo na\u0161ega audio\/video in tekstovnega pogovora z uporabni\u0161ko nazdirano enkripcijo od prve do zadnje to\u010dke.",
     "10663": "... and [X] more",
+    "12432": "Due to our advanced end-to-end encryption we do not yet support mobile browsers.",
+    "12433": "To use our service, you can either open MEGA on a desktop or laptop browser, or download the MEGA app.",
+    "12434": "To use our service, you can open MEGA on a desktop or laptop browser. A dedicated app for your platform will be coming soon.",
+    "12435": "To view this link, you can either open it on a desktop or laptop browser, or download the MEGA app.",
+    "12436": "Do you already have the MEGA app installed?",
+    "12437": "If you already have it installed [A]click here![\/A]",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

@@ -3687,6 +3687,12 @@
     "10661": "\uc5f0\ub77d\ucc98 \ud0ed\uc5d0\uc11c [B]\uc5f0\ub77d\ucc98\ub97c \ucd94\uac00\ud558\uace0 \uad00\ub9ac[\/B]\ud560 \uc218 \uc788\uace0, MEGAchat\uc744 \uc774\uc6a9\ud558\uc5ec \uc548\uc804\ud558\uac8c \ub300\ud654\ud558\uace0 \ud30c\uc77c\uc744 \uacf5\uc720\ud560 \uc218 \uc788\uc2b5\ub2c8\ub2e4.",
     "10662": "\uc774\uc6a9\uc790\uac00 \ud1b5\uc81c\ud558\ub294 \uc885\ub2e8\uac04 \uc554\ud638\ud654\ub97c \uc774\uc6a9\ud558\uc5ec \ub2f9\uc2e0\uc758 \uac00\uc871, \uce5c\uad6c\ub4e4, \ub3d9\ub8cc\ub4e4\uacfc \uc548\uc804\ud558\uac8c \ud1b5\uc2e0\ud558\uc138\uc694.",
     "10663": "... and [X] more",
+    "12432": "Due to our advanced end-to-end encryption we do not yet support mobile browsers.",
+    "12433": "To use our service, you can either open MEGA on a desktop or laptop browser, or download the MEGA app.",
+    "12434": "To use our service, you can open MEGA on a desktop or laptop browser. A dedicated app for your platform will be coming soon.",
+    "12435": "To view this link, you can either open it on a desktop or laptop browser, or download the MEGA app.",
+    "12436": "Do you already have the MEGA app installed?",
+    "12437": "If you already have it installed [A]click here![\/A]",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

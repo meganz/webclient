@@ -3687,6 +3687,12 @@
     "10661": "Mo\u017cesz [B]dodawa\u0107 i edytowa\u0107 kontakty[\/B] w zak\u0142adce Kontakty, a nast\u0119pnie bezpiecznie czatowa\u0107 i udost\u0119pnia\u0107 pliki korzystaj\u0105c z MEGAchat.",
     "10662": "Komunikuj si\u0119 bezpiecznie z rodzin\u0105, przyjaci\u00f3\u0142mi i znajomymi korzystaj\u0105c z rozm\u00f3w audio\/video lub czatuj\u0105c. Wszystkie wiadomo\u015bci s\u0105 szyfrowane.",
     "10663": "... and [X] more",
+    "12432": "Due to our advanced end-to-end encryption we do not yet support mobile browsers.",
+    "12433": "To use our service, you can either open MEGA on a desktop or laptop browser, or download the MEGA app.",
+    "12434": "To use our service, you can open MEGA on a desktop or laptop browser. A dedicated app for your platform will be coming soon.",
+    "12435": "To view this link, you can either open it on a desktop or laptop browser, or download the MEGA app.",
+    "12436": "Do you already have the MEGA app installed?",
+    "12437": "If you already have it installed [A]click here![\/A]",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

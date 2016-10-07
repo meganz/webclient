@@ -3687,6 +3687,12 @@
     "10661": "Na kart\u011b Kontakty m\u016f\u017eete [B]p\u0159idat a spravovat kontakty[\/B], pak bezpe\u010dn\u011b chatovat a sd\u00edlet soubory pomoc\u00ed MEGAchatu.",
     "10662": "Komunikujte bezpe\u010dn\u011b se svou rodinou, p\u0159\u00e1teli a kolegy pomoc\u00ed na\u0161eho audio\/video a textov\u00e9ho chatu s u\u017eivatelem \u0159\u00edzen\u00fdm koncov\u00fdm \u0161ifrov\u00e1n\u00edm.",
     "10663": "... a [X] dal\u0161\u00edch",
+    "12432": "Due to our advanced end-to-end encryption we do not yet support mobile browsers.",
+    "12433": "To use our service, you can either open MEGA on a desktop or laptop browser, or download the MEGA app.",
+    "12434": "To use our service, you can open MEGA on a desktop or laptop browser. A dedicated app for your platform will be coming soon.",
+    "12435": "To view this link, you can either open it on a desktop or laptop browser, or download the MEGA app.",
+    "12436": "Do you already have the MEGA app installed?",
+    "12437": "If you already have it installed [A]click here![\/A]",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

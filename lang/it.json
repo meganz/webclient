@@ -3687,6 +3687,12 @@
     "10661": "Puoi [B]aggiungere e gestire contatti[\/B] nella sezione Contatti e messaggiare e scambiare file in totale sicurezza con MEGAchat.",
     "10662": "Comunica in totale sicurezza con la tua famiglia, i tuoi amici e i tuoi colleghi usando la nostra chat di testo, audio e video con la criptazione end-to-end controllata dall&#039;utente.",
     "10663": "... e altri [X]",
+    "12432": "Due to our advanced end-to-end encryption we do not yet support mobile browsers.",
+    "12433": "To use our service, you can either open MEGA on a desktop or laptop browser, or download the MEGA app.",
+    "12434": "To use our service, you can open MEGA on a desktop or laptop browser. A dedicated app for your platform will be coming soon.",
+    "12435": "To view this link, you can either open it on a desktop or laptop browser, or download the MEGA app.",
+    "12436": "Do you already have the MEGA app installed?",
+    "12437": "If you already have it installed [A]click here![\/A]",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

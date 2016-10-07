@@ -3687,6 +3687,12 @@
     "10661": "Ki\u015filer sekmesinden [B]ki\u015filerinizi ekleyip d\u00fczenleyebilirsiniz[\/B], sonra da MEGAchat \u00fczerinden g\u00fcvenle konu\u015fup dosya payla\u015fabilirsiniz.",
     "10662": "Kullan\u0131c\u0131 kontroll\u00fc u\u00e7tan uca \u015fifreleme ile ses\/video ve metin sohbetini kullanarak aileniz, arkada\u015flar\u0131n\u0131z ve meslekta\u015flar\u0131n\u0131zla g\u00fcvenli bir \u015fekilde ileti\u015fim kurabilirsiniz.",
     "10663": "... ve [X] fazlas\u0131",
+    "12432": "Due to our advanced end-to-end encryption we do not yet support mobile browsers.",
+    "12433": "To use our service, you can either open MEGA on a desktop or laptop browser, or download the MEGA app.",
+    "12434": "To use our service, you can open MEGA on a desktop or laptop browser. A dedicated app for your platform will be coming soon.",
+    "12435": "To view this link, you can either open it on a desktop or laptop browser, or download the MEGA app.",
+    "12436": "Do you already have the MEGA app installed?",
+    "12437": "If you already have it installed [A]click here![\/A]",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

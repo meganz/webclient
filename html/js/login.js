@@ -116,13 +116,11 @@ function doConfirm(email, password, callback) {
                             msgDialog(
                                 "warninga",
                                 "Account Activation Error",
-                                "There is two possible solutions for current account activation problem:\
-                                    1. Logout from this ephemeral session and then re-try with account activation using the same activation link,\
-                                    2. Create New Account from this ephemeral session and then re-try account activation using new activation link."
-                                    );
+                                "You are using an ephemeral session in this browser. If you want to preserve the uploaded data, click 'Register' in the tab where you see your data.\
+                                    If you don't care about the data, click 'Logout' and re-try the account confirmation using the same link.");// l[12439]
                         }
                         else {
-                            msgDialog("warninga", "Account Activation Error", "Logout from account and then re-try with account activation using same activation link.");
+                            msgDialog("warninga", "Account Activation Error", "You are logged in to MEGA account from this browser. Click 'Logout' first and then re-try the account confirmation using the same link.");// l[12440]
                         }
                     }
                     else {

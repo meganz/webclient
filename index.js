@@ -58,6 +58,10 @@ function startMega() {
         $('body').safeAppend(translate(pages['dialogs'].replace(/{staticpath}/g, staticpath)));
         delete pages['dialogs'];
     }
+    if (pages['onboarding']) {
+        $('body').safeAppend(translate(pages['onboarding'].replace(/{staticpath}/g, staticpath)));
+        delete pages['onboarding'];
+    }
     if (pages['chat']) {
         $('body').safeAppend(translate(pages['chat'].replace(/{staticpath}/g, staticpath)));
         delete pages['chat'];
@@ -2056,4 +2060,5 @@ if (!is_karma && !is_mobile) {
     attribCache = new IndexedDBKVStorage('attrib', { murSeed: 0x800F0002 });
     attribCache.syncNameTimer = {};
     attribCache.uaPacketParser = uaPacketParser;
+    attribCache.bitMapsManager = new MegaDataBitMapManager();
 }

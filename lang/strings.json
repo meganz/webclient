@@ -6455,6 +6455,10 @@
         "text": "You are significantly over your allowed storage allocation, and your uploads have been disabled. Please ensure you are on the correct MEGA PRO plan, or contact support@mega.nz.",
         "context": ""
     },
+    "5930": {
+        "text": "Cancel request",
+        "context": "button"
+    },
     "5931": {
         "text": "Click [A]here[\/A] to view your storage usage.",
         "context": "The placeholder \"[A]\" and \"[\/A]\" are important. They will be converted into a link. "
@@ -8660,7 +8664,7 @@
         "context": "Information on the over bandwidth quota dialog."
     },
     "7099": {
-        "text": "You have utilized %1 of data transfer in the last 6 hours, which took you over our current limit. To circumvent this limit, you can [A]upgrade to PRO[\/A], which will give you your own bandwidth package and also ample extra storage space. ",
+        "text": "The IP address you are using has utilised %1 of data transfer in the last 6 hours, which took you over our current limit. To remove this limit, you can [A]upgrade to PRO[\/A], which will give you your own bandwidth package and also ample extra storage space. ",
         "context": "Information on the over bandwidth quota dialog.\r\n\r\n%1 is the amount of bandwidth they have used e.g. 532 MB."
     },
     "7100": {
@@ -12488,7 +12492,7 @@
         "context": "A button title for the find duplicates feature. This allows the user to search for multiple copies of a file within their account."
     },
     "8595": {
-        "text": "This folder will be decrypted as soon as the cryptographic key becomes available.",
+        "text": "This folder will be decrypted as soon as the cryptographic key becomes available (when the share creator logs in again).",
         "context": "A tooltip message for undecryptable folders."
     },
     "8596": {
@@ -12512,7 +12516,7 @@
         "context": "This option in the account settings allows users to download files with the external MEGAsync program if it is running in the background. Otherwise they will normally download through the browser.\r\n"
     },
     "8602": {
-        "text": "This file will be decrypted as soon as the cryptographic key becomes available.",
+        "text": "This file will be decrypted as soon as the cryptographic key becomes available (when the share creator logs in again).",
         "context": "A tooltip message for undecryptable file."
     },
     "8603": {

@@ -9720,9 +9720,10 @@ function propertiesDialog(close) {
         var onlinestatus = '';
         var user;
         var hiddenClass = '';
-        var susers = pd.find('.properties-body .properties-context-menu')
+        var $shareUsers = pd.find('.properties-body .properties-context-menu')
                         .empty()
                         .append('<div class="properties-context-arrow"></div>');
+        var shareUsersHtml = '';
 
         // Add contacts with full contact relation
         for (var userId in shares) {
@@ -9739,10 +9740,10 @@ function propertiesDialog(close) {
                     user = M.u[userId];
                     tmpStatus = megaChatIsReady && megaChat.karere.getPresence(megaChat.getJidFromNodeId(user.u));
                     onlinestatus = M.onlineStatusClass(tmpStatus);
-                    susers.append('<div class="properties-context-item ' + onlinestatus[1] + ' ' +  hiddenClass + '">'
+                    shareUsersHtml += '<div class="properties-context-item ' + onlinestatus[1] + ' ' +  hiddenClass + '">'
                         + '<div class="properties-contact-status"></div>'
                         + '<span>' + htmlentities(user.name || user.m) + '</span>'
-                        + '</div>');
+                        + '</div>';
                 }
             }
         }
@@ -9760,10 +9761,10 @@ function propertiesDialog(close) {
 
                 if (M.opc[userId]) {
                     user = M.opc[userId];
-                    susers.append('<div class="properties-context-item offline ' + hiddenClass + '">'
+                    shareUsersHtml += '<div class="properties-context-item offline ' + hiddenClass + '">'
                         + '<div class="properties-contact-status"></div>'
                         + '<span>' + htmlentities(user.m) + '</span>'
-                        + '</div>');
+                        + '</div>';
                 }
             }
         }
@@ -9772,11 +9773,13 @@ function propertiesDialog(close) {
         var repStr = l[10663];// '... and [X] more';
 
         if (hiddenNum > 0) {
-            susers.append(
-                '<div class="properties-context-item show-more">'
+            shareUsersHtml += '<div class="properties-context-item show-more">'
                 + '<span>...' + repStr.replace('[X]', hiddenNum) + '</span>'
-                + '</div>'
-                );
+                + '</div>';
+        }
+
+        if (shareUsersHtml !== '') {
+            $shareUsers.append(shareUsersHtml);
         }
     };// END of fillPropertiesContactList function
 

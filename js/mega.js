@@ -4485,10 +4485,16 @@ function MegaData()
                     $tr.find('.left-c p').css('transform', 'rotate(' + (transferDeg - 180) + 'deg)');
                 }
                 if (retime > 0) {
+                    var title = '';
+                    try {
+                        title = new Date((unixtime() + retime) * 1000).toLocaleString();
+                    }
+                    catch (ex) {
+                    }
                     $tr.find('.eta')
                         .text(secondsToTime(retime))
                         .removeClass('unknown')
-                        .attr('title', new Date((unixtime() + retime) * 1000).toLocaleString());
+                        .attr('title', title);
                 }
                 else {
                     $tr.find('.eta').addClass('unknown').text('');

@@ -8,11 +8,14 @@ var JinglePlugin = {
     HAS_CAM: 8,
     RtcOptions: {},
     init: function (conn) {
+        if (!RTC) {
+            throw new RtcSession.NotSupportedError("Bug: Attempting to initialize the JinglePlugin, but there is no webRTC support in this browser");
+        }
         this.sessions = {};
         this.callRequests = {};
         this.ice_config = {iceServers: []};
         this.pc_constraints = {};
-        if (RTC && RTC.browser === "firefox") {
+        if (RTC.browser === "firefox") {
             this.media_constraints = {
                 'offerToReceiveAudio': true,
                 'offerToReceiveVideo': true
@@ -51,7 +54,7 @@ var JinglePlugin = {
             if (info.e) {
                 var e = info.e;
                 if (e.stack) {
-                    if (RTC && (RTC.browser === 'chrome' || RTC.browser === 'opera')) {
+                    if (RTC.browser === 'chrome' || RTC.browser === 'opera') {
                         info.e = e.stack.toString();
                     } else {
                         info.e = e.toString()+'\n'+e.stack.toString();
@@ -94,8 +97,7 @@ var JinglePlugin = {
 // request is received from the network
         this.callAnswerTimeout = 50000;
         this.rtcSetup();
-        if (RTC)
-            this.registerDiscoCaps();
+        this.registerDiscoCaps();
     },
     registerDiscoCaps:function() {
         if (!this.connection.disco)
@@ -116,28 +118,21 @@ var JinglePlugin = {
         function addVideoCaps() {
             self.connection.disco.addNode('urn:xmpp:jingle:apps:rtp:video', {});
         }
-//        if (localStorage.megaDisableMediaInputs === undefined)
-//            RTC.queryMediaInputPermissions();
+
         var o = JinglePlugin;
         var mediaFlags = localStorage.megaMediaInputFlags;
         if (mediaFlags === undefined)
             mediaFlags = (o.HAS_MIC | o.HAS_CAM);
 
-        if (RTC.getMediaInputTypesFromScan) {
-            RTC.getMediaInputTypesFromScan(function(types) {
+        RTC.getMediaInputTypes()
+        .then(function(types) {
                 var hasAudio = (types.audio && !(mediaFlags & o.DISABLE_MIC));
                 var hasVideo = (types.video && !(mediaFlags & o.DISABLE_CAM));
                 if (hasAudio)
                     addAudioCaps();
                 if (hasVideo)
                     addVideoCaps();
-            });
-        } else { //if we can't detect, we assume we have both
-            if ((mediaFlags & o.HAS_MIC) && !(mediaFlags & o.DISABLE_MIC))
-                addAudioCaps();
-            if ((mediaFlags & o.HAS_CAM) && !(mediaFlags & o.DISABLE_CAM))
-                addVideoCaps();
-        }
+        });
     },
     /*
         Globally configures the webRTC abstraction layer

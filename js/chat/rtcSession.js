@@ -961,7 +961,11 @@ hangupAll: function(reason, text)
         @property {string} peer The full jid of the peer
         @property {SessWrapper} sess
         */
-        this.trigger('remote-player-remove', {id: '#'+this.vidIdFromSid(sess.sid), peer: sess.peerjid, sess:new SessWrapper(sess)});
+        this.trigger('remote-player-remove', {
+            id: '#'+this.vidIdFromSid(sess.sid),
+            peer: sess.peerjid,
+            sess:new SessWrapper(sess)
+        });
     },
 
     onMediaRecv: function(playerElem, sess, stream) {

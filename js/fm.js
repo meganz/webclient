@@ -10557,7 +10557,11 @@ function fm_importflnodes(nodes)
             document.location.hash = 'fm';
 
             $(document).one('onInitContextUI', SoonFc(function(e) {
-                if (ASSERT(M.RootID != FLRootID, 'Unexpected openFolder on Import')) {
+                if (M.RootID === FLRootID) {
+                    // TODO: How to reproduce this?
+                    console.warn('Unable to complete import, apparnetly we did not reached the cloud.');
+                }
+                else {
                     if (d) console.log('Importing Nodes...', sel, $.onImportCopyNodes);
 
                     $.selected = sel;

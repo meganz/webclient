@@ -342,7 +342,12 @@ Chatd.Shard.prototype.reconnect = function() {
     self.s.onopen = function(e) {
         self.keepAliveTimerRestart();
         self.logger.log('chatd connection established');
-        self.triggerSendIfAble();
+        if (!self.triggerSendIfAble()) {
+            // XXX: websocket.send() failed for whatever reason, onerror should
+            //      have been called and the connection restablished afterwards.
+            self.logger.error('chatd connection closed unexpectedly...');
+            return;
+        }
         self.rejoinexisting();
         self.chatd.trigger('onOpen', {
             shard: self
@@ -350,7 +355,7 @@ Chatd.Shard.prototype.reconnect = function() {
         // Resending of pending message should be done via the integration code, since it have more info and a direct
         // relation with the UI related actions on pending messages (persistence, user can click resend/cancel/etc).
         self.resendpending();
-        
+
         self.chatd.trigger('onOpen', {
             shard: self
         });
@@ -429,7 +434,13 @@ Chatd.Shard.prototype.triggerSendIfAble = function() {
             for (var i = this.cmdq.length; i--;) {
                 a[i] = this.cmdq.charCodeAt(i);
             }
-            this.s.send(a);
+
+            try {
+                this.s.send(a);
+            }
+            catch (ex) {
+                return false;
+            }
 
             this.cmdq = '';
         }

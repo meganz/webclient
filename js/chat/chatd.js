@@ -445,6 +445,7 @@ Chatd.Shard.prototype.triggerSendIfAble = function() {
             this.cmdq = '';
         }
     }
+    return true;
 };
 
 // rejoin all open chats after reconnection (this is mandatory)

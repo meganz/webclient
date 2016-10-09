@@ -2236,8 +2236,9 @@ function fmremove() {
             }
         });
         $('.fm-dialog-button.notification-button').each(function(i, e) {
-            if ($(e).text() === l[1018])
-                $(e).html('<span>'+l[83]+'</span>');
+            if ($(e).text() === l[1018]) {
+                $(e).safeHTML('<span>@@</span>', l[83]);
+            }
         });
     }
 
@@ -4511,7 +4512,38 @@ function avatarDialog(close)
     $.dialog = 'avatar';
     $('.fm-dialog.avatar-dialog').removeClass('hidden');
     fm_showoverlay();
-    $('.avatar-body').html('<div id="avatarcrop"><div class="image-upload-and-crop-container"><div class="image-explorer-container empty"><div class="image-explorer-image-view"><img class="image-explorer-source"><div class="avatar-white-bg"></div><div class="image-explorer-mask circle-mask"></div><div class="image-explorer-drag-delegate"></div></div><div class="image-explorer-scale-slider-wrapper"><input class="image-explorer-scale-slider disabled" type="range" min="0" max="100" step="1" value="0" disabled=""></div></div><div class="fm-notifications-bottom"><input type="file" id="image-upload-and-crop-upload-field" class="image-upload-field" accept="image/jpeg, image/gif, image/png"><label for="image-upload-and-crop-upload-field" class="image-upload-field-replacement fm-account-change-avatar"><span>' + l[1016] + '</span></label><div class="fm-account-change-avatar" id="fm-change-avatar"><span>' + l[1017] + '</span></div><div  class="fm-account-change-avatar" id="fm-cancel-avatar"><span>Cancel</span></div><div class="clear"></div></div></div></div>');
+    $('.avatar-body').safeHTML(
+        '<div id="avatarcrop">' +
+            '<div class="image-upload-and-crop-container">' +
+                '<div class="image-explorer-container empty">' +
+                    '<div class="image-explorer-image-view">' +
+                        '<img class="image-explorer-source" />' +
+                        '<div class="avatar-white-bg"></div>' +
+                        '<div class="image-explorer-mask circle-mask"></div>' +
+                        '<div class="image-explorer-drag-delegate"></div>' +
+                    '</div>' +
+                    '<div class="image-explorer-scale-slider-wrapper">' +
+                        '<input class="image-explorer-scale-slider disabled" type="range" ' +
+                            'min="0" max="100" step="1" value="0" disabled="" />' +
+                    '</div>' +
+                '</div>' +
+                '<div class="fm-notifications-bottom">' +
+                    '<input type="file" id="image-upload-and-crop-upload-field" class="image-upload-field" ' +
+                        'accept="image/jpeg, image/gif, image/png" />' +
+                    '<label for="image-upload-and-crop-upload-field" ' +
+                        'class="image-upload-field-replacement fm-account-change-avatar">' +
+                        '<span>@@</span>' +
+                    '</label>' +
+                    '<div class="fm-account-change-avatar" id="fm-change-avatar">' +
+                        '<span>@@</span>' +
+                    '</div>' +
+                    '<div  class="fm-account-change-avatar" id="fm-cancel-avatar">' +
+                        '<span>@@</span>' +
+                    '</div>' +
+                    '<div class="clear"></div>' +
+                '</div>' +
+            '</div>' +
+        '</div>', l[1016], l[1017], l[82]);
     $('#fm-change-avatar').hide();
     $('#fm-cancel-avatar').hide();
     var imageCrop = new ImageUploadAndCrop($("#avatarcrop").find('.image-upload-and-crop-container'),
@@ -6152,10 +6184,10 @@ function menuItems() {
         items['.add-star-item'] = 1;
 
         if (M.isFavourite($.selected)) {
-            $('.add-star-item').html('<span class="context-menu-icon"></span>' + l[5872]);
+            $('.add-star-item').safeHTML('<span class="context-menu-icon"></span>@@', l[5872]);
         }
         else {
-            $('.add-star-item').html('<span class="context-menu-icon"/></span>' + l[5871]);
+            $('.add-star-item').safeHTML('<span class="context-menu-icon"/></span>@@', l[5871]);
 
         }
     }
@@ -8450,7 +8482,7 @@ function initShareDialog() {
             $itemPermLevel
                 .removeClass(currPermLevel[0])
                 .removeClass('active')
-                .html('<span></span>' + newPermLevel[1])
+                .safeHTML('<span></span>@@', newPermLevel[1])
                 .addClass(newPermLevel[0]);
         }
         else if ($groupPermLevel.length) {// Group permission change, .permissions-icon
@@ -8478,14 +8510,14 @@ function initShareDialog() {
             $groupPermLevel
                 .removeClass(currPermLevel[0])
                 .removeClass('active')
-                .html('<span></span>' + newPermLevel[1])
+                .safeHTML('<span></span>@@', newPermLevel[1])
                 .addClass(newPermLevel[0]);
 
             /*$('.share-dialog-contact-bl .share-dialog-permissions')
                 .removeClass('read-only')
                 .removeClass('read-and-write')
                 .removeClass('full-access')
-                .html('<span></span>' + newPermLevel[1])
+                .safeHTML('<span></span>@@', newPermLevel[1])
                 .addClass(newPermLevel[0]);*/
         }
 

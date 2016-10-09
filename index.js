@@ -344,11 +344,15 @@ function init_page() {
                 mega.config.fetch();
             }
 
+            mega.loadReport = {startTime: Date.now(), stepTimeStamp: Date.now()};
+
             if (typeof mDB !== 'undefined' && !pfid && (!flhashchange || page === 'fm')) {
                 mDBstart();
+                mega.loadReport.mode = 1;
             }
             else {
                 loadfm();
+                mega.loadReport.mode = 2;
             }
         }
     }

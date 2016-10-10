@@ -811,6 +811,7 @@ ChatdIntegration.prototype._parseMessage = function(chatRoom, message) {
                     var messageId = obj.messageId;
                     var attachedMsg = chatRoom.messagesBuff.messages[messageId];
 
+                    var allAttachmentsRevoked = false;
                     if (!attachedMsg) {
                         return;
                     }
@@ -819,16 +820,38 @@ ChatdIntegration.prototype._parseMessage = function(chatRoom, message) {
                         try {
                             var attc = attachedMsg.textContents;
                             var attachments = JSON.parse(attc.substr(2, attc.length));
+                            var revokedInSameMessage = 0;
                             attachments.forEach(function(node) {
                                 if (node.h === revokedNode) {
                                     foundRevokedNode = node;
                                 }
-                            })
+                                if (
+                                    chatRoom.attachments[node.h] &&
+                                    chatRoom.attachments[node.h][messageId] &&
+                                    (
+                                        chatRoom.attachments[node.h][messageId].revoked === true ||
+                                        node.h === revokedNode
+                                    )
+                                ) {
+                                    revokedInSameMessage++;
+                                }
+                            });
+                            if (revokedInSameMessage === attachments.length) {
+                                allAttachmentsRevoked = true;
+                            }
                         } catch(e) {
                         }
-                        attachedMsg.revoked = true;
+
                         obj.revoked = true;
-                        
+                        // mark the whole message as revoked if all attachments in it are marked as revoked.
+                        if (allAttachmentsRevoked) {
+                            attachedMsg.revoked = true;
+                        }
+                        else {
+                            // force re-render
+                            attachedMsg.trackDataChange();
+                        }
+
                         if (!attachedMsg.seen) {
                             attachedMsg.seen = true;
                             if (chatRoom.messagesBuff._unreadCountCache > 0) {

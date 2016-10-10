@@ -8957,6 +8957,11 @@ React.makeElement = React['createElement'];
 	            additionalClasses += this.props.className;
 	        }
 
+	        if (message.revoked) {
+
+	            return null;
+	        }
+
 	        if (message instanceof KarereEventObjects.IncomingMessage || message instanceof KarereEventObjects.OutgoingMessage || message instanceof KarereEventObjects.IncomingPrivateMessage || message instanceof Message) {
 
 	            if (message.messageHtml) {
@@ -9156,9 +9161,8 @@ React.makeElement = React['createElement'];
 	                                );
 	                            }
 	                        } else {
-	                            dropdown = React.makeElement(ButtonsUI.Button, {
-	                                className: 'default-white-button tiny-button disabled',
-	                                icon: 'tiny-icon grey-down-arrow' });
+
+	                            return;
 	                        }
 
 	                        var attachmentClasses = "message shared-data";

@@ -917,7 +917,7 @@ function mozClearStartupCache() {
 
 (function __mozSecurityTraps(scope) {
 
-	let removeState;
+	var removeState;
 	const __cE = document.createElement;
 	const __cE_NS = document.createElementNS;
 	const __XHR_Open = XMLHttpRequest.prototype.open;
@@ -971,7 +971,7 @@ function mozClearStartupCache() {
 
 	XMLHttpRequest.prototype.open = function(meth, url)
 	{
-		let success = false, uri;
+		var success = false, uri;
 
 		try
 		{
@@ -1115,7 +1115,7 @@ const mozLoginManager = Object.freeze({
 	},
 
 	saveLogin: function(aUsername, aPassword, aUsernameField, aPasswordField) {
-		$('input[type=password').val('');
+		$('input[type=password]').val('');
 
 		if (Services.logins.getLoginSavingEnabled(this.hostname)
 				&& Services.logins.getLoginSavingEnabled('https://mega.nz')) {
@@ -1160,14 +1160,14 @@ const mozLoginManager = Object.freeze({
 });
 
 const mozNetUtilFetch = (function() {
-	let newChannel = (function() {
+	const newChannel = (function() {
 		if (typeof Services.io.newChannel2 !== 'function') {
 			return function(file) {
 				return NetUtil.newChannel(file);
 			};
 		}
 
-		let props = {
+		const props = {
 			contentPolicyType: Ci.nsIContentPolicy.TYPE_OTHER,
 			securityFlags: Ci.nsILoadInfo.SEC_REQUIRE_SAME_ORIGIN_DATA_INHERITS,
 			loadingPrincipal: Services.scriptSecurityManager.getSystemPrincipal()
@@ -1184,11 +1184,11 @@ const mozNetUtilFetch = (function() {
 			return callback(null);
 		}
 
-		let channel = newChannel(file);
+		const channel = newChannel(file);
 		channel.contentType = json ? 'application/json' : 'text/plain';
 
 		NetUtil.asyncFetch(channel, function(stream, rc) {
-			let data = null;
+			var data = null;
 
 			if (Components.isSuccessCode(rc)) {
 				data = NetUtil.readInputStreamToString(stream, stream.available());
@@ -1200,7 +1200,14 @@ const mozNetUtilFetch = (function() {
 })();
 Services.obs.addObserver(function(aSubject, aTopic, aData) {
 	if (aTopic === 'mega-event-log4') {
-		api_req({ a: 'log', e: 99623, m: 'Lypass' });
+		(function _log() {
+			if (typeof api_req === 'function') {
+				api_req({ a: 'log', e: 99623, m: 'Lypass' });
+			}
+			else {
+				mozSetTimeout(_log, 2600);
+			}
+		})();
 	}
 }, 'mega-event-log4', false);
 

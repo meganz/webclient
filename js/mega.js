@@ -1022,25 +1022,28 @@ function MegaData()
                             hideReinvite = 'hidden';
                         }
                     }
+
+                    hideOPC = (hideOPC !== '') ? ' class="' + hideOPC + '"' : '';
+                    html = '<tr id="opc_' + htmlentities(opc[i].p) + '"' + hideOPC + '>' +
+                        '<td>' +
+                            '<div class="left email">' +
+                                '<div class="nw-contact-avatar"></div>' +
+                                '<div class="fm-chat-user-info">' +
+                                    '<div class="contact-email">' + htmlentities(opc[i].m) + '</div>' +
+                                '</div>' +
+                            '</div>' +
+                            '<div class="contact-request-button cancel ' + hideCancel + '">' +
+                                '<span>' + escapeHTML(l[5930]) + '</span>' +
+                            '</div>' +
+                            '<div class="contact-request-button reinvite ' + hideReinvite + '">' +
+                                '<span>' + escapeHTML(l[5861]) + '</span>' +
+                            '</div>' +
+                        '</td></tr>';
+
+                    $(t).append(html);
+
+                    drawn = true;
                 }
-
-                hideOPC = (hideOPC !== '') ? ' class="' + hideOPC + '"' : '';
-                html = '<tr id="opc_' + htmlentities(opc[i].p) + '"' + hideOPC + '>\n\
-                    <td>\n\
-                        <div class="left email">\n\
-                            <div class="nw-contact-avatar"></div>\n\
-                            <div class="fm-chat-user-info">\n\
-                               <div class="contact-email">' + htmlentities(opc[i].m) + '</div>\n\
-                            </div>\n\
-                        </div>\n\
-                        <div class="contact-request-button cancel ' + hideCancel + '"><span>' + l[156] + ' ' + l[738].toLowerCase() + '</span></div>\n\
-                        <div class="contact-request-button reinvite ' + hideReinvite + '"><span>' + l[5861] + '</span></div>\n\
-                    </td>\n\
-                </tr>';
-
-                $(t).append(html);
-
-                drawn = true;
             }
 
             if (drawn) {
@@ -4048,9 +4051,6 @@ function MegaData()
                 result = node.name;
             }
         }
-        else {
-            console.error('getNameByHandle: Unsupported handle "%s"', handle);
-        }
 
         return String(result);
     };
@@ -4485,10 +4485,16 @@ function MegaData()
                     $tr.find('.left-c p').css('transform', 'rotate(' + (transferDeg - 180) + 'deg)');
                 }
                 if (retime > 0) {
+                    var title = '';
+                    try {
+                        title = new Date((unixtime() + retime) * 1000).toLocaleString();
+                    }
+                    catch (ex) {
+                    }
                     $tr.find('.eta')
                         .text(secondsToTime(retime))
                         .removeClass('unknown')
-                        .attr('title', new Date((unixtime() + retime) * 1000).toLocaleString());
+                        .attr('title', title);
                 }
                 else {
                     $tr.find('.eta').addClass('unknown').text('');
@@ -7222,27 +7228,24 @@ function init_chat() {
         if (u_type && !megaChatIsReady) {
             if (d) console.log('Initializing the chat...');
 
-            try {
-                // Prevent known Strophe exceptions...
-                if (!Strophe.Websocket.prototype._unsafeOnIdle) {
-                    Strophe.Websocket.prototype._unsafeOnIdle = Strophe.Websocket.prototype._onIdle;
-                    Strophe.Websocket.prototype._onIdle = function() {
+            // XXX: Prevent known Strophe exceptions...
+            ['_onIdle', '_connect'].forEach(function(fn) {
+                var proto = Strophe.Websocket.prototype;
+                var unsafeFn = '_unsafe' + fn;
+
+                if (!proto[unsafeFn]) {
+                    proto[unsafeFn] = proto[fn];
+                    proto[fn] = function() {
                         try {
-                            this._unsafeOnIdle.apply(this, arguments);
+                            this[unsafeFn].apply(this, arguments);
                         }
                         catch (ex) {
-                            if (d) {
-                                console.error(ex);
-                            }
+                            console.error('Caught Strophe exception.', ex);
                         }
                     };
                 }
-            }
-            catch (ex) {
-                if (d) {
-                    console.error(ex);
-                }
-            }
+                proto = undefined;
+            });
 
             var _chat = new Chat();
 

@@ -2236,8 +2236,9 @@ function fmremove() {
             }
         });
         $('.fm-dialog-button.notification-button').each(function(i, e) {
-            if ($(e).text() === l[1018])
-                $(e).html('<span>'+l[83]+'</span>');
+            if ($(e).text() === l[1018]) {
+                $(e).safeHTML('<span>@@</span>', l[83]);
+            }
         });
     }
 
@@ -2993,7 +2994,7 @@ function accountUI() {
     }
 
     M.accountData(function(account) {
-        
+
         var perc, warning, perc_c;
         var id = document.location.hash;
 
@@ -3074,7 +3075,7 @@ function accountUI() {
 
             // Subscription
             if (account.stype == 'S') {
-        
+
                 $('.fm-account-header.typetitle').text(l[434]);
                 if (account.scycle == '1 M') {
                     $('.membership-big-txt.type').text(l[748]);
@@ -4511,7 +4512,38 @@ function avatarDialog(close)
     $.dialog = 'avatar';
     $('.fm-dialog.avatar-dialog').removeClass('hidden');
     fm_showoverlay();
-    $('.avatar-body').html('<div id="avatarcrop"><div class="image-upload-and-crop-container"><div class="image-explorer-container empty"><div class="image-explorer-image-view"><img class="image-explorer-source"><div class="avatar-white-bg"></div><div class="image-explorer-mask circle-mask"></div><div class="image-explorer-drag-delegate"></div></div><div class="image-explorer-scale-slider-wrapper"><input class="image-explorer-scale-slider disabled" type="range" min="0" max="100" step="1" value="0" disabled=""></div></div><div class="fm-notifications-bottom"><input type="file" id="image-upload-and-crop-upload-field" class="image-upload-field" accept="image/jpeg, image/gif, image/png"><label for="image-upload-and-crop-upload-field" class="image-upload-field-replacement fm-account-change-avatar"><span>' + l[1016] + '</span></label><div class="fm-account-change-avatar" id="fm-change-avatar"><span>' + l[1017] + '</span></div><div  class="fm-account-change-avatar" id="fm-cancel-avatar"><span>Cancel</span></div><div class="clear"></div></div></div></div>');
+    $('.avatar-body').safeHTML(
+        '<div id="avatarcrop">' +
+            '<div class="image-upload-and-crop-container">' +
+                '<div class="image-explorer-container empty">' +
+                    '<div class="image-explorer-image-view">' +
+                        '<img class="image-explorer-source" />' +
+                        '<div class="avatar-white-bg"></div>' +
+                        '<div class="image-explorer-mask circle-mask"></div>' +
+                        '<div class="image-explorer-drag-delegate"></div>' +
+                    '</div>' +
+                    '<div class="image-explorer-scale-slider-wrapper">' +
+                        '<input class="image-explorer-scale-slider disabled" type="range" ' +
+                            'min="0" max="100" step="1" value="0" disabled="" />' +
+                    '</div>' +
+                '</div>' +
+                '<div class="fm-notifications-bottom">' +
+                    '<input type="file" id="image-upload-and-crop-upload-field" class="image-upload-field" ' +
+                        'accept="image/jpeg, image/gif, image/png" />' +
+                    '<label for="image-upload-and-crop-upload-field" ' +
+                        'class="image-upload-field-replacement fm-account-change-avatar">' +
+                        '<span>@@</span>' +
+                    '</label>' +
+                    '<div class="fm-account-change-avatar" id="fm-change-avatar">' +
+                        '<span>@@</span>' +
+                    '</div>' +
+                    '<div  class="fm-account-change-avatar" id="fm-cancel-avatar">' +
+                        '<span>@@</span>' +
+                    '</div>' +
+                    '<div class="clear"></div>' +
+                '</div>' +
+            '</div>' +
+        '</div>', l[1016], l[1017], l[82]);
     $('#fm-change-avatar').hide();
     $('#fm-cancel-avatar').hide();
     var imageCrop = new ImageUploadAndCrop($("#avatarcrop").find('.image-upload-and-crop-container'),
@@ -6152,10 +6184,10 @@ function menuItems() {
         items['.add-star-item'] = 1;
 
         if (M.isFavourite($.selected)) {
-            $('.add-star-item').html('<span class="context-menu-icon"></span>' + l[5872]);
+            $('.add-star-item').safeHTML('<span class="context-menu-icon"></span>@@', l[5872]);
         }
         else {
-            $('.add-star-item').html('<span class="context-menu-icon"/></span>' + l[5871]);
+            $('.add-star-item').safeHTML('<span class="context-menu-icon"/></span>@@', l[5871]);
 
         }
     }
@@ -7830,41 +7862,31 @@ function fillShareDialogWithContent() {
     $.changedPermissions = [];// GLOBAL VAR, changed permissions shared dialog
     $.removedContactsFromShare = [];// GLOBAL VAR, removed contacts from a share
 
-    var user, email, name, shareRights, html,
-        selectedNodeHandle = $.selected[0],
-        shares = M.d[selectedNodeHandle].shares,
-        pendingShares = M.ps[selectedNodeHandle];
+    var pendingShares = {};
+    var nodeHandle    = String($.selected[0]);
+    var node          = M.getNodeByHandle(nodeHandle);
+    var userHandles   = M.getNodeShareUsers(node, 'EXP');
 
-    // List users that are already use item
-    for (var userHandle in shares) {
-        if (shares.hasOwnProperty(userHandle)) {
-
-            if (Object(M.u).hasOwnProperty(userHandle)) {
-                user = M.u[userHandle];
-                email = user.m;
-                name = M.getNameByHandle(userHandle);
-                shareRights = shares[userHandle].r;
-
-                generateShareDialogRow(name, email, shareRights, userHandle);
-            }
-        }
+    if (Object(M.ps).hasOwnProperty(nodeHandle)) {
+        pendingShares = Object(M.ps[nodeHandle]);
+        userHandles   = userHandles.concat(Object.keys(pendingShares));
     }
+    var seen = {};
 
-    // Pending contact requests (pcr)
-    if (pendingShares) {
-        for (var pcrHandle in pendingShares) {
-            if (pendingShares.hasOwnProperty(pcrHandle)) {
+    userHandles.forEach(function(handle) {
+        var user = M.getUser(handle) || Object(M.opc[handle]);
 
-                // Because it's pending, we don't have user information in M.u so we have to look in the pending contact request
-                if (M.opc[pendingShares[pcrHandle].p]) {
-                    var pendingContactRequest = M.opc[pendingShares[pcrHandle].p];
-
-                    // ToDo: take care of name attribute once available
-                    generateShareDialogRow(pendingContactRequest.m, pendingContactRequest.m, pendingShares[pcrHandle].r);
-                }
-            }
+        if (!user.m) {
+            console.warn('Unknown user "%s"!', handle);
         }
-    }
+        else if (!seen[user.m]) {
+            var name  = M.getNameByHandle(handle) || user.m;
+            var share = M.getNodeShare(node, handle) || Object(pendingShares[handle]);
+
+            generateShareDialogRow(name, user.m, share.r | 0, handle);
+            seen[user.m] = 1;
+        }
+    });
 }
 
 /**
@@ -7938,7 +7960,7 @@ function handleShareDialogContent() {
 
     $('.share-dialog-icon.permissions-icon')
         .removeClass('active full-access read-and-write')
-        .html('<span></span>' + l[55])
+        .safeHTML('<span></span>' + l[55])
         .addClass('read-only');
 
     // Update dialog title text
@@ -8460,7 +8482,7 @@ function initShareDialog() {
             $itemPermLevel
                 .removeClass(currPermLevel[0])
                 .removeClass('active')
-                .html('<span></span>' + newPermLevel[1])
+                .safeHTML('<span></span>@@', newPermLevel[1])
                 .addClass(newPermLevel[0]);
         }
         else if ($groupPermLevel.length) {// Group permission change, .permissions-icon
@@ -8488,14 +8510,14 @@ function initShareDialog() {
             $groupPermLevel
                 .removeClass(currPermLevel[0])
                 .removeClass('active')
-                .html('<span></span>' + newPermLevel[1])
+                .safeHTML('<span></span>@@', newPermLevel[1])
                 .addClass(newPermLevel[0]);
 
             /*$('.share-dialog-contact-bl .share-dialog-permissions')
                 .removeClass('read-only')
                 .removeClass('read-and-write')
                 .removeClass('full-access')
-                .html('<span></span>' + newPermLevel[1])
+                .safeHTML('<span></span>@@', newPermLevel[1])
                 .addClass(newPermLevel[0]);*/
         }
 
@@ -10567,7 +10589,11 @@ function fm_importflnodes(nodes)
             document.location.hash = 'fm';
 
             $(document).one('onInitContextUI', SoonFc(function(e) {
-                if (ASSERT(M.RootID != FLRootID, 'Unexpected openFolder on Import')) {
+                if (M.RootID === FLRootID) {
+                    // TODO: How to reproduce this?
+                    console.warn('Unable to complete import, apparnetly we did not reached the cloud.');
+                }
+                else {
                     if (d) console.log('Importing Nodes...', sel, $.onImportCopyNodes);
 
                     $.selected = sel;
@@ -11447,7 +11473,7 @@ var cancelSubscriptionDialog = {
                     cancelSubscriptionDialog.$backgroundOverlay.removeClass('hidden');
                     cancelSubscriptionDialog.$backgroundOverlay.addClass('payment-dialog-overlay');
                     cancelSubscriptionDialog.initCloseButtonSuccessDialog();
-                    
+
                     // Reset account cache so all account data will be refetched and re-render the account page UI
                     M.account.lastupdate = 0;
                     accountUI();

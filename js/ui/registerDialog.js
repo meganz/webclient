@@ -134,7 +134,10 @@
             err = 1;
         }
 
-        var pw = zxcvbn($('#register-password', $dialog).val());
+        var pw = {};
+        if (typeof zxcvbn !== 'undefined') {
+            pw = zxcvbn($('#register-password', $dialog).val());
+        }
         if ($('#register-password', $dialog).attr('type') === 'text') {
             $('.login-register-input.password.first', $dialog).addClass('incorrect');
             $('.white-txt.password', $dialog).text(l[213]);

@@ -5660,22 +5660,9 @@ function execsc(actionPackets, callback) {
                 }
             }
             else if (actionPacket.a === 'ua') {
-                var attrs = actionPacket.ua;
-                var actionPacketUserId = actionPacket.u;
-                for (var j in attrs) {
-                    if (attrs.hasOwnProperty(j)) {
-                        var attributeName = attrs[j];
-
-                        if (attributeName === '+a') {
-                            if (!loadavatars) {
-                                loadavatars = [];
-                            }
-                            loadavatars.push(actionPacketUserId);
-                        }
-                        else if (attributeName === 'firstname' || attributeName === 'lastname') {
-                            attribCache.uaPacketParser(attributeName, actionPacketUserId, true);
-                        }
-                    }
+                var loadAvatarsResult = mega.attr.handleUserAttributeActionPackets(actionPacket);
+                if (loadAvatarsResult) {
+                    loadavatars = !loadavatars ? loadAvatarsResult : loadavatars.concat(loadAvatarsResult);
                 }
             }
         }// END own action packet
@@ -6013,7 +6000,12 @@ function execsc(actionPackets, callback) {
                 if (attrs.hasOwnProperty(j)) {
                     var attributeName = attrs[j];
 
-                    attribCache.uaPacketParser(attributeName, actionPacketUserId);
+                    attribCache.uaPacketParser(
+                        attributeName,
+                        actionPacketUserId,
+                        false,
+                        actionPacket.v && actionPacket.v[j] ? actionPacket.v[j] : undefined
+                    );
                 }
             }
         }

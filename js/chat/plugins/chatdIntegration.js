@@ -34,6 +34,7 @@ var ChatdIntegration = function(megaChat) {
     self.waitingChatIdPromises = {};
     self.chatIdToRoomJid = {};
     self._cachedHandlers = {};
+    self._loadingCount = 0;
 
     // chat events
     megaChat.rebind("onInit.chatdInt", function(e) {
@@ -41,10 +42,19 @@ var ChatdIntegration = function(megaChat) {
             assert(chatRoom.type, 'missing room type');
             self._attachToChatRoom(chatRoom);
         });
-        if (fminitialized === true && ChatdIntegration.mcfHasFinishedPromise.state() === 'pending') {
-            // old db, which means that the 'mcf' is empty and the 'f' was not called.
-            // do a separate mcf call!
-            self.retrieveChatsFromApi();
+        if (ChatdIntegration.mcfHasFinishedPromise.state() === 'pending') {
+            if (fminitialized === true) {
+                // old db, which means that the 'mcf' is empty and the 'f' was not called.
+                // do a separate mcf call!
+                self.retrieveChatsFromApi();
+            }
+            else {
+                mBroadcaster.once('fm:initialized', function() {
+                    if (ChatdIntegration.mcfHasFinishedPromise.state() === 'pending') {
+                        self.retrieveChatsFromApi();
+                    }
+                });
+            }
         }
         else {
             ChatdIntegration.mcfHasFinishedPromise.done(function () {
@@ -112,6 +122,7 @@ ChatdIntegration._queuedChats = {};
 
 ChatdIntegration.prototype.retrieveChatsFromApi = function() {
     var self = this;
+    self._loadingCount++;
     asyncApiReq({a: "mcf", d: 1, v: Chatd.VERSION})
         .done(function(r) {
             self.logger.debug("MCF returned: ", r);
@@ -146,6 +157,12 @@ ChatdIntegration.prototype.retrieveChatsFromApi = function() {
         .fail(function(r) {
             if (r === EEXPIRED) {
                 self.requiresUpdate();
+            }
+        })
+        .always(function() {
+            self._loadingCount--;
+            if (self._loadingCount === 0) {
+                $(self).trigger('onMcfLoadingDone');
             }
         });
 };
@@ -276,6 +293,8 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
         // 'mcf'/'f' is still loading..ANY incoming action packets, should be rejected (and never happen...)
         return;
     }
+    self._loadingCount++;
+
     var roomInfo = {
         'id': actionPacket.id,
         'cs': actionPacket.cs,
@@ -322,6 +341,8 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
     var wasActive = chatRoom ? chatRoom.isCurrentlyActive : false;
 
     var finishProcess = function() {
+        self._loadingCount--;
+
         // if the found chatRoom is in LEAVING mode...then try to reinitialise it!
 
         if (chatRoom && chatRoom.stateIsLeftOrLeaving() && actionPacket.ou !== u_handle) {
@@ -1506,6 +1527,11 @@ ChatdIntegration.prototype.discardMessage = function(chatRoom, msgId) {
         // debugger;
     }
     return self.chatd.discard(msgId, rawChatId);
+};
+
+
+ChatdIntegration.prototype.isLoading = function() {
+    return this._loadingCount > 0;
 };
 
 // decorate ALL functions which require shard to be available before executing

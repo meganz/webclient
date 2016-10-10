@@ -1259,11 +1259,13 @@ Chat.prototype.openChat = function(jids, type, chatId, chatShard, chatdUrl, setA
             var contact = self.getContactFromJid(jid);
             if (!contact || (contact.c !== 1 && contact.c !== 2 && contact.c !== 0)) {
                 allValid = false;
+                $promise.reject();
                 return false;
             }
         });
         if (allValid === false) {
-            return MegaPromise.reject();
+            $promise.reject();
+            return $promise;
         }
         var $element = $('.nw-conversations-item[data-jid="' + jids[0] + '"]');
         var roomJid = $element.attr('data-room-jid') + "@" + self.karere.options.mucDomain;
@@ -1313,7 +1315,8 @@ Chat.prototype.openChat = function(jids, type, chatId, chatShard, chatdUrl, setA
         if (setAsActive) {
             room.show();
         }
-        return [roomFullJid, room, (new $.Deferred()).resolve(roomFullJid, room)];
+        $promise.resolve(roomFullJid, room);
+        return [roomFullJid, room, $promise];
     }
     if (setAsActive && self.currentlyOpenedChat && self.currentlyOpenedChat != roomJid) {
         self.hideChat(self.currentlyOpenedChat);
@@ -1364,7 +1367,8 @@ Chat.prototype.openChat = function(jids, type, chatId, chatShard, chatdUrl, setA
 
 
     if (self.karere.getConnectionState() != Karere.CONNECTION_STATE.CONNECTED) {
-        return [roomJid, room, (new MegaPromise()).reject(roomJid, room)];
+        $promise.reject(roomJid, room);
+        return [roomJid, room, $promise];
     }
 
     var jidsWithoutMyself = room.getParticipantsExceptMe(jids);

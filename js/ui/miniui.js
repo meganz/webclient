@@ -39,7 +39,7 @@ var uiPlaceholders = function($scope) {
         });
 };
 
-var uiCheckboxes = function($scope, saveState) {
+var uiCheckboxes = function($scope, saveState, stateChangeCb) {
     $('.radio-txt', $scope).each(function() {
         var $label = $(this);
         var $cbxElement = $label.prev('.checkboxOn, .checkboxOff');
@@ -66,6 +66,9 @@ var uiCheckboxes = function($scope, saveState) {
                 else {
                     delete localStorage[saveState];
                 }
+            }
+            if (stateChangeCb) {
+                stateChangeCb(state);
             }
         };
 

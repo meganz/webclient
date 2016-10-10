@@ -1613,6 +1613,7 @@
     "5926": "Sin conexi\u00f3n",
     "5928": "Descarga Normal",
     "5929": "Ha sobrepasado considerablemente el limite de almacenamiento permitido y las subidas de archivos se ha deshabilitado. Por favor, aseg\u00farate de que tienes el plan MEGA PRO correcto, o contacta support@mega.nz.",
+    "5930": "Cancelar solicitud",
     "5931": "Haz clic [A]aqu\u00ed[\/A] para ver el uso de tu almacenamiento.",
     "5932": "Cuota superada",
     "5934": "No se pudo confirmar la cuenta. Vuelve a intentarlo. [{0}]",
@@ -3685,7 +3686,7 @@
     "10660": "Desactivar consejos futuros",
     "10661": "You can [B]add and manage contacts[\/B] in the Contacts tab, then securely chat and share files using MEGAchat.",
     "10662": "Communicate securely with your family, friends and colleagues using our audio\/video and text chat with user-controlled end-to-end encryption.",
-    "10663": "... and [X] more",
+    "10663": "... y [X] m\u00e1s",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

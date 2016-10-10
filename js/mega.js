@@ -7282,6 +7282,9 @@ function loadfm_callback(res, ctx) {
 
     loadingInitDialog.step3();
 
+    mega.loadReport.recvNodes     = Date.now() - mega.loadReport.stepTimeStamp;
+    mega.loadReport.stepTimeStamp = Date.now();
+
     if (pfkey) {
         if (res.f && res.f[0]) {
             M.RootID = res.f[0].h;
@@ -7358,6 +7361,9 @@ function loadfm_callback(res, ctx) {
             crypto_procsr(res.sr);
         }
 
+        mega.loadReport.procNodes     = Date.now() - mega.loadReport.stepTimeStamp;
+        mega.loadReport.stepTimeStamp = Date.now();
+
         // Retrieve initial batch of action-packets, if any
         // we'll then complete the process using loadfm_done
         getsc();
@@ -7379,12 +7385,24 @@ function loadfm_done(mDBload) {
 
     if (d > 1) console.error('loadfm_done', mDBload, is_fm());
 
+    mega.loadReport.procAPs       = Date.now() - mega.loadReport.stepTimeStamp;
+    mega.loadReport.stepTimeStamp = Date.now();
+
     mega.config.ready(function() {
         init_chat();
+
+        mega.loadReport.fmConfigFetch = Date.now() - mega.loadReport.stepTimeStamp;
+        mega.loadReport.stepTimeStamp = Date.now();
 
         // are we actually on an #fm/* page?
         if (is_fm() || $('.fm-main.default').is(":visible")) {
             renderfm();
+
+            mega.loadReport.renderfm      = Date.now() - mega.loadReport.stepTimeStamp;
+            mega.loadReport.stepTimeStamp = Date.now();
+        }
+        else {
+            mega.loadReport.renderfm = -1;
         }
 
         if (!CMS.isLoading()) {
@@ -7404,6 +7422,26 @@ function loadfm_done(mDBload) {
                     notify.getInitialNotifications();
                 }
             });
+
+            if (mBroadcaster.crossTab.master && !mega.loadReport.sent) {
+                mega.loadReport.sent = true;
+
+                var r = mega.loadReport;
+                r.totalTimeSpent = Date.now() - mega.loadReport.startTime;
+                r = [
+                    r.mode, // 1: DB, 2: API
+                    r.recvNodes, r.procNodes, r.procAPs,
+                    r.fmConfigFetch, r.renderfm,
+                    r.dbToNet | 0, // see mDB.js comment
+                    r.totalTimeSpent,
+                    Object.keys(M.d || {}).length
+                ];
+
+                if (d) {
+                    console.debug('loadReport', r);
+                }
+                api_req({ a: 'log', e: 99624, m: JSON.stringify(r) });
+            }
         }
 
         watchdog.notify('loadfm_done', mDBload);

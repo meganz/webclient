@@ -9727,6 +9727,85 @@ browserDialog.isWeak = function() {
 /* jshint -W074 */
 function propertiesDialog(close) {
 
+    /*
+    * fillPropertiesContactList, Handles node properties/info dialog contact list content
+    *
+    * @param {Object} shares Node related shares
+    * @param {Object} pendingShares Node related pending shares
+    * @param {Number} totalSharesNum
+    */
+    var fillPropertiesContactList = function(shares, pendingShares, totalSharesNum) {
+
+        var DEFAULT_CONTACTS_NUMBER = 5;
+        var counter = 0;
+        var tmpStatus = '';
+        var onlinestatus = '';
+        var user;
+        var hiddenClass = '';
+        var $shareUsers = pd.find('.properties-body .properties-context-menu')
+                        .empty()
+                        .append('<div class="properties-context-arrow"></div>');
+        var shareUsersHtml = '';
+
+        // Add contacts with full contact relation
+        for (var userId in shares) {
+            if (shares.hasOwnProperty(userId)) {
+
+                if (++counter <= DEFAULT_CONTACTS_NUMBER) {
+                    hiddenClass = '';
+                }
+                else {
+                    hiddenClass = 'hidden';
+                }
+
+                if (M.u[userId]) {
+                    user = M.u[userId];
+                    tmpStatus = megaChatIsReady && megaChat.karere.getPresence(megaChat.getJidFromNodeId(user.u));
+                    onlinestatus = M.onlineStatusClass(tmpStatus);
+                    shareUsersHtml += '<div class="properties-context-item '
+                        + onlinestatus[1] + ' ' +  hiddenClass + '">'
+                        + '<div class="properties-contact-status"></div>'
+                        + '<span>' + htmlentities(user.name || user.m) + '</span>'
+                        + '</div>';
+                }
+            }
+        }
+
+        // Add outgoing pending contacts for node handle [n.h]
+        for (userId in pendingShares) {
+            if (pendingShares.hasOwnProperty(userId)) {
+
+                if (++counter <= DEFAULT_CONTACTS_NUMBER) {
+                    hiddenClass = '';
+                }
+                else {
+                    hiddenClass = 'hidden';
+                }
+
+                if (M.opc[userId]) {
+                    user = M.opc[userId];
+                    shareUsersHtml += '<div class="properties-context-item offline ' + hiddenClass + '">'
+                        + '<div class="properties-contact-status"></div>'
+                        + '<span>' + htmlentities(user.m) + '</span>'
+                        + '</div>';
+                }
+            }
+        }
+
+        var hiddenNum = totalSharesNum - DEFAULT_CONTACTS_NUMBER;
+        var repStr = l[10663];// '... and [X] more';
+
+        if (hiddenNum > 0) {
+            shareUsersHtml += '<div class="properties-context-item show-more">'
+                + '<span>...' + repStr.replace('[X]', hiddenNum) + '</span>'
+                + '</div>';
+        }
+
+        if (shareUsersHtml !== '') {
+            $shareUsers.append(shareUsersHtml);
+        }
+    };// END of fillPropertiesContactList function
+
     var pd = $('.fm-dialog.properties-dialog');
     var c = $('.properties-elements-counter span');
 
@@ -9776,6 +9855,7 @@ function propertiesDialog(close) {
 
     $('.properties-elements-counter span').text('');
     $('.fm-dialog.properties-dialog .properties-body').rebind('click', function() {
+
         // Clicking anywhere in the dialog will close the context-menu, if open
         var e = $('.fm-dialog.properties-dialog .file-settings-icon');
         if (e.hasClass('active'))
@@ -9891,38 +9971,26 @@ function propertiesDialog(close) {
             p.t6 = l[897] + ':';
             p.t7 = fm_contains(sfilecnt, sfoldercnt);
             if (pd.attr('class').indexOf('shared') > -1) {
-                var shares, susers, total = 0
-                shares = Object.keys(n.shares || {}).length
-                p.t8 = l[1036] + ':';
-                p.t9 = shares == 1 ? l[990] : l[989].replace("[X]", shares);
-                p.t11 = n.ts ? htmlentities(time2date(n.ts)) : '';
-                p.t10 = p.t11 ? l[896] : '';
-                $('.properties-elements-counter span').text(typeof n.r == "number" ? '' : shares);
-                susers = pd.find('.properties-body .properties-context-menu')
-                    .empty()
-                    .append('<div class="properties-context-arrow"></div>')
-                for (var u in n.shares) {
-                    if (M.u[u]) {
-                        var u = M.u[u]
-                        var onlinestatus = M.onlineStatusClass(megaChatIsReady && megaChat.karere.getPresence(megaChat.getJidFromNodeId(u.u)));
-                        if (++total <= 5)
-                            susers.append('<div class="properties-context-item ' + onlinestatus[1] + '">'
-                                + '<div class="properties-contact-status"></div>'
-                                + '<span>' + htmlentities(u.name || u.m) + '</span>'
-                                + '</div>');
-                    }
-                }
 
-                if (total > 5) {
-                    susers.append(
-                        '<div class="properties-context-item show-more">'
-                        + '<span>... and ' + (total - 5) + ' more</span>'
-                        + '</div>'
-                        );
-                }
+                var fullSharesNum = Object.keys(n.shares || {}).length;
+                var pendingSharesNum = Object.keys(M.ps[n.h] || {}).length;
+                var totalSharesNum = fullSharesNum + pendingSharesNum;
 
-                if (total == 0)
+                // In case that user doesn't share with other
+                // Or in case that more then one node is selected
+                // Do NOT show contact informations in property dialog
+                if ((totalSharesNum === 0) || ($.selected.length > 1)) {
                     p.hideContacts = true;
+                }
+                else {
+                    p.t8 = l[1036] + ':';
+                    p.t9 = (totalSharesNum === 1) ? l[990] : l[989].replace("[X]", totalSharesNum);
+                    p.t11 = n.ts ? htmlentities(time2date(n.ts)) : '';
+                    p.t10 = p.t11 ? l[896] : '';
+                    $('.properties-elements-counter span').text(typeof n.r === "number" ? '' : totalSharesNum);
+
+                    fillPropertiesContactList(n.shares, M.ps[n.h], totalSharesNum);
+                }
             }
             if (pd.attr('class').indexOf('shared-with-me') > -1) {
                 p.t3 = l[64];
@@ -10006,8 +10074,7 @@ function propertiesDialog(close) {
     }
 
     if (pd.attr('class').indexOf('shared') > -1) {
-        $('.contact-list-icon').unbind('click');
-        $('.contact-list-icon').bind('click', function() {
+        $('.contact-list-icon').rebind('click', function() {
             if ($(this).attr('class').indexOf('active') == -1) {
                 $(this).addClass('active');
                 $('.properties-context-menu').css({
@@ -10020,11 +10087,42 @@ function propertiesDialog(close) {
                 $(this).removeClass('active');
                 $('.properties-context-menu').fadeOut(200);
             }
+
+            return false;
         });
-        $('.properties-context-item').unbind('click');
-        $('.properties-context-item').bind('click', function() {
+
+        $('.properties-dialog').rebind('click', function() {
+            var $list = $('.contact-list-icon');
+            if ($list.attr('class').indexOf('active') !== -1) {
+                $list.removeClass('active');
+                $('.properties-context-menu').fadeOut(200);
+            }
+        });
+
+        // ToDo: Can we redirects to contacts page when user clicks?
+        $('.properties-context-item').rebind('click', function(e) {
             $('.contact-list-icon').removeClass('active');
             $('.properties-context-menu').fadeOut(200);
+        });
+
+        // Expands properties-context-menu so rest of contacts can be shown
+        // By default only 5 contacts is shown
+        $('.properties-context-item.show-more').rebind('click', function() {
+
+            // $('.properties-context-menu').fadeOut(200);
+            $('.properties-dialog .properties-context-item')
+                .remove('.show-more')
+                .removeClass('hidden');// un-hide rest of contacts
+
+            var $cli = $('.contact-list-icon');
+            $('.properties-context-menu').css({
+                'left': $cli.position().left + 8 + 'px',
+                'top': $cli.position().top - $('.properties-context-menu').outerHeight() - 8 + 'px',
+                'margin-left': '-' + $('.properties-context-menu').width() / 2 + 'px'
+            });
+            // $('.properties-context-menu').fadeIn(200);
+
+            return false;// Prevent bubbling
         });
     }
 

@@ -9740,7 +9740,8 @@ function propertiesDialog(close) {
                     user = M.u[userId];
                     tmpStatus = megaChatIsReady && megaChat.karere.getPresence(megaChat.getJidFromNodeId(user.u));
                     onlinestatus = M.onlineStatusClass(tmpStatus);
-                    shareUsersHtml += '<div class="properties-context-item ' + onlinestatus[1] + ' ' +  hiddenClass + '">'
+                    shareUsersHtml += '<div class="properties-context-item '
+                        + onlinestatus[1] + ' ' +  hiddenClass + '">'
                         + '<div class="properties-contact-status"></div>'
                         + '<span>' + htmlentities(user.name || user.m) + '</span>'
                         + '</div>';

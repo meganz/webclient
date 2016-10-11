@@ -3697,6 +3697,12 @@
     "12439": "Stai usando una sessione effimera in questo browser. Se vuoi preservare i dati caricati, clicca su Registra nella barra dove vedi i tuoi dati. Se non ti importa dei dati, clicca su Esci e prova a cliccare lo stesso link di conferma dell&#039;account di nuovo.",
     "12440": "Sei gi\u00e0 loggato con un account MEGA da questo browser. Clicca Esci prima e poi prova a cliccare lo stesso link di conferma dell&#039;account di nuovo.",
     "12441": "Tempo rimanente stimato",
+    "12442": "MEGA provides free cloud storage with convenient and powerful always-on privacy",
+    "12443": "Unlike other cloud storage providers, your data is encrypted &amp; decrypted during transfer by your client devices only and never by us.",
+    "12444": "Secure Global Access",
+    "12445": "Only you control the keys to your files.",
+    "12446": "Secure Collaboration",
+    "12447": "Online collaboration has never been more private and secure.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

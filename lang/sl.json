@@ -3697,6 +3697,12 @@
     "12439": "V tem brskalniku uporabljate za\u010dasno sejo. \u010ce \u017eelite obdr\u017eati nalo\u017eene podatke, kliknite Registriraj v tabu, kjer vidite svoje podatke. \u010ce vam je za podatke vseeno, kliknite Odjavi in poskusite ponovno klikniti isto povezavo za potrditev ra\u010duna.",
     "12440": "Na MEGA ra\u010dun ste \u017ee prijavljeni s tega brskalnika. Najprej kliknite Odjava in potem poskusite ponovno klikniti na povezavo za potrdilo ra\u010duna.",
     "12441": "ETA",
+    "12442": "MEGA provides free cloud storage with convenient and powerful always-on privacy",
+    "12443": "Unlike other cloud storage providers, your data is encrypted &amp; decrypted during transfer by your client devices only and never by us.",
+    "12444": "Secure Global Access",
+    "12445": "Only you control the keys to your files.",
+    "12446": "Secure Collaboration",
+    "12447": "Online collaboration has never been more private and secure.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

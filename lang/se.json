@@ -3697,6 +3697,12 @@
     "12439": "Du anv\u00e4nder en kortlivad session i den h\u00e4r webbl\u00e4saren. Om du vill bevara den \u00f6verf\u00f6rda datan, klicka p\u00e5 Register p\u00e5 fliken d\u00e4r du ser dina data. Om du inte bryr sig om dessa data, klicka p\u00e5 Logga ut och klicka p\u00e5 samma konto bekr\u00e4ftelsel\u00e4nk igen.",
     "12440": "Du redan \u00e4r inloggad i ett MEGA konto fr\u00e5n den h\u00e4r webbl\u00e4saren. Klicka Logga ut f\u00f6rst och prova sedan klicka p\u00e5 samma konto bekr\u00e4ftelsel\u00e4nk igen.",
     "12441": "ETA",
+    "12442": "MEGA provides free cloud storage with convenient and powerful always-on privacy",
+    "12443": "Unlike other cloud storage providers, your data is encrypted &amp; decrypted during transfer by your client devices only and never by us.",
+    "12444": "Secure Global Access",
+    "12445": "Only you control the keys to your files.",
+    "12446": "Secure Collaboration",
+    "12447": "Online collaboration has never been more private and secure.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

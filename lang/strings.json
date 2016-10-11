@@ -14790,5 +14790,29 @@
     "12441": {
         "text": "ETA",
         "context": "An acronym for \"Estimated Time of Arrival\" which is used in the Transfers section to give an indication when the file will be fully downloaded\/uploaded."
+    },
+    "12442": {
+        "text": "MEGA provides free cloud storage with convenient and powerful always-on privacy",
+        "context": "Text from the mobile page"
+    },
+    "12443": {
+        "text": "Unlike other cloud storage providers, your data is encrypted & decrypted during transfer by your client devices only and never by us.",
+        "context": "Text from the mobile page"
+    },
+    "12444": {
+        "text": "Secure Global Access",
+        "context": "Text from the mobile page, please see screenshot"
+    },
+    "12445": {
+        "text": "Only you control the keys to your files.",
+        "context": "Text from the mobile page, please see screenshot."
+    },
+    "12446": {
+        "text": "Secure Collaboration",
+        "context": "Text from the mobile page, please see screenshot"
+    },
+    "12447": {
+        "text": "Online collaboration has never been more private and secure.",
+        "context": "Text from the mobile page (Online collaboration section), please see screenshot."
     }
 }

@@ -3414,12 +3414,10 @@ function showLoginDialog(email) {
         });
 
     $('.input-email', $dialog)
-        .data('placeholder', l[195])
-        .val(email || l[195]);
+        .val(email || '');
 
     $('.input-password', $dialog)
-        .data('placeholder', l[909])
-        .val(l[909]);
+        .val('');
 
     uiPlaceholders($dialog);
     uiCheckboxes($dialog);
@@ -3465,13 +3463,12 @@ var doProLogin = function($dialog) {
         {
             loadingDialog.hide();
             var e = $('#login-name', $dialog).val();
-            if (e === '' || e === l[195] || checkMail(e)) {
+            if (e === '' || checkMail(e)) {
                 $('.top-login-input-block.e-mail', $dialog).addClass('incorrect');
                 $('#login-name', $dialog).val('');
                 $('#login-name', $dialog).focus();
             }
-            else if ($('#login-password', $dialog).val() === ''
-                    || $('#login-password', $dialog).val() === l[909]) {
+            else if ($('#login-password', $dialog).val() === '') {
                 $('.top-login-input-block.password', $dialog).addClass('incorrect');
             }
             else if (r === EBLOCKED)

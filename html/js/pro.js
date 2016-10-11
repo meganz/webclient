@@ -3464,8 +3464,17 @@ var doProLogin = function($dialog) {
         checkloginresult: function(ctx,r)
         {
             loadingDialog.hide();
-
-            if (r == EBLOCKED)
+            var e = $('#login-name', $dialog).val();
+            if (e == '' || e == l[195] || checkMail(e)) {
+                $('.top-login-input-block.e-mail', $dialog).addClass('incorrect');
+                $('#login-name', $dialog).val('');
+                $('#login-name', $dialog).focus();
+            }
+            else if ($('#login-password', $dialog).val() == ''
+                    || $('#login-password', $dialog).val() == l[909]) {
+                $('.top-login-input-block.password', $dialog).addClass('incorrect');
+            }
+            else if (r == EBLOCKED)
             {
                 alert(l[730]);
             }
@@ -3486,8 +3495,9 @@ var doProLogin = function($dialog) {
             }
             else
             {
-                $('#login-password', $dialog).val('');
-                alert(l[201]);
+                $('.top-login-pad', $dialog).addClass('both-incorrect-inputs');
+                $('.top-login-input-tooltip.both-incorrect', $dialog).addClass('active');
+                $('#login-password', $dialog).select();
             }
         }
     };

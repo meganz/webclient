@@ -22380,9 +22380,6 @@ a.top-login-forgot-pass {
     cursor: pointer;
     float: right;
 }
-.pro-register-scroll {
-    overflow: hidden;
-}
 .pro-register-dialog p {
     font-size: 15px;
     line-height: 24px;

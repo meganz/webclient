@@ -343,6 +343,10 @@
                 var body = $.isFunction(textMessage.body) ? textMessage.body(self, params) : textMessage.body;
                 var icon = $.isFunction(textMessage.icon) ? textMessage.icon(self, params) : textMessage.icon;
 
+                if (icon === null) {
+                    icon = undefined;
+                }
+
                 self._desktopNotification = new Notification(title, {
                     body: body,
                     icon: icon,

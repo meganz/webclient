@@ -203,7 +203,8 @@ IndexedDBKVStorage.prototype.getItem = IndexedDBKVStorage._requiresDbConn(functi
     var promise = new MegaPromise();
 
     if (typeof(self._memCache[k]) !== 'undefined') {
-        return MegaPromise.resolve(self._memCache[k]);
+        promise.resolve(self._memCache[k]);
+        return promise;
     }
 
     self.db.getByIndex(

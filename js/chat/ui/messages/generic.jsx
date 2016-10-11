@@ -130,6 +130,11 @@ var GenericConversationMessage = React.createClass({
             additionalClasses += this.props.className;
         }
 
+        if (message.revoked) {
+            // skip doing tons of stuff and just return null, in case this message was marked as revoked.
+            return null;
+        }
+
         // if this is a text msg.
         if (
             (message instanceof KarereEventObjects.IncomingMessage) ||
@@ -316,8 +321,6 @@ var GenericConversationMessage = React.createClass({
                         var dropdown = null;
                         var previewButtons = null;
 
-
-
                         if (!attachmentMetaInfo.revoked) {
                             if (v.fa && (icon === "graphic" || icon === "image")) {
                                 var imagesListKey = message.messageId + "_" + v.h;
@@ -375,9 +378,8 @@ var GenericConversationMessage = React.createClass({
                             }
                         }
                         else {
-                            dropdown = <ButtonsUI.Button
-                                className="default-white-button tiny-button disabled"
-                                icon="tiny-icon grey-down-arrow" />;
+                            // else if (attachmentMetaInfo.revoked) { ... don't show revoked files
+                            return;
                         }
 
                         var attachmentClasses = "message shared-data";

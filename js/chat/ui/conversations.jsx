@@ -10,7 +10,6 @@ var DropdownsUI = require('./../../ui/dropdowns.jsx');
 var ContactsUI = require('./../ui/contacts.jsx');
 var ConversationPanelUI = require("./../ui/conversationpanel.jsx");
 
-
 var ConversationsListItem = React.createClass({
     mixins: [MegaRenderMixin, RenderDebugger],
     componentWillMount: function() {
@@ -143,6 +142,14 @@ var ConversationsListItem = React.createClass({
                     l[8000]
             );
 
+            if (ChatdIntegration.mcfHasFinishedPromise.state() === 'pending') {
+                if (!ChatdIntegration.mcfHasFinishedPromise._trackDataChangeAttached) {
+                    ChatdIntegration.mcfHasFinishedPromise.always(function () {
+                        megaChat.chats.trackDataChange();
+                    });
+                    ChatdIntegration.mcfHasFinishedPromise._trackDataChangeAttached = true;
+                }
+            }
 
             lastMessageDiv =
                 <div>

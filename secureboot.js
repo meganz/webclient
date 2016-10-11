@@ -436,8 +436,26 @@ if (b_u && !is_mobile) {
     document.location = 'update.html';
 }
 
-var ln = {}; ln.en = 'English'; ln.cn = '简体中文';  ln.ct = '中文繁體'; ln.ru = 'Pусский'; ln.es = 'Español'; ln.fr = 'Français'; ln.de = 'Deutsch'; ln.it = 'Italiano'; ln.br = 'Português Brasil'; ln.vi = 'Tiếng Việt'; ln.nl = 'Nederlands'; ln.kr = '한국어';   ln.ar = 'العربية'; ln.jp = '日本語'; ln.pt = 'Português'; ln.he = 'עברית'; ln.pl = 'Polski'; ln.sk = 'Slovenský'; ln.cz = 'Čeština'; ln.ro = 'Română'; ln.fi = 'Suomi'; ln.se = 'Svenska'; ln.hu = 'Magyar'; ln.sr = 'српски'; ln.sl = 'Slovenščina'; ln.tr = 'Türkçe';  ln.id = 'Bahasa Indonesia'; ln.uk = 'Українська'; ln.sr = 'српски'; ln.th = 'ภาษาไทย'; ln.bg = 'български'; ln.fa = 'فارسی '; ln.tl = 'Tagalog';
-var ln2 = {}; ln2.en = 'English'; ln2.cn = 'Chinese';  ln2.ct = 'Traditional Chinese'; ln2.ru = 'Russian'; ln2.es = 'Spanish'; ln2.fr = 'French'; ln2.de = 'German'; ln2.it = 'Italian'; ln2.br = 'Brazilian Portuguese'; ln2.vi = 'Vietnamese'; ln2.nl = 'Dutch'; ln2.kr = 'Korean';   ln2.ar = 'Arabic'; ln2.jp = 'Japanese'; ln2.pt = 'Portuguese'; ln2.he = 'Hebrew'; ln2.pl = 'Polish'; ln2.sk = 'Slovak'; ln2.cz = 'Czech'; ln2.ro = 'Romanian'; ln2.fi = 'Finnish'; ln2.se = 'Swedish'; ln2.hu = 'Hungarian'; ln2.sr = 'Serbian'; ln2.sl = 'Slovenian'; ln2.tr = 'Turkish'; ln2.id = 'Indonesian'; ln2.uk = 'Ukrainian'; ln2.sr = 'Serbian'; ln2.th = 'Thai'; ln2.bg = 'Bulgarian'; ln2.fa = 'Farsi'; ln2.tl = 'Tagalog';
+var ln = {};
+var ln2 = {};
+
+// Native language names
+ln.en = 'English'; ln.cn = '简体中文';  ln.ct = '中文繁體'; ln.ru = 'Pусский'; ln.es = 'Español';
+ln.fr = 'Français'; ln.de = 'Deutsch'; ln.it = 'Italiano'; ln.br = 'Português'; ln.vi = 'Tiếng Việt';
+ln.nl = 'Nederlands'; ln.kr = '한국어';   ln.ar = 'العربية'; ln.jp = '日本語'; ln.he = 'עברית';
+ln.pl = 'Polski'; ln.sk = 'Slovenský'; ln.cz = 'Čeština'; ln.ro = 'Română'; ln.fi = 'Suomi';
+ln.se = 'Svenska'; ln.hu = 'Magyar'; ln.sr = 'српски'; ln.sl = 'Slovenščina'; ln.tr = 'Türkçe';
+ln.id = 'Bahasa Indonesia'; ln.uk = 'Українська'; ln.sr = 'српски';
+ln.th = 'ภาษาไทย'; ln.bg = 'български'; ln.fa = 'فارسی '; ln.tl = 'Tagalog';
+
+// Language names in English
+ln2.en = 'English'; ln2.cn = 'Chinese';  ln2.ct = 'Traditional Chinese'; ln2.ru = 'Russian'; ln2.es = 'Spanish';
+ln2.fr = 'French'; ln2.de = 'German'; ln2.it = 'Italian'; ln2.br = 'Portuguese'; ln2.vi = 'Vietnamese';
+ln2.nl = 'Dutch'; ln2.kr = 'Korean';   ln2.ar = 'Arabic'; ln2.jp = 'Japanese'; ln2.he = 'Hebrew';
+ln2.pl = 'Polish'; ln2.sk = 'Slovak'; ln2.cz = 'Czech'; ln2.ro = 'Romanian'; ln2.fi = 'Finnish';
+ln2.se = 'Swedish'; ln2.hu = 'Hungarian'; ln2.sr = 'Serbian'; ln2.sl = 'Slovenian'; ln2.tr = 'Turkish';
+ln2.id = 'Indonesian'; ln2.uk = 'Ukrainian'; ln2.sr = 'Serbian'; ln2.th = 'Thai'; ln2.bg = 'Bulgarian';
+ln2.fa = 'Farsi'; ln2.tl = 'Tagalog';
 
 /**
  * Below is the asmCrypto SHA-256 library which was converted to a string so it can be run by the web worker which
@@ -965,6 +983,13 @@ if (is_ios) {
         }
     }
     tmp = undefined;
+
+    if (m) {
+        // Prevent Safari's copy&paste bug..
+        window.onhashchange = function() {
+            location.reload();
+        };
+    }
 }
 
 if (m)
@@ -1063,8 +1088,10 @@ if (m)
     }
     else if (window.location.hash.substr(1, 7) === 'confirm'
             || window.location.hash.substr(1, 6) === 'backup'
+            || window.location.hash.substr(1, 6) === 'cancel'
             || window.location.hash.substr(1, 6) === 'fm/ipc'
             || window.location.hash.substr(1, 9) === 'newsignup'
+            || window.location.hash.substr(1, 7) === 'recover'
             || window.location.hash.substr(1, 7) === 'account')
     {
         var i = 0;
@@ -1106,7 +1133,14 @@ else if (!b_u)
     d = window.d || 0;
     jj = window.jj || 0;
     var onBetaW = location.hostname === 'beta.mega.nz' || location.hostname.indexOf("developers.") === 0;
-    var languages = {'en':['en','en-'],'es':['es','es-'],'fr':['fr','fr-'],'de':['de','de-'],'it':['it','it-'],'nl':['nl','nl-'],'pt':['pt'],'br':['pt-br'],'se':['sv'],'fi':['fi'],'pl':['pl'],'cz':['cz','cs','cz-'],'sk':['sk','sk-'],'sl':['sl','sl-'],'hu':['hu','hu-'],'jp':['ja'],'cn':['zh','zh-cn'],'ct':['zh-hk','zh-sg','zh-tw'],'kr':['ko'],'ru':['ru','ru-mo'],'ar':['ar','ar-'],'he':['he'],'id':['id'],'sg':[],'tr':['tr','tr-'],'ro':['ro','ro-'],'uk':['||'],'sr':['||'],'th':['||'],'fa':['||'],'bg':['bg'],'tl':['en-ph'],'vi':['vn', 'vi']};
+    var languages = {
+        'en':['en','en-'], 'es':['es','es-'], 'fr':['fr','fr-'], 'de':['de','de-'], 'it':['it','it-'],
+        'nl':['nl','nl-'], 'br':['pt-br','pt'], 'se':['sv'], 'fi':['fi'], 'pl':['pl'], 'cz':['cz','cs','cz-'],
+        'sk':['sk','sk-'], 'sl':['sl','sl-'], 'hu':['hu','hu-'], 'jp':['ja'], 'cn':['zh','zh-cn'],
+        'ct':['zh-hk','zh-sg','zh-tw'], 'kr':['ko'], 'ru':['ru','ru-mo'], 'ar':['ar','ar-'], 'he':['he'],
+        'id':['id'], 'sg':[], 'tr':['tr','tr-'], 'ro':['ro','ro-'], 'uk':['||'], 'sr':['||'], 'th':['||'],
+        'fa':['||'], 'bg':['bg'], 'tl':['en-ph'], 'vi':['vn', 'vi']
+    };
 
     if (typeof console == "undefined") { this.console = { log: function() {}, error: function() {}}}
     if (d && !console.time) (function(c)
@@ -1121,10 +1155,10 @@ else if (!b_u)
         };
     })(console);
 
-    Object.defineProperty(window, "__cd_v", { value : 28, writable : false });
+    Object.defineProperty(window, "__cd_v", { value : 29, writable : false });
 
-    // Do not report exceptions if this build is older than 20 days
-    var exTimeLeft = ((buildVersion.timestamp + (20 * 86400)) * 1000) > Date.now();
+    // Do not report exceptions if this build is older than 10 days
+    var exTimeLeft = ((buildVersion.timestamp + (10 * 86400)) * 1000) > Date.now();
 
     if (!d && exTimeLeft && (location.host === 'mega.nz' || is_extension || onBetaW))
     {
@@ -1444,6 +1478,7 @@ else if (!b_u)
     jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
     jsl.push({f:'js/crypto.js', n: 'crypto_js', j:1,w:5});
     jsl.push({f:'js/account.js', n: 'user_js', j:1});
+    jsl.push({f:'js/attr.js', n: 'mega_attr_js', j:1});
     jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
 
     if (!is_mobile) {
@@ -1509,6 +1544,9 @@ else if (!b_u)
 
     // MEGA CHAT
     if ((location.host === 'mega.nz' || !megaChatIsDisabled) && !is_mobile) {
+        jsl.push({f:'js/vendor/react.js', n: 'react', j:1, w:10});
+        jsl.push({f:'js/vendor/react-dom.js', n: 'react-dom', j:1, w:1});
+
         jsl.push({f:'js/chat/strongvelope.js', n: 'strongvelope_js', j:1, w:1});
         jsl.push({f:'js/chat/rtcStats.js', n: 'rtcstats_js', j:1, w:1});
         jsl.push({f:'js/chat/rtcSession.js', n: 'rtcsession_js', j:1, w:1});
@@ -1612,6 +1650,7 @@ else if (!b_u)
         jsl.push({f:'css/chat-emojione.css', n: 'chat_emojione_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/vendor/perfect-scrollbar.css', n: 'vendor_ps_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/onboarding.css', n: 'onboarding_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/media-print.css', n: 'media_print_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/help2.css', n: 'help_css', j:2,w:5,c:1,d:1,cache:1});
 
@@ -1622,6 +1661,9 @@ else if (!b_u)
         jsl.push({f:'js/vendor/int64.js', n: 'int64_js', j:1});
         jsl.push({f:'js/transfers/zip64.js', n: 'zip_js', j:1});
         jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
+
+        jsl.push({f:'html/onboarding.html', n: 'onboarding', j:0,w:2});
+        jsl.push({f:'js/ui/onboarding.js', n: 'onboarding_js', j:1,w:1});
     } // !is_mobile
 
 

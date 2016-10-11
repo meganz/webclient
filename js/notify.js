@@ -602,6 +602,7 @@ var notify = {
 
         var date = time2last(notification.timestamp);
         var userHandle = notification.userHandle;
+        var customIconNotifications = ['psts', 'pses', 'ph'];   // Payment & Takedown notification types
         var userEmail = '';
         var avatar = '';
 
@@ -620,30 +621,37 @@ var notify = {
             userEmail = notify.userEmails[userHandle];
         }
 
-        // Generate from the user handle which will load their profile pic if they are already a contact
-        if (typeof M.u[userHandle] !== 'undefined') {
-            avatar = useravatar.contact(userHandle);
-        }
+        // If the notification is not one of the custom ones, generate an avatar from the user information
+        if (customIconNotifications.indexOf(notification.type) === -1) {
+            
+            // Generate avatar from the user handle which will load their profile pic if they are already a contact
+            if (typeof M.u[userHandle] !== 'undefined') {
+                avatar = useravatar.contact(userHandle);
+            }
 
-        // If it failed to generate an avatar from the user handle, or we haven't generated one yet use the email
-        // address. With the new v2.0 API for pending contacts, the user handle will usually not be available as they
-        // are not a full contact yet.
-        if (avatar === '') {
-            avatar = useravatar.contact(userEmail);
+            // If it failed to generate an avatar from the user handle, or we haven't generated one yet use the email
+            // address. With the new v2.0 API for pending contacts, the user handle will usually not be available as
+            // they are not a full contact yet.
+            if (avatar === '') {
+                avatar = useravatar.contact(userEmail);
+            }
+            
+            // Add the avatar HTML and show it
+            $notificationHtml.find('.notification-avatar').removeClass('hidden').prepend(avatar);
+        }
+        else {
+            // Hide the notification avatar code, the specific notification will render the icon
+            $notificationHtml.find('.notification-icon').removeClass('hidden');
         }
 
         // Get the user's name if we have it, otherwise user their email
         var displayNameOrEmail = notify.getDisplayName(userEmail);
 
-        // Escape email address
-        userEmail = htmlentities(userEmail);
-
         // Update common template variables
         $notificationHtml.attr('id', notification.id);
         $notificationHtml.find('.notification-date').text(date);
         $notificationHtml.find('.notification-username').text(displayNameOrEmail);
-        $notificationHtml.find('.notification-avatar').prepend(avatar);
-
+        
         // Add read status
         if (notification.seen) {
             $notificationHtml.addClass('read');
@@ -652,11 +660,11 @@ var notify = {
         // Populate other information based on each type of notification
         switch (notification.type) {
             case 'ipc':
-                return notify.renderIncomingPendingContact($notificationHtml, notification, userEmail);
+                return notify.renderIncomingPendingContact($notificationHtml, notification);
             case 'c':
                 return notify.renderContactChange($notificationHtml, notification);
             case 'upci':
-                return notify.renderUpdatedPendingContactIncoming($notificationHtml, notification, userEmail);
+                return notify.renderUpdatedPendingContactIncoming($notificationHtml, notification);
             case 'upco':
                 return notify.renderUpdatedPendingContactOutgoing($notificationHtml, notification);
             case 'share':

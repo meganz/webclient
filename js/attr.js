@@ -563,10 +563,10 @@ var attribCache = false;
     };
 
 
-    ns.handleUserAttributeActionPackets = function(actionPacket) {
+    ns.handleUserAttributeActionPackets = function(actionPacket, avatars) {
         var attrs = actionPacket.ua;
         var actionPacketUserId = actionPacket.u;
-        var loadavatars = false;
+
         for (var j in attrs) {
             if (attrs.hasOwnProperty(j)) {
                 var attributeName = attrs[j];
@@ -580,10 +580,7 @@ var attribCache = false;
 
                 // handle avatar related action packets (e.g. avatar modified)
                 if (attributeName === '+a') {
-                    if (!loadavatars) {
-                        loadavatars = [];
-                    }
-                    loadavatars.push(actionPacketUserId);
+                    avatars.push(actionPacketUserId);
                 }
                 // handle firstname/lastname attributes
                 else if (attributeName === 'firstname' || attributeName === 'lastname') {
@@ -596,7 +593,6 @@ var attribCache = false;
                 }
             }
         }
-        return loadavatars;
     };
 
     /**

@@ -1238,6 +1238,12 @@ function topmenuUI() {
         $('.create-account-button').hide();
         $('.membership-status-block').show();
 
+        Soon(function() {
+            if (!avatars[u_handle]) {
+                useravatar.loadAvatar(u_handle);
+            }
+        });
+
         // If a Lite/Pro plan has been purchased
         if (u_attr.p) {
 

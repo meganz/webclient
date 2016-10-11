@@ -3465,16 +3465,16 @@ var doProLogin = function($dialog) {
         {
             loadingDialog.hide();
             var e = $('#login-name', $dialog).val();
-            if (e == '' || e == l[195] || checkMail(e)) {
+            if (e === '' || e === l[195] || checkMail(e)) {
                 $('.top-login-input-block.e-mail', $dialog).addClass('incorrect');
                 $('#login-name', $dialog).val('');
                 $('#login-name', $dialog).focus();
             }
-            else if ($('#login-password', $dialog).val() == ''
-                    || $('#login-password', $dialog).val() == l[909]) {
+            else if ($('#login-password', $dialog).val() === ''
+                    || $('#login-password', $dialog).val() === l[909]) {
                 $('.top-login-input-block.password', $dialog).addClass('incorrect');
             }
-            else if (r == EBLOCKED)
+            else if (r === EBLOCKED)
             {
                 alert(l[730]);
             }

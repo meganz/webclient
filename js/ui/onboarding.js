@@ -491,7 +491,7 @@
                 ) {
                     return true;
                 }
-                else {
+                else if (typeof megaChat !== 'undefined') {
                     if (megaChat.plugins.chatdIntegration.isLoading() === false) {
                         $(megaChat.plugins.chatdIntegration).rebind('onMcfLoadingDone.onboardingChat', function() {
                             self.eventuallyRenderClickHandlers();
@@ -530,9 +530,19 @@
     scope.mega.ui = scope.mega.ui || {};
     scope.mega.ui.Onboarding = Onboarding;
 
-    mBroadcaster.once('fm:initialized', function _initOnboarding() {
+    var delayedInitOnboarding = function _delayedInitOnboarding() {
         if (typeof mega.ui.onboarding === 'undefined') {
-            mega.ui.onboarding = new mega.ui.Onboarding({});
+            if (typeof u_handle !== 'undefined') {
+                mega.ui.onboarding = new mega.ui.Onboarding({});
+            }
+            else {
+                // reschedule onboarding init in case this was a folder link
+                if (folderlink) {
+                    mBroadcaster.once('fm:initialized', delayedInitOnboarding);
+                }
+            }
         }
-    });
+    };
+
+    mBroadcaster.once('fm:initialized', delayedInitOnboarding);
 })(jQuery, mBroadcaster, window);

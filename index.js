@@ -1139,12 +1139,12 @@ function loginDialog(close) {
 
 function tooltiplogin() {
     var e = $('#login-name').val();
-    if (e == '' || checkMail(e)) {
+    if (e === '' || checkMail(e)) {
         $('.top-login-input-block.e-mail').addClass('incorrect');
         $('#login-name').val('');
         $('#login-name').focus();
     }
-    else if ($('#login-password').val() == '') {
+    else if ($('#login-password').val() === '') {
         $('.top-login-input-block.password').addClass('incorrect');
     }
     else {

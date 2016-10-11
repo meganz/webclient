@@ -5578,7 +5578,7 @@ function execsc(actionPackets, callback) {
                 process_u(actionPacket.u);
 
                 // Only show a notification if we did not trigger the action ourselves
-                if (actionPacket.ou !== u_attr.u) {
+                if (!pfid && u_attr && actionPacket.ou !== u_attr.u) {
                     notify.notifyFromActionPacket(actionPacket);
                 }
 
@@ -5972,7 +5972,7 @@ function execsc(actionPackets, callback) {
             }
 
             // Only show a notification if we did not trigger the action ourselves
-            if (actionPacket.ou !== u_attr.u) {
+            if (!pfid && u_attr && actionPacket.ou !== u_attr.u) {
                 notify.notifyFromActionPacket(actionPacket);
             }
 
@@ -5989,7 +5989,7 @@ function execsc(actionPackets, callback) {
             M.delNode(actionPacket.n);
 
             // Only show a notification if we did not trigger the action ourselves
-            if (actionPacket.ou !== u_attr.u) {
+            if (!pfid && u_attr && actionPacket.ou !== u_attr.u) {
                 notify.notifyFromActionPacket(actionPacket);
             }
         }

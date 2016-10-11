@@ -14774,5 +14774,21 @@
     "12437": {
         "text": "If you already have it installed [A]click here![\/A]",
         "context": "If the user is sure that they already have the native app installed then this link will give them a chance to open it."
+    },
+    "12438": {
+        "text": "Please enter your Recovery Key",
+        "context": "A message shown to explain that the user has to input (type or paste) their recovery key to continue with the reset password process."
+    },
+    "12439": {
+        "text": "You are using an ephemeral session in this browser. If you want to preserve the uploaded data, click Register in the tab where you see your data. If you do not care about the data, click Logout and try clicking the same account confirmation link again.",
+        "context": "This message will appear when a user is trying to activate their account from an ephemeral session which is not related to the activation link."
+    },
+    "12440": {
+        "text": "You are already logged into a MEGA account from this browser. Click Logout first and then try clicking the same account confirmation link again.",
+        "context": "This message will appear when a user is trying to activate their new account from an existing account."
+    },
+    "12441": {
+        "text": "ETA",
+        "context": "An acronym for \"Estimated Time of Arrival\" which is used in the Transfers section to give an indication when the file will be fully downloaded\/uploaded."
     }
 }

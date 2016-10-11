@@ -3693,6 +3693,10 @@
     "12435": "Aby zobaczy\u0107 ten plik, mo\u017cesz otworzy\u0107 go na komputerze, w przegl\u0105darce lub pobra\u0107 aplikacj\u0119 MEGA.",
     "12436": "Czy masz ju\u017c zainstalowan\u0105 aplikacj\u0119 MEGA?",
     "12437": "Je\u017celi masz ju\u017c zainstalowan\u0105 aplikacj\u0119 [A]kliknij tutaj[\/A]",
+    "12438": "Please enter your Recovery Key",
+    "12439": "You are using an ephemeral session in this browser. If you want to preserve the uploaded data, click Register in the tab where you see your data. If you do not care about the data, click Logout and try clicking the same account confirmation link again.",
+    "12440": "You are already logged into a MEGA account from this browser. Click Logout first and then try clicking the same account confirmation link again.",
+    "12441": "ETA",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

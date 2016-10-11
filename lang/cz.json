@@ -3693,6 +3693,10 @@
     "12435": "Pro zobrazen\u00ed tohoto odkazu m\u016f\u017eete ho bu\u010f otev\u0159\u00edt v prohl\u00ed\u017ee\u010di na po\u010d\u00edta\u010di \u010di notebooku, nebo st\u00e1hnout aplikaci MEGA.",
     "12436": "M\u00e1te ji\u017e nainstalov\u00e1nu aplikaci MEGA?",
     "12437": "Pokud ji m\u00e1te ji\u017e nainstalov\u00e1nu, [A]klikn\u011bte sem![\/A]",
+    "12438": "Zadejte sv\u016fj Obnovovac\u00ed kl\u00ed\u010d",
+    "12439": "You are using an ephemeral session in this browser. If you want to preserve the uploaded data, click Register in the tab where you see your data. If you do not care about the data, click Logout and try clicking the same account confirmation link again.",
+    "12440": "Ji\u017e jste p\u0159ihl\u00e1\u0161eni do MEGA z tohoto prohl\u00ed\u017ee\u010de. Nejprve klikn\u011bte na Odhl\u00e1sit a pak zkuste znovu kliknout na stejn\u00fd odkaz na potvrzen\u00ed \u00fa\u010dtu.",
+    "12441": "ETA",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

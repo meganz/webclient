@@ -3693,6 +3693,10 @@
     "12435": "To view this link, you can either open it on a desktop or laptop browser, or download the MEGA app.",
     "12436": "\u00bfYa tienes instalada la aplicaci\u00f3n MEGA?",
     "12437": "Si ya la tienes instalada [A]\u00a1haz clic aqu\u00ed![\/A]",
+    "12438": "Por favor, introduce tu Clave de Recuperaci\u00f3n",
+    "12439": "You are using an ephemeral session in this browser. If you want to preserve the uploaded data, click Register in the tab where you see your data. If you do not care about the data, click Logout and try clicking the same account confirmation link again.",
+    "12440": "You are already logged into a MEGA account from this browser. Click Logout first and then try clicking the same account confirmation link again.",
+    "12441": "APROX",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

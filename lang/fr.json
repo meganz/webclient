@@ -3693,6 +3693,10 @@
     "12435": "Pour visualiser ce lien, vous pouvez soit l&#039;ouvrir avec le navigateur d&#039;un ordinateur de bureau ou portable, soit t\u00e9l\u00e9charger l&#039;appli MEGA.",
     "12436": "L&#039;appli MEGA est-elle vraiment install\u00e9e?",
     "12437": "Si elle est d\u00e9j\u00e0 install\u00e9e, [A]cliquer ici ![\/A]",
+    "12438": "Please enter your Recovery Key",
+    "12439": "You are using an ephemeral session in this browser. If you want to preserve the uploaded data, click Register in the tab where you see your data. If you do not care about the data, click Logout and try clicking the same account confirmation link again.",
+    "12440": "You are already logged into a MEGA account from this browser. Click Logout first and then try clicking the same account confirmation link again.",
+    "12441": "ETA",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

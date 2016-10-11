@@ -14750,5 +14750,45 @@
     "10663": {
         "text": "... and [X] more",
         "context": "Context menu 'Info' action on node with shares gives a user properties dialog with an option to click to Shares with 'i' icon where by default only 5 contacts are shown, if there is a more then 5 contacts user must click at bottom of popup where this text stands e.g. 'and 6 more'\r\nPlease view the screenshot."
+    },
+    "12432": {
+        "text": "Due to our advanced end-to-end encryption we do not yet support mobile browsers.",
+        "context": "A description of the MEGA app in the mobile pages."
+    },
+    "12433": {
+        "text": "To use our service, you can either open MEGA on a desktop or laptop browser, or download the MEGA app.",
+        "context": "A description of the MEGA app in the mobile pages."
+    },
+    "12434": {
+        "text": "To use our service, you can open MEGA on a desktop or laptop browser. A dedicated app for your platform will be coming soon.",
+        "context": "A description of the MEGA app in the mobile pages."
+    },
+    "12435": {
+        "text": "To view this link, you can either open it on a desktop or laptop browser, or download the MEGA app.",
+        "context": "A message which is shown when people visit MEGA with a non supported mobile browser."
+    },
+    "12436": {
+        "text": "Do you already have the MEGA app installed?",
+        "context": "This asks the user if they already have MEGA's native app installed in their mobile phone."
+    },
+    "12437": {
+        "text": "If you already have it installed [A]click here![\/A]",
+        "context": "If the user is sure that they already have the native app installed then this link will give them a chance to open it."
+    },
+    "12438": {
+        "text": "Please enter your Recovery Key",
+        "context": "A message shown to explain that the user has to input (type or paste) their recovery key to continue with the reset password process."
+    },
+    "12439": {
+        "text": "You are using an ephemeral session in this browser. If you want to preserve the uploaded data, click Register in the tab where you see your data. If you do not care about the data, click Logout and try clicking the same account confirmation link again.",
+        "context": "This message will appear when a user is trying to activate their account from an ephemeral session which is not related to the activation link."
+    },
+    "12440": {
+        "text": "You are already logged into a MEGA account from this browser. Click Logout first and then try clicking the same account confirmation link again.",
+        "context": "This message will appear when a user is trying to activate their new account from an existing account."
+    },
+    "12441": {
+        "text": "ETA",
+        "context": "An acronym for \"Estimated Time of Arrival\" which is used in the Transfers section to give an indication when the file will be fully downloaded\/uploaded."
     }
 }

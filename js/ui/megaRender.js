@@ -767,7 +767,7 @@
                     assert(Object(M.u[aHandle]).c === 1, 'Found non-active contact');
                 }
 
-                var avatar = useravatar.contact(aHandle, "nw-contact-avatar");
+                var avatar = useravatar.contact(aHandle, 'nw-contact-avatar');
 
                 if (avatar) {
                     props.avatar = parseHTML(avatar).firstChild;

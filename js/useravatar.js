@@ -92,12 +92,12 @@ var useravatar = (function() {
      * @param {String} className Any extra CSS classes that we want to append to the HTML
      * @param {String} element The HTML tag
      * @returns {String} Returns the HTML
-     * @returns {String} Returns the HTML
+     * @returns {Boolean} Adds addition blured background block
      * @private
      */
     function _getAvatarContent(user, className, element, bg) {
         var id = user.u || user;
-        var bgBlock;
+        var bgBlock = '';
 
         if (element === 'ximg') {
             return _getAvatarSVGDataURI(user);
@@ -137,11 +137,11 @@ var useravatar = (function() {
      * @param {String} className Any extra CSS classes that we want to append to the HTML
      * @param {String} type The HTML tag type
      * @returns {String} The image HTML
-     * @returns {String} Returns the HTML
+     * @returns {Boolean} Adds addition blured background block
      * @private
      */
     function _getAvatarImageContent(url, id, className, type, bg) {
-        var bgBlock;
+        var bgBlock = '';
         id        = escapeHTML(id);
         url       = escapeHTML(url);
         type      = escapeHTML(type);
@@ -320,7 +320,7 @@ var useravatar = (function() {
      * @param {String} className
      * @param {String} element
      * @returns {String}
-     * @returns {String} Returns the HTML
+     * @returns {Boolean} Adds addition blured background block
      */
     ns.contact = function(user, className, element, bg) {
         user = M.getUser(user) || String(user);

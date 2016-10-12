@@ -1022,25 +1022,28 @@ function MegaData()
                             hideReinvite = 'hidden';
                         }
                     }
+
+                    hideOPC = (hideOPC !== '') ? ' class="' + hideOPC + '"' : '';
+                    html = '<tr id="opc_' + htmlentities(opc[i].p) + '"' + hideOPC + '>' +
+                        '<td>' +
+                            '<div class="left email">' +
+                                '<div class="nw-contact-avatar"></div>' +
+                                '<div class="fm-chat-user-info">' +
+                                    '<div class="contact-email">' + htmlentities(opc[i].m) + '</div>' +
+                                '</div>' +
+                            '</div>' +
+                            '<div class="contact-request-button cancel ' + hideCancel + '">' +
+                                '<span>' + escapeHTML(l[5930]) + '</span>' +
+                            '</div>' +
+                            '<div class="contact-request-button reinvite ' + hideReinvite + '">' +
+                                '<span>' + escapeHTML(l[5861]) + '</span>' +
+                            '</div>' +
+                        '</td></tr>';
+
+                    $(t).append(html);
+
+                    drawn = true;
                 }
-
-                hideOPC = (hideOPC !== '') ? ' class="' + hideOPC + '"' : '';
-                html = '<tr id="opc_' + htmlentities(opc[i].p) + '"' + hideOPC + '>\n\
-                    <td>\n\
-                        <div class="left email">\n\
-                            <div class="nw-contact-avatar"></div>\n\
-                            <div class="fm-chat-user-info">\n\
-                               <div class="contact-email">' + htmlentities(opc[i].m) + '</div>\n\
-                            </div>\n\
-                        </div>\n\
-                        <div class="contact-request-button cancel ' + hideCancel + '"><span>' + l[156] + ' ' + l[738].toLowerCase() + '</span></div>\n\
-                        <div class="contact-request-button reinvite ' + hideReinvite + '"><span>' + l[5861] + '</span></div>\n\
-                    </td>\n\
-                </tr>';
-
-                $(t).append(html);
-
-                drawn = true;
             }
 
             if (drawn) {
@@ -3964,6 +3967,62 @@ function MegaData()
             }
         }
 
+        if (!user && handle === u_handle) {
+            user = u_attr;
+        }
+
+        return user;
+    };
+
+    /**
+     * Retrieve an user object by its email
+     * @param {String} email The user's handle
+     * @return {Object} The user object, of false if not found
+     */
+    this.getUserByEmail = function(email) {
+        var user = false;
+
+        M.u.every(function(contact, u) {
+            if (M.u[u].m === email) {
+                // Found the user object
+                user = M.u[u];
+
+                if (user instanceof MegaDataObject) {
+                    user = user._data;
+                }
+                return false;
+            }
+            return true;
+        });
+
+        return user;
+    };
+
+    /**
+     * Retrieve an user object
+     * @param {String} str An email or handle
+     * @return {Object} The user object, of false if not found
+     */
+    this.getUser = function(str) {
+        var user = false;
+
+        if (typeof str !== 'string') {
+            // Check if it's an user object already..
+
+            if (Object(str).hasOwnProperty('u')) {
+                // Yup, likely.. let's see
+                user = this.getUserByHandle(str.u);
+            }
+        }
+        else if (str.length === 11) {
+            // It's an user handle
+            user = this.getUserByHandle(str);
+        }
+        else if (str.indexOf('@') > 0) {
+            // It's an email..
+            user = this.getUserByEmail(str);
+        }
+
         return user;
     };
 
@@ -3991,9 +4050,6 @@ function MegaData()
             if (node) {
                 result = node.name;
             }
-        }
-        else {
-            console.error('getNameByHandle: Unsupported handle "%s"', handle);
         }
 
         return String(result);
@@ -4429,10 +4485,16 @@ function MegaData()
                     $tr.find('.left-c p').css('transform', 'rotate(' + (transferDeg - 180) + 'deg)');
                 }
                 if (retime > 0) {
+                    var title = '';
+                    try {
+                        title = new Date((unixtime() + retime) * 1000).toLocaleString();
+                    }
+                    catch (ex) {
+                    }
                     $tr.find('.eta')
                         .text(secondsToTime(retime))
                         .removeClass('unknown')
-                        .attr('title', new Date((unixtime() + retime) * 1000).toLocaleString());
+                        .attr('title', title);
                 }
                 else {
                     $tr.find('.eta').addClass('unknown').text('');
@@ -5491,7 +5553,7 @@ function execsc(actionPackets, callback) {
         trights = false,
         tmoveid = false,
         rootsharenodes = [],
-        loadavatars = false;
+        loadavatars = [];
 
     newnodes = [];
     mega.flags |= window.MEGAFLAG_EXECSC;
@@ -5516,7 +5578,7 @@ function execsc(actionPackets, callback) {
                 process_u(actionPacket.u);
 
                 // Only show a notification if we did not trigger the action ourselves
-                if (actionPacket.ou !== u_attr.u) {
+                if (!pfid && u_attr && actionPacket.ou !== u_attr.u) {
                     notify.notifyFromActionPacket(actionPacket);
                 }
 
@@ -5598,23 +5660,7 @@ function execsc(actionPackets, callback) {
                 }
             }
             else if (actionPacket.a === 'ua') {
-                var attrs = actionPacket.ua;
-                var actionPacketUserId = actionPacket.u;
-                for (var j in attrs) {
-                    if (attrs.hasOwnProperty(j)) {
-                        var attributeName = attrs[j];
-
-                        if (attributeName === '+a') {
-                            if (!loadavatars) {
-                                loadavatars = [];
-                            }
-                            loadavatars.push(actionPacketUserId);
-                        }
-                        else if (attributeName === 'firstname' || attributeName === 'lastname') {
-                            attribCache.uaPacketParser(attributeName, actionPacketUserId, true);
-                        }
-                    }
-                }
+                mega.attr.handleUserAttributeActionPackets(actionPacket, loadavatars);
             }
         }// END own action packet
         else if (actionPacket.a === 'e') {
@@ -5923,7 +5969,7 @@ function execsc(actionPackets, callback) {
             }
 
             // Only show a notification if we did not trigger the action ourselves
-            if (actionPacket.ou !== u_attr.u) {
+            if (!pfid && u_attr && actionPacket.ou !== u_attr.u) {
                 notify.notifyFromActionPacket(actionPacket);
             }
 
@@ -5940,7 +5986,7 @@ function execsc(actionPackets, callback) {
             M.delNode(actionPacket.n);
 
             // Only show a notification if we did not trigger the action ourselves
-            if (actionPacket.ou !== u_attr.u) {
+            if (!pfid && u_attr && actionPacket.ou !== u_attr.u) {
                 notify.notifyFromActionPacket(actionPacket);
             }
         }
@@ -5951,7 +5997,12 @@ function execsc(actionPackets, callback) {
                 if (attrs.hasOwnProperty(j)) {
                     var attributeName = attrs[j];
 
-                    attribCache.uaPacketParser(attributeName, actionPacketUserId);
+                    attribCache.uaPacketParser(
+                        attributeName,
+                        actionPacketUserId,
+                        false,
+                        actionPacket.v && actionPacket.v[j] ? actionPacket.v[j] : undefined
+                    );
                 }
             }
         }
@@ -6040,7 +6091,7 @@ function execsc(actionPackets, callback) {
     if (newnodes.length > 0 && fminitialized) {
         renderNew();
     }
-    if (loadavatars) {
+    if (loadavatars.length) {
         M.avatars(loadavatars);
     }
     if (M.viewmode) {
@@ -7166,27 +7217,24 @@ function init_chat() {
         if (u_type && !megaChatIsReady) {
             if (d) console.log('Initializing the chat...');
 
-            try {
-                // Prevent known Strophe exceptions...
-                if (!Strophe.Websocket.prototype._unsafeOnIdle) {
-                    Strophe.Websocket.prototype._unsafeOnIdle = Strophe.Websocket.prototype._onIdle;
-                    Strophe.Websocket.prototype._onIdle = function() {
+            // XXX: Prevent known Strophe exceptions...
+            ['_onIdle', '_connect'].forEach(function(fn) {
+                var proto = Strophe.Websocket.prototype;
+                var unsafeFn = '_unsafe' + fn;
+
+                if (!proto[unsafeFn]) {
+                    proto[unsafeFn] = proto[fn];
+                    proto[fn] = function() {
                         try {
-                            this._unsafeOnIdle.apply(this, arguments);
+                            this[unsafeFn].apply(this, arguments);
                         }
                         catch (ex) {
-                            if (d) {
-                                console.error(ex);
-                            }
+                            console.error('Caught Strophe exception.', ex);
                         }
                     };
                 }
-            }
-            catch (ex) {
-                if (d) {
-                    console.error(ex);
-                }
-            }
+                proto = undefined;
+            });
 
             var _chat = new Chat();
 
@@ -7225,6 +7273,9 @@ function init_chat() {
 function loadfm_callback(res, ctx) {
 
     loadingInitDialog.step3();
+
+    mega.loadReport.recvNodes     = Date.now() - mega.loadReport.stepTimeStamp;
+    mega.loadReport.stepTimeStamp = Date.now();
 
     if (pfkey) {
         if (res.f && res.f[0]) {
@@ -7302,6 +7353,9 @@ function loadfm_callback(res, ctx) {
             crypto_procsr(res.sr);
         }
 
+        mega.loadReport.procNodes     = Date.now() - mega.loadReport.stepTimeStamp;
+        mega.loadReport.stepTimeStamp = Date.now();
+
         // Retrieve initial batch of action-packets, if any
         // we'll then complete the process using loadfm_done
         getsc();
@@ -7323,12 +7377,24 @@ function loadfm_done(mDBload) {
 
     if (d > 1) console.error('loadfm_done', mDBload, is_fm());
 
+    mega.loadReport.procAPs       = Date.now() - mega.loadReport.stepTimeStamp;
+    mega.loadReport.stepTimeStamp = Date.now();
+
     mega.config.ready(function() {
         init_chat();
+
+        mega.loadReport.fmConfigFetch = Date.now() - mega.loadReport.stepTimeStamp;
+        mega.loadReport.stepTimeStamp = Date.now();
 
         // are we actually on an #fm/* page?
         if (is_fm() || $('.fm-main.default').is(":visible")) {
             renderfm();
+
+            mega.loadReport.renderfm      = Date.now() - mega.loadReport.stepTimeStamp;
+            mega.loadReport.stepTimeStamp = Date.now();
+        }
+        else {
+            mega.loadReport.renderfm = -1;
         }
 
         if (!CMS.isLoading()) {
@@ -7348,6 +7414,26 @@ function loadfm_done(mDBload) {
                     notify.getInitialNotifications();
                 }
             });
+
+            if (mBroadcaster.crossTab.master && !mega.loadReport.sent) {
+                mega.loadReport.sent = true;
+
+                var r = mega.loadReport;
+                r.totalTimeSpent = Date.now() - mega.loadReport.startTime;
+                r = [
+                    r.mode, // 1: DB, 2: API
+                    r.recvNodes, r.procNodes, r.procAPs,
+                    r.fmConfigFetch, r.renderfm,
+                    r.dbToNet | 0, // see mDB.js comment
+                    r.totalTimeSpent,
+                    Object.keys(M.d || {}).length
+                ];
+
+                if (d) {
+                    console.debug('loadReport', r);
+                }
+                api_req({ a: 'log', e: 99624, m: JSON.stringify(r) });
+            }
         }
 
         watchdog.notify('loadfm_done', mDBload);

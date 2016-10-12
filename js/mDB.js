@@ -315,7 +315,7 @@ mBroadcaster.once('startMega', function __msdb_init() {
     db.addSchemaHandler('opc',  'p',  processOPC);
     db.addSchemaHandler('ipc',  'p',  processIPC);
     db.addSchemaHandler('ps',   'p',  processPS);
-    db.addSchemaHandler('mcf',   'id',  processMCF);
+    db.addSchemaHandler('mcf',  'id', processMCF);
 
     /*mStorageDB('idbcache', { plugins: 0, ersistant: 1 },
         function(aError) {
@@ -479,6 +479,9 @@ var mFileManagerDB = {
                                 u_sharekeys[n.h] = crypto_process_sharekey(n.h, n.sk);
                             }
                         }
+                        mega.loadReport.recvNodes = Date.now() - mega.loadReport.stepTimeStamp;
+                        mega.loadReport.stepTimeStamp = Date.now();
+
                         $.mDBIgnoreDB = true;
                         process_f(results, function(hasMissingKeys) {
                             delete $.mDBIgnoreDB;
@@ -540,6 +543,9 @@ var mFileManagerDB = {
                 console.timeEnd('fmdb');
                 console.log('fmdb fetch completed', maxaction, hasEntries);
             }
+
+            mega.loadReport.procNodes = Date.now() - mega.loadReport.stepTimeStamp;
+            mega.loadReport.stepTimeStamp = Date.now();
 
             if (!maxaction || !hasEntries) {
                 this.reload();
@@ -660,6 +666,11 @@ var mFileManagerDB = {
     },
 
     _loadfm: function mFileManagerDB__loadfm(aDBInstance) {
+
+        // dbToNet holds the time wasted trying to read local DB, and having found we have to query the server.
+        mega.loadReport.dbToNet = Date.now() - mega.loadReport.startTime;
+        mega.loadReport.stepTimeStamp = Date.now();
+
         this._setstate(aDBInstance);
         mBroadcaster.sendMessage('mFileManagerDB.done', loadfm) || loadfm();
     },

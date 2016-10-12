@@ -277,21 +277,16 @@ a, a:link, a:visited, a:hover, a:active, a:focus img, a:focus img {
     float: left
 }
 .nlanguage-lnk, a.nlanguage-lnk, a.nlanguage-lnk:link, a.nlanguage-lnk:visited, a.nlanguage-lnk:hover, a.nlanguage-lnk:active {
-    border: 2px solid transparent;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
+    border: 2px solid #fff;
     border-radius: 4px;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
     box-sizing: border-box;
     color: #605f5d;
-    display: block;
+    cursor: pointer;
+    display: inline-block;
     font-size: 14px;
-    height: 28px;
-    line-height: 23px;
     padding: 0 10px;
     position: relative;
-    cursor: pointer;
+    width: 163px;
 }
 a.nlanguage-lnk:hover {
     border: 2px solid #D31A00;
@@ -323,14 +318,6 @@ a.nlanguage-lnk.language-template {
 .languages-dialog-body {
     padding: 10px 20px 10px 10px;
 }
-.languages-dialog .tier-one-languages, .languages-dialog .tier-two-languages {
-    -webkit-column-count: 4;
-    -moz-column-count: 4;
-    column-count: 4;
-    -webkit-column-width: 163px;
-    -moz-column-width: 163px;
-    column-width: 163px;
-}
 .languages-dialog .tier-one-languages {
     margin-top: 15px;
 }
@@ -338,6 +325,9 @@ a.nlanguage-lnk.language-template {
     display: none;
     margin-top: 20px;
     padding-bottom: 65px;
+}
+.languages-dialog .native-language-name {
+    line-height: 28px;
 }
 .languages-dialog .show-more-languages {
     cursor: pointer;
@@ -1843,6 +1833,9 @@ a.blog-button:hover {
     text-transform: uppercase;
     font-family: 'source_sans_prolight';
 }
+.notification-avatar.hidden {
+    display: none;
+}
 .notification-item .avatar-wrapper.avatar {
     width: 48px;
     height: 48px;
@@ -1892,6 +1885,7 @@ a.blog-button:hover {
 .black {
     color: black;
 }
+
 /* Small notification icons on top of the notification avatar */
 .nt-revocation-of-incoming .notification-avatar-icon {
     background-position: -10px -153px;
@@ -1917,22 +1911,34 @@ a.blog-button:hover {
 .nt-payment-reminder-notification .notification-avatar-icon {
     background-position: -10px -415px;
 }
-.nt-takedown-notification .notification-avatar-icon, .nt-takedown-reinstated-notification .notification-avatar-icon, .nt-payment-notification .notification-avatar-icon {
+
+/* Custom icon instead of avatar for MEGA notifications */
+.notification-item .notification-icon {
+    background: rgba(0, 0, 0, 0) url("../images/mega/bitcoin-v7.png") no-repeat scroll 0 0;
+    -moz-border-radius: 100%;
+    -webkit-border-radius: 100%;
+    border-radius: 100%;
+    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2);
+    display: block;
+    height: 48px;
+    margin: -24px 0 0;
+    position: absolute;
+    top: 50%;
+    width: 48px;
+}
+.notification-item .notification-icon.hidden {
     display: none;
 }
-/* Custom icon instead of avatar for MEGA notifications */
-.nt-payment-reminder-notification .notification-avatar, .nt-payment-notification .notification-avatar {
-    background: url('../images/mega/bitcoin-v7.png') no-repeat scroll -151px -650px;
-    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2);
+.nt-payment-reminder-notification .notification-icon, .nt-payment-notification .notification-icon {
+    background-position: -151px -650px;
 }
-.nt-takedown-notification .notification-avatar {
-    background: url("../images/mega/bitcoin-v7.png") no-repeat scroll -151px -1451px;
-    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2);
+.nt-takedown-notification .notification-icon {
+    background-position: -151px -1451px;
 }
-.nt-takedown-reinstated-notification .notification-avatar {
-    background: url("../images/mega/bitcoin-v7.png") no-repeat scroll -1px -1451px;
-    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2);
+.nt-takedown-reinstated-notification .notification-icon {
+    background-position: -1px -1451px;
 }
+
 .notification-popup .jspDrag {
     width: 4px;
 }
@@ -22331,7 +22337,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 .pro-login-dialog .fm-dialog-header {
     margin-bottom: 10px;
 }
-a.top-login-forgot-pass {
+.top-login-forgot-pass {
     font-size: 13px;
     color: #999999;
     line-height: 21px;
@@ -22373,9 +22379,6 @@ a.top-login-forgot-pass {
 .pro-register-dialog .register-st2-button {
     cursor: pointer;
     float: right;
-}
-.pro-register-scroll {
-    overflow: hidden;
 }
 .pro-register-dialog p {
     font-size: 15px;

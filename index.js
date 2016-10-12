@@ -561,8 +561,7 @@ function init_page() {
                 confirmok = true;
                 page = 'login';
                 parsepage(pages['login']);
-                // login_txt = l[378];
-                login_txt = "Please enter your password to activate your account.";
+                login_txt = l[378];
                 init_login();
                 $('#login-name2').val(email);
                 $('.register-st2-button').addClass('active');

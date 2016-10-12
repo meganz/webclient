@@ -113,14 +113,10 @@ function doConfirm(email, password, callback) {
                     }
                     else if ((typeof res === 'number') && (res === -11)) {
                         if (u_type === 0) {// Ephemeral session
-                            msgDialog(
-                                "warninga",
-                                "Account Activation Error",
-                                "You are using an ephemeral session in this browser. If you want to preserve the uploaded data, click 'Register' in the tab where you see your data.\
-                                    If you don't care about the data, click 'Logout' and re-try the account confirmation using the same link.");// l[12439]
+                            msgDialog("warninga", l[2480], l[12439]);
                         }
                         else {
-                            msgDialog("warninga", "Account Activation Error", "You are logged in to MEGA account from this browser. Click 'Logout' first and then re-try the account confirmation using the same link.");// l[12440]
+                            msgDialog("warninga", l[2480], l[12440]);
                         }
                     }
                     else {
@@ -247,12 +243,9 @@ function init_login() {
         $('.login-page-create-new').addClass('hidden');
         $('.top-login-forgot-pass').addClass('hidden');
         $('.main-top-info-block').removeClass('hidden');
-        // $('.register-st2-button-arrow').text(l[1131]);
-        $('.register-st2-button-arrow').text("Activate your account");
-        // $('.main-italic-header.login').text(l[1131]);
-        $('.main-italic-header.login').text("Activate your account");
-        // $('.main-top-info-text').text(l[378]);
-        $('.main-top-info-text').text("Please enter your password to activate your account.");
+        $('.register-st2-button-arrow').text(l[1131]);
+        $('.main-italic-header.login').text(l[1131]);
+        $('.main-top-info-text').text(l[378]);
         $('.login-check').addClass('hidden').next().addClass('hidden');
     }
     else {

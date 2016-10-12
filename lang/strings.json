@@ -539,6 +539,10 @@
         "text": "Downloading",
         "context": "Title header on the download page while the file is downloading."
     },
+    "366": {
+        "text": "Copyright warning",
+        "context": ""
+    },
     "368": {
         "text": "Caution:",
         "context": ""
@@ -1331,9 +1335,17 @@
         "text": "Request",
         "context": "button"
     },
+    "739": {
+        "text": "forgot your password?",
+        "context": ""
+    },
     "741": {
         "text": "Please choose a new secure password.",
         "context": ""
+    },
+    "742": {
+        "text": "Reset",
+        "context": "button to reset the password"
     },
     "746": {
         "text": "Membership type",
@@ -12363,10 +12375,6 @@
         "text": "Please install our new app MEGA v3 with a new design and new features!",
         "context": "Message to tell the users that they should install the new app"
     },
-    "8560": {
-        "text": "You will have to enter your credentials (login and password) in the new app. If you don't remember your password, please Export your Master Key before uninstalling the v1 app.",
-        "context": "Message shown to tell the users that they should export the master key before uninstalling the old app"
-    },
     "8561": {
         "text": "If you have an active subscription on the v1 app, please cancel it on Google Play and subscribe again on the v3 app when the current subscription expires. Don't worry, you will keep your PRO status on the new app until it expires.",
         "context": "Message shown to PRO users using v1 app telling them that they should cancel their subscriptions on v1 and subscribe again on v3"
@@ -13935,10 +13943,6 @@
         "text": "email goes here",
         "context": "A hint message where the user can write his e-mail."
     },
-    "8975": {
-        "text": "Please enter you e-mail address below. You will receive a recovery link that will allow you to submit your Recovery Key and reset your password.",
-        "context": "Text of the alert message to ask for the link to reset the pass with the MK"
-    },
     "8976": {
         "text": "Recovery Key goes here",
         "context": "Hint of the text when the user can write his master key"
@@ -14757,10 +14761,6 @@
     },
     "12433": {
         "text": "To use our service, you can either open MEGA on a desktop or laptop browser, or download the MEGA app.",
-        "context": "A description of the MEGA app in the mobile pages."
-    },
-    "12434": {
-        "text": "To use our service, you can open MEGA on a desktop or laptop browser. A dedicated app for your platform will be coming soon.",
         "context": "A description of the MEGA app in the mobile pages."
     },
     "12435": {

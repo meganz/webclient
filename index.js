@@ -1130,7 +1130,7 @@ function loginDialog(close) {
         }
     });
     $('.top-login-popup').addClass('active');
-    document.getElementById('login-name').focus()
+    document.getElementById('login-name').focus();
 
     if (is_chrome_firefox) {
         Soon(mozLoginManager.fillForm.bind(mozLoginManager, 'form_login_header'));
@@ -1139,13 +1139,12 @@ function loginDialog(close) {
 
 function tooltiplogin() {
     var e = $('#login-name').val();
-    if (e == '' || e == l[195] || checkMail(e)) {
+    if (e === '' || checkMail(e)) {
         $('.top-login-input-block.e-mail').addClass('incorrect');
         $('#login-name').val('');
         $('#login-name').focus();
     }
-    else if ($('#login-password').val() == ''
-            || $('#login-password').val() == l[909]) {
+    else if ($('#login-password').val() === '') {
         $('.top-login-input-block.password').addClass('incorrect');
     }
     else {

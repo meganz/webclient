@@ -3414,12 +3414,10 @@ function showLoginDialog(email) {
         });
 
     $('.input-email', $dialog)
-        .data('placeholder', l[195])
-        .val(email || l[195]);
+        .val(email || '');
 
     $('.input-password', $dialog)
-        .data('placeholder', l[909])
-        .val(l[909]);
+        .val('');
 
     uiPlaceholders($dialog);
     uiCheckboxes($dialog);
@@ -3464,8 +3462,16 @@ var doProLogin = function($dialog) {
         checkloginresult: function(ctx,r)
         {
             loadingDialog.hide();
-
-            if (r == EBLOCKED)
+            var e = $('#login-name', $dialog).val();
+            if (e === '' || checkMail(e)) {
+                $('.top-login-input-block.e-mail', $dialog).addClass('incorrect');
+                $('#login-name', $dialog).val('');
+                $('#login-name', $dialog).focus();
+            }
+            else if ($('#login-password', $dialog).val() === '') {
+                $('.top-login-input-block.password', $dialog).addClass('incorrect');
+            }
+            else if (r === EBLOCKED)
             {
                 alert(l[730]);
             }
@@ -3486,8 +3492,9 @@ var doProLogin = function($dialog) {
             }
             else
             {
-                $('#login-password', $dialog).val('');
-                alert(l[201]);
+                $('.top-login-pad', $dialog).addClass('both-incorrect-inputs');
+                $('.top-login-input-tooltip.both-incorrect', $dialog).addClass('active');
+                $('#login-password', $dialog).select();
             }
         }
     };

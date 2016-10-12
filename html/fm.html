@@ -849,19 +849,6 @@
 
 
         <div class="fm-right-account-block">
-            <div class="fm-account-top">
-                <a class="fm-breadcrumbs account">
-                    <span class="right-arrow-bg">
-                        <span>[$1646]</span>
-                    </span>
-                </a>
-                <a class="fm-breadcrumbs next overview hidden">
-                    <span class="right-arrow-bg">
-                        [$983]
-                    </span>
-                </a>
-                <div class="clear"></div>
-            </div>
 
             <div class="fm-account-main">
 
@@ -870,116 +857,168 @@
                         <div class="account tab-lnk active" data-tab="general">[$1712]</div>
                         <div class="account tab-lnk" data-tab="email-and-pass">Email & Password</div>
                         <div class="account tab-lnk" data-tab="payment">Payment and Plan</div>
+                        <div class="account tab-lnk achievements" data-tab="achievements">Achievements</div>
+                        <a class="default-grey-button small right cancel-account">
+                            [$6181]
+                        </a>
                         <div class="clear"></div>
                     </div>
 
                     <div class="account tab-content general">
                         <div class="account max-width-bl">
-                            <div class="account data-block profile-form">
-                                <div class="fm-account-header">[$994]</div>
-                                <div class="account-form-wraper">
-                                    <div class="fm-account-labels">
-                                        <div class="labels-block">
-                                            <label for="account-firstname">[$1096] <span class="red">*</span></label>
+                            <div class="account-profile half-sized">
+                                <div class="account data-block profile-form">
+                                    <div class="fm-account-header">[$994]</div>
+                                    <div class="account-form-wraper">
+                                        <div class="fm-account-labels">
+                                            <div class="labels-block">
+                                                <label for="account-firstname">[$1096] <span class="red">*</span></label>
+                                            </div>
+                                            <div class="labels-block">
+                                                <label for="account-lastname">[$1097] </label>
+                                            </div>
+                                            <div class="labels-block">
+                                                <label >[$995]</label>
+                                            </div>
+                                            <div class="labels-block">
+                                                <label for="account-country">[$481]</label>
+                                            </div>
+                                            <!--div class="labels-block">
+                                                <label for="account-phonenumber">Phone Number</label>
+                                            </div-->
                                         </div>
-                                        <div class="labels-block">
-                                            <label for="account-lastname">[$1097] </label>
+                                        <div class="fm-accout-inputs-blocks">
+                                            <div class="fm-account-input">
+                                                <input type="text" value="" name="account-firstname" id="account-firstname" maxlength="40" />
+                                            </div>
+                                            <div class="fm-account-input">
+                                                <input type="text" value="" name="account-lastname" id="account-lastname" maxlength="40" />
+                                            </div>
+    
+                                            <div class="fm-account-select-block">
+                                                <div class="default-select year" id="account-year">
+                                                    <span>YYYY</span>
+                                                    <div class="default-select-dropdown hidden"><div class="default-select-scroll"></div></div>
+                                                </div>
+                                                <div class="default-select month" id="account-month">
+                                                    <span>MM</span>
+                                                    <div class="default-select-dropdown hidden"><div class="default-select-scroll"></div></div>
+                                                </div>
+                                                <div class="default-select day" id="account-day">
+                                                    <span>DD</span>
+                                                    <div class="default-select-dropdown hidden"><div class="default-select-scroll"></div></div>
+                                                </div>
+                                                <div class="clear"></div>
+                                            </div>
+                                            <div class="fm-account-select-block">
+                                                <div class="default-select country" id="account-country">
+                                                    <span>[$996]</span>
+                                                    <div class="default-select-dropdown hidden"><div class="default-select-scroll"></div></div>
+                                                </div>
+                                            </div>
+                                            <!--div class="fm-account-input no-icon">
+                                                <i class="medium-icon rocket"></i>
+                                                <input type="text" placeholder="Insert phone number" name="account-phonenumber" id="account-phonenumber" />
+                                            </div-->
                                         </div>
-                                        <div class="labels-block">
-                                            <label >[$995]</label>
-                                        </div>
-                                        <div class="labels-block">
-                                            <label for="account-country">[$481]</label>
-                                        </div>
-                                        <!--div class="labels-block">
-                                            <label for="account-phonenumber">Phone Number</label>
-                                        </div-->
                                     </div>
-                                    <div class="fm-accout-inputs-blocks">
-                                        <div class="fm-account-input">
-                                            <input type="text" value="" name="account-firstname" id="account-firstname" maxlength="40" />
+                                </div>
+                                
+                                <div class="account data-block">
+                                        <div class="fm-account-header">[$799]</div>
+                                        <div class="account quota-txt used-space"><span>0 GB</span> of 0 GB</div>
+                                        <div class="account paragraph hidden">
+                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
                                         </div>
-                                        <div class="fm-account-input">
-                                            <input type="text" value="" name="account-lastname" id="account-lastname" maxlength="40" />
+                                        <!--
+                                        <div class="half-sized account progress-list">
+                                            <div class="account progress-item">
+                                                <div class="account progress-data">
+                                                    <div class="account progress-indicator blue active"></div>
+                                                    <div class="account progress-txt cloud-drive"> 0 GB</div>
+                                                </div>
+                                                <div class="account progress-title">[$164]</div>
+                                            </div>
+                                            <div class="account progress-item">
+                                                <div class="account progress-indicator orange active"></div>
+                                                <div class="account progress-txt inbox"> 0 GB</div>
+                                                <div class="account progress-title">[$166]</div>
+                                            </div>
                                         </div>
-
-                                        <div class="fm-account-select-block">
-                                            <div class="default-select year" id="account-year">
-                                                <span>YYYY</span>
-                                                <div class="default-select-dropdown hidden"><div class="default-select-scroll"></div></div>
+                                        <div class="half-sized account progress-list">
+                                            <div class="account progress-item">
+                                                <div class="account progress-data">
+                                                    <div class="account progress-indicator yellow active"></div>
+                                                    <div class="account progress-txt incoming-shares"> 0 GB</div>
+                                                </div>
+                                                <div class="account progress-title">[$5542]</div>
                                             </div>
-                                            <div class="default-select month" id="account-month">
-                                                <span>MM</span>
-                                                <div class="default-select-dropdown hidden"><div class="default-select-scroll"></div></div>
+                                            <div class="account progress-item">
+                                                <div class="account progress-data">
+                                                    <div class="account progress-indicator green active"></div>
+                                                    <div class="account progress-txt rubbish-bin"> 0 GB</div>
+                                                </div>
+                                                <div class="account progress-title">[$168]</div>
                                             </div>
-                                            <div class="default-select day" id="account-day">
-                                                <span>DD</span>
-                                                <div class="default-select-dropdown hidden"><div class="default-select-scroll"></div></div>
+                                        </div>
+                                        <div class="clear"></div>
+                                        <div class="account progress-block used-space">
+                                            <div class="account progress-bar blue pr0"></div>
+                                            <div class="account progress-bar green pr1"></div>
+                                            <div class="account progress-bar yellow pr2"></div>
+                                            <div class="account progress-bar orange pr3"></div>
+                                        </div>
+                                        !-->
+                              
+                                        <div class="account progress-list medium">
+                                            <div class="account progress-indicator dark-red active"></div>
+                                            <div class="account progress-title">
+                                                [$164]
                                             </div>
+                                            <div class="account progress-size cloud-drive"></div>
+                                            <div class="clear"></div>
+                                            
+                                            <div class="account progress-indicator brown active"></div>
+                                            <div class="account progress-title">
+                                                [$166]
+                                            </div>
+                                            <div class="account progress-size inbox"></div>
+                                            <div class="clear"></div>
+                                            <div class="account progress-indicator orange active"></div>
+                                            <div class="account progress-title">
+                                                [$5542]
+                                            </div>
+                                            <div class="account progress-size incoming-shares"></div>
+                                            <div class="clear"></div>
+                                            <div class="account progress-indicator dark-grey active"></div>
+                                            <div class="account progress-title">
+                                                [$168]
+                                            </div>
+                                             <div class="account progress-size rubbish-bin"></div>
+                                            <div class="clear"></div>
+                                            <div class="account progress-indicator grey active"></div>
+                                            <div class="account progress-title">
+                                                [$1352]
+                                            </div>
+                                             <div class="account progress-size available"></div>
                                             <div class="clear"></div>
                                         </div>
-                                        <div class="fm-account-select-block">
-                                            <div class="default-select country" id="account-country">
-                                                <span>[$996]</span>
-                                                <div class="default-select-dropdown hidden"><div class="default-select-scroll"></div></div>
-                                            </div>
+                                        <div class="account progress-block tiny">
+                                            <div class="account progress-bar dark-red"></div>
+                                            <div class="account progress-bar brown"></div>
+                                            <div class="account progress-bar orange"></div>
+                                            <div class="account progress-bar dark-grey"></div>
                                         </div>
-                                        <!--div class="fm-account-input no-icon">
-                                            <i class="medium-icon rocket"></i>
-                                            <input type="text" placeholder="Insert phone number" name="account-phonenumber" id="account-phonenumber" />
-                                        </div-->
+                                        
                                     </div>
-                                </div>
                             </div>
+                            <div class="clear"></div>
 
-                            <div class="account used-space-block">
-
-                                <div class="account data-block">
-                                    <div class="fm-account-header">[$799]</div>
-                                    <div class="account quota-txt used-space"><span>0 GB</span> of 0 GB</div>
-                                    <div class="account paragraph hidden">
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                                    </div>
-                                    <div class="half-sized account progress-list">
-                                        <div class="account progress-item">
-                                            <div class="account progress-data">
-                                                <div class="account progress-indicator blue active"></div>
-                                                <div class="account progress-txt cloud-drive"> 0 GB</div>
-                                            </div>
-                                            <div class="account progress-title">[$164]</div>
-                                        </div>
-                                        <div class="account progress-item">
-                                            <div class="account progress-indicator orange active"></div>
-                                            <div class="account progress-txt inbox"> 0 GB</div>
-                                            <div class="account progress-title">[$166]</div>
-                                        </div>
-                                    </div>
-                                    <div class="half-sized account progress-list">
-                                        <div class="account progress-item">
-                                            <div class="account progress-data">
-                                                <div class="account progress-indicator yellow active"></div>
-                                                <div class="account progress-txt incoming-shares"> 0 GB</div>
-                                            </div>
-                                            <div class="account progress-title">[$5542]</div>
-                                        </div>
-                                        <div class="account progress-item">
-                                            <div class="account progress-data">
-                                                <div class="account progress-indicator green active"></div>
-                                                <div class="account progress-txt rubbish-bin"> 0 GB</div>
-                                            </div>
-                                            <div class="account progress-title">[$168]</div>
-                                        </div>
-                                    </div>
-                                    <div class="clear"></div>
-                                    <div class="account progress-block used-space">
-                                        <div class="account progress-bar blue pr0"></div>
-                                        <div class="account progress-bar green pr1"></div>
-                                        <div class="account progress-bar yellow pr2"></div>
-                                        <div class="account progress-bar orange pr3"></div>
-                                    </div>
-                                </div>
-
-                            </div>
+                        </div>
+                     </div>
+                     
+                    <div class="account tab-content achievements hidden">
+                        <div class="account max-width-bl">
 
                             <div class="account achievements-block">
 
@@ -1365,7 +1404,7 @@
                              <div class="half-sized">
                                  <div class="account data-block">
                                       <div class="fm-account-header">[$706]</div>
-                                      <div class="account-form-wraper">
+                                      <div class="account-form-wraper password">
                                           <div class="fm-account-labels">
                                               <div class="labels-block">
                                                   <label for="account-password">[$716]</label>
@@ -1447,31 +1486,44 @@
                          <div class="account max-width-bl">
                               <div class="account data-block half-sized first subscription-bl">
                                       <div class="fm-account-header">[$432]</div>
-                                      <div class="half-sized data-list">
-                                          <div class="account plan-info grey">
-                                              Plan
+                                      <div class="account plan-info-block">
+                                          <div class="account plan-info-row">
+                                              <div class="account plan-info grey small">
+                                                  Plan
+                                              </div>
+                                              <div class="account plan-info right-textalign accounttype bold">
+                                                  <span></span>
+                                              </div>
                                           </div>
-                                          <div class="account plan-info grey">
-                                              Storage
+                                          <div class="account plan-info-row">
+                                              <div class="account plan-info grey small">
+                                                  [$798]
+                                              </div>
+                                              <div class="account plan-info right-textalign storage">
+                                                  <span></span>
+                                                  <div class="account plan-comment blue">500 GB base quota + 200GB</div>
+                                              </div>
                                           </div>
-                                          <div class="account plan-info grey">
-                                              Bandwidth
+                                          <div class="account plan-info-row">
+                                              <div class="account plan-info grey small">
+                                                  Transfer Quota
+                                              </div>
+                                              <div class="account plan-info right-textalign bandwidth">
+                                                  <span></span>
+                                                  <div class="account plan-comment green">1TB base quota + 500GB</div>
+                                              </div>
                                           </div>
-                                          <div class="account plan-info expiry-txt grey">
-                                              [$7354]
+                                          <div class="account plan-info-row">
+                                              <div class="account plan-info expiry-txt grey small">
+                                                  [$7354]
+                                              </div>
+                                              <div class="account plan-info right-textalign expiry">
+                                                  <a href="#fm/account/history">
+                                                      [$987] <span class="red">September 1st 2013</span>
+                                                  </a>
+                                              </div>
                                           </div>
-                                      </div>
-                                      <div class="half-sized data-list right-textalign">
-                                          <div class="account plan-info accounttype bold"></div>
-                                          <div class="account plan-info storage"></div>
-                                          <div class="account plan-info bandwidth"></div>
-                                          <div class="account plan-info expiry">
-                                              <a href="#fm/account/history">
-                                                  [$987] <span class="red">September 1st 2013</span>
-                                              </a>
-                                          </div>
-                                      </div>
-                                      <div class="clear"></div>
+                                      </div>    
                                       <div class="account buttons">
                                           <div class="button default-white-button btn-cancel left hidden"><span>[$6822]</span></div>
                                           <div class="clear"></div>
@@ -1481,13 +1533,13 @@
                               <div class="account data-block half-sized second">
                                       <div class="fm-account-header">[$7108]:</div>
                                       <div class="half-sized data-list">
-                                          <div class="account plan-info grey">
+                                          <div class="account plan-info grey small">
                                               [$449]
                                           </div>
                                       </div>
                                       <div class="half-sized right-textalign data-list">
                                           <div class="account plan-info balance big">
-                                              &euro; 0.00
+                                              <span>&euro; 0.00</span>
                                           </div>
                                       </div>
                                       <div class="account buttons">

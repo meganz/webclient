@@ -1052,10 +1052,7 @@ a.account-manage-button:hover {
     display: block;
     font-size: 18px;
     line-height: 26px;
-    color: #2BA6DE;
-}
-.bandwidth .chart.data .size-txt {
-    color: #31B500;
+    color: #333333;
 }
 .chart.icon {
     position: absolute;
@@ -1697,7 +1694,6 @@ a.blog-button:hover {
 .black {
     color: black;
 }
-
 /* Small notification icons on top of the notification avatar */
 .nt-revocation-of-incoming .notification-avatar-icon {
     background-position: -10px -153px;
@@ -1723,7 +1719,6 @@ a.blog-button:hover {
 .nt-payment-reminder-notification .notification-avatar-icon {
     background-position: -10px -415px;
 }
-
 /* Custom icon instead of avatar for MEGA notifications */
 .notification-item .notification-icon {
     background: rgba(0, 0, 0, 0) url("../images/mega/bitcoin-v7.png") no-repeat scroll 0 0;
@@ -1750,7 +1745,6 @@ a.blog-button:hover {
 .nt-takedown-reinstated-notification .notification-icon {
     background-position: -1px -1451px;
 }
-
 .notification-popup .jspDrag {
     width: 4px;
 }
@@ -7410,10 +7404,6 @@ table {
 .fm-breadcrumbs.account .right-arrow-bg {
     background-position: -2px -10357px;
 }
-.fm-breadcrumbs.advanced .right-arrow-bg, .fm-breadcrumbs.history .right-arrow-bg, .fm-breadcrumbs.reseller .right-arrow-bg, .fm-breadcrumbs.account-s .right-arrow-bg, .fm-breadcrumbs.notifications .right-arrow-bg {
-    background-image: none;
-    padding: 0 0 0 10px;
-}
 .fm-breadcrumbs.rubbish-bin .right-arrow-bg span {
     display: none;
 }
@@ -8060,7 +8050,7 @@ color: white;
     opacity: 0.5;
 }
 .fm-account-input:first-child {
-    margin: 14px 0 0 0;
+    margin: 16px 0 0 0;
 }
 .fm-account-input input {
     padding: 0 35px 0 10px;
@@ -10709,14 +10699,6 @@ table {
 .read-only .context-menu-icon {
     background-position: -75px -238px;
 }
-.fm-account-top {
-    height: 49px;
-    background-color: #fafafa;
-    padding: 13px 0 0 22px;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-}
 .fm-account-top-title {
     font-size: 17px;
     line-height: 48px;
@@ -10727,9 +10709,6 @@ table {
 }
 .fm-account-main {
     height: 100%;
-    height: -webkit-calc(100% - 49px);
-    height: -moz-calc(100% -49px);
-    height: calc(100% - 49px);
 }
 .fm-account-header {
     font-size: 16px;
@@ -10820,16 +10799,19 @@ table {
 }
 .account.tabs-bl {
     background-color: #fafafa;
-    border-bottom: 1px solid #ededed;
-    padding: 13px 12px 0 12px;
+    border-bottom: 1px solid #eaeaea;
+    padding: 6px 12px 0 12px;
+}
+.account.tabs-bl .default-grey-button {
+    margin-top: 1px;
 }
 .fm-account-history .account.tab-content {
     height: 100%;
 }
 .account.tab-lnk {
     cursor: pointer;
-    font-size: 18px;
-    line-height: 24px;
+    font-size: 16px;
+    line-height: 20px;
     color: #777777;
     padding: 4px 24px 0 24px;
     border-bottom: 2px solid transparent;
@@ -10837,24 +10819,27 @@ table {
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
-    height: 34px;
+    height: 32px;
     margin-bottom: -1px;
 }
 .account.tab-lnk.active {
     border-color: #FF333A;
     color: #333333;
 }
+.account.tab-lnk.achievements {
+    display: none;
+}
 .account.quota-txt {
     font-size: 18px;
     line-height: 24px;
     color: #777777;
-    padding: 4px 0 0 0;
+    padding: 21px 0 4px 0;
 }
 .account.paragraph {
     font-size: 14px;
     line-height: 18px;
     color: #777777;
-    padding: 6px 0 0 0;
+    padding: 2px 0 0 0;
 }
 .account.radio-buttons {
     padding: 9px 0 22px 0;/*width: 530px;*/
@@ -10884,7 +10869,7 @@ table {
     top: 2px;
     display: none;
 }
-.active-achievements .medium-icon.rocket {
+.active-achievements .medium-icon.rocket, .active-achievements .account.tab-lnk.achievements {
     display: block;
 }
 .account.quota-txt span {
@@ -10983,7 +10968,7 @@ table {
     box-sizing: border-box;
     min-width: 404px;
     position: absolute;
-    right: 28px;
+    right: 34px;
     top: 70px;
     z-index: 2000;
 }
@@ -11088,7 +11073,10 @@ table {
     table-layout: fixed;
     width: 100%;
     padding: 0 0 0 0;
-    margin: 0;
+    margin: 0 0 -8px 0;
+}
+.account-form-wraper.password {
+    margin: 0 0 -25px 0;
 }
 .fm-account-labels .labels-block {
     display: table-row;
@@ -11111,7 +11099,7 @@ table {
     vertical-align: top;
 }
 .fm-account-labels {
-    padding-top: 6px;
+    padding-top: 8px;
 }
 .fm-accout-inputs-blocks {
     width: 240px;
@@ -11492,6 +11480,10 @@ table {
     padding: 9px 0 12px 0;
     display: block;
 }
+.medium.account.progress-list {
+    padding: 18px 0 12px 0;
+    display: block;
+}
 .small .account.progress-indicator {
     width: 8px;
     height: 8px;
@@ -11500,33 +11492,33 @@ table {
     border: 0;
     top: 8px;
 }
-.account.progress-indicator.blue0, .account.progress-bar.blue0 {
-    background-color: #2798CC;
-}
-.account.progress-indicator.blue1, .account.progress-bar.blue1 {
-    background-color: #29C2FF;
-}
-.account.progress-indicator.blue2, .account.progress-bar.blue2 {
-    background-color: #2BA6DE;
-}
-.account.progress-indicator.blue3, .account.progress-bar.blue3 {
-    background-color: #61D2FF;
-}
-.account.progress-indicator.green0, .account.progress-bar.green0 {
-    background-color: #31B500;
-}
-.account.progress-indicator.green1, .account.progress-bar.green1 {
-    background-color: #13E03C;
+.medium .account.progress-indicator {
+    width: 12px;
+    height: 12px;
+    float: left;
+    display: block;
+    border: 0;
+    top: 6px;
 }
 .small .account.progress-title {
     float: left;
     height: 24px;
     padding: 0;
 }
+.medium .account.progress-title {
+    float: left;
+    padding: 0;
+}
 .small .account.progress-size {
     float: right;
     font-size: 14px;
     line-height: 24px;
+    color: #777777;
+}
+.medium .account.progress-size {
+    float: right;
+    font-size: 18px;
+    line-height: 22px;
     color: #777777;
 }
 .account.progress-block.tiny {
@@ -11546,8 +11538,10 @@ table {
     position: absolute;
     height: 8px;
     width: 1px;
-    background-color: white;
-    right: 0;
+    background-color: #EEEEEE;
+}
+.tiny .account.progress-bar:first-child::after {
+    display: none;
 }
 .low-width .left-float-bl, .low-width .data-float-bl {
     width: 63.7%;
@@ -24589,18 +24583,21 @@ div.camera-bottom-txt {
     padding: 30px 30px 16px 36px;
 }
 .payment .account.data-block.second {
-    padding: 30px 30px 16px 30px;
+    padding: 30px 36px 16px 30px;
 }
 .email-and-pass .account.data-block {
     padding: 30px 30px 9px 36px;
 }
-.account.profile-form, .low-width .email-and-pass .account.data-block {
+.low-width .email-and-pass .account.data-block {
     max-width: 520px;
     padding: 30px 36px 9px 36px;
 }
 .account.transfers-form {
     max-width: 544px;
     padding-right: 28px;
+}
+.account-profile.half-sized {
+    width: 520px;
 }
 .account.transfers-form .account-counter-block {
     margin: 0 0 0 0;
@@ -24687,7 +24684,7 @@ div.camera-bottom-txt {
     border-color: #F27800;
 }
 .account.progress-indicator.orange.active, .account.progress-bar.orange {
-    background-color: #F27800;
+    background-color: #FFA500;
 }
 .account.progress-indicator.yellow {
     border-color: #FFD500;
@@ -24700,6 +24697,30 @@ div.camera-bottom-txt {
 }
 .account.progress-indicator.green.active, .account.progress-bar.green {
     background-color: #00E22C;
+}
+.account.progress-indicator.dark-red {
+    border-color: #D90007;
+}
+.account.progress-indicator.dark-red.active, .account.progress-bar.dark-red {
+    background-color: #D90007;
+}
+.account.progress-indicator.brown {
+    border-color: #F27800;
+}
+.account.progress-indicator.brown.active, .account.progress-bar.brown {
+    background-color: #F27800;
+}
+.account.progress-indicator.dark-grey {
+    border-color: #666666;
+}
+.account.progress-indicator.dark-grey.active, .account.progress-bar.dark-grey {
+    background-color: #666666;
+}
+.account.progress-indicator.grey {
+    border-color: #CCCCCC;
+}
+.account.progress-indicator.grey.active, .account.progress-bar.grey {
+    background-color: #CCCCCC;
 }
 .account.progress-txt {
     font-size: 18px;
@@ -24725,32 +24746,43 @@ div.camera-bottom-txt {
 .account.used-space-block {
     padding-bottom: 20px;
 }
-.account.achievements-block, .active-achievements .account.used-space-block {
-    display: none;
-}
-.active-achievements .account.achievements-block {
+.active-achievements .account.tab-content.achievements {
     display: block;
 }
 .red-txt {
     color: #D90007;
 }
 .account.progress-block {
-    height: 24px;
+    height: 12px;
     background-color: #EEEEEE;
     font-size: 0;
     white-space: nowrap;
     overflow: hidden;
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
-    border-radius: 3px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    margin: 0;
+}
+.account.progress-block {
+    height: 12px;
+    background-color: #EEEEEE;
+    font-size: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
     margin: 0;
 }
 .account.progress-bar {
-    height: 24px;
+    height: 12px;
     display: inline-block;
 }
-.account.progress-block.small, .account.progress-bar.small {
+.account.progress-block.small, .account.progress-block.small {
     height: 16px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
 }
 .account.progress-block.used-space, .used-space .account.progress-bar {
     height: 32px;
@@ -24937,6 +24969,34 @@ div.camera-bottom-txt {
     color: #333333;
     padding: 12px 0 17px 0;
 }
+.account.plan-info-block {
+    display: table;
+    width: 100%;
+    margin: 10px 0 16px 0;
+}
+.account.plan-comment {
+    font-size: 14px;
+    line-height: 18px;
+    display: none;
+}
+.account.plan-comment .account.plan-comment {
+    display: block;
+}
+.account.plan-comment.blue {
+    color: #2BA6DE;
+}
+.account.plan-comment.green {
+    color: #31B500;
+}
+.account.plan-info-row {
+    display: table-row;
+}
+.account.plan-info-row .account.plan-info {
+    display: table-cell;
+    vertical-align: middle;
+    padding: 10px 0 9px 0;
+    line-height: 22px;
+}
 .account.plan-info {
     font-size: 16px;
     line-height: 21px;
@@ -24946,17 +25006,20 @@ div.camera-bottom-txt {
 .account.plan-info.grey {
     color: #999999;
 }
+.account.plan-info.small {
+    font-size: 14px;
+}
 .account.plan-info.big {
     font-size: 18px;
 }
 .data-list {
-    padding-top: 9px;
+    padding-top: 14px;
 }
 .account.buttons {
     clear: both;
 }
 .account.buttons .button {
-    margin-top: 28px;
+    margin-top: 27px;
 }
 .fm-account-sections {
     height: 100%;

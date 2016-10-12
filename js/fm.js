@@ -3366,7 +3366,6 @@ Object.freeze(dashboardUI);
 
 function accountUI() {
 
-    var sectionTitle;
     var sectionClass;
 
     $('.fm-account-notifications').removeClass('hidden');
@@ -3401,7 +3400,6 @@ function accountUI() {
 
         if (id === '#fm/account/advanced') {
             $('.fm-account-settings').removeClass('hidden');
-            sectionTitle = l[1716];
             sectionClass = 'advanced';
 
             $('#network-testing-button').rebind('click', function() {
@@ -3433,17 +3431,14 @@ function accountUI() {
         }
         else if (id === '#fm/account') {
             $('.fm-account-profile').removeClass('hidden');
-            sectionTitle = l[403];
             sectionClass = 'account-s';
         }
         else if (id === '#fm/account/history') {
             $('.fm-account-history').removeClass('hidden');
-            sectionTitle = l[985];
             sectionClass = 'history';
         }
         else if (id === '#fm/account/reseller' && M.account.reseller) {
             $('.fm-account-reseller').removeClass('hidden');
-            sectionTitle = l[6873];
             sectionClass = 'reseller';
         }
         else {
@@ -3453,13 +3448,10 @@ function accountUI() {
             }
 
             $('.fm-account-notifications').removeClass('hidden');
-            sectionTitle = l[862];
             sectionClass = 'notifications';
         }
 
         $('.fm-account-button.' + sectionClass).addClass('active');
-        $('.fm-breadcrumbs.account').addClass('has-next-button');
-        $('.fm-breadcrumbs.next').attr('class', 'fm-breadcrumbs next ' + sectionClass).find('span').text(sectionTitle);
 
         if (u_attr.p) {
 
@@ -3467,7 +3459,7 @@ function accountUI() {
             var planNum = u_attr.p;
             var planText = getProPlan(planNum);
 
-            $('.account.plan-info.accounttype').text(planText);
+            $('.account.plan-info.accounttype span').text(planText);
             $('.small-icon.membership').addClass('pro' + planNum);
 
             // Subscription
@@ -3533,17 +3525,17 @@ function accountUI() {
         else {
 
             // free account:
-            $('.account.plan-info.accounttype').text(l[435]);
+            $('.account.plan-info.accounttype span').text(l[435]);
             $('.account.plan-info.expiry').text(l[436]);
             $('.btn-cancel').hide();
             $('.subscription-bl').removeClass('active-subscription');
         }
 
         // Maximum bandwidth
-        $('.account.plan-info.bandwidth').text(bytesToSize(account.bw, 0));
+        $('.account.plan-info.bandwidth span').text(bytesToSize(account.bw, 0));
 
         // Maximum disk space
-        $('.account.plan-info.storage').text(bytesToSize(account.space, 0));
+        $('.account.plan-info.storage span').text(bytesToSize(account.space, 0));
 
         /* New Used Bandwidth chart */
         perc = Math.round((account.servbw_used+account.downbw_used)/account.bw*100);
@@ -3620,9 +3612,10 @@ function accountUI() {
 
             $('.account.quota-txt.used-space')
                 .safeHTML('<span>@@</span> @@ @@',
-                    bytesToSize(account.space_used, 0), l[5528], b2.join(' '));
+                    bytesToSize(account.space_used), l[5528], b2.join(' '));
 
             var c = account.cstrgn, k = Object.keys(c), iSharesBytes = 0;
+            // TODO: Cloud/Incoming/Shared with me/Rubbish bin
             var percents = [
                 100 * c[k[0]][0] / account.space,
                 100 * c[k[2]][0] / account.space,
@@ -3634,17 +3627,19 @@ function accountUI() {
                 percents[2] += (100 * c[k[i]][0] / account.space);
             }
             for (var i = 0; i < 4; i++) {
-                $('.account.progress-bar.pr' + i).css('width', percents[i] + '%');
+                $('.account.progress-bar:nth-child(' + i + 1 + ')').css('width', percents[i] + '%');
             }
 
             // Cloud drive
-            $('.account.progress-txt.cloud-drive').text(bytesToSize(c[k[0]][0]));
+            $('.account.progress-size.cloud-drive').text(bytesToSize(c[k[0]][0]));
             // Rubbish bin
-            $('.account.progress-txt.rubbish-bin').text(bytesToSize(c[k[2]][0]));
+            $('.account.progress-size.rubbish-bin').text(bytesToSize(c[k[2]][0]));
             // Incoming shares
-            $('.account.progress-txt.incoming-shares').text(bytesToSize(iSharesBytes));
+            $('.account.progress-size.incoming-shares').text(bytesToSize(iSharesBytes));
             // Inbox
-            $('.account.progress-txt.inbox').text(bytesToSize(c[k[1]][0]));
+            $('.account.progress-size.inbox').text(bytesToSize(c[k[1]][0]));
+            // Available
+            $('.account.progress-size.available').text(bytesToSize(account.space - account.space_used));
         }
         else {
             $('.fm-right-account-block').addClass('active-achievements');
@@ -3823,7 +3818,7 @@ function accountUI() {
         {
             window.location.hash = 'pro';
         });
-        $('.account.plan-info.balance').safeHTML('&euro; @@', account.balance[0][0]);
+        $('.account.plan-info.balance span').safeHTML('&euro; @@', account.balance[0][0]);
         var a = 0;
         if (M.c['contacts']) {
             for (var i in M.c['contacts'])
@@ -4798,7 +4793,6 @@ function accountUI() {
             // Use 'All' or 'Last 10/100/250' for the dropdown text
             var buttonText = ($.voucherlimit === 'all') ? l[7557] : l['466a'].replace('[X]', $.voucherlimit);
 
-            $('.fm-account-button.reseller').removeClass('hidden');
             $('.account-history-dropdown-button.vouchers').text(buttonText);
             $('.account-history-drop-items.voucher10-').text(l['466a'].replace('[X]', 10));
             $('.account-history-drop-items.voucher100-').text(l['466a'].replace('[X]', 100));

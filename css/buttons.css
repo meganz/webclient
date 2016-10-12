@@ -19,9 +19,8 @@
     padding: 0;
     border: 0;
 }
-.button input[type=file],
-.button input[type=file]::-webkit-file-upload-button {
-    cursor: pointer; 
+.button input[type=file], .button input[type=file]::-webkit-file-upload-button {
+ cursor: pointer;
 }
 .link-button {
     display: block;
@@ -164,7 +163,7 @@
     border-radius: 3px;
 }
 .default-white-button.small, .default-grey-button.small {
-    line-height: 24px;
+    line-height: 23px;
     height: 24px;
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;

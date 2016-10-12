@@ -5701,7 +5701,7 @@ function execsc(actionPackets, callback) {
         trights = false,
         tmoveid = false,
         rootsharenodes = [],
-        loadavatars = false;
+        loadavatars = [];
 
     newnodes = [];
     mega.flags |= window.MEGAFLAG_EXECSC;
@@ -5808,10 +5808,7 @@ function execsc(actionPackets, callback) {
                 }
             }
             else if (actionPacket.a === 'ua') {
-                var loadAvatarsResult = mega.attr.handleUserAttributeActionPackets(actionPacket);
-                if (loadAvatarsResult) {
-                    loadavatars = !loadavatars ? loadAvatarsResult : loadavatars.concat(loadAvatarsResult);
-                }
+                mega.attr.handleUserAttributeActionPackets(actionPacket, loadavatars);
             }
         }// END own action packet
         else if (actionPacket.a === 'e') {
@@ -6242,7 +6239,7 @@ function execsc(actionPackets, callback) {
     if (newnodes.length > 0 && fminitialized) {
         renderNew();
     }
-    if (loadavatars) {
+    if (loadavatars.length) {
         M.avatars(loadavatars);
     }
     if (M.viewmode) {

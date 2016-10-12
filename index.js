@@ -1185,22 +1185,24 @@ function loginDialog(close) {
             $(c).addClass('checkboxOff');
         }
     });
+
     Soon(function() {
         $('.dropdown.top-login-popup').removeClass('hidden');
         topPopupAlign('.top-login-button', '.dropdown.top-login-popup', 40);
-        document.getElementById('login-name').focus();
+        if (is_chrome_firefox) {
+            mozLoginManager.fillForm.bind(mozLoginManager, 'form_login_header');
+        }
     });
 }
 
 function tooltiplogin() {
     var e = $('#login-name').val();
-    if (e == '' || e == l[195] || checkMail(e)) {
+    if (e === '' || checkMail(e)) {
         $('.top-login-input-block.e-mail').addClass('incorrect');
         $('#login-name').val('');
         $('#login-name').focus();
     }
-    else if ($('#login-password').val() == ''
-            || $('#login-password').val() == l[909]) {
+    else if ($('#login-password').val() === '') {
         $('.top-login-input-block.password').addClass('incorrect');
     }
     else {
@@ -1288,6 +1290,12 @@ function topmenuUI() {
         if (u_attr.maf) {
             $('.top-icon.achievements').show();
         }
+
+        Soon(function() {
+            if (!avatars[u_handle]) {
+                useravatar.loadAvatar(u_handle);
+            }
+        });
 
         // If a Lite/Pro plan has been purchased
         if (u_attr.p) {

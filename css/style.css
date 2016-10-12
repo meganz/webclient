@@ -21958,7 +21958,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 .pro-login-dialog .fm-dialog-header {
     margin-bottom: 10px;
 }
-a.top-login-forgot-pass {
+.top-login-forgot-pass {
     font-size: 13px;
     color: #999999;
     line-height: 21px;
@@ -22000,9 +22000,6 @@ a.top-login-forgot-pass {
 .pro-register-dialog .register-st2-button {
     cursor: pointer;
     float: right;
-}
-.pro-register-scroll {
-    overflow: hidden;
 }
 .pro-register-dialog p {
     font-size: 15px;

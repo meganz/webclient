@@ -10792,15 +10792,15 @@ table {
 }
 .account.tab-content {
     position: relative;
-    height: -webkit-calc(100% - 47px);
-    height: -moz-calc(100% -47px);
-    height: calc(100% - 47px);
+    height: -webkit-calc(100% - 38px);
+    height: -moz-calc(100% -38px);
+    height: calc(100% - 38px);
     background-color: white;
 }
 .account.tabs-bl {
     background-color: #fafafa;
     border-bottom: 1px solid #eaeaea;
-    padding: 6px 12px 0 12px;
+    padding: 6px 16px 0 12px;
 }
 .account.tabs-bl .default-grey-button {
     margin-top: 1px;
@@ -10858,7 +10858,7 @@ table {
     padding-top: 15px;
 }
 .account.sub-inputs {
-    padding: 17px 0 0 0;
+    padding: 17px 0 0 30px;
 }
 .account.sub-inputs .account-counter-number input {
     text-align: right;
@@ -25124,13 +25124,7 @@ div.camera-bottom-txt {
     height: 100%;
     content: '';
     position: absolute;
-    background-color: #2BA6DE;
-}
-.bandwidth .chart.progressbars span::before {
-    background-color: #31B500;
-}
-.chart.progressbars .achivement span::before {
-    background-color: rgba(0,0,0,0.5);
+    background-color: #777777;
 }
 .chart.progressbars .left-chart span::before {
     margin-left: 50%;

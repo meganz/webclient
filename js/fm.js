@@ -3588,16 +3588,6 @@ function accountUI() {
             $('.storage .main-chart.right-chart span').css('transform', 'rotate(' + (deg - 180) + 'deg)');
         }
 
-        /* Demo of achivement chart */
-        deg = (deg <= 20) ? deg : 20;
-        if (deg <= 180) {
-            $('.storage .achivement.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
-        }
-        else {
-            $('.storage .achivement.left-chart span').css('transform', 'rotate(180deg)');
-            $('.storage .achivement.right-chart span').css('transform', 'rotate(' + (deg - 180) + 'deg)');
-        }
-
         // Maximum disk space
         var b2 = bytesToSize(account.space, 0).split(' ');
         $('.storage .chart.data .pecents-txt').text(b2[0]);
@@ -3615,12 +3605,12 @@ function accountUI() {
                     bytesToSize(account.space_used), l[5528], b2.join(' '));
 
             var c = account.cstrgn, k = Object.keys(c), iSharesBytes = 0;
-            // TODO: Cloud/Incoming/Shared with me/Rubbish bin
+
             var percents = [
                 100 * c[k[0]][0] / account.space,
-                100 * c[k[2]][0] / account.space,
+                100 * c[k[1]][0] / account.space,
                 0,
-                100 * c[k[1]][0] / account.space
+                100 * c[k[2]][0] / account.space
             ];
             for (var i = 3 ; i < k.length ; ++i) {
                 iSharesBytes += c[k[i]][0];

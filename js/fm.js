@@ -3596,40 +3596,41 @@ function accountUI() {
         $('.storage .chart.data .size-txt').text(bytesToSize(account.space_used));
 
 
+        $('.account.quota-txt.used-space')
+            .safeHTML('<span>@@</span> @@ @@',
+                bytesToSize(account.space_used), l[5528], b2.join(' '));
+
+        var c = account.cstrgn, k = Object.keys(c), iSharesBytes = 0;
+
+        var percents = [
+            100 * c[k[0]][0] / account.space,
+            100 * c[k[1]][0] / account.space,
+            0,
+            100 * c[k[2]][0] / account.space
+        ];
+        for (var i = 3 ; i < k.length ; ++i) {
+            iSharesBytes += c[k[i]][0];
+            percents[2] += (100 * c[k[i]][0] / account.space);
+        }
+        for (var i = 0; i < 4; i++) {
+            $('.account.progress-bar:nth-child(' + i + 1 + ')').css('width', percents[i] + '%');
+        }
+
+        // Cloud drive
+        $('.account.progress-size.cloud-drive').text(bytesToSize(c[k[0]][0]));
+        // Rubbish bin
+        $('.account.progress-size.rubbish-bin').text(bytesToSize(c[k[2]][0]));
+        // Incoming shares
+        $('.account.progress-size.incoming-shares').text(bytesToSize(iSharesBytes));
+        // Inbox
+        $('.account.progress-size.inbox').text(bytesToSize(c[k[1]][0]));
+        // Available
+        $('.account.progress-size.available').text(bytesToSize(account.space - account.space_used));
+
+
         /* achievements */
         if (!account.maf) {
             $('.fm-right-account-block').removeClass('active-achievements');
-
-            $('.account.quota-txt.used-space')
-                .safeHTML('<span>@@</span> @@ @@',
-                    bytesToSize(account.space_used), l[5528], b2.join(' '));
-
-            var c = account.cstrgn, k = Object.keys(c), iSharesBytes = 0;
-
-            var percents = [
-                100 * c[k[0]][0] / account.space,
-                100 * c[k[1]][0] / account.space,
-                0,
-                100 * c[k[2]][0] / account.space
-            ];
-            for (var i = 3 ; i < k.length ; ++i) {
-                iSharesBytes += c[k[i]][0];
-                percents[2] += (100 * c[k[i]][0] / account.space);
-            }
-            for (var i = 0; i < 4; i++) {
-                $('.account.progress-bar:nth-child(' + i + 1 + ')').css('width', percents[i] + '%');
-            }
-
-            // Cloud drive
-            $('.account.progress-size.cloud-drive').text(bytesToSize(c[k[0]][0]));
-            // Rubbish bin
-            $('.account.progress-size.rubbish-bin').text(bytesToSize(c[k[2]][0]));
-            // Incoming shares
-            $('.account.progress-size.incoming-shares').text(bytesToSize(iSharesBytes));
-            // Inbox
-            $('.account.progress-size.inbox').text(bytesToSize(c[k[1]][0]));
-            // Available
-            $('.account.progress-size.available').text(bytesToSize(account.space - account.space_used));
         }
         else {
             $('.fm-right-account-block').addClass('active-achievements');

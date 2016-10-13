@@ -10826,7 +10826,7 @@ table {
     border-color: #FF333A;
     color: #333333;
 }
-.account.tab-lnk.achievements {
+.account.tab-lnk.achievements, .active-achievements .account.tab-lnk.payment  {
     display: none;
 }
 .account.quota-txt {
@@ -24579,10 +24579,10 @@ div.camera-bottom-txt {
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
-.payment .account.data-block.first {
+.account.data-block.first {
     padding: 30px 30px 16px 36px;
 }
-.payment .account.data-block.second {
+.account.data-block.second {
     padding: 30px 36px 16px 30px;
 }
 .email-and-pass .account.data-block {
@@ -24598,6 +24598,22 @@ div.camera-bottom-txt {
 }
 .account-profile.half-sized {
     width: 520px;
+}
+.active-achievements .account-profile.half-sized {
+    width: 50%;
+}
+.account-profile.second {
+    display: none;
+}
+.active-achievements .account-profile.second {
+    display: block;
+}
+.low-width .account-profile.half-sized {
+    width: 520px;
+    float: none;
+}
+.low-width .account-profile .account.data-block {
+    padding: 30px 36px 16px 36px;
 }
 .account.transfers-form .account-counter-block {
     margin: 0 0 0 0;
@@ -24746,7 +24762,7 @@ div.camera-bottom-txt {
 .account.used-space-block {
     padding-bottom: 20px;
 }
-.active-achievements .account.tab-content.achievements {
+.active-achievements .account.tab-content.achievements:not(.hidden) {
     display: block;
 }
 .red-txt {
@@ -24979,7 +24995,7 @@ div.camera-bottom-txt {
     line-height: 18px;
     display: none;
 }
-.account.plan-comment .account.plan-comment {
+.active-achievements .account.plan-comment {
     display: block;
 }
 .account.plan-comment.blue {

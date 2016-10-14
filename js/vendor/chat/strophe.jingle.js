@@ -757,4 +757,6 @@ function MuteInfo(affected) {
         this.video = true;
 }
 
-Strophe.addConnectionPlugin('jingle', JinglePlugin);
+if (RTC) {
+    Strophe.addConnectionPlugin('jingle', JinglePlugin);
+}

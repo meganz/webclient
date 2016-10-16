@@ -2451,22 +2451,14 @@ function MegaData()
         }
 
         // sync data objs M.u <-> M.d
-        if (n.h.length === 11) {
-            if (this.u[n.h] !== n) {
-                if (typeof(this.u[n.h]) === 'undefined') {
-                    M.addUser(n, ignoreDB);
-                }
-                var tmpNode = n;
-                n = this.u[n.h];
+        if (this.u[n.h] && this.u[n.h] !== n) {
+            for (var k in n) {
                 // merge changes from n->M.u[n.h]
-                Object.keys(tmpNode).forEach(function(k) {
-                    if (k === "name") {
-                        return;
-                    }
-
-                    n[k] = tmpNode[k];
-                });
+                if (n.hasOwnProperty(k) && k !== 'name') {
+                    this.u[n.h][k] = n[k];
+                }
             }
+            n = this.u[n.h];
         }
 
         this.d[n.h] = n;
@@ -7151,6 +7143,11 @@ function process_u(u) {
 
             // Update user attributes M.u
             M.addUser(u[i]);
+
+            if (u[i].c === 1) {
+                // sync data objs M.u <-> M.d
+                M.d[u[i].u] = M.u[u[i].u];
+            }
         }
     }
 }

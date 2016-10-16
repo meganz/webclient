@@ -165,13 +165,7 @@ var _fromJSDecorator = function(kls) {
 };
 
 var _toJS = function() {
-    var self = this;
-    var props = Object.keys(self._data);
-    var actualJSObj = {};
-    props.forEach(function(k) {
-        actualJSObj[k] = self._data[k];
-    });
-    return actualJSObj;
+    return this._data;
 };
 
 var manualTrackChangesOnStructure = function(obj, implementChangeListener) {

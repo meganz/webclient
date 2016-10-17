@@ -3013,7 +3013,6 @@ function dashboardUI() {
 
     // Space-widget clickable sections
     $('.account.widget .progress-title')
-        .css('cursor', 'pointer')
         .rebind('click', function() {
             var section = String($(this).next().attr('class')).replace(/account|progress-size/g, '').trim();
             switch (section) {
@@ -3053,14 +3052,13 @@ function dashboardUI() {
         $('.fm-account-blocks.storage, .fm-account-blocks.bandwidth').removeClass('exceeded going-out');
 
         // Free Storage Quota
-        var $fsq = $('.account.left-pane.info-block.fsq');
         if (account.maf) {
+            $('.fm-right-block.dashboard').addClass('active-achievements');
+            var $fsq = $('.account.widget.achivements');
             var curStorage = 0;
             var maxStorage = 0;
             var bsqStorage = 0;
             var maf = mega.achievem.prettify(account.maf);
-
-            $fsq.removeClass('hidden');
 
             Object.keys(maf).forEach(function(k) {
                 if (k === 'baseq') {
@@ -3078,24 +3076,17 @@ function dashboardUI() {
             curStorage += bsqStorage;
             maxStorage += bsqStorage;
 
-            $('.button', $fsq).rebind('click', function() {
-                achievementsListDialog();
-            });
             bsqStorage = Math.round(bsqStorage * 100 / maxStorage);
-            $('.progress-bar.red', $fsq).css('width', bsqStorage + '%');
-            $('.progress-bar.dark-violet', $fsq)
-                .css('width', Math.floor(curStorage * 100 / maxStorage - bsqStorage) + '%');
-            $('.left-pane.big-txt', $fsq)
-                .safeHTML('@@ [S]of @@[/S]'.replace('[S]', '<span>').replace('[/S]', '</span>'),
-                            bytesToSize(curStorage, 0), bytesToSize(maxStorage, 0));
+            $('.progress-bar.blue', $fsq).css('width', bsqStorage + '%');
+            $('.progress-size.medium.storage span', $fsq)
+                .safeHTML(bytesToSize(maxStorage, 0));
         }
         else {
-            $fsq.addClass('hidden');
+            $('.fm-right-block.dashboard').removeClass('active-achievements');
         }
 
         // Elements for free/pro accounts. Expites date / Registration date
         if (u_attr.p) {
-            $('.dashboard .button.upgrade-account').addClass('hidden');
 
             // Subscription
             if (account.stype == 'S') {
@@ -3107,29 +3098,28 @@ function dashboardUI() {
                 if (timestamp > 0) {
                     var date = new Date(timestamp * 1000);
                     var dateString = date.getDate() + ' ' + date_months[date.getMonth()] + ' ' + date.getFullYear();
-                    $('.account.left-pane.date-val').text(time2date(timestamp, 2));
-                    $('.account.left-pane.date-info').text(l[7354]);
+                    $('.account.left-pane.plan-date-val').text(time2date(timestamp, 2));
+                    $('.account.left-pane.plan-date-info').text(l[7354]);alert(l[7354]);
                 }
                 else {
                     // Otherwise hide info blocks
-                    $('.account.left-pane.date-val, .account.left-pane.date-info').addClass('hidden');
+                    $('.account.left-pane.plan-date-val, .account.left-pane.plan-date-info').addClass('hidden');
                 }
             }
             else if (account.stype == 'O') {
                 // one-time or cancelled subscription
-                $('.account.left-pane.date-info').text(l[987]);
-                $('.account.left-pane.date-val').text(time2date(account.expiry, 2));
+                $('.account.left-pane.plan-date-info').text(l[987]);
+                $('.account.left-pane.plan-date-val').text(time2date(account.expiry, 2));
             }
         }
-        else {
-            // Free account. Replace membership expiry date by registration date
-            $('.dashboard .button.upgrade-account').removeClass('hidden');
-            $('.dashboard .button.upgrade-account').rebind('click', function() {
-                window.location.hash = 'pro';
-            })
-            $('.account.left-pane.date-info').text('MEMBER SINCE');
-            $('.account.left-pane.date-val').text(time2date(u_attr.since, 2));
-        }
+
+
+        /* Registration date */
+        $('.dashboard .button.upgrade-account').rebind('click', function() {
+            window.location.hash = 'pro';
+        })
+        $('.account.left-pane.reg-date-info').text('MEMBER SINCE');
+        $('.account.left-pane.reg-date-val').text(time2date(u_attr.since, 2));
 
 
         /* New Used Bandwidth chart */
@@ -3242,12 +3232,12 @@ function dashboardUI() {
 
 
         /* TODO: Used Bandwidth progressbar */
-        $('.storage .account.progress-bar.green0').css('width',  '0%');
-        $('.storage .account.progress-bar.green1').css('width', '0%');
+        $('.bandwidth .account.progress-bar.grey').css('width',  '0%');
+        $('.bandwidth .account.progress-bar.light-grey').css('width', '0%');
         // Downloads
-        $('.account.progress-size.downloads').text('0 MB');
+        $('.bandwidth .account.progress-size.base-quota').text('0 MB');
         // Uploads
-        $('.account.progress-size.uploads').text('0 MB');
+        $('.bandwidth .account.progress-size.achives-quota').text('0 MB');
         /* End of Used Bandwidth progressbar */
 
         // Fill rest of widgets
@@ -3613,19 +3603,19 @@ function accountUI() {
             percents[2] += (100 * c[k[i]][0] / account.space);
         }
         for (var i = 0; i < 4; i++) {
-            $('.account.progress-bar:nth-child(' + i + 1 + ')').css('width', percents[i] + '%');
+            $('.tab-content .account.progress-bar:nth-child(' + i + 1 + ')').css('width', percents[i] + '%');
         }
 
         // Cloud drive
-        $('.account.progress-size.cloud-drive').text(bytesToSize(c[k[0]][0]));
+        $('.tab-content .account.progress-size.cloud-drive').text(bytesToSize(c[k[0]][0]));
         // Rubbish bin
-        $('.account.progress-size.rubbish-bin').text(bytesToSize(c[k[2]][0]));
+        $('.tab-content .account.progress-size.rubbish-bin').text(bytesToSize(c[k[2]][0]));
         // Incoming shares
-        $('.account.progress-size.incoming-shares').text(bytesToSize(iSharesBytes));
+        $('.tab-content .account.progress-size.incoming-shares').text(bytesToSize(iSharesBytes));
         // Inbox
-        $('.account.progress-size.inbox').text(bytesToSize(c[k[1]][0]));
+        $('.tab-content .account.progress-size.inbox').text(bytesToSize(c[k[1]][0]));
         // Available
-        $('.account.progress-size.available').text(bytesToSize(account.space - account.space_used));
+        $('.tab-content .account.progress-size.available').text(bytesToSize(account.space - account.space_used));
 
 
         /* achievements */
@@ -11970,7 +11960,7 @@ function fm_resize_handler() {
     else if (M.currentdirid && M.currentdirid.substr(0, 7) === 'account') {
         var $mainBlock = $('.fm-account-main');
 
-        $mainBlock.removeClass('low-width hi-width');
+        $mainBlock.removeClass('ultra-low-width low-width hi-width');
 
         if ($mainBlock.width() > 1675) {
             $mainBlock.addClass('hi-width');
@@ -11984,16 +11974,16 @@ function fm_resize_handler() {
     else if (M.currentdirid && M.currentdirid.substr(0, 9) === 'dashboard') {
         var $mainBlock = $('.fm-right-block.dashboard');
 
-        $mainBlock.removeClass('ultra-low-width low-width hi-width');
+        $mainBlock.removeClass('ultra low-width hi-width');
 
         if ($mainBlock.width() > 1675) {
             $mainBlock.addClass('hi-width');
         }
-        else if ($mainBlock.width() < 880 && $mainBlock.width() > 698) {
+        else if ($mainBlock.width() < 880 && $mainBlock.width() > 850) {
             $mainBlock.addClass('low-width');
         }
-        else if ($mainBlock.width() < 698) {
-            $mainBlock.addClass('ultra-low-width');
+        else if ($mainBlock.width() < 850) {
+            $mainBlock.addClass('ultra low-width');
         }
 
         initDashboardScroll();

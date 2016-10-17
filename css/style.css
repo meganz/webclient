@@ -3736,13 +3736,16 @@ label.iPhoneCheckLabelOff span {
 .fm-left-menu.account + .nw-tree-panel-header + .fm-tree-panel {
     height: 100%;
 }
-.fm-tree-panel, .fm-left-menu.dashboard + .nw-tree-panel-header + .fm-tree-panel {
+.fm-tree-panel {
     height: -webkit-calc(100% - 36px);
     height: -moz-calc(100% - 36px);
     height: calc(100% - 36px);
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
+}
+.fm-left-menu.dashboard + .nw-tree-panel-header + .fm-tree-panel {
+    height: 100%;
 }
 .nw-tree-panel-header + .fm-tree-panel, .not-logged .contacts-panel .fm-tree-panel {
     height: -webkit-calc(100% - 72px);
@@ -5223,6 +5226,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .fm-left-menu.dashboard {
     background-color: #FF333A;
+    display: none;
 }
 .fm-left-menu.transfers {
     background-color: #E0E0E0;
@@ -10063,7 +10067,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
     padding: 8px 0 13px 0;
     font-size: 14px;
     line-height: 18px;
-    color: #333333;
+    color: #666666;
     position: relative;
     white-space: nowrap;
     overflow: hidden;
@@ -10149,12 +10153,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
 .membership-usage-bl:first-child {
     border-left: 0;
     width: 235px;
-}
-.free .membership-usage-bl.storage, .free .fm-account-blocks.storage {
-    width: 100%;
-}
-.free .membership-usage-bl.bandwidth, .free .fm-account-blocks.bandwidth {
-    display: none;
 }
 .transfers .fm-account-blocks.bandwidth {
     padding-bottom: 20px;
@@ -10766,7 +10764,7 @@ table {
 }
 .account.user-data-block {
     position: relative;
-    padding: 80px 20px 16px 20px;
+    padding: 60px 20px 16px 20px;
     text-align: center;
     font-size: 0;
     line-height: 0;
@@ -10826,7 +10824,7 @@ table {
     border-color: #FF333A;
     color: #333333;
 }
-.account.tab-lnk.achievements, .active-achievements .account.tab-lnk.payment  {
+.account.tab-lnk.achievements, .active-achievements .account.tab-lnk.payment {
     display: none;
 }
 .account.quota-txt {
@@ -11282,10 +11280,10 @@ table {
     box-sizing: border-box;
 }
 .dashboard .account.user-data-block {
-    padding: 44px 20px 20px 20px;
+    padding: 60px 20px 0 20px;
 }
 .account.left-pane.info-block {
-    padding: 20px 25px 24px 25px;
+    padding: 17px 25px 24px 25px;
 }
 .account.left-pane.divider {
     height: 1px;
@@ -11294,22 +11292,26 @@ table {
 .account.max-width-bl {
     max-width: 1064px;
 }
+.account.left-pane.info-txt {
+    padding: 9px 0 12px 0;
+    font-size: 14px;
+    line-height: 18px;
+    color: #333333;
+}
 .account.left-pane.header {
     padding: 0 0 0 0;
-    font-size: 18px;
-    line-height: 23px;
+    font-size: 14px;
+    line-height: 32px;
+    text-transform: uppercase;
     color: #999999;
     white-space: nowrap;
     overflow: hidden;
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
 }
-.account.left-pane.header.bottom-pad {
-    padding-bottom: 19px;
-}
 .account.left-pane.big-txt {
-    padding: 3px 0 16px 0;
-    font-size: 24px;
+    padding: 3px 0 13px 0;
+    font-size: 18px;
     line-height: 31px;
     color: #333333;
     white-space: nowrap;
@@ -11321,10 +11323,14 @@ table {
     background-color: rgba(0,0,0,0.05);
 }
 .account.left-pane .button {
-    margin: 9px 0 0 0;
+    margin: 7px 0 0 0;
     height: 36px;
     line-height: 36px;
     max-width: 100%;
+}
+.account.left-pane .default-grey-button {
+    height: 32px;
+    line-height: 32px;
 }
 .account.left-pane .button.get-more-space {
     margin: 16px 0 0 0;
@@ -11341,9 +11347,9 @@ table {
     padding-left: 5px;
 }
 .account.left-pane.small-txt {
-    color: #666666;
-    font-size: 12px;
-    line-height: 15px;
+    color: #777777;
+    font-size: 14px;
+    line-height: 16px;
     margin: 0 0 -6px 0;
     text-transform: uppercase;
     white-space: nowrap;
@@ -11423,7 +11429,7 @@ table {
     margin: 18px 0 -1px 0;
 }
 .account.data-table.data {
-    margin: 17px 0 -2px 0;
+    margin: 17px 0 12px 0;
 }
 .account.data-table.hidden {
     display: none;
@@ -11476,9 +11482,33 @@ table {
     padding: 0 6px;
     margin: 1px 0 0 0;
 }
+.account.rounded-icon {
+    width: 21px;
+    height: 21px;
+    background-color: rgba(119,119,119,0.5);
+    -moz-border-radius: 100%;
+    -webkit-border-radius: 100%;
+    border-radius: 100%;
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
+    margin: 2px 0 0 0;
+    background-image: url(../images/mega/nw-fm-sprite_v19.svg);
+    background-position: -13px -11775px;
+    background-repeat: no-repeat;
+    cursor: pointer;
+}
+.account.rounded-icon:hover {
+    background-color: rgba(119,119,119,1);
+}
 .small.account.progress-list {
-    padding: 9px 0 12px 0;
+    padding: 9px 0 11px 0;
     display: block;
+}
+.small.account.progress-list.colorized {
+    padding: 12px 0 2px 0;
 }
 .medium.account.progress-list {
     padding: 18px 0 12px 0;
@@ -11515,6 +11545,12 @@ table {
     line-height: 24px;
     color: #777777;
 }
+.account.progress-title.free, .free .account.progress-title.pro {
+    display: none;
+}
+.free .account.progress-title.free {
+    display: block;
+}
 .medium .account.progress-size {
     float: right;
     font-size: 18px;
@@ -11543,17 +11579,18 @@ table {
 .tiny .account.progress-bar:first-child::after {
     display: none;
 }
-.low-width .left-float-bl, .low-width .data-float-bl {
-    width: 63.7%;
-}
-.low-width .right-float-bl {
-    width: 36.3%;
-}
-.low-width .contacts-widget, .low-width .chat-widget {
+/*
+.free .membership-usage-bl.storage, .free .fm-account-blocks.storage {
     width: 100%;
-    float: none;
 }
-.ultra-low-width .left-float-bl, .ultra-low-width .data-float-bl, .ultra-low-width .right-float-bl {
+.free .membership-usage-bl.bandwidth, .free .fm-account-blocks.bandwidth {
+    display: none;
+}
+*/
+.ultra.low-width .fm-account-blocks {
+    width: 50%;
+}
+.ultra.low-width .left-float-bl, .ultra.low-width .right-float-bl, .ultra.low-width .data-float-bl {
     width: 100%;
     float: none;
 }
@@ -24691,10 +24728,10 @@ div.camera-bottom-txt {
     background-color: #514152;
 }
 .account.progress-indicator.blue {
-    border-color: #1FA5E0;
+    border-color: #2BA6DE;
 }
 .account.progress-indicator.blue.active, .account.progress-bar.blue {
-    background-color: #1FA5E0;
+    background-color: #2BA6DE;
 }
 .account.progress-indicator.orange {
     border-color: #F27800;
@@ -24709,10 +24746,10 @@ div.camera-bottom-txt {
     background-color: #FFD500;
 }
 .account.progress-indicator.green {
-    border-color: #00E22C;
+    border-color: #31B500;
 }
 .account.progress-indicator.green.active, .account.progress-bar.green {
-    background-color: #00E22C;
+    background-color: #31B500;
 }
 .account.progress-indicator.dark-red {
     border-color: #D90007;
@@ -24733,9 +24770,15 @@ div.camera-bottom-txt {
     background-color: #666666;
 }
 .account.progress-indicator.grey {
-    border-color: #CCCCCC;
+    border-color: #999999;
 }
 .account.progress-indicator.grey.active, .account.progress-bar.grey {
+    background-color: #999999;
+}
+.account.progress-indicator.light-grey {
+    border-color: #CCCCCC;
+}
+.account.progress-indicator.light-grey.active, .account.progress-bar.light-grey {
     background-color: #CCCCCC;
 }
 .account.progress-txt {
@@ -24758,6 +24801,25 @@ div.camera-bottom-txt {
     height: 30px;
     display: table-cell;
     vertical-align: top;
+}
+.account.widget .progress-title {
+    cursor: pointer;
+}
+.account.progress-title.medium, .account.progress-size.medium {
+    font-size: 16px;
+    line-height: 28px;
+}
+.account.progress-size.grey {
+    color: #777777;
+}
+.account.progress-size.grey span {
+    color: #424242;
+}
+.account.progress-title.blue {
+    color: #2BA6DE;
+}
+.account.progress-title.green {
+    color: #31B500;
 }
 .account.used-space-block {
     padding-bottom: 20px;
@@ -24949,6 +25011,12 @@ div.camera-bottom-txt {
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
 }
+.right-float-bl.achivements, .account-achivements {
+    display: none;
+}
+.active-achievements .right-float-bl.achivements, .active-achievements .account-achivements {
+    display: block;
+}
 .account.widget.body {
     position: relative;
     margin: 12px 0 0 12px;
@@ -24982,8 +25050,9 @@ div.camera-bottom-txt {
 .account.widget.text {
     font-size: 14px;
     line-height: 18px;
-    color: #333333;
-    padding: 12px 0 17px 0;
+    color: #666666;
+    padding: 14px 0 0 0;
+    margin: 0 0 -1px 0;
 }
 .account.plan-info-block {
     display: table;

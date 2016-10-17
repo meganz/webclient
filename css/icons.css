@@ -481,33 +481,33 @@
     background-image: url(../images/mega/nw-fm-sprite_v19.svg);
     background-position: -10px -10780px;
 }
-.huge-white-icon.achivement {
+.huge-white-icon.achievement {
     background-image: url(../images/mega/account-sprite.png);
     width: 72px;
     height: 72px;
 }
-.huge-white-icon.achivement.ach-create-account {
+.huge-white-icon.achievement.ach-create-account {
     background-position: 0 -86px;
 }
-.huge-white-icon.achivement.ach-install-megasync {
+.huge-white-icon.achievement.ach-install-megasync {
     background-position: -104px -86px;
 }
-.huge-white-icon.achivement.ach-install-mobile-app {
+.huge-white-icon.achievement.ach-install-mobile-app {
     background-position: 0 -175px;
 }
-.huge-white-icon.achivement.ach-take-tour {
+.huge-white-icon.achievement.ach-take-tour {
     background-position: -104px -175px;
 }
-.huge-white-icon.achivement.ach-verify-number {
+.huge-white-icon.achievement.ach-verify-number {
     background-position: 0 -264px;
 }
-.huge-white-icon.achivement.ach-invite-friend {
+.huge-white-icon.achievement.ach-invite-friend {
     background-position: -104px -264px;
 }
-.huge-white-icon.achivement.ach-group-chat {
+.huge-white-icon.achievement.ach-group-chat {
     background-position: 0 -353px;
 }
-.huge-white-icon.achivement.ach-share-folder {
+.huge-white-icon.achievement.ach-share-folder {
     background-position: -104px -353px;
 }
 .big-icon.cloud {
@@ -573,34 +573,34 @@
     background-image: url(../images/mega/nw-fm-sprite_v19.svg);
     background-position: -4px -11097px;
 }
-.huge-icon.achivement {
+.huge-icon.achievement {
     background-image: url(../images/mega/big-achievements.png);
 }
-.ach-create-account .huge-icon.achivement {
+.ach-create-account .huge-icon.achievement {
     background-position: -2px 6px;
 }
-.ach-install-megasync .huge-icon.achivement {
+.ach-install-megasync .huge-icon.achievement {
     background-position: -152px 6px;
 }
-.ach-install-mobile-app .huge-icon.achivement {
+.ach-install-mobile-app .huge-icon.achievement {
     background-position: -302px 6px;
 }
-.ach-take-tour .huge-icon.achivement {
+.ach-take-tour .huge-icon.achievement {
     background-position: -2px -144px;
 }
-.ach-invite-friend .huge-icon.achivement {
+.ach-invite-friend .huge-icon.achievement {
     background-position: -152px -144px;
 }
-.ach-verify-number .huge-icon.achivement {
+.ach-verify-number .huge-icon.achievement {
     background-position: -302px -144px;
 }
-.ach-group-chat .huge-icon.achivement {
+.ach-group-chat .huge-icon.achievement {
     background-position: -2px -294px;
 }
-.ach-share-folder .huge-icon.achivement {
+.ach-share-folder .huge-icon.achievement {
     background-position: -152px -294px;
 }
-.green-tick .huge-icon.achivement {
+.green-tick .huge-icon.achievement {
     background-position: -2px -444px;
 }
 .semi-big-icon.cloud {

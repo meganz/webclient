@@ -200,23 +200,23 @@
 }
 /* End of Limited available bandwidth dialog */
 
-/* Achivement dialog */
-.fm-dialog.achivement-dialog {
+/* Achievement dialog */
+.fm-dialog.achievement-dialog {
     width: 484px;
     margin: -242px 0 0 -242px;
     background-color: #FAFAFA;
     font-size: 0;
 }
-.achivement-dialog.top-icon {
+.achievement-dialog.top-icon {
     padding: 5px 0 21px 0;
 }
-.achivement-dialog.fm-dialog-body {
+.achievement-dialog.fm-dialog-body {
     padding: 12px 48px 24px 48px;
 }
 .fm-dialog-body.centered-content {
     font-size: 0;
 }
-.achivement-dialog.header {
+.achievement-dialog.header {
     font-size: 20px;
     line-height: 30px;
     color: #666666;
@@ -225,22 +225,22 @@
     display: table-cell;
     width: 544px;
 }
-.achivement-dialog.header span {
+.achievement-dialog.header span {
     color: #FF333A;
     border-bottom: 2px solid #FF333A;
 }
-.achivement-dialog.reward {
+.achievement-dialog.reward {
     display: inline-block;
     margin: 15px 21px 0 21px;
     text-align: left;
 }
-.achivement-dialog.reward.hidden {
+.achievement-dialog.reward.hidden {
     display: none;
 }
-.achivement-dialog.reward i {
+.achievement-dialog.reward i {
     vertical-align: top;
 }
-.achivement-dialog.reward-txt {
+.achievement-dialog.reward-txt {
     display: inline-block;
     font-size: 14px;
     line-height: 17px;
@@ -248,41 +248,41 @@
     vertical-align: top;
     margin: 6px 0 0 15px;
 }
-.achivement-dialog.reward-txt span {
+.achievement-dialog.reward-txt span {
     font-size: 18px;
     line-height: 18px;
     display: block;
     text-transform: uppercase;
     color: #2BA6DE;
 }
-.achivement-dialog.reward.storage span {
+.achievement-dialog.reward.storage span {
     color: #2BA6DE;
 }
-.achivement-dialog.reward.bandwidth span {
+.achievement-dialog.reward.bandwidth span {
     color: #31B500;
 }
-.achivement-dialog.description {
+.achievement-dialog.description {
     padding: 18px 0 0 0;
     font-size: 14px;
     line-height: 18px;
     color: #666666;
 }
-.achivement-dialog.expires-txt {
+.achievement-dialog.expires-txt {
     font-size: 14px;
     line-height: 18px;
     color: #333333;
     padding: 15px 0 24px 0;
 }
-.achivement-dialog.expires-txt.red {
+.achievement-dialog.expires-txt.red {
     color: #FF333A;
 }
-.achivement-dialog .default-white-button {
+.achievement-dialog .default-white-button {
     display: inline-block;
     margin: 0 10px 0 10px;
     color: #777777;
     min-width: 102px;
 }
-/* End of Achivement dialog */
+/* End of Achievement dialog */
 
 
 /* Achievements list dialog */
@@ -302,11 +302,11 @@
 .achievements-cell-body {
     display: table-row;
 }
-.achievements-list-dialog .achivement-full.info {
+.achievements-list-dialog .achievement-full.info {
     margin: 0;
     padding: 0 36px 0 0;
 }
-.achivement-dialog.left-icon {
+.achievement-dialog.left-icon {
     display: table-cell;
     width: 200px;
     position: relative;
@@ -317,10 +317,10 @@
     box-sizing: border-box;
     padding-left: 18px;
 }
-.achivement-dialog.left-icon i {
+.achievement-dialog.left-icon i {
     margin: -5px 0;
 }
-.achivement-dialog.right-block {
+.achievement-dialog.right-block {
     display: table-cell;
     width: 223px;
     border-left: 1px solid #e5e5e5;
@@ -341,60 +341,60 @@
 .achievements-list-dialog .acivements-content {
     padding: 2px 24px 12px 24px;
 }
-.achivement-full.expires-txt {
+.achievement-full.expires-txt {
     font-size: 14px;
     line-height: 18px;
     color: #333333;
     padding: 10px 0 0 0;
 }
-.achivement-full.expires-txt.red {
+.achievement-full.expires-txt.red {
     color: #333333;
 }
-.achivement-dialog.right-block .reward {
+.achievement-dialog.right-block .reward {
     margin: 0px 0 17px 0;
 }
-.achivement-dialog.right-block .reward i {
+.achievement-dialog.right-block .reward i {
     margin: -2px 0 0 0;
 }
-.achivement-dialog.right-block .reward-txt {
+.achievement-dialog.right-block .reward-txt {
     margin: -4px 0 0 13px;
 }
 .achievements-cell-body .expires-txt {
     padding: 12px 0 0 0;
 }
-.achivement-dialog.status-block {
+.achievement-dialog.status-block {
     position: absolute;
     width: 100%;
     bottom: 0;
     left: 0;
 }
-.achivement-dialog.status-block .button {
+.achievement-dialog.status-block .button {
     display: inline-block;
     min-width: 126px;
 }
-.achived .achivement-dialog.status-block .button {
+.achived .achievement-dialog.status-block .button {
     display: none;
 }
-.achivement-dialog.status-txt {
+.achievement-dialog.status-txt {
     font-size: 18px;
     color: #31B500;
     line-height: 26px;
     text-transform: uppercase;
     display: none;
 }
-.achived .achivement-dialog.status-txt {
+.achived .achievement-dialog.status-txt {
     display: block;
 }
-.one-reward .achivement-dialog.right-block {
+.one-reward .achievement-dialog.right-block {
     vertical-align: middle;
 }
-.one-reward .achivement-dialog.right-block .reward {
+.one-reward .achievement-dialog.right-block .reward {
     margin: 0px 0 4px 0;
 }
 .one-reward .right-block .reward.bandwidth {
     display: none;
 }
-.achived .achivement-dialog.right-block .reward {
+.achived .achievement-dialog.right-block .reward {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     -moz-opacity: 0.5;
     -khtml-opacity: 0.5;
@@ -414,7 +414,7 @@
 .invite-dialog .fm-dialog-body {
     padding-bottom: 36px;
 }
-.achivement-dialog.green-header {
+.achievement-dialog.green-header {
     font-size: 16px;
     line-height: 20px;
     color: #54BCA9;
@@ -423,52 +423,52 @@
     background-color: #FAFAFA;
     padding: 21px 10px 0 10px;
 }
-.achivement-dialog.info-block {
+.achievement-dialog.info-block {
     display: table;
     width: 100%;
     border-top: 1px solid rgba(0,0,0,0.1);
     border-bottom: 1px solid rgba(0,0,0,0.1);
     margin: -12px 0 0 0;
 }
-.achivement-dialog.info-icon {
+.achievement-dialog.info-icon {
     display: table-cell;
     width: 88px;
     vertical-align: middle;
     text-align: left;
 }
-.achivement-dialog.info-icon i {
+.achievement-dialog.info-icon i {
     margin-left: -2px;
 }
-.achivement-dialog.info-body {
+.achievement-dialog.info-body {
     display: table-cell;
     vertical-align: middle;
     text-align: left;
     padding: 18px 0;
 }
-.achivement-dialog.info-body p {
+.achievement-dialog.info-body p {
     padding: 6px 0;
     margin: 0;
     font-size: 14px;
     line-height: 18px;
     color: #666666;
 }
-.achivement-dialog.info-body p strong {
+.achievement-dialog.info-body p strong {
     color: #333333;
 }
-.achivement-dialog.info-body p.italic {
+.achievement-dialog.info-body p.italic {
     font-style: italic;
     color: #999999;
 }
-.achivement-dialog.info-body p .red {
+.achievement-dialog.info-body p .red {
     color: #FF333A;
 }
-.achivement-dialog.input-header {
+.achievement-dialog.input-header {
     font-size: 16px;
     line-height: 20px;
     color: #666666;
     padding: 16px 0 16px 0;
 }
-.achivement-dialog.input-field {
+.achievement-dialog.input-field {
     max-height: 64px;
     min-height: 32px;
     background-color: rgba(0,0,0,0.05);
@@ -485,16 +485,16 @@
     text-align: center;
     overflow: hidden;
 }
-.active .achivement-dialog.input-field {
+.active .achievement-dialog.input-field {
     background-color: white;
     border: 1px solid rgba(0,0,0,0.2);
 }
-.achivement-dialog.input-field ul {
+.achievement-dialog.input-field ul {
     padding: 0 10px 0 10px;
     font-size: 0;
     line-height: 0;
 }
-.achivement-dialog.input-field li {
+.achievement-dialog.input-field li {
     overflow: hidden;
     height: 30px;
     line-height: 18px;
@@ -516,7 +516,7 @@
     overflow: hidden;
     white-space: nowrap;
 }
-.achivement-dialog.input-field input {
+.achievement-dialog.input-field input {
     border: 0;
     width: 100px;
     padding: 0;
@@ -529,34 +529,34 @@
     -webkit-appearance: caret;
     font-family: 'source_sans_proregular', Arial;
 }
-.achivement-dialog.input-field input.tiny {
+.achievement-dialog.input-field input.tiny {
     width: 0 !important;
 }
-.achivement-dialog.input-info.red, .achivement-dialog.input-field input.red {
+.achievement-dialog.input-info.red, .achievement-dialog.input-field input.red {
     color: #E54C51;
 }
-.achivement-dialog.input-info, .achivement-dialog.success-info {
+.achievement-dialog.input-info, .achievement-dialog.success-info {
     font-size: 12px;
     line-height: 15px;
     color: #999999;
     padding: 12px 0 15px 0;
 }
-.achivement-dialog.success-info {
+.achievement-dialog.success-info {
     padding: 23px 0 26px 0;
 }
-.achivement-dialog.success-content, .success .achivement-dialog.default-content, .invite-dialog .default-grey-button.back, .invite-dialog.success .default-grey-button.send {
+.achievement-dialog.success-content, .success .achievement-dialog.default-content, .invite-dialog .default-grey-button.back, .invite-dialog.success .default-grey-button.send {
     display: none;
 }
-.success .achivement-dialog.success-content {
+.success .achievement-dialog.success-content {
     display: block;
 }
 .invite-dialog.success .default-grey-button.back {
     display: inline-block;
 }
-.achivement-dialog .default-white-button.hidden {
+.achievement-dialog .default-white-button.hidden {
     display: none;
 }
-.achivement-dialog.links-block {
+.achievement-dialog.links-block {
     float: left;
     width: 50%;
     padding: 14px 12px 2px 0;
@@ -564,20 +564,20 @@
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
-.achivement-dialog.links-block.inputs {
+.achievement-dialog.links-block.inputs {
     float: left;
     width: 50%;
     padding: 14px 0 2px 12px;
 }
-.achivement-dialog.links-block input {
+.achievement-dialog.links-block input {
     width: 100%;
     margin-top: 6px;
 }
-.achivement-dialog.links-block .input-field {
+.achievement-dialog.links-block .input-field {
     margin: 16px 0;
     padding: 0 14px 0 14px;
 }
-.achivement-dialog.links-block .input-label {
+.achievement-dialog.links-block .input-label {
     margin: 16px 0;
     height: 32px;
     font-size: 14px;

@@ -467,11 +467,11 @@ body.pro:after {
     background-image: url(../images/mega/chat-static-sprite-v1@2x.png);
     background-size: 68px auto;
 }
-.huge-white-icon.achivement {
+.huge-white-icon.achievement {
     background-image: url(../images/mega/account-sprite@2x.png);
     background-size: 172px auto;
 }
-.huge-icon.achivement {
+.huge-icon.achievement {
     background-image: url(../images/mega/big-achievements@2x.png);
     background-size: 436px auto;
 }

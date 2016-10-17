@@ -24917,7 +24917,7 @@ div.camera-bottom-txt {
     -moz-box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
     box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
 }
-.achivement-left-side {
+.achievement-left-side {
     position: absolute;
     width: 114px;
     height: -webkit-calc(100% - 50px);
@@ -24936,24 +24936,24 @@ div.camera-bottom-txt {
     top: -5px;
     margin: 0 0 0 -37px;
 }
-.achivement-full.info {
+.achievement-full.info {
     padding: 0 24px 50px 0;
     margin-left: 138px;
     position: relative;
     z-index: 1;
 }
-.achivement-full.title {
+.achievement-full.title {
     font-size: 18px;
     line-height: 22px;
     color: #333333;
 }
-.achivement-full.description {
+.achievement-full.description {
     font-size: 14px;
     line-height: 18px;
     color: #999999;
     padding-top: 19px;
 }
-.achivement-full.status {
+.achievement-full.status {
     position: absolute;
     width: -webkit-calc(100% - 160px);
     width: -moz-calc(100% - 160px);
@@ -24962,20 +24962,20 @@ div.camera-bottom-txt {
     left: 138px;
     z-index: 1;
 }
-.achivement-full.rewards {
+.achievement-full.rewards {
     width: 100%;
     position: absolute;
     bottom: -2px;
     font-size: 0;
     white-space: nowrap;
 }
-.achivement-full.reward {
+.achievement-full.reward {
     font-size: 20px;
     line-height: 20px;
     color: #666666;
     padding: 10px 15px 0 15px;
 }
-.achivement-full.reward i {
+.achievement-full.reward i {
     width: 34px;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -24983,25 +24983,25 @@ div.camera-bottom-txt {
     margin: 0 0 0 0;
     border-right: 1px solid rgba(0,0,0,0.1);
 }
-.achivement-full.reward-txt {
+.achievement-full.reward-txt {
     display: inline-block;
     padding: 1px 0 0 4px;
 }
-.achivement-full.reward span {
+.achievement-full.reward span {
     font-size: 14px;
     text-transform: uppercase;
     padding-left: 3px;
 }
-.achivement-full .default-grey-button {
+.achievement-full .default-grey-button {
     min-width: 111px;
     margin-bottom: 6px;
 }
-.achivement-complete {
+.achievement-complete {
     font-size: 16px;
     line-height: 18px;
     color: #31B500;
 }
-.achivement-date {
+.achievement-date {
     font-size: 14px;
     line-height: 18px;
     color: #999999;
@@ -25011,10 +25011,10 @@ div.camera-bottom-txt {
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
 }
-.right-float-bl.achivements, .account-achivements {
+.right-float-bl.achievements, .account-achievements {
     display: none;
 }
-.active-achievements .right-float-bl.achivements, .active-achievements .account-achivements {
+.active-achievements .right-float-bl.achievements, .active-achievements .account-achievements {
     display: block;
 }
 .account.widget.body {

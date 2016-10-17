@@ -3054,7 +3054,7 @@ function dashboardUI() {
         // Free Storage Quota
         if (account.maf) {
             $('.fm-right-block.dashboard').addClass('active-achievements');
-            var $fsq = $('.account.widget.achivements');
+            var $fsq = $('.account.widget.achievements');
             var curStorage = 0;
             var maxStorage = 0;
             var bsqStorage = 0;
@@ -3722,8 +3722,8 @@ function accountUI() {
 
                             $('.status', $cell)
                                 .safeHTML(
-                                    '<div class="achivement-complete">@@</div>' +
-                                    '<div class="achivement-date">@@ <span class="red-txt">(@@)</span></div>' +
+                                    '<div class="achievement-complete">@@</div>' +
+                                    '<div class="achievement-date">@@ <span class="red-txt">(@@)</span></div>' +
                                     '<div class="clear"></div>',
                                     'Achieved', data.rwd.date.toLocaleDateString(),
                                     '%1 days left'.replace('%1', data.rwd.left));
@@ -10819,25 +10819,25 @@ function termsDialog(close, pp)
 }
 
 /**
- * Show achivement dialog
- * @param {String} achivement title
+ * Show achievement dialog
+ * @param {String} achievement title
  * @param {String} close dialog parameter
  */
-function achivementDialog(title, close) {
+function achievementDialog(title, close) {
     var headerTxt, descriptionTxt, storageSpace, transferQuota, monthNumber;
-    var $dialog = $('.fm-dialog.achivement-dialog')
+    var $dialog = $('.fm-dialog.achievement-dialog')
     if (close) {
         $.dialog = false;
         fm_hideoverlay();
         $dialog.addClass('hidden');
         return true;
     }
-    $.dialog = 'achivement';
+    $.dialog = 'achievement';
     fm_showoverlay();
     $dialog.removeClass('hidden');
 
-    $('.achivement-dialog .button.continue,.achivement-dialog .fm-dialog-close').rebind('click', function() {
-        achivementDialog(title, 1);
+    $('.achievement-dialog .button.continue,.achievement-dialog .fm-dialog-close').rebind('click', function() {
+        achievementDialog(title, 1);
     });
     switch (title) {
         case 'create-account':
@@ -10898,8 +10898,8 @@ function achivementDialog(title, close) {
     } else {
         $dialog.find('.bandwidth .reward-txt span').addClass('hidden');
     }
-    $dialog.find('.achivement-dialog.expires-txt span').text(monthNumber);
-    $dialog.attr('class','fm-dialog achivement-dialog ' + title);
+    $dialog.find('.achievement-dialog.expires-txt span').text(monthNumber);
+    $dialog.attr('class','fm-dialog achievement-dialog ' + title);
 }
 
 /**
@@ -11013,7 +11013,7 @@ function inviteFriendDialog(close) {
     var locFmt = 'Get [S]@@[/S] free storage and [S]@@[/S] of transfer quota for each friend who installs a MEGA app'.replace(/\[S\]/g, '<span>').replace(/\[\/S\]/g, '</span>');
     $('.header.default', $dialog).safeHTML(locFmt, bytesToSize(maf[0], 0), bytesToSize(maf[1], 0));
 
-    if (!$('.achivement-dialog.input').tokenInput("getSettings")) {
+    if (!$('.achievement-dialog.input').tokenInput("getSettings")) {
         initInviteDialogMultiInputPlugin();
 
         locFmt = "Encourage your friend to register and install a MEGA app. As long as your friend uses the same email address as you've entered, you will receive your free [S]@@[/S] of storage space and [S]@@[/S] of transfer quota.".replace(/\[S\]/g, '<span class="red">').replace(/\[\/S\]/g, '</span>');
@@ -11054,8 +11054,8 @@ function initInviteDialogMultiInputPlugin() {
 
     // Init textarea logic
     var $dialog = $('.fm-dialog.invite-dialog');
-    var $this  = $('.achivement-dialog.multiple-input.emails input');
-    var $inputWrapper  = $('.achivement-dialog.multiple-input');
+    var $this  = $('.achievement-dialog.multiple-input.emails input');
+    var $inputWrapper  = $('.achievement-dialog.multiple-input');
     var $sendButton = $dialog.find('.default-grey-button.send');
     var contacts = getContactsEMails();
 
@@ -11082,18 +11082,18 @@ function initInviteDialogMultiInputPlugin() {
         visibleComma: true,
         enableHTML: true,
         onEmailCheck: function() {
-            $('.achivement-dialog.input-info').addClass('red').text(l[7415]);
-            $('.achivement-dialog.multiple-input').find('li input').eq(0).addClass('red');
+            $('.achievement-dialog.input-info').addClass('red').text(l[7415]);
+            $('.achievement-dialog.multiple-input').find('li input').eq(0).addClass('red');
             resetInfoText();
         },
         onDoublet: function(u) {
-            $('.achivement-dialog.input-info').addClass('red').text(l[7413]);
-            $('.achivement-dialog.multiple-input').find('li input').eq(0).addClass('red');
+            $('.achievement-dialog.input-info').addClass('red').text(l[7413]);
+            $('.achievement-dialog.multiple-input').find('li input').eq(0).addClass('red');
             resetInfoText();
         },
         onHolder: function() {
-            $('.achivement-dialog.input-info').addClass('red').text(l[7414]);
-            $('.achivement-dialog.multiple-input').find('li input').eq(0).addClass('red');
+            $('.achievement-dialog.input-info').addClass('red').text(l[7414]);
+            $('.achievement-dialog.multiple-input').find('li input').eq(0).addClass('red');
             resetInfoText();
         },
         onReady: function() {// Called once on dialog initialization
@@ -11101,10 +11101,10 @@ function initInviteDialogMultiInputPlugin() {
 
             $input.rebind('keyup click', function() {
                 var value = $.trim($input.val());
-                var $wrapper = $('.achivement-dialog.multiple-input');
+                var $wrapper = $('.achievement-dialog.multiple-input');
                 if ($wrapper.find('.share-added-contact').length > 0 || checkMail(value) === false) {
                     $wrapper.find('li input').eq(0).removeClass('red');
-                    $('.achivement-dialog.input-info').removeClass('red').text(l[9093]);
+                    $('.achievement-dialog.input-info').removeClass('red').text(l[9093]);
                     $('.invite-dialog .default-grey-button.send').removeClass('disabled');
                 } else {
                     $('.invite-dialog .default-grey-button.send').addClass('disabled');
@@ -11120,7 +11120,7 @@ function initInviteDialogMultiInputPlugin() {
 
             var $inputTokens = $inviteDialog.find('.share-added-contact.token-input-token-invite');
             var itemNum = $inputTokens.length;
-            var $multiInput = $inviteDialog.find('.achivement-dialog.multiple-input');
+            var $multiInput = $inviteDialog.find('.achievement-dialog.multiple-input');
             var h1 = $inputTokens.outerHeight(true);// margin included
             var h2 = $multiInput.height();
 
@@ -11140,8 +11140,8 @@ function initInviteDialogMultiInputPlugin() {
             var $inviteDialog = $('.invite-dialog');
             var $inputTokens = $inviteDialog.find('.share-added-contact.token-input-token-invite');
             var itemNum = $inputTokens.length;
-            var $multiInput = $inviteDialog.find('.achivement-dialog.multiple-input');
-            var $scrollBox = $('.achivement-dialog.multiple-input .jspPane')[0];
+            var $multiInput = $inviteDialog.find('.achievement-dialog.multiple-input');
+            var $scrollBox = $('.achievement-dialog.multiple-input .jspPane')[0];
             var h1 = $inputTokens.outerHeight(true);// margin included
             var h2 = 0;
 
@@ -11175,11 +11175,11 @@ function initInviteDialogMultiInputPlugin() {
 
         setTimeout(function() {
             // Rest input info text and color
-            $('.achivement-dialog.input-info')
+            $('.achievement-dialog.input-info')
                 .removeClass('red')
                 .text(l[9093]);
 
-            $('.achivement-dialog.multiple-input').find('li input').eq(0).removeClass('red');
+            $('.achievement-dialog.multiple-input').find('li input').eq(0).removeClass('red');
         }, timeOut);
     }
 

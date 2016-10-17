@@ -3754,10 +3754,24 @@ function accountUI() {
                 $('.achievements-block .data-block.transfer .baseq').addClass('hidden');
             }
 
+            $('.account.plan-info.bandwidth .plan-comment')
+                .text('%1 base quota + %2'
+                    .replace('%1', bytesToSize(transferBaseQuota, 0))
+                    .replace('%2', bytesToSize(transferCurrentValue, 0))
+                );
+            $('.account.plan-info.storage .plan-comment')
+                .text('%1 base quota + %2'
+                    .replace('%1', bytesToSize(storageBaseQuota, 0))
+                    .replace('%2', bytesToSize(storageCurrentValue, 0))
+                );
+
             storageMaxValue += storageBaseQuota;
             storageCurrentValue += storageBaseQuota;
             transferMaxValue += transferBaseQuota;
             transferCurrentValue += transferBaseQuota;
+
+            $('.account.plan-info.bandwidth span').text(bytesToSize(transferCurrentValue, 0));
+            $('.account.plan-info.storage span').text(bytesToSize(storageCurrentValue, 0));
 
             storageMaxValue = Math.max(50 * (1024 * 1024 * 1024), storageMaxValue * 1.3);
             transferMaxValue = Math.max(50 * (1024 * 1024 * 1024), transferMaxValue * 1.3);

@@ -4015,7 +4015,9 @@ label.iPhoneCheckLabelOff span {
 .contacts-panel .fm-contact-requests, .contacts-panel .fm-received-requests {
     display: block;
 }
-.not-logged .contacts-panel .fm-contact-requests, .not-logged .contacts-panel .fm-received-requests {
+.not-logged .contacts-panel .fm-contact-requests,
+.not-logged .nw-fm-left-icon.conversations,
+.not-logged .contacts-panel .fm-received-requests {
     display: none;
 }
 .content-panel {

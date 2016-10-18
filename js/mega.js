@@ -7488,7 +7488,7 @@ function loadfm_done(mDBload) {
                     console.debug('loadReport', r);
                 }
                 if (d > 1 || window.exTimeLeft) {
-                    api_req({a: 'log', e: 99624, m: JSON.stringify(r)});
+                    api_req({a: 'log', e: 99625, m: JSON.stringify(r)});
                 }
             }
         }

@@ -7326,6 +7326,13 @@ function loadfm_callback(res, ctx) {
         return;
     }
 
+    if (res.noc) {
+        mega.loadReport.noc = res.noc;
+    }
+    if (res.tct) {
+        mega.loadReport.tct = res.tct;
+    }
+
     if (res.u) {
         process_u(res.u);
     }
@@ -7469,6 +7476,8 @@ function loadfm_done(mDBload) {
                     folderlink ? 1 : 0,
                     pageLoadTime, // secureboot's resources load time
                     r.ttfb | 0, // time-to-first-byte (for gettree)
+                    r.noc | 0, // tree not cached
+                    r.tct | 0, // tree compute time
                     r.recvAPs, // time waiting to receive APs
                     r.EAGAINs, // -3/-4s while loading
                     r.e500s, // http err 500 while loading

@@ -4159,9 +4159,9 @@ var rsa2aes = {};
 // Output: .key and .name set if successful
 // **NB** Any changes made to this function
 //        must be populated to keydec.js
-function crypto_processkey(me, master_aes, file) {
+function crypto_processkey(me, master_aes, file, quiet) {
     var id, key, k, n, decKey;
-    var success = false;
+    var success = quiet;
 
     if (!file.k) {
         if (!keycache[file.h]) {

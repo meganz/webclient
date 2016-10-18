@@ -5925,7 +5925,16 @@ function execsc(actionPackets, callback) {
                     k : actionPacket.k,
                     a : actionPacket.at
                 };
-                crypto_processkey(u_handle, u_k_aes, f);
+                crypto_processkey(u_handle, u_k_aes, f, u_nodekeys[n.h]);
+
+                if (!f.key && u_nodekeys[n.h]) {
+                    // TODO: This is a temporal fix, we have to investigate why does the API fails
+                    // on providing the right key for the node, likely we're missing giving it to it.
+
+                    f.k = u_handle + ':' + a32_to_base64(encrypt_key(u_k_aes, u_nodekeys[n.h]));
+                    crypto_processkey(u_handle, u_k_aes, f);
+                }
+
                 if (f.key) {
                     if (f.name !== n.name) {
                         M.onRenameUIUpdate(n.h, f.name);
@@ -5947,6 +5956,9 @@ function execsc(actionPackets, callback) {
                         key : f.key,
                         a : actionPacket.at
                     });
+                }
+                else if (n.key) {
+                    delete missingkeys[n.h];
                 }
                 if (actionPacket.cr) {
                     crypto_proccr(actionPacket.cr);

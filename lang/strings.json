@@ -543,6 +543,10 @@
         "text": "Copyright warning",
         "context": ""
     },
+    "367": {
+        "text": "MEGA respects the copyrights of others and requires that users of the MEGA cloud service comply with the laws of copyright. You are strictly prohibited from using the MEGA cloud service to infringe copyrights. You may not upload, download, store, share, display, stream, distribute, e-mail, link to, transmit or otherwise make available any files, data, or content that infringes any copyright or other proprietary rights of any person or entity.",
+        "context": ""
+    },
     "368": {
         "text": "Caution:",
         "context": ""
@@ -622,6 +626,14 @@
     "399": {
         "text": "Contact Us",
         "context": ""
+    },
+    "401": {
+        "text": "Sharing",
+        "context": "Sub category of the help section"
+    },
+    "403": {
+        "text": "Account",
+        "context": "Sub category of the help section"
     },
     "408": {
         "text": "January",
@@ -14814,5 +14826,49 @@
     "12447": {
         "text": "Online collaboration has never been more private and secure.",
         "context": "Text from the mobile page (Online collaboration section), please see screenshot."
+    },
+    "12479": {
+        "text": "Items are not permanently erased from MEGA when you move them to the Rubbish Bin.\r\nThis temporary storage is automatically cleaned from time to time and you can control its setup in the [A]Settings[\/A].",
+        "context": "This is shown in an onboarding tooltip to remind the user that they can\/should clear their rubbish bin. Files are not deleted when they click Remove\/Delete, but moved to the rubbish bin for a period of time.\r\nThey can alter the settings for when the rubbish bin should be cleared in the Settings page.\r\nClicking Settings would redirect them to the settings page which contains a list of site specific settings, from which, one of them is the Rubbish Bin related one. Please leave the [A] and [\/A] tags which will be used to hyperlink the Settings text."
+    },
+    "12480": {
+        "text": "%1 uploads were added to the transfers queue",
+        "context": "This is a tooltip (toast popup) that shows when a user has started uploading files to the cloud drive. The %1 will be replaced with the number of transfers that were added."
+    },
+    "12481": {
+        "text": "%1 downloads were added to the transfers queue",
+        "context": "This is a tooltip (toast popup) that shows when a user has started downloading files from the cloud drive. The %1 will be replaced with the number of transfers."
+    },
+    "12482": {
+        "text": "Please close this dialog and click [B]purchase[\/B] again.",
+        "context": "This is a dialog message which is shown when a Bitcoin payment failed due to connection error. Please leave the [B] and [\/B] tags as they will be used to bolden the text."
+    },
+    "12483": {
+        "text": "Before starting a call, allow your browser to[BR] access your microphone and camera.",
+        "context": "An information message before the start of a call. Please leave the [BR] tag which will be replaced with a line break for presentational purposes."
+    },
+    "12484": {
+        "text": "Pause any transfers",
+        "context": "A hint message for the user before starting a video\/audio call which should improve performance."
+    },
+    "12485": {
+        "text": "Also available for [A1]Mac[\/A1] and [A2]Linux[\/A2].",
+        "context": "A message on the #sync page underneath the Free Download button. This let's the user know they can download the MEGAsync client for the Mac and Linux operating systems as well. Please leave the [A1] and [A2] tags in the translation as they will be replaced with hyperlinks."
+    },
+    "12486": {
+        "text": "Also available for [A1]Windows[\/A1] and [A2]Mac[\/A2].",
+        "context": "A message on the #sync page underneath the Free Download button. This lets the user know they can download the MEGAsync client for the Windows and Mac operating systems as well. Please leave the [A1] and [A2] tags in the translation as they will be replaced with hyperlinks."
+    },
+    "12487": {
+        "text": "Also available for [A1]Windows[\/A1] and [A2]Linux[\/A2].",
+        "context": "A message on the #sync page underneath the Free Download button. This lets the user know they can download the MEGAsync client for the Windows and Linux operating systems as well. Please leave the [A1] and [A2] tags in the translation as they will be replaced with hyperlinks."
+    },
+    "12488": {
+        "text": "We strongly suggest using our sync client for vastly improved performance[BR] uploading hundreds of files. [A]Get MEGAsync now.[\/A]",
+        "context": "A modal dialog message on the #download page which is shown when the file size is quite large. Please leave the [A] and [\/A] tags which will be used to create a hyperlink and the [BR] tag which will be used to insert a line break for presentational effect."
+    },
+    "12489": {
+        "text": "When we launched MEGA early 2013, global mass surveillance by rogue governments under the pretext of fighting terrorism was still a wild conjecture and its proponents were often touted as conspiracy theorists. Edward Snowden's revelations 137 days later fundamentally changed public attitudes and it became excruciatingly clear that [I]security by policy[\/I] (\"we have access to your data, but we promise to keep it confidential and not misuse it\") had not been good enough. Anything short of [I]security by design[\/I] (\"we cannot gain access to your data without you being able to find out\"), for which strong end-to-end encryption is an essential prerequisite, now seems grossly insufficient.",
+        "context": "A message on the #about page. Please leave the [I] and [\/I] tags because they will be replaced with italic text. "
     }
 }

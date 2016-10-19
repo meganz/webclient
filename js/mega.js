@@ -7472,6 +7472,7 @@ function loadfm_done(mDBload) {
                     r.totalTimeSpent,
                     Object.keys(M.d || {}).length, // total account nodes
                     r.procNodeCount, // nodes before APs processing
+                    2, // -- VERSION TAG --
                     navigator.hardwareConcurrency | 0, // cpu cores
                     folderlink ? 1 : 0,
                     pageLoadTime, // secureboot's resources load time
@@ -7487,9 +7488,7 @@ function loadfm_done(mDBload) {
                 if (d) {
                     console.debug('loadReport', r);
                 }
-                if (d > 1 || window.exTimeLeft) {
-                    api_req({a: 'log', e: 99625, m: JSON.stringify(r)});
-                }
+                api_req({a: 'log', e: 99625, m: JSON.stringify(r)});
             }
         }
         clearInterval(mega.loadReport.aliveTimer);

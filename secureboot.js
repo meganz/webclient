@@ -1547,15 +1547,17 @@ else if (!b_u)
         jsl.push({f:'js/vendor/react-dom.js', n: 'react-dom', j:1, w:1});
 
         jsl.push({f:'js/chat/strongvelope.js', n: 'strongvelope_js', j:1, w:1});
-        jsl.push({f:'js/chat/rtcStats.js', n: 'rtcstats_js', j:1, w:1});
-        jsl.push({f:'js/chat/rtcSession.js', n: 'rtcsession_js', j:1, w:1});
 
+        // strophe.jingle.adapter.js must be loaded before any other webrtc file
+        // becase it provides platform detection and other files depend on it
+        jsl.push({f:'js/vendor/chat/strophe.jingle.adapter.js', n: 'strophejingleadapt_js', j:1, w:2});
+        jsl.push({f:'js/chat/rtcSession.js', n: 'rtcsession_js', j:1, w:1});
+        jsl.push({f:'js/chat/rtcStats.js', n: 'rtcstats_js', j:1, w:1});
         jsl.push({f:'js/vendor/chat/strophe.light.js', n: 'stropheligh_js', j:1, w:4});
         jsl.push({f:'js/vendor/chat/strophe.disco.js', n: 'strophedisco_js', j:1, w:1});
         jsl.push({f:'js/vendor/chat/strophe.jingle.js', n: 'strophejingle_js', j:1, w:3});
         jsl.push({f:'js/vendor/chat/strophe.jingle.session.js', n: 'strophejinglesess_js', j:1, w:2});
         jsl.push({f:'js/vendor/chat/strophe.jingle.sdp.js', n: 'strophejinglesdp_js', j:1, w:2});
-        jsl.push({f:'js/vendor/chat/strophe.jingle.adapter.js', n: 'strophejingleadapt_js', j:1, w:2});
         jsl.push({f:'js/vendor/chat/strophe.muc.js', n: 'strophemuc_js', j:1, w:1});
         jsl.push({f:'js/vendor/chat/strophe.roster.js', n: 'stropheroster_js', j:1, w:1});
         jsl.push({f:'js/vendor/chat/wildemitter.patched.js', n: 'wildemitter_js', j:1, w:1});

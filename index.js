@@ -349,6 +349,7 @@ function init_page() {
             }
             mega.initLoadReport();
 
+			/*
             if (typeof mDB !== 'undefined' && !pfid && (!flhashchange || page === 'fm')) {
                 mDBstart();
                 mega.loadReport.mode = 1;
@@ -357,6 +358,9 @@ function init_page() {
                 loadfm();
                 mega.loadReport.mode = 2;
             }
+			*/
+			loadfm();
+            mega.loadReport.mode = 2;
         }
     }
 

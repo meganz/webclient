@@ -1918,10 +1918,13 @@ function api_proc(q) {
                 var ctxs = this.q.ctxs[this.q.i];
                 var idx = ctxs.length;
                 while (idx--) {
-                    var ctx = ctxs[idx];
-
-                    if (typeof ctx.progress === 'function') {
-                        ctx.progress(progressPercent);
+                    var ctx = ctxs[idx];					
+					if (typeof ctx.progress === 'function') {
+						if (typeof ctx.buffer !== 'undefined') ctx.progress(progressPercent,this.responseText);
+						else
+						{
+							ctx.progress(progressPercent);
+						}
                     }
                 }
             };
@@ -4816,3 +4819,229 @@ function api_strerror(errno) {
     });
 
 })();
+
+// JSON parser/splitter
+// FIXME: convert to proper JS (I forgot how to do that)
+// This is tailored to processing what the API actually generates
+// i.e.: NO whitespace, NO non-numeric/string constants ("null"), etc...
+
+// returns the position after the end of the JSON string at o or -1 if none found
+// must be called with s[o] == '"', or will never terminate
+var stringre = /^"(((?=\\)\\(["\\\/bfnrt]|u[0-9a-fA-F]{4}))|[^"\\\0-\x1F\x7F]+)*$/;
+
+function strend(s, o)
+{
+    var oo = o;
+
+    // (we do not set lastIndex and use RegExp.exec() with /g due to the potentially enormous length of s)
+    while ((oo = s.indexOf('"', oo+1)) >= 0)
+        if (stringre.test(s.substr(o, oo-o))) return oo+1;
+
+    return -1;
+}
+
+// returns the position after the end of the JSON number at o or -1 if none found
+var numberre = /^-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?/;
+
+function numend(s, o)
+{
+    var oo = o;
+
+    // (we do not set lastIndex due to the potentially enormous length of s)
+    while ('0123456789-+eE.'.indexOf(s[oo]) >= 0) oo++;
+
+    if (oo > o)
+    {
+        var r = numberre.exec(s.substr(o, oo-o));
+
+        if (r) return o+r[0].length;
+    }
+
+    return -1;
+}
+
+function json_splitter(filters, residue)
+{
+    return {
+        proc : json_proc,
+
+        // position in source string (FIXME: allow chunked feeding)
+        p : 0,
+
+        // enclosing object stack at current position (type + name)
+        stack : [],
+
+        // type of current object ('[' for array, '{' for hash)
+        currentlevel : false,
+
+        // flag indicating that a value is coming next 
+        expectvalue : true,
+
+        // last hash name seen
+        lastname : '',
+
+        // array of exfiltration vectors
+        filters : filters,
+
+        // residual vector
+        residue : residue,
+
+        // filter state (only one can be active at a time)
+        lastpos : 0,
+        filter : -1,
+        res : ''
+    };
+}
+
+// returns -1 if it wants more data, 0 in case of a fatal error, 1 when done
+// FIXME: replace console.log with proper logging
+function json_proc(json)
+{
+    var c, t, i;
+
+    while (this.p < json.length)
+    {
+        c = json[this.p];
+
+        if (c == ',')
+        {
+            if (this.expectvalue)
+            {
+                console.log("Malformed JSON - stray comma " + json.substr(this.p-5, 100));
+                return 0;
+            }
+
+            if (!this.currentlevel)
+            {
+                console.log("Malformed JSON - list at top level");
+                return 0;
+            }
+
+            if (this.filter >= 0 && this.stack.length == this.filters[this.filter][1])
+            {
+                this.filters[this.filter][2](json.substr(this.lastpos, this.p-this.lastpos));
+                this.lastpos = this.p+1;
+            }
+
+            this.p++;
+            this.expectvalue = this.currentlevel == '[';
+        }
+        else if (c == '[' || c == '{')
+        {
+            // we only exfiltrate entire arrays or hashes
+            for (i = this.filters.length; i--; )
+            {
+                if (this.stack.length == this.filters[i][1] && this.stack[0] == this.filters[i][0])
+                {
+                    if (this.filter < 0)
+                    {
+                        this.res += json.substr(this.lastpos, this.p-this.lastpos);
+                        this.lastpos = this.p;
+                        this.filter = i;
+                    }
+                }
+            }
+
+            if (!this.expectvalue)
+            {
+                console.log("Malformed JSON - unexpected object or array");
+                return 0;
+            }
+
+            if (this.currentlevel) this.stack.unshift(this.currentlevel + this.lastname);
+            this.currentlevel = c;
+            this.lastname = '';
+            this.expectvalue = c == '[';
+            this.p++;
+        }
+        else if (c == '"')
+        {
+            t = strend(json, this.p);
+            if (t < 0) break;
+
+            if (this.expectvalue)
+            {
+                this.p = t;
+                this.expectvalue = false;
+            }
+            else
+            {
+                // (need at least one char after end of property string)
+                if (t == json.length) break;
+
+                if (json[t] == ':')
+                {
+                    if (this.currentlevel != '{')
+                    {
+                        console.log("Malformed JSON - named property found outside object");
+                        return 0;
+                    }
+
+                    if (this.expectvalue)
+                    {
+                        console.log("Malformed JSON - unexpected property name");
+                        return 0;
+                    }
+
+                    this.lastname = json.substr(this.p+1, t-this.p-2);
+                    this.expectvalue = true;
+                    this.p = t+1;
+                }
+                else
+                {
+                    this.p = t;
+                }
+            }
+        }
+        else if (c >= '0' && c <= '9' || c == '.' || c == '-')
+        {
+            if (!this.expectvalue)
+            {
+                console.log("Malformed JSON - unexpected number");
+                return 0;
+            }
+
+            // FIXME: add "input is complete" to detect incomplete
+            // multi-digi stand-alone numbers (once needed)
+            t = numend(json, this.p);
+            if (t < 0 || t == json.length) break;
+
+            this.p = t;
+            this.expectvalue = false;
+        }
+        else if (c == ']' || c == '}')
+        {
+            if (this.currentlevel != ((c == ']') ? '[' : '{'))
+            {
+                console.log("Malformed JSON - mismatched close");
+                return 0;
+            }
+
+            this.lastname = '';
+            this.currentlevel = this.stack.length && this.stack.shift()[0];
+            this.expectvalue = false;
+
+            if (this.filter >= 0 && this.stack.length < this.filters[this.filter][1])
+            {
+                this.filters[this.filter][2](json.substr(this.lastpos, this.p-this.lastpos));
+                this.lastpos = this.p;
+                this.filter = -1;
+            }
+
+            this.p++;
+        }
+        else
+        {
+            console.log("Malformed JSON - bogus char at position " + this.p);
+            return 0;
+        }
+
+        if (!this.currentlevel && !this.expectvalue)
+        {
+            this.residue(this.res + json.substr(this.lastpos));
+            return 1;
+        }
+    }
+
+    return -1;
+}

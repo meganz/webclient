@@ -6153,6 +6153,20 @@ function fm_commitkeyupdate()
 
 function loadfm(force)
 {
+	
+	function fnode(json)
+	{
+		console.log("EXFILTRATED NODE: " + json);
+	}
+
+	function fresidue(json)
+	{
+		console.log("FILTER RESIDUE: " + json);
+	}
+
+	var gettree_filter = json_splitter([['{f', 2, fnode]], fresidue);
+	
+
     if (force) {
         loadfm.loaded = false;
     }
@@ -6181,14 +6195,19 @@ function loadfm(force)
                 }
                 api_req(req_params, {
                     callback: loadfm_callback,
-                    progress: function(perc) {
+                    progress: function(perc,buffer) {
                         loadingInitDialog.step2(parseInt(perc));
-                    }
+						if (buffer && !gettree_filter.proc(buffer)) this.abort();
+                    },
+					buffer:true
                 },n_h ? 1 : 0);
             }, 350);
         }
     }
 }
+
+
+
 
 function RightsbyID(id) {
 

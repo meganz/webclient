@@ -18,7 +18,6 @@ function JingleSession(me, peerjid, sid, connection, sessStream, mutedState) {
     this.remoteStream = null;
     this.localSDP = null;
     this.remoteSDP = null;
-    this.remoteStreams = [];
     this.startTime = null;
     this.stopTime = null;
     this.media_constraints = null;
@@ -90,14 +89,21 @@ initiate: function(isInitiator) {
         }
         self.sendIceCandidate(event.candidate);
     };
-    self.peerconnection.onaddstream = function (event) {
-        self.remoteStream = event.stream;
-        self.remoteStreams.push(event.stream);
-        self.jingle.onRemoteStreamAdded(self, event);
-    };
+
+    if (window.RTCTrackEvent) { // New API
+        self.peerconnection.ontrack = function(event) {
+            self.remoteStream = event.streams[0];
+            self.jingle.onRemoteStreamAdded(self, self.remoteStream);
+        };
+    } else { //Legacy API
+        self.peerconnection.onaddstream = function(event) {
+            self.remoteStream = event.stream;
+            self.jingle.onRemoteStreamAdded(self, self.remoteStream);
+        };
+    }
+
     self.peerconnection.onremovestream = function (event) {
         self.remoteStream = null;
-        // FIXME: remove from self.remoteStreams
         self.jingle.onRemoteStreamRemoved(self, event);
     };
     self.peerconnection.onsignalingstatechange = function (event) {
@@ -176,9 +182,10 @@ accept: function (cb) {
 
 terminate: function (reason) {
     this.state = 'ended';
-    if (this.peerconnection)
-    {
-        this.peerconnection.close();
+    if (this.peerconnection) {
+        if (this.peerconnection.signallingState !== 'closed') {
+            this.peerconnection.close();
+        }
         this.peerconnection = null;
     }
 },

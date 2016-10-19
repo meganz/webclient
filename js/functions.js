@@ -589,6 +589,16 @@ function populate_l() {
     l[10650] = l[10650].replace('[A]', '<a href="#account">').replace('[/A]', '</a>');
     l[10656] = l[10656].replace('[A]', '<a href="mailto:support@mega.nz">').replace('[/A]', '</a>');
     l[10658] = l[10658].replace('[A]', '<a href="#terms">').replace('[/A]', '</a>');
+    l[12482] = l[12482].replace('[B]', '<b>').replace('[/B]', '</b>');
+    l[12483] = l[12483].replace('[BR]', '<br>');
+    l[12485] = l[12485].replace('[A1]', '<a href="" class="red mac">').replace('[/A1]', '</a>');
+    l[12485] = l[12485].replace('[A2]', '<a href="" class="red linux">').replace('[/A2]', '</a>');
+    l[12486] = l[12486].replace('[A1]', '<a href="" class="red windows">').replace('[/A1]', '</a>');
+    l[12486] = l[12486].replace('[A2]', '<a href="" class="red mac">').replace('[/A2]', '</a>');
+    l[12487] = l[12487].replace('[A1]', '<a href="" class="red windows">').replace('[/A1]', '</a>');
+    l[12487] = l[12487].replace('[A2]', '<a href="" class="red linux">').replace('[/A2]', '</a>');
+    l[7400] = l[7400].replace('[A]', '<a>').replace('[/A]', '</a>').replace('[BR]', '<br>');
+    l[12489] = l[12489].replace('[I]', '<i>').replace('[/I]', '</i>').replace('[I]', '<i>').replace('[/I]', '</i>');
 
     l['year'] = new Date().getFullYear();
     date_months = [

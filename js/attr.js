@@ -106,8 +106,7 @@ var attribCache = false;
          */
         var settleFunctionDone = function _settleFunctionDone(res, cached) {
             var tag = cached ? 'Cached ' : '';
-            res = res.av ? res.av : res;
-
+            res = Object(res).hasOwnProperty('av') ? res.av : res;
 
             // Another conditional, the result value may have been changed.
             if (typeof res !== 'number') {

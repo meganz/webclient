@@ -479,4 +479,8 @@ body.pro:after {
     background-image: url(../images/mega/chat-static-sprite-v1@2x.png);
     background-size: 68px auto;
 }
+#help2-main .ui-autocomplete .client {
+    background-image: url("../images/mega/help2/welcome_icons@2x.png");
+    background-size: 250px auto;
+}
 }

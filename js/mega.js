@@ -7431,7 +7431,7 @@ function loadfm_done(mDBload) {
         mega.loadReport.stepTimeStamp = Date.now();
 
         // are we actually on an #fm/* page?
-        if (is_fm() || $('.fm-main.default').is(":visible")) {
+        if (page !== 'start' && is_fm() || $('.fm-main.default').is(":visible")) {
             renderfm();
 
             mega.loadReport.renderfm      = Date.now() - mega.loadReport.stepTimeStamp;

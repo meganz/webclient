@@ -7472,7 +7472,7 @@ function loadfm_done(mDBload) {
                     r.totalTimeSpent,
                     Object.keys(M.d || {}).length, // total account nodes
                     r.procNodeCount, // nodes before APs processing
-                    2, // -- VERSION TAG --
+                    buildVersion.timeStamp || -1, // -- VERSION TAG --
                     navigator.hardwareConcurrency | 0, // cpu cores
                     folderlink ? 1 : 0,
                     pageLoadTime, // secureboot's resources load time

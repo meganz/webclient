@@ -347,8 +347,7 @@ function init_page() {
             if (u_type === 3 && !pfid && !folderlink) {
                 mega.config.fetch();
             }
-
-            mega.loadReport = {startTime: Date.now(), stepTimeStamp: Date.now()};
+            mega.initLoadReport();
 
             if (typeof mDB !== 'undefined' && !pfid && (!flhashchange || page === 'fm')) {
                 mDBstart();

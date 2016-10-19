@@ -12,7 +12,7 @@ var inherits = (function() {
     };
 })();
 
-makeEnum(['MDBOPEN', 'EXECSC'], 'MEGAFLAG_', window);
+makeEnum(['MDBOPEN', 'EXECSC', 'LOADINGCLOUD'], 'MEGAFLAG_', window);
 
 /**
  * Safely parse an HTML fragment, removing any executable

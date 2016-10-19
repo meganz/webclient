@@ -118,6 +118,9 @@ var attribCache = false;
 
                 if (d) {
                     var loggerValueOutput = pub ? JSON.stringify(res) : '-- hidden --';
+                    if (loggerValueOutput.length > 256) {
+                        loggerValueOutput = loggerValueOutput.substr(0, 256) + '...';
+                    }
                     logger.info(tag + 'Attribute "%s" for user "%s" is %s.',
                         attribute, userhandle, loggerValueOutput);
                 }

@@ -86,6 +86,10 @@ if (typeof loadingInitDialog === 'undefined') {
             $('.loading-info li.step2').addClass('loading');
             $('.loader-progressbar').addClass('active');
 
+            // Load performance report
+            mega.loadReport.ttfb          = Date.now() - mega.loadReport.stepTimeStamp;
+            mega.loadReport.stepTimeStamp = Date.now();
+
             // If the PSA is visible reposition the account loading bar
             psa.repositionAccountLoadingBar();
         }
@@ -2399,14 +2403,16 @@ function MegaData()
             }
         }
 
-        if (n.t === 2) {
-            this.RootID = n.h;
-        }
-        if (n.t === 3) {
-            this.InboxID = n.h;
-        }
-        if (n.t === 4) {
-            this.RubbishID = n.h;
+        if (n.t) {
+            if (n.t === 2) {
+                this.RootID = n.h;
+            }
+            else if (n.t === 3) {
+                this.InboxID = n.h;
+            }
+            else if (n.t === 4) {
+                this.RubbishID = n.h;
+            }
         }
 
         if (!n.c) {
@@ -2416,7 +2422,10 @@ function MegaData()
 
             if (n.t !== 2 && n.t !== 3 && n.t !== 4 && n.k) {
                 if (u_kdnodecache[n.h]) {
-                    $.extend(n, u_kdnodecache[n.h]);
+                    var obj = u_kdnodecache[n.h];
+                    for (var k in obj) {
+                        n[k] = obj[k];
+                    }
                 }
                 else {
                     crypto_processkey(u_handle, u_k_aes, n);
@@ -2451,22 +2460,14 @@ function MegaData()
         }
 
         // sync data objs M.u <-> M.d
-        if (n.h.length === 11) {
-            if (this.u[n.h] !== n) {
-                if (typeof(this.u[n.h]) === 'undefined') {
-                    M.addUser(n, ignoreDB);
-                }
-                var tmpNode = n;
-                n = this.u[n.h];
+        if (this.u[n.h] && this.u[n.h] !== n) {
+            for (var k in n) {
                 // merge changes from n->M.u[n.h]
-                Object.keys(tmpNode).forEach(function(k) {
-                    if (k === "name") {
-                        return;
-                    }
-
-                    n[k] = tmpNode[k];
-                });
+                if (n.hasOwnProperty(k) && k !== 'name') {
+                    this.u[n.h][k] = n[k];
+                }
             }
+            n = this.u[n.h];
         }
 
         this.d[n.h] = n;
@@ -5558,6 +5559,10 @@ function execsc(actionPackets, callback) {
     newnodes = [];
     mega.flags |= window.MEGAFLAG_EXECSC;
 
+    if (d) {
+        console.time('execsc');
+    }
+
     // Process action packets
     for (var i in actionPackets) {
         var actionPacket = actionPackets[i];
@@ -5903,9 +5908,14 @@ function execsc(actionPackets, callback) {
                 });
             }
 
+            // Temporarily disable the execsc flag so that all nodes are added to the DB using a single transaction
+            mega.flags &= ~window.MEGAFLAG_EXECSC;
+
             tparentid = false;
             trights = false;
             __process_f1(actionPacket.t.f);
+
+            mega.flags |= window.MEGAFLAG_EXECSC;
         }
         else if (actionPacket.a === 'u') {
             var n = M.d[actionPacket.n];
@@ -5915,7 +5925,16 @@ function execsc(actionPackets, callback) {
                     k : actionPacket.k,
                     a : actionPacket.at
                 };
-                crypto_processkey(u_handle, u_k_aes, f);
+                crypto_processkey(u_handle, u_k_aes, f, u_nodekeys[n.h]);
+
+                if (!f.key && u_nodekeys[n.h]) {
+                    // TODO: This is a temporal fix, we have to investigate why does the API fails
+                    // on providing the right key for the node, likely we're missing giving it to it.
+
+                    f.k = u_handle + ':' + a32_to_base64(encrypt_key(u_k_aes, u_nodekeys[n.h]));
+                    crypto_processkey(u_handle, u_k_aes, f);
+                }
+
                 if (f.key) {
                     if (f.name !== n.name) {
                         M.onRenameUIUpdate(n.h, f.name);
@@ -5937,6 +5956,9 @@ function execsc(actionPackets, callback) {
                         key : f.key,
                         a : actionPacket.at
                     });
+                }
+                else if (n.key) {
+                    delete missingkeys[n.h];
                 }
                 if (actionPacket.cr) {
                     crypto_proccr(actionPacket.cr);
@@ -6103,6 +6125,10 @@ function execsc(actionPackets, callback) {
     getsc();
     if (callback) {
         Soon(callback);
+    }
+
+    if (d) {
+        console.timeEnd('execsc');
     }
 
     mega.flags &= ~window.MEGAFLAG_EXECSC;
@@ -6775,7 +6801,8 @@ function process_f(f, cb, retry)
 
             kdWorker.process(ncn.sort(function() { return Math.random() - 0.5}), function kdwLoad(r,j) {
                 if (d) console.log('KeyDecWorker processed %d/%d-%d nodes', $.len(r), ncn.length, f.length, r);
-                $.extend(u_kdnodecache, r);
+                // $.extend(u_kdnodecache, r);
+                u_kdnodecache = r;
                 if (doNewNodes) {
                     newnodes = newnodes || [];
                 }
@@ -6785,7 +6812,11 @@ function process_f(f, cb, retry)
                         return process_f( f, cb, 1);
                     }
                 }
-                __process_f2(f, cb && cb.bind(this, !!j.newmissingkeys));
+                // __process_f2(f, cb && cb.bind(this, !!j.newmissingkeys));
+                __process_f1(f);
+                if (cb) {
+                    cb(j.newmissingkeys);
+                }
             }, function kdwError(err) {
                 if (d) console.error(err);
                 if (doNewNodes) {
@@ -7151,6 +7182,11 @@ function process_u(u) {
 
             // Update user attributes M.u
             M.addUser(u[i]);
+
+            if (u[i].c === 1) {
+                // sync data objs M.u <-> M.d
+                M.d[u[i].u] = M.u[u[i].u];
+            }
         }
     }
 }
@@ -7290,6 +7326,13 @@ function loadfm_callback(res, ctx) {
         return;
     }
 
+    if (res.noc) {
+        mega.loadReport.noc = res.noc;
+    }
+    if (res.tct) {
+        mega.loadReport.tct = res.tct;
+    }
+
     if (res.u) {
         process_u(res.u);
     }
@@ -7353,6 +7396,7 @@ function loadfm_callback(res, ctx) {
             crypto_procsr(res.sr);
         }
 
+        mega.loadReport.procNodeCount = Object.keys(M.d || {}).length;
         mega.loadReport.procNodes     = Date.now() - mega.loadReport.stepTimeStamp;
         mega.loadReport.stepTimeStamp = Date.now();
 
@@ -7426,16 +7470,31 @@ function loadfm_done(mDBload) {
                     r.fmConfigFetch, r.renderfm,
                     r.dbToNet | 0, // see mDB.js comment
                     r.totalTimeSpent,
-                    Object.keys(M.d || {}).length
+                    Object.keys(M.d || {}).length, // total account nodes
+                    r.procNodeCount, // nodes before APs processing
+                    buildVersion.timestamp || -1, // -- VERSION TAG --
+                    navigator.hardwareConcurrency | 0, // cpu cores
+                    folderlink ? 1 : 0,
+                    pageLoadTime, // secureboot's resources load time
+                    r.ttfb | 0, // time-to-first-byte (for gettree)
+                    r.noc | 0, // tree not cached
+                    r.tct | 0, // tree compute time
+                    r.recvAPs, // time waiting to receive APs
+                    r.EAGAINs, // -3/-4s while loading
+                    r.e500s, // http err 500 while loading
+                    r.errs // any other errors while loading
                 ];
 
                 if (d) {
                     console.debug('loadReport', r);
                 }
-                api_req({ a: 'log', e: 99624, m: JSON.stringify(r) });
+                api_req({a: 'log', e: 99625, m: JSON.stringify(r)});
             }
         }
+        clearInterval(mega.loadReport.aliveTimer);
+        mega.flags &= ~window.MEGAFLAG_LOADINGCLOUD;
 
+        u_kdnodecache = {};
         watchdog.notify('loadfm_done', mDBload);
     });
 }

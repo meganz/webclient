@@ -58,6 +58,10 @@ function startMega() {
         $('body').safeAppend(translate(pages['dialogs'].replace(/{staticpath}/g, staticpath)));
         delete pages['dialogs'];
     }
+    if (pages['onboarding']) {
+        $('body').safeAppend(translate(pages['onboarding'].replace(/{staticpath}/g, staticpath)));
+        delete pages['onboarding'];
+    }
     if (pages['chat']) {
         $('body').safeAppend(translate(pages['chat'].replace(/{staticpath}/g, staticpath)));
         delete pages['chat'];
@@ -343,12 +347,15 @@ function init_page() {
             if (u_type === 3 && !pfid && !folderlink) {
                 mega.config.fetch();
             }
+            mega.initLoadReport();
 
             if (typeof mDB !== 'undefined' && !pfid && (!flhashchange || page === 'fm')) {
                 mDBstart();
+                mega.loadReport.mode = 1;
             }
             else {
                 loadfm();
+                mega.loadReport.mode = 2;
             }
         }
     }
@@ -1122,7 +1129,7 @@ function loginDialog(close) {
         }
     });
     $('.top-login-popup').addClass('active');
-    document.getElementById('login-name').focus()
+    document.getElementById('login-name').focus();
 
     if (is_chrome_firefox) {
         Soon(mozLoginManager.fillForm.bind(mozLoginManager, 'form_login_header'));
@@ -1131,13 +1138,12 @@ function loginDialog(close) {
 
 function tooltiplogin() {
     var e = $('#login-name').val();
-    if (e == '' || e == l[195] || checkMail(e)) {
+    if (e === '' || checkMail(e)) {
         $('.top-login-input-block.e-mail').addClass('incorrect');
         $('#login-name').val('');
         $('#login-name').focus();
     }
-    else if ($('#login-password').val() == ''
-            || $('#login-password').val() == l[909]) {
+    else if ($('#login-password').val() === '') {
         $('.top-login-input-block.password').addClass('incorrect');
     }
     else {
@@ -1229,6 +1235,12 @@ function topmenuUI() {
         $('.top-change-language').hide();
         $('.create-account-button').hide();
         $('.membership-status-block').show();
+
+        Soon(function() {
+            if (!avatars[u_handle]) {
+                useravatar.loadAvatar(u_handle);
+            }
+        });
 
         // If a Lite/Pro plan has been purchased
         if (u_attr.p) {
@@ -2056,4 +2068,5 @@ if (!is_karma && !is_mobile) {
     attribCache = new IndexedDBKVStorage('attrib', { murSeed: 0x800F0002 });
     attribCache.syncNameTimer = {};
     attribCache.uaPacketParser = uaPacketParser;
+    attribCache.bitMapsManager = new MegaDataBitMapManager();
 }

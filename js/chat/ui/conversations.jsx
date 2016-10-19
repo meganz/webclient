@@ -142,6 +142,14 @@ var ConversationsListItem = React.createClass({
                     l[8000]
             );
 
+            if (ChatdIntegration.mcfHasFinishedPromise.state() === 'pending') {
+                if (!ChatdIntegration.mcfHasFinishedPromise._trackDataChangeAttached) {
+                    ChatdIntegration.mcfHasFinishedPromise.always(function () {
+                        megaChat.chats.trackDataChange();
+                    });
+                    ChatdIntegration.mcfHasFinishedPromise._trackDataChangeAttached = true;
+                }
+            }
 
             lastMessageDiv =
                 <div>

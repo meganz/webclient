@@ -1392,10 +1392,23 @@ var ConversationPanel = React.createClass({
 
         var sendContactDialog = null;
         if (self.state.sendContactDialog === true) {
+            var excludedContacts = [];
+            if (room.type == "private") {
+                room.getParticipantsExceptMe().forEach(function(jid) {
+                    var contact = room.megaChat.getContactFromJid(jid);
+                    if (contact) {
+                        excludedContacts.push(
+                            contact.u
+                        );
+                    }
+                });
+            }
+
             var selected = [];
             sendContactDialog = <ModalDialogsUI.SelectContactDialog
                 megaChat={room.megaChat}
                 chatRoom={room}
+                exclude={excludedContacts}
                 contacts={M.u}
                 onClose={() => {
                     self.setState({'sendContactDialog': false});

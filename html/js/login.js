@@ -111,6 +111,14 @@ function doConfirm(email, password, callback) {
                             ctx.callback2();
                         }
                     }
+                    else if ((typeof res === 'number') && (res === -11)) {
+                        if (u_type === 0) {// Ephemeral session
+                            msgDialog("warninga", l[2480], l[12439]);
+                        }
+                        else {
+                            msgDialog("warninga", l[2480], l[12440]);
+                        }
+                    }
                     else {
                         alert(l[200]);
                     }
@@ -151,7 +159,7 @@ function postLogin(email, password, remember, callback) {
 
 function pagelogin() {
     var e = $('#login-name2').val();
-    if (e === '' || e === l[195] || checkMail(e)) {
+    if (e === '' || checkMail(e)) {
         $('.login-register-input.email').addClass('incorrect');
         $('#login-name2').focus();
     }
@@ -257,9 +265,7 @@ function init_login() {
     });
 
     $('#login-password2, #login-name2').rebind('keydown', function(e) {
-        if ($('#login-name2').val() !== ''
-                && $('#login-name2').val() !== l[195]
-                && $('#login-password2').val() !== '') {
+        if ($('#login-name2').val() !== '' && $('#login-password2').val() !== '') {
             $('.register-st2-button').addClass('active');
         }
         $('.login-register-input.password').removeClass('incorrect');

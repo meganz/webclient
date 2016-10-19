@@ -1089,12 +1089,20 @@ MegaDataBitMap.prototype.commit = SoonFc(function() {
     });
 
     // check if we really need to commit anything (e.g. mask is not full of zeroes)
-    if (this._updatedMask.indexOf(1) === -1) {
+    var foundOnes = false;
+    for (var i = 0; i < this._updatedMask.length; i++) {
+        if (this._updatedMask[i] === 1) {
+            foundOnes = true;
+            break;
+        }
+    }
+
+    // no need to commit anything.
+    if (foundOnes === false) {
         var commitPromise = this._commitPromise;
         this._commitPromise.resolve(false);
         return commitPromise;
     }
-
     var attributeFullName = (this.isPublic() ? "+!" : "^!") + this.name;
 
     var cacheKey = u_handle + "_" + attributeFullName;

@@ -6263,10 +6263,21 @@ React.makeElement = React['createElement'];
 
 	        var sendContactDialog = null;
 	        if (self.state.sendContactDialog === true) {
+	            var excludedContacts = [];
+	            if (room.type == "private") {
+	                room.getParticipantsExceptMe().forEach(function (jid) {
+	                    var contact = room.megaChat.getContactFromJid(jid);
+	                    if (contact) {
+	                        excludedContacts.push(contact.u);
+	                    }
+	                });
+	            }
+
 	            var selected = [];
 	            sendContactDialog = React.makeElement(ModalDialogsUI.SelectContactDialog, {
 	                megaChat: room.megaChat,
 	                chatRoom: room,
+	                exclude: excludedContacts,
 	                contacts: M.u,
 	                onClose: function onClose() {
 	                    self.setState({ 'sendContactDialog': false });
@@ -7430,6 +7441,7 @@ React.makeElement = React['createElement'];
 	            React.makeElement(ContactsUI.ContactPickerWidget, {
 	                megaChat: self.props.megaChat,
 	                contacts: self.props.contacts,
+	                exclude: self.props.exclude,
 	                onClick: function onClick(contact, e) {
 	                    var contactHash = contact.h;
 

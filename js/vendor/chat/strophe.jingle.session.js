@@ -93,17 +93,24 @@ initiate: function(isInitiator) {
         self.sendIceCandidate(event.candidate);
     };
 
-    if (false) { //window.RTCTrackEvent) { // New API
+/*
+    The track-by-track approach does not signal when the whole stream is assembled.
+    It's very inconvenient when managing things at the stream/connection
+    level (like here), and may get undeprecated. See
+    https://lists.w3.org/Archives/Public/public-webrtc/2015Jun/0069.html
+
+    if (window.RTCTrackEvent) { // New API
         self.peerconnection.ontrack = function(event) {
             self.remoteStream = event.streams[0];
             self.jingle.onRemoteStreamAdded(self, self.remoteStream);
         };
     } else { //Legacy API
+*/
         self.peerconnection.onaddstream = function(event) {
             self.remoteStream = event.stream;
             self.jingle.onRemoteStreamAdded(self, self.remoteStream);
         };
-    }
+//    }
 
     self.peerconnection.onremovestream = function (event) {
         self.remoteStream = null;

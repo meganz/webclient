@@ -14869,6 +14869,6 @@
     },
     "12489": {
         "text": "When we launched MEGA early 2013, global mass surveillance by rogue governments under the pretext of fighting terrorism was still a wild conjecture and its proponents were often touted as conspiracy theorists. Edward Snowden's revelations 137 days later fundamentally changed public attitudes and it became excruciatingly clear that [I]security by policy[\/I] (\"we have access to your data, but we promise to keep it confidential and not misuse it\") had not been good enough. Anything short of [I]security by design[\/I] (\"we cannot gain access to your data without you being able to find out\"), for which strong end-to-end encryption is an essential prerequisite, now seems grossly insufficient.",
-        "context": "A message on the #about page. Please leave the [I] and [\/I] tags because they will be replaced with italic text. "
+        "context": "An introduction message on the https:\/\/mega.nz\/#about page. Please leave the [I] and [\/I] tags because they will be replaced with italic text. This should have already been translated in string 1821, so you can borrow that translation if need be. The difference is that the HTML tags have now been removed."
     }
 }

@@ -225,7 +225,7 @@ ChatRoom.prototype._retrieveTurnServerFromLoadBalancer = function() {
                     }
 
                     servers.push({
-                        urls: ['turn:' + v.host + ':' + v.port + '?transport=' + transport],
+                        url: 'turn:' + v.host + ':' + v.port + '?transport=' + transport,
                         username: "inoo20jdnH",
                         credential: '02nNKDBkkS'
                     });

@@ -1133,7 +1133,6 @@ hangupAll: function(reason, text)
         if (playerElem.currentTime > 0) {
             this.onMediaRecv(playerElem, sess, sess.remoteStream);
             RTC.attachMediaStream(playerElem, sess.remoteStream); // FIXME: why do i have to do this for FF?
-            // console.log('waitForremotevideo', sess.peerconnection.iceConnectionState, sess.peerconnection.signalingState);
         } else {
             setTimeout(function () { self.waitForRemoteMedia(playerElem, sess); }, 200);
         }

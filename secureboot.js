@@ -1548,11 +1548,11 @@ else if (!b_u)
 
         jsl.push({f:'js/chat/strongvelope.js', n: 'strongvelope_js', j:1, w:1});
 
+        // WebRTC
         // strophe.jingle.adapter.js must be loaded before any other webrtc file
         // becase it provides platform detection and other files depend on it
+
         jsl.push({f:'js/vendor/chat/strophe.jingle.adapter.js', n: 'strophejingleadapt_js', j:1, w:2});
-        jsl.push({f:'js/chat/rtcSession.js', n: 'rtcsession_js', j:1, w:1});
-        jsl.push({f:'js/chat/rtcStats.js', n: 'rtcstats_js', j:1, w:1});
         jsl.push({f:'js/vendor/chat/strophe.light.js', n: 'stropheligh_js', j:1, w:4});
         jsl.push({f:'js/vendor/chat/strophe.disco.js', n: 'strophedisco_js', j:1, w:1});
         jsl.push({f:'js/vendor/chat/strophe.jingle.js', n: 'strophejingle_js', j:1, w:3});
@@ -1562,8 +1562,12 @@ else if (!b_u)
         jsl.push({f:'js/vendor/chat/strophe.roster.js', n: 'stropheroster_js', j:1, w:1});
         jsl.push({f:'js/vendor/chat/wildemitter.patched.js', n: 'wildemitter_js', j:1, w:1});
         jsl.push({f:'js/vendor/chat/hark.patched.js', n: 'hark_js', j:1, w:1});
-        jsl.push({f:'js/vendor/chat/base32.js', n: 'base32_js', j:1, w:1});
+        jsl.push({f:'js/chat/rtcStats.js', n: 'rtcstats_js', j:1, w:1});
+        jsl.push({f:'js/chat/rtcSession.js', n: 'rtcsession_js', j:1, w:1});
 
+        // end WebRTC
+
+        jsl.push({f:'js/vendor/chat/base32.js', n: 'base32_js', j:1, w:1});
         jsl.push({f:'js/chat/chatd.js', n: 'chatd_js', j:1, w:1});
         jsl.push({f:'js/chat/ui/incomingCallDialog.js', n: 'incomingcalldialog_js', j:1, w:1});
 

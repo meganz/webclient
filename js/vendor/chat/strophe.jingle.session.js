@@ -59,7 +59,10 @@ initiate: function(isInitiator) {
 
     //console.log('create PeerConnection ' + JSON.stringify(self.ice_config));
     try {
-        self.peerconnection = new RTC.peerconnection({iceServers: self.iceServers}, self.pc_constraints);
+        self.peerconnection = new RTC.peerconnection(
+            { iceServers: RTC.fixupIceServers(self.iceServers) },
+            self.pc_constraints
+        );
         if ((RTC.Stats === undefined) && (typeof statsGlobalInit === 'function'))
             statsGlobalInit(self.peerconnection);
     } catch (e) {
@@ -90,7 +93,7 @@ initiate: function(isInitiator) {
         self.sendIceCandidate(event.candidate);
     };
 
-    if (window.RTCTrackEvent) { // New API
+    if (false) { //window.RTCTrackEvent) { // New API
         self.peerconnection.ontrack = function(event) {
             self.remoteStream = event.streams[0];
             self.jingle.onRemoteStreamAdded(self, self.remoteStream);

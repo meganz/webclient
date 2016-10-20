@@ -7,7 +7,9 @@ function WebrtcApi() {
         if (!MediaStream.prototype.getVideoTracks || !MediaStream.prototype.getAudioTracks)
             throw new Error('webRTC API missing MediaStream.getXXXTracks');
         
-        this.peerconnection = RTCPeerConnection ? RTCPeerConnection : mozRTCPeerConnection;
+        this.peerconnection = (typeof RTCPeerConnection !== 'undefined')
+             ? RTCPeerConnection
+             : mozRTCPeerConnection;
         this.browser = 'firefox';
         if (navigator.mediaDevices) {
             this.getUserMedia = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
@@ -34,8 +36,13 @@ function WebrtcApi() {
           else
             this.cloneMediaStream = function(src, what) {return src; } //no cloning, just returns original stream
         
-        this.RTCSessionDescription = RTCSessionDescription ? RTCSessionDescription : mozRTCSessionDescription;
-        this.RTCIceCandidate = RTCIceCandidate ? RTCIceCandidate : mozRTCIceCandidate;
+        this.RTCSessionDescription = (typeof RTCSessionDescription !== "undefined")
+             ? RTCSessionDescription
+             : mozRTCSessionDescription;
+
+        this.RTCIceCandidate = (typeof RTCIceCandidate !== "undefined")
+             ? RTCIceCandidate
+             : mozRTCIceCandidate;
         this.MediaStreamTrack = MediaStreamTrack;
 
     } else if (navigator.webkitGetUserMedia) {
@@ -218,17 +225,37 @@ WebrtcApi.prototype.getUserMediaWithConstraintsAndCallback = function(um)
 }
 
 WebrtcApi.prototype.stopMediaStream = function(stream) {
-    var tracks = stream.getTracks();
-    if (tracks.length === 0) {
-        return;
-    }
-    if (tracks[0].stop) { //can't check for stop in MediaStreamTrack prototype - it is not defined there, at least on Firefox. Have to check the track instance itself for stop method
-        for (var i = 0; i < tracks.length; i++) {
-            tracks[i].stop();
+    var track0 = null;
+    if (stream.getTracks) {
+        var tracks = stream.getTracks();
+        if (tracks.length === 0) {
+            return;
+        }
+
+        if (tracks[0].stop) {
+            // can't check for stop in MediaStreamTrack prototype - it is not
+            // defined there, at least on Firefox. Have to check the track
+            // instance itself for stop method
+            for (var i = 0; i < tracks.length; i++) {
+                tracks[i].stop();
+            }
+        } else {
+            stream.stop();
         }
     } else {
+        // no stream.getTracks() - old browser, probably will not have
+        // track.stop() as well, so use the deprecated stream.stop()
         stream.stop();
     }
+}
+
+WebrtcApi.prototype.fixupIceServers = function(iceServers) {
+    var len = iceServers.length;
+    for (var i = 0; i < len; i++) {
+        var server = iceServers[i];
+        server.url = server.urls[0];
+    }
+    return iceServers;
 }
 
 WebrtcApi.prototype._getBrowserVersion = function() {

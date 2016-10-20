@@ -202,9 +202,7 @@ MegaPromise.prototype.fail = function(rej) {
  *
  * @throws {Error}
  */
-MegaPromise.prototype.catch = function() {
-    throw new Error('.catch is prohibited in MegaPromises.');
-};
+MegaPromise.prototype.catch = MegaPromise.prototype.fail;
 
 /**
  * Alias of .resolve

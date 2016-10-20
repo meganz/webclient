@@ -627,9 +627,6 @@ var ConversationAudioVideoPanel = React.createClass({
         }
         else {
             var remotePlayer = callSession.remotePlayer[0];
-            if (!remotePlayer && callSession.remotePlayer) {
-                remotePlayer = callSession.remotePlayer;
-            }
 
             var remotePlayerSrc = remotePlayer.src;
 

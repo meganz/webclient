@@ -194,34 +194,34 @@ var Chat = function() {
                 }
             },
             iceServers:[
-                // {urls: ['stun:stun.l.google.com:19302']},
+                // {url: 'stun:stun.l.google.com:19302'},
                 {
-                    urls: ['turn:trn270n001.karere.mega.nz:3478?transport=udp'],   // Luxembourg
+                    url: 'turn:trn270n001.karere.mega.nz:3478?transport=udp',   // Luxembourg
                     username: "inoo20jdnH",
                     credential: '02nNKDBkkS'
                 },
                 {
-                    urls: ['turn:trn270n002.karere.mega.nz:3478?transport=udp'],   // Luxembourg
+                    url: 'turn:trn270n002.karere.mega.nz:3478?transport=udp',   // Luxembourg
                     username: "inoo20jdnH",
                     credential: '02nNKDBkkS'
                 },
                 {
-                    urls: ['turn:trn302n001.karere.mega.nz:3478?transport=udp'],   // Montreal, Canada
+                    url: 'turn:trn302n001.karere.mega.nz:3478?transport=udp',   // Montreal, Canada
                     username: "inoo20jdnH",
                     credential: '02nNKDBkkS'
                 },
                 {
-                    urls: ['turn:trn302n002.karere.mega.nz:3478?transport=udp'],   // Montreal, Canada
+                    url: 'turn:trn302n002.karere.mega.nz:3478?transport=udp',   // Montreal, Canada
                     username: "inoo20jdnH",
                     credential: '02nNKDBkkS'
                 },
                 {
-                    urls: ['turn:trn530n002.karere.mega.nz:3478?transport=udp'],   // NZ
+                    url: 'turn:trn530n002.karere.mega.nz:3478?transport=udp',   // NZ
                     username: "inoo20jdnH",
                     credential: '02nNKDBkkS'
                 },
                 {
-                    urls: ['turn:trn530n003.karere.mega.nz:3478?transport=udp'],   // NZ
+                    url: 'turn:trn530n003.karere.mega.nz:3478?transport=udp',   // NZ
                     username: "inoo20jdnH",
                     credential: '02nNKDBkkS'
                 }
@@ -1259,11 +1259,13 @@ Chat.prototype.openChat = function(jids, type, chatId, chatShard, chatdUrl, setA
             var contact = self.getContactFromJid(jid);
             if (!contact || (contact.c !== 1 && contact.c !== 2 && contact.c !== 0)) {
                 allValid = false;
+                $promise.reject();
                 return false;
             }
         });
         if (allValid === false) {
-            return MegaPromise.reject();
+            $promise.reject();
+            return $promise;
         }
         var $element = $('.nw-conversations-item[data-jid="' + jids[0] + '"]');
         var roomJid = $element.attr('data-room-jid') + "@" + self.karere.options.mucDomain;
@@ -1313,7 +1315,8 @@ Chat.prototype.openChat = function(jids, type, chatId, chatShard, chatdUrl, setA
         if (setAsActive) {
             room.show();
         }
-        return [roomFullJid, room, (new $.Deferred()).resolve(roomFullJid, room)];
+        $promise.resolve(roomFullJid, room);
+        return [roomFullJid, room, $promise];
     }
     if (setAsActive && self.currentlyOpenedChat && self.currentlyOpenedChat != roomJid) {
         self.hideChat(self.currentlyOpenedChat);
@@ -1364,7 +1367,8 @@ Chat.prototype.openChat = function(jids, type, chatId, chatShard, chatdUrl, setA
 
 
     if (self.karere.getConnectionState() != Karere.CONNECTION_STATE.CONNECTED) {
-        return [roomJid, room, (new MegaPromise()).reject(roomJid, room)];
+        $promise.reject(roomJid, room);
+        return [roomJid, room, $promise];
     }
 
     var jidsWithoutMyself = room.getParticipantsExceptMe(jids);

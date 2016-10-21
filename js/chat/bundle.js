@@ -1018,11 +1018,13 @@ React.makeElement = React['createElement'];
 	            var contact = self.getContactFromJid(jid);
 	            if (!contact || contact.c !== 1 && contact.c !== 2 && contact.c !== 0) {
 	                allValid = false;
+	                $promise.reject();
 	                return false;
 	            }
 	        });
 	        if (allValid === false) {
-	            return MegaPromise.reject();
+	            $promise.reject();
+	            return $promise;
 	        }
 	        var $element = $('.nw-conversations-item[data-jid="' + jids[0] + '"]');
 	        var roomJid = $element.attr('data-room-jid') + "@" + self.karere.options.mucDomain;
@@ -1064,7 +1066,8 @@ React.makeElement = React['createElement'];
 	        if (setAsActive) {
 	            room.show();
 	        }
-	        return [roomFullJid, room, new $.Deferred().resolve(roomFullJid, room)];
+	        $promise.resolve(roomFullJid, room);
+	        return [roomFullJid, room, $promise];
 	    }
 	    if (setAsActive && self.currentlyOpenedChat && self.currentlyOpenedChat != roomJid) {
 	        self.hideChat(self.currentlyOpenedChat);
@@ -1091,7 +1094,8 @@ React.makeElement = React['createElement'];
 	    }
 
 	    if (self.karere.getConnectionState() != Karere.CONNECTION_STATE.CONNECTED) {
-	        return [roomJid, room, new MegaPromise().reject(roomJid, room)];
+	        $promise.reject(roomJid, room);
+	        return [roomJid, room, $promise];
 	    }
 
 	    var jidsWithoutMyself = room.getParticipantsExceptMe(jids);
@@ -1533,6 +1537,15 @@ React.makeElement = React['createElement'];
 	            var lastMsgDivClasses = "conversation-message";
 
 	            var emptyMessage = ChatdIntegration.mcfHasFinishedPromise.state() !== 'resolved' || chatRoom.messagesBuff.messagesHistoryIsLoading() || chatRoom.messagesBuff.joined === false ? localStorage.megaChatPresence !== 'unavailable' ? l[7006] : "" : l[8000];
+
+	            if (ChatdIntegration.mcfHasFinishedPromise.state() === 'pending') {
+	                if (!ChatdIntegration.mcfHasFinishedPromise._trackDataChangeAttached) {
+	                    ChatdIntegration.mcfHasFinishedPromise.always(function () {
+	                        megaChat.chats.trackDataChange();
+	                    });
+	                    ChatdIntegration.mcfHasFinishedPromise._trackDataChangeAttached = true;
+	                }
+	            }
 
 	            lastMessageDiv = React.makeElement(
 	                "div",
@@ -6250,10 +6263,21 @@ React.makeElement = React['createElement'];
 
 	        var sendContactDialog = null;
 	        if (self.state.sendContactDialog === true) {
+	            var excludedContacts = [];
+	            if (room.type == "private") {
+	                room.getParticipantsExceptMe().forEach(function (jid) {
+	                    var contact = room.megaChat.getContactFromJid(jid);
+	                    if (contact) {
+	                        excludedContacts.push(contact.u);
+	                    }
+	                });
+	            }
+
 	            var selected = [];
 	            sendContactDialog = React.makeElement(ModalDialogsUI.SelectContactDialog, {
 	                megaChat: room.megaChat,
 	                chatRoom: room,
+	                exclude: excludedContacts,
 	                contacts: M.u,
 	                onClose: function onClose() {
 	                    self.setState({ 'sendContactDialog': false });
@@ -7417,6 +7441,7 @@ React.makeElement = React['createElement'];
 	            React.makeElement(ContactsUI.ContactPickerWidget, {
 	                megaChat: self.props.megaChat,
 	                contacts: self.props.contacts,
+	                exclude: self.props.exclude,
 	                onClick: function onClick(contact, e) {
 	                    var contactHash = contact.h;
 
@@ -8944,6 +8969,11 @@ React.makeElement = React['createElement'];
 	            additionalClasses += this.props.className;
 	        }
 
+	        if (message.revoked) {
+
+	            return null;
+	        }
+
 	        if (message instanceof KarereEventObjects.IncomingMessage || message instanceof KarereEventObjects.OutgoingMessage || message instanceof KarereEventObjects.IncomingPrivateMessage || message instanceof Message) {
 
 	            if (message.messageHtml) {
@@ -9143,9 +9173,8 @@ React.makeElement = React['createElement'];
 	                                );
 	                            }
 	                        } else {
-	                            dropdown = React.makeElement(ButtonsUI.Button, {
-	                                className: 'default-white-button tiny-button disabled',
-	                                icon: 'tiny-icon grey-down-arrow' });
+
+	                            return;
 	                        }
 
 	                        var attachmentClasses = "message shared-data";
@@ -10310,7 +10339,7 @@ React.makeElement = React['createElement'];
 	            return;
 	        }
 
-	        if (self.lastActivity && self.lastActivity > ts) {
+	        if (self.lastActivity && self.lastActivity >= ts) {
 
 	            return;
 	        }

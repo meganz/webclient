@@ -12,7 +12,7 @@ var inherits = (function() {
     };
 })();
 
-makeEnum(['MDBOPEN', 'EXECSC'], 'MEGAFLAG_', window);
+makeEnum(['MDBOPEN', 'EXECSC', 'LOADINGCLOUD'], 'MEGAFLAG_', window);
 
 /**
  * Safely parse an HTML fragment, removing any executable
@@ -460,7 +460,7 @@ function megatitle(nperc) {
 
 function populate_l() {
     if (d) {
-        for (var i = 10000 ; i-- ;) {
+        for (var i = 14000 ; i-- ;) {
             l[i] = (l[i] || '(translation-missing)');
         }
     }
@@ -4519,7 +4519,7 @@ function passwordManager(form) {
     if (is_chrome_firefox) {
         var creds = passwordManager.pickFormFields(form);
         if (creds) {
-            mozLoginManager.saveLogin(creds.usr, creds.pwd);
+            mozRunAsync(mozLoginManager.saveLogin.bind(mozLoginManager, creds.usr, creds.pwd));
         }
         $(form).find('input').val('');
         return;

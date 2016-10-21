@@ -80,6 +80,11 @@ var tlvstore = (function () {
         var result = '';
         for (var key in container) {
             if (container.hasOwnProperty(key)) {
+                if (typeof container[key] === "number") {
+                    console.error("Found element in container with key: ", key, " which value is a number. Only " +
+                        "strings are allowed!");
+                    return false;
+                }
                 result += ns.toTlvRecord(key, container[key]);
             }
         }

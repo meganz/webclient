@@ -24,6 +24,7 @@ describe("account unit test", function() {
     });
 
     afterEach(function() {
+        attribCache.clear();
         sandbox.restore();
     });
 
@@ -138,6 +139,7 @@ describe("account unit test", function() {
                 var theCtx = api_req.args[0][1];
                 callback('Zm9ydHl0d28=', theCtx);
                 assert.ok(tlvstore.blockDecrypt.calledWith('fortytwo', 'foo'));
+
                 assert.strictEqual(result.state(), 'rejected');
 
 
@@ -179,35 +181,36 @@ describe("account unit test", function() {
                 sandbox.stub(window, 'api_req');
                 mega.attr.get('me3456789xw', 'puEd255', undefined, undefined, undefined);
                 assert.strictEqual(api_req.callCount, 1);
-                assert.deepEqual(api_req.args[0][0], {a: 'uga', u: 'me3456789xw', ua: '+puEd255'});
+
+                assert.deepEqual(api_req.args[0][0], {a: 'uga', u: 'me3456789xw', ua: '+puEd255', v: 1});
             });
 
             it("public, non-historic attribute", function() {
                 sandbox.stub(window, 'api_req');
                 mega.attr.get('me3456789xw', 'puEd255', true, true, undefined);
                 assert.strictEqual(api_req.callCount, 1);
-                assert.deepEqual(api_req.args[0][0], {a: 'uga', u: 'me3456789xw', ua: '+!puEd255'});
+                assert.deepEqual(api_req.args[0][0], {a: 'uga', u: 'me3456789xw', ua: '+!puEd255', v: 1});
             });
 
             it("public attribute, two params", function() {
                 sandbox.stub(window, 'api_req');
                 mega.attr.get('me3456789xw', 'puEd255');
                 assert.strictEqual(api_req.callCount, 1);
-                assert.deepEqual(api_req.args[0][0], {a: 'uga', u: 'me3456789xw', ua: '+puEd255'});
+                assert.deepEqual(api_req.args[0][0], {a: 'uga', u: 'me3456789xw', ua: '+puEd255', v: 1});
             });
 
             it("private attribute", function() {
                 sandbox.stub(window, 'api_req');
                 mega.attr.get('me3456789xw', 'keyring', false, false, undefined);
                 assert.strictEqual(api_req.callCount, 1);
-                assert.deepEqual(api_req.args[0][0], {a: 'uga', u: 'me3456789xw', ua: '*keyring'});
+                assert.deepEqual(api_req.args[0][0], {a: 'uga', u: 'me3456789xw', ua: '*keyring', v: 1});
             });
 
             it("private, non-historic attribute", function() {
                 sandbox.stub(window, 'api_req');
                 mega.attr.get('me3456789xw', 'keyring', false, true, undefined);
                 assert.strictEqual(api_req.callCount, 1);
-                assert.deepEqual(api_req.args[0][0], {a: 'uga', u: 'me3456789xw', ua: '*!keyring'});
+                assert.deepEqual(api_req.args[0][0], {a: 'uga', u: 'me3456789xw', ua: '*!keyring', v: 1});
             });
         });
 

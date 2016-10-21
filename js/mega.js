@@ -86,6 +86,10 @@ if (typeof loadingInitDialog === 'undefined') {
             $('.loading-info li.step2').addClass('loading');
             $('.loader-progressbar').addClass('active');
 
+            // Load performance report
+            mega.loadReport.ttfb          = Date.now() - mega.loadReport.stepTimeStamp;
+            mega.loadReport.stepTimeStamp = Date.now();
+
             // If the PSA is visible reposition the account loading bar
             psa.repositionAccountLoadingBar();
         }
@@ -1022,25 +1026,28 @@ function MegaData()
                             hideReinvite = 'hidden';
                         }
                     }
+
+                    hideOPC = (hideOPC !== '') ? ' class="' + hideOPC + '"' : '';
+                    html = '<tr id="opc_' + htmlentities(opc[i].p) + '"' + hideOPC + '>' +
+                        '<td>' +
+                            '<div class="left email">' +
+                                '<div class="nw-contact-avatar"></div>' +
+                                '<div class="fm-chat-user-info">' +
+                                    '<div class="contact-email">' + htmlentities(opc[i].m) + '</div>' +
+                                '</div>' +
+                            '</div>' +
+                            '<div class="contact-request-button cancel ' + hideCancel + '">' +
+                                '<span>' + escapeHTML(l[5930]) + '</span>' +
+                            '</div>' +
+                            '<div class="contact-request-button reinvite ' + hideReinvite + '">' +
+                                '<span>' + escapeHTML(l[5861]) + '</span>' +
+                            '</div>' +
+                        '</td></tr>';
+
+                    $(t).append(html);
+
+                    drawn = true;
                 }
-
-                hideOPC = (hideOPC !== '') ? ' class="' + hideOPC + '"' : '';
-                html = '<tr id="opc_' + htmlentities(opc[i].p) + '"' + hideOPC + '>\n\
-                    <td>\n\
-                        <div class="left email">\n\
-                            <div class="nw-contact-avatar"></div>\n\
-                            <div class="fm-chat-user-info">\n\
-                               <div class="contact-email">' + htmlentities(opc[i].m) + '</div>\n\
-                            </div>\n\
-                        </div>\n\
-                        <div class="contact-request-button cancel ' + hideCancel + '"><span>' + l[156] + ' ' + l[738].toLowerCase() + '</span></div>\n\
-                        <div class="contact-request-button reinvite ' + hideReinvite + '"><span>' + l[5861] + '</span></div>\n\
-                    </td>\n\
-                </tr>';
-
-                $(t).append(html);
-
-                drawn = true;
             }
 
             if (drawn) {
@@ -2396,14 +2403,16 @@ function MegaData()
             }
         }
 
-        if (n.t === 2) {
-            this.RootID = n.h;
-        }
-        if (n.t === 3) {
-            this.InboxID = n.h;
-        }
-        if (n.t === 4) {
-            this.RubbishID = n.h;
+        if (n.t) {
+            if (n.t === 2) {
+                this.RootID = n.h;
+            }
+            else if (n.t === 3) {
+                this.InboxID = n.h;
+            }
+            else if (n.t === 4) {
+                this.RubbishID = n.h;
+            }
         }
 
         if (!n.c) {
@@ -2413,7 +2422,10 @@ function MegaData()
 
             if (n.t !== 2 && n.t !== 3 && n.t !== 4 && n.k) {
                 if (u_kdnodecache[n.h]) {
-                    $.extend(n, u_kdnodecache[n.h]);
+                    var obj = u_kdnodecache[n.h];
+                    for (var k in obj) {
+                        n[k] = obj[k];
+                    }
                 }
                 else {
                     crypto_processkey(u_handle, u_k_aes, n);
@@ -2448,22 +2460,14 @@ function MegaData()
         }
 
         // sync data objs M.u <-> M.d
-        if (n.h.length === 11) {
-            if (this.u[n.h] !== n) {
-                if (typeof(this.u[n.h]) === 'undefined') {
-                    M.addUser(n, ignoreDB);
-                }
-                var tmpNode = n;
-                n = this.u[n.h];
+        if (this.u[n.h] && this.u[n.h] !== n) {
+            for (var k in n) {
                 // merge changes from n->M.u[n.h]
-                Object.keys(tmpNode).forEach(function(k) {
-                    if (k === "name") {
-                        return;
-                    }
-
-                    n[k] = tmpNode[k];
-                });
+                if (n.hasOwnProperty(k) && k !== 'name') {
+                    this.u[n.h][k] = n[k];
+                }
             }
+            n = this.u[n.h];
         }
 
         this.d[n.h] = n;
@@ -4048,9 +4052,6 @@ function MegaData()
                 result = node.name;
             }
         }
-        else {
-            console.error('getNameByHandle: Unsupported handle "%s"', handle);
-        }
 
         return String(result);
     };
@@ -4485,10 +4486,16 @@ function MegaData()
                     $tr.find('.left-c p').css('transform', 'rotate(' + (transferDeg - 180) + 'deg)');
                 }
                 if (retime > 0) {
+                    var title = '';
+                    try {
+                        title = new Date((unixtime() + retime) * 1000).toLocaleString();
+                    }
+                    catch (ex) {
+                    }
                     $tr.find('.eta')
                         .text(secondsToTime(retime))
                         .removeClass('unknown')
-                        .attr('title', new Date((unixtime() + retime) * 1000).toLocaleString());
+                        .attr('title', title);
                 }
                 else {
                     $tr.find('.eta').addClass('unknown').text('');
@@ -5547,10 +5554,14 @@ function execsc(actionPackets, callback) {
         trights = false,
         tmoveid = false,
         rootsharenodes = [],
-        loadavatars = false;
+        loadavatars = [];
 
     newnodes = [];
     mega.flags |= window.MEGAFLAG_EXECSC;
+
+    if (d) {
+        console.time('execsc');
+    }
 
     // Process action packets
     for (var i in actionPackets) {
@@ -5572,7 +5583,7 @@ function execsc(actionPackets, callback) {
                 process_u(actionPacket.u);
 
                 // Only show a notification if we did not trigger the action ourselves
-                if (actionPacket.ou !== u_attr.u) {
+                if (!pfid && u_attr && actionPacket.ou !== u_attr.u) {
                     notify.notifyFromActionPacket(actionPacket);
                 }
 
@@ -5654,23 +5665,7 @@ function execsc(actionPackets, callback) {
                 }
             }
             else if (actionPacket.a === 'ua') {
-                var attrs = actionPacket.ua;
-                var actionPacketUserId = actionPacket.u;
-                for (var j in attrs) {
-                    if (attrs.hasOwnProperty(j)) {
-                        var attributeName = attrs[j];
-
-                        if (attributeName === '+a') {
-                            if (!loadavatars) {
-                                loadavatars = [];
-                            }
-                            loadavatars.push(actionPacketUserId);
-                        }
-                        else if (attributeName === 'firstname' || attributeName === 'lastname') {
-                            attribCache.uaPacketParser(attributeName, actionPacketUserId, true);
-                        }
-                    }
-                }
+                mega.attr.handleUserAttributeActionPackets(actionPacket, loadavatars);
             }
         }// END own action packet
         else if (actionPacket.a === 'e') {
@@ -5913,9 +5908,14 @@ function execsc(actionPackets, callback) {
                 });
             }
 
+            // Temporarily disable the execsc flag so that all nodes are added to the DB using a single transaction
+            mega.flags &= ~window.MEGAFLAG_EXECSC;
+
             tparentid = false;
             trights = false;
             __process_f1(actionPacket.t.f);
+
+            mega.flags |= window.MEGAFLAG_EXECSC;
         }
         else if (actionPacket.a === 'u') {
             var n = M.d[actionPacket.n];
@@ -5925,7 +5925,16 @@ function execsc(actionPackets, callback) {
                     k : actionPacket.k,
                     a : actionPacket.at
                 };
-                crypto_processkey(u_handle, u_k_aes, f);
+                crypto_processkey(u_handle, u_k_aes, f, u_nodekeys[n.h]);
+
+                if (!f.key && u_nodekeys[n.h]) {
+                    // TODO: This is a temporal fix, we have to investigate why does the API fails
+                    // on providing the right key for the node, likely we're missing giving it to it.
+
+                    f.k = u_handle + ':' + a32_to_base64(encrypt_key(u_k_aes, u_nodekeys[n.h]));
+                    crypto_processkey(u_handle, u_k_aes, f);
+                }
+
                 if (f.key) {
                     if (f.name !== n.name) {
                         M.onRenameUIUpdate(n.h, f.name);
@@ -5947,6 +5956,9 @@ function execsc(actionPackets, callback) {
                         key : f.key,
                         a : actionPacket.at
                     });
+                }
+                else if (n.key) {
+                    delete missingkeys[n.h];
                 }
                 if (actionPacket.cr) {
                     crypto_proccr(actionPacket.cr);
@@ -5979,7 +5991,7 @@ function execsc(actionPackets, callback) {
             }
 
             // Only show a notification if we did not trigger the action ourselves
-            if (actionPacket.ou !== u_attr.u) {
+            if (!pfid && u_attr && actionPacket.ou !== u_attr.u) {
                 notify.notifyFromActionPacket(actionPacket);
             }
 
@@ -5996,7 +6008,7 @@ function execsc(actionPackets, callback) {
             M.delNode(actionPacket.n);
 
             // Only show a notification if we did not trigger the action ourselves
-            if (actionPacket.ou !== u_attr.u) {
+            if (!pfid && u_attr && actionPacket.ou !== u_attr.u) {
                 notify.notifyFromActionPacket(actionPacket);
             }
         }
@@ -6007,7 +6019,12 @@ function execsc(actionPackets, callback) {
                 if (attrs.hasOwnProperty(j)) {
                     var attributeName = attrs[j];
 
-                    attribCache.uaPacketParser(attributeName, actionPacketUserId);
+                    attribCache.uaPacketParser(
+                        attributeName,
+                        actionPacketUserId,
+                        false,
+                        actionPacket.v && actionPacket.v[j] ? actionPacket.v[j] : undefined
+                    );
                 }
             }
         }
@@ -6096,7 +6113,7 @@ function execsc(actionPackets, callback) {
     if (newnodes.length > 0 && fminitialized) {
         renderNew();
     }
-    if (loadavatars) {
+    if (loadavatars.length) {
         M.avatars(loadavatars);
     }
     if (M.viewmode) {
@@ -6108,6 +6125,10 @@ function execsc(actionPackets, callback) {
     getsc();
     if (callback) {
         Soon(callback);
+    }
+
+    if (d) {
+        console.timeEnd('execsc');
     }
 
     mega.flags &= ~window.MEGAFLAG_EXECSC;
@@ -6780,7 +6801,8 @@ function process_f(f, cb, retry)
 
             kdWorker.process(ncn.sort(function() { return Math.random() - 0.5}), function kdwLoad(r,j) {
                 if (d) console.log('KeyDecWorker processed %d/%d-%d nodes', $.len(r), ncn.length, f.length, r);
-                $.extend(u_kdnodecache, r);
+                // $.extend(u_kdnodecache, r);
+                u_kdnodecache = r;
                 if (doNewNodes) {
                     newnodes = newnodes || [];
                 }
@@ -6790,7 +6812,11 @@ function process_f(f, cb, retry)
                         return process_f( f, cb, 1);
                     }
                 }
-                __process_f2(f, cb && cb.bind(this, !!j.newmissingkeys));
+                // __process_f2(f, cb && cb.bind(this, !!j.newmissingkeys));
+                __process_f1(f);
+                if (cb) {
+                    cb(j.newmissingkeys);
+                }
             }, function kdwError(err) {
                 if (d) console.error(err);
                 if (doNewNodes) {
@@ -7156,6 +7182,11 @@ function process_u(u) {
 
             // Update user attributes M.u
             M.addUser(u[i]);
+
+            if (u[i].c === 1) {
+                // sync data objs M.u <-> M.d
+                M.d[u[i].u] = M.u[u[i].u];
+            }
         }
     }
 }
@@ -7222,27 +7253,24 @@ function init_chat() {
         if (u_type && !megaChatIsReady) {
             if (d) console.log('Initializing the chat...');
 
-            try {
-                // Prevent known Strophe exceptions...
-                if (!Strophe.Websocket.prototype._unsafeOnIdle) {
-                    Strophe.Websocket.prototype._unsafeOnIdle = Strophe.Websocket.prototype._onIdle;
-                    Strophe.Websocket.prototype._onIdle = function() {
+            // XXX: Prevent known Strophe exceptions...
+            ['_onIdle', '_connect'].forEach(function(fn) {
+                var proto = Strophe.Websocket.prototype;
+                var unsafeFn = '_unsafe' + fn;
+
+                if (!proto[unsafeFn]) {
+                    proto[unsafeFn] = proto[fn];
+                    proto[fn] = function() {
                         try {
-                            this._unsafeOnIdle.apply(this, arguments);
+                            this[unsafeFn].apply(this, arguments);
                         }
                         catch (ex) {
-                            if (d) {
-                                console.error(ex);
-                            }
+                            console.error('Caught Strophe exception.', ex);
                         }
                     };
                 }
-            }
-            catch (ex) {
-                if (d) {
-                    console.error(ex);
-                }
-            }
+                proto = undefined;
+            });
 
             var _chat = new Chat();
 
@@ -7282,6 +7310,9 @@ function loadfm_callback(res, ctx) {
 
     loadingInitDialog.step3();
 
+    mega.loadReport.recvNodes     = Date.now() - mega.loadReport.stepTimeStamp;
+    mega.loadReport.stepTimeStamp = Date.now();
+
     if (pfkey) {
         if (res.f && res.f[0]) {
             M.RootID = res.f[0].h;
@@ -7293,6 +7324,13 @@ function loadfm_callback(res, ctx) {
     if (typeof res === 'number') {
         msgDialog('warninga', l[1311], "Sorry, we were unable to retrieve the Cloud Drive contents.", api_strerror(res));
         return;
+    }
+
+    if (res.noc) {
+        mega.loadReport.noc = res.noc;
+    }
+    if (res.tct) {
+        mega.loadReport.tct = res.tct;
     }
 
     if (res.u) {
@@ -7358,6 +7396,10 @@ function loadfm_callback(res, ctx) {
             crypto_procsr(res.sr);
         }
 
+        mega.loadReport.procNodeCount = Object.keys(M.d || {}).length;
+        mega.loadReport.procNodes     = Date.now() - mega.loadReport.stepTimeStamp;
+        mega.loadReport.stepTimeStamp = Date.now();
+
         // Retrieve initial batch of action-packets, if any
         // we'll then complete the process using loadfm_done
         getsc();
@@ -7379,12 +7421,24 @@ function loadfm_done(mDBload) {
 
     if (d > 1) console.error('loadfm_done', mDBload, is_fm());
 
+    mega.loadReport.procAPs       = Date.now() - mega.loadReport.stepTimeStamp;
+    mega.loadReport.stepTimeStamp = Date.now();
+
     mega.config.ready(function() {
         init_chat();
 
+        mega.loadReport.fmConfigFetch = Date.now() - mega.loadReport.stepTimeStamp;
+        mega.loadReport.stepTimeStamp = Date.now();
+
         // are we actually on an #fm/* page?
-        if (is_fm() || $('.fm-main.default').is(":visible")) {
+        if (page !== 'start' && is_fm() || $('.fm-main.default').is(":visible")) {
             renderfm();
+
+            mega.loadReport.renderfm      = Date.now() - mega.loadReport.stepTimeStamp;
+            mega.loadReport.stepTimeStamp = Date.now();
+        }
+        else {
+            mega.loadReport.renderfm = -1;
         }
 
         if (!CMS.isLoading()) {
@@ -7404,8 +7458,43 @@ function loadfm_done(mDBload) {
                     notify.getInitialNotifications();
                 }
             });
-        }
 
+            if (mBroadcaster.crossTab.master && !mega.loadReport.sent) {
+                mega.loadReport.sent = true;
+
+                var r = mega.loadReport;
+                r.totalTimeSpent = Date.now() - mega.loadReport.startTime;
+                r = [
+                    r.mode, // 1: DB, 2: API
+                    r.recvNodes, r.procNodes, r.procAPs,
+                    r.fmConfigFetch, r.renderfm,
+                    r.dbToNet | 0, // see mDB.js comment
+                    r.totalTimeSpent,
+                    Object.keys(M.d || {}).length, // total account nodes
+                    r.procNodeCount, // nodes before APs processing
+                    buildVersion.timestamp || -1, // -- VERSION TAG --
+                    navigator.hardwareConcurrency | 0, // cpu cores
+                    folderlink ? 1 : 0,
+                    pageLoadTime, // secureboot's resources load time
+                    r.ttfb | 0, // time-to-first-byte (for gettree)
+                    r.noc | 0, // tree not cached
+                    r.tct | 0, // tree compute time
+                    r.recvAPs, // time waiting to receive APs
+                    r.EAGAINs, // -3/-4s while loading
+                    r.e500s, // http err 500 while loading
+                    r.errs // any other errors while loading
+                ];
+
+                if (d) {
+                    console.debug('loadReport', r);
+                }
+                api_req({a: 'log', e: 99625, m: JSON.stringify(r)});
+            }
+        }
+        clearInterval(mega.loadReport.aliveTimer);
+        mega.flags &= ~window.MEGAFLAG_LOADINGCLOUD;
+
+        u_kdnodecache = {};
         watchdog.notify('loadfm_done', mDBload);
     });
 }

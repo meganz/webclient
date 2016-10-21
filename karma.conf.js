@@ -78,6 +78,7 @@ module.exports = function(config) {
         'js/megaDbEncryptionPlugin.js',
         'js/megaDb.js',
         'js/paycrypt.js',
+        'js/attr.js',
         'js/account.js',
         'js/authring.js',
         'js/fm.js',

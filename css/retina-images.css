@@ -1,4 +1,3 @@
-
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
 .try-new-close {
     background-image: url(../images/mega/close-white-icon@2x.png);
@@ -7,7 +6,7 @@
 body.pro:after {
     content: url(../images/mega/payment-animation@2x.gif);
 }
-.pro-register-paypal-dialog .reg-success-icon, .payment-confirmation .icon, .bitcoin-invoice-dialog .qr-code-mega-icon, .bitcoin-invoice-dialog .clock-icon, .payment-result-icon, .payment-close-icon, .overlay-close-icon, .nt-takedown-notification .notification-avatar, .nt-takedown-reinstated-notification .notification-avatar, .nt-payment-notification .notification-avatar, .nt-payment-reminder-notification .notification-avatar, .fm-dialog.bitcoin-provider-failure-dialog .reg-success-icon {
+.pro-register-paypal-dialog .reg-success-icon, .payment-confirmation .icon, .bitcoin-invoice-dialog .qr-code-mega-icon, .bitcoin-invoice-dialog .clock-icon, .payment-result-icon, .payment-close-icon, .overlay-close-icon, .notification-item .notification-icon, .fm-dialog.bitcoin-provider-failure-dialog .reg-success-icon {
     background-image: url(../images/mega/bitcoin-v7@2x.png);
     background-size: 200px auto;
 }
@@ -336,7 +335,7 @@ body.pro:after {
     background-image: url(../images/mega/rounded-progressbars@2x.png);
     background-size: 64px auto;
 }
-.top-login-full, .top-login-input-block, .top-login-warning-close, .top-login-warning-icon, .top-login-popup .top-login-warning-bott .checkboxOn, .top-login-popup .top-login-warning-bott .checkboxOff, .top-login-tooltip-arrow, .password-tooltip-arrow, .main-top-info-text, .login-register-input, .register-st2-button, .register-st2-button-arrow, .password-status-icon, .login-notification-icon, .top-login-forgot-pass, .login-forgot-password, .checkboxOn::after, .checkboxOff::after, .contains-value .top-search-clear, .account-history-drop-items.active, .account-warning-icon, .warning-gray-icon, .membership-arrow {
+.top-login-full, .top-login-input-block, .top-login-warning-close, .top-login-warning-icon, .top-login-popup .top-login-warning-bott .checkboxOn, .top-login-popup .top-login-warning-bott .checkboxOff, .top-login-tooltip-arrow, .password-tooltip-arrow, .main-top-info-text, .login-register-input, .register-st2-button, .register-st2-button-arrow, .password-status-icon, .login-notification-icon, .top-login-forgot-pass, .login-forgot-password, .checkboxOn::after, .checkboxOff::after, .contains-value .top-search-clear, .account-history-drop-items.active, .account-warning-icon, .warning-gray-icon, .membership-arrow, .top-login-forgot-pass {
     background-image: url(../images/mega/top-login-sprite_v6@2x.png);
     background-size: 48px auto;
 }
@@ -479,5 +478,9 @@ body.pro:after {
 .dropdown-white-arrow, .huge-white-icon, .shared-link.small-icon {
     background-image: url(../images/mega/chat-static-sprite-v1@2x.png);
     background-size: 68px auto;
+}
+#help2-main .ui-autocomplete .client {
+    background-image: url("../images/mega/help2/welcome_icons@2x.png");
+    background-size: 250px auto;
 }
 }

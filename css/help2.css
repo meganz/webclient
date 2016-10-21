@@ -3599,88 +3599,8 @@
     }
 }
 
-
 #help2-main img {
     max-width: 100%;
-}
-#help2-main .ui-autocomplete {
-    background: white;
-    background: #fff;
-    box-shadow: 0 0 20px 0 rgba(0,0,0,0.15);
-    border-radius: 2px;
-    margin: 62px auto !important;
-    padding: 7px 10px 10px 10px;
-    z-index: 10;
-    position: absolute;
-    display: block;
-    width: 519px;
-}
-#help2-main .ui-menu-item > a.ui-corner-all {
-    font-size: 14px;
-    color: #666;
-    letter-spacing: 0.2px;
-    padding-left: 12px;
-    padding-right: 14px;
-    padding-top: 9px;
-    padding-bottom: 9px;
-    text-decoration: none;
-    width: 424px;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
-    display: block;
-}
-#help2-main .ui-autocomplete li:first-child {
-    margin-top: 14px;
-}
-#help2-main .ui-autocomplete li {
-    font-size: 14px;
-    color: #444;
-    letter-spacing: 0.2px;
-    padding-left: 8px;
-    padding-right: 5px;
-    padding-top: 9px;
-    padding-bottom: 9px;
-    text-decoration: none;
-    width: auto;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
-    display: block;
-    line-height: 20px;
-    background-image: none;
-    border-radius: 0
-    transition-property:border-radius, box-shadow, background-image, background-color;
-    -moz-transition-property: border-radius, box-shadow, background-image, background-color; /* Firefox 4 */
-    -webkit-transition-property: border-radius, box-shadow, background-image, background-color; /* Safari and Chrome */
-    -o-transition-property: border-radius, box-shadow, background-image, background-color; /* Opera */
-    transition-duration: 0.3s;
-    -moz-transition-duration: 0.3s; /* Firefox 4 */
-    -webkit-transition-duration: 0.3s; /* Safari and Chrome */
-    -o-transition-duration: 0.3s; /* Opera */
-    transition-timing-function: ease;
-    -moz-transition-timing-function: ease; /* Firefox 4 */
-    -webkit-transition-timing-function: ease; /* Safari and Chrome */
-    -o-transition-timing-function: ease; /* Opera */
-}
-
-#help2-main .ui-autocomplete li:hover {
-    background-color: #f44;
-    border-radius: 4px;
-    color: #fff !important;
-    cursor: pointer;
-    transition-property: border-radius, box-shadow, background-image, background-color;
-    -moz-transition-property: border-radius, box-shadow, background-image, background-color; /* Firefox 4 */
-    -webkit-transition-property: border-radius, box-shadow, background-image, background-color; /* Safari and Chrome */
-    -o-transition-property: border-radius, box-shadow, background-image, background-color; /* Opera */
-    transition-duration: 0.3s;
-    -moz-transition-duration: 0.3s; /* Firefox 4 */
-    -webkit-transition-duration: 0.3s; /* Safari and Chrome */
-    -o-transition-duration: 0.3s; /* Opera */
-    transition-timing-function: ease;
-    -moz-transition-timing-function: ease; /* Firefox 4 */
-    -webkit-transition-timing-function: ease; /* Safari and Chrome */
-    -o-transition-timing-function: ease; /* Opera */
 }
 #help2-main .photos img {
     max-width: 100%;
@@ -3693,7 +3613,6 @@
 #help2-main .noscroll {
     overflow: hidden;
 }
-
 .share-help {
     width: 500px;
     margin-left: -250px;
@@ -3701,20 +3620,114 @@
     height: 135px;
     display: block;
 }
-
 .share-help .fm-dialog-new-folder-input {
     margin-top: 20px;
 }
-
 .share-help .fm-dialog-new-folder-pad {
     margin-right: 0;
 }
-/*
-#help2-main .selected-bullet {
-    background-color: #939DA3;
+
+/* New autocomplete styles */
+#help2-main .ui-autocomplete {
+    background: #ffffff none repeat scroll 0 0;
+    box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.15);
+    box-sizing: border-box;
+    color: #333333;
+    cursor: default;
+    list-style: outside none none;
+    max-height: 288px;
+    outline: 0 none;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 10px;
+    position: absolute;
+    top: -25px !important;
+    width: 540px !important;
+    z-index: 98;
 }
-#help2-main .bullet-number {
-    background-color: #939DA3;
-    color: #939DA3;
+#help2-main .ui-autocomplete .ui-menu-item {
+    cursor: pointer;
+    margin: 0;
+    padding: 0;
+    position: relative;
+    text-align: left;
 }
-*/
+#help2-main .ui-menu .ui-menu-item-wrapper {
+    position: relative;
+}
+#help2-main .ui-autocomplete .client {
+    background-color: rgba(0, 0, 0, 0);
+    background-image: url("../images/mega/help2/welcome_icons.png");
+    background-repeat: no-repeat;
+    display: inline-block;
+    height: 20px;
+    left: 10px;
+    margin-right: 12px;
+    padding: 0;
+    position: absolute;
+    top: 9px;
+    width: 20px;
+    z-index: 1;
+}
+#help2-main .ui-autocomplete .client.ui-state-active {
+    background-color: rgba(0, 0, 0, 0);
+    border: 0 none;
+    transition-duration: 0.3s;
+    transition-property: border-radius, box-shadow, background-image, background-color;
+    transition-timing-function: ease;
+}
+#help2-main .ui-autocomplete .ui-menu-item .ios {
+    background-position: -148px -300px;
+}
+#help2-main .ui-autocomplete .ui-menu-item .ios.ui-state-active {
+    background-position: -201px -300px;
+}
+#help2-main .ui-autocomplete .ui-menu-item .windows {
+    background-position: -149px -333px;
+}
+#help2-main .ui-autocomplete .ui-menu-item .windows.ui-state-active {
+    background-position: -201px -333px;
+}
+#help2-main .ui-autocomplete .ui-menu-item .android {
+    background-position: -148px -366px;
+}
+#help2-main .ui-autocomplete .ui-menu-item .android.ui-state-active {
+    background-position: -201px -366px;
+}
+#help2-main .ui-autocomplete .ui-menu-item .web {
+    background-position: -147px -428px
+}
+#help2-main .ui-autocomplete .ui-menu-item .web.ui-state-active {
+    background-position: -199px -428px;
+}
+#help2-main .ui-autocomplete .ui-menu-item .megasync {
+    background-position: -179px -302px;
+}
+#help2-main .ui-autocomplete .ui-menu-item .megasync.ui-state-active {
+    background-position: -231px -302px;
+}
+#help2-main .ui-autocomplete .ui-menu-item .megachat {
+    background-position: -178px -333px;
+}
+#help2-main .ui-autocomplete .ui-menu-item .megachat.ui-state-active {
+    background-position: -230px -333px;
+}
+#help2-main .ui-autocomplete .label-text {
+    border-radius: 4px;
+    display: block;
+    font-size: 14px;
+    letter-spacing: 0.2px;
+    line-height: 20px;
+    overflow: hidden;
+    padding: 9px 9px 9px 40px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+#help2-main .ui-autocomplete .label-text.ui-state-active {
+    background-color: #ff4444;
+    border: 0 none;
+    color: #fff;
+}
+.ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front.opened {
+    display: block !important;
+}

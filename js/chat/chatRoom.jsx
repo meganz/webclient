@@ -108,7 +108,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
             return;
         }
 
-        if (self.lastActivity && self.lastActivity > ts) {
+        if (self.lastActivity && self.lastActivity >= ts) {
             // this is an old message, DON'T update the lastActivity.
             return;
         }
@@ -225,7 +225,7 @@ ChatRoom.prototype._retrieveTurnServerFromLoadBalancer = function() {
                     }
 
                     servers.push({
-                        urls: ['turn:' + v.host + ':' + v.port + '?transport=' + transport],
+                        url: 'turn:' + v.host + ':' + v.port + '?transport=' + transport,
                         username: "inoo20jdnH",
                         credential: '02nNKDBkkS'
                     });

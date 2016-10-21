@@ -1,0 +1,48 @@
+<div id="onboarding-dialog-template" class="fm-dialog onboarding-dialog hidden">
+    <div class="fm-dialog-close"></div>
+
+    <div class="onboarding-dialog-contents"></div>
+
+    <label>
+        <input type="checkbox" />
+    </label>
+    <div class="checkbox-block">
+        <div class="checkdiv checkboxOff">
+            <input type="checkbox" name="disable-hints-checkbox" id="disable-hints-checkbox" class="checkboxOff">
+        </div>
+        <label for="disable-hints-checkbox" class="radio-txt">[$10660]</label>
+    </div>
+</div>
+
+<div id="onboarding-click-handler-template" class="onboarding onboarding-clickhandler hidden">
+    <div class="wrapper"><div class="main"></div></div>
+    <div class="outer"></div>
+</div>
+
+<div id="onboarding-screens" class="hidden">
+    <div
+            id="contacts-section"
+            data-click-handler-position=".fm-main.default .nw-fm-left-icon.contacts"
+            data-click-handler-position-my="left bottom"
+            data-click-handler-position-at="right-20px center+16px"
+        >
+        <img class="left" src="{staticpath}images/onboarding/contacts_hint@2x.png" width="180" />
+        <h3>[$165]</h3>
+        <p>
+            [$10661]
+        </p>
+    </div>
+
+    <div
+            id="chats-section"
+            data-click-handler-position=".fm-main.default .nw-fm-left-icon.conversations"
+            data-click-handler-position-my="left bottom"
+            data-click-handler-position-at="right-20px center+20px"
+    >
+        <img class="left" src="{staticpath}images/onboarding/chat_hint@2x.png" width="180" />
+        <h3>[$7997]</h3>
+        <p>
+            [$10662]
+        </p>
+    </div>
+</div>

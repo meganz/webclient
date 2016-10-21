@@ -49,7 +49,7 @@ function WebrtcApi() {
         console.log('This appears to be Chrome');
         this.peerconnection =  webkitRTCPeerConnection;
         this.browser =  window.opr ? 'opera' : 'chrome';
-        if (navigator.mediaDevices.getUserMedia) {
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
             this.getUserMedia = function(constraints) {
                 return navigator.mediaDevices.getUserMedia(constraints);
             }

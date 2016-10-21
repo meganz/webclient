@@ -1130,7 +1130,10 @@ hangupAll: function(reason, text)
             return;
         }
         var self = this;
-        if (playerElem.currentTime > 0) {
+
+        // Under Firefox < 4x, currentTime seems to stay at 0 forever,
+        // despite that there is playback
+        if ((playerElem.currentTime > 0) || (RTC.browser === "firefox")) {
             this.onMediaRecv(playerElem, sess, sess.remoteStream);
             RTC.attachMediaStream(playerElem, sess.remoteStream); // FIXME: why do i have to do this for FF?
         } else {

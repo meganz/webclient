@@ -3,22 +3,23 @@
 
 function WebrtcApi() {
     if (navigator.mozGetUserMedia) {
-        console.log('This appears to be Firefox');
+        this.browser = 'firefox';
         if (!MediaStream.prototype.getVideoTracks || !MediaStream.prototype.getAudioTracks)
             throw new Error('webRTC API missing MediaStream.getXXXTracks');
         
         this.peerconnection = (typeof RTCPeerConnection !== 'undefined')
              ? RTCPeerConnection
              : mozRTCPeerConnection;
-        this.browser = 'firefox';
         if (navigator.mediaDevices) {
             this.getUserMedia = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+            console.log('This appears to be Firefox');
         } else {
             this.getUserMedia = function(opts) {
                 return new Promise(function(resolve, reject) {
                     navigator.mozGetUserMedia(opts, resolve, reject);
                 });
             }
+            console.log('This appears to be an old Firefox');
         }
         this.attachMediaStream = function(elem, stream) {
             if (elem.mozSrcObject) {
@@ -46,19 +47,21 @@ function WebrtcApi() {
         this.MediaStreamTrack = MediaStreamTrack;
 
     } else if (navigator.webkitGetUserMedia) {
-        console.log('This appears to be Chrome');
-        this.peerconnection =  webkitRTCPeerConnection;
         this.browser =  window.opr ? 'opera' : 'chrome';
+        this.peerconnection =  webkitRTCPeerConnection;
+
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
             this.getUserMedia = function(constraints) {
                 return navigator.mediaDevices.getUserMedia(constraints);
             }
+            console.log('This appears to be Chrome');
         } else {
             this.getUserMedia = function(opts) {
                 return new Promise(function(ok, fail) {
                     navigator.webkitGetUserMedia(opts, ok, fail);
                 });
             }
+            console.log('This appears to be an old Chrome');
         }
         this.attachMediaStream = function(player, stream) {
             if (!stream) {
@@ -225,7 +228,6 @@ WebrtcApi.prototype.getUserMediaWithConstraintsAndCallback = function(um)
 }
 
 WebrtcApi.prototype.stopMediaStream = function(stream) {
-    var track0 = null;
     if (stream.getTracks) {
         var tracks = stream.getTracks();
         if (tracks.length === 0) {

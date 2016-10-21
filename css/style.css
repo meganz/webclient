@@ -7093,16 +7093,17 @@ table {
     height: -moz-calc(100% - 24px);
     height: calc(100% - 24px);
     width: 100% !important;
+    position: relative !important;
 }
 .fm-right-files-block, .fm-right-account-block {
     height: 100%;
     margin-left: 304px;
     position: relative;
 }
-.fm-right-header, .fm-tranfers-header {
+.fm-right-header, .fm-transfers-header {
     padding-right: 8px;
 }
-.fm-right-header, .new-notification-top, .fm-tranfers-header {
+.fm-right-header, .new-notification-top, .fm-transfers-header {
     height: 48px;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;

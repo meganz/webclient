@@ -1006,6 +1006,7 @@ function transferPanelContextMenu(target)
 
 function openTransferpanel()
 {
+    $.tresizer();
     $('.nw-fm-left-icon.transfers').addClass('transfering');
     // Start the new transfer right away even if the queue is paused?
     // XXX: Remove fm_tfspause calls at M.addDownload/addUpload to enable this
@@ -2662,7 +2663,7 @@ function initContextUI() {
                 fm_tfsmove(id, -1);
             });
         $('.transfer-table tr.ui-selected').removeClass('ui-selected');
-        Soon(fm_tfsupdate);
+        delay('fm_tfsupdate', fm_tfsupdate);
     });
 
     $(c + '.move-down').rebind('click', function() {
@@ -2673,7 +2674,7 @@ function initContextUI() {
                 fm_tfsmove(id, 1);
             });
         $('.transfer-table tr.ui-selected').removeClass('ui-selected');
-        Soon(fm_tfsupdate);
+        delay('fm_tfsupdate', fm_tfsupdate);
     });
 
     $(c + '.transfer-play').rebind('click', function() {
@@ -4599,7 +4600,6 @@ function gridUI() {
             headerColumn = $('.grid-table-header th').get(i);
             $(headerColumn).width($(e).width());
         });
-        initTransferScroll();
     };
 
     $.detailsGridHeader = function() {
@@ -4608,7 +4608,6 @@ function gridUI() {
             headerColumn = $('.contact-details-view .grid-table-header th').get(i);
             $(headerColumn).width($(e).width());
         });
-        initTransferScroll();
     };
 
     $.contactGridHeader = function() {
@@ -4626,7 +4625,6 @@ function gridUI() {
             headerColumn = $('.files-grid-view.contacts-view .grid-table-header th').get(i);
             $(headerColumn).width($(e).width());
         });
-        initTransferScroll();
     };
 
     $.opcGridHeader = function() {
@@ -4644,7 +4642,6 @@ function gridUI() {
             headerColumn = $('.sent-requests-grid .grid-table-header th').get(i);
             $(headerColumn).width($(e).width());
         });
-        initTransferScroll();
     };
 
     $.ipcGridHeader = function() {
@@ -4662,7 +4659,6 @@ function gridUI() {
             headerColumn = $('.contact-requests-grid .grid-table-header th').get(i);
             $(headerColumn).width($(e).width());
         });
-        initTransferScroll();
     };
 
     $.sharedGridHeader = function() {
@@ -4680,7 +4676,6 @@ function gridUI() {
             headerColumn = $('.shared-grid-view .grid-table-header th').get(i);
             $(headerColumn).width($(e).width());
         });
-        initTransferScroll();
     };
 
     $('.fm-blocks-view.fm').addClass('hidden');
@@ -5897,38 +5892,39 @@ function iconUI(aQuiet)
 
 function transferPanelUI()
 {
-    $.transferHeader = function()
+    $.transferHeader = function(tfse)
     {
-        var tt = $('.transfer-scrolling-table'),
-              tth = $('.transfer-table-header');
+        tfse                  = tfse || M.getTransferElements();
+        var domTableEmptyTxt  = tfse.domTableEmptyTxt;
+        var domTableHeader    = tfse.domTableHeader;
+        var domScrollingTable = tfse.domScrollingTable;
+        var domTable          = tfse.domTable;
+        tfse                  = undefined;
 
         // Show/Hide header if there is no items in transfer list
-        if (!$('.transfer-table tr').length)
-        {
-            $('.transfer-panel-empty-txt').removeClass('hidden');
-            tt.hide(0);
-            tth.hide(0);
+        if (domTable.querySelector('tr')) {
+            domTableEmptyTxt.classList.add('hidden');
+            domScrollingTable.style.display = '';
+            domTableHeader.style.display    = '';
         }
-        else
-        {
-            $('.transfer-panel-empty-txt').addClass('hidden');
-            tt.show(0);
-            tth.show(0);
+        else {
+            domTableEmptyTxt.classList.remove('hidden');
+            domScrollingTable.style.display = 'none';
+            domTableHeader.style.display    = 'none';
         }
 
-        $('.transfer-scrolling-table').rebind('click contextmenu', function(e)
-        {
+        $(domScrollingTable).rebind('click.tst contextmenu.tst', function(e) {
             if (!$(e.target).closest('.transfer-table').length) {
-                $('.transfer-table tr').removeClass('ui-selected');
+                $('.ui-selected', domTable).removeClass('ui-selected');
             }
         });
 
-        var $ttw = $('.transfer-table-wrapper .grid-url-arrow, .transfer-table-wrapper .clear-transfer-icon');
-        $ttw.rebind('click', function(e) {
+        var $tmp = $('.grid-url-arrow, .clear-transfer-icon', domTable);
+        $tmp.rebind('click', function(e) {
             var target = $(this).closest('tr');
             e.preventDefault();
             e.stopPropagation(); // do not treat it as a regular click on the file
-            $('.transfer-table-wrapper tr').removeClass('ui-selected');
+            $('tr', domTable).removeClass('ui-selected');
 
             if ($(this).hasClass('grid-url-arrow')) {
                 target.addClass('ui-selected');
@@ -5949,10 +5945,12 @@ function transferPanelUI()
                     $.tresizer();
                 });
             }
-        });
-        $ttw = undefined;
 
-        $('.transfer-table tr').rebind('dblclick', function(e) {
+            return false;
+        });
+
+        $tmp = $('tr', domTable);
+        $tmp.rebind('dblclick', function(e) {
             if ($(this).hasClass('transfer-completed')) {
                 var id = String($(this).attr('id'));
                 if (id[0] === 'd') {
@@ -5971,30 +5969,25 @@ function transferPanelUI()
                     reselect(1);
                 }
             }
+            return false;
         });
 
-        $('.transfer-table tr').rebind('click contextmenu', function(e)
+        $tmp.rebind('click contextmenu', function(e)
         {
-            $('.ui-selected').filter(function() {
-                return $(this).parent('.transfer-table').length;
-            }).removeClass('ui-selected');
-
             if (e.type == 'contextmenu')
             {
-                var c = $(this).attr('class');
-                if (!c || (c && c.indexOf('ui-selected') == -1))
-                    $('.transfer-table tr').removeClass('ui-selected');
+                $('.ui-selected', domTable).removeClass('ui-selected');
                 $(this).addClass('ui-selected dragover');
                 transferPanelContextMenu(null);
                 return !!contextMenuUI(e);
             }
             else
             {
-                var s = $('.transfer-table tr');
-                if (e.shiftKey && s.length > 0)
+                var domNode = domTable.querySelector('tr');
+                if (e.shiftKey && domNode)
                 {
-                    var start = s[0];
-                    var end = this;
+                    var start = domNode;
+                    var end   = this;
                     if ($.TgridLastSelected && $($.TgridLastSelected).hasClass('ui-selected')) {
                         start = $.TgridLastSelected;
                     }
@@ -6002,7 +5995,7 @@ function transferPanelUI()
                         end = start;
                         start = this;
                     }
-                    $('.transfer-table tr').removeClass('ui-selected');
+                    $('.ui-selected', domTable).removeClass('ui-selected');
                     $([start, end]).addClass('ui-selected');
                     $(start).nextUntil($(end)).each(function(i, e) {
                         $(e).addClass('ui-selected');
@@ -6010,7 +6003,7 @@ function transferPanelUI()
                 }
                 else if (!e.ctrlKey && !e.metaKey)
                 {
-                    $('.transfer-table tr').removeClass('ui-selected');
+                    $('.ui-selected', domTable).removeClass('ui-selected');
                     $(this).addClass('ui-selected');
                     $.TgridLastSelected = this;
                 }
@@ -6025,33 +6018,43 @@ function transferPanelUI()
                     }
                 }
             }
+
+            return false;
         });
-        initTransferScroll();
+        $tmp = undefined;
+
+        // initTransferScroll(domScrollingTable);
+        delay('tfs-ps-update', Ps.update.bind(Ps, domScrollingTable));
     };
 
     $.transferClose = function() {
         $('.nw-fm-left-icon.transfers').removeClass('active');
-        $('.fmholder').removeClass('transfer-panel-opened');
+        $('#fmholder').removeClass('transfer-panel-opened');
     };
 
     $.transferOpen = function(force) {
         if (force || !$('.nw-fm-left-icon.transfers').hasClass('active')) {
             $('.nw-fm-left-icon').removeClass('active');
             $('.nw-fm-left-icon.transfers').addClass('active');
-            notificationsUI(1);
             $('#fmholder').addClass('transfer-panel-opened');
+            notificationsUI(1);
+            var domScrollingTable = M.getTransferElements().domScrollingTable;
+            if (!domScrollingTable.classList.contains('ps-container')) {
+                Ps.initialize(domScrollingTable, {suppressScrollX: true});
+            }
             fm_tfsupdate(); // this will call $.transferHeader();
         }
     };
 
     $.clearTransferPanel = function() {
-        if ($('.transfer-table tr').length === 0) {
+        var obj = M.getTransferElements();
+        if (!obj.domTable.querySelector('tr')) {
             $('.transfer-clear-all-icon').addClass('disabled');
             $('.transfer-pause-icon').addClass('disabled');
             $('.transfer-clear-completed').addClass('disabled');
             $('.transfer-table-header').hide();
             $('.transfer-panel-empty-txt').removeClass('hidden');
-            $('.transfer-panel-title').html(l[104]);
+            $('.transfer-panel-title').text(l[104]);
             $('.nw-fm-left-icon.transfers').removeClass('transfering').find('p').removeAttr('style');
             if (M.currentdirid === 'transfers') {
                 fm_tfsupdate();
@@ -10750,35 +10753,30 @@ function fm_resize_handler() {
         console.time('fm_resize_handler');
     }
 
-    mega.utils.chrome110ZoomLevelNotification();
+    if (window.chrome) {
+        // XXX: Seems this 110% zoom bug got fixed as of Chrome 54?
+        mega.utils.chrome110ZoomLevelNotification();
+    }
 
-    $('.transfer-scrolling-table').css({
-        'height': (
-             $('.fm-transfers-block').outerHeight()
-                - $('.transfer-table-header').outerHeight()
-                - $('.fm-tranfers-header').outerHeight()
-        ) + "px"
-    });
+    if (ulmanager.isUploading || dlmanager.isDownloading) {
+        var tfse = M.getTransferElements();
 
-    // left panel resize logic
-    /*
-    var right_panel_margin = $('.fm-left-panel').outerWidth();
-     var resize_handle_width = $('.left-pane-drag-handle').outerWidth();
-     $('.fm-main.default > div:not(.fm-left-panel)').each(function() {
+        tfse.domScrollingTable.style.height = (
+                $(tfse.domTransfersBlock).outerHeight() -
+                $(tfse.domTableHeader).outerHeight() -
+                $(tfse.domTransferHeader).outerHeight()
+            ) + "px";
+    }
 
-     $(this).css({
-     'margin-left':  right_panel_margin
-     });
-     });
-     */
+    if (M.currentdirid !== 'transfers') {
+        $('.files-grid-view .grid-scrolling-table, .file-block-scrolling,' +
+            ' .contacts-grid-view .contacts-grid-scrolling-table')
+            .css({
+                'width': $(document.body).outerWidth() - $('.fm-left-panel').outerWidth()
+            });
 
-    $('.files-grid-view .grid-scrolling-table, .file-block-scrolling,' +
-        ' .contacts-grid-view .contacts-grid-scrolling-table')
-        .css({
-            'width': $(document.body).outerWidth() - $('.fm-left-panel').outerWidth()
-        });
-
-    initTreeScroll();
+        initTreeScroll();
+    }
 
     if (M.currentdirid === 'contacts') {
         if (M.viewmode) {
@@ -10832,17 +10830,19 @@ function fm_resize_handler() {
         }
     }
 
-    if (slideshowid && previews[slideshowid]) {
-        previewsrc(previews[slideshowid].src);
-    }
+    if (M.currentdirid !== 'transfers') {
+        if (slideshowid && previews[slideshowid]) {
+            previewsrc(previews[slideshowid].src);
+        }
 
-    if (megaChatIsReady && megaChat.resized) {
-        megaChat.resized();
-    }
+        if (megaChatIsReady && megaChat.resized) {
+            megaChat.resized();
+        }
 
-    $('.fm-right-files-block, .fm-right-account-block').css({
-        'margin-left': ($('.fm-left-panel:visible').width() + $('.nw-fm-left-icons-panel').width()) + "px"
-    });
+        $('.fm-right-files-block, .fm-right-account-block').css({
+            'margin-left': ($('.fm-left-panel:visible').width() + $('.nw-fm-left-icons-panel').width()) + "px"
+        });
+    }
 
     if (M.currentrootid === 'shares') {
         var shared_block_height = $('.shared-details-block').height() - $('.shared-top-details').height();

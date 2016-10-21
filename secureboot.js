@@ -578,6 +578,12 @@ Object.defineProperty(this, 'mBroadcaster', {
                 callback : options
             };
         }
+        if (options.hasOwnProperty('handleEvent')) {
+            options = {
+                scope: options,
+                callback: options.handleEvent
+            };
+        }
         if (typeof options.callback !== 'function') {
             return false;
         }
@@ -594,8 +600,24 @@ Object.defineProperty(this, 'mBroadcaster', {
         return id;
     },
 
-    removeListener: function mBroadcaster_removeListenr(token) {
+    removeListener: function mBroadcaster_removeListenr(token, listener) {
         if (d) console.log('Removing broadcast listener', token);
+
+        if (listener) {
+            // Remove an EventListener interface.
+            var found;
+            for (var id in this._topics[token]) {
+                if (this._topics[token].hasOwnProperty(id)
+                    && this._topics[token][id].scope === listener) {
+
+                    found = id;
+                    break;
+                }
+            }
+
+            token = found;
+        }
+
         for (var topic in this._topics) {
             if (this._topics[topic][token]) {
                 delete this._topics[topic][token];
@@ -610,8 +632,13 @@ Object.defineProperty(this, 'mBroadcaster', {
 
     sendMessage: function mBroadcaster_sendMessage(topic) {
         if (this._topics.hasOwnProperty(topic)) {
-            var args = Array.prototype.slice.call(arguments, 1);
-            var idr = [];
+            var idr  = [];
+            var args = toArray.apply(null, arguments);
+            args.shift();
+
+            if (!args.length) {
+                args = [{type: topic}];
+            }
 
             // if (d) console.log('Broadcasting ' + topic, args);
 
@@ -625,8 +652,11 @@ Object.defineProperty(this, 'mBroadcaster', {
                 if (ev.once || rc === 0xDEAD)
                     idr.push(id);
             }
-            if (idr.length)
-                idr.forEach(this.removeListener.bind(this));
+            if (idr.length) {
+                idr.forEach(function(id) {
+                    this.removeListener(id);
+                }.bind(this));
+            }
 
             return true;
         }
@@ -1348,7 +1378,7 @@ else if (!b_u)
 
             __cdumps.push(dump);
             if (__cd_t) clearTimeout(__cd_t);
-            var report = safeCall(function()
+            var report = tryCatch(function()
             {
                 function ctx(id)
                 {
@@ -1679,7 +1709,7 @@ else if (!b_u)
         jsl.push({f:'css/vendor/perfect-scrollbar.css', n: 'vendor_ps_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/onboarding.css', n: 'onboarding_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/media-print.css', n: 'media_print_css', j:2,w:5,c:1,d:1,cache:1});
-        
+
         jsl.push({f:'js/useravatar.js', n: 'contact_avatar_js', j:1,w:3});
         jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
         jsl.push({f:'js/states-countries.js', n: 'states_countries_js', j:1});
@@ -2434,9 +2464,26 @@ function showAd() {
     return showAd;
 }
 
-function safeCall(fn)
+/**
+ * Simple .toArray method to be used to convert `arguments` to a normal JavaScript Array
+ *
+ * Please note there is a huge performance degradation when using `arguments` outside their
+ * owning function, to mitigate it use this function as follow: toArray.apply(null, arguments)
+ *
+ * @returns {Array}
+ */
+function toArray() {
+    var len = arguments.length;
+    var res = Array(len);
+    while (len--) {
+        res[len] = arguments[len];
+    }
+    return res;
+}
+
+function tryCatch(fn)
 {
-    fn.foo = function __safeCallWrapper()
+    fn.foo = function __tryCatchWrapper()
     {
         try {
             return fn.apply(this, arguments);

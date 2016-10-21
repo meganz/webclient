@@ -100,7 +100,7 @@ function WebrtcApi() {
     {
         var hasAudio = false;
         var hasVideo = false;
-        for (var i=0; i<devices.length; i++) {
+        for (var i = 0; i < devices.length; i++) {
             var s = devices[i];
             if (s.kind === 'audio') {
                 hasAudio = true;
@@ -196,7 +196,7 @@ WebrtcApi.prototype.createUserMediaConstraints = function(um)
         constraints.video.mandatory.minHeight = 240;
         break;
     default:
-        if (navigator.userAgent.indexOf('Android') != -1) 
+        if (navigator.userAgent.indexOf('Android') !== -1)
 		{
             constraints.video.mandatory.minWidth = 320;
             constraints.video.mandatory.minHeight = 240;

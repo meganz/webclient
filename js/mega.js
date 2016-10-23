@@ -2487,7 +2487,9 @@ function MegaData()
     this.delNode = function(h) {
 
         function ds(h) {
-            removeUInode(h);
+            if (fminitialized) {
+                removeUInode(h);
+            }
             if (M.c[h] && h.length < 11) {
                 for (var h2 in M.c[h]) {
                     ds(h2);
@@ -5938,14 +5940,9 @@ function execsc(actionPackets, callback) {
                 });
             }
 
-            // Temporarily disable the execsc flag so that all nodes are added to the DB using a single transaction
-            mega.flags &= ~window.MEGAFLAG_EXECSC;
-
             tparentid = false;
             trights = false;
             __process_f1(actionPacket.t.f);
-
-            mega.flags |= window.MEGAFLAG_EXECSC;
         }
         else if (actionPacket.a === 'u') {
             var n = M.d[actionPacket.n];

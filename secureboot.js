@@ -338,7 +338,7 @@ var mega = {
         0, 'Torch', 'Epic'
     ],
 
-    maxWorkers: (navigator.hardwareConcurrency || 4),
+    maxWorkers: Math.min(navigator.hardwareConcurrency || 4, 12),
 
     /** Get browser brancd internal ID */
     getBrowserBrandID: function() {

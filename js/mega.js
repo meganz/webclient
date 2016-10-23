@@ -6959,11 +6959,27 @@ function process_f(f, cb, retry)
         }
         else
         {
-            if (!kdWorker) try {
-                kdWorker = mSpawnWorker('keydec.js');
-            } catch(e) {
-                if (d) console.error(e);
-                return __process_f2(f, cb);
+            if (!kdWorker) {
+                var nWorkers = mega.maxWorkers;
+
+                while (nWorkers && (ncn.length / nWorkers) < 800) {
+                    nWorkers >>= 1;
+                }
+                nWorkers = Math.max(nWorkers, 2);
+
+                try {
+                    kdWorker = mSpawnWorker('keydec.js', nWorkers);
+                }
+                catch (e) {
+                    if (d) {
+                        console.error('mSpawnWorker', e);
+                    }
+                    return __process_f2(f, cb);
+                }
+
+                if (d) {
+                    console.debug('Using %d workers to decrypt %d nodes.', nWorkers, ncn.length);
+                }
             }
 
             kdWorker.process(ncn.sort(function() { return Math.random() - 0.5}), function kdwLoad(r,j) {

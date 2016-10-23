@@ -1311,14 +1311,18 @@ function fm_tfsupdate() {
         var ttl    = M.getTransferTableLengths();
         var parent = domCompleted[0].parentNode;
 
-        if (completedLen > ttl.size) {
+        if (completedLen + 4 > ttl.size || M.pendingTransfers > 50 + ttl.used * 4) {
             // Remove completed transfers filling the whole table
-            parent.removeChild.apply(parent, domCompleted);
+            while (completedLen--) {
+                parent.removeChild(domCompleted[completedLen]);
+            }
             mBroadcaster.sendMessage('tfs-dynlist-flush');
         }
         else {
             // Move completed transfers to the bottom
-            parent.appendChild.apply(parent, domCompleted);
+            while (completedLen--) {
+                parent.appendChild(domCompleted[completedLen]);
+            }
         }
     }
     if ($.transferHeader) {
@@ -1348,6 +1352,7 @@ function fm_tfsupdate() {
             ++i;
         }
     }
+    M.pendingTransfers = i + u;
     var t;
     var sep = "\u202F";
     var l   = String(tfse.domPanelTitle.textContent).trim().split(sep)[0];

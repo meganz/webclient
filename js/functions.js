@@ -3472,6 +3472,7 @@ mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
         ulmanager.isUploading = false;
         ASSERT(ulQueue._running === 0, 'ulQueue._running inconsistency on completion');
         ulQueue._pending = [];
+        ulQueue.setSize((fmconfig.ul_maxSlots | 0) || 4);
     }
     if (!dl_queue.some(isQueueActive)) {
         dl_queue = new DownloadQueue();

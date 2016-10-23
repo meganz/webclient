@@ -72,6 +72,10 @@ inherits(MegaQueue, MegaEvents);
 
 MegaQueue.weakRef = [];
 
+MegaQueue.prototype.getSize = function() {
+    return this._limit;
+};
+
 MegaQueue.prototype.setSize = function(size) {
     this._limit = size;
     this._process();

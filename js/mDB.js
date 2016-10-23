@@ -776,13 +776,7 @@ function mDBadd(t, a) {
     delete a.presence;
     delete a.presenceMtime;
 
-    if (mega.flags & window.MEGAFLAG_EXECSC) {
-        // Inmediately fire the DB transaction while processing APs
-        // to prevent out of sync data with the gettree-cache which
-        // *could* happen if we'd use the below transactions queue.
-        mDBadd.dispatchTransactionQueue();
-        return mFileManagerDB.query('add', t, a);
-    }
+    mDBdel.dispatchTransactionQueue();
 
     if (!mFileManagerDB.addQueue) {
         mFileManagerDB.addQueue = {};
@@ -814,15 +808,7 @@ function mDBdel(t, id) {
         localStorage['fmdblock_' + u_handle] = 0xBADF;
         return;
     }
-
-    if (mega.flags & window.MEGAFLAG_EXECSC) {
-        // Inmediately fire the DB transaction while processing APs
-        // to prevent out of sync data with the gettree-cache which
-        // *could* happen if we'd use the below transactions queue.
-        mDBadd.dispatchTransactionQueue();
-        mDBdel.dispatchTransactionQueue();
-        return mFileManagerDB.query('remove', t, id);
-    }
+    mDBadd.dispatchTransactionQueue();
 
     if (!mFileManagerDB.delQueue) {
         mFileManagerDB.delQueue = {};

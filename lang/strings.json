@@ -4255,16 +4255,92 @@
         "text": "You are currently logged in. Would you like to log out and register a new account?",
         "context": "Confirmation message, that we show when the user clicks an invite link to register a new account while the user is logged in."
     },
+    "1825": {
+        "text": "What is MEGAsync?",
+        "context": ""
+    },
+    "1827": {
+        "text": "How do I install MEGAsync?",
+        "context": ""
+    },
     "1828": {
         "text": "Go to the [A]download page[\/A] and follow the instructions. During the installation, you will be asked to enter or create your MEGA account and to set up the folders to replicate (either your full MEGA cloud drive and folder structure to a single local folder location or specific subfolders in your cloud drive to corresponding local folders). After the installation completes, MEGAsync will start automatically. You will see a clickable MEGA logo in your system tray or menu bar while the sync tool is running that gives you access to a status popup and the settings page.",
+        "context": ""
+    },
+    "1829": {
+        "text": "Can I use MEGAsync on multiple computers?",
+        "context": ""
+    },
+    "1831": {
+        "text": "How can I monitor the sync status of my local files and folders?",
+        "context": ""
+    },
+    "1833": {
+        "text": "MEGAsync stores my login credentials to perform autologin. Isn't that a security concern?",
         "context": ""
     },
     "1838": {
         "text": "On the cloud side, deleted files will be moved to a special \"SyncDebris\" subfolder structure in your rubbish bin and can be retrieved from there (use MEGA's built-in search if needed). On the local computer, each sync's root folder will have a hidden \"Debris\" or \".rubbish\" folder in which deleted items are placed.",
         "context": ""
     },
+    "1839": {
+        "text": "Does MEGAsync perform explicit file versioning?",
+        "context": "e.g. when a user updates a file (a partial write operation), the user would have the ability to go back in time and reverse the operation, which is currently not supported by MEGA"
+    },
+    "1840": {
+        "text": "No. However, you can access overwritten files in the respective debris folders until they are purged.",
+        "context": ""
+    },
+    "1841": {
+        "text": "Does MEGAsync support modifying existing files?",
+        "context": ""
+    },
+    "1845": {
+        "text": "Are there any restrictions with regards to filenames?",
+        "context": ""
+    },
+    "1849": {
+        "text": "How can I make sure that I always have the latest version of MEGAsync?",
+        "context": ""
+    },
+    "1851": {
+        "text": "Will MEGAsync use peer-to-peer transfers to achieve faster syncing between computers in the same local area network?",
+        "context": ""
+    },
+    "1852": {
+        "text": "No. The current incarnation of MEGAsync always syncs via MEGA's cloud infrastructure.",
+        "context": ""
+    },
+    "1853": {
+        "text": "What happens if conflicting concurrent actions are performed on clients synced to the same cloud location?",
+        "context": ""
+    },
+    "1854": {
+        "text": "The current version of MEGAsync does not resolve such clashes in a deterministic manner. Avoid them if possible.",
+        "context": ""
+    },
+    "1856": {
+        "text": "No. Do not expect these to be replicated to the cloud.",
+        "context": ""
+    },
+    "1857": {
+        "text": "Does MEGAsync support syncing the same local folder to different remote locations or the same remote folder to different local locations?",
+        "context": ""
+    },
+    "1858": {
+        "text": "No, unless you want to run multiple MEGAsync processes in parallel, which is not recommended. As a general rule, each filesystem item must only be visible to MEGAsync once, so avoid syncing subfolders of synced folders or placing multiple links to the same filesystem item in a local synced folder.",
+        "context": "Whether you can sync one local folder to multiple remote folders, which is not possible. Each local folder can only be synced to one remote folder"
+    },
+    "1859": {
+        "text": "Where can I find your iOS app?",
+        "context": ""
+    },
     "1860": {
         "text": "You can download and install our iOS app on the [A]App Store[\/A].",
+        "context": ""
+    },
+    "1861": {
+        "text": "Where can I find your Android app?",
         "context": ""
     },
     "1862": {
@@ -4337,6 +4413,10 @@
     },
     "1885": {
         "text": "%1 folders weren't uploaded because they are extremely large. We do this check to prevent the uploading of entire boot volumes, which is inefficient and dangerous.",
+        "context": ""
+    },
+    "1886": {
+        "text": "I am trying to rename a local folder in Explorer, but the name of the corresponding folder in my cloud drive stays the same, no matter what I do.",
         "context": ""
     },
     "1888": {
@@ -4698,6 +4778,10 @@
     "1993": {
         "text": "or [A]create an account[\/A]",
         "context": "New link on the login page, to make it easier for users without an account to find the registration page if they ever end up on the login page."
+    },
+    "1995": {
+        "text": "I just remembered the password of my old account after performing a password reset. How do I get my data back?",
+        "context": "Help section question"
     },
     "1996": {
         "text": "If less than 60 days have passed since you parked your old account, your data can be recovered. Please contact [A]support@mega.nz[\/A] for assistance.",
@@ -7601,6 +7685,18 @@
     },
     "6240": {
         "text": "Windows Phone App",
+        "context": ""
+    },
+    "6243": {
+        "text": "Where do my downloads go?",
+        "context": ""
+    },
+    "6260": {
+        "text": "Audio & Video setup",
+        "context": ""
+    },
+    "6277": {
+        "text": "How do I register for an account?",
         "context": ""
     },
     "6508": {
@@ -14790,10 +14886,6 @@
     "12438": {
         "text": "Please enter your Recovery Key",
         "context": "A message shown to explain that the user has to input (type or paste) their recovery key to continue with the reset password process."
-    },
-    "12439": {
-        "text": "You are using an ephemeral session in this browser. If you want to preserve the uploaded data, click Register in the tab where you see your data. If you do not care about the data, click Logout and try clicking the same account confirmation link again.",
-        "context": "This message will appear when a user is trying to activate their account from an ephemeral session which is not related to the activation link."
     },
     "12440": {
         "text": "You are already logged into a MEGA account from this browser. Click Logout first and then try clicking the same account confirmation link again.",

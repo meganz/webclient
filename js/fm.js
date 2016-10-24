@@ -2361,7 +2361,7 @@ function fmremdupes(test)
 
 function initContextUI() {
 
-    var c = '.context-menu-item';
+    var c = '.context-menu .context-menu-item';
 
     $('.context-menu-section').off('mouseover', c);
     $('.context-menu-section').on('mouseover', c, function() {

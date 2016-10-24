@@ -8832,7 +8832,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     box-sizing: border-box;
     padding: 0 36px;
 }
-.bitcoin-invoice-dialog .price-expired-instruction span {
+.bitcoin-invoice-dialog .price-expired-instruction b {
     font-family: 'source_sans_prosemibold', Arial;
     text-transform: uppercase;
 }
@@ -8959,8 +8959,8 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     font-size: 14px;
     padding: 10px 30px 30px 30px;
 }
-.fm-dialog.bitcoin-provider-failure-dialog .instruction span {
-    font-weight: bold;
+.fm-dialog.bitcoin-provider-failure-dialog .instruction b {
+    font-family: 'source_sans_prosemibold', Arial;
     text-transform: uppercase;
 }
 .fm-dialog.reset-success-st2 {

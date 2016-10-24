@@ -14,7 +14,7 @@ function renderLinuxOptions(linuxsync) {
         ostxt = l[1158].replace('Mac', 'Linux');
     }
     $('.sync-button-txt.small').text(ostxt);
-    $('.sync-bottom-txt.button-txt').safeHTML(l[2027]);
+    $('.sync-bottom-txt.button-txt').safeHTML(l[12486]);
     $('.sync-bottom-txt.linux-txt')
         .safeHTML('<span class="nautilus-lnk">' +
             'MEGA <a href="" class="red">Nautilus extension</a> (@@)</span>', l[2028]);
@@ -117,7 +117,7 @@ function sync_switchOS(os) {
     syncurl = megasync.getMegaSyncUrl(os);
     if (os === 'windows') {
         $('.sync-button-txt.small').text(l[1158]);
-        $('.sync-bottom-txt.button-txt').safeHTML(l[2025]);
+        $('.sync-bottom-txt.button-txt').safeHTML(l[12485]);
         $('.sync-button').removeClass('mac linux');
         $('.sync-button').attr('href', syncurl);
         $('.sync-button').unbind('click');
@@ -131,7 +131,7 @@ function sync_switchOS(os) {
             ostxt = l[1158].replace('Linux', 'Mac');
         }
         $('.sync-button-txt.small').text(ostxt);
-        $('.sync-bottom-txt.button-txt').safeHTML(l[2026]);
+        $('.sync-bottom-txt.button-txt').safeHTML(l[12487]);
         $('.sync-button').removeClass('windows linux').addClass('mac');
         $('.sync-button').attr('href', syncurl);
         $('.sync-button').unbind('click');

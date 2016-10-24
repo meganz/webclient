@@ -458,6 +458,7 @@
             'contacts-section',
             function _shouldShowOnboardingContacts() {
                 if (
+                    u_type !== 0 &&
                     is_fm() &&
                     !folderlink &&
                     M.u.keys().length <= 2 /* 1 of them == u_handle */ &&
@@ -477,6 +478,7 @@
             'chats-section',
             function shouldShowOnboardingChats() {
                 if (
+                    u_type !== 0 &&
                     is_fm() &&
                     !folderlink &&
                     megaChatIsReady &&

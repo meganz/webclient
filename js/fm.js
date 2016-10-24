@@ -1193,7 +1193,7 @@ function showTransferToast(t_type, t_length, isPaused) {
             $toast = $('.toast-notification.download');
             $second_toast = $('.toast-notification.upload');
             if (t_length > 1) {
-                nt_txt = l[7220].replace('XX',t_length);
+                nt_txt = l[12481].replace('%1', t_length);
             } else {
                 nt_txt = l[7222];
             }
@@ -1202,7 +1202,7 @@ function showTransferToast(t_type, t_length, isPaused) {
             $toast = $('.toast-notification.upload');
             $second_toast = $('.toast-notification.download');
             if (t_length > 1) {
-                nt_txt = l[7221].replace('XX',t_length);
+                nt_txt = l[12480].replace('%1', t_length);
             } else {
                 nt_txt = l[7223];
             }
@@ -2354,7 +2354,7 @@ function fmremdupes(test)
 
 function initContextUI() {
 
-    var c = '.context-menu-item';
+    var c = '.context-menu .context-menu-item';
 
     $('.context-menu-section').off('mouseover', c);
     $('.context-menu-section').on('mouseover', c, function() {

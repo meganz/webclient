@@ -395,8 +395,7 @@ function init_page() {
             if (u_type === 3 && !pfid && !folderlink) {
                 mega.config.fetch();
             }
-
-            mega.loadReport = {startTime: Date.now(), stepTimeStamp: Date.now()};
+            mega.initLoadReport();
 
             if (typeof mDB !== 'undefined' && !pfid && (!flhashchange || page === 'fm')) {
                 mDBstart();
@@ -1287,7 +1286,7 @@ function topmenuUI() {
         $('.create-account-button').hide();
         $('.membership-status-block').show();
         $('.top-icon.notification').show();
-        if (u_attr.maf) {
+        if (u_attr.flags.ach) {
             $('.top-icon.achievements').show();
         }
 

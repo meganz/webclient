@@ -172,6 +172,7 @@ function u_checklogin3a(res, ctx) {
                 localStorage.chatDisabled = (u_attr.flags.mcs === 0) ? '1' : '0';
             }
         }
+        u_attr.flags = Object(u_attr.flags);
 
         // If their PRO plan has expired and Last User Payment info is set, configure the dialog
         if (typeof u_attr.lup !== 'undefined') {

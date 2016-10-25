@@ -249,7 +249,7 @@ var Help = (function() {
             $this.autocomplete({
                 source: function(request, response) {
                     var results = $.ui.autocomplete.filter(titles, request.term);
-                    response(results.slice(0, 6));
+                    response(results.slice(0, 7));
                 },
                 appendTo: $this.parent().parent(),
                 select: function(event, ui) {
@@ -263,12 +263,14 @@ var Help = (function() {
                 }
             });
             $this.data('ui-autocomplete')._renderItem = function(ul, item) {
-                var $icon = $("<span>").addClass(item.client.toLowerCase() + " client")
-                    .text(item.client + " :: ");
-                return $("<li>")
+                
+                var $icon = $('<span>').addClass(item.client.toLowerCase() + ' client');
+                var $label = $('<span>').addClass('label-text').text(item.label);
+                
+                return $('<li>')
                     .attr("data-value", item.value)
                     .append($icon)
-                    .append(item.label)
+                    .append($label)
                     .appendTo(ul);
             };
         });

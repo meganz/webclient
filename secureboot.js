@@ -4,6 +4,7 @@ var buildVersion = { website: '', chrome: '', firefox: '', commit: '', timestamp
 var m;
 var b_u = 0;
 var apipath;
+var pageLoadTime;
 var maintenance = false;
 var androidsplash = false;
 var silent_loading = false;
@@ -121,6 +122,11 @@ if (!String.prototype.trim) {
 if (!String.trim) {
     String.trim = function(s) {
         return String(s).trim();
+    };
+}
+if (!Date.now) {
+    Date.now = function now() {
+        return new Date().getTime();
     };
 }
 
@@ -356,6 +362,26 @@ var mega = {
         }
 
         return 0;
+    },
+
+    /** Load performance report */
+    initLoadReport: function() {
+        var r = {startTime: Date.now(), stepTimeStamp: Date.now(), EAGAINs: 0, e500s: 0, errs: 0};
+
+        r.aliveTimer = setInterval(function() {
+            var now = Date.now();
+            if ((now - r.aliveTimeStamp) > 20000) {
+                // Either the browser froze for too long or the computer
+                // was resumed from sleep/hibernation... let's hope it's
+                // the later and do not send this report.
+                r.sent = true;
+                clearInterval(r.aliveTimer);
+            }
+            r.aliveTimeStamp = now;
+        }, 2000);
+
+        this.loadReport = r;
+        this.flags |= window.MEGAFLAG_LOADINGCLOUD;
     },
 
     /** Parameters to append to API requests */
@@ -732,7 +758,7 @@ Object.defineProperty(this, 'mBroadcaster', {
         },
 
         handleEvent: function crossTab_handleEvent(ev) {
-            if (d) console.log('crossTab ' + ev.type + '-event', ev.key, ev.newValue, ev);
+            if (d > 1) console.log('crossTab ' + ev.type + '-event', ev.key, ev.newValue, ev);
 
             if (String(ev.key).indexOf(this.eTag) !== 0) {
                 return;
@@ -1648,12 +1674,12 @@ else if (!b_u)
         jsl.push({f:'css/chat-calls.css', n: 'chat_calls_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/chat-common.css', n: 'chat_common_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/chat-emojione.css', n: 'chat_emojione_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/help2.css', n: 'help_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/vendor/perfect-scrollbar.css', n: 'vendor_ps_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/onboarding.css', n: 'onboarding_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/media-print.css', n: 'media_print_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/help2.css', n: 'help_css', j:2,w:5,c:1,d:1,cache:1});
-
+        
         jsl.push({f:'js/useravatar.js', n: 'contact_avatar_js', j:1,w:3});
         jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
         jsl.push({f:'js/states-countries.js', n: 'states_countries_js', j:1});
@@ -1684,8 +1710,11 @@ else if (!b_u)
         jsl.push({f:'js/vendor/dcraw.js', n: 'dcraw_js', j:1, w:10});
     }
     if (!is_mobile
-            && (typeof Number.isNaN !== 'function'
-                || typeof Set === 'undefined')) {
+            && (
+                typeof Number.isNaN !== 'function' ||
+                typeof Set === 'undefined'
+            )
+    ) {
 
         jsl.push({f:'js/vendor/es6-shim.js', n: 'es6shim_js', j:1});
     }
@@ -2129,6 +2158,11 @@ else if (!b_u)
     }
     window.onload = function ()
     {
+        pageLoadTime = Date.now();
+        mBroadcaster.once('startMega', function() {
+            pageLoadTime = Date.now() - pageLoadTime;
+        });
+
         if (!maintenance && !androidsplash && !is_karma) {
             jsl_start();
         }

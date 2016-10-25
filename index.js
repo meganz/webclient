@@ -1286,7 +1286,7 @@ function topmenuUI() {
         $('.create-account-button').hide();
         $('.membership-status-block').show();
         $('.top-icon.notification').show();
-        if (u_attr.maf) {
+        if (u_attr.flags.ach) {
             $('.top-icon.achievements').show();
         }
 

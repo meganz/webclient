@@ -3307,6 +3307,10 @@ Object.defineProperty(mega, 'api', {
         req: function(params) {
             var promise = new MegaPromise();
 
+            if (typeof params === 'string') {
+                params = {a: params};
+            }
+
             api_req(params, {
                 callback: function(res) {
                     if (typeof res === 'number' && res < 0) {
@@ -4393,6 +4397,26 @@ mBroadcaster.once('startMega', function() {
         };
     }
 });
+
+/** getOwnPropertyDescriptors polyfill */
+mBroadcaster.once('startMega', function() {
+    if (!Object.hasOwnProperty('getOwnPropertyDescriptors')) {
+        Object.defineProperty(Object, 'getOwnPropertyDescriptors', {
+            value: function getOwnPropertyDescriptors(obj) {
+                var result = {};
+
+                for (var key in obj) {
+                    if (obj.hasOwnProperty(key)) {
+                        result[key] = Object.getOwnPropertyDescriptor(obj, key);
+                    }
+                }
+
+                return result;
+            }
+        });
+    }
+});
+
 
 /**
  * Cross-tab communication using WebStorage

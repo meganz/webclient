@@ -3044,6 +3044,8 @@ function dashboardUI() {
     M.accountData(function(account) {
 
         var perc, perc_c, b_exceeded, s_exceeded;
+        var tfsach  = 0;
+        var tfsacht = 0;
 
         // Show ballance
         $('.account.left-pane.balance-info').text(l[7108]);
@@ -3051,35 +3053,22 @@ function dashboardUI() {
 
         $('.fm-account-blocks.storage, .fm-account-blocks.bandwidth').removeClass('exceeded going-out');
 
-        // Free Storage Quota
+        // Achievements Widget
         if (account.maf) {
             $('.fm-right-block.dashboard').addClass('active-achievements');
-            var $fsq = $('.account.widget.achievements');
-            var curStorage = 0;
-            var maxStorage = 0;
-            var bsqStorage = 0;
-            var maf = mega.achievem.prettify(account.maf);
+            var $achWidget = $('.account.widget.achievements');
+            var maf        = mega.achievem.prettify(account.maf);
 
-            Object.keys(maf).forEach(function(k) {
-                if (k === 'baseq') {
-                    bsqStorage = maf[k];
-                    return;
-                }
-                var achStorage = (maf[k][0] * (Object(maf[k].rwds).length || 1));
+            $('.storage.grey span', $achWidget).text(bytesToSize(maf.storage.max, 0));
+            $('.transfers.grey span', $achWidget).text(bytesToSize(maf.transfer.max, 0));
 
-                if (maf[k].rwd) {
-                    curStorage += achStorage;
-                }
-                maxStorage += achStorage;
-            });
+            $('.progress-bar.storage', $achWidget)
+                .css('width', Math.round(maf.storage.current * 100 / maf.storage.max) + '%');
+            $('.progress-bar.transfers', $achWidget)
+                .css('width', Math.round(maf.transfer.current * 100 / maf.transfer.max) + '%');
 
-            curStorage += bsqStorage;
-            maxStorage += bsqStorage;
-
-            bsqStorage = Math.round(bsqStorage * 100 / maxStorage);
-            $('.progress-bar.blue', $fsq).css('width', bsqStorage + '%');
-            $('.progress-size.medium.storage span', $fsq)
-                .safeHTML(bytesToSize(maxStorage, 0));
+            tfsach  = maf.transfer.current;
+            tfsacht = maf.transfer.current * 100 / maf.transfer.max;
         }
         else {
             $('.fm-right-block.dashboard').removeClass('active-achievements');
@@ -3096,10 +3085,8 @@ function dashboardUI() {
 
                 // Display the date their subscription will renew
                 if (timestamp > 0) {
-                    var date = new Date(timestamp * 1000);
-                    var dateString = date.getDate() + ' ' + date_months[date.getMonth()] + ' ' + date.getFullYear();
                     $('.account.left-pane.plan-date-val').text(time2date(timestamp, 2));
-                    $('.account.left-pane.plan-date-info').text(l[7354]);alert(l[7354]);
+                    $('.account.left-pane.plan-date-info').text(l[7354]);
                 }
                 else {
                     // Otherwise hide info blocks
@@ -3231,13 +3218,17 @@ function dashboardUI() {
         /* End of Used Storage progressbar */
 
 
-        /* TODO: Used Bandwidth progressbar */
-        $('.bandwidth .account.progress-bar.grey').css('width',  '0%');
-        $('.bandwidth .account.progress-bar.light-grey').css('width', '0%');
-        // Downloads
-        $('.bandwidth .account.progress-size.base-quota').text('0 MB');
-        // Uploads
-        $('.bandwidth .account.progress-size.achives-quota').text('0 MB');
+        /* Used Bandwidth progressbar */
+        var base = account.downbw_used;
+        var max  = 1.5 * 1024 * 1024 * 1024;
+        if (u_attr.p) {
+            max = account.bw;
+            base += account.servbw_used;
+        }
+        $('.bandwidth .account.progress-size.base-quota').text(bytesToSize(base, 0));
+        $('.bandwidth .account.progress-size.achives-quota').text(bytesToSize(tfsach, 0));
+        $('.bandwidth .account.progress-bar.grey').css('width', Math.round(base * 100 / max / 2) + '%');
+        $('.bandwidth .account.progress-bar.light-grey').css('width', Math.round(tfsacht / 2) + '%');
         /* End of Used Bandwidth progressbar */
 
         // Fill rest of widgets
@@ -3742,12 +3733,12 @@ function accountUI() {
                 var $baseq = $('.achievements-block .data-block.storage .baseq');
                 storageBaseQuota = account.space;
                 $('.progress-txt', $baseq).text(bytesToSize(storageBaseQuota, 0));
-                $('.progress-title', $baseq).text('PRO Quota');
+                $('.progress-title', $baseq).text('PRO Base Quota');
 
                 transferBaseQuota = account.bw;
                 $baseq = $('.achievements-block .data-block.transfer .baseq');
                 $('.progress-txt', $baseq).text(bytesToSize(transferBaseQuota, 0));
-                $('.progress-title', $baseq).text('PRO Quota');
+                $('.progress-title', $baseq).text('PRO Base Quota');
             }
             else {
                 storageBaseQuota = maf.baseq;

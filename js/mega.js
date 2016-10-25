@@ -7861,7 +7861,11 @@ Object.defineProperty(mega, 'achievem', {
 
         prettify: {
             value: function prettify(maf) {
-                var data = Object(clone(maf.u));
+                var data  = Object(clone(maf.u));
+                var quota = {
+                    storage: {base: 0, current: 0, max: 0},
+                    transfer: {base: 0, current: 0, max: 0}
+                };
 
                 var setExpiry = function(data, out) {
                     var time = String(data[2]).split('');
@@ -7932,7 +7936,36 @@ Object.defineProperty(mega, 'achievem', {
                     }
                 }
 
-                data.baseq = maf.s;
+                Object.keys(data)
+                    .forEach(function(k) {
+                        var ach          = data[k];
+                        var base         = Object(ach.rwds).length || 1;
+                        var storageValue = ach[0] * base;
+
+                        if (ach.rwd) {
+                            quota.storage.current += storageValue;
+                        }
+                        quota.storage.max += storageValue;
+
+                        if (ach[1]) {
+                            var transferValue = ach[1] * base;
+
+                            if (ach.rwd) {
+                                quota.transfer.current += transferValue;
+                            }
+                            quota.transfer.max += transferValue;
+                        }
+                    });
+
+                if (Object(u_attr).p) {
+                    quota.storage.base  = Object(M.account).space;
+                    quota.transfer.base = Object(M.account).bw;
+                }
+                else {
+                    quota.storage.base = maf.s;
+                }
+
+                data = Object.create(quota, Object.getOwnPropertyDescriptors(data));
 
                 return data;
             }

@@ -888,6 +888,21 @@ function MegaData()
         configurable: false
     });
 
+    (function(self) {
+        var maf   = false;
+        var saved = 0;
+
+        Object.defineProperty(self, 'maf', {
+            get: function() {
+                if (Object(M.account).maf && saved !== M.account.maf) {
+                    saved = M.account.maf;
+                    maf   = mega.achievem.prettify(M.account.maf);
+                }
+                return maf;
+            }
+        })
+    })(this);
+
     /**
      *
      * @param {array.<JSON_objects>} ipc - received requests
@@ -3493,6 +3508,13 @@ function MegaData()
                         ctx.account.downbw_used = 0;
 
                     M.account = ctx.account;
+
+                    if (M.maf) {
+                        // Add achieved storage quota
+                        ctx.account.space += M.maf.storage.current;
+                        // Add achieved transfer quota
+                        ctx.account.bw += M.maf.transfer.current;
+                    }
 
                     if (ctx.cb)
                         ctx.cb(ctx.account);

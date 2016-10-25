@@ -3057,7 +3057,7 @@ function dashboardUI() {
         if (account.maf) {
             $('.fm-right-block.dashboard').addClass('active-achievements');
             var $achWidget = $('.account.widget.achievements');
-            var maf        = mega.achievem.prettify(account.maf);
+            var maf = M.maf;
 
             $('.storage.grey span', $achWidget).text(bytesToSize(maf.storage.max, 0));
             $('.transfers.grey span', $achWidget).text(bytesToSize(maf.transfer.max, 0));
@@ -3550,7 +3550,7 @@ function accountUI() {
             $('.bandwidth .chart.data span:not(.size-txt)').text('');
             $('.bandwidth .chart.data .pecents-txt').text('used');
         }
-        
+
         /* End of New Used Bandwidth chart */
 
 
@@ -3645,7 +3645,7 @@ function accountUI() {
             var transferBaseQuota = 0;
 
             var ach = mega.achievem;
-            var maf = ach.prettify(account.maf);
+            var maf = M.maf;
             for (var idx in maf) {
                 if (maf.hasOwnProperty(idx)) {
                     idx |= 0;
@@ -3656,16 +3656,16 @@ function accountUI() {
                         var storageValue = (data[0] * base);
                         var $cell = $('.' + selector, $achTable).closest('.achievements-cell');
                         var $storageItem = $('.progress-item.' + selector, $achStorage).removeClass('hidden');
+                        var $transferItem = $('.progress-item.' + selector, $achTransfer).removeClass('hidden');
                         $storageItem.parent().removeClass('hidden');
+                        $transferItem.parent().removeClass('hidden');
 
                         storageMaxValue += storageValue;
                         $('.progress-txt', $storageItem).text(bytesToSize(storageValue, 0));
-                        $('.rewards .reward:first-child .reward-txt', $cell).safeHTML(bytesToSize(data[0], 0, 2));
 
+                        $('.rewards .reward:first-child .reward-txt', $cell).safeHTML(bytesToSize(data[0], 0, 2));
                         if (data[1]) {
                             var transferValue = (data[1] * base);
-                            var $transferItem = $('.progress-item.' + selector, $achTransfer).removeClass('hidden');
-                            $transferItem.parent().removeClass('hidden');
 
                             transferMaxValue += transferValue;
                             $('.progress-txt', $transferItem).text(bytesToSize(transferValue, 0));
@@ -3696,9 +3696,9 @@ function accountUI() {
                                 .safeHTML(bytesToSize(data[1], 0, 2));
                         }
                         else {
+                            $transferItem.addClass('disabled');
                             $('.rewards .reward:last-child', $cell).addClass('hidden');
                         }
-
 
                         if (idx === ach.ACH_INVITE) {
                             ach.bind.call($('.button', $cell), ach.mapToAction[idx]);
@@ -3730,6 +3730,11 @@ function accountUI() {
                                     '<div class="clear"></div>',
                                     'Achieved', data.rwd.date.toLocaleDateString(),
                                     '%1 days left'.replace('%1', data.rwd.left));
+
+                            if (data.rwd.left < 1) {
+                                $storageItem.addClass('disabled');
+                                $transferItem.addClass('disabled');
+                            }
                         }
                         else {
                             ach.bind.call($('.button', $cell), ach.mapToAction[idx]);
@@ -3744,17 +3749,17 @@ function accountUI() {
             // For pro users replace base quota by pro quota
             if (u_attr.p) {
                 var $baseq = $('.achievements-block .data-block.storage .baseq');
-                storageBaseQuota = account.space;
+                storageBaseQuota = maf.storage.base;
                 $('.progress-txt', $baseq).text(bytesToSize(storageBaseQuota, 0));
                 $('.progress-title', $baseq).text('PRO Base Quota');
 
-                transferBaseQuota = account.bw;
+                transferBaseQuota = maf.transfer.base;
                 $baseq = $('.achievements-block .data-block.transfer .baseq');
                 $('.progress-txt', $baseq).text(bytesToSize(transferBaseQuota, 0));
                 $('.progress-title', $baseq).text('PRO Base Quota');
             }
             else {
-                storageBaseQuota = maf.baseq;
+                storageBaseQuota = maf.storage.base;
                 $('.achievements-block .data-block.transfer .baseq').addClass('hidden');
             }
 
@@ -10935,7 +10940,7 @@ function achievementsListDialog(close) {
     $('.achievements-cell', $dialog).addClass('hidden');
 
     var ach = mega.achievem;
-    var maf = ach.prettify(M.account.maf);
+    var maf = M.maf;
     for (var idx in maf) {
         if (maf.hasOwnProperty(idx)) {
             idx |= 0;
@@ -11016,7 +11021,7 @@ function inviteFriendDialog(close) {
     $dialog.find('.fm-dialog-close').rebind('click', inviteFriendDialog);
 
     var ach = mega.achievem;
-    var maf = ach.prettify(M.account.maf);
+    var maf = M.maf;
     maf = maf[ach.ACH_INVITE];
 
     var locFmt = 'Get [S]@@[/S] free storage and [S]@@[/S] of transfer quota for each friend who installs a MEGA app'.replace(/\[S\]/g, '<span>').replace(/\[\/S\]/g, '</span>');
@@ -11274,7 +11279,7 @@ function invitationStatusDialog(close) {
     $dialog.find('.fm-dialog-close').rebind('click', invitationStatusDialog);
 
     var ach = mega.achievem;
-    var maf = ach.prettify(M.account.maf);
+    var maf = M.maf;
     maf = maf[ach.ACH_INVITE];
 
     var locFmt = "Encourage your friend to register and install a MEGA app. As long as your friend uses the same email address as you've entered, you will receive your free [S]@@[/S] of storage space and [S]@@[/S] of transfer quota.".replace(/\[S\]/g, '<span>').replace(/\[\/S\]/g, '</span>');
@@ -11312,7 +11317,7 @@ function invitationStatusDialog(close) {
     });
 
     var ach = mega.achievem;
-    var maf = ach.prettify(M.account.maf);
+    var maf = M.maf;
     maf = maf[ach.ACH_INVITE];
     var rwds = maf.rwds;
     var rlen = rwds.length;

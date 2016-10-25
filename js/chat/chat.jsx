@@ -88,7 +88,9 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
             }
             else {
                 $promise = resp[2];
-                resp[1].show();
+                if (resp[1]) {
+                    resp[1].show();
+                }
             }
         }
         else if(roomType === "group") {
@@ -1307,6 +1309,28 @@ Chat.prototype.openChat = function(jids, type, chatId, chatShard, chatdUrl, setA
                 M.syncUsersFullname(contactHash);
             }
         });
+    }
+
+    if (!chatId && setAsActive === true) {
+        // manual/UI trigger, before the mcf/all chats are already loaded? postpone, since that chat may already
+        // exists, so an 'mcc' API call may not be required
+        if (
+            ChatdIntegration.allChatsHadLoaded.state() === 'pending' ||
+            ChatdIntegration.mcfHasFinishedPromise.state() === 'pending'
+        ) {
+            MegaPromise.allDone([
+                ChatdIntegration.allChatsHadLoaded,
+                ChatdIntegration.mcfHasFinishedPromise,
+            ])
+                .always(function() {
+                    var res = self.openChat(jids, type, chatId, chatShard, chatdUrl, setAsActive);
+                    $promise.linkDoneAndFailTo(
+                        res[2]
+                    );
+                });
+
+            return [roomJid, undefined, $promise];
+        }
     }
 
     var roomFullJid = roomJid + "@" + self.karere.options.mucDomain;

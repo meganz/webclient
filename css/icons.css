@@ -479,7 +479,7 @@
 }
 .medium-icon.rocket {
     background-image: url(../images/mega/nw-fm-sprite_v19.svg);
-    background-position: -10px -10780px;
+    background-position: -10px -10781px;
 }
 .huge-white-icon.achievement {
     background-image: url(../images/mega/account-sprite.png);
@@ -565,6 +565,10 @@
     background-image: url(../images/mega/nw-fm-sprite_v19.svg);
     background-position: -4px -11073px;
 }
+.semi-small-icon.rubbish-arrows {
+    background-image: url(../images/mega/nw-fm-sprite_v19.svg);
+    background-position: -3px -11073px;
+}
 .semi-small-icon.linked {
     background-image: url(../images/mega/nw-fm-sprite_v19.svg);
     background-position: -28px -11071px;
@@ -572,6 +576,22 @@
 .semi-small-icon.star {
     background-image: url(../images/mega/nw-fm-sprite_v19.svg);
     background-position: -4px -11097px;
+}
+.semi-small-icon.cloud {
+    background-image: url(../images/mega/nw-fm-sprite_v19.svg);
+        background-position: -3px -11895px;
+}
+.semi-small-icon.down-arrow {
+    background-image: url(../images/mega/nw-fm-sprite_v19.svg);
+        background-position: -29px -11895px;
+}
+.semi-small-icon.left-arrow-with-dot {
+    background-image: url(../images/mega/nw-fm-sprite_v19.svg);
+            background-position: -2px -11916px;
+}
+.semi-small-icon.circle {
+    background-image: url(../images/mega/nw-fm-sprite_v19.svg);
+        background-position: -3px -11937px;
 }
 .huge-icon.achievement {
     background-image: url(../images/mega/big-achievements.png);

@@ -3365,6 +3365,7 @@ function accountUI() {
     $('.fm-right-account-block').removeClass('hidden');
     $('.nw-fm-left-icon').removeClass('active');
     $('.nw-fm-left-icon.settings').addClass('active');
+    $('.account.data-block.storage-data').removeClass('exceeded');
 
     if ($('.fmholder').hasClass('transfer-panel-opened')) {
         $.transferClose();
@@ -3551,7 +3552,14 @@ function accountUI() {
         $('.bandwidth .chart.data .size-txt').text(bytesToSize(account.servbw_used + account.downbw_used, 0));
         $('.bandwidth .chart.data .pecents-txt').text((b2[0]));
         $('.bandwidth .chart.data .gb-txt').text((b2[1]));
-        $('.bandwidth .chart.data .perc-txt').text(perc_c + '%');
+        if (u_attr.p) {
+            $('.bandwidth .chart.data .perc-txt').text(perc_c + '%');
+        }
+        else {
+            $('.bandwidth .chart.data span:not(.size-txt)').text('');
+            $('.bandwidth .chart.data .pecents-txt').text('used');
+        }
+        
         /* End of New Used Bandwidth chart */
 
 
@@ -3561,10 +3569,11 @@ function accountUI() {
         if (perc_c > 100)
             perc_c = 100;
         if (perc > 99) {
-            $('.fm-account-blocks.storage').addClass('exceeded');
-        }
-        else if (perc > 80) {
-            $('.account.upgrade-account').removeClass('hidden');
+            $('.account.data-block.storage-data').addClass('exceeded');
+            $('.storage-data .button.upgrade-account, .storage-data.chart-warning')
+                .rebind('click', function() {
+                    window.location.hash = 'pro';
+                })
         }
 
         var deg =  230 * perc_c / 100;
@@ -3616,6 +3625,8 @@ function accountUI() {
         $('.tab-content .account.progress-size.inbox').text(bytesToSize(c[k[1]][0]));
         // Available
         $('.tab-content .account.progress-size.available').text(bytesToSize(account.space - account.space_used));
+        // Prgogressbar
+        $('.tab-content .account.progress-bar').css('width', perc_c + '%');
 
 
         /* achievements */
@@ -3627,10 +3638,9 @@ function accountUI() {
 
             // hide everything until seen on the api reply (maf)
             $('.achievements-table .achievements-cell').addClass('hidden');
-            $('.achievements-block .progress-bar.dark-violet').css('width', '0%');
             var $items = $('.account.progress-list.achievem .progress-item')
                 .not('.baseq').addClass('hidden');
-            $items.find('.progress-indicator').removeClass('dark-violet active');
+            $items.find('.progress-indicator').removeClass('active');
             $('.progress-title span', $items).remove();
 
             var $achStorage = $('.account.progress-list.achievem.storage');
@@ -3655,6 +3665,7 @@ function accountUI() {
                         var storageValue = (data[0] * base);
                         var $cell = $('.' + selector, $achTable).closest('.achievements-cell');
                         var $storageItem = $('.progress-item.' + selector, $achStorage).removeClass('hidden');
+                        $storageItem.parent().removeClass('hidden');
 
                         storageMaxValue += storageValue;
                         $('.progress-txt', $storageItem).text(bytesToSize(storageValue, 0));
@@ -3663,13 +3674,14 @@ function accountUI() {
                         if (data[1]) {
                             var transferValue = (data[1] * base);
                             var $transferItem = $('.progress-item.' + selector, $achTransfer).removeClass('hidden');
+                            $transferItem.parent().removeClass('hidden');
 
                             transferMaxValue += transferValue;
                             $('.progress-txt', $transferItem).text(bytesToSize(transferValue, 0));
 
                             if (data.rwd) {
                                 transferCurrentValue += transferValue;
-                                $('.progress-indicator', $transferItem).addClass('dark-violet active');
+                                $('.progress-indicator', $transferItem).addClass('active');
 
                                 if (idx !== ach.ACH_INVITE) {
                                     $('.progress-title', $transferItem)
@@ -3702,7 +3714,7 @@ function accountUI() {
 
                             if (data.rwd) {
                                 storageCurrentValue += storageValue;
-                                $('.progress-indicator', $storageItem).addClass('dark-violet active');
+                                $('.progress-indicator', $storageItem).addClass('active');
 
                                 if (base > 1) {
                                     ach.bind.call($storageItem, '~invitationStatusDialog');
@@ -3716,7 +3728,7 @@ function accountUI() {
                         else if (data.rwd) {
                             // Achieved
                             storageCurrentValue += storageValue;
-                            $('.progress-indicator', $storageItem).addClass('dark-violet active');
+                            $('.progress-indicator', $storageItem).addClass('active');
                             $('.progress-title', $storageItem)
                                 .safeAppend('<span class="red-txt">&nbsp;(@@)</span>', '%1 days left'.replace('%1', data.rwd.left));
 
@@ -3735,6 +3747,7 @@ function accountUI() {
                     }
                 }
             }
+
 
             // For free users only show base quota for storage and remove it for bandwidth.
             // For pro users replace base quota by pro quota
@@ -3778,15 +3791,6 @@ function accountUI() {
 
             storageBaseQuota = Math.round(storageBaseQuota * 100 / storageMaxValue);
             transferBaseQuota = Math.round(transferBaseQuota * 100 / transferMaxValue);
-
-            $('.account.data-block.storage .progress-block .red')
-                .css('width', storageBaseQuota + '%');
-            $('.account.data-block.transfer .progress-block .red')
-                .css('width', transferBaseQuota + '%');
-            $('.account.data-block.storage .progress-block .dark-violet')
-                .css('width', Math.floor(storageCurrentValue * 100 / storageMaxValue - storageBaseQuota) + '%');
-            $('.account.data-block.transfer .progress-block .dark-violet')
-                .css('width', Math.floor(transferCurrentValue * 100 / transferMaxValue - transferBaseQuota) + '%');
 
             // TODO: l[]
             var quotaTxt = '[S]@@[/S] of @@'.replace('[S]', '<span>').replace('[/S]', '</span>');

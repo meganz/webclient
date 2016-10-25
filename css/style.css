@@ -145,6 +145,14 @@ body {
 ::-moz-selection {
  background: rgba(0,0,0,0.1);
 }
+input[type='number'] {
+    -moz-appearance:textfield;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}
 input[type="search"], input[type="search"]::-webkit-search-decoration, input[type="search"]::-webkit-search-cancel-button, input[type="search"]::-webkit-search-results-button, input[type="search"]::-webkit-search-results-decoration {
  -webkit-appearance: none;
 }
@@ -1042,11 +1050,38 @@ a.account-manage-button:hover {
     color: #777777;
 }
 .chart.data .perc-txt {
-    display: block;
     font-size: 34px;
     line-height: 40px;
     color: #777777;
     font-family: 'source_sans_prolight', Arial;
+    position: relative;
+    display: inline-block;
+    height: 40px;
+}
+.free .bandwidth .chart.data .perc-txt {
+        background-image: url(../images/mega/nw-fm-sprite_v19.svg);
+    background-position: -10px -11854px;
+    width: 30px;
+}
+.free .bandwidth .chart.data .perc-txt::before {
+    content: '\00a0';
+}
+    
+.fm-account-blocks .perc-txt::after {
+    width: 8px;
+    height:8px;
+    content:'';
+    -moz-border-radius: 100%;
+    -webkit-border-radius: 100%;
+    border-radius: 100%;
+    position:absolute;
+    right: -11px;
+    top: 0px;
+    background-color: #D90007;
+    display: none;
+}
+.fm-account-blocks.exceeded.perc-txt::after {
+    display: block;
 }
 .chart.data .size-txt {
     display: block;
@@ -8063,6 +8098,12 @@ color: white;
     line-height: 32px;
     color: #333333;
 }
+.fm-account-input input:-webkit-autofill {
+        -webkit-box-shadow: 0 0 0 50px #f1f1f1 inset;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+}
 .fm-account-change-email {
     font-size: 12px;
     line-height: 16px;
@@ -10713,8 +10754,25 @@ table {
     line-height: 24px;
     color: #666666;
 }
+.fm-account-header.big {
+    font-size: 18px;
+        padding: 18px 0 0 0;
+}
+.fm-account-header.light-grey {
+    color: #999999;
+}
 .fm-account-history .fm-account-header {
     line-height: 16px;
+}
+.account.data-txt {
+        color: #333333;
+    font-size: 14px;
+    line-height: 18px;
+    padding: 12px 0 0 0;
+    margin: 0 0 -9px 0;
+}
+.account.data-txt span {
+    color:#FF333A;
 }
 .fm-account-header .semi-big-icon {
     vertical-align: top;
@@ -10831,7 +10889,10 @@ table {
     font-size: 18px;
     line-height: 24px;
     color: #777777;
-    padding: 21px 0 4px 0;
+    padding: 20px 0 5px 0;
+}
+.account.quota-txt.low-pad {
+    padding: 4px 0 4px 0;
 }
 .account.paragraph {
     font-size: 14px;
@@ -10866,6 +10927,10 @@ table {
     right: 2px;
     top: 2px;
     display: none;
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
+    -moz-opacity: 0.5;
+    -khtml-opacity: 0.5;
+    opacity: 0.5;
 }
 .active-achievements .medium-icon.rocket, .active-achievements .account.tab-lnk.achievements {
     display: block;
@@ -11071,7 +11136,12 @@ table {
     table-layout: fixed;
     width: 100%;
     padding: 0 0 0 0;
-    margin: 0 0 -8px 0;
+}
+.active-achievements .account-form-wraper {
+    margin: 0 0 41px 0;
+}
+.low-width .fm-account-header.big {
+    padding-top: 0;
 }
 .account-form-wraper.password {
     margin: 0 0 -25px 0;
@@ -11360,7 +11430,7 @@ table {
 .account.widget .fm-account-blocks {
     padding-top: 10px;
 }
-.chart-warning {
+.chart-warning, .chart-warning.red {
     font-size: 14px;
     line-height: 18px;
     color: #333333;
@@ -11563,11 +11633,19 @@ table {
     -webkit-border-radius: 8px;
     border-radius: 8px;
     margin-bottom: 2px;
+    background-color: white;
+        -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    -webkit-box-shadow: inset 0px 0px 0px 1px rgba(153,153,153,1);
+-moz-box-shadow: inset 0px 0px 0px 1px rgba(153,153,153,1);
+box-shadow: inset 0px 0px 0px 1px rgba(153,153,153,1);
 }
 .tiny .account.progress-bar {
     height: 8px;
     position: relative;
     overflow: hidden;
+    background-color: #666666;
 }
 .tiny .account.progress-bar::after {
     content: '';
@@ -24611,10 +24689,26 @@ div.camera-bottom-txt {
     float: right;
 }
 .account.data-block {
-    padding: 30px 36px 16px 36px;
+    padding: 30px 36px 29px 36px;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
+}
+.data-block.storage-data .chart-warning, .data-block.storage-data .account.buttons {
+    display: none;
+    
+}
+.data-block.exceeded .chart-warning, .data-block.exceeded .account.buttons {
+    display: block;
+    
+}
+.data-block.storage-data .chart-warning {
+    margin: 12px 0 -15px 10px;
+}
+.exceeded .account.progress-bar {
+    
+    background-color: #D90007;
+    width: 100% !important;
 }
 .account.data-block.first {
     padding: 30px 30px 16px 36px;
@@ -24633,17 +24727,8 @@ div.camera-bottom-txt {
     max-width: 544px;
     padding-right: 28px;
 }
-.account-profile.half-sized {
-    width: 520px;
-}
 .active-achievements .account-profile.half-sized {
     width: 50%;
-}
-.account-profile.second {
-    display: none;
-}
-.active-achievements .account-profile.second {
-    display: block;
 }
 .low-width .account-profile.half-sized {
     width: 520px;
@@ -24677,7 +24762,20 @@ div.camera-bottom-txt {
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
 }
-.account.progress-list.half-sized + .account.progress-list.half-sized {
+.account.progress-list.hidden {
+    display: none;
+}
+.account.progress-list i {
+    float: left;
+    margin: 3px 5px 0 0;
+}
+.empty .account.progress-list i, .empty .account.progress-title {
+        filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
+    -moz-opacity: 0.3;
+    -khtml-opacity: 0.3;
+    opacity: 0.3;
+}
+.account.progress-list.half-sized:not(.hidden) + .account.progress-list.half-sized {
     padding: 15px 0 14px 35px;
 }
 .account.progress-item {
@@ -24713,72 +24811,17 @@ div.camera-bottom-txt {
     border-radius: 100%;
 }
 .account.progress-indicator.active {
-    background-color: #CCCCCC;
-}
-.account.progress-indicator.red {
     border-color: #FF333A;
-}
-.account.progress-indicator.red.active, .account.progress-bar.red {
     background-color: #FF333A;
 }
-.account.progress-indicator.dark-violet {
-    border-color: #514152;
+.account.progress-item.disabled {
+        filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
+    -moz-opacity: 0.2;
+    -khtml-opacity: 0.2;
+    opacity: 0.2;
 }
-.account.progress-indicator.dark-violet.active, .account.progress-bar.dark-violet {
-    background-color: #514152;
-}
-.account.progress-indicator.blue {
-    border-color: #2BA6DE;
-}
-.account.progress-indicator.blue.active, .account.progress-bar.blue {
-    background-color: #2BA6DE;
-}
-.account.progress-indicator.orange {
-    border-color: #F27800;
-}
-.account.progress-indicator.orange.active, .account.progress-bar.orange {
-    background-color: #FFA500;
-}
-.account.progress-indicator.yellow {
-    border-color: #FFD500;
-}
-.account.progress-indicator.yellow.active, .account.progress-bar.yellow {
-    background-color: #FFD500;
-}
-.account.progress-indicator.green {
-    border-color: #31B500;
-}
-.account.progress-indicator.green.active, .account.progress-bar.green {
-    background-color: #31B500;
-}
-.account.progress-indicator.dark-red {
-    border-color: #D90007;
-}
-.account.progress-indicator.dark-red.active, .account.progress-bar.dark-red {
-    background-color: #D90007;
-}
-.account.progress-indicator.brown {
-    border-color: #F27800;
-}
-.account.progress-indicator.brown.active, .account.progress-bar.brown {
-    background-color: #F27800;
-}
-.account.progress-indicator.dark-grey {
-    border-color: #666666;
-}
-.account.progress-indicator.dark-grey.active, .account.progress-bar.dark-grey {
-    background-color: #666666;
-}
-.account.progress-indicator.grey {
-    border-color: #999999;
-}
-.account.progress-indicator.grey.active, .account.progress-bar.grey {
-    background-color: #999999;
-}
-.account.progress-indicator.light-grey {
+.disabled .account.progress-indicator {
     border-color: #CCCCCC;
-}
-.account.progress-indicator.light-grey.active, .account.progress-bar.light-grey {
     background-color: #CCCCCC;
 }
 .account.progress-txt {
@@ -24947,6 +24990,20 @@ div.camera-bottom-txt {
     line-height: 22px;
     color: #333333;
 }
+.account.star-description {
+    font-size: 14px;
+    line-height: 18px;
+    color:#777777;
+    margin: 0 0 -18px 0;
+}
+.red-star {
+    color: #FF333A;
+}
+.account .progress-title.star::after {
+    content:' *';
+    display: inline;
+    color: #FF333A;
+}
 .achievement-full.description {
     font-size: 14px;
     line-height: 18px;
@@ -25051,13 +25108,15 @@ div.camera-bottom-txt {
     font-size: 14px;
     line-height: 18px;
     color: #666666;
-    padding: 14px 0 0 0;
-    margin: 0 0 -1px 0;
+    padding: 12px 0 18px 0;
 }
 .account.plan-info-block {
     display: table;
     width: 100%;
-    margin: 10px 0 16px 0;
+    margin: 10px 0 30px 0;
+}
+.active-achievements .account.plan-info-block, .low-width .account.plan-info-block {
+        margin: 10px 0 9px 0;
 }
 .account.plan-comment {
     font-size: 14px;
@@ -25066,6 +25125,7 @@ div.camera-bottom-txt {
 }
 .active-achievements .account.plan-comment {
     display: block;
+    line-height: 21px;
 }
 .account.plan-comment.blue {
     color: #2BA6DE;
@@ -25080,7 +25140,12 @@ div.camera-bottom-txt {
     display: table-cell;
     vertical-align: middle;
     padding: 10px 0 9px 0;
-    line-height: 22px;
+}
+.active-achievements .account.plan-info.bandwidth {
+        padding: 13px 0 10px 0;
+}
+.active-achievements .account.plan-info.expiry {
+        padding: 17px 0 18px 0;
 }
 .account.plan-info {
     font-size: 16px;

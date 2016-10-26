@@ -1,3 +1,4 @@
+
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
 .try-new-close {
     background-image: url(../images/mega/close-white-icon@2x.png);
@@ -471,7 +472,7 @@ body.pro:after {
     background-image: url("../images/mega/help2/welcome_icons@2x.png");
     background-size: 250px auto;
 }
-.huge-white-icon.achievement {
+.huge-white-icon.achievement, .account.bonuses-icon, .dropdown.transfer-icon {
     background-image: url(../images/mega/account-sprite@2x.png);
     background-size: 172px auto;
 }

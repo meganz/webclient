@@ -146,12 +146,10 @@ body {
  background: rgba(0,0,0,0.1);
 }
 input[type='number'] {
-    -moz-appearance:textfield;
+    -moz-appearance: textfield;
 }
-
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
+ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
+ -webkit-appearance: none;
 }
 input[type="search"], input[type="search"]::-webkit-search-decoration, input[type="search"]::-webkit-search-cancel-button, input[type="search"]::-webkit-search-results-button, input[type="search"]::-webkit-search-results-decoration {
  -webkit-appearance: none;
@@ -176,6 +174,9 @@ div, span, input, object, texarea {
 }
 .right-textalign {
     text-align: right;
+}
+.centered-textalign {
+    text-align: center;
 }
 a, a:link, a:visited, a:hover, a:active {
     outline: none;
@@ -1059,22 +1060,21 @@ a.account-manage-button:hover {
     height: 40px;
 }
 .free .bandwidth .chart.data .perc-txt {
-        background-image: url(../images/mega/nw-fm-sprite_v19.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v19.svg);
     background-position: -10px -11854px;
     width: 30px;
 }
 .free .bandwidth .chart.data .perc-txt::before {
     content: '\00a0';
 }
-    
 .fm-account-blocks .perc-txt::after {
     width: 8px;
-    height:8px;
-    content:'';
+    height: 8px;
+    content: '';
     -moz-border-radius: 100%;
     -webkit-border-radius: 100%;
     border-radius: 100%;
-    position:absolute;
+    position: absolute;
     right: -11px;
     top: 0px;
     background-color: #D90007;
@@ -3862,9 +3862,7 @@ label.iPhoneCheckLabelOff span {
 .contacts-panel .fm-contact-requests, .contacts-panel .fm-received-requests {
     display: block;
 }
-.not-logged .contacts-panel .fm-contact-requests,
-.not-logged .nw-fm-left-icon.conversations,
-.not-logged .contacts-panel .fm-received-requests {
+.not-logged .contacts-panel .fm-contact-requests, .not-logged .nw-fm-left-icon.conversations, .not-logged .contacts-panel .fm-received-requests {
     display: none;
 }
 .content-panel {
@@ -8101,10 +8099,10 @@ color: white;
     color: #333333;
 }
 .fm-account-input input:-webkit-autofill {
-        -webkit-box-shadow: 0 0 0 50px #f1f1f1 inset;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
+ -webkit-box-shadow: 0 0 0 50px #f1f1f1 inset;
+ -moz-border-radius: 4px;
+ -webkit-border-radius: 4px;
+ border-radius: 4px;
 }
 .fm-account-change-email {
     font-size: 12px;
@@ -10758,7 +10756,7 @@ table {
 }
 .fm-account-header.big {
     font-size: 18px;
-        padding: 18px 0 0 0;
+    padding: 18px 0 0 0;
 }
 .fm-account-header.light-grey {
     color: #999999;
@@ -10767,14 +10765,14 @@ table {
     line-height: 16px;
 }
 .account.data-txt {
-        color: #333333;
+    color: #333333;
     font-size: 14px;
     line-height: 18px;
     padding: 12px 0 0 0;
     margin: 0 0 -9px 0;
 }
 .account.data-txt span {
-    color:#FF333A;
+    color: #FF333A;
 }
 .fm-account-header .semi-big-icon {
     vertical-align: top;
@@ -10929,7 +10927,7 @@ table {
     right: 2px;
     top: 2px;
     display: none;
-    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     -moz-opacity: 0.5;
     -khtml-opacity: 0.5;
     opacity: 0.5;
@@ -11311,11 +11309,11 @@ table {
     text-align: left;
 }
 .fm-close-all-sessions span {
-    background: rgba(255, 255, 255, 1) url("http://localhost:8089/images/mega/nw-fm-sprite_v19.svg") no-repeat scroll -18px -5468px;
+    background: rgba(255, 255, 255, 1) url(../images/mega/nw-fm-sprite_v19.svg) no-repeat scroll -18px -5468px;
     padding-left: 20px;
 }
 .settings-logout {
-    background: #ccc url("../images/mega/nw-fm-sprite_v19.svg") no-repeat scroll 5px -8423px;
+    background: #ccc url(../images/mega/nw-fm-sprite_v19.svg) no-repeat scroll 5px -8423px;
     cursor: pointer;
     float: right;
     margin-right: 26px;
@@ -11396,8 +11394,6 @@ table {
 }
 .account.left-pane .button {
     margin: 7px 0 0 0;
-    height: 36px;
-    line-height: 36px;
     max-width: 100%;
 }
 .account.left-pane .default-grey-button {
@@ -11501,13 +11497,53 @@ table {
     margin: 18px 0 -1px 0;
 }
 .account.data-table.data {
-    margin: 17px 0 12px 0;
+    margin: 9px 0 -8px 0;
 }
 .account.data-table.hidden {
     display: none;
 }
 .account.data-item {
     display: table-row;
+}
+.account.bonuses-block {
+    float: left;
+    width: 50%;
+    padding: 13px 0 8px 0;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.account.bonuses-block.second {
+    padding-left: 6px;
+}
+.account.bonuses-icon {
+    width: 52px;
+    height: 52px;
+    float: left;
+    background-image: url(../images/mega/account-sprite.png);
+    background-position: -2px -464px;
+    background-repeat: no-repeat;
+    margin-left: -2px;
+}
+.account.bonuses-icon.transfer {
+    background-position: -102px -464px;
+}
+.account.bonuses-info {
+    margin: 0 0 0 62px
+}
+.account.bonuses-title {
+    font-size: 16px;
+    line-height: 18px;
+    color: #666666;
+    padding: 2px 0 8px 0;
+}
+.account.bonuses-size {
+    font-size: 18px;
+    line-height: 18px;
+    color: #333333;
+}
+.account.bonuses-size.light-grey {
+    color: #999999;
 }
 .chat-widget .account.data-item, .chat-widget .account.widget.title {
     cursor: pointer;
@@ -11571,13 +11607,41 @@ table {
     background-position: -13px -11775px;
     background-repeat: no-repeat;
     cursor: pointer;
+    position: relative;
 }
-.account.rounded-icon:hover {
+.account.rounded-icon:hover, .account.rounded-icon.active {
     background-color: rgba(119,119,119,1);
+}
+.dropdown.transfer-icon {
+    background-image: url(../images/mega/account-sprite.png);
+    background-repeat: no-repeat;
+    background-position: -3px -554px;
+    width: 68px;
+    height: 68px;
+    margin: 23px auto 0 auto;
+}
+.dropdown.body.popup.bandwidth-info {
+    bottom: 34px;
+    width: 400px;
+    left: 50%;
+    margin-left: -200px;
+    cursor: default;
+}
+.low-width .dropdown.body.popup.bandwidth-info {
+    left: auto;
+    right: -24px;
+}
+.low-width .dropdown.bandwidth-info .dropdown-white-arrow {
+    right: 23px;
+    left: auto;
 }
 .small.account.progress-list {
     padding: 9px 0 11px 0;
     display: block;
+}
+.account.widget .medium.account.progress-list {
+    padding: 15px 0 0 0;
+    margin: 0 0 -8px 0;
 }
 .small.account.progress-list.colorized {
     padding: 12px 0 2px 0;
@@ -11586,7 +11650,7 @@ table {
     padding: 18px 0 12px 0;
     display: block;
 }
-.small .account.progress-indicator {
+.small .account.progress-indicator, .medium .account.progress-indicator {
     width: 8px;
     height: 8px;
     float: left;
@@ -11611,22 +11675,16 @@ table {
     float: left;
     padding: 0;
 }
-.small .account.progress-size {
-    float: right;
-    font-size: 14px;
-    line-height: 24px;
-    color: #777777;
-}
-.account.progress-title.free, .free .account.progress-title.pro {
-    display: none;
-}
-.free .account.progress-title.free {
-    display: block;
-}
 .medium .account.progress-size {
     float: right;
     font-size: 18px;
     line-height: 22px;
+    color: #777777;
+}
+.small.account.progress-size {
+    float: right;
+    font-size: 14px;
+    line-height: 24px;
     color: #777777;
 }
 .account.progress-block.tiny {
@@ -11636,12 +11694,24 @@ table {
     border-radius: 8px;
     margin-bottom: 2px;
     background-color: white;
-        -webkit-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     -webkit-box-shadow: inset 0px 0px 0px 1px rgba(153,153,153,1);
--moz-box-shadow: inset 0px 0px 0px 1px rgba(153,153,153,1);
-box-shadow: inset 0px 0px 0px 1px rgba(153,153,153,1);
+    -moz-box-shadow: inset 0px 0px 0px 1px rgba(153,153,153,1);
+    box-shadow: inset 0px 0px 0px 1px rgba(153,153,153,1);
+}
+.account.progress-block.tiny.filled {
+    background-color: #EEEEEE;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+}
+.account.bandwidth-data.pro, .enabled-pr-bar .account.bandwidth-data.free {
+    display: none;
+}
+.enabled-pr-bar .account.bandwidth-data.pro {
+    display: block;
 }
 .tiny .account.progress-bar {
     height: 8px;
@@ -24698,17 +24768,14 @@ div.camera-bottom-txt {
 }
 .data-block.storage-data .chart-warning, .data-block.storage-data .account.buttons {
     display: none;
-    
 }
 .data-block.exceeded .chart-warning, .data-block.exceeded .account.buttons {
     display: block;
-    
 }
 .data-block.storage-data .chart-warning {
     margin: 12px 0 -15px 10px;
 }
 .exceeded .account.progress-bar {
-    
     background-color: #D90007;
     width: 100% !important;
 }
@@ -24771,8 +24838,8 @@ div.camera-bottom-txt {
     float: left;
     margin: 3px 5px 0 0;
 }
-.empty .account.progress-list i, .empty .account.progress-title {
-        filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
+.empty.account.pr-item i, .empty .account.progress-title {
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     -moz-opacity: 0.3;
     -khtml-opacity: 0.3;
     opacity: 0.3;
@@ -24816,8 +24883,16 @@ div.camera-bottom-txt {
     border-color: #FF333A;
     background-color: #FF333A;
 }
+.account.progress-indicator.grey.active, .account.progress-bar.grey {
+    background-color: #666666;
+    border-color: #666666;
+}
+.account.progress-indicator.light-grey.active, .account.progress-bar.light-grey {
+    background-color: #CCCCCC;
+    border-color: #CCCCCC;
+}
 .account.progress-item.disabled {
-        filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
     -moz-opacity: 0.2;
     -khtml-opacity: 0.2;
     opacity: 0.2;
@@ -24857,7 +24932,7 @@ div.camera-bottom-txt {
     font-size: 14px;
     color: #666666;
     margin: 0 0 0 5px;
-        -webkit-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
@@ -25006,14 +25081,14 @@ div.camera-bottom-txt {
 .account.star-description {
     font-size: 14px;
     line-height: 18px;
-    color:#777777;
+    color: #777777;
     margin: 0 0 -18px 0;
 }
 .red-star {
     color: #FF333A;
 }
 .account .progress-title.star::after {
-    content:' *';
+    content: ' *';
     display: inline;
     color: #FF333A;
 }
@@ -25108,14 +25183,13 @@ div.camera-bottom-txt {
     padding: 18px 24px 23px 24px;
     z-index: 1;
 }
+.bandwidth .account.widget.content {
+    z-index: 2;
+}
 .account.widget.title {
     font-size: 18px;
     line-height: 24px;
     color: #999999;
-    white-space: nowrap;
-    overflow: hidden;
-    -o-text-overflow: ellipsis;
-    text-overflow: ellipsis;
 }
 .account.widget.text {
     font-size: 14px;
@@ -25129,7 +25203,7 @@ div.camera-bottom-txt {
     margin: 10px 0 30px 0;
 }
 .active-achievements .account.plan-info-block, .low-width .account.plan-info-block {
-        margin: 10px 0 9px 0;
+    margin: 10px 0 9px 0;
 }
 .account.plan-comment {
     font-size: 14px;
@@ -25155,10 +25229,10 @@ div.camera-bottom-txt {
     padding: 10px 0 9px 0;
 }
 .active-achievements .account.plan-info.bandwidth {
-        padding: 13px 0 10px 0;
+    padding: 13px 0 10px 0;
 }
 .active-achievements .account.plan-info.expiry {
-        padding: 17px 0 18px 0;
+    padding: 17px 0 18px 0;
 }
 .account.plan-info {
     font-size: 16px;
@@ -25180,6 +25254,13 @@ div.camera-bottom-txt {
 }
 .account.buttons {
     clear: both;
+}
+.widget.buttons {
+    margin: 11px -8px -7px 0;
+    clear: both;
+}
+.account.widget.text + .widget.buttons {
+    margin: -15px -8px -7px 0;
 }
 .account.buttons .button {
     margin-top: 27px;

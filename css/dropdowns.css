@@ -64,7 +64,7 @@
     display: none;
     position: absolute;
     left: 50%;
-    margin-left: -11px;
+    margin-left: -12px;
     top: -11px;
     width: 24px;
     height: 11px;
@@ -274,4 +274,18 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     width: 14px;
     height: 14px;
     background-image: url(../images/mega/top-login-sprite_v7.png);
+}
+.dropdown.text-block {
+    font-size: 14px;
+    line-height: 20px;
+    color: #666666;
+    position: relative;
+    margin: 0;
+    padding: 11px 24px 24px 24px;
+}
+.dropdown.text-block span {
+    color: #424242;
+}
+.dropdown.text-block a {
+    color: #FF4D4A;
 }

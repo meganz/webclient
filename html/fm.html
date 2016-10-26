@@ -331,7 +331,7 @@
                         <div class="account left-pane big-txt plan-date-val">
 
                         </div>
-                        <div class="button default-white-button right upgrade-account"><span>Upgrade Account</span></div>
+                        <div class="button default-white-button semi-big right upgrade-account"><span>Upgrade Account</span></div>
                         <div class="clear"></div>
                     </div>
                     <div class="account left-pane divider"></div>
@@ -342,7 +342,7 @@
                         <div class="account left-pane info-txt">
                             Your password isn’t stored by MEGA so we can’t recover it for you. For reliable access to your account we recommend that you download and save your Recovery Key in a secure medium.
                         </div>
-                        <div class="button default-grey-button right backup-master-key"><span>[$7412]</span></div>
+                        <div class="button default-grey-button semi-big right backup-master-key"><span>[$7412]</span></div>
                         <div class="clear"></div>
                     </div>
                 </div>
@@ -926,7 +926,7 @@
                                         </div>
 
                                         <div class="account progress-list medium">
-                                            <div class="account pr-item">
+                                            <div class="account pr-item pr0">
                                                 <i class="semi-small-icon cloud"></i>
                                                 <div class="account progress-title">
                                                     [$164]
@@ -934,7 +934,7 @@
                                                 <div class="account progress-size cloud-drive"></div>
                                                 <div class="clear"></div>
                                             </div>
-                                            <div class="account pr-item">
+                                            <div class="account pr-item pr1">
                                                 <i class="semi-small-icon down-arrow"></i>
                                                 <div class="account progress-title">
                                                     [$166]
@@ -942,7 +942,7 @@
                                                 <div class="account progress-size inbox"></div>
                                                 <div class="clear"></div>
                                             </div>
-                                            <div class="account pr-item">
+                                            <div class="account pr-item pr2">
                                                 <i class="semi-small-icon left-arrow-with-dot"></i>
                                                 <div class="account progress-title">
                                                     [$5542]
@@ -950,7 +950,7 @@
                                                 <div class="account progress-size incoming-shares"></div>
                                                 <div class="clear"></div>
                                             </div>
-                                            <div class="account pr-item">
+                                            <div class="account pr-item pr3">
                                                 <i class="semi-small-icon rubbish-arrows"></i>
                                                 <div class="account progress-title">
                                                     [$168]
@@ -958,7 +958,7 @@
                                                  <div class="account progress-size rubbish-bin"></div>
                                                 <div class="clear"></div>
                                             </div>
-                                            <div class="account pr-item">
+                                            <div class="account pr-item pr4">
                                                 <i class="semi-small-icon circle"></i>
                                                 <div class="account progress-title">
                                                     [$1352]
@@ -2206,59 +2206,53 @@
                     <div class="account widget body storage">
                         <div class="account widget content">
                             <div class="account widget title">
-                                Space
+                                Used Storage
                             </div>
-                            <div class="account progress-list small">
+                            <div class="account progress-list medium">
                                 <div class="account pr-item">
                                     <i class="semi-small-icon cloud"></i>
-                                    <div class="account progress-perc"></div>
+                                    <div class="account progress-perc pr0"></div>
                                     <div class="account progress-title">
                                         [$164]
                                     </div>
-                                     <div class="account progress-size cloud-drive">
+                                     <div class="account progress-size small cloud-drive">
                                         0 MB
                                     </div>
                                     <div class="clear"></div>
                                 </div>
                                 <div class="account pr-item">
                                     <i class="semi-small-icon down-arrow"></i>
-                                    <div class="account progress-perc"></div>
+                                    <div class="account progress-perc pr3"></div>
                                     <div class="account progress-title">
                                         [$166]
                                     </div>
-                                     <div class="account progress-size inbox">
+                                     <div class="account progress-size small inbox">
                                         0 MB
                                     </div>
                                     <div class="clear"></div>
                                 </div>
                                 <div class="account pr-item">
                                     <i class="semi-small-icon left-arrow-with-dot"></i>
-                                    <div class="account progress-perc"></div>
+                                    <div class="account progress-perc pr2"></div>
                                     <div class="account progress-title">
                                         [$5542]
                                     </div>
-                                     <div class="account progress-size incoming-shares">
+                                     <div class="account progress-size small incoming-shares">
                                         0 MB
                                     </div>
                                     <div class="clear"></div>
                                 </div>
                                 <div class="account pr-item">
                                     <i class="semi-small-icon rubbish-arrows"></i>
-                                    <div class="account progress-perc"></div>
+                                    <div class="account progress-perc pr1"></div>
                                     <div class="account progress-title">
                                         [$168]
                                     </div>
-                                     <div class="account progress-size rubbish-bin">
+                                     <div class="account progress-size small rubbish-bin">
                                         0 MB
                                     </div>
                                     <div class="clear"></div>
                                 </div>
-                            </div>
-                            <div class="account progress-block tiny">
-                                <div class="account progress-bar red"></div>
-                                <div class="account progress-bar brown"></div>
-                                <div class="account progress-bar orange"></div>
-                                <div class="account progress-bar dark-grey"></div>
                             </div>
                         </div>
                     </div>
@@ -2266,35 +2260,55 @@
                     <div class="account widget body bandwidth">
                         <div class="account widget content">
                             <div class="account widget title">
-                                <div class="account rounded-icon info right"></div>
+                                <div class="account rounded-icon info right">
+                                    <div class="dropdown body popup dropdown-arrow down-arrow bandwidth-info hidden">
+                                        <i class="dropdown-white-arrow"></i>
+                                        <div class="dropdown transfer-icon"></div>
+                                        <p class="dropdown text-block centered-textalign">
+                                            <span>Base Quota</span> is the free transfer allowance for your IP address. This value is dynamic and depends on the amount of unused bandwidth we have available.<br />
+You can increase your quota by completing <span>Account Achievements</span> or by <a href="#pro">Upgrading to PRO</a>.
+                                        </p>
+                                    </div>
+                                </div>
                                 <span>Transfer Quota</span>
                             </div>
-                              <div class="account progress-list small">
-                                <div class="account progress-indicator grey active"></div>
-                                <div class="account progress-title free">
-                                    Base Quota (IP)
-                                </div>
-                                <div class="account progress-title pro">
-                                    PRO Base Quota
-                                </div>
-                                 <div class="account progress-size base-quota">
-                                    0 MB
-                                </div>
-                                <div class="clear"></div>
-                                <div class="account-achievements">
+                            <div class="account bandwidth-data pro">
+                                <div class="account progress-list small">
+                                    <div class="account progress-indicator grey active"></div>
+                                    <div class="account progress-title">
+                                        Used
+                                    </div>
+                                     <div class="account progress-size small base-quota">
+                                        0 MB
+                                    </div>
+                                    <div class="clear"></div>
                                     <div class="account progress-indicator light-grey active"></div>
                                     <div class="account progress-title">
-                                        Account Achievements
+                                        Avaiable
                                     </div>
-                                     <div class="account progress-size achives-quota">
+                                     <div class="account progress-size small available-quota">
                                         0 MB
                                     </div>
                                     <div class="clear"></div>
                                 </div>
+                                <div class="account progress-block tiny filled">
+                                    <div class="account progress-bar grey"></div>
+                                </div>
                             </div>
-                            <div class="account progress-block tiny">
-                                <div class="account progress-bar grey"></div>
-                                <div class="account progress-bar light-grey"></div>
+                            <div class="account bandwidth-data free">
+                                <div class="account progress-list medium">
+                                    <div class="account progress-title">
+                                        Used quota for the last 6 hours:
+                                    </div>
+                                     <div class="account progress-size small base-quota">
+                                        0 MB
+                                    </div>
+                                    <div class="clear"></div>
+                                </div>
+                                <div class="widget buttons">
+                                    <div class="button default-white-button semi-big more-quota right"><span>Get more transfer quota</span></div>
+                                    <div class="clear"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -2303,36 +2317,30 @@
                     <div class="account widget body achievements">
                         <div class="account widget content">
                             <div class="account widget title">
-                                Achievements
+                                Unlocked bonuses:
                             </div>
+                            <div class="account bonuses-block">
+                                <div class="account bonuses-icon storage"></div>
+                                <div class="account bonuses-info">
+                                    <div class="account bonuses-title">Storage Quota</div>
+                                    <div class="account bonuses-size storage light-grey">0 GB</div>
+                                </div>
+                            </div>
+                            <div class="account bonuses-block second">
+                                <div class="account bonuses-icon transfer"></div>
+                                <div class="account bonuses-info">
+                                    <div class="account bonuses-title">Transfer Quota</div>
+                                    <div class="account bonuses-size transfer light-grey">0 GB</div>
+                                </div>
+                            </div>
+                            <div class="clear"></div>
                             <div class="account widget text">
-                                You can unlock more free storage and transfer quota simply using our products. Simple. Easy.
+                                You can unlock more free storage and transfer quota by using our products. Simple. Easy.
                             </div>
-                            <div class="account progress-list small colorized">
-                                <div class="account progress-title medium blue">
-                                  Storage Space
-                                </div>
-                                <div class="account progress-size medium storage grey">
-                                  up to <span>0</span>
-                                </div>
+                            <div class="widget buttons">
+                                <div class="button default-white-button semi-big more-bonuses right"><span>Get more bonuses</span></div>
                                 <div class="clear"></div>
                             </div>
-                            <div class="account progress-block tiny">
-                                <div class="account storage progress-bar blue"></div>
-                            </div>
-                            <div class="account progress-list small colorized">
-                                <div class="account progress-title medium green">
-                                    Transfer Quota
-                                </div>
-                                <div class="account progress-size medium transfers grey">
-                                    up to <span>0</span>
-                                </div>
-                                <div class="clear"></div>
-                            </div>
-                            <div class="account progress-block tiny">
-                                <div class="account transfers progress-bar green"></div>
-                            </div>
-
                         </div>
                     </div>
                 </div>

@@ -3135,7 +3135,13 @@ function dashboardUI() {
         $('.bandwidth .chart.data .size-txt').text(bytesToSize(account.servbw_used + account.downbw_used, 0));
         $('.bandwidth .chart.data .pecents-txt').text((b2[0]));
         $('.bandwidth .chart.data .gb-txt').text((b2[1]));
-        $('.bandwidth .chart.data .perc-txt').text(perc_c + '%');
+        if (u_attr.p) {
+            $('.bandwidth .chart.data .perc-txt').text(perc_c + '%');
+        }
+        else {
+            $('.bandwidth .chart.data span:not(.size-txt)').text('');
+            $('.bandwidth .chart.data .pecents-txt').text('used');
+        }
         /* End of New Used Bandwidth chart */
 
 

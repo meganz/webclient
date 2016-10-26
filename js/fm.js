@@ -7289,8 +7289,7 @@ function renameDialog() {
             $('.rename-dialog input')[0].selectionEnd = $('.rename-dialog input').val().length - ext.length - 1;
         }
 
-        $('.rename-dialog input').unbind('focus');
-        $('.rename-dialog input').bind('focus', function() {
+        $('.rename-dialog input').rebind('focus', function() {
             var selEnd;
             $(this).closest('.rename-dialog').addClass('focused');
             var d = $(this).val().lastIndexOf('.');
@@ -7302,11 +7301,9 @@ function renameDialog() {
             }
             $(this)[0].selectionStart = 0;
             $(this)[0].selectionEnd = selEnd;
-
         });
 
-        $('.rename-dialog input').unbind('blur');
-        $('.rename-dialog input').bind('blur', function() {
+        $('.rename-dialog input').rebind('blur', function() {
             $(this).closest('.rename-dialog').removeClass('focused');
         });
 
@@ -7321,7 +7318,7 @@ function renameDialog() {
             else {
                 $('.rename-dialog').addClass('active');
             }
-            if (!n.t && ext.length > 0) {
+            /*if (!n.t && ext.length > 0) {
                 if (this.selectionStart > $('.rename-dialog input').val().length - ext.length - 2) {
                     this.selectionStart = $('.rename-dialog input').val().length - ext.length - 1;
                     this.selectionEnd = $('.rename-dialog input').val().length - ext.length - 1;
@@ -7333,7 +7330,7 @@ function renameDialog() {
                     this.selectionEnd = $('.rename-dialog input').val().length - ext.length - 1;
                     return false;
                 }
-            }
+            }*/
         });
     }
 }

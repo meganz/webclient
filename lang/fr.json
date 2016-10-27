@@ -3741,7 +3741,10 @@
     "12487": "Aussi propos\u00e9 pour [A1]Windows[\/A1] et [A2]Linux[\/A2].",
     "12488": "Nous vous sugg\u00e9rons fortement d'utiliser notre client de synchronisation qui am\u00e9liorera grandement les performances[BR] lors du t\u00e9l\u00e9versement de centaines de fichiers. [A]Obtenez MEGAsync maintenant[\/A].",
     "12489": "Lorsque nous avons lanc\u00e9 MEGA au d\u00e9but 2013, la surveillance mondiale massive par des \u00c9tats voyous pr\u00e9textant lutter contre le terrorisme n'\u00e9tait que pure conjecture et ses d\u00e9fenseurs \u00e9taient souvent pr\u00e9sent\u00e9s comme des th\u00e9oriciens du complot. 137 jours plus tard, les r\u00e9v\u00e9lations d'Edward Snowden chang\u00e8rent radicalement les r\u00e9actions du public. Il devint tr\u00e8s clair que la [I]s\u00e9curit\u00e9 par politique[\/I] (\u00ab Nous avons acc\u00e8s \u00e0 vos donn\u00e9es, mais nous promettons dans conserver la confidentialit\u00e9 et de ne pas en faire mauvais usage \u00bb) n'avait pas \u00e9t\u00e9 suffisante. Toute autre solution qu'une [I]s\u00e9curit\u00e9 d\u00e8s la conception[\/I] (\u00ab Nous ne pouvons pas acc\u00e9der \u00e0 vos donn\u00e9es sans que vous le sachiez\u00bb), pour laquelle un chiffrement robuste de bout en bout est un pr\u00e9requis essentiel, semble maintenant \u00eatre tout \u00e0 fait insuffisante.",
-    "12689": "Caution: users with access to your file \/ folder links can use up your entire transfer quota if you grant them 100%. Click [A]Save[\/A] to proceed.",
+    "12689": "Attention : les utilisateurs ayant acc\u00e8s \u00e0 vos liens de fichiers ou dossiers peuvent utiliser votre quota de transfert en entier si vous leur allouez 100 %. Cliquer sur [A]Enregistrer[\/A] pour continuer.",
+    "12690": "Failed to share item(s) from MEGA. The destination application seems busy. Please try again later.",
+    "12691": "Failed to retrieve node details. Please try again.",
+    "12692": "\u00c9chec de visualisation des details",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

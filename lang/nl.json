@@ -3741,7 +3741,10 @@
     "12487": "Ook beschikbaar voor [A1]Windows[\/A1] en [A2]Linux[\/A2].",
     "12488": "Wij stellen je sterk voor om onze synchronisatie cli\u00ebnt voor enorm verbeterde prestatie[BR] te gebruiken voor het uploaden van honderden bestanden. [A]Krijg MEGAsync nu.[\/A]",
     "12489": "Toen we MEGA begin 2013 uitbrachten, was wereldwijde massa controle door malafide regeringen onder het mom van 'Terrorisme bestrijden' nog een wild vermoeden en de voorstanders werden vaak uitgeroepen tot complotdenkers. Edward Snowden zijn onthullingen 137 dagen later veranderden publieke houdingen fundamenteel en het werd schrikbarend duidelijk dat [I]beveiliging per beleid[\/I] (\"we hebben toegang tot je gegevens, maar we beloven om het vertrouwelijk te bewaren en niet te misbruiken\") niet goed genoeg was. Alles minder dan [I]beveiliging per ontwerp[\/I] (\"we kunnen geen toegang krijgen tot je gegevens zonder dat jij het te weten komt\"), waarvoor sterke end-to-end encryptie een vereiste is, lijkt nu in grote trekken onvoldoende.",
-    "12689": "Caution: users with access to your file \/ folder links can use up your entire transfer quota if you grant them 100%. Click [A]Save[\/A] to proceed.",
+    "12689": "Caution: users with access to your file \/ folder links can use up your entire transfer quota if you grant them 100%.",
+    "12690": "Failed to share item(s) from MEGA. The destination application seems busy. Please try again later.",
+    "12691": "Failed to retrieve node details. Please try again.",
+    "12692": "View details failed",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

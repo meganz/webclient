@@ -20,7 +20,7 @@ module.exports = function(config) {
 
         // == Basics ==
         'js/vendor/jquery-2.2.1.js',
-        'js/vendor/jquery-ui-1.11.4.js',
+        'js/vendor/jquery-ui.js',
         'js/vendor/jquery.jscrollpane.js',
         'js/vendor/jquery.mousewheel.js',
         'js/vendor/jquery.fullscreen.js',
@@ -78,6 +78,7 @@ module.exports = function(config) {
         'js/megaDbEncryptionPlugin.js',
         'js/megaDb.js',
         'js/paycrypt.js',
+        'js/attr.js',
         'js/account.js',
         'js/authring.js',
         'js/fm.js',

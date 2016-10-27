@@ -315,7 +315,7 @@ mBroadcaster.once('startMega', function __msdb_init() {
     db.addSchemaHandler('opc',  'p',  processOPC);
     db.addSchemaHandler('ipc',  'p',  processIPC);
     db.addSchemaHandler('ps',   'p',  processPS);
-    db.addSchemaHandler('mcf',   'id',  processMCF);
+    db.addSchemaHandler('mcf',  'id', processMCF);
 
     /*mStorageDB('idbcache', { plugins: 0, ersistant: 1 },
         function(aError) {
@@ -479,6 +479,9 @@ var mFileManagerDB = {
                                 u_sharekeys[n.h] = crypto_process_sharekey(n.h, n.sk);
                             }
                         }
+                        mega.loadReport.recvNodes = Date.now() - mega.loadReport.stepTimeStamp;
+                        mega.loadReport.stepTimeStamp = Date.now();
+
                         $.mDBIgnoreDB = true;
                         process_f(results, function(hasMissingKeys) {
                             delete $.mDBIgnoreDB;
@@ -541,6 +544,10 @@ var mFileManagerDB = {
                 console.log('fmdb fetch completed', maxaction, hasEntries);
             }
 
+            mega.loadReport.procNodeCount = Object.keys(M.d || {}).length;
+            mega.loadReport.procNodes     = Date.now() - mega.loadReport.stepTimeStamp;
+            mega.loadReport.stepTimeStamp = Date.now();
+
             if (!maxaction || !hasEntries) {
                 this.reload();
             }
@@ -562,7 +569,9 @@ var mFileManagerDB = {
         else if (this.schema[aTable]) {
             var promise;
 
-            if (d) console.log('fmdb query', aCommand, aTable, aData, lock);
+            if (d /*&& (d > 1 || !(mega.flags & window.MEGAFLAG_EXECSC))*/) {
+                console.debug('fmdb query', aCommand, aTable, aData, lock);
+            }
 
             try {
                 if (aCommand === 'add') {
@@ -660,6 +669,11 @@ var mFileManagerDB = {
     },
 
     _loadfm: function mFileManagerDB__loadfm(aDBInstance) {
+
+        // dbToNet holds the time wasted trying to read local DB, and having found we have to query the server.
+        mega.loadReport.dbToNet = Date.now() - mega.loadReport.startTime;
+        mega.loadReport.stepTimeStamp = Date.now();
+
         this._setstate(aDBInstance);
         mBroadcaster.sendMessage('mFileManagerDB.done', loadfm) || loadfm();
     },
@@ -742,49 +756,31 @@ function mDBstart(aSlave) {
     }
 }
 
-function mDBadd(t, n) {
+function mDBadd(t, a) {
     if (mFileManagerDB.state !== mFileManagerDB.STATE_WORKING
             && mFileManagerDB.state !== mFileManagerDB.STATE_READY) {
         console.warn('Invalid fmdb state', mFileManagerDB.state);
         localStorage['fmdblock_' + u_handle] = 0xBADF;
         return;
     }
-    var a = n;
-    if (a.name && a.p !== 'contacts') {
+
+    if (a.p !== 'contacts') {
+        delete a.ar;
         delete a.name;
     }
-    if (a.ar && a.p !== 'contacts') {
-        delete a.ar;
-    }
-    if (a.presence) {
-        a.presence = undefined;
-    }
-    if (a.presenceMtime) {
-        a.presenceMtime = undefined;
-    }
 
+    delete a.i; // comes from 't' APs (indicating an index?)
     delete a.key;
     delete a.seen;
 
-    var dispatchTransactionQueue = function() {
-        if (mFileManagerDB.addQueueTimer) {
-            for (var t in mFileManagerDB.addQueue) {
-                if (mFileManagerDB.addQueue.hasOwnProperty(t)) {
-                    var q = mFileManagerDB.addQueue[t];
-                    mFileManagerDB.query('add', t, q);
-                }
-            }
-            delete mFileManagerDB.addQueue;
-            delay.cancel(mFileManagerDB.addQueueTimer);
-            delete mFileManagerDB.addQueueTimer;
-        }
-    };
+    delete a.presence;
+    delete a.presenceMtime;
 
     if (mega.flags & window.MEGAFLAG_EXECSC) {
         // Inmediately fire the DB transaction while processing APs
         // to prevent out of sync data with the gettree-cache which
         // *could* happen if we'd use the below transactions queue.
-        dispatchTransactionQueue();
+        mDBadd.dispatchTransactionQueue();
         return mFileManagerDB.query('add', t, a);
     }
 
@@ -795,8 +791,21 @@ function mDBadd(t, n) {
         mFileManagerDB.addQueue[t] = [];
     }
     mFileManagerDB.addQueue[t].push(a);
-    mFileManagerDB.addQueueTimer = delay('mDBadd', dispatchTransactionQueue, 300);
+    mFileManagerDB.addQueueTimer = delay('mDBadd', mDBadd.dispatchTransactionQueue, 300);
 }
+mDBadd.dispatchTransactionQueue = function() {
+    if (mFileManagerDB.addQueueTimer) {
+        for (var t in mFileManagerDB.addQueue) {
+            if (mFileManagerDB.addQueue.hasOwnProperty(t)) {
+                var q = mFileManagerDB.addQueue[t];
+                mFileManagerDB.query('add', t, q);
+            }
+        }
+        delete mFileManagerDB.addQueue;
+        delay.cancel(mFileManagerDB.addQueueTimer);
+        delete mFileManagerDB.addQueueTimer;
+    }
+};
 
 function mDBdel(t, id) {
     if (mFileManagerDB.state !== mFileManagerDB.STATE_WORKING
@@ -806,25 +815,12 @@ function mDBdel(t, id) {
         return;
     }
 
-    var dispatchTransactionQueue = function() {
-        if (mFileManagerDB.delQueueTimer) {
-            for (var t in mFileManagerDB.delQueue) {
-                if (mFileManagerDB.delQueue.hasOwnProperty(t)) {
-                    var q = mFileManagerDB.delQueue[t];
-                    mFileManagerDB.query('remove', t, q);
-                }
-            }
-            delete mFileManagerDB.delQueue;
-            delay.cancel(mFileManagerDB.delQueueTimer);
-            delete mFileManagerDB.delQueueTimer;
-        }
-    };
-
     if (mega.flags & window.MEGAFLAG_EXECSC) {
         // Inmediately fire the DB transaction while processing APs
         // to prevent out of sync data with the gettree-cache which
         // *could* happen if we'd use the below transactions queue.
-        dispatchTransactionQueue();
+        mDBadd.dispatchTransactionQueue();
+        mDBdel.dispatchTransactionQueue();
         return mFileManagerDB.query('remove', t, id);
     }
 
@@ -835,8 +831,21 @@ function mDBdel(t, id) {
         mFileManagerDB.delQueue[t] = [];
     }
     mFileManagerDB.delQueue[t].push(id);
-    mFileManagerDB.delQueueTimer = delay('mDBdel', dispatchTransactionQueue, 300);
+    mFileManagerDB.delQueueTimer = delay('mDBdel', mDBdel.dispatchTransactionQueue, 300);
 }
+mDBdel.dispatchTransactionQueue = function() {
+    if (mFileManagerDB.delQueueTimer) {
+        for (var t in mFileManagerDB.delQueue) {
+            if (mFileManagerDB.delQueue.hasOwnProperty(t)) {
+                var q = mFileManagerDB.delQueue[t];
+                mFileManagerDB.query('remove', t, q);
+            }
+        }
+        delete mFileManagerDB.delQueue;
+        delay.cancel(mFileManagerDB.delQueueTimer);
+        delete mFileManagerDB.delQueueTimer;
+    }
+};
 
 function mDBreload() {
     loadfm.loaded = false;

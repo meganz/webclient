@@ -1128,24 +1128,28 @@ function base64_to_a32(s) {
 var firefox_boost = is_chrome_firefox && !!localStorage.fxboost;
 
 // ArrayBuffer to binary string
-var ab_to_str = firefox_boost ? mozAB2S : function (ab) {
-    var b = '',
-        i;
+var ab_to_str = function abToStr1(ab) {
+    return ab.buffer;
+};
 
-    if (have_ab) {
+if (firefox_boost) {
+    ab_to_str = mozAB2S;
+}
+else if (have_ab) {
+    ab_to_str = function abToStr2(ab) {
+        var u8 = new Uint8Array(ab);
+
+        /*if (u8.length < 0x10000) {
+         return String.fromCharCode.apply(String, u8);
+         }*/
+
         var b = '';
-
-        var ab8 = new Uint8Array(ab);
-
-        for (i = 0; i < ab8.length; i++) {
-            b = b + String.fromCharCode(ab8[i]);
+        for (var i = 0; i < u8.length; i++) {
+            b = b + String.fromCharCode(u8[i]);
         }
-    }
-    else {
-        return ab.buffer;
-    }
 
-    return b;
+        return b;
+    };
 }
 
 // ArrayBuffer to binary string
@@ -1154,52 +1158,52 @@ function ab_to_base64(ab) {
 }
 
 // ArrayBuffer to binary with depadding
-var ab_to_str_depad = firefox_boost ? mozAB2SDepad : function (ab) {
-    var b, i;
+var ab_to_str_depad = function abToStrDepad1(ab) {
+    var b = ab_to_str(ab);
 
-    if (have_ab) {
-        b = '';
+    for (var i = b.length; i-- && !b.charCodeAt(i););
 
-        var ab8 = new Uint8Array(ab);
-
-        for (i = 0; i < ab8.length && ab8[i]; i++) {
-            b = b + String.fromCharCode(ab8[i]);
-        }
-    }
-    else {
-        b = ab_to_str(ab);
-
-        for (i = b.length; i-- && !b.charCodeAt(i););
-
-        b = b.substr(0, i + 1);
-    }
+    b = b.substr(0, i + 1);
 
     return b;
+};
+
+if (firefox_boost) {
+    ab_to_str_depad = mozAB2SDepad;
+}
+else if (have_ab) {
+    ab_to_str_depad = function abToStrDepad2(ab) {
+        var b  = '';
+        var u8 = new Uint8Array(ab);
+
+        for (var i = 0; i < u8.length && u8[i]; i++) {
+            b = b + String.fromCharCode(u8[i]);
+        }
+
+        return b;
+    };
 }
 
 // binary string to ArrayBuffer, 0-padded to AES block size
-function str_to_ab(b) {
-    var ab, i;
+var str_to_ab = function strToAB1(b) {
+    b += Array(16 - ((b.length - 1) & 15)).join(String.fromCharCode(0));
 
-    if (have_ab) {
-        ab = new ArrayBuffer((b.length + 15) & -16);
-        var ab8 = new Uint8Array(ab);
+    return {
+        buffer: b
+    };
+};
 
-        for (i = b.length; i--;) {
-            ab8[i] = b.charCodeAt(i);
+if (have_ab) {
+    str_to_ab = function strToAB2(b) {
+        var ab = new ArrayBuffer((b.length + 15) & -16);
+        var u8 = new Uint8Array(ab);
+
+        for (var i = b.length; i--;) {
+            u8[i] = b.charCodeAt(i);
         }
 
         return ab;
-    }
-    else {
-        b += Array(16 - ((b.length - 1) & 15)).join(String.fromCharCode(0));
-
-        ab = {
-            buffer: b
-        };
-    }
-
-    return ab;
+    };
 }
 
 // binary string to ArrayBuffer, 0-padded to AES block size
@@ -1665,7 +1669,6 @@ function enc_attr(attr, key) {
 function dec_attr(attr, key) {
     var aes;
     var b;
-    var logger = MegaLogger.getLogger('crypt');
 
     attr = asmCrypto.AES_CBC.decrypt(attr,
         a32_to_ab([key[0] ^ key[4], key[1] ^ key[5], key[2] ^ key[6], key[3] ^ key[7]]), false);
@@ -1680,7 +1683,7 @@ function dec_attr(attr, key) {
     try {
         return JSON.parse(from8(b.substr(4)));
     } catch (e) {
-        logger.error(b, e);
+        console.error(b, e);
         var m = b.match(/"n"\s*:\s*"((?:\\"|.)*?)(\.\w{2,4})?"/),
             s = m && m[1],
             l = s && s.length || 0,
@@ -1872,7 +1875,7 @@ function api_proc(q) {
     q.xhr.onerror = function () {
         if (!this.q.cancelled) {
             logger.debug("API request error - retrying");
-            api_reqerror(q, -3);
+            api_reqerror(q, -3, this.status);
         }
     };
 
@@ -1928,17 +1931,26 @@ function api_proc(q) {
     q.xhr.onload = function onAPIProcXHRLoad() {
         if (!this.q.cancelled) {
             var t;
+            var status = this.status;
 
-            if (this.status === 200) {
+            if (status === 200) {
                 var response = this.responseText || this.response;
 
-                logger.debug('API response: ', response);
+                if (d) {
+                    if (d > 1 || !window.chrome || String(response).length < 512) {
+                        logger.debug('API response: ', response);
+                    }
+                    else {
+                        logger.debug('API response: ', String(response).substr(0, 512) + '...');
+                    }
+                }
 
                 try {
                     t = JSON.parse(response);
                     if (response[0] === '{') {
                         t = [t];
                     }
+                    status = true;
                 } catch (e) {
                     // bogus response, try again
                     logger.debug("Bad JSON data in response: " + response);
@@ -1946,7 +1958,7 @@ function api_proc(q) {
                 }
             }
             else {
-                logger.debug('API server connection failed (error ' + this.status + ')');
+                logger.debug('API server connection failed (error ' + status + ')');
                 t = ERATELIMIT;
             }
 
@@ -1969,7 +1981,7 @@ function api_proc(q) {
                 api_proc(this.q);
             }
             else {
-                api_reqerror(this.q, t);
+                api_reqerror(this.q, t, status);
             }
         }
     };
@@ -2004,7 +2016,7 @@ function api_send(q) {
     q.xhr.send(q.rawreq);
 }
 
-function api_reqerror(q, e) {
+function api_reqerror(q, e, status) {
     if (e === EAGAIN || e === ERATELIMIT) {
         // request failed - retry with exponential backoff
         if (q.backoff) {
@@ -2018,9 +2030,23 @@ function api_reqerror(q, e) {
         }
 
         q.timer = setTimeout(api_send, q.backoff, q);
+
+        e = EAGAIN;
     }
     else {
         q.failhandler(q.c, e);
+    }
+
+    if (mega.flags & window.MEGAFLAG_LOADINGCLOUD) {
+        if (status === true && e === EAGAIN) {
+            mega.loadReport.EAGAINs++;
+        }
+        else if (status === 500) {
+            mega.loadReport.e500s++;
+        }
+        else {
+            mega.loadReport.errs++;
+        }
     }
 }
 
@@ -2170,10 +2196,16 @@ function getsc(mDBload) {
 
                     // If we're loading the cloud, notify completion only
                     // once first action-packets have been processed.
-                    if (!fminitialized) {
+                    if (!fminitialized && (loadfm.loading || ctx.mDBload)) {
                         loadfm_done(ctx.mDBload);
                     }
                 }
+
+                if ((mega.flags & window.MEGAFLAG_LOADINGCLOUD) && !mega.loadReport.recvAPs) {
+                    mega.loadReport.recvAPs       = Date.now() - mega.loadReport.stepTimeStamp;
+                    mega.loadReport.stepTimeStamp = Date.now();
+                }
+
                 if (res.w) {
                     waiturl = res.w;
                     waittimeout = setTimeout(waitsc, waitbackoff);
@@ -4127,14 +4159,13 @@ var rsa2aes = {};
 // Output: .key and .name set if successful
 // **NB** Any changes made to this function
 //        must be populated to keydec.js
-function crypto_processkey(me, master_aes, file) {
-    var logger = MegaLogger.getLogger('crypt');
+function crypto_processkey(me, master_aes, file, quiet) {
     var id, key, k, n, decKey;
-    var success = false;
+    var success = quiet;
 
     if (!file.k) {
         if (!keycache[file.h]) {
-            logger.debug("No keycache entry!");
+            console.debug("No keycache entry!");
 
             return;
         }
@@ -4195,27 +4226,27 @@ function crypto_processkey(me, master_aes, file) {
                                 decKey = decrypt_key(new sjcl.cipher.aes(shareKey), k);
                             }
                             else {
-                                logger.error('Invalid shareKey length ' + id, shareKey);
+                                console.error('Invalid shareKey length ' + id, shareKey);
                             }
                         }
                         else {
-                            logger.error('Invalid shareKey ' + id, shareKey);
+                            console.error('Invalid shareKey ' + id, shareKey);
                         }
                     }
                     else {
-                        logger.error('No shareKey for ' + id);
+                        console.error('No shareKey for ' + id);
                     }
 
-                    if (!decKey) {
+                    /*if (!decKey) {
                         if (window.d) {
                             debugger;
                         }
-                    }
+                     }*/
                     k = decKey;
                 }
             }
             else {
-                logger.error("Received invalid key length (" + k.length + "): " + file.h);
+                console.error("Received invalid key length (" + k.length + "): " + file.h);
                 k = null;
             }
         }
@@ -4228,19 +4259,19 @@ function crypto_processkey(me, master_aes, file) {
                         k = str_to_a32(crypto_rsadecrypt(t, u_privk).substr(0, file.t ? 16 : 32));
                     }
                     else {
-                        logger.debug("Corrupt key for node " + file.h);
+                        console.debug("Corrupt key for node " + file.h);
                     }
                 } catch (e) {
-                    logger.error('Intercepted an exception. To not lose it, here it is: ' + e);
+                    console.error('Intercepted an exception. To not lose it, here it is: ' + e);
                 }
             }
             else {
-                logger.debug("Received RSA key, but have no public key published: " + file.h);
+                console.debug("Received RSA key, but have no public key published: " + file.h);
             }
         }
 
         if (!file.a) {
-            logger.warn('Missing attribute for node "%s"', file.h, file);
+            console.warn('Missing attribute for node "%s"', file.h, file);
         }
 
         var ab = k && file.a && base64_to_ab(file.a);
@@ -4288,7 +4319,7 @@ function crypto_processkey(me, master_aes, file) {
     }
 
     if (!success) {
-        logger.warn('Received no suitable key for "%s"', file.h, file);
+        console.warn('Received no suitable key for "%s"', file.h, file);
 
         if (!missingkeys[file.h]) {
             newmissingkeys = true;

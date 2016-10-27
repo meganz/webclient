@@ -108,7 +108,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
             return;
         }
 
-        if (self.lastActivity && self.lastActivity > ts) {
+        if (self.lastActivity && self.lastActivity >= ts) {
             // this is an old message, DON'T update the lastActivity.
             return;
         }

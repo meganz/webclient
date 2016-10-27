@@ -1264,6 +1264,8 @@ var exportExpiry = {
         /* jshint -W074 */
         var self = this;
         var $linksDialog = $('.fm-dialog.export-links-dialog');
+        var $linkButtons = $linksDialog.find('.link-handle, .link-decryption-key, .link-handle-and-key');
+        var $linkContent = $linksDialog.find('.export-content-block');
         var html = '';
         var scroll = '.export-link-body';
         var links = $.trim(getClipboardLinks());
@@ -1288,19 +1290,18 @@ var exportExpiry = {
 
         $.dialog = 'links';
 
-        $('.export-links-dialog').addClass('file-keys-view');
+        $linksDialog.addClass('file-keys-view');
 
         // Generate content
         html = itemExportLink();
 
         // Fill with content
-        $('.export-links-dialog .export-link-body').html(html);
+        $linksDialog.find('.export-link-body').safeHTML(html);
 
-        // Default export option is
-        $('.export-link-select, .export-content-block')
-            .removeClass('public-handle decryption-key full-link')
-            .addClass('public-handle');
-        $('.export-link-select').html($('.export-link-dropdown div.public-handle').html());
+        // Reset state from previous dialog opens and pre-select the 'Link with key' option by default
+        $linkContent.removeClass('public-handle decryption-key full-link').addClass('full-link');
+        $linkButtons.removeClass('selected');
+        $linksDialog.find('.link-handle-and-key').addClass('selected');
 
         fm_showoverlay();
 
@@ -1432,21 +1433,6 @@ var exportExpiry = {
         $('.export-links-warning-close').rebind('click', function() {
             $('.export-links-warning').addClass('hidden');
         });
-
-        $('.export-link-select').rebind('click', function() {
-            $('.export-link-dropdown').fadeIn(200);
-
-            // Stop propagation
-            return false;
-        });
-
-        // On Export File Links and Decryption Keys
-        var $linkButtons = $('.link-handle, .link-decryption-key, .link-handle-and-key');
-        var $linkHandle = $('.link-handle');
-
-        // Reset state from previous dialog opens and pre-select the 'Link without key' option by default
-        $linkButtons.removeClass('selected');
-        $linkHandle.addClass('selected');
 
         // Add click handler
         $linkButtons.rebind('click', function() {

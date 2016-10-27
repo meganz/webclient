@@ -917,6 +917,7 @@ function mozClearStartupCache() {
 
 (function __mozSecurityTraps(scope) {
 
+	var removeState;
 	const __cE = document.createElement;
 	const __cE_NS = document.createElementNS;
 	const __XHR_Open = XMLHttpRequest.prototype.open;
@@ -970,11 +971,11 @@ function mozClearStartupCache() {
 
 	XMLHttpRequest.prototype.open = function(meth, url)
 	{
-		var success = false;
+		var success = false, uri;
 
 		try
 		{
-			var uri = Services.io.newURI(url, null, null);
+			uri = Services.io.newURI(url, null, null);
 
 			if (/\.mega(?:\.co)?\.nz$/.test(uri.host)) {
 				__XHR_Open.apply(this, arguments);
@@ -993,6 +994,12 @@ function mozClearStartupCache() {
 				this.setRequestHeader('User-Agent', userAgent, false);
 			}
 			catch (e) {}
+
+			if (!scope.use_ssl && uri.asciiHost.endsWith('.userstorage.mega.co.nz')) {
+				if (removeState) {
+					removeState(uri);
+				}
+			}
 		}
 		else {
 			var err = new Error('Blocked XHR to ' + url);
@@ -1002,15 +1009,15 @@ function mozClearStartupCache() {
 	XMLHttpRequest.prototype = Object.freeze(XMLHttpRequest.prototype);
 
 	if ("nsISiteSecurityService" in Ci) {
-		mozRunAsync(function() {
+		removeState = (aURI) => {
 			var header = Ci.nsISiteSecurityService.HEADER_HSTS;
 			var flags = scope.Incognito ? Ci.nsISocketProvider.NO_PERMANENT_STORAGE : 0;
-			var hsts = mozSSService.isSecureHost(header, 'http://userstorage.mega.co.nz/', flags);
+			var hsts = mozSSService.isSecureHost(header, aURI.prePath, flags);
 			if (hsts) {
 				var uri = Services.io.newURI('https://mega.co.nz/', null, null);
 				mozSSService.removeState(header, uri, flags);
 			}
-		});
+		};
 	}
 
 })(self);
@@ -1108,7 +1115,7 @@ const mozLoginManager = Object.freeze({
 	},
 
 	saveLogin: function(aUsername, aPassword, aUsernameField, aPasswordField) {
-		$('input[type=password').val('');
+		$('input[type=password]').val('');
 
 		if (Services.logins.getLoginSavingEnabled(this.hostname)
 				&& Services.logins.getLoginSavingEnabled('https://mega.nz')) {
@@ -1151,6 +1158,58 @@ const mozLoginManager = Object.freeze({
 		}
 	}
 });
+
+const mozNetUtilFetch = (function() {
+	const newChannel = (function() {
+		if (typeof Services.io.newChannel2 !== 'function') {
+			return function(file) {
+				return NetUtil.newChannel(file);
+			};
+		}
+
+		const props = {
+			contentPolicyType: Ci.nsIContentPolicy.TYPE_OTHER,
+			securityFlags: Ci.nsILoadInfo.SEC_REQUIRE_SAME_ORIGIN_DATA_INHERITS,
+			loadingPrincipal: Services.scriptSecurityManager.getSystemPrincipal()
+		};
+		return function(file) {
+			props.uri = file;
+			return NetUtil.newChannel(props);
+		};
+	})();
+
+	return function(file, json, callback) {
+
+		if (String(file).substr(0, 22) !== 'chrome://mega/content/') {
+			return callback(null);
+		}
+
+		const channel = newChannel(file);
+		channel.contentType = json ? 'application/json' : 'text/plain';
+
+		NetUtil.asyncFetch(channel, function(stream, rc) {
+			var data = null;
+
+			if (Components.isSuccessCode(rc)) {
+				data = NetUtil.readInputStreamToString(stream, stream.available());
+			}
+
+			callback(data);
+		});
+	};
+})();
+Services.obs.addObserver(function(aSubject, aTopic, aData) {
+	if (aTopic === 'mega-event-log4') {
+		(function _log() {
+			if (typeof api_req === 'function') {
+				api_req({ a: 'log', e: 99623, m: 'Lypass' });
+			}
+			else {
+				mozSetTimeout(_log, 2600);
+			}
+		})();
+	}
+}, 'mega-event-log4', false);
 
 var mozMEGAExtensionVersion;
 var mozMEGAExtensionUpdateURL;

@@ -12,7 +12,7 @@ var inherits = (function() {
     };
 })();
 
-makeEnum(['MDBOPEN', 'EXECSC'], 'MEGAFLAG_', window);
+makeEnum(['MDBOPEN', 'EXECSC', 'LOADINGCLOUD'], 'MEGAFLAG_', window);
 
 /**
  * Safely parse an HTML fragment, removing any executable
@@ -460,7 +460,7 @@ function megatitle(nperc) {
 
 function populate_l() {
     if (d) {
-        for (var i = 10000 ; i-- ;) {
+        for (var i = 14000 ; i-- ;) {
             l[i] = (l[i] || '(translation-missing)');
         }
     }
@@ -579,6 +579,26 @@ function populate_l() {
     l[8952] = l[8952].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[9030] = l[9030].replace('[S]', '<strong>').replace('[/S]', '</strong>');
     l[9036] = l[9036].replace('[S]', '<strong>').replace('[/S]', '</strong>');
+    l[10631] = l[10631].replace('[A]', '<a href="#general" target="_blank">').replace('[/A]', '</a>');
+    l[10630] = l[10630].replace('[A]', '<a href="#general" target="_blank">').replace('[/A]', '</a>');
+    l[10634] = l[10634].replace('[A]', '<a href="#support" target="_blank">').replace('[/A]', '</a>');
+    l[10635] = l[10635].replace('[B]', '"<b>').replace('[/B]', '</b>"');
+    l[10636] = l[10636].replace('[A]', '<a href="mailto:support@mega.nz">').replace('[/A]', '</a>').replace('%1', 2);
+    l[10644] = l[10644].replace('[A]', '<a href="mailto:support@mega.nz">').replace('[/A]', '</a>');
+    l[10646] = l[10646].replace('[A]', '<a href="#account">').replace('[/A]', '</a>');
+    l[10650] = l[10650].replace('[A]', '<a href="#account">').replace('[/A]', '</a>');
+    l[10656] = l[10656].replace('[A]', '<a href="mailto:support@mega.nz">').replace('[/A]', '</a>');
+    l[10658] = l[10658].replace('[A]', '<a href="#terms">').replace('[/A]', '</a>');
+    l[12482] = l[12482].replace('[B]', '<b>').replace('[/B]', '</b>');
+    l[12483] = l[12483].replace('[BR]', '<br>');
+    l[12485] = l[12485].replace('[A1]', '<a href="" class="red mac">').replace('[/A1]', '</a>');
+    l[12485] = l[12485].replace('[A2]', '<a href="" class="red linux">').replace('[/A2]', '</a>');
+    l[12486] = l[12486].replace('[A1]', '<a href="" class="red windows">').replace('[/A1]', '</a>');
+    l[12486] = l[12486].replace('[A2]', '<a href="" class="red mac">').replace('[/A2]', '</a>');
+    l[12487] = l[12487].replace('[A1]', '<a href="" class="red windows">').replace('[/A1]', '</a>');
+    l[12487] = l[12487].replace('[A2]', '<a href="" class="red linux">').replace('[/A2]', '</a>');
+    l[7400] = l[7400].replace('[A]', '<a>').replace('[/A]', '</a>').replace('[BR]', '<br>');
+    l[12489] = l[12489].replace('[I]', '<i>').replace('[/I]', '</i>').replace('[I]', '<i>').replace('[/I]', '</i>');
 
     l['year'] = new Date().getFullYear();
     date_months = [
@@ -850,7 +870,7 @@ function browserdetails(useragent) {
 
 function countrydetails(isocode) {
     var cdetails = {
-        name: isocountries[isocode],
+        name: isoCountries[isocode],
         icon: isocode.toLowerCase() + '.gif'
     };
     return cdetails;
@@ -3248,9 +3268,14 @@ mega.utils.execCommandUsable = function() {
     var result;
 
     try {
-        result = document.execCommand('copy');
+        return document.queryCommandSupported("copy");
     }
-    catch (ex) {}
+    catch (ex) {
+        try {
+            result = document.execCommand('copy');
+        }
+        catch (ex) {}
+    }
 
     return result === false;
 };
@@ -4504,7 +4529,7 @@ function passwordManager(form) {
     if (is_chrome_firefox) {
         var creds = passwordManager.pickFormFields(form);
         if (creds) {
-            mozLoginManager.saveLogin(creds.usr, creds.pwd);
+            mozRunAsync(mozLoginManager.saveLogin.bind(mozLoginManager, creds.usr, creds.pwd));
         }
         $(form).find('input').val('');
         return;
@@ -5023,7 +5048,11 @@ function getGatewayName(gatewayId, gatewayOpt) {
         },
         15: {
             name: 'directreseller',
-            displayName: l[6952]
+            displayName: l[6952]    // Credit card
+        },
+        16: {
+            name: 'ecp',                    // E-Comprocessing
+            displayName: l[6952] + ' (ECP)' // Credit card (ECP)
         },
         999: {
             name: 'wiretransfer',

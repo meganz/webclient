@@ -287,10 +287,10 @@ copyright.init_cndispute = function () {
 
     // Set up the country values
     var markup = '<OPTION value="0"></OPTION>';
-    for (var country in isocountries) {
-        if (isocountries.hasOwnProperty(country)) {
+    for (var country in isoCountries) {
+        if (isoCountries.hasOwnProperty(country)) {
             markup += '<option value="' + escapeHTML(country) + '">'
-                    + escapeHTML(isocountries[country]) + '</option>';
+                    + escapeHTML(isoCountries[country]) + '</option>';
         }
     }
     $('.cn .select.country select').safeHTML(markup);

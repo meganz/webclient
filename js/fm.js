@@ -3662,31 +3662,6 @@ function accountUI() {
 
             var pws = zxcvbn($('#account-new-password').val());
 
-            if (typeof u_attr.bandwidthLimit === "number"
-                && parseInt(localStorage.bandwidthLimit) !== u_attr.bandwidthLimit) {
-
-                var done = function() {
-                    api_req({"a": "up", "srvratio": Math.round(u_attr.bandwidthLimit)});
-                    localStorage.bandwidthLimit = u_attr.bandwidthLimit;
-                };
-
-                if (u_attr.bandwidthLimit > 99) {
-                    msgDialog('warningb:!' + l[776], l[882], l[12689], 0, function(e) {
-                        if (e) {
-                            done();
-                        }
-                        else {
-                            u_attr.bandwidthLimit = 0;
-                            $('.slider-percentage span').text('0 %');
-                            $('#bandwidth-slider').slider('value', 0);
-                        }
-                    });
-                }
-                else {
-                    done();
-                }
-            }
-
             if (M.account.dl_maxSlots)
             {
                 mega.config.set('dl_maxSlots', M.account.dl_maxSlots);
@@ -3917,10 +3892,36 @@ function accountUI() {
 
             $('#bandwidth-slider').slider({
                 min: 0, max: 100, range: 'min', value: bandwidthLimit,
+                change: function(e, ui) {
+                    if (M.currentdirid === 'account/settings') {
+                        bandwidthLimit = ui.value;
+
+                        if (parseInt(localStorage.bandwidthLimit) !== bandwidthLimit) {
+
+                            var done = delay.bind(null, 'bandwidthLimit', function() {
+                                api_req({"a": "up", "srvratio": Math.round(bandwidthLimit)});
+                                localStorage.bandwidthLimit = bandwidthLimit;
+                            }, 2600);
+
+                            if (bandwidthLimit > 99) {
+                                msgDialog('warningb:!' + l[776], l[882], l[12689], 0, function(e) {
+                                    if (e) {
+                                        done();
+                                    }
+                                    else {
+                                        $('.slider-percentage span').text('0 %').removeClass('bold warn');
+                                        $('#bandwidth-slider').slider('value', 0);
+                                    }
+                                });
+                            }
+                            else {
+                                done();
+                            }
+                        }
+                    }
+                },
                 slide: function(e, ui) {
                     $('.slider-percentage span').text(ui.value + ' %');
-                    $('.fm-account-save-block').removeClass('hidden');
-                    u_attr.bandwidthLimit = ui.value;
 
                     if (ui.value > 90) {
                         $('.slider-percentage span').addClass('warn bold');

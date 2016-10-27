@@ -1962,11 +1962,12 @@ function MegaData()
                             sharedUInode(nodeHandle);
                         }
 
+                        /* @al: why is this used here? we should only update the DOM?
                         if (currNode) {
                             if (currNode.lbl) {
                                 M.colourLabeling(nodeHandle, currNode.lbl);
                             }
-                        }
+                         }*/
                     }
                 }
             }// END of for folders loop
@@ -1986,7 +1987,8 @@ function MegaData()
         for (var h in M.c[M.RootID]) {
             if (M.d[h] && M.d[h].t) {
                 cs = ' contains-submenu';
-                sm = '<span class="dropdown body submenu" id="sm_' + this.RootID + '"><span id="csb_' + this.RootID + '"></span>' + arrow + '</span>';
+                sm = '<span class="dropdown body submenu" id="sm_' + this.RootID + '">'
+                    + '<span id="csb_' + this.RootID + '"></span>' + arrow + '</span>';
                 break;
             }
         }
@@ -2039,8 +2041,9 @@ function MegaData()
                 for (var h in M.c[fid]) {
                     if (M.d[h] && M.d[h].t) {
                         sub = true;
-                        cs = ' contains-submenu';
-                        sm = '<span class="dropdown body submenu" id="sm_' + fid + '"><span id="csb_' + fid + '"></span>' + arrow + '</span>';
+                        cs  = ' contains-submenu';
+                        sm  = '<span class="dropdown body submenu" id="sm_' + fid + '">'
+                            + '<span id="csb_' + fid + '"></span>' + arrow + '</span>';
                         break;
                     }
                 }
@@ -2057,7 +2060,9 @@ function MegaData()
                     nodeName = this.d[fid].name;
                 }
 
-                html = '<span class="dropdown-item ' + sharedFolder + cs + '" id="fi_' + fid + '"><i class="small-icon context ' + sharedFolder +'"></i>' + htmlentities(nodeName) + '</span>' + sm;
+                html = '<span class="dropdown-item ' + sharedFolder + cs + '" id="fi_' + fid + '">'
+                    + '<i class="small-icon context ' + sharedFolder + '"></i>'
+                    + htmlentities(nodeName) + '</span>' + sm;
 
                 $('#csb_' + id).append(html);
             }
@@ -3583,24 +3588,18 @@ function MegaData()
 
         if (fminitialized) {
             var labelId       = parseInt(value);
-            var colourClass   = '';
             var removeClasses = 'colour-label red orange yellow blue green grey purple';
 
-            if (labelId) {
-                colourClass = 'colour-label ' + M.getColourClassFromId(labelId);
-            }
+            // Remove all colour label classes
+            $('#' + handle).removeClass(removeClasses);
+            $('#' + handle + ' a').removeClass(removeClasses);
 
             if (labelId) {
-                // DOM update, add colour label clases
+                // Add colour label classes.
+                var colourClass = 'colour-label ' + M.getColourClassFromId(labelId);
 
                 $('#' + handle).addClass(colourClass);
                 $('#' + handle + ' a').addClass(colourClass);
-            }
-            else {
-                // DOM update, remove all colour label clases
-
-                $('#' + handle).removeClass(removeClasses);
-                $('#' + handle + ' a').removeClass(removeClasses);
             }
         }
     };
@@ -3610,15 +3609,13 @@ function MegaData()
     *
     * @param {Array | string} handles Selected nodes handles
     * @param {Integer} labelId Numeric value of label
-    * @param {String} colourClass Matched class name for given labelId
-    * @param {Boolean | undefined} apiReq
     */
-    this.colourLabeling = function(handles, labelId, apiReq) {
+    this.colourLabeling = function(handles, labelId) {
 
         var newLabelState = 0;
 
-        if (fminitialized) {
-            if (handles && !Array.isArray(handles)) {
+        if (fminitialized && handles) {
+            if (!Array.isArray(handles)) {
                 handles = [handles];
             }
 
@@ -3631,16 +3628,7 @@ function MegaData()
                     newLabelState = 0;
                 }
 
-                // Remove all colour labels
-                M.colourLabelDomUpdate(handle, 0);
-
-                // Do not send api request preventing dead loop
-                if (apiReq === false) {
-                    M.nodeAttr({ h: handle, lbl: newLabelState });
-                }
-                else {
-                    api_setattr(handle, { lbl: newLabelState });
-                }
+                api_setattr(handle, {lbl: newLabelState});
                 M.colourLabelDomUpdate(handle, newLabelState);
             });
         }

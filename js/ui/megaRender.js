@@ -703,7 +703,7 @@
                     // Colour label
                     if (aNode.lbl) {
                         var colourLabel = M.getColourClassFromId(aNode.lbl);
-                        props.classNames.push('colour-label')
+                        props.classNames.push('colour-label');
                         props.classNames.push(colourLabel);
                     }
                 }
@@ -763,9 +763,9 @@
 
                 // Colour label
                 if (aNode.lbl && (aNode.su !== u_handle)) {
-                    props.colourLabel = M.getColourClassFromId(aNode.lbl);
-                    props.classNames.push('colour-label')
-                    props.classNames.push(props.colourLabel);
+                    var colourLabel = M.getColourClassFromId(aNode.lbl);
+                    props.classNames.push('colour-label');
+                    props.classNames.push(colourLabel);
                 }
 
                 return props;

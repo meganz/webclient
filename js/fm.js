@@ -763,7 +763,7 @@ function initUI() {
         importFile();
     }
 
-    $('.dropdown.body').rebind('contextmenu', function(e) {
+    $('.dropdown.body').rebind('contextmenu.dropdown', function(e) {
         if (!localStorage.contextmenu)
             e.preventDefault();
     });
@@ -997,7 +997,7 @@ function transferPanelContextMenu(target)
     var parent = menuitems.parent();
     parent
         .children('hr').hide().end()
-        .children('hr.pause').show().end()
+        .children('hr.pause').show().end();
 
     if (parent.height() < 56) {
         parent.find('hr.pause').hide();
@@ -2394,13 +2394,14 @@ function initContextUI() {
                 .next().find('.dropdown.body.submenu').removeClass('active');
         };
 
-        var $this = $(this),
-            // situation when we have 2 contains-submenus in same context-submenu one near another
-            b = $this.closest('.dropdown.body.submenu').find('.dropdown.body.submenu,.contains-submenu').not($this.next()),
-            a = $this.next(),// context-submenu
-            pos = $this.offset(),
-            menuPos,
-            currentId;
+        var menuPos;
+        var currentId;
+        var $this = $(this);
+        var pos   = $this.offset();
+        var a     = $this.next();
+        var b     = $this.closest('.dropdown.body.submenu')
+                        .find('.dropdown.body.submenu,.contains-submenu')
+                        .not($this.next());
 
         a.children().removeClass('active opened');
         a.find('.dropdown.body.submenu').removeClass('active');
@@ -2429,7 +2430,7 @@ function initContextUI() {
             hideSubMenus('.download-item');
         }
         if (!$this.is('.opened')) {
-            menuPos = reCalcMenuPosition($this, pos.left, pos.top, 'submenu'),
+            menuPos = reCalcMenuPosition($this, pos.left, pos.top, 'submenu');
 
             $this.next('.dropdown.body.submenu')
                 .css({'top': menuPos.top})

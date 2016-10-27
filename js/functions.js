@@ -3568,18 +3568,14 @@ mega.utils.reload = function megaUtilsReload() {
             }
         }
 
+        localStorage.force = true;
         location.reload(true);
     }
 
     if (u_type !== 3) {
         stopsc();
         stopapi();
-        if (typeof mDB === 'object' && !pfid) {
-            mDBreload();
-        }
-        else {
-            loadfm(true);
-        }
+        loadfm(true);
     }
     else {
         // Show message that this operation will destroy the browser cache and reload the data stored by MEGA

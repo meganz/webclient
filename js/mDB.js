@@ -1,3 +1,350 @@
+// FM IndexedDB layer (using Dexie.js - https://github.com/dfahlander/Dexie.js)
+
+// indexes and payload are obfuscate using AES ECB (FIXME: use CBC for the payload)
+
+// DB name is fm_ + encrypted u_handle (folder links are not cached yet - FIXME)
+// init() checks for the presence of an sn and wipes the DB if none is found
+// pending[] is an array of write transactions that will be streamed to the DB
+// once pending[].sn is set, the transaction must be left untouched
+
+// FIXME: use proper JS OOP
+function FMDB() {
+    return {
+        init : fmdb_init,
+        add : fmdb_add,
+        del : fmdb_del,
+        get : fmdb_get,
+
+        pending : [],  // pending obfuscated writes [transaction_autoincrement][tablename][op_autoincrement][payload]
+        current : 0,   // current transaction_autoincrement  
+        enqueue : fmdb_enqueue,
+        state : -1,    // -1: idle, 0: deleted sn and writing, 1: transaction open and writing
+        inflight : 0,  // number of executing DB updates
+        wrotesn : false,    // if set, the sn has been updated, completing the transaction
+        crashed : false     // a DB error sets this and prevents further DB access
+    };
+}
+
+// set up and check fm DB for user u
+// calls result(sn) if found and sn present
+// wipes DB an calls result(false) otherwise
+function fmdb_init(u, result, wipe) {
+    var fmdb = this;
+
+    if (fmdb.crashed) result(false);
+    else {
+        try {
+            if (!fmdb.db) {
+                fmdb.db = new Dexie('fm_' + ab_to_base64(fmdb_strcrypt(u_handle)));
+
+                // replicate any additions in fmdb_writepending()
+                fmdb.db.version(1).stores({
+                    f   : '&h, p, s',   // nodes - handle, parent, size (negative size: type)
+                    s   : '[o+t]',      // shares - origin/target; both incoming & outgoing
+                    ok  : '&h',         // ownerkeys for outgoing shares - handle
+                    mk  : '&h',         // missing node keys - handle
+                    u   : '&u',         // users - handle
+                    opc : '&p',         // outgoing pending contact - id
+                    ipc : '&p',         // incoming pending contact - id
+                    ps  : '[h+p]',      // pending share - handle/id
+                    mcf : '&id',        // chats - id
+                    sn  : '&i'          // sn - fixed index 1
+                });
+
+                fmdb.db.open().then(function(){
+                    fmdb.get('sn', function(r){
+                        if (!wipe && r[0] && r[0].length == 11) {
+                            console.log("DB sn: " + r[0]);
+                            result(r[0]);
+                        }
+                        else {
+                            if (d) console.log("No sn found in DB, wiping...");
+                            fmdb.db.delete().then(function(){
+                                fmdb.db.open().then(function(){
+                                    result(false);
+                                });
+                            });
+                        }
+                    });
+                }).catch (Dexie.MissingAPIError, function (e) {
+                    fmdb.crashed = true;
+                    console.error("IndexedDB unavailable");
+                }).catch (function (e) {
+                    fmdb.crashed = true;
+                    console.error(e);
+                });
+            }
+        }
+        catch (e) {
+            console.error("IndexedDB or crypto layer unavailable, disabling");
+            console.log(e);
+            fmdb.crashed = true;
+            result(false);
+        }
+    }
+}
+
+// enqueue table modification
+// a write is triggered if we have at least 1000 pending rows or the sn
+// type == 0: addition
+// type == 1: deletion
+function fmdb_enqueue(table, row, type) {
+    var fmdb = this;
+    var c, i;
+
+    // if needed, create new hash of table modifications at index fmdb.current
+    if (!(c = fmdb.pending[fmdb.current])) c = fmdb.pending[fmdb.current] = {};
+
+    // if needed, create new array of modifications for this table
+    if (!c[table]) c[table] = [];
+    c = c[table];
+
+    // even indexes hold additions, odd indexes hold deletions
+    // we continue to use the highest index if it is of the requested type
+    i = c.length-1;
+    if (type != (i & 1)) i++;
+    else if (i < 0) i = 1;  // (in case we start off with a deletion)
+
+    if (!c[i]) c[i] = [];
+    c[i].push(row);
+
+    // force a flush when a lot of data is pending or the sn was updated
+    if (c[i].length > 1000 || table == 'sn') fmdb_writepending(fmdb);
+}
+
+// FIXME: auto-retry smaller transactions? (need stats about transaction failures)
+function fmdb_writepending(fmdb) {
+    if (!fmdb.pending[fmdb.current] || fmdb.crashed) return;
+
+    if (fmdb.state < 0)
+    {
+        // delete preceding job
+        delete fmdb.pending[fmdb.current-1];
+
+        // if the new job is already complete (has sn set), we execute it in a single transaction
+        // without first clearing sn
+        if (fmdb.pending[fmdb.current].sn) {
+            fmdb.db.transaction('rw',
+                                fmdb.db.f,
+                                fmdb.db.s,
+                                fmdb.db.ok,
+                                fmdb.db.mk,
+                                fmdb.db.u,
+                                fmdb.db.opc,
+                                fmdb.db.ipc,
+                                fmdb.db.ps,
+                                fmdb.db.mcf,
+                                fmdb.db.sn,
+                                function(){
+                                    if (d) console.log("Transaction started");
+                                    fmdb.state = 1;
+                                    dispatchputs();
+                                }).then(function(){
+                                    fmdb.state = -1;
+                                    if (d) console.log("Transaction committed")  
+                                }).catch(function(e){
+                                    console.error("Transaction failed, marking DB as crashed");
+                                    console.log(e);
+                                    fmdb.state = -1;
+                                    fmdb.crashed = true;
+                                });
+        }
+        else {
+            // the job is incomplete - we clear the sn and execute it without transaction protection
+            // the DB will have to be wiped in case anything goes wrong
+            fmdb.state = 0;
+
+            fmdb.db.sn.clear().then(function(){
+                dispatchputs();
+            }).catch(function(e){
+                console.error("SN clearing failed, marking DB as crashed");
+                console.log(e);
+                fmdb.state = -1;
+                fmdb.crashed = true;
+            });
+        }
+    }
+
+    // write all pending data in this transaction to the DB
+    // immediately delete data being written from the transaction
+    function dispatchputs() {
+        for (var table in fmdb.pending[fmdb.current]) { // sn has to be the last in the sequence
+            for (var action in fmdb.pending[fmdb.current][table]) { // even: add, odd: delete
+                var t = fmdb.pending[fmdb.current][table][action];
+                fmdb.inflight++;
+                delete fmdb.pending[fmdb.current][table][action];
+                if (table == 'sn') fmdb.wrotesn = true; // sn is never explicitly deleted
+                if (d) console.log("write started with " + t.length + " elements on table " + table);
+                fmdb.db[table][action & 1 ? 'bulkDelete' : 'bulkPut'](t).then(function(){
+                    if (d) console.log("write completed with inflight=" + fmdb.inflight);
+                    if (!--fmdb.inflight) {
+                        if (d) console.log("No more writes in flight - wrotesn: " + fmdb.wrotesn);
+                        if (fmdb.wrotesn) {
+                            fmdb.current++; // proceed with the next transaction
+                            fmdb.wrotesn = false;
+                        }
+                        fmdb.state = -1;
+                        setTimeout(fmdb_writepending, 1, fmdb); // Dexie's way of committing a transaction?
+                    }
+                    else dispatchputs();
+                });
+            }
+        }
+        if (!fmdb.inflight) fmdb.state = -1;
+    }
+}
+
+// encrypt/decrypt UNICODE string s, returns ArrayBuffer
+// FIXME: use CBC instead of ECB!
+function fmdb_strcrypt(s) {
+    var a32 = str_to_a32(to8(s));
+    for (var i = (-a32.length) & 3; i--; ) a32.push(0);
+    return a32_to_ab(encrypt_key(u_k_aes, a32)).buffer;
+}
+
+function fmdb_strdecrypt(ab) {
+    if (!ab.byteLength) return '';
+    var a32 = [];
+    var dv = new DataView(ab);
+    for (var i = ab.byteLength/4; i--; ) a32[i] = dv.getUint32(i*4);
+    var s = from8(a32_to_str(decrypt_key(u_k_aes, a32)));
+    for (var i = s.length; i--; ) if (s.charCodeAt(i)) return s.substr(0, i+1);
+}
+
+// remove fields that are duplicated in or can be inferred from the index to reduce database size
+fmdb_stripnode = {
+    f : function(f) {
+        var t = { h : f.h, t : f.t, s : f.s };
+
+        delete f.h;
+        delete f.t;
+        delete f.s;
+
+        if (f.p && f.p.length == 8) {
+            f.p = f.p;
+            delete f.p;
+        }
+
+        if (Object.keys(f.ar).length) {
+            t.ar = f.ar;
+            delete f.ar;
+        }
+
+        return t;
+    },
+
+    s : function(s) {
+        var t = { s : o, s : t };
+
+        delete s.o;
+        delete s.t;
+
+        return t;
+    }
+}
+
+// re-add previously removed index fields to the payload object
+fmdb_restorenode = {
+    ok : function(ok, index) {
+        ok.h = index.h;
+    },
+
+    f : function(f, index) {
+        f.h = index.h;
+        f.p = index.p;
+        if (index.s < 0) f.t = -index.s;
+        else {
+            f.t = 0;
+            f.s = 1*index.s;    // FIXME: correct/efficient way of converting string to float?
+        }
+        if (!f.ar && f.k && typeof f.k == 'object') f.ar = {};
+    },
+
+    s : function(f, index) {
+        f.o = index.o;
+        f.t = index.t;
+    },
+
+    mk : function(mk, index) {
+        mk.h = index.h;
+    }
+}
+
+// enqueue IndexedDB puts
+// sn must be added last and effectively (mostly actually) "commits" the "transaction"
+// the next addition will then start a new "transaction"
+// (large writes will not execute as an IndexedDB transaction because IndexedDB can't)
+function fmdb_add(table, row) {
+    if (row.d) {
+        if (fmdb_stripnode[table]) {
+            // this node type is stripnode-optimised: temporarily remove redundant elements
+            // to create a leaner JSON and save IndexedDB space
+            var d = row.d;
+            var t = fmdb_stripnode[table];
+            row.d = JSON.stringify(d);
+            for (var i in t) d[i] = t[i];
+        }
+        else {
+            // otherwise, just stringify it all
+            row.d = JSON.stringify(row.d);
+        }
+    }
+    // obfuscate index elements as base64-encoded strings, payload as ArrayBuffer
+    for (var i in row) {
+        if (i == 'd') row.d = fmdb_strcrypt(row.d);
+        else row[i] = ab_to_base64(fmdb_strcrypt(row[i]));
+    }
+    this.enqueue(table, row, 0);
+}
+
+// enqueue IndexedDB deletions
+function fmdb_del(table, indexrow) {
+    for (var i = indexrow.length; i--; ) {
+        indexrow[i] = ab_to_base64(fmdb_strcrypt(indexrow[i]));
+    }
+    this.enqueue(table, indexrow, 1);
+}
+
+// non-transactional read with subsequent deobfuscation, with optional prefix filter
+// FIXME: replace procresult with Promises without incurring a massive readability/mem/CPU penalty!
+function fmdb_get(table, procresult, key, prefix) {
+    var promise;
+
+    if (d) console.log("Fetching table " + table + "...");
+
+    if (key) promise = fmdb.db[table].where(key).startsWith(prefix).toArray();
+    else promise = fmdb.db[table].toArray();
+ 
+    promise.then(function(r){
+        var t;
+        for (var i = r.length; i--; ) {
+            try {
+                t = r[i].d ?
+                    JSON.parse(xxx = fmdb_strdecrypt(r[i].d))
+                  : {};
+
+                if (fmdb_restorenode[table]) {
+                    // restore attributes based on the table's indexes
+                    for (var p in r[i]) {
+                        if (p != 'd') r[i][p] = fmdb_strdecrypt(base64_to_ab(r[i][p]));
+                    }
+                    fmdb_restorenode[table](t, r[i]);
+                }               
+
+                r[i] = t;            
+            }
+            catch (e) {
+                console.error("IndexedDB corruption: " + fmdb_strdecrypt(r[i].d));
+                delete r[i];
+            }
+        }
+
+        procresult(r);
+    });
+}
+
+if (0)
+{
 var mDBact, mDBv = 7, mDB, mSDB, mSDBPromises = [];
 
 /**
@@ -862,4 +1209,5 @@ function mDBcls() {
     catch (e) {
         mDB = undefined;
     }
+}
 }

@@ -1,10 +1,7 @@
 // global variables holding the user's identity
-var u_handle; // user handle
-var u_k; // master key
-var u_k_aes; // master key AES engine
+// (moved to nodedec.js)
 var u_p; // prepared password
 var u_attr; // attributes
-var u_privk; // private key
 
 // log in
 // returns user type if successful, false if not
@@ -235,13 +232,6 @@ function u_logout(logout) {
         localStorage.removeItem('registeremail');
         localStorage.removeItem('agreedToCopyrightWarning');
 
-        if (mDBact) {
-            mDBact = false;
-            delete localStorage[u_handle + '_mDBactive'];
-        }
-        if (typeof mDBcls === 'function') {
-            mDBcls(); // resets mDBloaded
-        }
         fminitialized = false;
         if (logout !== -0xDEADF) {
             watchdog.notify('logout');
@@ -252,7 +242,6 @@ function u_logout(logout) {
         notify.notifications = [];
         api_setsid(false);
         u_sharekeys = {};
-        u_nodekeys = {};
         u_type = false;
         loggedout = true;
         $('#fmholder').html('');

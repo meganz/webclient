@@ -1,0 +1,581 @@
+if (typeof jsl_loaded != 'object') {
+    importScripts('sjcl.js');
+    importScripts('rsaasm.js');
+
+    var firefox_boost = false;
+    var d;
+
+    self.postMessage = self.webkitPostMessage || self.postMessage;
+
+    function init(debug) {
+        rsa2aes = {};
+        missingkeys = {};
+        rsasharekeys = {};
+        u_sharekeys = {};
+        u_k_aes = {};
+        u_privk = [];
+        d = debug;
+    }
+
+    self.onmessage = function(e) {
+        var req = e.data;
+        var key;
+
+        if (req.t >= 0) {
+            // node
+            crypto_decryptnode(req);
+            self.postMessage(req);
+        }
+        else if (req.ha) {
+            // ownerkey (ok element)
+            if (crypto_handleauthcheck(req.h, req.ha)) {
+                console.log("successfully decrypted sharekeys for " + req.h);
+                key = decrypt_key(u_k_aes, base64_to_a32(req.k));
+                u_sharekeys[req.h] = [key, new sjcl.cipher.aes(key)];
+            }
+            else console.log("handleauthcheck failed for " + req.h);
+        }
+        else if (req.u_k) {
+            // setup for user account
+            init(req.d);
+
+            u_handle = req.u_handle;
+            u_privk = req.u_privk;
+            u_k_aes = new sjcl.cipher.aes(req.u_k);
+        }
+        else if (req.n_h) {
+            // setup folder link
+            init(req.d);
+
+            key = base64_to_a32(req.pfkey);
+            u_sharekeys[req.n_h] = [key, new sjcl.cipher.aes(key)];
+        }
+        else {
+            // (cannot serialise sjcl.cipher.aes)
+            for (var h in u_sharekeys) u_sharekeys[h] = u_sharekeys[h][0];
+
+            // dump state and terminate
+            self.postMessage({
+                rsa2aes        : Object.keys(rsa2aes).length && rsa2aes,
+                rsasharekeys   : Object.keys(rsasharekeys).length && rsasharekeys,
+                sharekeys      : Object.keys(u_sharekeys).length && u_sharekeys,
+                missingkeys    : Object.keys(missingkeys).length && missingkeys,
+            });
+
+            self.close();
+        }
+    }
+
+    var console = {
+        log: function() {
+            if (d) self.postMessage(['console', [].slice.call(arguments)]);
+        }
+    };
+}
+
+var u_handle;
+var u_privk;
+var missingkeys = {};
+var u_k_aes, u_sharekeys = {};
+
+var rsa2aes = {};
+var rsasharekeys = {};
+
+var keycache = {};
+
+function crypto_process_sharekey(handle, key) {
+    if (key.length > 22) {
+        key = base64urldecode(key);
+        var k = str_to_a32(crypto_rsadecrypt(key, u_privk).substr(0, 16));
+        rsasharekeys[handle] = true;
+        return k;
+    }
+
+    return decrypt_key(u_k_aes, base64_to_a32(key));
+}
+
+// decrypt a node received via `f`, in response to a `p` or in an actionpacket
+// no-op if the node object has previously been decrypted successfully
+// node states and their attributes:
+// RAW:     { h, p, u, ts, t, k (string), a (for t < 2), s (for t == 0), sk/r/su (for inshares), fa (for some t == 0) }
+// NO_KEY:  { h, p, u, ts, t, k (string), a (for t < 2), s (for t == 0), fa (for some t == 0) }
+// CORRUPT: { h, p, u, ts, t, k (object), s (for t == 0) }
+// OK:      { h, p, u, ts, t, k (object), s (for t == 0), name, hash, mtime, ar (containing attributes other than n/c/t) }
+function crypto_decryptnode(node) {
+    var key, k;
+    var id;
+    var p, pp;
+
+    // is this node in OK or CORRUPT state or a keyless (root) node? no decryption needed.
+    if (node.name || !node.k || typeof node.k == 'object') return;
+
+    // inbound share root?
+    if (node.sk) {
+        key = crypto_process_sharekey(node.h, node.sk);
+        u_sharekeys[node.h] = [key, new sjcl.cipher.aes(key)];
+        node.p = node.u;
+        delete node.sk;
+    }
+
+    // does the logged in user own the node? (user key is guaranteed to be located first in .k)
+    if (node.k.length == 43 || node.k.length == 22) {
+        id = u_handle;
+        p = 0;
+    }
+    else if (node.k[11] == ':' && u_handle === node.k.substr(0, 11)) {
+        id = u_handle;
+        p = u_handle.length+1;
+    } else {
+        // do we have a suitable sharekey?
+        for (p = 8; (p = node.k.indexOf(':', p)) >= 0; ) {
+            if (++p == 9 || node.k[p-9] == '/') {
+                id = node.k.substr(p-9, 8);
+                if (u_sharekeys[id]) {
+                    break;
+                }
+            }
+        }
+    }
+
+    if (p >= 0) {
+        var pp = node.k.indexOf('/', p);
+
+        if (pp < 0) {
+            pp = node.k.length;
+        }
+
+        key = node.k.substr(p, pp-p);
+
+        // we have found a suitable key: decrypt!
+        if (key.length < 46) {
+            // short keys: AES
+            k = base64_to_a32(key);
+
+            // check for permitted key lengths (4 == folder, 8 == file)
+            if (k.length == 4 || k.length == 8) {
+                k = decrypt_key(id === u_handle ? u_k_aes : u_sharekeys[id][1], k);
+            }
+            else {
+                if (d) {
+                    console.log("Received invalid key length (" + k.length + "): " + node.h);
+                }
+                k = false;
+            }
+        }
+        else {
+            // long keys: RSA
+            if (u_privk) {
+                var t = base64urldecode(key);
+                try {
+                    if (t) {
+                        k = str_to_a32(crypto_rsadecrypt(t, u_privk).substr(0, node.t ? 16 : 32));
+                    }
+                    else {
+                        if (d) {
+                            console.log("Corrupt key for node " + node.h);
+                        }
+                    }
+                }
+                catch (e) {
+                    if (d) {
+                        console.log('u_privk error: ' + e);
+                    }
+                }
+            }
+            else {
+                if (d) {
+                    console.log("Received RSA key, but have no public key published: " + node.h);
+                }
+            }
+        }
+
+        if (!k) {
+            if (d) console.log("Can't extract key from " + key + " for " + node.h);
+            missingkeys[node.h] = true;
+            return;
+        }
+
+        if (node.a) crypto_procattr(node, k);
+        else {
+            if (d && node.t > 1) {
+                console.log('Missing attribute for node ' + node.h);
+            }
+        }
+    }
+}
+
+// if decryption of .a is successful, set .name, .hash, .mtime, .k and .ar and clear .a
+function crypto_procattr(node, key)
+{
+    var ab = base64_to_ab(node.a);
+    var o = ab && dec_attr(ab, key);
+
+    if (o) {
+        if (typeof o.n == 'string') {
+            node.name = o.n;
+            delete o.n;
+
+            // now we can be sure that we have a good key: rewrite to RSA
+            if (key.length >= 46) {
+                rsa2aes[node.h] = a32_to_str(encrypt_key(u_k_aes, k));
+            }
+
+            if (typeof o.c == 'string') {
+                node.hash = o.c;
+                delete o.c;
+            }
+
+            if (typeof o.t != 'undefined') {
+                node.mtime = o.t;
+                delete o.t;
+            }
+            else if (node.hash) {
+                var h = base64urldecode(node.hash);
+                var i = h.charCodeAt(16);
+                if (i <= 4) { // FIXME: change to 5 before the year 2106
+                    var t = 0;
+                    for (var i = h.charCodeAt(16); i--;) {
+                        t = t * 256 + h.charCodeAt(17 + i);
+                    }
+                    node.mtime = t;
+                }
+            }
+
+            node.k = key;
+            node.ar = o;
+            delete node.a;
+
+            success = true;
+        }
+        else {
+            if (d) console.log("Incomplete attributes for node " + node.h);
+        }
+    }
+    else {
+        // we record the key as missing in the vague hope that someone will send us the correct one
+        if (d) console.log("Corrupted attributes or key for node " + node.h);
+        missingkeys[node.h] = true;        
+    }
+}
+
+// encrypt/decrypt 4- or 8-element 32-bit integer array
+function encrypt_key(cipher, a) {
+    if (!a) {
+        a = [];
+    }
+    if (a.length == 4) {
+        return cipher.encrypt(a);
+    }
+    var x = [];
+    for (var i = 0; i < a.length; i += 4) {
+        x = x.concat(cipher.encrypt([a[i], a[i + 1], a[i + 2], a[i + 3]]));
+    }
+    return x;
+}
+
+function decrypt_key(cipher, a) {
+    if (a.length == 4) {
+        return cipher.decrypt(a);
+    }
+
+    var x = [];
+    for (var i = 0; i < a.length; i += 4) {
+        x = x.concat(cipher.decrypt([a[i], a[i + 1], a[i + 2], a[i + 3]]));
+    }
+    return x;
+}
+
+function crypto_handleauthcheck(h, ha) {
+    var a = base64_to_a32(ha);
+    var b = encrypt_key(u_k_aes, str_to_a32(h + h));
+    return a[0] == b[0] && a[1] == b[1] && a[2] == b[2] && a[3] == b[3];
+}
+
+/**
+ * Decrypts a ciphertext string with the supplied private key.
+ *
+ * @param {String} ciphertext
+ *     Cipher text to decrypt.
+ * @param {Array} privkey
+ *     Private encryption key (in the usual internal format used).
+ * @return {String}
+ *     Decrypted clear text.
+ */
+// decrypts ciphertext string representing an MPI-formatted big number with the supplied privkey
+// returns cleartext string
+function crypto_rsadecrypt(ciphertext, privkey) {
+    var l = (ciphertext.charCodeAt(0) * 256 + ciphertext.charCodeAt(1) + 7) >> 3;
+    ciphertext = ciphertext.substr(2, l);
+
+    var cleartext = asmCrypto.bytes_to_string(asmCrypto.RSA_RAW.decrypt(ciphertext, privkey));
+    if (cleartext.length < privkey[0].length) {
+        cleartext = Array(privkey[0].length - cleartext.length + 1).join(String.fromCharCode(0)) + cleartext;
+    }
+
+    // Old bogus padding workaround
+    if (cleartext.charCodeAt(1) !== 0) {
+        cleartext = String.fromCharCode(0) + cleartext;
+    }
+
+    return cleartext.substr(2);
+}
+
+// array of 32-bit words to string (big endian)
+function a32_to_str(a) {
+    var b = '';
+
+    for (var i = 0; i < a.length * 4; i++) {
+        b = b + String.fromCharCode((a[i >> 2] >>> (24 - (i & 3) * 8)) & 255);
+    }
+
+    return b;
+}
+
+// array of 32-bit words ArrayBuffer (big endian)
+function a32_to_ab(a) {
+    var ab = new Uint8Array(4 * a.length);
+
+    for (var i = 0; i < a.length; i++) {
+        ab[4 * i] = a[i] >>> 24;
+        ab[4 * i + 1] = a[i] >>> 16 & 255;
+        ab[4 * i + 2] = a[i] >>> 8 & 255;
+        ab[4 * i + 3] = a[i] & 255;
+    }
+
+    return ab;
+}
+
+// string to array of 32-bit words (big endian)
+function str_to_a32(b) {
+    var a = Array((b.length + 3) >> 2);
+    for (var i = 0; i < b.length; i++) {
+        a[i >> 2] |= (b.charCodeAt(i) << (24 - (i & 3) * 8));
+    }
+    return a;
+}
+
+function base64_to_a32(s) {
+    return str_to_a32(base64urldecode(s));
+}
+
+// substitute standard base64 special characters to prevent JSON escaping, remove padding
+function base64urlencode(data) {
+    if (typeof btoa === 'function') {
+        return btoa(data).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+    }
+
+    var o1, o2, o3, h1, h2, h3, h4, bits, i = 0,
+        ac = 0,
+        enc = "",
+        tmp_arr = [];
+
+    do { // pack three octets into four hexets
+        o1 = data.charCodeAt(i++);
+        o2 = data.charCodeAt(i++);
+        o3 = data.charCodeAt(i++);
+
+        bits = o1 << 16 | o2 << 8 | o3;
+
+        h1 = bits >> 18 & 0x3f;
+        h2 = bits >> 12 & 0x3f;
+        h3 = bits >> 6 & 0x3f;
+        h4 = bits & 0x3f;
+
+        // use hexets to index into b64, and append result to encoded string
+        tmp_arr[ac++] = b64a[h1] + b64a[h2] + b64a[h3] + b64a[h4];
+    } while (i < data.length);
+
+    enc = tmp_arr.join('');
+    var r = data.length % 3;
+    return (r ? enc.slice(0, r - 3) : enc);
+}
+
+// b64 is also used by mega.js fetchfchunked()!
+var b64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_=";
+var b64a = b64.split('');
+
+var base64urldecode = function(data) {
+    data += '=='.substr((2 - data.length * 3) & 3)
+
+    data = data.replace(/\-/g, '+').replace(/_/g, '/').replace(/,/g, '');
+
+    try {
+        return atob(data);
+    }
+    catch (e) {
+        return '';
+    }
+};
+
+// (Safari workers lack atob()!) 
+if (typeof atob !== 'function') {
+    base64urldecode = function(data) {
+        data += '=='.substr((2 - data.length * 3) & 3);
+
+        // http://kevin.vanzonneveld.net
+        // +   original by: Tyler Akins (http://rumkin.com)
+        // +   improved by: Thunder.m
+        // +      input by: Aman Gupta
+        // +   improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+        // +   bugfixed by: Onno Marsman
+        // +   bugfixed by: Pellentesque Malesuada
+        // +   improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+        // +      input by: Brett Zamir (http://brett-zamir.me)
+        // +   bugfixed by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+        // *     example 1: base64_decode('S2V2aW4gdmFuIFpvbm5ldmVsZA==');
+        // *     returns 1: 'Kevin van Zonneveld'
+        // mozilla has this native
+        // - but breaks in 2.0.0.12!
+        //if (typeof this.window['atob'] === 'function') {
+        //    return atob(data);
+        //}
+        var o1, o2, o3, h1, h2, h3, h4, bits, i = 0,
+            ac = 0,
+            dec = "",
+            tmp_arr = [];
+
+        if (!data) {
+            return data;
+        }
+
+        data += '';
+
+        do { // unpack four hexets into three octets using index points in b64
+            h1 = b64.indexOf(data.charAt(i++));
+            h2 = b64.indexOf(data.charAt(i++));
+            h3 = b64.indexOf(data.charAt(i++));
+            h4 = b64.indexOf(data.charAt(i++));
+
+            bits = h1 << 18 | h2 << 12 | h3 << 6 | h4;
+
+            o1 = bits >> 16 & 0xff;
+            o2 = bits >> 8 & 0xff;
+            o3 = bits & 0xff;
+
+            if (h3 === 64) {
+                tmp_arr[ac++] = String.fromCharCode(o1);
+            }
+            else if (h4 === 64) {
+                tmp_arr[ac++] = String.fromCharCode(o1, o2);
+            }
+            else {
+                tmp_arr[ac++] = String.fromCharCode(o1, o2, o3);
+            }
+        } while (i < data.length);
+
+        dec = tmp_arr.join('');
+
+        return dec;
+    };
+}
+
+
+// binary string to ArrayBuffer, 0-padded to AES block size
+function str_to_ab(b) {
+    var ab = new ArrayBuffer((b.length + 15) & -16);
+    var u8 = new Uint8Array(ab);
+
+    for (var i = b.length; i--;) {
+        u8[i] = b.charCodeAt(i);
+    }
+
+    return ab;
+}
+
+// ArrayBuffer to binary with depadding
+function ab_to_str_depad(ab) {
+    var b = '', i;
+    var ab8 = new Uint8Array(ab);
+
+    for (i = 0; i < ab8.length && ab8[i]; i++) {
+        b = b + String.fromCharCode(ab8[i]);
+    }
+
+    return b;
+}
+
+// ArrayBuffer to binary string
+function ab_to_base64(ab) {
+    return base64urlencode(ab_to_str(ab));
+}
+
+if (firefox_boost) {
+    ab_to_str_depad = mozAB2SDepad;
+}
+
+function ab_to_str(ab) {
+    var b = '', i;
+    var ab8 = new Uint8Array(ab);
+
+    for (i = 0; i < ab8.length; i++) {
+        b = b + String.fromCharCode(ab8[i]);
+    }
+
+    return b;
+}
+
+// binary string to ArrayBuffer, 0-padded to AES block size
+function base64_to_ab(a) {
+    return str_to_ab(base64urldecode(a));
+}
+
+// decrypt attributes block using AES-CBC, check for MEGA canary
+// attr = ab, key as with enc_attr
+// returns [Object] or false
+function dec_attr(attr, key) {
+    var aes;
+    var b;
+
+    attr = asmCrypto.AES_CBC.decrypt(attr,
+        a32_to_ab([key[0] ^ key[4], key[1] ^ key[5], key[2] ^ key[6], key[3] ^ key[7]]), false);
+
+    b = ab_to_str_depad(attr);
+
+    if (b.substr(0, 6) !== 'MEGA{"') {
+        return false;
+    }
+
+    try {
+        return JSON.parse(from8(b.substr(4)));
+    }
+    catch (e) {
+        if (d) console.log(b, e);
+        var m = b.match(/"n"\s*:\s*"((?:\\"|.)*?)(\.\w{2,4})?"/);
+        var s = m && m[1];
+        var l = s && s.length || 0;
+        var j = ',';
+
+        while (l--) {
+            s = s.substr(0, l || 1);
+            try {
+                from8(s + j);
+                break;
+            }
+            catch (e) {}
+        }
+
+        if (~l) {
+            try {
+                var new_name = s + j + 'trunc' + Math.random().toString(16).slice(-4) + (m[2] || '');
+                return JSON.parse(from8(b.substr(4).replace(m[0], '"n":"' + new_name + '"')));
+            }
+            catch (e) {}
+        }
+
+        return {
+            n: 'MALFORMED_ATTRIBUTES'
+        };
+    }
+}
+
+/**
+ * Converts a UTF-8 encoded string to a Unicode string.
+ *
+ * @param {String} utf8
+ *     UTF-8 encoded string (8-bit characters only).
+ * @return {String}
+ *     Browser's native string encoding.
+ */
+var from8 = firefox_boost ? mozFrom8 : function (utf8) {
+    return decodeURIComponent(escape(utf8));
+};

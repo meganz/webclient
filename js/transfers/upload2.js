@@ -687,7 +687,7 @@ var ulmanager = {
             skipfile: (fmconfig.ul_skipIdentical && identical),
             callback: function(res, ctx) {
                 if (res.e === ETEMPUNAVAIL && ctx.skipfile) {
-                    ctx.uq.repair = ctx.n.key;
+                    ctx.uq.repair = ctx.n.k;
                     ulmanager.ulStart(File);
                 }
                 else if (typeof res === 'number' || res.e) {
@@ -702,7 +702,7 @@ var ulmanager = {
                     File.file.done_starting();
                 }
                 else {
-                    File.file.filekey = ctx.n.key;
+                    File.file.filekey = ctx.n.k;
                     File.file.response = ctx.n.h;
                     File.file.faid = ctx.n.fa;
                     File.file.path = ctx.uq.path;

@@ -1249,15 +1249,6 @@ function hideTransferToast ($toast) {
     $('.toast-notification').removeClass('second');
 }
 
-function isValidShareLink()
-{
-    var valid = true;
-    for (var i in u_nodekeys) {
-        valid = valid && typeof u_nodekeys[i] == "object"
-    }
-    return valid;
-}
-
 function removeUInode(h, parent) {
 
     var n = M.d[h],
@@ -10449,7 +10440,7 @@ function fetchsrc(id)
 
     preqs[id] = 1;
     var treq = {};
-    treq[id] = {fa: n.fa, k: n.key};
+    treq[id] = {fa: n.fa, k: n.k};
     api_getfileattr(treq, 1, function(ctx, id, uint8arr)
     {
         previewimg(id, uint8arr);
@@ -10458,10 +10449,10 @@ function fetchsrc(id)
                 console.log('Thumbnail found missing on preview, creating...', id, n);
             }
             var aes = new sjcl.cipher.aes([
-                n.key[0] ^ n.key[4],
-                n.key[1] ^ n.key[5],
-                n.key[2] ^ n.key[6],
-                n.key[3] ^ n.key[7]]);
+                n.k[0] ^ n.k[4],
+                n.k[1] ^ n.k[5],
+                n.k[2] ^ n.k[6],
+                n.k[3] ^ n.k[7]]);
             createnodethumbnail(n.h, aes, id, uint8arr);
         }
         if (id == slideshowid)
@@ -10562,7 +10553,7 @@ function fm_thumbnails()
                     treq[n.h] =
                         {
                             fa: n.fa,
-                            k: n.key
+                            k: n.k
                         };
                     th_requested[n.h] = 1;
 

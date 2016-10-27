@@ -34,6 +34,7 @@ module.exports = function(config) {
         'js/vendor/jsbn.js',
         'js/vendor/jsbn2.js',
         'js/vendor/nacl-fast.js',
+        'js/vendor/dexie.js',
         // For notifications.
         'js/vendor/ion.sound.js',
         'js/vendor/favico.js',
@@ -84,7 +85,7 @@ module.exports = function(config) {
         'js/fm.js',
         'js/mouse.js',
         'js/filedrag.js',
-        'js/mDB.js',
+        //'js/mDB.js',
         'js/thumbnail.js',
         'js/vendor/exif.js',
         'js/vendor/megapix.js',

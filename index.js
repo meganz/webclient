@@ -335,11 +335,12 @@ function init_page() {
                 loadfm.loaded = false;
                 if (loadfm.loading) {
                     api_init(wasFolderlink ? 1 : 0, 'cs');
+                    api_init(wasFolderlink ? 5 : 4, 'cs');
                     loadfm.loading = false;
                 }
-                if (typeof mDBcls === 'function') {
-                    mDBcls();
-                }
+                //if (typeof mDBcls === 'function') {
+                //    mDBcls();
+                //}
             }
         }
 

@@ -13,7 +13,7 @@ var storageQuotaError = false;
 var lastactive = new Date().getTime();
 var URL = window.URL || window.webkitURL;
 var seqno = Math.ceil(Math.random()*1000000000);
-var staticpath = 'https://eu.static.mega.co.nz/3/';
+var staticpath = 'https://staging.static.mega.co.nz/3/';
 var ua = window.navigator.userAgent.toLowerCase();
 var storage_version = '1'; // clear localStorage when version doesn't match
 var page = document.location.hash, l, d = false;
@@ -301,7 +301,7 @@ if (!b_u) try
         staticpath = localStorage.staticpath;
     }
     staticpath = staticpath || geoStaticpath();
-    apipath = localStorage.apipath || 'https://eu.api.mega.co.nz/';
+    apipath = localStorage.apipath || 'https://staging.api.mega.co.nz/';
 }
 catch(e) {
     if (!m || !cookiesDisabled) {
@@ -796,9 +796,9 @@ Object.defineProperty(this, 'mBroadcaster', {
                             }
                             delete localStorage['mCrossTabRef_' + u_handle];
                             this.setMaster();
-                            if (u_handle && window.indexedDB) {
-                                mDBstart(true);
-                            }
+                            //if (u_handle && window.indexedDB) {
+                            //    mDBstart(true);
+                            //}
                         }
                     }
                     break;
@@ -1495,6 +1495,7 @@ else if (!b_u)
 
     jsl.push({f:langFilepath, n: 'lang', j:3});
     jsl.push({f:'sjcl.js', n: 'sjcl_js', j:1});
+    jsl.push({f:'nodedec.js', n: 'nodedec_js', j:1});
     jsl.push({f:'js/vendor/jquery-2.2.1.js', n: 'jquery', j:1, w:10});
     jsl.push({f:'js/vendor/jquery-ui.js', n: 'jqueryui_js', j:1, w:10});
     jsl.push({f:'js/vendor/jquery.mousewheel.js', n: 'jquerymouse_js', j:1});
@@ -1521,6 +1522,7 @@ else if (!b_u)
         jsl.push({f:'js/vendor/jsbn.js', n: 'jsbn_js', j:1, w:2});
         jsl.push({f:'js/vendor/jsbn2.js', n: 'jsbn2_js', j:1, w:2});
         jsl.push({f:'js/vendor/nacl-fast.js', n: 'nacl_js', j:1,w:7});
+        jsl.push({f:'js/vendor/dexie.js', n: 'dexie_js', j:1,w:5});
         jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
 
         jsl.push({f:'js/authring.js', n: 'authring_js', j:1});

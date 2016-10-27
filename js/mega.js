@@ -2360,10 +2360,6 @@ function MegaData()
     };
 
     this.addNode = function(n, ignoreDB) {
-
-        if (!this.c['shares']) {
-            this.c['shares'] = [];
-        }
         if (!M.d[n.p] && n.p !== 'contacts') {
             if (n.sk) {
                 n.p = n.u;
@@ -2372,6 +2368,7 @@ function MegaData()
                 n.p = n.su;
             }
         }
+
         if (n.p && n.p.length === 11 && !M.d[n.p]) {
             var u = this.u[n.p];
             if (u) {
@@ -2384,14 +2381,7 @@ function MegaData()
                 console.log('something went wrong!', n.p, this.u[n.p]);
             }
         }
-        if (typeof mDB === 'object' && !ignoreDB && !pfkey) {
-            if (n instanceof MegaDataObject) {
-                mDBadd('f', clone(n.toJS()));
-            }
-            else {
-                mDBadd('f', clone(n));
-            }
-        }
+
         if (n.p) {
             if (typeof this.c[n.p] === 'undefined') {
                 this.c[n.p] = [];
@@ -2399,7 +2389,7 @@ function MegaData()
             this.c[n.p][n.h] = 1;
             // maintain special incoming shares index:
             if (n.p.length === 11) {
-                this.c['shares'][n.h] = 1;
+                this.c.shares[n.h] = { su : n.su, r : n.r };
             }
         }
 
@@ -2415,32 +2405,47 @@ function MegaData()
             }
         }
 
-        if (!n.c) {
-            if (n.sk && !u_sharekeys[n.h]) {
-                u_sharekeys[n.h] = crypto_process_sharekey(n.h, n.sk);
+        if (!n.c) { // FIXME: what is n.c?
+            if (n.sk /*&& !u_sharekeys[n.h]*/) {
+                var k = crypto_process_sharekey(n.h, n.sk);
+                u_sharekeys[n.h] = [k, new sjcl.cipher.aes(k)];
+
+                if (this.c.shares[n.h].su) {
+                    this.c.shares[n.h].sk = a32_to_base64(k);
+                    if (fmdb) fmdb.add('s', { o : M.c.shares[n.h].su,
+                                              t : n.h,
+                                              d : M.c.shares[n.h] });
+                }
             }
 
             if (n.t !== 2 && n.t !== 3 && n.t !== 4 && n.k) {
-                if (u_kdnodecache[n.h]) {
+                /*if (u_kdnodecache[n.h]) {
                     var obj = u_kdnodecache[n.h];
                     for (var k in obj) {
                         n[k] = obj[k];
                     }
                 }
-                else {
-                    crypto_processkey(u_handle, u_k_aes, n);
-                }
-                if (n.key) {
-                    u_nodekeys[n.h] = n.key;
-
+                else {*/
+                    crypto_decryptnode(n);
+                //}
+                if (n.k && (n.k.length == 4 || n.k.length == 8)) {
                     // Update global variable which holds data about missing keys
                     // so DOM can be updated accordingly
                     if (missingkeys[n.h]) {
                         delete missingkeys[n.h];
                     }
                 }
+
+                if (fmdb && !ignoreDB) {
+                    fmdb.add('f', global_f = {
+                            h : n.h,
+                            p : n.p,
+                            s : n.s >= 0 ? n.s : -n.t,
+                            d : n
+                        });
+                }
             }
-            else if (!n.k) {
+            else if (!n.k || typeof n.k != 'object') {
                 if (n.a) {
                     if (!missingkeys[n.h]) {
                         missingkeys[n.h] = true;
@@ -2484,8 +2489,7 @@ function MegaData()
         // $(window).trigger("megaNodeAdded", [n]);
     };
 
-    this.delNode = function(h) {
-
+    this.delNode = function(h, ignoreDB) {
         function ds(h) {
             removeUInode(h);
             if (M.c[h] && h.length < 11) {
@@ -2494,10 +2498,16 @@ function MegaData()
                 }
                 delete M.c[h];
             }
-            if (typeof mDB === 'object' && !pfkey) {
-                mDBdel('f', h);
+
+            if (fmdb && !ignoreDB) {
+                fmdb.del('f', [h]);
             }
+
             if (M.d[h]) {
+                if (M.d[h].p && M.d[h].p.length == 11 && fmdb && !ignoreDB) {
+                    fmdb.del('s', [M.d[h].p, h]);
+                }
+
                 M.delIndex(M.d[h].p, h);
                 M.delHash(M.d[h]);
                 delete M.d[h];
@@ -2537,7 +2547,7 @@ function MegaData()
                     break;
                 }
             }
-            if (M.h[n.hash].length == 0)
+            if (!M.h[n.hash].length)
                 delete M.h[n.hash];
         }
     };
@@ -3025,7 +3035,7 @@ function MegaData()
 
             this.u[userId].addChangeListener(this.onContactChanged);
 
-            if (typeof mDB === 'object' && !ignoreDB && !pfkey) {
+            if (fmdb && !ignoreDB && !pfkey) {
                 // convert MegaDataObjects -> JS
                 var cleanedUpUserData = clone(u.toJS ? u.toJS() : u);
                 delete cleanedUpUserData.presence;
@@ -3033,7 +3043,7 @@ function MegaData()
                 delete cleanedUpUserData.shortName;
                 delete cleanedUpUserData.name;
                 delete cleanedUpUserData.avatar;
-                mDBadd('u', cleanedUpUserData);
+                fmdb.add('u', { u : u.u, d : cleanedUpUserData });
             }
 
             this.syncUsersFullname(userId);
@@ -3043,8 +3053,8 @@ function MegaData()
     // Update M.opc and related localStorage
     this.addOPC = function(u, ignoreDB) {
         this.opc[u.p] = u;
-        if (typeof mSDB === 'object' && !ignoreDB && !pfkey) {
-            mSDB.add('opc', clone(u));
+        if (fmdb && !ignoreDB && !pfkey) {
+            fmdb.add('opc', { p : u.p, d : u });
         }
     };
 
@@ -3055,16 +3065,16 @@ function MegaData()
      *
      */
     this.delOPC = function(id) {
-        if (typeof mSDB === 'object' && !pfkey) {
-            mSDB.del('opc', id);
+        if (fmdb && !pfkey) {
+            fmdb.del('opc', [id]);
         }
     };
 
     // Update M.ipc and related localStorage
     this.addIPC = function(u, ignoreDB) {
         this.ipc[u.p] = u;
-        if (typeof mSDB === 'object' && !ignoreDB && !pfkey) {
-            mSDB.add('ipc', clone(u));
+        if (fmdb && !pfkey) {
+            fmdb.add('ipc', { p : u.p, d : u });
         }
     };
 
@@ -3075,8 +3085,8 @@ function MegaData()
      *
      */
     this.delIPC = function(id) {
-        if (typeof mSDB === 'object' && !pfkey) {
-            mSDB.del('ipc', id);
+        if (fmdb && !pfkey) {
+            fmdb.del('ipc', [id]);
         }
     };
 
@@ -3100,8 +3110,8 @@ function MegaData()
         }
         this.ps[ps.h][ps.p] = ps;
 
-        if (typeof mSDB === 'object' && !ignoreDB && !pfkey) {
-            mSDB.add('ps', clone(ps));
+        if (fmdb && !ignoreDB && !pfkey) {
+            fmdb.add('ps', { h : ps.h, p : ps.p, d : ps });
         }
 
         // maintain special outgoing shares index by user:
@@ -3135,8 +3145,8 @@ function MegaData()
 
         // Check how removing from indexedDb works and make
         // sure that pending share is/only removed from it
-        if (typeof mSDB === 'object' && !pfkey) {
-            mSDB.del('ps', pcrId);
+        if (fmdb && !pfkey) {
+            fmdb.del('ps', [nodeId,pcrId]);
         }
     };
 
@@ -3147,7 +3157,7 @@ function MegaData()
         }
 
         var sane = nodes.filter(function(node) {
-            return M.isNodeObject(node);
+            return M.isFileNode(node);
         });
 
         if (sane.length !== nodes.length) {
@@ -3207,7 +3217,7 @@ function MegaData()
             return false;
         }
 
-        var a = this.isNodeObject(cn) ? [cn] : ($.onImportCopyNodes || fm_getcopynodes(cn, t));
+        var a = this.isFileNode(cn) ? [cn] : ($.onImportCopyNodes || fm_getcopynodes(cn, t));
         var importNodes = Object(a).length;
         var ops = {a: 'p', t: t, n: a, i: requesti};
         var s = fm_getsharenodes(t);
@@ -3487,7 +3497,6 @@ function MegaData()
     };
 
     this.nodeAttr = function(attrs) {
-
         var node = M.d[attrs.h];
 
         if (node) {
@@ -3496,10 +3505,10 @@ function MegaData()
                     node[i] = attrs[i];
                 }
             }
-            if ((typeof mDB === 'object') && !pfkey) {
-                mDBadd('f', clone(node));
+            if (fmdb && !pfkey) {
+                fmdb.add('f', { h : node.h, p : node.p, s : node.s >= 0 ? node.s : -node.t, d : node });
             }
-            if (node.key && missingkeys[node.h]) {
+            if (node.k && typeof node.k == 'object' && missingkeys[node.h]) {
                 delete missingkeys[node.h];
             }
         }
@@ -3743,27 +3752,26 @@ function MegaData()
             }
 
             this.d[h].shares[s.u] = s;
-            if (typeof mDB === 'object') {
-                s['h_u'] = h + '_' + s.u;
+            if (fmdb) {
                 if (!ignoreDB && !pfkey) {
-                    mDBadd('s', clone(s));
+                    fmdb.add('s', { o : h, t : s.u, d : s });
                 }
             }
             if (fminitialized) {
                 sharedUInode(h);
             }
-            if ((typeof mDB === 'object') && !pfkey) {
+            if (fmdb && !pfkey && !ignoreDB) {
                 if (!u_sharekeys[h]) {
                     if (d && !this.getNodeShare(h)) {
                         console.warn('INVALID OPERATION -- No share key for handle "%s"', h);
                     }
                 }
                 else {
-                    mDBadd('ok', {
-                        h: h,
-                        k: a32_to_base64(encrypt_key(u_k_aes, u_sharekeys[h])),
-                        ha: crypto_handleauth(h)
-                    });
+                    fmdb.add('ok', {
+                        h : h,
+                        d : { k : a32_to_base64(encrypt_key(u_k_aes, u_sharekeys[h][0])),
+                              ha : crypto_handleauth(h) }
+                        });
                 }
             }
 
@@ -3787,7 +3795,6 @@ function MegaData()
      *                       owner share key must be removed too.
      */
     this.delNodeShare = function(h, u, okd) {
-
         if (this.d[h] && typeof this.d[h].shares !== 'undefined') {
             var a = 0;
 
@@ -3815,8 +3822,8 @@ function MegaData()
                 }
             }
 
-            if (typeof mDB === 'object') {
-                mDBdel('s', h + '_' + u);
+            if (fmdb) {
+                fmdb.del('s', [h, u]);
             }
         }
 
@@ -3826,7 +3833,7 @@ function MegaData()
             var users = this.getNodeShareUsers(h, 'EXP');
 
             if (users.length) {
-                console.error('The node "%s" still has shares on it!', h);
+                console.error('The node "' + h + '" still has shares on it!');
 
                 users.forEach(function(user) {
                     M.delNodeShare(h, user);
@@ -3834,8 +3841,8 @@ function MegaData()
             }
 
             delete u_sharekeys[h];
-            if (typeof mDB === 'object') {
-                mDBdel('ok', h);
+            if (fmdb) {
+                fmdb.del('ok', [h]);
             }
         }
     };
@@ -4078,12 +4085,12 @@ function MegaData()
     };
 
     /**
-     * Check whether an object is an ufs node
+     * Check whether an object is a file node
      * @param {String} n The object to check
      * @return {Boolean}
      */
-    this.isNodeObject = function(n) {
-        return typeof n === 'object' && Array.isArray(n.key) && n.key.length === 8;
+    this.isFileNode = function(n) {
+        return typeof n == 'object' && typeof n.k == 'object' && n.k.length == 8;
     };
 
     /** like addToTransferTable, but can take a download object */
@@ -4092,7 +4099,7 @@ function MegaData()
         node.name = node.name || node.n;
 
         if (d && console.assert) {
-            console.assert(this.isNodeObject(node), 'Invalid putToTransferTable node.');
+            console.assert(this.isFileNode(node), 'Invalid putToTransferTable node.');
         }
 
         var gid = 'dl_' + handle;
@@ -4171,8 +4178,8 @@ function MegaData()
                     if (!node.t) {
                         item.s = node.s;
                         item.ts = node.mtime || node.ts;
-                        if (Object(node.key).length) {
-                            item.k = a32_to_base64(node.key);
+                        if (node.k && typeof node.k == 'object') {
+                            item.k = a32_to_base64(node.k);
                         }
                     }
                     files.push(item);
@@ -4262,7 +4269,7 @@ function MegaData()
                     nodes.push(n[i]);
                 }
             }
-            else if (this.isNodeObject(n[i])) {
+            else if (this.isFileNode(n[i])) {
                 nodes.push(n[i]);
             }
         }
@@ -4293,9 +4300,9 @@ function MegaData()
         var ttl = this.getTransferTableLengths();
         for (var k in nodes) {
             /* jshint -W089 */
-            if (!nodes.hasOwnProperty(k) || !this.isNodeObject((n = M.d[nodes[k]]))) {
+            if (!nodes.hasOwnProperty(k) || !this.isFileNode((n = M.d[nodes[k]]))) {
                 n = nodes[k];
-                if (this.isNodeObject(n)) {
+                if (this.isFileNode(n)) {
                     dlmanager.logger.info('Using plain provided node object.');
                 }
                 else {
@@ -4314,7 +4321,7 @@ function MegaData()
             }
             dl_queue.push({
                 id: n.h,
-                key: n.key,
+                key: n.k,
                 n: n.name,
                 t: n.mtime || n.ts,
                 p: path,
@@ -5167,8 +5174,8 @@ function MegaData()
 
     this.cloneChatNode = function(n, keepParent) {
         var n2 = clone(n);
-        n2.k = a32_to_base64(n2.key);
-        delete n2.key, n2.ph, n2.ar;
+        n2.k = a32_to_base64(n2.k);
+        delete n2.k, n2.ph, n2.ar;
         if (!keepParent)
             delete n2.p;
         return n2;
@@ -5596,10 +5603,8 @@ function execsc(actionPackets, callback) {
                     });
                 }
             }
-
             // Full share
             else if (actionPacket.a === 's' || actionPacket.a === 's2') {
-
                 // Used during share dialog removal of contact from share list
                 // Find out is this a full share delete
                 if (actionPacket.r === undefined) {
@@ -5627,7 +5632,6 @@ function execsc(actionPackets, callback) {
                     sharedUInode(actionPacket.h);
                 }
             }
-
             // Outgoing pending contact
             else if (actionPacket.a === 'opc') {
                 processOPC([actionPacket]);
@@ -5637,24 +5641,20 @@ function execsc(actionPackets, callback) {
                     M.drawSentContactRequests([actionPacket]);
                 }
             }
-
             // Incoming pending contact
             else if (actionPacket.a === 'ipc') {
                 processIPC([actionPacket]);
                 M.drawReceivedContactRequests([actionPacket]);
                 notify.notifyFromActionPacket(actionPacket);
             }
-
             // Export link (public handle)
             else if (actionPacket.a === 'ph') {
                 processPH([actionPacket]);
             }
-
-            // Incomming request updated
+            // Incoming request updated
             else if (actionPacket.a === 'upci') {
                 processUPCI([actionPacket]);
             }
-
             // Outgoing request updated
             else if (actionPacket.a === 'upco') {
                 processUPCO([actionPacket]);
@@ -5683,12 +5683,10 @@ function execsc(actionPackets, callback) {
             });
         }
         else if ((actionPacket.a === 's' || actionPacket.a === 's2') && !folderlink) {
-
             var tsharekey = '';
             var prockey = false;
 
             if (actionPacket.o === u_handle) {
-
                 if (!actionPacket.u) {
                     // this must be a pending share
                     if (actionPacket.a !== 's2') {
@@ -5707,7 +5705,8 @@ function execsc(actionPackets, callback) {
                             || (actionPacket.ha === crypto_handleauth(actionPacket.n))) {
 
                         // I updated or created my share
-                        u_sharekeys[handle] = decrypt_key(u_k_aes, base64_to_a32(actionPacket.ok));
+                        var k = decrypt_key(u_k_aes, base64_to_a32(actionPacket.ok));
+                        u_sharekeys[handle] = [k, new sjcl.cipher.aes(k)];
                         M.nodeShare(handle, {
                             h: actionPacket.n,
                             r: actionPacket.r,
@@ -5730,8 +5729,9 @@ function execsc(actionPackets, callback) {
                         srvlog('Got share action-packet with no key.');
                     }
                     else {
-                        u_sharekeys[actionPacket.n] = crypto_process_sharekey(actionPacket.n, actionPacket.k);
-                        tsharekey = a32_to_base64(u_k_aes.encrypt(u_sharekeys[actionPacket.n]));
+                        var k = crypto_process_sharekey(actionPacket.n, actionPacket.k);
+                        u_sharekeys[actionPacket.n] = [k, new sjcl.cipher.aes(k)];
+                        tsharekey = a32_to_base64(u_k_aes.encrypt(k));
                         prockey = true;
                     }
                 }
@@ -5819,7 +5819,7 @@ function execsc(actionPackets, callback) {
                             h: n.h,
                             k: n.k
                         };
-                        crypto_processkey(u_handle, u_k_aes, f);
+                        crypto_decryptnode(f);
                         if (f.ar) {
                             // Bug #1983: No-Key issue.
                             n.ar = f.ar;
@@ -5827,7 +5827,7 @@ function execsc(actionPackets, callback) {
                         M.nodeAttr({
                             h: nodes[i],
                             name: f.name,
-                            key: f.key,
+                            k: f.k,
                             sk: tsharekey
                         });
                         newnodes.push(M.d[n.h]);
@@ -5925,17 +5925,17 @@ function execsc(actionPackets, callback) {
                     k : actionPacket.k,
                     a : actionPacket.at
                 };
-                crypto_processkey(u_handle, u_k_aes, f, u_nodekeys[n.h]);
+                crypto_decryptnode(f);
 
-                if (!f.key && u_nodekeys[n.h]) {
+/*                if (!f.key && u_nodekeys[n.h]) {
                     // TODO: This is a temporal fix, we have to investigate why does the API fails
                     // on providing the right key for the node, likely we're missing giving it to it.
 
                     f.k = u_handle + ':' + a32_to_base64(encrypt_key(u_k_aes, u_nodekeys[n.h]));
                     crypto_processkey(u_handle, u_k_aes, f);
-                }
+                }*/
 
-                if (f.key) {
+                if (f.k && typeof f.k == 'object') {
                     if (f.name !== n.name) {
                         M.onRenameUIUpdate(n.h, f.name);
                     }
@@ -5953,11 +5953,11 @@ function execsc(actionPackets, callback) {
                         h : actionPacket.n,
                         fav : f.fav,
                         name : f.name,
-                        key : f.key,
+                        k : f.k,
                         a : actionPacket.at
                     });
                 }
-                else if (n.key) {
+                else if (n.k && typeof n.k == 'object') {
                     delete missingkeys[n.h];
                 }
                 if (actionPacket.cr) {
@@ -6134,40 +6134,264 @@ function execsc(actionPackets, callback) {
     mega.flags &= ~window.MEGAFLAG_EXECSC;
 }
 
-function fm_updatekey(h, k)
-{
+function fm_updatekey(h, k) {
     var n = M.d[h];
     if (n)
     {
         var f = {h: h, k: k, a: M.d[h].a};
-        crypto_processkey(u_handle, u_k_aes, f);
-        u_nodekeys[h] = f.key;
-        M.nodeAttr({h: h, name: f.name, key: f.key, k: k});
+        crypto_decryptnode(f);
+
+        if (typeof f.k == 'object') {
+            M.nodeAttr({h: h, name: f.name, k: f.k, k: k});            
+        }
     }
 }
 
-function fm_commitkeyupdate()
-{
+function fm_commitkeyupdate() {
     // refresh render?
 }
 
-function loadfm(force)
-{
-	
-	function fnode(json)
-	{
-		console.log("EXFILTRATED NODE: " + json);
-	}
+// load tree for folder link handle (or current u_sid if !handle)
+// place nodes in target (pointing to M.d)
+// FIXME: allow multiple trees to coexist (one user tree, any number of folder links)
+function treefetcher() {
+    return {
+        fetch : treefetcher_fetch,
 
-	function fresidue(json)
-	{
-		console.log("FILTER RESIDUE: " + json);
-	}
+        // worker pool
+        workers : [],
 
-	var gettree_filter = json_splitter([['{f', 2, fnode]], fresidue);
-	
+        // next round-robin worker to assign
+        nextworker : 0,
 
+        // mapping of parent node to worker (to keep child nodes local to their sharekeys)
+        parentworker : {},
+
+        // the first node of a folder link fetch contains the private root node handle
+        getfolderlinkroot : false,
+
+        // worker pending state dump counter
+        dumpsremaining : 0,
+
+        // residual fm (minus ok/f elements) post-filtration
+        residualfm : false,
+
+        // get next worker index (round robin)
+        getnextworker : treefetcher_getnextworker
+    }
+}
+
+// initiate fetch of node tree
+function treefetcher_fetch() {
+    var workerstate;
+
+    if (this.workers.length) {
+        console.error("Cannot reuse treefetcher, please create a new one");
+        return;
+    }
+
+    if (n_h) this.getfolderlinkroot = true;
+    else {
+        // worker state for a user account fetch
+        workerstate = {
+            u_handle : u_handle,
+            u_privk  : u_privk,
+            u_k      : u_k,
+            d        : d
+        };
+    }
+
+    // create worker pool for this fetch
+    // FIXME: use navigator.hardwareConcurrency, but do not exceed browser limit
+    for (var i = 8; i--; ) {
+        // FIXME: try / catch with fallback to synchronous decryption
+        var w = new Worker("nodedec.js");
+        w.ctx = this;
+        w.onmessage = treefetcher_procmsg;
+        if (workerstate) w.postMessage(workerstate);
+        this.workers.push(w);
+    }
+
+    // we filter out the ownerkeys and pipe them to treefetcher_ok()
+    // we also filter out the nodes and pipe them to treefetcher_node()
+    // the rest of the `f` response goes to treefetcher_residue()
+    var gettree_filter = json_splitter(this, [['{ok', 2, treefetcher_ok], ['{f', 2, treefetcher_node]], treefetcher_residue);
+
+    var req_params = {
+        a : 'f',
+        c : 1,
+        r : 1
+    };
+
+    // we disallow treecache usage if this is a forced reload
+    if (!localStorage.force) req_params.ca = 1;
+    else delete localStorage.force;
+
+    if (!megaChatIsDisabled && typeof Chatd !== 'undefined') {
+        req_params['cv'] = Chatd.VERSION;
+    }
+
+    api_req(req_params, {
+        progress: function(perc, buffer) {
+            loadingInitDialog.step2(parseInt(perc));    // FIXME: make generic
+            if (buffer && !gettree_filter.proc(buffer)) {
+                // FIXME: trigger retry with exponential backoff 
+            }
+        },
+        buffer : true
+    }, n_h ? 5 : 4);
+}
+
+// this receives the ok elements one by one as per the filter rule
+// to facilitate the decryption of outbound shares, the API now sends ok before f
+function treefetcher_ok(ok, ctx) {
+    if (fmdb) fmdb.add('ok', { h : ok.h, d : ok });
+
+    // bind outbound share root to specific worker, post ok element to that worker
+    // FIXME: check if nested outbound shares are returned with all shareufskeys!
+    // if that is not the case, we need to bind all ok handles to the same worker
+    ctx.workers[ctx.parentworker[ok.h] = ctx.getnextworker()].postMessage(ok);
+}
+
+// returns true if no further processing is needed
+// FIXME: move to M
+function emplacenode(node) {
+    if (node.p) {
+        if (!M.c[node.p]) M.c[node.p] = {};
+        M.c[node.p][node.h] = node.t;
+        if (node.hash) {
+            if (!M.h[node.hash]) M.h[node.hash] = [];
+            M.h[node.hash].push(node.h);
+        }
+    }
+    else {
+        if (node.t > 1 && node.t < 5) {
+            M[['RootID', 'InboxID', 'RubbishID'][node.t-2]] = node.h;
+        }
+        else console.error("Received parent-less node of type " + t + ": " + node.h);
+    }
+
+    M.d[node.h] = node;
+}
+
+// this receives the node objects one by one as per the filter rule
+function treefetcher_node(node, ctx) {
+    if (ctx.getfolderlinkroot) {
+        // set up the workers for folder link decryption
+        ctx.getfolderlinkroot = false;
+
+        workerstate = {
+            n_h   : node.h,
+            pfkey : pfkey,
+            d     : d 
+        };
+
+        for (var i = ctx.workers.length; i--; ) ctx.workers[i].postMessage(workerstate);
+
+        M.RootID = node.h;
+    }
+
+    // children inherit their parents' worker bindings; unbound inshare roots receive a new binding
+    // unbound nodes go to a random worker (round-robin assignment)
+    if (node.p && ctx.parentworker[node.p] >= 0) ctx.workers[ctx.parentworker[node.h] = ctx.parentworker[node.p]].postMessage(node);
+    else if (ctx.parentworker[node.h] >= 0) ctx.workers[ctx.parentworker[node.h]].postMessage(node);
+    else if (node.sk) ctx.workers[ctx.parentworker[node.h] = ctx.getnextworker()].postMessage(node);
+    else ctx.workers[ctx.getnextworker()].postMessage(node);
+}
+
+// this receives the remainder of the JSON after the filter was applied
+function treefetcher_residue(fm, ctx) {
+    var i = ctx.workers.length;
+    ctx.dumpsremaining = i;
+
+    // send state dump request to all workers
+    while (i--) ctx.workers[i].postMessage({});
+
+    // and store the residual f response for perusal once all state dumps have been received
+    ctx.residualfm = fm[0];
+}
+
+// process worker responses (decrypted nodes, state dump...)
+function treefetcher_procmsg(ev) {
+    var h;
+
+    if (ev.data.h) {
+        // maintain special incoming shares index
+        if (ev.data.p.length == 11) {
+            M.c.shares[ev.data.h] = { su : ev.data.p, r : ev.data.r };
+        }
+
+        if (fmdb) {
+            fmdb.add('f', {
+                h : ev.data.h,
+                p : ev.data.p,
+                s : ev.data.s >= 0 ? ev.data.s : -ev.data.t,
+                d : ev.data
+            });
+        }
+
+        emplacenode(ev.data);
+    }
+    else if (typeof ev.data.sharekeys != 'undefined') {
+        if (d) console.log("Received state dump from worker, " + this.ctx.dumpsremaining + " remaining");
+
+        if (ev.data.rsasharekeys) {
+            for (h in ev.data.rsasharekeys) rsasharekeys[h] = ev.data.rsasharekeys[h];
+        }
+        if (ev.data.rsa2aes) {
+            for (h in ev.data.rsa2aes) rsa2aes[h] = ev.data.rsa2aes[h];
+        }
+        if (ev.data.sharekeys) {
+            for (h in ev.data.sharekeys) {
+                u_sharekeys[h] = [ev.data.sharekeys[h], new sjcl.cipher.aes(ev.data.sharekeys[h])];
+            }
+        }
+        if (ev.data.missingkeys) {
+            for (h in ev.data.missingkeys) missingkeys[h] = true;
+            newmissingkeys = true;
+        }
+
+        if (!--this.ctx.dumpsremaining) {
+            // store incoming shares
+            for (h in M.c.shares) {
+                if (u_sharekeys[h]) M.c.shares[h].sk = a32_to_base64(u_sharekeys[h][0]);
+
+                if (fmdb) fmdb.add('s', { o : M.c.shares[h].su,
+                                          t : h,
+                                          d : M.c.shares[h] });
+            }
+
+            // store missing keys
+            if (fmdb) {
+                for (h in missingkeys) {
+                    fmdb.add('mk', { h : h });
+                }                
+            }
+
+            loadfm_callback(this.ctx.residualfm);
+        }
+    }
+    else if (ev.data[0] === 'console') {
+        if (d) {
+            var args = ev.data[1];
+            args.unshift(self.token);
+            console.log.apply(console, args);
+        }
+        return;
+    }
+}
+
+function treefetcher_getnextworker() {
+    if (this.nextworker >= this.workers.length) this.nextworker = 0;
+    return this.nextworker++;
+}
+
+// the FM DB engine (cf. mDB.js)
+var fmdb;
+
+function loadfm(force) {
     if (force) {
+        localStorage.force = true;
         loadfm.loaded = false;
     }
     if (loadfm.loaded) {
@@ -6181,33 +6405,100 @@ function loadfm(force)
         }
         if (!loadfm.loading) {
             M.reset();
-            fminitialized = false;
-            loadfm.loading = true;
-            setTimeout(function __lazyLoadFM() {
-                var req_params = {
-                    a:'f',
-                    c:1,
-                    r:1,
-                    ca:1
-                };
-                if (!megaChatIsDisabled && typeof Chatd !== 'undefined') {
-                    req_params['cv'] = Chatd.VERSION;
-                }
-                api_req(req_params, {
-                    callback: loadfm_callback,
-                    progress: function(perc,buffer) {
-                        loadingInitDialog.step2(parseInt(perc));
-						if (buffer && !gettree_filter.proc(buffer)) this.abort();
-                    },
-					buffer:true
-                },n_h ? 1 : 0);
-            }, 350);
+            M.c.shares = [];
+
+            // is this a folder link? or do we have no valid cache for this session?
+            if (n_h) fetchfm(false);
+            else {
+                fmdb = FMDB();
+                fmdb.init(u_handle, fetchfm, localStorage.force);
+            }
         }
     }
 }
 
+function fetchfm(sn) {
+    if (sn) {
+        maxaction = sn;
+        dbfetchfm();
+    }
+    else {
+        // no cache requested or available - get from API
+        fminitialized = false;
+        loadfm.loading = true;
 
+        fetcher = treefetcher();
+        fetcher.fetch();
+    }
+}
 
+// to reduce peak mem usage, we fetch f in 64 small chunks
+function fetchfchunked(chunk, procresult) {
+    fmdb.get('f', function(r) {
+        for (i = r.length; i--; ) emplacenode(r[i]);
+        if (chunk == 64) procresult();
+        else fetchfchunked(chunk, procresult);
+    }, 'h', b64[chunk++]);
+}
+
+function dbfetchfm() {
+    var i;
+
+    loadingInitDialog.step2();
+
+    fmdb.get('ok', function(r){
+        process_ok(r, true);
+
+        // FIXME: remove this step and replace with dynamic on-demand loading
+        fetchfchunked(0, function(r){
+
+            fmdb.get('mk', function(r){
+                for (i = r.length; i--; ) missingkeys[r[i].h] = 1;
+
+                fmdb.get('u', function(r){
+                    process_u(r, true);
+
+                    fmdb.get('s', function(r){
+                        for (i = r.length; i--; ) {
+                            if (r[i].o.length == 11) {
+                                // this is an inbound share
+                                M.c.shares[r[i].t] = r[i];
+                                var k = base64_to_a32(r[i].sk);
+                                u_sharekeys[r[i].t] = [k, new sjcl.cipher.aes(k)];
+                            }
+                            else {
+                                // this is an outbound share
+                                M.nodeShare(r[i].h, r[i], true);
+                            }
+                        }
+
+                        fmdb.get('opc', function(r){
+                            processOPC(r, true);
+
+                            fmdb.get('ipc', function(r){
+                                processIPC(r, true);
+
+                                fmdb.get('ps', function(r){
+                                    processPS(r, true);
+
+                                    fmdb.get('mcf', function(r){
+                                        if (!megaChatIsDisabled) {
+                                            processMCF(r, true);
+                                        }
+
+                                        // fetch & process new actionpackets
+                                        loadingInitDialog.step3();
+                                        getsc(true);
+                                    });
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    });
+}
 
 function RightsbyID(id) {
 
@@ -6385,44 +6676,27 @@ function fm_getcopynodes(cn, t)
         if (n)
         {
             var ar;
-            if (!n.key) {
+            if (!n.k || typeof n.k != 'object') {
                 console.error('fm_getcopynodes: missing node key', n);
                 continue;
             }
-            if (!n.ar) {
-                console.warn('Something went wrong, missing node attr - trying to fix in the run...');
-                crypto_processkey(u_handle, u_k_aes, n);
-            }
             if (n.ar) {
                 ar = clone(n.ar);
-            }
-            else {
-                var cnt = 0;
+            } else {
                 ar = {};
-                if (n.name) {
-                    ar.n = n.name;
-                    cnt++;
-                }
-                if (n.mtime) {
-                    ar.t = n.mtime;
-                    cnt++;
-                }
-                if (n.hash) {
-                    ar.c = n.hash;
-                    cnt++;
-                }
-                else if (n.t) {
-                    cnt++;
-                }
-                if (cnt !== 3) {
-                    console.error('Missing node attr property...', ar, n);
-                }
-                else {
-                    console.log('Missing node attr restored manually...');
-                }
             }
-            if (typeof ar.fav !== 'undefined') delete ar.fav;
-            var mkat = enc_attr(ar,n.key);
+
+            if (n.name) {
+                ar.n = n.name;
+            }
+            if (n.mtime) {
+                ar.t = n.mtime;
+            }
+            if (n.hash) {
+                ar.c = n.hash;
+            }
+
+            var mkat = enc_attr(ar,n.k);
             var attr = ab_to_base64(mkat[0]);
             var key = c ? base64urlencode(encryptto(t,a32_to_str(mkat[1])))
                         : a32_to_base64(encrypt_key(u_k_aes,mkat[1]));
@@ -6761,15 +7035,13 @@ function processmove(jsonmove)
     }
 }
 
-var u_kdnodecache = {};
-var kdWorker;
+//var u_kdnodecache = {};
+//var kdWorker;
 
 function process_f(f, cb, retry)
 {
     var onMainThread = localStorage.dk ? 9e11 : 200;
     var doNewNodes = (typeof newnodes !== 'undefined');
-
-    // if (d) console.error('process_f', doNewNodes);
 
     if (f && f.length)
     {
@@ -6782,7 +7054,8 @@ function process_f(f, cb, retry)
             // }
             // if (d) console.log('non-cached nodes', ncn.length, ncn);
         // }
-        if (!retry && ncn.length > onMainThread) {
+// FIXME: keydec.js has been retired. Port worker-based decryption to nodedec.js ASAP.
+/*        if (!retry && ncn.length > onMainThread) {
             for (var i in f) {
                 if (f[i].sk) skn.push(f[i]);
             }
@@ -6794,6 +7067,7 @@ function process_f(f, cb, retry)
 
         if ( ncn.length < onMainThread )
         {
+*/
             if (d) {
                 console.log('Processing %d-%d nodes in the main thread.', ncn.length, f.length);
                 console.time('process_f');
@@ -6808,7 +7082,7 @@ function process_f(f, cb, retry)
                 }
             }
             if (d) console.timeEnd('process_f');
-        }
+/*        }
         else
         {
             if (!kdWorker) try {
@@ -6843,21 +7117,23 @@ function process_f(f, cb, retry)
                 }
                 __process_f2(f, cb);
             });
-        }
+        }*/
     }
     else if (cb) cb();
 }
+
 function __process_f1(f)
 {
-    for (var i in f) M.addNode(f[i], !!$.mDBIgnoreDB);
+    for (var i in f) M.addNode(f[i]);
 }
+
 function __process_f2(f, cb, tick)
 {
     var max = 12000, n;
 
     while ((n = f.pop()))
     {
-        M.addNode(n, !!$.mDBIgnoreDB);
+        M.addNode(n);
 
         if (cb && --max == 0) break;
     }
@@ -7176,14 +7452,14 @@ function processUPCO(ap) {
  *
  * @param {Object} u Users informations
  */
-function process_u(u) {
+function process_u(u, ignoreDB) {
     for (var i in u) {
         if (u.hasOwnProperty(i)) {
             if (u[i].c === 1) {
                 u[i].h = u[i].u;
                 u[i].t = 1;
                 u[i].p = 'contacts';
-                M.addNode(u[i]);
+                M.addNode(u[i], ignoreDB);
 
                 var contactName = M.getNameByHandle(u[i].h);
 
@@ -7192,7 +7468,7 @@ function process_u(u) {
                 addToMultiInputDropDownList('.add-contact-multiple-input', [{ id: u[i].m, name: contactName }]);
             }
             else if (M.d[u[i].u]) {
-                M.delNode(u[i].u);
+                M.delNode(u[i].u, ignoreDB);
 
                 // Update token.input plugin
                 removeFromMultiInputDDL('.share-multiple-input', { id: u[i].m, name: u[i].m });
@@ -7200,7 +7476,7 @@ function process_u(u) {
             }
 
             // Update user attributes M.u
-            M.addUser(u[i]);
+            M.addUser(u[i], ignoreDB);
 
             if (u[i].c === 1) {
                 // sync data objs M.u <-> M.d
@@ -7214,10 +7490,14 @@ function process_ok(ok, ignoreDB)
 {
     for (var i in ok)
     {
-        if (typeof mDB === 'object' && !pfkey && !ignoreDB)
-            mDBadd('ok', ok[i]);
         if (ok[i].ha == crypto_handleauth(ok[i].h))
-            u_sharekeys[ok[i].h] = decrypt_key(u_k_aes, base64_to_a32(ok[i].k));
+        {
+            if (fmdb && !pfkey && !ignoreDB) {
+                fmdb.add('ok', { h : ok[i].h, d : ok[i] });
+            }
+            var k = decrypt_key(u_k_aes, base64_to_a32(ok[i].k));
+            u_sharekeys[ok[i].h] = [k, new sjcl.cipher.aes(k)];
+        }
     }
 }
 
@@ -7242,8 +7522,8 @@ function processMCF(mcfResponse, ignoreDB) {
                 // skip non active chats for now...
                 return;
             }
-            if (typeof mSDB === 'object' && !pfkey && !ignoreDB) {
-                mSDB.add('mcf', clone(chatRoomInfo));
+            if (fmdb && !pfkey && !ignoreDB) {
+                fmdb.add('mcf', { id : chatRoomInfo.id, d : chatRoomInfo });
             }
 
             ChatdIntegration._queuedChats[chatRoomInfo.id] = chatRoomInfo;
@@ -7309,7 +7589,7 @@ function init_chat() {
         }
     }
     if (folderlink) {
-        if (d) console.log('Will not initializing chat [branch:1]');
+        if (d) console.log('Will not initialize chat [branch:1]');
     }
     else if (!megaChatIsDisabled) {
         if (pubEd25519[u_handle]) {
@@ -7317,33 +7597,28 @@ function init_chat() {
         }
         else {
             mBroadcaster.once('pubEd25519', __init_chat);
-            if (d) console.log('Will not initializing chat [branch:2]');
+            if (d) console.log('Will not initialize chat [branch:2]');
         }
     }
     else {
-        if (d) console.log('Will not initializing chat [branch:3]');
+        if (d) console.log('Will not initialize chat [branch:3]');
     }
 }
 
-function loadfm_callback(res, ctx) {
-
+function loadfm_callback(res) {
     loadingInitDialog.step3();
 
     mega.loadReport.recvNodes     = Date.now() - mega.loadReport.stepTimeStamp;
     mega.loadReport.stepTimeStamp = Date.now();
 
     if (pfkey) {
-        if (res.f && res.f[0]) {
-            M.RootID = res.f[0].h;
-            u_sharekeys[res.f[0].h] = base64_to_a32(pfkey);
-        }
         folderlink = pfid;
     }
 
-    if (typeof res === 'number') {
+/*    if (typeof res === 'number') {
         msgDialog('warninga', l[1311], "Sorry, we were unable to retrieve the Cloud Drive contents.", api_strerror(res));
         return;
-    }
+    }*/
 
     if (res.noc) {
         mega.loadReport.noc = res.noc;
@@ -7354,9 +7629,6 @@ function loadfm_callback(res, ctx) {
 
     if (res.u) {
         process_u(res.u);
-    }
-    if (res.ok) {
-        process_ok(res.ok);
     }
     if (res.opc) {
         processOPC(res.opc);
@@ -7403,10 +7675,8 @@ function loadfm_callback(res, ctx) {
             processPH(res.ph);
         }
 
-        maxaction = res.sn;
-        if (typeof mDB === 'object') {
-            localStorage[u_handle + '_maxaction'] = maxaction;
-        }
+        // set maxaction
+        setsn(res.sn);
 
         if (res.cr) {
             crypto_procmcr(res.cr);
@@ -7430,7 +7700,7 @@ function loadfm_callback(res, ctx) {
 }
 
 /**
- * Function to be invoked when the cloud has finished loaded,
+ * Function to be invoked when the cloud has finished loading,
  * being the nodes loaded from either server or local cache.
  * @param {Boolean} mDBload whether it came from local cache.
  */
@@ -7513,7 +7783,7 @@ function loadfm_done(mDBload) {
         clearInterval(mega.loadReport.aliveTimer);
         mega.flags &= ~window.MEGAFLAG_LOADINGCLOUD;
 
-        u_kdnodecache = {};
+//        u_kdnodecache = {};
         watchdog.notify('loadfm_done', mDBload);
     });
 }

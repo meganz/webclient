@@ -13552,16 +13552,16 @@
         "context": "A dialog message when there is a new chat server version available. This update will be incompatible with the current user's MEGA client so they will need to update their browser extension."
     },
     "8842": {
-        "text": "Grant bandwidth to downloading users:",
+        "text": "Grant transfer quota to downloading users:",
         "context": "Maximum percentage of your bandwidth which is available to third party users."
     },
     "8843": {
-        "text": "[S]50 %[\/S] bandwidth",
-        "context": "Full string: 50% bandwidth. This is the maximum percentage of your bandwidth which is available to third party users. The 50% is a placeholder for whatever the percentage will actually be.\r\n\r\nPlease leave \"[S]50 %[\/S]\" as it is."
+        "text": "[S]50 %[\/S] transfer quota",
+        "context": "Full string: 50% transfer quota. This is the maximum percentage of your transfer quota which is available to third party users. The 50% is a placeholder for whatever the percentage will actually be.\r\n\r\nPlease leave \"[S]50 %[\/S]\" as it is."
     },
     "8844": {
-        "text": "This is the maximum percentage of your bandwidth which is available to third party users.",
-        "context": "Full string: \r\n\"50% bandwith. This is the maximum percentage of your bandwidth which is available to third party users.\"\r\n\r\nUser can set bandwidth limit to users, who downloading his files.\r\n\r\n"
+        "text": "This is the percentage of your transfer quota which you are granting to third party users to download your file \/ folder links.",
+        "context": "Full string: \r\n\"50% Transfer quota. This is the percentage of your transfer quota which you are granting to third party users to download your file \/ folder links.\"\r\n\r\n"
     },
     "8845": {
         "text": "This purchase has expired.",
@@ -14887,6 +14887,10 @@
         "text": "Please enter your Recovery Key",
         "context": "A message shown to explain that the user has to input (type or paste) their recovery key to continue with the reset password process."
     },
+    "12439": {
+        "text": "You are using an ephemeral session in this browser. If you want to preserve the uploaded data, click [A1]Create Account[\/A] in the tab where you see your data. If you do not care about the data, click [A2]Logout[\/A2] and try clicking the same account confirmation link again.",
+        "context": "This message will appear when a user is trying to activate their account from an ephemeral session which is not related to the activation link."
+    },
     "12440": {
         "text": "You are already logged into a MEGA account from this browser. Click Logout first and then try clicking the same account confirmation link again.",
         "context": "This message will appear when a user is trying to activate their new account from an existing account."
@@ -14962,5 +14966,21 @@
     "12489": {
         "text": "When we launched MEGA early 2013, global mass surveillance by rogue governments under the pretext of fighting terrorism was still a wild conjecture and its proponents were often touted as conspiracy theorists. Edward Snowden's revelations 137 days later fundamentally changed public attitudes and it became excruciatingly clear that [I]security by policy[\/I] (\"we have access to your data, but we promise to keep it confidential and not misuse it\") had not been good enough. Anything short of [I]security by design[\/I] (\"we cannot gain access to your data without you being able to find out\"), for which strong end-to-end encryption is an essential prerequisite, now seems grossly insufficient.",
         "context": "An introduction message on the https:\/\/mega.nz\/#about page. Please leave the [I] and [\/I] tags because they will be replaced with italic text. This should have already been translated in string 1821, so you can borrow that translation if need be. The difference is that the HTML tags have now been removed."
+    },
+    "12689": {
+        "text": "Caution: users with access to your file \/ folder links can use up your entire transfer quota if you grant them 100%.",
+        "context": "Warning being shown when trying to grant all transfer quota to downloading users."
+    },
+    "12690": {
+        "text": "Failed to share item(s) from MEGA. The destination application seems busy. Please try again later.",
+        "context": "Message of the dialog displayed when the process to share item(s) from MEGA with other app fails because the destination app is busy."
+    },
+    "12691": {
+        "text": "Failed to retrieve node details. Please try again.",
+        "context": "Message of the dialog displayed when the process\/request to get node details failed."
+    },
+    "12692": {
+        "text": "View details failed",
+        "context": "Title of the dialog displayed when the process\/request to get node details failed - (String as short as possible)."
     }
 }

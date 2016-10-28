@@ -2458,8 +2458,8 @@ function initContextUI() {
     $('.dropdown.body.files-menu').off('click', '.folder-item');
     $('.dropdown.body.files-menu').on('click', '.folder-item', function() {
 
-        var t = $(this).attr('id').replace('fi_', ''),
-            n = [];
+        var t = $(this).attr('id').replace('fi_', '');
+        var n = [];
         if (!$(this).is('.disabled')) {
             for (var i in $.selected) {
                 if (!isCircular($.selected[i], t)) {
@@ -2990,7 +2990,7 @@ function accountUI() {
         $.transferClose();
     }
 
-    //Destroy jScrollings in select.dropdowns
+    // Destroy jScrollings in select dropdowns
     $('.fm-account-main .default-select-scroll').each(function(i, e) {
         $(e).parent().fadeOut(200).parent().removeClass('active');
         deleteScrollPanel(e, 'jsp');
@@ -4254,7 +4254,7 @@ function accountUI() {
             $('.resellerbuy').attr('href', 'mailto:' + email)
                 .find('span').text(l[9106].replace('%1', email));
 
-            // Use 'All' or 'Last 10/100/250' for the.dropdown text
+            // Use 'All' or 'Last 10/100/250' for the dropdown text
             var buttonText = ($.voucherlimit === 'all') ? l[7557] : l['466a'].replace('[X]', $.voucherlimit);
 
             $('.fm-account-button.reseller').removeClass('hidden');
@@ -4811,13 +4811,12 @@ function gridUI() {
         }
 
         for (var e in M.sortRules) {
-            pattern = new RegExp('\\b' + e + '\\b');
-
-            // Search for the whole word, because of 'fav' and 'swm' cases
-            if (c && pattern.test(c)) {
-                M.doSort(e, d);
-                M.renderMain();
-                break;
+            if (M.sortRules.hasOwnProperty(e)) {
+                if (c.indexOf(e) !== -1) {
+                    M.doSort(e, d);
+                    M.renderMain();
+                    break;
+                }
             }
         }
     });
@@ -6491,11 +6490,11 @@ function contextMenuUI(e, ll) {
     // This part of code is also executed when ll == 'undefined'
     v = m.children($('.dropdown-section'));
 
-    // count all items inside section, and hide dividers if necessary
+    // Count all items inside section, and hide dividers if necessary
     v.each(function() {
-        var a = $(this).find('a.dropdown-item'),
-            b = $(this).find('hr'),
-            x = a.filter(function() {
+        var a = $(this).find('a.dropdown-item');
+        var b = $(this).find('hr');
+        var x = a.filter(function() {
                 return $(this).css('display') === 'none';
             });
         if (x.length === a.length || a.length === 0) {
@@ -8027,8 +8026,9 @@ function handleShareDialogContent() {
  * updateDialogDropDownList
  *
  * Extract id from list of emails, preparing it for extrusion,
- * fill multi-input.dropdown list with not used emails.
- * @param {String} dialog, multi-input dialog class name.
+ * fill multi-input dropdown list with not used emails.
+ *
+ * @param {String} dialog multi-input dialog class name.
  */
 function updateDialogDropDownList(dialog) {
 
@@ -8163,7 +8163,7 @@ function initShareDialogMultiInputPlugin() {
             minChars: 1,
             accountHolder: (M.u[u_handle] || {}).m || '',
             scrollLocation: 'share',
-            // Exclude from.dropdownlist only emails/names which exists in multi-input (tokens)
+            // Exclude from dropdownlist only emails/names which exists in multi-input (tokens)
             excludeCurrent: true,
 
             onEmailCheck: function() {
@@ -11412,13 +11412,10 @@ function FMResizablePane(element, opts) {
 }
 
 /**
- * bindDropdownEvents
+ * bindDropdownEvents Bind custom select event
  *
- * Bind Custom select event
- *
- * @param {Selector}.dropdowns, elements selector.
- * @param {String} addition option for account page only. Allows to show "Show changes" notification
- *
+ * @param {Selector} $dropdown  Class .dropdown elements selector
+ * @param {String}   saveOption Addition option for account page only. Allows to show "Show changes" notification
  */
 function bindDropdownEvents($dropdown, saveOption) {
 
@@ -11433,7 +11430,7 @@ function bindDropdownEvents($dropdown, saveOption) {
                 $dropdown = $this.find('.default-select-dropdown'),
                 $activeDropdownItem = $this.find('.default-dropdown-item.active');
 
-            //Show Select.dropdown
+            //Show select dropdown
             $('.active .default-select-dropdown').fadeOut(200);
             $this.addClass('active');
             $dropdown.css('margin-top', '0px');
@@ -11463,7 +11460,7 @@ function bindDropdownEvents($dropdown, saveOption) {
         if (!$this.hasClass('active')) {
             var $select = $(this).closest('.default-select');
 
-            //Select.dropdown item
+            //Select dropdown item
             $select.find('.default-dropdown-item').removeClass('active');
             $this.addClass('active');
             $select.find('span').text($this.text());

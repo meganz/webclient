@@ -1962,12 +1962,9 @@ function MegaData()
                             sharedUInode(nodeHandle);
                         }
 
-                        /* @al: why is this used here? we should only update the DOM?
-                        if (currNode) {
-                            if (currNode.lbl) {
-                                M.colourLabeling(nodeHandle, currNode.lbl);
-                            }
-                         }*/
+                        if (currNode && currNode.lbl) {
+                            M.colourLabelDomUpdate(nodeHandle, currNode.lbl);
+                        }
                     }
                 }
             }// END of for folders loop
@@ -2041,8 +2038,8 @@ function MegaData()
                 for (var h in M.c[fid]) {
                     if (M.d[h] && M.d[h].t) {
                         sub = true;
-                        cs  = ' contains-submenu';
-                        sm  = '<span class="dropdown body submenu" id="sm_' + fid + '">'
+                        cs = ' contains-submenu';
+                        sm = '<span class="dropdown body submenu" id="sm_' + fid + '">'
                             + '<span id="csb_' + fid + '"></span>' + arrow + '</span>';
                         break;
                     }
@@ -3628,7 +3625,7 @@ function MegaData()
                     newLabelState = 0;
                 }
 
-                api_setattr(handle, {lbl: newLabelState});
+                api_setattr(handle, { lbl: newLabelState });
                 M.colourLabelDomUpdate(handle, newLabelState);
             });
         }
@@ -3637,8 +3634,8 @@ function MegaData()
     /**
     * favouriteDomUpdate
     *
-    * @param {Object} node          Node object
-    * @param {Number} favStarState  Favourites state 0 or 1
+    * @param {Object} node      Node object
+    * @param {Number} favState  Favourites state 0 or 1
      */
     this.favouriteDomUpdate = function(node, favState) {
         var $gridView  = $('#' + node.h + ' .grid-status-icon');
@@ -3689,7 +3686,6 @@ function MegaData()
 
         var result = false;
         var nodes = nodesId;
-        var isSharedWithMe = false;
 
         if (!Array.isArray(nodesId)) {
             nodes = [nodesId];
@@ -6028,6 +6024,7 @@ function execsc(actionPackets, callback) {
 
                 if (f.key) {
 
+                    /* jshint -W073 */ // Blocks are nested too deeply
                     if (fminitialized) {
                         if (f.name !== node.name) {
                             M.onRenameUIUpdate(nodeHandle, f.name);
@@ -6039,6 +6036,7 @@ function execsc(actionPackets, callback) {
                             M.colourLabelDomUpdate(nodeHandle, f.lbl);
                         }
                     }
+                    /* jshint +W073 */
                     M.nodeAttr({
                         h : actionPacket.n,
                         fav : f.fav,

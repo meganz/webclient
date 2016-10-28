@@ -3044,8 +3044,6 @@ function dashboardUI() {
     M.accountData(function(account) {
 
         var perc, perc_c, b_exceeded, s_exceeded;
-        var tfsach  = 0;
-        var tfsacht = 0;
 
         // Show ballance
         $('.account.left-pane.balance-info').text(l[7108]);
@@ -3062,7 +3060,7 @@ function dashboardUI() {
             var $transfer = $('.account.bonuses-size.transfer', $achWidget);
 
             $storage.text(bytesToSize(maf.storage.current, 0));
-            $transfer.text(bytesToSize(maf.storage.current, 0));
+            $transfer.text(bytesToSize(maf.transfer.current, 0));
             if (maf.storage.current > 0) {
                 $storage.removeClass('light-grey');
             }
@@ -3081,8 +3079,9 @@ function dashboardUI() {
             $('.progress-bar.transfers', $achWidget)
                 .css('width', Math.round(maf.transfer.current * 100 / maf.transfer.max) + '%');
 
-            tfsach  = maf.transfer.current;
-            tfsacht = maf.transfer.current * 100 / maf.transfer.max;
+            $('.more-bonuses', $achWidget).rebind('click', function() {
+                achievementsListDialog();
+            });
         }
         else {
             $('.fm-right-block.dashboard').removeClass('active-achievements');
@@ -3114,24 +3113,6 @@ function dashboardUI() {
             }
         }
 
-        /* Bandwidth notification */
-        $('.dashboard .account.rounded-icon.right').rebind('click', function() {
-            if (!$(this).hasClass('active')) {
-                $(this).addClass('active');
-                $(this).find('.dropdown').removeClass('hidden');
-            }
-            else {
-                $(this).removeClass('active');
-                $(this).find('.dropdown').addClass('hidden');
-            }
-        });
-        $('.fm-right-block.dashboard').rebind('click', function(e) {
-            if (!$(e.target).hasClass('rounded-icon') && $('.account.rounded-icon.info').hasClass('active')) {
-                $('.account.rounded-icon.info').removeClass('active');
-                $('.dropdown.body.bandwidth-info').addClass('hidden');
-            }
-        });
-
         /* Registration date, bandwidth notification link */
         $('.dashboard .button.upgrade-account, .bandwidth-info a').rebind('click', function() {
             window.location.hash = 'pro';
@@ -3141,7 +3122,13 @@ function dashboardUI() {
 
 
         /* New Used Bandwidth chart */
-        perc = Math.round((account.servbw_used+account.downbw_used)/account.bw*100);
+        var base = account.downbw_used;
+        var max  = 1.5 * 1024 * 1024 * 1024;
+        if (u_attr.p) {
+            max = account.bw;
+            base += account.servbw_used;
+        }
+        perc   = Math.round(base * 100 / max);
         perc_c = perc;
         if (perc_c > 100) {
             perc_c = 100;
@@ -3162,17 +3149,16 @@ function dashboardUI() {
         }
 
         // Maximum bandwidth
-        var b2 = bytesToSize(account.bw, 0).split(' ');
-        $('.bandwidth .chart.data .size-txt').text(bytesToSize(account.servbw_used + account.downbw_used, 0));
+        var b2 = bytesToSize(max, 0).split(' ');
+        $('.bandwidth .chart.data .size-txt').text(bytesToSize(base, 0));
         $('.bandwidth .chart.data .pecents-txt').text((b2[0]));
         $('.bandwidth .chart.data .gb-txt').text((b2[1]));
-        // TODO: or FREE account with unlocked bandwidth achievement
         if (u_attr.p) {
             $('.bandwidth .chart.data .perc-txt').text(perc_c + '%');
         }
         else {
             $('.bandwidth .chart.data span:not(.size-txt)').text('');
-            $('.bandwidth .chart.data .pecents-txt').text('used');
+            $('.bandwidth .chart.data .pecents-txt').text(l[5801]);
         }
         /* End of New Used Bandwidth chart */
 
@@ -3247,7 +3233,7 @@ function dashboardUI() {
             if (percents[i] > 0) {
                 $percBlock.text(Math.round(percents[i]) + ' %');
                 $percBlock.parent().removeClass('empty');
-            } 
+            }
             else {
                 $percBlock.text('');
                 $percBlock.parent().addClass('empty');
@@ -3276,19 +3262,49 @@ function dashboardUI() {
         /* Used Bandwidth progressbar */
         var base = account.downbw_used;
         var max  = 1.5 * 1024 * 1024 * 1024;
-        // TODO: or FREE account with unlocked bandwidth achievement
         if (u_attr.p) {
             max = account.bw;
             base += account.servbw_used;
             $('.account.widget.bandwidth').addClass('enabled-pr-bar');
             $('.bandwidth .account.progress-size.available-quota').text(bytesToSize(max - base, 0));
-            $('.bandwidth .account.progress-bar.grey').css('width', Math.round(base * 100 / max / 2) + '%');
+            $('.bandwidth .account.progress-bar.grey').css('width', (Math.round(base * 100 / max) || 1) + '%');
+
+            /* Bandwidth notification */
+            $('.dashboard .account.rounded-icon.right').rebind('click', function() {
+                if (!$(this).hasClass('active')) {
+                    $(this).addClass('active');
+                    $(this).find('.dropdown').removeClass('hidden');
+                }
+                else {
+                    $(this).removeClass('active');
+                    $(this).find('.dropdown').addClass('hidden');
+                }
+            });
+            $('.fm-right-block.dashboard').rebind('click', function(e) {
+                if (!$(e.target).hasClass('rounded-icon') && $('.account.rounded-icon.info').hasClass('active')) {
+                    $('.account.rounded-icon.info').removeClass('active');
+                    $('.dropdown.body.bandwidth-info').addClass('hidden');
+                }
+            });
         }
         else {
             $('.account.widget.bandwidth').removeClass('enabled-pr-bar');
+            $('.dashboard .account.rounded-icon.right').addClass('hidden');
+
+            // Get more transfer quota button
+            $('.account.widget.bandwidth .free .more-quota').rebind('click', function() {
+                // if the account have achievements, show them, otherwise #pro
+                if (M.maf) {
+                    achievementsListDialog();
+                }
+                else {
+                    location.hash = '#pro';
+                }
+                return false;
+            });
         }
         $('.bandwidth .account.progress-size.base-quota').text(bytesToSize(base, 0));
-        
+
         /* End of Used Bandwidth progressbar */
 
         // Fill rest of widgets
@@ -3666,7 +3682,7 @@ function accountUI() {
             var $percBlock = $('.data-block.storage-data .account.pr-item.pr' + i);
             if (percents[i] > 0) {
                 $percBlock.removeClass('empty');
-            } 
+            }
             else {
                 $percBlock.addClass('empty');
             }
@@ -3691,7 +3707,7 @@ function accountUI() {
         );
         // Available
         $('.tab-content .account.progress-size.available').text(
-            prSize = account.space - account.space_used > 0 ? 
+            prSize = account.space - account.space_used > 0 ?
                 bytesToSize(account.space - account.space_used) : '-'
         );
         // Progressbar

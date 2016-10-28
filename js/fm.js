@@ -3128,7 +3128,7 @@ function dashboardUI() {
             max = account.bw;
             base += account.servbw_used;
         }
-        perc   = Math.round(base * 100 / max);
+        perc   = Math.round(base * 100 / max) || 1;
         perc_c = perc;
         if (perc_c > 100) {
             perc_c = 100;
@@ -3596,7 +3596,13 @@ function accountUI() {
         $('.account.plan-info.storage span').text(bytesToSize(account.space, 0));
 
         /* New Used Bandwidth chart */
-        perc = Math.round((account.servbw_used+account.downbw_used)/account.bw*100);
+        var base = account.downbw_used;
+        var max  = 1.5 * 1024 * 1024 * 1024;
+        if (u_attr.p) {
+            max = account.bw;
+            base += account.servbw_used;
+        }
+        perc   = Math.round(base * 100 / max) || 1;
         perc_c = perc;
         if (perc_c > 100)
             perc_c = 100;
@@ -4309,54 +4315,10 @@ function accountUI() {
 
             var pws = zxcvbn($('#account-new-password').val());
 
-            if (M.account.dl_maxSlots)
-            {
-                mega.config.set('dl_maxSlots', M.account.dl_maxSlots);
-                dlQueue.setSize(fmconfig.dl_maxSlots);
-                delete M.account.dl_maxSlots;
-            }
-            if (M.account.ul_maxSlots)
-            {
-                mega.config.set('ul_maxSlots', M.account.ul_maxSlots);
-                ulQueue.setSize(fmconfig.ul_maxSlots);
-                delete M.account.ul_maxSlots;
-            }
-            if (typeof M.account.ul_maxSpeed !== 'undefined')
-            {
-                mega.config.set('ul_maxSpeed', M.account.ul_maxSpeed);
-                delete M.account.ul_maxSpeed;
-            }
-            if (typeof M.account.use_ssl !== 'undefined')
-            {
-                mega.config.set('use_ssl', M.account.use_ssl);
-                localStorage.use_ssl = M.account.use_ssl;
-                use_ssl = M.account.use_ssl;
-            }
-            if (typeof M.account.ul_skipIdentical !== 'undefined')
-            {
-                mega.config.set('ul_skipIdentical', M.account.ul_skipIdentical);
-                delete M.account.ul_skipIdentical;
-            }
-            if (typeof M.account.dlThroughMEGAsync !== 'undefined') {
-                mega.config.set('dlThroughMEGAsync', M.account.dlThroughMEGAsync);
-                delete M.account.dlThroughMEGAsync;
-            }
-
-            if (typeof M.account.uisorting !== 'undefined') {
-                mega.config.set('uisorting', M.account.uisorting);
-            }
-            if (typeof M.account.uiviewmode !== 'undefined') {
-                mega.config.set('uiviewmode', M.account.uiviewmode);
-            }
             if (typeof M.account.rubsched !== 'undefined') {
                 mega.config.set('rubsched', M.account.rubsched);
             }
-            if (typeof M.account.font_size !== 'undefined') {
-                mega.config.set('font_size', M.account.font_size);
-                $('body').removeClass('fontsize1 fontsize2')
-                    .addClass('fontsize' + fmconfig.font_size);
-                delete M.account.font_size;
-            }
+
             if ($('#account-password').val() == '' && ($('#account-new-password').val() !== '' || $('#account-confirm-password').val() !== ''))
             {
                 msgDialog('warninga', l[135], l[719], false, function()
@@ -4540,7 +4502,7 @@ function accountUI() {
             $('#bandwidth-slider').slider({
                 min: 0, max: 100, range: 'min', value: bandwidthLimit,
                 change: function(e, ui) {
-                    if (M.currentdirid === 'account/settings') {
+                    if (M.currentdirid === 'account/advanced') {
                         bandwidthLimit = ui.value;
 
                         if (parseInt(localStorage.bandwidthLimit) !== bandwidthLimit) {
@@ -4583,26 +4545,32 @@ function accountUI() {
         }
 
         $('#slider-range-max').slider({
-            min: 1, max: 6, range: "min", value: fmconfig.dl_maxSlots || 4, slide: function(e, ui)
-            {
-                var uiValue = ui.value;
-                M.account.dl_maxSlots = uiValue;
+            min: 1, max: 6, range: "min", value: fmconfig.dl_maxSlots || 4,
+            change: function(e, ui) {
+                if (M.currentdirid === 'account/advanced') {
+                    mega.config.set('dl_maxSlots', ui.value);
+                    dlQueue.setSize(fmconfig.dl_maxSlots);
+                }
+            },
+            slide: function(e, ui) {
                 $('.upload-settings .numbers.active').removeClass('active');
-                $('.upload-settings .numbers.val' + uiValue).addClass('active');
-                $('.fm-account-save-block').removeClass('hidden');
+                $('.upload-settings .numbers.val' + ui.value).addClass('active');
             }
         });
         $('.upload-settings .numbers.active').removeClass('active');
         $('.upload-settings .numbers.val' + $('#slider-range-max').slider('value')).addClass('active');
 
         $('#slider-range-max2').slider({
-            min: 1, max: 6, range: "min", value: fmconfig.ul_maxSlots || 4, slide: function(e, ui)
-            {
-                var uiValue = ui.value;
-                M.account.ul_maxSlots = ui.value;
+            min: 1, max: 6, range: "min", value: fmconfig.ul_maxSlots || 4,
+            change: function(e, ui) {
+                if (M.currentdirid === 'account/advanced') {
+                    mega.config.set('ul_maxSlots', ui.value);
+                    ulQueue.setSize(fmconfig.ul_maxSlots);
+                }
+            },
+            slide: function(e, ui) {
                 $('.download-settings .numbers.active').removeClass('active');
-                $('.download-settings .numbers.val' + uiValue).addClass('active');
-                $('.fm-account-save-block').removeClass('hidden');
+                $('.download-settings .numbers.val' + ui.value).addClass('active');
             }
         });
         $('.download-settings .numbers.active').removeClass('active');
@@ -4633,40 +4601,38 @@ function accountUI() {
         }
         $('.ulspeedradio input').rebind('click', function(e)
         {
+            var ul_maxSpeed;
             var id = $(this).attr('id');
-            if (id == 'rad2')
-                M.account.ul_maxSpeed = -1;
-            else if (id == 'rad1')
-                M.account.ul_maxSpeed = 0;
-            else
-            {
-                if (parseInt($('#ulspeedvalue').val()) > 0)
-                    M.account.ul_maxSpeed = parseInt($('#ulspeedvalue').val()) * 1024;
-                else
-                    M.account.ul_maxSpeed = 100 * 1024;
+            if (id == 'rad2') {
+                ul_maxSpeed = -1;
+            }
+            else if (id == 'rad1') {
+                ul_maxSpeed = 0;
+            }
+            else {
+                if (parseInt($('#ulspeedvalue').val()) > 0) {
+                    ul_maxSpeed = parseInt($('#ulspeedvalue').val()) * 1024;
+                }
+                else {
+                    ul_maxSpeed = 100 * 1024;
+                }
             }
             $('.ulspeedradio').removeClass('radioOn').addClass('radioOff');
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
-            $('.fm-account-save-block').removeClass('hidden');
+            mega.config.set('ul_maxSpeed', ul_maxSpeed);
         });
-        $('.uifontsize input').rebind('click', function(e)
-        {
+        $('#ulspeedvalue').rebind('click keyup', function(e) {
+            $('.ulspeedradio').removeClass('radioOn').addClass('radioOff');
+            $('#rad3,#rad3_div').addClass('radioOn').removeClass('radioOff');
+            $('#rad3').trigger('click');
+        });
+
+        $('.uifontsize input').rebind('click', function(e) {
             $('body').removeClass('fontsize1 fontsize2').addClass('fontsize' + $(this).val());
             $('.uifontsize input').removeClass('radioOn').addClass('radioOff').parent().removeClass('radioOn').addClass('radioOff');
             $(this).removeClass('radioOff').addClass('radioOn').parent().removeClass('radioOff').addClass('radioOn');
-            M.account.font_size = $(this).val();
-            $('.fm-account-save-block').removeClass('hidden');
-        });
-        $('#ulspeedvalue').rebind('click keyup', function(e)
-        {
-            $('.ulspeedradio').removeClass('radioOn').addClass('radioOff');
-            $('#rad3,#rad3_div').addClass('radioOn').removeClass('radioOff');
-            if (parseInt($('#ulspeedvalue').val()) > 0)
-                M.account.ul_maxSpeed = parseInt($('#ulspeedvalue').val()) * 1024;
-            else
-                M.account.ul_maxSpeed = 100 * 1024;
-            $('.fm-account-save-block').removeClass('hidden');
+            mega.config.set('font_size', $(this).val());
         });
 
         $('.ulskip').removeClass('radioOn').addClass('radioOff');
@@ -4678,15 +4644,16 @@ function accountUI() {
         $('#rad' + i).removeClass('radioOff').addClass('radioOn');
         $('.ulskip input').rebind('click', function(e)
         {
-            var id = $(this).attr('id');
-            if (id == 'rad4')
-                M.account.ul_skipIdentical = 1;
-            else if (id == 'rad5')
-                M.account.ul_skipIdentical = 0;
+            var ul_skipIdentical = 0;
+            var id               = $(this).attr('id');
+            if (id == 'rad4') {
+                ul_skipIdentical = 1;
+            }
+
             $('.ulskip').removeClass('radioOn').addClass('radioOff');
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
-            $('.fm-account-save-block').removeClass('hidden');
+            mega.config.set('ul_skipIdentical', ul_skipIdentical);
         });
 
         $('.dlThroughMEGAsync').removeClass('radioOn').addClass('radioOff');
@@ -4698,17 +4665,16 @@ function accountUI() {
         $('#rad' + i).removeClass('radioOff').addClass('radioOn');
         $('.dlThroughMEGAsync input').rebind('click', function(e)
         {
-            var id = $(this).attr('id');
+            var dlThroughMEGAsync = 0;
+            var id                = $(this).attr('id');
             if (id === 'rad18') {
-                M.account.dlThroughMEGAsync = 1;
+                dlThroughMEGAsync = 1;
             }
-            else if (id === 'rad19') {
-                M.account.dlThroughMEGAsync = 0;
-            }
+
             $('.dlThroughMEGAsync').removeClass('radioOn').addClass('radioOff');
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
-            $('.fm-account-save-block').removeClass('hidden');
+            mega.config.set('dlThroughMEGAsync', dlThroughMEGAsync);
         });
 
         $('.uisorting').removeClass('radioOn').addClass('radioOff');
@@ -4719,15 +4685,15 @@ function accountUI() {
         $('#rad' + i).removeClass('radioOff').addClass('radioOn');
         $('.uisorting input').rebind('click', function(e)
         {
-            var id = $(this).attr('id');
-            if (id == 'rad8')
-                M.account.uisorting = 0;
-            else if (id == 'rad9')
-                M.account.uisorting = 1;
+            var uisorting = 0;
+            var id        = $(this).attr('id');
+            if (id == 'rad9') {
+                uisorting = 1;
+            }
             $('.uisorting').removeClass('radioOn').addClass('radioOff');
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
-            $('.fm-account-save-block').removeClass('hidden');
+            mega.config.set('uisorting', uisorting);
         });
 
         $('.uiviewmode').removeClass('radioOn').addClass('radioOff');
@@ -4738,15 +4704,15 @@ function accountUI() {
         $('#rad' + i).removeClass('radioOff').addClass('radioOn');
         $('.uiviewmode input').rebind('click', function(e)
         {
-            var id = $(this).attr('id');
-            if (id == 'rad10')
-                M.account.uiviewmode = 0;
-            else if (id == 'rad11')
-                M.account.uiviewmode = 1;
+            var uiviewmode = 0;
+            var id         = $(this).attr('id');
+            if (id == 'rad11') {
+                uiviewmode = 1;
+            }
             $('.uiviewmode').removeClass('radioOn').addClass('radioOff');
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
-            $('.fm-account-save-block').removeClass('hidden');
+            mega.config.set('uiviewmode', uiviewmode);
         });
 
         $('.rubsched, .rubschedopt').removeClass('radioOn').addClass('radioOff');
@@ -4982,14 +4948,17 @@ function accountUI() {
         $('.usessl input').rebind('click', function(e)
         {
             var id = $(this).attr('id');
-            if (id == 'rad7')
-                M.account.use_ssl = 0;
-            else if (id == 'rad6')
-                M.account.use_ssl = 1;
+            if (id == 'rad7') {
+                use_ssl = 0;
+            }
+            else if (id == 'rad6') {
+                use_ssl = 1;
+            }
             $('.usessl').removeClass('radioOn').addClass('radioOff');
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
-            $('.fm-account-save-block').removeClass('hidden');
+            mega.config.set('use_ssl', use_ssl | 0);
+            localStorage.use_ssl = fmconfig.use_ssl;
         });
 
         $('.fm-account-remove-avatar,.fm-account-avatar').rebind('click', function() {

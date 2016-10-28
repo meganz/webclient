@@ -1175,6 +1175,9 @@ a.account-manage-button:hover {
     font-size: 17px;
     color: white;
 }
+.slider-percentage span.warn {
+    color: #FF0000;
+}
 .slider-percentage-info {
     font-size: 12px;
     line-height: 17px;

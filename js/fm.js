@@ -4309,10 +4309,6 @@ function accountUI() {
 
             var pws = zxcvbn($('#account-new-password').val());
 
-            if (typeof u_attr.bandwidthLimit === "number") {
-                api_req({"a":"up", "srvratio": Math.round(u_attr.bandwidthLimit) });
-            }
-
             if (M.account.dl_maxSlots)
             {
                 mega.config.set('dl_maxSlots', M.account.dl_maxSlots);
@@ -4539,19 +4535,51 @@ function accountUI() {
 
         // LITE/PRO account
         if (u_attr.p) {
-            // replace 50 (percents) by real value
-            api_req({ 'a': 'uq' }, {callback: function(response) {
-                var bandwidthLimit = Math.round(response.srvratio || 0);
-                $('.bandwith-settings').removeClass('hidden');
-                $('#bandwidth-slider').slider({
-                    min: 0, max: 100, range: 'min', value: bandwidthLimit, slide: function(e, ui) {
-                        $('.slider-percentage span').text(ui.value + ' %');
-                        $('.fm-account-save-block').removeClass('hidden');
-                        u_attr.bandwidthLimit = ui.value;
+            var bandwidthLimit = Math.round(account.servbw_limit | 0);
+
+            $('#bandwidth-slider').slider({
+                min: 0, max: 100, range: 'min', value: bandwidthLimit,
+                change: function(e, ui) {
+                    if (M.currentdirid === 'account/settings') {
+                        bandwidthLimit = ui.value;
+
+                        if (parseInt(localStorage.bandwidthLimit) !== bandwidthLimit) {
+
+                            var done = delay.bind(null, 'bandwidthLimit', function() {
+                                api_req({"a": "up", "srvratio": Math.round(bandwidthLimit)});
+                                localStorage.bandwidthLimit = bandwidthLimit;
+                            }, 2600);
+
+                            if (bandwidthLimit > 99) {
+                                msgDialog('warningb:!' + l[776], l[882], l[12689], 0, function(e) {
+                                    if (e) {
+                                        done();
+                                    }
+                                    else {
+                                        $('.slider-percentage span').text('0 %').removeClass('bold warn');
+                                        $('#bandwidth-slider').slider('value', 0);
+                                    }
+                                });
+                            }
+                            else {
+                                done();
+                            }
+                        }
                     }
-                });
-                $('.slider-percentage span').text(bandwidthLimit + ' %');
-            }});
+                },
+                slide: function(e, ui) {
+                    $('.slider-percentage span').text(ui.value + ' %');
+
+                    if (ui.value > 90) {
+                        $('.slider-percentage span').addClass('warn bold');
+                    }
+                    else {
+                        $('.slider-percentage span').removeClass('bold warn');
+                    }
+                }
+            });
+            $('.slider-percentage span').text(bandwidthLimit + ' %');
+            $('.bandwith-settings').removeClass('hidden');
         }
 
         $('#slider-range-max').slider({
@@ -8084,6 +8112,7 @@ function doRename() {
 }
 
 function msgDialog(type, title, msg, submsg, callback, checkbox) {
+    var doneButton  = l[81];
     var extraButton = String(type).split(':');
     if (extraButton.length === 1) {
         extraButton = null;
@@ -8091,6 +8120,11 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
     else {
         type = extraButton.shift();
         extraButton = extraButton.join(':');
+
+        if (extraButton[0] === '!') {
+            doneButton  = l[82];
+            extraButton = extraButton.substr(1);
+        }
     }
     $.msgDialog = type;
     $.warningCallback = callback;
@@ -8146,7 +8180,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
             $('#msgDialog .fm-notifications-bottom')
                 .safeHTML('<div class="default-white-button right notification-button confirm"><span>@@</span></div>' +
                     '<div class="default-white-button right notification-button cancel"><span>@@</span></div>' +
-                    '<div class="clear"></div>', l[81], extraButton);
+                    '<div class="clear"></div>', doneButton, extraButton);
 
             $('#msgDialog .default-white-button').eq(0).bind('click', function() {
                 closeMsg();

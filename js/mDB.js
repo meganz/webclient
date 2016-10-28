@@ -1,6 +1,6 @@
 // FM IndexedDB layer (using Dexie.js - https://github.com/dfahlander/Dexie.js)
 
-// indexes and payload are obfuscate using AES ECB (FIXME: use CBC for the payload)
+// indexes and payload are obfuscated using AES ECB (FIXME: use CBC for the payload)
 
 // DB name is fm_ + encrypted u_handle (folder links are not cached yet - FIXME)
 // init() checks for the presence of an sn and wipes the DB if none is found
@@ -188,6 +188,7 @@ function fmdb_writepending(fmdb) {
                     }
                     else dispatchputs();
                 });
+                break;  // don't overwhelm MSIE's IndexedDB implementation
             }
         }
         if (!fmdb.inflight) fmdb.state = -1;

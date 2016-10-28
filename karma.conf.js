@@ -85,7 +85,7 @@ module.exports = function(config) {
         'js/fm.js',
         'js/mouse.js',
         'js/filedrag.js',
-        //'js/mDB.js',
+        'js/mDB.js',
         'js/thumbnail.js',
         'js/vendor/exif.js',
         'js/vendor/megapix.js',

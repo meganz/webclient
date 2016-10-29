@@ -107,7 +107,7 @@ function crypto_decryptnode(node) {
     var p, pp;
 
     // is this node in OK or CORRUPT state or a keyless (root) node? no decryption needed.
-    if (node.name || !node.k || typeof node.k == 'object') return;
+    if (node.name || typeof node.k == 'undefined' || typeof node.k == 'object') return;
 
     // inbound share root?
     if (node.sk) {
@@ -189,18 +189,17 @@ function crypto_decryptnode(node) {
             }
         }
 
-        if (!k) {
-            if (d) console.log("Can't extract key from " + key + " for " + node.h);
-            missingkeys[node.h] = true;
-            return;
-        }
-
         if (node.a) crypto_procattr(node, k);
         else {
             if (d && node.t > 1) {
                 console.log('Missing attribute for node ' + node.h);
             }
         }
+    }
+
+    if (!k) {
+        if (d) console.log("Can't extract key from " + key + " for " + node.h);
+        missingkeys[node.h] = true;
     }
 }
 

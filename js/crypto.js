@@ -3964,8 +3964,6 @@ function crypto_proccr(cr) {
     for (i = 0; i < cr[2].length; i += 3) {
         fm_updatekey(cr[1][cr[2][i + 1]], cr[0][cr[2][i]] + ":" + cr[2][i + 2]);
     }
-
-    fm_commitkeyupdate();
 }
 
 // process incoming missing key cr

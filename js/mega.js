@@ -5846,13 +5846,13 @@ function execsc(actionPackets, callback) {
                 sharedUInode(actionPacket.n);
             }
         }
-        else if (actionPacket.a === 'k' && !folderlink) {
+        else if (actionPacket.a === 'k') {
             if (actionPacket.sr)
                 crypto_procsr(actionPacket.sr);
             else if (actionPacket.cr)
                 crypto_proccr(actionPacket.cr);
             else
-                api_req({
+                if (!folderlink) api_req({
                     a: 'k',
                     cr: crypto_makecr(actionPacket.n, [actionPacket.h], true)
                 });
@@ -6136,19 +6136,21 @@ function execsc(actionPackets, callback) {
 
 function fm_updatekey(h, k) {
     var n = M.d[h];
-    if (n)
-    {
-        var f = {h: h, k: k, a: M.d[h].a};
-        crypto_decryptnode(f);
+ 
+    if (n && (!n.k || typeof n.k == 'string')) {
+        n.k = k;
+        crypto_decryptnode(n);
 
-        if (typeof f.k == 'object') {
-            M.nodeAttr({h: h, name: f.name, k: f.k, k: k});            
+        if (typeof n.k == 'object') {
+            M.nodeAttr({h: n.h});   // save updated node to DB
+            if (fmdb) fmdb.del('mk', [n.h]);    // delete missing key
+            delete missingkeys[n.h];
+ 
+            removeUInode(n.h);
+            newnodes.push(n);
+            delete M.megaRender.nodeMap[n.h];
         }
     }
-}
-
-function fm_commitkeyupdate() {
-    // refresh render?
 }
 
 // load tree for folder link handle (or current u_sid if !handle)

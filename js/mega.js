@@ -1,4 +1,4 @@
-var newnodes;
+var newnodes = [];
 var maxaction;
 var fminitialized = false;
 var dl_interval, ul_interval;
@@ -2477,9 +2477,7 @@ function MegaData()
 
         this.d[n.h] = n;
 
-        if (typeof newnodes !== 'undefined') {
-            newnodes.push(n);
-        }
+        newnodes.push(n);
 
         if (fminitialized) {
             // Handle Inbox/RubbishBin UI changes
@@ -5464,7 +5462,6 @@ function renderfm() {
 }
 
 function renderNew() {
-
     var newNode, tb,
         treebuild = [],
         UImain = false,
@@ -5478,7 +5475,6 @@ function renderNew() {
     }
 
     for (var i in newnodes) {
-
         newNode = newnodes[i];
         if (newNode.h.length === 11) {
             newcontact = true;
@@ -5546,7 +5542,7 @@ function renderNew() {
         topmenuUI();
     }
 
-    newnodes = undefined;
+    newnodes = [];
     if (d) {
         console.timeEnd('rendernew');
     }
@@ -6110,7 +6106,7 @@ function execsc(actionPackets, callback) {
         }
     }
 
-    if (newnodes.length > 0 && fminitialized) {
+    if (newnodes.length && fminitialized) {
         renderNew();
     }
     if (loadavatars.length) {
@@ -6148,7 +6144,7 @@ function fm_updatekey(h, k) {
  
             removeUInode(n.h);
             newnodes.push(n);
-            delete M.megaRender.nodeMap[n.h];
+            delete M.megaRender.nodeMap[n.h];                
         }
     }
 }
@@ -7043,7 +7039,6 @@ function processmove(jsonmove)
 function process_f(f, cb, retry)
 {
     var onMainThread = localStorage.dk ? 9e11 : 200;
-    var doNewNodes = (typeof newnodes !== 'undefined');
 
     if (f && f.length)
     {
@@ -7144,14 +7139,10 @@ function __process_f2(f, cb, tick)
     {
         if (max) cb();
         else {
-            var doNewNodes = (typeof newnodes !== 'undefined');
             if (!+tick || tick > 1e3) {
                 tick = 200;
             }
             setTimeout(function pf2n() {
-                if (doNewNodes) {
-                    newnodes = newnodes || [];
-                }
                 __process_f2(f, cb, tick);
             }, tick *= 1.2);
         }

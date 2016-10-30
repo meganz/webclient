@@ -2115,8 +2115,8 @@ function removeShare(shareId, nfk) {
         api_updfkey(shareId);
     }
 
-    M.delNode(shareId);
-    api_req({ a: 'd', n: shareId, i: requesti });
+    M.delNode(shareId, true);   // must not update DB pre-API
+    api_req({ a: 'd', n: shareId/*, i: requesti*/ });
 
     M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
 
@@ -2288,7 +2288,8 @@ function fmremove() {
                                 for (var share in Object(M.d[dirTree[selection]]).shares) {
                                     if (M.d[dirTree[selection]].shares.hasOwnProperty(share)) {
                                         api_req({ a: 's2', n:  dirTree[selection], s: [{ u: M.d[dirTree[selection]].shares[share].u, r: ''}], ha: '', i: requesti });
-                                        M.delNodeShare(dirTree[selection], M.d[dirTree[selection]].shares[share].u);
+                                        // must not delete share before API responds
+                                        //M.delNodeShare(dirTree[selection], M.d[dirTree[selection]].shares[share].u);
                                         setLastInteractionWith(dirTree[selection], "0:" + unixtime());
                                     }
                                 }

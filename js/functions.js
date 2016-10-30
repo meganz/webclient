@@ -4129,8 +4129,8 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
                 }
 
                 handles.map(function(handle) {
-                    M.delNode(handle);
-                    api_req({a: 'd', n: handle, i: requesti});
+                    M.delNode(handle, true);    // must not update DB pre-API
+                    api_req({a: 'd', n: handle/*, i: requesti*/});
 
                     if (inRub) {
                         $('.grid-table.fm#' + handle).remove();
@@ -4818,7 +4818,8 @@ if (typeof sjcl !== 'undefined') {
                 // If it was a user handle, the share is a full share
                 if (M.u[handleOrEmail]) {
                     userEmail = M.u[handleOrEmail].m;
-                    M.delNodeShare(selectedNodeHandle, handleOrEmail);
+                    // must not delete share pre-API
+                    //M.delNodeShare(selectedNodeHandle, handleOrEmail);
                     setLastInteractionWith(handleOrEmail, "0:" + unixtime());
 
                     self.removeFromPermissionQueue(handleOrEmail);

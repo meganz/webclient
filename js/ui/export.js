@@ -1801,10 +1801,13 @@ var exportExpiry = {
         api_req(request, {
             nodeId: nodeId,
             callback: function(result) {
-
                 if (typeof result !== 'number') {
                     M.nodeShare(this.nodeId, { h: this.nodeId, r: 0, u: 'EXP', ts: unixtime() });
-                    M.nodeAttr({ h: this.nodeId, ph: result });
+                    var n;
+                    if (fmdb && (n = M.d[this.nodeId])) {
+                        n.ph = result;
+                        M.nodeUpdated(n);
+                    }
                 }
                 else { // Error
                     self.logger.warn('_getExportLinkRequest:', this.nodeId, 'Error code: ', result);

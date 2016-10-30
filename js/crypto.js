@@ -164,7 +164,7 @@ var crypt = (function () {
 
             var __retrieveRsaKeyFunc = function() {
                 // Fire it off.
-                api_req({ 'a': 'uk', 'u': userhandle, 'i': requesti }, myCtx);
+                api_req({ a: 'uk', u: userhandle }, myCtx);
             };
 
             if (attribCache) {
@@ -1407,33 +1407,6 @@ function decrypt_ab_ctr(aes, ab, nonce, pos) {
     return mac;
 }
 
-// generate attributes block using AES-CBC with MEGA canary
-// attr = Object, key = [] (four-word random key will be generated) or Array(8) (lower four words will be used)
-// returns [ArrayBuffer data,Array key]
-function enc_attr(attr, key) {
-    var ab;
-
-    try {
-        ab = str_to_ab('MEGA' + to8(JSON.stringify(attr)));
-    } catch (e) {
-        msgDialog('warningb', l[135], e.message || e);
-        throw e;
-    }
-
-    // if no key supplied, generate a random one
-    if (!key.length) {
-        for (i = 4; i--;) {
-            key[i] = rand(0x100000000);
-        }
-    }
-
-    ab = asmCrypto.AES_CBC.encrypt(ab,
-        a32_to_ab([key[0] ^ key[4], key[1] ^ key[5], key[2] ^ key[6], key[3] ^ key[7]]), false);
-
-    return [ab, key];
-}
-
-
 /**
  * Converts a Unicode string to a UTF-8 cleanly encoded string.
  *
@@ -2297,69 +2270,36 @@ function api_changepw(ctx, passwordkey, masterkey, oldpw, newpw, email) {
 }
 
 /**
- * Set node attribute.
- * @param {String}  handle The node's handle.
- * @param {Object}  attrs  Attributes.
- * @param {Boolean} shrink Use one-letter attrs.
+ * Send current node attributes to the API
  * @return {MegaPromise}
  */
-function api_setattr(handle, attrs, shrink) {
+function api_setattr(n) {
     var promise = new MegaPromise();
     var logger = MegaLogger.getLogger('crypt');
 
-    if (!Object(M.d).hasOwnProperty(handle)) {
-        promise.reject(ENOENT);
-    }
-    else if (typeof attrs !== 'object'
-            || !Object.keys(attrs).length) {
-
-        promise.reject(EARGS);
-    }
-    else {
-        var node = M.d[handle];
-        var ar = Object(node.ar);
-        var cache = {h: handle};
-        var callback = {
-            callback: function(res) {
-                if (res !== 0) {
-                    logger.error('api_setattr', ar, res);
-                    promise.reject(res);
-                }
-                else {
-                    promise.resolve(res);
-                }
+    var ctx = {
+        callback: function(res) {
+            if (res !== 0) {
+                logger.error('api_setattr', res);
+                promise.reject(res);
             }
-        };
-
-        for (var i in attrs) {
-            if (attrs.hasOwnProperty(i)) {
-                var name = (shrink ? i[0] : i);
-
-                if (d && ar.hasOwnProperty(name) && ar[name] === attrs[i]) {
-                    logger.warn('api_setattr: attribute "%s" already exists.', name);
-                }
-
-                cache[i] = attrs[i];
-                ar[name] = attrs[i];
+            else {
+                promise.resolve(res);
             }
         }
+    };
 
-        try {
-            var mkat = enc_attr(ar, node.k);
-            var attr = ab_to_base64(mkat[0]);
-            var key = a32_to_base64(encrypt_key(u_k_aes, mkat[1]));
+    try {
+        var at = ab_to_base64(crypto_makeattr(n));
 
-            logger.debug('Setting node attributes for "%s"...', handle, cache, ar);
+        logger.debug('Setting node attributes for "%s"...', n.h);
 
-            cache.a = attr;
-            M.nodeAttr(cache);
-
-            api_req({ a: 'a', n: handle, attr: attr, key: key, i: requesti }, callback);
-        }
-        catch (ex) {
-            logger.error(ex);
-            promise.reject(ex);
-        }
+        // we do not set i here
+        api_req({ a: 'a', n: n.h, at: at }, ctx);
+    }
+    catch (ex) {
+        logger.error(ex);
+        promise.reject(ex);
     }
 
     return promise;
@@ -2630,6 +2570,10 @@ function crypto_handleauth(h) {
     return a32_to_base64(encrypt_key(u_k_aes, str_to_a32(h + h)));
 }
 
+function crypto_keyok(n) {
+    return n && typeof n.k == 'object' && n.k.length == (n.t ? 4 : 8);
+}
+
 function crypto_encodepubkey(pubkey) {
     var mlen = pubkey[0].length * 8,
         elen = pubkey[1].length * 8;
@@ -2751,110 +2695,6 @@ function crypto_rsaencrypt(cleartext, pubkey) {
     ciphertext = String.fromCharCode(clen / 256) + String.fromCharCode(clen % 256) + ciphertext;
 
     return ciphertext;
-}
-
-// Complete upload
-// We construct a special node put command that uses the upload token
-// as the source handle
-function api_completeupload(t, uq, k, ctx) {
-    // Close nsIFile Stream
-    if (is_chrome_firefox && uq._close) {
-        uq._close();
-    }
-
-    if (uq.repair) {
-        uq.target = M.RubbishID;
-    }
-
-    api_completeupload2({
-        callback: api_completeupload2,
-        t: base64urlencode(t),
-        path: uq.path,
-        n: uq.name,
-        k: k,
-        fa: uq.faid ? api_getfa(uq.faid) : false,
-        ctx: ctx
-    }, uq);
-}
-
-function api_completeupload2(ctx, uq) {
-    var logger = MegaLogger.getLogger('crypt');
-    var p, ut = uq.target;
-
-    if (ctx.path && ctx.path !== ctx.n && (p = ctx.path.indexOf('/')) > 0) {
-        var pc = ctx.path.substr(0, p);
-        ctx.path = ctx.path.substr(p + 1);
-
-        fm_requestfolderid(ut, pc, {
-            uq: uq,
-            ctx: ctx,
-            callback: function (ctx, h) {
-                if (h) {
-                    ctx.uq.target = h;
-                }
-                api_completeupload2(ctx.ctx, ctx.uq);
-            }
-        });
-    }
-    else {
-        a = {
-            n: ctx.n
-        };
-        if (uq.hash) {
-            a.c = uq.hash;
-        }
-        logger.debug(ctx.k);
-        var ea = enc_attr(a, ctx.k);
-        logger.debug(ea);
-
-        if (!ut) {
-            ut = M.RootID;
-        }
-
-        var req = {
-            a: 'p',
-            t: ut,
-            n: [{
-                h: ctx.t,
-                t: 0,
-                a: ab_to_base64(ea[0]),
-                k: a32_to_base64(encrypt_key(u_k_aes, ctx.k))
-            }],
-            i: requesti
-        };
-
-        if (ctx.fa) {
-            req.n[0].fa = ctx.fa;
-        }
-
-        if (ut) {
-            // a target has been supplied: encrypt to all relevant shares
-            var sn = fm_getsharenodes(ut);
-
-            if (sn.length) {
-                req.cr = crypto_makecr([ctx.k], sn, false);
-                req.cr[1][0] = ctx.t;
-            }
-        }
-
-        api_req(req, ctx.ctx);
-    }
-}
-
-function is_devnull(email) {
-    return false;
-
-    var p, q;
-
-    if ((p = email.indexOf('@')) >= 0) {
-        if ((q = email.indexOf('.', p)) >= 0) {
-            if ("outlook.hotmail.msn.live".indexOf(email.substr(p + 1, q - p - 1).toLowerCase()) >= 0) {
-                return true;
-            }
-        }
-    }
-
-    return false;
 }
 
 function is_rawimage(name, ext) {
@@ -3743,7 +3583,8 @@ function api_pfaerror(handle) {
 
     // Got access denied, store 'f' attr to prevent subsequent attemps
     if (node && RightsbyID(node.h) > 1 && node.f !== u_handle) {
-        return api_setattr(node.h, {f: u_handle});
+        node.f = u_handle;
+        return api_setattr(node);
     }
 
     return false;

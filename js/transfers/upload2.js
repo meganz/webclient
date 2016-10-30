@@ -387,13 +387,13 @@ var ulmanager = {
 
         ASSERT(file.filekey, "*** filekey is missing ***");
 
-            var body = {
-                n: file.name
+            var n = {
+                name: file.name,
+                hash: file.hash,
+                k: file.filekey
             };
-            if (file.hash) {
-                body.c = file.hash;
-            }
-            var ea = enc_attr(body, file.filekey);
+
+            var ea = ab_to_base64(crypto_makeattr(n));
             var dir = target || file.target || M.RootID;
             var faid = file.faid ? api_getfa(file.faid) : false;
             var req = {
@@ -402,7 +402,7 @@ var ulmanager = {
                 n: [{
                     h: file.response,
                     t: 0,
-                    a: ab_to_base64(ea[0]),
+                    a: ea,
                     k: a32_to_base64(encrypt_key(u_k_aes, file.filekey))
                 }],
                 i: requesti

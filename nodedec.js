@@ -128,7 +128,7 @@ function crypto_decryptnode(node) {
     } else {
         // do we have a suitable sharekey?
         for (p = 8; (p = node.k.indexOf(':', p)) >= 0; ) {
-            if (++p == 9 || node.k[p-9] == '/') {
+            if (++p == 9 || node.k[p-10] == '/') {
                 id = node.k.substr(p-9, 8);
                 if (u_sharekeys[id]) {
                     break;
@@ -198,9 +198,57 @@ function crypto_decryptnode(node) {
     }
 
     if (!k) {
-        if (d) console.log("Can't extract key from " + key + " for " + node.h);
+        if (d) console.log("Can't extract key for " + node.h);
         missingkeys[node.h] = true;
     }
+}
+
+// generate attributes block for given node using AES-CBC with MEGA canary
+// (also generates random (folder-type) key if missing)
+function crypto_makeattr(n) {
+    // if node is keyless, generate one
+    if (typeof n.k == 'undefined' || !n.k.length) {
+        n.k = [];
+        for (i = 4; i--; ) n.k[i] = rand(0x100000000);
+    } else {
+        // node does not have a valid key
+        if (n.k.length != 4 && n.k.length != 8) {
+            throw new Error("Invalid key on " + n.h);
+        }        
+    }
+
+    // construct full set of transport attributes
+    // NOTE: changes must be replicated to crypto_procaddr()
+    var ar = clone(n.ar) || {};
+
+    if (n.hash) ar.c = n.hash;
+    else if (n.mtime) ar.t = n.mtime;
+
+    if (typeof n.name != 'undefined') ar.n = n.name;
+    if (typeof n.fav != 'undefined') ar.fav = n.fav;
+    if (typeof n.lbl != 'undefined') ar.lbl = n.lbl;
+    if (typeof n.f != 'undefined') ar.f = n.f;
+
+    try {
+        ab = str_to_ab('MEGA' + to8(JSON.stringify(ar)));
+    } catch (e) {
+        msgDialog('warningb', l[135], e.message || e);
+        throw e;
+    }
+
+    return asmCrypto.AES_CBC.encrypt(ab,
+        a32_to_ab([n.k[0] ^ n.k[4], n.k[1] ^ n.k[5], n.k[2] ^ n.k[6], n.k[3] ^ n.k[7]]), false);
+}
+
+// clear all node attributes, including derived ones
+function crypto_clearattr(n) {
+    delete n.ar;
+    delete n.name;
+    delete n.hash;
+    delete n.mtime;
+    delete n.fav;
+    delete n.lbl;
+    delete n.f;
 }
 
 // if decryption of .a is successful, set .name, .hash, .mtime, .k and .ar and clear .a
@@ -240,11 +288,24 @@ function crypto_procattr(node, key)
                 }
             }
 
+            if (typeof o.fav != 'undefined') {
+                node.fav = o.fav;
+                delete o.fav;
+            }
+
+            if (typeof o.lbl != 'undefined') {
+                node.lbl = o.lbl;
+                delete o.lbl;
+            }
+
+            if (typeof o.f != 'undefined') {
+                node.f = o.f;
+                delete o.f;
+            }
+
             node.k = key;
             node.ar = o;
             delete node.a;
-
-            success = true;
         }
         else {
             if (d) console.log("Incomplete attributes for node " + node.h);

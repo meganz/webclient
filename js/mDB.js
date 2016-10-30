@@ -299,11 +299,16 @@ function fmdb_add(table, row) {
 }
 
 // enqueue IndexedDB deletions
-function fmdb_del(table, indexrow) {
-    for (var i = indexrow.length; i--; ) {
-        indexrow[i] = ab_to_base64(fmdb_strcrypt(indexrow[i]));
+function fmdb_del(table, index) {
+    if (typeof index == 'object') {
+        for (var i = index.length; i--; ) {
+            index[i] = ab_to_base64(fmdb_strcrypt(index[i]));
+        }        
     }
-    this.enqueue(table, indexrow, 1);
+    else {
+        index = ab_to_base64(fmdb_strcrypt(index));
+    }
+    this.enqueue(table, index, 1);
 }
 
 // non-transactional read with subsequent deobfuscation, with optional prefix filter
@@ -321,7 +326,7 @@ function fmdb_get(table, procresult, key, prefix) {
         for (var i = r.length; i--; ) {
             try {
                 t = r[i].d ?
-                    JSON.parse(xxx = fmdb_strdecrypt(r[i].d))
+                    JSON.parse(fmdb_strdecrypt(r[i].d))
                   : {};
 
                 if (fmdb_restorenode[table]) {

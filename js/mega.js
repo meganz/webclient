@@ -5776,7 +5776,7 @@ function execsc(actionPackets, callback) {
                             // update rights:
                             n.r = actionPacket.r;
                             n.su = actionPacket.o;
-                            M.nodeUpdated();
+                            M.nodeUpdated(n);
                         }
                         else {
                             if (d) {

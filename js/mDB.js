@@ -35,18 +35,19 @@ function fmdb_init(u, result, wipe) {
     else {
         try {
             if (!fmdb.db) {
-                fmdb.db = new Dexie('fm_' + ab_to_base64(fmdb_strcrypt(u_handle)));
+                // protect user identity post-logout
+                fmdb.db = new Dexie('fm_' + ab_to_base64(fmdb_strcrypt((u_handle + u_handle).substr(0, 16))));
 
                 // replicate any additions in fmdb_writepending()
                 fmdb.db.version(1).stores({
                     f   : '&h, p, s',   // nodes - handle, parent, size (negative size: type)
-                    s   : '[o+t]',      // shares - origin/target; both incoming & outgoing
+                    s   : '&o_t', /*'[o+t]',*/      // shares - origin/target; both incoming & outgoing
                     ok  : '&h',         // ownerkeys for outgoing shares - handle
                     mk  : '&h',         // missing node keys - handle
                     u   : '&u',         // users - handle
                     opc : '&p',         // outgoing pending contact - id
                     ipc : '&p',         // incoming pending contact - id
-                    ps  : '[h+p]',      // pending share - handle/id
+                    ps  : '&h_p', /*[h+p]',*/      // pending share - handle/id
                     mcf : '&id',        // chats - id
                     sn  : '&i'          // sn - fixed index 1
                 });
@@ -221,12 +222,12 @@ fmdb_stripnode = {
         delete f.t;
         delete f.s;
 
-        if (f.p && f.p.length == 8) {
-            f.p = f.p;
+        if (f.p) {
+            t.p = f.p;
             delete f.p;
         }
 
-        if (Object.keys(f.ar).length) {
+        if (f.ar) {
             t.ar = f.ar;
             delete f.ar;
         }
@@ -235,7 +236,7 @@ fmdb_stripnode = {
     },
 
     s : function(s) {
-        var t = { s : o, s : t };
+        var t = { o : s.o, t : s.t };
 
         delete s.o;
         delete s.t;
@@ -262,8 +263,19 @@ fmdb_restorenode = {
     },
 
     s : function(f, index) {
-        f.o = index.o;
-        f.t = index.t;
+        var t = index.o_t.indexOf('*');
+        if (t >= 0) {
+            f.o = index.o_t.substr(0, t);
+            f.t = index.o_t.substr(t+1);   
+        }
+    },
+
+    ps : function(ps, index) {
+        var t = index.h_p.indexOf('*');
+        if (t >= 0) {
+            ps.h = index.h_p.substr(0, t);
+            ps.p = index.h_p.substr(t+1);   
+        }
     },
 
     mk : function(mk, index) {
@@ -280,10 +292,10 @@ function fmdb_add(table, row) {
         if (fmdb_stripnode[table]) {
             // this node type is stripnode-optimised: temporarily remove redundant elements
             // to create a leaner JSON and save IndexedDB space
-            var d = row.d;
-            var t = fmdb_stripnode[table];
-            row.d = JSON.stringify(d);
-            for (var i in t) d[i] = t[i];
+            var d = row.d;  // this references the live object!
+            var t = fmdb_stripnode[table](d);   // remove overhead
+            row.d = JSON.stringify(d);          // store lean result
+            for (var i in t) d[i] = t[i];       // restore overhead
         }
         else {
             // otherwise, just stringify it all
@@ -300,15 +312,7 @@ function fmdb_add(table, row) {
 
 // enqueue IndexedDB deletions
 function fmdb_del(table, index) {
-    if (typeof index == 'object') {
-        for (var i = index.length; i--; ) {
-            index[i] = ab_to_base64(fmdb_strcrypt(index[i]));
-        }        
-    }
-    else {
-        index = ab_to_base64(fmdb_strcrypt(index));
-    }
-    this.enqueue(table, index, 1);
+    this.enqueue(table, ab_to_base64(fmdb_strcrypt(index)), 1);
 }
 
 // non-transactional read with subsequent deobfuscation, with optional prefix filter
@@ -340,6 +344,7 @@ function fmdb_get(table, procresult, key, prefix) {
                 r[i] = t;            
             }
             catch (e) {
+                console.log(e);
                 console.error("IndexedDB corruption: " + fmdb_strdecrypt(r[i].d));
                 delete r[i];
             }

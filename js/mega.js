@@ -2418,8 +2418,7 @@ function MegaData()
                     // __process_f1() (which always runs in an actionpacket
                     // context)
                     // process_u() (with pass-through ignoreDB)
-                    if (fmdb) fmdb.add('s', { o : M.c.shares[n.h].su,
-                                              t : n.h,
+                    if (fmdb) fmdb.add('s', { o_t : M.c.shares[n.h].su + '*' + n.h,
                                               d : M.c.shares[n.h] });
                 }
             }
@@ -2498,12 +2497,15 @@ function MegaData()
                 delete M.c[h];
             }
 
+            // FIXME: this gets called with M.d[h] already
+            // deleted, which means that the test below cannot
+            // take effect.
             fmdb.del('f', h);
 
             if (M.d[h]) {
                 if (fmdb && !ignoreDB) {
                     if (M.d[h].p && M.d[h].p.length == 11) {
-                        fmdb.del('s', [M.d[h].p, h]);
+                        fmdb.del('s', M.d[h].p + '*' + h);
                     }
                 }
 
@@ -2511,6 +2513,7 @@ function MegaData()
                 M.delHash(M.d[h]);
                 delete M.d[h];
             }
+
             // Update M.v it's used for at least preview slideshow
             for (var k in M.v) {
                 if (M.v[k].h === h) {
@@ -3114,7 +3117,7 @@ function MegaData()
         this.ps[ps.h][ps.p] = ps;
 
         if (fmdb && !ignoreDB && !pfkey) {
-            fmdb.add('ps', { h : ps.h, p : ps.p, d : ps });
+            fmdb.add('ps', { h_p : ps.h + '*' + ps.p, d : ps });
         }
 
         // maintain special outgoing shares index by user:
@@ -3146,10 +3149,8 @@ function MegaData()
             }
         }
 
-        // Check how removing from indexedDb works and make
-        // sure that pending share is/only removed from it
         if (fmdb && !pfkey) {
-            fmdb.del('ps', [nodeId, pcrId]);
+            fmdb.del('ps', nodeId + '*' + pcrId);
         }
     };
 
@@ -3750,14 +3751,14 @@ function MegaData()
 
     this.nodeShare = function(h, s, ignoreDB) {
         if (this.d[h]) {
-            if (typeof this.d[h].shares === 'undefined') {
+            if (typeof this.d[h].shares == 'undefined') {
                 this.d[h].shares = [];
             }
 
             this.d[h].shares[s.u] = s;
             if (fmdb) {
                 if (!ignoreDB && !pfkey) {
-                    fmdb.add('s', { o : h, t : s.u, d : s });
+                    fmdb.add('s', { o_t : h + '*' + s.u, d : s });
                 }
             }
             if (fminitialized) {
@@ -3800,7 +3801,7 @@ function MegaData()
     this.delNodeShare = function(h, u, okd) {
         if (this.d[h] && typeof this.d[h].shares !== 'undefined') {
             if (fmdb) {
-                fmdb.del('s', [h, u]);
+                fmdb.del('s', h + '*' + u);
             }
 
             api_updfkey(h);
@@ -5749,7 +5750,7 @@ function execsc(actionPackets, callback) {
 
                             if (fmdb) {
                                 M.nodeUpdated(n);
-                                fmdb.del('s', [u_handle, actionPacket.n]);
+                                fmdb.del('s', u_handle + '*' + actionPacket.n);
                             }
                         }
                         else {
@@ -6336,8 +6337,7 @@ function treefetcher_procmsg(ev) {
             for (h in M.c.shares) {
                 if (u_sharekeys[h]) M.c.shares[h].sk = a32_to_base64(u_sharekeys[h][0]);
 
-                if (fmdb) fmdb.add('s', { o : M.c.shares[h].su,
-                                          t : h,
+                if (fmdb) fmdb.add('s', { o_t : M.c.shares[h].su + '*' + h,
                                           d : M.c.shares[h] });
             }
 
@@ -7271,7 +7271,6 @@ function processPH(publicHandles) {
  * @param {array.<JSON_objects>} pending shares
  */
 function processPS(pendingShares, ignoreDB) {
-
     DEBUG('processPS');
     var ps;
     var nodeHandle = '';
@@ -7280,62 +7279,55 @@ function processPS(pendingShares, ignoreDB) {
     var timeStamp = 0;
     var contactName = '';
 
-
     for (var i in pendingShares) {
-        if (pendingShares.hasOwnProperty(i)) {
-            ps = pendingShares[i];
+        ps = pendingShares[i];
 
-            // From gettree
-            if (ps.h) {
-                M.addPS(ps, ignoreDB);
-            }
+        // From gettree
+        if (ps.h) {
+            M.addPS(ps, ignoreDB);
+        }
+        // Situation different from gettree, s2 from API response, doesn't have .h attr instead have .n
+        else {
+            nodeHandle = ps.n;
+            pendingContactId = ps.p;
+            shareRights = ps.r;
+            timeStamp = ps.ts;
+            contactName = M.getNameByHandle(pendingContactId);
 
-            // Situation different from gettree, s2 from API response, doesn't have .h attr instead have .n
-            else {
-                nodeHandle = ps.n;
-                pendingContactId = ps.p;
-                shareRights = ps.r;
-                timeStamp = ps.ts;
-                contactName = M.getNameByHandle(pendingContactId);
+            // shareRights is undefined when user denies pending contact request
+            // .op is available when user accepts pending contact request and
+            // remaining pending share should be updated to full share
+            if ((typeof shareRights === 'undefined') || ps.op) {
+                M.delPS(pendingContactId, nodeHandle);
 
-                // shareRights is undefined when user denies pending contact request
-                // .op is available when user accepts pending contact request and
-                // remaining pending share should be updated to full share
-                if ((typeof shareRights === 'undefined') || ps.op) {
+                if (ps.op) {
+                    M.nodeShare(nodeHandle, ps);
+                }
 
-                    M.delPS(pendingContactId, nodeHandle);
-
-                    if (ps.op) {
-                        M.nodeShare(nodeHandle, ps);
-                    }
-
-                    if (M.opc && M.opc[ps.p]) {
-
-                        // Update tokenInput plugin
-                        addToMultiInputDropDownList('.share-multiple-input', [{
-                                id: M.opc[pendingContactId].m,
-                                name: contactName
-                            }]);
-                        addToMultiInputDropDownList('.add-contact-multiple-input', {
+                if (M.opc && M.opc[ps.p]) {
+                    // Update tokenInput plugin
+                    addToMultiInputDropDownList('.share-multiple-input', [{
                             id: M.opc[pendingContactId].m,
                             name: contactName
-                        });
-                    }
+                        }]);
+                    addToMultiInputDropDownList('.add-contact-multiple-input', {
+                        id: M.opc[pendingContactId].m,
+                        name: contactName
+                    });
                 }
-                else {
+            }
+            else {
+                // Add the pending share to state
+                M.addPS({
+                    'h':nodeHandle,
+                    'p':pendingContactId,
+                    'r':shareRights,
+                    'ts':timeStamp
+                }, ignoreDB);
+            }
 
-                    // Add the pending share to state
-                    M.addPS({
-                        'h':nodeHandle,
-                        'p':pendingContactId,
-                        'r':shareRights,
-                        'ts':timeStamp
-                    }, ignoreDB);
-                }
-
-                if (fminitialized) {
-                    sharedUInode(nodeHandle);
-                }
+            if (fminitialized) {
+                sharedUInode(nodeHandle);
             }
         }
     }

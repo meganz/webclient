@@ -708,6 +708,29 @@ function init_page() {
             });
         }
     }
+    else if (page === 'wiretransfer') {
+        parsepage(pages['placeholder']);
+
+        if (u_type === 3) {
+            wireTransferDialog
+                .init(function onClose() {
+                    location.hash = 'fm';
+                });
+        }
+        else {
+            mega.ui.showLoginRequiredDialog({
+                    minUserType: 3,
+                    skipInitialDialog: 1
+                })
+                .done(init_page)
+                .fail(function(aError) {
+                    if (aError) {
+                        alert(aError);
+                    }
+                    location.hash = 'start';
+                });
+        }
+    }
     else if (page === 'recovery') {
         parsepage(pages['recovery']);
         var accountRecovery = new mega.AccountRecovery();

@@ -2022,7 +2022,7 @@ var wireTransferDialog = {
     /**
      * Open and setup the dialog
      */
-    init: function() {
+    init: function(onCloseCallback) {
 
         // Close the pro register dialog if it's already open
         $('.pro-register-dialog').removeClass('active').addClass('hidden');
@@ -2045,6 +2045,11 @@ var wireTransferDialog = {
         this.$dialog.find('.btn-close-dialog').rebind('click', function() {
             wireTransferDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
             wireTransferDialog.$dialog.removeClass('active').addClass('hidden');
+
+            if (onCloseCallback) {
+                onCloseCallback();
+            }
+            return false;
         });
 
         // If logged in, pre-populate email address into wire transfer details
@@ -2058,7 +2063,12 @@ var wireTransferDialog = {
 
         // Update plan price in the dialog
         var proPrice = selectedProPackage[5];
-        this.$dialog.find('.amount').text(proPrice);
+        if (proPrice) {
+            this.$dialog.find('.amount').text(proPrice).closest('tr').removeClass('hidden');
+        }
+        else {
+            this.$dialog.find('.amount').closest('tr').addClass('hidden');
+        }
     }
 };
 

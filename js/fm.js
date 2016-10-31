@@ -2219,7 +2219,7 @@ function fmremove() {
             $('#msgDialog .fm-del-contact-avatar').html(avatar);
         }
     }
-    
+
     // Remove selected nodes from rubbish bin
     else if (RootbyId($.selected[0]) === M.RubbishID) {
 
@@ -2262,8 +2262,17 @@ function fmremove() {
                 if (tmp) {
                     M.currentdirid = tmp;
                 }
+
+                showToast('settings', dlgMessage);
             }
         });
+
+        // ToDo: is this necessary?
+        // $('.fm-dialog-button.notification-button').each(function(i, e) {
+        //     if ($(e).text() === l[1018]) {
+        //         $(e).safeHTML('<span>@@</span>', l[83]);
+        //     }
+        // });
     }
 
     // Remove contacts

@@ -6198,7 +6198,7 @@ function treefetcher_fetch() {
     // we filter out the ownerkeys and pipe them to treefetcher_ok()
     // we also filter out the nodes and pipe them to treefetcher_node()
     // the rest of the `f` response goes to treefetcher_residue()
-    var gettree_filter = json_splitter(this, [['{ok', 2, treefetcher_ok], ['{f', 2, treefetcher_node]], treefetcher_residue);
+    var gettree_filter = json_splitter(this, [['{ok0', 2, treefetcher_ok], ['{f', 2, treefetcher_node]], treefetcher_residue);
 
     var req_params = {
         a : 'f',

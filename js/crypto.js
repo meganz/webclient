@@ -1872,7 +1872,7 @@ function setsn(sn) {
     maxaction = sn;
 
     // update sn in DB, triggering a "commit" of the current "transaction"
-    if (fmdb) fmdb.add('sn', { i : 1, d : sn });
+    if (fmdb) fmdb.add('_sn', { i : 1, d : sn });
 }
 
 /**
@@ -3690,7 +3690,7 @@ function api_updfkey(h) {
 
     logger.debug('api_updfkey', h);
 
-    if (typeof h !== 'string') {
+    if (typeof h != 'string') {
         sn = h;
     }
     else {
@@ -3700,7 +3700,7 @@ function api_updfkey(h) {
 
     for (var i in sn) {
         h = sn[i];
-        if (M.d[h] && M.d[h].k && (M.d[h].k.length == 4 || M.d[h].k.length) && M.d[h].fk) {
+        if (M.d[h].u != u_handle && crypto_keyok(M.d[h])) {
             nk.push(h, a32_to_base64(encrypt_key(u_k_aes, M.d[h].k)));
         }
     }

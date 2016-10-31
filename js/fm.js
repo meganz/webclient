@@ -3405,7 +3405,6 @@ dashboardUI.updateCloudDataWidget = function() {
         .each(function(idx, elm) {
             var props = data[map[idx]];
             var str = l[locale[idx]];
-
             if (props.cnt === 1) {
                 str = l[(locale[idx] === files) ? file1 : folder1];
             }
@@ -3413,8 +3412,15 @@ dashboardUI.updateCloudDataWidget = function() {
                 props.cnt = intl.format(props.cnt || 0);
             }
 
-            elm.children[1].textContent = String(str).replace('[X]', props.cnt)
-            elm.children[2].textContent = bytesToSize(props.size);
+            elm.children[1].textContent = String(str).replace('[X]', props.cnt);
+            if (props.cnt > 0) {
+                elm.children[2].textContent = bytesToSize(props.size);
+                $(elm).removeClass('empty');
+            }
+            else {
+                elm.children[2].textContent = '-';
+                $(elm).addClass('empty');
+            }
         });
 };
 dashboardUI.prototype = undefined;
@@ -11137,6 +11143,11 @@ function inviteFriendDialog(close) {
     // Remove success dialog look
     $('.fm-dialog.invite-dialog').removeClass('success');
 
+    // Default buttons states
+    $('.button.back', $dialog).addClass('hidden');
+    $('.button.send', $dialog).removeClass('hidden').addClass('disabled');
+    $('.button.status', $dialog).addClass('hidden');
+
     // Show dialog
     fm_showoverlay();
     $dialog.removeClass('hidden');
@@ -11302,6 +11313,9 @@ function initInviteDialogMultiInputPlugin() {
         // Remove all previously added emails
         $('.share-added-contact.token-input-token-invite', $dialog).remove();
 
+        // Disable Send button
+        $('.button.send', $dialog).addClass('disabled');
+
         // Set focus on input so user can type asap
         $('.multiple-input .token-input-list-invite', $dialog).click();
 
@@ -11347,6 +11361,7 @@ function initInviteDialogMultiInputPlugin() {
             }
 
             $('.fm-dialog.invite-dialog').addClass('success');
+            $('.fm-dialog.invite-dialog button.back').removeClass('hidden');
         }
     });
 }

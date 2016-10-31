@@ -335,11 +335,24 @@
 }
 .achievements-scroll {
     max-height: 666px;
-    margin-top: 8px;
     overflow: hidden;
 }
+.achievements-scroll .jspContainer::before {
+    content: '';
+    display: block;
+    width: 100%;
+    height: 8px;
+    left: 0;
+    top: 0;
+    position: absolute;
+    background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2Y3ZjdmNyIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmN2Y3ZjciIHN0b3Atb3BhY2l0eT0iMCIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+background: -moz-linear-gradient(top, rgba(247,247,247,1) 0%, rgba(247,247,247,0) 100%);
+background: -webkit-linear-gradient(top, rgba(247,247,247,1) 0%,rgba(247,247,247,0) 100%);
+background: linear-gradient(to bottom, rgba(247,247,247,1) 0%,rgba(247,247,247,0) 100%);
+    z-index: 10;
+}
 .achievements-list-dialog .acivements-content {
-    padding: 2px 24px 12px 24px;
+    padding: 10px 24px 12px 24px;
 }
 .achievement-full.expires-txt {
     font-size: 14px;
@@ -351,7 +364,8 @@
     color: #333333;
 }
 .achievement-dialog.right-block .reward {
-    margin: 0px 0 17px 0;
+    margin: 0px 0 17px 10px;
+    min-width: 140px;
 }
 .achievement-dialog.right-block .reward i {
     margin: -2px 0 0 0;
@@ -389,7 +403,7 @@
     vertical-align: middle;
 }
 .one-reward .achievement-dialog.right-block .reward {
-    margin: 0px 0 4px 0;
+    margin: 0px 0 4px 10px;
 }
 .one-reward .right-block .reward.bandwidth {
     display: none;
@@ -405,8 +419,11 @@
 /* Invite a friend dialog */
 .fm-dialog.invite-dialog {
     width: 644px;
-    margin: -327px 0 0 -322px;
+    margin: -329px 0 0 -322px;
     background-color: #FAFAFA;
+}
+.fm-dialog.invite-dialog.success {
+    margin: -338px 0 0 -322px;
 }
 .invite-dialog .header {
     margin-top: -5px;
@@ -606,12 +623,6 @@
 }
 .invitation-dialog.table-row {
     display: table-row;
-}
-.invitation-dialog.table-row:not(.header):nth-child(odd) .table-cell {
-    background-color: white;
-}
-.invitation-dialog.table-row:not(.header):nth-child(even) .table-cell {
-    background-color: #f5f5f5;
 }
 .invitation-dialog.table-cell {
     font-size: 13px;

@@ -409,7 +409,7 @@ body.pro:after {
     background-size: 356px auto;
 }
 .loading-info li::after {
-    background-image: url(../images/mega/loading-sprite_v2@2x.png);
+    background-image: url(../images/mega/loading-sprite_v3@2x.png);
     background-size: 222px auto;
 }
 .powered-logo, .powered-arrow {
@@ -480,7 +480,7 @@ body.pro:after {
     background-image: url(../images/mega/big-achievements@2x.png);
     background-size: 436px auto;
 }
-.logo, .languages-dialog .show-more-languages .round-arrow span, .top-head .top-icon::before, .notification-txt, .nw-bottom-copyrights, .nw-bottom-social, .top-login-warning-arrow, .main-top-info-text, .new-notification-icon, .feedback-button, .semi-small-icon.grey-mega, .semi-small-icon.yellow-triangle, .tiny-icon.membership-status {
+.logo, .languages-dialog .show-more-languages .round-arrow span, .top-head .top-icon::before, .notification-txt, .nw-bottom-copyrights, .nw-bottom-social, .top-login-warning-arrow, .main-top-info-text, .new-notification-icon, .feedback-button, .semi-small-icon.grey-mega, .semi-small-icon.yellow-triangle, .tiny-icon.membership-status, .top-menu-item.submenu-item::before {
     background-image: url(../images/mega/top-sprite_v1@2x.png);
     background-size: 38px auto;
 }

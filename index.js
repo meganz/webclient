@@ -1510,16 +1510,16 @@ function topmenuUI() {
         }
     });
     $('.activity-status-block').rebind('click.topui', function (e) {
-
-        if ($(this).attr('class').indexOf('active') == -1) {
+        var $this = $(this);
+        if ($this.attr('class').indexOf('active') == -1) {
             Soon(function() {
-                $(this).addClass('active');
+                $this.addClass('active');
                 $('.top-user-status-popup').removeClass('hidden');
                 topPopupAlign('.activity-status-block', '.top-user-status-popup', 40);
             });
         }
         else {
-            $(this).removeClass('active');
+            $this.removeClass('active');
             $('.top-user-status-popup').addClass('hidden');
         }
     });
@@ -1528,121 +1528,132 @@ function topmenuUI() {
             $('.top-user-status-popup .dropdown-item').removeClass('active');
             $(this).addClass('active');
             $('.activity-status-block').find('.activity-status')
-                .attr('class', $(this).find('.activity-status').attr('class'));
+                .attr('class', 'top ' + $(this).find('.activity-status').attr('class'));
             $('.activity-status-block').removeClass('active');
             $('.top-user-status-popup').addClass('hidden');
         }
     });
 
     $('.top-menu-popup .top-menu-item').rebind('click', function () {
-        if ($('.light-overlay').is(':visible')) {
-            loadingInitDialog.hide();
-        }
-        $('.top-menu-popup').addClass('hidden');
-        $('.top-icon.menu').removeClass('active');
-        $(window).unbind('resize.topmenu');
-
         var className = $(this).attr('class');
         if (!className) {
             className = '';
         }
-        if (className.indexOf('privacycompany') > -1) {
-            document.location.hash = 'privacycompany';
+        if (className.indexOf('submenu-item') > -1) {
+            if (className.indexOf('expanded') > -1) {
+                $(this).removeClass('expanded');
+            } else {
+                $(this).addClass('expanded');
+            }
+            setTimeout(topMenuScroll,200);
         }
-        else if (className.indexOf('upgrade-your-account') > -1) {
-            document.location.hash = 'pro';
-            return false;
+        else {
+            if ($('.light-overlay').is(':visible')) {
+                loadingInitDialog.hide();
+            }
+            $('.top-menu-popup').addClass('hidden');
+            $('.top-icon.menu').removeClass('active');
+            $(window).unbind('resize.topmenu');
+            if (className.indexOf('privacycompany') > -1) {
+                document.location.hash = 'privacycompany';
+            }
+            else if (className.indexOf('upgrade-your-account') > -1) {
+                document.location.hash = 'pro';
+                return false;
+            }
+            else if (className.indexOf('register') > -1) {
+                document.location.hash = 'register';
+            }
+            else if (className.indexOf('login') > -1) {
+                document.location.hash = 'login';
+            }
+            else if (className.indexOf('aboutus') > -1) {
+                document.location.hash = 'about';
+            }
+            else if (className.indexOf('corporate') > -1) {
+                document.location.hash = 'corporate';
+            }
+            else if (className.indexOf('megablog') > -1) {
+                document.location.hash = 'blog';
+            }
+            else if (className.indexOf('credits') > -1) {
+                document.location.hash = 'credits';
+            }
+            else if (className.indexOf('chrome') > -1) {
+                document.location.hash = 'chrome';
+            }
+            else if (className.indexOf('resellers') > -1) {
+                document.location.hash = 'resellers';
+                return false;
+            }
+            else if (className.indexOf('export') > -1) {
+                document.location.hash = 'backup';
+                return false;
+            }
+            else if (className.indexOf('firefox') > -1) {
+                document.location.hash = 'firefox';
+            }
+            else if (className.indexOf('mobile') > -1) {
+                document.location.hash = 'mobile';
+            }
+            else if (className.indexOf('sync') > -1) {
+                document.location.hash = 'sync';
+            }
+            else if (className.indexOf('help') > -1) {
+                document.location.hash = 'help';
+            } else if (className.indexOf('contact') > -1) {
+                document.location.hash = 'contact';
+            } else if (className.indexOf('support') > -1) {
+                document.location.hash = 'support';
+            }
+            else if (className.indexOf('sitemap') > -1) {
+                document.location.hash = 'sitemap';
+            }
+            else if (className.indexOf('sdk') > -1) {
+                document.location.hash = 'sdk';
+            }
+            else if (className.indexOf('doc') > -1) {
+                document.location.hash = 'doc';
+            }
+            else if (className.indexOf('source-code') > -1) {
+                document.location.hash = 'sourcecode';
+            }
+            else if (className.indexOf('terms') > -1) {
+                document.location.hash = 'terms';
+            }
+            else if (className.indexOf('general') > -1) {
+                document.location.hash = 'general';
+            }
+            else if (className.indexOf('privacypolicy') > -1) {
+                document.location.hash = 'privacy';
+            }
+            else if (className.indexOf('mega') > -1) {
+                document.location.hash = 'mega';
+            }
+            else if (className.indexOf('copyright') > -1) {
+                document.location.hash = 'copyright';
+            }
+            else if (className.indexOf('takedown') > -1) {
+                document.location.hash = 'takedown';
+            }
+            else if (className.indexOf('account') > -1) {
+                document.location.hash = 'fm/account';
+            }
+            else if (className.indexOf('refresh') > -1) {
+                mega.utils.reload();
+            }
+            else if (className.indexOf('languages') > -1) {
+                langDialog.show();
+            }
+            else if (className.indexOf('logout') > -1) {
+                mLogout();
+            }
         }
-        else if (className.indexOf('register') > -1) {
-            document.location.hash = 'register';
-        }
-        else if (className.indexOf('login') > -1) {
-            document.location.hash = 'login';
-        }
-        else if (className.indexOf('aboutus') > -1) {
-            document.location.hash = 'about';
-        }
-        else if (className.indexOf('corporate') > -1) {
-            document.location.hash = 'corporate';
-        }
-        else if (className.indexOf('megablog') > -1) {
-            document.location.hash = 'blog';
-        }
-        else if (className.indexOf('credits') > -1) {
-            document.location.hash = 'credits';
-        }
-        else if (className.indexOf('chrome') > -1) {
-            document.location.hash = 'chrome';
-        }
-        else if (className.indexOf('resellers') > -1) {
-            document.location.hash = 'resellers';
-            return false;
-        }
-        else if (className.indexOf('export') > -1) {
-            document.location.hash = 'backup';
-            return false;
-        }
-        else if (className.indexOf('firefox') > -1) {
-            document.location.hash = 'firefox';
-        }
-        else if (className.indexOf('mobile') > -1) {
-            document.location.hash = 'mobile';
-        }
-        else if (className.indexOf('sync') > -1) {
-            document.location.hash = 'sync';
-        }
-        else if (className.indexOf('help') > -1) {
-            document.location.hash = 'help';
-        } else if (className.indexOf('contact') > -1) {
-            document.location.hash = 'contact';
-        } else if (className.indexOf('support') > -1) {
-            document.location.hash = 'support';
-        }
-        else if (className.indexOf('sitemap') > -1) {
-            document.location.hash = 'sitemap';
-        }
-        else if (className.indexOf('sdk') > -1) {
-            document.location.hash = 'sdk';
-        }
-        else if (className.indexOf('doc') > -1) {
-            document.location.hash = 'doc';
-        }
-        else if (className.indexOf('source-code') > -1) {
-            document.location.hash = 'sourcecode';
-        }
-        else if (className.indexOf('terms') > -1) {
-            document.location.hash = 'terms';
-        }
-        else if (className.indexOf('general') > -1) {
-            document.location.hash = 'general';
-        }
-        else if (className.indexOf('privacypolicy') > -1) {
-            document.location.hash = 'privacy';
-        }
-        else if (className.indexOf('mega') > -1) {
-            document.location.hash = 'mega';
-        }
-        else if (className.indexOf('copyright') > -1) {
-            document.location.hash = 'copyright';
-        }
-        else if (className.indexOf('takedown') > -1) {
-            document.location.hash = 'takedown';
-        }
-        else if (className.indexOf('account') > -1) {
-            document.location.hash = 'fm/account';
-        }
-        else if (className.indexOf('refresh') > -1) {
-            mega.utils.reload();
-        }
-        else if (className.indexOf('languages') > -1) {
-            langDialog.show();
-        }
-        else if (className.indexOf('clouddrive') > -1) {
-            document.location.hash = 'fm';
-        }
-        else if (className.indexOf('logout') > -1) {
-            mLogout();
-        }
+    });
+
+    $('.st-bottom-button').rebind('click', function () {
+        var url = $(this).attr('href');
+        window.open(url, '_blank'); 
     });
 
     $('.top-search-bl').rebind('click', function () {

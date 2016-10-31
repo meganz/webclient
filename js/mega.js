@@ -3296,16 +3296,19 @@ function MegaData()
 
     this.moveNodes = function(n, t) {
         newnodes = [];
-        var j = [];
         for (var i in n) {
             var h = n[i];
             var node = M.d[h];
-            j.push({
+ 
+            var apireq = {
                 a: 'm',
                 n: h,
                 t: t
                 //i: requesti - DB update only after incoming actionpacket!
-            });
+            };
+            processmove(apireq);
+            api_req(apireq);
+
             if (node && node.p) {
                 var parent = node.p;
 
@@ -3330,7 +3333,6 @@ function MegaData()
         }
         renderNew();
         Soon(fmtopUI);
-        processmove(j);
         $.tresizer();
     };
 
@@ -6594,27 +6596,24 @@ function ddtype(ids, toid, alt)
  *
  * Search for a subfolders.
  * @param {String} nodeId.
- * @param {Boolean} ignore Ignore .
- * @returns {Array|fm_getnodes.nodes} Array of subfolders ids. Root folder included.
+ * @returns {Array|fm_getnodes.nodes} Array of subfolders ids. Root folder NOT included.
  */
-function fm_getnodes(nodeId, ignore)
+function fm_getnodes(nodeId)
 {
     var nodes = [];
 
     function procnode(nodeId) {
         if (M.c[nodeId]) {
             for (var n in M.c[nodeId]) {
-                if (M.c[nodeId].hasOwnProperty(n)) {
-                    if (!M.d[n]) {
-                        if (d) {
-                            console.warn('Invalid node: ' + n, nodeId, M.c[nodeId][n]);
-                        }
-                        continue;
+                if (!M.d[n]) {
+                    if (d) {
+                        console.warn('Invalid node: ' + n, nodeId, M.c[nodeId][n]);
                     }
-                    nodes.push(n);
-                    if (M.d[n].t === 1) {
-                        procnode(n);
-                    }
+                    continue;
+                }
+                nodes.push(n);
+                if (M.d[n].t === 1) {
+                    procnode(n);
                 }
             }
         }
@@ -6630,7 +6629,7 @@ function fm_getsharenodes(h, root)
     var n = M.d[h];
     while (n && n.p)
     {
-        if (typeof n.shares !== 'undefined' || u_sharekeys[n.h])
+        if (u_sharekeys[n.h])
             sn.push(n.h);
         n = M.d[n.p];
     }
@@ -6983,27 +6982,53 @@ function doShare(nodeId, targets, dontShowShareDialog) {
     return masterPromise;
 }
 
-function processmove(jsonmove)
-{
-    var rts = [M.RootID,M.RubbishID,M.InboxID];
+// moving a foreign node (one that is not owned by u_handle) from an outshare
+// to a location not covered by any u_sharekey requires taking ownership
+// and re-encrypting its key with u_k.
+// moving a tree to a (possibly nested) outshare requires a full set of keys
+// to be provided. FIXME: record which keys are known to the API and exclude
+// those that are to reduce API traffic.
+function processmove(apireq) {
+    if (d) console.log('processmove', apireq);
 
-    if (d) console.log('processmove', jsonmove);
+    var root = {};
+    var tsharepath = fm_getsharenodes(apireq.t);
+    var nsharepath = fm_getsharenodes(apireq.n, root);
+    var movingnodes = false;
 
-    for (var i in jsonmove)
-    {
-        var root = {}, sharingnodes = fm_getsharenodes(jsonmove[i].t, root), movingnodes = 0;
+    // is the node to be moved in an outshare (or possibly multiple nested ones)?
+    if (nsharepath.length && root.handle) {
+        // yes, it is - are we moving to an outshare?
+        if (!tsharepath.length) {
+            // we are not - check for any foreign nodes being moved
+            movingnodes = fm_getnodes(apireq.n);
+            movingnodes.push(apireq.n);
 
-        if (d) console.log('sharingnodes', sharingnodes.length, sharingnodes, root.handle);
+            var foreignnodes = [];
 
-        if (sharingnodes.length)
-        {
-            movingnodes = fm_getnodes(jsonmove[i].n);
-            movingnodes.push(jsonmove[i].n);
-            jsonmove[i].cr = crypto_makecr(movingnodes,sharingnodes,true);
+            for (var i = movingnodes.length; i--; ) {
+                if (M.d[movingnodes[i]].u != u_handle) {
+                    foreignnodes.push(movingnodes[i]);
+                }
+            }
+
+            if (foreignnodes.length) {
+                if (d) console.log('rekeying foreignnodes', foreignnodes.length);
+                
+                // update all foreign nodes' keys and take ownership
+                api_updfkey(movingnodes);
+            }
         }
-        if (root.handle && rts.indexOf(root.handle) >= 0) api_updfkey(movingnodes || jsonmove[i].n);
+    }
 
-        api_req(jsonmove[i]);
+    // is the target location in any shares? add CR element.
+    if (tsharepath.length) {
+        if (!movingnodes) {
+            movingnodes = fm_getnodes(apireq.n);
+            movingnodes.push(apireq.n);
+        }
+
+        apireq.cr = crypto_makecr(movingnodes, tsharepath, true);
     }
 }
 

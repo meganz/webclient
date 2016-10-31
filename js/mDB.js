@@ -105,7 +105,7 @@ function fmdb_enqueue(table, row, type) {
 
     // even indexes hold additions, odd indexes hold deletions
     // we continue to use the highest index if it is of the requested type
-    i = Object.keys(a).pop();
+    i = Object.keys(c).pop();
     if (i >= 0) {
         // if previous action index was of a different type, increment
         if ((i ^ type) & 1) i++;

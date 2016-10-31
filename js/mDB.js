@@ -1,11 +1,14 @@
 // FM IndexedDB layer (using Dexie.js - https://github.com/dfahlander/Dexie.js)
-
-// indexes and payload are obfuscated using AES ECB (FIXME: use CBC for the payload)
+// (indexes and payload are obfuscated using AES ECB - FIXME: use CBC for the payload)
 
 // DB name is fm_ + encrypted u_handle (folder links are not cached yet - FIXME)
 // init() checks for the presence of a valid _sn record and wipes the DB if none is found
 // pending[] is an array of write transactions that will be streamed to the DB
 // setting pending[]._sn opens a new transaction, so always set it last
+
+// - small updates run as a physical IndexedDB transaction
+// - large updates are written on the fly, but with the _sn cleared, which
+//   ensures integrity, but invalidates the DB if the update can't complete
 
 // FIXME: use proper JS OOP
 function FMDB() {
@@ -16,13 +19,13 @@ function FMDB() {
         get : fmdb_get,
 
         pending : {},  // pending obfuscated writes [transaction_autoincrement][tablename][op_autoincrement] = [payloads]
-        head : 0,      // current transaction being written
-        tail : 0,      // current transaction being sent
+        head : 0,      // current transaction being received from the application code
+        tail : 0,      // current transaction being sent to IndexedDB
         enqueue : fmdb_enqueue,
         state : -1,    // -1: idle, 0: deleted sn and writing, 1: transaction open and writing
-        inflight : 0,  // number of executing DB updates
-        wrotesn : false,    // if set, the sn has been updated, completing the transaction
-        crashed : false     // a DB error sets this and prevents further DB access
+        inflight : 0,  // number of executing DB updates (MSIE restricted)
+        commit : false,    // if set, the sn has been updated, completing the transaction
+        crashed : false    // a DB error sets this and prevents further DB access
     };
 }
 
@@ -102,11 +105,10 @@ function fmdb_enqueue(table, row, type) {
 
     // even indexes hold additions, odd indexes hold deletions
     // we continue to use the highest index if it is of the requested type
-    for (var i in c);   // FIXME: there must be a better way for this in JS?
-
+    i = Object.keys(a).pop();
     if (i >= 0) {
-        // advance to the next action index with the required type
-        if ((i ^ type) & 1) i = ((i+2) & -2)+type;
+        // if previous action index was of a different type, increment
+        if ((i ^ type) & 1) i++;
     }
     else i = type;
 
@@ -125,49 +127,50 @@ function fmdb_enqueue(table, row, type) {
 function fmdb_writepending(fmdb) {
     if (!fmdb.pending[fmdb.tail] || fmdb.crashed) return;
 
-    if (fmdb.state < 0) {
-        // if the new job is already complete (has sn set), we execute it in a single transaction
-        // without first clearing sn
-        if (fmdb.pending[fmdb.tail]._sn) {
-            fmdb.db.transaction('rw',
-                                fmdb.db.f,
-                                fmdb.db.s,
-                                fmdb.db.ok,
-                                fmdb.db.mk,
-                                fmdb.db.u,
-                                fmdb.db.opc,
-                                fmdb.db.ipc,
-                                fmdb.db.ps,
-                                fmdb.db.mcf,
-                                fmdb.db._sn,
-                                function(){
-                                    if (d) console.log("Transaction started");
-                                    fmdb.state = 1;
-                                    dispatchputs();
-                                }).then(function(){
-                                    fmdb.state = -1;
-                                    if (d) console.log("Transaction committed")  
-                                }).catch(function(e){
-                                    console.error("Transaction failed, marking DB as crashed");
-                                    console.log(e);
-                                    fmdb.state = -1;
-                                    fmdb.crashed = true;
-                                });
-        }
-        else {
-            // the job is incomplete - we clear the sn and execute it without transaction protection
-            // unfortunately, the DB will have to be wiped in case anything goes wrong
-            fmdb.state = 0;
+    if (fmdb.state < 0 && fmdb.pending[fmdb.tail]._sn) {
+        // if the write job is already complete (has _sn set),
+        // we execute it in a single transaction without first clearing sn
+        fmdb.state = 1;
+        fmdb.db.transaction('rw',
+                            fmdb.db.f,
+                            fmdb.db.s,
+                            fmdb.db.ok,
+                            fmdb.db.mk,
+                            fmdb.db.u,
+                            fmdb.db.opc,
+                            fmdb.db.ipc,
+                            fmdb.db.ps,
+                            fmdb.db.mcf,
+                            fmdb.db._sn,
+                            function(){
+                                if (d) console.log("Transaction started");
+                                fmdb.commit = false;
+                                dispatchputs();
+                            }).then(function(){
+                                fmdb.state = -1;
+                                if (d) console.log("Transaction committed");
+                                fmdb_writepending(fmdb);  
+                            }).catch(function(e){
+                                console.error("Transaction failed, marking DB as crashed");
+                                console.log(e);
+                                fmdb.state = -1;
+                                fmdb.crashed = true;
+                            });
+    }
+    else {
+        // the job is incomplete - we clear the sn and execute it without transaction protection
+        // unfortunately, the DB will have to be wiped in case anything goes wrong
+        fmdb.state = 0;
 
-            fmdb.db._sn.clear().then(function(){
-                dispatchputs();
-            }).catch(function(e){
-                console.error("SN clearing failed, marking DB as crashed");
-                console.log(e);
-                fmdb.state = -1;
-                fmdb.crashed = true;
-            });
-        }
+        fmdb.db._sn.clear().then(function(){
+            fmdb.commit = false;
+            dispatchputs();
+        }).catch(function(e){
+            console.error("SN clearing failed, marking DB as crashed");
+            console.log(e);
+            fmdb.state = -1;
+            fmdb.crashed = true;
+        });
     }
 
     // start writing all pending data in this transaction to the DB
@@ -178,27 +181,46 @@ function fmdb_writepending(fmdb) {
     function dispatchputs() {
         if (fmdb.inflight) return;    // don't overwhelm MSIE's IndexedDB implementation
 
+        if (fmdb.commit) {
+            // the transaction is complete
+            if (!fmdb.state) {
+                // we had been executing without transaction protection
+                // try to dispatch the next transaction immediately
+                fmdb.state = -1;
+                fmdb_writepending(fmdb);
+            }
+
+            // we had a real transaction open: it will now commit automatically
+            return;
+        }
+
         // this entirely relies on non-numeric hash keys being iterated
         // in the order they were added. FIXME: check if always true
         for (var table in fmdb.pending[fmdb.tail]) { // iterate through pending tables, _sn last
             action = false;
 
             for (var action in fmdb.pending[fmdb.tail][table]) { // even: add, odd: delete
+                if (fmdb.commit) return dispatchputs(); // let transaction commit before writing further
+
+                // remove a chunk of updates from pending
                 var t = fmdb.pending[fmdb.tail][table][action];
                 fmdb.inflight++;
                 delete fmdb.pending[fmdb.tail][table][action];
 
+                // if the primary key is being updated, request a commit
+                // and delete the new completed write job
+                // (no further writes are allowed if this is a real transaction)
                 if (table[0] == '_') {
-                    fmdb.wrotesn = true; // a write to _sn commits
-                    delete fmdb.pending[fmdb.tail];  // and deletes the transaction
-                    fmdb.tail++;        // and advances to the next
+                    fmdb.commit = true;
+                    delete fmdb.pending[fmdb.tail++];
                 }
 
                 if (d) console.log("DB write started with " + t.length + " elements on table " + table);
 
+                // send the chunk of updates off to IndexedDB for writing
                 fmdb.db[table][action & 1 ? 'bulkDelete' : 'bulkPut'](t).then(function() {
                     fmdb.inflight--;
-                    if (d) console.log("No more DB writes in flight - transaction complete: " + fmdb.wrotesn);
+                    if (d) console.log("No more DB writes in flight - transaction complete: " + fmdb.commit);
                     dispatchputs();
                 });
 
@@ -206,11 +228,7 @@ function fmdb_writepending(fmdb) {
             }
 
             if (action !== false) break;      // don't overwhelm MSIE's IndexedDB implementation
-            delete fmdb.pending[fmdb.tail][table];
         }
-
-        // nothing else to do: revert state to idle
-        if (!fmdb.inflight) fmdb.state = -1;
     }
 }
 

@@ -2219,9 +2219,38 @@ function fmremove() {
             $('#msgDialog .fm-del-contact-avatar').html(avatar);
         }
     }
-    // Remove/Clean rubbih bin
+    
+    // Remove selected nodes from rubbish bin
     else if (RootbyId($.selected[0]) === M.RubbishID) {
-        msgDialog('clear-bin', l[1003], l[76].replace('[X]', (filecnt + foldercnt)) + ' ' + l[77], l[1007], function(e) {
+
+        var dlgMessage = '';
+
+        if ((filecnt === 1) && (!foldercnt)) {
+            dlgMessage = l[7543];// 1 file
+        }
+        else if ((filecnt > 1) && (!foldercnt)) {
+            dlgMessage = l[7544].replace('%d', filecnt);
+        }
+        else if ((!filecnt) && (foldercnt === 1)) {
+            dlgMessage = l[7545];// 1 folder
+        }
+        else if ((!filecnt) && (foldercnt > 1)) {
+            dlgMessage = l[7546].replace('%d', foldercnt);
+        }
+        else if ((filecnt === 1) && (foldercnt === 1)) {
+            dlgMessage = l[7547];// 1 file 1 folder
+        }
+        else if ((filecnt === 1) && (foldercnt > 1)) {
+            dlgMessage = l[7548].replace('%d', foldercnt);
+        }
+        else if ((filecnt > 1) && (foldercnt === 1)) {
+            dlgMessage = l[7549].replace('%d', filecnt);
+        }
+        else if ((filecnt > 1) && (foldercnt > 1)) {
+            dlgMessage = l[7550].replace('%d', filecnt).replace('%d', foldercnt);
+        }
+
+        msgDialog('clear-bin', l[1003], dlgMessage, l[1007], function(e) {
             if (e) {
                 var tmp = null;
                 if (String(M.currentdirid).substr(0, 7) === 'search/') {
@@ -2233,11 +2262,6 @@ function fmremove() {
                 if (tmp) {
                     M.currentdirid = tmp;
                 }
-            }
-        });
-        $('.fm-dialog-button.notification-button').each(function(i, e) {
-            if ($(e).text() === l[1018]) {
-                $(e).safeHTML('<span>@@</span>', l[83]);
             }
         });
     }

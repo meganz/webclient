@@ -50,7 +50,7 @@ function fmdb_init(u, result, wipe) {
                     ipc : '&p',         // incoming pending contact - id
                     ps  : '&h_p', /*[h+p]',*/      // pending share - handle/id
                     mcf : '&id',        // chats - id
-                    _sn  : '&i'         // sn - fixed index 1 - MUST be alphabetically first (hence the prefix)
+                    _sn  : '&i'         // sn - fixed index 1
                 });
 
                 fmdb.db.open().then(function(){
@@ -189,7 +189,7 @@ function fmdb_writepending(fmdb) {
                 delete fmdb.pending[fmdb.tail][table][action];
 
                 if (table[0] == '_') {
-                    fmdb.wrotesn = true; // a write t _sn commits
+                    fmdb.wrotesn = true; // a write to _sn commits
                     delete fmdb.pending[fmdb.tail];  // and deletes the transaction
                     fmdb.tail++;        // and advances to the next
                 }

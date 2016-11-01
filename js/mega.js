@@ -2537,8 +2537,7 @@ function MegaData()
             M.openFolder('shares', 1);
     };
 
-    this.delHash = function(n)
-    {
+    this.delHash = function(n) {
         if (n.hash && M.h[n.hash])
         {
             for (var i in M.h[n.hash])
@@ -7116,8 +7115,26 @@ function process_f(f, cb, retry)
         }*/
     }
     else if (cb) cb();
-}
 
+    if (newmissingkeys) {
+        // try to decrypt all missing keys
+        for (var h in missingkeys) {
+            var n = M.d[h];
+
+            crypto_decryptnode(n);
+
+            if (crypto_keyok(n)) {
+                // success: update in IndexedDB and remove from missingkeys
+                M.nodeUpdated(n);
+            }
+        }
+        newmissingkeys = false;
+
+        // FIXME: if missingkeys are remaining that have not yet been
+        // reported to the API, do so here.
+    }
+}
+    
 function __process_f1(f)
 {
     for (var i in f) M.addNode(f[i]);
@@ -7472,10 +7489,8 @@ function process_u(u, ignoreDB) {
     }
 }
 
-function process_ok(ok, ignoreDB)
-{
-    for (var i in ok)
-    {
+function process_ok(ok, ignoreDB) {
+    for (var i = ok.length; i--; ) {
         if (ok[i].ha == crypto_handleauth(ok[i].h))
         {
             if (fmdb && !pfkey && !ignoreDB) {
@@ -7612,7 +7627,10 @@ function loadfm_callback(res) {
     if (res.tct) {
         mega.loadReport.tct = res.tct;
     }
-
+    if (res.ok && !res.ok0) {
+        // this is a legacy cached tree without an ok0 element
+        process_ok(res.ok);
+    }
     if (res.u) {
         process_u(res.u);
     }

@@ -2890,7 +2890,16 @@ function fmtopUI() {
             $('.fm-file-upload').removeClass('hidden');
             if ((is_chrome_firefox & 2) || 'webkitdirectory' in document.createElement('input')) {
                 $('.fm-folder-upload').removeClass('hidden');
-            } else {
+            }
+            else if (ua.details.engine === 'Gecko') {
+                $('.fm-folder-upload').removeClass('hidden');
+                $('input[webkitdirectory], .fm-folder-upload input')
+                    .rebind('click', function() {
+                        firefoxDialog();
+                        return false;
+                    });
+            }
+            else {
                 $('.fm-file-upload').addClass('last-button');
             }
         }

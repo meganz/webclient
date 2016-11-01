@@ -708,7 +708,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                             decrypted.payload = "";
                         }
                         outgoingMessage.contents = decrypted.payload;
-                        chatRoom.messagesBuff.messages.replace(eventData.messageId, outgoingMessage);
+                        chatRoom.messagesBuff.messages.push(outgoingMessage);
 
                         chatRoom.megaChat.plugins.chatdIntegration._parseMessage(
                             chatRoom, chatRoom.messagesBuff.messages[eventData.messageId]

@@ -3782,7 +3782,7 @@ function crypto_fixmissingkeys(hs) {
 // set a newly received sharekey - apply to relevant missing key nodes, if any.
 function crypto_setsharekey(h, k) {
     u_sharekeys[h] = [k, new sjcl.cipher.aes(k)];
-    if (sharemissing[h]) crypto_fixmissingkeys(h);
+    if (sharemissing[h]) crypto_fixmissingkeys(sharemissing[h]);
 }
 
 // set a newly received nodekey

@@ -7028,12 +7028,10 @@ function processmove(apireq) {
 //var u_kdnodecache = {};
 //var kdWorker;
 
-function process_f(f, cb, retry)
-{
+function process_f(f, cb, retry) {
     var onMainThread = localStorage.dk ? 9e11 : 200;
 
-    if (f && f.length)
-    {
+    if (f && f.length) {
         var ncn = f, skn = [];
         // if ($.len(u_kdnodecache)) {
             // ncn = [];
@@ -7109,9 +7107,6 @@ function process_f(f, cb, retry)
         }*/
     }
     else if (cb) cb();
-
-    // check, fix and report missing keys
-    crypto_fixmissingkeys(missingkeys);
 }
     
 function __process_f1(f)

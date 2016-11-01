@@ -2481,7 +2481,7 @@ function api_setshare1(ctx, params) {
                     for (j = 4; j--;) {
                         sharekey.push(rand(0x100000000));
                     }
-                    u_sharekeys[ctx.node] = [sharekey, new sjcl.cipher.aes(sharekey)];
+                    crypto_setsharekey(ctx.node, sharekey);
                 }
 
                 req.ok = a32_to_base64(encrypt_key(u_k_aes, sharekey));
@@ -2525,7 +2525,7 @@ function api_setshare1(ctx, params) {
                 logger.debug('Share key clash: Set returned key and try again.');
                 ctx.req.ok = res.ok;
                 var k = decrypt_key(u_k_aes, base64_to_a32(res.ok));
-                u_sharekeys[ctx.node] = [k, new sjcl.cipher.aes(k)];
+                crypto_setsharekey(ctx.node, k);
                 ctx.req.ha = crypto_handleauth(ctx.node);
 
                 var ssharekey = a32_to_str(k);
@@ -3732,7 +3732,72 @@ function crypto_sendrsa2aes() {
     rsa2aes = {};
 }
 
+// missing keys handling
+// share keys can be unavailable because:
+// - the client that added the node wasn't using the SDK and didn't supply
+//   the required CR element
+// - a nested share situation, where the client adding the node is only part
+//   of the inner share - clients that are only part of the outer share can't
+//   decrypt the node without assistance from the share owner
+var missingkeys = {};
 var newmissingkeys = false;
+var sharemissing = {};
+
+// whenever a node fails to decrypt, call this.
+function crypto_reportmissingkeys(n) {
+    missingkeys[n.h] = true;
+    newmissingkeys = true;
+
+    for (var p = 8; (p = n.k.indexOf(':', p)) >= 0; p += 32) {
+        if (p == 8 || n.k[p-9] == '/') {
+            var id = n.k.substr(p-8, 8);
+            if (!sharemissing[id]) sharemissing[id] = {};
+            sharemissing[id][n.h] = true;
+        }
+    }
+}
+
+// upon receipt of a new u_sharekey, call this with sharemissing[sharehandle].
+// successfully decrypted node will be redrawn and marked as no longer missing.
+function crypto_fixmissingkeys(hs) {
+    if (hs) {
+        for (h in hs) {
+            var n = M.d[h];
+
+            if (n && !crypto_keyok(n)) {
+                crypto_decryptnode(n);
+
+                if (crypto_keyok(n)) {
+                    fm_updated(n);
+                }
+                else continue;
+            }
+
+            delete hs[h];
+            delete missingkeys[h];
+        }        
+    }
+}
+
+// set a newly received sharekey - apply to relevant missing key nodes, if any.
+function crypto_setsharekey(h, k) {
+    u_sharekeys[h] = [k, new sjcl.cipher.aes(k)];
+    if (sharemissing[h]) crypto_fixmissingkeys(h);
+}
+
+// set a newly received nodekey
+function crypto_setnodekey(h, k) {
+    var n = M.d[h];
+
+    if (n && !crypto_keyok(n)) {
+        n.k = k;
+        crypto_decryptnode(n);
+
+        if (crypto_keyok(n)) {
+            fm_updated(n);
+        }
+    }
+}
 
 function crypto_reqmissingkeys() {
     var logger = MegaLogger.getLogger('crypt');
@@ -3797,17 +3862,17 @@ function crypto_reqmissingkeys() {
     }
 }
 
-// process incoming cr, set fm keys and commit
+// process incoming cr, set nodekeys and commit
 function crypto_proccr(cr) {
     var i;
 
     // received keys in response, add
     for (i = 0; i < cr[2].length; i += 3) {
-        fm_updatekey(cr[1][cr[2][i + 1]], cr[0][cr[2][i]] + ":" + cr[2][i + 2]);
+        crypto_setnodekey(cr[1][cr[2][i + 1]], cr[0][cr[2][i]] + ":" + cr[2][i + 2]);
     }
 }
 
-// process incoming missing key cr
+// process incoming missing key cr and respond with the missing keys
 function crypto_procmcr(mcr) {
     var i;
     var si = {},
@@ -3822,7 +3887,7 @@ function crypto_procmcr(mcr) {
         if (u_sharekeys[sh]) {
             nh = mcr[1][mcr[2][i + 1]];
 
-            if (M.d[nh] && M.d[nh].k && (M.d[nh].k.length == 4 || M.d[nh].k.length == 8)) {
+            if (crypto_keyok(M.d[nh])) {
                 if (typeof si[sh] === 'undefined') {
                     si[sh] = cr[0].length;
                     cr[0].push(sh);

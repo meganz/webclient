@@ -375,12 +375,13 @@
                     $('.fm-empty-search').removeClass('hidden');
                 }
                 else if (M.currentdirid === M.RootID && folderlink) {
-                    if (!isValidShareLink()) {
+                    // FIXME: implement
+                    /*if (!isValidShareLink()) {
                         $('.fm-invalid-folder').removeClass('hidden');
                     }
                     else {
                         $('.fm-empty-folder-link').removeClass('hidden');
-                    }
+                    }*/
                 }
                 else if (M.currentdirid === M.RootID) {
                     $('.fm-empty-cloud').removeClass('hidden');

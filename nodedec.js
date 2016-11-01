@@ -9,12 +9,12 @@ if (typeof jsl_loaded != 'object') {
 
     function init(debug) {
         rsa2aes = {};
-        missingkeys = {};
         rsasharekeys = {};
         u_sharekeys = {};
         u_k_aes = {};
         u_privk = [];
         d = debug;
+        missingkeys = false;
     }
 
     self.onmessage = function(e) {
@@ -59,7 +59,6 @@ if (typeof jsl_loaded != 'object') {
                 rsa2aes        : Object.keys(rsa2aes).length && rsa2aes,
                 rsasharekeys   : Object.keys(rsasharekeys).length && rsasharekeys,
                 sharekeys      : Object.keys(u_sharekeys).length && u_sharekeys,
-                missingkeys    : Object.keys(missingkeys).length && missingkeys,
             });
 
             self.close();
@@ -75,7 +74,6 @@ if (typeof jsl_loaded != 'object') {
 
 var u_handle;
 var u_privk;
-var missingkeys = {};
 var u_k_aes, u_sharekeys = {};
 
 var rsa2aes = {};
@@ -199,7 +197,7 @@ function crypto_decryptnode(node) {
 
     if (!k) {
         if (d) console.log("Can't extract key for " + node.h);
-        missingkeys[node.h] = true;
+        if (missingkeys) crypto_reportmissingkeys(node);
     }
 }
 
@@ -312,9 +310,7 @@ function crypto_procattr(node, key)
         }
     }
     else {
-        // we record the key as missing in the vague hope that someone will send us the correct one
         if (d) console.log("Corrupted attributes or key for node " + node.h);
-        missingkeys[node.h] = true;        
     }
 }
 

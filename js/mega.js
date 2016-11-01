@@ -2408,7 +2408,7 @@ function MegaData()
         /*if (!n.c)*/ { // FIXME: what is n.c?
             if (n.sk /*&& !u_sharekeys[n.h]*/) {
                 var k = crypto_process_sharekey(n.h, n.sk);
-                u_sharekeys[n.h] = [k, new sjcl.cipher.aes(k)];
+                crypto_setsharekey(n.h, k);
 
                 if (this.c.shares[n.h].su) {
                     this.c.shares[n.h].sk = a32_to_base64(k);
@@ -5702,7 +5702,7 @@ function execsc(actionPackets, callback) {
 
                         // I updated or created my share
                         var k = decrypt_key(u_k_aes, base64_to_a32(actionPacket.ok));
-                        u_sharekeys[handle] = [k, new sjcl.cipher.aes(k)];
+                        crypto_setsharekey(handle, k);
                         M.nodeShare(handle, {
                             h: actionPacket.n,
                             r: actionPacket.r,
@@ -5726,7 +5726,7 @@ function execsc(actionPackets, callback) {
                     }
                     else {
                         var k = crypto_process_sharekey(actionPacket.n, actionPacket.k);
-                        u_sharekeys[actionPacket.n] = [k, new sjcl.cipher.aes(k)];
+                        crypto_setsharekey(actionPacket.n, k);
                         tsharekey = a32_to_base64(u_k_aes.encrypt(k));
                         prockey = true;
                     }
@@ -6117,19 +6117,14 @@ function execsc(actionPackets, callback) {
     mega.flags &= ~window.MEGAFLAG_EXECSC;
 }
 
-function fm_updatekey(h, k) {
-    var n = M.d[h];
- 
-    if (n && !crypto_keyok(n)) {
-        n.k = k;
-        crypto_decryptnode(n);
+// a node was updated significantly: write to DB and redraw
+function fm_updated(n) {
+    M.nodeUpdated(n); 
 
-        if (crypto_keyok(n)) {
-            M.nodeUpdated(n); 
-            removeUInode(n.h);
-            newnodes.push(n);
-            delete M.megaRender.nodeMap[n.h];                
-        }
+    if (M.megaRender) {
+        removeUInode(n.h);
+        newnodes.push(n);
+        delete M.megaRender.nodeMap[n.h];
     }
 }
 
@@ -6313,6 +6308,10 @@ function treefetcher_procmsg(ev) {
         }
 
         emplacenode(ev.data);
+
+        if (ev.data.t < 2 && !crypto_keyok(ev.data)) {
+            crypto_reportmissingkeys(ev.data);
+        }
     }
     else if (typeof ev.data.sharekeys != 'undefined') {
         if (d) console.log("Received state dump from worker, " + this.ctx.dumpsremaining + " remaining");
@@ -6325,12 +6324,8 @@ function treefetcher_procmsg(ev) {
         }
         if (ev.data.sharekeys) {
             for (h in ev.data.sharekeys) {
-                u_sharekeys[h] = [ev.data.sharekeys[h], new sjcl.cipher.aes(ev.data.sharekeys[h])];
+                crypto_setsharekey(h, ev.data.sharekeys[h]);
             }
-        }
-        if (ev.data.missingkeys) {
-            for (h in ev.data.missingkeys) missingkeys[h] = true;
-            newmissingkeys = true;
         }
 
         if (!--this.ctx.dumpsremaining) {
@@ -6444,8 +6439,7 @@ function dbfetchfm() {
                             if (r[i].o.length == 11) {
                                 // this is an inbound share
                                 M.c.shares[r[i].t] = r[i];
-                                var k = base64_to_a32(r[i].sk);
-                                u_sharekeys[r[i].t] = [k, new sjcl.cipher.aes(k)];
+                                crypto_setsharekey(r[i].t, base64_to_a32(r[i].sk));
                             }
                             else {
                                 // this is an outbound share
@@ -7116,23 +7110,8 @@ function process_f(f, cb, retry)
     }
     else if (cb) cb();
 
-    if (newmissingkeys) {
-        // try to decrypt all missing keys
-        for (var h in missingkeys) {
-            var n = M.d[h];
-
-            crypto_decryptnode(n);
-
-            if (crypto_keyok(n)) {
-                // success: update in IndexedDB and remove from missingkeys
-                M.nodeUpdated(n);
-            }
-        }
-        newmissingkeys = false;
-
-        // FIXME: if missingkeys are remaining that have not yet been
-        // reported to the API, do so here.
-    }
+    // check, fix and report missing keys
+    crypto_fixmissingkeys(missingkeys);
 }
     
 function __process_f1(f)
@@ -7259,50 +7238,50 @@ function processOPC(opc, ignoreDB) {
  * @param {Object} publicHandles The Public Handles action packet i.e. a: 'ph'.
  */
 function processPH(publicHandles) {
-
     var nodeId;
     var publicHandleId;
     var timeNow = unixtime();
     var UiExportLink = fminitialized && new mega.UI.Share.ExportLink();
 
-    for (var value in publicHandles) {
-        if (publicHandles.hasOwnProperty(value)) {
-            value = publicHandles[value];
-            nodeId = value.h;
-            publicHandleId = value.ph;
+    for (var i = publicHandles.length; i--; ) {
+        value = publicHandles[i];
 
-            // Remove export link, down: 1
-            if (value.d) {
-                M.delNodeShare(nodeId, 'EXP');
+        nodeId = value.h;
+        if (!M.d[nodeId]) continue;
 
-                if (UiExportLink) {
-                    UiExportLink.removeExportLinkIcon(nodeId);
-                }
+        publicHandleId = value.ph;
+
+        // Remove export link, down: 1
+        if (value.d) {
+            M.delNodeShare(nodeId, 'EXP');
+
+            if (UiExportLink) {
+                UiExportLink.removeExportLinkIcon(nodeId);
             }
-            else {
-                var share = clone(value);
-                delete share.a;
-                delete share.i;
-                delete share.n;
-                share.ts = timeNow;
-                share.u = 'EXP';
-                share.r = 0;
+        }
+        else {
+            var share = clone(value);
+            delete share.a;
+            delete share.i;
+            delete share.n;
+            share.ts = timeNow;
+            share.u = 'EXP';
+            share.r = 0;
 
-                if (Object(M.d[nodeId]).ph !== publicHandleId) {
-                    M.d[nodeId].ph = publicHandleId;
-                    M.nodeUpdated(M.d[nodeId]);
-                }
-
-                M.nodeShare(share.h, share);
-
-                if (UiExportLink) {
-                    UiExportLink.addExportLinkIcon(nodeId);
-                }
+            if (M.d[nodeId].ph !== publicHandleId) {
+                M.d[nodeId].ph = publicHandleId;
+                M.nodeUpdated(M.d[nodeId]);
             }
 
-            if (UiExportLink && (value.down !== undefined)) {
-                UiExportLink.updateTakenDownItem(nodeId, value.down);
+            M.nodeShare(share.h, share);
+
+            if (UiExportLink) {
+                UiExportLink.addExportLinkIcon(nodeId);
             }
+        }
+
+        if (UiExportLink && (value.down !== undefined)) {
+            UiExportLink.updateTakenDownItem(nodeId, value.down);
         }
     }
 }
@@ -7496,8 +7475,7 @@ function process_ok(ok, ignoreDB) {
             if (fmdb && !pfkey && !ignoreDB) {
                 fmdb.add('ok', { h : ok[i].h, d : ok[i] });
             }
-            var k = decrypt_key(u_k_aes, base64_to_a32(ok[i].k));
-            u_sharekeys[ok[i].h] = [k, new sjcl.cipher.aes(k)];
+            crypto_setsharekey(ok[i].h, decrypt_key(u_k_aes, base64_to_a32(ok[i].k)));
         }
     }
 }
@@ -7679,12 +7657,16 @@ function loadfm_callback(res) {
             processPH(res.ph);
         }
 
+        // decrypt undecrypted nodes
+        crypto_fixmissingkeys(missingkeys);
+
         // set maxaction
         setsn(res.sn);
 
         if (res.cr) {
             crypto_procmcr(res.cr);
         }
+
         if (res.sr) {
             crypto_procsr(res.sr);
         }

@@ -1571,57 +1571,43 @@ function api_proc(q) {
         }
     };
 
-    // ATM we only require progress when loading the cloud, so don't overload every other xhr unnecessarily
-    // if (loadingInitDialog.active) {
-        var needProgress = false;
-
-        // check whether this channel queue will need the progress
-        var ctxs = q.ctxs[q.i];
-        var idx = ctxs.length;
-        while (idx--) {
-            var ctx = ctxs[idx];
-
-            if (typeof ctx.progress === 'function') {
-                needProgress = true;
-                break;
-            }
-        }
-
-        if (needProgress) {
-            q.xhr.onprogress = function (evt) {
+    // if the client has defined .progress, route .onprogress to it
+    var ctxs = q.ctxs[q.i];
+    for (var i = ctxs.length; i--; ) {
+        if (typeof ctxs[i].progress === 'function') {
+            q.xhr.onprogress = function(evt) {
                 var progressPercent = 0;
                 var bytes = evt.total || this.totalBytes;
 
                 if (!bytes) {
-                    // This may throws an exception if the header doesn't exists
+                    // this may throw an exception if the header doesn't exist
                     try {
                         bytes = this.getResponseHeader('Original-Content-Length');
                         this.totalBytes = bytes;
                     }
                     catch (e) {}
                 }
-                if (!bytes || bytes < 10) {
-                    return false;
-                }
-                if (evt.loaded > 0) {
+
+                if (evt.loaded > 0 && bytes) {
                     progressPercent = evt.loaded / bytes * 100;
                 }
 
                 var ctxs = this.q.ctxs[this.q.i];
-                var idx = ctxs.length;
-                while (idx--) {
-                    var ctx = ctxs[idx];					
-					if (typeof ctx.progress === 'function') {
-						if (typeof ctx.buffer !== 'undefined') ctx.progress(progressPercent,this.responseText);
-						else
-						{
-							ctx.progress(progressPercent);
-						}
+                for (var i = ctxs.length; i--; ) {
+                    var ctx = ctxs[i];                    
+                    if (typeof ctx.progress == 'function') {
+                        if (typeof ctx.buffer != 'undefined') {
+                            ctx.progress(progressPercent, this.responseText);
+                        }
+                        else {
+                            ctx.progress(progressPercent);
+                        }
                     }
                 }
             };
+            break;
         }
-    // }
+    }
 
     q.xhr.onload = function onAPIProcXHRLoad() {
         if (!this.q.cancelled) {
@@ -1641,10 +1627,18 @@ function api_proc(q) {
                 }
 
                 try {
+                    if (typeof this.onprogress == 'function') {
+                        // we assume that the client has already performed the full
+                        // response processing in .progress(), so all it gets here
+                        // is an empty object, unless there was a request-level error
+                        if (response[0] == '[' || response[0] == '{') response = '[]';
+                    }
+
                     t = JSON.parse(response);
-                    if (response[0] === '{') {
+                    if (response[0] == '{') {
                         t = [t];
                     }
+
                     status = true;
                 } catch (e) {
                     // bogus response, try again
@@ -1676,6 +1670,7 @@ function api_proc(q) {
                 api_proc(this.q);
             }
             else {
+                delete this.totalBytes;
                 api_reqerror(this.q, t, status);
             }
         }
@@ -4218,20 +4213,20 @@ function api_strerror(errno) {
 
 // JSON parser/splitter
 // FIXME: convert to proper JS (I forgot how to do that)
-// This is tailored to processing what the API actually generates
-// i.e.: NO whitespace, NO non-numeric/string constants ("null"), etc...
+// (this is tailored to processing what the API actually generates
+// i.e.: NO whitespace, NO non-numeric/string constants ("null"), etc...)
 
 // returns the position after the end of the JSON string at o or -1 if none found
 // must be called with s[o] == '"', or will never terminate
 var stringre = /^"(((?=\\)\\(["\\\/bfnrt]|u[0-9a-fA-F]{4}))|[^"\\\0-\x1F\x7F]+)*$/;
 
-function strend(s, o)
-{
+function strend(s, o) {
     var oo = o;
 
     // (we do not set lastIndex and use RegExp.exec() with /g due to the potentially enormous length of s)
-    while ((oo = s.indexOf('"', oo+1)) >= 0)
-        if (stringre.test(s.substr(o, oo-o))) return oo+1;
+    while ((oo = s.indexOf('"', oo+1)) >= 0) {
+        if (stringre.test(s.substr(o, oo-o))) return oo+1;        
+    }
 
     return -1;
 }
@@ -4239,15 +4234,13 @@ function strend(s, o)
 // returns the position after the end of the JSON number at o or -1 if none found
 var numberre = /^-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?/;
 
-function numend(s, o)
-{
+function numend(s, o) {
     var oo = o;
 
     // (we do not set lastIndex due to the potentially enormous length of s)
     while ('0123456789-+eE.'.indexOf(s[oo]) >= 0) oo++;
 
-    if (oo > o)
-    {
+    if (oo > o) {
         var r = numberre.exec(s.substr(o, oo-o));
 
         if (r) return o+r[0].length;
@@ -4256,8 +4249,7 @@ function numend(s, o)
     return -1;
 }
 
-function json_splitter(ctx, filters, residue)
-{
+function json_splitter(ctx, filters, residue) {
     return {
         proc : json_proc,
 
@@ -4294,8 +4286,7 @@ function json_splitter(ctx, filters, residue)
 
 // returns -1 if it wants more data, 0 in case of a fatal error, 1 when done
 // FIXME: replace console.log with proper logging
-function json_proc(json)
-{
+function json_proc(json) {
     var c, t, i;
 
     while (this.p < json.length) {
@@ -4303,12 +4294,12 @@ function json_proc(json)
 
         if (c == ',') {
             if (this.expectvalue) {
-                console.log("Malformed JSON - stray comma " + json.substr(this.p-5, 100));
+                console.error("Malformed JSON - stray comma " + json.substr(this.p-5, 100));
                 return 0;
             }
 
             if (!this.currentlevel) {
-                console.log("Malformed JSON - list at top level");
+                console.error("Malformed JSON - list at top level");
                 return 0;
             }
 
@@ -4339,7 +4330,7 @@ function json_proc(json)
             }
 
             if (!this.expectvalue) {
-                console.log("Malformed JSON - unexpected object or array");
+                console.error("Malformed JSON - unexpected object or array");
                 return 0;
             }
 
@@ -4365,12 +4356,12 @@ function json_proc(json)
 
                 if (json[t] == ':') {
                     if (this.currentlevel != '{') {
-                        console.log("Malformed JSON - named property found outside object");
+                        console.error("Malformed JSON - named property found outside object");
                         return 0;
                     }
 
                     if (this.expectvalue) {
-                        console.log("Malformed JSON - unexpected property name");
+                        console.error("Malformed JSON - unexpected property name");
                         return 0;
                     }
 
@@ -4386,7 +4377,7 @@ function json_proc(json)
         else if (c >= '0' && c <= '9' || c == '.' || c == '-')
         {
             if (!this.expectvalue) {
-                console.log("Malformed JSON - unexpected number");
+                console.error("Malformed JSON - unexpected number");
                 return 0;
             }
 
@@ -4400,7 +4391,7 @@ function json_proc(json)
         }
         else if (c == ']' || c == '}') {
             if (this.currentlevel != ((c == ']') ? '[' : '{')) {
-                console.log("Malformed JSON - mismatched close");
+                console.error("Malformed JSON - mismatched close");
                 return 0;
             }
 
@@ -4412,7 +4403,7 @@ function json_proc(json)
                 try {
                     this.filters[this.filter][2](JSON.parse(json.substr(this.lastpos, this.p-this.lastpos)), this.ctx);
                 } catch (e) {
-                    console.log("Malformed JSON - parse error in last filter element " + this.filter);
+                    console.error("Malformed JSON - parse error in last filter element " + this.filter);
                     return 0;
                 }
 
@@ -4423,7 +4414,7 @@ function json_proc(json)
             this.p++;
         }
         else {
-            console.log("Malformed JSON - bogus char at position " + this.p);
+            console.error("Malformed JSON - bogus char at position " + this.p);
             return 0;
         }
 
@@ -4431,7 +4422,7 @@ function json_proc(json)
             try {
                 this.residue(JSON.parse(this.res + json.substr(this.lastpos)), this.ctx);
             } catch (e) {
-                console.log("Malformed JSON - parse error in residue");
+                console.error("Malformed JSON - parse error in residue");
                 return 0;
             }
 

@@ -77,6 +77,8 @@ Unless otherwise noted, they were released under a [MIT License].
 ---
 [jquery-ui.js]: jQuery-UI - jQuery User Interface library.
 
+> This is a custom build created from: [https://jqueryui.com/download/#!...](https://jqueryui.com/download/#!version=1.12.1&themeParams=none&components=111101011101111110100010110110001000001000000000)
+
 ---
 [jquery.fullscreen.js]: This jQuery plugin provides a simple to use mechanism to control the new fullscreen mode of modern browsers.
 

@@ -5,7 +5,7 @@
         options = options || {};
 
         // Already logged-in, even on ephemeral?
-        if (u_type !== false) {
+        if (u_type !== false && (!options.minUserType || u_type >= options.minUserType)) {
             Soon(function() {
                 promise.resolve();
             });
@@ -129,8 +129,6 @@
         });
     }
 
-
-    
 
     function doLogin($dialog, aPromise) {
         loadingDialog.show();

@@ -2298,7 +2298,13 @@ function fmremove() {
                                 // Remove pending share
                                 for (var pendingUserId in M.ps[dirTree[selection]]) {
                                     if (M.ps[dirTree[selection]].hasOwnProperty(pendingUserId)) {
-                                        api_req({ a: 's2', n:  dirTree[selection], s: [{ u: pendingUserId, r: ''}], ha: '', i: requesti });
+                                        var userEmailOrID = Object(M.opc[pendingUserId]).m || pendingUserId;
+
+                                        api_req({
+                                            a: 's2', n: dirTree[selection],
+                                            s: [{u: userEmailOrID, r: ''}], ha: '', i: requesti
+                                        });
+
                                         M.deletePendingShare(dirTree[selection], pendingUserId);
                                     }
                                 }
@@ -2877,7 +2883,16 @@ function fmtopUI() {
             $('.fm-file-upload').removeClass('hidden');
             if ((is_chrome_firefox & 2) || 'webkitdirectory' in document.createElement('input')) {
                 $('.fm-folder-upload').removeClass('hidden');
-            } else {
+            }
+            else if (ua.details.engine === 'Gecko') {
+                $('.fm-folder-upload').removeClass('hidden');
+                $('input[webkitdirectory], .fm-folder-upload input')
+                    .rebind('click', function() {
+                        firefoxDialog();
+                        return false;
+                    });
+            }
+            else {
                 $('.fm-file-upload').addClass('last-button');
             }
         }
@@ -9096,7 +9111,7 @@ function initShareDialog() {
         if (handleOrEmail !== '') {
 
             // Due to pending shares, the id could be an email instead of a handle
-            userEmail = handleOrEmail;
+            userEmail = Object(M.opc[handleOrEmail]).m || handleOrEmail;
 
             $.removedContactsFromShare.push({
                 'selectedNodeHandle': selectedNodeHandle,

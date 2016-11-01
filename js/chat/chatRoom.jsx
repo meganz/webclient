@@ -809,6 +809,7 @@ ChatRoom.prototype.appendMessage = function(message) {
 
     self.shownMessages[message.messageId] = true;
 
+    self.megaChat.updateDashboard();
     //self.trackDataChange();
 };
 

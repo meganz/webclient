@@ -1344,25 +1344,22 @@ function fm_tfsupdate() {
         }
     }
     var t;
-    var sep = "\u202F";
     var $tpt = $('.transfer-panel-title');
-    var l = $.trim($tpt.text()).split(sep)[0];
     if (i && u) {
         t = '\u2191 ' + u + ' \u2193 ' + i;
     }
     else if (i) {
-        t = i;
+        t =  '\u2193 ' + i;
     }
     else if (u) {
-        t = u;
+        t = '\u2191 ' + u;
     }
     else {
         t = '';
     }
     if (t) {
-        t = sep + ' ' + t;
+        $tpt.text(t);
     }
-    $tpt.text(l + t);
 }
 
 

@@ -70,6 +70,7 @@ if (typeof loadingInitDialog === 'undefined') {
         }
         this.hide();
         $('.light-overlay').removeClass('hidden');
+        $('body').addClass('loading');
         $('.loading-spinner:not(.manual-management)').removeClass('hidden').addClass('init active');
         this.active = true;
     };
@@ -109,6 +110,7 @@ if (typeof loadingInitDialog === 'undefined') {
         this.active = false;
         this.progress = false;
         $('.light-overlay').addClass('hidden');
+        $('body').removeClass('loading');
         $('.loading-spinner:not(.manual-management)').addClass('hidden').removeClass('init active');
         $('.loading-info li').removeClass('loading loaded');
         $('.loader-progressbar').removeClass('active');
@@ -886,6 +888,21 @@ function MegaData()
         configurable: false
     });
 
+    (function(self) {
+        var maf   = false;
+        var saved = 0;
+
+        Object.defineProperty(self, 'maf', {
+            get: function() {
+                if (Object(M.account).maf && saved !== M.account.maf) {
+                    saved = M.account.maf;
+                    maf   = mega.achievem.prettify(M.account.maf);
+                }
+                return maf;
+            }
+        })
+    })(this);
+
     /**
      *
      * @param {array.<JSON_objects>} ipc - received requests
@@ -937,9 +954,9 @@ function MegaData()
                         '</td>' +
                         '<td>' + ps + '</td>' +
                         '<td>' +
-                            '<div class="contact-request-button delete"><span>' + l[5858] + '</span></div>' +
-                            '<div class="contact-request-button accept"><span>' + l[5856] + '</span></div>' +
-                            '<div class="contact-request-button ignore"><span>' + l[5860] + '</span></div>' +
+                            '<div class="contact-request-button default-white-button grey-txt small right delete"><span>' + l[5858] + '</span></div>' +
+                            '<div class="contact-request-button default-white-button grey-txt small right accept"><span>' + l[5856] + '</span></div>' +
+                            '<div class="contact-request-button default-white-button grey-txt small right ignore"><span>' + l[5860] + '</span></div>' +
                             '<div class="contact-request-ignored"><span>' + l[5864] + '</span></div>' +
                             '<div class="clear"></div>' +
                         '</td>' +
@@ -1036,11 +1053,13 @@ function MegaData()
                                     '<div class="contact-email">' + htmlentities(opc[i].m) + '</div>' +
                                 '</div>' +
                             '</div>' +
-                            '<div class="contact-request-button cancel ' + hideCancel + '">' +
-                                '<span>' + escapeHTML(l[5930]) + '</span>' +
+                            '<div class="default-white-button grey-txt small ' +
+                                'contact-request-button right cancel ' + hideCancel + '">' +
+                                    '<span>' + escapeHTML(l[5930]) + '</span>' +
                             '</div>' +
-                            '<div class="contact-request-button reinvite ' + hideReinvite + '">' +
-                                '<span>' + escapeHTML(l[5861]) + '</span>' +
+                            '<div class="default-white-button grey-txt small ' +
+                                'contact-request-button right reinvite ' + hideReinvite + '">' +
+                                    '<span>' + escapeHTML(l[5861]) + '</span>' +
                             '</div>' +
                         '</td></tr>';
 
@@ -1274,7 +1293,7 @@ function MegaData()
     this.openFolder = function(id, force, chat) {
         var newHashLocation;
 
-        $('.fm-right-account-block').addClass('hidden');
+        $('.fm-right-account-block, .fm-right-block.dashboard').addClass('hidden');
         $('.fm-files-view-icon').removeClass('hidden');
 
         if (d) {
@@ -1285,6 +1304,10 @@ function MegaData()
             console.error('Internal error, do not call openFolder before the cloud finished loading.');
             return false;
         }
+
+        // open the dashboard by default
+        id = id || 'dashboard';
+
 
         if ((id !== 'notifications') && !$('.fm-main.notifications').hasClass('hidden')) {
             notificationsUI(1);
@@ -1301,6 +1324,7 @@ function MegaData()
         else if (id && id === this.currentdirid && !force) {// Do nothing if same path is choosen
             return false;
         }
+
 
         if (id === 'rubbish')
             id = this.RubbishID;
@@ -1334,6 +1358,8 @@ function MegaData()
         }
         else if (id && id.substr(0, 7) === 'account')
             accountUI();
+        else if (id && id.substr(0, 9) === 'dashboard')
+            dashboardUI();
         else if (id && id.substr(0, 13) === 'notifications')
             notificationsUI();
         else if (id && id.substr(0, 7) === 'search/')
@@ -1379,7 +1405,10 @@ function MegaData()
             // Force cleaning the current cloud contents and showing an empty msg
             M.renderMain();
         }
-        else if (id && (id.substr(0, 7) !== 'account') && (id.substr(0, 13) !== 'notifications')) {
+        else if (id && (id.substr(0, 7) !== 'account')
+                && (id.substr(0, 9) !== 'dashboard')
+                && (id.substr(0, 13) !== 'notifications')) {
+
             $('.fm-right-files-block').removeClass('hidden');
             if (d) {
                 console.time('time for rendering');
@@ -1507,19 +1536,29 @@ function MegaData()
         $(document).trigger('MegaOpenFolder');
     };
 
+    this.getActiveContacts = function() {
+        var res = [];
+
+        if (typeof M.c.contacts === 'object') {
+            Object.keys(M.c.contacts)
+                .forEach(function(userHandle) {
+                    if (Object(M.u[userHandle]).c === 1) {
+                        res.push(userHandle);
+                    }
+                });
+        }
+
+        return res;
+    };
+
     // Contacts left panel handling
     this.contacts = function() {
 
         var i;
-        var activeContacts = [];
-
-        for (i in M.c['contacts']) {
-
-            // Filter out contacts without full relationship
-            if (M.d.hasOwnProperty(i) && (M.d[i].c === 1)) {
-                activeContacts.push(M.d[i]);
-            }
-        }
+        var activeContacts = this.getActiveContacts()
+            .map(function(handle) {
+                return M.d[handle];
+            });
 
         if (typeof this.i_cache !== "object") {
             this.i_cache = {};
@@ -1565,9 +1604,9 @@ function MegaData()
                     onlinestatus = [l[5926], 'offline'];
                 }
 
-                var name = M.getNameByHandle(activeContacts[i].u).toLowerCase();
+                var name = M.getNameByHandle(activeContacts[i].u);
 
-                if (!treesearch || name.indexOf(treesearch.toLowerCase()) > -1) {
+                if (!treesearch || name.toLowerCase().indexOf(treesearch.toLowerCase()) > -1) {
 
                     html += '<div class="nw-contact-item ui-droppable '
                     + onlinestatus[1] + '" id="contact_' + htmlentities(activeContacts[i].u)
@@ -2646,7 +2685,10 @@ function MegaData()
             });
         }
 
-        this.inviteContactMessageHandler(proceed);
+        // In case of invite-dialog we will use notifications
+        if ($.dialog !== 'invite-friend') {
+            this.inviteContactMessageHandler(proceed);
+        }
 
         return proceed;
     };
@@ -2955,7 +2997,7 @@ function MegaData()
                 u_attr.lastname = lastName;
                 u_attr.name = self.u[userId].name;
 
-                $('.user-name').text(u_attr.firstname);
+                $('.user-name').text(u_attr.name);
 
                 $('.membership-big-txt.name:visible').text(
                     u_attr.name
@@ -3324,33 +3366,18 @@ function MegaData()
         $.tresizer();
     };
 
-    this.accountSessions = function(cb) {
-        /* x: 1, load the session ids
-           useful to expire the session from the session manager */
-        api_req({ a: 'usl', x: 1 }, {
-            account: account,
-            callback: function(res, ctx)
-            {
-                if (typeof res != 'object')
-                    res = [];
-                ctx.account.sessions = res;
-                if (typeof cb === "function") {
-                    cb();
-                }
-            }
-        });
-    };
-
     this.accountData = function(cb, blockui)
     {
-        if (this.account && this.account.lastupdate > new Date().getTime() - 300000 && cb)
-            cb(this.account);
-        else
-        {
-            if (blockui)
-                loadingDialog.show();
+        var account = Object(this.account);
 
-            account = {};
+        if (account.lastupdate > Date.now() - 300000 && cb) {
+            cb(account);
+        }
+        else {
+
+            if (blockui) {
+                loadingDialog.show();
+            }
 
             api_req({a: 'uq', strg: 1, xfer: 1, pro: 1}, {
                 account: account,
@@ -3415,6 +3442,15 @@ function MegaData()
                 }
             });
 
+            api_req({a: 'maf', v: mega.achievem.RWDLVL}, {
+                account: account,
+                callback: function(res, ctx) {
+                    if (typeof res === 'object') {
+                        ctx.account.maf = res;
+                    }
+                }
+            });
+
             api_req({a: 'utt'}, {
                 account: account,
                 callback: function(res, ctx)
@@ -3438,7 +3474,17 @@ function MegaData()
                 }
             });
 
-            this.accountSessions();
+            /* x: 1, load the session ids
+               useful to expire the session from the session manager */
+            api_req({ a: 'usl', x: 1 }, {
+                account: account,
+                callback: function(res, ctx) {
+                    if (typeof res != 'object') {
+                        res = [];
+                    }
+                    ctx.account.sessions = res;
+                }
+            });
 
             api_req({a: 'ug'}, {
                 cb: cb,
@@ -3465,6 +3511,13 @@ function MegaData()
                         ctx.account.downbw_used = 0;
 
                     M.account = ctx.account;
+
+                    if (M.maf) {
+                        // Add achieved storage quota
+                        ctx.account.space += M.maf.storage.current;
+                        // Add achieved transfer quota
+                        ctx.account.bw += M.maf.transfer.current;
+                    }
 
                     if (ctx.cb)
                         ctx.cb(ctx.account);
@@ -4163,6 +4216,119 @@ function MegaData()
         }
 
         return false;
+    };
+
+    /**
+     * Recursively retrieve node properties
+     * @param {String|Array} aNodes  ufs-node handle, or a list of them
+     */
+    this.getNodeProperties = function(aNodes) {
+        var res = {
+            favs: { cnt: 0, size: 0 },
+            links: { cnt: 0, size: 0 },
+            files: { cnt: 0, size: 0 },
+            folders: { cnt: 0, size: 0 },
+            oshares: { cnt: 0, size: 0 },
+        };
+
+        var forEach = function(nodes) {
+            var node;
+            var size;
+
+            for (var i in nodes) {
+                node = M.d[nodes[i]];
+
+                if (node) {
+                    if (node.t) {
+                        size = 0;
+
+                        if (M.c[node.h]) {
+                            size = res.files.size;
+
+                            forEach(Object.keys(M.c[node.h]));
+                            size = (res.files.size - size);
+                        }
+
+                        if (M.getNodeShareUsers(node, 'EXP').length) {
+                            res.oshares.cnt++;
+                            res.oshares.size += size;
+                        }
+
+                        res.folders.cnt++;
+                        res.folders.size += size;
+                    }
+                    else {
+                        size = node.s || 0;
+
+                        res.files.cnt++;
+                        res.files.size += size;
+
+                        if (node.ph) {
+                            res.links.cnt++;
+                            res.links.size += size;
+                        }
+                        if (node.fav) {
+                            res.favs.cnt++;
+                            res.favs.size += size;
+                        }
+                    }
+                }
+            }
+        };
+
+        if (!Array.isArray(aNodes)) {
+            if (M.c[aNodes]) {
+                aNodes = Object.keys(M.c[aNodes]);
+            }
+            else {
+                aNodes = [aNodes];
+            }
+        }
+
+        forEach(aNodes);
+
+        return res;
+    };
+
+    /**
+     * Retrieve dashboard statistics data
+     */
+    this.getDashboardData = function() {
+        var res = this.getNodeProperties(M.RootID);
+
+        [M.RubbishID, 'shares']
+            .forEach(function(handle) {
+                var key = 'rubbish';
+                var tmp = M.getNodeProperties(handle);
+
+                // remove unwanted properties
+                ['favs', 'links', 'oshares']
+                    .forEach(function(k) {
+                        if (d && tmp[k].cnt) {
+                            console.warn('getDashboardData: Found "%s" items for "%s"', k, handle);
+                        }
+                        delete tmp[k];
+                    });
+
+                tmp.cnt = tmp.files.cnt;
+                tmp.size = tmp.folders.size;
+
+                tmp.files = tmp.files.cnt;
+                tmp.folders = tmp.folders.cnt;
+
+                if (handle === 'shares') {
+                    key = 'ishares';
+                    tmp.cnt = Object.keys(M.c.shares || {}).length;
+                }
+                else if (!M.c[handle]) {
+                    // The rubbish is empty
+                    tmp.folders = 0;
+                }
+
+                res[key] = tmp;
+            });
+
+        return res;
     };
 
     /**
@@ -5004,7 +5170,7 @@ function MegaData()
             target = $.onDroppedTreeFolder;
             delete $.onDroppedTreeFolder;
         }
-        else if ($('.nw-fm-left-icon.transfers').hasClass('active')) {
+        else if (String(M.currentdirid).length !== 8) {
             target = M.lastSeenCloudFolder || M.RootID;
         }
         else {
@@ -5627,6 +5793,10 @@ function renderNew() {
         topmenuUI();
     }
 
+    if (M.currentdirid === 'dashboard') {
+        delay('dashboard:upd', dashboardUI, 2000);
+    }
+
     newnodes = undefined;
     if (d) {
         console.timeEnd('rendernew');
@@ -6185,7 +6355,7 @@ function execsc(actionPackets, callback) {
                     if (actionPacket.u === u_handle) {
                         u_attr.email = user.m;
 
-                        if (M.currentdirid === 'account/profile') {
+                        if (M.currentdirid === 'account') {
                             $('.nw-fm-left-icon.account').trigger('click');
                         }
                     }
@@ -6609,7 +6779,7 @@ function createFolder(toid, name, ulparams) {
             if (typeof res !== 'number') {
                 $('.fm-new-folder').removeClass('active');
                 $('.create-new-folder').addClass('hidden');
-                $('.create-folder-input-bl input').val('');
+                $('.create-new-folder input').val('');
                 newnodes = [];
                 M.addNode(res.f[0]);
                 renderNew();
@@ -6881,11 +7051,27 @@ function process_f(f, cb, retry)
         }
         else
         {
-            if (!kdWorker) try {
-                kdWorker = mSpawnWorker('keydec.js');
-            } catch(e) {
-                if (d) console.error(e);
-                return __process_f2(f, cb);
+            if (!kdWorker) {
+                var nWorkers = mega.maxWorkers;
+
+                while (nWorkers && (ncn.length / nWorkers) < 800) {
+                    nWorkers >>= 1;
+                }
+                nWorkers = Math.max(nWorkers, 2);
+
+                try {
+                    kdWorker = mSpawnWorker('keydec.js', nWorkers);
+                }
+                catch (e) {
+                    if (d) {
+                        console.error('mSpawnWorker', e);
+                    }
+                    return __process_f2(f, cb);
+                }
+
+                if (d) {
+                    console.debug('Using %d workers to decrypt %d nodes.', nWorkers, ncn.length);
+                }
             }
 
             kdWorker.process(ncn.sort(function() { return Math.random() - 0.5}), function kdwLoad(r,j) {
@@ -7277,6 +7463,10 @@ function process_u(u) {
                 M.d[u[i].u] = M.u[u[i].u];
             }
         }
+    }
+
+    if (M.currentdirid === 'dashboard') {
+        delay('dashboard:updcontacts', dashboardUI.updateContactsWidget);
     }
 }
 
@@ -7750,3 +7940,286 @@ function balance2pro(callback)
         }
     });
 }
+
+// MEGA Achievements
+Object.defineProperty(mega, 'achievem', {
+    value: Object.create(null, {
+        RWDLVL: { value: 0 },
+
+        toString: {
+            value: function toString(ach) {
+                if (ach !== undefined) {
+                    var res = Object.keys(this)
+                        .filter(function(v) {
+                            return this[v] === ach;
+                        }.bind(this));
+
+                    return String(res);
+                }
+
+                return '[object MegaAchievements]';
+            }
+        },
+
+        bind: {
+            value: function bind(action) {
+                this.rebind('click', function() {
+                    if (action) {
+                        switch (action[0]) {
+                            case '#':
+                                location.hash = action;
+                                break;
+
+                            case '~':
+                                var fn = action.substr(1);
+                                if (typeof window[fn] === 'function') {
+                                    if (fn.toLowerCase().indexOf('dialog') > 0) {
+                                        closeDialog();
+                                    }
+                                    window[fn]();
+                                }
+                                break;
+                        }
+                    }
+                    return false;
+                });
+            }
+        },
+
+        prettify: {
+            value: function prettify(maf) {
+                var data  = Object(clone(maf.u));
+                var quota = {
+                    storage: {base: 0, current: 0, max: 0},
+                    transfer: {base: 0, current: 0, max: 0}
+                };
+
+                var setExpiry = function(data, out) {
+                    var time = String(data[2]).split('');
+                    var unit = time.pop();
+                    time = time.join('') | 0;
+
+                    if (time === 1 && unit === 'y') {
+                        time = 12;
+                        unit = 'm';
+                    }
+
+                    var result = {
+                        unit: unit,
+                        value: time
+                    };
+
+                    // TODO: translate this
+                    switch (unit) {
+                        case 'd': result.utxt = (time < 2) ? 'day'   : 'days';    break;
+                        case 'w': result.utxt = (time < 2) ? 'week'  : 'weeks';   break;
+                        case 'm': result.utxt = (time < 2) ? 'month' : 'months';  break;
+                        case 'y': result.utxt = (time < 2) ? 'year'  : 'years';   break;
+                    }
+
+                    out = out || data;
+                    out.expiry = result;
+                    return result;
+                };
+
+                Object.keys(data)
+                    .forEach(function(k) {
+                        setExpiry(data[k]);
+                    });
+
+                var mafr = Object(maf.r);
+                var mafa = Object(maf.a);
+                var alen = mafa.length;
+                while (alen--) {
+                    var ach = clone(mafa[alen]);
+
+                    if (!data[ach.a]) {
+                        data[ach.a] = Object(clone(mafr[ach.r]));
+                        setExpiry(data[ach.a]);
+                    }
+                    var exp = setExpiry(mafr[ach.r] || data[ach.a], ach);
+
+                    var ts = ach.ts * 1000;
+                    var date = moment(ts);
+
+                    switch (exp.unit) {
+                        case 'd': date.add(exp.value, 'days');    break;
+                        case 'w': date.add(exp.value, 'weeks');   break;
+                        case 'm': date.add(exp.value, 'months');  break;
+                        case 'y': date.add(exp.value, 'years');   break;
+                    }
+
+                    ach.date = new Date(ts);
+                    ach.left = Math.round(date.diff(ach.date) / 86400000);
+
+                    if (data[ach.a].rwds) {
+                        data[ach.a].rwds.push(ach);
+                    }
+                    else if (data[ach.a].rwd) {
+                        data[ach.a].rwds = [data[ach.a].rwd, ach];
+                    }
+                    else {
+                        data[ach.a].rwd = ach;
+                    }
+                }
+
+                Object.keys(data)
+                    .forEach(function(k) {
+                        var ach          = data[k];
+                        var base         = Object(ach.rwds).length || 1;
+                        var storageValue = ach[0] * base;
+
+                        if (ach.rwd) {
+                            quota.storage.current += storageValue;
+                        }
+                        quota.storage.max += storageValue;
+
+                        if (ach[1]) {
+                            var transferValue = ach[1] * base;
+
+                            if (ach.rwd) {
+                                quota.transfer.current += transferValue;
+                            }
+                            quota.transfer.max += transferValue;
+                        }
+                    });
+
+                if (Object(u_attr).p) {
+                    quota.storage.base  = Object(M.account).space;
+                    quota.transfer.base = Object(M.account).bw;
+                }
+                else {
+                    quota.storage.base = maf.s;
+                }
+
+                data = Object.create(quota, Object.getOwnPropertyDescriptors(data));
+
+                return data;
+            }
+        }
+    })
+});
+
+(function(o) {
+    var map = {
+        /*  1 */ 'WELCOME':     'ach-create-account:#register',
+        /*  2 */ 'TOUR':        'ach-take-tour',
+        /*  3 */ 'INVITE':      'ach-invite-friend:~inviteFriendDialog',
+        /*  4 */ 'SYNCINSTALL': 'ach-install-megasync:#sync',
+        /*  5 */ 'APPINSTALL':  'ach-install-mobile-app:#mobile',
+        /*  6 */ 'VERIFYE164':  'ach-verify-number',
+        /*  7 */ 'GROUPCHAT':   'ach-group-chat:#fm/chat',
+        /*  8 */ 'FOLDERSHARE': 'ach-share-folder:#fm/contacts'
+    };
+    var mapToAction = Object.create(null);
+    var mapToElement = Object.create(null);
+
+    Object.keys(map).forEach(function(k, idx) {
+        Object.defineProperty(o, 'ACH_' + k, {
+            value: idx + 1,
+            enumerable: true
+        });
+
+        var tmp = map[k].split(':');
+        mapToAction[idx + 1] = tmp[1];
+        mapToElement[idx + 1] = tmp[0];
+    });
+
+    Object.defineProperty(o, 'mapToAction', {
+        value: Object.freeze(mapToAction)
+    });
+    Object.defineProperty(o, 'mapToElement', {
+        value: Object.freeze(mapToElement)
+    });
+
+    Object.freeze(o);
+})(mega.achievem);
+
+// Account Notifications (preferences)
+(function(map) {
+    var _enum = [];
+    var _tag = 'ACCNOTIF_';
+
+    Object.keys(map)
+        .forEach(function(k) {
+            map[k] = map[k].map(function(m) {
+                return k.toUpperCase() + '_' + m.toUpperCase();
+            });
+
+            var rsv = 0;
+            var memb = clone(map[k]);
+
+            while (memb.length < 10) {
+                memb.push(k.toUpperCase() + '_RSV' + (++rsv));
+            }
+
+            if (memb.length > 10) {
+                throw new Error('Stack overflow..');
+            }
+
+            _enum = _enum.concat(memb);
+        });
+
+    makeEnum(_enum, _tag, mega);
+
+    Object.defineProperty(mega, 'notif', {
+        value: Object.freeze((function(flags) {
+            function check(flag, tag) {
+                if (typeof flag === 'string') {
+                    if (tag !== undefined) {
+                        flag = tag + '_' + flag;
+                    }
+                    flag = String(flag).toUpperCase();
+                    flag = mega[flag] || mega[_tag + flag] || 0;
+                }
+                return flag;
+            }
+            return {
+                get flags() {
+                    return flags;
+                },
+
+                setup: function setup(oldFlags) {
+                    if (oldFlags === undefined) {
+                        // Initialize account notifications to defaults (all enabled)
+                        assert(!fmconfig.anf, 'Account notification flags already set');
+
+                        Object.keys(map)
+                            .forEach(function(k) {
+                                var grp = map[k];
+                                var len = grp.length;
+
+                                while (len--) {
+                                    this.set(grp[len]);
+                                }
+                            }.bind(this));
+                    }
+                    else {
+                        flags = oldFlags;
+                    }
+                },
+
+                has: function has(flag, tag) {
+                    return flags & check(flag, tag);
+                },
+
+                set: function set(flag, tag) {
+                    flags |= check(flag, tag);
+                    mega.config.set('anf', flags);
+                },
+
+                unset: function unset(flag, tag) {
+                    flags &= ~check(flag, tag);
+                    mega.config.set('anf', flags);
+                }
+            };
+        })(0))
+    });
+
+    _enum = undefined;
+
+})({
+    chat: ['ENABLED'],
+    cloud: ['ENABLED', 'NEWSHARE', 'DELSHARE', 'NEWFILES'],
+    contacts: ['ENABLED', 'FCRIN', 'FCRACPT', 'FCRDEL']
+});

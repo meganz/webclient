@@ -1,8 +1,8 @@
 .user-card-presence {
-	width: 8px;
-	height: 8px;
+	width: 6px;
+	height: 6px;
 	float: left;
-	margin: 14px 14px 0 6px;
+	margin: 16px 14px 0 6px;
 	-moz-border-radius: 100%;
 	-webkit-border-radius: 100%;
 	border-radius: 100%;

@@ -91,11 +91,13 @@ var useravatar = (function() {
      * @param {Object} user The user object or email
      * @param {String} className Any extra CSS classes that we want to append to the HTML
      * @param {String} element The HTML tag
-     * @return {String} Returns the HTML
+     * @returns {String} Returns the HTML
+     * @returns {Boolean} Adds addition blured background block
      * @private
      */
-    function _getAvatarContent(user, className, element) {
+    function _getAvatarContent(user, className, element, bg) {
         var id = user.u || user;
+        var bgBlock = '';
 
         if (element === 'ximg') {
             return _getAvatarSVGDataURI(user);
@@ -107,16 +109,24 @@ var useravatar = (function() {
             _watching[id] = {};
         }
 
+        if (bg) {
+            bgBlock = '<div class="avatar-bg colorized">' +
+                '<span class="colorized color' + s.colorIndex + '"></span></div>';
+        }
+
         _watching[id][className] = true;
 
         id        = escapeHTML(id);
         element   = escapeHTML(element);
         className = escapeHTML(className);
 
-        return '<' + element + ' data-color="color' + s.colorIndex + '" class="avatar-wrapper ' + className + ' ' + id +  ' color' + s.colorIndex + '"><span>'
-                    + '<div class="verified_icon"></div>'
-                    + s.letters
-                + '</span></' + element + '>';
+        return  bgBlock +
+            '<' + element + ' data-color="color' + s.colorIndex + '" class="avatar-wrapper ' +
+                className + ' ' + id +  ' color' + s.colorIndex + '">' +
+                '<span>' +
+                    '<div class="verified_icon"></div>' + s.letters + 
+                '</span>'  +
+            '</' + element + '>';
     };
 
     /**
@@ -127,18 +137,27 @@ var useravatar = (function() {
      * @param {String} className Any extra CSS classes that we want to append to the HTML
      * @param {String} type The HTML tag type
      * @returns {String} The image HTML
+     * @returns {Boolean} Adds addition blured background block
      * @private
      */
-    function _getAvatarImageContent(url, id, className, type) {
+    function _getAvatarImageContent(url, id, className, type, bg) {
+        var bgBlock = '';
         id        = escapeHTML(id);
         url       = escapeHTML(url);
         type      = escapeHTML(type);
         className = escapeHTML(className);
 
-        return '<' + type + ' data-color="" class="avatar-wrapper ' + id + ' ' + className + '">'
-                + '<div class="verified_icon"></div>'
-                + '<img src="' + url + '">'
-         + '</' + type + '>';
+        if (bg) {
+            bgBlock = '<div class="avatar-bg">' +
+                    '<span style="background-image: url(' + url + ');"></span>' +
+                '</div>';
+        }
+
+        return bgBlock +
+            '<' + type + ' data-color="" class="avatar-wrapper ' + id + ' ' + className + '">' +
+                '<i class="verified_icon"></i>' +
+                '<img src="' + url + '">' +
+            '</' + type + '>';
     };
 
     /**
@@ -235,6 +254,7 @@ var useravatar = (function() {
         if (user === u_handle) {
             // my avatar!
             $('.fm-avatar img,.fm-account-avatar img').attr('src', ns.imgUrl(user));
+            $('.fm-account-avatar .avatar-bg span').css('background-image', 'url(' + ns.imgUrl(user) + ')');
         }
 
         if (M.u[user]) {
@@ -300,8 +320,9 @@ var useravatar = (function() {
      * @param {String} className
      * @param {String} element
      * @returns {String}
+     * @returns {Boolean} Adds addition blured background block
      */
-    ns.contact = function(user, className, element) {
+    ns.contact = function(user, className, element, bg) {
         user = M.getUser(user) || String(user);
 
         element   = element || 'div';
@@ -312,10 +333,10 @@ var useravatar = (function() {
         }
 
         if (avatars[user.u]) {
-            return _getAvatarImageContent(avatars[user.u].url, user.u, className, element);
+            return _getAvatarImageContent(avatars[user.u].url, user.u, className, element, bg);
         }
 
-        return _getAvatarContent(user, className, element);
+        return _getAvatarContent(user, className, element, bg);
     };
 
     // Generic logic to retrieve and process user-avatars

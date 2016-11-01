@@ -647,6 +647,8 @@ Chat.prototype.init = function() {
         room.bind("onChatShown", function() {
             $('.conversations-main-listing').addClass("hidden");
         });
+
+        self.updateDashboard();
     });
     self.on('onRoomDestroy', function(e, room) {
         if (room.type === "private") {
@@ -818,6 +820,8 @@ Chat.prototype.updateSectionUnreadCount = function() {
                 .addClass('hidden');
         }
         self._lastUnreadCount = unreadCount;
+
+        self.updateDashboard();
     }
 };
 /**
@@ -1780,6 +1784,11 @@ Chat.prototype._destroyAllChatsFromChatd = function() {
     });
 };
 
+Chat.prototype.updateDashboard = function() {
+    if (M.currentdirid === 'dashboard') {
+        delay('dashboard:updchat', dashboardUI.updateChatWidget);
+    }
+};
 
 window.Chat = Chat;
 window.chatui = chatui;

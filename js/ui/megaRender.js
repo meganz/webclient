@@ -42,7 +42,7 @@
             // List view mode
             '<table>' +
                 '<tr>' +
-                    '<td width="30">' +
+                    '<td width="50">' +
                         '<span class="grid-status-icon"></span>' +
                     '</td>' +
                     '<td>' +
@@ -126,7 +126,7 @@
             // List view mode
             '<table>' +
                 '<tr>' +
-                    '<td width="30">' +
+                    '<td width="50">' +
                         '<span class="grid-status-icon"></span>' +
                     '</td>' +
                     '<td>' +
@@ -781,7 +781,7 @@
                     assert(Object(M.u[aHandle]).c === 1, 'Found non-active contact');
                 }
 
-                var avatar = useravatar.contact(aHandle, "nw-contact-avatar");
+                var avatar = useravatar.contact(aHandle, 'nw-contact-avatar');
 
                 if (avatar) {
                     props.avatar = parseHTML(avatar).firstChild;

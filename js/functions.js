@@ -64,7 +64,9 @@ function parseHTML(markup, forbidStyle, doc, baseURI, isXML) {
     // Either we are not running the Firefox extension or the above parser
     // failed, in such case we try to mimic it using jQuery.parseHTML
     var fragment = doc.createDocumentFragment();
-    $.parseHTML(String(markup), doc)
+
+    markup = String(markup).replace(/(?!\<[a-z][^>]+)\son[a-z]+\s*=/gi, ' data-dummy=');
+    $.parseHTML(markup, doc)
         .forEach(function(node) {
             fragment.appendChild(node);
         });
@@ -877,25 +879,36 @@ function countrydetails(isocode) {
 }
 
 /**
- * Converts a timestamp to a localised yyyy-mm-dd hh:mm format e.g. 2016-04-17 14:37
- * @param {Number} unixTime The UNIX timestamp in seconds e.g. 1464829467
- * @param {Boolean} ignoreTime If true only the date will be returned e.g. yyyy-mm-dd
- * @returns {String} Returns the date and time in yyyy-mm-dd hh:mm format by default
+ * Converts a timestamp to a readable time format - e.g. 2016-04-17 14:37
+ *
+ * @param {Number} unixTime  The UNIX timestamp in seconds e.g. 1464829467
+ * @param {Number} format    The readable time format to return
+ * @returns {String}
+ *
+ * Formats:
+ *       0: yyyy-mm-dd hh:mm
+ *       1: yyyy-mm-dd
+ *       2: dd fmn yyyy (fmn: Full month name, based on the locale)
  */
-function time2date(unixTime, ignoreTime) {
+function time2date(unixTime, format) {
 
-    var myDate = new Date(unixTime * 1000 || 0);
-    var myDateString =
-        myDate.getFullYear() + '-'
-        + ('0' + (myDate.getMonth() + 1)).slice(-2) + '-'
-        + ('0' + myDate.getDate()).slice(-2);
+    var result;
+    var date = new Date(unixTime * 1000 || 0);
 
-    if (!ignoreTime) {
-        myDateString += ' ' + ('0' + myDate.getHours()).slice(-2) + ':'
-            + ('0' + myDate.getMinutes()).slice(-2);
+    if (format === 2) {
+        result = date.getDate() + ' ' + date_months[date.getMonth()] + ' ' + date.getFullYear();
+    }
+    else {
+        var parts = date.toISOString().split('T');
+
+        result = parts[0];
+
+        if (!format) {
+            result += ' ' + parts[1].substr(0, 5);
+        }
     }
 
-    return myDateString;
+    return result;
 }
 
 // in case we need to run functions.js in a standalone (non secureboot.js) environment, we need to handle this case:
@@ -1109,15 +1122,12 @@ function numOfBytes(bytes, precision) {
 }
 
 function bytesToSize(bytes, precision, html_format) {
-    if (!bytes) {
-        return '0';
-    }
-
     var s_b = 'B';
     var s_kb = 'KB';
     var s_mb = 'MB';
     var s_gb = 'GB';
     var s_tb = 'TB';
+    var s_pb = 'PB';
 
     if (lang === 'fr') {
         s_b = 'O';
@@ -1125,21 +1135,31 @@ function bytesToSize(bytes, precision, html_format) {
         s_mb = 'Mo';
         s_gb = 'Go';
         s_tb = 'To';
+        s_pb = 'Po';
     }
 
     var kilobyte = 1024;
     var megabyte = kilobyte * 1024;
     var gigabyte = megabyte * 1024;
     var terabyte = gigabyte * 1024;
+    var petabyte = terabyte * 1024;
     var resultSize = 0;
     var resultUnit = '';
-    if (bytes > 1024 * 1024 * 1024) {
-        precision = 2;
+
+    if (precision === undefined) {
+        if (bytes > gigabyte) {
+            precision = 2;
+        }
+        else if (bytes > megabyte) {
+            precision = 1;
+        }
     }
-    else if (bytes > 1024 * 1024) {
-        precision = 1;
+
+    if (!bytes) {
+        resultSize = 0;
+        resultUnit = s_mb;
     }
-    if ((bytes >= 0) && (bytes < kilobyte)) {
+    else if ((bytes >= 0) && (bytes < kilobyte)) {
         resultSize = parseInt(bytes);
         resultUnit = s_b;
     }
@@ -1155,17 +1175,25 @@ function bytesToSize(bytes, precision, html_format) {
         resultSize = (bytes / gigabyte).toFixed(precision);
         resultUnit = s_gb;
     }
-    else if (bytes >= terabyte) {
+    else if ((bytes >= terabyte) && (bytes < petabyte)) {
         resultSize = (bytes / terabyte).toFixed(precision);
         resultUnit = s_tb;
+    }
+    else if (bytes >= petabyte) {
+        resultSize = (bytes / petabyte).toFixed(precision);
+        resultUnit = s_pb;
     }
     else {
         resultSize = parseInt(bytes);
         resultUnit = s_b;
     }
-    if (html_format) {
+    if (html_format === 2) {
+        return resultSize + '<span>' + resultUnit + '</span>';
+    }
+    else if (html_format) {
         return '<span>' + resultSize + '</span>' + resultUnit;
-    } else {
+    }
+    else {
         return resultSize + ' ' + resultUnit;
     }
 }
@@ -1235,14 +1263,14 @@ function makeObservable(kls) {
 /**
  * Instantiates an enum-like list on the provided target object
  */
-function makeEnum(aEnum, aPrefix, aTarget) {
+function makeEnum(aEnum, aPrefix, aTarget, aNorm) {
     aTarget = aTarget || {};
 
     var len = aEnum.length;
     while (len--) {
         Object.defineProperty(aTarget,
             (aPrefix || '') + String(aEnum[len]).toUpperCase(), {
-                value: 1 << len,
+                value: aNorm ? len : (1 << len),
                 enumerable: true
             });
     }
@@ -3257,6 +3285,48 @@ function assertStateChange(currentState, newState, allowedStatesMap, enumMap) {
     }
 }
 
+Object.defineProperty(mega, 'api', {
+    value: Object.freeze({
+        logger: new MegaLogger('API'),
+
+        setDomain: function(aDomain, aSave) {
+            apipath = 'https://' + aDomain + '/';
+
+            if (aSave) {
+                localStorage.apipath = apipath;
+            }
+        },
+
+        staging: function(aSave) {
+            this.setDomain('staging.api.mega.co.nz', aSave);
+        },
+        prod: function(aSave) {
+            this.setDomain('eu.api.mega.co.nz', aSave);
+        },
+
+        req: function(params) {
+            var promise = new MegaPromise();
+
+            if (typeof params === 'string') {
+                params = {a: params};
+            }
+
+            api_req(params, {
+                callback: function(res) {
+                    if (typeof res === 'number' && res < 0) {
+                        promise.reject.apply(promise, arguments);
+                    }
+                    else {
+                        promise.resolve.apply(promise, arguments);
+                    }
+                }
+            });
+
+            return promise;
+        }
+    })
+});
+
 /**
  * execCommandUsable
  *
@@ -3525,7 +3595,7 @@ mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
             clearInterval($.mTransferAnalysis);
             delete $.mTransferAnalysis;
         }
-        $('.transfer-panel-title').safeHTML(l[104]);
+        $('.transfer-panel-title').text('');
         dlmanager.dlRetryInterval = 3000;
     }
 
@@ -4328,6 +4398,26 @@ mBroadcaster.once('startMega', function() {
     }
 });
 
+/** getOwnPropertyDescriptors polyfill */
+mBroadcaster.once('startMega', function() {
+    if (!Object.hasOwnProperty('getOwnPropertyDescriptors')) {
+        Object.defineProperty(Object, 'getOwnPropertyDescriptors', {
+            value: function getOwnPropertyDescriptors(obj) {
+                var result = {};
+
+                for (var key in obj) {
+                    if (obj.hasOwnProperty(key)) {
+                        result[key] = Object.getOwnPropertyDescriptor(obj, key);
+                    }
+                }
+
+                return result;
+            }
+        });
+    }
+});
+
+
 /**
  * Cross-tab communication using WebStorage
  */
@@ -4786,10 +4876,10 @@ if (typeof sjcl !== 'undefined') {
 
         var self = this;
 
-        if ($.removedContactsFromShare.length > 0) {
+        if ($.remvoedContactsFromShare && ($.removedContactsFromShare.length > 0)) {
             self.removeContactFromShare();
         }
-        if ($.changedPermissions.length > 0) {
+        if ($.changedPermissions && ($.changedPermissions.length > 0)) {
             doShare($.selected[0], $.changedPermissions, true);
         }
         addContactToFolderShare();

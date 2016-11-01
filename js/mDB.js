@@ -23,7 +23,7 @@ function FMDB() {
         tail : 0,      // current transaction being sent to IndexedDB
         enqueue : fmdb_enqueue,
         state : -1,    // -1: idle, 0: deleted sn and writing, 1: transaction open and writing
-        inflight : 0,  // number of executing DB updates (MSIE restricted)
+        inflight : 0,  // number of currently executing DB updates (MSIE restricts this to a paltry 1)
         commit : false,    // if set, the sn has been updated, completing the transaction
         crashed : false    // a DB error sets this and prevents further DB access
     };

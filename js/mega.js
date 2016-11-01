@@ -2423,36 +2423,11 @@ function MegaData()
                 }
             }
 
-            if (n.t !== 2 && n.t !== 3 && n.t !== 4 && n.k) {
-                /*if (u_kdnodecache[n.h]) {
-                    var obj = u_kdnodecache[n.h];
-                    for (var k in obj) {
-                        n[k] = obj[k];
-                    }
-                }
-                else {*/
-                    crypto_decryptnode(n);
-                //}
-                if (crypto_keyok(n)) {
-                    // Update global variable which holds data about missing keys
-                    // so DOM can be updated accordingly
-                    if (missingkeys[n.h]) {
-                        delete missingkeys[n.h];
-                    }
-                }
+            if (n.t < 2) {
+                crypto_decryptnode(n);
+                M.nodeUpdated(n);
+            }
 
-                if (fmdb && !ignoreDB) {
-                    M.nodeUpdated(n);
-                }
-            }
-            else if (!n.k || typeof n.k != 'object') {
-                if (n.a) {
-                    if (!missingkeys[n.h]) {
-                        missingkeys[n.h] = true;
-                        newmissingkeys = true;
-                    }
-                }
-            }
             if (n.hash) {
                 if (!this.h[n.hash]) {
                     this.h[n.hash] = [];
@@ -2460,6 +2435,7 @@ function MegaData()
                 this.h[n.hash].push(n.h);
             }
         }
+
         if (this.d[n.h] && this.d[n.h].shares) {
             n.shares = this.d[n.h].shares;
         }
@@ -3501,16 +3477,24 @@ function MegaData()
     };
 
     this.nodeUpdated = function(n) {
-        if (fmdb) {
-            fmdb.add('f', { h : n.h,
-                            p : n.p,
-                            s : n.s >= 0 ? n.s : -n.t,
-                            d : n });
-        }
+        if (n.h && n.h.length == 8) {
+            if (fmdb) {
+                fmdb.add('f', { h : n.h,
+                                p : n.p,
+                                s : n.s >= 0 ? n.s : -n.t,
+                                d : n });
+            }
 
-        if (missingkeys[n.h] && crypto_keyok(n)) {
-            delete missingkeys[n.h];
-            if (fmdb) fmdb.del('mk', n.h)
+            // sync missingkeys with this node's key status
+            if (crypto_keyok(n)) {
+                // mark as fixed if necessary
+                if (missingkeys[n.h]) crypto_keyfixed(n.h);
+            }
+            else {
+                // always report missing keys as more shares may
+                // now be affected
+                crypto_reportmissingkey(n);
+            }            
         }
     };
 
@@ -5937,11 +5921,6 @@ function execsc(actionPackets, callback) {
                             $('#' + n.h + '.file-block .file-status-icon').removeClass('star');
                         }
                     }
-                    delete missingkeys[n.h];
-                }
-                else {
-                    // FIXME: show as undecryptable in the UI
-                    missingkeys[n.h] = 1;
                 }
 
                 // save node, even if it is undecryptable
@@ -6232,6 +6211,7 @@ function treefetcher_ok(ok, ctx) {
 
 // returns true if no further processing is needed
 // FIXME: move to M
+// FIXME: call from M.addNode() to avoid code duplication
 function emplacenode(node) {
     if (node.p) {
         if (!M.c[node.p]) M.c[node.p] = {};
@@ -6310,7 +6290,7 @@ function treefetcher_procmsg(ev) {
         emplacenode(ev.data);
 
         if (ev.data.t < 2 && !crypto_keyok(ev.data)) {
-            crypto_reportmissingkeys(ev.data);
+            crypto_reportmissingkey(ev.data);
         }
     }
     else if (typeof ev.data.sharekeys != 'undefined') {
@@ -6335,13 +6315,6 @@ function treefetcher_procmsg(ev) {
 
                 if (fmdb) fmdb.add('s', { o_t : M.c.shares[h].su + '*' + h,
                                           d : M.c.shares[h] });
-            }
-
-            // store missing keys
-            if (fmdb) {
-                for (h in missingkeys) {
-                    fmdb.add('mk', { h : h });
-                }                
             }
 
             loadfm_callback(this.ctx.residualfm);
@@ -6429,7 +6402,7 @@ function dbfetchfm() {
         fetchfchunked(0, function(r){
 
             fmdb.get('mk', function(r){
-                for (i = r.length; i--; ) missingkeys[r[i].h] = 1;
+                crypto_missingkeysfromdb(r);
 
                 fmdb.get('u', function(r){
                     process_u(r, true);

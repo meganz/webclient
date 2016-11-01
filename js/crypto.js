@@ -3734,22 +3734,65 @@ function crypto_sendrsa2aes() {
 // - a nested share situation, where the client adding the node is only part
 //   of the inner share - clients that are only part of the outer share can't
 //   decrypt the node without assistance from the share owner
-var missingkeys = {};
+// FIXME: update missingkeys/sharemissing for all undecryptable nodes whose
+// share path changed (whenever shares are added, removed or nodes are moved)
+var missingkeys = {};   // { node handle : { share handle : true } }
+var sharemissing = {};  // { share handle : { node handle : true } }
 var newmissingkeys = false;
-var sharemissing = {};
 
 // whenever a node fails to decrypt, call this.
-function crypto_reportmissingkeys(n) {
-    missingkeys[n.h] = true;
-    newmissingkeys = true;
+function crypto_reportmissingkey(n) {
+    var change = false;
+
+    if (!missingkeys[n.h]) {
+        missingkeys[n.h] = {};
+        change = true;
+    }
 
     for (var p = 8; (p = n.k.indexOf(':', p)) >= 0; p += 32) {
         if (p == 8 || n.k[p-9] == '/') {
             var id = n.k.substr(p-8, 8);
-            if (!sharemissing[id]) sharemissing[id] = {};
-            sharemissing[id][n.h] = true;
+            if (!missingkeys[n.h][id]) {
+                missingkeys[n.h][id] = true;
+                if (!sharemissing[id]) sharemissing[id] = {};
+                sharemissing[id][n.h] = true;
+                change = true;
+            }
         }
     }
+
+    if (change) {
+        newmissingkeys = true;
+        if (fmdb) fmdb.add('mk', { h : n.h,
+                                   d : { s : Object.keys(missingkeys[n.h]) }
+                                 });
+    }
+}
+
+// populate from IndexedDB's mk table
+function crypto_missingkeysfromdb(r) {
+    // FIXME: remove the following line
+    if (!r.length || !r[0].s) return;
+
+    for (var i = r.length; i--; ) {
+        if (!missingkeys[r[i].h]) missingkeys[r[i].h] = {};
+        for (var j = r[i].s.length; j--; ) {
+            missingkeys[r[i].h][r[i].s[j]] = true;
+            if (!sharemissing[r[i].s[j]]) sharemissing[r[i].s[j]] = {};
+            sharemissing[r[i].s[j]][r[i].h] = true;
+        }
+    }
+}
+
+function crypto_keyfixed(h) {
+    // no longer missing from the shares it was in
+    for (var sh in missingkeys[h]) delete sharemissing[sh][h];
+
+    // no longer missing
+    delete missingkeys[h];
+
+    // persist change
+    if (fmdb) fmdb.del('mk', h);    
 }
 
 // upon receipt of a new u_sharekey, call this with sharemissing[sharehandle].
@@ -3768,8 +3811,7 @@ function crypto_fixmissingkeys(hs) {
                 else continue;
             }
 
-            delete hs[h];
-            delete missingkeys[h];
+            crypto_keyfixed(h);
         }        
     }
 }
@@ -3790,6 +3832,7 @@ function crypto_setnodekey(h, k) {
 
         if (crypto_keyok(n)) {
             fm_updated(n);
+            crypto_keyfixed(h);
         }
     }
 }

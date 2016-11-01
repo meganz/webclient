@@ -197,7 +197,7 @@ function crypto_decryptnode(node) {
 
     if (!k) {
         if (d) console.log("Can't extract key for " + node.h);
-        if (missingkeys) crypto_reportmissingkeys(node);
+        if (missingkeys) crypto_reportmissingkey(node);
     }
 }
 

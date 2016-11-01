@@ -3741,7 +3741,10 @@
     "12487": "Tie\u017e dostupn\u00e9 pre [A1]Windows[\/A1] a [A2]Linux[\/A2].",
     "12488": "We strongly suggest using our sync client for vastly improved performance[BR] uploading hundreds of files. [A]Get MEGAsync now.[\/A]",
     "12489": "When we launched MEGA early 2013, global mass surveillance by rogue governments under the pretext of fighting terrorism was still a wild conjecture and its proponents were often touted as conspiracy theorists. Edward Snowden's revelations 137 days later fundamentally changed public attitudes and it became excruciatingly clear that [I]security by policy[\/I] (\"we have access to your data, but we promise to keep it confidential and not misuse it\") had not been good enough. Anything short of [I]security by design[\/I] (\"we cannot gain access to your data without you being able to find out\"), for which strong end-to-end encryption is an essential prerequisite, now seems grossly insufficient.",
-    "12689": "Caution: users with access to your file \/ folder links can use up your entire transfer quota if you grant them 100%. Click [A]Save[\/A] to proceed.",
+    "12689": "Caution: users with access to your file \/ folder links can use up your entire transfer quota if you grant them 100%.",
+    "12690": "Failed to share item(s) from MEGA. The destination application seems busy. Please try again later.",
+    "12691": "Failed to retrieve node details. Please try again.",
+    "12692": "View details failed",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

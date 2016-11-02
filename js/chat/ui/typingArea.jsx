@@ -18,8 +18,10 @@ var TypingArea = React.createClass({
         };
     },
     getInitialState: function () {
+        var initialText = this.props.initialText;
+
         return {
-            typedMessage: this.props.initialText ? this.props.initialText : "",
+            typedMessage: initialText ? initialText : "",
             textareaHeight: 20
         };
     },
@@ -171,6 +173,13 @@ var TypingArea = React.createClass({
             jsp.scrollToY(0);
             $('.jspPane', $textareaScrollBlock).css({'top': 0});
         }
+
+        if (this.props.persist) {
+            var megaChat = this.props.chatRoom.megaChat;
+            megaChat.plugins.persistedTypeArea.removePersistedTypedValue(
+                this.props.chatRoom
+            );
+        }
         return result;
     },
     onTypeAreaKeyDown: function(e) {
@@ -270,6 +279,24 @@ var TypingArea = React.createClass({
             self.typing();
         }
 
+        // persist typed values
+        if (this.props.persist) {
+            var megaChat = self.props.chatRoom.megaChat;
+            if (megaChat.plugins.persistedTypeArea) {
+                if ($.trim(e.target.value).length > 0) {
+                    megaChat.plugins.persistedTypeArea.updatePersistedTypedValue(
+                        self.props.chatRoom,
+                        e.target.value
+                    );
+                }
+                else {
+                    megaChat.plugins.persistedTypeArea.removePersistedTypedValue(
+                        self.props.chatRoom
+                    );
+                }
+            }
+        }
+
         self.updateScroll(true);
 
         // if (self.props.onUpdate) {
@@ -306,6 +333,37 @@ var TypingArea = React.createClass({
         });
         self.triggerOnUpdate(true);
 
+    },
+    componentWillMount: function() {
+        var self = this;
+        var chatRoom = self.props.chatRoom;
+        var megaChat = chatRoom.megaChat;
+        var initialText = self.props.initialText;
+
+
+        if (this.props.persist && megaChat.plugins.persistedTypeArea) {
+            if (!initialText) {
+                megaChat.plugins.persistedTypeArea.hasPersistedTypedValue(chatRoom).done(function () {
+                    megaChat.plugins.persistedTypeArea.getPersistedTypedValue(chatRoom).done(function (r) {
+                        if (self.state.typedMessage !== r) {
+                            self.setState({
+                                'typedMessage': r
+                            });
+                        }
+                    });
+
+                });
+            }
+            megaChat.plugins.persistedTypeArea.data.rebind(
+                'onChange.typingArea' + self.getUniqueId(),
+                function(e, k, v) {
+                    if (chatRoom.roomJid.split("@")[0] == k) {
+                        self.setState({'typedMessage': v ? v : ""});
+                        self.triggerOnUpdate(true);
+                    }
+                }
+            );
+        }
     },
     componentWillUnmount: function() {
         var self = this;

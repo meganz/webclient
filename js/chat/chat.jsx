@@ -239,7 +239,8 @@ var Chat = function() {
             'emoticonShortcutsFilter': EmoticonShortcutsFilter,
             'emoticonsFilter': EmoticonsFilter,
             'callFeedback': CallFeedback,
-            'karerePing': KarerePing
+            'karerePing': KarerePing,
+            'persistedTypeArea': PersistedTypeArea
         },
         'chatNotificationOptions': {
             'textMessages': {

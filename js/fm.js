@@ -2224,30 +2224,39 @@ function fmremove() {
     else if (RootbyId($.selected[0]) === M.RubbishID) {
 
         var dlgMessage = '';
+        var toastMessage = '';
 
         if ((filecnt === 1) && (!foldercnt)) {
-            dlgMessage = l[7543];// 1 file
+            dlgMessage = l[13749];// 1 file
+            toastMessage = l[13757];
         }
         else if ((filecnt > 1) && (!foldercnt)) {
-            dlgMessage = l[7544].replace('%d', filecnt);
+            dlgMessage = l[13750].replace('%1', filecnt);
+            toastMessage = l[13758].replace('%1', filecnt);
         }
         else if ((!filecnt) && (foldercnt === 1)) {
-            dlgMessage = l[7545];// 1 folder
+            dlgMessage = l[13751];// 1 folder
+            toastMessage = l[13759];
         }
         else if ((!filecnt) && (foldercnt > 1)) {
-            dlgMessage = l[7546].replace('%d', foldercnt);
+            dlgMessage = l[13752].replace('%1', foldercnt);
+            toastMessage = l[13760].replace('%1', foldercnt);
         }
         else if ((filecnt === 1) && (foldercnt === 1)) {
-            dlgMessage = l[7547];// 1 file 1 folder
+            dlgMessage = l[13753];// 1 file 1 folder
+            toastMessage = l[13761];
         }
         else if ((filecnt === 1) && (foldercnt > 1)) {
-            dlgMessage = l[7548].replace('%d', foldercnt);
+            dlgMessage = l[13754].replace('%1', foldercnt);
+            toastMessage = l[13762].replace('%1', foldercnt);
         }
         else if ((filecnt > 1) && (foldercnt === 1)) {
-            dlgMessage = l[7549].replace('%d', filecnt);
+            dlgMessage = l[13755].replace('%1', filecnt);
+            toastMessage = l[13763].replace('%1', filecnt);
         }
         else if ((filecnt > 1) && (foldercnt > 1)) {
-            dlgMessage = l[7550].replace('%d', filecnt).replace('%d', foldercnt);
+            dlgMessage = l[13756].replace('%1', filecnt).replace('%2', foldercnt);
+            toastMessage = l[13764].replace('%1', filecnt).replace('%2', foldercnt);
         }
 
         msgDialog('clear-bin', l[1003], dlgMessage, l[1007], function(e) {
@@ -2263,7 +2272,7 @@ function fmremove() {
                     M.currentdirid = tmp;
                 }
 
-                showToast('settings', dlgMessage);
+                showToast('settings', toastMessage);
             }
         });
 

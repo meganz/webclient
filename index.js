@@ -1320,8 +1320,10 @@ function topmenuUI() {
         $('.top-head .user-name').show();
     }
 
-    //Show language in top menu
+    // Show language in top menu
     $('.top-menu-item.languages .right-el').text(lang);
+    // Show version in top menu
+    $('.top-mega-version').text('v. ' + (buildVersion.website || 'dev'));
 
     if (u_type) {
         $('.top-menu-item.logout,.top-menu-item.export').removeClass('hidden');
@@ -1691,7 +1693,7 @@ function topmenuUI() {
 
     $('.st-bottom-button').rebind('click', function () {
         var url = $(this).attr('href');
-        window.open(url, '_blank'); 
+        window.open(url, '_blank');
     });
 
     $('.top-search-bl').rebind('click', function () {

@@ -1305,9 +1305,10 @@ function MegaData()
             return false;
         }
 
-        // open the dashboard by default
-        id = id || 'dashboard';
-
+        if (!folderlink) {
+            // open the dashboard by default
+            id = id || 'dashboard';
+        }
 
         if ((id !== 'notifications') && !$('.fm-main.notifications').hasClass('hidden')) {
             notificationsUI(1);

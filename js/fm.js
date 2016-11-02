@@ -7356,7 +7356,7 @@ function reCalcMenuPosition(m, x, y, ico)
     var wMax = x + cmW;// coordinate of right edge
     var hMax = y + cmH;// coordinate of bottom edge
 
-    this.overlapParentMenu = function()
+    var overlapParentMenu = function(n)
     {
         var tre = wW - wMax;// to right edge
         var tle = x - minX - SIDE_MARGIN;// to left edge
@@ -7377,7 +7377,7 @@ function reCalcMenuPosition(m, x, y, ico)
 
     // submenus are absolutely positioned, which means that they are relative to first parent, positioned other then static
     // first parent, which is NOT a .contains-submenu element (it's previous in same level)
-    this.horPos = function()// used for submenues
+    var horPos = function(n)// used for submenues
     {
         var top;
         var nTop = parseInt(n.css('padding-top'));
@@ -7437,7 +7437,7 @@ function reCalcMenuPosition(m, x, y, ico)
 
         var top = 'auto', left = '100%', right = 'auto';
 
-        top = this.horPos();
+        top = horPos(n);
         if (m.parent().parent('.left-position').length === 0)
         {
             if (maxX >= (wMax + nmW))
@@ -7446,7 +7446,7 @@ function reCalcMenuPosition(m, x, y, ico)
                 n.addClass('left-position');
             else
             {
-                this.overlapParentMenu();
+                overlapParentMenu(n);
 
                 return true;
             }
@@ -7459,7 +7459,7 @@ function reCalcMenuPosition(m, x, y, ico)
                 left = 'auto', right = '100%';
             else
             {
-                this.overlapParentMenu();
+                overlapParentMenu(n);
 
                 return true;
             }

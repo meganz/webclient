@@ -750,12 +750,10 @@ background: linear-gradient(to bottom, rgba(247,247,247,1) 0%,rgba(247,247,247,0
 }
 /* End of Invitation status dialog */
 
-
 .fm-dialog.create-folder-dialog {
     width: 360px;
     margin:-67px 0 0 -180px;
 }
-
 .fm-dialog.chat-rename-dialog {
     left: 50%;
     top: 50%;

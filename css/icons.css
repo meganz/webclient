@@ -455,7 +455,6 @@
     background-repeat: no-repeat;
     background-position: center -5633px;
 }
-
 .small-icon.membership {
     background-image: url(../images/mega/top-login-sprite_v7.png);
     background-repeat: no-repeat;
@@ -715,8 +714,6 @@
     background-image: url(../images/mega/nw-fm-sprite_v19.svg);
     background-position: -14px -11665px;
 }
-
-
 /* Context menu icons */
 .small-icon.context {
     background-image: url(../images/mega/icons-sprite.png);

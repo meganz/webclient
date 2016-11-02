@@ -3430,15 +3430,16 @@ dashboardUI.updateCloudDataWidget = function() {
     $('.data-float-bl').find('.data-item')
         .each(function(idx, elm) {
             var props = data[map[idx]];
-            var str = l[locale[idx]];
-            if (props.cnt === 1) {
+            var str   = l[locale[idx]];
+            var cnt   = props.cnt;
+            if (cnt === 1) {
                 str = l[(locale[idx] === files) ? file1 : folder1];
             }
             else if (intl) {
-                props.cnt = intl.format(props.cnt || 0);
+                cnt = intl.format(props.cnt || 0);
             }
 
-            elm.children[1].textContent = String(str).replace('[X]', props.cnt);
+            elm.children[1].textContent = String(str).replace('[X]', cnt);
             if (props.cnt > 0) {
                 elm.children[2].textContent = bytesToSize(props.size);
                 $(elm).removeClass('empty');
@@ -4925,6 +4926,7 @@ function accountUI() {
             });
 
             $('.grid-table.vouchers tr').remove();
+            $('.fm-account-button.reseller').removeClass('hidden');
             var html = '<tr><th>' + l[475] + '</th><th>' + l[7714] + '</th><th>' + l[477] + '</th><th>' + l[488] + '</th></tr>';
 
             $(account.vouchers).each(function(i, el) {
@@ -12210,7 +12212,7 @@ function fm_resize_handler() {
             megaChat.resized();
         }
 
-        $('.fm-right-files-block, .fm-right-account-block').css({
+        $('.fm-right-files-block, .fm-right-account-block, .fm-right-block.dashboard').css({
             'margin-left': ($('.fm-left-panel:visible').width() + $('.nw-fm-left-icons-panel').width()) + "px"
         });
     }

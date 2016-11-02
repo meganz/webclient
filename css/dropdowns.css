@@ -329,7 +329,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 .dropdown.body.dropdown-arrow.wide-dropdown {
     margin-bottom: 16px;
 }
-
 .dropdown-item.active-tick::before {
     position: absolute;
     content: '';
@@ -351,8 +350,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 .dropdown.text-block a {
     color: #FF4D4A;
 }
-
-
 .context .dropdown-item {
     font-size: 14px;
     line-height: 31px;

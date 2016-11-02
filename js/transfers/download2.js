@@ -1354,24 +1354,19 @@ function fm_tfsupdate() {
     }
     M.pendingTransfers = i + u;
     var t;
-    var sep = "\u202F";
-    var l   = String(tfse.domPanelTitle.textContent).trim().split(sep)[0];
     if (i && u) {
         t = '\u2191 ' + u + ' \u2193 ' + i;
     }
     else if (i) {
-        t = i;
+        t =  '\u2193 ' + i;
     }
     else if (u) {
-        t = u;
+        t = '\u2191 ' + u;
     }
     else {
         t = '';
     }
-    if (t) {
-        t = sep + ' ' + t;
-    }
-    tfse.domPanelTitle.textContent = (l + t);
+    tfse.domPanelTitle.textContent = (t);
 }
 
 

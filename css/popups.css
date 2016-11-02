@@ -124,14 +124,14 @@ color: #cccccc;
     line-height: 14px;
 }
 .contacts-search .user-card-name {
-	font-size: 13px;
-	line-height: 19px;
+    font-size: 13px;
+    line-height: 19px;
 }
 /* End of Search contacts popup */
 
 /* Emoji one popup */
 .popup.emoji-one {
-    height: 428px;
+    height: 432px;
 }
 .popup-header.emoji-one, .popup-footer.emoji-one {
     height: 48px;

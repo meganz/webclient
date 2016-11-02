@@ -43,7 +43,7 @@
                 icon = $(this.$dialog)
                     .addClass('warning-dialog-a login').removeClass('loginrequired-dialog');
 
-                $('.fm-dialog-button.pro-login', this.$dialog)
+                $('.default-white-button.pro-login', this.$dialog)
                     .rebind('click.loginrequired', function() {
                         loginRequiredDialog.hide();
                         showLoginDialog(promise);
@@ -51,7 +51,7 @@
                         return false;
                     });
 
-                $('.fm-dialog-button.pro-register', this.$dialog)
+                $('.default-white-button.pro-register', this.$dialog)
                     .rebind('click.loginrequired', function() {
                         promise.reject();
                         return false;

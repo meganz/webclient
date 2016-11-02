@@ -7236,16 +7236,17 @@ function contextMenuUI(e, ll) {
 
     // Count all items inside section, and hide dividers if necessary
     v.each(function() {
-        var a = $(this).find('a.dropdown-item');
-        var b = $(this).find('hr');
+        var $this = $(this);
+        var a = $this.find('a.dropdown-item');
+        var b = $this.find('hr');
         var x = a.filter(function() {
                 return $(this).css('display') === 'none';
             });
         if (x.length === a.length || a.length === 0) {
-            b.hide();
+            $this.hide();
         }
         else {
-            b.show();
+            $this.show();
         }
     });
 

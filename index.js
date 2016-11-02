@@ -1480,9 +1480,7 @@ function topmenuUI() {
         if (!e || ($(e.target).parents('.top-menu-popup').length == 0
                 && !$(e.target).hasClass('top-menu-popup')
                 && ((c && c.indexOf('top-icon menu') == -1) || !c))) {
-            $('.top-menu-popup').addClass('hidden');
-            $('.top-icon.menu').removeClass('active');
-            $(window).unbind('resize.topmenu');
+            topMenu(1);
         }
         if (!e || ($(e.target).parents('.top-warning-popup').length == 0
                 && ((c && c.indexOf('warning-icon-area') == -1) || !c))) {
@@ -1591,9 +1589,7 @@ function topmenuUI() {
             if ($('.light-overlay').is(':visible')) {
                 loadingInitDialog.hide();
             }
-            $('.top-menu-popup').addClass('hidden');
-            $('.top-icon.menu').removeClass('active');
-            $(window).unbind('resize.topmenu');
+            topMenu(1);
             if (className.indexOf('privacycompany') > -1) {
                 document.location.hash = 'privacycompany';
             }

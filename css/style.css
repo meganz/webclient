@@ -5575,7 +5575,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     background-position: 3px 8px;
 }
 .nw-fm-left-icon.folder-link::before {
-    background-position: 3px -238px;
+    background-position: 3px -237px;
 }
 .nw-fm-left-icon.notifications::before {
     background-position: 3px -6142px;
@@ -22101,10 +22101,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     background-repeat: no-repeat;
     margin: 4px 16px 0 0px;
 }
-.pro-login.fm-dialog-button, .pro-register.fm-dialog-button, .loginrequired-dialog .fm-dialog-button.notification-button, .warning-dialog-a.login .fm-dialog-button.notification-button {
+.pro-login.default-white-button, .pro-register.default-white-button, .loginrequired-dialog .notification-button, .warning-dialog-a.login .notification-button {
     display: none;
 }
-.loginrequired-dialog .pro-login.fm-dialog-button, .loginrequired-dialog .pro-register.fm-dialog-button, .warning-dialog-a.login .pro-login.fm-dialog-button, .warning-dialog-a.login .pro-register.fm-dialog-button {
+.loginrequired-dialog .pro-login, .loginrequired-dialog .pro-register, .warning-dialog-a.login .pro-login, .warning-dialog-a.login .pro-register {
     display: block;
 }
 /* login dialog */

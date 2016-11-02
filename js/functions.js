@@ -3518,8 +3518,7 @@ mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
     }
 
     if (page === 'download') {
-        fm_tfsupdate();
-        Later(percent_megatitle);
+        delay('percent_megatitle', percent_megatitle);
     }
 };
 

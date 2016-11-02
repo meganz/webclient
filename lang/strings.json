@@ -14982,5 +14982,77 @@
     "12692": {
         "text": "View details failed",
         "context": "Title of the dialog displayed when the process\/request to get node details failed - (String as short as possible)."
+    },
+    "13679": {
+        "text": "The link can't be generated because the file is inside an incoming shared folder or your Rubbish Bin.",
+        "context": "An error message which is shown when the user tries to create a public link for a file that can not be exported."
+    },
+    "13680": {
+        "text": "Owner permissions:",
+        "context": "A label to describe the owner permissions that will be applied to new files and folders."
+    },
+    "13749": {
+        "text": "You are about to permanently remove 1 file. Would you like to proceed?",
+        "context": "A dialog message confirming if the user would like to permanently remove a file from the rubbish bin."
+    },
+    "13750": {
+        "text": "You are about to permanently remove %1 files. Would you like to proceed?",
+        "context": "A confirmation message asking the user if they are sure they want to remove the files from the rubbish bin. Please leave the %1 placeholder which will be dynamically replaced with the number of files."
+    },
+    "13751": {
+        "text": "You are about to permanently remove 1 folder. Would you like to proceed?",
+        "context": "A confirmation message for the user before they remove 1 folder from the rubbish bin."
+    },
+    "13752": {
+        "text": "You are about to permanently remove %1 folders. Would you like to proceed?",
+        "context": "A confirmation message for the user before they remove a number of folders from the rubbish bin."
+    },
+    "13753": {
+        "text": "You are about to permanently remove 1 file and 1 folder. Would you like to proceed?",
+        "context": "A confirmation message for the user before the remove a file and folder from the rubbish bin."
+    },
+    "13754": {
+        "text": "You are about to permanently remove 1 file and %1 folders. Would you like to proceed?",
+        "context": "A message for the user to confirm their decision to remove one file and a number of folders from the rubbish bin. Please keep the %1 placeholder which will be replaced dynamically."
+    },
+    "13755": {
+        "text": "You are about to permanently remove %1 files and 1 folder. Would you like to proceed?",
+        "context": "A message for the user to confirm their decision to remove %1 files and one folder from the rubbish bin. Please keep the %1 placeholder which will be replaced dynamically with the number of files."
+    },
+    "13756": {
+        "text": "You are about to permanently remove %1 files and %2 folders. Would you like to proceed?",
+        "context": "A message for the user to confirm their decision to remove a number of files and folders from the rubbish bin. Please keep the %1 and %2 placeholders which will be replaced dynamically."
+    },
+    "13757": {
+        "text": "You permanently removed 1 file.",
+        "context": "A toast notification message after successful removal of one file from the rubbish bin."
+    },
+    "13758": {
+        "text": "You permanently removed %1 files.",
+        "context": "A toast notification message after successful removal of a number of files from the rubbish bin. Please leave the %1 placeholder which will be replaced with the number of files that were removed."
+    },
+    "13759": {
+        "text": "You permanently removed 1 folder.",
+        "context": "A toast notification message after successful removal of one folder from the rubbish bin."
+    },
+    "13760": {
+        "text": "You permanently removed %1 folders.",
+        "context": "A toast notification message after successful removal of a number of folders from the rubbish bin. Please keep the %1 placeholder which will be dynamically replaced with the number of folders."
+    },
+    "13761": {
+        "text": "You permanently removed 1 file and 1 folder.",
+        "context": "A toast notification message which is shown after successful removal of one file and one folder from the rubbish bin."
+    },
+    "13762": {
+        "text": "You permanently removed 1 file and %1 folders.",
+        "context": "A toast notification message after successful removal of one file and a number of folders from the rubbish bin. Please keep the %1 placeholder which will be dynamically replaced with the number of folders."
+    },
+    "13763": {
+        "text": "You permanently removed %1 files and 1 folder.",
+        "context": "A toast notification message after successful removal of a number of files and one folder from the rubbish bin. Please keep the %1 placeholder which will be dynamically replaced with the number of files."
+    },
+    "13764": {
+        "text": "You permanently removed %1 files and %2 folders.",
+        "context": "A toast notification message after successful removal of a number of files and folders from rubbish bin. Please leave the %1 and %2 placeholders which will be replaced with the number of files and folders at runtime."
     }
 }

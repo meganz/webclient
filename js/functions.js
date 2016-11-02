@@ -1504,23 +1504,6 @@ function createTimeoutPromise(validateFunction, tick, timeout,
 }
 
 /**
- * Simple .toArray method to be used to convert `arguments` to a normal JavaScript Array
- *
- * Please note there is a huge performance degradation when using `arguments` outside their
- * owning function, to mitigate it use this function as follow: toArray.apply(null, arguments)
- *
- * @returns {Array}
- */
-function toArray() {
-    var len = arguments.length;
-    var res = Array(len);
-    while (len--) {
-        res[len] = arguments[len];
-    }
-    return res;
-}
-
-/**
  * Date.parse with progressive enhancement for ISO 8601 <https://github.com/csnover/js-iso8601>
  * (c) 2011 Colin Snover <http://zetafleet.com>
  * Released under MIT license.
@@ -3569,6 +3552,7 @@ mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
         ulmanager.isUploading = false;
         ASSERT(ulQueue._running === 0, 'ulQueue._running inconsistency on completion');
         ulQueue._pending = [];
+        ulQueue.setSize((fmconfig.ul_maxSlots | 0) || 4);
     }
     if (!dl_queue.some(isQueueActive)) {
         dl_queue = new DownloadQueue();
@@ -3590,7 +3574,9 @@ mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
         M.tfsdomqueue = {};
         GlobalProgress = {};
         delete $.transferprogress;
-        fm_tfsupdate();
+        if (page !== 'download') {
+            fm_tfsupdate();
+        }
         if ($.mTransferAnalysis) {
             clearInterval($.mTransferAnalysis);
             delete $.mTransferAnalysis;
@@ -3603,8 +3589,9 @@ mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
         dlmanager.logger.info("resetUploadDownload", ul_queue.length, dl_queue.length);
     }
 
-    fm_tfsupdate();
-    Later(percent_megatitle);
+    if (page === 'download') {
+        delay('percent_megatitle', percent_megatitle);
+    }
 };
 
 /**
@@ -4581,6 +4568,10 @@ var watchdog = Object.freeze({
                     var chatRoom = megaChat.plugins.chatdIntegration._getChatRoomFromEventData(strg.data);
                     megaChat.plugins.chatdIntegration.discardMessage(chatRoom, strg.data.messageId);
                 }
+                break;
+
+            case 'idbchange':
+                mBroadcaster.sendMessage('idbchange:' + strg.data.name, [strg.data.key, strg.data.value]);
                 break;
         }
 

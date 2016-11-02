@@ -740,7 +740,7 @@
                     var cs = M.contactstatus(aHandle);
 
                     if (cs.files === 0 && cs.folders === 0) {
-                        props.shareInfo = l[1050];
+                        props.shareInfo = l[782];// Empty Folder
                     }
                     else {
                         props.shareInfo = fm_contains(cs.files, cs.folders);

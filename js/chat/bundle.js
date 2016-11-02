@@ -137,7 +137,9 @@ React.makeElement = React['createElement'];
 	                }
 	            } else {
 	                $promise = resp[2];
-	                resp[1].show();
+	                if (resp[1]) {
+	                    resp[1].show();
+	                }
 	            }
 	        } else if (roomType === "group") {
 	            megaChat.chats[roomOrUserHash + "@conference." + megaChat.options.xmppDomain].show();
@@ -1059,6 +1061,18 @@ React.makeElement = React['createElement'];
 	                M.syncUsersFullname(contactHash);
 	            }
 	        });
+	    }
+
+	    if (!chatId && setAsActive === true) {
+
+	        if (ChatdIntegration.allChatsHadLoaded.state() === 'pending' || ChatdIntegration.mcfHasFinishedPromise.state() === 'pending') {
+	            MegaPromise.allDone([ChatdIntegration.allChatsHadLoaded, ChatdIntegration.mcfHasFinishedPromise]).always(function () {
+	                var res = self.openChat(jids, type, chatId, chatShard, chatdUrl, setAsActive);
+	                $promise.linkDoneAndFailTo(res[2]);
+	            });
+
+	            return [roomJid, undefined, $promise];
+	        }
 	    }
 
 	    var roomFullJid = roomJid + "@" + self.karere.options.mucDomain;
@@ -6784,7 +6798,7 @@ React.makeElement = React['createElement'];
 	            var contactsList = [];
 	            var contactsListOffline = [];
 
-	            var hadLoaded = ChatdIntegration.mcfHasFinishedPromise.state() === 'resolved';
+	            var hadLoaded = ChatdIntegration.allChatsHadLoaded.state() !== 'pending' && ChatdIntegration.mcfHasFinishedPromise.state() !== 'pending';
 
 	            if (hadLoaded) {
 	                self.props.contacts.forEach(function (contact) {

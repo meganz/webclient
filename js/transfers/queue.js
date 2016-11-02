@@ -72,6 +72,10 @@ inherits(MegaQueue, MegaEvents);
 
 MegaQueue.weakRef = [];
 
+MegaQueue.prototype.getSize = function() {
+    return this._limit;
+};
+
 MegaQueue.prototype.setSize = function(size) {
     this._limit = size;
     this._process();
@@ -490,7 +494,7 @@ TransferQueue.prototype.pause = function(gid) {
             $.transferprogress[gid][2] = 0; // reset speed
         }
         if (page !== 'download') {
-            Soon(percent_megatitle);
+            delay('percent_megatitle', percent_megatitle);
         }
     }
     else if (d) {

@@ -4915,6 +4915,7 @@ function accountUI() {
             });
 
             $('.grid-table.vouchers tr').remove();
+            $('.fm-account-button.reseller').removeClass('hidden');
             var html = '<tr><th>' + l[475] + '</th><th>' + l[7714] + '</th><th>' + l[477] + '</th><th>' + l[488] + '</th></tr>';
 
             $(account.vouchers).each(function(i, el) {

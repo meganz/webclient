@@ -254,7 +254,7 @@ a, a:link, a:visited, a:hover, a:active, a:focus img, a:focus img {
 .loading .top-head {
     z-index: 1101;
 }
-.top-head::after, .fm-right-header::after, .new-notification-top::after, .fm-tranfers-header::after, .grid-table-header::after, .shared-top-details::after, .transfer-table-header::after, .contact-top-details::after, .fm-account-history-head::after, .fm-account-history .grey-bar::after, .fm-account-history hr::after {
+.top-head::after, .fm-right-header::after, .new-notification-top::after, .fm-tranfers-header::after, .grid-table-header::after, .shared-top-details::after, .transfer-table-header::after, .contact-top-details::after, .fm-account-history-head::after, .fm-account-history .grey-bar::after, .fm-account-history hr::after, .fm-account-reseller hr::after {
     content: '';
     width: 100%;
     height: 1px;
@@ -1292,9 +1292,6 @@ input.radioOn, input.radioOff {
 }
 .radio-txt.big {
     font-size: 18px;
-}
-.resellers-content {
-    margin: 20px 0 0 0;
 }
 .resellers-voucher-bl {
     padding: 18px 0;
@@ -10846,7 +10843,6 @@ table {
     margin: 3px 0;
     color: #666666;
     white-space: pre-line;
-    width: 100%;
     height: 18px;
 }
 .fm-account-header.big {
@@ -10956,8 +10952,12 @@ table {
 .account.tabs-bl .default-grey-button {
     margin-top: 1px;
 }
-.fm-account-history .account.tab-content {
+.fm-account-history .account.tab-content, .fm-account-reseller .account.tab-content {
     height: 100%;
+}
+.fm-account-reseller .account.data-block.first, .fm-account-reseller .account.data-block.second {
+    background-color: #FAFAFA;
+    padding-top: 22px;
 }
 .account.tab-lnk {
     cursor: pointer;
@@ -11100,13 +11100,6 @@ table {
 }
 .colorized + .avatar-wrapper {
     border: 4px solid white;
-    padding: 0;
-}
-.fm-account-reseller hr {
-    background-color: #eeeeee;
-    height: 2px;
-    margin: 0 24px;
-    border: 0;
     padding: 0;
 }
 .fm-account-notifications {
@@ -11344,7 +11337,7 @@ table {
 .fm-account-main .grid-table tr th:first-child, .fm-account-main .grid-table tr td:first-child {
     padding-left: 36px;
 }
-.fm-account-history hr {
+.fm-account-history hr, .fm-account-reseller hr {
     height: 28px;
     margin: 0;
     padding: 0;

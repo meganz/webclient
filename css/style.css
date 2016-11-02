@@ -3790,7 +3790,7 @@ label.iPhoneCheckLabelOff span {
 .fm-left-menu.dashboard + .nw-tree-panel-header + .fm-tree-panel {
     height: 100%;
 }
-.fm-tree-panel .jspTrack {
+.fm-tree-panel .jspTrack, .top-menu-popup .jspTrack {
     -webkit-transition: all 200ms ease-in-out;
     -moz-transition: all 200ms ease-in-out;
     -o-transition: all 200ms ease-in-out;
@@ -3801,7 +3801,7 @@ label.iPhoneCheckLabelOff span {
     -khtml-opacity: 0;
     opacity: 0;
 }
-.fm-tree-panel:hover .jspTrack {
+.fm-tree-panel:hover .jspTrack, .top-menu-popup:hover .jspTrack {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
     -moz-opacity: 1;
     -khtml-opacity: 1;
@@ -4802,9 +4802,27 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     top: 12px;
     background-image: url(../images/mega/top-sprite_v1.png);
     background-position: -12px -1304px;
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
+    -moz-opacity: 0.5;
+    -khtml-opacity: 0.5;
+    opacity: 0.5;
+    -webkit-transition: opacity 200ms ease-in-out;
+    -moz-transition: opacity 200ms ease-in-out;
+    -o-transition: opacity 200ms ease-in-out;
+    -ms-transition: opacity 200ms ease-in-out;
+    transition: opacity 200ms ease-in-out;
+}
+.top-menu-item.submenu-item:hover::before {
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
+    -moz-opacity: 0.7;
+    -khtml-opacity: 0.7;
+    opacity: 0.7;
 }
 .top-menu-item.submenu-item.expanded::before {
     background-position: -12px -1314px;
+}
+.rk-saved .top-menu-item.export i {
+    display:none;
 }
 .top-head .top-icon {
     height: 35px;
@@ -7909,12 +7927,12 @@ table {
     background-color: #F6F6F6;
     margin: 12px -12px -12px -12px;
     display: none;
-    -webkit-border-bottom-left-radius: 4px;
-    -moz-border-radius-bottomleft: 4px;
-    border-bottom-left-radius: 4px;
-    -webkit-border-bottom-right-radius: 4px;
-    -moz-border-radius-bottomright: 4px;
-    border-bottom-right-radius: 4px;
+    -webkit-border-bottom-left-radius: 8px;
+    -moz-border-radius-bottomleft: 8px;
+    border-bottom-left-radius: 8px;
+    -webkit-border-bottom-right-radius: 8px;
+    -moz-border-radius-bottomright: 8px;
+    border-bottom-right-radius: 8px;
     padding-right: 12px;
 }
 .create-folder-bottom .default-white-button, .create-folder-bottom .default-grey-button, .default-dialog-bottom .default-white-button, .default-dialog-bottom .default-grey-button {
@@ -9241,12 +9259,12 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .fm-move-bottom-block, .fm-share-bottom-block, .fm-notifications-bottom {
     background-color: #F6F6F6;
     height: 56px;
-    -webkit-border-bottom-left-radius: 4px;
-    -moz-border-radius-bottomleft: 4px;
-    border-bottom-left-radius: 4px;
-    -webkit-border-bottom-right-radius: 4px;
-    -moz-border-radius-bottomright: 4px;
-    border-bottom-right-radius: 4px;
+    -webkit-border-bottom-left-radius: 8px;
+    -moz-border-radius-bottomleft: 8px;
+    border-bottom-left-radius: 8px;
+    -webkit-border-bottom-right-radius: 8px;
+    -moz-border-radius-bottomright: 8px;
+    border-bottom-right-radius: 8px;
     position: relative;
     padding: 0 12px;
 }

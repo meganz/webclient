@@ -6228,6 +6228,9 @@ function UIkeyevents() {
         else if (e.keyCode == 27 && ($.copyDialog || $.moveDialog || $.copyrightsDialog)) {
             closeDialog();
         }
+        else if (e.keyCode == 27 && $.topMenu) {
+            topMenu(1);
+        }
         else if (e.keyCode == 27 && $.dialog) {
             closeDialog();
         }

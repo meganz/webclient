@@ -92,6 +92,26 @@ function mainScroll() {
     }
 }
 
+function topMenu(close) {
+    if (close) {
+        $.topMenu = '';
+        $('.top-icon.menu').removeClass('active');
+        $('.top-menu-popup').addClass('hidden');
+        $(window).unbind('resize.topmenu');
+    }
+    else {
+        $.topMenu = 'topmenu';
+        $('.top-icon.menu').addClass('active');
+        $('.top-menu-popup').removeClass('hidden');
+        topMenuScroll();
+        $(window).rebind('resize.topmenu', function (e) {
+            if ($('.top-icon.menu').hasClass('active')) {
+                topMenuScroll();
+            }
+        });
+    }
+}
+
 function topMenuScroll() {
     $('.top-menu-scroll').jScrollPane({
         enableKeyboardNavigation: false,
@@ -209,6 +229,11 @@ function init_page() {
     }
     else {
         $('body').attr('class', '');
+    }
+
+    // Recovery key has been saved
+    if (localStorage.recoverykey && !$('body').hasClass('rk-saved')) {
+        $('body').addClass('rk-saved');
     }
 
     // Add language class to body for CSS fixes for specific language strings
@@ -1271,8 +1296,8 @@ function topmenuUI() {
     }
 
     $('.top-icon.warning').addClass('hidden');
-    $('.top-menu-item.upgrade-your-account,.top-menu-item.export').addClass('hidden');
-    $('.top-menu-item.logout, .top-menu-item.resellers').addClass('hidden');
+    $('.top-menu-item.upgrade-your-account.green,.top-menu-item.export').addClass('hidden');
+    $('.top-menu-item.logout').addClass('hidden');
     $('.top-menu-item.register,.top-menu-item.login').addClass('hidden');
     $('.top-menu-item.clouddrive,.top-menu-item.account').addClass('hidden');
     $('.top-menu-item.refresh-item, .top-menu-divider.refresh').addClass('hidden');
@@ -1299,7 +1324,6 @@ function topmenuUI() {
     $('.top-menu-item.languages .right-el').text(lang);
 
     if (u_type) {
-
         $('.top-menu-item.logout,.top-menu-item.export').removeClass('hidden');
         $('.top-menu-item.clouddrive,.top-menu-item.account').removeClass('hidden');
         $('.fm-avatar').show();
@@ -1330,7 +1354,7 @@ function topmenuUI() {
             var cssClass = (proNum == 4) ? 'lite' : 'pro' + proNum;
 
             // Show the 'Upgrade your account' button in the main menu for all
-            $('.top-menu-item.upgrade-your-account,.top-menu-item.resellers').addClass('hidden');
+            $('.top-menu-item.upgrade-your-account.green').addClass('hidden');
             $('.membership-icon-pad .membership-big-txt.plan-txt').text(purchasedPlan);
             $('.membership-icon-pad .membership-icon').attr('class', 'membership-icon pro' + u_attr.p);
             $('.membership-status-block i').attr('class', 'tiny-icon membership-status ' + cssClass);
@@ -1340,7 +1364,7 @@ function topmenuUI() {
         }
         else {
             // Show the free badge
-            $('.top-menu-item.upgrade-your-account,.top-menu-item.resellers').removeClass('hidden');
+            $('.top-menu-item.upgrade-your-account.green').removeClass('hidden');
             $('.context-menu-divider.upgrade-your-account').removeClass('pro lite');
             $('.membership-icon').attr('class','membership-icon');
             $('.top-menu-item.account .right-el').text('FREE');
@@ -1381,7 +1405,7 @@ function topmenuUI() {
             }
         }
 
-        $('.top-menu-item.upgrade-your-account,.top-menu-item.resellers').addClass('hidden');
+        $('.top-menu-item.upgrade-your-account.green').addClass('hidden');
         $('.top-menu-item.pro-item span').text(l[129]);
         $('.membership-status-block').hide();
         $('.top-icon.notification').hide();
@@ -1515,23 +1539,14 @@ function topmenuUI() {
         });
     });
 
-    $('.top-icon.menu, .top-icon.close').rebind('click', function (e) {
-        if ($('.top-icon.menu').attr('class').indexOf('active') == -1) {
-            $('.top-icon.menu').addClass('active');
-            $('.top-menu-popup').removeClass('hidden');
-            topMenuScroll();
-            $(window).rebind('resize.topmenu', function (e) {
-                if ($('.top-icon.menu').hasClass('active')) {
-                    topMenuScroll();
-                }
-            });
-        }
-        else {
-            $('.top-icon.menu').removeClass('active');
-            $('.top-menu-popup').addClass('hidden');
-            $(window).unbind('resize.topmenu');
-        }
+    $('.top-icon.menu, .top-icon.close').rebind('click', function () {
+        topMenu();
     });
+
+    $('.top-icon.close').rebind('click', function () {
+        topMenu(1);
+    });
+
     $('.activity-status-block').rebind('click.topui', function (e) {
         var $this = $(this);
         if ($this.attr('class').indexOf('active') == -1) {

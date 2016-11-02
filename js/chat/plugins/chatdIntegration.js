@@ -58,10 +58,14 @@ var ChatdIntegration = function(megaChat) {
         }
         else {
             ChatdIntegration.mcfHasFinishedPromise.done(function () {
+                var allPromises = [];
                 Object.keys(ChatdIntegration._queuedChats).forEach(function (id) {
-                    self.openChatFromApi(ChatdIntegration._queuedChats[id], true);
+                    allPromises.push(
+                        self.openChatFromApi(ChatdIntegration._queuedChats[id], true)
+                    );
                 });
                 ChatdIntegration._queuedChats = {};
+                ChatdIntegration.allChatsHadLoaded.linkDoneAndFailTo(MegaPromise.allDone(allPromises));
             });
         }
     });
@@ -116,8 +120,21 @@ var ChatdIntegration = function(megaChat) {
     return self;
 };
 
+/**
+ * Resolved/rejected when the 'mcf' response is received (either from indexedDB or api),
+ * Note: When this is resolved, chats are not yet accessible via megaChat.chats yet!
+ *
+ * @type {MegaPromise}
+ */
 ChatdIntegration.mcfHasFinishedPromise = new MegaPromise();
-ChatdIntegration.deviceId = null;
+
+/**
+ * Resolved/rejected when all chats are added to megaChat.chats, mcurls are received, etc. E.g. they are ready for
+ * renderering.
+ *
+ * @type {MegaPromise}
+ */
+ChatdIntegration.allChatsHadLoaded = new MegaPromise();
 ChatdIntegration._queuedChats = {};
 
 ChatdIntegration.prototype.retrieveChatsFromApi = function() {
@@ -126,7 +143,8 @@ ChatdIntegration.prototype.retrieveChatsFromApi = function() {
     asyncApiReq({a: "mcf", d: 1, v: Chatd.VERSION})
         .done(function(r) {
             self.logger.debug("MCF returned: ", r);
-            
+
+            var allPromises = [];
             // reopen chats from the MCF response.
             if (r.c) {
                 r.c.forEach(function (actionPacket) {
@@ -134,7 +152,9 @@ ChatdIntegration.prototype.retrieveChatsFromApi = function() {
                         // skip non active chats for now...
                         return;
                     }
-                    self.openChatFromApi(actionPacket, true);
+                    allPromises.push(
+                        self.openChatFromApi(actionPacket, true)
+                    );
                     if (typeof mSDB === 'object' && !pfkey) {
                         var roomInfo = {
                             'id': actionPacket.id,
@@ -146,15 +166,18 @@ ChatdIntegration.prototype.retrieveChatsFromApi = function() {
                         mSDB.add('mcf', roomInfo);
                     }
                 });
-                ChatdIntegration.deviceId = r.d;
 
                 ChatdIntegration.mcfHasFinishedPromise.resolve();
+                ChatdIntegration.allChatsHadLoaded.linkDoneAndFailTo(MegaPromise.allDone(allPromises));
             }
             else {
                 ChatdIntegration.mcfHasFinishedPromise.reject(r);
+                ChatdIntegration.allChatsHadLoaded.reject();
             }
         })
         .fail(function(r) {
+            ChatdIntegration.allChatsHadLoaded.reject();
+
             if (r === EEXPIRED) {
                 self.requiresUpdate();
             }
@@ -289,9 +312,10 @@ ChatdIntegration.prototype.waitForProtocolHandler = function (chatRoom, cb) {
 ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
     var self = this;
 
+    var masterPromise = new MegaPromise();
     if (isMcf === false && ChatdIntegration.mcfHasFinishedPromise.state() === 'pending') {
         // 'mcf'/'f' is still loading..ANY incoming action packets, should be rejected (and never happen...)
-        return;
+        return masterPromise.reject();
     }
     self._loadingCount++;
 
@@ -312,12 +336,12 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
 
     if (actionPacket.active === 0) {
         // skip non active chats for now...
-        return false;
+        return MegaPromise.reject();
     }
     var chatParticipants = actionPacket.u;
     if (!chatParticipants) {
         // its ok, no participants mean inactive chat, that we woudl skip...for now...
-        return false;
+        return masterPromise.reject();
     }
     var chatJids = [];
     Object.keys(chatParticipants).forEach(function(k) {
@@ -381,7 +405,7 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
             if (actionPacket.n) {
                 var foundMeLeaving = actionPacket.n.some(function(userPrivChangeEntry) {
                     if (userPrivChangeEntry.p === -1 && userPrivChangeEntry.u === u_handle) {
-                        return true;
+                        return masterPromise.reject();
                     }
                 });
 
@@ -389,7 +413,7 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
                     if (typeof mSDB === 'object') {
                         mSDB.del('mcf', actionPacket.id);
                     }
-                    return;
+                    return masterPromise.reject();
                 }
             }
 
@@ -473,6 +497,7 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
                 }
             }
         }
+        return masterPromise.resolve();
     };
 
     if (!actionPacket.url && (!chatRoom || !chatRoom.chatdUrl)) {
@@ -494,6 +519,7 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
     else {
         finishProcess();
     }
+    return masterPromise;
 
 };
 
@@ -1307,7 +1333,6 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                 assert(u_privCu25519, 'u_privCu25519 is not loaded, null or undefined!');
                 assert(u_privEd25519, 'u_privEd25519 is not loaded, null or undefined!');
                 assert(u_pubEd25519, 'u_pubEd25519 is not loaded, null or undefined!');
-                assert(ChatdIntegration.deviceId !== null, 'deviceId not loaded.');
 
                 chatRoom.protocolHandler = new strongvelope.ProtocolHandler(
                     u_handle,

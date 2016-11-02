@@ -714,19 +714,19 @@ function initUI() {
         $('.fm-start-chat-dropdown').addClass('hidden').removeClass('active');
         $('.start-chat-button').removeClass('active');
         $('.nw-tree-panel-arrows').removeClass('active');
-        $('.context-menu-item.dropdown').removeClass('active');
+        $('.dropdown-item.dropdown').removeClass('active');
         $('.fm-tree-header').removeClass('dragover');
         $('.nw-fm-tree-item').removeClass('dragover');
         $('.nw-fm-tree-item.hovered').removeClass('hovered');
 
         // Set to default
-        a = $('.context-menu.files-menu,.context-menu.download');
+        a = $('.dropdown.body.files-menu,.dropdown.body.download');
         a.addClass('hidden');
-        b = a.find('.context-submenu');
+        b = a.find('.dropdown.body.submenu');
         b.attr('style', '');
         b.removeClass('active left-position overlap-right overlap-left mega-height');
         a.find('.disabled,.context-scrolling-block').removeClass('disabled context-scrolling-block');
-        a.find('.context-menu-item.contains-submenu.opened').removeClass('opened');
+        a.find('.dropdown-item.contains-submenu.opened').removeClass('opened');
 
         // Remove all sub-menues from context-menu move-item
         $('#csb_' + M.RootID).empty();
@@ -785,7 +785,7 @@ function initUI() {
         importFile();
     }
 
-    $('.context-menu').rebind('contextmenu', function(e) {
+    $('.dropdown.body').rebind('contextmenu.dropdown', function(e) {
         if (!localStorage.contextmenu)
             e.preventDefault();
     });
@@ -914,8 +914,8 @@ function transferPanelContextMenu(target)
     var file;
     var tclear;
 
-    $('.context-menu.files-menu .context-menu-item').hide();
-    var menuitems = $('.context-menu.files-menu .context-menu-item');
+    $('.dropdown.body.files-menu .dropdown-item').hide();
+    var menuitems = $('.dropdown.body.files-menu .dropdown-item');
 
     menuitems.filter('.transfer-pause,.transfer-play,.move-up,.move-down,.transfer-clear')
         .show();
@@ -1005,16 +1005,17 @@ function transferPanelContextMenu(target)
 
     var parent = menuitems.parent();
     parent
-        .children('.context-menu-divider').hide().end()
-        .children('.pause-item-divider').show().end()
+        .children('hr').hide().end()
+        .children('hr.pause').show().end();
 
     if (parent.height() < 56) {
-        parent.find('.pause-item-divider').hide();
+        parent.find('hr.pause').hide();
     }
 }
 
 function openTransferpanel()
 {
+    $.tresizer();
     $('.nw-fm-left-icon.transfers').addClass('transfering');
     // Start the new transfer right away even if the queue is paused?
     // XXX: Remove fm_tfspause calls at M.addDownload/addUpload to enable this
@@ -2360,49 +2361,55 @@ function fmremdupes(test)
 
 function initContextUI() {
 
-    var c = '.context-menu .context-menu-item';
+    var c = '.dropdown-item';
 
-    $('.context-menu-section').off('mouseover', c);
-    $('.context-menu-section').on('mouseover', c, function() {
+    $('.dropdown-section').off('mouseover', c);
+    $('.dropdown-section').on('mouseover', c, function() {
 
         // is move... or download...
-        if ($(this).parent().parent().is('.context-submenu')) {
+        if ($(this).parent().parent().is('.dropdown.body.submenu')) {
 
             // if just item hide child context-submenu
             if (!$(this).is('.contains-submenu')) {
                 $(this).parent().children().removeClass('active opened');
-                $(this).parent().find('.context-submenu').addClass('hidden');
+                $(this).parent().find('.dropdown.body.submenu').removeClass('active');
             }
         }
 
         // Hide all submenues, for download and for move...
         else {
             if (!$(this).is('.contains-submenu')) {
-                $('.context-menu .context-submenu.active ').removeClass('active');
-                $('.context-menu .contains-submenu.opened').removeClass('opened');
-                $('.context-menu .context-submenu').addClass('hidden');
+                $('.dropdown.body.dropdown.body.submenu.active').removeClass('active');
+                $('.dropdown.body .contains-submenu.opened').removeClass('opened');
             }
         }
     });
 
-    $('.context-menu-section').off('mouseover', '.contains-submenu');
-    $('.context-menu-section').on('mouseover', '.contains-submenu', function() {
+    $('.dropdown-section').off('mouseover', '.contains-submenu');
+    $('.dropdown-section').on('mouseover', '.contains-submenu', function() {
 
-        var $this = $(this),
-            // situation when we have 2 contains-submenus in same context-submenu one near another
-            b = $this.closest('.context-submenu').find('.context-submenu,.contains-submenu').not($this.next()),
-            a = $this.next(),// context-submenu
-            pos = $this.offset(),
-            menuPos,
-            currentId;
+        var hideSubMenus = function(item) {
+            $('.dropdown.body ' + item).removeClass('opened')
+                .next().removeClass('active opened')
+                .next().find('.dropdown.body.submenu').removeClass('active');
+        };
+
+        var menuPos;
+        var currentId;
+        var $this = $(this);
+        var pos   = $this.offset();
+        var a     = $this.next();
+        var b     = $this.closest('.dropdown.body.submenu')
+                        .find('.dropdown.body.submenu,.contains-submenu')
+                        .not($this.next());
 
         a.children().removeClass('active opened');
-        a.find('.context-submenu').addClass('hidden');
+        a.find('.dropdown.body.submenu').removeClass('active');
         a.find('.opened').removeClass('opened');
 
         if (b.length) {
             b.removeClass('active opened')
-                .find('.context-submenu').addClass('hidden');
+                .find('.dropdown.body.submenu').removeClass('active');
         }
 
         currentId = $this.attr('id');
@@ -2411,22 +2418,23 @@ function initContextUI() {
         }
 
         if ($this.is('.move-item')) {
-            $('.context-menu .download-item').removeClass('opened')
-                .next().removeClass('active opened')
-                .next().find('.context-submenu').addClass('hidden');
+            hideSubMenus('.download-item');
+            hideSubMenus('.colour-label-items');
         }
         if ($this.is('.download-item')) {
-            $('.context-menu .move-item').removeClass('opened')
-                .next().removeClass('active opened')
-                .next().find('.context-submenu').addClass('hidden');
+            hideSubMenus('.move-item');
+            hideSubMenus('.colour-label-items');
+        }
+        if ($this.is('.colour-label-items')) {
+            hideSubMenus('.move-item');
+            hideSubMenus('.download-item');
         }
         if (!$this.is('.opened')) {
-            menuPos = reCalcMenuPosition($this, pos.left, pos.top, 'submenu'),
+            menuPos = reCalcMenuPosition($this, pos.left, pos.top, 'submenu');
 
-            $this.next('.context-submenu')
+            $this.next('.dropdown.body.submenu')
                 .css({'top': menuPos.top})
-                .addClass('active')
-                .removeClass('hidden');
+                .addClass('active');
 
             $this.addClass('opened');
         }
@@ -2447,11 +2455,11 @@ function initContextUI() {
         }
     });
 
-    $('.context-menu.files-menu').off('click', '.folder-item');
-    $('.context-menu.files-menu').on('click', '.folder-item', function() {
+    $('.dropdown.body.files-menu').off('click', '.folder-item');
+    $('.dropdown.body.files-menu').on('click', '.folder-item', function() {
 
-        var t = $(this).attr('id').replace('fi_', ''),
-            n = [];
+        var t = $(this).attr('id').replace('fi_', '');
+        var n = [];
         if (!$(this).is('.disabled')) {
             for (var i in $.selected) {
                 if (!isCircular($.selected[i], t)) {
@@ -2629,16 +2637,23 @@ function initContextUI() {
     });
 
     $(c + '.add-star-item').rebind('click', function() {
+        var newFavState = Number(!M.isFavourite($.selected));
 
-        var delFavourite = M.isFavourite($.selected);
-
-        M.favourite($.selected, delFavourite);
+        M.favourite($.selected, newFavState);
 
         if (M.viewmode) {
             $('.file-block').removeClass('ui-selected');
         }
         else {
             $('.grid-table.fm tr').removeClass('ui-selected');
+        }
+    });
+
+    $('.labels .dropdown-colour-item').click(function() {
+        var labelId = parseInt(this.dataset.labelId);
+
+        if (labelId && (RightsbyID($.selected[0]) > 1)) {
+            M.colourLabeling($.selected, labelId);
         }
     });
 
@@ -2661,7 +2676,7 @@ function initContextUI() {
                 fm_tfsmove(id, -1);
             });
         $('.transfer-table tr.ui-selected').removeClass('ui-selected');
-        Soon(fm_tfsupdate);
+        delay('fm_tfsupdate', fm_tfsupdate);
     });
 
     $(c + '.move-down').rebind('click', function() {
@@ -2672,7 +2687,7 @@ function initContextUI() {
                 fm_tfsmove(id, 1);
             });
         $('.transfer-table tr.ui-selected').removeClass('ui-selected');
-        Soon(fm_tfsupdate);
+        delay('fm_tfsupdate', fm_tfsupdate);
     });
 
     $(c + '.transfer-play').rebind('click', function() {
@@ -2688,10 +2703,6 @@ function initContextUI() {
     $(c + '.transfer-pause').rebind('click', function() {
         $('.transfer-table tr.ui-selected').attrs('id').map(fm_tfspause);
         $('.transfer-table tr.ui-selected').removeClass('ui-selected');
-    });
-
-    $(c + '.select-all').rebind('click', function() {
-        selectionManager.select_all();
     });
 
     $(c + '.network-diagnostic').rebind('click', function() {
@@ -3460,7 +3471,7 @@ function accountUI() {
         $.transferClose();
     }
 
-    //Destroy jScrollings in select dropdowns
+    // Destroy jScrollings in select dropdowns
     $('.fm-account-main .default-select-scroll').each(function(i, e) {
         $(e).parent().fadeOut(200).parent().removeClass('active');
         deleteScrollPanel(e, 'jsp');
@@ -5380,7 +5391,6 @@ function gridUI() {
             headerColumn = $('.grid-table-header th').get(i);
             $(headerColumn).width($(e).width());
         });
-        initTransferScroll();
     };
 
     $.detailsGridHeader = function() {
@@ -5389,7 +5399,6 @@ function gridUI() {
             headerColumn = $('.contact-details-view .grid-table-header th').get(i);
             $(headerColumn).width($(e).width());
         });
-        initTransferScroll();
     };
 
     $.contactGridHeader = function() {
@@ -5398,7 +5407,6 @@ function gridUI() {
             headerColumn = $('.files-grid-view.contacts-view .grid-table-header th').get(i);
             $(headerColumn).width($(e).width());
         });
-        initTransferScroll();
     };
 
     $.opcGridHeader = function() {
@@ -5407,7 +5415,6 @@ function gridUI() {
             headerColumn = $('.sent-requests-grid .grid-table-header th').get(i);
             $(headerColumn).width($(e).width());
         });
-        initTransferScroll();
     };
 
     $.ipcGridHeader = function() {
@@ -5416,7 +5423,6 @@ function gridUI() {
             headerColumn = $('.contact-requests-grid .grid-table-header th').get(i);
             $(headerColumn).width($(e).width());
         });
-        initTransferScroll();
     };
 
     $.sharedGridHeader = function() {
@@ -5425,7 +5431,6 @@ function gridUI() {
             headerColumn = $('.shared-grid-view .grid-table-header th').get(i);
             $(headerColumn).width($(e).width());
         });
-        initTransferScroll();
     };
 
     $('.fm-blocks-view.fm').addClass('hidden');
@@ -5494,10 +5499,22 @@ function gridUI() {
     // enable add star on first column click (make favorite)
     $('.grid-table.fm tr td:first-child').rebind('click', function() {
         var id = [$(this).parent().attr('id')];
-        M.favourite(id, $('.grid-table.fm #' + id[0] + ' .grid-status-icon').hasClass('star'));
+        var newFavState = Number(!M.isFavourite(id));
+        M.favourite(id, newFavState);
     });
 
-    $('.context-menu-item.do-sort').rebind('click', function() {
+    // enable add star on first column click (make favorite)
+    $('.grid-table.shared-with-me tr td:first-child').rebind('click', function() {
+        var id = [$(this).parent().attr('id')];
+        var newFavState = Number(!M.isFavourite(id));
+
+        // Handling favourites is allowed for full permissions shares only
+        if (RightsbyID(id) > 1) {
+            M.favourite(id, newFavState);
+        }
+    });
+
+    $('.dropdown-item.do-sort').rebind('click', function() {
         M.setLastColumn($(this).data('by'));
         M.doSort($(this).data('by'), -1);
         M.renderMain();
@@ -5506,14 +5523,40 @@ function gridUI() {
     $('.grid-table-header .arrow').rebind('click', function() {
         var c = $(this).attr('class');
         var d = 1;
-        if (c && c.indexOf('desc') > -1)
+        var pattern = '';
+
+        if (c && (c.indexOf('desc') > -1)) {
             d = -1;
+        }
 
         for (var e in M.sortRules) {
-            if (c && c.indexOf(e) > -1) {
+            if (c.indexOf(e) !== -1) {
                 M.doSort(e, d);
                 M.renderMain();
                 break;
+            }
+        }
+
+        // Stop bubbling
+        return false;
+    });
+
+    $('.grid-first-th').rebind('click', function() {
+        var c = $(this).children().first().attr('class');
+        var d = 1;
+        var pattern = '';
+
+        if (c && (c.indexOf('desc') > -1)) {
+            d = -1;
+        }
+
+        for (var e in M.sortRules) {
+            if (M.sortRules.hasOwnProperty(e)) {
+                if (c.indexOf(e) !== -1) {
+                    M.doSort(e, d);
+                    M.renderMain();
+                    break;
+                }
             }
         }
     });
@@ -6635,38 +6678,39 @@ function iconUI(aQuiet)
 
 function transferPanelUI()
 {
-    $.transferHeader = function()
+    $.transferHeader = function(tfse)
     {
-        var tt = $('.transfer-scrolling-table'),
-              tth = $('.transfer-table-header');
+        tfse                  = tfse || M.getTransferElements();
+        var domTableEmptyTxt  = tfse.domTableEmptyTxt;
+        var domTableHeader    = tfse.domTableHeader;
+        var domScrollingTable = tfse.domScrollingTable;
+        var domTable          = tfse.domTable;
+        tfse                  = undefined;
 
         // Show/Hide header if there is no items in transfer list
-        if (!$('.transfer-table tr').length)
-        {
-            $('.transfer-panel-empty-txt').removeClass('hidden');
-            tt.hide(0);
-            tth.hide(0);
+        if (domTable.querySelector('tr')) {
+            domTableEmptyTxt.classList.add('hidden');
+            domScrollingTable.style.display = '';
+            domTableHeader.style.display    = '';
         }
-        else
-        {
-            $('.transfer-panel-empty-txt').addClass('hidden');
-            tt.show(0);
-            tth.show(0);
+        else {
+            domTableEmptyTxt.classList.remove('hidden');
+            domScrollingTable.style.display = 'none';
+            domTableHeader.style.display    = 'none';
         }
 
-        $('.transfer-scrolling-table').rebind('click contextmenu', function(e)
-        {
+        $(domScrollingTable).rebind('click.tst contextmenu.tst', function(e) {
             if (!$(e.target).closest('.transfer-table').length) {
-                $('.transfer-table tr').removeClass('ui-selected');
+                $('.ui-selected', domTable).removeClass('ui-selected');
             }
         });
 
-        var $ttw = $('.transfer-table-wrapper .grid-url-arrow, .transfer-table-wrapper .clear-transfer-icon');
-        $ttw.rebind('click', function(e) {
+        var $tmp = $('.grid-url-arrow, .clear-transfer-icon', domTable);
+        $tmp.rebind('click', function(e) {
             var target = $(this).closest('tr');
             e.preventDefault();
             e.stopPropagation(); // do not treat it as a regular click on the file
-            $('.transfer-table-wrapper tr').removeClass('ui-selected');
+            $('tr', domTable).removeClass('ui-selected');
 
             if ($(this).hasClass('grid-url-arrow')) {
                 target.addClass('ui-selected');
@@ -6687,10 +6731,12 @@ function transferPanelUI()
                     $.tresizer();
                 });
             }
-        });
-        $ttw = undefined;
 
-        $('.transfer-table tr').rebind('dblclick', function(e) {
+            return false;
+        });
+
+        $tmp = $('tr', domTable);
+        $tmp.rebind('dblclick', function(e) {
             if ($(this).hasClass('transfer-completed')) {
                 var id = String($(this).attr('id'));
                 if (id[0] === 'd') {
@@ -6709,30 +6755,25 @@ function transferPanelUI()
                     reselect(1);
                 }
             }
+            return false;
         });
 
-        $('.transfer-table tr').rebind('click contextmenu', function(e)
+        $tmp.rebind('click contextmenu', function(e)
         {
-            $('.ui-selected').filter(function() {
-                return $(this).parent('.transfer-table').length;
-            }).removeClass('ui-selected');
-
             if (e.type == 'contextmenu')
             {
-                var c = $(this).attr('class');
-                if (!c || (c && c.indexOf('ui-selected') == -1))
-                    $('.transfer-table tr').removeClass('ui-selected');
+                $('.ui-selected', domTable).removeClass('ui-selected');
                 $(this).addClass('ui-selected dragover');
                 transferPanelContextMenu(null);
                 return !!contextMenuUI(e);
             }
             else
             {
-                var s = $('.transfer-table tr');
-                if (e.shiftKey && s.length > 0)
+                var domNode = domTable.querySelector('tr');
+                if (e.shiftKey && domNode)
                 {
-                    var start = s[0];
-                    var end = this;
+                    var start = domNode;
+                    var end   = this;
                     if ($.TgridLastSelected && $($.TgridLastSelected).hasClass('ui-selected')) {
                         start = $.TgridLastSelected;
                     }
@@ -6740,7 +6781,7 @@ function transferPanelUI()
                         end = start;
                         start = this;
                     }
-                    $('.transfer-table tr').removeClass('ui-selected');
+                    $('.ui-selected', domTable).removeClass('ui-selected');
                     $([start, end]).addClass('ui-selected');
                     $(start).nextUntil($(end)).each(function(i, e) {
                         $(e).addClass('ui-selected');
@@ -6748,7 +6789,7 @@ function transferPanelUI()
                 }
                 else if (!e.ctrlKey && !e.metaKey)
                 {
-                    $('.transfer-table tr').removeClass('ui-selected');
+                    $('.ui-selected', domTable).removeClass('ui-selected');
                     $(this).addClass('ui-selected');
                     $.TgridLastSelected = this;
                 }
@@ -6763,27 +6804,37 @@ function transferPanelUI()
                     }
                 }
             }
+
+            return false;
         });
-        initTransferScroll();
+        $tmp = undefined;
+
+        // initTransferScroll(domScrollingTable);
+        delay('tfs-ps-update', Ps.update.bind(Ps, domScrollingTable));
     };
 
     $.transferClose = function() {
         $('.nw-fm-left-icon.transfers').removeClass('active');
-        $('.fmholder').removeClass('transfer-panel-opened');
+        $('#fmholder').removeClass('transfer-panel-opened');
     };
 
     $.transferOpen = function(force) {
         if (force || !$('.nw-fm-left-icon.transfers').hasClass('active')) {
             $('.nw-fm-left-icon').removeClass('active');
             $('.nw-fm-left-icon.transfers').addClass('active');
-            notificationsUI(1);
             $('#fmholder').addClass('transfer-panel-opened');
+            notificationsUI(1);
+            var domScrollingTable = M.getTransferElements().domScrollingTable;
+            if (!domScrollingTable.classList.contains('ps-container')) {
+                Ps.initialize(domScrollingTable, {suppressScrollX: true});
+            }
             fm_tfsupdate(); // this will call $.transferHeader();
         }
     };
 
     $.clearTransferPanel = function() {
-        if ($('.transfer-table tr').length === 0) {
+        var obj = M.getTransferElements();
+        if (!obj.domTable.querySelector('tr')) {
             $('.transfer-clear-all-icon').addClass('disabled');
             $('.transfer-pause-icon').addClass('disabled');
             $('.transfer-clear-completed').addClass('disabled');
@@ -6917,17 +6968,20 @@ function menuItems() {
         items['.rename-item'] = 1;
     }
 
-    if (RightsbyID($.selected[0]) > 0) {
+    if (((Object.keys($.selected)).length < 2)
+            && (RightsbyID($.selected[0]) > 1)) {
 
         items['.add-star-item'] = 1;
 
         if (M.isFavourite($.selected)) {
-            $('.add-star-item').safeHTML('<span class="context-menu-icon"></span>@@', l[5872]);
+            $('.add-star-item').safeHTML('<i class="small-icon context broken-heart"></i>@@', l[5872]);
         }
         else {
-            $('.add-star-item').safeHTML('<span class="context-menu-icon"/></span>@@', l[5871]);
-
+            $('.add-star-item').safeHTML('<i class="small-icon context heart"/></i>@@', l[5871]);
         }
+
+        items['.colour-label-items'] = 1;
+        M.colourLabelcmUpdate(M.d[$.selected[0]]);
     }
 
     selItem = M.d[$.selected[0]];
@@ -6975,12 +7029,13 @@ function menuItems() {
         exportLink = new mega.Share.ExportLink();
         isTakenDown = exportLink.isTakenDown($.selected);
 
-        // If any of selected items is taken donw remove actions from context menu
+        // If any of selected items is taken down remove actions from context menu
         if (isTakenDown) {
             delete items['.getlink-item'];
             delete items['.removelink-item'];
             delete items['.sh4r1ng-item'];
             delete items['.add-star-item'];
+            delete items['.colour-label-items'];
         }
     }
 
@@ -6997,6 +7052,7 @@ function menuItems() {
     if (folderlink) {
         delete items['.copy-item'];
         delete items['.add-star-item'];
+        delete items['.colour-label-items'];
         if (u_type) {
             items['.import-item'] = 1;
         }
@@ -7010,10 +7066,10 @@ function contextMenuUI(e, ll) {
     var v;
     var flt;
     var items = {};
-    var m = $('.context-menu.files-menu');
+    var m = $('.dropdown.body.files-menu');
 
-    // Selection of first child level ONLY of .context-menu-item in .context-menu
-    var menuCMI = '.context-menu.files-menu .context-menu-section > .context-menu-item';
+    // Selection of first child level ONLY of .dropdown-item in .dropdown.body
+    var menuCMI = '.dropdown.body.files-menu .dropdown-section > .dropdown-item';
     var currNodeClass = $(e.currentTarget).attr('class');
     var id = $(e.currentTarget).attr('id');
 
@@ -7029,7 +7085,7 @@ function contextMenuUI(e, ll) {
 
         // Enable upload item menu for clould-drive, don't show it for rubbish and rest of crew
         if (RightsbyID(M.currentdirid) && (M.currentrootid !== M.RubbishID)) {
-            $(menuCMI).filter('.context-menu-item').hide();
+            $(menuCMI).filter('.dropdown-item').hide();
             $(menuCMI).filter('.fileupload-item,.newfolder-item').show();
 
             if ((is_chrome_firefox & 2) || 'webkitdirectory' in document.createElement('input')) {
@@ -7042,8 +7098,8 @@ function contextMenuUI(e, ll) {
     }
     else if (ll === 3) {// we want just the download menu
         $(menuCMI).hide();
-        m = $('.context-menu.download');
-        menuCMI = '.context-menu.download .context-menu-item';
+        m = $('.dropdown.body.download');
+        menuCMI = '.dropdown.body.download .dropdown-item';
     }
     else if (ll === 4 || ll === 5) {// contactUI
         $(menuCMI).hide();
@@ -7063,8 +7119,8 @@ function contextMenuUI(e, ll) {
         }
     }
     else if (ll === 6) { // sort menu
-        $('.context-menu-item').hide();
-        $('.context-menu-item.do-sort').show();
+        $('.dropdown-item').hide();
+        $('.dropdown-item.do-sort').show();
     }
     else if (ll) {// Click on item
 
@@ -7108,8 +7164,6 @@ function contextMenuUI(e, ll) {
                 $(menuCMI).filter('.startvideo-item').addClass('disabled');
             }
 
-            // Remove select-all item from context menu
-            $(m).find('.select-all').remove();
         }
         else if (currNodeClass && (currNodeClass.indexOf('cloud-drive') > -1
                     || currNodeClass.indexOf('folder-link') > -1)) {
@@ -7161,6 +7215,7 @@ function contextMenuUI(e, ll) {
                 $(menuCMI).filter('.rename-item').hide();
                 $(menuCMI).filter('.copy-item').hide();
                 $(menuCMI).filter('.getlink-item').hide();
+                $(menuCMI).filter('.colour-label-items').hide();
             }
             else if (M.getNodeShare(id).down === 1) {
                 $(menuCMI).filter('.copy-item').hide();
@@ -7174,13 +7229,13 @@ function contextMenuUI(e, ll) {
         }
     }
     // This part of code is also executed when ll == 'undefined'
-    v = m.children($('.context-menu-section'));
+    v = m.children($('.dropdown-section'));
 
-    // count all items inside section, and hide dividers if necessary
+    // Count all items inside section, and hide dividers if necessary
     v.each(function() {
-        var a = $(this).find('a.context-menu-item'),
-            b = $(this).find('.context-menu-divider'),
-            x = a.filter(function() {
+        var a = $(this).find('a.dropdown-item');
+        var b = $(this).find('hr');
+        var x = a.filter(function() {
                 return $(this).css('display') === 'none';
             });
         if (x.length === a.length || a.length === 0) {
@@ -7235,7 +7290,7 @@ function setContextMenuGetLinkText() {
     var removeLinkText = (numOfExistingPublicLinks > 1) ? l[8735] : l[6821];
 
     // Set the text for the 'Get/Update link/s' and 'Remove link/s' context menu items
-    var $contextMenu = $('.context-menu');
+    var $contextMenu = $('.dropdown.body');
     $contextMenu.find('.getlink-menu-text').text(getLinkText);
     $contextMenu.find('.removelink-menu-text').text(removeLinkText);
 }
@@ -7306,7 +7361,7 @@ function reCalcMenuPosition(m, x, y, ico)
     var wMax = x + cmW;// coordinate of right edge
     var hMax = y + cmH;// coordinate of bottom edge
 
-    this.overlapParentMenu = function()
+    var overlapParentMenu = function(n)
     {
         var tre = wW - wMax;// to right edge
         var tle = x - minX - SIDE_MARGIN;// to left edge
@@ -7327,7 +7382,7 @@ function reCalcMenuPosition(m, x, y, ico)
 
     // submenus are absolutely positioned, which means that they are relative to first parent, positioned other then static
     // first parent, which is NOT a .contains-submenu element (it's previous in same level)
-    this.horPos = function()// used for submenues
+    var horPos = function(n)// used for submenues
     {
         var top;
         var nTop = parseInt(n.css('padding-top'));
@@ -7335,7 +7390,7 @@ function reCalcMenuPosition(m, x, y, ico)
         var pPos = m.position();
 
         var b = y + nmH - (nTop - tB);// bottom of submenu
-        var mP = m.closest('.context-submenu');
+        var mP = m.closest('.dropdown.body.submenu');
         var pT = 0, bT = 0, pE = 0;
         if (mP.length)
         {
@@ -7370,7 +7425,7 @@ function reCalcMenuPosition(m, x, y, ico)
     }
     else if (ico === 'submenu')// submenues
     {
-        var n = m.next('.context-submenu');
+        var n = m.next('.dropdown.body.submenu');
         var nmW = n.outerWidth();// margin not calculated
         var nmH = n.outerHeight();// margins not calculated
 
@@ -7387,7 +7442,7 @@ function reCalcMenuPosition(m, x, y, ico)
 
         var top = 'auto', left = '100%', right = 'auto';
 
-        top = this.horPos();
+        top = horPos(n);
         if (m.parent().parent('.left-position').length === 0)
         {
             if (maxX >= (wMax + nmW))
@@ -7396,7 +7451,7 @@ function reCalcMenuPosition(m, x, y, ico)
                 n.addClass('left-position');
             else
             {
-                this.overlapParentMenu();
+                overlapParentMenu(n);
 
                 return true;
             }
@@ -7409,7 +7464,7 @@ function reCalcMenuPosition(m, x, y, ico)
                 left = 'auto', right = '100%';
             else
             {
-                this.overlapParentMenu();
+                overlapParentMenu(n);
 
                 return true;
             }
@@ -7477,7 +7532,7 @@ function setBordersRadius(m, c)
 function scrollMegaSubMenu(e)
 {
     var ey = e.pageY;
-    var c = $(e.target).closest('.context-submenu');
+    var c = $(e.target).closest('.dropdown.body.submenu');
     var pNode = c.children(':first')[0];
 
     if (typeof pNode !== 'undefined')
@@ -8722,7 +8777,8 @@ function handleShareDialogContent() {
  *
  * Extract id from list of emails, preparing it for extrusion,
  * fill multi-input dropdown list with not used emails.
- * @param {String} dialog, multi-input dialog class name.
+ *
+ * @param {String} dialog multi-input dialog class name.
  */
 function updateDialogDropDownList(dialog) {
 
@@ -10786,7 +10842,7 @@ function propertiesDialog(close) {
             $(this).addClass('active');
             $('.fm-dialog').addClass('arrange-to-front');
             $('.properties-dialog').addClass('arrange-to-back');
-            $('.context-menu').addClass('arrange-to-front');
+            $('.dropdown.body').addClass('arrange-to-front');
             e.currentTarget = $('#' + n.h)
             e.calculatePosition = true;
             $.selected = [n.h];
@@ -10803,7 +10859,7 @@ function propertiesDialog(close) {
     $(document).bind('MegaCloseDialog.Properties', __fsi_close);
     function __fsi_close() {
         pd.find('.file-settings-icon').removeClass('active');
-        $('.context-menu').removeClass('arrange-to-front');
+        $('.dropdown.body').removeClass('arrange-to-front');
         $('.properties-dialog').removeClass('arrange-to-back');
         $('.fm-dialog').removeClass('arrange-to-front');
         $.hideContextMenu();
@@ -12001,7 +12057,7 @@ function fm_importflnodes(nodes)
                     $.mcImport = true;
 
                     // XXX: ...
-                    $('.context-menu-item.copy-item').click();
+                    $('.dropdown-item.copy-item').click();
                 }
             }));
         }).fail(function(aError) {
@@ -12053,27 +12109,30 @@ function fm_resize_handler() {
         console.time('fm_resize_handler');
     }
 
-    mega.utils.chrome110ZoomLevelNotification();
+    if (window.chrome) {
+        // XXX: Seems this 110% zoom bug got fixed as of Chrome 54?
+        mega.utils.chrome110ZoomLevelNotification();
+    }
 
-    // left panel resize logic
-    /*
-    var right_panel_margin = $('.fm-left-panel').outerWidth();
-     var resize_handle_width = $('.left-pane-drag-handle').outerWidth();
-     $('.fm-main.default > div:not(.fm-left-panel)').each(function() {
+    if (ulmanager.isUploading || dlmanager.isDownloading) {
+        var tfse = M.getTransferElements();
 
-     $(this).css({
-     'margin-left':  right_panel_margin
-     });
-     });
-     */
+        tfse.domScrollingTable.style.height = (
+                $(tfse.domTransfersBlock).outerHeight() -
+                $(tfse.domTableHeader).outerHeight() -
+                $(tfse.domTransferHeader).outerHeight()
+            ) + "px";
+    }
 
-    $('.files-grid-view .grid-scrolling-table, .file-block-scrolling,' +
-        ' .contacts-grid-view .contacts-grid-scrolling-table')
-        .css({
-            'width': $(document.body).outerWidth() - $('.fm-left-panel').outerWidth()
-        });
+    if (M.currentdirid !== 'transfers') {
+        $('.files-grid-view .grid-scrolling-table, .file-block-scrolling,' +
+            ' .contacts-grid-view .contacts-grid-scrolling-table')
+            .css({
+                'width': $(document.body).outerWidth() - $('.fm-left-panel').outerWidth()
+            });
 
-    initTreeScroll();
+        initTreeScroll();
+    }
 
     if (M.currentdirid === 'contacts') {
         if (M.viewmode) {
@@ -12144,17 +12203,30 @@ function fm_resize_handler() {
         }
     }
 
-    if (slideshowid && previews[slideshowid]) {
-        previewsrc(previews[slideshowid].src);
+    if (M.currentdirid !== 'transfers') {
+        if (slideshowid && previews[slideshowid]) {
+            previewsrc(previews[slideshowid].src);
+        }
+
+        if (megaChatIsReady && megaChat.resized) {
+            megaChat.resized();
+        }
+
+        $('.fm-right-files-block, .fm-right-account-block, .fm-right-block.dashboard').css({
+            'margin-left': ($('.fm-left-panel:visible').width() + $('.nw-fm-left-icons-panel').width()) + "px"
+        });
     }
 
-    if (megaChatIsReady && megaChat.resized) {
-        megaChat.resized();
-    }
+    if (M.currentrootid === 'shares') {
+        var shared_block_height = $('.shared-details-block').height() - $('.shared-top-details').height();
 
-    $('.fm-right-files-block, .fm-right-account-block, .fm-right-block.dashboard').css({
-        'margin-left': ($('.fm-left-panel:visible').width() + $('.nw-fm-left-icons-panel').width()) + "px"
-    });
+        if (shared_block_height > 0) {
+            $('.shared-details-block .files-grid-view, .shared-details-block .fm-blocks-view').css({
+                'height': shared_block_height + "px",
+                'min-height': shared_block_height + "px"
+            });
+        }
+    }
 
     if (d) {
         console.timeEnd('fm_resize_handler');
@@ -12450,7 +12522,7 @@ function contactUI() {
             e.preventDefault();
             e.stopPropagation(); // do not treat it as a regular click on the file
             // $(this).addClass('active');
-            $('.context-menu').addClass('arrange-to-front');
+            $('.dropdown.body').addClass('arrange-to-front');
             e.currentTarget = $(this);
             e.calculatePosition = true;
             $.selected = [location.hash.replace('#fm/', '')];
@@ -12660,13 +12732,10 @@ function FMResizablePane(element, opts) {
 }
 
 /**
- * bindDropdownEvents
+ * bindDropdownEvents Bind custom select event
  *
- * Bind Custom select event
- *
- * @param {Selector} dropdowns, elements selector.
- * @param {String} addition option for account page only. Allows to show "Show changes" notification
- *
+ * @param {Selector} $dropdown  Class .dropdown elements selector
+ * @param {String}   saveOption Addition option for account page only. Allows to show "Show changes" notification
  */
 function bindDropdownEvents($dropdown, saveOption) {
 
@@ -12681,7 +12750,7 @@ function bindDropdownEvents($dropdown, saveOption) {
                 $dropdown = $this.find('.default-select-dropdown'),
                 $activeDropdownItem = $this.find('.default-dropdown-item.active');
 
-            //Show Select dropdown
+            //Show select dropdown
             $('.active .default-select-dropdown').fadeOut(200);
             $this.addClass('active');
             $dropdown.css('margin-top', '0px');

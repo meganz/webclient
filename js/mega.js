@@ -527,7 +527,7 @@ function MegaData()
 
         if ($('.do-sort[data-by="' + col + '"]').length > 0) {
             // swap the column label
-            $('.context-menu-item.do-sort').removeClass('selected');
+            $('.dropdown-item.do-sort').removeClass('selected');
             $('.grid-url-header').prev().find('div')
                 .removeClass().addClass('arrow ' + col)
                 .text($('.do-sort[data-by="' + col + '"]').text());
@@ -1634,10 +1634,10 @@ function MegaData()
                 if (!$this.is(".active")) {
                     $('.start-chat-button').removeClass('active');
 
-                    $('.context-menu-item', m).removeClass("disabled");
+                    $('.dropdown-item', m).removeClass("disabled");
 
                     if ($userDiv.is(".offline")) {
-                        $('.context-menu-item.startaudio-item, .context-menu-item.startvideo-item', m)
+                        $('.dropdown-item.startaudio-item, .dropdown-item.startvideo-item', m)
                             .addClass("disabled");
                     }
 
@@ -1662,7 +1662,7 @@ function MegaData()
                 return false; // stop propagation!
             });
 
-            $('.fm-start-chat-dropdown .context-menu-item.startchat-item').rebind('click.treePanel', function() {
+            $('.fm-start-chat-dropdown .dropdown-item.startchat-item').rebind('click.treePanel', function() {
                 var $this = $(this);
 
                 if (!$this.is(".disabled")) {
@@ -1671,7 +1671,7 @@ function MegaData()
                 }
             });
 
-            $('.fm-start-chat-dropdown .context-menu-item.startaudio-item').rebind('click.treePanel', function() {
+            $('.fm-start-chat-dropdown .dropdown-item.startaudio-item').rebind('click.treePanel', function() {
                 var $this = $(this);
                 var $triggeredBy = $this.parent().data("triggeredBy");
                 var $userDiv = $triggeredBy.parent().parent();
@@ -1687,7 +1687,7 @@ function MegaData()
                 }
             });
 
-            $('.fm-start-chat-dropdown .context-menu-item.startvideo-item').rebind('click.treePanel', function() {
+            $('.fm-start-chat-dropdown .dropdown-item.startvideo-item').rebind('click.treePanel', function() {
                 var $this = $(this);
                 var $triggeredBy = $this.parent().data("triggeredBy");
                 var $userDiv = $triggeredBy.parent().parent();
@@ -1995,9 +1995,14 @@ function MegaData()
 
                     if (fminitialized) {
                         var nodeHandle = curItemHandle;
+                        var currNode = M.d[nodeHandle];
 
-                        if ((M.d[nodeHandle] && M.d[nodeHandle].shares) || M.ps[nodeHandle]) {
+                        if ((currNode && currNode.shares) || M.ps[nodeHandle]) {
                             sharedUInode(nodeHandle);
+                        }
+
+                        if (currNode && currNode.lbl) {
+                            M.colourLabelDomUpdate(nodeHandle, currNode.lbl);
                         }
                     }
                 }
@@ -2007,7 +2012,6 @@ function MegaData()
 
     this.buildtree.FORCE_REBUILD = 34675890009;
 
-    var icon = '<span class="context-menu-icon"></span>';
     var arrow = '<span class="context-top-arrow"></span><span class="context-bottom-arrow"></span>';
 
     this.buildRootSubMenu = function() {
@@ -2019,27 +2023,21 @@ function MegaData()
         for (var h in M.c[M.RootID]) {
             if (M.d[h] && M.d[h].t) {
                 cs = ' contains-submenu';
-                sm = '<span class="context-submenu" id="sm_' + this.RootID + '"><span id="csb_' + this.RootID + '"></span>' + arrow + '</span>';
+                sm = '<span class="dropdown body submenu" id="sm_' + this.RootID + '">'
+                    + '<span id="csb_' + this.RootID + '"></span>' + arrow + '</span>';
                 break;
             }
         }
 
-        html = '<span class="context-submenu" id="sm_move"><span id="csb_move">';
-        html += '<span class="context-menu-item cloud-item' + cs + '" id="fi_' + this.RootID + '">';
-        html +=     icon + l[1687];
-        html += '</span>' + sm;
-        html += '<span class="context-menu-item remove-item" id="fi_' + this.RubbishID + '">';
-        html +=     icon + l[5738];
-        html += '</span>';
-        html += '<span class="context-menu-divider"></span>'
-              + '<span class="context-menu-item advanced-item">'
-              +     '<span class="context-menu-icon"></span>'
-              +     l[9108]
-              + '</span>';
-        html += arrow;
-        html += '</span></span>';
+        html = '<span class="dropdown body submenu" id="sm_move"><span id="csb_move">'
+            + '<span class="dropdown-item cloud-item' + cs + '" id="fi_' + this.RootID + '">'
+            + '<i class="small-icon context cloud"></i>' + l[164] + '</span>' + sm
+            + '<span class="dropdown-item remove-item" id="fi_' + this.RubbishID + '">'
+            + '<i class="small-icon context remove-to-bin"></i>' + l[168] + '</span>'
+            + '<hr /><span class="dropdown-item advanced-item"><i class="small-icon context aim"></i>'
+            + l[9108] + '</span>' + arrow + '</span></span>';
 
-        $('.context-menu-item.move-item').after(html);
+        $('.dropdown-item.move-item').after(html);
     };
 
     /*
@@ -2061,7 +2059,7 @@ function MegaData()
         }
 
         // Check existance of sub-menu
-        if ($('#csb_' + id + ' > .context-menu-item').length !== folders.length)  {
+        if ($('#csb_' + id + ' > .dropdown-item').length !== folders.length)  {
             // localeCompare is not supported in IE10, >=IE11 only
             // sort by name is default in the tree
             folders.sort(function(a, b) {
@@ -2080,7 +2078,8 @@ function MegaData()
                     if (M.d[h] && M.d[h].t) {
                         sub = true;
                         cs = ' contains-submenu';
-                        sm = '<span class="context-submenu" id="sm_' + fid + '"><span id="csb_' + fid + '"></span>' + arrow + '</span>';
+                        sm = '<span class="dropdown body submenu" id="sm_' + fid + '">'
+                            + '<span id="csb_' + fid + '"></span>' + arrow + '</span>';
                         break;
                     }
                 }
@@ -2097,7 +2096,9 @@ function MegaData()
                     nodeName = this.d[fid].name;
                 }
 
-                html = '<span class="context-menu-item ' + sharedFolder + cs + '" id="fi_' + fid + '">' + icon + htmlentities(nodeName) + '</span>' + sm;
+                html = '<span class="dropdown-item ' + sharedFolder + cs + '" id="fi_' + fid + '">'
+                    + '<i class="small-icon context ' + sharedFolder + '"></i>'
+                    + htmlentities(nodeName) + '</span>' + sm;
 
                 $('#csb_' + id).append(html);
             }
@@ -2632,7 +2633,7 @@ function MegaData()
 //                if (opc[i].rts + TIME_FRAME <= Math.floor(new Date().getTime() / 1000)) {
                 return 0;
 //                }
-                return -12;
+                // return -12;
             }
         }
 
@@ -3598,47 +3599,132 @@ function MegaData()
         this.onRenameUIUpdate(itemHandle, newItemName);
     };
 
+
+    /* Colour Label context menu update
+    *
+    * @param {String} node Selected Node
+    */
+    this.colourLabelcmUpdate = function(node) {
+
+        var $items = $('.files-menu .dropdown-colour-item');
+        var value;
+
+        value = node.lbl;
+
+        // Reset label submenu
+        $items.removeClass('active');
+
+        // Add active state label`
+        if (value) {
+            $items.filter('[data-label-id=' + value + ']').addClass('active');
+        }
+    };
+
+    this.getColourClassFromId = function(id) {
+
+        return ({
+                '1': 'red', '2': 'orange', '3': 'yellow',
+                '4': 'green', '5': 'blue', '6': 'purple', '7': 'grey'
+            })[id] || '';
+    };
+
+    /**
+     * colourLabelDomUpdate
+     *
+     * @param {String} handle
+     * @param {Number} value Current labelId
+     */
+    this.colourLabelDomUpdate = function(handle, value) {
+
+        if (fminitialized) {
+            var labelId       = parseInt(value);
+            var removeClasses = 'colour-label red orange yellow blue green grey purple';
+
+            // Remove all colour label classes
+            $('#' + handle).removeClass(removeClasses);
+            $('#' + handle + ' a').removeClass(removeClasses);
+
+            if (labelId) {
+                // Add colour label classes.
+                var colourClass = 'colour-label ' + M.getColourClassFromId(labelId);
+
+                $('#' + handle).addClass(colourClass);
+                $('#' + handle + ' a').addClass(colourClass);
+            }
+        }
+    };
+
+    /*
+    * colourLabeling Handles colour labeling of nodes updates DOM and API
+    *
+    * @param {Array | string} handles Selected nodes handles
+    * @param {Integer} labelId Numeric value of label
+    */
+    this.colourLabeling = function(handles, labelId) {
+
+        var newLabelState = 0;
+
+        if (fminitialized && handles) {
+            if (!Array.isArray(handles)) {
+                handles = [handles];
+            }
+
+            $.each(handles, function(index, handle) {
+
+                var node = M.d[handle];
+                newLabelState = labelId;
+
+                if (node.lbl === labelId) {
+                    newLabelState = 0;
+                }
+
+                api_setattr(handle, { lbl: newLabelState });
+                M.colourLabelDomUpdate(handle, newLabelState);
+            });
+        }
+    };
+
+    /**
+    * favouriteDomUpdate
+    *
+    * @param {Object} node      Node object
+    * @param {Number} favState  Favourites state 0 or 1
+     */
+    this.favouriteDomUpdate = function(node, favState) {
+        var $gridView  = $('#' + node.h + ' .grid-status-icon');
+        var $blockView = $('#' + node.h + '.file-block .file-status-icon');
+
+        if (favState) {// Add favourite
+            $gridView.addClass('star');
+            $blockView.addClass('star');
+        }
+        else {// Remove from favourites
+            $gridView.removeClass('star');
+            $blockView.removeClass('star');
+        }
+    };
+
     /**
      * Change node favourite state.
-     * @param {Array}   handles  An array containing node handles
-     * @param {Boolean} del      User action i.e. true - delete from favorites, false - add to favorite
+     * @param {Array}   handles     An array containing node handles
+     * @param {Number}  newFavState Favourites state 0 or 1
      */
-    this.favourite = function(handles, del) {
-
-        var toRenderMain = false;
-        var newFavStarState = (del) ? 0 : 1;
+    this.favourite = function(handles, newFavState) {
         var exportLink = new mega.Share.ExportLink({});
 
-        if (!Array.isArray(handles)) {
-            handles = [handles];
-        }
-
-        $.each(handles, function(index, handle) {
-            var node = M.d[handle];
-            if (node && (node.fav !== newFavStarState)
-                    && !exportLink.isTakenDown(handle)) {
-
-                api_setattr(handle, {fav: newFavStarState});
-
-                // Add favourite
-                if (!del) {
-                    $('.grid-table.fm #' + node.h + ' .grid-status-icon').addClass('star');
-                    $('#' + node.h + '.file-block .file-status-icon').addClass('star');
-                }
-
-                // Remove from favourites
-                else {
-                    $('.grid-table.fm #' + node.h + ' .grid-status-icon').removeClass('star');
-                    $('#' + node.h + '.file-block .file-status-icon').removeClass('star');
-                }
-
-                toRenderMain = true;
+        if (fminitialized) {
+            if (!Array.isArray(handles)) {
+                handles = [handles];
             }
-        });
 
-        if (toRenderMain && M.sortmode && (M.sortmode.n === 'fav')) {
-            M.doSort('fav', M.sortmode.d);
-            M.renderMain();
+            $.each(handles, function(index, handle) {
+                var node = M.d[handle];
+
+                if (node && !exportLink.isTakenDown(handle)) {
+                    api_setattr(handle, { fav: newFavState });
+                    M.favouriteDomUpdate(node, newFavState);
+                }
+            });
         }
     };
 
@@ -3651,8 +3737,8 @@ function MegaData()
      */
     this.isFavourite = function(nodesId) {
 
-        var result = false,
-            nodes = nodesId;
+        var result = false;
+        var nodes = nodesId;
 
         if (!Array.isArray(nodesId)) {
             nodes = [nodesId];
@@ -3662,7 +3748,7 @@ function MegaData()
         $.each(nodes, function(index, value) {
             if (M.d[value] && M.d[value].fav) {
                 result = true;
-                return false;// Break each loop
+                return false;// Break the loop
             }
         });
 
@@ -4559,7 +4645,7 @@ function MegaData()
         if (!$.transferHeader) {
             transferPanelUI();
         }
-        $.transferHeader();
+        delay('fm_tfsupdate', fm_tfsupdate); // this will call $.transferHeader();
 
         if (!isZIP || zipSize) {
             M.addDownloadToast = ['d', isZIP ? 1 : added, isPaused];
@@ -4568,7 +4654,7 @@ function MegaData()
         initGridScrolling();
         initFileblocksScrolling();
         initTreeScroll();
-        Soon(fm_tfsupdate);
+
         if ((dlmanager.isDownloading = Boolean(dl_queue.length))) {
             $('.transfer-pause-icon').removeClass('disabled');
             $('.transfer-clear-completed').removeClass('disabled');
@@ -4625,7 +4711,7 @@ function MegaData()
             $tr.addClass('transfer-started');
             $tr.removeClass('transfer-initiliazing transfer-queued');
             $('.transfer-table').prepend($tr);
-            $.transferHeader();
+            delay('fm_tfsupdate', fm_tfsupdate); // this will call $.transferHeader();
         }
         // var eltime = (new Date().getTime()-st)/1000;
         var bps = kbps * 1000;
@@ -4674,7 +4760,7 @@ function MegaData()
                 else {
                     $tr.find('.speed').addClass('unknown').text('');
                 }
-                percent_megatitle();
+                delay('percent_megatitle', percent_megatitle);
 
                 if (page.substr(0, 2) !== 'fm')
                 {
@@ -4728,19 +4814,20 @@ function MegaData()
             setTimeout(fm_chromebar, 500, $.dlheight);
             setTimeout(fm_chromebar, 1000, $.dlheight);
         }
-        var a = dl_queue.filter(isQueueActive).length;
-        if (a < 2 && !ulmanager.isUploading)
-        {
-            $('.widget-block').fadeOut('slow', function(e)
-            {
-                $('.widget-block').addClass('hidden');
-                $('.widget-block').css({opacity: 1});
-            });
+        if (page.substr(0, 2) !== 'fm') {
+            var a = dl_queue.filter(isQueueActive).length;
+            if (a < 2 && !ulmanager.isUploading) {
+                $('.widget-block').fadeOut('slow', function(e) {
+                    $('.widget-block').addClass('hidden').css({opacity: 1});
+                });
+            }
+            else if (a < 2) {
+                $('.widget-icon.downloading').addClass('hidden');
+            }
+            else {
+                $('.widget-circle').attr('class', 'widget-circle percents-0');
+            }
         }
-        else if (a < 2)
-            $('.widget-icon.downloading').addClass('hidden');
-        else
-            $('.widget-circle').attr('class', 'widget-circle percents-0');
         if ($.transferprogress && $.transferprogress[id])
         {
             if (!$.transferprogress['dlc'])
@@ -4749,8 +4836,10 @@ function MegaData()
             delete $.transferprogress[id];
         }
 
-        $.transferHeader();
-        Soon(mega.utils.resetUploadDownload);
+        delay('tfscomplete', function() {
+            mega.utils.resetUploadDownload();
+            $.tresizer();
+        });
     }
 
     this.dlbeforecomplete = function()
@@ -4859,106 +4948,126 @@ function MegaData()
             .addClass('transfer-initiliazing')
             .find('.transfer-status').text(l[1042]);
 
-        Soon(fm_tfsupdate);
+        delay('fm_tfsupdate', fm_tfsupdate); // this will call $.transferHeader()
         dl.st = NOW();
         ASSERT(typeof dl_queue[dl.pos] === 'object', 'No dl_queue entry for the provided dl...');
         ASSERT(typeof dl_queue[dl.pos] !== 'object' || dl.n == dl_queue[dl.pos].n, 'No matching dl_queue entry...');
         if (typeof dl_queue[dl.pos] === 'object')
             M.dlprogress(id, 0, 0, 0, 0, dl.pos);
-        $.transferHeader();
     }
     this.mobileuploads = [];
 
-    this.dynListR = SoonFc(function()
-    {
-        function flush_cached_nodes(n)
-        {
-            n = Object.keys(M.tfsdomqueue).slice(0, n);
+    this.doFlushTransfersDynList = function(aNumNodes) {
+        aNumNodes = Object.keys(M.tfsdomqueue).slice(0, aNumNodes | 0);
 
-            if (n.length)
-            {
-                for (var i in n)
-                {
-                    i = n[i];
-                    addToTransferTable(i, M.tfsdomqueue[i], 1);
-                    delete M.tfsdomqueue[i];
-                }
+        if (aNumNodes.length) {
+            for (var i = 0, l = aNumNodes.length; i < l; ++i) {
+                var item = aNumNodes[i];
 
-                /*if (M._tfsDynlistR)
-                    clearTimeout(M._tfsDynlistR);
-                M._tfsDynlistR = setTimeout(function()
-                {
-                    delete M._tfsDynlistR;
-                    Soon(transferPanelUI);
-                    Soon(fm_tfsupdate);
-                }, 350);*/
-                $(window).trigger('resize');
+                addToTransferTable(item, M.tfsdomqueue[item], 1);
+                delete M.tfsdomqueue[item];
+            }
+
+            $.tresizer();
+        }
+    };
+
+    this.handleEvent = function(ev) {
+        if (d > 1) {
+            console.debug(ev.type, ev);
+        }
+
+        var ttl;
+        if (ev.type === 'ps-y-reach-end') {
+            ttl = M.getTransferTableLengths();
+            if (ttl.left > -100) {
+                this.doFlushTransfersDynList(ttl.size);
             }
         }
-        var $tst = $('.transfer-scrolling-table');
-        $tst.unbind('jsp-scroll-y.tfsdynlist');
+        else if (ev.type === 'tfs-dynlist-flush') {
+            ttl = M.getTransferTableLengths();
+            if (ttl.left > -10) {
+                this.doFlushTransfersDynList(ttl.size);
+            }
+        }
+    };
 
-        // if ($('#fmholder').hasClass('transfer-panel-opened'))
+    this.tfsResizeHandler = SoonFc(function() {
+
+        // if (M.currentdirid === 'transfers')
         {
             var T = M.getTransferTableLengths();
 
             if (d)
                 console.log('resize.tfsdynlist', JSON.stringify(T));
 
-            if (T.left > 0)
-                flush_cached_nodes(T.left + 3);
-
-            T = T.size;
-            $tst.bind('jsp-scroll-y.tfsdynlist', function(ev, pos, top, bot)
-            {
-                if (bot)
-                    flush_cached_nodes(T);
-            });
+            if (T.left > 0) {
+                M.doFlushTransfersDynList(T.left + 3);
+            }
         }
-        $tst = undefined;
     });
 
     this.getTransferTableLengths = function()
     {
-        var used = $('.transfer-table tr').length;
-        var size = Math.ceil($('.transfer-scrolling-table').height() / 24);
+        var te   = this.getTransferElements();
+        var used = te.domTable.querySelectorAll('tr').length;
+        var size = Math.ceil(parseInt(te.domScrollingTable.style.height) / 24);
 
         return {size: size, used: used, left: size - used};
     };
 
+    this.getTransferElements = function() {
+        var obj               = {};
+        obj.domTransfersBlock = document.querySelector('.fm-transfers-block');
+        obj.domTableWrapper   = obj.domTransfersBlock.querySelector('.transfer-table-wrapper');
+        obj.domTransferHeader = obj.domTransfersBlock.querySelector('.fm-transfers-header');
+        obj.domPanelTitle     = obj.domTransferHeader.querySelector('.transfer-panel-title');
+        obj.domTableEmptyTxt  = obj.domTableWrapper.querySelector('.transfer-panel-empty-txt');
+        obj.domTableHeader    = obj.domTableWrapper.querySelector('.transfer-table-header');
+        obj.domScrollingTable = obj.domTableWrapper.querySelector('.transfer-scrolling-table');
+        obj.domTable          = obj.domScrollingTable.querySelector('.transfer-table');
+
+        this.getTransferElements = function() {
+            return obj;
+        };
+
+        return obj;
+    };
+
     function addToTransferTable(gid, elem, q)
     {
+        var te     = M.getTransferElements();
         var target = gid[0] === 'u'
-            ? $('.transfer-table tr.transfer-upload.transfer-queued:last')
-            : $('.transfer-table tr.transfer-download.transfer-queued:last');
+            ? $('tr.transfer-upload.transfer-queued:last', te.domTable)
+            : $('tr.transfer-download.transfer-queued:last', te.domTable);
 
         if (target.length) {
             target.after(elem);
         }
         else {
             if (gid[0] != 'u') {
-                target = $('.transfer-table tr.transfer-upload.transfer-queued:first');
+                target = $('tr.transfer-upload.transfer-queued:first', te.domTable);
             }
 
             if (target.length) {
                 target.before(elem);
             }
             else {
-                target = $('.transfer-table tr.transfer-completed:first');
+                target = $('tr.transfer-completed:first', te.domTable);
 
                 if (target.length) {
                     target.before(elem);
                 }
                 else {
-                    $('.transfer-table').append(elem);
+                    $(te.domTable).append(elem);
                 }
             }
         }
-        if ($.mSortableT) {
+        /*if ($.mSortableT) {
             $.mSortableT.sortable('refresh');
-        }
+        }*/
         if (!q) {
-            Soon(fm_tfsupdate);
+            delay('fm_tfsupdate', fm_tfsupdate);
         }
     }
     this.addToTransferTable = function(gid, ttl, elem)
@@ -4970,10 +5079,15 @@ function MegaData()
             logger.info('Adding Transfer', gid, JSON.stringify(T));
         }
 
-        if (this.dynListR)
+        if (this.tfsResizeHandler)
         {
-            $(window).bind('resize.tfsdynlist', this.dynListR);
-            delete this.dynListR;
+            M.getTransferElements()
+                .domScrollingTable
+                .addEventListener('ps-y-reach-end', M, {passive: true});
+            mBroadcaster.addListener('tfs-dynlist-flush', M);
+
+            $(window).bind('resize.tfsdynlist', this.tfsResizeHandler);
+            delete this.tfsResizeHandler;
         }
 
         if (T.left > 0)
@@ -5164,9 +5278,8 @@ function MegaData()
         }
         else {
             showTransferToast('u', added);
-            $.transferHeader();
             openTransferpanel();
-            Soon(fm_tfsupdate);
+            delay('fm_tfsupdate', fm_tfsupdate); // this will call $.transferHeader()
         }
 
         setupTransferAnalysis();
@@ -5179,18 +5292,17 @@ function MegaData()
 
     this.ulprogress = function(ul, perc, bl, bt, bps)
     {
-        var id = ul.id;
-        var $tr = $('.transfer-table #ul_' + id);
+        var id  = ul.id;
+        var $tr = $('#ul_' + id);
         if (!$tr.hasClass('transfer-started')) {
             $tr.find('.transfer-status').text('');
             $tr.removeClass('transfer-initiliazing transfer-queued');
             $tr.addClass('transfer-started');
             $('.transfer-table').prepend($tr);
-            $.transferHeader();
+            delay('fm_tfsupdate', fm_tfsupdate); // this will call $.transferHeader()
         }
         if (!bl || !ul.starttime)
             return false;
-        var eltime = (new Date().getTime() - ul.starttime) / 1000;
         var retime = bps > 1000 ? (bt - bl) / bps : -1;
         var transferDeg = 0;
         if (!$.transferprogress)
@@ -5218,7 +5330,7 @@ function MegaData()
             } else {
                 $tr.find('.speed').addClass('unknown').text('');
             }
-            $.transferHeader();
+            // $.transferHeader();
 
             if (page.substr(0, 2) !== 'fm')
             {
@@ -5230,13 +5342,13 @@ function MegaData()
                 $('.widget-block').addClass('active');
             }
         }
-        percent_megatitle();
+        delay('percent_megatitle', percent_megatitle);
     }
 
     this.ulcomplete = function(ul, h, k)
     {
-        var id = ul.id;
-        var $tr = $('.transfer-table #ul_' + id);
+        var id  = ul.id;
+        var $tr = $('#ul_' + id);
 
         if ($.ulBunch && $.ulBunch[ul.target])
         {
@@ -5270,7 +5382,7 @@ function MegaData()
             showToast('megasync', l[372] + ' "' + ul.name + '" (' + l[1668] + ')');
         }
 
-        this.mobile_ul_completed = true;
+        /*this.mobile_ul_completed = true;
         for (var i in this.mobileuploads)
         {
             if (id == this.mobileuploads[i].id)
@@ -5284,24 +5396,29 @@ function MegaData()
             $('#mobileuploadtime').addClass('complete');
             $('#uploadpopbtn').text(l[726]);
             $('#mobileupload_header').text(l[1418]);
-        }
+         }*/
         $tr.removeClass('transfer-started').addClass('transfer-completed');
         $tr.find('.left-c p, .right-c p').css('transform', 'rotate(180deg)');
         $tr.find('.transfer-status').text(ul.skipfile ? l[1668] : l[1418]);
         $tr.find('.eta, .speed').text('').removeClass('unknown');
 
         ul_queue[ul.pos] = Object.freeze({});
-        var a=ul_queue.filter(isQueueActive).length;
-        if (a < 2 && !ulmanager.isUploading)
-        {
-            $('.widget-block').fadeOut('slow',function(e)
-            {
-                $('.widget-block').addClass('hidden');
-                $('.widget-block').css({opacity:1});
-            });
+
+        if (page.substr(0, 2) !== 'fm') {
+            var a = ul_queue.filter(isQueueActive).length;
+            if (a < 2 && !ulmanager.isDownloading) {
+                $('.widget-block').fadeOut('slow', function(e) {
+                    $('.widget-block').addClass('hidden').css({opacity: 1});
+                });
+            }
+            else if (a < 2) {
+                $('.widget-icon.uploading').addClass('hidden');
+            }
+            else {
+                $('.widget-circle').attr('class', 'widget-circle percents-0');
+            }
         }
-        else if (a < 2) $('.widget-icon.uploading').addClass('hidden');
-        else $('.widget-circle').attr('class','widget-circle percents-0');
+
         if ($.transferprogress && $.transferprogress['ul_'+ id])
         {
             if (!$.transferprogress['ulc']) $.transferprogress['ulc'] = 0;
@@ -5309,7 +5426,7 @@ function MegaData()
             delete $.transferprogress['ul_'+ id];
         }
         // $.transferHeader();
-        Soon(function() {
+        delay('tfscomplete', function() {
             mega.utils.resetUploadDownload();
             $.tresizer();
         });
@@ -5327,10 +5444,9 @@ function MegaData()
             .addClass('transfer-initiliazing')
             .find('.transfer-status').text(l[1042]);
 
-        Soon(fm_tfsupdate);
+        delay('fm_tfsupdate', fm_tfsupdate); // this will call $.transferHeader()
         ul.starttime = new Date().getTime();
         M.ulprogress(ul, 0, 0, 0);
-        $.transferHeader();
     };
 
     this.cloneChatNode = function(n, keepParent) {
@@ -6085,40 +6201,46 @@ function execsc(actionPackets, callback) {
             __process_f1(actionPacket.t.f);
         }
         else if (actionPacket.a === 'u') {
-            var n = M.d[actionPacket.n];
-            if (n) {
+
+            var nodeHandle = actionPacket.n;
+            var node = M.d[nodeHandle];
+
+            if (node) {
+
                 var f = {
-                    h : actionPacket.n,
+                    h : nodeHandle,
                     k : actionPacket.k,
                     a : actionPacket.at
                 };
-                crypto_processkey(u_handle, u_k_aes, f, u_nodekeys[n.h]);
+                crypto_processkey(u_handle, u_k_aes, f, u_nodekeys[nodeHandle]);
 
-                if (!f.key && u_nodekeys[n.h]) {
+                if (!f.key && u_nodekeys[nodeHandle]) {
                     // TODO: This is a temporal fix, we have to investigate why does the API fails
                     // on providing the right key for the node, likely we're missing giving it to it.
 
-                    f.k = u_handle + ':' + a32_to_base64(encrypt_key(u_k_aes, u_nodekeys[n.h]));
+                    f.k = u_handle + ':' + a32_to_base64(encrypt_key(u_k_aes, u_nodekeys[nodeHandle]));
                     crypto_processkey(u_handle, u_k_aes, f);
                 }
 
                 if (f.key) {
-                    if (f.name !== n.name) {
-                        M.onRenameUIUpdate(n.h, f.name);
-                    }
-                    if (fminitialized && f.fav !== n.fav) {
-                        if (f.fav) {
-                            $('.grid-table.fm #' + n.h + ' .grid-status-icon').addClass('star');
-                            $('#' + n.h + '.file-block .file-status-icon').addClass('star');
+
+                    /* jshint -W073 */ // Blocks are nested too deeply
+                    if (fminitialized) {
+                        if (f.name !== node.name) {
+                            M.onRenameUIUpdate(nodeHandle, f.name);
                         }
-                        else {
-                            $('.grid-table.fm #' + n.h + ' .grid-status-icon').removeClass('star');
-                            $('#' + n.h + '.file-block .file-status-icon').removeClass('star');
+                        if (node.fav !== f.fav) {
+                            M.favouriteDomUpdate(node, f.fav);
+                        }
+                        if (node.lbl !== f.lbl) {
+                            M.colourLabelDomUpdate(nodeHandle, f.lbl);
                         }
                     }
+                    /* jshint +W073 */
                     M.nodeAttr({
                         h : actionPacket.n,
                         fav : f.fav,
+                        lbl : f.lbl,
                         name : f.name,
                         key : f.key,
                         a : actionPacket.at
@@ -6148,7 +6270,7 @@ function execsc(actionPackets, callback) {
 
                         // was selected
                         $.selected = [];
-                        if ($('.context-menu.files-menu').is(":visible")) {
+                        if ($('.dropdown.body.files-menu').is(":visible")) {
                             $.hideContextMenu();
                         }
                     }

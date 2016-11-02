@@ -749,7 +749,20 @@ background: linear-gradient(to bottom, rgba(247,247,247,1) 0%,rgba(247,247,247,0
     margin-right: 30px;
 }
 /* End of Invitation status dialog */
+
 .fm-dialog.create-folder-dialog {
     width: 360px;
     margin:-67px 0 0 -180px;
+}
+.fm-dialog.chat-rename-dialog {
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+.chat-rename-dialog input {
+    padding-left: 10px;
+    width: 260px;
+}
+.chat-rename-dialog .rename-input-bl {
+    margin-bottom: 10px;
 }

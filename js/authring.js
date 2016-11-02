@@ -184,6 +184,7 @@ var authring = (function () {
 
         var rest = serialisedRing;
         var container = {};
+
         while (rest.length > 0) {
             var result = ns._deserialiseRecord(rest);
             rest = result.rest;

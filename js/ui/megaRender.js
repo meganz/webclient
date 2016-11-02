@@ -699,6 +699,13 @@
                                 || (aNode.p === 'contacts' && M.contactstatus(aHandle).ts));
                         }
                     }
+
+                    // Colour label
+                    if (aNode.lbl) {
+                        var colourLabel = M.getColourClassFromId(aNode.lbl);
+                        props.classNames.push('colour-label');
+                        props.classNames.push(colourLabel);
+                    }
                 }
 
                 return props;
@@ -733,7 +740,7 @@
                     var cs = M.contactstatus(aHandle);
 
                     if (cs.files === 0 && cs.folders === 0) {
-                        props.shareInfo = l[1050];
+                        props.shareInfo = l[782];// Empty Folder
                     }
                     else {
                         props.shareInfo = fm_contains(cs.files, cs.folders);
@@ -752,6 +759,13 @@
 
                 if (avatar) {
                     props.avatar = parseHTML(avatar).firstChild;
+                }
+
+                // Colour label
+                if (aNode.lbl && (aNode.su !== u_handle)) {
+                    var colourLabel = M.getColourClassFromId(aNode.lbl);
+                    props.classNames.push('colour-label');
+                    props.classNames.push(colourLabel);
                 }
 
                 return props;

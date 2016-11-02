@@ -714,3 +714,227 @@
     background-image: url(../images/mega/nw-fm-sprite_v19.svg);
     background-position: -14px -11665px;
 }
+/* Context menu icons */
+.small-icon.context {
+    background-image: url(../images/mega/icons-sprite.png);
+}
+.small-icon.context.standart-download {
+    background-position: -1px -499px;
+}
+.small-icon.context.download-as-zip {
+    background-position: -101px -499px;
+}
+.small-icon.context.labels {
+    background-position: -101px -99px;
+}
+.small-icon.context.download {
+    background-position: -101px -138px;
+}
+.small-icon.context.get-link {
+    background-position: -200px -133px;
+    width: 22px;
+    margin: 0 13px 1px -1px;
+}
+.small-icon.context.remove-link {
+    background-position: -200px -165px;
+    width: 22px;
+    margin: 0 13px 1px -1px;
+}
+.small-icon.context.share {
+    background-position: -99px -172px;
+    width: 23px;
+    margin: 0 12px 1px -1px;
+}
+.small-icon.context.conversation {
+    background-position: -1px -146px;
+}
+.small-icon.context.handset {
+    background-position: -1px -333px;
+}
+.small-icon.context.videocam {
+    background-position: -1px -365px;
+}
+.small-icon.context.writing-pen {
+    background-position: -202px -226px;
+}
+.small-icon.context.position-arrows {
+    background-position: -200px -258px;
+    width: 22px;
+    margin: 0 13px 1px -1px;
+}
+.small-icon.context.cloned-files {
+    background-position: -202px -288px;
+    height: 24px;
+}
+.small-icon.context.plus {
+    background-position: -201px -391px;
+}
+.small-icon.context.file-upload {
+    background-position: -201px -429px;
+}
+.small-icon.context.folder-upload {
+    background-position: -201px -461px;
+}
+.small-icon.context.remove-to-bin {
+    background-position: -200px -322px;
+    width: 22px;
+    margin: 0 13px 1px -1px;
+}
+.small-icon.context.loupe {
+    background-position: -102px 1px;
+}
+.small-icon.context.open-folder {
+    background-position: -202px -32px;
+}
+.small-icon.context.info {
+    background-position: -202px -71px;
+}
+.small-icon.context.heart {
+    background-position: -202px -499px;
+}
+.small-icon.context.broken-heart {
+    background-position: -202px -103px;
+}
+.small-icon.context.leave-share {
+    background-position: -100px -539px;
+}
+.small-icon.context.red-cross {
+    background-position: -102px -212px;
+}
+.small-icon.context.pause {
+    background-position: -1px -39px;
+}
+.small-icon.context.play {
+    background-position: -1px 1px;
+}
+.small-icon.context.move-up {
+    background-position: -1px -78px;
+}
+.small-icon.context.move-down {
+    background-position: -1px -110px;
+}
+.small-icon.context.small-refresh {
+    background-position: -202px 2px;
+}
+.small-icon.context.network-diagnostic {
+    background-position: -200px -538px;
+}
+.small-icon.context.aim {
+    background-position: -100px -60px;
+    width: 22px;
+    height: 22px;
+    margin: 0 13px 1px -1px;
+}
+.small-icon.context.cloud {
+    background-position: -102px -30px;
+}
+.small-icon.context.folder-item {
+    background-position: -100px -291px;
+}
+.small-icon.context.shared-folder-item {
+    background-position: -100px -331px;
+}
+/* hovers*/
+.dropdown-item:hover .small-icon.context.standart-download {
+    background-position: -41px -499px;
+}
+.dropdown-item:hover .small-icon.context.download-as-zip {
+    background-position: -141px -499px;
+}
+.dropdown-item:hover .small-icon.context.labels {
+    background-position: -141px -99px;
+}
+.dropdown-item:hover .small-icon.context.download {
+    background-position: -141px -138px;
+}
+.dropdown-item:hover .small-icon.context.get-link {
+    background-position: -240px -133px;
+}
+.dropdown-item:hover .small-icon.context.remove-link {
+    background-position: -240px -165px;
+}
+.dropdown-item:hover .small-icon.context.share {
+    background-position: -139px -172px;
+}
+.dropdown-item:hover .small-icon.context.conversation {
+    background-position: -41px -146px;
+}
+.dropdown-item:hover .small-icon.context.handset {
+    background-position: -41px -333px;
+}
+.dropdown-item:hover .small-icon.context.videocam {
+    background-position: -41px -365px;
+}
+.dropdown-item:hover .small-icon.context.writing-pen {
+    background-position: -242px -226px;
+}
+.dropdown-item:hover .small-icon.context.position-arrows {
+    background-position: -240px -258px;
+}
+.dropdown-item:hover .small-icon.context.cloned-files {
+    background-position: -242px -288px;
+}
+.dropdown-item:hover .small-icon.context.plus {
+    background-position: -241px -391px;
+}
+.dropdown-item:hover .small-icon.context.file-upload {
+    background-position: -241px -429px;
+}
+.dropdown-item:hover .small-icon.context.folder-upload {
+    background-position: -241px -461px;
+}
+.dropdown-item:hover .small-icon.context.remove-to-bin {
+    background-position: -240px -322px;
+}
+.dropdown-item:hover .small-icon.context.loupe {
+    background-position: -142px 1px;
+}
+.dropdown-item:hover .small-icon.context.open-folder {
+    background-position: -242px -32px;
+}
+.dropdown-item:hover .small-icon.context.info {
+    background-position: -242px -71px;
+}
+.dropdown-item:hover .small-icon.context.heart {
+    background-position: -242px -499px;
+}
+.dropdown-item:hover .small-icon.context.broken-heart {
+    background-position: -242px -103px;
+}
+.dropdown-item:hover .small-icon.context.red-cross {
+    background-position: -142px -212px;
+}
+.dropdown-item:hover .small-icon.context.pause {
+    background-position: -41px -39px;
+}
+.dropdown-item:hover .small-icon.context.play {
+    background-position: -41px 1px;
+}
+.dropdown-item:hover .small-icon.context.move-up {
+    background-position: -41px -78px;
+}
+.dropdown-item:hover .small-icon.context.move-down {
+    background-position: -41px -110px;
+}
+.dropdown-item:hover .small-icon.context.small-refresh {
+    background-position: -242px 2px;
+}
+.dropdown-item:hover .small-icon.context.network-diagnostic {
+    background-position: -240px -538px;
+}
+.dropdown-item:hover .small-icon.context.leave-share {
+    background-position: -140px -539px;
+}
+.dropdown-item:hover .small-icon.context.aim {
+    background-position: -140px -60px;
+}
+.dropdown-item:hover .small-icon.context.cloud {
+    background-position: -142px -30px;
+}
+.dropdown-item:hover .small-icon.context.folder-item {
+    background-position: -140px -291px;
+}
+.dropdown-item:hover .small-icon.context.shared-folder-item {
+    background-position: -140px -331px;
+}
+/* End of Context menu icons */

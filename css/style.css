@@ -254,7 +254,7 @@ a, a:link, a:visited, a:hover, a:active, a:focus img, a:focus img {
 .loading .top-head {
     z-index: 1101;
 }
-.top-head::after, .fm-right-header::after, .new-notification-top::after, .fm-tranfers-header::after, .grid-table-header::after, .shared-top-details::after, .transfer-table-header::after, .contact-top-details::after, .fm-account-history-head::after, .fm-account-history .grey-bar::after, .fm-account-history hr::after, .fm-account-reseller hr::after {
+.top-head::after, .fm-right-header::after, .new-notification-top::after, .fm-transfers-header::after, .grid-table-header::after, .shared-top-details::after, .transfer-table-header::after, .contact-top-details::after, .fm-account-history-head::after, .fm-account-history .grey-bar::after, .fm-account-history hr::after, .fm-account-reseller hr::after {
     content: '';
     width: 100%;
     height: 1px;
@@ -6088,6 +6088,8 @@ th.grid-first-th {
     -o-transition: all 200ms ease-in-out;
     -ms-transition: all 200ms ease-in-out;
     transition: all 200ms ease-in-out;
+    background-color: white;
+    text-align: center;
     position: relative;
 }
 .file-block::before, .contact-block-view::before, .file-block::after, .contact-block-view::after {
@@ -6231,8 +6233,8 @@ th.grid-first-th {
     line-height: 0;
     border: 0;
 }
-.file-block-title, .contact-block-view-name {
-    display: block;
+.file-block-title {
+    display: inline-block;
     padding: 0 0 0 0;
     white-space: pre-wrap;
     word-break: break-all;
@@ -6252,6 +6254,68 @@ th.grid-first-th {
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     position: relative;
+    max-width: 100%;
+}
+.colour-label .file-block-title {
+    padding-right: 18px;
+}
+.colour-label .file-block-title::after, .colour-label .tranfer-filetype-txt::after, .colour-label .shared-folder-info-block::after {
+    content: '';
+    display: block;
+    position: absolute;
+    right: 6px;
+    top: 10px;
+    background-color: #a4a4a7;
+    -moz-border-radius: 100%;
+    -webkit-border-radius: 100%;
+    border-radius: 100%;
+    width: 8px;
+    height: 8px;
+}
+.colour-label.red .file-block-title::after, .colour-label.red .tranfer-filetype-txt::after, .colour-label.red .shared-folder-info-block::after {
+    background-color: #FF625C;
+}
+.colour-label.orange .file-block-title::after, .colour-label.orange .tranfer-filetype-txt::after, .colour-label.orange .shared-folder-info-block::after {
+    background-color: #F9A646;
+}
+.colour-label.yellow .file-block-title::after, .colour-label.yellow .tranfer-filetype-txt::after, .colour-label.yellow .shared-folder-info-block::after {
+    background-color: #F4CE4A;
+}
+.colour-label.green .file-block-title::after, .colour-label.green .tranfer-filetype-txt::after, .colour-label.green .shared-folder-info-block::after {
+    background-color: #6DCC50;
+}
+.colour-label.blue .file-block-title::after, .colour-label.blue .tranfer-filetype-txt::after, .colour-label.blue .shared-folder-info-block::after {
+    background-color: #4BB8F3;
+}
+.colour-label.purple .file-block-title::after, .colour-label.purple .tranfer-filetype-txt::after, .colour-label.purple .shared-folder-info-block::after {
+    background-color: #D088E1;
+}
+.colour-label .shared-folder-info-block {
+    padding-right: 12px;
+    position: relative;
+}
+.colour-label .shared-folder-info-block::after {
+    right: 2px;
+    top: 13px;
+}
+.file-block.colour-label .shared-folder-info-block {
+    padding-right: 18px;
+    position: relative;
+}
+.file-block.colour-label .shared-folder-info-block::after {
+    right: 6px;
+    top: 24px;
+}
+.colour-label .tranfer-filetype-txt {
+    padding-right: 12px;
+    position: relative;
+}
+.file-block.colour-label .tranfer-filetype-txt {
+    padding-right: 12px;
+}
+.colour-label .tranfer-filetype-txt::after {
+    right: 2px;
+    top: 8px;
 }
 .grid-url-arrow, .file-settings-icon, .clear-transfer-icon {
     height: 16px;
@@ -6353,6 +6417,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
+}
+.grid-table {
+    width: 100%;
+    table-layout: fixed;
 }
 .transfer-table td, .grid-table td, .grid-share-table td, .contacts-grid-table td {
     color: #666666;
@@ -7050,8 +7118,9 @@ table {
 .tranfer-filetype-txt, .fm-browsers-txt, .fm-flags-txt, .fm-member-icon-txt {
     height: 24px;
     padding: 0 10px 0 26px;
-    word-break: break-all;
-    white-space: pre-wrap;
+    white-space: nowrap;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
     display: block;
     overflow: hidden;
     max-width: 100%;
@@ -7294,10 +7363,10 @@ table {
 .fm-right-header {
     padding-right: 8px;
 }
-.fm-tranfers-header {
+.fm-transfers-header {
     padding-right: 16px;
 }
-.fm-right-header, .new-notification-top, .fm-tranfers-header {
+.fm-right-header, .new-notification-top, .fm-transfers-header {
     height: 37px;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -7306,7 +7375,7 @@ table {
     background-color: #ffffff;
     position: relative;
 }
-.fm-right-header .link-button, .fm-tranfers-header .link-button {
+.fm-right-header .link-button, .fm-transfers-header .link-button {
     margin-top: 8px;
     font-size: 14px;
 }
@@ -7768,29 +7837,6 @@ table {
     position: absolute;
     z-index: 100;
     border: 1px dotted black;
-}
-.context-menu-item {
-    display: block;
-    height: 30px;
-    line-height: 28px;
-    padding: 0 15px 0 35px;
-    font-size: 13px;
-    font-family: 'source_sans_proregular', Arial;
-    background-repeat: no-repeat;
-    background-position: 10px -4847px;
-    cursor: pointer;
-}
-.context-menu-item.contains-submenu {
-    background-image: url(../images/mega/nw-fm-sprite_v19.svg);
-    background-position: right -4593px;
-    background-repeat: no-repeat;
-}
-.context-menu-item.contains-submenu:hover, .context-menu-item.contains-submenu.opened {
-    background-position: right -4763px;
-    color: white;
-}
-.context-menu-item.hidden {
-    display: none;
 }
 .context-menu, .nw-sorting-menu, .dialog-sorting-menu {
     min-width: 160px;
@@ -10396,145 +10442,73 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
 .membership-usage-bl.bandwidth .membership-arrow {
     right: 34px;
 }
-.context-submenu {
-    min-width: 170px;
-    position: absolute;
-    -webkit-background-clip: padding-box;
-    background-clip: padding-box;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    z-index: 1120;
-    min-height: 40px;
-    top: 0;
-    -moz-border-radius: 8px;
-    -webkit-border-radius: 8px;
-    border-radius: 8px;
-    margin: -8px 0 0 0;
-    padding: 8px 0;
- filter:progid:DXImageTransform.Microsoft.Alpha(opacity=0);
-    -moz-opacity: 0;
-    -khtml-opacity: 0;
-    opacity: 0;
-    -webkit-transition: opacity 200ms ease-in-out, right 200ms ease-in-out;
-    -moz-transition: opacity 200ms ease-in-out, right 200ms ease-in-out;
-    -o-transition: opacity 200ms ease-in-out, right 200ms ease-in-out;
-    -ms-transition: opacity 200ms ease-in-out, right 200ms ease-in-out;
-    transition: opacity 200ms ease-in-out, right 200ms ease-in-out;
-    border: 2px solid rgba(255,255,255,0.7);
+
+@media only screen and (max-width: 1105px) {
+.fm-account-mutliple-bl.bandwidth .membership-notification {
+    right: -30px;
+}
+.fm-account-mutliple-bl.bandwidth .membership-arrow {
+    right: 34px;
+}
+}
+.dropdown.body.submenu.reset {
     left: 100%;
     right: auto;
-    margin-left: -10600px;
-    margin-right: 0;
-    position: absolute;
-    background-color: #333333;
-    font-size: 13px;
-    color: #CCCCCC;
 }
-.context-submenu.active {
- filter:progid:DXImageTransform.Microsoft.Alpha(opacity=100);
-    -moz-opacity: 1;
-    -khtml-opacity: 1;
-    opacity: 1;
-    margin-left: 0;
-    margin-right: 0;
-    display: block;
-}
-.context-submenu.reset {
-    left: 100%;
-}
-.context-submenu.left-position {
+.dropdown.body.submenu.left-position {
     left: auto;
     right: 100%;
 }
-.context-submenu.overlap-right {
+.dropdown.body.submenu.overlap-right {
     right: auto;
 }
-.context-submenu.overlap-left {
+.dropdown.body.submenu.overlap-left {
     left: auto;
 }
 .context-top-arrow, .context-bottom-arrow {
     height: 16px;
-    width: 100%;
+    width: 12px;
+    left: 50%;
+    margin: 0 0 0 -6px;
     position: absolute;
     top: 6px;
     background-image: url(../images/mega/nw-fm-sprite_v19.svg);
     background-position: center -8343px;
+    background-position: right -1288px;
     background-repeat: no-repeat;
     display: none;
-    -webkit-transition: opacity 200ms ease-in-out;
-    -moz-transition: opacity 200ms ease-in-out;
-    -o-transition: opacity 200ms ease-in-out;
-    -ms-transition: opacity 200ms ease-in-out;
-    transition: opacity 200ms ease-in-out;
-filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
-    -moz-opacity: 0.5;
-    -khtml-opacity: 0.5;
-    opacity: 0.5;
     cursor: pointer;
 }
 .context-bottom-arrow {
-    background-position: center -8393px;
+    background-position: right -1228px;
     top: auto;
     bottom: 6px;
 }
-.context-top-arrow:hover, .context-bottom-arrow:hover {
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
-    -moz-opacity: 1;
-    -khtml-opacity: 1;
-    opacity: 1;
-}
 .context-top-arrow.disabled, .context-bottom-arrow.disabled {
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
-    -moz-opacity: 0.2;
-    -khtml-opacity: 0.2;
-    opacity: 0.2;
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
+    -moz-opacity: 0.7;
+    -khtml-opacity: 0.7;
+    opacity: 0.7;
     cursor: default;
 }
-.context-submenu.mega-height {
-    padding: 22px 0;
+.dropdown.body.submenu.mega-height {
+    padding: 22px 8px;
     margin-top: -14px;
 }
-.context-submenu.mega-height > .context-top-arrow, .context-submenu.mega-height > .context-bottom-arrow, .context-scrolling-block {
+.dropdown.body.submenu.mega-height > .context-top-arrow, .dropdown.body.submenu.mega-height > .context-bottom-arrow, .context-scrolling-block {
     display: block;
 }
-.context-submenu.mega-height > .context-scrolling-block {
+.dropdown.body.submenu.mega-height > .context-scrolling-block {
     height: 100%;
     overflow-y: hidden;
 }
-.context-submenu .context-menu-item {
+.dropdown.body.submenu .dropdown-item {
     display: block !important;
 }
-.context-submenu .context-menu-item.disabled {
-    opacity: 0.6;
-filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
-    -moz-opacity: 0.6;
-    -khtml-opacity: 0.6;
-}
-.context-submenu .context-menu-item.opened.disabled, .context-submenu .context-menu-item.disabled:hover {
-    background-color: transparent;
-    color: rgba(204,204,204,1);
-}
-.context-menu-item.disabled:hover > .context-menu-icon, .context-menu-item.opened.disabled > .context-menu-icon, .permissions-menu-item.active.disabled .context-menu-icon, .start-chat-button.disabled, .nw-contact-item:hover .start-chat-button.disabled, .nw-contact-item.selected .start-chat-button.disabled, .start-chat-button.active.disabled {
-    opacity: 0.5;
-filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
-    -moz-opacity: 0.5;
-    -khtml-opacity: 0.5;
-    cursor: default;
-}
-.context-menu-item.disabled.contains-submenu:hover, .context-menu-item.disabled.contains-submenu.opened {
-    color: rgba(204,204,204,1);
-    background-position: right -4593px;
-}
-.context-menu-item, .sorting-menu-item {
+.sorting-menu-item {
     display: block;
-    height: 32px;
-    line-height: 31px;
-    padding: 0 15px 0 26px;
-    font-size: 14px;
     cursor: pointer;
     position: relative;
-    color: #777777;
     white-space: nowrap;
     background-color: rgba(255,255,255,0);
     -webkit-transition: background-color 200ms ease-in-out, color 200ms ease-in-out;
@@ -10548,12 +10522,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     -moz-border-radius: 2px;
     -webkit-border-radius: 2px;
     border-radius: 2px;
-}
-.top-user-status-item:hover {
-    color: white;
-    background-color: #AAAAAA;
-}
-.sorting-menu-item {
     height: 24px;
     line-height: 23px;
     padding: 0 12px;
@@ -10578,77 +10546,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     height: 17px;
     left: -7px;
     top: 10px;
-}
-.context-menu-item {
-    padding: 0 10px 0 42px;
-    color: rgba(204,204,204,1);
-}
-.context-menu-item:hover, .context-menu-item.active, .context-menu-item.opened {
-    background-color: rgba(153,153,153,1);
-    color: rgba(255,255,255,1);
-}
-.context-menu-item.startchat-item:hover, .context-menu-item.startaudio-item:hover, .context-menu-item.startvideo-item:hover {
-    background-color: rgba(29,161,233,1);
-}
-.context-menu-item.download-item:hover, .context-menu-item.download-standart-item:hover, .context-menu-item.zipdownload-item:hover, .context-menu-item.download-item.opened {
-    background-color: rgba(220,0,0,1);
-}
-.context-menu-item.getlink-item:hover, .context-menu-item.sh4r1ng-item:hover, .context-menu-item.getlink-item.active, .context-menu-item.sh4r1ng-item.opened, .context-menu-item.removelink-item:hover, .context-menu-item.removelink-item.active {
-    background-color: rgba(255,179,0,1);
-}
-.context-menu-item.rename-item:hover, .context-menu-item.copy-item:hover, .context-menu-item.import-item:hover, .context-menu-item.newfolder-item:hover, .context-menu-item.fileupload-item:hover, .context-menu-item.folderupload-item:hover, .context-menu-item.remove-item:hover, .context-menu-item.cloud-item:hover, .context-menu-item.removeshare-item:hover, .context-menu-item.clearbin-item:hover, .context-menu-item.addcontact-item:hover, .context-menu-item.reply-item:hover, .context-menu-item.reply-to-all:hover, .context-menu-item.forward-item:hover, .context-menu-item.folder-item:hover, .context-menu-item.shared-folder-item:hover, .context-menu-item.move-item:hover, .context-menu-item.move-item.opened, .context-menu-item.rename-item.opened, .context-menu-item.copy-item.opened, .context-menu-item.import-item.opened, .context-menu-item.newfolder-item.opened, .context-menu-item.fileupload-item.opened, .context-menu-item.folderupload-item.opened, .context-menu-item.remove-item.opened, .context-menu-item.removeshare-item.opened, .context-menu-item.clearbin-item.opened, .context-menu-item.addcontact-item.opened, .context-menu-item.reply-item.opened, .context-menu-item.reply-to-all.opened, .context-menu-item.forward-item.opened, .context-menu-item.folder-item.opened, .context-menu-item.cloud-item.opened, .context-menu-item.shared-folder-item.opened {
-    background-color: rgba(49,181,0,1);
-}
-.context-menu-icon, .context-menu-points {
-    background-image: url(../images/mega/nw-fm-sprite_v19.svg);
-    background-position: left top;
-    background-repeat: no-repeat;
-    height: 32px;
-    width: 34px;
-    position: absolute;
-    left: 0;
-    top: 0;
-    -webkit-transition: opacity 200ms ease-in-out;
-    -moz-transition: opacity 200ms ease-in-out;
-    -o-transition: opacity 200ms ease-in-out;
-    -ms-transition: opacity 200ms ease-in-out;
-    transition: opacity 200ms ease-in-out;
-filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
-    -moz-opacity: 0.5;
-    -khtml-opacity: 0.5;
-    opacity: 0.5;
-}
-.context-menu-item.disabled, .context-menu-item:hover.disabled {
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
-    -moz-opacity: 0.6;
-    -khtml-opacity: 0.6;
-    opacity: 0.6;
-    background-color: transparent;
-    color: #cccccc;
-    cursor: default;
-}
-.context-menu-item.contains-submenu {
-    padding-right: 25px;
-}
-.context-menu-item.move-item.opened {
-    background-color: rgba(49,181,0,1);
-}
-.context-menu-item.opened {
-    background-color: rgba(49,181,0,1);
-}
-.context-menu-item:hover > .context-menu-icon, .context-menu-item.opened > .context-menu-icon {
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
-    -moz-opacity: 1;
-    -khtml-opacity: 1;
-    opacity: 1;
-}
-.context-menu-points {
-    width: 28px;
-    height: 8px;
-    left: 4px;
-    top: 4px;
-    background-position: -3px -3830px;
-    display: none;
 }
 table {
     display: table;
@@ -16804,15 +16701,6 @@ strong, b {
 .widget-circle.percents-100 {
     background-position: 0 -1000px;
 }
-.context-submenu {
-    max-width: 215px;
-}
-.context-submenu .context-menu-item {
-    width: 100%;
-    overflow: hidden;
-    -o-text-overflow: ellipsis;
-    text-overflow: ellipsis;
-}
 .resellers-main-block {
     margin: 0 -3px
 }
@@ -20303,6 +20191,7 @@ span.incoming-call-name {
     line-height: 18px;
     display: block;
     position: relative;
+    text-align: left;
 }
 .shared-folder-name, .contact-name {
     color: #111111;
@@ -26114,10 +26003,10 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', e
 .fontsize1 .nw-fm-tree-header input {
     margin: 12px 0 0 0;
 }
-.fontsize1 .nw-fm-tree-folder, .fontsize1 .nw-conversations-name, .fontsize1 .fm-tree-panel .nw-contact-name, .fontsize1 .nw-conversations-header, .fontsize1 .nw-tree-panel-header, .fontsize1 .copy-dialog-panel-header, .fontsize1 .move-dialog-panel-header, .fontsize1 .share-dialog-panel-header, .fontsize1 .top-user-status-item, .fontsize1 .context-menu-item, .fontsize1 .sorting-menu-item, .fontsize1 .permissions-menu-item, .fontsize1 .context-submenu, .fontsize1 .tranfer-filetype-txt, .fontsize1 .fm-browsers-txt, .fontsize1 .fm-flags-txt, .fontsize1 .fm-member-icon-txt, .fontsize1 .transfer-table td, .fontsize1 .grid-table td, .fontsize1 .grid-share-table td, .fontsize1 .contacts-grid-table td, .fontsize1 .file-block-title, .fontsize1 .contact-block-view-name, .fontsize1 .shared-folder-info-block, .fontsize1 .fm-chat-user, .fontsize1 .fm-chat-user-status, .fontsize1 .fm-chat-user-email, .fontsize1 .shared-folder-access, .fontsize1 .contacts-interation, .fontsize1 .transfer-table th, .fontsize1 .transfer-table td, .fontsize1 .transfer-table-header th, .fontsize1 .grid-table th, .fontsize1 .grid-table td, .fontsize1 .grid-share-table th, .fontsize1 .grid-share-table td, .fontsize1 .grid-table-header th, .fontsize1 .contacts-grid-header th, .fontsize1 .contacts-grid-table th, .fontsize1 .contacts-grid-table td, .fontsize1 .membership-status, .fontsize1 .new-notification-txt, .fontsize1 .dark-tooltip, .fontsize1 .new-notification-info {
+.fontsize1 .nw-fm-tree-folder, .fontsize1 .nw-conversations-name, .fontsize1 .fm-tree-panel .nw-contact-name, .fontsize1 .nw-conversations-header, .fontsize1 .nw-tree-panel-header, .fontsize1 .copy-dialog-panel-header, .fontsize1 .move-dialog-panel-header, .fontsize1 .share-dialog-panel-header, .fontsize1 .top-user-status-item, .fontsize1 .sorting-menu-item, .fontsize1 .permissions-menu-item, .fontsize1 .dropdown.body.submenu, .fontsize1 .tranfer-filetype-txt, .fontsize1 .fm-browsers-txt, .fontsize1 .fm-flags-txt, .fontsize1 .fm-member-icon-txt, .fontsize1 .transfer-table td, .fontsize1 .grid-table td, .fontsize1 .grid-share-table td, .fontsize1 .contacts-grid-table td, .fontsize1 .file-block-title, .fontsize1 .contact-block-view-name, .fontsize1 .shared-folder-info-block, .fontsize1 .fm-chat-user, .fontsize1 .fm-chat-user-status, .fontsize1 .fm-chat-user-email, .fontsize1 .shared-folder-access, .fontsize1 .contacts-interation, .fontsize1 .transfer-table th, .fontsize1 .transfer-table td, .fontsize1 .transfer-table-header th, .fontsize1 .grid-table th, .fontsize1 .grid-table td, .fontsize1 .grid-share-table th, .fontsize1 .grid-share-table td, .fontsize1 .grid-table-header th, .fontsize1 .contacts-grid-header th, .fontsize1 .contacts-grid-table th, .fontsize1 .contacts-grid-table td, .fontsize1 .membership-status, .fontsize1 .new-notification-txt, .fontsize1 .dark-tooltip, .fontsize1 .new-notification-info {
     font-size: 12px;
 }
-.fontsize1 .fm-add-user span, .fontsize1 .fm-start-video-call span, .fontsize1 .fm-clearbin-button span, .fontsize1 .fm-send-files span, .fontsize1 .fm-start-call span, .fontsize1 .fm-leave-share span, .fontsize1 .fm-share-copy span, .fontsize1 .fm-share-download span, .fontsize1 .contact-send-files span, .fontsize1 .fm-start-conversation span, .fontsize1 .fm-share-folders span, .fontsize1 .fm-verify span, .fontsize1 .fm-reset-stored-fingerprint span, .fontsize1 .fm-question span, .fontsize1 .fm-download-as-zip span, .fontsize1 .fm-import-to-cloudrive span, .fontsize1 .fm-dialog-button span, .fontsize1 .fm-close-all-sessions span, .fontsize1 .avatar-dialog .fm-account-change-avatar span, .fontsize1 .fm-new-folder span, .fontsize1 .search-files-result span, .fontsize1 .search-messages-result span, .fontsize1 .fm-file-upload span, .fontsize1 .search-messages-result span, .fontsize1 .fm-folder-upload span, .fontsize1 .fm-notification-settings span, .fontsize1 .create-folder-button span, .fontsize1 .add-user-popup-button span, .fontsize1 .create-folder-button-cancel span, .fontsize1 .fm-dialog-new-folder-button span, .fontsize1 .rename-dialog-button span, .fontsize1 .contact-request-button span, .fontsize1 .transfer-clear-all-icon span, .fontsize1 .transfer-clear-completed span, .fontsize1 .transfer-pause-icon span, .fontsize1 .user-name, .fontsize1 a.user-name, .fontsize1 .top-menu-icon, .fontsize1 .create-account-button, .fontsize1 .top-login-button, .fontsize1 .top-search-input, .fontsize1 .nw-fm-tree-header input, .fontsize1 .notification-info, .fontsize1 .notification-username, .fontsize1 .fm-account-remove-avatar, .fm-account-change-avatar, .fontsize1 .fm-account-save, .fontsize1 .fm-account-cancel, .fontsize1 .nlanguage-bottom, .fontsize1 .nlanguage-lnk, .fontsize1 a.nlanguage-lnk, .fontsize1 a.nlanguage-lnk:link, .fontsize1 a.nlanguage-lnk:visited, .fontsize1 a.nlanguage-lnk:hover, .fontsize1 a.nlanguage-lnk:active, .fontsize1 .share-dialog-permissions, .fontsize1 .share-dialog-icon.permissions-icon, .fontsize1 .transfer-panel-title, .fontsize1 .fm-breadcrumbs .right-arrow-bg, .fontsize1 .fm-share-breadcrumbs .right-arrow-bg, .fontsize1 .toast-notification, .fontsize1 .fm-notification-info p {
+.fontsize1 .nlanguage-bottom, .fontsize1 .nlanguage-lnk, .fontsize1 a.nlanguage-lnk, .fontsize1 a.nlanguage-lnk:link, .fontsize1 a.nlanguage-lnk:visited, .fontsize1 a.nlanguage-lnk:hover, .fontsize1 a.nlanguage-lnk:active, .fontsize1 .share-dialog-permissions, .fontsize1 .share-dialog-icon.permissions-icon, .fontsize1 .transfer-panel-title, .fontsize1 .fm-breadcrumbs .right-arrow-bg, .fontsize1 .fm-share-breadcrumbs .right-arrow-bg, .fontsize1 .toast-notification, .fontsize1 .fm-notification-info p {
     font-size: 13px;
 }
 .fontsize1 .nw-fm-dialog-title, .fontsize1 .fm-dialog-title {

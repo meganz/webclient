@@ -636,13 +636,13 @@ var Help = (function() {
             if (args.length === 3) {
                 question = args.pop();
             } else if (args.length !== 1) {
-                document.location.href = "#help/welcome";
+                document.location.href = "#help";
                 return;
             }
 
             var data = Data["help_" + args.join("_")];
             if (!data) {
-                document.location.href = "#help/welcome";
+                document.location.href = "#help";
                 return;
             }
 
@@ -718,7 +718,11 @@ var Help = (function() {
             return urls[parts[1]](parts.slice(1));
         }
 
-        document.location.href = url("welcome");
+        if (parts.length === 1) {
+            return urls.welcome();
+        }
+
+        document.location.href = "#help";
     }
 
     // getVisibleElement

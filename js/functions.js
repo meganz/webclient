@@ -3507,8 +3507,10 @@ mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
         dlmanager.logger.info("resetUploadDownload", ul_queue.length, dl_queue.length);
     }
 
-    // fm_tfsupdate();
-    // Later(percent_megatitle);
+    if (page === 'download') {
+        fm_tfsupdate();
+        Later(percent_megatitle);
+    }
 };
 
 /**

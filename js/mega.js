@@ -6300,7 +6300,9 @@ function treefetcher_procmsg(ev) {
             for (h in ev.data.rsasharekeys) rsasharekeys[h] = ev.data.rsasharekeys[h];
         }
         if (ev.data.rsa2aes) {
-            for (h in ev.data.rsa2aes) rsa2aes[h] = ev.data.rsa2aes[h];
+            for (h in ev.data.rsa2aes) {
+                if (ev.data.rsa2aes[h]) rsa2aes[h] = true;
+            }
         }
         if (ev.data.sharekeys) {
             for (h in ev.data.sharekeys) {
@@ -7625,8 +7627,11 @@ function loadfm_callback(res) {
             processPH(res.ph);
         }
 
-        // decrypt undecrypted nodes
+        // decrypt hitherto undecrypted nodes
         crypto_fixmissingkeys(missingkeys);
+
+        // rewrite RSA keys to AES to save CPU & bandwidth & space
+        crypto_node_rsa2aes();
 
         // set maxaction
         setsn(res.sn);

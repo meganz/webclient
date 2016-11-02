@@ -3709,12 +3709,13 @@ function api_updfkey(h) {
     }
 }
 
-function crypto_sendrsa2aes() {
-    var n;
+function crypto_node_rsa2aes() {
     var nk = [];
 
-    for (n in rsa2aes) {
-        nk.push(n, base64urlencode(rsa2aes[n]));
+    for (h in rsa2aes) {
+        if (rsa2aes[h] && crypto_keyok(M.d[h])) {
+            nk.push(h, a32_to_base64(encrypt_key(u_k_aes, M.d[h].k)));
+        }
     }
 
     if (nk.length) {
@@ -3837,69 +3838,6 @@ function crypto_setnodekey(h, k) {
     }
 }
 
-function crypto_reqmissingkeys() {
-    var logger = MegaLogger.getLogger('crypt');
-
-    if (!newmissingkeys) {
-        logger.debug('No new missing keys.');
-        return;
-    }
-
-    var i, j;
-    var n, s, ni, si, sn;
-    var cr = [[], [], []];
-
-    ni = {};
-    si = {};
-
-    for (n in missingkeys) {
-        // TODO: optimization: don't request keys for own files
-        sn = fm_getsharenodes(n);
-
-        for (j = sn.length; j--;) {
-            s = sn[j];
-
-            if (typeof si[s] === 'undefined') {
-                si[s] = cr[0].length;
-                cr[0].push(s);
-            }
-
-            if (typeof ni[n] === 'undefined') {
-                ni[n] = cr[1].length;
-                cr[1].push(n);
-            }
-
-            cr[2].push(si[s], ni[n]);
-        }
-    }
-
-    if (!cr[1].length) {
-        logger.debug('No missing keys');
-
-        return;
-    }
-
-    if (cr[0].length) {
-        var ctx = {};
-
-        ctx.callback = function (res, ctx) {
-            logger.debug("Processing crypto response");
-
-            if (typeof res === 'object' && typeof res[0] === 'object') {
-                crypto_proccr(res[0]);
-            }
-        }
-
-        res = api_req({
-            a: 'k',
-            cr: cr
-        }, ctx);
-    }
-    else {
-        logger.debug("Keys " + cr[1] + " missing, but no related shares found.");
-    }
-}
-
 // process incoming cr, set nodekeys and commit
 function crypto_proccr(cr) {
     var i;
@@ -3949,12 +3887,12 @@ function crypto_procmcr(mcr) {
 
 function crypto_share_rsa2aes() {
     var rsr = [],
-        n;
+        h;
 
-    for (n in rsasharekeys) {
-        if (u_sharekeys[n]) {
+    for (h in rsasharekeys) {
+        if (u_sharekeys[h]) {
             // pubkey found: encrypt share key to it
-            rsr.push(n, u_handle, a32_to_base64(encrypt_key(u_k_aes, u_sharekeys[n][0])));
+            rsr.push(h, u_handle, a32_to_base64(encrypt_key(u_k_aes, u_sharekeys[h][0])));
         }
     }
 
@@ -3963,6 +3901,7 @@ function crypto_share_rsa2aes() {
             a: 'k',
             sr: rsr
         });
+
         rsasharekeys = {};
     }
 }

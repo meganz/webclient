@@ -99,35 +99,35 @@ function crypto_process_sharekey(handle, key) {
 // NO_KEY:  { h, p, u, ts, t, k (string), a (for t < 2), s (for t == 0), fa (for some t == 0) }
 // CORRUPT: { h, p, u, ts, t, k (object), s (for t == 0) }
 // OK:      { h, p, u, ts, t, k (object), s (for t == 0), name, hash, mtime, ar (containing attributes other than n/c/t) }
-function crypto_decryptnode(node) {
+function crypto_decryptnode(n) {
     var key, k;
     var id;
     var p, pp;
 
     // is this node in OK or CORRUPT state or a keyless (root) node? no decryption needed.
-    if (node.name || typeof node.k == 'undefined' || typeof node.k == 'object') return;
+    if (n.name || typeof n.k == 'undefined' || typeof n.k == 'object') return;
 
     // inbound share root?
-    if (node.sk) {
-        key = crypto_process_sharekey(node.h, node.sk);
-        u_sharekeys[node.h] = [key, new sjcl.cipher.aes(key)];
-        node.p = node.u;
-        delete node.sk;
+    if (n.sk) {
+        key = crypto_process_sharekey(n.h, n.sk);
+        u_sharekeys[n.h] = [key, new sjcl.cipher.aes(key)];
+        n.p = n.u;
+        delete n.sk;
     }
 
     // does the logged in user own the node? (user key is guaranteed to be located first in .k)
-    if (node.k.length == 43 || node.k.length == 22) {
+    if (n.k.length == 43 || n.k.length == 22) {
         id = u_handle;
         p = 0;
     }
-    else if (node.k[11] == ':' && u_handle === node.k.substr(0, 11)) {
+    else if (n.k[11] == ':' && u_handle === n.k.substr(0, 11)) {
         id = u_handle;
         p = u_handle.length+1;
     } else {
         // do we have a suitable sharekey?
-        for (p = 8; (p = node.k.indexOf(':', p)) >= 0; ) {
-            if (++p == 9 || node.k[p-10] == '/') {
-                id = node.k.substr(p-9, 8);
+        for (p = 8; (p = n.k.indexOf(':', p)) >= 0; ) {
+            if (++p == 9 || n.k[p-10] == '/') {
+                id = n.k.substr(p-9, 8);
                 if (u_sharekeys[id]) {
                     break;
                 }
@@ -136,13 +136,13 @@ function crypto_decryptnode(node) {
     }
 
     if (p >= 0) {
-        var pp = node.k.indexOf('/', p);
+        var pp = n.k.indexOf('/', p);
 
         if (pp < 0) {
-            pp = node.k.length;
+            pp = n.k.length;
         }
 
-        key = node.k.substr(p, pp-p);
+        key = n.k.substr(p, pp-p);
 
         // we have found a suitable key: decrypt!
         if (key.length < 46) {
@@ -155,7 +155,7 @@ function crypto_decryptnode(node) {
             }
             else {
                 if (d) {
-                    console.log("Received invalid key length (" + k.length + "): " + node.h);
+                    console.log("Received invalid key length (" + k.length + "): " + n.h);
                 }
                 k = false;
             }
@@ -166,11 +166,14 @@ function crypto_decryptnode(node) {
                 var t = base64urldecode(key);
                 try {
                     if (t) {
-                        k = str_to_a32(crypto_rsadecrypt(t, u_privk).substr(0, node.t ? 16 : 32));
+                        k = str_to_a32(crypto_rsadecrypt(t, u_privk).substr(0, n.t ? 16 : 32));
+
+                        // request this RSA key to be rewritten to AES
+                        rsa2aes[n.h] = rsa2aes[n.h] || false;
                     }
                     else {
                         if (d) {
-                            console.log("Corrupt key for node " + node.h);
+                            console.log("Corrupt key for node " + n.h);
                         }
                     }
                 }
@@ -182,22 +185,22 @@ function crypto_decryptnode(node) {
             }
             else {
                 if (d) {
-                    console.log("Received RSA key, but have no public key published: " + node.h);
+                    console.log("Received RSA key, but have no public key published: " + n.h);
                 }
             }
         }
 
-        if (node.a) crypto_procattr(node, k);
+        if (n.a) crypto_procattr(n, k);
         else {
-            if (d && node.t > 1) {
-                console.log('Missing attribute for node ' + node.h);
+            if (d && n.t > 1) {
+                console.log('Missing attribute for node ' + n.h);
             }
         }
     }
 
     if (!k) {
-        if (d) console.log("Can't extract key for " + node.h);
-        if (missingkeys) crypto_reportmissingkey(node);
+        if (d) console.log("Can't extract key for " + n.h);
+        if (missingkeys) crypto_reportmissingkey(n);
     }
 }
 
@@ -250,67 +253,66 @@ function crypto_clearattr(n) {
 }
 
 // if decryption of .a is successful, set .name, .hash, .mtime, .k and .ar and clear .a
-function crypto_procattr(node, key)
-{
-    var ab = base64_to_ab(node.a);
+function crypto_procattr(n, key) {
+    var ab = base64_to_ab(n.a);
     var o = ab && dec_attr(ab, key);
 
     if (o) {
         if (typeof o.n == 'string') {
-            node.name = o.n;
+            n.name = o.n;
             delete o.n;
 
-            // now we can be sure that we have a good key: rewrite to RSA
-            if (key.length >= 46) {
-                rsa2aes[node.h] = a32_to_str(encrypt_key(u_k_aes, k));
+            // now we can be sure that we have a good key: approve requested AES rewrite
+            if (rsa2aes[n.h] === false) {
+                rsa2aes[n.h] = true;
             }
 
             if (typeof o.c == 'string') {
-                node.hash = o.c;
+                n.hash = o.c;
                 delete o.c;
             }
 
             if (typeof o.t != 'undefined') {
-                node.mtime = o.t;
+                n.mtime = o.t;
                 delete o.t;
             }
-            else if (node.hash) {
-                var h = base64urldecode(node.hash);
+            else if (n.hash) {
+                var h = base64urldecode(n.hash);
                 var i = h.charCodeAt(16);
                 if (i <= 4) { // FIXME: change to 5 before the year 2106
                     var t = 0;
                     for (var i = h.charCodeAt(16); i--;) {
                         t = t * 256 + h.charCodeAt(17 + i);
                     }
-                    node.mtime = t;
+                    n.mtime = t;
                 }
             }
 
             if (typeof o.fav != 'undefined') {
-                node.fav = o.fav;
+                n.fav = o.fav;
                 delete o.fav;
             }
 
             if (typeof o.lbl != 'undefined') {
-                node.lbl = o.lbl;
+                n.lbl = o.lbl;
                 delete o.lbl;
             }
 
             if (typeof o.f != 'undefined') {
-                node.f = o.f;
+                n.f = o.f;
                 delete o.f;
             }
 
-            node.k = key;
-            node.ar = o;
-            delete node.a;
+            n.k = key;
+            n.ar = o;
+            delete n.a;
         }
         else {
-            if (d) console.log("Incomplete attributes for node " + node.h);
+            if (d) console.log("Incomplete attributes for node " + n.h);
         }
     }
     else {
-        if (d) console.log("Corrupted attributes or key for node " + node.h);
+        if (d) console.log("Corrupted attributes or key for node " + n.h);
     }
 }
 

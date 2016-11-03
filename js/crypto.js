@@ -1465,7 +1465,7 @@ function api_setsid(sid) {
     }
 
     apixs[0].sid = sid;
-    apixs[2].sid = sid;
+    apixs[2].sid = sid + "&ec";
     apixs[3].sid = sid;
     apixs[4].sid = sid + "&ec";
 }
@@ -1597,7 +1597,7 @@ function api_proc(q) {
                     var ctx = ctxs[i];                    
                     if (typeof ctx.progress == 'function') {
                         if (typeof ctx.buffer != 'undefined') {
-                            ctx.progress(progressPercent, this.responseText);
+                            ctx.progress(progressPercent, this.responseText, ctx);
                         }
                         else {
                             ctx.progress(progressPercent);
@@ -1874,40 +1874,68 @@ function setsn(sn) {
  * calls execsc() with server-client requests received
  * @param {Boolean} mDBload whether invoked from indexedDB.
  */
+var sccount;
+
+function sc_packet(a) {
+    execsc(a);
+    sccount++;
+}
+
+function sc_node(n) {
+    crypto_decryptnode(n);
+    scnodes.push(n);
+}
+
+function sc_residue(sc, ctx) {
+    if (sc.sn) {
+        setsn(sc.sn);
+        getsc()
+    }
+    else if (sc.w) {
+        waiturl = sc.w;
+        waittimeout = setTimeout(waitsc, waitbackoff);
+
+        if ((mega.flags & window.MEGAFLAG_LOADINGCLOUD) && !mega.loadReport.recvAPs) {
+            mega.loadReport.recvAPs       = Date.now() - mega.loadReport.stepTimeStamp;
+            mega.loadReport.stepTimeStamp = Date.now();
+        }
+
+        // if we're loading the cloud, notify completion only
+        // once all pending action packets have been processed.
+        if (!fminitialized && (loadfm.loading || ctx.mDBload)) {
+            loadfm_done(ctx.mDBload);
+        }
+    }
+    else return sc_failure(ctx.mDBload);
+}
+
+function sc_failure(mDBload) {
+    if (sccount) {
+        // FIXME: inform user that a reload is now needed, wipe IndexedDB
+        // and reload
+    }
+    else {
+        // FIXME: exponential backoff
+        getsc(mDBload);
+    }
+}
+
+// request new actionpackets and stream them to sc_packet() as they come in
+// nodes in t packets are streamed to sc_node()
 function getsc(mDBload) {
+    scnodes = [];
+    sccount = 0;
+
     api_req('sn=' + maxaction + '&ssl=1&e=' + cmsNotifHandler, {
-        mDBload: mDBload,
-        callback: function __onGetSC(res, ctx) {
-            if (typeof res === 'object') {
-                function getSCDone(sma) {
-                    if (sma !== -0x7ff
-                            && !folderlink && !pfid) {
-                        setsn(maxaction);
-                    }
+        mDBload   : mDBload,
+        buffer    : true,
+        sc_filter : json_splitter({ '{[a{' : sc_packet,
+                               '{[a{{t[f{' : sc_node,
+                                       '{' : sc_residue }),
 
-                    // If we're loading the cloud, notify completion only
-                    // once first action-packets have been processed.
-                    if (!fminitialized && (loadfm.loading || ctx.mDBload)) {
-                        loadfm_done(ctx.mDBload);
-                    }
-                }
-
-                if ((mega.flags & window.MEGAFLAG_LOADINGCLOUD) && !mega.loadReport.recvAPs) {
-                    mega.loadReport.recvAPs       = Date.now() - mega.loadReport.stepTimeStamp;
-                    mega.loadReport.stepTimeStamp = Date.now();
-                }
-
-                if (res.w) {
-                    waiturl = res.w;
-                    waittimeout = setTimeout(waitsc, waitbackoff);
-                    getSCDone(-0x7ff);
-                }
-                else {
-                    if (res.sn) {
-                        maxaction = res.sn;
-                    }
-                    execsc(res.a, getSCDone);
-                }
+        progress: function(perc, buffer, ctx) {
+            if (buffer && !ctx.sc_filter.proc(buffer, ctx)) {
+                sc_failure(ctx.mDBload);
             }
         }
     }, 2);
@@ -3840,10 +3868,8 @@ function crypto_setnodekey(h, k) {
 
 // process incoming cr, set nodekeys and commit
 function crypto_proccr(cr) {
-    var i;
-
     // received keys in response, add
-    for (i = 0; i < cr[2].length; i += 3) {
+    for (var i = 0; i < cr[2].length; i += 3) {
         crypto_setnodekey(cr[1][cr[2][i + 1]], cr[0][cr[2][i]] + ":" + cr[2][i + 2]);
     }
 }
@@ -4231,7 +4257,7 @@ function numend(s, o) {
     return -1;
 }
 
-function json_splitter(ctx, filters, residue) {
+function json_splitter(filters) {
     return {
         proc : json_proc,
 
@@ -4241,119 +4267,110 @@ function json_splitter(ctx, filters, residue) {
         // enclosing object stack at current position (type + name)
         stack : [],
 
-        // type of current object ('[' for array, '{' for hash)
-        currentlevel : false,
-
-        // flag indicating that a value is coming next 
-        expectvalue : true,
+        // 0: no value expected, 1: optional value expected, -1: compulsory value expected 
+        expectvalue : -1,
 
         // last hash name seen
         lastname : '',
 
-        // client context
-        ctx : ctx,
-
-        // array of exfiltration vectors
+        // hash of exfiltration vector callbacks
         filters : filters,
 
-        // residual vector
-        residue : residue,
-
-        // filter state (only one can be active at a time)
+        // bucket stack
+        buckets : [],
         lastpos : 0,
-        filter : -1,
-        res : ''
     };
 }
 
 // returns -1 if it wants more data, 0 in case of a fatal error, 1 when done
 // FIXME: replace console.log with proper logging
-function json_proc(json) {
-    var c, t, i;
-
+function json_proc(json, ctx) {
     while (this.p < json.length) {
-        c = json[this.p];
+        var c = json[this.p];
 
-        if (c == ',') {
-            if (this.expectvalue) {
-                console.error("Malformed JSON - stray comma " + json.substr(this.p-5, 100));
-                return 0;
-            }
-
-            if (!this.currentlevel) {
-                console.error("Malformed JSON - list at top level");
-                return 0;
-            }
-
-            if (this.filter >= 0 && this.stack.length == this.filters[this.filter][1]) {
-                //try {
-                    this.filters[this.filter][2](JSON.parse(json.substr(this.lastpos, this.p-this.lastpos)), this.ctx);
-                //} catch (e) {
-                //    console.log(json.substr(this.lastpos, this.p-this.lastpos));
-                //    console.log("Malformed JSON - parse error in filter element " + this.filter);
-                //    return 0;
-                //}
-                this.lastpos = this.p+1;
-            }
-
-            this.p++;
-            this.expectvalue = this.currentlevel == '[';
-        }
-        else if (c == '[' || c == '{') {
-            // we only exfiltrate entire arrays or hashes
-            for (i = this.filters.length; i--; ) {
-                if (this.stack.length == this.filters[i][1] && this.stack[0] == this.filters[i][0]) {
-                    if (this.filter < 0) {
-                        this.res += json.substr(this.lastpos, this.p-this.lastpos);
-                        this.lastpos = this.p;
-                        this.filter = i;
-                    }
-                }
-            }
-
+        if (c == '[' || c == '{') {
             if (!this.expectvalue) {
                 console.error("Malformed JSON - unexpected object or array");
                 return 0;
             }
 
-            if (this.currentlevel) this.stack.unshift(this.currentlevel + this.lastname);
-            this.currentlevel = c;
+            this.stack.push(json[this.p] + this.lastname);
+
+            if (this.filters[this.stack.join('')]) {
+                // a filter is configured for this path - recurse
+                this.buckets[0] += json.substr(this.lastpos, this.p-this.lastpos);
+                this.lastpos = this.p;
+                this.buckets.unshift('');
+            }
+
+            this.p++;
             this.lastname = '';
             this.expectvalue = c == '[';
+        }
+        else if (c == ']' || c == '}') {
+            if (this.expectvalue < 0) {
+                console.error("Malformed JSON - premature array closure");
+                return 0;
+            }
+
+            if (!this.stack.length || "]}".indexOf(c) != "[{".indexOf(this.stack[this.stack.length-1][0])) {
+                console.error("Malformed JSON - mismatched close");
+                return 0;
+            }
+
+            this.lastname = '';
+
+            // check if this concludes an exfiltrated object and return it if so
+            var callback = this.filters[this.stack.join('')];
             this.p++;
+
+            if (callback) {
+                // we have a filter configured for this object
+                //try {
+                    // pass filtrate to application and empty bucket
+                    callback(JSON.parse(this.buckets[0] + json.substr(this.lastpos, this.p-this.lastpos)), ctx);
+                //} catch (e) {
+                //    console.log(json.substr(this.lastpos, this.p-this.lastpos));
+                //    console.log("Malformed JSON - parse error in filter element " + this.filter);
+                //    return 0;
+                //}
+
+                this.buckets.shift();
+                this.lastpos = this.p;
+            }
+
+            this.stack.pop();
+            this.expectvalue = 0;
+        }
+        else if (c == ',') {
+            if (this.expectvalue) {
+                console.error("Malformed JSON - stray comma " + json.substr(this.p-5, 100));
+                return 0;
+            }
+            if (this.lastpos == this.p) this.lastpos++;
+            this.p++;
+            this.expectvalue = this.stack[this.stack.length-1][0] == '[';
         }
         else if (c == '"') {
-            t = strend(json, this.p);
+            var t = strend(json, this.p);
             if (t < 0) break;
 
-            if (this.expectvalue)
-            {
+            if (this.expectvalue) {
                 this.p = t;
                 this.expectvalue = false;
             }
-            else
-            {
+            else {
                 // (need at least one char after end of property string)
                 if (t == json.length) break;
 
-                if (json[t] == ':') {
-                    if (this.currentlevel != '{') {
-                        console.error("Malformed JSON - named property found outside object");
-                        return 0;
-                    }
-
-                    if (this.expectvalue) {
-                        console.error("Malformed JSON - unexpected property name");
-                        return 0;
-                    }
-
-                    this.lastname = json.substr(this.p+1, t-this.p-2);
-                    this.expectvalue = true;
-                    this.p = t+1;
+                if (json[t] != ':') {
+                    console.error("Malformed JSON - no : found after property name");
+                    return 0;
                 }
-                else {
-                    this.p = t;
-                }
+
+                this.lastname = json.substr(this.p+1, t-this.p-2);
+                this.expectvalue = -1;
+                this.p = t+1;
             }
         }
         else if (c >= '0' && c <= '9' || c == '.' || c == '-')
@@ -4363,54 +4380,19 @@ function json_proc(json) {
                 return 0;
             }
 
-            // FIXME: add "input is complete" to detect incomplete
-            // multi-digi stand-alone numbers (once needed)
-            t = numend(json, this.p);
+            // FIXME: add "input is complete" flag to detect incomplete
+            // multi-digit stand-alone numbers (once needed)
+            var t = numend(json, this.p);
             if (t < 0 || t == json.length) break;
 
             this.p = t;
             this.expectvalue = false;
         }
-        else if (c == ']' || c == '}') {
-            if (this.currentlevel != ((c == ']') ? '[' : '{')) {
-                console.error("Malformed JSON - mismatched close");
-                return 0;
-            }
-
-            this.lastname = '';
-            this.currentlevel = this.stack.length && this.stack.shift()[0];
-            this.expectvalue = false;
-
-            if (this.filter >= 0 && this.stack.length < this.filters[this.filter][1]) {
-                try {
-                    this.filters[this.filter][2](JSON.parse(json.substr(this.lastpos, this.p-this.lastpos)), this.ctx);
-                } catch (e) {
-                    console.error("Malformed JSON - parse error in last filter element " + this.filter);
-                    return 0;
-                }
-
-                this.lastpos = this.p;
-                this.filter = -1;
-            }
-
-            this.p++;
-        }
         else {
             console.error("Malformed JSON - bogus char at position " + this.p);
             return 0;
         }
-
-        if (!this.currentlevel && !this.expectvalue) {
-            try {
-                this.residue(JSON.parse(this.res + json.substr(this.lastpos)), this.ctx);
-            } catch (e) {
-                console.error("Malformed JSON - parse error in residue");
-                return 0;
-            }
-
-            return 1;
-        }
     }
 
-    return -1;
+    return (!this.expectvalue && !this.stack.length) ? 1 : -1;
 }

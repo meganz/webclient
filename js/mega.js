@@ -5532,568 +5532,597 @@ function renderNew() {
     }
 }
 
-/**
- * Execute response from server to client
- */
-function execsc(actionPackets, callback) {
-    var n;
-    var tparentid = false,
-        trights = false,
-        tmoveid = false,
-        rootsharenodes = [],
-        loadavatars = [];
+// execute actionpacket
+// actionpackets are delivered strictly in order and one by one and processed
+// while being received (a connection abort forces a filemanager reload!)
+// the node payload of a t packet is parsed and decrypted upfront and stored
+// here:
+var scnodes = [];
 
-    newnodes = [];
-    mega.flags |= window.MEGAFLAG_EXECSC;
+// inter-actionpacket state:
+var tparentid = false,
+    trights = false,
+    tmoveid = false,
+    rootsharenodes = [],
+    loadavatars = [];
+
+function execsc(a) {
+    var n, i;
 
     if (d) {
-        console.time('execsc');
+        console.log('actionpacket', a);
     }
 
-    // Process action packets
-    for (var i in actionPackets) {
-        var actionPacket = actionPackets[i];
-
-        // If debug mode, log the packet to console
+    if (a.i === requesti) {
         if (d) {
-            console.log('actionpacket', actionPacket);
+            console.log('OWN ACTION PACKET');
         }
 
-        // If own action packet
-        if (actionPacket.i === requesti) {
-            if (d) {
-                console.log('OWN ACTION PACKET');
-            }
+        switch (a.a) {
+            case 'c':
+                // contact notification
+                process_u(a.u);
 
-            // If contact notification
-            if (actionPacket.a === 'c') {
-                process_u(actionPacket.u);
-
-                // Only show a notification if we did not trigger the action ourselves
-                if (!pfid && u_attr && actionPacket.ou !== u_attr.u) {
-                    notify.notifyFromActionPacket(actionPacket);
+                // only show a notification if we did not trigger the action ourselves
+                if (!pfid && u_attr && a.ou !== u_attr.u) {
+                    notify.notifyFromActionPacket(a);
                 }
 
                 if (megaChatIsReady) {
-                    $.each(actionPacket.u, function (k, v) {
+                    $.each(a.u, function (k, v) {
                         if (v.c !== 0) {
                             crypt.getPubRSA(v.u);
                         }
                         megaChat[v.c == 0 ? "processRemovedUser" : "processNewUser"](v.u);
                     });
                 }
-            }
-            // Full share
-            else if (actionPacket.a === 's' || actionPacket.a === 's2') {
-                // Used during share dialog removal of contact from share list
-                // Find out is this a full share delete
-                if (actionPacket.r === undefined) {
+                break;
 
-                    // Fill DDL with removed contact
-                    if (actionPacket.u && M.u[actionPacket.u] && M.u[actionPacket.u].m) {
-                        var email = M.u[actionPacket.u].m;
-                        var contactName = M.getNameByHandle(actionPacket.u);
+            case 's':
+            case 's2':
+                // share modification
+                // (used during share dialog removal of contact from share list)
+                // is this a full share delete?
+                if (a.r === undefined) {
+                    // fill DDL with removed contact
+                    if (a.u && M.u[a.u] && M.u[a.u].m) {
+                        var email = M.u[a.u].m;
+                        var contactName = M.getNameByHandle(a.u);
 
                         addToMultiInputDropDownList('.share-multiple-input', [{ id: email, name: contactName }]);
                         addToMultiInputDropDownList('.add-contact-multiple-input', [{ id: email, name: contactName }]);
                     }
                 }
 
-                if (actionPacket.okd) {
-                    M.delNodeShare(actionPacket.n, actionPacket.u, actionPacket.okd);
+                if (a.okd) {
+                    M.delNodeShare(a.n, a.u, a.okd);
                 }
 
-                if (actionPacket.a === 's2') {
-                    processPS([actionPacket]);
+                if (a.a == 's2') {
+                    processPS([a]);
                 }
 
                 if (fminitialized) {
                     // Full share contains .h param
-                    sharedUInode(actionPacket.h);
+                    sharedUInode(a.h);
                 }
-            }
-            // Outgoing pending contact
-            else if (actionPacket.a === 'opc') {
-                processOPC([actionPacket]);
+                break;
 
-                // Don't append to sent grid on deletion
-                if (!actionPacket.dts) {
-                    M.drawSentContactRequests([actionPacket]);
-                }
-            }
-            // Incoming pending contact
-            else if (actionPacket.a === 'ipc') {
-                processIPC([actionPacket]);
-                M.drawReceivedContactRequests([actionPacket]);
-                notify.notifyFromActionPacket(actionPacket);
-            }
-            // Export link (public handle)
-            else if (actionPacket.a === 'ph') {
-                processPH([actionPacket]);
-            }
-            // Incoming request updated
-            else if (actionPacket.a === 'upci') {
-                processUPCI([actionPacket]);
-            }
-            // Outgoing request updated
-            else if (actionPacket.a === 'upco') {
-                processUPCO([actionPacket]);
+            case 'opc':
+                // outgoing pending contact
+                processOPC([a]);
 
-                // If the status is accepted ('2') then this will be followed by a contact packet and we do not need to notify
-                if (actionPacket.s !== 2) {
-                    notify.notifyFromActionPacket(actionPacket);
+                // don't append to sent grid on deletion
+                if (!a.dts) {
+                    M.drawSentContactRequests([a]);
                 }
-            }
-            else if (actionPacket.a === 'ua') {
-                mega.attr.handleUserAttributeActionPackets(actionPacket, loadavatars);
-            }
-        }// END own action packet
-        else if (actionPacket.a === 'e') {
-            var str = hex2bin(actionPacket.c || "");
-            if (str.substr(0, 5) === ".cms.") {
-                var cmsType = str.split(".")[2];
-                var cmsId = str.substr(6 + cmsType.length).split(".");
-                CMS.reRender(cmsType, cmsId);
-            }
+                break;
+
+            case 'ipc':
+                // incoming pending contact
+                processIPC([a]);
+                M.drawReceivedContactRequests([a]);
+                notify.notifyFromActionPacket(a);
+                break;
+
+            case 'ph':
+                // exported link
+                processPH([a]);
+                break;
+
+            case 'upci':
+                // update to incoming pending contact request
+                processUPCI([a]);
+                break;
+
+            case 'upco':
+                // update to outgoing pending contact request
+                processUPCO([a]);
+
+                // request is accepted ('2') then this will be followed by a contact packet and we do not need to notify
+                if (a.s != 2) notify.notifyFromActionPacket(a);
+                break;
+
+            case 'ua':
+                mega.attr.handleUserAttributeActionPackets(a, loadavatars);
         }
-        else if (actionPacket.a === 'fa') {
-            if (n = M.d[actionPacket.n]) {
-                n.fa = actionPacket.fa;
-                M.nodeUpdated(n);
-            }
-        }
-        else if ((actionPacket.a === 's' || actionPacket.a === 's2') && !folderlink) {
-            var tsharekey = '';
-            var prockey = false;
-
-            if (actionPacket.o === u_handle) {
-                if (!actionPacket.u) {
-                    // this must be a pending share
-                    if (actionPacket.a !== 's2') {
-                        console.error('INVALID SHARE ACTION PACKET, Missing user-handle', actionPacket);
-                    }
+    }// END own action packet
+    else {
+        switch (a.a) {
+            case 'e':
+                // CMS update
+                var str = hex2bin(a.c || "");
+                if (str.substr(0, 5) === ".cms.") {
+                    var cmsType = str.split(".")[2];
+                    var cmsId = str.substr(6 + cmsType.length).split(".");
+                    CMS.reRender(cmsType, cmsId);
                 }
-                // If access right are undefined then share is deleted
-                else if (typeof actionPacket.r === "undefined") {
-                    M.delNodeShare(actionPacket.n, actionPacket.u, actionPacket.okd);
+                break;
+
+            case 'fa':
+                // file attribute change/addition
+                if (n = M.d[a.n]) {
+                    n.fa = a.fa;
+                    M.nodeUpdated(n);
                 }
-                else {
-                    var handle = actionPacket.n;
-                    var shares = Object(M.d[handle]).shares || {};
+                break;
 
-                    if (shares.hasOwnProperty(actionPacket.u)
-                            || (actionPacket.ha === crypto_handleauth(actionPacket.n))) {
+            case 's':
+            case 's2':
+                if (!folderlink) {
+                    var tsharekey = '';
+                    var prockey = false;
 
-                        // I updated or created my share
-                        var k = decrypt_key(u_k_aes, base64_to_a32(actionPacket.ok));
-                        crypto_setsharekey(handle, k);
-                        M.nodeShare(handle, {
-                            h: actionPacket.n,
-                            r: actionPacket.r,
-                            u: actionPacket.u,
-                            ts: actionPacket.ts
-                        });
-                    }
-                }
-            }
-            else {
-                if ((typeof actionPacket.n !== 'undefined')
-                        && (typeof actionPacket.k !== 'undefined')
-                        && (typeof u_sharekeys[actionPacket.n] === 'undefined')) {
-
-                    if (!actionPacket.k) {
-                        // XXX: We need to find out which API call is causing it
-                        //      (it might be a bug in the SDK or the webclient)
-                        // How to reproduce: Delete folder with pending shares,
-                        // on client side we will have this situation
-                        srvlog('Got share action-packet with no key.');
-                    }
-                    else {
-                        var k = crypto_process_sharekey(actionPacket.n, actionPacket.k);
-                        crypto_setsharekey(actionPacket.n, k);
-                        tsharekey = a32_to_base64(u_k_aes.encrypt(k));
-                        prockey = true;
-                    }
-                }
-
-                if (actionPacket && actionPacket.u === 'EXP') {
-                    var exportLink = new mega.Share.ExportLink({ 'nodesToProcess': [actionPacket.h] });
-                    exportLink.getExportLink();
-                }
-
-                if (typeof actionPacket.o !== 'undefined') {
-                    if (typeof actionPacket.r === "undefined") {
-                        if (d) {
-                            console.log('delete a share');
-                        }
-                        // delete a share:
-                        n = M.d[actionPacket.n];
-                        if (n && n.p.length != 11) {
-                            // outgoing share removed
-                            delete n.r;
-                            delete n.su;
-
-                            if (fmdb) {
-                                M.nodeUpdated(n);
-                                fmdb.del('s', u_handle + '*' + actionPacket.n);
+                    if (a.o === u_handle) {
+                        if (!a.u) {
+                            // this must be a pending share
+                            if (a.a != 's2') {
+                                console.error('INVALID SHARE ACTION PACKET, Missing user handle', a);
                             }
+                        }
+                        // if access right are undefined, then share is deleted
+                        else if (typeof a.r == 'undefined') {
+                            M.delNodeShare(a.n, a.u, a.okd);
                         }
                         else {
-                            M.delNode(actionPacket.n);
-                        }
-                        if (!folderlink && actionPacket.u !== 'EXP' && fminitialized) {
-                            notify.notifyFromActionPacket({
-                                a: 'dshare',
-                                n: actionPacket.n,
-                                u: actionPacket.o
-                            });
-                        }
-                        delete u_sharekeys[actionPacket.n];
-                    }
-                    else {
-                        if (d) {
-                            console.log('I receive a share, prepare for receiving tree a');
-                        }
-                        // I received a share, prepare for receiving tree
-                        tparentid = actionPacket.o;
-                        trights = actionPacket.r;
-                        if (n = M.d[actionPacket.n]) {
-                            // update rights:
-                            n.r = actionPacket.r;
-                            n.su = actionPacket.o;
-                            M.nodeUpdated(n);
-                        }
-                        else {
-                            if (d) {
-                                console.log('Look up other share nodes from this user');
-                            }
+                            var handle = a.n;
+                            var shares = Object(M.d[handle]).shares || {};
 
-                            if (typeof M.c[actionPacket.o] !== 'undefined') {
-                                for (var i in M.c[actionPacket.o]) {
-                                    if (M.d[i] && M.d[i].t == 1) {
-                                        rootsharenodes[i] = 1;
-                                    }
-                                }
-                            }
+                            if (shares.hasOwnProperty(a.u)
+                                    || (a.ha === crypto_handleauth(a.n))) {
 
-                            if (!folderlink && fminitialized) {
-                                notify.notifyFromActionPacket({
-                                    a: 'share',
-                                    n: actionPacket.n,
-                                    u: actionPacket.o
+                                // I updated or created my share
+                                var k = decrypt_key(u_k_aes, base64_to_a32(a.ok));
+                                crypto_setsharekey(handle, k);
+                                M.nodeShare(handle, {
+                                    h: a.n,
+                                    r: a.r,
+                                    u: a.u,
+                                    ts: a.ts
                                 });
                             }
                         }
                     }
-                }
-            }
+                    else {
+                        if (a.n && typeof a.k != 'undefined' && !u_sharekeys[a.n]) {
+                            if (!a.k) {
+                                // XXX: We need to find out which API call is causing it
+                                //      (it might be a bug in the SDK or the webclient)
+                                // How to reproduce: Delete folder with pending shares,
+                                // on client side we will have this situation
+                                srvlog('Got share action-packet with no key.');
+                            }
+                            else {
+                                var k = crypto_process_sharekey(a.n, a.k);
+                                crypto_setsharekey(a.n, k);
+                                tsharekey = a32_to_base64(u_k_aes.encrypt(k));
+                                prockey = true;
+                            }
+                        }
 
-            if (prockey) {
-                var nodes = fm_getnodes(actionPacket.n, 1);
-                nodes.push(actionPacket.n);
-                for (i = nodes.length; i--; ) {
-                    if (n = M.d[nodes[i]]) {
-                        if (typeof n.k == 'string') {
-                            crypto_decryptnode(n);                            
-                            newnodes.push(M.d[n.h]);
+                        if (a.u == 'EXP') {
+                            var exportLink = new mega.Share.ExportLink({ 'nodesToProcess': [a.h] });
+                            exportLink.getExportLink();
+                        }
+
+                        if (a.o) {
+                            if (typeof a.r == 'undefined') {
+                                if (d) {
+                                    console.log('delete a share');
+                                }
+
+                                // delete a share:
+                                n = M.d[a.n];
+                                if (n && n.p.length != 11) {
+                                    // outgoing share removed
+                                    delete n.r;
+                                    delete n.su;
+
+                                    if (fmdb) {
+                                        M.nodeUpdated(n);
+                                        fmdb.del('s', u_handle + '*' + a.n);
+                                    }
+                                }
+                                else {
+                                    M.delNode(a.n);
+                                }
+
+                                if (!folderlink && a.u != 'EXP' && fminitialized) {
+                                    notify.notifyFromActionPacket({
+                                        a: 'dshare',
+                                        n: a.n,
+                                        u: a.o
+                                    });
+                                }
+                                delete u_sharekeys[a.n];
+                            }
+                            else {
+                                if (d) {
+                                    console.log('I received a share, preparing for receiving tree a');
+                                }
+                                // I received a share, prepare for receiving tree
+                                tparentid = a.o;
+                                trights = a.r;
+                                if (n = M.d[a.n]) {
+                                    // update rights:
+                                    n.r = a.r;
+                                    n.su = a.o;
+                                    M.nodeUpdated(n);
+                                }
+                                else {
+                                    if (d) {
+                                        console.log('Look up other share nodes from this user');
+                                    }
+
+                                    if (M.c[a.o]) {
+                                        for (i in M.c[a.o]) {
+                                            if (M.d[i] && M.d[i].t == 1) {
+                                                rootsharenodes[i] = 1;
+                                            }
+                                        }
+                                    }
+
+                                    if (!folderlink && fminitialized) {
+                                        notify.notifyFromActionPacket({
+                                            a: 'share',
+                                            n: a.n,
+                                            u: a.o
+                                        });
+                                    }
+                                }
+                            }
                         }
                     }
-                }
-            }
 
-            crypto_share_rsa2aes();
-
-            if (actionPacket.a === 's2') {
-                processPS([actionPacket]);
-            }
-
-            if (fminitialized) {
-                M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
-                sharedUInode(actionPacket.n);
-            }
-        }
-        else if (actionPacket.a === 'k') {
-            if (actionPacket.sr)
-                crypto_procsr(actionPacket.sr);
-            else if (actionPacket.cr)
-                crypto_proccr(actionPacket.cr);
-            else
-                if (!folderlink) api_req({
-                    a: 'k',
-                    cr: crypto_makecr(actionPacket.n, [actionPacket.h], true)
-                });
-
-            if (fminitialized) {
-                M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
-            }
-        }
-        else if (actionPacket.a === 't') {
-            if (tparentid) {
-                for (var b in actionPacket.t.f) {
-                    if (rootsharenodes[actionPacket.t.f[b].h] && M.d[actionPacket.t.f[b].h]) {
-                        actionPacket.t.f[b].r = M.d[actionPacket.t.f[b].h].r;
-                        actionPacket.t.f[b].su = M.d[actionPacket.t.f[b].h].su;
-                        M.delNode(actionPacket.t.f[b].h);
-                    }
-                }
-
-                if (!M.d[actionPacket.t.f[0].p]) {
-                    actionPacket.t.f[0].p = tparentid;
-                }
-
-                actionPacket.t.f[0].su = tparentid;
-                actionPacket.t.f[0].r = trights;
-
-                if (tsharekey) {
-                    actionPacket.t.f[0].sk = tsharekey;
-                    tsharekey = false;
-                }
-                rootsharenodes = [];
-            }
-
-            // notification logic:
-            if (fminitialized && !folderlink && actionPacket.ou && actionPacket.ou != u_handle
-                && actionPacket.t && actionPacket.t.f && actionPacket.t.f[0]
-                && actionPacket.t.f[0].p.length < 11 && !tmoveid && !tparentid) {
-
-                var targetid = actionPacket.t.f[0].p;
-                var pnodes = [];
-                for (var i in actionPacket.t.f) {
-                    if (actionPacket.t.f[i].p === targetid) {
-                        pnodes.push({
-                            h: actionPacket.t.f[i].h,
-                            t: actionPacket.t.f[i].t
-                        });
-                    }
-                }
-                notify.notifyFromActionPacket({
-                    a: 'put',
-                    n: targetid,
-                    u: actionPacket.ou,
-                    f: pnodes
-                });
-            }
-
-            // Temporarily disable the execsc flag so that all nodes are added to the DB using a single transaction
-            mega.flags &= ~window.MEGAFLAG_EXECSC;
-
-            tparentid = false;
-            trights = false;
-            __process_f1(actionPacket.t.f);
-
-            mega.flags |= window.MEGAFLAG_EXECSC;
-        }
-        else if (actionPacket.a === 'u') {
-            // update node attributes
-            if (n = M.d[actionPacket.n]) {
-                var oldname = n.name;
-                var oldfav = n.fav;
-
-                // key update
-                if (actionPacket.k) n.k = actionPacket.k;
-
-                // attribute update - replaces all existing attributes!
-                if (actionPacket.at) {
-                    crypto_clearattr(n);
-                    n.a = actionPacket.at;
-                }
-
-                // owner update
-                if (actionPacket.u) n.u = actionPacket.u;
-
-                // timestamp update
-                if (actionPacket.ts) n.ts = actionPacket.ts;
-
-                // try to decrypt new attributes
-                crypto_decryptnode(n);
-
-                if (crypto_keyok(n)) {
-                    if (n.name !== oldname) {
-                        M.onRenameUIUpdate(n.h, n.name);
-                    }
-                    if (fminitialized && n.fav !== oldfav) {
-                        if (f.fav) {
-                            $('.grid-table.fm #' + n.h + ' .grid-status-icon').addClass('star');
-                            $('#' + n.h + '.file-block .file-status-icon').addClass('star');
-                        }
-                        else {
-                            $('.grid-table.fm #' + n.h + ' .grid-status-icon').removeClass('star');
-                            $('#' + n.h + '.file-block .file-status-icon').removeClass('star');
+                    if (prockey) {
+                        var nodes = fm_getnodes(a.n, 1);
+                        nodes.push(a.n);
+                        for (i = a.length; i--; ) {
+                            if (n = M.d[nodes[i]]) {
+                                if (typeof n.k == 'string') {
+                                    crypto_decryptnode(n);                            
+                                    newnodes.push(M.d[n.h]);
+                                }
+                            }
                         }
                     }
+
+                    crypto_share_rsa2aes();
+
+                    if (a.a == 's2') {
+                        processPS([a]);
+                    }
+
+                    if (fminitialized) {
+                        M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
+                        sharedUInode(a.n);
+                    }
                 }
+                break;
 
-                // save node, even if it is undecryptable
-                M.nodeUpdated(n);
-            }
-        }
-        else if (actionPacket.a === 'c') {
-            process_u(actionPacket.u);
+            case 'k':
+                // key request
+                if (a.sr) crypto_procsr(a.sr);
+                if (a.cr) crypto_proccr(a.cr);
+                // FIXME: obsolete - remove & replace
+                /*else
+                    if (!folderlink) api_req({
+                        a: 'k',
+                        cr: crypto_makecr(actionPacket.n, [actionPacket.h], true)
+                    });*/
 
-            // Contact is deleted on remote computer, remove contact from contacts left panel
-            if (fminitialized && actionPacket.u[0].c === 0) {
-                $('#contact_' + actionPacket.ou).remove();
+                if (fminitialized) {
+                    M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
+                }
+                break;
 
-                $.each(actionPacket.u, function(k, v) {
-
-                    var userHandle = v.u;
-
-                    // hide the context menu if it is currently visible and this contact was removed.
-                    if ($.selected && ($.selected[0] === userHandle)) {
-
-                        // was selected
-                        $.selected = [];
-                        if ($('.context-menu.files-menu').is(":visible")) {
-                            $.hideContextMenu();
+            case 't':
+                // node tree
+                // the nodes have been pre-parsed and stored in scnodes
+                if (tparentid) {
+                    for (i = 0; i < scnodes.length; i++) {
+                        if (rootsharenodes[scnodes[i].h] && M.d[scnodes[i].h]) {
+                            scnodes[i].r = M.d[scnodes[i].h].r;
+                            scnodes[i].su = M.d[scnodes[i].h].su;
+                            M.delNode(scnodes[i].h);
                         }
                     }
-                });
 
-                M.handleEmptyContactGrid();
-            }
-
-            // Only show a notification if we did not trigger the action ourselves
-            if (!pfid && u_attr && actionPacket.ou !== u_attr.u) {
-                notify.notifyFromActionPacket(actionPacket);
-            }
-
-            if (megaChatIsReady) {
-                $.each(actionPacket.u, function(k, v) {
-                    if (v.c !== 0) {
-                        crypt.getPubRSA(v.u);
+                    if (!M.d[scnodes[0].p]) {
+                        scnodes[0].p = tparentid;
                     }
-                    megaChat[v.c == 0 ? "processRemovedUser" : "processNewUser"](v.u);
-                });
-            }
-        }
-        else if (actionPacket.a === 'd') {
-            M.delNode(actionPacket.n);
 
-            // Only show a notification if we did not trigger the action ourselves
-            if (!pfid && u_attr && actionPacket.ou !== u_attr.u) {
-                notify.notifyFromActionPacket(actionPacket);
-            }
-        }
-        else if (actionPacket.a === 'ua' && fminitialized) {
-            var attrs = actionPacket.ua;
-            var actionPacketUserId = actionPacket.u;
-            for (var j in attrs) {
-                if (attrs.hasOwnProperty(j)) {
-                    var attributeName = attrs[j];
+                    scnodes[0].su = tparentid;
+                    scnodes[0].r = trights;
 
-                    attribCache.uaPacketParser(
-                        attributeName,
-                        actionPacketUserId,
-                        false,
-                        actionPacket.v && actionPacket.v[j] ? actionPacket.v[j] : undefined
-                    );
+                    // FIXME: put this earler
+                    if (tsharekey) {
+                        scnodes[0].sk = tsharekey;
+                        tsharekey = false;
+                    }
+
+                    rootsharenodes = [];
                 }
-            }
-        }
-        else if (actionPacket.a === 'la') {
-            notify.countAndShowNewNotifications();
-        }
-        else if (actionPacket.a === 'opc') {
-            processOPC([actionPacket]);
 
-            if (fminitialized) {
-                M.drawSentContactRequests([actionPacket]);
-            }
-        }
-        else if (actionPacket.a === 'ipc') {
-            processIPC([actionPacket]);
+                // notification logic
+                if (fminitialized && !folderlink && a.ou && a.ou != u_handle
+                    && scnodes.length && scnodes[0].p && scnodes[0].p.length < 11
+                    && !tmoveid && !tparentid) {
 
-            if (fminitialized) {
-                M.drawReceivedContactRequests([actionPacket]);
-            }
-            notify.notifyFromActionPacket(actionPacket);
-        }
-        else if (actionPacket.a === 'ph') {// Export link (public handle)
-            processPH([actionPacket]);
+                    var targetid = scnodes[0].p;
+                    var pnodes = [];
 
-            // Not applicable so don't return anything or it will show a blank notification
-            if (typeof actionPacket.up !== 'undefined' && typeof actionPacket.down !== 'undefined') {
-                notify.notifyFromActionPacket(actionPacket);
-            }
-        }
-        else if (actionPacket.a === 'upci') {
-            processUPCI([actionPacket]);
-        }
-        else if (actionPacket.a === 'upco') {
-            processUPCO([actionPacket]);
+                    for (i = 0; i < scnodes.length; i++) {
+                        if (scnodes[i].p === targetid) {
+                            pnodes.push({
+                                h: scnodes[i].h,
+                                t: scnodes[i].t
+                            });
+                        }
+                    }
 
-            // If the status is accepted ('2') then this will be followed by a contact packet and we do not need to notify
-            if (actionPacket.s !== 2) {
-                notify.notifyFromActionPacket(actionPacket);
-            }
-        }
-        // Action packet to notify about payment (Payment Service Transaction Status)
-        else if (actionPacket.a === 'psts') {
-            proPage.processPaymentReceived(actionPacket);
-        }
-        // Action packet for the mcc
-        else if (actionPacket.a === 'mcc') {
-            if (!megaChatIsDisabled) {
+                    notify.notifyFromActionPacket({
+                        a: 'put',
+                        n: targetid,
+                        u: a.ou,
+                        f: pnodes
+                    });
+                }
+
+                tparentid = false;
+                trights = false;
+
+                for (i = 0; i < scnodes.length; i++) M.addNode(scnodes[i]);
+                break;
+
+            case 'u':
+                // update node attributes
+                if (n = M.d[a.n]) {
+                    var oldname = n.name;
+                    var oldfav = n.fav;
+
+                    // key update
+                    if (a.k) n.k = a.k;
+
+                    // attribute update - replaces all existing attributes!
+                    if (a.at) {
+                        crypto_clearattr(n);
+                        n.a = a.at;
+                    }
+
+                    // owner update
+                    if (a.u) n.u = a.u;
+
+                    // timestamp update
+                    if (a.ts) n.ts = a.ts;
+
+                    // try to decrypt new attributes
+                    crypto_decryptnode(n);
+
+                    if (crypto_keyok(n)) {
+                        // success - check what changed an redraw
+                        if (n.name !== oldname) {
+                            M.onRenameUIUpdate(n.h, n.name);
+                        }
+                        if (fminitialized && n.fav !== oldfav) {
+                            if (f.fav) {
+                                $('.grid-table.fm #' + n.h + ' .grid-status-icon').addClass('star');
+                                $('#' + n.h + '.file-block .file-status-icon').addClass('star');
+                            }
+                            else {
+                                $('.grid-table.fm #' + n.h + ' .grid-status-icon').removeClass('star');
+                                $('#' + n.h + '.file-block .file-status-icon').removeClass('star');
+                            }
+                        }
+                    }
+
+                    // save modified node, even if it is undecryptable
+                    M.nodeUpdated(n);
+                }
+                break;
+
+            case 'c':
+                // contact update
+                process_u(a.u);
+
+                // contact is deleted on remote computer, remove contact from contacts left panel
+                if (fminitialized && a.u[0].c === 0) {
+                    $('#contact_' + a.ou).remove();
+
+                    $.each(a.u, function(k, v) {
+                        var userHandle = v.u;
+
+                        // hide the context menu if it is currently visible and this contact was removed.
+                        if ($.selected && ($.selected[0] === userHandle)) {
+
+                            // was selected
+                            $.selected = [];
+                            if ($('.context-menu.files-menu').is(":visible")) {
+                                $.hideContextMenu();
+                            }
+                        }
+                    });
+
+                    M.handleEmptyContactGrid();
+                }
+
+                // only show a notification if we did not trigger the action ourselves
+                if (!pfid && u_attr && a.ou !== u_attr.u) {
+                    notify.notifyFromActionPacket(a);
+                }
+
                 if (megaChatIsReady) {
-                    $(window).trigger('onChatdChatUpdatedActionPacket', actionPacket);
+                    $.each(a.u, function(k, v) {
+                        if (v.c !== 0) {
+                            crypt.getPubRSA(v.u);
+                        }
+                        megaChat[v.c == 0 ? "processRemovedUser" : "processNewUser"](v.u);
+                    });
                 }
-                else {
-                    ChatdIntegration._queuedChats[actionPacket.id] = actionPacket;
+                break;
+
+            case 'd':
+                // node deletion
+                M.delNode(a.n);
+
+                // Only show a notification if we did not trigger the action ourselves
+                if (!pfid && u_attr && a.ou !== u_attr.u) {
+                    notify.notifyFromActionPacket(a);
                 }
-            }
-        }
-        // Action packet for 'Set Email'
-        else if (actionPacket.a === 'se') {
-            var emailChangeAccepted = (actionPacket.s === 3
-                                       && typeof actionPacket.e === 'string'
-                                       && actionPacket.e.indexOf('@') !== -1);
+                break;
 
-            if (emailChangeAccepted) {
-                var user = M.getUserByHandle(actionPacket.u);
+            case 'ua':
+                // user attributes
+                if (fminitialized) {
+                    var attrs = a.ua;
+                    var actionPacketUserId = a.u;
 
-                if (user) {
-                    user.m = actionPacket.e;
-                    process_u([user]);
+                    for (var j in attrs) {
+                        var attributeName = attrs[j];
 
-                    if (actionPacket.u === u_handle) {
-                        u_attr.email = user.m;
+                        attribCache.uaPacketParser(
+                            attributeName,
+                            actionPacketUserId,
+                            false,
+                            a.v && a.v[j] ? a.v[j] : undefined
+                        );
+                    }
+                }
+                break;
 
-                        if (M.currentdirid === 'account/profile') {
-                            $('.nw-fm-left-icon.account').trigger('click');
+            case 'la':
+                // last seen/acknowledged notification sn
+                notify.countAndShowNewNotifications();
+                break;
+
+            case 'opc':
+                // outgoing pending contact
+                processOPC([a]);
+
+                if (fminitialized) {
+                    M.drawSentContactRequests([a]);
+                }
+                break;
+
+            case 'ipc':
+                // incoming pending contact
+                processIPC([a]);
+
+                if (fminitialized) {
+                    M.drawReceivedContactRequests([a]);
+                }
+
+                notify.notifyFromActionPacket(a);
+                break;
+
+            case 'ph':
+                // exported link
+                processPH([a]);
+
+                // not applicable - don't return anything, or it will show a blank notification
+                if (typeof a.up !== 'undefined' && typeof a.down != 'undefined') {
+                    notify.notifyFromActionPacket(a);
+                }
+                break;
+
+            case 'upci':
+                processUPCI([a]);
+                break;
+
+            case 'upco':
+                processUPCO([a]);
+
+                // if the status is accepted ('2'), then this will be followed
+                // by a contact packet and we do not need to notify
+                if (a.s != 2) {
+                    notify.notifyFromActionPacket(a);
+                }
+                break;
+
+            case 'psts':
+                proPage.processPaymentReceived(a);
+                break;
+
+            case 'mcc':
+                // MEGAchat
+                if (!megaChatIsDisabled) {
+                    if (megaChatIsReady) {
+                        $(window).trigger('onChatdChatUpdatedActionPacket', a);
+                    }
+                    else {
+                        ChatdIntegration._queuedChats[a.id] = a;
+                    }
+                }
+                break;
+
+            case 'se':
+                // set email
+                var emailChangeAccepted = (a.s == 3
+                                           && typeof a.e == 'string'
+                                           && a.e.indexOf('@') != -1);
+
+                if (emailChangeAccepted) {
+                    var user = M.getUserByHandle(a.u);
+
+                    if (user) {
+                        user.m = a.e;
+                        process_u([user]);
+
+                        if (a.u === u_handle) {
+                            u_attr.email = user.m;
+
+                            if (M.currentdirid === 'account/profile') {
+                                $('.nw-fm-left-icon.account').trigger('click');
+                            }
                         }
                     }
                 }
-            }
-        }
-        else {
-            if (d) {
-                console.log('not processing this action packet', actionPacket);
-            }
+                break;
+
+            default:
+                if (d) {
+                    console.log('not processing this action packet', a);
+                }
         }
     }
+
+    scnodes = [];
 
     if (newnodes.length && fminitialized) {
         renderNew();
     }
+
     if (loadavatars.length) {
         M.avatars(loadavatars);
     }
+
     if (M.viewmode) {
         delay('thumbnails', fm_thumbnails, 3200);
     }
+
     if ($.dialog === 'properties') {
         propertiesDialog();
     }
-    getsc();
-    if (callback) {
-        Soon(callback);
-    }
-
-    if (d) {
-        console.timeEnd('execsc');
-    }
-
-    mega.flags &= ~window.MEGAFLAG_EXECSC;
 }
 
 // a node was updated significantly: write to DB and redraw
@@ -6139,6 +6168,7 @@ function treefetcher() {
 
 // initiate fetch of node tree
 function treefetcher_fetch() {
+console.log("THIS=" + JSON.stringify(this));
     var workerstate;
 
     if (this.workers.length) {
@@ -6171,7 +6201,9 @@ function treefetcher_fetch() {
     // we filter out the ownerkeys and pipe them to treefetcher_ok()
     // we also filter out the nodes and pipe them to treefetcher_node()
     // the rest of the `f` response goes to treefetcher_residue()
-    var gettree_filter = json_splitter(this, [['{ok0', 2, treefetcher_ok], ['{f', 2, treefetcher_node]], treefetcher_residue);
+    var gettree_filter = json_splitter({ '[{[ok0{' : treefetcher_ok,
+                                           '[{[f{' : treefetcher_node,
+                                               '[' : treefetcher_residue });
 
     var req_params = {
         a : 'f',
@@ -6188,13 +6220,14 @@ function treefetcher_fetch() {
     }
 
     api_req(req_params, {
-        progress: function(perc, buffer) {
+        ctx : this,
+        buffer : true,
+        progress: function(perc, buffer, ctx) {
             loadingInitDialog.step2(parseInt(perc));    // FIXME: make generic
-            if (buffer && !gettree_filter.proc(buffer)) {
-                // FIXME: trigger retry with exponential backoff 
+            if (buffer && !gettree_filter.proc(buffer, ctx.ctx)) {
+                // FIXME: wipe DB, trigger retry with exponential backoff 
             }
-        },
-        buffer : true
+        }
     }, n_h ? 5 : 4);
 }
 
@@ -7089,7 +7122,7 @@ function __process_f1(f)
     for (var i in f) M.addNode(f[i]);
 }
 
-function __process_f2(f, cb, tick)
+/*function __process_f2(f, cb, tick)
 {
     var max = 12000, n;
 
@@ -7112,7 +7145,7 @@ function __process_f2(f, cb, tick)
             }, tick *= 1.2);
         }
     }
-}
+}*/
 
 /**
  * Handle incoming pending contacts
@@ -7221,7 +7254,7 @@ function processPH(publicHandles) {
 
         publicHandleId = value.ph;
 
-        // Remove export link, down: 1
+        // remove exported link, down: 1
         if (value.d) {
             M.delNodeShare(nodeId, 'EXP');
 

@@ -7243,10 +7243,10 @@ function contextMenuUI(e, ll) {
                 return $(this).css('display') === 'none';
             });
         if (x.length === a.length || a.length === 0) {
-            $this.hide();
-        }
+            $this.addClass('hidden');
+        } 
         else {
-            $this.show();
+            $this.removeClass('hidden');
         }
     });
 
@@ -7255,6 +7255,11 @@ function contextMenuUI(e, ll) {
     disableCircularTargets('#fi_');
 
     m.removeClass('hidden');
+
+    // Hide last divider
+    v.find('hr').removeClass('hidden');
+    m.find('.dropdown-section:visible:last hr').addClass('hidden');
+
     e.preventDefault();
 }
 

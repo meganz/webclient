@@ -18,7 +18,7 @@ function FMDB() {
         del : fmdb_del,
         get : fmdb_get,
 
-        name : '',       // DB name suffix, derived from u_handle and u_k
+        name : false,    // DB name suffix, derived from u_handle and u_k
         pending : {},    // pending obfuscated writes [tid][tablename][op_autoincrement] = [payloads]
         head : 0,        // current tid being received from the application code
         tail : 0,        // current tid being sent to IndexedDB
@@ -45,12 +45,15 @@ function fmdb_init(u, result, wipe) {
         fmdb_identity = rand(0x10000000) + '.' + rand(0x10000000) + '.' + rand(0x10000000) + '.' + (new Date).getTime();        
     }
 
+    if (!fmdb.name) {
+        // protect user identity post-logout
+        fmdb.name = ab_to_base64(fmdb_strcrypt((u_handle + u_handle).substr(0, 16)));        
+    }
+ 
     if (!fmdb.up()) result(false);
     else {
         try {
             if (!fmdb.db) {
-                // protect user identity post-logout
-                fmdb.name = ab_to_base64(fmdb_strcrypt((u_handle + u_handle).substr(0, 16)));
                 // start inter-tab heartbeat
                 fmdb_beacon(fmdb);
                 fmdb.db = new Dexie('fm_' + fmdb.name);

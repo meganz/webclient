@@ -1874,18 +1874,6 @@ function setsn(sn) {
  * calls execsc() with server-client requests received
  * @param {Boolean} mDBload whether invoked from indexedDB.
  */
-var sccount;
-
-function sc_packet(a) {
-    execsc(a);
-    sccount++;
-}
-
-function sc_node(n) {
-    crypto_decryptnode(n);
-    scnodes.push(n);
-}
-
 function sc_residue(sc, ctx) {
     if (newnodes.length && fminitialized) {
         renderNew();
@@ -1940,7 +1928,11 @@ function sc_failure(mDBload) {
 // nodes in t packets are streamed to sc_node()
 function getsc(mDBload) {
     scnodes = [];
-    sccount = 0;
+    tparentid = false;
+    trights = false;
+    tmoveid = false;
+    rootsharenodes = [];
+    loadavatars = [];
 
     api_req('sn=' + maxaction + '&ssl=1&e=' + cmsNotifHandler, {
         mDBload   : mDBload,

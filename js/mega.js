@@ -5533,21 +5533,67 @@ function renderNew() {
 }
 
 // execute actionpacket
-// actionpackets are delivered strictly in order and one by one and processed
-// while being received (a connection abort forces a filemanager reload!)
-// the node payload of a t packet is parsed and decrypted upfront and stored
-// here:
-var scnodes = [];
+// actionpackets are received and executed strictly in order. receiving and
+// execution run concurrently (a connection drop while the execution is
+// ongoing invalidates the IndexedDB state and forces a reload!)
+var scq = {};   // hash of [actionpacket, [nodes]]
+var sci = 0;    // hash index, strictly monotonously increasing
 
-// inter-actionpacket state:
-var tparentid = false,
-    trights = false,
-    tmoveid = false,
-    rootsharenodes = [],
-    loadavatars = [];
+var scinflight = false; // don't run multiple execsc() "threads"
+var sccount = 0;        // number of actionpackets processed at connection loss
 
-function execsc(a) {
+// FIXME: pipe through worker
+function sc_packet(a) {
+    if (!scq[sci]) {
+        scq[sci] = [a];
+    }
+    else {
+        scq[sci][0] = a;
+    }
+
+    sci++;
+
+    if (!scinflight) {
+        scinflight = true;
+        execsc();
+    }
+}
+
+// FIXME: pipe through worker
+function sc_node(n) {
+    if (!scq[sci]) {
+        scq[sci] = [null, []];
+    }
+
+    crypto_decryptnode(n);
+    scq[sci][1].push(n);
+}
+
+// inter-actionpacket state, gets reset in getsc()
+var tparentid,
+    trights,
+    tmoveid,
+    rootsharenodes,
+    loadavatars;
+
+function execsc() {
     var n, i;
+
+    for (i in scq) break;
+
+    if (!i) {
+        console.log(sccount + " actionpacket(s) processed.");
+        // scq ran empty
+        sccount = 0;
+        scinflight = false;
+        return;
+    }
+
+    sccount++;
+
+    var a = scq[i][0];
+    var scnodes = scq[i][1];
+    delete scq[i];
 
     if (d) {
         console.log('actionpacket', a);
@@ -6015,6 +6061,7 @@ function execsc(a) {
                 notify.countAndShowNewNotifications();
                 break;
 
+            // FIXME: duplicated code
             case 'opc':
                 // outgoing pending contact
                 processOPC([a]);
@@ -6024,6 +6071,7 @@ function execsc(a) {
                 }
                 break;
 
+            // FIXME: duplicated code
             case 'ipc':
                 // incoming pending contact
                 processIPC([a]);
@@ -6035,6 +6083,7 @@ function execsc(a) {
                 notify.notifyFromActionPacket(a);
                 break;
 
+            // FIXME: duplicated code
             case 'ph':
                 // exported link
                 processPH([a]);
@@ -6045,10 +6094,12 @@ function execsc(a) {
                 }
                 break;
 
+            // FIXME: duplicated code
             case 'upci':
                 processUPCI([a]);
                 break;
 
+            // FIXME: duplicated code
             case 'upco':
                 processUPCO([a]);
 
@@ -6106,7 +6157,7 @@ function execsc(a) {
         }
     }
 
-    scnodes = [];
+    setTimeout(execsc, 1);
 }
 
 // a node was updated significantly: write to DB and redraw

@@ -1308,11 +1308,11 @@ function topmenuUI() {
     }
 
     $('.top-icon.warning').addClass('hidden');
-    $('.top-menu-item.upgrade-your-account.green,.top-menu-item.export').addClass('hidden');
+    $('.top-menu-item.upgrade-your-account.green,.top-menu-item.backup').addClass('hidden');
     $('.top-menu-item.logout').addClass('hidden');
     $('.top-menu-item.register,.top-menu-item.login').addClass('hidden');
-    $('.top-menu-item.clouddrive,.top-menu-item.account').addClass('hidden');
-    $('.top-menu-item.refresh-item, .top-menu-divider.refresh').addClass('hidden');
+    $('.top-menu-item.account').addClass('hidden');
+    $('.top-menu-item.refresh-item').addClass('hidden');
     $('.activity-status-block .activity-status,.activity-status-block').hide();
     $('.membership-status-block i').attr('class', 'tiny-icon membership-status free');
     $('.membership-status, .top-head .user-name, .top-icon.achievements').hide();
@@ -1322,6 +1322,21 @@ function topmenuUI() {
     }
     else {
         $('.top-search-bl').addClass('hidden');
+    }
+    
+    // Show active item in main menu
+    var section = page.split('/')[0];
+    var $menuItem;
+    if (section === 'fm') {
+        section = page.split('/')[1];
+    }
+    $('.top-menu-item').removeClass('active');
+    $menuItem = $('.top-menu-item.' + section);
+    if (section && $menuItem.length) {
+        $menuItem.addClass('active');
+        if ($menuItem.parent('.top-submenu').length) {
+            $menuItem.parent('.top-submenu').prev().addClass('expanded');
+        }
     }
 
     $('.fm-avatar').hide();
@@ -1338,8 +1353,8 @@ function topmenuUI() {
     $('.top-mega-version').text('v. ' + (buildVersion.website || 'dev'));
 
     if (u_type) {
-        $('.top-menu-item.logout,.top-menu-item.export').removeClass('hidden');
-        $('.top-menu-item.clouddrive,.top-menu-item.account').removeClass('hidden');
+        $('.top-menu-item.logout,.top-menu-item.backup').removeClass('hidden');
+        $('.top-menu-item.account').removeClass('hidden');
         $('.fm-avatar').show();
         $('.top-login-button').hide();
         $('.membership-status').show();
@@ -1379,7 +1394,6 @@ function topmenuUI() {
         else {
             // Show the free badge
             $('.top-menu-item.upgrade-your-account.green').removeClass('hidden');
-            $('.context-menu-divider.upgrade-your-account').removeClass('pro lite');
             $('.membership-icon').attr('class','membership-icon');
             $('.top-menu-item.account .right-el').text('FREE');
             $('.membership-status').attr('class', 'tiny-icon membership-status free');
@@ -1388,7 +1402,7 @@ function topmenuUI() {
         }
 
         if (is_fm()) {
-            $('.top-menu-item.refresh-item,.top-menu-divider.refresh').removeClass('hidden');
+            $('.top-menu-item.refresh-item').removeClass('hidden');
         }
 
         // If the chat is disabled don't show the green status icon in the header
@@ -1406,7 +1420,6 @@ function topmenuUI() {
         if (u_type === 0 && !confirmok && page !== 'key') {
 
             $('.top-menu-item.register').text(l[968]);
-            $('.top-menu-item.clouddrive').removeClass('hidden');
 
             // If they have purchased Pro but not activated yet, show a warning
             if (isNonActivatedAccount()) {
@@ -1420,7 +1433,6 @@ function topmenuUI() {
         }
 
         $('.top-menu-item.upgrade-your-account.green').addClass('hidden');
-        $('.top-menu-item.pro-item span').text(l[129]);
         $('.membership-status-block').hide();
         $('.top-icon.notification').hide();
         $('.top-icon.achievements').hide();
@@ -1613,13 +1625,13 @@ function topmenuUI() {
             else if (className.indexOf('login') > -1) {
                 document.location.hash = 'login';
             }
-            else if (className.indexOf('aboutus') > -1) {
+            else if (className.indexOf('about') > -1) {
                 document.location.hash = 'about';
             }
             else if (className.indexOf('corporate') > -1) {
                 document.location.hash = 'corporate';
             }
-            else if (className.indexOf('megablog') > -1) {
+            else if (className.indexOf('blog') > -1) {
                 document.location.hash = 'blog';
             }
             else if (className.indexOf('credits') > -1) {
@@ -1632,7 +1644,7 @@ function topmenuUI() {
                 document.location.hash = 'resellers';
                 return false;
             }
-            else if (className.indexOf('export') > -1) {
+            else if (className.indexOf('backup') > -1) {
                 document.location.hash = 'backup';
                 return false;
             }
@@ -1647,9 +1659,11 @@ function topmenuUI() {
             }
             else if (className.indexOf('help') > -1) {
                 document.location.hash = 'help';
-            } else if (className.indexOf('contact') > -1) {
+            }
+            else if (className.indexOf('contact') > -1) {
                 document.location.hash = 'contact';
-            } else if (className.indexOf('support') > -1) {
+            }
+            else if (className.indexOf('support') > -1) {
                 document.location.hash = 'support';
             }
             else if (className.indexOf('sitemap') > -1) {
@@ -1661,7 +1675,7 @@ function topmenuUI() {
             else if (className.indexOf('doc') > -1) {
                 document.location.hash = 'doc';
             }
-            else if (className.indexOf('source-code') > -1) {
+            else if (className.indexOf('sourcecode') > -1) {
                 document.location.hash = 'sourcecode';
             }
             else if (className.indexOf('terms') > -1) {
@@ -1670,7 +1684,7 @@ function topmenuUI() {
             else if (className.indexOf('general') > -1) {
                 document.location.hash = 'general';
             }
-            else if (className.indexOf('privacypolicy') > -1) {
+            else if (className.indexOf('privacy') > -1) {
                 document.location.hash = 'privacy';
             }
             else if (className.indexOf('mega') > -1) {

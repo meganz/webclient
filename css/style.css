@@ -4739,16 +4739,19 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     cursor: pointer;
     position: relative;
 }
+.top-submenu .top-menu-item {
+    padding-left: 34px;
+}
 .top-menu-item span {
     display: block;
 }
 .top-menu-item .right-el i {
     margin-top: 2px;
 }
-.top-menu-item:hover {
+.top-menu-item:hover, .top-menu-item.active {
     color: #333333;
 }
-.top-menu-item:hover .right-el {
+.top-menu-item:hover .right-el, .top-menu-item.active .right-el {
     color: #666666;
 }
 .top-menu-item .right-el, .top-menu-item:hover .right-el {
@@ -4774,7 +4777,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     -o-transition: all 200ms ease-in-out;
     -ms-transition: all 200ms ease-in-out;
     transition: all 200ms ease-in-out;
-    padding-left: 12px;
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -moz-opacity: 0;
     -khtml-opacity: 0;
@@ -4790,7 +4792,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .top-submenu .top-menu-item {
     color: #999999;
 }
-.top-submenu .top-menu-item:hover {
+.top-submenu .top-menu-item:hover, .top-submenu .top-menu-item.active {
     color: #666666;
 }
 .top-menu-item.submenu-item::before {

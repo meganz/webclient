@@ -1864,8 +1864,6 @@ l
 }
 
 function setsn(sn) {
-    maxaction = sn;
-
     // update sn in DB, triggering a "commit" of the current "transaction"
     if (fmdb) fmdb.add('_sn', { i : 1, d : sn });
 }
@@ -1875,25 +1873,11 @@ function setsn(sn) {
  * @param {Boolean} mDBload whether invoked from indexedDB.
  */
 function sc_residue(sc, ctx) {
-    if (newnodes.length && fminitialized) {
-        renderNew();
-    }
-
-    if (loadavatars.length) {
-        M.avatars(loadavatars);
-    }
-
-    if (M.viewmode) {
-        delay('thumbnails', fm_thumbnails, 3200);
-    }
-
-    if ($.dialog === 'properties') {
-        propertiesDialog();
-    }
-
     if (sc.sn) {
-        setsn(sc.sn);
-        getsc()
+        // enqueue new sn
+        scq[scqhead++] = [sc.sn];
+        currsn = sc.sn;
+        getsc(ctx.mDBload);
     }
     else if (sc.w) {
         waiturl = sc.w;
@@ -1927,14 +1911,7 @@ function sc_failure(mDBload) {
 // request new actionpackets and stream them to sc_packet() as they come in
 // nodes in t packets are streamed to sc_node()
 function getsc(mDBload) {
-    scnodes = [];
-    tparentid = false;
-    trights = false;
-    tmoveid = false;
-    rootsharenodes = [];
-    loadavatars = [];
-
-    api_req('sn=' + maxaction + '&ssl=1&e=' + cmsNotifHandler, {
+    api_req('sn=' + currsn + '&ssl=1&e=' + cmsNotifHandler, {
         mDBload   : mDBload,
         buffer    : true,
         sc_filter : json_splitter({ '{[a{' : sc_packet,

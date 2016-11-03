@@ -1,5 +1,5 @@
 var newnodes = [];
-var maxaction;
+var currsn;     // current *network* sn (not to be confused with the IndexedDB/memory state)
 var fminitialized = false;
 var dl_interval, ul_interval;
 
@@ -5537,21 +5537,22 @@ function renderNew() {
 // execution run concurrently (a connection drop while the execution is
 // ongoing invalidates the IndexedDB state and forces a reload!)
 var scq = {};   // hash of [actionpacket, [nodes]]
-var sci = 0;    // hash index, strictly monotonously increasing
+var scqtail = 0;    // next scq index to process
+var scqhead = 0;    // next scq index to write
 
 var scinflight = false; // don't run multiple execsc() "threads"
 var sccount = 0;        // number of actionpackets processed at connection loss
 
 // FIXME: pipe through worker
 function sc_packet(a) {
-    if (!scq[sci]) {
-        scq[sci] = [a];
+    if (!scq[scqhead]) {
+        scq[scqhead] = [a];
     }
     else {
-        scq[sci][0] = a;
+        scq[scqhead][0] = a;
     }
 
-    sci++;
+    scqhead++;
 
     if (!scinflight) {
         scinflight = true;
@@ -5561,29 +5562,52 @@ function sc_packet(a) {
 
 // FIXME: pipe through worker
 function sc_node(n) {
-    if (!scq[sci]) {
-        scq[sci] = [null, []];
+    if (!scq[scqhead]) {
+        scq[scqhead] = [null, []];
     }
 
     crypto_decryptnode(n);
-    scq[sci][1].push(n);
+    scq[scqhead][1].push(n);
 }
 
 // inter-actionpacket state, gets reset in getsc()
 var tparentid,
     trights,
     tmoveid,
-    rootsharenodes,
-    loadavatars;
+    rootsharenodes = [],
+    loadavatars = [];
 
 function execsc() {
     var n, i;
 
-    for (i in scq) break;
-
-    if (!i) {
-        console.log(sccount + " actionpacket(s) processed.");
+    if (!scq[scqtail] || !scq[scqtail][0]) {
         // scq ran empty
+        console.log(sccount + " actionpacket(s) processed.");
+
+        // perform post-execution UI work
+        if (newnodes.length && fminitialized) {
+            renderNew();
+        }
+
+        if (loadavatars.length) {
+            M.avatars(loadavatars);
+        }
+
+        if (M.viewmode) {
+            delay('thumbnails', fm_thumbnails, 3200);
+        }
+
+        if ($.dialog === 'properties') {
+            propertiesDialog();
+        }
+
+        // reset state
+        tparentid = false;
+        trights = false;
+        tmoveid = false;
+        rootsharenodes = [];
+        loadavatars = [];
+
         sccount = 0;
         scinflight = false;
         return;
@@ -5591,9 +5615,18 @@ function execsc() {
 
     sccount++;
 
-    var a = scq[i][0];
-    var scnodes = scq[i][1];
-    delete scq[i];
+    // sn update encountered?
+    if (typeof scq[scqtail][0] == 'string') {
+        console.log("New sn: " + scq[scqtail][0]);
+        setsn(scq[scqtail][0]);
+        delete scq[scqtail++];
+        setTimeout(execsc, 100);
+        return;
+    }
+
+    var a = scq[scqtail][0];
+    var scnodes = scq[scqtail][1];
+    delete scq[scqtail++];
 
     if (d) {
         console.log('actionpacket', a);
@@ -6437,7 +6470,7 @@ function loadfm(force) {
 
 function fetchfm(sn) {
     if (sn) {
-        maxaction = sn;
+        currsn = sn;
         dbfetchfm();
     }
     else {
@@ -7700,8 +7733,9 @@ function loadfm_callback(res) {
         // rewrite RSA keys to AES to save CPU & bandwidth & space
         crypto_node_rsa2aes();
 
-        // set maxaction
+        // commit transaction and set sn
         setsn(res.sn);
+        currsn = res.sn;
 
         if (res.cr) {
             crypto_procmcr(res.cr);

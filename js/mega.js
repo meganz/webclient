@@ -2387,9 +2387,28 @@ function MegaData()
                 this.c[n.p] = [];
             }
             this.c[n.p][n.h] = 1;
-            // maintain special incoming shares index:
+
+            // maintain special incoming shares index
             if (n.p.length === 11) {
-                this.c.shares[n.h] = { su : n.su, r : n.r };
+                if (n.sk && !u_sharekeys[n.h]) {
+                    // extract sharekey from node's sk property
+                    var k = crypto_process_sharekey(n.h, n.sk);
+                    crypto_setsharekey(n.h, k);
+                }
+
+                if (u_sharekeys[n.h]) {
+                    this.c.shares[n.h] = { su : n.su,
+                                            r : n.r,
+                                           sk : a32_to_base64(u_sharekeys[n.h][0]) };
+
+                    // addNode() is called from:
+                    // createFolder() (in response to API `p` - currently
+                    // incorrect, but permissible in the future)
+                    // __process_f1()
+                    // process_u() (with pass-through ignoreDB)
+                    if (fmdb && !ignoreDB) fmdb.add('s', { o_t : n.su + '*' + n.h,
+                                                           d : this.c.shares[n.h] });                    
+                }
             }
         }
 
@@ -2405,35 +2424,16 @@ function MegaData()
             }
         }
 
-        /*if (!n.c)*/ { // FIXME: what is n.c?
-            if (n.sk /*&& !u_sharekeys[n.h]*/) {
-                var k = crypto_process_sharekey(n.h, n.sk);
-                crypto_setsharekey(n.h, k);
+        if (n.t < 2) {
+            crypto_decryptnode(n);
+            M.nodeUpdated(n);
+        }
 
-                if (this.c.shares[n.h].su) {
-                    this.c.shares[n.h].sk = a32_to_base64(k);
-                    // addNode() is called from:
-                    // createFolder() (in response to API `p` - currently
-                    // incorrect, but permissible in the future)
-                    // __process_f1() (which always runs in an actionpacket
-                    // context)
-                    // process_u() (with pass-through ignoreDB)
-                    if (fmdb) fmdb.add('s', { o_t : M.c.shares[n.h].su + '*' + n.h,
-                                              d : M.c.shares[n.h] });
-                }
+        if (n.hash) {
+            if (!this.h[n.hash]) {
+                this.h[n.hash] = [];
             }
-
-            if (n.t < 2) {
-                crypto_decryptnode(n);
-                M.nodeUpdated(n);
-            }
-
-            if (n.hash) {
-                if (!this.h[n.hash]) {
-                    this.h[n.hash] = [];
-                }
-                this.h[n.hash].push(n.h);
-            }
+            this.h[n.hash].push(n.h);
         }
 
         if (this.d[n.h] && this.d[n.h].shares) {
@@ -6107,22 +6107,6 @@ function execsc(a) {
     }
 
     scnodes = [];
-
-    if (newnodes.length && fminitialized) {
-        renderNew();
-    }
-
-    if (loadavatars.length) {
-        M.avatars(loadavatars);
-    }
-
-    if (M.viewmode) {
-        delay('thumbnails', fm_thumbnails, 3200);
-    }
-
-    if ($.dialog === 'properties') {
-        propertiesDialog();
-    }
 }
 
 // a node was updated significantly: write to DB and redraw
@@ -6168,7 +6152,6 @@ function treefetcher() {
 
 // initiate fetch of node tree
 function treefetcher_fetch() {
-console.log("THIS=" + JSON.stringify(this));
     var workerstate;
 
     if (this.workers.length) {

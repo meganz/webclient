@@ -1887,6 +1887,22 @@ function sc_node(n) {
 }
 
 function sc_residue(sc, ctx) {
+    if (newnodes.length && fminitialized) {
+        renderNew();
+    }
+
+    if (loadavatars.length) {
+        M.avatars(loadavatars);
+    }
+
+    if (M.viewmode) {
+        delay('thumbnails', fm_thumbnails, 3200);
+    }
+
+    if ($.dialog === 'properties') {
+        propertiesDialog();
+    }
+
     if (sc.sn) {
         setsn(sc.sn);
         getsc()

@@ -75,11 +75,9 @@ var alarm = {
             }
             else {
                 // Otherwise show the popup
-                Soon(function() {
-                    $dialog.removeClass('hidden');
-                    $container.addClass('active');
-                    topPopupAlign($container, dialog, 40);
-                });
+                $dialog.removeClass('hidden');
+                $container.addClass('active');
+                topPopupAlign($container, dialog, 40);
             }
         });
     },

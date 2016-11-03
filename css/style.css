@@ -4802,7 +4802,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     top: 12px;
     background-image: url(../images/mega/top-sprite_v1.png);
     background-position: -12px -1304px;
-    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     -moz-opacity: 0.5;
     -khtml-opacity: 0.5;
     opacity: 0.5;
@@ -4813,7 +4813,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     transition: opacity 200ms ease-in-out;
 }
 .top-menu-item.submenu-item:hover::before {
-    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
     -moz-opacity: 0.7;
     -khtml-opacity: 0.7;
     opacity: 0.7;
@@ -4822,7 +4822,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     background-position: -12px -1314px;
 }
 .rk-saved .top-menu-item.export i {
-    display:none;
+    display: none;
 }
 .top-head .top-icon {
     height: 35px;
@@ -4957,11 +4957,16 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     transition: all 200ms ease-in-out;
     position: relative;
 }
-.activity-status.top::before, .activity-status.top::after {
+.activity-status.top::before {
     content: '';
     position: absolute;
-    width: 6px;
-    height: 6px;
+    width: 10px;
+    height: 10px;
+    margin: -2px 0 0 -2px;
+    border: 2px solid #fafafa;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
     -moz-border-radius: 100%;
     -webkit-border-radius: 100%;
     border-radius: 100%;
@@ -4972,7 +4977,24 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     -ms-transition: all 200ms ease-in-out;
     transition: all 200ms ease-in-out;
 }
-.activity-status.top span {
+.activity-status.top:hover::before, .active .activity-status.top::before {
+    width: 10px;
+    height: 10px;
+    margin: -2px 0 0 -2px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    -webkit-box-shadow: 0px 0px 0px 2px #13E03C;
+    -moz-box-shadow: 0px 0px 0px 2px #13E03C;
+    box-shadow: 0px 0px 0px 2px #13E03C;
+}
+.activity-status.top.offline:hover::before, .active .activity-status.top.offline::before {
+    -webkit-box-shadow: 0px 0px 0px 2px #666666;
+    -moz-box-shadow: 0px 0px 0px 2px #666666;
+    box-shadow: 0px 0px 0px 2px #666666;
+}
+.activity-status.top::after {
+    content: '';
     position: absolute;
     width: 24px;
     height: 24px;
@@ -4980,20 +5002,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     z-index: 10;
     left: -9px;
     top: -9px;
-}
-.activity-status.top::after {
-    width: 10px;
-    height: 10px;
-    margin: -2px 0 0 -2px;
-    border: 2px solid #fafafa;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-}
-.activity-status.top:hover::before, .active .activity-status.top::before {
-    width: 14px;
-    height: 14px;
-    margin: -4px 0 0 -4px;
 }
 .dropdown-item .activity-status {
     height: 8px;
@@ -10150,6 +10158,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
 }
 .top-head .dropdown.body {
     top: 40px;
+    right: -100%;
     z-index: 1120;
 }
 .top-user-status-popup {

@@ -294,14 +294,12 @@ var notify = {
      * Opens the notification popup with notifications
      */
     openPopup: function() {
-        Soon(function() {
-            notify.$popup.removeClass('hidden');
-            notify.$popupIcon.addClass('active');
-            topPopupAlign('.top-icon.notification', notify.$popup, 40);
-
-            // Render and show notifications currently in list
-            notify.renderNotifications();
-        });
+        notify.$popup.removeClass('hidden');
+        notify.$popupIcon.addClass('active');
+        topPopupAlign('.top-icon.notification', notify.$popup, 40);
+    
+        // Render and show notifications currently in list
+        notify.renderNotifications();
     },
 
     /**

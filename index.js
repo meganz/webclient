@@ -139,42 +139,54 @@ function scrollMenu() {
 }
 
 function topPopupAlign(button, popup, topPos) {
-    var $button = $(button),
-        $popup = $(popup),
-        $popupArrow = $popup.find('.dropdown-white-arrow'),
-        pageWidth,
-        popupRightPos,
-        arrowRightPos,
-        buttonTopPos;
+    $.popupAlign = function()
+    {
+        var $button = $(button),
+            $popup = $(popup),
+            $popupArrow = $popup.find('.dropdown-white-arrow'),
+            pageWidth,
+            popupRightPos,
+            arrowRightPos,
+            buttonTopPos;
 
-    if ($button.length && $popup.length) {
-        pageWidth = $('body').width();
-        $popupArrow.removeAttr('style');
-        popupRightPos = pageWidth
-            - $button.offset().left
-            - $button.outerWidth()/2
-            - $popup.outerWidth()/2;
-        if (topPos) {
-            $popup.css('top', topPos + 'px');
-        } else {
-            buttonTopPos = $button.offset().top + $button.outerHeight();
-            $popup.css('top', buttonTopPos + 13 + 'px');
-        }
-
-
-        if (popupRightPos > 10) {
-            $popup.css('right', popupRightPos + 'px');
-        } else {
-            $popup.css('right', '10px');
-            arrowRightPos = pageWidth
+        if ($button.length && $popup.length) {
+            pageWidth = $('body').width();
+            $popupArrow.removeAttr('style');
+            popupRightPos = pageWidth
                 - $button.offset().left
-                - $button.outerWidth()/2;
-            $popupArrow.css({
-                left: 'auto',
-                right: arrowRightPos - 22
-            })
-        }
+                - $button.outerWidth()/2
+                - $popup.outerWidth()/2;
+            if (topPos) {
+                $popup.css('top', topPos + 'px');
+            }
+            else {
+                buttonTopPos = $button.offset().top + $button.outerHeight();
+                $popup.css('top', buttonTopPos + 13 + 'px');
+            }
 
+            if (popupRightPos > 10) {
+                $popup.css('right', popupRightPos + 'px');
+            }
+            else {
+                $popup.css('right', '10px');
+                arrowRightPos = pageWidth
+                    - $button.offset().left
+                    - $button.outerWidth()/2;
+                $popupArrow.css({
+                    left: 'auto',
+                    right: arrowRightPos - 22
+                })
+            }
+        }
+    };
+
+    // If top menu is opened - set timeout to count correct positions
+    if (!$('.top-menu-popup').hasClass('hidden')) {
+        setTimeout(function() {
+            $.popupAlign();
+        }, 250);
+    } else {
+        $.popupAlign();
     }
 }
 
@@ -1233,13 +1245,13 @@ function loginDialog(close) {
         }
     });
 
-    Soon(function() {
-        $('.dropdown.top-login-popup').removeClass('hidden');
-        topPopupAlign('.top-login-button', '.dropdown.top-login-popup', 40);
-        if (is_chrome_firefox) {
-            mozLoginManager.fillForm.bind(mozLoginManager, 'form_login_header');
-        }
-    });
+
+    $('.dropdown.top-login-popup').removeClass('hidden');
+    topPopupAlign('.top-login-button', '.dropdown.top-login-popup', 40);
+    if (is_chrome_firefox) {
+        mozLoginManager.fillForm.bind(mozLoginManager, 'form_login_header');
+    }
+
 }
 
 function tooltiplogin() {
@@ -1550,11 +1562,9 @@ function topmenuUI() {
     $('.activity-status-block').rebind('click.topui', function (e) {
         var $this = $(this);
         if ($this.attr('class').indexOf('active') == -1) {
-            Soon(function() {
-                $this.addClass('active');
-                $('.top-user-status-popup').removeClass('hidden');
-                topPopupAlign('.activity-status-block', '.top-user-status-popup', 40);
-            });
+            $this.addClass('active');
+            $('.top-user-status-popup').removeClass('hidden');
+            topPopupAlign('.activity-status-block', '.top-user-status-popup', 40);
         }
         else {
             $this.removeClass('active');

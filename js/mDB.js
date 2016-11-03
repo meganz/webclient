@@ -18,16 +18,20 @@ function FMDB() {
         del : fmdb_del,
         get : fmdb_get,
 
-        pending : {},  // pending obfuscated writes [transaction_autoincrement][tablename][op_autoincrement] = [payloads]
-        head : 0,      // current transaction being received from the application code
-        tail : 0,      // current transaction being sent to IndexedDB
+        name : '',       // DB name suffix, derived from u_handle and u_k
+        pending : {},    // pending obfuscated writes [tid][tablename][op_autoincrement] = [payloads]
+        head : 0,        // current tid being received from the application code
+        tail : 0,        // current tid being sent to IndexedDB
         enqueue : fmdb_enqueue,
-        state : -1,    // -1: idle, 0: deleted sn and writing, 1: transaction open and writing
-        inflight : 0,  // number of currently executing DB updates (MSIE restricts this to a paltry 1)
-        commit : false,    // if set, the sn has been updated, completing the transaction
-        crashed : false    // a DB error sets this and prevents further DB access
+        state : -1,      // -1: idle, 0: deleted sn and writing, 1: transaction open and writing
+        inflight : 0,    // number of currently executing DB updates (MSIE restricts this to a paltry 1)
+        commit : false,  // if set, the sn has been updated, completing the transaction
+        up : fmdb_up,    // checks if crashed or being used by another tab concurrently
+        crashed : false  // a DB error sets this and prevents further DB access
     };
 }
+
+var fmdb_identity;
 
 // set up and check fm DB for user u
 // calls result(sn) if found and sn present
@@ -35,12 +39,21 @@ function FMDB() {
 function fmdb_init(u, result, wipe) {
     var fmdb = this;
 
-    if (fmdb.crashed) result(false);
+    if (!fmdb_identity) {
+        // initialise cross-tab access arbitration identity
+        // FIXME: base64-encode for more entropy per byte
+        fmdb_identity = rand(0x10000000) + '.' + rand(0x10000000) + '.' + rand(0x10000000) + '.' + (new Date).getTime();        
+    }
+
+    if (!fmdb.up()) result(false);
     else {
         try {
             if (!fmdb.db) {
                 // protect user identity post-logout
-                fmdb.db = new Dexie('fm_' + ab_to_base64(fmdb_strcrypt((u_handle + u_handle).substr(0, 16))));
+                fmdb.name = ab_to_base64(fmdb_strcrypt((u_handle + u_handle).substr(0, 16)));
+                // start inter-tab heartbeat
+                fmdb_beacon(fmdb);
+                fmdb.db = new Dexie('fm_' + fmdb.name);
 
                 // replicate any additions to fmdb_writepending()
                 fmdb.db.version(1).stores({
@@ -324,6 +337,8 @@ fmdb_restorenode = {
 // the next addition will then start a new "transaction"
 // (large writes will not execute as an IndexedDB transaction because IndexedDB can't)
 function fmdb_add(table, row) {
+    if (this.crashed) return;
+
     if (row.d) {
         if (fmdb_stripnode[table]) {
             // this node type is stripnode-optimised: temporarily remove redundant elements
@@ -338,22 +353,28 @@ function fmdb_add(table, row) {
             row.d = JSON.stringify(row.d);
         }
     }
+
     // obfuscate index elements as base64-encoded strings, payload as ArrayBuffer
     for (var i in row) {
         if (i == 'd') row.d = fmdb_strcrypt(row.d);
         else row[i] = ab_to_base64(fmdb_strcrypt(row[i]));
     }
+
     this.enqueue(table, row, 0);
 }
 
 // enqueue IndexedDB deletions
 function fmdb_del(table, index) {
+    if (this.crashed) return;
+
     this.enqueue(table, ab_to_base64(fmdb_strcrypt(index)), 1);
 }
 
 // non-transactional read with subsequent deobfuscation, with optional prefix filter
 // FIXME: replace procresult with Promises without incurring a massive readability/mem/CPU penalty!
 function fmdb_get(table, procresult, key, prefix) {
+    if (!this.up()) return;
+
     var promise;
 
     if (d) console.log("Fetching table " + table + "...");
@@ -388,6 +409,33 @@ function fmdb_get(table, procresult, key, prefix) {
 
         procresult(r);
     });
+}
+
+function fmdb_up() {
+    if (this.crashed) return false;
+
+    var state = localStorage[this.name];
+    var time = (new Date).getTime();
+
+    // another tab was active within the last second?
+    if (state) {
+        state = JSON.parse(state);
+
+        if (time-state[0] < 1000
+        && state[1] !== fmdb_identity) {
+            this.crashed = true;
+            console.error("*** DISCONNECTING FROM INDEXEDDB - cross-tab interference detected");
+            // FIXME: check if mem-only ops are safe at this point, force reload if not
+            return false;
+        }
+    }
+
+    localStorage[this.name] = '[' + time + ',"' + fmdb_identity + '"]';
+    return true;
+}
+
+function fmdb_beacon(fmdb) {
+    if (fmdb.up()) setTimeout(fmdb_beacon, 500, fmdb);
 }
 
 if (0)

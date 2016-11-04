@@ -27,6 +27,7 @@ function FMDB() {
         inflight : 0,    // number of currently executing DB updates (MSIE restricts this to a paltry 1)
         commit : false,  // if set, the sn has been updated, completing the transaction
         up : fmdb_up,    // checks if crashed or being used by another tab concurrently
+        cantransact : -1, // probe whether multi-table transactions work or not (Apple, looking at you!)
         crashed : false  // a DB error sets this and prevents further DB access
     };
 }
@@ -143,7 +144,7 @@ function fmdb_enqueue(table, row, type) {
 function fmdb_writepending(fmdb) {
     if (!fmdb.pending[fmdb.tail] || fmdb.crashed) return;
 
-    if (fmdb.state < 0 && fmdb.pending[fmdb.tail]._sn) {
+    if (fmdb.state < 0 && fmdb.pending[fmdb.tail]._sn && fmdb.cantransact) {
         // if the write job is already complete (has _sn set),
         // we execute it in a single transaction without first clearing sn
         fmdb.state = 1;
@@ -161,16 +162,24 @@ function fmdb_writepending(fmdb) {
                             function(){
                                 if (d) console.log("Transaction started");
                                 fmdb.commit = false;
+                                fmdb.cantransact = 1;
                                 dispatchputs();
                             }).then(function(){
                                 fmdb.state = -1;
                                 if (d) console.log("Transaction committed");
-                                fmdb_writepending(fmdb);  
+                                fmdb_writepending(fmdb);
                             }).catch(function(e){
-                                console.error("Transaction failed, marking DB as crashed");
-                                console.log(e);
-                                fmdb.state = -1;
-                                fmdb.crashed = true;
+                                if (fmdb.cantransact < 0) {
+                                    console.error("Your browser's IndexedDB implementation is bogus, disabling transactions.");
+                                    fmdb.cantransact = 0;
+                                    fmdb_writepending(fmdb);
+                                }
+                                else {
+                                    console.error("Transaction failed, marking DB as crashed");
+                                    console.log(e);
+                                    fmdb.state = -1;
+                                    fmdb.crashed = true;                                    
+                                }
                             });
     }
     else {
@@ -231,7 +240,7 @@ function fmdb_writepending(fmdb) {
                     delete fmdb.pending[fmdb.tail++];
                 }
 
-                if (d) console.log("DB write started with " + t.length + " element(s( on table " + table);
+                if (d) console.log("DB write started with " + t.length + " element(s) on table " + table);
 
                 // send the chunk of updates off to IndexedDB for writing
                 fmdb.db[table][action & 1 ? 'bulkDelete' : 'bulkPut'](t).then(function() {

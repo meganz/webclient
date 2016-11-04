@@ -4754,10 +4754,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .top-menu-item:hover .right-el, .top-menu-item.active .right-el {
     color: #666666;
 }
-.top-menu-item .right-el, .top-menu-item:hover .right-el {
+.top-menu-item .right-el {
     float: right;
     text-transform: uppercase;
-    color: #999999;
+    color: #999999 !important;
     padding-left: 15px;
 }
 .top-menu-item.green, .upgrade-your-account.green:hover {

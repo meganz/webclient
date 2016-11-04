@@ -5555,14 +5555,11 @@ function sc_packet(a) {
     }
     else {
         // other packet types do not warrant the worker detour
-        if (scq[scqhead]) scq[scqhead][0] = a;
-        else scq[scqhead] = [a, []];
+        if (scq[scqhead]) scq[scqhead++][0] = a;
+        else scq[scqhead++] = [a, []];
 
-        // resume processing
-        if (scqhead++ == scqtail && !scinflight && !nodesinflight[scqtail]) {
-            scinflight = true;
-            execsc();
-        }
+        // resume processing if needed
+        resumesc();
     }
 }
 
@@ -5625,6 +5622,17 @@ var tparentid,
     rootsharenodes = [],
     loadavatars = [];
 
+// if no execsc() thread is running, check if one should be, and start it if so.
+function resumesc() {
+    if (!scinflight) {
+        if (scq[scqtail] && scq[scqtail][0] && !nodesinflight[scqtail]) {
+            scinflight = true;
+            execsc();
+        }
+    }
+}
+
+// execute actionpackets from scq[scqtail] onwards
 function execsc() {
     var n, i;
 
@@ -5657,33 +5665,17 @@ function execsc() {
 
     sccount++;
 
-    // sn update encountered?
-    if (typeof scq[scqtail][0] == 'string') {
-        console.log("New sn: " + scq[scqtail][0]);
-        setsn(scq[scqtail][0]);
-        delete scq[scqtail++];
-
-        // reset state
-        tparentid = false;
-        trights = false;
-        tmoveid = false;
-        rootsharenodes = [];
-
-        setTimeout(execsc, 100);
-        return;
-    }
-
     var a = scq[scqtail][0];
     var scnodes = scq[scqtail][1];
     delete scq[scqtail++];
 
     if (d) {
-        console.log('actionpacket', a);
+        console.log('Received SC command ', a);
     }
 
     if (a.i === requesti) {
         if (d) {
-            console.log('OWN ACTION PACKET');
+            console.log('(triggered locally)');
         }
 
         switch (a.a) {
@@ -5777,6 +5769,23 @@ function execsc() {
     }// END own action packet
     else {
         switch (a.a) {
+            case '_sn':
+                // sn update?
+                console.log("New SN: " + a.sn);
+                setsn(a.sn);
+
+                // reset state
+                tparentid = false;
+                trights = false;
+                tmoveid = false;
+                rootsharenodes = [];
+                break;
+
+            case '_fm':
+                // completed initial processing, enable UI
+                loadfm_done(true);
+                break;
+
             case 'e':
                 // CMS update
                 var str = hex2bin(a.c || "");
@@ -6054,7 +6063,7 @@ function execsc() {
                             M.onRenameUIUpdate(n.h, n.name);
                         }
                         if (fminitialized && n.fav !== oldfav) {
-                            if (f.fav) {
+                            if (n.fav) {
                                 $('.grid-table.fm #' + n.h + ' .grid-status-icon').addClass('star');
                                 $('#' + n.h + '.file-block .file-status-icon').addClass('star');
                             }
@@ -6235,7 +6244,7 @@ function execsc() {
 
             default:
                 if (d) {
-                    console.log('not processing this action packet', a);
+                    console.log('Ignoring unsupported SC command', a);
                 }
         }
     }
@@ -6433,10 +6442,7 @@ function worker_procmsg(ev) {
         else scq[ev.data.scqi] = [ev.data, []];
 
         // resume processing, if appropriate and needed
-        if (!scinflight && ev.data.scqi == scqtail && !nodesinflight[ev.data.scqi]) {
-            scinflight = true;
-            execsc();
-        }
+        resumesc();
     }
     else if (ev.data.scni >= 0) {
         // enqueue processed node
@@ -6447,10 +6453,7 @@ function worker_procmsg(ev) {
             delete nodesinflight[ev.data.scni];
 
             // resume processing, if appropriate and needed
-            if (!scinflight && ev.data.scni == scqtail) {
-                scinflight = true;
-                execsc();
-            }
+            resumesc();
         }
     }
     else if (ev.data.h) {

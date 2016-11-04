@@ -1875,23 +1875,24 @@ function setsn(sn) {
 function sc_residue(sc, ctx) {
     if (sc.sn) {
         // enqueue new sn
-        scq[scqhead++] = [sc.sn];
         currsn = sc.sn;
+        scq[scqhead++] = [{ a : '_sn', sn : currsn }];
         getsc(ctx.mDBload);
+        resumesc();
     }
     else if (sc.w) {
+        if (ctx.mDBload) {
+            scq[scqhead++] = [{ a : '_fm' }];
+            ctx.mDBload = false;
+            resumesc();
+        }
+
         waiturl = sc.w;
         waittimeout = setTimeout(waitsc, waitbackoff);
 
         if ((mega.flags & window.MEGAFLAG_LOADINGCLOUD) && !mega.loadReport.recvAPs) {
             mega.loadReport.recvAPs       = Date.now() - mega.loadReport.stepTimeStamp;
             mega.loadReport.stepTimeStamp = Date.now();
-        }
-
-        // if we're loading the cloud, notify completion only
-        // once all pending action packets have been processed.
-        if (!fminitialized && (loadfm.loading || ctx.mDBload)) {
-            loadfm_done(ctx.mDBload);
         }
     }
     else return sc_failure(ctx.mDBload);
@@ -3634,7 +3635,7 @@ function crypto_procsr(sr) {
         sr: sr,
         i: 0
     };
-
+console.error("PROCSR " + JSON.stringify(sr));
     ctx.callback = function (res, ctx) {
         if (ctx.sr) {
             var pubkey;
@@ -3790,10 +3791,13 @@ function crypto_missingkeysfromdb(r) {
 
     for (var i = r.length; i--; ) {
         if (!missingkeys[r[i].h]) missingkeys[r[i].h] = {};
-        for (var j = r[i].s.length; j--; ) {
-            missingkeys[r[i].h][r[i].s[j]] = true;
-            if (!sharemissing[r[i].s[j]]) sharemissing[r[i].s[j]] = {};
-            sharemissing[r[i].s[j]][r[i].h] = true;
+
+        if (r[i].s) {
+            for (var j = r[i].s.length; j--; ) {
+                missingkeys[r[i].h][r[i].s[j]] = true;
+                if (!sharemissing[r[i].s[j]]) sharemissing[r[i].s[j]] = {};
+                sharemissing[r[i].s[j]][r[i].h] = true;
+            }
         }
     }
 }
@@ -3899,7 +3903,7 @@ function crypto_procmcr(mcr) {
 function crypto_share_rsa2aes() {
     var rsr = [],
         h;
-
+console.error("RSA2AES " + JSON.stringify(rsasharekeys));
     for (h in rsasharekeys) {
         if (u_sharekeys[h]) {
             // pubkey found: encrypt share key to it

@@ -42,7 +42,7 @@ function fmdb_init(u, result, wipe) {
     if (!fmdb_identity) {
         // initialise cross-tab access arbitration identity
         // FIXME: base64-encode for more entropy per byte
-        fmdb_identity = rand(0x10000000) + '.' + rand(0x10000000) + '.' + rand(0x10000000) + '.' + (new Date).getTime();        
+        fmdb_identity = rand(0x10000000) + '.' + rand(0x10000000) + '.' + rand(0x10000000) + '.' + Date.now();        
     }
 
     if (!fmdb.name) {
@@ -418,7 +418,7 @@ function fmdb_up() {
     if (this.crashed) return false;
 
     var state = localStorage[this.name];
-    var time = (new Date).getTime();
+    var time = Date.now();
 
     // another tab was active within the last second?
     if (state) {

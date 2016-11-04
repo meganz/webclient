@@ -11,20 +11,35 @@ if (typeof jsl_loaded != 'object') {
         rsa2aes = {};
         rsasharekeys = {};
         u_sharekeys = {};
-        u_k_aes = {};
-        u_privk = [];
-        d = debug;
         missingkeys = false;
     }
+
+    init();
 
     self.onmessage = function(e) {
         var req = e.data;
         var key;
 
-        if (req.t >= 0) {
+        if (req.scqi >= 0) {
+            // actionpacket - we do CPU-intensive stuff here, e.g. decrypting
+            // sharekeys
+            if (req.a == 's' || req.a == 's2' && req.n && req.k) {
+                req.k = crypto_process_sharekey(req.n, req.k);
+                if (rsasharekeys[req.n]) {
+                    req.rsa = 1;
+                    delete rsasharekeys[req.n];
+                }
+            }
+            self.postMessage(req);
+        }
+        else if (req.t >= 0) {
             // node
             crypto_decryptnode(req);
             self.postMessage(req);
+        }
+        else if (req.sk) {
+            // existing sharekey
+            u_sharekeys[req.h] = [req.sk, new sjcl.cipher.aes(req.sk)];
         }
         else if (req.ha) {
             // ownerkey (ok element)
@@ -37,8 +52,9 @@ if (typeof jsl_loaded != 'object') {
         }
         else if (req.u_k) {
             // setup for user account
-            init(req.d);
+            init();
 
+            d = req.d;
             u_handle = req.u_handle;
             u_privk = req.u_privk;
             u_k_aes = new sjcl.cipher.aes(req.u_k);
@@ -54,14 +70,15 @@ if (typeof jsl_loaded != 'object') {
             // (cannot serialise sjcl.cipher.aes)
             for (var h in u_sharekeys) u_sharekeys[h] = u_sharekeys[h][0];
 
-            // dump state and terminate
+            // dump state
             self.postMessage({
                 rsa2aes        : Object.keys(rsa2aes).length && rsa2aes,
                 rsasharekeys   : Object.keys(rsasharekeys).length && rsasharekeys,
                 sharekeys      : Object.keys(u_sharekeys).length && u_sharekeys,
             });
 
-            self.close();
+            // free up allocated mem
+            init();
         }
     }
 
@@ -74,12 +91,11 @@ if (typeof jsl_loaded != 'object') {
 
 var u_handle;
 var u_privk;
-var u_k_aes, u_sharekeys = {};
+var u_k_aes;
+var u_sharekeys = {};
 
 var rsa2aes = {};
 var rsasharekeys = {};
-
-var keycache = {};
 
 function crypto_process_sharekey(handle, key) {
     if (key.length > 22) {
@@ -136,7 +152,7 @@ function crypto_decryptnode(n) {
     }
 
     if (p >= 0) {
-        var pp = n.k.indexOf('/', p);
+        var pp = n.k.indexOf('/', p+21);
 
         if (pp < 0) {
             pp = n.k.length;

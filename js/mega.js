@@ -5539,35 +5539,83 @@ function renderNew() {
 var scq = {};   // hash of [actionpacket, [nodes]]
 var scqtail = 0;    // next scq index to process
 var scqhead = 0;    // next scq index to write
+var shareworker = {};   // which worker knows about which sharekeys?
 
-var scinflight = false; // don't run multiple execsc() "threads"
+var scinflight = false; // don't run more than one execsc() "thread"
 var sccount = 0;        // number of actionpackets processed at connection loss
 
-// FIXME: pipe through worker
+var nodesinflight = {};  // number of nodes being processed in the worker for scqi
+
+// enqueue parsed actionpacket
 function sc_packet(a) {
-    if (!scq[scqhead]) {
-        scq[scqhead] = [a];
+    if ((a.a == 's' || a.a == 's2') && a.k) {
+        // keyed share packets may involve an RSA operation: run through worker
+        a.scqi = scqhead++;     // set scq slot number
+        workers[a.scqi % workers.length].postMessage(a);
     }
     else {
-        scq[scqhead][0] = a;
-    }
+        // other packet types do not warrant the worker detour
+        if (scq[scqhead]) scq[scqhead][0] = a;
+        else scq[scqhead] = [a, []];
 
-    scqhead++;
-
-    if (!scinflight) {
-        scinflight = true;
-        execsc();
+        // resume processing
+        if (scqhead++ == scqtail && !scinflight && !nodesinflight[scqtail]) {
+            scinflight = true;
+            execsc();
+        }
     }
 }
 
-// FIXME: pipe through worker
+// submit nodes from `t` actionpacket to worker
 function sc_node(n) {
-    if (!scq[scqhead]) {
-        scq[scqhead] = [null, []];
+    var p, id;
+
+    // own node?
+    if (n.k && n.k.substr(0, 11) === u_handle) p = -1;
+    else {
+        // no - do we have an existing share key?
+        for (p = 8; (p = n.k.indexOf(':', p)) >= 0; ) {
+            if (++p == 9 || n.k[p-10] == '/') {
+                id = n.k.substr(p-9, 8);
+                if (u_sharekeys[id]) {
+                    break;
+                }
+            }
+        }
     }
 
-    crypto_decryptnode(n);
-    scq[scqhead][1].push(n);
+    if (p >= 0) {
+        var pp = n.k.indexOf('/', p+21);
+
+        if (pp < 0) {
+            pp = n.k.length;
+        }
+
+        // rewrite key to the minimum
+        n.k = id + ':' + n.k.substr(p, pp-p);
+
+        if (shareworker[id] >= 0) {
+            // the key is already known to a worker
+            p = shareworker[id];
+        }
+        else {
+            // pick a pseudorandom worker (round robin)
+            p = scqhead % workers.length;
+
+            // record for future nodes in the same share
+            shareworker[id] = p;
+
+            // send sharekey
+            workers[p].postMessage({ h : id, sk : u_sharekeys[id][0] });
+        }
+    }
+    else p = scqhead % workers.length; 
+
+    if (nodesinflight[scqhead]) nodesinflight[scqhead]++;
+    else nodesinflight[scqhead] = 1;
+
+    n.scni = scqhead;       // set scq slot number (sc_packet() call will follow)
+    workers[p].postMessage(n);
 }
 
 // inter-actionpacket state, gets reset in getsc()
@@ -5580,9 +5628,9 @@ var tparentid,
 function execsc() {
     var n, i;
 
-    if (!scq[scqtail] || !scq[scqtail][0]) {
-        // scq ran empty
-        console.log(sccount + " actionpacket(s) processed.");
+    if (!scq[scqtail] || !scq[scqtail][0] || (scq[scqtail][0].a == 't' && nodesinflight[scqtail])) {
+        // scq ran empty - nothing to do for now
+        console.log((sccount-1) + " actionpacket(s) processed.");
 
         // perform post-execution UI work
         if (newnodes.length && fminitialized) {
@@ -5591,6 +5639,7 @@ function execsc() {
 
         if (loadavatars.length) {
             M.avatars(loadavatars);
+            loadavatars = [];
         }
 
         if (M.viewmode) {
@@ -5600,13 +5649,6 @@ function execsc() {
         if ($.dialog === 'properties') {
             propertiesDialog();
         }
-
-        // reset state
-        tparentid = false;
-        trights = false;
-        tmoveid = false;
-        rootsharenodes = [];
-        loadavatars = [];
 
         sccount = 0;
         scinflight = false;
@@ -5620,6 +5662,13 @@ function execsc() {
         console.log("New sn: " + scq[scqtail][0]);
         setsn(scq[scqtail][0]);
         delete scq[scqtail++];
+
+        // reset state
+        tparentid = false;
+        trights = false;
+        tmoveid = false;
+        rootsharenodes = [];
+
         setTimeout(execsc, 100);
         return;
     }
@@ -5792,9 +5841,10 @@ function execsc() {
                                 srvlog('Got share action-packet with no key.');
                             }
                             else {
-                                var k = crypto_process_sharekey(a.n, a.k);
-                                crypto_setsharekey(a.n, k);
-                                tsharekey = a32_to_base64(u_k_aes.encrypt(k));
+                                // a.k has been processed by the worker
+                                if (a.rsa) rsasharekeys[a.n] = true;
+                                crypto_setsharekey(a.n, a.k);
+                                tsharekey = a32_to_base64(u_k_aes.encrypt(a.k));
                                 prockey = true;
                             }
                         }
@@ -6211,9 +6261,6 @@ function treefetcher() {
     return {
         fetch : treefetcher_fetch,
 
-        // worker pool
-        workers : [],
-
         // next round-robin worker to assign
         nextworker : 0,
 
@@ -6234,17 +6281,14 @@ function treefetcher() {
     }
 }
 
-// initiate fetch of node tree
-function treefetcher_fetch() {
+// worker pool
+var workers;
+
+function initworkerpool() {
+    workers = [];
     var workerstate;
 
-    if (this.workers.length) {
-        console.error("Cannot reuse treefetcher, please create a new one");
-        return;
-    }
-
-    if (n_h) this.getfolderlinkroot = true;
-    else {
+    if (!n_h) {
         // worker state for a user account fetch
         workerstate = {
             u_handle : u_handle,
@@ -6254,15 +6298,26 @@ function treefetcher_fetch() {
         };
     }
 
-    // create worker pool for this fetch
     // FIXME: use navigator.hardwareConcurrency, but do not exceed browser limit
     for (var i = 8; i--; ) {
         // FIXME: try / catch with fallback to synchronous decryption
         var w = new Worker("nodedec.js");
-        w.ctx = this;
-        w.onmessage = treefetcher_procmsg;
+        w.onmessage = worker_procmsg;
         if (workerstate) w.postMessage(workerstate);
-        this.workers.push(w);
+        workers.push(w);
+    }
+}
+
+// initiate fetch of node tree
+// FIXME: what happens when the user pastes a folder link over his loaded/loading account?
+function treefetcher_fetch() {
+    var workerstate;
+
+    if (n_h) this.getfolderlinkroot = true;
+
+    // FIXME: not needed for folder links
+    for (i = workers.length; i--; ) {
+        workers[i].ctx = this;
     }
 
     // we filter out the ownerkeys and pipe them to treefetcher_ok()
@@ -6306,7 +6361,7 @@ function treefetcher_ok(ok, ctx) {
     // bind outbound share root to specific worker, post ok element to that worker
     // FIXME: check if nested outbound shares are returned with all shareufskeys!
     // if that is not the case, we need to bind all ok handles to the same worker
-    ctx.workers[ctx.parentworker[ok.h] = ctx.getnextworker()].postMessage(ok);
+    workers[ctx.parentworker[ok.h] = ctx.getnextworker()].postMessage(ok);
 }
 
 // returns true if no further processing is needed
@@ -6343,36 +6398,62 @@ function treefetcher_node(node, ctx) {
             d     : d 
         };
 
-        for (var i = ctx.workers.length; i--; ) ctx.workers[i].postMessage(workerstate);
+        for (var i = workers.length; i--; ) workers[i].postMessage(workerstate);
 
         M.RootID = node.h;
     }
 
     // children inherit their parents' worker bindings; unbound inshare roots receive a new binding
     // unbound nodes go to a random worker (round-robin assignment)
-    if (node.p && ctx.parentworker[node.p] >= 0) ctx.workers[ctx.parentworker[node.h] = ctx.parentworker[node.p]].postMessage(node);
-    else if (ctx.parentworker[node.h] >= 0) ctx.workers[ctx.parentworker[node.h]].postMessage(node);
-    else if (node.sk) ctx.workers[ctx.parentworker[node.h] = ctx.getnextworker()].postMessage(node);
-    else ctx.workers[ctx.getnextworker()].postMessage(node);
+    if (node.p && ctx.parentworker[node.p] >= 0) workers[ctx.parentworker[node.h] = ctx.parentworker[node.p]].postMessage(node);
+    else if (ctx.parentworker[node.h] >= 0) workers[ctx.parentworker[node.h]].postMessage(node);
+    else if (node.sk) workers[ctx.parentworker[node.h] = ctx.getnextworker()].postMessage(node);
+    else workers[ctx.getnextworker()].postMessage(node);
 }
 
 // this receives the remainder of the JSON after the filter was applied
 function treefetcher_residue(fm, ctx) {
-    var i = ctx.workers.length;
+    var i = workers.length;
     ctx.dumpsremaining = i;
 
     // send state dump request to all workers
-    while (i--) ctx.workers[i].postMessage({});
+    while (i--) workers[i].postMessage({});
 
     // and store the residual f response for perusal once all state dumps have been received
     ctx.residualfm = fm[0];
 }
 
-// process worker responses (decrypted nodes, state dump...)
-function treefetcher_procmsg(ev) {
+// process worker responses (decrypted nodes, processed actionpackets, state dumps...)
+function worker_procmsg(ev) {
     var h;
 
-    if (ev.data.h) {
+    if (ev.data.scqi >= 0) {
+        // enqueue processed actionpacket
+        if (scq[ev.data.scqi]) scq[ev.data.scqi][0] = ev.data;
+        else scq[ev.data.scqi] = [ev.data, []];
+
+        // resume processing, if appropriate and needed
+        if (!scinflight && ev.data.scqi == scqtail && !nodesinflight[ev.data.scqi]) {
+            scinflight = true;
+            execsc();
+        }
+    }
+    else if (ev.data.scni >= 0) {
+        // enqueue processed node
+        if (scq[ev.data.scni]) scq[ev.data.scni][1].push(ev.data);
+        else scq[ev.data.scni] = [null, [ev.data]];
+
+        if (!--nodesinflight[ev.data.scni]) {
+            delete nodesinflight[ev.data.scni];
+
+            // resume processing, if appropriate and needed
+            if (!scinflight && ev.data.scni == scqtail) {
+                scinflight = true;
+                execsc();
+            }
+        }
+    }
+    else if (ev.data.h) {
         // maintain special incoming shares index
         if (ev.data.p.length == 11) {
             M.c.shares[ev.data.h] = { su : ev.data.p, r : ev.data.r };
@@ -6433,7 +6514,7 @@ function treefetcher_procmsg(ev) {
 }
 
 function treefetcher_getnextworker() {
-    if (this.nextworker >= this.workers.length) this.nextworker = 0;
+    if (this.nextworker >= workers.length) this.nextworker = 0;
     return this.nextworker++;
 }
 
@@ -6441,6 +6522,8 @@ function treefetcher_getnextworker() {
 var fmdb;
 
 function loadfm(force) {
+    if (!workers) initworkerpool();
+
     if (force) {
         localStorage.force = true;
         loadfm.loaded = false;

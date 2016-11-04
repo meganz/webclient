@@ -361,7 +361,6 @@ function init_page() {
             }
 			*/
 			loadfm();
-            mega.loadReport.mode = 2;
         }
     }
 

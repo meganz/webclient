@@ -3593,7 +3593,12 @@ mega.utils.reload = function megaUtilsReload() {
                                 mega.utils.clearFileSystemStorage()
                             ]).then(function(r) {
                                     console.debug('megaUtilsReload', r);
-                                    _reload();
+                                    if (fmdb) {
+                                        fmdb.db.delete().then(_reload, _reload);
+                                    }
+                                    else {
+                                        _reload();
+                                    }
                                 });
                         });
                     }

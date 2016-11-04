@@ -2407,7 +2407,8 @@ function MegaData()
                     // __process_f1()
                     // process_u() (with pass-through ignoreDB)
                     if (fmdb && !ignoreDB) fmdb.add('s', { o_t : n.su + '*' + n.h,
-                                                           d : this.c.shares[n.h] });                    
+                        d: this.c.shares[n.h]
+                    });
                 }
             }
         }
@@ -3274,7 +3275,7 @@ function MegaData()
         for (var i in n) {
             var h = n[i];
             var node = M.d[h];
- 
+
             var apireq = {
                 a: 'm',
                 n: h,
@@ -3494,7 +3495,7 @@ function MegaData()
                 // always report missing keys as more shares may
                 // now be affected
                 crypto_reportmissingkey(n);
-            }            
+            }
         }
     };
 
@@ -3536,7 +3537,7 @@ function MegaData()
         if (n) {
             n.name = newItemName;
             api_setattr(n);
-            this.onRenameUIUpdate(itemHandle, newItemName);            
+            this.onRenameUIUpdate(itemHandle, newItemName);
         }
     };
 
@@ -5606,7 +5607,9 @@ function sc_node(n) {
             workers[p].postMessage({ h : id, sk : u_sharekeys[id][0] });
         }
     }
-    else p = scqhead % workers.length; 
+    else {
+        p = scqhead % workers.length;
+    }
 
     if (nodesinflight[scqhead]) nodesinflight[scqhead]++;
     else nodesinflight[scqhead] = 1;
@@ -5938,7 +5941,7 @@ function execsc() {
                         for (i = a.length; i--; ) {
                             if (n = M.d[nodes[i]]) {
                                 if (typeof n.k == 'string') {
-                                    crypto_decryptnode(n);                            
+                                    crypto_decryptnode(n);
                                     newnodes.push(M.d[n.h]);
                                 }
                             }
@@ -6254,7 +6257,7 @@ function execsc() {
 
 // a node was updated significantly: write to DB and redraw
 function fm_updated(n) {
-    M.nodeUpdated(n); 
+    M.nodeUpdated(n);
 
     if (M.megaRender) {
         removeUInode(n.h);
@@ -6307,13 +6310,32 @@ function initworkerpool() {
         };
     }
 
-    // FIXME: use navigator.hardwareConcurrency, but do not exceed browser limit
-    for (var i = 8; i--; ) {
-        // FIXME: try / catch with fallback to synchronous decryption
-        var w = new Worker("nodedec.js");
-        w.onmessage = worker_procmsg;
-        if (workerstate) w.postMessage(workerstate);
-        workers.push(w);
+    for (var i = Math.min(mega.maxWorkers, 10); i--;) {
+        try {
+            var w = new Worker("nodedec.js");
+
+            w.onmessage = worker_procmsg;
+            w.onerror   = function(err) {
+                console.error('[nodedec worker error]', err);
+
+                // TODO: retry gettree
+                if (workers) {
+                    var l = workers.length;
+                    while (l--) {
+                        workers[l].terminate();
+                    }
+                    workers = null;
+                }
+            };
+            if (workerstate) {
+                w.postMessage(workerstate);
+            }
+            workers.push(w);
+        }
+        catch (ex) {
+            console.error(ex);
+            workers = null;
+        }
     }
 }
 
@@ -6356,7 +6378,7 @@ function treefetcher_fetch() {
         progress: function(perc, buffer, ctx) {
             loadingInitDialog.step2(parseInt(perc));    // FIXME: make generic
             if (buffer && !gettree_filter.proc(buffer, ctx.ctx)) {
-                // FIXME: wipe DB, trigger retry with exponential backoff 
+                // FIXME: wipe DB, trigger retry with exponential backoff
             }
         }
     }, n_h ? 5 : 4);
@@ -6379,17 +6401,17 @@ function treefetcher_ok(ok, ctx) {
 function emplacenode(node) {
     if (node.p) {
         if (!M.c[node.p]) M.c[node.p] = {};
-        M.c[node.p][node.h] = node.t;
+        M.c[node.p][node.h] = node.t + 1;
         if (node.hash) {
             if (!M.h[node.hash]) M.h[node.hash] = [];
             M.h[node.hash].push(node.h);
         }
     }
+    else if (node.t > 1 && node.t < 5) {
+        M[['RootID', 'InboxID', 'RubbishID'][node.t - 2]] = node.h;
+    }
     else {
-        if (node.t > 1 && node.t < 5) {
-            M[['RootID', 'InboxID', 'RubbishID'][node.t-2]] = node.h;
-        }
-        else console.error("Received parent-less node of type " + t + ": " + node.h);
+        console.error("Received parent-less node of type " + node.t + ": " + node.h);
     }
 
     M.d[node.h] = node;
@@ -6404,29 +6426,50 @@ function treefetcher_node(node, ctx) {
         workerstate = {
             n_h   : node.h,
             pfkey : pfkey,
-            d     : d 
+            d: d
         };
 
-        for (var i = workers.length; i--; ) workers[i].postMessage(workerstate);
+        if (workers) {
+            for (var i = workers.length; i--;) workers[i].postMessage(workerstate);
+        }
 
         M.RootID = node.h;
     }
 
     // children inherit their parents' worker bindings; unbound inshare roots receive a new binding
     // unbound nodes go to a random worker (round-robin assignment)
-    if (node.p && ctx.parentworker[node.p] >= 0) workers[ctx.parentworker[node.h] = ctx.parentworker[node.p]].postMessage(node);
-    else if (ctx.parentworker[node.h] >= 0) workers[ctx.parentworker[node.h]].postMessage(node);
-    else if (node.sk) workers[ctx.parentworker[node.h] = ctx.getnextworker()].postMessage(node);
-    else workers[ctx.getnextworker()].postMessage(node);
+    if (!workers) {
+        crypto_decryptnode(node);
+        worker_procmsg({data: node});
+    }
+    else if (node.p && ctx.parentworker[node.p] >= 0) {
+        workers[ctx.parentworker[node.h] = ctx.parentworker[node.p]].postMessage(node);
+    }
+    else if (ctx.parentworker[node.h] >= 0) {
+        workers[ctx.parentworker[node.h]].postMessage(node);
+    }
+    else if (node.sk) {
+        workers[ctx.parentworker[node.h] = ctx.getnextworker()].postMessage(node);
+    }
+    else {
+        workers[ctx.getnextworker()].postMessage(node);
+    }
 }
 
 // this receives the remainder of the JSON after the filter was applied
 function treefetcher_residue(fm, ctx) {
-    var i = workers.length;
-    ctx.dumpsremaining = i;
-
     // send state dump request to all workers
-    while (i--) workers[i].postMessage({});
+    if (workers) {
+        var i = workers.length;
+        ctx.dumpsremaining = i;
+
+        while (i--) {
+            workers[i].postMessage({});
+        }
+    }
+    else {
+        ctx.dumpsremaining = 1;
+    }
 
     // and store the residual f response for perusal once all state dumps have been received
     ctx.residualfm = fm[0];
@@ -6509,7 +6552,7 @@ function worker_procmsg(ev) {
     else if (ev.data[0] === 'console') {
         if (d) {
             var args = ev.data[1];
-            args.unshift(self.token);
+            args.unshift('[nodedec worker]');
             console.log.apply(console, args);
         }
         return;
@@ -6544,6 +6587,9 @@ function loadfm(force) {
             M.reset();
             M.c.shares = [];
 
+            fminitialized  = false;
+            loadfm.loading = true;
+
             // is this a folder link? or do we have no valid cache for this session?
             if (n_h) fetchfm(false);
             else {
@@ -6561,18 +6607,23 @@ function fetchfm(sn) {
     }
     else {
         // no cache requested or available - get from API
-        fminitialized = false;
-        loadfm.loading = true;
-
         fetcher = treefetcher();
         fetcher.fetch();
+
+        mega.loadReport.mode = 2;
+
+        if (!n_h) {
+            // dbToNet holds the time wasted trying to read local DB, and having found we have to query the server.
+            mega.loadReport.dbToNet       = Date.now() - mega.loadReport.startTime;
+            mega.loadReport.stepTimeStamp = Date.now();
+        }
     }
 }
 
 // to reduce peak mem usage, we fetch f in 64 small chunks
 function fetchfchunked(chunk, procresult) {
     fmdb.get('f', function(r) {
-        for (i = r.length; i--; ) emplacenode(r[i]);
+        for (var i = r.length; i--;) emplacenode(r[i]);
         if (chunk == 64) procresult();
         else fetchfchunked(chunk, procresult);
     }, 'h', b64[chunk++]);
@@ -6588,6 +6639,9 @@ function dbfetchfm() {
 
         // FIXME: remove this step and replace with dynamic on-demand loading
         fetchfchunked(0, function(r){
+
+            mega.loadReport.recvNodes     = Date.now() - mega.loadReport.stepTimeStamp;
+            mega.loadReport.stepTimeStamp = Date.now();
 
             fmdb.get('mk', function(r){
                 crypto_missingkeysfromdb(r);
@@ -6621,6 +6675,10 @@ function dbfetchfm() {
                                         if (!megaChatIsDisabled) {
                                             processMCF(r, true);
                                         }
+
+                                        mega.loadReport.procNodeCount = Object.keys(M.d || {}).length;
+                                        mega.loadReport.procNodes     = Date.now() - mega.loadReport.stepTimeStamp;
+                                        mega.loadReport.stepTimeStamp = Date.now();
 
                                         // fetch & process new actionpackets
                                         loadingInitDialog.step3();
@@ -7168,7 +7226,7 @@ function processmove(apireq) {
 
             if (foreignnodes.length) {
                 if (d) console.log('rekeying foreignnodes', foreignnodes.length);
-                
+
                 // update all foreign nodes' keys and take ownership
                 api_updfkey(movingnodes);
             }
@@ -7269,7 +7327,7 @@ function process_f(f, cb, retry) {
     }
     else if (cb) cb();
 }
-    
+
 function __process_f1(f)
 {
     for (var i in f) M.addNode(f[i]);

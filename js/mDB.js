@@ -231,7 +231,7 @@ function fmdb_writepending(fmdb) {
                     delete fmdb.pending[fmdb.tail++];
                 }
 
-                if (d) console.log("DB write started with " + t.length + " elements on table " + table);
+                if (d) console.log("DB write started with " + t.length + " element(s( on table " + table);
 
                 // send the chunk of updates off to IndexedDB for writing
                 fmdb.db[table][action & 1 ? 'bulkDelete' : 'bulkPut'](t).then(function() {

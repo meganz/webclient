@@ -1974,7 +1974,7 @@ function waitsc() {
 
                 stopsc();
 
-                var t = new Date().getTime() - waitbegin;
+                var t = Date.now() - waitbegin;
 
                 if (t < 1000) {
                     waitbackoff += waitbackoff;
@@ -1986,12 +1986,12 @@ function waitsc() {
                     waitbackoff = 250;
                 }
 
-                getsc();
+                getsc(false);
             }
         }
     };
 
-    waitbegin = new Date().getTime();
+    waitbegin = Date.now();
     waitxhr.open('POST', waiturl, true);
     waitxhr.send();
 }

@@ -5766,7 +5766,7 @@ function execsc() {
             case 'ua':
                 mega.attr.handleUserAttributeActionPackets(a, loadavatars);
         }
-    }// END own action packet
+    } // end of own action packet section
     else {
         switch (a.a) {
             case '_sn':
@@ -7835,9 +7835,9 @@ function loadfm_callback(res) {
         mega.loadReport.procNodes     = Date.now() - mega.loadReport.stepTimeStamp;
         mega.loadReport.stepTimeStamp = Date.now();
 
-        // Retrieve initial batch of action-packets, if any
+        // retrieve initial batch of action packets, if any
         // we'll then complete the process using loadfm_done
-        getsc();
+        getsc(true);
 
         if (hasMissingKeys) {
             srvlog('Got missing keys processing gettree...', null, true);

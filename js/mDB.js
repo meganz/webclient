@@ -10,19 +10,21 @@
 // - large updates are written on the fly, but with the _sn cleared, which
 //   ensures integrity, but invalidates the DB if the update can't complete
 
-function FMDB() {
+function FMDB(plainname, schema) {
     if (!(this instanceof FMDB)) {
-        return new FMDB();
+        return new FMDB(plainname, schema);
     }
 
-    this.name     = false;  // DB name suffix, derived from u_handle and u_k
-    this.pending  = {};     // pending obfuscated writes [tid][tablename][op_autoincrement] = [payloads]
-    this.head     = 0;      // current tid being received from the application code
-    this.tail     = 0;      // current tid being sent to IndexedDB
-    this.state    = -1;     // -1: idle, 0: deleted sn and writing, 1: transaction open and writing
-    this.inflight = 0;      // number of currently executing DB updates (MSIE restricts this to a paltry 1)
-    this.commit   = false;  // if set, the sn has been updated, completing the transaction
-    this.crashed  = false;  // a DB error sets this and prevents further DB access
+    this.name      = false;  // DB name suffix, derived from u_handle and u_k
+    this.plainname = plainname; 
+    this.schema    = schema; // DB schema
+    this.pending   = {};     // pending obfuscated writes [tid][tablename][op_autoincrement] = [payloads]
+    this.head      = 0;      // current tid being received from the application code
+    this.tail      = 0;      // current tid being sent to IndexedDB
+    this.state     = -1;     // -1: idle, 0: deleted sn and writing, 1: transaction open and writing
+    this.inflight  = 0;      // number of currently executing DB updates (MSIE restricts this to a paltry 1)
+    this.commit    = false;  // if set, the sn has been updated, completing the transaction
+    this.crashed   = false;  // a DB error sets this and prevents further DB access
     this.cantransact = -1;  // whether multi-table transactions work (1) or not (0) (Apple, looking at you!)
 }
 
@@ -32,12 +34,12 @@ FMDB.prototype.identity = Date.now() + Math.random().toString(26);
 // set up and check fm DB for user u
 // calls result(sn) if found and sn present
 // wipes DB an calls result(false) otherwise
-FMDB.prototype.init = function fmdb_init(u, result, wipe) {
+FMDB.prototype.init = function fmdb_init(result, wipe) {
     var fmdb = this;
 
     if (!fmdb.name) {
         // protect user identity post-logout
-        fmdb.name = ab_to_base64(this.strcrypt((u_handle + u_handle).substr(0, 16)));
+        fmdb.name = ab_to_base64(this.strcrypt((fmdb.plainname + fmdb.plainname).substr(0, 16)));
     }
 
     if (!fmdb.up()) result(false);
@@ -49,20 +51,13 @@ FMDB.prototype.init = function fmdb_init(u, result, wipe) {
                 fmdb.db = new Dexie('fm_' + fmdb.name);
 
                 // replicate any additions to fmdb_writepending()
-                fmdb.db.version(1).stores({
-                    f   : '&h, p, s',   // nodes - handle, parent, size (negative size: type)
-                    s   : '&o_t',       // shares - origin/target; both incoming & outgoing
-                    ok  : '&h',         // ownerkeys for outgoing shares - handle
-                    mk  : '&h',         // missing node keys - handle
-                    u   : '&u',         // users - handle
-                    opc : '&p',         // outgoing pending contact - id
-                    ipc : '&p',         // incoming pending contact - id
-                    ps  : '&h_p',       // pending share - handle/id
-                    mcf : '&id',        // chats - id
-                    _sn  : '&i'         // sn - fixed index 1
-                });
+                fmdb.db.version(1).stores(fmdb.schema);
 
                 fmdb.db.open().then(function(){
+                    fmdb.tables = Object.keys(fmdb.schema);
+                    //[];
+                    //for (var table in fmdb.schema) fmdb.tables.push(fmdb.db[table]);
+
                     fmdb.get('_sn', function(r){
                         if (!wipe && r[0] && r[0].length == 11) {
                             console.log("DB sn: " + r[0]);
@@ -122,7 +117,7 @@ FMDB.prototype.enqueue = function fmdb_enqueue(table, row, type) {
     c[i].push(row);
 
     // force a flush when a lot of data is pending or the _sn was updated
-    if (c[i].length > 5 || table[0] == '_') {
+    if (c[i].length > 1000 || table[0] == '_') {
         // if we have the _sn, the next write goes to a fresh transaction
         if (table[0] == '_') fmdb.head++;
         fmdb.writepending();
@@ -139,41 +134,32 @@ FMDB.prototype.writepending = function fmdb_writepending(fmdb) {
         // we execute it in a single transaction without first clearing sn
         fmdb.state = 1;
         fmdb.db.transaction('rw',
-                            fmdb.db.f,
-                            fmdb.db.s,
-                            fmdb.db.ok,
-                            fmdb.db.mk,
-                            fmdb.db.u,
-                            fmdb.db.opc,
-                            fmdb.db.ipc,
-                            fmdb.db.ps,
-                            fmdb.db.mcf,
-                            fmdb.db._sn,
-                            function(){
-                                if (d) console.log("Transaction started");
-                                fmdb.commit = false;
-                                fmdb.cantransact = 1;
-                                dispatchputs();
-                            }).then(function(){
-                                // transaction completed: delete written data
-                                delete fmdb.pending[fmdb.tail++];
-                                fmdb.state = -1;
-                                if (d) console.log("Transaction committed");
-                                fmdb.writepending();
-                            }).catch(function(e){
-                                if (fmdb.cantransact < 0) {
-                                    console.error("Your browser's IndexedDB implementation is bogus, disabling transactions.");
-                                    fmdb.cantransact = 0;
-                                    fmdb_writepending(fmdb);
-                                }
-                                else {
-                                    // FIXME: retry instead? need statistics.
-                                    console.error("Transaction failed, marking DB as crashed");
-                                    console.log(e);
-                                    fmdb.state = -1;
-                                    fmdb.crashed = true;                                    
-                                }
-                            });
+            fmdb.tables,
+            function(){
+                if (d) console.log("Transaction started");
+                fmdb.commit = false;
+                fmdb.cantransact = 1;
+                dispatchputs();
+            }).then(function(){
+                // transaction completed: delete written data
+                delete fmdb.pending[fmdb.tail++];
+                fmdb.state = -1;
+                if (d) console.log("Transaction committed");
+                fmdb.writepending();
+            }).catch(function(e){
+                if (fmdb.cantransact < 0) {
+                    console.error("Your browser's IndexedDB implementation is bogus, disabling transactions.");
+                    fmdb.cantransact = 0;
+                    fmdb_writepending(fmdb);
+                }
+                else {
+                    // FIXME: retry instead? need statistics.
+                    console.error("Transaction failed, marking DB as crashed");
+                    console.log(e);
+                    fmdb.state = -1;
+                    fmdb.crashed = true;                                    
+                }
+            });
     }
     else {
         // the job is incomplete - we clear the sn and execute it without transaction protection
@@ -302,6 +288,14 @@ FMDB.prototype.stripnode = Object.freeze({
         delete s.t;
 
         return t;
+    },
+
+    attrib : function(attrib, index) {
+        delete attrib.k;
+    },
+
+    chatqueuedmsgs : function(chatqueuedmsgs, index) {
+        delete chatqueuedmsgs.k;
     }
 });
 
@@ -336,6 +330,14 @@ FMDB.prototype.restorenode = Object.freeze({
             ps.h = index.h_p.substr(0, t);
             ps.p = index.h_p.substr(t + 1);
         }
+    },
+
+    attrib : function(attrib, index) {
+        attrib.k = index.k;
+    },
+
+    chatqueuedmsgs : function(chatqueuedmsgs, index) {
+        chatqueuedmsgs.k = index.k;
     },
 
     mk : function(mk, index) {
@@ -386,17 +388,17 @@ FMDB.prototype.del = function fmdb_del(table, index) {
 };
 
 // non-transactional read with subsequent deobfuscation, with optional prefix filter
-// FIXME: replace procresult with Promises without incurring a massive readability/mem/CPU penalty!
+// FIXME: replace cb with Promises without incurring a massive readability/mem/CPU penalty!
 // (must NOT be used for dirty reads - use getbykey() instead)
 FMDB.prototype.get = function fmdb_get(table, cb, key, prefix) {
     if (!this.up()) {
-        return procresult([]);
+        return cb([]);
     }
 
     var promise;
     var fmdb = this;
 
-    if (d) console.log("Fetching table " + table + "...");
+    if (d) console.log("Fetching entire table " + table + "...");
 
     if (key) promise = fmdb.db[table].where(key).startsWith(prefix).toArray();
     else promise = fmdb.db[table].toArray();
@@ -414,37 +416,37 @@ FMDB.prototype.normaliseresult = function fmdb_normaliseresult(table, r) {
         try {
             t = r[i].d ? JSON.parse(fmdb.strdecrypt(r[i].d)) : {};
 
-            if (fmdb.restorenode[table]) {
+            if (this.restorenode[table]) {
                 // restore attributes based on the table's indexes
                 for (var p in r[i]) {
                     if (p != 'd') {
-                        r[i][p] = fmdb.strdecrypt(base64_to_ab(r[i][p]));
+                        r[i][p] = this.strdecrypt(base64_to_ab(r[i][p]));
                     }
                 }
-                fmdb.restorenode[table](t, r[i]);
+                this.restorenode[table](t, r[i]);
             }
 
             r[i] = t;
         }
         catch (e) {
             console.log(e);
-            console.error("IndexedDB corruption: " + fmdb.strdecrypt(r[i].d));
+            console.error("IndexedDB corruption: " + this.strdecrypt(r[i].d));
             r.splice(i, 1);
         }
     }
 }
 // non-transactional read with subsequent deobfuscation, with optional key filter
-// FIXME: replace procresult with Promises without incurring a massive readability/mem/CPU penalty!
+// FIXME: replace cb with Promises without incurring a massive readability/mem/CPU penalty!
 // (dirty reads are supported by scanning the pending writes after the IndexedDB read completes)
 // FIXME: do we have a race condition between a write immediately completing after the read?
 FMDB.prototype.getbykey = function fmdb_getbykey(table, index, where, cb) {
     if (!this.up()) {
-        return procresult([]);
+        return cb([]);
     }
 
     var fmdb = this;
 
-    if (d) console.log("Fetching table " + table + "...");
+    if (d) console.log("Fetching table " + table + (where ? (" by keys " + JSON.stringify(where)) : '') + "...");
 
     var t = fmdb.db[table];
     var i = 0;
@@ -539,11 +541,11 @@ FMDB.prototype.getbykey = function fmdb_getbykey(table, index, where, cb) {
                     delete matches[r[i][index]];
                 }
             }
+        }
 
-            // now add newly written records
-            for (t in matches) {
-                if (matches[t]) r[i].push(fmdb_clone(matches[t]));
-            }
+        // now add newly written records
+        for (t in matches) {
+            if (matches[t]) r[i].push(fmdb_clone(matches[t]));
         }
 
         fmdb.normaliseresult(table, r);

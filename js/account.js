@@ -189,8 +189,6 @@ function u_checklogin3a(res, ctx) {
         }
 
         if (r == 3) {
-            // Load/initialise the authentication system.
-            authring.initAuthenticationSystem();
             return mBroadcaster.crossTab.initialize(function() {
                 ctx.checkloginresult(ctx, r);
             });

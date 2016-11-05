@@ -1530,6 +1530,9 @@ function api_req(request, context, channel) {
     if (typeof channel === 'undefined') {
         channel = 0;
     }
+
+    if (d) console.log("CS command on " + channel + ": " + JSON.stringify(request));
+
     if (typeof context === 'undefined') {
         context = {};
     }

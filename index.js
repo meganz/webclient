@@ -345,9 +345,10 @@ function init_page() {
         }
 
         if (!fminitialized) {
-            if (u_type === 3 && !pfid && !folderlink) {
-                mega.config.fetch();
-            }
+// Not this early!
+//            if (u_type === 3 && !pfid && !folderlink) {
+//                mega.config.fetch();
+//            }
             mega.initLoadReport();
 
 			/*
@@ -1240,11 +1241,12 @@ function topmenuUI() {
         $('.create-account-button').hide();
         $('.membership-status-block').show();
 
-        Soon(function() {
-            if (!avatars[u_handle]) {
-                useravatar.loadAvatar(u_handle);
-            }
-        });
+// too soon!
+//        Soon(function() {
+//            if (!avatars[u_handle]) {
+//                useravatar.loadAvatar(u_handle);
+//            }
+//        });
 
         // If a Lite/Pro plan has been purchased
         if (u_attr.p) {
@@ -1964,7 +1966,9 @@ function parsetopmenu() {
     if (document.location.href.substr(0, 19) == 'chrome-extension://') {
         top = top.replace(/\/#/g, '/' + urlrootfile + '#');
     }
-    top = top.replace("{avatar-top}", window.useravatar && useravatar.top() || '');
+// not this early, please
+//    top = top.replace("{avatar-top}", window.useravatar && useravatar.top() || '');
+    top = top.replace("{avatar-top}", '');
     top = translate(top);
     return top;
 }

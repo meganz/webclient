@@ -6387,6 +6387,7 @@ function treefetcher_fetch() {
 // this receives the ok elements one by one as per the filter rule
 // to facilitate the decryption of outbound shares, the API now sends ok before f
 function treefetcher_ok(ok, ctx) {
+console.error("treefetcher_ok()");
     if (fmdb) fmdb.add('ok', { h : ok.h, d : ok });
 
     // bind outbound share root to specific worker, post ok element to that worker
@@ -6593,31 +6594,56 @@ function loadfm(force) {
             // is this a folder link? or do we have no valid cache for this session?
             if (n_h) fetchfm(false);
             else {
-                fmdb = FMDB();
-                fmdb.init(u_handle, fetchfm, localStorage.force);
+                fmdb = FMDB(u_handle, {
+                    f   : '&h, p, s',   // nodes - handle, parent, size (negative size: type)
+                    s   : '&o_t',       // shares - origin/target; both incoming & outgoing
+                    ok  : '&h',         // ownerkeys for outgoing shares - handle
+                    mk  : '&h',         // missing node keys - handle
+                    u   : '&u',         // users - handle
+                    opc : '&p',         // outgoing pending contact - id
+                    ipc : '&p',         // incoming pending contact - id
+                    ps  : '&h_p',       // pending share - handle/id
+                    mcf : '&id',        // chats - id
+                    chatqueuedmsgs : '&k',  // queued chat messages - k
+                    attrib : '&k',      // user attribute cache - k
+                    _sn  : '&i'         // sn - fixed index 1
+                });
+
+                fmdb.init(fetchfm, localStorage.force);
             }
         }
     }
 }
 
 function fetchfm(sn) {
-    if (sn) {
-        currsn = sn;
-        dbfetchfm();
-    }
-    else {
-        // no cache requested or available - get from API
-        fetcher = treefetcher();
-        fetcher.fetch();
+    // activate/prefetch attribute cache at this early stage
+    attribCache.prefillMemCache(fmdb).then(function(){
+        // moved here from index.js
+        useravatar.loadAvatar(u_handle);
+        mega.config.fetch();
 
-        mega.loadReport.mode = 2;
+        // Load/initialise the authentication system.
+        authring.initAuthenticationSystem();
 
-        if (!n_h) {
-            // dbToNet holds the time wasted trying to read local DB, and having found we have to query the server.
-            mega.loadReport.dbToNet       = Date.now() - mega.loadReport.startTime;
-            mega.loadReport.stepTimeStamp = Date.now();
+        if (sn) {
+            currsn = sn;
+            dbfetchfm();
         }
-    }
+        else {
+
+            // no cache requested or available - get from API
+            fetcher = treefetcher();
+            fetcher.fetch();
+
+            mega.loadReport.mode = 2;
+
+            if (!n_h) {
+                // dbToNet holds the time wasted trying to read local DB, and having found we have to query the server.
+                mega.loadReport.dbToNet       = Date.now() - mega.loadReport.startTime;
+                mega.loadReport.stepTimeStamp = Date.now();
+            }
+        }
+    });
 }
 
 // to reduce peak mem usage, we fetch f in 64 small chunks

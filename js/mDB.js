@@ -1452,13 +1452,8 @@ function mDBreload() {
 }
 
 function mDBcls() {
-    if (typeof mDB === 'object' && mDB.close) {
-        mFileManagerDB.exec('close');
+    if (Object(window.fmdb).hasOwnProperty('db')) {
+        fmdb.db.close();
     }
-    try {
-        mDB = indexedDB ? 0x9e : undefined;
-    }
-    catch (e) {
-        mDB = undefined;
-    }
+    fmdb = null;
 }

@@ -338,9 +338,9 @@ function init_page() {
                     api_init(wasFolderlink ? 5 : 4, 'cs');
                     loadfm.loading = false;
                 }
-                //if (typeof mDBcls === 'function') {
-                //    mDBcls();
-                //}
+                if (typeof mDBcls === 'function') {
+                   mDBcls(); // close fmdb
+                }
             }
         }
 

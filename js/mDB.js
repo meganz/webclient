@@ -23,7 +23,7 @@ function FMDB() {
     this.inflight = 0;      // number of currently executing DB updates (MSIE restricts this to a paltry 1)
     this.commit   = false;  // if set, the sn has been updated, completing the transaction
     this.crashed  = false;  // a DB error sets this and prevents further DB access
-    this.cantransact = -1;  // probe whether multi-table transactions work or not (Apple, looking at you!)
+    this.cantransact = -1;  // whether multi-table transactions work (1) or not (0) (Apple, looking at you!)
 }
 
 // initialise cross-tab access arbitration identity
@@ -105,7 +105,7 @@ FMDB.prototype.enqueue = function fmdb_enqueue(table, row, type) {
     // if needed, create new transaction at index fmdb.head
     if (!(c = fmdb.pending[fmdb.head])) c = fmdb.pending[fmdb.head] = {};
 
-    // if needed, create new array of modifications for this table
+    // if needed, create new hash of modifications for this table
     if (!c[table]) c[table] = {};
     c = c[table];
 
@@ -122,7 +122,7 @@ FMDB.prototype.enqueue = function fmdb_enqueue(table, row, type) {
     c[i].push(row);
 
     // force a flush when a lot of data is pending or the _sn was updated
-    if (c[i].length > 1000 || table[0] == '_') {
+    if (c[i].length > 5 || table[0] == '_') {
         // if we have the _sn, the next write goes to a fresh transaction
         if (table[0] == '_') fmdb.head++;
         fmdb.writepending();
@@ -155,6 +155,8 @@ FMDB.prototype.writepending = function fmdb_writepending(fmdb) {
                                 fmdb.cantransact = 1;
                                 dispatchputs();
                             }).then(function(){
+                                // transaction completed: delete written data
+                                delete fmdb.pending[fmdb.tail++];
                                 fmdb.state = -1;
                                 if (d) console.log("Transaction committed");
                                 fmdb.writepending();
@@ -165,6 +167,7 @@ FMDB.prototype.writepending = function fmdb_writepending(fmdb) {
                                     fmdb_writepending(fmdb);
                                 }
                                 else {
+                                    // FIXME: retry instead? need statistics.
                                     console.error("Transaction failed, marking DB as crashed");
                                     console.log(e);
                                     fmdb.state = -1;
@@ -189,23 +192,25 @@ FMDB.prototype.writepending = function fmdb_writepending(fmdb) {
     }
 
     // start writing all pending data in this transaction to the DB
-    // immediately delete data being written from the transaction
-    // advance to the next transaction once _sn has been written
+    // conclude/commit the (virtual or real) transaction once _sn has been written
     // FIXME: check if having multiple IndexedDB writes in flight improves performance
     // on Chrome/Firefox/Safari - it kills MSIE
     function dispatchputs() {
         if (fmdb.inflight) return;    // don't overwhelm MSIE's IndexedDB implementation
 
         if (fmdb.commit) {
-            // the transaction is complete
+            // the transaction is complete: delete from pending
             if (!fmdb.state) {
-                // we had been executing without transaction protection
-                // try to dispatch the next transaction immediately
+                // we had been executing without transaction protection, delete the current
+                // transaction and try to dispatch the next one immediately
+                delete fmdb.pending[fmdb.tail++];
+
                 fmdb.state = -1;
                 fmdb.writepending();
             }
 
-            // we had a real transaction open: it will now commit automatically
+            // if we had a real IndexedDB transaction open, it will commit
+            // as soon as the browser main thread goes idle
             return;
         }
 
@@ -217,32 +222,36 @@ FMDB.prototype.writepending = function fmdb_writepending(fmdb) {
             for (var action in fmdb.pending[fmdb.tail][table]) { // even: add, odd: delete
                 if (fmdb.commit) return dispatchputs(); // let transaction commit before writing further
 
-                // remove a chunk of updates from pending
-                var t = fmdb.pending[fmdb.tail][table][action];
-                fmdb.inflight++;
-                delete fmdb.pending[fmdb.tail][table][action];
+                if (d) console.log("DB write with " + fmdb.pending[fmdb.tail][table][action].length
+                                   + " element(s) on table " + table);
 
-                // if the primary key is being updated, request a commit
-                // and delete the new completed write job
-                // (no further writes are allowed if this is a real transaction)
-                if (table[0] == '_') {
-                    fmdb.commit = true;
-                    delete fmdb.pending[fmdb.tail++];
-                }
+                // record what we are sending...
+                fmdb.inflight = [fmdb.tail, table, action];
 
-                if (d) console.log("DB write started with " + t.length + " element(s) on table " + table);
+                // ...and send update off to IndexedDB for writing
+                fmdb.db[table][action & 1 ? 'bulkDelete' : 'bulkPut'](fmdb.pending[fmdb.tail][table][action]).then(function(){
+                    // if the primary key is being updated, request a commit
+                    if (fmdb.inflight[1][0] == '_') {
+                        fmdb.commit = true;
+                    }
 
-                // send the chunk of updates off to IndexedDB for writing
-                fmdb.db[table][action & 1 ? 'bulkDelete' : 'bulkPut'](t).then(function() {
-                    fmdb.inflight--;
-                    if (d) console.log("No more DB writes in flight - transaction complete: " + fmdb.commit);
+                    if (d) console.log('Wrote ' + fmdb.inflight.join(' / ') + (fmdb.commit ? ' - transaction complete' : ''));
+
+                    // remove the written data from pending
+                    delete fmdb.pending[fmdb.inflight[0]][fmdb.inflight[1]][fmdb.inflight[2]];
+
+                    // loop back to write more pending data (or to commit the transaction)
+                    fmdb.inflight = false;
                     dispatchputs();
                 });
 
-                break;  // don't overwhelm MSIE's IndexedDB implementation
+                break;
             }
 
-            if (action !== false) break;      // don't overwhelm MSIE's IndexedDB implementation
+            if (action !== false) break;
+
+            // no action left for this table - delete empty table hash
+            delete fmdb.pending[fmdb.tail][table];
         }
     }
 };
@@ -378,8 +387,11 @@ FMDB.prototype.del = function fmdb_del(table, index) {
 
 // non-transactional read with subsequent deobfuscation, with optional prefix filter
 // FIXME: replace procresult with Promises without incurring a massive readability/mem/CPU penalty!
-FMDB.prototype.get = function fmdb_get(table, procresult, key, prefix) {
-    if (!this.up()) return;
+// (must NOT be used for dirty reads - use getbykey() instead)
+FMDB.prototype.get = function fmdb_get(table, cb, key, prefix) {
+    if (!this.up()) {
+        return procresult([]);
+    }
 
     var promise;
     var fmdb = this;
@@ -390,35 +402,162 @@ FMDB.prototype.get = function fmdb_get(table, procresult, key, prefix) {
     else promise = fmdb.db[table].toArray();
 
     promise.then(function(r){
-        var t;
-        for (var i = r.length; i--; ) {
-            try {
-                t = r[i].d ?
-                    JSON.parse(fmdb.strdecrypt(r[i].d))
-                  : {};
+        fmdb.normaliseresult(table, r);
+        cb(r);
+    });
+};
 
-                if (fmdb.restorenode[table]) {
-                    // restore attributes based on the table's indexes
-                    for (var p in r[i]) {
-                        if (p != 'd') {
-                            r[i][p] = fmdb.strdecrypt(base64_to_ab(r[i][p]));
+FMDB.prototype.normaliseresult = function fmdb_normaliseresult(table, r) {
+    var t;
+
+    for (var i = r.length; i--; ) {
+        try {
+            t = r[i].d ? JSON.parse(fmdb.strdecrypt(r[i].d)) : {};
+
+            if (fmdb.restorenode[table]) {
+                // restore attributes based on the table's indexes
+                for (var p in r[i]) {
+                    if (p != 'd') {
+                        r[i][p] = fmdb.strdecrypt(base64_to_ab(r[i][p]));
+                    }
+                }
+                fmdb.restorenode[table](t, r[i]);
+            }
+
+            r[i] = t;
+        }
+        catch (e) {
+            console.log(e);
+            console.error("IndexedDB corruption: " + fmdb.strdecrypt(r[i].d));
+            r.splice(i, 1);
+        }
+    }
+}
+// non-transactional read with subsequent deobfuscation, with optional key filter
+// FIXME: replace procresult with Promises without incurring a massive readability/mem/CPU penalty!
+// (dirty reads are supported by scanning the pending writes after the IndexedDB read completes)
+// FIXME: do we have a race condition between a write immediately completing after the read?
+FMDB.prototype.getbykey = function fmdb_getbykey(table, index, where, cb) {
+    if (!this.up()) {
+        return procresult([]);
+    }
+
+    var fmdb = this;
+
+    if (d) console.log("Fetching table " + table + "...");
+
+    var t = fmdb.db[table];
+    var i = 0;
+
+    if (where) {
+        for (var k = where.length; k--; ) {
+            // encrypt the filter values (logical AND is commutative, so we can reverse the order)
+            where[k][1] = ab_to_base64(this.strcrypt(where[k][1]));
+
+            // apply filter criterion
+            if (i) t = t.and(where[k][0]);
+            else {
+                t = t.where(where[k][0]);
+                i = 1;
+            }
+
+            t = t.equals(where[k][1]);
+        }
+    }
+
+    t.toArray().then(function(r){
+        // now scan the pending elements to capture and return unwritten updates
+        // FIXME: typically, there are very few or no pending elements -
+        // determine if we can reduce overall CPU load by replacing the
+        // occasional scan with a constantly maintained hash for direct lookups?
+        var matches = {};
+        var tids = Object.keys(fmdb.pending);
+
+        // iterate transactions in reverse chronological order
+        for (t = tids.length; t--; ) {
+            var tid = tids[t];
+
+            if (fmdb.pending[tid][table]) {
+                var actions = Object.keys(fmdb.pending[tid][table]);
+
+                // iterate actions in reverse chronological order
+                for (var a = actions.length; a--; ) {
+                    if (a & 1) {
+                        // deletion - always by bare index
+                        var deletions = fmdb.pending[tid][table][a];
+
+                        for (var j = deletions.length; j--; ) {
+                            if (typeof matches[deletions[j]] == 'undefined') {
+                                // boolean false means "record deleted"
+                                matches[deletions[j]] = false;
+                            } 
                         }
                     }
-                    fmdb.restorenode[table](t, r[i]);
-                }
+                    else {
+                        // addition or update - index field is attribute
+                        var updates = fmdb.pending[tid][table][a];
 
-                r[i] = t;
-            }
-            catch (e) {
-                console.log(e);
-                console.error("IndexedDB corruption: " + fmdb.strdecrypt(r[i].d));
-                delete r[i];
+                        // iterate updates in reverse chronological order
+                        // (updates are not commutative)
+                        for (var j = updates.length; j--; ) {
+                            var update = updates[j];
+
+                            if (typeof matches[update[index]] == 'undefined') {
+                                // check if this update matches our criteria, if any
+                                if (where) {
+                                    for (var k = where.length; k--; ) {
+                                        if (update[where[k][0]] !== where[k][1]) break;
+                                    }
+
+                                    // mismatch detected - record it as a deletion
+                                    if (k >= 0) {
+                                        matches[update[index]] = false;
+                                        continue;   
+                                    }
+                                }
+
+                                matches[update[index]] = update;
+                            }
+                        }
+                    }
+                }
             }
         }
 
-        procresult(r);
+        // scan the result for updates/deletions/additions arising out of the matches found
+        for (i = r.length; i--; ) {
+            if (typeof matches[r[i][index]] != 'undefined') {
+                if (matches[r[i][index]] === false) {
+                    // a returned record was deleted or overwritten with
+                    // keys that fall outside our where clause
+                    r.splice(i, 1);
+                }
+                else {
+                    // a returned record was overwritten and still matches
+                    // our where clause
+                    r[i] = fmdb_clone(matches[r[i][index]]);
+                    delete matches[r[i][index]];
+                }
+            }
+
+            // now add newly written records
+            for (t in matches) {
+                if (matches[t]) r[i].push(fmdb_clone(matches[t]));
+            }
+        }
+
+        fmdb.normaliseresult(table, r);
+        cb(r);
     });
 };
+
+function fmdb_clone(o) {
+    var r = {};
+
+    for (var i in o) r[i] = o[i];
+
+    return r;
+}
 
 // checks if crashed or being used by another tab concurrently
 FMDB.prototype.up = function fmdb_up() {
@@ -444,7 +583,10 @@ FMDB.prototype.up = function fmdb_up() {
     return true;
 };
 
-// TODO: fixme..
+// FIXME: improve like this:
+// when a new tab is opened with the same session, request an update freeze from the master tab
+// once the loading is completed, relinquish update lock
+// (we could do this with transactions if Safari supported them properly...)
 FMDB.prototype.beacon = function fmdb_beacon(fmdb) {
     if (this.up()) {
         setTimeout(this.beacon.bind(this), 500);
@@ -452,7 +594,7 @@ FMDB.prototype.beacon = function fmdb_beacon(fmdb) {
 };
 Object.freeze(FMDB.prototype);
 
-
+// FIXME: remove
 var mDBact, mDBv = 7, mDB, mSDB, mSDBPromises = [];
 
 /**

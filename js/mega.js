@@ -2407,7 +2407,7 @@ function MegaData()
                     // __process_f1()
                     // process_u() (with pass-through ignoreDB)
                     if (fmdb && !ignoreDB) fmdb.add('s', { o_t : n.su + '*' + n.h,
-                        d: this.c.shares[n.h]
+                                                           d : this.c.shares[n.h]
                     });
                 }
             }
@@ -2454,11 +2454,11 @@ function MegaData()
 
         this.d[n.h] = n;
 
-        newnodes.push(n);
-
         if (fminitialized) {
             // Handle Inbox/RubbishBin UI changes
             delay('fmtopUI', fmtopUI);
+
+            newnodes.push(n);
         }
 
         // $(window).trigger("megaNodeAdded", [n]);
@@ -5551,22 +5551,34 @@ var nodesinflight = {};  // number of nodes being processed in the worker for sc
 function sc_packet(a) {
     if ((a.a == 's' || a.a == 's2') && a.k) {
         // keyed share packets may involve an RSA operation: run through worker
-        a.scqi = scqhead++;     // set scq slot number
-        workers[a.scqi % workers.length].postMessage(a);
-    }
-    else {
-        // other packet types do not warrant the worker detour
-        if (scq[scqhead]) scq[scqhead++][0] = a;
-        else scq[scqhead++] = [a, []];
+        if (workers) {
+            a.scqi = scqhead++;     // set scq slot number
+            workers[a.scqi % workers.length].postMessage(a);
+            return;
+        }
 
-        // resume processing if needed
-        resumesc();
+        a.k = crypto_process_sharekey(a.n, a.k);
     }
+
+    // other packet types do not warrant the worker detour
+    if (scq[scqhead]) scq[scqhead++][0] = a;
+    else scq[scqhead++] = [a, []];
+
+    // resume processing if needed
+    resumesc();
 }
 
 // submit nodes from `t` actionpacket to worker
 function sc_node(n) {
     var p, id;
+
+    if (!workers) {
+        crypto_decryptnode(n);
+        if (scq[scqhead]) scq[scqhead][1].push(n);
+        else scq[scqhead] = [null, [n]];
+        // sc_packet() call will follow
+        return;
+    }
 
     // own node?
     if (n.k && n.k.substr(0, 11) === u_handle) p = -1;
@@ -6312,7 +6324,7 @@ function initworkerpool() {
 
     for (var i = Math.min(mega.maxWorkers, 10); i--;) {
         try {
-            var w = new Worker("nodedec.js");
+            var w = new Worker("nodedec1.js");
 
             w.onmessage = worker_procmsg;
             w.onerror   = function(err) {
@@ -6334,7 +6346,10 @@ function initworkerpool() {
         }
         catch (ex) {
             console.error(ex);
-            workers = null;
+            if (!workers.length) {
+                workers = null;
+            }
+            break;
         }
     }
 }
@@ -6342,13 +6357,13 @@ function initworkerpool() {
 // initiate fetch of node tree
 // FIXME: what happens when the user pastes a folder link over his loaded/loading account?
 function treefetcher_fetch() {
-    var workerstate;
-
     if (n_h) this.getfolderlinkroot = true;
 
     // FIXME: not needed for folder links
-    for (i = workers.length; i--; ) {
-        workers[i].ctx = this;
+    if (workers) {
+        for (var i = workers.length; i--;) {
+            workers[i].ctx = this;
+        }
     }
 
     // we filter out the ownerkeys and pipe them to treefetcher_ok()
@@ -6393,7 +6408,17 @@ console.error("treefetcher_ok()");
     // bind outbound share root to specific worker, post ok element to that worker
     // FIXME: check if nested outbound shares are returned with all shareufskeys!
     // if that is not the case, we need to bind all ok handles to the same worker
-    workers[ctx.parentworker[ok.h] = ctx.getnextworker()].postMessage(ok);
+    if (workers) {
+        workers[ctx.parentworker[ok.h] = ctx.getnextworker()].postMessage(ok);
+    }
+    else if (crypto_handleauthcheck(ok.h, ok.ha)) {
+        if (d) console.log("successfully decrypted sharekeys for " + ok.h);
+        var key = decrypt_key(u_k_aes, base64_to_a32(ok.k));
+        u_sharekeys[ok.h] = [key, new sjcl.cipher.aes(key)];
+    }
+    else {
+        console.log("handleauthcheck failed for " + ok.h);
+    }
 }
 
 // returns true if no further processing is needed
@@ -6433,6 +6458,10 @@ function treefetcher_node(node, ctx) {
         if (workers) {
             for (var i = workers.length; i--;) workers[i].postMessage(workerstate);
         }
+        else {
+            var key = base64_to_a32(pfkey);
+            u_sharekeys[node.h] = [key, new sjcl.cipher.aes(key)];
+        }
 
         M.RootID = node.h;
     }
@@ -6459,7 +6488,10 @@ function treefetcher_node(node, ctx) {
 
 // this receives the remainder of the JSON after the filter was applied
 function treefetcher_residue(fm, ctx) {
-    // send state dump request to all workers
+    // store the residual f response for perusal once all state dumps have been received
+    ctx.residualfm = fm[0];
+
+    // and send state dump request to all workers
     if (workers) {
         var i = workers.length;
         ctx.dumpsremaining = i;
@@ -6470,10 +6502,8 @@ function treefetcher_residue(fm, ctx) {
     }
     else {
         ctx.dumpsremaining = 1;
+        worker_procmsg.call({ctx: ctx}, {data: {sharekeys: false}});
     }
-
-    // and store the residual f response for perusal once all state dumps have been received
-    ctx.residualfm = fm[0];
 }
 
 // process worker responses (decrypted nodes, processed actionpackets, state dumps...)
@@ -6569,7 +6599,7 @@ function treefetcher_getnextworker() {
 var fmdb;
 
 function loadfm(force) {
-    if (!workers) initworkerpool();
+    if (workers === undefined) initworkerpool();
 
     if (force) {
         localStorage.force = true;

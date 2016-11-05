@@ -231,6 +231,9 @@ function u_logout(logout) {
         localStorage.removeItem('agreedToCopyrightWarning');
 
         fminitialized = false;
+        if (typeof mDBcls === 'function') {
+            mDBcls(); // close fmdb
+        }
         if (logout !== -0xDEADF) {
             watchdog.notify('logout');
         }

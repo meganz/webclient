@@ -1181,7 +1181,7 @@ else if (!b_u)
         };
     })(console);
 
-    Object.defineProperty(window, "__cd_v", { value : 29, writable : false });
+    Object.defineProperty(window, "__cd_v", { value : 30, writable : false });
 
     // Do not report exceptions if this build is older than 10 days
     var exTimeLeft = ((buildVersion.timestamp + (10 * 86400)) * 1000) > Date.now();

@@ -130,7 +130,7 @@ FMDB.prototype.enqueue = function fmdb_enqueue(table, row, type) {
 };
 
 // FIXME: auto-retry smaller transactions? (need stats about transaction failures)
-FMDB.prototype.writepending = function fmdb_writepending(fmdb) {
+FMDB.prototype.writepending = function fmdb_writepending() {
     var fmdb = this;
     if (!fmdb.pending[fmdb.tail] || fmdb.crashed) return;
 
@@ -171,7 +171,7 @@ FMDB.prototype.writepending = function fmdb_writepending(fmdb) {
                                     console.error("Transaction failed, marking DB as crashed");
                                     console.log(e);
                                     fmdb.state = -1;
-                                    fmdb.crashed = true;                                    
+                                    fmdb.crashed = true;
                                 }
                             });
     }
@@ -390,7 +390,7 @@ FMDB.prototype.del = function fmdb_del(table, index) {
 // (must NOT be used for dirty reads - use getbykey() instead)
 FMDB.prototype.get = function fmdb_get(table, cb, key, prefix) {
     if (!this.up()) {
-        return procresult([]);
+        return cb([]);
     }
 
     var promise;
@@ -412,34 +412,35 @@ FMDB.prototype.normaliseresult = function fmdb_normaliseresult(table, r) {
 
     for (var i = r.length; i--; ) {
         try {
-            t = r[i].d ? JSON.parse(fmdb.strdecrypt(r[i].d)) : {};
+            t = r[i].d ? JSON.parse(this.strdecrypt(r[i].d)) : {};
 
-            if (fmdb.restorenode[table]) {
+            if (this.restorenode[table]) {
                 // restore attributes based on the table's indexes
                 for (var p in r[i]) {
                     if (p != 'd') {
-                        r[i][p] = fmdb.strdecrypt(base64_to_ab(r[i][p]));
+                        r[i][p] = this.strdecrypt(base64_to_ab(r[i][p]));
                     }
                 }
-                fmdb.restorenode[table](t, r[i]);
+                this.restorenode[table](t, r[i]);
             }
 
             r[i] = t;
         }
         catch (e) {
             console.log(e);
-            console.error("IndexedDB corruption: " + fmdb.strdecrypt(r[i].d));
+            console.error("IndexedDB corruption: " + this.strdecrypt(r[i].d));
             r.splice(i, 1);
         }
     }
-}
+};
+
 // non-transactional read with subsequent deobfuscation, with optional key filter
 // FIXME: replace procresult with Promises without incurring a massive readability/mem/CPU penalty!
 // (dirty reads are supported by scanning the pending writes after the IndexedDB read completes)
 // FIXME: do we have a race condition between a write immediately completing after the read?
 FMDB.prototype.getbykey = function fmdb_getbykey(table, index, where, cb) {
     if (!this.up()) {
-        return procresult([]);
+        return cb([]);
     }
 
     var fmdb = this;
@@ -490,7 +491,7 @@ FMDB.prototype.getbykey = function fmdb_getbykey(table, index, where, cb) {
                             if (typeof matches[deletions[j]] == 'undefined') {
                                 // boolean false means "record deleted"
                                 matches[deletions[j]] = false;
-                            } 
+                            }
                         }
                     }
                     else {
@@ -512,7 +513,7 @@ FMDB.prototype.getbykey = function fmdb_getbykey(table, index, where, cb) {
                                     // mismatch detected - record it as a deletion
                                     if (k >= 0) {
                                         matches[update[index]] = false;
-                                        continue;   
+                                        continue;
                                     }
                                 }
 
@@ -535,14 +536,14 @@ FMDB.prototype.getbykey = function fmdb_getbykey(table, index, where, cb) {
                 else {
                     // a returned record was overwritten and still matches
                     // our where clause
-                    r[i] = fmdb_clone(matches[r[i][index]]);
+                    r[i] = fmdb.clone(matches[r[i][index]]);
                     delete matches[r[i][index]];
                 }
             }
 
             // now add newly written records
             for (t in matches) {
-                if (matches[t]) r[i].push(fmdb_clone(matches[t]));
+                if (matches[t]) r[i].push(fmdb.clone(matches[t]));
             }
         }
 
@@ -551,13 +552,14 @@ FMDB.prototype.getbykey = function fmdb_getbykey(table, index, where, cb) {
     });
 };
 
-function fmdb_clone(o) {
+// clone object -- this might be unsafer than clone(), but it's 10x times faster
+FMDB.prototype.clone = function fmdb_clone(o) {
     var r = {};
 
     for (var i in o) r[i] = o[i];
 
     return r;
-}
+};
 
 // checks if crashed or being used by another tab concurrently
 FMDB.prototype.up = function fmdb_up() {
@@ -587,7 +589,7 @@ FMDB.prototype.up = function fmdb_up() {
 // when a new tab is opened with the same session, request an update freeze from the master tab
 // once the loading is completed, relinquish update lock
 // (we could do this with transactions if Safari supported them properly...)
-FMDB.prototype.beacon = function fmdb_beacon(fmdb) {
+FMDB.prototype.beacon = function fmdb_beacon() {
     if (this.up()) {
         setTimeout(this.beacon.bind(this), 500);
     }

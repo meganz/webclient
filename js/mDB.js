@@ -57,7 +57,7 @@ function FMDB(plainname, schema, channelmap) {
     this.cantransact = -1;
 
     // initialise additional channels
-    for (var i in Object.values(this.channelmap)) {
+    for (var i in obj_values(this.channelmap)) {
         this.head[i] = 0;
         this.tail[i] = 0;
         this.pending[i] = {};
@@ -140,7 +140,7 @@ FMDB.prototype.enqueue = function fmdb_enqueue(table, row, type) {
         // unless it is currently in flight)
         // increment .h(head) if needed
         c = c[table];
-        if (c.h == c.t || (c.h ^ type) & 1) c.h++;
+        if ((c.h ^ type) & 1) c.h++;
     }
 
     if (!c[c.h]) c[c.h] = [row];

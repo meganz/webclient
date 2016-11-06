@@ -6324,7 +6324,7 @@ function initworkerpool() {
 
     for (var i = Math.min(mega.maxWorkers, 10); i--;) {
         try {
-            var w = new Worker("nodedec1.js");
+            var w = new Worker("nodedec.js");
 
             w.onmessage = worker_procmsg;
             w.onerror   = function(err) {

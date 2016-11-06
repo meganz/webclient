@@ -36,14 +36,16 @@ IndexedDBKVStorage.prototype.prefillMemCache = function(fmdb) {
 IndexedDBKVStorage.prototype.setItem = function __IDBKVSetItem(k, v) {
     var promise = new MegaPromise();
 
-    this._memCache[k] = v;
+    if (this._memCache[k] !== v) {
+        this._memCache[k] = v;
 
-    if (this.fmdb) {
-        this.fmdb.add(this.name, { k : k, d : { v : v }});
+        if (this.fmdb) {
+            this.fmdb.add(this.name, { k : k, d : { v : v }});
+        }
     }
 
     promise.resolve([k, v]);
-   
+           
     return promise;
 };
 

@@ -10,22 +10,61 @@
 // - large updates are written on the fly, but with the _sn cleared, which
 //   ensures integrity, but invalidates the DB if the update can't complete
 
-function FMDB(plainname, schema) {
+// plainname: the base name that will be obfuscated using u_k
+// schema: the Dexie database schema
+// channelmap: { tablename : channel } - tables that do not map to channel 0
+// (only channel 0 operates under an _sn-triggered transaction regime)
+function FMDB(plainname, schema, channelmap) {
     if (!(this instanceof FMDB)) {
-        return new FMDB(plainname, schema);
+        return new FMDB(plainname, schema, channelmap);
     }
 
-    this.name      = false;  // DB name suffix, derived from u_handle and u_k
-    this.plainname = plainname; 
-    this.schema    = schema; // DB schema
-    this.pending   = {};     // pending obfuscated writes [tid][tablename][op_autoincrement] = [payloads]
-    this.head      = 0;      // current tid being received from the application code
-    this.tail      = 0;      // current tid being sent to IndexedDB
-    this.state     = -1;     // -1: idle, 0: deleted sn and writing, 1: transaction open and writing
-    this.inflight  = 0;      // number of currently executing DB updates (MSIE restricts this to a paltry 1)
-    this.commit    = false;  // if set, the sn has been updated, completing the transaction
-    this.crashed   = false;  // a DB error sets this and prevents further DB access
-    this.cantransact = -1;  // whether multi-table transactions work (1) or not (0) (Apple, looking at you!)
+    // DB name suffix, derived from u_handle and u_k
+    this.name = false;
+
+    // DB schema - https://github.com/dfahlander/Dexie.js/wiki/TableSchema
+    this.schema = schema;
+
+    // the table names contained in the schema
+    this.tables = Object.keys(schema);
+
+    // if we have non-transactional (write-through) tables, they are mapped
+    // to channel numbers > 0 here
+    this.channelmap = channelmap || {};
+
+    // pending obfuscated writes [channel][tid][tablename][action_autoincrement] = [payloads]
+    this.pending = [{}];
+    
+    // current channel tid being written to (via .add()/.del()) by the application code
+    this.head = [0];
+
+    // current channel tid being sent to IndexedDB
+    this.tail = [0];
+
+    // -1: idle, 0: deleted sn and writing (or write-through), 1: transaction open and writing
+    this.state = -1;
+
+    // [tid, tablename, action] of .pending[] hash item currently being written
+    this.inflight = false;
+
+    // the write is complete and needs be be committed (either because of _sn or write-through)
+    this.commit = false;
+
+    // a DB error occurred, do not touch IndexedDB for the rest of the session
+    this.crashed = false;
+
+    // whether multi-table transactions work (1) or not (0) (Apple, looking at you!)
+    this.cantransact = -1;
+
+    // initialise additional channels
+    for (var i in Object.values(this.channelmap)) {
+        this.head[i] = 0;
+        this.tail[i] = 0;
+        this.pending[i] = {};
+    }
+
+    // protect user identity post-logout
+    this.name = ab_to_base64(this.strcrypt((plainname + plainname).substr(0, 16)));    
 }
 
 // initialise cross-tab access arbitration identity
@@ -37,11 +76,6 @@ FMDB.prototype.identity = Date.now() + Math.random().toString(26);
 FMDB.prototype.init = function fmdb_init(result, wipe) {
     var fmdb = this;
 
-    if (!fmdb.name) {
-        // protect user identity post-logout
-        fmdb.name = ab_to_base64(this.strcrypt((fmdb.plainname + fmdb.plainname).substr(0, 16)));
-    }
-
     if (!fmdb.up()) result(false);
     else {
         try {
@@ -49,15 +83,8 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
                 // start inter-tab heartbeat
                 fmdb.beacon();
                 fmdb.db = new Dexie('fm_' + fmdb.name);
-
-                // replicate any additions to fmdb_writepending()
                 fmdb.db.version(1).stores(fmdb.schema);
-
                 fmdb.db.open().then(function(){
-                    fmdb.tables = Object.keys(fmdb.schema);
-                    //[];
-                    //for (var table in fmdb.schema) fmdb.tables.push(fmdb.db[table]);
-
                     fmdb.get('_sn', function(r){
                         if (!wipe && r[0] && r[0].length == 11) {
                             console.log("DB sn: " + r[0]);
@@ -96,41 +123,51 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
 FMDB.prototype.enqueue = function fmdb_enqueue(table, row, type) {
     var fmdb = this;
     var c;
+    var ch = fmdb.channelmap[table] || 0;
 
     // if needed, create new transaction at index fmdb.head
-    if (!(c = fmdb.pending[fmdb.head])) c = fmdb.pending[fmdb.head] = {};
+    if (!(c = fmdb.pending[ch][fmdb.head[ch]])) c = fmdb.pending[ch][fmdb.head[ch]] = {};
 
     // if needed, create new hash of modifications for this table
-    if (!c[table]) c[table] = {};
-    c = c[table];
-
-    // even indexes hold additions, odd indexes hold deletions
-    // we continue to use the highest index if it is of the requested type
-    var i = Object.keys(c).pop();
-    if (i >= 0) {
-        // if previous action index was of a different type, increment
-        if ((i ^ type) & 1) i++;
+    // .h = head, .t = tail (last written to the DB)
+    if (!c[table]) {
+        // even indexes hold additions, odd indexes hold deletions
+        c[table] = { t : -1, h : type };  
+        c = c[table];
     }
-    else i = type;
+    else {    
+        // (we continue to use the highest index if it is of the requested type
+        // unless it is currently in flight)
+        // increment .h(head) if needed
+        c = c[table];
+        if (c.h == c.t || (c.h ^ type) & 1) c.h++;
+    }
 
-    if (!c[i]) c[i] = [];
-    c[i].push(row);
+    if (!c[c.h]) c[c.h] = [row];
+    else c[c.h].push(row);    // add row to the highest index (we want big IndexedDB bulkPut()s)
 
     // force a flush when a lot of data is pending or the _sn was updated
-    if (c[i].length > 1000 || table[0] == '_') {
+    // also, force a flush for non-transactional channels (> 0)
+    if (ch || table[0] == '_' || c[c.h].length > 1000) {
         // if we have the _sn, the next write goes to a fresh transaction
-        if (table[0] == '_') fmdb.head++;
-        fmdb.writepending();
+        if (!ch && table[0] == '_') fmdb.head[ch]++;
+        fmdb.writepending(fmdb.head.length-1);
     }
 };
 
 // FIXME: auto-retry smaller transactions? (need stats about transaction failures)
-FMDB.prototype.writepending = function fmdb_writepending() {
-    var fmdb = this;
-    if (!fmdb.pending[fmdb.tail] || fmdb.crashed) return;
+// ch - channel to operate on
+FMDB.prototype.writepending = function fmdb_writepending(ch) {
+    // exit loop if we ran out of pending writes or have crashed
+    if (this.inflight || ch < 0 || this.crashed) return;
 
-    if (fmdb.state < 0 && fmdb.pending[fmdb.tail]._sn && fmdb.cantransact) {
-        // if the write job is already complete (has _sn set),
+    // iterate all channels to find pending writes
+    if (!this.pending[ch][this.tail[ch]]) return this.writepending(ch-1);
+
+    var fmdb = this;
+
+    if (!ch && fmdb.state < 0 && fmdb.pending[0][fmdb.tail[0]]._sn && fmdb.cantransact) {
+        // if the write job is on channel 0 and already complete (has _sn set),
         // we execute it in a single transaction without first clearing sn
         fmdb.state = 1;
         fmdb.db.transaction('rw',
@@ -142,39 +179,54 @@ FMDB.prototype.writepending = function fmdb_writepending() {
                 dispatchputs();
             }).then(function(){
                 // transaction completed: delete written data
-                delete fmdb.pending[fmdb.tail++];
+                delete fmdb.pending[0][fmdb.tail[0]++];
                 fmdb.state = -1;
                 if (d) console.log("Transaction committed");
-                fmdb.writepending();
+                fmdb.writepending(ch);
             }).catch(function(e){
                 if (fmdb.cantransact < 0) {
                     console.error("Your browser's IndexedDB implementation is bogus, disabling transactions.");
                     fmdb.cantransact = 0;
-                    fmdb_writepending(fmdb);
+                    fmdb.writepending(ch);
                 }
                 else {
                     // FIXME: retry instead? need statistics.
                     console.error("Transaction failed, marking DB as crashed");
                     console.log(e);
                     fmdb.state = -1;
-                    fmdb.crashed = true;                                    
+                    fmdb.crashed = true;                      
                 }
             });
     }
     else {
-        // the job is incomplete - we clear the sn and execute it without transaction protection
-        // unfortunately, the DB will have to be wiped in case anything goes wrong
-        fmdb.state = 0;
-
-        fmdb.db._sn.clear().then(function(){
-            fmdb.commit = false;
+        // we do not inject write-through operations into a live transaction
+        if (fmdb.state > 0) {
             dispatchputs();
-        }).catch(function(e){
-            console.error("SN clearing failed, marking DB as crashed");
-            console.log(e);
-            fmdb.state = -1;
-            fmdb.crashed = true;
-        });
+        }
+        else {
+            // the job is incomplete or non-transactional - set state to "executing
+            // write without transaction"
+            fmdb.state = 0;
+
+            if (ch) {
+                // non-transactional channel: go ahead and write
+                dispatchputs();
+            }
+            else {
+                // we clear the sn (the new sn will be written as the last action in this write job)
+                // unfortunately, the DB will have to be wiped in case anything goes wrong
+                fmdb.db._sn.clear().then(function(){
+                    fmdb.commit = false;
+                    dispatchputs();
+                }).catch(function(e){
+                    console.error("SN clearing failed, marking DB as crashed");
+                    console.log(e);
+                    fmdb.state = -1;
+                    fmdb.crashed = true;
+                });
+
+            }            
+        }
     }
 
     // start writing all pending data in this transaction to the DB
@@ -182,17 +234,18 @@ FMDB.prototype.writepending = function fmdb_writepending() {
     // FIXME: check if having multiple IndexedDB writes in flight improves performance
     // on Chrome/Firefox/Safari - it kills MSIE
     function dispatchputs() {
-        if (fmdb.inflight) return;    // don't overwhelm MSIE's IndexedDB implementation
+        if (fmdb.inflight) return;
 
         if (fmdb.commit) {
             // the transaction is complete: delete from pending
             if (!fmdb.state) {
                 // we had been executing without transaction protection, delete the current
                 // transaction and try to dispatch the next one immediately
-                delete fmdb.pending[fmdb.tail++];
+                if (!ch) delete fmdb.pending[0][fmdb.tail[0]++];
 
+                fmdb.commit = false;
                 fmdb.state = -1;
-                fmdb.writepending();
+                fmdb.writepending(ch);
             }
 
             // if we had a real IndexedDB transaction open, it will commit
@@ -200,44 +253,67 @@ FMDB.prototype.writepending = function fmdb_writepending() {
             return;
         }
 
+        var tablesremaining = false;
+
         // this entirely relies on non-numeric hash keys being iterated
         // in the order they were added. FIXME: check if always true
-        for (var table in fmdb.pending[fmdb.tail]) { // iterate through pending tables, _sn last
-            action = false;
+        for (var table in fmdb.pending[ch][fmdb.tail[ch]]) { // iterate through pending tables, _sn last
+            var t = fmdb.pending[ch][fmdb.tail[ch]][table];
 
-            for (var action in fmdb.pending[fmdb.tail][table]) { // even: add, odd: delete
-                if (fmdb.commit) return dispatchputs(); // let transaction commit before writing further
+            // do we have at least one update pending? (could be multiple)
+            if (t[t.h]) {
+                tablesremaining = true;
 
-                if (d) console.log("DB write with " + fmdb.pending[fmdb.tail][table][action].length
-                                   + " element(s) on table " + table);
+                // locate next pending table update (even/odd: put/del)
+                while (t.t <= t.h && !t[t.t]) t.t++;
+
+                // advance head
+                t.h++;
+
+                if (d) console.log("DB " + ((t.t & 1) ? 'del' : 'put') + " with " + t[t.t].length
+                                   + " element(s) on table " + table + ", channel " + ch);
+
+                // if we are on a non-transactional channel or the _sn is being updated,
+                // request a commit after the operation completes.
+                if (ch || table[0] == '_') {
+                    fmdb.commit = true;
+                }
 
                 // record what we are sending...
-                fmdb.inflight = [fmdb.tail, table, action];
+                fmdb.inflight = t;
 
                 // ...and send update off to IndexedDB for writing
-                fmdb.db[table][action & 1 ? 'bulkDelete' : 'bulkPut'](fmdb.pending[fmdb.tail][table][action]).then(function(){
-                    // if the primary key is being updated, request a commit
-                    if (fmdb.inflight[1][0] == '_') {
-                        fmdb.commit = true;
+                fmdb.db[table][t.t & 1 ? 'bulkDelete' : 'bulkPut'](t[t.t]).then(function(){
+                    if (d) console.log('DB write successful' + (fmdb.commit ? ' - transaction complete' : ''));
+
+                    // if we are non-transactional, remove the written data from pending
+                    // (we have to keep it for the transactional case because it needs to
+                    // be visible to the pending updates search that getbykey() performs)
+                    if (!fmdb.state) {
+                        delete fmdb.inflight[fmdb.inflight.t++];
                     }
-
-                    if (d) console.log('Wrote ' + fmdb.inflight.join(' / ') + (fmdb.commit ? ' - transaction complete' : ''));
-
-                    // remove the written data from pending
-                    delete fmdb.pending[fmdb.inflight[0]][fmdb.inflight[1]][fmdb.inflight[2]];
 
                     // loop back to write more pending data (or to commit the transaction)
                     fmdb.inflight = false;
                     dispatchputs();
                 });
 
-                break;
+                // we don't send more than one transaction (looking at you, Microsoft!)
+                return;
             }
+            else {
+                // if we are non-transactional and all data has been written for this
+                // table, we can safely delete its record
+                if (!fmdb.state && t.t == t.h) {
+                    delete fmdb.pending[ch][fmdb.tail[ch]][table];
+                }
+            }
+        }
 
-            if (action !== false) break;
-
-            // no action left for this table - delete empty table hash
-            delete fmdb.pending[fmdb.tail][table];
+        // if we are non-transactional, this deletes the "transaction" when done
+        // (as commit will never be set)
+        if (!fmdb.state && !tablesremaining) {
+            delete fmdb.pending[ch][fmdb.tail[ch]];
         }
     }
 };
@@ -446,6 +522,7 @@ FMDB.prototype.getbykey = function fmdb_getbykey(table, index, where, cb) {
     }
 
     var fmdb = this;
+    var ch = fmdb.channelmap[table] || 0;
 
     if (d) console.log("Fetching table " + table + (where ? (" by keys " + JSON.stringify(where)) : '') + "...");
 
@@ -474,52 +551,56 @@ FMDB.prototype.getbykey = function fmdb_getbykey(table, index, where, cb) {
         // determine if we can reduce overall CPU load by replacing the
         // occasional scan with a constantly maintained hash for direct lookups?
         var matches = {};
-        var tids = Object.keys(fmdb.pending);
+        var pendingch = fmdb.pending[ch];
+        var tids = Object.keys(pendingch);
 
         // iterate transactions in reverse chronological order
-        for (t = tids.length; t--; ) {
-            var tid = tids[t];
+        for (var ti = tids.length; ti--; ) {
+            var tid = tids[ti];
+            var t = pendingch[tid][table];
 
-            if (fmdb.pending[tid][table]) {
-                var actions = Object.keys(fmdb.pending[tid][table]);
+            // any updates pending for this table?
+            if (t && t[t.h] && t[t.h].length) {
+                // examine update actions in reverse chronological order
+                // FIXME: can stop the loop at t.t for non-transactional writes
+                for (var a = t.h; a >= 0; a--) {
+                    if (t[a]) {
+                        if (a & 1) {
+                            // deletion - always by bare index
+                            var deletions = t[a];
 
-                // iterate actions in reverse chronological order
-                for (var a = actions.length; a--; ) {
-                    if (a & 1) {
-                        // deletion - always by bare index
-                        var deletions = fmdb.pending[tid][table][a];
-
-                        for (var j = deletions.length; j--; ) {
-                            if (typeof matches[deletions[j]] == 'undefined') {
-                                // boolean false means "record deleted"
-                                matches[deletions[j]] = false;
+                            for (var j = deletions.length; j--; ) {
+                                if (typeof matches[deletions[j]] == 'undefined') {
+                                    // boolean false means "record deleted"
+                                    matches[deletions[j]] = false;
+                                }
                             }
                         }
-                    }
-                    else {
-                        // addition or update - index field is attribute
-                        var updates = fmdb.pending[tid][table][a];
+                        else {
+                            // addition or update - index field is attribute
+                            var updates = t[a];
 
-                        // iterate updates in reverse chronological order
-                        // (updates are not commutative)
-                        for (var j = updates.length; j--; ) {
-                            var update = updates[j];
+                            // iterate updates in reverse chronological order
+                            // (updates are not commutative)
+                            for (var j = updates.length; j--; ) {
+                                var update = updates[j];
 
-                            if (typeof matches[update[index]] == 'undefined') {
-                                // check if this update matches our criteria, if any
-                                if (where) {
-                                    for (var k = where.length; k--; ) {
-                                        if (update[where[k][0]] !== where[k][1]) break;
+                                if (typeof matches[update[index]] == 'undefined') {
+                                    // check if this update matches our criteria, if any
+                                    if (where) {
+                                        for (var k = where.length; k--; ) {
+                                            if (update[where[k][0]] !== where[k][1]) break;
+                                        }
+
+                                        // mismatch detected - record it as a deletion
+                                        if (k >= 0) {
+                                            matches[update[index]] = false;
+                                            continue;
+                                        }
                                     }
 
-                                    // mismatch detected - record it as a deletion
-                                    if (k >= 0) {
-                                        matches[update[index]] = false;
-                                        continue;
-                                    }
+                                    matches[update[index]] = update;
                                 }
-
-                                matches[update[index]] = update;
                             }
                         }
                     }
@@ -554,7 +635,7 @@ FMDB.prototype.getbykey = function fmdb_getbykey(table, index, where, cb) {
     });
 };
 
-// clone object -- this might be unsafer than clone(), but it's 10x times faster
+// simple/fast/non-recursive object cloning
 FMDB.prototype.clone = function fmdb_clone(o) {
     var r = {};
 

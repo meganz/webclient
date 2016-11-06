@@ -32,7 +32,7 @@ IndexedDBKVStorage.prototype.prefillMemCache = function(fmdb) {
     return promise;
 };
 
-// set item
+// set item (synchronously, can do without promise)
 IndexedDBKVStorage.prototype.setItem = function __IDBKVSetItem(k, v) {
     var promise = new MegaPromise();
 
@@ -40,9 +40,6 @@ IndexedDBKVStorage.prototype.setItem = function __IDBKVSetItem(k, v) {
 
     if (this.fmdb) {
         this.fmdb.add(this.name, { k : k, d : { v : v }});
-   
-        // FIXME: implement sn-preserving write flush to IndexedDB and remove this hack
-        if (currsn) setsn(currsn);
     }
 
     promise.resolve([k, v]);

@@ -6402,7 +6402,6 @@ function treefetcher_fetch() {
 // this receives the ok elements one by one as per the filter rule
 // to facilitate the decryption of outbound shares, the API now sends ok before f
 function treefetcher_ok(ok, ctx) {
-console.error("treefetcher_ok()");
     if (fmdb) fmdb.add('ok', { h : ok.h, d : ok });
 
     // bind outbound share root to specific worker, post ok element to that worker
@@ -6417,7 +6416,7 @@ console.error("treefetcher_ok()");
         u_sharekeys[ok.h] = [key, new sjcl.cipher.aes(key)];
     }
     else {
-        console.log("handleauthcheck failed for " + ok.h);
+        console.error("handleauthcheck failed for " + ok.h);
     }
 }
 
@@ -6625,6 +6624,7 @@ function loadfm(force) {
             if (n_h) fetchfm(false);
             else {
                 fmdb = FMDB(u_handle, {
+                    // channel 0: transactional by _sn update
                     f   : '&h, p, s',   // nodes - handle, parent, size (negative size: type)
                     s   : '&o_t',       // shares - origin/target; both incoming & outgoing
                     ok  : '&h',         // ownerkeys for outgoing shares - handle
@@ -6634,10 +6634,11 @@ function loadfm(force) {
                     ipc : '&p',         // incoming pending contact - id
                     ps  : '&h_p',       // pending share - handle/id
                     mcf : '&id',        // chats - id
-                    chatqueuedmsgs : '&k',  // queued chat messages - k
+                    _sn  : '&i',        // sn - fixed index 1
+                    // channel 1: non-transactional, used by IndexedDBKVStorage
                     attrib : '&k',      // user attribute cache - k
-                    _sn  : '&i'         // sn - fixed index 1
-                });
+                    chatqueuedmsgs : '&k' // queued chat messages - k
+                }, { attrib : 1, chatqueuedmsgs : 1 });
 
                 fmdb.init(fetchfm, localStorage.force);
             }

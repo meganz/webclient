@@ -1234,7 +1234,10 @@ function topmenuUI() {
 
         $('.top-menu-item.logout,.context-menu-divider.logout').show();
         $('.top-menu-item.clouddrive,.top-menu-item.account').show();
+
         $('.fm-avatar').show();
+// **** FIXME: replace with real fix ****
+$('.fm-avatar img').attr('src', useravatar.imgUrl(u_handle));
         $('.top-login-button').hide();
         $('.membership-status').show();
         $('.top-change-language').hide();

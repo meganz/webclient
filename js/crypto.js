@@ -1597,7 +1597,7 @@ function api_proc(q) {
 
                 var ctxs = this.q.ctxs[this.q.i];
                 for (var i = ctxs.length; i--; ) {
-                    var ctx = ctxs[i];                    
+                    var ctx = ctxs[i];
                     if (typeof ctx.progress == 'function') {
                         if (typeof ctx.buffer != 'undefined') {
                             ctx.progress(progressPercent, this.responseText, ctx);
@@ -1918,7 +1918,7 @@ function getsc(mDBload) {
     api_req('sn=' + currsn + '&ssl=1&e=' + cmsNotifHandler, {
         mDBload   : mDBload,
         buffer    : true,
-        sc_filter : json_splitter({ '{[a{' : sc_packet,
+        sc_filter : JSON.splitter({ '{[a{' : sc_packet,
                                '{[a{{t[f{' : sc_node,
                                        '{' : sc_residue }),
 
@@ -3813,7 +3813,9 @@ function crypto_keyfixed(h) {
     delete missingkeys[h];
 
     // persist change
-    if (fmdb) fmdb.del('mk', h);    
+    if (fmdb) {
+        fmdb.del('mk', h);
+    }
 }
 
 // upon receipt of a new u_sharekey, call this with sharemissing[sharehandle].
@@ -3833,7 +3835,7 @@ function crypto_fixmissingkeys(hs) {
             }
 
             crypto_keyfixed(h);
-        }        
+        }
     }
 }
 
@@ -4212,179 +4214,204 @@ function api_strerror(errno) {
 })();
 
 // JSON parser/splitter
-// FIXME: convert to proper JS (I forgot how to do that)
 // (this is tailored to processing what the API actually generates
 // i.e.: NO whitespace, NO non-numeric/string constants ("null"), etc...)
+(function() {
 
-// returns the position after the end of the JSON string at o or -1 if none found
-// must be called with s[o] == '"', or will never terminate
-var stringre = /^"(((?=\\)\\(["\\\/bfnrt]|u[0-9a-fA-F]{4}))|[^"\\\0-\x1F\x7F]+)*$/;
-
-function strend(s, o) {
-    var oo = o;
-
-    // (we do not set lastIndex and use RegExp.exec() with /g due to the potentially enormous length of s)
-    while ((oo = s.indexOf('"', oo+1)) >= 0) {
-        if (stringre.test(s.substr(o, oo-o))) return oo+1;        
-    }
-
-    return -1;
-}
-
-// returns the position after the end of the JSON number at o or -1 if none found
-var numberre = /^-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?/;
-
-function numend(s, o) {
-    var oo = o;
-
-    // (we do not set lastIndex due to the potentially enormous length of s)
-    while ('0123456789-+eE.'.indexOf(s[oo]) >= 0) oo++;
-
-    if (oo > o) {
-        var r = numberre.exec(s.substr(o, oo-o));
-
-        if (r) return o+r[0].length;
-    }
-
-    return -1;
-}
-
-function json_splitter(filters) {
-    return {
-        proc : json_proc,
+    var JSONSplitter = function json_splitter(filters) {
+        if (!(this instanceof json_splitter)) {
+            return new json_splitter(filters);
+        }
 
         // position in source string (FIXME: allow chunked feeding)
-        p : 0,
+        this.p = 0;
 
         // enclosing object stack at current position (type + name)
-        stack : [],
+        this.stack = [];
 
-        // 0: no value expected, 1: optional value expected, -1: compulsory value expected 
-        expectvalue : -1,
+        // 0: no value expected, 1: optional value expected, -1: compulsory value expected
+        this.expectvalue = -1;
 
         // last hash name seen
-        lastname : '',
+        this.lastname = '';
 
         // hash of exfiltration vector callbacks
-        filters : filters,
+        this.filters = filters;
 
         // bucket stack
-        buckets : [],
-        lastpos : 0,
+        this.buckets = [];
+        this.lastpos = 0;
+
+        // console logging
+        this.logger = MegaLogger.getLogger('JSONSplitter');
     };
-}
 
-// returns -1 if it wants more data, 0 in case of a fatal error, 1 when done
-// FIXME: replace console.log with proper logging
-function json_proc(json, ctx) {
-    while (this.p < json.length) {
-        var c = json[this.p];
+    // Inherit from JSON, which we'll extend later
+    JSONSplitter.prototype = Object.create(JSON);
 
-        if (c == '[' || c == '{') {
-            if (!this.expectvalue) {
-                console.error("Malformed JSON - unexpected object or array");
-                return 0;
+    // returns the position after the end of the JSON string at o or -1 if none found
+    // must be called with s[o] == '"', or will never terminate
+    JSONSplitter.prototype.stringre = /^"(((?=\\)\\(["\\\/bfnrt]|u[0-9a-fA-F]{4}))|[^"\\\0-\x1F\x7F]+)*$/;
+
+    JSONSplitter.prototype.strend = function strend(s, o) {
+        var oo = o;
+
+        // (we do not set lastIndex and use RegExp.exec() with /g due to the potentially enormous length of s)
+        while ((oo = s.indexOf('"', oo + 1)) >= 0) {
+            if (this.stringre.test(s.substr(o, oo - o))) {
+                return oo + 1;
             }
-
-            this.stack.push(json[this.p] + this.lastname);
-
-            if (this.filters[this.stack.join('')]) {
-                // a filter is configured for this path - recurse
-                this.buckets[0] += json.substr(this.lastpos, this.p-this.lastpos);
-                this.lastpos = this.p;
-                this.buckets.unshift('');
-            }
-
-            this.p++;
-            this.lastname = '';
-            this.expectvalue = c == '[';
         }
-        else if (c == ']' || c == '}') {
-            if (this.expectvalue < 0) {
-                console.error("Malformed JSON - premature array closure");
-                return 0;
+
+        return -1;
+    };
+
+    // returns the position after the end of the JSON number at o or -1 if none found
+    JSONSplitter.prototype.numberre = /^-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?/;
+
+    JSONSplitter.prototype.numend = function numend(s, o) {
+        var oo = o;
+
+        // (we do not set lastIndex due to the potentially enormous length of s)
+        while ('0123456789-+eE.'.indexOf(s[oo]) >= 0) oo++;
+
+        if (oo > o) {
+            var r = this.numberre.exec(s.substr(o, oo - o));
+
+            if (r) {
+                return o + r[0].length;
             }
-
-            if (!this.stack.length || "]}".indexOf(c) != "[{".indexOf(this.stack[this.stack.length-1][0])) {
-                console.error("Malformed JSON - mismatched close");
-                return 0;
-            }
-
-            this.lastname = '';
-
-            // check if this concludes an exfiltrated object and return it if so
-            var callback = this.filters[this.stack.join('')];
-            this.p++;
-
-            if (callback) {
-                // we have a filter configured for this object
-                //try {
-                    // pass filtrate to application and empty bucket
-                    callback(JSON.parse(this.buckets[0] + json.substr(this.lastpos, this.p-this.lastpos)), ctx);
-                //} catch (e) {
-                //    console.log(json.substr(this.lastpos, this.p-this.lastpos));
-                //    console.log("Malformed JSON - parse error in filter element " + this.filter);
-                //    return 0;
-                //}
-
-                this.buckets.shift();
-                this.lastpos = this.p;
-            }
-
-            this.stack.pop();
-            this.expectvalue = 0;
         }
-        else if (c == ',') {
-            if (this.expectvalue) {
-                console.error("Malformed JSON - stray comma " + json.substr(this.p-5, 100));
-                return 0;
-            }
-            if (this.lastpos == this.p) this.lastpos++;
-            this.p++;
-            this.expectvalue = this.stack[this.stack.length-1][0] == '[';
-        }
-        else if (c == '"') {
-            var t = strend(json, this.p);
-            if (t < 0) break;
 
-            if (this.expectvalue) {
-                this.p = t;
-                this.expectvalue = false;
-            }
-            else {
-                // (need at least one char after end of property string)
-                if (t == json.length) break;
+        return -1;
+    };
 
-                if (json[t] != ':') {
-                    console.error("Malformed JSON - no : found after property name");
+    // returns -1 if it wants more data, 0 in case of a fatal error, 1 when done
+    JSONSplitter.prototype.proc = function json_proc(json, ctx) {
+        while (this.p < json.length) {
+            var c = json[this.p];
+
+            if (c == '[' || c == '{') {
+                if (!this.expectvalue) {
+                    this.logger.error("Malformed JSON - unexpected object or array");
                     return 0;
                 }
 
-                this.lastname = json.substr(this.p+1, t-this.p-2);
-                this.expectvalue = -1;
-                this.p = t+1;
+                this.stack.push(json[this.p] + this.lastname);
+
+                if (this.filters[this.stack.join('')]) {
+                    // a filter is configured for this path - recurse
+                    this.buckets[0] += json.substr(this.lastpos, this.p - this.lastpos);
+                    this.lastpos = this.p;
+                    this.buckets.unshift('');
+                }
+
+                this.p++;
+                this.lastname    = '';
+                this.expectvalue = c == '[';
             }
-        }
-        else if (c >= '0' && c <= '9' || c == '.' || c == '-')
-        {
-            if (!this.expectvalue) {
-                console.error("Malformed JSON - unexpected number");
+            else if (c == ']' || c == '}') {
+                if (this.expectvalue < 0) {
+                    this.logger.error("Malformed JSON - premature array closure");
+                    return 0;
+                }
+
+                if (!this.stack.length || "]}".indexOf(c) != "[{".indexOf(this.stack[this.stack.length - 1][0])) {
+                    this.logger.error("Malformed JSON - mismatched close");
+                    return 0;
+                }
+
+                this.lastname = '';
+
+                // check if this concludes an exfiltrated object and return it if so
+                var callback = this.filters[this.stack.join('')];
+                this.p++;
+
+                if (callback) {
+                    // we have a filter configured for this object
+                    //try {
+                    // pass filtrate to application and empty bucket
+                    callback(this.parse(this.buckets[0] + json.substr(this.lastpos, this.p - this.lastpos)), ctx);
+                    //} catch (e) {
+                    //    this.logger.log(json.substr(this.lastpos, this.p-this.lastpos));
+                    //    this.logger.log("Malformed JSON - parse error in filter element " + this.filter);
+                    //    return 0;
+                    //}
+
+                    this.buckets.shift();
+                    this.lastpos = this.p;
+                }
+
+                this.stack.pop();
+                this.expectvalue = 0;
+            }
+            else if (c == ',') {
+                if (this.expectvalue) {
+                    this.logger.error("Malformed JSON - stray comma " + json.substr(this.p - 5, 100));
+                    return 0;
+                }
+                if (this.lastpos == this.p) {
+                    this.lastpos++;
+                }
+                this.p++;
+                this.expectvalue = this.stack[this.stack.length - 1][0] == '[';
+            }
+            else if (c == '"') {
+                var t = this.strend(json, this.p);
+                if (t < 0) {
+                    break;
+                }
+
+                if (this.expectvalue) {
+                    this.p           = t;
+                    this.expectvalue = false;
+                }
+                else {
+                    // (need at least one char after end of property string)
+                    if (t == json.length) {
+                        break;
+                    }
+
+                    if (json[t] != ':') {
+                        this.logger.error("Malformed JSON - no : found after property name");
+                        return 0;
+                    }
+
+                    this.lastname    = json.substr(this.p + 1, t - this.p - 2);
+                    this.expectvalue = -1;
+                    this.p           = t + 1;
+                }
+            }
+            else if (c >= '0' && c <= '9' || c == '.' || c == '-') {
+                if (!this.expectvalue) {
+                    this.logger.error("Malformed JSON - unexpected number");
+                    return 0;
+                }
+
+                // FIXME: add "input is complete" flag to detect incomplete
+                // multi-digit stand-alone numbers (once needed)
+                var t = this.numend(json, this.p);
+                if (t < 0 || t == json.length) {
+                    break;
+                }
+
+                this.p           = t;
+                this.expectvalue = false;
+            }
+            else {
+                this.logger.error("Malformed JSON - bogus char at position " + this.p);
                 return 0;
             }
-
-            // FIXME: add "input is complete" flag to detect incomplete
-            // multi-digit stand-alone numbers (once needed)
-            var t = numend(json, this.p);
-            if (t < 0 || t == json.length) break;
-
-            this.p = t;
-            this.expectvalue = false;
         }
-        else {
-            console.error("Malformed JSON - bogus char at position " + this.p);
-            return 0;
-        }
-    }
 
-    return (!this.expectvalue && !this.stack.length) ? 1 : -1;
-}
+        return (!this.expectvalue && !this.stack.length) ? 1 : -1;
+    };
+    Object.freeze(JSONSplitter.prototype);
+
+    JSON = Object.create(JSON, {
+        splitter: {
+            value: JSONSplitter
+        }
+    });
+    JSONSplitter = undefined;
+})();

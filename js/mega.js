@@ -6653,8 +6653,10 @@ function fetchfm(sn) {
         useravatar.loadAvatar(u_handle);
         mega.config.fetch();
 
-        // Load/initialise the authentication system.
-        authring.initAuthenticationSystem();
+        if (u_type == 3) {
+            // load/initialise the authentication system
+            authring.initAuthenticationSystem();            
+        }
 
         if (sn) {
             currsn = sn;

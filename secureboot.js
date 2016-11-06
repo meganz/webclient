@@ -2271,6 +2271,14 @@ else if (!b_u)
         }
         if (window.URL)
         {
+            if (!jj && !("ActiveXObject" in window) && Object.keys(nodedec).length === 3) {
+                var tmp = String(nodedec.nodedec_js).split(/importScripts\([^)]+\)/);
+
+                nodedec = [tmp.shift(), nodedec.sjcl_js, nodedec.asmcrypto_js, tmp.join(';')];
+                mega.nodedecBlobURI = mObjectURL(nodedec, 'text/javascript');
+                nodedec = tmp = undefined;
+            }
+
             cssar = cssar.length && mObjectURL(cssar, "text/css");
             if (cssar)
             {
@@ -2284,14 +2292,6 @@ else if (!b_u)
             if (jsar.length) evalscript_url(jsar);
             jsar=undefined;
             cssar=undefined;
-
-            if (!jj && Object.keys(nodedec).length === 3) {
-                var tmp = String(nodedec.nodedec_js).split(/importScripts\([^)]+\)/);
-
-                nodedec = [tmp.shift(), nodedec.sjcl_js, nodedec.asmcrypto_js, tmp.join(';')];
-                mega.nodedecBlobURI = mObjectURL(nodedec, 'text/javascript');
-                nodedec = tmp = undefined;
-            }
         }
         else
         {

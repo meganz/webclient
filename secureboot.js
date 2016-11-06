@@ -2212,6 +2212,7 @@ else if (!b_u)
     {
         var jsar = [];
         var cssar = [];
+        var nodedec = {};
         //for(var i in localStorage) if (i.substr(0,6) == 'cache!') delete localStorage[i];
         for (var i in jsl)
         {
@@ -2263,6 +2264,10 @@ else if (!b_u)
                 }
             }
             else if (jsl[i].j == 0) pages[jsl[i].n] = jsl[i].text;
+
+            if (jsl[i].n === 'sjcl_js' || jsl[i].n === 'nodedec_js' || jsl[i].n === 'asmcrypto_js') {
+                nodedec[jsl[i].n] = jsl[i].text;
+            }
         }
         if (window.URL)
         {
@@ -2279,6 +2284,14 @@ else if (!b_u)
             if (jsar.length) evalscript_url(jsar);
             jsar=undefined;
             cssar=undefined;
+
+            if (!jj && Object.keys(nodedec).length === 3) {
+                var tmp = String(nodedec.nodedec_js).split(/importScripts\([^)]+\)/);
+
+                nodedec = [tmp.shift(), nodedec.sjcl_js, nodedec.asmcrypto_js, tmp.join(';')];
+                mega.nodedecBlobURI = mObjectURL(nodedec, 'text/javascript');
+                nodedec = tmp = undefined;
+            }
         }
         else
         {

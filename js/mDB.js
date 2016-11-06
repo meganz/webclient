@@ -34,7 +34,7 @@ function FMDB(plainname, schema, channelmap) {
 
     // pending obfuscated writes [channel][tid][tablename][action_autoincrement] = [payloads]
     this.pending = [{}];
-    
+
     // current channel tid being written to (via .add()/.del()) by the application code
     this.head = [0];
 
@@ -64,7 +64,7 @@ function FMDB(plainname, schema, channelmap) {
     }
 
     // protect user identity post-logout
-    this.name = ab_to_base64(this.strcrypt((plainname + plainname).substr(0, 16)));    
+    this.name = ab_to_base64(this.strcrypt((plainname + plainname).substr(0, 16)));
 }
 
 // initialise cross-tab access arbitration identity
@@ -132,10 +132,10 @@ FMDB.prototype.enqueue = function fmdb_enqueue(table, row, type) {
     // .h = head, .t = tail (last written to the DB)
     if (!c[table]) {
         // even indexes hold additions, odd indexes hold deletions
-        c[table] = { t : -1, h : type };  
+        c[table] = { t : -1, h : type };
         c = c[table];
     }
-    else {    
+    else {
         // (we continue to use the highest index if it is of the requested type
         // unless it is currently in flight)
         // increment .h(head) if needed
@@ -194,7 +194,7 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                     console.error("Transaction failed, marking DB as crashed");
                     console.log(e);
                     fmdb.state = -1;
-                    fmdb.crashed = true;                      
+                    fmdb.crashed = true;
                 }
             });
     }
@@ -225,7 +225,7 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                     fmdb.crashed = true;
                 });
 
-            }            
+            }
         }
     }
 

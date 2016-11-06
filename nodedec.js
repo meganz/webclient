@@ -207,7 +207,7 @@ function crypto_decryptnode(n) {
     }
 
     if (!k) {
-        if (d) console.warn("Can't extract key for " + n.h);
+        if (d) console.log("Can't extract key for " + n.h);
         if (missingkeys) crypto_reportmissingkey(n);
     }
     else if (n.a) {
@@ -215,7 +215,7 @@ function crypto_decryptnode(n) {
     }
     else {
         if (d && n.t > 1) {
-            console.warn('Missing attribute for node ' + n.h);
+            console.log('Missing attribute for node ' + n.h);
         }
     }
 }

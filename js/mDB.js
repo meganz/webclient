@@ -267,8 +267,8 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                 // locate next pending table update (even/odd: put/del)
                 while (t.t <= t.h && !t[t.t]) t.t++;
 
-                // advance head
-                t.h++;
+                // all written: advance head
+                if (t.t == t.h) t.h++;
 
                 if (d) console.log("DB " + ((t.t & 1) ? 'del' : 'put') + " with " + t[t.t].length
                                    + " element(s) on table " + table + ", channel " + ch);
@@ -283,7 +283,7 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                 fmdb.inflight = t;
 
                 // ...and send update off to IndexedDB for writing
-                fmdb.db[table][t.t & 1 ? 'bulkDelete' : 'bulkPut'](t[t.t]).then(function(){
+                fmdb.db[table][t.t & 1 ? 'bulkDelete' : 'bulkPut'](t[t.t++]).then(function(){
                     if (d) console.log('DB write successful' + (fmdb.commit ? ' - transaction complete' : ''));
 
                     // if we are non-transactional, remove the written data from pending
@@ -627,7 +627,7 @@ FMDB.prototype.getbykey = function fmdb_getbykey(table, index, where, cb) {
 
         // now add newly written records
         for (t in matches) {
-            if (matches[t]) r[i].push(fmdb_clone(matches[t]));
+            if (matches[t]) r.push(fmdb.clone(matches[t]));
         }
 
         fmdb.normaliseresult(table, r);

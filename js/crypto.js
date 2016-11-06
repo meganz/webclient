@@ -2583,7 +2583,7 @@ function crypto_handleauth(h) {
 }
 
 function crypto_keyok(n) {
-    return n && typeof n.k == 'object' && n.k.length == (n.t ? 4 : 8);
+    return n && typeof n.k == 'object' && n.k.length >= (n.t ? 4 : 8);
 }
 
 function crypto_encodepubkey(pubkey) {
@@ -3638,7 +3638,7 @@ function crypto_procsr(sr) {
         sr: sr,
         i: 0
     };
-console.error("PROCSR " + JSON.stringify(sr));
+
     ctx.callback = function (res, ctx) {
         if (ctx.sr) {
             var pubkey;
@@ -3827,14 +3827,12 @@ function crypto_fixmissingkeys(hs) {
 
             if (n && !crypto_keyok(n)) {
                 crypto_decryptnode(n);
-
-                if (crypto_keyok(n)) {
-                    fm_updated(n);
-                }
-                else continue;
             }
 
-            crypto_keyfixed(h);
+            if (crypto_keyok(n)) {
+                fm_updated(n);
+                crypto_keyfixed(h);
+            }
         }
     }
 }
@@ -3908,7 +3906,7 @@ function crypto_procmcr(mcr) {
 function crypto_share_rsa2aes() {
     var rsr = [],
         h;
-console.error("RSA2AES " + JSON.stringify(rsasharekeys));
+
     for (h in rsasharekeys) {
         if (u_sharekeys[h]) {
             // pubkey found: encrypt share key to it

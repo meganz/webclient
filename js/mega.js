@@ -5798,6 +5798,7 @@ function execsc() {
 
             case '_fm':
                 // completed initial processing, enable UI
+                crypto_fixmissingkeys(missingkeys);
                 loadfm_done(true);
                 break;
 
@@ -6271,10 +6272,11 @@ function execsc() {
 function fm_updated(n) {
     M.nodeUpdated(n);
 
-    if (M.megaRender) {
+    if (fminitialized) {
         removeUInode(n.h);
         newnodes.push(n);
-        delete M.megaRender.nodeMap[n.h];
+        if (M.megaRender) delete M.megaRender.nodeMap[n.h];
+        renderNew();
     }
 }
 
@@ -6416,7 +6418,7 @@ function treefetcher_ok(ok, ctx) {
         u_sharekeys[ok.h] = [key, new sjcl.cipher.aes(key)];
     }
     else {
-        console.error("handleauthcheck failed for " + ok.h);
+        console.error("handleauthcheck() failed for " + ok.h);
     }
 }
 

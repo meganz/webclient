@@ -6309,8 +6309,15 @@ function execsc() {
         }
     }
 
-    setTimeout(execsc, 1);
+    if (Date.now() > execsc.tick) {
+        execsc.tick = Date.now() + 200;
+        setTimeout(execsc, 1);
+    }
+    else {
+        execsc();
+    }
 }
+execsc.tick = 0;
 
 // a node was updated significantly: write to DB and redraw
 function fm_updated(n) {
@@ -6443,6 +6450,15 @@ TreeFetcher.prototype.fetch = function treefetcher_fetch(force) {
         buffer : true,
         progress: function(perc, buffer, ctx, xhr) {
             loadingInitDialog.step2(parseInt(perc));    // FIXME: make generic
+
+            if (perc > 99) {
+                // Load performance report -- time to last byte
+                mega.loadReport.ttlb          = Date.now() - mega.loadReport.stepTimeStamp;
+                mega.loadReport.stepTimeStamp = Date.now();
+
+                mega.loadReport.ttlb += mega.loadReport.ttfb;
+                mega.loadReport.ttfm = mega.loadReport.stepTimeStamp;
+            }
 
             if (buffer && !gettree_filter.proc(buffer)) {
                 xhr.abort();
@@ -6644,6 +6660,10 @@ function worker_procmsg(ev) {
             }
 
             loadfm_callback(this.ctx.residualfm);
+
+            if (!d) {
+                delete this.ctx.residualfm;
+            }
         }
     }
     else if (ev.data[0] === 'console') {
@@ -8050,8 +8070,12 @@ function loadfm_done(mDBload) {
 
             mega.loadReport.renderfm      = Date.now() - mega.loadReport.stepTimeStamp;
             mega.loadReport.stepTimeStamp = Date.now();
+
+            // load report - time to fm after last byte received
+            mega.loadReport.ttfm = Date.now() - mega.loadReport.ttfm;
         }
         else {
+            mega.loadReport.ttfm = -1;
             mega.loadReport.renderfm = -1;
         }
 
@@ -8096,7 +8120,10 @@ function loadfm_done(mDBload) {
                     r.recvAPs, // time waiting to receive APs
                     r.EAGAINs, // -3/-4s while loading
                     r.e500s, // http err 500 while loading
-                    r.errs // any other errors while loading
+                    r.errs, // any other errors while loading
+                    workers && workers.length || -666,
+                    r.ttlb | 0, // time to last byte
+                    r.ttfm | 0, // time to fm since ttlb
                 ];
 
                 if (d) {

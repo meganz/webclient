@@ -2393,7 +2393,7 @@ function MegaData()
                 if (n.sk && !u_sharekeys[n.h]) {
                     // extract sharekey from node's sk property
                     var k = crypto_process_sharekey(n.h, n.sk);
-                    crypto_setsharekey(n.h, k);
+                    if (k !== false) crypto_setsharekey(n.h, k);
                 }
 
                 if (u_sharekeys[n.h]) {
@@ -5588,7 +5588,10 @@ function sc_packet(a) {
             return;
         }
 
-        a.k = crypto_process_sharekey(a.n, a.k);
+        var k = crypto_process_sharekey(a.n, a.k);
+
+        if (k !== false) a.k = k;
+        else console.log("Failed to decrypt RSA share key for " + a.n + ": " + a.k);
     }
 
     // other packet types do not warrant the worker detour

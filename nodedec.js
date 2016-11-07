@@ -23,10 +23,18 @@ if (typeof importScripts !== 'undefined') {
             // actionpacket - we do CPU-intensive stuff here, e.g. decrypting
             // sharekeys
             if (req.a == 's' || req.a == 's2' && req.n && req.k) {
-                req.k = crypto_process_sharekey(req.n, req.k);
-                if (rsasharekeys[req.n]) {
-                    req.rsa = 1;
-                    delete rsasharekeys[req.n];
+                var k = crypto_process_sharekey(req.n, req.k);
+
+                if (k === false) {
+                    console.log("Failed to decrypt RSA share key for " + req.n + ": " + req.k);
+                }
+                else {
+                    req.k = k;
+
+                    if (rsasharekeys[req.n]) {
+                        req.rsa = 1;
+                        delete rsasharekeys[req.n];
+                    }
                 }
             }
             self.postMessage(req);
@@ -99,9 +107,10 @@ var rsasharekeys = {};
 function crypto_process_sharekey(handle, key) {
     if (key.length > 22) {
         key = base64urldecode(key);
-        var k = str_to_a32(crypto_rsadecrypt(key, u_privk).substr(0, 16));
+        var k = crypto_rsadecrypt(key, u_privk);
+        if (k === false) return k;
         rsasharekeys[handle] = true;
-        return k;
+        return str_to_a32(k.substr(0, 16));
     }
 
     return decrypt_key(u_k_aes, base64_to_a32(key));
@@ -126,8 +135,12 @@ function crypto_decryptnode(n) {
         // inbound share root?
         if (n.sk) {
             key = crypto_process_sharekey(n.h, n.sk);
-            u_sharekeys[n.h] = [key, new sjcl.cipher.aes(key)];
-            n.p = n.u;
+
+            if (key !== false) {
+                u_sharekeys[n.h] = [key, new sjcl.cipher.aes(key)];
+                n.p = n.u;
+            }
+
             delete n.sk;
         }
 
@@ -182,10 +195,14 @@ function crypto_decryptnode(n) {
                     var t = base64urldecode(key);
                     try {
                         if (t) {
-                            k = str_to_a32(crypto_rsadecrypt(t, u_privk).substr(0, n.t ? 16 : 32));
+                            k = crypto_rsadecrypt(t, u_privk);
 
-                            // request this RSA key to be rewritten to AES
-                            rsa2aes[n.h] = rsa2aes[n.h] || false;
+                            if (k !== false) {
+                                k = str_to_a32(k.substr(0, n.t ? 16 : 32));
+
+                                // request this RSA key to be rewritten to AES
+                                rsa2aes[n.h] = rsa2aes[n.h] || false;
+                            }
                         }
                         else {
                             if (d) {
@@ -392,7 +409,7 @@ function crypto_handleauthcheck(h, ha) {
  * @param {Array} privkey
  *     Private encryption key (in the usual internal format used).
  * @return {String}
- *     Decrypted clear text.
+ *     Decrypted clear text or false in case of an error
  */
 // decrypts ciphertext string representing an MPI-formatted big number with the supplied privkey
 // returns cleartext string
@@ -400,7 +417,14 @@ function crypto_rsadecrypt(ciphertext, privkey) {
     var l = (ciphertext.charCodeAt(0) * 256 + ciphertext.charCodeAt(1) + 7) >> 3;
     ciphertext = ciphertext.substr(2, l);
 
-    var cleartext = asmCrypto.bytes_to_string(asmCrypto.RSA_RAW.decrypt(ciphertext, privkey));
+    try {
+        var cleartext = asmCrypto.bytes_to_string(asmCrypto.RSA_RAW.decrypt(ciphertext, privkey));
+    }
+    catch (e) {
+        console.log("RSA decryption failed: " + JSON.stringify(e));
+        return false;
+    }
+
     if (cleartext.length < privkey[0].length) {
         cleartext = Array(privkey[0].length - cleartext.length + 1).join(String.fromCharCode(0)) + cleartext;
     }
@@ -621,7 +645,6 @@ function dec_attr(attr, key) {
 
     attr = asmCrypto.AES_CBC.decrypt(attr,
         a32_to_ab([key[0] ^ key[4], key[1] ^ key[5], key[2] ^ key[6], key[3] ^ key[7]]), false);
-
     b = ab_to_str_depad(attr);
 
     if (b.substr(0, 6) !== 'MEGA{"') {

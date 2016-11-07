@@ -7388,119 +7388,18 @@ function processmove(apireq) {
     }
 }
 
-//var u_kdnodecache = {};
-//var kdWorker;
-
-function process_f(f, cb, retry) {
-    var onMainThread = localStorage.dk ? 9e11 : 200;
-
-    if (f && f.length) {
-        var ncn = f, skn = [];
-        // if ($.len(u_kdnodecache)) {
-            // ncn = [];
-            // for (var i in f) {
-                // var n1 = f[i], n2 = u_kdnodecache[n1.h];
-                // if (!n1.c && (!n2 || !$.len(n2))) ncn.push(n1);
-            // }
-            // if (d) console.log('non-cached nodes', ncn.length, ncn);
-        // }
-// FIXME: keydec.js has been retired. Port worker-based decryption to nodedec.js ASAP.
-/*        if (!retry && ncn.length > onMainThread) {
-            for (var i in f) {
-                if (f[i].sk) skn.push(f[i]);
-            }
-            if (skn.length) {
-                ncn = skn;
-                if (d) console.log('processing share-keys first', ncn.length, ncn);
-            }
+function process_f(f, cb) {
+    if (f) {
+        for (var i = 0; i < f.length; i++) {
+            M.addNode(f[i]);
         }
 
-        if ( ncn.length < onMainThread )
-        {
-*/
-            if (d) {
-                console.log('Processing %d-%d nodes in the main thread.', ncn.length, f.length);
-                console.time('process_f');
-            }
-            __process_f1(ncn);
-            if (skn.length) {
-                process_f(f, cb, 1);
-            }
-            else {
-                if (cb) {
-                    cb(newmissingkeys && M.checkNewMissingKeys());
-                }
-            }
-            if (d) console.timeEnd('process_f');
-/*        }
-        else
-        {
-            if (!kdWorker) try {
-                kdWorker = mSpawnWorker('keydec.js');
-            } catch(e) {
-                if (d) console.error(e);
-                return __process_f2(f, cb);
-            }
-
-            kdWorker.process(ncn.sort(function() { return Math.random() - 0.5}), function kdwLoad(r,j) {
-                if (d) console.log('KeyDecWorker processed %d/%d-%d nodes', $.len(r), ncn.length, f.length, r);
-                // $.extend(u_kdnodecache, r);
-                u_kdnodecache = r;
-                if (doNewNodes) {
-                    newnodes = newnodes || [];
-                }
-                if (j.newmissingkeys || ncn === skn) {
-                    if (d && j.newmissingkeys) console.log('Got missing keys, retrying?', !retry);
-                    if (!retry) {
-                        return process_f( f, cb, 1);
-                    }
-                }
-                // __process_f2(f, cb && cb.bind(this, !!j.newmissingkeys));
-                __process_f1(f);
-                if (cb) {
-                    cb(j.newmissingkeys);
-                }
-            }, function kdwError(err) {
-                if (d) console.error(err);
-                if (doNewNodes) {
-                    newnodes = newnodes || [];
-                }
-                __process_f2(f, cb);
-            });
-        }*/
+        if (cb) {
+            cb(newmissingkeys && M.checkNewMissingKeys());
+        }
     }
     else if (cb) cb();
 }
-
-function __process_f1(f)
-{
-    for (var i in f) M.addNode(f[i]);
-}
-
-/*function __process_f2(f, cb, tick)
-{
-    var max = 12000, n;
-
-    while ((n = f.pop()))
-    {
-        M.addNode(n);
-
-        if (cb && --max == 0) break;
-    }
-
-    if (cb)
-    {
-        if (max) cb();
-        else {
-            if (!+tick || tick > 1e3) {
-                tick = 200;
-            }
-            setTimeout(function pf2n() {
-                __process_f2(f, cb, tick);
-            }, tick *= 1.2);
-        }
-    }
-}*/
 
 /**
  * Handle incoming pending contacts

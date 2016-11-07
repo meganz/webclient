@@ -1,5 +1,6 @@
-if (typeof importScripts != 'undefined') {
-    importScripts('sjcl.js', 'rsaasm.js');
+if (typeof jsl_loaded != 'object') {
+    importScripts('sjcl.js');
+    importScripts('rsaasm.js');
 
     var firefox_boost = false;
     var d;
@@ -120,103 +121,109 @@ function crypto_decryptnode(n) {
     var p, pp;
 
     // is this node in OK or CORRUPT state or a keyless (root) node? no decryption needed.
-    if (n.name || typeof n.k == 'undefined' || typeof n.k == 'object') return;
+    if (typeof n.k == 'undefined' || n.name) return;
 
-    // inbound share root?
-    if (n.sk) {
-        key = crypto_process_sharekey(n.h, n.sk);
-        u_sharekeys[n.h] = [key, new sjcl.cipher.aes(key)];
-        n.p = n.u;
-        delete n.sk;
-    }
+    if (typeof n.k == 'string') {
+        // inbound share root?
+        if (n.sk) {
+            key = crypto_process_sharekey(n.h, n.sk);
+            u_sharekeys[n.h] = [key, new sjcl.cipher.aes(key)];
+            n.p = n.u;
+            delete n.sk;
+        }
 
-    // does the logged in user own the node? (user key is guaranteed to be located first in .k)
-    if (n.k.length == 43 || n.k.length == 22) {
-        id = u_handle;
-        p = 0;
-    }
-    else if (n.k[11] == ':' && u_handle === n.k.substr(0, 11)) {
-        id = u_handle;
-        p = u_handle.length+1;
-    } else {
-        // do we have a suitable sharekey?
-        for (p = 8; (p = n.k.indexOf(':', p)) >= 0; ) {
-            if (++p == 9 || n.k[p-10] == '/') {
-                id = n.k.substr(p-9, 8);
-                if (u_sharekeys[id]) {
-                    break;
+        // does the logged in user own the node? (user key is guaranteed to be located first in .k)
+        if (n.k.length == 43 || n.k.length == 22) {
+            id = u_handle;
+            p = 0;
+        }
+        else if (n.k[11] == ':' && u_handle === n.k.substr(0, 11)) {
+            id = u_handle;
+            p = u_handle.length+1;
+        } else {
+            // do we have a suitable sharekey?
+            for (p = 8; (p = n.k.indexOf(':', p)) >= 0; ) {
+                if (++p == 9 || n.k[p-10] == '/') {
+                    id = n.k.substr(p-9, 8);
+                    if (u_sharekeys[id]) {
+                        break;
+                    }
                 }
             }
         }
-    }
 
-    if (p >= 0) {
-        var pp = n.k.indexOf('/', p+21);
+        if (p >= 0) {
+            var pp = n.k.indexOf('/', p+21);
 
-        if (pp < 0) {
-            pp = n.k.length;
-        }
+            if (pp < 0) {
+                pp = n.k.length;
+            }
 
-        key = n.k.substr(p, pp-p);
+            key = n.k.substr(p, pp-p);
 
-        // we have found a suitable key: decrypt!
-        if (key.length < 46) {
-            // short keys: AES
-            k = base64_to_a32(key);
+            // we have found a suitable key: decrypt!
+            if (key.length < 46) {
+                // short keys: AES
+                k = base64_to_a32(key);
 
-            // check for permitted key lengths (4 == folder, 8 == file)
-            if (k.length == 4 || k.length == 8) {
-                k = decrypt_key(id === u_handle ? u_k_aes : u_sharekeys[id][1], k);
+                // check for permitted key lengths (4 == folder, 8 == file)
+                if (k.length == 4 || k.length == 8) {
+                    k = decrypt_key(id === u_handle ? u_k_aes : u_sharekeys[id][1], k);
+                }
+                else {
+                    if (d) {
+                        console.log("Received invalid key length (" + k.length + "): " + n.h);
+                    }
+                    k = false;
+                }
             }
             else {
-                if (d) {
-                    console.log("Received invalid key length (" + k.length + "): " + n.h);
-                }
-                k = false;
-            }
-        }
-        else {
-            // long keys: RSA
-            if (u_privk) {
-                var t = base64urldecode(key);
-                try {
-                    if (t) {
-                        k = str_to_a32(crypto_rsadecrypt(t, u_privk).substr(0, n.t ? 16 : 32));
+                // long keys: RSA
+                if (u_privk) {
+                    var t = base64urldecode(key);
+                    try {
+                        if (t) {
+                            k = str_to_a32(crypto_rsadecrypt(t, u_privk).substr(0, n.t ? 16 : 32));
 
-                        // request this RSA key to be rewritten to AES
-                        rsa2aes[n.h] = rsa2aes[n.h] || false;
+                            // request this RSA key to be rewritten to AES
+                            rsa2aes[n.h] = rsa2aes[n.h] || false;
+                        }
+                        else {
+                            if (d) {
+                                console.log("Corrupt key for node " + n.h);
+                            }
+                        }
                     }
-                    else {
+                    catch (e) {
                         if (d) {
-                            console.log("Corrupt key for node " + n.h);
+                            console.log('u_privk error: ' + e);
                         }
                     }
                 }
-                catch (e) {
+                else {
                     if (d) {
-                        console.log('u_privk error: ' + e);
+                        console.log("Received RSA key, but have no public key published: " + n.h);
                     }
                 }
             }
-            else {
-                if (d) {
-                    console.log("Received RSA key, but have no public key published: " + n.h);
-                }
-            }
         }
-    }
-
-    if (!k) {
-        if (d) console.log("Can't extract key for " + n.h);
-        if (missingkeys) crypto_reportmissingkey(n);
-    }
-    else if (n.a) {
-        crypto_procattr(n, k);
     }
     else {
-        if (d && n.t > 1) {
-            console.log('Missing attribute for node ' + n.h);
-        }
+        // use existing key (for attribute changes)
+        k = n.k;
+    }
+
+    if (k) {
+        if (n.a) crypto_procattr(n, k);
+        else {
+            if (d && n.t < 2) {
+                console.log('Missing attribute for node ' + n.h);
+            }
+        }        
+    }
+    else {
+        if (d) console.log("Can't extract a valid key for " + n.h);
+        if (missingkeys) crypto_reportmissingkey(n);
     }
 }
 
@@ -231,7 +238,7 @@ function crypto_makeattr(n) {
         // node does not have a valid key
         if (n.k.length != 4 && n.k.length != 8) {
             throw new Error("Invalid key on " + n.h);
-        }
+        }        
     }
 
     // construct full set of transport attributes
@@ -257,15 +264,28 @@ function crypto_makeattr(n) {
         a32_to_ab([n.k[0] ^ n.k[4], n.k[1] ^ n.k[5], n.k[2] ^ n.k[6], n.k[3] ^ n.k[7]]), false);
 }
 
+// derived node attr directory
+var dattrs = [ 'ar', 'name', 'hash', 'mtime', 'fav', 'lbl', 'f' ];
+
 // clear all node attributes, including derived ones
 function crypto_clearattr(n) {
-    delete n.ar;
-    delete n.name;
-    delete n.hash;
-    delete n.mtime;
-    delete n.fav;
-    delete n.lbl;
-    delete n.f;
+    var old = {};
+
+    for (var i = dattrs.length; i--; ) {
+        if (typeof n[dattrs[i]] != 'undefined') {
+            old[dattrs[i]] = n[dattrs[i]];
+            delete n[dattrs[i]];
+        }
+    }
+
+    return old;
+}
+
+// restore previously cleared attributes
+function crypto_restoreattr(n, old) {
+    for (var i in old) {
+        n[i] = old[i];
+    }
 }
 
 // if decryption of .a is successful, set .name, .hash, .mtime, .k and .ar and clear .a
@@ -481,7 +501,7 @@ var base64urldecode = function(data) {
     }
 };
 
-// (Safari workers lack atob()!)
+// (Safari workers lack atob()!) 
 if (typeof atob !== 'function') {
     base64urldecode = function(data) {
         data += '=='.substr((2 - data.length * 3) & 3);

@@ -6052,15 +6052,19 @@ function execsc() {
             case 'u':
                 // update node attributes
                 if (n = M.d[a.n]) {
+                    var oldattr;
                     var oldname = n.name;
                     var oldfav = n.fav;
 
-                    // key update
-                    if (a.k) n.k = a.k;
+                    // key update - no longer supported
+                    // API sends keys only for backwards compatibility
+                    // if (a.k) n.k = a.k;
 
                     // attribute update - replaces all existing attributes!
                     if (a.at) {
-                        crypto_clearattr(n);
+                        oldattr = crypto_clearattr(n);
+                        oldattr.u = n.u;
+                        oldattr.ts = n.ts;
                         n.a = a.at;
                     }
 
@@ -6073,25 +6077,34 @@ function execsc() {
                     // try to decrypt new attributes
                     crypto_decryptnode(n);
 
-                    if (crypto_keyok(n)) {
-                        // success - check what changed an redraw
-                        if (n.name !== oldname) {
-                            M.onRenameUIUpdate(n.h, n.name);
-                        }
-                        if (fminitialized && n.fav !== oldfav) {
-                            if (n.fav) {
-                                $('.grid-table.fm #' + n.h + ' .grid-status-icon').addClass('star');
-                                $('#' + n.h + '.file-block .file-status-icon').addClass('star');
-                            }
-                            else {
-                                $('.grid-table.fm #' + n.h + ' .grid-status-icon').removeClass('star');
-                                $('#' + n.h + '.file-block .file-status-icon').removeClass('star');
-                            }
-                        }
+                    // we got a new attribute string, but it didn't pass muster?
+                    // revert to previous state (effectively ignoring the SC command)
+                    if (a.at && n.a) {
+                        if (d) console.warn("Ignored bad attribute update for node " + a.n);
+                        crypto_restoreattr(n, oldattr);
+                        delete n.a;
                     }
+                    else {
+                        // success - check what changed and redraw
+                        if (a.at) {
+                            if (n.name !== oldname) {
+                                M.onRenameUIUpdate(n.h, n.name);
+                            }
+                            if (fminitialized && n.fav !== oldfav) {
+                                if (n.fav) {
+                                    $('.grid-table.fm #' + n.h + ' .grid-status-icon').addClass('star');
+                                    $('#' + n.h + '.file-block .file-status-icon').addClass('star');
+                                }
+                                else {
+                                    $('.grid-table.fm #' + n.h + ' .grid-status-icon').removeClass('star');
+                                    $('#' + n.h + '.file-block .file-status-icon').removeClass('star');
+                                }
+                            }
+                        }
 
-                    // save modified node, even if it is undecryptable
-                    M.nodeUpdated(n);
+                        // save modified node
+                        M.nodeUpdated(n);
+                    }
                 }
                 break;
 

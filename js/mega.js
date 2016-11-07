@@ -3199,10 +3199,22 @@ function MegaData()
 
         var a = this.isFileNode(cn) ? [cn] : ($.onImportCopyNodes || fm_getcopynodes(cn, t));
         var importNodes = Object(a).length;
-        var ops = {a: 'p', t: t, n: a, i: requesti};    // FIXME: deploy API-side sn check
+        var sconly = importNodes > 10;   // true -> new nodes delivered via SC `t` command only
+        var ops = {a: 'p', t: t, n: a}; // FIXME: deploy API-side sn check
+
+        if (sconly) {
+            // set version and no requesti
+            ops.v = 3;
+        }
+        else {
+            // set no version, but requesti
+            // FIXME: set v = 2 and check for node errors, warn user
+            ops[i] = requesti;
+        }
+
         var s = fm_getsharenodes(t);
 
-        if (s.length > 0) {
+        if (s.length) {
             var mn = [];
             for (i in a) {
                 mn.push(a[i].h);
@@ -3219,6 +3231,7 @@ function MegaData()
             cn: cn,
             del: del,
             t: t,
+            sconly: sconly,
             callback: function(res, ctx) {
                 function onCopyNodesDone() {
                     loadingDialog.hide();
@@ -3235,6 +3248,7 @@ function MegaData()
                         );
                     }
                 }
+
                 var nodesCount;
 
                 if (typeof res === 'number' && res < 0) {
@@ -3249,22 +3263,39 @@ function MegaData()
                     var j = [];
                     for (var i in ctx.cn) {
                         M.delNode(ctx.cn[i], true); // must not update DB pre-API
-                        api_req({a: 'd', n: cn[i]/*, i: requesti*/});
+                        if (!ctx.sconly || !res[i]) {
+                            api_req({a: 'd', n: cn[i]/*, i: requesti*/});
+                        }
                     }
                 }
 
-                newnodes = [];
+                if (ctx.sconly) {
+                    // FIXME: call callback after receipt of the corresponding SC packet
+                    loadingDialog.hide();
 
-                if (res.u) {
-                    process_u(res.u, true);
-                }
-
-                if (res.f) {
-                    nodesCount = Object(res.f).length;
-                    process_f(res.f, onCopyNodesDone);
+                    nodesCount = Object.keys(res).length;
+                    if (nodesCount) {
+                        msgDialog('warninga', l[882],
+                            l[8683]
+                                .replace('%1', importNodes-nodesCount)
+                                .replace('%2', importNodes)
+                        );
+                    }
                 }
                 else {
-                    onCopyNodesDone();
+                    newnodes = [];
+
+                    if (res.u) {
+                        process_u(res.u, true);
+                    }
+
+                    if (res.f) {
+                        nodesCount = Object(res.f).length;
+                        process_f(res.f, onCopyNodesDone);
+                    }
+                    else {
+                        onCopyNodesDone();
+                    }
                 }
             }
         });

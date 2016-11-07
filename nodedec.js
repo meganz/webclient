@@ -1,6 +1,5 @@
-if (typeof jsl_loaded != 'object') {
-    importScripts('sjcl.js');
-    importScripts('rsaasm.js');
+if (typeof importScripts !== 'undefined') {
+    importScripts('sjcl.js', 'rsaasm.js');
 
     var firefox_boost = false;
     var d;
@@ -219,7 +218,7 @@ function crypto_decryptnode(n) {
             if (d && n.t < 2) {
                 console.log('Missing attribute for node ' + n.h);
             }
-        }        
+        }
     }
     else {
         if (d) console.log("Can't extract a valid key for " + n.h);
@@ -238,7 +237,7 @@ function crypto_makeattr(n) {
         // node does not have a valid key
         if (n.k.length != 4 && n.k.length != 8) {
             throw new Error("Invalid key on " + n.h);
-        }        
+        }
     }
 
     // construct full set of transport attributes
@@ -501,7 +500,7 @@ var base64urldecode = function(data) {
     }
 };
 
-// (Safari workers lack atob()!) 
+// (Safari workers lack atob()!)
 if (typeof atob !== 'function') {
     base64urldecode = function(data) {
         data += '=='.substr((2 - data.length * 3) & 3);

@@ -6296,28 +6296,28 @@ function fm_updated(n) {
 // load tree for folder link handle (or current u_sid if !handle)
 // place nodes in target (pointing to M.d)
 // FIXME: allow multiple trees to coexist (one user tree, any number of folder links)
-function treefetcher() {
-    return {
-        fetch : treefetcher_fetch,
-
-        // next round-robin worker to assign
-        nextworker : 0,
-
-        // mapping of parent node to worker (to keep child nodes local to their sharekeys)
-        parentworker : {},
-
-        // the first node of a folder link fetch contains the private root node handle
-        getfolderlinkroot : false,
-
-        // worker pending state dump counter
-        dumpsremaining : 0,
-
-        // residual fm (minus ok/f elements) post-filtration
-        residualfm : false,
-
-        // get next worker index (round robin)
-        getnextworker : treefetcher_getnextworker
+function TreeFetcher() {
+    if (!(this instanceof TreeFetcher)) {
+        return new TreeFetcher();
     }
+
+    // next round-robin worker to assign
+    this.nextworker = 0;
+
+    // mapping of parent node to worker (to keep child nodes local to their sharekeys)
+    this.parentworker = {};
+
+    // the first node of a folder link fetch contains the private root node handle
+    this.getfolderlinkroot = false;
+
+    // worker pending state dump counter
+    this.dumpsremaining = 0;
+
+    // residual fm (minus ok/f elements) post-filtration
+    this.residualfm = false;
+
+    // console logging
+    this.logger = MegaLogger.getLogger('TreeFetcher');
 }
 
 // worker pool
@@ -6371,7 +6371,7 @@ function initworkerpool() {
 
 // initiate fetch of node tree
 // FIXME: what happens when the user pastes a folder link over his loaded/loading account?
-function treefetcher_fetch() {
+TreeFetcher.prototype.fetch = function treefetcher_fetch(force) {
     if (n_h) this.getfolderlinkroot = true;
 
     // FIXME: not needed for folder links
@@ -6384,9 +6384,9 @@ function treefetcher_fetch() {
     // we filter out the ownerkeys and pipe them to treefetcher_ok()
     // we also filter out the nodes and pipe them to treefetcher_node()
     // the rest of the `f` response goes to treefetcher_residue()
-    var gettree_filter = JSON.splitter({ '[{[ok0{' : treefetcher_ok,
-                                           '[{[f{' : treefetcher_node,
-                                               '[' : treefetcher_residue });
+    var gettree_filter = JSON.splitter({ '[{[ok0{' : this.ok,
+                                           '[{[f{' : this.node,
+                                               '[' : this.residue }, this);
 
     var req_params = {
         a : 'f',
@@ -6395,8 +6395,13 @@ function treefetcher_fetch() {
     };
 
     // we disallow treecache usage if this is a forced reload
-    if (!localStorage.force) req_params.ca = 1;
-    else delete localStorage.force;
+    force = force || localStorage.force;
+    if (!force) {
+        req_params.ca = 1;
+    }
+    else {
+        delete localStorage.force;
+    }
 
     if (!megaChatIsDisabled && typeof Chatd !== 'undefined') {
         req_params['cv'] = Chatd.VERSION;
@@ -6405,25 +6410,41 @@ function treefetcher_fetch() {
     api_req(req_params, {
         ctx : this,
         buffer : true,
-        progress: function(perc, buffer, ctx) {
+        progress: function(perc, buffer, ctx, xhr) {
             loadingInitDialog.step2(parseInt(perc));    // FIXME: make generic
-            if (buffer && !gettree_filter.proc(buffer, ctx.ctx)) {
-                // FIXME: wipe DB, trigger retry with exponential backoff
+
+            if (buffer && !gettree_filter.proc(buffer)) {
+                xhr.abort();
+                var retry = api_reqerror.bind(null, xhr.q, -3);
+                var fmdb_open = function() {
+                    fmdb.db.open().then(retry, retry);
+                };
+                fmdb.db.delete().then(fmdb_open, fmdb_open);
+
+                ctx.ctx.logger.warn('Error parsing JSON, retrying...');
             }
         }
     }, n_h ? 5 : 4);
-}
+};
+
+// get next worker index (round robin)
+TreeFetcher.prototype.getnextworker = function treefetcher_getnextworker() {
+    if (this.nextworker >= workers.length) {
+        this.nextworker = 0;
+    }
+    return this.nextworker++;
+};
 
 // this receives the ok elements one by one as per the filter rule
 // to facilitate the decryption of outbound shares, the API now sends ok before f
-function treefetcher_ok(ok, ctx) {
+TreeFetcher.prototype.ok = function treefetcher_ok(ok) {
     if (fmdb) fmdb.add('ok', { h : ok.h, d : ok });
 
     // bind outbound share root to specific worker, post ok element to that worker
     // FIXME: check if nested outbound shares are returned with all shareufskeys!
     // if that is not the case, we need to bind all ok handles to the same worker
     if (workers) {
-        workers[ctx.parentworker[ok.h] = ctx.getnextworker()].postMessage(ok);
+        workers[this.parentworker[ok.h] = this.getnextworker()].postMessage(ok);
     }
     else if (crypto_handleauthcheck(ok.h, ok.ha)) {
         if (d) console.log("successfully decrypted sharekeys for " + ok.h);
@@ -6431,9 +6452,9 @@ function treefetcher_ok(ok, ctx) {
         u_sharekeys[ok.h] = [key, new sjcl.cipher.aes(key)];
     }
     else {
-        console.error("handleauthcheck() failed for " + ok.h);
+        this.logger.error("handleauthcheck() failed for " + ok.h);
     }
-}
+};
 
 // returns true if no further processing is needed
 // FIXME: move to M
@@ -6458,10 +6479,10 @@ function emplacenode(node) {
 }
 
 // this receives the node objects one by one as per the filter rule
-function treefetcher_node(node, ctx) {
-    if (ctx.getfolderlinkroot) {
+TreeFetcher.prototype.node = function treefetcher_node(node) {
+    if (this.getfolderlinkroot) {
         // set up the workers for folder link decryption
-        ctx.getfolderlinkroot = false;
+        this.getfolderlinkroot = false;
 
         workerstate = {
             n_h   : node.h,
@@ -6486,39 +6507,39 @@ function treefetcher_node(node, ctx) {
         crypto_decryptnode(node);
         worker_procmsg({data: node});
     }
-    else if (node.p && ctx.parentworker[node.p] >= 0) {
-        workers[ctx.parentworker[node.h] = ctx.parentworker[node.p]].postMessage(node);
+    else if (node.p && this.parentworker[node.p] >= 0) {
+        workers[this.parentworker[node.h] = this.parentworker[node.p]].postMessage(node);
     }
-    else if (ctx.parentworker[node.h] >= 0) {
-        workers[ctx.parentworker[node.h]].postMessage(node);
+    else if (this.parentworker[node.h] >= 0) {
+        workers[this.parentworker[node.h]].postMessage(node);
     }
     else if (node.sk) {
-        workers[ctx.parentworker[node.h] = ctx.getnextworker()].postMessage(node);
+        workers[this.parentworker[node.h] = this.getnextworker()].postMessage(node);
     }
     else {
-        workers[ctx.getnextworker()].postMessage(node);
+        workers[this.getnextworker()].postMessage(node);
     }
-}
+};
 
 // this receives the remainder of the JSON after the filter was applied
-function treefetcher_residue(fm, ctx) {
+TreeFetcher.prototype.residue = function treefetcher_residue(fm) {
     // store the residual f response for perusal once all state dumps have been received
-    ctx.residualfm = fm[0];
+    this.residualfm = fm[0];
 
     // and send state dump request to all workers
     if (workers) {
         var i = workers.length;
-        ctx.dumpsremaining = i;
+        this.dumpsremaining = i;
 
         while (i--) {
             workers[i].postMessage({});
         }
     }
     else {
-        ctx.dumpsremaining = 1;
-        worker_procmsg.call({ctx: ctx}, {data: {sharekeys: false}});
+        this.dumpsremaining = 1;
+        worker_procmsg.call({ctx: this}, {data: {sharekeys: false}});
     }
-}
+};
 
 // process worker responses (decrypted nodes, processed actionpackets, state dumps...)
 function worker_procmsg(ev) {
@@ -6604,11 +6625,6 @@ function worker_procmsg(ev) {
     }
 }
 
-function treefetcher_getnextworker() {
-    if (this.nextworker >= workers.length) this.nextworker = 0;
-    return this.nextworker++;
-}
-
 // the FM DB engine (cf. mDB.js)
 var fmdb;
 
@@ -6670,7 +6686,7 @@ function fetchfm(sn) {
 
         if (u_type == 3) {
             // load/initialise the authentication system
-            authring.initAuthenticationSystem();            
+            authring.initAuthenticationSystem();
         }
 
         if (sn) {
@@ -6680,7 +6696,7 @@ function fetchfm(sn) {
         else {
 
             // no cache requested or available - get from API
-            fetcher = treefetcher();
+            fetcher = TreeFetcher();
             fetcher.fetch();
 
             mega.loadReport.mode = 2;

@@ -1599,12 +1599,7 @@ function api_proc(q) {
                 for (var i = ctxs.length; i--; ) {
                     var ctx = ctxs[i];
                     if (typeof ctx.progress == 'function') {
-                        if (typeof ctx.buffer != 'undefined') {
-                            ctx.progress(progressPercent, this.responseText, ctx);
-                        }
-                        else {
-                            ctx.progress(progressPercent);
-                        }
+                        ctx.progress(progressPercent, ctx.buffer && this.responseText, ctx, this);
                     }
                 }
             };
@@ -1859,7 +1854,7 @@ function stopsc() {
         waitxhr.abort();
         waitxhr = false;
     }
-l
+
     if (waittimeout) {
         clearTimeout(waittimeout);
         waittimeout = false;
@@ -1875,7 +1870,9 @@ function setsn(sn) {
  * calls execsc() with server-client requests received
  * @param {Boolean} mDBload whether invoked from indexedDB.
  */
-function sc_residue(sc, ctx) {
+function sc_residue(sc) {
+    var ctx = this;
+
     if (sc.sn) {
         // enqueue new sn
         currsn = sc.sn;
@@ -4216,9 +4213,9 @@ function api_strerror(errno) {
 // i.e.: NO whitespace, NO non-numeric/string constants ("null"), etc...)
 (function() {
 
-    var JSONSplitter = function json_splitter(filters) {
+    var JSONSplitter = function json_splitter(filters, ctx) {
         if (!(this instanceof json_splitter)) {
-            return new json_splitter(filters);
+            return new json_splitter(filters, ctx);
         }
 
         // position in source string (FIXME: allow chunked feeding)
@@ -4239,6 +4236,9 @@ function api_strerror(errno) {
         // bucket stack
         this.buckets = [];
         this.lastpos = 0;
+
+        // optional callee scope
+        this.ctx = ctx;
 
         // console logging
         this.logger = MegaLogger.getLogger('JSONSplitter');
@@ -4329,7 +4329,9 @@ function api_strerror(errno) {
                     // we have a filter configured for this object
                     //try {
                     // pass filtrate to application and empty bucket
-                    callback(this.parse(this.buckets[0] + json.substr(this.lastpos, this.p - this.lastpos)), ctx);
+                    callback.call(ctx || this.ctx,
+                        this.parse(this.buckets[0] + json.substr(this.lastpos, this.p - this.lastpos))
+                    );
                     //} catch (e) {
                     //    this.logger.log(json.substr(this.lastpos, this.p-this.lastpos));
                     //    this.logger.log("Malformed JSON - parse error in filter element " + this.filter);

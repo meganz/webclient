@@ -43,7 +43,7 @@ var astroPayDialog = {
         // Cache DOM reference for lookup in other functions
         this.$dialog = $('.fm-dialog.astropay-dialog');
         this.$backgroundOverlay = $('.fm-dialog-overlay');
-        this.$pendingOverlay = $('.payment-result.pending');
+        this.$pendingOverlay = $('.payment-result.pending.original');
 
         // Store the provider details
         this.selectedProvider = selectedProvider;
@@ -224,7 +224,7 @@ var astroPayDialog = {
     showPendingPayment: function() {
 
         this.$backgroundOverlay = $('.fm-dialog-overlay');
-        this.$pendingOverlay = $('.payment-result.pending');
+        this.$pendingOverlay = $('.payment-result.pending.original');
 
         // Show the success
         this.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');

@@ -960,6 +960,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                         chatRoom.protocolHandler.addParticipant(eventData.userId);
                         // also add to our list
                         chatRoom.members[eventData.userId] = eventData.priv;
+                        $(chatRoom).trigger('onMembersUpdated');
                     }
                     self.waitForProtocolHandler(chatRoom, addParticipant);
                 }
@@ -974,6 +975,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                     chatRoom.protocolHandler.removeParticipant(eventData.userId);
                     // also remove from our list
                     delete chatRoom.members[eventData.userId];
+                    $(chatRoom).trigger('onMembersUpdated');
                 }
                 self.waitForProtocolHandler(chatRoom, deleteParticipant);
             }
@@ -1090,6 +1092,8 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                                             included: v.includeParticipants,
                                             excluded: v.excludeParticipants
                                         };
+                                        ChatdIntegration._ensureNamesAreLoaded(v.excludeParticipants);
+                                        ChatdIntegration._ensureNamesAreLoaded(v.includeParticipants);
                                         chatRoom.messagesBuff.messages[messageId].dialogType = "alterParticipants";
                                     }
                                 }

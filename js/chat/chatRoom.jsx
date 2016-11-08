@@ -149,6 +149,36 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
         }
     });
 
+    /**
+     * Manually proxy contact related data change events, for more optimal UI rerendering.
+     */
+    var membersSnapshot = {};
+    self.rebind('onMembersUpdated.chatRoomMembersSync', function() {
+        var roomRequiresUpdate = false;
+
+        Object.keys(membersSnapshot).forEach(function(u_h) {
+            var contact = M.u[u_h];
+            if (contact) {
+                contact.removeChangeListener(membersSnapshot[u_h]);
+                if (!self.members[u_h]) {
+                    roomRequiresUpdate = true;
+                }
+            }
+            delete membersSnapshot[u_h];
+        });
+
+        Object.keys(self.members).forEach(function(u_h) {
+            var contact = M.u[u_h];
+            if (contact) {
+                membersSnapshot[u_h] = contact.addChangeListener(function() {
+                    self.trackDataChange();
+                });
+            }
+        });
+        if (roomRequiresUpdate) {
+            self.trackDataChange();
+        }
+    });
 
     self.getParticipantsExceptMe().forEach(function(jid) {
         var contact = self.megaChat.getContactFromJid(jid);

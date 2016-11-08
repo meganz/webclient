@@ -4819,25 +4819,38 @@ if (typeof sjcl !== 'undefined') {
                     s: [{ u: userEmail, r: ''}],
                     ha: '',
                     i: requesti
+                }, {
+                    userEmail: userEmail,
+                    selectedNodeHandle: selectedNodeHandle,
+                    handleOrEmail: handleOrEmail,
+
+                    callback : function(res, ctx) {
+                        if (typeof res == 'object') {
+                            // FIXME: examine error codes in res.r, display error
+                            // to user if needed
+
+                            // If it was a user handle, the share is a full share
+                            if (M.u[ctx.handleOrEmail]) {
+                                // FIXME: remove dead code
+                                //userEmail = M.u[ctx.handleOrEmail].m;
+                                M.delNodeShare(ctx.selectedNodeHandle, ctx.handleOrEmail);
+                                setLastInteractionWith(ctx.handleOrEmail, "0:" + unixtime());
+
+                                self.removeFromPermissionQueue(ctx.handleOrEmail);
+                            }
+                            // Pending share
+                            else {
+                                var pendingContactId = M.findOutgoingPendingContactIdByEmail(ctx.userEmail);
+                                M.deletePendingShare(ctx.selectedNodeHandle, pendingContactId);
+
+                                self.removeFromPermissionQueue(ctx.userEmail);
+                            }
+                        }
+                        else {
+                            // FIXME: display error to user
+                        }
+                    }
                 });
-
-                // If it was a user handle, the share is a full share
-                if (M.u[handleOrEmail]) {
-                    userEmail = M.u[handleOrEmail].m;
-                    // must not delete share pre-API
-                    //M.delNodeShare(selectedNodeHandle, handleOrEmail);
-                    setLastInteractionWith(handleOrEmail, "0:" + unixtime());
-
-                    self.removeFromPermissionQueue(handleOrEmail);
-                }
-
-                // Pending share
-                else {
-                    pendingContactId = M.findOutgoingPendingContactIdByEmail(userEmail);
-                    M.deletePendingShare(selectedNodeHandle, pendingContactId);
-
-                    self.removeFromPermissionQueue(userEmail);
-                }
             });
         }
     };

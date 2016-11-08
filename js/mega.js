@@ -5727,12 +5727,12 @@ function resumesc() {
 function execsc() {
     var n, i;
     var tick = Date.now();
-    var sccount = 0;
+    var tickcount = 0;
 
     do {
         if (!scq[scqtail] || !scq[scqtail][0] || (scq[scqtail][0].a == 't' && nodesinflight[scqtail])) {
             // scq ran empty - nothing to do for now
-            console.log((sccount-1) + " actionpacket(s) processed.");
+            if (d) console.log((sccount-1) + " actionpacket(s) processed.");
 
             // perform post-execution UI work
             if (newnodes.length && fminitialized) {
@@ -5817,7 +5817,7 @@ function execsc() {
                     }
 
                     if (fminitialized) {
-                        // Full share contains .h param
+                        // a full share contains .h param
                         sharedUInode(a.h);
                     }
                     break;
@@ -5865,7 +5865,7 @@ function execsc() {
             switch (a.a) {
                 case '_sn':
                     // sn update?
-                    console.log("New SN: " + a.sn);
+                    if (d) console.log("New SN: " + a.sn);
                     setsn(a.sn);
 
                     // reset state
@@ -5909,7 +5909,7 @@ function execsc() {
                             if (!a.u) {
                                 // this must be a pending share
                                 if (a.a != 's2') {
-                                    console.error('INVALID SHARE ACTION PACKET, Missing user handle', a);
+                                    console.error('INVALID SHARE, missing user handle', a);
                                 }
                             }
                             // if access right are undefined, then share is deleted
@@ -5961,7 +5961,7 @@ function execsc() {
                             if (a.o) {
                                 if (typeof a.r == 'undefined') {
                                     if (d) {
-                                        console.log('delete a share');
+                                        console.log('Share deletion');
                                     }
 
                                     // delete a share:
@@ -6004,7 +6004,7 @@ function execsc() {
                                     }
                                     else {
                                         if (d) {
-                                            console.log('Look up other share nodes from this user');
+                                            console.log('Looking up other share nodes from this user');
                                         }
 
                                         if (M.c[a.o]) {
@@ -6362,10 +6362,10 @@ function execsc() {
             }
         }
 
-        sccount++;
+        tickcount++;
     } while (Date.now()-tick < 200);
 
-    if (d) console.log("Processed " + sccount + " SC commands in the past 200 ms");
+    if (d) console.log("Processed " + tickcount + " SC commands in the past 200 ms");
     setTimeout(execsc, 1);
 }
 

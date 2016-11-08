@@ -3215,7 +3215,7 @@ function MegaData()
         var sconly = importNodes > 10;   // true -> new nodes delivered via SC `t` command only
         var ops = {a: 'p', t: t, n: a}; // FIXME: deploy API-side sn check
 
-        var onCopyNodesDone = function() {debugger;
+        var onCopyNodesDone = function() {
             loadingDialog.hide();
             if (promise) {
                 promise.resolve(0);
@@ -3247,15 +3247,25 @@ function MegaData()
 
         if (s.length) {
             var mn = [];
-            for (i in a) {
-                mn.push(a[i].h);
+            for (var i = 0; i < a.length; i++) {
+                mn.push(a[i].k);
             }
-            ops.cr = crypto_makecr(mn, s, true);
+
+            ops.cr = crypto_makecr(mn, s, false);
         }
 
         if (importNodes) {
             // #4290 'strict mode'
             ops.sm = 1;
+        }
+
+        // encrypt nodekeys, either by RSA or by AES, depending on whether
+        // we're sending them to a contact's inbox or not
+        // FIXME: do this in a worker
+        var c = (t || "").length == 11;
+        for (var i = a.length; i--; ) {
+            a[i].k = c ? base64urlencode(encryptto(t, a32_to_str(a[i].k)))
+                       : a32_to_base64(encrypt_key(u_k_aes, a[i].k));
         }
 
         api_req(ops, {
@@ -7006,49 +7016,54 @@ function fm_getsharenodes(h, root)
 
 function fm_getcopynodes(cn, t)
 {
-    var a=[];
-    var r=[];
-    var c=11 == (t || "").length;
-    for (var i in cn)
+    var a = [];
+    var r = [];
+    var i, j;
+
+    // add all subtrees under cn[], including the roots
+    for (i = 0; i < cn.length; i++)
     {
         var s = fm_getnodes(cn[i]);
-        for (var j in s) r.push(s[j]);
         r.push(cn[i]);
+        for (var j = 0; j < s.length; j++) r.push(s[j]);
     }
-    for (var i in r)
+
+    for (i = 0; i < r.length; i++)
     {
-        var n = clone(M.d[r[i]]);
+        var n = M.d[r[i]];
 
         if (n) {
-            if (!crypto_keyok(n)) {
-                console.error('fm_getcopynodes: missing node key', n);
-                continue;
-            }
+            if (crypto_keyok(n)) {
+                // repackage/-encrypt n for processing by the `p` API
+                nn = {};
 
-            if (n.t) delete n.k;    // copied folders receive a new key
+                // copied folders receive a new random key
+                // copied files must retain their existing key
+                nn.k = n.t ? false : n.k;
 
-            n.a = ab_to_base64(crypto_makeattr(n));
-            n.k = c ? base64urlencode(encryptto(t, a32_to_str(n.k)))
-                    : a32_to_base64(encrypt_key(u_k_aes, n.k));
+                // new node inherits all attributes
+                nn.a = ab_to_base64(crypto_makeattr(n, nn));
 
-            // send only relevant attributes to the API
-            n = { h : n.h,
-                  p : n.p,
-                  t : n.t,
-                  k : n.k,
-                  a : n.a };
+                // new node inherits handle, parent and type
+                nn.h = n.h;
+                nn.p = n.p;
+                nn.t = n.t;
 
-            // remove parent unless child
-            for (var j in cn) {
-                if (cn[j] == n.h) {
-                    delete n.p;
-                    break;
+                // remove parent unless child
+                for (j = 0; j < cn.length; j++) {
+                    if (cn[j] === nn.h) {
+                        delete nn.p;
+                        break;
+                    }
                 }
-            }
 
-            a.push(n);
+                a.push(nn);
+            }
+            else console.warn("fm_getcopynodes: Node " + r[i] + " undecrypted");
         }
+        else console.warn("fm_getcopynodes: Node " + r[i] + " went missing");
     }
+
     return a;
 }
 

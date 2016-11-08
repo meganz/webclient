@@ -245,14 +245,17 @@ function crypto_decryptnode(n) {
 
 // generate attributes block for given node using AES-CBC with MEGA canary
 // (also generates random (folder-type) key if missing)
-function crypto_makeattr(n) {
+// nn is an optional target node to which the attributes will be encrypted
+function crypto_makeattr(n, nn) {
+    if (!nn) nn = n;
+
     // if node is keyless, generate one
-    if (typeof n.k == 'undefined' || !n.k.length) {
-        n.k = [];
-        for (i = 4; i--; ) n.k[i] = rand(0x100000000);
+    if (!nn.k || !nn.k.length) {
+        nn.k = [];
+        for (var i = 4; i--; ) nn.k[i] = rand(0x100000000);
     } else {
         // node does not have a valid key
-        if (n.k.length != 4 && n.k.length != 8) {
+        if (nn.k.length != 4 && nn.k.length != 8) {
             throw new Error("Invalid key on " + n.h);
         }
     }
@@ -277,7 +280,7 @@ function crypto_makeattr(n) {
     }
 
     return asmCrypto.AES_CBC.encrypt(ab,
-        a32_to_ab([n.k[0] ^ n.k[4], n.k[1] ^ n.k[5], n.k[2] ^ n.k[6], n.k[3] ^ n.k[7]]), false);
+        a32_to_ab([nn.k[0] ^ nn.k[4], nn.k[1] ^ nn.k[5], nn.k[2] ^ nn.k[6], nn.k[3] ^ nn.k[7]]), false);
 }
 
 // derived node attr directory

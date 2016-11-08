@@ -379,9 +379,9 @@
                     /*if (!isValidShareLink()) {
                         $('.fm-invalid-folder').removeClass('hidden');
                     }
-                    else {
+                    else*/ {
                         $('.fm-empty-folder-link').removeClass('hidden');
-                    }*/
+                    }
                 }
                 else if (M.currentdirid === M.RootID) {
                     $('.fm-empty-cloud').removeClass('hidden');

@@ -5047,10 +5047,6 @@
         "text": "File import failed",
         "context": "Message of the dialog displayed when fails the process\/request to import an image."
     },
-    "2508": {
-        "text": "File import failed",
-        "context": "Title of the dialog displayed when fails the process\/request to import an image - (String as short as possible)."
-    },
     "2531": {
         "text": "Save image to photos",
         "context": "Title of the dialog displayed when a user want to save a image to the 'saved pictures' album, asking for confirmation to do it - (String as short as possible)."
@@ -12940,8 +12936,8 @@
         "context": "An alert message which is shown when the user removes various items from the Offline section."
     },
     "8683": {
-        "text": "We were unable to import all the files, likely because some of them were taken down. The operation finished with %1 of %2 nodes successfully imported.",
-        "context": "An error shown when importing a folder link and some of the folder's files failed to import."
+        "text": "Not all of the files could be imported. This can happen if some of the files were taken down. The operation finished with %1 of %2 items imported successfully.",
+        "context": "An error which is shown when importing a folder link and some of the folder's files failed to import to the user's cloud drive."
     },
     "8684": {
         "text": "Send and close",

@@ -2379,7 +2379,7 @@ function MegaData()
                 M.addNode(u);
             }
             else {
-                console.log('something went wrong!', n.p, this.u[n.p]);
+                console.log('No user record for incoming share', n.p, this.u[n.p]);
             }
         }
 
@@ -2839,7 +2839,7 @@ function MegaData()
                     }, {
                 callback: function(res, ctx) {
                     if (res !== 0) {
-                        console.error('Failed to remove Rubbish node.', handle, res);
+                        console.error('Failed to delete node from rubbish bin', handle, res);
                     }
                     else {
                         var h = handle;
@@ -3796,7 +3796,7 @@ function MegaData()
             if (fmdb && !pfkey && !ignoreDB) {
                 if (!u_sharekeys[h]) {
                     if (d && !this.getNodeShare(h)) {
-                        console.warn('INVALID OPERATION -- No share key for handle "%s"', h);
+                        console.warn('No share key for node ' + h);
                     }
                 }
                 else {
@@ -3862,7 +3862,7 @@ function MegaData()
             var users = this.getNodeShareUsers(h, 'EXP');
 
             if (users.length) {
-                console.error('The node "' + h + '" still has shares on it!');
+                console.error('The node ' + h + ' still has shares on it!');
 
                 users.forEach(function(user) {
                     M.delNodeShare(h, user);
@@ -3951,8 +3951,7 @@ function MegaData()
         }
         else
         {
-            if (d)
-                console.log('MAKEDIR: TODO');
+            // FIXME: add support once available
         }
     }
 
@@ -4230,7 +4229,7 @@ function MegaData()
                 foreach(n);
 
                 if (!files.length) {
-                    console.error('No files...');
+                    console.error('No files');
                     return webdl();
                 }
 
@@ -5732,7 +5731,7 @@ function execsc() {
     do {
         if (!scq[scqtail] || !scq[scqtail][0] || (scq[scqtail][0].a == 't' && nodesinflight[scqtail])) {
             // scq ran empty - nothing to do for now
-            if (d) console.log((sccount-1) + " actionpacket(s) processed.");
+            if (d) console.log((sccount-1) + " SC command(s) processed.");
 
             // perform post-execution UI work
             if (newnodes.length && fminitialized) {
@@ -6549,7 +6548,7 @@ TreeFetcher.prototype.ok = function treefetcher_ok(ok) {
         workers[this.parentworker[ok.h] = this.getnextworker()].postMessage(ok);
     }
     else if (crypto_handleauthcheck(ok.h, ok.ha)) {
-        if (d) console.log("successfully decrypted sharekeys for " + ok.h);
+        if (d) console.log("Successfully decrypted sharekeys for " + ok.h);
         var key = decrypt_key(u_k_aes, base64_to_a32(ok.k));
         u_sharekeys[ok.h] = [key, new sjcl.cipher.aes(key)];
     }
@@ -7796,7 +7795,7 @@ function process_ok(ok, ignoreDB) {
 
 function processMCF(mcfResponse, ignoreDB) {
     if (megaChatIsDisabled) {
-        console.error('chat is disabled!');
+        console.error('Chat is disabled!');
         return;
     }
 

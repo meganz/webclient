@@ -5059,7 +5059,7 @@ function getGatewayName(gatewayId, gatewayOpt) {
                 (gatewayOpt.type === 'subgateway') ? gatewayOpt.gatewayName : gateways[gatewayId].name;
 
             // Direct reseller still requires the translation from above to be in its name
-            if (gatewayId === 15) {
+            if (gatewayId === 15 && gatewayOpt.type !== 'subgateway') {
                 gateways[gatewayId].displayName = gateways[gatewayId].displayName + " " + gatewayOpt.displayName;
             }
             else {

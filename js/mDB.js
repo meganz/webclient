@@ -90,40 +90,40 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
                             todrop.push(r[i]);
                         }
                     }
-                });
+                }).finally(function(){
+                    if (todrop.length) {
+                        console.log("Deleting obsolete DBs: " + todrop.join(', '));
+                    }
 
-                if (todrop.length) {
-                    console.log("Deleting obsolete DBs: " + todrop.join(', '));
-                }
-
-                fmdb.drop(todrop, function() {
-                    // start inter-tab heartbeat
-                    fmdb.beacon();
-                    fmdb.db = new Dexie('fm_' + fmdb.name);
-                    fmdb.db.version(1).stores(fmdb.schema);
-                    fmdb.db.open().then(function(){
-                        fmdb.get('_sn', function(r){
-                            if (!wipe && r[0] && r[0].length == 11) {
-                                console.log("DB sn: " + r[0]);
-                                result(r[0]);
-                            }
-                            else {
-                                if (d) console.log("No sn found in DB, wiping...");
-                                fmdb.db.delete().then(function(){
-                                    fmdb.db.open().then(function(){
-                                        result(false);
+                    fmdb.drop(todrop, function() {
+                        // start inter-tab heartbeat
+                        fmdb.beacon();
+                        fmdb.db = new Dexie('fm_' + fmdb.name);
+                        fmdb.db.version(1).stores(fmdb.schema);
+                        fmdb.db.open().then(function(){
+                            fmdb.get('_sn', function(r){
+                                if (!wipe && r[0] && r[0].length == 11) {
+                                    console.log("DB sn: " + r[0]);
+                                    result(r[0]);
+                                }
+                                else {
+                                    if (d) console.log("No sn found in DB, wiping...");
+                                    fmdb.db.delete().then(function(){
+                                        fmdb.db.open().then(function(){
+                                            result(false);
+                                        });
                                     });
-                                });
-                            }
+                                }
+                            });
+                        }).catch (Dexie.MissingAPIError, function (e) {
+                            fmdb.crashed = true;
+                            console.error("IndexedDB unavailable");
+                            result(false);
+                        }).catch (function (e) {
+                            fmdb.crashed = true;
+                            console.error(e);
+                            result(false);
                         });
-                    }).catch (Dexie.MissingAPIError, function (e) {
-                        fmdb.crashed = true;
-                        console.error("IndexedDB unavailable");
-                        result(false);
-                    }).catch (function (e) {
-                        fmdb.crashed = true;
-                        console.error(e);
-                        result(false);
                     });
                 });
             }

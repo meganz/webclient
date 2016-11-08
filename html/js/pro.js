@@ -569,7 +569,7 @@ function pro_continue()
         if (pro_paymentmethod === 'perfunctio') {
             cardDialog.init();
         }
-        else if (pro_paymentmethod === 'ecp') {
+        else if (pro_paymentmethod.indexOf('ecp') === 0) {
             addressDialog.init();
         }
         else if (pro_paymentmethod === 'voucher') {
@@ -693,7 +693,7 @@ function pro_pay() {
             }
 
             // If Ecomprocessing, send extra details
-            else if (pro_paymentmethod === 'ecp') {
+            else if (pro_paymentmethod.indexOf('ecp') === 0) {
                 pro_m = addressDialog.gatewayId;
                 extra = addressDialog.extraDetails;
             }
@@ -1126,7 +1126,7 @@ var proPage = {
             var lastPayment = alarm.planExpired.lastPayment;
             var gatewayId = lastPayment.gw;
 
-            // Get the gateway name, if it's an Astropay subgateway, then it will have it's own name
+            // Get the gateway name, if it's a subgateway, then it will have it's own name
             var gatewayInfo = getGatewayName(gatewayId);
             var extraData = (typeof lastPayment.gwd !== 'undefined') ? lastPayment.gwd : null;
             var gatewayName = (typeof lastPayment.gwd !== 'undefined') ? extraData.gwname : gatewayInfo.name;

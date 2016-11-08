@@ -14865,6 +14865,12 @@ body.key.ka .reg-st3-bandwidth, body.key.uk .reg-st3-bandwidth {
 .provider-icon.ecp {
     background-position: 0 -3540px;
 }
+.provider-icon.ecpVI {
+    background-position: 0 -3360px;
+}
+.provider-icon.ecpMC {
+    background-position: 0 -1980px;
+}
 .provider-icon.wiretransfer {
     background-position: 0 -3960px;
 }

@@ -80,33 +80,51 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
     else {
         try {
             if (!fmdb.db) {
-                // start inter-tab heartbeat
-                fmdb.beacon();
-                fmdb.db = new Dexie('fm_' + fmdb.name);
-                fmdb.db.version(1).stores(fmdb.schema);
-                fmdb.db.open().then(function(){
-                    fmdb.get('_sn', function(r){
-                        if (!wipe && r[0] && r[0].length == 11) {
-                            console.log("DB sn: " + r[0]);
-                            result(r[0]);
+                var todrop = [];
+
+                // enumerate databases and collect those not prefixed with fm_
+                // (which is the current format)
+                Dexie.getDatabaseNames(function(r) {
+                    for (var i = r.length; i--; ) {
+                        if (r[i].substr(0,3) != 'fm_') {
+                            todrop.push(r[i]);
                         }
-                        else {
-                            if (d) console.log("No sn found in DB, wiping...");
-                            fmdb.db.delete().then(function(){
-                                fmdb.db.open().then(function(){
-                                    result(false);
+                    }
+                });
+
+                if (todrop.length) {
+                    console.log("Deleting obsolete DBs: " + todrop.join(', '));
+                }
+
+                fmdb.drop(todrop, function() {
+                    // start inter-tab heartbeat
+                    fmdb.beacon();
+                    fmdb.db = new Dexie('fm_' + fmdb.name);
+                    fmdb.db.version(1).stores(fmdb.schema);
+                    fmdb.db.open().then(function(){
+                        fmdb.get('_sn', function(r){
+                            if (!wipe && r[0] && r[0].length == 11) {
+                                console.log("DB sn: " + r[0]);
+                                result(r[0]);
+                            }
+                            else {
+                                if (d) console.log("No sn found in DB, wiping...");
+                                fmdb.db.delete().then(function(){
+                                    fmdb.db.open().then(function(){
+                                        result(false);
+                                    });
                                 });
-                            });
-                        }
+                            }
+                        });
+                    }).catch (Dexie.MissingAPIError, function (e) {
+                        fmdb.crashed = true;
+                        console.error("IndexedDB unavailable");
+                        result(false);
+                    }).catch (function (e) {
+                        fmdb.crashed = true;
+                        console.error(e);
+                        result(false);
                     });
-                }).catch (Dexie.MissingAPIError, function (e) {
-                    fmdb.crashed = true;
-                    console.error("IndexedDB unavailable");
-                    result(false);
-                }).catch (function (e) {
-                    fmdb.crashed = true;
-                    console.error(e);
-                    result(false);
                 });
             }
         }
@@ -118,6 +136,25 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
         }
     }
 };
+
+// drop databases
+FMDB.prototype.drop = function fmdb_drop(dbs, cb) {
+    if (!dbs || !dbs.length) {
+        cb();
+    }
+    else {
+        var fmdb = this;
+        var db = dbs.pop();
+
+        (new Dexie(db)).delete().then(function(){
+            console.log("Deleted IndexedDB " + db);
+        }).catch(function(err){
+            console.error("Unable to delete IndexedDB " + db, err);
+        }).finally(function(){
+            fmdb.drop(dbs, cb);
+        });
+    }
+}
 
 // enqueue a table write - type 0 == addition, type 1 == deletion
 // IndexedDB activity is triggered once we have at least 1000 pending rows or the sn

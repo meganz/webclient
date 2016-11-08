@@ -415,7 +415,7 @@ var ulmanager = {
             if (dir) {
                 var sn = fm_getsharenodes(dir);
                 if (sn.length) {
-                    req.cr = crypto_makecr([file.filekey], sn, false);
+                    req.cr = crypto_makecr([n], sn, false);
                     req.cr[1][0] = file.response;
                 }
             }

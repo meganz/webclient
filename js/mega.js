@@ -3248,12 +3248,7 @@ function MegaData()
         var s = fm_getsharenodes(t);
 
         if (s.length) {
-            var mn = [];
-            for (var i = 0; i < a.length; i++) {
-                mn.push(a[i].k);
-            }
-
-            ops.cr = crypto_makecr(mn, s, false);
+            ops.cr = crypto_makecr(a, s, false);
         }
 
         if (importNodes) {
@@ -7071,7 +7066,7 @@ function fm_getcopynodes(cn, t)
 
                 // copied folders receive a new random key
                 // copied files must retain their existing key
-                nn.k = n.t ? false : n.k;
+                if (!n.t) nn.k = n.k;
 
                 // new node inherits all attributes
                 nn.a = ab_to_base64(crypto_makeattr(n, nn));
@@ -7181,7 +7176,7 @@ function createFolder(toid, name, ulparams) {
         sn = fm_getsharenodes(toid);
 
     if (sn.length) {
-        req.cr = crypto_makecr([n.k], sn, false);
+        req.cr = crypto_makecr([n], sn, false);
         req.cr[1][0] = 'xxxxxxxx';
     }
 

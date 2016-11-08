@@ -817,11 +817,13 @@ var crypt = (function () {
      *     Convert cleartext from UTF-8 to unicode after decryption
      *     (default: false).
      * @return {String}
-     *     Decrypted clear text.
+     *     Decrypted clear text or false in case of an error
      */
     ns.rsaDecryptString = function(ciphertext, privkey, utf8convert) {
 
         var cleartext = crypto_rsadecrypt(ciphertext, privkey);
+        if (cleartext === false) return false;
+
         var length = (cleartext.charCodeAt(0) << 8) | cleartext.charCodeAt(1);
         cleartext = cleartext.substring(2, length + 2);
 
@@ -3601,22 +3603,21 @@ function api_pfaerror(handle) {
 
 // generate crypto request response for the given nodes/shares matrix
 function crypto_makecr(source, shares, source_is_nodes) {
-    var i, j, n, nk;
+    var nk;
     var cr = [shares, [], []];
-    var aes;
 
-    // if we have node handles, include in cr - otherwise, we have node keys
+    // if we have node handles, include in cr - otherwise, we have nodes
     if (source_is_nodes) {
         cr[1] = source;
     }
 
     // TODO: optimize - keep track of pre-existing/sent keys, only send new ones
-    for (i = shares.length; i--;) {
+    for (var i = shares.length; i--;) {
         if (u_sharekeys[shares[i]]) {
-            aes = u_sharekeys[shares[i]][1];
+            var aes = u_sharekeys[shares[i]][1];
 
-            for (j = source.length; j--;) {
-                if (source_is_nodes ? (nk = M.d[source[j]].k) : (nk = source[j])) {
+            for (var j = source.length; j--;) {
+                if (source_is_nodes ? (nk = M.d[source[j]].k) : (nk = source[j].k)) {
                     if (nk.length === 8 || nk.length === 4) {
                         cr[2].push(i, j, a32_to_base64(encrypt_key(aes, nk)));
                     }
@@ -3624,6 +3625,7 @@ function crypto_makecr(source, shares, source_is_nodes) {
             }
         }
     }
+
     return cr;
 }
 

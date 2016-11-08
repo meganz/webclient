@@ -1482,7 +1482,9 @@ function api_setfolder(h) {
     apixs[1].sid = h;
     apixs[1].failhandler = folderreqerr;
     apixs[2].sid = h;
+    apixs[2].failhandler = folderreqerr;
     apixs[5].sid = h + "&ec";
+    apixs[5].failhandler = folderreqerr;
 }
 
 function stopapi() {
@@ -1597,12 +1599,10 @@ function api_proc(q) {
                     progressPercent = evt.loaded / bytes * 100;
                 }
 
-                var ctxs = this.q.ctxs[this.q.i];
-                for (var i = ctxs.length; i--; ) {
-                    var ctx = ctxs[i];
-                    if (typeof ctx.progress == 'function') {
-                        ctx.progress(progressPercent, ctx.buffer && this.responseText, ctx, this);
-                    }
+                // no command aggregation supported in live-progress channels
+                var ctx = this.q.ctxs[this.q.i][0];
+                if (typeof ctx.progress == 'function') {
+                    ctx.progress(progressPercent, ctx.buffer && (this.responseText || this.response), ctx, this);
                 }
             };
             break;
@@ -1617,6 +1617,25 @@ function api_proc(q) {
             if (status === 200) {
                 var response = this.responseText || this.response;
 
+                if (typeof this.onprogress == 'function') {
+                    if (response[0] == '-') {
+                        api_reqerror(this.q, response, status);
+                        return;
+                    }
+                    else {
+                        var ctx = this.q.ctxs[this.q.i][0];
+
+                        // response complete - re-convey in full, just in case
+                        // onprogress wasn't called with the final buffer
+                        if (typeof ctx.progress == 'function') {
+                            ctx.progress(100, ctx.buffer && response, ctx, this);
+                        }
+
+                        // and get the channel ready for the next request
+                        return api_ready(this.q);
+                    }
+                }
+
                 if (d) {
                     if (d > 1 || !window.chrome || String(response).length < 512) {
                         logger.debug('API response: ', response);
@@ -1627,13 +1646,6 @@ function api_proc(q) {
                 }
 
                 try {
-                    if (typeof this.onprogress == 'function') {
-                        // we assume that the client has already performed the full
-                        // response processing in .progress(), so all it gets here
-                        // is an empty object, unless there was a request-level error
-                        if (response[0] == '[' || response[0] == '{') response = '[]';
-                    }
-
                     t = JSON.parse(response);
                     if (response[0] == '{') {
                         t = [t];
@@ -1662,11 +1674,8 @@ function api_proc(q) {
                     }
                 }
 
-                this.q.rawreq = false;
-                this.q.backoff = 0; // request succeeded - reset backoff timer
-                this.q.cmds[this.q.i] = [];
-                this.q.ctxs[this.q.i] = [];
-
+                // reset state for next request
+                api_ready(this.q);
                 api_proc(this.q);
             }
             else {
@@ -1707,7 +1716,7 @@ function api_send(q) {
 }
 
 function api_reqerror(q, e, status) {
-    if (e === EAGAIN || e === ERATELIMIT) {
+    if (e == EAGAIN || e == ERATELIMIT) {
         // request failed - retry with exponential backoff
         if (q.backoff) {
             q.backoff *= 2;
@@ -1728,7 +1737,7 @@ function api_reqerror(q, e, status) {
     }
 
     if (mega.flags & window.MEGAFLAG_LOADINGCLOUD) {
-        if (status === true && e === EAGAIN) {
+        if (status === true && e == EAGAIN) {
             mega.loadReport.EAGAINs++;
         }
         else if (status === 500) {
@@ -1738,6 +1747,14 @@ function api_reqerror(q, e, status) {
             mega.loadReport.errs++;
         }
     }
+}
+
+function api_ready(q)
+{
+    q.rawreq = false;
+    q.backoff = 0; // request succeeded - reset backoff timer
+    q.cmds[q.i] = [];
+    q.ctxs[q.i] = [];
 }
 
 var apiFloorCap = 3000;

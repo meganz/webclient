@@ -6499,6 +6499,11 @@ TreeFetcher.prototype.fetch = function treefetcher_fetch(force) {
         ctx : this,
         buffer : true,
         progress: function(perc, buffer, ctx, xhr) {
+            // ignore API request error responses
+            if (buffer[0] == '-') {
+                return;
+            }
+
             loadingInitDialog.step2(parseInt(perc));    // FIXME: make generic
 
             if (perc > 99) {
@@ -7825,7 +7830,7 @@ function processMCF(mcfResponse, ignoreDB) {
     }
 }
 
-function folderreqerr(c, e)
+function folderreqerr()
 {
     loadingDialog.hide();
     msgDialog('warninga', l[1043], l[1044] + '<ul><li>' + l[1045] + '</li><li>' + l[247] + '</li><li>' + l[1046] + '</li>', false, function()
@@ -7894,6 +7899,11 @@ function init_chat() {
 }
 
 function loadfm_callback(res) {
+    if (res[0] == '-') {
+        msgDialog('warninga', l[1311], "Sorry, we were unable to retrieve the Cloud Drive contents.", api_strerror(res));
+        return;
+    }
+
     loadingInitDialog.step3();
 
     mega.loadReport.recvNodes     = Date.now() - mega.loadReport.stepTimeStamp;
@@ -7902,11 +7912,6 @@ function loadfm_callback(res) {
     if (pfkey) {
         folderlink = pfid;
     }
-
-/*    if (typeof res === 'number') {
-        msgDialog('warninga', l[1311], "Sorry, we were unable to retrieve the Cloud Drive contents.", api_strerror(res));
-        return;
-    }*/
 
     if (res.noc) {
         mega.loadReport.noc = res.noc;

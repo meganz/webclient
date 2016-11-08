@@ -633,6 +633,9 @@ ChatRoom.prototype.leave = function(triggerLeaveRequest) {
 
             return self.megaChat.karere.leaveChat(self.roomJid).done(function () {
                 self.setState(ChatRoom.STATE.LEFT);
+                if (triggerLeaveRequest === true) {
+                    self.destroy();
+                }
             });
         }
         else {

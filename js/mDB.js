@@ -102,9 +102,11 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
                 }).catch (Dexie.MissingAPIError, function (e) {
                     fmdb.crashed = true;
                     console.error("IndexedDB unavailable");
+                    result(false);
                 }).catch (function (e) {
                     fmdb.crashed = true;
                     console.error(e);
+                    result(false);
                 });
             }
         }

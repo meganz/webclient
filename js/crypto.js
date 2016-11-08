@@ -1769,14 +1769,14 @@ function api_retry() {
 }
 
 function api_reqfailed(c, e) {
-    if (e === ESID) {
+    if (e == ESID) {
         u_logout(true);
         Soon(function() {
             showToast('clipboard', l[19]);
         });
         document.location.hash = 'login';
     }
-    else if (c === 2 && e === ETOOMANY) {
+    else if (c == 2 && e == ETOOMANY) {
         loadfm.loaded = false;
         loadfm.loading = false;
 
@@ -1792,9 +1792,8 @@ function api_reqfailed(c, e) {
 
         loadfm(true);
     }
-
-    // If suspended account
-    else if (e === EBLOCKED) {
+    // if suspended account
+    else if (e == EBLOCKED) {
         var queue = apixs[c];
         queue.rawreq = false;
         queue.cmds = [[], []];

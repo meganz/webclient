@@ -2332,10 +2332,25 @@ function fmremove() {
                                 // Remove regular/full share
                                 for (var share in Object(M.d[dirTree[selection]]).shares) {
                                     if (M.d[dirTree[selection]].shares.hasOwnProperty(share)) {
-                                        api_req({ a: 's2', n:  dirTree[selection], s: [{ u: M.d[dirTree[selection]].shares[share].u, r: ''}], ha: '', i: requesti });
-                                        // must not delete share before API responds
-                                        //M.delNodeShare(dirTree[selection], M.d[dirTree[selection]].shares[share].u);
-                                        setLastInteractionWith(dirTree[selection], "0:" + unixtime());
+                                        api_req({ a: 's2',
+                                                  n:  dirTree[selection],
+                                                  s: [{ u: M.d[dirTree[selection]].shares[share].u, r: ''}],
+                                                  ha: '',
+                                                  i: requesti
+                                                }, {
+                                                  selection: selection,
+                                                  share: share,
+                                                  callback: function(res, ctx) {
+                                                        if (typeof res == 'object') {
+                                                            // FIXME: verify error codes in res.r
+                                                            M.delNodeShare(dirTree[ctx.selection], M.d[dirTree[ctx.selection]].shares[ctx.share].u);
+                                                            setLastInteractionWith(dirTree[ctx.selection], "0:" + unixtime());
+                                                        }
+                                                        else {
+                                                            // FIXME: display error to user
+                                                        }
+                                                    }
+                                                });
                                     }
                                 }
 
@@ -2347,9 +2362,19 @@ function fmremove() {
                                         api_req({
                                             a: 's2', n: dirTree[selection],
                                             s: [{u: userEmailOrID, r: ''}], ha: '', i: requesti
+                                        }, {
+                                            selection: selection,
+                                            pendingUserId: pendingUserId,
+                                            callback: function(res, ctx) {
+                                                if (typeof res == 'object') {
+                                                    // FIXME: verify error codes in res.r
+                                                    M.deletePendingShare(dirTree[ctx.selection], ctx.pendingUserId);
+                                                }
+                                                else {
+                                                    // FIXME: display error to user
+                                                }
+                                            }
                                         });
-
-                                        M.deletePendingShare(dirTree[selection], pendingUserId);
                                     }
                                 }
                             }

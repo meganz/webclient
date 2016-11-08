@@ -4831,8 +4831,6 @@ if (typeof sjcl !== 'undefined') {
 
                             // If it was a user handle, the share is a full share
                             if (M.u[ctx.handleOrEmail]) {
-                                // FIXME: remove dead code
-                                //userEmail = M.u[ctx.handleOrEmail].m;
                                 M.delNodeShare(ctx.selectedNodeHandle, ctx.handleOrEmail);
                                 setLastInteractionWith(ctx.handleOrEmail, "0:" + unixtime());
 

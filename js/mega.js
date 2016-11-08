@@ -184,10 +184,11 @@ var MEGA_USER_STRUCT = {
 
 function MegaData()
 {
-    this.h = {};
-    this.csortd = -1;
-    this.csort = 'name';
-    this.tfsdomqueue = {};
+    this.h               = {};
+    this.csortd          = -1;
+    this.csort           = 'name';
+    this.tfsdomqueue     = {};
+    this.copynodeswaiter = {};
 
     this.reset = function()
     {
@@ -3168,16 +3169,22 @@ function MegaData()
     };
 
     /**
-     * @param {Array} cn                Array of nodes that needs to be copied
-     * @param {String} t                Destination node
-     * @param {Bool} del                Should we delete the node after copying? (Like a move operation)
-     * @param {Callback} callback       Callback function
-     * @param {Callback} callbackError  Callback function for custom errors handling (Optional)
+     * @param {Array}       cn            Array of nodes that needs to be copied
+     * @param {String}      t             Destination node
+     * @param {Boolean}     del           Should we delete the node after copying? (Like a move operation)
+     * @param {MegaPromise} promise       promise to notify completion on (Optional)
      */
-    this.copyNodes = function(cn, t, del, callback, callbackError) {
+    this.copyNodes = function(cn, t, del, promise) {
+        if (typeof promise === 'function') {
+            var tmp = promise;
+            promise = new MegaPromise();
+            promise.always(tmp);
+        }
+
         if ($.onImportCopyNodes && t.length === 11) {
             msgDialog('warninga', l[135], 'Operation not permitted.');
-            return false;
+            promise.reject(EARGS);
+            return promise;
         }
 
         loadingDialog.show();
@@ -3186,30 +3193,54 @@ function MegaData()
             var keyCachePromise = api_cachepubkeys([t]);
             keyCachePromise.always(function _cachepubkeyscomplete() {
                 if (u_pubkeys[t]) {
-                    M.copyNodes(cn, t, del, callback, callbackError);
+                    M.copyNodes(cn, t, del, promise);
                 }
                 else {
                     loadingDialog.hide();
                     alert(l[200]);
+
+                    // XXX: remove above alert() if promise is set?
+                    if (promise) {
+                        promise.reject(EKEY);
+                    }
                 }
             });
 
-            return false;
+            return promise;
         }
 
         var a = this.isFileNode(cn) ? [cn] : ($.onImportCopyNodes || fm_getcopynodes(cn, t));
         var importNodes = Object(a).length;
+        var nodesCount;
         var sconly = importNodes > 10;   // true -> new nodes delivered via SC `t` command only
         var ops = {a: 'p', t: t, n: a}; // FIXME: deploy API-side sn check
 
+        var onCopyNodesDone = function() {debugger;
+            loadingDialog.hide();
+            if (promise) {
+                promise.resolve(0);
+            }
+            if (!sconly) {
+                renderNew();
+            }
+
+            if (importNodes && nodesCount < importNodes) {
+                msgDialog('warninga', l[882],
+                    (nodesCount ? l[8683] : l[2507])
+                        .replace('%1', nodesCount)
+                        .replace('%2', importNodes)
+                );
+            }
+        };
+
         if (sconly) {
-            // set version and no requesti
             ops.v = 3;
+            ops.i = mRandomToken('pn');
+            M.copynodeswaiter[ops.i] = onCopyNodesDone;
         }
         else {
-            // set no version, but requesti
-            // FIXME: set v = 2 and check for node errors, warn user
-            ops[i] = requesti;
+            ops.v = 2;
+            ops.i = requesti;
         }
 
         var s = fm_getsharenodes(t);
@@ -3233,34 +3264,16 @@ function MegaData()
             t: t,
             sconly: sconly,
             callback: function(res, ctx) {
-                function onCopyNodesDone() {
-                    loadingDialog.hide();
-                    if (callback) {
-                        callback(res);
-                    }
-                    renderNew();
-
-                    if (importNodes && nodesCount < importNodes) {
-                        msgDialog('warninga', l[882],
-                            l[8683]
-                                .replace('%1', nodesCount)
-                                .replace('%2', importNodes)
-                        );
-                    }
-                }
-
-                var nodesCount;
 
                 if (typeof res === 'number' && res < 0) {
                     loadingDialog.hide();
-                    if (typeof callbackError === "function") {
-                        return callbackError(res);
+                    if (promise) {
+                        return promise.reject(res);
                     }
                     return msgDialog('warninga', l[135], l[47], api_strerror(res));
                 }
 
                 if (ctx.del) {
-                    var j = [];
                     for (var i in ctx.cn) {
                         M.delNode(ctx.cn[i], true); // must not update DB pre-API
                         if (!ctx.sconly || !res[i]) {
@@ -3270,17 +3283,7 @@ function MegaData()
                 }
 
                 if (ctx.sconly) {
-                    // FIXME: call callback after receipt of the corresponding SC packet
-                    loadingDialog.hide();
-
-                    nodesCount = Object.keys(res).length;
-                    if (nodesCount) {
-                        msgDialog('warninga', l[882],
-                            l[8683]
-                                .replace('%1', importNodes-nodesCount)
-                                .replace('%2', importNodes)
-                        );
-                    }
+                    nodesCount = importNodes - Object.keys(res).length;
                 }
                 else {
                     newnodes = [];
@@ -3299,6 +3302,8 @@ function MegaData()
                 }
             }
         });
+
+        return promise;
     };
 
     this.moveNodes = function(n, t) {
@@ -6084,6 +6089,11 @@ function execsc() {
                     trights = false;
 
                     for (i = 0; i < scnodes.length; i++) M.addNode(scnodes[i]);
+
+                    if (typeof M.copynodeswaiter[a.i] === 'function') {
+                        M.copynodeswaiter[a.i](scnodes);
+                        delete M.copynodeswaiter[a.i];
+                    }
                     break;
 
                 case 'u':

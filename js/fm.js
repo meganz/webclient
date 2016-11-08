@@ -608,18 +608,20 @@ function initUI() {
                 $.copyids = ids;
                 $.copyt = t;
                 setTimeout(function() {
-                    M.copyNodes($.copyids, $.copyt, (dd === 'copydel'), function() {
+                    M.copyNodes($.copyids, $.copyt, (dd === 'copydel'), new MegaPromise())
+                        .done(function() {
 
-                        // Update files count...
-                        if (M.currentdirid === 'shares' && !M.viewmode) {
-                            M.openFolder('shares', 1);
-                        }
-                    }, function(error) {
-                        if (error === EOVERQUOTA) {
-                            return msgDialog('warninga', l[135], l[8435]);
-                        }
-                        return msgDialog('warninga', l[135], l[47], api_strerror(error));
-                    });
+                            // Update files count...
+                            if (M.currentdirid === 'shares' && !M.viewmode) {
+                                M.openFolder('shares', 1);
+                            }
+                        })
+                        .fail(function(error) {
+                            if (error === EOVERQUOTA) {
+                                return msgDialog('warninga', l[135], l[8435]);
+                            }
+                            return msgDialog('warninga', l[135], l[47], api_strerror(error));
+                        });
                 }, 50);
             }
             else if (dd === 'download') {

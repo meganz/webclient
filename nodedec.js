@@ -96,6 +96,7 @@ if (typeof importScripts !== 'undefined') {
     };
 }
 
+var u_k;
 var u_handle;
 var u_privk;
 var u_k_aes;

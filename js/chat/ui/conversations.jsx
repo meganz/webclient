@@ -483,7 +483,7 @@ var ConversationsApp = React.createClass({
 
         return (
             <div className="conversationsApp" key="conversationsApp">
-                <div className="fm-left-panel" style={leftPanelStyles}>
+                <div className="fm-left-panel chat-left-panel" style={leftPanelStyles}>
                     <div className="left-pane-drag-handle"></div>
 
                     <div className="fm-left-menu conversations">

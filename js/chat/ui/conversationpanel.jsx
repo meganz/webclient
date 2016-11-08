@@ -1784,6 +1784,7 @@ var ConversationPanel = React.createClass({
                                 chatRoom={self.props.chatRoom}
                                 className="main-typing-area"
                                 disabled={room.isReadOnly()}
+                                persist={true}
                                 onUpEditPressed={() => {
                                     var foundMessage = false;
                                     room.messagesBuff.messages.keys().reverse().forEach(function(k) {
@@ -1936,7 +1937,8 @@ var ConversationPanels = React.createClass({
             var contactsList = [];
             var contactsListOffline = [];
 
-            var hadLoaded = ChatdIntegration.mcfHasFinishedPromise.state() === 'resolved';
+            var hadLoaded = ChatdIntegration.allChatsHadLoaded.state() !== 'pending' &&
+                ChatdIntegration.mcfHasFinishedPromise.state() !== 'pending';
 
             if (hadLoaded) {
                 self.props.contacts.forEach(function (contact) {

@@ -111,6 +111,14 @@ function doConfirm(email, password, callback) {
                             ctx.callback2();
                         }
                     }
+                    else if ((typeof res === 'number') && (res === -11)) {
+                        if (u_type === 0) {// Ephemeral session
+                            msgDialog("warninga", l[2480], l[12439]);
+                        }
+                        else {
+                            msgDialog("warninga", l[2480], l[12440]);
+                        }
+                    }
                     else {
                         alert(l[200]);
                     }

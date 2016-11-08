@@ -589,6 +589,16 @@ function populate_l() {
     l[10650] = l[10650].replace('[A]', '<a href="#account">').replace('[/A]', '</a>');
     l[10656] = l[10656].replace('[A]', '<a href="mailto:support@mega.nz">').replace('[/A]', '</a>');
     l[10658] = l[10658].replace('[A]', '<a href="#terms">').replace('[/A]', '</a>');
+    l[12482] = l[12482].replace('[B]', '<b>').replace('[/B]', '</b>');
+    l[12483] = l[12483].replace('[BR]', '<br>');
+    l[12485] = l[12485].replace('[A1]', '<a href="" class="red mac">').replace('[/A1]', '</a>');
+    l[12485] = l[12485].replace('[A2]', '<a href="" class="red linux">').replace('[/A2]', '</a>');
+    l[12486] = l[12486].replace('[A1]', '<a href="" class="red windows">').replace('[/A1]', '</a>');
+    l[12486] = l[12486].replace('[A2]', '<a href="" class="red mac">').replace('[/A2]', '</a>');
+    l[12487] = l[12487].replace('[A1]', '<a href="" class="red windows">').replace('[/A1]', '</a>');
+    l[12487] = l[12487].replace('[A2]', '<a href="" class="red linux">').replace('[/A2]', '</a>');
+    l[7400] = l[7400].replace('[A]', '<a>').replace('[/A]', '</a>').replace('[BR]', '<br>');
+    l[12489] = l[12489].replace('[I]', '<i>').replace('[/I]', '</i>').replace('[I]', '<i>').replace('[/I]', '</i>');
 
     l['year'] = new Date().getFullYear();
     date_months = [
@@ -1463,23 +1473,6 @@ function createTimeoutPromise(validateFunction, tick, timeout,
     }
 
     return $promise;
-}
-
-/**
- * Simple .toArray method to be used to convert `arguments` to a normal JavaScript Array
- *
- * Please note there is a huge performance degradation when using `arguments` outside their
- * owning function, to mitigate it use this function as follow: toArray.apply(null, arguments)
- *
- * @returns {Array}
- */
-function toArray() {
-    var len = arguments.length;
-    var res = Array(len);
-    while (len--) {
-        res[len] = arguments[len];
-    }
-    return res;
 }
 
 /**
@@ -3489,6 +3482,7 @@ mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
         ulmanager.isUploading = false;
         ASSERT(ulQueue._running === 0, 'ulQueue._running inconsistency on completion');
         ulQueue._pending = [];
+        ulQueue.setSize((fmconfig.ul_maxSlots | 0) || 4);
     }
     if (!dl_queue.some(isQueueActive)) {
         dl_queue = new DownloadQueue();
@@ -3510,7 +3504,9 @@ mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
         M.tfsdomqueue = {};
         GlobalProgress = {};
         delete $.transferprogress;
-        fm_tfsupdate();
+        if (page !== 'download') {
+            fm_tfsupdate();
+        }
         if ($.mTransferAnalysis) {
             clearInterval($.mTransferAnalysis);
             delete $.mTransferAnalysis;
@@ -3523,8 +3519,9 @@ mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
         dlmanager.logger.info("resetUploadDownload", ul_queue.length, dl_queue.length);
     }
 
-    fm_tfsupdate();
-    Later(percent_megatitle);
+    if (page === 'download') {
+        delay('percent_megatitle', percent_megatitle);
+    }
 };
 
 /**
@@ -4482,6 +4479,10 @@ var watchdog = Object.freeze({
                     var chatRoom = megaChat.plugins.chatdIntegration._getChatRoomFromEventData(strg.data);
                     megaChat.plugins.chatdIntegration.discardMessage(chatRoom, strg.data.messageId);
                 }
+                break;
+
+            case 'idbchange':
+                mBroadcaster.sendMessage('idbchange:' + strg.data.name, [strg.data.key, strg.data.value]);
                 break;
         }
 

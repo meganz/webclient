@@ -1333,6 +1333,9 @@ a.account-manage-button:hover {
     font-size: 17px;
     color: white;
 }
+.slider-percentage span.warn {
+    color: #FF0000;
+}
 .slider-percentage-info {
     font-size: 12px;
     line-height: 17px;
@@ -7093,16 +7096,17 @@ table {
     height: -moz-calc(100% - 24px);
     height: calc(100% - 24px);
     width: 100% !important;
+    position: relative !important;
 }
 .fm-right-files-block, .fm-right-account-block {
     height: 100%;
     margin-left: 304px;
     position: relative;
 }
-.fm-right-header, .fm-tranfers-header {
+.fm-right-header, .fm-transfers-header {
     padding-right: 8px;
 }
-.fm-right-header, .new-notification-top, .fm-tranfers-header {
+.fm-right-header, .new-notification-top, .fm-transfers-header {
     height: 48px;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -8832,7 +8836,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     box-sizing: border-box;
     padding: 0 36px;
 }
-.bitcoin-invoice-dialog .price-expired-instruction span {
+.bitcoin-invoice-dialog .price-expired-instruction b {
     font-family: 'source_sans_prosemibold', Arial;
     text-transform: uppercase;
 }
@@ -8959,8 +8963,8 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     font-size: 14px;
     padding: 10px 30px 30px 30px;
 }
-.fm-dialog.bitcoin-provider-failure-dialog .instruction span {
-    font-weight: bold;
+.fm-dialog.bitcoin-provider-failure-dialog .instruction b {
+    font-family: 'source_sans_prosemibold', Arial;
     text-transform: uppercase;
 }
 .fm-dialog.reset-success-st2 {

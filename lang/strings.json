@@ -543,6 +543,10 @@
         "text": "Copyright warning",
         "context": ""
     },
+    "367": {
+        "text": "MEGA respects the copyrights of others and requires that users of the MEGA cloud service comply with the laws of copyright. You are strictly prohibited from using the MEGA cloud service to infringe copyrights. You may not upload, download, store, share, display, stream, distribute, e-mail, link to, transmit or otherwise make available any files, data, or content that infringes any copyright or other proprietary rights of any person or entity.",
+        "context": ""
+    },
     "368": {
         "text": "Caution:",
         "context": ""
@@ -622,6 +626,14 @@
     "399": {
         "text": "Contact Us",
         "context": ""
+    },
+    "401": {
+        "text": "Sharing",
+        "context": "Sub category of the help section"
+    },
+    "403": {
+        "text": "Account",
+        "context": "Sub category of the help section"
     },
     "408": {
         "text": "January",
@@ -4243,16 +4255,92 @@
         "text": "You are currently logged in. Would you like to log out and register a new account?",
         "context": "Confirmation message, that we show when the user clicks an invite link to register a new account while the user is logged in."
     },
+    "1825": {
+        "text": "What is MEGAsync?",
+        "context": ""
+    },
+    "1827": {
+        "text": "How do I install MEGAsync?",
+        "context": ""
+    },
     "1828": {
         "text": "Go to the [A]download page[\/A] and follow the instructions. During the installation, you will be asked to enter or create your MEGA account and to set up the folders to replicate (either your full MEGA cloud drive and folder structure to a single local folder location or specific subfolders in your cloud drive to corresponding local folders). After the installation completes, MEGAsync will start automatically. You will see a clickable MEGA logo in your system tray or menu bar while the sync tool is running that gives you access to a status popup and the settings page.",
+        "context": ""
+    },
+    "1829": {
+        "text": "Can I use MEGAsync on multiple computers?",
+        "context": ""
+    },
+    "1831": {
+        "text": "How can I monitor the sync status of my local files and folders?",
+        "context": ""
+    },
+    "1833": {
+        "text": "MEGAsync stores my login credentials to perform autologin. Isn't that a security concern?",
         "context": ""
     },
     "1838": {
         "text": "On the cloud side, deleted files will be moved to a special \"SyncDebris\" subfolder structure in your rubbish bin and can be retrieved from there (use MEGA's built-in search if needed). On the local computer, each sync's root folder will have a hidden \"Debris\" or \".rubbish\" folder in which deleted items are placed.",
         "context": ""
     },
+    "1839": {
+        "text": "Does MEGAsync perform explicit file versioning?",
+        "context": "e.g. when a user updates a file (a partial write operation), the user would have the ability to go back in time and reverse the operation, which is currently not supported by MEGA"
+    },
+    "1840": {
+        "text": "No. However, you can access overwritten files in the respective debris folders until they are purged.",
+        "context": ""
+    },
+    "1841": {
+        "text": "Does MEGAsync support modifying existing files?",
+        "context": ""
+    },
+    "1845": {
+        "text": "Are there any restrictions with regards to filenames?",
+        "context": ""
+    },
+    "1849": {
+        "text": "How can I make sure that I always have the latest version of MEGAsync?",
+        "context": ""
+    },
+    "1851": {
+        "text": "Will MEGAsync use peer-to-peer transfers to achieve faster syncing between computers in the same local area network?",
+        "context": ""
+    },
+    "1852": {
+        "text": "No. The current incarnation of MEGAsync always syncs via MEGA's cloud infrastructure.",
+        "context": ""
+    },
+    "1853": {
+        "text": "What happens if conflicting concurrent actions are performed on clients synced to the same cloud location?",
+        "context": ""
+    },
+    "1854": {
+        "text": "The current version of MEGAsync does not resolve such clashes in a deterministic manner. Avoid them if possible.",
+        "context": ""
+    },
+    "1856": {
+        "text": "No. Do not expect these to be replicated to the cloud.",
+        "context": ""
+    },
+    "1857": {
+        "text": "Does MEGAsync support syncing the same local folder to different remote locations or the same remote folder to different local locations?",
+        "context": ""
+    },
+    "1858": {
+        "text": "No, unless you want to run multiple MEGAsync processes in parallel, which is not recommended. As a general rule, each filesystem item must only be visible to MEGAsync once, so avoid syncing subfolders of synced folders or placing multiple links to the same filesystem item in a local synced folder.",
+        "context": "Whether you can sync one local folder to multiple remote folders, which is not possible. Each local folder can only be synced to one remote folder"
+    },
+    "1859": {
+        "text": "Where can I find your iOS app?",
+        "context": ""
+    },
     "1860": {
         "text": "You can download and install our iOS app on the [A]App Store[\/A].",
+        "context": ""
+    },
+    "1861": {
+        "text": "Where can I find your Android app?",
         "context": ""
     },
     "1862": {
@@ -4325,6 +4413,10 @@
     },
     "1885": {
         "text": "%1 folders weren't uploaded because they are extremely large. We do this check to prevent the uploading of entire boot volumes, which is inefficient and dangerous.",
+        "context": ""
+    },
+    "1886": {
+        "text": "I am trying to rename a local folder in Explorer, but the name of the corresponding folder in my cloud drive stays the same, no matter what I do.",
         "context": ""
     },
     "1888": {
@@ -4687,6 +4779,10 @@
         "text": "or [A]create an account[\/A]",
         "context": "New link on the login page, to make it easier for users without an account to find the registration page if they ever end up on the login page."
     },
+    "1995": {
+        "text": "I just remembered the password of my old account after performing a password reset. How do I get my data back?",
+        "context": "Help section question"
+    },
     "1996": {
         "text": "If less than 60 days have passed since you parked your old account, your data can be recovered. Please contact [A]support@mega.nz[\/A] for assistance.",
         "context": "Help section answer. Please put the [A] & [\/A] tag appropriately in the translation."
@@ -4950,10 +5046,6 @@
     "2507": {
         "text": "File import failed",
         "context": "Message of the dialog displayed when fails the process\/request to import an image."
-    },
-    "2508": {
-        "text": "File import failed",
-        "context": "Title of the dialog displayed when fails the process\/request to import an image - (String as short as possible)."
     },
     "2531": {
         "text": "Save image to photos",
@@ -7589,6 +7681,18 @@
     },
     "6240": {
         "text": "Windows Phone App",
+        "context": ""
+    },
+    "6243": {
+        "text": "Where do my downloads go?",
+        "context": ""
+    },
+    "6260": {
+        "text": "Audio & Video setup",
+        "context": ""
+    },
+    "6277": {
+        "text": "How do I register for an account?",
         "context": ""
     },
     "6508": {
@@ -12832,8 +12936,8 @@
         "context": "An alert message which is shown when the user removes various items from the Offline section."
     },
     "8683": {
-        "text": "We were unable to import all the files, likely because some of them were taken down. The operation finished with %1 of %2 nodes successfully imported.",
-        "context": "An error shown when importing a folder link and some of the folder's files failed to import."
+        "text": "Not all of the files could be imported. This can happen if some of the files were taken down. The operation finished with %1 of %2 items imported successfully.",
+        "context": "An error which is shown when importing a folder link and some of the folder's files failed to import to the user's cloud drive."
     },
     "8684": {
         "text": "Send and close",
@@ -13444,16 +13548,16 @@
         "context": "A dialog message when there is a new chat server version available. This update will be incompatible with the current user's MEGA client so they will need to update their browser extension."
     },
     "8842": {
-        "text": "Grant bandwidth to downloading users:",
+        "text": "Grant transfer quota to downloading users:",
         "context": "Maximum percentage of your bandwidth which is available to third party users."
     },
     "8843": {
-        "text": "[S]50 %[\/S] bandwidth",
-        "context": "Full string: 50% bandwidth. This is the maximum percentage of your bandwidth which is available to third party users. The 50% is a placeholder for whatever the percentage will actually be.\r\n\r\nPlease leave \"[S]50 %[\/S]\" as it is."
+        "text": "[S]50 %[\/S] transfer quota",
+        "context": "Full string: 50% transfer quota. This is the maximum percentage of your transfer quota which is available to third party users. The 50% is a placeholder for whatever the percentage will actually be.\r\n\r\nPlease leave \"[S]50 %[\/S]\" as it is."
     },
     "8844": {
-        "text": "This is the maximum percentage of your bandwidth which is available to third party users.",
-        "context": "Full string: \r\n\"50% bandwith. This is the maximum percentage of your bandwidth which is available to third party users.\"\r\n\r\nUser can set bandwidth limit to users, who downloading his files.\r\n\r\n"
+        "text": "This is the percentage of your transfer quota which you are granting to third party users to download your file \/ folder links.",
+        "context": "Full string: \r\n\"50% Transfer quota. This is the percentage of your transfer quota which you are granting to third party users to download your file \/ folder links.\"\r\n\r\n"
     },
     "8845": {
         "text": "This purchase has expired.",
@@ -14780,7 +14884,7 @@
         "context": "A message shown to explain that the user has to input (type or paste) their recovery key to continue with the reset password process."
     },
     "12439": {
-        "text": "You are using an ephemeral session in this browser. If you want to preserve the uploaded data, click Register in the tab where you see your data. If you do not care about the data, click Logout and try clicking the same account confirmation link again.",
+        "text": "You are using an ephemeral session in this browser. If you want to preserve the uploaded data, click [A1]Create Account[\/A] in the tab where you see your data. If you do not care about the data, click [A2]Logout[\/A2] and try clicking the same account confirmation link again.",
         "context": "This message will appear when a user is trying to activate their account from an ephemeral session which is not related to the activation link."
     },
     "12440": {
@@ -14814,5 +14918,137 @@
     "12447": {
         "text": "Online collaboration has never been more private and secure.",
         "context": "Text from the mobile page (Online collaboration section), please see screenshot."
+    },
+    "12479": {
+        "text": "Items are not permanently erased from MEGA when you move them to the Rubbish Bin.\r\nThis temporary storage is automatically cleaned from time to time and you can control its setup in the [A]Settings[\/A].",
+        "context": "This is shown in an onboarding tooltip to remind the user that they can\/should clear their rubbish bin. Files are not deleted when they click Remove\/Delete, but moved to the rubbish bin for a period of time.\r\nThey can alter the settings for when the rubbish bin should be cleared in the Settings page.\r\nClicking Settings would redirect them to the settings page which contains a list of site specific settings, from which, one of them is the Rubbish Bin related one. Please leave the [A] and [\/A] tags which will be used to hyperlink the Settings text."
+    },
+    "12480": {
+        "text": "%1 uploads were added to the transfers queue",
+        "context": "This is a tooltip (toast popup) that shows when a user has started uploading files to the cloud drive. The %1 will be replaced with the number of transfers that were added."
+    },
+    "12481": {
+        "text": "%1 downloads were added to the transfers queue",
+        "context": "This is a tooltip (toast popup) that shows when a user has started downloading files from the cloud drive. The %1 will be replaced with the number of transfers."
+    },
+    "12482": {
+        "text": "Please close this dialog and click [B]purchase[\/B] again.",
+        "context": "This is a dialog message which is shown when a Bitcoin payment failed due to connection error. Please leave the [B] and [\/B] tags as they will be used to bolden the text."
+    },
+    "12483": {
+        "text": "Before starting a call, allow your browser to[BR] access your microphone and camera.",
+        "context": "An information message before the start of a call. Please leave the [BR] tag which will be replaced with a line break for presentational purposes."
+    },
+    "12484": {
+        "text": "Pause any transfers",
+        "context": "A hint message for the user before starting a video\/audio call which should improve performance."
+    },
+    "12485": {
+        "text": "Also available for [A1]Mac[\/A1] and [A2]Linux[\/A2].",
+        "context": "A message on the #sync page underneath the Free Download button. This let's the user know they can download the MEGAsync client for the Mac and Linux operating systems as well. Please leave the [A1] and [A2] tags in the translation as they will be replaced with hyperlinks."
+    },
+    "12486": {
+        "text": "Also available for [A1]Windows[\/A1] and [A2]Mac[\/A2].",
+        "context": "A message on the #sync page underneath the Free Download button. This lets the user know they can download the MEGAsync client for the Windows and Mac operating systems as well. Please leave the [A1] and [A2] tags in the translation as they will be replaced with hyperlinks."
+    },
+    "12487": {
+        "text": "Also available for [A1]Windows[\/A1] and [A2]Linux[\/A2].",
+        "context": "A message on the #sync page underneath the Free Download button. This lets the user know they can download the MEGAsync client for the Windows and Linux operating systems as well. Please leave the [A1] and [A2] tags in the translation as they will be replaced with hyperlinks."
+    },
+    "12488": {
+        "text": "We strongly suggest using our sync client for vastly improved performance[BR] uploading hundreds of files. [A]Get MEGAsync now.[\/A]",
+        "context": "A modal dialog message on the #download page which is shown when the file size is quite large. Please leave the [A] and [\/A] tags which will be used to create a hyperlink and the [BR] tag which will be used to insert a line break for presentational effect."
+    },
+    "12489": {
+        "text": "When we launched MEGA early 2013, global mass surveillance by rogue governments under the pretext of fighting terrorism was still a wild conjecture and its proponents were often touted as conspiracy theorists. Edward Snowden's revelations 137 days later fundamentally changed public attitudes and it became excruciatingly clear that [I]security by policy[\/I] (\"we have access to your data, but we promise to keep it confidential and not misuse it\") had not been good enough. Anything short of [I]security by design[\/I] (\"we cannot gain access to your data without you being able to find out\"), for which strong end-to-end encryption is an essential prerequisite, now seems grossly insufficient.",
+        "context": "An introduction message on the https:\/\/mega.nz\/#about page. Please leave the [I] and [\/I] tags because they will be replaced with italic text. This should have already been translated in string 1821, so you can borrow that translation if need be. The difference is that the HTML tags have now been removed."
+    },
+    "12689": {
+        "text": "Caution: users with access to your file \/ folder links can use up your entire transfer quota if you grant them 100%.",
+        "context": "Warning being shown when trying to grant all transfer quota to downloading users."
+    },
+    "12690": {
+        "text": "Failed to share item(s) from MEGA. The destination application seems busy. Please try again later.",
+        "context": "Message of the dialog displayed when the process to share item(s) from MEGA with other app fails because the destination app is busy."
+    },
+    "12691": {
+        "text": "Failed to retrieve node details. Please try again.",
+        "context": "Message of the dialog displayed when the process\/request to get node details failed."
+    },
+    "12692": {
+        "text": "View details failed",
+        "context": "Title of the dialog displayed when the process\/request to get node details failed - (String as short as possible)."
+    },
+    "13679": {
+        "text": "The link can't be generated because the file is inside an incoming shared folder or your Rubbish Bin.",
+        "context": "An error message which is shown when the user tries to create a public link for a file that can not be exported."
+    },
+    "13680": {
+        "text": "Owner permissions:",
+        "context": "A label to describe the owner permissions that will be applied to new files and folders."
+    },
+    "13749": {
+        "text": "You are about to permanently remove 1 file. Would you like to proceed?",
+        "context": "A dialog message confirming if the user would like to permanently remove a file from the rubbish bin."
+    },
+    "13750": {
+        "text": "You are about to permanently remove %1 files. Would you like to proceed?",
+        "context": "A confirmation message asking the user if they are sure they want to remove the files from the rubbish bin. Please leave the %1 placeholder which will be dynamically replaced with the number of files."
+    },
+    "13751": {
+        "text": "You are about to permanently remove 1 folder. Would you like to proceed?",
+        "context": "A confirmation message for the user before they remove 1 folder from the rubbish bin."
+    },
+    "13752": {
+        "text": "You are about to permanently remove %1 folders. Would you like to proceed?",
+        "context": "A confirmation message for the user before they remove a number of folders from the rubbish bin."
+    },
+    "13753": {
+        "text": "You are about to permanently remove 1 file and 1 folder. Would you like to proceed?",
+        "context": "A confirmation message for the user before the remove a file and folder from the rubbish bin."
+    },
+    "13754": {
+        "text": "You are about to permanently remove 1 file and %1 folders. Would you like to proceed?",
+        "context": "A message for the user to confirm their decision to remove one file and a number of folders from the rubbish bin. Please keep the %1 placeholder which will be replaced dynamically."
+    },
+    "13755": {
+        "text": "You are about to permanently remove %1 files and 1 folder. Would you like to proceed?",
+        "context": "A message for the user to confirm their decision to remove %1 files and one folder from the rubbish bin. Please keep the %1 placeholder which will be replaced dynamically with the number of files."
+    },
+    "13756": {
+        "text": "You are about to permanently remove %1 files and %2 folders. Would you like to proceed?",
+        "context": "A message for the user to confirm their decision to remove a number of files and folders from the rubbish bin. Please keep the %1 and %2 placeholders which will be replaced dynamically."
+    },
+    "13757": {
+        "text": "You permanently removed 1 file.",
+        "context": "A toast notification message after successful removal of one file from the rubbish bin."
+    },
+    "13758": {
+        "text": "You permanently removed %1 files.",
+        "context": "A toast notification message after successful removal of a number of files from the rubbish bin. Please leave the %1 placeholder which will be replaced with the number of files that were removed."
+    },
+    "13759": {
+        "text": "You permanently removed 1 folder.",
+        "context": "A toast notification message after successful removal of one folder from the rubbish bin."
+    },
+    "13760": {
+        "text": "You permanently removed %1 folders.",
+        "context": "A toast notification message after successful removal of a number of folders from the rubbish bin. Please keep the %1 placeholder which will be dynamically replaced with the number of folders."
+    },
+    "13761": {
+        "text": "You permanently removed 1 file and 1 folder.",
+        "context": "A toast notification message which is shown after successful removal of one file and one folder from the rubbish bin."
+    },
+    "13762": {
+        "text": "You permanently removed 1 file and %1 folders.",
+        "context": "A toast notification message after successful removal of one file and a number of folders from the rubbish bin. Please keep the %1 placeholder which will be dynamically replaced with the number of folders."
+    },
+    "13763": {
+        "text": "You permanently removed %1 files and 1 folder.",
+        "context": "A toast notification message after successful removal of a number of files and one folder from the rubbish bin. Please keep the %1 placeholder which will be dynamically replaced with the number of files."
+    },
+    "13764": {
+        "text": "You permanently removed %1 files and %2 folders.",
+        "context": "A toast notification message after successful removal of a number of files and folders from rubbish bin. Please leave the %1 and %2 placeholders which will be replaced with the number of files and folders at runtime."
     }
 }

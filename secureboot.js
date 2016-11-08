@@ -338,7 +338,7 @@ var mega = {
         0, 'Torch', 'Epic'
     ],
 
-    maxWorkers: (navigator.hardwareConcurrency || 4),
+    maxWorkers: Math.min(navigator.hardwareConcurrency || 4, 12),
 
     /** Get browser brancd internal ID */
     getBrowserBrandID: function() {
@@ -578,6 +578,12 @@ Object.defineProperty(this, 'mBroadcaster', {
                 callback : options
             };
         }
+        if (options.hasOwnProperty('handleEvent')) {
+            options = {
+                scope: options,
+                callback: options.handleEvent
+            };
+        }
         if (typeof options.callback !== 'function') {
             return false;
         }
@@ -594,8 +600,24 @@ Object.defineProperty(this, 'mBroadcaster', {
         return id;
     },
 
-    removeListener: function mBroadcaster_removeListenr(token) {
+    removeListener: function mBroadcaster_removeListenr(token, listener) {
         if (d) console.log('Removing broadcast listener', token);
+
+        if (listener) {
+            // Remove an EventListener interface.
+            var found;
+            for (var id in this._topics[token]) {
+                if (this._topics[token].hasOwnProperty(id)
+                    && this._topics[token][id].scope === listener) {
+
+                    found = id;
+                    break;
+                }
+            }
+
+            token = found;
+        }
+
         for (var topic in this._topics) {
             if (this._topics[topic][token]) {
                 delete this._topics[topic][token];
@@ -610,8 +632,13 @@ Object.defineProperty(this, 'mBroadcaster', {
 
     sendMessage: function mBroadcaster_sendMessage(topic) {
         if (this._topics.hasOwnProperty(topic)) {
-            var args = Array.prototype.slice.call(arguments, 1);
-            var idr = [];
+            var idr  = [];
+            var args = toArray.apply(null, arguments);
+            args.shift();
+
+            if (!args.length) {
+                args = [{type: topic}];
+            }
 
             // if (d) console.log('Broadcasting ' + topic, args);
 
@@ -625,8 +652,11 @@ Object.defineProperty(this, 'mBroadcaster', {
                 if (ev.once || rc === 0xDEAD)
                     idr.push(id);
             }
-            if (idr.length)
-                idr.forEach(this.removeListener.bind(this));
+            if (idr.length) {
+                idr.forEach(function(id) {
+                    this.removeListener(id);
+                }.bind(this));
+            }
 
             return true;
         }
@@ -1348,7 +1378,7 @@ else if (!b_u)
 
             __cdumps.push(dump);
             if (__cd_t) clearTimeout(__cd_t);
-            var report = safeCall(function()
+            var report = tryCatch(function()
             {
                 function ctx(id)
                 {
@@ -1602,6 +1632,7 @@ else if (!b_u)
         jsl.push({f:'js/chat/plugins/emoticonsFilter.js', n: 'emoticonsFilter_js', j:1, w:7});
         jsl.push({f:'js/chat/plugins/chatNotifications.js', n: 'chatnotifications_js', j:1, w:7});
         jsl.push({f:'js/chat/plugins/callFeedback.js', n: 'callfeedback_js', j:1, w:7});
+        jsl.push({f:'js/chat/plugins/persistedTypeArea.js', n: 'persistedTypeArea_js', j:1, w:1});
 
         jsl.push({f:'js/chat/karereEventObjects.js', n: 'keo_js', j:1, w:7});
         jsl.push({f:'js/connectionRetryManager.js', n: 'crm_js', j:1, w:7});
@@ -2449,9 +2480,26 @@ function showAd() {
     return showAd;
 }
 
-function safeCall(fn)
+/**
+ * Simple .toArray method to be used to convert `arguments` to a normal JavaScript Array
+ *
+ * Please note there is a huge performance degradation when using `arguments` outside their
+ * owning function, to mitigate it use this function as follow: toArray.apply(null, arguments)
+ *
+ * @returns {Array}
+ */
+function toArray() {
+    var len = arguments.length;
+    var res = Array(len);
+    while (len--) {
+        res[len] = arguments[len];
+    }
+    return res;
+}
+
+function tryCatch(fn)
 {
-    fn.foo = function __safeCallWrapper()
+    fn.foo = function __tryCatchWrapper()
     {
         try {
             return fn.apply(this, arguments);

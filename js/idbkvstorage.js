@@ -3,10 +3,11 @@
  */
 
 // (the name must exist in the FMDB schema with index 'k')
-var IndexedDBKVStorage = function(name, dbOpts) {
+var IndexedDBKVStorage = function(name, dbOpts, syncMemcache) {
     this.name = name;
     this.logger = new MegaLogger("IDBKVStorage[" + name + "]");
     this._memCache = {};
+    this.syncMemcache = syncMemcache;
 };
 
 // sets fmdb reference and prefills the memory cache from the DB
@@ -28,7 +29,21 @@ IndexedDBKVStorage.prototype.prefillMemCache = function(fmdb) {
         });
     }
     else promise.resolve();
+    
+    if (self.syncMemcache) {
+        self._mListener = mBroadcaster.addListener('idbchange:' + self.name + "_" + u_handle, function (data) {
+            var k = data[0];
+            var v = data[1];
+            if (typeof(v) === 'undefined') {
+                delete self._memCache[k];
+            }
+            else {
+                self._memCache[k] = v;
+            }
 
+            self.trigger('onChange', [k, v]);
+        });
+    }
     return promise;
 };
 
@@ -42,6 +57,18 @@ IndexedDBKVStorage.prototype.setItem = function __IDBKVSetItem(k, v) {
         if (this.fmdb) {
             this.fmdb.add(this.name, { k : k, d : { v : v }});
         }
+        
+        // FIXME: check if this is ok..
+        var self = this;
+        Soon(function() {
+            if (self.syncMemcache) {
+                watchdog.notify('idbchange', {
+                    name: self.name + "_" + u_handle,
+                    key: k,
+                    value: v
+                });
+            }
+        });
     }
 
     promise.resolve([k, v]);
@@ -83,6 +110,14 @@ IndexedDBKVStorage.prototype.getItem = function __IDBKVGetItem(k) {
 IndexedDBKVStorage.prototype.removeItem = function __IDBKVRemoveItem(k) {
     if (typeof(this._memCache[k]) !== 'undefined') {
         delete this._memCache[k];
+    }
+
+    if (this.syncMemcache) {
+        watchdog.notify('idbchange', {
+            name: this.name + "_" + u_handle,
+            key: k,
+            value: undefined
+        });
     }
 
     var promise = new MegaPromise();
@@ -171,3 +206,4 @@ IndexedDBKVStorage.prototype.eachPrefixItem = function __IDBKVEachItem(prefix, c
 
     return MegaPromise.resolve();
 };
+makeObservable(IndexedDBKVStorage);

@@ -42,8 +42,10 @@ var uldl_hold = false;
 /* jshint -W003 */
 var ulmanager = {
     ulFaId: 0,
+    ulSize: 0,
     ulIDToNode: {},
     isUploading: false,
+    ulSetupQueue: null,
     ulStartingPhase: false,
     ulCompletingPhase: false,
     ulPendingCompletion: [],
@@ -624,8 +626,10 @@ var ulmanager = {
             if (ctx.faid) {
                 api_attachfileattr(n.h, ctx.faid);
             }
-            ulmanager.ulIDToNode[ulmanager.getGID(ul_queue[ctx.ul_queue_num])] = n.h;
-            onUploadSuccess(ul_queue[ctx.ul_queue_num], n.h, ctx.faid);
+            if (ul_queue[ctx.ul_queue_num]) {
+                ulmanager.ulIDToNode[ulmanager.getGID(ul_queue[ctx.ul_queue_num])] = n.h;
+                onUploadSuccess(ul_queue[ctx.ul_queue_num], n.h, ctx.faid);
+            }
             ctx.file.ul_failed = false;
             ctx.file.retries = 0;
             ulmanager.ulCompletePending(ctx.target);
@@ -686,7 +690,10 @@ var ulmanager = {
             n: n,
             skipfile: (fmconfig.ul_skipIdentical && identical),
             callback: function(res, ctx) {
-                if (res.e === ETEMPUNAVAIL && ctx.skipfile) {
+                if (oIsFrozen(File)) {
+                    ulmanager.logger.debug('Upload aborted on deduplication...', File);
+                }
+                else if (res.e === ETEMPUNAVAIL && ctx.skipfile) {
                     ctx.uq.repair = ctx.n.k;
                     ulmanager.ulStart(File);
                 }
@@ -731,6 +738,54 @@ var ulmanager = {
             }
         }
         return false;
+    },
+
+    /**
+     * Initialize upload on fingerprint creation.
+     *
+     * @param {Object}  aFileUpload  FileUpload instance
+     * @param {Object}  aFile        File API interface instance
+     * @param {Boolean} aForce       Ignore locking queue.
+     */
+    ulSetup: function ulSetup(aFileUpload, aFile, aForce) {
+        assert(aFileUpload.file === aFile, 'Unexpected FileUpload instance.');
+        assert(aFile.hash, 'Fingerprint missing.');
+
+        if (!aForce) {
+            if (this.ulSetupQueue) {
+                return this.ulSetupQueue.push(aFileUpload);
+            }
+            this.ulSetupQueue = [];
+        }
+
+        createFolder(aFile.target, fm_safepath(aFile.path), new MegaPromise())
+            .always(function(target) {
+                if (typeof target === 'number') {
+                    ulmanager.logger.error('createFolder gave ' + target, api_strerror(target));
+                }
+                else {
+                    ulmanager.logger.info('createFolder', aFile.target, target);
+                    aFile.target = target;
+                }
+
+                if (ulmanager.ulSetupQueue.length) {
+                    var upload = ulmanager.ulSetupQueue.shift();
+                    Soon(ulmanager.ulSetup.bind(ulmanager, upload, upload.file, true));
+                }
+                else {
+                    ulmanager.ulSetupQueue = null;
+                }
+
+                var identical = ulmanager.ulIdentical(aFile);
+                ulmanager.logger.info(aFile.name, "fingerprint", M.h[aFile.hash], identical);
+
+                if (M.h[aFile.hash] || identical) {
+                    ulmanager.ulDeDuplicate(aFileUpload, identical);
+                }
+                else {
+                    ulmanager.ulStart(aFileUpload);
+                }
+            });
     }
 };
 
@@ -1076,6 +1131,10 @@ FileUpload.prototype.destroy = function() {
     if (!this.file) {
         return;
     }
+    if (Object(GlobalProgress[this.gid]).started) {
+        ulmanager.ulSize -= this.file.size;
+    }
+
     // Hmm, looks like there are more ChunkUploads than what we really upload (!?)
     if (d) {
         ASSERT(GlobalProgress[this.gid].working.length === 0, 'Huh, there are working upload chunks?..');
@@ -1103,7 +1162,8 @@ FileUpload.prototype.run = function(done) {
     file.xr = dlmanager.mGetXR();
     file.ul_lastreason = file.ul_lastreason || 0;
 
-    if (ulmanager.ulStartingPhase || $('#ul_' + file.id).length === 0) {
+    var domNode = document.getElementById('ul_' + file.id);
+    if (ulmanager.ulStartingPhase || !domNode) {
         done();
         ASSERT(0, "This shouldn't happen");
         return ulQueue.pushFirst(this);
@@ -1117,7 +1177,11 @@ FileUpload.prototype.run = function(done) {
         ulmanager.logger.info(file.name, "starting upload", file.id);
     }
 
-    ulmanager.ulStartingPhase = true;
+    domNode.classList.add('transfer-initiliazing');
+    domNode.querySelector('.transfer-status').textContent = (l[1042]);
+
+    ulmanager.ulSize += file.size;
+    // ulmanager.ulStartingPhase = true;
 
     var started = false;
     file.done_starting = function() {
@@ -1127,6 +1191,22 @@ FileUpload.prototype.run = function(done) {
         started = true;
         ulmanager.ulStartingPhase = false;
         delete file.done_starting;
+
+        if (ulmanager.ulSize < ulmanager.ulBlockExtraSize) {
+
+            if (file.size < ulmanager.ulBlockSize) {
+                var size = ulQueue.getSize();
+                var max  = ulQueue.maxActiveTransfers;
+
+                if (size < max && ulQueue.canExpand(max)) {
+                    ulQueue.setSize(size + 1);
+                }
+            }
+        }
+        else {
+            ulQueue.setSize((fmconfig.ul_maxSlots | 0) || 4);
+        }
+
         file = self = undefined;
         done();
     };
@@ -1174,26 +1254,7 @@ FileUpload.prototype.run = function(done) {
             file.hash = hash;
             file.ts = ts;
 
-            createFolder(file.target, fm_safepath(file.path), new MegaPromise())
-                .always(function(target) {
-                    if (typeof target === 'number') {
-                        ulmanager.logger.error('createFolder gave ' + target, api_strerror(target));
-                    }
-                    else {
-                        ulmanager.logger.info('createFolder', file.target, target);
-                        file.target = target;
-                    }
-
-                    var identical = ulmanager.ulIdentical(file);
-                    ulmanager.logger.info(file.name, "fingerprint", M.h[hash], identical);
-
-                    if (M.h[hash] || identical) {
-                        ulmanager.ulDeDuplicate(self, identical);
-                    }
-                    else {
-                        ulmanager.ulStart(self);
-                    }
-                });
+            ulmanager.ulSetup(self, file);
         });
     }
     catch (e) {
@@ -1287,13 +1348,26 @@ ulQueue.validateTask = function(pzTask) {
         return true;
     }
 
-    if (pzTask instanceof FileUpload && !ulmanager.ulStartingPhase && $('#ul_' + pzTask.file.id).length !== 0) {
+    if (pzTask instanceof FileUpload
+        && !ulmanager.ulStartingPhase
+        && document.getElementById('ul_' + pzTask.file.id)) {
+
         return true;
     }
 
     return false;
 };
 
+ulQueue.canExpand = function(max) {
+    max = max || this.maxActiveTransfers;
+    return !is_mobile && this._running < max;
+};
+
+Object.defineProperty(ulQueue, 'maxActiveTransfers', {
+    get: function() {
+        return Math.min(Math.floor(M.getTransferTableLengths().size / 1.6), 20);
+    }
+});
 
 mBroadcaster.once('startMega', function _setupEncrypter() {
     var encrypter = CreateWorkers('encrypter.js', function(context, e, done) {

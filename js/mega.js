@@ -8087,7 +8087,7 @@ function loadfm_done(mDBload) {
                 if (d) {
                     console.debug('loadReport', r);
                 }
-                api_req({a: 'log', e: 99625, m: JSON.stringify(r)});
+                api_req({a: 'log', e: 99626, m: JSON.stringify(r)});
             }
         }
         clearInterval(mega.loadReport.aliveTimer);

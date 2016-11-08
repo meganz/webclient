@@ -6506,7 +6506,7 @@ TreeFetcher.prototype.fetch = function treefetcher_fetch(force) {
 
             loadingInitDialog.step2(parseInt(perc));    // FIXME: make generic
 
-            if (perc > 99) {
+            if (perc > 99 && !mega.loadReport.ttlb) {
                 // Load performance report -- time to last byte
                 mega.loadReport.ttlb          = Date.now() - mega.loadReport.stepTimeStamp;
                 mega.loadReport.stepTimeStamp = Date.now();

@@ -9851,6 +9851,20 @@ React.makeElement = React['createElement'];
 	        var self = this;
 	        var chatRoom = self.props.message.chatRoom;
 	        var megaChat = chatRoom.megaChat;
+	        var contact = self.getContact();
+	        if (contact && contact.addChangeListener) {
+	            self._contactChangeListener = contact.addChangeListener(function () {
+	                self.debouncedForceUpdate();
+	            });
+	        }
+	    },
+	    componentWillUnmount: function componentWillUnmount() {
+	        var self = this;
+	        var contact = self.getContact();
+
+	        if (self._contactChangeListener && contact && contact.removeChangeListener) {
+	            contact.removeChangeListener(self._contactChangeListener);
+	        }
 	    },
 	    getContact: function getContact() {
 	        var message = this.props.message;
@@ -10430,6 +10444,34 @@ React.makeElement = React['createElement'];
 	            assert(contactHash, 'Invalid hash for user (extracted from inc. message)');
 	        } else {
 	            throw new Error("Not implemented");
+	        }
+	    });
+
+	    var membersSnapshot = {};
+	    self.rebind('onMembersUpdated.chatRoomMembersSync', function () {
+	        var roomRequiresUpdate = false;
+
+	        Object.keys(membersSnapshot).forEach(function (u_h) {
+	            var contact = M.u[u_h];
+	            if (contact) {
+	                contact.removeChangeListener(membersSnapshot[u_h]);
+	                if (!self.members[u_h]) {
+	                    roomRequiresUpdate = true;
+	                }
+	            }
+	            delete membersSnapshot[u_h];
+	        });
+
+	        Object.keys(self.members).forEach(function (u_h) {
+	            var contact = M.u[u_h];
+	            if (contact) {
+	                membersSnapshot[u_h] = contact.addChangeListener(function () {
+	                    self.trackDataChange();
+	                });
+	            }
+	        });
+	        if (roomRequiresUpdate) {
+	            self.trackDataChange();
 	        }
 	    });
 

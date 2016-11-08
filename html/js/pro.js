@@ -680,7 +680,7 @@ function pro_pay() {
             else if (pro_paymentmethod === 'tpay') {
                 pro_m = tpay.gatewayId; // 14
             }
-            else if (pro_paymentmethod === 'directreseller') {
+            else if (pro_paymentmethod.indexOf('directreseller') === 0) {
                 pro_m = directReseller.gatewayId; // 15
             }
 

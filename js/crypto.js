@@ -1918,12 +1918,17 @@ function sc_residue(sc) {
 
 function sc_failure(mDBload) {
     if (sccount) {
-        // FIXME: inform user that a reload is now needed, wipe IndexedDB
-        // and reload
+        localStorage.force = 1;
+        location.reload();
     }
     else {
-        // FIXME: exponential backoff
-        getsc(mDBload);
+        if (getsc.backoff) {
+            getsc.backoff = Math.min(getsc.backoff * 2, 666999);
+        }
+        else {
+            getsc.backoff = 125+Math.floor(Math.random()*600);
+        }
+        setTimeout(getsc, getsc.backoff, mDBload);
     }
 }
 

@@ -3233,7 +3233,7 @@
     "8679": "Su MEGA",
     "8681": "Sei sicuro di volere rimuovere questo elemento da Offline?",
     "8682": "Sei sicuro di voler rimuovere questi elementi da Offline?",
-    "8683": "Non riusciamo a importare tutti i file, probabilmente poich\u00e9 alcuni sono stati rimossi. L'operazione \u00e8 terminata con %1 su %2 nodi importati con successo.",
+    "8683": "Non tutti i file potrebbero esser stati importati. Questo succede se qualche file \u00e8 stato reso indisponibile. L'operazione \u00e8 finita con %1 su %2 elementi importati con successo.",
     "8684": "Invia e chiudi",
     "8685": "Per favore, spiegaci perch\u00e9 non vuoi rinnovare il tuo piano:",
     "8686": "cartella non decriptata",

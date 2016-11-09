@@ -3233,7 +3233,7 @@
     "8679": "Sur MEGA",
     "8681": "Voulez-vous vraiment supprimer cet \u00e9l\u00e9ment hors ligne?",
     "8682": "Voulez-vous vraiment supprimer ces \u00e9l\u00e9ments hors ligne?",
-    "8683": "Il nous a \u00e9t\u00e9 impossible d'importer tous les fichiers, probablement parce que certains d'entre eux ont fait l'objet d'un retrait. L'op\u00e9ration s'est termin\u00e9e avec %1 sur %2 n\u0153uds import\u00e9s avec succ\u00e8s.",
+    "8683": "Tous les fichiers n'ont pas pu \u00eatre import\u00e9s. Cela peut arriver si certains fichiers ont \u00e9t\u00e9 retir\u00e9s. %1 de %2 \u00e9l\u00e9ments ont \u00e9t\u00e9 import\u00e9s avec succ\u00e8s.",
     "8684": "Envoyer et fermer",
     "8685": "Veuillez expliquer pourquoi vous ne souhaitez as renouveler votre plan:",
     "8686": "dossier non d\u00e9chiffr\u00e9",

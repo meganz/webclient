@@ -218,27 +218,27 @@ React.makeElement = React['createElement'];
 	                }
 	            },
 	            iceServers: [{
-	                url: 'turn:trn270n001.karere.mega.nz:3478?transport=udp',
+	                urls: ['turn:trn270n001.karere.mega.nz:3478?transport=udp'],
 	                username: "inoo20jdnH",
 	                credential: '02nNKDBkkS'
 	            }, {
-	                url: 'turn:trn270n002.karere.mega.nz:3478?transport=udp',
+	                urls: ['turn:trn270n002.karere.mega.nz:3478?transport=udp'],
 	                username: "inoo20jdnH",
 	                credential: '02nNKDBkkS'
 	            }, {
-	                url: 'turn:trn302n001.karere.mega.nz:3478?transport=udp',
+	                urls: ['turn:trn302n001.karere.mega.nz:3478?transport=udp'],
 	                username: "inoo20jdnH",
 	                credential: '02nNKDBkkS'
 	            }, {
-	                url: 'turn:trn302n002.karere.mega.nz:3478?transport=udp',
+	                urls: ['turn:trn302n002.karere.mega.nz:3478?transport=udp'],
 	                username: "inoo20jdnH",
 	                credential: '02nNKDBkkS'
 	            }, {
-	                url: 'turn:trn530n002.karere.mega.nz:3478?transport=udp',
+	                urls: ['turn:trn530n002.karere.mega.nz:3478?transport=udp'],
 	                username: "inoo20jdnH",
 	                credential: '02nNKDBkkS'
 	            }, {
-	                url: 'turn:trn530n003.karere.mega.nz:3478?transport=udp',
+	                urls: ['turn:trn530n003.karere.mega.nz:3478?transport=udp'],
 	                username: "inoo20jdnH",
 	                credential: '02nNKDBkkS'
 	            }]
@@ -5597,6 +5597,9 @@ React.makeElement = React['createElement'];
 	            );
 	        } else {
 	            var remotePlayer = callSession.remotePlayer[0];
+	            if (!remotePlayer && callSession.remotePlayer) {
+	                remotePlayer = callSession.remotePlayer;
+	            }
 
 	            var remotePlayerSrc = remotePlayer.src;
 
@@ -9851,6 +9854,20 @@ React.makeElement = React['createElement'];
 	        var self = this;
 	        var chatRoom = self.props.message.chatRoom;
 	        var megaChat = chatRoom.megaChat;
+	        var contact = self.getContact();
+	        if (contact && contact.addChangeListener) {
+	            self._contactChangeListener = contact.addChangeListener(function () {
+	                self.debouncedForceUpdate();
+	            });
+	        }
+	    },
+	    componentWillUnmount: function componentWillUnmount() {
+	        var self = this;
+	        var contact = self.getContact();
+
+	        if (self._contactChangeListener && contact && contact.removeChangeListener) {
+	            contact.removeChangeListener(self._contactChangeListener);
+	        }
 	    },
 	    getContact: function getContact() {
 	        var message = this.props.message;
@@ -10433,6 +10450,34 @@ React.makeElement = React['createElement'];
 	        }
 	    });
 
+	    var membersSnapshot = {};
+	    self.rebind('onMembersUpdated.chatRoomMembersSync', function () {
+	        var roomRequiresUpdate = false;
+
+	        Object.keys(membersSnapshot).forEach(function (u_h) {
+	            var contact = M.u[u_h];
+	            if (contact) {
+	                contact.removeChangeListener(membersSnapshot[u_h]);
+	                if (!self.members[u_h]) {
+	                    roomRequiresUpdate = true;
+	                }
+	            }
+	            delete membersSnapshot[u_h];
+	        });
+
+	        Object.keys(self.members).forEach(function (u_h) {
+	            var contact = M.u[u_h];
+	            if (contact) {
+	                membersSnapshot[u_h] = contact.addChangeListener(function () {
+	                    self.trackDataChange();
+	                });
+	            }
+	        });
+	        if (roomRequiresUpdate) {
+	            self.trackDataChange();
+	        }
+	    });
+
 	    self.getParticipantsExceptMe().forEach(function (jid) {
 	        var contact = self.megaChat.getContactFromJid(jid);
 	        if (contact) {
@@ -10492,7 +10537,7 @@ React.makeElement = React['createElement'];
 	                }
 
 	                servers.push({
-	                    url: 'turn:' + v.host + ':' + v.port + '?transport=' + transport,
+	                    urls: ['turn:' + v.host + ':' + v.port + '?transport=' + transport],
 	                    username: "inoo20jdnH",
 	                    credential: '02nNKDBkkS'
 	                });

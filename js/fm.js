@@ -2354,7 +2354,7 @@ function fmremove() {
                                                       callback: function(res, ctx) {
                                                             if (typeof res == 'object') {
                                                                 // FIXME: verify error codes in res.r
-                                                                M.delNodeShare(dirTree[ctx.selection], M.d[ctx.n].shares[ctx.share].u);
+                                                                M.delNodeShare(ctx.n, M.d[ctx.n].shares[ctx.share].u);
                                                                 setLastInteractionWith(ctx.n, "0:" + unixtime());
 
                                                                 rubbishifnoshares(ctx.n);

@@ -423,6 +423,12 @@ var useravatar = (function() {
                 if (M.u[handle]) {
                     M.u[handle].avatar = false;
                 }
+
+                if (u_handle && handle === u_handle) {
+                    // topmenuUI code relies on avatars[...] to re-render the users avatar in case it gets
+                    // loaded/updated
+                    topmenuUI();
+                }
             }
             else {
                 logger.warn('setUserAvatar: Provided data is not an ArrayBuffer.', ab);

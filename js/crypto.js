@@ -1916,8 +1916,8 @@ function sc_residue(sc) {
     else return sc_failure(ctx.mDBload);
 }
 
-function sc_failure(mDBload) {
-    if (sccount) {
+function sc_failure(mDBload, badjson) {
+    if (sccount || badjson) {
         localStorage.force = 1;
         location.reload();
     }
@@ -1944,7 +1944,7 @@ function getsc(mDBload) {
 
         progress: function(perc, buffer, ctx) {
             if (buffer && !ctx.sc_filter.proc(buffer, ctx)) {
-                sc_failure(ctx.mDBload);
+                sc_failure(ctx.mDBload, true);
             }
         }
     }, 2);

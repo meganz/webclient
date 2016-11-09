@@ -1938,7 +1938,7 @@ function getsc(mDBload) {
     api_req('sn=' + currsn + '&ssl=1&e=' + cmsNotifHandler, {
         mDBload   : mDBload,
         buffer    : true,
-        sc_filter : JSON.splitter({ '{[a{' : sc_packet,
+        sc_filter : JSONSplitter({ '{[a{' : sc_packet,
                                '{[a{{t[f{' : sc_node,
                                        '{' : sc_residue }),
 
@@ -4431,10 +4431,5 @@ function api_strerror(errno) {
     };
     Object.freeze(JSONSplitter.prototype);
 
-    JSON = Object.create(JSON, {
-        splitter: {
-            value: JSONSplitter
-        }
-    });
-    JSONSplitter = undefined;
+    window.JSONSplitter = JSONSplitter;
 })();

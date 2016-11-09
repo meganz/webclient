@@ -2302,7 +2302,9 @@ else if (!b_u)
         }
         if (window.URL)
         {
-            if (!jj && !("ActiveXObject" in window) && Object.keys(nodedec).length === 3) {
+            nodedec = !jj && !is_extension && !("ActiveXObject" in window) && nodedec;
+
+            if (nodedec && Object.keys(nodedec).length === 3) {
                 var tmp = String(nodedec.nodedec_js).split(/importScripts\([^)]+\)/);
 
                 nodedec = [tmp.shift(), nodedec.sjcl_js, nodedec.asmcrypto_js, tmp.join(';')];

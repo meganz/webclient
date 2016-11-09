@@ -6797,11 +6797,12 @@ function loadfm(force) {
 function fetchfm(sn) {
     // activate/prefetch attribute cache at this early stage
     attribCache.prefillMemCache(fmdb).then(function(){
-        // moved here from index.js
-        useravatar.loadAvatar(u_handle);
-        mega.config.fetch();
 
         if (u_type == 3) {
+            // moved here from index.js
+            useravatar.loadAvatar(u_handle);
+            mega.config.fetch();
+
             // load/initialise the authentication system
             authring.initAuthenticationSystem();
         }
@@ -7844,10 +7845,17 @@ function processMCF(mcfResponse, ignoreDB) {
 function folderreqerr()
 {
     loadingDialog.hide();
+    loadingInitDialog.hide();
+
+    loadfm.loaded = false;
+    loadfm.loading = false;
+
     msgDialog('warninga', l[1043], l[1044] + '<ul><li>' + l[1045] + '</li><li>' + l[247] + '</li><li>' + l[1046] + '</li>', false, function()
     {
-        folderlink = pfid;
-        document.location.hash = '';
+        location.hash = '#login'; // if the user is logged-in, he'll be redirected to the cloud
+
+        // FIXME: no location.reload() should be needed..
+        location.reload();
     });
 }
 

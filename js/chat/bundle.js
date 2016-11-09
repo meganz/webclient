@@ -218,27 +218,27 @@ React.makeElement = React['createElement'];
 	                }
 	            },
 	            iceServers: [{
-	                url: 'turn:trn270n001.karere.mega.nz:3478?transport=udp',
+	                urls: ['turn:trn270n001.karere.mega.nz:3478?transport=udp'],
 	                username: "inoo20jdnH",
 	                credential: '02nNKDBkkS'
 	            }, {
-	                url: 'turn:trn270n002.karere.mega.nz:3478?transport=udp',
+	                urls: ['turn:trn270n002.karere.mega.nz:3478?transport=udp'],
 	                username: "inoo20jdnH",
 	                credential: '02nNKDBkkS'
 	            }, {
-	                url: 'turn:trn302n001.karere.mega.nz:3478?transport=udp',
+	                urls: ['turn:trn302n001.karere.mega.nz:3478?transport=udp'],
 	                username: "inoo20jdnH",
 	                credential: '02nNKDBkkS'
 	            }, {
-	                url: 'turn:trn302n002.karere.mega.nz:3478?transport=udp',
+	                urls: ['turn:trn302n002.karere.mega.nz:3478?transport=udp'],
 	                username: "inoo20jdnH",
 	                credential: '02nNKDBkkS'
 	            }, {
-	                url: 'turn:trn530n002.karere.mega.nz:3478?transport=udp',
+	                urls: ['turn:trn530n002.karere.mega.nz:3478?transport=udp'],
 	                username: "inoo20jdnH",
 	                credential: '02nNKDBkkS'
 	            }, {
-	                url: 'turn:trn530n003.karere.mega.nz:3478?transport=udp',
+	                urls: ['turn:trn530n003.karere.mega.nz:3478?transport=udp'],
 	                username: "inoo20jdnH",
 	                credential: '02nNKDBkkS'
 	            }]
@@ -5597,6 +5597,9 @@ React.makeElement = React['createElement'];
 	            );
 	        } else {
 	            var remotePlayer = callSession.remotePlayer[0];
+	            if (!remotePlayer && callSession.remotePlayer) {
+	                remotePlayer = callSession.remotePlayer;
+	            }
 
 	            var remotePlayerSrc = remotePlayer.src;
 
@@ -10534,7 +10537,7 @@ React.makeElement = React['createElement'];
 	                }
 
 	                servers.push({
-	                    url: 'turn:' + v.host + ':' + v.port + '?transport=' + transport,
+	                    urls: ['turn:' + v.host + ':' + v.port + '?transport=' + transport],
 	                    username: "inoo20jdnH",
 	                    credential: '02nNKDBkkS'
 	                });

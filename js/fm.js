@@ -2190,9 +2190,10 @@ function fmremove() {
                 $.selected.forEach(function(selected) {
 
                     if (M.c[selected]) {
-                        M.c[selected].forEach(function(sharenode) {
-                            removeShare(sharenode, 1);
-                        });
+                        Object.keys(M.c[selected])
+                            .forEach(function(sharenode) {
+                                removeShare(sharenode, 1);
+                            });
                     }
 
                     api_req({ a: 'ur2', u: $.selected[i], l: '0', i: requesti });
@@ -2348,7 +2349,7 @@ function fmremove() {
                                                     // FIXME: display error to user
                                                 }
 
-                                                if (--ctx.delctx.pending) {
+                                                if (!--ctx.delctx.pending) {
                                                     M.moveNodes(ctx.delctx.selected, M.RubbishID);
                                                 }
                                             }
@@ -2378,7 +2379,7 @@ function fmremove() {
                                             // FIXME: display error to user
                                         }
 
-                                        if (--ctx.delctx.pending) {
+                                        if (!--ctx.delctx.pending) {
                                             M.moveNodes(ctx.delctx.selected, M.RubbishID);
                                         }
                                     }
@@ -2386,7 +2387,7 @@ function fmremove() {
                             }
                         }
 
-                        if (--delctx.pending) {
+                        if (!--delctx.pending) {
                             M.moveNodes(delctx.selected, M.RubbishID);
                         }
                     }

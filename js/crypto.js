@@ -1482,7 +1482,7 @@ function api_setfolder(h) {
     apixs[1].sid = h;
     apixs[1].failhandler = folderreqerr;
     apixs[2].sid = h;
-    apixs[2].failhandler = folderreqerr;
+    // apixs[2].failhandler = folderreqerr;
     apixs[5].sid = h + "&ec";
     apixs[5].failhandler = folderreqerr;
 }

@@ -1870,7 +1870,7 @@ React.makeElement = React['createElement'];
 	            { className: "conversationsApp", key: "conversationsApp" },
 	            React.makeElement(
 	                "div",
-	                { className: "fm-left-panel", style: leftPanelStyles },
+	                { className: "fm-left-panel chat-left-panel", style: leftPanelStyles },
 	                React.makeElement("div", { className: "left-pane-drag-handle" }),
 	                React.makeElement(
 	                    "div",

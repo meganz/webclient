@@ -187,7 +187,7 @@ FMDB.prototype.enqueue = function fmdb_enqueue(table, row, type) {
 
     // force a flush when a lot of data is pending or the _sn was updated
     // also, force a flush for non-transactional channels (> 0)
-    if (ch || table[0] == '_' || c[c.h].length > 1000) {
+    if (ch || table[0] == '_' || c[c.h].length > 65536) {
         // if we have the _sn, the next write goes to a fresh transaction
         if (!ch && table[0] == '_') fmdb.head[ch]++;
         fmdb.writepending(fmdb.head.length-1);

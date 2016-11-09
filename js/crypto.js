@@ -4421,6 +4421,11 @@ function api_strerror(errno) {
                 this.p           = t;
                 this.expectvalue = false;
             }
+            else if (c == ' ') {
+                // a concession to the API team's aesthetic sense
+                // FIXME: also support tab, CR, LF
+                this.p++;
+            }
             else {
                 this.logger.error("Malformed JSON - bogus char at position " + this.p);
                 return 0;

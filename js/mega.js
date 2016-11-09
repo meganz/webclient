@@ -6483,7 +6483,7 @@ TreeFetcher.prototype.fetch = function treefetcher_fetch(force) {
     // we filter out the ownerkeys and pipe them to treefetcher_ok()
     // we also filter out the nodes and pipe them to treefetcher_node()
     // the rest of the `f` response goes to treefetcher_residue()
-    var gettree_filter = JSON.splitter({ '[{[ok0{' : this.ok,
+    var gettree_filter = JSONSplitter({ '[{[ok0{' : this.ok,
                                            '[{[f{' : this.node,
                                                '[' : this.residue }, this);
 

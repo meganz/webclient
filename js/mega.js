@@ -3829,6 +3829,8 @@ function MegaData()
      */
     this.delNodeShare = function(h, u, okd) {
         if (this.d[h] && typeof this.d[h].shares !== 'undefined') {
+            var updnode;
+
             if (fmdb) {
                 fmdb.del('s', h + '*' + u);
             }
@@ -3838,6 +3840,7 @@ function MegaData()
 
             if (u === 'EXP' && this.d[h].ph) {
                 delete this.d[h].ph;
+                updnode = true;
             }
 
             var a;
@@ -3850,6 +3853,12 @@ function MegaData()
 
             if (!a) {
                 delete this.d[h].shares;
+                updnode = true;
+            }
+
+            if (updnode) {
+                // XXX: is this really needed? we're no longer storing the whole node in DB...
+                M.nodeUpdated(this.d[h]);
 
                 if (fminitialized) {
                     sharedUInode(h);
@@ -3870,6 +3879,9 @@ function MegaData()
             }
 
             delete u_sharekeys[h];
+            if (fmdb) {
+                fmdb.del('ok', h);
+            }
         }
     };
 

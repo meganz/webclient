@@ -2324,16 +2324,17 @@ function fmremove() {
                         M.copyNodes($.selected, M.RubbishID, true);
                     }
                     else {
-                        function rubbishifnoshares(h) {
+                        var rubbishifnoshares = function(h) {
                             var n = M.d[h];
-                            if (n && (!n.shares || !n.shares.length)
-                             && (!M.ps[h] || !Object.keys(M.ps[h]).length)) {
+                            if (n && !M.getNodeShareUsers(n).length
+                                    && (!M.ps[h] || !Object.keys(M.ps[h]).length)) {
+
                                 // everything fully removed? move it!
                                 M.moveNodes([h], M.RubbishID);
                                 return true;
                             }
                             return false;
-                        }
+                        };
 
                         // Remove all shares related to selected nodes
                         for (var selection in dirTree) {

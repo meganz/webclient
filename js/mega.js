@@ -6529,13 +6529,16 @@ TreeFetcher.prototype.fetch = function treefetcher_fetch(force) {
             if (buffer && !gettree_filter.proc(buffer)) {
                 api_cancel(xhr.q);
 
-                var retry = api_reqerror.bind(null, xhr.q, -3);
+                /*var retry = api_reqerror.bind(null, xhr.q, -3);
                 var fmdb_open = function() {
                     fmdb.db.open().then(retry, retry);
                 };
-                fmdb.db.delete().then(fmdb_open, fmdb_open);
+                fmdb.db.delete().then(fmdb_open, fmdb_open);*/
 
                 ctx.ctx.logger.warn('Error parsing JSON, retrying...');
+
+                // FIXME...?
+                localStorage.force = 1; location.reload()
             }
         }
     }, n_h ? 5 : 4);

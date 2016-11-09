@@ -2324,64 +2324,76 @@ function fmremove() {
                         M.copyNodes($.selected, M.RubbishID, true);
                     }
                     else {
+                        function rubbishifnoshares(h) {
+                            var n = M.d[h];
+                            if (n && (!n.shares || !n.shares.length)
+                             && (!M.ps[h] || !Object.keys(M.ps[h]).length)) {
+                                // everything fully removed? move it!
+                                M.moveNodes([h], M.RubbishID);
+                                return true;
+                            }
+                            return false;
+                        }
 
                         // Remove all shares related to selected nodes
                         for (var selection in dirTree) {
                             if (dirTree.hasOwnProperty(selection)) {
+                                if (!rubbishifnoshares(dirTree[selection])) {
+                                    // Remove regular/full share
+                                    for (var share in Object(M.d[dirTree[selection]]).shares) {
+                                        if (M.d[dirTree[selection]].shares.hasOwnProperty(share)) {
+                                            api_req({ a: 's2',
+                                                      n: dirTree[selection],
+                                                      s: [{ u: M.d[dirTree[selection]].shares[share].u, r: ''}],
+                                                      ha: '',
+                                                      i: requesti
+                                                    }, {
+                                                      n: dirTree[selection],
+                                                      share: share,
+                                                      callback: function(res, ctx) {
+                                                            if (typeof res == 'object') {
+                                                                // FIXME: verify error codes in res.r
+                                                                M.delNodeShare(dirTree[ctx.selection], M.d[ctx.n].shares[ctx.share].u);
+                                                                setLastInteractionWith(ctx.n, "0:" + unixtime());
 
-                                // Remove regular/full share
-                                for (var share in Object(M.d[dirTree[selection]]).shares) {
-                                    if (M.d[dirTree[selection]].shares.hasOwnProperty(share)) {
-                                        api_req({ a: 's2',
-                                                  n:  dirTree[selection],
-                                                  s: [{ u: M.d[dirTree[selection]].shares[share].u, r: ''}],
-                                                  ha: '',
-                                                  i: requesti
-                                                }, {
-                                                  selection: selection,
-                                                  share: share,
-                                                  callback: function(res, ctx) {
-                                                        if (typeof res == 'object') {
-                                                            // FIXME: verify error codes in res.r
-                                                            M.delNodeShare(dirTree[ctx.selection], M.d[dirTree[ctx.selection]].shares[ctx.share].u);
-                                                            setLastInteractionWith(dirTree[ctx.selection], "0:" + unixtime());
+                                                                rubbishifnoshares(ctx.n);
+                                                            }
+                                                            else {
+                                                                // FIXME: display error to user
+                                                            }
                                                         }
-                                                        else {
-                                                            // FIXME: display error to user
-                                                        }
-                                                    }
-                                                });
+                                                    });
+                                        }
                                     }
-                                }
 
-                                // Remove pending share
-                                for (var pendingUserId in M.ps[dirTree[selection]]) {
-                                    if (M.ps[dirTree[selection]].hasOwnProperty(pendingUserId)) {
-                                        var userEmailOrID = Object(M.opc[pendingUserId]).m || pendingUserId;
+                                    // Remove pending share
+                                    for (var pendingUserId in M.ps[dirTree[selection]]) {
+                                        if (M.ps[dirTree[selection]].hasOwnProperty(pendingUserId)) {
+                                            var userEmailOrID = Object(M.opc[pendingUserId]).m || pendingUserId;
 
-                                        api_req({
-                                            a: 's2', n: dirTree[selection],
-                                            s: [{u: userEmailOrID, r: ''}], ha: '', i: requesti
-                                        }, {
-                                            selection: selection,
-                                            pendingUserId: pendingUserId,
-                                            callback: function(res, ctx) {
-                                                if (typeof res == 'object') {
-                                                    // FIXME: verify error codes in res.r
-                                                    M.deletePendingShare(dirTree[ctx.selection], ctx.pendingUserId);
+                                            api_req({
+                                                a: 's2', n: dirTree[selection],
+                                                s: [{u: userEmailOrID, r: ''}], ha: '', i: requesti
+                                            }, {
+                                                n: dirTree[selection],
+                                                pendingUserId: pendingUserId,
+                                                callback: function(res, ctx) {
+                                                    if (typeof res == 'object') {
+                                                        // FIXME: verify error codes in res.r
+                                                        M.deletePendingShare(ctx.n, ctx.pendingUserId);
+                                                        rubbishifnoshares(ctx.n);
+                                                    }
+                                                    else {
+                                                        // FIXME: display error to user
+                                                    }
                                                 }
-                                                else {
-                                                    // FIXME: display error to user
-                                                }
-                                            }
-                                        });
+                                            });
+                                        }
                                     }
                                 }
                             }
                         }
-                        M.moveNodes($.selected, M.RubbishID);
                     }
-
                 }
             }, true);
         }

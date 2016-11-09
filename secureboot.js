@@ -13,7 +13,7 @@ var storageQuotaError = false;
 var lastactive = new Date().getTime();
 var URL = window.URL || window.webkitURL;
 var seqno = Math.ceil(Math.random()*1000000000);
-var staticpath = 'https://staging.static.mega.co.nz/3/';
+var staticpath = 'https://eu.static.mega.co.nz/3/';
 var ua = window.navigator.userAgent.toLowerCase();
 var storage_version = '1'; // clear localStorage when version doesn't match
 var page = document.location.hash, l, d = false;
@@ -301,7 +301,7 @@ if (!b_u) try
         staticpath = localStorage.staticpath;
     }
     staticpath = staticpath || geoStaticpath();
-    apipath = localStorage.apipath || 'https://staging.api.mega.co.nz/';
+    apipath = localStorage.apipath || 'https://g.api.mega.co.nz/';
 }
 catch(e) {
     if (!m || !cookiesDisabled) {

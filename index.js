@@ -1331,8 +1331,8 @@ function topmenuUI() {
         section = page.split('/')[1];
     }
     $('.top-menu-item').removeClass('active');
-    $menuItem = $('.top-menu-item.' + section);
-    if (section && $menuItem.length) {
+    if (section) {
+        $menuItem = $('.top-menu-item.' + section);
         $menuItem.addClass('active');
         if ($menuItem.parent('.top-submenu').length) {
             $menuItem.parent('.top-submenu').prev().addClass('expanded');

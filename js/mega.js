@@ -6542,7 +6542,12 @@ TreeFetcher.prototype.fetch = function treefetcher_fetch(force) {
                 var fmdb_open = function() {
                     fmdb.db.open().then(retry, retry);
                 };
-                fmdb.db.delete().then(fmdb_open, fmdb_open);
+                if (fmdb) {
+                    fmdb.db.delete().then(fmdb_open, fmdb_open);
+                }
+                else {
+                    retry();
+                }
 
                 ctx.ctx.logger.warn('Error parsing JSON, retrying...');
             }

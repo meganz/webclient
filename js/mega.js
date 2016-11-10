@@ -5634,11 +5634,15 @@ var nodesinflight = {};  // number of nodes being processed in the worker for sc
 // enqueue parsed actionpacket
 function sc_packet(a) {
     if ((a.a == 's' || a.a == 's2') && a.k) {
-        // keyed share packets may involve an RSA operation: run through worker
-        if (workers) {
-            a.scqi = scqhead++;     // set scq slot number
-            workers[a.scqi % workers.length].postMessage(a);
-            return;
+        if (a.k && a.k.length > 43) {
+            // RSA-keyed share command: run through worker
+            rsasharekeys[a.n] = true;
+
+            if (workers) {
+                a.scqi = scqhead++;     // set scq slot number
+                workers[a.scqi % workers.length].postMessage(a);
+                return;
+            }
         }
 
         var k = crypto_process_sharekey(a.n, a.k);
@@ -5658,6 +5662,8 @@ function sc_packet(a) {
 // submit nodes from `t` actionpacket to worker
 function sc_node(n) {
     var p, id;
+
+    crypto_rsacheck(n);
 
     if (!workers) {
         crypto_decryptnode(n);
@@ -5879,6 +5885,12 @@ function execsc() {
                     if (d) console.log("New SN: " + a.sn);
                     setsn(a.sn);
 
+                    // rewrite accumulated RSA keys to AES to save CPU & bandwidth & space
+                    crypto_node_rsa2aes();
+
+                    // rewrite accumulated RSA keys to AES to save CPU & bandwidth & space
+                    crypto_share_rsa2aes();
+
                     // reset state
                     tparentid = false;
                     trights = false;
@@ -5957,7 +5969,6 @@ function execsc() {
                                 }
                                 else {
                                     // a.k has been processed by the worker
-                                    if (a.rsa) rsasharekeys[a.n] = true;
                                     crypto_setsharekey(a.n, a.k);
                                     tsharekey = a32_to_base64(u_k_aes.encrypt(a.k));
                                     prockey = true;
@@ -6050,8 +6061,6 @@ function execsc() {
                                 }
                             }
                         }
-
-                        crypto_share_rsa2aes();
 
                         if (a.a == 's2') {
                             processPS([a]);
@@ -6609,7 +6618,7 @@ TreeFetcher.prototype.node = function treefetcher_node(node) {
         };
 
         if (workers) {
-            for (var i = workers.length; i--;) workers[i].postMessage(workerstate);
+            for (var i = workers.length; i--; ) workers[i].postMessage(workerstate);
         }
         else {
             var key = base64_to_a32(pfkey);
@@ -6617,6 +6626,14 @@ TreeFetcher.prototype.node = function treefetcher_node(node) {
         }
 
         M.RootID = node.h;
+    }
+
+    crypto_rsacheck(node);
+
+    // RSA share key? need to rewrite, too.
+    if (node.sk && node.sk.length > 43) {
+console.error("RSA sharekey=" + node.sk);
+        rsasharekeys[node.h] = true;
     }
 
     // children inherit their parents' worker bindings; unbound inshare roots receive a new binding
@@ -6641,10 +6658,10 @@ TreeFetcher.prototype.node = function treefetcher_node(node) {
 
 // this receives the remainder of the JSON after the filter was applied
 TreeFetcher.prototype.residue = function treefetcher_residue(fm) {
-    // store the residual f response for perusal once all state dumps have been received
+    // store the residual f response for perusal once all workers signal that they're done
     this.residualfm = fm[0];
 
-    // and send state dump request to all workers
+    // request an "I am done" confirmation ({}) from all workers
     if (workers) {
         var i = workers.length;
         this.dumpsremaining = i;
@@ -6655,7 +6672,7 @@ TreeFetcher.prototype.residue = function treefetcher_residue(fm) {
     }
     else {
         this.dumpsremaining = 1;
-        worker_procmsg.call({ctx: this}, {data: {sharekeys: false}});
+        worker_procmsg.call({ctx: this}, {});
     }
 };
 
@@ -6671,55 +6688,59 @@ function worker_procmsg(ev) {
         // resume processing, if appropriate and needed
         resumesc();
     }
-    else if (ev.data.scni >= 0) {
-        // enqueue processed node
-        if (scq[ev.data.scni]) scq[ev.data.scni][1].push(ev.data);
-        else scq[ev.data.scni] = [null, [ev.data]];
-
-        if (!--nodesinflight[ev.data.scni]) {
-            delete nodesinflight[ev.data.scni];
-
-            // resume processing, if appropriate and needed
-            resumesc();
-        }
-    }
     else if (ev.data.h) {
-        // maintain special incoming shares index
-        if (ev.data.p.length == 11) {
-            M.c.shares[ev.data.h] = { su : ev.data.p, r : ev.data.r };
-        }
-
-        if (fmdb) {
-            fmdb.add('f', {
-                h : ev.data.h,
-                p : ev.data.p,
-                s : ev.data.s >= 0 ? ev.data.s : -ev.data.t,
-                d : ev.data
-            });
-        }
-
-        emplacenode(ev.data);
-
+        // enqueue or emplace processed node
         if (ev.data.t < 2 && !crypto_keyok(ev.data)) {
             crypto_reportmissingkey(ev.data);
         }
-    }
-    else if (typeof ev.data.sharekeys != 'undefined') {
-        if (d) console.log("Received state dump from worker, " + this.ctx.dumpsremaining + " remaining");
 
-        if (ev.data.rsasharekeys) {
-            for (h in ev.data.rsasharekeys) rsasharekeys[h] = ev.data.rsasharekeys[h];
+        // inbound share?
+        if (ev.data.sk && typeof ev.data.sk == 'object') {
+            u_sharekeys[ev.data.h] = [ev.data.sk, new sjcl.cipher.aes(ev.data.sk)];
+            delete ev.data.sk;
         }
-        if (ev.data.rsa2aes) {
-            for (h in ev.data.rsa2aes) {
-                if (ev.data.rsa2aes[h]) rsa2aes[h] = true;
+
+        if (ev.data.scni >= 0) {
+            // enqueue processed node
+            if (scq[ev.data.scni]) scq[ev.data.scni][1].push(ev.data);
+            else scq[ev.data.scni] = [null, [ev.data]];
+
+            if (!--nodesinflight[ev.data.scni]) {
+                delete nodesinflight[ev.data.scni];
+
+                // resume processing, if appropriate and needed
+                resumesc();
             }
         }
-        if (ev.data.sharekeys) {
-            for (h in ev.data.sharekeys) {
-                crypto_setsharekey(h, ev.data.sharekeys[h]);
+        else {
+            // maintain special incoming shares index
+            if (ev.data.p.length == 11) {
+                M.c.shares[ev.data.h] = { su : ev.data.p, r : ev.data.r };
+                if (u_sharekeys[ev.data.h]) M.c.shares[ev.data.h].sk = u_sharekeys[ev.data.h][0];
             }
+
+            if (fmdb) {
+                fmdb.add('f', {
+                    h : ev.data.h,
+                    p : ev.data.p,
+                    s : ev.data.s >= 0 ? ev.data.s : -ev.data.t,
+                    d : ev.data
+                });
+            }
+
+            emplacenode(ev.data);
         }
+    }
+    else if (ev.data[0] === 'console') {
+        if (d) {
+            var args = ev.data[1];
+            args.unshift('[nodedec worker]');
+            console.log.apply(console, args);
+        }
+        return;
+    }
+    else {
+        if (d) console.log("Worker done, " + this.ctx.dumpsremaining + " remaining");
 
         if (!--this.ctx.dumpsremaining) {
             // store incoming shares
@@ -6736,14 +6757,6 @@ function worker_procmsg(ev) {
                 delete this.ctx.residualfm;
             }
         }
-    }
-    else if (ev.data[0] === 'console') {
-        if (d) {
-            var args = ev.data[1];
-            args.unshift('[nodedec worker]');
-            console.log.apply(console, args);
-        }
-        return;
     }
 }
 
@@ -7997,9 +8010,6 @@ function loadfm_callback(res) {
 
         // decrypt hitherto undecrypted nodes
         crypto_fixmissingkeys(missingkeys);
-
-        // rewrite RSA keys to AES to save CPU & bandwidth & space
-        crypto_node_rsa2aes();
 
         // commit transaction and set sn
         setsn(res.sn);

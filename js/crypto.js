@@ -3746,14 +3746,29 @@ function api_updfkey(h) {
     }
 }
 
+var rsa2aes = {};
+
+// check for an RSA node key: need to rewrite to AES for faster subsequent loading.
+function crypto_rsacheck(n) {
+    if (typeof n.k == 'string'   // must be undecrypted
+     && (n.k.indexOf('/') > 55   // must be longer than userhandle (11) + ':' (1) + filekey (43)
+     || (n.k.length > 55 && n.k.indexOf('/') < 0))) {
+        rsa2aes[n.h] = true;
+    }
+}
+
 function crypto_node_rsa2aes() {
     var nk = [];
 
     for (h in rsa2aes) {
-        if (rsa2aes[h] && crypto_keyok(M.d[h])) {
+        // confirm that the key is good and actually decrypted the attribute
+        // string before rewriting
+        if (crypto_keyok(M.d[h]) && !M.d[h].a) {
             nk.push(h, a32_to_base64(encrypt_key(u_k_aes, M.d[h].k)));
         }
     }
+
+    rsa2aes = {};
 
     if (nk.length) {
         api_req({
@@ -3761,8 +3776,6 @@ function crypto_node_rsa2aes() {
             nk: nk
         });
     }
-
-    rsa2aes = {};
 }
 
 // missing keys handling
@@ -3923,24 +3936,26 @@ function crypto_procmcr(mcr) {
     }
 }
 
+var rsasharekeys = {};
+
 function crypto_share_rsa2aes() {
     var rsr = [],
         h;
 
     for (h in rsasharekeys) {
         if (u_sharekeys[h]) {
-            // pubkey found: encrypt share key to it
+            // valid AES sharekey found - overwrite the RSA version
             rsr.push(h, u_handle, a32_to_base64(encrypt_key(u_k_aes, u_sharekeys[h][0])));
         }
     }
+
+    rsasharekeys = {};
 
     if (rsr.length) {
         api_req({
             a: 'k',
             sr: rsr
         });
-
-        rsasharekeys = {};
     }
 }
 

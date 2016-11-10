@@ -7,8 +7,6 @@ if (typeof importScripts !== 'undefined') {
     self.postMessage = self.webkitPostMessage || self.postMessage;
 
     function init(debug) {
-        rsa2aes = {};
-        rsasharekeys = {};
         u_sharekeys = {};
         missingkeys = false;
     }
@@ -30,11 +28,6 @@ if (typeof importScripts !== 'undefined') {
                 }
                 else {
                     req.k = k;
-
-                    if (rsasharekeys[req.n]) {
-                        req.rsa = 1;
-                        delete rsasharekeys[req.n];
-                    }
                 }
             }
             self.postMessage(req);
@@ -51,7 +44,7 @@ if (typeof importScripts !== 'undefined') {
         else if (req.ha) {
             // ownerkey (ok element)
             if (crypto_handleauthcheck(req.h, req.ha)) {
-                console.log("successfully decrypted sharekeys for " + req.h);
+                console.log("Successfully decrypted sharekeys for " + req.h);
                 key = decrypt_key(u_k_aes, base64_to_a32(req.k));
                 u_sharekeys[req.h] = [key, new sjcl.cipher.aes(key)];
             }
@@ -74,18 +67,9 @@ if (typeof importScripts !== 'undefined') {
             u_sharekeys[req.n_h] = [key, new sjcl.cipher.aes(key)];
         }
         else {
-            // (cannot serialise sjcl.cipher.aes)
-            for (var h in u_sharekeys) u_sharekeys[h] = u_sharekeys[h][0];
-
-            // dump state
-            self.postMessage({
-                rsa2aes        : Object.keys(rsa2aes).length && rsa2aes,
-                rsasharekeys   : Object.keys(rsasharekeys).length && rsasharekeys,
-                sharekeys      : Object.keys(u_sharekeys).length && u_sharekeys,
-            });
-
-            // free up allocated mem
+            // done - free up allocated mem and confirm
             init();
+            self.postMessage({});
         }
     }
 
@@ -102,15 +86,11 @@ var u_privk;
 var u_k_aes;
 var u_sharekeys = {};
 
-var rsa2aes = {};
-var rsasharekeys = {};
-
 function crypto_process_sharekey(handle, key) {
-    if (key.length > 22) {
+    if (key.length > 43) {
         key = base64urldecode(key);
         var k = crypto_rsadecrypt(key, u_privk);
         if (k === false) return k;
-        rsasharekeys[handle] = true;
         return str_to_a32(k.substr(0, 16));
     }
 
@@ -140,9 +120,8 @@ function crypto_decryptnode(n) {
             if (key !== false) {
                 u_sharekeys[n.h] = [key, new sjcl.cipher.aes(key)];
                 n.p = n.u;
+                n.sk = key;
             }
-
-            delete n.sk;
         }
 
         // does the logged in user own the node? (user key is guaranteed to be located first in .k)
@@ -175,7 +154,7 @@ function crypto_decryptnode(n) {
             key = n.k.substr(p, pp-p);
 
             // we have found a suitable key: decrypt!
-            if (key.length < 46) {
+            if (key.length < 44) {
                 // short keys: AES
                 k = base64_to_a32(key);
 
@@ -200,9 +179,6 @@ function crypto_decryptnode(n) {
 
                             if (k !== false) {
                                 k = str_to_a32(k.substr(0, n.t ? 16 : 32));
-
-                                // request this RSA key to be rewritten to AES
-                                rsa2aes[n.h] = rsa2aes[n.h] || false;
                             }
                         }
                         else {
@@ -317,11 +293,6 @@ function crypto_procattr(n, key) {
         if (typeof o.n == 'string') {
             n.name = o.n;
             delete o.n;
-
-            // now we can be sure that we have a good key: approve requested AES rewrite
-            if (rsa2aes[n.h] === false) {
-                rsa2aes[n.h] = true;
-            }
 
             if (typeof o.c == 'string') {
                 n.hash = o.c;

@@ -2480,7 +2480,7 @@ function MegaData()
             // FIXME: this gets called with M.d[h] already
             // deleted, which means that the test below cannot
             // take effect.
-            fmdb.del('f', h);
+            if (fmdb) fmdb.del('f', h);
 
             if (M.d[h]) {
                 if (fmdb && !ignoreDB) {
@@ -3537,7 +3537,9 @@ function MegaData()
             else {
                 // always report missing keys as more shares may
                 // now be affected
-                crypto_reportmissingkey(n);
+                if (n.k) {
+                    crypto_reportmissingkey(n);
+                }
             }
         }
     };
@@ -6739,7 +6741,7 @@ function worker_procmsg(ev) {
         }
         return;
     }
-    else {
+    else if (ev.data.done) {
         if (d) console.log("Worker done, " + this.ctx.dumpsremaining + " remaining");
 
         if (!--this.ctx.dumpsremaining) {
@@ -6757,6 +6759,9 @@ function worker_procmsg(ev) {
                 delete this.ctx.residualfm;
             }
         }
+    }
+    else {
+        console.error("Unidentified nodedec worker response:", ev.data);
     }
 }
 

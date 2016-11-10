@@ -69,7 +69,7 @@ if (typeof importScripts !== 'undefined') {
         else {
             // done - free up allocated mem and confirm
             init();
-            self.postMessage({});
+            self.postMessage({done: 1});
         }
     }
 

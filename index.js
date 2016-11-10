@@ -192,6 +192,9 @@ function topPopupAlign(button, popup, topPos) {
 
 function init_page() {
 
+    // TODO: investigate why is this needed now.
+    page = page || (u_type ? 'fm' : 'start');
+
     /*if (page.substr(0, 8) == 'redirect') {
         return location.hash = page.substr(8);
     }*/
@@ -1323,7 +1326,7 @@ function topmenuUI() {
     else {
         $('.top-search-bl').addClass('hidden');
     }
-    
+
     // Show active item in main menu
     var section = page.split('/')[0];
     var $menuItem;

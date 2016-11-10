@@ -2149,22 +2149,24 @@ var directReseller = {
         var params = utcResult['EUR']['params'];
         params = atob(params);
 
-        // Gary at 6media
-        if (provider === 1) {
-            // Gary has a different urls for different countries, we modify the url based on
-            // where the API thinks we should go
-            var urlmod = utcResult['EUR']['urlmod'];
-            var baseurl = 'https://mega.and1.tw/';
+        var baseurls = [
+            '',
+            'https://mega.and1.tw/', // 6media
+            'https://mega.bwm-mediasoft.com/mega.php5?', // BWM Mediasoft
+            'https://my.hosting.co.uk/' // Hosting.co.uk
+        ];
 
-            // Check that country is defined, as originally the API did not provide it
+        if (provider >= 1 && provider <= 3)
+        {
+            var baseurl = baseurls[provider];
+            var urlmod = utcResult['EUR']['urlmod'];
+
+            // If the urlmod is not defined then we use the fully hardcoded url above,
+            // otherwise the API is adjusting the end of it.
             if (typeof urlmod !== 'undefined') {
                 baseurl += urlmod;
             }
             window.location =  baseurl + params;
-        }
-        // BWM Mediasoft
-        else if (provider === 2) {
-            window.location = 'https://mega.bwm-mediasoft.com/mega.php5?' + params;
         }
     }
 };

@@ -5634,7 +5634,7 @@ var nodesinflight = {};  // number of nodes being processed in the worker for sc
 // enqueue parsed actionpacket
 function sc_packet(a) {
     if ((a.a == 's' || a.a == 's2') && a.k) {
-        if (a.k && a.k.length > 43) {
+        if (a.k.length > 43) {
             // RSA-keyed share command: run through worker
             rsasharekeys[a.n] = true;
 

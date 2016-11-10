@@ -3762,6 +3762,7 @@
     "13762": "Ho\u00e0n t\u1ea5t x\u00f3a b\u1ecf v\u0129nh vi\u1ec5n 1 t\u1ec7p tin v\u00e0 %1 th\u01b0 m\u1ee5c.",
     "13763": "Ho\u00e0n t\u1ea5t x\u00f3a b\u1ecf v\u0129nh vi\u1ec5n %1 t\u1ec7p tin v\u00e0 1 th\u01b0 m\u1ee5c.",
     "13764": "Ho\u00e0n t\u1ea5t x\u00f3a b\u1ecf v\u0129nh vi\u1ec5n %1 t\u1ec7p tin v\u00e0 %2 th\u01b0 m\u1ee5c.",
+    "15536": "Click [B]Update[\/B] for the new browser code to run. Your session will remain open.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3991,6 +3992,7 @@
         "also-available-windows-mac": 12486,
         "also-available-windows-linux": 12487,
         "suggest-sync-client-message": 12488,
-        "about-page-introduction": 12489
+        "about-page-introduction": 12489,
+        "additional-site-update-message": 15536
     }
 }

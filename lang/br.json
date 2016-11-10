@@ -3762,6 +3762,7 @@
     "13762": "Voc\u00ea removeu permanentemente 1 arquivo e %1 pastas.",
     "13763": "Voc\u00ea removeu permanentemente os arquivos %1 e 1 pasta.",
     "13764": "Voc\u00ea removeu permanentemente os arquivos %1 e %2 pastas.",
+    "15536": "Click [B]Update[\/B] for the new browser code to run. Your session will remain open.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3991,6 +3992,7 @@
         "also-available-windows-mac": 12486,
         "also-available-windows-linux": 12487,
         "suggest-sync-client-message": 12488,
-        "about-page-introduction": 12489
+        "about-page-introduction": 12489,
+        "additional-site-update-message": 15536
     }
 }

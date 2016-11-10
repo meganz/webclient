@@ -3762,6 +3762,7 @@
     "13762": "Du har tagit bort 1 fil och %1 mappar permanent",
     "13763": "Du har tagit bort %1 filer och en mapp permanent",
     "13764": "Du har tagit bort %1 filer och %2 mappar  permanent",
+    "15536": "Click [B]Update[\/B] for the new browser code to run. Your session will remain open.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3991,6 +3992,7 @@
         "also-available-windows-mac": 12486,
         "also-available-windows-linux": 12487,
         "suggest-sync-client-message": 12488,
-        "about-page-introduction": 12489
+        "about-page-introduction": 12489,
+        "additional-site-update-message": 15536
     }
 }

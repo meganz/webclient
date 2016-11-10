@@ -3762,6 +3762,7 @@
     "13762": "Jeden plik i %1 katalogi zosta\u0142y usuni\u0119te.",
     "13763": "%1 pliki i 1 katalog zosta\u0142y usuni\u0119te.",
     "13764": "%1 pliki i %2 katalogi zosta\u0142y usuni\u0119te.",
+    "15536": "Click [B]Update[\/B] for the new browser code to run. Your session will remain open.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3991,6 +3992,7 @@
         "also-available-windows-mac": 12486,
         "also-available-windows-linux": 12487,
         "suggest-sync-client-message": 12488,
-        "about-page-introduction": 12489
+        "about-page-introduction": 12489,
+        "additional-site-update-message": 15536
     }
 }

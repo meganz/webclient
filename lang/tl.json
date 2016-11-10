@@ -3410,7 +3410,7 @@
     "8864": "Tinatanggal mo na ang nai-export ng Recovery Key file",
     "8865": "Kailangan mong ilagay ang iyong credentials (login at password) sa bagong app. Kung hindi mo tanda ang iyong password, maaaring i-Export ang Recovery Key bago tanggalin ang v1 app.",
     "8866": "Tingnan ang Profile",
-    "8867": "Tanggaling ang Ka-chat",
+    "8867": "Remove Participant",
     "8868": "Magtakda ng Pahintulot:",
     "8869": "Idagdag sa Grupohang Pag-uusap",
     "8870": "Pumili ng isa o higit pang contacts para magpatuloy",
@@ -3762,6 +3762,7 @@
     "13762": "Tinanggal mo ng tuluyan ang 1 file at %1 na folders.",
     "13763": "Tinanggal mo ng tuluyan ang %1 na files at 1 folder.",
     "13764": "You permanently removed %1 files and %2 folders.",
+    "15536": "Click [B]Update[\/B] for the new browser code to run. Your session will remain open.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3991,6 +3992,7 @@
         "also-available-windows-mac": 12486,
         "also-available-windows-linux": 12487,
         "suggest-sync-client-message": 12488,
-        "about-page-introduction": 12489
+        "about-page-introduction": 12489,
+        "additional-site-update-message": 15536
     }
 }

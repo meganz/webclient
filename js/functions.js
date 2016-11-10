@@ -3504,7 +3504,7 @@ mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
         M.tfsdomqueue = {};
         GlobalProgress = {};
         delete $.transferprogress;
-        if (page !== 'download' && document.querySelector('.fm-transfers-block')) {
+        if (page !== 'download') {
             fm_tfsupdate();
         }
         if ($.mTransferAnalysis) {

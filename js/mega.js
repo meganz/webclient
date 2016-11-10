@@ -4787,6 +4787,7 @@ function MegaData()
     this.tfsResizeHandler = SoonFc(function() {
 
         // if (M.currentdirid === 'transfers')
+        if (M.getTransferElements())
         {
             var T = M.getTransferTableLengths();
 
@@ -4811,6 +4812,9 @@ function MegaData()
     this.getTransferElements = function() {
         var obj               = {};
         obj.domTransfersBlock = document.querySelector('.fm-transfers-block');
+        if (!obj.domTransfersBlock) {
+            return false;
+        }
         obj.domTableWrapper   = obj.domTransfersBlock.querySelector('.transfer-table-wrapper');
         obj.domTransferHeader = obj.domTransfersBlock.querySelector('.fm-transfers-header');
         obj.domPanelTitle     = obj.domTransferHeader.querySelector('.transfer-panel-title');

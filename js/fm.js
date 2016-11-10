@@ -10881,11 +10881,13 @@ function fm_resize_handler() {
     if (ulmanager.isUploading || dlmanager.isDownloading) {
         var tfse = M.getTransferElements();
 
-        tfse.domScrollingTable.style.height = (
-                $(tfse.domTransfersBlock).outerHeight() -
-                $(tfse.domTableHeader).outerHeight() -
-                $(tfse.domTransferHeader).outerHeight()
-            ) + "px";
+        if (tfse) {
+            tfse.domScrollingTable.style.height = (
+                    $(tfse.domTransfersBlock).outerHeight() -
+                    $(tfse.domTableHeader).outerHeight() -
+                    $(tfse.domTransferHeader).outerHeight()
+                ) + "px";
+        }
     }
 
     if (M.currentdirid !== 'transfers') {

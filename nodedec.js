@@ -630,7 +630,7 @@ function dec_attr(attr, key) {
         return JSON.parse(from8(b.substr(4)));
     }
     catch (e) {
-        if (d) console.log(b, e);
+        if (d) console.log(b, String(e));
         var m = b.match(/"n"\s*:\s*"((?:\\"|.)*?)(\.\w{2,4})?"/);
         var s = m && m[1];
         var l = s && s.length || 0;

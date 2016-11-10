@@ -3565,18 +3565,14 @@ mega.utils.reload = function megaUtilsReload() {
             }
         }
 
+        localStorage.force = true;
         location.reload(true);
     }
 
     if (u_type !== 3) {
         stopsc();
         stopapi();
-        if (typeof mDB === 'object' && !pfid) {
-            mDBreload();
-        }
-        else {
-            loadfm(true);
-        }
+        loadfm(true);
     }
     else {
         // Show message that this operation will destroy the browser cache and reload the data stored by MEGA
@@ -3594,7 +3590,12 @@ mega.utils.reload = function megaUtilsReload() {
                                 mega.utils.clearFileSystemStorage()
                             ]).then(function(r) {
                                     console.debug('megaUtilsReload', r);
-                                    _reload();
+                                    if (fmdb) {
+                                        fmdb.db.delete().then(_reload, _reload);
+                                    }
+                                    else {
+                                        _reload();
+                                    }
                                 });
                         });
                     }
@@ -4130,8 +4131,8 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
                 }
 
                 handles.map(function(handle) {
-                    M.delNode(handle);
-                    api_req({a: 'd', n: handle, i: requesti});
+                    M.delNode(handle, true);    // must not update DB pre-API
+                    api_req({a: 'd', n: handle/*, i: requesti*/});
 
                     if (inRub) {
                         $('.grid-table.fm#' + handle).remove();
@@ -4818,24 +4819,36 @@ if (typeof sjcl !== 'undefined') {
                     s: [{ u: userEmail, r: ''}],
                     ha: '',
                     i: requesti
+                }, {
+                    userEmail: userEmail,
+                    selectedNodeHandle: selectedNodeHandle,
+                    handleOrEmail: handleOrEmail,
+
+                    callback : function(res, ctx) {
+                        if (typeof res == 'object') {
+                            // FIXME: examine error codes in res.r, display error
+                            // to user if needed
+
+                            // If it was a user handle, the share is a full share
+                            if (M.u[ctx.handleOrEmail]) {
+                                M.delNodeShare(ctx.selectedNodeHandle, ctx.handleOrEmail);
+                                setLastInteractionWith(ctx.handleOrEmail, "0:" + unixtime());
+
+                                self.removeFromPermissionQueue(ctx.handleOrEmail);
+                            }
+                            // Pending share
+                            else {
+                                var pendingContactId = M.findOutgoingPendingContactIdByEmail(ctx.userEmail);
+                                M.deletePendingShare(ctx.selectedNodeHandle, pendingContactId);
+
+                                self.removeFromPermissionQueue(ctx.userEmail);
+                            }
+                        }
+                        else {
+                            // FIXME: display error to user
+                        }
+                    }
                 });
-
-                // If it was a user handle, the share is a full share
-                if (M.u[handleOrEmail]) {
-                    userEmail = M.u[handleOrEmail].m;
-                    M.delNodeShare(selectedNodeHandle, handleOrEmail);
-                    setLastInteractionWith(handleOrEmail, "0:" + unixtime());
-
-                    self.removeFromPermissionQueue(handleOrEmail);
-                }
-
-                // Pending share
-                else {
-                    pendingContactId = M.findOutgoingPendingContactIdByEmail(userEmail);
-                    M.deletePendingShare(selectedNodeHandle, pendingContactId);
-
-                    self.removeFromPermissionQueue(userEmail);
-                }
             });
         }
     };

@@ -608,18 +608,20 @@ function initUI() {
                 $.copyids = ids;
                 $.copyt = t;
                 setTimeout(function() {
-                    M.copyNodes($.copyids, $.copyt, (dd === 'copydel'), function() {
+                    M.copyNodes($.copyids, $.copyt, (dd === 'copydel'), new MegaPromise())
+                        .done(function() {
 
-                        // Update files count...
-                        if (M.currentdirid === 'shares' && !M.viewmode) {
-                            M.openFolder('shares', 1);
-                        }
-                    }, function(error) {
-                        if (error === EOVERQUOTA) {
-                            return msgDialog('warninga', l[135], l[8435]);
-                        }
-                        return msgDialog('warninga', l[135], l[47], api_strerror(error));
-                    });
+                            // Update files count...
+                            if (M.currentdirid === 'shares' && !M.viewmode) {
+                                M.openFolder('shares', 1);
+                            }
+                        })
+                        .fail(function(error) {
+                            if (error === EOVERQUOTA) {
+                                return msgDialog('warninga', l[135], l[8435]);
+                            }
+                            return msgDialog('warninga', l[135], l[47], api_strerror(error));
+                        });
                 }, 50);
             }
             else if (dd === 'download') {
@@ -1249,15 +1251,6 @@ function showTransferToast(t_type, t_length, isPaused) {
 function hideTransferToast ($toast) {
     $toast.removeClass('visible');
     $('.toast-notification').removeClass('second');
-}
-
-function isValidShareLink()
-{
-    var valid = true;
-    for (var i in u_nodekeys) {
-        valid = valid && typeof u_nodekeys[i] == "object"
-    }
-    return valid;
 }
 
 function removeUInode(h, parent) {
@@ -2126,8 +2119,8 @@ function removeShare(shareId, nfk) {
         api_updfkey(shareId);
     }
 
-    M.delNode(shareId);
-    api_req({ a: 'd', n: shareId, i: requesti });
+    M.delNode(shareId, true);   // must not update DB pre-API
+    api_req({ a: 'd', n: shareId/*, i: requesti*/ });
 
     M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
 
@@ -2198,9 +2191,10 @@ function fmremove() {
                 $.selected.forEach(function(selected) {
 
                     if (M.c[selected]) {
-                        M.c[selected].forEach(function(sharenode) {
-                            removeShare(sharenode, 1);
-                        });
+                        Object.keys(M.c[selected])
+                            .forEach(function(sharenode) {
+                                removeShare(sharenode, 1);
+                            });
                     }
 
                     api_req({ a: 'ur2', u: $.selected[i], l: '0', i: requesti });
@@ -2308,23 +2302,19 @@ function fmremove() {
             }
         }
         else {
-
-            // Additional message in case that there's a shared node
-            var delShareInfo,
-
             // Contains complete directory structure of selected nodes, their ids
-            dirTree = [];
+            var selected = [], dirTree = [];
 
             for (var i in $.selected) {
-                if ($.selected.hasOwnProperty(i)) {
-                    var nodes = fm_getnodes($.selected[i], 1);
-                    nodes.unshift($.selected[i]);
-                    dirTree = dirTree.concat(nodes);
-                }
+                selected.push($.selected[i]);
+                var nodes = fm_getnodes($.selected[i], 1);
+                nodes.unshift($.selected[i]);
+                dirTree = dirTree.concat(nodes);
             }
 
+            // Additional message in case that there's a shared node
             var share = new mega.Share({});
-            delShareInfo = share.isShareExist(dirTree, true, true, true) ? ' ' + l[1952] + ' ' + l[7410] : '';
+            var delShareInfo = share.isShareExist(dirTree, true, true, true) ? ' ' + l[1952] + ' ' + l[7410] : '';
 
             msgDialog('remove', l[1003], l[1004].replace('[X]', fm_contains(filecnt, foldercnt)) + delShareInfo, false, function(e) {
                 if (e) {
@@ -2332,38 +2322,76 @@ function fmremove() {
                         M.copyNodes($.selected, M.RubbishID, true);
                     }
                     else {
+                        var delctx = { pending : 1, selected : selected };
 
                         // Remove all shares related to selected nodes
-                        for (var selection in dirTree) {
-                            if (dirTree.hasOwnProperty(selection)) {
+                        for (var i = dirTree.length; i--; ) {
+                            var h = dirTree[i];
 
-                                // Remove regular/full share
-                                for (var share in Object(M.d[dirTree[selection]]).shares) {
-                                    if (M.d[dirTree[selection]].shares.hasOwnProperty(share)) {
-                                        api_req({ a: 's2', n:  dirTree[selection], s: [{ u: M.d[dirTree[selection]].shares[share].u, r: ''}], ha: '', i: requesti });
-                                        M.delNodeShare(dirTree[selection], M.d[dirTree[selection]].shares[share].u);
-                                        setLastInteractionWith(dirTree[selection], "0:" + unixtime());
-                                    }
-                                }
+                            // remove established shares
+                            for (var share in Object(M.d[dirTree[i]]).shares) {
+                                delctx.pending++;
+                                api_req({ a: 's2',
+                                          n: h,
+                                          s: [{ u: M.d[h].shares[share].u, r: ''}],
+                                          ha: '',
+                                          i: requesti
+                                        }, {
+                                          n: h,
+                                          u: M.d[h].shares[share].u,
+                                          delctx: delctx,
+                                          callback: function(res, ctx) {
+                                                if (typeof res == 'object') {
+                                                    // FIXME: verify error codes in res.r
+                                                    M.delNodeShare(ctx.n, ctx.u);
+                                                    setLastInteractionWith(ctx.u, "0:" + unixtime());
+                                                }
+                                                else {
+                                                    // FIXME: display error to user
+                                                }
 
-                                // Remove pending share
-                                for (var pendingUserId in M.ps[dirTree[selection]]) {
-                                    if (M.ps[dirTree[selection]].hasOwnProperty(pendingUserId)) {
-                                        var userEmailOrID = Object(M.opc[pendingUserId]).m || pendingUserId;
-
-                                        api_req({
-                                            a: 's2', n: dirTree[selection],
-                                            s: [{u: userEmailOrID, r: ''}], ha: '', i: requesti
+                                                if (!--ctx.delctx.pending) {
+                                                    M.moveNodes(ctx.delctx.selected, M.RubbishID);
+                                                }
+                                            }
                                         });
+                            }
 
-                                        M.deletePendingShare(dirTree[selection], pendingUserId);
+                            // remove pending shares
+                            for (var pendingUserId in M.ps[h]) {
+                                var userEmailOrID = Object(M.opc[pendingUserId]).m || pendingUserId;
+                                delctx.pending++;
+                                api_req({
+                                    a: 's2',
+                                    n: h,
+                                    s: [{u: userEmailOrID, r: ''}],
+                                    ha: '',
+                                    i: requesti
+                                }, {
+                                    n: h,
+                                    u: pendingUserId,
+                                    delctx: delctx,
+                                    callback: function(res, ctx) {
+                                        if (typeof res == 'object') {
+                                            // FIXME: verify error codes in res.r
+                                            M.deletePendingShare(ctx.n, ctx.u);
+                                        }
+                                        else {
+                                            // FIXME: display error to user
+                                        }
+
+                                        if (!--ctx.delctx.pending) {
+                                            M.moveNodes(ctx.delctx.selected, M.RubbishID);
+                                        }
                                     }
-                                }
+                                });
                             }
                         }
-                        M.moveNodes($.selected, M.RubbishID);
-                    }
 
+                        if (!--delctx.pending) {
+                            M.moveNodes(delctx.selected, M.RubbishID);
+                        }
+                    }
                 }
             }, true);
         }
@@ -8366,9 +8394,9 @@ function initShareDialog() {
 
     $.shareTokens = [];
 
-    if (!u_type) {
+    /*if (!u_type) {
         return; // not for ephemeral
-    }
+    }*/
 
     // Prevents double initialization of token input
     if (!$('.share-multiple-input').tokenInput("getSettings")) {
@@ -10544,7 +10572,7 @@ function fetchsrc(id)
 
     preqs[id] = 1;
     var treq = {};
-    treq[id] = {fa: n.fa, k: n.key};
+    treq[id] = {fa: n.fa, k: n.k};
     api_getfileattr(treq, 1, function(ctx, id, uint8arr)
     {
         previewimg(id, uint8arr);
@@ -10553,10 +10581,10 @@ function fetchsrc(id)
                 console.log('Thumbnail found missing on preview, creating...', id, n);
             }
             var aes = new sjcl.cipher.aes([
-                n.key[0] ^ n.key[4],
-                n.key[1] ^ n.key[5],
-                n.key[2] ^ n.key[6],
-                n.key[3] ^ n.key[7]]);
+                n.k[0] ^ n.k[4],
+                n.k[1] ^ n.k[5],
+                n.k[2] ^ n.k[6],
+                n.k[3] ^ n.k[7]]);
             createnodethumbnail(n.h, aes, id, uint8arr);
         }
         if (id == slideshowid)
@@ -10657,7 +10685,7 @@ function fm_thumbnails()
                     treq[n.h] =
                         {
                             fa: n.fa,
-                            k: n.key
+                            k: n.k
                         };
                     th_requested[n.h] = 1;
 
@@ -10853,11 +10881,13 @@ function fm_resize_handler() {
     if (ulmanager.isUploading || dlmanager.isDownloading) {
         var tfse = M.getTransferElements();
 
-        tfse.domScrollingTable.style.height = (
-                $(tfse.domTransfersBlock).outerHeight() -
-                $(tfse.domTableHeader).outerHeight() -
-                $(tfse.domTransferHeader).outerHeight()
-            ) + "px";
+        if (tfse) {
+            tfse.domScrollingTable.style.height = (
+                    $(tfse.domTransfersBlock).outerHeight() -
+                    $(tfse.domTableHeader).outerHeight() -
+                    $(tfse.domTransferHeader).outerHeight()
+                ) + "px";
+        }
     }
 
     if (M.currentdirid !== 'transfers') {

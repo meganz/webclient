@@ -313,6 +313,10 @@ function init_page() {
         }
     }
 
+    // FIXME
+    // all gloabal state must be encapsulated in a single object -
+    // we can then comfortably switch between states by changing the
+    // current object and switching UI/XHR comms/IndexedDB
     var fmwasinitialized = !!fminitialized;
     if (((u_type === 0 || u_type === 3) || pfid || folderlink) && (!flhashchange || !pfid || pfkey !== oldPFKey)) {
 
@@ -331,32 +335,23 @@ function init_page() {
 
                 M.reset();
                 folderlink = 0;
+                initworkerpool();
                 fminitialized = false;
                 loadfm.loaded = false;
                 if (loadfm.loading) {
                     api_init(wasFolderlink ? 1 : 0, 'cs');
+                    api_init(wasFolderlink ? 5 : 4, 'cs');
                     loadfm.loading = false;
                 }
                 if (typeof mDBcls === 'function') {
-                    mDBcls();
+                   mDBcls(); // close fmdb
                 }
             }
         }
 
         if (!fminitialized) {
-            if (u_type === 3 && !pfid && !folderlink) {
-                mega.config.fetch();
-            }
             mega.initLoadReport();
-
-            if (typeof mDB !== 'undefined' && !pfid && (!flhashchange || page === 'fm')) {
-                mDBstart();
-                mega.loadReport.mode = 1;
-            }
-            else {
-                loadfm();
-                mega.loadReport.mode = 2;
-            }
+			loadfm();
         }
     }
 
@@ -1252,18 +1247,24 @@ function topmenuUI() {
 
         $('.top-menu-item.logout,.context-menu-divider.logout').show();
         $('.top-menu-item.clouddrive,.top-menu-item.account').show();
-        $('.fm-avatar').show();
+
+        if (M.u[u_handle] && M.u[u_handle].avatar || avatars[u_handle]) {
+            $('.fm-avatar').show();
+            $('.fm-avatar img').attr('src', useravatar.imgUrl(u_handle));
+        }
+
         $('.top-login-button').hide();
         $('.membership-status').show();
         $('.top-change-language').hide();
         $('.create-account-button').hide();
         $('.membership-status-block').show();
 
-        Soon(function() {
-            if (!avatars[u_handle]) {
-                useravatar.loadAvatar(u_handle);
-            }
-        });
+// too soon!
+//        Soon(function() {
+//            if (!avatars[u_handle]) {
+//                useravatar.loadAvatar(u_handle);
+//            }
+//        });
 
         // If a Lite/Pro plan has been purchased
         if (u_attr.p) {
@@ -1983,7 +1984,9 @@ function parsetopmenu() {
     if (document.location.href.substr(0, 19) == 'chrome-extension://') {
         top = top.replace(/\/#/g, '/' + urlrootfile + '#');
     }
-    top = top.replace("{avatar-top}", window.useravatar && useravatar.top() || '');
+// not this early, please
+//    top = top.replace("{avatar-top}", window.useravatar && useravatar.top() || '');
+    top = top.replace("{avatar-top}", '');
     top = translate(top);
     return top;
 }

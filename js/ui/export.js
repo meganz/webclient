@@ -574,12 +574,12 @@ var exportPassword = {
                         // Folder
                         if (node.t) {
                             linkInfo.type = exportPassword.LINK_TYPE_FOLDER;    // 0 byte for folder link
-                            linkInfo.key = u_sharekeys[node.h];                 // 128 bit key as array of 32 bit int
+                            linkInfo.key = u_sharekeys[node.h][0];              // 128 bit key as array of 32 bit int
                         }
                         else {
                             // File
                             linkInfo.type = exportPassword.LINK_TYPE_FILE;      // 1 byte for file link
-                            linkInfo.key = node.key;                            // 256 bit key as array of 32 bit int
+                            linkInfo.key = node.k;                              // 256 bit key as array of 32 bit int
                         }
 
                         // Convert the key to a byte array (big endian), also add the link's handle and public handle
@@ -1509,12 +1509,12 @@ var exportExpiry = {
                         if (node.t) {
                             // Folder
                             type = 'F';
-                            key = u_sharekeys[node.h];
+                            key = u_sharekeys[node.h][0];
                         }
                         else {
                             // File
                             type = '';
-                            key = node.key;
+                            key = node.k;
                         }
 
                         var nodeUrlWithPublicHandle = getBaseUrl() + '/#' + type + '!' + (node.ph);
@@ -1585,7 +1585,7 @@ var exportExpiry = {
         // Shared item type is folder
         if (item.t) {
             type = 'F';
-            key = u_sharekeys[item.h];
+            key = u_sharekeys[item.h][0];
             fileSize = '';
             folderClass = ' folder-item';
         }
@@ -1593,7 +1593,7 @@ var exportExpiry = {
         // Shared item type is file
         else {
             type = '';
-            key = item.key;
+            key = item.k;
             fileSize = htmlentities(bytesToSize(item.s));
         }
 
@@ -1801,10 +1801,13 @@ var exportExpiry = {
         api_req(request, {
             nodeId: nodeId,
             callback: function(result) {
-
                 if (typeof result !== 'number') {
                     M.nodeShare(this.nodeId, { h: this.nodeId, r: 0, u: 'EXP', ts: unixtime() });
-                    M.nodeAttr({ h: this.nodeId, ph: result });
+                    var n;
+                    if (fmdb && (n = M.d[this.nodeId])) {
+                        n.ph = result;
+                        M.nodeUpdated(n);
+                    }
                 }
                 else { // Error
                     self.logger.warn('_getExportLinkRequest:', this.nodeId, 'Error code: ', result);

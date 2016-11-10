@@ -8394,9 +8394,9 @@ function initShareDialog() {
 
     $.shareTokens = [];
 
-    if (!u_type) {
+    /*if (!u_type) {
         return; // not for ephemeral
-    }
+    }*/
 
     // Prevents double initialization of token input
     if (!$('.share-multiple-input').tokenInput("getSettings")) {

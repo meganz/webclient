@@ -908,7 +908,7 @@ function checkUserLogin() {
      * @private
      */
     var store = function() {
-        if (!u_handle) {
+        if (!u_handle || pfid) {
             return MegaPromise.reject(EINCOMPLETE);
         }
 

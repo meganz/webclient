@@ -3762,6 +3762,7 @@
     "13762": "\u0644\u0642\u062f \u062d\u0630\u0641\u062a \u0646\u0647\u0627\u0626\u064a\u0627 \u0645\u0644\u0641 \u0648\u0627\u062d\u062f \u0648 %1 \u0645\u062c\u0644\u062f\u0627\u062a.",
     "13763": "\u0644\u0642\u062f \u062d\u0630\u0641\u062a \u0646\u0647\u0627\u0626\u064a\u0627 %1 \u0645\u0644\u0641\u0627\u062a \u0648\u0645\u062c\u0644\u062f \u0648\u0627\u062d\u062f",
     "13764": "\u0644\u0642\u062f \u062d\u0630\u0641\u062a \u0646\u0647\u0627\u0626\u064a\u0627 %1 \u0645\u0644\u0641\u0627\u062a \u0648 %2 \u0645\u062c\u0644\u062f\u0627\u062a.",
+    "15536": "Click [B]Update[\/B] for the new browser code to run. Your session will remain open.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3991,6 +3992,7 @@
         "also-available-windows-mac": 12486,
         "also-available-windows-linux": 12487,
         "suggest-sync-client-message": 12488,
-        "about-page-introduction": 12489
+        "about-page-introduction": 12489,
+        "additional-site-update-message": 15536
     }
 }

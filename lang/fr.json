@@ -3762,6 +3762,7 @@
     "13762": "Vous avez supprim\u00e9 un fichier et %1 dossiers de fa\u00e7on permanente.",
     "13763": "Vous avez supprim\u00e9 %1 fichiers et un dossier de fa\u00e7on permanente.",
     "13764": "Vous avez supprim\u00e9 %1 fichiers et %2 dossiers de fa\u00e7on permanente.",
+    "15536": "Click [B]Update[\/B] for the new browser code to run. Your session will remain open.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3991,6 +3992,7 @@
         "also-available-windows-mac": 12486,
         "also-available-windows-linux": 12487,
         "suggest-sync-client-message": 12488,
-        "about-page-introduction": 12489
+        "about-page-introduction": 12489,
+        "additional-site-update-message": 15536
     }
 }

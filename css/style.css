@@ -7371,6 +7371,9 @@ table {
     position: relative;
     margin-top: -1px;
 }
+ .fm-right-block.dashboard, .fm-right-block.dashboard .jspContainer, .fm-right-block.dashboard .jspPane {
+     width:auto !important;
+ }
 .fm-right-block.dashboard {
     background-color: #fafafa;
 }

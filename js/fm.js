@@ -12212,7 +12212,6 @@ function fm_resize_handler() {
     }
     else if (M.currentdirid && M.currentdirid.substr(0, 7) === 'account') {
         var $mainBlock = $('.fm-account-main');
-
         $mainBlock.removeClass('ultra-low-width low-width hi-width');
 
         if ($mainBlock.width() > 1675) {
@@ -12221,25 +12220,23 @@ function fm_resize_handler() {
         else if ($mainBlock.width() < 880) {
             $mainBlock.addClass('low-width');
         }
-
         initAccountScroll();
     }
     else if (M.currentdirid && M.currentdirid.substr(0, 9) === 'dashboard') {
         var $mainBlock = $('.fm-right-block.dashboard');
-
-        $mainBlock.removeClass('ultra low-width hi-width');
-
-        if ($mainBlock.width() > 1675) {
-            $mainBlock.addClass('hi-width');
-        }
-        else if ($mainBlock.width() < 880 && $mainBlock.width() > 850) {
-            $mainBlock.addClass('low-width');
-        }
-        else if ($mainBlock.width() < 850) {
-            $mainBlock.addClass('ultra low-width');
-        }
-
-        initDashboardScroll();
+        Soon(function() {
+            $mainBlock.removeClass('ultra low-width hi-width');
+            if ($mainBlock.width() > 1675) {
+                $mainBlock.addClass('hi-width');
+            }
+            else if ($mainBlock.width() < 880 && $mainBlock.width() > 850) {
+                $mainBlock.addClass('low-width');
+            }
+            else if ($mainBlock.width() < 850) {
+                $mainBlock.addClass('ultra low-width');
+            }    
+            initDashboardScroll();
+        });
     }
     else {
         if (M.viewmode) {

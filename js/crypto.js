@@ -2908,7 +2908,7 @@ function api_storefileattr(id, type, key, data, ctx) {
         req.h = handle;
     }
 
-    api_req(req, ctx, folderlink ? 1 : 0);
+    api_req(req, ctx, pfid ? 1 : 0);
 }
 
 function api_getfileattr(fa, type, procfa, errfa) {

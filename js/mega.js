@@ -6442,7 +6442,7 @@ function initworkerpool() {
     workers = [];
     var workerstate;
 
-    if (!folderlink) {
+    if (!pfid) {
         // worker state for a user account fetch
         workerstate = {
             u_handle : u_handle,
@@ -6487,7 +6487,7 @@ function initworkerpool() {
 // initiate fetch of node tree
 // FIXME: what happens when the user pastes a folder link over his loaded/loading account?
 TreeFetcher.prototype.fetch = function treefetcher_fetch(force) {
-    if (folderlink) this.getfolderlinkroot = true;
+    if (pfid) this.getfolderlinkroot = true;
 
     // FIXME: not needed for folder links
     if (workers) {
@@ -6559,7 +6559,7 @@ TreeFetcher.prototype.fetch = function treefetcher_fetch(force) {
                 ctx.ctx.logger.warn('Error parsing JSON, retrying...');
             }
         }
-    }, folderlink ? 5 : 4);
+    }, pfid ? 5 : 4);
 };
 
 // get next worker index (round robin)
@@ -6644,7 +6644,6 @@ TreeFetcher.prototype.node = function treefetcher_node(node) {
 
     // RSA share key? need to rewrite, too.
     if (node.sk && node.sk.length > 43) {
-console.error("RSA sharekey=" + node.sk);
         rsasharekeys[node.h] = true;
     }
 
@@ -6802,7 +6801,7 @@ function loadfm(force) {
             loadfm.loading = true;
 
             // is this a folder link? or do we have no valid cache for this session?
-            if (folderlink) fetchfm(false);
+            if (pfid) fetchfm(false);
             else {
                 fmdb = FMDB(u_handle, {
                     // channel 0: transactional by _sn update

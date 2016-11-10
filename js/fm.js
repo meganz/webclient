@@ -875,7 +875,8 @@ function initUI() {
         setTimeout(browserDialog, 2000);
     }
 
-    var lPane = $('.fm-left-panel');
+    // chat can handle the left-panel resizing on its own
+    var lPane = $('.fm-left-panel').filter(":not(.chat-left-panel)");
     $.leftPaneResizable = new FMResizablePane(lPane, {
         'direction': 'e',
         'minWidth': 200,

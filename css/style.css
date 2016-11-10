@@ -14474,7 +14474,7 @@ body.key.ka .reg-st3-bandwidth, body.key.uk .reg-st3-bandwidth {
     margin-right: 4px;
 }
 .provider-icon {
-    background-image: url("../images/mega/payment-provider-icons-v1.png");
+    background-image: url("../images/mega/payment-provider-icons-v2.png");
     background-position: 0 0;
     background-repeat: no-repeat;
     display: inline-block;
@@ -14683,11 +14683,20 @@ body.key.ka .reg-st3-bandwidth, body.key.uk .reg-st3-bandwidth {
 .provider-icon.ecp {
     background-position: 0 -3540px;
 }
+.provider-icon.ecpVI {
+    background-position: 0 -3360px;
+}
+.provider-icon.ecpMC {
+    background-position: 0 -1980px;
+}
 .provider-icon.wiretransfer {
     background-position: 0 -3960px;
 }
 .provider-icon.directreseller {
     background-position: 0 -3540px;
+}
+.provider-icon.directresellerAlipay {
+    background-position: 0 -4020px;
 }
 .membership-new-offer text {
     font-weight: normal;

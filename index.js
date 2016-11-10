@@ -313,6 +313,10 @@ function init_page() {
         }
     }
 
+    // FIXME
+    // all gloabal state must be encapsulated in a single object -
+    // we can then comfortably switch between states by changing the
+    // current object and switching UI/XHR comms/IndexedDB
     var fmwasinitialized = !!fminitialized;
     if (((u_type === 0 || u_type === 3) || pfid || folderlink) && (!flhashchange || !pfid || pfkey !== oldPFKey)) {
 
@@ -331,6 +335,7 @@ function init_page() {
 
                 M.reset();
                 folderlink = 0;
+                initworkerpool();
                 fminitialized = false;
                 loadfm.loaded = false;
                 if (loadfm.loading) {
@@ -345,22 +350,7 @@ function init_page() {
         }
 
         if (!fminitialized) {
-// Not this early!
-//            if (u_type === 3 && !pfid && !folderlink) {
-//                mega.config.fetch();
-//            }
             mega.initLoadReport();
-
-			/*
-            if (typeof mDB !== 'undefined' && !pfid && (!flhashchange || page === 'fm')) {
-                mDBstart();
-                mega.loadReport.mode = 1;
-            }
-            else {
-                loadfm();
-                mega.loadReport.mode = 2;
-            }
-			*/
 			loadfm();
         }
     }

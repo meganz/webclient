@@ -41,12 +41,12 @@ module.exports = function(config) {
         'js/vendor/notification.js',
         'js/vendor/moment.js',
         // Chat libraries.
+        'js/vendor/chat/strophe.jingle.adapter.js',
         'js/vendor/chat/strophe.light.js',
         'js/vendor/chat/strophe.disco.js',
         'js/vendor/chat/strophe.jingle.js',
         'js/vendor/chat/strophe.jingle.session.js',
         'js/vendor/chat/strophe.jingle.sdp.js',
-        'js/vendor/chat/strophe.jingle.adapter.js',
         'js/vendor/chat/strophe.muc.js',
         'js/vendor/chat/strophe.roster.js',
         'js/vendor/chat/wildemitter.patched.js',
@@ -102,7 +102,6 @@ module.exports = function(config) {
         'js/notify.js',
         'js/megaNotifications.js',
         'js/vendor/avatar.js',
-        'js/megaKvStorage.js',
         'js/vendor/int64.js',
         'js/cms.js',
         // Google Import Contacts

@@ -129,7 +129,6 @@
         "e10s.js",
         "fileapi.js",
         "aesasm.js",
-        "keydec.js",
         "keygen.js",
         "nacl-fast.js",
         "karma.conf.js",

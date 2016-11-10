@@ -6434,10 +6434,15 @@ function TreeFetcher() {
 var workers;
 
 function initworkerpool() {
+    // terminate existing workers
+    if (workers) {
+        for (var i = workers.length; i--; ) workers[i].terminate();
+    }
+
     workers = [];
     var workerstate;
 
-    if (!n_h) {
+    if (!folderlink) {
         // worker state for a user account fetch
         workerstate = {
             u_handle : u_handle,
@@ -6482,7 +6487,7 @@ function initworkerpool() {
 // initiate fetch of node tree
 // FIXME: what happens when the user pastes a folder link over his loaded/loading account?
 TreeFetcher.prototype.fetch = function treefetcher_fetch(force) {
-    if (n_h) this.getfolderlinkroot = true;
+    if (folderlink) this.getfolderlinkroot = true;
 
     // FIXME: not needed for folder links
     if (workers) {
@@ -6554,7 +6559,7 @@ TreeFetcher.prototype.fetch = function treefetcher_fetch(force) {
                 ctx.ctx.logger.warn('Error parsing JSON, retrying...');
             }
         }
-    }, n_h ? 5 : 4);
+    }, folderlink ? 5 : 4);
 };
 
 // get next worker index (round robin)
@@ -6797,7 +6802,7 @@ function loadfm(force) {
             loadfm.loading = true;
 
             // is this a folder link? or do we have no valid cache for this session?
-            if (n_h) fetchfm(false);
+            if (folderlink) fetchfm(false);
             else {
                 fmdb = FMDB(u_handle, {
                     // channel 0: transactional by _sn update
@@ -6847,7 +6852,7 @@ function fetchfm(sn) {
 
             mega.loadReport.mode = 2;
 
-            if (!n_h) {
+            if (!folderlink) {
                 // dbToNet holds the time wasted trying to read local DB, and having found we have to query the server.
                 mega.loadReport.dbToNet       = Date.now() - mega.loadReport.startTime;
                 mega.loadReport.stepTimeStamp = Date.now();

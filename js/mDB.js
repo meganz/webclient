@@ -53,8 +53,9 @@ function FMDB(plainname, schema, channelmap) {
     // a DB error occurred, do not touch IndexedDB for the rest of the session
     this.crashed = false;
 
-    // DB invalidation process: reload request stage (-1: requested, 1: ready)
-    this.reload = 0;
+    // DB invalidation process: callback and ready flag
+    this.inval_cb = false;
+    this.inval_ready = false;
 
     // whether multi-table transactions work (1) or not (0) (Apple, looking at you!)
     this.cantransact = -1;
@@ -78,6 +79,10 @@ FMDB.prototype.identity = Date.now() + Math.random().toString(26);
 // wipes DB an calls result(false) otherwise
 FMDB.prototype.init = function fmdb_init(result, wipe) {
     var fmdb = this;
+
+    fmdb.crashed = false;
+    fmdb.inval_cb = false;
+    fmdb.inval_ready = false;
 
     if (!fmdb.up()) result(false);
     else {
@@ -279,10 +284,15 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
         if (fmdb.inflight) return;
 
         if (fmdb.commit) {
-            // commit with pending reload request? time to reload.
-            if (fmdb.reload > 0) {
-                location.replace('#');
-                return location.reload();
+            // invalidation commit completed?
+            if (fmdb.inval_ready) {
+                if (fmdb.inval_cb) {
+                    // actually complete the transaction
+                    setTimeout(fmdb.inval_cb, 1);
+                    // FIXME: is this guaranteed to first go here and then to the timeout completion?
+                    fmdb.inval_cb = false;
+                }
+                return;
             }
 
             // the transaction is complete: delete from pending
@@ -330,8 +340,8 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                 // record what we are sending...
                 fmdb.inflight = t;
 
-                // is this an in-band _sn invalidation? get ready for reload-on-commit
-                if (fmdb.reload < 0 && t.t & 1 && table[0] == '_') fmdb.reload = 1;
+                // is this an in-band _sn invalidation, and do we have a callback set? arm it.
+                if (fmdb.inval_cb && t.t & 1 && table[0] == '_') fmdb.inval_ready = true;
 
                 // ...and send update off to IndexedDB for writing
                 fmdb.db[table][t.t & 1 ? 'bulkDelete' : 'bulkPut'](t[t.t++]).then(function(){
@@ -695,9 +705,30 @@ FMDB.prototype.clone = function fmdb_clone(o) {
     return r;
 };
 
+// reliably invalidate the current database (delete the sn)
+FMDB.prototype.invalidate = function fmdb_invalidate(cb) {
+    var channels = Object.keys(this.pending);
+
+    // erase all pending data
+    for (var i = channels.length; i--; ) {
+        this.head[i] = 0;
+        this.tail[i] = 0;
+        this.pending[i] = {};
+    }
+
+    // enqueue the final _sn deletion that will mark the DB as invalid
+    this.del('_sn', 1);
+
+    // prevent further reads or writes
+    this.crashed = true;
+
+    // set completion callback
+    this.inval_cb = cb;
+};
+
 // checks if crashed or being used by another tab concurrently
 FMDB.prototype.up = function fmdb_up() {
-    if (this.crashed || this.reload) return false;
+    if (this.crashed) return false;
 
     var state = localStorage[this.name];
     var time = Date.now();

@@ -6494,9 +6494,10 @@ function fm_forcerefresh() {
     localStorage.force = 1;
 
     if (fmdb && !fmdb.crashed) {
-        fmdb.del('_sn', 1);
-        fmdb.reload = -1;   // request reload after _sn deletion
         execsc = function() {}; // stop further SC processing
+        fmdb.invalidate(function(){
+            location.reload();
+        });
     }
     else {
         location.reload();
@@ -6564,16 +6565,13 @@ TreeFetcher.prototype.fetch = function treefetcher_fetch(force) {
             if (buffer && !gettree_filter.proc(buffer)) {
                 api_cancel(xhr.q);
 
-                var retry = api_reqerror.bind(null, xhr.q, -3);
-                var fmdb_open = function() {
-                    fmdb.db.open().then(retry, retry);
-                };
-                if (fmdb) {
-                    fmdb.db.delete().then(fmdb_open, fmdb_open);
-                }
-                else {
-                    retry();
-                }
+                // bring DB to a defined state
+                fmdb.invalidate(function(){
+                    // wipe partially written data and trigger retry
+                    fmdb.init(function(){
+                        api_reqerror.bind(null, xhr.q, -3);
+                    }, true);
+                });
 
                 ctx.ctx.logger.warn('Error parsing JSON, retrying...');
             }

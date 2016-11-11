@@ -6286,6 +6286,27 @@ function execsc() {
                     notify.countAndShowNewNotifications();
                     break;
 
+                case 'usc':
+                    // user state cleared - mark local DB as invalid
+                    if (fmdb) {
+                        blocksn = true;
+                        fmdb.del('_sn', 1);
+                        // FIXME: add stopbeacon() to mDB.js
+                        fmdb.up = function() {};
+                    }
+
+                    localStorage.clear();
+                    sessionStorage.clear();
+
+                    // FIXME: localise
+                    msgDialog('warninga', '',
+                              'This account no longer exists',
+                              'It may have been parked or deleted.',
+                              function(){
+                                location.reload();
+                             });
+                    break;
+
                 // FIXME: duplicated code
                 case 'opc':
                     // outgoing pending contact

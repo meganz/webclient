@@ -1879,9 +1879,12 @@ function stopsc() {
     }
 }
 
+// if set, further sn updates are disallowed (the local state has become invalid)
+var blocksn = false;
+
 function setsn(sn) {
     // update sn in DB, triggering a "commit" of the current "transaction"
-    if (fmdb) fmdb.add('_sn', { i : 1, d : sn });
+    if (fmdb && !blocksn) fmdb.add('_sn', { i : 1, d : sn });
 }
 
 /**

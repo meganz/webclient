@@ -67,7 +67,7 @@ describe("crypto unit test", function() {
     });
 
     describe('crypt namespace', function() {
-        describe('getPubKeyAattribute()', function() {
+        describe('getPubKeyAttribute()', function() {
             it("RSA key", function() {
                 sandbox.stub(ns._logger, '_log');
                 var pubKey = 'the key';
@@ -84,7 +84,7 @@ describe("crypto unit test", function() {
                 assert.strictEqual(result, rootPromise);
                 assert.strictEqual(attribCache.getItem.callCount, 1);
                 assert.strictEqual(api_req.callCount, 1);
-                assert.deepEqual(api_req.args[0][0], { a: 'uk', u: 'you456789xw', i: requesti });
+                assert.deepEqual(api_req.args[0][0], { a: 'uk', u: 'you456789xw' });
                 assert.strictEqual(api_req.args[0][1].u, 'you456789xw');
 
                 var settleFunction = api_req.args[0][1].callback;
@@ -109,7 +109,7 @@ describe("crypto unit test", function() {
                 assert.strictEqual(result, rootPromise);
                 assert.strictEqual(attribCache.getItem.callCount, 1);
                 assert.strictEqual(api_req.callCount, 1);
-                assert.deepEqual(api_req.args[0][0], { a: 'uk', u: 'you456789xw', i: requesti });
+                assert.deepEqual(api_req.args[0][0], { a: 'uk', u: 'you456789xw' });
                 assert.strictEqual(api_req.args[0][1].u, 'you456789xw');
 
                 var settleFunction = api_req.args[0][1].callback;

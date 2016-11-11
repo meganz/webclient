@@ -39,6 +39,11 @@ Unless otherwise noted, they were released under a [MIT License].
 > **This is a fork**, [Compare the changes](https://github.com/aaronpowell/db.js/compare/master...meganz:master)
 
 ---
+[dexie.js]: A Minimalistic Wrapper for IndexedDB
+
+> Released under the [Apache License Version 2.0](http://www.apache.org/licenses/).
+
+---
 [dcraw.js]: Dave Coffin's raw photo decoder [dcraw.c](http://www.cybercom.net/~dcoffin/dcraw/) ported to JavaScript using [Emscripten]
 
 > NB: To compile from C source, fork the repo and run `build.sh`.
@@ -168,6 +173,7 @@ Unless otherwise noted, they were released under a [MIT License].
 [avatar.js]: <https://github.com/meganz/avatar-picker>
 [bitcoin-math.js]: <https://github.com/meganz/bitcoin-math>
 [db.js]: <https://github.com/meganz/db.js>
+[dexie.js]: <https://github.com/dfahlander/Dexie.js>
 [dcraw.js]: <https://github.com/meganz/dcraw.js>
 [es6-shim]: <https://github.com/meganz/es6-shim>
 [exif-js]: <https://github.com/meganz/exif-js>

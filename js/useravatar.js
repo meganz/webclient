@@ -234,7 +234,11 @@ var useravatar = (function() {
 
         if (user === u_handle) {
             // my avatar!
-            $('.fm-avatar img,.fm-account-avatar img').attr('src', ns.imgUrl(user));
+            Soon(function() {
+                $('.fm-avatar img,.fm-account-avatar img').attr('src', ns.imgUrl(user));
+                topmenuUI();
+            });
+
         }
 
         if (M.u[user]) {
@@ -339,7 +343,9 @@ var useravatar = (function() {
                     // it makes more sense to just call topmenuUI() and it should check if this avatar is missing
                     // but since M.u[u_handle] is not yet initialised...and missingAvatars are private, the only way
                     // to do this was in here.
-                    $('#topmenu .fm-avatar').show();
+                    Soon(function() {
+                        topmenuUI();
+                    });
                 }
             });
 
@@ -435,10 +441,9 @@ var useravatar = (function() {
                 };
 
                 if (M.u[handle]) {
-                    M.u[handle].avatar = false;
                     M.u[handle].avatar = {
-                        'type': 'text',
-                        'avatar': _getAvatarProperties(handle)
+                        'type': 'image',
+                        'avatar': avatars[handle].url
                     };
                 }
 
@@ -468,13 +473,32 @@ var useravatar = (function() {
             avatars[handle] = missingAvatars[handle] = undefined;
 
             if (M.u[handle]) {
-                M.u[handle].avatar = false;
+                M.u[handle].avatar = {
+                    'type': 'text',
+                    'avatar': _getAvatarProperties(M.u[handle])
+                };
             }
         };
 
         if (d) {
             ns._pendingGetters = pendingGetters;
             ns._missingAvatars = missingAvatars;
+        }
+
+        /**
+         * A method to indicate if the loading of an avatar (if such is available) for user `handle` had finished
+         * In case we are still loading for the avatar this method would return true
+         * If there is no avatar on the server, this method would also return true
+         * @param handle
+         * @returns {boolean}
+         */
+        ns.hadLoadedAvatar = function(handle) {
+            if (ns._missingAvatars[handle] || avatars[handle]) {
+                return true;
+            }
+            else {
+                return false;
+            }
         }
 
     })(ns);

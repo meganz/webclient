@@ -769,7 +769,6 @@ function MegaData()
         var waitingPromises = [];
         M.u.forEach(function(c, u) {
             if (!avatars[u] && (M.u[u].c === 1 || M.u[u].c === 2 || M.u[u].c === 0)) {
-
                 waitingPromises.push(useravatar.loadAvatar(u));
             }
         });

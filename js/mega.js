@@ -6288,25 +6288,7 @@ function execsc() {
 
                 case 'usc':
                     // user state cleared - mark local DB as invalid
-                    if (fmdb) {
-                        fmdb.del('_sn', 1);
-                        // FIXME: add stopbeacon() to mDB.js
-                        fmdb.up = function() {};
-                        execsc = function() {};
-                        setsn = function() {};
-                    }
-
-                    localStorage.clear();
-                    sessionStorage.clear();
-
-                    // FIXME: localise
-                    msgDialog('warninga', '',
-                              'This account no longer exists',
-                              'It may have been parked or deleted.',
-                              function(){
-                                location.reload();
-                             });
-                    return;
+                    return fm_forcerefresh();
 
                 // FIXME: duplicated code
                 case 'opc':
@@ -6501,6 +6483,23 @@ function initworkerpool() {
             }
             break;
         }
+    }
+}
+
+// queue a DB invalidation-plus-reload request to the FMDB subsystem
+// if it isn't up, reload directly
+// the server-side treecache is wiped (otherwise, we could run into
+// an endless loop)
+function fm_forcerefresh() {
+    localStorage.force = 1;
+
+    if (fmdb && !fmdb.crashed) {
+        fmdb.del('_sn', 1);
+        fmdb.reload = -1;   // request reload after _sn deletion
+        execsc = function() {}; // stop further SC processing
+    }
+    else {
+        location.reload();
     }
 }
 

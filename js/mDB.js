@@ -53,6 +53,9 @@ function FMDB(plainname, schema, channelmap) {
     // a DB error occurred, do not touch IndexedDB for the rest of the session
     this.crashed = false;
 
+    // DB invalidation process: reload request stage (-1: requested, 1: ready)
+    this.reload = 0;
+
     // whether multi-table transactions work (1) or not (0) (Apple, looking at you!)
     this.cantransact = -1;
 
@@ -276,6 +279,9 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
         if (fmdb.inflight) return;
 
         if (fmdb.commit) {
+            // commit with pending reload request? time to reload.
+            if (fmdb.reload > 0) return location.reload();
+
             // the transaction is complete: delete from pending
             if (!fmdb.state) {
                 // we had been executing without transaction protection, delete the current
@@ -320,6 +326,9 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
 
                 // record what we are sending...
                 fmdb.inflight = t;
+
+                // is this an in-band _sn invalidation? get ready for reload-on-commit
+                if (fmdb.reload < 0 && t.t & 1 && table[0] == '_') fmdb.reload = 1;
 
                 // ...and send update off to IndexedDB for writing
                 fmdb.db[table][t.t & 1 ? 'bulkDelete' : 'bulkPut'](t[t.t++]).then(function(){
@@ -685,7 +694,7 @@ FMDB.prototype.clone = function fmdb_clone(o) {
 
 // checks if crashed or being used by another tab concurrently
 FMDB.prototype.up = function fmdb_up() {
-    if (this.crashed) return false;
+    if (this.crashed || this.reload) return false;
 
     var state = localStorage[this.name];
     var time = Date.now();

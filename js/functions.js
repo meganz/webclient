@@ -3591,7 +3591,7 @@ mega.utils.reload = function megaUtilsReload() {
                             ]).then(function(r) {
                                     console.debug('megaUtilsReload', r);
                                     if (fmdb) {
-                                        fmdb.db.delete().then(_reload, _reload);
+                                        fmdb.invalidate(_reload);
                                     }
                                     else {
                                         _reload();

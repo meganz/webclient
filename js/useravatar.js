@@ -360,6 +360,12 @@ var useravatar = (function() {
 
                 missingAvatars[handle] = error;
                 promise.reject.apply(promise, arguments);
+                if (handle === u_handle) {
+                    // it makes more sense to just call topmenuUI() and it should check if this avatar is missing
+                    // but since M.u[u_handle] is not yet initialised...and missingAvatars are private, the only way
+                    // to do this was in here.
+                    $('#topmenu .fm-avatar').show();
+                }
             };
 
             logger.debug('Initiating user-avatar retrieval for "%s"...', handle);

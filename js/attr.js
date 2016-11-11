@@ -127,9 +127,6 @@ var attribCache = false;
                 thePromise.resolve(res);
             }
             else {
-// FIXME: move this where it belongs - to the catch() of the originating promise!
-if (attribute == '+a') $('.fm-avatar').show();
-// FIXME end
                 // Got back an error (a number).
                 logger.warn(tag + 'attribute "%s" for user "%s" could not be retrieved: %d!',
                     attribute, userhandle, res);

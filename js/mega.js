@@ -6565,13 +6565,18 @@ TreeFetcher.prototype.fetch = function treefetcher_fetch(force) {
             if (buffer && !gettree_filter.proc(buffer)) {
                 api_cancel(xhr.q);
 
-                // bring DB to a defined state
-                fmdb.invalidate(function(){
-                    // wipe partially written data and trigger retry
-                    fmdb.init(function(){
-                        api_reqerror.bind(null, xhr.q, -3);
-                    }, true);
-                });
+                var retry = api_reqerror.bind(null, xhr.q, -3);
+
+                if (fmdb) {
+                    // bring DB to a defined state
+                    fmdb.invalidate(function() {
+                        // wipe partially written data and trigger retry
+                        fmdb.init(retry, true);
+                    });
+                }
+                else {
+                    retry();
+                }
 
                 ctx.ctx.logger.warn('Error parsing JSON, retrying...');
             }

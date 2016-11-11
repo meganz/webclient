@@ -493,13 +493,8 @@ var useravatar = (function() {
          * @returns {boolean}
          */
         ns.hadLoadedAvatar = function(handle) {
-            if (ns._missingAvatars[handle] || avatars[handle]) {
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
+            return missingAvatars[handle] || avatars[handle];
+        };
 
     })(ns);
 

@@ -3233,7 +3233,7 @@
     "8679": "Na MEGA",
     "8681": "Czy na pewno chcesz usun\u0105\u0107 ten plik z trybu Offline?",
     "8682": "Czy na pewno chcesz usun\u0105\u0107 te pliki z trybu Offline?",
-    "8683": "Nie mo\u017cemy zaimportowa\u0107 wszystkich plik\u00f3w, poniewa\u017c niekt\u00f3re z nich zosta\u0142y usuni\u0119te. Operacje zako\u0144czy\u0142a si\u0119 zaimportowaniem %1 z %2 plik\u00f3w.",
+    "8683": "Nie wszystkie pliki mog\u0142y zosta\u0107 zaimportowane. Mo\u017ce to si\u0119 wydarzy\u0107, gdy pliki s\u0105 ju\u017c niedost\u0119pne. Operacja zako\u0144czy\u0142a si\u0119 zaimportwaniem %1 z %2 element\u00f3w.",
     "8684": "Wy\u015blij i zamknij",
     "8685": "Prosimy o podanie powod\u00f3w dla kt\u00f3rych nie planujesz odnowi\u0107 swojego planu:",
     "8686": "niezaszyfrowany katalog",
@@ -3762,7 +3762,7 @@
     "13762": "Jeden plik i %1 katalogi zosta\u0142y usuni\u0119te.",
     "13763": "%1 pliki i 1 katalog zosta\u0142y usuni\u0119te.",
     "13764": "%1 pliki i %2 katalogi zosta\u0142y usuni\u0119te.",
-    "15536": "Click [B]Update[\/B] for the new browser code to run. Your session will remain open.",
+    "15536": "Kliknij [B]Aktualizacja[\/B] w nowej przegl\u0105darce. Twoja sesja pozostanie otwarta.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

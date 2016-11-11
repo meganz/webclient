@@ -8144,6 +8144,7 @@ function loadfm_done(mDBload) {
                     workers && workers.length || -666,
                     r.ttlb | 0, // time to last byte
                     r.ttfm | 0, // time to fm since ttlb
+                    u_type == 3 ? (mBroadcaster.crossTab.master | 0) : -1, // master, or slave tab?
                 ];
 
                 if (d) {

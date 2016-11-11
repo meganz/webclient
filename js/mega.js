@@ -6289,10 +6289,11 @@ function execsc() {
                 case 'usc':
                     // user state cleared - mark local DB as invalid
                     if (fmdb) {
-                        blocksn = true;
                         fmdb.del('_sn', 1);
                         // FIXME: add stopbeacon() to mDB.js
                         fmdb.up = function() {};
+                        execsc = function() {};
+                        setsn = function() {};
                     }
 
                     localStorage.clear();
@@ -6305,7 +6306,7 @@ function execsc() {
                               function(){
                                 location.reload();
                              });
-                    break;
+                    return;
 
                 // FIXME: duplicated code
                 case 'opc':

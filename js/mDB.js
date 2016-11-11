@@ -280,7 +280,10 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
 
         if (fmdb.commit) {
             // commit with pending reload request? time to reload.
-            if (fmdb.reload > 0) return location.reload();
+            if (fmdb.reload > 0) {
+                location.replace('#');
+                return location.reload();
+            }
 
             // the transaction is complete: delete from pending
             if (!fmdb.state) {

@@ -2307,8 +2307,7 @@ function fmremove() {
 
             for (var i in $.selected) {
                 selected.push($.selected[i]);
-                var nodes = fm_getnodes($.selected[i], 1);
-                nodes.unshift($.selected[i]);
+                var nodes = fm_getnodes($.selected[i], true);
                 dirTree = dirTree.concat(nodes);
             }
 
@@ -9992,28 +9991,26 @@ function propertiesDialog(close) {
     var filecnt = 0, foldercnt = 0, size = 0, sfilecnt = 0, sfoldercnt = 0, n;
 
     for (var i in $.selected) {
-        if ($.selected.hasOwnProperty(i)) {
-            n = M.d[$.selected[i]];
-            if (!n) {
-                console.error('propertiesDialog: invalid node', $.selected[i]);
-            }
-            else if (n.t) {
-                var nodes = fm_getnodes(n.h);
-                for (i in nodes) {
-                    if (M.d[nodes[i]] && !M.d[nodes[i]].t) {
-                        size += M.d[nodes[i]].s;
-                        sfilecnt++;
-                    }
-                    else {
-                        sfoldercnt++;
-                    }
+        n = M.d[$.selected[i]];
+        if (!n) {
+            console.error('propertiesDialog: invalid node', $.selected[i]);
+        }
+        else if (n.t) {
+            var nodes = fm_getnodes(n.h);
+            for (var j = 0; j < nodes.length; j++) {
+                if (M.d[nodes[j]] && !M.d[nodes[j]].t) {
+                    size += M.d[nodes[j]].s;
+                    sfilecnt++;
                 }
-                foldercnt++;
+                else {
+                    sfoldercnt++;
+                }
             }
-            else {
-                filecnt++;
-                size += n.s;
-            }
+            foldercnt++;
+        }
+        else {
+            filecnt++;
+            size += n.s;
         }
     }
     if (!n) {

@@ -793,11 +793,10 @@ function MegaData()
         var ts = 0;
         if (M.d[h]) {
             if (!wantTimeStamp || !M.d[h].ts) {
+                // FIXME: include root?
                 var a = fm_getnodes(h);
-                for (var i in a) {
-                    if (!a.hasOwnProperty(i)) {
-                        continue;
-                    }
+
+                for (var i = a.length; i--; ) {
                     var n = M.d[a[i]];
                     if (n) {
                         if (ts < n.ts) {
@@ -3969,26 +3968,23 @@ function MegaData()
         }
     }
 
-    this.getDownloadFolderNodes = function(n, md, nodes, paths)
-    {
+    this.getDownloadFolderNodes = function(n, md, nodes, paths) {
         if (md) this.makeDir(n);
 
         var subids = fm_getnodes(n);
-        for (var j in subids)
-        {
+
+        for (var j = 0; j < subids.length; j++) {
             var p = this.getPath(subids[j]);
             var path = '';
 
-            for (var k in p)
-            {
+            for (var k = 0; k < p.length; k++) {
                 if (M.d[p[k]] && M.d[p[k]].t)
                     path = fm_safename(M.d[p[k]].name) + '/' + path;
                 if (p[k] == n)
                     break;
             }
 
-            if (!M.d[subids[j]].t)
-            {
+            if (!M.d[subids[j]].t) {
                 nodes.push(subids[j]);
                 paths[subids[j]] = path;
             }
@@ -4208,20 +4204,20 @@ function MegaData()
                 var files = [];
 
                 var addNode = function(node) {
-                    var item = {
-                        t: node.t,
-                        h: node.h,
-                        p: node.p,
-                        n: base64urlencode(node.name),
-                    };
-                    if (!node.t) {
-                        item.s = node.s;
-                        item.ts = node.mtime || node.ts;
-                        if (crypto_keyok(node)) {
+                    if (!node.a && node.k) {
+                        var item = {
+                            t: node.t,
+                            h: node.h,
+                            p: node.p,
+                            n: base64urlencode(node.name),
+                        };
+                        if (!node.t) {
+                            item.s = node.s;
+                            item.ts = node.mtime || node.ts;
                             item.k = a32_to_base64(node.k);
                         }
+                        files.push(item);
                     }
-                    files.push(item);
 
                     if (node.t) {
                         foreach(fm_getnodes(node.h));
@@ -4229,13 +4225,11 @@ function MegaData()
                 };
 
                 var foreach = function(nodes) {
-                    for (var i in nodes) {
-                        if (nodes.hasOwnProperty(i)) {
-                            var node = M.d[nodes[i]];
+                    for (var i = 0; i < nodes.length; i++) {
+                        var node = M.d[nodes[i]];
 
-                            if (node) {
-                                addNode(node);
-                            }
+                        if (node) {
+                            addNode(node);
                         }
                     }
                 };
@@ -6056,8 +6050,8 @@ function execsc() {
                         }
 
                         if (prockey) {
-                            var nodes = fm_getnodes(a.n, 1);
-                            nodes.push(a.n);
+                            var nodes = fm_getnodes(a.n, true);
+
                             for (i = a.length; i--; ) {
                                 if (n = M.d[nodes[i]]) {
                                     if (typeof n.k == 'string') {
@@ -7047,101 +7041,95 @@ function ddtype(ids, toid, alt)
     return r;
 }
 
-/**
- * fm_getnodes
- *
- * Search for a subfolders.
- * @param {String} nodeId.
- * @returns {Array|fm_getnodes.nodes} Array of subfolders ids. Root folder NOT included.
- */
-function fm_getnodes(nodeId)
-{
+// returns all nodes under root (the entire tree)
+// optionally includes root itself
+// optionally prunes everything that's undecryptable - good nodes
+// under a bad parent will NOT be returned to keep the result tree-shaped.
+// FIXME: add reporting about how many nodes were dropped in the process
+function fm_getnodes(root, includeroot, excludebad) {
     var nodes = [];
+    var parents = [root], newparents;
+    var i;
 
-    function procnode(nodeId) {
-        if (M.c[nodeId]) {
-            for (var n in M.c[nodeId]) {
-                if (!M.d[n]) {
-                    if (d) {
-                        console.warn('Invalid node: ' + n, nodeId, M.c[nodeId][n]);
-                    }
-                    continue;
-                }
-                nodes.push(n);
-                if (M.d[n].t === 1) {
-                    procnode(n);
+    while (i = parents.length) {
+        newparents = [];
+
+        while (i--) {
+            // must exist and optionally be fully decrypted to qualify
+            if (M.d[parents[i]] && (!excludebad || !M.d[parents[i]].a)) {
+                nodes.push(parents[i]);
+                if (M.c[parents[i]]) {
+                    newparents = newparents.concat(Object.keys(M.c[parents[i]]));
                 }
             }
         }
+
+        parents = newparents;
     }
-    procnode(nodeId);
+
+    if (!includeroot) nodes.shift();
 
     return nodes;
 }
 
-function fm_getsharenodes(h, root)
-{
+// get all parent nodes having a u_sharekey
+// optionally, return the path root
+function fm_getsharenodes(h, root) {
     var sn = [];
     var n = M.d[h];
-    while (n && n.p)
-    {
+
+    while (n && n.p) {
         if (u_sharekeys[n.h])
             sn.push(n.h);
         n = M.d[n.p];
     }
-    if (root)
+
+    if (root) {
         root.handle = n && n.h;
+    }
+
     return sn;
 }
 
-function fm_getcopynodes(cn, t)
-{
+// get all clean (decrypted) subtrees under cn
+// FIXME: return total number of nodes omitted because of decryption issues
+function fm_getcopynodes(cn, t) {
     var a = [];
     var r = [];
     var i, j;
 
     // add all subtrees under cn[], including the roots
-    for (i = 0; i < cn.length; i++)
-    {
-        var s = fm_getnodes(cn[i]);
-        r.push(cn[i]);
-        for (var j = 0; j < s.length; j++) r.push(s[j]);
+    for (i = 0; i < cn.length; i++) {
+        r = r.concat(fm_getnodes(cn[i], true, true));
     }
 
-    for (i = 0; i < r.length; i++)
-    {
+    for (i = 0; i < r.length; i++) {
         var n = M.d[r[i]];
 
-        if (n) {
-            if (crypto_keyok(n)) {
-                // repackage/-encrypt n for processing by the `p` API
-                nn = {};
+        // repackage/-encrypt n for processing by the `p` API
+        nn = {};
 
-                // copied folders receive a new random key
-                // copied files must retain their existing key
-                if (!n.t) nn.k = n.k;
+        // copied folders receive a new random key
+        // copied files must retain their existing key
+        if (!n.t) nn.k = n.k;
 
-                // new node inherits all attributes
-                nn.a = ab_to_base64(crypto_makeattr(n, nn));
+        // new node inherits all attributes
+        nn.a = ab_to_base64(crypto_makeattr(n, nn));
 
-                // new node inherits handle, parent and type
-                nn.h = n.h;
-                nn.p = n.p;
-                nn.t = n.t;
+        // new node inherits handle, parent and type
+        nn.h = n.h;
+        nn.p = n.p;
+        nn.t = n.t;
 
-                // remove parent unless child
-                for (j = 0; j < cn.length; j++) {
-                    if (cn[j] === nn.h) {
-                        delete nn.p;
-                        break;
-                    }
-                }
-
-                a.push(nn);
+        // remove parent unless child
+        for (j = 0; j < cn.length; j++) {
+            if (cn[j] === nn.h) {
+                delete nn.p;
+                break;
             }
-            else console.warn("fm_getcopynodes: Node " + r[i] + " undecrypted");
         }
-        else console.warn("fm_getcopynodes: Node " + r[i] + " went missing");
+
+        a.push(nn);
     }
 
     return a;
@@ -7377,8 +7365,7 @@ function doShare(nodeId, targets, dontShowShareDialog) {
     };
 
     // Get complete children directory structure for root node with id === nodeId
-    var childNodesId = fm_getnodes(nodeId);
-    childNodesId.push(nodeId);
+    var childNodesId = fm_getnodes(nodeId, true);
 
     // Create new lists of users, active (with user handle) and non existing (pending)
     targets.forEach(function(value) {
@@ -7462,8 +7449,7 @@ function processmove(apireq) {
         // yes, it is - are we moving to an outshare?
         if (!tsharepath.length) {
             // we are not - check for any foreign nodes being moved
-            movingnodes = fm_getnodes(apireq.n);
-            movingnodes.push(apireq.n);
+            movingnodes = fm_getnodes(apireq.n, true);
 
             var foreignnodes = [];
 
@@ -7485,8 +7471,7 @@ function processmove(apireq) {
     // is the target location in any shares? add CR element.
     if (tsharepath.length) {
         if (!movingnodes) {
-            movingnodes = fm_getnodes(apireq.n);
-            movingnodes.push(apireq.n);
+            movingnodes = fm_getnodes(apireq.n, true);
         }
 
         apireq.cr = crypto_makecr(movingnodes, tsharepath, true);

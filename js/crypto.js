@@ -3726,11 +3726,10 @@ function api_updfkey(h) {
         sn = h;
     }
     else {
-        sn = fm_getnodes(h, 1);
-        sn.push(h);
+        sn = fm_getnodes(h, true);
     }
 
-    for (var i in sn) {
+    for (var i = sn.length; i--; ) {
         h = sn[i];
         if (M.d[h].u != u_handle && crypto_keyok(M.d[h])) {
             nk.push(h, a32_to_base64(encrypt_key(u_k_aes, M.d[h].k)));

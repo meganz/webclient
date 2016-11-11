@@ -4073,7 +4073,7 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
         }
 
         if (d) {
-            console.log('Running Rubbish-Bin Cleaning Scheduler', mode, xval);
+            console.log('Running Rubbish Bin Cleaning Scheduler', mode, xval);
             console.time('rubsched');
         }
 
@@ -4084,16 +4084,13 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
         var nodes = Object.keys(M.c[M.RubbishID] || {});
         var rubnodes = [];
 
-        for (var i in nodes) {
+        for (var i = nodes.length; i--; ) {
             var node = M.d[nodes[i]];
             if (!node) {
                 console.error('Invalid node', nodes[i]);
                 continue;
             }
-            if (node.t == 1) {
-                rubnodes = rubnodes.concat(fm_getnodes(node.h));
-            }
-            rubnodes.push(node.h);
+            rubnodes = rubnodes.concat(fm_getnodes(node.h, true));
         }
 
         rubnodes.sort(handler.sort);

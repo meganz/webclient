@@ -426,8 +426,13 @@ var useravatar = (function() {
                     data: blob,
                     url: myURL.createObjectURL(blob)
                 };
+
                 if (M.u[handle]) {
                     M.u[handle].avatar = false;
+                    M.u[handle].avatar = {
+                        'type': 'text',
+                        'avatar': _getAvatarProperties(handle)
+                    };
                 }
 
                 if (u_handle && handle === u_handle) {

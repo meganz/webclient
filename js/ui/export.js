@@ -1508,7 +1508,7 @@ var exportExpiry = {
                     if (node.t) {
                         // Folder
                         type = 'F';
-                        key = u_sharekeys[node.h] ? u_sharekeys[node.h][0] : false;
+                        key = u_sharekeys[node.h] && u_sharekeys[node.h][0];
                     }
                     else {
                         // File
@@ -1584,12 +1584,17 @@ var exportExpiry = {
 
         // Shared item type is folder
         if (item.t) {
+            key = u_sharekeys[item.h] && u_sharekeys[item.h][0];
+
+            // folder key must exit, otherwise skip
+            if (!key) {
+                return '';
+            }
+
             type = 'F';
-            key = u_sharekeys[item.h][0];
             fileSize = '';
             folderClass = ' folder-item';
         }
-
         // Shared item type is file
         else {
             type = '';

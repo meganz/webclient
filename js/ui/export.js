@@ -1501,22 +1501,22 @@ var exportExpiry = {
         else {
             // Otherwise add all regular links
             for (var i in handles) {
-                if (handles.hasOwnProperty(i)) {
-                    var node = M.d[handles[i]];
+                var node = M.d[handles[i]];
 
-                    // Only nodes with public handle
-                    if (node && node.ph) {
-                        if (node.t) {
-                            // Folder
-                            type = 'F';
-                            key = u_sharekeys[node.h][0];
-                        }
-                        else {
-                            // File
-                            type = '';
-                            key = node.k;
-                        }
+                // Only nodes with public handle
+                if (node && node.ph) {
+                    if (node.t) {
+                        // Folder
+                        type = 'F';
+                        key = u_sharekeys[node.h] ? u_sharekeys[node.h][0] : false;
+                    }
+                    else {
+                        // File
+                        type = '';
+                        key = node.k;
+                    }
 
+                    if (key) {
                         var nodeUrlWithPublicHandle = getBaseUrl() + '/#' + type + '!' + (node.ph);
                         var nodeDecryptionKey = key ? '!' + a32_to_base64(key) : '';
 

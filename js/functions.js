@@ -3586,7 +3586,6 @@ mega.utils.reload = function megaUtilsReload() {
                             stopapi();
 
                             MegaPromise.allDone([
-                                MegaDB.dropAllDatabases(/*u_handle*/),
                                 mega.utils.clearFileSystemStorage()
                             ]).then(function(r) {
                                     console.debug('megaUtilsReload', r);

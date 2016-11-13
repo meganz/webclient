@@ -313,48 +313,6 @@ function init_page() {
         }
     }
 
-    // FIXME
-    // all gloabal state must be encapsulated in a single object -
-    // we can then comfortably switch between states by changing the
-    // current object and switching UI/XHR comms/IndexedDB
-    var fmwasinitialized = !!fminitialized;
-    if (((u_type === 0 || u_type === 3) || pfid || folderlink) && (!flhashchange || !pfid || pfkey !== oldPFKey)) {
-
-        if (is_fm()) {
-            // switch between FM & folderlinks (completely reinitialize)
-            if ((!pfid && folderlink) || (pfid && folderlink === 0) || pfkey !== oldPFKey) {
-
-                // re-initialize waitd connection when switching.
-                if (!pfid && folderlink && u_sid) {
-                    api_setsid(u_sid);
-
-                    if (waitxhr) {
-                        waitsc();
-                    }
-                }
-
-                M.reset();
-                folderlink = 0;
-                initworkerpool();
-                fminitialized = false;
-                loadfm.loaded = false;
-                if (loadfm.loading) {
-                    api_init(wasFolderlink ? 1 : 0, 'cs');
-                    api_init(wasFolderlink ? 5 : 4, 'cs');
-                    loadfm.loading = false;
-                }
-                if (typeof mDBcls === 'function') {
-                   mDBcls(); // close fmdb
-                }
-            }
-        }
-
-        if (!fminitialized) {
-            mega.initLoadReport();
-			loadfm();
-        }
-    }
-
     if (page.substr(0, 10) == 'blogsearch') {
         blogsearch = decodeURIComponent(page.substr(11, page.length - 2));
         if (!blogsearch) {
@@ -937,10 +895,45 @@ function init_page() {
             }
         }
 
-        if (d) console.log('Setting up fm...', id, pfid, fmwasinitialized, fminitialized, M.currentdirid);
+        if (d) {
+            console.log('Setting up fm...', id, pfid, fminitialized, M.currentdirid);
+        }
 
-        if (!id && fmwasinitialized) {
+        if (!id && fminitialized) {
             id = M.RootID;
+        }
+
+
+        // FIXME
+        // all global state must be encapsulated in a single object -
+        // we can then comfortably switch between states by changing the
+        // current object and switching UI/XHR comms/IndexedDB
+
+        // switch between FM & folderlinks (completely reinitialize)
+        if ((!pfid && folderlink) || (pfid && folderlink === 0) || pfkey !== oldPFKey) {
+
+            // re-initialize waitd connection when switching.
+            if (!pfid && folderlink && u_sid) {
+                api_setsid(u_sid);
+
+                if (waitxhr) {
+                    waitsc();
+                }
+            }
+
+            M.reset();
+            folderlink = 0;
+            initworkerpool();
+            fminitialized = false;
+            loadfm.loaded = false;
+            if (loadfm.loading) {
+                api_init(wasFolderlink ? 1 : 0, 'cs');
+                api_init(wasFolderlink ? 5 : 4, 'cs');
+                loadfm.loading = false;
+            }
+            if (typeof mDBcls === 'function') {
+                mDBcls(); // close fmdb
+            }
         }
 
         if (!fminitialized) {
@@ -950,6 +943,9 @@ function init_page() {
             if (!m && $('#fmholder').html() == '') {
                 $('#fmholder').safeHTML(translate(pages['fm'].replace(/{staticpath}/g, staticpath)));
             }
+
+            mega.initLoadReport();
+            loadfm();
         }
         else if ((!pfid || flhashchange) && id && id !== M.currentdirid) {
             M.openFolder(id);

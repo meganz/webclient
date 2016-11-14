@@ -480,7 +480,8 @@ var strongvelope = {};
                     case TLV_TYPES.KEY_BLOB:
                         var pos = 0;
                         while (pos < value.length) {
-                            var len = ns.unpack16le(value.substring(pos + USER_HANDLE_SIZE, pos + USER_HANDLE_SIZE + 2));
+                            var len =
+                                    ns.unpack16le(value.substring(pos + USER_HANDLE_SIZE, pos + USER_HANDLE_SIZE + 2));
                             parsedContent[_TLV_MAPPING[TLV_TYPES.RECIPIENT]].push(
                                     base64urlencode(value.substring(pos, pos + USER_HANDLE_SIZE)));
                             parsedContent[_TLV_MAPPING[TLV_TYPES.KEYS]].push(

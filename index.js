@@ -1836,17 +1836,27 @@ function topmenuUI() {
         }
     });
 
-    $('.fm-avatar img, .user-name').rebind('click', function () {
-        if ($('.fm-avatar img').attr('src').indexOf('blob:') > -1) {
-            document.location.hash = 'fm/account';
+    // If the avatar in the header is clicked
+    var $topHeader = $('.top-head');
+    $topHeader.find('.fm-avatar img').rebind('click', function() {
+
+        // If the user has an avatar already set, take them to the profile page where they can change or remove it
+        if ($(this).attr('src').indexOf('blob:') > -1) {
+            document.location.hash = 'fm/account/profile';
         }
         else {
+            // Otherwise if they don't have an avatar, open the change avatar dialog
             avatarDialog();
         }
     });
 
+    // If the user name in the header is clicked, take them to the account overview page
+    $topHeader.find('.user-name').rebind('click', function() {
+        document.location.hash = 'fm/account';
+    });
 
-    $('.top-head .logo').rebind('click', function () {
+    // If the main Mega M logo in the header is clicked
+    $topHeader.find('.logo').rebind('click', function() {
         if (typeof loadingInitDialog === 'undefined' || !loadingInitDialog.active) {
             if (folderlink) {
                 M.openFolder(M.RootID, true);

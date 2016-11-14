@@ -10834,7 +10834,7 @@ table {
     display: block;
     position: absolute;
     filter: blur(10px);
-    -webkit-filter: blur(10px);
+    -webkit-filter: blur(15px);
 }
 .avatar-bg::after {
     content: '';
@@ -11144,7 +11144,7 @@ table {
     margin-left: 88px;
 }
 .expiry a {
-    color: #D90007;
+    color: #fc444b;
 }
 .fm-account-save-block {
     position: fixed;
@@ -24914,10 +24914,10 @@ div.camera-bottom-txt {
     border-color: #CCCCCC;
 }
 .account.progress-item.disabled {
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
-    -moz-opacity: 0.2;
-    -khtml-opacity: 0.2;
-    opacity: 0.2;
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
+    -moz-opacity: 0.3;
+    -khtml-opacity: 0.3;
+    opacity: 0.3;
 }
 .disabled .account.progress-indicator {
     border-color: #CCCCCC;
@@ -25265,6 +25265,15 @@ div.camera-bottom-txt {
 .account.plan-info.grey {
     color: #999999;
 }
+.account.plan-info.accounttype {
+    color: #fc444b;
+}
+.free .account.plan-info.accounttype {
+    color: #31b500;
+}
+.lite .account.plan-info.accounttype {
+    color: #ffa500;
+}
 .account.plan-info.small {
     font-size: 14px;
 }
@@ -25390,7 +25399,10 @@ div.camera-bottom-txt {
     height: 100%;
     content: '';
     position: absolute;
-    background-color: #777777;
+    background-color: #2ba6de;
+}
+.bandwidth .chart.progressbars span::before {
+    background-color: #31b500;
 }
 .chart.progressbars .left-chart span::before {
     margin-left: 50%;

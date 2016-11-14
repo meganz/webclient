@@ -1382,8 +1382,16 @@ function topmenuUI() {
             var proNum = u_attr.p;
             var purchasedPlan = getProPlan(proNum);
 
-            // Set colour of plan
-            var cssClass = (proNum == 4) ? 'lite' : 'pro' + proNum;
+            // Set colour of plan and body class
+            var cssClass;
+            $('body').removeClass('free lite');
+
+            if (proNum === 4) {
+                cssClass = 'lite';
+                $('body').addClass('lite');
+            } else {
+                cssClass = 'pro' + proNum;
+            }
 
             // Show the 'Upgrade your account' button in the main menu for all
             $('.top-menu-item.upgrade-your-account.green').addClass('hidden');
@@ -1392,7 +1400,6 @@ function topmenuUI() {
             $('.membership-status-block i').attr('class', 'tiny-icon membership-status ' + cssClass);
             $('.top-menu-item.account .right-el').text(purchasedPlan);
             $('.membership-popup').addClass('pro-popup');
-            $('body').removeClass('free');
         }
         else {
             // Show the free badge
@@ -1401,7 +1408,7 @@ function topmenuUI() {
             $('.top-menu-item.account .right-el').text('FREE');
             $('.membership-status').attr('class', 'tiny-icon membership-status free');
             $('.membership-popup').removeClass('pro-popup');
-            $('body').addClass('free');
+            $('body').removeClass('lite').addClass('free');
         }
 
         if (is_fm()) {

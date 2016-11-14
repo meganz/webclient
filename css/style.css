@@ -25226,10 +25226,10 @@ div.camera-bottom-txt {
 .account.plan-info-block {
     display: table;
     width: 100%;
-    margin: 10px 0 30px 0;
+    margin: 14px 0 29px 0;
 }
 .active-achievements .account.plan-info-block, .low-width .account.plan-info-block {
-    margin: 10px 0 9px 0;
+    margin: 14px 0 8px 0;
 }
 .account.plan-comment {
     font-size: 14px;

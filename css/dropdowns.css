@@ -135,7 +135,7 @@
 .dropdown-item {
     height: 32px;
     font-size: 13px;
-    line-height: 32px;
+    line-height: 31px;
     color: #777777;
     -webkit-transition: all 100ms ease-in-out;
     -moz-transition: all 100ms ease-in-out;

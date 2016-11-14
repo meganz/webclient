@@ -5095,7 +5095,7 @@ function accountUI() {
     }
 
     // Show Membership plan
-    $('.small-icon.membership').removeClass('pro1 pro2 pro3 pro4');
+    $('.fm-tree-panel .small-icon.membership').removeClass('pro1 pro2 pro3 pro4');
     if (u_attr.p) {
         // LITE/PRO account
         var planNum = u_attr.p;

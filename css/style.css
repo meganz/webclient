@@ -1063,7 +1063,7 @@ a.account-manage-button:hover {
     display: inline-block;
     height: 40px;
 }
-.free .fm-right-block.dashboard:not(.active-achievements) .bandwidth .chart.data .perc-txt {
+.free .fm-right-block:not(.active-achievements) .bandwidth .chart.data .perc-txt, .free .fm-right-account-block:not(.active-achievements) .bandwidth .chart.data .perc-txt {
     background-image: url(../images/mega/nw-fm-sprite_v19.svg);
     background-position: -10px -11854px;
     width: 30px;
@@ -25391,6 +25391,9 @@ div.camera-bottom-txt {
     display: block;
     width: 100%;
     height: 100%;
+}
+.free .fm-right-block.dashboard:not(.active-achievements) .bandwidth .chart.progressbars span, .free .fm-right-account-block:not(.active-achievements) .bandwidth .chart.progressbars span {
+    transform:none !important;
 }
 .chart.progressbars .right-chart {
     clip: rect(0, 100px, 100px, 50px);

@@ -78,6 +78,12 @@ if (typeof importScripts !== 'undefined') {
             if (d) self.postMessage(['console', [].slice.call(arguments)]);
         }
     };
+
+    if (typeof srvlog2 === 'undefined') {
+        srvlog2 = function() {
+            self.postMessage(['srvlog2', [].slice.call(arguments)]);
+        };
+    }
 }
 
 var u_k;
@@ -118,9 +124,15 @@ function crypto_decryptnode(n) {
             key = crypto_process_sharekey(n.h, n.sk);
 
             if (key !== false) {
-                u_sharekeys[n.h] = [key, new sjcl.cipher.aes(key)];
-                n.p = n.u;
-                n.sk = key;
+                var keyLen = key.length;
+                if (keyLen !== 4 && keyLen !== 6 && keyLen !== 8) {
+                    srvlog2('invalid-aes-key-size', n.h, n.k.length, n.sk.length, keyLen);
+                }
+                else {
+                    u_sharekeys[n.h] = [key, new sjcl.cipher.aes(key)];
+                    n.p = n.u;
+                    n.sk = key;
+                }
             }
         }
 

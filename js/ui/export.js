@@ -1531,6 +1531,9 @@ var exportExpiry = {
                             links.push(nodeDecryptionKey);
                         }
                     }
+                    else {
+                        srvlog2('export-no-key', node.h, node.t);
+                    }
                 }
             }
         }

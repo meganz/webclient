@@ -2421,6 +2421,8 @@ else if (!b_u)
         }
         catch (e) {}
 
+        mBroadcaster.sendMessage('boot_done');
+
         if (u_checked || is_mobile) {
             startMega();
         }

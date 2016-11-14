@@ -1,12 +1,12 @@
 function voucherCentering($button) {
-    var $popupBlock = $('.fm-voucher-popup');
+    var $popupBlock =$('.fm-voucher-popup');
     var popupHeight = $popupBlock.outerHeight();
 
-    if ($button.position().top + 10 > popupHeight) {
-        $popupBlock.css('top', $button.position().top - popupHeight - 35);
+    if ($button.offset().top + 10 > popupHeight) {
+        $popupBlock.css('top', $button.offset().top - popupHeight - 10);
     }
     else {
-        $popupBlock.css('top', $button.position().top + $button.outerHeight() + 35);
+        $popupBlock.css('top', $button.offset().top + $button.outerHeight() + 10);
     }
 }
 

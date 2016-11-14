@@ -11052,22 +11052,9 @@ table {
 .fm-account-notifications {
     position: relative;
 }
-.fm-voucher-popup {
-    background-color: white;
-    -moz-border-radius: 7px;
-    -webkit-border-radius: 7px;
-    border-radius: 7px;
-    border: 2px solid rgba(0, 0, 0, .1);
-    background-color: white;
-    -webkit-background-clip: padding-box;
-    background-clip: padding-box;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
+.dropdown.body.popup.fm-voucher-popup {
     min-width: 404px;
-    position: absolute;
-    right: 34px;
-    top: 70px;
+    right: 36px;
     z-index: 2000;
 }
 .redeem-voucher.active {
@@ -20569,7 +20556,7 @@ span.incoming-call-name {
 .shared-details-buttons {
     right: 0;
     position: absolute;
-    padding: 74px 18px 0 0;
+    padding: 75px 18px 0 0;
 }
 .shared-details-buttons .default-white-button {
     min-width: 20px;

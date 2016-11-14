@@ -769,6 +769,7 @@ function MegaData()
         var waitingPromises = [];
         M.u.forEach(function(c, u) {
             if (!avatars[u] && (M.u[u].c === 1 || M.u[u].c === 2 || M.u[u].c === 0)) {
+
                 waitingPromises.push(useravatar.loadAvatar(u));
             }
         });
@@ -6445,11 +6446,21 @@ function TreeFetcher() {
 // worker pool
 var workers;
 
-function initworkerpool() {
+function killworkerpool() {
     // terminate existing workers
     if (workers) {
-        for (var i = workers.length; i--; ) workers[i].terminate();
+        var l = workers.length;
+        while (l--) {
+            workers[l].onmessage = null;
+            workers[l].terminate();
+        }
+
+        // workers === false implies "no workers available here"
+        workers = false;
     }
+}
+function initworkerpool() {
+    killworkerpool();
 
     workers = [];
     var workerstate;
@@ -6473,15 +6484,7 @@ function initworkerpool() {
                 console.error('[nodedec worker error]', err);
 
                 // TODO: retry gettree
-                if (workers) {
-                    var l = workers.length;
-                    while (l--) {
-                        workers[l].terminate();
-                    }
-
-                    // workers === false implies "no workers available here"
-                    workers = false;
-                }
+                killworkerpool();
             };
             if (workerstate) {
                 w.postMessage(workerstate);
@@ -6634,6 +6637,8 @@ function emplacenode(node) {
     }
     else {
         console.error("Received parent-less node of type " + node.t + ": " + node.h);
+
+        srvlog2('parent-less', node.t, node.h);
     }
 
     M.d[node.h] = node;
@@ -6708,7 +6713,7 @@ function tree_residue(fm, ctx) {
     }
     else {
         dumpsremaining = 1;
-        worker_procmsg({ data: {} });
+        worker_procmsg({ data: { done: 1 } });
     }
 
     // (mandatory steps at the conclusion of a successful split response)
@@ -6777,7 +6782,9 @@ function worker_procmsg(ev) {
             args.unshift('[nodedec worker]');
             console.log.apply(console, args);
         }
-        return;
+    }
+    else if (ev.data[0] === 'srvlog2') {
+        srvlog2.apply(null, ev.data[1]);
     }
     else if (ev.data.done) {
         if (d) console.log("Worker done, " + dumpsremaining + " remaining");

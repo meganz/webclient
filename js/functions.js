@@ -1662,6 +1662,7 @@ function ASSERT(what, msg, udata) {
     return !!what;
 }
 
+// log failures through jscrashes system
 function srvlog(msg, data, silent) {
     if (data && !(data instanceof Error)) {
         data = {
@@ -1675,6 +1676,30 @@ function srvlog(msg, data, silent) {
         window.onerror(msg, '', data ? 1 : -1, 0, data || null);
     }
 }
+
+// log failures through event id 99666
+function srvlog2(type /*, ...*/) {
+    if (d || window.exTimeLeft) {
+        var args    = toArray.apply(null, arguments);
+        var version = buildVersion.website;
+
+        if (is_extension) {
+            if (is_chrome_firefox) {
+                version = window.mozMEGAExtensionVersion || buildVersion.firefox;
+            }
+            else if (window.chrome) {
+                version = buildVersion.chrome;
+            }
+            else {
+                version = buildVersion.commit && buildVersion.commit.substr(0, 8) || '?';
+            }
+        }
+        args.unshift((is_extension ? 'e' : 'w') + (version || '-'));
+
+        api_req({a: 'log', e: 99666, m: JSON.stringify(args)});
+    }
+}
+
 
 function oDestroy(obj) {
     if (window.d) {
@@ -3586,7 +3611,6 @@ mega.utils.reload = function megaUtilsReload() {
                             stopapi();
 
                             MegaPromise.allDone([
-                                MegaDB.dropAllDatabases(/*u_handle*/),
                                 mega.utils.clearFileSystemStorage()
                             ]).then(function(r) {
                                     console.debug('megaUtilsReload', r);

@@ -912,25 +912,28 @@ function init_page() {
         // switch between FM & folderlinks (completely reinitialize)
         if ((!pfid && folderlink) || (pfid && folderlink === 0) || pfkey !== oldPFKey) {
 
-            // re-initialize waitd connection when switching.
-            if (!pfid && folderlink && u_sid) {
-                api_setsid(u_sid);
-
-                if (waitxhr) {
-                    waitsc();
-                }
-            }
-
             M.reset();
-            folderlink = 0;
+            folderlink     = 0;
+            fminitialized  = false;
+            loadfm.loaded  = false;
+            loadfm.loading = false;
+
+            stopapi();
+            api_reset();
             initworkerpool();
-            fminitialized = false;
-            loadfm.loaded = false;
-            if (loadfm.loading) {
-                api_init(wasFolderlink ? 1 : 0, 'cs');
-                api_init(wasFolderlink ? 5 : 4, 'cs');
-                loadfm.loading = false;
+
+            if (pfid) {
+                api_setfolder(n_h);
             }
+            else if (u_sid) {
+                api_setsid(u_sid);
+            }
+
+            // re-initialize waitd connection when switching.
+            if (waitxhr) {
+                waitsc();
+            }
+
             if (typeof mDBcls === 'function') {
                 mDBcls(); // close fmdb
             }

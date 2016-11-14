@@ -1063,7 +1063,7 @@ a.account-manage-button:hover {
     display: inline-block;
     height: 40px;
 }
-.free .bandwidth .chart.data .perc-txt {
+.free .fm-right-block.dashboard:not(.active-achievements) .bandwidth .chart.data .perc-txt {
     background-image: url(../images/mega/nw-fm-sprite_v19.svg);
     background-position: -10px -11854px;
     width: 30px;

@@ -3127,9 +3127,11 @@ function dashboardUI() {
             var maf = M.maf;
             var $storage = $('.account.bonuses-size.storage', $achWidget);
             var $transfer = $('.account.bonuses-size.transfer', $achWidget);
+            var storageCurrentValue = maf.storage.current + maf.storage.base;
+            var transferCurrentValue = maf.transfer.current + maf.transfer.base;
 
-            $storage.text(bytesToSize(maf.storage.current, 0));
-            $transfer.text(bytesToSize(maf.transfer.current, 0));
+            $storage.text(bytesToSize(storageCurrentValue, 0));
+            $transfer.text(bytesToSize(transferCurrentValue, 0));
             if (maf.storage.current > 0) {
                 $storage.removeClass('light-grey');
             }
@@ -3197,11 +3199,16 @@ function dashboardUI() {
             max = account.bw;
             base += account.servbw_used;
         }
+        else if (M.maf) {
+            max = M.maf.transfer.base + M.maf.transfer.current;
+            base += account.servbw_used;
+        }
         perc   = Math.round(base * 100 / max) || 1;
         perc_c = perc;
         if (perc_c > 100) {
             perc_c = 100;
-        } else if (perc > 99) {
+        }
+        else if (perc > 99) {
             $('.fm-account-blocks.bandwidth').addClass('exceeded');
             b_exceeded = 1;
         }
@@ -3222,7 +3229,7 @@ function dashboardUI() {
         $('.bandwidth .chart.data .size-txt').text(bytesToSize(base, 0));
         $('.bandwidth .chart.data .pecents-txt').text((b2[0]));
         $('.bandwidth .chart.data .gb-txt').text((b2[1]));
-        if (u_attr.p) {
+        if (u_attr.p || M.maf) {
             $('.bandwidth .chart.data .perc-txt').text(perc_c + '%');
         }
         else {
@@ -3335,30 +3342,43 @@ function dashboardUI() {
             max = account.bw;
             base += account.servbw_used;
             $('.account.widget.bandwidth').addClass('enabled-pr-bar');
+            $('.dashboard .account.rounded-icon.right').addClass('hidden');
             $('.bandwidth .account.progress-size.available-quota').text(bytesToSize(max - base, 0));
             $('.bandwidth .account.progress-bar.grey').css('width', (Math.round(base * 100 / max) || 1) + '%');
-
-            /* Bandwidth notification */
-            $('.dashboard .account.rounded-icon.right').rebind('click', function() {
-                if (!$(this).hasClass('active')) {
-                    $(this).addClass('active');
-                    $(this).find('.dropdown').removeClass('hidden');
-                }
-                else {
-                    $(this).removeClass('active');
-                    $(this).find('.dropdown').addClass('hidden');
-                }
-            });
-            $('.fm-right-block.dashboard').rebind('click', function(e) {
-                if (!$(e.target).hasClass('rounded-icon') && $('.account.rounded-icon.info').hasClass('active')) {
-                    $('.account.rounded-icon.info').removeClass('active');
-                    $('.dropdown.body.bandwidth-info').addClass('hidden');
-                }
-            });
         }
         else {
-            $('.account.widget.bandwidth').removeClass('enabled-pr-bar');
-            $('.dashboard .account.rounded-icon.right').addClass('hidden');
+
+            // Show available bandwith for FREE accounts with enabled achievements
+            if (account.maf) {
+                var maxTransferQuota = maf.transfer.current + maf.transfer.base;
+
+                $('.dashboard .account.rounded-icon.right').addClass('hidden');
+                $('.account.widget.bandwidth').addClass('enabled-pr-bar');
+                $('.bandwidth .account.progress-size.available-quota').text(bytesToSize(maxTransferQuota, 0));
+                $('.bandwidth .account.progress-bar.grey').css('width', (Math.round(base * 100 / maxTransferQuota) || 1) + '%');
+            }
+            else {
+                $('.dashboard .account.rounded-icon.right').removeClass('hidden');
+                $('.account.widget.bandwidth').removeClass('enabled-pr-bar');
+
+                /* Bandwidth notification */
+                $('.dashboard .account.rounded-icon.right').rebind('click', function() {
+                    if (!$(this).hasClass('active')) {
+                        $(this).addClass('active');
+                        $(this).find('.dropdown').removeClass('hidden');
+                    }
+                    else {
+                        $(this).removeClass('active');
+                        $(this).find('.dropdown').addClass('hidden');
+                    }
+                });
+                $('.fm-right-block.dashboard').rebind('click', function(e) {
+                    if (!$(e.target).hasClass('rounded-icon') && $('.account.rounded-icon.info').hasClass('active')) {
+                        $('.account.rounded-icon.info').removeClass('active');
+                        $('.dropdown.body.bandwidth-info').addClass('hidden');
+                    }
+                });
+            }
 
             // Get more transfer quota button
             $('.account.widget.bandwidth .free .more-quota').rebind('click', function() {
@@ -3677,6 +3697,10 @@ function accountUI() {
             max = account.bw;
             base += account.servbw_used;
         }
+        else if (M.maf) {
+            max = M.maf.transfer.base + M.maf.transfer.current;
+            base += account.servbw_used;
+        }
         perc   = Math.round(base * 100 / max) || 1;
         perc_c = perc;
         if (perc_c > 100)
@@ -3700,7 +3724,7 @@ function accountUI() {
         $('.bandwidth .chart.data .size-txt').text(bytesToSize(account.servbw_used + account.downbw_used, 0));
         $('.bandwidth .chart.data .pecents-txt').text((b2[0]));
         $('.bandwidth .chart.data .gb-txt').text((b2[1]));
-        if (u_attr.p) {
+        if (u_attr.p || M.maf) {
             $('.bandwidth .chart.data .perc-txt').text(perc_c + '%');
         }
         else {

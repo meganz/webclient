@@ -2937,7 +2937,7 @@ function MegaData()
 
             if (self.u[userId].avatar && self.u[userId].avatar.type != "image") {
                 self.u[userId].avatar = false;
-                useravatar.loaded(userId);
+                useravatar.loaded(userId); // FIXME: why is this needed here?
             }
 
             if (userId === u_handle) {
@@ -2951,9 +2951,10 @@ function MegaData()
                     u_attr.name
                 );
 
-                if (fminitialized) {
+                // XXX: why are we invalidating avatars on first/last-name change?
+                /*if (fminitialized) {
                     M.avatars(u_handle);
-                }
+                }*/
             }
         });
     },
@@ -5906,7 +5907,7 @@ function execsc() {
                 case '_fm':
                     // completed initial processing, enable UI
                     crypto_fixmissingkeys(missingkeys);
-                    loadfm_done(true);
+                    loadfm_done();
                     break;
 
                 case 'e':
@@ -8012,6 +8013,7 @@ function loadfm_callback(res) {
         processMCF(res.mcf.c ? res.mcf.c : res.mcf);
     }
     M.avatars();
+    loadfm.fromapi = true;
 
     process_f(res.f, function onLoadFMDone(hasMissingKeys) {
 
@@ -8078,9 +8080,12 @@ function loadfm_callback(res) {
  * Function to be invoked when the cloud has finished loading,
  * being the nodes loaded from either server or local cache.
  */
-function loadfm_done() {
+function loadfm_done(mDBload) {
+    mDBload = mDBload || !loadfm.fromapi;
+
     loadfm.loaded = Date.now();
     loadfm.loading = false;
+    loadfm.fromapi = false;
 
     if (d > 1) console.error('loadfm_done', is_fm());
 
@@ -8113,9 +8118,8 @@ function loadfm_done() {
             loadingInitDialog.hide();
         }
 
-        // FIXME: remove this condition?
         // -0x800e0fff indicates a call to loadfm() when it was already loaded
-        //if (mDBload !== -0x800e0fff) {
+        if (mDBload !== -0x800e0fff) {
             Soon(function _initialNotify() {
                 // After the first SC request all subsequent requests can generate notifications
                 notify.initialLoadComplete = true;
@@ -8154,7 +8158,7 @@ function loadfm_done() {
                     workers && workers.length || -666,
                     r.ttlb | 0, // time to last byte
                     r.ttfm | 0, // time to fm since ttlb
-                    u_type == 3 ? (mBroadcaster.crossTab.master | 0) : -1, // master, or slave tab?
+                    u_type === 3 ? (mBroadcaster.crossTab.master ? 1 : 0) : -1, // master, or slave tab?
                 ];
 
                 if (d) {
@@ -8166,7 +8170,7 @@ function loadfm_done() {
             if (mDBload) {
                 M.avatars();
             }
-        //}
+        }
         clearInterval(mega.loadReport.aliveTimer);
         mega.flags &= ~window.MEGAFLAG_LOADINGCLOUD;
 

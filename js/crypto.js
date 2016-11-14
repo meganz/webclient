@@ -1596,8 +1596,7 @@ function api_proc(q) {
         // (currently only available with Firefox)
         // FIXME: use Fetch API with Chrome
         // FIXME: use ms-stream with MSIE?
-        // FIXME: suppress Chrome warning when doing this?
-        if (q.split && moz_chunked_active) {
+        if (q.split && !window.chrome && moz_chunked_active) {
             q.xhr.responseType = 'moz-chunked-text';
 
             // first try? record success
@@ -1815,8 +1814,6 @@ function api_ready(q)
     q.ctxs[q.i] = [];
 }
 
-// FIXME: call eventsCollect() *before* the first call to api_req()
-// FIXME: never stop eventsCollect()
 var apiFloorCap = 3000;
 function api_retry() {
     for (var i = apixs.length; i--; ) {

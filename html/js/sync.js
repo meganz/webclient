@@ -84,7 +84,7 @@ function init_sync() {
     });
 
     $('.sync-help-center').rebind('click', function(e) {
-        document.location.hash = 'help/sync';
+        document.location.hash = 'help/client/megasync';
     });
     setTimeout(function() {
         $('#syncanim').rebind('click', function(e) {

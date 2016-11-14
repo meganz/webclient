@@ -1451,6 +1451,7 @@ function api_reset() {
                         '['       : tree_residue,    // tree residue
                         '#'       : api_esplit });   // numeric error code
 }
+mBroadcaster.once('startMega', api_reset);
 
 // a chunked request received a purely numerical response - handle it the usual way
 function api_esplit(e) {

@@ -2430,7 +2430,11 @@ else if (!b_u)
         }
         else if (loginresponse)
         {
-            api_setsid(u_sid);
+            // crypto.js's api_reset was moved to startMega-bcast since it now depends on mega.js,
+            // as result we cannot set the sid this early, unless through startMega as well
+            mBroadcaster.once('startMega', function() {
+                api_setsid(u_sid);
+            });
             u_checklogin3a(loginresponse[0],{checkloginresult:boot_auth});
             loginresponse = undefined;
         }

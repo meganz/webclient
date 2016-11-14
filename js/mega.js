@@ -5622,11 +5622,6 @@ function renderNew() {
     }
 }
 
-// FIXME: call during some initialisation routine, not during file load
-// (had to be moved over from crypto.js, as it now references stuff
-// defined in mega.js)
-api_reset();
-
 // execute actionpacket
 // actionpackets are received and executed strictly in order. receiving and
 // execution run concurrently (a connection drop while the execution is

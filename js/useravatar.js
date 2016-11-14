@@ -189,7 +189,7 @@ var useravatar = (function() {
     /**
      * Return the current user's avatar in image URL.
      */
-    ns.top = function() {
+    ns.mine = function() {
 
         if (!u_handle) {
             /* No user */
@@ -203,20 +203,6 @@ var useravatar = (function() {
             logger.error(ex);
             return '';
         }
-    };
-
-
-    /**
-     * Return the current user's avatar in image URL.
-     */
-    ns.mine = function() {
-
-        // If no user, return default avatar
-        if (!u_handle) {
-            return '';
-        }
-
-        return ns.imgUrl(u_handle);
     };
 
     /**
@@ -233,8 +219,13 @@ var useravatar = (function() {
         logger.debug('Processing loaded user-avatar', user);
 
         if (user === u_handle) {
-            // my avatar!
-            $('.fm-avatar img,.fm-account-avatar img').attr('src', ns.imgUrl(user));
+            var myavatar = ns.mine();
+
+            $('.fm-avatar img,.fm-account-avatar img').attr('src', myavatar);
+            $('.fm-avatar').show();
+
+            // we recreate the top-menu on each navigation, so...
+            ns.my = myavatar;
         }
 
         if (M.u[user]) {
@@ -422,12 +413,6 @@ var useravatar = (function() {
                 };
                 if (M.u[handle]) {
                     M.u[handle].avatar = false;
-                }
-
-                if (u_handle && handle === u_handle) {
-                    // topmenuUI code relies on avatars[...] to re-render the users avatar in case it gets
-                    // loaded/updated
-                    topmenuUI();
                 }
             }
             else {

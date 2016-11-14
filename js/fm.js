@@ -759,8 +759,6 @@ function initUI() {
         folderlink = 0;
     }
 
-    M.avatars();
-
     if ((typeof dl_import !== 'undefined') && dl_import) {
         importFile();
     }

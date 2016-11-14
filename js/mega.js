@@ -6859,8 +6859,6 @@ function fetchfm(sn) {
     attribCache.prefillMemCache(fmdb).then(function(){
 
         if (u_type == 3) {
-            // moved here from index.js
-            useravatar.loadAvatar(u_handle);
             mega.config.fetch();
 
             // load/initialise the authentication system
@@ -8008,6 +8006,7 @@ function loadfm_callback(res) {
     if (res.mcf && !megaChatIsDisabled) {
         processMCF(res.mcf.c ? res.mcf.c : res.mcf);
     }
+    M.avatars();
 
     process_f(res.f, function onLoadFMDone(hasMissingKeys) {
 
@@ -8157,6 +8156,10 @@ function loadfm_done(mDBload) {
                     console.debug('loadReport', r);
                 }
                 api_req({a: 'log', e: 99626, m: JSON.stringify(r)});
+            }
+
+            if (mDBload) {
+                M.avatars();
             }
         }
         clearInterval(mega.loadReport.aliveTimer);

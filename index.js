@@ -1221,12 +1221,14 @@ function topmenuUI() {
         $('.top-search-bl').hide();
     }
 
-    $('.fm-avatar').hide();
+    var avatar = useravatar.my;
+    if (!avatar) {
+        $('.fm-avatar').hide();
+    }
 
     // If the 'firstname' property is set, display it
     if (u_type == 3 && u_attr.firstname) {
-        $('.top-head .user-name').text(u_attr.firstname);
-        $('.top-head .user-name').show();
+        $('.top-head .user-name').text(u_attr.firstname).show();
     }
 
     // Check for pages that do not have the 'firstname' property set e.g. #about
@@ -1235,8 +1237,7 @@ function topmenuUI() {
 
         // Try get the first name from the full 'name' property and display
         var nameParts = u_attr.name.split(' ');
-        $('.top-head .user-name').text(nameParts[0]);
-        $('.top-head .user-name').show();
+        $('.top-head .user-name').text(nameParts[0]).show();
     }
 
     if (u_type) {
@@ -1244,9 +1245,8 @@ function topmenuUI() {
         $('.top-menu-item.logout,.context-menu-divider.logout').show();
         $('.top-menu-item.clouddrive,.top-menu-item.account').show();
 
-        if (M.u[u_handle] && M.u[u_handle].avatar || avatars[u_handle]) {
-            $('.fm-avatar').show();
-            $('.fm-avatar img').attr('src', useravatar.imgUrl(u_handle));
+        if (avatar) {
+            $('.fm-avatar img').attr('src', avatar);
         }
 
         $('.top-login-button').hide();
@@ -1254,13 +1254,6 @@ function topmenuUI() {
         $('.top-change-language').hide();
         $('.create-account-button').hide();
         $('.membership-status-block').show();
-
-// too soon!
-//        Soon(function() {
-//            if (!avatars[u_handle]) {
-//                useravatar.loadAvatar(u_handle);
-//            }
-//        });
 
         // If a Lite/Pro plan has been purchased
         if (u_attr.p) {
@@ -1860,9 +1853,6 @@ function topmenuUI() {
         $('body').removeClass('overlayed');
     }
 
-    if (page.substr(0, 2) !== 'fm' && u_type == 3 && !avatars[u_handle]) {
-        M.avatars();
-    }
     if (ulmanager.isUploading || dlmanager.isDownloading) {
         $('.widget-block').removeClass('hidden');
     }
@@ -1980,9 +1970,7 @@ function parsetopmenu() {
     if (document.location.href.substr(0, 19) == 'chrome-extension://') {
         top = top.replace(/\/#/g, '/' + urlrootfile + '#');
     }
-// not this early, please
-//    top = top.replace("{avatar-top}", window.useravatar && useravatar.top() || '');
-    top = top.replace("{avatar-top}", '');
+    top = top.replace("{avatar-top}", window.useravatar && useravatar.mine() || '');
     top = translate(top);
     return top;
 }

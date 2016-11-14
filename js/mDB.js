@@ -705,6 +705,10 @@ FMDB.prototype.clone = function fmdb_clone(o) {
 
 // reliably invalidate the current database (delete the sn)
 FMDB.prototype.invalidate = function fmdb_invalidate(cb) {
+    if (this.crashed) {
+        return cb();
+    }
+
     var channels = Object.keys(this.pending);
 
     // erase all pending data

@@ -11433,7 +11433,7 @@ table {
 }
 .account.left-pane .default-grey-button {
     height: 32px;
-    line-height: 32px;
+    line-height: 31px;
 }
 .account.left-pane .button.get-more-space {
     margin: 16px 0 0 0;

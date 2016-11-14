@@ -234,11 +234,7 @@ var useravatar = (function() {
 
         if (user === u_handle) {
             // my avatar!
-            Soon(function() {
-                $('.fm-avatar img,.fm-account-avatar img').attr('src', ns.imgUrl(user));
-                topmenuUI();
-            });
-
+            $('.fm-avatar img,.fm-account-avatar img').attr('src', ns.imgUrl(user));
         }
 
         if (M.u[user]) {
@@ -336,30 +332,15 @@ var useravatar = (function() {
          * @return {MegaPromise}
          */
         ns.loadAvatar = function(handle) {
-            var promise = new MegaPromise();
-
-            promise.fail(function() {
-                if (handle === u_handle) {
-                    // it makes more sense to just call topmenuUI() and it should check if this avatar is missing
-                    // but since M.u[u_handle] is not yet initialised...and missingAvatars are private, the only way
-                    // to do this was in here.
-                    Soon(function() {
-                        topmenuUI();
-                    });
-                }
-            });
-
             // Ensure this is a sane call...
             if (typeof handle !== 'string' || handle.length !== 11) {
                 logger.error('Unable to retrieve user-avatar, invalid handle!', handle);
-                promise.reject(EARGS);
-                return promise;
+                return MegaPromise.reject(EARGS);
             }
             if (missingAvatars[handle]) {
                 // If the retrieval already failed for the current session
                 logger.warn('User-avatar retrieval for "%s" had failed...', handle, missingAvatars[handle]);
-                promise.reject(missingAvatars[handle]);
-                return promise;
+                return MegaPromise.reject(missingAvatars[handle]);
             }
             if (pendingGetters[handle]) {
                 // It's already pending, return associated promise
@@ -371,7 +352,7 @@ var useravatar = (function() {
                 return MegaPromise.resolve(EEXIST);
             }
 
-
+            var promise = new MegaPromise();
             pendingGetters[handle] = promise;
 
             var reject = function(error) {
@@ -439,12 +420,8 @@ var useravatar = (function() {
                     data: blob,
                     url: myURL.createObjectURL(blob)
                 };
-
                 if (M.u[handle]) {
-                    M.u[handle].avatar = {
-                        'type': 'image',
-                        'avatar': avatars[handle].url
-                    };
+                    M.u[handle].avatar = false;
                 }
 
                 if (u_handle && handle === u_handle) {
@@ -473,32 +450,13 @@ var useravatar = (function() {
             avatars[handle] = missingAvatars[handle] = undefined;
 
             if (M.u[handle]) {
-                M.u[handle].avatar = {
-                    'type': 'text',
-                    'avatar': _getAvatarProperties(M.u[handle])
-                };
+                M.u[handle].avatar = false;
             }
         };
 
         if (d) {
             ns._pendingGetters = pendingGetters;
             ns._missingAvatars = missingAvatars;
-        }
-
-        /**
-         * A method to indicate if the loading of an avatar (if such is available) for user `handle` had finished
-         * In case we are still loading for the avatar this method would return true
-         * If there is no avatar on the server, this method would also return true
-         * @param handle
-         * @returns {boolean}
-         */
-        ns.hadLoadedAvatar = function(handle) {
-            if (ns._missingAvatars[handle] || avatars[handle]) {
-                return true;
-            }
-            else {
-                return false;
-            }
         }
 
     })(ns);

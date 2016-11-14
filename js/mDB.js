@@ -287,10 +287,8 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
             // invalidation commit completed?
             if (fmdb.inval_ready) {
                 if (fmdb.inval_cb) {
-                    // actually complete the transaction
-                    setTimeout(fmdb.inval_cb, 1);
-                    // FIXME: is this guaranteed to first go here and then to the timeout completion?
-                    fmdb.inval_cb = false;
+                    fmdb.db.close();
+                    fmdb.inval_cb();    // caller must not reuse fmdb object
                 }
                 return;
             }

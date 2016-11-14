@@ -194,7 +194,7 @@ function MegaData()
     {
         this.d = {};
         this.v = [];
-        this.c = {};
+        this.c = { shares: {} };
 
         if (typeof MegaDataMap !== 'undefined') {
             this.u = new MegaDataMap();
@@ -3289,6 +3289,11 @@ function MegaData()
 
                 if (ctx.sconly) {
                     nodesCount = importNodes - Object.keys(res).length;
+
+                    // accelerate arrival of SC-conveyed new nodes by directly
+                    // issuing a fetch
+                    // (instead of waiting for waitxhr's connection to drop)
+                    getsc();
                 }
                 else {
                     newnodes = [];
@@ -6473,7 +6478,9 @@ function initworkerpool() {
                     while (l--) {
                         workers[l].terminate();
                     }
-                    workers = null;
+
+                    // workers === false implies "no workers available here"
+                    workers = false;
                 }
             };
             if (workerstate) {
@@ -6552,20 +6559,24 @@ TreeFetcher.prototype.fetch = function treefetcher_fetch(force) {
 function fm_fullreload(q) {
     api_cancel(q);
 
-    // FIXME: do not pass arguments to TreeFetcher.fetch() via localStorage!
-    localStorage.force = true;
-
-    var retry = api_reqerror.bind(null, q, -3);
+    // FIXME: properly encapsulate ALL client state in an object
+    // that supports destruction.
+    // (at the moment, if we wipe the DB and then call loadfm(),
+    // there will be way too much attribute, key and chat stuff already
+    // churning away - we simply cannot just delete their databases
+    // without restarting them.
+    // until then - it's the sledgehammer method; can't be anything
+    // more surgical :(
+    localStorage.force = 1;
 
     if (fmdb) {
         // bring DB to a defined state
         fmdb.invalidate(function() {
-            // wipe partially written data and trigger retry
-            fmdb.init(retry, true);
+            location.reload();
         });
     }
     else {
-        retry();
+        location.reload();
     }
 }
 
@@ -6699,6 +6710,10 @@ function tree_residue(fm, ctx) {
         dumpsremaining = 1;
         worker_procmsg({ data: {} });
     }
+
+    // (mandatory steps at the conclusion of a successful split response)
+    api_ready(this.q);
+    api_proc(this.q);
 };
 
 // process worker responses (decrypted nodes, processed actionpackets, state dumps...)
@@ -6789,7 +6804,7 @@ function worker_procmsg(ev) {
 var fmdb;
 
 function loadfm(force) {
-    if (workers === undefined) initworkerpool();
+    if (workers !== false) initworkerpool();
 
     if (force) {
         localStorage.force = true;
@@ -6806,13 +6821,15 @@ function loadfm(force) {
         }
         if (!loadfm.loading) {
             M.reset();
-            M.c.shares = [];
 
             fminitialized  = false;
             loadfm.loading = true;
 
             // is this a folder link? or do we have no valid cache for this session?
-            if (pfid) fetchfm(false);
+            if (pfid) {
+                fmdb = false;
+                fetchfm(false);
+            }
             else {
                 fmdb = FMDB(u_handle, {
                     // channel 0: transactional by _sn update
@@ -6936,7 +6953,7 @@ function dbfetchfm() {
 
                                         // fetch & process new actionpackets
                                         loadingInitDialog.step3();
-                                        getsc();
+                                        getsc(true);
                                     });
                                 });
                             });
@@ -8048,7 +8065,7 @@ function loadfm_callback(res) {
 
         // retrieve initial batch of action packets, if any
         // we'll then complete the process using loadfm_done
-        getsc();
+        getsc(true);
 
         if (hasMissingKeys) {
             srvlog('Got missing keys processing gettree...', null, true);

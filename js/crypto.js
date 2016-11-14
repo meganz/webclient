@@ -1507,14 +1507,15 @@ function stopapi() {
         api_cancel(apixs[i]);
         apixs[i].cmds = [[], []];
         apixs[i].ctxs = [[], []];
-        apixs[i].cancelled = false;
     }
 }
 
 function api_cancel(q) {
     if (q) {
-        q.cancelled = true;
         if (q.xhr) {
+            // the "cancelled" flag merely (redundantly?) ensures that
+            // subsequent onerror/onload/onprogress callbacks are ignored.
+            q.xhr.cancelled = true;
             q.xhr.abort();
         }
         if (q.timer) {
@@ -1553,7 +1554,7 @@ function api_req(request, context, channel) {
         channel = 0;
     }
 
-    if (d) console.log("CS command on " + channel + ": " + JSON.stringify(request));
+    if (d) console.log("API request on " + channel + ": " + JSON.stringify(request));
 
     if (typeof context == 'undefined') {
         context = {};
@@ -1607,9 +1608,9 @@ function api_proc(q) {
         q.xhr.q = q;
 
         q.xhr.onerror = function () {
-            if (!this.q.cancelled) {
+            if (!this.cancelled) {
                 logger.debug("API request error - retrying");
-                api_reqerror(q, -3, this.status);
+                api_reqerror(q, EAGAIN, this.status);
             }
         };
 
@@ -1617,9 +1618,9 @@ function api_proc(q) {
         // so route .onprogress to it.
         if (q.split) {
             q.xhr.onprogress = function(evt) {
-                if (!this.q.cancelled) {
+                if (!this.cancelled) {
                     // caller wants progress updates? give caller progress updates!
-                    if (this.q.ctxs[this.q.i][0].progress) {
+                    if (this.q.ctxs[this.q.i][0] && this.q.ctxs[this.q.i][0].progress) {
                         var progressPercent = 0;
                         var bytes = evt.total || this.totalBytes;
 
@@ -1661,7 +1662,7 @@ function api_proc(q) {
         }
 
         q.xhr.onload = function onAPIProcXHRLoad() {
-            if (!this.q.cancelled) {
+            if (!this.cancelled) {
                 var t;
                 var status = this.status;
 
@@ -1678,10 +1679,6 @@ function api_proc(q) {
                         if (!this.q.splitter.chunkproc((response && response.length > this.q.received) ? response : '', this, true)) {
                             fm_fullreload(this.q);
                         }
-
-                        // reset state for next request
-                        api_ready(this.q);
-                        api_proc(this.q);
                         return;
                     }
 
@@ -1771,6 +1768,7 @@ function api_send(q) {
         q.splitter = new JSONSplitter(q.split);
     }
 
+    q.xhr.cancelled = false;
     q.xhr.send(q.rawreq);
 }
 
@@ -1816,6 +1814,8 @@ function api_ready(q)
     q.ctxs[q.i] = [];
 }
 
+// FIXME: call eventsCollect() *before* the first call to api_req()
+// FIXME: never stop eventsCollect()
 var apiFloorCap = 3000;
 function api_retry() {
     for (var i = apixs.length; i--; ) {
@@ -1843,25 +1843,7 @@ function api_reqfailed(c, e) {
     }
     else if (c == 2 && e == ETOOMANY) {
         // too many pending SC requests - reload from scratch
-        loadfm.loaded = false;
-        loadfm.loading = false;
-
-
-        // FIXME: do this more gently
-        localStorage.force = 1;
-        // FIXME: drop DB here
-        location.reload();
-/*        M.reset();
-        api_init(2, 'sc', true);
-
-        if (pfkey) {
-            api_setfolder(n_h);
-        }
-        else {
-            apixs[2].sid = 'sid=' + u_sid + '&ec';
-        }
-
-        loadfm(true);*/
+        fm_fullreload(this.q);
     }
     // if suspended account
     else if (e == EBLOCKED) {
@@ -1967,7 +1949,7 @@ function sc_residue(sc) {
         // enqueue new sn
         currsn = sc.sn;
         scq[scqhead++] = [{ a : '_sn', sn : currsn }];
-        getsc();
+        getsc(true);
         resumesc();
     }
     else if (sc.w) {
@@ -1979,6 +1961,8 @@ function sc_residue(sc) {
             resumesc();
         }
 
+        // we're done, wait for more
+        gettingsc = false;
         waiturl = sc.w;
         waittimeout = setTimeout(waitsc, waitbackoff);
 
@@ -1987,29 +1971,35 @@ function sc_residue(sc) {
             mega.loadReport.stepTimeStamp = Date.now();
         }
     }
-    else return sc_failure(false);
+    else {
+        // malformed SC response - take the conservative route and reload fully
+        // FIXME: add one single retry if !sscount: Clear scq, clear worker state,
+        // then reissue getsc() (difficult to get right - be cautious)
+        return fm_fullreload();
+    }
+
+    // (mandatory steps at the conclusion of a successful split response)
+    api_ready(this.q);
+    api_proc(this.q);
 }
 
-function sc_failure(badjson) {
-    if (sccount || badjson) {
-        localStorage.force = 1;
-        location.reload();
-    }
-    else {
-        if (getsc.backoff) {
-            getsc.backoff = Math.min(getsc.backoff * 2, 666999);
-        }
-        else {
-            getsc.backoff = 125+Math.floor(Math.random()*600);
-        }
-        setTimeout(getsc, getsc.backoff);
-    }
-}
+// getsc() serialisation (getsc() can be called anytime from anywhere if
+// someone thinks that it is beneficial!)
+var gettingsc;
 
 // request new actionpackets and stream them to sc_packet() as they come in
 // nodes in t packets are streamed to sc_node()
-function getsc() {
-    api_req('sn=' + currsn + '&ssl=1&e=' + cmsNotifHandler, {}, 2);
+function getsc(force) {
+    if (force || !gettingsc) {
+        gettingsc = true;
+
+        if (waitxhr) {
+            waitxhr.abort();
+        }
+
+        api_ready(apixs[2]);
+        api_req('sn=' + currsn + '&ssl=1&e=' + cmsNotifHandler, {}, 2);
+    }
 }
 
 function waitsc() {
@@ -2056,7 +2046,6 @@ function waitsc() {
             waittimeout = false;
 
             if (this.waitid === waitid) {
-
                 stopsc();
 
                 var t = Date.now() - waitbegin;
@@ -2071,7 +2060,7 @@ function waitsc() {
                     waitbackoff = 250;
                 }
 
-                getsc(false);
+                getsc();
             }
         }
     };

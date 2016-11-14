@@ -74,30 +74,32 @@ var notify = {
                 notify.addUserEmails(pendingContactUsers);
 
                 // Loop through the notifications
-                for (var i = 0; i < notifications.length; i++) {
+                if (notifications) {
+                    for (var i = 0; i < notifications.length; i++) {
 
-                    if (notify.isUnwantedNotification(notifications[i])) {
-                        continue;
+                        if (notify.isUnwantedNotification(notifications[i])) {
+                            continue;
+                        }
+
+                        var notification = notifications[i];            // The full notification object
+                        var id = makeid(10);                            // Make random ID
+                        var type = notification.t;                      // Type of notification e.g. share
+                        var timeDelta = notification.td;                // Seconds since the notification occurred
+                        var seen = (timeDelta >= lastTimeDelta);        // If the notification time delta is older than the last time the user saw the notification then it is read
+                        var timestamp = currentTime - timeDelta;        // Timestamp of the notification
+                        var userHandle = notification.u;                // User handle e.g. new share from this user
+
+                        // Add notifications to list
+                        notify.notifications.push({
+                            data: notification, // The full notification object
+                            id: id,
+                            seen: seen,
+                            timeDelta: timeDelta,
+                            timestamp: timestamp,
+                            type: type,
+                            userHandle: userHandle
+                        });
                     }
-
-                    var notification = notifications[i];            // The full notification object
-                    var id = makeid(10);                            // Make random ID
-                    var type = notification.t;                      // Type of notification e.g. share
-                    var timeDelta = notification.td;                // Seconds since the notification occurred
-                    var seen = (timeDelta >= lastTimeDelta);        // If the notification time delta is older than the last time the user saw the notification then it is read
-                    var timestamp = currentTime - timeDelta;        // Timestamp of the notification
-                    var userHandle = notification.u;                // User handle e.g. new share from this user
-
-                    // Add notifications to list
-                    notify.notifications.push({
-                        data: notification, // The full notification object
-                        id: id,
-                        seen: seen,
-                        timeDelta: timeDelta,
-                        timestamp: timestamp,
-                        type: type,
-                        userHandle: userHandle
-                    });
                 }
 
                 // Show the notifications

@@ -7170,8 +7170,11 @@ table {
 .fm-flags-txt {
     padding: 0 0 0 27px;
 }
+.fm-member-icon {
+    padding: 3px 0 0 0;
+}
 .fm-member-icon-txt {
-    padding: 0 0 0 21px;
+    padding: 0 0 0 28px;
 }
 .transfer-status {
     height: 24px;
@@ -10868,6 +10871,7 @@ table {
     font-family: 'source_sans_prosemibold', Arial, Helvetica;
     position: relative;
     text-transform: uppercase;
+    margin: -2px 0 0 0;
 }
 .account.usename-block {
     position: relative;

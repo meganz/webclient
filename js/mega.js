@@ -6824,7 +6824,6 @@ function worker_procmsg(ev) {
 var fmdb;
 
 function loadfm(force) {
-    if (workers !== false) initworkerpool();
 
     if (force) {
         localStorage.force = true;
@@ -6840,6 +6839,9 @@ function loadfm(force) {
             loadingInitDialog.step1();
         }
         if (!loadfm.loading) {
+            if (workers !== false) {
+                initworkerpool();
+            }
             M.reset();
 
             fminitialized  = false;

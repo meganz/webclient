@@ -1573,7 +1573,7 @@ function api_req(request, context, channel) {
 
 // indicates whether this is a Firefox supporting the moz-chunked-*
 // responseType - unknown: -1, no: 0, yes: 1
-var moz_chunked_active = -1;
+var moz_chunked_active = !window.chrome && -1;
 
 // send pending API request on channel q
 function api_proc(q) {
@@ -1596,7 +1596,7 @@ function api_proc(q) {
         // (currently only available with Firefox)
         // FIXME: use Fetch API with Chrome
         // FIXME: use ms-stream with MSIE?
-        if (q.split && !window.chrome && moz_chunked_active) {
+        if (q.split && moz_chunked_active) {
             q.xhr.responseType = 'moz-chunked-text';
 
             // first try? record success

@@ -1145,6 +1145,7 @@ if (m)
     else if (window.location.hash.substr(1, 7) === 'confirm'
             || window.location.hash.substr(1, 6) === 'backup'
             || window.location.hash.substr(1, 6) === 'cancel'
+            || window.location.hash.substr(1, 6) === 'verify'
             || window.location.hash.substr(1, 6) === 'fm/ipc'
             || window.location.hash.substr(1, 9) === 'newsignup'
             || window.location.hash.substr(1, 7) === 'recover'

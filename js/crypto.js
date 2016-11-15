@@ -1654,8 +1654,7 @@ function api_proc(q) {
                     // for maximum flexibility, the splitter ctx will be the XHR
                     if (!this.q.splitter.chunkproc(chunk, this, false)) {
                         // a JSON syntax error occurred: hard reload
-                        // FIXME: log this highly concerning event
-                        fm_fullreload(this.q);
+                        fm_fullreload(this.q, 'JSON Syntax Error');
                     }
                 }
             };
@@ -1677,7 +1676,7 @@ function api_proc(q) {
                         // otherwise, we send an empty string
                         // in all cases, set the inputcomplete flag to catch incomplete API responses
                         if (!this.q.splitter.chunkproc((response && response.length > this.q.received) ? response : '', this, true)) {
-                            fm_fullreload(this.q);
+                            fm_fullreload(this.q, 'onload json syntax error');
                         }
                         return;
                     }
@@ -1841,7 +1840,7 @@ function api_reqfailed(c, e) {
     }
     else if (c == 2 && e == ETOOMANY) {
         // too many pending SC requests - reload from scratch
-        fm_fullreload(this.q);
+        fm_fullreload(this.q, 'ETOOMANY');
     }
     // if suspended account
     else if (e == EBLOCKED) {
@@ -1973,7 +1972,7 @@ function sc_residue(sc) {
         // malformed SC response - take the conservative route and reload fully
         // FIXME: add one single retry if !sscount: Clear scq, clear worker state,
         // then reissue getsc() (difficult to get right - be cautious)
-        return fm_fullreload();
+        return fm_fullreload(null, 'malformed SC response');
     }
 
     // (mandatory steps at the conclusion of a successful split response)

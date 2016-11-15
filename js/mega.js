@@ -747,6 +747,9 @@ function MegaData()
 
     this.avatars = function(userPurgeList)
     {
+        if (u_type !== 3) {
+            return false;
+        }
         if (!M.c.contacts) {
             M.c.contacts = {};
         }
@@ -6555,8 +6558,10 @@ TreeFetcher.prototype.fetch = function treefetcher_fetch(force) {
 
 // triggers a full reload including wiping the remote treecache
 // (e.g. because the treecache is damaged or too old)
-function fm_fullreload(q) {
-    api_cancel(q);
+function fm_fullreload(q, logMsg) {
+    if (q) {
+        api_cancel(q);
+    }
 
     // FIXME: properly encapsulate ALL client state in an object
     // that supports destruction.
@@ -6568,14 +6573,26 @@ function fm_fullreload(q) {
     // more surgical :(
     localStorage.force = 1;
 
+    // done reload callback
+    var step = 1;
+    var done = function() {
+        if (!--step) {
+            location.reload();
+        }
+    };
+
+    // log event if message provided
+    if (logMsg) {
+        api_req({a: 'log', e: 99624, m: logMsg}, {callback: done});
+        step++;
+    }
+
     if (fmdb) {
         // bring DB to a defined state
-        fmdb.invalidate(function() {
-            location.reload();
-        });
+        fmdb.invalidate(done);
     }
     else {
-        location.reload();
+        done();
     }
 }
 

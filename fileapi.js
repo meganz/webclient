@@ -1137,7 +1137,7 @@ const mozLoginManager = Object.freeze({
 					}
 				}
 			}
-			else {
+			else if (!window.Incognito) {
 				this.prompter.promptToSavePassword(loginInfo);
 			}
 		}

@@ -14884,7 +14884,7 @@
         "context": "A message shown to explain that the user has to input (type or paste) their recovery key to continue with the reset password process."
     },
     "12439": {
-        "text": "You are using an ephemeral session in this browser. If you want to preserve the uploaded data, click [A1]Create Account[\/A] in the tab where you see your data. If you do not care about the data, click [A2]Logout[\/A2] and try clicking the same account confirmation link again.",
+        "text": "You are using an ephemeral session in this browser. If you want to preserve the uploaded data, click [A1]Create Account[\/A1] in the tab where you see your data. If you do not care about the data, click [A2]Logout[\/A2] and try clicking the same account confirmation link again.",
         "context": "This message will appear when a user is trying to activate their account from an ephemeral session which is not related to the activation link."
     },
     "12440": {

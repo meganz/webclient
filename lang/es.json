@@ -3720,7 +3720,7 @@
     "12436": "\u00bfYa tienes instalada la aplicaci\u00f3n MEGA?",
     "12437": "Si ya la tienes instalada [A]\u00a1haz clic aqu\u00ed![\/A]",
     "12438": "Por favor, introduce tu Clave de Recuperaci\u00f3n",
-    "12439": "Est\u00e1s utilizando una sesi\u00f3n ef\u00edmera en este navegador. Si quieres conservar los datos cargados, haz clic en [A1]Crear Cuenta[\/A] en la pesta\u00f1a donde ves tus datos. Si no te importan los datos, haz clic en [A2]Salir[\/A2] y trata de hacer clic en el enlace de confirmaci\u00f3n de la misma cuenta otra vez.",
+    "12439": "You are using an ephemeral session in this browser. If you want to preserve the uploaded data, click [A1]Create Account[\/A1] in the tab where you see your data. If you do not care about the data, click [A2]Logout[\/A2] and try clicking the same account confirmation link again.",
     "12440": "Tienes una sesi\u00f3n abierta con una cuenta MEGA desde este navegador. Haz clic en Desconectar y luego pulsa de nuevo sobre el enlace de confirmaci\u00f3n.",
     "12441": "APROX",
     "12442": "MEGA ofrece almacenamiento en la nube s\u00f3lido con privacidad c\u00f3moda y eficaz siempre activo.",
@@ -3762,7 +3762,7 @@
     "13762": "Has eliminado permanentemente 1 archivo y %1 carpetas.",
     "13763": "Has eliminado permanentemente %1 archivos y 1 carpeta.",
     "13764": "Has eliminado permanentemente %1 archivos y %2 carpetas.",
-    "15536": "Click [B]Update[\/B] for the new browser code to run. Your session will remain open.",
+    "15536": "Haz clic en [B]actualizar[\/B] para ejecutar el c\u00f3digo del navegador. Tu sesi\u00f3n se quedar\u00e1 abierta.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

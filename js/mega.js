@@ -3244,7 +3244,7 @@ function MegaData()
             M.copynodeswaiter[ops.i] = onCopyNodesDone;
         }
         else {
-            ops.v = 2;
+            // ops.v = 2;
             ops.i = requesti;
         }
 

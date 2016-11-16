@@ -313,48 +313,6 @@ function init_page() {
         }
     }
 
-    // FIXME
-    // all gloabal state must be encapsulated in a single object -
-    // we can then comfortably switch between states by changing the
-    // current object and switching UI/XHR comms/IndexedDB
-    var fmwasinitialized = !!fminitialized;
-    if (((u_type === 0 || u_type === 3) || pfid || folderlink) && (!flhashchange || !pfid || pfkey !== oldPFKey)) {
-
-        if (is_fm()) {
-            // switch between FM & folderlinks (completely reinitialize)
-            if ((!pfid && folderlink) || (pfid && folderlink === 0) || pfkey !== oldPFKey) {
-
-                // re-initialize waitd connection when switching.
-                if (!pfid && folderlink && u_sid) {
-                    api_setsid(u_sid);
-
-                    if (waitxhr) {
-                        waitsc();
-                    }
-                }
-
-                M.reset();
-                folderlink = 0;
-                initworkerpool();
-                fminitialized = false;
-                loadfm.loaded = false;
-                if (loadfm.loading) {
-                    api_init(wasFolderlink ? 1 : 0, 'cs');
-                    api_init(wasFolderlink ? 5 : 4, 'cs');
-                    loadfm.loading = false;
-                }
-                if (typeof mDBcls === 'function') {
-                   mDBcls(); // close fmdb
-                }
-            }
-        }
-
-        if (!fminitialized) {
-            mega.initLoadReport();
-			loadfm();
-        }
-    }
-
     if (page.substr(0, 10) == 'blogsearch') {
         blogsearch = decodeURIComponent(page.substr(11, page.length - 2));
         if (!blogsearch) {
@@ -937,10 +895,48 @@ function init_page() {
             }
         }
 
-        if (d) console.log('Setting up fm...', id, pfid, fmwasinitialized, fminitialized, M.currentdirid);
+        if (d) {
+            console.log('Setting up fm...', id, pfid, fminitialized, M.currentdirid);
+        }
 
-        if (!id && fmwasinitialized) {
+        if (!id && fminitialized) {
             id = M.RootID;
+        }
+
+
+        // FIXME
+        // all global state must be encapsulated in a single object -
+        // we can then comfortably switch between states by changing the
+        // current object and switching UI/XHR comms/IndexedDB
+
+        // switch between FM & folderlinks (completely reinitialize)
+        if ((!pfid && folderlink) || (pfid && folderlink === 0) || pfkey !== oldPFKey) {
+
+            M.reset();
+            folderlink     = 0;
+            fminitialized  = false;
+            loadfm.loaded  = false;
+            loadfm.loading = false;
+
+            stopapi();
+            api_reset();
+            initworkerpool();
+
+            if (pfid) {
+                api_setfolder(n_h);
+            }
+            else if (u_sid) {
+                api_setsid(u_sid);
+            }
+
+            // re-initialize waitd connection when switching.
+            if (waitxhr) {
+                waitsc();
+            }
+
+            if (typeof mDBcls === 'function') {
+                mDBcls(); // close fmdb
+            }
         }
 
         if (!fminitialized) {
@@ -950,6 +946,9 @@ function init_page() {
             if (!m && $('#fmholder').html() == '') {
                 $('#fmholder').safeHTML(translate(pages['fm'].replace(/{staticpath}/g, staticpath)));
             }
+
+            mega.initLoadReport();
+            loadfm();
         }
         else if ((!pfid || flhashchange) && id && id !== M.currentdirid) {
             M.openFolder(id);
@@ -1225,12 +1224,14 @@ function topmenuUI() {
         $('.top-search-bl').hide();
     }
 
-    $('.fm-avatar').hide();
+    var avatar = useravatar.my;
+    if (!avatar) {
+        $('.fm-avatar').hide();
+    }
 
     // If the 'firstname' property is set, display it
     if (u_type == 3 && u_attr.firstname) {
-        $('.top-head .user-name').text(u_attr.firstname);
-        $('.top-head .user-name').show();
+        $('.top-head .user-name').text(u_attr.firstname).show();
     }
 
     // Check for pages that do not have the 'firstname' property set e.g. #about
@@ -1239,8 +1240,7 @@ function topmenuUI() {
 
         // Try get the first name from the full 'name' property and display
         var nameParts = u_attr.name.split(' ');
-        $('.top-head .user-name').text(nameParts[0]);
-        $('.top-head .user-name').show();
+        $('.top-head .user-name').text(nameParts[0]).show();
     }
 
     if (u_type) {
@@ -1248,9 +1248,8 @@ function topmenuUI() {
         $('.top-menu-item.logout,.context-menu-divider.logout').show();
         $('.top-menu-item.clouddrive,.top-menu-item.account').show();
 
-        if (M.u[u_handle] && M.u[u_handle].avatar || avatars[u_handle]) {
-            $('.fm-avatar').show();
-            $('.fm-avatar img').attr('src', useravatar.imgUrl(u_handle));
+        if (avatar) {
+            $('.fm-avatar img').attr('src', avatar);
         }
 
         $('.top-login-button').hide();
@@ -1258,13 +1257,6 @@ function topmenuUI() {
         $('.top-change-language').hide();
         $('.create-account-button').hide();
         $('.membership-status-block').show();
-
-// too soon!
-//        Soon(function() {
-//            if (!avatars[u_handle]) {
-//                useravatar.loadAvatar(u_handle);
-//            }
-//        });
 
         // If a Lite/Pro plan has been purchased
         if (u_attr.p) {
@@ -1864,9 +1856,6 @@ function topmenuUI() {
         $('body').removeClass('overlayed');
     }
 
-    if (page.substr(0, 2) !== 'fm' && u_type == 3 && !avatars[u_handle]) {
-        M.avatars();
-    }
     if (ulmanager.isUploading || dlmanager.isDownloading) {
         $('.widget-block').removeClass('hidden');
     }
@@ -1984,9 +1973,7 @@ function parsetopmenu() {
     if (document.location.href.substr(0, 19) == 'chrome-extension://') {
         top = top.replace(/\/#/g, '/' + urlrootfile + '#');
     }
-// not this early, please
-//    top = top.replace("{avatar-top}", window.useravatar && useravatar.top() || '');
-    top = top.replace("{avatar-top}", '');
+    top = top.replace("{avatar-top}", window.useravatar && useravatar.mine() || '');
     top = translate(top);
     return top;
 }

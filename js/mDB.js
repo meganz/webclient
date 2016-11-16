@@ -93,11 +93,11 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
                 // enumerate databases and collect those not prefixed with fm_
                 // (which is the current format)
                 Dexie.getDatabaseNames(function(r) {
-                    for (var i = r.length; i--; ) {
+                    /*for (var i = r.length; i--; ) {
                         if (r[i].substr(0,3) != 'fm_') {
                             todrop.push(r[i]);
                         }
-                    }
+                    }*/
                 }).finally(function(){
                     if (todrop.length) {
                         console.log("Deleting obsolete DBs: " + todrop.join(', '));

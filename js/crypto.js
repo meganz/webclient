@@ -1573,7 +1573,7 @@ function api_req(request, context, channel) {
 
 // indicates whether this is a Firefox supporting the moz-chunked-*
 // responseType - unknown: -1, no: 0, yes: 1
-var moz_chunked_active = -1;
+var moz_chunked_active = !window.chrome && -1;
 
 // send pending API request on channel q
 function api_proc(q) {
@@ -1596,7 +1596,6 @@ function api_proc(q) {
         // (currently only available with Firefox)
         // FIXME: use Fetch API with Chrome
         // FIXME: use ms-stream with MSIE?
-        // FIXME: suppress Chrome warning when doing this?
         if (q.split && moz_chunked_active) {
             q.xhr.responseType = 'moz-chunked-text';
 
@@ -1655,8 +1654,7 @@ function api_proc(q) {
                     // for maximum flexibility, the splitter ctx will be the XHR
                     if (!this.q.splitter.chunkproc(chunk, this, false)) {
                         // a JSON syntax error occurred: hard reload
-                        // FIXME: log this highly concerning event
-                        fm_fullreload(this.q);
+                        fm_fullreload(this.q, 'JSON Syntax Error');
                     }
                 }
             };
@@ -1678,7 +1676,7 @@ function api_proc(q) {
                         // otherwise, we send an empty string
                         // in all cases, set the inputcomplete flag to catch incomplete API responses
                         if (!this.q.splitter.chunkproc((response && response.length > this.q.received) ? response : '', this, true)) {
-                            fm_fullreload(this.q);
+                            fm_fullreload(this.q, 'onload json syntax error');
                         }
                         return;
                     }
@@ -1815,8 +1813,6 @@ function api_ready(q)
     q.ctxs[q.i] = [];
 }
 
-// FIXME: call eventsCollect() *before* the first call to api_req()
-// FIXME: never stop eventsCollect()
 var apiFloorCap = 3000;
 function api_retry() {
     for (var i = apixs.length; i--; ) {
@@ -1844,7 +1840,7 @@ function api_reqfailed(c, e) {
     }
     else if (c == 2 && e == ETOOMANY) {
         // too many pending SC requests - reload from scratch
-        fm_fullreload(this.q);
+        fm_fullreload(this.q, 'ETOOMANY');
     }
     // if suspended account
     else if (e == EBLOCKED) {
@@ -1976,7 +1972,7 @@ function sc_residue(sc) {
         // malformed SC response - take the conservative route and reload fully
         // FIXME: add one single retry if !sscount: Clear scq, clear worker state,
         // then reissue getsc() (difficult to get right - be cautious)
-        return fm_fullreload();
+        return fm_fullreload(null, 'malformed SC response');
     }
 
     // (mandatory steps at the conclusion of a successful split response)

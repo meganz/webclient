@@ -408,7 +408,8 @@ function crypto_rsadecrypt(ciphertext, privkey) {
         var cleartext = asmCrypto.bytes_to_string(asmCrypto.RSA_RAW.decrypt(ciphertext, privkey));
     }
     catch (e) {
-        console.log("RSA decryption failed: " + JSON.stringify(e));
+        console.log("RSA decryption failed: " + e);
+        srvlog2('rsa-dec-err', String(e), String(JSON.stringify(privkey)).length);
         return false;
     }
 

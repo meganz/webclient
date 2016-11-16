@@ -3561,6 +3561,7 @@ mega.utils.reload = function megaUtilsReload() {
             u_key = u_storage.k,
             privk = u_storage.privk,
             debug = u_storage.d,
+            jj = u_storage.jj,
             apipath = debug ? localStorage.apipath : undefined;
         var mcd = u_storage.testChatDisabled;
 
@@ -3577,8 +3578,8 @@ mega.utils.reload = function megaUtilsReload() {
             u_storage.minLogLevel = 0;
             if (location.host !== 'mega.nz') {
                 u_storage.dd = true;
-                if (!is_extension) {
-                    u_storage.jj = true;
+                if (!is_extension && jj)  {
+                    u_storage.jj = jj;
                 }
                 if (mcd) {
                     u_storage.testChatDisabled = 1;

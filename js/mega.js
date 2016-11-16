@@ -1568,9 +1568,9 @@ function MegaData()
                     onlinestatus = [l[5926], 'offline'];
                 }
 
-                var name = M.getNameByHandle(activeContacts[i].u).toLowerCase();
+                var name = M.getNameByHandle(activeContacts[i].u);
 
-                if (!treesearch || name.indexOf(treesearch.toLowerCase()) > -1) {
+                if (!treesearch || name.toLowerCase().indexOf(treesearch.toLowerCase()) > -1) {
 
                     html += '<div class="nw-contact-item ui-droppable '
                     + onlinestatus[1] + '" id="contact_' + htmlentities(activeContacts[i].u)

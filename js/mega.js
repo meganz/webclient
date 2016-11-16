@@ -6802,6 +6802,12 @@ function worker_procmsg(ev) {
     else if (ev.data.done) {
         if (d) console.log("Worker done, " + dumpsremaining + " remaining");
 
+        if (ev.data.sharekeys) {
+            for (var h in ev.data.sharekeys) {
+                crypto_setsharekey(h, ev.data.sharekeys[h]);
+            }
+        }
+
         if (!--dumpsremaining) {
             // store incoming shares
             for (h in M.c.shares) {

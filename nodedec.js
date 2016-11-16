@@ -67,9 +67,13 @@ if (typeof importScripts !== 'undefined') {
             u_sharekeys[req.n_h] = [key, new sjcl.cipher.aes(key)];
         }
         else {
-            // done - free up allocated mem and confirm
+            // unfortunately, we have to discard the SJCL AES cipher
+            // because it does not fit in a worker message
+            for (var h in u_sharekeys) u_sharekeys[h] = u_sharekeys[h][0];
+
+            // done - post state back to main thread
+            self.postMessage({ done: 1, sharekeys: u_sharekeys });
             init();
-            self.postMessage({done: 1});
         }
     }
 

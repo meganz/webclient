@@ -3720,7 +3720,7 @@
     "12436": "M\u00e1te ji\u017e nainstalov\u00e1nu aplikaci MEGA?",
     "12437": "Pokud ji m\u00e1te ji\u017e nainstalov\u00e1nu, [A]klikn\u011bte sem![\/A]",
     "12438": "Zadejte sv\u016fj Obnovovac\u00ed kl\u00ed\u010d",
-    "12439": "V tomto prohl\u00ed\u017ee\u010di pou\u017e\u00edv\u00e1te do\u010dasnou relaci. Pokud chcete zachovat nahran\u00e1 data, klikn\u011bte na [A1]Vytvo\u0159it \u00fa\u010det[\/A] na kart\u011b, kde vid\u00edte sv\u00e1 data. Pokud s data nezaj\u00edmaj\u00ed, klikn\u011bte na [A2]Odhl\u00e1sit se[\/A2] a zkuste znovu kliknout na stejn\u00fd odkaz na potvrzen\u00ed \u00fa\u010dtu.",
+    "12439": "You are using an ephemeral session in this browser. If you want to preserve the uploaded data, click [A1]Create Account[\/A1] in the tab where you see your data. If you do not care about the data, click [A2]Logout[\/A2] and try clicking the same account confirmation link again.",
     "12440": "Ji\u017e jste p\u0159ihl\u00e1\u0161eni do MEGA z tohoto prohl\u00ed\u017ee\u010de. Nejprve klikn\u011bte na Odhl\u00e1sit a pak zkuste znovu kliknout na stejn\u00fd odkaz na potvrzen\u00ed \u00fa\u010dtu.",
     "12441": "Odhadovan\u00fd \u010das",
     "12442": "MEGA poskytuje bezplatn\u00e9 cloudov\u00e9 \u00falo\u017ei\u0161t\u011b s praktick\u00fdm a v\u00fdkonn\u00fdm v\u017edy zapnut\u00fdm soukrom\u00edm.",
@@ -3762,7 +3762,7 @@
     "13762": "Trvale jste odebrali 1 soubor a %1 slo\u017eek.",
     "13763": "Trvale jste odebrali %1 soubor\u016f a 1 slo\u017eku.",
     "13764": "Trvale jste odebrali %1 soubor\u016f a %2 slo\u017eek.",
-    "15536": "Click [B]Update[\/B] for the new browser code to run. Your session will remain open.",
+    "15536": "Klikn\u011bte na [B]Aktualizovat[\/B], aby se spustil nov\u00fd k\u00f3d prohl\u00ed\u017ee\u010de. Va\u0161e relace z\u016fstane otev\u0159ena.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

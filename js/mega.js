@@ -6752,12 +6752,6 @@ function worker_procmsg(ev) {
             crypto_reportmissingkey(ev.data);
         }
 
-        // inbound share?
-        if (ev.data.sk && typeof ev.data.sk == 'object') {
-            u_sharekeys[ev.data.h] = [ev.data.sk, new sjcl.cipher.aes(ev.data.sk)];
-            delete ev.data.sk;
-        }
-
         if (ev.data.scni >= 0) {
             // enqueue processed node
             if (scq[ev.data.scni]) scq[ev.data.scni][1].push(ev.data);

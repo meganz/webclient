@@ -6969,9 +6969,7 @@ function dbfetchfm() {
                                     processPS(r, true);
 
                                     fmdb.get('mcf', function(r){
-                                        if (!megaChatIsDisabled) {
-                                            processMCF(r, true);
-                                        }
+                                        loadfm.chatmcf = [r, true];
 
                                         mega.loadReport.procNodeCount = Object.keys(M.d || {}).length;
                                         mega.loadReport.procNodes     = Date.now() - mega.loadReport.stepTimeStamp;
@@ -8034,8 +8032,8 @@ function loadfm_callback(res) {
     if (res.ps) {
         processPS(res.ps);
     }
-    if (res.mcf && !megaChatIsDisabled) {
-        processMCF(res.mcf.c ? res.mcf.c : res.mcf);
+    if (res.mcf) {
+        loadfm.chatmcf = [res.mcf.c || res.mcf, false];
     }
     M.avatars();
     loadfm.fromapi = true;
@@ -8118,7 +8116,34 @@ function loadfm_done(mDBload) {
     mega.loadReport.stepTimeStamp = Date.now();
 
     mega.config.ready(function() {
-        init_chat();
+
+        if ((location.host === 'mega.nz' || !megaChatIsDisabled) && !is_mobile) {
+
+            if (u_type && !loadfm.chatloading) {
+                loadfm.chatloading = true;
+
+                mega.utils.require('chat')
+                    .always(function() {
+                        loadfm.chatloading = false;
+                        loadfm.chatloaded  = Date.now();
+
+                        if (typeof ChatRoom !== 'undefined') {
+                            init_chat();
+
+                            if (loadfm.chatmcf) {
+                                // FIXME: check this (ie, move to init_chat?)
+                                Soon(function() {
+                                    processMCF(loadfm.chatmcf[0], loadfm.chatmcf[1]);
+                                });
+                            }
+                        }
+                        else {
+                            // FIXME: this won't be reached because the request will fail silently
+                            console.error('Chat resources failed to load...');
+                        }
+                    });
+            }
+        }
 
         mega.loadReport.fmConfigFetch = Date.now() - mega.loadReport.stepTimeStamp;
         mega.loadReport.stepTimeStamp = Date.now();

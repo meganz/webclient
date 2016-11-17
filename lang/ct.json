@@ -3763,6 +3763,10 @@
     "13763": "\u60a8\u5df2\u6c38\u4e45\u522a\u9664%1\u500b\u6a94\u6848\u82071\u500b\u8cc7\u6599\u593e\u3002",
     "13764": "\u60a8\u5df2\u6c38\u4e45\u522a\u9664%1\u500b\u6a94\u6848\u8207%2\u500b\u8cc7\u6599\u593e\u3002",
     "15536": "Click [B]Update[\/B] for the new browser code to run. Your session will remain open.",
+    "16096": "\u5df2\u5132\u5b58",
+    "16097": "\u8acb\u6aa2\u67e5\u60a8\u7684\u96fb\u5b50\u4fe1\u7bb1\uff0c\u4e26\u9ede\u64ca\u4fe1\u4e2d\u7684\u9023\u7d50\u4ee5\u78ba\u8a8d\u555f\u7528\u60a8\u7684\u5e33\u6236\u3002",
+    "16098": "\u70ba\u4ec0\u9ebc\u6211\u6703\u9700\u8981\u9084\u539f\u91d1\u9470\uff1f",
+    "16099": "You can reset your password by following the recovery link that will be sent to your email.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

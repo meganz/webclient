@@ -3763,6 +3763,10 @@
     "13763": "Hai rimosso permanentemente %1 file e 1 cartella.",
     "13764": "Hai rimosso permanentemente %1 file e %2 cartelle.",
     "15536": "Clicca su [B]Aggiorna[\/B] per aggiornare la versione. La sessione rimarr\u00e0 aperta.",
+    "16096": "Salvato",
+    "16097": "Per favore, controlla la tua email e clicca sul link per confermare l'account.",
+    "16098": "Perch\u00e9 ho bisogno di una Chiave di Recupero?",
+    "16099": "Puoi resettare la password usando il link di recupero che ti sar\u00e0 inviato per email.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

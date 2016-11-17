@@ -3233,7 +3233,7 @@
     "8679": "En MEGA",
     "8681": "\u00bfSeguro que quieres eliminar este elemento de Desconectado?",
     "8682": "\u00bfSeguro que quieres eliminar estos elementos de Desconectado?",
-    "8683": "No hemos podido importar todos los archivos, probablemente porque algunos han sido eliminados. La operaci\u00f3n ha terminado con %1 de %2 nodos importados con \u00e9xito.",
+    "8683": "No se pueden importar todos los archivos. Puede ser debido a que algunos de los archivos hayan sido eliminados. La operaci\u00f3n ha finalizado con %1 de %2 elementos importados correctamente.",
     "8684": "Enviar y cerrar",
     "8685": "Por favor, cu\u00e9ntanos por qu\u00e9 no deseas renovar tu plan:",
     "8686": "carpeta no desencriptada",

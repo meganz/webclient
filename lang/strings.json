@@ -5047,6 +5047,10 @@
         "text": "File import failed",
         "context": "Message of the dialog displayed when fails the process\/request to import an image."
     },
+    "2508": {
+        "text": "File import failed",
+        "context": "Title of the dialog displayed when fails the process\/request to import an image - (String as short as possible)."
+    },
     "2531": {
         "text": "Save image to photos",
         "context": "Title of the dialog displayed when a user want to save a image to the 'saved pictures' album, asking for confirmation to do it - (String as short as possible)."

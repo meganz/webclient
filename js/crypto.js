@@ -1592,19 +1592,6 @@ function api_proc(q) {
     if (!q.xhr) {
         q.xhr = getxhr();
 
-        // try enabling chunked transfers to conserve memory & CPU
-        // (currently only available with Firefox)
-        // FIXME: use Fetch API with Chrome
-        // FIXME: use ms-stream with MSIE?
-        if (q.split && moz_chunked_active) {
-            q.xhr.responseType = 'moz-chunked-text';
-
-            // first try? record success
-            if (moz_chunked_active < 0) {
-                moz_chunked_active = q.xhr.responseType == 'moz-chunked-text';
-            }
-        }
-
         q.xhr.q = q;
 
         q.xhr.onerror = function () {
@@ -1755,6 +1742,19 @@ function api_send(q) {
     q.timer = false;
 
     q.xhr.open('POST', q.url, true);
+
+    // try enabling chunked transfers to conserve memory & CPU
+    // (currently only available with Firefox)
+    // FIXME: use Fetch API with Chrome
+    // FIXME: use ms-stream with MSIE?
+    if (q.split && moz_chunked_active) {
+        q.xhr.responseType = 'moz-chunked-text';
+
+        // first try? record success
+        if (moz_chunked_active < 0) {
+            moz_chunked_active = q.xhr.responseType == 'moz-chunked-text';
+        }
+    }
 
     logger.debug("Sending API request: " + q.rawreq + " to " + q.url);
 

@@ -3763,6 +3763,10 @@
     "13763": "Vous avez supprim\u00e9 %1 fichiers et un dossier de fa\u00e7on permanente.",
     "13764": "Vous avez supprim\u00e9 %1 fichiers et %2 dossiers de fa\u00e7on permanente.",
     "15536": "Cliquer sur [B]Mise \u00e0 jour[\/B] pour que le nouveau code de navigateur s'ex\u00e9cute. Votre session restera ouverte.",
+    "16096": "Enregistr\u00e9",
+    "16097": "Veuillez v\u00e9rifier votre courriel et suivre le lien pour confirmer votre compte.",
+    "16098": "Pourquoi ai-je besoin d'une cl\u00e9 de r\u00e9cup\u00e9ration?",
+    "16099": "Vous pouvez r\u00e9initialiser votre mot de passe en suivant le lien de r\u00e9cup\u00e9ration qui vous sera envoy\u00e9 par courriel.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

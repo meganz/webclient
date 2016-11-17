@@ -3763,6 +3763,10 @@
     "13763": "Trajno ste odstranili %1 datotek in 1 mapo.",
     "13764": "Trajno ste odstranili %1 datotek in %2 map.",
     "15536": "Kliknite [B]Nadgradi[\/B], da se za\u017eene nova koda za brskalnik. Va\u0161a seja bo ostala odprta.",
+    "16096": "Saved",
+    "16097": "Please check your e-mail and follow the link to confirm your account.",
+    "16098": "Why do I need a Recovery Key?",
+    "16099": "You can reset your password by following the recovery link that will be sent to your email.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

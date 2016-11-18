@@ -1274,7 +1274,8 @@ function MegaData()
         treeUI();
     };
 
-    this.openFolder = function(id, force, chat) {
+    // FIXME: make all calls to this one async (good luck, Diego!)
+    this.openFolder = function(id, force, chat, cb) {
         var newHashLocation;
 
         $('.fm-right-account-block').addClass('hidden');
@@ -1286,7 +1287,7 @@ function MegaData()
 
         if (!loadfm.loaded) {
             console.error('Internal error, do not call openFolder before the cloud finished loading.');
-            return false;
+            return cb ? cb(false) : false;
         }
 
         if ((id !== 'notifications') && !$('.fm-main.notifications').hasClass('hidden')) {
@@ -1302,7 +1303,7 @@ function MegaData()
             mBroadcaster.sendMessage('fm:initialized');
         }
         else if (id && id === this.currentdirid && !force) {// Do nothing if same path is choosen
-            return false;
+            return cb ? cb(false) : false;
         }
 
         if (id === 'rubbish')
@@ -1362,157 +1363,161 @@ function MegaData()
             }
         }
 
-        this.previousdirid = this.currentdirid;
-        this.currentdirid = id;
-        this.currentrootid = RootbyId(id);
+        var self = this;
+        fetchchildren(id, function() {
+            self.previousdirid = self.currentdirid;
+            self.currentdirid = id;
+            self.currentrootid = RootbyId(id);
 
-        if (M.currentrootid === M.RootID) {
-            M.lastSeenCloudFolder = M.currentdirid;
-        }
-
-        $('.nw-fm-tree-item').removeClass('opened');
-
-        if (this.chat) {
-            M.v = [];
-            sharedFolderUI(); // remove shares-specific UI
-            //$.tresizer();
-        }
-        else if (id === undefined && folderlink) {
-            // Error reading shared folder link! (Eg, server gave a -11 (EACCESS) error)
-            // Force cleaning the current cloud contents and showing an empty msg
-            M.renderMain();
-        }
-        else if (id && (id.substr(0, 7) !== 'account') && (id.substr(0, 13) !== 'notifications')) {
-            $('.fm-right-files-block').removeClass('hidden');
-            if (d) {
-                console.time('time for rendering');
+            if (M.currentrootid === M.RootID) {
+                M.lastSeenCloudFolder = M.currentdirid;
             }
-            if (id === 'transfers') {
+
+            $('.nw-fm-tree-item').removeClass('opened');
+
+            if (self.chat) {
                 M.v = [];
+                sharedFolderUI(); // remove shares-specific UI
+                //$.tresizer();
             }
-            else if (id.substr(0, 6) === 'search') {
-                M.filterBySearch(M.currentdirid);
+            else if (id === undefined && folderlink) {
+                // Error reading shared folder link! (Eg, server gave a -11 (EACCESS) error)
+                // Force cleaning the current cloud contents and showing an empty msg
+                M.renderMain();
             }
-            else {
-                M.filterByParent(M.currentdirid);
-            }
-
-            var viewmode = 0;// 0 is list view, 1 block view
-            if (M.overrideViewMode !== undefined) {
-                viewmode = M.overrideViewMode;
-                delete M.overrideViewMode;
-            }
-            else if (typeof fmconfig.uiviewmode !== 'undefined' && fmconfig.uiviewmode) {
-                if (fmconfig.viewmode) {
-                    viewmode = fmconfig.viewmode;
+            else if (id && (id.substr(0, 7) !== 'account') && (id.substr(0, 13) !== 'notifications')) {
+                $('.fm-right-files-block').removeClass('hidden');
+                if (d) {
+                    console.time('time for rendering');
                 }
-            }
-            else if (typeof fmconfig.viewmodes !== 'undefined' && typeof fmconfig.viewmodes[id] !== 'undefined') {
-                viewmode = fmconfig.viewmodes[id];
-            }
-            else {
-                for (var i in M.v) {
-                    if (is_image(M.v[i])) {
-                        viewmode = 1;
-                        break;
+                if (id === 'transfers') {
+                    M.v = [];
+                }
+                else if (id.substr(0, 6) === 'search') {
+                    M.filterBySearch(M.currentdirid);
+                }
+                else {
+                    M.filterByParent(M.currentdirid);
+                }
+
+                var viewmode = 0;// 0 is list view, 1 block view
+                if (M.overrideViewMode !== undefined) {
+                    viewmode = M.overrideViewMode;
+                    delete M.overrideViewMode;
+                }
+                else if (typeof fmconfig.uiviewmode !== 'undefined' && fmconfig.uiviewmode) {
+                    if (fmconfig.viewmode) {
+                        viewmode = fmconfig.viewmode;
                     }
                 }
+                else if (typeof fmconfig.viewmodes !== 'undefined' && typeof fmconfig.viewmodes[id] !== 'undefined') {
+                    viewmode = fmconfig.viewmodes[id];
+                }
+                else {
+                    for (var i in M.v) {
+                        if (is_image(M.v[i])) {
+                            viewmode = 1;
+                            break;
+                        }
+                    }
+                }
+                M.viewmode = viewmode;
+                if (M.overrideSortMode) {
+                    M.doSort(M.overrideSortMode[0], M.overrideSortMode[1]);
+                    delete M.overrideSortMode;
+                }
+                else if (fmconfig.uisorting && fmconfig.sorting) {
+                    M.doSort(fmconfig.sorting.n, fmconfig.sorting.d);
+                }
+                else if (fmconfig.sortmodes && fmconfig.sortmodes[id]) {
+                    M.doSort(fmconfig.sortmodes[id].n, fmconfig.sortmodes[id].d);
+                }
+                else if (M.currentdirid === 'contacts') {
+                    M.doSort('status', 1);
+                }
+                else {
+                    M.doSort('name', 1);
+                }
+
+                if (M.currentdirid === 'opc') {
+                    self.v = [];
+                    for (var i in M.opc) {
+                        self.v.push(M.opc[i]);
+                    }
+                }
+                else if (M.currentdirid === 'ipc') {
+                    self.v = [];
+                    for (var i in M.ipc) {
+                        self.v.push(M.ipc[i]);
+                    }
+                }
+
+                M.renderMain();
+
+                if (fminitialized) {
+                    var currentdirid = M.currentdirid;
+                    if (id.substr(0, 6) === 'search') {
+                        currentdirid = M.RootID;
+
+                        if (M.d[M.previousdirid]) {
+                            currentdirid = M.previousdirid;
+                        }
+                    }
+
+                    if ($('#treea_' + currentdirid).length === 0) {
+                        var n = M.d[currentdirid];
+                        if (n && n.p) {
+                            treeUIopen(n.p, false, true);
+                        }
+                    }
+                    treeUIopen(currentdirid, currentdirid === 'contacts');
+
+                    $('#treea_' + currentdirid).addClass('opened');
+                }
+                if (d) {
+                    console.timeEnd('time for rendering');
+                }
+
+                Soon(function() {
+                    M.renderPath();
+                });
             }
-            M.viewmode = viewmode;
-            if (M.overrideSortMode) {
-                M.doSort(M.overrideSortMode[0], M.overrideSortMode[1]);
-                delete M.overrideSortMode;
-            }
-            else if (fmconfig.uisorting && fmconfig.sorting) {
-                M.doSort(fmconfig.sorting.n, fmconfig.sorting.d);
-            }
-            else if (fmconfig.sortmodes && fmconfig.sortmodes[id]) {
-                M.doSort(fmconfig.sortmodes[id].n, fmconfig.sortmodes[id].d);
-            }
-            else if (M.currentdirid === 'contacts') {
-                M.doSort('status', 1);
+
+
+            // If a folderlink, and entering a new folder.
+            if (pfid && self.currentrootid === self.RootID) {
+                var target = '';
+                if (self.currentdirid !== self.RootID) {
+                    target = '!' +  self.currentdirid;
+                }
+                newHashLocation = '#F!' + pfid + '!' + pfkey + target;
+                M.lastSeenFolderLink = newHashLocation;
             }
             else {
-                M.doSort('name', 1);
-            }
-
-            if (M.currentdirid === 'opc') {
-                this.v = [];
-                for (var i in M.opc) {
-                    this.v.push(M.opc[i]);
+                // new hash location can be altered already by the chat logic in the previous lines in this func
+                if (!newHashLocation) {
+                    newHashLocation = '#fm/' + M.currentdirid;
                 }
             }
-            else if (M.currentdirid === 'ipc') {
-                this.v = [];
-                for (var i in M.ipc) {
-                    this.v.push(M.ipc[i]);
-                }
+            try {
+                window.location.hash = newHashLocation;
             }
-
-            M.renderMain();
-
-            if (fminitialized) {
-                var currentdirid = M.currentdirid;
-                if (id.substr(0, 6) === 'search') {
-                    currentdirid = M.RootID;
-
-                    if (M.d[M.previousdirid]) {
-                        currentdirid = M.previousdirid;
-                    }
-                }
-
-                if ($('#treea_' + currentdirid).length === 0) {
-                    var n = M.d[currentdirid];
-                    if (n && n.p) {
-                        treeUIopen(n.p, false, true);
-                    }
-                }
-                treeUIopen(currentdirid, currentdirid === 'contacts');
-
-                $('#treea_' + currentdirid).addClass('opened');
+            catch (ex) {
+                console.error(ex);
             }
-            if (d) {
-                console.timeEnd('time for rendering');
-            }
+            searchPath();
 
-            Soon(function() {
-                M.renderPath();
-            });
-        }
+            var sortMenu = new mega.SortMenu();
+            sortMenu.treeSearchUI();
 
+            $(document).trigger('MegaOpenFolder');
 
-        // If a folderlink, and entering a new folder.
-        if (pfid && this.currentrootid === this.RootID) {
-            var target = '';
-            if (this.currentdirid !== this.RootID) {
-                target = '!' +  this.currentdirid;
-            }
-            newHashLocation = '#F!' + pfid + '!' + pfkey + target;
-            M.lastSeenFolderLink = newHashLocation;
-        }
-        else {
-            // new hash location can be altered already by the chat logic in the previous lines in this func
-            if (!newHashLocation) {
-                newHashLocation = '#fm/' + M.currentdirid;
-            }
-        }
-        try {
-            window.location.hash = newHashLocation;
-        }
-        catch (ex) {
-            console.error(ex);
-        }
-        searchPath();
-
-        var sortMenu = new mega.SortMenu();
-        sortMenu.treeSearchUI();
-
-        $(document).trigger('MegaOpenFolder');
+            if (cb) cb(true);
+        });
     };
 
     // Contacts left panel handling
     this.contacts = function() {
-
         var i;
         var activeContacts = [];
 
@@ -6912,12 +6917,71 @@ function fetchfm(sn) {
 }
 
 // to reduce peak mem usage, we fetch f in 64 small chunks
-function fetchfchunked(chunk, procresult) {
+/*function fetchfchunked(chunk, procresult) {
     fmdb.get('f', function(r) {
         for (var i = r.length; i--;) emplacenode(r[i]);
         if (chunk == 64) procresult();
         else fetchfchunked(chunk, procresult);
     }, 'h', b64[chunk++]);
+}*/
+
+function fetchfroot(/*chunk,*/ cb) {
+    // fetch the three root nodes
+    fmdb.getbykey('f', 'h', ['s', ['-2', '-3', '-4']], false, function(r) {
+        for (var i = r.length; i--; ) emplacenode(r[i]);
+        // fetch all top-level nodes
+        fmdb.getbykey('f', 'h', ['p', [M.RootID, M.InboxID, M.RubbishID]], false, function(r) {
+            var folders = [];
+            for (var i = r.length; i--; ) {
+                emplacenode(r[i]);
+                if (r[i].t == 1) folders.push(r[i].h);
+            }
+            // fetch second-level nodes (to show the little arrows in the tree)
+            // FIXME: add further loading as needed to the fmconfig processing of
+            // opened subfolders in the tree!
+            fmdb.getbykey('f', 'h', ['p', folders], false/*[[ 't', '2' ]]*/, function(r) {
+                for (var i = r.length; i--; ) emplacenode(r[i]);
+                cb();
+            });
+        });
+    });
+}
+
+// fetch all children; also, fetch path to root
+// populates M.c and M.d
+function fetchchildren(parent, cb) {
+    // is this a user handle or a non-handle? no fetching needed.
+    if (parent.length != 8) {
+        cb();
+    }
+    // have the children been fetched yet?
+    else if (!M.c[parent]) {
+        // no: do so now.
+        fmdb.getbykey('f', 'h', ['p', [parent]], false, function(r) {
+            M.c[parent] = {};
+            for (var i = r.length; i--; ) emplacenode(r[i]);
+            fetchchildren(parent, cb);
+        });
+    }
+    // has the parent been fetched yet?
+    else if (!M.d[parent]) {
+        fmdb.getbykey('f', 'h', ['h', [parent]], false, function(r) {
+            if (r.length) {
+                // parent found
+                emplacenode(r[0]);
+                fetchchildren(r[0].p, cb);
+            }
+            else {
+                // no parent found (internal error, should probably reload)
+                console.error("Parent of " + parent + " missing from DB");
+                cb();
+            }
+        });
+    }
+    else {
+        // crawl back to root (not necessary until we start purging from memory)
+        fetchchildren(M.d[parent].p, cb);
+    }
 }
 
 function dbfetchfm() {
@@ -6929,7 +6993,7 @@ function dbfetchfm() {
         process_ok(r, true);
 
         // FIXME: remove this step and replace with dynamic on-demand loading
-        fetchfchunked(0, function(r){
+        fetchfroot(/*0,*/ function(r){
 
             mega.loadReport.recvNodes     = Date.now() - mega.loadReport.stepTimeStamp;
             mega.loadReport.stepTimeStamp = Date.now();

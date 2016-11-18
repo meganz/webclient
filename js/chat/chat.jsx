@@ -88,7 +88,9 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
             }
             else {
                 $promise = resp[2];
-                resp[1].show();
+                if (resp[1]) {
+                    resp[1].show();
+                }
             }
         }
         else if(roomType === "group") {
@@ -194,34 +196,34 @@ var Chat = function() {
                 }
             },
             iceServers:[
-                // {url: 'stun:stun.l.google.com:19302'},
+                // {urls: ['stun:stun.l.google.com:19302']},
                 {
-                    url: 'turn:trn270n001.karere.mega.nz:3478?transport=udp',   // Luxembourg
+                    urls: ['turn:trn270n001.karere.mega.nz:3478?transport=udp'],   // Luxembourg
                     username: "inoo20jdnH",
                     credential: '02nNKDBkkS'
                 },
                 {
-                    url: 'turn:trn270n002.karere.mega.nz:3478?transport=udp',   // Luxembourg
+                    urls: ['turn:trn270n002.karere.mega.nz:3478?transport=udp'],   // Luxembourg
                     username: "inoo20jdnH",
                     credential: '02nNKDBkkS'
                 },
                 {
-                    url: 'turn:trn302n001.karere.mega.nz:3478?transport=udp',   // Montreal, Canada
+                    urls: ['turn:trn302n001.karere.mega.nz:3478?transport=udp'],   // Montreal, Canada
                     username: "inoo20jdnH",
                     credential: '02nNKDBkkS'
                 },
                 {
-                    url: 'turn:trn302n002.karere.mega.nz:3478?transport=udp',   // Montreal, Canada
+                    urls: ['turn:trn302n002.karere.mega.nz:3478?transport=udp'],   // Montreal, Canada
                     username: "inoo20jdnH",
                     credential: '02nNKDBkkS'
                 },
                 {
-                    url: 'turn:trn530n002.karere.mega.nz:3478?transport=udp',   // NZ
+                    urls: ['turn:trn530n002.karere.mega.nz:3478?transport=udp'],   // NZ
                     username: "inoo20jdnH",
                     credential: '02nNKDBkkS'
                 },
                 {
-                    url: 'turn:trn530n003.karere.mega.nz:3478?transport=udp',   // NZ
+                    urls: ['turn:trn530n003.karere.mega.nz:3478?transport=udp'],   // NZ
                     username: "inoo20jdnH",
                     credential: '02nNKDBkkS'
                 }
@@ -239,7 +241,8 @@ var Chat = function() {
             'emoticonShortcutsFilter': EmoticonShortcutsFilter,
             'emoticonsFilter': EmoticonsFilter,
             'callFeedback': CallFeedback,
-            'karerePing': KarerePing
+            'karerePing': KarerePing,
+            'persistedTypeArea': PersistedTypeArea
         },
         'chatNotificationOptions': {
             'textMessages': {
@@ -856,12 +859,11 @@ Chat.prototype._onUsersUpdate = function(type, e, eventObject) {
                 self.chats[eventObject.getRoomJid()].setState(ChatRoom.STATE.LEFT);
             }
         }
-        else { // i'd joined
+        else {
+            // i'd joined
             room = self.chats[eventObject.getRoomJid()];
             if (room) {
-                if (room._conv_ended === true || typeof room._conv_ended === 'undefined') {
-                    room._conversationStarted(room.getParticipantsExceptMe()[0]);
-                }
+                room.setState(ChatRoom.STATE.READY);
             }
         }
     }
@@ -1260,11 +1262,13 @@ Chat.prototype.openChat = function(jids, type, chatId, chatShard, chatdUrl, setA
             var contact = self.getContactFromJid(jid);
             if (!contact || (contact.c !== 1 && contact.c !== 2 && contact.c !== 0)) {
                 allValid = false;
+                $promise.reject();
                 return false;
             }
         });
         if (allValid === false) {
-            return MegaPromise.reject();
+            $promise.reject();
+            return $promise;
         }
         var $element = $('.nw-conversations-item[data-jid="' + jids[0] + '"]');
         var roomJid = $element.attr('data-room-jid') + "@" + self.karere.options.mucDomain;
@@ -1308,13 +1312,36 @@ Chat.prototype.openChat = function(jids, type, chatId, chatShard, chatdUrl, setA
         });
     }
 
+    if (!chatId && setAsActive === true) {
+        // manual/UI trigger, before the mcf/all chats are already loaded? postpone, since that chat may already
+        // exists, so an 'mcc' API call may not be required
+        if (
+            ChatdIntegration.allChatsHadLoaded.state() === 'pending' ||
+            ChatdIntegration.mcfHasFinishedPromise.state() === 'pending'
+        ) {
+            MegaPromise.allDone([
+                ChatdIntegration.allChatsHadLoaded,
+                ChatdIntegration.mcfHasFinishedPromise,
+            ])
+                .always(function() {
+                    var res = self.openChat(jids, type, chatId, chatShard, chatdUrl, setAsActive);
+                    $promise.linkDoneAndFailTo(
+                        res[2]
+                    );
+                });
+
+            return [roomJid, undefined, $promise];
+        }
+    }
+
     var roomFullJid = roomJid + "@" + self.karere.options.mucDomain;
     if (self.chats[roomFullJid]) {
         var room = self.chats[roomFullJid];
         if (setAsActive) {
             room.show();
         }
-        return [roomFullJid, room, (new $.Deferred()).resolve(roomFullJid, room)];
+        $promise.resolve(roomFullJid, room);
+        return [roomFullJid, room, $promise];
     }
     if (setAsActive && self.currentlyOpenedChat && self.currentlyOpenedChat != roomJid) {
         self.hideChat(self.currentlyOpenedChat);
@@ -1365,7 +1392,8 @@ Chat.prototype.openChat = function(jids, type, chatId, chatShard, chatdUrl, setA
 
 
     if (self.karere.getConnectionState() != Karere.CONNECTION_STATE.CONNECTED) {
-        return [roomJid, room, (new MegaPromise()).reject(roomJid, room)];
+        $promise.reject(roomJid, room);
+        return [roomJid, room, $promise];
     }
 
     var jidsWithoutMyself = room.getParticipantsExceptMe(jids);
@@ -1541,11 +1569,6 @@ Chat.prototype.processRemovedUser = function(u) {
 
     self.logger.debug("removed: ", u);
 
-
-    var room = self.getPrivateRoom(u);
-    if (room) {
-        room.destroy(true);
-    }
     this.karere.unsubscribe(megaChat.getJidFromNodeId(u), self.getMyXMPPPassword());
 
     self.renderMyStatus();
@@ -1699,7 +1722,7 @@ Chat.prototype.renderListing = function() {
 
             sortedConversations.sort(mega.utils.sortObjFn("lastActivity", -1));
 
-            if (sortedConversations.length > 1) {
+            if (sortedConversations.length > 0) {
                 var room = sortedConversations[0];
                 room.setActive();
                 room.show();

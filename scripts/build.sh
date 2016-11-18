@@ -1,4 +1,5 @@
 #!/bin/bash
+
 NODE_ENV="production" ./node_modules/.bin/webpack  --config webpack.config.js
 
 build_file=js/chat/bundle.js
@@ -9,5 +10,4 @@ cat $build_file \
     | sed 's/createElement:/makeElement:/' \
     | sed -E 's/(React\w*)\.createElement/\1.makeElement/' > $temp_file1
 
-./scripts/cleaner.js $temp_file1 $build_file
-rm $temp_file1
+mv $temp_file1 $build_file

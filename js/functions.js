@@ -12,7 +12,7 @@ var inherits = (function() {
     };
 })();
 
-makeEnum(['MDBOPEN', 'EXECSC'], 'MEGAFLAG_', window);
+makeEnum(['MDBOPEN', 'EXECSC', 'LOADINGCLOUD'], 'MEGAFLAG_', window);
 
 /**
  * Safely parse an HTML fragment, removing any executable
@@ -238,6 +238,21 @@ var Soon = is_chrome_firefox ? mozRunAsync : function(callback) {
     }, 20);
 };
 
+/**
+ *  Delays the execution of a function
+ *
+ *  Wraps a function to execute at most once
+ *  in a 100 ms time period. Useful to wrap
+ *  expensive jQuery events (for instance scrolling
+ *  events).
+ *
+ *  All argument and *this* is passed to the callback
+ *  after the 100ms (default)
+ *
+ *  @param {Function} func  Function to wrap
+ *  @param {Number}   ms    Timeout
+ *  @returns {Function} wrapped function
+ */
 function SoonFc(func, ms) {
     return function __soonfc() {
         var self = this,
@@ -445,7 +460,7 @@ function megatitle(nperc) {
 
 function populate_l() {
     if (d) {
-        for (var i = 10000 ; i-- ;) {
+        for (var i = 14000 ; i-- ;) {
             l[i] = (l[i] || '(translation-missing)');
         }
     }
@@ -564,6 +579,27 @@ function populate_l() {
     l[8952] = l[8952].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[9030] = l[9030].replace('[S]', '<strong>').replace('[/S]', '</strong>');
     l[9036] = l[9036].replace('[S]', '<strong>').replace('[/S]', '</strong>');
+    l[10631] = l[10631].replace('[A]', '<a href="#general" target="_blank">').replace('[/A]', '</a>');
+    l[10630] = l[10630].replace('[A]', '<a href="#general" target="_blank">').replace('[/A]', '</a>');
+    l[10634] = l[10634].replace('[A]', '<a href="#support" target="_blank">').replace('[/A]', '</a>');
+    l[10635] = l[10635].replace('[B]', '"<b>').replace('[/B]', '</b>"');
+    l[10636] = l[10636].replace('[A]', '<a href="mailto:support@mega.nz">').replace('[/A]', '</a>').replace('%1', 2);
+    l[10644] = l[10644].replace('[A]', '<a href="mailto:support@mega.nz">').replace('[/A]', '</a>');
+    l[10646] = l[10646].replace('[A]', '<a href="#account">').replace('[/A]', '</a>');
+    l[10650] = l[10650].replace('[A]', '<a href="#account">').replace('[/A]', '</a>');
+    l[10656] = l[10656].replace('[A]', '<a href="mailto:support@mega.nz">').replace('[/A]', '</a>');
+    l[10658] = l[10658].replace('[A]', '<a href="#terms">').replace('[/A]', '</a>');
+    l[12482] = l[12482].replace('[B]', '<b>').replace('[/B]', '</b>');
+    l[12483] = l[12483].replace('[BR]', '<br>');
+    l[12485] = l[12485].replace('[A1]', '<a href="" class="red mac">').replace('[/A1]', '</a>');
+    l[12485] = l[12485].replace('[A2]', '<a href="" class="red linux">').replace('[/A2]', '</a>');
+    l[12486] = l[12486].replace('[A1]', '<a href="" class="red windows">').replace('[/A1]', '</a>');
+    l[12486] = l[12486].replace('[A2]', '<a href="" class="red mac">').replace('[/A2]', '</a>');
+    l[12487] = l[12487].replace('[A1]', '<a href="" class="red windows">').replace('[/A1]', '</a>');
+    l[12487] = l[12487].replace('[A2]', '<a href="" class="red linux">').replace('[/A2]', '</a>');
+    l[7400] = l[7400].replace('[A]', '<a>').replace('[/A]', '</a>').replace('[BR]', '<br>');
+    l[12489] = l[12489].replace('[I]', '<i>').replace('[/I]', '</i>').replace('[I]', '<i>').replace('[/I]', '</i>');
+    l[15536] = l[15536].replace('[B]', '<b>').replace('[/B]', '</b>');
 
     l['year'] = new Date().getFullYear();
     date_months = [
@@ -625,9 +661,11 @@ function browserdetails(useragent) {
     var icon = '';
     var name = '';
     var brand = '';
+    var verTag = '';
     var nameTrans = '';
     var current = false;
     var brand = false;
+    var details = {};
 
     if (useragent === undefined || useragent === ua) {
         current = true;
@@ -733,10 +771,15 @@ function browserdetails(useragent) {
     else if (useragent.indexOf('k-meleon') > 0) {
         browser = 'K-Meleon';
     }
+    else if (useragent.indexOf(' crios') > 0) {
+        browser = 'Chrome';
+        details.brand = verTag = 'CriOS';
+    }
     else if (useragent.indexOf('chrome') > 0) {
         browser = 'Chrome';
     }
     else if (useragent.indexOf('safari') > 0) {
+        verTag = 'Version';
         browser = 'Safari';
     }
     else if (useragent.indexOf('firefox') > 0) {
@@ -785,13 +828,13 @@ function browserdetails(useragent) {
         }
     }
 
-    var details = {};
     details.name = name;
     details.nameTrans = nameTrans || name;
     details.icon = icon;
     details.os = os || '';
     details.browser = browser;
-    details.version = (useragent.match(RegExp("\\s+" + (brand || browser) + "/([\\d.]+)", 'i')) || [])[1] || 0;
+    details.version =
+        (useragent.match(RegExp("\\s+" + (verTag || brand || browser) + "/([\\d.]+)", 'i')) || [])[1] || 0;
 
     // Determine if the OS is 64bit
     details.is64bit = /\b(WOW64|x86_64|Win64|intel mac os x 10.(9|\d{2,}))/i.test(useragent);
@@ -828,7 +871,7 @@ function browserdetails(useragent) {
 
 function countrydetails(isocode) {
     var cdetails = {
-        name: isocountries[isocode],
+        name: isoCountries[isocode],
         icon: isocode.toLowerCase() + '.gif'
     };
     return cdetails;
@@ -891,6 +934,11 @@ function acc_time2date(unixtime, yearIsOptional) {
         result +=  th + ' ' + MyDate.getFullYear();
     }
     return result;
+}
+
+function humandate(unixtime) {
+    var date = new Date(unixtime * 1000);
+    return date.getDate() + ' ' + date_months[date.getMonth()] +  ' ' + date.getFullYear();
 }
 
 function time2last(timestamp) {
@@ -1429,23 +1477,6 @@ function createTimeoutPromise(validateFunction, tick, timeout,
 }
 
 /**
- * Simple .toArray method to be used to convert `arguments` to a normal JavaScript Array
- *
- * Please note there is a huge performance degradation when using `arguments` outside their
- * owning function, to mitigate it use this function as follow: toArray.apply(null, arguments)
- *
- * @returns {Array}
- */
-function toArray() {
-    var len = arguments.length;
-    var res = Array(len);
-    while (len--) {
-        res[len] = arguments[len];
-    }
-    return res;
-}
-
-/**
  * Date.parse with progressive enhancement for ISO 8601 <https://github.com/csnover/js-iso8601>
  * (c) 2011 Colin Snover <http://zetafleet.com>
  * Released under MIT license.
@@ -1632,6 +1663,7 @@ function ASSERT(what, msg, udata) {
     return !!what;
 }
 
+// log failures through jscrashes system
 function srvlog(msg, data, silent) {
     if (data && !(data instanceof Error)) {
         data = {
@@ -1645,6 +1677,30 @@ function srvlog(msg, data, silent) {
         window.onerror(msg, '', data ? 1 : -1, 0, data || null);
     }
 }
+
+// log failures through event id 99666
+function srvlog2(type /*, ...*/) {
+    if (d || window.exTimeLeft) {
+        var args    = toArray.apply(null, arguments);
+        var version = buildVersion.website;
+
+        if (is_extension) {
+            if (is_chrome_firefox) {
+                version = window.mozMEGAExtensionVersion || buildVersion.firefox;
+            }
+            else if (window.chrome) {
+                version = buildVersion.chrome;
+            }
+            else {
+                version = buildVersion.commit && buildVersion.commit.substr(0, 8) || '?';
+            }
+        }
+        args.unshift((is_extension ? 'e' : 'w') + (version || '-'));
+
+        api_req({a: 'log', e: 99666, m: JSON.stringify(args)});
+    }
+}
+
 
 function oDestroy(obj) {
     if (window.d) {
@@ -2403,22 +2459,7 @@ mSpawnWorker.prototype = {
 
             // Don't report `newmissingkeys` unless there are *new* missing keys
             if (job.newmissingkeys) {
-                try {
-                    var keys = Object.keys(u_nodekeys).sort();
-                    var hash = MurmurHash3(JSON.stringify(keys));
-                    var prop = u_handle + '_lastMissingKeysHash';
-                    var oldh = parseInt(localStorage[prop]);
-
-                    if (oldh !== hash) {
-                        localStorage[prop] = hash;
-                    }
-                    else {
-                        job.newmissingkeys = false;
-                    }
-                }
-                catch (ex) {
-                    console.error(ex);
-                }
+                job.newmissingkeys = M.checkNewMissingKeys();
             }
 
             delete this.jobs[reply.jid];
@@ -3236,9 +3277,14 @@ mega.utils.execCommandUsable = function() {
     var result;
 
     try {
-        result = document.execCommand('copy');
+        return document.queryCommandSupported("copy");
     }
-    catch (ex) {}
+    catch (ex) {
+        try {
+            result = document.execCommand('copy');
+        }
+        catch (ex) {}
+    }
 
     return result === false;
 };
@@ -3462,6 +3508,7 @@ mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
         ulmanager.isUploading = false;
         ASSERT(ulQueue._running === 0, 'ulQueue._running inconsistency on completion');
         ulQueue._pending = [];
+        ulQueue.setSize((fmconfig.ul_maxSlots | 0) || 4);
     }
     if (!dl_queue.some(isQueueActive)) {
         dl_queue = new DownloadQueue();
@@ -3483,7 +3530,9 @@ mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
         M.tfsdomqueue = {};
         GlobalProgress = {};
         delete $.transferprogress;
-        fm_tfsupdate();
+        if (page !== 'download') {
+            fm_tfsupdate();
+        }
         if ($.mTransferAnalysis) {
             clearInterval($.mTransferAnalysis);
             delete $.mTransferAnalysis;
@@ -3496,8 +3545,9 @@ mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
         dlmanager.logger.info("resetUploadDownload", ul_queue.length, dl_queue.length);
     }
 
-    fm_tfsupdate();
-    Later(percent_megatitle);
+    if (page === 'download') {
+        delay('percent_megatitle', percent_megatitle);
+    }
 };
 
 /**
@@ -3512,6 +3562,7 @@ mega.utils.reload = function megaUtilsReload() {
             u_key = u_storage.k,
             privk = u_storage.privk,
             debug = u_storage.d,
+            jj = u_storage.jj,
             apipath = debug ? localStorage.apipath : undefined;
         var mcd = u_storage.testChatDisabled;
 
@@ -3528,8 +3579,8 @@ mega.utils.reload = function megaUtilsReload() {
             u_storage.minLogLevel = 0;
             if (location.host !== 'mega.nz') {
                 u_storage.dd = true;
-                if (!is_extension) {
-                    u_storage.jj = true;
+                if (!is_extension && jj)  {
+                    u_storage.jj = jj;
                 }
                 if (mcd) {
                     u_storage.testChatDisabled = 1;
@@ -3541,18 +3592,14 @@ mega.utils.reload = function megaUtilsReload() {
             }
         }
 
+        localStorage.force = true;
         location.reload(true);
     }
 
     if (u_type !== 3) {
         stopsc();
         stopapi();
-        if (typeof mDB === 'object' && !pfid) {
-            mDBreload();
-        }
-        else {
-            loadfm(true);
-        }
+        loadfm(true);
     }
     else {
         // Show message that this operation will destroy the browser cache and reload the data stored by MEGA
@@ -3566,11 +3613,15 @@ mega.utils.reload = function megaUtilsReload() {
                             stopapi();
 
                             MegaPromise.allDone([
-                                MegaDB.dropAllDatabases(/*u_handle*/),
                                 mega.utils.clearFileSystemStorage()
                             ]).then(function(r) {
                                     console.debug('megaUtilsReload', r);
-                                    _reload();
+                                    if (fmdb) {
+                                        fmdb.invalidate(_reload);
+                                    }
+                                    else {
+                                        _reload();
+                                    }
                                 });
                         });
                     }
@@ -3789,6 +3840,142 @@ mega.utils.vtol = function megaUtilsVTOL(version, hex) {
 };
 
 /**
+ * Retrieve data from storage servers.
+ * @param {String|Object} aData        ufs-node's handle or public link
+ * @param {Number}        aStartOffset offset to start retrieveing data from
+ * @param {Number}        aEndOffset   retrieve data until this offset
+ * @returns {MegaPromise}
+ */
+mega.utils.gfsfetch = function(aData, aStartOffset, aEndOffset) {
+    var promise = new MegaPromise();
+
+    var fetcher = function(data) {
+
+        if (aEndOffset === -1) {
+            aEndOffset = data.s;
+        }
+
+        aEndOffset = parseInt(aEndOffset);
+        aStartOffset = parseInt(aStartOffset);
+
+        if ((!aStartOffset && aStartOffset !== 0)
+                || aStartOffset > data.s || !aEndOffset
+                || aEndOffset < aStartOffset) {
+
+            return promise.reject(ERANGE, data);
+        }
+        var byteOffset = aStartOffset % 16;
+
+        if (byteOffset) {
+            aStartOffset -= byteOffset;
+        }
+
+        mega.utils.xhr({
+            method: 'POST',
+            type: 'arraybuffer',
+            url: data.g + '/' + aStartOffset + '-' + (aEndOffset - 1)
+        }).done(function(ev, response) {
+
+            data.macs = [];
+            data.writer = [];
+
+            if (!data.nonce) {
+                var key = data.key;
+
+                data.nonce = JSON.stringify([
+                    key[0] ^ key[4],
+                    key[1] ^ key[5],
+                    key[2] ^ key[6],
+                    key[3] ^ key[7],
+                    key[4],  key[5]]);
+            }
+
+            Decrypter.unshift([
+                [data, aStartOffset],
+                data.nonce,
+                aStartOffset / 16,
+                new Uint8Array(response)
+            ], function resolver() {
+                try {
+                    var buffer = data.writer.shift().data.buffer;
+
+                    if (byteOffset) {
+                        buffer = buffer.slice(byteOffset);
+                    }
+
+                    data.buffer = buffer;
+                    promise.resolve(data);
+                }
+                catch (ex) {
+                    promise.reject(ex);
+                }
+            });
+
+        }).fail(function() {
+            promise.reject.apply(promise, arguments);
+        });
+    };
+
+    if (typeof aData !== 'object') {
+        var key;
+        var handle;
+
+        // If a ufs-node's handle provided
+        if (String(aData).length === 8) {
+            handle = aData;
+        }
+        else {
+            // if a public-link provided, eg #!<handle>!<key>
+            aData = String(aData).replace(/^.*?#!/, '').split('!');
+
+            if (aData.length === 2 && aData[0].length === 8) {
+                handle = aData[0];
+                key = base64_to_a32(aData[1]).slice(0, 8);
+            }
+        }
+
+        if (!handle) {
+            promise.reject(EARGS);
+        }
+        else {
+            var callback = function(res) {
+                if (typeof res === 'object' && res.g) {
+                    res.key = key;
+                    res.handle = handle;
+                    fetcher(res);
+                }
+                else {
+                    promise.reject(res);
+                }
+            };
+            var req = { a: 'g', g: 1, ssl: use_ssl };
+
+            if (!key) {
+                req.n = handle;
+                key = M.getNodeByHandle(handle).key;
+            }
+            else {
+                req.p = handle;
+            }
+
+            if (!Array.isArray(key) || key.length !== 8) {
+                promise.reject(EKEY);
+            }
+            else {
+                api_req(req, { callback: callback });
+            }
+        }
+    }
+    else {
+        fetcher(aData);
+    }
+
+    aData = undefined;
+
+    return promise;
+};
+
+/**
  * Perform a normal logout
  *
  * @param {Function} aCallback optional
@@ -3912,7 +4099,7 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
         }
 
         if (d) {
-            console.log('Running Rubbish-Bin Cleaning Scheduler', mode, xval);
+            console.log('Running Rubbish Bin Cleaning Scheduler', mode, xval);
             console.time('rubsched');
         }
 
@@ -3923,16 +4110,13 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
         var nodes = Object.keys(M.c[M.RubbishID] || {});
         var rubnodes = [];
 
-        for (var i in nodes) {
+        for (var i = nodes.length; i--; ) {
             var node = M.d[nodes[i]];
             if (!node) {
                 console.error('Invalid node', nodes[i]);
                 continue;
             }
-            if (node.t == 1) {
-                rubnodes = rubnodes.concat(fm_getnodes(node.h));
-            }
-            rubnodes.push(node.h);
+            rubnodes = rubnodes.concat(fm_getnodes(node.h, true));
         }
 
         rubnodes.sort(handler.sort);
@@ -3970,8 +4154,8 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
                 }
 
                 handles.map(function(handle) {
-                    M.delNode(handle);
-                    api_req({a: 'd', n: handle, i: requesti});
+                    M.delNode(handle, true);    // must not update DB pre-API
+                    api_req({a: 'd', n: handle/*, i: requesti*/});
 
                     if (inRub) {
                         $('.grid-table.fm#' + handle).remove();
@@ -4319,6 +4503,10 @@ var watchdog = Object.freeze({
                     megaChat.plugins.chatdIntegration.discardMessage(chatRoom, strg.data.messageId);
                 }
                 break;
+
+            case 'idbchange':
+                mBroadcaster.sendMessage('idbchange:' + strg.data.name, [strg.data.key, strg.data.value]);
+                break;
         }
 
         delete localStorage[ev.key];
@@ -4353,33 +4541,15 @@ function rand_range(a, b) {
  *
  */
 function passwordManager(form) {
-    if (navigator.mozGetUserMedia) {
+    if (is_chrome_firefox) {
         var creds = passwordManager.pickFormFields(form);
         if (creds) {
-            // prepare pwd to be stored encrypted
-            // format: "~:<keypw>:<userhash>"
-            var pwd = creds.pwd;
-
-            if (!passwordManager.getStoredCredentials(pwd)) {
-                var keypw = prepare_key_pw(pwd);
-                var pwaes = new sjcl.cipher.aes(keypw);
-                var hash = stringhash(creds.usr.toLowerCase(), pwaes);
-
-                pwd = '~:' + a32_to_base64(keypw) + ':' + hash;
-
-                $('#pmh_username').val(creds.usr);
-                $('#pmh_password').val(pwd);
-                $('#pwdmanhelper').submit();
-                Soon(function() {
-                    $('#pwdmanhelper input').val('');
-                    $(form).find('input').val('');
-                    $('iframe#dummyTestFrame').attr('src', 'about:blank');
-                });
-            }
+            mozRunAsync(mozLoginManager.saveLogin.bind(mozLoginManager, creds.usr, creds.pwd));
         }
+        $(form).find('input').val('');
         return;
     }
-    if (is_chrome_firefox || typeof history !== "object") {
+    if (typeof history !== "object") {
         return false;
     }
     $(form).rebind('submit', function() {
@@ -4672,24 +4842,36 @@ if (typeof sjcl !== 'undefined') {
                     s: [{ u: userEmail, r: ''}],
                     ha: '',
                     i: requesti
+                }, {
+                    userEmail: userEmail,
+                    selectedNodeHandle: selectedNodeHandle,
+                    handleOrEmail: handleOrEmail,
+
+                    callback : function(res, ctx) {
+                        if (typeof res == 'object') {
+                            // FIXME: examine error codes in res.r, display error
+                            // to user if needed
+
+                            // If it was a user handle, the share is a full share
+                            if (M.u[ctx.handleOrEmail]) {
+                                M.delNodeShare(ctx.selectedNodeHandle, ctx.handleOrEmail);
+                                setLastInteractionWith(ctx.handleOrEmail, "0:" + unixtime());
+
+                                self.removeFromPermissionQueue(ctx.handleOrEmail);
+                            }
+                            // Pending share
+                            else {
+                                var pendingContactId = M.findOutgoingPendingContactIdByEmail(ctx.userEmail);
+                                M.deletePendingShare(ctx.selectedNodeHandle, pendingContactId);
+
+                                self.removeFromPermissionQueue(ctx.userEmail);
+                            }
+                        }
+                        else {
+                            // FIXME: display error to user
+                        }
+                    }
                 });
-
-                // If it was a user handle, the share is a full share
-                if (M.u[handleOrEmail]) {
-                    userEmail = M.u[handleOrEmail].m;
-                    M.delNodeShare(selectedNodeHandle, handleOrEmail);
-                    setLastInteractionWith(handleOrEmail, "0:" + unixtime());
-
-                    self.removeFromPermissionQueue(handleOrEmail);
-                }
-
-                // Pending share
-                else {
-                    pendingContactId = M.findOutgoingPendingContactIdByEmail(userEmail);
-                    M.deletePendingShare(selectedNodeHandle, pendingContactId);
-
-                    self.removeFromPermissionQueue(userEmail);
-                }
             });
         }
     };
@@ -4893,7 +5075,11 @@ function getGatewayName(gatewayId, gatewayOpt) {
         },
         15: {
             name: 'directreseller',
-            displayName: l[6952]
+            displayName: l[6952]    // Credit card
+        },
+        16: {
+            name: 'ecp',                    // E-Comprocessing
+            displayName: l[6952] + ' (ECP)' // Credit card (ECP)
         },
         999: {
             name: 'wiretransfer',
@@ -4909,7 +5095,7 @@ function getGatewayName(gatewayId, gatewayOpt) {
                 (gatewayOpt.type === 'subgateway') ? gatewayOpt.gatewayName : gateways[gatewayId].name;
 
             // Direct reseller still requires the translation from above to be in its name
-            if (gatewayId === 15) {
+            if (gatewayId === 15 && gatewayOpt.type !== 'subgateway') {
                 gateways[gatewayId].displayName = gateways[gatewayId].displayName + " " + gatewayOpt.displayName;
             }
             else {
@@ -4980,9 +5166,7 @@ mega.utils.chrome110ZoomLevelNotification = function() {
 
     }
 };
-
 mBroadcaster.once('zoomLevelCheck', mega.utils.chrome110ZoomLevelNotification);
-
 
 var debounce = function(func, execAsap) {
     var timeout;

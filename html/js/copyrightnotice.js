@@ -32,7 +32,7 @@ copyright.validateEmail = function(email) {
  */
 copyright.validateUrl = function(url) {
     url = copyright.decodeURIm(url);
-    handles = copyright.getHandles(url);
+    var handles = copyright.getHandles(url);
     return Object.keys(handles).length;
 };
 
@@ -42,10 +42,28 @@ copyright.validateUrl = function(url) {
  * @return {Object} hashset of handles
  */
 copyright.getHandles = function(data) {
+
     var handles = {};
+    var passwordLinkPattern = /(#P!)([\w-]+)\b/gi;
+
+    // Find the handles for any password protected link
+    data = data.replace(passwordLinkPattern, function(fullUrlHash, passwordLinkId, urlEncodedData) {
+
+        // Decode the Base64 URL encoded data and get the 6 bytes for the handle, then re-encode the handle to Base64
+        var bytes = exportPassword.base64UrlDecode(urlEncodedData);
+        var handle = bytes.subarray(2, 8);
+        var handleBase64 = exportPassword.base64UrlEncode(handle);
+
+        // Add the handle
+        handles[handleBase64] = 1;
+
+        // Remove the link so the bottom code doesn't detect it as well
+        return '';
+    });
+
     var p = /.(?:F?!|\w+\=)([\w-]{8})(?:!([\w-]+))?\b/gi;
 
-    (data.replace(/<\/?\w[^>]+>/g,'').replace(/\s+/g,'')+data).replace(p,function(a,id,key) {
+    (data.replace(/<\/?\w[^>]+>/g, '').replace(/\s+/g, '') + data).replace(p, function(a, id, key) {
         if (!handles[id]) {
             handles[id] = 1;
         }
@@ -58,7 +76,7 @@ copyright.getHandles = function(data) {
  * Iteratively remove any %% stuff from the data
  * @param {String} data The data string to decode
  * @return {String} the decoded data
- */ 
+ */
 copyright.decodeURIm = function(data) {
     for (var lmt = 7 ; --lmt && /%[a-f\d]{2}/i.test(data) ; )
     {
@@ -70,10 +88,10 @@ copyright.decodeURIm = function(data) {
     }
 
     while (~data.indexOf('%25')) {
-        data = data.replace('%25','%','g');
+        data = data.replace(/%25/g, '%');
     }
 
-    return data.replace('%21','!','g');
+    return data.replace(/%21/g, '!');
 };
 
 /**
@@ -172,7 +190,20 @@ copyright.init_cn = function() {
                     proceed = false;
                     msgDialog('warninga', l[135], escapeHTML(l[7686]));
                     $(e).addClass("red");
-                    $(e).click(function(){$(e).removeClass("red")});
+                    $(e).rebind('click', function() {
+                        $(this).unbind('click').removeClass("red");
+                    });
+                    return false;
+                }
+
+                if (copyright.validateUrl(cval)) {
+                    proceed = false;
+                    msgDialog('warninga', l[135], escapeHTML(l[9056]));
+                    $(copyrightwork[i])
+                        .addClass("red")
+                        .rebind('click', function() {
+                            $(this).unbind('click').removeClass("red");
+                        });
                     return false;
                 }
 
@@ -314,10 +345,10 @@ copyright.init_cn = function() {
         }
     });
     var markup = '<OPTION value="0"></OPTION>';
-    for (var country in isocountries) {
-        if (isocountries.hasOwnProperty(country)) {
+    for (var country in isoCountries) {
+        if (isoCountries.hasOwnProperty(country)) {
             markup += '<option value="' + escapeHTML(country) + '">'
-                + escapeHTML(isocountries[country]) + '</option>';
+                + escapeHTML(isoCountries[country]) + '</option>';
         }
     }
     $('.select.country select').safeHTML(markup);

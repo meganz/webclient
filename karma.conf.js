@@ -20,7 +20,7 @@ module.exports = function(config) {
 
         // == Basics ==
         'js/vendor/jquery-2.2.1.js',
-        'js/vendor/jquery-ui-1.11.4.js',
+        'js/vendor/jquery-ui.js',
         'js/vendor/jquery.jscrollpane.js',
         'js/vendor/jquery.mousewheel.js',
         'js/vendor/jquery.fullscreen.js',
@@ -34,18 +34,19 @@ module.exports = function(config) {
         'js/vendor/jsbn.js',
         'js/vendor/jsbn2.js',
         'js/vendor/nacl-fast.js',
+        'js/vendor/dexie.js',
         // For notifications.
         'js/vendor/ion.sound.js',
         'js/vendor/favico.js',
         'js/vendor/notification.js',
         'js/vendor/moment.js',
         // Chat libraries.
+        'js/vendor/chat/strophe.jingle.adapter.js',
         'js/vendor/chat/strophe.light.js',
         'js/vendor/chat/strophe.disco.js',
         'js/vendor/chat/strophe.jingle.js',
         'js/vendor/chat/strophe.jingle.session.js',
         'js/vendor/chat/strophe.jingle.sdp.js',
-        'js/vendor/chat/strophe.jingle.adapter.js',
         'js/vendor/chat/strophe.muc.js',
         'js/vendor/chat/strophe.roster.js',
         'js/vendor/chat/wildemitter.patched.js',
@@ -67,6 +68,7 @@ module.exports = function(config) {
         // == Our code ==
         'secureboot.js',
         'index.js',
+        'nodedec.js',
         'js/functions.js',
         'js/datastructs.js',
         'js/vendor/megaLogger.js',
@@ -78,6 +80,7 @@ module.exports = function(config) {
         'js/megaDbEncryptionPlugin.js',
         'js/megaDb.js',
         'js/paycrypt.js',
+        'js/attr.js',
         'js/account.js',
         'js/authring.js',
         'js/fm.js',
@@ -91,6 +94,7 @@ module.exports = function(config) {
         'js/filetypes.js',
         'js/ui/miniui.js',
         'js/ui/filepicker.js',
+        'js/ui/export.js',
         'js/ui/dialog.js',
         'js/ui/feedbackDialog.js',
         'js/ui/credentialsWarningDialog.js',
@@ -98,8 +102,6 @@ module.exports = function(config) {
         'js/notify.js',
         'js/megaNotifications.js',
         'js/vendor/avatar.js',
-        'js/countries.js',
-        'js/megaKvStorage.js',
         'js/vendor/int64.js',
         'js/cms.js',
         // Google Import Contacts
@@ -131,6 +133,9 @@ module.exports = function(config) {
         'js/chat/karere.js',
         'js/chat/messages.js',
         'js/chat/ui/incomingCallDialog.js',
+
+        // Speedmeter
+        'js/network-testing.js',
 
         {pattern: 'test/chat/transcripts/*.json', included: false},
 

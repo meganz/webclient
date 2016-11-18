@@ -5,7 +5,7 @@
         options = options || {};
 
         // Already logged-in, even on ephemeral?
-        if (u_type !== false) {
+        if (u_type !== false && (!options.minUserType || u_type >= options.minUserType)) {
             Soon(function() {
                 promise.resolve();
             });
@@ -101,12 +101,10 @@
             });
 
         $('.input-email', $dialog)
-            .data('placeholder', l[195])
-            .val(l[195]);
+            .val('');
 
         $('.input-password', $dialog)
-            .data('placeholder', l[909])
-            .val(l[909]);
+            .data('placeholder', l[909]);
 
         uiPlaceholders($dialog);
         uiCheckboxes($dialog);
@@ -131,8 +129,6 @@
         });
     }
 
-
-    
 
     function doLogin($dialog, aPromise) {
         loadingDialog.show();

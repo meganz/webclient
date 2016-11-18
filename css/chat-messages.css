@@ -1,8 +1,33 @@
+.chat-topic-block {
+    display: block;
+    color: #666666;
+    background-color: white;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    border-right: 1px solid rgba(0, 0, 0, 0.1);
+    border-left: 1px solid rgba(0, 0, 0, 0.1);
+    position: relative;
+    margin-right: 256px;
+    height: 23px;
+    font-size: 18px;
+    padding: 12px 17px;
+    z-index: 3; /* weird bug */
+    white-space: nowrap;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    overflow: hidden;
+
+}
 .messages-block {
     height: 100%;
     position: relative;
     background-color: #fafafa;
     margin-right: 256px;
+    border-right: 1px solid rgba(0, 0, 0, 0.1);
+}
+.conversation-panel.group-chat .messages-block {
+    height: -webkit-calc(100% - 48px);
+    height: -moz-calc(100% - 48px);
+    height: calc(100% - 48px);
 }
 .messages-block::before {
     display: block;

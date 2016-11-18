@@ -10,7 +10,6 @@ var DropdownsUI = require('./../../ui/dropdowns.jsx');
 var ContactsUI = require('./../ui/contacts.jsx');
 var ConversationPanelUI = require("./../ui/conversationpanel.jsx");
 
-
 var ConversationsListItem = React.createClass({
     mixins: [MegaRenderMixin, RenderDebugger],
     componentWillMount: function() {
@@ -143,6 +142,14 @@ var ConversationsListItem = React.createClass({
                     l[8000]
             );
 
+            if (ChatdIntegration.mcfHasFinishedPromise.state() === 'pending') {
+                if (!ChatdIntegration.mcfHasFinishedPromise._trackDataChangeAttached) {
+                    ChatdIntegration.mcfHasFinishedPromise.always(function () {
+                        megaChat.chats.trackDataChange();
+                    });
+                    ChatdIntegration.mcfHasFinishedPromise._trackDataChangeAttached = true;
+                }
+            }
 
             lastMessageDiv =
                 <div>
@@ -178,7 +185,12 @@ var ConversationsListItem = React.createClass({
             <li className={classString} id={id} data-room-jid={roomShortJid} data-jid={contactJid} onClick={this.props.onConversationClicked}>
                 <div className="user-card-name conversation-name">
                     {chatRoom.getRoomTitle()}
-                    <span className={"user-card-presence " + presenceClass}></span>
+                    {
+                        chatRoom.type === "private" ?
+                            <span className={"user-card-presence " + presenceClass}></span>
+                            :
+                            undefined
+                    }
                 </div>
                 {unreadDiv}
                 {inCallDiv}
@@ -253,12 +265,13 @@ var ConversationsList = React.createClass({
         sortedConversations.sort(mega.utils.sortObjFn("lastActivity", -1));
 
         sortedConversations.forEach((chatRoom) => {
+            var contact;
             if (!chatRoom || !chatRoom.roomJid) {
                 return;
             }
 
             if (chatRoom.type === "private") {
-                var contact = chatRoom.getParticipantsExceptMe()[0];
+                contact = chatRoom.getParticipantsExceptMe()[0];
                 if (!contact) {
                     return;
                 }
@@ -276,6 +289,7 @@ var ConversationsList = React.createClass({
                 <ConversationsListItem
                     key={chatRoom.roomJid.split("@")[0]}
                     chatRoom={chatRoom}
+                    contact={contact}
                     messages={chatRoom.messagesBuff}
                     megaChat={megaChat}
                     onConversationClicked={(e) => {
@@ -455,11 +469,9 @@ var ConversationsApp = React.createClass({
     render: function() {
         var self = this;
 
-        //console.error("ConversationsApp render");
-
         var presence = self.props.megaChat.karere.getMyPresence();
 
-        var startChatIsDisabled = !presence || presence === "offline";
+        var startChatIsDisabled = !presence || presence === "offline" || presence === "unavailable";
 
 
         var leftPanelStyles = {};
@@ -471,7 +483,7 @@ var ConversationsApp = React.createClass({
 
         return (
             <div className="conversationsApp" key="conversationsApp">
-                <div className="fm-left-panel" style={leftPanelStyles}>
+                <div className="fm-left-panel chat-left-panel" style={leftPanelStyles}>
                     <div className="left-pane-drag-handle"></div>
 
                     <div className="fm-left-menu conversations">

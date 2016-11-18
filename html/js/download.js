@@ -16,6 +16,12 @@ var MOBILE_FILETYPES = {
     "xlsx" : 'word'
 };
 
+if (navigator.userAgent.match(/CriOS/i)) {
+    // chrome on iOS :-(
+    MOBILE_MAXFILESIZE = 1.5 * (1024 * 1024);
+}
+
+
 function dlinfo(ph,key,next)
 {
     dl_next = next;
@@ -218,25 +224,75 @@ function dl_g(res) {
                 $('.mobile.filename').text(str_mtrunc(filename, 30));
                 $('.mobile.filesize').text(bytesToSize(res.s));
                 $('.mobile.dl-megaapp').rebind('click', function() {
-                    switch (ua.details.os) {
-                        case 'iPad':
-                        case 'iPhone':
-                            window.location = "mega://" + location.hash;
-                            break;
+                    if (is_ios) {
+                        // Based off https://github.com/prabeengiri/DeepLinkingToNativeApp/
+                        var ns = '.ios ';
+                        var appLink = "mega://" + location.hash;
+                        var events = ["pagehide", "blur", "beforeunload"];
+                        var timeout = null;
 
-                        case 'Windows Phone':
-                            window.location = "mega://" + location.hash.substr(1);
-                            break;
+                        var preventDialog = function(e) {
+                            clearTimeout(timeout);
+                            timeout = null;
+                            $(window).unbind(events.join(ns) + ns);
+                        };
 
-                        case 'Android':
-                            var intent = 'intent://' + location.hash
-                                + '/#Intent;scheme=mega;package=mega.privacy.android.app;end';
-                            document.location = intent;
-                            break;
+                        var redirectToStore = function() {
+                            window.top.location = getStoreLink();
+                        };
 
-                        default:
-                            alert('Unknown device.');
+                        var redirect = function() {
+                            var ms = 500;
+
+                            preventDialog();
+                            $(window).bind(events.join(ns) + ns, preventDialog);
+
+                            window.location = appLink;
+
+                            // Starting with iOS 9.x, there will be a confirmation dialog asking whether we want to
+                            // open the app, which turns the setTimeout trick useless because no page unloading is
+                            // notified and users redirected to the app-store regardless if the app is installed.
+                            // Hence, as a mean to not remove the redirection we'll increase the timeout value, so
+                            // that users with the app installed will have a higher chance of confirming the dialog.
+                            // If past that time they didn't, we'll redirect them anyhow which isn't ideal but
+                            // otherwise users will the app NOT installed might don't know where the app is,
+                            // at least if they disabled the smart-app-banner...
+                            // NB: Chrome (CriOS) is not affected.
+                            if (is_ios > 8 && ua.details.brand !== 'CriOS') {
+                                ms = 4100;
+                            }
+
+                            timeout = setTimeout(redirectToStore, ms);
+                        };
+
+                        Soon(function() {
+                            // If user navigates back to browser and clicks the button,
+                            // try redirecting again.
+                            $('.mobile.dl-megaapp').rebind('click', function(e) {
+                                e.preventDefault();
+                                redirect();
+                                return false;
+                            });
+                        });
+                        redirect();
                     }
+                    else {
+                        switch (ua.details.os) {
+                            case 'Windows Phone':
+                                window.location = "mega://" + location.hash.substr(1);
+                                break;
+
+                            case 'Android':
+                                var intent = 'intent://' + location.hash
+                                    + '/#Intent;scheme=mega;package=mega.privacy.android.app;end';
+                                document.location = intent;
+                                break;
+
+                            default:
+                                alert('Unknown device.');
+                        }
+                    }
+
                     return false;
                 });
 
@@ -348,24 +404,35 @@ function browserDownload() {
     }
 }
 
+function getStoreLink() {
+    switch (ua.details.os) {
+    case 'iPad':
+    case 'iPhone':
+        return 'https://itunes.apple.com/app/mega/id706857885';
+
+    case 'Windows Phone':
+        return 'zune://navigate/?phoneappID=1b70a4ef-8b9c-4058-adca-3b9ac8cc194a';
+
+    case 'Android':
+        return 'https://play.google.com/store/apps/details?id=mega.privacy.android.app&referrer=meganzindexandroid';
+    }
+}
+
 function setMobileAppInfo() {
+    $('.mobile.download-app').attr('href', getStoreLink());
     switch (ua.details.os) {
         case 'iPad':
         case 'iPhone':
             $('.app-info-block').addClass('ios');
-            $('.mobile.download-app').attr('href', 'https://itunes.apple.com/app/mega/id706857885');
             break;
 
         case 'Windows Phone':
             $('.app-info-block').addClass('wp');
-            $('.mobile.download-app').attr('href', 'zune://navigate/?phoneappID=1b70a4ef-8b9c-4058-adca-3b9ac8cc194a');
             $('.mobile.dl-browser').addClass('disabled').unbind('click');
             break;
 
         case 'Android':
             $('.app-info-block').addClass('android');
-            $('.mobile.download-app').attr('href',
-                'https://play.google.com/store/apps/details?id=mega.privacy.android.app&referrer=meganzindexandroid');
             break;
     }
 }

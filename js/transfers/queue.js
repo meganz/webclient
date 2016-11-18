@@ -72,6 +72,10 @@ inherits(MegaQueue, MegaEvents);
 
 MegaQueue.weakRef = [];
 
+MegaQueue.prototype.getSize = function() {
+    return this._limit;
+};
+
 MegaQueue.prototype.setSize = function(size) {
     this._limit = size;
     this._process();
@@ -392,6 +396,13 @@ MegaQueue.prototype.push = function(arg, next, self) {
     this._process();
 };
 
+MegaQueue.prototype.unshift = function(arg, next, self) {
+    this._queue.unshift([arg, next, self]);
+    // this.logger.debug('Queueing new task, total: %d', this._queue.length, arg);
+    this.trigger('queue');
+    this._process();
+};
+
 function TransferQueue() {
     MegaQueue.prototype.constructor.apply(this, arguments);
 
@@ -482,7 +493,9 @@ TransferQueue.prototype.pause = function(gid) {
         if (($.transferprogress || {})[gid]) {
             $.transferprogress[gid][2] = 0; // reset speed
         }
-        Soon(percent_megatitle);
+        if (page !== 'download') {
+            delay('percent_megatitle', percent_megatitle);
+        }
     }
     else if (d) {
         if (!GlobalProgress[gid]) {

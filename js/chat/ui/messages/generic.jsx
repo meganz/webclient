@@ -52,11 +52,19 @@ var GenericConversationMessage = React.createClass({
                 });
             }
         });
+        $(self.props.message).rebind('onChange.GenericConversationMessage' + self.getUniqueId(), function() {
+            Soon(function() {
+                if (self.isMounted()) {
+                    self.eventuallyUpdate();
+                }
+            });
+        });
     },
     componentWillUnmount: function() {
         var self = this;
         var $node = $(self.findDOMNode());
         $node.unbind('onEditRequest.genericMessage');
+        $(self.props.message).unbind('onChange.GenericConversationMessage' + self.getUniqueId());
     },
     doDelete: function(e, msg) {
         e.preventDefault(e);
@@ -120,6 +128,11 @@ var GenericConversationMessage = React.createClass({
 
         if (this.props.className) {
             additionalClasses += this.props.className;
+        }
+
+        if (message.revoked) {
+            // skip doing tons of stuff and just return null, in case this message was marked as revoked.
+            return null;
         }
 
         // if this is a text msg.
@@ -308,8 +321,6 @@ var GenericConversationMessage = React.createClass({
                         var dropdown = null;
                         var previewButtons = null;
 
-
-
                         if (!attachmentMetaInfo.revoked) {
                             if (v.fa && (icon === "graphic" || icon === "image")) {
                                 var imagesListKey = message.messageId + "_" + v.h;
@@ -367,9 +378,8 @@ var GenericConversationMessage = React.createClass({
                             }
                         }
                         else {
-                            dropdown = <ButtonsUI.Button
-                                className="default-white-button tiny-button disabled"
-                                icon="tiny-icon grey-down-arrow" />;
+                            // else if (attachmentMetaInfo.revoked) { ... don't show revoked files
+                            return;
                         }
 
                         var attachmentClasses = "message shared-data";
@@ -727,7 +737,8 @@ var GenericConversationMessage = React.createClass({
                             if (self.props.onEditDone) {
                                 Soon(function() {
                                     self.props.onEditDone(messageContents);
-                                    });
+                                    self.forceUpdate();
+                                });
                             }
 
                             return true;
@@ -761,6 +772,7 @@ var GenericConversationMessage = React.createClass({
                         contact && contact.u === u_handle &&
                         (unixtime() - message.delay) < MESSAGE_NOT_EDITABLE_TIMEOUT &&
                         self.state.editing !== true &&
+                        chatRoom.isReadOnly() === false &&
                         !message.requiresManualRetry
                     ) {
                         messageActionButtons = <ButtonsUI.Button

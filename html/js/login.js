@@ -111,6 +111,14 @@ function doConfirm(email, password, callback) {
                             ctx.callback2();
                         }
                     }
+                    else if ((typeof res === 'number') && (res === -11)) {
+                        if (u_type === 0) {// Ephemeral session
+                            msgDialog("warninga", l[2480], l[12439]);
+                        }
+                        else {
+                            msgDialog("warninga", l[2480], l[12440]);
+                        }
+                    }
                     else {
                         alert(l[200]);
                     }
@@ -151,7 +159,7 @@ function postLogin(email, password, remember, callback) {
 
 function pagelogin() {
     var e = $('#login-name2').val();
-    if (e === '' || e === l[195] || checkMail(e)) {
+    if (e === '' || checkMail(e)) {
         $('.login-register-input.email').addClass('incorrect');
         $('#login-name2').focus();
     }
@@ -164,6 +172,11 @@ function pagelogin() {
         $('.top-dialog-login-button').addClass('loading');
         if ($('.loginwarning-checkbox').hasClass('checkboxOn')) {
             localStorage.hideloginwarning = 1;
+        }
+        var remember;
+        // XXX: Set remember on by default if confirming a freshly created account
+        if (confirmok || $('.login-check').hasClass('checkboxOn')) {
+            remember = 1;
         }
 
         if (confirmok) {
@@ -182,12 +195,9 @@ function pagelogin() {
             });
         }
         else {
-            var remember;
-            if ($('.login-check').hasClass('checkboxOn')) {
-                remember = 1;
-            }
             postLogin($('#login-name2').val(), $('#login-password2').val(), remember, function(r) {
                 loadingDialog.hide();
+
                 if (r === EBLOCKED) {
                     alert(l[730]);
                 }
@@ -208,10 +218,15 @@ function pagelogin() {
                 else {
                     $('.login-register-input.password').addClass('incorrect');
                     $('.login-register-input.email').addClass('incorrect');
-                    msgDialog('warninga', l[135], l[1130] + ' ' + l[969], false, function(e) {
-                        $('#login-password2').val('');
-                        $('#login-name2').select();
-                    });
+
+                    // Check that there is not already a message dialog being shown, otherwise
+                    // this generic one will override the other's more specific error message
+                    if ($('#msgDialog').hasClass('hidden')) {
+                        msgDialog('warninga', l[135], l[7431], false, function(e) {
+                            $('#login-password2').val('');
+                            $('#login-name2').select();
+                        });
+                    }
                 }
             });
         }
@@ -231,6 +246,7 @@ function init_login() {
         $('.register-st2-button-arrow').text(l[1131]);
         $('.main-italic-header.login').text(l[1131]);
         $('.main-top-info-text').text(l[378]);
+        $('.login-check').addClass('hidden').next().addClass('hidden');
     }
     else {
         $('.register-st2-button').addClass('active');
@@ -249,9 +265,7 @@ function init_login() {
     });
 
     $('#login-password2, #login-name2').rebind('keydown', function(e) {
-        if ($('#login-name2').val() !== ''
-                && $('#login-name2').val() !== l[195]
-                && $('#login-password2').val() !== '') {
+        if ($('#login-name2').val() !== '' && $('#login-password2').val() !== '') {
             $('.register-st2-button').addClass('active');
         }
         $('.login-register-input.password').removeClass('incorrect');
@@ -287,7 +301,11 @@ function init_login() {
     $('.login-register-input').rebind('click', function(e) {
         $(this).find('input').focus();
     });
-    document.getElementById('login-name2').focus()
+    document.getElementById('login-name2').focus();
+
+    if (is_chrome_firefox) {
+        Soon(mozLoginManager.fillForm.bind(mozLoginManager, 'login_form'));
+    }
 }
 
 function postlogin() {

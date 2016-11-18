@@ -6,19 +6,17 @@ Unless otherwise noted, they were released under a [MIT License].
 ---
 [asmcrypto.js]: asmCrypto - JavaScript Cryptographic Library with performance in mind.
 
+> **This is a fork**, [Compare the changes](https://github.com/vibornoff/asmcrypto.js/compare/master...meganz:master)
+>
 > NB: We are using a custom, unobfuscated build which was created using:
 > 
 > ```bash
-> git clone https://github.com/vibornoff/asmcrypto.js.git
-> git checkout a0ac7b98ad5401d595a78516c7591a4980799b08  (using fixes in master since last v0.0.10 release)
-> npm install
-> grunt --with="common,utils,exports,globals,aes,aes-ecb,aes-cbc,aes-ctr,aes-ccm,aes-gcm,aes-exports,aes-ecb-exports,aes-cbc-exports,aes-ctr-exports,aes-ccm-exports,aes-gcm-exports,hash,sha256,sha256-exports,sha512,sha512-exports,hmac,hmac-sha256,hmac-sha512,hmac-sha256-exports,hmac-sha512-exports,rng,rng-exports,rng-globals,bn,bn-exports,rsa,rsa-raw,rsa-keygen-exports,rsa-raw-exports" devel
-> In our code special UTF-8 characters are removed for better SHA-256 hashing performance so a few comments were changed:
-> 1) Find and replace the special character '—' with a regular hyphen '-'.
-> 2) Find and replace the special character '²' with '^2'.
-> 3) Find and replace the special character '×' with 'x'.
-> 4) Find and replace the special character '≤' with '<='.
+> git clone https://github.com/meganz/asmcrypto.js.git
+> cd asmcrypto.js
+> build.sh
 > ```
+>
+> If that doesn't creates an 1:1 copy, try `build.sh master` (that'll build the file from master, as opposed to latest tagged version)
 
 ---
 [autolinker.js]: Utility to Automatically Link URLs, Email Addresses, Phone Numbers, Twitter handles, and Hashtags in a given block of text/HTML.
@@ -39,6 +37,11 @@ Unless otherwise noted, they were released under a [MIT License].
 [db.js]: Wrapper for IndexedDB to make it easier to work against, making it look more like a queryable API.
 
 > **This is a fork**, [Compare the changes](https://github.com/aaronpowell/db.js/compare/master...meganz:master)
+
+---
+[dexie.js]: A Minimalistic Wrapper for IndexedDB
+
+> Released under the [Apache License Version 2.0](http://www.apache.org/licenses/).
 
 ---
 [dcraw.js]: Dave Coffin's raw photo decoder [dcraw.c](http://www.cybercom.net/~dcoffin/dcraw/) ported to JavaScript using [Emscripten]
@@ -77,7 +80,9 @@ Unless otherwise noted, they were released under a [MIT License].
 [jquery-2.2.1.js]: jQuery JavaScript Library.
 
 ---
-[jquery-ui-1.11.4.js]: jQuery-UI - jQuery User Interface library.
+[jquery-ui.js]: jQuery-UI - jQuery User Interface library.
+
+> This is a custom build created from: [https://jqueryui.com/download/#!...](https://jqueryui.com/download/#!version=1.12.1&themeParams=none&components=111101011101111110100010110110001000001000000000)
 
 ---
 [jquery.fullscreen.js]: This jQuery plugin provides a simple to use mechanism to control the new fullscreen mode of modern browsers.
@@ -122,6 +127,9 @@ Unless otherwise noted, they were released under a [MIT License].
 [notification.js]: A shim polyfill for adding notifications to browsers which offer limited support.
 
 ---
+[react-dom.js, react.js]: A declarative, efficient, and flexible JavaScript library for building user interfaces.
+
+---
 [smartcrop.js]: Content aware image cropping.
 
 > **This is a fork**, [Compare the changes](https://github.com/jwagner/smartcrop.js/compare/master...meganz:master)
@@ -145,25 +153,27 @@ Unless otherwise noted, they were released under a [MIT License].
 ---
 [chat/strophe.light.js]: Strophe.js is an XMPP library for JavaScript.
 
-> NB: We are using a custom build which was created using:
+> NB: This is the **light** version built as follow:
 > 
 > ```bash
 > git clone https://github.com/strophe/strophejs.git
 > cd strophejs
-> git checkout 30033f05eded0bb079e8c06a75045f195068d896
+> git checkout v1.2.8
 > npm install
 > make strophe.light.js
+> make check
 > ```
 
 ---
 
 [MIT License]: <https://opensource.org/licenses/MIT>
 [Emscripten]: <http://emscripten.org/>
-[asmcrypto.js]: <https://github.com/vibornoff/asmcrypto.js/tree/a0ac7b98ad5401d595a78516c7591a4980799b08>
+[asmcrypto.js]: <https://github.com/meganz/asmcrypto.js>
 [autolinker.js]: <https://github.com/gregjacobs/Autolinker.js/tree/0.12.3/dist>
 [avatar.js]: <https://github.com/meganz/avatar-picker>
 [bitcoin-math.js]: <https://github.com/meganz/bitcoin-math>
 [db.js]: <https://github.com/meganz/db.js>
+[dexie.js]: <https://github.com/dfahlander/Dexie.js>
 [dcraw.js]: <https://github.com/meganz/dcraw.js>
 [es6-shim]: <https://github.com/meganz/es6-shim>
 [exif-js]: <https://github.com/meganz/exif-js>
@@ -172,7 +182,7 @@ Unless otherwise noted, they were released under a [MIT License].
 [int64.js]: <https://github.com/meganz/node-int64>
 [ion.sound.js]: <https://github.com/meganz/ion.sound>
 [jquery-2.2.1.js]: <https://github.com/jquery/jquery/blob/2.2.1/dist/jquery.js>
-[jquery-ui-1.11.4.js]: <https://code.jquery.com/ui/1.11.4/jquery-ui.js>
+[jquery-ui.js]: <https://code.jquery.com/ui/1.12.1/jquery-ui.js>
 [jquery.fullscreen.js]: <https://github.com/kayahr/jquery-fullscreen-plugin/tree/5c95707f9ebf3d4962e9057b09cc43c10f11c3f4>
 [jquery.jscrollpane.js]: <https://github.com/meganz/jScrollPane>
 [jquery.mousewheel.js]: <https://github.com/meganz/jquery-mousewheel>
@@ -185,6 +195,7 @@ Unless otherwise noted, they were released under a [MIT License].
 [nacl-fast.js]: <https://github.com/dchest/tweetnacl-js/tree/v0.13.1>
 [notification.js]: <https://github.com/MrSwitch/notification.js/tree/v0.0.1>
 [qrcode.js]: <https://github.com/jeromeetienne/jquery-qrcode/blob/2bad93deab2f0ec66451b0cc962d56fad6fba403/src/qrcode.js>
+[react-dom.js, react.js]: https://github.com/facebook/react/tree/v0.14.8
 [smartcrop.js]: <https://github.com/meganz/smartcrop.js>
 [zxcvbn.js]: <https://github.com/dropbox/zxcvbn/tree/1.0.1>
-[chat/strophe.light.js]: <https://github.com/strophe/strophejs/tree/30033f05eded0bb079e8c06a75045f195068d896>
+[chat/strophe.light.js]: <https://github.com/strophe/strophejs>

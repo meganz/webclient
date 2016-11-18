@@ -242,7 +242,7 @@ describe("authring unit test", function() {
             it("unsupported key type", function() {
                 sandbox.stub(ns._logger, '_log');
                 var result = ns.getContacts('DSA');
-                assert.strictEqual(result, undefined);
+                assert.strictEqual(result.state(), 'rejected');
                 assert.strictEqual(ns._logger._log.args[0][0],
                                    'Unsupported authentication key type: DSA');
             });
@@ -305,7 +305,7 @@ describe("authring unit test", function() {
             it("unsupported key type", function() {
                 sandbox.stub(ns._logger, '_log');
                 var result = ns.setContacts('DSA');
-                assert.strictEqual(result, undefined);
+                assert.strictEqual(result.state(), 'rejected');
                 assert.strictEqual(ns._logger._log.args[0][0],
                                    'Unsupported authentication key type: DSA');
             });
@@ -347,7 +347,7 @@ describe("authring unit test", function() {
             it("unsupported key type", function() {
                 sandbox.stub(ns._logger, '_log');
                 var result = ns.computeFingerprint(RSA_PUB_KEY, 'DSA');
-                assert.strictEqual(result, undefined);
+                assert.strictEqual(result, '');
                 assert.strictEqual(ns._logger._log.args[0][0],
                                    'Unsupported key type: DSA');
             });
@@ -606,7 +606,7 @@ describe("authring unit test", function() {
             sandbox.stub(ns._logger, '_log');
             sandbox.stub(u_authring, 'Ed25519', undefined);
             var result = ns.getContactAuthenticated('you456789xw', 'Ed25519');
-            assert.strictEqual(result, undefined);
+            assert.strictEqual(result, false);
             assert.strictEqual(ns._logger._log.args[0][0],
                           'First initialise u_authring by calling authring.getContacts()');
         });
@@ -614,7 +614,7 @@ describe("authring unit test", function() {
         it("unsupported key type", function() {
             sandbox.stub(ns._logger, '_log');
             var result = ns.getContactAuthenticated('you456789xw', 'DSA');
-            assert.strictEqual(result, undefined);
+            assert.strictEqual(result, false);
             assert.strictEqual(ns._logger._log.args[0][0],
                                'Unsupported key type: DSA');
         });
@@ -660,7 +660,7 @@ describe("authring unit test", function() {
                 var result;
                 for (var i = 0; i < tests.length; i++) {
                     result = ns._longToByteString(tests[i]);
-                    assert.strictEqual(result, undefined);
+                    assert.strictEqual(result, '');
                     assert.strictEqual(ns._logger._log.args[0][0],
                         'Integer not suitable for lossless conversion in JavaScript.');
                 }
@@ -801,7 +801,7 @@ describe("authring unit test", function() {
             it('unsupported key type', function() {
                 sandbox.stub(ns._logger, '_log');
                 var result = ns._checkPubKey('the key', 'RSA');
-                assert.strictEqual(result, undefined);
+                assert.strictEqual(result.state(), 'rejected');
                 assert.strictEqual(ns._logger._log.args[0][0],
                                    'Unsupported key type for pub key check: RSA');
             });
@@ -1024,7 +1024,7 @@ describe("authring unit test", function() {
             it('unsupported key', function() {
                 sandbox.stub(ns._logger, '_log');
                 var result = ns._setupKeyPair('Ed25519');
-                assert.strictEqual(result, undefined);
+                assert.strictEqual(result.state(), 'rejected');
                 assert.strictEqual(ns._logger._log.args[0][0],
                                    'Unsupported key type for key generation: Ed25519');
             });
@@ -1034,7 +1034,7 @@ describe("authring unit test", function() {
             it('unsupported key', function() {
                 sandbox.stub(ns._logger, '_log');
                 var result = ns._initKeyPair('Ed25519');
-                assert.strictEqual(result, undefined);
+                assert.strictEqual(result.state(), 'rejected');
                 assert.strictEqual(ns._logger._log.args[0][0],
                                    'Unsupported key type for initialisation: Ed25519');
             });

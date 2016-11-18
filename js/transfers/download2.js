@@ -1302,27 +1302,34 @@ function fm_tfsupdate() {
     var i = 0;
     var u = 0;
 
-    // Move completed transfers to the bottom
-    var $completed = $('.transfer-table tr.transfer-completed');
-    var completedLen = $completed.length;
-    $('.transfer-table').append($completed);
+    var tfse = M.getTransferElements();
+    if (!tfse) {
+        return false;
+    }
+    var domTable = tfse.domTable;
 
-    // Remove completed transfers filling the whole table
-    if ($('.transfer-table tr:first').hasClass('transfer-completed')) {
-        var trLen = M.getTransferTableLengths().size;
-        if (completedLen >= trLen) {
-            if (completedLen > 50) {
-                $('.transfer-table tr.transfer-completed')
-                    .slice(0, trLen)
-                    .fadeOut(function() {
-                        $(this).remove();
-                    });
+    var domCompleted = domTable.querySelectorAll('tr.transfer-completed');
+    var completedLen = domCompleted.length;
+    if (completedLen) {
+        var ttl    = M.getTransferTableLengths();
+        var parent = domCompleted[0].parentNode;
+
+        if (completedLen + 4 > ttl.size || M.pendingTransfers > 50 + ttl.used * 4) {
+            // Remove completed transfers filling the whole table
+            while (completedLen--) {
+                parent.removeChild(domCompleted[completedLen]);
             }
-            $('.transfer-scrolling-table').trigger('jsp-scroll-y.tfsdynlist', [0, 0, 1]);
+            mBroadcaster.sendMessage('tfs-dynlist-flush');
+        }
+        else {
+            // Move completed transfers to the bottom
+            while (completedLen--) {
+                parent.appendChild(domCompleted[completedLen]);
+            }
         }
     }
     if ($.transferHeader) {
-        $.transferHeader();
+        $.transferHeader(tfse);
     }
 
     /*$('.transfer-table span.row-number').each(function() {
@@ -1332,8 +1339,13 @@ function fm_tfsupdate() {
             ++u;
         }
     });*/
-    var $trs = $('.transfer-table tr').not('.transfer-completed');
-    u = $trs.find('.transfer-type.upload').length;
+    var $trs = domTable.querySelectorAll('tr:not(.transfer-completed)');
+    i = $trs.length;
+    while (i--) {
+        if ($trs[i].classList.contains('transfer-upload')) {
+            ++u;
+        }
+    }
     i = $trs.length - u;
     for (var k in M.tfsdomqueue) {
         if (k[0] === 'u') {
@@ -1343,10 +1355,10 @@ function fm_tfsupdate() {
             ++i;
         }
     }
+    M.pendingTransfers = i + u;
     var t;
     var sep = "\u202F";
-    var $tpt = $('.transfer-panel-title');
-    var l = $.trim($tpt.text()).split(sep)[0];
+    var l   = String(tfse.domPanelTitle.textContent).trim().split(sep)[0];
     if (i && u) {
         t = '\u2191 ' + u + ' \u2193 ' + i;
     }
@@ -1362,7 +1374,7 @@ function fm_tfsupdate() {
     if (t) {
         t = sep + ' ' + t;
     }
-    $tpt.text(l + t);
+    tfse.domPanelTitle.textContent = (l + t);
 }
 
 

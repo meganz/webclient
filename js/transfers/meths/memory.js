@@ -90,12 +90,19 @@
             }
             else if (is_mobile) {
                 if (page === 'download') {
-                    blob = myURL.createObjectURL(blob);
+                    var sblob = myURL.createObjectURL(blob);
                     $('body')
                         .addClass('download-complete')
                         .find('.download-progress')
                         .rebind('click', function() {
-                            window.open(blob, '_blank');
+                            if (navigator.userAgent.match(/CriOS/i)) {
+                                var reader = new FileReader();
+                                reader.onload = function(e) {
+                                    window.open(reader.result, '_blank');
+                                };
+                                return reader.readAsDataURL(blob);
+                            }
+                            window.open(sblob, '_blank');
                             return false;
                         });
                     $('.mobile.download-speed, .mobile.download-percents').text('');
@@ -124,7 +131,7 @@
 
         this.setCredentials = function(url, size, filename, chunks, sizes) {
             if (d) {
-                logger = new MegaLogger('MemoryIO', {}, dl.writer.logger);
+                logger = new MegaLogger('MemoryIO', {}, dl.writer && dl.writer.logger);
                 logger.info('MemoryIO Begin', dl_id, Array.prototype.slice.call(arguments));
             }
             if (size > MemoryIO.fileSizeLimit) {

@@ -10,7 +10,7 @@ function init_backup() {
         var blob = new Blob([key], {
             type: "text/plain;charset=utf-8"
         });
-        saveAs(blob, 'MEGA-MASTERKEY.txt');
+        saveAs(blob, 'MEGA-RECOVERYKEY.txt');
     });
 
     if (is_extension || mega.utils.execCommandUsable()) {

@@ -337,42 +337,6 @@ function treePanelType() {
     return $.trim($('.nw-fm-left-icon.active').attr('class').replace(/(active|nw-fm-left-icon|ui-droppable)/g, ''));
 }
 
-/**
- * treePanelSortElements
- *
- * @param {String} type, key value for global variable $.sortTreepanel, can bi prexied with Copy and Move for those dialogs.
- * @param {Array} elements, elements that will be sorted
- * @param {type} handlers
- * @param {} ifEq
- */
-function treePanelSortElements(type, elements, handlers, ifEq) {
-
-    if (!$.sortTreePanel) {
-       // XX: not yet initialised, initUI was not called yet, which means that most likely rendering/sorting should not be
-       // triggered at the moment. Caused receiving action packets, BEFORE the ui was initialised, so this call can simply
-       // do nothing at this moment.
-
-       return;
-    }
-
-    var settings = $.sortTreePanel[type],
-        sort = handlers[settings.by];
-
-    if (!sort) {
-        return;
-    }
-
-    elements.sort(function(a, b) {
-
-        var d = sort(a, b);
-
-        if (d == 0 && ifEq) {
-            return ifEq(a, b);
-        }
-        return d * settings.dir;
-    });
-}
-
 function initUI() {
     if (d) {
         console.time('initUI');
@@ -644,18 +608,20 @@ function initUI() {
                 $.copyids = ids;
                 $.copyt = t;
                 setTimeout(function() {
-                    M.copyNodes($.copyids, $.copyt, (dd === 'copydel'), function() {
+                    M.copyNodes($.copyids, $.copyt, (dd === 'copydel'), new MegaPromise())
+                        .done(function() {
 
-                        // Update files count...
-                        if (M.currentdirid === 'shares' && !M.viewmode) {
-                            M.openFolder('shares', 1);
-                        }
-                    }, function(error) {
-                        if (error === EOVERQUOTA) {
-                            return msgDialog('warninga', l[135], l[8435]);
-                        }
-                        return msgDialog('warninga', l[135], l[47], api_strerror(error));
-                    });
+                            // Update files count...
+                            if (M.currentdirid === 'shares' && !M.viewmode) {
+                                M.openFolder('shares', 1);
+                            }
+                        })
+                        .fail(function(error) {
+                            if (error === EOVERQUOTA) {
+                                return msgDialog('warninga', l[135], l[8435]);
+                            }
+                            return msgDialog('warninga', l[135], l[47], api_strerror(error));
+                        });
                 }, 50);
             }
             else if (dd === 'download') {
@@ -752,13 +718,15 @@ function initUI() {
             $.hideTopMenu(e);
         }
         var $target = $(e.target);
+        var exclude = '.upgradelink, .campaign-logo, .resellerbuy, .linkified, a.red';
 
         if ($target.attr('data-reactid') || $target.is('.chatlink')) {
             // chat can handle its own links..no need to return false on every "click" and "element" :O
             return;
         }
         if ($target.attr('type') !== 'file'
-                && !$target.is('.upgradelink, .campaign-logo, .resellerbuy, .linkified, a.red')) {
+                && !$target.is(exclude)
+                && !$target.parent().is(exclude)) {
             return false;
         }
     });
@@ -790,8 +758,6 @@ function initUI() {
     else {
         folderlink = 0;
     }
-
-    M.avatars();
 
     if ((typeof dl_import !== 'undefined') && dl_import) {
         importFile();
@@ -900,7 +866,8 @@ function initUI() {
         setTimeout(browserDialog, 2000);
     }
 
-    var lPane = $('.fm-left-panel');
+    // chat can handle the left-panel resizing on its own
+    var lPane = $('.fm-left-panel').filter(":not(.chat-left-panel)");
     $.leftPaneResizable = new FMResizablePane(lPane, {
         'direction': 'e',
         'minWidth': 200,
@@ -1023,7 +990,7 @@ function transferPanelContextMenu(target)
     // origin of some problems, users can still use the new d&d logic to move transfers
     menuitems.filter('.move-up,.move-down').hide();
 
-    if (target.length === 1 && target.eq(0).attr('id').match(/^dl_/)) {
+    if (target.length === 1 && target.eq(0).attr('id').match(/^dl_/) && !!localStorage.d) {
         menuitems.filter('.network-diagnostic').show();
     }
 
@@ -1040,6 +1007,7 @@ function transferPanelContextMenu(target)
 
 function openTransferpanel()
 {
+    $.tresizer();
     $('.nw-fm-left-icon.transfers').addClass('transfering');
     // Start the new transfer right away even if the queue is paused?
     // XXX: Remove fm_tfspause calls at M.addDownload/addUpload to enable this
@@ -1218,7 +1186,7 @@ function showTransferToast(t_type, t_length, isPaused) {
             $toast = $('.toast-notification.download');
             $second_toast = $('.toast-notification.upload');
             if (t_length > 1) {
-                nt_txt = l[7220].replace('XX',t_length);
+                nt_txt = l[12481].replace('%1', t_length);
             } else {
                 nt_txt = l[7222];
             }
@@ -1227,7 +1195,7 @@ function showTransferToast(t_type, t_length, isPaused) {
             $toast = $('.toast-notification.upload');
             $second_toast = $('.toast-notification.download');
             if (t_length > 1) {
-                nt_txt = l[7221].replace('XX',t_length);
+                nt_txt = l[12480].replace('%1', t_length);
             } else {
                 nt_txt = l[7223];
             }
@@ -1281,15 +1249,6 @@ function showTransferToast(t_type, t_length, isPaused) {
 function hideTransferToast ($toast) {
     $toast.removeClass('visible');
     $('.toast-notification').removeClass('second');
-}
-
-function isValidShareLink()
-{
-    var valid = true;
-    for (var i in u_nodekeys) {
-        valid = valid && typeof u_nodekeys[i] == "object"
-    }
-    return valid;
 }
 
 function removeUInode(h, parent) {
@@ -2158,8 +2117,8 @@ function removeShare(shareId, nfk) {
         api_updfkey(shareId);
     }
 
-    M.delNode(shareId);
-    api_req({ a: 'd', n: shareId, i: requesti });
+    M.delNode(shareId, true);   // must not update DB pre-API
+    api_req({ a: 'd', n: shareId/*, i: requesti*/ });
 
     M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
 
@@ -2230,9 +2189,10 @@ function fmremove() {
                 $.selected.forEach(function(selected) {
 
                     if (M.c[selected]) {
-                        M.c[selected].forEach(function(sharenode) {
-                            removeShare(sharenode, 1);
-                        });
+                        Object.keys(M.c[selected])
+                            .forEach(function(sharenode) {
+                                removeShare(sharenode, 1);
+                            });
                     }
 
                     api_req({ a: 'ur2', u: $.selected[i], l: '0', i: requesti });
@@ -2253,9 +2213,47 @@ function fmremove() {
             $('#msgDialog .fm-del-contact-avatar').html(avatar);
         }
     }
-    // Remove/Clean rubbih bin
+
+    // Remove selected nodes from rubbish bin
     else if (RootbyId($.selected[0]) === M.RubbishID) {
-        msgDialog('clear-bin', l[1003], l[76].replace('[X]', (filecnt + foldercnt)) + ' ' + l[77], l[1007], function(e) {
+
+        var dlgMessage = '';
+        var toastMessage = '';
+
+        if ((filecnt === 1) && (!foldercnt)) {
+            dlgMessage = l[13749];// 1 file
+            toastMessage = l[13757];
+        }
+        else if ((filecnt > 1) && (!foldercnt)) {
+            dlgMessage = l[13750].replace('%1', filecnt);
+            toastMessage = l[13758].replace('%1', filecnt);
+        }
+        else if ((!filecnt) && (foldercnt === 1)) {
+            dlgMessage = l[13751];// 1 folder
+            toastMessage = l[13759];
+        }
+        else if ((!filecnt) && (foldercnt > 1)) {
+            dlgMessage = l[13752].replace('%1', foldercnt);
+            toastMessage = l[13760].replace('%1', foldercnt);
+        }
+        else if ((filecnt === 1) && (foldercnt === 1)) {
+            dlgMessage = l[13753];// 1 file 1 folder
+            toastMessage = l[13761];
+        }
+        else if ((filecnt === 1) && (foldercnt > 1)) {
+            dlgMessage = l[13754].replace('%1', foldercnt);
+            toastMessage = l[13762].replace('%1', foldercnt);
+        }
+        else if ((filecnt > 1) && (foldercnt === 1)) {
+            dlgMessage = l[13755].replace('%1', filecnt);
+            toastMessage = l[13763].replace('%1', filecnt);
+        }
+        else if ((filecnt > 1) && (foldercnt > 1)) {
+            dlgMessage = l[13756].replace('%1', filecnt).replace('%2', foldercnt);
+            toastMessage = l[13764].replace('%1', filecnt).replace('%2', foldercnt);
+        }
+
+        msgDialog('clear-bin', l[1003], dlgMessage, l[1007], function(e) {
             if (e) {
                 var tmp = null;
                 if (String(M.currentdirid).substr(0, 7) === 'search/') {
@@ -2267,12 +2265,17 @@ function fmremove() {
                 if (tmp) {
                     M.currentdirid = tmp;
                 }
+
+                showToast('settings', toastMessage);
             }
         });
-        $('.fm-dialog-button.notification-button').each(function(i, e) {
-            if ($(e).text() === l[1018])
-                $(e).html('<span>'+l[83]+'</span>');
-        });
+
+        // ToDo: is this necessary?
+        // $('.fm-dialog-button.notification-button').each(function(i, e) {
+        //     if ($(e).text() === l[1018]) {
+        //         $(e).safeHTML('<span>@@</span>', l[83]);
+        //     }
+        // });
     }
 
     // Remove contacts
@@ -2297,23 +2300,18 @@ function fmremove() {
             }
         }
         else {
-
-            // Additional message in case that there's a shared node
-            var delShareInfo,
-
             // Contains complete directory structure of selected nodes, their ids
-            dirTree = [];
+            var selected = [], dirTree = [];
 
             for (var i in $.selected) {
-                if ($.selected.hasOwnProperty(i)) {
-                    var nodes = fm_getnodes($.selected[i], 1);
-                    nodes.unshift($.selected[i]);
-                    dirTree = dirTree.concat(nodes);
-                }
+                selected.push($.selected[i]);
+                var nodes = fm_getnodes($.selected[i], true);
+                dirTree = dirTree.concat(nodes);
             }
 
+            // Additional message in case that there's a shared node
             var share = new mega.Share({});
-            delShareInfo = share.isShareExist(dirTree, true, true, true) ? ' ' + l[1952] + ' ' + l[7410] : '';
+            var delShareInfo = share.isShareExist(dirTree, true, true, true) ? ' ' + l[1952] + ' ' + l[7410] : '';
 
             msgDialog('remove', l[1003], l[1004].replace('[X]', fm_contains(filecnt, foldercnt)) + delShareInfo, false, function(e) {
                 if (e) {
@@ -2321,32 +2319,76 @@ function fmremove() {
                         M.copyNodes($.selected, M.RubbishID, true);
                     }
                     else {
+                        var delctx = { pending : 1, selected : selected };
 
                         // Remove all shares related to selected nodes
-                        for (var selection in dirTree) {
-                            if (dirTree.hasOwnProperty(selection)) {
+                        for (var i = dirTree.length; i--; ) {
+                            var h = dirTree[i];
 
-                                // Remove regular/full share
-                                for (var share in Object(M.d[dirTree[selection]]).shares) {
-                                    if (M.d[dirTree[selection]].shares.hasOwnProperty(share)) {
-                                        api_req({ a: 's2', n:  dirTree[selection], s: [{ u: M.d[dirTree[selection]].shares[share].u, r: ''}], ha: '', i: requesti });
-                                        M.delNodeShare(dirTree[selection], M.d[dirTree[selection]].shares[share].u);
-                                        setLastInteractionWith(dirTree[selection], "0:" + unixtime());
-                                    }
-                                }
+                            // remove established shares
+                            for (var share in Object(M.d[dirTree[i]]).shares) {
+                                delctx.pending++;
+                                api_req({ a: 's2',
+                                          n: h,
+                                          s: [{ u: M.d[h].shares[share].u, r: ''}],
+                                          ha: '',
+                                          i: requesti
+                                        }, {
+                                          n: h,
+                                          u: M.d[h].shares[share].u,
+                                          delctx: delctx,
+                                          callback: function(res, ctx) {
+                                                if (typeof res == 'object') {
+                                                    // FIXME: verify error codes in res.r
+                                                    M.delNodeShare(ctx.n, ctx.u);
+                                                    setLastInteractionWith(ctx.u, "0:" + unixtime());
+                                                }
+                                                else {
+                                                    // FIXME: display error to user
+                                                }
 
-                                // Remove pending share
-                                for (var pendingUserId in M.ps[dirTree[selection]]) {
-                                    if (M.ps[dirTree[selection]].hasOwnProperty(pendingUserId)) {
-                                        api_req({ a: 's2', n:  dirTree[selection], s: [{ u: pendingUserId, r: ''}], ha: '', i: requesti });
-                                        M.deletePendingShare(dirTree[selection], pendingUserId);
+                                                if (!--ctx.delctx.pending) {
+                                                    M.moveNodes(ctx.delctx.selected, M.RubbishID);
+                                                }
+                                            }
+                                        });
+                            }
+
+                            // remove pending shares
+                            for (var pendingUserId in M.ps[h]) {
+                                var userEmailOrID = Object(M.opc[pendingUserId]).m || pendingUserId;
+                                delctx.pending++;
+                                api_req({
+                                    a: 's2',
+                                    n: h,
+                                    s: [{u: userEmailOrID, r: ''}],
+                                    ha: '',
+                                    i: requesti
+                                }, {
+                                    n: h,
+                                    u: pendingUserId,
+                                    delctx: delctx,
+                                    callback: function(res, ctx) {
+                                        if (typeof res == 'object') {
+                                            // FIXME: verify error codes in res.r
+                                            M.deletePendingShare(ctx.n, ctx.u);
+                                        }
+                                        else {
+                                            // FIXME: display error to user
+                                        }
+
+                                        if (!--ctx.delctx.pending) {
+                                            M.moveNodes(ctx.delctx.selected, M.RubbishID);
+                                        }
                                     }
-                                }
+                                });
                             }
                         }
-                        M.moveNodes($.selected, M.RubbishID);
-                    }
 
+                        if (!--delctx.pending) {
+                            M.moveNodes(delctx.selected, M.RubbishID);
+                        }
+                    }
                 }
             }, true);
         }
@@ -2394,7 +2436,7 @@ function fmremdupes(test)
 
 function initContextUI() {
 
-    var c = '.context-menu-item';
+    var c = '.context-menu .context-menu-item';
 
     $('.context-menu-section').off('mouseover', c);
     $('.context-menu-section').on('mouseover', c, function() {
@@ -2513,8 +2555,6 @@ function initContextUI() {
 
     $(c + '.getlink-item').rebind('click', function() {
 
-        var selectedNodeHandle;
-
         if (u_type === 0) {
             ephemeralDialog(l[1005]);
         }
@@ -2607,10 +2647,16 @@ function initContextUI() {
 
     $(c + '.startchat-item').rebind('click', function() {
         var $this = $(this);
-        var user_handle = $.selected && $.selected[0];
+        var user_handle = $.selected;
 
-        if (!$this.is(".disabled") && user_handle) {
-            window.location = "#fm/chat/" + user_handle;
+
+        if (user_handle.length === 1) {
+            if (!$this.is(".disabled") && user_handle) {
+                window.location = "#fm/chat/" + user_handle;
+            }
+        }
+        else {
+            megaChat.createAndShowGroupRoomFor(user_handle);
         }
     });
 
@@ -2691,7 +2737,7 @@ function initContextUI() {
                 fm_tfsmove(id, -1);
             });
         $('.transfer-table tr.ui-selected').removeClass('ui-selected');
-        Soon(fm_tfsupdate);
+        delay('fm_tfsupdate', fm_tfsupdate);
     });
 
     $(c + '.move-down').rebind('click', function() {
@@ -2702,7 +2748,7 @@ function initContextUI() {
                 fm_tfsmove(id, 1);
             });
         $('.transfer-table tr.ui-selected').removeClass('ui-selected');
-        Soon(fm_tfsupdate);
+        delay('fm_tfsupdate', fm_tfsupdate);
     });
 
     $(c + '.transfer-play').rebind('click', function() {
@@ -2919,7 +2965,16 @@ function fmtopUI() {
             $('.fm-file-upload').removeClass('hidden');
             if ((is_chrome_firefox & 2) || 'webkitdirectory' in document.createElement('input')) {
                 $('.fm-folder-upload').removeClass('hidden');
-            } else {
+            }
+            else if (ua.details.engine === 'Gecko') {
+                $('.fm-folder-upload').removeClass('hidden');
+                $('input[webkitdirectory], .fm-folder-upload input')
+                    .rebind('click', function() {
+                        firefoxDialog();
+                        return false;
+                    });
+            }
+            else {
                 $('.fm-file-upload').addClass('last-button');
             }
         }
@@ -3104,6 +3159,7 @@ function accountUI() {
 
             // Subscription
             if (account.stype == 'S') {
+
                 $('.fm-account-header.typetitle').text(l[434]);
                 if (account.scycle == '1 M') {
                     $('.membership-big-txt.type').text(l[748]);
@@ -3117,25 +3173,26 @@ function accountUI() {
 
                 // Get the date their subscription will renew
                 var timestamp = account.srenew[0];
-                var paymentType = htmlentities('(' + account.sgw.join(',') + ')');      // Credit card etc
+                var paymentType = (account.sgw.length > 0) ? account.sgw[0] : '';   // Credit Card etc
 
-                // Display the date their subscription will renew in format '14 March 2015 (credit card)'
+                // Display the date their subscription will renew if known
                 if (timestamp > 0) {
                     var date = new Date(timestamp * 1000);
-                    var dateString = l[6971] + ' ' + date.getDate() + ' ' + date_months[date.getMonth()] + ' ' + date.getFullYear();
-                    $('.membership-medium-txt.expiry').html(dateString + ' ' + paymentType);
+                    var dateString = l[6971] + ' ' + date.getDate() + ' ' + date_months[date.getMonth()] + ' '
+                                   + date.getFullYear();
+
+                    // Use format: 14 March 2015 - Credit Card
+                    paymentType = dateString + ' - ' + paymentType;
                 }
-                else {
-                    // Otherwise just show payment type
-                    $('.membership-medium-txt.expiry').html(paymentType);
-                }
+
+                // Otherwise just show payment type
+                $('.membership-medium-txt.expiry').text(paymentType);
 
                 // Check if there are any active subscriptions
                 // ccqns = Credit Card Query Number of Subscriptions
-                api_req({ a: 'ccqns' },
-                {
-                    callback : function(numOfSubscriptions, ctx)
-                    {
+                api_req({ a: 'ccqns' }, {
+                    callback : function(numOfSubscriptions, ctx) {
+
                         // If there is an active subscription
                         if (numOfSubscriptions > 0) {
 
@@ -3151,12 +3208,12 @@ function accountUI() {
             else if (account.stype == 'O') {
 
                 // one-time or cancelled subscription
-                $('.fm-account-header.typetitle').text(l[746]+':');
+                $('.fm-account-header.typetitle').text(l[746] + ':');
                 $('.membership-big-txt.type').text(l[751]);
-                $('.membership-medium-txt.expiry a').rebind('click', function() {
+                $('.membership-medium-txt.expiry').rebind('click', function() {
                     document.location = $(this).attr('href');
                 });
-                $('.membership-medium-txt.expiry a').html(l[987] + ' ' + time2date(account.expiry));
+                $('.membership-medium-txt.expiry').text(l[987] + ' ' + time2date(account.expiry));
                 $('.fm-account-blocks .btn-cancel').hide();
                 $('.subscription-bl').removeClass('active-subscription');
             }
@@ -3574,17 +3631,22 @@ function accountUI() {
         var html = '', sel = '';
         $('.default-select.country span').text(l[996]);
 
-        for (var country in isocountries) {
+        for (var country in isoCountries) {
+            if (!isoCountries.hasOwnProperty(country)) {
+                continue;
+            }
             if (u_attr.country && country == u_attr.country) {
                 sel = 'active';
-                $('.default-select.country span').text(isocountries[country]);
+                $('.default-select.country span').text(isoCountries[country]);
             }
             else {
                 sel = '';
             }
-            html += '<div class="default-dropdown-item ' + sel + '" data-value="' + country + '">' + isocountries[country] + '</div>';
+            html += '<div class="default-dropdown-item ' + sel + '" data-value="' + country + '">'
+                  +      isoCountries[country]
+                  + '</div>';
         }
-        $('.default-select.country .default-select-scroll').html(html);
+        $('.default-select.country .default-select-scroll').safeHTML(html);
 
         // Bind Dropdowns events
         bindDropdownEvents($('.fm-account-main .default-select'), 1);
@@ -3683,10 +3745,6 @@ function accountUI() {
             });
 
             var pws = zxcvbn($('#account-new-password').val());
-
-            if (typeof u_attr.bandwidthLimit === "number") {
-                api_req({"a":"up", "srvratio": Math.round(u_attr.bandwidthLimit) });
-            }
 
             if (M.account.dl_maxSlots)
             {
@@ -3914,19 +3972,51 @@ function accountUI() {
 
         // LITE/PRO account
         if (u_attr.p) {
-            // replace 50 (percents) by real value
-            api_req({ 'a': 'uq' }, {callback: function(response) {
-                var bandwidthLimit = Math.round(response.srvratio || 0);
-                $('.bandwith-settings').removeClass('hidden');
-                $('#bandwidth-slider').slider({
-                    min: 0, max: 100, range: 'min', value: bandwidthLimit, slide: function(e, ui) {
-                        $('.slider-percentage span').text(ui.value + ' %');
-                        $('.fm-account-save-block').removeClass('hidden');
-                        u_attr.bandwidthLimit = ui.value;
+            var bandwidthLimit = Math.round(account.servbw_limit | 0);
+
+            $('#bandwidth-slider').slider({
+                min: 0, max: 100, range: 'min', value: bandwidthLimit,
+                change: function(e, ui) {
+                    if (M.currentdirid === 'account/settings') {
+                        bandwidthLimit = ui.value;
+
+                        if (parseInt(localStorage.bandwidthLimit) !== bandwidthLimit) {
+
+                            var done = delay.bind(null, 'bandwidthLimit', function() {
+                                api_req({"a": "up", "srvratio": Math.round(bandwidthLimit)});
+                                localStorage.bandwidthLimit = bandwidthLimit;
+                            }, 2600);
+
+                            if (bandwidthLimit > 99) {
+                                msgDialog('warningb:!' + l[776], l[882], l[12689], 0, function(e) {
+                                    if (e) {
+                                        done();
+                                    }
+                                    else {
+                                        $('.slider-percentage span').text('0 %').removeClass('bold warn');
+                                        $('#bandwidth-slider').slider('value', 0);
+                                    }
+                                });
+                            }
+                            else {
+                                done();
+                            }
+                        }
                     }
-                });
-                $('.slider-percentage span').text(bandwidthLimit + ' %');
-            }});
+                },
+                slide: function(e, ui) {
+                    $('.slider-percentage span').text(ui.value + ' %');
+
+                    if (ui.value > 90) {
+                        $('.slider-percentage span').addClass('warn bold');
+                    }
+                    else {
+                        $('.slider-percentage span').removeClass('bold warn');
+                    }
+                }
+            });
+            $('.slider-percentage span').text(bandwidthLimit + ' %');
+            $('.bandwith-settings').removeClass('hidden');
         }
 
         $('#slider-range-max').slider({
@@ -4261,6 +4351,10 @@ function accountUI() {
         });
 
         if (M.account.reseller) {
+            var email = 'resellers@mega.nz';
+
+            $('.resellerbuy').attr('href', 'mailto:' + email)
+                .find('span').text(l[9106].replace('%1', email));
 
             // Use 'All' or 'Last 10/100/250' for the dropdown text
             var buttonText = ($.voucherlimit === 'all') ? l[7557] : l['466a'].replace('[X]', $.voucherlimit);
@@ -4530,7 +4624,38 @@ function avatarDialog(close)
     $.dialog = 'avatar';
     $('.fm-dialog.avatar-dialog').removeClass('hidden');
     fm_showoverlay();
-    $('.avatar-body').html('<div id="avatarcrop"><div class="image-upload-and-crop-container"><div class="image-explorer-container empty"><div class="image-explorer-image-view"><img class="image-explorer-source"><div class="avatar-white-bg"></div><div class="image-explorer-mask circle-mask"></div><div class="image-explorer-drag-delegate"></div></div><div class="image-explorer-scale-slider-wrapper"><input class="image-explorer-scale-slider disabled" type="range" min="0" max="100" step="1" value="0" disabled=""></div></div><div class="fm-notifications-bottom"><input type="file" id="image-upload-and-crop-upload-field" class="image-upload-field" accept="image/jpeg, image/gif, image/png"><label for="image-upload-and-crop-upload-field" class="image-upload-field-replacement fm-account-change-avatar"><span>' + l[1016] + '</span></label><div class="fm-account-change-avatar" id="fm-change-avatar"><span>' + l[1017] + '</span></div><div  class="fm-account-change-avatar" id="fm-cancel-avatar"><span>Cancel</span></div><div class="clear"></div></div></div></div>');
+    $('.avatar-body').safeHTML(
+        '<div id="avatarcrop">' +
+            '<div class="image-upload-and-crop-container">' +
+                '<div class="image-explorer-container empty">' +
+                    '<div class="image-explorer-image-view">' +
+                        '<img class="image-explorer-source" />' +
+                        '<div class="avatar-white-bg"></div>' +
+                        '<div class="image-explorer-mask circle-mask"></div>' +
+                        '<div class="image-explorer-drag-delegate"></div>' +
+                    '</div>' +
+                    '<div class="image-explorer-scale-slider-wrapper">' +
+                        '<input class="image-explorer-scale-slider disabled" type="range" ' +
+                            'min="0" max="100" step="1" value="0" disabled="" />' +
+                    '</div>' +
+                '</div>' +
+                '<div class="fm-notifications-bottom">' +
+                    '<input type="file" id="image-upload-and-crop-upload-field" class="image-upload-field" ' +
+                        'accept="image/jpeg, image/gif, image/png" />' +
+                    '<label for="image-upload-and-crop-upload-field" ' +
+                        'class="image-upload-field-replacement fm-account-change-avatar">' +
+                        '<span>@@</span>' +
+                    '</label>' +
+                    '<div class="fm-account-change-avatar" id="fm-change-avatar">' +
+                        '<span>@@</span>' +
+                    '</div>' +
+                    '<div  class="fm-account-change-avatar" id="fm-cancel-avatar">' +
+                        '<span>@@</span>' +
+                    '</div>' +
+                    '<div class="clear"></div>' +
+                '</div>' +
+            '</div>' +
+        '</div>', l[1016], l[1017], l[82]);
     $('#fm-change-avatar').hide();
     $('#fm-cancel-avatar').hide();
     var imageCrop = new ImageUploadAndCrop($("#avatarcrop").find('.image-upload-and-crop-container'),
@@ -4586,7 +4711,6 @@ function gridUI() {
             headerColumn = $('.grid-table-header th').get(i);
             $(headerColumn).width($(e).width());
         });
-        initTransferScroll();
     };
 
     $.detailsGridHeader = function() {
@@ -4595,7 +4719,6 @@ function gridUI() {
             headerColumn = $('.contact-details-view .grid-table-header th').get(i);
             $(headerColumn).width($(e).width());
         });
-        initTransferScroll();
     };
 
     $.contactGridHeader = function() {
@@ -4613,7 +4736,6 @@ function gridUI() {
             headerColumn = $('.files-grid-view.contacts-view .grid-table-header th').get(i);
             $(headerColumn).width($(e).width());
         });
-        initTransferScroll();
     };
 
     $.opcGridHeader = function() {
@@ -4631,7 +4753,6 @@ function gridUI() {
             headerColumn = $('.sent-requests-grid .grid-table-header th').get(i);
             $(headerColumn).width($(e).width());
         });
-        initTransferScroll();
     };
 
     $.ipcGridHeader = function() {
@@ -4649,7 +4770,6 @@ function gridUI() {
             headerColumn = $('.contact-requests-grid .grid-table-header th').get(i);
             $(headerColumn).width($(e).width());
         });
-        initTransferScroll();
     };
 
     $.sharedGridHeader = function() {
@@ -4667,7 +4787,6 @@ function gridUI() {
             headerColumn = $('.shared-grid-view .grid-table-header th').get(i);
             $(headerColumn).width($(e).width());
         });
-        initTransferScroll();
     };
 
     $('.fm-blocks-view.fm').addClass('hidden');
@@ -4726,7 +4845,7 @@ function gridUI() {
         return !!contextMenuUI(e, 6);
     });
 
-    $('.files-grid-view,.fm-empty-cloud').rebind('contextmenu', function(e) {
+    $('.files-grid-view, .fm-empty-cloud, .fm-empty-folder').rebind('contextmenu.fm', function(e) {
         $('.file-block').removeClass('ui-selected');
         $.selected = [];
         $.hideTopMenu();
@@ -5242,6 +5361,7 @@ var selectionManager;
 function UIkeyevents() {
     $(window).unbind('keydown.uikeyevents');
     $(window).bind('keydown.uikeyevents', function(e) {
+
         if (e.keyCode == 9 && !$(e.target).is("input,textarea,select")) {
             return false;
         }
@@ -5259,7 +5379,7 @@ function UIkeyevents() {
             return true;
         }
 
-        if (!is_fm() && (page !== 'login')) {
+        if (!is_fm() && (page !== 'login') && (page.substr(0, 3) !== 'pro')) {
             return true;
         }
 
@@ -5340,9 +5460,9 @@ function UIkeyevents() {
 
                 $target.addClass("ui-selected");
                 selectionManager.set_currently_selected($target);
-
             }
         }
+
         if ((e.keyCode == 38) && (s.length > 0) && ($.selectddUIgrid.indexOf('.grid-scrolling-table') > -1) && !$.dialog) {
 
             // up in grid
@@ -5422,9 +5542,13 @@ function UIkeyevents() {
         else if ((e.keyCode === 13) && ($.dialog === 'add-contact-popup')) {
             addNewContact($('.add-user-popup-button.add'));
         }
-
         else if ((e.keyCode === 13) && ($.dialog === 'rename')) {
             doRename();
+        }
+
+        // If the Esc key is pressed while the payment address dialog is visible, close it
+        else if ((e.keyCode === 27) && !$('.payment-address-dialog').hasClass('hidden')) {
+            addressDialog.closeDialog();
         }
         else if (e.keyCode == 27 && ($.copyDialog || $.moveDialog || $.copyrightsDialog)) {
             closeDialog();
@@ -5879,38 +6003,39 @@ function iconUI(aQuiet)
 
 function transferPanelUI()
 {
-    $.transferHeader = function()
+    $.transferHeader = function(tfse)
     {
-        var tt = $('.transfer-scrolling-table'),
-              tth = $('.transfer-table-header');
+        tfse                  = tfse || M.getTransferElements();
+        var domTableEmptyTxt  = tfse.domTableEmptyTxt;
+        var domTableHeader    = tfse.domTableHeader;
+        var domScrollingTable = tfse.domScrollingTable;
+        var domTable          = tfse.domTable;
+        tfse                  = undefined;
 
         // Show/Hide header if there is no items in transfer list
-        if (!$('.transfer-table tr').length)
-        {
-            $('.transfer-panel-empty-txt').removeClass('hidden');
-            tt.hide(0);
-            tth.hide(0);
+        if (domTable.querySelector('tr')) {
+            domTableEmptyTxt.classList.add('hidden');
+            domScrollingTable.style.display = '';
+            domTableHeader.style.display    = '';
         }
-        else
-        {
-            $('.transfer-panel-empty-txt').addClass('hidden');
-            tt.show(0);
-            tth.show(0);
+        else {
+            domTableEmptyTxt.classList.remove('hidden');
+            domScrollingTable.style.display = 'none';
+            domTableHeader.style.display    = 'none';
         }
 
-        $('.transfer-scrolling-table').rebind('click contextmenu', function(e)
-        {
+        $(domScrollingTable).rebind('click.tst contextmenu.tst', function(e) {
             if (!$(e.target).closest('.transfer-table').length) {
-                $('.transfer-table tr').removeClass('ui-selected');
+                $('.ui-selected', domTable).removeClass('ui-selected');
             }
         });
 
-        var $ttw = $('.transfer-table-wrapper .grid-url-arrow, .transfer-table-wrapper .clear-transfer-icon');
-        $ttw.rebind('click', function(e) {
+        var $tmp = $('.grid-url-arrow, .clear-transfer-icon', domTable);
+        $tmp.rebind('click', function(e) {
             var target = $(this).closest('tr');
             e.preventDefault();
             e.stopPropagation(); // do not treat it as a regular click on the file
-            $('.transfer-table-wrapper tr').removeClass('ui-selected');
+            $('tr', domTable).removeClass('ui-selected');
 
             if ($(this).hasClass('grid-url-arrow')) {
                 target.addClass('ui-selected');
@@ -5931,10 +6056,12 @@ function transferPanelUI()
                     $.tresizer();
                 });
             }
-        });
-        $ttw = undefined;
 
-        $('.transfer-table tr').rebind('dblclick', function(e) {
+            return false;
+        });
+
+        $tmp = $('tr', domTable);
+        $tmp.rebind('dblclick', function(e) {
             if ($(this).hasClass('transfer-completed')) {
                 var id = String($(this).attr('id'));
                 if (id[0] === 'd') {
@@ -5953,30 +6080,25 @@ function transferPanelUI()
                     reselect(1);
                 }
             }
+            return false;
         });
 
-        $('.transfer-table tr').rebind('click contextmenu', function(e)
+        $tmp.rebind('click contextmenu', function(e)
         {
-            $('.ui-selected').filter(function() {
-                return $(this).parent('.transfer-table').length;
-            }).removeClass('ui-selected');
-
             if (e.type == 'contextmenu')
             {
-                var c = $(this).attr('class');
-                if (!c || (c && c.indexOf('ui-selected') == -1))
-                    $('.transfer-table tr').removeClass('ui-selected');
+                $('.ui-selected', domTable).removeClass('ui-selected');
                 $(this).addClass('ui-selected dragover');
                 transferPanelContextMenu(null);
                 return !!contextMenuUI(e);
             }
             else
             {
-                var s = $('.transfer-table tr');
-                if (e.shiftKey && s.length > 0)
+                var domNode = domTable.querySelector('tr');
+                if (e.shiftKey && domNode)
                 {
-                    var start = s[0];
-                    var end = this;
+                    var start = domNode;
+                    var end   = this;
                     if ($.TgridLastSelected && $($.TgridLastSelected).hasClass('ui-selected')) {
                         start = $.TgridLastSelected;
                     }
@@ -5984,7 +6106,7 @@ function transferPanelUI()
                         end = start;
                         start = this;
                     }
-                    $('.transfer-table tr').removeClass('ui-selected');
+                    $('.ui-selected', domTable).removeClass('ui-selected');
                     $([start, end]).addClass('ui-selected');
                     $(start).nextUntil($(end)).each(function(i, e) {
                         $(e).addClass('ui-selected');
@@ -5992,7 +6114,7 @@ function transferPanelUI()
                 }
                 else if (!e.ctrlKey && !e.metaKey)
                 {
-                    $('.transfer-table tr').removeClass('ui-selected');
+                    $('.ui-selected', domTable).removeClass('ui-selected');
                     $(this).addClass('ui-selected');
                     $.TgridLastSelected = this;
                 }
@@ -6007,33 +6129,43 @@ function transferPanelUI()
                     }
                 }
             }
+
+            return false;
         });
-        initTransferScroll();
+        $tmp = undefined;
+
+        // initTransferScroll(domScrollingTable);
+        delay('tfs-ps-update', Ps.update.bind(Ps, domScrollingTable));
     };
 
     $.transferClose = function() {
         $('.nw-fm-left-icon.transfers').removeClass('active');
-        $('.fmholder').removeClass('transfer-panel-opened');
+        $('#fmholder').removeClass('transfer-panel-opened');
     };
 
     $.transferOpen = function(force) {
         if (force || !$('.nw-fm-left-icon.transfers').hasClass('active')) {
             $('.nw-fm-left-icon').removeClass('active');
             $('.nw-fm-left-icon.transfers').addClass('active');
-            notificationsUI(1);
             $('#fmholder').addClass('transfer-panel-opened');
+            notificationsUI(1);
+            var domScrollingTable = M.getTransferElements().domScrollingTable;
+            if (!domScrollingTable.classList.contains('ps-container')) {
+                Ps.initialize(domScrollingTable, {suppressScrollX: true});
+            }
             fm_tfsupdate(); // this will call $.transferHeader();
         }
     };
 
     $.clearTransferPanel = function() {
-        if ($('.transfer-table tr').length === 0) {
+        var obj = M.getTransferElements();
+        if (!obj.domTable.querySelector('tr')) {
             $('.transfer-clear-all-icon').addClass('disabled');
             $('.transfer-pause-icon').addClass('disabled');
             $('.transfer-clear-completed').addClass('disabled');
             $('.transfer-table-header').hide();
             $('.transfer-panel-empty-txt').removeClass('hidden');
-            $('.transfer-panel-title').html(l[104]);
+            $('.transfer-panel-title').text(l[104]);
             $('.nw-fm-left-icon.transfers').removeClass('transfering').find('p').removeAttr('style');
             if (M.currentdirid === 'transfers') {
                 fm_tfsupdate();
@@ -6166,10 +6298,10 @@ function menuItems() {
         items['.add-star-item'] = 1;
 
         if (M.isFavourite($.selected)) {
-            $('.add-star-item').html('<span class="context-menu-icon"></span>' + l[5872]);
+            $('.add-star-item').safeHTML('<span class="context-menu-icon"></span>@@', l[5872]);
         }
         else {
-            $('.add-star-item').html('<span class="context-menu-icon"/></span>' + l[5871]);
+            $('.add-star-item').safeHTML('<span class="context-menu-icon"/></span>@@', l[5871]);
 
         }
     }
@@ -6318,26 +6450,45 @@ function contextMenuUI(e, ll) {
         id = $(e.currentTarget).attr('id');
 
         if (id) {
-            id = id.replace('treea_', '');// if right clicked on left panel
+
+            // Contacts left panel click
+            if (id.indexOf('contact_') !== -1) {
+                id = id.replace('contact_', '');
+            }
+
+            // File manager left panel click
+            else if (id.indexOf('treea_') !== -1) {
+                id = id.replace('treea_', '');
+            }
         }
 
         if (id && !M.d[id]) {
-            id = undefined;// exist in node list
+
+            // exist in node list
+            id = undefined;
         }
 
         // In case that id belongs to contact, 11 char length
         if (id && (id.length === 11)) {
-            $(menuCMI).filter('.remove-item,.startchat-item,.startaudio-item,.startvideo-item').show();// transfer panel
+            flt = '.remove-item';
+            if (!window.megaChatIsDisabled) {
+                flt += ',.startchat-item,.startaudio-item,.startvideo-item';
+            }
+            $(menuCMI).filter(flt).show();
 
             $(menuCMI).filter('.startaudio-item,.startvideo-item').removeClass('disabled');
 
             // If selected contact is offline make sure that audio and video calls are forbiden (disabled)
-            if ($('#' + id).find('.offline').length) {
+            if ($('#' + id).find('.offline').length || $.selected.length > 1) {
                 $(menuCMI).filter('.startaudio-item').addClass('disabled');
                 $(menuCMI).filter('.startvideo-item').addClass('disabled');
             }
+
+            // Remove select-all item from context menu
+            $(m).find('.select-all').remove();
         }
-        else if (currNodeClass && (currNodeClass.indexOf('cloud-drive') > -1 || currNodeClass.indexOf('folder-link') > -1)) {
+        else if (currNodeClass && (currNodeClass.indexOf('cloud-drive') > -1
+                    || currNodeClass.indexOf('folder-link') > -1)) {
             flt = '.properties-item';
             if (folderlink) {
                 flt += ',.import-item';
@@ -6823,8 +6974,7 @@ function treeUI()
             $(e.target).parents('.fm-breadcrumbs').length ||
             $(e.target).hasClass('contact-details-user-name') ||
             $(e.target).hasClass('contact-details-email') ||
-            $(e.target).hasClass('nw-conversations-name') ||
-            ($(e.target).hasClass('nw-contact-name') && $(e.target).parents('.fm-tree-panel').length)) {
+            $(e.target).hasClass('nw-conversations-name')) {
             return;
         } else if (!localStorage.contextmenu) {
             $.hideContextMenu();
@@ -6877,6 +7027,21 @@ function treeUI()
         }
 
         return false;
+    });
+
+    $('.fm-tree-panel .nw-contact-item').rebind('contextmenu.treeUI', function(e) {
+        var $self = $(this);
+
+        if ($self.attr('class').indexOf('selected') === -1) {
+            $('.content-panel.contacts .nw-contact-item.selected').removeClass('selected');
+            $self.addClass('selected');
+        }
+
+        $.selected = [$self.attr('id').replace('contact_', '')];
+        searchPath();
+        $.hideTopMenu();
+
+        return Boolean(contextMenuUI(e, 1));
     });
 
     /**
@@ -7059,7 +7224,12 @@ function sectionUIopen(id) {
             headertxt = l[5915];
             break;
         case 'cloud-drive':
-            headertxt = l[5916];
+            if (folderlink) {
+                headertxt = Object(M.d[M.RootID]).name || '';
+            }
+            else {
+                headertxt = l[5916];
+            }
             break;
         case 'inbox':
             headertxt = l[949];
@@ -7069,9 +7239,7 @@ function sectionUIopen(id) {
             break;
     }
 
-    if (!folderlink) {
-        $('.fm-left-panel .nw-tree-panel-header span').text(headertxt);
-    }
+    $('.fm-left-panel .nw-tree-panel-header span').text(headertxt);
 
     {
         // required tricks to make the conversations work with the old UI HTML/css structure
@@ -7308,6 +7476,7 @@ function doRename() {
 }
 
 function msgDialog(type, title, msg, submsg, callback, checkbox) {
+    var doneButton  = l[81];
     var extraButton = String(type).split(':');
     if (extraButton.length === 1) {
         extraButton = null;
@@ -7315,6 +7484,11 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
     else {
         type = extraButton.shift();
         extraButton = extraButton.join(':');
+
+        if (extraButton[0] === '!') {
+            doneButton  = l[82];
+            extraButton = extraButton.substr(1);
+        }
     }
     $.msgDialog = type;
     $.warningCallback = callback;
@@ -7370,7 +7544,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
             $('#msgDialog .fm-notifications-bottom')
                 .safeHTML('<div class="fm-dialog-button notification-button confirm"><span>@@</span></div>' +
                     '<div class="fm-dialog-button notification-button cancel"><span>@@</span></div>' +
-                    '<div class="clear"></div>', l[81], extraButton);
+                    '<div class="clear"></div>', doneButton, extraButton);
 
             $('#msgDialog .fm-dialog-button').eq(0).bind('click', function() {
                 closeMsg();
@@ -7808,41 +7982,31 @@ function fillShareDialogWithContent() {
     $.changedPermissions = [];// GLOBAL VAR, changed permissions shared dialog
     $.removedContactsFromShare = [];// GLOBAL VAR, removed contacts from a share
 
-    var user, email, name, shareRights, html,
-        selectedNodeHandle = $.selected[0],
-        shares = M.d[selectedNodeHandle].shares,
-        pendingShares = M.ps[selectedNodeHandle];
+    var pendingShares = {};
+    var nodeHandle    = String($.selected[0]);
+    var node          = M.getNodeByHandle(nodeHandle);
+    var userHandles   = M.getNodeShareUsers(node, 'EXP');
 
-    // List users that are already use item
-    for (var userHandle in shares) {
-        if (shares.hasOwnProperty(userHandle)) {
-
-            if (Object(M.u).hasOwnProperty(userHandle)) {
-                user = M.u[userHandle];
-                email = user.m;
-                name = M.getNameByHandle(userHandle);
-                shareRights = shares[userHandle].r;
-
-                generateShareDialogRow(name, email, shareRights, userHandle);
-            }
-        }
+    if (Object(M.ps).hasOwnProperty(nodeHandle)) {
+        pendingShares = Object(M.ps[nodeHandle]);
+        userHandles   = userHandles.concat(Object.keys(pendingShares));
     }
+    var seen = {};
 
-    // Pending contact requests (pcr)
-    if (pendingShares) {
-        for (var pcrHandle in pendingShares) {
-            if (pendingShares.hasOwnProperty(pcrHandle)) {
+    userHandles.forEach(function(handle) {
+        var user = M.getUser(handle) || Object(M.opc[handle]);
 
-                // Because it's pending, we don't have user information in M.u so we have to look in the pending contact request
-                if (M.opc[pendingShares[pcrHandle].p]) {
-                    var pendingContactRequest = M.opc[pendingShares[pcrHandle].p];
-
-                    // ToDo: take care of name attribute once available
-                    generateShareDialogRow(pendingContactRequest.m, pendingContactRequest.m, pendingShares[pcrHandle].r);
-                }
-            }
+        if (!user.m) {
+            console.warn('Unknown user "%s"!', handle);
         }
-    }
+        else if (!seen[user.m]) {
+            var name  = M.getNameByHandle(handle) || user.m;
+            var share = M.getNodeShare(node, handle) || Object(pendingShares[handle]);
+
+            generateShareDialogRow(name, user.m, share.r | 0, handle);
+            seen[user.m] = 1;
+        }
+    });
 }
 
 /**
@@ -7916,7 +8080,7 @@ function handleShareDialogContent() {
 
     $('.share-dialog-icon.permissions-icon')
         .removeClass('active full-access read-and-write')
-        .html('<span></span>' + l[55])
+        .safeHTML('<span></span>' + l[55])
         .addClass('read-only');
 
     // Update dialog title text
@@ -8227,9 +8391,9 @@ function initShareDialog() {
 
     $.shareTokens = [];
 
-    if (!u_type) {
+    /*if (!u_type) {
         return; // not for ephemeral
-    }
+    }*/
 
     // Prevents double initialization of token input
     if (!$('.share-multiple-input').tokenInput("getSettings")) {
@@ -8322,7 +8486,7 @@ function initShareDialog() {
         if (handleOrEmail !== '') {
 
             // Due to pending shares, the id could be an email instead of a handle
-            userEmail = handleOrEmail;
+            userEmail = Object(M.opc[handleOrEmail]).m || handleOrEmail;
 
             $.removedContactsFromShare.push({
                 'selectedNodeHandle': selectedNodeHandle,
@@ -8438,7 +8602,7 @@ function initShareDialog() {
             $itemPermLevel
                 .removeClass(currPermLevel[0])
                 .removeClass('active')
-                .html('<span></span>' + newPermLevel[1])
+                .safeHTML('<span></span>@@', newPermLevel[1])
                 .addClass(newPermLevel[0]);
         }
         else if ($groupPermLevel.length) {// Group permission change, .permissions-icon
@@ -8466,14 +8630,14 @@ function initShareDialog() {
             $groupPermLevel
                 .removeClass(currPermLevel[0])
                 .removeClass('active')
-                .html('<span></span>' + newPermLevel[1])
+                .safeHTML('<span></span>@@', newPermLevel[1])
                 .addClass(newPermLevel[0]);
 
             /*$('.share-dialog-contact-bl .share-dialog-permissions')
                 .removeClass('read-only')
                 .removeClass('read-and-write')
                 .removeClass('full-access')
-                .html('<span></span>' + newPermLevel[1])
+                .safeHTML('<span></span>@@', newPermLevel[1])
                 .addClass(newPermLevel[0]);*/
         }
 
@@ -8590,6 +8754,14 @@ function closeDialog() {
     if ($('.fm-dialog.incoming-call-dialog').is(':visible') === true) {
         // managing dialogs should be done properly in the future, so that we won't need ^^ bad stuff like this one
         return false;
+    }
+
+    if ($.dialog === 'passwordlink-dialog') {
+        if (String(page).substr(0, 2) === 'P!') {
+            // do nothing while on the password-link page
+            return false;
+        }
+        $('.fm-dialog.password-dialog').addClass('hidden');
     }
 
     if ($.dialog === 'createfolder' && ($.copyDialog || $.moveDialog)) {
@@ -9675,6 +9847,85 @@ browserDialog.isWeak = function() {
 /* jshint -W074 */
 function propertiesDialog(close) {
 
+    /*
+    * fillPropertiesContactList, Handles node properties/info dialog contact list content
+    *
+    * @param {Object} shares Node related shares
+    * @param {Object} pendingShares Node related pending shares
+    * @param {Number} totalSharesNum
+    */
+    var fillPropertiesContactList = function(shares, pendingShares, totalSharesNum) {
+
+        var DEFAULT_CONTACTS_NUMBER = 5;
+        var counter = 0;
+        var tmpStatus = '';
+        var onlinestatus = '';
+        var user;
+        var hiddenClass = '';
+        var $shareUsers = pd.find('.properties-body .properties-context-menu')
+                        .empty()
+                        .append('<div class="properties-context-arrow"></div>');
+        var shareUsersHtml = '';
+
+        // Add contacts with full contact relation
+        for (var userId in shares) {
+            if (shares.hasOwnProperty(userId)) {
+
+                if (++counter <= DEFAULT_CONTACTS_NUMBER) {
+                    hiddenClass = '';
+                }
+                else {
+                    hiddenClass = 'hidden';
+                }
+
+                if (M.u[userId]) {
+                    user = M.u[userId];
+                    tmpStatus = megaChatIsReady && megaChat.karere.getPresence(megaChat.getJidFromNodeId(user.u));
+                    onlinestatus = M.onlineStatusClass(tmpStatus);
+                    shareUsersHtml += '<div class="properties-context-item '
+                        + onlinestatus[1] + ' ' +  hiddenClass + '">'
+                        + '<div class="properties-contact-status"></div>'
+                        + '<span>' + htmlentities(user.name || user.m) + '</span>'
+                        + '</div>';
+                }
+            }
+        }
+
+        // Add outgoing pending contacts for node handle [n.h]
+        for (userId in pendingShares) {
+            if (pendingShares.hasOwnProperty(userId)) {
+
+                if (++counter <= DEFAULT_CONTACTS_NUMBER) {
+                    hiddenClass = '';
+                }
+                else {
+                    hiddenClass = 'hidden';
+                }
+
+                if (M.opc[userId]) {
+                    user = M.opc[userId];
+                    shareUsersHtml += '<div class="properties-context-item offline ' + hiddenClass + '">'
+                        + '<div class="properties-contact-status"></div>'
+                        + '<span>' + htmlentities(user.m) + '</span>'
+                        + '</div>';
+                }
+            }
+        }
+
+        var hiddenNum = totalSharesNum - DEFAULT_CONTACTS_NUMBER;
+        var repStr = l[10663];// '... and [X] more';
+
+        if (hiddenNum > 0) {
+            shareUsersHtml += '<div class="properties-context-item show-more">'
+                + '<span>...' + repStr.replace('[X]', hiddenNum) + '</span>'
+                + '</div>';
+        }
+
+        if (shareUsersHtml !== '') {
+            $shareUsers.append(shareUsersHtml);
+        }
+    };// END of fillPropertiesContactList function
+
     var pd = $('.fm-dialog.properties-dialog');
     var c = $('.properties-elements-counter span');
 
@@ -9724,6 +9975,7 @@ function propertiesDialog(close) {
 
     $('.properties-elements-counter span').text('');
     $('.fm-dialog.properties-dialog .properties-body').rebind('click', function() {
+
         // Clicking anywhere in the dialog will close the context-menu, if open
         var e = $('.fm-dialog.properties-dialog .file-settings-icon');
         if (e.hasClass('active'))
@@ -9737,28 +9989,26 @@ function propertiesDialog(close) {
     var filecnt = 0, foldercnt = 0, size = 0, sfilecnt = 0, sfoldercnt = 0, n;
 
     for (var i in $.selected) {
-        if ($.selected.hasOwnProperty(i)) {
-            n = M.d[$.selected[i]];
-            if (!n) {
-                console.error('propertiesDialog: invalid node', $.selected[i]);
-            }
-            else if (n.t) {
-                var nodes = fm_getnodes(n.h);
-                for (i in nodes) {
-                    if (M.d[nodes[i]] && !M.d[nodes[i]].t) {
-                        size += M.d[nodes[i]].s;
-                        sfilecnt++;
-                    }
-                    else {
-                        sfoldercnt++;
-                    }
+        n = M.d[$.selected[i]];
+        if (!n) {
+            console.error('propertiesDialog: invalid node', $.selected[i]);
+        }
+        else if (n.t) {
+            var nodes = fm_getnodes(n.h);
+            for (var j = 0; j < nodes.length; j++) {
+                if (M.d[nodes[j]] && !M.d[nodes[j]].t) {
+                    size += M.d[nodes[j]].s;
+                    sfilecnt++;
                 }
-                foldercnt++;
+                else {
+                    sfoldercnt++;
+                }
             }
-            else {
-                filecnt++;
-                size += n.s;
-            }
+            foldercnt++;
+        }
+        else {
+            filecnt++;
+            size += n.s;
         }
     }
     if (!n) {
@@ -9839,38 +10089,26 @@ function propertiesDialog(close) {
             p.t6 = l[897] + ':';
             p.t7 = fm_contains(sfilecnt, sfoldercnt);
             if (pd.attr('class').indexOf('shared') > -1) {
-                var shares, susers, total = 0
-                shares = Object.keys(n.shares || {}).length
-                p.t8 = l[1036] + ':';
-                p.t9 = shares == 1 ? l[990] : l[989].replace("[X]", shares);
-                p.t11 = n.ts ? htmlentities(time2date(n.ts)) : '';
-                p.t10 = p.t11 ? l[896] : '';
-                $('.properties-elements-counter span').text(typeof n.r == "number" ? '' : shares);
-                susers = pd.find('.properties-body .properties-context-menu')
-                    .empty()
-                    .append('<div class="properties-context-arrow"></div>')
-                for (var u in n.shares) {
-                    if (M.u[u]) {
-                        var u = M.u[u]
-                        var onlinestatus = M.onlineStatusClass(megaChatIsReady && megaChat.karere.getPresence(megaChat.getJidFromNodeId(u.u)));
-                        if (++total <= 5)
-                            susers.append('<div class="properties-context-item ' + onlinestatus[1] + '">'
-                                + '<div class="properties-contact-status"></div>'
-                                + '<span>' + htmlentities(u.name || u.m) + '</span>'
-                                + '</div>');
-                    }
-                }
 
-                if (total > 5) {
-                    susers.append(
-                        '<div class="properties-context-item show-more">'
-                        + '<span>... and ' + (total - 5) + ' more</span>'
-                        + '</div>'
-                        );
-                }
+                var fullSharesNum = Object.keys(n.shares || {}).length;
+                var pendingSharesNum = Object.keys(M.ps[n.h] || {}).length;
+                var totalSharesNum = fullSharesNum + pendingSharesNum;
 
-                if (total == 0)
+                // In case that user doesn't share with other
+                // Or in case that more then one node is selected
+                // Do NOT show contact informations in property dialog
+                if ((totalSharesNum === 0) || ($.selected.length > 1)) {
                     p.hideContacts = true;
+                }
+                else {
+                    p.t8 = l[1036] + ':';
+                    p.t9 = (totalSharesNum === 1) ? l[990] : l[989].replace("[X]", totalSharesNum);
+                    p.t11 = n.ts ? htmlentities(time2date(n.ts)) : '';
+                    p.t10 = p.t11 ? l[896] : '';
+                    $('.properties-elements-counter span').text(typeof n.r === "number" ? '' : totalSharesNum);
+
+                    fillPropertiesContactList(n.shares, M.ps[n.h], totalSharesNum);
+                }
             }
             if (pd.attr('class').indexOf('shared-with-me') > -1) {
                 p.t3 = l[64];
@@ -9954,8 +10192,7 @@ function propertiesDialog(close) {
     }
 
     if (pd.attr('class').indexOf('shared') > -1) {
-        $('.contact-list-icon').unbind('click');
-        $('.contact-list-icon').bind('click', function() {
+        $('.contact-list-icon').rebind('click', function() {
             if ($(this).attr('class').indexOf('active') == -1) {
                 $(this).addClass('active');
                 $('.properties-context-menu').css({
@@ -9968,11 +10205,42 @@ function propertiesDialog(close) {
                 $(this).removeClass('active');
                 $('.properties-context-menu').fadeOut(200);
             }
+
+            return false;
         });
-        $('.properties-context-item').unbind('click');
-        $('.properties-context-item').bind('click', function() {
+
+        $('.properties-dialog').rebind('click', function() {
+            var $list = $('.contact-list-icon');
+            if ($list.attr('class').indexOf('active') !== -1) {
+                $list.removeClass('active');
+                $('.properties-context-menu').fadeOut(200);
+            }
+        });
+
+        // ToDo: Can we redirects to contacts page when user clicks?
+        $('.properties-context-item').rebind('click', function(e) {
             $('.contact-list-icon').removeClass('active');
             $('.properties-context-menu').fadeOut(200);
+        });
+
+        // Expands properties-context-menu so rest of contacts can be shown
+        // By default only 5 contacts is shown
+        $('.properties-context-item.show-more').rebind('click', function() {
+
+            // $('.properties-context-menu').fadeOut(200);
+            $('.properties-dialog .properties-context-item')
+                .remove('.show-more')
+                .removeClass('hidden');// un-hide rest of contacts
+
+            var $cli = $('.contact-list-icon');
+            $('.properties-context-menu').css({
+                'left': $cli.position().left + 8 + 'px',
+                'top': $cli.position().top - $('.properties-context-menu').outerHeight() - 8 + 'px',
+                'margin-left': '-' + $('.properties-context-menu').width() / 2 + 'px'
+            });
+            // $('.properties-context-menu').fadeIn(200);
+
+            return false;// Prevent bubbling
         });
     }
 
@@ -10299,7 +10567,7 @@ function fetchsrc(id)
 
     preqs[id] = 1;
     var treq = {};
-    treq[id] = {fa: n.fa, k: n.key};
+    treq[id] = {fa: n.fa, k: n.k};
     api_getfileattr(treq, 1, function(ctx, id, uint8arr)
     {
         previewimg(id, uint8arr);
@@ -10308,10 +10576,10 @@ function fetchsrc(id)
                 console.log('Thumbnail found missing on preview, creating...', id, n);
             }
             var aes = new sjcl.cipher.aes([
-                n.key[0] ^ n.key[4],
-                n.key[1] ^ n.key[5],
-                n.key[2] ^ n.key[6],
-                n.key[3] ^ n.key[7]]);
+                n.k[0] ^ n.k[4],
+                n.k[1] ^ n.k[5],
+                n.k[2] ^ n.k[6],
+                n.k[3] ^ n.k[7]]);
             createnodethumbnail(n.h, aes, id, uint8arr);
         }
         if (id == slideshowid)
@@ -10412,7 +10680,7 @@ function fm_thumbnails()
                     treq[n.h] =
                         {
                             fa: n.fa,
-                            k: n.key
+                            k: n.k
                         };
                     th_requested[n.h] = 1;
 
@@ -10537,7 +10805,11 @@ function fm_importflnodes(nodes)
             document.location.hash = 'fm';
 
             $(document).one('onInitContextUI', SoonFc(function(e) {
-                if (ASSERT(M.RootID != FLRootID, 'Unexpected openFolder on Import')) {
+                if (M.RootID === FLRootID) {
+                    // TODO: How to reproduce this?
+                    console.warn('Unable to complete import, apparnetly we did not reached the cloud.');
+                }
+                else {
                     if (d) console.log('Importing Nodes...', sel, $.onImportCopyNodes);
 
                     $.selected = sel;
@@ -10596,35 +10868,32 @@ function fm_resize_handler() {
         console.time('fm_resize_handler');
     }
 
-    mega.utils.chrome110ZoomLevelNotification();
+    if (window.chrome) {
+        // XXX: Seems this 110% zoom bug got fixed as of Chrome 54?
+        mega.utils.chrome110ZoomLevelNotification();
+    }
 
-    $('.transfer-scrolling-table').css({
-        'height': (
-             $('.fm-transfers-block').outerHeight()
-                - $('.transfer-table-header').outerHeight()
-                - $('.fm-tranfers-header').outerHeight()
-        ) + "px"
-    });
+    if (ulmanager.isUploading || dlmanager.isDownloading) {
+        var tfse = M.getTransferElements();
 
-    // left panel resize logic
-    /*
-    var right_panel_margin = $('.fm-left-panel').outerWidth();
-     var resize_handle_width = $('.left-pane-drag-handle').outerWidth();
-     $('.fm-main.default > div:not(.fm-left-panel)').each(function() {
+        if (tfse) {
+            tfse.domScrollingTable.style.height = (
+                    $(tfse.domTransfersBlock).outerHeight() -
+                    $(tfse.domTableHeader).outerHeight() -
+                    $(tfse.domTransferHeader).outerHeight()
+                ) + "px";
+        }
+    }
 
-     $(this).css({
-     'margin-left':  right_panel_margin
-     });
-     });
-     */
+    if (M.currentdirid !== 'transfers') {
+        $('.files-grid-view .grid-scrolling-table, .file-block-scrolling,' +
+            ' .contacts-grid-view .contacts-grid-scrolling-table')
+            .css({
+                'width': $(document.body).outerWidth() - $('.fm-left-panel').outerWidth()
+            });
 
-    $('.files-grid-view .grid-scrolling-table, .file-block-scrolling,' +
-        ' .contacts-grid-view .contacts-grid-scrolling-table')
-        .css({
-            'width': $(document.body).outerWidth() - $('.fm-left-panel').outerWidth()
-        });
-
-    initTreeScroll();
+        initTreeScroll();
+    }
 
     if (M.currentdirid === 'contacts') {
         if (M.viewmode) {
@@ -10678,17 +10947,19 @@ function fm_resize_handler() {
         }
     }
 
-    if (slideshowid && previews[slideshowid]) {
-        previewsrc(previews[slideshowid].src);
-    }
+    if (M.currentdirid !== 'transfers') {
+        if (slideshowid && previews[slideshowid]) {
+            previewsrc(previews[slideshowid].src);
+        }
 
-    if (megaChatIsReady && megaChat.resized) {
-        megaChat.resized();
-    }
+        if (megaChatIsReady && megaChat.resized) {
+            megaChat.resized();
+        }
 
-    $('.fm-right-files-block, .fm-right-account-block').css({
-        'margin-left': ($('.fm-left-panel:visible').width() + $('.nw-fm-left-icons-panel').width()) + "px"
-    });
+        $('.fm-right-files-block, .fm-right-account-block').css({
+            'margin-left': ($('.fm-left-panel:visible').width() + $('.nw-fm-left-icons-panel').width()) + "px"
+        });
+    }
 
     if (M.currentrootid === 'shares') {
         var shared_block_height = $('.shared-details-block').height() - $('.shared-top-details').height();
@@ -11055,6 +11326,12 @@ function contactUI() {
             fm_showoverlay();
         });
 
+        // Remove contact button on contacts page
+        $('.fm-remove-contact').rebind('click', function() {
+            $.selected = [M.currentdirid];
+            fmremove();
+        });
+
         if (!megaChatIsDisabled) {
 
             // Bind the "Start conversation" button
@@ -11401,24 +11678,20 @@ var cancelSubscriptionDialog = {
             api_req({ a: 'cccs', r: reason }, {
                 callback: function() {
 
-                    // Reset account cache and refetch all account data to display UI
-                    // (note potential race condition if cancellation callback wasn't received in 7500ms)
+                    // Hide loading dialog and cancel subscription button on account page
+                    loadingDialog.hide();
+                    cancelSubscriptionDialog.$accountPageCancelButton.hide();
+                    cancelSubscriptionDialog.$accountPageSubscriptionBlock.removeClass('active-subscription');
+
+                    // Show success dialog and refresh UI
+                    cancelSubscriptionDialog.$dialogSuccess.removeClass('hidden');
+                    cancelSubscriptionDialog.$backgroundOverlay.removeClass('hidden');
+                    cancelSubscriptionDialog.$backgroundOverlay.addClass('payment-dialog-overlay');
+                    cancelSubscriptionDialog.initCloseButtonSuccessDialog();
+
+                    // Reset account cache so all account data will be refetched and re-render the account page UI
                     M.account.lastupdate = 0;
-
-                    setTimeout(function() {
-
-                        // Hide loading dialog and cancel subscription button on account page
-                        loadingDialog.hide();
-                        cancelSubscriptionDialog.$accountPageCancelButton.hide();
-                        cancelSubscriptionDialog.$accountPageSubscriptionBlock.removeClass('active-subscription');
-
-                        // Show success dialog and refresh UI
-                        cancelSubscriptionDialog.$dialogSuccess.removeClass('hidden');
-                        cancelSubscriptionDialog.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
-                        cancelSubscriptionDialog.initCloseButtonSuccessDialog();
-                        accountUI();
-
-                    }, 7500);
+                    accountUI();
                 }
             });
         });

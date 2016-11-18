@@ -31,6 +31,10 @@
 	background-color: #666666;
 	border-color: #666666;
 }
+.offline.user-card-presence {
+	background-color: #666666;
+	border-color: #666666;
+}
 .user-card-presence.big {
 	width: 16px;
 	height: 16px;

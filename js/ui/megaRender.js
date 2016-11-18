@@ -375,10 +375,11 @@
                     $('.fm-empty-search').removeClass('hidden');
                 }
                 else if (M.currentdirid === M.RootID && folderlink) {
-                    if (!isValidShareLink()) {
+                    // FIXME: implement
+                    /*if (!isValidShareLink()) {
                         $('.fm-invalid-folder').removeClass('hidden');
                     }
-                    else {
+                    else*/ {
                         $('.fm-empty-folder-link').removeClass('hidden');
                     }
                 }
@@ -733,7 +734,7 @@
                     var cs = M.contactstatus(aHandle);
 
                     if (cs.files === 0 && cs.folders === 0) {
-                        props.shareInfo = l[1050];
+                        props.shareInfo = l[782];// Empty Folder
                     }
                     else {
                         props.shareInfo = fm_contains(cs.files, cs.folders);

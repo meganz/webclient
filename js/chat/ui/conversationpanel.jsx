@@ -20,6 +20,7 @@ var AlterParticipantsConversationMessage =
     require('./messages/alterParticipants.jsx').AlterParticipantsConversationMessage;
 var TruncatedMessage = require('./messages/truncated.jsx').TruncatedMessage;
 var PrivilegeChange = require('./messages/privilegeChange.jsx').PrivilegeChange;
+var TopicChange = require('./messages/topicChange.jsx').TopicChange;
 
 
 
@@ -145,6 +146,7 @@ var ConversationRightArea = React.createClass({
         if (
             myPresence === 'offline' ||
             !room.iAmOperator() ||
+            room.isReadOnly() ||
             room.messagesBuff.messages.length === 0 ||
             (
                 room.messagesBuff.messages.length === 1 &&
@@ -176,14 +178,22 @@ var ConversationRightArea = React.createClass({
         //     myPresence === 'offline'
         // );
 
+        var renameButtonClass = "link-button " + (
+            room.isReadOnly() || !room.iAmOperator() || myPresence === 'offline' ?
+                "disabled" : ""
+            );
+
         return <div className="chat-right-area">
             <div className="chat-right-area conversation-details-scroll">
                 <div className="chat-right-pad">
 
                     {isReadOnlyElement}
                     {membersHeader}
-                    <ParticipantsList chatRoom={room} members={room.members}
-                                      isCurrentlyActive={room.isCurrentlyActive} />
+                    <ParticipantsList
+                        chatRoom={room}
+                        members={room.members}
+                        isCurrentlyActive={room.isCurrentlyActive}
+                    />
 
                     <div className="buttons-block">
                         {room.type !== "group" ? startAudioCallButton : null}
@@ -223,6 +233,24 @@ var ConversationRightArea = React.createClass({
                                 />
                         </ButtonsUI.Button>
 
+                        {
+                            room.type == "group" ?
+                            (
+                                <div className={renameButtonClass}
+                                     onClick={(e) => {
+                                         if ($(e.target).closest('.disabled').size() > 0) {
+                                             return false;
+                                         }
+                                         if (self.props.onRenameClicked) {
+                                            self.props.onRenameClicked();
+                                         }
+                                }}>
+                                    <i className="small-icon writing-pen"></i>
+                                    {__(l[9080])}
+                                </div>
+                            ) : null
+                        }
+
                         <ButtonsUI.Button
                             className="link-button dropdown-element"
                             icon="rounded-grey-up-arrow"
@@ -246,22 +274,31 @@ var ConversationRightArea = React.createClass({
 
                         {endCallButton}
 
-                        { !dontShowTruncateButton ? (
-                            <div className="link-button red" onClick={() => {
-                                if (self.props.onTruncateClicked) {
-                                    self.props.onTruncateClicked();
-                                }
+                        {
+                            <div className={"link-button red " + (dontShowTruncateButton ? "disabled" : "")}
+                                 onClick={(e) => {
+                                     if ($(e.target).closest('.disabled').size() > 0) {
+                                         return false;
+                                     }
+                                     if (self.props.onTruncateClicked) {
+                                        self.props.onTruncateClicked();
+                                     }
                             }}>
                                 <i className="small-icon rounded-stop"></i>
                                 {__(l[8871])}
                             </div>
-                        ) : null
                         }
-                        { myPresence !== 'offline' && room.type === "group" && !room.stateIsLeftOrLeaving() ? (
-                            <div className="link-button red" onClick={() => {
-                                if (self.props.onLeaveClicked) {
-                                    self.props.onLeaveClicked();
-                                }
+                        { room.type === "group" ? (
+                            <div className={"link-button red " + (
+                                    myPresence === 'offline' || room.stateIsLeftOrLeaving() ? "disabled" : ""
+                                )}
+                                 onClick={(e) => {
+                                     if ($(e.target).closest('.disabled').size() > 0) {
+                                         return false;
+                                     }
+                                     if (self.props.onLeaveClicked) {
+                                        self.props.onLeaveClicked();
+                                     }
                             }}>
                                 <i className="small-icon rounded-stop"></i>
                                 {l[8633]}
@@ -360,6 +397,7 @@ var ConversationAudioVideoPanel = React.createClass({
                 else if (!!$(document).fullScreen() && room.isCurrentlyActive) {
                     self.setState({fullScreenModeEnabled: true});
                 }
+                self.forceUpdate();
             });
 
         var $localMediaDisplay = $('.call.local-video, .call.local-audio', $container);
@@ -589,6 +627,9 @@ var ConversationAudioVideoPanel = React.createClass({
         }
         else {
             var remotePlayer = callSession.remotePlayer[0];
+            if (!remotePlayer && callSession.remotePlayer) {
+                remotePlayer = callSession.remotePlayer;
+            }
 
             var remotePlayerSrc = remotePlayer.src;
 
@@ -797,6 +838,7 @@ var ConversationPanel = React.createClass({
                 else if (!!$(document).fullScreen() && room.isCurrentlyActive) {
                     self.setState({isFullscreenModeEnabled: true});
                 }
+                self.forceUpdate();
             });
 
         if (doResize !== false) {
@@ -859,6 +901,12 @@ var ConversationPanel = React.createClass({
                 moveCursortoToEnd($typeArea[0]);
             }
         }
+        if (!prevState.renameDialog && self.state.renameDialog === true) {
+            var $input = $('.chat-rename-dialog input');
+            $input.focus();
+            $input[0].selectionStart = 0;
+            $input[0].selectionEnd = $input.val().length;
+        }
         
         if (prevState.editing === false && self.state.editing !== false) {
             if (self.messagesListScrollable) {
@@ -886,6 +934,7 @@ var ConversationPanel = React.createClass({
         // We need to check ".fm-chat-input-scroll" instead of ".fm-chat-line-block" height
         var scrollBlockHeight = (
             $('.chat-content-block', $container).outerHeight() -
+            $('.chat-topic-block', $container).outerHeight() -
             $('.call-block', $container).outerHeight() -
             $('.chat-textarea-block', $container).outerHeight()
         );
@@ -1037,7 +1086,7 @@ var ConversationPanel = React.createClass({
             contact = room.megaChat.getContactFromJid(contactJid);
         }
 
-        var conversationPanelClasses = "conversation-panel";
+        var conversationPanelClasses = "conversation-panel " + room.type + "-chat";
 
         if (!room.isCurrentlyActive) {
             conversationPanelClasses += " hidden";
@@ -1219,6 +1268,14 @@ var ConversationPanel = React.createClass({
                             grouped={grouped}
                         />
                     }
+                    else if (v.dialogType === 'topicChange') {
+                        messageInstance = <TopicChange
+                            message={v}
+                            key={v.messageId}
+                            contact={M.u[v.userId]}
+                            grouped={grouped}
+                        />
+                    }
 
                     messagesList.push(messageInstance);
                 }
@@ -1247,6 +1304,7 @@ var ConversationPanel = React.createClass({
                                 self.editDomElement = null;
 
                                 var currentContents = v.textContents ? v.textContents : v.contents;
+
                                 if (messageContents === false || messageContents === currentContents) {
                                     self.messagesListScrollable.scrollToBottom(true);
                                     self.lastScrollPositionPerc = 1;
@@ -1334,10 +1392,23 @@ var ConversationPanel = React.createClass({
 
         var sendContactDialog = null;
         if (self.state.sendContactDialog === true) {
+            var excludedContacts = [];
+            if (room.type == "private") {
+                room.getParticipantsExceptMe().forEach(function(jid) {
+                    var contact = room.megaChat.getContactFromJid(jid);
+                    if (contact) {
+                        excludedContacts.push(
+                            contact.u
+                        );
+                    }
+                });
+            }
+
             var selected = [];
             sendContactDialog = <ModalDialogsUI.SelectContactDialog
                 megaChat={room.megaChat}
                 chatRoom={room}
+                exclude={excludedContacts}
                 contacts={M.u}
                 onClose={() => {
                     self.setState({'sendContactDialog': false});
@@ -1390,6 +1461,17 @@ var ConversationPanel = React.createClass({
                         'confirmDeleteDialog': false,
                         'messageToBeDeleted': false
                     });
+
+                    $(msg).trigger(
+                        'onChange',
+                        [
+                            msg,
+                            "deleted",
+                            false,
+                            true
+                        ]
+                    );
+
                 }}
             >
                 <div className="fm-dialog-content">
@@ -1462,6 +1544,95 @@ var ConversationPanel = React.createClass({
                 </div>
             </ModalDialogsUI.ConfirmDialog>
         }
+        if (self.state.renameDialog === true) {
+            var onEditSubmit = function(e) {
+                if ($.trim(self.state.renameDialogValue).length > 0 &&
+                    self.state.renameDialogValue !== self.props.chatRoom.getRoomTitle()
+                ) {
+                    var participants = self.props.chatRoom.protocolHandler.getTrackedParticipants();
+                    var promises = [];
+                    promises.push(
+                        ChatdIntegration._ensureKeysAreLoaded(undefined, participants)
+                    );
+                    var _runUpdateTopic = function() {
+                        // self.state.value
+                        var newTopic = self.state.renameDialogValue;
+                        var topic = self.props.chatRoom.protocolHandler.embeddedEncryptTo
+                                            (newTopic,
+                                             strongvelope.MESSAGE_TYPES.TOPIC_CHANGE,
+                                             participants);
+                        if (topic) {
+                            asyncApiReq({
+                                "a":"mcst",
+                                "id":self.props.chatRoom.chatId,
+                                "ct":base64urlencode(topic),
+                                "v": Chatd.VERSION
+                            });
+                        }
+                    };
+                    MegaPromise.allDone(promises).done(
+                        function () {
+                            _runUpdateTopic();
+                        }
+                    );
+                    self.setState({'renameDialog': false, 'renameDialogValue': undefined});
+                }
+                e.preventDefault();
+                e.stopPropagation();
+            };
+
+            confirmDeleteDialog = <ModalDialogsUI.ModalDialog
+                megaChat={room.megaChat}
+                chatRoom={room}
+                title={__(l[9080])}
+                name="rename-group"
+                className="chat-rename-dialog"
+                onClose={() => {
+                    self.setState({'renameDialog': false, 'renameDialogValue': undefined});
+                }}
+                buttons={[
+                    {
+                        "label": l[61],
+                        "key": "rename",
+                        "className": (
+                            $.trim(self.state.renameDialogValue).length === 0 ||
+                            self.state.renameDialogValue === self.props.chatRoom.getRoomTitle() ?
+                                "disabled" : ""
+                        ),
+                        "onClick": function(e) {
+                            onEditSubmit(e);
+                        }
+                    },
+                    {
+                        "label": l[1686],
+                        "key": "cancel",
+                        "onClick": function(e) {
+                            self.setState({'renameDialog': false, 'renameDialogValue': undefined});
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }
+                    },
+                ]}>
+                <div className="fm-dialog-content">
+
+                    <div className="dialog secondary-header">
+                        <div className="rename-input-bl">
+                            <input type="text" name="newTopic"
+                                   defaultValue={self.props.chatRoom.getRoomTitle()}
+                                   value={self.state.renameDialogValue}
+                                   maxLength="30"
+                                   onChange={(e) => {
+                                self.setState({'renameDialogValue': e.target.value.substr(0, 30)});
+                            }} onKeyUp={(e) => {
+                                if (e.which === 13) {
+                                    onEditSubmit(e);
+                                }
+                            }} />
+                        </div>
+                    </div>
+                </div>
+            </ModalDialogsUI.ModalDialog>
+        }
 
         var additionalClass = "";
         if (
@@ -1480,6 +1651,7 @@ var ConversationPanel = React.createClass({
                 <div className="chat-content-block">
                     <ConversationRightArea
                         chatRoom={this.props.chatRoom}
+                        members={this.props.chatRoom.members}
                         contacts={self.props.contacts}
                         megaChat={this.props.chatRoom.megaChat}
                         messagesBuff={room.messagesBuff}
@@ -1488,6 +1660,12 @@ var ConversationPanel = React.createClass({
                         }}
                         onTruncateClicked={function() {
                             self.setState({'truncateDialog': true});
+                        }}
+                        onRenameClicked={function() {
+                            self.setState({
+                                'renameDialog': true,
+                                'renameDialogValue': self.props.chatRoom.getRoomTitle()
+                            });
                         }}
                         onLeaveClicked={function() {
                             room.leave(true);
@@ -1522,6 +1700,7 @@ var ConversationPanel = React.createClass({
                         chatRoom={this.props.chatRoom}
                         contacts={self.props.contacts}
                         megaChat={this.props.chatRoom.megaChat}
+                        unreadCount={this.props.chatRoom.messagesBuff.getUnreadCount()}
                         onMessagesToggle={function(isActive) {
                             self.setState({
                                 'messagesToggledInCall': isActive
@@ -1561,6 +1740,13 @@ var ConversationPanel = React.createClass({
                         </div>
                     </div>
 
+                    {
+                        self.props.chatRoom.type === "group" ?
+                            <div className="chat-topic-block">
+                                {self.props.chatRoom.getRoomTitle()}
+                            </div> :
+                            undefined
+                    }
                     <div className={"messages-block " + additionalClass}>
                         <div className="messages scroll-area">
                             <PerfectScrollbar
@@ -1601,6 +1787,7 @@ var ConversationPanel = React.createClass({
                                 chatRoom={self.props.chatRoom}
                                 className="main-typing-area"
                                 disabled={room.isReadOnly()}
+                                persist={true}
                                 onUpEditPressed={() => {
                                     var foundMessage = false;
                                     room.messagesBuff.messages.keys().reverse().forEach(function(k) {
@@ -1753,7 +1940,8 @@ var ConversationPanels = React.createClass({
             var contactsList = [];
             var contactsListOffline = [];
 
-            var hadLoaded = ChatdIntegration.mcfHasFinishedPromise.state() === 'resolved';
+            var hadLoaded = ChatdIntegration.allChatsHadLoaded.state() !== 'pending' &&
+                ChatdIntegration.mcfHasFinishedPromise.state() !== 'pending';
 
             if (hadLoaded) {
                 self.props.contacts.forEach(function (contact) {

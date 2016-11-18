@@ -550,6 +550,7 @@ var SelectContactDialog = React.createClass({
             <ContactsUI.ContactPickerWidget
                 megaChat={self.props.megaChat}
                 contacts={self.props.contacts}
+                exclude={self.props.exclude}
                 onClick={(contact, e) => {
                     var contactHash = contact.h;
 

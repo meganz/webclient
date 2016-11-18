@@ -1,12 +1,10 @@
 function doregister() {
     /* jshint -W074 */
-    if ((document.getElementById('register_name').value === '')
-            || (document.getElementById('register_name').value === l[206])) {
+    if ((document.getElementById('register_name').value === '')) {
         alert(l[212]);
         document.getElementById('register_name').focus();
     }
-    else if ((document.getElementById('register_email').value === '')
-            || (document.getElementById('register_email').value === l[207])) {
+    else if ((document.getElementById('register_email').value === '')) {
         alert(l[197]);
         document.getElementById('register_email').focus();
     }
@@ -14,8 +12,7 @@ function doregister() {
         alert(l[198]);
         document.getElementById('register_email').focus();
     }
-    else if ((document.getElementById('register_password').value === '')
-            || (document.getElementById('register_password').value === 'Password')) {
+    else if ((document.getElementById('register_password').value === '')) {
         alert(l[213]);
         document.getElementById('register_email').focus();
     }
@@ -28,12 +25,6 @@ function doregister() {
             document.getElementById('register_password').value = '';
             document.getElementById('register_password_confirm').value = '';
             document.getElementById('register_password').focus();
-        }
-        else {
-            document.getElementById('register_password').value = l[770];
-            document.getElementById('register_password').type = 'text';
-            document.getElementById('register_password_confirm').value = l[771];
-            document.getElementById('register_password_confirm').type = 'text';
         }
     }
     else if (!document.getElementById('register_checkbox').checked) {
@@ -90,16 +81,23 @@ function doregister() {
 }
 
 function registeraccount() {
+    var rv = {};
     var ctx = {
         callback: function(res) {
             if (res === 0) {
+                var ops = {
+                    a: 'up'
+                };
                 loadingDialog.hide();
                 passwordManager($('#register_form'));
+
                 if (m) {
                     done_text1 = l[216];
                     done_text2 = l[217];
                     page = 'done';
                     mobileui();
+
+                    ops.name2 = $('#register_name').val();
                 }
                 else {
                     $('.fm-dialog.registration-page-success').unbind('click');
@@ -107,20 +105,14 @@ function registeraccount() {
                     // fm_showoverlay();
                     // ^ legacy confirmation dialog, with no email change option
                     mega.ui.sendSignupLinkDialog(rv);
-                }
-                var ops = {
-                    a: 'up'
-                };
-                if (m) {
-                    ops.name2 = $('#register_name').val();
-                }
-                else {
-                    var uname = $('#register-firstname').val() + ' ' + $('#register-lastname').val();
+
                     ops.terms = 'Mq';
-                    ops.firstname = base64urlencode(to8($('#register-firstname').val()));
-                    ops.lastname = base64urlencode(to8($('#register-lastname').val()));
-                    ops.name2 = base64urlencode(to8(uname));
+                    ops.firstname = base64urlencode(to8(rv.first));
+                    ops.lastname = base64urlencode(to8(rv.last));
+                    ops.name2 = base64urlencode(to8(rv.name));
                     u_attr.terms = 1;
+
+                    localStorage.awaitingConfirmationAccount = JSON.stringify(rv);
                 }
                 api_req(ops);
             }
@@ -161,16 +153,17 @@ function registeraccount() {
             }
         }
     };
-    var rv = {};
     if (m) {
         rv.name = $('#register_name').val();
         rv.email = $('#register_email').val();
         rv.password = $('#register_password').val();
     }
     else {
-        rv.name = $('#register-firstname').val() + ' ' + $('#register-lastname').val();
-        rv.email = $('#register-email').val();
         rv.password = $('#register-password').val();
+        rv.first = $('#register-firstname').val();
+        rv.last = $('#register-lastname').val();
+        rv.email = $('#register-email').val();
+        rv.name = rv.first + ' ' + rv.last;
     }
     sendsignuplink(rv.name, rv.email, rv.password, ctx);
 }
@@ -185,27 +178,23 @@ function pageregister() {
     var err = false;
 
     if ($('#register-firstname').val() === ''
-            || $('#register-firstname').val() === l[1096]
-            || $('#register-lastname').val() === ''
-            || $('#register-lastname').val() === l[1097]) {
+            || $('#register-lastname').val() === '') {
         $('.login-register-input.name').addClass('incorrect');
         err = 1;
     }
     if ($('#register-email').val() === ''
-            || $('#register-email').val() === l[1096]
             || checkMail($('#register-email').val())) {
         $('.login-register-input.email').addClass('incorrect');
         err = 1;
     }
 
     if ($('#register-email').val() === ''
-            || $('#register-email').val() === l[1096]
             || checkMail($('#register-email').val())) {
         $('.login-register-input.email').addClass('incorrect');
         err = 1;
     }
 
-    if ($('#register-password').attr('type') === 'text') {
+    if ($('#register-password').val() === '') {
         $('.login-register-input.password.first').addClass('incorrect');
         $('.white-txt.password').text(l[213]);
         err = 1;
@@ -220,8 +209,6 @@ function pageregister() {
     }
 
     if ($('#register-password').val() !== $('#register-password2').val()) {
-        $('#register-password')[0].type = 'password';
-        $('#register-password2')[0].type = 'password';
         $('#register-password').val('');
         $('#register-password2').val('');
         $('.login-register-input.password.confirm').addClass('incorrect');
@@ -395,7 +382,7 @@ function registerpwcheck() {
     $('.login-register-input.password').removeClass('weak-password strong-password');
     $('.new-registration').removeClass('good1 good2 good3 good4 good5');
     if (typeof zxcvbn === 'undefined'
-            || $('#register-password').attr('type') === 'text' || $('#register-password').val() === '') {
+            || $('#register-password').val() === '') {
         return false;
     }
     var pw = zxcvbn($('#register-password').val());

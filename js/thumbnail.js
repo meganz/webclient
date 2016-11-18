@@ -528,7 +528,7 @@ function benchmarkireq() {
         var treq = {};
         treq[n.h] = {
             fa: n.fa,
-            k: n.key
+            k: n.k
         };
         preqs[slideshowid = n.h] = 1;
         api_getfileattr(treq, 1, function(ctx, id, uint8arr) {

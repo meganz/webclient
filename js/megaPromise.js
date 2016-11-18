@@ -197,14 +197,12 @@ MegaPromise.prototype.fail = function(rej) {
 
 
 /**
- * Intentionally we'd added this method to throw an exception, since we don't want anyone
- * using it.
+ * Alias of .fail
  *
- * @throws {Error}
+ * @param rej
+ * @returns {MegaPromise}
  */
-MegaPromise.prototype.catch = function() {
-    throw new Error('.catch is prohibited in MegaPromises.');
-};
+MegaPromise.prototype.catch = MegaPromise.prototype.fail;
 
 /**
  * Alias of .resolve

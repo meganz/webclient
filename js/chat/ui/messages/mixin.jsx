@@ -10,6 +10,20 @@ var ConversationMessageMixin = {
         var self = this;
         var chatRoom = self.props.message.chatRoom;
         var megaChat = chatRoom.megaChat;
+        var contact = self.getContact();
+        if (contact && contact.addChangeListener) {
+            self._contactChangeListener = contact.addChangeListener(function() {
+                self.debouncedForceUpdate();
+            });
+        }
+    },
+    componentWillUnmount: function() {
+        var self = this;
+        var contact = self.getContact();
+
+        if (self._contactChangeListener && contact && contact.removeChangeListener) {
+            contact.removeChangeListener(self._contactChangeListener);
+        }
     },
     getContact: function() {
         var message = this.props.message;

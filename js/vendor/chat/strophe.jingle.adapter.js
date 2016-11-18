@@ -3,23 +3,33 @@
 
 function WebrtcApi() {
     if (navigator.mozGetUserMedia) {
-        console.log('This appears to be Firefox');
+        this.browser = 'firefox';
         if (!MediaStream.prototype.getVideoTracks || !MediaStream.prototype.getAudioTracks)
             throw new Error('webRTC API missing MediaStream.getXXXTracks');
-        if (!mozRTCPeerConnection)
-            throw new Error('Your version of Firefox is too old, at lest version 22 for Desktop and version 24 for Andorid is required');
         
-        this.peerconnection = mozRTCPeerConnection;
-        this.browser = 'firefox';
-        this.getUserMedia = navigator.mozGetUserMedia.bind(navigator);
-        this.attachMediaStream = function (element, stream) {
-            var elem = element[0];
+        this.peerconnection = (typeof RTCPeerConnection !== 'undefined')
+             ? RTCPeerConnection
+             : mozRTCPeerConnection;
+        if (navigator.mediaDevices) {
+            this.getUserMedia = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+            console.log('This appears to be Firefox');
+        } else {
+            this.getUserMedia = function(opts) {
+                return new Promise(function(resolve, reject) {
+                    navigator.mozGetUserMedia(opts, resolve, reject);
+                });
+            }
+            console.log('This appears to be an old Firefox');
+        }
+        this.attachMediaStream = function(elem, stream) {
             if (elem.mozSrcObject) {
                 elem.mozSrcObject = stream;
             } else {
                 elem.srcObject = stream;
             }
-            elem.play();
+            if (stream) {
+                elem.play();
+            }
         };
         this.pc_constraints = {};
 		if (MediaStream.prototype.clone)
@@ -27,19 +37,37 @@ function WebrtcApi() {
           else
             this.cloneMediaStream = function(src, what) {return src; } //no cloning, just returns original stream
         
-        this.RTCSessionDescription = mozRTCSessionDescription;
-        this.RTCIceCandidate = mozRTCIceCandidate;
+        this.RTCSessionDescription = (typeof RTCSessionDescription !== "undefined")
+             ? RTCSessionDescription
+             : mozRTCSessionDescription;
+
+        this.RTCIceCandidate = (typeof RTCIceCandidate !== "undefined")
+             ? RTCIceCandidate
+             : mozRTCIceCandidate;
         this.MediaStreamTrack = MediaStreamTrack;
+
     } else if (navigator.webkitGetUserMedia) {
-        console.log('This appears to be Chrome');
+        this.browser =  window.opr ? 'opera' : 'chrome';
         this.peerconnection =  webkitRTCPeerConnection;
-        this.browser =  window.opr?'opera':'chrome';
-        this.getUserMedia = navigator.webkitGetUserMedia.bind(navigator);
-        this.attachMediaStream = function (element, stream) {
+
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            this.getUserMedia = function(constraints) {
+                return navigator.mediaDevices.getUserMedia(constraints);
+            }
+            console.log('This appears to be Chrome');
+        } else {
+            this.getUserMedia = function(opts) {
+                return new Promise(function(ok, fail) {
+                    navigator.webkitGetUserMedia(opts, ok, fail);
+                });
+            }
+            console.log('This appears to be an old Chrome');
+        }
+        this.attachMediaStream = function(player, stream) {
             if (!stream) {
-                element.removeAttr('src');
+                player.removeAttribute('src');
             } else {
-                element.attr('src', URL.createObjectURL(stream));
+                player.setAttribute('src', URL.createObjectURL(stream));
             }
         };
         this.pc_constraints = {'optional': [{'DtlsSrtpKeyAgreement': 'true'}]}; // enable dtls support for compat with Firefox            
@@ -71,37 +99,42 @@ function WebrtcApi() {
     } else {
         throw new Error('Browser does not appear to be WebRTC-capable');
     }
-    var mst = this.MediaStreamTrack;
-    if (mst && mst.getSources) {
-        this.getMediaInputTypesFromScan = function(cb) {
-            mst.getSources(function(sources) {
-                var hasAudio = false;
-                var hasVideo = false;
-                for (var i=0; i<sources.length; i++) {
-                    var s = sources[i];
-                    if (s.kind === 'audio')
-                        hasAudio = true;
-                    else if (s.kind === 'video')
-                        hasVideo = true;
-                }
-                cb({audio:hasAudio, video:hasVideo});
+    function processDevices(devices)
+    {
+        var hasAudio = false;
+        var hasVideo = false;
+        for (var i = 0; i < devices.length; i++) {
+            var s = devices[i];
+            if (s.kind === 'audio') {
+                hasAudio = true;
+            }
+            else if (s.kind === 'video') {
+                hasVideo = true;
+            }
+        }
+        return {audio:hasAudio, video:hasVideo};
+    }
+
+    if (navigator.mediaDevices && navigator.mediaDevices.enumerateDevices) {
+        this.getMediaInputTypes = function() {
+            return new Promise(function(resolve, reject) {
+                navigator.mediaDevices.enumerateDevices()
+                .then(function(devices) {
+                    resolve(processDevices(devices));
+                })
+                .catch(function(error) {
+                    reject(error);
+                });
             });
         }
-        this.getMediaInputTypes = this.getMediaInputTypesFromScan;
     } else {
-        this.getMediaInputTypesFromStream = function(cb) {
-            this.getUserMedia({audio:true, video:true},
-                function(stream) {
-                    var result = {audio: (stream.getAudioTracks().length > 0), video: (stream.getVideoTracks().length > 0)};
-                    stream = null;
-                    cb(result);
-                },
-                function() {
-                    cb({error: true})
-                }
-            );
-        }
-        this.getMediaInputTypes = this.getMediaInputTypesFromStream;
+        this.getMediaInputTypes = function() {
+            return new Promise(function(resolve, reject) {
+                this.MediaStreamTrack.getSources(function(sources) {
+                    resolve(processDevices(sources));
+                });
+            });
+        };
     }
 }
 
@@ -166,7 +199,7 @@ WebrtcApi.prototype.createUserMediaConstraints = function(um)
         constraints.video.mandatory.minHeight = 240;
         break;
     default:
-        if (navigator.userAgent.indexOf('Android') != -1) 
+        if (navigator.userAgent.indexOf('Android') !== -1)
 		{
             constraints.video.mandatory.minWidth = 320;
             constraints.video.mandatory.minHeight = 240;
@@ -189,26 +222,42 @@ WebrtcApi.prototype.createUserMediaConstraints = function(um)
 	return constraints;
 }
 
-WebrtcApi.prototype.getUserMediaWithConstraintsAndCallback = function(um, self, okCallback, errCallback)
+WebrtcApi.prototype.getUserMediaWithConstraintsAndCallback = function(um)
 {
-	try 
-	{
-		this.getUserMedia(this.createUserMediaConstraints(um),
-			okCallback.bind(self), errCallback.bind(self));
-	} catch(e) {
-		errCallback.call(self, null, e);
-    }
-}		
+    return this.getUserMedia(this.createUserMediaConstraints(um));
+}
 
 WebrtcApi.prototype.stopMediaStream = function(stream) {
-    if (!stream.stop) {
+    if (stream.getTracks) {
         var tracks = stream.getTracks();
-        for (var i = 0; i < tracks.length; i++) {
-            tracks[i].stop();
+        if (tracks.length === 0) {
+            return;
+        }
+
+        if (tracks[0].stop) {
+            // can't check for stop in MediaStreamTrack prototype - it is not
+            // defined there, at least on Firefox. Have to check the track
+            // instance itself for stop method
+            for (var i = 0; i < tracks.length; i++) {
+                tracks[i].stop();
+            }
+        } else {
+            stream.stop();
         }
     } else {
+        // no stream.getTracks() - old browser, probably will not have
+        // track.stop() as well, so use the deprecated stream.stop()
         stream.stop();
     }
+}
+
+WebrtcApi.prototype.fixupIceServers = function(iceServers) {
+    var len = iceServers.length;
+    for (var i = 0; i < len; i++) {
+        var server = iceServers[i];
+        server.url = server.urls[0];
+    }
+    return iceServers;
 }
 
 WebrtcApi.prototype._getBrowserVersion = function() {

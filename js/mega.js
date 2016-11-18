@@ -1277,7 +1277,7 @@ function MegaData()
     // FIXME: make all calls to this one async (good luck, Diego!)
     this.openFolder = function(id, force, chat, cb) {
         var newHashLocation;
-
+console.error("openFolder: " + id);
         $('.fm-right-account-block').addClass('hidden');
         $('.fm-files-view-icon').removeClass('hidden');
 

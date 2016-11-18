@@ -1364,7 +1364,7 @@ function MegaData()
         }
 
         var self = this;
-        fetchchildren(id, function() {
+        /*fetchchildren(id, function()*/ {
             self.previousdirid = self.currentdirid;
             self.currentdirid = id;
             self.currentrootid = RootbyId(id);
@@ -1513,7 +1513,7 @@ function MegaData()
             $(document).trigger('MegaOpenFolder');
 
             if (cb) cb(true);
-        });
+        }/*)*/;
     };
 
     // Contacts left panel handling
@@ -6917,13 +6917,13 @@ function fetchfm(sn) {
 }
 
 // to reduce peak mem usage, we fetch f in 64 small chunks
-/*function fetchfchunked(chunk, procresult) {
+function fetchfchunked(chunk, procresult) {
     fmdb.get('f', function(r) {
         for (var i = r.length; i--;) emplacenode(r[i]);
         if (chunk == 64) procresult();
         else fetchfchunked(chunk, procresult);
     }, 'h', b64[chunk++]);
-}*/
+}
 
 function fetchfroot(/*chunk,*/ cb) {
     // fetch the three root nodes
@@ -6993,7 +6993,8 @@ function dbfetchfm() {
         process_ok(r, true);
 
         // FIXME: remove this step and replace with dynamic on-demand loading
-        fetchfroot(/*0,*/ function(r){
+//        fetchfroot(/*0,*/ function(r){
+        fetchfchunked(0, function(r){
 
             mega.loadReport.recvNodes     = Date.now() - mega.loadReport.stepTimeStamp;
             mega.loadReport.stepTimeStamp = Date.now();

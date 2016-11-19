@@ -7971,17 +7971,12 @@ function init_chat() {
             }
         }
     }
-    if (folderlink) {
+
+    if (pfid) {
         if (d) console.log('Will not initialize chat [branch:1]');
     }
-    else if (!megaChatIsDisabled) {
-        if (pubEd25519[u_handle]) {
-            Soon(__init_chat);
-        }
-        else {
-            mBroadcaster.once('pubEd25519', __init_chat);
-            if (d) console.log('Will not initialize chat [branch:2]');
-        }
+    else if (!loadfm.chatloaded) {
+        authring.onAuthringReady('chat').done(__init_chat);
     }
     else {
         if (d) console.log('Will not initialize chat [branch:3]');
@@ -8126,8 +8121,6 @@ function loadfm_done(mDBload) {
 
                 mega.utils.require('chat')
                     .always(function() {
-                        loadfm.chatloading = false;
-                        loadfm.chatloaded  = Date.now();
 
                         if (typeof ChatRoom !== 'undefined') {
                             init_chat();
@@ -8143,6 +8136,9 @@ function loadfm_done(mDBload) {
                             // FIXME: this won't be reached because the request will fail silently
                             console.error('Chat resources failed to load...');
                         }
+
+                        loadfm.chatloading = false;
+                        loadfm.chatloaded  = Date.now();
                     });
             }
         }

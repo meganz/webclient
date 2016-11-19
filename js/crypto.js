@@ -1572,8 +1572,40 @@ function api_req(request, context, channel) {
 }
 
 // indicates whether this is a Firefox supporting the moz-chunked-*
-// responseType - unknown: -1, no: 0, yes: 1
-var moz_chunked_active = !window.chrome && -1;
+// responseType or a Chrome derivative supporting the fetch API
+// values: unknown: -1, no: 0, moz-chunked: 1, fetch: 2
+// FIXME: check for fetch on !Firefox, not just on Chrome
+var chunked_method = window.chrome ? (self.fetch ? 2 : 0) : -1;
+
+// this kludge emulates moz-chunked-text on an existing XHR
+// FIXME: enable native Uint8Array support in JSONSplitter instead
+// of converting to text first
+function chunkedfetch(xhr, uri, postdata) {
+    fetch(uri, { method: 'POST', body: postdata }).then(function(response) {
+        var reader = response.body.getReader();
+        xhr.fetchStatus = response.status;
+        xhr.totalBytes = response.headers.get('Original-Content-Length');
+
+        function chunkedread() {
+            return reader.read().then(function(r) {
+                if (r.done) {
+                    // signal completion through .onload()
+                    xhr.onload();
+                }
+                else {
+                    // feed chunk to JSONSplitter
+                    xhr.onprogress({ fetchchunk: ab_to_str(r.value.buffer) });
+                    chunkedread();
+                }
+            });
+        }
+
+        chunkedread();
+    }).catch(function(err) {
+        console.error("Fetch error: ", err);
+        xhr.onerror();
+    });
+}
 
 // send pending API request on channel q
 function api_proc(q) {
@@ -1627,8 +1659,8 @@ function api_proc(q) {
 
                     // update number of bytes received in .onprogress() for subsequent check
                     // in .onload() whether it contains more data
-                    var chunk = this.responseText || this.response
-                    if (!moz_chunked_active) {
+                    var chunk = evt.fetchchunk || this.responseText || this.response
+                    if (!chunked_method) {
                         // unfortunately, we're receiving a growing response
                         this.q.received = chunk.length;
                     }
@@ -1650,9 +1682,9 @@ function api_proc(q) {
         q.xhr.onload = function onAPIProcXHRLoad() {
             if (!this.cancelled) {
                 var t;
-                var status = this.status;
+                var status = this.status || this.fetchStatus;
 
-                if (status === 200) {
+                if (status == 200) {
                     var response = this.responseText || this.response;
 
                     // is this residual data that hasn't gone to the splitter yet?
@@ -1741,21 +1773,6 @@ function api_send(q) {
     var logger = MegaLogger.getLogger('crypt');
     q.timer = false;
 
-    q.xhr.open('POST', q.url, true);
-
-    // try enabling chunked transfers to conserve memory & CPU
-    // (currently only available with Firefox)
-    // FIXME: use Fetch API with Chrome
-    // FIXME: use ms-stream with MSIE?
-    if (q.split && moz_chunked_active) {
-        q.xhr.responseType = 'moz-chunked-text';
-
-        // first try? record success
-        if (moz_chunked_active < 0) {
-            moz_chunked_active = q.xhr.responseType == 'moz-chunked-text';
-        }
-    }
-
     logger.debug("Sending API request: " + q.rawreq + " to " + q.url);
 
     // reset number of bytes received and response size
@@ -1768,7 +1785,28 @@ function api_send(q) {
     }
 
     q.xhr.cancelled = false;
-    q.xhr.send(q.rawreq);
+
+    if (q.split && chunked_method == 2) {
+        // use chunked fetch
+        chunkedfetch(q.xhr, q.url, q.rawreq);
+    }
+    else {
+        // use XHR
+        q.xhr.open('POST', q.url, true);
+
+        // try enabling chunked transfers to conserve memory & CPU
+        // (currently only available with Firefox)
+        if (q.split && chunked_method) {
+            q.xhr.responseType = 'moz-chunked-text';
+
+            // first try? record success
+            if (chunked_method < 0) {
+                chunked_method = q.xhr.responseType == 'moz-chunked-text';
+            }
+        }
+
+        q.xhr.send(q.rawreq);
+    }
 }
 
 function api_reqerror(q, e, status) {
@@ -2011,11 +2049,13 @@ function waitsc() {
     if (!waitxhr) {
         waitxhr = getxhr();
     }
+
     waitxhr.waitid = newid;
 
     if (waittimeout) {
         clearTimeout(waittimeout);
     }
+
     waittimeout = setTimeout(waitsc, 300000);
 
     waitxhr.onerror = function () {
@@ -4382,7 +4422,7 @@ function api_strerror(errno) {
     // FIXME: rewrite without large string concatenation
     JSONSplitter.prototype.chunkproc = function json_chunkproc(chunk, ctx, inputcomplete) {
         // we are not receiving responses incrementally: process as growing buffer
-        if (!moz_chunked_active) return this.proc(chunk, ctx, inputcomplete);
+        if (!chunked_method) return this.proc(chunk, ctx, inputcomplete);
 
         // otherwise, we just retain the data that is still going to be needed in the
         // next round... enabling infinitely large accounts to be "streamed" to IndexedDB

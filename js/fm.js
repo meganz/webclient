@@ -11398,10 +11398,10 @@ function FMResizablePane(element, opts) {
     }
 
     /**
-     * Destroy if already initialized.
+     * Already initialized.
      */
     if ($element.data('fmresizable')) {
-        $element.data('fmresizable').destroy();
+        return;
     }
 
     self.destroy = function() {

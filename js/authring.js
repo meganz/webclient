@@ -282,19 +282,21 @@ var authring = (function () {
             return MegaPromise.reject(EARGS);
         }
 
-        if (ns.hadInitialised() === false) {
-            var proxyPromise = new MegaPromise();
+        var promise = new MegaPromise();
 
-            ns.initAuthenticationSystem()
-                .done(function() {
-                    proxyPromise.linkDoneAndFailTo(ns.setContacts(keyType));
-                });
-        }
-        else {
-            return mega.attr.set(ns._PROPERTIES[keyType],
-                {'': ns.serialise(u_authring[keyType])},
-                false, true);
-        }
+        this.onAuthringReady('setContacts')
+            .fail(function() {
+                promise.reject.apply(promise, arguments);
+            })
+            .done(function() {
+
+                var attrPromise = mega.attr.set(ns._PROPERTIES[keyType],
+                    {'': ns.serialise(u_authring[keyType])}, false, true);
+
+                promise.linkDoneAndFailTo(attrPromise);
+            });
+
+        return promise;
     };
 
 
@@ -631,6 +633,38 @@ var authring = (function () {
      */
     ns.hadInitialised = function() {
         return ns._initialisingPromise === true;
+    };
+
+    /**
+     * Invoke authring-operation once initialization has succeed.
+     *
+     * @returns {MegaPromise}
+     */
+    ns.onAuthringReady = function(debugTag) {
+        var promise = new MegaPromise();
+
+        if (d > 1) {
+            logger.log('authring.onAuthringReady', debugTag);
+        }
+
+        if (this.hadInitialised() === false) {
+            logger.debug('Will wait for authring to initialize...', debugTag);
+            promise.linkDoneAndFailTo(this.initAuthenticationSystem());
+        }
+        else {
+            // Always resolve asynchronously
+            // TODO: upgrade to jQuery v3 ...
+            Soon(function() {
+                if (u_authring.Ed25519) {
+                    return promise.resolve();
+                }
+
+                logger.error('Unexpected authring failure...', debugTag);
+                promise.reject(EINTERNAL);
+            });
+        }
+
+        return promise;
     };
 
     /**

@@ -6890,13 +6890,6 @@ function fetchfm(sn) {
     // activate/prefetch attribute cache at this early stage
     attribCache.prefillMemCache(fmdb).then(function(){
 
-        if (u_type == 3) {
-            mega.config.fetch();
-
-            // load/initialise the authentication system
-            authring.initAuthenticationSystem();
-        }
-
         if (sn) {
             currsn = sn;
             dbfetchfm();
@@ -8114,6 +8107,15 @@ function loadfm_done(mDBload) {
 
     mega.loadReport.procAPs       = Date.now() - mega.loadReport.stepTimeStamp;
     mega.loadReport.stepTimeStamp = Date.now();
+
+    if (u_type == 3) {
+
+        // load/initialise the authentication system
+        mega.config.fetch()
+            .always(function() {
+                authring.initAuthenticationSystem();
+            });
+    }
 
     mega.config.ready(function() {
 

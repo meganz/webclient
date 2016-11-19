@@ -4466,7 +4466,7 @@ function api_strerror(errno) {
                         );
                     } catch (e) {
                         this.logger.log(json.substr(this.lastpos, this.p-this.lastpos));
-                        this.logger.log("Malformed JSON - parse error in filter element " + this.filter);
+                        this.logger.error("Malformed JSON - parse error in filter element " + callback.name, e);
                         return 0;
                     }
 

@@ -1582,6 +1582,7 @@ var chunked_method = window.chrome ? (self.fetch ? 2 : 0) : -1;
 // of converting to text first
 function chunkedfetch(xhr, uri, postdata) {
     fetch(uri, { method: 'POST', body: postdata }).then(function(response) {
+        var loaded = 0;
         var reader = response.body.getReader();
         xhr.status = response.status;
         xhr.totalBytes = response.headers.get('Original-Content-Length');
@@ -1594,7 +1595,8 @@ function chunkedfetch(xhr, uri, postdata) {
                 }
                 else {
                     // feed chunk to JSONSplitter
-                    xhr.onprogress({ fetchchunk: ab_to_str(r.value.buffer) });
+                    loaded += r.value.length;
+                    xhr.onprogress({ loaded: loaded, fetchchunk: ab_to_str(r.value.buffer) });
                     chunkedread();
                 }
             });

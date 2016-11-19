@@ -1662,7 +1662,11 @@ function api_proc(q) {
 
                     // update number of bytes received in .onprogress() for subsequent check
                     // in .onload() whether it contains more data
-                    var chunk = this.responseText || this.response
+
+                    var chunk = this.response;
+
+                    // is this an ArrayBuffer? turn into a Uint8Array
+                    if (!(chunk.length >= 0)) chunk = new Uint8Array(chunk);
 
                     if (!chunked_method) {
                         // unfortunately, we're receiving a growing response
@@ -1675,7 +1679,7 @@ function api_proc(q) {
 
                     // send incoming live data to splitter
                     // for maximum flexibility, the splitter ctx will be the XHR
-                    if (!this.q.splitter.chunkproc(chunk, this, false)) {
+                    if (!this.q.splitter.chunkproc(chunk, false)) {
                         // a JSON syntax error occurred: hard reload
                         fm_fullreload(this.q, 'onerror JSON Syntax Error');
                     }
@@ -1689,7 +1693,7 @@ function api_proc(q) {
                 var status = this.status;
 
                 if (status == 200) {
-                    var response = this.responseText || this.response;
+                    var response = this.response;
 
                     // is this residual data that hasn't gone to the splitter yet?
                     if (this.q.splitter) {
@@ -1698,7 +1702,7 @@ function api_proc(q) {
                         // the last onprogress(), send .substr(this.q.received) instead!
                         // otherwise, we send false to indicate no further input
                         // in all cases, set the inputcomplete flag to catch incomplete API responses
-                        if (!this.q.splitter.chunkproc((response && response.length > this.q.received) ? response : false, this, true)) {
+                        if (!this.q.splitter.chunkproc((response && response.length > this.q.received) ? response : false, true)) {
                             fm_fullreload(this.q, 'onload JSON Syntax Error');
                         }
                         return;
@@ -1783,31 +1787,31 @@ function api_send(q) {
     q.received = 0;
     delete q.xhr.totalBytes;
 
-    // create splitter if rules are attached
-    if (q.split) {
-        q.splitter = new JSONSplitter(q.split, false, chunked_method == 2);
-    }
-
     q.xhr.cancelled = false;
 
     if (q.split && chunked_method == 2) {
-        // use chunked fetch
+        // use chunked fetch with JSONSplitter input type Uint8Array
+        q.splitter = new JSONSplitter(q.split, q.xhr, true);
         chunkedfetch(q.xhr, q.url, q.rawreq);
     }
     else {
         // use XHR
         q.xhr.open('POST', q.url, true);
 
-        // try enabling chunked transfers to conserve memory & CPU
-        // (currently only available with Firefox)
-        if (q.split && chunked_method) {
-            q.xhr.responseType = 'moz-chunked-text';
+        if (q.split) {
+            if (chunked_method) {
+                // FIXME: use Fetch API if more efficient than this
+                q.xhr.responseType = 'moz-chunked-arraybuffer';
 
-            // first try? record success
-            if (chunked_method < 0) {
-                chunked_method = q.xhr.responseType == 'moz-chunked-text';
+                // first try? record success
+                if (chunked_method < 0) {
+                    chunked_method = q.xhr.responseType == 'moz-chunked-arraybuffer';
+                }
             }
-        }
+
+            // at this point, chunked_method being logically true implies arraybuffer
+            q.splitter = new JSONSplitter(q.split, q.xhr, chunked_method);
+         }
 
         q.xhr.send(q.rawreq);
     }
@@ -1847,8 +1851,7 @@ function api_reqerror(q, e, status) {
     }
 }
 
-function api_ready(q)
-{
+function api_ready(q) {
     q.rawreq = false;
     q.backoff = 0; // request succeeded - reset backoff timer
     q.cmds[q.i] = [];
@@ -4361,8 +4364,8 @@ function api_strerror(errno) {
         // position in source string
         this.p = 0;
 
-        // remaining source string from previous chunk (chunked feeding)
-        this.rem = '';
+        // remaining part of previous chunk (chunked feeding only)
+        this.rem = false;
 
         // enclosing object stack at current position (type + name)
         this.stack = [];
@@ -4401,17 +4404,18 @@ function api_strerror(errno) {
                 return String.fromCharCode(c);
             };
 
-            // concatenate two Uint8Arrays
+            // concatenate two Uint8Arrays (relies on boolean.length to be undefined)
             this.concat = function(a, b) {
                 var t = new Uint8Array(a.length+b.length);
-                t.set(a, 0);
-                t.set(b, a.length);
+                if (a) t.set(a, 0);
+                t.set(b, a.length+0);
                 return t;
             };
 
             // sub-Uint8Array of a Uint8Array given position p and optional length l
             this.sub = function(s, p, l) {
-                return new Uint8Array(s.buffer, p, l);
+                return l >= 0 ? new Uint8Array(s.buffer, p, l)
+                              : new Uint8Array(s.buffer, p);
             }
         }
         else {
@@ -4486,9 +4490,9 @@ function api_strerror(errno) {
 
     // process a JSON chunk (of a stream of chunks, if the browser supports it)
     // FIXME: rewrite without large string concatenation
-    JSONSplitter.prototype.chunkproc = function json_chunkproc(chunk, ctx, inputcomplete) {
+    JSONSplitter.prototype.chunkproc = function json_chunkproc(chunk, inputcomplete) {
         // we are not receiving responses incrementally: process as growing buffer
-        if (!chunked_method) return this.proc(chunk, ctx, inputcomplete);
+        if (!chunked_method) return this.proc(chunk, inputcomplete);
 
         // otherwise, we just retain the data that is still going to be needed in the
         // next round... enabling infinitely large accounts to be "streamed" to IndexedDB
@@ -4502,17 +4506,18 @@ function api_strerror(errno) {
         }
 
         // process combined residue + new chunk
-        var r = this.proc(chunk, ctx, inputcomplete);
+        var r = this.proc(chunk, inputcomplete);
 
         if (r >= 0) {
             // processing ended
-            this.rem = '';
+            this.rem = false;
             return r;
         }
 
         if (this.lastpos) {
             // remove processed data
             this.rem = this.sub(chunk, this.lastpos);
+
             this.p -= this.lastpos;
             this.lastpos = 0;
         }
@@ -4525,7 +4530,7 @@ function api_strerror(errno) {
     };
 
     // returns -1 if it wants more data, 0 in case of a fatal error, 1 when done
-    JSONSplitter.prototype.proc = function json_proc(json, ctx, inputcomplete) {
+    JSONSplitter.prototype.proc = function json_proc(json, inputcomplete) {
         while (this.p < json.length) {
             var c = this.tochar(json[this.p]);
 
@@ -4569,7 +4574,7 @@ function api_strerror(errno) {
                     // we have a filter configured for this object
                     try {
                         // pass filtrate to application and empty bucket
-                        callback.call(ctx || this.ctx,
+                        callback.call(this.ctx,
                             JSON.parse(this.buckets[0]+this.tostring(this.sub(json, this.lastpos, this.p-this.lastpos)))
                         );
                     } catch (e) {
@@ -4636,7 +4641,7 @@ function api_strerror(errno) {
                         // this is a stand-alone number, do we have a callback for them?
                         callback = this.filters['#'];
                         if (callback) {
-                            callback.call(ctx || this.ctx, this.tostring(json));
+                            callback.call(this.ctx, this.tostring(json));
                         }
                         return 1;
                     }

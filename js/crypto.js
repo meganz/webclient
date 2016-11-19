@@ -1517,7 +1517,7 @@ function api_cancel(q) {
             // the "cancelled" flag merely (redundantly?) ensures that
             // subsequent onerror/onload/onprogress callbacks are ignored.
             q.xhr.cancelled = true;
-            q.xhr.abort();
+            if (q.xhr.abort) q.xhr.abort();
         }
         if (q.timer) {
             clearTimeout(q.timer);
@@ -1583,7 +1583,7 @@ var chunked_method = window.chrome ? (self.fetch ? 2 : 0) : -1;
 function chunkedfetch(xhr, uri, postdata) {
     fetch(uri, { method: 'POST', body: postdata }).then(function(response) {
         var reader = response.body.getReader();
-        xhr.fetchStatus = response.status;
+        xhr.status = response.status;
         xhr.totalBytes = response.headers.get('Original-Content-Length');
 
         function chunkedread() {
@@ -1622,7 +1622,8 @@ function api_proc(q) {
     q.i ^= 1;
 
     if (!q.xhr) {
-        q.xhr = getxhr();
+        // we need a real XHR only if we don't use fetch for this channel
+        q.xhr = (!q.split || chunked_method != 2) ? getxhr() : {};
 
         q.xhr.q = q;
 
@@ -1682,7 +1683,7 @@ function api_proc(q) {
         q.xhr.onload = function onAPIProcXHRLoad() {
             if (!this.cancelled) {
                 var t;
-                var status = this.status || this.fetchStatus;
+                var status = this.status;
 
                 if (status == 200) {
                     var response = this.responseText || this.response;

@@ -834,10 +834,8 @@ var crypt = (function () {
     return ns;
 }());
 
-
-
-
 window.URL = window.URL || window.webkitURL;
+
 var have_ab = typeof ArrayBuffer !== 'undefined' && typeof DataView !== 'undefined';
 var use_workers = have_ab && typeof Worker !== 'undefined';
 
@@ -868,13 +866,14 @@ else {
     }
 }
 
+// general errors
 var EINTERNAL = -1;
 var EARGS = -2;
 var EAGAIN = -3;
 var ERATELIMIT = -4;
 var EFAILED = -5;
-var ETOOMANY = -6; // too many IP addresses
-var ERANGE = -7; // file packet out of range
+var ETOOMANY = -6;
+var ERANGE = -7;
 var EEXPIRED = -8;
 
 // FS access errors
@@ -1425,7 +1424,6 @@ var to8 = firefox_boost ? mozTo8 : function (unicode) {
 // All commands are executed in sequence, with no overlap
 // FIXME: show user warning after backoff > 1000
 
-// FIXME: proper OOP!
 var apixs = [];
 
 function api_reset() {
@@ -1451,6 +1449,7 @@ function api_reset() {
                         '['       : tree_residue,    // tree residue
                         '#'       : api_esplit });   // numeric error code
 }
+
 mBroadcaster.once('boot_done', api_reset);
 
 // a chunked request received a purely numerical response - handle it the usual way
@@ -1514,7 +1513,7 @@ function stopapi() {
 function api_cancel(q) {
     if (q) {
         if (q.xhr) {
-            // the "cancelled" flag merely (redundantly?) ensures that
+            // setting the "cancelled" flag ensures that
             // subsequent onerror/onload/onprogress callbacks are ignored.
             q.xhr.cancelled = true;
             if (q.xhr.abort) q.xhr.abort();
@@ -1590,6 +1589,7 @@ function chunkedfetch(xhr, uri, postdata) {
             return reader.read().then(function(r) {
                 if (r.done) {
                     // signal completion through .onload()
+                    xhr.response = null;
                     xhr.onload();
                 }
                 else {
@@ -1795,7 +1795,7 @@ function api_send(q) {
         chunkedfetch(q.xhr, q.url, q.rawreq);
     }
     else {
-        // use XHR
+        // use legacy XHR API
         q.xhr.open('POST', q.url, true);
 
         if (q.split) {
@@ -1859,6 +1859,7 @@ function api_ready(q) {
 }
 
 var apiFloorCap = 3000;
+
 function api_retry() {
     for (var i = apixs.length; i--; ) {
         if (apixs[i].timer && apixs[i].backoff > apiFloorCap) {
@@ -2847,6 +2848,7 @@ function is_image(name) {
 
     return false;
 }
+
 is_image.def = {
     'JPG': 1,
     'JPEG': 1,
@@ -2854,6 +2856,7 @@ is_image.def = {
     'BMP': 1,
     'PNG': 1
 };
+
 is_image.raw = {
     // http://www.sno.phy.queensu.ca/~phil/exiftool/#supported
     // let raw = {}; for(let tr of document.querySelectorAll('.norm.tight.sm.bm tr'))
@@ -2906,6 +2909,7 @@ var mThumbHandler = {
         return this.sup[ext];
     }
 };
+
 mThumbHandler.add('PSD', function PSDThumbHandler(ab, cb) {
     // http://www.awaresystems.be/imaging/tiff/tifftags/docs/photoshopthumbnail.html
     var logger = MegaLogger.getLogger('crypt');
@@ -2953,6 +2957,7 @@ mThumbHandler.add('PSD', function PSDThumbHandler(ab, cb) {
     }
     cb(result);
 });
+
 mThumbHandler.add('SVG', function SVGThumbHandler(ab, cb) {
     var canvas = document.createElement('canvas');
     var ctx = canvas.getContext('2d');
@@ -4063,6 +4068,7 @@ function crypto_share_rsa2aes() {
     }
 }
 
+// FIXME: add to translations?
 function api_strerror(errno) {
     switch (errno) {
     case 0:
@@ -4391,7 +4397,13 @@ function api_strerror(errno) {
 
             // convert input Uint8Array to string
             this.tostring = function(u8) {
-                return String.fromCharCode.apply(null, u8);
+                var b = '';
+
+                for (var i = 0; i < u8.length; i++) {
+                    b = b + String.fromCharCode(u8[i]);
+                }
+
+                return b;
             };
 
             // convert char to Uint8Array element (number)
@@ -4404,7 +4416,7 @@ function api_strerror(errno) {
                 return String.fromCharCode(c);
             };
 
-            // concatenate two Uint8Arrays (relies on boolean.length to be undefined)
+            // concatenate two Uint8Arrays (a can be false - relies on boolean.length to be undefined)
             this.concat = function(a, b) {
                 var t = new Uint8Array(a.length+b.length);
                 if (a) t.set(a, 0);
@@ -4436,9 +4448,9 @@ function api_strerror(errno) {
                 return c;
             };
 
-            // concatenate two strings
+            // concatenate two strings (a can be false)
             this.concat = function(a, b) {
-                return a+b;
+                return a ? a+b : b;
             };
 
             // substring

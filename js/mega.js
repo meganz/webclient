@@ -8104,7 +8104,7 @@ function loadfm_done(mDBload) {
     mega.loadReport.procAPs       = Date.now() - mega.loadReport.stepTimeStamp;
     mega.loadReport.stepTimeStamp = Date.now();
 
-    if (u_type == 3) {
+    if (!pfid && u_type == 3) {
 
         // load/initialise the authentication system
         mega.config.fetch()
@@ -8118,7 +8118,7 @@ function loadfm_done(mDBload) {
 
         if ((location.host === 'mega.nz' || !megaChatIsDisabled) && !is_mobile) {
 
-            if (u_type === 3 && !loadfm.chatloading) {
+            if (!pfid && u_type === 3 && !loadfm.chatloading) {
                 loadfm.chatloading = true;
 
                 mega.utils.require('chat')

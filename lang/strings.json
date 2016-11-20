@@ -15054,5 +15054,21 @@
     "15536": {
         "text": "Click [B]Update[\/B] for the new browser code to run. Your session will remain open.",
         "context": "An additional message on the site update dialog. This lets the user know that they need to click the Update button in order for their browser to download and run the latest version of the website."
+    },
+    "16096": {
+        "text": "Saved",
+        "context": "State shown if something is 'Saved' (String as short as possible)."
+    },
+    "16097": {
+        "text": "Please check your e-mail and follow the link to confirm your account.",
+        "context": "Text shown just after creating an account to remenber the user what to do to complete the account creation proccess"
+    },
+    "16098": {
+        "text": "Why do I need a Recovery Key?",
+        "context": "Question button to present a view where it's explained what is the Recovery Key"
+    },
+    "16099": {
+        "text": "You can reset your password by following the recovery link that will be sent to your email.",
+        "context": "Text of the alert dialog to inform the user that have to check the email after clicking the option forgot password"
     }
 }

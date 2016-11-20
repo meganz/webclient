@@ -574,8 +574,7 @@ FMDB.prototype.normaliseresult = function fmdb_normaliseresult(table, r) {
 // non-transactional read with subsequent deobfuscation, with optional key filter
 // FIXME: replace cb with Promises without incurring a massive readability/mem/CPU penalty!
 // (dirty reads are supported by scanning the pending writes after the IndexedDB read completes)
-// FIXME: do we have a race condition between a write immediately completing after the read?
-FMDB.prototype.getbykey = function fmdb_getbykey(table, index, where, cb) {
+FMDB.prototype.getbykey = function fmdb_getbykey(table, index, anyof, where, cb) {
     if (!this.up()) {
         return cb([]);
     }
@@ -587,6 +586,13 @@ FMDB.prototype.getbykey = function fmdb_getbykey(table, index, where, cb) {
 
     var t = fmdb.db[table];
     var i = 0;
+
+    if (anyof) {
+        // encrypt all values in the list
+        for (i = anyof[1].length; i--; ) anyof[1][i] = ab_to_base64(this.strcrypt(anyof[1][i]));
+        // (this leaves i == -1, which triggers the .where() branch below)
+        t = t.where(anyof[0]).anyOf(anyof[1]);
+    }
 
     if (where) {
         for (var k = where.length; k--; ) {
@@ -604,6 +610,7 @@ FMDB.prototype.getbykey = function fmdb_getbykey(table, index, where, cb) {
         }
     }
 
+    // FIXME (critical): support anyof below!
     t.toArray().then(function(r){
         // now scan the pending elements to capture and return unwritten updates
         // FIXME: typically, there are very few or no pending elements -

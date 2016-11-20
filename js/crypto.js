@@ -834,10 +834,8 @@ var crypt = (function () {
     return ns;
 }());
 
-
-
-
 window.URL = window.URL || window.webkitURL;
+
 var have_ab = typeof ArrayBuffer !== 'undefined' && typeof DataView !== 'undefined';
 var use_workers = have_ab && typeof Worker !== 'undefined';
 
@@ -868,13 +866,14 @@ else {
     }
 }
 
+// general errors
 var EINTERNAL = -1;
 var EARGS = -2;
 var EAGAIN = -3;
 var ERATELIMIT = -4;
 var EFAILED = -5;
-var ETOOMANY = -6; // too many IP addresses
-var ERANGE = -7; // file packet out of range
+var ETOOMANY = -6;
+var ERANGE = -7;
 var EEXPIRED = -8;
 
 // FS access errors
@@ -1425,7 +1424,6 @@ var to8 = firefox_boost ? mozTo8 : function (unicode) {
 // All commands are executed in sequence, with no overlap
 // FIXME: show user warning after backoff > 1000
 
-// FIXME: proper OOP!
 var apixs = [];
 
 function api_reset() {
@@ -1451,6 +1449,7 @@ function api_reset() {
                         '['       : tree_residue,    // tree residue
                         '#'       : api_esplit });   // numeric error code
 }
+
 mBroadcaster.once('boot_done', api_reset);
 
 // a chunked request received a purely numerical response - handle it the usual way
@@ -1514,10 +1513,11 @@ function stopapi() {
 function api_cancel(q) {
     if (q) {
         if (q.xhr) {
-            // the "cancelled" flag merely (redundantly?) ensures that
+            // setting the "cancelled" flag ensures that
             // subsequent onerror/onload/onprogress callbacks are ignored.
             q.xhr.cancelled = true;
-            q.xhr.abort();
+            if (q.xhr.abort) q.xhr.abort();
+            q.xhr = false;
         }
         if (q.timer) {
             clearTimeout(q.timer);
@@ -1572,8 +1572,42 @@ function api_req(request, context, channel) {
 }
 
 // indicates whether this is a Firefox supporting the moz-chunked-*
-// responseType - unknown: -1, no: 0, yes: 1
-var moz_chunked_active = !window.chrome && -1;
+// responseType or a Chrome derivative supporting the fetch API
+// values: unknown: -1, no: 0, moz-chunked: 1, fetch: 2
+// FIXME: check for fetch on !Firefox, not just on Chrome
+var chunked_method = window.chrome ? (self.fetch ? 2 : 0) : -1;
+
+// this kludge emulates moz-chunked-arraybuffer with XHR-style callbacks
+function chunkedfetch(xhr, uri, postdata) {
+    fetch(uri, { method: 'POST', body: postdata }).then(function(response) {
+        var reader = response.body.getReader();
+        var evt = { loaded: 0 };
+        xhr.status = response.status;
+        xhr.totalBytes = response.headers.get('Original-Content-Length');
+
+        function chunkedread() {
+            return reader.read().then(function(r) {
+                if (r.done) {
+                    // signal completion through .onload()
+                    xhr.response = null;
+                    xhr.onload();
+                }
+                else {
+                    // feed received chunk to JSONSplitter via .onprogress()
+                    evt.loaded += r.value.length;
+                    xhr.response = r.value;
+                    xhr.onprogress(evt);
+                    chunkedread();
+                }
+            });
+        }
+
+        chunkedread();
+    }).catch(function(err) {
+        console.error("Fetch error: ", err);
+        xhr.onerror();
+    });
+}
 
 // send pending API request on channel q
 function api_proc(q) {
@@ -1590,20 +1624,8 @@ function api_proc(q) {
     q.i ^= 1;
 
     if (!q.xhr) {
-        q.xhr = getxhr();
-
-        // try enabling chunked transfers to conserve memory & CPU
-        // (currently only available with Firefox)
-        // FIXME: use Fetch API with Chrome
-        // FIXME: use ms-stream with MSIE?
-        if (q.split && moz_chunked_active) {
-            q.xhr.responseType = 'moz-chunked-text';
-
-            // first try? record success
-            if (moz_chunked_active < 0) {
-                moz_chunked_active = q.xhr.responseType == 'moz-chunked-text';
-            }
-        }
+        // we need a real XHR only if we don't use fetch for this channel
+        q.xhr = (!q.split || chunked_method != 2) ? getxhr() : {};
 
         q.xhr.q = q;
 
@@ -1640,8 +1662,13 @@ function api_proc(q) {
 
                     // update number of bytes received in .onprogress() for subsequent check
                     // in .onload() whether it contains more data
-                    var chunk = this.responseText || this.response
-                    if (!moz_chunked_active) {
+
+                    var chunk = this.response;
+
+                    // is this an ArrayBuffer? turn into a Uint8Array
+                    if (!(chunk.length >= 0)) chunk = new Uint8Array(chunk);
+
+                    if (!chunked_method) {
                         // unfortunately, we're receiving a growing response
                         this.q.received = chunk.length;
                     }
@@ -1652,9 +1679,9 @@ function api_proc(q) {
 
                     // send incoming live data to splitter
                     // for maximum flexibility, the splitter ctx will be the XHR
-                    if (!this.q.splitter.chunkproc(chunk, this, false)) {
+                    if (!this.q.splitter.chunkproc(chunk, false)) {
                         // a JSON syntax error occurred: hard reload
-                        fm_fullreload(this.q, 'JSON Syntax Error');
+                        fm_fullreload(this.q, 'onerror JSON Syntax Error');
                     }
                 }
             };
@@ -1665,18 +1692,18 @@ function api_proc(q) {
                 var t;
                 var status = this.status;
 
-                if (status === 200) {
-                    var response = this.responseText || this.response;
+                if (status == 200) {
+                    var response = this.response;
 
                     // is this residual data that hasn't gone to the splitter yet?
                     if (this.q.splitter) {
                         // we process the full response if additional bytes were received
                         // FIXME: in moz-chunked transfers, if onload() can contain chars beyond
                         // the last onprogress(), send .substr(this.q.received) instead!
-                        // otherwise, we send an empty string
+                        // otherwise, we send false to indicate no further input
                         // in all cases, set the inputcomplete flag to catch incomplete API responses
-                        if (!this.q.splitter.chunkproc((response && response.length > this.q.received) ? response : '', this, true)) {
-                            fm_fullreload(this.q, 'onload json syntax error');
+                        if (!this.q.splitter.chunkproc((response && response.length > this.q.received) ? response : false, true)) {
+                            fm_fullreload(this.q, 'onload JSON Syntax Error');
                         }
                         return;
                     }
@@ -1754,21 +1781,40 @@ function api_send(q) {
     var logger = MegaLogger.getLogger('crypt');
     q.timer = false;
 
-    q.xhr.open('POST', q.url, true);
-
     logger.debug("Sending API request: " + q.rawreq + " to " + q.url);
 
     // reset number of bytes received and response size
     q.received = 0;
     delete q.xhr.totalBytes;
 
-    // create splitter if rules are attached
-    if (q.split) {
-        q.splitter = new JSONSplitter(q.split);
-    }
-
     q.xhr.cancelled = false;
-    q.xhr.send(q.rawreq);
+
+    if (q.split && chunked_method == 2) {
+        // use chunked fetch with JSONSplitter input type Uint8Array
+        q.splitter = new JSONSplitter(q.split, q.xhr, true);
+        chunkedfetch(q.xhr, q.url, q.rawreq);
+    }
+    else {
+        // use legacy XHR API
+        q.xhr.open('POST', q.url, true);
+
+        if (q.split) {
+            if (chunked_method) {
+                // FIXME: use Fetch API if more efficient than this
+                q.xhr.responseType = 'moz-chunked-arraybuffer';
+
+                // first try? record success
+                if (chunked_method < 0) {
+                    chunked_method = q.xhr.responseType == 'moz-chunked-arraybuffer';
+                }
+            }
+
+            // at this point, chunked_method being logically true implies arraybuffer
+            q.splitter = new JSONSplitter(q.split, q.xhr, chunked_method);
+         }
+
+        q.xhr.send(q.rawreq);
+    }
 }
 
 function api_reqerror(q, e, status) {
@@ -1805,8 +1851,7 @@ function api_reqerror(q, e, status) {
     }
 }
 
-function api_ready(q)
-{
+function api_ready(q) {
     q.rawreq = false;
     q.backoff = 0; // request succeeded - reset backoff timer
     q.cmds[q.i] = [];
@@ -1814,6 +1859,7 @@ function api_ready(q)
 }
 
 var apiFloorCap = 3000;
+
 function api_retry() {
     for (var i = apixs.length; i--; ) {
         if (apixs[i].timer && apixs[i].backoff > apiFloorCap) {
@@ -1994,6 +2040,7 @@ function getsc(force) {
             waitxhr.abort();
         }
 
+        api_cancel(apixs[2]);   // retire existing XHR that may still be completing the request
         api_ready(apixs[2]);
         api_req('sn=' + currsn + '&ssl=1&e=' + cmsNotifHandler, {}, 2);
     }
@@ -2011,11 +2058,13 @@ function waitsc() {
     if (!waitxhr) {
         waitxhr = getxhr();
     }
+
     waitxhr.waitid = newid;
 
     if (waittimeout) {
         clearTimeout(waittimeout);
     }
+
     waittimeout = setTimeout(waitsc, 300000);
 
     waitxhr.onerror = function () {
@@ -2799,6 +2848,7 @@ function is_image(name) {
 
     return false;
 }
+
 is_image.def = {
     'JPG': 1,
     'JPEG': 1,
@@ -2806,6 +2856,7 @@ is_image.def = {
     'BMP': 1,
     'PNG': 1
 };
+
 is_image.raw = {
     // http://www.sno.phy.queensu.ca/~phil/exiftool/#supported
     // let raw = {}; for(let tr of document.querySelectorAll('.norm.tight.sm.bm tr'))
@@ -2858,6 +2909,7 @@ var mThumbHandler = {
         return this.sup[ext];
     }
 };
+
 mThumbHandler.add('PSD', function PSDThumbHandler(ab, cb) {
     // http://www.awaresystems.be/imaging/tiff/tifftags/docs/photoshopthumbnail.html
     var logger = MegaLogger.getLogger('crypt');
@@ -2905,6 +2957,7 @@ mThumbHandler.add('PSD', function PSDThumbHandler(ab, cb) {
     }
     cb(result);
 });
+
 mThumbHandler.add('SVG', function SVGThumbHandler(ab, cb) {
     var canvas = document.createElement('canvas');
     var ctx = canvas.getContext('2d');
@@ -4015,6 +4068,7 @@ function crypto_share_rsa2aes() {
     }
 }
 
+// FIXME: add to translations?
 function api_strerror(errno) {
     switch (errno) {
     case 0:
@@ -4305,9 +4359,10 @@ function api_strerror(errno) {
 // JSON parser/splitter
 // (this is tailored to processing what the API actually generates
 // i.e.: NO whitespace, NO non-numeric/string constants ("null"), etc...)
+// accepts string and Uint8Array input, but not a mixture of the two
 (function() {
 
-    var JSONSplitter = function json_splitter(filters, ctx) {
+    var JSONSplitter = function json_splitter(filters, ctx, format_uint8array) {
         if (!(this instanceof json_splitter)) {
             return new json_splitter(filters, ctx);
         }
@@ -4315,8 +4370,8 @@ function api_strerror(errno) {
         // position in source string
         this.p = 0;
 
-        // remaining source string from previous chunk (chunked feeding)
-        this.rem = '';
+        // remaining part of previous chunk (chunked feeding only)
+        this.rem = false;
 
         // enclosing object stack at current position (type + name)
         this.stack = [];
@@ -4337,6 +4392,73 @@ function api_strerror(errno) {
         // optional callee scope
         this.ctx = ctx;
 
+        if (format_uint8array) {
+            // extraction/manipulation helpers for Uint8Array inputs
+
+            // convert input Uint8Array to string
+            this.tostring = function(u8) {
+                var b = '';
+
+                for (var i = 0; i < u8.length; i++) {
+                    b = b + String.fromCharCode(u8[i]);
+                }
+
+                return b;
+            };
+
+            // convert char to Uint8Array element (number)
+            this.fromchar = function(c) {
+                return c.charCodeAt(0);
+            };
+
+            // convert Uint8Array element (number) to char
+            this.tochar = function(c) {
+                return String.fromCharCode(c);
+            };
+
+            // concatenate two Uint8Arrays (a can be false - relies on boolean.length to be undefined)
+            this.concat = function(a, b) {
+                var t = new Uint8Array(a.length+b.length);
+                if (a) t.set(a, 0);
+                t.set(b, a.length+0);
+                return t;
+            };
+
+            // sub-Uint8Array of a Uint8Array given position p and optional length l
+            this.sub = function(s, p, l) {
+                return l >= 0 ? new Uint8Array(s.buffer, p, l)
+                              : new Uint8Array(s.buffer, p);
+            }
+        }
+        else {
+            // extraction/manipulation helpers (mostly no-ops) for string inputs
+
+            // convert input string to string
+            this.tostring = function(s) {
+                return s;
+            };
+
+            // convert char to string element (char)
+            this.fromchar = function(c) {
+                return c;
+            };
+
+            // convert string element (char) to char
+            this.tochar = function(c) {
+                return c;
+            };
+
+            // concatenate two strings (a can be false)
+            this.concat = function(a, b) {
+                return a ? a+b : b;
+            };
+
+            // substring
+            this.sub = function(s, p, l) {
+                return s.substr(p, l);
+            }
+        }
+
         // console logging
         this.logger = MegaLogger.getLogger('JSONSplitter');
     };
@@ -4349,9 +4471,9 @@ function api_strerror(errno) {
         var oo = o;
 
         // (we do not set lastIndex and use RegExp.exec() with /g due to the potentially enormous length of s)
-        while ((oo = s.indexOf('"', oo + 1)) >= 0) {
-            if (this.stringre.test(s.substr(o, oo - o))) {
-                return oo + 1;
+        while ((oo = s.indexOf(this.fromchar('"'), oo+1)) >= 0) {
+            if (this.stringre.test(this.tostring(this.sub(s, o, oo-o)))) {
+                return oo+1;
             }
         }
 
@@ -4365,13 +4487,13 @@ function api_strerror(errno) {
         var oo = o;
 
         // (we do not set lastIndex due to the potentially enormous length of s)
-        while ('0123456789-+eE.'.indexOf(s[oo]) >= 0) oo++;
+        while ('0123456789-+eE.'.indexOf(this.tochar(s[oo])) >= 0) oo++;
 
         if (oo > o) {
-            var r = this.numberre.exec(s.substr(o, oo - o));
+            var r = this.numberre.exec(this.tostring(this.sub(s, o, oo-o)));
 
             if (r) {
-                return o + r[0].length;
+                return o+r[0].length;
             }
         }
 
@@ -4380,31 +4502,34 @@ function api_strerror(errno) {
 
     // process a JSON chunk (of a stream of chunks, if the browser supports it)
     // FIXME: rewrite without large string concatenation
-    JSONSplitter.prototype.chunkproc = function json_chunkproc(chunk, ctx, inputcomplete) {
+    JSONSplitter.prototype.chunkproc = function json_chunkproc(chunk, inputcomplete) {
         // we are not receiving responses incrementally: process as growing buffer
-        if (!moz_chunked_active) return this.proc(chunk, ctx, inputcomplete);
+        if (!chunked_method) return this.proc(chunk, inputcomplete);
 
         // otherwise, we just retain the data that is still going to be needed in the
         // next round... enabling infinitely large accounts to be "streamed" to IndexedDB
         // (in theory)
         if (this.rem.length) {
             // append to previous residue
-            this.rem += chunk;
+            if (chunk) {
+                this.rem = this.concat(this.rem, chunk);
+            }
             chunk = this.rem;
         }
 
         // process combined residue + new chunk
-        var r = this.proc(chunk, ctx, inputcomplete);
+        var r = this.proc(chunk, inputcomplete);
 
         if (r >= 0) {
             // processing ended
-            this.rem = '';
+            this.rem = false;
             return r;
         }
 
         if (this.lastpos) {
             // remove processed data
-            this.rem = chunk.substr(this.lastpos);
+            this.rem = this.sub(chunk, this.lastpos);
+
             this.p -= this.lastpos;
             this.lastpos = 0;
         }
@@ -4417,9 +4542,9 @@ function api_strerror(errno) {
     };
 
     // returns -1 if it wants more data, 0 in case of a fatal error, 1 when done
-    JSONSplitter.prototype.proc = function json_proc(json, ctx, inputcomplete) {
+    JSONSplitter.prototype.proc = function json_proc(json, inputcomplete) {
         while (this.p < json.length) {
-            var c = json[this.p];
+            var c = this.tochar(json[this.p]);
 
             if (c == '[' || c == '{') {
                 if (!this.expectvalue) {
@@ -4427,11 +4552,11 @@ function api_strerror(errno) {
                     return 0;
                 }
 
-                this.stack.push(json[this.p] + this.lastname);
+                this.stack.push(this.tochar(json[this.p]) + this.lastname);
 
                 if (this.filters[this.stack.join('')]) {
                     // a filter is configured for this path - recurse
-                    this.buckets[0] += json.substr(this.lastpos, this.p-this.lastpos);
+                    this.buckets[0] += this.tostring(this.sub(json, this.lastpos, this.p-this.lastpos));
                     this.lastpos = this.p;
                     this.buckets.unshift('');
                 }
@@ -4461,11 +4586,10 @@ function api_strerror(errno) {
                     // we have a filter configured for this object
                     try {
                         // pass filtrate to application and empty bucket
-                        callback.call(ctx || this.ctx,
-                            JSON.parse(this.buckets[0]+json.substr(this.lastpos, this.p-this.lastpos))
+                        callback.call(this.ctx,
+                            JSON.parse(this.buckets[0]+this.tostring(this.sub(json, this.lastpos, this.p-this.lastpos)))
                         );
                     } catch (e) {
-                        this.logger.log(json.substr(this.lastpos, this.p-this.lastpos));
                         this.logger.error("Malformed JSON - parse error in filter element " + callback.name, e);
                         return 0;
                     }
@@ -4479,7 +4603,7 @@ function api_strerror(errno) {
             }
             else if (c == ',') {
                 if (this.expectvalue) {
-                    this.logger.error("Malformed JSON - stray comma " + json.substr(this.p-5, 100));
+                    this.logger.error("Malformed JSON - stray comma");
                     return 0;
                 }
                 if (this.lastpos == this.p) {
@@ -4504,12 +4628,12 @@ function api_strerror(errno) {
                         break;
                     }
 
-                    if (json[t] != ':') {
+                    if (this.tochar(json[t]) != ':') {
                         this.logger.error("Malformed JSON - no : found after property name");
                         return 0;
                     }
 
-                    this.lastname = json.substr(this.p+1, t-this.p-2);
+                    this.lastname = this.tostring(this.sub(json, this.p+1, t-this.p-2));
                     this.expectvalue = -1;
                     this.p = t+1;
                 }
@@ -4529,7 +4653,7 @@ function api_strerror(errno) {
                         // this is a stand-alone number, do we have a callback for them?
                         callback = this.filters['#'];
                         if (callback) {
-                            callback.call(ctx || this.ctx, json);
+                            callback.call(this.ctx, this.tostring(json));
                         }
                         return 1;
                     }

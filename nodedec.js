@@ -123,19 +123,18 @@ function crypto_decryptnode(n) {
     if (typeof n.k == 'undefined' || n.name) return;
 
     if (typeof n.k == 'string') {
-        // inbound share root?
+        // inbound share root? exract & store sharekey.
         if (n.sk) {
             key = crypto_process_sharekey(n.h, n.sk);
 
-            if (key !== false) {
-                var keyLen = key.length;
-                if (keyLen !== 4 && keyLen !== 6 && keyLen !== 8) {
-                    srvlog2('invalid-aes-key-size', n.h, n.k.length, n.sk.length, keyLen);
+            if (key) {
+                if (key.length != 4 && key.length != 8) {
+                    srvlog2('invalid-aes-key-size', n.h, n.k.length, n.sk.length, key.length);
                 }
                 else {
+                    delete n.sk;
                     u_sharekeys[n.h] = [key, new sjcl.cipher.aes(key)];
                     n.p = n.u;
-                    n.sk = key;
                 }
             }
         }

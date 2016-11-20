@@ -20,7 +20,7 @@ IndexedDBKVStorage.prototype.prefillMemCache = function(fmdb) {
     var promise = new MegaPromise();
 
     if (fmdb) {
-        this.fmdb.getbykey(this.name, 'k', false, function(r){
+        this.fmdb.getbykey(this.name, 'k', false, false, function(r){
             for (var i = r.length; i--; ) {
                 self._memCache[r[i].k] = r[i].v;
             }
@@ -88,7 +88,7 @@ IndexedDBKVStorage.prototype.getItem = function __IDBKVGetItem(k) {
     }
 
     if (this.fmdb) {
-        this.fmdb.getbykey(this.name, 'k', [['k', k]], function(r){
+        this.fmdb.getbykey(this.name, 'k', false, [['k', k]], function(r){
             if (r.length) {
                 self._memCache[r[0].k] = r[0].v;
                 promise.resolve(r[0].v);
@@ -162,7 +162,7 @@ IndexedDBKVStorage.prototype.hasItem = function __IDBKVHasItem(k) {
     }
 
     if (this.fmdb) {
-        this.fmdb.getbykey(this.name, 'k', [['k', k]], function(r){
+        this.fmdb.getbykey(this.name, 'k', false, [['k', k]], function(r){
             if (r.length) {
                 promise.resolve();
             }

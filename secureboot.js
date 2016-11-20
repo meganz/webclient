@@ -1954,6 +1954,8 @@ else if (!b_u)
             waitingToBeLoaded++;
             elem.onload = function() {
                 // if (d) console.log('jj.progress...', waitingToBeLoaded);
+                jsl_current += Object(jsl[id]).w || 1;
+                jsl_progress();
                 if (--waitingToBeLoaded == 0) {
                     jj_done = true;
                     boot_done();
@@ -2006,13 +2008,13 @@ else if (!b_u)
 
                     if (jsl[i].j === 1) {
                         jj_done = false;
-                        createScriptTag("jsl" + i, bootstaticpath + jsl[i].f + jjNoCache);
+                        jsl[i].text = '/**/';
+                        createScriptTag(i, bootstaticpath + jsl[i].f + jjNoCache);
                     }
                     else if (jsl[i].j === 2) {
-                        if ((m && (jsl[i].m)) || ((!m) && (jsl[i].d))) {
-                            jj_done = false;
-                            createStyleTag("jsl" + i, bootstaticpath + jsl[i].f + jjNoCache);
-                        }
+                        jj_done = false;
+                        jsl[i].text = '/**/';
+                        createStyleTag(i, bootstaticpath + jsl[i].f + jjNoCache);
                     }
                 }
             }
@@ -2110,18 +2112,6 @@ else if (!b_u)
 
     function xhr_load(url,jsi,xhri)
     {
-        if (jj) {
-            if (jsl[jsi].j == 1 || jsl[jsi].j == 2) {
-                // DON'T load via XHR any js or css files...since when jj == 1, secureboot will append them in the doc.
-
-                jsl_current += jsl[jsi].w || 1;
-                jsl_progress();
-                if (++jslcomplete == jsl.length) initall();
-                else jsl_load(xhri);
-
-                return;
-            }
-        }
         xhr_stack[xhri] = getxhr();
         xhr_stack[xhri].onload = function()
         {

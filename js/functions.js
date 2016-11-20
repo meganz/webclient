@@ -3740,7 +3740,7 @@ mega.utils.require = function megaUtilsRequire() {
             // inject them into jsl2
             for (var i = group.length; i--;) {
                 if (!jsl2[group[i]]) {
-                    jsl2[group[i]] = jsl3[rsc][group[i]];
+                    (jsl2[group[i]] = jsl3[rsc][group[i]]).n = group[i];
                 }
             }
         }

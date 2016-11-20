@@ -5519,7 +5519,6 @@ function renderfm() {
     }
 
     initUI();
-    loadingDialog.hide();
     M.sortByName();
     M.renderTree();
     M.renderPath();
@@ -7970,16 +7969,18 @@ function init_chat() {
                 }
             }
         }
+
+        if (!loadfm.loading) {
+            loadingDialog.hide();
+            loadingInitDialog.hide();
+        }
     }
 
     if (pfid) {
         if (d) console.log('Will not initialize chat [branch:1]');
     }
-    else if (!loadfm.chatloaded) {
-        authring.onAuthringReady('chat').done(__init_chat);
-    }
     else {
-        if (d) console.log('Will not initialize chat [branch:3]');
+        authring.onAuthringReady('chat').done(__init_chat);
     }
 }
 
@@ -8113,10 +8114,11 @@ function loadfm_done(mDBload) {
     }
 
     mega.config.ready(function() {
+        var hideLoadingDialog = !CMS.isLoading();
 
         if ((location.host === 'mega.nz' || !megaChatIsDisabled) && !is_mobile) {
 
-            if (u_type && !loadfm.chatloading) {
+            if (u_type === 3 && !loadfm.chatloading) {
                 loadfm.chatloading = true;
 
                 mega.utils.require('chat')
@@ -8126,7 +8128,6 @@ function loadfm_done(mDBload) {
                             init_chat();
 
                             if (loadfm.chatmcf) {
-                                // FIXME: check this (ie, move to init_chat?)
                                 Soon(function() {
                                     processMCF(loadfm.chatmcf[0], loadfm.chatmcf[1]);
                                 });
@@ -8140,6 +8141,11 @@ function loadfm_done(mDBload) {
                         loadfm.chatloading = false;
                         loadfm.chatloaded  = Date.now();
                     });
+
+                if (location.hash.substr(0, 8) === '#fm/chat') {
+                    // Keep the "decrypting" step until the chat have loaded.
+                    hideLoadingDialog = false;
+                }
             }
         }
 
@@ -8161,7 +8167,7 @@ function loadfm_done(mDBload) {
             mega.loadReport.renderfm = -1;
         }
 
-        if (!CMS.isLoading()) {
+        if (hideLoadingDialog) {
             loadingDialog.hide();
             loadingInitDialog.hide();
         }

@@ -675,6 +675,11 @@ var authring = (function () {
      */
     ns.initAuthenticationSystem = function() {
 
+        if (pfid) {
+            console.error('Do not initialize the authentication system on folder-links.');
+            return MegaPromise.reject(EACCESS);
+        }
+
         // Make sure we're initialising only once.
         if (ns._initialisingPromise !== false) {
             if (ns._initialisingPromise === true) {

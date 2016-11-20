@@ -426,76 +426,80 @@ var strongvelope = {};
         var tlvType;
         var tlvVariable;
         var value;
-
-        parsedContent.protocolVersion = binaryMessage.charCodeAt(0);
-        var rest = binaryMessage.substring(1);
-        if (parsedContent.protocolVersion > PROTOCOL_VERSION_V1) {
-            rest = binaryMessage.substring(2);
-            parsedContent[_TLV_MAPPING[TLV_TYPES.MESSAGE_TYPE]] = binaryMessage.charCodeAt(1);
-        }
-        while (rest.length > 0) {
-            part = (parsedContent.protocolVersion > PROTOCOL_VERSION_V1) ?
-                tlvstore.splitSingleTlvElement(rest) : tlvstore.splitSingleTlvRecord(rest);
-            tlvType = part.record[0].charCodeAt(0);
-            tlvVariable = _TLV_MAPPING[tlvType];
-            value = part.record[1];
-
-            if (typeof tlvVariable === 'undefined') {
-                logger.critical('Received unexpected TLV type: ' + tlvType + '.');
-
-                return parsedContent;
+        try {
+            parsedContent.protocolVersion = binaryMessage.charCodeAt(0);
+            var rest = binaryMessage.substring(1);
+            if (parsedContent.protocolVersion > PROTOCOL_VERSION_V1) {
+                rest = binaryMessage.substring(2);
+                parsedContent[_TLV_MAPPING[TLV_TYPES.MESSAGE_TYPE]] = binaryMessage.charCodeAt(1);
             }
+            while (rest.length > 0) {
+                part = (parsedContent.protocolVersion > PROTOCOL_VERSION_V1) ?
+                    tlvstore.splitSingleTlvElement(rest) : tlvstore.splitSingleTlvRecord(rest);
+                tlvType = part.record[0].charCodeAt(0);
+                tlvVariable = _TLV_MAPPING[tlvType];
+                value = part.record[1];
 
-            // Some records need different treatment. Let's go through cases.
-            switch (tlvType) {
-                case TLV_TYPES.SIGNATURE:
-                    parsedContent[tlvVariable] = value;
-                    parsedContent.signedContent = part.rest;
-                    break;
-                case TLV_TYPES.MESSAGE_TYPE:
-                    parsedContent[tlvVariable] = value.charCodeAt(0);
-                    break;
-                case TLV_TYPES.RECIPIENT:
-                case TLV_TYPES.INC_PARTICIPANT:
-                case TLV_TYPES.EXC_PARTICIPANT:
-                    parsedContent[tlvVariable].push(base64urlencode(value));
-                    break;
-                case TLV_TYPES.KEYS:
-                    parsedContent[tlvVariable].push(value);
-                    break;
-                case TLV_TYPES.KEY_IDS:
-                    var keyIds = value;
+                if (typeof tlvVariable === 'undefined') {
+                    logger.critical('Received unexpected TLV type: ' + tlvType + '.');
 
-                    // The key length can change depending on the version
-                    var keyIdLength = strongvelope._getKeyIdLength(parsedContent.protocolVersion);
+                    return parsedContent;
+                }
 
-                    while (keyIds.length > 0) {
-                        parsedContent[tlvVariable].push(keyIds.substring(0, keyIdLength));
-                        keyIds = keyIds.substring(keyIdLength);
-                    }
-                    break;
-                case TLV_TYPES.INVITOR:
-                    parsedContent[tlvVariable] = base64urlencode(value);
-                    break;
-                case TLV_TYPES.KEY_BLOB:
-                    var pos = 0;
-                    while (pos < value.length) {
-                        var len = ns.unpack16le(value.substring(pos + USER_HANDLE_SIZE, pos + USER_HANDLE_SIZE + 2));
-                        parsedContent[_TLV_MAPPING[TLV_TYPES.RECIPIENT]].push(
-                                base64urlencode(value.substring(pos, pos + USER_HANDLE_SIZE)));
-                        parsedContent[_TLV_MAPPING[TLV_TYPES.KEYS]].push(
-                                value.substring(pos + USER_HANDLE_SIZE + 2, pos + USER_HANDLE_SIZE + 2 + len));
-                        pos = pos + USER_HANDLE_SIZE + 2 + len;
-                    }
-                    break;
-                default:
-                    // For all non-special cases, this will be used.
-                    parsedContent[tlvVariable] = value;
+                // Some records need different treatment. Let's go through cases.
+                switch (tlvType) {
+                    case TLV_TYPES.SIGNATURE:
+                        parsedContent[tlvVariable] = value;
+                        parsedContent.signedContent = part.rest;
+                        break;
+                    case TLV_TYPES.MESSAGE_TYPE:
+                        parsedContent[tlvVariable] = value.charCodeAt(0);
+                        break;
+                    case TLV_TYPES.RECIPIENT:
+                    case TLV_TYPES.INC_PARTICIPANT:
+                    case TLV_TYPES.EXC_PARTICIPANT:
+                        parsedContent[tlvVariable].push(base64urlencode(value));
+                        break;
+                    case TLV_TYPES.KEYS:
+                        parsedContent[tlvVariable].push(value);
+                        break;
+                    case TLV_TYPES.KEY_IDS:
+                        var keyIds = value;
+
+                        // The key length can change depending on the version
+                        var keyIdLength = strongvelope._getKeyIdLength(parsedContent.protocolVersion);
+
+                        while (keyIds.length > 0) {
+                            parsedContent[tlvVariable].push(keyIds.substring(0, keyIdLength));
+                            keyIds = keyIds.substring(keyIdLength);
+                        }
+                        break;
+                    case TLV_TYPES.INVITOR:
+                        parsedContent[tlvVariable] = base64urlencode(value);
+                        break;
+                    case TLV_TYPES.KEY_BLOB:
+                        var pos = 0;
+                        while (pos < value.length) {
+                            var len =
+                                    ns.unpack16le(value.substring(pos + USER_HANDLE_SIZE, pos + USER_HANDLE_SIZE + 2));
+                            parsedContent[_TLV_MAPPING[TLV_TYPES.RECIPIENT]].push(
+                                    base64urlencode(value.substring(pos, pos + USER_HANDLE_SIZE)));
+                            parsedContent[_TLV_MAPPING[TLV_TYPES.KEYS]].push(
+                                    value.substring(pos + USER_HANDLE_SIZE + 2, pos + USER_HANDLE_SIZE + 2 + len));
+                            pos = pos + USER_HANDLE_SIZE + 2 + len;
+                        }
+                        break;
+                    default:
+                        // For all non-special cases, this will be used.
+                        parsedContent[tlvVariable] = value;
+                }
+
+                rest = part.rest;
             }
-
-            rest = part.rest;
+        } catch (e) {
+            logger.critical('Could not parse the content, probably a broken binary.');
+            return parsedContent;
         }
-
         return parsedContent;
     };
 

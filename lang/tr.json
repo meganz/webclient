@@ -3233,7 +3233,7 @@
     "8679": "MEGA'da",
     "8681": "Bu \u00f6\u011feyi \u00c7evrimd\u0131\u015f\u0131'dan silmek iste\u011finizden emin misiniz?",
     "8682": "Bu \u00f6\u011feleri \u00c7evrimd\u0131\u015f\u0131'dan silmek iste\u011finizden emin misiniz?",
-    "8683": "T\u00fcm dosyalar\u0131 i\u00e7e aktaram\u0131yoruz, b\u00fcy\u00fck ihtimalle baz\u0131lar\u0131 \u00e7\u00f6km\u00fc\u015f. Operasyon %2 d\u00fc\u011f\u00fcmden %1 tanesinin i\u00e7e aktar\u0131lmas\u0131yla sonland\u0131.",
+    "8683": "T\u00fcm dosyalar i\u00e7eri aktar\u0131lamaz. E\u011fer se\u00e7ili dosyalardan baz\u0131lar\u0131 kald\u0131r\u0131ld\u0131ysa bu durum ortaya \u00e7\u0131kabilir. \u0130\u015flem %2 \u00f6\u011feden %1 tanesi aktar\u0131larak sonu\u00e7land\u0131.",
     "8684": "G\u00f6nder ve kapat",
     "8685": "L\u00fctfen plan\u0131n\u0131z\u0131 neden yenilemek istemedi\u011finizi a\u00e7\u0131klay\u0131n:",
     "8686": "\u015fifresi \u00e7\u00f6z\u00fclmemi\u015f klas\u00f6r",
@@ -3720,7 +3720,7 @@
     "12436": "MEGA uygulamas\u0131 zaten y\u00fckl\u00fc m\u00fc?",
     "12437": "E\u011fer zaten y\u00fckl\u00fcyse [A]t\u0131klay\u0131n![\/A]",
     "12438": "L\u00fctfen Kurtarma Anahtar\u0131n\u0131 girin",
-    "12439": "You are using an ephemeral session in this browser. If you want to preserve the uploaded data, click [A1]Create Account[\/A] in the tab where you see your data. If you do not care about the data, click [A2]Logout[\/A2] and try clicking the same account confirmation link again.",
+    "12439": "Bu taray\u0131c\u0131da ge\u00e7ici oturum kullanmaktas\u0131n\u0131z. E\u011fer y\u00fckl\u00fc veriyi saklamak istiyorsan\u0131z, y\u00fcklenenler k\u0131sm\u0131ndaki [A1]Hesap Olu\u015ftur[\/A1]'a bas\u0131n. E\u011fer veri umrunuzda de\u011fil ise, [A2]\u00c7\u0131k\u0131\u015f Yap[\/A2]'a bas\u0131n ve ayn\u0131 hesap onaylama linkine tekrar t\u0131klay\u0131n.",
     "12440": "Bu taray\u0131c\u0131dan MEGA hesab\u0131nda oturum a\u00e7\u0131lm\u0131\u015f zaten. \u00d6nce oturumu kapata t\u0131klay\u0131n ve sonra ayn\u0131 hesap do\u011frulama ba\u011flant\u0131s\u0131na t\u0131klamay\u0131 deneyin.",
     "12441": "TBZ",
     "12442": "MEGA, her zaman gizli, g\u00fc\u00e7l\u00fc, uygun ve \u00fccretsiz bulut depolama alan\u0131 sa\u011flar",
@@ -3762,6 +3762,11 @@
     "13762": "Kal\u0131c\u0131 olarak 1 dosya ve %1 klas\u00f6r kald\u0131rd\u0131n\u0131z.",
     "13763": "Kal\u0131c\u0131 olarak %1 dosya ve 1 klas\u00f6r kald\u0131rd\u0131n\u0131z.",
     "13764": "Kal\u0131c\u0131 olarak %1 dosya ve %2 klas\u00f6r kald\u0131rd\u0131n\u0131z.",
+    "15536": "Yeni taray\u0131c\u0131 kodunun \u00e7al\u0131\u015fmas\u0131 i\u00e7in [B]G\u00fcncelle[\/B]ye t\u0131klay\u0131n. Otuurmunuz a\u00e7\u0131k kalacakt\u0131r.",
+    "16096": "Saved",
+    "16097": "Please check your e-mail and follow the link to confirm your account.",
+    "16098": "Why do I need a Recovery Key?",
+    "16099": "You can reset your password by following the recovery link that will be sent to your email.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3991,6 +3996,7 @@
         "also-available-windows-mac": 12486,
         "also-available-windows-linux": 12487,
         "suggest-sync-client-message": 12488,
-        "about-page-introduction": 12489
+        "about-page-introduction": 12489,
+        "additional-site-update-message": 15536
     }
 }

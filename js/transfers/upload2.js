@@ -389,13 +389,13 @@ var ulmanager = {
 
         ASSERT(file.filekey, "*** filekey is missing ***");
 
-            var body = {
-                n: file.name
+            var n = {
+                name: file.name,
+                hash: file.hash,
+                k: file.filekey
             };
-            if (file.hash) {
-                body.c = file.hash;
-            }
-            var ea = enc_attr(body, file.filekey);
+
+            var ea = ab_to_base64(crypto_makeattr(n));
             var dir = target || file.target || M.RootID;
             var faid = file.faid ? api_getfa(file.faid) : false;
             var req = {
@@ -404,7 +404,7 @@ var ulmanager = {
                 n: [{
                     h: file.response,
                     t: 0,
-                    a: ab_to_base64(ea[0]),
+                    a: ea,
                     k: a32_to_base64(encrypt_key(u_k_aes, file.filekey))
                 }],
                 i: requesti
@@ -415,7 +415,7 @@ var ulmanager = {
             if (dir) {
                 var sn = fm_getsharenodes(dir);
                 if (sn.length) {
-                    req.cr = crypto_makecr([file.filekey], sn, false);
+                    req.cr = crypto_makecr([n], sn, false);
                     req.cr[1][0] = file.response;
                 }
             }
@@ -694,7 +694,7 @@ var ulmanager = {
                     ulmanager.logger.debug('Upload aborted on deduplication...', File);
                 }
                 else if (res.e === ETEMPUNAVAIL && ctx.skipfile) {
-                    ctx.uq.repair = ctx.n.key;
+                    ctx.uq.repair = ctx.n.k;
                     ulmanager.ulStart(File);
                 }
                 else if (typeof res === 'number' || res.e) {
@@ -709,7 +709,7 @@ var ulmanager = {
                     File.file.done_starting();
                 }
                 else {
-                    File.file.filekey = ctx.n.key;
+                    File.file.filekey = ctx.n.k;
                     File.file.response = ctx.n.h;
                     File.file.faid = ctx.n.fa;
                     File.file.path = ctx.uq.path;

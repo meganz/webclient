@@ -507,19 +507,23 @@ var alarm = {
                 this.updateUrl = 'https://eu.static.mega.co.nz/3/current_ver_test.txt';
             }
 
-            // Clear old timer
-            window.clearTimeout(this.timeoutId);
+            // Only run the update check if on mega.nz or the testSiteUpdate flag is set
+            if ((window.location.hostname === 'mega.nz') || localStorage.getItem('testSiteUpdate')) {
 
-            // Set timeout to check if there is an update available
-            this.timeoutId = setTimeout(function() {
+                // Clear old timer
+                window.clearTimeout(this.timeoutId);
 
-                // Reset the timer id after completion
-                alarm.siteUpdate.timeoutId = null;
+                // Set timeout to check if there is an update available
+                this.timeoutId = setTimeout(function() {
 
-                // Get the server version
-                alarm.siteUpdate.getServerBuildVersion();
+                    // Reset the timer id after completion
+                    alarm.siteUpdate.timeoutId = null;
 
-            }, this.checkInterval);
+                    // Get the server version
+                    alarm.siteUpdate.getServerBuildVersion();
+
+                }, this.checkInterval);
+            }
         },
 
         /**

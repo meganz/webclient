@@ -216,7 +216,7 @@ var authring = (function () {
         if (ns._PROPERTIES[keyType] === undefined) {
             logger.error('Unsupported authentication key type: ' + keyType);
 
-            return;
+            return MegaPromise.reject(EARGS);
         }
 
         // This promise will be the one which is going to be returned.
@@ -280,7 +280,7 @@ var authring = (function () {
     ns.setContacts = function(keyType) {
         if (ns._PROPERTIES[keyType] === undefined) {
             logger.error('Unsupported authentication key type: ' + keyType);
-            return;
+            return MegaPromise.reject(EARGS);
         }
 
         if (ns.hadInitialised() === false) {
@@ -317,18 +317,20 @@ var authring = (function () {
         if (ns._PROPERTIES[keyType] === undefined) {
             logger.error('Unsupported key type: ' + keyType);
 
-            return;
+            return false;
         }
+
         if (u_authring[keyType] === undefined) {
             logger.error('First initialise u_authring by calling authring.getContacts()');
 
-            return;
-        }
-        if (u_authring[keyType].hasOwnProperty(userhandle)) {
-            return u_authring[keyType][userhandle];
-        } else {
             return false;
         }
+
+        if (u_authring[keyType].hasOwnProperty(userhandle)) {
+            return u_authring[keyType][userhandle];
+        }
+
+        return false;
     };
 
 
@@ -400,17 +402,18 @@ var authring = (function () {
         if (ns._PROPERTIES[keyType] === undefined) {
             logger.error('Unsupported key type: ' + keyType);
 
-            return;
+            return '';
         }
         format = format || 'hex';
         keyType = keyType || 'Ed25519';
+
         var value = key;
         if (keyType === 'Ed25519' || keyType === 'Cu25519') {
             if (key.length !== 32) {
                 logger.error('Unexpected key length for type ' + keyType
                              + ': ' + key.length);
 
-                return;
+                return '';
             }
         }
         else if (keyType === 'RSA') {
@@ -419,11 +422,13 @@ var authring = (function () {
         else {
             logger.error('Unexpected key type for fingerprinting: ' + keyType);
 
-            return;
+            return '';
         }
+
         if (format === "string") {
             return asmCrypto.bytes_to_string(asmCrypto.SHA256.bytes(value)).substring(0, 20);
-        } else if (format === "hex") {
+        }
+        else if (format === "hex") {
             return asmCrypto.SHA256.hex(value).substring(0, 40);
         }
     };
@@ -551,7 +556,7 @@ var authring = (function () {
             // Check for value > Number.MAX_SAFE_INTEGER (not available in all JS).
             logger.error('Integer not suitable for lossless conversion in JavaScript.');
 
-            return;
+            return '';
         }
         var result = '';
 
@@ -823,7 +828,7 @@ var authring = (function () {
         }
         else {
             logger.error('Unsupported key type for key generation: ' + keyType);
-            return;
+            return MegaPromise.reject(EARGS);
         }
 
         window[crypt.PRIVKEY_VARIABLE_MAPPING[keyType]] = privKey;
@@ -867,7 +872,7 @@ var authring = (function () {
         if (keyType !== 'RSA' && keyType !== 'Cu25519') {
             logger.error('Unsupported key type for initialisation: ' + keyType);
 
-            return;
+            return MegaPromise.reject(EARGS);
         }
 
         var privKey = (keyType === 'RSA')
@@ -997,7 +1002,7 @@ var authring = (function () {
         if (keyType !== 'Ed25519' && keyType !== 'Cu25519') {
             logger.error('Unsupported key type for pub key check: ' + keyType);
 
-            return;
+            return MegaPromise.reject(EARGS);
         }
 
         var attributePromise = mega.attr.get(u_handle,

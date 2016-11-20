@@ -77,7 +77,7 @@ class MegaTest(unittest.TestCase):
             try:
                 if "File Upload" == driver.find_element_by_css_selector(".fm-file-upload span").text: break
             except: pass
-            time.sleep(0.3)
+            time.sleep(1.3)
         else: self.fail("time out")
         # 
         # Test: 0002  New Folder
@@ -475,7 +475,7 @@ class MegaTest(unittest.TestCase):
             except: pass
             time.sleep(0.3)
         else: self.fail("time out: 0014  Folderlink")
-        self.assertRegexpMatches(driver.find_element_by_css_selector(".fm-dialog.warning-dialog-a .fm-notification-info").text, r"^[\s\S]*successfully imported\.$")
+        self.assertRegexpMatches(driver.find_element_by_css_selector(".fm-dialog.warning-dialog-a .fm-notification-info").text, r"^[\s\S]*imported successfully\.$")
         driver.find_element_by_css_selector(".fm-dialog-button.notification-button").click()
         for i in range(60):
             try:

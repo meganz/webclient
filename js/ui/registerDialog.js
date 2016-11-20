@@ -26,7 +26,7 @@
                 if (login) {
                     Soon(function() {
                         showToast('megasync', l[8745]);
-                        $('.fm-avatar img').attr('src', useravatar.top());
+                        $('.fm-avatar img').attr('src', useravatar.mine());
                     });
                 }
                 Soon(topmenuUI);

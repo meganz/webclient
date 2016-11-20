@@ -1302,7 +1302,10 @@ function fm_tfsupdate() {
     var i = 0;
     var u = 0;
 
-    var tfse     = M.getTransferElements();
+    var tfse = M.getTransferElements();
+    if (!tfse) {
+        return false;
+    }
     var domTable = tfse.domTable;
 
     var domCompleted = domTable.querySelectorAll('tr.transfer-completed');

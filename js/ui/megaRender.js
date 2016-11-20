@@ -375,10 +375,11 @@
                     $('.fm-empty-search').removeClass('hidden');
                 }
                 else if (M.currentdirid === M.RootID && folderlink) {
-                    if (!isValidShareLink()) {
+                    // FIXME: implement
+                    /*if (!isValidShareLink()) {
                         $('.fm-invalid-folder').removeClass('hidden');
                     }
-                    else {
+                    else*/ {
                         $('.fm-empty-folder-link').removeClass('hidden');
                     }
                 }

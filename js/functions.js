@@ -601,6 +601,7 @@ function populate_l() {
     l[12487] = l[12487].replace('[A2]', '<a href="" class="red linux">').replace('[/A2]', '</a>');
     l[7400] = l[7400].replace('[A]', '<a>').replace('[/A]', '</a>').replace('[BR]', '<br>');
     l[12489] = l[12489].replace('[I]', '<i>').replace('[/I]', '</i>').replace('[I]', '<i>').replace('[/I]', '</i>');
+    l[15536] = l[15536].replace('[B]', '<b>').replace('[/B]', '</b>');
 
     l['year'] = new Date().getFullYear();
     date_months = [
@@ -1690,6 +1691,7 @@ function ASSERT(what, msg, udata) {
     return !!what;
 }
 
+// log failures through jscrashes system
 function srvlog(msg, data, silent) {
     if (data && !(data instanceof Error)) {
         data = {
@@ -1703,6 +1705,30 @@ function srvlog(msg, data, silent) {
         window.onerror(msg, '', data ? 1 : -1, 0, data || null);
     }
 }
+
+// log failures through event id 99666
+function srvlog2(type /*, ...*/) {
+    if (d || window.exTimeLeft) {
+        var args    = toArray.apply(null, arguments);
+        var version = buildVersion.website;
+
+        if (is_extension) {
+            if (is_chrome_firefox) {
+                version = window.mozMEGAExtensionVersion || buildVersion.firefox;
+            }
+            else if (window.chrome) {
+                version = buildVersion.chrome;
+            }
+            else {
+                version = buildVersion.commit && buildVersion.commit.substr(0, 8) || '?';
+            }
+        }
+        args.unshift((is_extension ? 'e' : 'w') + (version || '-'));
+
+        api_req({a: 'log', e: 99666, m: JSON.stringify(args)});
+    }
+}
+
 
 function oDestroy(obj) {
     if (window.d) {
@@ -3606,6 +3632,7 @@ mega.utils.reload = function megaUtilsReload() {
             u_key = u_storage.k,
             privk = u_storage.privk,
             debug = u_storage.d,
+            jj = u_storage.jj,
             apipath = debug ? localStorage.apipath : undefined;
         var mcd = u_storage.testChatDisabled;
 
@@ -3622,8 +3649,8 @@ mega.utils.reload = function megaUtilsReload() {
             u_storage.minLogLevel = 0;
             if (location.host !== 'mega.nz') {
                 u_storage.dd = true;
-                if (!is_extension) {
-                    u_storage.jj = true;
+                if (!is_extension && jj)  {
+                    u_storage.jj = jj;
                 }
                 if (mcd) {
                     u_storage.testChatDisabled = 1;
@@ -3635,18 +3662,14 @@ mega.utils.reload = function megaUtilsReload() {
             }
         }
 
+        localStorage.force = true;
         location.reload(true);
     }
 
     if (u_type !== 3) {
         stopsc();
         stopapi();
-        if (typeof mDB === 'object' && !pfid) {
-            mDBreload();
-        }
-        else {
-            loadfm(true);
-        }
+        loadfm(true);
     }
     else {
         // Show message that this operation will destroy the browser cache and reload the data stored by MEGA
@@ -3660,11 +3683,15 @@ mega.utils.reload = function megaUtilsReload() {
                             stopapi();
 
                             MegaPromise.allDone([
-                                MegaDB.dropAllDatabases(/*u_handle*/),
                                 mega.utils.clearFileSystemStorage()
                             ]).then(function(r) {
                                     console.debug('megaUtilsReload', r);
-                                    _reload();
+                                    if (fmdb) {
+                                        fmdb.invalidate(_reload);
+                                    }
+                                    else {
+                                        _reload();
+                                    }
                                 });
                         });
                     }
@@ -4142,7 +4169,7 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
         }
 
         if (d) {
-            console.log('Running Rubbish-Bin Cleaning Scheduler', mode, xval);
+            console.log('Running Rubbish Bin Cleaning Scheduler', mode, xval);
             console.time('rubsched');
         }
 
@@ -4153,16 +4180,13 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
         var nodes = Object.keys(M.c[M.RubbishID] || {});
         var rubnodes = [];
 
-        for (var i in nodes) {
+        for (var i = nodes.length; i--; ) {
             var node = M.d[nodes[i]];
             if (!node) {
                 console.error('Invalid node', nodes[i]);
                 continue;
             }
-            if (node.t == 1) {
-                rubnodes = rubnodes.concat(fm_getnodes(node.h));
-            }
-            rubnodes.push(node.h);
+            rubnodes = rubnodes.concat(fm_getnodes(node.h, true));
         }
 
         rubnodes.sort(handler.sort);
@@ -4200,8 +4224,8 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
                 }
 
                 handles.map(function(handle) {
-                    M.delNode(handle);
-                    api_req({a: 'd', n: handle, i: requesti});
+                    M.delNode(handle, true);    // must not update DB pre-API
+                    api_req({a: 'd', n: handle/*, i: requesti*/});
 
                     if (inRub) {
                         $('.grid-table.fm#' + handle).remove();
@@ -4908,24 +4932,36 @@ if (typeof sjcl !== 'undefined') {
                     s: [{ u: userEmail, r: ''}],
                     ha: '',
                     i: requesti
+                }, {
+                    userEmail: userEmail,
+                    selectedNodeHandle: selectedNodeHandle,
+                    handleOrEmail: handleOrEmail,
+
+                    callback : function(res, ctx) {
+                        if (typeof res == 'object') {
+                            // FIXME: examine error codes in res.r, display error
+                            // to user if needed
+
+                            // If it was a user handle, the share is a full share
+                            if (M.u[ctx.handleOrEmail]) {
+                                M.delNodeShare(ctx.selectedNodeHandle, ctx.handleOrEmail);
+                                setLastInteractionWith(ctx.handleOrEmail, "0:" + unixtime());
+
+                                self.removeFromPermissionQueue(ctx.handleOrEmail);
+                            }
+                            // Pending share
+                            else {
+                                var pendingContactId = M.findOutgoingPendingContactIdByEmail(ctx.userEmail);
+                                M.deletePendingShare(ctx.selectedNodeHandle, pendingContactId);
+
+                                self.removeFromPermissionQueue(ctx.userEmail);
+                            }
+                        }
+                        else {
+                            // FIXME: display error to user
+                        }
+                    }
                 });
-
-                // If it was a user handle, the share is a full share
-                if (M.u[handleOrEmail]) {
-                    userEmail = M.u[handleOrEmail].m;
-                    M.delNodeShare(selectedNodeHandle, handleOrEmail);
-                    setLastInteractionWith(handleOrEmail, "0:" + unixtime());
-
-                    self.removeFromPermissionQueue(handleOrEmail);
-                }
-
-                // Pending share
-                else {
-                    pendingContactId = M.findOutgoingPendingContactIdByEmail(userEmail);
-                    M.deletePendingShare(selectedNodeHandle, pendingContactId);
-
-                    self.removeFromPermissionQueue(userEmail);
-                }
             });
         }
     };

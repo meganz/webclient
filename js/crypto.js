@@ -164,7 +164,7 @@ var crypt = (function () {
 
             var __retrieveRsaKeyFunc = function() {
                 // Fire it off.
-                api_req({ 'a': 'uk', 'u': userhandle, 'i': requesti }, myCtx);
+                api_req({ a: 'uk', u: userhandle }, myCtx);
             };
 
             if (attribCache) {
@@ -817,11 +817,13 @@ var crypt = (function () {
      *     Convert cleartext from UTF-8 to unicode after decryption
      *     (default: false).
      * @return {String}
-     *     Decrypted clear text.
+     *     Decrypted clear text or false in case of an error
      */
     ns.rsaDecryptString = function(ciphertext, privkey, utf8convert) {
 
         var cleartext = crypto_rsadecrypt(ciphertext, privkey);
+        if (cleartext === false) return false;
+
         var length = (cleartext.charCodeAt(0) << 8) | cleartext.charCodeAt(1);
         cleartext = cleartext.substring(2, length + 2);
 
@@ -832,10 +834,8 @@ var crypt = (function () {
     return ns;
 }());
 
-
-
-
 window.URL = window.URL || window.webkitURL;
+
 var have_ab = typeof ArrayBuffer !== 'undefined' && typeof DataView !== 'undefined';
 var use_workers = have_ab && typeof Worker !== 'undefined';
 
@@ -866,13 +866,14 @@ else {
     }
 }
 
+// general errors
 var EINTERNAL = -1;
 var EARGS = -2;
 var EAGAIN = -3;
 var ERATELIMIT = -4;
 var EFAILED = -5;
-var ETOOMANY = -6; // too many IP addresses
-var ERANGE = -7; // file packet out of range
+var ETOOMANY = -6;
+var ERANGE = -7;
 var EEXPIRED = -8;
 
 // FS access errors
@@ -977,152 +978,8 @@ function prepare_key_pw(password) {
     return prepare_key(str_to_a32(password));
 }
 
-var b64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_=";
-var b64a = b64.split('');
-
-// unsubstitute standard base64 special characters, restore padding
-function base64urldecode(data) {
-    data += '=='.substr((2 - data.length * 3) & 3)
-
-    if (typeof atob === 'function') {
-        data = data.replace(/\-/g, '+').replace(/_/g, '/').replace(/,/g, '');
-
-        try {
-            return atob(data);
-        } catch (e) {
-            return '';
-        }
-    }
-
-    // http://kevin.vanzonneveld.net
-    // +   original by: Tyler Akins (http://rumkin.com)
-    // +   improved by: Thunder.m
-    // +      input by: Aman Gupta
-    // +   improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
-    // +   bugfixed by: Onno Marsman
-    // +   bugfixed by: Pellentesque Malesuada
-    // +   improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
-    // +      input by: Brett Zamir (http://brett-zamir.me)
-    // +   bugfixed by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
-    // *     example 1: base64_decode('S2V2aW4gdmFuIFpvbm5ldmVsZA==');
-    // *     returns 1: 'Kevin van Zonneveld'
-    // mozilla has this native
-    // - but breaks in 2.0.0.12!
-    //if (typeof this.window['atob'] === 'function') {
-    //    return atob(data);
-    //}
-    var o1, o2, o3, h1, h2, h3, h4, bits, i = 0,
-        ac = 0,
-        dec = "",
-        tmp_arr = [];
-
-    if (!data) {
-        return data;
-    }
-
-    data += '';
-
-    do { // unpack four hexets into three octets using index points in b64
-        h1 = b64.indexOf(data.charAt(i++));
-        h2 = b64.indexOf(data.charAt(i++));
-        h3 = b64.indexOf(data.charAt(i++));
-        h4 = b64.indexOf(data.charAt(i++));
-
-        bits = h1 << 18 | h2 << 12 | h3 << 6 | h4;
-
-        o1 = bits >> 16 & 0xff;
-        o2 = bits >> 8 & 0xff;
-        o3 = bits & 0xff;
-
-        if (h3 === 64) {
-            tmp_arr[ac++] = String.fromCharCode(o1);
-        }
-        else if (h4 === 64) {
-            tmp_arr[ac++] = String.fromCharCode(o1, o2);
-        }
-        else {
-            tmp_arr[ac++] = String.fromCharCode(o1, o2, o3);
-        }
-    } while (i < data.length);
-
-    dec = tmp_arr.join('');
-
-    return dec;
-}
-
-// substitute standard base64 special characters to prevent JSON escaping, remove padding
-function base64urlencode(data) {
-    if (typeof btoa === 'function') {
-        return btoa(data).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
-    }
-
-    var o1, o2, o3, h1, h2, h3, h4, bits, i = 0,
-        ac = 0,
-        enc = "",
-        tmp_arr = [];
-
-    do { // pack three octets into four hexets
-        o1 = data.charCodeAt(i++);
-        o2 = data.charCodeAt(i++);
-        o3 = data.charCodeAt(i++);
-
-        bits = o1 << 16 | o2 << 8 | o3;
-
-        h1 = bits >> 18 & 0x3f;
-        h2 = bits >> 12 & 0x3f;
-        h3 = bits >> 6 & 0x3f;
-        h4 = bits & 0x3f;
-
-        // use hexets to index into b64, and append result to encoded string
-        tmp_arr[ac++] = b64a[h1] + b64a[h2] + b64a[h3] + b64a[h4];
-    } while (i < data.length);
-
-    enc = tmp_arr.join('');
-    var r = data.length % 3;
-    return (r ? enc.slice(0, r - 3) : enc);
-}
-
-// array of 32-bit words to string (big endian)
-function a32_to_str(a) {
-    var b = '';
-
-    for (var i = 0; i < a.length * 4; i++) {
-        b = b + String.fromCharCode((a[i >> 2] >>> (24 - (i & 3) * 8)) & 255);
-    }
-
-    return b;
-}
-
-// array of 32-bit words ArrayBuffer (big endian)
-function a32_to_ab(a) {
-    var ab = have_ab ? new Uint8Array(4 * a.length)
-        : new Array(4 * a.length);
-
-    for (var i = 0; i < a.length; i++) {
-        ab[4 * i] = a[i] >>> 24;
-        ab[4 * i + 1] = a[i] >>> 16 & 255;
-        ab[4 * i + 2] = a[i] >>> 8 & 255;
-        ab[4 * i + 3] = a[i] & 255;
-    }
-
-    return ab;
-}
-
 function a32_to_base64(a) {
     return base64urlencode(a32_to_str(a));
-}
-
-// string to array of 32-bit words (big endian)
-function str_to_a32(b) {
-    var a = Array((b.length + 3) >> 2);
-    for (var i = 0; i < b.length; i++) {
-        a[i >> 2] |= (b.charCodeAt(i) << (24 - (i & 3) * 8));
-    }
-    return a;
-}
-
-function base64_to_a32(s) {
-    return str_to_a32(base64urldecode(s));
 }
 
 var firefox_boost = is_chrome_firefox && !!localStorage.fxboost;
@@ -1150,65 +1007,6 @@ else if (have_ab) {
 
         return b;
     };
-}
-
-// ArrayBuffer to binary string
-function ab_to_base64(ab) {
-    return base64urlencode(ab_to_str(ab));
-}
-
-// ArrayBuffer to binary with depadding
-var ab_to_str_depad = function abToStrDepad1(ab) {
-    var b = ab_to_str(ab);
-
-    for (var i = b.length; i-- && !b.charCodeAt(i););
-
-    b = b.substr(0, i + 1);
-
-    return b;
-};
-
-if (firefox_boost) {
-    ab_to_str_depad = mozAB2SDepad;
-}
-else if (have_ab) {
-    ab_to_str_depad = function abToStrDepad2(ab) {
-        var b  = '';
-        var u8 = new Uint8Array(ab);
-
-        for (var i = 0; i < u8.length && u8[i]; i++) {
-            b = b + String.fromCharCode(u8[i]);
-        }
-
-        return b;
-    };
-}
-
-// binary string to ArrayBuffer, 0-padded to AES block size
-var str_to_ab = function strToAB1(b) {
-    b += Array(16 - ((b.length - 1) & 15)).join(String.fromCharCode(0));
-
-    return {
-        buffer: b
-    };
-};
-
-if (have_ab) {
-    str_to_ab = function strToAB2(b) {
-        var ab = new ArrayBuffer((b.length + 15) & -16);
-        var u8 = new Uint8Array(ab);
-
-        for (var i = b.length; i--;) {
-            u8[i] = b.charCodeAt(i);
-        }
-
-        return ab;
-    };
-}
-
-// binary string to ArrayBuffer, 0-padded to AES block size
-function base64_to_ab(a) {
-    return str_to_ab(base64urldecode(a));
 }
 
 // encrypt ArrayBuffer in CTR mode, return MAC
@@ -1610,103 +1408,6 @@ function decrypt_ab_ctr(aes, ab, nonce, pos) {
     return mac;
 }
 
-// encrypt/decrypt 4- or 8-element 32-bit integer array
-function encrypt_key(cipher, a) {
-    if (!a) {
-        a = [];
-    }
-    if (a.length === 4) {
-        return cipher.encrypt(a);
-    }
-    var x = [];
-    for (var i = 0; i < a.length; i += 4) {
-        x = x.concat(cipher.encrypt([a[i], a[i + 1], a[i + 2], a[i + 3]]));
-    }
-    return x;
-}
-
-function decrypt_key(cipher, a) {
-    if (a.length === 4) {
-        return cipher.decrypt(a);
-    }
-
-    var x = [];
-    for (var i = 0; i < a.length; i += 4) {
-        x = x.concat(cipher.decrypt([a[i], a[i + 1], a[i + 2], a[i + 3]]));
-    }
-    return x;
-}
-
-// generate attributes block using AES-CBC with MEGA canary
-// attr = Object, key = [] (four-word random key will be generated) or Array(8) (lower four words will be used)
-// returns [ArrayBuffer data,Array key]
-function enc_attr(attr, key) {
-    var ab;
-
-    try {
-        ab = str_to_ab('MEGA' + to8(JSON.stringify(attr)));
-    } catch (e) {
-        msgDialog('warningb', l[135], e.message || e);
-        throw e;
-    }
-
-    // if no key supplied, generate a random one
-    if (!key.length) {
-        for (i = 4; i--;) {
-            key[i] = rand(0x100000000);
-        }
-    }
-
-    ab = asmCrypto.AES_CBC.encrypt(ab,
-        a32_to_ab([key[0] ^ key[4], key[1] ^ key[5], key[2] ^ key[6], key[3] ^ key[7]]), false);
-
-    return [ab, key];
-}
-
-// decrypt attributes block using AES-CBC, check for MEGA canary
-// attr = ab, key as with enc_attr
-// returns [Object] or false
-function dec_attr(attr, key) {
-    var aes;
-    var b;
-
-    attr = asmCrypto.AES_CBC.decrypt(attr,
-        a32_to_ab([key[0] ^ key[4], key[1] ^ key[5], key[2] ^ key[6], key[3] ^ key[7]]), false);
-
-    b = ab_to_str_depad(attr);
-
-    if (b.substr(0, 6) !== 'MEGA{"') {
-        return false;
-    }
-
-    // @@@ protect against syntax errors
-    try {
-        return JSON.parse(from8(b.substr(4)));
-    } catch (e) {
-        console.error(b, e);
-        var m = b.match(/"n"\s*:\s*"((?:\\"|.)*?)(\.\w{2,4})?"/),
-            s = m && m[1],
-            l = s && s.length || 0,
-            j = ',';
-        while (l--) {
-            s = s.substr(0, l || 1);
-            try {
-                from8(s + j);
-                break;
-            } catch (e) {}
-        }
-        if (~l) {
-            try {
-                var new_name = s + j + 'trunc' + simpleStringHashCode(s).toString(16) + (m[2] || '');
-                return JSON.parse(from8(b.substr(4).replace(m[0], '"n":"' + new_name + '"')));
-            } catch (e) {}
-        }
-        return {
-            n: 'MALFORMED_ATTRIBUTES'
-        };
-    }
-}
-
 /**
  * Converts a Unicode string to a UTF-8 cleanly encoded string.
  *
@@ -1719,32 +1420,41 @@ var to8 = firefox_boost ? mozTo8 : function (unicode) {
     return unescape(encodeURIComponent(unicode));
 };
 
-/**
- * Converts a UTF-8 encoded string to a Unicode string.
- *
- * @param {String} utf8
- *     UTF-8 encoded string (8-bit characters only).
- * @return {String}
- *     Browser's native string encoding.
- */
-var from8 = firefox_boost ? mozFrom8 : function (utf8) {
-    return decodeURIComponent(escape(utf8));
-};
-
 // API command queueing
 // All commands are executed in sequence, with no overlap
-// @@@ user warning after backoff > 1000
+// FIXME: show user warning after backoff > 1000
 
-// FIXME: proper OOP!
 var apixs = [];
 
-api_reset();
-
 function api_reset() {
-    api_init(0, 'cs'); // main API interface
-    api_init(1, 'cs'); // exported folder access
-    api_init(2, 'sc'); // SC queries
-    api_init(3, 'sc'); // notification queries
+    // user account API interface
+    api_init(0, 'cs');
+
+    // folder link API interface
+    api_init(1, 'cs');
+
+    // active view's SC interface (chunked mode)
+    api_init(2, 'sc', { '{[a{'      : sc_packet,     // SC command
+                        '{[a{{t[f{' : sc_node,       // SC node
+                        '{'         : sc_residue,    // SC residue
+                        '#'         : api_esplit }); // numeric error code
+
+
+    // user account event notifications
+    api_init(3, 'sc');
+
+    // active view's initial tree fetch (chunked mode)
+    api_init(4, 'cs', { '[{[ok0{' : tree_ok0,        // tree shareownerkey
+                        '[{[f{'   : tree_node,       // tree node
+                        '['       : tree_residue,    // tree residue
+                        '#'       : api_esplit });   // numeric error code
+}
+
+mBroadcaster.once('boot_done', api_reset);
+
+// a chunked request received a purely numerical response - handle it the usual way
+function api_esplit(e) {
+    api_reqerror(this.q, e, false);
 }
 
 function api_setsid(sid) {
@@ -1777,6 +1487,7 @@ function api_setsid(sid) {
     apixs[0].sid = sid;
     apixs[2].sid = sid;
     apixs[3].sid = sid;
+    apixs[4].sid = sid;
 }
 
 function api_setfolder(h) {
@@ -1787,24 +1498,26 @@ function api_setfolder(h) {
     }
 
     apixs[1].sid = h;
-    apixs[1].failhandler = folderreqerr;
     apixs[2].sid = h;
+    apixs[4].sid = h;
 }
 
 function stopapi() {
-    for (var i = 4; i--;) {
+    for (var i = apixs.length; i--;) {
         api_cancel(apixs[i]);
         apixs[i].cmds = [[], []];
         apixs[i].ctxs = [[], []];
-        apixs[i].cancelled = false;
     }
 }
 
 function api_cancel(q) {
     if (q) {
-        q.cancelled = true;
         if (q.xhr) {
-            q.xhr.abort();
+            // setting the "cancelled" flag ensures that
+            // subsequent onerror/onload/onprogress callbacks are ignored.
+            q.xhr.cancelled = true;
+            if (q.xhr.abort) q.xhr.abort();
+            q.xhr = false;
         }
         if (q.timer) {
             clearTimeout(q.timer);
@@ -1812,7 +1525,7 @@ function api_cancel(q) {
     }
 }
 
-function api_init(channel, service) {
+function api_init(channel, service, split) {
     if (apixs[channel]) {
         api_cancel(apixs[channel]);
     }
@@ -1829,27 +1542,71 @@ function api_init(channel, service) {
         backoff: 0,                 // timer backoff
         service: service,           // base URI component
         sid: '',                    // sid URI component (optional)
+        split: split,               // associated JSON splitter rules, presence triggers progressive/chunked mode
+        splitter: false,            // JSONSplitter instance implementing .split
         rawreq: false,
         setimmediate: false
     };
 }
 
+// queue request on API channel
 function api_req(request, context, channel) {
-    if (typeof channel === 'undefined') {
+    if (typeof channel == 'undefined') {
         channel = 0;
     }
-    if (typeof context === 'undefined') {
+
+    if (d) console.log("API request on " + channel + ": " + JSON.stringify(request));
+
+    if (typeof context == 'undefined') {
         context = {};
     }
 
-    var queue = apixs[channel];
+    var q = apixs[channel];
 
-    queue.cmds[queue.i ^ 1].push(request);
-    queue.ctxs[queue.i ^ 1].push(context);
+    q.cmds[q.i ^ 1].push(request);
+    q.ctxs[q.i ^ 1].push(context);
 
-    if (!queue.setimmediate) {
-        queue.setimmediate = setTimeout(api_proc, 0, queue);
+    if (!q.setimmediate) {
+        q.setimmediate = setTimeout(api_proc, 0, q);
     }
+}
+
+// indicates whether this is a Firefox supporting the moz-chunked-*
+// responseType or a Chrome derivative supporting the fetch API
+// values: unknown: -1, no: 0, moz-chunked: 1, fetch: 2
+// FIXME: check for fetch on !Firefox, not just on Chrome
+var chunked_method = window.chrome ? (self.fetch ? 2 : 0) : -1;
+
+// this kludge emulates moz-chunked-arraybuffer with XHR-style callbacks
+function chunkedfetch(xhr, uri, postdata) {
+    fetch(uri, { method: 'POST', body: postdata }).then(function(response) {
+        var reader = response.body.getReader();
+        var evt = { loaded: 0 };
+        xhr.status = response.status;
+        xhr.totalBytes = response.headers.get('Original-Content-Length');
+
+        function chunkedread() {
+            return reader.read().then(function(r) {
+                if (r.done) {
+                    // signal completion through .onload()
+                    xhr.response = null;
+                    xhr.onload();
+                }
+                else {
+                    // feed received chunk to JSONSplitter via .onprogress()
+                    evt.loaded += r.value.length;
+                    xhr.response = r.value;
+                    xhr.onprogress(evt);
+                    chunkedread();
+                }
+            });
+        }
+
+        chunkedread();
+    }).catch(function(err) {
+        console.error("Fetch error: ", err);
+        xhr.onerror();
+    });
 }
 
 // send pending API request on channel q
@@ -1867,131 +1624,146 @@ function api_proc(q) {
     q.i ^= 1;
 
     if (!q.xhr) {
-        q.xhr = getxhr();
-    }
+        // we need a real XHR only if we don't use fetch for this channel
+        q.xhr = (!q.split || chunked_method != 2) ? getxhr() : {};
 
-    q.xhr.q = q;
+        q.xhr.q = q;
 
-    q.xhr.onerror = function () {
-        if (!this.q.cancelled) {
-            logger.debug("API request error - retrying");
-            api_reqerror(q, -3, this.status);
-        }
-    };
-
-    // ATM we only require progress when loading the cloud, so don't overload every other xhr unnecessarily
-    // if (loadingInitDialog.active) {
-        var needProgress = false;
-
-        // check whether this channel queue will need the progress
-        var ctxs = q.ctxs[q.i];
-        var idx = ctxs.length;
-        while (idx--) {
-            var ctx = ctxs[idx];
-
-            if (typeof ctx.progress === 'function') {
-                needProgress = true;
-                break;
+        q.xhr.onerror = function () {
+            if (!this.cancelled) {
+                logger.debug("API request error - retrying");
+                api_reqerror(q, EAGAIN, this.status);
             }
-        }
+        };
 
-        if (needProgress) {
-            q.xhr.onprogress = function (evt) {
-                var progressPercent = 0;
-                var bytes = evt.total || this.totalBytes;
+        // JSON splitters are keen on processing the data as soon as it arrives,
+        // so route .onprogress to it.
+        if (q.split) {
+            q.xhr.onprogress = function(evt) {
+                if (!this.cancelled) {
+                    // caller wants progress updates? give caller progress updates!
+                    if (this.q.ctxs[this.q.i][0] && this.q.ctxs[this.q.i][0].progress) {
+                        var progressPercent = 0;
+                        var bytes = evt.total || this.totalBytes;
 
-                if (!bytes) {
-                    // This may throws an exception if the header doesn't exists
-                    try {
-                        bytes = this.getResponseHeader('Original-Content-Length');
-                        this.totalBytes = bytes;
+                        if (!bytes) {
+                            // this may throw an exception if the header doesn't exist
+                            try {
+                                bytes = this.getResponseHeader('Original-Content-Length');
+                                this.totalBytes = bytes;
+                            }
+                            catch (e) {}
+                        }
+
+                        if (evt.loaded > 0 && bytes) {
+                            this.q.ctxs[this.q.i][0].progress(evt.loaded / bytes * 100);
+                        }
                     }
-                    catch (e) {}
-                }
-                if (!bytes || bytes < 10) {
-                    return false;
-                }
-                if (evt.loaded > 0) {
-                    progressPercent = evt.loaded / bytes * 100;
-                }
 
-                var ctxs = this.q.ctxs[this.q.i];
-                var idx = ctxs.length;
-                while (idx--) {
-                    var ctx = ctxs[idx];
+                    // update number of bytes received in .onprogress() for subsequent check
+                    // in .onload() whether it contains more data
 
-                    if (typeof ctx.progress === 'function') {
-                        ctx.progress(progressPercent);
+                    var chunk = this.response;
+
+                    // is this an ArrayBuffer? turn into a Uint8Array
+                    if (!(chunk.length >= 0)) chunk = new Uint8Array(chunk);
+
+                    if (!chunked_method) {
+                        // unfortunately, we're receiving a growing response
+                        this.q.received = chunk.length;
+                    }
+                    else {
+                        // wonderful, we're receiving a chunked response
+                        this.q.received += chunk.length;
+                    }
+
+                    // send incoming live data to splitter
+                    // for maximum flexibility, the splitter ctx will be the XHR
+                    if (!this.q.splitter.chunkproc(chunk, false)) {
+                        // a JSON syntax error occurred: hard reload
+                        fm_fullreload(this.q, 'onerror JSON Syntax Error');
                     }
                 }
             };
         }
-    // }
 
-    q.xhr.onload = function onAPIProcXHRLoad() {
-        if (!this.q.cancelled) {
-            var t;
-            var status = this.status;
+        q.xhr.onload = function onAPIProcXHRLoad() {
+            if (!this.cancelled) {
+                var t;
+                var status = this.status;
 
-            if (status === 200) {
-                var response = this.responseText || this.response;
+                if (status == 200) {
+                    var response = this.response;
 
-                if (d) {
-                    if (d > 1 || !window.chrome || String(response).length < 512) {
-                        logger.debug('API response: ', response);
+                    // is this residual data that hasn't gone to the splitter yet?
+                    if (this.q.splitter) {
+                        // we process the full response if additional bytes were received
+                        // FIXME: in moz-chunked transfers, if onload() can contain chars beyond
+                        // the last onprogress(), send .substr(this.q.received) instead!
+                        // otherwise, we send false to indicate no further input
+                        // in all cases, set the inputcomplete flag to catch incomplete API responses
+                        if (!this.q.splitter.chunkproc((response && response.length > this.q.received) ? response : false, true)) {
+                            fm_fullreload(this.q, 'onload JSON Syntax Error');
+                        }
+                        return;
                     }
-                    else {
-                        logger.debug('API response: ', String(response).substr(0, 512) + '...');
+
+                    if (d) {
+                        if (d > 1 || !window.chrome || String(response).length < 512) {
+                            logger.debug('API response: ', response);
+                        }
+                        else {
+                            logger.debug('API response: ', String(response).substr(0, 512) + '...');
+                        }
                     }
-                }
 
-                try {
-                    t = JSON.parse(response);
-                    if (response[0] === '{') {
-                        t = [t];
-                    }
-                    status = true;
-                } catch (e) {
-                    // bogus response, try again
-                    logger.debug("Bad JSON data in response: " + response);
-                    t = EAGAIN;
-                }
-            }
-            else {
-                logger.debug('API server connection failed (error ' + status + ')');
-                t = ERATELIMIT;
-            }
+                    try {
+                        t = JSON.parse(response);
+                        if (response[0] == '{') {
+                            t = [t];
+                        }
 
-            if (typeof t === 'object') {
-                var ctxs = this.q.ctxs[this.q.i];
-
-                for (var i = 0; i < ctxs.length; i++) {
-                    var ctx = ctxs[i];
-
-                    if (typeof ctx.callback === 'function') {
-                        ctx.callback(t[i], ctx, this);
+                        status = true;
+                    } catch (e) {
+                        // bogus response, try again
+                        logger.debug("Bad JSON data in response: " + response);
+                        t = EAGAIN;
                     }
                 }
+                else {
+                    logger.debug('API server connection failed (error ' + status + ')');
+                    t = ERATELIMIT;
+                }
 
-                this.q.rawreq = false;
-                this.q.backoff = 0; // request succeeded - reset backoff timer
-                this.q.cmds[this.q.i] = [];
-                this.q.ctxs[this.q.i] = [];
+                if (typeof t === 'object') {
+                    var ctxs = this.q.ctxs[this.q.i];
 
-                api_proc(this.q);
+                    for (var i = 0; i < ctxs.length; i++) {
+                        var ctx = ctxs[i];
+
+                        if (typeof ctx.callback === 'function') {
+                            ctx.callback(t[i], ctx, this);
+                        }
+                    }
+
+                    // reset state for next request
+                    api_ready(this.q);
+                    api_proc(this.q);
+                }
+                else {
+                    api_reqerror(this.q, t, status);
+                }
             }
-            else {
-                api_reqerror(this.q, t, status);
-            }
-        }
-    };
+        };
+    }
 
     if (q.rawreq === false) {
         q.url = apipath + q.service
               + '?id=' + (q.seqno++)
               + '&' + q.sid
-              + '&lang=' + lang      // Their selected language
-              + mega.urlParams();    // Additional parameters
+              + (q.split ? '&ec' : '')  // encoding: chunked if splitter attached
+              + '&lang=' + lang         // selected language
+              + mega.urlParams();       // additional parameters
 
         if (typeof q.cmds[q.i][0] === 'string') {
             q.url += '&' + q.cmds[q.i][0];
@@ -2009,15 +1781,44 @@ function api_send(q) {
     var logger = MegaLogger.getLogger('crypt');
     q.timer = false;
 
-    q.xhr.open('POST', q.url, true);
-
     logger.debug("Sending API request: " + q.rawreq + " to " + q.url);
 
-    q.xhr.send(q.rawreq);
+    // reset number of bytes received and response size
+    q.received = 0;
+    delete q.xhr.totalBytes;
+
+    q.xhr.cancelled = false;
+
+    if (q.split && chunked_method == 2) {
+        // use chunked fetch with JSONSplitter input type Uint8Array
+        q.splitter = new JSONSplitter(q.split, q.xhr, true);
+        chunkedfetch(q.xhr, q.url, q.rawreq);
+    }
+    else {
+        // use legacy XHR API
+        q.xhr.open('POST', q.url, true);
+
+        if (q.split) {
+            if (chunked_method) {
+                // FIXME: use Fetch API if more efficient than this
+                q.xhr.responseType = 'moz-chunked-arraybuffer';
+
+                // first try? record success
+                if (chunked_method < 0) {
+                    chunked_method = q.xhr.responseType == 'moz-chunked-arraybuffer';
+                }
+            }
+
+            // at this point, chunked_method being logically true implies arraybuffer
+            q.splitter = new JSONSplitter(q.split, q.xhr, chunked_method);
+         }
+
+        q.xhr.send(q.rawreq);
+    }
 }
 
 function api_reqerror(q, e, status) {
-    if (e === EAGAIN || e === ERATELIMIT) {
+    if (e == EAGAIN || e == ERATELIMIT) {
         // request failed - retry with exponential backoff
         if (q.backoff) {
             q.backoff *= 2;
@@ -2038,7 +1839,7 @@ function api_reqerror(q, e, status) {
     }
 
     if (mega.flags & window.MEGAFLAG_LOADINGCLOUD) {
-        if (status === true && e === EAGAIN) {
+        if (status === true && e == EAGAIN) {
             mega.loadReport.EAGAINs++;
         }
         else if (status === 500) {
@@ -2050,9 +1851,17 @@ function api_reqerror(q, e, status) {
     }
 }
 
+function api_ready(q) {
+    q.rawreq = false;
+    q.backoff = 0; // request succeeded - reset backoff timer
+    q.cmds[q.i] = [];
+    q.ctxs[q.i] = [];
+}
+
 var apiFloorCap = 3000;
+
 function api_retry() {
-    for (var i = 4; i--;) {
+    for (var i = apixs.length; i--; ) {
         if (apixs[i].timer && apixs[i].backoff > apiFloorCap) {
             clearTimeout(apixs[i].timer);
             apixs[i].backoff = apiFloorCap;
@@ -2062,37 +1871,25 @@ function api_retry() {
 }
 
 function api_reqfailed(c, e) {
-    if (e === ESID) {
+    // does this failure belong to a folder link, but not on the SC channel?
+    if (apixs[c].sid[0] == 'n' && c != 2) {
+        // yes: handle as a failed folder link access
+        return folderreqerr(c, e);
+    }
+
+    if (e == ESID) {
         u_logout(true);
         Soon(function() {
             showToast('clipboard', l[19]);
         });
         document.location.hash = 'login';
     }
-    else if (c === 2 && e === ETOOMANY) {
-        loadfm.loaded = false;
-        loadfm.loading = false;
-
-        M.reset();
-        api_init(2, 'sc');
-
-        if (pfkey) {
-            api_setfolder(n_h);
-        }
-        else {
-            apixs[2].sid = 'sid=' + u_sid;
-        }
-
-        if (typeof mDB === 'object' && mDB.drop) {
-            mFileManagerDB.exec('drop').always(mDBstart);
-        }
-        else {
-            loadfm(true);
-        }
+    else if (c == 2 && e == ETOOMANY) {
+        // too many pending SC requests - reload from scratch
+        fm_fullreload(this.q, 'ETOOMANY');
     }
-
-    // If suspended account
-    else if (e === EBLOCKED) {
+    // if suspended account
+    else if (e == EBLOCKED) {
         var queue = apixs[c];
         queue.rawreq = false;
         queue.cmds = [[], []];
@@ -2178,48 +1975,75 @@ function stopsc() {
     }
 }
 
-/**
- * calls execsc() with server-client requests received
- * @param {Boolean} mDBload whether invoked from indexedDB.
- */
-function getsc(mDBload) {
-    api_req('sn=' + maxaction + '&ssl=1&e=' + cmsNotifHandler, {
-        mDBload: mDBload,
-        callback: function __onGetSC(res, ctx) {
-            if (typeof res === 'object') {
-                function getSCDone(sma) {
-                    if (sma !== -0x7ff
-                            && !folderlink && !pfid
-                            && typeof mDB !== 'undefined') {
-                        localStorage[u_handle + '_maxaction'] = maxaction;
-                    }
+// if set, further sn updates are disallowed (the local state has become invalid)
+function setsn(sn) {
+    // update sn in DB, triggering a "commit" of the current "transaction"
+    if (fmdb) {
+        fmdb.add('_sn', { i : 1, d : sn });
+    }
+}
 
-                    // If we're loading the cloud, notify completion only
-                    // once first action-packets have been processed.
-                    if (!fminitialized && (loadfm.loading || ctx.mDBload)) {
-                        loadfm_done(ctx.mDBload);
-                    }
-                }
+// are we processing historical SC commands?
+var initialscfetch;
 
-                if ((mega.flags & window.MEGAFLAG_LOADINGCLOUD) && !mega.loadReport.recvAPs) {
-                    mega.loadReport.recvAPs       = Date.now() - mega.loadReport.stepTimeStamp;
-                    mega.loadReport.stepTimeStamp = Date.now();
-                }
-
-                if (res.w) {
-                    waiturl = res.w;
-                    waittimeout = setTimeout(waitsc, waitbackoff);
-                    getSCDone(-0x7ff);
-                }
-                else {
-                    if (res.sn) {
-                        maxaction = res.sn;
-                    }
-                    execsc(res.a, getSCDone);
-                }
-            }
+// last step of the streamed SC response processing
+function sc_residue(sc) {
+    if (sc.sn) {
+        // enqueue new sn
+        currsn = sc.sn;
+        scq[scqhead++] = [{ a : '_sn', sn : currsn }];
+        getsc(true);
+        resumesc();
+    }
+    else if (sc.w) {
+        if (initialscfetch) {
+            // we have concluded the post-load SC fetch, as we have now
+            // run out of new actionpackets: show filemanager!
+            scq[scqhead++] = [{ a : '_fm' }];
+            initialscfetch = false;
+            resumesc();
         }
-    }, 2);
+
+        // we're done, wait for more
+        gettingsc = false;
+        waiturl = sc.w;
+        waittimeout = setTimeout(waitsc, waitbackoff);
+
+        if ((mega.flags & window.MEGAFLAG_LOADINGCLOUD) && !mega.loadReport.recvAPs) {
+            mega.loadReport.recvAPs       = Date.now() - mega.loadReport.stepTimeStamp;
+            mega.loadReport.stepTimeStamp = Date.now();
+        }
+    }
+    else {
+        // malformed SC response - take the conservative route and reload fully
+        // FIXME: add one single retry if !sscount: Clear scq, clear worker state,
+        // then reissue getsc() (difficult to get right - be cautious)
+        return fm_fullreload(null, 'malformed SC response');
+    }
+
+    // (mandatory steps at the conclusion of a successful split response)
+    api_ready(this.q);
+    api_proc(this.q);
+}
+
+// getsc() serialisation (getsc() can be called anytime from anywhere if
+// someone thinks that it is beneficial!)
+var gettingsc;
+
+// request new actionpackets and stream them to sc_packet() as they come in
+// nodes in t packets are streamed to sc_node()
+function getsc(force) {
+    if (force || !gettingsc) {
+        gettingsc = true;
+
+        if (waitxhr) {
+            waitxhr.abort();
+        }
+
+        api_cancel(apixs[2]);   // retire existing XHR that may still be completing the request
+        api_ready(apixs[2]);
+        api_req('sn=' + currsn + '&ssl=1&e=' + cmsNotifHandler, {}, 2);
+    }
 }
 
 function waitsc() {
@@ -2234,11 +2058,13 @@ function waitsc() {
     if (!waitxhr) {
         waitxhr = getxhr();
     }
+
     waitxhr.waitid = newid;
 
     if (waittimeout) {
         clearTimeout(waittimeout);
     }
+
     waittimeout = setTimeout(waitsc, 300000);
 
     waitxhr.onerror = function () {
@@ -2266,10 +2092,9 @@ function waitsc() {
             waittimeout = false;
 
             if (this.waitid === waitid) {
-
                 stopsc();
 
-                var t = new Date().getTime() - waitbegin;
+                var t = Date.now() - waitbegin;
 
                 if (t < 1000) {
                     waitbackoff += waitbackoff;
@@ -2286,7 +2111,7 @@ function waitsc() {
         }
     };
 
-    waitbegin = new Date().getTime();
+    waitbegin = Date.now();
     waitxhr.open('POST', waiturl, true);
     waitxhr.send();
 }
@@ -2574,69 +2399,36 @@ function api_changepw(ctx, passwordkey, masterkey, oldpw, newpw, email) {
 }
 
 /**
- * Set node attribute.
- * @param {String}  handle The node's handle.
- * @param {Object}  attrs  Attributes.
- * @param {Boolean} shrink Use one-letter attrs.
+ * Send current node attributes to the API
  * @return {MegaPromise}
  */
-function api_setattr(handle, attrs, shrink) {
+function api_setattr(n) {
     var promise = new MegaPromise();
     var logger = MegaLogger.getLogger('crypt');
 
-    if (!Object(M.d).hasOwnProperty(handle)) {
-        promise.reject(ENOENT);
-    }
-    else if (typeof attrs !== 'object'
-            || !Object.keys(attrs).length) {
-
-        promise.reject(EARGS);
-    }
-    else {
-        var node = M.d[handle];
-        var ar = Object(node.ar);
-        var cache = {h: handle};
-        var callback = {
-            callback: function(res) {
-                if (res !== 0) {
-                    logger.error('api_setattr', ar, res);
-                    promise.reject(res);
-                }
-                else {
-                    promise.resolve(res);
-                }
+    var ctx = {
+        callback: function(res) {
+            if (res !== 0) {
+                logger.error('api_setattr', res);
+                promise.reject(res);
             }
-        };
-
-        for (var i in attrs) {
-            if (attrs.hasOwnProperty(i)) {
-                var name = (shrink ? i[0] : i);
-
-                if (d && ar.hasOwnProperty(name) && ar[name] === attrs[i]) {
-                    logger.warn('api_setattr: attribute "%s" already exists.', name);
-                }
-
-                cache[i] = attrs[i];
-                ar[name] = attrs[i];
+            else {
+                promise.resolve(res);
             }
         }
+    };
 
-        try {
-            var mkat = enc_attr(ar, node.key);
-            var attr = ab_to_base64(mkat[0]);
-            var key = a32_to_base64(encrypt_key(u_k_aes, mkat[1]));
+    try {
+        var at = ab_to_base64(crypto_makeattr(n));
 
-            logger.debug('Setting node attributes for "%s"...', handle, cache, ar);
+        logger.debug('Setting node attributes for "%s"...', n.h);
 
-            cache.a = attr;
-            M.nodeAttr(cache);
-
-            api_req({ a: 'a', n: handle, attr: attr, key: key, i: requesti }, callback);
-        }
-        catch (ex) {
-            logger.error(ex);
-            promise.reject(ex);
-        }
+        // we do not set i here
+        api_req({ a: 'a', n: n.h, at: at }, ctx);
+    }
+    catch (ex) {
+        logger.error(ex);
+        promise.reject(ex);
     }
 
     return promise;
@@ -2738,9 +2530,6 @@ function encryptto(user, data) {
     return false;
 }
 
-var u_sharekeys = {};
-var u_nodekeys = {};
-
 /**
  * Add/cancel share(s) to a set of users or email addresses
  * targets is an array of {u,r} - if no r given, cancel share
@@ -2812,7 +2601,7 @@ function api_setshare1(ctx, params) {
         if (typeof req.s[i].r !== 'undefined') {
             if (!req.ok) {
                 if (u_sharekeys[ctx.node]) {
-                    sharekey = u_sharekeys[ctx.node];
+                    sharekey = u_sharekeys[ctx.node][0];
                     newkey = false;
                 }
                 else {
@@ -2821,7 +2610,7 @@ function api_setshare1(ctx, params) {
                     for (j = 4; j--;) {
                         sharekey.push(rand(0x100000000));
                     }
-                    u_sharekeys[ctx.node] = sharekey;
+                    crypto_setsharekey(ctx.node, sharekey);
                 }
 
                 req.ok = a32_to_base64(encrypt_key(u_k_aes, sharekey));
@@ -2864,10 +2653,11 @@ function api_setshare1(ctx, params) {
             if (res.ok) {
                 logger.debug('Share key clash: Set returned key and try again.');
                 ctx.req.ok = res.ok;
-                u_sharekeys[ctx.node] = decrypt_key(u_k_aes, base64_to_a32(res.ok));
+                var k = decrypt_key(u_k_aes, base64_to_a32(res.ok));
+                crypto_setsharekey(ctx.node, k);
                 ctx.req.ha = crypto_handleauth(ctx.node);
 
-                var ssharekey = a32_to_str(u_sharekeys[ctx.node]);
+                var ssharekey = a32_to_str(k);
 
                 for (var i = ctx.req.s.length; i--;) {
                     if (u_pubkeys[ctx.req.s[i].u]) {
@@ -2907,6 +2697,10 @@ function api_setshare2(ctx) {
 
 function crypto_handleauth(h) {
     return a32_to_base64(encrypt_key(u_k_aes, str_to_a32(h + h)));
+}
+
+function crypto_keyok(n) {
+    return n && typeof n.k == 'object' && n.k.length >= (n.t ? 4 : 8);
 }
 
 function crypto_encodepubkey(pubkey) {
@@ -3032,136 +2826,6 @@ function crypto_rsaencrypt(cleartext, pubkey) {
     return ciphertext;
 }
 
-/**
- * Decrypts a ciphertext string with the supplied private key.
- *
- * @param {String} ciphertext
- *     Cipher text to decrypt.
- * @param {Array} privkey
- *     Private encryption key (in the usual internal format used).
- * @return {String}
- *     Decrypted clear text.
- */
-function crypto_rsadecrypt(ciphertext, privkey) {
-    var l = (ciphertext.charCodeAt(0) * 256 + ciphertext.charCodeAt(1) + 7) >> 3;
-    ciphertext = ciphertext.substr(2, l);
-
-    var cleartext = asmCrypto.bytes_to_string(asmCrypto.RSA_RAW.decrypt(ciphertext, privkey));
-    if (cleartext.length < privkey[0].length) {
-        cleartext = Array(privkey[0].length - cleartext.length + 1).join(String.fromCharCode(0)) + cleartext;
-    }
-    if (cleartext.charCodeAt(1) !== 0) {
-        // Old bogus padding workaround
-        cleartext = String.fromCharCode(0) + cleartext;
-    }
-
-    return cleartext.substr(2);
-}
-
-// Complete upload
-// We construct a special node put command that uses the upload token
-// as the source handle
-function api_completeupload(t, uq, k, ctx) {
-    // Close nsIFile Stream
-    if (is_chrome_firefox && uq._close) {
-        uq._close();
-    }
-
-    if (uq.repair) {
-        uq.target = M.RubbishID;
-    }
-
-    api_completeupload2({
-        callback: api_completeupload2,
-        t: base64urlencode(t),
-        path: uq.path,
-        n: uq.name,
-        k: k,
-        fa: uq.faid ? api_getfa(uq.faid) : false,
-        ctx: ctx
-    }, uq);
-}
-
-function api_completeupload2(ctx, uq) {
-    var logger = MegaLogger.getLogger('crypt');
-    var p, ut = uq.target;
-
-    if (ctx.path && ctx.path !== ctx.n && (p = ctx.path.indexOf('/')) > 0) {
-        var pc = ctx.path.substr(0, p);
-        ctx.path = ctx.path.substr(p + 1);
-
-        fm_requestfolderid(ut, pc, {
-            uq: uq,
-            ctx: ctx,
-            callback: function (ctx, h) {
-                if (h) {
-                    ctx.uq.target = h;
-                }
-                api_completeupload2(ctx.ctx, ctx.uq);
-            }
-        });
-    }
-    else {
-        a = {
-            n: ctx.n
-        };
-        if (uq.hash) {
-            a.c = uq.hash;
-        }
-        logger.debug(ctx.k);
-        var ea = enc_attr(a, ctx.k);
-        logger.debug(ea);
-
-        if (!ut) {
-            ut = M.RootID;
-        }
-
-        var req = {
-            a: 'p',
-            t: ut,
-            n: [{
-                h: ctx.t,
-                t: 0,
-                a: ab_to_base64(ea[0]),
-                k: a32_to_base64(encrypt_key(u_k_aes, ctx.k))
-            }],
-            i: requesti
-        };
-
-        if (ctx.fa) {
-            req.n[0].fa = ctx.fa;
-        }
-
-        if (ut) {
-            // a target has been supplied: encrypt to all relevant shares
-            var sn = fm_getsharenodes(ut);
-
-            if (sn.length) {
-                req.cr = crypto_makecr([ctx.k], sn, false);
-                req.cr[1][0] = ctx.t;
-            }
-        }
-
-        api_req(req, ctx.ctx);
-    }
-}
-
-function is_devnull(email) {
-    return false;
-
-    var p, q;
-
-    if ((p = email.indexOf('@')) >= 0) {
-        if ((q = email.indexOf('.', p)) >= 0) {
-            if ("outlook.hotmail.msn.live".indexOf(email.substr(p + 1, q - p - 1).toLowerCase()) >= 0) {
-                return true;
-            }
-        }
-    }
-
-    return false;
-}
-
 function is_rawimage(name, ext) {
     ext = ext || ('' + name).split('.').pop().toUpperCase();
 
@@ -3184,6 +2848,7 @@ function is_image(name) {
 
     return false;
 }
+
 is_image.def = {
     'JPG': 1,
     'JPEG': 1,
@@ -3191,6 +2856,7 @@ is_image.def = {
     'BMP': 1,
     'PNG': 1
 };
+
 is_image.raw = {
     // http://www.sno.phy.queensu.ca/~phil/exiftool/#supported
     // let raw = {}; for(let tr of document.querySelectorAll('.norm.tight.sm.bm tr'))
@@ -3243,6 +2909,7 @@ var mThumbHandler = {
         return this.sup[ext];
     }
 };
+
 mThumbHandler.add('PSD', function PSDThumbHandler(ab, cb) {
     // http://www.awaresystems.be/imaging/tiff/tifftags/docs/photoshopthumbnail.html
     var logger = MegaLogger.getLogger('crypt');
@@ -3290,6 +2957,7 @@ mThumbHandler.add('PSD', function PSDThumbHandler(ab, cb) {
     }
     cb(result);
 });
+
 mThumbHandler.add('SVG', function SVGThumbHandler(ab, cb) {
     var canvas = document.createElement('canvas');
     var ctx = canvas.getContext('2d');
@@ -3341,7 +3009,7 @@ function api_storefileattr(id, type, key, data, ctx) {
         req.h = handle;
     }
 
-    api_req(req, ctx, n_h ? 1 : 0);
+    api_req(req, ctx, pfid ? 1 : 0);
 }
 
 function api_getfileattr(fa, type, procfa, errfa) {
@@ -4048,7 +3716,8 @@ function api_pfaerror(handle) {
 
     // Got access denied, store 'f' attr to prevent subsequent attemps
     if (node && RightsbyID(node.h) > 1 && node.f !== u_handle) {
-        return api_setattr(node.h, {f: u_handle});
+        node.f = u_handle;
+        return api_setattr(node);
     }
 
     return false;
@@ -4056,22 +3725,21 @@ function api_pfaerror(handle) {
 
 // generate crypto request response for the given nodes/shares matrix
 function crypto_makecr(source, shares, source_is_nodes) {
-    var i, j, n, nk;
+    var nk;
     var cr = [shares, [], []];
-    var aes;
 
-    // if we have node handles, include in cr - otherwise, we have node keys
+    // if we have node handles, include in cr - otherwise, we have nodes
     if (source_is_nodes) {
         cr[1] = source;
     }
 
     // TODO: optimize - keep track of pre-existing/sent keys, only send new ones
-    for (i = shares.length; i--;) {
+    for (var i = shares.length; i--;) {
         if (u_sharekeys[shares[i]]) {
-            aes = new sjcl.cipher.aes(u_sharekeys[shares[i]]);
+            var aes = u_sharekeys[shares[i]][1];
 
-            for (j = source.length; j--;) {
-                if (source_is_nodes ? (nk = u_nodekeys[source[j]]) : (nk = source[j])) {
+            for (var j = source.length; j--;) {
+                if (source_is_nodes ? (nk = M.d[source[j]].k) : (nk = source[j].k)) {
                     if (nk.length === 8 || nk.length === 4) {
                         cr[2].push(i, j, a32_to_base64(encrypt_key(aes, nk)));
                     }
@@ -4079,6 +3747,7 @@ function crypto_makecr(source, shares, source_is_nodes) {
             }
         }
     }
+
     return cr;
 }
 
@@ -4125,7 +3794,7 @@ function crypto_procsr(sr) {
 
                         if ((pubkey = u_pubkeys[ctx.sr[i]])) {
                             // pubkey found: encrypt share key to it
-                            if ((n = crypto_rsaencrypt(a32_to_str(u_sharekeys[sh]), pubkey))) {
+                            if ((n = crypto_rsaencrypt(a32_to_str(u_sharekeys[sh][0]), pubkey))) {
                                 rsr.push(sh, ctx.sr[i], base64urlencode(n));
                             }
                         }
@@ -4148,209 +3817,23 @@ function crypto_procsr(sr) {
     ctx.callback(false, ctx);
 }
 
-var keycache = {};
-
-var rsa2aes = {};
-
-// Try to decrypt ufs node.
-// Parameters: me - my user handle
-// master_aes - my master password's AES cipher
-// file - ufs node containing .k and .a
-// Output: .key and .name set if successful
-// **NB** Any changes made to this function
-//        must be populated to keydec.js
-function crypto_processkey(me, master_aes, file, quiet) {
-    var id, key, k, n, decKey;
-    var success = quiet;
-
-    if (!file.k) {
-        if (!keycache[file.h]) {
-            console.debug("No keycache entry!");
-
-            return;
-        }
-
-        file.k = keycache[file.h];
-    }
-
-    id = me;
-
-    // do I own the file? (user key is guaranteed to be first in .k)
-    var p = file.k.indexOf(id + ':');
-
-    if (p) {
-        // I don't - do I have a suitable sharekey?
-        for (id in u_sharekeys) {
-            p = file.k.indexOf(id + ':');
-
-            if (p >= 0 && (!p || file.k.charAt(p - 1) === '/')) {
-                file.fk = 1;
-                break;
-            }
-
-            p = -1;
-        }
-    }
-
-    if (p >= 0) {
-        delete keycache[file.h];
-
-        var pp = file.k.indexOf('/', p);
-
-        if (pp < 0) {
-            pp = file.k.length;
-        }
-
-        p += id.length + 1;
-
-        key = file.k.substr(p, pp - p);
-
-        // we have found a suitable key: decrypt!
-        if (key.length < 46) {
-            // short keys: AES
-            k = base64_to_a32(key);
-
-            // check for permitted key lengths (4 === folder, 8 === file)
-            if (k.length === 4 || k.length === 8) {
-                // TODO: cache sharekeys in aes
-                if (id === me) {
-                    k = decrypt_key(master_aes, k);
-                }
-                else {
-                    decKey = null;
-                    var shareKey = u_sharekeys[id];
-                    if (shareKey) {
-                        if (Array.isArray(shareKey)) {
-                            var len = shareKey.length;
-                            if (len === 4 || len === 6 || len === 8) {
-                                decKey = decrypt_key(new sjcl.cipher.aes(shareKey), k);
-                            }
-                            else {
-                                console.error('Invalid shareKey length ' + id, shareKey);
-                            }
-                        }
-                        else {
-                            console.error('Invalid shareKey ' + id, shareKey);
-                        }
-                    }
-                    else {
-                        console.error('No shareKey for ' + id);
-                    }
-
-                    /*if (!decKey) {
-                        if (window.d) {
-                            debugger;
-                        }
-                     }*/
-                    k = decKey;
-                }
-            }
-            else {
-                console.error("Received invalid key length (" + k.length + "): " + file.h);
-                k = null;
-            }
-        }
-        else {
-            // long keys: RSA
-            if (u_privk) {
-                var t = base64urldecode(key);
-                try {
-                    if (t) {
-                        k = str_to_a32(crypto_rsadecrypt(t, u_privk).substr(0, file.t ? 16 : 32));
-                    }
-                    else {
-                        console.debug("Corrupt key for node " + file.h);
-                    }
-                } catch (e) {
-                    console.error('Intercepted an exception. To not lose it, here it is: ' + e);
-                }
-            }
-            else {
-                console.debug("Received RSA key, but have no public key published: " + file.h);
-            }
-        }
-
-        if (!file.a) {
-            console.warn('Missing attribute for node "%s"', file.h, file);
-        }
-
-        var ab = k && file.a && base64_to_ab(file.a);
-        var o = ab && dec_attr(ab, k);
-
-        if (o && typeof o === 'object') {
-            if (typeof o.n === 'string') {
-                if (file.h) {
-                    u_nodekeys[file.h] = k;
-                    if (key.length >= 46) {
-                        rsa2aes[file.h] = a32_to_str(encrypt_key(u_k_aes, k));
-                    }
-                }
-                if (typeof o.c === 'string') {
-                    file.hash = o.c;
-                }
-
-                if (file.hash) {
-                    var h = base64urldecode(file.hash);
-                    var t = 0;
-                    for (var i = h.charCodeAt(16); i--;) {
-                        t = t * 256 + h.charCodeAt(17 + i);
-                    }
-                    file.mtime = t;
-                }
-
-                if (typeof o.t !== 'undefined') {
-                    file.mtime = o.t;
-                }
-
-                file.key = k;
-                file.ar = o;
-                file.name = file.ar.n;
-
-                var exclude = {t:1, c:1, n:1};
-                for (var j in o) {
-                    if (o.hasOwnProperty(j) && !exclude[j]) {
-                        file[j] = o[j];
-                    }
-                }
-
-                success = true;
-            }
-        }
-    }
-
-    if (!success) {
-        console.warn('Received no suitable key for "%s"', file.h, file);
-
-        if (!missingkeys[file.h]) {
-            newmissingkeys = true;
-            missingkeys[file.h] = true;
-        }
-
-        if (file.k) {
-            keycache[file.h] = file.k;
-        }
-    }
-}
-
 function api_updfkey(h) {
     var logger = MegaLogger.getLogger('crypt');
-    var nk = [],
-        sn;
+    var nk = [], k, sn;
 
     logger.debug('api_updfkey', h);
 
-    if (typeof h !== 'string') {
+    if (typeof h != 'string') {
         sn = h;
     }
     else {
-        sn = fm_getnodes(h, 1);
-        sn.push(h);
+        sn = fm_getnodes(h, true);
     }
 
-    for (var i in sn) {
+    for (var i = sn.length; i--; ) {
         h = sn[i];
-        if (u_nodekeys[h] && M.d[h] && M.d[h].fk) {
-            nk.push(h, a32_to_base64(encrypt_key(u_k_aes, u_nodekeys[h])));
+        if (M.d[h].u != u_handle && crypto_keyok(M.d[h])) {
+            nk.push(h, a32_to_base64(encrypt_key(u_k_aes, M.d[h].k)));
         }
     }
 
@@ -4363,13 +3846,29 @@ function api_updfkey(h) {
     }
 }
 
-function crypto_sendrsa2aes() {
-    var n;
+var rsa2aes = {};
+
+// check for an RSA node key: need to rewrite to AES for faster subsequent loading.
+function crypto_rsacheck(n) {
+    if (typeof n.k == 'string'   // must be undecrypted
+     && (n.k.indexOf('/') > 55   // must be longer than userhandle (11) + ':' (1) + filekey (43)
+     || (n.k.length > 55 && n.k.indexOf('/') < 0))) {
+        rsa2aes[n.h] = true;
+    }
+}
+
+function crypto_node_rsa2aes() {
     var nk = [];
 
-    for (n in rsa2aes) {
-        nk.push(n, base64urlencode(rsa2aes[n]));
+    for (h in rsa2aes) {
+        // confirm that the key is good and actually decrypted the attribute
+        // string before rewriting
+        if (crypto_keyok(M.d[h]) && !M.d[h].a) {
+            nk.push(h, a32_to_base64(encrypt_key(u_k_aes, M.d[h].k)));
+        }
     }
+
+    rsa2aes = {};
 
     if (nk.length) {
         api_req({
@@ -4377,95 +3876,144 @@ function crypto_sendrsa2aes() {
             nk: nk
         });
     }
-
-    rsa2aes = {};
 }
 
-var missingkeys = {};
+// missing keys handling
+// share keys can be unavailable because:
+// - the client that added the node wasn't using the SDK and didn't supply
+//   the required CR element
+// - a nested share situation, where the client adding the node is only part
+//   of the inner share - clients that are only part of the outer share can't
+//   decrypt the node without assistance from the share owner
+// FIXME: update missingkeys/sharemissing for all undecryptable nodes whose
+// share path changed (whenever shares are added, removed or nodes are moved)
+var missingkeys = {};   // { node handle : { share handle : true } }
+var sharemissing = {};  // { share handle : { node handle : true } }
 var newmissingkeys = false;
 
-function crypto_reqmissingkeys() {
-    var logger = MegaLogger.getLogger('crypt');
+// whenever a node fails to decrypt, call this.
+function crypto_reportmissingkey(n) {
+    var change = false;
 
-    if (!newmissingkeys) {
-        logger.debug('No new missing keys.');
-        return;
+    if (!missingkeys[n.h]) {
+        missingkeys[n.h] = {};
+        change = true;
     }
 
-    var i, j;
-    var n, s, ni, si, sn;
-    var cr = [[], [], []];
-
-    ni = {};
-    si = {};
-
-    for (n in missingkeys) {
-        // TODO: optimization: don't request keys for own files
-        sn = fm_getsharenodes(n);
-
-        for (j = sn.length; j--;) {
-            s = sn[j];
-
-            if (typeof si[s] === 'undefined') {
-                si[s] = cr[0].length;
-                cr[0].push(s);
-            }
-
-            if (typeof ni[n] === 'undefined') {
-                ni[n] = cr[1].length;
-                cr[1].push(n);
-            }
-
-            cr[2].push(si[s], ni[n]);
-        }
-    }
-
-    if (!cr[1].length) {
-        logger.debug('No missing keys');
-
-        return;
-    }
-
-    if (cr[0].length) {
-        var ctx = {};
-
-        ctx.callback = function (res, ctx) {
-            logger.debug("Processing crypto response");
-
-            if (typeof res === 'object' && typeof res[0] === 'object') {
-                crypto_proccr(res[0]);
+    if (typeof n.k == 'string') {
+        for (var p = 8; (p = n.k.indexOf(':', p)) >= 0; p += 32) {
+            if (p == 8 || n.k[p - 9] == '/') {
+                var id = n.k.substr(p - 8, 8);
+                if (!missingkeys[n.h][id]) {
+                    missingkeys[n.h][id] = true;
+                    if (!sharemissing[id]) {
+                        sharemissing[id] = {};
+                    }
+                    sharemissing[id][n.h] = true;
+                    change = true;
+                }
             }
         }
-
-        res = api_req({
-            a: 'k',
-            cr: cr
-        }, ctx);
     }
     else {
-        logger.debug("Keys " + cr[1] + " missing, but no related shares found.");
+        console.error('invalid-missingkey ' + n.h, change);
+
+        srvlog2('invalid-missingkey', n.h, typeof n.k, Object(n.k).length | 0);
+    }
+
+    if (change) {
+        newmissingkeys = true;
+        if (fmdb) fmdb.add('mk', { h : n.h,
+                                   d : { s : Object.keys(missingkeys[n.h]) }
+                                 });
     }
 }
 
-// process incoming cr, set fm keys and commit
+// populate from IndexedDB's mk table
+function crypto_missingkeysfromdb(r) {
+    // FIXME: remove the following line
+    if (!r.length || !r[0].s) return;
+
+    for (var i = r.length; i--; ) {
+        if (!missingkeys[r[i].h]) missingkeys[r[i].h] = {};
+
+        if (r[i].s) {
+            for (var j = r[i].s.length; j--; ) {
+                missingkeys[r[i].h][r[i].s[j]] = true;
+                if (!sharemissing[r[i].s[j]]) sharemissing[r[i].s[j]] = {};
+                sharemissing[r[i].s[j]][r[i].h] = true;
+            }
+        }
+    }
+}
+
+function crypto_keyfixed(h) {
+    // no longer missing from the shares it was in
+    for (var sh in missingkeys[h]) delete sharemissing[sh][h];
+
+    // no longer missing
+    delete missingkeys[h];
+
+    // persist change
+    if (fmdb) {
+        fmdb.del('mk', h);
+    }
+}
+
+// upon receipt of a new u_sharekey, call this with sharemissing[sharehandle].
+// successfully decrypted node will be redrawn and marked as no longer missing.
+function crypto_fixmissingkeys(hs) {
+    if (hs) {
+        for (h in hs) {
+            var n = M.d[h];
+
+            if (n && !crypto_keyok(n)) {
+                crypto_decryptnode(n);
+            }
+
+            if (crypto_keyok(n)) {
+                fm_updated(n);
+                crypto_keyfixed(h);
+            }
+        }
+    }
+}
+
+// set a newly received sharekey - apply to relevant missing key nodes, if any.
+function crypto_setsharekey(h, k) {
+    u_sharekeys[h] = [k, new sjcl.cipher.aes(k)];
+    if (sharemissing[h]) crypto_fixmissingkeys(sharemissing[h]);
+}
+
+// set a newly received nodekey
+function crypto_setnodekey(h, k) {
+    var n = M.d[h];
+
+    if (n && !crypto_keyok(n)) {
+        n.k = k;
+        crypto_decryptnode(n);
+
+        if (crypto_keyok(n)) {
+            fm_updated(n);
+            crypto_keyfixed(h);
+        }
+    }
+}
+
+// process incoming cr, set nodekeys and commit
 function crypto_proccr(cr) {
-    var i;
-
     // received keys in response, add
-    for (i = 0; i < cr[2].length; i += 3) {
-        fm_updatekey(cr[1][cr[2][i + 1]], cr[0][cr[2][i]] + ":" + cr[2][i + 2]);
+    for (var i = 0; i < cr[2].length; i += 3) {
+        crypto_setnodekey(cr[1][cr[2][i + 1]], cr[0][cr[2][i]] + ":" + cr[2][i + 2]);
     }
-
-    fm_commitkeyupdate();
 }
 
-// process incoming missing key cr
+// process incoming missing key cr and respond with the missing keys
 function crypto_procmcr(mcr) {
     var i;
     var si = {},
         ni = {};
     var sh, nh;
-    var sc = {};
     var cr = [[], [], []];
 
     // received keys in response, add
@@ -4475,9 +4023,8 @@ function crypto_procmcr(mcr) {
         if (u_sharekeys[sh]) {
             nh = mcr[1][mcr[2][i + 1]];
 
-            if (u_nodekeys[nh]) {
+            if (crypto_keyok(M.d[nh])) {
                 if (typeof si[sh] === 'undefined') {
-                    sc[sh] = new sjcl.cipher.aes(u_sharekeys[sh]);
                     si[sh] = cr[0].length;
                     cr[0].push(sh);
                 }
@@ -4485,7 +4032,7 @@ function crypto_procmcr(mcr) {
                     ni[nh] = cr[1].length;
                     cr[1].push(nh);
                 }
-                cr[2].push(si[sh], ni[nh], a32_to_base64(encrypt_key(sc[sh], u_nodekeys[nh])));
+                cr[2].push(si[sh], ni[nh], a32_to_base64(encrypt_key(u_sharekeys[sh][1], M.d[nh].k)));
             }
         }
     }
@@ -4500,36 +4047,28 @@ function crypto_procmcr(mcr) {
 
 var rsasharekeys = {};
 
-function crypto_process_sharekey(handle, key) {
-    if (key.length > 22) {
-        key = base64urldecode(key);
-        var k = str_to_a32(crypto_rsadecrypt(key, u_privk).substr(0, 16));
-        rsasharekeys[handle] = true;
-        return k;
-    }
-    return decrypt_key(u_k_aes, base64_to_a32(key));
-}
-
 function crypto_share_rsa2aes() {
     var rsr = [],
-        n;
+        h;
 
-    for (n in rsasharekeys) {
-        if (u_sharekeys[n]) {
-            // pubkey found: encrypt share key to it
-            rsr.push(n, u_handle, a32_to_base64(encrypt_key(u_k_aes, u_sharekeys[n])));
+    for (h in rsasharekeys) {
+        if (u_sharekeys[h]) {
+            // valid AES sharekey found - overwrite the RSA version
+            rsr.push(h, u_handle, a32_to_base64(encrypt_key(u_k_aes, u_sharekeys[h][0])));
         }
     }
+
+    rsasharekeys = {};
 
     if (rsr.length) {
         api_req({
             a: 'k',
             sr: rsr
         });
-        rsasharekeys = {};
     }
 }
 
+// FIXME: add to translations?
 function api_strerror(errno) {
     switch (errno) {
     case 0:
@@ -4815,4 +4354,333 @@ function api_strerror(errno) {
         backgroundNacl.requiresWorkersInit();
     });
 
+})();
+
+// JSON parser/splitter
+// (this is tailored to processing what the API actually generates
+// i.e.: NO whitespace, NO non-numeric/string constants ("null"), etc...)
+// accepts string and Uint8Array input, but not a mixture of the two
+(function() {
+
+    var JSONSplitter = function json_splitter(filters, ctx, format_uint8array) {
+        if (!(this instanceof json_splitter)) {
+            return new json_splitter(filters, ctx);
+        }
+
+        // position in source string
+        this.p = 0;
+
+        // remaining part of previous chunk (chunked feeding only)
+        this.rem = false;
+
+        // enclosing object stack at current position (type + name)
+        this.stack = [];
+
+        // 0: no value expected, 1: optional value expected, -1: compulsory value expected
+        this.expectvalue = -1;
+
+        // last hash name seen
+        this.lastname = '';
+
+        // hash of exfiltration vector callbacks
+        this.filters = filters;
+
+        // bucket stack
+        this.buckets = [];
+        this.lastpos = 0;
+
+        // optional callee scope
+        this.ctx = ctx;
+
+        if (format_uint8array) {
+            // extraction/manipulation helpers for Uint8Array inputs
+
+            // convert input Uint8Array to string
+            this.tostring = function(u8) {
+                var b = '';
+
+                for (var i = 0; i < u8.length; i++) {
+                    b = b + String.fromCharCode(u8[i]);
+                }
+
+                return b;
+            };
+
+            // convert char to Uint8Array element (number)
+            this.fromchar = function(c) {
+                return c.charCodeAt(0);
+            };
+
+            // convert Uint8Array element (number) to char
+            this.tochar = function(c) {
+                return String.fromCharCode(c);
+            };
+
+            // concatenate two Uint8Arrays (a can be false - relies on boolean.length to be undefined)
+            this.concat = function(a, b) {
+                var t = new Uint8Array(a.length+b.length);
+                if (a) t.set(a, 0);
+                t.set(b, a.length+0);
+                return t;
+            };
+
+            // sub-Uint8Array of a Uint8Array given position p and optional length l
+            this.sub = function(s, p, l) {
+                return l >= 0 ? new Uint8Array(s.buffer, p, l)
+                              : new Uint8Array(s.buffer, p);
+            }
+        }
+        else {
+            // extraction/manipulation helpers (mostly no-ops) for string inputs
+
+            // convert input string to string
+            this.tostring = function(s) {
+                return s;
+            };
+
+            // convert char to string element (char)
+            this.fromchar = function(c) {
+                return c;
+            };
+
+            // convert string element (char) to char
+            this.tochar = function(c) {
+                return c;
+            };
+
+            // concatenate two strings (a can be false)
+            this.concat = function(a, b) {
+                return a ? a+b : b;
+            };
+
+            // substring
+            this.sub = function(s, p, l) {
+                return s.substr(p, l);
+            }
+        }
+
+        // console logging
+        this.logger = MegaLogger.getLogger('JSONSplitter');
+    };
+
+    // returns the position after the end of the JSON string at o or -1 if none found
+    // must be called with s[o] == '"', or will never terminate
+    JSONSplitter.prototype.stringre = /^"(((?=\\)\\(["\\\/bfnrt]|u[0-9a-fA-F]{4}))|[^"\\\0-\x1F\x7F]+)*$/;
+
+    JSONSplitter.prototype.strend = function strend(s, o) {
+        var oo = o;
+
+        // (we do not set lastIndex and use RegExp.exec() with /g due to the potentially enormous length of s)
+        while ((oo = s.indexOf(this.fromchar('"'), oo+1)) >= 0) {
+            if (this.stringre.test(this.tostring(this.sub(s, o, oo-o)))) {
+                return oo+1;
+            }
+        }
+
+        return -1;
+    };
+
+    // returns the position after the end of the JSON number at o or -1 if none found
+    JSONSplitter.prototype.numberre = /^-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?/;
+
+    JSONSplitter.prototype.numend = function numend(s, o) {
+        var oo = o;
+
+        // (we do not set lastIndex due to the potentially enormous length of s)
+        while ('0123456789-+eE.'.indexOf(this.tochar(s[oo])) >= 0) oo++;
+
+        if (oo > o) {
+            var r = this.numberre.exec(this.tostring(this.sub(s, o, oo-o)));
+
+            if (r) {
+                return o+r[0].length;
+            }
+        }
+
+        return -1;
+    };
+
+    // process a JSON chunk (of a stream of chunks, if the browser supports it)
+    // FIXME: rewrite without large string concatenation
+    JSONSplitter.prototype.chunkproc = function json_chunkproc(chunk, inputcomplete) {
+        // we are not receiving responses incrementally: process as growing buffer
+        if (!chunked_method) return this.proc(chunk, inputcomplete);
+
+        // otherwise, we just retain the data that is still going to be needed in the
+        // next round... enabling infinitely large accounts to be "streamed" to IndexedDB
+        // (in theory)
+        if (this.rem.length) {
+            // append to previous residue
+            if (chunk) {
+                this.rem = this.concat(this.rem, chunk);
+            }
+            chunk = this.rem;
+        }
+
+        // process combined residue + new chunk
+        var r = this.proc(chunk, inputcomplete);
+
+        if (r >= 0) {
+            // processing ended
+            this.rem = false;
+            return r;
+        }
+
+        if (this.lastpos) {
+            // remove processed data
+            this.rem = this.sub(chunk, this.lastpos);
+
+            this.p -= this.lastpos;
+            this.lastpos = 0;
+        }
+        else {
+            // no data was processed: store entire chunk
+            this.rem = chunk;
+        }
+
+        return r;
+    };
+
+    // returns -1 if it wants more data, 0 in case of a fatal error, 1 when done
+    JSONSplitter.prototype.proc = function json_proc(json, inputcomplete) {
+        while (this.p < json.length) {
+            var c = this.tochar(json[this.p]);
+
+            if (c == '[' || c == '{') {
+                if (!this.expectvalue) {
+                    this.logger.error("Malformed JSON - unexpected object or array");
+                    return 0;
+                }
+
+                this.stack.push(this.tochar(json[this.p]) + this.lastname);
+
+                if (this.filters[this.stack.join('')]) {
+                    // a filter is configured for this path - recurse
+                    this.buckets[0] += this.tostring(this.sub(json, this.lastpos, this.p-this.lastpos));
+                    this.lastpos = this.p;
+                    this.buckets.unshift('');
+                }
+
+                this.p++;
+                this.lastname = '';
+                this.expectvalue = c == '[';
+            }
+            else if (c == ']' || c == '}') {
+                if (this.expectvalue < 0) {
+                    this.logger.error("Malformed JSON - premature array closure");
+                    return 0;
+                }
+
+                if (!this.stack.length || "]}".indexOf(c) != "[{".indexOf(this.stack[this.stack.length-1][0])) {
+                    this.logger.error("Malformed JSON - mismatched close");
+                    return 0;
+                }
+
+                this.lastname = '';
+
+                // check if this concludes an exfiltrated object and return it if so
+                var callback = this.filters[this.stack.join('')];
+                this.p++;
+
+                if (callback) {
+                    // we have a filter configured for this object
+                    try {
+                        // pass filtrate to application and empty bucket
+                        callback.call(this.ctx,
+                            JSON.parse(this.buckets[0]+this.tostring(this.sub(json, this.lastpos, this.p-this.lastpos)))
+                        );
+                    } catch (e) {
+                        this.logger.log("Malformed JSON - parse error in filter element " + this.filter);
+                        return 0;
+                    }
+
+                    this.buckets.shift();
+                    this.lastpos = this.p;
+                }
+
+                this.stack.pop();
+                this.expectvalue = 0;
+            }
+            else if (c == ',') {
+                if (this.expectvalue) {
+                    this.logger.error("Malformed JSON - stray comma");
+                    return 0;
+                }
+                if (this.lastpos == this.p) {
+                    this.lastpos++;
+                }
+                this.p++;
+                this.expectvalue = this.stack[this.stack.length-1][0] == '[';
+            }
+            else if (c == '"') {
+                var t = this.strend(json, this.p);
+                if (t < 0) {
+                    break;
+                }
+
+                if (this.expectvalue) {
+                    this.p = t;
+                    this.expectvalue = false;
+                }
+                else {
+                    // (need at least one char after end of property string)
+                    if (t == json.length) {
+                        break;
+                    }
+
+                    if (this.tochar(json[t]) != ':') {
+                        this.logger.error("Malformed JSON - no : found after property name");
+                        return 0;
+                    }
+
+                    this.lastname = this.tostring(this.sub(json, this.p+1, t-this.p-2));
+                    this.expectvalue = -1;
+                    this.p = t+1;
+                }
+            }
+            else if (c >= '0' && c <= '9' || c == '.' || c == '-') {
+                if (!this.expectvalue) {
+                    this.logger.error("Malformed JSON - unexpected number");
+                    return 0;
+                }
+
+                var t = this.numend(json, this.p);
+
+                if (t == json.length) {
+                    // numbers, on the face of them, do not tell whether they are complete yet
+                    // fortunately, we have the "inputcomplete" flag to assist
+                    if (inputcomplete && !this.stack.length) {
+                        // this is a stand-alone number, do we have a callback for them?
+                        callback = this.filters['#'];
+                        if (callback) {
+                            callback.call(this.ctx, this.tostring(json));
+                        }
+                        return 1;
+                    }
+                    break;
+                }
+
+                if (t < 0) {
+                    break;
+                }
+
+                this.p = t;
+                this.expectvalue = false;
+            }
+            else if (c == ' ') {
+                // a concession to the API team's aesthetic sense
+                // FIXME: also support tab, CR, LF
+                this.p++;
+            }
+            else {
+                this.logger.error("Malformed JSON - bogus char at position " + this.p);
+                return 0;
+            }
+        }
+
+        return (!this.expectvalue && !this.stack.length) ? 1 : (inputcomplete ? 0 : -1);
+    };
+    Object.freeze(JSONSplitter.prototype);
+
+    window.JSONSplitter = JSONSplitter;
 })();

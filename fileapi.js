@@ -1137,7 +1137,7 @@ const mozLoginManager = Object.freeze({
 					}
 				}
 			}
-			else {
+			else if (!window.Incognito) {
 				this.prompter.promptToSavePassword(loginInfo);
 			}
 		}
@@ -1201,7 +1201,7 @@ const mozNetUtilFetch = (function() {
 Services.obs.addObserver(function(aSubject, aTopic, aData) {
 	if (aTopic === 'mega-event-log4') {
 		(function _log() {
-			if (typeof api_req === 'function') {
+			if (typeof api_req === 'function' && window.u_checked) {
 				api_req({ a: 'log', e: 99623, m: 'Lypass' });
 			}
 			else {

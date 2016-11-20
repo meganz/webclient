@@ -401,65 +401,6 @@ function init_page() {
         }
     }
 
-    var fmwasinitialized = !!fminitialized;
-    if (((u_type === 0 || u_type === 3) || pfid || folderlink) && (!flhashchange || !pfid || pfkey !== oldPFKey)) {
-
-        if (is_fm()) {
-            // switch between FM & folderlinks (completely reinitialize)
-            if ((!pfid && folderlink) || (pfid && folderlink === 0) || pfkey !== oldPFKey) {
-
-                // re-initialize waitd connection when switching.
-                if (!pfid && folderlink && u_sid) {
-                    api_setsid(u_sid);
-
-                    if (waitxhr) {
-                        waitsc();
-                    }
-                }
-
-                M.reset();
-                folderlink = 0;
-                fminitialized = false;
-                loadfm.loaded = false;
-                if (loadfm.loading) {
-                    api_init(wasFolderlink ? 1 : 0, 'cs');
-                    loadfm.loading = false;
-                }
-                if (typeof mDBcls === 'function') {
-                    mDBcls();
-                }
-            }
-        }
-
-        if (!fminitialized) {
-            if (u_type === 3 && !pfid && !folderlink) {
-                mega.config.fetch();
-            }
-            mega.initLoadReport();
-
-            if (typeof mDB !== 'undefined' && !pfid && (!flhashchange || page === 'fm')) {
-                mDBstart();
-                mega.loadReport.mode = 1;
-            }
-            else {
-                loadfm();
-                mega.loadReport.mode = 2;
-            }
-        }
-
-        // Cleanup M.currentdirid switching from static pages <> fm
-        if (fminitialized) {
-            if (is_fm()) {
-                M.currentdirid = M.lastCurrentDirID;
-                delete M.lastCurrentDirID;
-            }
-            else if (M.currentdirid) {
-                M.lastCurrentDirID = M.currentdirid;
-                M.currentdirid = null;
-            }
-        }
-    }
-
     if (page.substr(0, 10) == 'blogsearch') {
         blogsearch = decodeURIComponent(page.substr(11, page.length - 2));
         if (!blogsearch) {
@@ -1046,10 +987,48 @@ function init_page() {
             }
         }
 
-        if (d) console.log('Setting up fm...', id, pfid, fmwasinitialized, fminitialized, M.currentdirid);
+        if (d) {
+            console.log('Setting up fm...', id, pfid, fminitialized, M.currentdirid);
+        }
 
-        if (!id && fmwasinitialized) {
+        if (!id && fminitialized) {
             id = M.RootID;
+        }
+
+
+        // FIXME
+        // all global state must be encapsulated in a single object -
+        // we can then comfortably switch between states by changing the
+        // current object and switching UI/XHR comms/IndexedDB
+
+        // switch between FM & folderlinks (completely reinitialize)
+        if ((!pfid && folderlink) || (pfid && folderlink === 0) || pfkey !== oldPFKey) {
+
+            M.reset();
+            folderlink     = 0;
+            fminitialized  = false;
+            loadfm.loaded  = false;
+            loadfm.loading = false;
+
+            stopapi();
+            api_reset();
+            initworkerpool();
+
+            if (pfid) {
+                api_setfolder(n_h);
+            }
+            else if (u_sid) {
+                api_setsid(u_sid);
+            }
+
+            // re-initialize waitd connection when switching.
+            if (waitxhr) {
+                waitsc();
+            }
+
+            if (typeof mDBcls === 'function') {
+                mDBcls(); // close fmdb
+            }
         }
 
         if (!fminitialized) {
@@ -1059,6 +1038,9 @@ function init_page() {
             if (!m && $('#fmholder').html() == '') {
                 $('#fmholder').safeHTML(translate(pages['fm'].replace(/{staticpath}/g, staticpath)));
             }
+
+            mega.initLoadReport();
+            loadfm();
         }
         else if ((!pfid || flhashchange) && id && id !== M.currentdirid) {
             M.openFolder(id);
@@ -1326,6 +1308,11 @@ function topmenuUI() {
     else {
         $('.top-search-bl').addClass('hidden');
     }
+    
+    var avatar = useravatar.my;
+    if (!avatar) {
+        $('.fm-avatar').hide();
+    }
 
     // Show active item in main menu
     var section = page.split('/')[0];
@@ -1342,14 +1329,21 @@ function topmenuUI() {
         }
     }
 
-    $('.fm-avatar').hide();
 
     // If the 'name' property is set, display it
     if (u_type == 3 && u_attr.name) {
-        $('.top-head .user-name').text(u_attr.name);
-        $('.top-head .user-name').show();
+        $('.top-head .user-name').text(u_attr.name).show();
     }
 
+    // Check for pages that do not have the 'firstname' property set e.g. #about
+    else if ((u_type == 3) && (!u_attr.firstname)
+            && (typeof u_attr.name === 'string') && (u_attr.name.indexOf(' ') != -1)) {
+
+        // Try get the first name from the full 'name' property and display
+        var nameParts = u_attr.name.split(' ');
+        $('.top-head .user-name').text(nameParts[0]).show();
+    }
+    
     // Show language in top menu
     $('.top-menu-item.languages .right-el').text(lang);
     // Show version in top menu
@@ -1358,7 +1352,9 @@ function topmenuUI() {
     if (u_type) {
         $('.top-menu-item.logout,.top-menu-item.backup').removeClass('hidden');
         $('.top-menu-item.account').removeClass('hidden');
-        $('.fm-avatar').show();
+        if (avatar) {
+            $('.fm-avatar img').attr('src', avatar);
+        }
         $('.top-login-button').hide();
         $('.membership-status').show();
         $('.top-change-language').hide();
@@ -1369,11 +1365,6 @@ function topmenuUI() {
             $('.top-icon.achievements').show();
         }
 
-        Soon(function() {
-            if (!avatars[u_handle]) {
-                useravatar.loadAvatar(u_handle);
-            }
-        });
 
         // If a Lite/Pro plan has been purchased
         if (u_attr.p) {
@@ -1828,19 +1819,34 @@ function topmenuUI() {
         clearTimeout($.liTooltipTimer);
     });
 
-    $('.fm-avatar img, .user-name').rebind('click', function () {
-        if ($('.fm-avatar img').attr('src').indexOf('blob:') > -1) {
-            document.location.hash = 'fm/account';
+    var $topHeader = $('.top-head');
+    $topHeader.find('.fm-avatar img').rebind('click', function() {
+
+        // If the user has an avatar already set, take them to the profile page where they can change or remove it
+        if ($(this).attr('src').indexOf('blob:') > -1) {
+            document.location.hash = 'fm/account/profile';
         }
         else {
+            // Otherwise if they don't have an avatar, open the change avatar dialog
             avatarDialog();
         }
     });
 
-    $('.top-head .logo').rebind('click', function () {
+    // If the user name in the header is clicked, take them to the account overview page
+    $topHeader.find('.user-name').rebind('click', function() {
+        document.location.hash = 'fm/account';
+    });
+
+    // If the main Mega M logo in the header is clicked
+    $topHeader.find('.logo').rebind('click', function() {
         if (typeof loadingInitDialog === 'undefined' || !loadingInitDialog.active) {
-            document.location.hash =
-                typeof u_type !== 'undefined' && +u_type > 2 ? '#fm/dashboard' : '#start';
+            if (folderlink) {
+                M.openFolder(M.RootID, true);
+            }
+            else {
+                document.location.hash =
+                    typeof u_type !== 'undefined' && +u_type > 2 ? '#fm/dashboard' : '#start';
+            }
         }
     });
 
@@ -1850,9 +1856,6 @@ function topmenuUI() {
         $('body').removeClass('overlayed');
     }
 
-    if (page.substr(0, 2) !== 'fm' && u_type == 3 && !avatars[u_handle]) {
-        M.avatars();
-    }
     if (ulmanager.isUploading || dlmanager.isDownloading) {
         $('.widget-block').removeClass('hidden');
     }
@@ -1966,7 +1969,7 @@ function parsetopmenu() {
     if (document.location.href.substr(0, 19) == 'chrome-extension://') {
         top = top.replace(/\/#/g, '/' + urlrootfile + '#');
     }
-    top = top.replace("{avatar-top}", window.useravatar && useravatar.top() || '');
+    top = top.replace("{avatar-top}", window.useravatar && useravatar.mine() || '');
     top = translate(top);
     return top;
 }

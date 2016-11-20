@@ -574,12 +574,12 @@ var exportPassword = {
                         // Folder
                         if (node.t) {
                             linkInfo.type = exportPassword.LINK_TYPE_FOLDER;    // 0 byte for folder link
-                            linkInfo.key = u_sharekeys[node.h];                 // 128 bit key as array of 32 bit int
+                            linkInfo.key = u_sharekeys[node.h][0];              // 128 bit key as array of 32 bit int
                         }
                         else {
                             // File
                             linkInfo.type = exportPassword.LINK_TYPE_FILE;      // 1 byte for file link
-                            linkInfo.key = node.key;                            // 256 bit key as array of 32 bit int
+                            linkInfo.key = node.k;                              // 256 bit key as array of 32 bit int
                         }
 
                         // Convert the key to a byte array (big endian), also add the link's handle and public handle
@@ -1501,22 +1501,22 @@ var exportExpiry = {
         else {
             // Otherwise add all regular links
             for (var i in handles) {
-                if (handles.hasOwnProperty(i)) {
-                    var node = M.d[handles[i]];
+                var node = M.d[handles[i]];
 
-                    // Only nodes with public handle
-                    if (node && node.ph) {
-                        if (node.t) {
-                            // Folder
-                            type = 'F';
-                            key = u_sharekeys[node.h];
-                        }
-                        else {
-                            // File
-                            type = '';
-                            key = node.key;
-                        }
+                // Only nodes with public handle
+                if (node && node.ph) {
+                    if (node.t) {
+                        // Folder
+                        type = 'F';
+                        key = u_sharekeys[node.h] && u_sharekeys[node.h][0];
+                    }
+                    else {
+                        // File
+                        type = '';
+                        key = node.k;
+                    }
 
+                    if (key) {
                         var nodeUrlWithPublicHandle = getBaseUrl() + '/#' + type + '!' + (node.ph);
                         var nodeDecryptionKey = key ? '!' + a32_to_base64(key) : '';
 
@@ -1530,6 +1530,9 @@ var exportExpiry = {
                         else if (modeDecKey) {
                             links.push(nodeDecryptionKey);
                         }
+                    }
+                    else {
+                        srvlog2('export-no-key', node.h, node.t);
                     }
                 }
             }
@@ -1584,16 +1587,21 @@ var exportExpiry = {
 
         // Shared item type is folder
         if (item.t) {
+            key = u_sharekeys[item.h] && u_sharekeys[item.h][0];
+
+            // folder key must exit, otherwise skip
+            if (!key) {
+                return '';
+            }
+
             type = 'F';
-            key = u_sharekeys[item.h];
             fileSize = '';
             folderClass = ' folder-item';
         }
-
         // Shared item type is file
         else {
             type = '';
-            key = item.key;
+            key = item.k;
             fileSize = htmlentities(bytesToSize(item.s));
         }
 
@@ -1801,10 +1809,13 @@ var exportExpiry = {
         api_req(request, {
             nodeId: nodeId,
             callback: function(result) {
-
                 if (typeof result !== 'number') {
                     M.nodeShare(this.nodeId, { h: this.nodeId, r: 0, u: 'EXP', ts: unixtime() });
-                    M.nodeAttr({ h: this.nodeId, ph: result });
+                    var n;
+                    if (fmdb && (n = M.d[this.nodeId])) {
+                        n.ph = result;
+                        M.nodeUpdated(n);
+                    }
                 }
                 else { // Error
                     self.logger.warn('_getExportLinkRequest:', this.nodeId, 'Error code: ', result);

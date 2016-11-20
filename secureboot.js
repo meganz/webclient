@@ -301,7 +301,7 @@ if (!b_u) try
         staticpath = localStorage.staticpath;
     }
     staticpath = staticpath || geoStaticpath();
-    apipath = localStorage.apipath || 'https://eu.api.mega.co.nz/';
+    apipath = localStorage.apipath || 'https://g.api.mega.co.nz/';
 }
 catch(e) {
     if (!m || !cookiesDisabled) {
@@ -366,7 +366,7 @@ var mega = {
 
     /** Load performance report */
     initLoadReport: function() {
-        var r = {startTime: Date.now(), stepTimeStamp: Date.now(), EAGAINs: 0, e500s: 0, errs: 0};
+        var r = {startTime: Date.now(), stepTimeStamp: Date.now(), EAGAINs: 0, e500s: 0, errs: 0, mode: 1};
 
         r.aliveTimer = setInterval(function() {
             var now = Date.now();
@@ -826,9 +826,9 @@ Object.defineProperty(this, 'mBroadcaster', {
                             }
                             delete localStorage['mCrossTabRef_' + u_handle];
                             this.setMaster();
-                            if (u_handle && window.indexedDB) {
-                                mDBstart(true);
-                            }
+                            //if (u_handle && window.indexedDB) {
+                            //    mDBstart(true);
+                            //}
                         }
                     }
                     break;
@@ -1145,6 +1145,7 @@ if (m)
     else if (window.location.hash.substr(1, 7) === 'confirm'
             || window.location.hash.substr(1, 6) === 'backup'
             || window.location.hash.substr(1, 6) === 'cancel'
+            || window.location.hash.substr(1, 6) === 'verify'
             || window.location.hash.substr(1, 6) === 'fm/ipc'
             || window.location.hash.substr(1, 9) === 'newsignup'
             || window.location.hash.substr(1, 7) === 'recover'
@@ -1211,7 +1212,7 @@ else if (!b_u)
         };
     })(console);
 
-    Object.defineProperty(window, "__cd_v", { value : 29, writable : false });
+    Object.defineProperty(window, "__cd_v", { value : 32, writable : false });
 
     // Do not report exceptions if this build is older than 10 days
     var exTimeLeft = ((buildVersion.timestamp + (10 * 86400)) * 1000) > Date.now();
@@ -1525,6 +1526,7 @@ else if (!b_u)
 
     jsl.push({f:langFilepath, n: 'lang', j:3});
     jsl.push({f:'sjcl.js', n: 'sjcl_js', j:1});
+    jsl.push({f:'nodedec.js', n: 'nodedec_js', j:1});
     jsl.push({f:'js/vendor/jquery-2.2.1.js', n: 'jquery', j:1, w:10});
     jsl.push({f:'js/vendor/jquery-ui.js', n: 'jqueryui_js', j:1, w:10});
     jsl.push({f:'js/vendor/jquery.mousewheel.js', n: 'jquerymouse_js', j:1});
@@ -1551,6 +1553,7 @@ else if (!b_u)
         jsl.push({f:'js/vendor/jsbn.js', n: 'jsbn_js', j:1, w:2});
         jsl.push({f:'js/vendor/jsbn2.js', n: 'jsbn2_js', j:1, w:2});
         jsl.push({f:'js/vendor/nacl-fast.js', n: 'nacl_js', j:1,w:7});
+        jsl.push({f:'js/vendor/dexie.js', n: 'dexie_js', j:1,w:5});
         jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
 
         jsl.push({f:'js/authring.js', n: 'authring_js', j:1});
@@ -2247,6 +2250,7 @@ else if (!b_u)
     {
         var jsar = [];
         var cssar = [];
+        var nodedec = {};
         //for(var i in localStorage) if (i.substr(0,6) == 'cache!') delete localStorage[i];
         for (var i in jsl)
         {
@@ -2298,9 +2302,23 @@ else if (!b_u)
                 }
             }
             else if (jsl[i].j == 0) pages[jsl[i].n] = jsl[i].text;
+
+            if (jsl[i].n === 'sjcl_js' || jsl[i].n === 'nodedec_js' || jsl[i].n === 'asmcrypto_js') {
+                nodedec[jsl[i].n] = jsl[i].text;
+            }
         }
         if (window.URL)
         {
+            nodedec = !jj && !is_extension && !("ActiveXObject" in window) && nodedec;
+
+            if (nodedec && Object.keys(nodedec).length === 3) {
+                var tmp = String(nodedec.nodedec_js).split(/importScripts\([^)]+\)/);
+
+                nodedec = [tmp.shift(), nodedec.sjcl_js, nodedec.asmcrypto_js, tmp.join(';')];
+                mega.nodedecBlobURI = mObjectURL(nodedec, 'text/javascript');
+                nodedec = tmp = undefined;
+            }
+
             cssar = cssar.length && mObjectURL(cssar, "text/css");
             if (cssar)
             {
@@ -2403,6 +2421,8 @@ else if (!b_u)
             ua.details = Object.create(browserdetails(ua));
         }
         catch (e) {}
+
+        mBroadcaster.sendMessage('boot_done');
 
         if (u_checked || is_mobile) {
             startMega();

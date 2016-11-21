@@ -6,7 +6,7 @@ function WebrtcApi() {
         this.browser = 'firefox';
         if (!MediaStream.prototype.getVideoTracks || !MediaStream.prototype.getAudioTracks)
             throw new Error('webRTC API missing MediaStream.getXXXTracks');
-        
+
         this.peerconnection = (typeof RTCPeerConnection !== 'undefined')
              ? RTCPeerConnection
              : mozRTCPeerConnection;
@@ -32,11 +32,11 @@ function WebrtcApi() {
             }
         };
         this.pc_constraints = {};
-		if (MediaStream.prototype.clone)
+        if (MediaStream.prototype.clone)
             this.cloneMediaStream = function(src, what) {return src.clone(); }
           else
             this.cloneMediaStream = function(src, what) {return src; } //no cloning, just returns original stream
-        
+
         this.RTCSessionDescription = (typeof RTCSessionDescription !== "undefined")
              ? RTCSessionDescription
              : mozRTCSessionDescription;
@@ -70,8 +70,8 @@ function WebrtcApi() {
                 player.setAttribute('src', URL.createObjectURL(stream));
             }
         };
-        this.pc_constraints = {'optional': [{'DtlsSrtpKeyAgreement': 'true'}]}; // enable dtls support for compat with Firefox            
-		this.cloneMediaStream = function(src, what) {
+        this.pc_constraints = {'optional': [{'DtlsSrtpKeyAgreement': 'true'}]}; // enable dtls support for compat with Firefox
+        this.cloneMediaStream = function(src, what) {
             var stream = new webkitMediaStream;
             var ats = src.getAudioTracks();
             if (what.audio && (ats.length > 0)) {
@@ -81,8 +81,8 @@ function WebrtcApi() {
             if (what.video && (vts.length > 0)) {
                 stream.addTrack(vts[0]);
             }
-			return stream;
-		}
+            return stream;
+        }
         this.RTCSessionDescription = RTCSessionDescription;
         this.RTCIceCandidate = RTCIceCandidate;
         this.MediaStreamTrack = MediaStreamTrack;
@@ -144,10 +144,10 @@ WebrtcApi.prototype.createUserMediaConstraints = function(um)
 
     if (um.video)
         constraints.video = {mandatory: {}};// same behaviour as true
-    
+
     if (um.audio)
         constraints.audio = {};// same behaviour as true
-   
+
     if (um.screen)
         constraints.video = {
             "mandatory": {
@@ -155,12 +155,12 @@ WebrtcApi.prototype.createUserMediaConstraints = function(um)
             }
         };
 
-    if (um.resolution && !constraints.video) 
+    if (um.resolution && !constraints.video)
         constraints.video = {mandatory: {}};// same behaviour as true
-    
+
     // see https://code.google.com/p/chromium/issues/detail?id=143631#c9 for list of supported resolutions
-    switch (um.resolution) 
-	{
+    switch (um.resolution)
+    {
     // 16:9 first
     case '1080':
     case 'fullhd':
@@ -200,7 +200,7 @@ WebrtcApi.prototype.createUserMediaConstraints = function(um)
         break;
     default:
         if (navigator.userAgent.indexOf('Android') !== -1)
-		{
+        {
             constraints.video.mandatory.minWidth = 320;
             constraints.video.mandatory.minHeight = 240;
             constraints.video.mandatory.maxFrameRate = 15;
@@ -209,17 +209,17 @@ WebrtcApi.prototype.createUserMediaConstraints = function(um)
     }
 
     if (um.bandwidth)
-	{ // doesn't work currently, see webrtc issue 1846
+    { // doesn't work currently, see webrtc issue 1846
         if (!constraints.video) constraints.video = {mandatory: {}};//same behaviour as true
         constraints.video.optional = [{bandwidth: um.bandwidth}];
     }
     if (um.fps)
-	{ // for some cameras it might be necessary to request 30fps
+    { // for some cameras it might be necessary to request 30fps
         // so they choose 30fps mjpg over 10fps yuy2
         if (!constraints.video) constraints.video = {mandatory: {}};// same behaviour as tru;
         constraints.video.mandatory.minFrameRate = fps;
     }
-	return constraints;
+    return constraints;
 }
 
 WebrtcApi.prototype.getUserMediaWithConstraintsAndCallback = function(um)
@@ -283,5 +283,7 @@ try {
 catch(e)
 {
     RTC = null;
-    console.warn("Error enabling webrtc support: "+e);
+    if (d) {
+        console.warn("Error enabling webrtc support: "+e);
+    }
 }

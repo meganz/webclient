@@ -69,6 +69,17 @@ function FMDB(plainname, schema, channelmap) {
 
     // protect user identity post-logout
     this.name = ab_to_base64(this.strcrypt((plainname + plainname).substr(0, 16)));
+
+    // console logging
+    this.logger = MegaLogger.getLogger('FMDB');
+    this.logger.options.printDate = false;
+    this.logger.options.levelColors = {
+        'ERROR': '#fe000b',
+        'DEBUG': '#005aff',
+        'WARN':  '#d66d00',
+        'INFO':  '#2ca100',
+        'LOG':   '#8e8da7'
+    };
 }
 
 // initialise cross-tab access arbitration identity
@@ -99,8 +110,8 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
                         }
                     }*/
                 }).finally(function(){
-                    if (todrop.length) {
-                        console.log("Deleting obsolete DBs: " + todrop.join(', '));
+                    if (d && todrop.length) {
+                        fmdb.logger.log("Deleting obsolete DBs: " + todrop.join(', '));
                     }
 
                     fmdb.drop(todrop, function() {
@@ -111,11 +122,15 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
                         fmdb.db.open().then(function(){
                             fmdb.get('_sn', function(r){
                                 if (!wipe && r[0] && r[0].length == 11) {
-                                    console.log("DB sn: " + r[0]);
+                                    if (d) {
+                                        fmdb.logger.log("DB sn: " + r[0]);
+                                    }
                                     result(r[0]);
                                 }
                                 else {
-                                    if (d) console.log("No sn found in DB, wiping...");
+                                    if (d) {
+                                        fmdb.logger.log("No sn found in DB, wiping...");
+                                    }
                                     fmdb.db.delete().then(function(){
                                         fmdb.db.open().then(function(){
                                             result(false);
@@ -125,11 +140,11 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
                             });
                         }).catch (Dexie.MissingAPIError, function (e) {
                             fmdb.crashed = true;
-                            console.error("IndexedDB unavailable");
+                            fmdb.logger.error("IndexedDB unavailable");
                             result(false);
                         }).catch (function (e) {
                             fmdb.crashed = true;
-                            console.error(e);
+                            fmdb.logger.error(e);
                             result(false);
                         });
                     });
@@ -137,8 +152,7 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
             }
         }
         catch (e) {
-            console.error("IndexedDB or crypto layer unavailable, disabling");
-            console.log(e);
+            fmdb.logger.error("IndexedDB or crypto layer unavailable, disabling", e);
             fmdb.crashed = true;
             result(false);
         }
@@ -155,9 +169,9 @@ FMDB.prototype.drop = function fmdb_drop(dbs, cb) {
         var db = dbs.pop();
 
         (new Dexie(db)).delete().then(function(){
-            console.log("Deleted IndexedDB " + db);
+            fmdb.logger.log("Deleted IndexedDB " + db);
         }).catch(function(err){
-            console.error("Unable to delete IndexedDB " + db, err);
+            fmdb.logger.error("Unable to delete IndexedDB " + db, err);
         }).finally(function(){
             fmdb.drop(dbs, cb);
         });
@@ -220,7 +234,9 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
         fmdb.db.transaction('rw',
             fmdb.tables,
             function(){
-                if (d) console.log("Transaction started");
+                if (d) {
+                    fmdb.logger.log("Transaction started");
+                }
                 fmdb.commit = false;
                 fmdb.cantransact = 1;
                 dispatchputs();
@@ -228,18 +244,19 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                 // transaction completed: delete written data
                 delete fmdb.pending[0][fmdb.tail[0]++];
                 fmdb.state = -1;
-                if (d) console.log("Transaction committed");
+                if (d) {
+                    fmdb.logger.log("Transaction committed");
+                }
                 fmdb.writepending(ch);
             }).catch(function(e){
                 if (fmdb.cantransact < 0) {
-                    console.error("Your browser's IndexedDB implementation is bogus, disabling transactions.");
+                    fmdb.logger.error("Your browser's IndexedDB implementation is bogus, disabling transactions.");
                     fmdb.cantransact = 0;
                     fmdb.writepending(ch);
                 }
                 else {
                     // FIXME: retry instead? need statistics.
-                    console.error("Transaction failed, marking DB as crashed");
-                    console.log(e);
+                    fmdb.logger.error("Transaction failed, marking DB as crashed", e);
                     fmdb.state = -1;
                     fmdb.crashed = true;
                 }
@@ -266,8 +283,7 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                     fmdb.commit = false;
                     dispatchputs();
                 }).catch(function(e){
-                    console.error("SN clearing failed, marking DB as crashed");
-                    console.log(e);
+                    fmdb.logger.error("SN clearing failed, marking DB as crashed", e);
                     fmdb.state = -1;
                     fmdb.crashed = true;
                 });
@@ -326,8 +342,10 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                 // all written: advance head
                 if (t.t == t.h) t.h++;
 
-                if (d) console.log("DB " + ((t.t & 1) ? 'del' : 'put') + " with " + t[t.t].length
-                                   + " element(s) on table " + table + ", channel " + ch);
+                if (d) {
+                    fmdb.logger.log("DB " + ((t.t & 1) ? 'del' : 'put') + " with " + t[t.t].length
+                                    + " element(s) on table " + table + ", channel " + ch);
+                }
 
                 // if we are on a non-transactional channel or the _sn is being updated,
                 // request a commit after the operation completes.
@@ -343,7 +361,9 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
 
                 // ...and send update off to IndexedDB for writing
                 fmdb.db[table][t.t & 1 ? 'bulkDelete' : 'bulkPut'](t[t.t++]).then(function(){
-                    if (d) console.log('DB write successful' + (fmdb.commit ? ' - transaction complete' : ''));
+                    if (d) {
+                        fmdb.logger.log('DB write successful' + (fmdb.commit ? ' - transaction complete' : ''));
+                    }
 
                     // if we are non-transactional, remove the written data from pending
                     // (we have to keep it for the transactional case because it needs to
@@ -533,7 +553,9 @@ FMDB.prototype.get = function fmdb_get(table, cb, key, prefix) {
     var promise;
     var fmdb = this;
 
-    if (d) console.log("Fetching entire table " + table + "...");
+    if (d) {
+        fmdb.logger.log("Fetching entire table " + table + "...");
+    }
 
     if (key) promise = fmdb.db[table].where(key).startsWith(prefix).toArray();
     else promise = fmdb.db[table].toArray();
@@ -564,8 +586,7 @@ FMDB.prototype.normaliseresult = function fmdb_normaliseresult(table, r) {
             r[i] = t;
         }
         catch (e) {
-            console.log(e);
-            console.error("IndexedDB corruption: " + this.strdecrypt(r[i].d));
+            this.logger.error("IndexedDB corruption: " + this.strdecrypt(r[i].d), e);
             r.splice(i, 1);
         }
     }
@@ -582,7 +603,9 @@ FMDB.prototype.getbykey = function fmdb_getbykey(table, index, anyof, where, cb)
     var fmdb = this;
     var ch = fmdb.channelmap[table] || 0;
 
-    if (d) console.log("Fetching table " + table + (where ? (" by keys " + JSON.stringify(where)) : '') + "...");
+    if (d) {
+        fmdb.logger.log("Fetching table " + table + (where ? (" by keys " + JSON.stringify(where)) : '') + "...");
+    }
 
     var t = fmdb.db[table];
     var i = 0;
@@ -749,7 +772,7 @@ FMDB.prototype.up = function fmdb_up() {
         if (time-state[0] < 1000
         && state[1] !== this.identity) {
             this.crashed = true;
-            console.error("*** DISCONNECTING FROM INDEXEDDB - cross-tab interference detected");
+            this.logger.error("*** DISCONNECTING FROM INDEXEDDB - cross-tab interference detected");
             // FIXME: check if mem-only ops are safe at this point, force reload if not
             return false;
         }

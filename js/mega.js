@@ -7019,7 +7019,7 @@ function dbfetchfm() {
                                     processPS(r, true);
 
                                     fmdb.get('mcf', function(r){
-                                        loadfm.chatmcf = [r, true];
+                                        loadfm.chatmcf = r;
 
                                         mega.loadReport.procNodeCount = Object.keys(M.d || {}).length;
                                         mega.loadReport.procNodes     = Date.now() - mega.loadReport.stepTimeStamp;
@@ -7940,17 +7940,13 @@ function process_ok(ok, ignoreDB) {
 }
 
 function processMCF(mcfResponse, ignoreDB) {
-    if (megaChatIsDisabled) {
-        console.error('Chat is disabled!');
-        return;
+
+    if (typeof ChatdIntegration !== 'undefined') {
+        ChatdIntegration.requiresUpdate = true;
     }
 
     if (mcfResponse === EEXPIRED) {
-        ChatdIntegration.requiresUpdate = true;
         return;
-    }
-    else {
-        ChatdIntegration.requiresUpdate = true;
     }
 
     // reopen chats from the MCF response.
@@ -7964,13 +7960,18 @@ function processMCF(mcfResponse, ignoreDB) {
                 fmdb.add('mcf', { id : chatRoomInfo.id, d : chatRoomInfo });
             }
 
-            ChatdIntegration._queuedChats[chatRoomInfo.id] = chatRoomInfo;
+            if (typeof ChatdIntegration !== 'undefined') {
+                ChatdIntegration._queuedChats[chatRoomInfo.id] = chatRoomInfo;
+            }
         });
-        ChatdIntegration.deviceId = mcfResponse.d;
 
-        ChatdIntegration.mcfHasFinishedPromise.resolve(mcfResponse);
+        if (typeof ChatdIntegration !== 'undefined') {
+            ChatdIntegration.deviceId = mcfResponse.d;
+
+            ChatdIntegration.mcfHasFinishedPromise.resolve(mcfResponse);
+        }
     }
-    else {
+    else if (typeof ChatdIntegration !== 'undefined') {
         ChatdIntegration.mcfHasFinishedPromise.reject(mcfResponse);
     }
 }
@@ -8085,7 +8086,10 @@ function loadfm_callback(res) {
         processPS(res.ps);
     }
     if (res.mcf) {
-        loadfm.chatmcf = [res.mcf.c || res.mcf, false];
+        // save the response to be processed later once chat files were loaded
+        loadfm.chatmcf = res.mcf.c || res.mcf;
+        // ensure the response is saved in fmdb, even if the chat is disabled or not loaded yet
+        processMCF(loadfm.chatmcf);
     }
     M.avatars();
     loadfm.fromapi = true;
@@ -8190,7 +8194,7 @@ function loadfm_done(mDBload) {
                         if (typeof ChatRoom !== 'undefined') {
 
                             if (loadfm.chatmcf) {
-                                processMCF.apply(null, loadfm.chatmcf);
+                                processMCF(loadfm.chatmcf, true);
                                 loadfm.chatmcf = null;
                             }
                             init_chat();

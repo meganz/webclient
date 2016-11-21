@@ -26190,3 +26190,20 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .terms-main .jspPane {
     min-width: auto;
 }
+
+.fadeinout {
+    -webkit-animation: fadeinout 2s linear forwards;
+    animation: fadeinout 2s linear forwards;
+    animation-iteration-count: infinite;
+    -webkit-animation-iteration-count: infinite;
+}
+
+@-webkit-keyframes fadeinout {
+    0%,100% { opacity: 0.2; }
+    50% { opacity: 1; }
+}
+
+@keyframes fadeinout {
+    0%,100% { opacity: 0.2; }
+    50% { opacity: 1; }
+}

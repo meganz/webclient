@@ -6828,7 +6828,6 @@ function worker_procmsg(ev) {
 var fmdb;
 
 function loadfm(force) {
-
     if (force) {
         localStorage.force = true;
         loadfm.loaded = false;
@@ -8184,6 +8183,7 @@ function loadfm_done(mDBload) {
                     .always(function() {
 
                         if (typeof ChatRoom !== 'undefined') {
+                            // if mega.utils.require is working as expected, how can this happen ^^ ?
                             init_chat();
 
                             if (loadfm.chatmcf) {

@@ -1471,6 +1471,15 @@ function topmenuUI() {
                 .attr('class', $(this).find('.activity-status').attr('class'));
             $('.activity-status-block').removeClass('active');
             $('.top-user-status-popup').removeClass('active');
+            if (!megaChatIsReady && !megaChatIsDisabled) {
+                var presence = $(this).data("presence");
+                localStorage.megaChatPresence = presence;
+                localStorage.megaChatPresenceMtime = unixtime();
+
+                mega.initLoadReport();
+                loadfm();
+                $('.activity-status-block').addClass("fadeinout");
+            }
         }
     });
     $('.membership-status-block').rebind('click', function (e) {

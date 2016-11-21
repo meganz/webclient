@@ -8188,14 +8188,12 @@ function loadfm_done(mDBload) {
                     .always(function() {
 
                         if (typeof ChatRoom !== 'undefined') {
-                            // if mega.utils.require is working as expected, how can this happen ^^ ?
-                            init_chat();
 
                             if (loadfm.chatmcf) {
-                                Soon(function() {
-                                    processMCF(loadfm.chatmcf[0], loadfm.chatmcf[1]);
-                                });
+                                processMCF.apply(null, loadfm.chatmcf);
+                                loadfm.chatmcf = null;
                             }
+                            init_chat();
                         }
                         else {
                             // FIXME: this won't be reached because the request will fail silently

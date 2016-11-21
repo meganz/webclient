@@ -90,6 +90,7 @@ FMDB.prototype.identity = Date.now() + Math.random().toString(26);
 // wipes DB an calls result(false) otherwise
 FMDB.prototype.init = function fmdb_init(result, wipe) {
     var fmdb = this;
+    var slave = !mBroadcaster.crossTab.master;
 
     fmdb.crashed = false;
     fmdb.inval_cb = false;
@@ -104,11 +105,11 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
                 // enumerate databases and collect those not prefixed with fm_
                 // (which is the current format)
                 Dexie.getDatabaseNames(function(r) {
-                    /*for (var i = r.length; i--; ) {
+                    for (var i = r.length; i--;) {
                         if (r[i].substr(0,3) != 'fm_') {
                             todrop.push(r[i]);
                         }
-                    }*/
+                    }
                 }).finally(function(){
                     if (d && todrop.length) {
                         fmdb.logger.log("Deleting obsolete DBs: " + todrop.join(', '));
@@ -116,7 +117,7 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
 
                     fmdb.drop(todrop, function() {
                         // start inter-tab heartbeat
-                        fmdb.beacon();
+                        // fmdb.beacon();
                         fmdb.db = new Dexie('fm_' + fmdb.name);
                         fmdb.db.version(1).stores(fmdb.schema);
                         fmdb.db.open().then(function(){
@@ -126,6 +127,10 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
                                         fmdb.logger.log("DB sn: " + r[0]);
                                     }
                                     result(r[0]);
+                                }
+                                else if (slave) {
+                                    fmdb.crashed = true;
+                                    result(false);
                                 }
                                 else {
                                     if (d) {
@@ -760,6 +765,8 @@ FMDB.prototype.invalidate = function fmdb_invalidate(cb) {
 
 // checks if crashed or being used by another tab concurrently
 FMDB.prototype.up = function fmdb_up() {
+    return !this.crashed;
+    /*
     if (this.crashed) return false;
 
     var state = localStorage[this.name];
@@ -780,6 +787,7 @@ FMDB.prototype.up = function fmdb_up() {
 
     localStorage[this.name] = '[' + time + ',"' + this.identity + '"]';
     return true;
+     */
 };
 
 // FIXME: improve like this:

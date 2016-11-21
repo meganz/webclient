@@ -829,6 +829,9 @@ Object.defineProperty(this, 'mBroadcaster', {
                             //if (u_handle && window.indexedDB) {
                             //    mDBstart(true);
                             //}
+                            if (Object(window.fmdb).crashed === 'slave') {
+                                fmdb.crashed = 0;
+                            }
                         }
                     }
                     break;

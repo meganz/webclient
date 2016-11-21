@@ -6536,7 +6536,7 @@ TreeFetcher.prototype.fetch = function treefetcher_fetch(force) {
     if (!force) {
         req_params.ca = 1;
     }
-    else {
+    else if (mBroadcaster.crossTab.master) {
         delete localStorage.force;
     }
 
@@ -7024,6 +7024,11 @@ function dbfetchfm() {
                                         mega.loadReport.procNodeCount = Object.keys(M.d || {}).length;
                                         mega.loadReport.procNodes     = Date.now() - mega.loadReport.stepTimeStamp;
                                         mega.loadReport.stepTimeStamp = Date.now();
+
+                                        if (!mBroadcaster.crossTab.master) {
+                                            // on a secondary tab, prevent writing to DB once we have read its contents
+                                            fmdb.crashed = 'slave';
+                                        }
 
                                         // fetch & process new actionpackets
                                         loadingInitDialog.step3();

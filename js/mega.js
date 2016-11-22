@@ -5524,7 +5524,6 @@ function renderfm() {
     }
 
     initUI();
-    loadingDialog.hide();
     M.sortByName();
     M.renderTree();
     M.renderPath();
@@ -6537,7 +6536,7 @@ TreeFetcher.prototype.fetch = function treefetcher_fetch(force) {
     if (!force) {
         req_params.ca = 1;
     }
-    else {
+    else if (mBroadcaster.crossTab.master) {
         delete localStorage.force;
     }
 
@@ -6829,7 +6828,6 @@ function worker_procmsg(ev) {
 var fmdb;
 
 function loadfm(force) {
-
     if (force) {
         localStorage.force = true;
         loadfm.loaded = false;
@@ -6888,13 +6886,6 @@ function fetchfm(sn) {
 
     // activate/prefetch attribute cache at this early stage
     attribCache.prefillMemCache(fmdb).then(function(){
-
-        if (u_type == 3) {
-            mega.config.fetch();
-
-            // load/initialise the authentication system
-            authring.initAuthenticationSystem();
-        }
 
         if (sn) {
             currsn = sn;
@@ -7028,13 +7019,16 @@ function dbfetchfm() {
                                     processPS(r, true);
 
                                     fmdb.get('mcf', function(r){
-                                        if (!megaChatIsDisabled) {
-                                            processMCF(r, true);
-                                        }
+                                        loadfm.chatmcf = r;
 
                                         mega.loadReport.procNodeCount = Object.keys(M.d || {}).length;
                                         mega.loadReport.procNodes     = Date.now() - mega.loadReport.stepTimeStamp;
                                         mega.loadReport.stepTimeStamp = Date.now();
+
+                                        if (!mBroadcaster.crossTab.master) {
+                                            // on a secondary tab, prevent writing to DB once we have read its contents
+                                            fmdb.crashed = 'slave';
+                                        }
 
                                         // fetch & process new actionpackets
                                         loadingInitDialog.step3();
@@ -7946,17 +7940,13 @@ function process_ok(ok, ignoreDB) {
 }
 
 function processMCF(mcfResponse, ignoreDB) {
-    if (megaChatIsDisabled) {
-        console.error('Chat is disabled!');
-        return;
+
+    if (typeof ChatdIntegration !== 'undefined') {
+        ChatdIntegration.requiresUpdate = true;
     }
 
     if (mcfResponse === EEXPIRED) {
-        ChatdIntegration.requiresUpdate = true;
         return;
-    }
-    else {
-        ChatdIntegration.requiresUpdate = true;
     }
 
     // reopen chats from the MCF response.
@@ -7970,13 +7960,18 @@ function processMCF(mcfResponse, ignoreDB) {
                 fmdb.add('mcf', { id : chatRoomInfo.id, d : chatRoomInfo });
             }
 
-            ChatdIntegration._queuedChats[chatRoomInfo.id] = chatRoomInfo;
+            if (typeof ChatdIntegration !== 'undefined') {
+                ChatdIntegration._queuedChats[chatRoomInfo.id] = chatRoomInfo;
+            }
         });
-        ChatdIntegration.deviceId = mcfResponse.d;
 
-        ChatdIntegration.mcfHasFinishedPromise.resolve(mcfResponse);
+        if (typeof ChatdIntegration !== 'undefined') {
+            ChatdIntegration.deviceId = mcfResponse.d;
+
+            ChatdIntegration.mcfHasFinishedPromise.resolve(mcfResponse);
+        }
     }
-    else {
+    else if (typeof ChatdIntegration !== 'undefined') {
         ChatdIntegration.mcfHasFinishedPromise.reject(mcfResponse);
     }
 }
@@ -8038,21 +8033,18 @@ function init_chat() {
                 }
             }
         }
+
+        if (!loadfm.loading) {
+            loadingDialog.hide();
+            loadingInitDialog.hide();
+        }
     }
-    if (folderlink) {
+
+    if (pfid) {
         if (d) console.log('Will not initialize chat [branch:1]');
     }
-    else if (!megaChatIsDisabled) {
-        if (pubEd25519[u_handle]) {
-            Soon(__init_chat);
-        }
-        else {
-            mBroadcaster.once('pubEd25519', __init_chat);
-            if (d) console.log('Will not initialize chat [branch:2]');
-        }
-    }
     else {
-        if (d) console.log('Will not initialize chat [branch:3]');
+        authring.onAuthringReady('chat').done(__init_chat);
     }
 }
 
@@ -8093,8 +8085,11 @@ function loadfm_callback(res) {
     if (res.ps) {
         processPS(res.ps);
     }
-    if (res.mcf && !megaChatIsDisabled) {
-        processMCF(res.mcf.c ? res.mcf.c : res.mcf);
+    if (res.mcf) {
+        // save the response to be processed later once chat files were loaded
+        loadfm.chatmcf = res.mcf.c || res.mcf;
+        // ensure the response is saved in fmdb, even if the chat is disabled or not loaded yet
+        processMCF(loadfm.chatmcf);
     }
     M.avatars();
     loadfm.fromapi = true;
@@ -8176,8 +8171,49 @@ function loadfm_done(mDBload) {
     mega.loadReport.procAPs       = Date.now() - mega.loadReport.stepTimeStamp;
     mega.loadReport.stepTimeStamp = Date.now();
 
+    if (!pfid && u_type == 3) {
+
+        // load/initialise the authentication system
+        mega.config.fetch()
+            .always(function() {
+                authring.initAuthenticationSystem();
+            });
+    }
+
     mega.config.ready(function() {
-        init_chat();
+        var hideLoadingDialog = !CMS.isLoading();
+
+        if ((location.host === 'mega.nz' || !megaChatIsDisabled) && !is_mobile) {
+
+            if (!pfid && u_type === 3 && !loadfm.chatloading) {
+                loadfm.chatloading = true;
+
+                mega.utils.require('chat')
+                    .always(function() {
+
+                        if (typeof ChatRoom !== 'undefined') {
+
+                            if (loadfm.chatmcf) {
+                                processMCF(loadfm.chatmcf, true);
+                                loadfm.chatmcf = null;
+                            }
+                            init_chat();
+                        }
+                        else {
+                            // FIXME: this won't be reached because the request will fail silently
+                            console.error('Chat resources failed to load...');
+                        }
+
+                        loadfm.chatloading = false;
+                        loadfm.chatloaded  = Date.now();
+                    });
+
+                if (location.hash.substr(0, 8) === '#fm/chat') {
+                    // Keep the "decrypting" step until the chat have loaded.
+                    hideLoadingDialog = false;
+                }
+            }
+        }
 
         mega.loadReport.fmConfigFetch = Date.now() - mega.loadReport.stepTimeStamp;
         mega.loadReport.stepTimeStamp = Date.now();
@@ -8197,7 +8233,7 @@ function loadfm_done(mDBload) {
             mega.loadReport.renderfm = -1;
         }
 
-        if (!CMS.isLoading()) {
+        if (hideLoadingDialog) {
             loadingDialog.hide();
             loadingInitDialog.hide();
         }

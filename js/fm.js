@@ -11278,17 +11278,8 @@ function contactUI() {
         showAuthenticityCredentials(user);
 
         // Set authentication state of contact from authring.
-        var authringPromise = new MegaPromise();
-        if (u_authring.Ed25519) {
-            authringPromise.resolve();
-        }
-        else {
-            // First load the authentication system.
-            var authSystemPromise = authring.initAuthenticationSystem();
-            authringPromise.linkDoneAndFailTo(authSystemPromise);
-        }
-        /** To be called on settled authring promise. */
-        var _setVerifiedState = function() {
+        // To be called on settled authring promise.
+        authring.onAuthringReady('contactUI').done(function _setVerifiedState() {
 
             var handle = user.u || user;
             var verificationState = u_authring.Ed25519[handle] || {};
@@ -11304,8 +11295,7 @@ function contactUI() {
                 // Otherwise show the Verify... button.
                 enableVerifyFingerprintsButton(handle);
             }
-        };
-        authringPromise.done(_setVerifiedState);
+        });
 
         // Reset seen or verified fingerprints and re-enable the Verify button
         $('.fm-reset-stored-fingerprint').rebind('click', function() {
@@ -11398,10 +11388,10 @@ function FMResizablePane(element, opts) {
     }
 
     /**
-     * Destroy if already initialized.
+     * Already initialized.
      */
     if ($element.data('fmresizable')) {
-        $element.data('fmresizable').destroy();
+        return;
     }
 
     self.destroy = function() {

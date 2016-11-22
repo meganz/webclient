@@ -3728,8 +3728,28 @@ mega.utils.neuterArrayBuffer = function neuter(ab) {
  */
 mega.utils.require = function megaUtilsRequire() {
     var files = [];
+    var args = [];
 
-    toArray.apply(null, arguments).forEach(function(file) {
+    toArray.apply(null, arguments).forEach(function(rsc) {
+        // check if a group of resources was provided
+        if (jsl3[rsc]) {
+            var group = Object.keys(jsl3[rsc]);
+
+            args = args.concat(group);
+
+            // inject them into jsl2
+            for (var i = group.length; i--;) {
+                if (!jsl2[group[i]]) {
+                    (jsl2[group[i]] = jsl3[rsc][group[i]]).n = group[i];
+                }
+            }
+        }
+        else {
+            args.push(rsc);
+        }
+    });
+
+    args.forEach(function(file) {
 
         // If a plain filename, inject it into jsl2
         // XXX: Likely this will have a conflict with our current build script

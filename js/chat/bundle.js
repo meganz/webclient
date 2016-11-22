@@ -956,9 +956,9 @@ React.makeElement = React['createElement'];
 	    $status.addClass(cssClass);
 
 	    if (self.karere.getConnectionState() === Karere.CONNECTION_STATE.CONNECTING) {
-	        $status.parent().addClass("connecting");
+	        $status.parent().addClass("fadeinout");
 	    } else {
-	        $status.parent().removeClass("connecting");
+	        $status.parent().removeClass("fadeinout");
 	    }
 	};
 
@@ -1791,10 +1791,9 @@ React.makeElement = React['createElement'];
 	            }
 	        });
 
-	        var lPane = $('.conversationsApp .fm-left-panel');
-
 	        self.fmConfigThrottling = null;
 	        self.fmConfigLeftPaneListener = mBroadcaster.addListener('fmconfig:leftPaneWidth', function () {
+	            var lPane = $('.conversationsApp .fm-left-panel');
 	            clearTimeout(self.fmConfigThrottling);
 	            self.fmConfigThrottling = setTimeout(function fmConfigThrottlingLeftPaneResize() {
 	                self.setState({
@@ -1807,34 +1806,45 @@ React.makeElement = React['createElement'];
 	            $('.fm-tree-panel', lPane).width(mega.config.get('leftPaneWidth'));
 	        });
 
-	        $.leftPaneResizableChat = new FMResizablePane(lPane, $.leftPaneResizable.options);
+	        var lPaneResizableInit = function lPaneResizableInit() {
+	            var lPane = $('.conversationsApp .fm-left-panel');
+	            $.leftPaneResizableChat = new FMResizablePane(lPane, $.leftPaneResizable.options);
 
-	        if (fmconfig.leftPaneWidth) {
-	            lPane.width(Math.min($.leftPaneResizableChat.options.maxWidth, Math.max($.leftPaneResizableChat.options.minWidth, fmconfig.leftPaneWidth)));
-	        }
-
-	        $($.leftPaneResizableChat).on('resize', function () {
-	            var w = lPane.width();
-	            if (w >= $.leftPaneResizableChat.options.maxWidth) {
-	                $('.left-pane-drag-handle').css('cursor', 'w-resize');
-	            } else if (w <= $.leftPaneResizableChat.options.minWidth) {
-	                $('.left-pane-drag-handle').css('cursor', 'e-resize');
-	            } else {
-	                $('.left-pane-drag-handle').css('cursor', 'we-resize');
+	            if (fmconfig.leftPaneWidth) {
+	                lPane.width(Math.min($.leftPaneResizableChat.options.maxWidth, Math.max($.leftPaneResizableChat.options.minWidth, fmconfig.leftPaneWidth)));
 	            }
 
-	            $('.jspVerticalBar:visible').addClass('hiden-when-dragging');
-	        });
+	            $($.leftPaneResizableChat).on('resize', function () {
+	                var w = lPane.width();
+	                if (w >= $.leftPaneResizableChat.options.maxWidth) {
+	                    $('.left-pane-drag-handle').css('cursor', 'w-resize');
+	                } else if (w <= $.leftPaneResizableChat.options.minWidth) {
+	                    $('.left-pane-drag-handle').css('cursor', 'e-resize');
+	                } else {
+	                    $('.left-pane-drag-handle').css('cursor', 'we-resize');
+	                }
 
-	        $($.leftPaneResizableChat).on('resizestop', function () {
-	            $('.fm-left-panel').width(lPane.width());
+	                $('.jspVerticalBar:visible').addClass('hiden-when-dragging');
+	            });
 
-	            $('.jScrollPaneContainer:visible').trigger('forceResize');
+	            $($.leftPaneResizableChat).on('resizestop', function () {
+	                $('.fm-left-panel').width(lPane.width());
 
-	            setTimeout(function () {
-	                $('.hiden-when-dragging').removeClass('hiden-when-dragging');
-	            }, 100);
-	        });
+	                $('.jScrollPaneContainer:visible').trigger('forceResize');
+
+	                setTimeout(function () {
+	                    $('.hiden-when-dragging').removeClass('hiden-when-dragging');
+	                }, 100);
+	            });
+	        };
+
+	        if (typeof $.leftPaneResizable === 'undefined') {
+	            mBroadcaster.once('fm:initialized', function () {
+	                lPaneResizableInit();
+	            });
+	        } else {
+	            lPaneResizableInit();
+	        }
 
 	        this.handleWindowResize();
 	    },

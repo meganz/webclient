@@ -1160,11 +1160,11 @@ Chat.prototype.renderMyStatus = function() {
 
     if (self.karere.getConnectionState() === Karere.CONNECTION_STATE.CONNECTING) {
         $status.parent()
-            .addClass("connecting");
+            .addClass("fadeinout");
     }
     else {
         $status.parent()
-            .removeClass("connecting");
+            .removeClass("fadeinout");
     }
 
 };

@@ -283,8 +283,17 @@ describe("authring unit test", function() {
                 sandbox.stub(u_authring, 'Ed25519', RING_ED25519);
                 sandbox.stub(mega.attr, 'set').returns('foo');
                 sandbox.stub(window, 'u_handle', 'Nxmg3MOw0CI');
-                sandbox.stub(ns, 'hadInitialised').returns(true);
-                assert.strictEqual(ns.setContacts('Ed25519'), 'foo');
+                var fakePromise = { done: sinon.stub(),
+                                    fail: function() {}};
+                sandbox.stub(fakePromise, 'fail').returns(fakePromise);
+                sandbox.stub(ns, 'onAuthringReady').returns(fakePromise);
+                var masterPromise = { resolve: sinon.stub(),
+                                      linkDoneAndFailTo: sinon.stub()};
+                sandbox.stub(window, 'MegaPromise').returns(masterPromise);
+                assert.strictEqual(ns.setContacts('Ed25519'), masterPromise);
+                var callback = fakePromise.done.args[0][0];
+                callback();
+                assert.strictEqual(masterPromise.linkDoneAndFailTo.args[0][0], 'foo');
                 assert.strictEqual(mega.attr.set.callCount, 1);
                 assert.lengthOf(mega.attr.set.args[0], 4);
                 assert.strictEqual(mega.attr.set.args[0][0], 'authring');
@@ -294,8 +303,17 @@ describe("authring unit test", function() {
                 sandbox.stub(u_authring, 'RSA', RING_RSA);
                 sandbox.stub(mega.attr, 'set').returns('foo');
                 sandbox.stub(window, 'u_handle', 'Nxmg3MOw0CI');
-                sandbox.stub(ns, 'hadInitialised').returns(true);
-                assert.strictEqual(ns.setContacts('RSA'), 'foo');
+                var fakePromise = { done: sinon.stub(),
+                    fail: function() {}};
+                sandbox.stub(fakePromise, 'fail').returns(fakePromise);
+                sandbox.stub(ns, 'onAuthringReady').returns(fakePromise);
+                var masterPromise = { resolve: sinon.stub(),
+                    linkDoneAndFailTo: sinon.stub()};
+                sandbox.stub(window, 'MegaPromise').returns(masterPromise);
+                assert.strictEqual(ns.setContacts('RSA'), masterPromise);
+                var callback = fakePromise.done.args[0][0];
+                callback();
+                assert.strictEqual(masterPromise.linkDoneAndFailTo.args[0][0], 'foo');
                 assert.strictEqual(mega.attr.set.callCount, 1);
                 assert.lengthOf(mega.attr.set.args[0], 4);
                 assert.strictEqual(mega.attr.set.args[0][0], 'authRSA');

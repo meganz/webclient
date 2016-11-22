@@ -283,7 +283,7 @@ try {
 catch(e)
 {
     RTC = null;
-    if (d) {
+    if (window.d) {
         console.warn("Error enabling webrtc support: "+e);
     }
 }

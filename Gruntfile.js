@@ -152,8 +152,10 @@ var Secureboot = function() {
                             if (!jsl3_new[g]) {
                                 jsl3_new[g] = {};
                             }
-                            jsl3_new[g][g + '_group' + idx + '_' + pfx] = {
+                            var name = g + '_group' + idx + '_' + pfx;
+                            jsl3_new[g][name] = {
                                 f: filename,
+                                n: name,
                                 j: (pfx[0] == 'c') + 1,
                                 w: Math.round((length/fileLimit)*30)
                             };
@@ -182,7 +184,7 @@ var Secureboot = function() {
                     }
                 });
 
-                m = 'jsl3 = ' + JSON.stringify(jsl3_new).replace(/"/g, "'").replace(/'f':/g, 'f:') + '\n';
+                m = 'jsl3 = ' + JSON.stringify(jsl3_new).replace(/"/g, "'").replace(/'(\w)':/g, '$1:') + '\n';
             }
 
             return m + '    var subpages';

@@ -6372,6 +6372,10 @@ function execsc() {
                             console.error('FIXME: unable to parse mcc packet');
                         }
                     }
+                    if (fmdb) {
+                        delete a.a;
+                        fmdb.add('mcf', { id : a.id, d : a });
+                    }
                     break;
 
                 case 'se':

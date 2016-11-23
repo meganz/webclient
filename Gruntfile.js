@@ -39,13 +39,15 @@ var Secureboot = function() {
                     line = line.replace(/\(.+\)/, '(true)');
                 }
                 lines.push(line);
-                if (line.trim() == "}") {
+                // detect any } OR } // comment to break the current group
+                if (line.trim() == "}" || line.trim().indexOf("} //") !== -1) {
                     lines.push('jsl.push({f:"\0.js"})');
                 }
             }
         }
         var is_chrome_firefox = 0;
         var is_mobile = 0;
+
         eval(lines.join("\n"));
         return jsl;
     };

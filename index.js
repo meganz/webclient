@@ -1224,9 +1224,13 @@ function topmenuUI() {
         $('.top-search-bl').hide();
     }
 
-    var avatar = useravatar.my;
-    if (!avatar) {
+    var avatar;
+    // can happen on mobile (useravatar to be empty, e.g. not loaded/initialised)
+    if (typeof(useravatar) === 'undefined' || !useravatar.my) {
         $('.fm-avatar').hide();
+    }
+    else {
+        avatar = useravatar.my;
     }
 
     // If the 'firstname' property is set, display it

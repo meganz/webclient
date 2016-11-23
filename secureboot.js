@@ -1215,8 +1215,6 @@ else if (!b_u)
         };
     })(console);
 
-    Object.defineProperty(window, "__cd_v", { value : 33, writable : false });
-
     // Do not report exceptions if this build is older than 10 days
     var exTimeLeft = ((buildVersion.timestamp + (10 * 86400)) * 1000) > Date.now();
 
@@ -1429,9 +1427,26 @@ else if (!b_u)
                 }
                 report = JSON.stringify(r? report:{});
 
+                var version = buildVersion.website;
+
+                if (is_extension) {
+                    if (is_chrome_firefox) {
+                        version = buildVersion.firefox;
+                    }
+                    else if (window.chrome) {
+                        version = buildVersion.chrome;
+                    }
+                }
+
                 for (var i in __cdumps)
                 {
-                    api_req({ a : 'cd', c : JSON.stringify(__cdumps[i]), v : report, t : +__cd_v, s : window.location.host }, ctx(ids[i]));
+                    api_req({
+                        a: 'cd2',
+                        c: JSON.stringify(__cdumps[i]),
+                        v: report,
+                        t: version,
+                        s: window.location.host
+                    }, ctx(ids[i]));
                 }
                 __cd_t = 0;
                 __cdumps = [];

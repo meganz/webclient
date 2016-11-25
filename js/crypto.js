@@ -4295,7 +4295,6 @@ function api_strerror(errno) {
     };
 })(this);
 
-
 (function() {
     var backgroundNacl = {};
     backgroundNacl.workers = null;

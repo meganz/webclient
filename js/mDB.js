@@ -25,8 +25,8 @@ function FMDB(plainname, schema, channelmap) {
     // DB schema - https://github.com/dfahlander/Dexie.js/wiki/TableSchema
     this.schema = schema;
 
-    // the table names contained in the schema
-    this.tables = Object.keys(schema);
+    // the table names contained in the schema (set at open)
+    this.tables = null;
 
     // if we have non-transactional (write-through) tables, they are mapped
     // to channel numbers > 0 here
@@ -85,6 +85,9 @@ function FMDB(plainname, schema, channelmap) {
 // initialise cross-tab access arbitration identity
 FMDB.prototype.identity = Date.now() + Math.random().toString(26);
 
+// pre-computed 'anyof' or 'where'
+FMDB.prototype.filters = Object.create(null);
+
 // set up and check fm DB for user u
 // calls result(sn) if found and sn present
 // wipes DB an calls result(false) otherwise
@@ -106,7 +109,7 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
                 // (which is the current format)
                 Dexie.getDatabaseNames(function(r) {
                     for (var i = r.length; i--;) {
-                        if (r[i].substr(0,3) != 'fm_') {
+                        if (r[i].substr(0,4) != 'fm2_') {
                             todrop.push(r[i]);
                         }
                     }
@@ -118,10 +121,26 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
                     fmdb.drop(todrop, function() {
                         // start inter-tab heartbeat
                         // fmdb.beacon();
-                        fmdb.db = new Dexie('fm_' + fmdb.name);
-                        fmdb.db.version(1).stores(fmdb.schema);
+                        fmdb.db = new Dexie('fm2_' + fmdb.name);
+
+                        var dbSchema = {};
+                        if (!Array.isArray(fmdb.schema)) {
+                            fmdb.schema = [fmdb.schema];
+                        }
+
+                        for (var i = 0; i < fmdb.schema.length; i++) {
+                            var schema = fmdb.schema[i];
+                            for (var k in schema) {
+                                if (schema.hasOwnProperty(k)) {
+                                    dbSchema[k] = schema[k];
+                                }
+                            }
+                            fmdb.db.version(i + 1).stores(dbSchema);
+                        }
+                        fmdb.tables = Object.keys(dbSchema);
+
                         fmdb.db.open().then(function(){
-                            fmdb.get('_sn', function(r){
+                            fmdb.get('_sn').always(function(r){
                                 if (!wipe && r[0] && r[0].length == 11) {
                                     if (d) {
                                         fmdb.logger.log("DB sn: " + r[0]);
@@ -181,7 +200,7 @@ FMDB.prototype.drop = function fmdb_drop(dbs, cb) {
             fmdb.drop(dbs, cb);
         });
     }
-}
+};
 
 // enqueue a table write - type 0 == addition, type 1 == deletion
 // IndexedDB activity is triggered once we have at least 1000 pending rows or the sn
@@ -374,7 +393,7 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                     // (we have to keep it for the transactional case because it needs to
                     // be visible to the pending updates search that getbykey() performs)
                     if (!fmdb.state) {
-                        delete fmdb.inflight[fmdb.inflight.t++];
+                        delete fmdb.inflight[fmdb.inflight.t-1];
                     }
 
                     // loop back to write more pending data (or to commit the transaction)
@@ -500,6 +519,11 @@ FMDB.prototype.restorenode = Object.freeze({
         chatqueuedmsgs.k = index.k;
     },
 
+    h : function(out, index) {
+        out.h = index.h;
+        out.hash = index.c;
+    },
+
     mk : function(mk, index) {
         mk.h = index.h;
     }
@@ -548,14 +572,14 @@ FMDB.prototype.del = function fmdb_del(table, index) {
 };
 
 // non-transactional read with subsequent deobfuscation, with optional prefix filter
-// FIXME: replace cb with Promises without incurring a massive readability/mem/CPU penalty!
 // (must NOT be used for dirty reads - use getbykey() instead)
-FMDB.prototype.get = function fmdb_get(table, cb, key, prefix) {
+FMDB.prototype.get = function fmdb_get(table, key, prefix) {
     if (!this.up()) {
-        return cb([]);
+        return MegaPromise.reject([]);
     }
 
     var promise;
+    var masterPromise = new MegaPromise();
     var fmdb = this;
 
     if (d) {
@@ -567,8 +591,10 @@ FMDB.prototype.get = function fmdb_get(table, cb, key, prefix) {
 
     promise.then(function(r){
         fmdb.normaliseresult(table, r);
-        cb(r);
+        masterPromise.resolve(r);
     });
+
+    return masterPromise;
 };
 
 FMDB.prototype.normaliseresult = function fmdb_normaliseresult(table, r) {
@@ -598,15 +624,16 @@ FMDB.prototype.normaliseresult = function fmdb_normaliseresult(table, r) {
 };
 
 // non-transactional read with subsequent deobfuscation, with optional key filter
-// FIXME: replace cb with Promises without incurring a massive readability/mem/CPU penalty!
 // (dirty reads are supported by scanning the pending writes after the IndexedDB read completes)
-FMDB.prototype.getbykey = function fmdb_getbykey(table, index, anyof, where, cb) {
-    if (!this.up()) {
-        return cb([]);
+// anyof and where are mutually exclusive, FIXME: add post-anyof where filtering?
+FMDB.prototype.getbykey = function fmdb_getbykey(table, index, anyof, where, limit) {
+    if (!this.up() || anyof && !anyof[1].length) {
+        return MegaPromise.reject([]);
     }
 
     var fmdb = this;
     var ch = fmdb.channelmap[table] || 0;
+    var promise = new MegaPromise();
 
     if (d) {
         fmdb.logger.log("Fetching table " + table + (where ? (" by keys " + JSON.stringify(where)) : '') + "...");
@@ -617,18 +644,28 @@ FMDB.prototype.getbykey = function fmdb_getbykey(table, index, anyof, where, cb)
 
     if (anyof) {
         // encrypt all values in the list
-        for (i = anyof[1].length; i--; ) anyof[1][i] = ab_to_base64(this.strcrypt(anyof[1][i]));
-        // (this leaves i == -1, which triggers the .where() branch below)
+        for (i = anyof[1].length; i--;) {
+            /*if (!this.filters[anyof[1][i]]) {
+                this.filters[anyof[1][i]] = ab_to_base64(this.strcrypt(anyof[1][i]));
+            }
+            anyof[1][i] = this.filters[anyof[1][i]];*/
+            anyof[1][i] = ab_to_base64(this.strcrypt(anyof[1][i]));
+        }
+
         t = t.where(anyof[0]).anyOf(anyof[1]);
     }
-
-    if (where) {
+    else {
         for (var k = where.length; k--; ) {
             // encrypt the filter values (logical AND is commutative, so we can reverse the order)
-            where[k][1] = ab_to_base64(this.strcrypt(where[k][1]));
+            if (!this.filters[where[k][1]]) {
+                this.filters[where[k][1]] = ab_to_base64(this.strcrypt(where[k][1]));
+            }
+            where[k][1] = this.filters[where[k][1]];
 
             // apply filter criterion
-            if (i) t = t.and(where[k][0]);
+            if (i) {
+                t = t.and(where[k][0]);
+            }
             else {
                 t = t.where(where[k][0]);
                 i = 1;
@@ -638,7 +675,10 @@ FMDB.prototype.getbykey = function fmdb_getbykey(table, index, anyof, where, cb)
         }
     }
 
-    // FIXME (critical): support anyof below!
+    if (limit) {
+        t = t.limit(limit);
+    }
+
     t.toArray().then(function(r){
         // now scan the pending elements to capture and return unwritten updates
         // FIXME: typically, there are very few or no pending elements -
@@ -692,6 +732,19 @@ FMDB.prototype.getbykey = function fmdb_getbykey(table, index, anyof, where, cb)
                                             continue;
                                         }
                                     }
+                                    else {
+                                        // does this update modify a record matched by the
+                                        // anyof inclusion list?
+                                        for (var k = anyof[1].length; k--; ) {
+                                            if (update[anyof[0]] === anyof[1][k]) break;
+                                        }
+
+                                        // no match detected - record it as a deletion
+                                        if (k < 0) {
+                                            matches[update[index]] = false;
+                                            continue;
+                                        }
+                                    }
 
                                     matches[update[index]] = update;
                                 }
@@ -724,9 +777,33 @@ FMDB.prototype.getbykey = function fmdb_getbykey(table, index, anyof, where, cb)
             if (matches[t]) r.push(fmdb.clone(matches[t]));
         }
 
-        fmdb.normaliseresult(table, r);
-        cb(r);
+        // filter out matching records
+        if (where) {
+            for (i = r.length; i--;) {
+                for (var k = where.length; k--;) {
+                    if (r[i][where[k][0]] !== where[k][1]) {
+                        r.splice(i, 1);
+                        break;
+                    }
+                }
+            }
+        }
+
+        // limit matches records
+        if (limit && r.length > limit) {
+            r = r.slice(0, limit);
+        }
+
+        if (r.length) {
+            fmdb.normaliseresult(table, r);
+            promise.resolve(r);
+        }
+        else {
+            promise.reject(r);
+        }
     });
+
+    return promise;
 };
 
 // simple/fast/non-recursive object cloning

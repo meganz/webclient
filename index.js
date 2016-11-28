@@ -1887,7 +1887,7 @@ function topmenuUI() {
             document.location.hash = $.dlhash;
         }
         else if (folderlink && M.lastSeenFolderLink) {
-            $(document).one('MegaOpenFolder', function() {
+            mBroadcaster.once('mega:openfolder', function() {
                 $('.nw-fm-left-icon.transfers').click();
             });
             location.hash = M.lastSeenFolderLink;

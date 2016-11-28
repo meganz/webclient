@@ -1738,7 +1738,6 @@ var exportExpiry = {
     ExportLink.prototype._getFolderExportLinkRequest = function(nodeId) {
 
         var self = this;
-        var childNodes = [];
         var share = M.getNodeShare(nodeId);
 
         // No need to perform an API call if this folder was already exported (Ie, we're updating)
@@ -1747,28 +1746,29 @@ var exportExpiry = {
         }
 
         // Get all child nodes of root folder with nodeId
-        childNodes = fm_getnodes(nodeId);
-        childNodes.push(nodeId);
+        M.getNodes(nodeId, true)
+            .always(function(childNodes) {
 
-        var sharePromise = api_setshare(nodeId, [{ u: 'EXP', r: 0 }], childNodes);
-        sharePromise.done(function _sharePromiseDone(result) {
-            if (result.r && result.r[0] === 0) {
+                var sharePromise = api_setshare(nodeId, [{u: 'EXP', r: 0}], childNodes);
+                sharePromise.done(function _sharePromiseDone(result) {
+                    if (result.r && result.r[0] === 0) {
 
-                self._getExportLinkRequest(nodeId);
+                        self._getExportLinkRequest(nodeId);
 
-                if (!self.nodesLeft) {
-                    loadingDialog.hide();
-                }
-            }
-            else {
-                self.logger.warn('_getFolderExportLinkRequest', nodeId, 'Error code: ', result);
-                loadingDialog.hide();
-            }
-        });
-        sharePromise.fail(function _sharePromiseFailed(result) {
-            self.logger.warn('Get folder link failed: ' + result);
-            // XXX: this seem to lack some handling code for this condition
-        });
+                        if (!self.nodesLeft) {
+                            loadingDialog.hide();
+                        }
+                    }
+                    else {
+                        self.logger.warn('_getFolderExportLinkRequest', nodeId, 'Error code: ', result);
+                        loadingDialog.hide();
+                    }
+                });
+                sharePromise.fail(function _sharePromiseFailed(result) {
+                    self.logger.warn('Get folder link failed: ' + result);
+                    // FIXME: this seem to lack some handling code for this condition
+                });
+            });
     };
 
     /**

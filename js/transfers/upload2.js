@@ -413,7 +413,7 @@ var ulmanager = {
                 req.n[0].fa = faid;
             }
             if (dir) {
-                var sn = fm_getsharenodes(dir);
+                var sn = M.getShareNodesSync(dir);
                 if (sn.length) {
                     req.cr = crypto_makecr([n], sn, false);
                     req.cr[1][0] = file.response;
@@ -661,7 +661,7 @@ var ulmanager = {
         }
     },
 
-    ulDeDuplicate: function UM_ul_deduplicate(File, identical) {
+    ulDeDuplicate: function UM_ul_deduplicate(File, identical, mNode) {
         var n;
         var uq = File.ul;
         if (identical && fmconfig.ul_skipIdentical) {
@@ -671,7 +671,7 @@ var ulmanager = {
             return ulmanager.ulStart(File);
         }
         else if (M.h[uq.hash]) {
-            n = M.d[M.h[uq.hash][0]];
+            n = mNode || M.d[M.h[uq.hash].first];
             // identical = n;
         }
         if (!n) {
@@ -725,15 +725,13 @@ var ulmanager = {
         var nodes = M.c[file.target];
         if (nodes) {
             for (var node in nodes) {
-                if (nodes.hasOwnProperty(node)) {
-                    node = M.d[node];
+                node = M.d[node];
 
-                    if (node
-                            && file.size === node.s
-                            && file.name === node.name
-                            && file.hash === node.hash) {
-                        return node;
-                    }
+                if (node
+                        && file.size === node.s
+                        && file.name === node.name
+                        && file.hash === node.hash) {
+                    return node;
                 }
             }
         }
@@ -768,22 +766,48 @@ var ulmanager = {
                     aFile.target = target;
                 }
 
-                if (ulmanager.ulSetupQueue.length) {
-                    var upload = ulmanager.ulSetupQueue.shift();
-                    Soon(ulmanager.ulSetup.bind(ulmanager, upload, upload.file, true));
-                }
-                else {
-                    ulmanager.ulSetupQueue = null;
+                var hashNode;
+                var startUpload = function _startUpload() {
+
+                    if (ulmanager.ulSetupQueue.length) {
+                        var upload = ulmanager.ulSetupQueue.shift();
+                        Soon(ulmanager.ulSetup.bind(ulmanager, upload, upload.file, true));
+                    }
+                    else {
+                        ulmanager.ulSetupQueue = null;
+                    }
+
+                    var identical = ulmanager.ulIdentical(aFile);
+                    ulmanager.logger.info(aFile.name, "fingerprint", aFile.hash, M.h[aFile.hash], identical);
+
+                    if (M.h[aFile.hash] || identical) {
+                        ulmanager.ulDeDuplicate(aFileUpload, identical, hashNode);
+                    }
+                    else {
+                        ulmanager.ulStart(aFileUpload);
+                    }
+                };
+
+                var promises = [];
+
+                if (!M.c[aFile.target]) {
+                    promises.push(dbfetch.get(aFile.target, new MegaPromise()));
                 }
 
-                var identical = ulmanager.ulIdentical(aFile);
-                ulmanager.logger.info(aFile.name, "fingerprint", M.h[aFile.hash], identical);
+                if (!M.h[hash] || !M.d[M.h[hash].first]) {
+                    promises.push(
+                        dbfetch.hash(aFile.hash)
+                            .always(function(node) {
+                                hashNode = node;
+                            })
+                    );
+                }
 
-                if (M.h[aFile.hash] || identical) {
-                    ulmanager.ulDeDuplicate(aFileUpload, identical);
+                if (promises.length) {
+                    MegaPromise.allDone(promises).wait(startUpload);
                 }
                 else {
-                    ulmanager.ulStart(aFileUpload);
+                    startUpload();
                 }
             });
     }

@@ -439,8 +439,10 @@ var notify = {
             notify.markAllNotificationsAsSeen();
 
             // Open the folder
-            M.openFolder(folderId);
-            reselect(true);
+            M.openFolder(folderId)
+                .always(function() {
+                    reselect(true);
+                });
         });
     },
 
@@ -460,8 +462,10 @@ var notify = {
             notify.markAllNotificationsAsSeen();
 
             // Open the folder
-            M.openFolder(parentFolderId);
-            reselect(true);
+            M.openFolder(parentFolderId)
+                .always(function() {
+                    reselect(true);
+                });
         });
     },
 
@@ -553,7 +557,7 @@ var notify = {
 
         // If the notification is not one of the custom ones, generate an avatar from the user information
         if (customIconNotifications.indexOf(notification.type) === -1) {
-            
+
             // Generate avatar from the user handle which will load their profile pic if they are already a contact
             if (typeof M.u[userHandle] !== 'undefined') {
                 avatar = useravatar.contact(userHandle);
@@ -565,7 +569,7 @@ var notify = {
             if (avatar === '') {
                 avatar = useravatar.contact(userEmail);
             }
-            
+
             // Add the avatar HTML and show it
             $notificationHtml.find('.notification-avatar').removeClass('hidden').prepend(avatar);
         }
@@ -581,7 +585,7 @@ var notify = {
         $notificationHtml.attr('id', notification.id);
         $notificationHtml.find('.notification-date').text(date);
         $notificationHtml.find('.notification-username').text(displayNameOrEmail);
-        
+
         // Add read status
         if (notification.seen) {
             $notificationHtml.addClass('read');

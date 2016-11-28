@@ -3818,27 +3818,32 @@ function crypto_procsr(sr) {
 }
 
 function api_updfkey(h) {
-    var logger = MegaLogger.getLogger('crypt');
-    var nk = [], k, sn;
-
-    logger.debug('api_updfkey', h);
-
-    if (typeof h != 'string') {
-        sn = h;
+    if (typeof h === 'string') {
+        M.getNodes(h, true).always(api_updfkeysync);
     }
     else {
-        sn = fm_getnodes(h, true);
+        api_updfkeysync(h);
+    }
+}
+function api_updfkeysync(sn) {
+    var logger = d && MegaLogger.getLogger('crypt');
+    var nk     = [];
+
+    if (d) {
+        logger.debug('api_updfkey', sn);
     }
 
     for (var i = sn.length; i--; ) {
-        h = sn[i];
+        var h = sn[i];
         if (M.d[h].u != u_handle && crypto_keyok(M.d[h])) {
             nk.push(h, a32_to_base64(encrypt_key(u_k_aes, M.d[h].k)));
         }
     }
 
     if (nk.length) {
-        logger.debug('api_updfkey.r', nk);
+        if (d) {
+            logger.debug('api_updfkey.r', nk);
+        }
         api_req({
             a: 'k',
             nk: nk
@@ -3887,8 +3892,8 @@ function crypto_node_rsa2aes() {
 //   decrypt the node without assistance from the share owner
 // FIXME: update missingkeys/sharemissing for all undecryptable nodes whose
 // share path changed (whenever shares are added, removed or nodes are moved)
-var missingkeys = {};   // { node handle : { share handle : true } }
-var sharemissing = {};  // { share handle : { node handle : true } }
+var missingkeys    = Object.create(null);  // { node handle : { share handle : true } }
+var sharemissing   = Object.create(null);  // { share handle : { node handle : true } }
 var newmissingkeys = false;
 
 // whenever a node fails to decrypt, call this.
@@ -3896,7 +3901,7 @@ function crypto_reportmissingkey(n) {
     var change = false;
 
     if (!missingkeys[n.h]) {
-        missingkeys[n.h] = {};
+        missingkeys[n.h] = Object.create(null);
         change = true;
     }
 
@@ -3907,7 +3912,7 @@ function crypto_reportmissingkey(n) {
                 if (!missingkeys[n.h][id]) {
                     missingkeys[n.h][id] = true;
                     if (!sharemissing[id]) {
-                        sharemissing[id] = {};
+                        sharemissing[id] = Object.create(null);
                     }
                     sharemissing[id][n.h] = true;
                     change = true;
@@ -3935,12 +3940,16 @@ function crypto_missingkeysfromdb(r) {
     if (!r.length || !r[0].s) return;
 
     for (var i = r.length; i--; ) {
-        if (!missingkeys[r[i].h]) missingkeys[r[i].h] = {};
+        if (!missingkeys[r[i].h]) {
+            missingkeys[r[i].h] = Object.create(null);
+        }
 
         if (r[i].s) {
             for (var j = r[i].s.length; j--; ) {
                 missingkeys[r[i].h][r[i].s[j]] = true;
-                if (!sharemissing[r[i].s[j]]) sharemissing[r[i].s[j]] = {};
+                if (!sharemissing[r[i].s[j]]) {
+                    sharemissing[r[i].s[j]] = Object.create(null);
+                }
                 sharemissing[r[i].s[j]][r[i].h] = true;
             }
         }
@@ -3964,7 +3973,7 @@ function crypto_keyfixed(h) {
 // successfully decrypted node will be redrawn and marked as no longer missing.
 function crypto_fixmissingkeys(hs) {
     if (hs) {
-        for (h in hs) {
+        for (var h in hs) {
             var n = M.d[h];
 
             if (n && !crypto_keyok(n)) {

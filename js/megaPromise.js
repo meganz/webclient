@@ -101,6 +101,32 @@ MegaPromise.asMegaPromiseProxy  = function(p) {
 };
 
 /**
+ * Show the loading dialog if a promise takes longer than 200ms
+ * @returns {MegaPromise}
+ */
+MegaPromise.busy = function() {
+    var promise = new MegaPromise();
+
+    if (fminitialized && !loadingDialog.active) {
+        var timer = setTimeout(function() {
+            timer = null;
+            loadingDialog.show();
+        }, 200);
+
+        promise.always(function() {
+            if (timer) {
+                clearTimeout(timer);
+            }
+            else {
+                loadingDialog.hide();
+            }
+        });
+    }
+
+    return promise;
+};
+
+/**
  * Common function to be used as reject callback to promises.
  *
  * @param promise {MegaPromise}
@@ -231,6 +257,46 @@ MegaPromise.prototype.reject = function() {
  */
 MegaPromise.prototype.always = function() {
     this._internalPromise.always.apply(this._internalPromise, arguments);
+    return this;
+};
+
+/**
+ * Alias of .always
+ *
+ * @returns {MegaPromise}
+ */
+MegaPromise.prototype.wait = function(callback) {
+    // callback = tryCatch(callback);
+
+    this._internalPromise.always(function() {
+        var args = toArray.apply(null, arguments);
+
+        setTimeout(function() {
+            callback.apply(null, args);
+        });
+    });
+    return this;
+};
+
+/**
+ * Alias of .always
+ *
+ * @returns {MegaPromise}
+ */
+MegaPromise.prototype.unpack = function(callback) {
+    // callback = tryCatch(callback);
+
+    this._internalPromise.always(function(result) {
+        if (result.__unpack$$$) {
+            // flatten an n-dimensional array.
+            for (var i = result.length; i--;) {
+                // pick the first argument for each member
+                result[i] = result[i][0];
+            }
+            result = Array.prototype.concat.apply([], result);
+        }
+        callback(result);
+    });
     return this;
 };
 
@@ -381,8 +447,10 @@ MegaPromise.allDone = function(promisesList, timeout) {
         return MegaPromise.resolve();
     }
     var totalLeft = promisesList.length;
-    var results = [];
     var masterPromise = new MegaPromise();
+    var results = [];
+    results.__unpack$$$ = 1;
+
     var alwaysCb = function() {
         results.push(toArray.apply(null, arguments));
 
@@ -390,7 +458,6 @@ MegaPromise.allDone = function(promisesList, timeout) {
             masterPromise.resolve(results);
         }
     };
-
 
     var _megaPromisesList = [];
     promisesList.forEach(function(v, k) {
@@ -475,3 +542,5 @@ MegaPromise.prototype.fakeDelay = function(ms) {
 
     return self;
 };
+
+Object.freeze(MegaPromise);

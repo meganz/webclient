@@ -2263,213 +2263,6 @@ function dcTracer(ctr) {
     }
 }
 
-function mSpawnWorker(url, nw) {
-    if (!(this instanceof mSpawnWorker)) {
-        return new mSpawnWorker(url, nw);
-    }
-
-    this.jid = 1;
-    this.jobs = {};
-    this.nworkers = nw = nw || mega.maxWorkers;
-    this.wrk = new Array(nw);
-    this.token = mRandomToken('mSpawnWorker.' + url.split(".")[0]);
-
-    while (nw--) {
-        if (!(this.wrk[nw] = this.add(url))) {
-            throw new Error(this.token.split("$")[0] + ' Setup Error');
-        }
-    }
-}
-mSpawnWorker.prototype = {
-    process: function mSW_Process(data, callback, onerror) {
-        if (!Array.isArray(data)) {
-            var err = new Error("'data' must be an array");
-            if (onerror) {
-                return onerror(err);
-            }
-            throw err;
-        }
-        if (this.unreliably) {
-            return onerror(0xBADF);
-        }
-        var nw = this.nworkers,
-            l = Math.ceil(data.length / nw);
-        var id = mRandomToken("mSWJobID" + this.jid++),
-            idx = 0;
-        var job = {
-            done: 0,
-            data: [],
-            callback: callback
-        };
-
-        while (nw--) {
-            job.data.push(data.slice(idx, idx += l));
-        }
-        if (onerror) {
-            job.onerror = onerror;
-        }
-        this.jobs[id] = job;
-        this.postNext();
-    },
-    postNext: function mSW_PostNext() {
-        if (this.busy()) {
-            return;
-        }
-        for (var id in this.jobs) {
-            var nw = this.nworkers;
-            var job = this.jobs[id],
-                data;
-
-            while (nw--) {
-                if (!this.wrk[nw].working) {
-                    data = job.data.shift();
-                    if (data) {
-                        this.wrk[nw].working = !0;
-                        this.wrk[nw].postMessage({
-                            data: data,
-                            debug: !!window.d,
-                            u_sharekeys: u_sharekeys,
-                            u_privk: u_privk,
-                            u_handle: u_handle,
-                            u_k: u_k,
-                            jid: id
-                        });
-
-                        if (d && job.data.length === this.nworkers - 1) {
-                            console.time(id);
-                        }
-                    }
-                }
-            }
-        }
-    },
-    busy: function() {
-        var nw = this.nworkers;
-        while (nw-- && this.wrk[nw].working);
-        return nw === -1;
-    },
-    add: function mSW_Add(url) {
-        var self = this,
-            wrk;
-
-        try {
-            wrk = new Worker(url);
-        }
-        catch (e) {
-            console.error(e);
-            if (!window[this.token]) {
-                window[this.token] = true;
-                msgDialog('warninga', l[16], "Unable to launch " + url + " worker.", e);
-            }
-            return false;
-        }
-
-        wrk.onerror = function mSW_OnError(err) {
-            console.error(err);
-            if (!(self && self.wrk)) {
-                return;
-            }
-            /*Soon(function() {
-                throw err.message || err;
-            });*/
-            self.unreliably = true;
-            var nw = self.nworkers;
-            while (nw--) {
-                if (self.wrk[nw]) {
-                    self.wrk[nw].terminate();
-                }
-            }
-            for (var id in self.jobs) {
-                var job = self.jobs[id];
-                if (job.onerror) {
-                    job.onerror(err);
-                }
-            }
-            /*if (!window[self.token]) {
-                window[self.token] = true;
-                if (err.filename) {
-                    msgDialog('warninga',
-                        "Worker Exception: " + url, err.message, err.filename + ":" + err.lineno);
-                }
-            }*/
-            delete self.wrk;
-            delete self.jobs;
-            self = undefined;
-        };
-
-        wrk.onmessage = function mSW_OnMessage(ev) {
-            if (ev.data[0] === 'console') {
-                if (d) {
-                    var args = ev.data[1];
-                    args.unshift(self.token);
-                    console.log.apply(console, args);
-                }
-                return;
-            }
-            if (d) {
-                console.log(self.token, ev.data);
-            }
-
-            wrk.working = false;
-            if (!self.done(ev.data)) {
-                this.onerror(0xBADF);
-            }
-        };
-
-        if (d) {
-            console.log(this.token, 'Starting...');
-        }
-
-        wrk.postMessage = wrk.postMessage || wrk.webkitPostMessage;
-
-        return wrk;
-    },
-    done: function mSW_Done(reply) {
-        var job = this.jobs[reply.jid];
-        if (!ASSERT(job, 'Invalid worker reply.')) {
-            return false;
-        }
-
-        if (!job.result) {
-            job.result = reply.result;
-        }
-        else {
-            $.extend(job.result, reply.result);
-        }
-
-        if (reply.newmissingkeys) {
-            job.newmissingkeys = newmissingkeys = true;
-            $.extend(missingkeys, reply.missingkeys);
-        }
-        if (reply.rsa2aes) {
-            $.extend(rsa2aes, reply.rsa2aes);
-        }
-        if (reply.u_sharekeys) {
-            $.extend(u_sharekeys, reply.u_sharekeys);
-        }
-        if (reply.rsasharekeys) {
-            $.extend(rsasharekeys, reply.rsasharekeys);
-        }
-
-        Soon(this.postNext.bind(this));
-        if (++job.done === this.nworkers) {
-            if (d) {
-                console.timeEnd(reply.jid);
-            }
-
-            // Don't report `newmissingkeys` unless there are *new* missing keys
-            if (job.newmissingkeys) {
-                job.newmissingkeys = M.checkNewMissingKeys();
-            }
-
-            delete this.jobs[reply.jid];
-            job.callback(job.result, job);
-        }
-
-        return true;
-    }
-};
-
 function mRandomToken(pfx) {
     return (pfx || '!') + '$' + (Math.random() * Date.now()).toString(36);
 }
@@ -3715,7 +3508,7 @@ mega.utils.neuterArrayBuffer = function neuter(ab) {
         }
     }
     catch (ex) {
-        if (d) {
+        if (d > 1) {
             console.warn('Cannot neuter ArrayBuffer', ab, ex);
         }
     }
@@ -4093,19 +3886,19 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
         updId = mBroadcaster.addListener('fmconfig:rubsched', _update);
         if (fmconfig.rubsched) {
             timer = setInterval(function() {
-                _proc();
+                // Do nothing unless the user has been idle
+                if (Date.now() - lastactive < RUBSCHED_IDLETIME) {
+                    return;
+                }
+                _exit();
+
+                dbfetch.coll([M.RubbishID]).wait(_proc);
+
             }, RUBSCHED_WAITPROC);
         }
     }
 
     function _proc() {
-
-        // Do nothing unless the user has been idle
-        if (Date.now() - lastactive < RUBSCHED_IDLETIME) {
-            return;
-        }
-
-        _exit();
 
         // Mode 14 - Remove files older than X days
         // Mode 15 - Keep the Rubbish-Bin under X GB
@@ -4136,7 +3929,7 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
                 console.error('Invalid node', nodes[i]);
                 continue;
             }
-            rubnodes = rubnodes.concat(fm_getnodes(node.h, true));
+            rubnodes = rubnodes.concat(M.getNodesSync(node.h, true));
         }
 
         rubnodes.sort(handler.sort);
@@ -5188,27 +4981,22 @@ mega.utils.chrome110ZoomLevelNotification = function() {
 };
 mBroadcaster.once('zoomLevelCheck', mega.utils.chrome110ZoomLevelNotification);
 
-var debounce = function(func, execAsap) {
-    var timeout;
-
-    return function debounced() {
-        var obj = this;
-        var args = arguments;
-
-        function delayed() {
-            if (!execAsap) {
-                func.apply(obj, args);
+/**
+ * Create prototype-less hash object.
+ */
+function newNodeHash() {
+    return Object.create(null, {
+        first: {
+            get: function() {
+                for (var k in this) {
+                    return k
+                }
             }
-            timeout = null;
+        },
+        length: {
+            get: function() {
+                return Object.keys(this).length;
+            }
         }
-
-        if (timeout) {
-            cancelAnimationFrame(timeout);
-        }
-        else if (execAsap) {
-            func.apply(obj, args);
-        }
-
-        timeout = requestAnimationFrame(delayed);
-    };
-};
+    });
+}

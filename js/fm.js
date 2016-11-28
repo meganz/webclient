@@ -2104,10 +2104,13 @@ function ephemeralDialog(msg) {
 /**
  * Removes the user from the share
  *
- * @param {String} shareId The share id
- * @param {Boolean} nfk
+ * @param {String}  shareId     The share id
+ * @param {Boolean} [nfk]       Keep foreign key..
+ * @param {Boolean} [norender]  do not invoke buildtree/openFolder
+ * @returns {MegaPromise}
  */
-function removeShare(shareId, nfk) {
+function removeShare(shareId, nfk, norender) {
+    var promise;
 
     if (d) {
         console.log('removeShare', shareId);
@@ -2120,41 +2123,74 @@ function removeShare(shareId, nfk) {
     M.delNode(shareId, true);   // must not update DB pre-API
     api_req({ a: 'd', n: shareId/*, i: requesti*/ });
 
-    M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
+    if (!norender) {
 
-    if ((M.currentdirid === shareId) || (isCircular(shareId, M.currentdirid) === true)) {
-        M.openFolder(RootbyId(shareId));
+        promise = M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
+
+        if ((M.currentdirid === shareId) || (isCircular(shareId, M.currentdirid) === true)) {
+            var openPromise = new MegaPromise();
+            promise.always(function() {
+                openPromise.linkDoneAndFailTo(M.openFolder(RootbyId(shareId)));
+            });
+            promise = openPromise;
+        }
+    }
+    else {
+        promise = MegaPromise.resolve();
     }
 
     delete u_sharekeys[shareId];
+
+    return promise;
 }
 
 function fmremove() {
+    var promise = new MegaPromise();
+    var handles = ($.selected || []).concat();
+
+    dbfetch.coll(handles)
+        .always(function() {
+            var doRemoveShare = handles.some(function(h) {
+                return M.d[h] && M.d[h].p.length === 11;
+            });
+
+            if (doRemoveShare) {
+                var removeSharePromise;
+
+                for (var i = handles.length; i--;) {
+                    removeSharePromise = removeShare(handles[i], false, i);
+                }
+
+                removeSharePromise.always(function() {
+                    promise.linkDoneAndFailTo(M.openFolder('shares', true));
+                });
+            }
+            else {
+                fmremovesync();
+                promise.resolve();
+            }
+        });
+
+    return promise;
+}
+function fmremovesync() {
     var filecnt = 0,
         foldercnt = 0,
         contactcnt = 0,
         removesharecnt = 0;
 
-    // Loop throught selected items
     for (var i in $.selected) {
         var n = M.d[$.selected[i]];
 
-        // ToDo: Not clear what this represents
         if (n && n.p.length === 11) {
             removesharecnt++;
         }
-
-        // ToDo: Replace counting contact id chars with something more reliable
         else if (String($.selected[i]).length === 11) {
             contactcnt++;
         }
-
-        // Folder
         else if (n && n.t) {
             foldercnt++;
         }
-
-        // File
         else {
             filecnt++;
         }
@@ -2305,8 +2341,8 @@ function fmremove() {
 
             for (var i in $.selected) {
                 selected.push($.selected[i]);
-                var nodes = fm_getnodes($.selected[i], true);
-                dirTree = dirTree.concat(nodes);
+                var nodes = M.getNodesSync($.selected[i], true);
+                dirTree   = dirTree.concat(nodes);
             }
 
             // Additional message in case that there's a shared node
@@ -5677,8 +5713,15 @@ function searchPath()
                         $.selected.push(id);
                         id = n.p;
                     }
-                    if (n) M.openFolder(id);
-                    if ($.selected.length > 0) reselect(1);
+                    var promise = MegaPromise.resolve();
+                    if (n) {
+                        promise = M.openFolder(id);
+                    }
+                    promise.always(function() {
+                        if ($.selected.length > 0) {
+                            reselect(1);
+                        }
+                    });
                 }
             });
         }
@@ -6072,12 +6115,14 @@ function transferPanelUI()
                 }
                 var path = M.getPath(id);
                 if (path.length > 1) {
-                    M.openFolder(path[1], true);
-                    if (!$('#' + id).length) {
-                        $(window).trigger('dynlist.flush');
-                    }
-                    $.selected = [id];
-                    reselect(1);
+                    M.openFolder(path[1], true)
+                        .always(function() {
+                            if (!$('#' + id).length) {
+                                $(window).trigger('dynlist.flush');
+                            }
+                            $.selected = [id];
+                            reselect(1);
+                        });
                 }
             }
             return false;
@@ -6281,7 +6326,7 @@ function getDDhelper()
 function menuItems() {
 
     var selItem,
-        items = [],
+        items = Object.create(null),
         share = {},
         exportLink = {},
         isTakenDown = false,
@@ -6884,10 +6929,13 @@ function scrollMegaSubMenu(e)
 
 function treeUI()
 {
-    //console.error('treeUI');
-    if (d)
+    if (d) {
         console.time('treeUI');
-    $('.fm-tree-panel .nw-fm-tree-item:visible').draggable(
+    }
+    var $treePanel = $('.fm-tree-panel');
+    var $treeItem = $('.nw-fm-tree-item:visible', $treePanel);
+
+    $treeItem.draggable(
         {
             revert: true,
             containment: 'document',
@@ -6958,23 +7006,23 @@ function treeUI()
         });
 
     // disabling right click, default contextmenu.
-    $(document).unbind('contextmenu');
-    $(document).bind('contextmenu', function(e) {
+    $(document).rebind('contextmenu', function(e) {
+        var $target = $(e.target);
         if (!is_fm() ||
-            $(e.target).parents('#startholder').length ||
-            $(e.target).is('input') ||
-            $(e.target).is('textarea') ||
-            $(e.target).is('.download.info-txt') ||
-            $(e.target).closest('.content-panel.conversations').length ||
-            $(e.target).closest('.messages.content-area').length ||
-            $(e.target).closest('.chat-right-pad .user-card-data').length ||
-            $(e.target).parents('.fm-account-main').length ||
-            $(e.target).parents('.export-link-item').length ||
-            $(e.target).parents('.contact-fingerprint-txt').length ||
-            $(e.target).parents('.fm-breadcrumbs').length ||
-            $(e.target).hasClass('contact-details-user-name') ||
-            $(e.target).hasClass('contact-details-email') ||
-            $(e.target).hasClass('nw-conversations-name')) {
+            $target.parents('#startholder').length ||
+            $target.is('input') ||
+            $target.is('textarea') ||
+            $target.is('.download.info-txt') ||
+            $target.closest('.content-panel.conversations').length ||
+            $target.closest('.messages.content-area').length ||
+            $target.closest('.chat-right-pad .user-card-data').length ||
+            $target.parents('.fm-account-main').length ||
+            $target.parents('.export-link-item').length ||
+            $target.parents('.contact-fingerprint-txt').length ||
+            $target.parents('.fm-breadcrumbs').length ||
+            $target.hasClass('contact-details-user-name') ||
+            $target.hasClass('contact-details-email') ||
+            $target.hasClass('nw-conversations-name')) {
             return;
         } else if (!localStorage.contextmenu) {
             $.hideContextMenu();
@@ -6982,7 +7030,7 @@ function treeUI()
         }
     });
 
-    $('.fm-tree-panel .nw-fm-tree-item:visible').rebind('click.treeUI, contextmenu.treeUI', function(e) {
+    $treeItem.rebind('click.treeUI, contextmenu.treeUI', function(e) {
         var $this = $(this);
         var id = $this.attr('id').replace('treea_', '');
 
@@ -7029,7 +7077,7 @@ function treeUI()
         return false;
     });
 
-    $('.fm-tree-panel .nw-contact-item').rebind('contextmenu.treeUI', function(e) {
+    $('.nw-contact-item', $treePanel).rebind('contextmenu.treeUI', function(e) {
         var $self = $(this);
 
         if ($self.attr('class').indexOf('selected') === -1) {
@@ -7055,36 +7103,25 @@ function treeUI()
     }
 }
 
-function treeUIexpand(id, force, moveDialog)
+function treeUIexpand(id, force)
 {
-    M.buildtree(M.d[id]);
+    return M.buildtree(M.d[id])
+        .always(function() {
+            var $tree = $('#treea_' + id);
 
-    var b = $('#treea_' + id);
-    var d = b.attr('class');
+            if ($tree.hasClass('expanded') && !force) {
+                fmtreenode(id, false);
+                $('#treesub_' + id).removeClass('opened');
+                $tree.removeClass('expanded');
+            }
+            else if ($tree.hasClass('contains-folders')) {
+                fmtreenode(id, true);
+                $('#treesub_' + id).addClass('opened');
+                $tree.addClass('expanded');
+            }
 
-    if (M.currentdirid !== id)
-    {
-        var path = M.getPath(M.currentdirid), pid = {}, active_sub = false;
-        for (var i in path)
-            pid[path[i]] = i;
-        if (pid[M.currentdirid] < pid[id])
-            active_sub = true;
-    }
-
-    if (d && d.indexOf('expanded') > -1 && !force)
-    {
-        fmtreenode(id, false);
-        $('#treesub_' + id).removeClass('opened');
-        b.removeClass('expanded');
-    }
-    else if (d && d.indexOf('contains-folders') > -1)
-    {
-        fmtreenode(id, true);
-        $('#treesub_' + id).addClass('opened');
-        b.addClass('expanded');
-    }
-
-    treeUI();
+            delay('treeUI', treeUI);
+        });
 }
 
 function sectionUIopen(id) {
@@ -7991,7 +8028,7 @@ function fillShareDialogWithContent() {
         pendingShares = Object(M.ps[nodeHandle]);
         userHandles   = userHandles.concat(Object.keys(pendingShares));
     }
-    var seen = {};
+    var seen = Object.create(null);
 
     userHandles.forEach(function(handle) {
         var user = M.getUser(handle) || Object(M.opc[handle]);
@@ -9846,6 +9883,20 @@ browserDialog.isWeak = function() {
 
 /* jshint -W074 */
 function propertiesDialog(close) {
+    if (close) {
+        _propertiesDialog(1);
+    }
+    else {
+        var promise = dbfetch.coll($.selected || []);
+
+        promise.always(function() {
+            _propertiesDialog();
+        });
+
+        return promise;
+    }
+}
+function _propertiesDialog(close) {
 
     /*
     * fillPropertiesContactList, Handles node properties/info dialog contact list content
@@ -9994,7 +10045,7 @@ function propertiesDialog(close) {
             console.error('propertiesDialog: invalid node', $.selected[i]);
         }
         else if (n.t) {
-            var nodes = fm_getnodes(n.h);
+            var nodes = M.getNodesSync(n.h);
             for (var j = 0; j < nodes.length; j++) {
                 if (M.d[nodes[j]] && !M.d[nodes[j]].t) {
                     size += M.d[nodes[j]].s;
@@ -10333,9 +10384,9 @@ function termsDialog(close, pp)
     });
 }
 
-var previews = {};
-var preqs = {};
-var pfails = {};
+var previews = Object.create(null);
+var preqs = Object.create(null);
+var pfails = Object.create(null);
 var slideshowid;
 
 function slideshowsteps()
@@ -10646,10 +10697,9 @@ function previewimg(id, uint8arr)
     }
 }
 
-var thumbnails = [];
-var thumbnailblobs = [];
-var th_requested = [];
-var fa_duplicates = {};
+var thumbnails = Object.create(null);
+var th_requested = Object.create(null);
+var fa_duplicates = Object.create(null);
 var fa_reqcnt = 0;
 var fa_addcnt = 8;
 var fa_tnwait = 0;
@@ -10729,7 +10779,6 @@ function fm_thumbnails()
                 } catch (err) {}
                 if (blob.size < 25)
                     blob = new Blob([uint8arr.buffer]);
-                // thumbnailblobs[node] = blob;
                 thumbnails[node] = myURL.createObjectURL(blob);
 
                 var targetNode = M.getNodeByHandle(node);
@@ -10800,9 +10849,14 @@ function fm_importflnodes(nodes)
         var FLRootID = M.RootID;
 
         mega.ui.showLoginRequiredDialog().done(function() {
+            loadingDialog.show();
 
-            $.onImportCopyNodes = fm_getcopynodes(sel);
-            document.location.hash = 'fm';
+            M.getCopyNodes(sel)
+                .done(function(nodes) {
+
+                    $.onImportCopyNodes = nodes;
+                    location.hash       = 'fm';
+                });
 
             $(document).one('onInitContextUI', SoonFc(function(e) {
                 if (M.RootID === FLRootID) {
@@ -11936,7 +11990,7 @@ function removeFromMultiInputDDL(dialog, item) {
 
         var self = this;
 
-        $.sortTreePanel = {};
+        $.sortTreePanel = Object.create(null);
 
         $.each(['folder-link', 'contacts', 'conversations', 'inbox', 'shared-with-me', 'cloud-drive', 'rubbish-bin'], function(key, type) {
             $.sortTreePanel[type] = {

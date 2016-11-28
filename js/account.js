@@ -856,9 +856,6 @@ function checkUserLogin() {
         };
 
         for (var key in config) {
-            if (!config.hasOwnProperty(key)) {
-                continue;
-            }
             var value = config[key];
 
             if (!value && value !== 0) {
@@ -1057,7 +1054,7 @@ function checkUserLogin() {
         var push = function() {
             if (u_type === 3 && !pfid && !folderlink) {
                 // through a timer to prevent floods
-                timer = delay('fmconfig:store', store, 9701);
+                timer = delay('fmconfig:store', store, 3100);
             }
             else {
                 localStorage.fmconfig = JSON.stringify(fmconfig);

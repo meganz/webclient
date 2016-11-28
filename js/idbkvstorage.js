@@ -17,19 +17,17 @@ IndexedDBKVStorage.prototype.prefillMemCache = function(fmdb) {
     var self = this;
     this.fmdb = fmdb;
 
-    var promise = new MegaPromise();
+    var promise = MegaPromise.resolve();
 
     if (fmdb) {
-        this.fmdb.getbykey(this.name, 'k', false, false, function(r){
+        promise = this.fmdb.getbykey(this.name, 'k', false, false);
+        promise.done(function(r) {
             for (var i = r.length; i--; ) {
                 self._memCache[r[i].k] = r[i].v;
             }
-
-            promise.resolve();
         });
     }
-    else promise.resolve();
-    
+
     if (self.syncMemcache) {
         self._mListener = mBroadcaster.addListener('idbchange:' + self.name + "_" + u_handle, function (data) {
             var k = data[0];
@@ -57,7 +55,7 @@ IndexedDBKVStorage.prototype.setItem = function __IDBKVSetItem(k, v) {
         if (this.fmdb) {
             this.fmdb.add(this.name, { k : k, d : { v : v }});
         }
-        
+
         // FIXME: check if this is ok..
         var self = this;
         Soon(function() {
@@ -72,7 +70,7 @@ IndexedDBKVStorage.prototype.setItem = function __IDBKVSetItem(k, v) {
     }
 
     promise.resolve([k, v]);
-           
+
     return promise;
 };
 
@@ -80,23 +78,23 @@ IndexedDBKVStorage.prototype.setItem = function __IDBKVSetItem(k, v) {
 IndexedDBKVStorage.prototype.getItem = function __IDBKVGetItem(k) {
     var self = this;
 
-    var promise = new MegaPromise();
-
     if (typeof(self._memCache[k]) != 'undefined') {
-        promise.resolve(self._memCache[k]);
-        return promise;
+        return MegaPromise.resolve(self._memCache[k]);
     }
 
+    var promise = new MegaPromise();
+
     if (this.fmdb) {
-        this.fmdb.getbykey(this.name, 'k', false, [['k', k]], function(r){
-            if (r.length) {
-                self._memCache[r[0].k] = r[0].v;
-                promise.resolve(r[0].v);
-            }
-            else {
-                promise.reject();
-            }
-        });
+        this.fmdb.getbykey(this.name, 'k', false, [['k', k]])
+            .always(function(r) {
+                if (r.length) {
+                    self._memCache[r[0].k] = r[0].v;
+                    promise.resolve(r[0].v);
+                }
+                else {
+                    promise.reject();
+                }
+            });
     }
     else {
         // no DB available
@@ -155,21 +153,22 @@ IndexedDBKVStorage.prototype.destroy = function __IDBKVDestroy() {
 
 // check if item exists
 IndexedDBKVStorage.prototype.hasItem = function __IDBKVHasItem(k) {
-    var promise = new MegaPromise();
 
     if (typeof(this._memCache[k]) != 'undefined') {
         return MegaPromise.resolve();
     }
+    var promise = new MegaPromise();
 
     if (this.fmdb) {
-        this.fmdb.getbykey(this.name, 'k', false, [['k', k]], function(r){
-            if (r.length) {
-                promise.resolve();
-            }
-            else {
-                promise.reject();
-            }
-        });
+        this.fmdb.getbykey(this.name, 'k', false, [['k', k]])
+            .always(function(r) {
+                if (r.length) {
+                    promise.resolve();
+                }
+                else {
+                    promise.reject();
+                }
+            });
     }
     else {
         // no DB available

@@ -1154,7 +1154,14 @@ function MegaData()
             e.currentTarget = target;
             cacheselect();
             searchPath();
-            contextMenuUI(e, 1);
+            if (!$(this).hasClass('active')) {
+                contextMenuUI(e, 1);
+                $(this).addClass('active');
+            }
+            else {
+                $.hideContextMenu();
+                $(this).removeClass('active');
+            }
         });
 
         $('.file-block .file-settings-icon').rebind('click', function(e) {
@@ -1168,7 +1175,14 @@ function MegaData()
             e.currentTarget = target;
             cacheselect();
             searchPath();
-            contextMenuUI(e, 1);
+            if (!$(this).hasClass('active')) {
+                $(this).addClass('active');
+                contextMenuUI(e, 1);
+            }
+            else {
+                $(this).removeClass('active');
+                $.hideContextMenu();
+            }
         });
 
         if (!u) {
@@ -1185,7 +1199,14 @@ function MegaData()
 
                 $('.shared-details-info-block .grid-url-arrow').rebind('click', function (e) {
                     prepareShareMenuHandler(e);
-                    contextMenuUI(e, 1);
+                    if (!$(this).hasClass('active')) {
+                        contextMenuUI(e, 1);
+                        $(this).addClass('active');
+                    }
+                    else {
+                        $.hideContextMenu();
+                        $(this).removeClass('active');
+                    }
                 });
 
                 $('.shared-details-info-block .fm-share-download').rebind('click', function (e) {
@@ -1194,7 +1215,14 @@ function MegaData()
                     e.clientX = $this.offset().left;
                     e.clientY = $this.offset().top + $this.height()
 
-                    contextMenuUI(e, 3);
+                    if (!$(this).hasClass('active')) {
+                        contextMenuUI(e, 3);
+                        $(this).addClass('active');
+                    }
+                    else {
+                        $.hideContextMenu();
+                        $(this).removeClass('active');
+                    }
                 });
 
                 $('.shared-details-info-block .fm-share-copy').rebind('click', function (e) {

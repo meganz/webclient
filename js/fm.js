@@ -6004,7 +6004,14 @@ function transferPanelUI()
                 target.addClass('ui-selected');
                 e.currentTarget = target;
                 transferPanelContextMenu(target);
-                contextMenuUI(e);
+                if (!$(this).hasClass('active')) {
+                    contextMenuUI(e);
+                    $(this).addClass('active');
+                }
+                else {
+                    $.hideContextMenu();
+                    $(this).removeClass('active');
+                }
             }
             else {
                 if (!target.hasClass('.transfer-completed')) {
@@ -11234,7 +11241,14 @@ function contactUI() {
             e.calculatePosition = true;
             $.selected = [location.hash.replace('#fm/', '')];
             searchPath();
-            contextMenuUI(e, 4);
+            if (!$(this).hasClass('active')) {
+                contextMenuUI(e, 4);
+                $(this).addClass('active');
+            }
+            else {
+                $.hideContextMenu();
+                $(this).removeClass('active');
+            }
         });
 
         // Display the current fingerpring

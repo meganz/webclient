@@ -2429,55 +2429,23 @@ function fmremdupes(test)
 
 function initContextUI() {
 
-    var c = '.dropdown-item';
+    var c = '.dropdown.body.context .dropdown-item';
 
-    $('.dropdown-section').off('mouseover', c);
-    $('.dropdown-section').on('mouseover', c, function() {
+    $('.dropdown-section').off('mouseover', '.dropdown-item');
+    $('.dropdown-section').on('mouseover', '.dropdown-item', function() {
+        var $this = $(this),
+            pos = $this.offset(),
+            menuPos,
+            currentId;
 
-        // is move... or download...
-        if ($(this).parent().parent().is('.dropdown.body.submenu')) {
-
-            // if just item hide child context-submenu
-            if (!$(this).is('.contains-submenu')) {
-                $(this).parent().children().removeClass('active opened');
-                $(this).parent().find('.dropdown.body.submenu').removeClass('active');
-            }
+        // Hide opened submenus
+        if (!$this.parent().parent().hasClass('submenu')) {
+            $('.dropdown-item').removeClass('opened');
+            $('.dropdown.body.submenu').removeClass('active');
         }
-
-        // Hide all submenues, for download and for move...
         else {
-            if (!$(this).is('.contains-submenu')) {
-                $('.dropdown.body.dropdown.body.submenu.active').removeClass('active');
-                $('.dropdown.body .contains-submenu.opened').removeClass('opened');
-            }
-        }
-    });
-
-    $('.dropdown-section').off('mouseover', '.contains-submenu');
-    $('.dropdown-section').on('mouseover', '.contains-submenu', function() {
-
-        var hideSubMenus = function(item) {
-            $('.dropdown.body ' + item).removeClass('opened')
-                .next().removeClass('active opened')
-                .next().find('.dropdown.body.submenu').removeClass('active');
-        };
-
-        var menuPos;
-        var currentId;
-        var $this = $(this);
-        var pos   = $this.offset();
-        var a     = $this.next();
-        var b     = $this.closest('.dropdown.body.submenu')
-                        .find('.dropdown.body.submenu,.contains-submenu')
-                        .not($this.next());
-
-        a.children().removeClass('active opened');
-        a.find('.dropdown.body.submenu').removeClass('active');
-        a.find('.opened').removeClass('opened');
-
-        if (b.length) {
-            b.removeClass('active opened')
-                .find('.dropdown.body.submenu').removeClass('active');
+            $this.parent().find('.dropdown-item').removeClass('opened');
+            $this.parent().find('.submenu').removeClass('active');
         }
 
         currentId = $this.attr('id');
@@ -2485,25 +2453,14 @@ function initContextUI() {
             M.buildSubMenu(currentId.replace('fi_', ''));
         }
 
-        if ($this.is('.move-item')) {
-            hideSubMenus('.download-item');
-            hideSubMenus('.colour-label-items');
-        }
-        if ($this.is('.download-item')) {
-            hideSubMenus('.move-item');
-            hideSubMenus('.colour-label-items');
-        }
-        if ($this.is('.colour-label-items')) {
-            hideSubMenus('.move-item');
-            hideSubMenus('.download-item');
-        }
-        if (!$this.is('.opened')) {
+        // Show necessary submenu
+        if (!$this.hasClass('opened') && $this.hasClass('contains-submenu')) {
             menuPos = reCalcMenuPosition($this, pos.left, pos.top, 'submenu');
 
-            $this.next('.dropdown.body.submenu')
+            $this.next('.submenu')
                 .css({'top': menuPos.top})
                 .addClass('active');
-
+  
             $this.addClass('opened');
         }
     });

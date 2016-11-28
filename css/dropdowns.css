@@ -161,7 +161,7 @@
 .dropdown-item.mid-txt {
     font-size: 14px;
 }
-.dropdown-item:hover {
+.dropdown-item:hover, .dropdown-item.opened {
     background-color: #AAAAAA;
     color: white;
 }
@@ -177,7 +177,7 @@
     background-repeat: no-repeat;
     background-position: -106px -254px;
 }
-.dropdown-item.contains-submenu:hover::before {
+.dropdown-item.contains-submenu:hover::before, .dropdown-item.contains-submenu.opened::before {
     background-position: -146px -254px;
 }
 .dropdown-item.tick-item {

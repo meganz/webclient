@@ -2455,12 +2455,13 @@ function initContextUI() {
             $this.parent().find('.context-submenu').removeClass('active');
         }
 
+        currentId = $this.attr('id');
+        if (currentId) {
+            M.buildSubMenu(currentId.replace('fi_', ''));
+        }
+
         // Show necessary submenu
         if (!$this.hasClass('opened') && $this.hasClass('contains-submenu')) {
-            currentId = $this.attr('id');
-            if (currentId) {
-                M.buildSubMenu(currentId.replace('fi_', ''));
-            }
             menuPos = reCalcMenuPosition($this, pos.left, pos.top, 'submenu');
 
             $this.next('.context-submenu')

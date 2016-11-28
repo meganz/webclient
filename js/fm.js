@@ -2438,72 +2438,35 @@ function initContextUI() {
 
     var c = '.context-menu .context-menu-item';
 
-    $('.context-menu-section').off('mouseover', c);
-    $('.context-menu-section').on('mouseover', c, function() {
-
-        // is move... or download...
-        if ($(this).parent().parent().is('.context-submenu')) {
-
-            // if just item hide child context-submenu
-            if (!$(this).is('.contains-submenu')) {
-                $(this).parent().children().removeClass('active opened');
-                $(this).parent().find('.context-submenu').addClass('hidden');
-            }
-        }
-
-        // Hide all submenues, for download and for move...
-        else {
-            if (!$(this).is('.contains-submenu')) {
-                $('.context-menu .context-submenu.active ').removeClass('active');
-                $('.context-menu .contains-submenu.opened').removeClass('opened');
-                $('.context-menu .context-submenu').addClass('hidden');
-            }
-        }
-    });
-
-    $('.context-menu-section').off('mouseover', '.contains-submenu');
-    $('.context-menu-section').on('mouseover', '.contains-submenu', function() {
-
+    $('.context-menu-section').off('mouseover', '.context-menu-item');
+    $('.context-menu-section').on('mouseover', '.context-menu-item', function() {
         var $this = $(this),
-            // situation when we have 2 contains-submenus in same context-submenu one near another
-            b = $this.closest('.context-submenu').find('.context-submenu,.contains-submenu').not($this.next()),
-            a = $this.next(),// context-submenu
             pos = $this.offset(),
             menuPos,
             currentId;
 
-        a.children().removeClass('active opened');
-        a.find('.context-submenu').addClass('hidden');
-        a.find('.opened').removeClass('opened');
-
-        if (b.length) {
-            b.removeClass('active opened')
-                .find('.context-submenu').addClass('hidden');
+        // Hide opened submenus
+        if (!$this.parent().parent().hasClass('context-submenu')) {
+            $('.context-menu-item').removeClass('opened');
+            $('.context-submenu').removeClass('active');
+        }
+        else {
+            $this.parent().find('.context-menu-item').removeClass('opened');
+            $this.parent().find('.context-submenu').removeClass('active');
         }
 
-        currentId = $this.attr('id');
-        if (currentId) {
-            M.buildSubMenu(currentId.replace('fi_', ''));
-        }
-
-        if ($this.is('.move-item')) {
-            $('.context-menu .download-item').removeClass('opened')
-                .next().removeClass('active opened')
-                .next().find('.context-submenu').addClass('hidden');
-        }
-        if ($this.is('.download-item')) {
-            $('.context-menu .move-item').removeClass('opened')
-                .next().removeClass('active opened')
-                .next().find('.context-submenu').addClass('hidden');
-        }
-        if (!$this.is('.opened')) {
-            menuPos = reCalcMenuPosition($this, pos.left, pos.top, 'submenu'),
+        // Show necessary submenu
+        if (!$this.hasClass('opened') && $this.hasClass('contains-submenu')) {
+            currentId = $this.attr('id');
+            if (currentId) {
+                M.buildSubMenu(currentId.replace('fi_', ''));
+            }
+            menuPos = reCalcMenuPosition($this, pos.left, pos.top, 'submenu');
 
             $this.next('.context-submenu')
                 .css({'top': menuPos.top})
-                .addClass('active')
-                .removeClass('hidden');
-
+                .addClass('active');
+  
             $this.addClass('opened');
         }
     });

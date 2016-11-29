@@ -269,6 +269,10 @@ function init_pro()
         if (verifyUrlParam.indexOf('ecp') > -1) {
             addressDialog.showPaymentResult(verifyUrlParam);
         }
+
+        if (verifyUrlParam.indexOf('sabadell') > -1) {
+            sabadell.showPaymentResult(verifyUrlParam);
+        }
     }
 
     if (localStorage.keycomplete) {
@@ -696,6 +700,9 @@ function pro_pay() {
             else if (pro_paymentmethod.indexOf('ecp') === 0) {
                 pro_m = addressDialog.gatewayId;
                 extra = addressDialog.extraDetails;
+            }
+            else if (pro_paymentmethod.indexOf('sabadell') === 0) {
+                pro_m = sabadell.gatewayId; // 17
             }
 
             // Update the last payment provider ID for the 'psts' action packet. If the provider e.g. bitcoin
@@ -1688,6 +1695,10 @@ var proPage = {
             case directReseller.gatewayId:
                 directReseller.redirectToSite(utcResult);
                 break;
+
+            case sabadell.gatewayId:
+                sabadell.redirectToSite(utcResult);
+                break;
         }
     }
 };
@@ -2096,6 +2107,80 @@ var unionPay = {
             form.append(input);
             $('body').append(form);
             form.submit();
+        }
+    }
+};
+
+/**
+ * Code for Sabadell Spanish Bank
+ */
+var sabadell = {
+
+    gatewayId: 17,
+
+    /**
+     * Redirect to the site
+     * @param {Object} utcResult
+     */
+    redirectToSite: function(utcResult) {
+
+        // DynamicPay
+        // We need to redirect to their site via a post, so we are building a form :\
+        var form = $("<form id='pay_form' name='pay_form' action='" + utcResult.EUR['url'] + "' method='post'></form>");
+
+        for (var key in utcResult.EUR['postdata'])
+        {
+            var input = $("<input type='hidden' name='" + key + "' value='" + utcResult.EUR['postdata'][key] + "' />");
+            form.append(input);
+            $('body').append(form);
+            form.submit();
+        }
+    },
+
+    /**
+     * Show the payment result of success or failure after coming back from the Sabadell site
+     * @param {String} verifyUrlParam The URL parameter e.g. 'sabadell-success' or 'sabadell-failure'
+     */
+    showPaymentResult: function(verifyUrlParam) {
+
+        var $backgroundOverlay = $('.fm-dialog-overlay');
+        var $pendingOverlay = $('.payment-result.pending.alternate');
+        var $failureOverlay = $('.payment-result.failed');
+
+        // Show the overlay
+        $backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+
+        // On successful payment
+        if (verifyUrlParam === 'sabadell-success') {
+
+            // Show the success
+            $pendingOverlay.removeClass('hidden');
+
+            // Add click handlers for 'Go to my account' and Close buttons
+            $pendingOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
+
+                // Hide the overlay
+                $backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+                $pendingOverlay.addClass('hidden');
+
+                // Make sure it fetches new account data on reload
+                if (M.account) {
+                    M.account.lastupdate = 0;
+                }
+                window.location.hash = 'fm/account/history';
+            });
+        }
+        else {
+            // Show the failure overlay
+            $failureOverlay.removeClass('hidden');
+
+            // On click of the 'Try again' or Close buttons, hide the overlay
+            $failureOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
+
+                // Hide the overlay
+                $backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+                $failureOverlay.addClass('hidden');
+            });
         }
     }
 };

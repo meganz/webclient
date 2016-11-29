@@ -14648,7 +14648,7 @@ body.key.ka .reg-st3-bandwidth, body.key.uk .reg-st3-bandwidth {
     margin-right: 4px;
 }
 .provider-icon {
-    background-image: url("../images/mega/payment-provider-icons-v2.png");
+    background-image: url("../images/mega/payment-provider-icons-v3.png");
     background-position: 0 0;
     background-repeat: no-repeat;
     display: inline-block;
@@ -14871,6 +14871,9 @@ body.key.ka .reg-st3-bandwidth, body.key.uk .reg-st3-bandwidth {
 }
 .provider-icon.directresellerAlipay {
     background-position: 0 -4020px;
+}
+.provider-icon.sabadell {
+    background-position: 0 -4080px;
 }
 .membership-new-offer text {
     font-weight: normal;

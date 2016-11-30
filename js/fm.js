@@ -1,6 +1,11 @@
 function voucherCentering($button) {
-    var $popupBlock =$('.fm-voucher-popup');
+    var $popupBlock = $('.fm-voucher-popup');
     var popupHeight = $popupBlock.outerHeight();
+
+    $popupBlock.css({
+        'top': $button.offset().top - popupHeight - 10,
+        'right': $('body').outerWidth() -$button.outerWidth() - $button.offset().left
+    });
 
     if ($button.offset().top + 10 > popupHeight) {
         $popupBlock.css('top', $button.offset().top - popupHeight - 10);
@@ -2460,7 +2465,7 @@ function initContextUI() {
             $this.next('.submenu')
                 .css({'top': menuPos.top})
                 .addClass('active');
-  
+
             $this.addClass('opened');
         }
     });
@@ -3063,9 +3068,9 @@ function dashboardUI() {
     });
 
     // Space-widget clickable sections
-    $('.account.widget .progress-title')
+    $('.account.widget.storage .pr-item')
         .rebind('click', function() {
-            var section = String($(this).next().attr('class')).replace(/account|progress-size/g, '').trim();
+            var section = String($(this).attr('class')).replace(/account|pr-item/g, '').trim();
             switch (section) {
                 case 'cloud-drive':
                     section = M.RootID;
@@ -3084,7 +3089,7 @@ function dashboardUI() {
                     break;
             }
 
-            if (section) {
+            if (section && !$(this).hasClass('empty')) {
                 M.openFolder(section);
             }
 
@@ -3326,7 +3331,7 @@ function dashboardUI() {
             $('.account.widget.bandwidth').addClass('enabled-pr-bar');
             $('.dashboard .account.rounded-icon.right').addClass('hidden');
             $('.bandwidth .account.progress-size.available-quota').text(bytesToSize(max - base, 0));
-            $('.bandwidth .account.progress-bar.grey').css('width', (Math.round(base * 100 / max) || 1) + '%');
+            $('.bandwidth .account.progress-bar.green').css('width', (Math.round(base * 100 / max) || 1) + '%');
         }
         else {
 
@@ -3337,7 +3342,7 @@ function dashboardUI() {
                 $('.dashboard .account.rounded-icon.right').addClass('hidden');
                 $('.account.widget.bandwidth').addClass('enabled-pr-bar');
                 $('.bandwidth .account.progress-size.available-quota').text(bytesToSize(maxTransferQuota, 0));
-                $('.bandwidth .account.progress-bar.grey').css('width', (Math.round(base * 100 / maxTransferQuota) || 1) + '%');
+                $('.bandwidth .account.progress-bar.green').css('width', (Math.round(base * 100 / maxTransferQuota) || 1) + '%');
             }
             else {
                 $('.dashboard .account.rounded-icon.right').removeClass('hidden');
@@ -3656,6 +3661,9 @@ function accountUI() {
                 $('.account.data-block .btn-cancel').hide();
                 $('.subscription-bl').removeClass('active-subscription');
             }
+			// Maximum bandwidth
+			$('.account.plan-info.bandwidth span').text(bytesToSize(account.bw, 0));
+			$('.account.plan-info-row.bandwidth').show();
         }
         else {
 
@@ -3664,10 +3672,10 @@ function accountUI() {
             $('.account.plan-info.expiry').text(l[436]);
             $('.btn-cancel').hide();
             $('.subscription-bl').removeClass('active-subscription');
+			$('.account.plan-info-row.bandwidth').hide();
         }
 
-        // Maximum bandwidth
-        $('.account.plan-info.bandwidth span').text(bytesToSize(account.bw, 0));
+
 
         // Maximum disk space
         $('.account.plan-info.storage span').text(bytesToSize(account.space, 0));
@@ -4481,7 +4489,8 @@ function accountUI() {
                 // Request change of email
                 // e => new email address
                 // i => requesti (Always has the global variable requesti (last request ID))
-                api_req({ a: 'se', aa: 'a', e: email, i: requesti }, { callback : function(res) {
+                api_req({ a: 'se', aa: 'a', e: email, i: requesti }, {
+                    callback: function (res) {
 
                         loadingDialog.hide();
 
@@ -4857,6 +4866,9 @@ function accountUI() {
                 $this.addClass('active');
                 $('.fm-voucher-popup').removeClass('hidden');
                 voucherCentering($this);
+                $(window).rebind('resize.voucher', function (e) {
+                    voucherCentering($this);
+                });
 
                 $('.fm-account-overlay, .fm-purchase-voucher, .fm-voucher-button').rebind('click.closeDialog', function() {
                     $('.fm-account-overlay').fadeOut(100);
@@ -4869,6 +4881,7 @@ function accountUI() {
                 $('.fm-account-overlay').fadeOut(200);
                 $this.removeClass('active');
                 $('.fm-voucher-popup').addClass('hidden');
+                $(window).unbind('resize.voucher');
             }
         });
 
@@ -6767,7 +6780,14 @@ function transferPanelUI()
                 target.addClass('ui-selected');
                 e.currentTarget = target;
                 transferPanelContextMenu(target);
-                contextMenuUI(e);
+                if (!$(this).hasClass('active')) {
+                    contextMenuUI(e);
+                    $(this).addClass('active');
+                }
+                else {
+                    $.hideContextMenu();
+                    $(this).removeClass('active');
+                }
             }
             else {
                 if (!target.hasClass('.transfer-completed')) {
@@ -7292,7 +7312,7 @@ function contextMenuUI(e, ll) {
             });
         if (x.length === a.length || a.length === 0) {
             $this.addClass('hidden');
-        } 
+        }
         else {
             $this.removeClass('hidden');
         }
@@ -7580,7 +7600,8 @@ function setBordersRadius(m, c)
         'border-top-left-radius': tl,
         'border-top-right-radius': tr,
         'border-bottom-left-radius': bl,
-        'border-bottom-right-radius': br});
+        'border-bottom-right-radius': br
+    });
 
     return true;
 }
@@ -11287,7 +11308,7 @@ function inviteFriendDialog(close) {
     $('.multiple-input .token-input-list-invite', $dialog).click();
 
     // Show "Invitation Status" button if invitations were sent before
-    if (maf.rwd) {
+    if (maf && maf.rwd) {
         $('.default-white-button.inline.status', $dialog)
             .removeClass('hidden')
             .rebind('click', function() {
@@ -11329,7 +11350,7 @@ function initInviteDialogMultiInputPlugin() {
         accountHolder: (M.u[u_handle] || {}).m || '',
         scrolLocation: 'invite',
         excludeCurrent: false,
-        visibleComma: true,
+        visibleComma: false,
         enableHTML: true,
         onEmailCheck: function() {
             $('.achievement-dialog.input-info').addClass('red').text(l[7415]);
@@ -11514,6 +11535,20 @@ function invitationStatusDialog(close) {
     if (!invitationStatusDialog.$tmpl) {
         invitationStatusDialog.$tmpl = $('.table-row:first', $table).clone();
     }
+
+    var getConfig = function () {
+        return invitationStatusDialog.config;
+    };
+
+    var setConfig = function (what, value) {
+        invitationStatusDialog.config[what] = value;
+    };
+
+    if (!invitationStatusDialog.config) {
+        invitationStatusDialog.config = {};
+        setConfig('sortBy', l[16100]);
+        setConfig('sortDir', 1);
+    }
     $table.empty();
 
     $dialog.find('.fm-dialog-close').rebind('click', invitationStatusDialog);
@@ -11525,40 +11560,90 @@ function invitationStatusDialog(close) {
     var locFmt = "Encourage your friend to register and install a MEGA app. As long as your friend uses the same email address as you've entered, you will receive your free [S]@@[/S] of storage space and [S]@@[/S] of transfer quota.".replace(/\[S\]/g, '<span>').replace(/\[\/S\]/g, '</span>');
     $('.hint', $dialog).safeHTML(locFmt, bytesToSize(maf[0], 0), bytesToSize(maf[1], 0));
 
-    $('.button.invite-more', $dialog).rebind('click', function() {
-        closeDialog();
-        inviteFriendDialog();
-        return false;
-    });
+    // Due specific M.maf.rwds structure sorting must be done respecting it
+    var getSortByMafEmailFn = function () {
+        var sortfn;
 
-    var reinvite = function(email, $row) {
-        email = String(email).trim();
-        var opc = M.findOutgoingPendingContactIdByEmail(email);
-
-        if (opc) {
-            M.reinvitePendingContactRequest(email);
-        }
-        else {
-            console.warn('No outgoing pending contact request for %s', email);
-        }
-
-        $('.date div', $row).fadeOut(700);
-    };
-    $('.button.reinvite-all', $dialog).rebind('click', function() {
-        $('.table-row', $table).each(function(idx, $row) {
-            $row = $($row);
-
-            if ($('.date div', $row).length) {
-                reinvite($('.email strong', $row).text(), $row);
+        sortfn = function (a, b, d) {
+            if (typeof a.m[0] == 'string' && typeof b.m[0] == 'string') {
+                return a.m[0].localeCompare(b.m[0]) * d;
             }
-        });
-        $(this).addClass('hidden');
-        return false;
-    });
+            else {
+                return -1;
+            }
+        };
 
-    var ach = mega.achievem;
-    var maf = M.maf;
-    maf = maf[ach.ACH_INVITE];
+        return sortfn;
+    };
+
+    /**
+     * getSortByMafStatusFn, sort by .c and .csu attrs
+     */
+    var getSortByMafStatusFn = function () {
+        var sortfn;
+
+        sortfn = function(a, b, d) {
+
+            var compare = function (x, y, d) {
+                if (x < y) {
+                    return (-1 * d);
+                }
+                else if (x > y) {
+                    return d;
+                }
+                else {
+                    return 0;
+                }
+            };
+
+            if (a.c && b.c) {
+                return compare(a.c, b.c);
+            }
+            else if (a.c && !b.c) {
+                return d;
+            }
+            else if (!a.c && b.c) {
+                return (-1 * d);
+            }
+
+            // No completed, search for .csu contact signed up
+            else {
+                if (a.csu && b.csu) {
+                    return compare(a.csu, b.csu);
+                }
+                else if (a.csu && !b.csu) {
+                    return d;
+                }
+                else if (!a.csu && b.csu) {
+                    return (-1 * d);
+                }
+
+                // No completed and not signed up, sort by challenge timestamp
+                else {
+                    return compare(a.ts, b.ts);
+                }
+            }
+        };
+
+        return sortfn;
+    };
+
+    var sortFn = getSortByMafEmailFn();
+    var sortBy = getConfig().sortBy;
+
+    if (sortBy === l[89]) {// Status
+        sortFn = getSortByMafStatusFn();
+    }
+    else if (sortBy === l[16100]) {// Date Sent
+        sortFn = M.getSortByDateTimeFn();
+    }
+
+    maf.rwds.sort(
+        function (a, b) {
+            return sortFn(a, b, getConfig().sortDir);
+        }
+    );
+
     var rwds = maf.rwds;
     var rlen = rwds.length;
 
@@ -11570,39 +11655,42 @@ function invitationStatusDialog(close) {
         $('.date span', $tmpl).text(time2date(rwd.ts));
 
         // If no pending (the invitee signed up)
-        if (rwd.csu) {
-
-            if (rwd.c) {
-                // Granted
+        if (rwd.csu) {// csu - contact (invitee) signed up
+            if (rwd.c) {// c - completed, time elapsed from time when app is installed
 
                 $('.status', $tmpl)
                     .safeHTML(
-                        '<strong class="green">@@</strong>' +
-                        '<span class="light-grey"></span>',
-                        'Quota Granted');
+                    '<strong class="green">@@</strong>' +
+                    '<span class="light-grey"></span>',
+                    l[16105]);// Quota Granted
 
                 var expiry = rwd.expiry || maf.expiry;
                 var locFmt = '(Expires in [S]@@[/S] @@)'.replace('[S]', '').replace('[/S]', '');
                 $('.status .light-grey', $tmpl)
                     .safeHTML(locFmt, expiry.value, expiry.utxt);
 
-                $('.icon i', $tmpl).removeClass('dots').addClass('tick');
+                $('.icon i', $tmpl).addClass('tick');
             }
-            else {
-                // Pending APP Install
-                $('.status', $tmpl)
-                    .safeHTML('<strong class="orange">@@</span>', 'Pending App Install');
+            else {// Pending APP Install
 
-                $('.icon i', $tmpl).removeClass('dots').addClass('exclamation-point');
+                $('.status', $tmpl)
+                    .safeHTML('<strong class="orange">@@</span>', l[16104]);// Pending App Install
+
+                $('.icon i', $tmpl).addClass('exclamation-point');
             }
 
             // Remove reinvite button
             $('.date div', $tmpl).remove();
         }
-        else {
-            // Pending
+        else {// Pending
 
-            $('.date div', $tmpl).rebind('click', function() {
+            $('.status', $tmpl)
+                .safeHTML('<strong >@@</span>', l[7379]);// Pending
+
+            $('.icon i', $tmpl).addClass('dots');
+
+            // In case that time-limit is not
+            $('.date div', $tmpl).rebind('click', function () {
                 var $row = $(this).closest('.table-row');
 
                 reinvite($('.email strong', $row).text(), $row);
@@ -11620,15 +11708,80 @@ function invitationStatusDialog(close) {
     // Init scroll
     var $contentBlock = $dialog.find('.table-bg');
 
-    if ($contentBlock.height() > 384) {
-        $table.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
+    if ($contentBlock.height() > 384) {// ToDo: how 384 is calculated?
+        $table.jScrollPane({ enableKeyboardNavigation: false, showArrows: true, arrowSize: 5 });
     }
     else {
         deleteScrollPanel($scrollBlock, 'jsp');
     }
 
     // Dialog aligment
-    $dialog.css('margin-top', '-' + $dialog.outerHeight()/2 + 'px');
+    $dialog.css('margin-top', '-' + $dialog.outerHeight() / 2 + 'px');
+
+    $('.button.invite-more', $dialog).rebind('click', function () {
+        closeDialog();
+        inviteFriendDialog();
+        return false;
+    });
+
+    $('.button.reinvite-all', $dialog).rebind('click', function () {
+        $('.table-row', $table).each(function (idx, $row) {
+            $row = $($row);
+
+            if ($('.date div', $row).length) {
+                reinvite($('.email strong', $row).text(), $row);
+            }
+        });
+        $(this).addClass('hidden');
+        return false;
+    });
+
+    // Click on sort column Email, Status or Date Sent
+    $('.header .table-cell', $dialog).rebind('click', function () {
+
+        $this = $(this);
+        var config = getConfig();
+        var $elem = $this.find('span');
+        var sortBy = $elem.text();
+        var sortClass = 'asc';
+
+        // Do not sort for first colum
+        if (!sortBy) {
+            return false;
+        }
+
+        if (config.sortBy === sortBy) {
+            setConfig('sortDir', config.sortDir*(-1))
+        }
+        else {
+            setConfig('sortBy', sortBy);
+            setConfig('sortDir', 1);
+        }
+
+        if (config.sortDir === -1) {
+            sortClass = 'desc';
+        }
+
+        $('.invitation-dialog.table-cell span', $dialog).removeClass('asc desc');
+        $($elem).addClass(sortClass);
+
+        // Repaint dialog
+        invitationStatusDialog();
+    });
+
+    var reinvite = function (email, $row) {
+        var email = String(email).trim();
+        var opc = M.findOutgoingPendingContactIdByEmail(email);
+
+        if (opc) {
+            M.reinvitePendingContactRequest(email);
+        }
+        else {
+            console.warn('No outgoing pending contact request for %s', email);
+        }
+
+        $('.date div', $row).fadeOut(700);
+    };
 }
 
 var previews = {};
@@ -12240,7 +12393,7 @@ function fm_resize_handler() {
         }
         else if ($mainBlock.width() < 850) {
             $mainBlock.addClass('ultra low-width');
-        }    
+        }
         initDashboardScroll();
     }
     else {
@@ -12580,24 +12733,22 @@ function contactUI() {
             e.calculatePosition = true;
             $.selected = [location.hash.replace('#fm/', '')];
             searchPath();
-            contextMenuUI(e, 4);
+            if (!$(this).hasClass('active')) {
+                contextMenuUI(e, 4);
+                $(this).addClass('active');
+            }
+            else {
+                $.hideContextMenu();
+                $(this).removeClass('active');
+            }
         });
 
         // Display the current fingerpring
         showAuthenticityCredentials(user);
 
         // Set authentication state of contact from authring.
-        var authringPromise = new MegaPromise();
-        if (u_authring.Ed25519) {
-            authringPromise.resolve();
-        }
-        else {
-            // First load the authentication system.
-            var authSystemPromise = authring.initAuthenticationSystem();
-            authringPromise.linkDoneAndFailTo(authSystemPromise);
-        }
-        /** To be called on settled authring promise. */
-        var _setVerifiedState = function() {
+        // To be called on settled authring promise.
+        authring.onAuthringReady('contactUI').done(function _setVerifiedState() {
 
             var handle = user.u || user;
             var verificationState = u_authring.Ed25519[handle] || {};
@@ -12613,8 +12764,7 @@ function contactUI() {
                 // Otherwise show the Verify... button.
                 enableVerifyFingerprintsButton(handle);
             }
-        };
-        authringPromise.done(_setVerifiedState);
+        });
 
         // Reset seen or verified fingerprints and re-enable the Verify button
         $('.fm-reset-stored-fingerprint').rebind('click', function() {

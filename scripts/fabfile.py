@@ -30,7 +30,7 @@ from fabric.api import *
 env.target_dir = '/var/www'
 
 BETA_HOST = 'deployer@beta.mega.nz'
-BETA_DEV_HOST = 'deployer@beta.developers.mega.co.nz'
+BETA_DEV_HOST = 'deployer@beta.developers.mega.co.nz:28999'
 SANDBOX3_HOST = 'deployer@sandbox3.developers.mega.co.nz'
 
 

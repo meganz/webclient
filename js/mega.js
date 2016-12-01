@@ -1999,6 +1999,9 @@ function MegaData()
                     }
                 }
             }// END of for folders loop
+
+            // Tree view DOM elements events listeners update
+            treeUI();
         }
     };// END buildtree()
 
@@ -5786,6 +5789,7 @@ function execsc() {
     var n, i;
     var tick = Date.now();
     var tickcount = 0;
+    var updateRights = false;
 
     do {
         if (!scq[scqtail] || !scq[scqtail][0] || (scq[scqtail][0].a == 't' && nodesinflight[scqtail])) {
@@ -6064,6 +6068,7 @@ function execsc() {
                                         n.r = a.r;
                                         n.su = a.o;
                                         M.nodeUpdated(n);
+                                        updateRights = true;
                                     }
                                     else {
                                         if (d) {
@@ -6110,6 +6115,11 @@ function execsc() {
                         if (fminitialized) {
                             M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
                             sharedUInode(a.n);
+
+                            // Inshares permission DOM update
+                            if (updateRights) {
+                                sharedFolderUI();
+                            }
                         }
                     }
                     break;

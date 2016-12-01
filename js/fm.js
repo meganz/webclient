@@ -2440,10 +2440,10 @@ function initContextUI() {
 
     $('.context-menu-section').off('mouseover', '.context-menu-item');
     $('.context-menu-section').on('mouseover', '.context-menu-item', function() {
-        var $this = $(this),
-            pos = $this.offset(),
-            menuPos,
-            currentId;
+        var $this = $(this);
+        var pos = $this.offset();
+        var menuPos;
+        var currentId;
 
         // Hide opened submenus
         if (!$this.parent().parent().hasClass('context-submenu')) {

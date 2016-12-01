@@ -5047,10 +5047,6 @@
         "text": "File import failed",
         "context": "Message of the dialog displayed when fails the process\/request to import an image."
     },
-    "2508": {
-        "text": "File import failed",
-        "context": "Title of the dialog displayed when fails the process\/request to import an image - (String as short as possible)."
-    },
     "2531": {
         "text": "Save image to photos",
         "context": "Title of the dialog displayed when a user want to save a image to the 'saved pictures' album, asking for confirmation to do it - (String as short as possible)."
@@ -15074,5 +15070,29 @@
     "16099": {
         "text": "You can reset your password by following the recovery link that will be sent to your email.",
         "context": "Text of the alert dialog to inform the user that have to check the email after clicking the option forgot password"
+    },
+    "16100": {
+        "text": "Date Sent",
+        "context": "A table column header which shows the date and time when the contact request was sent."
+    },
+    "16101": {
+        "text": "Invitation Status",
+        "context": "A dialog title on the achievements page for the invitation status of contacts."
+    },
+    "16102": {
+        "text": "Invite more friends",
+        "context": "A button on the invitation dialog of the achievements page."
+    },
+    "16103": {
+        "text": "Reinvite all pending",
+        "context": "A button on the invitation dialog of the achievements page."
+    },
+    "16104": {
+        "text": "Pending App Install",
+        "context": "An invitation status on the invitation dialog of the achievements page."
+    },
+    "16105": {
+        "text": "Quota Granted",
+        "context": "The invitation status on the invitation dialog of the achievements page."
     }
 }

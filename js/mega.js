@@ -6098,7 +6098,7 @@ function execsc() {
                         if (prockey) {
                             var nodes = fm_getnodes(a.n, true);
 
-                            for (i = a.length; i--; ) {
+                            for (i = nodes.length; i--; ) {
                                 if (n = M.d[nodes[i]]) {
                                     if (typeof n.k == 'string') {
                                         crypto_decryptnode(n);

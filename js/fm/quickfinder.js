@@ -5,8 +5,8 @@
  *
  * @param searchable_elements selector/elements a list/selector of elements which should be searched for the user
  * specified key press character
- * @param containers selector/elements a list/selector of containers to which the input field will be centered (the code
- * will dynamically detect and pick the :visible container)
+ * @param containers selector/elements a list/selector of containers to which the input field will be centered
+ * (the code will dynamically detect and pick the :visible container)
  *
  * @returns {*}
  * @constructor

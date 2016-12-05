@@ -26,7 +26,10 @@ function initAccountScroll(scroll)
 
 function initGridScrolling()
 {
-    $('.grid-scrolling-table').filter(":not(.megaList,.megaListContainer)").jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
+    $('.grid-scrolling-table')
+        .filter(":not(.megaList,.megaListContainer)")
+        .jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
+
     jScrollFade('.grid-scrolling-table:not(.megaList,.megaListContainer)');
 }
 

@@ -1,12 +1,10 @@
-
-
 /**
  * This should take care of flagging the LAST selected item in those cases:
  *
  *  - jQ UI $.selectable's multi selection using drag area (integrated using jQ UI $.selectable's Events)
  *
- *  - Single click selection (integrated by assumption that the .get_currently_selected will also try to cover this case
- *  when there is only one .ui-selected...this is how no other code had to be changed :))
+ *  - Single click selection (integrated by assumption that the .get_currently_selected will also try to cover this
+ *  case when there is only one .ui-selected...this is how no other code had to be changed :))
  *
  *  - Left/right/up/down keys (integrated by using the .set_currently_selected and .get_currently_selected public
  *  methods)
@@ -218,7 +216,9 @@ var SelectionManager = function($selectable, resume) {
             currentViewIds.push(v.h);
         });
 
-        var items_per_row = Math.floor($('.file-block').parent().outerWidth() / $('.file-block:first').outerWidth(true));
+        var items_per_row = Math.floor(
+            $('.file-block').parent().outerWidth() / $('.file-block:first').outerWidth(true)
+        );
 
         var current = this.get_currently_selected("first");
         var current_idx = currentViewIds.indexOf(current);

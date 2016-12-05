@@ -1952,6 +1952,13 @@ var exportExpiry = {
         var $nodeId = $('#' + nodeId);
         var $tree = $('#treea_' + nodeId);
 
+        if ($nodeId.length === 0) {
+            // not inserted in the DOM, retrieve the nodeMap cache and update that DOM node instead.
+            if (M.megaRender && M.megaRender.nodeMap && M.megaRender.nodeMap[nodeId]) {
+                $nodeId = $(M.megaRender.nodeMap[nodeId]);
+            }
+        }
+
         if (!$nodeId.length && !$tree.length) {
             self.logger.warn('No DOM Node matching "%s"', nodeId);
 
@@ -1983,12 +1990,19 @@ var exportExpiry = {
      * @param {String} nodeId
      */
     UiExportLink.prototype.removeExportLinkIcon = function(nodeId) {
+        var $node = $('#' + nodeId);
+        if ($node.length === 0) {
+            // not inserted in the DOM, retrieve the nodeMap cache and update that DOM node instead.
+            if (M.megaRender && M.megaRender.nodeMap && M.megaRender.nodeMap[nodeId]) {
+                $node = $(M.megaRender.nodeMap[nodeId]);
+            }
+        }
 
         // Remove link icon from list view
-        $('#' + nodeId).removeClass('linked').find('.own-data').removeClass('linked');
+        $node.removeClass('linked').find('.own-data').removeClass('linked');
 
         // Remove link icon from grid view
-        $('#' + nodeId + '.file-block').removeClass('linked');
+        $node.filter('.file-block').removeClass('linked');
 
         // Remove link icon from left panel
         $('#treeli_' + nodeId + ' span').removeClass('linked');
@@ -2030,6 +2044,9 @@ var exportExpiry = {
         // Add taken-down to block view
         $('#' + nodeId + '.file-block').addClass('taken-down');
 
+        if (M.megaRender && M.megaRender.nodeMap && M.megaRender.nodeMap[nodeId]) {
+            $(M.megaRender.nodeMap[nodeId]).addClass('take-down');
+        }
         // Add taken-down to left panel
         $('#treea_' + nodeId).addClass('taken-down');
 
@@ -2065,6 +2082,9 @@ var exportExpiry = {
      * @param {String} nodeId
      */
     UiExportLink.prototype.removeTakenDownIcon = function(nodeId) {
+        if (M.megaRender && M.megaRender.nodeMap && M.megaRender.nodeMap[nodeId]) {
+            $(M.megaRender.nodeMap[nodeId]).removeClass('take-down');
+        }
 
         // Add taken-down to list view
         $('.grid-table.fm #' + nodeId).removeClass('taken-down');

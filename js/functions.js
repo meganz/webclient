@@ -5212,3 +5212,10 @@ var debounce = function(func, execAsap) {
         timeout = requestAnimationFrame(delayed);
     };
 };
+
+function array_diff(old_arr, new_arr) {
+    return {
+        'removed': old_arr.filter(function(v) { return new_arr.indexOf(v) < 0; }),
+        'added': new_arr.filter(function(v) { return old_arr.indexOf(v) < 0; }),
+    };
+};

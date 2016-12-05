@@ -26,8 +26,8 @@ function initAccountScroll(scroll)
 
 function initGridScrolling()
 {
-    $('.grid-scrolling-table').jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
-    jScrollFade('.grid-scrolling-table');
+    $('.grid-scrolling-table').filter(":not(.megaList,.megaListContainer)").jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
+    jScrollFade('.grid-scrolling-table:not(.megaList,.megaListContainer)');
 }
 
 function initSelectScrolling(scrollBlock)
@@ -38,8 +38,8 @@ function initSelectScrolling(scrollBlock)
 
 function initFileblocksScrolling()
 {
-    $('.file-block-scrolling').jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
-    jScrollFade('.file-block-scrolling');
+    $('.file-block-scrolling').filter(":not(.megaList)").jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
+    jScrollFade('.file-block-scrolling:not(.megaList)');
 }
 
 function initFileblocksScrolling2()
@@ -262,11 +262,16 @@ function treeDroppable()
 function cacheselect()
 {
     $.selected = [];
-    $($.selectddUIgrid + ' ' + $.selectddUIitem).each(function(i, o) {
-        if ($(o).hasClass('ui-selected')) {
-            $.selected.push($(o).attr('id'));
-        }
-    });
+    if (selectionManager) {
+        $.selected = selectionManager.selected_list;
+    }
+    else {
+        $($.selectddUIgrid + ' ' + $.selectddUIitem).each(function (i, o) {
+            if ($(o).hasClass('ui-selected')) {
+                $.selected.push($(o).attr('id'));
+            }
+        });
+    }
 }
 
 function hideEmptyGrids() {
@@ -287,6 +292,9 @@ function reselect(n)
         {
             $('#' + $.selected[i] + ' .grid-status-icon').addClass('new');
             $('#' + $.selected[i] + ' .file-status-icon').addClass('new');
+        }
+        if (selectionManager) {
+            selectionManager.add_to_selection($.selected[i]);
         }
     }
     if (n)
@@ -1251,6 +1259,14 @@ function hideTransferToast ($toast) {
     $('.toast-notification').removeClass('second');
 }
 
+function removeUInodeIfInCurrentView(h) {
+    if (!M.d[h]) {
+        return;
+    }
+
+    $("#" + h).remove();
+};
+
 function removeUInode(h, parent) {
 
     var n = M.d[h],
@@ -1311,7 +1327,7 @@ function removeUInode(h, parent) {
             }
 
             // Remove item
-            $('#' + h).remove();
+            removeUInodeIfInCurrentView(h);
 
             // Remove folder and subfolders
             $('#treeli_' + h).remove();
@@ -1326,7 +1342,7 @@ function removeUInode(h, parent) {
             }
 
             // Remove item
-            $('#' + h).remove();
+            removeUInodeIfInCurrentView(h);
 
             // Remove folder and subfolders
             $('#treeli_' + h).remove();
@@ -1340,7 +1356,9 @@ function removeUInode(h, parent) {
             if (i == 0 && n) {
                 $('#treea_' + n.p).removeClass('contains-folders expanded');
             }
-            $('#' + h).remove();// remove item
+
+            removeUInodeIfInCurrentView(h);
+
             $('#treeli_' + h).remove();// remove folder and subfolders
             if (!hasItems) {
                 if (sharedFolderUI()) {
@@ -4695,7 +4713,7 @@ function avatarDialog(close)
     });
 }
 
-function gridUI() {
+function gridUI(refresh) {
     if (M.chat)
         return;
     if (d)
@@ -4707,7 +4725,14 @@ function gridUI() {
 
     $.gridHeader = function() {
         var headerColumn = '';
-        $('.grid-table tr:first-child td:visible').each(function(i, e) {
+        var $firstChildTd = $('.grid-table tr:first-child td:visible');
+        if ($firstChildTd.size() === 0) {
+            // if the first <tr> does not contain any TDs, pick the next one
+            // this can happen when MegaList's prepusher (empty <TR/> is first)
+            $firstChildTd = $('.grid-table tr:nth-child(2) td:visible');
+        }
+
+        $firstChildTd.each(function(i, e) {
             headerColumn = $('.grid-table-header th').get(i);
             $(headerColumn).width($(e).width());
         });
@@ -4890,720 +4915,18 @@ function gridUI() {
     else if (String(M.currentdirid).length === 11 && M.currentrootid == 'contacts')
         $.selectddUIgrid = '.files-grid-view.contact-details-view .grid-scrolling-table';
     else
-        $.selectddUIgrid = '.files-grid-view.fm .grid-scrolling-table';
+        $.selectddUIgrid = '.files-grid-view.fm .grid-scrolling-table tbody';
 
     $.selectddUIitem = 'tr';
-    Soon(selectddUI);
+    if (refresh) {
+        selectddUI(true);
+    }
+    else {
+        Soon(selectddUI);
+    }
 
     if (d)
         console.timeEnd('gridUI');
-}
-
-/**
- * Really simple shortcut logic for select all, copy, paste, delete
- *
- * @constructor
- */
-function FMShortcuts() {
-
-    var current_operation = null;
-
-    // unbind if already bound.
-    $(window).unbind('keydown.fmshortcuts');
-
-    // bind
-    $(window).bind('keydown.fmshortcuts', function(e) {
-
-        if (!is_fm())
-            return true;
-
-        e = e || window.event;
-
-        // DO NOT start the search in case that the user is typing something in a form field... (eg.g. contacts -> add
-        // contact field)
-        if ($(e.target).is("input, textarea, select") || $.dialog) {
-            return;
-        }
-        var charCode = e.which || e.keyCode; // ff
-        var charTyped = String.fromCharCode(charCode).toLowerCase();
-
-        if (charTyped == "a" && (e.ctrlKey || e.metaKey)) {
-            if (typeof selectionManager != 'undefined' && selectionManager) {
-                selectionManager.select_all();
-            }
-            return false; // stop prop.
-        } else if (
-            (charTyped == "c" || charTyped == "x") &&
-            (e.ctrlKey || e.metaKey)
-            ) {
-            var $items = selectionManager.get_selected();
-            if ($items.size() == 0) {
-                return; // dont do anything.
-            }
-
-            current_operation = {
-                'op': charTyped == "c" ? 'copy' : 'cut',
-                'src': $items
-            };
-            return false; // stop prop.
-        } else if (charTyped == "v" && (e.ctrlKey || e.metaKey)) {
-            if (!current_operation) {
-                return false; // stop prop.
-            }
-
-            $.each(current_operation.src, function(k, v) {
-                if (current_operation.op == "copy") {
-                    M.copyNodes([$(v).attr('id')], M.currentdirid);
-                } else if (current_operation.op == "cut") {
-                    M.moveNodes([$(v).attr('id')], M.currentdirid);
-                }
-            });
-
-            if (current_operation.op == "cut") {
-                current_operation = null;
-            }
-
-            return false; // stop prop.
-        } else if (charCode == 8) {
-            var $items = selectionManager.get_selected();
-            if ($items.size() == 0 || (RightsbyID(M.currentdirid || '') | 0) < 1) {
-                return; // dont do anything.
-            }
-
-            $.selected = [];
-            $items.each(function() {
-                $.selected.push($(this).attr('id'));
-            });
-
-            fmremove();
-
-            // force remove, no confirmation
-            if (e.ctrlKey || e.metaKey) {
-                $('#msgDialog:visible .fm-dialog-button.confirm').trigger('click');
-            }
-
-            return false;
-        }
-
-    });
-}
-
-/**
- * Simple way for searching for nodes by their first letter.
- *
- * PS: This is meant to be somehow reusable.
- *
- * @param searchable_elements selector/elements a list/selector of elements which should be searched for the user
- * specified key press character
- * @param containers selector/elements a list/selector of containers to which the input field will be centered (the code
- * will dynamically detect and pick the :visible container)
- *
- * @returns {*}
- * @constructor
- */
-var QuickFinder = function(searchable_elements, containers) {
-    var self = this;
-
-    var DEBUG = false;
-
-    self._is_active = false; // defined as a prop of this. so that when in debug mode it can be easily accessed from
-    // out of this scope
-
-    var last_key = null;
-    var next_idx = 0;
-
-    // hide on page change
-    $(window).unbind('hashchange.quickfinder');
-    $(window).bind('hashchange.quickfinder', function() {
-        if (self.is_active()) {
-            self.deactivate();
-        }
-    });
-
-    // unbind if already bound.
-    $(window).unbind('keypress.quickFinder');
-
-    // bind
-    $(window).bind('keypress.quickFinder', function(e) {
-
-        e = e || window.event;
-        // DO NOT start the search in case that the user is typing something in a form field... (eg.g. contacts -> add
-        // contact field)
-        if ($(e.target).is("input, textarea, select") || $.dialog)
-            return;
-
-        var charCode = e.which || e.keyCode; // ff
-
-        if (
-            (charCode >= 48 && charCode <= 57) ||
-            (charCode >= 65 && charCode <= 123) ||
-            charCode > 255
-            ) {
-            var charTyped = String.fromCharCode(charCode);
-
-            // get the currently visible container
-            var $container = $(containers).filter(":visible");
-            if ($container.size() == 0) {
-                // no active container, this means that we are receiving events for a page, for which we should not
-                // do anything....
-                return;
-            }
-
-            self._is_active = true;
-
-            $(self).trigger("activated");
-
-            var $found = $(searchable_elements).filter(":visible:istartswith('" + charTyped + "')");
-
-            if (
-                /* repeat key press, but show start from the first element */
-                    (last_key != null && ($found.size() - 1) <= next_idx)
-                    ||
-                    /* repeat key press is not active, should reset the target idx to always select the first element */
-                        (last_key == null)
-                        ) {
-                    next_idx = 0;
-                    last_key = null;
-                } else if (last_key == charTyped) {
-                    next_idx++;
-                } else if (last_key != charTyped) {
-                    next_idx = 0;
-                }
-                last_key = charTyped;
-
-                $(searchable_elements).parents(".ui-selectee, .ui-draggable").removeClass('ui-selected');
-
-                var $target_elm = $($found[next_idx]);
-
-                $target_elm.parents(".ui-selectee, .ui-draggable").addClass("ui-selected");
-
-                var $jsp = $target_elm.getParentJScrollPane();
-                if ($jsp) {
-                    var $scrolled_elm = $target_elm.parent("a");
-
-                    if ($scrolled_elm.size() == 0) { // not in icon view, its a list view, search for a tr
-                        $scrolled_elm = $target_elm.parents('tr:first');
-                    }
-                    $jsp.scrollToElement($scrolled_elm);
-                }
-
-                $(self).trigger('search');
-
-                if ($target_elm && $target_elm.size() > 0) {
-                    // ^^ DONT stop prop. if there are no found elements.
-                    return false;
-                }
-            }
-            else if (charCode >= 33 && charCode <= 36)
-            {
-                var e = '.files-grid-view.fm';
-                if (M.viewmode == 1)
-                    e = '.fm-blocks-view.fm';
-
-                if ($(e + ':visible').length)
-                {
-                    e = $('.grid-scrolling-table:visible, .file-block-scrolling:visible');
-                    var jsp = e.data('jsp');
-
-                    if (jsp)
-                    {
-                        switch (charCode)
-                        {
-                            case 33: /* Page Up   */
-                                jsp.scrollByY(-e.height(), !0);
-                                break;
-                            case 34: /* Page Down */
-                                jsp.scrollByY(e.height(), !0);
-                                break;
-                            case 35: /* End       */
-                                jsp.scrollToBottom(!0);
-                                break;
-                            case 36: /* Home      */
-                                jsp.scrollToY(0, !0);
-                                break;
-                        }
-                    }
-                }
-            }
-        });
-
-    // hide the search field when the user had clicked somewhere in the document
-    $(document.body).delegate('> *', 'mousedown', function(e) {
-        if (!is_fm()) {
-            return;
-        }
-        if (self.is_active()) {
-            self.deactivate();
-            return false;
-        }
-    });
-
-    // use events as a way to communicate with this from the outside world.
-    self.deactivate = function() {
-        self._is_active = false;
-        $(self).trigger("deactivated");
-    };
-
-    self.is_active = function() {
-        return self._is_active;
-    };
-
-    self.disable_if_active = function() {
-        if (self.is_active()) {
-            self.deactivate();
-        }
-    };
-
-    return this;
-};
-
-var quickFinder = new QuickFinder(
-    '.tranfer-filetype-txt, .file-block-title, td span.contacts-username',
-    '.files-grid-view, .fm-blocks-view.fm, .contacts-grid-table'
-    );
-
-/**
- * This should take care of flagging the LAST selected item in those cases:
- *
- *  - jQ UI $.selectable's multi selection using drag area (integrated using jQ UI $.selectable's Events)
- *
- *  - Single click selection (integrated by assumption that the .get_currently_selected will also try to cover this case
- *  when there is only one .ui-selected...this is how no other code had to be changed :))
- *
- *  - Left/right/up/down keys (integrated by using the .set_currently_selected and .get_currently_selected public
- *  methods)
- *
- * @param $selectable
- * @returns {*}
- * @constructor
- */
-var SelectionManager = function($selectable) {
-    var self = this;
-
-    $selectable.unbind('selectableselecting');
-    $selectable.unbind('selectableselected');
-    $selectable.unbind('selectableunselecting');
-    $selectable.unbind('selectableunselected');
-
-    /**
-     * Store all selected items in an _ordered_ array.
-     *
-     * @type {Array}
-     */
-    var selected_list = [];
-
-    /**
-     * Helper func to clear old reset state from other icons.
-     */
-    this.clear = function() {
-        $('.currently-selected', $selectable).removeClass('currently-selected');
-    };
-
-    this.clear(); // remove ANY old .currently-selected values.
-
-    /**
-     * The idea of this method is to _validate_ and return the .currently-selected element.
-     *
-     * @param first_or_last string ("first" or "last") by default will return the first selected element if there is
-     * not .currently-selected
-     *
-     * @returns {*|jQuery|HTMLElement}
-     */
-    this.get_currently_selected = function(first_or_last) {
-        if (!first_or_last) {
-            first_or_last = "first";
-        }
-
-        var $currently_selected = $('.currently-selected', $selectable);
-
-        if ($currently_selected.size() == 0) { // NO .currently-selected
-            return $('.ui-selected:' + first_or_last, $selectable);
-        } else if (!$currently_selected.is(".ui-selected")) { // validate that the currently selected is actually selected.
-            // if not, try to get the first_or_last .ui-selected item
-            var selected_elms = $('.ui-selected:' + first_or_last, $selectable);
-            return selected_elms;
-        } else { // everything is ok, we should return the .currently-selected
-            return $currently_selected;
-        }
-    };
-
-    /**
-     * Used from the shortcut keys code.
-     *
-     * @param element
-     */
-    this.set_currently_selected = function($element) {
-
-        self.clear();
-        $element.addClass("currently-selected");
-        quickFinder.disable_if_active();
-
-        // Do .scrollIntoView if the parent or parent -> parent DOM Element is a JSP.
-        {
-            var $jsp = $element.getParentJScrollPane();
-            if ($jsp) {
-                $jsp.scrollToElement($element);
-            }
-        }
-    };
-
-    /**
-     * Simple helper func, for selecting all elements in the current view.
-     */
-    this.select_all = function() {
-        $(window).trigger('dynlist.flush');
-        var $selectable_containers = $(
-            [
-                ".fm-transfers-block",
-                ".fm-blocks-view.fm",
-                ".fm-blocks-view.contacts-view",
-                ".files-grid-view.fm",
-                ".files-grid-view.contacts-view",
-                ".contacts-grid-view",
-                ".fm-contacts-blocks-view",
-                ".files-grid-view.contact-details-view",
-                ".shared-grid-view",
-                ".shared-blocks-view",
-                ".shared-details-block"
-            ].join(",")
-            ).filter(":visible");
-
-        var $selectables = $(
-            [
-                ".file-block",
-                "tr.ui-draggable",
-                "tr.ui-selectee",
-                ".contact-block-view.ui-draggable",
-                ".transfer-table tr"
-            ].join(","),
-            $selectable_containers
-            ).filter(":visible");
-
-        $selectables.addClass("ui-selected");
-    };
-
-    /**
-     * Use this to get ALL (multiple!) selected items in the currently visible view/grid.
-     */
-    this.get_selected = function() {
-        var $selectable_containers = $(
-            [
-                ".fm-blocks-view.fm",
-                ".fm-blocks-view.contacts-view",
-                ".files-grid-view.fm",
-                ".files-grid-view.contacts-view",
-                ".contacts-grid-view",
-                ".fm-contacts-blocks-view",
-                ".files-grid-view.contact-details-view"
-            ].join(",")
-            ).filter(":visible");
-
-        var $selected = $(
-            [
-                ".file-block",
-                "tr.ui-draggable",
-                "tr.ui-selectee",
-                ".contact-block-view.ui-draggable"
-            ].join(","),
-            $selectable_containers
-            ).filter(":visible.ui-selected");
-
-        return $selected;
-    };
-
-    /**
-     * Push the last selected item to the end of the selected_list array.
-     */
-    $selectable.bind('selectableselecting', function(e, data) {
-        var $selected = $(data.selecting);
-        selected_list.push(
-            $selected
-            );
-    });
-
-    /**
-     * Remove any unselected element from the selected_list array.
-     */
-    $selectable.bind('selectableunselecting', function(e, data) {
-        var $unselected = $(data.unselecting);
-        var idx = $.elementInArray($unselected, selected_list);
-
-        if (idx > -1) {
-            delete selected_list[idx];
-        }
-    });
-
-    /**
-     * After the user finished selecting the icons, flag the last selected one as .currently-selecting
-     */
-    $selectable.bind('selectablestop', function(e, data) {
-
-        self.clear();
-
-        // remove `undefined` from the list
-        selected_list = $.map(selected_list, function(n, i) {
-            if (n != undefined) {
-                return n;
-            }
-        });
-
-        // add the .currently-selected
-        if (selected_list.length > 0) {
-            $(selected_list[selected_list.length - 1]).addClass('currently-selected');
-        }
-        selected_list = []; // reset the state of the last selected items for the next selectablestart
-    });
-    return this;
-};
-
-var selectionManager;
-
-function UIkeyevents() {
-    $(window).unbind('keydown.uikeyevents');
-    $(window).bind('keydown.uikeyevents', function(e) {
-
-        if (e.keyCode == 9 && !$(e.target).is("input,textarea,select")) {
-            return false;
-        }
-
-        var sl = false, s;
-        if (M.viewmode) {
-            s = $('.file-block.ui-selected');
-        }
-        else {
-            s = $('.grid-table tr.ui-selected');
-        }
-        var selPanel = $('.fm-transfers-block tr.ui-selected');
-
-        if (M.chat) {
-            return true;
-        }
-
-        if (!is_fm() && (page !== 'login') && (page.substr(0, 3) !== 'pro')) {
-            return true;
-        }
-
-        /**
-         * Because of te .unbind, this can only be here... it would be better if its moved to iconUI(), but maybe some
-         * other day :)
-         */
-        if (!$.dialog && !slideshowid && M.viewmode == 1) {
-            var items_per_row = Math.floor($('.file-block').parent().outerWidth() / $('.file-block:first').outerWidth(true));
-            var total_rows = Math.ceil($('.file-block').size() / items_per_row);
-
-            if (e.keyCode == 37) {
-                // left
-                var current = selectionManager.get_currently_selected("first");
-                // clear old selection if no shiftKey
-                if (!e.shiftKey) {
-                    s.removeClass("ui-selected");
-                }
-                var $target_element = null;
-                if (current.length > 0 && current.prev(".file-block").length > 0) {
-                    $target_element = current.prev(".file-block");
-                }
-                else {
-                    $target_element = $('.file-block:last');
-                }
-                if ($target_element) {
-                    $target_element.addClass('ui-selected');
-                    selectionManager.set_currently_selected($target_element);
-                }
-            }
-            else if (e.keyCode == 39) {
-
-                // right
-                var current = selectionManager.get_currently_selected("last");
-                if (!e.shiftKey) {
-                    s.removeClass("ui-selected");
-                }
-                var $target_element = null;
-                var next = current.next(".file-block");
-
-                // clear old selection if no shiftKey
-                if (next.length > 0) {
-                    $target_element = next;
-                }
-                else {
-                    $target_element = $('.file-block:first');
-                }
-                if ($target_element) {
-                    $target_element.addClass('ui-selected');
-                    selectionManager.set_currently_selected($target_element);
-                }
-            }
-
-            // up & down
-            else if (e.keyCode == 38 || e.keyCode == 40) {
-                var current = selectionManager.get_currently_selected("first"),
-                    current_idx = $.elementInArray(current, $('.file-block')) + 1;
-
-                if (!e.shiftKey) {
-                    s.removeClass("ui-selected");
-                }
-
-                var current_row = Math.ceil(current_idx / items_per_row),
-                    current_col = current_idx % items_per_row,
-                    target_row;
-
-                if (e.keyCode == 38) { // up
-                    // handle the case when the users presses ^ and the current row is the first row
-                    target_row = current_row == 1 ? total_rows : current_row - 1;
-                } else if (e.keyCode == 40) { // down
-                    // handle the case when the users presses DOWN and the current row is the last row
-                    target_row = current_row == total_rows ? 1 : current_row + 1;
-                }
-
-                // calc the index of the target element
-                var target_element_num = ((target_row - 1) * items_per_row) + (current_col - 1),
-                    $target = $('.file-block:eq(' + target_element_num + ')');
-
-                $target.addClass("ui-selected");
-                selectionManager.set_currently_selected($target);
-            }
-        }
-
-        if ((e.keyCode == 38) && (s.length > 0) && ($.selectddUIgrid.indexOf('.grid-scrolling-table') > -1) && !$.dialog) {
-
-            // up in grid
-            if (e.shiftKey) {
-                $(e).addClass('ui-selected');
-            }
-            if ($(s[0]).prev().length > 0) {
-                if (!e.shiftKey) {
-                    $('.grid-table tr').removeClass('ui-selected');
-                }
-                $(s[0]).prev().addClass('ui-selected');
-                sl = $(s[0]).prev();
-
-                quickFinder.disable_if_active();
-            }
-        }
-        else if (e.keyCode == 40 && s.length > 0 && $.selectddUIgrid.indexOf('.grid-scrolling-table') > -1 && !$.dialog) {
-
-            // down in grid
-            if (e.shiftKey) {
-                $(e).addClass('ui-selected');
-            }
-            if ($(s[s.length - 1]).next().length > 0) {
-                if (!e.shiftKey) {
-                    $('.grid-table tr').removeClass('ui-selected');
-                }
-                $(s[s.length - 1]).next().addClass('ui-selected');
-                sl = $(s[0]).next();
-
-                quickFinder.disable_if_active();
-            }
-        }
-        else if (e.keyCode == 46 && s.length > 0 && !$.dialog && RightsbyID(M.currentdirid) > 1) {
-            $.selected = [];
-            s.each(function(i, e) {
-                $.selected.push($(e).attr('id'));
-            });
-            fmremove();
-        }
-        else if (e.keyCode == 46 && selPanel.length > 0 && !$.dialog && RightsbyID(M.currentdirid) > 1) {
-            var selected = [];
-            selPanel.each(function() {
-                selected.push($(this).attr('id'));
-            });
-            msgDialog('confirmation', l[1003], "Cancel " + selected.length + " transferences?", false, function(e) {
-
-                // we should encapsule the click handler
-                // to call a function rather than use this hacking
-                if (e) {
-                    $('.transfer-clear').trigger('click');
-                }
-            });
-        }
-        else if (e.keyCode == 13 && s.length > 0 && !$.dialog && !$.msgDialog && $('.fm-new-folder').attr('class').indexOf('active') == -1 && $('.top-search-bl').attr('class').indexOf('active') == -1) {
-            $.selected = [];
-            s.each(function(i, e) {
-                $.selected.push($(e).attr('id'));
-            });
-            if ($.selected && $.selected.length > 0) {
-                var n = M.d[$.selected[0]];
-                if (n && n.t) {
-                    M.openFolder(n.h);
-                }
-                else if ($.selected.length == 1 && M.d[$.selected[0]] && is_image(M.d[$.selected[0]])) {
-                    slideshow($.selected[0]);
-                }
-                else {
-                    M.addDownload($.selected);
-                }
-            }
-        }
-        else if ((e.keyCode === 13) && ($.dialog === 'share')) {
-
-            var share = new mega.Share();
-            share.updateNodeShares();
-        }
-        else if ((e.keyCode === 13) && ($.dialog === 'add-contact-popup')) {
-            addNewContact($('.add-user-popup-button.add'));
-        }
-        else if ((e.keyCode === 13) && ($.dialog === 'rename')) {
-            doRename();
-        }
-
-        // If the Esc key is pressed while the payment address dialog is visible, close it
-        else if ((e.keyCode === 27) && !$('.payment-address-dialog').hasClass('hidden')) {
-            addressDialog.closeDialog();
-        }
-        else if (e.keyCode == 27 && ($.copyDialog || $.moveDialog || $.copyrightsDialog)) {
-            closeDialog();
-        }
-        else if (e.keyCode == 27 && $.dialog) {
-            closeDialog();
-        }
-        else if (e.keyCode == 27 && $('.default-select.active').length) {
-            var $selectBlock = $('.default-select.active');
-            $selectBlock.find('.default-select-dropdown').fadeOut(200);
-            $selectBlock.removeClass('active');
-        }
-        else if (e.keyCode == 27 && $.msgDialog) {
-            closeMsg();
-            if ($.warningCallback) {
-                $.warningCallback(false);
-            }
-        }
-        else if ((e.keyCode == 13 && $.msgDialog == 'confirmation') && (e.keyCode == 13 && $.msgDialog == 'remove')) {
-            closeMsg();
-            if ($.warningCallback) {
-                $.warningCallback(true);
-            }
-        }
-        else if ((e.keyCode === 113 /* F2 */) && (s.length > 0) && !$.dialog && RightsbyID(M.currentdirid) > 1) {
-            $.selected = [];
-            s.each(function(i, e) {
-                $.selected.push($(e).attr('id'));
-            });
-            renameDialog();
-        }
-        else if (e.keyCode == 65 && e.ctrlKey && !$.dialog) {
-            $('.grid-table.fm tr').addClass('ui-selected');
-            $('.file-block').addClass('ui-selected');
-        }
-        else if (e.keyCode == 37 && slideshowid) {
-            slideshow_prev();
-        }
-        else if (e.keyCode == 39 && slideshowid) {
-            slideshow_next();
-        }
-        else if (e.keyCode == 27 && slideshowid) {
-            slideshow(slideshowid, true);
-        }
-        else if (e.keyCode == 27) {
-            $.hideTopMenu();
-        }
-
-        if (sl && $.selectddUIgrid.indexOf('.grid-scrolling-table') > -1) {
-            var jsp = $($.selectddUIgrid).data('jsp');
-            jsp.scrollToElement(sl);
-        }
-
-        searchPath();
-    });
 }
 
 function searchPath()
@@ -5687,7 +5010,7 @@ function searchPath()
     else $('.fm-blocks-view,.files-grid-view').removeClass('search');
 }
 
-function selectddUI() {
+function selectddUI(refresh) {
     if (M.currentdirid && M.currentdirid.substr(0, 7) === 'account') {
         return false;
     }
@@ -5735,24 +5058,33 @@ function selectddUI() {
                 $('body').addClass('dragging');
                 if (!$(this).hasClass('ui-selected'))
                 {
-                    $($.selectddUIgrid + ' ' + $.selectddUIitem).removeClass('ui-selected');
-                    $(this).addClass('ui-selected');
+                    if (selectionManager) {
+                        $($.selectddUIgrid + ' ' + $.selectddUIitem).removeClass('ui-selected');
+                        selectionManager.clear_selection();
+                        selectionManager.set_currently_selected($(this).attr('id'));
+                    }
+                    else {
+                        $($.selectddUIgrid + ' ' + $.selectddUIitem).removeClass('ui-selected');
+                        $(this).addClass('ui-selected');
+                    }
                 }
-                var s = $($.selectddUIgrid + ' .ui-selected'), max = ($(window).height() - 96) / 24, html = [];
+                var max = Math.floor(($(window).height() - 96) / 24);
+                var html = [];
                 $.selected = [];
-                s.each(function(i, e)
+                var selected = selectionManager.get_selected();
+                selected.forEach(function(id, i)
                 {
-                    var id = $(e).attr('id'), n = M.d[id];
+                    var n = M.d[id];
                     if (n) {
                         $.selected.push(id);
-                        if (max > i) {
+                        if (max > i + 1) {
                             html.push('<div class="transfer-filtype-icon ' + fileIcon(n) + ' tranfer-filetype-txt dragger-entry">' + str_mtrunc(htmlentities(n.name)) + '</div>');
                         }
                     }
                 });
-                if (s.length > max)
+                if (selected.length > max)
                 {
-                    $('.dragger-files-number').text(s.length);
+                    $('.dragger-files-number').text(selected.length);
                     $('.dragger-files-number').show();
                 }
                 $('#draghelper .dragger-content').html(html.join(""));
@@ -5784,6 +5116,9 @@ function selectddUI() {
                 if (d) console.log('draggable.stop');
                 $.gridDragging = $.draggingClass = false;
                 $('body').removeClass('dragging').removeClassWith("dndc-");
+                if (selectionManager) {
+                    selectionManager.clear_selection();
+                }
                 var origin = $.draggerOrigin;
                 setTimeout(function __onDragStop() {
                     if (M.currentdirid === 'contacts') {
@@ -5800,6 +5135,7 @@ function selectddUI() {
     $('.ui-selectable-helper').remove();
 
     $ddUIgrid.selectable({
+        autoRefresh: true,
         filter: $.selectddUIitem,
         start: function(e, u) {
             $.hideContextMenu(e);
@@ -5810,17 +5146,25 @@ function selectddUI() {
         }
     });
 
-    /**
-     * (Re)Init the selectionManager, because the .selectable() is reinitialized and we need to reattach to its
-     * events.
-     *
-     * @type {SelectionManager}
-     */
-
     if (!window.fmShortcuts) {
         window.fmShortcuts = new FMShortcuts();
     }
-    selectionManager = new SelectionManager($ddUIgrid);
+
+    if (!refresh) {
+        /**
+         * (Re)Init the selectionManager, because the .selectable() is reinitialized and we need to reattach to its
+         * events.
+         *
+         * @type {SelectionManager}
+         */
+
+        selectionManager = new SelectionManager($ddUIgrid, $.selected && $.selected.length > 0);
+        if ($.selected) {
+            $.selected.forEach(function(h) {
+                selectionManager.add_to_selection(h);
+            });
+        }
+    }
 
     $ddUIitem.rebind('contextmenu', function(e)
     {
@@ -5835,49 +5179,34 @@ function selectddUI() {
         return !!contextMenuUI(e, 1);
     });
 
-    $ddUIitem.rebind('click', function(e)
+    $ddUIitem.rebind('click.ddui', function(e)
     {
         if ($.gridDragging)
             return false;
-        var s = e.shiftKey && $($.selectddUIgrid + ' .ui-selected');
-        if (s && s.length > 0)
+        var s = e.shiftKey;
+        if (e.shiftKey)
         {
-            var start = s[0];
-            var end = this;
-            if ($.gridLastSelected && $($.gridLastSelected).attr('class').indexOf('ui-selected') > -1)
-                start = $.gridLastSelected;
-            else
-                $.gridLastSelected = this;
-            if ($(start).index() > $(end).index())
-            {
-                end = start;
-                start = this;
-            }
-            $($.selectddUIgrid + ' ' + $.selectddUIitem).removeClass('ui-selected');
-            $([start, end]).addClass('ui-selected');
-            $(start).nextUntil($(end)).each(function(i, e)
-            {
-                $(e).addClass('ui-selected');
-            });
-
-            selectionManager.set_currently_selected($(this));
+            selectionManager.shift_select_to($(this).attr('id'));
         }
         else if (e.ctrlKey == false && e.metaKey == false)
         {
             $($.selectddUIgrid + ' ' + $.selectddUIitem).removeClass('ui-selected');
             $(this).addClass('ui-selected');
             $.gridLastSelected = this;
-            selectionManager.set_currently_selected($(this));
+            selectionManager.clear_selection();
+            selectionManager.add_to_selection($(this).attr('id'));
         }
         else
         {
-            if ($(this).hasClass("ui-selected"))
+            if ($(this).hasClass("ui-selected")) {
                 $(this).removeClass("ui-selected");
+                selectionManager.remove_from_selection($(this).attr('id'));
+            }
             else
             {
                 $(this).addClass("ui-selected");
                 $.gridLastSelected = this;
-                selectionManager.set_currently_selected($(this));
+                selectionManager.add_to_selection($(this).attr('id'));
             }
         }
         searchPath();
@@ -5911,7 +5240,10 @@ function selectddUI() {
             console.log('jsp:!u', !!jsp);
         delete $.rmInitJSP;
     }
-    $.tresizer();
+    if (!refresh) {
+        $.tresizer();
+    }
+
     if (d) {
         console.timeEnd('selectddUI');
     }
@@ -5919,7 +5251,7 @@ function selectddUI() {
     $ddUIitem = $ddUIgrid = undefined;
 }
 
-function iconUI(aQuiet)
+function iconUI(aQuiet, refresh)
 {
     if (d) console.time('iconUI');
 
@@ -5955,7 +5287,6 @@ function iconUI(aQuiet)
     }
     else if (M.currentdirid === M.InboxID || RootbyId(M.currentdirid) === M.InboxID)
     {
-        //console.error("Inbox iconUI");
         if (M.v.length > 0)
         {
             $('.fm-blocks-view.fm').removeClass('hidden');
@@ -5971,7 +5302,7 @@ function iconUI(aQuiet)
     $('.fm-blocks-view, .shared-blocks-view').rebind('contextmenu.blockview', function(e)
     {
         $('.file-block').removeClass('ui-selected');
-        selectionManager.clear(); // is this required? don't we have a support for a multi-selection context menu?
+        selectionManager.clear_selection(); // is this required? don't we have a support for a multi-selection context menu?
         $.selected = [];
         $.hideTopMenu();
         return !!contextMenuUI(e, 2);
@@ -5997,7 +5328,8 @@ function iconUI(aQuiet)
         $.selectddUIgrid = '.file-block-scrolling';
         $.selectddUIitem = 'a';
     }
-    selectddUI();
+    selectddUI(refresh);
+
     if (d) console.timeEnd('iconUI');
 }
 
@@ -6884,7 +6216,6 @@ function scrollMegaSubMenu(e)
 
 function treeUI()
 {
-    //console.error('treeUI');
     if (d)
         console.time('treeUI');
     $('.fm-tree-panel .nw-fm-tree-item:visible').draggable(
@@ -7270,8 +6601,6 @@ function treeUIopen(id, event, ignoreScroll, dragOver, DragOpen) {
     var id_r = RootbyId(id);
     var id_s = id.split('/')[0];
     var e, scrollTo = false, stickToTop = false;
-
-    //console.error("treeUIopen", id);
 
     if (id_r === 'shares') {
         sectionUIopen('shared-with-me');
@@ -10889,7 +10218,10 @@ function fm_resize_handler() {
         $('.files-grid-view .grid-scrolling-table, .file-block-scrolling,' +
             ' .contacts-grid-view .contacts-grid-scrolling-table')
             .css({
-                'width': $(document.body).outerWidth() - $('.fm-left-panel').outerWidth()
+                'width': (
+                    $(document.body).outerWidth() - $('.fm-left-panel').outerWidth() -
+                    $('.nw-fm-left-icons-panel').outerWidth()
+                )
             });
 
         initTreeScroll();
@@ -11800,6 +11132,7 @@ function removeFromMultiInputDDL(dialog, item) {
                 var $parentElem = $self.parent();
 
                 if (e.keyCode === 27) {
+                    // esc
                     $parentElem.removeClass('filled-input');
                     $self.val('');
                     $self.blur();

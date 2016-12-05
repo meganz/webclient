@@ -5905,6 +5905,10 @@ th.grid-first-th {
     content: '';
     height: 12px;
 }
+.file-block-scrolling .megaList-content {
+    margin-bottom: 12px;
+}
+
 .file-block, .contact-block-view {
     height: 152px;
     width: 128px;
@@ -8502,7 +8506,7 @@ color: white;
     color: white;
     font-size: 11px;
     line-height: 13px;
-    display: none !important;
+    display: none;
 }
 .u-dfn {
     margin: -9px 0 0 39px;

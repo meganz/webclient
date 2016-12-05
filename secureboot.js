@@ -1629,6 +1629,10 @@ else if (!b_u)
 
     if (!is_mobile) {
         jsl.push({f:'css/style.css', n: 'style_css', j:2,w:30,c:1,d:1,cache:1});
+        jsl.push({f:'js/vendor/megalist.js', n: 'megalist_js', j:1,w:5});
+        jsl.push({f:'js/fm/keyevents.js', n: 'fm_keyevents_js', j:1,w:1});
+        jsl.push({f:'js/fm/quickfinder.js', n: 'fm_quickfinder_js', j:1,w:1});
+        jsl.push({f:'js/fm/selectionmanager.js', n: 'fm_selectionmanager_js', j:1,w:1});
         jsl.push({f:'js/fm.js', n: 'fm_js', j:1,w:12});
         jsl.push({f:'js/ui/miniui.js', n: 'miniui_js', j:1});
 
@@ -1647,6 +1651,7 @@ else if (!b_u)
         jsl.push({f:'js/notify.js', n: 'notify_js', j:1});
         jsl.push({f:'js/popunda.js', n: 'popunda_js', j:1});
         jsl.push({f:'css/user-card.css', n: 'user_card_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/fm-lists.css', n: 'fm_lists_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/avatars.css', n: 'avatars_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/icons.css', n: 'icons_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/buttons.css', n: 'buttons_css', j:2,w:5,c:1,d:1,cache:1});

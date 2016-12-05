@@ -1,7 +1,7 @@
 (function(scope) {
     "use strict"; /* jshint maxcomplexity:19, maxdepth:6 */
 
-    var DYNLIST_ENABLED = !0;
+    var DYNLIST_ENABLED = false;
     var logger;
 
     var viewModeTemplates = {
@@ -231,6 +231,7 @@
     function MegaRender(aViewMode) {
         var renderer;
         var section = 'cloud-drive';
+        var self = this;
 
         if (M.currentdirid === 'shares') {
 
@@ -268,6 +269,46 @@
         define(this, 'getNodeProperties',   this.nodeProperties[section] || this.nodeProperties['*']);
         define(this, 'dynListCache',        []);
         define(this, 'section',             section);
+
+        var megaListOptions = {
+            'itemRenderFunction': this.megaListRenderCb.bind(this),
+            'preserveOrderInDOM': true,
+            'extraRows': 2,
+            'onContentUpdated': function() {
+                self.throttledRefresh(aViewMode);
+            },
+            'perfectScrollOptions': {
+                'handlers': ['click-rail', 'drag-scrollbar', 'wheel', 'touch']
+            },
+        };
+
+        // only enable the MegaList for eventually longer lists as the cloud drive,
+        // shares, inbox, etc. (all of those set section to 'cloud-drive')
+        if (
+            section == 'cloud-drive'
+        ) {
+            var $megaListContainer;
+
+            if (this.viewmode) {
+                megaListOptions['itemWidth'] = 128 + 12 /* 12 = margin-left */;
+                megaListOptions['itemHeight'] = 152 + 12 /* 12 = margin-top */;
+                $megaListContainer = $('.fm-blocks-view.fm .file-block-scrolling');
+            }
+            else {
+                megaListOptions['itemWidth'] = false;
+                megaListOptions['itemHeight'] = 24;
+                megaListOptions['appendTo'] = 'table';
+                megaListOptions['renderAdapter'] = new MegaList.RENDER_ADAPTERS.Table();
+                $megaListContainer = $('.files-grid-view.fm .grid-scrolling-table');
+                if ($('.files-grid-view.fm .grid-scrolling-table table tbody').length === 0) {
+                    $('.files-grid-view.fm .grid-scrolling-table table').append($('<tbody></tbody>'));
+                }
+            }
+
+            if ($megaListContainer) {
+                define(this, 'megaList', new MegaList($megaListContainer, megaListOptions));
+            };
+        };
 
         var maxItemsInView; // used for the dynlist
         Object.defineProperty(this, 'maxItemsInView', {
@@ -312,8 +353,33 @@
 
         renderer = undefined;
     }
+    var refreshTimeout = false;
+
     MegaRender.prototype = Object.freeze({
         constructor: MegaRender,
+
+        /**
+         * A function, which would be called on every DOM update (or scroll). This func would implement
+         * throttling, so that we won't update the UI components too often.
+         *
+         * @param aViewMode {Number}
+         */
+        throttledRefresh: function(aViewMode) {
+
+            if (refreshTimeout) {
+                clearTimeout(refreshTimeout);
+            }
+            refreshTimeout = setTimeout(function() {
+                if (aViewMode === 0) {
+                    gridUI(true);
+                }
+                else {
+                    iconUI(false, true);
+                }
+                fm_thumbnails();
+                refreshTimeout = false;
+            }, 75);
+        },
 
         /**
          * Cleanup rendering layout.
@@ -433,7 +499,39 @@
 
             this.container = document.querySelector(viewModeContainers[this.section][this.viewmode]);
 
+            if (this.megaList) {
+                var ids = [];
+                aNodeList.forEach(function(v) {
+                    ids.push(v.h);
+                });
+
+                if (!aUpdate) {
+                    if (this.viewmode) {
+                        var $container = $('.fm-blocks-view.fm.fm');
+                        $('.files-grid-view.fm').addClass("hidden");
+                    }
+                    else {
+                        var $container = $('.files-grid-view.fm');
+                        $('.fm-blocks-view.fm.fm').addClass("hidden");
+                    }
+                    $container.addClass('megaListContainer');
+                    $container.removeClass("hidden");
+                    this.megaList.batchAdd(ids);
+                    this.megaList.initialRender();
+                }
+                else {
+                    // XX: some day, if we want updates to be more efficient, we can remove this piece of code and
+                    // manually trigger .remove/add from the actual action packets received.
+
+                    this.megaList.syncItemsFromArray(ids);
+                }
+            }
+
+
             if (!this.container) {
+                if (d) {
+                    console.error("Missing this.container in MegaRender. Stopping execution.");
+                }
                 siteLoadError(l[1311], this);
                 return 0;
             }
@@ -479,7 +577,12 @@
                 console.timeEnd('MegaRender.renderLayout');
             }
 
-            return this.numInsertedDOMNodes - inViewNodes;
+            if (!this.megaList) {
+                return this.numInsertedDOMNodes - inViewNodes;
+            }
+            else {
+                return aNodeList.length;
+            }
         },
 
         /**
@@ -490,6 +593,7 @@
          * @param {String} aHandle The ufs-node's handle
          */
         getDOMNode: function(aNode, aHandle) {
+
             if (!this.nodeMap[aHandle]) {
                 var template = this.template.cloneNode(true);
                 var properties = this.getNodeProperties(aNode, aHandle);
@@ -510,6 +614,31 @@
         },
 
         /**
+         * Helper function that would return a DOM node for a specific handle
+         *
+         * @param aHandle {String}
+         */
+        megaListRenderCb: function(aHandle) {
+            var node = this.getDOMNode(M.d[aHandle], aHandle);
+
+            if (selectionManager && selectionManager.selected_list) {
+                if (selectionManager.selected_list.indexOf(aHandle) > -1) {
+                    this.addClasses(node, ['ui-selected']);
+                }
+                else {
+                    this.removeClasses(node, ['ui-selected']);
+                }
+                this.removeClasses(node, ['ui-selectee']);
+            }
+
+            M.d[aHandle].seen = true;
+
+            return node;
+        },
+
+        /**
+
+        /**
          * Add classes to DOM node
          * @param {Object} aDOMNode    DOM node to set class over
          * @param {Array}  aClassNames An array of classes
@@ -519,6 +648,19 @@
             var len = aClassNames.length;
             while (len--) {
                 aDOMNode.classList.add(aClassNames[len]);
+            }
+        },
+
+        /**
+         * Remove classes from DOM node
+         * @param {Object} aDOMNode    DOM node to set class over
+         * @param {Array}  aClassNames An array of classes
+         */
+        removeClasses: function(aDOMNode, aClassNames) {
+            // XXX: classList.add does support an array, but not in all browsers
+            var len = aClassNames.length;
+            while (len--) {
+                aDOMNode.classList.remove(aClassNames[len]);
             }
         },
 
@@ -941,7 +1083,9 @@
              * @param {Object}  aUserData  Any data provided by initializers
              */
             '*': function(aNode, aHandle, aDOMNode, aNodeIndex, aUpdate, aUserData) {
-                this.insertDOMNode(aNode, aNodeIndex, aDOMNode, aUpdate);
+                if (!this.megaList) {
+                    this.insertDOMNode(aNode, aNodeIndex, aDOMNode, aUpdate);
+                }
             },
             'contacts': function(aNode, aHandle, aDOMNode, aNodeIndex, aUpdate, aUserData) {
                 this.renderer['*'].apply(this, arguments);
@@ -965,7 +1109,9 @@
                     cacheEntry = this.getCacheEntry(aNode, aHandle, aDOMNode, aNodeIndex);
                 }
 
-                this.insertDOMNode(aNode, aNodeIndex, aDOMNode, aUpdate, cacheEntry);
+                if (!this.megaList) {
+                    this.insertDOMNode(aNode, aNodeIndex, aDOMNode, aUpdate, cacheEntry);
+                }
             }
         }),
 
@@ -1192,6 +1338,12 @@
                 }
             }
         }),
+
+        destroy: function() {
+            if (this.megaList) {
+                this.megaList.destroy();
+            }
+        },
 
         toString: function() {
             return '[MegaRender:' + this.section + ':' + this.viewmode + ']';

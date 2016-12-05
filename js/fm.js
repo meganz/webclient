@@ -41,7 +41,9 @@ function initSelectScrolling(scrollBlock)
 
 function initFileblocksScrolling()
 {
-    $('.file-block-scrolling').filter(":not(.megaList)").jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
+    $('.file-block-scrolling')
+        .filter(":not(.megaList)")
+        .jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
     jScrollFade('.file-block-scrolling:not(.megaList)');
 }
 
@@ -5269,7 +5271,8 @@ function iconUI(aQuiet, refresh)
     $('.fm-blocks-view, .shared-blocks-view').rebind('contextmenu.blockview', function(e)
     {
         $('.file-block').removeClass('ui-selected');
-        selectionManager.clear_selection(); // is this required? don't we have a support for a multi-selection context menu?
+        // is this required? don't we have a support for a multi-selection context menu?
+        selectionManager.clear_selection();
         $.selected = [];
         $.hideTopMenu();
         return !!contextMenuUI(e, 2);

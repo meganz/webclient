@@ -3773,7 +3773,8 @@
     "16103": "\u91cd\u65b0\u9080\u8acb\u6240\u6709\u5f85\u8655\u7406\u9805\u76ee",
     "16104": "\u5f85\u8655\u7406\u5b89\u88dd\u61c9\u7528\u7a0b\u5f0f",
     "16105": "\u6279\u51c6\u914d\u984d",
-    "16106": "Your purchase of MEGA services will be processed by ECP for [B]Mega Europe sarl, 4 Rue Graham Bell, L-3235, Bettembourg, Luxembourg[B].",
+    "16106": "Your purchase of MEGA services will be processed by ECP for [B]Mega Europe sarl, 4 Rue Graham Bell, L-3235, Bettembourg, Luxembourg[\/B].",
+    "16107": "Did you know that you can download the entire folder at once if you [S]install the free MEGA app[\/S]?",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4005,6 +4006,7 @@
         "suggest-sync-client-message": 12488,
         "about-page-introduction": 12489,
         "additional-site-update-message": 15536,
-        "purchase-processed-by-message": 16106
+        "purchase-processed-by-message": 16106,
+        "install-free-mega-app": 16107
     }
 }

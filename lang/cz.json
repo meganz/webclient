@@ -3773,7 +3773,8 @@
     "16103": "Znovu pozvat v\u0161echny \u010dekaj\u00edc\u00ed",
     "16104": "\u010cekaj\u00edc\u00ed instalace aplikace",
     "16105": "Ud\u011blen\u00e1 kv\u00f3ta",
-    "16106": "Your purchase of MEGA services will be processed by ECP for [B]Mega Europe sarl, 4 Rue Graham Bell, L-3235, Bettembourg, Luxembourg[B].",
+    "16106": "Your purchase of MEGA services will be processed by ECP for [B]Mega Europe sarl, 4 Rue Graham Bell, L-3235, Bettembourg, Luxembourg[\/B].",
+    "16107": "Did you know that you can download the entire folder at once if you [S]install the free MEGA app[\/S]?",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4005,6 +4006,7 @@
         "suggest-sync-client-message": 12488,
         "about-page-introduction": 12489,
         "additional-site-update-message": 15536,
-        "purchase-processed-by-message": 16106
+        "purchase-processed-by-message": 16106,
+        "install-free-mega-app": 16107
     }
 }

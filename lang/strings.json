@@ -15096,7 +15096,11 @@
         "context": "The invitation status on the invitation dialog of the achievements page."
     },
     "16106": {
-        "text": "Your purchase of MEGA services will be processed by ECP for [B]Mega Europe sarl, 4 Rue Graham Bell, L-3235, Bettembourg, Luxembourg[B].",
+        "text": "Your purchase of MEGA services will be processed by ECP for [B]Mega Europe sarl, 4 Rue Graham Bell, L-3235, Bettembourg, Luxembourg[\/B].",
         "context": "An informational message on the payment dialog. Please leave the [B] and [\/B] tags which will be used to change the colour of the text. The text between the tags (the address) does not need to be translated. ECP is the name of a payment provider and does not need to be translated."
+    },
+    "16107": {
+        "text": "Did you know that you can download the entire folder at once if you [S]install the free MEGA app[\/S]?",
+        "context": "A hint message on the download overlay after coming from a mobile folder link. Do not remove the [S] and [\/S] tags which will be used to highlight the text red."
     }
 }

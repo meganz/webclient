@@ -1826,11 +1826,12 @@ else if (!b_u)
             'emoticonsFilter_js': {f:'js/chat/plugins/emoticonsFilter.js', n: 'emoticonsFilter_js', j:1},
             'chatnotifications_js': {f:'js/chat/plugins/chatNotifications.js', n: 'chatnotifications_js', j:1},
             'callfeedback_js': {f:'js/chat/plugins/callFeedback.js', n: 'callfeedback_js', j:1},
-            'persistedTypeArea_js': {f:'js/chat/plugins/persistedTypeArea.js', n: 'persistedTypeArea_js', j:1, w:1},
+            'persistedTypeArea_js': {f:'js/chat/plugins/persistedTypeArea.js', n: 'persistedTypeArea_js', j:1, w:1},'presencedIntegration_js': {f:'js/chat/plugins/presencedIntegration.js', n: 'presencedIntegration_js', j:1, w:1},
             'keo_js': {f:'js/chat/karereEventObjects.js', n: 'keo_js', j:1},
             'crm_js': {f:'js/connectionRetryManager.js', n: 'crm_js', j:1},
             'karere_js': {f:'js/chat/karere.js', n: 'karere_js', j:1},
             'chat_messages_Js': {f:'js/chat/messages.js', n: 'chat_messages_Js', j:1},
+            'presence_js': {f:'js/chat/presence.js', n: 'presence_js', j:1},
             'chat_react_minified_js': {f:'js/chat/bundle.js', n: 'chat_react_minified_js', j:1}
         }
     };

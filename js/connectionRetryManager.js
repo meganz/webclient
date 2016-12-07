@@ -219,7 +219,7 @@ ConnectionRetryManager.prototype.doConnectionRetry = function(immediately){
     self._connectionRetries++;
 
 
-    if (self.logger) {
+    if (self.logger && !immediately) {
         self.logger.error(
             "request error, passed arguments: ", arguments, ", number of errors: ", self._connectionRetries
         );
@@ -275,6 +275,7 @@ ConnectionRetryManager.prototype.doConnectionRetry = function(immediately){
             } else {
             }
         }, connectionRetryTimeout);
+        console.error("retry in: ", connectionRetryTimeout);
 
 
         self._lastConnectionRetryTime = unixtime();
@@ -311,5 +312,23 @@ ConnectionRetryManager.prototype.resetConnectionRetries = function() {
     clearTimeout(self._connectionRetryInProgress);
     if (self._$connectingPromise) {
         self._$connectingPromise.reject();
+    }
+};
+
+
+/**
+ * Can be used to run code that requires a conncetion (or forces a connect).
+ *
+ * @returns {MegaPromise|*}
+ */
+ConnectionRetryManager.prototype.requiresConnection = function() {
+    var self = this;
+
+    if (!self.options.functions.isConnectedOrConnecting()) {
+        self.doConnectionRetry(true);
+        return self._$connectingPromise;
+    }
+    else {
+        return MegaPromise.resolve();
     }
 };

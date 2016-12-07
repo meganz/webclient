@@ -45,7 +45,6 @@
 
         // current presenced URL and connection failures
         this.url = false;
-        this.attempts = 0;
 
         // user handle
         this.userhandle = userhandle;
@@ -59,15 +58,89 @@
         // online/away flag
         this.status_online = false;
 
+        // mobile
+        this.status_mobile = false;
+
         // do not disturb flag
         this.status_dnd = false;
 
         // current override
         this.override = 0;
 
+        this.canceled = localStorage.userPresenceIsOffline && localStorage.userPresenceIsOffline === '1';
+
+        var self = this;
+
         // retry timer and timeout (exponential backoff)
-        this.retrytimer = false;
-        this.retrytimeout = 0;
+        this.connectionRetryManager = new ConnectionRetryManager(
+            {
+                functions: {
+                    reconnect: function(connectionRetryManager) {
+                        if (connectionRetryManager._connectionRetries > 2) {
+                            self.url = false;
+                        }
+                        self.reconnect();
+                    },
+                    /**
+                     * A Callback that will trigger the 'forceDisconnect' procedure for this type of connection
+                     * @param connectionRetryManager {ConnectionRetryManager}
+                     */
+                    forceDisconnect: function(connectionRetryManager) {
+                        return self.disconnect();
+                    },
+                    /**
+                     * Should return true or false depending on the current state of this connection, e.g.
+                     * (connected || connecting)
+                     *
+                     * @param connectionRetryManager {ConnectionRetryManager}
+                     * @returns {bool}
+                     */
+                    isConnectedOrConnecting: function(connectionRetryManager) {
+                        return (
+                            self.s && (
+                                self.s.readyState == self.s.CONNECTING ||
+                                self.s.readyState == self.s.OPEN
+                            )
+                        );
+                    },
+                    /**
+                     * Should return true/false if the current state === CONNECTED
+                     * @param connectionRetryManager {ConnectionRetryManager}
+                     * @returns {bool}
+                     */
+                    isConnected: function(connectionRetryManager) {
+                        return (
+                            self.s && (
+                                self.s.readyState == self.s.OPEN
+                            )
+                        );
+                    },
+                    /**
+                     * Should return true/false if the current state === DISCONNECTED
+                     * @param connectionRetryManager {ConnectionRetryManager}
+                     * @returns {bool}
+                     */
+                    isDisconnected: function(connectionRetryManager) {
+                        return (
+                            !self.s || self.s.readyState == self.s.CLOSED
+                        );
+                    },
+                    /**
+                     * Should return true IF the user had forced the connection to go offline
+                     * @param connectionRetryManager {ConnectionRetryManager}
+                     * @returns {bool}
+                     */
+                    isUserForcedDisconnect: function(connectionRetryManager) {
+                        return (
+                            self.canceled === true ||
+                            localStorage.megaChatPresence === "unavailable" ||
+                            localStorage.userPresenceIsOffline
+                        );
+                    }
+                }
+            },
+            self.logger
+        );
 
         // ping timer
         this.pingtimer = false;
@@ -78,18 +151,8 @@
 
         // console logging
         this.logger = MegaLogger.getLogger('UserPresence');
-
-        this.reconnect();
     };
 
-    UserPresence.prototype.retry = function presence_retry() {
-        if (this.retrytimer) {
-            clearTimeout(this.retrytimer);
-            this.retrytimer = false;
-            this.retrytimeout = false;
-            this.reconnect();
-        }
-    }
 
     UserPresence.prototype.reconnect = function presence_reconnect(self) {
         if (!self) {
@@ -97,36 +160,16 @@
         }
 
         if (self.s) {
-            self.cancelled = true;
             self.s.close();
+            self.s.onclose = undefined;
+            self.s.onerror = undefined;
             self.s = false;
             self.open = false;
-        }
-
-        // FIXME: immediately retry upon mouse move
-        if (!self.retrytimer) {
-            if (!self.retrytimeout) {
-                self.retrytimeout = 100;
-            }
-            else {
-                self.retrytimer = setTimeout(self.reconnect, self.retrytimeout, this);
-                self.retrytimeout *= 2;
-                return;
-            }
-        }
-        else {
-            clearTimeout(self.retrytimer);
-            self.retrytimer = false;
         }
 
         if (self.pingtimer) {
             clearTimeout(self.pingtimer);
             self.pingtimer = false;
-        }
-
-        if (self.attempts > 2) {
-            self.attempts = 0;
-            self.url = false;
         }
 
         if (self.url) {
@@ -136,7 +179,7 @@
             self.s.up = self;
 
             self.s.onopen = function () {
-                if (!this.cancelled) {
+                if (!self.canceled) {
                     this.up.retrytimeout = 0;
                     this.up.open = true;
 
@@ -154,25 +197,39 @@
 
                     // start pinging
                     this.up.ping();
+                    this.up.connectionRetryManager.gotConnected();
+                    $(self).trigger('onConnected');
+                }
+                else {
+                    // if canceled while trying to connect, drop the connection or it would stay idle.
+                    this.up.disconnect(true);
                 }
             };
 
             self.s.onclose = function () {
-                if (!this.cancelled) {
-                    this.up.attempts++;
-                    this.up.reconnect(this.up);
+                $(self).trigger('onDisconnected');
+
+                if (self.pingtimer) {
+                    clearTimeout(self.pingtimer);
+                    self.pingtimer = false;
                 }
+                self.connectionRetryManager.gotDisconnected();
             };
 
             self.s.onerror = function () {
-                if (!this.cancelled) {
-                    this.up.attempts++;
-                    this.up.reconnect(this.up);
+                $(self).trigger('onDisconnected');
+
+                if (self.pingtimer) {
+                    clearTimeout(self.pingtimer);
+                    self.pingtimer = false;
+                }
+                if (!this.canceled) {
+                    self.connectionRetryManager.doConnectionRetry();
                 }
             };
 
             self.s.onmessage = function (m) {
-                if (!this.cancelled) {
+                if (!this.canceled) {
                     var u = new Uint8Array(m.data);
                     var p = 0;
 
@@ -207,14 +264,38 @@
             };
         }
         else {
-            api_req({ a: 'pu' }, { callback: function(res, ctx) {
-                if (typeof res == 'string') {
-                    ctx.self.url = res;
+            api_req(
+                {
+                    a: 'pu'
+                },
+                {
+                    callback: function(res, ctx) {
+                        if (typeof res == 'string') {
+                            ctx.self.url = res;
+                        }
+                        ctx.self.reconnect();
+                    },
+                    self: self
                 }
-                ctx.self.reconnect();
-            },
-            self: self });
+            );
         }
+    };
+
+    UserPresence.prototype.disconnect = function(userForced) {
+        var self = this;
+
+        if (userForced) {
+            self.canceled = true;
+        }
+
+        if (self.s && self.s.close) {
+            self.s.close();
+        }
+        self.s = false;
+        self.open = false;
+
+        clearTimeout(self.pingtimer);
+        self.pingtimer = false;
     };
 
     UserPresence.prototype.addremovepeers = function presence_addremovepeers(peers, del) {
@@ -288,7 +369,7 @@
               | (this.status_mobile ? 0x40 : 0)
               | (this.status_webrtc ? 0x80 : 0)));
         }
-    }
+    };
 
     // send local dynamic status to the server (with mobile bit 7 cleared, as we are a browser)
     UserPresence.prototype.ping = function presence_ping(self) {
@@ -304,6 +385,30 @@
             self.pingtimer = setTimeout(self.ping, 25000, self);
         }
     };
+
+
+    UserPresence.PRESENCE = {
+        'CLEAR': 0,
+        'OFFLINE': 1,
+        'AWAY': 2,
+        'ONLINE': 3,
+        'DND': 4
+    };
+
+    if (localStorage.presencedDebug) {
+        Object.keys(UserPresence.prototype).forEach(function(fn) {
+            var origFn = UserPresence.prototype[fn];
+            UserPresence.prototype[fn] = function() {
+                console.error(fn, arguments);
+                var res = origFn.apply(this, arguments);
+                if (res) {
+                    console.error(fn, 'result', arguments);
+                }
+
+                return res;
+            };
+        });
+    }
     Object.freeze(UserPresence.prototype);
 
     window.UserPresence = UserPresence;

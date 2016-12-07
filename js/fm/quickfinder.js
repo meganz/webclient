@@ -65,11 +65,13 @@ var QuickFinder = function(searchable_elements, containers) {
 
             if (M.megaRender && M.megaRender.megaList) {
                 var foundIds = [];
-                M.v.forEach(function(v) {
+
+                charTyped = charTyped.toLowerCase();
+
+                foundIds = M.v.filter(function(v) {
                     var nameStr = v.name;
-                    // XX: ^^ add support for contacts via .firstName if .name is not found
-                    if (nameStr[0].toLowerCase() === charTyped.toLowerCase()) {
-                        foundIds.push(v.h);
+                    if (nameStr[0].toLowerCase() === charTyped) {
+                        return true;
                     }
                 });
 
@@ -90,7 +92,7 @@ var QuickFinder = function(searchable_elements, containers) {
                 }
                 last_key = charTyped;
                 if (foundIds[next_idx]) {
-                    var nextId = foundIds[next_idx];
+                    var nextId = foundIds[next_idx].h;
                     selectionManager.clear_selection();
                     selectionManager.set_currently_selected(nextId, true);
                 }
@@ -100,10 +102,10 @@ var QuickFinder = function(searchable_elements, containers) {
 
                 if (
                     /* repeat key press, but show start from the first element */
-                (last_key != null && ($found.size() - 1) <= next_idx)
-                ||
-                /* repeat key press is not active, should reset the target idx to always select the first element */
-                (last_key == null)
+                    (last_key != null && ($found.size() - 1) <= next_idx)  ||
+                    /* repeat key press is not active, should reset the target idx to always select the first
+                    element */
+                    (last_key == null)
                 ) {
                     next_idx = 0;
                     last_key = null;

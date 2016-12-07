@@ -1264,14 +1264,6 @@ function hideTransferToast ($toast) {
     $('.toast-notification').removeClass('second');
 }
 
-function removeUInodeIfInCurrentView(h) {
-    if (!M.d[h]) {
-        return;
-    }
-
-    $("#" + h).remove();
-};
-
 function removeUInode(h, parent) {
 
     var n = M.d[h],
@@ -1332,7 +1324,7 @@ function removeUInode(h, parent) {
             }
 
             // Remove item
-            removeUInodeIfInCurrentView(h);
+            $("#" + h).remove();
 
             // Remove folder and subfolders
             $('#treeli_' + h).remove();
@@ -1347,7 +1339,7 @@ function removeUInode(h, parent) {
             }
 
             // Remove item
-            removeUInodeIfInCurrentView(h);
+            $("#" + h).remove();
 
             // Remove folder and subfolders
             $('#treeli_' + h).remove();
@@ -1362,7 +1354,7 @@ function removeUInode(h, parent) {
                 $('#treea_' + n.p).removeClass('contains-folders expanded');
             }
 
-            removeUInodeIfInCurrentView(h);
+            $("#" + h).remove();
 
             $('#treeli_' + h).remove();// remove folder and subfolders
             if (!hasItems) {
@@ -4687,6 +4679,7 @@ function gridUI(refresh) {
         return;
     if (d)
         console.time('gridUI');
+
     // $.gridDragging=false;
     $.gridLastSelected = false;
     $('.fm-files-view-icon.listing-view').addClass('active');

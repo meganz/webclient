@@ -3670,15 +3670,15 @@ function MegaData()
                 if (!del) {
                     $('.grid-table.fm #' + node.h + ' .grid-status-icon').addClass('star');
                     $('#' + node.h + '.file-block .file-status-icon').addClass('star');
-                    if (M.megaRender && M.megaRender.nodeMap && M.megaRender.nodeMap[node.h]) {
-                        $('.grid-status-icon', M.megaRender.nodeMap[node.h]).addClass('star');
+                    if (M.megaRender.hasDOMNode([node.h])) {
+                        $('.grid-status-icon', M.megaRender.getDOMNode(node.h)).addClass('star');
                     }
                 }
 
                 // Remove from favourites
                 else {
-                    if (M.megaRender && M.megaRender.nodeMap && M.megaRender.nodeMap[node.h]) {
-                        $('.grid-status-icon', M.megaRender.nodeMap[node.h]).removeClass('star');
+                    if (M.megaRender.hasDOMNode(node.h)) {
+                        $('.grid-status-icon', M.megaRender.getDOMNode(node.h)).removeClass('star');
                     }
                     $('.grid-table.fm #' + node.h + ' .grid-status-icon').removeClass('star');
                     $('#' + node.h + '.file-block .file-status-icon').removeClass('star');
@@ -6266,15 +6266,15 @@ function execsc() {
                                 }
                                 if (fminitialized && n.fav !== oldfav) {
                                     if (n.fav) {
-                                        if (M.megaRender && M.megaRender.nodeMap && M.megaRender.nodeMap[n.h]) {
-                                            $('.grid-status-icon', M.megaRender.nodeMap[n.h]).addClass('star');
+                                        if (M.megaRender.hasDOMNode(n.h)) {
+                                            $('.grid-status-icon', M.megaRender.getDOMNode(n.h)).addClass('star');
                                         }
                                         $('.grid-table.fm #' + n.h + ' .grid-status-icon').addClass('star');
                                         $('#' + n.h + '.file-block .file-status-icon').addClass('star');
                                     }
                                     else {
-                                        if (M.megaRender && M.megaRender.nodeMap && M.megaRender.nodeMap[n.h]) {
-                                            $('.grid-status-icon', M.megaRender.nodeMap[n.h]).removeClass('star');
+                                        if (M.megaRender.hasDOMNode(n.h)) {
+                                            $('.grid-status-icon', M.megaRender.getDOMNode(n.h)).removeClass('star');
                                         }
                                         $('.grid-table.fm #' + n.h + ' .grid-status-icon').removeClass('star');
                                         $('#' + n.h + '.file-block .file-status-icon').removeClass('star');

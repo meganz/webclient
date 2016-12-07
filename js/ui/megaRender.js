@@ -614,6 +614,15 @@
         },
 
         /**
+         * Checks if a DOM node for that `aHandle` is created and cached in MegaRender.
+         *
+         * @param aHandle
+         */
+        hasDOMNode: function(aHandle) {
+            return this.nodeMap[aHandle] ? true : false;
+        },
+
+        /**
          * Helper function that would return a DOM node for a specific handle
          *
          * @param aHandle {String}

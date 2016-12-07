@@ -1954,8 +1954,8 @@ var exportExpiry = {
 
         if ($nodeId.length === 0) {
             // not inserted in the DOM, retrieve the nodeMap cache and update that DOM node instead.
-            if (M.megaRender && M.megaRender.nodeMap && M.megaRender.nodeMap[nodeId]) {
-                $nodeId = $(M.megaRender.nodeMap[nodeId]);
+            if (M.megaRender.hasDOMNode(nodeId)) {
+                $nodeId = $(M.megaRender.getDOMNode(nodeId));
             }
         }
 
@@ -1993,8 +1993,8 @@ var exportExpiry = {
         var $node = $('#' + nodeId);
         if ($node.length === 0) {
             // not inserted in the DOM, retrieve the nodeMap cache and update that DOM node instead.
-            if (M.megaRender && M.megaRender.nodeMap && M.megaRender.nodeMap[nodeId]) {
-                $node = $(M.megaRender.nodeMap[nodeId]);
+            if (M.megaRender.hasDOMNode(nodeId)) {
+                $node = $(M.megaRender.getDOMNode(nodeId));
             }
         }
 
@@ -2082,8 +2082,8 @@ var exportExpiry = {
      * @param {String} nodeId
      */
     UiExportLink.prototype.removeTakenDownIcon = function(nodeId) {
-        if (M.megaRender && M.megaRender.nodeMap && M.megaRender.nodeMap[nodeId]) {
-            $(M.megaRender.nodeMap[nodeId]).removeClass('take-down');
+        if (M.megaRender.hasDOMNode(nodeId)) {
+            $(M.megaRender.getDOMNode(nodeId)).removeClass('take-down');
         }
 
         // Add taken-down to list view

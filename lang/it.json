@@ -3685,7 +3685,7 @@
     "10632": "Inserisci i dettagli del tuo indirizzo di fatturazione",
     "10633": "Per favore, riempi tutti i campi obbligatori",
     "10634": "Se stai riscontrando problemi con il pagamento, [A]contatta il nostro team di supporto[\/A].",
-    "10635": "Nota: Questo pagamento tramite carta di credito verr\u00e0 segnato come [B]MEGA PRO AUCKLAND[\/B] sul tuo resoconto.",
+    "10635": "Nota: Questo pagamento tramite carta di credito verr\u00e0 segnato come [B]MEGA PRO GLOBAL[\/B] sul tuo resoconto.",
     "10636": "Grazie! Il tuo account verr\u00e0 aggiornato non appena riceveremo la conferma del tuo pagamento dal nostro provider dei pagamenti nel giro di pochi minuti. Se non ricevi il tuo account MEGA PRO entro %1 ore, contattaci a [A]support@mega.nz[\/A].",
     "10637": "Clicca qui per pi\u00f9 dettagli sui pagamenti ricorrenti, la nostra policy dei rimborsi, o come cancellare l'abbonamento.",
     "10638": "Vuoi rinnovare il tuo piano automaticamente ogni mese?",
@@ -3773,6 +3773,7 @@
     "16103": "In attesa del re-invito di tutti",
     "16104": "In attesa dell'installazione dell'app",
     "16105": "Quota garantita",
+    "16106": "Il tuo acquisto di servizi MEGA sar\u00e0 processato da ECP per [B]Mega Europe sarl, 4 Rue Graham Bell, L-3235, Bettembourg, Lussemburgo[B].",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4003,6 +4004,7 @@
         "also-available-windows-linux": 12487,
         "suggest-sync-client-message": 12488,
         "about-page-introduction": 12489,
-        "additional-site-update-message": 15536
+        "additional-site-update-message": 15536,
+        "purchase-processed-by-message": 16106
     }
 }

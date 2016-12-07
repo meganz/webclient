@@ -3685,7 +3685,7 @@
     "10632": "Vul uw factuuradres gegevens in",
     "10633": "Vul alstublieft alle verplichte velden in.",
     "10634": "Als u problemen heeft met uw betaling, neem dan alstublieft [A]contact op met onze helpdesk[\/A]",
-    "10635": "Let op: Deze creditcard betaling zal worden geregistreerd als [B]MEGA PRO AUCKLAND[\/B] op uw bankafschrift.",
+    "10635": "Let op: Deze creditcard betaling zal worden geregistreerd als [B]MEGA PRO GLOBAL[\/B] op uw bankafschrift.",
     "10636": "Bedankt! Uw account zal opgewaardeerd worden zodra we bevestiging ontvangen van uw betaling van onze betalingsleverancier in een paar minuten. Als u uw MEGA PRO account niet hebt ontvangen binnen %1 uur, neem dan alstublieft contact op via [A]support@mega.nz[\/A].",
     "10637": "Klik hier voor meer informatie over periodieke betalingen, ons restitutie beleid, of hoe u uw abonnement kunt annuleren.",
     "10638": "Wilt u dat uw betaling automatisch wordt vernieuwd elke maand?",
@@ -3773,6 +3773,7 @@
     "16103": "Reinvite all pending",
     "16104": "Pending App Install",
     "16105": "Quota Granted",
+    "16106": "Your purchase of MEGA services will be processed by ECP for [B]Mega Europe sarl, 4 Rue Graham Bell, L-3235, Bettembourg, Luxembourg[B].",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4003,6 +4004,7 @@
         "also-available-windows-linux": 12487,
         "suggest-sync-client-message": 12488,
         "about-page-introduction": 12489,
-        "additional-site-update-message": 15536
+        "additional-site-update-message": 15536,
+        "purchase-processed-by-message": 16106
     }
 }

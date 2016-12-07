@@ -3685,7 +3685,7 @@
     "10632": "Zadejte podrobnosti sv\u00e9 faktura\u010dn\u00ed adresy",
     "10633": "Vypl\u0148te v\u0161echna vy\u017eadovan\u00e1 pole.",
     "10634": "Pokud m\u00e1te probl\u00e9my se svou platbou, [A]obra\u0165te se na n\u00e1\u0161 t\u00fdm podpory [\/A].",
-    "10635": "Pozn\u00e1mka: Tato platba platebn\u00ed kartou bude ve va\u0161em bankovn\u00edm v\u00fdpisu uvedena jako [B]MEGA PRO AUCKLAND[\/B].",
+    "10635": "Pozn\u00e1mka: Tato platba platebn\u00ed kartou bude ve va\u0161em bankovn\u00edm v\u00fdpisu uvedena jako [B]MEGA PRO GLOBAL[\/B].",
     "10636": "D\u00edky! V\u00e1\u0161 \u00fa\u010det bude upgradov\u00e1n, jakmile b\u011bhem n\u011bkolika minut obdr\u017e\u00edme potvrzen\u00ed o va\u0161\u00ed platb\u011b od na\u0161eho poskytovatele platebn\u00edch slu\u017eeb. Pokud neobdr\u017e\u00edte sv\u016fj \u00fa\u010det MEGA PRO b\u011bhem %1 hodin, obra\u0165te se na n\u00e1s na [A]support@mega.nz[\/A].",
     "10637": "Klikn\u011bte sem pro v\u00edce podrobnost\u00ed o opakovan\u00fdch platb\u00e1ch, na\u0161ich z\u00e1sad\u00e1ch vracen\u00ed pen\u011bz nebo jak zru\u0161it va\u0161e p\u0159edplatn\u00e9.",
     "10638": "Cht\u011bli byste, aby se v\u00e1\u0161 pl\u00e1n automaticky obnovoval ka\u017ed\u00fd m\u011bs\u00edc?",
@@ -3773,6 +3773,7 @@
     "16103": "Znovu pozvat v\u0161echny \u010dekaj\u00edc\u00ed",
     "16104": "\u010cekaj\u00edc\u00ed instalace aplikace",
     "16105": "Ud\u011blen\u00e1 kv\u00f3ta",
+    "16106": "Your purchase of MEGA services will be processed by ECP for [B]Mega Europe sarl, 4 Rue Graham Bell, L-3235, Bettembourg, Luxembourg[B].",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4003,6 +4004,7 @@
         "also-available-windows-linux": 12487,
         "suggest-sync-client-message": 12488,
         "about-page-introduction": 12489,
-        "additional-site-update-message": 15536
+        "additional-site-update-message": 15536,
+        "purchase-processed-by-message": 16106
     }
 }

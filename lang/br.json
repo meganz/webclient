@@ -3685,7 +3685,7 @@
     "10632": "Insira os detalhes do endere\u00e7o de cobran\u00e7a",
     "10633": "Por favor, preencha todos os campos requisitados.",
     "10634": "Se voc\u00ea est\u00e1 tendo problemas com seu pagamento, por favor [A]entre em contato com nossa equipe de suporte[\/A].",
-    "10635": "Nota: Este pagamento com cart\u00e3o de cr\u00e9dito ser\u00e1 listado como [B]MEGA PRO AUCKLAND[\/B] no seu extrato banc\u00e1rio.",
+    "10635": "Nota: Este pagamento com cart\u00e3o de cr\u00e9dito ser\u00e1 listado como [B]MEGA PRO GLOBAL[\/B] no seu extrato banc\u00e1rio.",
     "10636": "Obrigado! A sua conta ser\u00e1 atualizado assim que receber a confirma\u00e7\u00e3o do seu pagamento de nossa provedor de pagamentos em poucos minutos. Se voc\u00ea n\u00e3o tiver recebido a sua conta MEGA PRO dentro de %1 horas, por favor contate-nos em [A]support@mega.nz[\/A].",
     "10637": "Clique aqui para obter mais detalhes sobre os pagamentos recorrentes, a nossa pol\u00edtica de reembolso, ou como cancelar a sua assinatura.",
     "10638": "Gostaria que o seu plano para renovar automaticamente a cada m\u00eas?",
@@ -3773,6 +3773,7 @@
     "16103": "Re-convidar todos os pendentes",
     "16104": "Instala\u00e7\u00e3o do aplicativo pendente",
     "16105": "Cota concedida",
+    "16106": "A sua compra de servi\u00e7os MEGA ser\u00e1 processada pela ECP para [B]Mega Europe sarl, 4 Rue Graham Bell, L-3235, Bettembourg, Luxembourg[B].",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4003,6 +4004,7 @@
         "also-available-windows-linux": 12487,
         "suggest-sync-client-message": 12488,
         "about-page-introduction": 12489,
-        "additional-site-update-message": 15536
+        "additional-site-update-message": 15536,
+        "purchase-processed-by-message": 16106
     }
 }

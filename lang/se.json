@@ -3685,7 +3685,7 @@
     "10632": "Ange faktureringsdetaljer. ",
     "10633": "Fyll i alla obligatoriska f\u00e4lt. ",
     "10634": "Har du problem med din betalning v\u00e4nligen kontakta: [A]contact our support team[\/A].",
-    "10635": "Note: This credit card payment will be listed as [B]MEGA PRO AUCKLAND[\/B] on your bank statement.",
+    "10635": "Note: This credit card payment will be listed as [B]MEGA PRO GLOBAL[\/B] on your bank statement.",
     "10636": "Thanks! Your account will be upgraded as soon as we receive confirmation of your payment from our payment provider in a few minutes. If you have not received your MEGA PRO account within %1 hours, please contact us at [A]support@mega.nz[\/A].",
     "10637": "Klicka h\u00e4r f\u00f6r mer information om \u00e5terkommande betalningar, v\u00e5r \u00e5terbetalningspolicy , eller hur man s\u00e4ger upp prenumerationen.",
     "10638": "Vill du att din plan f\u00f6rnyas automatiskt varje m\u00e5nad? ",
@@ -3773,6 +3773,7 @@
     "16103": "Bjud in v\u00e4ntande igen ",
     "16104": "Avvaktar app installation ",
     "16105": "Kvot beviljad",
+    "16106": "Your purchase of MEGA services will be processed by ECP for [B]Mega Europe sarl, 4 Rue Graham Bell, L-3235, Bettembourg, Luxembourg[B].",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4003,6 +4004,7 @@
         "also-available-windows-linux": 12487,
         "suggest-sync-client-message": 12488,
         "about-page-introduction": 12489,
-        "additional-site-update-message": 15536
+        "additional-site-update-message": 15536,
+        "purchase-processed-by-message": 16106
     }
 }

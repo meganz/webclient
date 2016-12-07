@@ -3685,7 +3685,7 @@
     "10632": "Wprowad\u017a dane do faktury",
     "10633": "Wype\u0142nij wymagane pola.",
     "10634": "Je\u017celi masz problemy z p\u0142atno\u015bci\u0105, skontaktuj si\u0119 z [A]obs\u0142ug\u0105 klienta[\/A].",
-    "10635": "Uwaga: Op\u0142ata za us\u0142ugi Mega b\u0119dzie widnia\u0142a na wyci\u0105gu bankowym jako [B]MEGA PRO AUCKLAND[\/B] .",
+    "10635": "Uwaga: Op\u0142ata za us\u0142ugi Mega b\u0119dzie widnia\u0142a na wyci\u0105gu bankowym jako [B]MEGA PRO GLOBAL[\/B] .",
     "10636": "Dzi\u0119kujemy! Twoje konto zostanie aktywowane jak tylko otrzymamy potwierdzenie p\u0142atno\u015bci. Je\u017celi nie dostaniesz od nas potwierdzenia w przeci\u0105gu %1 godzin, prosimy o kontakt na [A]support@mega.nz[\/A].",
     "10637": "Kliknij tutaj aby dowiedzie\u0107 si\u0119 wi\u0119cej o subskrypcjach, zasadach zwrotu i jak anulowa\u0107 subskrypcj\u0119.",
     "10638": "Czy chcesz odnawia\u0107 miesi\u0119czn\u0105 subskrypcj\u0119 automatycznie?",
@@ -3773,6 +3773,7 @@
     "16103": "Pon\u00f3w zaproszenia",
     "16104": "Oczekuj\u0105ca instalacja",
     "16105": "Przyznana pojemno\u015b\u0107",
+    "16106": "Your purchase of MEGA services will be processed by ECP for [B]Mega Europe sarl, 4 Rue Graham Bell, L-3235, Bettembourg, Luxembourg[B].",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4003,6 +4004,7 @@
         "also-available-windows-linux": 12487,
         "suggest-sync-client-message": 12488,
         "about-page-introduction": 12489,
-        "additional-site-update-message": 15536
+        "additional-site-update-message": 15536,
+        "purchase-processed-by-message": 16106
     }
 }

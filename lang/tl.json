@@ -3685,7 +3685,7 @@
     "10632": "Ilagay ang detalye ng iyong billing address.",
     "10633": "Ilagay ang hinihinging fields.",
     "10634": "Kung nagkakaroon ka ng problema sa pagbabayad, mangyaring [A]i-contact ang aming support team[\/A].",
-    "10635": "Paalala: Sa bank statement mo, isusulat itong kabayaran bilang [B]MEGA PRO AUCKLAND[\/B] sa iyong credit card.",
+    "10635": "Paalala: Sa bank statement mo, isusulat itong kabayaran bilang [B]MEGA PRO GLOBAL[\/B] sa iyong credit card.",
     "10636": "Salamat! Ang inyong account ay maa-upgrade na habang hinihintay namin ang kumpirmasyon ng inyong bayad sa loob ng ilang minuto mula sa aming tagapagbigay ng bayad. Kung sa loob ng %1 na oras ay hindi mo pa nakukuha ang iyong MEGA PRO account, pakiusap na i-contact kami sa [A]support@mega.nz[\/A].",
     "10637": "Mag-click dito para sa karagdagang detalye para sa recurring payments, sa aming refund policy at kung paano ikansela ang inyong subscription.",
     "10638": "Gusto mo bang awtomatikong i-renew ang iyong plan kada buwan?",
@@ -3767,12 +3767,13 @@
     "16097": "Para kumpirmahin ang iyong account, tingnan ang iyong email at sundan ang link.",
     "16098": "Bakit ko ba kailangan ang Recovery Key?",
     "16099": "Sundan ang recovery link na ipapadala sa emai mo upang mai-reset ang password.",
-    "16100": "Date Sent",
-    "16101": "Invitation Status",
-    "16102": "Invite more friends",
-    "16103": "Reinvite all pending",
-    "16104": "Pending App Install",
-    "16105": "Quota Granted",
+    "16100": "Pinadalang Data",
+    "16101": "Status ng Paanyaya",
+    "16102": "Magdagdag ng mga kaibigan",
+    "16103": "Imbitahan muli ang lahat ng Pending",
+    "16104": "Pending na Paglalagay ng App",
+    "16105": "Quotang Ibinigay",
+    "16106": "Ang nabili mong serbisyo sa MEGA ay ipo-proseso ng ECP para sa [B]Mega Europe sarl, 4 Rue Graham Bell, L-3235, Bettembourg, Luxembourg[B].",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4003,6 +4004,7 @@
         "also-available-windows-linux": 12487,
         "suggest-sync-client-message": 12488,
         "about-page-introduction": 12489,
-        "additional-site-update-message": 15536
+        "additional-site-update-message": 15536,
+        "purchase-processed-by-message": 16106
     }
 }

@@ -3685,7 +3685,7 @@
     "10632": "Zadajte va\u0161e faktura\u010dn\u00e9 \u00fadaje",
     "10633": "Pros\u00edm vypl\u0148te v\u0161etky po\u017eadovan\u00e9 polia.",
     "10634": "If you are having trouble with your payment, please [A]contact our support team[\/A].",
-    "10635": "Note: This credit card payment will be listed as [B]MEGA PRO AUCKLAND[\/B] on your bank statement.",
+    "10635": "Note: This credit card payment will be listed as [B]MEGA PRO GLOBAL[\/B] on your bank statement.",
     "10636": "Thanks! Your account will be upgraded as soon as we receive confirmation of your payment from our payment provider in a few minutes. If you have not received your MEGA PRO account within %1 hours, please contact us at [A]support@mega.nz[\/A].",
     "10637": "Click here for more details on recurring payments, our refund policy, or how to cancel your subscription.",
     "10638": "Chcete aby sa v\u00e1\u0161 pl\u00e1n automaticky obnovoval ka\u017ed\u00fd mesiac?",
@@ -3773,6 +3773,7 @@
     "16103": "Reinvite all pending",
     "16104": "Pending App Install",
     "16105": "Quota Granted",
+    "16106": "Your purchase of MEGA services will be processed by ECP for [B]Mega Europe sarl, 4 Rue Graham Bell, L-3235, Bettembourg, Luxembourg[B].",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4003,6 +4004,7 @@
         "also-available-windows-linux": 12487,
         "suggest-sync-client-message": 12488,
         "about-page-introduction": 12489,
-        "additional-site-update-message": 15536
+        "additional-site-update-message": 15536,
+        "purchase-processed-by-message": 16106
     }
 }

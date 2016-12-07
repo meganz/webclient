@@ -3685,7 +3685,7 @@
     "10632": "Masukan detil alamat billing anda",
     "10633": "Harap isi semua kolom wajib. ",
     "10634": "Jika anda memiliki masalah dengan pembayaran, harap [A]kontak tim bantuan kami[\/A].",
-    "10635": "Catatan: Pembayaran kartu kredit ini akan ditulis sebagai [B]MEGA PRO AUCKLAND[\/B] pada mutasi bank anda.",
+    "10635": "Catatan: Pembayaran kartu kredit ini akan ditulis sebagai [B]MEGA PRO GLOBAL[\/B] pada mutasi bank anda.",
     "10636": "Terima kasih! Akun anda akan diupgrade sesaat setelah kami menerima konfirmasi pembayaran anda dari provider pembayaran kami dalam beberapa menit. Jika anda belum menerima akun MEGA PRO anda dalam %1 jam, harap kontak kami di [A]support@mega.nz[\/A].",
     "10637": "Klik di sini untuk detil lebih lanjut tentang pembayaran berulang, kebijakan pengembalian uang kami, dan cara membatalkan langganan anda.",
     "10638": "Apakah anda ingin langganan anda diperbarui secara otomatis setiap bulan?",
@@ -3773,6 +3773,7 @@
     "16103": "Reinvite all pending",
     "16104": "Pending App Install",
     "16105": "Quota Granted",
+    "16106": "Your purchase of MEGA services will be processed by ECP for [B]Mega Europe sarl, 4 Rue Graham Bell, L-3235, Bettembourg, Luxembourg[B].",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4003,6 +4004,7 @@
         "also-available-windows-linux": 12487,
         "suggest-sync-client-message": 12488,
         "about-page-introduction": 12489,
-        "additional-site-update-message": 15536
+        "additional-site-update-message": 15536,
+        "purchase-processed-by-message": 16106
     }
 }

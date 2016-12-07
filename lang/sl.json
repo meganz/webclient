@@ -3685,7 +3685,7 @@
     "10632": "Vnesite naslov pla\u010dnika",
     "10633": "Prosim, izpolnite vsa potrebna polja.",
     "10634": "\u010ce imate te\u017eave s pla\u010dilom, prosim [A]stopite v stik z na\u0161im podpornim teamom[\/A].",
-    "10635": "Opomba: To pla\u010dilo s kreditno kartico bo ozna\u010deno kot [B]MEGA PRO AUCKLAND[\/B] na va\u0161em ban\u010dnem izpisku.",
+    "10635": "Opomba: To pla\u010dilo s kreditno kartico bo ozna\u010deno kot [B]MEGA PRO GLOBAL[\/B] na va\u0161em ban\u010dnem izpisku.",
     "10636": "Hvala! Va\u0161 ra\u010dun bo nadgrajen takoj, ko dobimo potrdilo pla\u010dila s strani na\u0161ega ponudnika pla\u010dil v nekaj minutah. \u010ce ne boste dobili svojega MEGA PRO ra\u010duna v roku %1 ur, prosim, stopite v stik s [A]support@mega.nz[\/A].",
     "10637": "Kliknite tu za ve\u010d podrobnosti o ponavljujo\u010dih se pla\u010dilih, na\u0161i politiki vra\u010dila, ali kako prekiniti svojo naro\u010dnino.",
     "10638": "Ali \u017eelite, da avtomatsko obnovimo va\u0161 paket vsak mesec?",
@@ -3773,6 +3773,7 @@
     "16103": "Ponovno povabite vse \u010dakajo\u010de",
     "16104": "Namestitev aplikacije v \u010dakanju",
     "16105": "Dovoljena kvota",
+    "16106": "Your purchase of MEGA services will be processed by ECP for [B]Mega Europe sarl, 4 Rue Graham Bell, L-3235, Bettembourg, Luxembourg[B].",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4003,6 +4004,7 @@
         "also-available-windows-linux": 12487,
         "suggest-sync-client-message": 12488,
         "about-page-introduction": 12489,
-        "additional-site-update-message": 15536
+        "additional-site-update-message": 15536,
+        "purchase-processed-by-message": 16106
     }
 }

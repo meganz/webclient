@@ -3685,7 +3685,7 @@
     "10632": "Introduce tu direcci\u00f3n de facturaci\u00f3n",
     "10633": "Por favor, rellena todos los campos obligatorios.",
     "10634": "Si tienes problemas con el pago, por favor [A]contacta con nuestro soporte t\u00e9cnico[\/A].",
-    "10635": "Aviso: Este pago con tarjeta de cr\u00e9dito se mostrar\u00e1 como [B]MEGA PRO AUCKLAND[\/B] en tu extracto bancario.",
+    "10635": "Aviso: Este pago con tarjeta de cr\u00e9dito se mostrar\u00e1 como [B]MEGA PRO GLOBAL[\/B] en tu extracto bancario.",
     "10636": "\u00a1Gracias! Tu cuenta se har\u00e1 PRO en cuanto nuestro proveedor de pagos nos confirme la transacci\u00f3n en unos minutos. Si tu cuenta no se ha actualizado en %1 horas, ponte en contacto con nosotros en [A]support@mega.nz[\/A].",
     "10637": "Haz clic aqu\u00ed para m\u00e1s informaci\u00f3n sobre la suscripci\u00f3n peri\u00f3dica, nuestra pol\u00edtica de devoluciones o la cancelaci\u00f3n de tu suscripci\u00f3n.",
     "10638": "\u00bfQuieres que tu plan se renueve autom\u00e1ticamente cada mes?",
@@ -3773,6 +3773,7 @@
     "16103": "Reinvitar a todos los pendientes",
     "16104": "Instalaci\u00f3n de Aplicaci\u00f3n Pendiente",
     "16105": "Cuota Concedida",
+    "16106": "Your purchase of MEGA services will be processed by ECP for [B]Mega Europe sarl, 4 Rue Graham Bell, L-3235, Bettembourg, Luxembourg[B].",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4003,6 +4004,7 @@
         "also-available-windows-linux": 12487,
         "suggest-sync-client-message": 12488,
         "about-page-introduction": 12489,
-        "additional-site-update-message": 15536
+        "additional-site-update-message": 15536,
+        "purchase-processed-by-message": 16106
     }
 }

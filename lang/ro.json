@@ -3685,7 +3685,7 @@
     "10632": "Introdu detaliile adresei de facturare",
     "10633": "Te rug\u0103m s\u0103 completezi toate c\u00e2mpurile necesare.",
     "10634": "If you are having trouble with your payment, please [A]contact our support team[\/A].",
-    "10635": "Not\u0103: Aceast\u0103 plat\u0103 cu cardul de credit va fi listat\u0103 ca [B]MEGA PRO AUCKLAND[\/B] pe extrasul de cont.",
+    "10635": "Not\u0103: Aceast\u0103 plat\u0103 cu cardul de credit va fi listat\u0103 ca [B]MEGA PRO GLOBAL[\/B] pe extrasul de cont.",
     "10636": "Thanks! Your account will be upgraded as soon as we receive confirmation of your payment from our payment provider in a few minutes. If you have not received your MEGA PRO account within %1 hours, please contact us at [A]support@mega.nz[\/A].",
     "10637": "Clic aici pentru mai multe detalii cu privire la pl\u0103\u0163ile recurente, politica noastr\u0103 de rambursare sau cum s\u0103 anulezi abonamentul.",
     "10638": "Dore\u015fti ca planul s\u0103 fie re\u00eennoit automat \u00een fiecare lun\u0103?",
@@ -3773,6 +3773,7 @@
     "16103": "Reinvit\u0103 toate \u00een a\u015fteptare",
     "16104": "Instalare a aplica\u0163iei \u00een a\u015fteptare",
     "16105": "Cot\u0103 acordat\u0103",
+    "16106": "Your purchase of MEGA services will be processed by ECP for [B]Mega Europe sarl, 4 Rue Graham Bell, L-3235, Bettembourg, Luxembourg[B].",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4003,6 +4004,7 @@
         "also-available-windows-linux": 12487,
         "suggest-sync-client-message": 12488,
         "about-page-introduction": 12489,
-        "additional-site-update-message": 15536
+        "additional-site-update-message": 15536,
+        "purchase-processed-by-message": 16106
     }
 }

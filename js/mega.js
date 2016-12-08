@@ -6911,13 +6911,16 @@ function loadfm(force) {
                     ok  : '&h',         // ownerkeys for outgoing shares - handle
                     mk  : '&h',         // missing node keys - handle
                     u   : '&u',         // users - handle
+                    h   : '&h, c',      // hashes - handle, checksum
+                    ph  : '&h',         // exported links - handle
                     opc : '&p',         // outgoing pending contact - id
                     ipc : '&p',         // incoming pending contact - id
                     ps  : '&h_p',       // pending share - handle/id
                     mcf : '&id',        // chats - id
-                    _sn  : '&i',        // sn - fixed index 1
+                    _sn : '&i',         // sn - fixed index 1
+
                     // channel 1: non-transactional, used by IndexedDBKVStorage
-                    attrib : '&k',      // user attribute cache - k
+                    attrib : '&k',        // user attribute cache - k
                     chatqueuedmsgs : '&k' // queued chat messages - k
                 }, { attrib : 1, chatqueuedmsgs : 1 });
 

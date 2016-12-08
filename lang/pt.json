@@ -3685,7 +3685,7 @@
     "10632": "Insira os seus dados da morada de factura\u00e7\u00e3o",
     "10633": "Por favor preencha todos os campos requeridos.",
     "10634": "Se est\u00e1 a ter dificuldade em efectuar o seu pagamento, por favor [A]contacte a nossa equipa de apoio[\/A].",
-    "10635": "Nota: Este pagamento de cart\u00e3o de cr\u00e9dito ser\u00e1 listado como [B]MEGA PRO AUCKLAND[\/B] no seu extracto de conta.",
+    "10635": "Nota: Este pagamento de cart\u00e3o de cr\u00e9dito ser\u00e1 listado como [B]MEGA PRO GLOBAL[\/B] no seu extracto de conta.",
     "10636": "Obrigado! A sua conta ser\u00e1 actualizada assim que recebermos confirma\u00e7\u00e3o do seu pagamento do nosso fornecedor de pagamentos dentro de minutos. Se n\u00e3o tiver recebido a sua conta MEGA PRO dentro de %1 horas, por favor contacte-nos em [A]support@mega.nz[\/A].",
     "10637": "Clique aqui para mais detalhes sobre pagamentos recorrentes, a nossa pol\u00edtica de reembolso, ou como cancelar a sua subscri\u00e7\u00e3o.",
     "10638": "Gostaria que o seu plano fosse renovado automaticamente cada m\u00eas?",
@@ -3767,6 +3767,14 @@
     "16097": "Please check your e-mail and follow the link to confirm your account.",
     "16098": "Why do I need a Recovery Key?",
     "16099": "You can reset your password by following the recovery link that will be sent to your email.",
+    "16100": "Date Sent",
+    "16101": "Invitation Status",
+    "16102": "Invite more friends",
+    "16103": "Reinvite all pending",
+    "16104": "Pending App Install",
+    "16105": "Quota Granted",
+    "16106": "Your purchase of MEGA services will be processed by ECP for [B]Mega Europe sarl, 4 Rue Graham Bell, L-3235, Bettembourg, Luxembourg[\/B].",
+    "16107": "Did you know that you can download the entire folder at once if you [S]install the free MEGA app[\/S]?",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3997,6 +4005,8 @@
         "also-available-windows-linux": 12487,
         "suggest-sync-client-message": 12488,
         "about-page-introduction": 12489,
-        "additional-site-update-message": 15536
+        "additional-site-update-message": 15536,
+        "purchase-processed-by-message": 16106,
+        "install-free-mega-app": 16107
     }
 }

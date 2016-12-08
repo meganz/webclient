@@ -1999,9 +1999,6 @@ function MegaData()
                     }
                 }
             }// END of for folders loop
-
-            // Tree view DOM elements events listeners update
-            treeUI();
         }
     };// END buildtree()
 
@@ -6115,6 +6112,7 @@ function execsc() {
                         if (fminitialized) {
                             M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
                             sharedUInode(a.n);
+                            treeUI();
 
                             // Inshares permission DOM update
                             if (updateRights) {

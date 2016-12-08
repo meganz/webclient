@@ -3685,7 +3685,7 @@
     "10632": "Xin nh\u1eadp \u0111\u1ecba ch\u1ec9 c\u1ee7a qu\u00fd kh\u00e1ch \u0111\u1ec3 thanh to\u00e1n",
     "10633": "Xin nh\u1eadp th\u00f4ng tin v\u00e0o c\u00e1c \u00f4 tr\u1ed1ng.",
     "10634": "N\u1ebfu qu\u00fd kh\u00e1ch g\u1eb7p tr\u1ee5c tr\u1eb7c v\u1edbI c\u00e1ch thanh to\u00e1n n\u00e0y, xin [A]li\u00ean h\u1ec7 v\u1edbi b\u1ed9 ph\u1eadn tr\u1ee3 gi\u00fap[\/A].",
-    "10635": "Ghi ch\u00fa: Th\u1ebb ng\u00e2n h\u00e0ng c\u1ee7a qu\u00fd kh\u00e1ch s\u1ebd c\u00f3 t\u00ean c\u1ee7a [B]MEGA PRO AUCKLAND[\/B] khi th\u1ef1c hi\u1ec7n giao d\u1ecbch.",
+    "10635": "Ghi ch\u00fa: Th\u1ebb ng\u00e2n h\u00e0ng c\u1ee7a qu\u00fd kh\u00e1ch s\u1ebd c\u00f3 t\u00ean c\u1ee7a [B]MEGA PRO GLOBAL[\/B] khi th\u1ef1c hi\u1ec7n giao d\u1ecbch.",
     "10636": "Xin c\u1ea3m \u01a1n qu\u00fd kh\u00e1ch! T\u00e0i kho\u1ea3n c\u1ee7a qu\u00fd kh\u00e1ch s\u1ebd \u0111\u01b0\u1ee3c \u0111\u01b0\u1ee3c n\u00e2ng c\u1ea5p ngay sau khi ch\u00fang t\u00f4i nh\u1eadn \u0111\u01b0\u1ee3c th\u00f4ng tin x\u00e1c nh\u1eadn t\u1eeb ng\u00e2n h\u00e0ng trong v\u00e0i ph\u00fat t\u1edbi. N\u1ebfu t\u00e0i kho\u1ea3n c\u1ee7a qu\u00fd kh\u00e1ch kh\u00f4ng nh\u1eadn \u0111\u01b0\u1ee3c n\u00e2ng c\u1ea5p trong v\u00f2ng %1 gi\u1edd, xin li\u00ean h\u1ec7 v\u1edbi ch\u00fang t\u00f4i [A]support@mega.nz[\/A].",
     "10637": "Click v\u00e0o \u0111\u00e2y \u0111\u1ec3 hi\u1ec3u r\u00f5 h\u01a1n v\u1ec1 vi\u1ec7c thu ti\u1ec1n t\u1ef1 \u0111\u1ed9ng, c\u00e1ch ho\u00e0n ti\u1ec1n, ho\u1eb7c c\u00e1ch h\u1ee7y b\u1ecf h\u1ea1ng th\u00e0nh vi\u00ean.",
     "10638": "Qu\u00fd kh\u00e1ch c\u00f3 mu\u1ed1n h\u1ec7 th\u1ed1ng t\u1ef1 th\u00e2u ti\u1ec1n v\u00e0o m\u1ed7i th\u00e1ng hay kh\u00f4ng?",
@@ -3767,6 +3767,14 @@
     "16097": "Please check your e-mail and follow the link to confirm your account.",
     "16098": "Why do I need a Recovery Key?",
     "16099": "You can reset your password by following the recovery link that will be sent to your email.",
+    "16100": "Date Sent",
+    "16101": "Invitation Status",
+    "16102": "Invite more friends",
+    "16103": "Reinvite all pending",
+    "16104": "Pending App Install",
+    "16105": "Quota Granted",
+    "16106": "Your purchase of MEGA services will be processed by ECP for [B]Mega Europe sarl, 4 Rue Graham Bell, L-3235, Bettembourg, Luxembourg[\/B].",
+    "16107": "Did you know that you can download the entire folder at once if you [S]install the free MEGA app[\/S]?",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3997,6 +4005,8 @@
         "also-available-windows-linux": 12487,
         "suggest-sync-client-message": 12488,
         "about-page-introduction": 12489,
-        "additional-site-update-message": 15536
+        "additional-site-update-message": 15536,
+        "purchase-processed-by-message": 16106,
+        "install-free-mega-app": 16107
     }
 }

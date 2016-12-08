@@ -5,6 +5,13 @@ function voucherCentering(button) {
     popupBlock.css('top', button.position().top - 141);
 }
 
+/**
+ * WARNING: DELETING A SCROLL PANEL WOULD REMOVE THE CONTAINER DOM NODE AND ADD IT BACK TO THE DOM,
+ * which would basically break any stored references to it or its children nodes.
+ *
+ * @param from
+ * @param data
+ */
 function deleteScrollPanel(from, data) {
     var jsp = $(from).data(data);
     if (jsp) {
@@ -55,7 +62,6 @@ function initFileblocksScrolling2()
 
 function initContactsGridScrolling() {
     var scroll = '.grid-scrolling-table.contacts';
-    deleteScrollPanel(scroll, 'jsp');
     $(scroll).jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
     jScrollFade(scroll);
 }
@@ -163,7 +169,6 @@ function initTextareaScrolling($textarea, textareaMaxHeight, resizeEvent) {
  */
 function initOpcGridScrolling() {
     var scroll = '.grid-scrolling-table.opc';
-    deleteScrollPanel(scroll, 'jsp');
     $(scroll).jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
     jScrollFade(scroll);
 }
@@ -175,7 +180,6 @@ function initOpcGridScrolling() {
  */
 function initIpcGridScrolling() {
     var scroll = '.grid-scrolling-table.ipc';
-    deleteScrollPanel(scroll, 'jsp');
     $(scroll).jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
     jScrollFade(scroll);
 }
@@ -185,7 +189,6 @@ function initContactsBlocksScrolling() {
     if ($('.contacts-blocks-scrolling:visible').length === 0) {
         return;
     }
-    deleteScrollPanel(scroll, 'jsp');
     $(scroll).jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
     jScrollFade(scroll);
 }
@@ -195,7 +198,6 @@ function initShareBlocksScrolling() {
     if ($('.shared-blocks-scrolling:visible').length === 0) {
         return;
     }
-    deleteScrollPanel(scroll, 'jsp');
     $(scroll).jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
     jScrollFade(scroll);
 }
@@ -1265,7 +1267,6 @@ function hideTransferToast ($toast) {
 }
 
 function removeUInode(h, parent) {
-
     var n = M.d[h],
         i = 0;
 
@@ -1369,6 +1370,11 @@ function removeUInode(h, parent) {
             }
             break;
     }
+
+    if (M.megaRender && M.megaRender.megaList) {
+        M.megaRender.megaList.remove(h);
+    }
+
 
     if (M.currentdirid === h || isCircular(h, M.currentdirid) === true) {
         parent = parent || Object(M.getNodeByHandle(h)).p || RootbyId(h);
@@ -11288,3 +11294,33 @@ function removeFromMultiInputDDL(dialog, item) {
     scope.mega = scope.mega || {};
     scope.mega.SortMenu = SortMenu;
 })(jQuery, window);
+
+
+
+(function() {
+    var refreshTimeout;
+    /**
+     * A function, which would be called on every DOM update (or scroll). This func would implement
+     * throttling, so that we won't update the UI components too often.
+     *
+     * @param aViewMode {Number}
+     */
+    var fm_throttled_refresh = function fm_throttled_refresh(aViewMode) {
+
+        if (refreshTimeout) {
+            clearTimeout(refreshTimeout);
+        }
+        refreshTimeout = setTimeout(function() {
+            if (aViewMode === 0) {
+                gridUI(true);
+            }
+            else {
+                iconUI(false, true);
+            }
+            fm_thumbnails();
+            refreshTimeout = false;
+        }, 75);
+    };
+    window.fm_throttled_refresh = fm_throttled_refresh;
+})();
+

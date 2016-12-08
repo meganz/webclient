@@ -1,7 +1,8 @@
 (function(scope) {
     "use strict"; /* jshint maxcomplexity:19, maxdepth:6 */
 
-    var DYNLIST_ENABLED = false;
+    var DYNLIST_ENABLED = true;
+
     var logger;
 
     var viewModeTemplates = {
@@ -257,7 +258,6 @@
         else {
             this.chatIsReady = megaChatIsReady;
         }
-        this.numInsertedDOMNodes = 0;
 
         define(this, 'viewmode',            aViewMode);
         define(this, 'nodeMap',             Object.create(null));
@@ -269,74 +269,6 @@
         define(this, 'getNodeProperties',   this.nodeProperties[section] || this.nodeProperties['*']);
         define(this, 'dynListCache',        []);
         define(this, 'section',             section);
-
-        var megaListOptions = {
-            'itemRenderFunction': this.megaListRenderCb.bind(this),
-            'preserveOrderInDOM': true,
-            'extraRows': 2,
-            'onContentUpdated': function() {
-                self.throttledRefresh(aViewMode);
-            },
-            'perfectScrollOptions': {
-                'handlers': ['click-rail', 'drag-scrollbar', 'wheel', 'touch']
-            },
-        };
-
-        // only enable the MegaList for eventually longer lists as the cloud drive,
-        // shares, inbox, etc. (all of those set section to 'cloud-drive')
-        if (
-            section == 'cloud-drive'
-        ) {
-            var $megaListContainer;
-
-            if (this.viewmode) {
-                megaListOptions['itemWidth'] = 128 + 12 /* 12 = margin-left */;
-                megaListOptions['itemHeight'] = 152 + 12 /* 12 = margin-top */;
-                $megaListContainer = $('.fm-blocks-view.fm .file-block-scrolling');
-            }
-            else {
-                megaListOptions['itemWidth'] = false;
-                megaListOptions['itemHeight'] = 24;
-                megaListOptions['appendTo'] = 'table';
-                megaListOptions['renderAdapter'] = new MegaList.RENDER_ADAPTERS.Table();
-                $megaListContainer = $('.files-grid-view.fm .grid-scrolling-table');
-                if ($('.files-grid-view.fm .grid-scrolling-table table tbody').length === 0) {
-                    $('.files-grid-view.fm .grid-scrolling-table table').append($('<tbody></tbody>'));
-                }
-            }
-
-            if ($megaListContainer) {
-                define(this, 'megaList', new MegaList($megaListContainer, megaListOptions));
-            };
-        };
-
-        var maxItemsInView; // used for the dynlist
-        Object.defineProperty(this, 'maxItemsInView', {
-            set: function(value) {
-                maxItemsInView = (value | 0);
-            },
-            get: function() {
-                if (!maxItemsInView) {
-                    if (this.viewmode) {
-                        var $fm = $('.fm-blocks-view.fm');
-                        var row = Math.floor($fm.width() / 140);
-                        maxItemsInView = row * Math.ceil($fm.height() / 164) + row;
-                    }
-                    else {
-                        maxItemsInView = Math.ceil($('.files-grid-view.fm').height() / 24 * 1.4);
-                    }
-
-                    if (this.logger) {
-                        this.logger.debug('maxItemsInView', maxItemsInView);
-                    }
-
-                    // this is used in fm_thumbnails()
-                    $.rmItemsInView = (maxItemsInView | 0);
-                }
-
-                return maxItemsInView || (Math.pow(2, 32) - 1);
-            }
-        });
 
         if (scope.d) {
             var options = {
@@ -357,29 +289,6 @@
 
     MegaRender.prototype = Object.freeze({
         constructor: MegaRender,
-
-        /**
-         * A function, which would be called on every DOM update (or scroll). This func would implement
-         * throttling, so that we won't update the UI components too often.
-         *
-         * @param aViewMode {Number}
-         */
-        throttledRefresh: function(aViewMode) {
-
-            if (refreshTimeout) {
-                clearTimeout(refreshTimeout);
-            }
-            refreshTimeout = setTimeout(function() {
-                if (aViewMode === 0) {
-                    gridUI(true);
-                }
-                else {
-                    iconUI(false, true);
-                }
-                fm_thumbnails();
-                refreshTimeout = false;
-            }, 75);
-        },
 
         /**
          * Cleanup rendering layout.
@@ -487,7 +396,6 @@
          */
         renderLayout: function(aUpdate, aNodeList) {
             var initData = null;
-            var inViewNodes = this.numInsertedDOMNodes;
 
             if (this.logger) {
                 console.time('MegaRender.renderLayout');
@@ -498,35 +406,6 @@
             }
 
             this.container = document.querySelector(viewModeContainers[this.section][this.viewmode]);
-
-            if (this.megaList) {
-                var ids = [];
-                aNodeList.forEach(function(v) {
-                    ids.push(v.h);
-                });
-
-                if (!aUpdate) {
-                    if (this.viewmode) {
-                        var $container = $('.fm-blocks-view.fm.fm');
-                        $('.files-grid-view.fm').addClass("hidden");
-                    }
-                    else {
-                        var $container = $('.files-grid-view.fm');
-                        $('.fm-blocks-view.fm.fm').addClass("hidden");
-                    }
-                    $container.addClass('megaListContainer');
-                    $container.removeClass("hidden");
-                    this.megaList.batchAdd(ids);
-                    this.megaList.initialRender();
-                }
-                else {
-                    // XX: some day, if we want updates to be more efficient, we can remove this piece of code and
-                    // manually trigger .remove/add from the actual action packets received.
-
-                    this.megaList.syncItemsFromArray(ids);
-                }
-            }
-
 
             if (!this.container) {
                 if (d) {
@@ -557,7 +436,7 @@
 
                     if (node && node.h) {
                         var handle = node.h;
-                        var domNode = this.getDOMNode(node, handle);
+                        var domNode = this.getDOMNode(handle, node);
 
                         if (domNode) {
                             this.render(node, handle, domNode, idx | 0, aUpdate, initData);
@@ -577,24 +456,23 @@
                 console.timeEnd('MegaRender.renderLayout');
             }
 
-            if (!this.megaList) {
-                return this.numInsertedDOMNodes - inViewNodes;
-            }
-            else {
-                return aNodeList.length;
-            }
+            return aNodeList.length;
         },
 
         /**
          * Retrieves a DOM node stored in the `nodeMap`,
          * creating it if it doesn't exists.
          *
-         * @param {String} aNode   The ufs-node
          * @param {String} aHandle The ufs-node's handle
+         * @param {String} [aNode]   The ufs-node
          */
-        getDOMNode: function(aNode, aHandle) {
+        getDOMNode: function(aHandle, aNode) {
 
             if (!this.nodeMap[aHandle]) {
+                if (!aNode) {
+                    aNode = M.d[aHandle];
+                }
+
                 var template = this.template.cloneNode(true);
                 var properties = this.getNodeProperties(aNode, aHandle);
 
@@ -628,7 +506,7 @@
          * @param aHandle {String}
          */
         megaListRenderCb: function(aHandle) {
-            var node = this.getDOMNode(M.d[aHandle], aHandle);
+            var node = this.getDOMNode(aHandle, M.d[aHandle]);
 
             if (selectionManager && selectionManager.selected_list) {
                 if (selectionManager.selected_list.indexOf(aHandle) > -1) {
@@ -689,7 +567,6 @@
                 }
                 else {
                     aNode.seen = true;
-                    this.numInsertedDOMNodes++;
                     this.container.appendChild(aDOMNode);
                 }
             }
@@ -759,7 +636,6 @@
                     }
                 }
                 aNode.seen = true;
-                this.numInsertedDOMNodes++;
             }
         },
 
@@ -1101,24 +977,7 @@
                 getLastInteractionWith(aHandle);
             },
             'cloud-drive': function(aNode, aHandle, aDOMNode, aNodeIndex, aUpdate, aUserData) {
-                var putInView;
-                var cacheEntry = null;
-
-                // if we're updating the list, prevent caching if a prev/next node is in view
-                if (aUpdate && aUserData) {
-                    var prevNode = this.nodeList[aNodeIndex - 1];
-                    var nextNode = this.nodeList[aNodeIndex + 1];
-
-                    putInView =
-                        (prevNode && aUserData.inViewNodeList[prevNode.h]) ||
-                        (nextNode && aUserData.inViewNodeList[nextNode.h]) ;
-                }
-
-                if (!putInView && this.numInsertedDOMNodes >= this.maxItemsInView) {
-                    cacheEntry = this.getCacheEntry(aNode, aHandle, aDOMNode, aNodeIndex);
-                }
-
-                if (!this.megaList) {
+                if (!DYNLIST_ENABLED) {
                     this.insertDOMNode(aNode, aNodeIndex, aDOMNode, aUpdate, cacheEntry);
                 }
             }
@@ -1139,54 +998,46 @@
                 return null;
             },
             'cloud-drive': function(aUpdate, aNodeList) {
+                var self = this;
                 var result = this.initializers['*'].apply(this, arguments);
 
-                // If we're updating the list, no need to traverse the whole nodeList (M.v) again, filter out new nodes
-                if (aUpdate && DYNLIST_ENABLED && aNodeList.length && Object(newnodes).length) {
+                if (DYNLIST_ENABLED && (!aUpdate || !this.megaList)) {
+                    var megaListOptions = {
+                        'itemRenderFunction': this.megaListRenderCb.bind(this),
+                        'preserveOrderInDOM': true,
+                        'extraRows': 2,
+                        'onContentUpdated': function () {
+                            fm_throttled_refresh(self.viewmode);
+                        },
+                        'perfectScrollOptions': {
+                            'handlers': ['click-rail', 'drag-scrollbar', 'wheel', 'touch']
+                        },
+                    };
+                    var megaListContainer;
 
-                    var inView = [];
-                    var newNodes = [];
-                    var nodeIndex = [];
-
-                    var objMap = newnodes
-                        .map(function(n) {
-                            return n.h;
-                        })
-                        .reduce(function(obj, value) {
-                            obj[value] = 1;
-                            return obj;
-                        }, {});
-
-                    for (var idx in aNodeList) {
-                        if (aNodeList.hasOwnProperty(idx)) {
-                            if (objMap[aNodeList[idx].h]) {
-                                newNodes[idx] = aNodeList[idx];
-                            }
-                            if (aNodeList[idx].seen) {
-                                inView[aNodeList[idx].h] = 1;
-                            }
-                            nodeIndex[aNodeList[idx].h] = idx;
+                    if (this.viewmode) {
+                        megaListOptions['itemWidth'] = 128 + 12 /* 12 = margin-left */;
+                        megaListOptions['itemHeight'] = 152 + 12 /* 12 = margin-top */;
+                        megaListContainer = document.querySelector('.fm-blocks-view.fm .file-block-scrolling');
+                    }
+                    else {
+                        megaListOptions['itemWidth'] = false;
+                        megaListOptions['itemHeight'] = 24;
+                        megaListOptions['appendTo'] = 'table';
+                        megaListOptions['renderAdapter'] = new MegaList.RENDER_ADAPTERS.Table();
+                        megaListContainer = document.querySelector('.files-grid-view.fm .grid-scrolling-table');
+                        if (
+                            document.querySelectorAll(
+                                '.files-grid-view.fm .grid-scrolling-table table tbody'
+                            ).length === 0
+                        ) {
+                            var tableNode = document.querySelector('.files-grid-view.fm .grid-scrolling-table table');
+                            tableNode.appendChild(document.createElement("tbody"));
                         }
                     }
 
-                    if (newNodes.length) {
-                        var cache = this.dynListCache;
-                        var len = cache.length;
-
-                        while (len--) {
-                            if (!nodeIndex[cache[len].nodeHandle]) {
-                                if (this.logger) {
-                                    this.logger.error('Cached node not found.', len, cache[len].nodeHandle);
-                                }
-                            }
-                            else {
-                                cache[len].nodeIndex = nodeIndex[cache[len].nodeHandle];
-                            }
-                        }
-
-                        result = Object(result);
-                        result.newNodeList = newNodes;
-                        result.inViewNodeList = inView;
+                    if (megaListContainer) {
+                        define(this, 'megaList', new MegaList(megaListContainer, megaListOptions));
                     }
                 }
 
@@ -1212,144 +1063,38 @@
             },
             'cloud-drive': function(aUpdate, aNodeList, aUserData) {
                 if (DYNLIST_ENABLED) {
-                    if (this.logger) {
-                        this.logger.info('dynListCache %d/%d (%d)',
-                            this.dynListCache.length,
-                            Object.keys(this.nodeMap).length,
-                            this.numInsertedDOMNodes);
-                    }
-
-                    if (aUpdate) {
-
-                        if (aUserData && aUserData.newNodeList) {
-
-                            // If we just updated the list, re-sort the cached
-                            // entries based on the nodeIndex (relative to M.v)
-                            this.dynListCache.sort(function(a, b) {
-                                return a.nodeIndex - b.nodeIndex;
-                            });
-                        }
-                    }
-
-                    var self = this;
-                    var lSel = this.cloudListSelector;
-
-                    var flushCachedNodes = function(aFlushCount) {
-                        var entries = self.dynListCache.splice(0, aFlushCount || self.dynListCache.length);
-
-                        if (self.logger) {
-                            self.logger.debug('Flushing cached nodes...',
-                                entries.length, self.dynListCache.length);
-                        }
-
-                        if (entries.length) {
-                            var nodeList = self.nodeList;
-                            var $container = $(self.container);
-
-                            if (self.viewmode) {
-                                $container = $container.data('jsp');
-
-                                if (!$container) {
-                                    if (self.logger) {
-                                        self.logger.error('JSP Not Found...', self);
-                                    }
-                                    return;
-                                }
-                                $container = $container.getContentPane();
-                            }
-
-                            for (var idx in entries) {
-                                if (entries.hasOwnProperty(idx)) {
-                                    var node = nodeList[entries[idx].nodeIndex];
-
-                                    // Set the `seen` flag for thumbnail retrieval.
-                                    if (node && node.h === entries[idx].nodeHandle) {
-                                        node.seen = true;
-                                    }
-                                    else {
-                                        if (self.logger) {
-                                            self.logger.warn('desync cached node...', entries[idx].nodeHandle);
-                                        }
-
-                                        for (var k in nodeList) {
-                                            if (nodeList[k].h === entries[idx].nodeHandle) {
-                                                nodeList[k].seen = true;
-                                                break;
-                                            }
-                                        }
-                                    }
-
-                                    self.numInsertedDOMNodes++;
-                                    $container.append(entries[idx].domNode);
-                                }
-                            }
-
-                            // Delayed M.rmSetupUI() call to bind mouse events to newly inserted nodes
-                            delay('dynlist.flush', M.rmSetupUI.bind(M), 750);
-                            $(window).trigger('resize');
-                        }
-                        else {
-                            // No more cached entries found, thus unbind jScrollPane listener.
-                            $(lSel).unbind('jsp-scroll-y.dynlist');
-                        }
-                    };
-
-                    $(window).rebind('dynlist.flush', function() {
-                        if (self.dynListCache.length) {
-                            flushCachedNodes();
-                        }
+                    var ids = [];
+                    aNodeList.forEach(function(v) {
+                        ids.push(v.h);
                     });
 
-                    if (this.dynListCache.length) {
-
-                        // Listen for jScrollPane events triggered when scrolling to the bottom
-                        $(lSel).rebind('jsp-scroll-y.dynlist', function(ev, pos, atTop, atBottom) {
-                            if (atBottom) {
-                                flushCachedNodes(self.maxItemsInView);
-                            }
-                        });
-
-                        var cdid = M.currentdirid;
-                        var viewmode = M.viewmode;
-                        $(window).rebind("resize.dynlist", SoonFc(function() {
-                            if (cdid !== M.currentdirid || viewmode !== M.viewmode) {
-                                return;
-                            }
-
-                            // on resizing, clear the maxItemsInView
-                            if (self.viewPixelSize !== (scope.innerWidth * scope.innerHeight)) {
-                                self.maxItemsInView = null;
-                                self.viewPixelSize = (scope.innerWidth * scope.innerHeight);
-                            }
-
-                            // check if pending cached entries
-                            if (self.dynListCache.length) {
-
-                                // if the scrollbar is not visible
-                                if (!$(lSel).find('.jspDrag:visible').length) {
-                                    var num = self.maxItemsInView;
-
-                                    // flush nodes to fill remaining view
-                                    num -= self.container.querySelectorAll(self.template.nodeName).length;
-
-                                    if (num > 0) {
-                                        flushCachedNodes(num);
-                                    }
-                                }
-                            }
-                            else {
-                                $(window).unbind('resize.dynlist');
-                            }
-                        }));
+                    if (!aUpdate) {
+                        if (this.viewmode) {
+                            var container = document.querySelector('.fm-blocks-view.fm.fm');
+                            this.addClasses(document.querySelector('.files-grid-view.fm'), ["hidden"]);
+                        }
+                        else {
+                            var container = document.querySelector('.files-grid-view.fm');
+                            this.addClasses(document.querySelector('.fm-blocks-view.fm.fm'), ["hidden"]);
+                        }
+                        this.addClasses(container, ['megaListContainer']);
+                        this.removeClasses(container, ["hidden"]);
+                        this.megaList.batchAdd(ids);
+                        this.megaList.initialRender();
                     }
+                    else {
+                        // XX: some day, if we want updates to be more efficient, we can remove this piece of code and
+                        // manually trigger .remove/add from the actual action packets received.
 
-                    aNodeList = aUserData = undefined;
+                        this.megaList.syncItemsFromArray(ids);
+                    }
                 }
             }
         }),
 
         destroy: function() {
-            if (this.megaList) {
+            // megaList can be undefined/empty if the current folder had no nodes in it.
+            if (DYNLIST_ENABLED && this.megaList) {
                 this.megaList.destroy();
             }
         },

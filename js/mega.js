@@ -3362,7 +3362,6 @@ function MegaData()
 
     this.moveNodes = function(n, t) {
         newnodes = [];
-        var megaListRemovedNodes = [];
 
         for (var i in n) {
             var h = n[i];
@@ -3388,9 +3387,6 @@ function MegaData()
                 for (var k in M.v) {
                     if (M.v[k].h === h) {
                         M.v.splice(k, 1);
-                        if (M.megaRender && M.megaRender.megaList.items.indexOf(h) !== false) {
-                            megaListRemovedNodes.push(h);
-                        }
                         break;
                     }
                 }
@@ -3402,9 +3398,6 @@ function MegaData()
                 removeUInode(h, parent);
                 newnodes.push(node);
             }
-        }
-        if (megaListRemovedNodes.length > 0) {
-            M.megaRender.megaList.batchRemove(megaListRemovedNodes);
         }
 
         renderNew();

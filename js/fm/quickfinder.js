@@ -63,80 +63,68 @@ var QuickFinder = function(searchable_elements, containers) {
 
             $(self).trigger("activated");
 
-            if (M.megaRender && M.megaRender.megaList) {
-                var foundIds = [];
 
-                charTyped = charTyped.toLowerCase();
+            var foundIds = [];
 
-                foundIds = M.v.filter(function(v) {
-                    var nameStr = v.name;
-                    if (nameStr[0].toLowerCase() === charTyped) {
-                        return true;
-                    }
-                });
+            charTyped = charTyped.toLowerCase();
 
-                if (
-                    /* repeat key press, but show start from the first element */
-                    (last_key != null && (foundIds.length - 1) <= next_idx)
-                    ||
-                    /* repeat key press is not active, should reset the target idx to always select the first
-                    element */
-                    (last_key == null)
-                ) {
-                    next_idx = 0;
-                    last_key = null;
-                } else if (last_key == charTyped) {
-                    next_idx++;
-                } else if (last_key != charTyped) {
-                    next_idx = 0;
+            foundIds = M.v.filter(function(v) {
+                var nameStr = "";
+                if (v.name) {
+                     nameStr = v.name;
                 }
-                last_key = charTyped;
-                if (foundIds[next_idx]) {
-                    var nextId = foundIds[next_idx].h;
-                    selectionManager.clear_selection();
-                    selectionManager.set_currently_selected(nextId, true);
+                else if (v.firstName) {
+                    nameStr = v.firstName;
                 }
+                else if (v.m) {
+                    // ipc and opc
+                    nameStr = v.m;
+                }
+
+                if (nameStr[0].toLowerCase() === charTyped) {
+                    return true;
+                }
+            });
+
+            if (
+                /* repeat key press, but show start from the first element */
+                (last_key != null && (foundIds.length - 1) <= next_idx)
+                ||
+                /* repeat key press is not active, should reset the target idx to always select the first
+                element */
+                (last_key == null)
+            ) {
+                next_idx = 0;
+                last_key = null;
+            } else if (last_key == charTyped) {
+                next_idx++;
+            } else if (last_key != charTyped) {
+                next_idx = 0;
             }
-            else {
-                var $found = $(searchable_elements).filter(":visible:istartswith('" + charTyped + "')");
+            last_key = charTyped;
+            if (foundIds[next_idx]) {
+                var nextId = SelectionManager.dynamicNodeIdRetriever(foundIds[next_idx]);
+                selectionManager.clear_selection();
+                selectionManager.set_currently_selected(nextId, true);
 
-                if (
-                    /* repeat key press, but show start from the first element */
-                    (last_key != null && ($found.size() - 1) <= next_idx)  ||
-                    /* repeat key press is not active, should reset the target idx to always select the first
-                    element */
-                    (last_key == null)
-                ) {
-                    next_idx = 0;
-                    last_key = null;
-                } else if (last_key == charTyped) {
-                    next_idx++;
-                } else if (last_key != charTyped) {
-                    next_idx = 0;
-                }
-                last_key = charTyped;
+                if (!M.megaRender.megaList) {
+                    $(searchable_elements).parents(".ui-selectee, .ui-draggable").removeClass('ui-selected');
 
-                $(searchable_elements).parents(".ui-selectee, .ui-draggable").removeClass('ui-selected');
+                    var $target_elm = $('#' + nextId);
 
-                var $target_elm = $($found[next_idx]);
+                    $target_elm.parents(".ui-selectee, .ui-draggable").addClass("ui-selected");
 
-                $target_elm.parents(".ui-selectee, .ui-draggable").addClass("ui-selected");
+                    var $jsp = $target_elm.getParentJScrollPane();
+                    if ($jsp) {
+                        var $scrolled_elm = $target_elm.parent("a");
 
-                var $jsp = $target_elm.getParentJScrollPane();
-                if ($jsp) {
-                    var $scrolled_elm = $target_elm.parent("a");
-
-                    if ($scrolled_elm.size() == 0) { // not in icon view, its a list view, search for a tr
-                        $scrolled_elm = $target_elm.parents('tr:first');
+                        if ($scrolled_elm.size() == 0) { // not in icon view, its a list view, search for a tr
+                            $scrolled_elm = $target_elm.parents('tr:first');
+                        }
+                        $jsp.scrollToElement($scrolled_elm);
                     }
-                    $jsp.scrollToElement($scrolled_elm);
-                }
 
-                $(self).trigger('search');
-
-                if ($target_elm && $target_elm.size() > 0) {
-                    // ^^ DONT stop prop. if there are no found elements.
-                    return false;
+                    $(self).trigger('search');
                 }
             }
         }
@@ -220,5 +208,6 @@ var QuickFinder = function(searchable_elements, containers) {
 
 var quickFinder = new QuickFinder(
     '.tranfer-filetype-txt, .file-block-title, td span.contacts-username',
-    '.files-grid-view, .fm-blocks-view.fm, .contacts-grid-table'
+    '.files-grid-view, .fm-blocks-view.fm, .contacts-grid-table, .contacts-blocks-scrolling,' +
+    '.contact-requests-grid, .sent-requests-grid'
 );

@@ -75,10 +75,10 @@ var SelectionManager = function($selectable, resume) {
             return this.last_selected;
         }
         else if ((first_or_last === "first" || !first_or_last) && M.v.length > 0) {
-            return M.v[0].h;
+            return SelectionManager.dynamicNodeIdRetriever(M.v[0]);
         }
         else if (first_or_last === "last" &&  M.v.length > 0) {
-            return M.v[M.v.length - 1].h;
+            return SelectionManager.dynamicNodeIdRetriever(M.v[M.v.length - 1]);
         }
         else {
             return false;
@@ -159,7 +159,7 @@ var SelectionManager = function($selectable, resume) {
         self.clear_selection();
 
         M.v.forEach(function(v) {
-            self.add_to_selection(v.h, false);
+            self.add_to_selection(SelectionManager.dynamicNodeIdRetriever(v), false);
         });
     };
 
@@ -174,7 +174,7 @@ var SelectionManager = function($selectable, resume) {
     this._select_pointer = function(ptr, shiftKey, scrollTo) {
         var currentViewIds = [];
         M.v.forEach(function(v) {
-            currentViewIds.push(v.h);
+            currentViewIds.push(SelectionManager.dynamicNodeIdRetriever(v));
         });
 
         var current = this.get_currently_selected("first");
@@ -213,7 +213,7 @@ var SelectionManager = function($selectable, resume) {
     this._select_ptr_grid = function(ptr, shiftKey, scrollTo) {
         var currentViewIds = [];
         M.v.forEach(function(v) {
-            currentViewIds.push(v.h);
+            currentViewIds.push(SelectionManager.dynamicNodeIdRetriever(v));
         });
 
         var items_per_row = Math.floor(
@@ -278,7 +278,7 @@ var SelectionManager = function($selectable, resume) {
 
         var currentViewIds = [];
         M.v.forEach(function(v) {
-            currentViewIds.push(v.h);
+            currentViewIds.push(SelectionManager.dynamicNodeIdRetriever(v));
         });
 
         var current = this.get_currently_selected("first");
@@ -335,7 +335,35 @@ var SelectionManager = function($selectable, resume) {
     $selectable.bind('selectablestop', function(e, data) {
         // dont do nothing
     });
+
+    // if (localStorage.selectionManagerDebug) {
+    //     var self = this;
+    //     Object.keys(self).forEach(function(k) {
+    //         if (typeof(self[k]) === 'function') {
+    //             var old = self[k];
+    //             self[k] = function () {
+    //                 console.error(k, arguments);
+    //                 return old.apply(this, arguments);
+    //             };
+    //         }
+    //     })
+    // }
+
     return this;
+};
+
+/**
+ * Helper function that would retrieve the DOM Node ID from `n` and convert it to DOM node ID
+ *
+ * @param n
+ */
+SelectionManager.dynamicNodeIdRetriever = function(n) {
+    if ((M.currentdirid === "ipc" || M.currentdirid === "opc") && n.p) {
+        return M.currentdirid + "_" + n.p;
+    }
+    else {
+        return n.h;
+    }
 };
 
 var selectionManager;

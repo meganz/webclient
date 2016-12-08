@@ -32,6 +32,9 @@ function FMShortcuts() {
 
         if (charTyped == "a" && (e.ctrlKey || e.metaKey)) {
             if (typeof selectionManager != 'undefined' && selectionManager) {
+                if (M.currentdirid === 'ipc' || M.currentdirid === 'opc') {
+                    return;
+                }
                 selectionManager.select_all();
             }
             return false; // stop prop.
@@ -261,6 +264,9 @@ function UIkeyevents() {
             }
         }
         else if ((e.keyCode === 113 /* F2 */) && (s.length > 0) && !$.dialog && RightsbyID(M.currentdirid) > 1) {
+            if (M.currentdirid === 'ipc' || M.currentdirid === 'opc') {
+                return;
+            }
             // F2 rename in FM
             $.selected = [];
             s.each(function(i, e) {
@@ -269,6 +275,9 @@ function UIkeyevents() {
             renameDialog();
         }
         else if (e.keyCode == 65 && e.ctrlKey && !$.dialog) {
+            if (M.currentdirid === 'ipc' || M.currentdirid === 'opc') {
+                return;
+            }
             // ctrl+a/cmd+a - select all
             // $('.grid-table.fm tr').addClass('ui-selected');
             // $('.file-block').addClass('ui-selected');

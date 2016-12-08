@@ -23474,6 +23474,11 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
     color: #ff4444;
     text-decoration: underline;
 }
+.payment-address-dialog .payment-note-first b {
+    color: #333;
+    font-family: "source_sans_proregular", sans-serif;
+    font-weight: normal;
+}
 .payment-address-dialog .payment-note-second {
     bottom: -90px;
     color: #fff;

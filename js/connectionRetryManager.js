@@ -12,6 +12,7 @@ var ConnectionRetryManager = function(opts, parentLogger) {
     self._lastConnectionRetryTime = 0;
     self._connectionRetryInProgress = null;
     self._connectionRetries = 0;
+    self._connectionState = ConnectionRetryManager.CONNECTION_STATE.DISCONNECTED;
     self.logger = new MegaLogger("connectionRetryManager", {}, parentLogger);
 
     self.options = $.extend({}, ConnectionRetryManager.DEFAULT_OPTS, opts);
@@ -124,6 +125,13 @@ ConnectionRetryManager.DEFAULT_OPTS = {
     }
 };
 
+
+ConnectionRetryManager.CONNECTION_STATE = {
+    'CONNECTED': 1,
+    'CONNECTING': 2,
+    'DISCONNECTED': 0,
+};
+
 /**
  * Should be triggered when the connection closed
  */
@@ -138,6 +146,7 @@ ConnectionRetryManager.prototype.gotDisconnected = function(){
         self.options.functions.isDisconnected() === true &&
         self.options.functions.isUserForcedDisconnect() === false
     ) {
+        self._connectionState = ConnectionRetryManager.CONNECTION_STATE.DISCONNECTED;
 
         //console.error(self._instanceIdx, "bind mouse move");
         $(document).rebind("mousemove.megaChatRetry" + self._instanceIdx, function() {
@@ -163,6 +172,9 @@ ConnectionRetryManager.prototype.gotDisconnected = function(){
  */
 ConnectionRetryManager.prototype.gotConnected = function(){
     var self = this;
+
+    self._connectionState = ConnectionRetryManager.CONNECTION_STATE.CONNECTED;
+
     self._connectionRetries = 0; // reset connection retries
 
     // stop any timer which is running to try to reconnect (which should not happen, but since Karere is async...
@@ -177,6 +189,7 @@ ConnectionRetryManager.prototype.gotConnected = function(){
     $(window).rebind("offline.megaChatRetry" + self._instanceIdx, function() {
         if (!self.options.functions.isUserForcedDisconnect()) {
             self.options.functions.forceDisconnect(self);
+            self._connectionState = ConnectionRetryManager.CONNECTION_STATE.DISCONNECTED;
         }
     });
 };
@@ -233,6 +246,7 @@ ConnectionRetryManager.prototype.doConnectionRetry = function(immediately){
                 !self.options.functions.isConnectedOrConnecting()
             ) {
                 self.options.functions.reconnect(self);
+                self._connectionState = ConnectionRetryManager.CONNECTION_STATE.CONNECTING;
             }
             self._connectionRetryInProgress = null;
         }, self.options.restartConnectionRetryTimeout);
@@ -272,6 +286,7 @@ ConnectionRetryManager.prototype.doConnectionRetry = function(immediately){
         self._connectionRetryInProgress = setTimeout(function() {
             if (!self.options.functions.isConnected()) {
                 self.options.functions.reconnect(self);
+                self._connectionState = ConnectionRetryManager.CONNECTION_STATE.CONNECTING;
             } else {
             }
         }, connectionRetryTimeout);
@@ -316,6 +331,10 @@ ConnectionRetryManager.prototype.resetConnectionRetries = function() {
 };
 
 
+ConnectionRetryManager.prototype.getConnectionState = function() {
+    return this._connectionState;
+};
+
 /**
  * Can be used to run code that requires a conncetion (or forces a connect).
  *
@@ -324,6 +343,7 @@ ConnectionRetryManager.prototype.resetConnectionRetries = function() {
 ConnectionRetryManager.prototype.requiresConnection = function() {
     var self = this;
 
+    debugger;
     if (!self.options.functions.isConnectedOrConnecting()) {
         self.doConnectionRetry(true);
         return self._$connectingPromise;

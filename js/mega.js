@@ -841,15 +841,14 @@ function MegaData()
     };
 
     this.onlineStatusEvent = function(u, status) {
+        console.error('onlineStatusEvent', u, status, "translated to:", u.u, this.onlineStatusClass(status));
         if (u && megaChatIsReady) {
-            // this event is triggered for a specific resource/device (fullJid), so we need to get the presen for the
-            // user's devices, which is aggregated by Karere already
-            status = megaChat.karere.getPresence(megaChat.getJidFromNodeId(u.u));
             var e = $('.ustatus.' + u.u);
             if (e.length > 0) {
                 $(e).removeClass('offline online busy away');
                 $(e).addClass(this.onlineStatusClass(status)[1]);
             }
+
             var e = $('.fm-chat-user-status.' + u.u);
             if (e.length > 0) {
                 $(e).html(this.onlineStatusClass(status)[0]);

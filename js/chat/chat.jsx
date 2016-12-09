@@ -346,80 +346,58 @@ Chat.prototype.init = function() {
 
 
     // Karere Events
-    this.karere.bind("onPresence", function(e, eventObject) {
-        if (eventObject.error) {
-            return;
-        }
-
-        var bareJid = eventObject.getFromJid().split("/")[0];
-
-        // should we trigger refreshUI ?
-        if (eventObject.isMyOwn(self.karere) === false) {
-            self.chats.forEach(function(room, roomJid) {
-
-                if (room.participantExistsInRoom(bareJid)) {
-                    // if this user is part of the currently visible room, then refresh the UI
-                    if (self.getCurrentRoomJid() === room.roomJid) {
-                        // room.refreshUI();
-                    }
-                }
-            });
-        }
-
-
-        // update M.u
-        var contact = self.getContactFromJid(eventObject.getFromJid());
-        if (contact) {
-            if (!contact.presenceMtime || parseFloat(contact.presenceMtime) < eventObject.getDelay()) {
-                contact.presence = megaChat.karere.getPresence(megaChat.getJidFromNodeId(contact.u));
-                contact.presenceMtime = eventObject.getDelay();
-            }
-        }
-
-        if (eventObject.getShow() !== "unavailable") {
-            if (eventObject.isMyOwn(self.karere) === false) {
-                // Sync presence across devices (will check the delayed val!)
-                if (bareJid === self.karere.getBareJid()) {
-                    if (eventObject.getDelay() && eventObject.getDelay() >= parseFloat(localStorage.megaChatPresenceMtime) && self._myPresence != eventObject.getShow()) {
-                        self._myPresence = eventObject.getShow();
-                        localStorage.megaChatPresence = eventObject.getShow();
-                        localStorage.megaChatPresenceMtime = eventObject.getDelay();
-
-                        self.karere.setPresence(
-                            eventObject.getShow(),
-                            undefined,
-                            eventObject.getDelay()
-                        );
-                    }
-                }
-
-            }
-        }
-
-        self.renderMyStatus();
-    });
-
-    // Disco capabilities updated
-    this.karere.bind("onDiscoCapabilities", function(e, eventObject) {
-        var $treeElement = $('.nw-conversations-item[data-jid="' + eventObject.getFromUserBareJid() + '"]');
-
-        $.each(eventObject.getCapabilities(), function(capability, capable) {
-            if (capable) {
-                $treeElement.addClass('chat-capability-' + capability);
-            }
-            else {
-                $treeElement.removeClass('chat-capability-' + capability);
-            }
-        });
-
-        var roomJid = $treeElement.attr('data-room-jid');
-
-        var room = self.chats[roomJid + "@conference." + megaChat.options.xmppDomain];
-        if (room) { // refresh UI if new capabilities were received.
-            // room.refreshUI();
-        }
-
-    });
+    // this.karere.bind("onPresence", function(e, eventObject) {
+    //     if (eventObject.error) {
+    //         return;
+    //     }
+    //
+    //     var bareJid = eventObject.getFromJid().split("/")[0];
+    //
+    //     // should we trigger refreshUI ?
+    //     if (eventObject.isMyOwn(self.karere) === false) {
+    //         self.chats.forEach(function(room, roomJid) {
+    //
+    //             if (room.participantExistsInRoom(bareJid)) {
+    //                 // if this user is part of the currently visible room, then refresh the UI
+    //                 if (self.getCurrentRoomJid() === room.roomJid) {
+    //                     // room.refreshUI();
+    //                 }
+    //             }
+    //         });
+    //     }
+    //
+    //
+    //     // update M.u
+    //     var contact = self.getContactFromJid(eventObject.getFromJid());
+    //     if (contact) {
+    //         if (!contact.presenceMtime || parseFloat(contact.presenceMtime) < eventObject.getDelay()) {
+    //             contact.presence = megaChat.karere.getPresence(megaChat.getJidFromNodeId(contact.u));
+    //             contact.presenceMtime = eventObject.getDelay();
+    //         }
+    //     }
+    //
+    //     if (eventObject.getShow() !== "unavailable") {
+    //         if (eventObject.isMyOwn(self.karere) === false) {
+    //             // Sync presence across devices (will check the delayed val!)
+    //             if (bareJid === self.karere.getBareJid()) {
+    //                 if (eventObject.getDelay() && eventObject.getDelay() >= parseFloat(localStorage.megaChatPresenceMtime) && self._myPresence != eventObject.getShow()) {
+    //                     self._myPresence = eventObject.getShow();
+    //                     localStorage.megaChatPresence = eventObject.getShow();
+    //                     localStorage.megaChatPresenceMtime = eventObject.getDelay();
+    //
+    //                     self.karere.setPresence(
+    //                         eventObject.getShow(),
+    //                         undefined,
+    //                         eventObject.getDelay()
+    //                     );
+    //                 }
+    //             }
+    //
+    //         }
+    //     }
+    //
+    //     self.renderMyStatus();
+    // });
 
     var updateMyConnectionStatus = function() {
         self.renderMyStatus();
@@ -492,10 +470,10 @@ Chat.prototype.init = function() {
         self._myPresence = presence;
 
         localStorage.megaChatPresence = presence;
-        localStorage.megaChatPresenceMtime = unixtime();
 
         $('.top-user-status-popup').removeClass("active");
 
+        // karere...
         if (self.karere.getConnectionState() != Karere.CONNECTION_STATE.CONNECTED && presence != Karere.PRESENCE.OFFLINE) {
             self.karere._myPresence = presence;
             self.connect().done(function() {
@@ -522,6 +500,16 @@ Chat.prototype.init = function() {
                 self.karere.connectionRetryManager.resetConnectionRetries();
                 self.karere.setPresence(presence, undefined, localStorage.megaChatPresenceMtime);
             }
+        }
+        // presenced integration
+        var targetPresence = PresencedIntegration.cssClassToPresence(presence);
+        if (targetPresence === UserPresence.PRESENCE.OFFLINE) {
+            self.userPresence.disconnect(true);
+        }
+        else {
+            self.userPresence.connectionRetryManager.requiresConnection(function () {
+                self.userPresence.setoverride(targetPresence);
+            });
         }
     });
 
@@ -667,10 +655,10 @@ Chat.prototype.init = function() {
         }
     });
     
-    self.karere.rebind("onPresence.maintainUI", function(e, presenceEventData) {
-        var contact = self.getContactFromJid(presenceEventData.getFromJid());
-        M.onlineStatusEvent(contact, presenceEventData.getShow());
-    });
+    // self.karere.rebind("onPresence.maintainUI", function(e, presenceEventData) {
+    //     var contact = self.getContactFromJid(presenceEventData.getFromJid());
+    //     M.onlineStatusEvent(contact, presenceEventData.getShow());
+    // });
 
 
 
@@ -1068,30 +1056,6 @@ Chat.prototype.xmppPresenceToCssClass = function(presence) {
 };
 
 /**
- * Helper to convert XMPP presence from string (e.g. 'chat'), to a translated text
- *
- * @param presence {String}
- * @returns {String}
- */
-Chat.prototype.xmppPresenceToText = function(presence) {
-    if (presence == Karere.PRESENCE.ONLINE || presence == Karere.PRESENCE.AVAILABLE || presence === true) {
-        return l[5923];
-    }
-    else if (presence == Karere.PRESENCE.AWAY || presence == "xa") {
-        return l[5924];
-    }
-    else if (presence == Karere.PRESENCE.BUSY) {
-        return l[5925];
-    }
-    else if (!presence || presence == Karere.PRESENCE.OFFLINE) {
-        return l[5926];
-    }
-    else {
-        return __('Unknown');
-    }
-};
-
-/**
  * Used to re-render my own presence/status
  */
 Chat.prototype.renderMyStatus = function() {
@@ -1116,24 +1080,31 @@ Chat.prototype.renderMyStatus = function() {
 
 
     var presence = self.karere.getConnectionState() === Karere.CONNECTION_STATE.CONNECTED ?
-                self.karere.getPresence(self.karere.getJid()) :
+                self.plugins.presencedIntegration.getPresence() :
                 localStorage.megaChatPresence;
 
-    var cssClass = self.xmppPresenceToCssClass(
+    var cssClass = PresencedIntegration.presenceToCssClass(
         presence
     );
 
 
     if (!presence && self.karere.getConnectionState() === Karere.CONNECTION_STATE.CONNECTED) {
         if (!localStorage.megaChatPresence) {
-            presence = localStorage.megaChatPresence = "chat"; // default
+            presence = localStorage.megaChatPresence = UserPresence.PRESENCE.ONLINE; // default
         }
         else { // cached
             presence = localStorage.megaChatPresence;
         }
 
     }
-    else if (self.karere.getConnectionState() === Karere.CONNECTION_STATE.DISCONNECTED || self.karere.getConnectionState() === Karere.CONNECTION_STATE.AUTHFAIL || self.karere.getConnectionState() === Karere.CONNECTION_STATE.DISCONNECTING) {
+    else if (
+        self.karere.getConnectionState() === Karere.CONNECTION_STATE.DISCONNECTED ||
+        self.karere.getConnectionState() === Karere.CONNECTION_STATE.AUTHFAIL ||
+        self.karere.getConnectionState() === Karere.CONNECTION_STATE.DISCONNECTING ||
+        self.userPresence
+            .connectionRetryManager
+            .getConnectionState() === ConnectionRetryManager.CONNECTION_STATE.DISCONNECTED
+    ) {
         cssClass = "offline";
     }
 
@@ -1159,7 +1130,11 @@ Chat.prototype.renderMyStatus = function() {
         cssClass
     );
 
-    if (self.karere.getConnectionState() === Karere.CONNECTION_STATE.CONNECTING) {
+    if (
+        self.karere.getConnectionState() === Karere.CONNECTION_STATE.CONNECTING ||
+        self.userPresence.connectionRetryManager
+            .getConnectionState() === ConnectionRetryManager.CONNECTION_STATE.CONNECTING
+    ) {
         $status.parent()
             .addClass("fadeinout");
     }
@@ -1553,9 +1528,10 @@ Chat.prototype.processNewUser = function(u) {
 
     this.karere.subscribe(megaChat.getJidFromNodeId(u), self.getMyXMPPPassword());
 
-    if (M.u[u] && !M.u[u].presence) {
-        M.u[u].presence = this.karere.getPresence(megaChat.getJidFromNodeId(u));
-    }
+    // TODO: presenced
+    // if (M.u[u] && !M.u[u].presence) {
+    //     M.u[u].presence = this.karere.getPresence(megaChat.getJidFromNodeId(u));
+    // }
 
     self.renderMyStatus();
 };

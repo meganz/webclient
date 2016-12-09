@@ -27,12 +27,47 @@ var PresencedIntegration = function(megaChat) {
 };
 
 
-
 PresencedIntegration.FLAGS = {
     'IS_WEBRTC': 0x80,
     'IS_MOBILE': 0x40
 };
 
+
+PresencedIntegration.presenceToCssClass = function(presence) {
+    if (presence === UserPresence.PRESENCE.ONLINE || presence === true) {
+        return 'online';
+    }
+    else if (presence === UserPresence.PRESENCE.AWAY) {
+        return 'away';
+    }
+    else if (presence === UserPresence.PRESENCE.DND) {
+        return 'busy';
+    }
+    else if (!presence || presence === UserPresence.PRESENCE.OFFLINE) {
+        return 'offline';
+    }
+    else {
+        return 'black';
+    }
+};
+
+PresencedIntegration.cssClassToPresence = function(cssClass) {
+    if (cssClass === 'online') {
+        return UserPresence.PRESENCE.ONLINE;
+    }
+    else if (cssClass === 'away') {
+        return UserPresence.PRESENCE.AWAY;
+    }
+    else if (cssClass === 'busy') {
+        return UserPresence.PRESENCE.DND;
+    }
+    else if (cssClass === 'offline') {
+        return UserPresence.PRESENCE.OFFLINE;
+    }
+    else {
+        return UserPresence.PRESENCE.OFFLINE;
+    }
+};
 
 PresencedIntegration.prototype.init = function() {
     var self = this;
@@ -41,18 +76,63 @@ PresencedIntegration.prototype.init = function() {
     var userPresence = new UserPresence(
         u_handle,
         !!RTC,
-        function(overridedPresence, isWebrtcFlag) {
-            self._presence[u_handle] = overridedPresence;
+        false,
+        function presencedIntegration_connectedcb(isConnected) {
+
+        },
+        function presencedIntegration_overridecb(presence, isWebrtcFlag) {
+            self._presence[u_handle] = presence;
             self._is_webrtc[u_handle] = isWebrtcFlag === PresencedIntegration.FLAGS.IS_WEBRTC;
 
-            console.error("overridecb", arguments);
+            var status;
+            if (presence == UserPresence.PRESENCE.OFFLINE) {
+                status = 'offline';
+            }
+            else if (presence == UserPresence.PRESENCE.AWAY) {
+                status = 'away';
+            }
+            else if (presence == UserPresence.PRESENCE.DND) {
+                status = 'dnd';
+            }
+            else if (presence == UserPresence.PRESENCE.ONLINE) {
+                status = 'available';
+            }
+            else {
+                status = 'unavailable';
+            }
+
+            console.error("overridecb", status, isWebrtcFlag);
         },
-        function(user_hash, presence, isWebrtcFlag) {
+        function presencedIntegration_peerstatuscb(user_hash, presence, isWebrtcFlag) {
             console.error('presecencb', user_hash, presence, isWebrtcFlag);
 
             isWebrtcFlag = isWebrtcFlag === PresencedIntegration.FLAGS.IS_WEBRTC;
             self._presence[user_hash] = presence;
             self._is_webrtc[user_hash] = isWebrtcFlag;
+
+            var contact = M.u[user_hash];
+            if (contact) {
+                var status;
+                if (presence == UserPresence.PRESENCE.OFFLINE) {
+                    status = 'offline';
+                }
+                else if (presence == UserPresence.PRESENCE.AWAY) {
+                    status = 'away';
+                }
+                else if (presence == UserPresence.PRESENCE.DND) {
+                    status = 'dnd';
+                }
+                else if (presence == UserPresence.PRESENCE.ONLINE) {
+                    status = 'available';
+                }
+                else {
+                    status = 'unavailable';
+                }
+
+                contact.presence = status;
+
+                M.onlineStatusEvent(contact, status);
+            }
 
             $(self).trigger(
                 'onPeerStatus',
@@ -70,11 +150,16 @@ PresencedIntegration.prototype.init = function() {
     megaChat.userPresence = self.userPresence = userPresence;
 
     $(userPresence).rebind('onConnected.presencedIntegration', function(e) {
+        // set my own presence
+
         var contactHashes = [];
         M.u.forEach(function(v, k) {
             if (k !== u_handle) {
                 contactHashes.push(k);
             }
+
+            console.error(k, 'default pres');
+            v.presence = 'unavailable';
         });
 
         userPresence.addremovepeers(contactHashes);
@@ -142,3 +227,11 @@ PresencedIntegration.prototype.setPresence = function(presence) {
             });
     }
 };
+
+PresencedIntegration.prototype.getPresence = function(u_h) {
+    if (!u_h) {
+        u_h = u_handle;
+    }
+    return this._presence[u_h];
+};
+

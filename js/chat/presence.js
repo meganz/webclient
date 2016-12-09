@@ -270,6 +270,7 @@
                     while (p < u.length) {
                         switch (u[p]) {
                             case 0: // OPCODE_KEEPALIVE
+                                console.error("got keep alive");
                                 if (this.up.keepalivechecktimer) {
                                     clearTimeout(this.up.keepalivechecktimer);
                                     this.up.keepalivechecktimer = false;
@@ -373,8 +374,9 @@
             u[i] = s.charCodeAt(i);
         }
 
+        if (!this.s) { debugger; }
         this.s.send(u);
-    }
+    };
 
     // must be called with the binary representation of the userid delta
     UserPresence.prototype.sendpeerupdate = function presence_sendpeerupdate(peerstring, del) {
@@ -433,6 +435,7 @@
         }
 
         self.sendstring("\0");
+        console.error("sent keep alive");
         self.keepalivesendtimer = setTimeout(self.sendkeepalive, self.KEEPALIVETIMEOUT-5000, self);
 
         if (!self.keepalivechecktimer) {
@@ -441,6 +444,7 @@
     };
 
     UserPresence.prototype.keepalivetimeout = function presence_keepalivetimeout(self) {
+        console.error("sent keep alive timeout");
         self.reconnect();
     };
 

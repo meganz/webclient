@@ -162,7 +162,7 @@
     var viewModeContainers = {
         'cloud-drive': [
             '.grid-table.fm',
-            '.fm-blocks-view.fm .file-block-scrolling'
+            '.fm-blocks-view.fm .file-block-scrolling',
         ],
         'contacts': [
             '.grid-table.contacts',
@@ -232,7 +232,6 @@
     function MegaRender(aViewMode) {
         var renderer;
         var section = 'cloud-drive';
-        var self = this;
 
         if (M.currentdirid === 'shares') {
 
@@ -267,7 +266,6 @@
         define(this, 'initialize',          this.initializers[section] || this.initializers['*']);
         define(this, 'render',              renderer || this.renderer[section] || this.renderer['*']);
         define(this, 'getNodeProperties',   this.nodeProperties[section] || this.nodeProperties['*']);
-        define(this, 'dynListCache',        []);
         define(this, 'section',             section);
 
         if (scope.d) {
@@ -285,7 +283,6 @@
 
         renderer = undefined;
     }
-    var refreshTimeout = false;
 
     MegaRender.prototype = Object.freeze({
         constructor: MegaRender,
@@ -307,11 +304,7 @@
             }
 
             var lSel = aListSelector;
-            this.cloudListSelector = lSel;
 
-            $(lSel).unbind('jsp-scroll-y.dynlist');
-            $(window).unbind('resize.dynlist');
-            $(window).unbind('dynlist.flush');
             hideEmptyGrids();
             $.tresizer();
 
@@ -421,7 +414,6 @@
                     this.container = tbody;
                 }
             }
-            this.viewPixelSize = scope.innerWidth * scope.innerHeight;
 
             if (this.initialize) {
                 initData = this.initialize(aUpdate, aNodeList);
@@ -562,13 +554,8 @@
         insertDOMNode: function(aNode, aNodeIndex, aDOMNode, aUpdate, aDynCache) {
             if (!aUpdate || !this.container.querySelector(aDOMNode.nodeName)) {
                 // 1. if the current view does not have any nodes, just append it
-                if (aDynCache) {
-                    this.dynListCache.push(aDynCache);
-                }
-                else {
-                    aNode.seen = true;
-                    this.container.appendChild(aDOMNode);
-                }
+                aNode.seen = true;
+                this.container.appendChild(aDOMNode);
             }
             else {
                 var domNode;
@@ -577,24 +564,6 @@
 
                 if (document.getElementById(aNode.h)) {
                     aNode.seen = true;
-                    return;
-                }
-
-                if (aDynCache) {
-                    var cache = this.dynListCache;
-
-                    if (aNode.t) {
-                        // find the first folder in the cache and add it after
-                        var x = 0;
-                        var m = cache.length;
-                        while (x < m && cache[x].isFolder) {
-                            ++x;
-                        }
-                        cache.splice(x, 0, aDynCache);
-                    }
-                    else {
-                        cache.push(aDynCache);
-                    }
                     return;
                 }
 
@@ -637,24 +606,6 @@
                 }
                 aNode.seen = true;
             }
-        },
-
-        /**
-         * Generate a new dynlist cache entry.
-         * @param {Object}  aNode      The ufs-node
-         * @param {String}  aHandle    The ufs-node's handle
-         * @param {Object}  aDOMNode   The DOM Node
-         * @param {Number}  aNodeIndex The ufs-node's index in M.v
-         */
-        getCacheEntry: function(aNode, aHandle, aDOMNode, aNodeIndex) {
-            var item = {
-                domNode:    aDOMNode,
-                isFolder:   aNode.t,
-                nodeIndex:  aNodeIndex,
-                nodeHandle: aHandle
-            };
-
-            return item;
         },
 
         /** Node properties collector */
@@ -968,7 +919,7 @@
              * @param {Object}  aUserData  Any data provided by initializers
              */
             '*': function(aNode, aHandle, aDOMNode, aNodeIndex, aUpdate, aUserData) {
-                if (!this.megaList) {
+                if (!DYNLIST_ENABLED) {
                     this.insertDOMNode(aNode, aNodeIndex, aDOMNode, aUpdate);
                 }
             },
@@ -1018,27 +969,17 @@
                     if (this.viewmode) {
                         megaListOptions['itemWidth'] = 128 + 12 /* 12 = margin-left */;
                         megaListOptions['itemHeight'] = 152 + 12 /* 12 = margin-top */;
-                        megaListContainer = document.querySelector('.fm-blocks-view.fm .file-block-scrolling');
+                        megaListContainer = this.container;
                     }
                     else {
                         megaListOptions['itemWidth'] = false;
                         megaListOptions['itemHeight'] = 24;
                         megaListOptions['appendTo'] = 'table';
                         megaListOptions['renderAdapter'] = new MegaList.RENDER_ADAPTERS.Table();
-                        megaListContainer = document.querySelector('.files-grid-view.fm .grid-scrolling-table');
-                        if (
-                            document.querySelectorAll(
-                                '.files-grid-view.fm .grid-scrolling-table table tbody'
-                            ).length === 0
-                        ) {
-                            var tableNode = document.querySelector('.files-grid-view.fm .grid-scrolling-table table');
-                            tableNode.appendChild(document.createElement("tbody"));
-                        }
+                        megaListContainer = this.container.parentNode.parentNode;
                     }
 
-                    if (megaListContainer) {
-                        define(this, 'megaList', new MegaList(megaListContainer, megaListOptions));
-                    }
+                    define(this, 'megaList', new MegaList(megaListContainer, megaListOptions));
                 }
 
                 return result;

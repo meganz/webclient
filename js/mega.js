@@ -664,7 +664,6 @@ function MegaData()
                 // Wait for M.openFolder to finish and set colors to matching hashes
                 M.onRenderFinished = function() {
                     var find = M.viewmode ? 'a' : 'tr';
-                    $(window).trigger('dynlist.flush');
                     $(M.fsViewSel).find(find).each(function() {
                         var $this = $(this);
                         var node = M.d[$this.attr('id')];
@@ -1396,6 +1395,9 @@ function MegaData()
 
         var self = this;
         /*fetchchildren(id, function()*/ {
+            if (d) {
+                console.time('time for rendering');
+            }
             self.previousdirid = self.currentdirid;
             self.currentdirid = id;
             self.currentrootid = RootbyId(id);
@@ -1418,9 +1420,7 @@ function MegaData()
             }
             else if (id && (id.substr(0, 7) !== 'account') && (id.substr(0, 13) !== 'notifications')) {
                 $('.fm-right-files-block').removeClass('hidden');
-                if (d) {
-                    console.time('time for rendering');
-                }
+
                 if (id === 'transfers') {
                     M.v = [];
                 }

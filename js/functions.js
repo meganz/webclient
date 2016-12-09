@@ -4168,11 +4168,6 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
             if (handles.length) {
                 var inRub = (M.RubbishID === M.currentrootid);
 
-                if (inRub) {
-                    // Flush cached nodes
-                    $(window).trigger('dynlist.flush');
-                }
-
                 handles.map(function(handle) {
                     M.delNode(handle, true);    // must not update DB pre-API
                     api_req({a: 'd', n: handle/*, i: requesti*/});

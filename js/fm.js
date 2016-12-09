@@ -5381,9 +5381,6 @@ function transferPanelUI()
                 var path = M.getPath(id);
                 if (path.length > 1) {
                     M.openFolder(path[1], true);
-                    if (!$('#' + id).length) {
-                        $(window).trigger('dynlist.flush');
-                    }
                     $.selected = [id];
                     reselect(1);
                 }

@@ -152,8 +152,6 @@ var SelectionManager = function($selectable, resume) {
      * Simple helper func, for selecting all elements in the current view.
      */
     this.select_all = function() {
-        $(window).trigger('dynlist.flush');
-
         var self = this;
 
         self.clear_selection();
@@ -249,7 +247,10 @@ var SelectionManager = function($selectable, resume) {
         }
         if (target_element_num >= 0) {
             if (shiftKey) {
-                $("#" + currentViewIds[target_element_num]).addClass('ui-selected');
+                var node = document.getElementById(currentViewIds[target_element_num]);
+                if (node) {
+                    node.classList.add('ui-selected');
+                }
                 this.add_to_selection(currentViewIds[target_element_num], scrollTo);
             }
             else {

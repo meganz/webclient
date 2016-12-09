@@ -1,8 +1,14 @@
 // presenced client layer
 
-// presence = new UserPresence(u_handle, can_webrtc, overridecb, peerpresencecb)
+// presence = new UserPresence(u_handle, can_webrtc, can_mobilepush, connectedcb, overridecb, peerpresencecb)
+
+// capabilities:
+
+// can_webrtc: client is able to receive WebRTC calls
+// can_mobilepush: client can be woken up by push notifications (should be false for browsers)
 
 // presence levels:
+
 // 1 - offline, user could be offline or invisible
 // 2 - away, at least one app is either pinging or likely to be reacting to push notifications
 // 3 - online, user is actively using at least one app
@@ -10,7 +16,8 @@
 
 // presence.setoverride(presencelevel)
 // sets permanent override for the presence level that others see
-// (including the WebRTC capability flag) - presencelevel = 0 reverts to automatic presence
+// presencelevel = 0 reverts to automatic presence
+// (call this only when the user has made a manual change using the override UI)
 
 // presence.setonline(flag)
 // flag == true: changes the tab's status to "online" (triggered by mouse move or keystroke)
@@ -28,13 +35,16 @@
 // cancels exponential backoff and retries the reconnect immediately
 // (call in response to mouse moves/keystrokes)
 
-// overridecb(presencelevel, can_webrtc) will be called with a new override status if available
+// connectedcb(status) will be called when the presenced connection goes up (status == true) or down
+
+// overridecb(presencelevel) will be called with a new override status if available (it will not be called
+// in response to a local presence.setoverride()!)
 
 // peerpresencecb(userhandle, presencelevel, can_webrtc) will be called with any change of peer presence
 
 (function() {
 
-    var UserPresence = function userpresence(userhandle, can_webrtc, overridecb, peerstatuscb) {
+    var UserPresence = function userpresence(userhandle, can_webrtc, can_mobilepush, connectedcb, overridecb, peerstatuscb) {
         if (!(this instanceof userpresence)) {
             return new userpresence(userhandle);
         }
@@ -52,8 +62,8 @@
         // current peers
         this.peers = {};
 
-        // WebRTC capability flag
-        this.status_webrtc = can_webrtc;
+        // WebRTC/push notification capability flags
+        this.capabilities = String.fromCharCode(((can_webrtc && 0x80) | (can_mobilepush && 0x40)));
 
         // online/away flag
         this.status_online = false;
@@ -64,14 +74,15 @@
         // do not disturb flag
         this.status_dnd = false;
 
-        // current override
-        this.override = 0;
+        // current override and "changed locally, try to push to server" flag
+        this.override = false;
+        this.overridechanged = false;
 
         this.canceled = localStorage.userPresenceIsOffline && localStorage.userPresenceIsOffline === '1';
 
         var self = this;
 
-        // retry timer and timeout (exponential backoff)
+        // connection retry timer and timeout (exponential backoff)
         this.connectionRetryManager = new ConnectionRetryManager(
             {
                 functions: {
@@ -142,12 +153,20 @@
             self.logger
         );
 
-        // ping timer
-        this.pingtimer = false;
+        // keepalive timers
+        this.keepalivesendtimer = false;
+        this.keepalivechecktimer = false;
+        this.KEEPALIVETIMEOUT = 30000;
+
+        // fixed client capability flags
+        // 0x80 - client can be called with WebRTC
+        // 0x40 - client can be woken up with push notifications
+        this.capabilities = 0;
 
         // callbacks
-        this.overridecb = overridecb;
-        this.peerstatuscb = peerstatuscb;
+        this.connectedcb = connectedcb;   // called when the connection to presenced is going up or down
+        this.overridecb = overridecb;     // called when the override status for this user changes, update override UI
+        this.peerstatuscb = peerstatuscb; // called when any peer's status changes (including for self)
 
         // console logging
         this.logger = MegaLogger.getLogger('UserPresence');
@@ -164,12 +183,22 @@
             self.s.onclose = undefined;
             self.s.onerror = undefined;
             self.s = false;
+
+            if (self.open) {
+                self.connectedcb(false);
+            }
+
             self.open = false;
         }
 
-        if (self.pingtimer) {
-            clearTimeout(self.pingtimer);
-            self.pingtimer = false;
+        if (self.keepalivesendtimer) {
+            clearTimeout(self.keepalivesendtimer);
+            self.keepalivesendtimer = false;
+        }
+
+        if (self.keepalivechecktimer) {
+            clearTimeout(self.keepalivechecktimer);
+            self.keepalivechecktimer = false;
         }
 
         if (self.url) {
@@ -183,11 +212,16 @@
                     this.up.retrytimeout = 0;
                     this.up.open = true;
 
-                    // reinitialise remote state
-                    this.up.sendstring("\1\1\0");   // HELLO version 1
+                    this.up.connectedcb(true);
 
-                    // to reduce flapping, we first set the override...
-                    this.up.sendstring("\2" + String.fromCharCode(this.override));
+                    // reinitialise remote state
+                    // HELLO version 1 with fixed client capability flags
+                    this.up.sendstring("\1\1" + this.up.capabilities);
+
+                    // only update override if user has made an unconfirmed change
+                    if (this.overridechanged) {
+                        this.up.sendstring("\2" + String.fromCharCode(this.up.override));
+                    }
 
                     // ...and then the dynamic status flags
                     this.up.setflags();
@@ -196,7 +230,7 @@
                     this.up.sendpeerupdate(Object.keys(this.up.peers).join(''));
 
                     // start pinging
-                    this.up.ping();
+                    this.up.sendkeepalive();
                     this.up.connectionRetryManager.gotConnected();
                     $(self).trigger('onConnected');
                 }
@@ -235,9 +269,23 @@
 
                     while (p < u.length) {
                         switch (u[p]) {
+                            case 0: // OPCODE_KEEPALIVE
+                                if (this.up.keepalivechecktimer) {
+                                    clearTimeout(this.up.keepalivechecktimer);
+                                    this.up.keepalivechecktimer = false;
+                                }
+                                p++;
+                                break;
+
                             case 2: // OPCODE_STATUSOVERRIDE
-                                if (this.up.overridecb) {
-                                    this.up.overridecb(u[1] & 0xf, u[1] & 0x80);
+                                if (this.up.override === u[1]) {
+                                    // the override matches what we wanted to set
+                                    this.up.overridechanged = false;
+                                }
+                                else if (this.up.overridecb) {
+                                    this.up.override = u[1];
+                                    // ask app to change the override UI element
+                                    this.up.overridecb(this.up.override);
                                 }
                                 p += 2;
                                 break;
@@ -342,19 +390,25 @@
         this.sendstring(peerstring);
     };
 
-    UserPresence.prototype.setoverride = function presence_setoverride(status, can_webrtc) {
+    // call this when the user makes a change in the override UI
+    UserPresence.prototype.setoverride = function presence_setoverride(status) {
         if (this.open) {
-            this.override = status + (can_webrtc ? 0x80 : 0);
+            this.override = status;
+            this.overridechanged = true;    // this will be reset once the server responds with the same status
             this.sendstring("\2" + String.fromCharCode(this.override));
         }
     };
 
+    // call this when the app deems he user to have become active or inactive
+    // (via a timer and a mouse move/keystroke monitor)
     // false = away, true = online (active)
     UserPresence.prototype.setonline = function presence_setonline(status) {
         this.status_online = status;
         this.setflags();
     };
 
+    // call this is the user sets the dynamic DnD status
+    // (reserved for future use - for the moment, DnD would go through setoverride instead)
     // false = can be contacted, true = dnd (do not disturb)
     UserPresence.prototype.setdnd = function presence_setdnd(status) {
         this.status_dnd = status;
@@ -365,27 +419,30 @@
         if (this.open) {
             this.sendstring("\3" + String.fromCharCode(
                 (this.status_online ? 1 : 0)
-              | (this.status_dnd ? 2 : 0)
-              | (this.status_mobile ? 0x40 : 0)
-              | (this.status_webrtc ? 0x80 : 0)));
+              | (this.status_dnd ? 2 : 0)));
         }
     };
 
-    // send local dynamic status to the server (with mobile bit 7 cleared, as we are a browser)
-    UserPresence.prototype.ping = function presence_ping(self) {
+    UserPresence.prototype.sendkeepalive = function presence_sendkeepalive(self) {
         if (!self) {
             self = this;
-            if (self.pingtimer) clearTimeout(self.pingtimer);
         }
 
-        if (self.open) {
-            self.sendstring("\0");
+        if (self.keepalivesendtimer) {
+            clearTimeout(self.keepalivesendtimer);
+        }
 
-            // need to reliably ping in < 30 second intervals to avoid status flapping
-            self.pingtimer = setTimeout(self.ping, 25000, self);
+        self.sendstring("\0");
+        self.keepalivesendtimer = setTimeout(self.sendkeepalive, self.KEEPALIVETIMEOUT-5000, self);
+
+        if (!self.keepalivechecktimer) {
+            self.keepalivechecktimer = setTimeout(self.keepalivetimeout, self.KEEPALIVETIMEOUT, self);
         }
     };
 
+    UserPresence.prototype.keepalivetimeout = function presence_keepalivetimeout(self) {
+        self.reconnect();
+    };
 
     UserPresence.PRESENCE = {
         'CLEAR': 0,
@@ -395,20 +452,7 @@
         'DND': 4
     };
 
-    if (localStorage.presencedDebug) {
-        Object.keys(UserPresence.prototype).forEach(function(fn) {
-            var origFn = UserPresence.prototype[fn];
-            UserPresence.prototype[fn] = function() {
-                console.error(fn, arguments);
-                var res = origFn.apply(this, arguments);
-                if (res) {
-                    console.error(fn, 'result', arguments);
-                }
 
-                return res;
-            };
-        });
-    }
     Object.freeze(UserPresence.prototype);
 
     window.UserPresence = UserPresence;

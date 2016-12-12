@@ -2467,41 +2467,22 @@ function initContextUI() {
             $this.next('.context-submenu')
                 .css({'top': menuPos.top})
                 .addClass('active');
-  
+
             $this.addClass('opened');
         }
     });
 
-    $(c + '.cloud-item').rebind('click', function() {
-
-        var t = $(this).attr('id').replace('fi_', ''),
-            n = [];
+    var safeMoveNodes = function() {
         if (!$(this).is('.disabled')) {
-            for (var i in $.selected) {
-                if (!isCircular($.selected[i], t)) {
-                    n.push($.selected[i]);
-                }
-            }
             $.hideContextMenu();
-            M.moveNodes(n, t);
+            M.safeMoveNodes(String($(this).attr('id')).replace('fi_', ''));
         }
-    });
+    };
+    $(c + '.cloud-item').rebind('click', safeMoveNodes);
 
     $('.context-menu.files-menu').off('click', '.folder-item');
-    $('.context-menu.files-menu').on('click', '.folder-item', function() {
-
-        var t = $(this).attr('id').replace('fi_', ''),
-            n = [];
-        if (!$(this).is('.disabled')) {
-            for (var i in $.selected) {
-                if (!isCircular($.selected[i], t)) {
-                    n.push($.selected[i]);
-                }
-            }
-            $.hideContextMenu();
-            M.moveNodes(n, t);
-        }
-    });
+    $('.context-menu.files-menu').on('click', '.folder-item', safeMoveNodes);
+    safeMoveNodes = undefined;
 
     $(c + '.download-item').rebind('click', function(event) {
         var c = $(event.target).attr('class');
@@ -6283,6 +6264,7 @@ function menuItems() {
         items['.removeshare-item'] = 1;
     }
     else if (RightsbyID($.selected[0]) > 1) {
+        items['.move-item']   = 1;
         items['.remove-item'] = 1;
     }
 
@@ -9432,19 +9414,8 @@ function moveDialog() {
 
         if (typeof $.mcselected != 'undefined') {
 
-            var n = [];
-            for (var i in $.selected) {
-                if (!isCircular($.selected[i], $.mcselected)) {
-                    n.push($.selected[i]);
-                }
-            }
             closeDialog();
-            if (RootbyId($.mcselected) === 'shares') {
-                M.copyNodes(n, $.mcselected, true);
-            }
-            else {
-                M.moveNodes(n, $.mcselected);
-            }
+            M.safeMoveNodes($.mcselected);
         }
     });
 }

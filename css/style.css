@@ -20726,11 +20726,16 @@ span.incoming-call-name {
     font-size: 13px;
     padding: 12px 0 0 0;
     font-family: 'source_sans_proregular', Helvetica, Arial;
+    overflow: hidden;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 .shared-details-buttons {
     right: 0;
     position: absolute;
-    padding: 58px 18px 0 0;
+    margin: 63px 18px 0 0;
+    background-color: white;
 }
 .files-grid-view.shared-folder-content, .fm-blocks-view.shared-folder-content {
     height: -webkit-calc(100% - 123px);
@@ -21078,6 +21083,7 @@ div.token-input-dropdown-mega ul li {
     -o-transition: background-color 200ms ease-in-out;
     -ms-transition: background-color 200ms ease-in-out;
     transition: background-color 200ms ease-in-out;
+    text-align: left;
 }
 div.token-input-dropdown-mega ul li.token-input-dropdown-item-mega {
     background-color: #fff;
@@ -23473,6 +23479,11 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 .payment-address-dialog .payment-note-first a {
     color: #ff4444;
     text-decoration: underline;
+}
+.payment-address-dialog .payment-note-first b {
+    color: #333;
+    font-family: "source_sans_proregular", sans-serif;
+    font-weight: normal;
 }
 .payment-address-dialog .payment-note-second {
     bottom: -90px;

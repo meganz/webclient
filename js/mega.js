@@ -1155,7 +1155,14 @@ function MegaData()
             e.currentTarget = target;
             cacheselect();
             searchPath();
-            contextMenuUI(e, 1);
+            if (!$(this).hasClass('active')) {
+                contextMenuUI(e, 1);
+                $(this).addClass('active');
+            }
+            else {
+                $.hideContextMenu();
+                $(this).removeClass('active');
+            }
         });
 
         $('.file-block .file-settings-icon').rebind('click', function(e) {
@@ -1169,7 +1176,14 @@ function MegaData()
             e.currentTarget = target;
             cacheselect();
             searchPath();
-            contextMenuUI(e, 1);
+            if (!$(this).hasClass('active')) {
+                $(this).addClass('active');
+                contextMenuUI(e, 1);
+            }
+            else {
+                $(this).removeClass('active');
+                $.hideContextMenu();
+            }
         });
 
         if (!u) {
@@ -1186,7 +1200,14 @@ function MegaData()
 
                 $('.shared-details-info-block .grid-url-arrow').rebind('click', function (e) {
                     prepareShareMenuHandler(e);
-                    contextMenuUI(e, 1);
+                    if (!$(this).hasClass('active')) {
+                        contextMenuUI(e, 1);
+                        $(this).addClass('active');
+                    }
+                    else {
+                        $.hideContextMenu();
+                        $(this).removeClass('active');
+                    }
                 });
 
                 $('.shared-details-info-block .fm-share-download').rebind('click', function (e) {
@@ -1195,7 +1216,14 @@ function MegaData()
                     e.clientX = $this.offset().left;
                     e.clientY = $this.offset().top + $this.height()
 
-                    contextMenuUI(e, 3);
+                    if (!$(this).hasClass('active')) {
+                        contextMenuUI(e, 3);
+                        $(this).addClass('active');
+                    }
+                    else {
+                        $.hideContextMenu();
+                        $(this).removeClass('active');
+                    }
                 });
 
                 $('.shared-details-info-block .fm-share-copy').rebind('click', function (e) {
@@ -5759,6 +5787,7 @@ function execsc() {
     var n, i;
     var tick = Date.now();
     var tickcount = 0;
+    var updateRights = false;
 
     do {
         if (!scq[scqtail] || !scq[scqtail][0] || (scq[scqtail][0].a == 't' && nodesinflight[scqtail])) {
@@ -6037,6 +6066,7 @@ function execsc() {
                                         n.r = a.r;
                                         n.su = a.o;
                                         M.nodeUpdated(n);
+                                        updateRights = true;
                                     }
                                     else {
                                         if (d) {
@@ -6066,7 +6096,7 @@ function execsc() {
                         if (prockey) {
                             var nodes = fm_getnodes(a.n, true);
 
-                            for (i = a.length; i--; ) {
+                            for (i = nodes.length; i--; ) {
                                 if (n = M.d[nodes[i]]) {
                                     if (typeof n.k == 'string') {
                                         crypto_decryptnode(n);
@@ -6083,6 +6113,12 @@ function execsc() {
                         if (fminitialized) {
                             M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
                             sharedUInode(a.n);
+                            treeUI();
+
+                            // Inshares permission DOM update
+                            if (updateRights) {
+                                sharedFolderUI();
+                            }
                         }
                     }
                     break;
@@ -6874,13 +6910,16 @@ function loadfm(force) {
                     ok  : '&h',         // ownerkeys for outgoing shares - handle
                     mk  : '&h',         // missing node keys - handle
                     u   : '&u',         // users - handle
+                    h   : '&h, c',      // hashes - handle, checksum
+                    ph  : '&h',         // exported links - handle
                     opc : '&p',         // outgoing pending contact - id
                     ipc : '&p',         // incoming pending contact - id
                     ps  : '&h_p',       // pending share - handle/id
                     mcf : '&id',        // chats - id
-                    _sn  : '&i',        // sn - fixed index 1
+                    _sn : '&i',         // sn - fixed index 1
+
                     // channel 1: non-transactional, used by IndexedDBKVStorage
-                    attrib : '&k',      // user attribute cache - k
+                    attrib : '&k',        // user attribute cache - k
                     chatqueuedmsgs : '&k' // queued chat messages - k
                 }, { attrib : 1, chatqueuedmsgs : 1 });
 

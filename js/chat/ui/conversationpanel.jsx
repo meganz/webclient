@@ -1110,7 +1110,7 @@ var ConversationPanel = React.createClass({
                 self.props.chatRoom.messagesBuff.messagesHistoryIsLoading() === true
             )
         ) {
-            if (localStorage.megaChatPresence !== 'unavailable') {
+            if (!localStorage.userPresenceIsOffline) {
                 self.loadingShown = true;
             }
         }

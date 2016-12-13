@@ -841,7 +841,6 @@ function MegaData()
     };
 
     this.onlineStatusEvent = function(u, status) {
-        console.error('onlineStatusEvent', u, status, "translated to:", u.u, this.onlineStatusClass(status));
         if (u && megaChatIsReady) {
             var e = $('.ustatus.' + u.u);
             if (e.length > 0) {
@@ -866,6 +865,9 @@ function MegaData()
             if (window.location.hash === "#fm/" + u.u) {
                 // re-render the contact view page if the presence had changed
                 contactUI();
+            }
+            if (u && u.u === u_handle) {
+                megaChat.renderMyStatus();
             }
         }
     };

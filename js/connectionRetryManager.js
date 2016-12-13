@@ -165,6 +165,9 @@ ConnectionRetryManager.prototype.gotDisconnected = function(){
             self.doConnectionRetry();
         }
     }
+    else {
+        self._connectionState = ConnectionRetryManager.CONNECTION_STATE.DISCONNECTED;
+    }
 };
 
 /**
@@ -258,7 +261,7 @@ ConnectionRetryManager.prototype.doConnectionRetry = function(immediately){
 
 
         self._lastConnectionRetryTime = unixtime();
-
+        return self.startedConnecting();
     }
     else {
         var connectionRetryTimeout = (
@@ -290,11 +293,11 @@ ConnectionRetryManager.prototype.doConnectionRetry = function(immediately){
             } else {
             }
         }, connectionRetryTimeout);
-        console.error("retry in: ", connectionRetryTimeout);
 
 
         self._lastConnectionRetryTime = unixtime();
 
+        return self.startedConnecting();
     }
 };
 /**
@@ -343,7 +346,6 @@ ConnectionRetryManager.prototype.getConnectionState = function() {
 ConnectionRetryManager.prototype.requiresConnection = function() {
     var self = this;
 
-    debugger;
     if (!self.options.functions.isConnectedOrConnecting()) {
         self.doConnectionRetry(true);
         return self._$connectingPromise;

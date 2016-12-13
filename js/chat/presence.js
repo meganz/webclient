@@ -144,7 +144,6 @@
                     isUserForcedDisconnect: function(connectionRetryManager) {
                         return (
                             self.canceled === true ||
-                            localStorage.megaChatPresence === "unavailable" ||
                             localStorage.userPresenceIsOffline
                         );
                     }
@@ -243,9 +242,14 @@
             self.s.onclose = function () {
                 $(self).trigger('onDisconnected');
 
-                if (self.pingtimer) {
-                    clearTimeout(self.pingtimer);
-                    self.pingtimer = false;
+                if (self.keepalivesendtimer) {
+                    clearTimeout(self.keepalivesendtimer);
+                    self.keepalivesendtimer = false;
+                }
+
+                if (self.keepalivechecktimer) {
+                    clearTimeout(self.keepalivechecktimer);
+                    self.keepalivechecktimer = false;
                 }
                 self.connectionRetryManager.gotDisconnected();
             };
@@ -253,10 +257,16 @@
             self.s.onerror = function () {
                 $(self).trigger('onDisconnected');
 
-                if (self.pingtimer) {
-                    clearTimeout(self.pingtimer);
-                    self.pingtimer = false;
+                if (self.keepalivesendtimer) {
+                    clearTimeout(self.keepalivesendtimer);
+                    self.keepalivesendtimer = false;
                 }
+
+                if (self.keepalivechecktimer) {
+                    clearTimeout(self.keepalivechecktimer);
+                    self.keepalivechecktimer = false;
+                }
+
                 if (!this.canceled) {
                     self.connectionRetryManager.doConnectionRetry();
                 }
@@ -270,7 +280,6 @@
                     while (p < u.length) {
                         switch (u[p]) {
                             case 0: // OPCODE_KEEPALIVE
-                                console.error("got keep alive");
                                 if (this.up.keepalivechecktimer) {
                                     clearTimeout(this.up.keepalivechecktimer);
                                     this.up.keepalivechecktimer = false;
@@ -343,8 +352,16 @@
         self.s = false;
         self.open = false;
 
-        clearTimeout(self.pingtimer);
-        self.pingtimer = false;
+        if (self.keepalivesendtimer) {
+            clearTimeout(self.keepalivesendtimer);
+            self.keepalivesendtimer = false;
+        }
+
+        if (self.keepalivechecktimer) {
+            clearTimeout(self.keepalivechecktimer);
+            self.keepalivechecktimer = false;
+        }
+        self.connectionRetryManager.gotDisconnected();
     };
 
     UserPresence.prototype.addremovepeers = function presence_addremovepeers(peers, del) {
@@ -368,13 +385,16 @@
     };
 
     UserPresence.prototype.sendstring = function presence_sendstring(s) {
+        if (!this.s) {
+            console.error("Called UserPresence.sendstring when offline.");
+            return;
+        }
         var u = new Uint8Array(s.length);
 
         for (var i = s.length; i--; ) {
             u[i] = s.charCodeAt(i);
         }
 
-        if (!this.s) { debugger; }
         this.s.send(u);
     };
 
@@ -435,7 +455,6 @@
         }
 
         self.sendstring("\0");
-        console.error("sent keep alive");
         self.keepalivesendtimer = setTimeout(self.sendkeepalive, self.KEEPALIVETIMEOUT-5000, self);
 
         if (!self.keepalivechecktimer) {
@@ -444,7 +463,6 @@
     };
 
     UserPresence.prototype.keepalivetimeout = function presence_keepalivetimeout(self) {
-        console.error("sent keep alive timeout");
         self.reconnect();
     };
 

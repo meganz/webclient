@@ -264,7 +264,7 @@ var Karere = function(user_options) {
                  */
                 isUserForcedDisconnect: function(connectionRetryManager) {
                     return (
-                        self.destroying === true || localStorage.megaChatPresence === "unavailable"
+                        self.destroying === true || localStorage.userPresenceIsOffline === "1"
                     );
                 }
             }
@@ -1711,8 +1711,6 @@ makeMetaAware(Karere);
      * @param [delay] Number unix timestamp that should be used for sending a urn:xmpp:delay w/ the presence stanza
      */
     Karere.prototype.setPresence = function(presence, status, delay) {
-        console.error(presence, status);
-
         presence = presence || "chat";
         status = status || "";
         delay = delay ? parseFloat(delay) : undefined;

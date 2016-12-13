@@ -51,17 +51,17 @@ PresencedIntegration.presenceToCssClass = function(presence) {
     }
 };
 
-PresencedIntegration.cssClassToPresence = function(cssClass) {
-    if (cssClass === 'online') {
+PresencedIntegration.cssClassToPresence = function(strPresence) {
+    if (strPresence === 'online' || strPresence === 'chat') {
         return UserPresence.PRESENCE.ONLINE;
     }
-    else if (cssClass === 'away') {
+    else if (strPresence === 'away') {
         return UserPresence.PRESENCE.AWAY;
     }
-    else if (cssClass === 'busy') {
+    else if (strPresence === 'busy' || strPresence === 'dnd') {
         return UserPresence.PRESENCE.DND;
     }
-    else if (cssClass === 'offline') {
+    else if (strPresence === 'offline') {
         return UserPresence.PRESENCE.OFFLINE;
     }
     else {
@@ -101,48 +101,23 @@ PresencedIntegration.prototype.init = function() {
                 status = 'unavailable';
             }
 
-            console.error("overridecb", status, isWebrtcFlag);
-        },
-        function presencedIntegration_peerstatuscb(user_hash, presence, isWebrtcFlag) {
-            console.error('presecencb', user_hash, presence, isWebrtcFlag);
-
-            isWebrtcFlag = isWebrtcFlag === PresencedIntegration.FLAGS.IS_WEBRTC;
-            self._presence[user_hash] = presence;
-            self._is_webrtc[user_hash] = isWebrtcFlag;
-
-            var contact = M.u[user_hash];
-            if (contact) {
-                var status;
-                if (presence == UserPresence.PRESENCE.OFFLINE) {
-                    status = 'offline';
-                }
-                else if (presence == UserPresence.PRESENCE.AWAY) {
-                    status = 'away';
-                }
-                else if (presence == UserPresence.PRESENCE.DND) {
-                    status = 'dnd';
-                }
-                else if (presence == UserPresence.PRESENCE.ONLINE) {
-                    status = 'available';
-                }
-                else {
-                    status = 'unavailable';
-                }
-
-                contact.presence = status;
-
-                M.onlineStatusEvent(contact, status);
+            // sync presenced -> xmpp
+            var xmppPresence = megaChat.karere.getPresence(megaChat.karere.getJid());
+            if (status === 'offline' && xmppPresence) {
+                megaChat.karere.disconnect();
+            }
+            else if (status === 'away' && xmppPresence !== 'away') {
+                megaChat.karere.setPresence(Karere.PRESENCE.AWAY);
+            }
+            else if (status === 'dnd' && xmppPresence !== 'dnd') {
+                megaChat.karere.setPresence(Karere.PRESENCE.BUSY);
+            }
+            else if (status === 'available' && xmppPresence !== 'available') {
+                megaChat.karere.setPresence(Karere.PRESENCE.ONLINE);
             }
 
-            $(self).trigger(
-                'onPeerStatus',
-                [
-                    user_hash,
-                    presence,
-                    isWebrtcFlag
-                ]
-            );
-        }
+        },
+        self._peerstatuscb.bind(self)
     );
 
 
@@ -154,19 +129,14 @@ PresencedIntegration.prototype.init = function() {
 
         var contactHashes = [];
         M.u.forEach(function(v, k) {
-            if (k !== u_handle) {
+            if (k !== u_handle && v.c !== 0) {
                 contactHashes.push(k);
             }
 
-            console.error(k, 'default pres');
             v.presence = 'unavailable';
         });
 
         userPresence.addremovepeers(contactHashes);
-    });
-
-    $(userPresence).rebind('onDisconnected.presencedIntegration', function(e) {
-        // TODO: change my presence to false and clear local presence cache for other users
     });
 
     if (!localStorage.userPresenceIsOffline) {
@@ -174,12 +144,53 @@ PresencedIntegration.prototype.init = function() {
     }
 };
 
+PresencedIntegration.prototype._peerstatuscb = function(user_hash, presence, isWebrtcFlag) {
+    var self = this;
+
+    isWebrtcFlag = isWebrtcFlag === PresencedIntegration.FLAGS.IS_WEBRTC;
+    self._presence[user_hash] = presence;
+    self._is_webrtc[user_hash] = isWebrtcFlag;
+
+    var contact = M.u[user_hash];
+    if (contact) {
+        var status;
+        if (presence == UserPresence.PRESENCE.OFFLINE) {
+            status = 'offline';
+        }
+        else if (presence == UserPresence.PRESENCE.AWAY) {
+            status = 'away';
+        }
+        else if (presence == UserPresence.PRESENCE.DND) {
+            status = 'dnd';
+        }
+        else if (presence == UserPresence.PRESENCE.ONLINE) {
+            status = 'available';
+        }
+        else {
+            status = 'unavailable';
+        }
+
+        contact.presence = status;
+
+        M.onlineStatusEvent(contact, status);
+    }
+
+    $(self).trigger(
+        'onPeerStatus',
+        [
+            user_hash,
+            presence,
+            isWebrtcFlag
+        ]
+    );
+};
 
 PresencedIntegration.prototype.setPresence = function(presence) {
     var self = this;
     if (presence === UserPresence.PRESENCE.ONLINE) {
         localStorage.removeItem("userPresenceIsOffline");
         localStorage.removeItem("megaChatPresence"); // legacy
+        self.userPresence.canceled = false;
 
         self.userPresence.connectionRetryManager.requiresConnection()
             .done(function() {
@@ -190,6 +201,7 @@ PresencedIntegration.prototype.setPresence = function(presence) {
     else if (presence === UserPresence.PRESENCE.AWAY) {
         localStorage.removeItem("userPresenceIsOffline");
         localStorage.removeItem("megaChatPresence"); // legacy
+        self.userPresence.canceled = false;
 
         self.userPresence.connectionRetryManager.requiresConnection()
             .done(function() {
@@ -200,6 +212,7 @@ PresencedIntegration.prototype.setPresence = function(presence) {
     else if (presence === UserPresence.PRESENCE.AWAY) {
         localStorage.removeItem("userPresenceIsOffline");
         localStorage.removeItem("megaChatPresence"); // legacy
+        self.userPresence.canceled = false;
 
         self.userPresence.connectionRetryManager.requiresConnection()
             .done(function() {
@@ -210,6 +223,7 @@ PresencedIntegration.prototype.setPresence = function(presence) {
     else if (presence === UserPresence.PRESENCE.DND) {
         localStorage.removeItem("userPresenceIsOffline");
         localStorage.removeItem("megaChatPresence"); // legacy
+        self.userPresence.canceled = false;
 
         self.userPresence.connectionRetryManager.requiresConnection()
             .done(function() {
@@ -220,11 +234,33 @@ PresencedIntegration.prototype.setPresence = function(presence) {
     else if (presence === UserPresence.PRESENCE.OFFLINE) {
         localStorage.userPresenceIsOffline = 1;
         localStorage.removeItem("megaChatPresence"); // legacy
+        self.userPresence.canceled = true;
 
         self.userPresence.connectionRetryManager.requiresConnection()
             .done(function() {
                 self.userPresence.disconnect(true);
             });
+    }
+};
+
+PresencedIntegration.prototype.addContact = function(u_h) {
+    if (
+        this.userPresence.connectionRetryManager.getConnectionState()
+            ===
+        ConnectionRetryManager.CONNECTION_STATE.CONNECTED
+    ) {
+        this.userPresence.addremovepeers([u_h]);
+    }
+};
+
+PresencedIntegration.prototype.removeContact = function(u_h) {
+    if (
+        this.userPresence.connectionRetryManager.getConnectionState()
+        ===
+        ConnectionRetryManager.CONNECTION_STATE.CONNECTED
+    ) {
+        this.userPresence.addremovepeers([u_h], true);
+        this._peerstatuscb(u_h, UserPresence.PRESENCE.OFFLINE, false);
     }
 };
 

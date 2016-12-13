@@ -222,6 +222,7 @@ function u_logout(logout) {
                 megaChat.destroy( /* isLogout: */ true);
 
                 localStorage.removeItem("megaChatPresence");
+                localStorage.removeItem("userPresenceIsOffline");
                 localStorage.removeItem("megaChatPresenceMtime");
             }
         }

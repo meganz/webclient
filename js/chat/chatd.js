@@ -165,7 +165,7 @@ Chatd.prototype.addshard = function(chatId, shard, url) {
 
     // attempt a connection ONLY if this is a new shard.
     if (newshard) {
-        if (localStorage.megaChatPresence !== "unavailable") {
+        if (!localStorage.userPresenceIsOffline) {
             this.shards[shard].reconnect();
         }
     }
@@ -282,7 +282,7 @@ Chatd.Shard = function(chatd, shard) {
                  */
                 isUserForcedDisconnect: function(connectionRetryManager) {
                     return (
-                        self.chatd.destroyed === true || localStorage.megaChatPresence === "unavailable" ||
+                        self.chatd.destroyed === true || localStorage.userPresenceIsOffline ||
                             self.destroyed === true
                     );
                 }
@@ -402,6 +402,8 @@ Chatd.Shard.prototype.disconnect = function() {
     self.s = null;
 
     clearTimeout(self.keepAliveTimer);
+
+    self.connectionRetryManager.gotDisconnected();
 };
 
 Chatd.Shard.prototype.multicmd = function(cmds) {

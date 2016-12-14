@@ -21782,6 +21782,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .key.file-link-info {
     color: #D90007;
+    white-space: nowrap;
 }
 .fm-expiry-dropdown {
     display: block;

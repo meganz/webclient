@@ -2467,7 +2467,7 @@ function initContextUI() {
             $this.next('.context-submenu')
                 .css({'top': menuPos.top})
                 .addClass('active');
-  
+
             $this.addClass('opened');
         }
     });
@@ -3742,6 +3742,10 @@ function accountUI() {
                 mega.config.set('dlThroughMEGAsync', M.account.dlThroughMEGAsync);
                 delete M.account.dlThroughMEGAsync;
             }
+            if (typeof M.account.dbDropOnLogout !== 'undefined') {
+                mega.config.set('dbDropOnLogout', M.account.dbDropOnLogout);
+                delete M.account.dbDropOnLogout;
+            }
 
             if (typeof M.account.uisorting !== 'undefined') {
                 mega.config.set('uisorting', M.account.uisorting);
@@ -4112,6 +4116,27 @@ function accountUI() {
                 M.account.dlThroughMEGAsync = 0;
             }
             $('.dlThroughMEGAsync').removeClass('radioOn').addClass('radioOff');
+            $(this).addClass('radioOn').removeClass('radioOff');
+            $(this).parent().addClass('radioOn').removeClass('radioOff');
+            $('.fm-account-save-block').removeClass('hidden');
+        });
+
+        $('.dbDropOnLogout').removeClass('radioOn').addClass('radioOff');
+        i = 21;
+        if (fmconfig.dbDropOnLogout) {
+            i = 20;
+        }
+        $('#rad' + i + '_div').removeClass('radioOff').addClass('radioOn');
+        $('#rad' + i).removeClass('radioOff').addClass('radioOn');
+        $('.dbDropOnLogout input').rebind('click', function(e) {
+            var id = $(this).attr('id');
+            if (id === 'rad20') {
+                M.account.dbDropOnLogout = 1;
+            }
+            else if (id === 'rad21') {
+                M.account.dbDropOnLogout = 0;
+            }
+            $('.dbDropOnLogout').removeClass('radioOn').addClass('radioOff');
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
             $('.fm-account-save-block').removeClass('hidden');

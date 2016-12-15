@@ -460,7 +460,7 @@ function megatitle(nperc) {
 
 function populate_l() {
     if (d) {
-        for (var i = 14000 ; i-- ;) {
+        for (var i = 24000 ; i-- ;) {
             l[i] = (l[i] || '(translation-missing)');
         }
     }
@@ -3804,23 +3804,14 @@ mega.utils.logout = function megaUtilsLogout() {
         var finishLogout = function() {
             if (--step === 0) {
                 u_logout(true);
-                if (typeof aCallback === 'function') {
-                    aCallback();
-                }
-                else {
-                    document.location.reload();
-                }
+                location.reload();
             }
         }, step = 1;
 
         loadingDialog.show();
-        if (typeof mDB === 'object' && mDB.drop) {
+        if (fmdb && fmconfig.dbDropOnLogout) {
             step++;
-            mFileManagerDB.exec('drop').always(finishLogout);
-        }
-        if (typeof attribCache === 'object' && attribCache.db) {
-            step++;
-            attribCache.destroy().always(finishLogout);
+            fmdb.drop().always(finishLogout);
         }
         if (u_privk && !loadfm.loading) {
             // Use the 'Session Management Logout' API call to kill the current session
@@ -3829,9 +3820,8 @@ mega.utils.logout = function megaUtilsLogout() {
         else {
             finishLogout();
         }
-
     });
-}
+};
 
 /**
  * Convert a version string (eg, 2.1.1) to an integer, for easier comparison

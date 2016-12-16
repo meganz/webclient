@@ -3393,14 +3393,20 @@ function MegaData()
                             M.c[t][h] = 1;
                             node.p    = t;
                             removeUInode(h, parent);
+                            M.nodeUpdated(node);
                             newnodes.push(node);
                         }
                     }
 
                     if (!--ctx.pending.value) {
-                        renderNew();
-                        Soon(fmtopUI);
-                        $.tresizer();
+                        if (newnodes.length) {
+                            renderNew();
+                            Soon(fmtopUI);
+                            $.tresizer();
+                            // force fmdb flush by writing the sn, so that we don't have to
+                            // wait for the packet to do so if the operation succeed here.
+                            setsn(currsn);
+                        }
                         loadingDialog.hide();
                     }
                 }

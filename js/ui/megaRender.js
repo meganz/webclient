@@ -962,7 +962,6 @@
                             megaListContainer = this.container.parentNode.parentNode;
                         }
 
-                        console.error("new MegaList");
                         define(this, 'megaList', new MegaList(megaListContainer, megaListOptions));
                     }
                     else if(aNodeList.length && Object(newnodes).length) {
@@ -1019,8 +1018,6 @@
             },
             'cloud-drive': function(aUpdate, aNodeList, aUserData) {
                 if (DYNLIST_ENABLED) {
-                    console.error('finalizer: ', aUserData);
-
                     if (!aUpdate) {
                         if (this.viewmode) {
                             var container = document.querySelector('.fm-blocks-view.fm.fm');

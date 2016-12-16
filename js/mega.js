@@ -1103,7 +1103,6 @@ function MegaData()
             }
             else {
                 numRenderedNodes = this.megaRender.renderLayout(aUpdate, this.v);
-                console.error("renderLayout returned: ", numRenderedNodes);
             }
         }
 

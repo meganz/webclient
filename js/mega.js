@@ -51,7 +51,19 @@ if (typeof loadingDialog === 'undefined') {
         $('.dark-overlay').hide();
         $('.loading-spinner:not(.manual-management)').addClass('hidden').removeClass('active');
         this.active = false;
-   };
+    };
+    loadingDialog.nest = 0;
+    loadingDialog.pshow = function() {
+        if (!this.nest++) {
+            this.show();
+        }
+    };
+    loadingDialog.phide = function() {
+        if (--this.nest < 1) {
+            this.hide();
+            this.nest = 0;
+        }
+    };
 }
 if (typeof loadingInitDialog === 'undefined') {
     var loadingInitDialog = Object.create(null);
@@ -184,9 +196,9 @@ var MEGA_USER_STRUCT = {
 
 function MegaData()
 {
-    this.csortd          = -1;
-    this.csort           = 'name';
-    this.tfsdomqueue     = Object.create(null);
+    this.csortd = -1;
+    this.csort = 'name';
+    this.tfsdomqueue = Object.create(null);
     this.copynodeswaiter = Object.create(null);
 
     this.reset = function()
@@ -1581,7 +1593,7 @@ function MegaData()
             if (this.currentdirid !== this.RootID) {
                 target = '!' + this.currentdirid;
             }
-            newHashLocation      = '#F!' + pfid + '!' + pfkey + target;
+            newHashLocation = '#F!' + pfid + '!' + pfkey + target;
             M.lastSeenFolderLink = newHashLocation;
         }
         else {
@@ -2573,18 +2585,11 @@ function MegaData()
         // $(window).trigger("megaNodeAdded", [n]);
     };
 
+    var delInShareQueue = Object.create(null);
     this.delNode = function(h, ignoreDB) {
         function ds(h) {
             if (fminitialized) {
                 removeUInode(h);
-
-                // Update M.v it's used for at least preview slideshow
-                for (var k = M.v.length; k--;) {
-                    if (M.v[k].h === h) {
-                        M.v.splice(k, 1);
-                        break;
-                    }
-                }
             }
             if (M.c[h] && h.length < 11) {
                 for (var h2 in M.c[h]) {
@@ -2593,16 +2598,13 @@ function MegaData()
                 delete M.c[h];
             }
 
-            // FIXME: this gets called with M.d[h] already
-            // deleted, which means that the test below cannot
-            // take effect.
             if (fmdb) fmdb.del('f', h);
 
             if (M.d[h]) {
-                if (fmdb && !ignoreDB) {
-                    if (M.d[h].p && M.d[h].p.length == 11) {
-                        fmdb.del('s', M.d[h].p + '*' + h);
-                    }
+                if (M.d[h].p && M.d[h].p.length === 11) {
+                    // this is an inbound share
+                    delete M.c.shares[h];
+                    delInShareQ.push(M.d[h].p + '*' + h);
                 }
 
                 M.delIndex(M.d[h].p, h);
@@ -2610,12 +2612,22 @@ function MegaData()
                 delete M.d[h];
             }
 
-            // if (M.u[h]) delete M.u[h];
             if (typeof M.u[h] === 'object') {
                 M.u[h].c = 0;
             }
         }
+
+        var delInShareQ = delInShareQueue[h] = delInShareQueue[h] || [];
         ds(h);
+
+        if (fmdb && !ignoreDB) {
+            // Perform DB deletions once we got acknowledge from API (action-packets)
+            // which we can't do above because M.d[h] might be already deleted.
+            for (var i = delInShareQ.length; i--;) {
+                fmdb.del('s', delInShareQ[i]);
+            }
+            delete delInShareQueue[h];
+        }
 
         if (fminitialized) {
             // Handle Inbox/RubbishBin UI changes
@@ -2623,6 +2635,15 @@ function MegaData()
 
             if (M.currentdirid === 'shares' && !M.viewmode) {
                 M.openFolder('shares', 1);
+            }
+            else {
+                // Update M.v it's used for at least preview slideshow
+                for (var k = M.v.length; k--;) {
+                    if (M.v[k].h === h) {
+                        M.v.splice(k, 1);
+                        break;
+                    }
+                }
             }
         }
     };
@@ -3264,11 +3285,15 @@ function MegaData()
             return node.h;
         });
 
-        this.copyNodes(sane, target, false, callback);
+        this.copyNodes(sane, target, false, new MegaPromise())
+            .always(function(res) {
 
-        nodes.forEach(function(handle) {
-            delete M.d[handle];
-        });
+                nodes.forEach(function(handle) {
+                    delete M.d[handle];
+                });
+
+                callback(res);
+            });
 
         return nodes.length;
     };
@@ -3293,7 +3318,7 @@ function MegaData()
             return promise;
         }
 
-        loadingDialog.show();
+        loadingDialog.pshow();
 
         if (t.length === 11 && !u_pubkeys[t]) {
             var keyCachePromise = api_cachepubkeys([t]);
@@ -3302,7 +3327,7 @@ function MegaData()
                     M.copyNodes(cn, t, del, promise);
                 }
                 else {
-                    loadingDialog.hide();
+                    loadingDialog.phide();
                     alert(l[200]);
 
                     // XXX: remove above alert() if promise is set?
@@ -3333,14 +3358,14 @@ function MegaData()
             }
         }
 
-        var a      = tree;
+        var a = tree;
         var importNodes = Object(a).length;
         var nodesCount;
         var sconly = importNodes > 10;   // true -> new nodes delivered via SC `t` command only
-        var ops    = {a: 'p', t: t, n: a}; // FIXME: deploy API-side sn check
+        var ops = {a: 'p', t: t, n: a}; // FIXME: deploy API-side sn check
 
         var onCopyNodesDone = function() {
-            loadingDialog.hide();
+            loadingDialog.phide();
             if (promise) {
                 promise.resolve(0);
             }
@@ -3367,7 +3392,7 @@ function MegaData()
             ops.i = requesti;
         }
 
-        var s           = M.getShareNodesSync(t);
+        var s = M.getShareNodesSync(t);
 
         if (s.length) {
             ops.cr = crypto_makecr(a, s, false);
@@ -3395,7 +3420,7 @@ function MegaData()
             callback: function(res, ctx) {
 
                 if (typeof res === 'number' && res < 0) {
-                    loadingDialog.hide();
+                    loadingDialog.phide();
                     if (promise) {
                         return promise.reject(res);
                     }
@@ -3449,91 +3474,87 @@ function MegaData()
     this.moveNodes = function moveNodes(n, t) {
         var promise = new MegaPromise();
 
+        loadingDialog.pshow();
         dbfetch.coll(n.concat(t))
             .always(function() {
-                promise.linkDoneAndFailTo(M.moveNodesSync(n, t));
-            });
+                var pending = {value: 0};
+                var apiReq = function(apireq, h) {
+                    pending.value++;
 
-        return promise;
-    };
+                    api_req(apireq, {
+                        handle: h,
+                        target: t,
+                        pending: pending,
+                        callback: function(res, ctx) {
+                            // if the move operation succeed (res == 0), perform the actual move locally
+                            if (!res) {
+                                var node = M.getNodeByHandle(ctx.handle);
 
-    /**
-     * Move nodes.
-     * @param {Array} n   Array of node handles
-     * @param {String} t  Target folder node handle
-     * @returns {MegaPromise}
-     */
-    this.moveNodesSync = function moveNodesSync(n, t) {
-        newnodes = [];
-        loadingDialog.show();
+                                if (node && node.p) {
+                                    var h = ctx.handle;
+                                    var t = ctx.target;
+                                    var parent = node.p;
 
-        var pending = {value: 0};
-        var apiReq  = function(apireq, h) {
-            pending.value++;
+                                    // Update M.v it's used for slideshow preview at least
+                                    for (var k = M.v.length; k--;) {
+                                        if (M.v[k].h === h) {
+                                            M.v.splice(k, 1);
+                                            break;
+                                        }
+                                    }
 
-            api_req(apireq, {
-                handle: h,
-                target: t,
-                pending: pending,
-                callback: function(res, ctx) {
-                    // if the move operation succeed (res == 0), perform the actual move locally
-                    if (!res) {
-                        var node = M.getNodeByHandle(ctx.handle);
-
-                        if (node && node.p) {
-                            var h      = ctx.handle;
-                            var t      = ctx.target;
-                            var parent = node.p;
-
-                            // Update M.v it's used for slideshow preview at least
-                            for (var k = M.v.length; k--;) {
-                                if (M.v[k].h === h) {
-                                    M.v.splice(k, 1);
-                                    break;
+                                    if (M.c[parent] && M.c[parent][h]) {
+                                        delete M.c[parent][h];
+                                    }
+                                    if (typeof M.c[t] === 'undefined') {
+                                        M.c[t] = Object.create(null);
+                                    }
+                                    M.c[t][h] = 1;
+                                    node.p = t;
+                                    removeUInode(h, parent);
+                                    M.nodeUpdated(node);
+                                    newnodes.push(node);
                                 }
                             }
 
-                            if (M.c[parent] && M.c[parent][h]) {
-                                delete M.c[parent][h];
-                            }
-                            if (typeof M.c[t] === 'undefined') {
-                                M.c[t] = Object.create(null);
-                            }
-                            M.c[t][h] = 1;
-                            node.p    = t;
-                            removeUInode(h, parent);
-                            M.nodeUpdated(node);
-                            newnodes.push(node);
-                        }
-                    }
+                            if (!--ctx.pending.value) {
+                                var renderPromise = MegaPromise.resolve();
 
-                    if (!--ctx.pending.value) {
-                        if (newnodes.length) {
-                            renderNew();
-                            Soon(fmtopUI);
-                            $.tresizer();
-                            // force fmdb flush by writing the sn, so that we don't have to
-                            // wait for the packet to do so if the operation succeed here.
-                            setsn(currsn);
+                                if (newnodes.length) {
+                                    // force fmdb flush by writing the sn, so that we don't have to
+                                    // wait for the packet to do so if the operation succeed here.
+                                    setsn(currsn);
+
+                                    renderPromise = renderNew();
+                                }
+
+                                renderPromise.always(function() {
+                                    Soon(fmtopUI);
+                                    $.tresizer();
+
+                                    loadingDialog.phide();
+                                    promise.resolve();
+                                });
+                            }
                         }
-                        loadingDialog.hide();
-                    }
+                    });
+                };
+
+                for (var i = 0; i < n.length; i++) {
+                    var h = n[i];
+
+                    var apireq = {
+                        a: 'm',
+                        n: h,
+                        t: t,
+                        i: requesti
+                    };
+                    processmove(apireq);
+                    apiReq(apireq, h);
                 }
             });
-        };
 
-        for (var i in n) {
-            var h = n[i];
-
-            var apireq = {
-                a: 'm',
-                n: h,
-                t: t,
-                i: requesti
-            };
-            processmove(apireq);
-            apiReq(apireq, h);
-        }
+        return promise;
     };
 
     /**
@@ -3544,38 +3565,44 @@ function MegaData()
      * @returns {MegaPromise}
      */
     this.safeMoveNodes = function safeMoveNodes(target, nodes) {
-        var copy    = [];
-        var move    = [];
         var promise = new MegaPromise();
 
         nodes = nodes || $.selected || [];
 
-        // Always copy if the target's root is an inshare
-        if (RootbyId(target) === 'shares') {
-            move = copy;
-        }
+        dbfetch.coll(nodes.concat(target))
+            .always(function() {
+                var copy = [];
+                var move = [];
+                var promises = [];
 
-        for (var i = nodes.length; i--;) {
-            var node = nodes[i];
-
-            if (!isCircular(node, target)) {
-                if (RootbyId(node) === 'shares') {
-                    copy.push(node);
+                // Always copy if the target's root is an inshare
+                if (RootbyId(target) === 'shares') {
+                    move = copy;
                 }
-                else {
-                    move.push(node);
+
+                for (var i = nodes.length; i--;) {
+                    var node = nodes[i];
+
+                    if (!isCircular(node, target)) {
+                        if (RootbyId(node) === 'shares') {
+                            copy.push(node);
+                        }
+                        else {
+                            move.push(node);
+                        }
+                    }
                 }
-            }
-        }
 
-        if (copy.length) {
-            this.copyNodes(copy, target, true);
-        }
-        if (move.length && copy !== move) {
-            this.moveNodes(move, target);
-        }
+                if (copy.length) {
+                    promises.push(M.copyNodes(copy, target, true, new MegaPromise()));
+                }
+                if (move.length && copy !== move) {
+                    promises.push(M.moveNodes(move, target));
+                }
 
-        // TODO: promises support (realdbpaging)
+                promise.linkDoneAndFailTo(MegaPromise.allDone(promises));
+            });
+
         return promise;
     };
 
@@ -4246,7 +4273,7 @@ function MegaData()
     };
 
     /**
-     * Delete node share.
+     * Remove outbound share.
      * @param {String}  h    Node handle.
      * @param {String}  u    User handle to remove the associated share
      * @param {Boolean} okd  Whether API notified the node is no longer
@@ -4283,7 +4310,6 @@ function MegaData()
             }
 
             if (updnode) {
-                // XXX: is this really needed? we're no longer storing the whole node in DB...
                 M.nodeUpdated(this.d[h]);
 
                 if (fminitialized) {
@@ -6045,11 +6071,9 @@ function renderNew() {
                 }
 
                 if (M.currentdirid === 'shares' && !M.viewmode) {
-                    var openPromise = new MegaPromise();
-                    renderPromise.always(function() {
-                        openPromise.linkDoneAndFailTo(M.openFolder('shares', 1));
+                    renderPromise.pipe(function() {
+                        return M.openFolder('shares', 1);
                     });
-                    renderPromise = openPromise;
                 }
 
                 renderPromise.always(function() {
@@ -6348,12 +6372,12 @@ function execsc() {
                         propertiesDialog();
                     }
 
-                    sccount    = 0;
+                    sccount = 0;
                     scinflight = false;
                 });
             }
             else {
-                sccount    = 0;
+                sccount = 0;
                 scinflight = false;
             }
             return;
@@ -7078,7 +7102,7 @@ function initworkerpool() {
             var w = new Worker(mega.nodedecBlobURI || "nodedec.js");
 
             w.onmessage = worker_procmsg;
-            w.onerror   = function(err) {
+            w.onerror = function(err) {
                 console.error('[nodedec worker error]', err);
 
                 // TODO: retry gettree
@@ -7523,368 +7547,6 @@ function fetchfm(sn) {
     });
 }
 
-/**
- * Helper functions to retrieve nodes from indexedDB.
- * @name dbfetch
- */
-Object.defineProperty(self, 'dbfetch', (function() {
-    var tree_inflight = Object.create(null);
-    var node_inflight = Object.create(null);
-
-    var dbfetch = Object.freeze({
-        /**
-         * Retrieve whole 'f' table.
-         * To reduce peak mem usage, we fetch f in 64 small chunks.
-         *
-         * @param {Number} chunk
-         * @param {MegaPromise} [promise]
-         * @returns {MegaPromise}
-         * @memberOf dbfetch
-         */
-        chunked: function fetchfchunked(chunk, promise) {
-            promise = promise || (new MegaPromise());
-
-            fmdb.get('f', 'h', b64[chunk++])
-                .always(function(r) {
-                    for (var i = r.length; i--;) {
-                        emplacenode(r[i]);
-                    }
-                    if (chunk == 64) {
-                        promise.resolve(null);
-                    }
-                    else {
-                        dbfetch.chunked(chunk, promise);
-                    }
-                });
-
-            return promise;
-        },
-
-        /**
-         * Retrieve root nodes only, on-demand node loading mode.
-         * @returns {MegaPromise}
-         * @memberOf dbfetch
-         */
-        root: function fetchfroot() {
-            var promise = new MegaPromise();
-
-            // fetch the three root nodes
-            fmdb.getbykey('f', 'h', ['s', ['-2', '-3', '-4']]).always(function(r) {
-                for (var i = r.length; i--;) emplacenode(r[i]);
-                // fetch all top-level nodes
-                fmdb.getbykey('f', 'h', ['p', [M.RootID, M.InboxID, M.RubbishID]]).always(function(r) {
-                    var folders = [];
-                    for (var i = r.length; i--;) {
-                        emplacenode(r[i]);
-
-                        if (r[i].t == 1) {
-                            folders.push(r[i].h);
-                        }
-                    }
-                    promise.resolve(folders);
-                });
-            });
-
-            return promise;
-        },
-
-        /**
-         * Fetch all children; also, fetch path to root; populates M.c and M.d
-         *
-         * @param {String} parent  Node handle
-         * @param {MegaPromise} [promise]
-         * @returns {*|MegaPromise}
-         * @memberOf dbfetch
-         */
-        get: function fetchchildren(parent, promise) {
-            console.info('fetchchildren', parent, promise);
-            promise = promise || MegaPromise.busy();
-
-            if (typeof parent !== 'string') {
-                if (d) {
-                    console.warn('Invalid parent, cannot fetchchildren', parent);
-                }
-                promise.reject();
-            }
-            // is this a user handle or a non-handle? no fetching needed.
-            else if (parent.length != 8) {
-                promise.resolve();
-            }
-            // has the parent been fetched yet?
-            else if (!M.d[parent]) {
-                this.node([parent])
-                    .unpack(function(r) {
-                        for (var i = r.length; i--;) {
-                            // providing a 'true' flag so that the node isn't added to M.c,
-                            // otherwise crawling back to the parent won't work properly.
-                            emplacenode(r[i], true);
-                        }
-                        if (!M.d[parent]) {
-                            // no parent found?!
-                            promise.reject(ENOENT);
-                        }
-                        else {
-                            dbfetch.get(parent, promise);
-                        }
-                    });
-            }
-            // have the children been fetched yet?
-            else if (M.d[parent].t && !M.c[parent]) {
-                // no: do so now.
-                this.tree([parent], 0, new MegaPromise())
-                    .always(function() {
-                        if (M.d[parent] && M.c[parent]) {
-                            dbfetch.get(parent, promise);
-                        }
-                        else {
-                            promise.reject(EACCESS);
-                        }
-                    });
-            }
-            else {
-                // crawl back to root (not necessary until we start purging from memory)
-                dbfetch.get(M.d[parent].p, promise);
-            }
-
-            return promise;
-        },
-
-        /**
-         * Fetch all children; also, fetch path to root; populates M.c and M.d
-         * same as fetchchildren/dbfetch.get, but takes an array of handles.
-         *
-         * @param {Array} handles
-         * @param {MegaPromise} [promise]
-         * @returns {MegaPromise}
-         * @memberOf dbfetch
-         */
-        geta: function geta(handles, promise) {
-            promise = promise || MegaPromise.busy();
-
-            var promises = [];
-            for (var i = handles.length; i--;) {
-                // fetch nodes and their path to root
-                promises.push(dbfetch.get(handles[i], new MegaPromise()));
-            }
-
-            promise.linkDoneAndFailTo(MegaPromise.allDone(promises));
-
-            return promise;
-        },
-
-        /**
-         * Fetch entire subtree.
-         *
-         * @param {Array} parents  Node handles
-         * @param {Number} [level] Recursion level, optional
-         * @param {MegaPromise} [promise] optional
-         * @param {Array} [handles] -- internal use only
-         * @returns {*|MegaPromise}
-         * @memberOf dbfetch
-         */
-        tree: function fetchsubtree(parents, level, promise, handles) {
-            var p        = [];
-            var inflight = Object.create(null);
-
-            if (level === undefined) {
-                level = -1;
-            }
-
-            // setup promise
-            promise = promise || MegaPromise.busy();
-
-            // first round: replace undefined handles with the parents
-            if (!handles) {
-                handles = parents;
-            }
-
-            // check which parents have already been fetched - no need to fetch those
-            // (since we do not purge loaded nodes, the presence of M.c for a node
-            // means that all of its children are guaranteed to be in memory.)
-            for (var i = parents.length; i--;) {
-                if (tree_inflight[parents[i]]) {
-                    inflight[parents[i]] = tree_inflight[parents[i]];
-                }
-                else if (!M.c[parents[i]]) {
-                    p.push(parents[i]);
-                    tree_inflight[parents[i]] = promise;
-                }
-            }
-
-            var masterPromise = promise;
-            if ($.len(inflight)) {
-                masterPromise = MegaPromise.allDone(array_unique(obj_values(inflight)).concat(promise));
-            }
-            // console.warn('fetchsubtree', arguments, p, inflight);
-
-            // fetch children of all unfetched parents
-            fmdb.getbykey('f', 'h', ['p', p.concat()])
-                .always(function(r) {
-                    // store fetched nodes
-                    for (var i = p.length; i--;) {
-                        delete tree_inflight[p[i]];
-
-                        // M.c should be set when *all direct* children have
-                        // been fetched from the DB (even if there are none)
-                        M.c[p[i]] = Object.create(null);
-                    }
-                    for (var i = r.length; i--;) {
-                        emplacenode(r[i]);
-                    }
-
-                    if (level--) {
-                        // extract parents from children
-                        p = [];
-
-                        for (var i = parents.length; i--;) {
-                            for (var h in M.c[parents[i]]) {
-                                handles.push(h);
-
-                                // FIXME: with file versioning, files can have children, too!
-                                if (M.d[h].t) {
-                                    p.push(h);
-                                }
-                            }
-                        }
-
-                        if (p.length) {
-                            fetchsubtree(p, level, promise, handles);
-                            return;
-                        }
-                    }
-                    promise.resolve();
-                });
-
-            return masterPromise;
-        },
-
-        /**
-         * Retrieve nodes by handle.
-         * WARNING: emplacenode() is not used, it's up to the caller if so desired.
-         *
-         * @param {Array} handles
-         * @returns {MegaPromise}
-         * @memberOf dbfetch
-         */
-        node: function fetchnode(handles) {
-            var promise  = new MegaPromise();
-            var inflight = Object.create(null);
-
-            for (var i = handles.length; i--;) {
-                if (M.d[handles[i]]) {
-                    handles.splice(i, 1);
-                }
-                else if (node_inflight[handles[i]]) {
-                    inflight[handles[i]] = node_inflight[handles[i]];
-                    handles.splice(i, 1);
-                }
-                else {
-                    node_inflight[handles[i]] = promise;
-                }
-            }
-            // console.warn('fetchnode', arguments, handles, inflight);
-
-            var masterPromise = promise;
-            if ($.len(inflight)) {
-                masterPromise = MegaPromise.allDone(array_unique(obj_values(inflight)).concat(promise));
-            }
-            else if (!handles.length) {
-                return MegaPromise.resolve([]);
-            }
-
-            fmdb.getbykey('f', 'h', ['h', handles.concat()])
-                .always(function(r) {
-                    if (handles.length == 1 && r.length > 1) {
-                        console.error('Unexpected DB reply, more than a single node returned.');
-                    }
-
-                    for (var i = handles.length; i--;) {
-                        delete node_inflight[handles[i]];
-                    }
-
-                    promise.resolve(r);
-                });
-
-            return masterPromise;
-        },
-
-        /**
-         * Retrieve a node by its hash.
-         *
-         * @param hash
-         * @returns {MegaPromise}
-         * @memberOf dbfetch
-         */
-        hash: function fetchhash(hash) {
-            var promise = new MegaPromise();
-
-            if (M.h[hash] && M.d[M.h[hash].first]) {
-                promise.resolve(M.d[M.h[hash].first]);
-            }
-            else {
-                fmdb.getbykey('h', 'c', false, [['c', hash]], 1)
-                    .always(function(r) {
-                        var node = r[0];
-                        if (node) {
-                            // got the hash and a handle it belong to
-                            M.h[hash]         = M.h[hash] || newNodeHash();
-                            M.h[hash][node.h] = 1;
-
-                            // retrieve the full node for this handle
-                            dbfetch.node([node.h])
-                                .always(function(r) {
-                                    promise.resolve(r[0]);
-                                });
-                        }
-                        else {
-                            promise.resolve();
-                        }
-                    });
-            }
-
-            return promise;
-        },
-
-        /**
-         * Fetch all children recursively; also, fetch path to root
-         *
-         * @param {Array} handles
-         * @param {MegaPromise} [promise]
-         * @returns {*|MegaPromise}
-         * @memberOf dbfetch
-         */
-        coll: function fetchrecursive(handles, promise) {
-            promise = promise || MegaPromise.busy();
-
-            // fetch nodes and their path to root
-            this.geta(handles)
-                .always(function() {
-                    var folders = [];
-                    for (var i = handles.length; i--;) {
-                        var h = handles[i];
-                        if (M.d[h] && M.d[h].t) {
-                            folders.push(h);
-                        }
-                    }
-                    if (folders.length) {
-                        dbfetch.tree(folders, -1, new MegaPromise())
-                            .always(function(r) {
-                                promise.resolve(r);
-                            });
-                    }
-                    else {
-                        promise.resolve();
-                    }
-                });
-
-            return promise;
-        }
-    });
-
-    return {value: dbfetch};
-})());
-
-
 function dbfetchfm() {
     var i;
 
@@ -8156,10 +7818,10 @@ function createFolder(toid, name, ulparams) {
             }
         }
 
-        var n    = {name: name};
+        var n = {name: name};
         var attr = ab_to_base64(crypto_makeattr(n));
-        var key  = a32_to_base64(encrypt_key(u_k_aes, n.k));
-        var req  = {a: 'p', t: toid, n: [{h: 'xxxxxxxx', t: 1, a: attr, k: key}], i: requesti};
+        var key = a32_to_base64(encrypt_key(u_k_aes, n.k));
+        var req = {a: 'p', t: toid, n: [{h: 'xxxxxxxx', t: 1, a: attr, k: key}], i: requesti};
         var sn = M.getShareNodesSync(toid);
 
         if (sn.length) {
@@ -9135,7 +8797,7 @@ function loadfm_done(mDBload) {
                 mega.loadReport.ttfm = Date.now() - mega.loadReport.ttfm;
             }
             else {
-                mega.loadReport.ttfm     = -1;
+                mega.loadReport.ttfm = -1;
                 mega.loadReport.renderfm = -1;
             }
 

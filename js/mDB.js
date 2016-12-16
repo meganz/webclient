@@ -104,12 +104,13 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
         try {
             if (!fmdb.db) {
                 var todrop = [];
+                var dbpfx = 'fm2_';
 
                 // enumerate databases and collect those not prefixed with fm_
                 // (which is the current format)
                 Dexie.getDatabaseNames(function(r) {
                     for (var i = r.length; i--;) {
-                        if (r[i].substr(0,4) != 'fm2_') {
+                        if (r[i].substr(0, dbpfx.length) != dbpfx) {
                             todrop.push(r[i]);
                         }
                     }
@@ -121,7 +122,10 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
                     fmdb.drop(todrop, function() {
                         // start inter-tab heartbeat
                         // fmdb.beacon();
-                        fmdb.db = new Dexie('fm2_' + fmdb.name);
+                        fmdb.db = new Dexie(dbpfx + fmdb.name);
+
+                        // save the db name for our getDatabaseNames polyfill
+                        localStorage['_$mdb$' + dbpfx + fmdb.name] = Date.now();
 
                         var dbSchema = {};
                         if (!Array.isArray(fmdb.schema)) {
@@ -944,6 +948,9 @@ mBroadcaster.once('startMega', function __idb_setup() {
                                         list[length++] = i.substr(0, i.length - 5);
                                     }
                                 }
+                                else if (i.substr(0, 6) === '_$mdb$') {
+                                    list[length++] = i.substr(6);
+                                }
                             }
 
                             __Notify('success', list);
@@ -985,3 +992,367 @@ mBroadcaster.once('startMega', function __idb_setup() {
         }
     }
 });
+
+
+// --------------------------------------------------------------------------
+
+/**
+ * Helper functions to retrieve nodes from indexedDB.
+ * @name dbfetch
+ */
+Object.defineProperty(self, 'dbfetch', (function() {
+    var tree_inflight = Object.create(null);
+    var node_inflight = Object.create(null);
+
+    var dbfetch = Object.freeze({
+        /**
+         * Retrieve whole 'f' table.
+         * To reduce peak mem usage, we fetch f in 64 small chunks.
+         *
+         * @param {Number} chunk
+         * @param {MegaPromise} [promise]
+         * @returns {MegaPromise}
+         * @memberOf dbfetch
+         */
+        chunked: function fetchfchunked(chunk, promise) {
+            promise = promise || (new MegaPromise());
+
+            fmdb.get('f', 'h', b64[chunk++])
+                .always(function(r) {
+                    for (var i = r.length; i--;) {
+                        emplacenode(r[i]);
+                    }
+                    if (chunk == 64) {
+                        promise.resolve(null);
+                    }
+                    else {
+                        dbfetch.chunked(chunk, promise);
+                    }
+                });
+
+            return promise;
+        },
+
+        /**
+         * Retrieve root nodes only, on-demand node loading mode.
+         * @returns {MegaPromise}
+         * @memberOf dbfetch
+         */
+        root: function fetchfroot() {
+            var promise = new MegaPromise();
+
+            // fetch the three root nodes
+            fmdb.getbykey('f', 'h', ['s', ['-2', '-3', '-4']]).always(function(r) {
+                for (var i = r.length; i--;) emplacenode(r[i]);
+                // fetch all top-level nodes
+                fmdb.getbykey('f', 'h', ['p', [M.RootID, M.InboxID, M.RubbishID]]).always(function(r) {
+                    var folders = [];
+                    for (var i = r.length; i--;) {
+                        emplacenode(r[i]);
+
+                        if (r[i].t == 1) {
+                            folders.push(r[i].h);
+                        }
+                    }
+                    promise.resolve(folders);
+                });
+            });
+
+            return promise;
+        },
+
+        /**
+         * Fetch all children; also, fetch path to root; populates M.c and M.d
+         *
+         * @param {String} parent  Node handle
+         * @param {MegaPromise} [promise]
+         * @returns {*|MegaPromise}
+         * @memberOf dbfetch
+         */
+        get: function fetchchildren(parent, promise) {
+            console.info('fetchchildren', parent, promise);
+            promise = promise || MegaPromise.busy();
+
+            if (typeof parent !== 'string') {
+                if (d) {
+                    console.warn('Invalid parent, cannot fetchchildren', parent);
+                }
+                promise.reject();
+            }
+            // is this a user handle or a non-handle? no fetching needed.
+            else if (parent.length != 8) {
+                promise.resolve();
+            }
+            // has the parent been fetched yet?
+            else if (!M.d[parent]) {
+                this.node([parent])
+                    .unpack(function(r) {
+                        for (var i = r.length; i--;) {
+                            // providing a 'true' flag so that the node isn't added to M.c,
+                            // otherwise crawling back to the parent won't work properly.
+                            emplacenode(r[i], true);
+                        }
+                        if (!M.d[parent]) {
+                            // no parent found?!
+                            promise.reject(ENOENT);
+                        }
+                        else {
+                            dbfetch.get(parent, promise);
+                        }
+                    });
+            }
+            // have the children been fetched yet?
+            else if (M.d[parent].t && !M.c[parent]) {
+                // no: do so now.
+                this.tree([parent], 0, new MegaPromise())
+                    .always(function() {
+                        if (M.d[parent] && M.c[parent]) {
+                            dbfetch.get(parent, promise);
+                        }
+                        else {
+                            promise.reject(EACCESS);
+                        }
+                    });
+            }
+            else {
+                // crawl back to root (not necessary until we start purging from memory)
+                dbfetch.get(M.d[parent].p, promise);
+            }
+
+            return promise;
+        },
+
+        /**
+         * Fetch all children; also, fetch path to root; populates M.c and M.d
+         * same as fetchchildren/dbfetch.get, but takes an array of handles.
+         *
+         * @param {Array} handles
+         * @param {MegaPromise} [promise]
+         * @returns {MegaPromise}
+         * @memberOf dbfetch
+         */
+        geta: function geta(handles, promise) {
+            promise = promise || MegaPromise.busy();
+
+            var promises = [];
+            for (var i = handles.length; i--;) {
+                // fetch nodes and their path to root
+                promises.push(dbfetch.get(handles[i], new MegaPromise()));
+            }
+
+            promise.linkDoneAndFailTo(MegaPromise.allDone(promises));
+
+            return promise;
+        },
+
+        /**
+         * Fetch entire subtree.
+         *
+         * @param {Array} parents  Node handles
+         * @param {Number} [level] Recursion level, optional
+         * @param {MegaPromise} [promise] optional
+         * @param {Array} [handles] -- internal use only
+         * @returns {*|MegaPromise}
+         * @memberOf dbfetch
+         */
+        tree: function fetchsubtree(parents, level, promise, handles) {
+            var p = [];
+            var inflight = Object.create(null);
+
+            if (level === undefined) {
+                level = -1;
+            }
+
+            // setup promise
+            promise = promise || MegaPromise.busy();
+
+            // first round: replace undefined handles with the parents
+            if (!handles) {
+                handles = parents;
+            }
+
+            // check which parents have already been fetched - no need to fetch those
+            // (since we do not purge loaded nodes, the presence of M.c for a node
+            // means that all of its children are guaranteed to be in memory.)
+            for (var i = parents.length; i--;) {
+                if (tree_inflight[parents[i]]) {
+                    inflight[parents[i]] = tree_inflight[parents[i]];
+                }
+                else if (!M.c[parents[i]]) {
+                    p.push(parents[i]);
+                    tree_inflight[parents[i]] = promise;
+                }
+            }
+
+            var masterPromise = promise;
+            if ($.len(inflight)) {
+                masterPromise = MegaPromise.allDone(array_unique(obj_values(inflight)).concat(promise));
+            }
+            // console.warn('fetchsubtree', arguments, p, inflight);
+
+            // fetch children of all unfetched parents
+            fmdb.getbykey('f', 'h', ['p', p.concat()])
+                .always(function(r) {
+                    // store fetched nodes
+                    for (var i = p.length; i--;) {
+                        delete tree_inflight[p[i]];
+
+                        // M.c should be set when *all direct* children have
+                        // been fetched from the DB (even if there are none)
+                        M.c[p[i]] = Object.create(null);
+                    }
+                    for (var i = r.length; i--;) {
+                        emplacenode(r[i]);
+                    }
+
+                    if (level--) {
+                        // extract parents from children
+                        p = [];
+
+                        for (var i = parents.length; i--;) {
+                            for (var h in M.c[parents[i]]) {
+                                handles.push(h);
+
+                                // FIXME: with file versioning, files can have children, too!
+                                if (M.d[h].t) {
+                                    p.push(h);
+                                }
+                            }
+                        }
+
+                        if (p.length) {
+                            fetchsubtree(p, level, promise, handles);
+                            return;
+                        }
+                    }
+                    promise.resolve();
+                });
+
+            return masterPromise;
+        },
+
+        /**
+         * Retrieve nodes by handle.
+         * WARNING: emplacenode() is not used, it's up to the caller if so desired.
+         *
+         * @param {Array} handles
+         * @returns {MegaPromise}
+         * @memberOf dbfetch
+         */
+        node: function fetchnode(handles) {
+            var promise = new MegaPromise();
+            var inflight = Object.create(null);
+
+            for (var i = handles.length; i--;) {
+                if (M.d[handles[i]]) {
+                    handles.splice(i, 1);
+                }
+                else if (node_inflight[handles[i]]) {
+                    inflight[handles[i]] = node_inflight[handles[i]];
+                    handles.splice(i, 1);
+                }
+                else {
+                    node_inflight[handles[i]] = promise;
+                }
+            }
+            // console.warn('fetchnode', arguments, handles, inflight);
+
+            var masterPromise = promise;
+            if ($.len(inflight)) {
+                masterPromise = MegaPromise.allDone(array_unique(obj_values(inflight)).concat(promise));
+            }
+            else if (!handles.length) {
+                return MegaPromise.resolve([]);
+            }
+
+            fmdb.getbykey('f', 'h', ['h', handles.concat()])
+                .always(function(r) {
+                    if (handles.length == 1 && r.length > 1) {
+                        console.error('Unexpected DB reply, more than a single node returned.');
+                    }
+
+                    for (var i = handles.length; i--;) {
+                        delete node_inflight[handles[i]];
+                    }
+
+                    promise.resolve(r);
+                });
+
+            return masterPromise;
+        },
+
+        /**
+         * Retrieve a node by its hash.
+         *
+         * @param hash
+         * @returns {MegaPromise}
+         * @memberOf dbfetch
+         */
+        hash: function fetchhash(hash) {
+            var promise = new MegaPromise();
+
+            if (M.h[hash] && M.d[M.h[hash].first]) {
+                promise.resolve(M.d[M.h[hash].first]);
+            }
+            else {
+                fmdb.getbykey('h', 'c', false, [['c', hash]], 1)
+                    .always(function(r) {
+                        var node = r[0];
+                        if (node) {
+                            // got the hash and a handle it belong to
+                            M.h[hash] = M.h[hash] || newNodeHash();
+                            M.h[hash][node.h] = 1;
+
+                            // retrieve the full node for this handle
+                            dbfetch.node([node.h])
+                                .always(function(r) {
+                                    promise.resolve(r[0]);
+                                });
+                        }
+                        else {
+                            promise.resolve();
+                        }
+                    });
+            }
+
+            return promise;
+        },
+
+        /**
+         * Fetch all children recursively; also, fetch path to root
+         *
+         * @param {Array} handles
+         * @param {MegaPromise} [promise]
+         * @returns {*|MegaPromise}
+         * @memberOf dbfetch
+         */
+        coll: function fetchrecursive(handles, promise) {
+            promise = promise || MegaPromise.busy();
+
+            // fetch nodes and their path to root
+            this.geta(handles)
+                .always(function() {
+                    var folders = [];
+                    for (var i = handles.length; i--;) {
+                        var h = handles[i];
+                        if (M.d[h] && M.d[h].t) {
+                            folders.push(h);
+                        }
+                    }
+                    if (folders.length) {
+                        dbfetch.tree(folders, -1, new MegaPromise())
+                            .always(function(r) {
+                                promise.resolve(r);
+                            });
+                    }
+                    else {
+                        promise.resolve();
+                    }
+                });
+
+            return promise;
+        }
+    });
+
+    return {value: dbfetch};
+})());

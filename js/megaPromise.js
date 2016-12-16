@@ -24,7 +24,8 @@
 function MegaPromise(fn) {
     var self = this;
 
-    self._internalPromise = new $.Deferred();
+    this.$deferred = new $.Deferred();
+    this.state$deferred = this.$deferred;
 
     if (fn) {
         var resolve = function() {
@@ -54,8 +55,7 @@ function MegaPromise(fn) {
     if (MegaPromise.debugPreStack === true) {
         self.stack = mega.utils.getStack();
     }
-    return this;
-};
+}
 
 if (typeof Promise !== "undefined") {
     MegaPromise._origPromise = Promise;
@@ -110,7 +110,7 @@ MegaPromise.busy = function() {
     if (fminitialized && !loadingDialog.active) {
         var timer = setTimeout(function() {
             timer = null;
-            loadingDialog.show();
+            loadingDialog.pshow();
         }, 200);
 
         promise.always(function() {
@@ -118,7 +118,7 @@ MegaPromise.busy = function() {
                 clearTimeout(timer);
             }
             else {
-                loadingDialog.hide();
+                loadingDialog.phide();
             }
         });
     }
@@ -173,7 +173,7 @@ MegaPromise.getTraceableReject = function($promise, origPromise) {
  * @returns {jQuery.Deferred}
  */
 MegaPromise.prototype.promise = function() {
-    return this._internalPromise.promise();
+    return this.$deferred.promise();
 };
 
 /**
@@ -187,7 +187,7 @@ MegaPromise.prototype.promise = function() {
  */
 MegaPromise.prototype.then = function(res, rej) {
 
-    return MegaPromise.asMegaPromiseProxy(this._internalPromise.then(res, rej));
+    return MegaPromise.asMegaPromiseProxy(this.$deferred.then(res, rej));
 };
 
 /**
@@ -197,7 +197,7 @@ MegaPromise.prototype.then = function(res, rej) {
  * @returns {MegaPromise}
  */
 MegaPromise.prototype.done = function(res) {
-    this._internalPromise.done(res);
+    this.$deferred.done(res);
     return this;
 };
 
@@ -207,7 +207,7 @@ MegaPromise.prototype.done = function(res) {
  * @returns {String}
  */
 MegaPromise.prototype.state = function() {
-    return this._internalPromise.state();
+    return this.$deferred.state();
 };
 
 /**
@@ -217,7 +217,7 @@ MegaPromise.prototype.state = function() {
  * @returns {MegaPromise}
  */
 MegaPromise.prototype.fail = function(rej) {
-    this._internalPromise.fail(rej);
+    this.$deferred.fail(rej);
     return this;
 };
 
@@ -236,7 +236,7 @@ MegaPromise.prototype.catch = MegaPromise.prototype.fail;
  * @returns {MegaPromise}
  */
 MegaPromise.prototype.resolve = function() {
-    this._internalPromise.resolve.apply(this._internalPromise, arguments);
+    this.state$deferred.resolve.apply(this.state$deferred, arguments);
     return this;
 };
 
@@ -246,7 +246,7 @@ MegaPromise.prototype.resolve = function() {
  * @returns {MegaPromise}
  */
 MegaPromise.prototype.reject = function() {
-    this._internalPromise.reject.apply(this._internalPromise, arguments);
+    this.state$deferred.reject.apply(this.state$deferred, arguments);
     return this;
 };
 
@@ -256,8 +256,19 @@ MegaPromise.prototype.reject = function() {
  * @returns {MegaPromise}
  */
 MegaPromise.prototype.always = function() {
-    this._internalPromise.always.apply(this._internalPromise, arguments);
+    this.$deferred.always.apply(this.$deferred, arguments);
     return this;
+};
+
+/**
+ * Alias of .then, which works like .always and exchanges the internal Deferred promise.
+ *
+ * @returns {MegaPromise}
+ */
+MegaPromise.prototype.pipe = function(resolve, reject) {
+    var pipe = this.then(resolve, reject || resolve);
+    this.$deferred = pipe.$deferred;
+    return pipe;
 };
 
 /**
@@ -268,7 +279,7 @@ MegaPromise.prototype.always = function() {
 MegaPromise.prototype.wait = function(callback) {
     // callback = tryCatch(callback);
 
-    this._internalPromise.always(function() {
+    this.$deferred.always(function() {
         var args = toArray.apply(null, arguments);
 
         setTimeout(function() {
@@ -286,7 +297,7 @@ MegaPromise.prototype.wait = function(callback) {
 MegaPromise.prototype.unpack = function(callback) {
     // callback = tryCatch(callback);
 
-    this._internalPromise.always(function(result) {
+    this.$deferred.always(function(result) {
         if (result.__unpack$$$) {
             // flatten an n-dimensional array.
             for (var i = result.length; i--;) {
@@ -311,11 +322,21 @@ MegaPromise.prototype.unpack = function(callback) {
  */
 MegaPromise.prototype.linkDoneTo = function(targetPromise) {
     var self = this;
-    targetPromise.then(function() {
-        self.resolve.apply(self, arguments);
-    });
 
-    return self;
+    if (targetPromise instanceof MegaPromise) {
+        // Using MegaPromise.done since it's more lightweight than the thenable
+        // which creates a new deferred instance proxied back to MegaPromise...
+        targetPromise.done(function() {
+            self.resolve.apply(self, arguments);
+        });
+    }
+    else {
+        targetPromise.then(function() {
+            self.resolve.apply(self, arguments);
+        });
+    }
+
+    return this;
 };
 
 /**
@@ -329,12 +350,23 @@ MegaPromise.prototype.linkDoneTo = function(targetPromise) {
  */
 MegaPromise.prototype.linkFailTo = function(targetPromise) {
     var self = this;
-    targetPromise.then(undefined, function() {
-        self.reject.apply(self, arguments);
-    });
 
-    return self;
+    if (targetPromise instanceof MegaPromise) {
+        // Using MegaPromise.fail since it's more lightweight than the thenable
+        // which creates a new deferred instance proxied back to MegaPromise...
+        targetPromise.fail(function() {
+            self.resolve.apply(self, arguments);
+        });
+    }
+    else {
+        targetPromise.then(undefined, function() {
+            self.reject.apply(self, arguments);
+        });
+    }
+
+    return this;
 };
+
 /**
  * Link the `targetPromise`'s state to the current promise (both done and fail, see .linkDoneTo and .linkFailTo)
  *
@@ -344,12 +376,9 @@ MegaPromise.prototype.linkFailTo = function(targetPromise) {
  * @returns {MegaPromise} current promise, helpful for js call chaining
  */
 MegaPromise.prototype.linkDoneAndFailTo = function(targetPromise) {
-    var self = this;
-
-    self.linkDoneTo(targetPromise);
-    self.linkFailTo(targetPromise);
-
-    return self;
+    this.linkDoneTo(targetPromise);
+    this.linkFailTo(targetPromise);
+    return this;
 };
 
 /**
@@ -446,8 +475,8 @@ MegaPromise.allDone = function(promisesList, timeout) {
     if (promisesList.length === 0) {
         return MegaPromise.resolve();
     }
-    var totalLeft = promisesList.length;
     var masterPromise = new MegaPromise();
+    var totalLeft = promisesList.length;
     var results = [];
     results.__unpack$$$ = 1;
 
@@ -459,15 +488,16 @@ MegaPromise.allDone = function(promisesList, timeout) {
         }
     };
 
-    var _megaPromisesList = [];
-    promisesList.forEach(function(v, k) {
+    for (var i = promisesList.length; i--;) {
+        var v = promisesList[i];
+
         if (MegaPromise._origPromise && v instanceof MegaPromise._origPromise) {
             v = MegaPromise.asMegaPromiseProxy(v);
         }
-        _megaPromisesList.push(v);
+
         v.done(alwaysCb);
         v.fail(alwaysCb);
-    });
+    }
 
     if (timeout) {
         var timeoutTimer = setTimeout(function () {
@@ -478,7 +508,6 @@ MegaPromise.allDone = function(promisesList, timeout) {
             clearTimeout(timeoutTimer);
         });
     }
-
 
     return masterPromise;
 };

@@ -8,6 +8,7 @@ describe("MegaPromise Unit Test", function() {
         done();
     });
 
+    var assert = chai.assert;
     var fail = function(message) {
         assert(false, message);
     };
@@ -187,8 +188,8 @@ describe("MegaPromise Unit Test", function() {
 
         p12.then(function() {
             expect(arguments.length).to.eql(1);
-            expect(p1._internalPromise.state()).to.eql("resolved");
-            expect(p2._internalPromise.state()).to.eql("resolved");
+            expect(p1.state()).to.eql("resolved");
+            expect(p2.state()).to.eql("resolved");
             expect(arguments[0]).to.deep.equal([123, 456]);
             done();
         }, function() {
@@ -208,7 +209,7 @@ describe("MegaPromise Unit Test", function() {
 
         mp.then(function() {
             expect(arguments.length).to.eql(1);
-            expect(mp._internalPromise.state()).to.eql("resolved");
+            expect(mp.state()).to.eql("resolved");
             expect(arguments[0]).to.eql(123);
             done();
         }, function() {
@@ -225,7 +226,7 @@ describe("MegaPromise Unit Test", function() {
 
         mp.then(function() {
             expect(arguments.length).to.eql(1);
-            expect(mp._internalPromise.state()).to.eql("resolved");
+            expect(mp.state()).to.eql("resolved");
             expect(arguments[0]).to.eql(123);
             done();
         }, function() {
@@ -250,7 +251,7 @@ describe("MegaPromise Unit Test", function() {
 
         p123.then(function() {
             expect(arguments.length).to.eql(1);
-            expect(p1._internalPromise.state()).to.eql("resolved");
+            expect(p1.state()).to.eql("resolved");
             expect(p3.state()).to.equal("resolved");
             expect(arguments[0]).to.deep.equal([123, 456, 789]);
             done();
@@ -273,7 +274,7 @@ describe("MegaPromise Unit Test", function() {
             fail('.all was resolved, while it should have been rejected');
         }, function() {
             expect(arguments.length).to.eql(1);
-            expect(ap._internalPromise.state()).to.eql("rejected");
+            expect(ap.state()).to.eql("rejected");
             expect(arguments[0]).to.eql(123);
             done();
         });
@@ -309,6 +310,65 @@ describe("MegaPromise Unit Test", function() {
                         done();
                     });
             });
+    });
+
+    it('MegaPromise.pipe', function(done) {
+        var p1 = function() {
+            var p = new MegaPromise();
+            setTimeout(function() {
+                result.push('p1-resolved');
+                p.resolve(111);
+            }, 20);
+            return p;
+        };
+        var p2 = function(v) {
+            var p = new MegaPromise();
+            setTimeout(function() {
+                result.push('p2-resolved');
+                p.resolve(v<<1);
+            }, 280);
+            return p;
+        };
+        var track = function(tag) {
+            return function(res) {
+                result.push(tag + '$' + res);
+            };
+        };
+        var result = [];
+        var promise = p1().done(track('p1-done'));
+
+        // pipe will now transparently replace 'promise' to the one returned from its callback
+        promise.pipe(function(res) {
+            track('pipe')(res);
+
+            return p2(res);
+        });
+
+        // wait for p2 fulfilment
+        promise.done(track('p1-to-p2'));
+
+        promise.always(function(res) {
+            track('done')(res);
+            assert.strictEqual(JSON.stringify(result),
+                '["p1-resolved","p1-done$111","pipe$111","p2-resolved","p1-to-p2$222","done$222"]');
+            done();
+        });
+    });
+
+    it('MegaPromise.unpack', function(done) {
+        var p1 = new MegaPromise();
+        var p2 = new MegaPromise();
+        var p3 = new MegaPromise();
+
+        MegaPromise.allDone([p1, p3, p2])
+            .unpack(function(res) {
+                assert.strictEqual(JSON.stringify(res), '[222,111,333]');
+                done();
+            });
+
+        p2.resolve(222);
+        p1.resolve(111, 999);
+        p3.reject(333);
     });
 
     it("Multiple promises, combined with $.when", function(done) {

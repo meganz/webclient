@@ -2128,11 +2128,9 @@ function removeShare(shareId, nfk, norender) {
         promise = M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
 
         if ((M.currentdirid === shareId) || (isCircular(shareId, M.currentdirid) === true)) {
-            var openPromise = new MegaPromise();
-            promise.always(function() {
-                openPromise.linkDoneAndFailTo(M.openFolder(RootbyId(shareId)));
+            promise.pipe(function() {
+                return M.openFolder(RootbyId(shareId));
             });
-            promise = openPromise;
         }
     }
     else {

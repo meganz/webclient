@@ -2002,9 +2002,6 @@ function MegaData()
                     }
                 }
             }// END of for folders loop
-
-            // Tree view DOM elements events listeners update
-            treeUI();
         }
     };// END buildtree()
 
@@ -3362,47 +3359,69 @@ function MegaData()
 
     this.moveNodes = function(n, t) {
         newnodes = [];
+        loadingDialog.show();
+
+        var pending = {value: 0};
+        var apiReq  = function(apireq, h) {
+            pending.value++;
+
+            api_req(apireq, {
+                handle: h,
+                target: t,
+                pending: pending,
+                callback: function(res, ctx) {
+                    // if the move operation succeed (res == 0), perform the actual move locally
+                    if (!res) {
+                        var node = M.getNodeByHandle(ctx.handle);
+
+                        if (node && node.p) {
+                            var h      = ctx.handle;
+                            var t      = ctx.target;
+                            var parent = node.p;
+
+                            // Update M.v it's used for slideshow preview at least
+                            for (var k = M.v.length; k--;) {
+                                if (M.v[k].h === h) {
+                                    M.v.splice(k, 1);
+                                    break;
+                                }
+                            }
+
+                            if (M.c[parent] && M.c[parent][h]) {
+                                delete M.c[parent][h];
+                            }
+                            if (typeof M.c[t] === 'undefined') {
+                                M.c[t] = [];
+                            }
+                            M.c[t][h] = 1;
+                            node.p    = t;
+                            removeUInode(h, parent);
+                            newnodes.push(node);
+                        }
+                    }
+
+                    if (!--ctx.pending.value) {
+                        renderNew();
+                        Soon(fmtopUI);
+                        $.tresizer();
+                        loadingDialog.hide();
+                    }
+                }
+            });
+        };
 
         for (var i in n) {
             var h = n[i];
-            var node = M.d[h];
 
             var apireq = {
                 a: 'm',
                 n: h,
-                t: t
-                //i: requesti - DB update only after incoming actionpacket!
+                t: t,
+                i: requesti
             };
             processmove(apireq);
-            api_req(apireq);
-
-
-            if (node && node.p) {
-                var parent = node.p;
-
-                if (M.c[parent] && M.c[parent][h]) {
-                    delete M.c[node.p][h];
-                }
-                // Update M.v it's used for slideshow preview at least
-                for (var k in M.v) {
-                    if (M.v[k].h === h) {
-                        M.v.splice(k, 1);
-                        break;
-                    }
-                }
-                if (typeof M.c[t] === 'undefined') {
-                    M.c[t] = [];
-                }
-                M.c[t][h] = 1;
-                node.p = t;
-                removeUInode(h, parent);
-                newnodes.push(node);
-            }
+            apiReq(apireq, h);
         }
-
-        renderNew();
-        Soon(fmtopUI);
-        $.tresizer();
     };
 
     this.accountSessions = function(cb) {
@@ -6127,6 +6146,7 @@ function execsc() {
                         if (fminitialized) {
                             M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
                             sharedUInode(a.n);
+                            treeUI();
 
                             // Inshares permission DOM update
                             if (updateRights) {
@@ -6929,13 +6949,16 @@ function loadfm(force) {
                     ok  : '&h',         // ownerkeys for outgoing shares - handle
                     mk  : '&h',         // missing node keys - handle
                     u   : '&u',         // users - handle
+                    h   : '&h, c',      // hashes - handle, checksum
+                    ph  : '&h',         // exported links - handle
                     opc : '&p',         // outgoing pending contact - id
                     ipc : '&p',         // incoming pending contact - id
                     ps  : '&h_p',       // pending share - handle/id
                     mcf : '&id',        // chats - id
-                    _sn  : '&i',        // sn - fixed index 1
+                    _sn : '&i',         // sn - fixed index 1
+
                     // channel 1: non-transactional, used by IndexedDBKVStorage
-                    attrib : '&k',      // user attribute cache - k
+                    attrib : '&k',        // user attribute cache - k
                     chatqueuedmsgs : '&k' // queued chat messages - k
                 }, { attrib : 1, chatqueuedmsgs : 1 });
 

@@ -7157,7 +7157,6 @@ function handleDialogContent(dialogTabClass, parentTag, newFolderButton, dialogP
     if (buttonLabel === l[1344]) {
         $('.fm-dialog.copy-dialog .share-dialog-permissions').removeClass('hidden');
         $('.dialog-newfolder-button').addClass('hidden');
-        $('.copy-dialog-button').addClass('hidden');
         $('.copy-operation-txt').text(l[1344]);
 
         $('.fm-dialog.copy-dialog .share-dialog-permissions')

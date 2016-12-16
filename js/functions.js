@@ -597,9 +597,10 @@ function populate_l() {
     l[12486] = l[12486].replace('[A2]', '<a href="" class="red mac">').replace('[/A2]', '</a>');
     l[12487] = l[12487].replace('[A1]', '<a href="" class="red windows">').replace('[/A1]', '</a>');
     l[12487] = l[12487].replace('[A2]', '<a href="" class="red linux">').replace('[/A2]', '</a>');
-    l[7400] = l[7400].replace('[A]', '<a>').replace('[/A]', '</a>').replace('[BR]', '<br>');
+    l[12488] = l[12488].replace('[A]', '<a>').replace('[/A]', '</a>').replace('[BR]', '<br>');
     l[12489] = l[12489].replace('[I]', '<i>').replace('[/I]', '</i>').replace('[I]', '<i>').replace('[/I]', '</i>');
     l[15536] = l[15536].replace('[B]', '<b>').replace('[/B]', '</b>');
+    l[16106] = l[16106].replace('[B]', '<b>').replace('[/B]', '</b>');
 
     l['year'] = new Date().getFullYear();
     date_months = [

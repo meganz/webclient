@@ -1955,7 +1955,7 @@ var exportExpiry = {
         if ($nodeId.length === 0) {
             // not inserted in the DOM, retrieve the nodeMap cache and update that DOM node instead.
             if (M.megaRender.hasDOMNode(nodeId)) {
-                $nodeId = $(M.megaRender.getDOMNode(nodeId));
+                $nodeId = $(M.megaRender.getDOMNode(nodeId, M.d[nodeId]));
             }
         }
 
@@ -1994,7 +1994,7 @@ var exportExpiry = {
         if ($node.length === 0) {
             // not inserted in the DOM, retrieve the nodeMap cache and update that DOM node instead.
             if (M.megaRender.hasDOMNode(nodeId)) {
-                $node = $(M.megaRender.getDOMNode(nodeId));
+                $node = $(M.megaRender.getDOMNode(nodeId, M.d[nodeId]));
             }
         }
 
@@ -2083,7 +2083,7 @@ var exportExpiry = {
      */
     UiExportLink.prototype.removeTakenDownIcon = function(nodeId) {
         if (M.megaRender.hasDOMNode(nodeId)) {
-            $(M.megaRender.getDOMNode(nodeId)).removeClass('take-down');
+            $(M.megaRender.getDOMNode(nodeId, M.d[nodeId])).removeClass('take-down');
         }
 
         // Add taken-down to list view

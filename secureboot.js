@@ -969,6 +969,10 @@ function siteLoadError(error, filename) {
 
     message.push('BrowserID: ' + (typeof mozBrowserID !== 'undefined' ? mozBrowserID : ua));
 
+    if (d) {
+        console.error(error, filename);
+    }
+
     contenterror = 1;
     alert(message.join("\n\n"));
 }

@@ -1372,7 +1372,16 @@ function removeUInode(h, parent) {
     }
 
     if (M.megaRender && M.megaRender.megaList) {
-        M.megaRender.megaList.remove(h);
+        if (parent) {
+           // this was a move node op
+            if (parent === M.currentdirid) {
+                // the node was moved out of the current viewport, so lets remove it from the MegaList
+                M.megaRender.megaList.remove(h);
+            }
+        }
+        else {
+            M.megaRender.megaList.remove(h);
+        }
     }
 
 
@@ -10048,7 +10057,9 @@ function fm_thumbnails()
                         {
                             thumbnails[M.v[i].h] = thumbnails[node];
                             if (M.v[i].seen && M.currentdirid === cdid)
-                                fm_thumbnail_render(M.v[i]);
+                                {
+                                    fm_thumbnail_render(M.v[i]);
+                                }
                         }
                     }
                 }
@@ -10056,7 +10067,9 @@ function fm_thumbnails()
         }
     }
     if (d)
-        console.timeEnd('fm_thumbnails');
+        {
+            console.timeEnd('fm_thumbnails');
+        }
 }
 
 
@@ -10111,7 +10124,9 @@ function fm_importflnodes(nodes)
                     console.warn('Unable to complete import, apparnetly we did not reached the cloud.');
                 }
                 else {
-                    if (d) console.log('Importing Nodes...', sel, $.onImportCopyNodes);
+                    if (d) {
+                        console.log('Importing Nodes...', sel, $.onImportCopyNodes);
+                    }
 
                     $.selected = sel;
                     $.mcImport = true;
@@ -10132,13 +10147,17 @@ function fm_importflnodes(nodes)
 function clipboardcopycomplete()
 {
     if (d)
-        console.log('clipboard copied');
+        {
+            console.log('clipboard copied');
+        }
 }
 
 function saveprogress(id, bytesloaded, bytestotal)
 {
     if (d)
-        console.log('saveprogress', id, bytesloaded, bytestotal);
+        {
+            console.log('saveprogress', id, bytesloaded, bytestotal);
+        }
 }
 
 function savecomplete(id)
@@ -10146,7 +10165,9 @@ function savecomplete(id)
     $('.fm-dialog.download-dialog').addClass('hidden');
     fm_hideoverlay();
     if (!$.dialog)
-        $('#dlswf_' + id).remove();
+        {
+            $('#dlswf_' + id).remove();
+        }
     var dl = dlmanager.getDownloadByHandle(id);
     if (dl) {
         M.dlcomplete(dl);
@@ -11307,16 +11328,33 @@ function removeFromMultiInputDDL(dialog, item) {
             clearTimeout(refreshTimeout);
         }
         refreshTimeout = setTimeout(function() {
-            if (aViewMode === 0) {
-                gridUI(true);
-            }
-            else {
-                iconUI(false, true);
-            }
-            fm_thumbnails();
+            M.rmSetupUI(false, true);
             refreshTimeout = false;
         }, 75);
     };
     window.fm_throttled_refresh = fm_throttled_refresh;
 })();
 
+function fm_megalist_node_render(aHandle) {
+    var megaRender = M.megaRender;
+    if (!megaRender) {
+        return;
+    }
+    megaRender.numInsertedDOMNodes++;
+
+    var node = megaRender.getDOMNode(aHandle, M.d[aHandle]);
+
+    if (selectionManager && selectionManager.selected_list) {
+        if (selectionManager.selected_list.indexOf(aHandle) > -1) {
+            node.classList.add('ui-selected');
+        }
+        else {
+            node.classList.remove('ui-selected');
+        }
+        node.classList.remove('ui-selectee');
+    }
+
+    M.d[aHandle].seen = true;
+
+    return node;
+}

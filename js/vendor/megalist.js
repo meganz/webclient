@@ -227,6 +227,7 @@
     MegaList.prototype.batchRemove = function (itemIdsArray) {
         var self = this;
         var requiresRerender = false;
+        var itemsWereModified = false;
 
         itemIdsArray.forEach(function(itemId) {
             var itemIndex = self.items.indexOf(itemId);
@@ -238,17 +239,20 @@
 
                 }
                 self.items.splice(itemIndex, 1);
+                itemsWereModified = true;
             }
         });
 
-        if (this._wasRendered) {
-            this._contentUpdated();
-        }
+        if (itemsWereModified) {
+            if (this._wasRendered) {
+                this._contentUpdated();
+            }
 
-        if (requiresRerender) {
-            this._repositionRenderedItems();
-            this._applyDOMChanges();
+            if (requiresRerender) {
+                this._repositionRenderedItems();
+                this._applyDOMChanges();
 
+            }
         }
     };
 
@@ -823,6 +827,8 @@
     MegaList.prototype._applyDOMChanges = function() {
         this._recalculate();
 
+        // console.error("applyDOM", this.items.length);
+
         var first = this._calculated['visibleFirstItemNum'];
         var last = this._calculated['visibleLastItemNum'];
 
@@ -991,6 +997,59 @@
                 else {
                     self.items.splice(targetIndex, 0, itemId);
                 }
+            }
+        });
+
+        if (this._wasRendered) {
+            this._contentUpdated();
+        }
+        else {
+            this.initialRender();
+        }
+
+        if (requiresRerender) {
+            this._repositionRenderedItems();
+            this._applyDOMChanges();
+
+        }
+    };
+
+    /**
+     * Utility function for batch adding of new nodes on *specific* positions in the items list
+     *
+     * @param idsObj {{int,string}} a hash map with keys = position for the item to be added, string = item id
+     */
+    MegaList.prototype.batchAddFromMap = function(idsObj) {
+        var self = this;
+
+        // IF initially the folder was empty, megaList may not had been rendered...so, lets check
+        var requiresRerender = false;
+
+        Object.keys(idsObj).forEach(function(targetIndex) {
+            var itemId = idsObj[targetIndex];
+
+            var itemIndex = self.items.indexOf(itemId);
+            if (itemIndex === -1) {
+                // XX: Can be made more optimal, e.g. to only rerender if prev/next was updated
+                requiresRerender = true;
+
+                if (targetIndex === 0) {
+                    self.items.unshift(itemId);
+                    console.error('1unshift', itemId);
+                }
+                else {
+                    self.items.splice(targetIndex, 0, itemId);
+                    console.error('1splice', targetIndex, itemId);
+                }
+            }
+            else if (itemIndex !== targetIndex) {
+                requiresRerender = true;
+                // delete item from the array
+                console.error('2remove', itemIndex);
+                self.items.splice(itemIndex, 1);
+                // add it back to the new target position
+                console.error('2add', targetIndex);
+                self.items.splice(targetIndex, 0, itemId);
             }
         });
 

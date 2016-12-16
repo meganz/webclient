@@ -296,8 +296,15 @@ function MegaData()
         if (typeof Intl !== 'undefined' && Intl.Collator) {
             var intl = new Intl.Collator('co', { numeric: true });
 
+            var sortByDateTimeFn = this.getSortByDateTimeFn();
+
             this.sortfn = function(a, b, d) {
-                return intl.compare(a.name, b.name) * d;
+                if (a.name === b.name) {
+                    return sortByDateTimeFn(a, b, d);
+                }
+                else {
+                    return intl.compare(a.name, b.name) * d;
+                }
             };
         }
         else
@@ -1096,6 +1103,7 @@ function MegaData()
             }
             else {
                 numRenderedNodes = this.megaRender.renderLayout(aUpdate, this.v);
+                console.error("renderLayout returned: ", numRenderedNodes);
             }
         }
 
@@ -1124,20 +1132,20 @@ function MegaData()
         }
     };
 
-    this.rmSetupUI = function(u) {
+    this.rmSetupUI = function(u, refresh) {
         if (this.viewmode === 1) {
             if (this.v.length > 0) {
                 var o = $('.fm-blocks-view.fm .file-block-scrolling');
                 o.find('div.clear').remove();
                 o.append('<div class="clear"></div>');
             }
-            iconUI(u);
+            iconUI(u, refresh);
             if (!u) {
                 fm_thumbnails();
             }
         }
         else {
-            Soon(gridUI);
+            Soon(gridUI.bind(window, refresh));
         }
         Soon(fmtopUI);
 
@@ -3361,6 +3369,9 @@ function MegaData()
         newnodes = [];
         loadingDialog.show();
 
+        var requiresSort = false;
+        var removedNodes = [];
+
         var pending = {value: 0};
         var apiReq  = function(apireq, h) {
             pending.value++;
@@ -3383,6 +3394,8 @@ function MegaData()
                             for (var k = M.v.length; k--;) {
                                 if (M.v[k].h === h) {
                                     M.v.splice(k, 1);
+                                    // nodes with the same names, may get wrongly ordered, thats why a new sort op should be done
+                                    requiresSort = true;
                                     break;
                                 }
                             }
@@ -3395,10 +3408,21 @@ function MegaData()
                             }
                             M.c[t][h] = 1;
                             node.p    = t;
-                            removeUInode(h, parent);
-                            newnodes.push(node);
+                            removedNodes.push([h, parent]);
                         }
                     }
+
+                    if (requiresSort) {
+                        M.sort();
+                    }
+
+                    removedNodes.forEach(function(v) {
+                        var h = v[0];
+                        var parent = v[1];
+
+                        removeUInode(h, parent);
+                        newnodes.push(node);
+                    });
 
                     if (!--ctx.pending.value) {
                         renderNew();
@@ -3406,9 +3430,16 @@ function MegaData()
                         $.tresizer();
                         loadingDialog.hide();
                     }
+                    // if target folder is currently shown/rendered in the treeUI menu, we need to trigger an update on
+                    // the parent
+                    if ($('#treea_' + t).size() > 0) {
+                        M.buildtree(M.d[t].p ? M.d[M.d[t].p] : M.d[M.RootID]);
+                    }
                 }
             });
         };
+
+
 
         for (var i in n) {
             var h = n[i];
@@ -3683,14 +3714,14 @@ function MegaData()
                     $('.grid-table.fm #' + node.h + ' .grid-status-icon').addClass('star');
                     $('#' + node.h + '.file-block .file-status-icon').addClass('star');
                     if (M.megaRender.hasDOMNode([node.h])) {
-                        $('.grid-status-icon', M.megaRender.getDOMNode(node.h)).addClass('star');
+                        $('.grid-status-icon', M.megaRender.getDOMNode(node.h, M.d[node.h])).addClass('star');
                     }
                 }
 
                 // Remove from favourites
                 else {
                     if (M.megaRender.hasDOMNode(node.h)) {
-                        $('.grid-status-icon', M.megaRender.getDOMNode(node.h)).removeClass('star');
+                        $('.grid-status-icon', M.megaRender.getDOMNode(node.h, M.d[node.h])).removeClass('star');
                     }
                     $('.grid-table.fm #' + node.h + ' .grid-status-icon').removeClass('star');
                     $('#' + node.h + '.file-block .file-status-icon').removeClass('star');
@@ -6280,14 +6311,14 @@ function execsc() {
                                 if (fminitialized && n.fav !== oldfav) {
                                     if (n.fav) {
                                         if (M.megaRender.hasDOMNode(n.h)) {
-                                            $('.grid-status-icon', M.megaRender.getDOMNode(n.h)).addClass('star');
+                                            $('.grid-status-icon', M.megaRender.getDOMNode(n.h, M.d[n.h])).addClass('star');
                                         }
                                         $('.grid-table.fm #' + n.h + ' .grid-status-icon').addClass('star');
                                         $('#' + n.h + '.file-block .file-status-icon').addClass('star');
                                     }
                                     else {
                                         if (M.megaRender.hasDOMNode(n.h)) {
-                                            $('.grid-status-icon', M.megaRender.getDOMNode(n.h)).removeClass('star');
+                                            $('.grid-status-icon', M.megaRender.getDOMNode(n.h, M.d[n.h])).removeClass('star');
                                         }
                                         $('.grid-table.fm #' + n.h + ' .grid-status-icon').removeClass('star');
                                         $('#' + n.h + '.file-block .file-status-icon').removeClass('star');

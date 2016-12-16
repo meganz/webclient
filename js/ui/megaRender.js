@@ -258,6 +258,9 @@
             this.chatIsReady = megaChatIsReady;
         }
 
+        this.numInsertedDOMNodes = 0;
+
+
         define(this, 'viewmode',            aViewMode);
         define(this, 'nodeMap',             Object.create(null));
         define(this, 'buildDOMNode',        this.builders[section]);
@@ -389,6 +392,7 @@
          */
         renderLayout: function(aUpdate, aNodeList) {
             var initData = null;
+            this.numInsertedDOMNodes = 0;
 
             if (this.logger) {
                 console.time('MegaRender.renderLayout');
@@ -401,9 +405,6 @@
             this.container = document.querySelector(viewModeContainers[this.section][this.viewmode]);
 
             if (!this.container) {
-                if (d) {
-                    console.error("Missing this.container in MegaRender. Stopping execution.");
-                }
                 siteLoadError(l[1311], this);
                 return 0;
             }
@@ -448,7 +449,13 @@
                 console.timeEnd('MegaRender.renderLayout');
             }
 
-            return aNodeList.length;
+            if (DYNLIST_ENABLED) {
+                return this.numInsertedDOMNodes;
+            }
+            else {
+                return aNodeList.length;
+            }
+
         },
 
         /**
@@ -461,10 +468,6 @@
         getDOMNode: function(aHandle, aNode) {
 
             if (!this.nodeMap[aHandle]) {
-                if (!aNode) {
-                    aNode = M.d[aHandle];
-                }
-
                 var template = this.template.cloneNode(true);
                 var properties = this.getNodeProperties(aNode, aHandle);
 
@@ -490,29 +493,6 @@
          */
         hasDOMNode: function(aHandle) {
             return this.nodeMap[aHandle] ? true : false;
-        },
-
-        /**
-         * Helper function that would return a DOM node for a specific handle
-         *
-         * @param aHandle {String}
-         */
-        megaListRenderCb: function(aHandle) {
-            var node = this.getDOMNode(aHandle, M.d[aHandle]);
-
-            if (selectionManager && selectionManager.selected_list) {
-                if (selectionManager.selected_list.indexOf(aHandle) > -1) {
-                    this.addClasses(node, ['ui-selected']);
-                }
-                else {
-                    this.removeClasses(node, ['ui-selected']);
-                }
-                this.removeClasses(node, ['ui-selectee']);
-            }
-
-            M.d[aHandle].seen = true;
-
-            return node;
         },
 
         /**
@@ -555,6 +535,7 @@
             if (!aUpdate || !this.container.querySelector(aDOMNode.nodeName)) {
                 // 1. if the current view does not have any nodes, just append it
                 aNode.seen = true;
+                this.numInsertedDOMNodes++;
                 this.container.appendChild(aDOMNode);
             }
             else {
@@ -605,6 +586,7 @@
                     }
                 }
                 aNode.seen = true;
+                this.numInsertedDOMNodes++;
             }
         },
 
@@ -952,34 +934,67 @@
                 var self = this;
                 var result = this.initializers['*'].apply(this, arguments);
 
-                if (DYNLIST_ENABLED && (!aUpdate || !this.megaList)) {
-                    var megaListOptions = {
-                        'itemRenderFunction': this.megaListRenderCb.bind(this),
-                        'preserveOrderInDOM': true,
-                        'extraRows': 2,
-                        'onContentUpdated': function () {
-                            fm_throttled_refresh(self.viewmode);
-                        },
-                        'perfectScrollOptions': {
-                            'handlers': ['click-rail', 'drag-scrollbar', 'wheel', 'touch']
-                        },
-                    };
-                    var megaListContainer;
+                if (DYNLIST_ENABLED) {
+                    if (!aUpdate || !this.megaList) {
+                        var megaListOptions = {
+                            'itemRenderFunction': fm_megalist_node_render,
+                            'preserveOrderInDOM': true,
+                            'extraRows': 2,
+                            'onContentUpdated': function () {
+                                fm_throttled_refresh(self.viewmode);
+                            },
+                            'perfectScrollOptions': {
+                                'handlers': ['click-rail', 'drag-scrollbar', 'wheel', 'touch']
+                            },
+                        };
+                        var megaListContainer;
 
-                    if (this.viewmode) {
-                        megaListOptions['itemWidth'] = 128 + 12 /* 12 = margin-left */;
-                        megaListOptions['itemHeight'] = 152 + 12 /* 12 = margin-top */;
-                        megaListContainer = this.container;
-                    }
-                    else {
-                        megaListOptions['itemWidth'] = false;
-                        megaListOptions['itemHeight'] = 24;
-                        megaListOptions['appendTo'] = 'table';
-                        megaListOptions['renderAdapter'] = new MegaList.RENDER_ADAPTERS.Table();
-                        megaListContainer = this.container.parentNode.parentNode;
-                    }
+                        if (this.viewmode) {
+                            megaListOptions['itemWidth'] = 128 + 12 /* 12 = margin-left */;
+                            megaListOptions['itemHeight'] = 152 + 12 /* 12 = margin-top */;
+                            megaListContainer = this.container;
+                        }
+                        else {
+                            megaListOptions['itemWidth'] = false;
+                            megaListOptions['itemHeight'] = 24;
+                            megaListOptions['appendTo'] = 'table';
+                            megaListOptions['renderAdapter'] = new MegaList.RENDER_ADAPTERS.Table();
+                            megaListContainer = this.container.parentNode.parentNode;
+                        }
 
-                    define(this, 'megaList', new MegaList(megaListContainer, megaListOptions));
+                        console.error("new MegaList");
+                        define(this, 'megaList', new MegaList(megaListContainer, megaListOptions));
+                    }
+                    else if(aNodeList.length && Object(newnodes).length) {
+                        if (!result) {
+                            result = {};
+                        }
+
+                        var newNodes = [];
+                        var nodeIndex = [];
+
+                        var objMap = newnodes
+                            .map(function(n) {
+                                return n.h;
+                            })
+                            .reduce(function(obj, value) {
+                                obj[value] = 1;
+                                return obj;
+                            }, {});
+
+                        for (var idx in aNodeList) {
+                            if (aNodeList.hasOwnProperty(idx)) {
+                                if (objMap[aNodeList[idx].h]) {
+                                    newNodes[idx] = aNodeList[idx];
+                                }
+                                nodeIndex[aNodeList[idx].h] = idx;
+                            }
+                        }
+
+                        if (newNodes.length) {
+                            result.newNodeList = newNodes;
+                        }
+                    }
                 }
 
                 return result;
@@ -1004,10 +1019,7 @@
             },
             'cloud-drive': function(aUpdate, aNodeList, aUserData) {
                 if (DYNLIST_ENABLED) {
-                    var ids = [];
-                    aNodeList.forEach(function(v) {
-                        ids.push(v.h);
-                    });
+                    console.error('finalizer: ', aUserData);
 
                     if (!aUpdate) {
                         if (this.viewmode) {
@@ -1020,14 +1032,35 @@
                         }
                         this.addClasses(container, ['megaListContainer']);
                         this.removeClasses(container, ["hidden"]);
+
+                        var ids = [];
+                        aNodeList.forEach(function(v) {
+                            ids.push(v.h);
+                        });
+
                         this.megaList.batchAdd(ids);
                         this.megaList.initialRender();
                     }
-                    else {
-                        // XX: some day, if we want updates to be more efficient, we can remove this piece of code and
-                        // manually trigger .remove/add from the actual action packets received.
+                    else if (aUserData && aUserData.newNodeList && aUserData.newNodeList.length > 0) {
+                        var sortedNodeList = {};
+                        var foundNodesForAdding = false;
+                        aNodeList.forEach(function(v, k) {
+                            // newnodes, and update may be triggered by an move op (because of the newly modified
+                            // lack of 'i' property), so the newnodes may contain unrelated nodes (to the current
+                            // view)
+                            if (v.p === M.currentdirid) {
+                                foundNodesForAdding = true;
+                                sortedNodeList[k] = v.h;
+                                if (!M.v[k] || M.v[k].h !== v.h) {
+                                    debugger;
+                                }
+                            }
 
-                        this.megaList.syncItemsFromArray(ids);
+                        });
+
+                        if (foundNodesForAdding) {
+                            this.megaList.batchAddFromMap(sortedNodeList);
+                        }
                     }
                 }
             }

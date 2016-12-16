@@ -1154,7 +1154,14 @@ function MegaData()
             e.currentTarget = target;
             cacheselect();
             searchPath();
-            contextMenuUI(e, 1);
+            if (!$(this).hasClass('active')) {
+                contextMenuUI(e, 1);
+                $(this).addClass('active');
+            }
+            else {
+                $.hideContextMenu();
+                $(this).removeClass('active');
+            }
         });
 
         $('.file-block .file-settings-icon').rebind('click', function(e) {
@@ -1168,7 +1175,14 @@ function MegaData()
             e.currentTarget = target;
             cacheselect();
             searchPath();
-            contextMenuUI(e, 1);
+            if (!$(this).hasClass('active')) {
+                $(this).addClass('active');
+                contextMenuUI(e, 1);
+            }
+            else {
+                $(this).removeClass('active');
+                $.hideContextMenu();
+            }
         });
 
         if (!u) {
@@ -1185,7 +1199,14 @@ function MegaData()
 
                 $('.shared-details-info-block .grid-url-arrow').rebind('click', function (e) {
                     prepareShareMenuHandler(e);
-                    contextMenuUI(e, 1);
+                    if (!$(this).hasClass('active')) {
+                        contextMenuUI(e, 1);
+                        $(this).addClass('active');
+                    }
+                    else {
+                        $.hideContextMenu();
+                        $(this).removeClass('active');
+                    }
                 });
 
                 $('.shared-details-info-block .fm-share-download').rebind('click', function (e) {
@@ -1194,7 +1215,14 @@ function MegaData()
                     e.clientX = $this.offset().left;
                     e.clientY = $this.offset().top + $this.height()
 
-                    contextMenuUI(e, 3);
+                    if (!$(this).hasClass('active')) {
+                        contextMenuUI(e, 3);
+                        $(this).addClass('active');
+                    }
+                    else {
+                        $.hideContextMenu();
+                        $(this).removeClass('active');
+                    }
                 });
 
                 $('.shared-details-info-block .fm-share-copy').rebind('click', function (e) {
@@ -3431,48 +3459,75 @@ function MegaData()
      */
     this.moveNodesSync = function moveNodesSync(n, t) {
         newnodes = [];
+        loadingDialog.show();
+
+        var pending = {value: 0};
+        var apiReq  = function(apireq, h) {
+            pending.value++;
+
+            api_req(apireq, {
+                handle: h,
+                target: t,
+                pending: pending,
+                callback: function(res, ctx) {
+                    // if the move operation succeed (res == 0), perform the actual move locally
+                    if (!res) {
+                        var node = M.getNodeByHandle(ctx.handle);
+
+                        if (node && node.p) {
+                            var h      = ctx.handle;
+                            var t      = ctx.target;
+                            var parent = node.p;
+
+                            // Update M.v it's used for slideshow preview at least
+                            for (var k = M.v.length; k--;) {
+                                if (M.v[k].h === h) {
+                                    M.v.splice(k, 1);
+                                    break;
+                                }
+                            }
+
+                            if (M.c[parent] && M.c[parent][h]) {
+                                delete M.c[parent][h];
+                            }
+                            if (typeof M.c[t] === 'undefined') {
+                                M.c[t] = Object.create(null);
+                            }
+                            M.c[t][h] = 1;
+                            node.p    = t;
+                            removeUInode(h, parent);
+                            M.nodeUpdated(node);
+                            newnodes.push(node);
+                        }
+                    }
+
+                    if (!--ctx.pending.value) {
+                        if (newnodes.length) {
+                            renderNew();
+                            Soon(fmtopUI);
+                            $.tresizer();
+                            // force fmdb flush by writing the sn, so that we don't have to
+                            // wait for the packet to do so if the operation succeed here.
+                            setsn(currsn);
+                        }
+                        loadingDialog.hide();
+                    }
+                }
+            });
+        };
+
         for (var i in n) {
             var h = n[i];
-            var node = M.d[h];
 
             var apireq = {
                 a: 'm',
                 n: h,
-                t: t
-                //i: requesti - DB update only after incoming actionpacket!
+                t: t,
+                i: requesti
             };
             processmove(apireq);
-            api_req(apireq);
-
-            if (node && node.p) {
-                var parent = node.p;
-
-                if (M.c[parent] && M.c[parent][h]) {
-                    delete M.c[node.p][h];
-                }
-                // Update M.v it's used for slideshow preview at least
-                for (var k in M.v) {
-                    if (M.v[k].h === h) {
-                        M.v.splice(k, 1);
-                        break;
-                    }
-                }
-                if (typeof M.c[t] === 'undefined') {
-                    M.c[t] = Object.create(null);
-                }
-                M.c[t][h] = 1;
-                node.p = t;
-                removeUInode(h, parent);
-                newnodes.push(node);
-            }
+            apiReq(apireq, h);
         }
-
-        // FIXME: track down all moveNodes usages
-        return renderNew()
-            .always(function() {
-                Soon(fmtopUI);
-                $.tresizer();
-            });
     };
 
     this.accountSessions = function(cb) {
@@ -6210,6 +6265,7 @@ function execsc() {
     var n, i;
     var tick = Date.now();
     var tickcount = 0;
+    var updateRights = false;
 
     do {
         if (!scq[scqtail] || !scq[scqtail][0] || scwaitnodes[scqtail]
@@ -6504,6 +6560,7 @@ function execsc() {
                                         n.r = a.r;
                                         n.su = a.o;
                                         M.nodeUpdated(n);
+                                        updateRights = true;
                                     }
                                     else {
                                         if (d) {
@@ -6550,6 +6607,12 @@ function execsc() {
                         if (fminitialized) {
                             M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
                             sharedUInode(a.n);
+                            treeUI();
+
+                            // Inshares permission DOM update
+                            if (updateRights) {
+                                sharedFolderUI();
+                            }
                         }
                     }
                     break;

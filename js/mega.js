@@ -3356,44 +3356,75 @@ function MegaData()
 
     this.moveNodes = function(n, t) {
         newnodes = [];
+        loadingDialog.show();
+
+        var pending = {value: 0};
+        var apiReq  = function(apireq, h) {
+            pending.value++;
+
+            api_req(apireq, {
+                handle: h,
+                target: t,
+                pending: pending,
+                callback: function(res, ctx) {
+                    // if the move operation succeed (res == 0), perform the actual move locally
+                    if (!res) {
+                        var node = M.getNodeByHandle(ctx.handle);
+
+                        if (node && node.p) {
+                            var h      = ctx.handle;
+                            var t      = ctx.target;
+                            var parent = node.p;
+
+                            // Update M.v it's used for slideshow preview at least
+                            for (var k = M.v.length; k--;) {
+                                if (M.v[k].h === h) {
+                                    M.v.splice(k, 1);
+                                    break;
+                                }
+                            }
+
+                            if (M.c[parent] && M.c[parent][h]) {
+                                delete M.c[parent][h];
+                            }
+                            if (typeof M.c[t] === 'undefined') {
+                                M.c[t] = [];
+                            }
+                            M.c[t][h] = 1;
+                            node.p    = t;
+                            removeUInode(h, parent);
+                            M.nodeUpdated(node);
+                            newnodes.push(node);
+                        }
+                    }
+
+                    if (!--ctx.pending.value) {
+                        if (newnodes.length) {
+                            renderNew();
+                            Soon(fmtopUI);
+                            $.tresizer();
+                            // force fmdb flush by writing the sn, so that we don't have to
+                            // wait for the packet to do so if the operation succeed here.
+                            setsn(currsn);
+                        }
+                        loadingDialog.hide();
+                    }
+                }
+            });
+        };
+
         for (var i in n) {
             var h = n[i];
-            var node = M.d[h];
 
             var apireq = {
                 a: 'm',
                 n: h,
-                t: t
-                //i: requesti - DB update only after incoming actionpacket!
+                t: t,
+                i: requesti
             };
             processmove(apireq);
-            api_req(apireq);
-
-            if (node && node.p) {
-                var parent = node.p;
-
-                if (M.c[parent] && M.c[parent][h]) {
-                    delete M.c[node.p][h];
-                }
-                // Update M.v it's used for slideshow preview at least
-                for (var k in M.v) {
-                    if (M.v[k].h === h) {
-                        M.v.splice(k, 1);
-                        break;
-                    }
-                }
-                if (typeof M.c[t] === 'undefined') {
-                    M.c[t] = [];
-                }
-                M.c[t][h] = 1;
-                node.p = t;
-                removeUInode(h, parent);
-                newnodes.push(node);
-            }
+            apiReq(apireq, h);
         }
-        renderNew();
-        Soon(fmtopUI);
-        $.tresizer();
     };
 
     this.accountSessions = function(cb) {

@@ -11107,7 +11107,7 @@ function bottomPageDialog(close, pp, hh) {
 
     fm_showoverlay();
     $dialog.removeClass('hidden');
-    $('.bp-main', $dialog).html(
+    $('.bp-main', $dialog).safeHTML(
         translate(
             pages[pp].split('((TOP))')[1].split('((BOTTOM))')[0].replace('main-mid-pad new-bottom-pages', '')
         )

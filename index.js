@@ -1074,7 +1074,7 @@ function init_page() {
                 ulQueue.pause();
                 uldl_hold = true;
 
-                termsDialog();
+                bottomPageDialog(false, 'terms'); // show terms dialog
             }
         }
         $('#topmenu').safeHTML(parsetopmenu());
@@ -1308,7 +1308,7 @@ function topmenuUI() {
     else {
         $('.top-search-bl').addClass('hidden');
     }
-    
+
     var avatar = window.useravatar && useravatar.my;
     if (!avatar) {
         $('.fm-avatar').hide();
@@ -1343,7 +1343,7 @@ function topmenuUI() {
         var nameParts = u_attr.name.split(' ');
         $('.top-head .user-name').text(nameParts[0]).show();
     }
-    
+
     // Show language in top menu
     $('.top-menu-item.languages .right-el').text(lang);
     // Show version in top menu

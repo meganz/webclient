@@ -61,7 +61,7 @@ function dev_init(pp, appkey) {
                             localStorage.sdkterms = true;
                             $('.dev-new-button.plus-icon').click();
                         };
-                        termsDialog(false, 'sdkterms');
+                        bottomPageDialog(false, 'sdkterms');
                         return false;
                     }
                     else {
@@ -100,7 +100,7 @@ function dev_init(pp, appkey) {
                     localStorage.sdkterms = true;
                     document.location = 'https://github.com/meganz/sdk';
                 };
-                termsDialog(false, 'sdkterms');
+                bottomPageDialog(false, 'sdkterms');
                 return false;
             }
         });

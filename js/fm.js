@@ -2465,7 +2465,7 @@ function initContextUI() {
             $this.next('.submenu')
                 .css({'top': menuPos.top})
                 .addClass('active');
-  
+
             $this.addClass('opened');
         }
     });
@@ -11023,32 +11023,82 @@ function propertiesDialog(close) {
 }
 /* jshint +W074 */
 
-function termsDialog(close, pp)
-{
+/**
+ * Show bottom pages dialog
+ * @param {Boolean} close dialog parameter
+ * @param {String} bottom page title
+ * @param {String} dialog header
+ */
+function bottomPageDialog(close, pp, hh) {
+    var $dialog = $('.fm-dialog.bottom-pages-dialog');
+
     if (close)
     {
-        $('.fm-dialog.terms-dialog').addClass('hidden');
+        $dialog.addClass('hidden');
         if (!$('.pro-register-dialog').is(":visible")) {
             fm_hideoverlay();
-            $.dialog=false;
+            $.dialog = false;
         }
-        if ($.termsAgree) $.termsAgree=undefined;
-        if ($.termsDeny) $.termsDeny=undefined;
+        if ($.termsAgree) $.termsAgree = undefined;
+        if ($.termsDeny) $.termsDeny = undefined;
         return false;
     }
 
-    if (!pp)
+    if (!pp) {
         pp = 'terms';
+    }
 
     $.dialog = pp;
+
+    // Show Agree/Cancel buttons for Terms dialogs
+    if (pp === 'terms' || pp === 'sdkterms') {
+        $('.fm-bp-cancel, .fm-bp-agree', $dialog).removeClass('hidden');
+        $('.fm-bp-close', $dialog).addClass('hidden');
+        $('.fm-dialog-title', $dialog).text(l[385]);
+
+        $('.fm-bp-cancel', $dialog).rebind('click', function(e)
+        {
+            if ($.termsDeny) {
+                $.termsDeny();
+            }
+            bottomPageDialog(1);
+        });
+
+        $('.fm-bp-agree', $dialog).rebind('click', function(e)
+        {
+            if ($.termsAgree) {
+                $.termsAgree();
+            }
+            bottomPageDialog(1);
+        });
+
+        $('.fm-dialog-close', $dialog).rebind('click', function(e)
+        {
+            if ($.termsDeny) {
+                $.termsDeny();
+            }
+            bottomPageDialog(1);
+        });
+    }
+    else {
+        $('.fm-bp-cancel, .fm-bp-agree', $dialog).addClass('hidden');
+        $('.fm-bp-close', $dialog).removeClass('hidden');
+        if (hh) {
+            $('.fm-dialog-title', $dialog).text(hh)
+        }
+
+        $('.fm-dialog-close, .fm-bp-close', $dialog).rebind('click', function(e)
+        {
+            bottomPageDialog(1);
+        });
+    }
 
     if (!pages[pp])
     {
         loadingDialog.show();
-        silent_loading = function()
-        {
+        silent_loading = function () {
             loadingDialog.hide();
-            termsDialog(false, $.dialog);
+            bottomPageDialog(false, $.dialog);
         };
         jsl.push(jsl2[pp]);
         jsl_start();
@@ -11056,32 +11106,15 @@ function termsDialog(close, pp)
     }
 
     fm_showoverlay();
-    $('.fm-dialog.terms-dialog').removeClass('hidden');
-    $('.fm-dialog.terms-dialog .terms-main').html(pages[pp].split('((TOP))')[1].split('((BOTTOM))')[0].replace('main-mid-pad new-bottom-pages', ''));
+    $dialog.removeClass('hidden');
+    $('.bp-main', $dialog).html(
+        translate(
+            pages[pp].split('((TOP))')[1].split('((BOTTOM))')[0].replace('main-mid-pad new-bottom-pages', '')
+        )
+    );
 
-    $('.terms-body').jScrollPane({showArrows: true, arrowSize: 5, animateScroll: true, verticalDragMinHeight: 50});
-    jScrollFade('.terms-body');
-
-    $('.fm-terms-cancel').rebind('click', function(e)
-    {
-        if ($.termsDeny)
-            $.termsDeny();
-        termsDialog(1);
-    });
-
-    $('.fm-terms-agree').rebind('click', function(e)
-    {
-        if ($.termsAgree)
-            $.termsAgree();
-        termsDialog(1);
-    });
-
-    $('.terms-dialog .fm-dialog-close').rebind('click', function(e)
-    {
-        if ($.termsDeny)
-            $.termsDeny();
-        termsDialog(1);
-    });
+    $('.bp-body', $dialog).jScrollPane({showArrows: true, arrowSize: 5, animateScroll: true, verticalDragMinHeight: 50});
+    jScrollFade('.bp-body');
 }
 
 /**

@@ -3719,7 +3719,7 @@ function accountUI() {
         }
         else {
             $('.bandwidth .chart.data span:not(.size-txt)').text('');
-            $('.bandwidth .chart.data .pecents-txt').text('used');
+            $('.bandwidth .chart.data .pecents-txt').text(l[5801]);
         }
 
         /* End of New Used Bandwidth chart */

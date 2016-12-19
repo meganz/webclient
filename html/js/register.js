@@ -360,7 +360,7 @@ function init_register() {
             $('.register-check').removeClass('checkboxOff');
             $('.register-check').addClass('checkboxOn');
         };
-        bottomPageDialog(false, 'terms'); // show terms dialog
+        bottomPageDialog(false, 'terms');
         return false;
     });
     $('.login-register-input.email,.login-register-input.password').rebind('click', function(e) {

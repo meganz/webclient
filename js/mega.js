@@ -1338,7 +1338,9 @@ function MegaData()
 
         if (!folderlink) {
             // open the dashboard by default
-            id = id || 'dashboard';
+            /*id = id || 'dashboard';
+                disabled for now
+             */
         }
 
         if ((id !== 'notifications') && !$('.fm-main.notifications').hasClass('hidden')) {

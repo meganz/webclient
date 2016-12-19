@@ -575,7 +575,6 @@ function populate_l() {
     l[8847] = l[8847].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8846] = l[8846].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8912] = l[8912].replace('[B]', '<span>').replace('[/B]', '</span>');
-    l[8944] = l[8944].replace('[S]', '<a class="red">').replace('[/S]', '</a>').replace('[BR]', '<br/>');
     l[8950] = l[8950].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8951] = l[8951].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8952] = l[8952].replace('[S]', '<span>').replace('[/S]', '</span>');
@@ -602,7 +601,19 @@ function populate_l() {
     l[12488] = l[12488].replace('[A]', '<a>').replace('[/A]', '</a>').replace('[BR]', '<br>');
     l[12489] = l[12489].replace('[I]', '<i>').replace('[/I]', '</i>').replace('[I]', '<i>').replace('[/I]', '</i>');
     l[15536] = l[15536].replace('[B]', '<b>').replace('[/B]', '</b>');
+    /* New FM UI strings. 
     l[16106] = l[16106].replace('[B]', '<b>').replace('[/B]', '</b>');
+    l[16116] = l[16116].replace('[S]', '<span>').replace('[/S]', '</span>');
+    l[16119] = l[16119].replace('[S]', '<span>').replace('[/S]', '</span>');
+    l[16120] = l[16120].replace('[S]', '<span>').replace('[/S]', '</span>');
+    l[16123] = l[16123].replace('[S]', '<span>').replace('[/S]', '</span>').replace('[A]', '<a href="#pro">').replace('[/A]', '</a>').replace('[BR]', '<br />');
+    l[16124] = l[16124].replace('[S]', '<span>').replace('[/S]', '</span>').replace('[A]', '<a href="#pro">').replace('[/A]', '</a>').replace('[BR]', '<br />');
+    l[16135] = l[16135].replace('[BR]', '<br />');
+    l[16136] = l[16136].replace('[A]', '<a href="#pro">').replace('[/A]', '</a>');
+    l[16137] = l[16137].replace('[A]', '<a href="#pro">').replace('[/A]', '</a>');
+    l[16138] = l[16138].replace('[A]', '<a href="#pro">').replace('[/A]', '</a>');
+    l[16164] = l[16164].replace('[S]', '<a class="red">').replace('[/S]', '</a>').replace('[BR]', '<br/>');
+    */
 
     l['year'] = new Date().getFullYear();
     date_months = [

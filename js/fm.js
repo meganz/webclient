@@ -3175,7 +3175,7 @@ function dashboardUI() {
         $('.dashboard .button.upgrade-account, .bandwidth-info a').rebind('click', function() {
             window.location.hash = 'pro';
         });
-        $('.account.left-pane.reg-date-info').text('MEMBER SINCE');
+        $('.account.left-pane.reg-date-info').text(l[16128]);
         $('.account.left-pane.reg-date-val').text(time2date(u_attr.since, 2));
 
 

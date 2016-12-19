@@ -122,12 +122,12 @@ var useravatar = (function() {
 
         return  bgBlock +
             '<' + element + ' data-color="color' + s.colorIndex + '" class="avatar-wrapper ' +
-                className + ' ' + id +  ' color' + s.colorIndex + '">' +
+                className + ' ' + id + ' color' + s.colorIndex + '">' +
                 '<span>' +
-                    '<div class="verified_icon"></div>' + s.letters + 
+                    '<i class="verified_icon"></i>' + s.letters + 
                 '</span>'  +
             '</' + element + '>';
-    };
+    }
 
     /**
      * Return an image HTML from an URL.
@@ -158,7 +158,7 @@ var useravatar = (function() {
                 '<i class="verified_icon"></i>' +
                 '<img src="' + url + '">' +
             '</' + type + '>';
-    };
+    }
 
     /**
      * Check if the current user is verified by the current user. It

@@ -113,10 +113,12 @@
 
             // Icon view mode
             '<a class="file-block ustatus">' +
-                '<span class="nw-contact-status"></span>' +
                 '<span class="file-settings-icon"></span>' +
                 '<span class="shared-folder-info-block">' +
-                    '<span class="shared-folder-name"></span>' +
+                    '<span class="u-card-data">' +
+                        '<span class="shared-folder-name"></span>' +
+                        '<span class="nw-contact-status"></span>' +
+                    '</span>' +
                     '<span class="shared-folder-info"></span>' +
                 '</span>' +
             '</a>'

@@ -425,7 +425,7 @@ body.pro:after {
     background-size: 60px auto;
 }
 .empty-icon, .fm-empty-cloud-bg, .fm-empty-folder-bg, .fm-empty-conversations-bg, .fm-empty-incoming-bg, .fm-empty-contacts-bg, .fm-invalid-folder-bg, .fm-empty-folder-link-bg, .fm-empty-trashbin-bg, .fm-empty-transfers-bg, .fm-empty-search-bg {
-    background-image: url(../images/mega/empty-sprite_v1@2x.png);
+    background-image: url(../images/mega/empty-sprite_v2@2x.png);
     background-size: 294px auto;
 }
 .membership-icon-old {

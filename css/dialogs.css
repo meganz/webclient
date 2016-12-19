@@ -520,7 +520,7 @@ background: linear-gradient(to bottom, rgba(247,247,247,1) 0%,rgba(247,247,247,0
     cursor: default;
     font-size: 14px;
     color: #333333;
-    padding: 6px 0 0 4px;
+    padding: 6px 18px 0 4px;
     display: inline-block;
     white-space: nowrap;
     position: relative;
@@ -532,6 +532,9 @@ background: linear-gradient(to bottom, rgba(247,247,247,1) 0%,rgba(247,247,247,0
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
+}
+li.token-input-token-invite .input-close {
+    top: 6px;
 }
 .achievement-dialog.input-field input {
     border: 0;

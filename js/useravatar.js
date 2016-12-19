@@ -69,7 +69,7 @@ var useravatar = (function() {
         $template = window.btoa(to8($template.html()));
 
         return 'data:image/svg+xml;base64,' + $template;
-    };
+    }
 
     /**
      * Return two letters and the color for a given string.
@@ -83,7 +83,7 @@ var useravatar = (function() {
         var color = user.charCodeAt(0) % _colors.length;
 
         return {letters: name.toUpperCase()[0], color: _colors[color], colorIndex: color + 1};
-    };
+    }
 
     /**
      * Return the HTML to represent a two letter avatar.
@@ -166,20 +166,18 @@ var useravatar = (function() {
      * @param {String} userHandle The user handle
      * @private
      */
+    var pendingVerifyQuery = {};
     function isUserVerified(userHandle) {
-        if (u_type !== 3) {
+        if (u_type !== 3 || userHandle === u_handle || pendingVerifyQuery[userHandle]) {
             return;
         }
+        pendingVerifyQuery[userHandle] = Date.now();
 
-        if (authring.hadInitialised() === false) {
-            var authSystemPromise = authring.initAuthenticationSystem();
-            authSystemPromise.done(isUserVerified_Callback);
-        }
-        else {
-            Soon(isUserVerified_Callback);
+        if (d > 1) {
+            logger.log('isUserVerified', userHandle);
         }
 
-        function isUserVerified_Callback() {
+        authring.onAuthringReady('avatar-v').done(function isUserVerified_Callback() {
             var ed25519 = u_authring.Ed25519;
             var verifyState = ed25519 && ed25519[userHandle] || {};
             var isVerified = (verifyState.method >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON);
@@ -187,7 +185,9 @@ var useravatar = (function() {
             if (isVerified) {
                 $('.avatar-wrapper.' + userHandle).addClass('verified');
             }
-        }
+        }).always(function() {
+            delete pendingVerifyQuery[userHandle];
+        });
     }
 
     /**

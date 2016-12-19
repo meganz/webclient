@@ -2465,7 +2465,7 @@ function initContextUI() {
             $this.next('.submenu')
                 .css({'top': menuPos.top})
                 .addClass('active');
-
+  
             $this.addClass('opened');
         }
     });

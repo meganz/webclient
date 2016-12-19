@@ -956,9 +956,9 @@ React.makeElement = React['createElement'];
 	    $status.addClass(cssClass);
 
 	    if (self.karere.getConnectionState() === Karere.CONNECTION_STATE.CONNECTING) {
-	        $status.parent().addClass("connecting");
+	        $status.parent().addClass("fadeinout");
 	    } else {
-	        $status.parent().removeClass("connecting");
+	        $status.parent().removeClass("fadeinout");
 	    }
 	};
 

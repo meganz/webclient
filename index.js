@@ -1014,11 +1014,11 @@ function init_page() {
             api_reset();
             initworkerpool();
 
+            if (u_sid) {
+                api_setsid(u_sid);
+            }
             if (pfid) {
                 api_setfolder(n_h);
-            }
-            else if (u_sid) {
-                api_setsid(u_sid);
             }
 
             // re-initialize waitd connection when switching.
@@ -1309,7 +1309,7 @@ function topmenuUI() {
         $('.top-search-bl').addClass('hidden');
     }
     
-    var avatar = useravatar.my;
+    var avatar = window.useravatar && useravatar.my;
     if (!avatar) {
         $('.fm-avatar').hide();
     }
@@ -1592,6 +1592,15 @@ function topmenuUI() {
                 .attr('class', 'top ' + $(this).find('.activity-status').attr('class'));
             $('.activity-status-block').removeClass('active');
             $('.top-user-status-popup').addClass('hidden');
+            if (!megaChatIsReady && !megaChatIsDisabled) {
+                var presence = $(this).data("presence");
+                localStorage.megaChatPresence = presence;
+                localStorage.megaChatPresenceMtime = unixtime();
+
+                mega.initLoadReport();
+                loadfm();
+                $('.activity-status-block').addClass("fadeinout");
+            }
         }
     });
 

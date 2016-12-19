@@ -525,26 +525,19 @@
         ]);
     };
 
+    mBroadcaster.addListener('fm:initialized', function _delayedInitOnboarding() {
+        if (!folderlink) {
+            assert(typeof mega.ui.onboarding === 'undefined', 'unexpected onboarding initialization');
+            assert(typeof u_handle !== 'undefined', 'onboarding expects a valid user...');
 
+            mega.ui.onboarding = new mega.ui.Onboarding({});
+
+            // we reached our goal, stop listening for fminitialized
+            return 0xDEAD;
+        }
+    });
 
     // export
-    scope.mega = scope.mega || {};
-    scope.mega.ui = scope.mega.ui || {};
     scope.mega.ui.Onboarding = Onboarding;
 
-    var delayedInitOnboarding = function _delayedInitOnboarding() {
-        if (typeof mega.ui.onboarding === 'undefined') {
-            if (typeof u_handle !== 'undefined') {
-                mega.ui.onboarding = new mega.ui.Onboarding({});
-            }
-            else {
-                // reschedule onboarding init in case this was a folder link
-                if (folderlink) {
-                    mBroadcaster.once('fm:initialized', delayedInitOnboarding);
-                }
-            }
-        }
-    };
-
-    mBroadcaster.once('fm:initialized', delayedInitOnboarding);
 })(jQuery, mBroadcaster, window);

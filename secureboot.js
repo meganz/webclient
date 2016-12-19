@@ -829,6 +829,9 @@ Object.defineProperty(this, 'mBroadcaster', {
                             //if (u_handle && window.indexedDB) {
                             //    mDBstart(true);
                             //}
+                            if (Object(window.fmdb).crashed === 'slave') {
+                                fmdb.crashed = 0;
+                            }
                         }
                     }
                     break;
@@ -1212,8 +1215,6 @@ else if (!b_u)
         };
     })(console);
 
-    Object.defineProperty(window, "__cd_v", { value : 32, writable : false });
-
     // Do not report exceptions if this build is older than 10 days
     var exTimeLeft = ((buildVersion.timestamp + (10 * 86400)) * 1000) > Date.now();
 
@@ -1426,9 +1427,26 @@ else if (!b_u)
                 }
                 report = JSON.stringify(r? report:{});
 
+                var version = buildVersion.website;
+
+                if (is_extension) {
+                    if (is_chrome_firefox) {
+                        version = buildVersion.firefox;
+                    }
+                    else if (window.chrome) {
+                        version = buildVersion.chrome;
+                    }
+                }
+
                 for (var i in __cdumps)
                 {
-                    api_req({ a : 'cd', c : JSON.stringify(__cdumps[i]), v : report, t : +__cd_v, s : window.location.host }, ctx(ids[i]));
+                    api_req({
+                        a: 'cd2',
+                        c: JSON.stringify(__cdumps[i]),
+                        v: report,
+                        t: version,
+                        s: window.location.host
+                    }, ctx(ids[i]));
                 }
                 __cd_t = 0;
                 __cdumps = [];
@@ -1573,13 +1591,9 @@ else if (!b_u)
 
 
         // notifications
-        jsl.push({f:'js/megaNotifications.js', n: 'meganotifications_js', j:1,w:7});
-        jsl.push({f:'js/vendor/ion.sound.js', n: 'ionsound_js', j:1,w:7});
-        jsl.push({f:'js/vendor/favico.js', n: 'favico_js', j:1,w:7});
         jsl.push({f:'js/vendor/notification.js', n: 'notification_js', j:1,w:7});
 
         // Other
-        jsl.push({f:'js/vendor/autolinker.js', n: 'autolinker_js', j:1,w:1});
         jsl.push({f:'js/vendor/moment.js', n: 'moment_js', j:1,w:1});
         jsl.push({f:'js/vendor/perfect-scrollbar.js', n: 'ps_js', j:1,w:1});
 
@@ -1600,55 +1614,6 @@ else if (!b_u)
         jsl.push({f:'js/ui/alarm.js', n: 'alarm_js', j:1,w:1});
         jsl.push({f:'js/ui/export.js', n: 'export_js', j:1,w:1});
     } // !is_mobile
-
-    // MEGA CHAT
-    if ((location.host === 'mega.nz' || !megaChatIsDisabled) && !is_mobile) {
-        jsl.push({f:'js/vendor/react.js', n: 'react', j:1, w:10});
-        jsl.push({f:'js/vendor/react-dom.js', n: 'react-dom', j:1, w:1});
-
-        jsl.push({f:'js/chat/strongvelope.js', n: 'strongvelope_js', j:1, w:1});
-
-        // WebRTC
-        // strophe.jingle.adapter.js must be loaded before any other webrtc file
-        // becase it provides platform detection and other files depend on it
-
-        jsl.push({f:'js/vendor/chat/strophe.jingle.adapter.js', n: 'strophejingleadapt_js', j:1, w:2});
-        jsl.push({f:'js/vendor/chat/strophe.light.js', n: 'stropheligh_js', j:1, w:4});
-        jsl.push({f:'js/vendor/chat/strophe.disco.js', n: 'strophedisco_js', j:1, w:1});
-        jsl.push({f:'js/vendor/chat/strophe.jingle.js', n: 'strophejingle_js', j:1, w:3});
-        jsl.push({f:'js/vendor/chat/strophe.jingle.session.js', n: 'strophejinglesess_js', j:1, w:2});
-        jsl.push({f:'js/vendor/chat/strophe.jingle.sdp.js', n: 'strophejinglesdp_js', j:1, w:2});
-        jsl.push({f:'js/vendor/chat/strophe.muc.js', n: 'strophemuc_js', j:1, w:1});
-        jsl.push({f:'js/vendor/chat/strophe.roster.js', n: 'stropheroster_js', j:1, w:1});
-        jsl.push({f:'js/vendor/chat/wildemitter.patched.js', n: 'wildemitter_js', j:1, w:1});
-        jsl.push({f:'js/vendor/chat/hark.patched.js', n: 'hark_js', j:1, w:1});
-        jsl.push({f:'js/chat/rtcStats.js', n: 'rtcstats_js', j:1, w:1});
-        jsl.push({f:'js/chat/rtcSession.js', n: 'rtcsession_js', j:1, w:1});
-
-        // end WebRTC
-
-        jsl.push({f:'js/vendor/chat/base32.js', n: 'base32_js', j:1, w:1});
-        jsl.push({f:'js/chat/chatd.js', n: 'chatd_js', j:1, w:1});
-        jsl.push({f:'js/chat/ui/incomingCallDialog.js', n: 'incomingcalldialog_js', j:1, w:1});
-
-        jsl.push({f:'js/chat/plugins/chatdIntegration.js', n: 'chatdInt_js', j:1, w:2});
-        jsl.push({f:'js/chat/plugins/karerePing.js', n: 'karerePing_js', j:1, w:7});
-        jsl.push({f:'js/chat/plugins/callManager.js', n: 'callManager_js', j:1, w:7});
-        jsl.push({f:'js/chat/plugins/urlFilter.js', n: 'urlFilter_js', j:1, w:7});
-        jsl.push({f:'js/chat/plugins/emoticonShortcutsFilter.js', n: 'emoticonShortcutsFilter_js', j:1, w:7});
-        jsl.push({f:'js/chat/plugins/emoticonsFilter.js', n: 'emoticonsFilter_js', j:1, w:7});
-        jsl.push({f:'js/chat/plugins/chatNotifications.js', n: 'chatnotifications_js', j:1, w:7});
-        jsl.push({f:'js/chat/plugins/callFeedback.js', n: 'callfeedback_js', j:1, w:7});
-        jsl.push({f:'js/chat/plugins/persistedTypeArea.js', n: 'persistedTypeArea_js', j:1, w:1});
-
-        jsl.push({f:'js/chat/karereEventObjects.js', n: 'keo_js', j:1, w:7});
-        jsl.push({f:'js/connectionRetryManager.js', n: 'crm_js', j:1, w:7});
-        jsl.push({f:'js/chat/karere.js', n: 'karere_js', j:1, w:7});
-        jsl.push({f:'js/chat/messages.js', n: 'chat_messages_Js', j:1, w:1});
-        jsl.push({f:'js/chat/bundle.js', n: 'chat_react_minified_js', j:1, w:10});
-    }
-    // END OF MEGA CHAT
-
 
     // Transfers
     jsl.push({f:'js/transfers/xhr2.js', n: 'xhr_js', j:1});
@@ -1705,15 +1670,6 @@ else if (!b_u)
         jsl.push({f:'css/popups.css', n: 'popups_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/spinners.css', n: 'spinners_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/data-blocks-view.css', n: 'data_blocks_view_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/chat-messages.css', n: 'chat_messages_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/chat-share-links.css', n: 'chat_share_links_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/chat-textarea.css', n: 'chat_textarea_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/chat-typing.css', n: 'chat_typing_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/chat-left-pane.css', n: 'chat_left_pane_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/chat-feedback.css', n: 'chat_feedback_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/chat-calls.css', n: 'chat_calls_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/chat-common.css', n: 'chat_common_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/chat-emojione.css', n: 'chat_emojione_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/help2.css', n: 'help_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/vendor/perfect-scrollbar.css', n: 'vendor_ps_css', j:2,w:5,c:1,d:1,cache:1});
@@ -1824,6 +1780,59 @@ else if (!b_u)
         'chrome_js': {f:'html/js/chrome.js', n: 'chrome_js', j:1},
         'firefox': {f:'html/firefox.html', n: 'firefox', j:0},
         'firefox_js': {f:'html/js/firefox.js', n: 'firefox_js', j:1}
+    };
+
+    var jsl3 = {
+        'chat': {
+            /* chat related css */
+            'chat_messages_css':{f:'css/chat-messages.css', n: 'chat_messages_css', j:2,'w':5,'c':1,'cache':1,'d':1},
+            'chat_share_links_css':{f:'css/chat-share-links.css', n: 'chat_share_links_css', j:2,'w':5,'c':1,'cache':1,'d':1},
+            'chat_textarea_css':{f:'css/chat-textarea.css', n: 'chat_textarea_css', j:2,'w':5,'c':1,'cache':1,'d':1},
+            'chat_typing_css':{f:'css/chat-typing.css', n: 'chat_typing_css', j:2,'w':5,'c':1,'cache':1,'d':1},
+            'chat_left_pane_css':{f:'css/chat-left-pane.css', n: 'chat_left_pane_css', j:2,'w':5,'c':1,'cache':1,'d':1},
+            'chat_feedback_css':{f:'css/chat-feedback.css', n: 'chat_feedback_css', j:2,'w':5,'c':1,'cache':1,'d':1},
+            'chat_calls_css':{f:'css/chat-calls.css', n: 'chat_calls_css', j:2,'w':5,'c':1,'cache':1,'d':1},
+            'chat_common_css':{f:'css/chat-common.css', n: 'chat_common_css', j:2,'w':5,'c':1,'cache':1,'d':1},
+            'chat_emojione_css':{f:'css/chat-emojione.css', n: 'chat_emojione_css', j:2,'w':5,'c':1,'cache':1,'d':1},
+
+            /* chat related js */
+            'react_js': {f:'js/vendor/react.js', n: 'react_js', j:1},
+            'reactdom_js': {f:'js/vendor/react-dom.js', n: 'reactdom_js', j:1},
+            'meganotifications_js': {f:'js/megaNotifications.js', n: 'meganotifications_js', j:1},
+            'ionsound_js': {f:'js/vendor/ion.sound.js', n: 'ionsound_js', j:1},
+            'favico_js': {f:'js/vendor/favico.js', n: 'favico_js', j:1},
+            'autolinker_js': {f:'js/vendor/autolinker.js', n: 'autolinker_js', j:1},
+            'strongvelope_js': {f:'js/chat/strongvelope.js', n: 'strongvelope_js', j:1},
+            'strophejingleadapt_js': {f:'js/vendor/chat/strophe.jingle.adapter.js', n: 'strophejingleadapt_js', j:1},
+            'rtcstats_js': {f:'js/chat/rtcStats.js', n: 'rtcstats_js', j:1},
+            'rtcsession_js': {f:'js/chat/rtcSession.js', n: 'rtcsession_js', j:1},
+            'strophelight_js': {f:'js/vendor/chat/strophe.light.js', n: 'strophelight_js', j:1},
+            'strophedisco_js': {f:'js/vendor/chat/strophe.disco.js', n: 'strophedisco_js', j:1},
+            'strophejingle_js': {f:'js/vendor/chat/strophe.jingle.js', n: 'strophejingle_js', j:1},
+            'strophejinglesess_js': {f:'js/vendor/chat/strophe.jingle.session.js', n: 'strophejinglesess_js', j:1},
+            'strophejinglesdp_js': {f:'js/vendor/chat/strophe.jingle.sdp.js', n: 'strophejinglesdp_js', j:1},
+            'strophemuc_js': {f:'js/vendor/chat/strophe.muc.js', n: 'strophemuc_js', j:1},
+            'stropheroster_js': {f:'js/vendor/chat/strophe.roster.js', n: 'stropheroster_js', j:1},
+            'wildemitter_js': {f:'js/vendor/chat/wildemitter.patched.js', n: 'wildemitter_js', j:1},
+            'hark_js': {f:'js/vendor/chat/hark.patched.js', n: 'hark_js', j:1},
+            'base32_js': {f:'js/vendor/chat/base32.js', n: 'base32_js', j:1},
+            'chatd_js': {f:'js/chat/chatd.js', n: 'chatd_js', j:1},
+            'incomingcalldialog_js': {f:'js/chat/ui/incomingCallDialog.js', n: 'incomingcalldialog_js', j:1},
+            'chatdInt_js': {f:'js/chat/plugins/chatdIntegration.js', n: 'chatdInt_js', j:1},
+            'karerePing_js': {f:'js/chat/plugins/karerePing.js', n: 'karerePing_js', j:1},
+            'callManager_js': {f:'js/chat/plugins/callManager.js', n: 'callManager_js', j:1},
+            'urlFilter_js': {f:'js/chat/plugins/urlFilter.js', n: 'urlFilter_js', j:1},
+            'emoticonShortcutsFilter_js': {f:'js/chat/plugins/emoticonShortcutsFilter.js', n: 'emoticonShortcutsFilter_js', j:1},
+            'emoticonsFilter_js': {f:'js/chat/plugins/emoticonsFilter.js', n: 'emoticonsFilter_js', j:1},
+            'chatnotifications_js': {f:'js/chat/plugins/chatNotifications.js', n: 'chatnotifications_js', j:1},
+            'callfeedback_js': {f:'js/chat/plugins/callFeedback.js', n: 'callfeedback_js', j:1},
+            'persistedTypeArea_js': {f:'js/chat/plugins/persistedTypeArea.js', n: 'persistedTypeArea_js', j:1, w:1},
+            'keo_js': {f:'js/chat/karereEventObjects.js', n: 'keo_js', j:1},
+            'crm_js': {f:'js/connectionRetryManager.js', n: 'crm_js', j:1},
+            'karere_js': {f:'js/chat/karere.js', n: 'karere_js', j:1},
+            'chat_messages_Js': {f:'js/chat/messages.js', n: 'chat_messages_Js', j:1},
+            'chat_react_minified_js': {f:'js/chat/bundle.js', n: 'chat_react_minified_js', j:1}
+        }
     };
 
     var subpages =
@@ -1963,10 +1972,11 @@ else if (!b_u)
             waitingToBeLoaded++;
             elem.onload = function() {
                 // if (d) console.log('jj.progress...', waitingToBeLoaded);
+                jsl_current += Object(jsl[id]).w || 1;
+                jsl_progress();
                 if (--waitingToBeLoaded == 0) {
                     jj_done = true;
                     boot_done();
-                    _queueWaitToBeLoaded = createScriptTag = createStyleTag = undefined;
                 }
                 elem.onload = null;
             };
@@ -1986,24 +1996,6 @@ else if (!b_u)
             elem.href = src;
             return elem;
         };
-
-        l=[];
-        var i = 3000, r = '?r=' + (new Date().toISOString().replace(/[^\w]/g,''));
-        if (!localStorage.jjnocache) r = '';
-        while (i--) l[i]='l';
-        for (var i in jsl)
-        {
-            if (jsl[i].j === 1) {
-                createScriptTag("jsl" + i, bootstaticpath + jsl[i].f + r);
-            }
-            else if (jsl[i].j === 2)
-            {
-                if ((m && (jsl[i].m)) || ((!m) && (jsl[i].d))) {
-                    createStyleTag("jsl" + i, bootstaticpath + jsl[i].f + r);
-                }
-            }
-        }
-        if (d) console.log('jj.total...', waitingToBeLoaded);
     }
 
     var pages = [],xhr_progress,xhr_stack,jsl_fm_current,jsl_current,jsl_total,jsl_perc,jsli,jslcomplete;
@@ -2022,11 +2014,33 @@ else if (!b_u)
         jsl_total = 0;
         jsl_perc = 0;
         jsli=0;
-        for (var i = jsl.length; i--;) {
+        var jjNoCache = '';
+        if (localStorage.jjnocache) {
+            jjNoCache = '?r=' + (new Date().toISOString().replace(/[^\w]/g, ''));
+        }
+        for (var i = 0; i < jsl.length; i++) {
             if (jsl[i] && !jsl[i].text) {
                 jsl_total += jsl[i].w || 1;
+
+                if (jj) {
+
+                    if (jsl[i].j === 1) {
+                        jj_done = false;
+                        jsl[i].text = '/**/';
+                        createScriptTag(i, bootstaticpath + jsl[i].f + jjNoCache);
+                    }
+                    else if (jsl[i].j === 2) {
+                        jj_done = false;
+                        jsl[i].text = '/**/';
+                        createStyleTag(i, bootstaticpath + jsl[i].f + jjNoCache);
+                    }
+                }
             }
         }
+        if (d) {
+            console.log('jj.total...', waitingToBeLoaded);
+        }
+
         if (fx_startup_cache)
         {
             var step = function(jsi)
@@ -2116,18 +2130,6 @@ else if (!b_u)
 
     function xhr_load(url,jsi,xhri)
     {
-        if (d && jj) {
-            if (jsl[jsi].j == 1 || jsl[jsi].j == 2) {
-                // DON'T load via XHR any js or css files...since when jj == 1, secureboot will append them in the doc.
-
-                jsl_current += jsl[jsi].w || 1;
-                jsl_progress();
-                if (++jslcomplete == jsl.length) initall();
-                else jsl_load(xhri);
-
-                return;
-            }
-        }
         xhr_stack[xhri] = getxhr();
         xhr_stack[xhri].onload = function()
         {
@@ -2338,7 +2340,6 @@ else if (!b_u)
             jsl_done=true;
             boot_done();
         }
-        jj = 0; //prevent further 'silent_loading' loads from failing..
     }
 
     var istaticpath = staticpath;

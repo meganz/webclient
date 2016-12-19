@@ -4590,7 +4590,7 @@ function api_strerror(errno) {
                             JSON.parse(this.buckets[0]+this.tostring(this.sub(json, this.lastpos, this.p-this.lastpos)))
                         );
                     } catch (e) {
-                        this.logger.log("Malformed JSON - parse error in filter element " + this.filter);
+                        this.logger.error("Malformed JSON - parse error in filter element " + callback.name, e);
                         return 0;
                     }
 

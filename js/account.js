@@ -959,7 +959,7 @@ function checkUserLogin() {
         if (waiter) {
             return waiter;
         }
-        waiter = new MegaPromise();
+        var promise = waiter = new MegaPromise();
 
         mega.attr.get(u_handle, 'fmconfig', false, true)
             .always(moveLegacySettings)
@@ -1020,7 +1020,7 @@ function checkUserLogin() {
                 waiter = undefined;
             });
 
-        return waiter;
+        return promise;
     };
 
     /**

@@ -3685,7 +3685,7 @@
     "10632": "Fatura adresi bilgilerinizi girin",
     "10633": "L\u00fctfen gerekli t\u00fcm alanlar\u0131 doldurun.",
     "10634": "E\u011fer \u00f6demeniz ile ilgili s\u0131k\u0131nt\u0131 ya\u015f\u0131yorsan\u0131z, l\u00fctfen [A]m\u00fc\u015fteri hizmetleri ile ileti\u015fime ge\u00e7iniz[\/A].",
-    "10635": "Not: Bu kredi kart\u0131 \u00f6demesi kart hareketlerinde [B]MEGA PRO AUCKLAND[\/B] olarak g\u00f6z\u00fckecektir.",
+    "10635": "Not: Bu kredi kart\u0131 \u00f6demesi kart hareketlerinde [B]MEGA PRO GLOBAL[\/B] olarak g\u00f6z\u00fckecektir.",
     "10636": "Te\u015fekk\u00fcrler! \u00d6demeniz \u00f6deme sa\u011flay\u0131c\u0131m\u0131z taraf\u0131ndan birka\u00e7 dakika i\u00e7erisinde onaylan\u0131r onaylanmaz hesab\u0131n\u0131z y\u00fckseltilecektir. E\u011fer MEGA hesab\u0131n\u0131z %1 saat i\u00e7erisinde PRO'ya y\u00fckseltilmez ise l\u00fctfen bize ula\u015f\u0131n [A]support@mega.nz[\/A].",
     "10637": "Yinelenen \u00f6demeler, iade ilkemiz, veya aboneli\u011finizin iptaline dair detaylar i\u00e7in buraya t\u0131klay\u0131n.",
     "10638": "Plan\u0131n\u0131z\u0131 otomatik olarak her ay yenilemek ister misiniz?",
@@ -3763,10 +3763,18 @@
     "13763": "Kal\u0131c\u0131 olarak %1 dosya ve 1 klas\u00f6r kald\u0131rd\u0131n\u0131z.",
     "13764": "Kal\u0131c\u0131 olarak %1 dosya ve %2 klas\u00f6r kald\u0131rd\u0131n\u0131z.",
     "15536": "Yeni taray\u0131c\u0131 kodunun \u00e7al\u0131\u015fmas\u0131 i\u00e7in [B]G\u00fcncelle[\/B]ye t\u0131klay\u0131n. Otuurmunuz a\u00e7\u0131k kalacakt\u0131r.",
-    "16096": "Saved",
-    "16097": "Please check your e-mail and follow the link to confirm your account.",
-    "16098": "Why do I need a Recovery Key?",
-    "16099": "You can reset your password by following the recovery link that will be sent to your email.",
+    "16096": "Kaydedildi",
+    "16097": "L\u00fctfen e-postan\u0131z\u0131 kontrol edin ve hesab\u0131n\u0131z\u0131 onaylamak i\u00e7in g\u00f6nderilen linke t\u0131klay\u0131n.",
+    "16098": "Neden Kurtarma Anahtar\u0131na ihtiyac\u0131m var?",
+    "16099": "Parolan\u0131z\u0131 eposta adresinize g\u00f6nderilen kurtarma linkinden s\u0131f\u0131rlayabilirsiniz.",
+    "16100": "G\u00f6nderilen Tarih",
+    "16101": "Davet Durumu",
+    "16102": "Daha fazla arkada\u015f davet et",
+    "16103": "T\u00fcm bekleyenleri tekrar davet et",
+    "16104": "Bekleyen Uygulama Y\u00fcklemesi",
+    "16105": "Kota Verildi",
+    "16106": "MEGA hizmetleri sat\u0131n al\u0131m\u0131n\u0131z ECP [B]Mega Europe sarl, 4 Rue Graham Bell, L-3235, Bettembourg, Luxembourg[\/B] taraf\u0131ndan i\u015flenecektir.",
+    "16107": "Did you know that you can download the entire folder at once if you [S]install the free MEGA app[\/S]?",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -3997,6 +4005,8 @@
         "also-available-windows-linux": 12487,
         "suggest-sync-client-message": 12488,
         "about-page-introduction": 12489,
-        "additional-site-update-message": 15536
+        "additional-site-update-message": 15536,
+        "purchase-processed-by-message": 16106,
+        "install-free-mega-app": 16107
     }
 }

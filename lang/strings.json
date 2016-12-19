@@ -9255,6 +9255,10 @@
         "text": "Are you sure you want to clear all transfers?",
         "context": ""
     },
+    "7226": {
+        "text": "Rubbish-Bin Cleaning Scheduler:",
+        "context": ""
+    },
     "7227": {
         "text": "Queued",
         "context": "Text shown when one file has been selected to be downloaded but it's on the queue to be downloaded, it's pending for download"
@@ -9894,10 +9898,6 @@
     "7399": {
         "text": "File is locked.",
         "context": "While uploading a file and we can't read it because it is locked by another program\/process."
-    },
-    "7400": {
-        "text": "We strongly suggest using our sync client for vastly improved performance<br\/> uploading hundreds of files. <a>Get MEGAsync now.<\/a>",
-        "context": "Please keep : <br \/>, <a>, <\/a>\r\n<br \/> new line tag\r\n<a> - link tag"
     },
     "7401": {
         "text": "CONTINUE ANYWAY",

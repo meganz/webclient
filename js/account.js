@@ -1061,7 +1061,7 @@ function checkUserLogin() {
         var push = function() {
             if (u_type === 3 && !pfid && !folderlink) {
                 // through a timer to prevent floods
-                timer = delay('fmconfig:store', store, 9701);
+                timer = delay('fmconfig:store', store, 3100);
             }
             else {
                 localStorage.fmconfig = JSON.stringify(fmconfig);
@@ -1078,6 +1078,22 @@ function checkUserLogin() {
         }
 
         mBroadcaster.sendMessage('fmconfig:' + key, value);
+    };
+
+    /**
+     * Same as .set, but displays a toast notification.
+     * @param {String} key          Configuration key
+     * @param {String} value        Configuration value
+     * @param {String} [toastText]  Toast notification text
+     */
+    ns.setn = function _setConfigValueToast(key, value, toastText) {
+        toastText = toastText || l[16168];
+
+        delay('fmconfig:setn', function() {
+            showToast('settings', toastText);
+
+            mega.config.set(key, value);
+        });
     };
 
     if (is_karma) {

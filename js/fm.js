@@ -4634,7 +4634,7 @@ function accountUI() {
             min: 1, max: 6, range: "min", value: fmconfig.dl_maxSlots || 4,
             change: function(e, ui) {
                 if (M.currentdirid === 'account/advanced') {
-                    mega.config.set('dl_maxSlots', ui.value);
+                    mega.config.setn('dl_maxSlots', ui.value);
                     dlQueue.setSize(fmconfig.dl_maxSlots);
                 }
             },
@@ -4650,7 +4650,7 @@ function accountUI() {
             min: 1, max: 6, range: "min", value: fmconfig.ul_maxSlots || 4,
             change: function(e, ui) {
                 if (M.currentdirid === 'account/advanced') {
-                    mega.config.set('ul_maxSlots', ui.value);
+                    mega.config.setn('ul_maxSlots', ui.value);
                     ulQueue.setSize(fmconfig.ul_maxSlots);
                 }
             },
@@ -4706,7 +4706,7 @@ function accountUI() {
             $('.ulspeedradio').removeClass('radioOn').addClass('radioOff');
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
-            mega.config.set('ul_maxSpeed', ul_maxSpeed);
+            mega.config.setn('ul_maxSpeed', ul_maxSpeed);
         });
         $('#ulspeedvalue').rebind('click keyup', function(e) {
             $('.ulspeedradio').removeClass('radioOn').addClass('radioOff');
@@ -4718,7 +4718,7 @@ function accountUI() {
             $('body').removeClass('fontsize1 fontsize2').addClass('fontsize' + $(this).val());
             $('.uifontsize input').removeClass('radioOn').addClass('radioOff').parent().removeClass('radioOn').addClass('radioOff');
             $(this).removeClass('radioOff').addClass('radioOn').parent().removeClass('radioOff').addClass('radioOn');
-            mega.config.set('font_size', $(this).val());
+            mega.config.setn('font_size', $(this).val());
         });
 
         $('.ulskip').removeClass('radioOn').addClass('radioOff');
@@ -4739,7 +4739,7 @@ function accountUI() {
             $('.ulskip').removeClass('radioOn').addClass('radioOff');
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
-            mega.config.set('ul_skipIdentical', ul_skipIdentical);
+            mega.config.setn('ul_skipIdentical', ul_skipIdentical);
         });
 
         $('.dlThroughMEGAsync').removeClass('radioOn').addClass('radioOff');
@@ -4760,7 +4760,7 @@ function accountUI() {
             $('.dlThroughMEGAsync').removeClass('radioOn').addClass('radioOff');
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
-            mega.config.set('dlThroughMEGAsync', dlThroughMEGAsync);
+            mega.config.setn('dlThroughMEGAsync', dlThroughMEGAsync);
         });
 
         $('.uisorting').removeClass('radioOn').addClass('radioOff');
@@ -4779,7 +4779,7 @@ function accountUI() {
             $('.uisorting').removeClass('radioOn').addClass('radioOff');
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
-            mega.config.set('uisorting', uisorting);
+            mega.config.setn('uisorting', uisorting);
         });
 
         $('.uiviewmode').removeClass('radioOn').addClass('radioOff');
@@ -4798,7 +4798,7 @@ function accountUI() {
             $('.uiviewmode').removeClass('radioOn').addClass('radioOff');
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
-            mega.config.set('uiviewmode', uiviewmode);
+            mega.config.setn('uiviewmode', uiviewmode);
         });
 
         $('.rubsched, .rubschedopt').removeClass('radioOn').addClass('radioOff');
@@ -4816,7 +4816,7 @@ function accountUI() {
         $('.rubschedopt input').rebind('click', function(e) {
             var id = $(this).attr('id');
             var opt = $('#' + id + '_opt').val();
-            mega.config.set('rubsched', id.substr(3) + ':' + opt);
+            mega.config.setn('rubsched', id.substr(3) + ':' + opt);
             $('.rubschedopt').removeClass('radioOn').addClass('radioOff');
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
@@ -4826,19 +4826,19 @@ function accountUI() {
             var id = String($(this).attr('id')).split('_')[0];
             $('.rubschedopt').removeClass('radioOn').addClass('radioOff');
             $('#'+id+',#'+id+'_div').addClass('radioOn').removeClass('radioOff');
-            mega.config.set('rubsched', id.substr(3) + ':' + $(this).val());
+            mega.config.setn('rubsched', id.substr(3) + ':' + $(this).val());
             initAccountScroll(1);
         });
         $('.rubsched input').rebind('click', function(e) {
             var id = $(this).attr('id');
             if (id == 'rad13') {
-                mega.config.set('rubsched', 0);
+                mega.config.setn('rubsched', 0);
                 $('#rubsched_options').addClass('hidden');
             }
             else if (id == 'rad12') {
                 $('#rubsched_options').removeClass('hidden');
                 if (!fmconfig.rubsched) {
-                    mega.config.set('rubsched', "14:15");
+                    mega.config.setn('rubsched', "14:15");
                     var defOption = 14;
                     $('#rad' + defOption + '_div').removeClass('radioOff').addClass('radioOn');
                     $('#rad' + defOption).removeClass('radioOff').addClass('radioOn');
@@ -5045,7 +5045,7 @@ function accountUI() {
             $('.usessl').removeClass('radioOn').addClass('radioOff');
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
-            mega.config.set('use_ssl', use_ssl | 0);
+            mega.config.setn('use_ssl', use_ssl | 0);
             localStorage.use_ssl = fmconfig.use_ssl;
         });
 

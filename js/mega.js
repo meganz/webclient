@@ -4347,7 +4347,7 @@ function MegaData()
             var node;
             var size;
 
-            for (var i in nodes) {
+            for (var i = 0; i < nodes.length; i++) {
                 node = M.d[nodes[i]];
 
                 if (node) {
@@ -4355,10 +4355,12 @@ function MegaData()
                         size = 0;
 
                         if (M.c[node.h]) {
+                            var fs = res.folders.size;
                             size = res.files.size;
 
                             forEach(Object.keys(M.c[node.h]));
                             size = (res.files.size - size);
+                            res.folders.size = fs;
                         }
 
                         if (M.getNodeShareUsers(node, 'EXP').length) {

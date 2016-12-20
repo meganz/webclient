@@ -4404,10 +4404,6 @@ function accountUI() {
 
             var pws = zxcvbn($('#account-new-password').val());
 
-            if (typeof M.account.rubsched !== 'undefined') {
-                mega.config.set('rubsched', M.account.rubsched);
-            }
-
             if ($('#account-password').val() == '' && ($('#account-new-password').val() !== '' || $('#account-confirm-password').val() !== ''))
             {
                 msgDialog('warninga', l[135], l[719], false, function()
@@ -4820,31 +4816,29 @@ function accountUI() {
         $('.rubschedopt input').rebind('click', function(e) {
             var id = $(this).attr('id');
             var opt = $('#' + id + '_opt').val();
-            M.account.rubsched = id.substr(3) + ':' + opt;
+            mega.config.set('rubsched', id.substr(3) + ':' + opt);
             $('.rubschedopt').removeClass('radioOn').addClass('radioOff');
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
-            $('.fm-account-save-block').removeClass('hidden');
             initAccountScroll(1);
         });
         $('.rubsched_textopt').rebind('click keyup', function(e) {
             var id = String($(this).attr('id')).split('_')[0];
             $('.rubschedopt').removeClass('radioOn').addClass('radioOff');
             $('#'+id+',#'+id+'_div').addClass('radioOn').removeClass('radioOff');
-            M.account.rubsched = id.substr(3) + ':' + $(this).val();
-            $('.fm-account-save-block').removeClass('hidden');
+            mega.config.set('rubsched', id.substr(3) + ':' + $(this).val());
             initAccountScroll(1);
         });
         $('.rubsched input').rebind('click', function(e) {
             var id = $(this).attr('id');
             if (id == 'rad13') {
-                M.account.rubsched = 0;
+                mega.config.set('rubsched', 0);
                 $('#rubsched_options').addClass('hidden');
             }
             else if (id == 'rad12') {
                 $('#rubsched_options').removeClass('hidden');
                 if (!fmconfig.rubsched) {
-                    M.account.rubsched = "14:15";
+                    mega.config.set('rubsched', "14:15");
                     var defOption = 14;
                     $('#rad' + defOption + '_div').removeClass('radioOff').addClass('radioOn');
                     $('#rad' + defOption).removeClass('radioOff').addClass('radioOn');
@@ -4853,7 +4847,6 @@ function accountUI() {
             $('.rubsched').removeClass('radioOn').addClass('radioOff');
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
-            $('.fm-account-save-block').removeClass('hidden');
             initAccountScroll(1);
         });
 

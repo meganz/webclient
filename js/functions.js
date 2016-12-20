@@ -612,6 +612,7 @@ function populate_l() {
     l[16137] = l[16137].replace('[A]', '<a href="#pro">').replace('[/A]', '</a>');
     l[16138] = l[16138].replace('[A]', '<a href="#pro">').replace('[/A]', '</a>');
     l[16164] = l[16164].replace('[S]', '<a class="red">').replace('[/S]', '</a>').replace('[BR]', '<br/>');
+    l[16167] = l[16167].replace('[S]', '<a href="#mobile page">').replace('[/S]', '</a>');
 
     l['year'] = new Date().getFullYear();
     date_months = [

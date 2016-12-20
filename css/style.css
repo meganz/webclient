@@ -20572,7 +20572,7 @@ span.incoming-call-name {
     box-sizing: border-box;
 }
 .contact-details-pad .nw-contact-status {
-    margin: 5px 6px 0 0;
+    margin: 6px 6px 0 0;
 }
 .contact-details-pad .fm-remove-contact, .contact-details-pad .fm-start-conversation, .contact-details-pad .fm-send-files, .contact-details-pad .fm-share-folders {
     float: left;

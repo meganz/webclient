@@ -1676,7 +1676,7 @@ function MegaData()
                     }
 
                     $this.addClass('active');
-                    var y = $this.offset().top - 20;
+                    var y = $this.offset().top + 21;
                     m
                         .css('top', y)
                         .removeClass('hidden')

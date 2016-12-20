@@ -805,7 +805,7 @@ function init_page() {
             var html = '';
             var a = 4;
 
-            $('.about').safeHTML(content.html);
+            $('.new-bottom-pages.about').safeHTML(content.html);
             $('.team-person-block').sort(function () {
                 return (Math.round(Math.random()) - 0.5);
             }).each(function (i, element) {

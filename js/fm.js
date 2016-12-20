@@ -7374,27 +7374,29 @@ function setContextMenuGetLinkText() {
  */
 function disableCircularTargets(pref) {
 
-    var nodeId;
+    var nodes = $.selected || [];
 
-    for (var s in $.selected) {
-        if ($.selected.hasOwnProperty(s)) {
-            nodeId = $.selected[s];
-            if (M.d[nodeId]) {
-                $(pref + nodeId).addClass('disabled');
-            }
+    for (var s = nodes.length; s--;) {
+        var handle = nodes[s];
+        var node = M.d[handle];
 
-            if (M.d[nodeId] && M.d[nodeId].p) {
+        if (node) {
+            $(pref + handle).addClass('disabled');
 
+            if (node.p) {
                 // Disable parent dir
-                $(pref + M.d[nodeId].p).addClass('disabled');
+                $(pref + node.p).addClass('disabled');
             }
-            else if (d) {
-                console.error('disableCircularTargets: Invalid node', nodeId, pref);
+            else if (d && node.t < 2) {
+                console.error('disableCircularTargets: parent-less node!', handle, pref);
             }
-
-            // Disable all children folders
-            disableDescendantFolders(nodeId, pref);
         }
+        else if (d) {
+            console.error('disableCircularTargets: Invalid node', handle, pref);
+        }
+
+        // Disable all children folders
+        disableDescendantFolders(handle, pref);
     }
 }
 

@@ -18882,12 +18882,15 @@ a.ff-extension-button:hover {
 }
 .search-bottom-menu {
     background-color: #EEEEEE;
-    height: 30px;
+    height: 36px;
     position: absolute;
     bottom: 0;
     width: 100%;
-    padding-left: 13px;
+    padding: 3px 0 0 7px;
     display: none;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
 .search .search-bottom-menu {
     display: block;
@@ -18972,15 +18975,15 @@ a.ff-extension-button:hover {
 }
 .search .grid-scrolling-table, .search .contacts-grid-scrolling-table {
     height: 100%;
-    height: -webkit-calc(100% - 54px);
-    height: -moz-calc(100% - 54px);
-    height: calc(100% - 54px);
+    height: -webkit-calc(100% - 60px);
+    height: -moz-calc(100% - 60px);
+    height: calc(100% - 60px);
 }
 .search .file-block-scrolling, .search .fm-contacts-blocks-view {
     height: 100%;
-    height: -webkit-calc(100% - 29px);
-    height: -moz-calc(100% - 29px);
-    height: calc(100% - 29px);
+    height: -webkit-calc(100% - 35px);
+    height: -moz-calc(100% - 35px);
+    height: calc(100% - 35px);
 }
 .lpxf {
     font-size: 17px !important;

@@ -7850,6 +7850,7 @@ function sectionUIopen(id) {
         console.log('sectionUIopen', id, folderlink);
     }
 
+    $.hideContextMenu();
     $('.nw-fm-left-icon').removeClass('active');
     if (M.hasInboxItems() === true) {
         $('.nw-fm-left-icon.inbox').removeClass('hidden');

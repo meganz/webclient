@@ -1309,6 +1309,10 @@ function topmenuUI() {
         $('.top-search-bl').addClass('hidden');
     }
 
+    if (page === 'download') {
+        $('.top-menu-item.refresh-item').removeClass('hidden');
+    }
+
     var avatar = window.useravatar && useravatar.my;
     if (!avatar) {
         $('.fm-avatar').hide();

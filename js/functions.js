@@ -3639,32 +3639,35 @@ mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
  */
 mega.utils.reload = function megaUtilsReload() {
     function _reload() {
-        var u_sid = u_storage.sid,
-            u_key = u_storage.k,
-            privk = u_storage.privk,
-            debug = u_storage.d,
-            jj = u_storage.jj,
-            apipath = debug ? localStorage.apipath : undefined;
-        var mcd = u_storage.testChatDisabled;
+        var u_sid = u_storage.sid;
+        var u_key = u_storage.k;
+        var privk = u_storage.privk;
+        var jj = localStorage.jj;
+        var debug = localStorage.d;
+        var mcd = localStorage.testChatDisabled;
+        var apipath = debug && localStorage.apipath;
 
         localStorage.clear();
         sessionStorage.clear();
 
-        u_storage.sid = u_sid;
-        u_storage.privk = privk;
-        u_storage.k = u_key;
-        u_storage.wasloggedin = true;
+        if (u_sid) {
+            u_storage.sid = u_sid;
+            u_storage.privk = privk;
+            u_storage.k = u_key;
+            u_storage.wasloggedin = true;
+        }
 
         if (debug) {
-            u_storage.d = 1;
-            u_storage.minLogLevel = 0;
+            localStorage.d = 1;
+            localStorage.minLogLevel = 0;
+
             if (location.host !== 'mega.nz') {
-                u_storage.dd = true;
+                localStorage.dd = true;
                 if (!is_extension && jj)  {
-                    u_storage.jj = jj;
+                    localStorage.jj = jj;
                 }
                 if (mcd) {
-                    u_storage.testChatDisabled = 1;
+                    localStorage.testChatDisabled = 1;
                 }
             }
             if (apipath) {
@@ -3677,7 +3680,7 @@ mega.utils.reload = function megaUtilsReload() {
         location.reload(true);
     }
 
-    if (u_type !== 3) {
+    if (u_type !== 3 && page !== 'download') {
         stopsc();
         stopapi();
         loadfm(true);
@@ -3687,7 +3690,7 @@ mega.utils.reload = function megaUtilsReload() {
         msgDialog('confirmation', l[761], l[7713], l[6994], function(doIt) {
             if (doIt) {
                 var reload = function() {
-                    if (mBroadcaster.crossTab.master) {
+                    if (mBroadcaster.crossTab.master || page === 'download') {
                         mega.utils.abortTransfers().then(function() {
                             loadingDialog.show();
                             stopsc();

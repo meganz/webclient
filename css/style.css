@@ -7545,6 +7545,7 @@ table {
     -moz-opacity: 0.83;
     -khtml-opacity: 0.83;
     opacity: 0.83;
+    vertical-align: top;
 }
 .deactivated .fm-breadcrumbs .right-arrow-bg, .deactivated .fm-share-breadcrumbs .right-arrow-bg {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
@@ -23432,7 +23433,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
     border: 1px solid #ff4444;
 }
 #address-dialog-states-button .ui-icon, #address-dialog-countries-button .ui-icon {
-    background-image: url("../images/mega/nw-fm-sprite_v18.svg");
+    background-image: url("../images/mega/nw-fm-sprite_v18_1.svg");
     background-position: -21px -8367px;
     background-repeat: no-repeat;
     display: inline-block;

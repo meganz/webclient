@@ -395,6 +395,7 @@
                     $('.fm-empty-incoming').removeClass('hidden');
                 }
                 else if (M.currentrootid === M.RootID
+                        || M.currentrootid === M.RubbishID
                         || M.currentrootid === M.InboxID) {
 
                     $('.fm-empty-folder').removeClass('hidden');
@@ -405,6 +406,9 @@
                 else if (M.currentrootid === 'contacts') {
                     $('.fm-empty-incoming.contact-details-view').removeClass('hidden');
                     $('.contact-share-notification').addClass('hidden');
+                }
+                else if (this.logger) {
+                    this.logger.info('Empty folder not handled...', M.currentdirid, M.currentrootid);
                 }
             }
 

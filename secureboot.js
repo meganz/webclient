@@ -39,6 +39,11 @@ var is_ios = is_mobile && (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 
 function isMobile()
 {
     if (is_chrome_firefox) return false;
+    
+    // Flag for testing the mobile site
+    if (localStorage.testMobileSite) {
+        return true;
+    }
     var mobile = ['iphone','ipad','android','blackberry','nokia','opera mini','windows mobile','windows phone','iemobile','mobile safari','bb10; touch'];
     for (var i in mobile) if (ua.indexOf(mobile[i]) > 0) return true;
     return false;
@@ -1015,7 +1020,7 @@ if (m || (typeof localStorage !== 'undefined' && localStorage.mobile))
     m=true;
 }
 
-if (location.hash.substr(1, 1) === '!') {
+if ((location.hash.substr(1, 1) === '!') || (location.hash.substr(1, 2) === 'F!')) {
     m = false;
 }
 
@@ -1556,6 +1561,7 @@ else if (!b_u)
     jsl.push({f:'js/account.js', n: 'user_js', j:1});
     jsl.push({f:'js/attr.js', n: 'mega_attr_js', j:1});
     jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
 
     if (!is_mobile) {
 
@@ -1572,7 +1578,6 @@ else if (!b_u)
         jsl.push({f:'js/vendor/jsbn2.js', n: 'jsbn2_js', j:1, w:2});
         jsl.push({f:'js/vendor/nacl-fast.js', n: 'nacl_js', j:1,w:7});
         jsl.push({f:'js/vendor/dexie.js', n: 'dexie_js', j:1,w:5});
-        jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
 
         jsl.push({f:'js/authring.js', n: 'authring_js', j:1});
         jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
@@ -1734,8 +1739,8 @@ else if (!b_u)
         'resellers': {f:'html/resellers.html', n: 'resellers', j:0},
         'download': {f:'html/download.html', n: 'download', j:0},
         'download_js': {f:'html/js/download.js', n: 'download_js', j:1},
-        'download_mobile': {f:'html/download-mobile.html', n: 'download', j: 0},
-        'mobile_css': {f:'css/mobile-app-new.css', n: 'mobile_css', j:2,w:30,c:1,d:1,m:1},
+        'fm_mobile': {f:'html/fm-mobile.html', n: 'fm_mobile', j:0},
+        'fm_mobile_js': {f:'js/ui/megaRenderMobile.js', n: 'fm_mobile_js', j:1},
         'network_js': {f:'js/network-testing.js', n: 'network_js', j:1},
         'dispute': {f:'html/dispute.html', n: 'dispute', j:0},
         'disputenotice': {f:'html/disputenotice.html', n: 'disputenotice', j:0},
@@ -1878,7 +1883,15 @@ else if (!b_u)
     };
 
     if (is_mobile) {
-        subpages['!'] = ['download_mobile', 'download_js', 'mobile_css'];
+        // Common to all mobile pages
+        jsl.push({f:'js/vendor/jquery.mobile.js', n: 'jquery_mobile_js', j:1, w:5});
+        jsl.push({f:'css/mobile-app-new.css', n: 'mobile_css', j:2, w:30, c:1, d:1, m:1});
+        jsl.push({f:'css/spinners.css', n: 'spinners_css', j:2,w:5,c:1,d:1,cache:1});
+        
+        // Page specific
+        subpages['!'] = ['fm_mobile', 'download_js'];
+        subpages['F!'] = ['fm_mobile', 'fm_mobile_js'];
+        subpages['fm'] = ['fm_mobile', 'fm_mobile_js'];
     }
 
     if (page)

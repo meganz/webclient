@@ -174,7 +174,7 @@ React.makeElement = React['createElement'];
 	        'delaySendMessageIfRoomNotAvailableTimeout': 3000,
 	        'xmppDomain': xmppDomain,
 	        'loadbalancerService': 'gelb.karere.mega.nz',
-	        'fallbackXmppServers': ["https://xmpp270n001.karere.mega.nz/ws", "https://xmpp270n002.karere.mega.nz/ws"],
+	        'fallbackXmppServers': ["https://xmpp.karere.mega.nz/ws"],
 	        'rtcSession': {
 	            'crypto': {
 	                encryptMessageForJid: function encryptMessageForJid(msg, bareJid) {
@@ -218,27 +218,7 @@ React.makeElement = React['createElement'];
 	                }
 	            },
 	            iceServers: [{
-	                urls: ['turn:trn270n001.karere.mega.nz:3478?transport=udp'],
-	                username: "inoo20jdnH",
-	                credential: '02nNKDBkkS'
-	            }, {
-	                urls: ['turn:trn270n002.karere.mega.nz:3478?transport=udp'],
-	                username: "inoo20jdnH",
-	                credential: '02nNKDBkkS'
-	            }, {
-	                urls: ['turn:trn302n001.karere.mega.nz:3478?transport=udp'],
-	                username: "inoo20jdnH",
-	                credential: '02nNKDBkkS'
-	            }, {
-	                urls: ['turn:trn302n002.karere.mega.nz:3478?transport=udp'],
-	                username: "inoo20jdnH",
-	                credential: '02nNKDBkkS'
-	            }, {
-	                urls: ['turn:trn530n002.karere.mega.nz:3478?transport=udp'],
-	                username: "inoo20jdnH",
-	                credential: '02nNKDBkkS'
-	            }, {
-	                urls: ['turn:trn530n003.karere.mega.nz:3478?transport=udp'],
+	                urls: ['turn:trn.karere.mega.nz:3478?transport=udp'],
 	                username: "inoo20jdnH",
 	                credential: '02nNKDBkkS'
 	            }]

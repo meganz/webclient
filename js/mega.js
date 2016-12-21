@@ -2434,9 +2434,6 @@ function MegaData()
     };
 
     this.addNode = function(n, ignoreDB) {
-        if (is_mobile) {
-            return false;
-        }
         if (!M.d[n.p] && n.p !== 'contacts') {
             if (n.sk) {
                 n.p = n.u;
@@ -2540,6 +2537,12 @@ function MegaData()
 
         // $(window).trigger("megaNodeAdded", [n]);
     };
+
+    if (is_mobile) {
+        this.addNode = function() {
+            return false;
+        };
+    }
 
     this.delNode = function(h, ignoreDB) {
         function ds(h) {
@@ -8380,19 +8383,17 @@ function loadfm_done(mDBload) {
         }
 
         // -0x800e0fff indicates a call to loadfm() when it was already loaded
-        if (mDBload !== -0x800e0fff) {
-            if (!is_mobile) {
-                Soon(function _initialNotify() {
-                    // After the first SC request all subsequent requests can generate notifications
-                    notify.initialLoadComplete = true;
+        if (!is_mobile && mDBload !== -0x800e0fff) {
+            Soon(function _initialNotify() {
+                // After the first SC request all subsequent requests can generate notifications
+                notify.initialLoadComplete = true;
 
-                    // If this was called from the initial fm load via gettree or db load, we should request the
-                    // latest notifications. These must be done after the first getSC call.
-                    if (!folderlink) {
-                        notify.getInitialNotifications();
-                    }
-                });
-            }
+                // If this was called from the initial fm load via gettree or db load, we should request the
+                // latest notifications. These must be done after the first getSC call.
+                if (!folderlink) {
+                    notify.getInitialNotifications();
+                }
+            });
 
             if (mBroadcaster.crossTab.master && !mega.loadReport.sent) {
                 mega.loadReport.sent = true;

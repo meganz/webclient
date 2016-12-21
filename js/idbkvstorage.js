@@ -6,7 +6,7 @@
 var IndexedDBKVStorage = function(name) {
     this.name = name;
     this.logger = new MegaLogger("IDBKVStorage[" + name + "]");
-    this._memCache = {};
+    this._memCache = Object.create(null);
 };
 
 // sets fmdb reference and prefills the memory cache from the DB
@@ -58,7 +58,7 @@ IndexedDBKVStorage.prototype.getItem = function __IDBKVGetItem(k) {
 
     var promise = new MegaPromise();
 
-    if (typeof(self._memCache[k]) != 'undefined' && self._memCache[k] !== null) {
+    if (typeof(self._memCache[k]) != 'undefined') {
         // record exists
         promise.resolve(self._memCache[k]);
     }
@@ -74,8 +74,8 @@ IndexedDBKVStorage.prototype.getItem = function __IDBKVGetItem(k) {
 // (must only be called in response to an API response triggered by an actionpacket)
 // FIXME: convert to synchronous operation
 IndexedDBKVStorage.prototype.removeItem = function __IDBKVRemoveItem(k) {
-    if (typeof(this._memCache[k]) != 'undefined' && this._memCache[k] !== null) {
-        this._memCache[k] = null;
+    if (typeof(this._memCache[k]) != 'undefined') {
+        delete this._memCache[k];
         if (this.fmdb) this.fmdb.del(this.name, k);
     }
 
@@ -97,5 +97,11 @@ IndexedDBKVStorage.prototype.eachPrefixItem = function __IDBKVEachItem(prefix, c
     // FIXME: also retrieve DB contents? (was not implemented in the original version)
 
     return MegaPromise.resolve();
+};
+
+// FIXME: check if this gets called for caches other than the ua attribCache
+// - if that is the case, also clear the underlying DB table
+IndexedDBKVStorage.prototype.destroy = function __IDBKVDestroy() {
+    this._memCache = Object.create(null);
 };
 makeObservable(IndexedDBKVStorage);

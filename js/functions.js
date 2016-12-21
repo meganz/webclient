@@ -911,12 +911,12 @@ function time2date(unixTime, format) {
         result = date.getDate() + ' ' + date_months[date.getMonth()] + ' ' + date.getFullYear();
     }
     else {
-        var parts = date.toISOString().split('T');
-
-        result = parts[0];
+        result = date.getFullYear() + '-'
+               + ('0' + (date.getMonth() + 1)).slice(-2)
+               + '-' + ('0' + date.getDate()).slice(-2);
 
         if (!format) {
-            result += ' ' + parts[1].substr(0, 5);
+            result += ' ' + date.toTimeString().substr(0, 5);
         }
     }
 

@@ -2098,7 +2098,7 @@ window.onunload = function() {
 
 if (!is_karma && !is_mobile) {
     window.M = new MegaData();
-    attribCache = new IndexedDBKVStorage('attrib', { murSeed: 0x800F0002 });
+    attribCache = new IndexedDBKVStorage('ua', { murSeed: 0x800F0002 });
     attribCache.syncNameTimer = {};
     attribCache.uaPacketParser = uaPacketParser;
     attribCache.bitMapsManager = new MegaDataBitMapManager();

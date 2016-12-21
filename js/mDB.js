@@ -101,12 +101,13 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
         try {
             if (!fmdb.db) {
                 var todrop = [];
+                var dbpfx = 'fm3_';
 
-                // enumerate databases and collect those not prefixed with fm_
+                // enumerate databases and collect those not prefixed with 'dbpfx'
                 // (which is the current format)
                 Dexie.getDatabaseNames(function(r) {
                     for (var i = r.length; i--;) {
-                        if (r[i].substr(0,4) != 'fm2_') {
+                        if (r[i].substr(0, dbpfx.length) != dbpfx) {
                             todrop.push(r[i]);
                         }
                     }
@@ -118,7 +119,11 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
                     fmdb.drop(todrop, function() {
                         // start inter-tab heartbeat
                         // fmdb.beacon();
-                        fmdb.db = new Dexie('fm2_' + fmdb.name);
+                        fmdb.db = new Dexie(dbpfx + fmdb.name);
+
+                        // save the db name for our getDatabaseNames polyfill
+                        localStorage['_$mdb$' + dbpfx + fmdb.name] = Date.now();
+
                         fmdb.db.version(1).stores(fmdb.schema);
                         fmdb.db.open().then(function(){
                             fmdb.get('_sn', function(r){
@@ -500,6 +505,11 @@ FMDB.prototype.restorenode = Object.freeze({
         chatqueuedmsgs.k = index.k;
     },
 
+    h: function(out, index) {
+        out.h = index.h;
+        out.hash = index.c;
+    },
+
     mk : function(mk, index) {
         mk.h = index.h;
     }
@@ -866,6 +876,9 @@ mBroadcaster.once('startMega', function __idb_setup() {
                                     if (idx == 'hash') {
                                         list[length++] = i.substr(0, i.length - 5);
                                     }
+                                }
+                                else if (i.substr(0, 6) === '_$mdb$') {
+                                    list[length++] = i.substr(6);
                                 }
                             }
 

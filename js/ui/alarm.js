@@ -275,7 +275,7 @@ var alarm = {
 
             // Add button click handlers
             this.initChooseButton($container, $dialog);
-            this.initRenewButton($container, $dialog, '1');
+            this.initRenewButton($container, $dialog, proNum);
             this.initDontShowAgainButton($dialog);
             this.initFeedbackMessageKeyup($dialog);
             this.initSendAndCloseButton($container, $dialog);

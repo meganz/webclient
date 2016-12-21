@@ -2595,7 +2595,10 @@ function MegaData()
             // FIXME: this gets called with M.d[h] already
             // deleted, which means that the test below cannot
             // take effect.
-            if (fmdb) fmdb.del('f', h);
+            if (fmdb) {
+                fmdb.del('f', h);
+                fmdb.del('ph', h);
+            }
 
             if (M.d[h]) {
                 if (fmdb && !ignoreDB) {
@@ -4101,6 +4104,11 @@ function MegaData()
 
             if (u === 'EXP' && this.d[h].ph) {
                 delete this.d[h].ph;
+
+                if (fmdb) {
+                    fmdb.del('ph', h);
+                }
+
                 updnode = true;
             }
 
@@ -8117,6 +8125,15 @@ function processPH(publicHandles) {
         nodeId = value.h;
         if (!M.d[nodeId]) continue;
 
+        if (fmdb) {
+            if (value.d) {
+                fmdb.del('ph', nodeId);
+            }
+            else {
+                fmdb.add('ph', { h : nodeId });
+            }
+        }
+
         publicHandleId = value.ph;
 
         // remove exported link, down: 1
@@ -8534,7 +8551,7 @@ function loadfm_callback(res) {
             }
         }
 
-        // Handle public/export links. Why here? Make sure that M.d already exist
+        // Handle public/export links. Why here? Make sure that M.d already exists
         if (res.ph) {
             processPH(res.ph);
         }

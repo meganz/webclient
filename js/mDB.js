@@ -497,8 +497,12 @@ FMDB.prototype.restorenode = Object.freeze({
         }
     },
 
-    attrib : function(attrib, index) {
-        attrib.k = index.k;
+    ph : function(ph, index) {
+        ph.h = index.h;
+    },
+
+    ua : function(ua, index) {
+        ua.k = index.k;
     },
 
     chatqueuedmsgs : function(chatqueuedmsgs, index) {

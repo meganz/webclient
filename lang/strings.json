@@ -15151,6 +15151,30 @@
         "text": "Overall Usage",
         "context": "A header\/title of a block in the My Account section. It contains information about the user's used\/available storage and transfer quotas. "
     },
+    "16119": {
+        "text": "[S]Storage[\/S]",
+        "context": "Short for \"Storage quota\". Header of the block which contains information about used\/available storage space on the cloud drive. Please leave [S] and [\/S] as is."
+    },
+    "16120": {
+        "text": "[S]Transfer[\/S]",
+        "context": "This is short for \"Transfer quota\". It is the header\/title of block\/section which contains information about used\/available transfer quota. Please leave the [S] and [\/S] tags."
+    },
+    "16121": {
+        "text": "Used Storage",
+        "context": "A header\/title of a block\/section which contains information about the user's used storage space on their cloud drive."
+    },
+    "16122": {
+        "text": "Transfer Quota",
+        "context": "The header\/title of a block\/section which contains information about the user's used\/available transfer allowance for their account."
+    },
+    "16123": {
+        "text": "[S]Used base quota[\/S] is the free transfer allowance for the IP address you are using. This value is dynamic and depends on the amount of unused transfer quota we have available.[BR] You can increase your quota by [A]Upgrading to PRO[\/A].",
+        "context": "Some information about the base transfer quota which is available for free accounts. Please leave the tags [S], [\/S], [A], [\/A] and [BR]."
+    },
+    "16124": {
+        "text": "[S]Used base quota[\/S] is the free transfer allowance for the IP address you are using. This value is dynamic and depends on the amount of unused transfer quota we have available.[BR] You can increase your quota by completing [S]Account Achievements[\/S] or by [A]Upgrading to PRO[\/A].",
+        "context": "Some information about base transfer quota which is available for free accounts. Please leave the [S], [\/S], [A], [\/A] and [BR] tags."
+    },
     "16125": {
         "text": "Used quota for the last 6 hours:",
         "context": "The used quota is the free transfer allowance for the IP address the user is currently using."

@@ -173,7 +173,7 @@
     position: absolute;
     right: 7px;
     top: 9px;
-    background-image: url(http://localhost:8089/images/mega/icons-sprite.png);
+    background-image: url(../images/mega/icons-sprite.png);
     background-repeat: no-repeat;
     background-position: -106px -254px;
 }

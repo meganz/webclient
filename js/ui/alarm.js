@@ -47,7 +47,7 @@ var alarm = {
     hideAllWarningPopups: function() {
 
         var $containers = $('.top-icon.warning');
-        var $dialogs = $containers.find('.top-warning-popup');
+        var $dialogs = $('.top-warning-popup');
 
         $containers.addClass('hidden').removeClass('active');
         $dialogs.addClass('hidden');
@@ -140,7 +140,7 @@ var alarm = {
             var $dialog = $('.top-warning-popup.ephemeral-session');
 
             // Add button click handler
-            this.initRegisterButton($dialog);
+            this.initRegisterButton($container, $dialog);
 
             // Hide other dialogs that may be open and make the icon clickable
             alarm.hideAllWarningPopups();
@@ -152,7 +152,7 @@ var alarm = {
          * Initialises the click handler for the Choose button
          * @param {Object} $dialog The dialog
          */
-        initRegisterButton: function($dialog) {
+        initRegisterButton: function($container, $dialog) {
 
             // Redirect to register signup page on button click
             $dialog.find('.warning-button').click(function() {
@@ -274,8 +274,8 @@ var alarm = {
             $dialog.find('.gateway-name').text(gatewayDisplayName);
 
             // Add button click handlers
-            this.initChooseButton($dialog);
-            this.initRenewButton($dialog, proNum);
+            this.initChooseButton($container, $dialog);
+            this.initRenewButton($container, $dialog, '1');
             this.initDontShowAgainButton($dialog);
             this.initFeedbackMessageKeyup($dialog);
             this.initSendAndCloseButton($container, $dialog);
@@ -290,7 +290,7 @@ var alarm = {
          * Initialises the click handler for the Choose button
          * @param {Object} $dialog The dialog
          */
-        initChooseButton: function($dialog) {
+        initChooseButton: function($container, $dialog) {
 
             // On the Choose button click
             $dialog.find('.warning-button.choose').rebind('click', function() {
@@ -315,7 +315,7 @@ var alarm = {
          * @param {Object} $dialog The dialog
          * @param {Number} proNum The Pro plan number e.g. 1, 2, 3, 4
          */
-        initRenewButton: function($dialog, proNum) {
+        initRenewButton: function($container, $dialog, proNum) {
 
             // On the Renew button click
             $dialog.find('.warning-button.renew').rebind('click', function() {
@@ -590,7 +590,7 @@ var alarm = {
 
                 // Initialise popup buttons
                 this.initDontUpdateButton($container, $dialog);
-                this.initUpdateButton($dialog);
+                this.initUpdateButton($container, $dialog);
 
                 // Hide any other popups that may be open, make the icon clickable and show the popup
                 alarm.hideAllWarningPopups();
@@ -628,7 +628,7 @@ var alarm = {
          * If the Update button is clicked, hard refresh the page to break cache
          * @param {Object} $dialog The dialog
          */
-        initUpdateButton: function($dialog) {
+        initUpdateButton: function($container, $dialog) {
 
             $dialog.find('.warning-button.update').rebind('click', function() {
 

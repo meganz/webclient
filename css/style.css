@@ -4620,12 +4620,12 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     border: 2px solid rgba(255,255,255,1);
 }
 .fm-avatar::after {
-    content:'';
-    position:absolute;
-    width:100%;
+    content: '';
+    position: absolute;
+    width: 100%;
     height: 100%;
-    left:0;
-    top:0;
+    left: 0;
+    top: 0;
 }
 .download-page .fm-avatar {
     height: 44px;
@@ -5205,7 +5205,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     font-family: 'source_sans_prosemibold', Arial;
 }
 .astropay-payment-reminder .first-message, .astropay-payment-reminder .second-message {
-    margin-top: 20px;
+    margin-top: 15px;
 }
 .astropay-payment-reminder .plan-expired-checkbox {
     margin: 20px 11px 0 8px;
@@ -5229,7 +5229,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     height: 62px;
     margin-top: 5px;
     padding: 10px;
-    width: 276px;
+    width: 100%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
 /* Site update dialog */
 .site-update-available .warning-header {
@@ -10231,6 +10234,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
 }
 .dropdown.popup.top-warning-popup {
     min-width: 404px;
+}
+.dropdown.popup.astropay-payment-reminder {
+    min-width: 434px;
 }
 .dropdown.popup.membership-popup {
     min-width: 472px;
@@ -18916,7 +18922,6 @@ a.ff-extension-button:hover {
     background-repeat: no-repeat;
     height: 30px;
     cursor: pointer;
-    
 }
 .search-path-icon.last {
     width: 18px;
@@ -18974,7 +18979,7 @@ a.ff-extension-button:hover {
     background-repeat: no-repeat;
     background-image: url(../images/mega/nw-fm-sprite_v19.svg);
     background-position: right -1430px;
-        margin: 0 4px 0 0;
+    margin: 0 4px 0 0;
 }
 .search .grid-scrolling-table, .search .contacts-grid-scrolling-table {
     height: 100%;

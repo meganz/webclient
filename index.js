@@ -1512,8 +1512,10 @@ function topmenuUI() {
             topMenu(1);
         }
         if (!e || ($(e.target).parents('.top-warning-popup').length == 0
-                && ((c && c.indexOf('warning-icon-area') == -1) || !c))) {
+                && !$(e.target).hasClass('top-menu-popup')
+                && ((c && c.indexOf('top-icon warning') == -1) || !c))) {
             $('.top-warning-popup').addClass('hidden');
+            $('.top-icon.warning').removeClass('active');
         }
         if (!e || ($(e.target).parents('.top-user-status-popup').length == 0
                 && ((c && c.indexOf('activity-status') == -1 && c.indexOf('loading') == -1) || !c))) {

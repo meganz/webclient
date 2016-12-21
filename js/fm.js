@@ -3070,7 +3070,7 @@ function dashboardUI() {
     // Space-widget clickable sections
     $('.account.widget.storage .pr-item')
         .rebind('click', function() {
-            var section = String($(this).attr('class')).replace(/account|pr-item/g, '').trim();
+            var section = String($(this).attr('class')).replace(/account|pr-item|empty/g, '').trim();
             switch (section) {
                 case 'cloud-drive':
                     section = M.RootID;
@@ -3089,7 +3089,7 @@ function dashboardUI() {
                     break;
             }
 
-            if (section && !$(this).hasClass('empty')) {
+            if (section) {
                 M.openFolder(section);
             }
 
@@ -3782,6 +3782,35 @@ function accountUI() {
                 $percBlock.addClass('empty');
             }
         }
+
+        // Storage usage clickable sections
+        $('.account.storage-data .pr-item')
+            .rebind('click', function() {
+                var section = String($(this).attr('class')).replace(/account|pr-item|empty/g, '').trim();
+                switch (section) {
+                    case 'pr0':
+                        section = M.RootID;
+                        break;
+                    case 'pr1':
+                        section = M.InboxID;
+                        break;
+                    case 'pr2':
+                        section = 'shares';
+                        break;
+                    case 'pr3':
+                        section = M.RubbishID;
+                        break;
+                    default:
+                        section = null;
+                        break;
+                }
+
+                if (section) {
+                    M.openFolder(section);
+                }
+
+                return false;
+            });
 
         var prSize;
         // Cloud drive

@@ -25043,7 +25043,7 @@ div.camera-bottom-txt {
 .account.pr-item {
     cursor: default;
 }
-.storage .account.pr-item:not(.empty) {
+.storage .account.pr-item, .account.storage-data .pr-item:not(.pr4) {
     cursor: pointer;
 }
 .account.progress-perc {

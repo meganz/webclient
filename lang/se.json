@@ -3830,7 +3830,7 @@
     "16165": "Your transfer may be interrupted.[BR][S]Get a PRO account[\/S] for increased transfer quota.",
     "16166": "Plan",
     "16167": "You can also pay via the Google Play Store, Apple App Store, Microsoft Store or Android mobile carrier billing when using our [A]MEGA apps[\/A].",
-    "16168": "Saving settings...",
+    "16168": "Spara inst\u00e4llningar",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4063,6 +4063,7 @@
         "about-page-introduction": 12489,
         "additional-site-update-message": 15536,
         "purchase-processed-by-message": 16106,
-        "install-free-mega-app": 16107
+        "install-free-mega-app": 16107,
+        "storage_quota_header": 16119
     }
 }

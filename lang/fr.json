@@ -55,7 +55,7 @@
     "108": "Confirmation",
     "113": "Lien du fichier",
     "115": "Nom du fichier",
-    "120": "Votre t\u00e9l\u00e9chargement ne peut pas \u00eatre effectu\u00e9 parce qu'il exc\u00e9derait le quota de transfert gratuit disponible pour votre adresse IP.",
+    "120": "Votre t\u00e9l\u00e9chargement n'a pas pu continuer, car cela vous ferait d\u00e9passer la limite actuelle de transfert gratuit pour votre adresse IP.",
     "121": "La limite est dynamique et d\u00e9pend de la quantit\u00e9 de bande passante inutilis\u00e9e disponible.",
     "122": "Seuls les transferts effectu\u00e9s durant les cinq \u00e0 six derni\u00e8res heures comptent.",
     "127": "Pour votre confort, vos t\u00e9l\u00e9chargements en file d'attente seront conserv\u00e9s ainsi jusqu'\u00e0 ce que vous ayez suffisamment de bande passante disponible, puis reprendront automatiquement.",
@@ -3785,7 +3785,7 @@
     "16114": "Juridique",
     "16115": "Annuler le compte",
     "16116": "[S]Avertissement :[\/S] vous ne pourrez plus acc\u00e9der \u00e0 vos donn\u00e9es de compte, \u00e0 vos contacts MEGA ni \u00e0 vos conversations apr\u00e8s avoir confirm\u00e9 cette action.",
-    "16117": "Accomplissements",
+    "16117": "R\u00e9alisations",
     "16118": "Utilisation globale",
     "16125": "Quota utilis\u00e9 pour les derni\u00e8res 6 heures :",
     "16126": "Obtenir plus de quota de transfert",
@@ -3829,8 +3829,8 @@
     "16164": "Le quota de transfert disponible est limit\u00e9",
     "16165": "Votre transfert pourrait \u00eatre interrompu.[BR][S]Passez \u00e0 un compte PRO[\/S] et augmentez votre quota de transfert.",
     "16166": "Abonnement",
-    "16167": "You can also pay via the Google Play Store, Apple App Store, Microsoft Store or Android mobile carrier billing when using our [A]MEGA apps[\/A].",
-    "16168": "Saving settings...",
+    "16167": "Vous pouvez aussi payer par le biais des logith\u00e8ques Google Play Store, Apple App Store et Microsoft Store, ou par facturation de l'op\u00e9rateur mobile sur Android lorsque vous utilisez nos [A]applis MEGA[\/A].",
+    "16168": "Enregistrement des param\u00e8tres...",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4063,6 +4063,7 @@
         "about-page-introduction": 12489,
         "additional-site-update-message": 15536,
         "purchase-processed-by-message": 16106,
-        "install-free-mega-app": 16107
+        "install-free-mega-app": 16107,
+        "storage_quota_header": 16119
     }
 }

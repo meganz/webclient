@@ -842,6 +842,7 @@ function MegaData()
 
     this.onlineStatusEvent = function(u, status) {
         if (u && megaChatIsReady) {
+            console.error('onlineStatusEvent', u.u, status);
             var e = $('.ustatus.' + u.u);
             if (e.length > 0) {
                 $(e).removeClass('offline online busy away');
@@ -1594,9 +1595,10 @@ function MegaData()
         // status can be: "online"/"away"/"busy"/"offline"
         for (i in activeContacts) {
             if (activeContacts.hasOwnProperty(i)) {
-                if (megaChatIsReady) {
-                    var jId = megaChat.getJidFromNodeId(activeContacts[i].u);
-                    onlinestatus = M.onlineStatusClass(megaChat.karere.getPresence(jId));
+                if (megaChatIsReady && activeContacts[i].u) {
+                    onlinestatus = M.onlineStatusClass(
+                        activeContacts[i].presence ? activeContacts[i].presence : 'unavailable'
+                    );
                 }
                 else {
                     onlinestatus = [l[5926], 'offline'];

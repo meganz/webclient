@@ -11220,7 +11220,7 @@ function contactUI() {
 
         var onlinestatus = M.onlineStatusClass(
             megaChatIsReady &&
-            megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h))
+            M.u[u_h] ? M.u[u_h].presence : "unavailable"
         );
 
         $('.contact-top-details .nw-contact-block-avatar').empty().append( avatar.removeClass('avatar').addClass('square') );

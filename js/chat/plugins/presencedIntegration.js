@@ -9,7 +9,40 @@
 
 var PresencedIntegration = function(megaChat) {
     var self = this;
-    self.logger = MegaLogger.getLogger("presencedIntegration", {}, megaChat.logger);
+    var loggerOpts = {};
+    if (localStorage.presencedDebug) {
+        loggerOpts['minLogLevel'] = function() { return MegaLogger.LEVELS.DEBUG; };
+        loggerOpts['transport'] = function(level, args) {
+            var fn = "log";
+
+            if (level === MegaLogger.LEVELS.DEBUG) {
+                fn = "debug";
+            }
+            else if (level === MegaLogger.LEVELS.LOG) {
+                fn = "log";
+            }
+            else if (level === MegaLogger.LEVELS.INFO) {
+                fn = "info";
+            }
+            else if (level === MegaLogger.LEVELS.WARN) {
+                fn = "warn";
+            }
+            else if (level === MegaLogger.LEVELS.ERROR) {
+                fn = "error";
+            }
+            else if (level === MegaLogger.LEVELS.CRITICAL) {
+                fn = "error";
+            }
+
+            args.push("[" + fn + "]");
+            console.warn.apply(console, args);
+        };
+    }
+    else {
+        loggerOpts['minLogLevel'] = function() { return MegaLogger.LEVELS.ERROR; };
+    }
+
+    self.logger = MegaLogger.getLogger("presencedIntegration", loggerOpts, megaChat.logger);
 
     self.megaChat = megaChat;
 
@@ -78,9 +111,10 @@ PresencedIntegration.prototype.init = function() {
         !!RTC,
         false,
         function presencedIntegration_connectedcb(isConnected) {
-
+            self.logger.debug(isConnected ? "connected" : "disconnected");
         },
         function presencedIntegration_overridecb(presence, isWebrtcFlag) {
+            self.logger.debug("overridecb", presence, isWebrtcFlag);
             self._presence[u_handle] = presence;
             self._is_webrtc[u_handle] = isWebrtcFlag === PresencedIntegration.FLAGS.IS_WEBRTC;
 
@@ -147,6 +181,8 @@ PresencedIntegration.prototype.init = function() {
 PresencedIntegration.prototype._peerstatuscb = function(user_hash, presence, isWebrtcFlag) {
     var self = this;
 
+    self.logger.debug("peerstatuscb", user_hash, presence, isWebrtcFlag);
+
     isWebrtcFlag = isWebrtcFlag === PresencedIntegration.FLAGS.IS_WEBRTC;
     self._presence[user_hash] = presence;
     self._is_webrtc[user_hash] = isWebrtcFlag;
@@ -171,8 +207,6 @@ PresencedIntegration.prototype._peerstatuscb = function(user_hash, presence, isW
         }
 
         contact.presence = status;
-
-        M.onlineStatusEvent(contact, status);
     }
 
     $(self).trigger(
@@ -187,6 +221,8 @@ PresencedIntegration.prototype._peerstatuscb = function(user_hash, presence, isW
 
 PresencedIntegration.prototype.setPresence = function(presence) {
     var self = this;
+    self.logger.debug("setPresence", presence);
+
     if (presence === UserPresence.PRESENCE.ONLINE) {
         localStorage.removeItem("userPresenceIsOffline");
         localStorage.removeItem("megaChatPresence"); // legacy
@@ -244,6 +280,8 @@ PresencedIntegration.prototype.setPresence = function(presence) {
 };
 
 PresencedIntegration.prototype.addContact = function(u_h) {
+    this.logger.debug("addContact", u_h);
+
     if (
         this.userPresence.connectionRetryManager.getConnectionState()
             ===
@@ -254,6 +292,8 @@ PresencedIntegration.prototype.addContact = function(u_h) {
 };
 
 PresencedIntegration.prototype.removeContact = function(u_h) {
+    this.logger.debug("removeContact", u_h);
+
     if (
         this.userPresence.connectionRetryManager.getConnectionState()
         ===
@@ -268,6 +308,14 @@ PresencedIntegration.prototype.getPresence = function(u_h) {
     if (!u_h) {
         u_h = u_handle;
     }
+    this.logger.debug("getPresence", u_h, this._presence[u_h]);
     return this._presence[u_h];
 };
+
+PresencedIntegration.prototype.getPresenceAsText = function(u_h, pres) {
+    if (!pres) {
+        pres = this.getPresence(u_h);
+    }
+    return constStateToText(UserPresence.PRESENCE, pres);
+}
 

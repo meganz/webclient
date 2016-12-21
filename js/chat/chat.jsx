@@ -369,10 +369,21 @@ Chat.prototype.init = function() {
 
         // update M.u
         var contact = self.getContactFromJid(eventObject.getFromJid());
+
+        console.error(
+            "karere.onPresence",
+            contact.u,
+            megaChat.karere.getPresence(megaChat.getJidFromNodeId(contact.u))
+        );
+
         if (contact) {
-            if (!contact.presenceMtime || parseFloat(contact.presenceMtime) < eventObject.getDelay()) {
-                contact.presence = megaChat.karere.getPresence(megaChat.getJidFromNodeId(contact.u));
-                contact.presenceMtime = eventObject.getDelay();
+            var presencedPresence = self.plugins.presencedIntegration.getPresence(contact.u);
+
+            if (typeof presencedPresence === 'undefined') {
+                if (!contact.presenceMtime || parseFloat(contact.presenceMtime) < eventObject.getDelay()) {
+                    contact.presence = megaChat.karere.getPresence(megaChat.getJidFromNodeId(contact.u));
+                    contact.presenceMtime = eventObject.getDelay();
+                }
             }
         }
 
@@ -500,6 +511,7 @@ Chat.prototype.init = function() {
         // presenced integration
         var targetPresence = PresencedIntegration.cssClassToPresence(presence);
         if (targetPresence === UserPresence.PRESENCE.OFFLINE) {
+            self.userPresence.override
             self.userPresence.disconnect(true);
         }
         else {
@@ -667,12 +679,6 @@ Chat.prototype.init = function() {
             room.callSession.endCall();
         }
     });
-
-    self.karere.rebind("onPresence.maintainUI", function(e, presenceEventData) {
-        var contact = self.getContactFromJid(presenceEventData.getFromJid());
-        M.onlineStatusEvent(contact, presenceEventData.getShow());
-    });
-
 
 
     $(document).rebind('megaulcomplete.megaChat', function(e, ul_target, uploads) {

@@ -1284,6 +1284,9 @@ input.radioOn, input.radioOff {
     padding-right: 36px;
     padding-top: 6px;
 }
+.fm-dialog-footer .radio-txt {
+    padding-right: 0;
+}
 .radio-txt.small {
     font-size: 12px;
 }

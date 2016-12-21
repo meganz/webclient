@@ -57,18 +57,6 @@ var Karere = function(user_options) {
         if (self.getConnectionState() === Karere.CONNECTION_STATE.CONNECTED) {
             self.destroying = true;
 
-            var msg = $pres({
-                type: 'unavailable'
-            });
-
-
-
-            self.connection.send(msg);
-
-            self.connection.flush();
-
-            self.connection.sync = true;
-
             self.connection.disconnect();
 
             self.logger.warn("flushing out and disconnecting onbeforeunload");

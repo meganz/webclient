@@ -5158,6 +5158,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 /* PRO plan expired dialog */
 .astropay-payment-reminder .warning-popup-body {
     display: table;
+    position: relative;
 }
 .astropay-payment-reminder .left-block {
     display: table-cell;

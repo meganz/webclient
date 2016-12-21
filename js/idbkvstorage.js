@@ -102,6 +102,6 @@ IndexedDBKVStorage.prototype.eachPrefixItem = function __IDBKVEachItem(prefix, c
 // FIXME: check if this gets called for caches other than the ua attribCache
 // - if that is the case, also clear the underlying DB table
 IndexedDBKVStorage.prototype.destroy = function __IDBKVDestroy() {
-    this.memCache = Object.create(null);
+    this._memCache = Object.create(null);
 };
 makeObservable(IndexedDBKVStorage);

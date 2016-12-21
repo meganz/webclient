@@ -20702,6 +20702,7 @@ span.incoming-call-name {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
+    vertical-align: top;
 }
 .u-card-data .shared-folder-name {
     display: block;

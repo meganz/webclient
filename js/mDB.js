@@ -102,11 +102,11 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
             if (!fmdb.db) {
                 var todrop = [];
 
-                // enumerate databases and collect those not prefixed with fm_
+                // enumerate databases and collect those not prefixed with fm3_
                 // (which is the current format)
                 Dexie.getDatabaseNames(function(r) {
                     for (var i = r.length; i--;) {
-                        if (r[i].substr(0,4) != 'fm2_') {
+                        if (r[i].substr(0,4) != 'fm3_') {
                             todrop.push(r[i]);
                         }
                     }
@@ -118,7 +118,7 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
                     fmdb.drop(todrop, function() {
                         // start inter-tab heartbeat
                         // fmdb.beacon();
-                        fmdb.db = new Dexie('fm2_' + fmdb.name);
+                        fmdb.db = new Dexie('fm3_' + fmdb.name);
                         fmdb.db.version(1).stores(fmdb.schema);
                         fmdb.db.open().then(function(){
                             fmdb.get('_sn', function(r){

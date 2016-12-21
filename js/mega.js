@@ -6946,10 +6946,10 @@ function loadfm(force) {
                     ipc : '&p',         // incoming pending contact - id
                     ps  : '&h_p',       // pending share - handle/id
                     mcf : '&id',        // chats - id
+                    ua  : '&k',         // user attributes - key (maintained by IndexedBKVStorage)
                     _sn : '&i',         // sn - fixed index 1
 
-                    // channel 1: non-transactional, used by IndexedDBKVStorage
-                    attrib : '&k',        // user attribute cache - k
+                    // channel 1: non-transactional (maintained by IndexedDBKVStorage)
                     chatqueuedmsgs : '&k' // queued chat messages - k
                 }, { attrib : 1, chatqueuedmsgs : 1 });
 

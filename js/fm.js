@@ -13371,6 +13371,8 @@ function removeFromMultiInputDDL(dialog, item) {
                 $self.addClass('active');
 
                 menu = $('.nw-sorting-menu').removeClass('hidden');
+                menu.css('right', '-' + (menu.outerWidth() - 4) + 'px');
+
                 type = treePanelType();
 
                 if (type === 'settings') {

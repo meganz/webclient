@@ -466,9 +466,9 @@ function populate_l() {
             l[i] = (l[i] || '(translation-missing)');
         }
     }
-    l[0] = 'Mega Limited ' + new Date().getFullYear();
+    l[0] = 'MEGA ' + new Date().getFullYear();
     if ((lang === 'es') || (lang === 'pt') || (lang === 'sk')) {
-        l[0] = 'Mega Ltd.';
+        l[0] = 'MEGA';
     }
     l[1] = l[398];
     if (lang === 'en') {

@@ -934,7 +934,12 @@ function init_page() {
                 }
             }
         }
-        parsepage(pages['download'], 'download');
+        if (is_mobile) {
+            parsepage(pages['fm_mobile']);
+        }
+        else {
+            parsepage(pages['download']);
+        }
         dlinfo(dlid, dlkey, false);
         topmenuUI();
         mainScroll();
@@ -1035,7 +1040,10 @@ function init_page() {
             if (id) {
                 M.currentdirid = id;
             }
-            if (!m && $('#fmholder').html() == '') {
+            if (is_mobile) {
+                parsepage(pages['fm_mobile']);
+            }
+            else if (!is_mobile && $('#fmholder').html() === '') {
                 $('#fmholder').safeHTML(translate(pages['fm'].replace(/{staticpath}/g, staticpath)));
             }
 
@@ -1083,13 +1091,14 @@ function init_page() {
         $('#startholder').hide();
         if ($('#fmholder:visible').length == 0) {
             $('#fmholder').show();
-            if (fminitialized) {
+            if (fminitialized && !is_mobile) {
                 if (M.viewmode == 1) {
                     iconUI();
                 }
                 else {
                     gridUI();
                 }
+
                 treeUI();
                 if ($.transferHeader) {
                     $.transferHeader();

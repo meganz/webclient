@@ -58,16 +58,26 @@ if (typeof loadingInitDialog === 'undefined') {
     loadingInitDialog.progress = false;
     loadingInitDialog.active = false;
     loadingInitDialog.show = function() {
+        var $loadingSpinner = $('.loading-spinner');
+
+        // Folder link load
         if (pfid) {
-            $('.loading-spinner .step1').text(l[8584]);
-            $('.loading-spinner .step2').text(l[8585]);
-            $('.loading-spinner .step3').text(l[8586]);
+            $loadingSpinner.find('.step1').text(l[8584]);   // Requesting folder data
+            $loadingSpinner.find('.step2').text(l[8585]);   // Receiving folder data
+            $loadingSpinner.find('.step3').text(l[8586]);   // Decrypting folder data
         }
         else {
-            $('.loading-spinner .step1').text(l[8577]);
-            $('.loading-spinner .step2').text(l[8578]);
-            $('.loading-spinner .step3').text(l[8579]);
+            // Regular account load
+            $loadingSpinner.find('.step1').text(l[8577]);   // Requesting account data
+            $loadingSpinner.find('.step2').text(l[8578]);   // Receiving account data
+            $loadingSpinner.find('.step3').text(l[8579]);   // Decrypting
         }
+
+        // On mobile, due to reduced screen size we just want a simpler single step with the text 'Loading'
+        if (is_mobile) {
+            $loadingSpinner.find('.step1').text(l[1456]);
+        }
+
         this.hide();
         $('.light-overlay').removeClass('hidden');
         $('body').addClass('loading');
@@ -83,8 +93,12 @@ if (typeof loadingInitDialog === 'undefined') {
             return;
         }
         if (this.progress === false) {
-            $('.loading-info li.loading').addClass('loaded').removeClass('loading');
-            $('.loading-info li.step2').addClass('loading');
+
+            // Don't show step 2 loading if on mobile
+            if (!is_mobile) {
+                $('.loading-info li.loading').addClass('loaded').removeClass('loading');
+                $('.loading-info li.step2').addClass('loading');
+            }
             $('.loader-progressbar').addClass('active');
 
             // Load performance report
@@ -92,7 +106,9 @@ if (typeof loadingInitDialog === 'undefined') {
             mega.loadReport.stepTimeStamp = Date.now();
 
             // If the PSA is visible reposition the account loading bar
-            psa.repositionAccountLoadingBar();
+            if (!is_mobile) {
+                psa.repositionAccountLoadingBar();
+            }
         }
         if (progress) {
             $('.loader-percents').width(progress + '%');
@@ -101,8 +117,12 @@ if (typeof loadingInitDialog === 'undefined') {
     };
     loadingInitDialog.step3 = function() {
         if (this.progress) {
-            $('.loading-info li.loading').addClass('loaded').removeClass('loading');
-            $('.loading-info li.step3').addClass('loading');
+
+            // Don't show step 3 loading if on mobile
+            if (!is_mobile) {
+                $('.loading-info li.loading').addClass('loaded').removeClass('loading');
+                $('.loading-info li.step3').addClass('loading');
+            }
             $('.loader-progressbar').removeClass('active').css('bottom', 0);
         }
     };
@@ -1343,7 +1363,7 @@ function MegaData()
              */
         }
 
-        if ((id !== 'notifications') && !$('.fm-main.notifications').hasClass('hidden')) {
+        if (!is_mobile && (id !== 'notifications') && !$('.fm-main.notifications').hasClass('hidden')) {
             notificationsUI(1);
         }
 
@@ -1437,7 +1457,13 @@ function MegaData()
         else if (id === undefined && folderlink) {
             // Error reading shared folder link! (Eg, server gave a -11 (EACCESS) error)
             // Force cleaning the current cloud contents and showing an empty msg
-            M.renderMain();
+            if (!is_mobile) {
+                    M.renderMain();
+                }
+                else {
+                    // Trigger rendering of mobile file manager
+                    mobilefm.renderLayout();
+                }
         }
         else if (id && (id.substr(0, 7) !== 'account')
                 && (id.substr(0, 9) !== 'dashboard')
@@ -1509,7 +1535,13 @@ function MegaData()
                 }
             }
 
-            M.renderMain();
+            if (!is_mobile) {
+                    M.renderMain();
+                }
+                else {
+                    // Trigger rendering of mobile file manager
+                    mobilefm.renderLayout();
+                }
 
             if (fminitialized) {
                 var currentdirid = M.currentdirid;
@@ -1521,15 +1553,17 @@ function MegaData()
                     }
                 }
 
-                if ($('#treea_' + currentdirid).length === 0) {
-                    var n = M.d[currentdirid];
-                    if (n && n.p) {
-                        treeUIopen(n.p, false, true);
-                    }
-                }
-                treeUIopen(currentdirid, currentdirid === 'contacts');
+                if (!is_mobile) {
+                        if ($('#treea_' + currentdirid).length === 0) {
+                            var n = M.d[currentdirid];
+                            if (n && n.p) {
+                                treeUIopen(n.p, false, true);
+                            }
+                        }
+                        treeUIopen(currentdirid, currentdirid === 'contacts');
 
-                $('#treea_' + currentdirid).addClass('opened');
+                        $('#treea_' + currentdirid).addClass('opened');
+                    }
             }
             if (d) {
                 console.timeEnd('time for rendering');
@@ -1562,10 +1596,12 @@ function MegaData()
         catch (ex) {
             console.error(ex);
         }
-        searchPath();
+        if (!is_mobile) {
+                searchPath();
 
-        var sortMenu = new mega.SortMenu();
-        sortMenu.treeSearchUI();
+                var sortMenu = new mega.SortMenu();
+                sortMenu.treeSearchUI();
+            }
 
         $(document).trigger('MegaOpenFolder');
     };
@@ -2537,6 +2573,12 @@ function MegaData()
 
         // $(window).trigger("megaNodeAdded", [n]);
     };
+
+    if (is_mobile) {
+        this.addNode = function() {
+            return false;
+        };
+    }
 
     this.delNode = function(h, ignoreDB) {
         function ds(h) {
@@ -5835,10 +5877,17 @@ function renderfm() {
         console.time('renderfm');
     }
 
-    initUI();
+    if (!is_mobile) {
+        initUI();
+    }
+
     M.sortByName();
-    M.renderTree();
-    M.renderPath();
+
+    if (!is_mobile) {
+        M.renderTree();
+        M.renderPath();
+    }
+
     var c = $('#treesub_' + M.RootID).attr('class');
     if (c && c.indexOf('opened') < 0) {
         $('.fm-tree-header.cloud-drive-item').addClass('opened');
@@ -7220,27 +7269,40 @@ function fetchfm(sn) {
     // before showing the filemanager
     initialscfetch = true;
 
-    // activate/prefetch attribute cache at this early stage
-    attribCache.prefillMemCache(fmdb).then(function(){
+    if (!is_mobile) {
+        // activate/prefetch attribute cache at this early stage
+        attribCache.prefillMemCache(fmdb).then(function() {
 
-        if (sn) {
-            currsn = sn;
-            dbfetchfm();
-        }
-        else {
-            // no cache requested or available - get from API
-            fetcher = new TreeFetcher();
-            fetcher.fetch();
-
-            mega.loadReport.mode = 2;
-
-            if (!folderlink) {
-                // dbToNet holds the time wasted trying to read local DB, and having found we have to query the server.
-                mega.loadReport.dbToNet       = Date.now() - mega.loadReport.startTime;
-                mega.loadReport.stepTimeStamp = Date.now();
+            if (sn) {
+                currsn = sn;
+                dbfetchfm();
             }
-        }
-    });
+            else {
+                // no cache requested or available - get from API
+                loadFromApi();
+            }
+        });
+    }
+    else {
+        loadFromApi();
+    }
+}
+
+/**
+ * No cache requested or available - get from API
+ */
+function loadFromApi() {
+
+    fetcher = new TreeFetcher();
+    fetcher.fetch();
+
+    mega.loadReport.mode = 2;
+
+    if (!folderlink) {
+        // dbToNet holds the time wasted trying to read local DB, and having found we have to query the server.
+        mega.loadReport.dbToNet       = Date.now() - mega.loadReport.startTime;
+        mega.loadReport.stepTimeStamp = Date.now();
+    }
 }
 
 // to reduce peak mem usage, we fetch f in 64 small chunks
@@ -8521,7 +8583,7 @@ function loadfm_done(mDBload) {
     }
 
     mega.config.ready(function() {
-        var hideLoadingDialog = !CMS.isLoading();
+        var hideLoadingDialog = (!is_mobile && !CMS.isLoading());
 
         if ((location.host === 'mega.nz' || !megaChatIsDisabled) && !is_mobile) {
 
@@ -8579,7 +8641,7 @@ function loadfm_done(mDBload) {
         }
 
         // -0x800e0fff indicates a call to loadfm() when it was already loaded
-        if (mDBload !== -0x800e0fff) {
+        if (!is_mobile && mDBload !== -0x800e0fff) {
             Soon(function _initialNotify() {
                 // After the first SC request all subsequent requests can generate notifications
                 notify.initialLoadComplete = true;
@@ -9084,3 +9146,441 @@ Object.defineProperty(mega, 'achievem', {
     cloud: ['ENABLED', 'NEWSHARE', 'DELSHARE', 'NEWFILES'],
     contacts: ['ENABLED', 'FCRIN', 'FCRACPT', 'FCRDEL']
 });
+
+// jscs:disable
+// jshint ignore:start
+var thumbnails = [];
+var thumbnailblobs = [];
+var th_requested = [];
+var fa_duplicates = {};
+var fa_reqcnt = 0;
+var fa_addcnt = 8;
+var fa_tnwait = 0;
+
+function fm_thumbnails()
+{
+    var treq = {}, a = 0, max = Math.max($.rmItemsInView || 1, 71) + fa_addcnt, u = max - Math.floor(max / 3), y;
+    if (!fa_reqcnt)
+        fa_tnwait = y;
+    if (d)
+        console.time('fm_thumbnails');
+    if (M.viewmode || M.chat)
+    {
+        for (var i in M.v)
+        {
+            var n = M.v[i];
+            if (n && n.fa && String(n.fa).indexOf(':0') > 0)
+            {
+                if (fa_tnwait == n.h && n.seen)
+                    fa_tnwait = 0;
+                // if (!fa_tnwait && !thumbnails[n.h] && !th_requested[n.h])
+                if (n.seen && !thumbnails[n.h] && !th_requested[n.h])
+                {
+                    if (typeof fa_duplicates[n.fa] == 'undefined')
+                        fa_duplicates[n.fa] = 0;
+                    else
+                        fa_duplicates[n.fa] = 1;
+                    treq[n.h] =
+                        {
+                            fa: n.fa,
+                            k: n.k
+                        };
+                    th_requested[n.h] = 1;
+
+                    if (u == a)
+                        y = n.h;
+                    if (++a > max)
+                    {
+                        if (!n.seen)
+                            break;
+                        y = n.h;
+                    }
+                }
+                else if (n.seen && n.seen !== 2)
+                {
+                    fm_thumbnail_render(n);
+                }
+            }
+        }
+        if (y)
+            fa_tnwait = y;
+        if (a > 0)
+        {
+            fa_reqcnt += a;
+            if (d)
+                console.log('Requesting %d thumbs (%d loaded)', a, fa_reqcnt);
+
+            var rt = Date.now();
+            var cdid = M.currentdirid;
+            api_getfileattr(treq, 0, function(ctx, node, uint8arr)
+            {
+                if (uint8arr === 0xDEAD)
+                {
+                    if (d)
+                        console.log('Aborted thumbnail retrieval for ' + node);
+                    delete th_requested[node];
+                    return;
+                }
+                if (rt)
+                {
+                    if (((Date.now() - rt) > 4000) && ((fa_addcnt += u) > 300))
+                        fa_addcnt = 301;
+                    rt = 0;
+                }
+                try {
+                    var blob = new Blob([uint8arr], {type: 'image/jpeg'});
+                } catch (err) {}
+                if (blob.size < 25)
+                    blob = new Blob([uint8arr.buffer]);
+                // thumbnailblobs[node] = blob;
+                thumbnails[node] = myURL.createObjectURL(blob);
+
+                var targetNode = M.getNodeByHandle(node);
+
+                if (targetNode && targetNode.seen && M.currentdirid === cdid) {
+                    fm_thumbnail_render(targetNode);
+                }
+
+                // deduplicate in view when there is a duplicate fa:
+                if (targetNode && fa_duplicates[targetNode.fa] > 0)
+                {
+                    for (var i in M.v)
+                    {
+                        if (M.v[i].h !== node && M.v[i].fa === targetNode.fa && !thumbnails[M.v[i].h])
+                        {
+                            thumbnails[M.v[i].h] = thumbnails[node];
+                            if (M.v[i].seen && M.currentdirid === cdid)
+                                fm_thumbnail_render(M.v[i]);
+                        }
+                    }
+                }
+            });
+        }
+    }
+    if (d)
+        console.timeEnd('fm_thumbnails');
+}
+
+function fm_thumbnail_render(n) {
+    if (n && thumbnails[n.h]) {
+        var imgNode = document.getElementById(n.h);
+
+        if (imgNode && (imgNode = imgNode.querySelector('img'))) {
+            n.seen = 2;
+            imgNode.setAttribute('src', thumbnails[n.h]);
+            imgNode.parentNode.classList.add('thumb');
+        }
+    }
+}
+// jscs:enable
+// jshint ignore:end
+
+/**
+ * Code to trigger the mobile file manager download overlay and related behaviour
+ */
+var mobileDownload = {
+
+    /** Supported max file size of 100 MB */
+    maxFileSize: 100 * (1024 * 1024),
+
+    /** Supported file types for download on mobile */
+    supportedFileTypes: {
+        docx: 'word',
+        jpeg: 'image',
+        jpg: 'image',
+        mp3: 'audio',
+        mp4: 'video',
+        pdf: 'pdf',
+        png: 'image',
+        xlsx: 'word'
+    },
+
+    /** Download start time in milliseconds */
+    startTime: null,
+
+    /** jQuery selector for the download overlay */
+    $overlay: null,
+
+    /**
+     * Initialise the overlay
+     * @param {String} nodeHandle A public or regular node handle
+     */
+    showOverlay: function(nodeHandle) {
+
+        // Store the selector as it is re-used
+        this.$overlay = $('#mobile-ui-main');
+
+        // Get initial overlay details
+        var node = M.d[nodeHandle];
+        var fileName = node.name;
+        var fileSizeBytes = node.s;
+        var fileSize = numOfBytes(fileSizeBytes);
+        var fileSizeFormatted = fileSize.size + ' ' + fileSize.unit;
+        var fileIconName = fileIcon(node);
+        var fileIconPath = 'images/mobile/extensions/' + fileIconName + '.png';
+
+        // Set file name, size and image
+        this.$overlay.find('.filename').text(fileName);
+        this.$overlay.find('.filesize').text(fileSizeFormatted);
+        this.$overlay.find('.filetype-img').attr('src', fileIconPath);
+
+        // Initialise overlay buttons
+        this.initBrowserFileDownloadButton(nodeHandle);
+        this.initAppFileDownloadButton(nodeHandle);
+        this.initOverlayCloseButton();
+
+        // Change depending on platform and file size/type
+        this.setMobileAppInfo();
+        this.adjustMaxFileSize();
+        this.checkSupportedFile(node);
+
+        // Disable scrolling of the file manager in the background to fix a bug on iOS Safari
+        $('.mobile.fm-block').addClass('disable-scroll');
+
+        // Show the overlay
+        this.$overlay.removeClass('hidden').addClass('overlay');
+    },
+
+    /**
+     * Initialise the Open in Browser button on the file download overlay
+     * @param {String} nodeHandle The node handle for this file
+     */
+    initBrowserFileDownloadButton: function(nodeHandle) {
+
+        this.$overlay.find('.first.dl-browser').off('tap').on('tap', function() {
+
+            // Start the download
+            mobileDownload.startFileDownload(nodeHandle);
+
+            // Prevent default anchor link behaviour
+            return false;
+        });
+    },
+
+    /**
+     * Initialise the Open in Mega App button on the file download overlay
+     * @param {String} nodeHandle The node handle for this file
+     */
+    initAppFileDownloadButton: function(nodeHandle) {
+
+        this.$overlay.find('.second.dl-megaapp').off('tap').on('tap', function() {
+
+            // Start the download
+            mega.utils.redirectToApp($(this));  // ToDo: make the app start the download by node handle directly
+
+            // Prevent default anchor link behaviour
+            return false;
+        });
+    },
+
+    /**
+     * Initialises the close button on the overlay with download button options and also the download progress overlay
+     */
+    initOverlayCloseButton: function() {
+
+        var $closeButton = this.$overlay.find('.fm-dialog-close');
+
+        // Show close button for folder links
+        $closeButton.removeClass('hidden');
+
+        // Add tap handler
+        $closeButton.off('tap').on('tap', function() {
+
+            // Hide overlay with download button options
+            mobileDownload.$overlay.addClass('hidden');
+
+            // Hide downloading progress overlay
+            $('body').removeClass('downloading');
+
+            // Re-show the file manager and re-enable scrolling
+            $('.mobile.fm-block').removeClass('hidden disable-scroll');
+        });
+    },
+
+    /**
+     * Start the file download
+     * @param {String} nodeHandle The node handle for this file
+     */
+    startFileDownload: function(nodeHandle) {
+
+        // Show downloading overlay
+        $('body').addClass('downloading');
+
+        // Reset state from past downloads
+        this.$overlay.find('.download-progress').removeClass('complete');
+        this.$overlay.find('.download-percents').text('');
+        this.$overlay.find('.download-speed').text('');
+        this.$overlay.find('.download-progress span').text(l[1624] + '...');  // Downloading...
+        this.$overlay.find('.download-progress .bar').width('0%');
+
+        // Change message to 'Did you know that you can download the entire folder at once...'
+        this.$overlay.find('.file-manager-download-message').removeClass('hidden');
+
+        // Set the start time
+        this.startTime = new Date().getTime();
+
+        // Start download and show progress
+        mega.utils.gfsfetch(nodeHandle, 0, -1, this.showDownloadProgress).always(function(data) {
+
+            mobileDownload.showDownloadComplete(data, nodeHandle);
+        });
+    },
+
+    /**
+     * Download progress handler
+     * @param {Number} percentComplete The number representing the percentage complete e.g. 49.23, 51.5 etc
+     * @param {Number} bytesLoaded The number of bytes loaded so far
+     * @param {Number} bytesTotal The total number of bytes in the file
+     */
+    showDownloadProgress: function(percentComplete, bytesLoaded, bytesTotal) {
+
+        var $downloadButtonText = mobileDownload.$overlay.find('.download-progress span');
+        var $downloadProgressBar = mobileDownload.$overlay.find('.download-progress .bar');
+        var $downloadPercent = mobileDownload.$overlay.find('.download-percents');
+        var $downloadSpeed = mobileDownload.$overlay.find('.download-speed');
+
+        // Calculate the download speed
+        var percentCompleteRounded = Math.round(percentComplete);
+        var currentTime = new Date().getTime();
+        var secondsElapsed = (currentTime - mobileDownload.startTime) / 1000;
+        var bytesPerSecond = (secondsElapsed) ? (bytesLoaded / secondsElapsed) : 0;
+        var speed = numOfBytes(bytesPerSecond);
+        var speedText = speed.size + speed.unit + '/s';
+
+        // Display the download progress and speed
+        $downloadPercent.text(percentCompleteRounded + '%');
+        $downloadProgressBar.width(percentComplete + '%');
+        $downloadSpeed.text(speedText);
+
+        // If the download is complete e.g. 99/100%, change button text to Decrypting... which can take some time
+        if (percentComplete >= 99) {
+            $downloadButtonText.text(l[8579] + '...');
+        }
+    },
+
+    /**
+     * Download complete handler, activate the Open File button and let the user download the file
+     * @param {Object} data The download data
+     * @param {String} nodeHandle The node handle for this file
+     */
+    showDownloadComplete: function(data, nodeHandle) {
+
+        var $downloadButton = this.$overlay.find('.download-progress');
+        var $downloadButtonText = this.$overlay.find('.download-progress span');
+        var $downloadPercent = this.$overlay.find('.download-percents');
+        var $downloadSpeed = this.$overlay.find('.download-speed');
+
+        // Change button text to full white and hide the download percentage and speed
+        $downloadButton.addClass('complete');
+        $downloadPercent.text('');
+        $downloadSpeed.text('');
+        $downloadButtonText.text(l[8949]);  // Open File
+
+        // Make download button clickable
+        $downloadButton.off('tap').on('tap', function() {
+
+            // Get the file's mime type
+            var node = M.d[nodeHandle];
+            var fileName = node.name;
+            var mimeType = filemime(fileName);
+
+            // Create object URL to download the file to the client
+            location.href = mObjectURL([data.buffer], mimeType);
+        });
+    },
+
+    /**
+     * Change the max file size supported for various platforms based on device testing
+     */
+    adjustMaxFileSize: function() {
+
+        // If Chrome or Firefox on iOS, reduce the size to 1.3 MB
+        if ((navigator.userAgent.match(/CriOS/i)) || (navigator.userAgent.match(/FxiOS/i))) {
+            this.maxFileSize = 1.3 * (1024 * 1024);
+        }
+    },
+
+    /**
+     * Checks if the file download can be performed in the browser or shows an error overlay
+     * @param {Object} node The file node information
+     */
+    checkSupportedFile: function(node) {
+
+        var $openInBrowserButton = this.$overlay.find('.first.dl-browser');
+        var $fileTypeUnsupportedMessage = this.$overlay.find('.file-unsupported');
+        var $fileSizeUnsupportedMessage = this.$overlay.find('.file-too-large');
+
+        // Get the name, size, extension and whether supported
+        var fileName = node.name;
+        var fileSize = node.s;
+        var fileExtension = fileext(fileName);
+        var fileExtensionIsSupported = this.supportedFileTypes[fileExtension];
+
+        // Check if the download is supported
+        if ((fileSize > this.maxFileSize) || !fileExtensionIsSupported) {
+
+            // Show an error overlay
+            $('body').addClass('wrong-file');
+
+            // Remove the tap/click handler and show as greyed out
+            $openInBrowserButton.off('tap').addClass('disabled');
+
+            // Change error message
+            if (!fileExtensionIsSupported) {
+                $fileTypeUnsupportedMessage.removeClass('hidden');
+            }
+            else {
+                $fileSizeUnsupportedMessage.removeClass('hidden');
+            }
+        }
+    },
+
+    /**
+     * Gets the app store link based on the user agent
+     * @returns {String} Returns the link to the relevant app store for the user's platform
+     */
+    getStoreLink: function() {
+
+        switch (ua.details.os) {
+            case 'iPad':
+            case 'iPhone':
+                return 'https://itunes.apple.com/app/mega/id706857885';
+
+            case 'Windows Phone':
+                return 'zune://navigate/?phoneappID=1b70a4ef-8b9c-4058-adca-3b9ac8cc194a';
+
+            case 'Android':
+                return 'https://play.google.com/store/apps/details?id=mega.privacy.android.app' +
+                       '&referrer=meganzindexandroid';
+        }
+    },
+
+    /**
+     * Changes the footer image and text depending on what platform they are on
+     */
+    setMobileAppInfo: function() {
+
+        var $downloadOnAppStoreButton = $('.mobile.download-app');
+        var $appInfoBlock = $('.app-info-block');
+        var $openInBrowserButton = $('.mobile.dl-browser');
+
+        // Change the link
+        $downloadOnAppStoreButton.attr('href', this.getStoreLink());
+
+        switch (ua.details.os) {
+            case 'iPad':
+            case 'iPhone':
+                $appInfoBlock.addClass('ios');
+                break;
+
+            case 'Windows Phone':
+                $appInfoBlock.addClass('wp');
+                $openInBrowserButton.off('tap').addClass('disabled');
+                break;
+
+            case 'Android':
+                $appInfoBlock.addClass('android');
+                break;
+        }
+    }
+};

@@ -380,7 +380,7 @@ def reduce_validator(file_line_mapping, **extra):
         an integer containing the number of failed rules.
     """
 
-    exclude = ['vendor', 'asm', 'sjcl']
+    exclude = ['vendor', 'asm', 'sjcl', 'dont-deploy']
     special_chars_exclude = ['secureboot']
     logging.info('Analyzing modified files ...')
     result = ['\nValidator output:\n=================']

@@ -602,6 +602,7 @@ function populate_l() {
     l[12489] = l[12489].replace('[I]', '<i>').replace('[/I]', '</i>').replace('[I]', '<i>').replace('[/I]', '</i>');
     l[15536] = l[15536].replace('[B]', '<b>').replace('[/B]', '</b>');
     l[16106] = l[16106].replace('[B]', '<b>').replace('[/B]', '</b>');
+    l[16107] = l[16107].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[16116] = l[16116].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[16119] = l[16119].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[16120] = l[16120].replace('[S]', '<span>').replace('[/S]', '</span>');
@@ -3423,15 +3424,18 @@ mega.utils.sortObjFn = function(key, order) {
             }
         }
         else return 0;
-    }
+    };
 };
 
 /**
  * Promise-based XHR request
  * @param {Mixed} aURLOrOptions URL or options
- * @param {Mixed} aData         data to send, optional
+ * @param {Mixed} aData Data to send, optional
+ * @param {Function} progressCallback An optional progress callback which passes the percent complete e.g. 49.23 as the
+ *                                    first param, the bytes loaded as the second param and the total bytes as the
+ *                                    third param.
  */
-mega.utils.xhr = function megaUtilsXHR(aURLOrOptions, aData) {
+mega.utils.xhr = function megaUtilsXHR(aURLOrOptions, aData, progressCallback) {
     /* jshint -W074 */
     var xhr;
     var url;
@@ -3466,6 +3470,22 @@ mega.utils.xhr = function megaUtilsXHR(aURLOrOptions, aData) {
             promise.reject(ev);
         }
     };
+
+    // If the calling function requests download progress, add progress handler
+    if (typeof progressCallback === 'function') {
+        xhr.addEventListener('progress', function(event) {
+            if (event.lengthComputable) {
+
+                // Calculate percentage downloaded e.g. 49.23
+                var percentComplete = ((event.loaded / event.total) * 100);
+                var bytesLoaded = event.loaded;
+                var bytesTotal = event.total;
+
+                // Pass the percent complete to the callback function
+                progressCallback(percentComplete, bytesLoaded, bytesTotal);
+            }
+        }, false);
+    }
 
     try {
         if (d) {
@@ -3948,9 +3968,10 @@ mega.utils.vtol = function megaUtilsVTOL(version, hex) {
  * @param {String|Object} aData        ufs-node's handle or public link
  * @param {Number}        aStartOffset offset to start retrieveing data from
  * @param {Number}        aEndOffset   retrieve data until this offset
+ * @param {Function} progressCallback A callback function which is called with the percent complete
  * @returns {MegaPromise}
  */
-mega.utils.gfsfetch = function(aData, aStartOffset, aEndOffset) {
+mega.utils.gfsfetch = function(aData, aStartOffset, aEndOffset, progressCallback) {
     var promise = new MegaPromise();
 
     var fetcher = function(data) {
@@ -3974,11 +3995,15 @@ mega.utils.gfsfetch = function(aData, aStartOffset, aEndOffset) {
             aStartOffset -= byteOffset;
         }
 
-        mega.utils.xhr({
-            method: 'POST',
-            type: 'arraybuffer',
-            url: data.g + '/' + aStartOffset + '-' + (aEndOffset - 1)
-        }).done(function(ev, response) {
+        mega.utils.xhr(
+            {
+                method: 'POST',
+                type: 'arraybuffer',
+                url: data.g + '/' + aStartOffset + '-' + (aEndOffset - 1)
+            },
+            null,
+            progressCallback
+        ).done(function(ev, response) {
 
             data.macs = [];
             data.writer = [];
@@ -4056,7 +4081,7 @@ mega.utils.gfsfetch = function(aData, aStartOffset, aEndOffset) {
 
             if (!key) {
                 req.n = handle;
-                key = M.getNodeByHandle(handle).key;
+                key = M.getNodeByHandle(handle).k;
             }
             else {
                 req.p = handle;
@@ -4066,7 +4091,7 @@ mega.utils.gfsfetch = function(aData, aStartOffset, aEndOffset) {
                 promise.reject(EKEY);
             }
             else {
-                api_req(req, { callback: callback });
+                api_req(req, { callback: callback }, pfid ? 1 : 0);
             }
         }
     }
@@ -5240,6 +5265,84 @@ function getGatewayName(gatewayId, gatewayOpt) {
         displayName: 'Unknown'
     };
 }
+
+/**
+ * Redirects to the mobile app
+ * @param {Object} $selector The jQuery selector for the button
+ */
+mega.utils.redirectToApp = function($selector) {
+
+    if (is_ios) {
+        // Based off https://github.com/prabeengiri/DeepLinkingToNativeApp/
+        var ns = '.ios ';
+        var appLink = "mega://" + location.hash;
+        var events = ["pagehide", "blur", "beforeunload"];
+        var timeout = null;
+
+        var preventDialog = function(e) {
+            clearTimeout(timeout);
+            timeout = null;
+            $(window).unbind(events.join(ns) + ns);
+        };
+
+        var redirectToStore = function() {
+            window.top.location = getStoreLink();
+        };
+
+        var redirect = function() {
+            var ms = 500;
+
+            preventDialog();
+            $(window).bind(events.join(ns) + ns, preventDialog);
+
+            window.location = appLink;
+
+            // Starting with iOS 9.x, there will be a confirmation dialog asking whether we want to
+            // open the app, which turns the setTimeout trick useless because no page unloading is
+            // notified and users redirected to the app-store regardless if the app is installed.
+            // Hence, as a mean to not remove the redirection we'll increase the timeout value, so
+            // that users with the app installed will have a higher chance of confirming the dialog.
+            // If past that time they didn't, we'll redirect them anyhow which isn't ideal but
+            // otherwise users will the app NOT installed might don't know where the app is,
+            // at least if they disabled the smart-app-banner...
+            // NB: Chrome (CriOS) is not affected.
+            if (is_ios > 8 && ua.details.brand !== 'CriOS') {
+                ms = 4100;
+            }
+
+            timeout = setTimeout(redirectToStore, ms);
+        };
+
+        Soon(function() {
+            // If user navigates back to browser and clicks the button,
+            // try redirecting again.
+            $selector.rebind('click', function(e) {
+                e.preventDefault();
+                redirect();
+                return false;
+            });
+        });
+        redirect();
+    }
+    else {
+        switch (ua.details.os) {
+            case 'Windows Phone':
+                window.location = "mega://" + location.hash.substr(1);
+                break;
+
+            case 'Android':
+                var intent = 'intent://' + location.hash
+                    + '/#Intent;scheme=mega;package=mega.privacy.android.app;end';
+                document.location = intent;
+                break;
+
+            default:
+                alert('Unknown device.');
+        }
+    }
+
+    return false;
+};
 
 /*
  * Alert about 110% zoom level in Chrome/Chromium

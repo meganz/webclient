@@ -8644,7 +8644,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 .fm-dialog.copy-dialog.arrange-to-back, .fm-dialog.move-dialog.arrange-to-back {
     z-index: 900;
 }
-.arrange-to-front, .context-menu.arrange-to-front {
+.arrange-to-front, .dropdown.context.arrange-to-front {
     z-index: 1300;
 }
 .fm-dialog.download-dialog {

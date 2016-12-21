@@ -77,7 +77,7 @@ var alarm = {
                 // Otherwise show the popup
                 $dialog.removeClass('hidden');
                 $container.addClass('active');
-                topPopupAlign($container, dialog, 40);
+                topPopupAlign($container, $dialog, 40);
             }
         });
     },

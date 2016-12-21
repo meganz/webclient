@@ -15,29 +15,29 @@ var alarm = {
 
     /**
      * Shows the warning popup
-     * @param {Object} $container The dialog's container
+     * @param {Object} $button Button which allows to open dialog
      * @param {Object} $dialog The dialog
      */
-    showWarningPopup: function($container, $dialog) {
+    showWarningPopup: function($button, $dialog) {
 
         // If permanently hidden, make sure it stays hidden
         if (alarm.hidden === 2) {
-            $container.addClass('hidden').removeClass('active');
+            $button.addClass('hidden').removeClass('active');
             $dialog.addClass('hidden');
         }
 
         // If they have seen it already, we still want to let them open the dialog
         // So just show the warning icon and they can click to re-show the dialog if they want
         else if (alarm.hidden === 1) {
-            $container.removeClass('hidden active');
+            $button.removeClass('hidden active');
             $dialog.addClass('hidden');
         }
 
         // Otherwise auto show the dialog and warning icon
         else {
-            $container.removeClass('hidden').addClass('active');
+            $button.removeClass('hidden').addClass('active');
             $dialog.removeClass('hidden');
-            topPopupAlign($container, $dialog, 40);
+            topPopupAlign($button, $dialog, 40);
         }
     },
 
@@ -46,29 +46,29 @@ var alarm = {
      */
     hideAllWarningPopups: function() {
 
-        var $containers = $('.top-icon.warning');
+        var $buttons = $('.top-icon.warning');
         var $dialogs = $('.top-warning-popup');
 
-        $containers.addClass('hidden').removeClass('active');
+        $buttons.addClass('hidden').removeClass('active');
         $dialogs.addClass('hidden');
     },
 
     /**
      * Adds a click event on the warning icon to hide and show the dialog
-     * @param {Object} $container The dialog's container
+     * @param {Object} $button Button which allows to open dialog
      * @param {Object} $dialog The dialog
      */
-    initWarningIconButton: function($container, $dialog) {
+    initWarningIconButton: function($button, $dialog) {
 
         // On warning icon click
-        $container.rebind('click', function() {
+        $button.rebind('click', function() {
 
             // If the popup is currently visible
             if (!$dialog.hasClass('hidden')) {
 
                 // Hide the popup
                 $dialog.addClass('hidden');
-                $container.removeClass('active');
+                $button.removeClass('active');
 
                 // Set flag so it doesn't auto show each time
                 alarm.hidden = 1;
@@ -76,8 +76,8 @@ var alarm = {
             else {
                 // Otherwise show the popup
                 $dialog.removeClass('hidden');
-                $container.addClass('active');
-                topPopupAlign($container, $dialog, 40);
+                $button.addClass('active');
+                topPopupAlign($button, $dialog, 40);
             }
         });
     },
@@ -94,7 +94,7 @@ var alarm = {
         render: function() {
 
             // Cache lookups
-            var $container = $('.top-icon.warning.over-quota');
+            var $button = $('.top-icon.warning.over-quota');
             var $dialog = $('.top-warning-popup.over-quota');
 
             // Add button click handler
@@ -102,8 +102,8 @@ var alarm = {
 
             // Hide other dialogs that may be open and make the icon clickable
             alarm.hideAllWarningPopups();
-            alarm.initWarningIconButton($container, $dialog);
-            alarm.showWarningPopup($container, $dialog);
+            alarm.initWarningIconButton($button, $dialog);
+            alarm.showWarningPopup($button, $dialog);
         },
 
         /**
@@ -136,23 +136,23 @@ var alarm = {
         render: function() {
 
             // Cache lookups
-            var $container = $('.top-icon.warning.ephemeral-session');
+            var $button = $('.top-icon.warning.ephemeral-session');
             var $dialog = $('.top-warning-popup.ephemeral-session');
 
             // Add button click handler
-            this.initRegisterButton($container, $dialog);
+            this.initRegisterButton($button, $dialog);
 
             // Hide other dialogs that may be open and make the icon clickable
             alarm.hideAllWarningPopups();
-            alarm.initWarningIconButton($container, $dialog);
-            alarm.showWarningPopup($container, $dialog);
+            alarm.initWarningIconButton($button, $dialog);
+            alarm.showWarningPopup($button, $dialog);
         },
 
         /**
          * Initialises the click handler for the Choose button
          * @param {Object} $dialog The dialog
          */
-        initRegisterButton: function($container, $dialog) {
+        initRegisterButton: function($button, $dialog) {
 
             // Redirect to register signup page on button click
             $dialog.find('.warning-button').click(function() {
@@ -167,7 +167,7 @@ var alarm = {
 
                 // Hide the dialog and go to register page
                 $dialog.addClass('hidden');
-                $container.removeClass('active');
+                $button.removeClass('active');
                 document.location.hash = 'register';
             });
         }
@@ -188,7 +188,7 @@ var alarm = {
         render: function(recentPurchase) {
 
             // Cache lookups
-            var $container = $('.top-icon.warning.non-activated-account');
+            var $button = $('.top-icon.warning.non-activated-account');
             var $dialog = $('.top-warning-popup.non-activated-account');
 
             // If they just purchased it, log specific event
@@ -203,8 +203,8 @@ var alarm = {
 
             // Hide other dialogs that may be open
             alarm.hideAllWarningPopups();
-            alarm.initWarningIconButton($container, $dialog);
-            alarm.showWarningPopup($container, $dialog);
+            alarm.initWarningIconButton($button, $dialog);
+            alarm.showWarningPopup($button, $dialog);
         }
     },
 
@@ -243,7 +243,7 @@ var alarm = {
             }
 
             // Cache lookups
-            var $container = $('.top-icon.warning.astropay-payment-reminder');
+            var $button = $('.top-icon.warning.astropay-payment-reminder');
             var $dialog = $('.top-warning-popup.astropay-payment-reminder');
 
             // Get PRO plan name e.g. PRO III
@@ -274,30 +274,30 @@ var alarm = {
             $dialog.find('.gateway-name').text(gatewayDisplayName);
 
             // Add button click handlers
-            this.initChooseButton($container, $dialog);
-            this.initRenewButton($container, $dialog, proNum);
+            this.initChooseButton($button, $dialog);
+            this.initRenewButton($button, $dialog, proNum);
             this.initDontShowAgainButton($dialog);
             this.initFeedbackMessageKeyup($dialog);
-            this.initSendAndCloseButton($container, $dialog);
+            this.initSendAndCloseButton($button, $dialog);
 
             // Hide other dialogs that may be open and make the icon clickable
             alarm.hideAllWarningPopups();
-            alarm.initWarningIconButton($container, $dialog);
-            alarm.showWarningPopup($container, $dialog);
+            alarm.initWarningIconButton($button, $dialog);
+            alarm.showWarningPopup($button, $dialog);
         },
 
         /**
          * Initialises the click handler for the Choose button
          * @param {Object} $dialog The dialog
          */
-        initChooseButton: function($container, $dialog) {
+        initChooseButton: function($button, $dialog) {
 
             // On the Choose button click
             $dialog.find('.warning-button.choose').rebind('click', function() {
 
                 // Hide the dialog and go to pro page
                 $dialog.addClass('hidden');
-                $container.removeClass('active');
+                $button.removeClass('active');
 
                 // Set a flag so it doesn't show each time
                 alarm.hidden = 1;
@@ -315,14 +315,14 @@ var alarm = {
          * @param {Object} $dialog The dialog
          * @param {Number} proNum The Pro plan number e.g. 1, 2, 3, 4
          */
-        initRenewButton: function($container, $dialog, proNum) {
+        initRenewButton: function($button, $dialog, proNum) {
 
             // On the Renew button click
             $dialog.find('.warning-button.renew').rebind('click', function() {
 
                 // Hide the dialog
                 $dialog.addClass('hidden');
-                $container.removeClass('active');
+                $button.removeClass('active');
 
                 // Set a flag so it doesn't show each time
                 alarm.hidden = 1;
@@ -395,10 +395,10 @@ var alarm = {
 
         /**
          * Initialises the button to send the user's feedback
-         * @param {Object} $container The dialog container which includes the warning icon
+         * @param {Object} $button Button which allows to open dialog
          * @param {Object} $dialog The dialog
          */
-        initSendAndCloseButton: function($container, $dialog) {
+        initSendAndCloseButton: function($button, $dialog) {
 
             // On the Send and close button
             $dialog.find('.warning-button.close').rebind('click', function() {
@@ -432,7 +432,7 @@ var alarm = {
                 );
 
                 // Hide the warning icon and the dialog
-                $container.addClass('hidden');
+                $button.addClass('hidden');
                 $dialog.addClass('hidden');
             });
         },
@@ -562,7 +562,7 @@ var alarm = {
         render: function(serverBuildVersion, reRender) {
 
             // Cache lookups
-            var $container = $('.top-icon.warning.site-update-available');
+            var $button = $('.top-icon.warning.site-update-available');
             var $dialog = $('.top-warning-popup.site-update-available');
 
             // Convert versions to integers for easier comparison
@@ -589,13 +589,13 @@ var alarm = {
                 this.cachedServerBuildVersion = serverBuildVersion;
 
                 // Initialise popup buttons
-                this.initDontUpdateButton($container, $dialog);
-                this.initUpdateButton($container, $dialog);
+                this.initDontUpdateButton($button, $dialog);
+                this.initUpdateButton($button, $dialog);
 
                 // Hide any other popups that may be open, make the icon clickable and show the popup
                 alarm.hideAllWarningPopups();
-                alarm.initWarningIconButton($container, $dialog);
-                alarm.showWarningPopup($container, $dialog);
+                alarm.initWarningIconButton($button, $dialog);
+                alarm.showWarningPopup($button, $dialog);
             }
             else {
                 // Using current version, try again in another 24 hours
@@ -605,10 +605,10 @@ var alarm = {
 
         /**
          * If the Don't Update button is clicked, hide the dialog and don't show it again
-         * @param {Object} $container The dialog container which includes the warning icon
+         * @param {Object} $button Button which allows to open dialog
          * @param {Object} $dialog The dialog
          */
-        initDontUpdateButton: function($container, $dialog) {
+        initDontUpdateButton: function($button, $dialog) {
 
             $dialog.find('.warning-button.dont-update').rebind('click', function() {
 
@@ -619,7 +619,7 @@ var alarm = {
                 api_req({ a: 'log', e: 99611, m: 'User chose not to update from site update dialog' });
 
                 // Hide the warning icon and the dialog
-                $container.addClass('hidden');
+                $button.addClass('hidden');
                 $dialog.addClass('hidden');
             });
         },
@@ -628,7 +628,7 @@ var alarm = {
          * If the Update button is clicked, hard refresh the page to break cache
          * @param {Object} $dialog The dialog
          */
-        initUpdateButton: function($container, $dialog) {
+        initUpdateButton: function($button, $dialog) {
 
             $dialog.find('.warning-button.update').rebind('click', function() {
 
@@ -637,7 +637,7 @@ var alarm = {
 
                 // Hide the warning dialog
                 $dialog.addClass('hidden');
-                $container.removeClass('active');
+                $button.removeClass('active');
 
                 // Check for pending transfers and if there are, prompt user to see if they want to continue
                 mega.utils.abortTransfers().then(function() {

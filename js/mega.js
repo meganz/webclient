@@ -2580,6 +2580,7 @@ function MegaData()
         };
     }
 
+    var delInShareQueue = Object.create(null);
     this.delNode = function(h, ignoreDB) {
         function ds(h) {
             if (fminitialized) {
@@ -2592,19 +2593,16 @@ function MegaData()
                 delete M.c[h];
             }
 
-            // FIXME: this gets called with M.d[h] already
-            // deleted, which means that the test below cannot
-            // take effect.
             if (fmdb) {
                 fmdb.del('f', h);
                 fmdb.del('ph', h);
             }
 
             if (M.d[h]) {
-                if (fmdb && !ignoreDB) {
-                    if (M.d[h].p && M.d[h].p.length == 11) {
-                        fmdb.del('s', M.d[h].p + '*' + h);
-                    }
+                if (M.d[h].p && M.d[h].p.length === 11) {
+                    // this is an inbound share
+                    delete M.c.shares[h];
+                    delInShareQ.push(M.d[h].p + '*' + h);
                 }
 
                 M.delIndex(M.d[h].p, h);
@@ -2612,27 +2610,39 @@ function MegaData()
                 delete M.d[h];
             }
 
-            // Update M.v it's used for at least preview slideshow
-            for (var k in M.v) {
-                if (M.v[k].h === h) {
-                    M.v.splice(k, 1);
-                    break;
-                }
-            }
             // if (M.u[h]) delete M.u[h];
             if (typeof M.u[h] === 'object') {
                 M.u[h].c = 0;
             }
         }
+        var delInShareQ = delInShareQueue[h] = delInShareQueue[h] || [];
         ds(h);
 
+        if (fmdb && !ignoreDB) {
+            // Perform DB deletions once we got acknowledge from API (action-packets)
+            // which we can't do above because M.d[h] might be already deleted.
+            for (var i = delInShareQ.length; i--;) {
+                fmdb.del('s', delInShareQ[i]);
+            }
+            delete delInShareQueue[h];
+        }
         if (fminitialized) {
             // Handle Inbox/RubbishBin UI changes
             delay('fmtopUI', fmtopUI);
-        }
 
-        if (M.currentdirid === 'shares' && !M.viewmode)
-            M.openFolder('shares', 1);
+            if (M.currentdirid === 'shares' && !M.viewmode) {
+                M.openFolder('shares', 1);
+            }
+            else {
+                // Update M.v it's used for at least preview slideshow
+                for (var k = M.v.length; k--;) {
+                    if (M.v[k].h === h) {
+                        M.v.splice(k, 1);
+                        break;
+                    }
+                }
+            }
+        }
     };
 
     this.delHash = function(n) {

@@ -3292,7 +3292,7 @@ function dashboardUI() {
             percents[2] += (100 * c[k[i]][0] / account.space);
         }
         for (var i = 0; i < 4; i++) {
-            var $percBlock = $('.storage .account.progress-perc.pr' + i);console.log(percents[i]);
+            var $percBlock = $('.storage .account.progress-perc.pr' + i);
             if (percents[i] > 0) {
                 $percBlock.text(Math.round(percents[i]) + ' %');
                 $percBlock.parent().removeClass('empty');
@@ -3661,9 +3661,10 @@ function accountUI() {
                 $('.account.data-block .btn-cancel').hide();
                 $('.subscription-bl').removeClass('active-subscription');
             }
-			// Maximum bandwidth
-			$('.account.plan-info.bandwidth span').text(bytesToSize(account.bw, 0));
-			$('.account.plan-info-row.bandwidth').show();
+
+            // Maximum bandwidth
+            $('.account.plan-info.bandwidth span').text(bytesToSize(account.bw, 0));
+            $('.account.plan-info-row.bandwidth').show();
         }
         else {
 
@@ -3672,7 +3673,7 @@ function accountUI() {
             $('.account.plan-info.expiry').text(l[436]);
             $('.btn-cancel').hide();
             $('.subscription-bl').removeClass('active-subscription');
-			$('.account.plan-info-row.bandwidth').hide();
+            $('.account.plan-info-row.bandwidth').hide();
         }
 
 

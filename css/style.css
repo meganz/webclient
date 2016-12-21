@@ -10316,7 +10316,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
 }
 .membership-big-txt.name {
     padding: 16px 0 0 0;
-    margin-right: 20px;
     font-size: 18px;
     line-height: 23px;
     color: #333333;
@@ -10325,9 +10324,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
     max-width: 100%;
-}
-.dashboard .membership-big-txt.name {
-    margin-right: 0;
 }
 .membership-big-txt.email {
     padding: 8px 0 13px 0;
@@ -10939,6 +10935,9 @@ table {
     right: 0;
     top: 20px;
     cursor: pointer;
+}
+.account.settings-button i {
+    display: none;
 }
 .account.tab-content {
     position: relative;

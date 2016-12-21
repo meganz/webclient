@@ -5134,7 +5134,7 @@ function accountUI() {
         $('.membership-big-txt.email').hide();
     }
 
-    $('.editprofile, .account.settings-button').rebind('click', function() {
+    $('.editprofile').rebind('click', function() {
         document.location.hash = 'fm/account';
     });
 

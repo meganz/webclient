@@ -134,4 +134,19 @@ IndexedDBKVStorage.prototype.destroy = function __IDBKVDestroy() {
     this.newcache = Object.create(null);    // new items that are pending flushing to the DB
     this.delcache = Object.create(null);    // delete items that are pending deletion from the DB
 };
+
+IndexedDBKVStorage.prototype.clear = function __IDBKVDestroy() {
+    var self = this;
+    if (fmdb) {
+        fmdb.get(self.name, function(r){
+            for (var i = r.length; i--; ) {
+                fmdb.del(self.name, r[i].k);
+            }
+        });
+    }
+
+    this.destroy();
+
+
+};
 makeObservable(IndexedDBKVStorage);

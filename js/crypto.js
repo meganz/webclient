@@ -2182,7 +2182,7 @@ function api_resetuser(ctx, c, email, pw) {
     var pw_aes = new sjcl.cipher.aes(prepare_key_pw(pw));
 
     var ssc = Array(4);
-    for (i = 4; i--;) {
+    for (var i = 4; i--;) {
         ssc[i] = rand(0x100000000);
     }
 
@@ -2438,6 +2438,7 @@ function api_setattr(n) {
 function stringhash(s, aes) {
     var s32 = str_to_a32(s);
     var h32 = [0, 0, 0, 0];
+    var i;
 
     for (i = 0; i < s32.length; i++) {
         h32[i & 3] ^= s32[i];

@@ -37,13 +37,13 @@ IndexedDBKVStorage.prototype.prefillMemCache = function(fmdb) {
 // will be a no-op if no fmdb set
 IndexedDBKVStorage.prototype.flush = function() {
     if (this.fmdb) {
-        for (k in this.delcache) {
+        for (var k in this.delcache) {
             this.fmdb.del(this.name, k);
             delete this.dbcache[k];
         }
         this.delcache = Object.create(null);
 
-        for (k in this.newcache) {
+        for (var k in this.newcache) {
             this.fmdb.add(this.name, { k : k, d : { v : this.newcache[k] }});
             this.dbcache[k] = this.newcache[k];
         }
@@ -116,11 +116,11 @@ IndexedDBKVStorage.prototype.removeItem = function __IDBKVRemoveItem(k) {
 // iterate over all items, with prefix
 // FIXME: convert to synchronous operation
 IndexedDBKVStorage.prototype.eachPrefixItem = function __IDBKVEachItem(prefix, cb) {
-    for (k in this.newcache) {
+    for (var k in this.newcache) {
         if (!this.delcache[k]) cb(this.newcache[k], k);
     }
 
-    for (k in this.dbcache) {
+    for (var k in this.dbcache) {
         if (!this.delcache[k] && typeof this.newcache[k] == 'undefined') cb(this.dbcache[k], k);
     }
 

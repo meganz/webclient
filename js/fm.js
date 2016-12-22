@@ -4415,11 +4415,6 @@ function accountUI() {
 
             var pws = zxcvbn($('#account-new-password').val());
 
-        if (typeof M.account.dbDropOnLogout !== 'undefined') {
-                mega.config.set('dbDropOnLogout', M.account.dbDropOnLogout);
-                delete M.account.dbDropOnLogout;
-            }
-            
             if ($('#account-password').val() == '' && ($('#account-new-password').val() !== '' || $('#account-confirm-password').val() !== ''))
             {
                 msgDialog('warninga', l[135], l[719], false, function()
@@ -4789,16 +4784,14 @@ function accountUI() {
         $('#rad' + i).removeClass('radioOff').addClass('radioOn');
         $('.dbDropOnLogout input').rebind('click', function(e) {
             var id = $(this).attr('id');
+            var dbDropOnLogout = 0;
             if (id === 'rad20') {
-                M.account.dbDropOnLogout = 1;
+                dbDropOnLogout = 1;
             }
-            else if (id === 'rad21') {
-                M.account.dbDropOnLogout = 0;
-            }
+            mega.config.setn('dbDropOnLogout', dbDropOnLogout);
             $('.dbDropOnLogout').removeClass('radioOn').addClass('radioOff');
             $(this).addClass('radioOn').removeClass('radioOff');
             $(this).parent().addClass('radioOn').removeClass('radioOff');
-            $('.fm-account-save-block').removeClass('hidden');
         });
 
         $('.uisorting').removeClass('radioOn').addClass('radioOff');

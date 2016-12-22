@@ -7196,6 +7196,7 @@ function contextMenuUI(e, ll) {
         $(menuCMI).hide();
         m = $('.dropdown.body.download');
         menuCMI = '.dropdown.body.download .dropdown-item';
+        $(menuCMI).show();
     }
     else if (ll === 4 || ll === 5) {// contactUI
         $(menuCMI).hide();

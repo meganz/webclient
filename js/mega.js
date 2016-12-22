@@ -1116,6 +1116,12 @@ function MegaData()
             console.time('renderMain');
         }
 
+        // Disable aUpdate flag if a new item was added to an empty
+        // folder, so that MegaRender properly uses JSP container..
+        if (aUpdate && M.v.length === 1) {
+            aUpdate = false;
+        }
+
         if (!aUpdate) {
             this.megaRender = new MegaRender(this.viewmode);
         }

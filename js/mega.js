@@ -3471,6 +3471,49 @@ function MegaData()
         }
     };
 
+    /**
+     * Helper function to move nodes falling back to copy+delete under inshares.
+     *
+     * @param {String} target  The handle for the target folder to move nodes into
+     * @param {Array} [nodes]  Array of nodes to move, $.selected if none provided
+     * @returns {MegaPromise}
+     */
+    this.safeMoveNodes = function safeMoveNodes(target, nodes) {
+        var copy    = [];
+        var move    = [];
+        var promise = new MegaPromise();
+
+        nodes = nodes || $.selected || [];
+
+        // Always copy if the target's root is an inshare
+        if (RootbyId(target) === 'shares') {
+            move = copy;
+        }
+
+        for (var i = nodes.length; i--;) {
+            var node = nodes[i];
+
+            if (!isCircular(node, target)) {
+                if (RootbyId(node) === 'shares') {
+                    copy.push(node);
+                }
+                else {
+                    move.push(node);
+                }
+            }
+        }
+
+        if (copy.length) {
+            this.copyNodes(copy, target, true);
+        }
+        if (move.length && copy !== move) {
+            this.moveNodes(move, target);
+        }
+
+        // TODO: promises support (realdbpaging)
+        return promise;
+    };
+
     this.accountSessions = function(cb) {
         /* x: 1, load the session ids
            useful to expire the session from the session manager */

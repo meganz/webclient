@@ -1258,6 +1258,9 @@ var proPage = {
         // Show recurring info box next to Purchase button and update dialog text for recurring
         if (recurringEnabled) {
             $step2.find('.subscription-instructions').removeClass('hidden');
+            $step2.find('.subscription-instructions').rebind('click', function() {
+                bottomPageDialog(false, 'general', l[1712]);
+            });
             $paymentAddressDialog.find('.payment-note-first.recurring').removeClass('hidden');
             $paymentAddressDialog.find('.payment-note-first.one-time').addClass('hidden');
         }
@@ -1505,6 +1508,7 @@ var proPage = {
 
         var $durationOptionsList = $('.duration-options-list');
         var $durationOptions = $durationOptionsList.find('.payment-duration:not(.template)');
+        var selectedPlanIndex = $durationOptionsList.find('.membership-radio.checked').parent().attr('data-plan-index');
         var selectedGatewayName = $('.payment-options-list input:checked').val();
         var selectedProvider = proPage.allGateways.filter(function(val) {
             return (val.gatewayName === selectedGatewayName);
@@ -1536,12 +1540,20 @@ var proPage = {
             }
         });
 
-        // Select the first remaining option that is not hidden
-        var $firstOption = $durationOptionsList.find('.payment-duration:not(.template, .hidden)').first();
-        var newPlanIndex = $firstOption.attr('data-plan-index');
-        $firstOption.find('.membership-radio').addClass('checked');
-        $firstOption.find('.membership-radio-label').addClass('checked');
-        $firstOption.find('input').attr('checked', 'checked');
+        // Select the first remaining option or previously selected (if its not hidden)
+        var $newDurationOption;
+        var newPlanIndex;
+        $newDurationOption = $durationOptionsList.find('[data-plan-index=' + selectedPlanIndex + ']');
+        if ($newDurationOption.length && !$newDurationOption.hasClass('hidden')) {
+            newPlanIndex = selectedPlanIndex;
+        }
+        else {
+            $newDurationOption = $durationOptionsList.find('.payment-duration:not(.template, .hidden)').first();
+            newPlanIndex = $newDurationOption.attr('data-plan-index');
+        }
+        $newDurationOption.find('.membership-radio').addClass('checked');
+        $newDurationOption.find('.membership-radio-label').addClass('checked');
+        $newDurationOption.find('input').attr('checked', 'checked');
 
         // Update the text for one-time or recurring
         proPage.updateMainPrice(newPlanIndex);

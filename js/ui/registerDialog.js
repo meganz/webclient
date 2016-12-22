@@ -418,7 +418,7 @@
                     $('.register-check').removeClass('checkboxOff');
                     $('.register-check').addClass('checkboxOn');
                 };
-                termsDialog();
+                bottomPageDialog(false, 'terms'); // show terms dialog
                 return false;
             });
     }

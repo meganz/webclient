@@ -64,7 +64,9 @@ function parseHTML(markup, forbidStyle, doc, baseURI, isXML) {
     // Either we are not running the Firefox extension or the above parser
     // failed, in such case we try to mimic it using jQuery.parseHTML
     var fragment = doc.createDocumentFragment();
-    $.parseHTML(String(markup), doc)
+
+    markup = String(markup).replace(/(?!\<[a-z][^>]+)\son[a-z]+\s*=/gi, ' data-dummy=');
+    $.parseHTML(markup, doc)
         .forEach(function(node) {
             fragment.appendChild(node);
         });
@@ -570,10 +572,10 @@ function populate_l() {
     l[8848] = l[8848].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8849] = l[8849].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[1389] = l[1389].replace('[B]', '').replace('[/B]', '').replace('[A]', '<span>').replace('[/A]', '</span>');
-    l[8847] = l[8847].replace('[S]', '<span>').replace('[/S]', '</span>');
-    l[8846] = l[8846].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8912] = l[8912].replace('[B]', '<span>').replace('[/B]', '</span>');
-    l[8944] = l[8944].replace('[S]', '<a class="red">').replace('[/S]', '</a>').replace('[BR]', '<br/>');
+    l[8944] = l[8944].replace('[BR]', '<br>').replace('[S]', '<span>').replace('[/S]', '</span>');
+    l[8846] = l[8846].replace('[S]', '<span>').replace('[/S]', '</span>');
+    l[8847] = l[8847].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8950] = l[8950].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8951] = l[8951].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8952] = l[8952].replace('[S]', '<span>').replace('[/S]', '</span>');
@@ -602,6 +604,17 @@ function populate_l() {
     l[15536] = l[15536].replace('[B]', '<b>').replace('[/B]', '</b>');
     l[16106] = l[16106].replace('[B]', '<b>').replace('[/B]', '</b>');
     l[16107] = l[16107].replace('[S]', '<span>').replace('[/S]', '</span>');
+    l[16116] = l[16116].replace('[S]', '<span>').replace('[/S]', '</span>');
+    l[16119] = l[16119].replace('[S]', '<span>').replace('[/S]', '</span>');
+    l[16120] = l[16120].replace('[S]', '<span>').replace('[/S]', '</span>');
+    l[16123] = l[16123].replace('[S]', '<span>').replace('[/S]', '</span>').replace('[A]', '<a href="#pro">').replace('[/A]', '</a>').replace('[BR]', '<br />');
+    l[16124] = l[16124].replace('[S]', '<span>').replace('[/S]', '</span>').replace('[A]', '<a href="#pro">').replace('[/A]', '</a>').replace('[BR]', '<br />');
+    l[16135] = l[16135].replace('[BR]', '<br />');
+    l[16136] = l[16136].replace('[A]', '<a href="#pro">').replace('[/A]', '</a>');
+    l[16137] = l[16137].replace('[A]', '<a href="#pro">').replace('[/A]', '</a>');
+    l[16138] = l[16138].replace('[A]', '<a href="#pro">').replace('[/A]', '</a>');
+    l[16164] = l[16164].replace('[S]', '<a class="red">').replace('[/S]', '</a>').replace('[BR]', '<br/>');
+    l[16167] = l[16167].replace('[S]', '<a href="#mobile page">').replace('[/S]', '</a>');
 
     l['year'] = new Date().getFullYear();
     date_months = [
@@ -880,25 +893,36 @@ function countrydetails(isocode) {
 }
 
 /**
- * Converts a timestamp to a localised yyyy-mm-dd hh:mm format e.g. 2016-04-17 14:37
- * @param {Number} unixTime The UNIX timestamp in seconds e.g. 1464829467
- * @param {Boolean} ignoreTime If true only the date will be returned e.g. yyyy-mm-dd
- * @returns {String} Returns the date and time in yyyy-mm-dd hh:mm format by default
+ * Converts a timestamp to a readable time format - e.g. 2016-04-17 14:37
+ *
+ * @param {Number} unixTime  The UNIX timestamp in seconds e.g. 1464829467
+ * @param {Number} format    The readable time format to return
+ * @returns {String}
+ *
+ * Formats:
+ *       0: yyyy-mm-dd hh:mm
+ *       1: yyyy-mm-dd
+ *       2: dd fmn yyyy (fmn: Full month name, based on the locale)
  */
-function time2date(unixTime, ignoreTime) {
+function time2date(unixTime, format) {
 
-    var myDate = new Date(unixTime * 1000 || 0);
-    var myDateString =
-        myDate.getFullYear() + '-'
-        + ('0' + (myDate.getMonth() + 1)).slice(-2) + '-'
-        + ('0' + myDate.getDate()).slice(-2);
+    var result;
+    var date = new Date(unixTime * 1000 || 0);
 
-    if (!ignoreTime) {
-        myDateString += ' ' + ('0' + myDate.getHours()).slice(-2) + ':'
-            + ('0' + myDate.getMinutes()).slice(-2);
+    if (format === 2) {
+        result = date.getDate() + ' ' + date_months[date.getMonth()] + ' ' + date.getFullYear();
+    }
+    else {
+        result = date.getFullYear() + '-'
+               + ('0' + (date.getMonth() + 1)).slice(-2)
+               + '-' + ('0' + date.getDate()).slice(-2);
+
+        if (!format) {
+            result += ' ' + date.toTimeString().substr(0, 5);
+        }
     }
 
-    return myDateString;
+    return result;
 }
 
 // in case we need to run functions.js in a standalone (non secureboot.js) environment, we need to handle this case:
@@ -1112,15 +1136,12 @@ function numOfBytes(bytes, precision) {
 }
 
 function bytesToSize(bytes, precision, html_format) {
-    if (!bytes) {
-        return '0';
-    }
-
     var s_b = 'B';
     var s_kb = 'KB';
     var s_mb = 'MB';
     var s_gb = 'GB';
     var s_tb = 'TB';
+    var s_pb = 'PB';
 
     if (lang === 'fr') {
         s_b = 'O';
@@ -1128,21 +1149,31 @@ function bytesToSize(bytes, precision, html_format) {
         s_mb = 'Mo';
         s_gb = 'Go';
         s_tb = 'To';
+        s_pb = 'Po';
     }
 
     var kilobyte = 1024;
     var megabyte = kilobyte * 1024;
     var gigabyte = megabyte * 1024;
     var terabyte = gigabyte * 1024;
+    var petabyte = terabyte * 1024;
     var resultSize = 0;
     var resultUnit = '';
-    if (bytes > 1024 * 1024 * 1024) {
-        precision = 2;
+
+    if (precision === undefined) {
+        if (bytes > gigabyte) {
+            precision = 2;
+        }
+        else if (bytes > megabyte) {
+            precision = 1;
+        }
     }
-    else if (bytes > 1024 * 1024) {
-        precision = 1;
+
+    if (!bytes) {
+        resultSize = 0;
+        resultUnit = s_mb;
     }
-    if ((bytes >= 0) && (bytes < kilobyte)) {
+    else if ((bytes >= 0) && (bytes < kilobyte)) {
         resultSize = parseInt(bytes);
         resultUnit = s_b;
     }
@@ -1158,17 +1189,25 @@ function bytesToSize(bytes, precision, html_format) {
         resultSize = (bytes / gigabyte).toFixed(precision);
         resultUnit = s_gb;
     }
-    else if (bytes >= terabyte) {
+    else if ((bytes >= terabyte) && (bytes < petabyte)) {
         resultSize = (bytes / terabyte).toFixed(precision);
         resultUnit = s_tb;
+    }
+    else if (bytes >= petabyte) {
+        resultSize = (bytes / petabyte).toFixed(precision);
+        resultUnit = s_pb;
     }
     else {
         resultSize = parseInt(bytes);
         resultUnit = s_b;
     }
-    if (html_format) {
+    if (html_format === 2) {
+        return resultSize + '<span>' + resultUnit + '</span>';
+    }
+    else if (html_format) {
         return '<span>' + resultSize + '</span>' + resultUnit;
-    } else {
+    }
+    else {
         return resultSize + ' ' + resultUnit;
     }
 }
@@ -1238,14 +1277,14 @@ function makeObservable(kls) {
 /**
  * Instantiates an enum-like list on the provided target object
  */
-function makeEnum(aEnum, aPrefix, aTarget) {
+function makeEnum(aEnum, aPrefix, aTarget, aNorm) {
     aTarget = aTarget || {};
 
     var len = aEnum.length;
     while (len--) {
         Object.defineProperty(aTarget,
             (aPrefix || '') + String(aEnum[len]).toUpperCase(), {
-                value: 1 << len,
+                value: aNorm ? len : (1 << len),
                 enumerable: true
             });
     }
@@ -3268,6 +3307,48 @@ function assertStateChange(currentState, newState, allowedStatesMap, enumMap) {
     }
 }
 
+Object.defineProperty(mega, 'api', {
+    value: Object.freeze({
+        logger: new MegaLogger('API'),
+
+        setDomain: function(aDomain, aSave) {
+            apipath = 'https://' + aDomain + '/';
+
+            if (aSave) {
+                localStorage.apipath = apipath;
+            }
+        },
+
+        staging: function(aSave) {
+            this.setDomain('staging.api.mega.co.nz', aSave);
+        },
+        prod: function(aSave) {
+            this.setDomain('eu.api.mega.co.nz', aSave);
+        },
+
+        req: function(params) {
+            var promise = new MegaPromise();
+
+            if (typeof params === 'string') {
+                params = {a: params};
+            }
+
+            api_req(params, {
+                callback: function(res) {
+                    if (typeof res === 'number' && res < 0) {
+                        promise.reject.apply(promise, arguments);
+                    }
+                    else {
+                        promise.resolve.apply(promise, arguments);
+                    }
+                }
+            });
+
+            return promise;
+        }
+    })
+});
+
 /**
  * execCommandUsable
  *
@@ -3558,7 +3639,7 @@ mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
             clearInterval($.mTransferAnalysis);
             delete $.mTransferAnalysis;
         }
-        $('.transfer-panel-title').safeHTML(l[104]);
+        $('.transfer-panel-title').text('');
         dlmanager.dlRetryInterval = 3000;
     }
 
@@ -3579,32 +3660,35 @@ mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
  */
 mega.utils.reload = function megaUtilsReload() {
     function _reload() {
-        var u_sid = u_storage.sid,
-            u_key = u_storage.k,
-            privk = u_storage.privk,
-            debug = u_storage.d,
-            jj = u_storage.jj,
-            apipath = debug ? localStorage.apipath : undefined;
-        var mcd = u_storage.testChatDisabled;
+        var u_sid = u_storage.sid;
+        var u_key = u_storage.k;
+        var privk = u_storage.privk;
+        var jj = localStorage.jj;
+        var debug = localStorage.d;
+        var mcd = localStorage.testChatDisabled;
+        var apipath = debug && localStorage.apipath;
 
         localStorage.clear();
         sessionStorage.clear();
 
-        u_storage.sid = u_sid;
-        u_storage.privk = privk;
-        u_storage.k = u_key;
-        u_storage.wasloggedin = true;
+        if (u_sid) {
+            u_storage.sid = u_sid;
+            u_storage.privk = privk;
+            u_storage.k = u_key;
+            u_storage.wasloggedin = true;
+        }
 
         if (debug) {
-            u_storage.d = 1;
-            u_storage.minLogLevel = 0;
+            localStorage.d = 1;
+            localStorage.minLogLevel = 0;
+
             if (location.host !== 'mega.nz') {
-                u_storage.dd = true;
+                localStorage.dd = true;
                 if (!is_extension && jj)  {
-                    u_storage.jj = jj;
+                    localStorage.jj = jj;
                 }
                 if (mcd) {
-                    u_storage.testChatDisabled = 1;
+                    localStorage.testChatDisabled = 1;
                 }
             }
             if (apipath) {
@@ -3617,7 +3701,7 @@ mega.utils.reload = function megaUtilsReload() {
         location.reload(true);
     }
 
-    if (u_type !== 3) {
+    if (u_type !== 3 && page !== 'download') {
         stopsc();
         stopapi();
         loadfm(true);
@@ -3627,7 +3711,7 @@ mega.utils.reload = function megaUtilsReload() {
         msgDialog('confirmation', l[761], l[7713], l[6994], function(doIt) {
             if (doIt) {
                 var reload = function() {
-                    if (mBroadcaster.crossTab.master) {
+                    if (mBroadcaster.crossTab.master || page === 'download') {
                         mega.utils.abortTransfers().then(function() {
                             loadingDialog.show();
                             stopsc();
@@ -4375,6 +4459,26 @@ mBroadcaster.once('startMega', function() {
     }
 });
 
+/** getOwnPropertyDescriptors polyfill */
+mBroadcaster.once('startMega', function() {
+    if (!Object.hasOwnProperty('getOwnPropertyDescriptors')) {
+        Object.defineProperty(Object, 'getOwnPropertyDescriptors', {
+            value: function getOwnPropertyDescriptors(obj) {
+                var result = {};
+
+                for (var key in obj) {
+                    if (obj.hasOwnProperty(key)) {
+                        result[key] = Object.getOwnPropertyDescriptor(obj, key);
+                    }
+                }
+
+                return result;
+            }
+        });
+    }
+});
+
+
 /**
  * Cross-tab communication using WebStorage
  */
@@ -4837,10 +4941,10 @@ if (typeof sjcl !== 'undefined') {
 
         var self = this;
 
-        if ($.removedContactsFromShare.length > 0) {
+        if ($.remvoedContactsFromShare && ($.removedContactsFromShare.length > 0)) {
             self.removeContactFromShare();
         }
-        if ($.changedPermissions.length > 0) {
+        if ($.changedPermissions && ($.changedPermissions.length > 0)) {
             doShare($.selected[0], $.changedPermissions, true);
         }
         addContactToFolderShare();
@@ -5305,4 +5409,28 @@ var debounce = function(func, execAsap) {
 
         timeout = requestAnimationFrame(delayed);
     };
+};
+
+/**
+ * Returns the currently running site version depending on if in development, on the live site or if in an extension
+ * @returns {String} Returns the string 'dev' if in development or the currently running version e.g. 3.7.0
+ */
+mega.utils.getSiteVersion = function() {
+
+    // Use 'dev' as the default version if in development
+    var version = 'dev';
+
+    // If this is a production version the timestamp will be set
+    if (buildVersion.timestamp !== '') {
+
+        // Use the website build version by default
+        version = buildVersion.website;
+
+        // If an extension use the version of that (because sometimes there are independent deployments of extensions)
+        if (is_extension) {
+            version = (window.chrome) ? buildVersion.chrome + ' ' + l[957] : buildVersion.firefox + ' ' + l[959];
+        }
+    }
+
+    return version;
 };

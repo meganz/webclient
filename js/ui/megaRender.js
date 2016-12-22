@@ -42,7 +42,7 @@
             // List view mode
             '<table>' +
                 '<tr>' +
-                    '<td width="30">' +
+                    '<td width="50">' +
                         '<span class="grid-status-icon"></span>' +
                     '</td>' +
                     '<td>' +
@@ -113,10 +113,12 @@
 
             // Icon view mode
             '<a class="file-block ustatus">' +
-                '<span class="nw-contact-status"></span>' +
                 '<span class="file-settings-icon"></span>' +
                 '<span class="shared-folder-info-block">' +
-                    '<span class="shared-folder-name"></span>' +
+                    '<span class="u-card-data">' +
+                        '<span class="shared-folder-name"></span>' +
+                        '<span class="nw-contact-status"></span>' +
+                    '</span>' +
                     '<span class="shared-folder-info"></span>' +
                 '</span>' +
             '</a>'
@@ -126,7 +128,7 @@
             // List view mode
             '<table>' +
                 '<tr>' +
-                    '<td width="30">' +
+                    '<td width="50">' +
                         '<span class="grid-status-icon"></span>' +
                     '</td>' +
                     '<td>' +
@@ -393,6 +395,7 @@
                     $('.fm-empty-incoming').removeClass('hidden');
                 }
                 else if (M.currentrootid === M.RootID
+                        || M.currentrootid === M.RubbishID
                         || M.currentrootid === M.InboxID) {
 
                     $('.fm-empty-folder').removeClass('hidden');
@@ -403,6 +406,9 @@
                 else if (M.currentrootid === 'contacts') {
                     $('.fm-empty-incoming.contact-details-view').removeClass('hidden');
                     $('.contact-share-notification').addClass('hidden');
+                }
+                else if (this.logger) {
+                    this.logger.info('Empty folder not handled...', M.currentdirid, M.currentrootid);
                 }
             }
 
@@ -700,6 +706,13 @@
                                 || (aNode.p === 'contacts' && M.contactstatus(aHandle).ts));
                         }
                     }
+
+                    // Colour label
+                    if (aNode.lbl) {
+                        var colourLabel = M.getColourClassFromId(aNode.lbl);
+                        props.classNames.push('colour-label');
+                        props.classNames.push(colourLabel);
+                    }
                 }
 
                 return props;
@@ -755,6 +768,13 @@
                     props.avatar = parseHTML(avatar).firstChild;
                 }
 
+                // Colour label
+                if (aNode.lbl && (aNode.su !== u_handle)) {
+                    var colourLabel = M.getColourClassFromId(aNode.lbl);
+                    props.classNames.push('colour-label');
+                    props.classNames.push(colourLabel);
+                }
+
                 return props;
             },
             'contact-shares': function(aNode, aHandle, aExtendedInfo) {
@@ -768,7 +788,7 @@
                     assert(Object(M.u[aHandle]).c === 1, 'Found non-active contact');
                 }
 
-                var avatar = useravatar.contact(aHandle, "nw-contact-avatar");
+                var avatar = useravatar.contact(aHandle, 'nw-contact-avatar');
 
                 if (avatar) {
                     props.avatar = parseHTML(avatar).firstChild;

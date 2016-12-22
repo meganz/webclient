@@ -61,7 +61,8 @@ function FMDB(plainname, schema, channelmap) {
     this.cantransact = -1;
 
     // initialise additional channels
-    for (var i in obj_values(this.channelmap)) {
+    for (var i in this.channelmap) {
+        i = this.channelmap[i];
         this.head[i] = 0;
         this.tail[i] = 0;
         this.pending[i] = {};
@@ -101,12 +102,13 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
         try {
             if (!fmdb.db) {
                 var todrop = [];
+                var dbpfx = 'fm3_';
 
-                // enumerate databases and collect those not prefixed with fm_
+                // enumerate databases and collect those not prefixed with 'dbpfx'
                 // (which is the current format)
                 Dexie.getDatabaseNames(function(r) {
                     for (var i = r.length; i--;) {
-                        if (r[i].substr(0,4) != 'fm2_') {
+                        if (r[i].substr(0, dbpfx.length) != dbpfx) {
                             todrop.push(r[i]);
                         }
                     }
@@ -118,7 +120,11 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
                     fmdb.dropall(todrop, function() {
                         // start inter-tab heartbeat
                         // fmdb.beacon();
-                        fmdb.db = new Dexie('fm2_' + fmdb.name);
+                        fmdb.db = new Dexie(dbpfx + fmdb.name);
+
+                        // save the db name for our getDatabaseNames polyfill
+                        localStorage['_$mdb$' + dbpfx + fmdb.name] = Date.now();
+
                         fmdb.db.version(1).stores(fmdb.schema);
                         fmdb.db.open().then(function(){
                             fmdb.get('_sn', function(r){
@@ -477,8 +483,8 @@ FMDB.prototype.stripnode = Object.freeze({
         return t;
     },
 
-    attrib : function(attrib, index) {
-        delete attrib.k;
+    ua : function(ua, index) {
+        delete ua.k;
     },
 
     chatqueuedmsgs : function(chatqueuedmsgs, index) {
@@ -519,12 +525,21 @@ FMDB.prototype.restorenode = Object.freeze({
         }
     },
 
-    attrib : function(attrib, index) {
-        attrib.k = index.k;
+    ph : function(ph, index) {
+        ph.h = index.h;
+    },
+
+    ua : function(ua, index) {
+        ua.k = index.k;
     },
 
     chatqueuedmsgs : function(chatqueuedmsgs, index) {
         chatqueuedmsgs.k = index.k;
+    },
+
+    h: function(out, index) {
+        out.h = index.h;
+        out.hash = index.c;
     },
 
     mk : function(mk, index) {
@@ -893,6 +908,9 @@ mBroadcaster.once('startMega', function __idb_setup() {
                                     if (idx == 'hash') {
                                         list[length++] = i.substr(0, i.length - 5);
                                     }
+                                }
+                                else if (i.substr(0, 6) === '_$mdb$') {
+                                    list[length++] = i.substr(6);
                                 }
                             }
 

@@ -11140,6 +11140,7 @@ table {
 }
 .fm-voucher-body {
     padding: 20px;
+    position: relative;
 }
 .fm-voucher-body .fm-dialog-new-folder-input.active {
     width: 250px;

@@ -19,7 +19,7 @@ IndexedDBKVStorage.prototype.prefillMemCache = function(fmdb) {
     var promise = new MegaPromise();
 
     if (fmdb) {
-        this.fmdb.getbykey(this.name, 'k', false, false, function(r){
+        fmdb.get(this.name, function(r){
             for (var i = r.length; i--; ) {
                 self.dbcache[r[i].k] = r[i].v;
             }
@@ -88,6 +88,17 @@ IndexedDBKVStorage.prototype.getItem = function __IDBKVGetItem(k) {
     // record deleted or unavailable
     promise.reject();
     return promise;
+};
+
+// check if item exists
+IndexedDBKVStorage.prototype.hasItem = function __IDBKVHasItem(k) {
+    var promise = new MegaPromise();
+
+    if (!his.delcache[k] && (typeof(this.newcache[k]) != 'undefined' || typeof(this.dbcache[k]) != 'undefined')) {
+        return MegaPromise.resolve();
+    }
+
+    return MegaPromise.reject();
 };
 
 // remove item from DB/cache

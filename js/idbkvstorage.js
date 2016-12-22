@@ -28,7 +28,7 @@ IndexedDBKVStorage.prototype.prefillMemCache = function(fmdb) {
         });
     }
     else promise.resolve();
-    
+
     return promise;
 };
 
@@ -47,7 +47,7 @@ IndexedDBKVStorage.prototype.setItem = function __IDBKVSetItem(k, v) {
     }
 
     promise.resolve([k, v]);
-           
+
     return promise;
 };
 

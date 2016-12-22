@@ -455,8 +455,8 @@ FMDB.prototype.stripnode = Object.freeze({
         return t;
     },
 
-    attrib : function(attrib, index) {
-        delete attrib.k;
+    ua : function(ua, index) {
+        delete ua.k;
     },
 
     chatqueuedmsgs : function(chatqueuedmsgs, index) {

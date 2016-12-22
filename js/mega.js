@@ -7285,7 +7285,7 @@ function loadfm(force) {
 
                     // channel 1: non-transactional (maintained by IndexedDBKVStorage)
                     chatqueuedmsgs : '&k' // queued chat messages - k
-                }, { attrib : 1, chatqueuedmsgs : 1 });
+                }, { chatqueuedmsgs : 1 });
 
                 fmdb.init(fetchfm, localStorage.force);
             }

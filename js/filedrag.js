@@ -231,6 +231,7 @@
             (
                 folderlink ||
                 (
+                    M.currentdirid !== 'dashboard' &&
                     M.currentdirid !== 'transfers' &&
                     (RightsbyID(targetid) | 0) < 1
                 )

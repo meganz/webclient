@@ -3041,6 +3041,11 @@ function dashboardUI() {
         $('.add-user-size-icon').trigger('click');
         return false;
     });
+    
+    // Avatar dialog
+    $('.fm-account-avatar').rebind('click', function(e) {
+        avatarDialog();
+    });
 
     // Data plus, upload file
     $('.data-float-bl .icon-button').rebind('click', function() {
@@ -7326,7 +7331,7 @@ function contextMenuUI(e, ll) {
         }
     }
     // This part of code is also executed when ll == 'undefined'
-    v = m.children($('.dropdown-section'));
+    v = m.children('.dropdown-section');
 
     // Count all items inside section, and hide dividers if necessary
     v.each(function() {
@@ -8651,6 +8656,8 @@ function handleDialogContent(dialogTabClass, parentTag, newFolderButton, dialogP
                 var $btn = $(this);
                 var $menu = $('.permissions-menu', this.parentNode);
                 var $items = $('.permissions-menu-item', $menu);
+
+                $menu.removeAttr('style');
 
                 $items
                     .rebind('click', function() {

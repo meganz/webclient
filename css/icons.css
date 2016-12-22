@@ -315,13 +315,13 @@
     background-position: -2px -1193px;
 }
 .dropdown-item .small-icon.audio-call {
-    background-position: -4px -38px;
+    background-position: -104px -38px;
 }
 .dropdown-item:hover .small-icon.audio-call {
     background-position: -154px -38px;
 }
 .dropdown-item .small-icon.video-call {
-    background-position: -4px -74px;
+    background-position: -104px -74px;
 }
 .dropdown-item:hover .small-icon.video-call {
     background-position: -154px -74px;
@@ -830,7 +830,7 @@
     background-position: -202px 2px;
 }
 .small-icon.context.network-diagnostic {
-    background-position: -200px -538px;
+    background-position: -201px -538px;
 }
 .small-icon.context.aim {
     background-position: -100px -60px;
@@ -933,7 +933,7 @@
     background-position: -242px 2px;
 }
 .dropdown-item:hover .small-icon.context.network-diagnostic {
-    background-position: -240px -538px;
+    background-position: -241px -538px;
 }
 .dropdown-item:hover .small-icon.context.leave-share {
     background-position: -140px -539px;

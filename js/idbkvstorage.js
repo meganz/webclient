@@ -70,7 +70,7 @@ IndexedDBKVStorage.prototype.setItem = function __IDBKVSetItem(k, v) {
 IndexedDBKVStorage.prototype.getItem = function __IDBKVGetItem(k) {
     var promise = new MegaPromise();
 
-    if (!typeof(this.delcache[k])) {
+    if (!this.delcache[k]) {
         if (typeof(this.newcache[k]) != 'undefined') {
             // record recently (over)written
             promise.resolve(this.newcache[k]);

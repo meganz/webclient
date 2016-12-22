@@ -5439,6 +5439,7 @@ function MegaData()
             if (!$.ulBunch[M.currentdirid]) {
                 $.ulBunch[M.currentdirid] = {};
             }
+            target = M.currentdirid;
         }
 
         if (uldl_hold) {

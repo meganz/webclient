@@ -211,7 +211,7 @@ FMDB.prototype.dropall = function fmdb_dropall(dbs, cb) {
         }).catch(function(err){
             fmdb.logger.error("Unable to delete IndexedDB " + db, err);
         }).finally(function(){
-            fmdb.drop(dbs, cb);
+            fmdb.dropall(dbs, cb);
         });
     }
 }

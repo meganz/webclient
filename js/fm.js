@@ -8652,6 +8652,8 @@ function handleDialogContent(dialogTabClass, parentTag, newFolderButton, dialogP
                 var $menu = $('.permissions-menu', this.parentNode);
                 var $items = $('.permissions-menu-item', $menu);
 
+                $menu.removeAttr('style');
+
                 $items
                     .rebind('click', function() {
                         $items.unbind('click');

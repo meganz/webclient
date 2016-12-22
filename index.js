@@ -2073,7 +2073,7 @@ window.onhashchange = function() {
         }
         for (var p in subpages) {
             if (page && page.substr(0, p.length) == p) {
-                for (i in subpages[p]) {
+                for (var i in subpages[p]) {
                     if (!jsl_loaded[jsl2[subpages[p][i]].n]) {
                         jsl.push(jsl2[subpages[p][i]]);
                     }

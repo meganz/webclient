@@ -11165,7 +11165,8 @@ table {
     border-bottom-left-radius: 8px;
     -webkit-border-bottom-right-radius: 8px;
     -moz-border-radius-bottomright: 8px;
-    border-bottom-right-radius: 8px
+    border-bottom-right-radius: 8px;
+    position: relative;
 }
 .fm-purchase-voucher {
     height: 30px;

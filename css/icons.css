@@ -315,13 +315,13 @@
     background-position: -2px -1193px;
 }
 .dropdown-item .small-icon.audio-call {
-    background-position: -4px -38px;
+    background-position: -104px -38px;
 }
 .dropdown-item:hover .small-icon.audio-call {
     background-position: -154px -38px;
 }
 .dropdown-item .small-icon.video-call {
-    background-position: -4px -74px;
+    background-position: -104px -74px;
 }
 .dropdown-item:hover .small-icon.video-call {
     background-position: -154px -74px;

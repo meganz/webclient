@@ -1689,6 +1689,12 @@ function topmenuUI() {
             else if (className.indexOf('contact') > -1) {
                 document.location.hash = 'contact';
             }
+            else if (className.indexOf('feedback') > -1) {
+
+                // Show the Feedback dialog
+                var feedbackDialog = mega.ui.FeedbackDialog.singleton($(this));
+                feedbackDialog._type = 'top-button';
+            }
             else if (className.indexOf('support') > -1) {
                 document.location.hash = 'support';
             }

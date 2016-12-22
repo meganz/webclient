@@ -22909,6 +22909,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 .collected-data-review-dialog textarea {
     display: block;
 }
+.collected-data-review-button-cancel {
+    margin-top: 12px;
+}
 .fm-dialog.copyrights-dialog {
     width: 644px;
     margin: -240px 0 0 -322px;

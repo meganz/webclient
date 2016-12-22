@@ -1979,6 +1979,7 @@ function stopsc() {
 function setsn(sn) {
     // update sn in DB, triggering a "commit" of the current "transaction"
     if (fmdb) {
+        attribCache.flush();
         fmdb.add('_sn', { i : 1, d : sn });
     }
 }

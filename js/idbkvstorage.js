@@ -6,7 +6,7 @@
 var IndexedDBKVStorage = function(name) {
     this.name = name;
     this.logger = new MegaLogger("IDBKVStorage[" + name + "]");
-    this._memCache = Object.create(null);
+    this.destroy();
 };
 
 // sets fmdb reference and prefills the memory cache from the DB
@@ -21,7 +21,7 @@ IndexedDBKVStorage.prototype.prefillMemCache = function(fmdb) {
     if (fmdb) {
         this.fmdb.getbykey(this.name, 'k', false, false, function(r){
             for (var i = r.length; i--; ) {
-                self._memCache[r[i].k] = r[i].v;
+                self.dbcache[r[i].k] = r[i].v;
             }
 
             promise.resolve();
@@ -32,19 +32,33 @@ IndexedDBKVStorage.prototype.prefillMemCache = function(fmdb) {
     return promise;
 };
 
+// flush new items / deletions to the DB (in channel 0, this should
+// be followed by call to setsn())
+// will be a no-op if no fmdb set
+IndexedDBKVStorage.prototype.flush = function() {
+    if (this.fmdb) {
+        for (k in this.delcache) {
+            this.fmdb.del(this.name, k);
+            delete this.dbcache[k];
+        }
+        this.delcache = Object.create(null);
+
+        for (k in this.newcache) {
+            this.fmdb.add(this.name, { k : k, d : { v : this.newcache[k] }});
+            this.dbcache[k] = this.newcache[k];
+        }
+        this.newcache = Object.create(null);
+    }
+};
+
 // set item in DB/cache
 // (must only be called in response to an API response triggered by an actionpacket)
 // FIXME: convert to synchronous operation
 IndexedDBKVStorage.prototype.setItem = function __IDBKVSetItem(k, v) {
     var promise = new MegaPromise();
 
-    if (this._memCache[k] !== v) {
-        this._memCache[k] = v;
-
-        if (this.fmdb) {
-            this.fmdb.add(this.name, { k : k, d : { v : v }});
-        }
-    }
+    delete this.delcache[k];
+    this.newcache[k] = v;
 
     promise.resolve([k, v]);
 
@@ -54,19 +68,25 @@ IndexedDBKVStorage.prototype.setItem = function __IDBKVSetItem(k, v) {
 // get item - if not found, promise will be rejected
 // FIXME: convert to synchronous operation
 IndexedDBKVStorage.prototype.getItem = function __IDBKVGetItem(k) {
-    var self = this;
-
     var promise = new MegaPromise();
 
-    if (typeof(self._memCache[k]) != 'undefined') {
-        // record exists
-        promise.resolve(self._memCache[k]);
-    }
-    else {
-        // no such record
-        promise.reject();
+    if (!this.delcache[k]) {
+        if (typeof(this.newcache[k]) != 'undefined') {
+            // record recently (over)written
+            promise.resolve(this.newcache[k]);
+            return promise;
+        }
+        else {
+            // record available in DB
+            if (typeof(this.dbcache[k]) != 'undefined') {
+                promise.resolve(this.dbcache[k]);
+                return promise;
+            }
+        }
     }
 
+    // record deleted or unavailable
+    promise.reject();
     return promise;
 };
 
@@ -74,10 +94,8 @@ IndexedDBKVStorage.prototype.getItem = function __IDBKVGetItem(k) {
 // (must only be called in response to an API response triggered by an actionpacket)
 // FIXME: convert to synchronous operation
 IndexedDBKVStorage.prototype.removeItem = function __IDBKVRemoveItem(k) {
-    if (typeof(this._memCache[k]) != 'undefined') {
-        delete this._memCache[k];
-        if (this.fmdb) this.fmdb.del(this.name, k);
-    }
+    this.delcache[k] = true;
+    delete this.newcache[k];
 
     var promise = new MegaPromise();
     promise.resolve();
@@ -85,16 +103,15 @@ IndexedDBKVStorage.prototype.removeItem = function __IDBKVRemoveItem(k) {
 };
 
 // iterate over all items, with prefix
+// FIXME: convert to synchronous operation
 IndexedDBKVStorage.prototype.eachPrefixItem = function __IDBKVEachItem(prefix, cb) {
-    var self = this;
+    for (k in this.newcache) {
+        if (!this.delcache[k]) cb(this.newcache[k], k);
+    }
 
-    Object.keys(this._memCache).forEach(function(k) {
-        if (k.indexOf(prefix) === 0) {
-            cb(self._memCache[k], k);
-        }
-    });
-
-    // FIXME: also retrieve DB contents? (was not implemented in the original version)
+    for (k in this.dbcache) {
+        if (!this.delcache[k] && typeof this.newcache[k] == 'undefined') cb(this.dbcache[k], k);
+    }
 
     return MegaPromise.resolve();
 };
@@ -102,6 +119,8 @@ IndexedDBKVStorage.prototype.eachPrefixItem = function __IDBKVEachItem(prefix, c
 // FIXME: check if this gets called for caches other than the ua attribCache
 // - if that is the case, also clear the underlying DB table
 IndexedDBKVStorage.prototype.destroy = function __IDBKVDestroy() {
-    this._memCache = Object.create(null);
+    this.dbcache = Object.create(null);     // items that reside in the DB
+    this.newcache = Object.create(null);    // new items that are pending flushing to the DB
+    this.delcache = Object.create(null);    // delete items that are pending deletion from the DB
 };
 makeObservable(IndexedDBKVStorage);

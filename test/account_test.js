@@ -26,9 +26,12 @@ describe("account unit test", function() {
         api_req = window.api_req;
     });
 
-    afterEach(function() {
-        attribCache.clear();
-        sandbox.restore();
+    afterEach(function(done) {
+        attribCache.clear()
+            .always(function() {
+                sandbox.restore();
+                done();
+            });
     });
 
     describe('user attributes', function() {
@@ -42,7 +45,7 @@ describe("account unit test", function() {
                 var theCtx = api_req.args[0][1];
                 callback(EFAILED, theCtx);
                 assert.strictEqual(aPromise.state(), 'rejected');
-                assert.strictEqual(ns._logger.warn.callCount, 1);               
+                assert.strictEqual(ns._logger.warn.callCount, 1);
                 assert.strictEqual(ns._logger.warn.args[0][1], "+puEd255");
                 assert.strictEqual(ns._logger.warn.args[0][2], "me3456789xw");
                 assert.strictEqual(ns._logger.warn.args[0][3], -5);
@@ -50,7 +53,7 @@ describe("account unit test", function() {
 
             it("internal callback error, custom callback", function() {
                 sandbox.stub(ns._logger, 'warn');
-                
+
                 var myCallback = sinon.spy();
                 var aPromise = mega.attr.get('me3456789xw', 'puEd255', true, false, myCallback);
                 assert.strictEqual(api_req.callCount, 1);
@@ -66,7 +69,7 @@ describe("account unit test", function() {
 
             it("internal callback OK, no custom callback", function(done) {
                 sandbox.stub(ns._logger, '_log');
-                
+
                 var aPromise = mega.attr.get('me3456789xw', 'puEd255', true, false, undefined);
                 assert.strictEqual(api_req.callCount, 1);
                 var callback = api_req.args[0][1].callback;
@@ -104,7 +107,7 @@ describe("account unit test", function() {
                 assert.strictEqual(ns._logger._log.args[0][1],"+puEd255");
                 assert.strictEqual(ns._logger._log.args[0][2],"me3456789xw");
                 assert.strictEqual(ns._logger._log.args[0][3],'"fortytwo"');
-                
+
             });
 
             it("private attribute, internal callback OK, custom callback, crypto stubbed", function() {

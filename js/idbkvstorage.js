@@ -135,18 +135,33 @@ IndexedDBKVStorage.prototype.destroy = function __IDBKVDestroy() {
     this.delcache = Object.create(null);    // delete items that are pending deletion from the DB
 };
 
-IndexedDBKVStorage.prototype.clear = function __IDBKVDestroy() {
+/**
+ * Clear DB contents.
+ * @returns {MegaPromise}
+ */
+IndexedDBKVStorage.prototype.clear = function __IDBKVClear() {
     var self = this;
-    if (fmdb) {
-        fmdb.get(self.name, function(r){
-            for (var i = r.length; i--; ) {
-                fmdb.del(self.name, r[i].k);
-            }
+    var fmdb = this.fmdb;
+    var promise = new MegaPromise();
+
+    if (fmdb && Object(fmdb.db).hasOwnProperty(this.name)) {
+
+        fmdb.db[this.name].clear().then(function() {
+            self.logger.debug("Table cleared.");
+        }).catch(function(err) {
+            self.logger.error("Unable to clear table!", err);
+        }).finally(function() {
+            promise.resolve();
         });
     }
+    else {
+        promise.reject();
+    }
 
-    this.destroy();
+    promise.always(function() {
+        self.destroy();
+    });
 
-
+    return promise;
 };
 makeObservable(IndexedDBKVStorage);

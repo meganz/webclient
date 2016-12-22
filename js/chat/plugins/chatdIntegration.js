@@ -696,6 +696,10 @@ ChatdIntegration._ensureKeysAreLoaded = function(messages, users) {
 
     if (Array.isArray(messages)) {
         messages.forEach(function (msgObject) {
+            if (typeof(msgObject.userId) === "undefined" || msgObject.userId === null) {
+                return;
+            }
+
             if (msgObject.userId === strongvelope.COMMANDER) {
                 return;
             }
@@ -721,6 +725,10 @@ ChatdIntegration._ensureKeysAreLoaded = function(messages, users) {
     }
     if (Array.isArray(users)) {
         users.forEach(function (userId) {
+            if (typeof(userId) === "undefined" || userId === null) {
+                return;
+            }
+
             if (userId === strongvelope.COMMANDER) {
                 return;
             }
@@ -1367,26 +1375,27 @@ ChatdIntegration.prototype.decryptTopic = function(chatRoom) {
     var self = this;
     if (chatRoom && chatRoom.ct && chatRoom.protocolHandler) {
         var parsedMessage = strongvelope._parseMessageContent(base64urldecode(chatRoom.ct));
-
-        var promises = [];
-        promises.push(
-            ChatdIntegration._ensureKeysAreLoaded(undefined, [parsedMessage.invitor])
-        );
-        var _runTopicDecryption = function() {
-            try {
-                var decryptedCT = chatRoom.protocolHandler.decryptFrom(base64urldecode(chatRoom.ct));
-                if (decryptedCT) {
-                    chatRoom.topic = decryptedCT.payload;
+        if (parsedMessage) {
+            var promises = [];
+            promises.push(
+                ChatdIntegration._ensureKeysAreLoaded(undefined, [parsedMessage.invitor])
+            );
+            var _runTopicDecryption = function() {
+                try {
+                    var decryptedCT = chatRoom.protocolHandler.decryptFrom(base64urldecode(chatRoom.ct));
+                    if (decryptedCT) {
+                        chatRoom.topic = decryptedCT.payload;
+                    }
+                } catch (e) {
+                    self.logger.error("Could not decrypt topic: ", e);
                 }
-            } catch (e) {
-                self.logger.error("Could not decrypt topic: ", e);
-            }
-        };
-        MegaPromise.allDone(promises).done(
-            function () {
-                _runTopicDecryption();
-            }
-        );
+            };
+            MegaPromise.allDone(promises).done(
+                function () {
+                    _runTopicDecryption();
+                }
+            );
+        }
     }
 };
 

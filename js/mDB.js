@@ -116,7 +116,7 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
                         fmdb.logger.log("Deleting obsolete DBs: " + todrop.join(', '));
                     }
 
-                    fmdb.drop(todrop, function() {
+                    fmdb.dropall(todrop, function() {
                         // start inter-tab heartbeat
                         // fmdb.beacon();
                         fmdb.db = new Dexie(dbpfx + fmdb.name);
@@ -169,8 +169,35 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
     }
 };
 
-// drop databases
-FMDB.prototype.drop = function fmdb_drop(dbs, cb) {
+// drop database
+FMDB.prototype.drop = function fmdb_drop() {
+    var promise = new MegaPromise();
+
+    if (!this.db) {
+        promise.resolve();
+    }
+    else {
+        var fmdb = this;
+
+        this.invalidate(function() {
+
+            fmdb.db.delete().then(function() {
+                fmdb.logger.debug("IndexedDB deleted...");
+            }).catch(function(err) {
+                fmdb.logger.error("Unable to delete IndexedDB!", err);
+            }).finally(function() {
+                promise.resolve();
+            });
+
+            this.db = null;
+        });
+    }
+
+    return promise;
+};
+
+// drop random databases
+FMDB.prototype.dropall = function fmdb_dropall(dbs, cb) {
     if (!dbs || !dbs.length) {
         cb();
     }
@@ -817,7 +844,7 @@ Object.freeze(FMDB.prototype);
 
 
 function mDBcls() {
-    if (Object(window.fmdb).hasOwnProperty('db')) {
+    if (fmdb && fmdb.db) {
         fmdb.db.close();
     }
     fmdb = null;

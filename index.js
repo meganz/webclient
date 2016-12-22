@@ -1359,8 +1359,9 @@ function topmenuUI() {
 
     // Show language in top menu
     $('.top-menu-item.languages .right-el').text(lang);
+
     // Show version in top menu
-    $('.top-mega-version').text('v. ' + (buildVersion.website || 'dev'));
+    $('.top-mega-version').text('v. ' + mega.utils.getSiteVersion());
 
     if (u_type) {
         $('.top-menu-item.logout,.top-menu-item.backup').removeClass('hidden');

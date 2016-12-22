@@ -5410,3 +5410,27 @@ var debounce = function(func, execAsap) {
         timeout = requestAnimationFrame(delayed);
     };
 };
+
+/**
+ * Returns the currently running site version depending on if in development, on the live site or if in an extension
+ * @returns {String} Returns the string 'dev' if in development or the currently running version e.g. 3.7.0
+ */
+mega.utils.getSiteVersion = function() {
+
+    // Use 'dev' as the default version if in development
+    var version = 'dev';
+
+    // If this is a production version the timestamp will be set
+    if (buildVersion.timestamp !== '') {
+
+        // Use the website build version by default
+        version = buildVersion.website;
+
+        // If an extension use the version of that (because sometimes there are independent deployments of extensions)
+        if (is_extension) {
+            version = (window.chrome) ? buildVersion.chrome + ' ' + l[957] : buildVersion.firefox + ' ' + l[959];
+        }
+    }
+
+    return version;
+};

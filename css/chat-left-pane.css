@@ -13,6 +13,7 @@
     background-image: url(../images/mega/nw-chat-bg.svg);
     background-repeat: repeat;
     min-height: 100%;
+    display: block;
 }
 .conversations-pane li {
     padding: 8px 12px;

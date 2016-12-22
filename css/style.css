@@ -9525,6 +9525,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     right: auto;
     z-index: 100;
     min-width: 170px;
+    margin: -1px 0 0 -4px;
 }
 .fm-dialogs-dropdown {
     top: auto;

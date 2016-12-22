@@ -22731,11 +22731,13 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 .credentials-warning-dialog .resetCredentials .reset-credentials-button {
     display: inline-block;
     float: none;
-    margin-left: -3px;
+    margin-left: 1px;
+    margin-top: 2px;
 }
 .credentials-warning-dialog .resetCredentials .reset-credentials-button span {
     background-image: url("../images/mega/shared-sprite_v4.svg");
     background-position: -34px -1506px;
+    display: block;
     text-indent: 17px;
 }
 .credentials-warning-dialog .resetCredentials .reset-credentials-button.hidden {
@@ -22752,7 +22754,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 }
 .credentials-warning-dialog .verifyCredentials .verify-contact-button span {
     background-image: url("../images/mega/shared-sprite_v4.svg");
-    background-position: -4px -739px;
+    background-position: -9px -739px;
+    display: block;
     text-indent: 19px;
 }
 .credentials-warning-dialog .verifyCredentials .verify-contact-button.hidden {
@@ -22775,6 +22778,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 .credentials-warning-dialog .instruction .accept {
     color: #31B500;
     font-weight: bold;
+}
+.credentials-warning-dialog .default-white-button.right.red {
+    margin-top: 12px;
 }
 /* Key signature mismatch warning dialog */
 .key-signature-warning-button {
@@ -22842,6 +22848,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 .key-signature-warning-dialog .instruction .accept {
     color: #31B500;
     font-weight: bold;
+}
+.key-signature-warning-dialog .default-white-button.right.red {
+    margin-top: 12px;
 }
 .collected-data-review-dialog {
     z-index: 1250;

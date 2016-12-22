@@ -3041,6 +3041,11 @@ function dashboardUI() {
         $('.add-user-size-icon').trigger('click');
         return false;
     });
+    
+    // Avatar dialog
+    $('.fm-account-avatar').rebind('click', function(e) {
+        avatarDialog();
+    });
 
     // Data plus, upload file
     $('.data-float-bl .icon-button').rebind('click', function() {

@@ -7326,7 +7326,7 @@ function contextMenuUI(e, ll) {
         }
     }
     // This part of code is also executed when ll == 'undefined'
-    v = m.children($('.dropdown-section'));
+    v = m.children('.dropdown-section');
 
     // Count all items inside section, and hide dividers if necessary
     v.each(function() {

@@ -4329,7 +4329,7 @@ function accountUI() {
         $newEmail.val('');
         $emailInfoMessage.addClass('hidden');
 
-        $passwords.rebind('keyup', function() {
+        $passwords.rebind('keyup.em', function() {
             var texts = [];
             $passwords.each(function() {
                 texts.push($(this).val());
@@ -5229,7 +5229,7 @@ function accountUI() {
     });
 
     $('.account-pass-lines').attr('class', 'account-pass-lines');
-    $('#account-new-password').rebind('keyup', function(el)
+    $('#account-new-password').rebind('keyup.pwdchg', function(el)
     {
         $('.account-pass-lines').attr('class', 'account-pass-lines');
         if ($(this).val() !== '') {
@@ -5248,7 +5248,7 @@ function accountUI() {
         }
     });
 
-    $('#account-confirm-password').rebind('keyup', function(el) {
+    $('#account-confirm-password').rebind('keyup.pwdchg', function(el) {
 
         if ($(this).val() === $('#account-new-password').val()) {
             $('.fm-account-save-block').removeClass('hidden');

@@ -94,7 +94,7 @@ IndexedDBKVStorage.prototype.getItem = function __IDBKVGetItem(k) {
 IndexedDBKVStorage.prototype.hasItem = function __IDBKVHasItem(k) {
     var promise = new MegaPromise();
 
-    if (!his.delcache[k] && (typeof(this.newcache[k]) != 'undefined' || typeof(this.dbcache[k]) != 'undefined')) {
+    if (!this.delcache[k] && (typeof(this.newcache[k]) != 'undefined' || typeof(this.dbcache[k]) != 'undefined')) {
         return MegaPromise.resolve();
     }
 

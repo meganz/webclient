@@ -61,7 +61,8 @@ function FMDB(plainname, schema, channelmap) {
     this.cantransact = -1;
 
     // initialise additional channels
-    for (var i in obj_values(this.channelmap)) {
+    for (var i in this.channelmap) {
+        i = this.channelmap[i];
         this.head[i] = 0;
         this.tail[i] = 0;
         this.pending[i] = {};

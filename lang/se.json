@@ -3378,7 +3378,7 @@
     "8830": "objekt delade p\u00e5 MEGA",
     "8831": "Kopierar...",
     "8832": "Minnesstatistik",
-    "8833": "To enhance this limit, you can register an account. This will not only give you ample extra bandwidth but also 50 GB of secure storage space in the cloud - [B]for free[\/B].",
+    "8833": "To enhance this limit, you can register an account. This will not only give you ample extra transfer quota but also 50 GB of secure storage space in the cloud - [B]for free[\/B].",
     "8834": "H\u00e4mtningen kunde inte forts\u00e4tta eftersom det skulle ta dig \u00f6ver den nuvarande kapacitet f\u00f6r din fria \u00f6verf\u00f6ring p\u00e5 din IP-adress.",
     "8835": "Det gick inte att kopiera \u00e5terst\u00e4llningsnyckeln till urklipp, f\u00f6rs\u00f6k igen.",
     "8836": "\u00c5terst\u00e4llningsnyckel kopierad till urklipp",
@@ -3837,6 +3837,7 @@
     "16166": "Plan",
     "16167": "You can also pay via the Google Play Store, Apple App Store, Microsoft Store or Android mobile carrier billing when using our [A]MEGA apps[\/A].",
     "16168": "Spara inst\u00e4llningar",
+    "16169": "Date created",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

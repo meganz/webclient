@@ -20,7 +20,7 @@
         "context": "Error message while downloading"
     },
     "17": {
-        "text": "Bandwidth quota exceeded",
+        "text": "Transfer quota exceeded",
         "context": "Free users have limited bandwidth quota, and when exceeded this message will be shown during the download. If you have difficulty translating \"quota\" you could also translate \"Bandwidth limit exceeded\" or \"Data limit exceeded\"."
     },
     "18": {
@@ -1964,8 +1964,8 @@
         "context": "Warning message in a dialog that asks for confirmation before deleting something."
     },
     "1008": {
-        "text": "PRO bandwidth quota exceeded.",
-        "context": "Pro refers to the paid membership, which is often \"Pro\" in the same language. "
+        "text": "PRO transfer quota exceeded.",
+        "context": "PRO refers to the paid membership, which is often \"PRO\" in the same language. "
     },
     "1009": {
         "text": "Need more bandwidth?",
@@ -8432,8 +8432,8 @@
         "context": "This question is displayed on the Feedback dialog and asks the user if we can contact them for more information or clarification about their feedback."
     },
     "6989": {
-        "text": "Free bandwidth quota exceeded",
-        "context": ""
+        "text": "Free transfer quota exceeded",
+        "context": "A dialog title explaining that the user has used all of their free transfer quota (bandwidth) that is available on their free account."
     },
     "6991": {
         "text": "Clear all transfers",
@@ -13516,7 +13516,7 @@
         "context": "A label for any memory (RAM) statistics button, link, text, title, etc."
     },
     "8833": {
-        "text": "To enhance this limit, you can register an account. This will not only give you ample extra bandwidth but also 50 GB of secure storage space in the cloud - [B]for free[\/B].",
+        "text": "To enhance this limit, you can register an account. This will not only give you ample extra transfer quota but also 50 GB of secure storage space in the cloud - [B]for free[\/B].",
         "context": "A message displayed to encourage the user to register an account for extra bandwidth and free storage. Please keep the [B] and [\/B] tags as they will be used to stylise the text at runtime."
     },
     "8834": {
@@ -15350,5 +15350,9 @@
     "16168": {
         "text": "Saving settings...",
         "context": "A toast notification which is shown when saving settings."
+    },
+    "16169": {
+        "text": "Date created",
+        "context": "A table column header for the date when a file was created."
     }
 }

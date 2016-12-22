@@ -1283,9 +1283,12 @@ input.radioOn, input.radioOff {
     color: #777777;
     padding-right: 36px;
     padding-top: 6px;
-    max-width: -webkit-calc(100% - 70px);
-    max-width: -moz-calc(100% - 70px);
-    max-width:  calc(100% - 70px);
+    max-width: -webkit-calc(100% - 30px);
+    max-width: -moz-calc(100% - 30px);
+    max-width:  calc(100% - 30px);
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
 .fm-dialog-footer .radio-txt {
     padding-right: 0;

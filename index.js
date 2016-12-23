@@ -1851,10 +1851,10 @@ function topmenuUI() {
     });
 
     var $topHeader = $('.top-head');
-    $topHeader.find('.fm-avatar img').rebind('click', function() {
+    $topHeader.find('.fm-avatar').rebind('click', function() {
 
         // If the user has an avatar already set, take them to the profile page where they can change or remove it
-        if ($(this).attr('src').indexOf('blob:') > -1) {
+        if ($(this).find('img').attr('src').indexOf('blob:') > -1) {
             document.location.hash = 'fm/account/profile';
         }
         else {

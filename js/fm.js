@@ -5479,7 +5479,7 @@ function gridUI() {
         var headerColumn = '';
         $('.grid-table tr:first-child td:visible').each(function(i, e) {
             headerColumn = $('.grid-table-header th').get(i);
-            $(headerColumn).width($(e).width());
+            $(headerColumn).width(Math.floor($(e).width()));
         });
     };
 

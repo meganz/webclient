@@ -5405,9 +5405,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     background-color: #FF333A;
     display: none;
 }
-.fm-left-menu.transfers {
-    background-color: #E0E0E0;
-}
 .transfers .nw-fm-tree-header span {
     color: #333333;
 }
@@ -5416,6 +5413,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .fm-left-menu.cloud-drive, .fm-left-menu.notifications, .fm-left-menu.folder-link {
     background-color: #FF333A;
+}
+.fm-left-menu.transfers {
+    background-color: #E0E0E0;
 }
 .nw-fm-left-icon.rubbish-bin::after {
     content: '';
@@ -10666,13 +10666,15 @@ table {
     border-collapse: separate;
     border-spacing: 0;
 }
-.transfer-table-header th, .transfer-table-header th, .grid-table-header th, .contacts-grid-table th {
-    display: block;
-    float: left;
+.transfer-table-header th, .grid-table-header th, .contacts-grid-table th {
+    display: inline-block;
+    float: none;
 }
-.grid-table-header, .transfer-table-header {
+.grid-table-header, .transfer-table-header, .contacts-grid-table {
     background-color: white;
     position: relative;
+    font-size: 0;
+    white-space: nowrap;
 }
 .transfer-table-header th:first-child span {
     display: block;
@@ -25923,7 +25925,7 @@ div.camera-bottom-txt {
     top: 50%;
 }
 .empty-icon {
-    background-image: url(../images/mega/empty-sprite_v3.svg);
+    background-image: url(../images/mega/empty-sprite_v2.png);
     background-repeat: no-repeat;
     height: 185px;
 }
@@ -25943,6 +25945,7 @@ div.camera-bottom-txt {
 }
 .empty-icon.conversations {
     background-position: center 0px;
+    height: 208px;
 }
 /* End of common components */
 
@@ -26215,7 +26218,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', e
     font-size: 16px;
 }
 /* User select */
-.selectable, .selectable *, input, textarea, .fm-dialog p, .properties-file-link, .contact-fingerprint-txt *, .fingerprint-txt, .contact-details-user-name, .contact-details-email, .nw-contact-name, .fm-breadcrumbs.contact .right-arrow-bg span, div.new-download-file-title, .dev-nw *, .fmholder .dev-nw div, .fmholder div.new-affiliate-bg1 *, .fmholder div.main-mid-pad.new-bottom-pages *, .collected-data li, .export-item-title, .grid-table.vouchers *, .export-item-title, .properties-file-txt, .wire-transfer-details *, .blog-new-full *, div div.new-download-file-title, div div.nt-info-txt, div div.nt-main-date, .new-right-content-block *, .ff-right-block *, .pro-gray-block *, .sync-white-bl *, .sync-top-txt, .sync-top-txt-block *, .blog-new-full *, .fingerprint > span, .fm-account-main table *, .fm-account-main label, .fm-account-main div:not(.default-big-button):not(.default-button), .fm-account-main div:not(.default-big-button):not(.default-button) + span, .new-bottom-pages *, .file-link-info, .nw-conversations-name, .active-folder-link .tranfer-filetype-txt, .active-folder-link .nw-fm-tree-folder, .active-folder-link .file-block-title, .fm-breadcrumbs span span, .export-item-title, .export-link-gray-txt, .message.text-block, .user-card-name:not(.message), .user-card-name:not(.message) span, .user-card-email, .message.data-title, .download.info-txt, .fm-account-main a, .fm-account-main span {
+.selectable, .selectable *, input, textarea, .fm-dialog p, .properties-file-link, .contact-fingerprint-txt *, .fingerprint-txt, .contact-details-user-name, .contact-details-email, .nw-contact-name, .fm-breadcrumbs.contact .right-arrow-bg span, div.new-download-file-title, .dev-nw *, .fmholder .dev-nw div, .fmholder div.new-affiliate-bg1 *, .fmholder div.main-mid-pad.new-bottom-pages *, .collected-data li, .export-item-title, .grid-table.vouchers *, .export-item-title, .properties-file-txt, .wire-transfer-details *, .blog-new-full *, div div.new-download-file-title, div div.nt-info-txt, div div.nt-main-date, .new-right-content-block *, .ff-right-block *, .pro-gray-block *, .sync-white-bl *, .sync-top-txt, .sync-top-txt-block *, .blog-new-full *, .fingerprint > span, .fm-account-main table *, .fm-account-main label, .fm-account-main div:not(.default-big-button):not(.default-button), .fm-account-main div:not(.default-big-button):not(.default-button) + span, .new-bottom-pages *, .file-link-info, .nw-conversations-name, .active-folder-link .tranfer-filetype-txt, .active-folder-link .nw-fm-tree-folder, .active-folder-link .file-block-title, .fm-breadcrumbs span span, .export-item-title, .export-link-gray-txt, .message.text-block, .user-card-name:not(.message), .user-card-name:not(.message) span, .user-card-email, .message.data-title, .download.info-txt, .fm-account-main a, .fm-account-main span, .fingerprint-txt span, .membership-big-txt.email {
     -webkit-touch-callout: text !important;
     -webkit-user-select: text !important;
     -khtml-user-select: text !important;

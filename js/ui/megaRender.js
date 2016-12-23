@@ -840,7 +840,9 @@
                         aTemplate.querySelector('.grid-url-field').classList.add('linked');
                     }
 
-                    aTemplate.querySelector('.size').textContent = aProperties.size;
+                    if (aProperties.size !== undefined) {
+                        aTemplate.querySelector('.size').textContent = aProperties.size;
+                    }
                     aTemplate.querySelector('.type').textContent = aProperties.type;
                     aTemplate.querySelector('.time').textContent = aProperties.time;
                     aTemplate.querySelector('.tranfer-filetype-txt').textContent = aProperties.name;

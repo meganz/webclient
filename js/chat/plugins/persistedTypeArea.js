@@ -16,7 +16,7 @@ var PersistedTypeArea = function(megaChat) {
 
     megaChat.unbind("onInit.persistedTypeArea");
     megaChat.bind("onInit.persistedTypeArea", function(e) {
-        self.data = new IndexedDBKVStorage("persistedTypeArea", {}, true);
+        self.data = new IndexedDBKVStorage("pta");
     });
 
     // clear on logout

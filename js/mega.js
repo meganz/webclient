@@ -7335,8 +7335,12 @@ function loadfm(force) {
                     _sn : '&i',         // sn - fixed index 1
 
                     // channel 1: non-transactional (maintained by IndexedDBKVStorage)
-                    chatqueuedmsgs : '&k' // queued chat messages - k
-                }, { chatqueuedmsgs : 1 });
+                    chatqueuedmsgs : '&k', // queued chat messages - k
+                    pta: '&k' // persisted type messages - k
+                }, {
+                    chatqueuedmsgs : 1,
+                    pta: 1
+                });
 
                 fmdb.init(fetchfm, localStorage.force);
             }

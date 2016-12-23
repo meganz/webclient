@@ -3791,8 +3791,8 @@
     "16120": "[S]\u00d6verf\u00f6r[\/S]",
     "16121": "Anv\u00e4nt utrymme",
     "16122": "\u00d6verf\u00f6ringskvot ",
-    "16123": "[S]Used base quota[\/S] is the free transfer allowance for the IP address you are using. This value is dynamic and depends on the amount of unused transfer quota we have available.[BR] You can increase your quota by [A]Upgrading to PRO[\/A].",
-    "16124": "[S]Used base quota[\/S] is the free transfer allowance for the IP address you are using. This value is dynamic and depends on the amount of unused transfer quota we have available.[BR] You can increase your quota by completing [S]Account Achievements[\/S] or by [A]Upgrading to PRO[\/A].",
+    "16123": "[S]Used base quota[\/S] is the free transfer allowance for the IP address you are using. This value is dynamic and depends on the amount of unused bandwidth we have available.[BR] You can increase your quota by [A]Upgrading to PRO[\/A].",
+    "16124": "[S]Used base quota[\/S] is the free transfer allowance for the IP address you are using. This value is dynamic and depends on the amount of unused bandwidth we have available.[BR] You can increase your quota by completing [S]Account Achievements[\/S] or by [A]Upgrading to PRO[\/A].",
     "16125": "Anv\u00e4nd kvot f\u00f6r de senaste 6 timmar:",
     "16126": "F\u00e5 mer kvot\u00f6verf\u00f6ring",
     "16127": "Lagringskvot ",
@@ -3838,6 +3838,7 @@
     "16167": "You can also pay via the Google Play Store, Apple App Store, Microsoft Store or Android mobile carrier billing when using our [A]MEGA apps[\/A].",
     "16168": "Spara inst\u00e4llningar",
     "16169": "Date created",
+    "16170": "There is an unknown error in the download path. Please try again and if continues failing contact support@mega.nz. [{0}]",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

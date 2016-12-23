@@ -3791,8 +3791,8 @@
     "16120": "[S]Transfer[\/S]",
     "16121": "Used Storage",
     "16122": "Transfer Quota",
-    "16123": "[S]Used base quota[\/S] is the free transfer allowance for the IP address you are using. This value is dynamic and depends on the amount of unused transfer quota we have available.[BR] You can increase your quota by [A]Upgrading to PRO[\/A].",
-    "16124": "[S]Used base quota[\/S] is the free transfer allowance for the IP address you are using. This value is dynamic and depends on the amount of unused transfer quota we have available.[BR] You can increase your quota by completing [S]Account Achievements[\/S] or by [A]Upgrading to PRO[\/A].",
+    "16123": "[S]Used base quota[\/S] is the free transfer allowance for the IP address you are using. This value is dynamic and depends on the amount of unused bandwidth we have available.[BR] You can increase your quota by [A]Upgrading to PRO[\/A].",
+    "16124": "[S]Used base quota[\/S] is the free transfer allowance for the IP address you are using. This value is dynamic and depends on the amount of unused bandwidth we have available.[BR] You can increase your quota by completing [S]Account Achievements[\/S] or by [A]Upgrading to PRO[\/A].",
     "16125": "\uc9c0\ub09c 6\uc2dc\uac04 \ub3d9\uc548 \uc774\uc6a9\ud55c \ud560\ub2f9\ub7c9:",
     "16126": "\ub354 \ub9ce\uc740 \uc804\uc1a1 \ud560\ub2f9\ub7c9 \uc5bb\uae30",
     "16127": "\uc800\uc7a5\uacf5\uac04 \ud560\ub2f9\ub7c9",
@@ -3838,6 +3838,7 @@
     "16167": "You can also pay via the Google Play Store, Apple App Store, Microsoft Store or Android mobile carrier billing when using our [A]MEGA apps[\/A].",
     "16168": "Saving settings...",
     "16169": "Date created",
+    "16170": "There is an unknown error in the download path. Please try again and if continues failing contact support@mega.nz. [{0}]",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

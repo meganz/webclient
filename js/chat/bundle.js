@@ -231,8 +231,8 @@ React.makeElement = React['createElement'];
 	            'emoticonShortcutsFilter': EmoticonShortcutsFilter,
 	            'emoticonsFilter': EmoticonsFilter,
 	            'callFeedback': CallFeedback,
-	            'karerePing': KarerePing,
-	            'persistedTypeArea': PersistedTypeArea
+	            'karerePing': KarerePing
+
 	        },
 	        'chatNotificationOptions': {
 	            'textMessages': {

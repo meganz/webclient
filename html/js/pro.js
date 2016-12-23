@@ -3598,14 +3598,14 @@ var showSignupPromptDialog = function() {
             $('.fm-notification-info',this.$dialog)
                 .safeHTML('<p>@@</p>', l[5842]);
 
-            $('.fm-dialog-button.pro-login', this.$dialog)
+            $('.pro-login', this.$dialog)
                 .rebind('click.loginrequired', function() {
                     signupPromptDialog.hide();
                     showLoginDialog();
                     return false;
                 });
 
-            $('.fm-dialog-button.pro-register', this.$dialog)
+            $('.pro-register', this.$dialog)
                 .rebind('click.loginrequired', function() {
                     signupPromptDialog.hide();
 

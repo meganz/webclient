@@ -8033,7 +8033,9 @@ React.makeElement = React['createElement'];
 
 	        if (this.props.persist) {
 	            var megaChat = this.props.chatRoom.megaChat;
-	            megaChat.plugins.persistedTypeArea.removePersistedTypedValue(this.props.chatRoom);
+	            if (megaChat.plugins.persistedTypeArea) {
+	                megaChat.plugins.persistedTypeArea.removePersistedTypedValue(this.props.chatRoom);
+	            }
 	        }
 	        return result;
 	    },

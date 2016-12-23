@@ -10666,13 +10666,15 @@ table {
     border-collapse: separate;
     border-spacing: 0;
 }
-.transfer-table-header th, .transfer-table-header th, .grid-table-header th, .contacts-grid-table th {
-    display: block;
-    float: left;
+.transfer-table-header th, .grid-table-header th, .contacts-grid-table th {
+    display: inline-block;
+    float: none;
 }
-.grid-table-header, .transfer-table-header {
+.grid-table-header, .transfer-table-header, .contacts-grid-table {
     background-color: white;
     position: relative;
+    font-size: 0;
+    white-space: nowrap;
 }
 .transfer-table-header th:first-child span {
     display: block;

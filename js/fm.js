@@ -3041,7 +3041,7 @@ function dashboardUI() {
         $('.add-user-size-icon').trigger('click');
         return false;
     });
-    
+
     // Avatar dialog
     $('.fm-account-avatar').rebind('click', function(e) {
         avatarDialog();
@@ -12885,8 +12885,14 @@ function bindDropdownEvents($dropdown, saveOption) {
             //Dropdown scrolling initialization
             initSelectScrolling(scrollBlock);
             jsp = $(scrollBlock).data('jsp');
+
+            // Prevent horizontal scrolling
+            $(scrollBlock).jScrollPane({
+                contentWidth: '0px'
+            });
+
             if (jsp && $activeDropdownItem.length) {
-                jsp.scrollToElement($activeDropdownItem)
+                jsp.scrollToElement($activeDropdownItem);
             }
         } else {
             $this.find('.default-select-dropdown').fadeOut(200);

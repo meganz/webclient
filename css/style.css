@@ -26529,6 +26529,7 @@ body.key:not(.en):not(.ar):not(.se):not(.jp):not(.cn):not(.ct):not(.kr):not(.ar)
     width: 30px;
 }
 .support #support-subject {
+    float: none;
     width: 100px;
 }
 .support textarea {

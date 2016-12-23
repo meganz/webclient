@@ -42,7 +42,7 @@
         $.dialog = self.opt.dlgName;
 
         // Button close account listener
-        $(self.opt.dialogClass + ' .fm-dialog-button.close-account').rebind('click', function(e) {
+        $(self.opt.dialogClass + ' .close-account').rebind('click', function(e) {
 
             loadingDialog.show();
 
@@ -69,7 +69,7 @@
         });
 
         // Cancel button listener
-        $(self.opt.dialogClass + ' .fm-dialog-button.cancel').rebind('click', function() {
+        $(self.opt.dialogClass + ' .cancel').rebind('click', function() {
             loadingDialog.hide();
             document.location.hash = 'fm/account';
         });
@@ -80,7 +80,7 @@
             var key = e.wich || e.keyCode;
 
             if (key === 13) {
-                $(self.opt.dialogClass + ' .fm-dialog-button.close-account').click();
+                $(self.opt.dialogClass + ' .close-account').click();
             }
         });
     };
@@ -215,7 +215,7 @@
         $.dialog = obj.opt.fbDlgName;
 
         // Send feedback button listener
-        $(obj.opt.fbDlgClass + ' .fm-dialog-button.feedback-submit').rebind('click', function() {
+        $(obj.opt.fbDlgClass + ' .feedback-submit').rebind('click', function() {
 
             obj.opt.feedbackText = obj._prepareJsonString(obj._gatherFeedback());
             api_req({'a': 'clog', 't': obj.opt.fbType, 'd': obj.opt.feedbackText});
@@ -228,7 +228,7 @@
         });
 
         // Cancel button listener
-        $(obj.opt.fbDlgClass + ' .fm-dialog-button.cancel').rebind('click', function() {
+        $(obj.opt.fbDlgClass + ' .cancel').rebind('click', function() {
 
             obj.opt.feedbackText = obj._prepareJsonString("User did NOT provide feedback.");
             api_req({'a': 'clog', 't': obj.opt.fbType, 'd': obj.opt.feedbackText});
@@ -246,7 +246,7 @@
             var key = e.wich || e.keyCode;
 
             if (key === 13) {
-                $(obj.opt.fbDlgClass + ' .fm-dialog-button.feedback-button').click();
+                $(obj.opt.fbDlgClass + ' .feedback-button').click();
             }
         });
 

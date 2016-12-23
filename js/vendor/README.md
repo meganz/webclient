@@ -85,6 +85,11 @@ Unless otherwise noted, they were released under a [MIT License].
 > This is a custom build created from: [https://jqueryui.com/download/#!...](https://jqueryui.com/download/#!version=1.12.1&themeParams=none&components=111101011101111110100010110110001000001000000000)
 
 ---
+[jquery.mobile.js]: jQuery Mobile - Make apps that are accessible on all smartphone, tablet and desktop devices.
+
+> This is a custom build created from: [http://amd-builder.jquerymobile.com...](http://amd-builder.jquerymobile.com/v1/bundle/jquery/jquery-mobile/1.4.5/jquery.mobile.custom.zip?baseUrl=js&include=jquery.mobile.ns%2Cjquery.mobile.support.touch%2Cjquery.mobile.vmouse%2Cevents%2Ftouch&exclude=jquery%2Cjson%2Cjson!..%2Fpackage.json&wrap=%7B%22startFile%22%3A%22build%2Fwrap.start%22%2C%22endFile%22%3A%22build%2Fwrap.end%22%7D&pragmasOnSave=%7B+%22jqmBuildExclude%22%3A+true+%7D&preserveLicenseComments=false&skipModuleInsertion=true&filter=..%2Fbuild%2Ffilter&mainConfigFile=js%2Frequirejs.config.js)
+
+---
 [jquery.fullscreen.js]: This jQuery plugin provides a simple to use mechanism to control the new fullscreen mode of modern browsers.
 
 ---

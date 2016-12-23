@@ -36,8 +36,8 @@ var notify = {
     init: function() {
 
         // Cache lookups
-        notify.$popup = $('.top-head .notification-popup');
-        notify.$popupIcon = $('.top-head .cloud-popup-icon');
+        notify.$popup = $('.dropdown.popup.notification-popup');
+        notify.$popupIcon = $('.top-head .top-icon.notification');
         notify.$popupNum = $('.top-head .notification-num');
 
         // Init event handler to open popup
@@ -74,26 +74,32 @@ var notify = {
                 notify.addUserEmails(pendingContactUsers);
 
                 // Loop through the notifications
-                for (var i = 0; i < notifications.length; i++) {
+                if (notifications) {
+                    for (var i = 0; i < notifications.length; i++) {
 
-                    var notification = notifications[i];            // The full notification object
-                    var id = makeid(10);                            // Make random ID
-                    var type = notification.t;                      // Type of notification e.g. share
-                    var timeDelta = notification.td;                // Seconds since the notification occurred
-                    var seen = (timeDelta >= lastTimeDelta);        // If the notification time delta is older than the last time the user saw the notification then it is read
-                    var timestamp = currentTime - timeDelta;        // Timestamp of the notification
-                    var userHandle = notification.u;                // User handle e.g. new share from this user
+                        if (notify.isUnwantedNotification(notifications[i])) {
+                            continue;
+                        }
 
-                    // Add notifications to list
-                    notify.notifications.push({
-                        data: notification, // The full notification object
-                        id: id,
-                        seen: seen,
-                        timeDelta: timeDelta,
-                        timestamp: timestamp,
-                        type: type,
-                        userHandle: userHandle
-                    });
+                        var notification = notifications[i];            // The full notification object
+                        var id = makeid(10);                            // Make random ID
+                        var type = notification.t;                      // Type of notification e.g. share
+                        var timeDelta = notification.td;                // Seconds since the notification occurred
+                        var seen = (timeDelta >= lastTimeDelta);        // If the notification time delta is older than the last time the user saw the notification then it is read
+                        var timestamp = currentTime - timeDelta;        // Timestamp of the notification
+                        var userHandle = notification.u;                // User handle e.g. new share from this user
+
+                        // Add notifications to list
+                        notify.notifications.push({
+                            data: notification, // The full notification object
+                            id: id,
+                            seen: seen,
+                            timeDelta: timeDelta,
+                            timestamp: timestamp,
+                            type: type,
+                            userHandle: userHandle
+                        });
+                    }
                 }
 
                 // Show the notifications
@@ -109,7 +115,7 @@ var notify = {
     notifyFromActionPacket: function(actionPacket) {
 
         // We should not show notifications if we haven't yet done the initial notifications load yet
-        if (!notify.initialLoadComplete) {
+        if (!notify.initialLoadComplete || notify.isUnwantedNotification(actionPacket)) {
             return false;
         }
 
@@ -138,9 +144,79 @@ var notify = {
         notify.countAndShowNewNotifications();
 
         // If the popup is open, re-render the notifications to show the latest one
-        if (notify.$popup.hasClass('active')) {
+        if (!notify.$popup.hasClass('hidden')) {
             notify.renderNotifications();
         }
+    },
+
+    /**
+     * Check whether we should omit a notification.
+     * @param {Object} notification
+     * @returns {Boolean}
+     */
+    isUnwantedNotification: function(notification) {
+        var action;
+
+        switch (notification.a || notification.t) {
+            case 'put':
+            case 'share':
+            case 'dshare':
+                if (!mega.notif.has('cloud_enabled')) {
+                    return true;
+                }
+                break;
+
+            case 'c':
+            case 'ipc':
+            case 'upci':
+            case 'upco':
+                if (!mega.notif.has('contacts_enabled')) {
+                    return true;
+                }
+                break;
+        }
+
+        switch (notification.a || notification.t) {
+            case 'put':
+                if (!mega.notif.has('cloud_newfiles')) {
+                    return true;
+                }
+                break;
+
+            case 'share':
+                if (!mega.notif.has('cloud_newshare')) {
+                    return true;
+                }
+                break;
+
+            case 'dshare':
+                if (!mega.notif.has('cloud_delshare')) {
+                    return true;
+                }
+                break;
+
+            case 'ipc':
+                if (!mega.notif.has('contacts_fcrin')) {
+                    return true;
+                }
+                break;
+
+            case 'c':
+                action = (typeof notification.c !== 'undefined') ? notification.c : notification.u[0].c;
+                if (action === 0 && !mega.notif.has('contacts_fcrdel')) {
+                    return true;
+                }
+                break;
+
+            case 'upco':
+                action = (typeof notification.s !== 'undefined') ? notification.s : notification.u[0].s;
+                if (action === 2 && !mega.notif.has('contacts_fcracpt')) {
+                    return true;
+                }
+            default:
+                break;
+        }
+        return false;
     },
 
     /**
@@ -202,11 +278,11 @@ var notify = {
     initNotifyIconClickHandler: function() {
 
         // Add delegated event for when the notifications icon is clicked
-        $('.top-head').off('click', '.cloud-popup-icon');
-        $('.top-head').on('click', '.cloud-popup-icon', function() {
+        $('.top-head').off('click', '.top-icon.notification');
+        $('.top-head').on('click', '.top-icon.notification', function() {
 
             // If the popup is already open, then close it
-            if (notify.$popup.hasClass('active')) {
+            if (!notify.$popup.hasClass('hidden')) {
                 notify.closePopup();
             }
             else {
@@ -220,16 +296,10 @@ var notify = {
      * Opens the notification popup with notifications
      */
     openPopup: function() {
-
-        // Calculate the position of the notifications popup so it is centered beneath the notifications icon.
-        // This is dynamically calculated because sometimes the icon position can change depending on the top nav items.
-        var popupPosition = notify.$popupIcon.offset().left - 40;
-
-        // Set the position of the notifications popup and open it
-        notify.$popup.css('left', popupPosition + 'px');
-        notify.$popup.addClass('active');
+        notify.$popup.removeClass('hidden');
         notify.$popupIcon.addClass('active');
-
+        topPopupAlign('.top-icon.notification', notify.$popup, 40);
+    
         // Render and show notifications currently in list
         notify.renderNotifications();
     },
@@ -243,10 +313,10 @@ var notify = {
     closePopup: function() {
 
         // Make sure it is actually visible (otherwise any call to $.hideTopMenu in index.js could trigger this
-        if ((notify.$popup !== null) && (notify.$popup.hasClass('active'))) {
+        if ((notify.$popup !== null) && (!notify.$popup.hasClass('hidden'))) {
 
             // Hide the popup
-            notify.$popup.removeClass('active');
+            notify.$popup.addClass('hidden');
             notify.$popupIcon.removeClass('active');
 
             // Mark all notifications as seen seeing the popup has been opened and they have been viewed
@@ -254,7 +324,7 @@ var notify = {
         }
         else {
             // Otherwise this call probably came from $.hideTopMenu in index.js so just hide the popup
-            notify.$popup.removeClass('active');
+            notify.$popup.addClass('hidden');
         }
     },
 

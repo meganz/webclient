@@ -146,8 +146,7 @@ var Chat = function() {
         'xmppDomain': xmppDomain,
         'loadbalancerService': 'gelb.karere.mega.nz',
         'fallbackXmppServers': [
-             "https://xmpp270n001.karere.mega.nz/ws",
-             "https://xmpp270n002.karere.mega.nz/ws"
+             "https://xmpp.karere.mega.nz/ws",
         ],
         'rtcSession': {
             'crypto': {
@@ -198,32 +197,7 @@ var Chat = function() {
             iceServers:[
                 // {urls: ['stun:stun.l.google.com:19302']},
                 {
-                    urls: ['turn:trn270n001.karere.mega.nz:3478?transport=udp'],   // Luxembourg
-                    username: "inoo20jdnH",
-                    credential: '02nNKDBkkS'
-                },
-                {
-                    urls: ['turn:trn270n002.karere.mega.nz:3478?transport=udp'],   // Luxembourg
-                    username: "inoo20jdnH",
-                    credential: '02nNKDBkkS'
-                },
-                {
-                    urls: ['turn:trn302n001.karere.mega.nz:3478?transport=udp'],   // Montreal, Canada
-                    username: "inoo20jdnH",
-                    credential: '02nNKDBkkS'
-                },
-                {
-                    urls: ['turn:trn302n002.karere.mega.nz:3478?transport=udp'],   // Montreal, Canada
-                    username: "inoo20jdnH",
-                    credential: '02nNKDBkkS'
-                },
-                {
-                    urls: ['turn:trn530n002.karere.mega.nz:3478?transport=udp'],   // NZ
-                    username: "inoo20jdnH",
-                    credential: '02nNKDBkkS'
-                },
-                {
-                    urls: ['turn:trn530n003.karere.mega.nz:3478?transport=udp'],   // NZ
+                    urls: ['turn:trn.karere.mega.nz:3478?transport=udp'],   // Luxembourg
                     username: "inoo20jdnH",
                     credential: '02nNKDBkkS'
                 }
@@ -650,6 +624,8 @@ Chat.prototype.init = function() {
         room.bind("onChatShown", function() {
             $('.conversations-main-listing').addClass("hidden");
         });
+
+        self.updateDashboard();
     });
     self.on('onRoomDestroy', function(e, room) {
         if (room.type === "private") {
@@ -821,6 +797,8 @@ Chat.prototype.updateSectionUnreadCount = function() {
                 .addClass('hidden');
         }
         self._lastUnreadCount = unreadCount;
+
+        self.updateDashboard();
     }
 };
 /**
@@ -1805,6 +1783,11 @@ Chat.prototype._destroyAllChatsFromChatd = function() {
     });
 };
 
+Chat.prototype.updateDashboard = function() {
+    if (M.currentdirid === 'dashboard') {
+        delay('dashboard:updchat', dashboardUI.updateChatWidget);
+    }
+};
 
 window.Chat = Chat;
 window.chatui = chatui;

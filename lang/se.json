@@ -3378,7 +3378,7 @@
     "8830": "objekt delade p\u00e5 MEGA",
     "8831": "Kopierar...",
     "8832": "Minnesstatistik",
-    "8833": "To enhance this limit, you can register an account. This will not only give you ample extra bandwidth but also 50 GB of secure storage space in the cloud - [B]for free[\/B].",
+    "8833": "To enhance this limit, you can register an account. This will not only give you ample extra transfer quota but also 50 GB of secure storage space in the cloud - [B]for free[\/B].",
     "8834": "H\u00e4mtningen kunde inte forts\u00e4tta eftersom det skulle ta dig \u00f6ver den nuvarande kapacitet f\u00f6r din fria \u00f6verf\u00f6ring p\u00e5 din IP-adress.",
     "8835": "Det gick inte att kopiera \u00e5terst\u00e4llningsnyckeln till urklipp, f\u00f6rs\u00f6k igen.",
     "8836": "\u00c5terst\u00e4llningsnyckel kopierad till urklipp",
@@ -3774,7 +3774,7 @@
     "16103": "Bjud in v\u00e4ntande igen ",
     "16104": "Avvaktar app installation ",
     "16105": "Kvot beviljad",
-    "16106": "Your purchase of MEGA services will be processed by ECP for [B]Mega Europe sarl, 4 Rue Graham Bell, L-3235, Bettembourg, Luxembourg[\/B].",
+    "16106": "Your purchase of MEGA services will be processed for [B]Mega Europe sarl, 4 Rue Graham Bell, L-3235, Bettembourg, Luxembourg[\/B].",
     "16107": "Did you know that you can download the entire folder at once if you [S]install the free MEGA app[\/S]?",
     "16108": "Utloggning Alternativ:",
     "16109": "Rensa alla lokala metadata vid utloggning - Din n\u00e4sta inloggning kommer att ta l\u00e4ngre tid att bearbeta.",
@@ -3787,6 +3787,12 @@
     "16116": "[S]Warning:[\/S] You will not be able to access your account data, your MEGA contacts or conversations after you confirm this action.",
     "16117": "Framg\u00e5ngar",
     "16118": "\u00d6vergripande anv\u00e4ndande",
+    "16119": "[S]Utrymme[\/S]",
+    "16120": "[S]\u00d6verf\u00f6r[\/S]",
+    "16121": "Anv\u00e4nt utrymme",
+    "16122": "\u00d6verf\u00f6ringskvot ",
+    "16123": "[S]Used base quota[\/S] is the free transfer allowance for the IP address you are using. This value is dynamic and depends on the amount of unused bandwidth we have available.[BR] You can increase your quota by [A]Upgrading to PRO[\/A].",
+    "16124": "[S]Used base quota[\/S] is the free transfer allowance for the IP address you are using. This value is dynamic and depends on the amount of unused bandwidth we have available.[BR] You can increase your quota by completing [S]Account Achievements[\/S] or by [A]Upgrading to PRO[\/A].",
     "16125": "Anv\u00e4nd kvot f\u00f6r de senaste 6 timmar:",
     "16126": "F\u00e5 mer kvot\u00f6verf\u00f6ring",
     "16127": "Lagringskvot ",
@@ -3830,7 +3836,9 @@
     "16165": "Your transfer may be interrupted.[BR][S]Get a PRO account[\/S] for increased transfer quota.",
     "16166": "Plan",
     "16167": "You can also pay via the Google Play Store, Apple App Store, Microsoft Store or Android mobile carrier billing when using our [A]MEGA apps[\/A].",
-    "16168": "Saving settings...",
+    "16168": "Spara inst\u00e4llningar",
+    "16169": "Date created",
+    "16170": "There is an unknown error in the download path. Please try again and if continues failing contact support@mega.nz. [{0}]",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4063,6 +4071,7 @@
         "about-page-introduction": 12489,
         "additional-site-update-message": 15536,
         "purchase-processed-by-message": 16106,
-        "install-free-mega-app": 16107
+        "install-free-mega-app": 16107,
+        "storage_quota_header": 16119
     }
 }

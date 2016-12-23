@@ -2,8 +2,13 @@
 
     /**
      * Warning dialog when there is a fingerprint mismatch e.g. a MITM attack in progress.
-     * Triggerable with the following test code:
-     * mega.ui.CredentialsWarningDialog.singleton('DKLLwlj_THc', authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON, 'ABCDEF0123456789ABCDEF0123456789ABCDEF01', 'ABCDFF0123456789ABCDEE0123456788ABCDEF00' });
+     * Triggerable with the following test code (change the user handle to one in your account's M.u):
+     * mega.ui.CredentialsWarningDialog.singleton(
+     *      '4Hlf71R5IxY',
+     *      'Ed25519',
+     *      'ABCDEF0123456789ABCDEF0123456789ABCDEF01',
+     *      'ABCDFF0123456789ABCDEE0123456788ABCDEF00'
+     * );
      *
      * @param opts {Object}
      * @constructor
@@ -38,8 +43,8 @@
             'title': 'Warning',
             'buttons': [
                 {
-                    'label': "Close",
-                    'className': "fm-dialog-button-red",
+                    'label': l[148],
+                    'className': 'default-white-button right red',
                     'callback': function() {
                         this.hide();
                         this._hideOverlay();

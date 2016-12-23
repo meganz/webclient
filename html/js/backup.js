@@ -11,6 +11,10 @@ function init_backup() {
             type: "text/plain;charset=utf-8"
         });
         saveAs(blob, 'MEGA-RECOVERYKEY.txt');
+        if (!localStorage.recoverykey) {
+            localStorage.recoverykey = 1;
+            $('body').addClass('rk-saved');
+        }
     });
 
     if (is_extension || mega.utils.execCommandUsable()) {
@@ -24,6 +28,10 @@ function init_backup() {
             else {
                 $('#backup_keyinput').select();
                 document.execCommand('copy');
+            }
+            if (!localStorage.recoverykey) {
+                localStorage.recoverykey = 1;
+                $('body').addClass('rk-saved');
             }
         });
     }

@@ -3774,7 +3774,7 @@
     "16103": "Reinvite all pending",
     "16104": "Pending App Install",
     "16105": "Quota Granted",
-    "16106": "Your purchase of MEGA services will be processed by ECP for [B]Mega Europe sarl, 4 Rue Graham Bell, L-3235, Bettembourg, Luxembourg[\/B].",
+    "16106": "Your purchase of MEGA services will be processed for [B]Mega Europe sarl, 4 Rue Graham Bell, L-3235, Bettembourg, Luxembourg[\/B].",
     "16107": "Did you know that you can download the entire folder at once if you [S]install the free MEGA app[\/S]?",
     "16108": "Logout options:",
     "16109": "Wipe all local metadata when logging out - Your next login will take longer to process.",
@@ -3787,6 +3787,12 @@
     "16116": "[S]Warning:[\/S] You will not be able to access your account data, your MEGA contacts or conversations after you confirm this action.",
     "16117": "Achievements",
     "16118": "Overall Usage",
+    "16119": "[S]Storage[\/S]",
+    "16120": "[S]Transfer[\/S]",
+    "16121": "Used Storage",
+    "16122": "Transfer Quota",
+    "16123": "[S]Used base quota[\/S] is the free transfer allowance for the IP address you are using. This value is dynamic and depends on the amount of unused bandwidth we have available.[BR] You can increase your quota by [A]Upgrading to PRO[\/A].",
+    "16124": "[S]Used base quota[\/S] is the free transfer allowance for the IP address you are using. This value is dynamic and depends on the amount of unused bandwidth we have available.[BR] You can increase your quota by completing [S]Account Achievements[\/S] or by [A]Upgrading to PRO[\/A].",
     "16125": "Used quota for the last 6 hours:",
     "16126": "Get more transfer quota",
     "16127": "Storage Quota",
@@ -3825,12 +3831,14 @@
     "16160": "Generous transfer quota",
     "16161": "Transfer quota exceeded",
     "16162": "Free transfer quota exceeded",
-    "16163": "Your download could not proceed because it would take you over the current free transfer allowance for your IP address. This limit is dynamic and depends on the amount of unused transfer quota we have available.",
+    "16163": "Your download could not proceed because it would take you over the current free transfer allowance for your IP address. This limit is dynamic and depends on the amount of unused bandwidth we have available.",
     "16164": "Limited available transfer quota",
     "16165": "Your transfer may be interrupted.[BR][S]Get a PRO account[\/S] for increased transfer quota.",
     "16166": "Plan",
     "16167": "You can also pay via the Google Play Store, Apple App Store, Microsoft Store or Android mobile carrier billing when using our [A]MEGA apps[\/A].",
     "16168": "Saving settings...",
+    "16169": "Date created",
+    "16170": "There is an unknown error in the download path. Please try again and if continues failing contact support@mega.nz. [{0}]",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4063,6 +4071,7 @@
         "about-page-introduction": 12489,
         "additional-site-update-message": 15536,
         "purchase-processed-by-message": 16106,
-        "install-free-mega-app": 16107
+        "install-free-mega-app": 16107,
+        "storage_quota_header": 16119
     }
 }

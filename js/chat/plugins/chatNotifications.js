@@ -12,6 +12,7 @@ var ChatNotifications = function(megaChat, options) {
     options = options || {};
 
     options.parentLogger = megaChat.logger;
+    options.anfFlag = "chat_enabled";
 
     self.notifications = new MegaNotifications(options);
 
@@ -95,6 +96,7 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
                                 'group': megaRoom.roomJid,
                                 'incrementCounter': unreadFlag,
                                 'icon': icon,
+                                'anfFlag': 'chat_enabled',
                                 'params': {
                                     'from': avatarMeta.fullName
                                 }

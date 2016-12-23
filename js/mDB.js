@@ -102,7 +102,7 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
         try {
             if (!fmdb.db) {
                 var todrop = [];
-                var dbpfx = 'fm3_';
+                var dbpfx = 'fm4_';
 
                 // enumerate databases and collect those not prefixed with 'dbpfx'
                 // (which is the current format)
@@ -489,6 +489,10 @@ FMDB.prototype.stripnode = Object.freeze({
 
     chatqueuedmsgs : function(chatqueuedmsgs, index) {
         delete chatqueuedmsgs.k;
+    },
+
+    pta: function(pta, index) {
+        delete pta.k;
     }
 });
 
@@ -535,6 +539,9 @@ FMDB.prototype.restorenode = Object.freeze({
 
     chatqueuedmsgs : function(chatqueuedmsgs, index) {
         chatqueuedmsgs.k = index.k;
+    },
+    pta: function(pta, index) {
+        pta.k = index.k;
     },
 
     h: function(out, index) {

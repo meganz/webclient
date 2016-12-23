@@ -120,7 +120,7 @@ var astroPayDialog = {
     initCloseButton: function() {
 
         // Initialise the close and cancel buttons
-        this.$dialog.find('.fm-dialog-close, .fm-dialog-button.cancel').rebind('click', function() {
+        this.$dialog.find('.fm-dialog-close, .cancel').rebind('click', function() {
 
             // Hide the overlay and dialog
             astroPayDialog.hideDialog();
@@ -137,7 +137,7 @@ var astroPayDialog = {
      */
     initConfirmButton: function() {
 
-        this.$dialog.find('.fm-dialog-button.accept').rebind('click', function() {
+        this.$dialog.find('.accept').rebind('click', function() {
 
             // Store the full name and tax number entered
             astroPayDialog.fullName = $.trim(astroPayDialog.$dialog.find('#astropay-name-field').val());

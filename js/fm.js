@@ -5258,10 +5258,10 @@ function accountUI() {
                 }
             }
             else {
-                $('#account-new-password').addClass('loading');
+                $('.fm-account-input').addClass('loading');
                 silent_loading = function() {
                     // $('.login-register-input.password').removeClass('loading');
-                    $('#account-new-password').removeClass('loading');
+                    $('.fm-account-input').removeClass('loading');
                     // registerpwcheck();
                 };
                 jsl.push(jsl2['zxcvbn_js']);

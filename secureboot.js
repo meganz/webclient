@@ -39,7 +39,7 @@ var is_ios = is_mobile && (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 
 function isMobile()
 {
     if (is_chrome_firefox) return false;
-    
+
     // Flag for testing the mobile site
     if (localStorage.testMobileSite) {
         return true;
@@ -1624,17 +1624,13 @@ else if (!b_u)
     jsl.push({f:'js/transfers/xhr2.js', n: 'xhr_js', j:1});
     jsl.push({f:'js/transfers/queue.js', n: 'queue', j:1,w:4});
     jsl.push({f:'js/transfers/meths/cache.js', n: 'dl_cache', j:1,w:3});
+    jsl.push({f:'js/transfers/meths/flash.js', n: 'dl_flash', j:1,w:3});
+    jsl.push({f:'js/transfers/meths/memory.js', n: 'dl_memory', j:1,w:3});
     jsl.push({f:'js/transfers/meths/filesystem.js', n: 'dl_chrome', j:1,w:3});
     jsl.push({f:'js/transfers/meths/mediasource.js', n: 'dl_mediasource', j:1,w:3});
-    if (is_chrome_firefox && parseInt(Services.appinfo.version) > 27)
-    {
+    if (is_chrome_firefox && parseInt(Services.appinfo.version) > 27) {
         is_chrome_firefox |= 4;
         jsl.push({f:'js/transfers/meths/firefox-extension.js', n: 'dl_firefox', j:1,w:3});
-    }
-    else
-    {
-        jsl.push({f:'js/transfers/meths/memory.js', n: 'dl_memory', j:1,w:3});
-        jsl.push({f:'js/transfers/meths/flash.js', n: 'dl_flash', j:1,w:3});
     }
     jsl.push({f:'js/transfers/downloader.js', n: 'dl_downloader', j:1,w:3});
     jsl.push({f:'js/transfers/download2.js', n: 'dl_js', j:1,w:3});
@@ -1723,6 +1719,13 @@ else if (!b_u)
     // only used on beta
     if (onBetaW) {
         jsl.push({f: 'js/betacrashes.js', n: 'betacrashes_js', j: 1});
+    }
+
+    if (is_mobile) {
+        // Common to all mobile pages
+        jsl.push({f:'js/vendor/jquery.mobile.js', n: 'jquery_mobile_js', j: 1, w: 5});
+        jsl.push({f:'css/mobile-app-new.css', n: 'mobile_css', j: 2, w: 30, c: 1, d: 1, m: 1});
+        jsl.push({f:'css/spinners.css', n: 'spinners_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
     }
 
     var jsl2 =
@@ -1883,11 +1886,6 @@ else if (!b_u)
     };
 
     if (is_mobile) {
-        // Common to all mobile pages
-        jsl.push({f:'js/vendor/jquery.mobile.js', n: 'jquery_mobile_js', j:1, w:5});
-        jsl.push({f:'css/mobile-app-new.css', n: 'mobile_css', j:2, w:30, c:1, d:1, m:1});
-        jsl.push({f:'css/spinners.css', n: 'spinners_css', j:2,w:5,c:1,d:1,cache:1});
-        
         // Page specific
         subpages['!'] = ['fm_mobile', 'download_js'];
         subpages['F!'] = ['fm_mobile', 'fm_mobile_js'];

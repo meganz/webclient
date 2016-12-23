@@ -1334,7 +1334,12 @@ function topmenuUI() {
         section = page.split('/')[1];
     }
     $('.top-menu-item').removeClass('active');
+
     if (section) {
+        // just in case, a payment provider appended any ?returnurl vars
+        section = section.split("?")[0];
+        section = section.replace(/[^a-zA-Z\-\_]/g, "");
+
         $menuItem = $('.top-menu-item.' + section);
         $menuItem.addClass('active');
         if ($menuItem.parent('.top-submenu').length) {

@@ -4608,6 +4608,21 @@ var watchdog = Object.freeze({
                 }
                 break;
 
+            case 'setrsa':
+                if (typeof dlmanager === 'object'
+                        && dlmanager.isOverFreeQuota) {
+
+                    var sid = strg.data[1];
+                    u_type = strg.data[0];
+
+                    if (sid !== u_sid) {
+                        api_setsid(sid);
+                    }
+
+                    dlmanager._onQuotaRetry(true, sid);
+                }
+                break;
+
             case 'setsid':
                 if (typeof dlmanager === 'object'
                         && dlmanager.isOverQuota) {

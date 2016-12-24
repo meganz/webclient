@@ -1465,10 +1465,7 @@ function api_setsid(sid) {
 
             if (dlmanager.isOverQuota) {
 
-                if (dlmanager.isOverFreeQuota) {
-                    dlmanager._onQuotaRetry(true, sid);
-                }
-                else {
+                if (!dlmanager.isOverFreeQuota) {
                     dlmanager.uqFastTrack = 1;
                     dlmanager._overquotaInfo();
                 }

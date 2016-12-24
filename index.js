@@ -1886,11 +1886,13 @@ function topmenuUI() {
         }
     });
 
+    /**
+     * this is closing the EFQ email confirm dialog, if needed for something else ask before re-enabling [dc]
     if (!$('.fm-dialog.registration-page-success').hasClass('hidden')) {
         $('.fm-dialog.registration-page-success').addClass('hidden');
         $('.fm-dialog-overlay').addClass('hidden');
         $('body').removeClass('overlayed');
-    }
+    }*/
 
     if (ulmanager.isUploading || dlmanager.isDownloading) {
         $('.widget-block').removeClass('hidden');

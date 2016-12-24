@@ -219,12 +219,8 @@ function init_page() {
             dlkey = ar[1].replace(/[^\w-]+/g, "");
         }
 
-        if (mega.utils.hasPendingTransfers()) {
+        if (mega.utils.hasPendingTransfers() && $.lastSeenFilelink !== location.hash) {
             page = 'download';
-
-            if ($.lastSeenFilelink === location.hash) {
-                return;
-            }
 
             mega.utils.abortTransfers()
                 .done(function() {
@@ -1894,9 +1890,11 @@ function topmenuUI() {
         $('body').removeClass('overlayed');
     }*/
 
+    /**
+     * why was this needed here?
     if (ulmanager.isUploading || dlmanager.isDownloading) {
         $('.widget-block').removeClass('hidden');
-    }
+    }*/
 
     $('.widget-block').rebind('click', function (e) {
         if ($.infoscroll && page == 'download') {

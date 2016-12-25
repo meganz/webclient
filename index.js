@@ -219,12 +219,8 @@ function init_page() {
             dlkey = ar[1].replace(/[^\w-]+/g, "");
         }
 
-        if (mega.utils.hasPendingTransfers()) {
+        if (mega.utils.hasPendingTransfers() && $.lastSeenFilelink !== location.hash) {
             page = 'download';
-
-            if ($.lastSeenFilelink === location.hash) {
-                return;
-            }
 
             mega.utils.abortTransfers()
                 .done(function() {
@@ -1886,15 +1882,19 @@ function topmenuUI() {
         }
     });
 
+    /**
+     * this is closing the EFQ email confirm dialog, if needed for something else ask before re-enabling [dc]
     if (!$('.fm-dialog.registration-page-success').hasClass('hidden')) {
         $('.fm-dialog.registration-page-success').addClass('hidden');
         $('.fm-dialog-overlay').addClass('hidden');
         $('body').removeClass('overlayed');
-    }
+    }*/
 
+    /**
+     * why was this needed here?
     if (ulmanager.isUploading || dlmanager.isDownloading) {
         $('.widget-block').removeClass('hidden');
-    }
+    }*/
 
     $('.widget-block').rebind('click', function (e) {
         if ($.infoscroll && page == 'download') {

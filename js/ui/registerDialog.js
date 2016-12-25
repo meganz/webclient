@@ -275,6 +275,10 @@
         var closeRegisterDialog = function() {
             closeDialog();
             $(window).unbind('resize.proregdialog');
+
+            if (options.onDialogClosed) {
+                options.onDialogClosed($dialog);
+            }
         };
 
         dialogBodyScroll();

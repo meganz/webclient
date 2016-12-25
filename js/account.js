@@ -294,6 +294,8 @@ function u_setrsa(rsakey) {
                         process_u([user]);
 
                         if (d) console.log('Account activation succeeded', user);
+
+                        watchdog.notify('setrsa', [u_type, u_sid]);
                     }
                     $promise.resolve(rsakey);
                     ui_keycomplete();

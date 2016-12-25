@@ -334,7 +334,6 @@ var dlmanager = {
 
                     dlmanager.isOverQuota = false;
                     dlmanager.isOverFreeQuota = false;
-                    delete localStorage.awaitingConfirmationAccount;
                     return ctx.next(false, res, attr, ctx.object);
                 }
             }
@@ -838,7 +837,7 @@ var dlmanager = {
             });
     },
 
-    showOverQuotaRegisterDialog: function DM_quotaDialog(dlTask) {
+    showOverQuotaRegisterDialog: function DM_freeQuotaDialog(dlTask) {
 
         this._setOverQuotaState(dlTask);
 
@@ -848,6 +847,12 @@ var dlmanager = {
             return delay('overfreequota:retry', this._onQuotaRetry.bind(this, true), 1200);
         }
         this.isOverFreeQuota = true;
+
+        if (localStorage.awaitingConfirmationAccount) {
+            var accountData = JSON.parse(localStorage.awaitingConfirmationAccount);
+            this.logger.debug('showOverQuotaRegisterDialog: awaitingConfirmationAccount!');
+            return mega.ui.sendSignupLinkDialog(accountData);
+        }
 
         api_req({ a: 'log', e: 99613, m: 'efq' });
 
@@ -879,6 +884,7 @@ var dlmanager = {
                 Soon(callback);
                 callback = $dialog = undefined;
             }
+            delete this.onLimitedBandwidth;
         };
 
         fm_showoverlay();
@@ -893,7 +899,7 @@ var dlmanager = {
             open(getAppBaseUrl() + '#pro');
         });
 
-        $('.continue', $dialog).rebind('click', callback)
+        $('.continue', $dialog).rebind('click', this.onLimitedBandwidth.bind(this))
             .find('span')
             .text(res === 2 ? l[8946] : l[8945]);
 

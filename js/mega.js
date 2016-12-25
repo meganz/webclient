@@ -4576,8 +4576,9 @@ function MegaData()
         var handle = node.h || node.dl_id;
         node.name = node.name || node.n;
 
-        if (d && console.assert) {
-            console.assert(this.isFileNode(node), 'Invalid putToTransferTable node.');
+        if (d) {
+            var isDownload = node.owner instanceof ClassFile;
+            console.assert(this.isFileNode(node) || isDownload, 'Invalid putToTransferTable node.');
         }
 
         var gid = 'dl_' + handle;

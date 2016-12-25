@@ -26471,7 +26471,7 @@ body.key:not(.en):not(.ar):not(.se):not(.jp):not(.cn):not(.ct):not(.kr):not(.ar)
 .left-pane-drag-handle {
     cursor: ew-resize;
     position: absolute;
-    width: 8px;
+    width: 4px;
     z-index: 10;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;

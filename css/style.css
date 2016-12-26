@@ -1232,6 +1232,8 @@ div.radioOn::before, div.radioOff::before {
     height: 100%;
     position: absolute;
     content: '';
+    left: 0;
+    top: 0;
     -moz-border-radius: 100%;
     -webkit-border-radius: 100%;
     border-radius: 100%;

@@ -9508,7 +9508,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     left: -4px;
     right: auto;
     overflow: hidden;
-    max-width: 150%;
 }
 .default-select-dropdown .jspDrag {
     width: 4px;
@@ -26533,7 +26532,7 @@ body.key:not(.en):not(.ar):not(.se):not(.jp):not(.cn):not(.ct):not(.kr):not(.ar)
 }
 .support #support-subject {
     float: none;
-    width: 100px;
+    display: inline-block;
 }
 .support textarea {
     width: 100%;

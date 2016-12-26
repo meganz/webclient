@@ -5933,6 +5933,15 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     text-overflow: ellipsis;
     position: relative;
 }
+.fm-account-reseller .account.tab-content th:nth-child(2) {
+    width: 340px;
+}
+.fm-account-reseller .account.tab-content {
+    background-color: #FAFAFA;
+}
+.fm-account-reseller .resellers-content {
+    background-color: #FFFFFF;
+}
 .transfer-table .transfer-type, .transfer-table .tranfer-filetype-txt {
     white-space: nowrap;
     overflow: hidden;

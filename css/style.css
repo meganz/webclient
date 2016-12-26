@@ -20477,7 +20477,6 @@ span.incoming-call-name {
     padding: 0 0 0 10px;
     font-size: 14px;
     color: #333333;
-    white-space: nowrap;
     font-family: 'source_sans_prosemibold';
     height: 35px;
 }
@@ -22655,7 +22654,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
     visibility: hidden;
 }
 .credentials-warning-dialog .fm-mega-dialog-pad {
-    margin: 12px 0;
+    margin: 12px 0 0 0;
 }
 .credentials-warning-dialog .fm-mega-dialog-bottom {
     background-color: #eee;
@@ -22664,7 +22663,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 .credentials-warning-dialog {
     background-color: #fff;
     width: 600px;
+    margin: -221px 0 0 -300px;
     z-index: 1101;
+    overflow: hidden;
 }
 .credentials-warning-dialog .content {
     color: #999999;
@@ -22745,14 +22746,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 .credentials-warning-dialog .resetCredentials .reset-credentials-button {
     display: inline-block;
     float: none;
-    margin-left: 1px;
-    margin-top: 2px;
-}
-.credentials-warning-dialog .resetCredentials .reset-credentials-button span {
-    background-image: url("../images/mega/shared-sprite_v4.svg");
-    background-position: -34px -1506px;
-    display: block;
-    text-indent: 17px;
+    margin-top: 10px;
+    margin-left: 0;
 }
 .credentials-warning-dialog .resetCredentials .reset-credentials-button.hidden {
     display: none;

@@ -5000,6 +5000,7 @@ function accountUI() {
             var buttonText = ($.voucherlimit === 'all') ? l[7557] : l['466a'].replace('[X]', $.voucherlimit);
 
             $('.account-history-dropdown-button.vouchers').text(buttonText);
+            $('.fm-account-reseller .membership-big-txt.balance').safeHTML('@@ &euro; ', account.balance[0][0]);
             $('.account-history-drop-items.voucher10-').text(l['466a'].replace('[X]', 10));
             $('.account-history-drop-items.voucher100-').text(l['466a'].replace('[X]', 100));
             $('.account-history-drop-items.voucher250-').text(l['466a'].replace('[X]', 250));

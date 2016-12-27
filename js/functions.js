@@ -285,7 +285,7 @@ function delay(aProcID, aFunction, aTimeout) {
     if (typeof aProcID === 'function') {
         aTimeout = aFunction;
         aFunction = aProcID;
-        aProcID = mRandomToken();
+        aProcID = aFunction.name || MurmurHash3(String(aFunction));
     }
 
     if (d > 1) {
@@ -3307,6 +3307,9 @@ function assertStateChange(currentState, newState, allowedStatesMap, enumMap) {
     }
 }
 
+Object.defineProperty(mega, 'logger', {value: MegaLogger.getLogger('mega')});
+Object.defineProperty(mega.utils, 'logger', {value: MegaLogger.getLogger('utils', null, mega.logger)});
+
 Object.defineProperty(mega, 'api', {
     value: Object.freeze({
         logger: new MegaLogger('API'),
@@ -3834,6 +3837,7 @@ mega.utils.neuterArrayBuffer = function neuter(ab) {
 mega.utils.require = function megaUtilsRequire() {
     var files = [];
     var args = [];
+    var logger = d && MegaLogger.getLogger('require', 0, this.logger);
 
     toArray.apply(null, arguments).forEach(function(rsc) {
         // check if a group of resources was provided
@@ -3863,7 +3867,6 @@ mega.utils.require = function megaUtilsRequire() {
             var extension = filename.split('.').pop().toLowerCase();
             var name = filename.replace(/\./g, '_');
             var type;
-            var result;
 
             if (extension === 'html') {
                 type = 0;
@@ -3886,19 +3889,87 @@ mega.utils.require = function megaUtilsRequire() {
 
     if (files.length === 0) {
         // Everything is already loaded
+        if (logger) {
+            logger.debug('Nothing to load.', args);
+        }
         return MegaPromise.resolve();
     }
 
-    Array.prototype.push.apply(jsl, files);
-
     var promise = new MegaPromise();
-    silent_loading = function() {
-        promise.resolve();
-    };
-    jsl_start();
+    var rl = mega.utils.require.loading;
+    var rp = mega.utils.require.pending;
+    var loading = Object.keys(rl).length;
 
+    // Check which files are already being loaded
+    for (var i = files.length; i--;) {
+        var f = files[i];
+
+        if (rl[f.n]) {
+            // loading, remove it.
+            files.splice(i, 1);
+        }
+        else {
+            // not loading, track it.
+            rl[f.n] = mega.utils.getStack();
+        }
+    }
+
+    // hold up if other files are loading
+    if (loading) {
+        rp.push([files, promise]);
+
+        if (logger) {
+            logger.debug('Queueing %d files...', files.length, args);
+        }
+    }
+    else {
+
+        (function _load(files, promise) {
+            var onload = function() {
+                // all files have been loaded, remove them from the tracking queue
+                for (var i = files.length; i--;) {
+                    delete rl[files[i].n];
+                }
+
+                if (logger) {
+                    logger.debug('Finished loading %d files...', files.length, files);
+                }
+
+                // resolve promise, in a try/catch to ensure the caller doesn't mess us..
+                try {
+                    promise.resolve();
+                }
+                catch (ex) {
+                    (logger || console).error(ex);
+                }
+
+                // check if there is anything pending, and fire it.
+                var pending = rp.shift();
+
+                if (pending) {
+                    _load.apply(null, pending);
+                }
+            };
+
+            if (logger) {
+                logger.debug('Loading %d files...', files.length, files);
+            }
+
+            if (!files.length) {
+                // nothing to load
+                onload();
+            }
+            else {
+                Array.prototype.push.apply(jsl, files);
+                silent_loading = onload;
+                jsl_start();
+            }
+        })(files, promise);
+    }
     return promise;
 };
+mega.utils.require.pending = [];
+mega.utils.require.loading = Object.create(null);
 
 /**
  *  Kill session and Logout

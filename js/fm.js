@@ -3513,10 +3513,12 @@ function accountUI() {
     });
 
     sectionUIopen('account');
-    if (typeof zxcvbn === 'undefined' && !silent_loading) {
-        silent_loading = accountUI;
-        jsl.push(jsl2['zxcvbn_js']);
-        return jsl_start();
+    if (typeof zxcvbn === 'undefined') {
+        loadingDialog.show();
+        return mega.utils.require('zxcvbn_js')
+            .done(function() {
+                delay(accountUI);
+            });
     }
 
     M.accountData(function(account) {
@@ -11138,12 +11140,11 @@ function bottomPageDialog(close, pp, hh) {
     if (!pages[pp])
     {
         loadingDialog.show();
-        silent_loading = function () {
-            loadingDialog.hide();
-            bottomPageDialog(false, $.dialog);
-        };
-        jsl.push(jsl2[pp]);
-        jsl_start();
+        mega.utils.require(pp)
+            .done(function() {
+                loadingDialog.hide();
+                bottomPageDialog(false, $.dialog);
+            });
         return false;
     }
 

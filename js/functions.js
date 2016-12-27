@@ -3433,13 +3433,11 @@ mega.utils.sortObjFn = function(key, order) {
 
 /**
  * Promise-based XHR request
- * @param {Mixed} aURLOrOptions URL or options
- * @param {Mixed} aData Data to send, optional
- * @param {Function} progressCallback An optional progress callback which passes the percent complete e.g. 49.23 as the
- *                                    first param, the bytes loaded as the second param and the total bytes as the
- *                                    third param.
+ * @param {Object|String} aURLOrOptions   URL or options
+ * @param {Object|String} [aData]         Data to send, optional
+ * @returns {MegaPromise}
  */
-mega.utils.xhr = function megaUtilsXHR(aURLOrOptions, aData, progressCallback) {
+mega.utils.xhr = function megaUtilsXHR(aURLOrOptions, aData) {
     /* jshint -W074 */
     var xhr;
     var url;
@@ -3474,22 +3472,6 @@ mega.utils.xhr = function megaUtilsXHR(aURLOrOptions, aData, progressCallback) {
             promise.reject(ev);
         }
     };
-
-    // If the calling function requests download progress, add progress handler
-    if (typeof progressCallback === 'function') {
-        xhr.addEventListener('progress', function(event) {
-            if (event.lengthComputable) {
-
-                // Calculate percentage downloaded e.g. 49.23
-                var percentComplete = ((event.loaded / event.total) * 100);
-                var bytesLoaded = event.loaded;
-                var bytesTotal = event.total;
-
-                // Pass the percent complete to the callback function
-                progressCallback(percentComplete, bytesLoaded, bytesTotal);
-            }
-        }, false);
-    }
 
     try {
         if (d) {
@@ -4027,13 +4009,13 @@ mega.utils.vtol = function megaUtilsVTOL(version, hex) {
 
 /**
  * Retrieve data from storage servers.
- * @param {String|Object} aData        ufs-node's handle or public link
- * @param {Number}        aStartOffset offset to start retrieveing data from
- * @param {Number}        aEndOffset   retrieve data until this offset
- * @param {Function} progressCallback A callback function which is called with the percent complete
+ * @param {String|Object} aData           ufs-node's handle or public link
+ * @param {Number}        [aStartOffset]  offset to start retrieveing data from
+ * @param {Number}        [aEndOffset]    retrieve data until this offset
+ * @param {Function}      [aProgress]     callback function which is called with the percent complete
  * @returns {MegaPromise}
  */
-mega.utils.gfsfetch = function(aData, aStartOffset, aEndOffset, progressCallback) {
+mega.utils.gfsfetch = function gfsfetch(aData, aStartOffset, aEndOffset, aProgress) {
     var promise = new MegaPromise();
 
     var fetcher = function(data) {
@@ -4057,15 +4039,30 @@ mega.utils.gfsfetch = function(aData, aStartOffset, aEndOffset, progressCallback
             aStartOffset -= byteOffset;
         }
 
-        mega.utils.xhr(
-            {
-                method: 'POST',
-                type: 'arraybuffer',
-                url: data.g + '/' + aStartOffset + '-' + (aEndOffset - 1)
-            },
-            null,
-            progressCallback
-        ).done(function(ev, response) {
+        var request = {
+            method: 'POST',
+            type: 'arraybuffer',
+            url: data.g + '/' + aStartOffset + '-' + (aEndOffset - 1)
+        };
+
+        if (typeof aProgress === 'function') {
+            request.prepare = function(xhr) {
+                xhr.addEventListener('progress', function(ev) {
+                    if (ev.lengthComputable) {
+
+                        // Calculate percentage downloaded e.g. 49.23
+                        var percentComplete = ((ev.loaded / ev.total) * 100);
+                        var bytesLoaded = ev.loaded;
+                        var bytesTotal = ev.total;
+
+                        // Pass the percent complete to the callback function
+                        aProgress(percentComplete, bytesLoaded, bytesTotal);
+                    }
+                }, false);
+            };
+        }
+
+        mega.utils.xhr(request).done(function(ev, response) {
 
             data.macs = [];
             data.writer = [];

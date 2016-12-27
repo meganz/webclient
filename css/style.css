@@ -22667,7 +22667,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 }
 .credentials-warning-dialog .fm-mega-dialog-bottom {
     background-color: #eee;
-    margin: 0 0 -12px;
+    margin: 0;
 }
 .credentials-warning-dialog {
     background-color: #fff;

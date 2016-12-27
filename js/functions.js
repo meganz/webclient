@@ -4681,13 +4681,22 @@ var watchdog = Object.freeze({
                         && dlmanager.isOverFreeQuota) {
 
                     var sid = strg.data[1];
-                    u_type = strg.data[0];
+                    var type = strg.data[0];
 
-                    if (sid !== u_sid) {
-                        api_setsid(sid);
-                    }
+                    u_storage = init_storage(localStorage);
+                    u_storage.sid = sid;
 
-                    dlmanager._onQuotaRetry(true, sid);
+                    u_checklogin({
+                        checkloginresult: function(ctx, r) {
+                            u_type = r;
+
+                            if (u_type !== type) {
+                                console.error('Unexpected user-type: got %s, expected %s', r, type);
+                            }
+
+                            dlmanager._onQuotaRetry(true, sid);
+                        }
+                    });
                 }
                 break;
 

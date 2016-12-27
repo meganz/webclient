@@ -377,6 +377,7 @@
             $('.password-status-warning', $dialog).css('margin-left',
                 ($('.password-status-warning', $dialog).width() / 2 * -1) - 13);
             reposition();
+            dialogBodyScroll();
         };
 
         if (typeof zxcvbn === 'undefined' && !silent_loading) {
@@ -393,12 +394,13 @@
         $('#register-password', $dialog).rebind('keyup.proRegister', function(e) {
             registerpwcheck();
         });
+
         $('.password-status-icon', $dialog).rebind('mouseover.proRegister', function(e) {
             if ($(this).parents('.strong-password').length === 0) {
                 $('.password-status-warning', $dialog).removeClass('hidden');
             }
-
         });
+
         $('.password-status-icon', $dialog).rebind('mouseout.proRegister', function(e) {
             if ($(this).parents('.strong-password').length === 0) {
                 $('.password-status-warning', $dialog).addClass('hidden');

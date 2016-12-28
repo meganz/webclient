@@ -144,6 +144,8 @@ IndexedDBKVStorage.prototype.clear = function __IDBKVClear() {
     var fmdb = this.fmdb;
     var promise = new MegaPromise();
 
+    this.destroy();
+
     if (fmdb && Object(fmdb.db).hasOwnProperty(this.name)) {
 
         fmdb.db[this.name].clear().then(function() {
@@ -157,10 +159,6 @@ IndexedDBKVStorage.prototype.clear = function __IDBKVClear() {
     else {
         promise.reject();
     }
-
-    promise.always(function() {
-        self.destroy();
-    });
 
     return promise;
 };

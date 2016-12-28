@@ -3610,16 +3610,19 @@ function accountUI() {
 
                 // Display the date their subscription will renew if known
                 if (timestamp > 0) {
-                    var date = new Date(timestamp * 1000);
-                    var dateString = l[6971] + ' ' + date.getDate() + ' ' + date_months[date.getMonth()] + ' '
-                                   + date.getFullYear();
+                    var dateString = time2date(timestamp, 2);
 
                     // Use format: 14 March 2015 - Credit Card
                     paymentType = dateString + ' - ' + paymentType;
-                }
 
-                // Otherwise just show payment type
-                $('.membership-medium-txt.expiry').text(paymentType);
+                    $('.account.plan-info.expiry-txt').text(l[6971]); // change placeholder 'Expires on' by 'Renews'
+                    $('.account.plan-info.expiry').text(paymentType);
+                }
+                else {
+                    // Otherwise show nothing
+                    $('.account.plan-info.expiry').text('');
+                    $('.account.plan-info.expiry-txt').text('');
+                }
 
                 // Check if there are any active subscriptions
                 // ccqns = Credit Card Query Number of Subscriptions

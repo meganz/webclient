@@ -45,8 +45,8 @@ function startMega() {
     mBroadcaster.sendMessage('startMega');
 
     if (silent_loading) {
-        silent_loading();
         jsl = [];
+        Soon(silent_loading);
         silent_loading = false;
         return false;
     }

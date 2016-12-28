@@ -302,13 +302,13 @@
 
                             case 6: // OPCODE_PEERSTATUS
                                 if (this.up.peerstatuscb) {
-                                    this.up.peerstatuscb(ab_to_base64(new Uint8Array(u.buffer, p+2, 8)), u[1] & 0xf, u[1] & 0x80);
+                                    this.up.peerstatuscb(ab_to_base64(new Uint8Array(u.buffer, p+2, 8)), u[p + 1] & 0xf, u[p + 1] & 0x80);
                                 }
                                 p += 10;
                                 break;
 
                             default:
-                                console.error("Fatal - unknown opcode: " + u[0]);
+                                console.error("Fatal - unknown opcode: " + u[p]);
                                 // reload forcefully, as we are probably out of date
                                 return this.up.reload();
                         }

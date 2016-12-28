@@ -5235,38 +5235,21 @@ function accountUI() {
     });
 
     $('.account-pass-lines').attr('class', 'account-pass-lines');
-    $('#account-new-password').bind('keyup.pswdchange', function(el)
+    $('#account-new-password').rebind('keyup.pwdchg', function(el)
     {
         $('.account-pass-lines').attr('class', 'account-pass-lines');
         if ($(this).val() !== '') {
-            if (typeof zxcvbn !== 'undefined') {
-                var pws = zxcvbn($(this).val());
-
-                if ((pws.score > 3) && (pws.entropy > 75)) {
-                    $('.account-pass-lines').addClass('good4');
-                }
-                else if ((pws.score > 2) && (pws.entropy > 50)) {
-                    $('.account-pass-lines').addClass('good3');
-                }
-                else if ((pws.score > 1) && (pws.entropy > 40)) {
-                    $('.account-pass-lines').addClass('good2');
-                }
-                else if ((pws.score > 0) && (pws.entropy > 15)) {
-                    $('.account-pass-lines').addClass('good1');
-                }
-                else {
-                    $('.account-pass-lines').addClass('weak-password');
-                }
-            }
-            else {
-                $('.fm-account-input').addClass('loading');
-                silent_loading = function() {
-                    // $('.login-register-input.password').removeClass('loading');
-                    $('.fm-account-input').removeClass('loading');
-                    // registerpwcheck();
-                };
-                jsl.push(jsl2['zxcvbn_js']);
-                jsl_start();
+            var pws = zxcvbn($(this).val());
+            if (pws.score > 3 && pws.entropy > 75) {
+                $('.account-pass-lines').addClass('good4');
+            } else if (pws.score > 2 && pws.entropy > 50) {
+                $('.account-pass-lines').addClass('good3');
+            } else if (pws.score > 1 && pws.entropy > 40) {
+                $('.account-pass-lines').addClass('good2');
+            } else if (pws.score > 0 && pws.entropy > 15) {
+                $('.account-pass-lines').addClass('good1');
+            } else {
+                $('.account-pass-lines').addClass('weak-password');
             }
         }
     });

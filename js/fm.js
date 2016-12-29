@@ -11979,6 +11979,7 @@ function slideshow(id, close)
     $('.slideshow-progress').addClass('hidden');
     $('.slideshow-error').addClass('hidden');
     $('.slideshow-image-bl').addClass('hidden');
+    $('.slideshow-prev-button,.slideshow-next-button').removeClass('active');
 
     slideshowid = id;
     var steps = slideshowsteps();
@@ -11986,7 +11987,7 @@ function slideshow(id, close)
         $('.slideshow-prev-button').addClass('active');
     if (steps.forward.length > 0)
         $('.slideshow-next-button').addClass('active');
-    $('.slideshow-prev-button,.slideshow-next-button').removeClass('active').rebind('click', function(e)
+    $('.slideshow-prev-button,.slideshow-next-button').rebind('click', function(e)
     {
         var c = $(this).attr('class');
         if (c && c.indexOf('active') > -1)

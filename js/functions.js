@@ -5033,7 +5033,7 @@ if (typeof sjcl !== 'undefined') {
 
         var self = this;
 
-        if ($.remvoedContactsFromShare && ($.removedContactsFromShare.length > 0)) {
+        if ($.removedContactsFromShare && ($.removedContactsFromShare.length > 0)) {
             self.removeContactFromShare();
         }
         if ($.changedPermissions && ($.changedPermissions.length > 0)) {

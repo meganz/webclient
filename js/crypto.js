@@ -1798,7 +1798,9 @@ function api_send(q) {
         if (q.split) {
             if (chunked_method) {
                 // FIXME: use Fetch API if more efficient than this
-                q.xhr.responseType = 'moz-chunked-arraybuffer';
+                if (typeof Uint8Array.prototype.indexOf === 'function') {
+                    q.xhr.responseType = 'moz-chunked-arraybuffer';
+                }
 
                 // first try? record success
                 if (chunked_method < 0) {
@@ -4363,7 +4365,7 @@ function api_strerror(errno) {
 
     var JSONSplitter = function json_splitter(filters, ctx, format_uint8array) {
         if (!(this instanceof json_splitter)) {
-            return new json_splitter(filters, ctx);
+            return new json_splitter(filters, ctx, format_uint8array);
         }
 
         // position in source string

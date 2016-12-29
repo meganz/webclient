@@ -1983,8 +1983,11 @@ else if (!b_u)
             waitingToBeLoaded++;
             elem.onload = function() {
                 // if (d) console.log('jj.progress...', waitingToBeLoaded);
+
+                jsl_loaded[Object(jsl[id]).n] = 1;
                 jsl_current += Object(jsl[id]).w || 1;
                 jsl_progress();
+
                 if (--waitingToBeLoaded == 0) {
                     jj_done = true;
                     boot_done();
@@ -2045,6 +2048,10 @@ else if (!b_u)
                         jsl[i].text = '/**/';
                         createStyleTag(i, bootstaticpath + jsl[i].f + jjNoCache);
                     }
+                }
+
+                if (!jj || !jsl[i].j || jsl[i].j > 2) {
+                    jsl_done = false;
                 }
             }
         }
@@ -2267,7 +2274,9 @@ else if (!b_u)
         //for(var i in localStorage) if (i.substr(0,6) == 'cache!') delete localStorage[i];
         for (var i in jsl)
         {
-            jsl_loaded[jsl[i].n]=1;
+            if (!jj || !jsl[i].j || jsl[i].j > 2) {
+                jsl_loaded[jsl[i].n] = 1;
+            }
             if ((jsl[i].j == 1) && (!jj))
             {
                 if (!fx_startup_cache)

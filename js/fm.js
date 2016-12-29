@@ -3513,10 +3513,12 @@ function accountUI() {
     });
 
     sectionUIopen('account');
-    if (typeof zxcvbn === 'undefined' && !silent_loading) {
-        silent_loading = accountUI;
-        jsl.push(jsl2['zxcvbn_js']);
-        return jsl_start();
+    if (typeof zxcvbn === 'undefined') {
+        loadingDialog.show();
+        return mega.utils.require('zxcvbn_js')
+            .done(function() {
+                delay(accountUI);
+            });
     }
 
     M.accountData(function(account) {
@@ -3608,16 +3610,19 @@ function accountUI() {
 
                 // Display the date their subscription will renew if known
                 if (timestamp > 0) {
-                    var date = new Date(timestamp * 1000);
-                    var dateString = l[6971] + ' ' + date.getDate() + ' ' + date_months[date.getMonth()] + ' '
-                                   + date.getFullYear();
+                    var dateString = time2date(timestamp, 2);
 
                     // Use format: 14 March 2015 - Credit Card
                     paymentType = dateString + ' - ' + paymentType;
-                }
 
-                // Otherwise just show payment type
-                $('.membership-medium-txt.expiry').text(paymentType);
+                    $('.account.plan-info.expiry-txt').text(l[6971]); // change placeholder 'Expires on' by 'Renews'
+                    $('.account.plan-info.expiry').text(paymentType);
+                }
+                else {
+                    // Otherwise show nothing
+                    $('.account.plan-info.expiry').text('');
+                    $('.account.plan-info.expiry-txt').text('');
+                }
 
                 // Check if there are any active subscriptions
                 // ccqns = Credit Card Query Number of Subscriptions
@@ -11121,12 +11126,11 @@ function bottomPageDialog(close, pp, hh) {
     if (!pages[pp])
     {
         loadingDialog.show();
-        silent_loading = function () {
-            loadingDialog.hide();
-            bottomPageDialog(false, $.dialog);
-        };
-        jsl.push(jsl2[pp]);
-        jsl_start();
+        mega.utils.require(pp)
+            .done(function() {
+                loadingDialog.hide();
+                bottomPageDialog(false, $.dialog);
+            });
         return false;
     }
 
@@ -11975,6 +11979,7 @@ function slideshow(id, close)
     $('.slideshow-progress').addClass('hidden');
     $('.slideshow-error').addClass('hidden');
     $('.slideshow-image-bl').addClass('hidden');
+    $('.slideshow-prev-button,.slideshow-next-button').removeClass('active');
 
     slideshowid = id;
     var steps = slideshowsteps();
@@ -11982,7 +11987,7 @@ function slideshow(id, close)
         $('.slideshow-prev-button').addClass('active');
     if (steps.forward.length > 0)
         $('.slideshow-next-button').addClass('active');
-    $('.slideshow-prev-button,.slideshow-next-button').removeClass('active').rebind('click', function(e)
+    $('.slideshow-prev-button,.slideshow-next-button').rebind('click', function(e)
     {
         var c = $(this).attr('class');
         if (c && c.indexOf('active') > -1)

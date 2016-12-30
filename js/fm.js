@@ -3593,17 +3593,6 @@ function accountUI() {
             // Subscription
             if (account.stype == 'S') {
 
-                $('.fm-account-header.typetitle').text(l[434]);
-                if (account.scycle == '1 M') {
-                    $('.membership-big-txt.type').text(l[748]);
-                }
-                else if (account.scycle == '1 Y') {
-                    $('.membership-big-txt.type').text(l[749]);
-                }
-                else {
-                    $('.membership-big-txt.type').text('');
-                }
-
                 // Get the date their subscription will renew
                 var timestamp = account.srenew[0];
                 var paymentType = (account.sgw.length > 0) ? account.sgw[0] : '';   // Credit Card etc
@@ -3631,9 +3620,8 @@ function accountUI() {
 
                         // If there is an active subscription
                         if (numOfSubscriptions > 0) {
-
                             // Show cancel button and show cancellation dialog
-                            $('.fm-account-blocks .btn-cancel').show().rebind('click', function() {
+                            $('.account.data-block .btn-cancel').removeClass('hidden').rebind('click', function() {
                                 cancelSubscriptionDialog.init();
                             });
                             $('.subscription-bl').addClass('active-subscription');
@@ -3649,7 +3637,7 @@ function accountUI() {
                 });
                 $('.account.plan-info.expiry-txt').text(l[987]);
                 $('.account.plan-info.expiry a').text(time2date(account.expiry, 2));
-                $('.account.data-block .btn-cancel').hide();
+                $('.account.data-block .btn-cancel').addClass('hidden');
                 $('.subscription-bl').removeClass('active-subscription');
             }
 
@@ -3662,7 +3650,7 @@ function accountUI() {
             // free account:
             $('.account.plan-info.accounttype span').text(l[435]);
             $('.account.plan-info.expiry').text(l[436]);
-            $('.btn-cancel').hide();
+            $('.btn-cancel').addClass('hidden');
             $('.subscription-bl').removeClass('active-subscription');
             $('.account.plan-info-row.bandwidth').hide();
         }
@@ -4346,10 +4334,10 @@ function accountUI() {
             });
             $newEmail.val('');
             if (texts.join("") === "") {
-                $newEmail.removeAttr('disabled').parents('.fm-account-blocks').removeClass('disabled');
+                $newEmail.removeAttr('disabled').parents('.account.data-block').removeClass('disabled');
             }
             else {
-                $newEmail.attr('disabled', 'disabled').parents('.fm-account-blocks').addClass('disabled');
+                $newEmail.attr('disabled', 'disabled').parents('.account.data-block').addClass('disabled');
             }
         });
 
@@ -4360,9 +4348,9 @@ function accountUI() {
             $passwords.val('');
 
             if (mail === "") {
-                $passwords.removeAttr('disabled').parents('.fm-account-blocks').removeClass('disabled');
+                $passwords.removeAttr('disabled').parents('.account.data-block').removeClass('disabled');
             } else {
-                $passwords.attr('disabled', 'disabled').parents('.fm-account-blocks').addClass('disabled');
+                $passwords.attr('disabled', 'disabled').parents('.account.data-block').addClass('disabled');
             }
 
             // Show information message
@@ -4386,8 +4374,8 @@ function accountUI() {
         });
         $('.fm-account-cancel').rebind('click', function(e)
         {
-            $passwords.removeAttr('disabled').parents('.fm-account-blocks').removeClass('disabled');
-            $newEmail.removeAttr('disabled').parents('.fm-account-blocks').removeClass('disabled');
+            $passwords.removeAttr('disabled').parents('.account.data-block').removeClass('disabled');
+            $newEmail.removeAttr('disabled').parents('.account.data-block').removeClass('disabled');
             $('.fm-account-save-block').addClass('hidden');
             $('.profile-form.first').removeClass('email-confirm');
             accountUI();
@@ -4395,8 +4383,8 @@ function accountUI() {
 
         $('.fm-account-save').rebind('click', function()
         {
-            $passwords.removeAttr('disabled').parents('.fm-account-blocks').removeClass('disabled');
-            $newEmail.removeAttr('disabled').parents('.fm-account-blocks').removeClass('disabled');
+            $passwords.removeAttr('disabled').parents('.account.data-block').removeClass('disabled');
+            $newEmail.removeAttr('disabled').parents('.account.data-block').removeClass('disabled');
             u_attr.firstname = $('#account-firstname').val().trim();
             u_attr.lastname = $('#account-lastname').val().trim();
             u_attr.birthday = $('.default-select.day .default-dropdown-item.active').attr('data-value');
@@ -13066,7 +13054,7 @@ var cancelSubscriptionDialog = {
 
                     // Hide loading dialog and cancel subscription button on account page
                     loadingDialog.hide();
-                    cancelSubscriptionDialog.$accountPageCancelButton.hide();
+                    cancelSubscriptionDialog.$accountPageCancelButton.addClass('hidden');
                     cancelSubscriptionDialog.$accountPageSubscriptionBlock.removeClass('active-subscription');
 
                     // Show success dialog and refresh UI

@@ -25435,6 +25435,9 @@ div.camera-bottom-txt {
 .account.buttons .button {
     margin-top: 27px;
 }
+.button.default-white-button.btn-cancel {
+    margin-top: -12px;
+}
 .fm-account-sections {
     height: 100%;
     overflow: hidden;
@@ -26686,20 +26689,15 @@ table.speed-table {
     margin-left: -2px;
     margin-top: -2px;
 }
-.fm-dialog-button.encrypt-link-button .encrypt-text, .fm-dialog-new-folder-button.decrypt-link-button .decrypt-text {
-    font-style: normal;
-}
 .fm-dialog-button.encrypt-link-button .encrypt-text.encrypted, .fm-dialog-new-folder-button.decrypt-link-button .decrypt-text.decrypted {
     color: #7dd016;
 }
 .fm-dialog-button.encrypt-link-button .encryption-in-progress, .fm-dialog-new-folder-button.decrypt-link-button .decryption-in-progress {
-    background-image: url("../images/mega/loader-get-link-encryption.gif");
-    background-position: 0 0;
+    background-image: url(../images/mega/loader-get-link-encryption.gif);
+    background-position: 1px 4px;
     background-repeat: no-repeat;
     display: inline-block;
-    height: 11px;
-    margin-left: 10px;
-    width: 16px;
+    margin: 6px -5px 1px 6px;
 }
 .fm-dialog-button.encrypt-link-button .encryption-in-progress.hidden, .fm-dialog-new-folder-button.decrypt-link-button .decryption-in-progress.hidden {
     display: none;

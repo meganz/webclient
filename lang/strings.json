@@ -15370,5 +15370,9 @@
     "16173": {
         "text": "Choose colour:",
         "context": "Context menu item which allows to choose color of selected folder"
+    },
+    "16174": {
+        "text": "Date Modified",
+        "context": "A table column header for the date when a file was modified."
     }
 }

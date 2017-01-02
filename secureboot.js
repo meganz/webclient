@@ -124,6 +124,13 @@ if (!String.prototype.trim) {
         return this.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
     };
 }
+if (!String.prototype.localeCompare) {
+    String.prototype.localeCompare = function(to) {
+        var s1 = this.toLowerCase();
+        var s2 = String(to).toLowerCase();
+        return s1 > s2 ? 1 : (s1 < s2 ? -1 : 0);
+    };
+}
 if (!String.trim) {
     String.trim = function(s) {
         return String(s).trim();

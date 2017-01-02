@@ -5174,6 +5174,12 @@ function MegaData()
     {
         var id = (dl.zipid ? 'zip_' + dl.zipid : 'dl_' + dl.dl_id);
 
+        if (M.tfsdomqueue[id]) {
+            // flush the transfer from the DOM queue
+            addToTransferTable(id, M.tfsdomqueue[id]);
+            delete M.tfsdomqueue[id];
+        }
+
         $('.transfer-table #' + id)
             .addClass('transfer-initiliazing')
             .find('.transfer-status').text(l[1042]);
@@ -5336,19 +5342,20 @@ function MegaData()
 
             if (gid[0] !== 'u')
             {
+                // keep inserting downloads as long there are uploads
                 var dl = $('.transfer-table tr.transfer-download.transfer-queued:last');
 
-                if (dl.length)
-                {
-                    // keep inserting downloads as long there are uploads
-                    // dl = +dl.closest('tr').children(':first').text();
+                if (dl.length) {
                     dl = dl.prevAll().length;
 
-                    if (dl && dl + 1 < T.used)
-                    {
-                        addToTransferTable(gid, elem);
-                        fit = true;
-                    }
+                    fit = (dl && dl + 1 < T.used);
+                }
+                else {
+                    fit = !document.querySelector('.transfer-table tr.transfer-download');
+                }
+
+                if (fit) {
+                    addToTransferTable(gid, elem);
                 }
             }
 

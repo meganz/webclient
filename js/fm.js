@@ -6856,7 +6856,9 @@ function transferPanelUI()
         {
             if (e.type == 'contextmenu')
             {
-                $('.ui-selected', domTable).removeClass('ui-selected');
+                if (!e.ctrlKey && !e.metaKey && !e.shiftKey) {
+                    $('.ui-selected', domTable).removeClass('ui-selected');
+                }
                 $(this).addClass('ui-selected dragover');
                 transferPanelContextMenu(null);
                 return !!contextMenuUI(e);

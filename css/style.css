@@ -6545,6 +6545,10 @@ table {
     height: -moz-calc(100% - 26px);
     height: calc(100% - 26px);
 }
+.transfer-scrolling-table {
+    /* do not remove, needed for perfect-scrollbar */
+    position: relative !important;
+}
 .transfer-filtype-icon, .fm-browsers-icon, .fm-flags-icon, .fm-member-icon {
     display: block;
     position: absolute;

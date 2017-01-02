@@ -3981,9 +3981,18 @@ function crypto_fixmissingkeys(hs) {
 }
 
 // set a newly received sharekey - apply to relevant missing key nodes, if any.
+// also, update M.c.shares/FMDB.s if the sharekey was not previously known.
 function crypto_setsharekey(h, k) {
     u_sharekeys[h] = [k, new sjcl.cipher.aes(k)];
     if (sharemissing[h]) crypto_fixmissingkeys(sharemissing[h]);
+
+    if (M.c.shares[h] && !M.c.shares[h].sk) {
+        M.c.shares[h].sk = a32_to_base64(k);
+
+        if (fmdb) fmdb.add('s', { o_t : M.c.shares[h].su + '*' + h,
+                                  d : M.c.shares[h]
+        });
+    }
 }
 
 // set a newly received nodekey

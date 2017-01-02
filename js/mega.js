@@ -2512,20 +2512,16 @@ function MegaData()
                     if (k !== false) crypto_setsharekey(n.h, k);
                 }
 
-                if (u_sharekeys[n.h]) {
-                    this.c.shares[n.h] = { su : n.su,
-                                            r : n.r,
-                                           sk : a32_to_base64(u_sharekeys[n.h][0]) };
+                this.c.shares[n.h] = { su : n.su,
+                                        r : n.r };
 
-                    // addNode() is called from:
-                    // createFolder() (in response to API `p` - currently
-                    // incorrect, but permissible in the future)
-                    // __process_f1()
-                    // process_u() (with pass-through ignoreDB)
-                    if (fmdb && !ignoreDB) fmdb.add('s', { o_t : n.su + '*' + n.h,
-                                                           d : this.c.shares[n.h]
-                    });
+                if (u_sharekeys[n.h]) {
+                    this.c.shares[n.h].sk = a32_to_base64(u_sharekeys[n.h][0]);
                 }
+
+                if (fmdb && !ignoreDB) fmdb.add('s', { o_t : n.su + '*' + n.h,
+                                                       d : this.c.shares[n.h]
+                });
             }
         }
 
@@ -7484,7 +7480,9 @@ function dbfetchfm() {
                             if (r[i].o.length == 11) {
                                 // this is an inbound share
                                 M.c.shares[r[i].t] = r[i];
-                                crypto_setsharekey(r[i].t, base64_to_a32(r[i].sk));
+                                if (r[i].sk) {
+                                    crypto_setsharekey(r[i].t, base64_to_a32(r[i].sk));
+                                }
                             }
                             else {
                                 // this is an outbound share

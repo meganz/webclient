@@ -9270,7 +9270,7 @@ function fm_thumbnails()
         for (var i in M.v)
         {
             var n = M.v[i];
-            if (n && n.fa && String(n.fa).indexOf(':0') > 0)
+            if (n && !missingkeys[n.h] && n.fa && String(n.fa).indexOf(':0') > 0)
             {
                 if (fa_tnwait == n.h && n.seen)
                     fa_tnwait = 0;

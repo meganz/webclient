@@ -7217,6 +7217,12 @@ function worker_procmsg(ev) {
     else if (ev.data.h) {
         // enqueue or emplace processed node
         if (ev.data.t < 2 && !crypto_keyok(ev.data)) {
+            // ignore if node already exists
+            if (ev.data.h in M.d) {
+                return;
+            }
+
+            // otherwise, report as missing
             crypto_reportmissingkey(ev.data);
         }
 

@@ -304,8 +304,8 @@ function MegaData()
                 // have defined first or last name then email address will be used
                 // for comparasion. Files and folders doesn't have .m field but
                 // it's not possible to rename them to null i.e. '' => no side effects.
-                var itemA = ((typeof a.name === 'string') && (a.name.length)) ? a.name : a.m;
-                var itemB = ((typeof b.name === 'string') && (b.name.length)) ? b.name : b.m;
+                var itemA = ((typeof a.name === 'string') && (a.name.length)) ? a.name : a.m || '';
+                var itemB = ((typeof b.name === 'string') && (b.name.length)) ? b.name : b.m || '';
 
                 return itemA.localeCompare(itemB) * d;
             };

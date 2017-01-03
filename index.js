@@ -1325,7 +1325,6 @@ function topmenuUI() {
 
     // Show active item in main menu
     var section = page.split('/')[0];
-    var $menuItem;
     if (section === 'fm') {
         section = page.split('/')[1];
     }
@@ -1336,26 +1335,28 @@ function topmenuUI() {
         section = section.split("?")[0];
         section = section.replace(/[^a-zA-Z\-\_]/g, "");
 
-        $menuItem = $('.top-menu-item.' + section);
+        var $menuItem = $('.top-menu-item.' + section);
         $menuItem.addClass('active');
         if ($menuItem.parent('.top-submenu').length) {
             $menuItem.parent('.top-submenu').prev().addClass('expanded');
         }
+        $menuItem = undefined;
     }
 
+    if (u_type === 3) {
+        var name = '';
 
-    // If the 'name' property is set, display it
-    if (u_type == 3 && u_attr.name) {
-        $('.top-head .user-name').text(u_attr.name).show();
-    }
+        if (u_attr.firstname) {
+            name = u_attr.firstname;
+        }
+        if (u_attr.lastname) {
+            name += (name.length ? ' ' : '') + u_attr.lastname;
+        }
+        name = name || u_attr.name;
 
-    // Check for pages that do not have the 'firstname' property set e.g. #about
-    else if ((u_type == 3) && (!u_attr.firstname)
-            && (typeof u_attr.name === 'string') && (u_attr.name.indexOf(' ') != -1)) {
-
-        // Try get the first name from the full 'name' property and display
-        var nameParts = u_attr.name.split(' ');
-        $('.top-head .user-name').text(nameParts[0]).show();
+        if (name) {
+            $('.top-head .user-name').text(name).show();
+        }
     }
 
     // Show language in top menu

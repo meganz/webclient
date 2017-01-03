@@ -5366,7 +5366,7 @@ function MegaData()
     this.addUpload = function(u, ignoreWarning) {
         var flag = 'ulMegaSyncAD';
 
-        if (u.length > 99 && !ignoreWarning && !localStorage[flag]) {
+        if (u.length > 999 && !ignoreWarning && !localStorage[flag]) {
             var showMEGAsyncDialog = function(button, syncData) {
                 $('.download-button.light-red.download').safeHTML(button);
                 $('.download-button.light-white.continue').safeHTML(l[8846]);
@@ -7217,6 +7217,12 @@ function worker_procmsg(ev) {
     else if (ev.data.h) {
         // enqueue or emplace processed node
         if (ev.data.t < 2 && !crypto_keyok(ev.data)) {
+            // ignore if node already exists
+            if (ev.data.h in M.d) {
+                return;
+            }
+
+            // otherwise, report as missing
             crypto_reportmissingkey(ev.data);
         }
 

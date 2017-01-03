@@ -525,6 +525,7 @@
         ]);
     };
 
+    if(0) // disabled for now
     mBroadcaster.addListener('fm:initialized', function _delayedInitOnboarding() {
         if (!folderlink) {
             assert(typeof mega.ui.onboarding === 'undefined', 'unexpected onboarding initialization');

@@ -2351,7 +2351,13 @@ var addressDialog = {
         $statesSelect.append(stateOptions);
 
         // Initialise the jQueryUI selectmenu
-        $statesSelect.selectmenu();
+        $statesSelect.selectmenu({
+            position: {
+                my: "left top-18",
+                at: "left bottom-18",
+                collision: "flip"  // default is ""
+            }
+        });
     },
 
     /**
@@ -2376,7 +2382,13 @@ var addressDialog = {
         $countriesSelect.append(countryOptions);
 
         // Initialise the jQueryUI selectmenu
-        $countriesSelect.selectmenu();
+        $countriesSelect.selectmenu({
+            position: {
+                my: "left top-18",
+                at: "left bottom-18",
+                collision: "flip"  // default is ""
+            }
+        });
     },
 
     /**

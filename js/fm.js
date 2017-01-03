@@ -13063,7 +13063,8 @@ var cancelSubscriptionDialog = {
                     loadingDialog.hide();
                     cancelSubscriptionDialog.$accountPageCancelButton.addClass('hidden');
                     cancelSubscriptionDialog.exipryTextBlock.text(l[987]);
-                    cancelSubscriptionDialog.exipryDateBlock.safeHTML('<a href="#fm/account/history">' + time2date(account.expiry, 2) + '</a>');
+                    cancelSubscriptionDialog.exipryDateBlock
+                        .safeHTML('<a href="#fm/account/history">' + time2date(account.expiry, 2) + '</a>');
                     cancelSubscriptionDialog.exipryDateBlock.find('a').rebind('click', function() {
                         document.location = $(this).attr('href');
                     });

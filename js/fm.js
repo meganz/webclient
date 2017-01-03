@@ -3590,6 +3590,7 @@ function accountUI() {
 
             $('.account.plan-info.accounttype span').text(planText);
             $('.small-icon.membership').addClass('pro' + planNum);
+            $('.default-white-button.upgrade-to-pro').addClass('hidden');
 
             // Subscription
             if (account.stype == 'S') {
@@ -3625,7 +3626,6 @@ function accountUI() {
                             $('.account.data-block .btn-cancel').removeClass('hidden').rebind('click', function() {
                                 cancelSubscriptionDialog.init();
                             });
-                            $('.subscription-bl').addClass('active-subscription');
                         }
                     }
                 });
@@ -3639,7 +3639,6 @@ function accountUI() {
                 $('.account.plan-info.expiry-txt').text(l[987]);
                 $('.account.plan-info.expiry a').text(time2date(account.expiry, 2));
                 $('.account.data-block .btn-cancel').addClass('hidden');
-                $('.subscription-bl').removeClass('active-subscription');
             }
 
             // Maximum bandwidth
@@ -3652,8 +3651,12 @@ function accountUI() {
             $('.account.plan-info.accounttype span').text(l[435]);
             $('.account.plan-info.expiry').text(l[436]);
             $('.btn-cancel').addClass('hidden');
-            $('.subscription-bl').removeClass('active-subscription');
             $('.account.plan-info-row.bandwidth').hide();
+            $('.default-white-button.upgrade-to-pro')
+                .removeClass('hidden')
+                .rebind('click', function() {
+                    window.location.hash = 'pro';
+                });
         }
 
 
@@ -12971,7 +12974,8 @@ var cancelSubscriptionDialog = {
         this.$continueButton = this.$dialog.find('.continue-cancel-subscription');
         this.$cancelReason = this.$dialog.find('.cancel-textarea textarea');
         this.$backgroundOverlay = $('.fm-dialog-overlay');
-        this.$accountPageSubscriptionBlock = $('.subscription-bl');
+        this.exipryTextBlock = $('.account.plan-info.expiry-txt');
+        this.exipryDateBlock = $('.account.plan-info.expiry');
 
         // Show the dialog
         this.$dialog.removeClass('hidden');
@@ -13055,10 +13059,15 @@ var cancelSubscriptionDialog = {
             api_req({ a: 'cccs', r: reason }, {
                 callback: function() {
 
-                    // Hide loading dialog and cancel subscription button on account page
+                    // Hide loading dialog and cancel subscription button on account page, set exiry date
                     loadingDialog.hide();
                     cancelSubscriptionDialog.$accountPageCancelButton.addClass('hidden');
-                    cancelSubscriptionDialog.$accountPageSubscriptionBlock.removeClass('active-subscription');
+                    cancelSubscriptionDialog.exipryTextBlock.text(l[987]);
+                    cancelSubscriptionDialog.exipryDateBlock
+                        .safeHTML('<a href="#fm/account/history">' + time2date(account.expiry, 2) + '</a>');
+                    cancelSubscriptionDialog.exipryDateBlock.find('a').rebind('click', function() {
+                        document.location = $(this).attr('href');
+                    });
 
                     // Show success dialog and refresh UI
                     cancelSubscriptionDialog.$dialogSuccess.removeClass('hidden');

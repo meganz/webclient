@@ -2509,7 +2509,7 @@ function MegaData()
                 if (n.sk && !u_sharekeys[n.h]) {
                     // extract sharekey from node's sk property
                     var k = crypto_process_sharekey(n.h, n.sk);
-                    if (k !== false) crypto_setsharekey(n.h, k);
+                    if (k !== false) crypto_setsharekey(n.h, k, ignoreDB);
                 }
 
                 this.c.shares[n.h] = { su : n.su,
@@ -6291,6 +6291,11 @@ function execsc() {
                     }
 
                     if (a.a == 's2') {
+                        // store ownerkey
+                        if (fmdb) {
+                            fmdb.add('ok', { h : a.n, d : { k : a.ok, ha : a.ha } });
+                        }
+
                         processPS([a]);
                     }
 
@@ -6390,14 +6395,8 @@ function execsc() {
                         var prockey = false;
 
                         if (a.o === u_handle) {
-                            if (!a.u) {
-                                // this must be a pending share
-                                if (a.a != 's2') {
-                                    console.error('INVALID SHARE, missing user handle', a);
-                                }
-                            }
                             // if access right are undefined, then share is deleted
-                            else if (typeof a.r == 'undefined') {
+                            if (typeof a.r == 'undefined') {
                                 M.delNodeShare(a.n, a.u, a.okd);
                             }
                             else {
@@ -6405,17 +6404,35 @@ function execsc() {
                                 var shares = Object(M.d[handle]).shares || {};
 
                                 if (shares.hasOwnProperty(a.u)
-                                        || (a.ha === crypto_handleauth(a.n))) {
+                                    || a.ha === crypto_handleauth(a.n)) {
 
                                     // I updated or created my share
                                     var k = decrypt_key(u_k_aes, base64_to_a32(a.ok));
-                                    crypto_setsharekey(handle, k);
-                                    M.nodeShare(handle, {
-                                        h: a.n,
-                                        r: a.r,
-                                        u: a.u,
-                                        ts: a.ts
-                                    });
+
+                                    if (k) {
+                                        crypto_setsharekey(handle, k);
+
+                                        if (!a.u) {
+                                            // this must be a pending share
+                                            if (a.a == 's2') {
+                                                // store ownerkey
+                                                if (fmdb) {
+                                                    fmdb.add('ok', { h : handle, d : { k : a.ok, ha : a.ha } });
+                                                }
+                                            }
+                                            else {
+                                                console.error('INVALID SHARE, missing user handle', a);
+                                            }
+                                        }
+                                        else {
+                                            M.nodeShare(handle, {
+                                                h: a.n,
+                                                r: a.r,
+                                                u: a.u,
+                                                ts: a.ts
+                                            });
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -7079,7 +7096,9 @@ function treefetcher_getnextworker() {
 // this receives the ok elements one by one as per the filter rule
 // to facilitate the decryption of outbound shares, the API now sends ok before f
 function tree_ok0(ok) {
-    if (fmdb) fmdb.add('ok', { h : ok.h, d : ok });
+    if (fmdb) {
+        fmdb.add('ok', { h : ok.h, d : ok });
+    }
 
     // bind outbound share root to specific worker, post ok element to that worker
     // FIXME: check if nested outbound shares are returned with all shareufskeys!
@@ -7217,12 +7236,7 @@ function worker_procmsg(ev) {
     else if (ev.data.h) {
         // enqueue or emplace processed node
         if (ev.data.t < 2 && !crypto_keyok(ev.data)) {
-            // ignore if node already exists
-            if (ev.data.h in M.d) {
-                return;
-            }
-
-            // otherwise, report as missing
+            // report as missing
             crypto_reportmissingkey(ev.data);
         }
 
@@ -7499,7 +7513,7 @@ function dbfetchfm() {
                                 // this is an inbound share
                                 M.c.shares[r[i].t] = r[i];
                                 if (r[i].sk) {
-                                    crypto_setsharekey(r[i].t, base64_to_a32(r[i].sk));
+                                    crypto_setsharekey(r[i].t, base64_to_a32(r[i].sk), true);
                                 }
                             }
                             else {
@@ -8446,7 +8460,7 @@ function process_ok(ok, ignoreDB) {
             if (fmdb && !pfkey && !ignoreDB) {
                 fmdb.add('ok', { h : ok[i].h, d : ok[i] });
             }
-            crypto_setsharekey(ok[i].h, decrypt_key(u_k_aes, base64_to_a32(ok[i].k)));
+            crypto_setsharekey(ok[i].h, decrypt_key(u_k_aes, base64_to_a32(ok[i].k)), ignoreDB);
         }
     }
 }

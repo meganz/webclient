@@ -2611,7 +2611,7 @@ function api_setshare1(ctx, params) {
                     for (j = 4; j--;) {
                         sharekey.push(rand(0x100000000));
                     }
-                    crypto_setsharekey(ctx.node, sharekey);
+                    crypto_setsharekey(ctx.node, sharekey, true);
                 }
 
                 req.ok = a32_to_base64(encrypt_key(u_k_aes, sharekey));
@@ -3982,16 +3982,17 @@ function crypto_fixmissingkeys(hs) {
 
 // set a newly received sharekey - apply to relevant missing key nodes, if any.
 // also, update M.c.shares/FMDB.s if the sharekey was not previously known.
-function crypto_setsharekey(h, k) {
+function crypto_setsharekey(h, k, ignoreDB) {
     u_sharekeys[h] = [k, new sjcl.cipher.aes(k)];
     if (sharemissing[h]) crypto_fixmissingkeys(sharemissing[h]);
 
     if (M.c.shares[h] && !M.c.shares[h].sk) {
         M.c.shares[h].sk = a32_to_base64(k);
 
-        if (fmdb) fmdb.add('s', { o_t : M.c.shares[h].su + '*' + h,
-                                  d : M.c.shares[h]
-        });
+        if (fmdb && !ignoreDB) {
+            fmdb.add('s', { o_t: M.c.shares[h].su + '*' + h,
+                            d: M.c.shares[h] });
+        }
     }
 }
 

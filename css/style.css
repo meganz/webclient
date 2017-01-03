@@ -25412,8 +25412,11 @@ div.camera-bottom-txt {
 .account.buttons .button {
     margin-top: 27px;
 }
-.button.default-white-button.btn-cancel {
+.min-pad .button.default-white-button {
     margin-top: -12px;
+}
+.free .min-pad .button.default-white-button {
+    margin-top: 0;
 }
 .fm-account-sections {
     height: 100%;

@@ -3522,6 +3522,7 @@ function accountUI() {
     }
 
     M.accountData(function(account) {
+        loadingDialog.hide();
 
         var perc, warning, perc_c;
         var id = document.location.hash;

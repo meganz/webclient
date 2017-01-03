@@ -5366,7 +5366,7 @@ function MegaData()
     this.addUpload = function(u, ignoreWarning) {
         var flag = 'ulMegaSyncAD';
 
-        if (u.length > 99 && !ignoreWarning && !localStorage[flag]) {
+        if (u.length > 999 && !ignoreWarning && !localStorage[flag]) {
             var showMEGAsyncDialog = function(button, syncData) {
                 $('.download-button.light-red.download').safeHTML(button);
                 $('.download-button.light-white.continue').safeHTML(l[8846]);

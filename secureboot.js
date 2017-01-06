@@ -40,10 +40,6 @@ function isMobile()
 {
     if (is_chrome_firefox) return false;
 
-    // Flag for testing the mobile site
-    if (localStorage.testMobileSite) {
-        return true;
-    }
     var mobile = ['iphone','ipad','android','blackberry','nokia','opera mini','windows mobile','windows phone','iemobile','mobile safari','bb10; touch'];
     for (var i in mobile) if (ua.indexOf(mobile[i]) > 0) return true;
     return false;

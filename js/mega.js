@@ -6682,10 +6682,10 @@ function execsc() {
                                 }
                                 if (fminitialized) {
                                     if (n.fav !== oldfav) {
-                                        M.favouriteDomUpdate(node, n.fav);
+                                        M.favouriteDomUpdate(n, n.fav);
                                     }
                                     if (n.lbl !== oldlbl) {
-                                        M.colourLabelDomUpdate(nodeHandle, n.lbl);
+                                        M.colourLabelDomUpdate(n.h, n.lbl);
                                     }
                                 }
                             }

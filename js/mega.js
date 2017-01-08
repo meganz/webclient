@@ -210,7 +210,7 @@ function MegaData()
     this.csortd          = -1;
     this.csort           = 'name';
     this.tfsdomqueue     = {};
-    this.copynodeswaiter = {};
+    this.scAckQueue = {};
 
     this.reset = function()
     {
@@ -3377,7 +3377,7 @@ function MegaData()
         if (sconly) {
             ops.v = 3;
             ops.i = mRandomToken('pn');
-            M.copynodeswaiter[ops.i] = onCopyNodesDone;
+            M.scAckQueue[ops.i] = onCopyNodesDone;
         }
         else {
             // ops.v = 2;
@@ -3815,7 +3815,7 @@ function MegaData()
         var n = M.d[itemHandle];
         if (n) {
             n.name = newItemName;
-            api_setattr(n);
+            api_setattr(n, mRandomToken('mv'));
             this.onRenameUIUpdate(itemHandle, newItemName);
         }
     };
@@ -3900,7 +3900,7 @@ function MegaData()
                 }
                 node.lbl = newLabelState;
 
-                api_setattr(node);
+                api_setattr(node, mRandomToken('lbl'));
                 M.colourLabelDomUpdate(handle, newLabelState);
             });
         }
@@ -3944,7 +3944,7 @@ function MegaData()
 
                 if (node && !exportLink.isTakenDown(handle)) {
                     node.fav = newFavState;
-                    api_setattr(node);
+                    api_setattr(node, mRandomToken('fav'));
                     M.favouriteDomUpdate(node, newFavState);
                 }
             });
@@ -6632,9 +6632,9 @@ function execsc() {
 
                     for (i = 0; i < scnodes.length; i++) M.addNode(scnodes[i]);
 
-                    if (typeof M.copynodeswaiter[a.i] === 'function') {
-                        M.copynodeswaiter[a.i](scnodes);
-                        delete M.copynodeswaiter[a.i];
+                    if (typeof M.scAckQueue[a.i] === 'function') {
+                        M.scAckQueue[a.i](scnodes);
+                        delete M.scAckQueue[a.i];
                     }
                     break;
 
@@ -6676,11 +6676,18 @@ function execsc() {
                         }
                         else {
                             // success - check what changed and redraw
-                            if (a.at) {
-                                if (n.name !== oldname) {
-                                    M.onRenameUIUpdate(n.h, n.name);
+                            if (M.scAckQueue[a.i]) {
+                                // Triggered locally, being DOM already updated.
+                                if (d) {
+                                    console.log('scAckQueue - triggered locally.', a.i);
                                 }
+                                delete M.scAckQueue[a.i];
+                            }
+                            else if (a.at) {
                                 if (fminitialized) {
+                                    if (n.name !== oldname) {
+                                        M.onRenameUIUpdate(n.h, n.name);
+                                    }
                                     if (n.fav !== oldfav) {
                                         M.favouriteDomUpdate(n, n.fav);
                                     }

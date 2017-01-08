@@ -2402,7 +2402,7 @@ function api_changepw(ctx, passwordkey, masterkey, oldpw, newpw, email) {
  * Send current node attributes to the API
  * @return {MegaPromise}
  */
-function api_setattr(n) {
+function api_setattr(n, idtag) {
     var promise = new MegaPromise();
     var logger = MegaLogger.getLogger('crypt');
 
@@ -2421,10 +2421,14 @@ function api_setattr(n) {
     try {
         var at = ab_to_base64(crypto_makeattr(n));
 
-        logger.debug('Setting node attributes for "%s"...', n.h);
+        logger.debug('Setting node attributes for "%s"...', n.h, idtag);
 
-        // we do not set i here
-        api_req({ a: 'a', n: n.h, at: at }, ctx);
+        // we do not set i here, unless explicitly specified
+        api_req({a: 'a', n: n.h, at: at, i: idtag}, ctx);
+
+        if (idtag) {
+            M.scAckQueue[idtag] = Date.now();
+        }
     }
     catch (ex) {
         logger.error(ex);

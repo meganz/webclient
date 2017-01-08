@@ -2280,8 +2280,8 @@ function mKeyDialog(ph, fl, keyr) {
 }
 
 function dcTracer(ctr) {
-    var name = ctr.name,
-        proto = ctr.prototype;
+    var name = ctr.name || 'unknown',
+        proto = ctr.prototype || ctr;
     for (var fn in proto) {
         if (proto.hasOwnProperty(fn) && typeof proto[fn] === 'function') {
             console.log('Tracing ' + name + '.' + fn);

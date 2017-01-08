@@ -9,7 +9,7 @@ file of 1KB just for these tests, and don't do anything else on it.
 Run this script with the --help flag for further details.
 
 Requirements:
-    - Selenium Python Webdriver: pip.exe install -U selenium
+    - Selenium Python Webdriver: pip install -U selenium
     - WebDriver for Chrome: https://sites.google.com/a/chromium.org/chromedriver/home
 
 This test runner will work with both Python 2.7 as well as 3.x.
@@ -72,38 +72,44 @@ class MegaTest(unittest.TestCase):
         driver.find_element_by_id("login-name").send_keys(username)
         driver.find_element_by_id("login-password").clear()
         driver.find_element_by_id("login-password").send_keys(password)
-        driver.find_element_by_css_selector("div.top-dialog-login-button > span").click()
+        driver.find_element_by_css_selector(".top-head .top-dialog-login-button").click()
         for i in range(60):
             try:
                 if "File Upload" == driver.find_element_by_css_selector(".fm-file-upload span").text: break
             except: pass
-            time.sleep(1.3)
+            time.sleep(1.4)
         else: self.fail("time out")
         # 
         # Test: 0002  New Folder
         # Create new folder
         driver.find_element_by_css_selector("div.fm-new-folder").click()
-        driver.find_element_by_css_selector("div.create-folder-input-bl > input[type=\"text\"]").click()
-        driver.find_element_by_css_selector("div.create-folder-input-bl > input[type=\"text\"]").clear()
-        driver.find_element_by_css_selector("div.create-folder-input-bl > input[type=\"text\"]").send_keys("000.foldertest")
-        driver.find_element_by_css_selector("div.create-folder-button > span").click()
+        driver.find_element_by_css_selector("div.create-new-folder div.create-folder-input-bl > input[type=\"text\"]").click()
+        driver.find_element_by_css_selector("div.create-new-folder div.create-folder-input-bl > input[type=\"text\"]").clear()
+        driver.find_element_by_css_selector("div.create-new-folder div.create-folder-input-bl > input[type=\"text\"]").send_keys("000.foldertest")
+        driver.find_element_by_css_selector("div.create-folder-button").click()
         for i in range(60):
             try:
                 if "000.foldertest" == driver.find_element_by_css_selector("span.tranfer-filetype-txt").text: break
             except: pass
             time.sleep(0.3)
         else: self.fail("time out: 0002  New Folder")
+        self.assertEqual("000.foldertest", driver.find_element_by_css_selector(".content-panel.cloud-drive .nw-fm-tree-item").text)
         # Remove the created folder
         self.fire_contextmenu(By.CSS_SELECTOR, "tr.folder span.tranfer-filetype-txt")
-        self.on_visibleclick("a.context-menu-item.remove-item")
+        self.on_visibleclick("a.dropdown-item.remove-item")
         for i in range(60):
             try:
                 if re.search(r"^Are you sure that you want to move [\s\S]* to the rubbish bin[\s\S]$", driver.find_element_by_css_selector("div.fm-notification-info p").text): break
             except: pass
             time.sleep(0.3)
         else: self.fail("time out: 0002  New Folder")
-        driver.find_element_by_css_selector(".fm-dialog-button.notification-button.confirm").click()
-        self.assertNotEqual("000.foldertest", driver.find_element_by_css_selector("span.tranfer-filetype-txt").text)
+        driver.find_element_by_css_selector(".fm-dialog.confirmation-dialog.remove-dialog .notification-button.confirm").click()
+        for i in range(60):
+            try:
+                if "000.foldertest" != driver.find_element_by_css_selector("span.tranfer-filetype-txt").text: break
+            except: pass
+            time.sleep(0.3)
+        else: self.fail("time out: 0002  New Folder")
         # 
         # Test: 0004  Empty Rubbish
         driver.find_element_by_css_selector(".fm-main.default .nw-fm-left-icon.rubbish-bin").click()
@@ -114,7 +120,7 @@ class MegaTest(unittest.TestCase):
             except: pass
             time.sleep(0.3)
         else: self.fail("time out: 0004  Empty Rubbish")
-        driver.find_element_by_css_selector(".fm-dialog-button.notification-button.confirm").click()
+        driver.find_element_by_css_selector(".fm-dialog.clear-bin-dialog .notification-button.confirm").click()
         for i in range(60):
             try:
                 if driver.find_element_by_css_selector(".fm-empty-trashbin .fm-empty-cloud-txt").is_displayed(): break
@@ -123,8 +129,8 @@ class MegaTest(unittest.TestCase):
         else: self.fail("time out: 0004  Empty Rubbish")
         # 
         # Test: 0004  Reload
-        driver.find_element_by_link_text("Menu").click()
-        driver.find_element_by_css_selector("div.top-menu-item.refresh-item").click()
+        driver.find_element_by_css_selector("#topmenu .top-icon.menu").click()
+        self.on_visibleclick("div.top-menu-item.refresh-item")
         for i in range(60):
             try:
                 if driver.find_element_by_css_selector("div.fm-notification-warning").is_displayed(): break
@@ -132,7 +138,7 @@ class MegaTest(unittest.TestCase):
             time.sleep(0.3)
         else: self.fail("time out: 0004  Reload")
         self.assertRegexpMatches(driver.find_element_by_css_selector("div.fm-notification-warning").text, r"^Are you sure you want to continue[\s\S]$")
-        driver.find_element_by_css_selector(".fm-dialog-button.notification-button.confirm").click()
+        driver.find_element_by_css_selector(".fm-dialog.confirmation-dialog .notification-button.confirm").click()
         for i in range(60):
             try:
                 if driver.find_element_by_css_selector(".light-overlay, .st-social-block-load").is_displayed(): break
@@ -167,12 +173,12 @@ class MegaTest(unittest.TestCase):
         self.assertTrue(self.is_element_present(By.CSS_SELECTOR, "span.right-arrow-bg.ui-draggable"))
         self.assertEqual("My incoming shares", driver.find_element_by_css_selector("div.nw-tree-panel-header > span").text)
         driver.find_element_by_css_selector("div.nw-tree-panel-arrows").click()
-        self.assertEqual("Ascending", driver.find_element_by_css_selector(".nw-sorting-menu > .context-menu-section > .sorting-menu-item[data-dir='1']").text)
+        self.assertEqual("Ascending", driver.find_element_by_css_selector(".nw-sorting-menu > .dropdown-section > .sorting-menu-item[data-dir='1']").text)
         # Switch back to Cloud
         driver.find_element_by_css_selector(".fm-main.default .nw-fm-left-icon.cloud-drive").click()
         driver.find_element_by_css_selector("a.fm-files-view-icon.block-view").click()
         self.fire_contextmenu(By.CSS_SELECTOR, "span.block-view-file-type")
-        self.on_visibleclick("a.context-menu-item.properties-item")
+        self.on_visibleclick("a.dropdown-item.properties-item")
         self.assertEqual("Created:", driver.find_element_by_css_selector("div.properties-float-bl > div.properties-small-gray").text)
         driver.find_element_by_css_selector(".fm-dialog.properties-dialog .fm-dialog-close").click()
         driver.find_element_by_css_selector("a.fm-files-view-icon.listing-view").click()
@@ -186,14 +192,14 @@ class MegaTest(unittest.TestCase):
         # Test: 0006  Context Actions
         # Favourite
         self.fire_contextmenu(By.CSS_SELECTOR, "span.tranfer-filetype-txt")
-        self.on_visibleclick("a.context-menu-item.add-star-item")
+        self.on_visibleclick("a.dropdown-item.add-star-item")
         self.assertTrue(self.is_element_present(By.CSS_SELECTOR, "span.grid-status-icon.star"))
         # Remove Favourite
         self.fire_contextmenu(By.CSS_SELECTOR, "span.tranfer-filetype-txt")
-        self.on_visibleclick("a.context-menu-item.add-star-item")
+        self.on_visibleclick("a.dropdown-item.add-star-item")
         # Get link
         self.fire_contextmenu(By.CSS_SELECTOR, "span.tranfer-filetype-txt")
-        self.on_visibleclick("a.context-menu-item.getlink-item")
+        self.on_visibleclick("a.dropdown-item.getlink-item")
         for i in range(60):
             try:
                 if driver.find_element_by_css_selector("div.copyrights-dialog-head").is_displayed(): break
@@ -201,7 +207,7 @@ class MegaTest(unittest.TestCase):
             time.sleep(0.3)
         else: self.fail("time out: 0006  Context Actions")
         self.assertEqual("Copyright warning to all users", driver.find_element_by_css_selector("div.copyrights-dialog-head").text)
-        driver.find_element_by_css_selector(".fm-dialog.copyrights-dialog .fm-dialog-button.accept").click()
+        driver.find_element_by_css_selector(".fm-dialog.copyrights-dialog .accept").click()
         for i in range(60):
             try:
                 if driver.find_element_by_css_selector(".fm-dialog.export-links-dialog .fm-dialog-title").is_displayed(): break
@@ -217,10 +223,11 @@ class MegaTest(unittest.TestCase):
             except: pass
             time.sleep(0.3)
         else: self.fail("time out: 0006  Context Actions")
+        self.assertTrue(driver.find_element_by_css_selector(".export-link-item .export-item-title").is_displayed())
         driver.find_element_by_css_selector(".fm-dialog.export-links-dialog .fm-dialog-close").click()
         # Remove Link
         self.fire_contextmenu(By.CSS_SELECTOR, "span.tranfer-filetype-txt")
-        self.on_visibleclick("a.context-menu-item.removelink-item")
+        self.on_visibleclick("a.dropdown-item.removelink-item")
         for i in range(60):
             try:
                 if not driver.find_element_by_css_selector(".dark-overlay").is_displayed(): break
@@ -229,7 +236,7 @@ class MegaTest(unittest.TestCase):
         else: self.fail("time out: 0006  Context Actions")
         # Rename
         self.fire_contextmenu(By.CSS_SELECTOR, "span.tranfer-filetype-txt")
-        self.on_visibleclick("a.context-menu-item.rename-item")
+        self.on_visibleclick("a.dropdown-item.rename-item")
         for i in range(60):
             try:
                 if driver.find_element_by_css_selector(".fm-dialog.rename-dialog").is_displayed(): break
@@ -249,7 +256,7 @@ class MegaTest(unittest.TestCase):
         else: self.fail("time out: 0006  Context Actions")
         # Rename Back
         self.fire_contextmenu(By.CSS_SELECTOR, "span.tranfer-filetype-txt")
-        self.on_visibleclick("a.context-menu-item.rename-item")
+        self.on_visibleclick("a.dropdown-item.rename-item")
         for i in range(60):
             try:
                 if driver.find_element_by_css_selector(".fm-dialog.rename-dialog").is_displayed(): break
@@ -267,7 +274,7 @@ class MegaTest(unittest.TestCase):
         else: self.fail("time out: 0006  Context Actions")
         # Copy
         self.fire_contextmenu(By.CSS_SELECTOR, "span.tranfer-filetype-txt")
-        self.on_visibleclick("a.context-menu-item.copy-item")
+        self.on_visibleclick("a.dropdown-item.copy-item")
         for i in range(60):
             try:
                 if driver.find_element_by_css_selector(".fm-dialog.copy-dialog").is_displayed(): break
@@ -275,7 +282,7 @@ class MegaTest(unittest.TestCase):
             time.sleep(0.3)
         else: self.fail("time out: 0006  Context Actions")
         self.assertEqual("My folders", driver.find_element_by_css_selector(".copy-dialog-panel-header span").text)
-        driver.find_element_by_css_selector(".fm-dialog-button.dialog-copy-button").click()
+        driver.find_element_by_css_selector(".fm-dialog.copy-dialog .dialog-copy-button").click()
         for i in range(60):
             try:
                 if 2 == len(driver.find_elements_by_xpath("//span[@class='tranfer-filetype-txt']")): break
@@ -284,15 +291,15 @@ class MegaTest(unittest.TestCase):
         else: self.fail("time out: 0006  Context Actions")
         # Move
         self.fire_contextmenu(By.CSS_SELECTOR, "span.tranfer-filetype-txt")
-        self.fire_mouseover(By.CSS_SELECTOR, "a.context-menu-item.move-item.contains-submenu")
-        self.on_visibleclick("span.context-submenu .context-menu-item.remove-item")
+        self.fire_mouseover(By.CSS_SELECTOR, "a.dropdown-item.move-item.contains-submenu")
+        self.on_visibleclick("span.dropdown.submenu.active .dropdown-item.remove-item")
         for i in range(60):
             try:
                 if driver.find_element_by_css_selector(".fm-dialog.confirmation-dialog.remove-dialog").is_displayed(): break
             except: pass
             time.sleep(0.3)
         else: self.fail("time out: 0006  Context Actions")
-        driver.find_element_by_css_selector(".fm-dialog-button.notification-button.confirm").click()
+        driver.find_element_by_css_selector(".fm-dialog.confirmation-dialog.remove-dialog .notification-button.confirm").click()
         for i in range(60):
             try:
                 if 1 == len(driver.find_elements_by_xpath("//span[@class='tranfer-filetype-txt']")): break
@@ -305,21 +312,16 @@ class MegaTest(unittest.TestCase):
         # Overview
         for i in range(60):
             try:
-                if driver.find_element_by_css_selector(".fm-account-blocks.storage .fm-account-header").is_displayed(): break
+                if driver.find_element_by_css_selector(".fm-account-profile .account.tabs-bl").is_displayed(): break
             except: pass
             time.sleep(0.3)
         else: self.fail("time out: 0007  Settings")
-        self.assertEqual("Edit your profile", driver.find_element_by_css_selector(".fm-account-info-block .default-button.editprofile > span").text)
-        self.assertEqual("Backup Recovery Key", driver.find_element_by_css_selector(".fm-account-info-block .default-button.backup-master-key > span").text)
-        self.assertEqual("Cancel your account", driver.find_element_by_css_selector(".fm-account-info-block .default-button.cancel-account > span").text)
-        driver.find_element_by_css_selector(".fm-account-info-block .default-button.editprofile > span").click()
+        self.assertEqual("General", driver.find_element_by_css_selector(".account.tab-lnk.active").text)
+        self.assertEqual("Email & Password", driver.find_element_by_css_selector(".account.tab-lnk[data-tab='email-and-pass']").text)
+        self.assertEqual("Payment and Plan", driver.find_element_by_css_selector(".account.tab-lnk[data-tab='payment']").text)
+        self.assertEqual("Cancel your account", driver.find_element_by_css_selector(".account.data-block.second .button.default-grey-button.cancel-account.right").text)
+        self.assertEqual("Upgrade Account", driver.find_element_by_css_selector(".account.data-block.second .button.default-white-button.upgrade-to-pro.right span").text)
         # Profile
-        for i in range(60):
-            try:
-                if driver.find_element_by_css_selector(".fm-account-blocks.profile-form .fm-account-header").is_displayed(): break
-            except: pass
-            time.sleep(0.3)
-        else: self.fail("time out: 0007  Settings")
         oldName = driver.find_element_by_id("account-firstname").get_attribute("value")
         driver.find_element_by_id("account-firstname").clear()
         driver.find_element_by_id("account-firstname").send_keys("")
@@ -369,20 +371,10 @@ class MegaTest(unittest.TestCase):
             except: pass
             time.sleep(0.3)
         else: self.fail("time out: 0007  Settings")
-        # Settings
-        driver.find_element_by_css_selector(".fm-account-button.settings").click()
-        for i in range(60):
-            try:
-                if driver.find_element_by_css_selector(".fm-account-settings.fm-account-sections").is_displayed(): break
-            except: pass
-            time.sleep(0.3)
-        else: self.fail("time out: 0007  Settings")
-        self.fire_mouseover(By.ID, "rad12")
-        driver.find_element_by_id("rad12").click()
         # 
         # Test: 0011  Blog
-        driver.find_element_by_link_text("Menu").click()
-        driver.find_element_by_css_selector("div.top-menu-item.megablog").click()
+        driver.find_element_by_css_selector("#topmenu .top-icon.menu").click()
+        self.on_visibleclick("div.top-menu-item.blog")
         for i in range(60):
             try:
                 if not driver.find_element_by_css_selector(".dark-overlay").is_displayed(): break
@@ -460,15 +452,15 @@ class MegaTest(unittest.TestCase):
         else: self.fail("time out: 0014  Folderlink")
         # FolderLink - Import to Cloud Drive
         self.fire_contextmenu(By.CSS_SELECTOR, ".fm-main.default.active-folder-link .nw-fm-left-icon.folder-link")
-        self.on_visibleclick("a.context-menu-item.import-item")
+        self.on_visibleclick("a.dropdown-item.import-item")
         for i in range(60):
             try:
                 if driver.find_element_by_css_selector(".fm-dialog.copy-dialog").is_displayed(): break
             except: pass
             time.sleep(0.3)
         else: self.fail("time out: 0014  Folderlink")
-        self.assertEqual("Import", driver.find_element_by_css_selector(".fm-dialog-button.dialog-copy-button span").text)
-        driver.find_element_by_css_selector(".fm-dialog-button.dialog-copy-button").click()
+        self.assertEqual("Import", driver.find_element_by_css_selector(".fm-dialog.copy-dialog .dialog-copy-button span").text)
+        driver.find_element_by_css_selector(".fm-dialog.copy-dialog .dialog-copy-button").click()
         for i in range(60):
             try:
                 if driver.find_element_by_css_selector(".fm-dialog.warning-dialog-a").is_displayed(): break
@@ -476,7 +468,7 @@ class MegaTest(unittest.TestCase):
             time.sleep(0.3)
         else: self.fail("time out: 0014  Folderlink")
         self.assertRegexpMatches(driver.find_element_by_css_selector(".fm-dialog.warning-dialog-a .fm-notification-info").text, r"^[\s\S]*imported successfully\.$")
-        driver.find_element_by_css_selector(".fm-dialog-button.notification-button").click()
+        driver.find_element_by_css_selector(".fm-dialog.warning-dialog-a .notification-button").click()
         for i in range(60):
             try:
                 if "111.importTest" == driver.find_element_by_css_selector("span.tranfer-filetype-txt").text: break
@@ -485,19 +477,24 @@ class MegaTest(unittest.TestCase):
         else: self.fail("time out: 0014  Folderlink")
         # FolderLink - Remove the imported folder
         self.fire_contextmenu(By.CSS_SELECTOR, "tr.folder span.tranfer-filetype-txt")
-        self.on_visibleclick("a.context-menu-item.remove-item")
+        self.on_visibleclick("a.dropdown-item.remove-item")
         for i in range(60):
             try:
                 if re.search(r"^Are you sure that you want to move [\s\S]* to the rubbish bin[\s\S]$", driver.find_element_by_css_selector("div.fm-notification-info p").text): break
             except: pass
             time.sleep(0.3)
         else: self.fail("time out: 0014  Folderlink")
-        driver.find_element_by_css_selector(".fm-dialog-button.notification-button.confirm").click()
-        self.assertNotEqual("111.importTest", driver.find_element_by_css_selector("span.tranfer-filetype-txt").text)
+        driver.find_element_by_css_selector(".fm-dialog.remove-dialog .notification-button.confirm").click()
+        for i in range(60):
+            try:
+                if "111.importTest" != driver.find_element_by_css_selector("span.tranfer-filetype-txt").text: break
+            except: pass
+            time.sleep(0.3)
+        else: self.fail("time out: 0014  Folderlink")
         # 
         # Test: 0999  Logout
-        driver.find_element_by_link_text("Menu").click()
-        driver.find_element_by_css_selector("div.top-menu-item.logout").click()
+        driver.find_element_by_css_selector("#topmenu .top-icon.menu").click()
+        self.on_visibleclick("div.top-menu-item.logout")
         for i in range(60):
             try:
                 if not driver.find_element_by_css_selector(".dark-overlay").is_displayed(): break
@@ -528,6 +525,7 @@ class MegaTest(unittest.TestCase):
             except: pass
             time.sleep(0.4)
         else: self.abort("time out", selector)
+        time.sleep(0.2) # delay in case of CSS animations
         driver.find_element_by_css_selector(selector).click()
 
     def abort(msg, elm=None):

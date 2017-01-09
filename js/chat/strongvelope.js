@@ -436,6 +436,10 @@ var strongvelope = {};
             while (rest.length > 0) {
                 part = (parsedContent.protocolVersion > PROTOCOL_VERSION_V1) ?
                     tlvstore.splitSingleTlvElement(rest) : tlvstore.splitSingleTlvRecord(rest);
+                if (part === false) {
+                    logger.critical('Could not parse the content, probably a broken binary.');
+                    return false;
+                }
                 tlvType = part.record[0].charCodeAt(0);
                 tlvVariable = _TLV_MAPPING[tlvType];
                 value = part.record[1];
@@ -443,7 +447,7 @@ var strongvelope = {};
                 if (typeof tlvVariable === 'undefined') {
                     logger.critical('Received unexpected TLV type: ' + tlvType + '.');
 
-                    return parsedContent;
+                    return false;
                 }
 
                 // Some records need different treatment. Let's go through cases.
@@ -498,7 +502,7 @@ var strongvelope = {};
             }
         } catch (e) {
             logger.critical('Could not parse the content, probably a broken binary.');
-            return parsedContent;
+            return false;
         }
         return parsedContent;
     };
@@ -728,7 +732,11 @@ var strongvelope = {};
         var parsedMessage = ns._parseMessageContent(message.message);
         var result = { parsedMessage: parsedMessage, senderKeys: {}};
 
-        if (parsedMessage) {
+        if (parsedMessage === false) {
+            logger.error('Can not parse the message content.');
+            return false;
+        }
+        else {
             if ((parsedMessage.protocolVersion <= PROTOCOL_VERSION_V1) &&
                     (_KEYED_MESSAGES.indexOf(parsedMessage.type) >= 0)) {
                 if (ns._verifyMessage(parsedMessage.signedContent,
@@ -771,10 +779,6 @@ var strongvelope = {};
                     return false;
                 }
             }
-        }
-        else {
-            logger.error('Can not parse the message content.');
-            return false;
         }
 
         return result;
@@ -1404,55 +1408,55 @@ var strongvelope = {};
 
         var self = this;
         var result = false;
+        if (parsedMessage) {
+            if (parsedMessage.type === MESSAGE_TYPES.ALTER_PARTICIPANTS
+                    || parsedMessage.type === MESSAGE_TYPES.TRUNCATE
+                    || parsedMessage.type === MESSAGE_TYPES.PRIVILEGE_CHANGE) {
+                // Sanity checks.
+                if (setutils.intersection(new Set(parsedMessage.includeParticipants),
+                            new Set(parsedMessage.excludeParticipants)).size > 0) {
+                    // There should be not intersection between includeParticipants and excludeParticipants.
 
-        if (parsedMessage.type === MESSAGE_TYPES.ALTER_PARTICIPANTS
-                || parsedMessage.type === MESSAGE_TYPES.TRUNCATE
-                || parsedMessage.type === MESSAGE_TYPES.PRIVILEGE_CHANGE) {
-            // Sanity checks.
-            if (setutils.intersection(new Set(parsedMessage.includeParticipants),
-                        new Set(parsedMessage.excludeParticipants)).size > 0) {
-                // There should be not intersection between includeParticipants and excludeParticipants.
-
-                return false;
-            }
-            result = {
-                sender: parsedMessage.invitor,
-                type: parsedMessage.type,
-                recipients: parsedMessage.recipients,
-                privilege: parsedMessage.privilege,
-                includeParticipants: parsedMessage.includeParticipants,
-                excludeParticipants: parsedMessage.excludeParticipants
-            };
-            if (historicMessage === true) {
+                    return false;
+                }
+                result = {
+                    sender: parsedMessage.invitor,
+                    type: parsedMessage.type,
+                    recipients: parsedMessage.recipients,
+                    privilege: parsedMessage.privilege,
+                    includeParticipants: parsedMessage.includeParticipants,
+                    excludeParticipants: parsedMessage.excludeParticipants
+                };
+                if (historicMessage === true) {
+                    return result;
+                }
+                // Do group participant update.
+                parsedMessage.includeParticipants.forEach(function (item) {
+                    self.addParticipant(item);
+                });
+                parsedMessage.excludeParticipants.forEach(function (item) {
+                    self.removeParticipant(item);
+                });
                 return result;
             }
-            // Do group participant update.
-            parsedMessage.includeParticipants.forEach(function (item) {
-                self.addParticipant(item);
-            });
-            parsedMessage.excludeParticipants.forEach(function (item) {
-                self.removeParticipant(item);
-            });
-            return result;
-        }
-        else if (parsedMessage.type === MESSAGE_TYPES.TOPIC_CHANGE) {
-            var cleartext = this.decryptMessage(parsedMessage, parsedMessage.invitor, null);
-            if (cleartext === false) {
-                return false;
+            else if (parsedMessage.type === MESSAGE_TYPES.TOPIC_CHANGE) {
+                var cleartext = this.decryptMessage(parsedMessage, parsedMessage.invitor, null);
+                if (cleartext === false) {
+                    return false;
+                }
+                var payload = ns._parsePayload(cleartext, parsedMessage.protocolVersion);
+                // Bail out if payload can not be parsed.
+                if (payload === false) {
+                    return false;
+                }
+                result = {
+                    sender: parsedMessage.invitor,
+                    type: parsedMessage.type,
+                    payload: payload.plaintext
+                };
+                return result;
             }
-            var payload = ns._parsePayload(cleartext, parsedMessage.protocolVersion);
-            // Bail out if payload can not be parsed.
-            if (payload === false) {
-                return false;
-            }
-            result = {
-                sender: parsedMessage.invitor,
-                type: parsedMessage.type,
-                payload: payload.plaintext
-            };
-            return result;
         }
-
         return false;
     };
 

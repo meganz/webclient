@@ -20,7 +20,7 @@
         "context": "Error message while downloading"
     },
     "17": {
-        "text": "Bandwidth quota exceeded",
+        "text": "Transfer quota exceeded",
         "context": "Free users have limited bandwidth quota, and when exceeded this message will be shown during the download. If you have difficulty translating \"quota\" you could also translate \"Bandwidth limit exceeded\" or \"Data limit exceeded\"."
     },
     "18": {
@@ -1964,8 +1964,8 @@
         "context": "Warning message in a dialog that asks for confirmation before deleting something."
     },
     "1008": {
-        "text": "PRO bandwidth quota exceeded.",
-        "context": "Pro refers to the paid membership, which is often \"Pro\" in the same language. "
+        "text": "PRO transfer quota exceeded.",
+        "context": "PRO refers to the paid membership, which is often \"PRO\" in the same language. "
     },
     "1009": {
         "text": "Need more bandwidth?",
@@ -5046,6 +5046,10 @@
     "2507": {
         "text": "File import failed",
         "context": "Message of the dialog displayed when fails the process\/request to import an image."
+    },
+    "2508": {
+        "text": "File import failed",
+        "context": "Title of the dialog displayed when fails the process\/request to import an image - (String as short as possible)."
     },
     "2531": {
         "text": "Save image to photos",
@@ -8428,8 +8432,8 @@
         "context": "This question is displayed on the Feedback dialog and asks the user if we can contact them for more information or clarification about their feedback."
     },
     "6989": {
-        "text": "Free bandwidth quota exceeded",
-        "context": ""
+        "text": "Free transfer quota exceeded",
+        "context": "A dialog title explaining that the user has used all of their free transfer quota (bandwidth) that is available on their free account."
     },
     "6991": {
         "text": "Clear all transfers",
@@ -9255,6 +9259,10 @@
         "text": "Are you sure you want to clear all transfers?",
         "context": ""
     },
+    "7226": {
+        "text": "Rubbish-Bin Cleaning Scheduler:",
+        "context": ""
+    },
     "7227": {
         "text": "Queued",
         "context": "Text shown when one file has been selected to be downloaded but it's on the queue to be downloaded, it's pending for download"
@@ -9894,10 +9902,6 @@
     "7399": {
         "text": "File is locked.",
         "context": "While uploading a file and we can't read it because it is locked by another program\/process."
-    },
-    "7400": {
-        "text": "We strongly suggest using our sync client for vastly improved performance<br\/> uploading hundreds of files. <a>Get MEGAsync now.<\/a>",
-        "context": "Please keep : <br \/>, <a>, <\/a>\r\n<br \/> new line tag\r\n<a> - link tag"
     },
     "7401": {
         "text": "CONTINUE ANYWAY",
@@ -13512,7 +13516,7 @@
         "context": "A label for any memory (RAM) statistics button, link, text, title, etc."
     },
     "8833": {
-        "text": "To enhance this limit, you can register an account. This will not only give you ample extra bandwidth but also 50 GB of secure storage space in the cloud - [B]for free[\/B].",
+        "text": "To enhance this limit, you can register an account. This will not only give you ample extra transfer quota but also 50 GB of secure storage space in the cloud - [B]for free[\/B].",
         "context": "A message displayed to encourage the user to register an account for extra bandwidth and free storage. Please keep the [B] and [\/B] tags as they will be used to stylise the text at runtime."
     },
     "8834": {
@@ -15096,11 +15100,279 @@
         "context": "The invitation status on the invitation dialog of the achievements page."
     },
     "16106": {
-        "text": "Your purchase of MEGA services will be processed by ECP for [B]Mega Europe sarl, 4 Rue Graham Bell, L-3235, Bettembourg, Luxembourg[\/B].",
-        "context": "An informational message on the payment dialog. Please leave the [B] and [\/B] tags which will be used to change the colour of the text. The text between the tags (the address) does not need to be translated. ECP is the name of a payment provider and does not need to be translated."
+        "text": "Your purchase of MEGA services will be processed for [B]Mega Europe sarl, 4 Rue Graham Bell, L-3235, Bettembourg, Luxembourg[\/B].",
+        "context": "An informational message on the payment dialog. Please leave the [B] and [\/B] tags which will be used to change the colour of the text. The text between the tags (the address) does not need to be translated."
     },
     "16107": {
         "text": "Did you know that you can download the entire folder at once if you [S]install the free MEGA app[\/S]?",
         "context": "A hint message on the download overlay after coming from a mobile folder link. Do not remove the [S] and [\/S] tags which will be used to highlight the text red."
+    },
+    "16108": {
+        "text": "Logout options:",
+        "context": "Header for new setting option which will allow users to drop indexedDB on logout"
+    },
+    "16109": {
+        "text": "Wipe all local metadata when logging out - Your next login will take longer to process.",
+        "context": "drop-local-database option, if the user selects this choice then Mega will remove all the locally encrypted data it has stored. Without this data the login process is slower."
+    },
+    "16110": {
+        "text": "Leave encrypted metadata saved locally for a faster login with your next session.",
+        "context": "drop-local-database option, if the user selects this choice then Mega will keep all the locally encrypted data it has stored. This data can be used to speed up the login process."
+    },
+    "16111": {
+        "text": "Plans & Pricing",
+        "context": "A button which leads to the section where you can see all membership plans and prices."
+    },
+    "16112": {
+        "text": "About MEGA",
+        "context": "A button which leads to a section where you can see all information about the company."
+    },
+    "16113": {
+        "text": "Privacy Company",
+        "context": "A button which leads to a section (mega.nz#privacycompany) where you can see all information about MEGA: The Privacy Company."
+    },
+    "16114": {
+        "text": "Legal and Policies",
+        "context": "A dropdown which contains links to Terms of Service, Privacy Policy and Copyright sections."
+    },
+    "16115": {
+        "text": "Cancel account",
+        "context": "A button in the My Account section. This will let the user delete\/remove\/cancel their account."
+    },
+    "16116": {
+        "text": "[S]Warning:[\/S] You will not be able to access your account data, your MEGA contacts or conversations after you confirm this action.",
+        "context": "Some warning information for the Cancel Account button. It warns the user that their data cannot be restored after deleting their account."
+    },
+    "16117": {
+        "text": "Achievements",
+        "context": "The Achievements section header\/title. This section contains information about bonuses for achieving specific goals or hitting predetermined targets."
+    },
+    "16118": {
+        "text": "Overall Usage",
+        "context": "A header\/title of a block in the My Account section. It contains information about the user's used\/available storage and transfer quotas. "
+    },
+    "16119": {
+        "text": "[S]Storage[\/S]",
+        "context": "Short for \"Storage quota\". Header of the block which contains information about used\/available storage space on the cloud drive. Please leave [S] and [\/S] as is."
+    },
+    "16120": {
+        "text": "[S]Transfer[\/S]",
+        "context": "This is short for \"Transfer quota\". It is the header\/title of block\/section which contains information about used\/available transfer quota. Please leave the [S] and [\/S] tags."
+    },
+    "16121": {
+        "text": "Used Storage",
+        "context": "A header\/title of a block\/section which contains information about the user's used storage space on their cloud drive."
+    },
+    "16122": {
+        "text": "Transfer Quota",
+        "context": "The header\/title of a block\/section which contains information about the user's used\/available transfer allowance for their account."
+    },
+    "16123": {
+        "text": "[S]Used base quota[\/S] is the free transfer allowance for the IP address you are using. The free limitation is dynamic and depends on the amount of unused bandwidth we have available.[BR] You can increase your quota by [A]Upgrading to PRO[\/A].",
+        "context": "Some information about the base transfer quota which is available for free accounts. Please leave the tags [S], [\/S], [A], [\/A] and [BR]."
+    },
+    "16124": {
+        "text": "[S]Used base quota[\/S] is the free transfer allowance for the IP address you are using. The free limitation is dynamic and depends on the amount of unused bandwidth we have available.[BR] You can increase your quota by completing [S]Account Achievements[\/S] or by [A]Upgrading to PRO[\/A].",
+        "context": "Some information about base transfer quota which is available for free accounts. Please leave the [S], [\/S], [A], [\/A] and [BR] tags."
+    },
+    "16125": {
+        "text": "Used quota for the last 6 hours:",
+        "context": "The used quota is the free transfer allowance for the IP address the user is currently using."
+    },
+    "16126": {
+        "text": "Get more transfer quota",
+        "context": "A button which allows the user to get more transfer quota by upgrading their account to PRO or by completing some Account Achievements."
+    },
+    "16127": {
+        "text": "Storage Quota",
+        "context": "A header\/title of a section which contains information about used\/available storage space on a user's cloud drive."
+    },
+    "16128": {
+        "text": "Member since",
+        "context": "Information about the account creation date. The date will be appended to the end. E.g. Member since January 1, 2016."
+    },
+    "16129": {
+        "text": "Your password is not stored by MEGA so we cannot recover it for you. For reliable access to your account we recommend that you download and save your Recovery Key in a secure place.",
+        "context": "Information for the Backup Recovery Key button which allows the user to download their recovery key. "
+    },
+    "16130": {
+        "text": "Data",
+        "context": "The header\/title of a section which contains information about files\/folders\/rubbish bin etc which are stored on the cloud drive."
+    },
+    "16131": {
+        "text": "All Files",
+        "context": "Information about all files the user has stored on MEGA."
+    },
+    "16132": {
+        "text": "All Folders",
+        "context": "Information about all the folders the user has stored on MEGA."
+    },
+    "16133": {
+        "text": "Linked Files",
+        "context": "Information about all files stored on MEGA with a public link. A public link is a link to a file which can be sent to another user to download directly and they do not need to be a registered user on MEGA. "
+    },
+    "16134": {
+        "text": "Favourited Files",
+        "context": "Information about all the user's files stored on MEGA which were marked as Favourite."
+    },
+    "16135": {
+        "text": "You're running out of cloud space.[BR] Please consider upgrading your account plan.",
+        "context": "Error message shown when you have almost used available storage. Please leave [BR] as it is."
+    },
+    "16136": {
+        "text": "Your account has exceeded its allowed storage quota. Free space on your Cloud Drive or [A]upgrade[\/A] to keep enjoying secure, end-to-end encrypted storage.",
+        "context": "An error message which is shown when the user has used more MEGA storage than they are allowed. Please leave the [A] and [\/A] tags as they will be replaced with a hyperlink."
+    },
+    "16137": {
+        "text": "Your account has exceeded its allowed transfer quota. You can wait until you have enough transfer quota available or [A]upgrade[\/A] to keep enjoying secure, end-to-end encrypted storage.",
+        "context": "An error message which is shown when the user has used more MEGA transfer quota than they are allowed. Please leave the [A] and [\/A] tags as they will be replaced with a hyperlink."
+    },
+    "16138": {
+        "text": "Your account has exceeded its allowed storage & transfer quota. You can free up space on your Cloud Drive and wait until you have enough transfer quota available or [A]upgrade[\/A] to keep enjoying secure, end-to-end encrypted storage.",
+        "context": "An error message which is shown when the user has used more MEGA storage and transfer quota than they are allowed. Please leave the [A] and [\/A] as they will be replaced with a hyperlink."
+    },
+    "16139": {
+        "text": "Email & Password",
+        "context": "A section header. The user can change their email and password in this section."
+    },
+    "16140": {
+        "text": "Payment and Plan",
+        "context": "A section header\/title. This section contains information about the user's current membership plan, account balance, storage and transfer quotas."
+    },
+    "16141": {
+        "text": "Enable",
+        "context": "A label to let the user enable\/disable a specific feature."
+    },
+    "16142": {
+        "text": "Disable",
+        "context": "A label to let the user enable\/disable a specific feature."
+    },
+    "16143": {
+        "text": "Enable Notifications",
+        "context": "The header\/title of a section where the user can turn notifications on or off."
+    },
+    "16144": {
+        "text": "Desktop Notifications",
+        "context": "A header\/title of a section where a user can turn notifications off or on."
+    },
+    "16145": {
+        "text": "New shared folder from contact",
+        "context": "A label for a checkbox which allows users to turn notifications on or off about new shared folders."
+    },
+    "16146": {
+        "text": "Access to shared folder was removed",
+        "context": "A label for a checkbox which allows the user to turn notifications on or off. This notification is about removing access to incoming shared folders by another user."
+    },
+    "16147": {
+        "text": "Contact added files to a shared folder",
+        "context": "A label for a checkbox which allows the user to turn notifications on or off about new files in incoming shared folders."
+    },
+    "16148": {
+        "text": "Someone sent you a contact request",
+        "context": "A label for checkbox which allows the user to turn notifications on or off about new contact requests."
+    },
+    "16149": {
+        "text": "When someone accepted your contact request",
+        "context": "A label for checkbox which allows the user to turn notifications on or off about accepted contact requests."
+    },
+    "16150": {
+        "text": "Someone deleted your contact request",
+        "context": "A label for a checkbox which allows the user to turn notifications on or off about deleted contact requests."
+    },
+    "16151": {
+        "text": "Tips and Hints:",
+        "context": "The header\/title of section. It contains information about MEGA tips and hints which may help user get to know MEGA and all of its functionality."
+    },
+    "16152": {
+        "text": "Our tips and hints help you get to know MEGA and all of its functionality. It's hard to learn everything all at once so you can reset those tips and hints anytime.",
+        "context": "Information about MEGA tips and hints which may help the user get to know MEGA."
+    },
+    "16153": {
+        "text": "Reset Tips and Hints",
+        "context": "This button allows re-showing the Tips and Hints which a user has already seen before."
+    },
+    "16154": {
+        "text": "Remove files older than",
+        "context": "A rubbish bin scheduler setting which allows removing old files from the rubbish bin automatically. E.g. Remove files older than 15 days."
+    },
+    "16155": {
+        "text": "Keep the Rubbish Bin under",
+        "context": "A rubbish bin scheduler setting which allows for automatic removal of files from the rubbish bin if the rubbish bin takes more space than user has set. E.g. Keep the Rubbish Bin under 2 GB."
+    },
+    "16156": {
+        "text": "Grant your transfer quota to users downloading your links:",
+        "context": "The maximum percentage of your bandwidth which is available to third party users."
+    },
+    "16157": {
+        "text": "This is the maximum percentage of your transfer quota which is available to other users downloading your links.",
+        "context": "Information for transfer quota settings. User is able to set transfer quota limit for other users. Almost same with 8844 string."
+    },
+    "16158": {
+        "text": "User Interface",
+        "context": "A section header which contains the web client user interface settings."
+    },
+    "16159": {
+        "text": "File Management",
+        "context": "A section header which contains the file management settings. These settings allow users to remove duplicate files etc."
+    },
+    "16160": {
+        "text": "Generous transfer quota",
+        "context": "Information about a MEGA advantage e.g. MEGA provides massive storage space and a generous transfer quota."
+    },
+    "16161": {
+        "text": "Transfer quota exceeded",
+        "context": "Free users have limited transfer quota and when exceeded this message will be shown during the download. If you have difficulty translating the word \"quota\" you could also translate \"Transfer limit exceeded\" or \"Data limit exceeded\"."
+    },
+    "16162": {
+        "text": "Free transfer quota exceeded",
+        "context": "Free users have a limited transfer quota and when exceeded this message will be shown during the download. If you have difficulty translating \"quota\" you could also translate \"Transfer limit exceeded\" or \"Data limit exceeded\"."
+    },
+    "16163": {
+        "text": "Your download could not proceed because it would take you over the current free transfer allowance for your IP address. This limit is dynamic and depends on the amount of unused bandwidth we have available.",
+        "context": "A warning message which is displayed about why the user's download cannot proceed. The reason is because they would be over their transfer quota."
+    },
+    "16164": {
+        "text": "Limited available transfer quota",
+        "context": "A warning header\/title. This informs the user that their transfer quota is limited for the current membership plan."
+    },
+    "16165": {
+        "text": "Your transfer may be interrupted.[BR]\r\n[S]Get a PRO account[\/S] for increased transfer quota.",
+        "context": "This informs the user that their transfer quota is limited for their current membership plan. The user can buy a PRO plan to increase their transfer quota. Please leave the [BR], [S] and [\/S] tags."
+    },
+    "16166": {
+        "text": "Plan",
+        "context": "A membership plan e.g. Free, PRO Lite, PRO I etc."
+    },
+    "16167": {
+        "text": "You can also pay via the Google Play Store, Apple App Store, Microsoft Store or Android mobile carrier billing when using our [A]MEGA apps[\/A].",
+        "context": "A message on the #pro page telling the user we also offer other payment methods. The [A] and [\/A] tags will be replaced with a hyperlink to the #mobile page so do not remove them from the translated text."
+    },
+    "16168": {
+        "text": "Saving settings...",
+        "context": "A toast notification which is shown when saving settings."
+    },
+    "16169": {
+        "text": "Date created",
+        "context": "A table column header for the date when a file was created."
+    },
+    "16170": {
+        "text": "There is an unknown error in the download path. Please try again and if continues failing contact support@mega.nz. [{0}]",
+        "context": "A dialog message which is displayed when the process\/request to download a file\/folder failed because of an unknown error in the download path.\r\nPlease preserve the [{0}] code because is for including the error code or the error message at runtime."
+    },
+    "16171": {
+        "text": "There is an unknown error in the download path. Please try again and if it continues to fail, please contact support@mega.nz. [{0}]",
+        "context": "A dialog message which is displayed when the process\/request to download a file\/folder failed because of an unknown error in the download path.\r\nPlease preserve the [{0}] code because is for including the error code or the error message at runtime."
+    },
+    "16172": {
+        "text": "Label...",
+        "context": "Context menu item which allows to mark folders with own color label"
+    },
+    "16173": {
+        "text": "Choose colour:",
+        "context": "Context menu item which allows to choose color of selected folder"
+    },
+    "16174": {
+        "text": "Date Modified",
+        "context": "A table column header for the date when a file was modified."
     }
 }

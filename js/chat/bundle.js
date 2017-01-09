@@ -174,7 +174,7 @@ React.makeElement = React['createElement'];
 	        'delaySendMessageIfRoomNotAvailableTimeout': 3000,
 	        'xmppDomain': xmppDomain,
 	        'loadbalancerService': 'gelb.karere.mega.nz',
-	        'fallbackXmppServers': ["https://xmpp270n001.karere.mega.nz/ws", "https://xmpp270n002.karere.mega.nz/ws"],
+	        'fallbackXmppServers': ["https://xmpp.karere.mega.nz/ws"],
 	        'rtcSession': {
 	            'crypto': {
 	                encryptMessageForJid: function encryptMessageForJid(msg, bareJid) {
@@ -218,27 +218,7 @@ React.makeElement = React['createElement'];
 	                }
 	            },
 	            iceServers: [{
-	                urls: ['turn:trn270n001.karere.mega.nz:3478?transport=udp'],
-	                username: "inoo20jdnH",
-	                credential: '02nNKDBkkS'
-	            }, {
-	                urls: ['turn:trn270n002.karere.mega.nz:3478?transport=udp'],
-	                username: "inoo20jdnH",
-	                credential: '02nNKDBkkS'
-	            }, {
-	                urls: ['turn:trn302n001.karere.mega.nz:3478?transport=udp'],
-	                username: "inoo20jdnH",
-	                credential: '02nNKDBkkS'
-	            }, {
-	                urls: ['turn:trn302n002.karere.mega.nz:3478?transport=udp'],
-	                username: "inoo20jdnH",
-	                credential: '02nNKDBkkS'
-	            }, {
-	                urls: ['turn:trn530n002.karere.mega.nz:3478?transport=udp'],
-	                username: "inoo20jdnH",
-	                credential: '02nNKDBkkS'
-	            }, {
-	                urls: ['turn:trn530n003.karere.mega.nz:3478?transport=udp'],
+	                urls: ['turn:trn.karere.mega.nz:3478?transport=udp'],
 	                username: "inoo20jdnH",
 	                credential: '02nNKDBkkS'
 	            }]
@@ -251,8 +231,8 @@ React.makeElement = React['createElement'];
 	            'emoticonShortcutsFilter': EmoticonShortcutsFilter,
 	            'emoticonsFilter': EmoticonsFilter,
 	            'callFeedback': CallFeedback,
-	            'karerePing': KarerePing,
-	            'persistedTypeArea': PersistedTypeArea
+	            'karerePing': KarerePing
+
 	        },
 	        'chatNotificationOptions': {
 	            'textMessages': {
@@ -600,6 +580,8 @@ React.makeElement = React['createElement'];
 	        room.bind("onChatShown", function () {
 	            $('.conversations-main-listing').addClass("hidden");
 	        });
+
+	        self.updateDashboard();
 	    });
 	    self.on('onRoomDestroy', function (e, room) {
 	        if (room.type === "private") {
@@ -734,6 +716,8 @@ React.makeElement = React['createElement'];
 	            $('.new-messages-indicator').addClass('hidden');
 	        }
 	        self._lastUnreadCount = unreadCount;
+
+	        self.updateDashboard();
 	    }
 	};
 	Chat.prototype._onUsersUpdate = function (type, e, eventObject) {
@@ -1395,6 +1379,12 @@ React.makeElement = React['createElement'];
 	            }
 	        });
 	    });
+	};
+
+	Chat.prototype.updateDashboard = function () {
+	    if (M.currentdirid === 'dashboard') {
+	        delay('dashboard:updchat', dashboardUI.updateChatWidget);
+	    }
 	};
 
 	window.Chat = Chat;
@@ -7217,8 +7207,8 @@ React.makeElement = React['createElement'];
 	    mixins: [MegaRenderMixin],
 	    getDefaultProps: function getDefaultProps() {
 	        return {
-	            'selectLabel': __("Attach"),
-	            'cancelLabel': __("Cancel"),
+	            'selectLabel': __(l[8023]),
+	            'cancelLabel': __(l[82]),
 	            'hideable': true
 	        };
 	    },
@@ -7415,8 +7405,8 @@ React.makeElement = React['createElement'];
 	    clickTime: 0,
 	    getDefaultProps: function getDefaultProps() {
 	        return {
-	            'selectLabel': __("Send"),
-	            'cancelLabel': __("Cancel"),
+	            'selectLabel': __(l[1940]),
+	            'cancelLabel': __(l[82]),
 	            'hideable': true
 	        };
 	    },
@@ -7503,8 +7493,8 @@ React.makeElement = React['createElement'];
 	    mixins: [MegaRenderMixin],
 	    getDefaultProps: function getDefaultProps() {
 	        return {
-	            'confirmLabel': __("Continue"),
-	            'cancelLabel': __("Cancel"),
+	            'confirmLabel': __(l[6826]),
+	            'cancelLabel': __(l[82]),
 	            'hideable': true
 	        };
 	    },
@@ -8043,7 +8033,9 @@ React.makeElement = React['createElement'];
 
 	        if (this.props.persist) {
 	            var megaChat = this.props.chatRoom.megaChat;
-	            megaChat.plugins.persistedTypeArea.removePersistedTypedValue(this.props.chatRoom);
+	            if (megaChat.plugins.persistedTypeArea) {
+	                megaChat.plugins.persistedTypeArea.removePersistedTypedValue(this.props.chatRoom);
+	            }
 	        }
 	        return result;
 	    },
@@ -10941,6 +10933,8 @@ React.makeElement = React['createElement'];
 	    self.messagesBuff.messages.push(message);
 
 	    self.shownMessages[message.messageId] = true;
+
+	    self.megaChat.updateDashboard();
 	};
 
 	ChatRoom.prototype.getNavElement = function () {

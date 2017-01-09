@@ -3,7 +3,7 @@
     /**
      * Warning dialog when a public key's signature does not verify.
      * Triggerable with the following test code:
-     * mega.ui.KeySignatureWarningDialog.singleton('DKLLwlj_THc', 'RSA');
+     * mega.ui.KeySignatureWarningDialog.singleton('4Hlf71R5IxY', 'RSA');
      *
      * @param opts {Object}
      * @constructor
@@ -38,8 +38,8 @@
             'title': 'Warning',
             'buttons': [
                 {
-                    'label': "Close",
-                    'className': "fm-dialog-button-red",
+                    'label': l[148],
+                    'className': 'default-white-button right red',
                     'callback': function() {
                         this.hide();
                         this._hideOverlay();

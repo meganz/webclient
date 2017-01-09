@@ -45,8 +45,8 @@ function startMega() {
     mBroadcaster.sendMessage('startMega');
 
     if (silent_loading) {
-        silent_loading();
         jsl = [];
+        Soon(silent_loading);
         silent_loading = false;
         return false;
     }
@@ -92,6 +92,35 @@ function mainScroll() {
     }
 }
 
+function topMenu(close) {
+    if (close) {
+        $.topMenu = '';
+        $('.top-icon.menu').removeClass('active');
+        $('.top-menu-popup').addClass('hidden');
+        $(window).unbind('resize.topmenu');
+    }
+    else {
+        $.topMenu = 'topmenu';
+        $('.top-icon.menu').addClass('active');
+        $('.top-menu-popup').removeClass('hidden');
+        topMenuScroll();
+        $(window).rebind('resize.topmenu', function (e) {
+            if ($('.top-icon.menu').hasClass('active')) {
+                topMenuScroll();
+            }
+        });
+    }
+}
+
+function topMenuScroll() {
+    $('.top-menu-scroll').jScrollPane({
+        enableKeyboardNavigation: false,
+        showArrows: true,
+        arrowSize: 5,
+        animateScroll: true
+    });
+}
+
 function scrollMenu() {
     $('.main-scroll-block').bind('jsp-scroll-y', function (event, scrollPositionY, isAtTop, isAtBottom) {
         if (page === 'doc' || page.substr(0, 4) === 'help' || page === 'cpage' || page === 'sdk' || page === 'dev') {
@@ -109,8 +138,62 @@ function scrollMenu() {
     });
 }
 
+function topPopupAlign(button, popup, topPos) {
+    $.popupAlign = function()
+    {
+        var $button = $(button),
+            $popup = $(popup),
+            $popupArrow = $popup.find('.dropdown-white-arrow'),
+            pageWidth,
+            popupRightPos,
+            arrowRightPos,
+            buttonTopPos;
+
+        if ($button.length && $popup.length) {
+            pageWidth = $('body').width();
+            $popupArrow.removeAttr('style');
+            popupRightPos = pageWidth
+                - $button.offset().left
+                - $button.outerWidth()/2
+                - $popup.outerWidth()/2;
+            if (topPos) {
+                $popup.css('top', topPos + 'px');
+            }
+            else {
+                buttonTopPos = $button.offset().top + $button.outerHeight();
+                $popup.css('top', buttonTopPos + 13 + 'px');
+            }
+
+            if (popupRightPos > 10) {
+                $popup.css('right', popupRightPos + 'px');
+            }
+            else {
+                $popup.css('right', '10px');
+                arrowRightPos = pageWidth
+                    - $button.offset().left
+                    - $button.outerWidth()/2;
+                $popupArrow.css({
+                    left: 'auto',
+                    right: arrowRightPos - 22
+                })
+            }
+        }
+    };
+
+    // If top menu is opened - set timeout to count correct positions
+    if (!$('.top-menu-popup').hasClass('hidden')) {
+        setTimeout(function() {
+            $.popupAlign();
+        }, 250);
+    } else {
+        $.popupAlign();
+    }
+}
 
 function init_page() {
+
+    // TODO: investigate why is this needed now.
+    page = page || (u_type ? 'fm' : 'start');
 
     /*if (page.substr(0, 8) == 'redirect') {
         return location.hash = page.substr(8);
@@ -136,12 +219,8 @@ function init_page() {
             dlkey = ar[1].replace(/[^\w-]+/g, "");
         }
 
-        if (mega.utils.hasPendingTransfers()) {
+        if (mega.utils.hasPendingTransfers() && $.lastSeenFilelink !== location.hash) {
             page = 'download';
-
-            if ($.lastSeenFilelink === location.hash) {
-                return;
-            }
 
             mega.utils.abortTransfers()
                 .done(function() {
@@ -161,6 +240,11 @@ function init_page() {
     }
     else {
         $('body').attr('class', '');
+    }
+
+    // Recovery key has been saved
+    if (localStorage.recoverykey && !$('body').hasClass('rk-saved')) {
+        $('body').addClass('rk-saved');
     }
 
     // Add language class to body for CSS fixes for specific language strings
@@ -564,6 +648,10 @@ function init_page() {
         document.location.hash = 'fm/account';
         return false;
     }
+    else if (page == 'dashboard') {
+        document.location.hash = 'fm/dashboard';
+        return false;
+    }
     else if (page == 'register') {
         if (u_storage.sid && u_type !== 0) {
             document.location.hash = '#fm';
@@ -713,7 +801,7 @@ function init_page() {
             var html = '';
             var a = 4;
 
-            $('.about').safeHTML(content.html);
+            $('.new-bottom-pages.about').safeHTML(content.html);
             $('.team-person-block').sort(function () {
                 return (Math.round(Math.random()) - 0.5);
             }).each(function (i, element) {
@@ -842,7 +930,12 @@ function init_page() {
                 }
             }
         }
-        parsepage(pages['download'], 'download');
+        if (is_mobile) {
+            parsepage(pages['fm_mobile']);
+        }
+        else {
+            parsepage(pages['download']);
+        }
         dlinfo(dlid, dlkey, false);
         topmenuUI();
         mainScroll();
@@ -943,7 +1036,10 @@ function init_page() {
             if (id) {
                 M.currentdirid = id;
             }
-            if (!m && $('#fmholder').html() == '') {
+            if (is_mobile) {
+                parsepage(pages['fm_mobile']);
+            }
+            else if (!is_mobile && $('#fmholder').html() === '') {
                 $('#fmholder').safeHTML(translate(pages['fm'].replace(/{staticpath}/g, staticpath)));
             }
 
@@ -982,31 +1078,23 @@ function init_page() {
                 ulQueue.pause();
                 uldl_hold = true;
 
-                termsDialog();
+                bottomPageDialog(false, 'terms'); // show terms dialog
             }
         }
         $('#topmenu').safeHTML(parsetopmenu());
-
-        $('.feedback-button')
-            .removeClass("hidden")
-            .rebind("click.feedbackDialog", function () {
-                var feedbackDialog = mega.ui.FeedbackDialog.singleton($(this));
-                feedbackDialog._type = "top-button";
-
-                return false;
-            });
 
         $('#pageholder').hide();
         $('#startholder').hide();
         if ($('#fmholder:visible').length == 0) {
             $('#fmholder').show();
-            if (fminitialized) {
+            if (fminitialized && !is_mobile) {
                 if (M.viewmode == 1) {
                     iconUI();
                 }
                 else {
                     gridUI();
                 }
+
                 treeUI();
                 if ($.transferHeader) {
                     $.transferHeader();
@@ -1068,23 +1156,24 @@ function init_page() {
 }
 
 function loginDialog(close) {
+    var $dialog = $('.dropdown.top-login-popup');
     if (close) {
-        $('.top-login-popup form').empty();
-        $('.top-login-popup').removeClass('active');
+        $dialog.find('form').empty();
+        $dialog.addClass('hidden');
         return false;
     }
-    $('.top-login-popup form').replaceWith(getTemplate('top-login'));
+    $dialog.find('form').replaceWith(getTemplate('top-login'));
     if (localStorage.hideloginwarning || is_extension) {
-        $('.top-login-warning').hide();
-        $('.login-notification-icon').removeClass('hidden');
+        $dialog.find('.top-login-warning').hide();
+        $dialog.find('.login-notification-icon').removeClass('hidden');
     }
-    $('.login-checkbox,.top-login-popup .radio-txt').rebind('click', function (e) {
-        var c = $('.login-checkbox').attr('class');
+    $dialog.find('.login-checkbox, .radio-txt').rebind('click', function (e) {
+        var c = $dialog.find('.login-checkbox').attr('class');
         if (c.indexOf('checkboxOff') > -1) {
-            $('.login-checkbox').attr('class', 'login-checkbox checkboxOn');
+            $dialog.find('.login-checkbox').attr('class', 'login-checkbox checkboxOn');
         }
         else {
-            $('.login-checkbox').attr('class', 'login-checkbox checkboxOff');
+            $dialog.find('.login-checkbox').attr('class', 'login-checkbox checkboxOff');
         }
     });
 
@@ -1145,12 +1234,14 @@ function loginDialog(close) {
             $(c).addClass('checkboxOff');
         }
     });
-    $('.top-login-popup').addClass('active');
-    document.getElementById('login-name').focus();
 
+
+    $('.dropdown.top-login-popup').removeClass('hidden');
+    topPopupAlign('.top-login-button', '.dropdown.top-login-popup', 40);
     if (is_chrome_firefox) {
-        Soon(mozLoginManager.fillForm.bind(mozLoginManager, 'form_login_header'));
+        mozLoginManager.fillForm.bind(mozLoginManager, 'form_login_header');
     }
+
 }
 
 function tooltiplogin() {
@@ -1206,61 +1297,90 @@ function topmenuUI() {
         $('.top-login-button').text(l[967]);
     }
 
-    $('.warning-popup-icon').addClass('hidden');
-    $('.top-menu-item.upgrade-your-account').hide();
-    $('.top-menu-item.register,.top-menu-item.login').hide();
-    $('.top-menu-item.logout,.context-menu-divider.logout').hide();
-    $('.top-menu-item.clouddrive,.top-menu-item.account').hide();
+    $('.top-icon.warning').addClass('hidden');
+    $('.top-menu-item.upgrade-your-account.green,.top-menu-item.backup').addClass('hidden');
+    $('.top-menu-item.logout').addClass('hidden');
+    $('.top-menu-item.register,.top-menu-item.login').addClass('hidden');
+    $('.top-menu-item.account').addClass('hidden');
     $('.top-menu-item.refresh-item').addClass('hidden');
-    $('.activity-status,.activity-status-block').hide();
-    $('.membership-status-block').safeHTML('<div class="membership-status free">@@</div>', l[435]);
-    $('.membership-status').hide();
-    $('.top-head .user-name').hide();
+    $('.activity-status-block .activity-status,.activity-status-block').hide();
+    $('.membership-status-block i').attr('class', 'tiny-icon membership-status free');
+    $('.membership-status, .top-head .user-name, .top-icon.achievements').hide();
 
     if (fminitialized) {
-        $('.top-search-bl').show();
+        $('.top-search-bl').removeClass('hidden');
     }
     else {
-        $('.top-search-bl').hide();
+        $('.top-search-bl').addClass('hidden');
     }
 
-    var avatar;
-    // can happen on mobile (useravatar to be empty, e.g. not loaded/initialised)
-    if (typeof(useravatar) === 'undefined' || !useravatar.my) {
+    if (page === 'download') {
+        $('.top-menu-item.refresh-item').removeClass('hidden');
+    }
+
+    var avatar = window.useravatar && useravatar.my;
+    if (!avatar) {
         $('.fm-avatar').hide();
     }
-    else {
-        avatar = useravatar.my;
+
+    // Show active item in main menu
+    var section = page.split('/')[0];
+    if (section === 'fm') {
+        section = page.split('/')[1];
+    }
+    $('.top-menu-item').removeClass('active');
+
+    if (section) {
+        // just in case, a payment provider appended any ?returnurl vars
+        section = section.split("?")[0];
+        section = section.replace(/[^a-zA-Z\-\_]/g, "");
+
+        var $menuItem = $('.top-menu-item.' + section);
+        $menuItem.addClass('active');
+        if ($menuItem.parent('.top-submenu').length) {
+            $menuItem.parent('.top-submenu').prev().addClass('expanded');
+        }
+        $menuItem = undefined;
     }
 
-    // If the 'firstname' property is set, display it
-    if (u_type == 3 && u_attr.firstname) {
-        $('.top-head .user-name').text(u_attr.firstname).show();
+    if (u_type === 3) {
+        var name = '';
+
+        if (u_attr.firstname) {
+            name = u_attr.firstname;
+        }
+        if (u_attr.lastname) {
+            name += (name.length ? ' ' : '') + u_attr.lastname;
+        }
+        name = name || u_attr.name;
+
+        if (name) {
+            $('.top-head .user-name').text(name).show();
+        }
     }
 
-    // Check for pages that do not have the 'firstname' property set e.g. #about
-    else if ((u_type == 3) && (!u_attr.firstname)
-            && (typeof u_attr.name === 'string') && (u_attr.name.indexOf(' ') != -1)) {
+    // Show language in top menu
+    $('.top-menu-item.languages .right-el').text(lang);
 
-        // Try get the first name from the full 'name' property and display
-        var nameParts = u_attr.name.split(' ');
-        $('.top-head .user-name').text(nameParts[0]).show();
-    }
+    // Show version in top menu
+    $('.top-mega-version').text('v. ' + mega.utils.getSiteVersion());
 
     if (u_type) {
-
-        $('.top-menu-item.logout,.context-menu-divider.logout').show();
-        $('.top-menu-item.clouddrive,.top-menu-item.account').show();
-
+        $('.top-menu-item.logout,.top-menu-item.backup').removeClass('hidden');
+        $('.top-menu-item.account').removeClass('hidden');
         if (avatar) {
             $('.fm-avatar img').attr('src', avatar);
         }
-
         $('.top-login-button').hide();
         $('.membership-status').show();
         $('.top-change-language').hide();
         $('.create-account-button').hide();
         $('.membership-status-block').show();
+        $('.top-icon.notification').show();
+        if (u_attr.flags.ach) {
+            $('.top-icon.achievements').show();
+        }
+
 
         // If a Lite/Pro plan has been purchased
         if (u_attr.p) {
@@ -1269,26 +1389,33 @@ function topmenuUI() {
             var proNum = u_attr.p;
             var purchasedPlan = getProPlan(proNum);
 
-            // Set colour of plan
-            var cssClass = (proNum == 4) ? 'lite' : 'pro';
+            // Set colour of plan and body class
+            var cssClass;
+            $('body').removeClass('free lite');
+
+            if (proNum === 4) {
+                cssClass = 'lite';
+                $('body').addClass('lite');
+            } else {
+                cssClass = 'pro' + proNum;
+            }
 
             // Show the 'Upgrade your account' button in the main menu for all
-            $('.top-menu-item.upgrade-your-account,.context-menu-divider.upgrade-your-account').show();
-            $('.membership-icon-pad .membership-big-txt.red').text(purchasedPlan);
+            $('.top-menu-item.upgrade-your-account.green').addClass('hidden');
+            $('.membership-icon-pad .membership-big-txt.plan-txt').text(purchasedPlan);
             $('.membership-icon-pad .membership-icon').attr('class', 'membership-icon pro' + u_attr.p);
-            $('.membership-status-block')
-                .safeHTML('<div class="membership-status @@">@@</div>', cssClass, purchasedPlan);
-            $('.context-menu-divider.upgrade-your-account').addClass('pro');
-            $('.membership-popup.pro-popup');
-            $('body').removeClass('free');
+            $('.membership-status-block i').attr('class', 'tiny-icon membership-status ' + cssClass);
+            $('.top-menu-item.account .right-el').text(purchasedPlan);
+            $('.membership-popup').addClass('pro-popup');
         }
         else {
             // Show the free badge
-            $('.top-menu-item.upgrade-your-account,.context-menu-divider.upgrade-your-account').show();
-            $('.context-menu-divider.upgrade-your-account').removeClass('pro lite');
-            $('.membership-status').addClass('free');
-            $('.membership-status').text(l[435]);
-            $('body').addClass('free');
+            $('.top-menu-item.upgrade-your-account.green').removeClass('hidden');
+            $('.membership-icon').attr('class','membership-icon');
+            $('.top-menu-item.account .right-el').text('FREE');
+            $('.membership-status').attr('class', 'tiny-icon membership-status free');
+            $('.membership-popup').removeClass('pro-popup');
+            $('body').removeClass('lite').addClass('free');
         }
 
         if (is_fm()) {
@@ -1297,7 +1424,7 @@ function topmenuUI() {
 
         // If the chat is disabled don't show the green status icon in the header
         if (!megaChatIsDisabled) {
-            $('.activity-status-block, .activity-status').show();
+            $('.activity-status-block, .activity-status-block .activity-status').show();
             if (megaChatIsReady) {
                 megaChat.renderMyStatus();
             }
@@ -1310,7 +1437,6 @@ function topmenuUI() {
         if (u_type === 0 && !confirmok && page !== 'key') {
 
             $('.top-menu-item.register').text(l[968]);
-            $('.top-menu-item.clouddrive').show();
 
             // If they have purchased Pro but not activated yet, show a warning
             if (isNonActivatedAccount()) {
@@ -1323,9 +1449,10 @@ function topmenuUI() {
             }
         }
 
-        $('.top-menu-item.upgrade-your-account').show();
-        $('.top-menu-item.pro-item span').text(l[129]);
+        $('.top-menu-item.upgrade-your-account.green').addClass('hidden');
         $('.membership-status-block').hide();
+        $('.top-icon.notification').hide();
+        $('.top-icon.achievements').hide();
         $('.create-account-button').show();
         $('.create-account-button').rebind('click', function () {
             document.location.hash = 'register';
@@ -1336,12 +1463,12 @@ function topmenuUI() {
                 mLogout();
             }
             else {
-                var c = $('.top-login-popup').attr('class');
-                if (c && c.indexOf('active') > -1) {
-                    loginDialog(1);
+                var c = $('.dropdown.top-login-popup').attr('class');
+                if (c && c.indexOf('hidden') > -1) {
+                    loginDialog();
                 }
                 else {
-                    loginDialog();
+                    loginDialog(1);
                 }
             }
         });
@@ -1352,10 +1479,12 @@ function topmenuUI() {
             // Get current language
             var $topChangeLang = $('.top-change-language');
             var $topChangeLangName = $topChangeLang.find('.top-change-language-name');
-            var languageName = ln[lang];
+
+            //TODO: Change translated values on short translated
+            //var languageName = ln[lang];
 
             // Init the top header change language button
-            $topChangeLangName.text(languageName);
+            $topChangeLangName.text(lang);
             $topChangeLang.removeClass('hidden');
             $topChangeLang.rebind('click', function() {
 
@@ -1367,19 +1496,14 @@ function topmenuUI() {
             });
         }
 
-        $('.top-menu-item.register,.context-menu-divider.register,.top-menu-item.login').show();
+        $('.top-menu-item.register,.top-menu-item.login').removeClass('hidden');
 
         if (u_type === 0) {
-            $('.top-menu-item.login').hide();
-            $('.top-menu-item.logout,.context-menu-divider.logout').show();
+            $('.top-menu-item.login').addClass('hidden');
+            $('.top-menu-item.logout').removeClass('hidden');
         }
 
-        $('.top-login-arrow').css('margin-right',
-            $('.top-menu-icon').width() + $('.create-account-button').width() +
-            ($('.top-login-button').width() / 2) + 78 + 'px');
     }
-
-    $('.top-menu-arrow').css('margin-right', $('.top-menu-icon').width() / 2 + 'px');
 
     $.hideTopMenu = function (e) {
 
@@ -1391,33 +1515,35 @@ function topmenuUI() {
         if (!e || ($(e.target).parents('.membership-popup').length == 0
                 && ((c && c.indexOf('membership-status') == -1) || !c))
                 || (c && c.indexOf('mem-button') > -1)) {
-            $('.membership-popup').removeClass('active');
+            $('.membership-popup').addClass('hidden');
             $('.membership-status-block').removeClass('active');
         }
         if (!e || ($(e.target).parents('.top-menu-popup').length == 0
-                && ((c && c.indexOf('top-menu-icon') == -1) || !c))) {
-            $('.top-menu-popup').removeClass('active');
-            $('.top-menu-icon').removeClass('active');
+                && !$(e.target).hasClass('top-menu-popup')
+                && ((c && c.indexOf('top-icon menu') == -1) || !c))) {
+            topMenu(1);
         }
         if (!e || ($(e.target).parents('.top-warning-popup').length == 0
-                && ((c && c.indexOf('warning-icon-area') == -1) || !c))) {
-            $('.top-warning-popup').removeClass('active');
+                && !$(e.target).hasClass('top-menu-popup')
+                && ((c && c.indexOf('top-icon warning') == -1) || !c))) {
+            $('.top-warning-popup').addClass('hidden');
+            $('.top-icon.warning').removeClass('active');
         }
         if (!e || ($(e.target).parents('.top-user-status-popup').length == 0
                 && ((c && c.indexOf('activity-status') == -1 && c.indexOf('loading') == -1) || !c))) {
-            $('.top-user-status-popup').removeClass('active');
+            $('.top-user-status-popup').addClass('hidden');
             $('.activity-status-block').removeClass('active');
         }
         if (!e || ($(e.target).parents('.notification-popup').length == 0
-                && ((c && c.indexOf('cloud-popup-icon') == -1) || !c))) {
+                && ((c && c.indexOf('top-icon notification') == -1) || !c))) {
 
             if (typeof notify === 'object') {
                 notify.closePopup();
             }
         }
-        if (!e || ($(e.target).parents('.top-login-popup').length == 0
+        if (!e || ($(e.target).parents('.dropdown.top-login-popup').length == 0
                 && ((c && c.indexOf('top-login-button') == -1) || !c))) {
-            $('.top-login-popup').removeClass('active');
+            $('.dropdown.top-login-popup').addClass('hidden');
         }
         if ((!e || $(e.target).parents('.create-new-folder').length == 0)
                 && (!c || c.indexOf('fm-new-folder') == -1)) {
@@ -1444,37 +1570,46 @@ function topmenuUI() {
         }
     });
 
-    $('.top-menu-icon').rebind('click', function (e) {
-        if ($(this).attr('class').indexOf('active') == -1) {
-            $(this).addClass('active');
-            $('.top-menu-popup').addClass('active');
-        }
-        else {
-            $(this).removeClass('active');
-            $('.top-menu-popup').removeClass('active');
-        }
-    });
-    $('.activity-status-block').rebind('click.topui', function (e) {
+    $('.top-icon.achievements').rebind('click', function() {
+        loadingDialog.show();
 
-        if ($(this).attr('class').indexOf('active') == -1) {
-            $(this).addClass('active');
-            $('.top-user-status-popup').addClass('active');
-            $('.top-user-status-popup').css('right',
-                $('.top-head').outerWidth() - $('.activity-status-block').position().left + -138 + 'px');
+        M.accountData(function(account) {
+            loadingDialog.hide();
+
+            if (account.maf) {
+                achievementsListDialog();
+            }
+        });
+    });
+
+    $('.top-icon.menu, .top-icon.close').rebind('click', function () {
+        topMenu();
+    });
+
+    $('.top-icon.close').rebind('click', function () {
+        topMenu(1);
+    });
+
+    $('.activity-status-block').rebind('click.topui', function (e) {
+        var $this = $(this);
+        if ($this.attr('class').indexOf('active') == -1) {
+            $this.addClass('active');
+            $('.top-user-status-popup').removeClass('hidden');
+            topPopupAlign('.activity-status-block', '.top-user-status-popup', 40);
         }
         else {
-            $(this).removeClass('active');
-            $('.top-user-status-popup').removeClass('active');
+            $this.removeClass('active');
+            $('.top-user-status-popup').addClass('hidden');
         }
     });
-    $('.top-user-status-item').rebind('click.topui', function (e) {
+    $('.top-user-status-popup .dropdown-item').rebind('click.topui', function (e) {
         if ($(this).attr('class').indexOf('active') == -1) {
-            $('.top-user-status-item').removeClass('active');
+            $('.top-user-status-popup .dropdown-item').removeClass('active');
             $(this).addClass('active');
             $('.activity-status-block').find('.activity-status')
-                .attr('class', $(this).find('.activity-status').attr('class'));
+                .attr('class', 'top ' + $(this).find('.activity-status').attr('class'));
             $('.activity-status-block').removeClass('active');
-            $('.top-user-status-popup').removeClass('active');
+            $('.top-user-status-popup').addClass('hidden');
             if (!megaChatIsReady && !megaChatIsDisabled) {
                 var presence = $(this).data("presence");
                 localStorage.megaChatPresence = presence;
@@ -1486,305 +1621,143 @@ function topmenuUI() {
             }
         }
     });
-    $('.membership-status-block').rebind('click', function (e) {
-        $('.membership-popup .membership-main-block').hide();
-        $('.membership-popup .membership-loading').show();
-
-        if ($(this).attr('class').indexOf('active') == -1) {
-            $(this).addClass('active');
-            if (u_attr.p) {
-                $('.pro-popup').addClass('active');
-            }
-            else {
-                $('.free-popup').addClass('active');
-            }
-
-            M.accountData(function (account) {
-
-                var perc, warning, perc_c;
-                var percent = {
-                    space: Math.min(100, Math.round(account.space_used / account.space * 100)),
-                    bw: Math.round((account.servbw_used + account.downbw_used) / account.bw * 100)
-                };
-
-
-                $('.membership-popup .membership-loading').hide();
-                $('.membership-popup .membership-main-block').show();
-                var $parent = $('.membership-popup.free-popup');
-
-                if (u_attr.p) {
-                    var planNum = u_attr.p;
-                    var planName = getProPlan(planNum);
-                    $parent = $('.membership-popup.pro-popup');
-
-                    $('.membership-popup.pro-popup .membership-icon').addClass('pro' + planNum);
-                    var $elm = $('.membership-popup.pro-popup .membership-icon-txt-bl .membership-medium-txt');
-                    if (account.stype !== 'S') {
-                        $elm.safeHTML('@@ <span class="red">@@</span>', l[987], time2date(account.expiry));
-                    }
-                    else if (Array.isArray(account.sgw)) {
-                        $elm.safeHTML('<span class="red">(@@)</span>', account.sgw.join(', '));
-                    }
-                    else {
-                        $elm.text('');
-                    }
-
-                    // Update current plan to PRO I, PRO II, PRO III or LITE in popup
-                    $('.membership-icon-pad .membership-big-txt.red').text(planName);
-                }
-                else {
-                    $('.membership-popup .upgrade-account').rebind('click', function () {
-                        document.location.hash = 'pro';
-                    });
-                }
-                if (account.balance
-                        && account.balance[0]
-                        && account.balance[0][0] > 0) {
-                    $parent.find('.membership-price-txt .membership-big-txt')
-                        .safeHTML('&euro; @@', account.balance[0][0]);
-                }
-                else {
-                    $parent.find('.membership-price-txt .membership-big-txt').html('&euro; 0.00');
-                }
-
-                $parent.find('.storage .membership-circle-bg.blue-circle').attr('class',
-                    'membership-circle-bg blue-circle percents-' + percent.space);
-                $parent.find('.storage .membership-circle-bg.blue-circle')
-                    .safeHTML(percent.space  + '<span class="membership-small-txt">%</span>');
-                var b1 = bytesToSize(account.space_used);
-                b1 = b1.split(' ');
-                b1[0] = Math.round(b1[0]) + ' ';
-                var b2 = bytesToSize(account.space);
-                b2 = b2.split(' ');
-                b2[0] = Math.round(b2[0]) + ' ';
-
-                warning = '';
-                if (percent.space > 99) {
-                    warning =
-                        '<div class="account-warning-icon"><span class="membership-notification"><span><span class="yellow">'
-                        + l[34] + '</span> '
-                        + l[1010] + '. ' + l[1011] + ' <a href="#pro" class="upgradelink">'
-                        + l[920] + '</a></span><span class="membership-arrow"></span></span>&nbsp;</div>';
-                }
-                else if (percent.space > 80) {
-                    warning =
-                        '<div class="account-warning-icon"><span class="membership-notification"><span><span class="yellow">'
-                        + l[34] + '</span> '
-                        + l[1012] + ' ' + l[1013] + ' <a href="#pro"  class="upgradelink">'
-                        + l[920] + '</a></span><span class="membership-arrow"></span></span>&nbsp;</div>';
-                }
-
-                var usedspace =
-                    '<span class="membership-small-txt">' + l['439a'].replace('[X1]',
-                    '<span class="blue lpxf">' + htmlentities(b1[0]) + '<span class="membership-small-txt">' +
-                    htmlentities(b1[1]) + '</span></span>').replace('[X2]',
-                        '<span class="lpxf">' + htmlentities(b2[0]) + '</span>' + ' <span class="membership-small-txt">' +
-                    htmlentities(b2[1]) + '</span>') + '</span>';
-
-                var usedspacetxt = l[799];
-                if (lang == 'de') {
-                    usedspacetxt = l[799].charAt(0).toLowerCase() + l[799].slice(1);
-                }
-
-                $parent.find('.storage .membership-usage-txt').safeHTML('<div class="membership-big-txt">' +
-                    usedspace + '</div><div class="membership-medium-txt">' + usedspacetxt +
-                    warning + '</div>');
-
-                if (percent.space > 80) {
-                    $parent.find('.storage .membership-usage-txt').addClass('exceeded');
-                }
-
-                $parent.find('.bandwidth  .membership-circle-bg.green-circle')
-                    .attr('class', 'membership-circle-bg green-circle percents-' + percent.bw);
-                $parent.find('.bandwidth  .membership-circle-bg.green-circle')
-                    .safeHTML(percent.bw + '<span class="membership-small-txt">%</span>');
-                var b1 = bytesToSize(account.servbw_used + account.downbw_used);
-                b1 = b1.split(' ');
-                b1[0] = Math.round(b1[0]) + ' ';
-                var b2 = bytesToSize(account.bw);
-                b2 = b2.split(' ');
-                b2[0] = Math.round(b2[0]) + ' ';
-
-                var waittime = '30 minutes';
-
-                warning = '';
-                if (percent.bw > 99 && !u_attr.p) {
-                    warning =
-                        '<div class="account-warning-icon"><span class="membership-notification"><span><span class="yellow">'
-                        + l[34] + '</span> <span class="red">'
-                        + l[17].toLowerCase() + '</span><br /> '
-                        + l[1054].replace('[X]',
-                            '<span class="green">' + waittime + '</span>')
-                        + ' ' + l[1055] + ' <a href="#pro"  class="upgradelink">'
-                        + l[920] + '</a></span><span class="membership-arrow"></span></span>&nbsp;</div>';
-                }
-                else if (percent.bw > 99 && u_attr.p) {
-                    warning =
-                        '<div class="account-warning-icon"><span class="membership-notification"><span><span class="yellow">'
-                        + l[34] + '</span> '
-                        + l[1008] + ' ' + l[1009] + ' <a href="#pro" class="upgradelink">'
-                        + l[920] + '</a></span><span class="membership-arrow"></span></span>&nbsp;</div>';
-                }
-                else if (percent.bw > 80) {
-                    warning =
-                        '<div class="account-warning-icon"><span class="membership-notification"><span><span class="yellow">'
-                        + l[34] + '</span> '
-                        + l[1053] + ' ' + l[1009] + ' <a href="#pro" class="upgradelink">'
-                        + l[920] + '</a></span><span class="membership-arrow"></span></span>&nbsp;</div>';
-                }
-
-                var usedbw = '<span class="membership-small-txt">' + l['439a'].replace('[X1]',
-                    '<span class="green lpxf">' + htmlentities(b1[0]) + '<span class="membership-small-txt">' +
-                    htmlentities(b1[1]) + '</span></span>').replace('[X2]',
-                    '<span class="lpxf">' + htmlentities(b2[0]) + '</span>' +
-                    ' <span class="membership-small-txt">' +
-                    htmlentities(b2[1]) + '</span>') + '</span>';
-                var usedbwtxt = l[973];
-                if (lang == 'de') {
-                    usedbwtxt = l[973].charAt(0).toLowerCase() + l[973].slice(1);
-                }
-
-                $parent.find('.bandwidth .membership-usage-txt').safeHTML('<div class="membership-big-txt">' +
-                    usedbw + '</div><div class="membership-medium-txt">' + usedbwtxt + warning + '</div>');
-
-                if (percent.bw > 80) {
-                    $parent.find('.bandwidth .membership-usage-txt').addClass('exceeded');
-                }
-
-                $('.membership-popup .mem-button').rebind('click', function (e) {
-                    document.location.hash = 'fm/account';
-                    $.hideTopMenu(e);
-                });
-            });
-        }
-        else {
-            $(this).removeClass('active');
-            if ($(this).find('.membership-status').attr('class').indexOf('free') == -1) {
-                $('.pro-popup').removeClass('active');
-            }
-            else {
-                $('.free-popup').removeClass('active');
-            }
-        }
-    });
 
     $('.top-menu-popup .top-menu-item').rebind('click', function () {
-        if ($('.light-overlay').is(':visible')) {
-            loadingInitDialog.hide();
-        }
-        $('.top-menu-popup').removeClass('active');
-        $('.top-menu-icon').removeClass('active');
-
         var className = $(this).attr('class');
         if (!className) {
             className = '';
         }
-        if (className.indexOf('privacycompany') > -1) {
-            document.location.hash = 'privacycompany';
+        if (className.indexOf('submenu-item') > -1) {
+            if (className.indexOf('expanded') > -1) {
+                $(this).removeClass('expanded');
+            } else {
+                $(this).addClass('expanded');
+            }
+            setTimeout(topMenuScroll,200);
         }
-        else if (className.indexOf('upgrade-your-account') > -1) {
-            document.location.hash = 'pro';
-            return false;
-        }
-        else if (className.indexOf('register') > -1) {
-            document.location.hash = 'register';
-        }
-        else if (className.indexOf('login') > -1) {
-            document.location.hash = 'login';
-        }
-        else if (className.indexOf('aboutus') > -1) {
-            document.location.hash = 'about';
-        }
-        else if (className.indexOf('corporate') > -1) {
-            document.location.hash = 'corporate';
-        }
-        else if (className.indexOf('megablog') > -1) {
-            document.location.hash = 'blog';
-        }
-        else if (className.indexOf('credits') > -1) {
-            document.location.hash = 'credits';
-        }
-        else if (className.indexOf('chrome') > -1) {
-            document.location.hash = 'chrome';
-        }
-        else if (className.indexOf('resellers') > -1) {
-            document.location.hash = 'resellers';
-            return false;
-        }
-        else if (className.indexOf('firefox') > -1) {
-            document.location.hash = 'firefox';
-        }
-        else if (className.indexOf('mobile') > -1) {
-            document.location.hash = 'mobile';
-        }
-        else if (className.indexOf('sync') > -1) {
-            document.location.hash = 'sync';
-        }
-        else if (className.indexOf('help') > -1) {
-            document.location.hash = 'help';
-        } else if (className.indexOf('contact') > -1) {
-            document.location.hash = 'contact';
-        } else if (className.indexOf('support') > -1) {
-            document.location.hash = 'support';
-        }
-        else if (className.indexOf('sitemap') > -1) {
-            document.location.hash = 'sitemap';
-        }
-        else if (className.indexOf('sdk') > -1) {
-            document.location.hash = 'sdk';
-        }
-        else if (className.indexOf('doc') > -1) {
-            document.location.hash = 'doc';
-        }
-        else if (className.indexOf('source-code') > -1) {
-            document.location.hash = 'sourcecode';
-        }
-        else if (className.indexOf('terms') > -1) {
-            document.location.hash = 'terms';
-        }
-        else if (className.indexOf('general') > -1) {
-            document.location.hash = 'general';
-        }
-        else if (className.indexOf('privacypolicy') > -1) {
-            document.location.hash = 'privacy';
-        }
-        else if (className.indexOf('mega') > -1) {
-            document.location.hash = 'mega';
-        }
-        else if (className.indexOf('copyright') > -1) {
-            document.location.hash = 'copyright';
-        }
-        else if (className.indexOf('takedown') > -1) {
-            document.location.hash = 'takedown';
-        }
-        else if (className.indexOf('account') > -1) {
-            document.location.hash = 'fm/account';
-        }
-        else if (className.indexOf('refresh') > -1) {
-            mega.utils.reload();
-        }
-        else if (className.indexOf('languages') > -1) {
-            langDialog.show();
-        }
-        else if (className.indexOf('clouddrive') > -1) {
-            document.location.hash = 'fm';
-        }
-        else if (className.indexOf('logout') > -1) {
-            mLogout();
+        else {
+            if ($('.light-overlay').is(':visible')) {
+                loadingInitDialog.hide();
+            }
+            topMenu(1);
+            if (className.indexOf('privacycompany') > -1) {
+                document.location.hash = 'privacycompany';
+            }
+            else if (className.indexOf('upgrade-your-account') > -1) {
+                document.location.hash = 'pro';
+                return false;
+            }
+            else if (className.indexOf('register') > -1) {
+                document.location.hash = 'register';
+            }
+            else if (className.indexOf('login') > -1) {
+                document.location.hash = 'login';
+            }
+            else if (className.indexOf('about') > -1) {
+                document.location.hash = 'about';
+            }
+            else if (className.indexOf('corporate') > -1) {
+                document.location.hash = 'corporate';
+            }
+            else if (className.indexOf('blog') > -1) {
+                document.location.hash = 'blog';
+            }
+            else if (className.indexOf('credits') > -1) {
+                document.location.hash = 'credits';
+            }
+            else if (className.indexOf('chrome') > -1) {
+                document.location.hash = 'chrome';
+            }
+            else if (className.indexOf('resellers') > -1) {
+                document.location.hash = 'resellers';
+                return false;
+            }
+            else if (className.indexOf('backup') > -1) {
+                document.location.hash = 'backup';
+                return false;
+            }
+            else if (className.indexOf('firefox') > -1) {
+                document.location.hash = 'firefox';
+            }
+            else if (className.indexOf('mobile') > -1) {
+                document.location.hash = 'mobile';
+            }
+            else if (className.indexOf('sync') > -1) {
+                document.location.hash = 'sync';
+            }
+            else if (className.indexOf('help') > -1) {
+                document.location.hash = 'help';
+            }
+            else if (className.indexOf('contact') > -1) {
+                document.location.hash = 'contact';
+            }
+            else if (className.indexOf('feedback') > -1) {
+
+                // Show the Feedback dialog
+                var feedbackDialog = mega.ui.FeedbackDialog.singleton($(this));
+                feedbackDialog._type = 'top-button';
+            }
+            else if (className.indexOf('support') > -1) {
+                document.location.hash = 'support';
+            }
+            else if (className.indexOf('sitemap') > -1) {
+                document.location.hash = 'sitemap';
+            }
+            else if (className.indexOf('sdk') > -1) {
+                document.location.hash = 'sdk';
+            }
+            else if (className.indexOf('doc') > -1) {
+                document.location.hash = 'doc';
+            }
+            else if (className.indexOf('sourcecode') > -1) {
+                document.location.hash = 'sourcecode';
+            }
+            else if (className.indexOf('terms') > -1) {
+                document.location.hash = 'terms';
+            }
+            else if (className.indexOf('general') > -1) {
+                document.location.hash = 'general';
+            }
+            else if (className.indexOf('privacy') > -1) {
+                document.location.hash = 'privacy';
+            }
+            else if (className.indexOf('mega') > -1) {
+                document.location.hash = 'mega';
+            }
+            else if (className.indexOf('copyright') > -1) {
+                document.location.hash = 'copyright';
+            }
+            else if (className.indexOf('takedown') > -1) {
+                document.location.hash = 'takedown';
+            }
+            else if (className.indexOf('account') > -1) {
+                document.location.hash = 'fm/account';
+            }
+            else if (className.indexOf('refresh') > -1) {
+                mega.utils.reload();
+            }
+            else if (className.indexOf('languages') > -1) {
+                langDialog.show();
+            }
+            else if (className.indexOf('logout') > -1) {
+                mLogout();
+            }
         }
     });
 
-    $('.top-search-input').rebind('focus', function () {
-        $('.top-search-bl').addClass('active');
-        if ($(this).val() == l[102]) {
-            $(this).val('');
-        }
+    $('.st-bottom-button').rebind('click', function () {
+        var url = $(this).attr('href');
+        window.open(url, '_blank');
+    });
+
+    $('.top-search-bl').rebind('click', function () {
+        $(this).addClass('active');
+        $('.top-search-input').focus();
     });
 
     $('.top-search-input').rebind('blur', function () {
         $(this).closest('.top-search-bl').removeClass('active');
         if ($(this).val() == '') {
-            $(this).val(l[102]);
             $('.top-search-bl').removeClass('contains-value');
         }
         else {
@@ -1799,8 +1772,8 @@ function topmenuUI() {
             dn.closest(ct).show();
             $(window).trigger('resize');
         }
-        $('.top-search-input').val(l[102]);
-        $('.top-search-bl').removeClass('contains-value');
+        $('.top-search-bl').removeClass('contains-value active');
+        $('.top-search-input').val('');
     });
 
     $('.top-search-input').rebind('keyup', function _topSearchHandler(e) {
@@ -1841,12 +1814,49 @@ function topmenuUI() {
         }
     });
 
-    // If the avatar in the header is clicked
+    // Hover tooltip for top-menu elements and sidebar icons
+    $('.nw-fm-left-icon, .top-icon').rebind('mouseover.nw-fm-left-icon', function() {
+        var $this    = $(this);
+        var $tooltip = $this.find('.dark-tooltip');
+        var tooltipPos;
+        var tooltipWidth;
+        var buttonPos;
+
+        if ($.liTooltipTimer) {
+            clearTimeout($.liTooltipTimer);
+        }
+        $.liTooltipTimer = window.setTimeout(
+            function() {
+                if ($tooltip.hasClass('top')) {
+                    tooltipWidth = $tooltip.outerWidth();
+                    buttonPos    = $this.position().left;
+                    tooltipPos   = buttonPos + $this.outerWidth() / 2 - tooltipWidth / 2;
+                    if ($('body').width() - (tooltipPos + tooltipWidth) > 0) {
+                        $tooltip.css({
+                            'left': tooltipPos,
+                            'right': 'auto'
+                        });
+                    }
+                    else {
+                        $tooltip.css({
+                            'left': 'auto',
+                            'right': 0
+                        });
+                    }
+                }
+                $tooltip.addClass('hovered');
+            }, 1000);
+    })
+    .rebind('mouseout.nw-fm-left-icon', function() {
+        $(this).find('.dark-tooltip').removeClass('hovered');
+        clearTimeout($.liTooltipTimer);
+    });
+
     var $topHeader = $('.top-head');
-    $topHeader.find('.fm-avatar img').rebind('click', function() {
+    $topHeader.find('.fm-avatar').rebind('click', function() {
 
         // If the user has an avatar already set, take them to the profile page where they can change or remove it
-        if ($(this).attr('src').indexOf('blob:') > -1) {
+        if ($(this).find('img').attr('src').indexOf('blob:') > -1) {
             document.location.hash = 'fm/account/profile';
         }
         else {
@@ -1868,20 +1878,24 @@ function topmenuUI() {
             }
             else {
                 document.location.hash =
-                    typeof u_type !== 'undefined' && +u_type > 2 ? '#fm' : '#start';
+                    typeof u_type !== 'undefined' && +u_type > 2 ? '#fm/dashboard' : '#start';
             }
         }
     });
 
+    /**
+     * this is closing the EFQ email confirm dialog, if needed for something else ask before re-enabling [dc]
     if (!$('.fm-dialog.registration-page-success').hasClass('hidden')) {
         $('.fm-dialog.registration-page-success').addClass('hidden');
         $('.fm-dialog-overlay').addClass('hidden');
         $('body').removeClass('overlayed');
-    }
+    }*/
 
+    /**
+     * why was this needed here?
     if (ulmanager.isUploading || dlmanager.isDownloading) {
         $('.widget-block').removeClass('hidden');
-    }
+    }*/
 
     $('.widget-block').rebind('click', function (e) {
         if ($.infoscroll && page == 'download') {
@@ -1906,10 +1920,6 @@ function topmenuUI() {
         $('.top-search-bl input').val(decodeURIComponent(M.currentdirid.substr(7)));
     }
 
-    if (u_type) {
-        $('.membership-popup-arrow').css('margin-right',
-            $('.top-menu-icon').width() + $('.membership-status-block').width() / 2 + 57 + 'px');
-    }
 
     // Initialise notification popup and tooltip
     if (typeof notify === 'object') {
@@ -2069,7 +2079,7 @@ window.onhashchange = function() {
         }
         for (var p in subpages) {
             if (page && page.substr(0, p.length) == p) {
-                for (i in subpages[p]) {
+                for (var i in subpages[p]) {
                     if (!jsl_loaded[jsl2[subpages[p][i]].n]) {
                         jsl.push(jsl2[subpages[p][i]]);
                     }
@@ -2101,7 +2111,7 @@ window.onunload = function() {
 
 if (!is_karma && !is_mobile) {
     window.M = new MegaData();
-    attribCache = new IndexedDBKVStorage('attrib', { murSeed: 0x800F0002 });
+    attribCache = new IndexedDBKVStorage('ua', { murSeed: 0x800F0002 });
     attribCache.syncNameTimer = {};
     attribCache.uaPacketParser = uaPacketParser;
     attribCache.bitMapsManager = new MegaDataBitMapManager();

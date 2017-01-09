@@ -3,11 +3,10 @@
  */
 
 // (the name must exist in the FMDB schema with index 'k')
-var IndexedDBKVStorage = function(name, dbOpts, syncMemcache) {
+var IndexedDBKVStorage = function(name) {
     this.name = name;
     this.logger = new MegaLogger("IDBKVStorage[" + name + "]");
-    this._memCache = {};
-    this.syncMemcache = syncMemcache;
+    this.destroy();
 };
 
 // sets fmdb reference and prefills the memory cache from the DB
@@ -20,54 +19,44 @@ IndexedDBKVStorage.prototype.prefillMemCache = function(fmdb) {
     var promise = MegaPromise.resolve();
 
     if (fmdb) {
-        promise = this.fmdb.getbykey(this.name, 'k', false, false);
+        promise = fmdb.get(this.name);
         promise.done(function(r) {
             for (var i = r.length; i--; ) {
-                self._memCache[r[i].k] = r[i].v;
+                self.dbache[r[i].k] = r[i].v;
             }
         });
     }
 
-    if (self.syncMemcache) {
-        self._mListener = mBroadcaster.addListener('idbchange:' + self.name + "_" + u_handle, function (data) {
-            var k = data[0];
-            var v = data[1];
-            if (typeof(v) === 'undefined') {
-                delete self._memCache[k];
-            }
-            else {
-                self._memCache[k] = v;
-            }
-
-            self.trigger('onChange', [k, v]);
-        });
-    }
     return promise;
 };
 
-// set item (synchronously, can do without promise)
+// flush new items / deletions to the DB (in channel 0, this should
+// be followed by call to setsn())
+// will be a no-op if no fmdb set
+IndexedDBKVStorage.prototype.flush = function() {
+    if (this.fmdb) {
+        for (var k in this.delcache) {
+            this.fmdb.del(this.name, k);
+            delete this.dbcache[k];
+        }
+        this.delcache = Object.create(null);
+
+        for (var k in this.newcache) {
+            this.fmdb.add(this.name, { k : k, d : { v : this.newcache[k] }});
+            this.dbcache[k] = this.newcache[k];
+        }
+        this.newcache = Object.create(null);
+    }
+};
+
+// set item in DB/cache
+// (must only be called in response to an API response triggered by an actionpacket)
+// FIXME: convert to synchronous operation
 IndexedDBKVStorage.prototype.setItem = function __IDBKVSetItem(k, v) {
     var promise = new MegaPromise();
 
-    if (this._memCache[k] !== v) {
-        this._memCache[k] = v;
-
-        if (this.fmdb) {
-            this.fmdb.add(this.name, { k : k, d : { v : v }});
-        }
-
-        // FIXME: check if this is ok..
-        var self = this;
-        Soon(function() {
-            if (self.syncMemcache) {
-                watchdog.notify('idbchange', {
-                    name: self.name + "_" + u_handle,
-                    key: k,
-                    value: v
-                });
-            }
-        });
-    }
+    delete this.delcache[k];
+    this.newcache[k] = v;
 
     promise.resolve([k, v]);
 
@@ -75,134 +64,100 @@ IndexedDBKVStorage.prototype.setItem = function __IDBKVSetItem(k, v) {
 };
 
 // get item - if not found, promise will be rejected
+// FIXME: convert to synchronous operation
 IndexedDBKVStorage.prototype.getItem = function __IDBKVGetItem(k) {
-    var self = this;
-
-    if (typeof(self._memCache[k]) != 'undefined') {
-        return MegaPromise.resolve(self._memCache[k]);
-    }
-
     var promise = new MegaPromise();
 
-    if (this.fmdb) {
-        this.fmdb.getbykey(this.name, 'k', false, [['k', k]])
-            .always(function(r) {
-                if (r.length) {
-                    self._memCache[r[0].k] = r[0].v;
-                    promise.resolve(r[0].v);
-                }
-                else {
-                    promise.reject();
-                }
-            });
-    }
-    else {
-        // no DB available
-        promise.reject();
+    if (!this.delcache[k]) {
+        if (typeof(this.newcache[k]) != 'undefined') {
+            // record recently (over)written
+            promise.resolve(this.newcache[k]);
+            return promise;
+        }
+        else {
+            // record available in DB
+            if (typeof(this.dbcache[k]) != 'undefined') {
+                promise.resolve(this.dbcache[k]);
+                return promise;
+            }
+        }
     }
 
+    // record deleted or unavailable
+    promise.reject();
     return promise;
-};
-
-// remove item
-IndexedDBKVStorage.prototype.removeItem = function __IDBKVRemoveItem(k) {
-    if (typeof(this._memCache[k]) !== 'undefined') {
-        delete this._memCache[k];
-    }
-
-    if (this.syncMemcache) {
-        watchdog.notify('idbchange', {
-            name: this.name + "_" + u_handle,
-            key: k,
-            value: undefined
-        });
-    }
-
-    var promise = new MegaPromise();
-
-    if (this.fmdb) this.fmdb.del(this.name, k);
-
-    promise.resolve();
-
-    return promise;
-};
-
-// clear all items
-IndexedDBKVStorage.prototype.clear = function __IDBKVClear() {
-    this._memCache = {};
-
-    var promise = new MegaPromise();
-
-    // FIXME: add .clear() to mDB.js
-    if (this.fmdb) this.fmdb.clear(this.name);
-
-    promise.resolve();
-
-    return promise;
-};
-
-// FIXME: obsolete, remove
-IndexedDBKVStorage.prototype.destroy = function __IDBKVDestroy() {
-    var self = this;
-    self._memCache = {};
-
-    var promise = new MegaPromise();
-
-    return MegaPromise.resolve();
 };
 
 // check if item exists
 IndexedDBKVStorage.prototype.hasItem = function __IDBKVHasItem(k) {
-
-    if (typeof(this._memCache[k]) != 'undefined') {
-        return MegaPromise.resolve();
-    }
     var promise = new MegaPromise();
 
-    if (this.fmdb) {
-        this.fmdb.getbykey(this.name, 'k', false, [['k', k]])
-            .always(function(r) {
-                if (r.length) {
-                    promise.resolve();
-                }
-                else {
-                    promise.reject();
-                }
-            });
+    if (!this.delcache[k] && (typeof(this.newcache[k]) != 'undefined' || typeof(this.dbcache[k]) != 'undefined')) {
+        return MegaPromise.resolve();
+    }
+
+    return MegaPromise.reject();
+};
+
+// remove item from DB/cache
+// (must only be called in response to an API response triggered by an actionpacket)
+// FIXME: convert to synchronous operation
+IndexedDBKVStorage.prototype.removeItem = function __IDBKVRemoveItem(k) {
+    this.delcache[k] = true;
+    delete this.newcache[k];
+
+    var promise = new MegaPromise();
+    promise.resolve();
+    return promise;
+};
+
+// iterate over all items, with prefix
+// FIXME: convert to synchronous operation
+IndexedDBKVStorage.prototype.eachPrefixItem = function __IDBKVEachItem(prefix, cb) {
+    for (var k in this.newcache) {
+        if (!this.delcache[k]) cb(this.newcache[k], k);
+    }
+
+    for (var k in this.dbcache) {
+        if (!this.delcache[k] && typeof this.newcache[k] == 'undefined') cb(this.dbcache[k], k);
+    }
+
+    return MegaPromise.resolve();
+};
+
+// FIXME: check if this gets called for caches other than the ua attribCache
+// - if that is the case, also clear the underlying DB table
+IndexedDBKVStorage.prototype.destroy = function __IDBKVDestroy() {
+    this.dbcache = Object.create(null);     // items that reside in the DB
+    this.newcache = Object.create(null);    // new items that are pending flushing to the DB
+    this.delcache = Object.create(null);    // delete items that are pending deletion from the DB
+};
+
+/**
+ * Clear DB Table contents.
+ * @returns {MegaPromise}
+ */
+IndexedDBKVStorage.prototype.clear = function __IDBKVClear() {
+    var self = this;
+    var fmdb = this.fmdb;
+    var promise = new MegaPromise();
+
+    this.destroy();
+
+    if (fmdb && Object(fmdb.db).hasOwnProperty(this.name)) {
+
+        fmdb.db[this.name].clear().then(function() {
+            self.logger.debug("Table cleared.");
+        }).catch(function(err) {
+            self.logger.error("Unable to clear table!", err);
+        }).finally(function() {
+            promise.resolve();
+        });
     }
     else {
-        // no DB available
         promise.reject();
     }
 
     return promise;
-};
-
-// iterate over all items
-IndexedDBKVStorage.prototype.eachItem = function __IDBKVEachItem(cb) {
-    var self = this;
-
-    Object.keys(this._memCache).forEach(function(k) {
-        cb(self._memCache[k], k);
-    });
-
-    // FIXME: also retrieve DB contents? (was not implemented in the original version)
-
-    return MegaPromise.resolve();
-};
-
-// iterate over all items, with prefix
-IndexedDBKVStorage.prototype.eachPrefixItem = function __IDBKVEachItem(prefix, cb) {
-    var self = this;
-
-    Object.keys(this._memCache).forEach(function(k) {
-        if (k.indexOf(prefix) === 0) {
-            cb(self._memCache[k], k);
-        }
-    });
-
-    // FIXME: also retrieve DB contents? (was not implemented in the original version)
-
-    return MegaPromise.resolve();
 };
 makeObservable(IndexedDBKVStorage);

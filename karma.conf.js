@@ -57,6 +57,7 @@ module.exports = function(config) {
         'js/vendor/qrcode.js',
         'js/vendor/bitcoin-math.js',
         'js/vendor/db.js',
+        'js/vendor/megaLogger.js',
 
         // == Test helpers and test configuration ==
         'test/lang_dummy.js',
@@ -71,7 +72,6 @@ module.exports = function(config) {
         'nodedec.js',
         'js/functions.js',
         'js/datastructs.js',
-        'js/vendor/megaLogger.js',
         'js/mega.js',
         'js/tlvstore.js',
         'js/crypto.js',

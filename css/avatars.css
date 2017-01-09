@@ -20,6 +20,20 @@
 	box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.1);
     position: relative;
 }
+.small-rounded-avatar::before {
+    content: '';
+    display: block;
+    width: 36px;
+    height: 36px;
+    position: absolute;
+    margin: -2px 0 0 -2px;
+    -webkit-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
+    -moz-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
+    box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
+    -moz-border-radius: 100%;
+    -webkit-border-radius: 100%;
+    border-radius: 100%;
+}
 .avatar-letter::before {
     position:absolute;
     text-align: center;

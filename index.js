@@ -334,16 +334,16 @@ function init_page() {
                         location.hash = 'start';
                     });
             }
+
+            if (fminitialized) {
+                M.currentdirid = M.RootID = undefined;
+            }
         }
         if (pfhandle) {
             page = 'fm/' + pfhandle;
         }
         else {
             page = 'fm';
-        }
-
-        if (fminitialized) {
-            M.currentdirid = undefined;
         }
     }
     else if (!flhashchange || page !== 'fm/transfers') {

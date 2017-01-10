@@ -22,7 +22,7 @@ IndexedDBKVStorage.prototype.prefillMemCache = function(fmdb) {
         promise = fmdb.get(this.name);
         promise.done(function(r) {
             for (var i = r.length; i--; ) {
-                self.dbache[r[i].k] = r[i].v;
+                self.dbcache[r[i].k] = r[i].v;
             }
         });
     }

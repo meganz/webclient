@@ -142,6 +142,19 @@ copyright.loadCopyrightOwnerValues = function() {
  * Initialises the copyright form page, binding the events the form requires
  */
 copyright.init_cn = function() {
+    var wrong = function(elm) {
+        $(elm)
+            .addClass("red")
+            .css('font-weight', 'bold')
+            .rebind('click', function() {
+                $(this).unbind('click')
+                    .removeClass("red")
+                    .css('font-weight', 'normal')
+                    .parent()
+                    .css('box-shadow', 'none');
+            })
+            .parent().css('box-shadow', '0px 0px 8px #f00');
+    };
 
     $('.addurlbtn').rebind('click', function(e) {
         $('#cn_urls').safeAppend('<div class="new-affiliate-label">' +
@@ -169,41 +182,37 @@ copyright.init_cn = function() {
             msgDialog('warninga', l[135], escapeHTML(l[658]));
         }
         else {
+            var invalidWords = ['asd', 'asdf', 'copyright'];
             var copyrightwork = $('.copyrightwork');
             var proceed = false;
             $('.contenturl').each(function(i, e) {
                 proceed = true;
-                var eval = $(e).val();
-                var cval = $(copyrightwork[i]).val();
-                if (eval !== ''  && cval === '' || cval === 'asd' || cval === 'asdf') {
+                var eVal = String($(e).val()).trim();
+                var cVal = String($(copyrightwork[i]).val()).trim();
+                if (eVal !== ''  && cVal === '' || invalidWords.indexOf(cVal.toLowerCase()) !== -1) {
                     proceed = false;
                     msgDialog('warninga', l[135], escapeHTML(l[660]));
+                    wrong(copyrightwork[i]);
                     return false;
                 }
-                if (eval === '' || cval === '') {
+                if (eVal === '' || cVal === '') {
                     proceed = false;
                     msgDialog('warninga', l[135], escapeHTML(l[659]));
+                    wrong(eVal ? copyrightwork[i] : e);
                     return false;
                 }
 
-                if (!copyright.validateUrl(eval)) {
+                if (!copyright.validateUrl(eVal)) {
                     proceed = false;
                     msgDialog('warninga', l[135], escapeHTML(l[7686]));
-                    $(e).addClass("red");
-                    $(e).rebind('click', function() {
-                        $(this).unbind('click').removeClass("red");
-                    });
+                    wrong(e);
                     return false;
                 }
 
-                if (copyright.validateUrl(cval)) {
+                if (copyright.validateUrl(cVal)) {
                     proceed = false;
                     msgDialog('warninga', l[135], escapeHTML(l[9056]));
-                    $(copyrightwork[i])
-                        .addClass("red")
-                        .rebind('click', function() {
-                            $(this).unbind('click').removeClass("red");
-                        });
+                    wrong(copyrightwork[i]);
                     return false;
                 }
 

@@ -1373,6 +1373,11 @@ Object.defineProperty(self, 'dbfetch', (function() {
         coll: function fetchrecursive(handles, promise) {
             promise = promise || MegaPromise.busy();
 
+            if (!fmdb) {
+                promise.resolve();
+                return promise;
+            }
+
             // fetch nodes and their path to root
             this.geta(handles)
                 .always(function() {

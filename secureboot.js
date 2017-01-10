@@ -1726,6 +1726,7 @@ else if (!b_u)
 
     if (is_mobile) {
         // Common to all mobile pages
+        jsl.push({f:'js/transfers/mobile.js', n: 'mobile_js', j:1});
         jsl.push({f:'js/vendor/jquery.mobile.js', n: 'jquery_mobile_js', j: 1, w: 5});
         jsl.push({f:'css/mobile-app-new.css', n: 'mobile_css', j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'css/spinners.css', n: 'spinners_css', j: 2, w: 5, c: 1, d: 1, cache: 1});

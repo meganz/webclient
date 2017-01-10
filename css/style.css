@@ -10874,6 +10874,9 @@ table {
     white-space: pre-line;
     height: 18px;
 }
+.transfers-form .fm-account-header {
+    height: auto;
+}
 .fm-account-header.big {
     font-size: 18px;
     padding: 18px 0 0 0;

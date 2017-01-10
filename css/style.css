@@ -232,6 +232,7 @@ a, a:link, a:visited, a:hover, a:active, a:focus img, a:focus img {
 .top-head {
     background-color: #fafafa;
     position: relative;
+    z-index: 1;
 }
 .logo {
     width: 24px;

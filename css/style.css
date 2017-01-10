@@ -7444,6 +7444,7 @@ table {
     height: calc(100% - 35px);
     position: relative;
     margin-top: -1px;
+    z-index: 1;
 }
 .fm-right-block.dashboard, .fm-right-block.dashboard .jspContainer, .fm-right-block.dashboard .jspPane {
     width: auto !important;

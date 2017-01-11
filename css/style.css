@@ -11570,8 +11570,19 @@ table {
     left: 165px;
     top: 26px;
 }
+.exceeded .chart-indicator {
+    background-color: #cc0006;
+    left: 180px;
+    display: block;
+}
 .going-out .chart-indicator {
     display: block;
+}
+.going-out .big-icon.cloud {
+    background-position: 0px -11804px;
+}
+.going-out .chart.progressbars span::before {
+    background-color: #ffa500;
 }
 .exceeded .big-icon.cloud {
     background-position: 0px -10934px;

@@ -3168,6 +3168,7 @@ function dashboardUI() {
         /* New Used Bandwidth chart */
         var base = account.downbw_used;
         var max  = 1.5 * 1024 * 1024 * 1024;
+        var $bandwidthChart = $('.fm-account-blocks.bandwidth');
         if (u_attr.p) {
             max = account.bw;
             base += account.servbw_used;
@@ -3181,15 +3182,13 @@ function dashboardUI() {
         if (perc_c > 100) {
             perc_c = 100;
         }
-        else if (perc > 99) {
-            $('.fm-account-blocks.bandwidth').addClass('exceeded');
+        if (perc_c > 99) {
+            $bandwidthChart.addClass('exceeded');
             b_exceeded = 1;
         }
-
         var deg =  230 * perc_c / 100;
 
         // Used Bandwidth chart
-        var $bandwidthChart = $('.fm-account-blocks.bandwidth');
         if (deg <= 180) {
             $bandwidthChart.find('.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
             $bandwidthChart.find('.right-chart span').removeAttr('style');
@@ -3215,21 +3214,23 @@ function dashboardUI() {
 
 
         /* New Used Storage chart */
+        var $storageChart = $('.fm-account-blocks.storage');
         perc = Math.round(account.space_used / account.space * 100);
         perc_c = perc;
         if (perc_c > 100) {
             perc_c = 100;
-        } else if (perc > 99) {
-            $('.fm-account-blocks.storage').addClass('exceeded');
+        }
+        if (perc_c > 99) {
+            $storageChart.addClass('exceeded');
             s_exceeded = 1;
-        } else if (perc > 80) {
-            $('.fm-account-blocks.storage').addClass('going-out');
+        }
+        else if (perc_c > 80) {
+            $storageChart.addClass('going-out');
         }
 
         var deg =  230 * perc_c / 100;
 
         // Used space chart
-        var $storageChart = $('.fm-account-blocks.storage');
         if (deg <= 180) {
             $storageChart.find('.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
             $storageChart.find('.right-chart span').removeAttr('style');
@@ -3249,22 +3250,28 @@ function dashboardUI() {
 
 
         /* Charts warning notifications */
-        $('.dashboard .chart-warning:not(.hidden)').addClass('hidden');
+        var $chartsBlock = $('.account.widget.content');
+        $chartsBlock.find('.chart-warning:not(.hidden)').addClass('hidden');
         if (b_exceeded && s_exceeded) {
             // Bandwidth and Storage quota exceeded
-            $('.dashboard .chart-warning.storage-and-bandwidth').removeClass('hidden');
+            $chartsBlock.find('.chart-warning.storage-and-bandwidth').removeClass('hidden');
         }
         else if (s_exceeded) {
             // Storage quota exceeded
-            $('.dashboard .chart-warning.storage').removeClass('hidden');
+            $chartsBlock.find('.chart-warning.storage').removeClass('hidden');
         }
         else if (b_exceeded) {
             // Bandwidth quota exceeded
-            $('.dashboard .chart-warning.bandwidth').removeClass('hidden');
+            $chartsBlock.find('.chart-warning.bandwidth').removeClass('hidden');
         }
-        else if (perc > 97) {
+        else if (perc_c > 80) {
             // Running out of cloud space
-            $('.dashboard .chart-warning.out-of-space').removeClass('hidden');
+            $chartsBlock.find('.chart-warning.out-of-space').removeClass('hidden');
+        }
+        if (b_exceeded || s_exceeded || perc_c > 80) {
+            $chartsBlock.find('.chart-warning').rebind('click', function() {
+                window.location.hash = 'pro';
+            });
         }
         /* End of Charts warning notifications */
 
@@ -3528,7 +3535,7 @@ function accountUI() {
     M.accountData(function(account) {
         loadingDialog.hide();
 
-        var perc, warning, perc_c;
+        var perc, warning, perc_c, b_exceeded, s_exceeded;
         var id = document.location.hash;
 
         if (id === '#fm/account/advanced') {
@@ -3671,6 +3678,7 @@ function accountUI() {
         /* New Used Bandwidth chart */
         var base = account.downbw_used;
         var max  = 1.5 * 1024 * 1024 * 1024;
+        var $bandwidthChart = $('.fm-account-blocks.bandwidth');
         if (u_attr.p) {
             max = account.bw;
             base += account.servbw_used;
@@ -3681,15 +3689,17 @@ function accountUI() {
         }
         perc   = Math.round(base * 100 / max) || 1;
         perc_c = perc;
-        if (perc_c > 100)
+        if (perc_c > 100) {
             perc_c = 100;
-        if (perc > 99)
-            $('.fm-account-blocks.bandwidth').addClass('exceeded');
+        }
+        if (perc_c > 99) {
+            $bandwidthChart.addClass('exceeded');
+            b_exceeded = 1;
+        }
 
         var deg =  230 * perc_c / 100;
 
         // Used Bandwidth chart
-        var $bandwidthChart = $('.fm-account-blocks.bandwidth');
         if (deg <= 180) {
             $bandwidthChart.find('.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
             $bandwidthChart.find('.right-chart span').removeAttr('style');
@@ -3716,22 +3726,26 @@ function accountUI() {
 
 
         /* New Used space */
+        var $storageChart = $('.fm-account-blocks.storage');
+        var $storageData = $('.account.data-block.storage-data');
+        $storageData.removeClass('exceeded');
         perc = Math.round(account.space_used / account.space * 100);
         perc_c = perc;
-        if (perc_c > 100)
+        if (perc_c > 100) {
             perc_c = 100;
-        if (perc > 99) {
-            $('.account.data-block.storage-data').addClass('exceeded');
-            $('.storage-data .button.upgrade-account, .storage-data.chart-warning')
-                .rebind('click', function() {
-                    window.location.hash = 'pro';
-                })
+        }
+        if (perc_c > 99) {
+            s_exceeded = 1;
+            $storageChart.addClass('exceeded');
+            $storageData.addClass('exceeded');
+        }
+        else if (perc_c > 80) {
+            $storageChart.addClass('going-out');
         }
 
         var deg =  230 * perc_c / 100;
 
         // Used space chart
-        var $storageChart = $('.fm-account-blocks.storage');
         if (deg <= 180) {
             $storageChart.find('.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
             $storageChart.find('.right-chart span').removeAttr('style');
@@ -3747,6 +3761,32 @@ function accountUI() {
         $storageChart.find('.chart.data .gb-txt').text(b2[1]);
         $storageChart.find('.chart.data .perc-txt').text(perc_c + '%');
         $storageChart.find('.chart.data .size-txt').text(bytesToSize(account.space_used));
+
+        // Charts warning notifications
+        var $chartsBlock = $('.account.data-block.charts');
+        $chartsBlock.find('.chart-warning:not(.hidden)').addClass('hidden');
+        if (b_exceeded && s_exceeded) {
+            // Bandwidth and Storage quota exceeded
+            $chartsBlock.find('.chart-warning.storage-and-bandwidth').removeClass('hidden');
+        }
+        else if (s_exceeded) {
+            // Storage quota exceeded
+            $chartsBlock.find('.chart-warning.storage').removeClass('hidden');
+        }
+        else if (b_exceeded) {
+            // Bandwidth quota exceeded
+            $chartsBlock.find('.chart-warning.bandwidth').removeClass('hidden');
+        }
+        else if (perc_c > 80) {
+            // Running out of cloud space
+            $chartsBlock.find('.chart-warning.out-of-space').removeClass('hidden');
+        }
+        if (b_exceeded || s_exceeded || perc_c > 80) {
+            $chartsBlock.find('.chart-warning').rebind('click', function() {
+                window.location.hash = 'pro';
+            });
+        }
+        /* End of Charts warning notifications */
 
 
         $('.account.quota-txt.used-space')

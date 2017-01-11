@@ -251,19 +251,16 @@ var exportPassword = {
          */
         loadPasswordEstimatorLibrary: function() {
 
-            if (typeof zxcvbn === 'undefined' && !silent_loading) {
+            if (typeof zxcvbn === 'undefined') {
 
                 // Show loading spinner
                 var $loader = this.$dialog.find('.estimator-loading-icon').addClass('loading');
 
                 // On completion of loading, hide the loading spinner
-                silent_loading = function() {
-                    $loader.removeClass('loading');
-                };
-
-                // Load the library
-                jsl.push(jsl2['zxcvbn_js']);
-                jsl_start();
+                mega.utils.require('zxcvbn_js')
+                    .done(function() {
+                        $loader.removeClass('loading');
+                    });
             }
         },
 

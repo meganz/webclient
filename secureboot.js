@@ -40,10 +40,6 @@ function isMobile()
 {
     if (is_chrome_firefox) return false;
 
-    // Flag for testing the mobile site
-    if (localStorage.testMobileSite) {
-        return true;
-    }
     var mobile = ['iphone','ipad','android','blackberry','nokia','opera mini','windows mobile','windows phone','iemobile','mobile safari','bb10; touch'];
     for (var i in mobile) if (ua.indexOf(mobile[i]) > 0) return true;
     return false;
@@ -122,6 +118,13 @@ if (!myURL) {
 if (!String.prototype.trim) {
     String.prototype.trim = function() {
         return this.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
+    };
+}
+if (!String.prototype.localeCompare) {
+    String.prototype.localeCompare = function(to) {
+        var s1 = this.toLowerCase();
+        var s2 = String(to).toLowerCase();
+        return s1 > s2 ? 1 : (s1 < s2 ? -1 : 0);
     };
 }
 if (!String.trim) {
@@ -2017,8 +2020,11 @@ else if (!b_u)
             waitingToBeLoaded++;
             elem.onload = function() {
                 // if (d) console.log('jj.progress...', waitingToBeLoaded);
+
+                jsl_loaded[Object(jsl[id]).n] = 1;
                 jsl_current += Object(jsl[id]).w || 1;
                 jsl_progress();
+
                 if (--waitingToBeLoaded == 0) {
                     jj_done = true;
                     boot_done();
@@ -2079,6 +2085,10 @@ else if (!b_u)
                         jsl[i].text = '/**/';
                         createStyleTag(i, bootstaticpath + jsl[i].f + jjNoCache);
                     }
+                }
+
+                if (!jj || !jsl[i].j || jsl[i].j > 2) {
+                    jsl_done = false;
                 }
             }
         }
@@ -2301,7 +2311,9 @@ else if (!b_u)
         //for(var i in localStorage) if (i.substr(0,6) == 'cache!') delete localStorage[i];
         for (var i in jsl)
         {
-            jsl_loaded[jsl[i].n]=1;
+            if (!jj || !jsl[i].j || jsl[i].j > 2) {
+                jsl_loaded[jsl[i].n] = 1;
+            }
             if ((jsl[i].j == 1) && (!jj))
             {
                 if (!fx_startup_cache)

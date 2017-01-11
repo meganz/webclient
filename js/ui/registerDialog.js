@@ -293,6 +293,9 @@
 
         $('*', $dialog).removeClass('incorrect'); // <- how bad idea is that "*" there?
 
+        // this might gets binded from init_page() which will conflict here..
+        $('.login-register-input').unbind('click');
+
         // controls
         $('.fm-dialog-close', $dialog)
             .rebind('click.proDialog', function() {
@@ -380,15 +383,14 @@
             dialogBodyScroll();
         };
 
-        if (typeof zxcvbn === 'undefined' && !silent_loading) {
+        if (typeof zxcvbn === 'undefined') {
             $('.login-register-input.password', $dialog).addClass('loading');
 
-            silent_loading = function() {
-                $('.login-register-input.password', $dialog).removeClass('loading');
-                registerpwcheck();
-            };
-            jsl.push(jsl2['zxcvbn_js']);
-            jsl_start();
+            mega.utils.require('zxcvbn_js')
+                .done(function() {
+                    $('.login-register-input.password', $dialog).removeClass('loading');
+                    registerpwcheck();
+                });
         }
 
         $('#register-password', $dialog).rebind('keyup.proRegister', function(e) {

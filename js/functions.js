@@ -285,7 +285,7 @@ function delay(aProcID, aFunction, aTimeout) {
     if (typeof aProcID === 'function') {
         aTimeout = aFunction;
         aFunction = aProcID;
-        aProcID = mRandomToken();
+        aProcID = aFunction.name || MurmurHash3(String(aFunction));
     }
 
     if (d > 1) {
@@ -2280,8 +2280,8 @@ function mKeyDialog(ph, fl, keyr) {
 }
 
 function dcTracer(ctr) {
-    var name = ctr.name,
-        proto = ctr.prototype;
+    var name = ctr.name || 'unknown',
+        proto = ctr.prototype || ctr;
     for (var fn in proto) {
         if (proto.hasOwnProperty(fn) && typeof proto[fn] === 'function') {
             console.log('Tracing ' + name + '.' + fn);
@@ -3307,6 +3307,9 @@ function assertStateChange(currentState, newState, allowedStatesMap, enumMap) {
     }
 }
 
+Object.defineProperty(mega, 'logger', {value: MegaLogger.getLogger('mega')});
+Object.defineProperty(mega.utils, 'logger', {value: MegaLogger.getLogger('utils', null, mega.logger)});
+
 Object.defineProperty(mega, 'api', {
     value: Object.freeze({
         logger: new MegaLogger('API'),
@@ -3430,13 +3433,11 @@ mega.utils.sortObjFn = function(key, order) {
 
 /**
  * Promise-based XHR request
- * @param {Mixed} aURLOrOptions URL or options
- * @param {Mixed} aData Data to send, optional
- * @param {Function} progressCallback An optional progress callback which passes the percent complete e.g. 49.23 as the
- *                                    first param, the bytes loaded as the second param and the total bytes as the
- *                                    third param.
+ * @param {Object|String} aURLOrOptions   URL or options
+ * @param {Object|String} [aData]         Data to send, optional
+ * @returns {MegaPromise}
  */
-mega.utils.xhr = function megaUtilsXHR(aURLOrOptions, aData, progressCallback) {
+mega.utils.xhr = function megaUtilsXHR(aURLOrOptions, aData) {
     /* jshint -W074 */
     var xhr;
     var url;
@@ -3471,22 +3472,6 @@ mega.utils.xhr = function megaUtilsXHR(aURLOrOptions, aData, progressCallback) {
             promise.reject(ev);
         }
     };
-
-    // If the calling function requests download progress, add progress handler
-    if (typeof progressCallback === 'function') {
-        xhr.addEventListener('progress', function(event) {
-            if (event.lengthComputable) {
-
-                // Calculate percentage downloaded e.g. 49.23
-                var percentComplete = ((event.loaded / event.total) * 100);
-                var bytesLoaded = event.loaded;
-                var bytesTotal = event.total;
-
-                // Pass the percent complete to the callback function
-                progressCallback(percentComplete, bytesLoaded, bytesTotal);
-            }
-        }, false);
-    }
 
     try {
         if (d) {
@@ -3834,6 +3819,7 @@ mega.utils.neuterArrayBuffer = function neuter(ab) {
 mega.utils.require = function megaUtilsRequire() {
     var files = [];
     var args = [];
+    var logger = d && MegaLogger.getLogger('require', 0, this.logger);
 
     toArray.apply(null, arguments).forEach(function(rsc) {
         // check if a group of resources was provided
@@ -3863,7 +3849,6 @@ mega.utils.require = function megaUtilsRequire() {
             var extension = filename.split('.').pop().toLowerCase();
             var name = filename.replace(/\./g, '_');
             var type;
-            var result;
 
             if (extension === 'html') {
                 type = 0;
@@ -3886,19 +3871,87 @@ mega.utils.require = function megaUtilsRequire() {
 
     if (files.length === 0) {
         // Everything is already loaded
+        if (logger) {
+            logger.debug('Nothing to load.', args);
+        }
         return MegaPromise.resolve();
     }
 
-    Array.prototype.push.apply(jsl, files);
-
     var promise = new MegaPromise();
-    silent_loading = function() {
-        promise.resolve();
-    };
-    jsl_start();
+    var rl = mega.utils.require.loading;
+    var rp = mega.utils.require.pending;
+    var loading = Object.keys(rl).length;
 
+    // Check which files are already being loaded
+    for (var i = files.length; i--;) {
+        var f = files[i];
+
+        if (rl[f.n]) {
+            // loading, remove it.
+            files.splice(i, 1);
+        }
+        else {
+            // not loading, track it.
+            rl[f.n] = mega.utils.getStack();
+        }
+    }
+
+    // hold up if other files are loading
+    if (loading) {
+        rp.push([files, promise]);
+
+        if (logger) {
+            logger.debug('Queueing %d files...', files.length, args);
+        }
+    }
+    else {
+
+        (function _load(files, promise) {
+            var onload = function() {
+                // all files have been loaded, remove them from the tracking queue
+                for (var i = files.length; i--;) {
+                    delete rl[files[i].n];
+                }
+
+                if (logger) {
+                    logger.debug('Finished loading %d files...', files.length, files);
+                }
+
+                // resolve promise, in a try/catch to ensure the caller doesn't mess us..
+                try {
+                    promise.resolve();
+                }
+                catch (ex) {
+                    (logger || console).error(ex);
+                }
+
+                // check if there is anything pending, and fire it.
+                var pending = rp.shift();
+
+                if (pending) {
+                    _load.apply(null, pending);
+                }
+            };
+
+            if (logger) {
+                logger.debug('Loading %d files...', files.length, files);
+            }
+
+            if (!files.length) {
+                // nothing to load
+                onload();
+            }
+            else {
+                Array.prototype.push.apply(jsl, files);
+                silent_loading = onload;
+                jsl_start();
+            }
+        })(files, promise);
+    }
     return promise;
 };
+mega.utils.require.pending = [];
+mega.utils.require.loading = Object.create(null);
 
 /**
  *  Kill session and Logout
@@ -3956,13 +4009,13 @@ mega.utils.vtol = function megaUtilsVTOL(version, hex) {
 
 /**
  * Retrieve data from storage servers.
- * @param {String|Object} aData        ufs-node's handle or public link
- * @param {Number}        aStartOffset offset to start retrieveing data from
- * @param {Number}        aEndOffset   retrieve data until this offset
- * @param {Function} progressCallback A callback function which is called with the percent complete
+ * @param {String|Object} aData           ufs-node's handle or public link
+ * @param {Number}        [aStartOffset]  offset to start retrieveing data from
+ * @param {Number}        [aEndOffset]    retrieve data until this offset
+ * @param {Function}      [aProgress]     callback function which is called with the percent complete
  * @returns {MegaPromise}
  */
-mega.utils.gfsfetch = function(aData, aStartOffset, aEndOffset, progressCallback) {
+mega.utils.gfsfetch = function gfsfetch(aData, aStartOffset, aEndOffset, aProgress) {
     var promise = new MegaPromise();
 
     var fetcher = function(data) {
@@ -3986,15 +4039,30 @@ mega.utils.gfsfetch = function(aData, aStartOffset, aEndOffset, progressCallback
             aStartOffset -= byteOffset;
         }
 
-        mega.utils.xhr(
-            {
-                method: 'POST',
-                type: 'arraybuffer',
-                url: data.g + '/' + aStartOffset + '-' + (aEndOffset - 1)
-            },
-            null,
-            progressCallback
-        ).done(function(ev, response) {
+        var request = {
+            method: 'POST',
+            type: 'arraybuffer',
+            url: data.g + '/' + aStartOffset + '-' + (aEndOffset - 1)
+        };
+
+        if (typeof aProgress === 'function') {
+            request.prepare = function(xhr) {
+                xhr.addEventListener('progress', function(ev) {
+                    if (ev.lengthComputable) {
+
+                        // Calculate percentage downloaded e.g. 49.23
+                        var percentComplete = ((ev.loaded / ev.total) * 100);
+                        var bytesLoaded = ev.loaded;
+                        var bytesTotal = ev.total;
+
+                        // Pass the percent complete to the callback function
+                        aProgress(percentComplete, bytesLoaded, bytesTotal);
+                    }
+                }, false);
+            };
+        }
+
+        mega.utils.xhr(request).done(function(ev, response) {
 
             data.macs = [];
             data.writer = [];
@@ -4659,13 +4727,30 @@ var watchdog = Object.freeze({
                         && dlmanager.isOverFreeQuota) {
 
                     var sid = strg.data[1];
-                    u_type = strg.data[0];
+                    var type = strg.data[0];
 
-                    if (sid !== u_sid) {
-                        api_setsid(sid);
-                    }
+                    u_storage = init_storage(localStorage);
+                    u_storage.sid = sid;
 
-                    dlmanager._onQuotaRetry(true, sid);
+                    u_checklogin({
+                        checkloginresult: function(ctx, r) {
+                            u_type = r;
+
+                            if (u_type !== type) {
+                                console.error('Unexpected user-type: got %s, expected %s', r, type);
+                            }
+
+                            if (n_h) {
+                                // set new u_sid under folderlinks
+                                api_setfolder(n_h);
+
+                                // hide ephemeral account warning
+                                alarm.hideAllWarningPopups();
+                            }
+
+                            dlmanager._onQuotaRetry(true, sid);
+                        }
+                    });
                 }
                 break;
 
@@ -5119,7 +5204,7 @@ if (typeof sjcl !== 'undefined') {
 
         var self = this;
 
-        if ($.remvoedContactsFromShare && ($.removedContactsFromShare.length > 0)) {
+        if ($.removedContactsFromShare && ($.removedContactsFromShare.length > 0)) {
             self.removeContactFromShare();
         }
         if ($.changedPermissions && ($.changedPermissions.length > 0)) {

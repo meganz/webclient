@@ -3191,6 +3191,7 @@ function dashboardUI() {
         // Used Bandwidth chart
         if (deg <= 180) {
             $('.bandwidth .main-chart.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
+            $('.bandwidth .main-chart.right-chart span').css('transform', 'rotate(0deg)');
         }
         else {
             $('.bandwidth .main-chart.left-chart span').css('transform', 'rotate(180deg)');
@@ -3229,6 +3230,7 @@ function dashboardUI() {
         // Used space chart
         if (deg <= 180) {
             $('.storage .main-chart.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
+            $('.storage .main-chart.right-chart span').css('transform', 'rotate(0deg)');
         }
         else {
             $('.storage .main-chart.left-chart span').css('transform', 'rotate(180deg)');
@@ -3513,13 +3515,16 @@ function accountUI() {
     });
 
     sectionUIopen('account');
-    if (typeof zxcvbn === 'undefined' && !silent_loading) {
-        silent_loading = accountUI;
-        jsl.push(jsl2['zxcvbn_js']);
-        return jsl_start();
+    if (typeof zxcvbn === 'undefined') {
+        loadingDialog.show();
+        return mega.utils.require('zxcvbn_js')
+            .done(function() {
+                delay(accountUI);
+            });
     }
 
     M.accountData(function(account) {
+        loadingDialog.hide();
 
         var perc, warning, perc_c;
         var id = document.location.hash;
@@ -3587,20 +3592,10 @@ function accountUI() {
 
             $('.account.plan-info.accounttype span').text(planText);
             $('.small-icon.membership').addClass('pro' + planNum);
+            $('.default-white-button.upgrade-to-pro').addClass('hidden');
 
             // Subscription
             if (account.stype == 'S') {
-
-                $('.fm-account-header.typetitle').text(l[434]);
-                if (account.scycle == '1 M') {
-                    $('.membership-big-txt.type').text(l[748]);
-                }
-                else if (account.scycle == '1 Y') {
-                    $('.membership-big-txt.type').text(l[749]);
-                }
-                else {
-                    $('.membership-big-txt.type').text('');
-                }
 
                 // Get the date their subscription will renew
                 var timestamp = account.srenew[0];
@@ -3608,16 +3603,19 @@ function accountUI() {
 
                 // Display the date their subscription will renew if known
                 if (timestamp > 0) {
-                    var date = new Date(timestamp * 1000);
-                    var dateString = l[6971] + ' ' + date.getDate() + ' ' + date_months[date.getMonth()] + ' '
-                                   + date.getFullYear();
+                    var dateString = time2date(timestamp, 2);
 
                     // Use format: 14 March 2015 - Credit Card
                     paymentType = dateString + ' - ' + paymentType;
-                }
 
-                // Otherwise just show payment type
-                $('.membership-medium-txt.expiry').text(paymentType);
+                    $('.account.plan-info.expiry-txt').text(l[6971]); // change placeholder 'Expires on' by 'Renews'
+                    $('.account.plan-info.expiry').text(paymentType);
+                }
+                else {
+                    // Otherwise show nothing
+                    $('.account.plan-info.expiry').text('');
+                    $('.account.plan-info.expiry-txt').text('');
+                }
 
                 // Check if there are any active subscriptions
                 // ccqns = Credit Card Query Number of Subscriptions
@@ -3626,12 +3624,10 @@ function accountUI() {
 
                         // If there is an active subscription
                         if (numOfSubscriptions > 0) {
-
                             // Show cancel button and show cancellation dialog
-                            $('.fm-account-blocks .btn-cancel').show().rebind('click', function() {
+                            $('.account.data-block .btn-cancel').removeClass('hidden').rebind('click', function() {
                                 cancelSubscriptionDialog.init();
                             });
-                            $('.subscription-bl').addClass('active-subscription');
                         }
                     }
                 });
@@ -3644,8 +3640,7 @@ function accountUI() {
                 });
                 $('.account.plan-info.expiry-txt').text(l[987]);
                 $('.account.plan-info.expiry a').text(time2date(account.expiry, 2));
-                $('.account.data-block .btn-cancel').hide();
-                $('.subscription-bl').removeClass('active-subscription');
+                $('.account.data-block .btn-cancel').addClass('hidden');
             }
 
             // Maximum bandwidth
@@ -3657,9 +3652,13 @@ function accountUI() {
             // free account:
             $('.account.plan-info.accounttype span').text(l[435]);
             $('.account.plan-info.expiry').text(l[436]);
-            $('.btn-cancel').hide();
-            $('.subscription-bl').removeClass('active-subscription');
+            $('.btn-cancel').addClass('hidden');
             $('.account.plan-info-row.bandwidth').hide();
+            $('.default-white-button.upgrade-to-pro')
+                .removeClass('hidden')
+                .rebind('click', function() {
+                    window.location.hash = 'pro';
+                });
         }
 
 
@@ -3690,6 +3689,7 @@ function accountUI() {
         /* Used Bandwidth chart */
         if (deg <= 180) {
             $('.bandwidth .main-chart.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
+            $('.bandwidth .main-chart.right-chart span').css('transform', 'rotate(0deg)');
         }
         else {
             $('.bandwidth .main-chart.left-chart span').css('transform', 'rotate(180deg)');
@@ -3730,6 +3730,7 @@ function accountUI() {
         /* Used space chart */
         if (deg <= 180) {
             $('.storage .main-chart.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
+            $('.storage .main-chart.right-chart span').css('transform', 'rotate(0deg)');
         }
         else {
             $('.storage .main-chart.left-chart span').css('transform', 'rotate(180deg)');
@@ -4341,10 +4342,10 @@ function accountUI() {
             });
             $newEmail.val('');
             if (texts.join("") === "") {
-                $newEmail.removeAttr('disabled').parents('.fm-account-blocks').removeClass('disabled');
+                $newEmail.removeAttr('disabled').parents('.account.data-block').removeClass('disabled');
             }
             else {
-                $newEmail.attr('disabled', 'disabled').parents('.fm-account-blocks').addClass('disabled');
+                $newEmail.attr('disabled', 'disabled').parents('.account.data-block').addClass('disabled');
             }
         });
 
@@ -4355,9 +4356,9 @@ function accountUI() {
             $passwords.val('');
 
             if (mail === "") {
-                $passwords.removeAttr('disabled').parents('.fm-account-blocks').removeClass('disabled');
+                $passwords.removeAttr('disabled').parents('.account.data-block').removeClass('disabled');
             } else {
-                $passwords.attr('disabled', 'disabled').parents('.fm-account-blocks').addClass('disabled');
+                $passwords.attr('disabled', 'disabled').parents('.account.data-block').addClass('disabled');
             }
 
             // Show information message
@@ -4381,8 +4382,8 @@ function accountUI() {
         });
         $('.fm-account-cancel').rebind('click', function(e)
         {
-            $passwords.removeAttr('disabled').parents('.fm-account-blocks').removeClass('disabled');
-            $newEmail.removeAttr('disabled').parents('.fm-account-blocks').removeClass('disabled');
+            $passwords.removeAttr('disabled').parents('.account.data-block').removeClass('disabled');
+            $newEmail.removeAttr('disabled').parents('.account.data-block').removeClass('disabled');
             $('.fm-account-save-block').addClass('hidden');
             $('.profile-form.first').removeClass('email-confirm');
             accountUI();
@@ -4390,8 +4391,8 @@ function accountUI() {
 
         $('.fm-account-save').rebind('click', function()
         {
-            $passwords.removeAttr('disabled').parents('.fm-account-blocks').removeClass('disabled');
-            $newEmail.removeAttr('disabled').parents('.fm-account-blocks').removeClass('disabled');
+            $passwords.removeAttr('disabled').parents('.account.data-block').removeClass('disabled');
+            $newEmail.removeAttr('disabled').parents('.account.data-block').removeClass('disabled');
             u_attr.firstname = $('#account-firstname').val().trim();
             u_attr.lastname = $('#account-lastname').val().trim();
             u_attr.birthday = $('.default-select.day .default-dropdown-item.active').attr('data-value');
@@ -5235,38 +5236,21 @@ function accountUI() {
     });
 
     $('.account-pass-lines').attr('class', 'account-pass-lines');
-    $('#account-new-password').bind('keyup.pswdchange', function(el)
+    $('#account-new-password').rebind('keyup.pwdchg', function(el)
     {
         $('.account-pass-lines').attr('class', 'account-pass-lines');
         if ($(this).val() !== '') {
-            if (typeof zxcvbn !== 'undefined') {
-                var pws = zxcvbn($(this).val());
-
-                if ((pws.score > 3) && (pws.entropy > 75)) {
-                    $('.account-pass-lines').addClass('good4');
-                }
-                else if ((pws.score > 2) && (pws.entropy > 50)) {
-                    $('.account-pass-lines').addClass('good3');
-                }
-                else if ((pws.score > 1) && (pws.entropy > 40)) {
-                    $('.account-pass-lines').addClass('good2');
-                }
-                else if ((pws.score > 0) && (pws.entropy > 15)) {
-                    $('.account-pass-lines').addClass('good1');
-                }
-                else {
-                    $('.account-pass-lines').addClass('weak-password');
-                }
-            }
-            else {
-                $('.fm-account-input').addClass('loading');
-                silent_loading = function() {
-                    // $('.login-register-input.password').removeClass('loading');
-                    $('.fm-account-input').removeClass('loading');
-                    // registerpwcheck();
-                };
-                jsl.push(jsl2['zxcvbn_js']);
-                jsl_start();
+            var pws = zxcvbn($(this).val());
+            if (pws.score > 3 && pws.entropy > 75) {
+                $('.account-pass-lines').addClass('good4');
+            } else if (pws.score > 2 && pws.entropy > 50) {
+                $('.account-pass-lines').addClass('good3');
+            } else if (pws.score > 1 && pws.entropy > 40) {
+                $('.account-pass-lines').addClass('good2');
+            } else if (pws.score > 0 && pws.entropy > 15) {
+                $('.account-pass-lines').addClass('good1');
+            } else {
+                $('.account-pass-lines').addClass('weak-password');
             }
         }
     });
@@ -6880,7 +6864,9 @@ function transferPanelUI()
         {
             if (e.type == 'contextmenu')
             {
-                $('.ui-selected', domTable).removeClass('ui-selected');
+                if (!e.ctrlKey && !e.metaKey && !e.shiftKey) {
+                    $('.ui-selected', domTable).removeClass('ui-selected');
+                }
                 $(this).addClass('ui-selected dragover');
                 transferPanelContextMenu(null);
                 return !!contextMenuUI(e);
@@ -11138,12 +11124,11 @@ function bottomPageDialog(close, pp, hh) {
     if (!pages[pp])
     {
         loadingDialog.show();
-        silent_loading = function () {
-            loadingDialog.hide();
-            bottomPageDialog(false, $.dialog);
-        };
-        jsl.push(jsl2[pp]);
-        jsl_start();
+        mega.utils.require(pp)
+            .done(function() {
+                loadingDialog.hide();
+                bottomPageDialog(false, $.dialog);
+            });
         return false;
     }
 
@@ -11992,6 +11977,7 @@ function slideshow(id, close)
     $('.slideshow-progress').addClass('hidden');
     $('.slideshow-error').addClass('hidden');
     $('.slideshow-image-bl').addClass('hidden');
+    $('.slideshow-prev-button,.slideshow-next-button').removeClass('active');
 
     slideshowid = id;
     var steps = slideshowsteps();
@@ -11999,7 +11985,7 @@ function slideshow(id, close)
         $('.slideshow-prev-button').addClass('active');
     if (steps.forward.length > 0)
         $('.slideshow-next-button').addClass('active');
-    $('.slideshow-prev-button,.slideshow-next-button').removeClass('active').rebind('click', function(e)
+    $('.slideshow-prev-button,.slideshow-next-button').rebind('click', function(e)
     {
         var c = $(this).attr('class');
         if (c && c.indexOf('active') > -1)
@@ -12992,7 +12978,8 @@ var cancelSubscriptionDialog = {
         this.$continueButton = this.$dialog.find('.continue-cancel-subscription');
         this.$cancelReason = this.$dialog.find('.cancel-textarea textarea');
         this.$backgroundOverlay = $('.fm-dialog-overlay');
-        this.$accountPageSubscriptionBlock = $('.subscription-bl');
+        this.exipryTextBlock = $('.account.plan-info.expiry-txt');
+        this.exipryDateBlock = $('.account.plan-info.expiry');
 
         // Show the dialog
         this.$dialog.removeClass('hidden');
@@ -13076,10 +13063,15 @@ var cancelSubscriptionDialog = {
             api_req({ a: 'cccs', r: reason }, {
                 callback: function() {
 
-                    // Hide loading dialog and cancel subscription button on account page
+                    // Hide loading dialog and cancel subscription button on account page, set exiry date
                     loadingDialog.hide();
-                    cancelSubscriptionDialog.$accountPageCancelButton.hide();
-                    cancelSubscriptionDialog.$accountPageSubscriptionBlock.removeClass('active-subscription');
+                    cancelSubscriptionDialog.$accountPageCancelButton.addClass('hidden');
+                    cancelSubscriptionDialog.exipryTextBlock.text(l[987]);
+                    cancelSubscriptionDialog.exipryDateBlock
+                        .safeHTML('<a href="#fm/account/history">' + time2date(account.expiry, 2) + '</a>');
+                    cancelSubscriptionDialog.exipryDateBlock.find('a').rebind('click', function() {
+                        document.location = $(this).attr('href');
+                    });
 
                     // Show success dialog and refresh UI
                     cancelSubscriptionDialog.$dialogSuccess.removeClass('hidden');

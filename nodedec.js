@@ -121,20 +121,23 @@ function crypto_decryptnode(n) {
     if (typeof n.k == 'undefined' || n.name) return;
 
     if (typeof n.k == 'string') {
-        // inbound share root? exract & store sharekey.
-        if (n.sk) {
-            key = crypto_process_sharekey(n.h, n.sk);
+        // inbound share root? set parent to sharing user; extract & store sharekey.
+        if (n.su) {
+            if (n.sk) {
+                key = crypto_process_sharekey(n.h, n.sk);
 
-            if (key) {
-                if (key.length != 4 && key.length != 8) {
-                    srvlog2('invalid-aes-key-size', n.h, n.k.length, n.sk.length, key.length);
-                }
-                else {
-                    delete n.sk;
-                    u_sharekeys[n.h] = [key, new sjcl.cipher.aes(key)];
-                    n.p = n.u;
+                if (key) {
+                    if (key.length != 4 && key.length != 8) {
+                        srvlog2('invalid-aes-key-size', n.h, n.k.length, n.sk.length, key.length);
+                    }
+                    else {
+                        delete n.sk;
+                        u_sharekeys[n.h] = [key, new sjcl.cipher.aes(key)];
+                    }
                 }
             }
+
+            n.p = n.su;
         }
 
         // does the logged in user own the node? (user key is guaranteed to be located first in .k)

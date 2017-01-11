@@ -210,7 +210,7 @@ function MegaData()
     this.csortd          = -1;
     this.csort           = 'name';
     this.tfsdomqueue     = {};
-    this.copynodeswaiter = {};
+    this.scAckQueue = {};
 
     this.reset = function()
     {
@@ -304,8 +304,8 @@ function MegaData()
                 // have defined first or last name then email address will be used
                 // for comparasion. Files and folders doesn't have .m field but
                 // it's not possible to rename them to null i.e. '' => no side effects.
-                var itemA = ((typeof a.name === 'string') && (a.name.length)) ? a.name : a.m;
-                var itemB = ((typeof b.name === 'string') && (b.name.length)) ? b.name : b.m;
+                var itemA = ((typeof a.name === 'string') && (a.name.length)) ? a.name : a.m || '';
+                var itemB = ((typeof b.name === 'string') && (b.name.length)) ? b.name : b.m || '';
 
                 return itemA.localeCompare(itemB) * d;
             };
@@ -2509,21 +2509,19 @@ function MegaData()
                 if (n.sk && !u_sharekeys[n.h]) {
                     // extract sharekey from node's sk property
                     var k = crypto_process_sharekey(n.h, n.sk);
-                    if (k !== false) crypto_setsharekey(n.h, k);
+                    if (k !== false) crypto_setsharekey(n.h, k, ignoreDB);
                 }
 
-                if (u_sharekeys[n.h]) {
-                    this.c.shares[n.h] = { su : n.su,
-                                            r : n.r,
-                                           sk : a32_to_base64(u_sharekeys[n.h][0]) };
+                this.c.shares[n.h] = { su : n.su,
+                                        r : n.r };
 
-                    // addNode() is called from:
-                    // createFolder() (in response to API `p` - currently
-                    // incorrect, but permissible in the future)
-                    // __process_f1()
-                    // process_u() (with pass-through ignoreDB)
-                    if (fmdb && !ignoreDB) fmdb.add('s', { o_t : n.su + '*' + n.h,
-                                                           d : this.c.shares[n.h]
+                if (u_sharekeys[n.h]) {
+                    this.c.shares[n.h].sk = a32_to_base64(u_sharekeys[n.h][0]);
+                }
+
+                if (fmdb && !ignoreDB) {
+                    fmdb.add('s', { o_t : n.su + '*' + n.h,
+                                    d : this.c.shares[n.h]
                     });
                 }
             }
@@ -3379,7 +3377,7 @@ function MegaData()
         if (sconly) {
             ops.v = 3;
             ops.i = mRandomToken('pn');
-            M.copynodeswaiter[ops.i] = onCopyNodesDone;
+            M.scAckQueue[ops.i] = onCopyNodesDone;
         }
         else {
             // ops.v = 2;
@@ -3817,7 +3815,7 @@ function MegaData()
         var n = M.d[itemHandle];
         if (n) {
             n.name = newItemName;
-            api_setattr(n);
+            api_setattr(n, mRandomToken('mv'));
             this.onRenameUIUpdate(itemHandle, newItemName);
         }
     };
@@ -3902,7 +3900,7 @@ function MegaData()
                 }
                 node.lbl = newLabelState;
 
-                api_setattr(node);
+                api_setattr(node, mRandomToken('lbl'));
                 M.colourLabelDomUpdate(handle, newLabelState);
             });
         }
@@ -3946,7 +3944,7 @@ function MegaData()
 
                 if (node && !exportLink.isTakenDown(handle)) {
                     node.fav = newFavState;
-                    api_setattr(node);
+                    api_setattr(node, mRandomToken('fav'));
                     M.favouriteDomUpdate(node, newFavState);
                 }
             });
@@ -5174,6 +5172,12 @@ function MegaData()
     {
         var id = (dl.zipid ? 'zip_' + dl.zipid : 'dl_' + dl.dl_id);
 
+        if (M.tfsdomqueue[id]) {
+            // flush the transfer from the DOM queue
+            addToTransferTable(id, M.tfsdomqueue[id]);
+            delete M.tfsdomqueue[id];
+        }
+
         $('.transfer-table #' + id)
             .addClass('transfer-initiliazing')
             .find('.transfer-status').text(l[1042]);
@@ -5336,19 +5340,20 @@ function MegaData()
 
             if (gid[0] !== 'u')
             {
+                // keep inserting downloads as long there are uploads
                 var dl = $('.transfer-table tr.transfer-download.transfer-queued:last');
 
-                if (dl.length)
-                {
-                    // keep inserting downloads as long there are uploads
-                    // dl = +dl.closest('tr').children(':first').text();
+                if (dl.length) {
                     dl = dl.prevAll().length;
 
-                    if (dl && dl + 1 < T.used)
-                    {
-                        addToTransferTable(gid, elem);
-                        fit = true;
-                    }
+                    fit = (dl && dl + 1 < T.used);
+                }
+                else {
+                    fit = !document.querySelector('.transfer-table tr.transfer-download');
+                }
+
+                if (fit) {
+                    addToTransferTable(gid, elem);
                 }
             }
 
@@ -5361,7 +5366,7 @@ function MegaData()
     this.addUpload = function(u, ignoreWarning) {
         var flag = 'ulMegaSyncAD';
 
-        if (u.length > 99 && !ignoreWarning && !localStorage[flag]) {
+        if (u.length > 999 && !ignoreWarning && !localStorage[flag]) {
             var showMEGAsyncDialog = function(button, syncData) {
                 $('.download-button.light-red.download').safeHTML(button);
                 $('.download-button.light-white.continue').safeHTML(l[8846]);
@@ -6286,6 +6291,11 @@ function execsc() {
                     }
 
                     if (a.a == 's2') {
+                        // store ownerkey
+                        if (fmdb) {
+                            fmdb.add('ok', { h : a.n, d : { k : a.ok, ha : a.ha } });
+                        }
+
                         processPS([a]);
                     }
 
@@ -6385,14 +6395,8 @@ function execsc() {
                         var prockey = false;
 
                         if (a.o === u_handle) {
-                            if (!a.u) {
-                                // this must be a pending share
-                                if (a.a != 's2') {
-                                    console.error('INVALID SHARE, missing user handle', a);
-                                }
-                            }
                             // if access right are undefined, then share is deleted
-                            else if (typeof a.r == 'undefined') {
+                            if (typeof a.r == 'undefined') {
                                 M.delNodeShare(a.n, a.u, a.okd);
                             }
                             else {
@@ -6400,17 +6404,35 @@ function execsc() {
                                 var shares = Object(M.d[handle]).shares || {};
 
                                 if (shares.hasOwnProperty(a.u)
-                                        || (a.ha === crypto_handleauth(a.n))) {
+                                    || a.ha === crypto_handleauth(a.n)) {
 
                                     // I updated or created my share
                                     var k = decrypt_key(u_k_aes, base64_to_a32(a.ok));
-                                    crypto_setsharekey(handle, k);
-                                    M.nodeShare(handle, {
-                                        h: a.n,
-                                        r: a.r,
-                                        u: a.u,
-                                        ts: a.ts
-                                    });
+
+                                    if (k) {
+                                        crypto_setsharekey(handle, k);
+
+                                        if (!a.u) {
+                                            // this must be a pending share
+                                            if (a.a == 's2') {
+                                                // store ownerkey
+                                                if (fmdb) {
+                                                    fmdb.add('ok', { h : handle, d : { k : a.ok, ha : a.ha } });
+                                                }
+                                            }
+                                            else {
+                                                console.error('INVALID SHARE, missing user handle', a);
+                                            }
+                                        }
+                                        else {
+                                            M.nodeShare(handle, {
+                                                h: a.n,
+                                                r: a.r,
+                                                u: a.u,
+                                                ts: a.ts
+                                            });
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -6610,9 +6632,9 @@ function execsc() {
 
                     for (i = 0; i < scnodes.length; i++) M.addNode(scnodes[i]);
 
-                    if (typeof M.copynodeswaiter[a.i] === 'function') {
-                        M.copynodeswaiter[a.i](scnodes);
-                        delete M.copynodeswaiter[a.i];
+                    if (typeof M.scAckQueue[a.i] === 'function') {
+                        M.scAckQueue[a.i](scnodes);
+                        delete M.scAckQueue[a.i];
                     }
                     break;
 
@@ -6654,16 +6676,23 @@ function execsc() {
                         }
                         else {
                             // success - check what changed and redraw
-                            if (a.at) {
-                                if (n.name !== oldname) {
-                                    M.onRenameUIUpdate(n.h, n.name);
+                            if (M.scAckQueue[a.i]) {
+                                // Triggered locally, being DOM already updated.
+                                if (d) {
+                                    console.log('scAckQueue - triggered locally.', a.i);
                                 }
+                                delete M.scAckQueue[a.i];
+                            }
+                            else if (a.at) {
                                 if (fminitialized) {
+                                    if (n.name !== oldname) {
+                                        M.onRenameUIUpdate(n.h, n.name);
+                                    }
                                     if (n.fav !== oldfav) {
-                                        M.favouriteDomUpdate(node, n.fav);
+                                        M.favouriteDomUpdate(n, n.fav);
                                     }
                                     if (n.lbl !== oldlbl) {
-                                        M.colourLabelDomUpdate(nodeHandle, n.lbl);
+                                        M.colourLabelDomUpdate(n.h, n.lbl);
                                     }
                                 }
                             }
@@ -7074,7 +7103,9 @@ function treefetcher_getnextworker() {
 // this receives the ok elements one by one as per the filter rule
 // to facilitate the decryption of outbound shares, the API now sends ok before f
 function tree_ok0(ok) {
-    if (fmdb) fmdb.add('ok', { h : ok.h, d : ok });
+    if (fmdb) {
+        fmdb.add('ok', { h : ok.h, d : ok });
+    }
 
     // bind outbound share root to specific worker, post ok element to that worker
     // FIXME: check if nested outbound shares are returned with all shareufskeys!
@@ -7212,6 +7243,7 @@ function worker_procmsg(ev) {
     else if (ev.data.h) {
         // enqueue or emplace processed node
         if (ev.data.t < 2 && !crypto_keyok(ev.data)) {
+            // report as missing
             crypto_reportmissingkey(ev.data);
         }
 
@@ -7231,7 +7263,10 @@ function worker_procmsg(ev) {
             // maintain special incoming shares index
             if (ev.data.p.length == 11) {
                 M.c.shares[ev.data.h] = { su : ev.data.p, r : ev.data.r };
-                if (u_sharekeys[ev.data.h]) M.c.shares[ev.data.h].sk = u_sharekeys[ev.data.h][0];
+
+                if (u_sharekeys[ev.data.h]) {
+                    M.c.shares[ev.data.h].sk = u_sharekeys[ev.data.h][0];
+                }
             }
 
             if (fmdb) {
@@ -7484,7 +7519,9 @@ function dbfetchfm() {
                             if (r[i].o.length == 11) {
                                 // this is an inbound share
                                 M.c.shares[r[i].t] = r[i];
-                                crypto_setsharekey(r[i].t, base64_to_a32(r[i].sk));
+                                if (r[i].sk) {
+                                    crypto_setsharekey(r[i].t, base64_to_a32(r[i].sk), true);
+                                }
                             }
                             else {
                                 // this is an outbound share
@@ -8430,7 +8467,7 @@ function process_ok(ok, ignoreDB) {
             if (fmdb && !pfkey && !ignoreDB) {
                 fmdb.add('ok', { h : ok[i].h, d : ok[i] });
             }
-            crypto_setsharekey(ok[i].h, decrypt_key(u_k_aes, base64_to_a32(ok[i].k)));
+            crypto_setsharekey(ok[i].h, decrypt_key(u_k_aes, base64_to_a32(ok[i].k)), ignoreDB);
         }
     }
 }
@@ -9263,7 +9300,7 @@ function fm_thumbnails()
         for (var i in M.v)
         {
             var n = M.v[i];
-            if (n && n.fa && String(n.fa).indexOf(':0') > 0)
+            if (n && !missingkeys[n.h] && n.fa && String(n.fa).indexOf(':0') > 0)
             {
                 if (fa_tnwait == n.h && n.seen)
                     fa_tnwait = 0;

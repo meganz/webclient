@@ -11541,7 +11541,7 @@ table {
     padding-top: 10px;
     max-width: 50%;
 }
-.chart-warning, .chart-warning.red {
+.chart-warning {
     font-size: 14px;
     line-height: 18px;
     color: #333333;
@@ -11549,6 +11549,7 @@ table {
     padding: 0 0 0 8px;
     margin: 21px 0 1px 0;
     position: relative;
+    cursor: pointer;
 }
 .chart-warning a {
     color: #D90007;

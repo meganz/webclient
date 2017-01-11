@@ -3191,6 +3191,7 @@ function dashboardUI() {
         // Used Bandwidth chart
         if (deg <= 180) {
             $('.bandwidth .main-chart.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
+            $('.bandwidth .main-chart.right-chart span').css('transform', 'rotate(0deg)');
         }
         else {
             $('.bandwidth .main-chart.left-chart span').css('transform', 'rotate(180deg)');
@@ -3229,6 +3230,7 @@ function dashboardUI() {
         // Used space chart
         if (deg <= 180) {
             $('.storage .main-chart.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
+            $('.storage .main-chart.right-chart span').css('transform', 'rotate(0deg)');
         }
         else {
             $('.storage .main-chart.left-chart span').css('transform', 'rotate(180deg)');
@@ -3687,6 +3689,7 @@ function accountUI() {
         /* Used Bandwidth chart */
         if (deg <= 180) {
             $('.bandwidth .main-chart.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
+            $('.bandwidth .main-chart.right-chart span').css('transform', 'rotate(0deg)');
         }
         else {
             $('.bandwidth .main-chart.left-chart span').css('transform', 'rotate(180deg)');
@@ -3727,6 +3730,7 @@ function accountUI() {
         /* Used space chart */
         if (deg <= 180) {
             $('.storage .main-chart.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
+            $('.storage .main-chart.right-chart span').css('transform', 'rotate(0deg)');
         }
         else {
             $('.storage .main-chart.left-chart span').css('transform', 'rotate(180deg)');

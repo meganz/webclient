@@ -3085,7 +3085,10 @@ function dashboardUI() {
     // Account data
     M.accountData(function(account) {
 
-        var perc, perc_c, b_exceeded, s_exceeded;
+        var perc;
+        var perc_c;
+        var b_exceeded;
+        var s_exceeded;
 
         // Show ballance
         $('.account.left-pane.balance-info').text(l[7108]);
@@ -3535,7 +3538,11 @@ function accountUI() {
     M.accountData(function(account) {
         loadingDialog.hide();
 
-        var perc, warning, perc_c, b_exceeded, s_exceeded;
+        var perc;
+        var warning;
+        var perc_c;
+        var b_exceeded;
+        var s_exceeded;
         var id = document.location.hash;
 
         if (id === '#fm/account/advanced') {

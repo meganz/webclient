@@ -11541,7 +11541,7 @@ table {
     padding-top: 10px;
     max-width: 50%;
 }
-.chart-warning, .chart-warning.red {
+.chart-warning {
     font-size: 14px;
     line-height: 18px;
     color: #333333;
@@ -11549,6 +11549,7 @@ table {
     padding: 0 0 0 8px;
     margin: 21px 0 1px 0;
     position: relative;
+    cursor: pointer;
 }
 .chart-warning a {
     color: #D90007;
@@ -11570,8 +11571,19 @@ table {
     left: 165px;
     top: 26px;
 }
+.exceeded .chart-indicator {
+    background-color: #cc0006;
+    left: 180px;
+    display: block;
+}
 .going-out .chart-indicator {
     display: block;
+}
+.going-out .big-icon.cloud {
+    background-position: 0px -11804px;
+}
+.going-out .chart.progressbars span::before {
+    background-color: #ffa500;
 }
 .exceeded .big-icon.cloud {
     background-position: 0px -10934px;

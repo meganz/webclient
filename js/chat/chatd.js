@@ -12,12 +12,7 @@ var Chatd = function(userId, options) {
     self.chatIdMessages = {};
 
     // local cache of the Message object
-    self.messagesQueueKvStorage = new IndexedDBKVStorage("chatqueuedmsgs", {
-            murSeed: 0x800F0002
-        });
-
-    // preload
-    self.messagesQueueKvStorage.prefillMemCache(fmdb);
+    self.messagesQueueKvStorage = new SharedLocalKVStorage("chatqueuedmsgs", 1);
 
     /**
      * Set to true when this chatd instance is (being) destroyed
@@ -1554,7 +1549,6 @@ Chatd.Messages.prototype.confirmkey = function(keyid) {
                     'updated' : v.updated,
                     'type' : v.type
                 });
-                self.chatd.messagesQueueKvStorage.flush();
             }
         })
     );
@@ -1634,7 +1628,6 @@ Chatd.Messages.prototype.persist = function(messagekey) {
                     'updated' : self.sendingbuf[num][Chatd.MsgField.UPDATED],
                     'type' : self.sendingbuf[num][Chatd.MsgField.TYPE]
                 });
-                self.chatd.messagesQueueKvStorage.flush();
             }
         });
     }
@@ -1651,7 +1644,6 @@ Chatd.Messages.prototype.persist = function(messagekey) {
                 'updated' : self.sendingbuf[num][Chatd.MsgField.UPDATED],
                 'type' : self.sendingbuf[num][Chatd.MsgField.TYPE]
             });
-            self.chatd.messagesQueueKvStorage.flush();
         }
     }
 };
@@ -1661,7 +1653,6 @@ Chatd.Messages.prototype.removefrompersist = function(messagekey) {
     var self = this;
     var cacheKey = base64urlencode(self.chatId) + ":" + messagekey;
     self.chatd.messagesQueueKvStorage.removeItem(cacheKey);
-    self.chatd.messagesQueueKvStorage.flush();
 };
 
 // restore persisted messages to sending buffer

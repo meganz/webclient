@@ -711,9 +711,14 @@ Object.defineProperty(this, 'mBroadcaster', {
             this.listen(setup);
             this.notify('ping');
 
+            // if multiple tabs are reloaded/opened at the same time
+            // they would both see .ctInstances as === 0, so we need to increase this
+            // as earlier as possible, e.g. now.
+            localStorage.ctInstances = parseInt(localStorage.ctInstances) + 1;
+
             setTimeout(function() {
                 setup();
-            }, !parseInt(localStorage.ctInstances) ? 0 : 2000);
+            }, parseInt(localStorage.ctInstances) === 1 ? 0 : 2000);
         },
 
         listen: function crossTab_listen(aListener) {
@@ -745,7 +750,15 @@ Object.defineProperty(this, 'mBroadcaster', {
             if (this.ctID) {
                 var wasMaster = this.master;
                 if (wasMaster) {
-                    localStorage.ctInstances--;
+                    var current = parseInt(localStorage.ctInstances);
+                    if (current > 1) {
+                        // only decrease ctInstnaces if its > 1, so that we would never
+                        // get into a case when ctInstances is < 0
+                        localStorage.ctInstances--;
+                    }
+                    else {
+                        localStorage.ctInstances = 0;
+                    }
                     localStorage['mCrossTabRef_' + u_handle] = this.master;
                     delete this.master;
                 } else if (d) {
@@ -836,6 +849,26 @@ Object.defineProperty(this, 'mBroadcaster', {
                             //}
                             if (Object(window.fmdb).crashed === 'slave') {
                                 fmdb.crashed = 0;
+                            }
+                        }
+                    }
+                default:
+                    if (typeof watchdog !== 'undefined') {
+                        // proxy the event to the watchdog's event handlers
+                        var processed = false;
+                        var op = ev.key.split("!");
+
+                        if (op.length === 3) {
+                            op = op[2];
+                            processed = watchdog.triggerEventHandlersByName(op, [
+                                strg,
+                                this
+                            ]);
+                        }
+
+                        if (!processed) {
+                            if (d) {
+                                console.debug("[mBroadcaster] Unknown event: ", op, ev.key, strg);
                             }
                         }
                     }
@@ -1572,6 +1605,7 @@ else if (!b_u)
         jsl.push({f:'js/megaDbEncryptionPlugin.js', n: 'megadbenc_js', j:1,w:5});
         jsl.push({f:'js/megaDb.js', n: 'megadb_js', j:1,w:5});
         jsl.push({f:'js/idbkvstorage.js', n: 'idbkvstorage_js', j: 1, w: 5});
+        jsl.push({f:'js/sharedlocalkvstorage.js', n: 'sharedlocalkvstorage_js', j: 1, w: 5});
 
         jsl.push({f:'js/tlvstore.js', n: 'tlvstore_js', j:1});
         jsl.push({f:'js/vendor/jsbn.js', n: 'jsbn_js', j:1, w:2});

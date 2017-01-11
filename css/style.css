@@ -232,7 +232,6 @@ a, a:link, a:visited, a:hover, a:active, a:focus img, a:focus img {
 .top-head {
     background-color: #fafafa;
     position: relative;
-    z-index: 1;
 }
 .logo {
     width: 24px;
@@ -7444,7 +7443,6 @@ table {
     height: calc(100% - 35px);
     position: relative;
     margin-top: -1px;
-    z-index: 1;
 }
 .fm-right-block.dashboard, .fm-right-block.dashboard .jspContainer, .fm-right-block.dashboard .jspPane {
     width: auto !important;

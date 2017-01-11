@@ -81,8 +81,6 @@ module.exports = function(config) {
         'sjcl.js',
         'js/mDB.js',
         'js/sharedlocalkvstorage.js',
-        'js/megaDbEncryptionPlugin.js',
-        'js/megaDb.js',
         'js/paycrypt.js',
         'js/attr.js',
         'js/account.js',

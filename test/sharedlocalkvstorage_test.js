@@ -1,4 +1,15 @@
 describe("SharedLocalKVStorage Unit Test", function() {
+    // DON'T RUN THOSE TEST ON CHROME, until https://bugs.chromium.org/p/chromium/issues/detail?id=675372 gets fixed
+
+    if (window.chrome && document.hidden) {
+        console.error(
+            "Detected Google Chrome with an inactive tab/window. Halting SLKVStorage tests, because of:",
+            "https://bugs.chromium.org/p/chromium/issues/detail?id=675372"
+        );
+        return;
+    }
+
+    localStorage.SharedLocalKVStorageDebug = 1;
 
     var shouldDropDatabases = [];
 
@@ -8,6 +19,8 @@ describe("SharedLocalKVStorage Unit Test", function() {
     var dropOnFinished = function(kvStorage) {
         shouldDropDatabases.push(kvStorage);
     }
+
+
 
 
     var generateUniqueId = function() {
@@ -47,6 +60,10 @@ describe("SharedLocalKVStorage Unit Test", function() {
                     if (v.persistAdapter.dbState === SharedLocalKVStorage.DB_STATE.READY) {
                         deleted[v.name] = true;
                         waiting.push(v.destroy());
+                        v.persistAdapter.close();
+                    }
+                    else {
+                        v.persistAdapter.close();
                     }
                 }
             }
@@ -59,11 +76,81 @@ describe("SharedLocalKVStorage Unit Test", function() {
 
     });
 
+    it("core func test - DexieStorage.keys()", function(done) {
+        var allDone = [];
+        var failed = [];
+
+        [
+            {
+                'newcache': {},
+                'delcache': {},
+                'dbcache': {
+                    'a': 2
+                },
+                'expected': ['a']
+            },
+            {
+                'newcache': {'b':3},
+                'delcache': {},
+                'dbcache': {
+                    'a': 2
+                },
+                'expected': ['a', 'b']
+            },
+            {
+                'newcache': {},
+                'delcache': {'b': true},
+                'dbcache': {
+                    'a': 2,
+                    'b': 3
+                },
+                'expected': [
+                    'a'
+                ]
+            },
+            {
+                'newcache': {'a': 3},
+                'delcache': {'b': true},
+                'dbcache': {
+                    'a': 2,
+                    'b': 3
+                },
+                'expected': ['a']
+            },
+            {
+                'prefix': 'test_',
+                'newcache': {'test_a': 3},
+                'delcache': {'test_b': true},
+                'dbcache': {
+                    'test_a': 2,
+                    'test_b': 3,
+                    'nottest_asdf': 212
+                },
+                'expected': ['test_a']
+            }
+        ].forEach(function(testCase) {
+            allDone.push(
+                SharedLocalKVStorage.Utils.DexieStorage.prototype._keys.apply(testCase, [testCase.prefix])
+                    .done(function(result) {
+                        if (JSON.stringify(result) !== JSON.stringify(testCase.expected)) {
+                            failed.push([result, testCase]);
+                        }
+                    })
+            );
+        });
+
+        MegaPromise.allDone(allDone).always(function() {
+            failed.length === 0 || console.error("Failed test cases: ", JSON.stringify(failed, null, '\t'));
+            expect(failed.length).to.eql(0);
+            done();
+        });
+    });
+
     it("basic single master set -> get item test", function(done) {
         var kvStorage = new SharedLocalKVStorage.Utils.DexieStorage("test1", 1);
         dropOnFinished(kvStorage);
+        kvStorage.setItem('test', 'test123').dumpToConsole("tets");
 
-        kvStorage.setItem('test', 'test123');
         promiseHelpers.expectPromiseToBeResolved(kvStorage.getItem("test"), 'test123', 'getItem test = test123');
 
         promiseHelpers.testWaitForAllPromises(done);
@@ -84,6 +171,7 @@ describe("SharedLocalKVStorage Unit Test", function() {
 
 
     it("basic single master - open -> set -> close -> get (persistence test)", function(done) {
+
         var kvStorage = new SharedLocalKVStorage.Utils.DexieStorage("test1", 1);
         kvStorage.setItem('test', 'test123')
             .done(function() {
@@ -101,6 +189,7 @@ describe("SharedLocalKVStorage Unit Test", function() {
                 promiseHelpers.testWaitForAllPromises(done);
             });
     });
+
 
     it("comprehensive single master test", function(done) {
         var kvStorage = new SharedLocalKVStorage.Utils.DexieStorage("test1", 1);
@@ -191,7 +280,7 @@ describe("SharedLocalKVStorage Unit Test", function() {
 
     it("basic test for SharedLocalKVStorage, using 1 master", function(done) {
         var connector = new FakeBroadcastersConnector();
-        var broadcaster = new FakeBroadcaster("tab1");
+        var broadcaster = CreateNewFakeBroadcaster("tab1");
         connector.addTab(broadcaster);
         connector.setMaster("tab1");
 
@@ -203,40 +292,41 @@ describe("SharedLocalKVStorage Unit Test", function() {
             .done(function() {
                 sharedLocalKvInstance.clear()
                     .done(function() {
-                        promiseHelpers.expectPromiseToFail(
-                            sharedLocalKvInstance.getItem("test"),
-                            undefined,
-                            'getItem test, which was removed (async)'
-                        );
+                        MegaPromise.allDone([
+                            promiseHelpers.expectPromiseToFail(
+                                sharedLocalKvInstance.getItem("test"),
+                                undefined,
+                                'getItem test, which was removed (async)'
+                            ),
+                            promiseHelpers.expectPromiseToFail(
+                                sharedLocalKvInstance.getItem("test"),
+                                undefined,
+                                'getItem test, which was removed (async)'
+                            )
+                        ]).done(function() {
+                            sharedLocalKvInstance.setItem('test', 'test123')
+                                .done(function () {
+                                    promiseHelpers.expectPromiseToBeResolved(
+                                        sharedLocalKvInstance.getItem("test"), 'test123', 'getItem test = test123'
+                                    );
 
-                        promiseHelpers.expectPromiseToFail(
-                            sharedLocalKvInstance.getItem("test"),
-                            undefined,
-                            'getItem test, which was removed (async)'
-                        );
-
-
-                        sharedLocalKvInstance.setItem('test', 'test123');
-                        promiseHelpers.expectPromiseToBeResolved(
-                            sharedLocalKvInstance.getItem("test"), 'test123', 'getItem test = test123'
-                        );
-
-
-                        promiseHelpers.testWaitForAllPromises(done);
+                                    promiseHelpers.testWaitForAllPromises(done);
+                                });
+                        });
                     });
             });
     });
 
     it("basic, cross tab SharedLocalKVStorage, using 3 tabs - 1 master and 2 slaves", function(done) {
         var connector = new FakeBroadcastersConnector();
-        var broadcaster1 = new FakeBroadcaster("tab1");
+        var broadcaster1 = CreateNewFakeBroadcaster("tab1");
         connector.addTab(broadcaster1);
 
-        var broadcaster2 = new FakeBroadcaster("tab2");
+        var broadcaster2 = CreateNewFakeBroadcaster("tab2");
         connector.addTab(broadcaster2);
 
 
-        var broadcaster3 = new FakeBroadcaster("tab3");
+        var broadcaster3 = CreateNewFakeBroadcaster("tab3");
         connector.addTab(broadcaster3);
 
         connector.setMaster("tab1");
@@ -308,14 +398,14 @@ describe("SharedLocalKVStorage Unit Test", function() {
 
     it("basic, cross tab SharedLocalKVStorage - removeItem, using 3 tabs - 1 master and 2 slaves", function(done) {
         var connector = new FakeBroadcastersConnector();
-        var broadcaster1 = new FakeBroadcaster("tab1");
+        var broadcaster1 = CreateNewFakeBroadcaster("tab1");
         connector.addTab(broadcaster1);
 
-        var broadcaster2 = new FakeBroadcaster("tab2");
+        var broadcaster2 = CreateNewFakeBroadcaster("tab2");
         connector.addTab(broadcaster2);
 
 
-        var broadcaster3 = new FakeBroadcaster("tab3");
+        var broadcaster3 = CreateNewFakeBroadcaster("tab3");
         connector.addTab(broadcaster3);
 
         connector.setMaster("tab1");
@@ -420,14 +510,14 @@ describe("SharedLocalKVStorage Unit Test", function() {
 
     it("basic, cross tab SharedLocalKVStorage - eachPrefix, using 3 tabs - 1 master and 2 slaves", function(done) {
         var connector = new FakeBroadcastersConnector();
-        var broadcaster1 = new FakeBroadcaster("tab1");
+        var broadcaster1 = CreateNewFakeBroadcaster("tab1");
         connector.addTab(broadcaster1);
 
-        var broadcaster2 = new FakeBroadcaster("tab2");
+        var broadcaster2 = CreateNewFakeBroadcaster("tab2");
         connector.addTab(broadcaster2);
 
 
-        var broadcaster3 = new FakeBroadcaster("tab3");
+        var broadcaster3 = CreateNewFakeBroadcaster("tab3");
         connector.addTab(broadcaster3);
 
         connector.setMaster("tab1");
@@ -484,6 +574,7 @@ describe("SharedLocalKVStorage Unit Test", function() {
                             expectAllValsToEqual("hello_2", "world2"),
                             expectAllValsToEqual("hello_3", "world3")
                         ])
+                            .dumpToConsole("allDone1")
                             .fail(function() { promise.reject(arguments); })
                             .done(function() {
                                 var results = [];
@@ -510,7 +601,7 @@ describe("SharedLocalKVStorage Unit Test", function() {
 
                                 kvInstance.eachPrefixItem("hello", cb);
                             })
-                    });
+                    })
 
                 return promise;
             });
@@ -520,6 +611,30 @@ describe("SharedLocalKVStorage Unit Test", function() {
     });
 
     it("1 master, 2 slaves, one of the slaves becomes a master", function(done) {
+        var connector = new FakeBroadcastersConnector();
+        var broadcaster1 = CreateNewFakeBroadcaster("tab1");
+        connector.addTab(broadcaster1);
+
+        var broadcaster2 = CreateNewFakeBroadcaster("tab2");
+        connector.addTab(broadcaster2);
+
+
+        var broadcaster3 = CreateNewFakeBroadcaster("tab3");
+        connector.addTab(broadcaster3);
+
+        connector.setMaster("tab1");
+
+        var sharedLocalKvInstance1 = new SharedLocalKVStorage("test1", 1, false, broadcaster1);
+
+        var sharedLocalKvInstance2 = new SharedLocalKVStorage("test1", 1, false, broadcaster2);
+
+        var sharedLocalKvInstance3 = new SharedLocalKVStorage("test1", 1, false, broadcaster3);
+
+
+        dropOnFinished(sharedLocalKvInstance1);
+        dropOnFinished(sharedLocalKvInstance2);
+        dropOnFinished(sharedLocalKvInstance3);
+
         var expectAllValsToEqual = function(key, targetValue, instances) {
             var promises = [];
 
@@ -542,28 +657,6 @@ describe("SharedLocalKVStorage Unit Test", function() {
             return MegaPromise.allDone(promises);
         };
 
-        var connector = new FakeBroadcastersConnector();
-        var broadcaster1 = new FakeBroadcaster("tab1");
-        connector.addTab(broadcaster1);
-
-        var broadcaster2 = new FakeBroadcaster("tab2");
-        connector.addTab(broadcaster2);
-
-
-        var broadcaster3 = new FakeBroadcaster("tab3");
-        connector.addTab(broadcaster3);
-
-        connector.setMaster("tab1");
-
-        var sharedLocalKvInstance1 = new SharedLocalKVStorage("test1", 1, false, broadcaster1);
-
-        var sharedLocalKvInstance2 = new SharedLocalKVStorage("test1", 1, false, broadcaster2);
-
-        var sharedLocalKvInstance3 = new SharedLocalKVStorage("test1", 1, false, broadcaster3);
-
-
-        dropOnFinished(sharedLocalKvInstance1);
-        dropOnFinished(sharedLocalKvInstance2);
 
         var onChangeCalls = [];
 
@@ -599,65 +692,52 @@ describe("SharedLocalKVStorage Unit Test", function() {
                         promise
                             .dumpToConsole("promise")
                             .done(function() {
-                            expectAllValsToEqual(
-                                "hello",
-                                "test2",
-                                [
-                                    sharedLocalKvInstance2,
-                                    sharedLocalKvInstance3
-                                ]
-                            )
-                                .always(function( ){
-                                    onChangeCalls.sort();
+                                expectAllValsToEqual(
+                                    "hello",
+                                    "test2",
+                                    [
+                                        sharedLocalKvInstance2,
+                                        sharedLocalKvInstance3
+                                    ]
+                                )
+                                    .always(function( ){
 
-                                    var expectedChangeCalls = [
-                                        {
-                                            "src": "tab1",
-                                            "k": "hello",
-                                            "v": "test1"
-                                        },
-                                        {
-                                            "src": "tab2",
-                                            "k": "hello",
-                                            "v": "test1"
-                                        },
-                                        {
-                                            "src": "tab3",
-                                            "k": "hello",
-                                            "v": "test1"
-                                        },
-                                        {
-                                            "src": "tab2",
-                                            "k": "hello",
-                                            "v": "test2"
-                                        },
-                                        {
-                                            "src": "tab3",
-                                            "k": "hello",
-                                            "v": "test2"
-                                        },
-                                        {
-                                            "src": "tab2",
-                                            "k": "hello",
-                                            "v": "test2"
-                                        },
-                                        {
-                                            "src": "tab3",
-                                            "k": "hello",
-                                            "v": "test2"
+                                        var expectedChangeCalls = [
+                                            {
+                                                "src": "tab1",
+                                                "k": "hello",
+                                                "v": "test1"
+                                            },
+                                            {
+                                                "src": "tab2",
+                                                "k": "hello",
+                                                "v": "test1"
+                                            },
+                                            {
+                                                "src": "tab2",
+                                                "k": "hello",
+                                                "v": "test2"
+                                            }
+                                        ];
+
+
+
+                                        var matched = (
+                                            JSON.stringify(onChangeCalls) === JSON.stringify(expectedChangeCalls)
+                                        );
+
+                                        var msg = 'On change calls did not matched the expected value. Got: ' +
+                                            JSON.stringify(onChangeCalls,null, "\t", 4) + ', while expecting: ' +
+                                            JSON.stringify(expectedChangeCalls, null, "\t", 4);
+                                        if (!matched) {
+                                            console.error(msg)
+                                            return false;
+                                        } else {
+                                            promiseHelpers.testWaitForAllPromises(done);
                                         }
-                                    ];
-
-                                    assert(
-                                        JSON.stringify(onChangeCalls) === JSON.stringify(expectedChangeCalls),
-                                        'On change calls did not matched the expected value. Got: ' +
-                                        JSON.stringify(onChangeCalls,null, "\t", 4) + ', while expecting: ' +
-                                        JSON.stringify(expectedChangeCalls, null, "\t", 4)
-                                    );
-                                    promiseHelpers.testWaitForAllPromises(done);
-                                });
-                        })
-                    })
+                                    });
+                            })
+                    });
             });
 
     });

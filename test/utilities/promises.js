@@ -18,7 +18,7 @@ var PromiseHelpers = function() {
 
 
 PromiseHelpers.prototype.destroy = function() {
-    delete this._testIsWaitingForPromises;
+    this._testIsWaitingForPromises = [];
     this.promiseCount = 0;
     this.sandbox.restore();
 };
@@ -73,7 +73,8 @@ PromiseHelpers.prototype.expectPromiseToBeResolved = function(promise, promiseRe
                 ', promise pre stack: ' + promise.stack);
         });
 
-    this.failTestIfPromiseTimeouts(promise, 1000, promiseName);
+    this.failTestIfPromiseTimeouts(promise, 5000, promiseName);
+
 
     this.queueTestPromise(promise);
     return promise;

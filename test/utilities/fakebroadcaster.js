@@ -4,6 +4,11 @@
 
 
 
+// copy the mBroadcaster once, so that we can reuse it later for crafting multiple, separated
+// broadcasters for unit tests
+var MASTER_BROADCASTER = clone(mBroadcaster);
+MASTER_BROADCASTER._topics = {};
+
 /**
  * Fake watchdog
  *
@@ -22,7 +27,7 @@ var FakeBroadcasterWatchdog = function(broadcaster) {
     // Holds query replies if cached
     this.replyCache = {};
 
-    this.eventHandlers = {};
+    this.waitingQueries = {};
 
     var loggerOpts = {};
     if (localStorage.fakeBroadcasterWatchdogDebug) {
@@ -64,15 +69,30 @@ var FakeBroadcasterWatchdog = function(broadcaster) {
     this.logger = new MegaLogger("FakeBroadcasterWatchdog[" + this.id + "]", loggerOpts);
 
     var self = this;
-    this.addEventHandler("Q!Rep!y", function(args, watchdog) {
+    this.broadcaster.addListener("watchdog:Q!Rep!y", function(args) {
         self.logger.debug("Got reply: ", args.data.query, args.data.token, args.data.value);
 
-        if (watchdog.queryQueue[args.data.token]) {
-            watchdog.queryQueue[args.data.token].push(args.data.value);
+        if (self.queryQueue[args.data.token]) {
+            self.queryQueue[args.data.token].push(args.data.value);
         }
 
-        if (watchdog.replyCache[args.data.query]) {
-            watchdog.replyCache[args.data.query].push(args.data.value);
+        if (self.replyCache[args.data.query]) {
+            self.replyCache[args.data.query].push(args.data.value);
+        }
+
+        // if there is a promise in .waitingQueries, that means that this query is expecting only 1 response
+        // so we can resolve it immediately.
+        if (self.waitingQueries[args.data.token]) {
+
+            clearTimeout(self.waitingQueries[args.data.token].timer);
+            self.waitingQueries[args.data.token]
+                .always(function() {
+                    // cleanup after all other done/always/fail handlers...
+                    delete self.waitingQueries[args.data.token];
+                    delete self.queryQueue[args.data.token];
+                })
+                .resolve([args.data.value]);
+
         }
     });
 };
@@ -80,7 +100,7 @@ var FakeBroadcasterWatchdog = function(broadcaster) {
 FakeBroadcasterWatchdog.prototype.destroy = function() {
     var self = this;
 
-    self.queryQueue = self.replyCache = self.eventHandlers = {};
+    self.queryQueue = self.replyCache = {};
 };
 
 /**
@@ -107,7 +127,7 @@ FakeBroadcasterWatchdog.prototype.notify = function(msg, data) {
  * @param cache
  * @returns {MegaPromise}
  */
-FakeBroadcasterWatchdog.prototype.query = function(what, timeout, cache, data) {
+FakeBroadcasterWatchdog.prototype.query = function(what, timeout, cache, data, expectsSingleAnswer) {
     var self = this;
     var token = mRandomToken();
     var promise = new MegaPromise();
@@ -139,26 +159,34 @@ FakeBroadcasterWatchdog.prototype.query = function(what, timeout, cache, data) {
         }
         tmpData['reply'] = token;
 
-        // Soon does not work in PhantomJS, which causes tests using this function to fail.
-        var delayedFnCall = /PhantomJS/.test(window.navigator.userAgent) ? setTimeout : Soon;
-
-        delayedFnCall(function() {
+        setTimeout(function() {
             self.notify('Q!' + what, tmpData);
         });
 
 
-        // wait for reply and fullfil/reject the promise
-        setTimeout(function() {
-            if (self.queryQueue[token].length) {
-                self.logger.debug("RECEIVED response on query: ", what, token, self.queryQueue[token], timeout, cache);
-                promise.resolve(self.queryQueue[token]);
-            }
-            else {
-                self.logger.debug("NO response on query: ", what, token, timeout, cache, self.queryQueue);
-                promise.reject(EACCESS);
-            }
-            delete self.queryQueue[token];
-        }, timeout || 200);
+        if (!expectsSingleAnswer) {
+            // wait for reply and fullfil/reject the promise
+            setTimeout(function () {
+                if (self.queryQueue[token].length) {
+                    promise.resolve(self.queryQueue[token]);
+                }
+                else {
+                    promise.reject(EACCESS);
+                }
+                delete self.queryQueue[token];
+            }, timeout || 200);
+        }
+        else {
+            promise.timer = setTimeout(function () {
+                if (promise.state() === 'pending') {
+                    promise.reject(EACCESS);
+                    delete self.queryQueue[token];
+                    delete self.waitingQueries[token];
+                }
+            }, timeout || 200);
+
+            self.waitingQueries[token] = promise;
+        }
     }
     else {
         // reject if master
@@ -173,95 +201,6 @@ FakeBroadcasterWatchdog.prototype.query = function(what, timeout, cache, data) {
     }
 
     return promise;
-};
-
-/**
- * Get all currently registered eventHandlers
- *
- * @return {Object}
- */
-FakeBroadcasterWatchdog.prototype.getEventHandlers = function () {
-    return this.eventHandlers;
-};
-
-/**
- * Add new eventHandler.
- *
- * @param id {String} Index/unique ID of the eventHandler
- * @param val {Object} The actual eventHandler
- * @return {Object} the newly added eventHandler
- */
-FakeBroadcasterWatchdog.prototype.addEventHandler = function (id, val) {
-    this.eventHandlers[id] = val;
-
-    return this.eventHandlers[id];
-};
-
-/**
- * Remove a eventHandler.
- *
- * @param idx {String} The Index/unique ID of the eventHandler to remove
- */
-FakeBroadcasterWatchdog.prototype.removeEventHandler = function (idx) {
-    if (this.hasEventHandler(idx)) {
-        var tmp = this.eventHandlers[idx];
-        delete this.eventHandlers[idx];
-    }
-};
-
-/**
- * Triggers a fn calls on all event handlers (incl. those with namespaces).
- *
- * @param eventName {String}
- * @param args {Array}
- * @returns {boolean} returns true if at least 1 event handler was called
- */
-FakeBroadcasterWatchdog.prototype.triggerEventHandlersByName = function(eventName, args) {
-    var self = this;
-
-    var processed = false;
-
-    self.getEventHandlersByName(eventName).forEach(function(cb) {
-        processed = true;
-        cb.apply(self, args);
-    });
-
-    return processed;
-};
-
-
-/**
- * Returns ALL functions/callbacks for a specific event name (have support for .namespaces).
- *
- * @param eventName {String} name of the event (can have support for ".namespace", in which case, multiple
- * event callbacks can be returned)
- *
- * @returns {Array}
- */
-FakeBroadcasterWatchdog.prototype.getEventHandlersByName = function(eventName) {
-    var self = this;
-    var found = [];
-    Object.keys(this.eventHandlers).forEach(function(name) {
-        var isNs = name.indexOf(".") !== -1;
-        if (isNs && name.indexOf(eventName + ".") === 0) {
-            found.push(self.eventHandlers[name]);
-        }
-        else if(!isNs && name === eventName) {
-            found.push(self.eventHandlers[name]);
-        }
-    });
-
-    return found;
-};
-
-/**
- * Check if eventHandler with id `idx` exists
- *
- * @param idx {String} Index/unique ID of the eventHandler
- * @return {boolean}
- */
-FakeBroadcasterWatchdog.prototype.hasEventHandler = function (idx) {
-    return !!this.eventHandlers[idx];
 };
 
 /**
@@ -282,24 +221,7 @@ FakeBroadcasterWatchdog.prototype.handleEvent = function(k, v) {
     }
     else {
         var operation = k.substring(self.eTag.length);
-
-        if (self.getEventHandlersByName(operation).length > 0) {
-            processed = self.triggerEventHandlersByName(operation, [
-                data,
-                self
-            ]);
-        }
-        else {
-            if (operation.length === 0) {
-                processed = this.triggerEventHandlersByName(k, [
-                    data,
-                    self
-                ]);
-            }
-        }
-    }
-    if (!processed) {
-        self.logger.debug("Unknown event: ", k, v);
+        self.broadcaster.sendMessage("watchdog:" + operation, data);
     }
 };
 
@@ -321,7 +243,8 @@ var FakeBroadcastersConnector = function() {
  * @param newMasterId {String} the new master ID
  */
 FakeBroadcastersConnector.prototype.setMaster = function(newMasterId) {
-    if (newMasterId instanceof FakeBroadcaster) {
+    if (typeof newMasterId.crossTab !== 'undefined') {
+        // found a mBroadcaster as first argument, convert to string ID
         newMasterId = newMasterId.id;
     }
 
@@ -422,12 +345,14 @@ FakeBroadcastersConnector.prototype.removeTab = function (idx) {
                 newMaster = tabIds[0];
             }
         }
-        this.notify('leaving', JSON.stringify({
+
+        this.notify(tmp.crossTab.eTag + 'leaving', JSON.stringify({
             data: {
                 wasMaster: wasMaster || -1,
                 newMaster: newMaster
             }
         }));
+
         tmp.sendMessage('crossTab:leave', wasMaster);
     }
 };
@@ -461,32 +386,17 @@ FakeBroadcastersConnector.prototype.hasTab = function (idx) {
  * @param id {String}
  * @constructor
  */
-var FakeBroadcaster = function(id) {
-    this.id = id;
-    this.crossTab = {
-        eTag: '$CTE$!_',
-        master: null,
-        slaves: [],
-        ctID: id,
-        notify: function crossTab_notify(msg, data) {
+var CreateNewFakeBroadcaster = function(id) {
+    var broadcaster = clone(MASTER_BROADCASTER);
+    broadcaster.id = id;
+    broadcaster.watchdog = new FakeBroadcasterWatchdog(broadcaster);
+    broadcaster.crossTab.master = null;
+    broadcaster.crossTab.slaves = [];
+    broadcaster.destroy = function() {
+        this._topics = [];
+        this.watchdog.destroy();
+        this.connector.removeTab(this);
+    }
 
-        }
-    };
-    this._topics = [];
-    this.watchdog = new FakeBroadcasterWatchdog(this);
-    this.connector = null;
-};
-
-FakeBroadcaster.prototype.once = mBroadcaster.once;
-FakeBroadcaster.prototype.addListener = mBroadcaster.addListener;
-FakeBroadcaster.prototype.removeListener = mBroadcaster.removeListener;
-FakeBroadcaster.prototype.sendMessage = mBroadcaster.sendMessage;
-
-/**
- *  Unit test purposes only
- */
-FakeBroadcaster.prototype.destroy = function() {
-    this._topics = [];
-    this.watchdog.destroy();
-    this.connector.removeTab(this);
+    return broadcaster;
 };

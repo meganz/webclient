@@ -26,15 +26,10 @@ var PersistedTypeArea = function(megaChat) {
     });
 
 
-    self._throttledQueue = {};
+
+
     self._throttledUpdate = function(key, cb) {
-        if (self._throttledQueue[key]) {
-            clearTimeout(self._throttledQueue[key]);
-        }
-        self._throttledQueue[key] = setTimeout(function() {
-            cb();
-            delete self._throttledQueue[key];
-        }, 250);
+        delay('ptaupdate:' + key, cb, 250);
     };
     return self;
 };

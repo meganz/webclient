@@ -1,7 +1,7 @@
 describe("Fakebroadcaster Unit Test", function() {
 
 
-    // localStorage.fakeBroadcasterWatchdogDebug = 1;
+    localStorage.fakeBroadcasterWatchdogDebug = 1;
 
 
     var sandbox = sinon.sandbox.create();
@@ -33,9 +33,9 @@ describe("Fakebroadcaster Unit Test", function() {
     });
 
     it("3 tabs (master and 2 slaves) are properly set up", function(done) {
-        var tab1 = new FakeBroadcaster("tab1");
-        var tab2 = new FakeBroadcaster("tab2");
-        var tab3 = new FakeBroadcaster("tab3");
+        var tab1 = CreateNewFakeBroadcaster("tab1");
+        var tab2 = CreateNewFakeBroadcaster("tab2");
+        var tab3 = CreateNewFakeBroadcaster("tab3");
         var connector = new FakeBroadcastersConnector();
         connector.addTab(tab1);
         connector.addTab(tab2);
@@ -58,9 +58,9 @@ describe("Fakebroadcaster Unit Test", function() {
 
 
     it("3 tabs (master and a slave) can communicate (notify) with each other", function(done) {
-        var tab1 = new FakeBroadcaster("tab1");
-        var tab2 = new FakeBroadcaster("tab2");
-        var tab3 = new FakeBroadcaster("tab3");
+        var tab1 = CreateNewFakeBroadcaster("tab1");
+        var tab2 = CreateNewFakeBroadcaster("tab2");
+        var tab3 = CreateNewFakeBroadcaster("tab3");
         var connector = new FakeBroadcastersConnector();
         connector.addTab(tab1);
         connector.addTab(tab2);
@@ -71,50 +71,50 @@ describe("Fakebroadcaster Unit Test", function() {
 
         // tab2 -> tab1
         var eventHandlerCalled = false;
-        tab1.watchdog.addEventHandler("hello", function(args) {
+        var listener1 = tab1.addListener("watchdog:hello", function(args) {
             eventHandlerCalled = true;
             assert(args.data.hello == "world", 'event handler received invalid data.');
             assert(args.origin == "tab2", 'invalid origin.');
         });
         tab2.watchdog.notify("hello", {"hello": "world"});
         assert(eventHandlerCalled, 'eventHandler "hello" was not called!');
-        tab1.watchdog.removeEventHandler("hello");
+        tab1.removeListener(listener1);
 
         // tab1 -> tab2
         var eventHandlerCalled2 = false;
-        tab2.watchdog.addEventHandler("hello", function(args) {
+        var listener2 = tab2.addListener("watchdog:hello", function(args) {
             eventHandlerCalled2 = true;
             assert(args.data.hello == "world2", 'event handler received invalid data.');
             assert(args.origin == "tab1", 'invalid origin.');
         });
         tab1.watchdog.notify("hello", {"hello": "world2"});
         assert(eventHandlerCalled2, 'eventHandler "hello" was not called!');
-        tab2.watchdog.removeEventHandler("hello");
+        tab2.removeListener(listener2);
 
         // tab3 -> tab1
         eventHandlerCalled = false;
-        tab1.watchdog.addEventHandler("hello", function(args) {
+        var listener3 = tab1.addListener("watchdog:hello", function(args) {
             eventHandlerCalled = true;
             assert(args.data.hello == "world3", 'event handler received invalid data.');
             assert(args.origin == "tab3", 'invalid origin.');
         });
         tab3.watchdog.notify("hello", {"hello": "world3"});
         assert(eventHandlerCalled, 'eventHandler "hello" was not called!');
-        tab1.watchdog.removeEventHandler("hello");
+        tab1.removeListener(listener3);
 
         done();
     });
 
     it("2 tabs (master and a slave) can query each other", function(done) {
-        var tab1 = new FakeBroadcaster("tab1");
-        var tab2 = new FakeBroadcaster("tab2");
+        var tab1 = CreateNewFakeBroadcaster("tab1");
+        var tab2 = CreateNewFakeBroadcaster("tab2");
         var connector = new FakeBroadcastersConnector();
         connector.addTab(tab1);
         connector.addTab(tab2);
         connector.setMaster(tab1);
 
         // tab2 -> tab1
-        tab1.watchdog.addEventHandler("Q!hellothere", function(args) {
+        tab1.addListener("watchdog:Q!hellothere", function(args) {
             var token = args.data.reply;
 
             replyToQuery(tab1.watchdog, token, "Q!hellothere", "hi!");
@@ -127,7 +127,7 @@ describe("Fakebroadcaster Unit Test", function() {
 
 
         // tab 1 -> tab2
-        tab2.watchdog.addEventHandler("Q!hellothereFromMaster", function(args) {
+        tab2.addListener("watchdog:Q!hellothereFromMaster", function(args) {
             var token = args.data.reply;
             replyToQuery(tab2.watchdog, token, "Q!hellothereFromMaster", "hi master!");
             assert(args.origin == "tab1", 'invalid origin.');

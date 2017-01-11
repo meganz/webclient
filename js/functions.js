@@ -4563,9 +4563,6 @@ var watchdog = Object.freeze({
     // waiting queries
     waitingQueries: {},
 
-    // Holds any externally added event handlers via .addEventHandler
-    eventHandlers: {},
-
     /** setup watchdog/webstorage listeners */
     setup: function() {
         if (window.addEventListener) {
@@ -4790,129 +4787,13 @@ var watchdog = Object.freeze({
                 }
                 break;
 
-            case 'idbchange':
-                mBroadcaster.sendMessage('idbchange:' + strg.data.name, [strg.data.key, strg.data.value]);
-                break;
-
             default:
-                var processed = false;
-                var operation = ev.key.substring(this.eTag.length);
-
-                // handle watchdog events
-                if (this.getEventHandlersByName(operation).length > 0) {
-                    processed = this.triggerEventHandlersByName(operation, [
-                        strg,
-                        this
-                    ]);
-                }
-                else {
-                    // if there is no operation found, maybe it was a mBroadcaster event,
-                    // so try to find a eventHandler by that name (e.g. "leaving")
-                    if (operation.length === 0) {
-                        processed = this.triggerEventHandlersByName(ev.key, [
-                            strg,
-                            this
-                        ]);
-                    }
-                }
-
-                if (!processed) {
-                    if (d) {
-                        console.debug("[watchdog] Unknown event: ", operation, ev.key, strg);
-                    }
-                }
+                mBroadcaster.sendMessage("watchdog:" + msg, strg);
 
                 break;
         }
 
         delete localStorage[ev.key];
-    },
-
-    /**
-     * Get all currently registered eventHandlers
-     *
-     * @return {Object}
-     */
-    getEventHandlers: function () {
-        return this.eventHandlers;
-    },
-
-    /**
-     * Add new eventHandler.
-     *
-     * @param id {String} Index/unique ID of the eventHandler
-     * @param val {Object} The actual eventHandler
-     * @return {Object} the newly added eventHandler
-     */
-    addEventHandler: function (id, val) {
-        this.eventHandlers[id] = val;
-
-        return this.eventHandlers[id];
-    },
-
-    /**
-     * Remove a eventHandler.
-     *
-     * @param idx {String} The Index/unique ID of the eventHandler to remove
-     */
-    removeEventHandler: function (idx) {
-        if (this.hasEventHandler(idx)) {
-            var tmp = this.eventHandlers[idx];
-            delete this.eventHandlers[idx];
-        }
-    },
-
-    /**
-     * Check if eventHandler with id `idx` exists (note: namespaces are not supported!)
-     *
-     * @param idx {String} Index/unique ID of the eventHandler
-     * @return {bool}
-     */
-    hasEventHandler: function (idx) {
-        return typeof this.eventHandlers[idx] !== 'undefined';
-    },
-
-    /**
-     * Returns ALL functions/callbacks for a specific event name (have support for .namespaces).
-     *
-     * @param eventName {String} name of the event (can have support for ".namespace", in which case, multiple
-     * event callbacks can be returned)
-     *
-     * @returns {Array}
-     */
-    getEventHandlersByName: function(eventName) {
-        var self = this;
-        var found = [];
-        Object.keys(this.eventHandlers).forEach(function(name) {
-            var isNs = name.indexOf(".") !== -1;
-            if (isNs && name.indexOf(eventName + ".") === 0) {
-                found.push(self.eventHandlers[name]);
-            }
-            else if (!isNs && name === eventName) {
-                found.push(self.eventHandlers[name]);
-            }
-        });
-
-        return found;
-    },
-    /**
-     * Triggers a fn calls on all event handlers (incl. those with namespaces).
-     *
-     * @param eventName {String}
-     * @param args {Array}
-     * @returns {bool} returns true if at least 1 event handler was called
-     */
-    triggerEventHandlersByName: function(eventName, args) {
-        var self = this;
-
-        var processed = false;
-
-        self.getEventHandlersByName(eventName).forEach(function(cb) {
-            processed = true;
-            cb.apply(self, args);
-        });
-
-        return processed;
     }
 });
 watchdog.setup();

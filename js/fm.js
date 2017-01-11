@@ -3201,15 +3201,15 @@ function dashboardUI() {
 
         // Maximum bandwidth
         var b2 = bytesToSize(max, 0).split(' ');
-        $('.bandwidth .chart.data .size-txt').text(bytesToSize(base, 0));
-        $('.bandwidth .chart.data .pecents-txt').text((b2[0]));
-        $('.bandwidth .chart.data .gb-txt').text((b2[1]));
+        $bandwidthChart.find('.chart.data .size-txt').text(bytesToSize(base, 0));
+        $bandwidthChart.find('.chart.data .pecents-txt').text((b2[0]));
+        $bandwidthChart.find('.chart.data .gb-txt').text((b2[1]));
         if (u_attr.p || M.maf) {
-            $('.bandwidth .chart.data .perc-txt').text(perc_c + '%');
+            $bandwidthChart.find('.chart.data .perc-txt').text(perc_c + '%');
         }
         else {
-            $('.bandwidth .chart.data span:not(.size-txt)').text('');
-            $('.bandwidth .chart.data .pecents-txt').text(l[5801]);
+            $bandwidthChart.find('.chart.data span:not(.size-txt)').text('');
+            $bandwidthChart.find('.chart.data .pecents-txt').text(l[5801]);
         }
         /* End of New Used Bandwidth chart */
 
@@ -3241,10 +3241,10 @@ function dashboardUI() {
 
         // Maximum disk space
         var b2 = bytesToSize(account.space, 0).split(' ');
-        $('.storage .chart.data .pecents-txt').text((b2[0]));
-        $('.storage .chart.data .gb-txt').text((b2[1]));
-        $('.storage .chart.data .perc-txt').text(perc_c + '%');
-        $('.storage .chart.data .size-txt').text(bytesToSize(account.space_used));
+        $storageChart.find('.chart.data .pecents-txt').text((b2[0]));
+        $storageChart.find('.chart.data .gb-txt').text((b2[1]));
+        $storageChart.find('.chart.data .perc-txt').text(perc_c + '%');
+        $storageChart.find('.chart.data .size-txt').text(bytesToSize(account.space_used));
         /* End of New Used Storage chart */
 
 
@@ -3701,15 +3701,15 @@ function accountUI() {
 
         // Maximum bandwidth
         var b2 = bytesToSize(account.bw, 0).split(' ');
-        $('.bandwidth .chart.data .size-txt').text(bytesToSize(account.servbw_used + account.downbw_used, 0));
-        $('.bandwidth .chart.data .pecents-txt').text((b2[0]));
-        $('.bandwidth .chart.data .gb-txt').text((b2[1]));
+        $bandwidthChart.find('.chart.data .size-txt').text(bytesToSize(account.servbw_used + account.downbw_used, 0));
+        $bandwidthChart.find('.chart.data .pecents-txt').text((b2[0]));
+        $bandwidthChart.find('.chart.data .gb-txt').text((b2[1]));
         if (u_attr.p || M.maf) {
-            $('.bandwidth .chart.data .perc-txt').text(perc_c + '%');
+            $bandwidthChart.find('.chart.data .perc-txt').text(perc_c + '%');
         }
         else {
-            $('.bandwidth .chart.data span:not(.size-txt)').text('');
-            $('.bandwidth .chart.data .pecents-txt').text(l[5801]);
+            $bandwidthChart.find('.chart.data span:not(.size-txt)').text('');
+            $bandwidthChart.find('.chart.data .pecents-txt').text(l[5801]);
         }
 
         /* End of New Used Bandwidth chart */
@@ -3743,10 +3743,10 @@ function accountUI() {
 
         // Maximum disk space
         var b2 = bytesToSize(account.space, 0).split(' ');
-        $('.storage .chart.data .pecents-txt').text(b2[0]);
-        $('.storage .chart.data .gb-txt').text(b2[1]);
-        $('.storage .chart.data .perc-txt').text(perc_c + '%');
-        $('.storage .chart.data .size-txt').text(bytesToSize(account.space_used));
+        $storageChart.find('.chart.data .pecents-txt').text(b2[0]);
+        $storageChart.find('.chart.data .gb-txt').text(b2[1]);
+        $storageChart.find('.chart.data .perc-txt').text(perc_c + '%');
+        $storageChart.find('.chart.data .size-txt').text(bytesToSize(account.space_used));
 
 
         $('.account.quota-txt.used-space')

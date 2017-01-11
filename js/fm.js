@@ -3189,13 +3189,14 @@ function dashboardUI() {
         var deg =  230 * perc_c / 100;
 
         // Used Bandwidth chart
+        var $bandwidthChart = $('.fm-account-blocks.bandwidth');
         if (deg <= 180) {
-            $('.bandwidth .main-chart.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
-            $('.bandwidth .main-chart.right-chart span').css('transform', 'rotate(0deg)');
+            $bandwidthChart.find('.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
+            $bandwidthChart.find('.right-chart span').removeAttr('style');
         }
         else {
-            $('.bandwidth .main-chart.left-chart span').css('transform', 'rotate(180deg)');
-            $('.bandwidth .main-chart.right-chart span').css('transform', 'rotate(' + (deg - 180) + 'deg)');
+            $bandwidthChart.find('.left-chart span').css('transform', 'rotate(180deg)');
+            $bandwidthChart.find('.right-chart span').css('transform', 'rotate(' + (deg - 180) + 'deg)');
         }
 
         // Maximum bandwidth
@@ -3228,13 +3229,14 @@ function dashboardUI() {
         var deg =  230 * perc_c / 100;
 
         // Used space chart
+        var $storageChart = $('.fm-account-blocks.storage');
         if (deg <= 180) {
-            $('.storage .main-chart.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
-            $('.storage .main-chart.right-chart span').css('transform', 'rotate(0deg)');
+            $storageChart.find('.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
+            $storageChart.find('.right-chart span').removeAttr('style');
         }
         else {
-            $('.storage .main-chart.left-chart span').css('transform', 'rotate(180deg)');
-            $('.storage .main-chart.right-chart span').css('transform', 'rotate(' + (deg - 180) + 'deg)');
+            $storageChart.find('.left-chart span').css('transform', 'rotate(180deg)');
+            $storageChart.find('.right-chart span').css('transform', 'rotate(' + (deg - 180) + 'deg)');
         }
 
         // Maximum disk space
@@ -3686,14 +3688,15 @@ function accountUI() {
 
         var deg =  230 * perc_c / 100;
 
-        /* Used Bandwidth chart */
+        // Used Bandwidth chart
+        var $bandwidthChart = $('.fm-account-blocks.bandwidth');
         if (deg <= 180) {
-            $('.bandwidth .main-chart.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
-            $('.bandwidth .main-chart.right-chart span').css('transform', 'rotate(0deg)');
+            $bandwidthChart.find('.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
+            $bandwidthChart.find('.right-chart span').removeAttr('style');
         }
         else {
-            $('.bandwidth .main-chart.left-chart span').css('transform', 'rotate(180deg)');
-            $('.bandwidth .main-chart.right-chart span').css('transform', 'rotate(' + (deg - 180) + 'deg)');
+            $bandwidthChart.find('.left-chart span').css('transform', 'rotate(180deg)');
+            $bandwidthChart.find('.right-chart span').css('transform', 'rotate(' + (deg - 180) + 'deg)');
         }
 
         // Maximum bandwidth
@@ -3727,14 +3730,15 @@ function accountUI() {
 
         var deg =  230 * perc_c / 100;
 
-        /* Used space chart */
+        // Used space chart
+        var $storageChart = $('.fm-account-blocks.storage');
         if (deg <= 180) {
-            $('.storage .main-chart.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
-            $('.storage .main-chart.right-chart span').css('transform', 'rotate(0deg)');
+            $storageChart.find('.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
+            $storageChart.find('.right-chart span').removeAttr('style');
         }
         else {
-            $('.storage .main-chart.left-chart span').css('transform', 'rotate(180deg)');
-            $('.storage .main-chart.right-chart span').css('transform', 'rotate(' + (deg - 180) + 'deg)');
+            $storageChart.find('.left-chart span').css('transform', 'rotate(180deg)');
+            $storageChart.find('.right-chart span').css('transform', 'rotate(' + (deg - 180) + 'deg)');
         }
 
         // Maximum disk space

@@ -37,12 +37,12 @@
 .chat-right-area {
     width: 256px;
     height: 100%;
-    float: right;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     background-color: white;
-    position:relative;
+    position: absolute;
+    right: 0;
 }
 .chat-right-area::after {
     content: '';

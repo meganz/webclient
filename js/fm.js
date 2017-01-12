@@ -4180,6 +4180,7 @@ function accountUI() {
         $('.fm-close-all-sessions').rebind('click', function() {
 
             loadingDialog.show();
+            var $this = $(this);
             var $activeSessionsRows = $('.active-session-txt').parents('tr');
 
             // Expire all sessions but not the current one
@@ -4189,6 +4190,7 @@ function accountUI() {
                     $activeSessionsRows.find('.settings-logout').remove();
                     $activeSessionsRows.find('.active-session-txt').removeClass('active-session-txt')
                         .addClass('expired-session-txt').text(l[1664]);
+                    $this.hide();
                     loadingDialog.hide();
                 }
             });

@@ -3018,6 +3018,11 @@ function dashboardUI() {
         $('.account.membership-plan').text(l[435]);
     }
 
+    // update avatar
+    $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', true));
+    $('.fm-avatar img').attr('src', useravatar.mine());
+
+
     // Show first name or last name
     if (u_attr.firstname) {
         $('.membership-big-txt.name').text(u_attr.firstname + ' ' + u_attr.lastname);
@@ -3490,7 +3495,6 @@ Object.freeze(dashboardUI);
 
 
 function accountUI() {
-
     var sectionClass;
 
     $('.fm-account-notifications').removeClass('hidden');

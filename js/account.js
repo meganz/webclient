@@ -964,7 +964,12 @@ function checkUserLogin() {
         var promise = waiter = new MegaPromise();
 
         mega.attr.get(u_handle, 'fmconfig', false, true)
-            .always(moveLegacySettings)
+            .always(function() {
+                moveLegacySettings();
+
+                // Initialize account notifications.
+                mega.notif.setup(fmconfig.anf);
+            })
             .done(function(result) {
                 result = Object(result);
                 for (var key in result) {
@@ -975,9 +980,6 @@ function checkUserLogin() {
                         catch (ex) {}
                     }
                 }
-
-                // Initialize account notifications.
-                mega.notif.setup(fmconfig.anf);
 
                 if (fminitialized) {
                     var view = Object(fmconfig.viewmodes)[M.currentdirid];

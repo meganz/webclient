@@ -80,14 +80,14 @@ function init_reset() {
         }
     });
 
-    if (typeof zxcvbn === 'undefined' && !silent_loading) {
+    if (typeof zxcvbn === 'undefined') {
         $('.login-register-input.password').addClass('loading');
-        silent_loading = function() {
-            $('.login-register-input.password').removeClass('loading');
-            reset_pwcheck();
-        };
-        jsl.push(jsl2['zxcvbn_js']);
-        jsl_start();
+
+        mega.utils.require('zxcvbn_js')
+            .done(function() {
+                $('.login-register-input.password').removeClass('loading');
+                reset_pwcheck();
+            });
     }
     else {
         $('.login-register-input.password').removeClass('loading');

@@ -329,14 +329,14 @@ function init_register() {
             $('.register-check').removeClass('checkboxOff');
         }
     });
-    if (typeof zxcvbn === 'undefined' && !silent_loading) {
+    if (typeof zxcvbn === 'undefined') {
         $('.login-register-input.password').addClass('loading');
-        silent_loading = function() {
-            $('.login-register-input.password').removeClass('loading');
-            registerpwcheck();
-        };
-        jsl.push(jsl2['zxcvbn_js']);
-        jsl_start();
+
+        mega.utils.require('zxcvbn_js')
+            .done(function() {
+                $('.login-register-input.password').removeClass('loading');
+                registerpwcheck();
+            });
     }
     $('#register-password').rebind('keyup', function(e) {
         registerpwcheck();

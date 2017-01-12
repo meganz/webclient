@@ -3810,7 +3810,7 @@
     "16139": "Email & Password",
     "16140": "Payment and Plan",
     "16141": "Paganahin",
-    "16142": "Disable",
+    "16142": "Tanggalin",
     "16143": "Enable Notifications",
     "16144": "Desktop Notifications",
     "16145": "New shared folder from contact",
@@ -3842,6 +3842,7 @@
     "16171": "There is an unknown error in the download path. Please try again and if it continues to fail, please contact support@mega.nz. [{0}]",
     "16172": "Label...",
     "16173": "Choose colour:",
+    "16174": "Date Modified",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

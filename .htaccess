@@ -1,5 +1,8 @@
-#rewriteEngine On
-#rewriteRule ^([0-z]+)$ index.html
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^([A-Za-z0-9_/]*)/?$ /
+
 <IfModule mod_headers.c>
 #Header set Access-Control-Allow-Origin "*"
 #Header set Access-Control-Allow-Headers "uloffset, ulkey"

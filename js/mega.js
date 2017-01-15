@@ -901,7 +901,7 @@ function MegaData()
                 M.contacts();
             }
 
-            if (window.location.hash === "#fm/" + u.u) {
+            if (getSitePath() === "/fm/" + u.u) {
                 // re-render the contact view page if the presence had changed
                 contactUI();
             }
@@ -1299,7 +1299,7 @@ function MegaData()
                 $('.shared-details-info-block .fm-leave-share').rebind('click', function (e) {
 
                     // Get the share ID from the hash in the URL
-                    var shareId = window.location.hash.replace('#fm/', '');
+                    var shareId = getSitePath().replace('/fm/', '');
 
                     // Remove user from the share
                     leaveShare(shareId);
@@ -1602,17 +1602,29 @@ function MegaData()
             if (this.currentdirid !== this.RootID) {
                 target = '!' +  this.currentdirid;
             }
-            newHashLocation = '#F!' + pfid + '!' + pfkey + target;
+            newHashLocation = 'F!' + pfid + '!' + pfkey + target;
             M.lastSeenFolderLink = newHashLocation;
         }
         else {
             // new hash location can be altered already by the chat logic in the previous lines in this func
             if (!newHashLocation) {
-                newHashLocation = '#fm/' + M.currentdirid;
+                newHashLocation = 'fm/' + M.currentdirid;
             }
         }
         try {
-            window.location.hash = newHashLocation;
+
+            if (hashLogic) {
+                document.location.hash = '#' + newHashLocation;
+            }
+            else {
+                if (window.location.pathname !== "/"+newHashLocation && !pfid) {
+                    history.pushState({ fmpage: newHashLocation }, "", "/"+newHashLocation);
+                }
+                else if (pfid && document.location.hash !== '#'+newHashLocation) {
+                    history.pushState({ fmpage: newHashLocation }, "", "#"+newHashLocation);
+                }
+                page = newHashLocation;
+            }
         }
         catch (ex) {
             console.error(ex);
@@ -1758,7 +1770,7 @@ function MegaData()
 
                 if (!$this.is(".disabled")) {
                     var user_handle = $.selected && $.selected[0];
-                    window.location = "#fm/chat/" + user_handle;
+                    loadSubPage("fm/chat/" + user_handle);
                 }
             });
 
@@ -1770,7 +1782,7 @@ function MegaData()
                 if (!$this.is(".disabled") && !$userDiv.is(".offline")) {
                     var user_handle = $userDiv.attr('id').replace("contact_", "");
 
-                    window.location = "#fm/chat/" + user_handle;
+                    loadSubPage("fm/chat/" + user_handle);
                     var room = megaChat.createAndShowPrivateRoomFor(user_handle);
                     if (room) {
                         room.startAudioCall();
@@ -1786,7 +1798,7 @@ function MegaData()
                 if (!$this.is(".disabled") && !$userDiv.is(".offline")) {
                     var user_handle = $userDiv.attr('id').replace("contact_", "");
 
-                    window.location = "#fm/chat/" + user_handle;
+                    loadSubPage("fm/chat/" + user_handle);
                     var room = megaChat.createAndShowPrivateRoomFor(user_handle);
                     if (room) {
                         room.startVideoCall();
@@ -1815,8 +1827,7 @@ function MegaData()
 
             // Get the user handle and change to conversations screen
             var user_handle = id.replace('contact_', '');
-            window.location = '#fm/chat/' + user_handle;
-
+            loadSubPage('fm/chat/' + user_handle);
         });
     };
 
@@ -3128,7 +3139,7 @@ function MegaData()
      */
     this.onContactChanged = function(contact) {
         if (fminitialized) {
-            if (window.location.hash === "#fm/" + contact.u) {
+            if (getSitePath() === "/fm/" + contact.u) {
                 // re-render the contact view page if the presence had changed
                 contactUI();
             }
@@ -3147,7 +3158,7 @@ function MegaData()
                 M.contacts(); // we need to resort
             }
 
-            if (window.location.hash === "#fm/contacts") {
+            if (getSitePath() === "/fm/contacts") {
                 // re-render the contact view page if the presence had changed
                 M.openFolder('contacts', true);
             }
@@ -5740,7 +5751,7 @@ function MegaData()
             }
             catch (ex) {
                 console.error(ex);
-                window.location.hash = 'login';
+                loadSubPage('login');
                 return false;
             }
 
@@ -5830,8 +5841,6 @@ function MegaData()
                             u_checklogin(ctx, false);
                         }
                     });
-
-                // Successful transfer, continue load
                 return false;
             }
         }
@@ -7001,10 +7010,18 @@ function initworkerpool() {
             d        : d
         };
     }
+    var workerURL = mega.nodedecBlobURI;
+    if (!workerURL) {
+        workerURL = 'nodedec.js';
+
+        if (!is_extension && !is_karma) {
+            workerURL = '/' + workerURL;
+        }
+    }
 
     for (var i = Math.min(mega.maxWorkers, 10); i--;) {
         try {
-            var w = new Worker(mega.nodedecBlobURI || "nodedec.js");
+            var w = new Worker(workerURL);
 
             w.onmessage = worker_procmsg;
             w.onerror   = function(err) {
@@ -8793,7 +8810,7 @@ function loadfm_done(mDBload) {
                         loadfm.chatloaded  = Date.now();
                     });
 
-                if (location.hash.substr(0, 8) === '#fm/chat') {
+                if (getSitePath().substr(0, 8) === '/fm/chat') {
                     // Keep the "decrypting" step until the chat have loaded.
                     hideLoadingDialog = false;
                 }

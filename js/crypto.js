@@ -1881,7 +1881,7 @@ function api_reqfailed(c, e) {
         Soon(function() {
             showToast('clipboard', l[19]);
         });
-        document.location.hash = 'login';
+        loadSubPage('login');
     }
     else if (c == 2 && e == ETOOMANY) {
         // too many pending SC requests - reload from scratch

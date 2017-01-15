@@ -241,7 +241,7 @@ var astroPayDialog = {
             if (M.account) {
                 M.account.lastupdate = 0;
             }
-            window.location.hash = 'fm/account/history';
+            loadSubPage('fm/account/history');
         });
     }
 };
@@ -296,9 +296,9 @@ function init_pro()
             }
         });
     }
-    if (document.location.hash.indexOf('#pro/') > -1)
+    if (getSitePath().indexOf('pro/') > -1)
     {
-        localStorage.affid = document.location.hash.replace('#pro/','');
+        localStorage.affid = getSitePath().replace('pro/','');
         localStorage.affts = new Date().getTime();
     }
 
@@ -320,9 +320,9 @@ function init_pro()
 
             if (account_type_num === '0') {
                 if (page === 'fm') {
-                    document.location.hash = '#start';
+                    loadSubPage('start');
                 } else {
-                    document.location.hash = '#fm';
+                    loadSubPage('fm');
                 }
                 return false;
             }
@@ -408,9 +408,9 @@ function init_pro()
 
             if (account_type_num === '0') {
                 if (page === 'fm') {
-                    document.location.hash = '#start';
+                    loadSubPage('start');
                 } else {
-                    document.location.hash = '#fm';
+                    loadSubPage('fm');
                 }
                 return false;
             }
@@ -431,7 +431,7 @@ function init_pro()
         $('.pro-bottom-button').unbind('click');
         $('.pro-bottom-button').bind('click',function(e)
         {
-            document.location.hash = 'contact';
+            loadSubPage('contact');
         });
     }
 
@@ -475,9 +475,14 @@ function pro_next_step(proPlanName) {
     if (proPlanName !== 'lite') {
         proPlanName = proPlanName.length;
     }
-    if (location.hash.split('_').pop() != proPlanName) {
-        window.skipHashChange = true;
-        location.hash = 'pro_' + proPlanName;
+    if (getSitePath().split('_').pop() != proPlanName) {
+        if (hashLogic) {
+            window.skipHashChange = true;
+            location.hash = 'pro_' + proPlanName;
+        }
+        else {
+            history.pushState({ subpage: 'pro_' + proPlanName }, "", 'pro_' + proPlanName);
+        }
     }
 
     var currentDate = new Date(),
@@ -488,10 +493,12 @@ function pro_next_step(proPlanName) {
 
     // Add hyperlink to mobile payment providers at top of #pro page step 2
     var $otherPaymentProviders = $('.membership-step2 .other-payment-providers');
-    var linkHtml = $otherPaymentProviders.html().replace('[A]', '<a href="#mobile">');
+    var linkHtml = $otherPaymentProviders.html().replace('[A]', '<a href="/mobile" class="clickurl">');
     linkHtml = linkHtml.replace('[/A]', '</a>');
     linkHtml = linkHtml.replace('Android', '');
     $otherPaymentProviders.safeHTML(linkHtml);
+
+    clickURLs();
 
     // Stylise the "PURCHASE" text in the 3rd instruction
     var $paymentInstructions = $('.membership-step2 .payment-instructions');
@@ -762,7 +769,7 @@ var proPage = {
 
             // If last payment was Bitcoin, we need to redirect to the account page
             if (this.lastPaymentProviderId === 4) {
-                window.location.hash = 'fm/account/history';
+                loadSubPage('fm/account/history');
             }
         }
     },
@@ -821,12 +828,16 @@ var proPage = {
 
             // Replace text with proper link
             var $linkText = $noPlansSuitable.find('.no-plans-suitable-text');
-            var newLinkText = $linkText.html().replace('[A]', '<a href="#contact">').replace('[/A]', '</a>');
-            $linkText.html(newLinkText);
+            var newLinkText = $linkText.html()
+                .replace('[A]', '<a href="/contact" class="clickurl">')
+                .replace('[/A]', '</a>');
+            $linkText.safeHTML(newLinkText);
+
+            clickURLs();
 
             // Redirect to #contact
             $noPlansSuitable.find('.btn-request-plan').rebind('click', function() {
-                document.location.hash = 'contact';
+                loadSubPage('contact');
             });
         }
     },
@@ -1768,9 +1779,11 @@ var voucherDialog = {
 
         // Translate text
         var html = this.$dialog.find('.voucher-information-help').html();
-            html = html.replace('[A]', '<a href="#resellers" class="voucher-reseller-link">');
+            html = html.replace('[A]', '<a href="/resellers" class="voucher-reseller-link clickurl">');
             html = html.replace('[/A]', '</a>');
         this.$dialog.find('.voucher-information-help').html(html);
+
+        clickURLs();
 
         // Reset state to hide voucher input
         voucherDialog.$dialog.find('.voucher-input-container').fadeOut('fast', function() {
@@ -2018,7 +2031,7 @@ var voucherDialog = {
             if (M.account) {
                 M.account.lastupdate = 0;
             }
-            window.location.hash = 'fm/account/history';
+            loadSubPage('fm/account/history');
         });
     }
 };
@@ -2206,7 +2219,7 @@ var paysafecard = {
     showConnectionError: function() {
         msgDialog('warninga', l[7235], l[7233], '', function() {
             proPage.hideLoadingOverlay();
-            document.location.hash = "pro"; // redirect to remove any query parameters from the url
+            loadSubPage('pro'); // redirect to remove any query parameters from the url
         });
     },
 
@@ -2215,7 +2228,7 @@ var paysafecard = {
      */
     showPaymentError: function() {
         msgDialog('warninga', l[7235], l[7234], '', function() {
-            document.location.hash = "pro"; // redirect to remove any query parameters from the url
+            loadSubPage('pro'); // redirect to remove any query parameters from the url
         });
     },
 
@@ -2246,7 +2259,7 @@ var paysafecard = {
                     }
                     else {
                         // Continue to account screen
-                        document.location.hash = "account";
+                        loadSubPage('account');
                     }
                 }
             });
@@ -2673,7 +2686,7 @@ var addressDialog = {
                 if (M.account) {
                     M.account.lastupdate = 0;
                 }
-                window.location.hash = 'fm/account/history';
+                loadSubPage('fm/account/history');
             });
         }
         else {
@@ -3111,7 +3124,7 @@ var cardDialog = {
             if (M.account) {
                 M.account.lastupdate = 0;
             }
-            window.location.hash = 'fm/account/history';
+            loadSubPage('fm/account/history');
         });
     },
 
@@ -3473,13 +3486,15 @@ function showLoginDialog(email) {
     $('.top-login-forgot-pass', $dialog).unbind('click');
     $('.top-login-forgot-pass', $dialog).bind('click',function(e)
     {
-        document.location.hash = 'recovery';
+        loadSubPage('recovery');
     });
 
     $('.top-dialog-login-button', $dialog).unbind('click');
     $('.top-dialog-login-button', $dialog).bind('click',function(e) {
         doProLogin($dialog);
     });
+
+    clickURLs();
 };
 
 var doProLogin = function($dialog) {

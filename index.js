@@ -1612,7 +1612,9 @@ function topmenuUI() {
             $('.activity-status-block').find('.activity-status')
                 .attr('class', 'top ' + $(this).find('.activity-status').attr('class'));
             $('.activity-status-block').removeClass('active');
+
             $('.top-user-status-popup').addClass('hidden');
+
             if (!megaChatIsReady && !megaChatIsDisabled) {
                 var presence = $(this).data("presence");
                 localStorage.megaChatPresence = presence;

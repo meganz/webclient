@@ -14253,28 +14253,32 @@ h5.main-italic-header {
     border: 2px solid #d9d9d9;
     margin: 8px;
 }
-body:not(.en):not(.ar):not(.fr):not(.de):not(.dk):not(.se):not(.fi):not(.pl):not(.cz):not(.sl):not(.hu):not(.jp):not(.cn):not(.ct):not(.kr):not(.ar):not(.he):not(.id):not(.sg):not(.tr):not(.hr):not(.sr):not(.th):not(.fa):not(.ee):not(.tl):not(.vi) .reg-st3-big-txt {
-    font-size: 20px;
-    line-height: 26px;
+body.ru .reg-st3-big-txt {
+    font-size: 16px;
+    
 }
-body:not(.en):not(.ar):not(.fr):not(.de):not(.dk):not(.se):not(.fi):not(.pl):not(.cz):not(.sl):not(.hu):not(.jp):not(.cn):not(.ct):not(.kr):not(.ar):not(.he):not(.id):not(.sg):not(.tr):not(.hr):not(.sr):not(.th):not(.fa):not(.ee):not(.tl):not(.vi) .reg-st3-big-txt span, body:not(.en):not(.ar):not(.fr):not(.de):not(.dk):not(.se):not(.fi):not(.pl):not(.cz):not(.sl):not(.hu):not(.jp):not(.cn):not(.ct):not(.kr):not(.ar):not(.he):not(.id):not(.sg):not(.tr):not(.hr):not(.sr):not(.th):not(.fa):not(.ee):not(.tl):not(.vi) .reg-st3-mid-txt, body.key.de .reg-st3-big-txt span, body.key.de .reg-st3-mid-txt, body.key.hu .reg-st3-big-txt span, body.key.hu .reg-st3-mid-txt, body.key.fr .reg-st3-big-txt span, body.key.fr .reg-st3-mid-txt, body.key.se .reg-st3-big-txt span, body.key.se .reg-st3-mid-txt, body.key.dk .reg-st3-big-txt span, body.key.dk .reg-st3-mid-txt, body.key.ee .reg-st3-big-txt span, body.key.ee .reg-st3-mid-txt, body.key.fi .reg-st3-big-txt span, body.key.fi .reg-st3-mid-txt, body.key.hr .reg-st3-big-txt span, body.key.hr .reg-st3-mid-txt, body.key.sl .reg-st3-big-txt span, body.key.sl .reg-st3-mid-txt, body.key.sr .reg-st3-big-txt span, body.key.sr .reg-st3-mid-txt, body.key.vi .reg-st3-big-txt span, body.key.vi .reg-st3-mid-txt {
+body.de .reg-st3-mid-txt, body.de.key .free .reg-st3-big-txt span,
+body.br .reg-st3-mid-txt, body.br.key .free .reg-st3-big-txt span,
+body.nl.key .reg-st3-mid-txt, body.nl.key .free .reg-st3-big-txt span,
+body.tr.key .reg-st3-mid-txt, body.tr.key .free .reg-st3-big-txt span,
+body.es .reg-st3-mid-txt, body.es.key .free .reg-st3-big-txt span,
+body.it.key .reg-st3-mid-txt, body.it.key .free .reg-st3-big-txt span,
+body.ro .reg-st3-mid-txt, body.ro.key .free .reg-st3-big-txt span,
+body.ru .reg-st3-mid-txt, body.ru.key .free .reg-st3-big-txt span {
+    font-size: 13px;
+    line-height: 36px;
+}
+body.de .reg-st3-bandwidth .reg-st3-mid-txt,
+body.br .reg-st3-bandwidth .reg-st3-mid-txt,
+body.nl.key .reg-st3-bandwidth .reg-st3-mid-txt,
+body.tr.key .reg-st3-bandwidth .reg-st3-mid-txt,
+body.es .reg-st3-bandwidth .reg-st3-mid-txt,
+body.it.key .reg-st3-bandwidth .reg-st3-mid-txt,
+body.ro .reg-st3-bandwidth .reg-st3-mid-txt,
+body.ru .reg-st3-bandwidth .reg-st3-mid-txt {
     font-size: 13px;
 }
-body:not(.en):not(.ar):not(.fr):not(.de):not(.dk):not(.cz):not(.hu):not(.jp):not(.cn):not(.ct):not(.kr):not(.ar):not(.he):not(.id):not(.sg):not(.sr):not(.th):not(.fa):not(.ee):not(.tl) .reg-st3-storage, body:not(.en):not(.ar):not(.fr):not(.de):not(.dk):not(.cz):not(.hu):not(.jp):not(.cn):not(.ct):not(.kr):not(.ar):not(.he):not(.id):not(.sg):not(.sr):not(.th):not(.fa):not(.ee):not(.tl) .reg-st3-bandwidth {
-    padding-left: 20px;
-    padding-right: 20px;
-}
-body.key.ka .reg-st3-big-txt, body.key.ka .reg-st3-mid-txt, body.key.uk .reg-st3-big-txt, body.key.uk .reg-st3-mid-txt {
-    float: none;
-    height: 22px;
-    line-height: 20px;
-}
-body.key.ka .reg-st3-storage, body.key.uk .reg-st3-storage {
-    padding-top: 8px;
-}
-body.key.ka .reg-st3-bandwidth, body.key.uk .reg-st3-bandwidth {
-    padding-top: 2px;
-}
+
 .no .membership-new-offer text, .kr .membership-new-offer text, .ct .membership-new-offer text {
     transform: translate(37.500000px, 39.000000px) rotate(-45.000000deg) translate(-27.500000px, -39.000000px) !important;
 }
@@ -15024,13 +15028,6 @@ body.key.ka .reg-st3-bandwidth, body.key.uk .reg-st3-bandwidth {
     line-height: 20px;
     right: 11px;
     margin: 33px 0 0 0;
-}
-.th .reg-st3-mid-txt {
-    font-size: 14px;
-}
-.ar .reg-st3-mid-txt {
-    font-size: 17px;
-    line-height: 20px;
 }
 .reg-st3-percents {
     text-align: center;
@@ -26242,20 +26239,50 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', e
 }
 }
 
-@media only screen and (max-width: 1296px) {
-body.key.ru .reg-st3-big-txt, body.key.ru .reg-st3-mid-txt, body.key.hu .reg-st3-big-txt, body.key.hu .reg-st3-mid-txt, body.key.sr .reg-st3-big-txt, body.key.sr .reg-st3-mid-txt {
-    float: none;
-    height: 22px;
-    line-height: 20px;
-}
-body.key.ru .reg-st3-storage, body.key.hu .reg-st3-storage, body.key.sr .reg-st3-storage {
-    padding-top: 8px;
-}
-body.key.ru .reg-st3-bandwidth, body.key.hu .reg-st3-bandwidth, body.key.sr .reg-st3-bandwidth {
-    padding-top: 2px;
-}
-}
 
+@media only screen and (max-width: 1268px) {
+body.key.de .reg-st3-big-txt, body.key.de .reg-st3-mid-txt,
+body.key.br .reg-st3-big-txt, body.key.br .reg-st3-mid-txt,
+body.key.nl .reg-st3-big-txt, body.key.nl .reg-st3-mid-txt,
+body.key.tr .reg-st3-big-txt, body.key.tr .reg-st3-mid-txt,
+body.key.es .reg-st3-big-txt, body.key.es .reg-st3-mid-txt,
+body.key.it .reg-st3-big-txt, body.key.it .reg-st3-mid-txt,
+body.key.ro .reg-st3-big-txt, body.key.ro .reg-st3-mid-txt,
+body.key.vi .reg-st3-big-txt, body.key.vi .reg-st3-mid-txt,
+body.key.ru .reg-st3-big-txt, body.key.ru .reg-st3-mid-txt {
+    float: none;
+        height: 24px;
+    line-height: 24px;
+}
+body.key.de .reg-st3-storage,
+body.key.br .reg-st3-storage,
+body.key.nl .reg-st3-storage,
+body.key.tr .reg-st3-storage,
+body.key.es .reg-st3-storage,
+body.key.it .reg-st3-storage,
+body.key.ro .reg-st3-storage,
+body.key.vi .reg-st3-storage,
+body.key.ru .reg-st3-storage {
+padding-top: 7px;
+    height: 44px;
+}
+body.key.de .reg-st3-bandwidth,
+body.key.br .reg-st3-bandwidth,
+body.key.nl .reg-st3-bandwidth,
+body.key.tr .reg-st3-bandwidth,
+body.key.es .reg-st3-bandwidth,
+body.key.it .reg-st3-bandwidth,
+body.key.ro .reg-st3-bandwidth,
+body.key.vi .reg-st3-bandwidth,
+body.key.ru .reg-st3-bandwidth {
+    padding-top: 5px;
+    height: 48px;
+}
+body.key.vi .reg-st3-mid-txt, body.key.vi .reg-st3-mid-txt {
+    font-size: 14px;
+    line-height: 22px;
+}
+}
 @media only screen and (max-width: 1260px) {
 .transfer-table td:nth-child(3), .transfer-table-header th:nth-child(3) {
     width: 192px;
@@ -26278,36 +26305,15 @@ body.key.ru .reg-st3-bandwidth, body.key.hu .reg-st3-bandwidth, body.key.sr .reg
     -webkit-border-radius: 12px;
     border-radius: 12px;
 }
+body.key.th .reg-st3-mid-txt, body.key.th .reg-st3-mid-txt,
+body.key.id .reg-st3-mid-txt, body.key.id .reg-st3-mid-txt,
+body.key.fr .reg-st3-mid-txt, body.key.fr .reg-st3-mid-txt,
+body.key.jp .reg-st3-mid-txt, body.key.jp .reg-st3-mid-txt {
+    font-size: 14px;
+    line-height: 34px;
+}
 }
 
-@media only screen and (max-width: 1188px) {
-.key .reg-st3-big-txt {
-    font-size: 20px;
-    line-height: 26px;
-}
-.key .reg-st3-big-txt span, .key .reg-st3-mid-txt {
-    font-size: 14px;
-}
-body.key:not(.en):not(.ar):not(.se):not(.jp):not(.cn):not(.ct):not(.kr):not(.ar):not(.he):not(.id):not(.sg):not(.th):not(.fa):not(.tl) .reg-st3-big-txt span, body.key:not(.en):not(.ar):not(.se):not(.jp):not(.cn):not(.ct):not(.kr):not(.ar):not(.he):not(.id):not(.sg):not(.th):not(.fa):not(.tl) .reg-st3-mid-txt {
-    font-size: 13px;
-    line-height: 26px;
-    vertical-align: top;
-}
-body.key:not(.en):not(.ar):not(.se):not(.jp):not(.cn):not(.ct):not(.kr):not(.ar):not(.he):not(.id):not(.sg):not(.th):not(.fa):not(.tl) .reg-st3-storage {
-    padding-top: 8px;
-}
-body.key:not(.en):not(.ar):not(.se):not(.jp):not(.cn):not(.ct):not(.kr):not(.ar):not(.he):not(.id):not(.sg):not(.th):not(.fa):not(.tl) .reg-st3-bandwidth {
-    padding-top: 2px;
-}
-body.key:not(.en):not(.ar):not(.se):not(.jp):not(.cn):not(.ct):not(.kr):not(.ar):not(.he):not(.id):not(.sg):not(.th):not(.fa):not(.tl) .reg-st3-big-txt {
-    font-size: 20px;
-}
-body.key:not(.en):not(.ar):not(.se):not(.jp):not(.cn):not(.ct):not(.kr):not(.ar):not(.he):not(.id):not(.sg):not(.th):not(.tl) .reg-st3-big-txt, body.key:not(.en):not(.ar):not(.se):not(.jp):not(.cn):not(.ct):not(.kr):not(.ar):not(.he):not(.id):not(.sg):not(.th):not(.tl) .reg-st3-mid-txt {
-    float: none;
-    height: 20px;
-    line-height: 20px;
-}
-}
 
 @media only screen and (max-width: 1100px) {
 .ads-right-block, .products-right-block {

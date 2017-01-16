@@ -343,7 +343,10 @@ function init_page() {
         }
 
         if (fminitialized) {
+            // Clean up internal state in case we're navigating back to a folderlink
             M.currentdirid = undefined;
+            delete $.onImportCopyNodes;
+            delete $.mcImport;
         }
     }
     else if (!flhashchange || page !== 'fm/transfers') {

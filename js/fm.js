@@ -7209,9 +7209,7 @@ function menuItems() {
         delete items['.copy-item'];
         delete items['.add-star-item'];
         delete items['.colour-label-items'];
-        if (u_type) {
-            items['.import-item'] = 1;
-        }
+        items['.import-item'] = 1;
     }
 
     return items;
@@ -8641,6 +8639,9 @@ function handleDialogContent(dialogTabClass, parentTag, newFolderButton, dialogP
 
         // XXX: Ideally show some notification that importing from folder link to anything else than the cloud isn't supported.
         $('.copy-dialog-button.' + dialogTabClass).fadeOut(200).fadeIn(100);
+        // clicking the shares tab deactivates the "Import" button, restore it.
+        $('.dialog-copy-button').removeClass('disabled');
+        $.mcselected = $.mcselected || M.RootID;
 
         return;
     }

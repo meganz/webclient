@@ -14264,7 +14264,16 @@ body.tr.key .reg-st3-mid-txt, body.tr.key .free .reg-st3-big-txt span,
 body.es .reg-st3-mid-txt, body.es.key .free .reg-st3-big-txt span,
 body.it.key .reg-st3-mid-txt, body.it.key .free .reg-st3-big-txt span,
 body.ro .reg-st3-mid-txt, body.ro.key .free .reg-st3-big-txt span,
-body.ru .reg-st3-mid-txt, body.ru.key .free .reg-st3-big-txt span {
+body.ru .reg-st3-mid-txt, body.ru.key .free .reg-st3-big-txt span,
+body.bg .reg-st3-mid-txt, body.bg.key .free .reg-st3-big-txt span,
+body.pl.key .reg-st3-mid-txt, body.pl.key .free .reg-st3-big-txt span,
+body.sr.key .reg-st3-mid-txt, body.sr.key .free .reg-st3-big-txt span,
+body.fa.key .reg-st3-mid-txt, body.fa.key .free .reg-st3-big-txt span,
+body.se.key .reg-st3-mid-txt, body.se.key .free .reg-st3-big-txt span,
+body.tl.key .reg-st3-mid-txt, body.tl.key .free .reg-st3-big-txt span,
+body.fi.key .reg-st3-mid-txt, body.fi.key .free .reg-st3-big-txt span,
+body.sk .reg-st3-mid-txt, body.sk.key .free .reg-st3-big-txt span,
+body.uk.key .reg-st3-mid-txt, body.uk.key .free .reg-st3-big-txt span {
     font-size: 13px;
     line-height: 36px;
 }
@@ -14275,7 +14284,16 @@ body.tr.key .reg-st3-bandwidth .reg-st3-mid-txt,
 body.es .reg-st3-bandwidth .reg-st3-mid-txt,
 body.it.key .reg-st3-bandwidth .reg-st3-mid-txt,
 body.ro .reg-st3-bandwidth .reg-st3-mid-txt,
-body.ru .reg-st3-bandwidth .reg-st3-mid-txt {
+body.ru .reg-st3-bandwidth .reg-st3-mid-txt,
+body.bg .reg-st3-bandwidth .reg-st3-mid-txt,
+body.pl.key .reg-st3-bandwidth .reg-st3-mid-txt,
+body.sr.key .reg-st3-bandwidth .reg-st3-mid-txt,
+body.fa.key .reg-st3-bandwidth .reg-st3-mid-txt,
+body.se.key .reg-st3-bandwidth .reg-st3-mid-txt,
+body.tl.key .reg-st3-bandwidth .reg-st3-mid-txt,
+body.fi.key .reg-st3-bandwidth .reg-st3-mid-txt,
+body.sk .reg-st3-bandwidth .reg-st3-mid-txt,
+body.uk.key .reg-st3-bandwidth .reg-st3-mid-txt {
     font-size: 13px;
 }
 
@@ -26249,7 +26267,12 @@ body.key.es .reg-st3-big-txt, body.key.es .reg-st3-mid-txt,
 body.key.it .reg-st3-big-txt, body.key.it .reg-st3-mid-txt,
 body.key.ro .reg-st3-big-txt, body.key.ro .reg-st3-mid-txt,
 body.key.vi .reg-st3-big-txt, body.key.vi .reg-st3-mid-txt,
-body.key.ru .reg-st3-big-txt, body.key.ru .reg-st3-mid-txt {
+body.key.ru .reg-st3-big-txt, body.key.ru .reg-st3-mid-txt,
+body.key.bg .reg-st3-big-txt, body.key.bg .reg-st3-mid-txt,
+body.key.pl .reg-st3-big-txt, body.key.pl .reg-st3-mid-txt,
+body.key.sr .reg-st3-big-txt, body.key.sr .reg-st3-mid-txt,
+body.key.fa .reg-st3-big-txt, body.key.fa .reg-st3-mid-txt,
+body.key.sk .reg-st3-big-txt, body.key.sk .reg-st3-mid-txt {
     float: none;
         height: 24px;
     line-height: 24px;
@@ -26262,7 +26285,12 @@ body.key.es .reg-st3-storage,
 body.key.it .reg-st3-storage,
 body.key.ro .reg-st3-storage,
 body.key.vi .reg-st3-storage,
-body.key.ru .reg-st3-storage {
+body.key.ru .reg-st3-storage,
+body.key.bg .reg-st3-storage,
+body.key.pl .reg-st3-storage,
+body.key.sr .reg-st3-storage,
+body.key.fa .reg-st3-storage,
+body.key.sk .reg-st3-storage {
 padding-top: 7px;
     height: 44px;
 }
@@ -26274,7 +26302,12 @@ body.key.es .reg-st3-bandwidth,
 body.key.it .reg-st3-bandwidth,
 body.key.ro .reg-st3-bandwidth,
 body.key.vi .reg-st3-bandwidth,
-body.key.ru .reg-st3-bandwidth {
+body.key.ru .reg-st3-bandwidth,
+body.key.bg .reg-st3-bandwidth,
+body.key.pl .reg-st3-bandwidth,
+body.key.sr .reg-st3-bandwidth,
+body.key.fa .reg-st3-bandwidth,
+body.key.sk .reg-st3-bandwidth {
     padding-top: 5px;
     height: 48px;
 }
@@ -26308,7 +26341,8 @@ body.key.vi .reg-st3-mid-txt, body.key.vi .reg-st3-mid-txt {
 body.key.th .reg-st3-mid-txt, body.key.th .reg-st3-mid-txt,
 body.key.id .reg-st3-mid-txt, body.key.id .reg-st3-mid-txt,
 body.key.fr .reg-st3-mid-txt, body.key.fr .reg-st3-mid-txt,
-body.key.jp .reg-st3-mid-txt, body.key.jp .reg-st3-mid-txt {
+body.key.jp .reg-st3-mid-txt, body.key.jp .reg-st3-mid-txt,
+body.key.sl .reg-st3-mid-txt, body.key.sl .reg-st3-mid-txt {
     font-size: 14px;
     line-height: 34px;
 }

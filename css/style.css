@@ -2141,6 +2141,8 @@ a.nt-settings-button:hover span {
 .jspContainer {
     overflow: hidden;
     position: relative;
+    min-height: 100%;
+    min-width: 100%;
 }
 .jspPane {
     position: absolute;
@@ -3804,6 +3806,7 @@ label.iPhoneCheckLabelOff span {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
+    min-width: 100%;
 }
 .fm-left-menu.dashboard + .nw-tree-panel-header + .fm-tree-panel {
     height: 100%;
@@ -20935,7 +20938,7 @@ ul.token-input-list-mega li input, .multiple-input input {
 li.token-input-token-mega {
     overflow: hidden;
     height: 20px;
-    line-height: 18px;
+    line-height: 19px;
     margin: 6px 3px 2px 3px;
     padding: 0 20px 0 24px;
     background-color: white;

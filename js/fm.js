@@ -7456,8 +7456,8 @@ function setContextMenuGetLinkText() {
 
     // Set the text for the 'Get/Update link/s' and 'Remove link/s' context menu items
     var $contextMenu = $('.dropdown.body');
-    $contextMenu.find('.getlink-menu-text').text(getLinkText);
-    $contextMenu.find('.removelink-menu-text').text(removeLinkText);
+    $contextMenu.find('.getlink-item span').text(getLinkText);
+    $contextMenu.find('.removelink-item span').text(removeLinkText);
 }
 
 /**

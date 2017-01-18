@@ -136,8 +136,6 @@ function crypto_decryptnode(n) {
                     }
                 }
             }
-
-            n.p = n.su;
         }
 
         // does the logged in user own the node? (user key is guaranteed to be located first in .k)

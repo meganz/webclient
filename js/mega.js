@@ -621,7 +621,7 @@ function MegaData()
     this.filterByParent = function(id) {
         if (id === 'shares') {
             this.filterBy(function(node) {
-                return (node.p === 'shares') || (node.p && node.p.length === 11);
+                return node.su;
             });
         }
         else if (id === 'contacts') {
@@ -1863,6 +1863,8 @@ function MegaData()
 
         var share = new mega.Share({});
 
+        var inshares = n.h == 'shares';
+
         /*
          * XXX: Initially this function was designed to render new nodes only,
          * but due to a bug the entire tree was being rendered/created from
@@ -1886,7 +1888,7 @@ function MegaData()
                 $('.' + dialog + ' .cloud-drive .dialog-content-block').html('<ul id="mctreesub_' + htmlentities(M.RootID) + '"></ul>');
             }
         }
-        else if (n.h === 'shares') {
+        else if (inshares) {
             if (typeof dialog === 'undefined') {
                 $('.content-panel.shared-with-me').html('<ul id="treesub_shares"></ul>');
             }
@@ -1934,6 +1936,11 @@ function MegaData()
             folders = [];
 
             for (var i in this.c[n.h]) {
+                // skip subshares
+                if (inshares && this.d[this.d[i].p]) {
+                    continue;
+                }
+
                 if (this.d[i] && (this.d[i].t === 1)) {
                     folders.push(this.d[i]);
                 }
@@ -2485,8 +2492,8 @@ function MegaData()
             }
         }
 
-        if (n.p && n.p.length === 11 && !M.d[n.p]) {
-            var u = this.u[n.p];
+        if (n.su) {
+            var u = this.u[n.su];
             if (u) {
                 u.h = u.u;
                 u.t = 1;
@@ -2494,7 +2501,7 @@ function MegaData()
                 M.addNode(u);
             }
             else {
-                console.log('No user record for incoming share', n.p, this.u[n.p]);
+                console.log('No user record for incoming share', n.su);
             }
         }
 
@@ -2505,7 +2512,7 @@ function MegaData()
             this.c[n.p][n.h] = 1;
 
             // maintain special incoming shares index
-            if (n.p.length === 11) {
+            if (n.su) {
                 if (n.sk && !u_sharekeys[n.h]) {
                     // extract sharekey from node's sk property
                     var k = crypto_process_sharekey(n.h, n.sk);
@@ -2603,10 +2610,11 @@ function MegaData()
             }
 
             if (M.d[h]) {
-                if (M.d[h].p && M.d[h].p.length === 11) {
+                if (M.d[h].su) {
                     // this is an inbound share
                     delete M.c.shares[h];
                     delInShareQ.push(M.d[h].p + '*' + h);
+                    M.delIndex(M.d[h].su, h);
                 }
 
                 M.delIndex(M.d[h].p, h);
@@ -6466,7 +6474,7 @@ function execsc() {
 
                                     // delete a share:
                                     n = M.d[a.n];
-                                    if (n && n.p.length != 11) {
+                                    if (!n.su) {
                                         // outgoing share removed
                                         delete n.r;
                                         delete n.su;
@@ -6604,7 +6612,7 @@ function execsc() {
 
                     // notification logic
                     if (fminitialized && !folderlink && a.ou && a.ou != u_handle
-                        && scnodes.length && scnodes[0].p && scnodes[0].p.length < 11
+                        && scnodes.length && scnodes[0].p && !scnodes[0].su
                         && !tmoveid && !tparentid) {
 
                         var targetid = scnodes[0].p;
@@ -7128,6 +7136,15 @@ function tree_ok0(ok) {
 // FIXME: call from M.addNode() to avoid code duplication
 function emplacenode(node) {
     if (node.p) {
+        // we have to add M.c[sharinguserhandle] records explicitly as
+        // node.p has ceased to be the sharing user handle
+        if (node.su) {
+            if (!M.c[node.su]) {
+                M.c[node.su] = [];
+            }
+            M.c[node.su][node.h] = node.t + 1;
+        }
+
         if (!M.c[node.p]) {
             M.c[node.p] = [];
         }
@@ -7261,8 +7278,8 @@ function worker_procmsg(ev) {
         }
         else {
             // maintain special incoming shares index
-            if (ev.data.p.length == 11) {
-                M.c.shares[ev.data.h] = { su : ev.data.p, r : ev.data.r };
+            if (ev.data.su) {
+                M.c.shares[ev.data.h] = { su : ev.data.su, r : ev.data.r };
 
                 if (u_sharekeys[ev.data.h]) {
                     M.c.shares[ev.data.h].sk = u_sharekeys[ev.data.h][0];

@@ -1287,7 +1287,7 @@ function MegaData()
                     var shareId = window.location.hash.replace('#fm/', '');
 
                     // Remove user from the share
-                    removeShare (shareId);
+                    leaveShare(shareId);
 
                     // Open the shares folder
                     M.openFolder('shares', true);

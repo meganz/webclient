@@ -2099,32 +2099,25 @@ function ephemeralDialog(msg) {
     });
 }
 
-/**
- * Removes the user from the share
- *
- * @param {String} shareId The share id
- * @param {Boolean} nfk
- */
-function removeShare(shareId, nfk) {
-
+// leave incoming share h
+function leaveShare(h) {
     if (d) {
-        console.log('removeShare', shareId);
+        console.log('leaveShare', h);
     }
 
-    if (!nfk) {
-        api_updfkey(shareId);
+    // leaving inner nested shares is not allowed: walk to the share root
+    while (M.d[h] && M.d[h].p.length == 8) {
+        h = M.d[h].p;
     }
 
-    M.delNode(shareId, true);   // must not update DB pre-API
-    api_req({ a: 'd', n: shareId/*, i: requesti*/ });
+    if (M.d[h] && M.d[h].p.length == 11) {
+        M.delNode(h, true);   // must not update DB pre-API
+        api_req({ a: 'd', n: h/*, i: requesti*/ });
 
-    M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
+        M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
 
-    if ((M.currentdirid === shareId) || (isCircular(shareId, M.currentdirid) === true)) {
-        M.openFolder(RootbyId(shareId));
+        delete u_sharekeys[h];
     }
-
-    delete u_sharekeys[shareId];
 }
 
 function fmremove() {
@@ -2160,7 +2153,7 @@ function fmremove() {
 
     if (removesharecnt) {
         for (var i in $.selected) {
-            removeShare($.selected[i]);
+            leaveShare($.selected[i]);
         }
         M.openFolder('shares', true);
     }
@@ -2189,7 +2182,7 @@ function fmremove() {
                     if (M.c[selected]) {
                         Object.keys(M.c[selected])
                             .forEach(function(sharenode) {
-                                removeShare(sharenode, 1);
+                                leaveShare(sharenode);
                             });
                     }
 

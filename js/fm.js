@@ -7153,26 +7153,19 @@ function menuItems() {
         items['.remove-item'] = 1;
     }
 
-    if (selItem && ($.selected.length === 1) && selItem.t) {
-        items['.open-item'] = 1;
-    }
+    if (selItem && $.selected.length === 1) {
+        if (selItem.t) {
+            if (M.currentdirid !== selItem.h) {
+                items['.open-item'] = 1;
+            }
 
-    if (
-        selItem
-        && ($.selected.length === 1)
-        && is_image(selItem)
-        ) {
-        items['.preview-item'] = 1;
-    }
-
-    if (
-        selItem
-        && (sourceRoot === M.RootID)
-        && ($.selected.length === 1)
-        && selItem.t
-        && !folderlink
-        ) {
-        items['.sh4r1ng-item'] = 1;
+            if (sourceRoot === M.RootID && !folderlink) {
+                items['.sh4r1ng-item'] = 1;
+            }
+        }
+        else if (is_image(selItem)) {
+            items['.preview-item'] = 1;
+        }
     }
 
     if ((sourceRoot === M.RootID) && !folderlink) {
@@ -12517,6 +12510,11 @@ function sharedFolderUI() {
             + '</div>');
 
         $(rightPanelView).addClass('shared-folder-content');
+
+        if (c) {
+            // hide leave-share under non-root shares
+            $('.fm-leave-share').addClass('hidden');
+        }
 
         Soon(function() {
             $(window).trigger('resize');

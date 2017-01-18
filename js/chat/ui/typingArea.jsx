@@ -14,7 +14,7 @@ var TypingArea = React.createClass({
     mixins: [MegaRenderMixin, RenderDebugger],
     getDefaultProps: function() {
         return {
-            'textareaMaxHeight': 100
+            'textareaMaxHeight': "40%"
         };
     },
     getInitialState: function () {
@@ -408,6 +408,22 @@ var TypingArea = React.createClass({
             maintainPosition: false
         });
     },
+    getTextareaMaxHeight: function() {
+        var self = this;
+        var textareaMaxHeight = self.props.textareaMaxHeight;
+
+        if (String(textareaMaxHeight).indexOf("%") > -1) {
+            textareaMaxHeight = (parseInt(textareaMaxHeight.replace("%", "")) || 0) /100;
+            if (textareaMaxHeight === 0) {
+                textareaMaxHeight = 100;
+            }
+            else {
+                var $messagesContainer = $('.messages-block:visible');
+                textareaMaxHeight = $messagesContainer.height() * textareaMaxHeight;
+            }
+        }
+        return textareaMaxHeight;
+    },
     updateScroll: function(keyEvents) {
         var self = this;
 
@@ -421,8 +437,10 @@ var TypingArea = React.createClass({
 
         var $textarea = $('textarea:first', $node);
         var $textareaClone = $('.message-preview', $node);
-        var textareaMaxHeight = self.props.textareaMaxHeight;
+        var textareaMaxHeight = self.getTextareaMaxHeight();
+
         var $textareaScrollBlock = $('.textarea-scroll', $node);
+
 
         var textareaContent = $textarea.val();
         var cursorPosition = self.getCursorPosition($textarea[0]);
@@ -600,7 +618,7 @@ var TypingArea = React.createClass({
         var textareaScrollBlockStyles = {
             height: Math.min(
                     self.state.textareaHeight,
-                    self.props.textareaMaxHeight
+                    self.getTextareaMaxHeight()
                 )
         };
 

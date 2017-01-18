@@ -7876,7 +7876,7 @@ React.makeElement = React['createElement'];
 	    mixins: [MegaRenderMixin, RenderDebugger],
 	    getDefaultProps: function getDefaultProps() {
 	        return {
-	            'textareaMaxHeight': 100
+	            'textareaMaxHeight': "40%"
 	        };
 	    },
 	    getInitialState: function getInitialState() {
@@ -8238,6 +8238,21 @@ React.makeElement = React['createElement'];
 	            maintainPosition: false
 	        });
 	    },
+	    getTextareaMaxHeight: function getTextareaMaxHeight() {
+	        var self = this;
+	        var textareaMaxHeight = self.props.textareaMaxHeight;
+
+	        if (String(textareaMaxHeight).indexOf("%") > -1) {
+	            textareaMaxHeight = (parseInt(textareaMaxHeight.replace("%", "")) || 0) / 100;
+	            if (textareaMaxHeight === 0) {
+	                textareaMaxHeight = 100;
+	            } else {
+	                var $messagesContainer = $('.messages-block:visible');
+	                textareaMaxHeight = $messagesContainer.height() * textareaMaxHeight;
+	            }
+	        }
+	        return textareaMaxHeight;
+	    },
 	    updateScroll: function updateScroll(keyEvents) {
 	        var self = this;
 
@@ -8249,7 +8264,8 @@ React.makeElement = React['createElement'];
 
 	        var $textarea = $('textarea:first', $node);
 	        var $textareaClone = $('.message-preview', $node);
-	        var textareaMaxHeight = self.props.textareaMaxHeight;
+	        var textareaMaxHeight = self.getTextareaMaxHeight();
+
 	        var $textareaScrollBlock = $('.textarea-scroll', $node);
 
 	        var textareaContent = $textarea.val();
@@ -8391,7 +8407,7 @@ React.makeElement = React['createElement'];
 	        };
 
 	        var textareaScrollBlockStyles = {
-	            height: Math.min(self.state.textareaHeight, self.props.textareaMaxHeight)
+	            height: Math.min(self.state.textareaHeight, self.getTextareaMaxHeight())
 	        };
 
 	        return React.makeElement(

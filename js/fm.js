@@ -2138,7 +2138,7 @@ function fmremove() {
         var n = M.d[$.selected[i]];
 
         // ToDo: Not clear what this represents
-        if (n && n.p.length === 11) {
+        if (n && n.su) {
             removesharecnt++;
         }
 
@@ -12425,7 +12425,7 @@ function sharedFolderUI() {
     var nodeData = M.d[M.currentdirid];
     var browsingSharedContent = false;
     var c;
-
+console.error("sharedFolerUI for " + M.currentdirid);
     // Browsing shared content
     if ($('.shared-details-block').length > 0) {
 
@@ -12436,22 +12436,9 @@ function sharedFolderUI() {
         browsingSharedContent = true;
     }
 
-    // Checks it's not a contact, contacts handles are 11 chars long
-    // file/folder handles are 8 chars long
-    if (!nodeData || (nodeData.p.length !== 11)) {
-
-        // [<current selection handle>, 'owners handle', 'tab name']
-        var p = M.getPath(M.currentdirid);
-        nodeData = null;
-
-        if (p[p.length - 1] === 'shares') {
-            c = M.d[p[0]];
-            nodeData = M.d[p[p.length - 3]];
-
-            if (!nodeData || (nodeData.p.length !== 11)) {
-                nodeData = 0;
-            }
-        }
+    // are we in an inshare?
+    while (nodeData && !nodeData.su) {
+        nodeData = M.d[nodeData.p];
     }
 
     if (nodeData) {

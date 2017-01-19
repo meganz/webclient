@@ -3741,7 +3741,7 @@ function accountUI() {
         var $storageData = $('.account.data-block.storage-data');
         $storageData.removeClass('exceeded');
         perc = Math.round(account.space_used / account.space * 100);
-        perc_c = perc;
+        perc_c = 100;
         if (perc_c > 100) {
             perc_c = 100;
         }
@@ -3768,6 +3768,7 @@ function accountUI() {
 
         // Maximum disk space
         var b2 = bytesToSize(account.space, 0).split(' ');
+        var $storgageData = $('.account.data-block.storage-data'); 
         $storageChart.find('.chart.data .pecents-txt').text(b2[0]);
         $storageChart.find('.chart.data .gb-txt').text(b2[1]);
         $storageChart.find('.chart.data .perc-txt').text(perc_c + '%');
@@ -3794,6 +3795,9 @@ function accountUI() {
         }
         if (b_exceeded || s_exceeded || perc_c > 80) {
             $chartsBlock.find('.chart-warning').rebind('click', function() {
+                window.location.hash = 'pro';
+            });
+            $storgageData.find('.chart-warning, .upgrade-account.button').rebind('click', function() {
                 window.location.hash = 'pro';
             });
         }

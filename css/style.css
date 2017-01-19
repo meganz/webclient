@@ -4196,24 +4196,16 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .nw-fm-tree-item.opened.selected .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.opened.dragover .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.opened:hover .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.opened.selected .nw-fm-tree-shared-folder, .nw-fm-tree-item.opened.dragover .nw-fm-tree-shared-folder, .nw-fm-tree-item.opened:hover .nw-fm-tree-shared-folder, .rubbish-bin .nw-fm-tree-item.opened.selected .nw-fm-tree-folder.shared-folder, .rubbish-bin .nw-fm-tree-item.opened.dragover .nw-fm-tree-folder.shared-folder, .rubbish-bin .nw-fm-tree-item.opened:hover .nw-fm-tree-folder.shared-folder, .rubbish-bin .nw-fm-tree-item.opened.selected .nw-fm-tree-shared-folder, .rubbish-bin .nw-fm-tree-item.opened.dragover .nw-fm-tree-shared-folder, .rubbish-bin .nw-fm-tree-item.opened:hover .nw-fm-tree-shared-folder {
     background-position: -15px -7538px;
 }
-#treesub_shares > li > .nw-fm-tree-item .nw-fm-tree-folder {
+.content-panel.shared-with-me > ul > li > .nw-fm-tree-item > .nw-fm-tree-folder {
     background-position: -15px -7106px;
 }
-#treesub_shares > li > .nw-fm-tree-item.expanded .nw-fm-tree-folder,
-#treesub_shares > li > .nw-fm-tree-item.opened .nw-fm-tree-folder {
-    background-position: -15px -7136px;
-}
-#treesub_shares > li > .nw-fm-tree-item.selected .nw-fm-tree-folder,
-#treesub_shares > li > .nw-fm-tree-item.dragover .nw-fm-tree-folder,
-#treesub_shares > li > .nw-fm-tree-item:hover .nw-fm-tree-folder {
+.content-panel.shared-with-me > ul > li > .nw-fm-tree-item:hover > .nw-fm-tree-folder, .content-panel.shared-with-me > ul > li > .nw-fm-tree-item.selected > .nw-fm-tree-folder, .content-panel.shared-with-me > ul > li > .nw-fm-tree-item.dragover > .nw-fm-tree-folder {
     background-position: -15px -7166px;
 }
-#treesub_shares > li > .nw-fm-tree-item.opened.selected .nw-fm-tree-folder,
-#treesub_shares > li > .nw-fm-tree-item.dragover.opened .nw-fm-tree-folder,
-#treesub_shares > li > .nw-fm-tree-item.opened:hover .nw-fm-tree-folder,
-#treesub_shares > li > .nw-fm-tree-item.expanded.selected .nw-fm-tree-folder,
-#treesub_shares > li > .nw-fm-tree-item.dragover.expanded .nw-fm-tree-folder,
-#treesub_shares > li > .nw-fm-tree-item.expanded:hover .nw-fm-tree-folder {
+.content-panel.shared-with-me > ul > li > .nw-fm-tree-item.expanded > .nw-fm-tree-folder, .content-panel.shared-with-me > ul > li > .nw-fm-tree-item.opened > .nw-fm-tree-folder {
+    background-position: -15px -7136px;
+}
+.content-panel.shared-with-me > ul > li > .nw-fm-tree-item.expanded:hover > .nw-fm-tree-folder, .content-panel.shared-with-me > ul > li > .nw-fm-tree-item.opened:hover > .nw-fm-tree-folder, .content-panel.shared-with-me > ul > li > .nw-fm-tree-item.selected.expanded > .nw-fm-tree-folder, .content-panel.shared-with-me > ul > li > .nw-fm-tree-item.selected.opened > .nw-fm-tree-folder, .content-panel.shared-with-me > ul > li > .nw-fm-tree-item.expanded.dragover > .nw-fm-tree-folder, .content-panel.shared-with-me > ul > li > .nw-fm-tree-item.opened.dragover > .nw-fm-tree-folder {
     background-position: -15px -7196px;
 }
 .nw-contact-item, .add-contact-item {

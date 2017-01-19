@@ -349,7 +349,7 @@ var mobilefm = {
 
         // Map the file extension back to the image icon
         var iconName = fileIcon(node);
-        var iconPath = 'images/mobile/extensions/' + iconName + '.png';
+        var iconPath = staticpath + 'images/mobile/extensions/' + iconName + '.png';
 
         // Update seen property so thumbnails will render
         node.seen = true;

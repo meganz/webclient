@@ -3018,6 +3018,11 @@ function dashboardUI() {
         $('.account.membership-plan').text(l[435]);
     }
 
+    // update avatar
+    $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', true));
+    $('.fm-avatar img').attr('src', useravatar.mine());
+
+
     // Show first name or last name
     if (u_attr.firstname) {
         $('.membership-big-txt.name').text(u_attr.firstname + ' ' + u_attr.lastname);
@@ -3504,7 +3509,6 @@ Object.freeze(dashboardUI);
 
 
 function accountUI() {
-
     var sectionClass;
 
     $('.fm-account-notifications').removeClass('hidden');
@@ -7211,9 +7215,7 @@ function menuItems() {
         delete items['.copy-item'];
         delete items['.add-star-item'];
         delete items['.colour-label-items'];
-        if (u_type) {
-            items['.import-item'] = 1;
-        }
+        items['.import-item'] = 1;
     }
 
     return items;
@@ -7456,8 +7458,8 @@ function setContextMenuGetLinkText() {
 
     // Set the text for the 'Get/Update link/s' and 'Remove link/s' context menu items
     var $contextMenu = $('.dropdown.body');
-    $contextMenu.find('.getlink-menu-text').text(getLinkText);
-    $contextMenu.find('.removelink-menu-text').text(removeLinkText);
+    $contextMenu.find('.getlink-item span').text(getLinkText);
+    $contextMenu.find('.removelink-item span').text(removeLinkText);
 }
 
 /**
@@ -8643,6 +8645,9 @@ function handleDialogContent(dialogTabClass, parentTag, newFolderButton, dialogP
 
         // XXX: Ideally show some notification that importing from folder link to anything else than the cloud isn't supported.
         $('.copy-dialog-button.' + dialogTabClass).fadeOut(200).fadeIn(100);
+        // clicking the shares tab deactivates the "Import" button, restore it.
+        $('.dialog-copy-button').removeClass('disabled');
+        $.mcselected = $.mcselected || M.RootID;
 
         return;
     }

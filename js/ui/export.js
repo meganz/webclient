@@ -1735,16 +1735,21 @@ var exportExpiry = {
     ExportLink.prototype._getFolderExportLinkRequest = function(nodeId) {
 
         var self = this;
-        var childNodes = [];
         var share = M.getNodeShare(nodeId);
 
         // No need to perform an API call if this folder was already exported (Ie, we're updating)
         if (share.h === nodeId) {
-            return self._getExportLinkRequest(nodeId);
+            if (!M.d[nodeId].t || u_sharekeys[nodeId]) {
+                return self._getExportLinkRequest(nodeId);
+            }
+
+            if (d) {
+                console.warn('Missing sharekey for "%s" - relying on s2 to obtain it...', nodeId);
+            }
         }
 
         // Get all child nodes of root folder with nodeId
-        childNodes = fm_getnodes(nodeId);
+        var childNodes = fm_getnodes(nodeId);
         childNodes.push(nodeId);
 
         var sharePromise = api_setshare(nodeId, [{ u: 'EXP', r: 0 }], childNodes);

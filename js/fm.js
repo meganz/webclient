@@ -2100,18 +2100,18 @@ function ephemeralDialog(msg) {
 }
 
 // leave incoming share h
+// FIXME: implement sn tagging to prevent race condition
 function leaveShare(h) {
     if (d) {
         console.log('leaveShare', h);
     }
 
     // leaving inner nested shares is not allowed: walk to the share root
-    while (M.d[h] && !M.d[h].su) {
+    while (M.d[h] && M.d[M.d[h].p]) {
         h = M.d[h].p;
     }
 
     if (M.d[h] && M.d[h].su) {
-        M.delNode(h, true);   // must not update DB pre-API
         api_req({ a: 'd', n: h/*, i: requesti*/ });
 
         M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);

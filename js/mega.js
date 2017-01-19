@@ -6496,18 +6496,21 @@ function execsc() {
 
                                     // delete a share:
                                     n = M.d[a.n];
-                                    if (!n.su) {
-                                        // outgoing share removed
-                                        delete n.r;
-                                        delete n.su;
 
-                                        if (fmdb) {
-                                            M.nodeUpdated(n);
-                                            fmdb.del('s', u_handle + '*' + a.n);
+                                    if (n) {
+                                        if (!n.su) {
+                                            // outgoing share removed
+                                            delete n.r;
+                                            delete n.su;
+
+                                            if (fmdb) {
+                                                M.nodeUpdated(n);
+                                                fmdb.del('s', u_handle + '*' + a.n);
+                                            }
                                         }
-                                    }
-                                    else {
-                                        M.delNode(a.n);
+                                        else {
+                                            M.delNode(a.n);
+                                        }
                                     }
 
                                     if (!folderlink && a.u != 'EXP' && fminitialized) {

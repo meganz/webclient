@@ -40,10 +40,6 @@ function isMobile()
 {
     if (is_chrome_firefox) return false;
 
-    // Flag for testing the mobile site
-    if (localStorage.testMobileSite) {
-        return true;
-    }
     var mobile = ['iphone','ipad','android','blackberry','nokia','opera mini','windows mobile','windows phone','iemobile','mobile safari','bb10; touch'];
     for (var i in mobile) if (ua.indexOf(mobile[i]) > 0) return true;
     return false;
@@ -122,6 +118,13 @@ if (!myURL) {
 if (!String.prototype.trim) {
     String.prototype.trim = function() {
         return this.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
+    };
+}
+if (!String.prototype.localeCompare) {
+    String.prototype.localeCompare = function(to) {
+        var s1 = this.toLowerCase();
+        var s2 = String(to).toLowerCase();
+        return s1 > s2 ? 1 : (s1 < s2 ? -1 : 0);
     };
 }
 if (!String.trim) {

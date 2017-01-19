@@ -2402,7 +2402,7 @@ function api_changepw(ctx, passwordkey, masterkey, oldpw, newpw, email) {
  * Send current node attributes to the API
  * @return {MegaPromise}
  */
-function api_setattr(n) {
+function api_setattr(n, idtag) {
     var promise = new MegaPromise();
     var logger = MegaLogger.getLogger('crypt');
 
@@ -2421,10 +2421,14 @@ function api_setattr(n) {
     try {
         var at = ab_to_base64(crypto_makeattr(n));
 
-        logger.debug('Setting node attributes for "%s"...', n.h);
+        logger.debug('Setting node attributes for "%s"...', n.h, idtag);
 
-        // we do not set i here
-        api_req({ a: 'a', n: n.h, at: at }, ctx);
+        // we do not set i here, unless explicitly specified
+        api_req({a: 'a', n: n.h, at: at, i: idtag}, ctx);
+
+        if (idtag) {
+            M.scAckQueue[idtag] = Date.now();
+        }
     }
     catch (ex) {
         logger.error(ex);
@@ -2611,7 +2615,7 @@ function api_setshare1(ctx, params) {
                     for (j = 4; j--;) {
                         sharekey.push(rand(0x100000000));
                     }
-                    crypto_setsharekey(ctx.node, sharekey);
+                    crypto_setsharekey(ctx.node, sharekey, true);
                 }
 
                 req.ok = a32_to_base64(encrypt_key(u_k_aes, sharekey));
@@ -3981,9 +3985,19 @@ function crypto_fixmissingkeys(hs) {
 }
 
 // set a newly received sharekey - apply to relevant missing key nodes, if any.
-function crypto_setsharekey(h, k) {
+// also, update M.c.shares/FMDB.s if the sharekey was not previously known.
+function crypto_setsharekey(h, k, ignoreDB) {
     u_sharekeys[h] = [k, new sjcl.cipher.aes(k)];
     if (sharemissing[h]) crypto_fixmissingkeys(sharemissing[h]);
+
+    if (M.c.shares[h] && !M.c.shares[h].sk) {
+        M.c.shares[h].sk = a32_to_base64(k);
+
+        if (fmdb && !ignoreDB) {
+            fmdb.add('s', { o_t: M.c.shares[h].su + '*' + h,
+                            d: M.c.shares[h] });
+        }
+    }
 }
 
 // set a newly received nodekey

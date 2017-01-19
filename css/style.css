@@ -6228,7 +6228,7 @@ th.grid-first-th {
     background-position: center top;
     margin: -38px 0 0 -47px;
 }
-.shared-folder-content .block-view-file-type.folder, .contact-details-view .block-view-file-type.folder-shared {
+.contact-details-view .block-view-file-type.folder-shared {
     background-image: url(../images/mega/shared-sprite_v5.svg);
     background-repeat: no-repeat;
     background-position: center 3px;

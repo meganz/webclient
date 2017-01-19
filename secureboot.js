@@ -2545,3 +2545,16 @@ function tryCatch(fn)
     fn.foo.bar = fn;
     return fn.foo;
 }
+
+var onIdle = window.requestIdleCallback || function(handler) {
+        var startTime = Date.now();
+
+        return setTimeout(function() {
+            handler({
+                didTimeout: false,
+                timeRemaining: function() {
+                    return Math.max(0, 50.0 - (Date.now() - startTime));
+                }
+            });
+        }, 1);
+    };

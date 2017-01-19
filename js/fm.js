@@ -2112,11 +2112,9 @@ function leaveShare(h) {
     }
 
     if (M.d[h] && M.d[h].su) {
+        loadingDialog.show(); // this will be hidden somewhere else after processing the action-packet
+
         api_req({ a: 'd', n: h/*, i: requesti*/ });
-
-        M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
-
-        delete u_sharekeys[h];
     }
     else if (d) {
         console.warn('Cannot leaveShare', h);

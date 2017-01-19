@@ -1951,13 +1951,11 @@ function MegaData()
             folders = [];
 
             for (var i in this.c[n.h]) {
-                // skip subshares
-                if (inshares && this.d[this.d[i].p]) {
-                    continue;
-                }
-
-                if (this.d[i] && (this.d[i].t === 1)) {
-                    folders.push(this.d[i]);
+                if (this.d[i]) {
+                    // folders, and skip subshares
+                    if (this.d[i].t && !(inshares && this.d[this.d[i].p])) {
+                        folders.push(this.d[i]);
+                    }
                 }
             }
 
@@ -2505,15 +2503,6 @@ function MegaData()
     };
 
     this.addNode = function(n, ignoreDB) {
-        if (!M.d[n.p] && n.p !== 'contacts') {
-            if (n.sk) {
-                n.p = n.u;
-            }
-            else if (n.su) {
-                n.p = n.su;
-            }
-        }
-
         if (n.su) {
             var u = this.u[n.su];
             if (u) {
@@ -2522,9 +2511,14 @@ function MegaData()
                 u.p = 'contacts';
                 M.addNode(u);
             }
-            else {
-                console.log('No user record for incoming share', n.su);
+            else if (d) {
+                console.warn('No user record for incoming share', n.su);
             }
+
+            if (!this.c[n.su]) {
+                this.c[n.su] = [];
+            }
+            this.c[n.su][n.h] = n.t + 1;
         }
 
         if (n.p) {
@@ -6217,6 +6211,7 @@ function sc_node(n) {
 var tparentid,
     trights,
     tmoveid,
+    scsharesuiupd,
     rootsharenodes = [],
     loadavatars = [];
 
@@ -6235,7 +6230,6 @@ function execsc() {
     var n, i;
     var tick = Date.now();
     var tickcount = 0;
-    var updateRights = false;
 
     do {
         if (!scq[scqtail] || !scq[scqtail][0] || (scq[scqtail][0].a == 't' && nodesinflight[scqtail])) {
@@ -6258,6 +6252,21 @@ function execsc() {
 
             if ($.dialog === 'properties') {
                 propertiesDialog();
+            }
+
+            if (scsharesuiupd) {
+                if (fminitialized) {
+                    onIdle(function() {
+                        M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
+
+                        if (M.currentrootid === 'shares') {
+                            M.openFolder(M.currentdirid, true);
+                            loadingDialog.hide(); // TODO: from leaveShare, check if ok..
+                        }
+                    });
+                }
+
+                scsharesuiupd = false;
             }
 
             sccount = 0;
@@ -6534,7 +6543,6 @@ function execsc() {
                                         n.r = a.r;
                                         n.su = a.o;
                                         M.nodeUpdated(n);
-                                        updateRights = true;
                                     }
                                     else {
                                         if (d) {
@@ -6579,15 +6587,9 @@ function execsc() {
                         }
 
                         if (fminitialized) {
-                            M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
                             sharedUInode(a.n);
-                            treeUI();
-
-                            // Inshares permission DOM update
-                            if (updateRights) {
-                                sharedFolderUI();
-                            }
                         }
+                        scsharesuiupd = true;
                     }
                     break;
 
@@ -6602,9 +6604,7 @@ function execsc() {
                             cr: crypto_makecr(actionPacket.n, [actionPacket.h], true)
                         });*/
 
-                    if (fminitialized) {
-                        M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
-                    }
+                    scsharesuiupd = true;
                     break;
 
                 case 't':
@@ -6615,12 +6615,13 @@ function execsc() {
                             if (rootsharenodes[scnodes[i].h] && M.d[scnodes[i].h]) {
                                 scnodes[i].r = M.d[scnodes[i].h].r;
                                 scnodes[i].su = M.d[scnodes[i].h].su;
-                                M.delNode(scnodes[i].h);
-                            }
-                        }
+                                M.delNode(scnodes[i].h); // removes nested share
 
-                        if (!M.d[scnodes[0].p]) {
-                            scnodes[0].p = tparentid;
+                                if (d) {
+                                    console.log('User %s shared parent %s of existing share %s',
+                                        tparentid, scnodes[i].p, scnodes[i].h);
+                                }
+                            }
                         }
 
                         scnodes[0].su = tparentid;

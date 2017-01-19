@@ -3741,7 +3741,7 @@ function accountUI() {
         var $storageData = $('.account.data-block.storage-data');
         $storageData.removeClass('exceeded');
         perc = Math.round(account.space_used / account.space * 100);
-        perc_c = 100;
+        perc_c = perc;
         if (perc_c > 100) {
             perc_c = 100;
         }

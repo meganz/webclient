@@ -619,16 +619,31 @@ function MegaData()
     };*/
 
     this.filterByParent = function(id) {
+        var i;
+        var node;
+
         if (id === 'shares') {
-            this.filterBy(function(node) {
-                return node.su;
-            });
+            this.v = [];
+            var inshares = Object.keys(M.c.shares || {});
+            for (i = inshares.length; i--;) {
+                node = M.d[inshares[i]] || false;
+
+                if (node.su && !this.d[node.p]) {
+                    this.v.push(node);
+                }
+            }
         }
         else if (id === 'contacts') {
-            this.filterBy(function(node) {
-                // Fill M.v with active contacts only
-                return (node.p === 'contacts') && (node.c === 1);
-            });
+            this.v = [];
+            var contacts = Object.keys(M.c.contacts || {});
+            for (i = contacts.length; i--;) {
+                node = M.d[contacts[i]] || false;
+
+                if (node.c === 1) {
+                    // Fill M.v with active contacts only
+                    this.v.push(node);
+                }
+            }
         }
         // We should have a parent's childs into M.c, no need to traverse the whole M.d
         else if (M.c[id]) {
@@ -1863,7 +1878,7 @@ function MegaData()
 
         var share = new mega.Share({});
 
-        var inshares = n.h == 'shares';
+        var inshares = n.h === 'shares';
 
         /*
          * XXX: Initially this function was designed to render new nodes only,
@@ -2254,10 +2269,16 @@ function MegaData()
 
         var result = [];
         var loop = true;
+        var inshare;
 
         while (loop) {
             if ((id === 'contacts') && (result.length > 1)) {
                 id = 'shares';
+            }
+
+            if (inshare && !M.d[id]) {
+                // we reached the inshare root, use the owner next
+                id = inshare;
             }
 
             if (
@@ -2293,6 +2314,7 @@ function MegaData()
                     break;
                 }
 
+                inshare = M.d[id].su;
                 id = this.d[id].p;
             }
         }

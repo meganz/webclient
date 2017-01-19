@@ -2106,17 +2106,20 @@ function leaveShare(h) {
     }
 
     // leaving inner nested shares is not allowed: walk to the share root
-    while (M.d[h] && M.d[h].p.length == 8) {
+    while (M.d[h] && !M.d[h].su) {
         h = M.d[h].p;
     }
 
-    if (M.d[h] && M.d[h].p.length == 11) {
+    if (M.d[h] && M.d[h].su) {
         M.delNode(h, true);   // must not update DB pre-API
         api_req({ a: 'd', n: h/*, i: requesti*/ });
 
         M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
 
         delete u_sharekeys[h];
+    }
+    else if (d) {
+        console.warn('Cannot leaveShare', h);
     }
 }
 
@@ -7138,7 +7141,7 @@ function menuItems() {
 
     selItem = M.d[$.selected[0]];
 
-    if (selItem && (selItem.p.length === 11)) {
+    if (selItem && selItem.su && !M.d[selItem.p]) {
         items['.removeshare-item'] = 1;
     }
     else if (RightsbyID($.selected[0]) > 1) {
@@ -12417,8 +12420,7 @@ function sharedFolderUI() {
     /* jshint -W074 */
     var nodeData = M.d[M.currentdirid];
     var browsingSharedContent = false;
-    var c;
-console.error("sharedFolerUI for " + M.currentdirid);
+
     // Browsing shared content
     if ($('.shared-details-block').length > 0) {
 
@@ -12430,7 +12432,7 @@ console.error("sharedFolerUI for " + M.currentdirid);
     }
 
     // are we in an inshare?
-    while (nodeData && !nodeData.su) {
+    while (nodeData && (!nodeData.su || M.d[nodeData.p])) {
         nodeData = M.d[nodeData.p];
     }
 
@@ -12442,6 +12444,7 @@ console.error("sharedFolerUI for " + M.currentdirid);
 
         // Handle of initial share owner
         var ownersHandle = nodeData.su;
+        var folderName = (M.d[M.currentdirid] || nodeData).name;
         var displayName = htmlentities(M.getNameByHandle(ownersHandle));
         var avatar = useravatar.contact(M.d[ownersHandle], 'nw-contact-avatar');
 
@@ -12470,7 +12473,7 @@ console.error("sharedFolerUI for " + M.currentdirid);
                 + '<div class="shared-details-icon"></div>'
                 + '<div class="shared-details-info-block">'
                     + '<div class="shared-details-pad">'
-                        + '<div class="shared-details-folder-name">' + htmlentities((c || nodeData).name) + '</div>'
+                        + '<div class="shared-details-folder-name">' + htmlentities(folderName) + '</div>'
                         + '<a href="javascript:;" class="grid-url-arrow"></a>'
                         + '<div class="shared-folder-access' + rightsclass + '">' + rights + '</div>'
                         + '<div class="clear"></div>'
@@ -12491,7 +12494,7 @@ console.error("sharedFolerUI for " + M.currentdirid);
 
         $(rightPanelView).addClass('shared-folder-content');
 
-        if (c) {
+        if (M.d[M.currentdirid] !== nodeData) {
             // hide leave-share under non-root shares
             $('.fm-leave-share').addClass('hidden');
         }

@@ -458,16 +458,16 @@ Chat.prototype.init = function() {
     
 
     // UI events
-    $(document.body).undelegate('.top-user-status-item', 'mousedown.megachat');
+    $(document.body).undelegate('.top-user-status-popup .tick-item', 'mousedown.megachat');
 
-    $(document.body).delegate('.top-user-status-item', 'mousedown.megachat', function() {
+    $(document.body).delegate('.top-user-status-popup .tick-item', 'mousedown.megachat', function(e) {
         var presence = $(this).data("presence");
         self._myPresence = presence;
 
         localStorage.megaChatPresence = presence;
         localStorage.megaChatPresenceMtime = unixtime();
 
-        $('.top-user-status-popup').removeClass("active");
+        $('.top-user-status-popup').addClass("hidden");
 
         if (self.karere.getConnectionState() != Karere.CONNECTION_STATE.CONNECTED && presence != Karere.PRESENCE.OFFLINE) {
             self.karere._myPresence = presence;
@@ -479,7 +479,6 @@ Chat.prototype.init = function() {
                     shard.reconnect();
                 });
             });
-            return true;
         }
         else {
             if (presence === Karere.PRESENCE.OFFLINE) {
@@ -1080,7 +1079,7 @@ Chat.prototype.renderMyStatus = function() {
     // reset
     var $status = $('.activity-status-block .activity-status');
 
-    $('.top-user-status-popup .top-user-status-item').removeClass("active");
+    $('.top-user-status-popup .tick-item').removeClass("active");
 
 
     $status
@@ -1117,19 +1116,19 @@ Chat.prototype.renderMyStatus = function() {
 
 
     if (cssClass === 'online') {
-        $('.top-user-status-popup .top-user-status-item[data-presence="chat"]').addClass("active");
+        $('.top-user-status-popup .tick-item[data-presence="chat"]').addClass("active");
     }
     else if (cssClass === 'away') {
-        $('.top-user-status-popup .top-user-status-item[data-presence="away"]').addClass("active");
+        $('.top-user-status-popup .tick-item[data-presence="away"]').addClass("active");
     }
     else if (cssClass === 'busy') {
-        $('.top-user-status-popup .top-user-status-item[data-presence="dnd"]').addClass("active");
+        $('.top-user-status-popup .tick-item[data-presence="dnd"]').addClass("active");
     }
     else if (cssClass === 'offline') {
-        $('.top-user-status-popup .top-user-status-item[data-presence="unavailable"]').addClass("active");
+        $('.top-user-status-popup .tick-item[data-presence="unavailable"]').addClass("active");
     }
     else {
-        $('.top-user-status-popup .top-user-status-item[data-presence="unavailable"]').addClass("active");
+        $('.top-user-status-popup .tick-item[data-presence="unavailable"]').addClass("active");
     }
 
     $status.addClass(

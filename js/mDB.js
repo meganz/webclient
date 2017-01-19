@@ -102,7 +102,7 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
         try {
             if (!fmdb.db) {
                 var todrop = [];
-                var dbpfx = 'fm4_';
+                var dbpfx = 'fm5_';
 
                 // enumerate databases and collect those not prefixed with 'dbpfx'
                 // (which is the current format)

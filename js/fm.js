@@ -3085,7 +3085,10 @@ function dashboardUI() {
     // Account data
     M.accountData(function(account) {
 
-        var perc, perc_c, b_exceeded, s_exceeded;
+        var perc;
+        var perc_c;
+        var b_exceeded;
+        var s_exceeded;
 
         // Show ballance
         $('.account.left-pane.balance-info').text(l[7108]);
@@ -3526,7 +3529,10 @@ function accountUI() {
     M.accountData(function(account) {
         loadingDialog.hide();
 
-        var perc, warning, perc_c;
+        var perc;
+        var warning;
+        var perc_c;
+
         var id = document.location.hash;
 
         if (id === '#fm/account/advanced') {
@@ -3679,10 +3685,12 @@ function accountUI() {
         }
         perc   = Math.round(base * 100 / max) || 1;
         perc_c = perc;
-        if (perc_c > 100)
+        if (perc_c > 100) {
             perc_c = 100;
-        if (perc > 99)
+        }
+        if (perc > 99) {
             $('.fm-account-blocks.bandwidth').addClass('exceeded');
+        }
 
         var deg =  230 * perc_c / 100;
 
@@ -3715,14 +3723,15 @@ function accountUI() {
         /* New Used space */
         perc = Math.round(account.space_used / account.space * 100);
         perc_c = perc;
-        if (perc_c > 100)
+        if (perc_c > 100) {
             perc_c = 100;
+        }
         if (perc > 99) {
             $('.account.data-block.storage-data').addClass('exceeded');
             $('.storage-data .button.upgrade-account, .storage-data.chart-warning')
                 .rebind('click', function() {
                     window.location.hash = 'pro';
-                })
+                });
         }
 
         var deg =  230 * perc_c / 100;

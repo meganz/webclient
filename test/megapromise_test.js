@@ -397,4 +397,61 @@ describe("MegaPromise Unit Test", function() {
             done();
         });
     });
+
+    it("test MegaPromise.QueuedPromiseCallbacks", function(done) {
+        var queue = MegaPromise.QueuedPromiseCallbacks();
+
+        var callstack = [];
+
+        var res = function(name, timeout) {
+            return function() {
+                callstack.push([name, "called"]);
+                var p = new MegaPromise();
+                setTimeout(function() {
+                    callstack.push([name, "finished"]);
+                    p.resolve();
+                }, timeout);
+
+                return p;
+            }
+        };
+
+        var rej = function(name, timeout) {
+            return function() {
+                callstack.push([name, "called"]);
+                var p = new MegaPromise();
+                setTimeout(function() {
+                    callstack.push([name, "finished"]);
+                    p.reject();
+                }, timeout);
+
+                return p;
+            }
+        };
+
+        queue.queue(res("p1", 100));
+        queue.queue(res("p2", 150));
+        queue.queue(rej("p3", 300));
+        queue.queue(res("p4", 200));
+        queue.tick();
+
+        var expected = [
+            ["p1", "called"],
+            ["p1", "finished"],
+            ["p2", "called"],
+            ["p2", "finished"],
+            ["p3", "called"],
+            ["p3", "finished"],
+            ["p4", "called"],
+            ["p4", "finished"],
+        ];
+        setTimeout(function() {
+            assert(
+                JSON.stringify(callstack) === JSON.stringify(expected),
+                'Unexpected call order, expected ' + JSON.stringify(expected, null, '\t'), '\ngot: ' +
+                JSON.stringify(callstack, null, '\t')
+            );
+            done();
+        }, 800);
+    })
 });

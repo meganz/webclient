@@ -60,10 +60,18 @@ describe("SharedLocalKVStorage Unit Test", function() {
                     if (v.persistAdapter.dbState === SharedLocalKVStorage.DB_STATE.READY) {
                         deleted[v.name] = true;
                         waiting.push(v.destroy());
-                        v.persistAdapter.close();
                     }
                     else {
                         v.persistAdapter.close();
+                    }
+                }
+                else if (v.db) {
+                    if (v.dbState === SharedLocalKVStorage.DB_STATE.READY) {
+                        deleted[v.name] = true;
+                        waiting.push(v.destroy());
+                    }
+                    else {
+                        v.close();
                     }
                 }
             }
@@ -146,10 +154,93 @@ describe("SharedLocalKVStorage Unit Test", function() {
         });
     });
 
+    it("core func test - DexieStorage preserve the order in which data is inserted/deleted", function(done) {
+        var pq = promiseHelpers.promiseQueue();
+
+        pq.whenFinished(function() {
+            promiseHelpers.testWaitForAllPromises(function() {
+                (new SharedLocalKVStorage.Utils.DexieStorage("test1", false, "whatever")).destroy().always(function() {
+                    done();
+                });
+            });
+        });
+
+        [
+            {
+                'insert': [
+                    ['a1', 'val1'],
+                    ['b1', 'val2'],
+                    ['a2', 'val3'],
+                ],
+                'expected': [
+                    'a1', 'b1', 'a2'
+                ]
+            },
+            {
+                'insert': [
+                    ['2z1', 'val4'],
+                    ['2a1', 'val1'],
+                    ['2b1', 'val2'],
+                    ['2a2', 'val3'],
+                ],
+                'expected': [
+                    '2z1', '2a1', '2b1', '2a2'
+                ]
+            }
+        ].forEach(function(testCase) {
+            pq.queue(function() {
+                var promise = new MegaPromise();
+
+                var rej = function() { promise.reject(arguments); };
+                var res = function() { promise.resolve(arguments); };
+
+                var dexieStorage = new SharedLocalKVStorage.Utils.DexieStorage("test1", false, "whatever");
+
+                var allInserts = [];
+                dexieStorage.clear().always(function() {
+                    testCase.insert.forEach(function(kv) {
+                        allInserts.push(
+                            promiseHelpers.expectPromiseToBeResolved(
+                                dexieStorage.setItem(kv[0], kv[1])
+                            )
+                                .fail(rej)
+                        );
+                    });
+
+
+                    MegaPromise.allDone(
+                        allInserts
+                    )
+                        .done(function() {
+                            dexieStorage.close();
+
+                            setTimeout(function() {
+                                // reopen
+                                dexieStorage = new SharedLocalKVStorage.Utils.DexieStorage("test1", false, "whatever");
+
+                                promiseHelpers.expectPromiseToBeResolved(
+                                    dexieStorage.keys(),
+                                    testCase.expected
+                                )
+                                    .fail(rej)
+                                    .always(function() {
+                                        dexieStorage.clear().always(res);
+                                    });
+                            }, 300);
+                        });
+                });
+
+                return promise;
+            }, 'testQueueOp');
+        });
+
+        pq.tick();
+    });
+
     it("basic single master set -> get item test", function(done) {
-        var kvStorage = new SharedLocalKVStorage.Utils.DexieStorage("test1", 1);
+        var kvStorage = new SharedLocalKVStorage.Utils.DexieStorage("test1");
         dropOnFinished(kvStorage);
-        kvStorage.setItem('test', 'test123').dumpToConsole("tets");
+        kvStorage.setItem('test', 'test123').dumpToConsole("test=test123");
 
         promiseHelpers.expectPromiseToBeResolved(kvStorage.getItem("test"), 'test123', 'getItem test = test123');
 
@@ -157,7 +248,7 @@ describe("SharedLocalKVStorage Unit Test", function() {
     });
 
     it("basic single master set -> remove -> {getItem - fail, removeItem - fail} test", function(done) {
-        var kvStorage = new SharedLocalKVStorage.Utils.DexieStorage("test1", 1);
+        var kvStorage = new SharedLocalKVStorage.Utils.DexieStorage("test1");
         dropOnFinished(kvStorage);
 
         kvStorage.setItem('test', 'test123');
@@ -171,13 +262,12 @@ describe("SharedLocalKVStorage Unit Test", function() {
 
 
     it("basic single master - open -> set -> close -> get (persistence test)", function(done) {
-
-        var kvStorage = new SharedLocalKVStorage.Utils.DexieStorage("test1", 1);
+        var kvStorage = new SharedLocalKVStorage.Utils.DexieStorage("test1");
         kvStorage.setItem('test', 'test123')
             .done(function() {
                 kvStorage.close();
 
-                var kvStorage2 = new SharedLocalKVStorage.Utils.DexieStorage("test1", 1);
+                var kvStorage2 = new SharedLocalKVStorage.Utils.DexieStorage("test1");
                 dropOnFinished(kvStorage2);
 
                 promiseHelpers.expectPromiseToBeResolved(
@@ -192,7 +282,7 @@ describe("SharedLocalKVStorage Unit Test", function() {
 
 
     it("comprehensive single master test", function(done) {
-        var kvStorage = new SharedLocalKVStorage.Utils.DexieStorage("test1", 1);
+        var kvStorage = new SharedLocalKVStorage.Utils.DexieStorage("test1");
         dropOnFinished(kvStorage);
 
         kvStorage.setItem("test", "test1");
@@ -229,7 +319,7 @@ describe("SharedLocalKVStorage Unit Test", function() {
     });
 
     it("basic single master test - clear (async)", function(done) {
-        var kvStorage = new SharedLocalKVStorage.Utils.DexieStorage("test1", 1);
+        var kvStorage = new SharedLocalKVStorage.Utils.DexieStorage("test1");
 
         dropOnFinished(kvStorage);
 
@@ -249,7 +339,7 @@ describe("SharedLocalKVStorage Unit Test", function() {
     });
 
     it("basic single master test - clear (sync)", function(done) {
-        var kvStorage = new SharedLocalKVStorage.Utils.DexieStorage("test1", 1);
+        var kvStorage = new SharedLocalKVStorage.Utils.DexieStorage("test1");
 
         dropOnFinished(kvStorage);
 
@@ -284,7 +374,7 @@ describe("SharedLocalKVStorage Unit Test", function() {
         connector.addTab(broadcaster);
         connector.setMaster("tab1");
 
-        var sharedLocalKvInstance = new SharedLocalKVStorage("test1", 1, false, broadcaster);
+        var sharedLocalKvInstance = new SharedLocalKVStorage("test1", false, broadcaster);
 
         dropOnFinished(sharedLocalKvInstance);
 
@@ -331,11 +421,11 @@ describe("SharedLocalKVStorage Unit Test", function() {
 
         connector.setMaster("tab1");
 
-        var sharedLocalKvInstance1 = new SharedLocalKVStorage("test1", 1, false, broadcaster1);
+        var sharedLocalKvInstance1 = new SharedLocalKVStorage("test1", false, broadcaster1);
 
-        var sharedLocalKvInstance2 = new SharedLocalKVStorage("test1", 1, false, broadcaster2);
+        var sharedLocalKvInstance2 = new SharedLocalKVStorage("test1", false, broadcaster2);
 
-        var sharedLocalKvInstance3 = new SharedLocalKVStorage("test1", 1, false, broadcaster3);
+        var sharedLocalKvInstance3 = new SharedLocalKVStorage("test1", false, broadcaster3);
 
 
 
@@ -410,11 +500,11 @@ describe("SharedLocalKVStorage Unit Test", function() {
 
         connector.setMaster("tab1");
 
-        var sharedLocalKvInstance1 = new SharedLocalKVStorage("test1", 1, false, broadcaster1);
+        var sharedLocalKvInstance1 = new SharedLocalKVStorage("test1", false, broadcaster1);
 
-        var sharedLocalKvInstance2 = new SharedLocalKVStorage("test1", 1, false, broadcaster2);
+        var sharedLocalKvInstance2 = new SharedLocalKVStorage("test1", false, broadcaster2);
 
-        var sharedLocalKvInstance3 = new SharedLocalKVStorage("test1", 1, false, broadcaster3);
+        var sharedLocalKvInstance3 = new SharedLocalKVStorage("test1", false, broadcaster3);
 
 
 
@@ -522,14 +612,16 @@ describe("SharedLocalKVStorage Unit Test", function() {
 
         connector.setMaster("tab1");
 
-        var sharedLocalKvInstance1 = new SharedLocalKVStorage("test1", 1, false, broadcaster1);
+        var sharedLocalKvInstance1 = new SharedLocalKVStorage("test1", false, broadcaster1);
 
-        var sharedLocalKvInstance2 = new SharedLocalKVStorage("test1", 1, false, broadcaster2);
+        var sharedLocalKvInstance2 = new SharedLocalKVStorage("test1", false, broadcaster2);
 
-        var sharedLocalKvInstance3 = new SharedLocalKVStorage("test1", 1, false, broadcaster3);
+        var sharedLocalKvInstance3 = new SharedLocalKVStorage("test1", false, broadcaster3);
 
 
         dropOnFinished(sharedLocalKvInstance1);
+        dropOnFinished(sharedLocalKvInstance2);
+        dropOnFinished(sharedLocalKvInstance3);
 
         var expectAllValsToEqual = function(k, v) {
             return MegaPromise.allDone([
@@ -563,18 +655,19 @@ describe("SharedLocalKVStorage Unit Test", function() {
                 var promise = new MegaPromise();
 
                 MegaPromise.allDone([
-                    kvInstance.setItem("nooohelloo", 'worldno'),
-                    kvInstance.setItem("hello_1", 'world1'),
-                    kvInstance.setItem("hello_2", 'world2'),
-                    kvInstance.setItem("hello_3", 'world3')
+                    kvInstance.setItem("nooohelloo", 'worldno').dumpToConsole("nohelloSet"),
+                    kvInstance.setItem("hello_1", 'world1').dumpToConsole("h1Set"),
+                    kvInstance.setItem("hello_2", 'world2').dumpToConsole("h2Set"),
+                    kvInstance.setItem("hello_3", 'world3').dumpToConsole("h3Set")
                 ])
+                    .dumpToConsole("allDone1")
                     .done(function() {
                         MegaPromise.allDone([
                             expectAllValsToEqual("hello_1", "world1"),
                             expectAllValsToEqual("hello_2", "world2"),
                             expectAllValsToEqual("hello_3", "world3")
                         ])
-                            .dumpToConsole("allDone1")
+                            .dumpToConsole("allDone2")
                             .fail(function() { promise.reject(arguments); })
                             .done(function() {
                                 var results = [];
@@ -584,7 +677,7 @@ describe("SharedLocalKVStorage Unit Test", function() {
 
                                     if (results.length === 3) {
                                         var expected = JSON.stringify(['world1', 'world2', 'world3']);
-                                        
+
                                         results.sort();
 
                                         assert(
@@ -604,7 +697,7 @@ describe("SharedLocalKVStorage Unit Test", function() {
                     })
 
                 return promise;
-            });
+            }, 'testQueueOp');
         });
 
         pq.tick();
@@ -624,11 +717,11 @@ describe("SharedLocalKVStorage Unit Test", function() {
 
         connector.setMaster("tab1");
 
-        var sharedLocalKvInstance1 = new SharedLocalKVStorage("test1", 1, false, broadcaster1);
+        var sharedLocalKvInstance1 = new SharedLocalKVStorage("test1", false, broadcaster1);
 
-        var sharedLocalKvInstance2 = new SharedLocalKVStorage("test1", 1, false, broadcaster2);
+        var sharedLocalKvInstance2 = new SharedLocalKVStorage("test1", false, broadcaster2);
 
-        var sharedLocalKvInstance3 = new SharedLocalKVStorage("test1", 1, false, broadcaster3);
+        var sharedLocalKvInstance3 = new SharedLocalKVStorage("test1", false, broadcaster3);
 
 
         dropOnFinished(sharedLocalKvInstance1);

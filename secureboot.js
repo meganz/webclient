@@ -866,7 +866,9 @@ Object.defineProperty(this, 'mBroadcaster', {
     }
 }});
 
-is_karma || Object.freeze(mBroadcaster);
+if (!is_karma) {
+    Object.freeze(mBroadcaster);
+}
 
 
 var sh = [];

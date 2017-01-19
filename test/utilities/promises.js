@@ -30,7 +30,7 @@ PromiseHelpers.prototype.queueTestPromise = function(promise) {
 };
 
 PromiseHelpers.prototype.testWaitForAllPromises = function(doneCb) {
-    MegaPromise.allDone(this._testIsWaitingForPromises).always(function() {
+    return MegaPromise.allDone(this._testIsWaitingForPromises).always(function() {
         doneCb();
     });
 };
@@ -105,53 +105,5 @@ PromiseHelpers.prototype.expectPromiseToFail = function(promise, promiseFailedVa
 
 
 PromiseHelpers.prototype.promiseQueue = function() {
-    /*jshint -W057 */
-    return new (function() {
-        /*jshint +W057 */
-        var self = this;
-
-        self._queued = [];
-        self._pos = 0;
-        self.queue = function(fn) {
-            self._queued.push(fn);
-            console.log("-=> Added to queue FN#", self._queued.length);
-            return self;
-        };
-
-        self.tick = function() {
-            if (
-                self._queued[self._pos] &&
-                !self._queued[self._pos].state
-            ) {
-                console.log("-=> PromiseQueue Starting FN#", self._pos);
-
-
-                var execPromise = self._queued[self._pos]();
-
-                self._queued[self._pos] = createTimeoutPromise(
-                        function() {
-                            return execPromise.state() !== 'pending';
-                        }, 50, 1000
-                    )
-                    .fail(function() {
-                        assert(false, 'promise had timed out!');
-                    })
-                    .done(function() {
-                        console.log("-=> PromiseQueue Finished FN#", self._pos);
-                        self._pos++;
-                        self.tick();
-                    });
-            }
-            else if (self._pos === self._queued.length) {
-                // all done!
-                if (self._finishedCb) {
-                    self._finishedCb();
-                }
-            }
-        };
-        self.whenFinished = function(cb) {
-            self._finishedCb = cb;
-            return self;
-        };
-    })();
+    return MegaPromise.QueuedPromiseCallbacks();
 };

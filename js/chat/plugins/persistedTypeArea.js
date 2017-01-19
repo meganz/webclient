@@ -16,7 +16,7 @@ var PersistedTypeArea = function(megaChat) {
 
     megaChat.unbind("onInit.persistedTypeArea");
     megaChat.bind("onInit.persistedTypeArea", function(e) {
-        self.data = new SharedLocalKVStorage("pta2", 1);
+        self.data = new SharedLocalKVStorage("pta2");
     });
 
     // clear on logout

@@ -396,7 +396,7 @@ var CreateNewFakeBroadcaster = function(id) {
         this._topics = [];
         this.watchdog.destroy();
         this.connector.removeTab(this);
-    }
+    };
 
     return broadcaster;
 };

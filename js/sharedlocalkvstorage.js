@@ -5,14 +5,13 @@
  * setItem, getItem, keys, removeItem, etc promises are resolved.
  *
  * @param name {String}
- * @param version {Number}
  * @param manualFlush {bool} by default disabled, note: NOT tested/used yet.
  * @param [broadcaster] {Object} mBroadcaster-like object in case you don't want to use the global mBroadcaster
  * and watchdog (useful for unit tests - see test/utilities/fakebroadcaster.js)
  *
  * @constructor
  */
-var SharedLocalKVStorage = function(name, version, manualFlush, broadcaster) {
+var SharedLocalKVStorage = function(name, manualFlush, broadcaster) {
     var self = this;
 
     if (!broadcaster) {
@@ -32,7 +31,6 @@ var SharedLocalKVStorage = function(name, version, manualFlush, broadcaster) {
 
 
     self.name = name;
-    self.version = version;
     self.manualFlush = manualFlush;
 
     var loggerOpts = {};
@@ -142,7 +140,6 @@ SharedLocalKVStorage.prototype._setupPersistance = function() {
         // i'm the cross tab master
         self.persistAdapter = new SharedLocalKVStorage.Utils.DexieStorage(
             self.name,
-            self.version,
             self.manualFlush,
             self.wdog.wdID
         );
@@ -212,8 +209,6 @@ SharedLocalKVStorage.prototype._setupPersistance = function() {
     Object.keys(listenersMap).forEach(function(k) {
         self._listeners[k] = self.broadcaster.addListener(k, listenersMap[k]);
     });
-
-    delete listenersMap;
 };
 
 SharedLocalKVStorage.prototype._initPersistance = function() {
@@ -277,8 +272,6 @@ SharedLocalKVStorage.prototype.getItem = function(k) {
         return this.persistAdapter.getItem(k);
     }
     else {
-        self.logger.debug("getItem request: ", k);
-
         // request using cross tab from master
         var promise = new MegaPromise();
 
@@ -302,6 +295,7 @@ SharedLocalKVStorage.prototype.getItem = function(k) {
 
 SharedLocalKVStorage.prototype.eachPrefixItem = function __SLKVEachItem(prefix, cb) {
     var self = this;
+
     if (self.broadcaster.crossTab.master) {
         return self.persistAdapter.eachPrefixItem(prefix, cb);
     }
@@ -514,11 +508,10 @@ SharedLocalKVStorage.decrypt = function(val) {
 
 SharedLocalKVStorage.Utils = {};
 
-SharedLocalKVStorage.Utils.DexieStorage = function(name, version, manualFlush, wdID) {
+SharedLocalKVStorage.Utils.DexieStorage = function(name, manualFlush, wdID) {
     var self = this;
 
     self.name = name;
-    self.version = version;
     self.manualFlush = manualFlush;
 
     var loggerOpts = {};
@@ -585,9 +578,23 @@ SharedLocalKVStorage.Utils.DexieStorage._requiresDbReady = function SLKVDBConnRe
 
             self.dbLoadingPromise = new MegaPromise();
 
+
             self.db = new Dexie("slkv_" + u_handle + "_" + self.name);
-            self.db.version(self.version).stores({
+
+            self.db.version(1).stores({
                 'kv': '&k, v'
+            });
+            self.db.version(2)
+                .stores({
+                    'kv': null
+                })
+                .upgrade(function(transaction) {
+                    // because Dexie does not support changing PKs, we would need to drop the table
+                    transaction.idbtrans.db.deleteObjectStore('kv');
+                });
+
+            self.db.version(3).stores({
+                'kv': '++i, &k, v'
             });
 
             // typically...we could have used a .finally catch-all clause here, but because of Promises A+,
@@ -613,8 +620,8 @@ SharedLocalKVStorage.Utils.DexieStorage._requiresDbReady = function SLKVDBConnRe
                                 }, 0);
                             });
                     },
-                    function() {
-                        self.logger.error("Failed to initialise db.");
+                    function(e) {
+                        self.logger.error("Failed to initialise db.", e && e.message ? e.message : e);
 
                         self.dbState = SharedLocalKVStorage.DB_STATE.FAILED;
 
@@ -699,6 +706,23 @@ SharedLocalKVStorage.Utils.DexieStorage._requiresDbReady = function SLKVDBConnRe
 };
 
 
+SharedLocalKVStorage.Utils.DexieStorage.prototype._queuedExecution = function(cb, args, fnName) {
+    var self = this;
+
+    if (!self._execQueue) {
+        self._execQueue = MegaPromise.QueuedPromiseCallbacks();
+    }
+
+    var arr = [self];
+    args.forEach(function(v) {
+        arr.push(v);
+    });
+
+    var resultPromise = self._execQueue.queue(cb.bind.apply(cb, arr), fnName);
+    self._execQueue.tick();
+    return resultPromise;
+};
+
 SharedLocalKVStorage.Utils.DexieStorage.prototype._prefillMemCache = function() {
     var self = this;
 
@@ -733,32 +757,84 @@ SharedLocalKVStorage.Utils.DexieStorage.prototype._prefillMemCache = function() 
 SharedLocalKVStorage.Utils.DexieStorage.prototype.flush = function() {
     var self = this;
 
-    var promises = [];
+    var masterPromise = new MegaPromise();
+
+    var delPromises = [];
+
     for (var k in this.delcache) {
-        promises.push(
-            MegaPromise.asMegaPromiseProxy(
-                self.db.kv.delete(SharedLocalKVStorage.encrypt(k))
-            )
-        );
-        delete self.dbcache[k];
+        if (this.delcache.hasOwnProperty(k)) {
+            delPromises.push(
+                MegaPromise.asMegaPromiseProxy(
+                    self.db.kv.where('k').equals(SharedLocalKVStorage.encrypt(k)).delete()
+                )
+            );
+            delete self.dbcache[k];
+        }
     }
     self.delcache = {};
 
-    for (var k in this.newcache) {
-        promises.push(
-            MegaPromise.asMegaPromiseProxy(
-                self.db.kv.put({
-                    k : SharedLocalKVStorage.encrypt(k),
-                    v : SharedLocalKVStorage.encrypt(self.newcache[k])
-                })
-            )
-        );
-        self.dbcache[k] = self.newcache[k];
-    }
+
+    var tmpNewCache = self.newcache;
+    MegaPromise.allDone(delPromises)
+        .always(function() {
+            var promises = [];
+            for (var k in tmpNewCache) {
+                if (tmpNewCache.hasOwnProperty(k)) {
+                    /*jshint -W083*/
+                    var encryptedVal = SharedLocalKVStorage.encrypt(tmpNewCache[k]);
+                    var encryptedKey = SharedLocalKVStorage.encrypt(k);
+
+                    var tmpPromise = new MegaPromise();
+
+                    self.db.transaction('rw', self.db.kv, function () {
+                        // delete and put SHOULD be done in an ordered, atomical way.
+                        self.db.kv.where('k').equals(encryptedKey).delete().then(function () {
+                            if (self.db && self.db.kv) {
+                                tmpPromise.linkFailTo(
+                                    MegaPromise.asMegaPromiseProxy(
+                                        self.db.kv.add({
+                                            k: encryptedKey,
+                                            v: encryptedVal
+                                        })
+                                            .catch(function (e) {
+                                                self.logger.error(
+                                                    "setItem -> flush -> dexie.put failed:",
+                                                    e && e.message ? e.message : e
+                                                );
+                                                tmpPromise.reject();
+                                            })
+                                    )
+                                );
+                            } else {
+                                // Connection to db closed.
+                                tmpPromise.reject();
+                            }
+                        });
+                    }).then(function () {
+                        tmpPromise.resolve();
+                    }).catch(function (err) {
+                        self.logger.error("Transaction failed on flush: ", err.message, err.type, err.stack, err);
+                        tmpPromise.reject(err);
+                    });
+
+
+                    /*jshint +W083*/
+                    promises.push(tmpPromise);
+
+                    self.dbcache[k] = tmpNewCache[k];
+                }
+            }
+
+            masterPromise.linkDoneAndFailTo(
+                MegaPromise.allDone(promises)
+            );
+        });
+
 
     self.newcache = {};
 
-    return MegaPromise.allDone(promises);
+
+    return masterPromise;
 };
 
 
@@ -769,7 +845,7 @@ SharedLocalKVStorage.Utils.DexieStorage.prototype.setItem = function __SLKVSetIt
     this.newcache[k] = v;
 
     if (this.manualFlush) {
-        promise.resolve([k, v]);
+        promise.resolve();
     }
     else {
         this.flush()
@@ -785,19 +861,18 @@ SharedLocalKVStorage.Utils.DexieStorage.prototype.setItem = function __SLKVSetIt
 };
 
 // get item - if not found, promise will be rejected
-// FIXME: convert to synchronous operation
 SharedLocalKVStorage.Utils.DexieStorage.prototype.getItem = function __SLKVGetItem(k) {
     var promise = new MegaPromise();
 
     if (!this.delcache[k]) {
-        if (typeof(this.newcache[k]) != 'undefined') {
+        if (typeof(this.newcache[k]) !== 'undefined') {
             // record recently (over)written
             promise.resolve(this.newcache[k]);
             return promise;
         }
         else {
             // record available in DB
-            if (typeof(this.dbcache[k]) != 'undefined') {
+            if (typeof(this.dbcache[k]) !== 'undefined') {
                 promise.resolve(this.dbcache[k]);
                 return promise;
             }
@@ -830,16 +905,14 @@ SharedLocalKVStorage.Utils.DexieStorage.prototype.keys = function __SLKVKeys(pre
 SharedLocalKVStorage.Utils.DexieStorage.prototype.hasItem = function __SLKVHasItem(k) {
     var promise = new MegaPromise();
 
-    if (!this.delcache[k] && (typeof(this.newcache[k]) != 'undefined' || typeof(this.dbcache[k]) != 'undefined')) {
+    if (!this.delcache[k] && (typeof(this.newcache[k]) !== 'undefined' || typeof(this.dbcache[k]) !== 'undefined')) {
         return MegaPromise.resolve();
     }
 
     return MegaPromise.reject();
 };
 
-// remove item from DB/cache
-// (must only be called in response to an API response triggered by an actionpacket)
-// FIXME: convert to synchronous operation
+
 SharedLocalKVStorage.Utils.DexieStorage.prototype.removeItem = function __SLKVRemoveItem(k) {
     var self = this;
 
@@ -853,7 +926,8 @@ SharedLocalKVStorage.Utils.DexieStorage.prototype.removeItem = function __SLKVRe
     delete self.newcache[k];
     delete self.dbcache[k];
 
-    self.db.kv.delete(SharedLocalKVStorage.encrypt(k))
+
+    self.db.kv.where('k').equals(SharedLocalKVStorage.encrypt(k)).delete()
         .then(
             function() {
                 self.delcache[k] = true;
@@ -877,17 +951,17 @@ SharedLocalKVStorage.Utils.DexieStorage.prototype.removeItem = function __SLKVRe
  */
 SharedLocalKVStorage.Utils.DexieStorage.prototype.eachPrefixItem = function __SLKVEachItem(prefix, cb) {
     for (var k in this.newcache) {
-        if (!this.delcache[k]) {
+        if (this.newcache.hasOwnProperty(k) && !this.delcache[k]) {
             if (k.indexOf(prefix) === 0) {
                 cb(this.newcache[k], k);
             }
         }
     }
 
-    for (var k in this.dbcache) {
-        if (!this.delcache[k] && typeof this.newcache[k] == 'undefined') {
-            if (k.indexOf(prefix) === 0) {
-                cb(this.dbcache[k], k);
+    for (var kk in this.dbcache) {
+        if (this.dbcache.hasOwnProperty(kk) && !this.delcache[kk] && typeof this.newcache[kk] === 'undefined') {
+            if (kk.indexOf(prefix) === 0) {
+                cb(this.dbcache[kk], kk);
             }
         }
     }
@@ -939,36 +1013,18 @@ SharedLocalKVStorage.Utils.DexieStorage.prototype.reinitCache = function __SLKVR
 SharedLocalKVStorage.Utils.DexieStorage.prototype.clear = function __SLKVClear() {
     var self = this;
 
-    var queuedForDeletion = [];
-
-    Object.keys(self.newcache).forEach(function(k) {
-        queuedForDeletion.push(k);
-    });
-    Object.keys(self.dbcache).forEach(function(k) {
-        queuedForDeletion.push(k);
-    });
-
-    var promises = [];
-    queuedForDeletion.forEach(function(k) {
-        promises.push(
-            self.removeItem(k)
-        );
-    });
-
-
-
     var promise = new MegaPromise();
-    MegaPromise.allDone(promises).always(function() {
-        self.db.kv.clear()
-            .catch(function (e) {
-                self.logger.error("clear failed: ", arguments, e.stack);
-                self.reinitCache();
-            })
-            .finally(function () {
-                self.reinitCache();
-                promise.resolve();
-            });
-    });
+
+    self.db.kv.clear()
+        .catch(function (e) {
+            self.logger.error("clear failed: ", arguments, e.stack);
+            self.reinitCache();
+            promise.reject(e);
+        })
+        .finally(function () {
+            self.reinitCache();
+            promise.resolve();
+        });
 
     return promise;
 };
@@ -994,22 +1050,41 @@ SharedLocalKVStorage.Utils.DexieStorage.prototype.close = function __SLKVClose()
     'flush',
     'keys',
     'getItem',
+    'eachPrefixItem',
     'hasItem',
     'clear',
     'destroy'
 ]
     .forEach(function(methodName) {
-
         var origFunc = SharedLocalKVStorage.Utils.DexieStorage.prototype[methodName];
         if (is_karma) {
             SharedLocalKVStorage.Utils.DexieStorage.prototype["_" + methodName] = origFunc;
         }
-        SharedLocalKVStorage.Utils.DexieStorage.prototype[methodName] = SharedLocalKVStorage.Utils.DexieStorage
-            ._requiresDbReady(
-                origFunc
-            );
-});
 
+        // jscs:disable validateIndentation
+        SharedLocalKVStorage.Utils.DexieStorage.prototype[methodName] = SharedLocalKVStorage.Utils.DexieStorage
+            ._requiresDbReady(origFunc);
+        // jscs:enable validateIndentation
+    });
+
+/**
+ * Guarantee that promise-returning methods are executed one after another.
+ */
+[
+    'setItem',
+    'removeItem',
+    'clear',
+    'destroy',
+    'eachPrefixItem',
+    'getItem',
+    'keys'
+]
+    .forEach(function(methodName) {
+        var origFunc = SharedLocalKVStorage.Utils.DexieStorage.prototype[methodName];
+        SharedLocalKVStorage.Utils.DexieStorage.prototype[methodName] = function() {
+            return this._queuedExecution(origFunc, Array.prototype.slice.call(arguments), methodName);
+        };
+    });
 /**
  * add support for .bind, .rebind, .unbind, .trigger
  */

@@ -12,7 +12,7 @@ var Chatd = function(userId, options) {
     self.chatIdMessages = {};
 
     // local cache of the Message object
-    self.messagesQueueKvStorage = new SharedLocalKVStorage("chatqueuedmsgs", 1);
+    self.messagesQueueKvStorage = new SharedLocalKVStorage("chatqueuedmsgs");
 
     /**
      * Set to true when this chatd instance is (being) destroyed
@@ -1723,6 +1723,7 @@ Chatd.Messages.prototype.restore = function() {
             }
         })
     );
+
     var _resendPending = function() {
         if (iskey) {
             trivialkeys.push(self.getmessagekey(previouskeyid, Chatd.MsgType.KEY));

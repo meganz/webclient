@@ -28,6 +28,7 @@ if (typeof importScripts !== 'undefined') {
                 }
                 else {
                     req.k = k;
+                    u_sharekeys[req.n] = [k, new sjcl.cipher.aes(k)];
                 }
             }
             self.postMessage(req);

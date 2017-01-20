@@ -6124,7 +6124,14 @@ function sc_packet(a) {
 
             if (workers) {
                 a.scqi = scqhead++;     // set scq slot number
-                workers[a.scqi % workers.length].postMessage(a);
+
+                var p = a.scqi % workers.length;
+
+                // pin the nodes of this share to the same worker
+                // (it is the only one that knows the sharekey)
+                shareworker[a.n] = p;
+
+                workers[p].postMessage(a);
                 return;
             }
         }
@@ -6164,7 +6171,7 @@ function sc_node(n) {
         for (p = 8; (p = n.k.indexOf(':', p)) >= 0; ) {
             if (++p == 9 || n.k[p-10] == '/') {
                 id = n.k.substr(p-9, 8);
-                if (u_sharekeys[id]) {
+                if (shareworker[id] || u_sharekeys[id]) {
                     break;
                 }
             }
@@ -6208,12 +6215,14 @@ function sc_node(n) {
 }
 
 // inter-actionpacket state, gets reset in getsc()
-var tparentid,
-    trights,
-    tmoveid,
+var tmoveid, // FIXME - is this still in use?
     scsharesuiupd,
-    rootsharenodes = [],
     loadavatars = [];
+
+var inshare_skip = false,
+    inshare_h = false,
+    inshare_su,
+    inshare_r;
 
 // if no execsc() thread is running, check if one should be, and start it if so.
 function resumesc() {
@@ -6397,10 +6406,9 @@ function execsc() {
                     crypto_share_rsa2aes();
 
                     // reset state
-                    tparentid = false;
-                    trights = false;
+                    inshare_skip = false;
+                    inshare_h = false;
                     tmoveid = false;
-                    rootsharenodes = [];
                     break;
 
                 case '_fm':
@@ -6533,29 +6541,27 @@ function execsc() {
                                 }
                                 else {
                                     if (d) {
-                                        console.log('I received a share, preparing for receiving tree a');
+                                        console.log('Inbound share, preparing for receiving its nodes');
                                     }
-                                    // I received a share, prepare for receiving tree
-                                    tparentid = a.o;
-                                    trights = a.r;
+
+                                    // if the parent node already exists, all we do is setting .r/.su
+                                    // we can skip the subsequent tree; we already have the nodes
                                     if (n = M.d[a.n]) {
-                                        // update rights:
                                         n.r = a.r;
                                         n.su = a.o;
+
+                                        // FIXME: also add to M.c.shares and M.c[a.o] here?
+
                                         M.nodeUpdated(n);
+
+                                        inshare_skip = true;
                                     }
                                     else {
-                                        if (d) {
-                                            console.log('Looking up other share nodes from this user');
-                                        }
-
-                                        if (M.c[a.o]) {
-                                            for (i in M.c[a.o]) {
-                                                if (M.d[i] && M.d[i].t == 1) {
-                                                    rootsharenodes[i] = 1;
-                                                }
-                                            }
-                                        }
+                                        inshare_skip = false;
+                                        inshare_h = a.n;
+                                        inshare_su = a.o;
+                                        inshare_r = a.r;
+                                        inshare_sk = a.k;
 
                                         if (!folderlink && fminitialized) {
                                             notify.notifyFromActionPacket({
@@ -6610,36 +6616,33 @@ function execsc() {
                 case 't':
                     // node tree
                     // the nodes have been pre-parsed and stored in scnodes
-                    if (tparentid) {
-                        for (i = 0; i < scnodes.length; i++) {
-                            if (rootsharenodes[scnodes[i].h] && M.d[scnodes[i].h]) {
-                                scnodes[i].r = M.d[scnodes[i].h].r;
-                                scnodes[i].su = M.d[scnodes[i].h].su;
-                                M.delNode(scnodes[i].h); // removes nested share
+                    if (inshare_skip) {
+                        // FIXME: do we still need to notify anything here?
+                        inshare_skipnodes = false;
+                        break;
+                    }
 
-                                if (d) {
-                                    console.log('User %s shared parent %s of existing share %s',
-                                        tparentid, scnodes[i].p, scnodes[i].h);
-                                }
+                    // is this tree a new inshare with root inshare_h? set share-relevant
+                    // attributes in its root node.
+                    if (inshare_h) {
+                        // FIXME: no loop needed if scnodes[0] guaranteed to be share's root
+                        // FIXME: set M.c.shares and M.c[inshare_su]?
+                        for (i = 0; i < scnodes.length; i++) {
+                            if (scnodes[i].h === inshare_h) {
+                                scnodes[i].su = inshare_su;
+                                scnodes[i].r = inshare_r;
+                                scnodes[i].sk = inshare_sk;
+                                break;
                             }
                         }
-
-                        scnodes[0].su = tparentid;
-                        scnodes[0].r = trights;
-
-                        // FIXME: put this earler
-                        if (tsharekey) {
-                            scnodes[0].sk = tsharekey;
-                            tsharekey = false;
-                        }
-
-                        rootsharenodes = [];
+                        inshare_h = false;
                     }
 
                     // notification logic
+                    // FIXME: this assumes that scnodes[0] is the root - check if always true
                     if (fminitialized && !folderlink && a.ou && a.ou != u_handle
                         && scnodes.length && scnodes[0].p && !scnodes[0].su
-                        && !tmoveid && !tparentid) {
+                        && !tmoveid) {
 
                         var targetid = scnodes[0].p;
                         var pnodes = [];
@@ -6660,9 +6663,6 @@ function execsc() {
                             f: pnodes
                         });
                     }
-
-                    tparentid = false;
-                    trights = false;
 
                     for (i = 0; i < scnodes.length; i++) M.addNode(scnodes[i]);
 

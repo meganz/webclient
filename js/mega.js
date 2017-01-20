@@ -2629,6 +2629,7 @@ function MegaData()
                 if (M.d[h].su) {
                     // this is an inbound share
                     delete M.c.shares[h];
+                    delete u_sharekeys[h];
                     delInShareQ.push(M.d[h].p + '*' + h);
                     M.delIndex(M.d[h].su, h);
                 }
@@ -6215,7 +6216,7 @@ function sc_node(n) {
 }
 
 // inter-actionpacket state, gets reset in getsc()
-var tmoveid, // FIXME - is this still in use?
+var
     scsharesuiupd,
     loadavatars = [];
 
@@ -6408,7 +6409,6 @@ function execsc() {
                     // reset state
                     inshare_skip = false;
                     inshare_h = false;
-                    tmoveid = false;
                     break;
 
                 case '_fm':
@@ -6641,8 +6641,7 @@ function execsc() {
                     // notification logic
                     // FIXME: this assumes that scnodes[0] is the root - check if always true
                     if (fminitialized && !folderlink && a.ou && a.ou != u_handle
-                        && scnodes.length && scnodes[0].p && !scnodes[0].su
-                        && !tmoveid) {
+                        && scnodes.length && scnodes[0].p && !scnodes[0].su) {
 
                         var targetid = scnodes[0].p;
                         var pnodes = [];

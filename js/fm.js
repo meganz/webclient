@@ -2099,32 +2099,26 @@ function ephemeralDialog(msg) {
     });
 }
 
-/**
- * Removes the user from the share
- *
- * @param {String} shareId The share id
- * @param {Boolean} nfk
- */
-function removeShare(shareId, nfk) {
-
+// leave incoming share h
+// FIXME: implement sn tagging to prevent race condition
+function leaveShare(h) {
     if (d) {
-        console.log('removeShare', shareId);
+        console.log('leaveShare', h);
     }
 
-    if (!nfk) {
-        api_updfkey(shareId);
+    // leaving inner nested shares is not allowed: walk to the share root
+    while (M.d[h] && M.d[M.d[h].p]) {
+        h = M.d[h].p;
     }
 
-    M.delNode(shareId, true);   // must not update DB pre-API
-    api_req({ a: 'd', n: shareId/*, i: requesti*/ });
+    if (M.d[h] && M.d[h].su) {
+        loadingDialog.show(); // this will be hidden somewhere else after processing the action-packet
 
-    M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
-
-    if ((M.currentdirid === shareId) || (isCircular(shareId, M.currentdirid) === true)) {
-        M.openFolder(RootbyId(shareId));
+        api_req({ a: 'd', n: h/*, i: requesti*/ });
     }
-
-    delete u_sharekeys[shareId];
+    else if (d) {
+        console.warn('Cannot leaveShare', h);
+    }
 }
 
 function fmremove() {
@@ -2138,7 +2132,7 @@ function fmremove() {
         var n = M.d[$.selected[i]];
 
         // ToDo: Not clear what this represents
-        if (n && n.p.length === 11) {
+        if (n && n.su) {
             removesharecnt++;
         }
 
@@ -2160,7 +2154,7 @@ function fmremove() {
 
     if (removesharecnt) {
         for (var i in $.selected) {
-            removeShare($.selected[i]);
+            leaveShare($.selected[i]);
         }
         M.openFolder('shares', true);
     }
@@ -2189,7 +2183,7 @@ function fmremove() {
                     if (M.c[selected]) {
                         Object.keys(M.c[selected])
                             .forEach(function(sharenode) {
-                                removeShare(sharenode, 1);
+                                leaveShare(sharenode);
                             });
                     }
 
@@ -7145,7 +7139,7 @@ function menuItems() {
 
     selItem = M.d[$.selected[0]];
 
-    if (selItem && (selItem.p.length === 11)) {
+    if (selItem && selItem.su && !M.d[selItem.p]) {
         items['.removeshare-item'] = 1;
     }
     else if (RightsbyID($.selected[0]) > 1) {
@@ -7153,26 +7147,19 @@ function menuItems() {
         items['.remove-item'] = 1;
     }
 
-    if (selItem && ($.selected.length === 1) && selItem.t) {
-        items['.open-item'] = 1;
-    }
+    if (selItem && $.selected.length === 1) {
+        if (selItem.t) {
+            if (M.currentdirid !== selItem.h) {
+                items['.open-item'] = 1;
+            }
 
-    if (
-        selItem
-        && ($.selected.length === 1)
-        && is_image(selItem)
-        ) {
-        items['.preview-item'] = 1;
-    }
-
-    if (
-        selItem
-        && (sourceRoot === M.RootID)
-        && ($.selected.length === 1)
-        && selItem.t
-        && !folderlink
-        ) {
-        items['.sh4r1ng-item'] = 1;
+            if (sourceRoot === M.RootID && !folderlink) {
+                items['.sh4r1ng-item'] = 1;
+            }
+        }
+        else if (is_image(selItem)) {
+            items['.preview-item'] = 1;
+        }
     }
 
     if ((sourceRoot === M.RootID) && !folderlink) {
@@ -12428,10 +12415,8 @@ mega.utils.findDupes = function() {
 };
 
 function sharedFolderUI() {
-    /* jshint -W074 */
     var nodeData = M.d[M.currentdirid];
     var browsingSharedContent = false;
-    var c;
 
     // Browsing shared content
     if ($('.shared-details-block').length > 0) {
@@ -12443,22 +12428,9 @@ function sharedFolderUI() {
         browsingSharedContent = true;
     }
 
-    // Checks it's not a contact, contacts handles are 11 chars long
-    // file/folder handles are 8 chars long
-    if (!nodeData || (nodeData.p.length !== 11)) {
-
-        // [<current selection handle>, 'owners handle', 'tab name']
-        var p = M.getPath(M.currentdirid);
-        nodeData = null;
-
-        if (p[p.length - 1] === 'shares') {
-            c = M.d[p[0]];
-            nodeData = M.d[p[p.length - 3]];
-
-            if (!nodeData || (nodeData.p.length !== 11)) {
-                nodeData = 0;
-            }
-        }
+    // are we in an inshare?
+    while (nodeData && !nodeData.su) {
+        nodeData = M.d[nodeData.p];
     }
 
     if (nodeData) {
@@ -12469,6 +12441,7 @@ function sharedFolderUI() {
 
         // Handle of initial share owner
         var ownersHandle = nodeData.su;
+        var folderName = (M.d[M.currentdirid] || nodeData).name;
         var displayName = htmlentities(M.getNameByHandle(ownersHandle));
         var avatar = useravatar.contact(M.d[ownersHandle], 'nw-contact-avatar');
 
@@ -12497,7 +12470,7 @@ function sharedFolderUI() {
                 + '<div class="shared-details-icon"></div>'
                 + '<div class="shared-details-info-block">'
                     + '<div class="shared-details-pad">'
-                        + '<div class="shared-details-folder-name">' + htmlentities((c || nodeData).name) + '</div>'
+                        + '<div class="shared-details-folder-name">' + htmlentities(folderName) + '</div>'
                         + '<a href="javascript:;" class="grid-url-arrow"></a>'
                         + '<div class="shared-folder-access' + rightsclass + '">' + rights + '</div>'
                         + '<div class="clear"></div>'
@@ -12518,6 +12491,11 @@ function sharedFolderUI() {
 
         $(rightPanelView).addClass('shared-folder-content');
 
+        if (M.d[M.currentdirid] !== nodeData) {
+            // hide leave-share under non-root shares
+            $('.fm-leave-share').addClass('hidden');
+        }
+
         Soon(function() {
             $(window).trigger('resize');
             Soon(fm_resize_handler);
@@ -12525,7 +12503,6 @@ function sharedFolderUI() {
     }
 
     return browsingSharedContent;
-    /* jshint -W074 */
 }
 
 function userFingerprint(userid, callback) {

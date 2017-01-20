@@ -1812,7 +1812,7 @@ var exportExpiry = {
             nodeId: nodeId,
             callback: function(result) {
                 if (typeof result !== 'number') {
-                    M.nodeShare(this.nodeId, { h: this.nodeId, r: 0, u: 'EXP', ts: unixtime() });
+                    M.nodeShare(this.nodeId, { h: this.nodeId, r: 0, u: 'EXP', ts: unixtime(), ph: result });
                     var n;
                     if (fmdb && (n = M.d[this.nodeId])) {
                         n.ph = result;

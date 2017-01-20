@@ -619,16 +619,31 @@ function MegaData()
     };*/
 
     this.filterByParent = function(id) {
+        var i;
+        var node;
+
         if (id === 'shares') {
-            this.filterBy(function(node) {
-                return (node.p === 'shares') || (node.p && node.p.length === 11);
-            });
+            this.v = [];
+            var inshares = Object.keys(M.c.shares || {});
+            for (i = inshares.length; i--;) {
+                node = M.d[inshares[i]] || false;
+
+                if (node.su && !this.d[node.p]) {
+                    this.v.push(node);
+                }
+            }
         }
         else if (id === 'contacts') {
-            this.filterBy(function(node) {
-                // Fill M.v with active contacts only
-                return (node.p === 'contacts') && (node.c === 1);
-            });
+            this.v = [];
+            var contacts = Object.keys(M.c.contacts || {});
+            for (i = contacts.length; i--;) {
+                node = M.d[contacts[i]] || false;
+
+                if (node.c === 1) {
+                    // Fill M.v with active contacts only
+                    this.v.push(node);
+                }
+            }
         }
         // We should have a parent's childs into M.c, no need to traverse the whole M.d
         else if (M.c[id]) {
@@ -1287,7 +1302,7 @@ function MegaData()
                     var shareId = window.location.hash.replace('#fm/', '');
 
                     // Remove user from the share
-                    removeShare (shareId);
+                    leaveShare(shareId);
 
                     // Open the shares folder
                     M.openFolder('shares', true);
@@ -1863,6 +1878,8 @@ function MegaData()
 
         var share = new mega.Share({});
 
+        var inshares = n.h === 'shares';
+
         /*
          * XXX: Initially this function was designed to render new nodes only,
          * but due to a bug the entire tree was being rendered/created from
@@ -1886,7 +1903,7 @@ function MegaData()
                 $('.' + dialog + ' .cloud-drive .dialog-content-block').html('<ul id="mctreesub_' + htmlentities(M.RootID) + '"></ul>');
             }
         }
-        else if (n.h === 'shares') {
+        else if (inshares) {
             if (typeof dialog === 'undefined') {
                 $('.content-panel.shared-with-me').html('<ul id="treesub_shares"></ul>');
             }
@@ -1934,8 +1951,11 @@ function MegaData()
             folders = [];
 
             for (var i in this.c[n.h]) {
-                if (this.d[i] && (this.d[i].t === 1)) {
-                    folders.push(this.d[i]);
+                if (this.d[i]) {
+                    // folders, and skip subshares
+                    if (this.d[i].t && !(inshares && this.d[this.d[i].p])) {
+                        folders.push(this.d[i]);
+                    }
                 }
             }
 
@@ -2247,10 +2267,16 @@ function MegaData()
 
         var result = [];
         var loop = true;
+        var inshare;
 
         while (loop) {
             if ((id === 'contacts') && (result.length > 1)) {
                 id = 'shares';
+            }
+
+            if (inshare && !M.d[id]) {
+                // we reached the inshare root, use the owner next
+                id = inshare;
             }
 
             if (
@@ -2286,6 +2312,7 @@ function MegaData()
                     break;
                 }
 
+                inshare = M.d[id].su;
                 id = this.d[id].p;
             }
         }
@@ -2476,26 +2503,22 @@ function MegaData()
     };
 
     this.addNode = function(n, ignoreDB) {
-        if (!M.d[n.p] && n.p !== 'contacts') {
-            if (n.sk) {
-                n.p = n.u;
-            }
-            else if (n.su) {
-                n.p = n.su;
-            }
-        }
-
-        if (n.p && n.p.length === 11 && !M.d[n.p]) {
-            var u = this.u[n.p];
+        if (n.su) {
+            var u = this.u[n.su];
             if (u) {
                 u.h = u.u;
                 u.t = 1;
                 u.p = 'contacts';
                 M.addNode(u);
             }
-            else {
-                console.log('No user record for incoming share', n.p, this.u[n.p]);
+            else if (d) {
+                console.warn('No user record for incoming share', n.su);
             }
+
+            if (!this.c[n.su]) {
+                this.c[n.su] = [];
+            }
+            this.c[n.su][n.h] = n.t + 1;
         }
 
         if (n.p) {
@@ -2505,7 +2528,7 @@ function MegaData()
             this.c[n.p][n.h] = 1;
 
             // maintain special incoming shares index
-            if (n.p.length === 11) {
+            if (n.su) {
                 if (n.sk && !u_sharekeys[n.h]) {
                     // extract sharekey from node's sk property
                     var k = crypto_process_sharekey(n.h, n.sk);
@@ -2603,10 +2626,12 @@ function MegaData()
             }
 
             if (M.d[h]) {
-                if (M.d[h].p && M.d[h].p.length === 11) {
+                if (M.d[h].su) {
                     // this is an inbound share
                     delete M.c.shares[h];
+                    delete u_sharekeys[h];
                     delInShareQ.push(M.d[h].p + '*' + h);
+                    M.delIndex(M.d[h].su, h);
                 }
 
                 M.delIndex(M.d[h].p, h);
@@ -6095,20 +6120,35 @@ var nodesinflight = {};  // number of nodes being processed in the worker for sc
 function sc_packet(a) {
     if ((a.a == 's' || a.a == 's2') && a.k) {
         if (a.k.length > 43) {
-            // RSA-keyed share command: run through worker
-            rsasharekeys[a.n] = true;
+            if (a.u === u_handle) {
+                // RSA-keyed share command targeted to u_handle: run through worker
+                rsasharekeys[a.n] = true;
 
-            if (workers) {
-                a.scqi = scqhead++;     // set scq slot number
-                workers[a.scqi % workers.length].postMessage(a);
-                return;
+                if (workers) {
+                    a.scqi = scqhead++;     // set scq slot number
+
+                    var p = a.scqi % workers.length;
+
+                    // pin the nodes of this share to the same worker
+                    // (it is the only one that knows the sharekey)
+                    shareworker[a.n] = p;
+
+                    workers[p].postMessage(a);
+                    return;
+                }
             }
         }
+        else {
+            if (a.o === u_handle) {
+                var k = crypto_process_sharekey(a.n, a.k);
 
-        var k = crypto_process_sharekey(a.n, a.k);
-
-        if (k !== false) a.k = k;
-        else console.log("Failed to decrypt RSA share key for " + a.n + ": " + a.k);
+                if (k !== false) {
+                    a.k = k;
+                    crypto_setsharekey(a.n, k, true);
+                }
+                else console.log("Failed to decrypt RSA share key for " + a.n + ": " + a.k);
+            }
+        }
     }
 
     // other packet types do not warrant the worker detour
@@ -6140,7 +6180,7 @@ function sc_node(n) {
         for (p = 8; (p = n.k.indexOf(':', p)) >= 0; ) {
             if (++p == 9 || n.k[p-10] == '/') {
                 id = n.k.substr(p-9, 8);
-                if (u_sharekeys[id]) {
+                if (shareworker[id] || u_sharekeys[id]) {
                     break;
                 }
             }
@@ -6184,11 +6224,9 @@ function sc_node(n) {
 }
 
 // inter-actionpacket state, gets reset in getsc()
-var tparentid,
-    trights,
-    tmoveid,
-    rootsharenodes = [],
-    loadavatars = [];
+var scsharesuiupd;
+var loadavatars = [];
+var scinshare = Object.create(null);
 
 // if no execsc() thread is running, check if one should be, and start it if so.
 function resumesc() {
@@ -6205,7 +6243,6 @@ function execsc() {
     var n, i;
     var tick = Date.now();
     var tickcount = 0;
-    var updateRights = false;
 
     do {
         if (!scq[scqtail] || !scq[scqtail][0] || (scq[scqtail][0].a == 't' && nodesinflight[scqtail])) {
@@ -6228,6 +6265,21 @@ function execsc() {
 
             if ($.dialog === 'properties') {
                 propertiesDialog();
+            }
+
+            if (scsharesuiupd) {
+                if (fminitialized) {
+                    onIdle(function() {
+                        M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
+
+                        if (M.currentrootid === 'shares') {
+                            M.openFolder(M.currentdirid, true);
+                            loadingDialog.hide(); // TODO: from leaveShare, check if ok..
+                        }
+                    });
+                }
+
+                scsharesuiupd = false;
             }
 
             sccount = 0;
@@ -6358,10 +6410,7 @@ function execsc() {
                     crypto_share_rsa2aes();
 
                     // reset state
-                    tparentid = false;
-                    trights = false;
-                    tmoveid = false;
-                    rootsharenodes = [];
+                    scinshare = Object.create(null);
                     break;
 
                 case '_fm':
@@ -6466,18 +6515,21 @@ function execsc() {
 
                                     // delete a share:
                                     n = M.d[a.n];
-                                    if (n && n.p.length != 11) {
-                                        // outgoing share removed
-                                        delete n.r;
-                                        delete n.su;
 
-                                        if (fmdb) {
-                                            M.nodeUpdated(n);
-                                            fmdb.del('s', u_handle + '*' + a.n);
+                                    if (n) {
+                                        if (!n.su) {
+                                            // outgoing share removed
+                                            delete n.r;
+                                            delete n.su;
+
+                                            if (fmdb) {
+                                                M.nodeUpdated(n);
+                                                fmdb.del('s', u_handle + '*' + a.n);
+                                            }
                                         }
-                                    }
-                                    else {
-                                        M.delNode(a.n);
+                                        else {
+                                            M.delNode(a.n);
+                                        }
                                     }
 
                                     if (!folderlink && a.u != 'EXP' && fminitialized) {
@@ -6491,30 +6543,24 @@ function execsc() {
                                 }
                                 else {
                                     if (d) {
-                                        console.log('I received a share, preparing for receiving tree a');
+                                        console.log('Inbound share, preparing for receiving its nodes');
                                     }
-                                    // I received a share, prepare for receiving tree
-                                    tparentid = a.o;
-                                    trights = a.r;
+
+                                    // if the parent node already exists, all we do is setting .r/.su
+                                    // we can skip the subsequent tree; we already have the nodes
                                     if (n = M.d[a.n]) {
-                                        // update rights:
                                         n.r = a.r;
                                         n.su = a.o;
                                         M.nodeUpdated(n);
-                                        updateRights = true;
+
+                                        scinshare.skip = true;
                                     }
                                     else {
-                                        if (d) {
-                                            console.log('Looking up other share nodes from this user');
-                                        }
-
-                                        if (M.c[a.o]) {
-                                            for (i in M.c[a.o]) {
-                                                if (M.d[i] && M.d[i].t == 1) {
-                                                    rootsharenodes[i] = 1;
-                                                }
-                                            }
-                                        }
+                                        scinshare.skip = false;
+                                        scinshare.h = a.n;
+                                        scinshare.r = a.r;
+                                        scinshare.sk = a.k;
+                                        scinshare.su = a.o;
 
                                         if (!folderlink && fminitialized) {
                                             notify.notifyFromActionPacket({
@@ -6546,15 +6592,9 @@ function execsc() {
                         }
 
                         if (fminitialized) {
-                            M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
                             sharedUInode(a.n);
-                            treeUI();
-
-                            // Inshares permission DOM update
-                            if (updateRights) {
-                                sharedFolderUI();
-                            }
                         }
+                        scsharesuiupd = true;
                     }
                     break;
 
@@ -6569,49 +6609,44 @@ function execsc() {
                             cr: crypto_makecr(actionPacket.n, [actionPacket.h], true)
                         });*/
 
-                    if (fminitialized) {
-                        M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
-                    }
+                    scsharesuiupd = true;
                     break;
 
                 case 't':
                     // node tree
                     // the nodes have been pre-parsed and stored in scnodes
-                    if (tparentid) {
-                        for (i = 0; i < scnodes.length; i++) {
-                            if (rootsharenodes[scnodes[i].h] && M.d[scnodes[i].h]) {
-                                scnodes[i].r = M.d[scnodes[i].h].r;
-                                scnodes[i].su = M.d[scnodes[i].h].su;
-                                M.delNode(scnodes[i].h);
+                    if (scinshare.skip) {
+                        // FIXME: do we still need to notify anything here?
+                        scinshare.skip = false;
+                        break;
+                    }
+
+                    // is this tree a new inshare with root scinshare.h? set share-relevant
+                    // attributes in its root node.
+                    if (scinshare.h) {
+                        for (i = scnodes.length; i--;) {
+                            if (scnodes[i].h === scinshare.h) {
+                                scnodes[i].su = scinshare.su;
+                                scnodes[i].r = scinshare.r;
+                                scnodes[i].sk = scinshare.sk;
+                            }
+                            else if (M.d[scnodes[i].h]) {
+                                delete scnodes[i];
                             }
                         }
-
-                        if (!M.d[scnodes[0].p]) {
-                            scnodes[0].p = tparentid;
-                        }
-
-                        scnodes[0].su = tparentid;
-                        scnodes[0].r = trights;
-
-                        // FIXME: put this earler
-                        if (tsharekey) {
-                            scnodes[0].sk = tsharekey;
-                            tsharekey = false;
-                        }
-
-                        rootsharenodes = [];
+                        scinshare.h = false;
                     }
 
                     // notification logic
+                    // FIXME: this assumes that scnodes[0] is the root - check if always true
                     if (fminitialized && !folderlink && a.ou && a.ou != u_handle
-                        && scnodes.length && scnodes[0].p && scnodes[0].p.length < 11
-                        && !tmoveid && !tparentid) {
+                        && scnodes.length && scnodes[0].p && !scnodes[0].su) {
 
                         var targetid = scnodes[0].p;
                         var pnodes = [];
 
                         for (i = 0; i < scnodes.length; i++) {
-                            if (scnodes[i].p === targetid) {
+                            if (scnodes[i] && scnodes[i].p === targetid) {
                                 pnodes.push({
                                     h: scnodes[i].h,
                                     t: scnodes[i].t
@@ -6627,13 +6662,14 @@ function execsc() {
                         });
                     }
 
-                    tparentid = false;
-                    trights = false;
-
-                    for (i = 0; i < scnodes.length; i++) M.addNode(scnodes[i]);
+                    for (i = 0; i < scnodes.length; i++) {
+                        if (scnodes[i]) {
+                            M.addNode(scnodes[i]);
+                        }
+                    }
 
                     if (typeof M.scAckQueue[a.i] === 'function') {
-                        M.scAckQueue[a.i](scnodes);
+                        M.scAckQueue[a.i]();
                         delete M.scAckQueue[a.i];
                     }
                     break;
@@ -7128,6 +7164,15 @@ function tree_ok0(ok) {
 // FIXME: call from M.addNode() to avoid code duplication
 function emplacenode(node) {
     if (node.p) {
+        // we have to add M.c[sharinguserhandle] records explicitly as
+        // node.p has ceased to be the sharing user handle
+        if (node.su) {
+            if (!M.c[node.su]) {
+                M.c[node.su] = [];
+            }
+            M.c[node.su][node.h] = node.t + 1;
+        }
+
         if (!M.c[node.p]) {
             M.c[node.p] = [];
         }
@@ -7261,8 +7306,8 @@ function worker_procmsg(ev) {
         }
         else {
             // maintain special incoming shares index
-            if (ev.data.p.length == 11) {
-                M.c.shares[ev.data.h] = { su : ev.data.p, r : ev.data.r };
+            if (ev.data.su) {
+                M.c.shares[ev.data.h] = { su : ev.data.su, r : ev.data.r };
 
                 if (u_sharekeys[ev.data.h]) {
                     M.c.shares[ev.data.h].sk = u_sharekeys[ev.data.h][0];

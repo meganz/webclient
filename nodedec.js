@@ -28,6 +28,7 @@ if (typeof importScripts !== 'undefined') {
                 }
                 else {
                     req.k = k;
+                    u_sharekeys[req.n] = [k, new sjcl.cipher.aes(k)];
                 }
             }
             self.postMessage(req);
@@ -136,8 +137,6 @@ function crypto_decryptnode(n) {
                     }
                 }
             }
-
-            n.p = n.su;
         }
 
         // does the logged in user own the node? (user key is guaranteed to be located first in .k)

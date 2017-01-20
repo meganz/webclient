@@ -167,21 +167,33 @@ describe("SharedLocalKVStorage Unit Test", function() {
 
         [
             {
-                'insert': [
-                    ['a1', 'val1'],
-                    ['b1', 'val2'],
-                    ['a2', 'val3'],
+                'operations': [
+                    ['setItem', 'a1', 'val1'],
+                    ['setItem', 'b1', 'val2'],
+                    ['setItem', 'a2', 'val3'],
                 ],
                 'expected': [
                     'a1', 'b1', 'a2'
                 ]
             },
             {
-                'insert': [
-                    ['2z1', 'val4'],
-                    ['2a1', 'val1'],
-                    ['2b1', 'val2'],
-                    ['2a2', 'val3'],
+                'operations': [
+                    ['setItem', '2z1', 'val4'],
+                    ['setItem', '2a1', 'val1'],
+                    ['setItem', '2b1', 'val2'],
+                    ['setItem', '2a2', 'val3'],
+                ],
+                'expected': [
+                    '2z1', '2a1', '2b1', '2a2'
+                ]
+            },
+            {
+                'operations': [
+                    ['setItem', '2z1', 'val1'],
+                    ['setItem', '2a1', 'val2'],
+                    ['setItem', '2b1', 'val3'],
+                    ['setItem', '2a2', 'val4'],
+                    ['setItem', '2z1', 'val5'],
                 ],
                 'expected': [
                     '2z1', '2a1', '2b1', '2a2'
@@ -198,10 +210,10 @@ describe("SharedLocalKVStorage Unit Test", function() {
 
                 var allInserts = [];
                 dexieStorage.clear().always(function() {
-                    testCase.insert.forEach(function(kv) {
+                    testCase.operations.forEach(function(kv) {
                         allInserts.push(
                             promiseHelpers.expectPromiseToBeResolved(
-                                dexieStorage.setItem(kv[0], kv[1])
+                                dexieStorage[kv[0]](kv[1], kv[2])
                             )
                                 .fail(rej)
                         );

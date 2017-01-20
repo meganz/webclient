@@ -788,8 +788,32 @@ SharedLocalKVStorage.Utils.DexieStorage.prototype.flush = function() {
 
                     self.db.transaction('rw', self.db.kv, function () {
                         // delete and put SHOULD be done in an ordered, atomical way.
-                        self.db.kv.where('k').equals(encryptedKey).delete().then(function () {
-                            if (self.db && self.db.kv) {
+                        self.db.kv.where('k').equals(encryptedKey).toArray(function (found) {
+                            if (!self.db || !self.db.kv) {
+                                // Connection to db closed.
+                                tmpPromise.reject();
+                            }
+                            else if (found.length === 1) {
+                                tmpPromise.linkFailTo(
+                                    MegaPromise.asMegaPromiseProxy(
+                                        self.db.kv.update(found[0], {
+                                            v: encryptedVal
+                                        })
+                                            .catch(function (e) {
+                                                self.logger.error(
+                                                    "setItem -> flush -> dexie.update failed:",
+                                                    e && e.message ? e.message : e,
+                                                    found,
+                                                    k,
+                                                    tmpNewCache[k],
+                                                    arguments
+                                                );
+                                                tmpPromise.reject();
+                                            })
+                                    )
+                                );
+                            } else if(!found || found.length === 0) {
+                                // not found, proceed to add entry
                                 tmpPromise.linkFailTo(
                                     MegaPromise.asMegaPromiseProxy(
                                         self.db.kv.add({
@@ -798,7 +822,7 @@ SharedLocalKVStorage.Utils.DexieStorage.prototype.flush = function() {
                                         })
                                             .catch(function (e) {
                                                 self.logger.error(
-                                                    "setItem -> flush -> dexie.put failed:",
+                                                    "setItem -> flush -> dexie.add failed:",
                                                     e && e.message ? e.message : e
                                                 );
                                                 tmpPromise.reject();
@@ -806,8 +830,9 @@ SharedLocalKVStorage.Utils.DexieStorage.prototype.flush = function() {
                                     )
                                 );
                             } else {
-                                // Connection to db closed.
-                                tmpPromise.reject();
+                                if (d) {
+                                    self.logger.error("THIS SHOULD NEVER HAPPEN!", k, tmpNewCache[k], arguments);
+                                }
                             }
                         });
                     }).then(function () {

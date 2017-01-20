@@ -6618,7 +6618,7 @@ function execsc() {
                     // the nodes have been pre-parsed and stored in scnodes
                     if (inshare_skip) {
                         // FIXME: do we still need to notify anything here?
-                        inshare_skipnodes = false;
+                        inshare_skip = false;
                         break;
                     }
 

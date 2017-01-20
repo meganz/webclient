@@ -6216,14 +6216,9 @@ function sc_node(n) {
 }
 
 // inter-actionpacket state, gets reset in getsc()
-var
-    scsharesuiupd,
-    loadavatars = [];
-
-var inshare_skip = false,
-    inshare_h = false,
-    inshare_su,
-    inshare_r;
+var scsharesuiupd;
+var loadavatars = [];
+var scinshare = Object.create(null);
 
 // if no execsc() thread is running, check if one should be, and start it if so.
 function resumesc() {
@@ -6407,8 +6402,7 @@ function execsc() {
                     crypto_share_rsa2aes();
 
                     // reset state
-                    inshare_skip = false;
-                    inshare_h = false;
+                    scinshare = Object.create(null);
                     break;
 
                 case '_fm':
@@ -6549,19 +6543,16 @@ function execsc() {
                                     if (n = M.d[a.n]) {
                                         n.r = a.r;
                                         n.su = a.o;
-
-                                        // FIXME: also add to M.c.shares and M.c[a.o] here?
-
                                         M.nodeUpdated(n);
 
-                                        inshare_skip = true;
+                                        scinshare.skip = true;
                                     }
                                     else {
-                                        inshare_skip = false;
-                                        inshare_h = a.n;
-                                        inshare_su = a.o;
-                                        inshare_r = a.r;
-                                        inshare_sk = a.k;
+                                        scinshare.skip = false;
+                                        scinshare.h = a.n;
+                                        scinshare.r = a.r;
+                                        scinshare.sk = a.k;
+                                        scinshare.su = a.o;
 
                                         if (!folderlink && fminitialized) {
                                             notify.notifyFromActionPacket({
@@ -6616,26 +6607,26 @@ function execsc() {
                 case 't':
                     // node tree
                     // the nodes have been pre-parsed and stored in scnodes
-                    if (inshare_skip) {
+                    if (scinshare.skip) {
                         // FIXME: do we still need to notify anything here?
-                        inshare_skip = false;
+                        scinshare.skip = false;
                         break;
                     }
 
-                    // is this tree a new inshare with root inshare_h? set share-relevant
+                    // is this tree a new inshare with root scinshare.h? set share-relevant
                     // attributes in its root node.
-                    if (inshare_h) {
-                        // FIXME: no loop needed if scnodes[0] guaranteed to be share's root
-                        // FIXME: set M.c.shares and M.c[inshare_su]?
-                        for (i = 0; i < scnodes.length; i++) {
-                            if (scnodes[i].h === inshare_h) {
-                                scnodes[i].su = inshare_su;
-                                scnodes[i].r = inshare_r;
-                                scnodes[i].sk = inshare_sk;
-                                break;
+                    if (scinshare.h) {
+                        for (i = scnodes.length; i--;) {
+                            if (scnodes[i].h === scinshare.h) {
+                                scnodes[i].su = scinshare.su;
+                                scnodes[i].r = scinshare.r;
+                                scnodes[i].sk = scinshare.sk;
+                            }
+                            else if (M.d[scnodes[i].h]) {
+                                delete scnodes[i];
                             }
                         }
-                        inshare_h = false;
+                        scinshare.h = false;
                     }
 
                     // notification logic
@@ -6647,7 +6638,7 @@ function execsc() {
                         var pnodes = [];
 
                         for (i = 0; i < scnodes.length; i++) {
-                            if (scnodes[i].p === targetid) {
+                            if (scnodes[i] && scnodes[i].p === targetid) {
                                 pnodes.push({
                                     h: scnodes[i].h,
                                     t: scnodes[i].t
@@ -6663,10 +6654,14 @@ function execsc() {
                         });
                     }
 
-                    for (i = 0; i < scnodes.length; i++) M.addNode(scnodes[i]);
+                    for (i = 0; i < scnodes.length; i++) {
+                        if (scnodes[i]) {
+                            M.addNode(scnodes[i]);
+                        }
+                    }
 
                     if (typeof M.scAckQueue[a.i] === 'function') {
-                        M.scAckQueue[a.i](scnodes);
+                        M.scAckQueue[a.i]();
                         delete M.scAckQueue[a.i];
                     }
                     break;

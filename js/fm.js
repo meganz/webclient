@@ -12415,7 +12415,6 @@ mega.utils.findDupes = function() {
 };
 
 function sharedFolderUI() {
-    /* jshint -W074 */
     var nodeData = M.d[M.currentdirid];
     var browsingSharedContent = false;
 
@@ -12430,7 +12429,7 @@ function sharedFolderUI() {
     }
 
     // are we in an inshare?
-    while (nodeData && (!nodeData.su || M.d[nodeData.p])) {
+    while (nodeData && !nodeData.su) {
         nodeData = M.d[nodeData.p];
     }
 
@@ -12504,7 +12503,6 @@ function sharedFolderUI() {
     }
 
     return browsingSharedContent;
-    /* jshint -W074 */
 }
 
 function userFingerprint(userid, callback) {

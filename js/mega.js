@@ -6120,27 +6120,35 @@ var nodesinflight = {};  // number of nodes being processed in the worker for sc
 function sc_packet(a) {
     if ((a.a == 's' || a.a == 's2') && a.k) {
         if (a.k.length > 43) {
-            // RSA-keyed share command: run through worker
-            rsasharekeys[a.n] = true;
+            if (a.u === u_handle) {
+                // RSA-keyed share command targeted to u_handle: run through worker
+                rsasharekeys[a.n] = true;
 
-            if (workers) {
-                a.scqi = scqhead++;     // set scq slot number
+                if (workers) {
+                    a.scqi = scqhead++;     // set scq slot number
 
-                var p = a.scqi % workers.length;
+                    var p = a.scqi % workers.length;
 
-                // pin the nodes of this share to the same worker
-                // (it is the only one that knows the sharekey)
-                shareworker[a.n] = p;
+                    // pin the nodes of this share to the same worker
+                    // (it is the only one that knows the sharekey)
+                    shareworker[a.n] = p;
 
-                workers[p].postMessage(a);
-                return;
+                    workers[p].postMessage(a);
+                    return;
+                }
             }
         }
+        else {
+            if (a.o === u_handle) {
+                var k = crypto_process_sharekey(a.n, a.k);
 
-        var k = crypto_process_sharekey(a.n, a.k);
-
-        if (k !== false) a.k = k;
-        else console.log("Failed to decrypt RSA share key for " + a.n + ": " + a.k);
+                if (k !== false) {
+                    a.k = k;
+                    crypto_setsharekey(a.n, k, true);
+                }
+                else console.log("Failed to decrypt RSA share key for " + a.n + ": " + a.k);
+            }
+        }
     }
 
     // other packet types do not warrant the worker detour

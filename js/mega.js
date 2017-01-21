@@ -7621,7 +7621,11 @@ function RightsbyID(id) {
         return (M.d[p[p.length - 3]] || {}).r;
     }
     else if (p[p.length - 1] === 'shares') {
-        return (M.d[id] || {}).r
+        var n = M.d[id] || {};
+        while (n && !n.su) {
+            n = M.d[n.p];
+        }
+        return (n || {}).r;
     }
     else {
         return 2;

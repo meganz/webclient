@@ -4082,11 +4082,11 @@ function MegaData()
     this.getNodeShare = function(node, user) {
         user = user || 'EXP';
 
-        if (typeof node !== 'object') {
+        if (typeof node != 'object') {
             node = this.getNodeByHandle(node);
         }
 
-        if (node && Object(node.shares).hasOwnProperty(user)) {
+        if (node && node.shares && user in node.shares) {
             return node.shares[user];
         }
 
@@ -4175,8 +4175,12 @@ function MegaData()
      *                       owner share key must be removed too.
      */
     this.delNodeShare = function(h, u, okd) {
-        if (this.d[h] && typeof this.d[h].shares !== 'undefined') {
+        if (this.d[h] && typeof this.d[h].shares != 'undefined') {
             var updnode;
+
+            if (this.su[u]) {
+                delete this.su[u][h];
+            }
 
             if (fmdb) {
                 fmdb.del('s', h + '*' + u);
@@ -6452,8 +6456,7 @@ function execsc() {
                                 var handle = a.n;
                                 var shares = Object(M.d[handle]).shares || {};
 
-                                if (shares.hasOwnProperty(a.u)
-                                    || a.ha === crypto_handleauth(a.n)) {
+                                if (a.u in shares || a.ha === crypto_handleauth(a.n)) {
 
                                     // I updated or created my share
                                     var k = decrypt_key(u_k_aes, base64_to_a32(a.ok));
@@ -6507,28 +6510,41 @@ function execsc() {
                                 exportLink.getExportLink();
                             }
 
-                            if (a.o) {
-                                if (typeof a.r == 'undefined') {
-                                    if (d) {
-                                        console.log('Share deletion');
-                                    }
-
-                                    // delete a share:
+                            if ('o' in a) {
+                                if (!('r' in a)) {
+                                    // share deletion
                                     n = M.d[a.n];
 
                                     if (n) {
-                                        if (!n.su) {
-                                            // outgoing share removed
-                                            delete n.r;
-                                            delete n.su;
+                                        if (a.u === u_handle) {
+                                            // incoming share
+                                            if (d) {
+                                                console.log('Incoming share ' + a.n + " revoked");
+                                            }
+
+                                            if (M.d[n.p]) {
+                                                // inner share: leave nodes intact, just remove .r/.su
+                                                delete n.r;
+                                                delete n.su;
+                                                delete u_sharekeys[a.n];
+                                            }
+                                            else {
+                                                // toplevel share: delete entire tree
+                                                // (the API will have removed all subshares at this point)
+                                                M.delNode(a.n);
+                                            }
+
+                                            delete u_sharekeys[a.n];
 
                                             if (fmdb) {
                                                 M.nodeUpdated(n);
-                                                fmdb.del('s', u_handle + '*' + a.n);
+                                                fmdb.del('s', a.n + '*' + u_handle);
                                             }
                                         }
                                         else {
-                                            M.delNode(a.n);
+                                            if (a.o === u_handle) {
+                                                M.delNodeShare(a.n, a.u);
+                                            }
                                         }
                                     }
 
@@ -6539,7 +6555,6 @@ function execsc() {
                                             u: a.o
                                         });
                                     }
-                                    delete u_sharekeys[a.n];
                                 }
                                 else {
                                     if (d) {

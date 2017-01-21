@@ -12491,7 +12491,7 @@ function sharedFolderUI() {
 
         $(rightPanelView).addClass('shared-folder-content');
 
-        if (M.d[M.currentdirid] !== nodeData) {
+        if (M.d[M.currentdirid] !== nodeData || M.d[nodeData.p]) {
             // hide leave-share under non-root shares
             $('.fm-leave-share').addClass('hidden');
         }

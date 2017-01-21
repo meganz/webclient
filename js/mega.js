@@ -7617,8 +7617,11 @@ function RightsbyID(id) {
 
     var p = M.getPath(id);
 
-    if ((p[p.length - 1] === 'contacts') || (p[p.length - 1] === 'shares')) {
+    if (p[p.length - 1] === 'contacts') {
         return (M.d[p[p.length - 3]] || {}).r;
+    }
+    else if (p[p.length - 1] === 'shares') {
+        return (M.d[id] || {}).r
     }
     else {
         return 2;

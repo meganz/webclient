@@ -3569,28 +3569,33 @@ function MegaData()
 
         nodes = nodes || $.selected || [];
 
-        // Always copy if the target's root is an inshare
-        if (RootbyId(target) === 'shares') {
-            move = copy;
-        }
+        var totype = treetype(target);
 
         for (var i = nodes.length; i--;) {
             var node = nodes[i];
 
-            if (!isCircular(node, target)) {
-                if (RootbyId(node) === 'shares') {
-                    copy.push(node);
+            var fromtype = treetype(node);
+
+            if (fromtype == totype) {
+                if (!isbelow(node, target)) {
+                    if (totype != 'shares' || sharer(node) === sharer(target)) {
+                        move.push(node);
+                    }
+                    else {
+                        copy.push(node);
+                    }
                 }
-                else {
-                    move.push(node);
-                }
+            }
+            else {
+                copy.push(node);
             }
         }
 
         if (copy.length) {
             this.copyNodes(copy, target, true);
         }
-        if (move.length && copy !== move) {
+
+        if (move.length) {
             this.moveNodes(move, target);
         }
 

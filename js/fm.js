@@ -8589,22 +8589,16 @@ function handleDialogTabContent(dialogTabClass, parentTag, dialogPrefix, htmlCon
  * @param {String} dialogName Dialog name i.e. { copy, move }.
  */
 function disableReadOnlySharedFolders(dialogName) {
-
-    var nodeId, accessRight, rootParentDirId,
-        $mcTreeSub = $("#mctreesub_shares"),
-        $ro = $('.' + dialogName + '-dialog-tree-panel.shared-with-me .dialog-content-block span[id^="mctreea_"]');
+    var $ro = $('.' + dialogName + '-dialog-tree-panel.shared-with-me .dialog-content-block span[id^="mctreea_"]');
 
     $ro.each(function(i, v) {
-        nodeId = $(v).attr('id').replace('mctreea_', '');
+        var node = M.d[$(v).attr('id').replace('mctreea_', '')];
 
-        // Apply access right of root parent dir to all subfolders
-        rootParentDirId = $("#mctreea_" + nodeId).parentsUntil($mcTreeSub).last().attr('id').replace('mctreeli_', '');
-
-        if (M.d[rootParentDirId]) {
-            accessRight = M.d[rootParentDirId].r;
+        while (node && !node.su) {
+            node = M.d[node.p];
         }
 
-        if (!accessRight || (accessRight === 0)) {
+        if (!node || !node.r) {
             $(v).addClass('disabled');
         }
     });

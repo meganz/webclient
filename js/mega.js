@@ -2514,11 +2514,6 @@ function MegaData()
             else if (d) {
                 console.warn('No user record for incoming share', n.su);
             }
-
-            if (!this.c[n.su]) {
-                this.c[n.su] = [];
-            }
-            this.c[n.su][n.h] = n.t + 1;
         }
 
         if (n.p) {
@@ -2526,28 +2521,6 @@ function MegaData()
                 this.c[n.p] = [];
             }
             this.c[n.p][n.h] = 1;
-
-            // maintain special incoming shares index
-            if (n.su) {
-                if (n.sk && !u_sharekeys[n.h]) {
-                    // extract sharekey from node's sk property
-                    var k = crypto_process_sharekey(n.h, n.sk);
-                    if (k !== false) crypto_setsharekey(n.h, k, ignoreDB);
-                }
-
-                this.c.shares[n.h] = { su : n.su,
-                                        r : n.r };
-
-                if (u_sharekeys[n.h]) {
-                    this.c.shares[n.h].sk = a32_to_base64(u_sharekeys[n.h][0]);
-                }
-
-                if (fmdb && !ignoreDB) {
-                    fmdb.add('s', { o_t : n.su + '*' + n.h,
-                                    d : this.c.shares[n.h]
-                    });
-                }
-            }
         }
 
         if (n.t) {
@@ -2564,7 +2537,7 @@ function MegaData()
 
         if (n.t < 2) {
             crypto_decryptnode(n);
-            M.nodeUpdated(n);
+            M.nodeUpdated(n, ignoreDB);
         }
 
         if (n.hash) {
@@ -3775,7 +3748,7 @@ function MegaData()
         }
     };
 
-    this.nodeUpdated = function(n) {
+    this.nodeUpdated = function(n, ignoreDB) {
         if (n.h && n.h.length == 8) {
             if (fmdb) {
                 fmdb.add('f', { h : n.h,
@@ -3800,6 +3773,35 @@ function MegaData()
                     crypto_reportmissingkey(n);
                 }
             }
+
+            // maintain special incoming shares index
+            if (n.su) {
+                if (!M.c[n.su]) {
+                    M.c[n.su] = [];
+                }
+                M.c[n.su][n.h] = n.t + 1;
+
+                if (!M.c.shares[n.h]) {
+                    if (n.sk && !u_sharekeys[n.h]) {
+                        // extract sharekey from node's sk property
+                        var k = crypto_process_sharekey(n.h, n.sk);
+                        if (k !== false) crypto_setsharekey(n.h, k, ignoreDB);
+                    }
+
+                    M.c.shares[n.h] = { su: n.su, r: n.r };
+
+                    if (u_sharekeys[n.h]) {
+                        M.c.shares[n.h].sk = a32_to_base64(u_sharekeys[n.h][0]);
+                    }
+
+                    if (fmdb && !ignoreDB) {
+                        fmdb.add('s', { o_t: n.su + '*' + n.h,
+                                          d: M.c.shares[n.h]
+                        });
+                    }
+                }
+            }
+
         }
     };
 

@@ -3577,7 +3577,7 @@ function MegaData()
             var fromtype = treetype(node);
 
             if (fromtype == totype) {
-                if (!isbelow(node, target)) {
+                if (!isCircular(node, target)) {
                     if (totype != 'shares' || sharer(node) === sharer(target)) {
                         move.push(node);
                     }
@@ -7645,25 +7645,15 @@ function RightsbyID(id) {
     return 2;
 }
 
-function isCircular(fromid, toid)
-{
-    var n = M.d[fromid];
-    if (n && n.t && toid != fromid)
-    {
-        var p1 = M.getPath(fromid);
-        var p2 = M.getPath(toid);
-        p1.reverse();
-        p2.reverse();
-        var c = 1;
-        for (var i in p1) {
-            if (p1[i] !== p2[i]) {
-                c = 0;
-                break;
-            }
-        }
-        return !!c;
+// returns true if h1 cannot be moved into h2 without creating circular linkage, false otherwise
+function isCircular(h1, h2) {
+    for (;;) {
+        if (h1 == h2) return true;
+
+        if (!M.d[h2]) return false;
+
+        h2 = M.d[h2].p;
     }
-    return false;
 }
 
 function RootbyId(id)
@@ -7713,17 +7703,6 @@ function sharer(h) {
     return false;
 }
 
-// returns true if h1 cannot be moved into h2 without creating circular linkage, false otherwise
-function isbelow(h1, h2) {
-    for (;;) {
-        if (h1 == h2) return true;
-
-        if (!M.d[h2]) return false;
-
-        h2 = M.d[h2].p;
-    }
-}
-
 // FIXME: remove alt
 function ddtype(ids, toid, alt) {
     if (folderlink) {
@@ -7742,7 +7721,7 @@ function ddtype(ids, toid, alt) {
         if (totype == 'cloud') {
             if (fromtype == 'cloud') {
                 // within and between own trees, always allow move ...
-                if (isbelow(fromid, toid)) {
+                if (isCircular(fromid, toid)) {
                     // ... except of a folder into itself or a subfolder
                     return false;
                 }
@@ -7765,7 +7744,7 @@ function ddtype(ids, toid, alt) {
         else if (totype == 'shares' && RightsbyID(toid)) {
             if (fromtype == 'shares') {
                 if (sharer(fromid) === sharer(toid)) {
-                    if (isbelow(fromid, toid)) {
+                    if (isCircular(fromid, toid)) {
                         // prevent moving/copying of a folder into iself or a subfolder
                         return false;
                     }

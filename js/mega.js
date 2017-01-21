@@ -7630,14 +7630,14 @@ function RightsbyID(id) {
         return false;
     }
 
-    var p = M.getPath(id);
+    while (M.d[id] && M.d[id].p) {
+        if (M.d[id].r >= 0) {
+            return M.d[id].r;
+        }
+        id = M.d[id].p;
+    }
 
-    if ((p[p.length - 1] === 'contacts') || (p[p.length - 1] === 'shares')) {
-        return (M.d[p[p.length - 3]] || {}).r;
-    }
-    else {
-        return 2;
-    }
+    return 2;
 }
 
 function isCircular(fromid, toid)
@@ -7669,67 +7669,119 @@ function RootbyId(id)
     return p[p.length - 1];
 }
 
-function ddtype(ids, toid, alt)
-{
-    if (folderlink)
-        return false;
-
-    var r = false, toid_r = RootbyId(toid);
-    for (var i in ids)
-    {
-        var fromid = ids[i], fromid_r;
-
-        if (fromid == toid || !M.d[fromid]) return false;
-        fromid_r = RootbyId(fromid);
-
-        // never allow move to own inbox, or to own contacts
-        if (toid == M.InboxID || toid == 'contacts')
-            return false;
-
-        // to a contact, always allow a copy
-        if (toid_r == 'contacts' && M.d[toid].p == 'contacts')
-            r = 'copy';
-
-        // to a shared folder, only with write rights
-        if ((toid_r == 'contacts' || toid_r == 'shares') && RightsbyID(toid) > 0)
-        {
-            if (isCircular(fromid, toid))
-                return false;
-            else
-                r = 'copy';
+// returns tree type h is in
+// FIXME: make result numeric
+function treetype(h) {
+    for (;;) {
+        if (!M.d[h]) {
+            return h;
         }
-        // cannot move or copy to the existing parent
-        if (toid == M.d[fromid].p)
-            return false;
 
-        // from own cloud to own cloud / trashbin, always move
-        if ((toid == M.RootID || toid == M.RubbishID || M.d[toid].t) && (fromid_r == M.RootID) && (toid_r == M.RootID || toid == M.RubbishID))
-        {
-            if (isCircular(fromid, toid))
-                return false;
-            else
-                r = 'move';
+        // root node reached?
+        if (M.d[h].t > 1) {
+            return 'cloud';
         }
-        // from trashbin or inbox to own cloud, always move
-        if ((fromid_r == M.RubbishID || fromid_r == M.InboxID) && toid_r == M.RootID)
-            r = 'move';
 
-        // from inbox to trashbin, always move
-        if (fromid_r == M.InboxID && toid_r == M.RubbishID)
-            r = 'move';
+        // incoming share reached? (does not need to be the outermost one)
+        if (M.d[h].su) {
+            return 'shares';
+        }
 
-        // from trashbin or inbox to a shared folder with write permission, always copy
-        if ((fromid_r == M.RubbishID || fromid_r == M.InboxID) && (toid_r == 'contacts' || toid_r == 'shares') && RightsbyID(toid) > 0)
-            r = 'copy';
+        if ('contacts shares messages opc ipc '.indexOf(M.d[h].p + ' ') >= 0) {
+            return M.d[h].p;
+        }
 
-        // copy from a share to cloud
-        if ((fromid_r == 'contacts' || fromid_r == 'shares') && (toid == M.RootID || toid_r == M.RootID))
-            r = 'copy';
-
-        // move from a share to trashbin only with full control rights (do a copy + del for proper handling)
-        if ((fromid_r == 'contacts' || fromid_r == 'shares') && toid == M.RubbishID && RightsbyID(fromid) > 1)
-            r = 'copydel';
+        h = M.d[h].p;
     }
+}
+
+// returns sharing user (or false if not in an inshare)
+function sharer(h) {
+    while (h && M.d[h]) {
+        if (M.d[h].su) {
+            return M.d[h].su;
+        }
+
+        h = M.d[h].p;
+    }
+
+    return false;
+}
+
+// returns true if h1 cannot be moved into h2 without creating circular linkage, false otherwise
+function isbelow(h1, h2) {
+    for (;;) {
+        if (h1 == h2) return true;
+
+        if (!M.d[h2]) return false;
+
+        h2 = M.d[h2].p;
+    }
+}
+
+// FIXME: remove alt
+function ddtype(ids, toid, alt) {
+    if (folderlink) {
+        return false;
+    }
+
+    var r = false, totype = treetype(toid);
+
+    for (var i = ids.length; i--; ) {
+        var fromid = ids[i];
+
+        if (fromid === toid || !M.d[fromid]) return false;
+
+        var fromtype = treetype(fromid);
+
+        if (totype == 'cloud') {
+            if (fromtype == 'cloud') {
+                // within and between own trees, always allow move ...
+                if (isbelow(fromid, toid)) {
+                    // ... except of a folder into itself or a subfolder
+                    return false;
+                }
+
+                r = 'move';
+            }
+            else if (fromtype == 'shares') {
+                r = (toid === M.RubbishID) ? 'copydel' : 'copy';
+            }
+        }
+        else if (totype == 'contacts') {
+            if (toid == 'contacts') {
+                // never allow move to own contacts
+                return false;
+            }
+
+            // to a contact, always allow a copy (inbox drop)
+            r = 'copy';
+        }
+        else if (totype == 'shares' && RightsbyID(toid)) {
+            if (fromtype == 'shares') {
+                if (sharer(fromid) === sharer(toid)) {
+                    if (isbelow(fromid, toid)) {
+                        // prevent moving/copying of a folder into iself or a subfolder
+                        return false;
+                    }
+
+                    r = (RightsbyID(fromid) > 1) ? 'move' : 'copy';
+                }
+                else {
+                    r = 'copy';
+                }
+            }
+            else if (fromtype == 'cloud') {
+                // from cloud to a folder with write permission, always copy
+                r = 'copy';
+            }
+        }
+        else {
+            return false;
+        }
+    }
+
+    // FIXME: do not simply return the operation allowed for the last processed fromid
     return r;
 }
 

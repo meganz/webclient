@@ -9767,3 +9767,87 @@ var mobileDownload = {
         }
     }
 };
+
+
+(function() {
+    mBroadcaster.once('boot_done', function() {
+        if (
+            ua.details.browser === "Safari" ||
+            ua.details.browser === "Edge" ||
+            ua.details.browser === "Internet Explorer"
+        ) {
+            return;
+        }
+        // Didn't found a better place for this, so I'm leaving it here...
+        // This is basically a proxy of on paste, that would trigger a new event, which would receive the actual
+        // File object, name, etc.
+        $(document).on('paste', function (event) {
+            if (ua.details.browser === "Safari") {
+                // Safari is not supported
+                return;
+            }
+            else if (
+                ua.details.browser.toLowerCase().indexOf("explorer")  !== -1 ||
+                ua.details.browser.toLowerCase().indexOf("edge")  !== -1
+            ) {
+                // IE is not supported
+                return;
+            }
+
+            var items = (event.clipboardData || event.originalEvent.clipboardData).items;
+            if (!items && event.originalEvent.clipboardData && event.originalEvent.clipboardData.files) {
+                // safari
+                items = event.originalEvent.clipboardData.files;
+            }
+            var fileName = false;
+
+            var blob = null;
+            if (items) {
+                if (ua.details.browser === "Firefox" && items.length === 2) {
+                    // trying to paste an image, but .. FF does not have support for that. (It adds the file icon as
+                    // the image, which is a BAD UX, so .. halt now!)
+                    return;
+                }
+                for (var i = 0; i < items.length; i++) {
+                    if (items[i].type.indexOf("image") === 0) {
+                        if (items[i] instanceof File) {
+                            // Safari, using .files
+                            blob = items[i];
+                        }
+                        else {
+                            blob = items[i].getAsFile();
+                        }
+                    }
+                    else if (items[i].kind === "string") {
+                        items[0].getAsString(function (str) {
+                            fileName = str;
+                        });
+                    }
+                }
+            }
+
+            if (blob !== null) {
+                if (fileName) {
+                    // we've got the name of the file...
+                    blob.name = fileName;
+                }
+
+                if (!blob.name) {
+                    // no name found..generate dummy name.
+                    var ext = blob.type.replace("image/", "").toLowerCase();
+                    fileName = blob.name = "image." + (ext === "jpeg" ? "jpg" : ext);
+                }
+
+                var simulatedEvent = new $.Event("pastedimage");
+                $(window).trigger(simulatedEvent, [blob, fileName]);
+
+                // was this event handled and preventing default? if yes, prevent the raw event from pasting the
+                // file name text
+                if (simulatedEvent.isDefaultPrevented()) {
+                    event.preventDefault();
+                    return false;
+                }
+            }
+        });
+    });
+})();

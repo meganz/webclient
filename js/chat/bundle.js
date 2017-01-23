@@ -5730,6 +5730,7 @@ React.makeElement = React['createElement'];
 	            messagesToggledInCall: false,
 	            sendContactDialog: false,
 	            confirmDeleteDialog: false,
+	            pasteImageConfirmDialog: false,
 	            messageToBeDeleted: null,
 	            editing: false
 	        };
@@ -5897,6 +5898,15 @@ React.makeElement = React['createElement'];
 	                    }
 	                });
 	            }
+	        }
+
+	        if (self.isMounted() && self.$messages && self.isComponentEventuallyVisible()) {
+	            $(window).rebind('pastedimage.chatRoom', function (e, blob, fileName) {
+	                if (self.isMounted() && self.$messages && self.isComponentEventuallyVisible()) {
+	                    self.setState({ 'pasteImageConfirmDialog': [blob, fileName, URL.createObjectURL(blob)] });
+	                    e.preventDefault();
+	                }
+	            });
 	        }
 	    },
 	    handleWindowResize: function handleWindowResize(e, scrollToBottom) {
@@ -6362,6 +6372,51 @@ React.makeElement = React['createElement'];
 	                        hideActionButtons: true,
 	                        initTextScrolling: true
 	                    })
+	                )
+	            );
+	        }
+
+	        var pasteImageConfirmDialog = null;
+	        if (self.state.pasteImageConfirmDialog) {
+	            confirmDeleteDialog = React.makeElement(
+	                ModalDialogsUI.ConfirmDialog,
+	                {
+	                    megaChat: room.megaChat,
+	                    chatRoom: room,
+	                    title: __("Confirm paste"),
+	                    name: "paste-image-chat",
+	                    onClose: function onClose() {
+	                        self.setState({ 'pasteImageConfirmDialog': false });
+	                    },
+	                    onConfirmClicked: function onConfirmClicked() {
+	                        var meta = self.state.pasteImageConfirmDialog;
+	                        if (!meta) {
+	                            return;
+	                        }
+
+	                        M.addUpload([meta[0]]);
+
+	                        self.setState({
+	                            'pasteImageConfirmDialog': false
+	                        });
+	                    }
+	                },
+	                React.makeElement(
+	                    "div",
+	                    { className: "fm-dialog-content" },
+	                    React.makeElement(
+	                        "div",
+	                        { className: "dialog secondary-header" },
+	                        __("Please confirm that you want to upload this image and share it in this chat room.")
+	                    ),
+	                    React.makeElement("img", { src: self.state.pasteImageConfirmDialog[2], style: {
+	                            maxWidth: "90%",
+	                            height: "auto",
+	                            margin: '10px auto',
+	                            display: 'block',
+	                            border: '1px solid #ccc',
+	                            borderRadius: '4px'
+	                        } })
 	                )
 	            );
 	        }

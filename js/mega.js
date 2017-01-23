@@ -9819,7 +9819,7 @@ var mobileDownload = {
                         }
                     }
                     else if (items[i].kind === "string") {
-                        items[0].getAsString(function (str) {
+                        items[i].getAsString(function (str) {
                             fileName = str;
                         });
                     }

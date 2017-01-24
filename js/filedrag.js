@@ -393,3 +393,21 @@
     }
 
 })(this);
+
+// Selenium helper to fake a drop event
+function fakeDropEvent(target) {
+    // hash: "MTIzNAAAAAAAAAAAAAAAAAOLqRY"
+    var file = new File(['1234'], 'test.txt', {
+        type: "application/octet-stream",
+        lastModified: 1485195382
+    });
+
+    var ev = document.createEvent("HTMLEvents");
+    ev.initEvent("drop", true, true);
+    ev.dataTransfer = {
+        files: [file]
+    };
+
+    target = target || document.getElementById("startholder");
+    target.dispatchEvent(ev);
+}

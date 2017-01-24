@@ -120,7 +120,7 @@ var astroPayDialog = {
     initCloseButton: function() {
 
         // Initialise the close and cancel buttons
-        this.$dialog.find('.fm-dialog-close, .fm-dialog-button.cancel').rebind('click', function() {
+        this.$dialog.find('.fm-dialog-close, .cancel').rebind('click', function() {
 
             // Hide the overlay and dialog
             astroPayDialog.hideDialog();
@@ -137,7 +137,7 @@ var astroPayDialog = {
      */
     initConfirmButton: function() {
 
-        this.$dialog.find('.fm-dialog-button.accept').rebind('click', function() {
+        this.$dialog.find('.accept').rebind('click', function() {
 
             // Store the full name and tax number entered
             astroPayDialog.fullName = $.trim(astroPayDialog.$dialog.find('#astropay-name-field').val());
@@ -1258,6 +1258,9 @@ var proPage = {
         // Show recurring info box next to Purchase button and update dialog text for recurring
         if (recurringEnabled) {
             $step2.find('.subscription-instructions').removeClass('hidden');
+            $step2.find('.subscription-instructions').rebind('click', function() {
+                bottomPageDialog(false, 'general', l[1712]);
+            });
             $paymentAddressDialog.find('.payment-note-first.recurring').removeClass('hidden');
             $paymentAddressDialog.find('.payment-note-first.one-time').addClass('hidden');
         }
@@ -1505,6 +1508,7 @@ var proPage = {
 
         var $durationOptionsList = $('.duration-options-list');
         var $durationOptions = $durationOptionsList.find('.payment-duration:not(.template)');
+        var selectedPlanIndex = $durationOptionsList.find('.membership-radio.checked').parent().attr('data-plan-index');
         var selectedGatewayName = $('.payment-options-list input:checked').val();
         var selectedProvider = proPage.allGateways.filter(function(val) {
             return (val.gatewayName === selectedGatewayName);
@@ -1536,12 +1540,20 @@ var proPage = {
             }
         });
 
-        // Select the first remaining option that is not hidden
-        var $firstOption = $durationOptionsList.find('.payment-duration:not(.template, .hidden)').first();
-        var newPlanIndex = $firstOption.attr('data-plan-index');
-        $firstOption.find('.membership-radio').addClass('checked');
-        $firstOption.find('.membership-radio-label').addClass('checked');
-        $firstOption.find('input').attr('checked', 'checked');
+        // Select the first remaining option or previously selected (if its not hidden)
+        var $newDurationOption;
+        var newPlanIndex;
+        $newDurationOption = $durationOptionsList.find('[data-plan-index=' + selectedPlanIndex + ']');
+        if ($newDurationOption.length && !$newDurationOption.hasClass('hidden')) {
+            newPlanIndex = selectedPlanIndex;
+        }
+        else {
+            $newDurationOption = $durationOptionsList.find('.payment-duration:not(.template, .hidden)').first();
+            newPlanIndex = $newDurationOption.attr('data-plan-index');
+        }
+        $newDurationOption.find('.membership-radio').addClass('checked');
+        $newDurationOption.find('.membership-radio-label').addClass('checked');
+        $newDurationOption.find('input').attr('checked', 'checked');
 
         // Update the text for one-time or recurring
         proPage.updateMainPrice(newPlanIndex);
@@ -2339,7 +2351,13 @@ var addressDialog = {
         $statesSelect.append(stateOptions);
 
         // Initialise the jQueryUI selectmenu
-        $statesSelect.selectmenu();
+        $statesSelect.selectmenu({
+            position: {
+                my: "left top-18",
+                at: "left bottom-18",
+                collision: "flip"  // default is ""
+            }
+        });
     },
 
     /**
@@ -2364,7 +2382,13 @@ var addressDialog = {
         $countriesSelect.append(countryOptions);
 
         // Initialise the jQueryUI selectmenu
-        $countriesSelect.selectmenu();
+        $countriesSelect.selectmenu({
+            position: {
+                my: "left top-18",
+                at: "left bottom-18",
+                collision: "flip"  // default is ""
+            }
+        });
     },
 
     /**
@@ -3586,14 +3610,14 @@ var showSignupPromptDialog = function() {
             $('.fm-notification-info',this.$dialog)
                 .safeHTML('<p>@@</p>', l[5842]);
 
-            $('.fm-dialog-button.pro-login', this.$dialog)
+            $('.pro-login', this.$dialog)
                 .rebind('click.loginrequired', function() {
                     signupPromptDialog.hide();
                     showLoginDialog();
                     return false;
                 });
 
-            $('.fm-dialog-button.pro-register', this.$dialog)
+            $('.pro-register', this.$dialog)
                 .rebind('click.loginrequired', function() {
                     signupPromptDialog.hide();
 

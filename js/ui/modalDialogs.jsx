@@ -295,8 +295,8 @@ var CloudBrowserDialog = React.createClass({
     mixins: [MegaRenderMixin],
     getDefaultProps: function() {
         return {
-            'selectLabel': __("Attach"),
-            'cancelLabel': __("Cancel"),
+            'selectLabel': __(l[8023]),
+            'cancelLabel': __(l[82]),
             'hideable': true
         }
     },
@@ -492,8 +492,8 @@ var SelectContactDialog = React.createClass({
     clickTime: 0,
     getDefaultProps: function() {
         return {
-            'selectLabel': __("Send"),
-            'cancelLabel': __("Cancel"),
+            'selectLabel': __(l[1940]),
+            'cancelLabel': __(l[82]),
             'hideable': true
         }
     },
@@ -586,8 +586,8 @@ var ConfirmDialog = React.createClass({
     mixins: [MegaRenderMixin],
     getDefaultProps: function() {
         return {
-            'confirmLabel': __("Continue"),
-            'cancelLabel': __("Cancel"),
+            'confirmLabel': __(l[6826]),
+            'cancelLabel': __(l[82]),
             'hideable': true
         }
     },

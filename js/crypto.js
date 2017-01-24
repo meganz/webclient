@@ -1465,10 +1465,7 @@ function api_setsid(sid) {
 
             if (dlmanager.isOverQuota) {
 
-                if (dlmanager.isOverFreeQuota) {
-                    dlmanager._onQuotaRetry(true, sid);
-                }
-                else {
+                if (!dlmanager.isOverFreeQuota) {
                     dlmanager.uqFastTrack = 1;
                     dlmanager._overquotaInfo();
                 }
@@ -1801,7 +1798,9 @@ function api_send(q) {
         if (q.split) {
             if (chunked_method) {
                 // FIXME: use Fetch API if more efficient than this
-                q.xhr.responseType = 'moz-chunked-arraybuffer';
+                if (typeof Uint8Array.prototype.indexOf === 'function') {
+                    q.xhr.responseType = 'moz-chunked-arraybuffer';
+                }
 
                 // first try? record success
                 if (chunked_method < 0) {
@@ -1979,6 +1978,7 @@ function stopsc() {
 function setsn(sn) {
     // update sn in DB, triggering a "commit" of the current "transaction"
     if (fmdb) {
+        attribCache.flush();
         fmdb.add('_sn', { i : 1, d : sn });
     }
 }
@@ -2181,7 +2181,7 @@ function api_resetuser(ctx, c, email, pw) {
     var pw_aes = new sjcl.cipher.aes(prepare_key_pw(pw));
 
     var ssc = Array(4);
-    for (i = 4; i--;) {
+    for (var i = 4; i--;) {
         ssc[i] = rand(0x100000000);
     }
 
@@ -2402,7 +2402,7 @@ function api_changepw(ctx, passwordkey, masterkey, oldpw, newpw, email) {
  * Send current node attributes to the API
  * @return {MegaPromise}
  */
-function api_setattr(n) {
+function api_setattr(n, idtag) {
     var promise = new MegaPromise();
     var logger = MegaLogger.getLogger('crypt');
 
@@ -2421,10 +2421,14 @@ function api_setattr(n) {
     try {
         var at = ab_to_base64(crypto_makeattr(n));
 
-        logger.debug('Setting node attributes for "%s"...', n.h);
+        logger.debug('Setting node attributes for "%s"...', n.h, idtag);
 
-        // we do not set i here
-        api_req({ a: 'a', n: n.h, at: at }, ctx);
+        // we do not set i here, unless explicitly specified
+        api_req({a: 'a', n: n.h, at: at, i: idtag}, ctx);
+
+        if (idtag) {
+            M.scAckQueue[idtag] = Date.now();
+        }
     }
     catch (ex) {
         logger.error(ex);
@@ -2437,6 +2441,7 @@ function api_setattr(n) {
 function stringhash(s, aes) {
     var s32 = str_to_a32(s);
     var h32 = [0, 0, 0, 0];
+    var i;
 
     for (i = 0; i < s32.length; i++) {
         h32[i & 3] ^= s32[i];
@@ -2610,7 +2615,7 @@ function api_setshare1(ctx, params) {
                     for (j = 4; j--;) {
                         sharekey.push(rand(0x100000000));
                     }
-                    crypto_setsharekey(ctx.node, sharekey);
+                    crypto_setsharekey(ctx.node, sharekey, true);
                 }
 
                 req.ok = a32_to_base64(encrypt_key(u_k_aes, sharekey));
@@ -3980,9 +3985,19 @@ function crypto_fixmissingkeys(hs) {
 }
 
 // set a newly received sharekey - apply to relevant missing key nodes, if any.
-function crypto_setsharekey(h, k) {
+// also, update M.c.shares/FMDB.s if the sharekey was not previously known.
+function crypto_setsharekey(h, k, ignoreDB) {
     u_sharekeys[h] = [k, new sjcl.cipher.aes(k)];
     if (sharemissing[h]) crypto_fixmissingkeys(sharemissing[h]);
+
+    if (M.c.shares[h] && !M.c.shares[h].sk) {
+        M.c.shares[h].sk = a32_to_base64(k);
+
+        if (fmdb && !ignoreDB) {
+            fmdb.add('s', { o_t: M.c.shares[h].su + '*' + h,
+                            d: M.c.shares[h] });
+        }
+    }
 }
 
 // set a newly received nodekey
@@ -4363,7 +4378,7 @@ function api_strerror(errno) {
 
     var JSONSplitter = function json_splitter(filters, ctx, format_uint8array) {
         if (!(this instanceof json_splitter)) {
-            return new json_splitter(filters, ctx);
+            return new json_splitter(filters, ctx, format_uint8array);
         }
 
         // position in source string

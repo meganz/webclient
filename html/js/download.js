@@ -16,9 +16,9 @@ var MOBILE_FILETYPES = {
     "xlsx" : 'word'
 };
 
-if (navigator.userAgent.match(/CriOS/i)) {
-    // chrome on iOS :-(
-    MOBILE_MAXFILESIZE = 1.5 * (1024 * 1024);
+// If Chrome or Firefox on iOS, reduce the size to 1.3 MB
+if ((navigator.userAgent.match(/CriOS/i)) || (navigator.userAgent.match(/FxiOS/i))) {
+    MOBILE_MAXFILESIZE = 1.3 * (1024 * 1024);
 }
 
 
@@ -224,76 +224,7 @@ function dl_g(res) {
                 $('.mobile.filename').text(str_mtrunc(filename, 30));
                 $('.mobile.filesize').text(bytesToSize(res.s));
                 $('.mobile.dl-megaapp').rebind('click', function() {
-                    if (is_ios) {
-                        // Based off https://github.com/prabeengiri/DeepLinkingToNativeApp/
-                        var ns = '.ios ';
-                        var appLink = "mega://" + location.hash;
-                        var events = ["pagehide", "blur", "beforeunload"];
-                        var timeout = null;
-
-                        var preventDialog = function(e) {
-                            clearTimeout(timeout);
-                            timeout = null;
-                            $(window).unbind(events.join(ns) + ns);
-                        };
-
-                        var redirectToStore = function() {
-                            window.top.location = getStoreLink();
-                        };
-
-                        var redirect = function() {
-                            var ms = 500;
-
-                            preventDialog();
-                            $(window).bind(events.join(ns) + ns, preventDialog);
-
-                            window.location = appLink;
-
-                            // Starting with iOS 9.x, there will be a confirmation dialog asking whether we want to
-                            // open the app, which turns the setTimeout trick useless because no page unloading is
-                            // notified and users redirected to the app-store regardless if the app is installed.
-                            // Hence, as a mean to not remove the redirection we'll increase the timeout value, so
-                            // that users with the app installed will have a higher chance of confirming the dialog.
-                            // If past that time they didn't, we'll redirect them anyhow which isn't ideal but
-                            // otherwise users will the app NOT installed might don't know where the app is,
-                            // at least if they disabled the smart-app-banner...
-                            // NB: Chrome (CriOS) is not affected.
-                            if (is_ios > 8 && ua.details.brand !== 'CriOS') {
-                                ms = 4100;
-                            }
-
-                            timeout = setTimeout(redirectToStore, ms);
-                        };
-
-                        Soon(function() {
-                            // If user navigates back to browser and clicks the button,
-                            // try redirecting again.
-                            $('.mobile.dl-megaapp').rebind('click', function(e) {
-                                e.preventDefault();
-                                redirect();
-                                return false;
-                            });
-                        });
-                        redirect();
-                    }
-                    else {
-                        switch (ua.details.os) {
-                            case 'Windows Phone':
-                                window.location = "mega://" + location.hash.substr(1);
-                                break;
-
-                            case 'Android':
-                                var intent = 'intent://' + location.hash
-                                    + '/#Intent;scheme=mega;package=mega.privacy.android.app;end';
-                                document.location = intent;
-                                break;
-
-                            default:
-                                alert('Unknown device.');
-                        }
-                    }
-
-                    return false;
+                    mega.utils.redirectToApp($(this));
                 });
 
                 var ext = fileext(filename);
@@ -309,13 +240,13 @@ function dl_g(res) {
                     $('.mobile.dl-browser').addClass('disabled');
                     $('.mobile.dl-browser').unbind('click');
 
-                    var errmsg = l[8951];
-
+                    // Change error message
                     if (!supported) {
-                        errmsg = l[8952];
+                        $('.mobile.error-txt.file-unsupported').removeClass('hidden');
                     }
-
-                    $('.mobile.error-txt').safeHTML(errmsg);
+                    else {
+                        $('.mobile.error-txt.file-too-large').removeClass('hidden');
+                    }
                 }
             }
         }
@@ -344,7 +275,7 @@ function dl_g(res) {
         $('.mobile.application-txt').safeHTML(l[8950]);
 
         if (!fdl_queue_var) {
-            $('#mobile-ui-main').addClass('hidden');
+            // Show file not found overlay
             $('#mobile-ui-notFound').removeClass('hidden');
 
             var msg;
@@ -362,6 +293,10 @@ function dl_g(res) {
             }
 
             $('.mobile.na-file-txt').safeHTML(msg);
+        }
+        else {
+            // Show the download overlay
+            $('#mobile-ui-main').removeClass('hidden');
         }
     }
 
@@ -390,6 +325,7 @@ function browserDownload() {
         $('.download.content-block').addClass('downloading');
         $('.download.percents-txt').text('0 %');
         $('.download.status-txt').text(l[819]).removeClass('green');
+        $('.standalone-download-message').removeClass('hidden');
 
         if (is_mobile) {
             $('body').addClass('downloading')
@@ -555,6 +491,11 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
 
     if (bytesloaded === bytestotal) {
         $('.download.status-txt').text(l[8579]);
+
+        // Change button text to DECRYPTING... which can take some time
+        if (is_mobile) {
+            $('.mobile .download-progress span').text(l[8579] + '...');
+        }
     }
 
     if (fdl_starttime) var eltime = (new Date().getTime()-fdl_starttime)/1000;
@@ -675,6 +616,11 @@ function dlcomplete(id)
     Soon(mega.utils.resetUploadDownload);
     $('.download.content-block').removeClass('downloading').addClass('download-complete');
     fdl_queue_var = false;
+
+    // Change button text to OPEN FILE
+    if (is_mobile) {
+        $('.mobile .download-progress span').text(l[8949]);
+    }
 }
 
 function sync_switchOS(os)

@@ -61,7 +61,8 @@ function FMDB(plainname, schema, channelmap) {
     this.cantransact = -1;
 
     // initialise additional channels
-    for (var i in obj_values(this.channelmap)) {
+    for (var i in this.channelmap) {
+        i = this.channelmap[i];
         this.head[i] = 0;
         this.tail[i] = 0;
         this.pending[i] = {};
@@ -101,12 +102,13 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
         try {
             if (!fmdb.db) {
                 var todrop = [];
+                var dbpfx = 'fm667_';
 
-                // enumerate databases and collect those not prefixed with fm_
+                // enumerate databases and collect those not prefixed with 'dbpfx'
                 // (which is the current format)
                 Dexie.getDatabaseNames(function(r) {
                     for (var i = r.length; i--;) {
-                        if (r[i].substr(0,4) != 'fm2_') {
+                        if (r[i].substr(0, dbpfx.length) != dbpfx) {
                             todrop.push(r[i]);
                         }
                     }
@@ -115,10 +117,14 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
                         fmdb.logger.log("Deleting obsolete DBs: " + todrop.join(', '));
                     }
 
-                    fmdb.drop(todrop, function() {
+                    fmdb.dropall(todrop, function() {
                         // start inter-tab heartbeat
                         // fmdb.beacon();
-                        fmdb.db = new Dexie('fm2_' + fmdb.name);
+                        fmdb.db = new Dexie(dbpfx + fmdb.name);
+
+                        // save the db name for our getDatabaseNames polyfill
+                        localStorage['_$mdb$' + dbpfx + fmdb.name] = Date.now();
+
                         fmdb.db.version(1).stores(fmdb.schema);
                         fmdb.db.open().then(function(){
                             fmdb.get('_sn', function(r){
@@ -164,8 +170,35 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
     }
 };
 
-// drop databases
-FMDB.prototype.drop = function fmdb_drop(dbs, cb) {
+// drop database
+FMDB.prototype.drop = function fmdb_drop() {
+    var promise = new MegaPromise();
+
+    if (!this.db) {
+        promise.resolve();
+    }
+    else {
+        var fmdb = this;
+
+        this.invalidate(function() {
+
+            fmdb.db.delete().then(function() {
+                fmdb.logger.debug("IndexedDB deleted...");
+            }).catch(function(err) {
+                fmdb.logger.error("Unable to delete IndexedDB!", err);
+            }).finally(function() {
+                promise.resolve();
+            });
+
+            this.db = null;
+        });
+    }
+
+    return promise;
+};
+
+// drop random databases
+FMDB.prototype.dropall = function fmdb_dropall(dbs, cb) {
     if (!dbs || !dbs.length) {
         cb();
     }
@@ -178,7 +211,7 @@ FMDB.prototype.drop = function fmdb_drop(dbs, cb) {
         }).catch(function(err){
             fmdb.logger.error("Unable to delete IndexedDB " + db, err);
         }).finally(function(){
-            fmdb.drop(dbs, cb);
+            fmdb.dropall(dbs, cb);
         });
     }
 }
@@ -450,12 +483,16 @@ FMDB.prototype.stripnode = Object.freeze({
         return t;
     },
 
-    attrib : function(attrib, index) {
-        delete attrib.k;
+    ua : function(ua, index) {
+        delete ua.k;
     },
 
     chatqueuedmsgs : function(chatqueuedmsgs, index) {
         delete chatqueuedmsgs.k;
+    },
+
+    pta: function(pta, index) {
+        delete pta.k;
     }
 });
 
@@ -492,12 +529,24 @@ FMDB.prototype.restorenode = Object.freeze({
         }
     },
 
-    attrib : function(attrib, index) {
-        attrib.k = index.k;
+    ph : function(ph, index) {
+        ph.h = index.h;
+    },
+
+    ua : function(ua, index) {
+        ua.k = index.k;
     },
 
     chatqueuedmsgs : function(chatqueuedmsgs, index) {
         chatqueuedmsgs.k = index.k;
+    },
+    pta: function(pta, index) {
+        pta.k = index.k;
+    },
+
+    h: function(out, index) {
+        out.h = index.h;
+        out.hash = index.c;
     },
 
     mk : function(mk, index) {
@@ -803,7 +852,7 @@ Object.freeze(FMDB.prototype);
 
 
 function mDBcls() {
-    if (Object(window.fmdb).hasOwnProperty('db')) {
+    if (fmdb && fmdb.db) {
         fmdb.db.close();
     }
     fmdb = null;
@@ -866,6 +915,9 @@ mBroadcaster.once('startMega', function __idb_setup() {
                                     if (idx == 'hash') {
                                         list[length++] = i.substr(0, i.length - 5);
                                     }
+                                }
+                                else if (i.substr(0, 6) === '_$mdb$') {
+                                    list[length++] = i.substr(6);
                                 }
                             }
 

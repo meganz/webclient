@@ -146,8 +146,7 @@ var Chat = function() {
         'xmppDomain': xmppDomain,
         'loadbalancerService': 'gelb.karere.mega.nz',
         'fallbackXmppServers': [
-             "https://xmpp270n001.karere.mega.nz/ws",
-             "https://xmpp270n002.karere.mega.nz/ws"
+             "https://xmpp.karere.mega.nz/ws",
         ],
         'rtcSession': {
             'crypto': {
@@ -198,32 +197,7 @@ var Chat = function() {
             iceServers:[
                 // {urls: ['stun:stun.l.google.com:19302']},
                 {
-                    urls: ['turn:trn270n001.karere.mega.nz:3478?transport=udp'],   // Luxembourg
-                    username: "inoo20jdnH",
-                    credential: '02nNKDBkkS'
-                },
-                {
-                    urls: ['turn:trn270n002.karere.mega.nz:3478?transport=udp'],   // Luxembourg
-                    username: "inoo20jdnH",
-                    credential: '02nNKDBkkS'
-                },
-                {
-                    urls: ['turn:trn302n001.karere.mega.nz:3478?transport=udp'],   // Montreal, Canada
-                    username: "inoo20jdnH",
-                    credential: '02nNKDBkkS'
-                },
-                {
-                    urls: ['turn:trn302n002.karere.mega.nz:3478?transport=udp'],   // Montreal, Canada
-                    username: "inoo20jdnH",
-                    credential: '02nNKDBkkS'
-                },
-                {
-                    urls: ['turn:trn530n002.karere.mega.nz:3478?transport=udp'],   // NZ
-                    username: "inoo20jdnH",
-                    credential: '02nNKDBkkS'
-                },
-                {
-                    urls: ['turn:trn530n003.karere.mega.nz:3478?transport=udp'],   // NZ
+                    urls: ['turn:trn.karere.mega.nz:3478?transport=udp'],   // Luxembourg
                     username: "inoo20jdnH",
                     credential: '02nNKDBkkS'
                 }
@@ -242,8 +216,8 @@ var Chat = function() {
             'emoticonsFilter': EmoticonsFilter,
             'callFeedback': CallFeedback,
             'karerePing': KarerePing,
-            'persistedTypeArea': PersistedTypeArea,
             "presencedIntegration": PresencedIntegration,
+            // 'persistedTypeArea': PersistedTypeArea
         },
         'chatNotificationOptions': {
             'textMessages': {
@@ -480,19 +454,27 @@ Chat.prototype.init = function() {
     
 
     // UI events
-    $(document.body).undelegate('.top-user-status-item', 'mousedown.megachat');
+    $(document.body).undelegate('.top-user-status-popup .tick-item', 'mousedown.megachat');
 
-    $(document.body).delegate('.top-user-status-item', 'mousedown.megachat', function() {
+    $(document.body).delegate('.top-user-status-popup .tick-item', 'mousedown.megachat', function(e) {
         var presence = $(this).data("presence");
         self._myPresence = presence;
 
         $('.top-user-status-popup').removeClass("active");
+
+        $('.top-user-status-popup').addClass("hidden");
 
         // karere...
         if (self.karere.getConnectionState() != Karere.CONNECTION_STATE.CONNECTED && presence != Karere.PRESENCE.OFFLINE) {
             self.karere._myPresence = presence;
             self.connect().done(function() {
                 self.karere.setPresence(presence, undefined, localStorage.megaChatPresenceMtime);
+
+                //TODO: is this needed?
+                Object.keys(self.plugins.chatdIntegration.chatd.shards).forEach(function(k) {
+                    var shard = self.plugins.chatdIntegration.chatd.shards[k];
+                    shard.reconnect();
+                });
             });
         }
         else {
@@ -511,7 +493,6 @@ Chat.prototype.init = function() {
         // presenced integration
         var targetPresence = PresencedIntegration.cssClassToPresence(presence);
         if (targetPresence === UserPresence.PRESENCE.OFFLINE) {
-            self.userPresence.override
             self.userPresence.disconnect(true);
         }
         else {
@@ -664,6 +645,8 @@ Chat.prototype.init = function() {
         room.bind("onChatShown", function() {
             $('.conversations-main-listing').addClass("hidden");
         });
+
+        self.updateDashboard();
     });
     self.on('onRoomDestroy', function(e, room) {
         if (room.type === "private") {
@@ -829,6 +812,8 @@ Chat.prototype.updateSectionUnreadCount = function() {
                 .addClass('hidden');
         }
         self._lastUnreadCount = unreadCount;
+
+        self.updateDashboard();
     }
 };
 /**
@@ -1086,7 +1071,7 @@ Chat.prototype.renderMyStatus = function() {
     // reset
     var $status = $('.activity-status-block .activity-status');
 
-    $('.top-user-status-popup .top-user-status-item').removeClass("active");
+    $('.top-user-status-popup .tick-item').removeClass("active");
 
 
     $status
@@ -1121,19 +1106,19 @@ Chat.prototype.renderMyStatus = function() {
 
 
     if (cssClass === 'online') {
-        $('.top-user-status-popup .top-user-status-item[data-presence="chat"]').addClass("active");
+        $('.top-user-status-popup .tick-item[data-presence="chat"]').addClass("active");
     }
     else if (cssClass === 'away') {
-        $('.top-user-status-popup .top-user-status-item[data-presence="away"]').addClass("active");
+        $('.top-user-status-popup .tick-item[data-presence="away"]').addClass("active");
     }
     else if (cssClass === 'busy') {
-        $('.top-user-status-popup .top-user-status-item[data-presence="dnd"]').addClass("active");
+        $('.top-user-status-popup .tick-item[data-presence="dnd"]').addClass("active");
     }
     else if (cssClass === 'offline') {
-        $('.top-user-status-popup .top-user-status-item[data-presence="unavailable"]').addClass("active");
+        $('.top-user-status-popup .tick-item[data-presence="unavailable"]').addClass("active");
     }
     else {
-        $('.top-user-status-popup .top-user-status-item[data-presence="unavailable"]').addClass("active");
+        $('.top-user-status-popup .tick-item[data-presence="unavailable"]').addClass("active");
     }
 
     $status.addClass(
@@ -1798,6 +1783,11 @@ Chat.prototype._destroyAllChatsFromChatd = function() {
     });
 };
 
+Chat.prototype.updateDashboard = function() {
+    if (M.currentdirid === 'dashboard') {
+        delay('dashboard:updchat', dashboardUI.updateChatWidget);
+    }
+};
 
 window.Chat = Chat;
 window.chatui = chatui;

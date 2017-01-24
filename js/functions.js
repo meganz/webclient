@@ -64,7 +64,9 @@ function parseHTML(markup, forbidStyle, doc, baseURI, isXML) {
     // Either we are not running the Firefox extension or the above parser
     // failed, in such case we try to mimic it using jQuery.parseHTML
     var fragment = doc.createDocumentFragment();
-    $.parseHTML(String(markup), doc)
+
+    markup = String(markup).replace(/(?!\<[a-z][^>]+)\son[a-z]+\s*=/gi, ' data-dummy=');
+    $.parseHTML(markup, doc)
         .forEach(function(node) {
             fragment.appendChild(node);
         });
@@ -283,7 +285,7 @@ function delay(aProcID, aFunction, aTimeout) {
     if (typeof aProcID === 'function') {
         aTimeout = aFunction;
         aFunction = aProcID;
-        aProcID = mRandomToken();
+        aProcID = aFunction.name || MurmurHash3(String(aFunction));
     }
 
     if (d > 1) {
@@ -460,13 +462,13 @@ function megatitle(nperc) {
 
 function populate_l() {
     if (d) {
-        for (var i = 14000 ; i-- ;) {
+        for (var i = 24000 ; i-- ;) {
             l[i] = (l[i] || '(translation-missing)');
         }
     }
-    l[0] = 'Mega Limited ' + new Date().getFullYear();
+    l[0] = 'MEGA ' + new Date().getFullYear();
     if ((lang === 'es') || (lang === 'pt') || (lang === 'sk')) {
-        l[0] = 'Mega Ltd.';
+        l[0] = 'MEGA';
     }
     l[1] = l[398];
     if (lang === 'en') {
@@ -570,10 +572,10 @@ function populate_l() {
     l[8848] = l[8848].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8849] = l[8849].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[1389] = l[1389].replace('[B]', '').replace('[/B]', '').replace('[A]', '<span>').replace('[/A]', '</span>');
-    l[8847] = l[8847].replace('[S]', '<span>').replace('[/S]', '</span>');
-    l[8846] = l[8846].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8912] = l[8912].replace('[B]', '<span>').replace('[/B]', '</span>');
-    l[8944] = l[8944].replace('[S]', '<a class="red">').replace('[/S]', '</a>').replace('[BR]', '<br/>');
+    l[8944] = l[8944].replace('[BR]', '<br>').replace('[S]', '<span>').replace('[/S]', '</span>');
+    l[8846] = l[8846].replace('[S]', '<span>').replace('[/S]', '</span>');
+    l[8847] = l[8847].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8950] = l[8950].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8951] = l[8951].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8952] = l[8952].replace('[S]', '<span>').replace('[/S]', '</span>');
@@ -601,6 +603,18 @@ function populate_l() {
     l[12489] = l[12489].replace('[I]', '<i>').replace('[/I]', '</i>').replace('[I]', '<i>').replace('[/I]', '</i>');
     l[15536] = l[15536].replace('[B]', '<b>').replace('[/B]', '</b>');
     l[16106] = l[16106].replace('[B]', '<b>').replace('[/B]', '</b>');
+    l[16107] = l[16107].replace('[S]', '<span>').replace('[/S]', '</span>');
+    l[16116] = l[16116].replace('[S]', '<span>').replace('[/S]', '</span>');
+    l[16119] = l[16119].replace('[S]', '<span>').replace('[/S]', '</span>');
+    l[16120] = l[16120].replace('[S]', '<span>').replace('[/S]', '</span>');
+    l[16123] = l[16123].replace('[S]', '<span>').replace('[/S]', '</span>').replace('[A]', '<a href="#pro">').replace('[/A]', '</a>').replace('[BR]', '<br />');
+    l[16124] = l[16124].replace('[S]', '<span>').replace('[/S]', '</span>').replace('[A]', '<a href="#pro">').replace('[/A]', '</a>').replace('[BR]', '<br />');
+    l[16135] = l[16135].replace('[BR]', '<br />');
+    l[16136] = l[16136].replace('[A]', '<a href="#pro">').replace('[/A]', '</a>');
+    l[16137] = l[16137].replace('[A]', '<a href="#pro">').replace('[/A]', '</a>');
+    l[16138] = l[16138].replace('[A]', '<a href="#pro">').replace('[/A]', '</a>');
+    l[16164] = l[16164].replace('[S]', '<a class="red">').replace('[/S]', '</a>').replace('[BR]', '<br/>');
+    l[16167] = l[16167].replace('[S]', '<a href="#mobile page">').replace('[/S]', '</a>');
 
     l['year'] = new Date().getFullYear();
     date_months = [
@@ -879,25 +893,36 @@ function countrydetails(isocode) {
 }
 
 /**
- * Converts a timestamp to a localised yyyy-mm-dd hh:mm format e.g. 2016-04-17 14:37
- * @param {Number} unixTime The UNIX timestamp in seconds e.g. 1464829467
- * @param {Boolean} ignoreTime If true only the date will be returned e.g. yyyy-mm-dd
- * @returns {String} Returns the date and time in yyyy-mm-dd hh:mm format by default
+ * Converts a timestamp to a readable time format - e.g. 2016-04-17 14:37
+ *
+ * @param {Number} unixTime  The UNIX timestamp in seconds e.g. 1464829467
+ * @param {Number} format    The readable time format to return
+ * @returns {String}
+ *
+ * Formats:
+ *       0: yyyy-mm-dd hh:mm
+ *       1: yyyy-mm-dd
+ *       2: dd fmn yyyy (fmn: Full month name, based on the locale)
  */
-function time2date(unixTime, ignoreTime) {
+function time2date(unixTime, format) {
 
-    var myDate = new Date(unixTime * 1000 || 0);
-    var myDateString =
-        myDate.getFullYear() + '-'
-        + ('0' + (myDate.getMonth() + 1)).slice(-2) + '-'
-        + ('0' + myDate.getDate()).slice(-2);
+    var result;
+    var date = new Date(unixTime * 1000 || 0);
 
-    if (!ignoreTime) {
-        myDateString += ' ' + ('0' + myDate.getHours()).slice(-2) + ':'
-            + ('0' + myDate.getMinutes()).slice(-2);
+    if (format === 2) {
+        result = date.getDate() + ' ' + date_months[date.getMonth()] + ' ' + date.getFullYear();
+    }
+    else {
+        result = date.getFullYear() + '-'
+               + ('0' + (date.getMonth() + 1)).slice(-2)
+               + '-' + ('0' + date.getDate()).slice(-2);
+
+        if (!format) {
+            result += ' ' + date.toTimeString().substr(0, 5);
+        }
     }
 
-    return myDateString;
+    return result;
 }
 
 // in case we need to run functions.js in a standalone (non secureboot.js) environment, we need to handle this case:
@@ -1111,15 +1136,12 @@ function numOfBytes(bytes, precision) {
 }
 
 function bytesToSize(bytes, precision, html_format) {
-    if (!bytes) {
-        return '0';
-    }
-
     var s_b = 'B';
     var s_kb = 'KB';
     var s_mb = 'MB';
     var s_gb = 'GB';
     var s_tb = 'TB';
+    var s_pb = 'PB';
 
     if (lang === 'fr') {
         s_b = 'O';
@@ -1127,21 +1149,31 @@ function bytesToSize(bytes, precision, html_format) {
         s_mb = 'Mo';
         s_gb = 'Go';
         s_tb = 'To';
+        s_pb = 'Po';
     }
 
     var kilobyte = 1024;
     var megabyte = kilobyte * 1024;
     var gigabyte = megabyte * 1024;
     var terabyte = gigabyte * 1024;
+    var petabyte = terabyte * 1024;
     var resultSize = 0;
     var resultUnit = '';
-    if (bytes > 1024 * 1024 * 1024) {
-        precision = 2;
+
+    if (precision === undefined) {
+        if (bytes > gigabyte) {
+            precision = 2;
+        }
+        else if (bytes > megabyte) {
+            precision = 1;
+        }
     }
-    else if (bytes > 1024 * 1024) {
-        precision = 1;
+
+    if (!bytes) {
+        resultSize = 0;
+        resultUnit = s_mb;
     }
-    if ((bytes >= 0) && (bytes < kilobyte)) {
+    else if ((bytes >= 0) && (bytes < kilobyte)) {
         resultSize = parseInt(bytes);
         resultUnit = s_b;
     }
@@ -1157,17 +1189,25 @@ function bytesToSize(bytes, precision, html_format) {
         resultSize = (bytes / gigabyte).toFixed(precision);
         resultUnit = s_gb;
     }
-    else if (bytes >= terabyte) {
+    else if ((bytes >= terabyte) && (bytes < petabyte)) {
         resultSize = (bytes / terabyte).toFixed(precision);
         resultUnit = s_tb;
+    }
+    else if (bytes >= petabyte) {
+        resultSize = (bytes / petabyte).toFixed(precision);
+        resultUnit = s_pb;
     }
     else {
         resultSize = parseInt(bytes);
         resultUnit = s_b;
     }
-    if (html_format) {
+    if (html_format === 2) {
+        return resultSize + '<span>' + resultUnit + '</span>';
+    }
+    else if (html_format) {
         return '<span>' + resultSize + '</span>' + resultUnit;
-    } else {
+    }
+    else {
         return resultSize + ' ' + resultUnit;
     }
 }
@@ -1237,14 +1277,14 @@ function makeObservable(kls) {
 /**
  * Instantiates an enum-like list on the provided target object
  */
-function makeEnum(aEnum, aPrefix, aTarget) {
+function makeEnum(aEnum, aPrefix, aTarget, aNorm) {
     aTarget = aTarget || {};
 
     var len = aEnum.length;
     while (len--) {
         Object.defineProperty(aTarget,
             (aPrefix || '') + String(aEnum[len]).toUpperCase(), {
-                value: 1 << len,
+                value: aNorm ? len : (1 << len),
                 enumerable: true
             });
     }
@@ -2240,8 +2280,8 @@ function mKeyDialog(ph, fl, keyr) {
 }
 
 function dcTracer(ctr) {
-    var name = ctr.name,
-        proto = ctr.prototype;
+    var name = ctr.name || 'unknown',
+        proto = ctr.prototype || ctr;
     for (var fn in proto) {
         if (proto.hasOwnProperty(fn) && typeof proto[fn] === 'function') {
             console.log('Tracing ' + name + '.' + fn);
@@ -3267,6 +3307,51 @@ function assertStateChange(currentState, newState, allowedStatesMap, enumMap) {
     }
 }
 
+Object.defineProperty(mega, 'logger', {value: MegaLogger.getLogger('mega')});
+Object.defineProperty(mega.utils, 'logger', {value: MegaLogger.getLogger('utils', null, mega.logger)});
+
+Object.defineProperty(mega, 'api', {
+    value: Object.freeze({
+        logger: new MegaLogger('API'),
+
+        setDomain: function(aDomain, aSave) {
+            apipath = 'https://' + aDomain + '/';
+
+            if (aSave) {
+                localStorage.apipath = apipath;
+            }
+        },
+
+        staging: function(aSave) {
+            this.setDomain('staging.api.mega.co.nz', aSave);
+        },
+        prod: function(aSave) {
+            this.setDomain('eu.api.mega.co.nz', aSave);
+        },
+
+        req: function(params) {
+            var promise = new MegaPromise();
+
+            if (typeof params === 'string') {
+                params = {a: params};
+            }
+
+            api_req(params, {
+                callback: function(res) {
+                    if (typeof res === 'number' && res < 0) {
+                        promise.reject.apply(promise, arguments);
+                    }
+                    else {
+                        promise.resolve.apply(promise, arguments);
+                    }
+                }
+            });
+
+            return promise;
+        }
+    })
+});
+
 /**
  * execCommandUsable
  *
@@ -3343,13 +3428,14 @@ mega.utils.sortObjFn = function(key, order) {
             }
         }
         else return 0;
-    }
+    };
 };
 
 /**
  * Promise-based XHR request
- * @param {Mixed} aURLOrOptions URL or options
- * @param {Mixed} aData         data to send, optional
+ * @param {Object|String} aURLOrOptions   URL or options
+ * @param {Object|String} [aData]         Data to send, optional
+ * @returns {MegaPromise}
  */
 mega.utils.xhr = function megaUtilsXHR(aURLOrOptions, aData) {
     /* jshint -W074 */
@@ -3538,7 +3624,7 @@ mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
             clearInterval($.mTransferAnalysis);
             delete $.mTransferAnalysis;
         }
-        $('.transfer-panel-title').safeHTML(l[104]);
+        $('.transfer-panel-title').text('');
         dlmanager.dlRetryInterval = 3000;
     }
 
@@ -3559,32 +3645,35 @@ mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
  */
 mega.utils.reload = function megaUtilsReload() {
     function _reload() {
-        var u_sid = u_storage.sid,
-            u_key = u_storage.k,
-            privk = u_storage.privk,
-            debug = u_storage.d,
-            jj = u_storage.jj,
-            apipath = debug ? localStorage.apipath : undefined;
-        var mcd = u_storage.testChatDisabled;
+        var u_sid = u_storage.sid;
+        var u_key = u_storage.k;
+        var privk = u_storage.privk;
+        var jj = localStorage.jj;
+        var debug = localStorage.d;
+        var mcd = localStorage.testChatDisabled;
+        var apipath = debug && localStorage.apipath;
 
         localStorage.clear();
         sessionStorage.clear();
 
-        u_storage.sid = u_sid;
-        u_storage.privk = privk;
-        u_storage.k = u_key;
-        u_storage.wasloggedin = true;
+        if (u_sid) {
+            u_storage.sid = u_sid;
+            u_storage.privk = privk;
+            u_storage.k = u_key;
+            u_storage.wasloggedin = true;
+        }
 
         if (debug) {
-            u_storage.d = 1;
-            u_storage.minLogLevel = 0;
+            localStorage.d = 1;
+            localStorage.minLogLevel = 0;
+
             if (location.host !== 'mega.nz') {
-                u_storage.dd = true;
+                localStorage.dd = true;
                 if (!is_extension && jj)  {
-                    u_storage.jj = jj;
+                    localStorage.jj = jj;
                 }
                 if (mcd) {
-                    u_storage.testChatDisabled = 1;
+                    localStorage.testChatDisabled = 1;
                 }
             }
             if (apipath) {
@@ -3597,7 +3686,7 @@ mega.utils.reload = function megaUtilsReload() {
         location.reload(true);
     }
 
-    if (u_type !== 3) {
+    if (u_type !== 3 && page !== 'download') {
         stopsc();
         stopapi();
         loadfm(true);
@@ -3607,7 +3696,7 @@ mega.utils.reload = function megaUtilsReload() {
         msgDialog('confirmation', l[761], l[7713], l[6994], function(doIt) {
             if (doIt) {
                 var reload = function() {
-                    if (mBroadcaster.crossTab.master) {
+                    if (mBroadcaster.crossTab.master || page === 'download') {
                         mega.utils.abortTransfers().then(function() {
                             loadingDialog.show();
                             stopsc();
@@ -3730,6 +3819,7 @@ mega.utils.neuterArrayBuffer = function neuter(ab) {
 mega.utils.require = function megaUtilsRequire() {
     var files = [];
     var args = [];
+    var logger = d && MegaLogger.getLogger('require', 0, this.logger);
 
     toArray.apply(null, arguments).forEach(function(rsc) {
         // check if a group of resources was provided
@@ -3759,7 +3849,6 @@ mega.utils.require = function megaUtilsRequire() {
             var extension = filename.split('.').pop().toLowerCase();
             var name = filename.replace(/\./g, '_');
             var type;
-            var result;
 
             if (extension === 'html') {
                 type = 0;
@@ -3782,19 +3871,87 @@ mega.utils.require = function megaUtilsRequire() {
 
     if (files.length === 0) {
         // Everything is already loaded
+        if (logger) {
+            logger.debug('Nothing to load.', args);
+        }
         return MegaPromise.resolve();
     }
 
-    Array.prototype.push.apply(jsl, files);
-
     var promise = new MegaPromise();
-    silent_loading = function() {
-        promise.resolve();
-    };
-    jsl_start();
+    var rl = mega.utils.require.loading;
+    var rp = mega.utils.require.pending;
+    var loading = Object.keys(rl).length;
 
+    // Check which files are already being loaded
+    for (var i = files.length; i--;) {
+        var f = files[i];
+
+        if (rl[f.n]) {
+            // loading, remove it.
+            files.splice(i, 1);
+        }
+        else {
+            // not loading, track it.
+            rl[f.n] = mega.utils.getStack();
+        }
+    }
+
+    // hold up if other files are loading
+    if (loading) {
+        rp.push([files, promise]);
+
+        if (logger) {
+            logger.debug('Queueing %d files...', files.length, args);
+        }
+    }
+    else {
+
+        (function _load(files, promise) {
+            var onload = function() {
+                // all files have been loaded, remove them from the tracking queue
+                for (var i = files.length; i--;) {
+                    delete rl[files[i].n];
+                }
+
+                if (logger) {
+                    logger.debug('Finished loading %d files...', files.length, files);
+                }
+
+                // resolve promise, in a try/catch to ensure the caller doesn't mess us..
+                try {
+                    promise.resolve();
+                }
+                catch (ex) {
+                    (logger || console).error(ex);
+                }
+
+                // check if there is anything pending, and fire it.
+                var pending = rp.shift();
+
+                if (pending) {
+                    _load.apply(null, pending);
+                }
+            };
+
+            if (logger) {
+                logger.debug('Loading %d files...', files.length, files);
+            }
+
+            if (!files.length) {
+                // nothing to load
+                onload();
+            }
+            else {
+                Array.prototype.push.apply(jsl, files);
+                silent_loading = onload;
+                jsl_start();
+            }
+        })(files, promise);
+    }
     return promise;
 };
+mega.utils.require.pending = [];
+mega.utils.require.loading = Object.create(null);
 
 /**
  *  Kill session and Logout
@@ -3804,23 +3961,14 @@ mega.utils.logout = function megaUtilsLogout() {
         var finishLogout = function() {
             if (--step === 0) {
                 u_logout(true);
-                if (typeof aCallback === 'function') {
-                    aCallback();
-                }
-                else {
-                    document.location.reload();
-                }
+                location.reload();
             }
         }, step = 1;
 
         loadingDialog.show();
-        if (typeof mDB === 'object' && mDB.drop) {
+        if (fmdb && fmconfig.dbDropOnLogout) {
             step++;
-            mFileManagerDB.exec('drop').always(finishLogout);
-        }
-        if (typeof attribCache === 'object' && attribCache.db) {
-            step++;
-            attribCache.destroy().always(finishLogout);
+            fmdb.drop().always(finishLogout);
         }
         if (u_privk && !loadfm.loading) {
             // Use the 'Session Management Logout' API call to kill the current session
@@ -3829,9 +3977,8 @@ mega.utils.logout = function megaUtilsLogout() {
         else {
             finishLogout();
         }
-
     });
-}
+};
 
 /**
  * Convert a version string (eg, 2.1.1) to an integer, for easier comparison
@@ -3862,12 +4009,13 @@ mega.utils.vtol = function megaUtilsVTOL(version, hex) {
 
 /**
  * Retrieve data from storage servers.
- * @param {String|Object} aData        ufs-node's handle or public link
- * @param {Number}        aStartOffset offset to start retrieveing data from
- * @param {Number}        aEndOffset   retrieve data until this offset
+ * @param {String|Object} aData           ufs-node's handle or public link
+ * @param {Number}        [aStartOffset]  offset to start retrieveing data from
+ * @param {Number}        [aEndOffset]    retrieve data until this offset
+ * @param {Function}      [aProgress]     callback function which is called with the percent complete
  * @returns {MegaPromise}
  */
-mega.utils.gfsfetch = function(aData, aStartOffset, aEndOffset) {
+mega.utils.gfsfetch = function gfsfetch(aData, aStartOffset, aEndOffset, aProgress) {
     var promise = new MegaPromise();
 
     var fetcher = function(data) {
@@ -3891,11 +4039,30 @@ mega.utils.gfsfetch = function(aData, aStartOffset, aEndOffset) {
             aStartOffset -= byteOffset;
         }
 
-        mega.utils.xhr({
+        var request = {
             method: 'POST',
             type: 'arraybuffer',
             url: data.g + '/' + aStartOffset + '-' + (aEndOffset - 1)
-        }).done(function(ev, response) {
+        };
+
+        if (typeof aProgress === 'function') {
+            request.prepare = function(xhr) {
+                xhr.addEventListener('progress', function(ev) {
+                    if (ev.lengthComputable) {
+
+                        // Calculate percentage downloaded e.g. 49.23
+                        var percentComplete = ((ev.loaded / ev.total) * 100);
+                        var bytesLoaded = ev.loaded;
+                        var bytesTotal = ev.total;
+
+                        // Pass the percent complete to the callback function
+                        aProgress(percentComplete, bytesLoaded, bytesTotal);
+                    }
+                }, false);
+            };
+        }
+
+        mega.utils.xhr(request).done(function(ev, response) {
 
             data.macs = [];
             data.writer = [];
@@ -3973,7 +4140,7 @@ mega.utils.gfsfetch = function(aData, aStartOffset, aEndOffset) {
 
             if (!key) {
                 req.n = handle;
-                key = M.getNodeByHandle(handle).key;
+                key = M.getNodeByHandle(handle).k;
             }
             else {
                 req.p = handle;
@@ -3983,7 +4150,7 @@ mega.utils.gfsfetch = function(aData, aStartOffset, aEndOffset) {
                 promise.reject(EKEY);
             }
             else {
-                api_req(req, { callback: callback });
+                api_req(req, { callback: callback }, pfid ? 1 : 0);
             }
         }
     }
@@ -4360,6 +4527,26 @@ mBroadcaster.once('startMega', function() {
     }
 });
 
+/** getOwnPropertyDescriptors polyfill */
+mBroadcaster.once('startMega', function() {
+    if (!Object.hasOwnProperty('getOwnPropertyDescriptors')) {
+        Object.defineProperty(Object, 'getOwnPropertyDescriptors', {
+            value: function getOwnPropertyDescriptors(obj) {
+                var result = {};
+
+                for (var key in obj) {
+                    if (obj.hasOwnProperty(key)) {
+                        result[key] = Object.getOwnPropertyDescriptor(obj, key);
+                    }
+                }
+
+                return result;
+            }
+        });
+    }
+});
+
+
 /**
  * Cross-tab communication using WebStorage
  */
@@ -4486,6 +4673,38 @@ var watchdog = Object.freeze({
             case 'loadfm_done':
                 if (this.Strg.login === strg.origin) {
                     location.assign(location.pathname);
+                }
+                break;
+
+            case 'setrsa':
+                if (typeof dlmanager === 'object'
+                        && dlmanager.isOverFreeQuota) {
+
+                    var sid = strg.data[1];
+                    var type = strg.data[0];
+
+                    u_storage = init_storage(localStorage);
+                    u_storage.sid = sid;
+
+                    u_checklogin({
+                        checkloginresult: function(ctx, r) {
+                            u_type = r;
+
+                            if (u_type !== type) {
+                                console.error('Unexpected user-type: got %s, expected %s', r, type);
+                            }
+
+                            if (n_h) {
+                                // set new u_sid under folderlinks
+                                api_setfolder(n_h);
+
+                                // hide ephemeral account warning
+                                alarm.hideAllWarningPopups();
+                            }
+
+                            dlmanager._onQuotaRetry(true, sid);
+                        }
+                    });
                 }
                 break;
 
@@ -4822,10 +5041,10 @@ if (typeof sjcl !== 'undefined') {
 
         var self = this;
 
-        if ($.removedContactsFromShare.length > 0) {
+        if ($.removedContactsFromShare && ($.removedContactsFromShare.length > 0)) {
             self.removeContactFromShare();
         }
-        if ($.changedPermissions.length > 0) {
+        if ($.changedPermissions && ($.changedPermissions.length > 0)) {
             doShare($.selected[0], $.changedPermissions, true);
         }
         addContactToFolderShare();
@@ -5138,6 +5357,84 @@ function getGatewayName(gatewayId, gatewayOpt) {
     };
 }
 
+/**
+ * Redirects to the mobile app
+ * @param {Object} $selector The jQuery selector for the button
+ */
+mega.utils.redirectToApp = function($selector) {
+
+    if (is_ios) {
+        // Based off https://github.com/prabeengiri/DeepLinkingToNativeApp/
+        var ns = '.ios ';
+        var appLink = "mega://" + location.hash;
+        var events = ["pagehide", "blur", "beforeunload"];
+        var timeout = null;
+
+        var preventDialog = function(e) {
+            clearTimeout(timeout);
+            timeout = null;
+            $(window).unbind(events.join(ns) + ns);
+        };
+
+        var redirectToStore = function() {
+            window.top.location = getStoreLink();
+        };
+
+        var redirect = function() {
+            var ms = 500;
+
+            preventDialog();
+            $(window).bind(events.join(ns) + ns, preventDialog);
+
+            window.location = appLink;
+
+            // Starting with iOS 9.x, there will be a confirmation dialog asking whether we want to
+            // open the app, which turns the setTimeout trick useless because no page unloading is
+            // notified and users redirected to the app-store regardless if the app is installed.
+            // Hence, as a mean to not remove the redirection we'll increase the timeout value, so
+            // that users with the app installed will have a higher chance of confirming the dialog.
+            // If past that time they didn't, we'll redirect them anyhow which isn't ideal but
+            // otherwise users will the app NOT installed might don't know where the app is,
+            // at least if they disabled the smart-app-banner...
+            // NB: Chrome (CriOS) is not affected.
+            if (is_ios > 8 && ua.details.brand !== 'CriOS') {
+                ms = 4100;
+            }
+
+            timeout = setTimeout(redirectToStore, ms);
+        };
+
+        Soon(function() {
+            // If user navigates back to browser and clicks the button,
+            // try redirecting again.
+            $selector.rebind('click', function(e) {
+                e.preventDefault();
+                redirect();
+                return false;
+            });
+        });
+        redirect();
+    }
+    else {
+        switch (ua.details.os) {
+            case 'Windows Phone':
+                window.location = "mega://" + location.hash.substr(1);
+                break;
+
+            case 'Android':
+                var intent = 'intent://' + location.hash
+                    + '/#Intent;scheme=mega;package=mega.privacy.android.app;end';
+                document.location = intent;
+                break;
+
+            default:
+                alert('Unknown device.');
+        }
+    }
+
+    return false;
+};
+
 /*
  * Alert about 110% zoom level in Chrome/Chromium
  */
@@ -5212,4 +5509,28 @@ var debounce = function(func, execAsap) {
 
         timeout = requestAnimationFrame(delayed);
     };
+};
+
+/**
+ * Returns the currently running site version depending on if in development, on the live site or if in an extension
+ * @returns {String} Returns the string 'dev' if in development or the currently running version e.g. 3.7.0
+ */
+mega.utils.getSiteVersion = function() {
+
+    // Use 'dev' as the default version if in development
+    var version = 'dev';
+
+    // If this is a production version the timestamp will be set
+    if (buildVersion.timestamp !== '') {
+
+        // Use the website build version by default
+        version = buildVersion.website;
+
+        // If an extension use the version of that (because sometimes there are independent deployments of extensions)
+        if (is_extension) {
+            version = (window.chrome) ? buildVersion.chrome + ' ' + l[957] : buildVersion.firefox + ' ' + l[959];
+        }
+    }
+
+    return version;
 };

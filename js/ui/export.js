@@ -251,19 +251,16 @@ var exportPassword = {
          */
         loadPasswordEstimatorLibrary: function() {
 
-            if (typeof zxcvbn === 'undefined' && !silent_loading) {
+            if (typeof zxcvbn === 'undefined') {
 
                 // Show loading spinner
                 var $loader = this.$dialog.find('.estimator-loading-icon').addClass('loading');
 
                 // On completion of loading, hide the loading spinner
-                silent_loading = function() {
-                    $loader.removeClass('loading');
-                };
-
-                // Load the library
-                jsl.push(jsl2['zxcvbn_js']);
-                jsl_start();
+                mega.utils.require('zxcvbn_js')
+                    .done(function() {
+                        $loader.removeClass('loading');
+                    });
             }
         },
 
@@ -1738,16 +1735,21 @@ var exportExpiry = {
     ExportLink.prototype._getFolderExportLinkRequest = function(nodeId) {
 
         var self = this;
-        var childNodes = [];
         var share = M.getNodeShare(nodeId);
 
         // No need to perform an API call if this folder was already exported (Ie, we're updating)
         if (share.h === nodeId) {
-            return self._getExportLinkRequest(nodeId);
+            if (!M.d[nodeId].t || u_sharekeys[nodeId]) {
+                return self._getExportLinkRequest(nodeId);
+            }
+
+            if (d) {
+                console.warn('Missing sharekey for "%s" - relying on s2 to obtain it...', nodeId);
+            }
         }
 
         // Get all child nodes of root folder with nodeId
-        childNodes = fm_getnodes(nodeId);
+        var childNodes = fm_getnodes(nodeId);
         childNodes.push(nodeId);
 
         var sharePromise = api_setshare(nodeId, [{ u: 'EXP', r: 0 }], childNodes);
@@ -1810,7 +1812,7 @@ var exportExpiry = {
             nodeId: nodeId,
             callback: function(result) {
                 if (typeof result !== 'number') {
-                    M.nodeShare(this.nodeId, { h: this.nodeId, r: 0, u: 'EXP', ts: unixtime() });
+                    M.nodeShare(this.nodeId, { h: this.nodeId, r: 0, u: 'EXP', ts: unixtime(), ph: result });
                     var n;
                     if (fmdb && (n = M.d[this.nodeId])) {
                         n.ph = result;
@@ -2007,7 +2009,7 @@ var exportExpiry = {
             if (M.d[nodeId].fav === 1) {
 
                 // Remove favourite (star)
-                M.favourite(nodeId, true);
+                M.favourite(nodeId, 0);
             }
             self.addTakenDownIcon(nodeId);
         }

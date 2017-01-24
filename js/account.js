@@ -110,7 +110,7 @@ function u_checklogin3a(res, ctx) {
         u_attr = res;
         var exclude = [
             'c', 'email', 'k', 'name', 'p', 'privk', 'pubk', 's',
-            'ts', 'u', 'currk', 'flags', '*!lastPsaSeen', 'lup'
+            'ts', 'u', 'currk', 'flags', '*!lastPsaSeen', 'lup', 'since'
         ];
 
         for (var n in u_attr) {
@@ -169,6 +169,7 @@ function u_checklogin3a(res, ctx) {
                 localStorage.chatDisabled = (u_attr.flags.mcs === 0) ? '1' : '0';
             }
         }
+        u_attr.flags = Object(u_attr.flags);
 
         // If their PRO plan has expired and Last User Payment info is set, configure the dialog
         if (typeof u_attr.lup !== 'undefined') {
@@ -294,6 +295,8 @@ function u_setrsa(rsakey) {
                         process_u([user]);
 
                         if (d) console.log('Account activation succeeded', user);
+
+                        watchdog.notify('setrsa', [u_type, u_sid]);
                     }
                     $promise.resolve(rsakey);
                     ui_keycomplete();
@@ -962,7 +965,12 @@ function checkUserLogin() {
         var promise = waiter = new MegaPromise();
 
         mega.attr.get(u_handle, 'fmconfig', false, true)
-            .always(moveLegacySettings)
+            .always(function() {
+                moveLegacySettings();
+
+                // Initialize account notifications.
+                mega.notif.setup(fmconfig.anf);
+            })
             .done(function(result) {
                 result = Object(result);
                 for (var key in result) {
@@ -1058,7 +1066,7 @@ function checkUserLogin() {
         var push = function() {
             if (u_type === 3 && !pfid && !folderlink) {
                 // through a timer to prevent floods
-                timer = delay('fmconfig:store', store, 9701);
+                timer = delay('fmconfig:store', store, 3100);
             }
             else {
                 localStorage.fmconfig = JSON.stringify(fmconfig);
@@ -1075,6 +1083,22 @@ function checkUserLogin() {
         }
 
         mBroadcaster.sendMessage('fmconfig:' + key, value);
+    };
+
+    /**
+     * Same as .set, but displays a toast notification.
+     * @param {String} key          Configuration key
+     * @param {String} value        Configuration value
+     * @param {String} [toastText]  Toast notification text
+     */
+    ns.setn = function _setConfigValueToast(key, value, toastText) {
+        toastText = toastText || l[16168];
+
+        delay('fmconfig:setn', function() {
+            showToast('settings', toastText);
+
+            mega.config.set(key, value);
+        });
     };
 
     if (is_karma) {

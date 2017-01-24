@@ -39,6 +39,7 @@ var is_ios = is_mobile && (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 
 function isMobile()
 {
     if (is_chrome_firefox) return false;
+
     var mobile = ['iphone','ipad','android','blackberry','nokia','opera mini','windows mobile','windows phone','iemobile','mobile safari','bb10; touch'];
     for (var i in mobile) if (ua.indexOf(mobile[i]) > 0) return true;
     return false;
@@ -117,6 +118,13 @@ if (!myURL) {
 if (!String.prototype.trim) {
     String.prototype.trim = function() {
         return this.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
+    };
+}
+if (!String.prototype.localeCompare) {
+    String.prototype.localeCompare = function(to) {
+        var s1 = this.toLowerCase();
+        var s2 = String(to).toLowerCase();
+        return s1 > s2 ? 1 : (s1 < s2 ? -1 : 0);
     };
 }
 if (!String.trim) {
@@ -417,7 +425,7 @@ if (!b_u && is_extension)
     {
         bootstaticpath = 'chrome://mega/content/';
         urlrootfile = 'secure.html';
-        if (d > 1) {
+        if (d) {
             staticpath = bootstaticpath;
         }
         else {
@@ -1015,7 +1023,7 @@ if (m || (typeof localStorage !== 'undefined' && localStorage.mobile))
     m=true;
 }
 
-if (location.hash.substr(1, 1) === '!') {
+if ((location.hash.substr(1, 1) === '!') || (location.hash.substr(1, 2) === 'F!')) {
     m = false;
 }
 
@@ -1556,6 +1564,7 @@ else if (!b_u)
     jsl.push({f:'js/account.js', n: 'user_js', j:1});
     jsl.push({f:'js/attr.js', n: 'mega_attr_js', j:1});
     jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
 
     if (!is_mobile) {
 
@@ -1572,7 +1581,6 @@ else if (!b_u)
         jsl.push({f:'js/vendor/jsbn2.js', n: 'jsbn2_js', j:1, w:2});
         jsl.push({f:'js/vendor/nacl-fast.js', n: 'nacl_js', j:1,w:7});
         jsl.push({f:'js/vendor/dexie.js', n: 'dexie_js', j:1,w:5});
-        jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
 
         jsl.push({f:'js/authring.js', n: 'authring_js', j:1});
         jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
@@ -1619,17 +1627,13 @@ else if (!b_u)
     jsl.push({f:'js/transfers/xhr2.js', n: 'xhr_js', j:1});
     jsl.push({f:'js/transfers/queue.js', n: 'queue', j:1,w:4});
     jsl.push({f:'js/transfers/meths/cache.js', n: 'dl_cache', j:1,w:3});
+    jsl.push({f:'js/transfers/meths/flash.js', n: 'dl_flash', j:1,w:3});
+    jsl.push({f:'js/transfers/meths/memory.js', n: 'dl_memory', j:1,w:3});
     jsl.push({f:'js/transfers/meths/filesystem.js', n: 'dl_chrome', j:1,w:3});
     jsl.push({f:'js/transfers/meths/mediasource.js', n: 'dl_mediasource', j:1,w:3});
-    if (is_chrome_firefox && parseInt(Services.appinfo.version) > 27)
-    {
+    if (is_chrome_firefox && parseInt(Services.appinfo.version) > 27) {
         is_chrome_firefox |= 4;
         jsl.push({f:'js/transfers/meths/firefox-extension.js', n: 'dl_firefox', j:1,w:3});
-    }
-    else
-    {
-        jsl.push({f:'js/transfers/meths/memory.js', n: 'dl_memory', j:1,w:3});
-        jsl.push({f:'js/transfers/meths/flash.js', n: 'dl_flash', j:1,w:3});
     }
     jsl.push({f:'js/transfers/downloader.js', n: 'dl_downloader', j:1,w:3});
     jsl.push({f:'js/transfers/download2.js', n: 'dl_js', j:1,w:3});
@@ -1720,6 +1724,13 @@ else if (!b_u)
         jsl.push({f: 'js/betacrashes.js', n: 'betacrashes_js', j: 1});
     }
 
+    if (is_mobile) {
+        // Common to all mobile pages
+        jsl.push({f:'js/vendor/jquery.mobile.js', n: 'jquery_mobile_js', j: 1, w: 5});
+        jsl.push({f:'css/mobile-app-new.css', n: 'mobile_css', j: 2, w: 30, c: 1, d: 1, m: 1});
+        jsl.push({f:'css/spinners.css', n: 'spinners_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
+    }
+
     var jsl2 =
     {
         'about': {f:'html/about.html', n: 'about', j:0},
@@ -1734,8 +1745,8 @@ else if (!b_u)
         'resellers': {f:'html/resellers.html', n: 'resellers', j:0},
         'download': {f:'html/download.html', n: 'download', j:0},
         'download_js': {f:'html/js/download.js', n: 'download_js', j:1},
-        'download_mobile': {f:'html/download-mobile.html', n: 'download', j: 0},
-        'mobile_css': {f:'css/mobile-app-new.css', n: 'mobile_css', j:2,w:30,c:1,d:1,m:1},
+        'fm_mobile': {f:'html/fm-mobile.html', n: 'fm_mobile', j:0},
+        'fm_mobile_js': {f:'js/ui/megaRenderMobile.js', n: 'fm_mobile_js', j:1},
         'network_js': {f:'js/network-testing.js', n: 'network_js', j:1},
         'dispute': {f:'html/dispute.html', n: 'dispute', j:0},
         'disputenotice': {f:'html/disputenotice.html', n: 'disputenotice', j:0},
@@ -1879,7 +1890,10 @@ else if (!b_u)
     };
 
     if (is_mobile) {
-        subpages['!'] = ['download_mobile', 'download_js', 'mobile_css'];
+        // Page specific
+        subpages['!'] = ['fm_mobile', 'download_js'];
+        subpages['F!'] = ['fm_mobile', 'fm_mobile_js'];
+        subpages['fm'] = ['fm_mobile', 'fm_mobile_js'];
     }
 
     if (page)
@@ -1973,8 +1987,11 @@ else if (!b_u)
             waitingToBeLoaded++;
             elem.onload = function() {
                 // if (d) console.log('jj.progress...', waitingToBeLoaded);
+
+                jsl_loaded[Object(jsl[id]).n] = 1;
                 jsl_current += Object(jsl[id]).w || 1;
                 jsl_progress();
+
                 if (--waitingToBeLoaded == 0) {
                     jj_done = true;
                     boot_done();
@@ -2035,6 +2052,10 @@ else if (!b_u)
                         jsl[i].text = '/**/';
                         createStyleTag(i, bootstaticpath + jsl[i].f + jjNoCache);
                     }
+                }
+
+                if (!jj || !jsl[i].j || jsl[i].j > 2) {
+                    jsl_done = false;
                 }
             }
         }
@@ -2257,7 +2278,9 @@ else if (!b_u)
         //for(var i in localStorage) if (i.substr(0,6) == 'cache!') delete localStorage[i];
         for (var i in jsl)
         {
-            jsl_loaded[jsl[i].n]=1;
+            if (!jj || !jsl[i].j || jsl[i].j > 2) {
+                jsl_loaded[jsl[i].n] = 1;
+            }
             if ((jsl[i].j == 1) && (!jj))
             {
                 if (!fx_startup_cache)
@@ -2347,7 +2370,7 @@ else if (!b_u)
     if (document.location.href.substr(0,19) == 'chrome-extension://')  istaticpath = '../';
     else if (is_chrome_firefox) istaticpath = 'chrome://mega/content/';
 
-    mCreateElement('style', {type: 'text/css'}, 'body').textContent = '.div, span, input {outline: none;}.hidden {display: none;}.clear {clear: both;margin: 0px;padding: 0px;display: block;}.loading-main-block {width: 100%;height: 100%;overflow: auto;font-family:Arial, Helvetica, sans-serif;}.loading-mid-white-block {height: 100%;width:100%;}.loading-cloud {width: 222px;height: 158px;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v2.png);background-repeat: no-repeat;background-position: 0 0;position:absolute;left:50%;top:50%;margin:-79px 0 0 -111px;}.loading-m-block{width:60px;height:60px;position:absolute; left:81px;top:65px;background-color:white;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v2.png);background-repeat: no-repeat;background-position: -81px -65px;border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;z-index:10;}.loading-percentage { width: 80px;height: 80px;position: absolute;-moz-border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;overflow: hidden;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v2.png);background-repeat: no-repeat;background-position: -70px -185px;left:71px;top:55px;}.loading-percentage ul {list-style-type: none;}.loading-percentage li {position: absolute;top: 0px;}.loading-percentage p, .loading-percentage li, .loading-percentage ul{width: 80px;height: 80px;padding: 0;margin: 0;}.loading-percentage span {display: block;width: 40px;height: 80px;}.loading-percentage ul :nth-child(odd) {clip: rect(0px, 80px, 80px, 40px);}.loading-percentage ul :nth-child(even) {clip: rect(0px, 40px, 80px, 0px);}.loading-percentage .right-c span {-moz-border-radius-topleft: 40px;-moz-border-radius-bottomleft: 40px;-webkit-border-top-left-radius: 40px;-webkit-border-bottom-left-radius: 40px;border-top-left-radius: 40px;border-bottom-left-radius: 40px;background-color:#dc0000;}.loading-percentage .left-c span {margin-left: 40px;-moz-border-radius-topright: 40px;-moz-border-radius-bottomright: 40px;-webkit-border-top-right-radius: 40px;-webkit-border-bottom-right-radius: 40px;border-top-right-radius: 40px;border-bottom-right-radius: 40px;background-color:#dc0000;}.loading-main-bottom {max-width: 940px;width: 100%;position: absolute;bottom: 20px;left: 50%;margin: 0 0 0 -470px;text-align: center;}.loading-bottom-button {height: 29px;width: 29px;float: left;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v2.png);background-repeat: no-repeat;cursor: pointer;}.st-social-block-load {position: absolute;bottom: 20px;left: 0;width: 100%;height: 43px;text-align: center;}.st-bottom-button {height: 29px;width: 29px;display: inline-block;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v2.png);background-repeat: no-repeat;cursor: pointer;}.st-bottom-button.st-google-button {background-position: -94px -468px;position: relative;margin: 0 5px;}.st-bottom-button.st-google-button:hover {background-position: -94px -408px;}.st-bottom-button.st-facebook-button {background-position: -49px -468px;margin: 0 5px;}.st-bottom-button.st-facebook-button:hover {background-position: -49px -408px;}.st-bottom-button.st-twitter-button {background-position: left -468px;margin: 0 5px;}.st-bottom-button.st-twitter-button:hover {    background-position: left -408px;}@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {.maintance-block, .loading-percentage, .loading-m-block, .loading-cloud, .loading-bottom-button,.st-bottom-button, .st-bottom-scroll-button {background-image: url(' + istaticpath + 'images/mega/loading-sprite_v2@2x.png);    background-size: 222px auto;}}';
+    mCreateElement('style', {type: 'text/css'}, 'body').textContent = '.div, span, input {outline: none;}.hidden {display: none;}.clear {clear: both;margin: 0px;padding: 0px;display: block;}.loading-main-block {width: 100%;height: 100%;overflow: auto;font-family:Arial, Helvetica, sans-serif;}.loading-mid-white-block {height: 100%;width:100%;}.loading-cloud {width: 222px;height: 158px;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v3.png);background-repeat: no-repeat;background-position: 0 0;position:absolute;left:50%;top:50%;margin:-79px 0 0 -111px;}.loading-m-block{width:60px;height:60px;position:absolute; left:81px;top:65px;background-color:white;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v3.png);background-repeat: no-repeat;background-position: -81px -65px;border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;z-index:10;}.loading-percentage { width: 80px;height: 80px; background-color: #e1e1e1;position: absolute;-moz-border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;overflow: hidden;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v3.png);background-repeat: no-repeat;background-position: -70px -185px;left:71px;top:55px;}.loading-percentage ul {list-style-type: none;}.loading-percentage li {position: absolute;top: 0px;}.loading-percentage p, .loading-percentage li, .loading-percentage ul{width: 80px;height: 80px;padding: 0;margin: 0;}.loading-percentage span {display: block;width: 40px;height: 80px;}.loading-percentage ul :nth-child(odd) {clip: rect(0px, 80px, 80px, 40px);}.loading-percentage ul :nth-child(even) {clip: rect(0px, 40px, 80px, 0px);}.loading-percentage .right-c span {-moz-border-radius-topleft: 40px;-moz-border-radius-bottomleft: 40px;-webkit-border-top-left-radius: 40px;-webkit-border-bottom-left-radius: 40px;border-top-left-radius: 40px;border-bottom-left-radius: 40px;background-color:#dc0000;}.loading-percentage .left-c span {margin-left: 40px;-moz-border-radius-topright: 40px;-moz-border-radius-bottomright: 40px;-webkit-border-top-right-radius: 40px;-webkit-border-bottom-right-radius: 40px;border-top-right-radius: 40px;border-bottom-right-radius: 40px;background-color:#dc0000;}.loading-main-bottom {max-width: 940px;width: 100%;position: absolute;bottom: 20px;left: 50%;margin: 0 0 0 -470px;text-align: center;}.loading-bottom-button {height: 29px;width: 29px;float: left;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v3.png);background-repeat: no-repeat;cursor: pointer;}.st-social-block-load {position: absolute;bottom: 20px;left: 0;width: 100%;height: 43px;text-align: center;}.st-bottom-button {height: 24px;width: 24px;margin: 0 8px;display: inline-block;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v3.png);background-repeat: no-repeat;background-position:11px -405px;cursor: pointer;-moz-border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;-webkit-transition: all 200ms ease-in-out;-moz-transition: background-color 200ms ease-in-out;-o-transition: background-color 200ms ease-in-out;-ms-transition: background-color 200ms ease-in-out;transition: background-color 200ms ease-in-out;background-color:#999999;}.st-bottom-button.st-google-button {background-position: 11px -405px;}.st-bottom-button.st-google-button {background-position: -69px -405px;}.st-bottom-button.st-twitter-button{background-position: -29px -405px;}.st-bottom-button:hover {background-color:#334f8d;}.st-bottom-button.st-twitter-button:hover {background-color:#1a96f0;}.st-bottom-button.st-google-button:hover {background-color:#d0402a;}@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {.maintance-block, .loading-percentage, .loading-m-block, .loading-cloud, .loading-bottom-button,.st-bottom-button, .st-bottom-scroll-button {background-image: url(' + istaticpath + 'images/mega/loading-sprite_v3@2x.png);    background-size: 222px auto;}}';
 
     mCreateElement('div', { "class": "loading-main-block", id: "loading"}, 'body')
         .innerHTML =
@@ -2523,3 +2546,16 @@ function tryCatch(fn)
     fn.foo.bar = fn;
     return fn.foo;
 }
+
+var onIdle = window.requestIdleCallback || function(handler) {
+        var startTime = Date.now();
+
+        return setTimeout(function() {
+            handler({
+                didTimeout: false,
+                timeRemaining: function() {
+                    return Math.max(0, 50.0 - (Date.now() - startTime));
+                }
+            });
+        }, 1);
+    };

@@ -470,7 +470,6 @@ Chat.prototype.init = function() {
             self.connect().done(function() {
                 self.karere.setPresence(presence, undefined, localStorage.megaChatPresenceMtime);
 
-                //TODO: is this needed?
                 Object.keys(self.plugins.chatdIntegration.chatd.shards).forEach(function(k) {
                     var shard = self.plugins.chatdIntegration.chatd.shards[k];
                     shard.reconnect();

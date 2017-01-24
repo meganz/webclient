@@ -4220,7 +4220,6 @@ function MegaData()
             }
 
             if (updnode) {
-                // XXX: is this really needed? we're no longer storing the whole node in DB...
                 M.nodeUpdated(this.d[h]);
 
                 if (fminitialized) {

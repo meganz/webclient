@@ -6532,19 +6532,18 @@ function execsc() {
                                                 // inner share: leave nodes intact, just remove .r/.su
                                                 delete n.r;
                                                 delete n.su;
+                                                delete n.sk;
                                                 delete u_sharekeys[a.n];
+
+                                                if (fmdb) {
+                                                    M.nodeUpdated(n);
+                                                    fmdb.del('s', a.n + '*' + u_handle);
+                                                }
                                             }
                                             else {
                                                 // toplevel share: delete entire tree
                                                 // (the API will have removed all subshares at this point)
                                                 M.delNode(a.n);
-                                            }
-
-                                            delete u_sharekeys[a.n];
-
-                                            if (fmdb) {
-                                                M.nodeUpdated(n);
-                                                fmdb.del('s', a.n + '*' + u_handle);
                                             }
                                         }
                                         else {

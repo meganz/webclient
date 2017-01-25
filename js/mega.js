@@ -4247,7 +4247,7 @@ function MegaData()
             var users = this.getNodeShareUsers(h, 'EXP');
 
             if (users.length) {
-                console.error('The node ' + h + ' still has shares on it!');
+                console.warn('The node ' + h + ' still has shares on it!', users);
 
                 users.forEach(function(user) {
                     M.delNodeShare(h, user);

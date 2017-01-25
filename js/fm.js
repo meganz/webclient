@@ -8581,12 +8581,22 @@ function handleDialogTabContent(dialogTabClass, parentTag, dialogPrefix, htmlCon
  */
 function disableReadOnlySharedFolders(dialogName) {
     var $ro = $('.' + dialogName + '-dialog-tree-panel.shared-with-me .dialog-content-block span[id^="mctreea_"]');
+    var targets = $.selected || [];
 
     $ro.each(function(i, v) {
         var node = M.d[$(v).attr('id').replace('mctreea_', '')];
 
         while (node && !node.su) {
             node = M.d[node.p];
+        }
+
+        if (node) {
+            for (i = targets.length; i--;) {
+                if (isCircular(node.h, targets[i])) {
+                    node = null;
+                    break;
+                }
+            }
         }
 
         if (!node || !node.r) {

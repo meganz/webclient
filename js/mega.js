@@ -1303,9 +1303,6 @@ function MegaData()
 
                     // Remove user from the share
                     leaveShare(shareId);
-
-                    // Open the shares folder
-                    M.openFolder('shares', true);
                 });
             }
         }

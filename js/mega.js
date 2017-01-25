@@ -2015,6 +2015,9 @@ function MegaData()
                     if (share.isShareExist([curItemHandle], true, true, false)) {
                         sharedfolder = ' shared-folder';
                     }
+                    else if (M.d[curItemHandle] && M.d[curItemHandle].su) {
+                        sharedfolder = ' inbound-share';
+                    }
 
                     openedc = '';
                     if (M.currentdirid === curItemHandle) {

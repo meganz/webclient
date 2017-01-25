@@ -647,6 +647,10 @@
                 var props = {classNames: []};
                 var share = M.getNodeShare(aNode);
 
+                if (aNode.su) {
+                    props.classNames.push('inbound-share');
+                }
+
                 if (aNode.t) {
                     props.type = l[1049];
                     props.icon = 'folder';
@@ -721,7 +725,6 @@
                 var avatar;
                 var props = this.nodeProperties['*'].call(this, aNode, aHandle, false);
 
-                props.shareUser = aNode.su;
                 props.userHandle = aNode.su || aNode.p;
                 props.userName = M.getNameByHandle(props.userHandle);
 

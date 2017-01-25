@@ -6152,7 +6152,7 @@ function sc_packet(a) {
             }
         }
         else {
-            if (a.o === u_handle) {
+            if (!a.o || a.o === u_handle) {
                 var k = crypto_process_sharekey(a.n, a.k);
 
                 if (k !== false) {

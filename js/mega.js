@@ -421,8 +421,8 @@ function MegaData()
     {
         this.sortfn = function(a, b, d)
         {
-            var usera = Object(M.d[a.p]);
-            var userb = Object(M.d[b.p]);
+            var usera = Object(M.d[a.su]);
+            var userb = Object(M.d[b.su]);
 
             if (typeof usera.name === 'string' && typeof userb.name === 'string') {
                 return usera.name.localeCompare(userb.name) * d;
@@ -2606,7 +2606,7 @@ function MegaData()
                     // this is an inbound share
                     delete M.c.shares[h];
                     delete u_sharekeys[h];
-                    delInShareQ.push(M.d[h].p + '*' + h);
+                    delInShareQ.push(M.d[h].su + '*' + h);
                     M.delIndex(M.d[h].su, h);
                 }
 

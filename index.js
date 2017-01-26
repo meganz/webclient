@@ -903,6 +903,7 @@ function init_page() {
     }
     else if (page == 'megacmd') {
         parsepage(pages['megacmd']);
+        initMegacmd();
     }
     else if (page == 'mobile') {
         parsepage(pages['mobile']);

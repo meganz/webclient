@@ -64,7 +64,7 @@ var megasync = (function() {
             selected($(this));
         });
 
-        $('.main-pad-block').rebind('click.closedropdown', function(e) {
+        $('.main-pad-block').rebind('click.closesyncdropdown', function(e) {
             if ($dropdown.hasClass('active')) {
                 if ($(e.target).parent('.megasync-dropdown').length === 0 && !$(e.target).hasClass('megasync-dropdown')) {
                     $dropdown.removeClass('active');
@@ -99,7 +99,7 @@ var megasync = (function() {
         var $pane = $main.find('.megasync-dropdown-scroll');
         var jsp   = $pane.data('jsp');
         var $list = $main.find('.megasync-dropdown-list');
-        var $arrow = $main.find('.megasync-list-arrow');
+        var $arrow = $main.find('.mega-list-arrow');
         var overlayHeight = $('.megasync-overlay').outerHeight();
         var listHeight = $main.find('.megasync-scr-pad').outerHeight() + 72;
 

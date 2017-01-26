@@ -24173,6 +24173,15 @@ body.pro:after {
     margin: 63px auto 55px auto;
     display: none;
 }
+.megacmd-dropdown {
+    width: 228px;
+    float: none;
+    margin: 40px auto 5px auto;
+}
+.megacmd-linux .sync-radio-buttons {
+    width: 228px;
+    margin: 0 auto;
+}
 .default-dropdown-item.icon {
     padding: 0 30px 0 34px;
     background-image: url(../images/mega/download-sprite-v6.png);
@@ -24246,17 +24255,17 @@ body.pro:after {
     font-size: 13px;
     cursor: default;
 }
-.megasync-dropdown-list .jspContainer .jspPane {
+.default-select-dropdown .jspContainer .jspPane {
     min-width: 100%;
     max-width: 100% !important;
 }
-.megasync-list-arrow {
+.mega-list-arrow {
     height: 23px;
     background-image: url(../images/mega/download-sprite-v6.png);
     background-position: center -2171px;
     cursor: pointer;
 }
-.megasync-list-arrow.inactive {
+.mega-list-arrow.inactive {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     -moz-opacity: 0.3;
     -khtml-opacity: 0.3;

@@ -1,4 +1,5 @@
- @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
+
+@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
 .try-new-close {
     background-image: url(../images/mega/close-white-icon@2x.png);
     background-size: 14px auto;
@@ -323,7 +324,7 @@ body.pro:after {
     background-image: url(../images/mega/register-info@2x.png);
     background-size: 120px auto;
 }
-.download-dialog-icon, .download-chrome-lnk, a.download-chrome-lnk, .download-user-icon, .new-download-sync-app, .new-download-red-button, .megasync-list-arrow, .megasync-logo, .megasync-table table th span, .megasync-table table td span, .default-dropdown-item.icon, .camera-bottom-icon, .camera-top-icon, .button.download-button.down-arrow, .button.download-button.to-clouddrive, .download-icon, .download.error-text.na-icon, .download.error-text.cross-icon, .download.error-text.error-icon, .megasync-info-arrow, .megasync-dark-logo, .megasync-icon, .megasync-slider.button, .megasync .toast-icon, .toast-close-button {
+.download-dialog-icon, .download-chrome-lnk, a.download-chrome-lnk, .download-user-icon, .new-download-sync-app, .new-download-red-button, .mega-list-arrow, .megasync-logo, .megasync-table table th span, .megasync-table table td span, .default-dropdown-item.icon, .camera-bottom-icon, .camera-top-icon, .button.download-button.down-arrow, .button.download-button.to-clouddrive, .download-icon, .download.error-text.na-icon, .download.error-text.cross-icon, .download.error-text.error-icon, .megasync-info-arrow, .megasync-dark-logo, .megasync-icon, .megasync-slider.button, .megasync .toast-icon, .toast-close-button {
     background-image: url(../images/mega/download-sprite-v6@2x.png);
     background-size: 257px auto;
 }

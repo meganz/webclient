@@ -914,7 +914,7 @@ var GenericConversationMessage = React.createClass({
                         icon = <i className={"small-icon " + button.icon}></i>;
                     }
                     buttons.push(
-                        <div className={classes} key={k}  onClick={(() => { button.callback(); })}>
+                        <div className={classes} key={k}  onClick={((e) => { button.callback.call(e.target); })}>
                             {icon}
                             {button.text}
                         </div>

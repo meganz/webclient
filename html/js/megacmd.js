@@ -45,6 +45,8 @@ function cmd_switchOS(os) {
 function initMegacmd() {
     var pf = navigator.platform.toUpperCase();
 
+    $('.download-megacmd').removeClass('disabled');
+
     if (pf.indexOf('MAC') >= 0) {
         cmd_switchOS('mac');
     }
@@ -75,15 +77,17 @@ function initMegacmd() {
  */
 function initMegacmdDownload(url) {
     var $button = $('.download-megacmd');
-    if (url) {
-        $button.rebind('click', function() {
-            window.location = url;
-        });
-    }
-    else {
-        $button.rebind('click', function() {
-            window.location = $button.attr('data-link');
-        });
+    if (!$button.hasClass('disabled')) {
+        if (url) {
+            $button.rebind('click', function() {
+                window.location = url;
+            });
+        }
+        else {
+            $button.rebind('click', function() {
+                window.location = $button.attr('data-link');
+            });
+        }
     }
 }
 
@@ -92,20 +96,28 @@ function initMegacmdDownload(url) {
  */
 function linuxMegacmdDropdown() {
 
-    var is64 = browserdetails().is64bit;
+    var $button = $('.download-megacmd');
     var $dropdown = $('.megacmd-dropdown'); 
-    var $select = $dropdown.find('.megacmd-scr-pad').empty();
+    var $select = $dropdown.find('.megacmd-scr-pad');
     var $list = $dropdown.find('.megacmd-dropdown-list');
-    $('.megasync-overlay').addClass('linux');
+
+    $button.addClass('disabled');
 
     /* TODO: create dropdown items and links */
         // ....
+        //  $('<div/>').addClass('default-dropdown-item icon ' + icon)
+        //     .text(client.name)
+        //     .attr('link', '')
+        //     .appendTo($select);
+        // ....
+        // inuxMegacmdDropdownResizeHandler();
     /* End */
 
     // Dropdown item click event
     $('.default-dropdown-item', $dropdown).rebind('click', function() {
         $dropdown.find('span').text($(this).text());
         initMegacmdDownload($(this).attr('link'));
+        $button.removeClass('disabled');
     });
 
     // Close Dropdown if another element was clicked
@@ -128,14 +140,6 @@ function linuxMegacmdDropdown() {
             $this.addClass('active');
             $list.removeClass('hidden');
             linuxMegacmdDropdownResizeHandler();
-        }
-    });
-
-    // Download button click event
-    $('.download-megacmd').rebind('click', function() {
-        var $this = $(this);
-        if ($this.attr('data-link')) {
-            window.location = $this.attr('data-link');
         }
     });
 

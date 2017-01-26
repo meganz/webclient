@@ -70,6 +70,7 @@ function renderLinuxOptions(linuxsync) {
         else if ($(this).hasClass('linux')) {
             sync_switchOS('linux');
         }
+        mainScroll();
         return false;
     });
 }

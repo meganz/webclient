@@ -175,12 +175,12 @@ function linuxMegacmdDropdownResizeHandler() {
 
         $pane.bind('jsp-arrow-change', function(event, isAtTop, isAtBottom, isAtLeft, isAtRight) {
 
-            if (isAtBottom) {
-                $arrow.addClass('inactive');
-            } else {
-                $arrow.removeClass('inactive');
-            }
-        });
+        if (isAtBottom) {
+            $arrow.addClass('inactive');
+        } else {
+            $arrow.removeClass('inactive');
+        }
+    });
 
     } else {
         if (jsp) {

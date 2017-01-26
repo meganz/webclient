@@ -3,6 +3,7 @@
  */
 function cmd_switchOS(os) {
     var url;
+    $('.download-megacmd').removeClass('disabled');
     $('.megacmd-linux:visible').addClass('hidden');
 
     if (os === 'windows') {

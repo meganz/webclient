@@ -162,8 +162,12 @@ function linuxMegacmdDropdownResizeHandler() {
     var $arrow = $main.find('.mega-list-arrow');
     var overlayHeight = $('.megasync-overlay').outerHeight();
     var listHeight = $main.find('.megacmd-scr-pad').outerHeight() + 72;
+    var listPosition;
 
-    var listPosition = $list.offset().top;
+    if ($list.length) {
+        listPosition = $list.offset().top;
+    }
+
     if (overlayHeight < (listHeight + listPosition)) {
         $arrow.removeClass('hidden inactive');
         $pane.height(overlayHeight - listPosition - 72);

@@ -102,7 +102,7 @@ var megasync = (function() {
         var $arrow = $main.find('.mega-list-arrow');
         var overlayHeight = $('.megasync-overlay').outerHeight();
         var listHeight = $main.find('.megasync-scr-pad').outerHeight() + 72;
-        var listPosition = $list.offset().top;
+        var listPosition;
 
         if ($list.length) {
             listPosition = $list.offset().top;

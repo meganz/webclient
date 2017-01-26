@@ -182,6 +182,7 @@ function changeLinux(linuxsync, i) {
                                  l[1909], linuxsync[i].c, filename);
         $('.linuxhint').show();
         syncsel = i;
+        mainScroll();
     }
     else {
         syncurl = false;
@@ -190,5 +191,6 @@ function changeLinux(linuxsync, i) {
         $('.sync-button.linux').addClass('disabled');
         $('.sync-bottom-txt.linux-txt').css('opacity', '0.3');
         $('.version-select-txt').text(l[2029]);
+        mainScroll();
     }
 }

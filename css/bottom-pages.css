@@ -1,0 +1,85 @@
+.transparent-header .top-head {
+    background-color: transparent;
+    position: absolute;
+    width: 100%;
+}
+.transparent-header .top-head::after {
+    display: none;
+}
+.transparent-header .logo {
+    background-position: -6px -773px;
+}
+/* MEGAcmd */
+.megacmd-header {
+    background-position: center;
+    background-size: cover;
+    background-image: url(../images/mega/megacmd-bg.jpg);
+    background-repeat: no-repeat;
+    padding: 128px 0 0 0;
+    text-align: center;
+}
+.megacmd-logo {
+    background-image: url(../images/mega/megacmd-sprite.png);
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    width: 228px;
+    height: 36px;
+    margin: 0 auto;
+}
+.megacmd-header-txt {
+    max-width: 708px;
+    padding: 67px 0 65px 0;
+    font-size: 18px;
+    line-height: 26px;
+    text-align: center;
+    color: #333333;
+    margin: 0 auto;
+}
+.megacmd-button-info {
+    color: #666666;
+    font-size: 14px;
+    line-height: 24px;
+    padding: 28px 0 38px 0;
+}
+.megacmd-button-info a.red {
+    cursor: pointer;
+    color: #FF333A;
+}
+.megacmd-icon {
+    width: 100px;
+    height: 100px;
+    background-image: url(../images/mega/megacmd-sprite.png);
+    background-repeat: no-repeat;
+    background-position: 0 -151px;
+    margin: 0 auto 17px auto;
+}
+.megacmd-features {
+    width: 50%;
+    float: left;
+    text-align: center;
+    padding: 100px 0 60px 11px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.megacmd-features.first {
+    padding: 100px 11px 60px 0;
+}
+.megacmd-icon.cogs {
+    background-position: 0 -271px;
+}
+.megacmd-icon-info {
+    font-size: 18px;
+    line-height: 21px;
+    color: #666666;
+    padding: 15px 0 7px 0;
+}
+.megacmd-icon-info.small {
+    font-size: 14px;
+    line-height: 24px;
+    padding: 15px 0 0 0;
+}
+.megacmd-icon-info.red {
+    color: #FF333A;
+}
+/* end of MEGAcmd */

@@ -901,6 +901,9 @@ function init_page() {
         topmenuUI();
         mainScroll();
     }
+    else if (page == 'megacmd') {
+        parsepage(pages['megacmd']);
+    }
     else if (page == 'mobile') {
         parsepage(pages['mobile']);
     }
@@ -1689,6 +1692,9 @@ function topmenuUI() {
             }
             else if (className.indexOf('sync') > -1) {
                 document.location.hash = 'sync';
+            }
+            else if (className.indexOf('megacmd') > -1) {
+                document.location.hash = 'megacmd';
             }
             else if (className.indexOf('help') > -1) {
                 document.location.hash = 'help';

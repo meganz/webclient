@@ -103,7 +103,7 @@ function linuxMegacmdDropdown() {
     var $list = $dropdown.find('.megacmd-dropdown-list');
 
     $button.addClass('disabled');
-
+    var linuxClients;
     /* TODO: create dropdown items and links */
         // ....
         //  $('<div/>').addClass('default-dropdown-item icon ' + icon)
@@ -113,7 +113,28 @@ function linuxMegacmdDropdown() {
         // ....
         // inuxMegacmdDropdownResizeHandler();
     /* End */
+        // Talk to the CMS server and get information
+        // about the `sync` (expect a JSON)
+        CMS.get('cmd', function(err, content) {
+            linuxClients = content.object;
+            var linux = 'https://mega.nz/linux/MEGAsync/';
+            linuxClients.forEach(function(val) {
 
+                ['32', '64'].forEach(function(platform) {
+                    var icon = val.name.toLowerCase().match(/([a-z]+)/i)[1];
+                    icon = (icon === 'red') ? 'redhat' : icon;
+                    if (val[platform]) {
+                        $('<div/>').addClass('default-dropdown-item icon ' + icon)
+                        .text(val.name)
+                        .attr('link', '')
+                        .appendTo($select);
+
+                        linuxMegacmdDropdownResizeHandler();
+                    }
+                });
+            });
+            next(linuxClients);
+        });
     // Dropdown item click event
     $('.default-dropdown-item', $dropdown).rebind('click', function() {
         $dropdown.find('span').text($(this).text());

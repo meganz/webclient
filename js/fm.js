@@ -1856,8 +1856,8 @@ function addContactUI() {
 
     $('.fm-add-user').rebind('click', function() {
 
-        var $this = $(this),
-            $d = $('.add-user-popup');
+        var $this = $(this);
+        var $d = $('.add-user-popup');
 
         $.hideContextMenu();
         $.dialog = 'add-contact-popup';
@@ -1875,6 +1875,7 @@ function addContactUI() {
         else {
             $('.add-user-popup .import-contacts-dialog').fadeOut(0);
             $('.import-contacts-link').removeClass('active');
+            clearScrollPanel('.add-user-popup');
             $this.addClass('active');
             $d.removeClass('hidden dialog');
             $('.add-user-popup .multiple-input .token-input-token-mega').remove();
@@ -2526,6 +2527,7 @@ function initContextUI() {
             // this is used like identifier when key with key code 27 is pressed
             $.dialog = 'share';
             $.hideContextMenu();
+            clearScrollPanel('.share-dialog');
 
             // Show the share dialog
             $shareDialog.removeClass('hidden');
@@ -3790,6 +3792,9 @@ function accountUI() {
             $chartsBlock.find('.chart-warning').rebind('click', function() {
                 window.location.hash = 'pro';
             });
+            $storageData.find('.chart-warning, .upgrade-account.button').rebind('click', function() {
+                window.location.hash = 'pro';
+            });
         }
         /* End of Charts warning notifications */
 
@@ -4178,6 +4183,7 @@ function accountUI() {
         $('.fm-close-all-sessions').rebind('click', function() {
 
             loadingDialog.show();
+            var $this = $(this);
             var $activeSessionsRows = $('.active-session-txt').parents('tr');
 
             // Expire all sessions but not the current one
@@ -4187,6 +4193,7 @@ function accountUI() {
                     $activeSessionsRows.find('.settings-logout').remove();
                     $activeSessionsRows.find('.active-session-txt').removeClass('active-session-txt')
                         .addClass('expired-session-txt').text(l[1664]);
+                    $this.hide();
                     loadingDialog.hide();
                 }
             });
@@ -9570,14 +9577,17 @@ function closeImportContactNotification(c) {
 
 function clearScrollPanel(from) {
     var j = $(from + ' .multiple-input').jScrollPane().data();
+
     if (j && j.jsp) {
         j.jsp.destroy();
     }
+
     $(from + ' .multiple-input .jspPane').unwrap();
     $(from + ' .multiple-input .jspPane:first-child').unwrap();
 
     // remove share dialog contacts, jScrollPane
     j = $(from + ' .share-dialog-contacts').jScrollPane().data();
+
     if (j && j.jsp) {
         j.jsp.destroy();
     }
@@ -9635,12 +9645,9 @@ function closeDialog() {
         $('.add-contact-multiple-input').tokenInput("clearOnCancel");
         $('.share-multiple-input').tokenInput("clearOnCancel");
 
-        clearScrollPanel('.add-user-popup');
-
         // share dialog
         $('.share-dialog-contact-bl').remove();
         $('.import-contacts-service').removeClass('imported');
-        clearScrollPanel('.share-dialog');
 
         // share dialog permission menu
         $('.permissions-menu').fadeOut(0);

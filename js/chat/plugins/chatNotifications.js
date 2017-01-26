@@ -125,6 +125,7 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
                                 'sound': 'alert_info_message',
                                 'group': megaRoom.roomJid,
                                 'incrementCounter': true,
+                                'anfFlag': 'chat_enabled',
                                 'icon': icon,
                                 'params': {
                                     'from': avatarMeta.fullName,
@@ -175,6 +176,7 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
                             'group': megaRoom.roomJid,
                             'incrementCounter': false,
                             'icon': avatars[u_handle],
+                            'anfFlag': 'chat_enabled',
                             'params': {
                                 'room': megaRoom,
                                 'from': generateAvatarMeta(u_handle).fullName,
@@ -211,6 +213,7 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
                             'sound': 'hang_out',
                             'group': room.roomJid,
                             'incrementCounter': false,
+                            'anfFlag': 'chat_enabled',
                             'icon': icon,
                             'params': {
                                 'from': avatarMeta.fullName
@@ -247,6 +250,7 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
                     'alwaysPlaySound': true,
                     'group': room.roomJid,
                     'incrementCounter': true,
+                    'anfFlag': 'chat_enabled',
                     'icon': avatar,
                     'params': {
                         'room': room,

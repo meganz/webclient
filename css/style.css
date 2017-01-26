@@ -7208,12 +7208,12 @@ table {
     line-height: 0;
     margin-left: -4px;
 }
-.fm-flags-icon img, .fm-browsers-icon img {
+.fm-flags-icon img {
     margin: 7px 0 0 2px;
     width: auto;
 }
 .fm-browsers-icon img {
-    margin: 4px 0 0 0px;
+    margin: 5px 0 0 0px;
     width: auto;
 }
 .tranfer-filetype-txt, .fm-browsers-txt, .fm-flags-txt, .fm-member-icon-txt {
@@ -11390,8 +11390,9 @@ table {
 .active-session-txt, .current-session-txt, .expired-session-txt, .settings-logout {
     display: block;
     float: left;
-    height: 16px;
+    height: 18px;
     background-color: #13E03C;
+    border:1px solid transparent;
     color: white;
     font-size: 12px;
     text-transform: uppercase;
@@ -11405,7 +11406,10 @@ table {
     -moz-transition: background-color 200ms ease-in-out;
     -o-transition: background-color 200ms ease-in-out;
     -ms-transition: background-color 200ms ease-in-out;
-    transition: background-color 200ms
+    transition: background-color 200ms;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
 .active-session-txt, .current-session-txt, .expired-session-txt {
     text-align: center;
@@ -24573,7 +24577,7 @@ body.pro:after {
     color: white;
     text-decoration: underline;
     white-space: nowrap;
-    padding-left: 3px;
+    padding-left: 0;
     cursor: pointer;
 }
 .toast-button:hover {

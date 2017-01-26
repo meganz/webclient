@@ -234,7 +234,7 @@ ChatRoom.STATE = {
     'LEFT': 250
 };
 
-ChatRoom.prototype._retrieveTurnServerFromLoadBalancer = function() {
+ChatRoom.prototype._retrieveTurnServerFromLoadBalancer = function(timeout) {
     var self = this;
 
     var $promise = new MegaPromise();
@@ -244,7 +244,10 @@ ChatRoom.prototype._retrieveTurnServerFromLoadBalancer = function() {
     if (self.megaChat.rtc && self.megaChat.rtc.ownAnonId) {
         anonId = self.megaChat.rtc.ownAnonId;
     }
-    $.get("https://" + self.megaChat.options.loadbalancerService + "/?service=turn&anonid=" + anonId)
+    $.ajax("https://" + self.megaChat.options.loadbalancerService + "/?service=turn&anonid=" + anonId, {
+        method: "GET",
+        timeout: timeout ? timeout : 10000
+    })
         .done(function(r) {
             if (r.turn && r.turn.length > 0) {
                 var servers = [];

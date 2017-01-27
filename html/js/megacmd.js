@@ -101,9 +101,8 @@ function linuxMegacmdDropdown() {
     var $dropdown = $('.megacmd-dropdown'); 
     var $select = $dropdown.find('.megacmd-scr-pad');
     var $list = $dropdown.find('.megacmd-dropdown-list');
-
-    $button.addClass('disabled');
     var linuxClients;
+    $button.addClass('disabled');
     /* TODO: create dropdown items and links */
         // ....
         //  $('<div/>').addClass('default-dropdown-item icon ' + icon)
@@ -133,14 +132,14 @@ function linuxMegacmdDropdown() {
                     }
                 });
             });
-            next(linuxClients);
+            // Dropdown item click event
+            $('.default-dropdown-item', $dropdown).rebind('click', function() {
+                $dropdown.find('span').text($(this).text());
+                initMegacmdDownload($(this).attr('link'));
+                $button.removeClass('disabled');
+            });
         });
-    // Dropdown item click event
-    $('.default-dropdown-item', $dropdown).rebind('click', function() {
-        $dropdown.find('span').text($(this).text());
-        initMegacmdDownload($(this).attr('link'));
-        $button.removeClass('disabled');
-    });
+
 
     // Close Dropdown if another element was clicked
     $('.main-pad-block').rebind('click.closecmddropdown', function(e) {

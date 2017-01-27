@@ -16,7 +16,6 @@ function cmd_switchOS(os) {
     if (os === 'windows') {
         $('.megacmd-button-info').safeHTML(l[12485]);
         url = windowsurl;
-        url = 'windows';
     }
     else if (os === 'mac') {
         $('.megacmd-button-info').safeHTML(l[12487]);

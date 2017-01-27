@@ -241,9 +241,8 @@ a, a:link, a:visited, a:hover, a:active, a:focus img, a:focus img {
     border-radius: 100%;
     float: left;
     margin: 6px 0 0 12px;
-    background-color: #d90007;
     background-position: -6px -383px;
-    background-image: url(../images/mega/top-sprite_v1.png);
+    background-image: url(../images/mega/top-sprite_v2.png);
     background-repeat: no-repeat;
     cursor: pointer;
     display: none;
@@ -313,7 +312,7 @@ a.nlanguage-lnk.language-template {
     margin: 16px 0 0 0;
     background-position: 0px -1037px;
     background-position: -2px -286px;
-    background-image: url(../images/mega/top-sprite_v1.png);
+    background-image: url(../images/mega/top-sprite_v2.png);
     background-repeat: no-repeat;
 }
 .nlanguage-bottom a, .nlanguage-bottom a:link, .nlanguage-bottom a:visited, .nlanguage-bottom a:hover, .nlanguage-bottom a:active {
@@ -365,7 +364,7 @@ a.nlanguage-lnk.language-template {
     vertical-align: middle;
 }
 .languages-dialog .show-more-languages .round-arrow span {
-    background-image: url(../images/mega/top-sprite_v1.png);
+    background-image: url(../images/mega/top-sprite_v2.png);
     background-position: -13px -1108px;
     background-repeat: no-repeat;
     display: inline-block;
@@ -4854,7 +4853,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     height: 14px;
     right: 25px;
     top: 9px;
-    background-image: url(../images/mega/top-sprite_v1.png);
+    background-image: url(../images/mega/top-sprite_v2.png);
     background-position: -12px -1303px;
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     -moz-opacity: 0.5;
@@ -4910,7 +4909,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     width: 24px;
     height: 24px;
     display: block;
-    background-image: url(../images/mega/top-sprite_v1.png);
+    background-image: url(../images/mega/top-sprite_v2.png);
     background-repeat: no-repeat;
     -webkit-transition: all 200ms ease-in-out;
     -moz-transition: all 200ms ease-in-out;
@@ -9097,7 +9096,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     color: #999999;
     display: inline-block;
     padding: 0 0 0 26px;
-    background-image: url(../images/mega/top-sprite_v1.png);
+    background-image: url(../images/mega/top-sprite_v2.png);
     background-position: -8px -511px;
     background-repeat: no-repeat;
     float: none;
@@ -9482,6 +9481,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     position: relative;
+    text-align: left;
 }
 .default-select::before, .ui-selectmenu-button::before {
     content: '';
@@ -9505,6 +9505,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
     overflow: hidden;
+    position: relative;
 }
 .fm-share-dropdown {
     margin: 10px -20px 0 0;
@@ -9537,6 +9538,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     left: -4px;
     right: auto;
     overflow: hidden;
+    text-align: left;
 }
 .default-select-dropdown .jspDrag {
     width: 4px;
@@ -11903,9 +11905,12 @@ table {
     height: 100%;
     overflow: hidden;
 }
+.st-main-block, .main-scroll-block {
+    min-width: 980px;
+}
 .st-main-block > .jspContainer .jspPane, .main-scroll-block > .jspContainer .jspPane {
     min-height: 100%;
-    min-width: 980px;
+    min-width: 100%;
     width: 100% !important;
     position: relative;
 }
@@ -12712,7 +12717,7 @@ body.new-startpage {
     color: white;
     line-height: 23px;
     padding: 6px 0 11px 26px;
-    background-image: url(../images/mega/top-sprite_v1.png);
+    background-image: url(../images/mega/top-sprite_v2.png);
     background-repeat: no-repeat;
     background-position: -11px -729px;
     margin: 0;
@@ -12725,7 +12730,7 @@ body.new-startpage {
     width: 26px;
     height: 26px;
     float: right;
-    background-image: url(../images/mega/top-sprite_v1.png);
+    background-image: url(../images/mega/top-sprite_v2.png);
     background-repeat: no-repeat;
     background-position: -6px -854px;
     margin: 5px 0 0 9px;
@@ -12789,7 +12794,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    padding: 30px 0;
+    padding: 20px 0;
 }
 .nw-bottom-column:nth-child(1) {
     min-width: 177px;
@@ -12943,7 +12948,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     margin-left: 0;
 }
 .top-login-warning-arrow {
-    background-image: url(../images/mega/top-sprite_v1.png);
+    background-image: url(../images/mega/top-sprite_v2.png);
     background-position: 2px -420px;
     background-repeat: no-repeat;
     width: 30px;
@@ -13184,7 +13189,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     line-height: 28px;
     padding-left: 36px;
     color: white;
-    background-image: url(../images/mega/top-sprite_v1.png);
+    background-image: url(../images/mega/top-sprite_v2.png);
     background-position: -4px -1261px;
     background-repeat: no-repeat;
     font-size: 14px;
@@ -17888,7 +17893,7 @@ code, c {
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     background-color: #5b5a59;
-    background-image: url(../images/mega/top-sprite_v1.png);
+    background-image: url(../images/mega/top-sprite_v2.png);
     background-position: -9px -941px;
     background-repeat: no-repeat;
     margin: 8px 0 0 240px;
@@ -22487,7 +22492,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     display: inline-block;
     border-radius: 12px;
     text-transform: uppercase;
-    background-image: url(../images/mega/top-sprite_v1.png);
+    background-image: url(../images/mega/top-sprite_v2.png);
     background-repeat: no-repeat;
     background-position: -6px -981px;
     color: rgba(255,255,255,0.7) !important;
@@ -24182,17 +24187,24 @@ body.pro:after {
 }
 .megasync-dropdown {
     width: 280px;
-    height: 32px;
-    background-color: white;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
+    float: none;
     margin: 63px auto 55px auto;
-    text-align: left;
-    -moz-box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
-    -webkit-box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
-    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
     display: none;
+}
+.megacmd-dropdown {
+    width: 228px;
+    float: none;
+    margin: 40px auto 5px auto;
+}
+.megacmd-linux .sync-radio-buttons {
+    width: 228px;
+    margin: 0 auto;
+}
+.default-dropdown-item.icon {
+    padding: 0 30px 0 34px;
+    background-image: url(../images/mega/download-sprite-v6.png);
+    background-position: 0 64px;
+    background-repeat: no-repeat;
 }
 .sync-bottom-block .megasync-dropdown {
     margin: 0px;
@@ -24200,62 +24212,29 @@ body.pro:after {
 .linux .megasync-dropdown {
     display: block;
 }
-.megasync-dropdown span, .megasync-dropdown-link {
-    padding: 0 30px 0 11px;
-    background-image: url(../images/mega/download-sprite-v6.png);
-    background-position: right -1811px;
-    color: #666666;
-    background-repeat: no-repeat;
-    font-size: 14px;
-    line-height: 32px;
-    height: 32px;
-    display: block;
-    position: relative;
-    z-index: 20;
-    cursor: pointer;
-    white-space: nowrap;
-    -o-text-overflow: ellipsis;
-    text-overflow: ellipsis;
-    overflow: hidden;
-}
-.megasync-dropdown-link {
-    padding-left: 34px;
-    background-color: rgba(255,255,255,0);
-    -webkit-transition: background-color 200ms ease-in-out;
-    -moz-transition: background-color 200ms ease-in-out;
-    -o-transition: background-color 200ms ease-in-out;
-    -ms-transition: background-color 200ms ease-in-out;
-    transition: background-color 200ms ease-in-out;
-}
-.megasync-dropdown-link:hover {
-    background-color: rgba(0,0,0,0.05);
-}
-.megasync-dropdown-link.centos {
+.default-dropdown-item.centos {
     background-position: 10px -1921px;
 }
-.megasync-dropdown-link.debian {
+.default-dropdown-item.debian {
     background-position: 10px -1982px;
 }
-.megasync-dropdown-link.elementary, .megasync-dropdown-link.elementaryosfreya {
+.default-dropdown-item.elementary, .default-dropdown-item.elementaryosfreya {
     background-position: 10px -1952px;
 }
-.megasync-dropdown-link.fedora {
+.default-dropdown-item.fedora {
     background-position: 10px -2132px;
 }
-.megasync-dropdown-link.mint {
+.default-dropdown-item.mint {
     background-position: 10px -2102px;
 }
-.megasync-dropdown-link.opensuse {
+.default-dropdown-item.opensuse {
     background-position: 10px -2072px;
 }
-.megasync-dropdown-link.redhat {
+.default-dropdown-item.redhat {
     background-position: 10px -2042px;
 }
-.megasync-dropdown-link.ubuntu {
+.default-dropdown-item.ubuntu {
     background-position: 10px -2012px;
-}
-.megasync-dropdown span.active {
-    background-position: right -1883px;
 }
 .megasync-close {
     width: 14px;
@@ -24294,49 +24273,17 @@ body.pro:after {
     font-size: 13px;
     cursor: default;
 }
-.megasync-dropdown-list {
-    width: 288px;
-    position: absolute;
-    left: 50%;
-    margin: 0 0 0 -144px;
-    -moz-border-radius: 8px;
-    -webkit-border-radius: 8px;
-    border-radius: 8px;
-    background-color: rgba(0,0,0,0.15);
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    padding: 4px;
-    z-index: 10;
-    top: 122px;
+.default-select-dropdown .jspContainer .jspPane {
+    min-width: 100%;
+    max-width: 100% !important;
 }
-.megasync-dropdown-list .jspPane {
-    min-width: 280px;
-    max-width: 280px;
-}
-.megasync-dropdown-pad {
-    background-color: white;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
-    text-align: left;
-    -webkit-box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
-    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    padding: 36px 0 4px 0;
-}
-.megasync-dropdown-scroll .jspVerticalBar {
-    width: 10px;
-}
-.megasync-list-arrow {
+.mega-list-arrow {
     height: 23px;
     background-image: url(../images/mega/download-sprite-v6.png);
     background-position: center -2171px;
     cursor: pointer;
 }
-.megasync-list-arrow.inactive {
+.mega-list-arrow.inactive {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     -moz-opacity: 0.3;
     -khtml-opacity: 0.3;

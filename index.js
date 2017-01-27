@@ -936,6 +936,10 @@ function init_page() {
         topmenuUI();
         mainScroll();
     }
+    else if (page == 'cmd') {
+        parsepage(pages['cmd']);
+        initMegacmd();
+    }
     else if (page == 'mobile') {
         parsepage(pages['mobile']);
     }
@@ -1742,6 +1746,10 @@ function topmenuUI() {
             }
             else if (className.indexOf('sync') > -1) {
                 loadSubPage('sync');
+                return false;
+            }
+            else if (className.indexOf('cmd') > -1) {
+                loadSubPage('cmd');
                 return false;
             }
             else if (className.indexOf('help') > -1) {

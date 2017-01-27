@@ -3010,7 +3010,7 @@ function api_storefileattr(id, type, key, data, ctx) {
         ssl: use_ssl
     };
 
-    if (M.d[ctx.handle] && RightsbyID(ctx.handle) > 1) {
+    if (M.d[ctx.handle] && rightsById(ctx.handle) > 1) {
         req.h = handle;
     }
 
@@ -3720,7 +3720,7 @@ function api_pfaerror(handle) {
     }
 
     // Got access denied, store 'f' attr to prevent subsequent attemps
-    if (node && RightsbyID(node.h) > 1 && node.f !== u_handle) {
+    if (node && rightsById(node.h) > 1 && node.f !== u_handle) {
         node.f = u_handle;
         return api_setattr(node);
     }

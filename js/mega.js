@@ -7662,7 +7662,7 @@ function dbfetchfm() {
     });
 }
 
-function RightsbyID(id) {
+function rightsById(id) {
 
     if (folderlink || (id && id.length > 8)) {
         return false;
@@ -7774,7 +7774,7 @@ function ddtype(ids, toid, alt) {
             // to a contact, always allow a copy (inbox drop)
             r = 'copy';
         }
-        else if (totype == 'shares' && RightsbyID(toid)) {
+        else if (totype === 'shares' && rightsById(toid)) {
             if (fromtype == 'shares') {
                 if (sharer(fromid) === sharer(toid)) {
                     if (isCircular(fromid, toid)) {
@@ -7782,7 +7782,7 @@ function ddtype(ids, toid, alt) {
                         return false;
                     }
 
-                    r = (RightsbyID(fromid) > 1) ? 'move' : 'copy';
+                    r = (rightsById(fromid) > 1) ? 'move' : 'copy';
                 }
                 else {
                     r = 'copy';

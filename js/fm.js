@@ -2658,7 +2658,7 @@ function initContextUI() {
     $('.labels .dropdown-colour-item').click(function() {
         var labelId = parseInt(this.dataset.labelId);
 
-        if (labelId && (RightsbyID($.selected[0]) > 1)) {
+        if (labelId && (rightsById($.selected[0]) > 1)) {
             M.colourLabeling($.selected, labelId);
         }
     });
@@ -2894,7 +2894,7 @@ function fmtopUI() {
             }
         }
         else if (String(M.currentdirid).length === 8
-                && RightsbyID(M.currentdirid) > 0) {
+                && rightsById(M.currentdirid) > 0) {
 
             $('.fm-new-folder').removeClass('hidden');
             $('.fm-file-upload').removeClass('hidden');
@@ -5646,19 +5646,12 @@ function gridUI() {
     });
 
     // enable add star on first column click (make favorite)
-    $('.grid-table.fm tr td:first-child').rebind('click', function() {
-        var id = [$(this).parent().attr('id')];
-        var newFavState = Number(!M.isFavourite(id));
-        M.favourite(id, newFavState);
-    });
-
-    // enable add star on first column click (make favorite)
-    $('.grid-table.shared-with-me tr td:first-child').rebind('click', function() {
+    $('.grid-table.shared-with-me tr td:first-child,.grid-table.fm tr td:first-child').rebind('click', function() {
         var id = [$(this).parent().attr('id')];
         var newFavState = Number(!M.isFavourite(id));
 
         // Handling favourites is allowed for full permissions shares only
-        if (RightsbyID(id) > 1) {
+        if (rightsById(id) > 1) {
             M.favourite(id, newFavState);
         }
     });
@@ -5797,7 +5790,7 @@ function FMShortcuts() {
             return false; // stop prop.
         } else if (charCode == 8) {
             var $items = selectionManager.get_selected();
-            if ($items.size() == 0 || (RightsbyID(M.currentdirid || '') | 0) < 1) {
+            if ($items.size() === 0 || (rightsById(M.currentdirid || '') | 0) < 1) {
                 return; // dont do anything.
             }
 
@@ -6319,14 +6312,16 @@ function UIkeyevents() {
                 quickFinder.disable_if_active();
             }
         }
-        else if (e.keyCode == 46 && s.length > 0 && !$.dialog && RightsbyID(M.currentdirid) > 1) {
+        else if ((e.keyCode === 46) && (s.length > 0)
+            && !$.dialog && rightsById(M.currentdirid) > 1) {
             $.selected = [];
             s.each(function(i, e) {
                 $.selected.push($(e).attr('id'));
             });
             fmremove();
         }
-        else if (e.keyCode == 46 && selPanel.length > 0 && !$.dialog && RightsbyID(M.currentdirid) > 1) {
+        else if ((e.keyCode === 46) && (selPanel.length > 0)
+            && !$.dialog && rightsById(M.currentdirid) > 1) {
             var selected = [];
             selPanel.each(function() {
                 selected.push($(this).attr('id'));
@@ -6400,7 +6395,7 @@ function UIkeyevents() {
                 $.warningCallback(true);
             }
         }
-        else if ((e.keyCode === 113 /* F2 */) && (s.length > 0) && !$.dialog && RightsbyID(M.currentdirid) > 1) {
+        else if ((e.keyCode === 113 /* F2 */) && (s.length > 0) && !$.dialog && rightsById(M.currentdirid) > 1) {
             $.selected = [];
             s.each(function(i, e) {
                 $.selected.push($(e).attr('id'));
@@ -7125,12 +7120,12 @@ function menuItems() {
         sourceRoot = RootbyId($.selected[0]);
 
     // Show Rename action in case that only one item is selected
-    if (($.selected.length === 1) && (RightsbyID($.selected[0]) > 1)) {
+    if (($.selected.length === 1) && (rightsById($.selected[0]) > 1)) {
         items['.rename-item'] = 1;
     }
 
     if (((Object.keys($.selected)).length < 2)
-            && (RightsbyID($.selected[0]) > 1)) {
+            && (rightsById($.selected[0]) > 1)) {
 
         items['.add-star-item'] = 1;
 
@@ -7150,7 +7145,7 @@ function menuItems() {
     if (selItem && selItem.su && !M.d[selItem.p]) {
         items['.removeshare-item'] = 1;
     }
-    else if (RightsbyID($.selected[0]) > 1) {
+    else if (rightsById($.selected[0]) > 1) {
         items['.move-item']   = 1;
         items['.remove-item'] = 1;
     }
@@ -7237,7 +7232,7 @@ function contextMenuUI(e, ll) {
     if (ll === 2) {
 
         // Enable upload item menu for clould-drive, don't show it for rubbish and rest of crew
-        if (RightsbyID(M.currentdirid) && (M.currentrootid !== M.RubbishID)) {
+        if (rightsById(M.currentdirid) && (M.currentrootid !== M.RubbishID)) {
             $(menuCMI).filter('.dropdown-item').hide();
             $(menuCMI).filter('.fileupload-item,.newfolder-item').show();
 

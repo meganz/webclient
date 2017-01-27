@@ -427,11 +427,11 @@ var urlrootfile = '';
 
 if (!b_u && is_extension)
 {
+    hashLogic = true;
     nocontentcheck=true;
 
     if (is_chrome_firefox)
     {
-        hashLogic = true;
         bootstaticpath = 'chrome://mega/content/';
         urlrootfile = 'secure.html';
         if (d) {

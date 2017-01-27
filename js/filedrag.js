@@ -94,7 +94,7 @@
         if (d) {
             console.log(e);
         }
-        // if (folderlink || RightsbyID(M.currentdirid) < 1) return false;
+        // if (folderlink || rightsById(M.currentdirid) < 1) return false;
         e.stopPropagation();
         e.preventDefault();
         setTimeout(function() {
@@ -233,7 +233,7 @@
                 (
                     M.currentdirid !== 'dashboard' &&
                     M.currentdirid !== 'transfers' &&
-                    (RightsbyID(targetid) | 0) < 1
+                    (rightsById(targetid) | 0) < 1
                 )
             ) &&
             String(M.currentdirid).indexOf("chat/") === -1

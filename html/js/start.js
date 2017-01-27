@@ -72,9 +72,9 @@ function init_start() {
     });
     $('.st-bottom-scroll-button.scrolldown').rebind('click', function(event) {
         if (page === 'download') {
-            // FIXME!
-            document.location.hash = '#mega';
-        } else {
+            loadSubPage('mega');
+        }
+        else {
             startpageScroll();
         }
     });
@@ -95,7 +95,7 @@ function init_start() {
     if (page === 'start') {
         InitFileDrag();
     }
-    if (document.location.hash === '#info') {
+    if (getSitePath() === '/info') {
         startpageScroll(1);
     }
 }

@@ -5452,7 +5452,7 @@ function MegaData()
                     hideMEGAsyncDialog();
 
                     if (!syncData) {
-                        location.hash = '#sync';
+                        loadSubPage('sync');
                     }
                     // if the user is running MEGAsync 3.0+
                     else if (!syncData.verNotMeet) {
@@ -5783,7 +5783,7 @@ function MegaData()
                 // If the user is already logged in here with the same account
                 // we can avoid a lot and just take them to the correct page
                 if (JSON.stringify(u_k) === JSON.stringify(urlParts[0])) {
-                    window.location.hash = urlParts[2];
+                    loadSubPage(urlParts[2]);
                     return false;
                 }
 
@@ -5791,11 +5791,11 @@ function MegaData()
                 // hash they came from e.g. a folder link may not be valid for this account so just load the file manager.
                 else if (u_k && (JSON.stringify(u_k) !== JSON.stringify(urlParts[0]))) {
                     if (!urlParts[2] || String(urlParts[2]).match(/^fm/)) {
-                        window.location.hash = 'fm';
+                        loadSubPage('fm');
                         return false;
                     }
                     else {
-                        window.location.hash = urlParts[2];
+                        loadSubPage(urlParts[2]);
                         return false;
                     }
                 }
@@ -5819,8 +5819,8 @@ function MegaData()
 
                 var _goToPage = function() {
                     loadingDialog.hide();
-                    window.location.hash = toPage;
-                }
+                    loadSubPage(toPage);
+                };
 
                 var _rawXHR = function(url, data, callback) {
                     mega.utils.xhr(url, JSON.stringify([data]))
@@ -8648,7 +8648,7 @@ function folderreqerr()
 
     msgDialog('warninga', l[1043], l[1044] + '<ul><li>' + l[1045] + '</li><li>' + l[247] + '</li><li>' + l[1046] + '</li>', false, function()
     {
-        location.hash = '#login'; // if the user is logged-in, he'll be redirected to the cloud
+        loadSubPage('login'); // if the user is logged-in, he'll be redirected to the cloud
 
         // FIXME: no location.reload() should be needed..
         location.reload();
@@ -8768,7 +8768,7 @@ function loadfm_callback(res) {
 
             return mKeyDialog(pfid, true, true)
                 .fail(function() {
-                    location.hash = 'start';
+                    loadSubPage('start');
                 });
         }
 
@@ -9150,7 +9150,7 @@ Object.defineProperty(mega, 'achievem', {
                     if (action) {
                         switch (action[0]) {
                             case '#':
-                                location.hash = action;
+                                loadSubPage(action);
                                 break;
 
                             case '~':

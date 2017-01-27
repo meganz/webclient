@@ -477,6 +477,8 @@ if (!b_u && is_extension)
 
 
 var page;
+var locSearch = location.search;
+
 if (hashLogic) {
     // legacy support:
     page = document.location.hash;

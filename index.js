@@ -327,12 +327,6 @@ function init_page() {
         loadingDialog.hide();
     }
 
-    // If they recently tried to redeem their voucher but were not logged in or registered then direct them to the
-    // #redeem page to complete their purchase. For newly registered users this happens after key creation is complete.
-    if ((localStorage.getItem('voucher') !== null) && (u_type === 3)) {
-        loadSubPage('redeem');
-    }
-
     var wasFolderlink = pfid;
     var oldPFKey = pfkey;
     if (page.substr(0, 2) == 'F!' && page.length > 2) {
@@ -1024,6 +1018,13 @@ function init_page() {
         loadingDialog.show();
         parsepage(pages['redeem']);
         redeem.init();
+    }
+
+    // If they recently tried to redeem their voucher but were not logged in or registered then direct them to the
+    // #redeem page to complete their purchase. For newly registered users this happens after key creation is complete.
+    else if ((localStorage.getItem('voucher') !== null) && (u_type === 3)) {
+        loadSubPage('redeem');
+        return false;
     }
 
     else if (is_fm()) {

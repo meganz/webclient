@@ -7774,7 +7774,7 @@ function ddtype(ids, toid, alt) {
             // to a contact, always allow a copy (inbox drop)
             r = 'copy';
         }
-        else if (totype == 'shares' && rightsById(toid)) {
+        else if (totype === 'shares' && rightsById(toid)) {
             if (fromtype == 'shares') {
                 if (sharer(fromid) === sharer(toid)) {
                     if (isCircular(fromid, toid)) {

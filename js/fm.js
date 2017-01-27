@@ -5790,7 +5790,7 @@ function FMShortcuts() {
             return false; // stop prop.
         } else if (charCode == 8) {
             var $items = selectionManager.get_selected();
-            if ($items.size() == 0 || (rightsById(M.currentdirid || '') | 0) < 1) {
+            if ($items.size() === 0 || (rightsById(M.currentdirid || '') | 0) < 1) {
                 return; // dont do anything.
             }
 
@@ -6312,14 +6312,16 @@ function UIkeyevents() {
                 quickFinder.disable_if_active();
             }
         }
-        else if (e.keyCode == 46 && s.length > 0 && !$.dialog && rightsById(M.currentdirid) > 1) {
+        else if ((e.keyCode === 46) && (s.length > 0)
+            && !$.dialog && rightsById(M.currentdirid) > 1) {
             $.selected = [];
             s.each(function(i, e) {
                 $.selected.push($(e).attr('id'));
             });
             fmremove();
         }
-        else if (e.keyCode == 46 && selPanel.length > 0 && !$.dialog && rightsById(M.currentdirid) > 1) {
+        else if ((e.keyCode === 46) && (selPanel.length > 0)
+            && !$.dialog && rightsById(M.currentdirid) > 1) {
             var selected = [];
             selPanel.each(function() {
                 selected.push($(this).attr('id'));

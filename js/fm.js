@@ -3792,7 +3792,7 @@ function accountUI() {
                 loadSubPage('pro');
             });
             $storageData.find('.chart-warning, .upgrade-account.button').rebind('click', function() {
-                window.location.hash = 'pro';
+                loadSubPage('pro');
             });
         }
         /* End of Charts warning notifications */

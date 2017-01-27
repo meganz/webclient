@@ -132,8 +132,8 @@ function linuxMegacmdDropdown() {
         // Dropdown item click event
         $('.default-dropdown-item', $dropdown).rebind('click', function() {
             $dropdown.find('span').text($(this).text());
-            initMegacmdDownload($(this).attr('link'));
             $button.removeClass('disabled');
+            initMegacmdDownload($(this).attr('link'));
             cmdsel = linuxnameindex[$(this).text()];
             changeLinux(linuxClients, cmdsel);
         });

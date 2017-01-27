@@ -256,7 +256,7 @@ function init_page() {
             dlkey = ar[1].replace(/[^\w-]+/g, "");
         }
 
-        if (mega.utils.hasPendingTransfers() && $.lastSeenFilelink !== location.hash) {
+        if (mega.utils.hasPendingTransfers() && $.lastSeenFilelink !== getSitePath()) {
             page = 'download';
 
             mega.utils.abortTransfers()
@@ -264,12 +264,12 @@ function init_page() {
                     location.reload();
                 })
                 .fail(function() {
-                    location.hash = $.lastSeenFilelink;
+                    loadSubPage($.lastSeenFilelink);
                 });
 
             return;
         }
-        $.lastSeenFilelink = location.hash;
+        $.lastSeenFilelink = getSitePath();
     }
 
     if (!u_type) {
@@ -549,13 +549,11 @@ function init_page() {
             localStorage.registeremail = email;
 
             // Redirect to the register page
-            removeHash();
-            location.hash = '#register';
+            loadSubPage('register');
         }
         else {
             // Redirect to the register page
-            removeHash();
-            location.hash = '#register';
+            loadSubPage('register');
 
             // Show message
             alert('We can\'t decipher your invite link, please check you copied the link correctly, or sign up manually with the same email address.');
@@ -598,7 +596,7 @@ function init_page() {
                             mLogout();
                         }
                         else {
-                            document.location.hash = '';
+                            loadSubPage('');
                         }
                     });
                 }
@@ -785,7 +783,7 @@ function init_page() {
                 if (aError) {
                     alert(aError);
                 }
-                location.hash = 'start';
+                loadSubPage('start');
             });
         }
     }
@@ -795,7 +793,7 @@ function init_page() {
         if (u_type === 3) {
             wireTransferDialog
                 .init(function onClose() {
-                    location.hash = 'fm';
+                    loadSubPage('fm');
                 });
         }
         else {
@@ -808,7 +806,7 @@ function init_page() {
                     if (aError) {
                         alert(aError);
                     }
-                    location.hash = 'start';
+                    loadSubPage('start');
                 });
         }
     }
@@ -908,7 +906,7 @@ function init_page() {
         var tmp = page.split('/uao=');
         if (tmp.length > 1) {
             mega.uaoref = decodeURIComponent(tmp[1]);
-            location.hash = tmp[0];
+            loadSubPage(tmp[0]);
             return;
         }
         parsepage(pages['pro']);
@@ -1003,7 +1001,7 @@ function init_page() {
             // If their account is ephemeral and the email is not confirmed, then show them a dialog to warn them and
             // make sure they confirm first otherwise we get lots of chargebacks from users paying in the wrong account
             msgDialog('warningb', l[8666], l[8665], false, function() {
-                location.hash = 'fm';
+                loadSubPage('fm');
             });
         }
         else {
@@ -1173,7 +1171,7 @@ function init_page() {
     }
     else if (page.substr(0, 2) == 'fm' && !u_type) {
         if (loggedout) {
-            document.location.hash = 'start';
+            loadSubPage('start');
             return false;
         }
         login_next = page;
@@ -1977,13 +1975,14 @@ function topmenuUI() {
             startpageMain();
         }
         else if ($.dlhash) {
-            document.location.hash = $.dlhash;
+            // XXX TODO FIXME check this
+            loadSubPage($.dlhash);
         }
         else if (folderlink && M.lastSeenFolderLink) {
             $(document).one('MegaOpenFolder', function() {
                 $('.nw-fm-left-icon.transfers').click();
             });
-            location.hash = M.lastSeenFolderLink;
+            loadSubPage(M.lastSeenFolderLink);
         }
         else {
             loadSubPage('fm');

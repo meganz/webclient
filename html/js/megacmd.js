@@ -1,3 +1,10 @@
+var linuxClients;
+var cmdsel = false;
+var platformsel = '64';
+var linuxnameindex = {};
+var linuxurl = 'https://mega.nz/linux/MEGAsync/';
+var windowsurl = 'https://mega.nz/MEGAcmdSetup.exe';
+var osxurl = 'https://mega.nz/MEGAcmdSetup.dmg';
 /**
  * Switch OS 
  */
@@ -8,12 +15,12 @@ function cmd_switchOS(os) {
 
     if (os === 'windows') {
         $('.megacmd-button-info').safeHTML(l[12485]);
-        // TODO: set url url = '/windows/...';
+        url = windowsurl;
         url = 'windows';
     }
     else if (os === 'mac') {
         $('.megacmd-button-info').safeHTML(l[12487]);
-        // TODO: set url url = '/mac/...';
+        url = osxurl;
     }
     else if (os === 'linux') {
         $('.megacmd-button-info').safeHTML(l[12486]);
@@ -101,45 +108,60 @@ function linuxMegacmdDropdown() {
     var $dropdown = $('.megacmd-dropdown'); 
     var $select = $dropdown.find('.megacmd-scr-pad');
     var $list = $dropdown.find('.megacmd-dropdown-list');
-    var linuxClients;
     $button.addClass('disabled');
-    /* TODO: create dropdown items and links */
-        // ....
-        //  $('<div/>').addClass('default-dropdown-item icon ' + icon)
-        //     .text(client.name)
-        //     .attr('link', '')
-        //     .appendTo($select);
-        // ....
-        // inuxMegacmdDropdownResizeHandler();
-    /* End */
-        // Talk to the CMS server and get information
-        // about the `sync` (expect a JSON)
-        CMS.get('cmd', function(err, content) {
-            linuxClients = content.object;
-            var linux = 'https://mega.nz/linux/MEGAsync/';
-            linuxClients.forEach(function(val) {
 
-                ['32', '64'].forEach(function(platform) {
-                    var icon = val.name.toLowerCase().match(/([a-z]+)/i)[1];
-                    icon = (icon === 'red') ? 'redhat' : icon;
-                    if (val[platform]) {
-                        $('<div/>').addClass('default-dropdown-item icon ' + icon)
-                        .text(val.name)
-                        .attr('link', '')
-                        .appendTo($select);
+    CMS.get('cmd', function(err, content) {
+        linuxnameindex = {};
+        linuxClients = content.object;
+        for (var i = 0;i<linuxClients.length;i++) {
+            var val = linuxClients[i];
+            linuxnameindex[val.name] = i;
+            ['32', '64'].forEach(function(platform) {
+                var icon = val.name.toLowerCase().match(/([a-z]+)/i)[1];
+                icon = (icon === 'red') ? 'redhat' : icon;
+                if (val[platform] && platform === platformsel) {
+                    $('<div/>').addClass('default-dropdown-item icon ' + icon)
+                    .text(val.name)
+                    .attr('link', linuxurl+val[platform])
+                    .appendTo($select);
 
-                        linuxMegacmdDropdownResizeHandler();
-                    }
-                });
+                    linuxMegacmdDropdownResizeHandler();
+                }
             });
-            // Dropdown item click event
-            $('.default-dropdown-item', $dropdown).rebind('click', function() {
-                $dropdown.find('span').text($(this).text());
-                initMegacmdDownload($(this).attr('link'));
-                $button.removeClass('disabled');
-            });
+        };
+        // Dropdown item click event
+        $('.default-dropdown-item', $dropdown).rebind('click', function() {
+            $dropdown.find('span').text($(this).text());
+            initMegacmdDownload($(this).attr('link'));
+            $button.removeClass('disabled');
+            cmdsel = linuxnameindex[$(this).text()];
+            changeLinux(linuxClients, cmdsel);
         });
+    });
 
+    $('.sync-radio-buttons input').rebind('change', function(e) {
+        var $radio1 = $('#rad1');
+        var $radio2 = $('#rad2');
+        if ($radio1.parent().hasClass('radioOff')) {
+            $radio1.parent().addClass('radioOn');
+            $radio1.parent().removeClass('radioOff');
+            $radio2.parent().addClass('radioOff');
+            $radio2.parent().removeClass('radioOn');
+            platformsel = '32';
+        }
+        else {
+            $radio1.parent().addClass('radioOff');
+            $radio1.parent().removeClass('radioOn');
+            $radio2.parent().addClass('radioOn');
+            $radio2.parent().removeClass('radioOff');
+            platformsel = '64';
+        }
+        var link = linuxurl+linuxClients[cmdsel][platformsel];
+        if (link) {
+            initMegacmdDownload($(this).attr('link'));
+        }
+        changeLinux(linuxClients, cmdsel);
+    });
 
     // Close Dropdown if another element was clicked
     $('.main-pad-block').rebind('click.closecmddropdown', function(e) {
@@ -209,6 +231,22 @@ function linuxMegacmdDropdownResizeHandler() {
         $pane.unbind('jsp-arrow-change');
         $arrow.removeAttr('style');
         $arrow.addClass('hidden');
+    }
+}
+
+/**
+ * Turn on/off the 32/64bit radio button based on the selected linux distribution.
+ */
+function changeLinux(linuxdist, i) {
+    if (linuxdist[i]) {
+        if (linuxdist[i]['32']) {
+            $('.linux32').parent().show();
+            $('.radio-txt.32').show();
+        }
+        else {
+            $('.linux32').parent().hide();
+            $('.radio-txt.32').hide();
+        }
     }
 }
 

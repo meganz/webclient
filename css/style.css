@@ -5042,6 +5042,16 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     -moz-box-shadow: 0px 0px 0px 2px #13E03C;
     box-shadow: 0px 0px 0px 2px #13E03C;
 }
+.activity-status.top.away:hover::before, .active .activity-status.top.away::before {
+    -webkit-box-shadow: 0px 0px 0px 2px #FFA500;
+    -moz-box-shadow: 0px 0px 0px 2px #FFA500;
+    box-shadow: 0px 0px 0px 2px #FFA500;
+}
+.activity-status.top.busy:hover::before, .active .activity-status.top.busy::before {
+    -webkit-box-shadow: 0px 0px 0px 2px #EB4444;
+    -moz-box-shadow: 0px 0px 0px 2px #EB4444;
+    box-shadow: 0px 0px 0px 2px #EB4444;
+}
 .activity-status.top.offline:hover::before, .active .activity-status.top.offline::before {
     -webkit-box-shadow: 0px 0px 0px 2px #666666;
     -moz-box-shadow: 0px 0px 0px 2px #666666;
@@ -5082,10 +5092,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     background-color: #13E03C;
 }
 .activity-status.away, .contact-status.away-status {
-    background-color: #FFD200;
+    background-color: #FFA500;
 }
 .activity-status.busy, .contact-status.busy-status {
-    background-color: #FFA500;
+    background-color: #EB4444;
 }
 .activity-status.offline, .contact-status.offline-status {
     background-color: #666666;

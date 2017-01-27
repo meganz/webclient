@@ -7897,21 +7897,12 @@ function treeUI()
     }
 }
 
-function treeUIexpand(id, force, moveDialog)
+function treeUIexpand(id, force)
 {
     M.buildtree(M.d[id]);
 
     var b = $('#treea_' + id);
     var d = b.attr('class');
-
-    if (M.currentdirid !== id)
-    {
-        var path = M.getPath(M.currentdirid), pid = {}, active_sub = false;
-        for (var i in path)
-            pid[path[i]] = i;
-        if (pid[M.currentdirid] < pid[id])
-            active_sub = true;
-    }
 
     if (d && d.indexOf('expanded') > -1 && !force)
     {
@@ -7926,7 +7917,7 @@ function treeUIexpand(id, force, moveDialog)
         b.addClass('expanded');
     }
 
-    treeUI();
+    delay(treeUI);
 }
 
 function sectionUIopen(id) {
@@ -8152,7 +8143,7 @@ function treeUIopen(id, event, ignoreScroll, dragOver, DragOpen) {
         var ids = M.getPath(id);
         var i = 1;
         while (i < ids.length) {
-            if (M.d[ids[i]]) {
+            if (M.d[ids[i]] && ids[i].length === 8) {
                 treeUIexpand(ids[i], 1);
             }
             i++;
@@ -8200,7 +8191,7 @@ function treeUIopen(id, event, ignoreScroll, dragOver, DragOpen) {
             }, 50);
         }
     }
-    treeUI();
+    delay(treeUI);
 }
 
 function fm_hideoverlay() {
@@ -8598,22 +8589,26 @@ function handleDialogTabContent(dialogTabClass, parentTag, dialogPrefix, htmlCon
  * @param {String} dialogName Dialog name i.e. { copy, move }.
  */
 function disableReadOnlySharedFolders(dialogName) {
-
-    var nodeId, accessRight, rootParentDirId,
-        $mcTreeSub = $("#mctreesub_shares"),
-        $ro = $('.' + dialogName + '-dialog-tree-panel.shared-with-me .dialog-content-block span[id^="mctreea_"]');
+    var $ro = $('.' + dialogName + '-dialog-tree-panel.shared-with-me .dialog-content-block span[id^="mctreea_"]');
+    var targets = $.selected || [];
 
     $ro.each(function(i, v) {
-        nodeId = $(v).attr('id').replace('mctreea_', '');
+        var node = M.d[$(v).attr('id').replace('mctreea_', '')];
 
-        // Apply access right of root parent dir to all subfolders
-        rootParentDirId = $("#mctreea_" + nodeId).parentsUntil($mcTreeSub).last().attr('id').replace('mctreeli_', '');
-
-        if (M.d[rootParentDirId]) {
-            accessRight = M.d[rootParentDirId].r;
+        while (node && !node.su) {
+            node = M.d[node.p];
         }
 
-        if (!accessRight || (accessRight === 0)) {
+        if (node) {
+            for (i = targets.length; i--;) {
+                if (isCircular(node.h, targets[i])) {
+                    node = null;
+                    break;
+                }
+            }
+        }
+
+        if (!node || !node.r) {
             $(v).addClass('disabled');
         }
     });

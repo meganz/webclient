@@ -345,7 +345,7 @@ function init_page() {
 
         pfkey = false;
         if (ar[1]) {
-            pfkey = ar[1].replace(/[^\w-]+/g, "");
+            pfkey = ar[1].replace(/[^\w-]+/g, "").substr(0, 22);
         }
 
         pfhandle = false;

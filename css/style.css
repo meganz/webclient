@@ -4196,16 +4196,24 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .nw-fm-tree-item.opened.selected .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.opened.dragover .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.opened:hover .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.opened.selected .nw-fm-tree-shared-folder, .nw-fm-tree-item.opened.dragover .nw-fm-tree-shared-folder, .nw-fm-tree-item.opened:hover .nw-fm-tree-shared-folder, .rubbish-bin .nw-fm-tree-item.opened.selected .nw-fm-tree-folder.shared-folder, .rubbish-bin .nw-fm-tree-item.opened.dragover .nw-fm-tree-folder.shared-folder, .rubbish-bin .nw-fm-tree-item.opened:hover .nw-fm-tree-folder.shared-folder, .rubbish-bin .nw-fm-tree-item.opened.selected .nw-fm-tree-shared-folder, .rubbish-bin .nw-fm-tree-item.opened.dragover .nw-fm-tree-shared-folder, .rubbish-bin .nw-fm-tree-item.opened:hover .nw-fm-tree-shared-folder {
     background-position: -15px -7538px;
 }
-.content-panel.shared-with-me > ul > li > .nw-fm-tree-item > .nw-fm-tree-folder {
+.inbound-share {
     background-position: -15px -7106px;
 }
-.content-panel.shared-with-me > ul > li > .nw-fm-tree-item:hover > .nw-fm-tree-folder, .content-panel.shared-with-me > ul > li > .nw-fm-tree-item.selected > .nw-fm-tree-folder, .content-panel.shared-with-me > ul > li > .nw-fm-tree-item.dragover > .nw-fm-tree-folder {
+.nw-fm-tree-item:hover > .nw-fm-tree-folder.inbound-share,
+.nw-fm-tree-item.selected > .nw-fm-tree-folder.inbound-share,
+.nw-fm-tree-item.dragover > .nw-fm-tree-folder.inbound-share {
     background-position: -15px -7166px;
 }
-.content-panel.shared-with-me > ul > li > .nw-fm-tree-item.expanded > .nw-fm-tree-folder, .content-panel.shared-with-me > ul > li > .nw-fm-tree-item.opened > .nw-fm-tree-folder {
+.nw-fm-tree-item.expanded > .nw-fm-tree-folder.inbound-share,
+.nw-fm-tree-item.opened > .nw-fm-tree-folder.inbound-share {
     background-position: -15px -7136px;
 }
-.content-panel.shared-with-me > ul > li > .nw-fm-tree-item.expanded:hover > .nw-fm-tree-folder, .content-panel.shared-with-me > ul > li > .nw-fm-tree-item.opened:hover > .nw-fm-tree-folder, .content-panel.shared-with-me > ul > li > .nw-fm-tree-item.selected.expanded > .nw-fm-tree-folder, .content-panel.shared-with-me > ul > li > .nw-fm-tree-item.selected.opened > .nw-fm-tree-folder, .content-panel.shared-with-me > ul > li > .nw-fm-tree-item.expanded.dragover > .nw-fm-tree-folder, .content-panel.shared-with-me > ul > li > .nw-fm-tree-item.opened.dragover > .nw-fm-tree-folder {
+.nw-fm-tree-item.expanded:hover > .nw-fm-tree-folder.inbound-share,
+.nw-fm-tree-item.opened:hover > .nw-fm-tree-folder.inbound-share,
+.nw-fm-tree-item.selected.expanded > .nw-fm-tree-folder.inbound-share,
+.nw-fm-tree-item.selected.opened > .nw-fm-tree-folder.inbound-share,
+.nw-fm-tree-item.expanded.dragover > .nw-fm-tree-folder.inbound-share,
+.nw-fm-tree-item.opened.dragover > .nw-fm-tree-folder.inbound-share {
     background-position: -15px -7196px;
 }
 .nw-contact-item, .add-contact-item {
@@ -6228,7 +6236,7 @@ th.grid-first-th {
     background-position: center top;
     margin: -38px 0 0 -47px;
 }
-.contact-details-view .block-view-file-type.folder-shared {
+.block-view-file-type.folder.inbound-share, .contact-details-view .block-view-file-type.folder-shared {
     background-image: url(../images/mega/shared-sprite_v5.svg);
     background-repeat: no-repeat;
     background-position: center 3px;
@@ -6661,13 +6669,16 @@ table {
 .transfer-filtype-icon.font, .search-path-icon-span.font {
     background-position: -61px -1196px;
 }
-.transfer-filtype-icon.folder, .search-path-icon-span.folder, .transfer-filtype-icon.folder-shared, .search-path-icon-span.folder-shared {
+.transfer-filtype-icon.folder, .transfer-filtype-icon.inbound-share, .search-path-icon-span.folder, .transfer-filtype-icon.folder-shared, .search-path-icon-span.folder-shared {
     background-image: url(../images/mega/nw-fm-sprite_v20.svg);
     background-position: -14px -7465px;
     background-repeat: no-repeat;
 }
 .transfer-filtype-icon.folder-shared, .search-path-icon-span.folder-shared {
     background-position: -14px -7566px;
+}
+.transfer-filtype-icon.inbound-share {
+    background-position: -14px -7106px;
 }
 .rename-input-bl .transfer-filtype-icon.folder, .rename-input-bl .transfer-filtype-icon.folder-shared {
     background-image: url(../images/mega/dialogs-sprite_v12.svg);

@@ -3797,7 +3797,7 @@
     "16126": "Meer overdracht quota",
     "16127": "Opslag Quota",
     "16128": "Lid sinds",
-    "16129": "Uw wachtwoord is niet opgeslagen door MEGA en dus kunnen we het niet voor u herstellen, mocht u het verliezen of vergeten. Voor betrouwbare toegang tot uw account raden wij u aan dat u de Herstel Sleuten download en oplsaat op een veilige plek.",
+    "16129": "Uw wachtwoord is niet opgeslagen door MEGA en dus kunnen we het niet voor u herstellen, mocht u het verliezen of vergeten. Voor betrouwbare toegang tot uw account raden wij u aan dat u de Herstel Sleutel download en opslaat op een veilige plek.",
     "16130": "Data",
     "16131": "All bestanden",
     "16132": "All mappen",
@@ -4135,6 +4135,7 @@
         "additional-site-update-message": 15536,
         "purchase-processed-by-message": 16106,
         "install-free-mega-app": 16107,
-        "storage_quota_header": 16119
+        "storage_quota_header": 16119,
+        "test_string": 16244
     }
 }

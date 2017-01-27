@@ -666,19 +666,6 @@ function divscroll(el) {
     }
 }
 
-function removeHash() {
-    var scrollV, scrollH, loc = window.location;
-
-    // Prevent scrolling by storing the page's current scroll offset
-    scrollV = document.body.scrollTop;
-    scrollH = document.body.scrollLeft;
-    loc.hash = "";
-
-    // Restore the scroll offset, should be flicker free
-    document.body.scrollTop = scrollV;
-    document.body.scrollLeft = scrollH;
-}
-
 function browserdetails(useragent) {
     var os = false;
     var browser = false;
@@ -2269,14 +2256,14 @@ function mKeyDialog(ph, fl, keyr) {
             // Remove the ! from the key which is exported from the export dialog
             key = key.replace('!', '');
 
-            var newHash = (fl ? '#F!' : '#!') + ph + '!' + key;
+            var newHash = (fl ? '/F!' : '/!') + ph + '!' + key;
 
             if (getSitePath() !== newHash) {
                 promise.resolve(key);
 
                 fm_hideoverlay();
                 $('.fm-dialog.dlkey-dialog').addClass('hidden');
-                location.hash = newHash;
+                loadSubPage(newHash);
             }
         }
         else {
@@ -5434,13 +5421,15 @@ mega.utils.redirectToApp = function($selector) {
         redirect();
     }
     else {
+        var path = getSitePath().substr(1);
+
         switch (ua.details.os) {
             case 'Windows Phone':
-                window.location = "mega://" + location.hash.substr(1);
+                window.location = "mega://" + path;
                 break;
 
             case 'Android':
-                var intent = 'intent://' + location.hash
+                var intent = 'intent://#' + path
                     + '/#Intent;scheme=mega;package=mega.privacy.android.app;end';
                 document.location = intent;
                 break;

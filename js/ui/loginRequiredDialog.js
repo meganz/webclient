@@ -121,7 +121,7 @@
 
         $('.top-login-forgot-pass', $dialog).rebind('click', function(e) {
             aPromise.reject();
-            document.location.hash = 'recovery';
+            loadSubPage('recovery');
         });
 
         $('.top-dialog-login-button', $dialog).rebind('click', function(e) {

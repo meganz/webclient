@@ -339,7 +339,7 @@ var exportPassword = {
 
                 // On button click, go to the Pro page
                 $proButton.rebind('click', function() {
-                    document.location.hash = 'pro';
+                    loadSubPage('pro');
                 });
             }
             else {
@@ -644,7 +644,8 @@ var exportPassword = {
 
             // Add a click handler for the close button to return to the home page (or cloud drive if logged in)
             $closeButton.rebind('click', function() {
-                location.hash = '';
+                loadSubPage('');
+                return false;
             });
 
             // Add click handler for Decrypt button
@@ -792,7 +793,7 @@ var exportPassword = {
                 $password.val('');
 
                 // On success, redirect to actual file/folder link
-                location.hash = url;
+                loadSubPage(url);
             });
         }
     },  // Decrypt functions

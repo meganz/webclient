@@ -76,22 +76,22 @@
      * Reset state of dialog if it had previously appeared this session and they had reset credentials
      */
     CredentialsWarningDialog.prototype._resetToDefaultState = function() {
-        
+
         var $dialog = $('.credentials-warning-dialog');
-        
+
         $dialog.find('.previousCredentials').show();
         $dialog.find('.newCredentials').show();
         $dialog.find('.resetCredentials').show();
         $dialog.find('.reset-credentials-button').removeClass('hidden');
         $dialog.find('.postResetCredentials').hide();
-        $dialog.find('.verifyCredentials').hide();        
+        $dialog.find('.verifyCredentials').hide();
     };
 
     /**
      * Render the placeholder details in the dialog
      */
     CredentialsWarningDialog.prototype._renderDetails = function() {
-        
+
         // Change wording to seen or verified
         var infoFirstLine = (CredentialsWarningDialog.seenOrVerified === 'seen') ? l[6881] : l[6882];
             infoFirstLine = infoFirstLine.replace('%1', '<span class="emailAddress">' + CredentialsWarningDialog.contactEmail + '</span>');
@@ -118,7 +118,7 @@
             authring.resetFingerprintsForUser(CredentialsWarningDialog.contactHandle);
 
             // If they're already on the contact's page, reload the fingerprint info
-            if (location.hash === '#fm/' + CredentialsWarningDialog.contactHandle) {
+            if (getSitePath() === '/fm/' + CredentialsWarningDialog.contactHandle) {
 
                 // Get the user
                 var user = M.u[CredentialsWarningDialog.contactHandle];
@@ -166,7 +166,7 @@
         var newFingerprint = CredentialsWarningDialog.newFingerprint;
         var previousFingerprintHtml = '';
         var newFingerprintHtml = '';
-        
+
         // Build up the fingerprint HTML
         for (var i = 0, groupCount = 0, length = previousFingerprint.length;  i < length;  i++) {
 

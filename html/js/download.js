@@ -336,7 +336,7 @@ function browserDownload() {
             dlmanager.isDownloading = true;
             dl_queue.push(fdl_queue_var);
         }
-        $.dlhash = window.location.hash;
+        $.dlhash = getSitePath();
     }
 }
 

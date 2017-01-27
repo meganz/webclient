@@ -11905,9 +11905,12 @@ table {
     height: 100%;
     overflow: hidden;
 }
+.st-main-block, .main-scroll-block {
+    min-width: 980px;
+}
 .st-main-block > .jspContainer .jspPane, .main-scroll-block > .jspContainer .jspPane {
     min-height: 100%;
-    min-width: 980px;
+    min-width: 100%;
     width: 100% !important;
     position: relative;
 }

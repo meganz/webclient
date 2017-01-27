@@ -1238,7 +1238,7 @@ React.makeElement = React['createElement'];
 	    return this.chats[this.chats.keys()[idx]];
 	};
 
-	Chat.prototype.getXmppServiceUrl = function () {
+	Chat.prototype.getXmppServiceUrl = function (timeout) {
 	    var self = this;
 
 	    if (localStorage.megaChatUseSandbox) {
@@ -1248,7 +1248,10 @@ React.makeElement = React['createElement'];
 	    } else {
 	        var $promise = new MegaPromise();
 
-	        $.get("https://" + self.options.loadbalancerService + "/?service=xmpp").done(function (r) {
+	        $.ajax("https://" + self.options.loadbalancerService + "/?service=xmpp", {
+	            method: "GET",
+	            timeout: timeout ? timeout : 10000
+	        }).done(function (r) {
 	            if (r.xmpp && r.xmpp.length > 0) {
 	                var randomHost = array_random(r.xmpp);
 	                if (webSocketsSupport) {
@@ -10534,7 +10537,7 @@ React.makeElement = React['createElement'];
 	    'LEFT': 250
 	};
 
-	ChatRoom.prototype._retrieveTurnServerFromLoadBalancer = function () {
+	ChatRoom.prototype._retrieveTurnServerFromLoadBalancer = function (timeout) {
 	    var self = this;
 
 	    var $promise = new MegaPromise();
@@ -10544,7 +10547,10 @@ React.makeElement = React['createElement'];
 	    if (self.megaChat.rtc && self.megaChat.rtc.ownAnonId) {
 	        anonId = self.megaChat.rtc.ownAnonId;
 	    }
-	    $.get("https://" + self.megaChat.options.loadbalancerService + "/?service=turn&anonid=" + anonId).done(function (r) {
+	    $.ajax("https://" + self.megaChat.options.loadbalancerService + "/?service=turn&anonid=" + anonId, {
+	        method: "GET",
+	        timeout: timeout ? timeout : 10000
+	    }).done(function (r) {
 	        if (r.turn && r.turn.length > 0) {
 	            var servers = [];
 	            r.turn.forEach(function (v) {

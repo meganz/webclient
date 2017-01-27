@@ -4135,6 +4135,7 @@
         "additional-site-update-message": 15536,
         "purchase-processed-by-message": 16106,
         "install-free-mega-app": 16107,
-        "storage_quota_header": 16119
+        "storage_quota_header": 16119,
+        "test_string": 16244
     }
 }

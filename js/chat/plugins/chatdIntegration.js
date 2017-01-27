@@ -438,11 +438,11 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
                 if (chatRoom.lastActivity === 0) {
                     chatRoom.lastActivity = unixtime();
                 }
-                window.location = chatRoom.getRoomUrl();
+                loadSubPage(chatRoom.getRoomUrl());
             }
 
             if (wasActive) {
-                window.location = chatRoom.getRoomUrl();
+                loadSubPage(chatRoom.getRoomUrl());
             }
         }
         else {

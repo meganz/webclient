@@ -35,7 +35,7 @@ function dev_init(pp, appkey) {
                             dev_app();
                         }
                         else {
-                            document.location.hash = 'sdk';
+                            loadSubPage('sdk');
                         }
                     });
                 }
@@ -79,7 +79,7 @@ function dev_init(pp, appkey) {
                                         'key': res,
                                         'new': 1
                                     };
-                                    document.location.hash = 'sdk_' + res;
+                                    loadSubPage('sdk_' + res);
                                 }
                             }
                         });
@@ -90,7 +90,7 @@ function dev_init(pp, appkey) {
         else {
             $('.dev-new-button.plus-icon').rebind('click', function(e) {
                 login_txt = 'Please log in to manage your App Keys.';
-                document.location.hash = 'login';
+                loadSubPage('login');
             });
         }
 
@@ -108,14 +108,14 @@ function dev_init(pp, appkey) {
     $('.new-left-menu-link').rebind('click', function() {
         /* jshint -W074 */
         if ($(this).hasClass('dev')) {
-            document.location.hash = 'dev';
+            loadSubPage('dev');
         }
         else if ($(this).hasClass('doc')) {
             $('.new-left-menu-link.preface').click();
-            document.location.hash = 'doc';
+            loadSubPage('doc');
         }
         else if ($(this).hasClass('sdk')) {
-            document.location.hash = 'sdk';
+            loadSubPage('sdk');
         }
         else if (!$(this).hasClass('active')) {
             if ($(this).parent().hasClass('new-left-submenu-item')) {
@@ -220,7 +220,7 @@ function dev_app() {
 
 
     $('.reg-st5-complete-button.cancel').rebind('click', function(e) {
-        document.location.hash = 'sdk';
+        loadSubPage('sdk');
     });
 
     $('.reg-st5-complete-button.save').rebind('click', function(e) {
@@ -240,7 +240,7 @@ function dev_app() {
         }, {
             callback: function() {
                 loadingDialog.hide();
-                document.location.hash = 'sdk';
+                loadSubPage('sdk');
             }
         });
     });
@@ -260,7 +260,7 @@ function dev_app() {
                     }, {
                         callback: function() {
                             loadingDialog.hide();
-                            document.location.hash = 'sdk';
+                            loadSubPage('sdk');
                         }
                     });
                 }
@@ -329,7 +329,7 @@ function sdk_key_render() {
                     sdk_app = sdk_keys[i];
                 }
             }
-            document.location.hash = 'sdk_' + $(this).attr('id');
+            loadSubPage('sdk_' + $(this).attr('id'));
         });
     $('.main-scroll-block').jScrollPane({
             showArrows: true,

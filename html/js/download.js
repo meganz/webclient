@@ -413,7 +413,7 @@ function megasyncOverlay() {
 
     $('.megasync-info-txt a', $this).rebind('click', function(e) {
         $this.addClass('hidden');
-        document.location.hash = 'pro';
+        loadSubPage('pro');
     });
 
     $('.megasync-close, .fm-dialog-close', $this).rebind('click', function(e) {
@@ -535,8 +535,7 @@ function start_import()
     dl_import = dlpage_ph;
 
     if (u_type) {
-        document.location.hash = 'fm';
-
+        loadSubPage('fm');
         if (fminitialized) {
             importFile();
         }
@@ -566,7 +565,7 @@ function start_anoimport()
             u_type = r;
             u_checked=true;
             loadingDialog.hide();
-            document.location.hash = 'fm';
+            loadSubPage('fm');
         }
     },true);
 }
@@ -663,7 +662,7 @@ function sync_switchOS(os)
         var c = $(this).attr('class');
         if (c && c.indexOf('windows') > -1) sync_switchOS('windows');
         else if (c && c.indexOf('mac') > -1) sync_switchOS('mac');
-        else if (c && c.indexOf('linux') > -1) document.location.hash = 'sync';
+        else if (c && c.indexOf('linux') > -1) loadSubPage('sync');
         return false;
     });
 }

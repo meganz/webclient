@@ -53,7 +53,7 @@ function doregister() {
                     }
                     else {
                         u_type = r;
-                        document.location.hash = 'fm';
+                        loadSubPage('fm');
                     }
                 }
             };
@@ -235,7 +235,7 @@ function pageregister() {
                         else {
                             loadingDialog.hide();
                             u_type = r;
-                            document.location.hash = 'fm';
+                            loadSubPage('fm');
                         }
                     }
                 };

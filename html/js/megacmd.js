@@ -133,7 +133,7 @@ function linuxMegacmdDropdown() {
         $('.default-dropdown-item', $dropdown).rebind('click', function() {
             $dropdown.find('span').text($(this).text());
             $button.removeClass('disabled');
-            initMegacmdDownload($(this).attr('link'));
+
             cmdsel = linuxnameindex[$(this).text()];
             changeLinux(linuxClients, cmdsel);
         });
@@ -156,10 +156,7 @@ function linuxMegacmdDropdown() {
             $radio2.parent().removeClass('radioOff');
             platformsel = '64';
         }
-        var link = linuxurl+linuxClients[cmdsel][platformsel];
-        if (link) {
-            initMegacmdDownload($(this).attr('link'));
-        }
+
         changeLinux(linuxClients, cmdsel);
     });
 
@@ -246,6 +243,13 @@ function changeLinux(linuxdist, i) {
         else {
             $('.linux32').parent().hide();
             $('.radio-txt.32').hide();
+            $('#rad1').attr('checked', false).parent().switchClass('radioOn', 'radioOff');
+            $('#rad2').attr('checked', true).parent().switchClass('radioOff', 'radioOn');
+            platformsel = '64';
+        }
+        var link = linuxurl+linuxdist[i][platformsel];
+        if (link) {
+            initMegacmdDownload(link);
         }
     }
 }

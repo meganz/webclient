@@ -2113,7 +2113,10 @@ else if (!b_u)
             {
                 jsl_current += jsl[jsi].w || 1;
                 jsl_progress();
-                if (++jslcomplete == jsl.length) initall();
+                if (++jslcomplete == jsl.length) {
+                    jsl_done = true;
+                    initall();
+                }
                 else
                 {
                     // mozRunAsync(next.bind(this, jsli++));
@@ -2399,7 +2402,14 @@ else if (!b_u)
             } else {
                 boot_done();
             }
-            if (jsar.length) evalscript_url(jsar);
+            if (jsar.length) {
+                if (is_chrome_firefox) {
+                    console.error('jsar must be empty here...');
+                }
+                else {
+                    evalscript_url(jsar);
+                }
+            }
             jsar=undefined;
             cssar=undefined;
         }

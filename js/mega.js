@@ -6510,12 +6510,9 @@ function execsc() {
                         }
                         else {
                             if (a.n && typeof a.k != 'undefined' && !u_sharekeys[a.n]) {
-                                if (!a.k) {
-                                    // XXX: We need to find out which API call is causing it
-                                    //      (it might be a bug in the SDK or the webclient)
-                                    // How to reproduce: Delete folder with pending shares,
-                                    // on client side we will have this situation
-                                    srvlog('Got share action-packet with no key.');
+                                if (!Array.isArray(a.k)) {
+                                    // XXX: misdirected actionpackets?
+                                    srvlog('Got share action-packet with invalid key.');
                                 }
                                 else {
                                     // a.k has been processed by the worker
@@ -6551,7 +6548,7 @@ function execsc() {
 
                                                 if (fmdb) {
                                                     M.nodeUpdated(n);
-                                                    fmdb.del('s', a.n + '*' + u_handle);
+                                                    fmdb.del('s', a.u + '*' + a.n);
                                                 }
                                             }
                                             else {
@@ -6587,6 +6584,10 @@ function execsc() {
                                         n.su = a.o;
                                         M.nodeUpdated(n);
 
+                                        scinshare.skip = true;
+                                    }
+                                    else if (!Array.isArray(a.k)) {
+                                        srvlog('Skipping share action-packet with invalid key.');
                                         scinshare.skip = true;
                                     }
                                     else {

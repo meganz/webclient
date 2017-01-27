@@ -16,7 +16,8 @@ var seqno = Math.ceil(Math.random()*1000000000);
 var staticpath = 'https://eu.static.mega.co.nz/3/';
 var ua = window.navigator.userAgent.toLowerCase();
 var storage_version = '1'; // clear localStorage when version doesn't match
-var page = document.location.hash, l, d = false;
+var l, d = false;
+
 
 var is_electron = false;
 if (typeof process !== 'undefined') {
@@ -297,7 +298,8 @@ if (!b_u) try
         nocontentcheck = true;
         var devhost = window.location.host;
         // handle subdirs
-        var pathSuffix = window.location.pathname;
+        // Disable pathSuffixes, because they are no longer supported: the webclient will now only work from root
+        var pathSuffix = '';
         pathSuffix = pathSuffix.split("/").slice(0, -1).join("/");
         // set the staticpath for debug mode
         staticpath = window.location.protocol + "//" + devhost + pathSuffix + "/";
@@ -414,11 +416,18 @@ var mega = {
         return this._urlParams;
     }
 };
+
+var hashLogic = false;
+if (localStorage.hashLogic) hashLogic=true;
+if (typeof history == 'undefined') hashLogic=true;
+
+
 var bootstaticpath = staticpath;
 var urlrootfile = '';
 
 if (!b_u && is_extension)
 {
+    hashLogic = true;
     nocontentcheck=true;
 
     if (is_chrome_firefox)
@@ -465,6 +474,34 @@ if (!b_u && is_extension)
         }
     });
 }
+
+
+var page;
+if (hashLogic) {
+    // legacy support:
+    page = document.location.hash;
+}
+else if (document.location.hash.substr(1,2) === 'F!' || document.location.hash.substr(1,1) === '!') {
+    // folder or file link: always keep the hash URL to ensure that keys remain client side
+    page = document.location.hash;
+    // history.replaceState so that back button works in new URL paradigm
+    history.replaceState({subpage: document.location.hash.replace('#', '')}, "", document.location.hash);
+}
+else if (document.location.hash.length > 0) {
+    // history.replaceState for legacy hash requests to new URL paradigm
+    page = document.location.hash;
+    history.replaceState({subpage: page.replace('#', '')}, "", '/' + page.replace('#', ''));
+}
+else {
+    // new URL paradigm, look for desired page in the location.pathname:
+    page = document.location.pathname;
+    if (page.substr(0, 1) == '/') {
+        page = page.substr(1, page.length - 1);
+    }
+    history.replaceState({subpage: page}, "", '/' + page);
+}
+page = page.replace('#','');
+
 
 if (b_u && !is_mobile) {
     document.location = 'update.html';
@@ -1023,7 +1060,7 @@ if (m || (typeof localStorage !== 'undefined' && localStorage.mobile))
     m=true;
 }
 
-if ((location.hash.substr(1, 1) === '!') || (location.hash.substr(1, 2) === 'F!')) {
+if ((page.substr(0,1) === '!') || (page.substr(0,2) === 'F!')) {
     m = false;
 }
 
@@ -1031,7 +1068,7 @@ if (is_ios) {
     tmp = document.querySelector('meta[name="apple-itunes-app"]');
     if (tmp) {
         tmp.setAttribute('content',
-            'app-id=706857885, app-argument=mega://' + window.location.hash);
+            'app-id=706857885, app-argument=mega://#' + page);
     }
 
     // http://whatsmyuseragent.com/Devices/iPhone-User-Agent-Strings
@@ -1069,7 +1106,7 @@ if (m)
     document.head.appendChild(link);
     // AMO: Markup should not be passed to `innerHTML` dynamically. -- This isnt reached for the extension, anyway
     document.body.innerHTML = '<div class="main-scroll-block"> <div class="main-content-block"> <div class="free-green-tip"></div><div class="main-centered-bl"><div class="main-logo"></div><div class="main-head-txt" id="m_title"></div><div class="main-head-txt" id="m_desc"></div><br /><br /><a href="" class="main-button" id="m_appbtn"></a><div class="main-social hidden"><a href="https://www.facebook.com/MEGAprivacy" class="main-social-icon facebook"></a><a href="https://www.twitter.com/MEGAprivacy" class="main-social-icon twitter"></a><div class="clear"></div></div></div> </div><div class="scrolling-content"><div class="mid-logo"></div> <div class="mid-gray-block">MEGA provides free cloud storage with convenient and powerful always-on privacy </div> <div class="scrolling-block-icon encription"></div> <div class="scrolling-block-header"> End-to-end encryption </div> <div class="scrolling-block-txt">Unlike other cloud storage providers, your data is encrypted & decrypted during transfer by your client devices only and never by us. </div> <div class="scrolling-block-icon access"></div> <div class="scrolling-block-header"> Secure Global Access </div> <div class="scrolling-block-txt">Your data is accessible any time, from any device, anywhere. Only you control the keys to your files.</div> <div class="scrolling-block-icon colaboration"></div> <div class="scrolling-block-header"> Secure Collaboration </div> <div class="scrolling-block-txt">Share folders with your contacts and see their updates in real time. Online collaboration has never been more private and secure.</div> <div class="bottom-menu full-version"><div class="copyright-txt">Mega Limited ' + new Date().getFullYear() + '</div><div class="language-block"></div><div class="clear"></div><iframe src="" width="1" height="1" frameborder="0" style="width:1px; height:1px; border:none;" id="m_iframe"></iframe></div></div></div>';
-    if (window.location.hash.substr(1,4) == 'blog') mobileblog=1;
+    if (page.substr(0,4) == 'blog') mobileblog=1;
     if (ua.indexOf('windows phone') > -1 /*&& ua.indexOf('iemobile') > -1*/)
     {
         app='zune://navigate/?phoneappID=1b70a4ef-8b9c-4058-adca-3b9ac8cc194a';
@@ -1087,7 +1124,7 @@ if (m)
             ver = ver.pop();
             // Check for Android 2.3+
             if (ver > 2 || (ver === 2 && rev > 3)) {
-                intent = 'intent://' + location.hash + '/#Intent;scheme=mega;package=mega.privacy.android.app;end';
+                intent = 'intent://#' + page + '/#Intent;scheme=mega;package=mega.privacy.android.app;end';
             }
         }
         if (intent && !mobileblog) {
@@ -1116,11 +1153,12 @@ if (m)
     {
         document.getElementById('m_desc').innerHTML = 'To use our service, you can open MEGA on a desktop or laptop browser. A dedicated app for your platform will be coming soon.';
     }
-    if (window.location.hash.substr(1,1) == '!' || window.location.hash.substr(1,2) == 'F!')
+    if (page.substr(0,1) == '!' || page.substr(0,2) == 'F!')
     {
-        var i = 0;
+        var i = 0, prechar = '#';
         if (ua.indexOf('windows phone') > -1) {
             i = 1;
+            prechar = '';
         }
 
         if (app) {
@@ -1137,7 +1175,7 @@ if (m)
             else {
                 setTimeout(function() {
                     if (confirm('Do you already have the MEGA app installed?')) {
-                        document.location = intent ? intent : 'mega://' + window.location.hash;
+                        document.location = intent ? intent : 'mega://#' + page;
                     }
                 }, 2500);
             }
@@ -1145,39 +1183,39 @@ if (m)
         else if (is_ios > 8) {
             setTimeout(function() {
                 if (confirm('Do you already have the MEGA app installed?')) {
-                    document.location = 'mega://' + window.location.hash;
+                    document.location = 'mega://#' + page;
                 }
             }, 1500);
         }
         else {
-            document.getElementById('m_iframe').src = 'mega://' + window.location.hash.substr(i);
+            document.getElementById('m_iframe').src = 'mega://' + prechar + page;
         }
     }
-    else if (window.location.hash.substr(1, 7) === 'confirm'
-            || window.location.hash.substr(1, 6) === 'backup'
-            || window.location.hash.substr(1, 6) === 'cancel'
-            || window.location.hash.substr(1, 6) === 'verify'
-            || window.location.hash.substr(1, 6) === 'fm/ipc'
-            || window.location.hash.substr(1, 9) === 'newsignup'
-            || window.location.hash.substr(1, 7) === 'recover'
-            || window.location.hash.substr(1, 7) === 'account')
+    else if (page.substr(0, 7) === 'confirm'
+            || page.substr(0, 6) === 'backup'
+            || page.substr(0, 6) === 'cancel'
+            || page.substr(0, 6) === 'verify'
+            || page.substr(0, 6) === 'fm/ipc'
+            || page.substr(0, 9) === 'newsignup'
+            || page.substr(0, 7) === 'recover'
+            || page.substr(0, 7) === 'account')
     {
-        var i = 0;
+        var prechar = '#';
         if (ua.indexOf('windows phone') > -1) {
-            i = 1;
+            prechar = '';
         }
         if (ua.indexOf('chrome') > -1) {
-            window.location = 'mega://' + window.location.hash.substr(i);
+            window.location = 'mega://' + prechar + page;
         }
         else if (is_ios > 8) {
             setTimeout(function() {
                 if (confirm('Do you already have the MEGA app installed?')) {
-                    document.location = 'mega://' + window.location.hash;
+                    document.location = 'mega://#' + page;
                 }
             }, 1500);
         }
         else {
-            document.getElementById('m_iframe').src = 'mega://' + window.location.hash.substr(i);
+            document.getElementById('m_iframe').src = 'mega://' + prechar + page;
         }
 
         if (intent) {
@@ -1192,7 +1230,7 @@ if (m)
             .src = ((location.host === 'mega.nz') ? '/blog.js' : 'html/js/blog.js');
     }
 }
-else if (page == '#android')
+else if (page == 'android')
 {
     document.location = 'https://play.google.com/store/apps/details?id=mega.privacy.android.app&referrer=meganzmobileapps';
 }
@@ -1692,7 +1730,9 @@ else if (!b_u)
         jsl.push({f:'js/ui/onboarding.js', n: 'onboarding_js', j:1,w:1});
     } // !is_mobile
 
-
+    if (localStorage.makeCache) {
+        jsl.push({f:'makecache.js', n: 'makecache', j:1});
+    }
 
     if (localStorage.enableDevtools) {
         jsl.push({f:'dont-deploy/transcripter/exporter.js', n: 'tse_js', j:1});
@@ -1895,6 +1935,7 @@ else if (!b_u)
         subpages['fm'] = ['fm_mobile', 'fm_mobile_js'];
     }
 
+
     if (page)
     {
         if (page.indexOf('%25') !== -1)
@@ -1906,10 +1947,9 @@ else if (!b_u)
         if (page.indexOf('%21') !== -1)
         {
             page = page.replace(/%21/g, '!');
-            document.location.hash = page;
+            if (hashLogic) document.location.hash = page;
+            else history.replaceState({ subpage: page }, "", page);
         }
-
-        page = page.replace('#','');
         for (var p in subpages)
         {
             if (page.substr(0,p.length) == p)
@@ -2047,6 +2087,7 @@ else if (!b_u)
                         createScriptTag(i, bootstaticpath + jsl[i].f + jjNoCache);
                     }
                     else if (jsl[i].j === 2) {
+
                         jj_done = false;
                         jsl[i].text = '/**/';
                         createStyleTag(i, bootstaticpath + jsl[i].f + jjNoCache);
@@ -2268,9 +2309,9 @@ else if (!b_u)
             }
         }
     }
+    var cssCache=false;
     var jsl_loaded={};
-    function initall()
-    {
+    function initall() {
         var jsar = [];
         var cssar = [];
         var nodedec = {};
@@ -2343,7 +2384,7 @@ else if (!b_u)
                 mega.nodedecBlobURI = mObjectURL(nodedec, 'text/javascript');
                 nodedec = tmp = undefined;
             }
-
+            if (localStorage.makeCache && !cssCache) cssCache=cssar;
             cssar = cssar.length && mObjectURL(cssar, "text/css");
             if (cssar)
             {
@@ -2386,7 +2427,6 @@ else if (!b_u)
             '    <div class="st-social-block-load" id="bootbottom">'+
             '        <a href="https://www.facebook.com/MEGAprivacy" target="_blank" class="st-bottom-button st-facebook-button"></a>'+
             '        <a href="https://www.twitter.com/MEGAprivacy" target="_blank" class="st-bottom-button st-twitter-button"></a>'+
-            '    <a href="https://plus.google.com/b/108055545377490138410/" target="_blank" class="st-bottom-button st-google-button"></a>'+
             '    </div>'+
             '</div>';
 
@@ -2431,8 +2471,18 @@ else if (!b_u)
         u_checked=true;
         startMega();
     }
+
+    var boot_done_makecache=false;
+
     function boot_done()
     {
+        if (boot_done_makecache)
+        {
+            boot_done_makecache=false;
+            makeCache();
+            return false;
+        }
+
         lxhr = dlxhr = undefined;
 
         if (d) console.log('boot_done', loginresponse === true, dl_res === true, !jsl_done, !jj_done);

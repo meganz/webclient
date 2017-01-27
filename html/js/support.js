@@ -19,7 +19,7 @@ var support = (function() {
         $textarea.css('height', height);
         mainScroll();
     }
-    
+
     function submit() {
         var opts = {
             a: 'sse', // send support email
@@ -46,7 +46,7 @@ var support = (function() {
                         l[7881], // Thank you! One of our support consultants...
                         '',
                         function() {
-                            document.location.href = '#fm/' + M.RootID;
+                            loadSubPage('fm');
                         }
                     );
                 }
@@ -73,7 +73,7 @@ var support = (function() {
         bottomHeight = $('.nw-bottom-block').height();
         headerHeight = $('.about-top-block').height();
         $subject = $('#support-subject');
-        
+
         var supportSubjects = {
             0: l[8527],     // General Inquiry
             1: l[8528],     // Technical Issue
@@ -92,7 +92,7 @@ var support = (function() {
 
             delete window.helpOrigin;
         }
-        
+
         for (var i in supportSubjects) {
             if (supportSubjects.hasOwnProperty(i)) {
                 if (first) {
@@ -103,7 +103,7 @@ var support = (function() {
                 first = false;
             }
         }
-        
+
         $subject.find('.default-select-scroll').safeHTML(html);
         bindDropdownEvents($subject);
         $window.rebind('resize.support-textarea', resizeHandler);

@@ -533,7 +533,7 @@ var GenericConversationMessage = React.createClass({
                                         icon="human-profile"
                                         label={__(l[5868])}
                                         onClick={() => {
-                                            window.location = "#fm/" + contact.u;
+                                            loadSubPage("fm/" + contact.u);
                                         }}
                                     />
                                     <hr/>
@@ -541,14 +541,14 @@ var GenericConversationMessage = React.createClass({
                                      icon="rounded-grey-plus"
                                      label={__(l[8631])}
                                      onClick={() => {
-                                     window.location = "#fm/" + contact.u;
+                                     loadSubPage("fm/" + contact.u);
                                      }}
                                      />*/}
                                     <DropdownsUI.DropdownItem
                                         icon="conversations"
                                         label={__(l[8632])}
                                         onClick={() => {
-                                            window.location = "#fm/chat/" + contact.u;
+                                            loadSubPage("fm/chat/" + contact.u);
                                         }}
                                     />
                                     {deleteButtonOptional ? <hr /> : null}

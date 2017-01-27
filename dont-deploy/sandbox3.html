@@ -9,29 +9,29 @@
          * "dont-deploy" folder, it contains stuff which are used for
          * development/debugging/internal demo purposes and it should
          * not be deployed to production.
-         * 
+         *
          * The devboot.html also setups the localStorage so that:
-         * 
+         *
          * 0) Clear the localStorage
-         * 
+         *
          * 1) Debug mode is enabled - e.g. a lot of stuff will be
          *    printed in the dev console, via console.* and the
          *    MegaLogger.
-         * 
+         *
          * 2) Static path is dynamically set to ../../ (relative to
          *    dont-deploy/devboot.html). This means that the staticPath
          *    should be correctly set even if you have your project
          *    running in localhost/meganz-webclient/ or customVhost/ +
          *    it will work with http OR https.
-         * 
+         *
          * 3) Will enable the megaChat (<-- major thing, may change a
          *    lot of stuff)
-         * 
+         *
          * 4) Will force the secureboot to load the actual .js files
          *    instead of just pushing ALL javascript files into a single
          *    blog: (this was really helpful for debugging the JS code
          *    using the Chrome debugger).
-         * 
+         *
          * 5) Will enable stopOnAssertFail, which in case of assertion
          *    fail (mainly in the chat.js code) will run a debugger;
          *    (something pretty handy during development)
@@ -40,13 +40,13 @@
         var devhost = window.location.host;
         var pathSuffix = window.location.pathname;
         pathSuffix = pathSuffix.split("/").slice(0, -2).join("/");
-        
+
         localStorage.clear();
-        
+
         // Add ?apipath=staging to the end of the URL if you want to
         // use the staging API, apipath=prod for the live API servers,
         // or leave blank for Sandbox 3.
-                                            
+
         if (window.location.search.indexOf('apipath=staging') > -1) {
             localStorage.apipath = 'https://staging.api.mega.co.nz/';
         }
@@ -58,8 +58,11 @@
         }
         else {
             localStorage.apipath = 'https://api-sandbox3.developers.mega.co.nz/';
-        }        
+        }
 
+        if (window.location.search.indexOf('hashLogic') > -1) {
+            localStorage.hashLogic = 1;
+        }
         localStorage.staticpath = window.location.protocol + "//" + devhost + pathSuffix + "/";
 
         // Disable the cryptographic hash verification logic.
@@ -82,12 +85,12 @@
         // localStorage.testChatDisabled = '1';
 
         localStorage.allowBreakpointsOnReload = '1';
-        
+
         // Retain current hash on redirect so you can give a test link
         // to the direct page e.g.
         // https://beta.developers.mega.co.nz/updated-credentials-dialog/dont-deploy/sandbox3.html?apipath=prod#pro
 
-        window.location = '../' + location.hash;          
+        window.location = '../' + location.hash;
     </script>
 </head>
 <body>

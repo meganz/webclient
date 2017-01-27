@@ -188,7 +188,7 @@
                 u_type = r;
                 u_checked = true;
                 loadingDialog.hide();
-                document.location.hash = 'fm';
+                loadSubPage('fm');
             }
         }, true);
     }

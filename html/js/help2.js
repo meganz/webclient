@@ -109,8 +109,11 @@ var Help = (function() {
         });
     }
 
+
     var setHash = SoonFc(function(hash) {
         if (hash !== document.location.hash) {
+
+            /*
             try {
                 history.pushState({}, "page 2", document.location.pathname + hash);
             }
@@ -119,12 +122,13 @@ var Help = (function() {
                 skipHashChange = true;
                 location.hash = hash;
             }
+            */
         }
     }, 1000);
 
 
     function url() {
-        return '#help/' + toArray.apply(null, arguments).join("/");
+        return 'help/' + toArray.apply(null, arguments).join("/");
     }
 
     function selectMenuItem($element, $elements) {
@@ -163,7 +167,7 @@ var Help = (function() {
     }
 
     function notFound() {
-        document.location.href = "#help";
+        loadSubPage('help');
     }
 
     function getClient(clientName) {
@@ -222,6 +226,22 @@ var Help = (function() {
         contentChanged();
     }
 
+    function patchLinks() {
+        $('.d-section-items a, .popular-question-items a').each(function(i,el) {
+            var url = $(el).attr('href') || $(el).data('fxhref');
+
+            if (url) {
+                $(el).attr('href', String(url).replace('#', '/'));
+            }
+        });
+        $('.d-section-items a, .popular-question-items a').rebind('click',function(e) {
+            var url = $(this).attr('href') || $(this).data('fxhref');
+            if (url) {
+                loadSubPage(String(url).replace('#', ''));
+                return false;
+            }
+        });
+    }
 
     function sidebars() {
 
@@ -241,7 +261,7 @@ var Help = (function() {
             // Log search submitted
             api_req({ a: 'log', e: 99619, m: 'Help2 regular search feature used' });
 
-            document.location.href = url("search", $(this).find('input[type="text"]').val());
+            loadSubPage(url("search", $(this).find('input[type="text"]').val()));
         });
 
         $container.find('form input[type=text]').each(function() {
@@ -259,14 +279,14 @@ var Help = (function() {
 
                     $('.close-icon').trigger('click');
 
-                    document.location.href = ui.item.url;
+                    loadSubPage(ui.item.url);
                 }
             });
             $this.data('ui-autocomplete')._renderItem = function(ul, item) {
-                
+
                 var $icon = $('<span>').addClass(item.client.toLowerCase() + ' client');
                 var $label = $('<span>').addClass('label-text').text(item.label);
-                
+
                 return $('<li>')
                     .attr("data-value", item.value)
                     .append($icon)
@@ -498,7 +518,7 @@ var Help = (function() {
 
         $html.rebind('scroll.help2', function() {
             // TODO: write a cleanup function to be invoked when moving out of the #help section
-            if (String(location.hash).substr(0, 5) !== '#help') {
+            if (String(getSitePath()).substr(0, 5) !== '/help') {
                 return $html.unbind('scroll.help2');
             }
 
@@ -583,9 +603,11 @@ var Help = (function() {
                 $('.main-search-pad,.sidebar-menu-container').show();
             }
 
+
+
             articles.reverse().map(function(article) {
                 var $article = $('<div>').addClass("search-result link content-by-tags")
-                    .data('href', "#help/client/" + article.id)
+                    .data('href', "help/client/" + article.id)
                     .data('tags', article.tags.map(function(w) { return tagUri(w); }));
 
                 $('<div>').addClass('search-result-title')
@@ -627,7 +649,7 @@ var Help = (function() {
         "client": function(args) {
             if (args[1] === 'mobile') {
                 args[1] = 'android';
-                document.location.href = url.apply(null, args);
+                loadSubPage(url.apply(null, args));
                 return;
             }
 
@@ -636,21 +658,22 @@ var Help = (function() {
             if (args.length === 3) {
                 question = args.pop();
             } else if (args.length !== 1) {
-                document.location.href = "#help";
+                loadSubPage('help');
                 return;
             }
+
+
 
             var data = Data["help_" + args.join("_")];
             if (!data) {
-                document.location.href = "#help";
+                loadSubPage('help');
                 return;
             }
-
 
             parsepage(data.html);
 
             $('.support-email-icon').rebind('click', function() {
-                var parts = document.location.href.split(/\//);
+                var parts = getSitePath().split(/\//);
                 parts.pop();
                 parts.push($(this).parents('.support-article').attr('id'));
                 window.helpOrigin = parts.join('/');
@@ -659,11 +682,11 @@ var Help = (function() {
                     login_next = support;
                     support    = "#login";
                 }
-                document.location.href = support;
+                loadSubPage('support');
             });
 
             $('.support-link-icon').rebind('click', function() {
-                var parts = document.location.href.split(/\//);
+                var parts = getSitePath.split(/\//);
                 parts.pop();
                 parts.push($(this).parents('.support-article').attr('id'));
 
@@ -705,7 +728,7 @@ var Help = (function() {
     };
 
     function getUrlParts() {
-        return document.location.hash.split(/\//).filter(function(x) {
+        return getSitePath().split(/\//).filter(function(x) {
             return x.length > 0;
         });
     }
@@ -722,7 +745,9 @@ var Help = (function() {
             return urls.welcome();
         }
 
-        document.location.href = "#help";
+        // init page here instead with page set as 'help' ?!
+        // document.location.href = "#help";
+        //loadSubPage('help');
     }
 
     // getVisibleElement
@@ -799,49 +824,60 @@ var Help = (function() {
         });
     }
 
-    CMS.index("help_" + lang, function(err, blobs) {
-        if (err) {
-            return alert("Invalid response from the server");
-        }
 
-        for (var name in blobs) {
-            if (blobs.hasOwnProperty(name)) {
-                blobs[name.replace(/\.[a-z]{2}$/, '')] = blobs[name];
+    ns.loadfromCMS = function(callback)
+    {
+        CMS.index("help_" + lang, function(err, blobs)
+        {
+            if (err) {
+                return alert("Invalid response from the server");
             }
-        }
 
-        Data = blobs;
-        titles = [];
-        titles = blobs.help_search.object.map(function(entry) {
-            entry.label = entry.title;
-            entry.value = entry.title;
-            entry.url   = "#help/client/" + entry.id;
-            return entry;
+            for (var name in blobs) {
+                if (blobs.hasOwnProperty(name)) {
+                    blobs[name.replace(/\.[a-z]{2}$/, '')] = blobs[name];
+                }
+            }
+
+            Data = blobs;
+            titles = [];
+            titles = blobs.help_search.object.map(function(entry) {
+                entry.label = entry.title;
+                entry.value = entry.title;
+                entry.url   = "help/client/" + entry.id;
+                return entry;
+            });
+
+
+            idx = {
+                search: elasticlunr(function() {
+                    this.setRef('pos');
+                    this.addField('title', { boost: 10 });
+                    this.addField('tags', { boost: 100 });
+                    this.addField('body');
+                }),
+                all: Data.help_search.object
+            };
+
+            Data.help_search.object.map(function(obj, id) {
+                obj.pos = id;
+                obj.tags = obj.tags.split(/, /);
+                idx.search.addDoc(obj);
+            });
+
+            ready = true;
+            if (doRender) {
+                ns.render();
+                loadingDialog.hide();
+            }
+
+            if (callback) {
+                callback();
+            };
         });
+    }
 
-
-        idx = {
-            search: elasticlunr(function() {
-                this.setRef('pos');
-                this.addField('title', { boost: 10 });
-                this.addField('tags', { boost: 100 });
-                this.addField('body');
-            }),
-            all: Data.help_search.object
-        };
-
-        Data.help_search.object.map(function(obj, id) {
-            obj.pos = id;
-            obj.tags = obj.tags.split(/, /);
-            idx.search.addDoc(obj);
-        });
-
-        ready = true;
-        if (doRender) {
-            ns.render();
-            loadingDialog.hide();
-        }
-    });
+    ns.loadfromCMS();
 
     var helpAlreadyLogged;
     ns.render = function() {
@@ -866,6 +902,7 @@ var Help = (function() {
         headerInteraction();
         directoryInteraction();
         searchAnimations();
+        patchLinks();
 
         // Log that the help page has been viewed
         if (!helpAlreadyLogged) {
@@ -883,15 +920,14 @@ var Help = (function() {
 
             if (!$this.is('.disabled')) {
                 var url = $this.data('href');
-                if (url === '#support' && !u_type) {
+                if (url === 'support' && !u_type) {
                     login_next = url;
-                    url = "#login";
+                    url = "login";
                 }
-
                 // Log that they clicked on the panel
                 api_req({ a: 'log', e: 99621, m: 'Help2 client selection panel used' });
-
-                document.location.href = url;
+                url = url.replace('#','');
+                loadSubPage(url);
             }
         });
 

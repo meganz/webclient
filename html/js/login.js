@@ -38,13 +38,13 @@ function dologin() {
                             else if (typeof res[0] === 'string') {
                                 if (u_type) {
                                     if (login_next) {
-                                        document.location.hash = login_next;
+                                        loadSubPage(login_next);
                                     }
                                     else if (page !== 'login') {
                                         init_page();
                                     }
                                     else {
-                                        document.location.hash = 'fm';
+                                        loadSubPage('fm');
                                     }
                                     login_next = false;
                                     document.title = 'MEGA';
@@ -189,7 +189,7 @@ function pagelogin() {
                     }
                     else if (r) {
                         u_type = r;
-                        document.location.hash = 'key';
+                        loadSubPage('key');
                     }
                 });
             });
@@ -205,13 +205,13 @@ function pagelogin() {
                     u_type = r;
                     passwordManager('#login_form');
                     if (login_next) {
-                        document.location.hash = login_next;
+                        loadSubPage(login_next);
                     }
                     else if (page !== 'login') {
                         init_page();
                     }
                     else {
-                        document.location.hash = 'fm';
+                        loadSubPage('fm');
                     }
                     login_next = false;
                 }
@@ -291,11 +291,11 @@ function init_login() {
     });
 
     $('.top-login-forgot-pass').rebind('click', function(e) {
-        document.location.hash = 'recovery';
+        loadSubPage('recovery');
     });
 
     $('.login-page-create-new span').rebind('click', function(e) {
-        document.location.hash = 'register';
+        loadSubPage('register');
     });
 
     $('.login-register-input').rebind('click', function(e) {
@@ -329,19 +329,19 @@ function postlogin() {
                 document.getElementById('login_email').value = '';
                 u_type = r;
                 if (page === 'login') {
-                    if (document.location.hash === '#fm') {
+                    if (getSitePath().substr(0,3) == '/fm') {
                         page = 'fm';
                         init_page();
                     }
                     else {
                         if (login_next) {
-                            document.location.hash = login_next;
+                            loadSubPage(login_next);
                         }
                         else if (page !== 'login') {
                             init_page();
                         }
                         else {
-                            document.location.hash = 'fm';
+                            loadSubPage('fm');
                         }
                         login_next = false;
                         document.title = 'MEGA';

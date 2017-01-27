@@ -27,7 +27,7 @@ copyright.validatePhoneNumber = function (phoneNumber) {
 
     var p = /\d[^\d]*\d[^\d]*\d[^\d]*\d/;
     var match = p.exec(phoneNumber);
-    
+
     if (match === null) {
         return false; // not at least 4 numbers, what is this thing?
     }
@@ -252,7 +252,7 @@ copyright.init_cndispute = function () {
                     msgDialog('info',
                             escapeHTML(l[1287]), escapeHTML(l[1288]), false,
                             function (e) {
-                                document.location.hash = 'dispute';
+                                loadSubPage('dispute');
                             });
                 }
             });

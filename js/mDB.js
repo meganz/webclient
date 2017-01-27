@@ -102,7 +102,7 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
         try {
             if (!fmdb.db) {
                 var todrop = [];
-                var dbpfx = 'fm667_';
+                var dbpfx = 'fm5_';
 
                 // enumerate databases and collect those not prefixed with 'dbpfx'
                 // (which is the current format)
@@ -204,17 +204,29 @@ FMDB.prototype.dropall = function fmdb_dropall(dbs, cb) {
     }
     else {
         var fmdb = this;
-        var db = dbs.pop();
-
-        (new Dexie(db)).delete().then(function(){
-            fmdb.logger.log("Deleted IndexedDB " + db);
-        }).catch(function(err){
-            fmdb.logger.error("Unable to delete IndexedDB " + db, err);
-        }).finally(function(){
+        var db = new Dexie(dbs.pop());
+        var next = function(ev) {
+            next = function() {};
+            if (ev && ev.type === 'blocked') {
+                fmdb.logger.warn('Cannot delete blocked indexedDB: ' + db.name);
+            }
             fmdb.dropall(dbs, cb);
+        };
+
+        // If the DB is blocked, Dexie will try to delete it as soon there are no locks on it.
+        // However, we'll resolve immediately without waiting for it, since that will happen in
+        // an undetermined amount of time which needless to say is an odd UX experience...
+        db.on('blocked', next);
+
+        db.delete().then(function() {
+            fmdb.logger.log("Deleted IndexedDB " + db.name);
+        }).catch(function(err){
+            fmdb.logger.error("Unable to delete IndexedDB " + db.name, err);
+        }).finally(function() {
+            next();
         });
     }
-}
+};
 
 // enqueue a table write - type 0 == addition, type 1 == deletion
 // IndexedDB activity is triggered once we have at least 1000 pending rows or the sn

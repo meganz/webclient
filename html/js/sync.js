@@ -76,20 +76,20 @@ function renderLinuxOptions(linuxsync) {
 
 function init_sync() {
     $('.st-apps-icon.mobile').rebind('click', function() {
-        document.location.hash = 'mobile';
+        loadSubPage('mobile');
     });
 
     $('.st-apps-icon.browser').rebind('click', function() {
-        document.location.hash = 'plugin';
+        loadSubPage('plugin');
     });
 
     $('.sync-help-center').rebind('click', function(e) {
-        document.location.hash = 'help/client/megasync';
+        loadSubPage('help/client/megasync');
     });
     setTimeout(function() {
         $('#syncanim').rebind('click', function(e) {
             if (syncurl) {
-                document.location.href = syncurl;
+                loadSubPage(syncurl);
             }
         });
     }, 1000);

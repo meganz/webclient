@@ -3888,13 +3888,13 @@
     "16220": "%@ is typing ...",
     "16221": "Add label %1",
     "16222": "Remove label %1",
-    "16223": "Red",
-    "16224": "Orange",
-    "16225": "Yellow",
-    "16226": "Green",
-    "16227": "Blue",
-    "16228": "Purple",
-    "16229": "Grey",
+    "16223": "\u0e41\u0e14\u0e07",
+    "16224": "\u0e2a\u0e49\u0e21",
+    "16225": "\u0e40\u0e2b\u0e25\u0e37\u0e2d\u0e07",
+    "16226": "\u0e40\u0e02\u0e35\u0e22\u0e27",
+    "16227": "\u0e19\u0e49\u0e33\u0e40\u0e07\u0e34\u0e19",
+    "16228": "\u0e21\u0e48\u0e27\u0e07",
+    "16229": "\u0e40\u0e17\u0e32",
     "16230": "Resume downloads",
     "16231": "Pause Downloads",
     "16232": "Resume uploads",
@@ -4135,6 +4135,7 @@
         "additional-site-update-message": 15536,
         "purchase-processed-by-message": 16106,
         "install-free-mega-app": 16107,
-        "storage_quota_header": 16119
+        "storage_quota_header": 16119,
+        "test_string": 16244
     }
 }

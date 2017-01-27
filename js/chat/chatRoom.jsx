@@ -234,7 +234,7 @@ ChatRoom.STATE = {
     'LEFT': 250
 };
 
-ChatRoom.prototype._retrieveTurnServerFromLoadBalancer = function() {
+ChatRoom.prototype._retrieveTurnServerFromLoadBalancer = function(timeout) {
     var self = this;
 
     var $promise = new MegaPromise();
@@ -244,7 +244,10 @@ ChatRoom.prototype._retrieveTurnServerFromLoadBalancer = function() {
     if (self.megaChat.rtc && self.megaChat.rtc.ownAnonId) {
         anonId = self.megaChat.rtc.ownAnonId;
     }
-    $.get("https://" + self.megaChat.options.loadbalancerService + "/?service=turn&anonid=" + anonId)
+    $.ajax("https://" + self.megaChat.options.loadbalancerService + "/?service=turn&anonid=" + anonId, {
+        method: "GET",
+        timeout: timeout ? timeout : 10000
+    })
         .done(function(r) {
             if (r.turn && r.turn.length > 0) {
                 var servers = [];
@@ -668,7 +671,7 @@ ChatRoom.prototype.destroy = function(notifyOtherDevices, noRedirect) {
         mc.chats.remove(roomJid);
 
         if (!noRedirect) {
-            window.location = '#fm/chat';
+            loadSubPage('fm/chat');
         }
     });
 };
@@ -723,7 +726,7 @@ ChatRoom.prototype.isActive = function() {
 };
 
 ChatRoom.prototype.setActive = function() {
-    window.location = this.getRoomUrl();
+    loadSubPage(this.getRoomUrl());
 };
 
 
@@ -733,11 +736,11 @@ ChatRoom.prototype.getRoomUrl = function() {
         var participants = self.getParticipantsExceptMe();
         var contact = self.megaChat.getContactFromJid(participants[0]);
         if (contact) {
-            return "#fm/chat/" + contact.u;
+            return "fm/chat/" + contact.u;
         }
     }
     else if (self.type === "group") {
-            return "#fm/chat/g/" + self.roomJid.split("@")[0];
+            return "fm/chat/g/" + self.roomJid.split("@")[0];
     }
     else {
         throw new Error("Can't get room url for unknown room type.");
@@ -750,7 +753,7 @@ ChatRoom.prototype.getRoomUrl = function() {
 ChatRoom.prototype.activateWindow = function() {
     var self = this;
 
-    window.location = self.getRoomUrl();
+    loadSubPage(self.getRoomUrl());
 };
 
 /**

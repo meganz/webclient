@@ -46,6 +46,7 @@ base_url="https://eu.static.mega.co.nz/3/"
 #        0013  Filelink
 #        0014  Folderlink
 #        0999  Logout
+#        1000  Ephemeral
 
 class MegaTest(unittest.TestCase):
     def setUp(self):
@@ -313,6 +314,47 @@ class MegaTest(unittest.TestCase):
         # Test: 0999  Logout
         driver.find_element_by_css_selector("#topmenu .top-icon.menu").click()
         self.on_visibleclick("div.top-menu-item.logout")
+        self.waitfor_invisibility(".dark-overlay")
+        # 
+        # Test: 1000  Ephemeral
+        # Ephemeral account creation by drag&drop file upload
+        driver.get(self.base_url + "#start")
+        self.waitfor_visibility("#startholder .st-main-button-icon")
+        driver.execute_script("""fakeDropEvent()""")
+        # we were logged-in from previous tests, hence we should get a warning about logging-in instead
+        self.waitfor_text(".fm-dialog.confirmation-dialog .fm-notification-warning", "\"No\" will allow you to log in and start your upload.")
+        driver.find_element_by_css_selector(".fm-dialog.confirmation-dialog .notification-button.confirm").click()
+        # wait for TOS dialog and click Agree
+        self.waitfor_text(".fm-dialog.bottom-pages-dialog .fm-dialog-title", "Terms of Service")
+        driver.find_element_by_css_selector(".fm-dialog.bottom-pages-dialog .fm-bp-agree").click()
+        # move to the transfers panel and wait for the upload to finish
+        driver.find_element_by_css_selector(".fm-main.default .nw-fm-left-icon.transfers").click()
+        self.waitfor_text("tr#ul_8001 .transfer-status", "Completed")
+        # move back to the cloud and check stuff there
+        driver.find_element_by_css_selector(".fm-main.default .nw-fm-left-icon.cloud-drive").click()
+        self.waitfor_text("tr.file span.tranfer-filetype-txt", "test.txt")
+        self.assertEqual("4 B", driver.find_element_by_css_selector("tr.file td.size").text)
+        self.assertEqual("Text Document", driver.find_element_by_css_selector("tr.file td.type").text)
+        # check the hash/checksum of the uploaded file
+        self.assertEqual("MTIzNAAAAAAAAAAAAAAAAAOLqRY", self.waitfor_jsstate("M.v[0].hash"))
+        # on upload completion, we should get a warning about using an ephemeral session
+        self.waitfor_text(".top-warning-popup .warning-header", "You are using an ephemeral session.")
+        self.assertEqual("Register now", driver.find_element_by_css_selector(".top-warning-popup .warning-button span").text)
+        # switch to other sections and check elements visibility there
+        driver.find_element_by_css_selector(".fm-main.default .nw-fm-left-icon.shared-with-me").click()
+        self.waitfor_text(".fm-empty-incoming .fm-empty-cloud-txt", "No Incoming Shares")
+        self.assertEqual("Create Account", driver.find_element_by_css_selector(".fm-empty-incoming .fm-not-logged-button.create-account").text)
+        driver.find_element_by_css_selector(".fm-main.default .nw-fm-left-icon.contacts").click()
+        self.waitfor_text(".fm-empty-contacts .fm-empty-cloud-txt", "No Contacts")
+        self.assertEqual("Create Account", driver.find_element_by_css_selector(".fm-empty-contacts .fm-not-logged-button.create-account").text)
+        # account settings are for registered users, check ephemeral user is asked to register
+        driver.find_element_by_css_selector(".fm-main.default .nw-fm-left-icon.account").click()
+        self.waitfor_text(".fm-dialog.confirmation-dialog .fm-notification-warning", "Avoid losing access. Free registration is highly recommended!")
+        driver.find_element_by_css_selector(".fm-dialog.confirmation-dialog .notification-button.cancel").click()
+        # logout from the ephemeral session
+        driver.find_element_by_css_selector(".top-login-button").click()
+        self.waitfor_text(".fm-dialog.confirmation-dialog .fm-notification-warning", "This action will delete all your data.")
+        driver.find_element_by_css_selector(".fm-dialog.confirmation-dialog .notification-button.confirm").click()
         self.waitfor_invisibility(".dark-overlay")
 
     def is_element_present(self, how, what):

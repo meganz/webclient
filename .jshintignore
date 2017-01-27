@@ -19,6 +19,7 @@ e10s.js
 fileapi.js
 aesasm.js
 keygen.js
+makecache.js
 karma.conf.js
 nacl-fast.js
 js/cmsSnapshot.js

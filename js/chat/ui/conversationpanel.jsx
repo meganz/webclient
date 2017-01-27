@@ -1898,7 +1898,7 @@ var ConversationPanels = React.createClass({
 
         var conversations = [];
 
-        if (window.location.hash === "#fm/chat") {
+        if (getSitePath() === "/fm/chat") {
             // do we need to "activate" an conversation?
             var activeFound = false;
             self.props.conversations.forEach(function (chatRoom) {

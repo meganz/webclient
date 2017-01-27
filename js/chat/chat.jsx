@@ -19,7 +19,7 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
             if (!megaChat.chats[roomOrUserHash + "@conference." + megaChat.options.xmppDomain]) {
                 // chat not found
                 setTimeout(function () {
-                    window.location = '#fm/chat';
+                    loadSubPage('fm/chat');
                     M.openFolder('chat');
                 }, 100);
                 return;
@@ -28,7 +28,7 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
         else {
             if (!M.u[roomOrUserHash]) {
                 setTimeout(function () {
-                    window.location = '#fm/chat';
+                    loadSubPage('fm/chat');
                     M.openFolder('chat');
                 }, 100);
                 return;
@@ -586,7 +586,7 @@ Chat.prototype.init = function() {
         if (!appContainer) {
             $(window).rebind('hashchange.delayedChatUiInit', function() {
                 if (typeof($.leftPaneResizable) === 'undefined' || !fminitialized) {
-                    // delay the chat init a bit more! specially for the case of a user getting from #pro -> #fm, which
+                    // delay the chat init a bit more! specially for the case of a user getting from /pro -> /fm, which
                     // for some unknown reason, stopped working and delayed the init of $.leftPaneResizable
                     return;
                 }
@@ -1601,7 +1601,7 @@ Chat.prototype.getChatNum = function(idx) {
  * Called when the BOSH service url is requested for Karere to connect. Should return a full URL to the actual
  * BOSH service that should be used for connecting the current user.
  */
-Chat.prototype.getXmppServiceUrl = function() {
+Chat.prototype.getXmppServiceUrl = function(timeout) {
     var self = this;
 
     if (localStorage.megaChatUseSandbox) {
@@ -1613,7 +1613,10 @@ Chat.prototype.getXmppServiceUrl = function() {
     else {
         var $promise = new MegaPromise();
 
-        $.get("https://" + self.options.loadbalancerService + "/?service=xmpp")
+        $.ajax("https://" + self.options.loadbalancerService + "/?service=xmpp", {
+            method: "GET",
+            timeout: timeout ? timeout : 10000
+            })
             .done(function(r) {
                 if (r.xmpp && r.xmpp.length > 0) {
                     var randomHost = array_random(r.xmpp);

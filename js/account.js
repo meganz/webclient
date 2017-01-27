@@ -559,8 +559,8 @@ function isEphemeral() {
  */
 function checkUserLogin() {
     if (!u_type) {
-        login_next = document.location.hash;
-        document.location.hash = "#login";
+        login_next = getSitePath();
+        loadSubPage('login');
         return true;
     }
 

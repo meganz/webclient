@@ -219,7 +219,7 @@ var ContactCard = React.createClass({
                 moreDropdowns.unshift(
                     <DropdownsUI.DropdownItem
                             key="view" icon="human-profile" label={__(l[8866])} onClick={() => {
-                                window.location = '#fm/' + contact.u;
+                                loadSubPage('fm/' + contact.u);
                             }} />
                 );
             }

@@ -77,7 +77,6 @@ function initMegacmd() {
         }
         return false;
     });
-    initMegacmdDownload();
 }
 
 /**

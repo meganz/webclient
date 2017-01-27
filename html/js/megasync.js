@@ -66,7 +66,8 @@ var megasync = (function() {
 
         $('.main-pad-block').rebind('click.closesyncdropdown', function(e) {
             if ($dropdown.hasClass('active')) {
-                if ($(e.target).parent('.megasync-dropdown').length === 0 && !$(e.target).hasClass('megasync-dropdown')) {
+                if ($(e.target).parent('.megasync-dropdown').length === 0 &&
+                        !$(e.target).hasClass('megasync-dropdown')) {
                     $dropdown.removeClass('active');
                     $list.addClass('hidden');
                 }

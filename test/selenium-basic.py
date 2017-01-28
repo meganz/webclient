@@ -29,7 +29,7 @@ import unittest, time, re, sys, argparse, tempfile
 
 username=None
 password=None
-base_url="https://eu.static.mega.co.nz/3/"
+base_url="https://smoketest.static.mega.co.nz"
 
 # This test suite includes:
 #
@@ -113,7 +113,7 @@ class MegaTest(unittest.TestCase):
         self.waitfor_visibility("div.fm-notification-warning")
         self.assertRegexpMatches(driver.find_element_by_css_selector("div.fm-notification-warning").text, r"^Are you sure you want to continue[\s\S]$")
         driver.find_element_by_css_selector(".fm-dialog.confirmation-dialog .notification-button.confirm").click()
-        self.waitfor_visibility(".light-overlay, .st-social-block-load")
+        self.waitfor_text(".loading-info li.step1.loading", "Requesting account data")
         self.waitfor_visibility(".fm-empty-trashbin .fm-empty-cloud-txt")
         # 
         # Test: 0005  Switch Sections
@@ -330,6 +330,9 @@ class MegaTest(unittest.TestCase):
         # move to the transfers panel and wait for the upload to finish
         driver.find_element_by_css_selector(".fm-main.default .nw-fm-left-icon.transfers").click()
         self.waitfor_text("tr#ul_8001 .transfer-status", "Completed")
+        # on upload completion, we should get a warning about using an ephemeral session
+        self.waitfor_text(".top-warning-popup .warning-header", "You are using an ephemeral session.")
+        self.assertEqual("Register now", driver.find_element_by_css_selector(".top-warning-popup .warning-button span").text)
         # move back to the cloud and check stuff there
         driver.find_element_by_css_selector(".fm-main.default .nw-fm-left-icon.cloud-drive").click()
         self.waitfor_text("tr.file span.tranfer-filetype-txt", "test.txt")
@@ -337,9 +340,6 @@ class MegaTest(unittest.TestCase):
         self.assertEqual("Text Document", driver.find_element_by_css_selector("tr.file td.type").text)
         # check the hash/checksum of the uploaded file
         self.assertEqual("MTIzNAAAAAAAAAAAAAAAAAOLqRY", self.waitfor_jsstate("M.v[0].hash"))
-        # on upload completion, we should get a warning about using an ephemeral session
-        self.waitfor_text(".top-warning-popup .warning-header", "You are using an ephemeral session.")
-        self.assertEqual("Register now", driver.find_element_by_css_selector(".top-warning-popup .warning-button span").text)
         # switch to other sections and check elements visibility there
         driver.find_element_by_css_selector(".fm-main.default .nw-fm-left-icon.shared-with-me").click()
         self.waitfor_text(".fm-empty-incoming .fm-empty-cloud-txt", "No Incoming Shares")

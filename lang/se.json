@@ -3902,6 +3902,9 @@
     "16234": "Blockerad fil: %1",
     "16235": "Pausa nedladdningar",
     "16243": "Du kommer inte l\u00e4ngre ha tillg\u00e5ng till denna konversation",
+    "16257": "Chat is disabled",
+    "16258": "Status appearance",
+    "16259": "Auto-away",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

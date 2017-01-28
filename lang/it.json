@@ -3902,6 +3902,9 @@
     "16234": "File bloccato: %1",
     "16235": "Ferma i download",
     "16243": "Non avrai pi\u00f9 accesso a questa conversazione",
+    "16257": "Chat is disabled",
+    "16258": "Status appearance",
+    "16259": "Auto-away",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

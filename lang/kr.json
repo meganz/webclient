@@ -3902,6 +3902,9 @@
     "16234": "\ucc28\ub2e8\ub41c \ud30c\uc77c: %1",
     "16235": "\ub2e4\uc6b4\ub85c\ub4dc \uc77c\uc2dc\uc815\uc9c0",
     "16243": "\ub2f9\uc2e0\uc740 \ub354 \uc774\uc0c1 \uc774 \ub300\ud654\uc5d0 \uc811\uadfc\ud560 \uc218 \uc5c6\uc2b5\ub2c8\ub2e4",
+    "16257": "Chat is disabled",
+    "16258": "Status appearance",
+    "16259": "Auto-away",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

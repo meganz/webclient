@@ -3902,6 +3902,9 @@
     "16234": "Blokovan\u00fd soubor: %1",
     "16235": "Pozastavit stahov\u00e1n\u00ed",
     "16243": "Nem\u00e1te ji\u017e p\u0159\u00edstup k t\u00e9to konverzaci",
+    "16257": "Chat is disabled",
+    "16258": "Status appearance",
+    "16259": "Auto-away",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

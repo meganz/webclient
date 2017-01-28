@@ -7,9 +7,7 @@ var Help = (function() {
     var doRender = false;
     var idx;
     var focus;
-    var popularQuestions = [];
     var allTags = [];
-    var articlesById = [];
     var titles = [];
     var isScrolling = false;
     var $window = $(window);
@@ -97,36 +95,6 @@ var Help = (function() {
         });
     }
 
-    function sortClients(client, clients) {
-
-        var isMobile = client.tags.indexOf("mobile");
-        return clients.sort(function(a, b) {
-            if (isMobile) {
-                return a.tags.indexOf("mobile") ? -1 : 1;
-            }
-
-            return a.tags.indexOf("mobile") ? 1 : -1;
-        });
-    }
-
-
-    var setHash = SoonFc(function(hash) {
-        if (hash !== document.location.hash) {
-
-            /*
-            try {
-                history.pushState({}, "page 2", document.location.pathname + hash);
-            }
-            catch (ex) {
-                // Fx Extension while using `mega:` protocol...
-                skipHashChange = true;
-                location.hash = hash;
-            }
-            */
-        }
-    }, 1000);
-
-
     function url() {
         return 'help/' + toArray.apply(null, arguments).join("/");
     }
@@ -138,15 +106,11 @@ var Help = (function() {
         $elements = $elements || $('.updateSelected.current');
         $elements.removeClass('current');
         $element.addClass('current');
-        var $current = $($element.data('update'))
+        $($element.data('update'))
             .parent().
                 find('.active').removeClass('active').end()
             .end()
             .addClass('active');
-        var hash = $current.data('state');
-        if (hash) {
-            setHash(hash);
-        }
     }
 
 
@@ -164,22 +128,6 @@ var Help = (function() {
             true
         );
         isScrolling = true;
-    }
-
-    function notFound() {
-        loadSubPage('help');
-    }
-
-    function getClient(clientName) {
-        for (var i = 0; i < clients.length; ++i) {
-            if (clients[i].url === clientName) {
-                return clients[i];
-            }
-        }
-
-        // not found
-        notFound();
-        return false;
     }
 
     function filterContentByTag(tag) {
@@ -334,9 +282,6 @@ var Help = (function() {
                 $deviceIcon.rotate(0, 180, 400, 'easeOutQuint');
             }
         });
-
-
-
     }
 
 
@@ -405,36 +350,28 @@ var Help = (function() {
     function homepageinteraction() {
 
         var $container = $('#help2-main');
-        var $getStartBlock = $(".getstart-block", $container);
-        var $useMegaBlock = $(".usemega-block", $container);
-        var $articleArrow = $(".article-arrow", $container);
-        var $arrowContainer = $(".browsearticle-button", $container);
-        var $getStartImg = $(".getstart-img", $container);
-        var $getStartCon = $(".getstart-content", $container);
         var $mobileDeviceBlock = $(".block-mobile-device", $container);
         var $mobileNavBlock = $(".mobile-block", $container);
         var timer;
 
-        $mobileNavBlock.rebind('mouseenter', function() {
-            timer = setTimeout(function()   {
-            $mobileDeviceBlock.fadeIn(300);
-        }, 400); })
-        .rebind('mouseleave', function() {
-            clearTimeout(timer);
-            $mobileDeviceBlock.fadeOut(200);
-        });
-
+        $mobileNavBlock
+            .rebind('mouseenter', function() {
+                timer = setTimeout(function() {
+                    $mobileDeviceBlock.fadeIn(300);
+                }, 400);
+            })
+            .rebind('mouseleave', function() {
+                clearTimeout(timer);
+                $mobileDeviceBlock.fadeOut(200);
+            });
     }
 
     function searchBarInteraction() {
 
         var $container = $('#help2-main');
         var $inputSearch = $("input.search", $container);
-        var $searchBar = $("form#support-search", $container);
         var $sideBar = $(".sidebar-menu-container", $container);
-        var $directoryBody = $(".support-info-container ", $container);
         var $autoSuggestContainer = $(".ui-autocomplete", $container);
-        var $mainTitleSection = $('.main-title-section', $container);
         var $popularQuestions = $(".search-section .popular-question-block");
 
         $inputSearch.on('focus', function () {
@@ -449,17 +386,6 @@ var Help = (function() {
         });
     }
 
-    //  Directory list functions go here.
-    function directoryInteraction() {
-
-        var $this = $(this);
-        var $container = $('#help2-main');
-        var $directoryArticle = $('.d-section-items li');
-        var $bulletPoint = $('.d-bullet-point');
-
-        // Bullet point animation when hovering
-    }
-
     // Header functions including search and go back buttons
 
     function headerInteraction() {
@@ -467,33 +393,27 @@ var Help = (function() {
         var $container = $('#help2-main');
         var $goBackContainer = $(".support-go-back", $container);
         var $goBackArrow = $(".support-go-back-icon", $container);
-        var $goBackHead = $(".support-go-back-heading", $container);
-        var $searchHead = $(".support-search-heading", $container);
-        var $searchClone = $(".support-section-header-clone .support-search");
-        var $searchCloneHeader = $(".support-section-header-clone .support-search-heading");
-        var $searchCloseHead = $('.support-search-heading-close', $container);
         var $searchContainer = $(".support-search", $container);
         var $searchMagnifyGlass = $(".support-search-icon", $container);
-        var $mainPadAnchor = $(".main-pad-container", $container);
         var $sideBar = $(".sidebar-menu-container", $container);
         var $mainTitleSection = $('.main-title-section', $container);
         var $searchHeader = $(".support-section-header", $container);
         var $cloneHeader = $(".support-section-header-clone", $container);
-        var $sideBarSlider = $(".sidebar-menu-slider", $container);
         var $closeIcon = $(".close-icon", $container);
-        var $searchOverlay = $(".search-section-header", $container);
         var $getStartTitle = $(".getstart-title-section", $container);
         var timer;
 
         // Arrow Animation for Go back block
-        $goBackContainer.rebind('mouseenter', function() {
-            timer = setTimeout(function()   {
-            $goBackArrow.animate({marginRight: 8}, 300, "easeOutQuart");
-        },  300);
-        }).rebind('mouseleave', function() {
-            clearTimeout(timer);
-            $goBackArrow.animate({marginRight: 16}, 300, "easeOutQuart");
-        });
+        $goBackContainer
+            .rebind('mouseenter', function() {
+                timer = setTimeout(function() {
+                    $goBackArrow.animate({marginRight: 8}, 300, "easeOutQuart");
+                }, 300);
+            })
+            .rebind('mouseleave', function() {
+                clearTimeout(timer);
+                $goBackArrow.animate({marginRight: 16}, 300, "easeOutQuart");
+            });
 
         $closeIcon.rebind('click', function() {
             if (($mainTitleSection.hasClass('hidden')) || ($getStartTitle.hasClass('hidden'))) {
@@ -531,45 +451,22 @@ var Help = (function() {
             }
         }).trigger('scroll');
 
-
-        if ($searchContainer.hasClass('close')) {
-            $searchMagnifyGlass = $(".support-search-icon", $container);
-            $searchContainer.rebind('mouseenter', function() {
-                timer = setTimeout(function()   {
-                $searchMagnifyGlass.animate({
-                    marginLeft: "8",
-                    marginRight:"8"
-                }, 300, "easeOutQuart");
-
-            }, 300);
+        $searchContainer
+            .rebind('mouseenter', function() {
+                timer = setTimeout(function() {
+                    $searchMagnifyGlass.animate({
+                        marginLeft: "8",
+                        marginRight: "8"
+                    }, 300, "easeOutQuart");
+                }, 300);
             })
             .rebind('mouseleave', function() {
                 clearTimeout(timer);
                 $searchMagnifyGlass.animate({
                     marginLeft: "16",
-                    marginRight:"0"
+                    marginRight: "0"
                 }, 300, "easeOutQuart");
-
             });
-        } else {
-            $searchContainer.rebind('mouseenter', function() {
-                timer = setTimeout(function()   {
-                $searchMagnifyGlass.animate({
-                    marginLeft: "8",
-                    marginRight:"8"
-                }, 300, "easeOutQuart");
-
-            }, 300);
-            })
-            .rebind('mouseleave', function() {
-                clearTimeout(timer);
-                $searchMagnifyGlass.animate({
-                    marginLeft: "16",
-                    marginRight:"0"
-                }, 300, "easeOutQuart");
-
-            });
-        }
     }
 
 
@@ -728,9 +625,7 @@ var Help = (function() {
     };
 
     function getUrlParts() {
-        return getSitePath().split(/\//).filter(function(x) {
-            return x.length > 0;
-        });
+        return getSitePath().split('/').map(String.trim).filter(String);
     }
 
 
@@ -772,7 +667,6 @@ var Help = (function() {
 
         return args[0][0];
     }
-    //
 
     function handleScroll() {
 
@@ -781,6 +675,7 @@ var Help = (function() {
         var menuHeight = $menu.height();
         var top   = $('.help-background-block').height();
         var $elements = $('.updateSelected:visible', $main);
+        var isBottomScrolling;
 
         $window.rebind('resize.help2', function() {
             if ($('#help2-main').length === 0) {
@@ -840,7 +735,6 @@ var Help = (function() {
             }
 
             Data = blobs;
-            titles = [];
             titles = blobs.help_search.object.map(function(entry) {
                 entry.label = entry.title;
                 entry.value = entry.title;
@@ -873,11 +767,11 @@ var Help = (function() {
 
             if (callback) {
                 callback();
-            };
+            }
         });
-    }
+    };
 
-    ns.loadfromCMS();
+    mBroadcaster.once('startMega', ns.loadfromCMS.bind(ns, null));
 
     var helpAlreadyLogged;
     ns.render = function() {
@@ -900,7 +794,6 @@ var Help = (function() {
         homepageinteraction();
         searchBarInteraction();
         headerInteraction();
-        directoryInteraction();
         searchAnimations();
         patchLinks();
 

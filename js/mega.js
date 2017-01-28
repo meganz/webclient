@@ -6154,7 +6154,7 @@ var nodesinflight = {};  // number of nodes being processed in the worker for sc
 function sc_packet(a) {
     if ((a.a == 's' || a.a == 's2') && a.k) {
         if (a.k.length > 43) {
-            if (a.u === u_handle) {
+            if (!a.u || a.u === u_handle) {
                 // RSA-keyed share command targeted to u_handle: run through worker
                 rsasharekeys[a.n] = true;
 
@@ -6594,10 +6594,6 @@ function execsc() {
                                         n.su = a.o;
                                         M.nodeUpdated(n);
 
-                                        scinshare.skip = true;
-                                    }
-                                    else if (!Array.isArray(a.k)) {
-                                        srvlog('Skipping share action-packet with invalid key.');
                                         scinshare.skip = true;
                                     }
                                     else {

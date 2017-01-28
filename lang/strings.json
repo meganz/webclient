@@ -15610,5 +15610,17 @@
     "16243": {
         "text": "You will no longer have access to this conversation",
         "context": "Alert text that explains what it means to be confirming the action 'Leave'. (i.e. what will happen to the user if they choose to leave the chat - they won't be able to see or access it anymore)"
+    },
+    "16257": {
+        "text": "Chat is disabled",
+        "context": "A title which is shown when the chat is disabled."
+    },
+    "16258": {
+        "text": "Status appearance",
+        "context": "A header in the Chat settings. This section allows the user to select their presence status (Online, Away, Busy, Offline) which will be set automatically after they log in."
+    },
+    "16259": {
+        "text": "Auto-away",
+        "context": "A header in the Chat settings. This changes the user's status to Away after some time of inactivity."
     }
 }

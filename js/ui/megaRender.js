@@ -281,7 +281,7 @@
                     if (this.viewmode) {
                         var $fm = $('.fm-blocks-view.fm');
                         var row = Math.floor($fm.width() / 140);
-                        maxItemsInView = row * Math.ceil($fm.height() / 164) + row;
+                        maxItemsInView = Math.max(row * Math.ceil($fm.height() / 164) + row, 100);
                     }
                     else {
                         maxItemsInView = Math.ceil($('.files-grid-view.fm').height() / 24 * 1.4);

@@ -4801,7 +4801,8 @@ function passwordManager(form) {
             var path  = getSitePath();
             var title = document.title;
             history.replaceState({ success: true }, '', "index.html#" + document.location.hash.substr(1));
-            if (hashLogic) path = getSitePath().replace('/','/#');
+			if (hashLogic && !is_chrome_firefox && is_extension) path = getSitePath().replace('/','/mega/secure.html#');
+            else if (hashLogic) path = getSitePath().replace('/','/#');			
             history.replaceState({ success: true, subpage: path.replace('#','').replace('/','') }, '', path);
             $(form).find('input').val('');
         }, 1000);

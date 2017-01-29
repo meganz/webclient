@@ -46,6 +46,26 @@ function isMobile()
     return false;
 }
 
+function getSitePath() {
+	var hash = location.hash.replace('#', '');
+
+	if (hashLogic || hash.substr(0, 2) === 'F!' || hash[0] === '!') {
+		return '/' + hash;
+	}
+
+	return document.location.pathname;
+}
+
+function clickURLs() {
+    $('a.clickurl').rebind('click', function() {
+        var url = $(this).attr('href') || $(this).data('fxhref');
+        if (url) {
+            loadSubPage(url.substr(1));
+            return false;
+        }
+    });
+}
+
 function geoStaticpath(eu)
 {
     if (!eu) {

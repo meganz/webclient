@@ -11,41 +11,15 @@
 		"mega.nz"    : 1,
 		"me.ga"      : 1
 	};
-	const _pages = [
-		"about",
-		"blog",
-		"chrome",
-		"contact",
-		"copyright",
-		"copyrightnotice",
-		"credits",
-		"dev",
-		"doc",
-		"firefox",
-		"general",
-		"login",
-		"mobile",
-		"privacy",
-		"privacycompany",
-		"pro",
-		"register",
-		"resellers",
-		"sdk",
-		"sourcecode",
-		"start",
-		"sync",
-		"takedown",
-		"terms"
-	];
 	const pathToHash = function(l) {
-		var path = String(l.hash || l.pathname).substr(1).toLowerCase();
+		var path = String(l.hash || l.pathname).substr(1);
 
-		if (!path || ~_pages.indexOf(path) || path.substr(0, 4) === 'help') {
+		if (!path || !~path.indexOf('.')) {
 			
-			return '#' + path;
+			return '#' + path + l.search;
 		}
 
-		return l.hash;
+		return l.hash + l.search;
 	};
 	const shouldLoad = function(l) {
 		var hash;

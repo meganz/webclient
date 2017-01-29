@@ -31,11 +31,20 @@ var cachepages = [
     "start",
     "sync",
     "takedown",
-    "terms"
+    "terms",
+	"cmd"
 ];
 
-//var cachepages = ['help/client/android','help/client/ios'];
-//var cachepages = ['pro','terms'];
+// add blogs:
+var i = 1;
+while (i < 45)
+{
+	cachepages.push("blog_" + i);
+	i++;
+}
+
+//var cachepages = ['cmd','pro'];
+
 
 var cacheindex=0;
 var cachepage = '';
@@ -116,12 +125,15 @@ function detectCacheReady() {
 				lang = cachelang;
 				loadSubPage('help');
 				loadingDialog.show();
-				Help.loadfromCMS(function()
-				{
-					boot_done_makecache=true;
-					jsl.push({f:getLanguageFilePath(cachelang), n: 'lang', j:3});
-					jsl_start();
-				});
+				if (typeof Help !== 'undefined') {
+					Help.loadfromCMS(function()
+					{
+						boot_done_makecache=true;
+						jsl.push({f:getLanguageFilePath(cachelang), n: 'lang', j:3});
+						jsl_start();
+					});
+				}
+				else makeCache();
 			}
 			else {				
 				
@@ -209,6 +221,7 @@ function cacheHTML() {
 	var url = URL.createObjectURL(file);
 	$('#startholder').append('<div style="background-color:white; position:absolute; left:0px; top:0px; width:1600px; height:1000px; z-index:9999;"><iframe src="' + url + '" width="100%" height="100%"></iframe></div>');
 	*/
+	
 	
 	return html;
 }

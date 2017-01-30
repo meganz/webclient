@@ -69,13 +69,13 @@
 /* Add From Cloud Dialog */
 .fm-dialog.add-from-cloud {
     width: 644px;
-    margin: -246px 0 0 -322px;
+    margin: -247px 0 0 -322px;
 }
 .fm-dialog .fm-breadcrumbs-block {
     float: none;
     height: 46px;
-    margin: 0 0 13px 0;
-    padding: 22px 0 0 16px;
+    margin: 0 0 11px 0;
+    padding: 22px 0 0 2px;
 }
 .fm-dialog-table.grid-table tr:nth-child(odd) td {
     background-color: rgba(255,255,255,1);
@@ -696,12 +696,12 @@ li.token-input-token-invite .input-close {
     margin-right: 8px;
 }
 .invitation-dialog.table-cell span.desc {
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     background-position: right -11445px;
     background-repeat: no-repeat;
 }
 .invitation-dialog.table-cell span.asc {
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     background-position: right -11475px;
     background-repeat: no-repeat;
 }

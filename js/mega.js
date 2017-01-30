@@ -2485,12 +2485,12 @@ function MegaData()
                 $(el[i]).addClass('short-foldername');
                 i++;
             } else if (j < el.length - 1) {
-                $(el[j]).html('');
+                $(el[j]).addClass('ultra-short-foldername');
                 j++;
             } else if (!$(el[j]).hasClass('short-foldername')) {
                 $(el[j]).addClass('short-foldername');
             } else {
-                $(el[j]).html('');
+                $(el[j]).addClass('ultra-short-foldername');
                 break;
             }
         }

@@ -877,6 +877,13 @@ function browserdetails(useragent) {
         details.engine = 'Unknown';
     }
 
+    // Product info to quickly access relevant info.
+    details.prod = details.name + ' [' + details.engine + ']'
+        + (details.brand ? '[' + details.brand + ']' : '')
+        + '[' + details.version + ']'
+        + (details.isExtension ? '[E:' + details.isExtension + ']' : '')
+        + '[' + (details.is64bit ? 'x64' : 'x32') + ']';
+
     return details;
 }
 
@@ -4799,10 +4806,14 @@ function passwordManager(form) {
     $(form).rebind('submit', function() {
         setTimeout(function() {
             var path  = getSitePath();
-            var title = document.title;
             history.replaceState({ success: true }, '', "index.html#" + document.location.hash.substr(1));
-			if (hashLogic && !is_chrome_firefox && is_extension) path = getSitePath().replace('/','/mega/secure.html#');
-            else if (hashLogic) path = getSitePath().replace('/','/#');			
+            if (hashLogic) {
+                path = getSitePath().replace('/', '/#');
+
+                if (location.href.substr(0, 19) === 'chrome-extension://') {
+                    path = path.replace('/#', '/mega/secure.html#');
+                }
+            }
             history.replaceState({ success: true, subpage: path.replace('#','').replace('/','') }, '', path);
             $(form).find('input').val('');
         }, 1000);

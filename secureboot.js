@@ -56,6 +56,30 @@ function getSitePath() {
 	return document.location.pathname;
 }
 
+// remove dangling characters from the pathname/hash
+function getCleanSitePath(path) {
+    if (path === undefined) {
+        path = getSitePath();
+    }
+
+    if (path.indexOf('%25') >= 0) {
+        do {
+            path = path.replace(/%25/g, '%');
+        } while (path.indexOf('%25') >= 0);
+    }
+    if (path.indexOf('%21') >= 0) {
+        path = path.replace(/%21/g, '!');
+    }
+    try {
+        path = decodeURIComponent(path);
+    }
+    catch (e) {}
+
+    path = path.replace(/^[/#]+|[^\w-]+$/g, '');
+
+    return path;
+}
+
 function clickURLs() {
     $('a.clickurl').rebind('click', function() {
         var url = $(this).attr('href') || $(this).data('fxhref');
@@ -507,19 +531,18 @@ else if (document.location.hash.substr(1,2) === 'F!' || document.location.hash.s
     // folder or file link: always keep the hash URL to ensure that keys remain client side
     page = document.location.hash;
     // history.replaceState so that back button works in new URL paradigm
-    history.replaceState({subpage: document.location.hash.replace('#', '')}, "", document.location.hash);
-}
-else if (document.location.hash.length > 0) {
-    // history.replaceState for legacy hash requests to new URL paradigm
-    page = document.location.hash;
-    history.replaceState({subpage: page.replace('#', '')}, "", '/' + page.replace('#', ''));
+    history.replaceState({subpage: page.replace('#', '')}, "", page);
 }
 else {
-    // new URL paradigm, look for desired page in the location.pathname:
-    page = document.location.pathname;
-    if (page.substr(0, 1) == '/') {
-        page = page.substr(1, page.length - 1);
+    if (document.location.hash.length > 0) {
+        // history.replaceState for legacy hash requests to new URL paradigm
+        page = document.location.hash;
     }
+    else {
+        // new URL paradigm, look for desired page in the location.pathname:
+        page = document.location.pathname;
+    }
+    page = getCleanSitePath(page);
     history.replaceState({subpage: page}, "", '/' + page);
 }
 page = page.replace('#','');
@@ -756,6 +779,9 @@ Object.defineProperty(this, 'mBroadcaster', {
                     if (d) {
                         console.log('CROSSTAB COMMUNICATION INITIALIZED AS '
                             + (this.master ? 'MASTER':'SLAVE'));
+
+                        console.debug(String(ua));
+                        console.debug(browserdetails(ua).prod);
                     }
                     cb(this.master);
                     cb = null;

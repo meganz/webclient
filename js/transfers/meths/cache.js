@@ -134,7 +134,12 @@ function CacheIO(dl_id, dl) {
 
         if (this.is_zip || !dl.zipid) {
             __max_chunk_size = Math.min(size + 4194304, __max_chunk_size);
-            u8buf = new Uint8Array(__max_chunk_size);
+            try {
+                u8buf = new Uint8Array(__max_chunk_size);
+            }
+            catch (ex) {
+                return dlFatalError(dl, ex);
+            }
 
             IO = new dlMethod(dl_id, dl);
             IO.begin = this.begin;

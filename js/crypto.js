@@ -1786,6 +1786,10 @@ function api_send(q) {
 
     q.xhr.cancelled = false;
 
+    if (chunked_method === 2 && typeof Uint8Array.prototype.indexOf !== 'function') {
+        chunked_method = 0;
+    }
+
     if (q.split && chunked_method == 2) {
         // use chunked fetch with JSONSplitter input type Uint8Array
         q.splitter = new JSONSplitter(q.split, q.xhr, true);

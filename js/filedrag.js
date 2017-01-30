@@ -94,7 +94,7 @@
         if (d) {
             console.log(e);
         }
-        // if (folderlink || RightsbyID(M.currentdirid) < 1) return false;
+        // if (folderlink || rightsById(M.currentdirid) < 1) return false;
         e.stopPropagation();
         e.preventDefault();
         setTimeout(function() {
@@ -188,7 +188,7 @@
                 u_type = r;
                 u_checked = true;
                 loadingDialog.hide();
-                document.location.hash = 'fm';
+                loadSubPage('fm');
             }
         }, true);
     }
@@ -233,7 +233,7 @@
                 (
                     M.currentdirid !== 'dashboard' &&
                     M.currentdirid !== 'transfers' &&
-                    (RightsbyID(targetid) | 0) < 1
+                    (rightsById(targetid) | 0) < 1
                 )
             ) &&
             String(M.currentdirid).indexOf("chat/") === -1

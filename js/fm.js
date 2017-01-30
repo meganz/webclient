@@ -369,7 +369,7 @@ function initUI() {
     }
     $('.not-logged .fm-not-logged-button.create-account').rebind('click', function()
     {
-        document.location.hash = 'register';
+        loadSubPage('register');
     });
 
     $('.fm-dialog-overlay').rebind('click.fm', function()
@@ -843,10 +843,10 @@ function initUI() {
                 ephemeralDialog(l[7687]);
             }
             else if ($(this).hasClass('dashboard')) {
-                document.location.hash = 'fm/dashboard';
+                loadSubPage('fm/dashboard');
             }
             else {
-                document.location.hash = 'fm/account';
+                loadSubPage('fm/account');
             }
             return false;
         }
@@ -2095,7 +2095,7 @@ function ephemeralDialog(msg) {
 
     msgDialog('confirmation', l[998], msg + ' ' + l[999], l[1000], function(e) {
         if (e) {
-            document.location.hash = 'register';
+            loadSubPage('register');
         }
     });
 }
@@ -2538,7 +2538,6 @@ function initContextUI() {
 
             fm_showoverlay();
             handleShareDialogContent();
-
         }
     });
 
@@ -2591,7 +2590,7 @@ function initContextUI() {
 
         if (user_handle.length === 1) {
             if (!$this.is(".disabled") && user_handle) {
-                window.location = "#fm/chat/" + user_handle;
+                loadSubPage('fm/chat/' + user_handle);
             }
         }
         else {
@@ -2605,7 +2604,7 @@ function initContextUI() {
         var room;
 
         if (!$this.is(".disabled") && user_handle) {
-            window.location = "#fm/chat/" + user_handle;
+            loadSubPage('fm/chat/' + user_handle);
             room = megaChat.createAndShowPrivateRoomFor(user_handle);
             if (room) {
                 room.startAudioCall();
@@ -2619,7 +2618,7 @@ function initContextUI() {
         var room;
 
         if (!$this.is(".disabled") && user_handle) {
-            window.location = "#fm/chat/" + user_handle;
+            loadSubPage('fm/chat/' + user_handle);
             room = megaChat.createAndShowPrivateRoomFor(user_handle);
             if (room) {
                 room.startVideoCall();
@@ -2659,7 +2658,7 @@ function initContextUI() {
     $('.labels .dropdown-colour-item').click(function() {
         var labelId = parseInt(this.dataset.labelId);
 
-        if (labelId && (RightsbyID($.selected[0]) > 1)) {
+        if (labelId && (rightsById($.selected[0]) > 1)) {
             M.colourLabeling($.selected, labelId);
         }
     });
@@ -2895,7 +2894,7 @@ function fmtopUI() {
             }
         }
         else if (String(M.currentdirid).length === 8
-                && RightsbyID(M.currentdirid) > 0) {
+                && rightsById(M.currentdirid) > 0) {
 
             $('.fm-new-folder').removeClass('hidden');
             $('.fm-file-upload').removeClass('hidden');
@@ -2994,7 +2993,7 @@ function dashboardUI() {
          $('.account.widget.recovery-key').removeClass('hidden');
          // Button on dashboard to backup their master key
         $('.backup-master-key').rebind('click', function() {
-            document.location.hash = 'backup';
+            loadSubPage('backup');
         });
     }
 
@@ -3163,7 +3162,7 @@ function dashboardUI() {
 
         /* Registration date, bandwidth notification link */
         $('.dashboard .button.upgrade-account, .bandwidth-info a').rebind('click', function() {
-            window.location.hash = 'pro';
+            loadSubPage('pro');
         });
         $('.account.left-pane.reg-date-info').text(l[16128]);
         $('.account.left-pane.reg-date-val').text(time2date(u_attr.since, 2));
@@ -3274,7 +3273,7 @@ function dashboardUI() {
         }
         if (b_exceeded || s_exceeded || perc_c > 80) {
             $chartsBlock.find('.chart-warning').rebind('click', function() {
-                window.location.hash = 'pro';
+                loadSubPage('pro');
             });
         }
         /* End of Charts warning notifications */
@@ -3375,7 +3374,7 @@ function dashboardUI() {
                     achievementsListDialog();
                 }
                 else {
-                    location.hash = '#pro';
+                    loadSubPage('pro');
                 }
                 return false;
             });
@@ -3458,10 +3457,10 @@ dashboardUI.updateChatWidget = function() {
     }
     $('.chat-widget .account.data-item, .chat-widget .account.widget.title')
         .rebind('click.chatlink', function() {
-            window.location = '#fm/chat';
+            loadSubPage('fm/chat');
         });
     $('.chat-widget .add-contacts').rebind('click.chatlink', function() {
-        window.location = '#fm/chat';
+        loadSubPage('fm/chat');
         Soon(function() {
             $('.conversations .small-icon.white-medium-plus').parent().trigger('click');
         });
@@ -3543,9 +3542,9 @@ function accountUI() {
         var perc_c;
         var b_exceeded;
         var s_exceeded;
-        var id = document.location.hash;
+        var id = getSitePath();
 
-        if (id === '#fm/account/advanced') {
+        if (id === '/fm/account/advanced') {
             $('.fm-account-settings').removeClass('hidden');
             sectionClass = 'advanced';
 
@@ -3576,15 +3575,15 @@ function accountUI() {
                 }
             }
         }
-        else if (id === '#fm/account') {
+        else if (id === '/fm/account') {
             $('.fm-account-profile').removeClass('hidden');
             sectionClass = 'account-s';
         }
-        else if (id === '#fm/account/history') {
+        else if (id === '/fm/account/history') {
             $('.fm-account-history').removeClass('hidden');
             sectionClass = 'history';
         }
-        else if (id === '#fm/account/reseller' && M.account.reseller) {
+        else if (id === '/fm/account/reseller' && M.account.reseller) {
             $('.fm-account-reseller').removeClass('hidden');
             sectionClass = 'reseller';
         }
@@ -3673,7 +3672,7 @@ function accountUI() {
             $('.default-white-button.upgrade-to-pro')
                 .removeClass('hidden')
                 .rebind('click', function() {
-                    window.location.hash = 'pro';
+                    loadSubPage('pro');
                 });
         }
 
@@ -3790,10 +3789,10 @@ function accountUI() {
         }
         if (b_exceeded || s_exceeded || perc_c > 80) {
             $chartsBlock.find('.chart-warning').rebind('click', function() {
-                window.location.hash = 'pro';
+                loadSubPage('pro');
             });
             $storageData.find('.chart-warning, .upgrade-account.button').rebind('click', function() {
-                window.location.hash = 'pro';
+                loadSubPage('pro');
             });
         }
         /* End of Charts warning notifications */
@@ -4071,7 +4070,7 @@ function accountUI() {
 
         $('.fm-account-main .pro-upgrade').rebind('click', function(e)
         {
-            window.location.hash = 'pro';
+            loadSubPage('pro');
         });
         $('.account.plan-info.balance span').safeHTML('&euro; @@', account.balance[0][0]);
         var a = 0;
@@ -5115,7 +5114,7 @@ function accountUI() {
 
         $('.fm-purchase-voucher,.default-white-button.topup').rebind('click', function(e)
         {
-            document.location.hash = 'resellers';
+            loadSubPage('resellers');
         });
 
         if (is_extension || ssl_needed())
@@ -5166,6 +5165,8 @@ function accountUI() {
 
         $.tresizer();
 
+        clickURLs();
+
     }, 1);
 
     // Show first name or last name
@@ -5199,11 +5200,11 @@ function accountUI() {
     }
 
     $('.editprofile').rebind('click', function() {
-        document.location.hash = 'fm/account';
+        loadSubPage('fm/account');
     });
 
     $('.rubbish-bin-link').rebind('click', function() {
-        document.location.hash = 'fm/rubbish';
+        loadSubPage('fm/rubbish');
     });
 
     // Cancel account button on main Account page
@@ -5252,26 +5253,26 @@ function accountUI() {
 
     // Button on main Account page to backup their master key
     $('.backup-master-key').rebind('click', function() {
-        document.location.hash = 'backup';
+        loadSubPage('backup');
     });
 
     $('.fm-account-button').rebind('click', function() {
         if ($(this).attr('class').indexOf('active') == -1) {
             switch (true) {
                 case ($(this).hasClass('account-s')):
-                    document.location.hash = 'fm/account';
+                    loadSubPage('fm/account');
                     break;
                 case ($(this).hasClass('advanced')):
-                    document.location.hash = 'fm/account/advanced';
+                    loadSubPage('fm/account/advanced');
                     break;
                 case ($(this).hasClass('notifications')):
-                    document.location.hash = 'fm/account/notifications';
+                    loadSubPage('fm/account/notifications');
                     break;
                 case ($(this).hasClass('history')):
-                    document.location.hash = 'fm/account/history';
+                    loadSubPage('fm/account/history');
                     break;
                 case ($(this).hasClass('reseller')):
-                    document.location.hash = 'fm/account/reseller';
+                    loadSubPage('fm/account/reseller');
                     break;
             }
         }
@@ -5645,19 +5646,12 @@ function gridUI() {
     });
 
     // enable add star on first column click (make favorite)
-    $('.grid-table.fm tr td:first-child').rebind('click', function() {
-        var id = [$(this).parent().attr('id')];
-        var newFavState = Number(!M.isFavourite(id));
-        M.favourite(id, newFavState);
-    });
-
-    // enable add star on first column click (make favorite)
-    $('.grid-table.shared-with-me tr td:first-child').rebind('click', function() {
+    $('.grid-table.shared-with-me tr td:first-child,.grid-table.fm tr td:first-child').rebind('click', function() {
         var id = [$(this).parent().attr('id')];
         var newFavState = Number(!M.isFavourite(id));
 
         // Handling favourites is allowed for full permissions shares only
-        if (RightsbyID(id) > 1) {
+        if (rightsById(id) > 1) {
             M.favourite(id, newFavState);
         }
     });
@@ -5796,7 +5790,7 @@ function FMShortcuts() {
             return false; // stop prop.
         } else if (charCode == 8) {
             var $items = selectionManager.get_selected();
-            if ($items.size() == 0 || (RightsbyID(M.currentdirid || '') | 0) < 1) {
+            if ($items.size() === 0 || (rightsById(M.currentdirid || '') | 0) < 1) {
                 return; // dont do anything.
             }
 
@@ -6318,14 +6312,16 @@ function UIkeyevents() {
                 quickFinder.disable_if_active();
             }
         }
-        else if (e.keyCode == 46 && s.length > 0 && !$.dialog && RightsbyID(M.currentdirid) > 1) {
+        else if ((e.keyCode === 46) && (s.length > 0)
+            && !$.dialog && rightsById(M.currentdirid) > 1) {
             $.selected = [];
             s.each(function(i, e) {
                 $.selected.push($(e).attr('id'));
             });
             fmremove();
         }
-        else if (e.keyCode == 46 && selPanel.length > 0 && !$.dialog && RightsbyID(M.currentdirid) > 1) {
+        else if ((e.keyCode === 46) && (selPanel.length > 0)
+            && !$.dialog && rightsById(M.currentdirid) > 1) {
             var selected = [];
             selPanel.each(function() {
                 selected.push($(this).attr('id'));
@@ -6399,7 +6395,7 @@ function UIkeyevents() {
                 $.warningCallback(true);
             }
         }
-        else if ((e.keyCode === 113 /* F2 */) && (s.length > 0) && !$.dialog && RightsbyID(M.currentdirid) > 1) {
+        else if ((e.keyCode === 113 /* F2 */) && (s.length > 0) && !$.dialog && rightsById(M.currentdirid) > 1) {
             $.selected = [];
             s.each(function(i, e) {
                 $.selected.push($(e).attr('id'));
@@ -7124,12 +7120,12 @@ function menuItems() {
         sourceRoot = RootbyId($.selected[0]);
 
     // Show Rename action in case that only one item is selected
-    if (($.selected.length === 1) && (RightsbyID($.selected[0]) > 1)) {
+    if (($.selected.length === 1) && (rightsById($.selected[0]) > 1)) {
         items['.rename-item'] = 1;
     }
 
     if (((Object.keys($.selected)).length < 2)
-            && (RightsbyID($.selected[0]) > 1)) {
+            && (rightsById($.selected[0]) > 1)) {
 
         items['.add-star-item'] = 1;
 
@@ -7149,7 +7145,7 @@ function menuItems() {
     if (selItem && selItem.su && !M.d[selItem.p]) {
         items['.removeshare-item'] = 1;
     }
-    else if (RightsbyID($.selected[0]) > 1) {
+    else if (rightsById($.selected[0]) > 1) {
         items['.move-item']   = 1;
         items['.remove-item'] = 1;
     }
@@ -7236,7 +7232,7 @@ function contextMenuUI(e, ll) {
     if (ll === 2) {
 
         // Enable upload item menu for clould-drive, don't show it for rubbish and rest of crew
-        if (RightsbyID(M.currentdirid) && (M.currentrootid !== M.RubbishID)) {
+        if (rightsById(M.currentdirid) && (M.currentrootid !== M.RubbishID)) {
             $(menuCMI).filter('.dropdown-item').hide();
             $(menuCMI).filter('.fileupload-item,.newfolder-item').show();
 
@@ -7896,21 +7892,12 @@ function treeUI()
     }
 }
 
-function treeUIexpand(id, force, moveDialog)
+function treeUIexpand(id, force)
 {
     M.buildtree(M.d[id]);
 
     var b = $('#treea_' + id);
     var d = b.attr('class');
-
-    if (M.currentdirid !== id)
-    {
-        var path = M.getPath(M.currentdirid), pid = {}, active_sub = false;
-        for (var i in path)
-            pid[path[i]] = i;
-        if (pid[M.currentdirid] < pid[id])
-            active_sub = true;
-    }
 
     if (d && d.indexOf('expanded') > -1 && !force)
     {
@@ -7925,7 +7912,7 @@ function treeUIexpand(id, force, moveDialog)
         b.addClass('expanded');
     }
 
-    treeUI();
+    delay(treeUI);
 }
 
 function sectionUIopen(id) {
@@ -8151,7 +8138,7 @@ function treeUIopen(id, event, ignoreScroll, dragOver, DragOpen) {
         var ids = M.getPath(id);
         var i = 1;
         while (i < ids.length) {
-            if (M.d[ids[i]]) {
+            if (M.d[ids[i]] && ids[i].length === 8) {
                 treeUIexpand(ids[i], 1);
             }
             i++;
@@ -8199,7 +8186,7 @@ function treeUIopen(id, event, ignoreScroll, dragOver, DragOpen) {
             }, 50);
         }
     }
-    treeUI();
+    delay(treeUI);
 }
 
 function fm_hideoverlay() {
@@ -8496,8 +8483,8 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
         $('#msgDialog').addClass('notification-dialog');
         title = l[5841];
         msg = '<p>' + escapeHTML(l[5842]) + '</p>\n' +
-            '<a class="top-login-button" href="#login">' + escapeHTML(l[171]) + '</a>\n' +
-            '<a class="create-account-button" href="#register">' + escapeHTML(l[1076]) + '</a><br/>';
+            '<a class="top-login-button clickurl" href="/login">' + escapeHTML(l[171]) + '</a>\n' +
+            '<a class="create-account-button clickurl" href="/register">' + escapeHTML(l[1076]) + '</a><br/>';
 
         var $selectedPlan = $('.reg-st3-membership-bl.selected');
         var plan = 1;
@@ -8517,6 +8504,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
     $('#msgDialog .fm-dialog-title span').text(title);
 
     $('#msgDialog .fm-notification-info p').safeHTML(msg);
+    clickURLs();
     if (submsg) {
         $('#msgDialog .fm-notification-warning').text(submsg);
         $('#msgDialog .fm-notification-warning').show();
@@ -8596,22 +8584,26 @@ function handleDialogTabContent(dialogTabClass, parentTag, dialogPrefix, htmlCon
  * @param {String} dialogName Dialog name i.e. { copy, move }.
  */
 function disableReadOnlySharedFolders(dialogName) {
-
-    var nodeId, accessRight, rootParentDirId,
-        $mcTreeSub = $("#mctreesub_shares"),
-        $ro = $('.' + dialogName + '-dialog-tree-panel.shared-with-me .dialog-content-block span[id^="mctreea_"]');
+    var $ro = $('.' + dialogName + '-dialog-tree-panel.shared-with-me .dialog-content-block span[id^="mctreea_"]');
+    var targets = $.selected || [];
 
     $ro.each(function(i, v) {
-        nodeId = $(v).attr('id').replace('mctreea_', '');
+        var node = M.d[$(v).attr('id').replace('mctreea_', '')];
 
-        // Apply access right of root parent dir to all subfolders
-        rootParentDirId = $("#mctreea_" + nodeId).parentsUntil($mcTreeSub).last().attr('id').replace('mctreeli_', '');
-
-        if (M.d[rootParentDirId]) {
-            accessRight = M.d[rootParentDirId].r;
+        while (node && !node.su) {
+            node = M.d[node.p];
         }
 
-        if (!accessRight || (accessRight === 0)) {
+        if (node) {
+            for (i = targets.length; i--;) {
+                if (isCircular(node.h, targets[i])) {
+                    node = null;
+                    break;
+                }
+            }
+        }
+
+        if (!node || !node.r) {
             $(v).addClass('disabled');
         }
     });
@@ -9135,6 +9127,12 @@ function initShareDialogMultiInputPlugin() {
                         $shareDialog.find('.token-input-input-token-mega input').focus();
                     }, 0);
                 }
+
+                $('.fm-dialog.share-dialog').position({
+                    'my': 'center center',
+                    'at': 'center center',
+                    'of': $(window)
+                });
             },
             onDelete: function() {
 
@@ -9183,6 +9181,12 @@ function initShareDialogMultiInputPlugin() {
                     // Disable group permission change drop down list
                     $('.share-dialog .permissions-icon').addClass('disabled');
                 }
+
+                $('.fm-dialog.share-dialog').position({
+                    'my': 'center center',
+                    'at': 'center center',
+                    'of': $(window)
+                });
             }
         });
 }
@@ -10537,6 +10541,7 @@ function megaSyncDialog() {
             $this.attr('checked', false);
         }
     });
+    clickURLs();
 };
 
 function firefoxDialog(close)
@@ -10580,6 +10585,8 @@ function firefoxDialog(close)
             $(this).attr('checked', false);
         }
     });
+
+    clickURLs();
 }
 
 function browserDialog(close) {
@@ -11192,6 +11199,7 @@ function bottomPageDialog(close, pp, hh) {
 
     $('.bp-body', $dialog).jScrollPane({showArrows: true, arrowSize: 5, animateScroll: true, verticalDragMinHeight: 50});
     jScrollFade('.bp-body');
+    clickURLs();
 }
 
 /**
@@ -12222,7 +12230,10 @@ function fm_importflnodes(nodes)
         mega.ui.showLoginRequiredDialog().done(function() {
 
             $.onImportCopyNodes = fm_getcopynodes(sel);
-            document.location.hash = 'fm';
+
+            // TODO: test whether importing nodes from a folder link still works
+
+            loadSubPage('fm');
 
             $(document).one('onInitContextUI', SoonFc(function(e) {
                 if (M.RootID === FLRootID) {
@@ -12417,7 +12428,7 @@ mega.utils.findDupes = function() {
     loadingDialog.show();
     Soon(function() {
         M.overrideModes = 1;
-        location.hash = '#fm/search/~findupes';
+        loadSubPage('fm/search/~findupes');
     });
 };
 
@@ -12692,7 +12703,7 @@ function contactUI() {
             $('.dropdown.body').addClass('arrange-to-front');
             e.currentTarget = $(this);
             e.calculatePosition = true;
-            $.selected = [location.hash.replace('#fm/', '')];
+            $.selected = [getSitePath().replace('/fm/', '')];
             searchPath();
             if (!$(this).hasClass('active')) {
                 contextMenuUI(e, 4);
@@ -12756,8 +12767,7 @@ function contactUI() {
 
             // Bind the "Start conversation" button
             $('.fm-start-conversation').rebind('click.megaChat', function() {
-
-                window.location = '#fm/chat/' + u_h;
+                loadSubPage('fm/chat/' + u_h);
                 return false;
             });
         }
@@ -13108,7 +13118,9 @@ var cancelSubscriptionDialog = {
                     cancelSubscriptionDialog.$accountPageCancelButton.addClass('hidden');
                     cancelSubscriptionDialog.exipryTextBlock.text(l[987]);
                     cancelSubscriptionDialog.exipryDateBlock
-                        .safeHTML('<a href="#fm/account/history">' + time2date(account.expiry, 2) + '</a>');
+                        .safeHTML('<a href="/fm/account/history" class="clickurl">@@</a>',
+                            time2date(account.expiry, 2));
+                        clickURLs();
                     cancelSubscriptionDialog.exipryDateBlock.find('a').rebind('click', function() {
                         document.location = $(this).attr('href');
                     });

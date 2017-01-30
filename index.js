@@ -33,12 +33,23 @@ var loggedout = false;
 var flhashchange = false;
 var avatars = {};
 
+
+
+
 var pro_json = '[[["N02zLAiWqRU",1,500,1024,1,"9.99","EUR"],["zqdkqTtOtGc",1,500,1024,12,"99.99","EUR"],["j-r9sea9qW4",2,2048,4096,1,"19.99","EUR"],["990PKO93JQU",2,2048,4096,12,"199.99","EUR"],["bG-i_SoVUd0",3,4096,8182,1,"29.99","EUR"],["e4dkakbTRWQ",3,4096,8182,12,"299.99","EUR"]]]';
 
 pages['placeholder'] = '((TOP))<div class="main-scroll-block"><div class="main-pad-block">' +
                        '<div class="main-mid-pad new-bottom-pages"></div></div></div>';
 
 function startMega() {
+    if (!hashLogic) {
+        $(window).rebind('popstate.mega', function(event) {
+            var state = event.originalEvent.state || {};
+            loadSubPage(state.subpage || state.fmpage || location.hash, event);
+        });
+    }
+
+
     if (!window.M) {
         window.M = new MegaData();
     }
@@ -190,14 +201,11 @@ function topPopupAlign(button, popup, topPos) {
     }
 }
 
+
+
+
 function init_page() {
-
-    // TODO: investigate why is this needed now.
     page = page || (u_type ? 'fm' : 'start');
-
-    /*if (page.substr(0, 8) == 'redirect') {
-        return location.hash = page.substr(8);
-    }*/
 
     // If they are transferring from mega.co.nz
     if (page.substr(0, 13) == 'sitetransfer!') {
@@ -208,7 +216,10 @@ function init_page() {
         }
     }
 
+
+
     if (page.substr(0, 1) === '!' && page.length > 1) {
+
         var ar = page.substr(1, page.length - 1).split('!');
         if (ar[0]) {
             dlid = ar[0].replace(/[^\w-]+/g, "");
@@ -219,7 +230,7 @@ function init_page() {
             dlkey = ar[1].replace(/[^\w-]+/g, "");
         }
 
-        if (mega.utils.hasPendingTransfers() && $.lastSeenFilelink !== location.hash) {
+        if (mega.utils.hasPendingTransfers() && $.lastSeenFilelink !== getSitePath()) {
             page = 'download';
 
             mega.utils.abortTransfers()
@@ -227,12 +238,12 @@ function init_page() {
                     location.reload();
                 })
                 .fail(function() {
-                    location.hash = $.lastSeenFilelink;
+                    loadSubPage($.lastSeenFilelink);
                 });
 
             return;
         }
-        $.lastSeenFilelink = location.hash;
+        $.lastSeenFilelink = getSitePath();
     }
 
     if (!u_type) {
@@ -279,7 +290,7 @@ function init_page() {
             && page !== 'mega'
             && page !== 'privacy' && page !== 'chrome' && page !== 'firefox') {
         register_txt = l[1291];
-        document.location.hash = 'signup' + localStorage.signupcode;
+        loadSubPage('signup' + localStorage.signupcode);
         return false;
     }
     if (!page.match(/^(blog|help|corporate|page_)/)) {
@@ -288,12 +299,6 @@ function init_page() {
     $('#loading').hide();
     if (window.loadingDialog) {
         loadingDialog.hide();
-    }
-
-    // If they recently tried to redeem their voucher but were not logged in or registered then direct them to the
-    // #redeem page to complete their purchase. For newly registered users this happens after key creation is complete.
-    if ((localStorage.getItem('voucher') !== null) && (u_type === 3)) {
-        document.location.hash = 'redeem';
     }
 
     var wasFolderlink = pfid;
@@ -308,7 +313,7 @@ function init_page() {
 
         pfkey = false;
         if (ar[1]) {
-            pfkey = ar[1].replace(/[^\w-]+/g, "");
+            pfkey = ar[1].replace(/[^\w-]+/g, "").substr(0, 22);
         }
 
         pfhandle = false;
@@ -317,7 +322,7 @@ function init_page() {
         }
 
         n_h = pfid;
-        if (!flhashchange || pfkey !== oldPFKey) {
+        if (!flhashchange || pfkey !== oldPFKey || pfkey === false) {
             if (pfkey) {
                 api_setfolder(n_h);
                 if (waitxhr) {
@@ -331,7 +336,7 @@ function init_page() {
 
                 return mKeyDialog(pfid, true)
                     .fail(function() {
-                        location.hash = 'start';
+                        loadSubPage('start');
                     });
             }
         }
@@ -372,6 +377,8 @@ function init_page() {
         page = 'newpw';
     }
 
+
+
     blogmonth = false;
     blogsearch = false;
 
@@ -401,9 +408,9 @@ function init_page() {
     }
 
     if (page.substr(0, 10) == 'blogsearch') {
-        blogsearch = decodeURIComponent(page.substr(11, page.length - 2));
+        blogsearch = decodeURIComponent(page.substr(11, page.length - 1));
         if (!blogsearch) {
-            document.location.hash = 'blog';
+            loadSubPage('blog');
         }
         page = 'blog';
         parsepage(pages['blogarticle']);
@@ -516,13 +523,11 @@ function init_page() {
             localStorage.registeremail = email;
 
             // Redirect to the register page
-            removeHash();
-            location.hash = '#register';
+            loadSubPage('register');
         }
         else {
             // Redirect to the register page
-            removeHash();
-            location.hash = '#register';
+            loadSubPage('register');
 
             // Show message
             alert('We can\'t decipher your invite link, please check you copied the link correctly, or sign up manually with the same email address.');
@@ -545,12 +550,12 @@ function init_page() {
                     else {
                         msgDialog('warningb', l[135], l[1290]);
                     }
-                    document.location.hash = 'start';
+                    loadSubPage('start');
                 }
                 else if (u_type === false) {
                     localStorage.signupcode = signupcode;
                     localStorage.registeremail = res;
-                    document.location.hash = 'register';
+                    loadSubPage('register');
                     if (!register_txt) {
                         register_txt = l[1289];
                     }
@@ -565,7 +570,7 @@ function init_page() {
                             mLogout();
                         }
                         else {
-                            document.location.hash = '';
+                            loadSubPage('');
                         }
                     });
                 }
@@ -641,23 +646,23 @@ function init_page() {
     }
     else if (page == 'login') {
         if (u_storage.sid) {
-            document.location.hash = '#fm';
+            loadSubPage('fm');
             return false;
         }
         parsepage(pages['login']);
         init_login();
     }
     else if (page == 'account') {
-        document.location.hash = 'fm/account';
+        loadSubPage('fm/account');
         return false;
     }
     else if (page == 'dashboard') {
-        document.location.hash = 'fm/dashboard';
+        loadSubPage('fm/dashboard');
         return false;
     }
     else if (page == 'register') {
         if (u_storage.sid && u_type !== 0) {
-            document.location.hash = '#fm';
+            loadSubPage('fm');
             return false;
         }
         parsepage(pages['register']);
@@ -677,9 +682,11 @@ function init_page() {
             $('.account-mid-block').addClass('high');
         }
     }
-    else if (page.substr(0, 4) == 'help') {
+    else if (page.substr(0,4) == 'help') {
         return Help.render();
+
         function doRenderHelp() {
+
             if (window.helpTemplate) {
                 parsepage(window.helpTemplate);
                 init_help();
@@ -748,7 +755,7 @@ function init_page() {
                 if (aError) {
                     alert(aError);
                 }
-                location.hash = 'start';
+                loadSubPage('start');
             });
         }
     }
@@ -758,7 +765,7 @@ function init_page() {
         if (u_type === 3) {
             wireTransferDialog
                 .init(function onClose() {
-                    location.hash = 'fm';
+                    loadSubPage('fm');
                 });
         }
         else {
@@ -771,7 +778,7 @@ function init_page() {
                     if (aError) {
                         alert(aError);
                     }
-                    location.hash = 'start';
+                    loadSubPage('start');
                 });
         }
     }
@@ -831,7 +838,8 @@ function init_page() {
     else if (page === 'sourcecode') {
         parsepage(pages['sourcecode']);
     }
-    else if (page === 'terms') {
+    else if (page === 'terms')
+    {
         parsepage(pages['terms']);
     }
     else if (page === 'general') {
@@ -847,7 +855,7 @@ function init_page() {
     else if (page == 'copyright') {
         parsepage(pages['copyright']);
         $('.reg-st5-complete-button').rebind('click', function (e) {
-            document.location.hash = 'copyrightnotice';
+            loadSubPage('copyrightnotice');
         });
         if (lang == 'en') {
             $('#copyright_txt').text($('#copyright_txt').text().split('(i)')[0]);
@@ -862,7 +870,7 @@ function init_page() {
     else if (page === 'dispute') {
         parsepage(pages['dispute']);
         $('.reg-st5-complete-button').rebind('click', function (e) {
-            document.location.hash = 'disputenotice';
+            loadSubPage('disputenotice');
         });
         mainScroll();
     }
@@ -870,7 +878,7 @@ function init_page() {
         var tmp = page.split('/uao=');
         if (tmp.length > 1) {
             mega.uaoref = decodeURIComponent(tmp[1]);
-            location.hash = tmp[0];
+            loadSubPage(tmp[0]);
             return;
         }
         parsepage(pages['pro']);
@@ -900,6 +908,10 @@ function init_page() {
         init_sync();
         topmenuUI();
         mainScroll();
+    }
+    else if (page == 'cmd') {
+        parsepage(pages['cmd']);
+        initMegacmd();
     }
     else if (page == 'mobile') {
         parsepage(pages['mobile']);
@@ -958,19 +970,19 @@ function init_page() {
         // If not logged in, direct them to login or register first
         if (u_type === false) {
             login_txt = l[7712];
-            document.location.hash = 'login';
+            loadSubPage('login');
             return false;
         }
         else if (u_type < 3) {
             // If their account is ephemeral and the email is not confirmed, then show them a dialog to warn them and
             // make sure they confirm first otherwise we get lots of chargebacks from users paying in the wrong account
             msgDialog('warningb', l[8666], l[8665], false, function() {
-                location.hash = 'fm';
+                loadSubPage('fm');
             });
         }
         else {
             // Otherwise go to the Redeem page which will detect the voucher code and show a dialog
-            document.location.hash = 'redeem';
+            loadSubPage('redeem');
             return false;
         }
     }
@@ -980,6 +992,13 @@ function init_page() {
         loadingDialog.show();
         parsepage(pages['redeem']);
         redeem.init();
+    }
+
+    // If they recently tried to redeem their voucher but were not logged in or registered then direct them to the
+    // #redeem page to complete their purchase. For newly registered users this happens after key creation is complete.
+    else if ((localStorage.getItem('voucher') !== null) && (u_type === 3)) {
+        loadSubPage('redeem');
+        return false;
     }
 
     else if (is_fm()) {
@@ -1128,12 +1147,12 @@ function init_page() {
     }
     else if (page.substr(0, 2) == 'fm' && !u_type) {
         if (loggedout) {
-            document.location.hash = 'start';
+            loadSubPage('start');
             return false;
         }
         login_next = page;
         login_txt = l[1298];
-        document.location.hash = 'login';
+        loadSubPage('login');
     }
     else if (typeof init_start === 'function') {
         page = 'start';
@@ -1181,7 +1200,7 @@ function loginDialog(close) {
     });
 
     $('.top-login-forgot-pass').rebind('click', function (e) {
-        document.location.hash = 'recovery';
+        loadSubPage('recovery');
         loginDialog(1);
     });
 
@@ -1190,7 +1209,7 @@ function loginDialog(close) {
     });
     $('.top-login-full').rebind('click', function (e) {
         loginDialog(1);
-        document.location.hash = 'login';
+        loadSubPage('login');
     });
     $('#login-password, #login-name').rebind('keydown', function (e) {
         $('.top-login-pad').removeClass('both-incorrect-inputs');
@@ -1275,14 +1294,15 @@ function tooltiplogin() {
                 passwordManager('#form_login_header');
                 u_type = r;
                 if (login_next) {
-                    document.location.hash = login_next;
+
+                    loadSubPage(login_next);
                 }
                 else if (page !== 'login') {
-                    page = document.location.hash.substr(1);
+                    page = getSitePath().substr(1);
                     init_page();
                 }
                 else {
-                    document.location.hash = 'fm';
+                    loadSubPage('fm');
                 }
                 login_next = false;
             }
@@ -1458,7 +1478,7 @@ function topmenuUI() {
         $('.top-icon.achievements').hide();
         $('.create-account-button').show();
         $('.create-account-button').rebind('click', function () {
-            document.location.hash = 'register';
+            loadSubPage('register');
         });
         $('.top-login-button').show();
         $('.top-login-button').rebind('click', function () {
@@ -1646,55 +1666,72 @@ function topmenuUI() {
             }
             topMenu(1);
             if (className.indexOf('privacycompany') > -1) {
-                document.location.hash = 'privacycompany';
+                loadSubPage('privacycompany');
+                return false;
             }
             else if (className.indexOf('upgrade-your-account') > -1) {
-                document.location.hash = 'pro';
+                loadSubPage('pro');
                 return false;
             }
             else if (className.indexOf('register') > -1) {
-                document.location.hash = 'register';
+                loadSubPage('register');
+                return false;
             }
             else if (className.indexOf('login') > -1) {
-                document.location.hash = 'login';
+                loadSubPage('login');
+                return false;
             }
             else if (className.indexOf('about') > -1) {
-                document.location.hash = 'about';
+                loadSubPage('about');
+                return false;
             }
             else if (className.indexOf('corporate') > -1) {
-                document.location.hash = 'corporate';
+                loadSubPage('corporate');
+                return false;
             }
             else if (className.indexOf('blog') > -1) {
-                document.location.hash = 'blog';
+                loadSubPage('blog');
+                return false;
             }
             else if (className.indexOf('credits') > -1) {
-                document.location.hash = 'credits';
+                loadSubPage('credits');
+                return false;
             }
             else if (className.indexOf('chrome') > -1) {
-                document.location.hash = 'chrome';
+                loadSubPage('chrome');
+                return false;
             }
             else if (className.indexOf('resellers') > -1) {
-                document.location.hash = 'resellers';
+                loadSubPage('resellers');
                 return false;
             }
             else if (className.indexOf('backup') > -1) {
-                document.location.hash = 'backup';
+                loadSubPage('backup');
                 return false;
             }
             else if (className.indexOf('firefox') > -1) {
-                document.location.hash = 'firefox';
+                loadSubPage('firefox');
+                return false;
             }
             else if (className.indexOf('mobile') > -1) {
-                document.location.hash = 'mobile';
+                loadSubPage('mobile');
+                return false;
             }
             else if (className.indexOf('sync') > -1) {
-                document.location.hash = 'sync';
+                loadSubPage('sync');
+                return false;
+            }
+            else if (className.indexOf('cmd') > -1) {
+                loadSubPage('cmd');
+                return false;
             }
             else if (className.indexOf('help') > -1) {
-                document.location.hash = 'help';
+                loadSubPage('help');
+                return false;
             }
             else if (className.indexOf('contact') > -1) {
-                document.location.hash = 'contact';
+                loadSubPage('contact');
+                return false;
             }
             else if (className.indexOf('feedback') > -1) {
 
@@ -1703,40 +1740,52 @@ function topmenuUI() {
                 feedbackDialog._type = 'top-button';
             }
             else if (className.indexOf('support') > -1) {
-                document.location.hash = 'support';
+                loadSubPage('support');
+                return false;
             }
             else if (className.indexOf('sitemap') > -1) {
-                document.location.hash = 'sitemap';
+                loadSubPage('sitemap');
+                return false;
             }
             else if (className.indexOf('sdk') > -1) {
-                document.location.hash = 'sdk';
+                loadSubPage('sdk');
+                return false;
             }
             else if (className.indexOf('doc') > -1) {
-                document.location.hash = 'doc';
+                loadSubPage('doc');
+                return false;
             }
             else if (className.indexOf('sourcecode') > -1) {
-                document.location.hash = 'sourcecode';
+                loadSubPage('sourcecode');
+                return false;
             }
             else if (className.indexOf('terms') > -1) {
-                document.location.hash = 'terms';
+                loadSubPage('terms');
+                return false;
             }
             else if (className.indexOf('general') > -1) {
-                document.location.hash = 'general';
+                loadSubPage('general');
+                return false;
             }
             else if (className.indexOf('privacy') > -1) {
-                document.location.hash = 'privacy';
+                loadSubPage('privacy');
+                return false;
             }
             else if (className.indexOf('mega') > -1) {
-                document.location.hash = 'mega';
+                loadSubPage('mega');
+                return false;
             }
             else if (className.indexOf('copyright') > -1) {
-                document.location.hash = 'copyright';
+                loadSubPage('copyright');
+                return false;
             }
             else if (className.indexOf('takedown') > -1) {
-                document.location.hash = 'takedown';
+                loadSubPage('takedown');
+                return false;
             }
             else if (className.indexOf('account') > -1) {
-                document.location.hash = 'fm/account';
+                loadSubPage('fm/account');
+                return false;
             }
             else if (className.indexOf('refresh') > -1) {
                 mega.utils.reload();
@@ -1813,7 +1862,7 @@ function topmenuUI() {
                     e.stopPropagation();
                 }
                 else {
-                    document.location.hash = 'fm/search/' + val;
+                    loadSubPage('fm/search/' + val);
                 }
             }
         }
@@ -1862,7 +1911,7 @@ function topmenuUI() {
 
         // If the user has an avatar already set, take them to the profile page where they can change or remove it
         if ($(this).find('img').attr('src').indexOf('blob:') > -1) {
-            document.location.hash = 'fm/account/profile';
+            loadSubPage('fm/account/profile');
         }
         else {
             // Otherwise if they don't have an avatar, open the change avatar dialog
@@ -1872,7 +1921,7 @@ function topmenuUI() {
 
     // If the user name in the header is clicked, take them to the account overview page
     $topHeader.find('.user-name').rebind('click', function() {
-        document.location.hash = 'fm/account';
+        loadSubPage('fm/account');
     });
 
     // If the main Mega M logo in the header is clicked
@@ -1882,8 +1931,7 @@ function topmenuUI() {
                 M.openFolder(M.RootID, true);
             }
             else {
-                document.location.hash =
-                    typeof u_type !== 'undefined' && +u_type > 2 ? '#fm/dashboard' : '#start';
+                    loadSubPage(typeof u_type !== 'undefined' && +u_type > 2 ? 'fm/dashboard' : 'start');
             }
         }
     });
@@ -1907,16 +1955,17 @@ function topmenuUI() {
             startpageMain();
         }
         else if ($.dlhash) {
-            document.location.hash = $.dlhash;
+            // XXX TODO FIXME check this
+            loadSubPage($.dlhash);
         }
         else if (folderlink && M.lastSeenFolderLink) {
             $(document).one('MegaOpenFolder', function() {
                 $('.nw-fm-left-icon.transfers').click();
             });
-            location.hash = M.lastSeenFolderLink;
+            loadSubPage(M.lastSeenFolderLink);
         }
         else {
-            document.location.hash = 'fm';
+            loadSubPage('fm');
         }
     });
 
@@ -1992,6 +2041,8 @@ function parsepage(pagehtml, pp) {
         .safeHTML(translate(pages['transferwidget']) + pagehtml)
         .show();
 
+    clickURLs();
+
     Soon(mainScroll);
     $(window).rebind('resize.subpage', function (e) {
         if (page !== 'start' && page !== 'download') {
@@ -2004,6 +2055,7 @@ function parsepage(pagehtml, pp) {
     if (typeof UIkeyevents === 'function') {
         UIkeyevents();
     }
+    clickURLs();
 }
 
 function parsetopmenu() {
@@ -2016,20 +2068,16 @@ function parsetopmenu() {
     return top;
 }
 
-window.onhashchange = function() {
-    var tpage = document.location.hash;
 
-    if (typeof gifSlider !== 'undefined' && tpage.substr(0, 2) !== '#!') {
+function loadSubPage(tpage, event)
+{
+    tpage = getCleanSitePath(tpage);
+
+    if (typeof gifSlider !== 'undefined' && tpage[0] !== '!') {
         gifSlider.clear();
     }
 
-    if (window.skipHashChange) {
-        delete window.skipHashChange;
-        return false;
-    }
-
-    if (silent_loading) {
-        document.location.hash = hash;
+    if (silent_loading || tpage === page) {
         return false;
     }
 
@@ -2037,20 +2085,21 @@ window.onhashchange = function() {
         flhashchange = true;
     }
 
-    if (tpage == '#info' && page == 'start') {
+    if (tpage == 'info' && page == 'start') {
         if (!$.infoscroll) {
             startpageScroll();
         }
         return false;
     }
 
-    if ((tpage == '#' || tpage == '' || tpage == 'start') && page == 'start' ) {
+    if ((!tpage || tpage === 'start') && page === 'start') {
         if ($.infoscroll) {
             startpageMain();
         }
         return false;
     }
 
+    // TODO: check what this was for and its relevance
     var overlay = document.getElementById('overlay');
     if (overlay && overlay.style.display == '' && !is_fm()) {
         document.location.hash = hash;
@@ -2058,32 +2107,17 @@ window.onhashchange = function() {
     }
 
     dlid = false;
-    hash = window.location.hash;
-    if (hash) {
-        page = hash.replace('#', '');
 
-        if (page) {
-            try {
-                page = decodeURIComponent(page);
-            }
-            catch (e) {}
-        }
+    if (tpage) {
+        page = tpage;
     }
     else {
         page = '';
     }
 
     if (page) {
-        if (page.indexOf('%25') !== -1) {
-            do {
-                page = page.replace(/%25/g, '%');
-            } while (page.indexOf('%25') !== -1);
-        }
-        if (page.indexOf('%21') !== -1) {
-            page = page.replace(/%21/g, '!');
-        }
         for (var p in subpages) {
-            if (page && page.substr(0, p.length) == p) {
+            if (page.substr(0, p.length) === p) {
                 for (var i in subpages[p]) {
                     if (!jsl_loaded[jsl2[subpages[p][i]].n]) {
                         jsl.push(jsl2[subpages[p][i]]);
@@ -2093,12 +2127,33 @@ window.onhashchange = function() {
         }
     }
 
+    if (hashLogic || page.substr(0, 2) === 'F!' || page[0] === '!') {
+        document.location.hash = '#' + page;
+    }
+    else if (!event || event.type !== 'popstate') {
+        history.pushState({ subpage: page }, "", "/"+page);
+    }
+
     if (jsl.length > 0) {
         loadingDialog.show();
         jsl_start();
     }
     else {
         init_page();
+    }
+}
+
+
+window.onhashchange = function() {
+    if (window.skipHashChange) {
+        delete window.skipHashChange;
+        return false;
+    }
+    if (hashLogic) {
+        hash = getCleanSitePath(location.hash);
+        if (hash !== page) {
+            loadSubPage(hash);
+        }
     }
 };
 

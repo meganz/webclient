@@ -1786,6 +1786,10 @@ function api_send(q) {
 
     q.xhr.cancelled = false;
 
+    if (chunked_method === 2 && typeof Uint8Array.prototype.indexOf !== 'function') {
+        chunked_method = 0;
+    }
+
     if (q.split && chunked_method == 2) {
         // use chunked fetch with JSONSplitter input type Uint8Array
         q.splitter = new JSONSplitter(q.split, q.xhr, true);
@@ -1881,7 +1885,7 @@ function api_reqfailed(c, e) {
         Soon(function() {
             showToast('clipboard', l[19]);
         });
-        document.location.hash = 'login';
+        loadSubPage('login');
     }
     else if (c == 2 && e == ETOOMANY) {
         // too many pending SC requests - reload from scratch
@@ -3010,7 +3014,7 @@ function api_storefileattr(id, type, key, data, ctx) {
         ssl: use_ssl
     };
 
-    if (M.d[ctx.handle] && RightsbyID(ctx.handle) > 1) {
+    if (M.d[ctx.handle] && rightsById(ctx.handle) > 1) {
         req.h = handle;
     }
 
@@ -3720,7 +3724,7 @@ function api_pfaerror(handle) {
     }
 
     // Got access denied, store 'f' attr to prevent subsequent attemps
-    if (node && RightsbyID(node.h) > 1 && node.f !== u_handle) {
+    if (node && rightsById(node.h) > 1 && node.f !== u_handle) {
         node.f = u_handle;
         return api_setattr(node);
     }

@@ -15,10 +15,10 @@
 
         self.options = $.extend(true, {}, defaultOptions, opts);
     };
-    
+
     AccountRecovery.prototype.initRecovery = function() {
         var self = this;
-        
+
         $('.login-register-input input').unbind('focus');
         $('.login-register-input input').bind('focus', function() {
             $(this).parent().addClass('focused');
@@ -34,12 +34,12 @@
                 $('.recover-button').removeClass('active');
                 $('.recover-block').addClass('hidden');
                 $(this).addClass('active');
-                
+
                 // Yes button, have master key
                 if ($(this).attr('class').indexOf('yes') !== -1) {
                     $('.positive.recover-block').removeClass('hidden');
                 }
-                
+
                 // No button, don't have master key
                 else {
                     $('.negative.recover-block').removeClass('hidden');
@@ -65,30 +65,30 @@
                 self._startRecovery();
             }
         });
-        
+
         // Inform that can't recover with temporary sesstion
         if (u_type === 0) {
             msgDialog('info', l[135], l[1944], false, function() {
-                document.location.hash = 'start';
+                loadSubPage('start');
             });
         }
-        
+
         // Inform that current session can be used to backup master key
         else if (u_type) {
             msgDialog('warninga', l[135], l[1945].replace('[X]', u_attr.email), false, function() {
-                document.location.hash = 'backup';
+                loadSubPage('backup');
             });
         }
     };
 
     /**
-     * 
+     *
      * @param {integer} actions: recover, park
-     * 
+     *
      */
     AccountRecovery.prototype._startRecovery = function() {
         var self = this;
-       
+
         var t,
             email = '',
             c = $('.recover-button.no').attr('class');
@@ -98,13 +98,13 @@
             email = $('#recover-input2').val();
             t = self.options.APARK;
         }
-        
-        // Recover account using backup master key 
+
+        // Recover account using backup master key
         else {
             email = $('#recover-input1').val();
             t = self.options.ARECOVER;
         }
-        
+
         if (checkMail(email)) {
             msgDialog('warninga', l[1100], l[1101]);
         } else {
@@ -123,7 +123,7 @@
             });
         }
     };
-    
+
     //export
     scope.mega = scope.mega || {};
     scope.mega.AccountRecovery = AccountRecovery;

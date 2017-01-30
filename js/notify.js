@@ -299,7 +299,7 @@ var notify = {
         notify.$popup.removeClass('hidden');
         notify.$popupIcon.addClass('active');
         topPopupAlign('.top-icon.notification', notify.$popup, 40);
-    
+
         // Render and show notifications currently in list
         notify.renderNotifications();
     },
@@ -487,9 +487,8 @@ var notify = {
 
         // Add click handler for the 'Contact relationship established' notification
         this.$popup.find('.nt-contact-accepted').rebind('click', function() {
-
             // Redirect to the contact's page
-            document.location.hash = '#fm/' + $(this).attr('data-contact-handle');
+            loadSubPage('fm/' + $(this).attr('data-contact-handle'));
             notify.closePopup();
         });
     },
@@ -547,7 +546,9 @@ var notify = {
             notify.markAllNotificationsAsSeen();
 
             // Redirect to payment history
-            document.location.hash = '#fm/account/history';
+            loadSubPage('fm/account/history');
+
+
         });
     },
 
@@ -563,7 +564,7 @@ var notify = {
             notify.markAllNotificationsAsSeen();
 
             // Redirect to pro page
-            document.location.hash = '#pro';
+            loadSubPage('pro');
         });
     },
 
@@ -623,7 +624,7 @@ var notify = {
 
         // If the notification is not one of the custom ones, generate an avatar from the user information
         if (customIconNotifications.indexOf(notification.type) === -1) {
-            
+
             // Generate avatar from the user handle which will load their profile pic if they are already a contact
             if (typeof M.u[userHandle] !== 'undefined') {
                 avatar = useravatar.contact(userHandle);
@@ -635,7 +636,7 @@ var notify = {
             if (avatar === '') {
                 avatar = useravatar.contact(userEmail);
             }
-            
+
             // Add the avatar HTML and show it
             $notificationHtml.find('.notification-avatar').removeClass('hidden').prepend(avatar);
         }
@@ -651,7 +652,7 @@ var notify = {
         $notificationHtml.attr('id', notification.id);
         $notificationHtml.find('.notification-date').text(date);
         $notificationHtml.find('.notification-username').text(displayNameOrEmail);
-        
+
         // Add read status
         if (notification.seen) {
             $notificationHtml.addClass('read');

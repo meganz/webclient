@@ -105,7 +105,7 @@ var ModalDialog = React.createClass({
             var buttons = [];
             self.props.buttons.forEach(function(v) {
                 buttons.push(
-                    <a href="javascript:;" className={"default-white-button right" + (v.className ? " " + v.className : "")} onClick={(e) => {
+                    <a href="javascript:;" className={v.className} onClick={(e) => {
                         if (v.onClick) {
                             v.onClick(e, self);
                         }
@@ -115,7 +115,7 @@ var ModalDialog = React.createClass({
                 );
             });
 
-            footer = <div className="fm-dialog-footer">
+            footer = <div className="fm-dialog-footer white">
                 {extraFooterElements}
                 {buttons}
                 <div className="clear"></div>
@@ -442,7 +442,7 @@ var CloudBrowserDialog = React.createClass({
                         {
                             "label": self.props.selectLabel,
                             "key": "select",
-                            "className": self.state.selected.length === 0 ? "disabled" : null,
+                            "className": "default-grey-button right " + (self.state.selected.length === 0 ? "disabled" : null),
                             "onClick": function(e) {
                                 if (self.state.selected.length > 0) {
                                     self.props.onSelected(self.state.selected);
@@ -455,6 +455,7 @@ var CloudBrowserDialog = React.createClass({
                         {
                             "label": self.props.cancelLabel,
                             "key": "cancel",
+                            "className": "default-white-button right",
                             "onClick": function(e) {
                                 self.props.onClose(self);
                                 e.preventDefault();

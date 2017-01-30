@@ -7572,7 +7572,7 @@ table {
 }
 .fm-breadcrumbs .right-arrow-bg, .fm-share-breadcrumbs .right-arrow-bg {
     line-height: 20px;
-    color: #777777;
+    color: #666666;
     font-size: 14px;
     background-image: url(../images/mega/nw-fm-sprite_v20.svg);
     background-repeat: no-repeat;
@@ -7590,6 +7590,9 @@ table {
     -khtml-opacity: 0.83;
     opacity: 0.83;
     vertical-align: top;
+}
+.fm-breadcrumbs.has-next-button .right-arrow-bg, .fm-share-breadcrumbs.has-next-button .right-arrow-bg {
+    color: #999999;
 }
 .deactivated .fm-breadcrumbs .right-arrow-bg, .deactivated .fm-share-breadcrumbs .right-arrow-bg {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
@@ -22161,6 +22164,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 }
 .dialog-tree-panel-scroll {
     height: 168px;
+    min-width: 100%;
 }
 .fm-dialog-body .nw-conversations-item {
     padding-left: 13px;
@@ -22186,6 +22190,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 }
 .dialog-empty-block.active, .copy-dialog-tree-panel.active, .move-dialog-tree-panel.active, .share-dialog-tree-panel.active {
     display: block;
+}
+.dialog-content-block {
+    min-width: 100%;
 }
 .overlayed .main-blur-block {
     filter: blur(0.25em);

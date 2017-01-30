@@ -73,22 +73,9 @@
 }
 .fm-dialog .fm-breadcrumbs-block {
     float: none;
-    height: 40px;
-    margin: 0 0 19px 0;
+    height: 46px;
+    margin: 0 0 13px 0;
     padding: 22px 0 0 16px;
-}
-.fm-dialog .fm-breadcrumbs-block:not(.long-path) .cloud-drive .right-arrow-bg {
-    padding: 0 7px 0 8px;
-    background-image: none;
-}
-.fm-dialog .fm-breadcrumbs .right-arrow-bg {
-    font-size: 13px;
-}
-.fm-dialog .fm-breadcrumbs:first-child .right-arrow-bg span {
-    display: block;
-}
-.fm-dialog .long-path .fm-breadcrumbs .right-arrow-bg span {
-    display: none;
 }
 .fm-dialog-table.grid-table tr:nth-child(odd) td {
     background-color: rgba(255,255,255,1);

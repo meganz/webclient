@@ -323,10 +323,10 @@
 .blue.big-button:hover {
     background-color: #2BA6DE;
 }
-.default-white-button.left {
+.default-white-button.left, .default-grey-button.left {
     margin-right: 12px;
 }
-.default-white-button.right {
+.default-white-button.right, .default-grey-button.right {
     margin-left: 12px;
 }
 .red {

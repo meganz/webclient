@@ -3902,9 +3902,9 @@
     "16234": "Archivo bloqueado: %1",
     "16235": "Pausar descargas",
     "16243": "Ya no tendr\u00e1s acceso a esta conversaci\u00f3n.",
-    "16257": "Chat is disabled",
-    "16258": "Status appearance",
-    "16259": "Auto-away",
+    "16257": "El chat est\u00e1 deshabilitado",
+    "16258": "Mostrar estado como",
+    "16259": "Auto-ausencia",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

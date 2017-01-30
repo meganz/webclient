@@ -147,16 +147,16 @@ def dev(build_bundle=False, branch_name=''):
         if build_bundle:
             _build_chat_bundle(remote_branch_path)
 
-        # Keep just the hostname e.g. deployer@beta.developers.mega.co.nz:28999 -> developers.mega.co.nz
-        host_name = env.host_string.split('@')[-1].split(':')[0].replace("beta.", "")
+        # Keep just the hostname e.g. deployer@beta.developers.mega.co.nz:28999 -> beta.developers.mega.co.nz
+        host_name = env.host_string.split('@')[-1].split(':')[0]
 
         boot_html = ('sandbox3' if env.host_string == SANDBOX3_HOST
                      else 'devboot-beta')
 
         # Provide test link and version info.
-        print('Test link:\n    https://{branch_name}.{host_name}'
+        print('Test link:\n    https://{branch_name}.{host}'
                 '/dont-deploy/sandbox3.html?apipath=prod'
-                .format(host=host_name,
+                .format(host=host_name.replace("beta.", ""),
                         branch_name=branch_name,
                         boot_html=boot_html))
         print("Latest version deployed:\n    {}".format(version))

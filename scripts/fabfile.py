@@ -147,8 +147,8 @@ def dev(build_bundle=False, branch_name=''):
         if build_bundle:
             _build_chat_bundle(remote_branch_path)
 
-        # Keep just the hostname e.g. deployer@beta.developers.mega.co.nz:28999 -> beta.developers.mega.co.nz
-        host_name = env.host_string.split('@')[-1].split(':')[0]
+        # Keep just the hostname e.g. deployer@beta.developers.mega.co.nz:28999 -> developers.mega.co.nz
+        host_name = env.host_string.split('@')[-1].split(':')[0].replace("beta.", "")
 
         boot_html = ('sandbox3' if env.host_string == SANDBOX3_HOST
                      else 'devboot-beta')

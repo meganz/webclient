@@ -183,6 +183,7 @@ var BrowserEntries = React.createClass({
         e.stopPropagation();
         e.preventDefault();
 
+        this.setState({'selected': [node.h]});
         if (this.props.folderSelectNotAllowed === true && node.t === 1) {
             // halt on folder selection
 
@@ -202,6 +203,7 @@ var BrowserEntries = React.createClass({
             self.setState({'selected': []});
             self.props.onSelected([]);
             self.props.onExpand(node);
+            self.forceUpdate();
         }
         else {
             self.onEntryClick(e, node);
@@ -282,7 +284,10 @@ var BrowserEntries = React.createClass({
                 </tr>
             )
         });
-        return <utils.JScrollPane className="fm-dialog-grid-scroll" selected={this.state.selected}>
+        return <utils.JScrollPane className="fm-dialog-grid-scroll"
+                                  selected={this.state.selected}
+                                  entries={this.props.entries}
+                        >
             <table className="grid-table fm-dialog-table">
                 <tbody>
                 {items}

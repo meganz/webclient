@@ -7856,7 +7856,7 @@ table {
     margin-top: -171px;
 }
 .fm-empty-cloud-bg, .fm-empty-folder-bg, .fm-empty-conversations-bg, .fm-empty-incoming-bg, .fm-empty-contacts-bg, .fm-invalid-folder-bg, .fm-empty-folder-link-bg, .fm-empty-trashbin-bg, .fm-empty-transfers-bg, .fm-empty-search-bg {
-    background-image: url(../images/mega/empty-sprite_v2.png);
+    background-image: url(../images/mega/empty-sprite_v3.png);
     background-repeat: no-repeat;
 }
 .fm-empty-cloud-bg {
@@ -22082,8 +22082,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 .copy-dialog-button.rubbish-bin.active, .move-dialog-button.rubbish-bin.active {
     background-color: rgba(49,181,0,1);
 }
-.copy-dialog-empty.cloud-drive, .copy-dialog-empty.shared-with-me, .copy-dialog-empty.conversations, .move-dialog-empty.cloud-drive, .move-dialog-empty.shared-with-me, .move-dialog-empty.conversations, .move-dialog-empty.rubbish-bin {
+.dialog-empty-block {
     height: 240px;
+    position: relative;
     display: none;
 }
 .move-dialog-button {
@@ -22092,29 +22093,35 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 .move-dialog-button.shared-with-me {
     width: 160px;
 }
-.copy-dialog-empty-icon, .move-dialog-empty-icon {
-    height: 166px;
-    background-image: url(../images/mega/dialogs-sprite_v12.svg);
-    background-position: center -867px;
+.dialog-empty-icon {
+    height: 128px;
+    background-image: url(../images/mega/empty-sprite_v3.png);
+    background-position: center -2677px;
     background-repeat: no-repeat;
 }
-.shared-with-me .copy-dialog-empty-icon, .shared-with-me .move-dialog-empty-icon {
-    background-position: center -1037px;
+.folder.dialog-empty-icon {
+    background-position: center -2818px;
 }
-.conversations .copy-dialog-empty-icon, .conversations .move-dialog-empty-icon {
-    background-position: center -1187px;
+.shared-with-me .dialog-empty-icon {
+        background-position: center -2968px;
 }
-.rubbish-bin .copy-dialog-empty-icon, .rubbish-bin .move-dialog-empty-icon {
-    background-position: center -1352px;
+.rubbish-bin .dialog-empty-icon {
+    background-position: center -3118px;
 }
-.copy-dialog-empty-header, .move-dialog-empty-header {
-    font-size: 19px;
+.dialog-empty-header{
+    font-size: 18px;
     line-height: 24px;
-    color: #CCCCCC;
+    color: #777777;
     text-align: center;
-    padding: 0 12px;
+    padding: 10px 12px 0 12px;
 }
-.copy-dialog-empty-txt, .move-dialog-empty-txt {
+.dialog-empty-pad {
+    position:absolute;
+    top: 50%;
+    width: 100%;
+    margin-top: -82px;
+}
+.dialog-empty-txt {
     font-size: 13px;
     padding-top: 3px;
     line-height: 21px;
@@ -22177,7 +22184,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 .copy-dialog-txt.active, .move-dialog-txt.active {
     display: inline;
 }
-.copy-dialog-empty.active, .copy-dialog-tree-panel.active, .move-dialog-empty.active, .move-dialog-tree-panel.active, .share-dialog-tree-panel.active {
+.dialog-empty-block.active, .copy-dialog-tree-panel.active, .move-dialog-tree-panel.active, .share-dialog-tree-panel.active {
     display: block;
 }
 .overlayed .main-blur-block {
@@ -25874,7 +25881,7 @@ div.camera-bottom-txt {
     top: 50%;
 }
 .empty-icon {
-    background-image: url(../images/mega/empty-sprite_v2.png);
+    background-image: url(../images/mega/empty-sprite_v3.png);
     background-repeat: no-repeat;
     height: 185px;
 }

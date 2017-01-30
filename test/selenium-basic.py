@@ -277,7 +277,12 @@ class MegaTest(unittest.TestCase):
         else: self.fail("time out: 0013  Filelink")
         # 
         # Test: 0014  Folderlink
-        driver.get(self.base_url + "#F!9sUAGZ4R!moe6GANiPRawdt3ZUFLp4g")
+        driver.get(self.base_url + "#F!9sUAGZ4R")
+        driver.refresh()
+        self.waitfor_text(".fm-dialog.dlkey-dialog .fm-dialog-title", "Enter decryption key")
+        driver.find_element_by_css_selector(".fm-dialog.dlkey-dialog input").clear()
+        driver.find_element_by_css_selector(".fm-dialog.dlkey-dialog input").send_keys("moe6GANiPRawdt3ZUFLp4g")
+        driver.find_element_by_css_selector(".fm-dialog.dlkey-dialog .default-white-button").click()
         driver.refresh()
         self.waitfor_visibility(".nw-fm-tree-header.folder-link")
         self.assertEqual("111.importTest", driver.find_element_by_css_selector("div.nw-tree-panel-header span").text)

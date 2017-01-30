@@ -71,8 +71,8 @@ def deploy():
         with cd("logger"):
             run("git pull -u")
         version = run("cat current_ver.txt")
-        print("Latest version deployed: {}".format(version)) 
- 
+        print("Latest version deployed: {}".format(version))
+
 
 def _build_chat_bundle(target_dir):
     """
@@ -105,10 +105,10 @@ def dev(build_bundle=False, branch_name=''):
     # Get the current branch if not passed in
     if branch_name == '':
         branch_name = local('git rev-parse --abbrev-ref HEAD', capture=True)
-    
+
     # Get the remote path e.g. /var/www/xxx-branch-name
     remote_branch_path = os.path.join(env.target_dir, branch_name)
-    
+
     # Clone the repo into /var/www/xxx-branch-name
     # but not the full git history to save on storage space
     with cd(env.target_dir):
@@ -116,12 +116,12 @@ def dev(build_bundle=False, branch_name=''):
                      ' git@code.developers.mega.co.nz:web/webclient.git'
                      ' {} -b {}'.format(branch_name, branch_name),
                      warn_only=True)
-        
+
         # If successful
         if result.return_code == 0:
             # Show last commit from the branch
             with cd(remote_branch_path):
-                run('git log -1') 
+                run('git log -1')
 
             # Output beta server test link
             print('\nCloned branch {} to {}'
@@ -154,9 +154,9 @@ def dev(build_bundle=False, branch_name=''):
                      else 'devboot-beta')
 
         # Provide test link and version info.
-        print('Test link:\n    https://{host}/{branch_name}'
+        print('Test link:\n    https://{branch_name}.{host}'
                 '/dont-deploy/sandbox3.html?apipath=prod'
-                .format(host=host_name,
+                .format(host=host_name.replace("beta.", ""),
                         branch_name=branch_name,
                         boot_html=boot_html))
-        print("Latest version deployed:\n    {}".format(version)) 
+        print("Latest version deployed:\n    {}".format(version))

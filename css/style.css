@@ -5926,7 +5926,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 .transfer-table-header th:nth-child(8), .transfer-table td:nth-child(8), .dndc-sort .transfer-table td:nth-child(8) {
     display: none;
 }
-.fm-right-files-block td, .fm-right-files-block th, .fm-transfers-block td, .fm-transfers-block th, .account.tab-content td, .account.tab-content th {
+.fm-right-files-block td, .fm-right-files-block th, .fm-transfers-block td, .fm-transfers-block th, .account.tab-content td, .account.tab-content th, .grid-table-header th {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -6002,7 +6002,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     height: -moz-calc(100% - 211px);
     height: calc(100% - 211px);
 }
-.fm-right-files-block th::after, .account.tab-content th::after, .transfer-table-wrapper th::after {
+.fm-right-files-block th::after, .account.tab-content th::after, .transfer-table-wrapper th::after, .grid-table-header th::after {
     content: '';
     position: absolute;
     right: 0;
@@ -6021,7 +6021,7 @@ th.grid-first-th {
 .grid-table.contacts td:first-child, .contacts-view .grid-table-header th:first-child {
     padding: 0 10px 0 16px;
 }
-.fm-right-files-block th:last-child::after, .account.tab-content th:last-child::after, .transfer-table-wrapper th:last-child::after, .transfer-table-wrapper th:first-child::after {
+.fm-right-files-block th:last-child::after, .account.tab-content th:last-child::after, .transfer-table-wrapper th:last-child::after, .transfer-table-wrapper th:first-child::after, .grid-table-header th:last-child::after {
     display: none;
 }
 .arrow.desc.grid-header-star, .arrow.asc.grid-header-star, .grid-header-star {
@@ -6535,6 +6535,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     vertical-align: top;
     font-size: 13px;
     cursor: default;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
 .grid-table.shared-with-me td, .grid-table.contacts td, .contact-requests-grid td, .sent-requests-grid td {
     vertical-align: middle;

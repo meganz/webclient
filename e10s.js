@@ -14,7 +14,7 @@
 	const pathToHash = function(l) {
 		var path = String(l.hash || l.pathname).substr(1);
 
-		if (!path || !~path.indexOf('.')) {
+		if (!path || (!~path.indexOf('.') && path.substr(0,5) !== 'linux')) {
 			
 			return '#' + path + l.search;
 		}

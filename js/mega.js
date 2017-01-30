@@ -1515,8 +1515,8 @@ function MegaData()
                 viewmode = fmconfig.viewmodes[id];
             }
             else {
-                for (var i in M.v) {
-                    if (is_image(M.v[i])) {
+                for (var i = this.v.length; i--;) {
+                    if (is_image(this.v[i])) {
                         viewmode = 1;
                         break;
                     }

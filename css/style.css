@@ -7498,6 +7498,11 @@ table {
 .fm-right-header .link-button, .fm-transfers-header .link-button {
     margin-top: 8px;
     font-size: 14px;
+    -webkit-transition: opacity 200ms ease-in-out, color 200ms ease-in-out;
+    -moz-transition: opacity 200ms ease-in-out, color 200ms ease-in-out;
+    -o-transition: opacity 200ms ease-in-out, color 200ms ease-in-out;
+    -ms-transition: opacity 200ms ease-in-out, color 200ms ease-in-out;
+    transition: opacity 200ms ease-in-out, color 200ms ease-in-out;
 }
 .fm-right-header .link-button > .small-icon {
     margin-right: 6px;
@@ -8520,7 +8525,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     width: 45px;
 }
 .nw-fm-dialog-title, .fm-dialog-title {
-    font-size: 20px;
+    font-size: 16px;
     line-height: 20px;
     color: #999999;
     padding: 15px 33px 2px 33px;

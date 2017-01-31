@@ -583,11 +583,11 @@ var Help = (function() {
             });
 
             $('.support-link-icon').rebind('click', function() {
-                var parts = getSitePath.split(/\//);
+                var parts = getSitePath().split('/');
                 parts.pop();
                 parts.push($(this).parents('.support-article').attr('id'));
 
-                var link   = parts.join('/');
+                var link   = getBaseUrl() + parts.join('/');
                 var $input = $('.share-help').removeClass('hidden')
                     .find('input').val(link)
                     .focus().select();

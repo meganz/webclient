@@ -7580,7 +7580,7 @@ table {
     line-height: 20px;
     color: #666666;
     font-size: 14px;
-    cursor: pointer;
+    cursor: default;
     padding: 1px 0 0 10px;
     display: block;
     height: 24px;
@@ -7601,6 +7601,7 @@ table {
 }
 .fm-breadcrumbs.has-next-button .right-arrow-bg, .fm-share-breadcrumbs.has-next-button .right-arrow-bg {
     color: #999999;
+    cursor: pointer;
 }
 .deactivated .fm-breadcrumbs .right-arrow-bg, .deactivated .fm-share-breadcrumbs .right-arrow-bg {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);

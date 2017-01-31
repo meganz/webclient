@@ -106,11 +106,26 @@ var Help = (function() {
         $elements = $elements || $('.updateSelected.current');
         $elements.removeClass('current');
         $element.addClass('current');
-        $($element.data('update'))
+        var $link = $($element.data('update'))
             .parent().
                 find('.active').removeClass('active').end()
             .end()
             .addClass('active');
+
+        delay('help2:selectMenuItem', function() {
+            var newpage = getCleanSitePath($link.data('state'));
+            if (newpage !== page && page.substr(0, 4) === 'help') {
+                page = newpage;
+
+                try {
+                    history.pushState({subpage: newpage}, "", "/" + newpage);
+                }
+                catch (ex) {
+                    skipHashChange = true;
+                    location.hash = '#' + newpage;
+                }
+            }
+        }, 1350);
     }
 
 

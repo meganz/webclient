@@ -22089,6 +22089,11 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     position: relative;
     display: none;
 }
+.dialog-empty-block.dialog-fm {
+    background-color: #FAFAFA;
+    height:312px;
+    display: block;
+}
 .move-dialog-button {
     width: 158px;
 }

@@ -286,17 +286,32 @@ var BrowserEntries = React.createClass({
                 </tr>
             )
         });
-        return <utils.JScrollPane className="fm-dialog-grid-scroll"
-                                  selected={this.state.selected}
-                                  highlighted={this.state.highlighted}
-                                  entries={this.props.entries}
-                        >
-            <table className="grid-table fm-dialog-table">
-                <tbody>
-                {items}
-                </tbody>
-            </table>
-        </utils.JScrollPane>;
+        if (items.length > 0) {
+            return (
+                <utils.JScrollPane className="fm-dialog-grid-scroll"
+                                          selected={this.state.selected}
+                                          highlighted={this.state.highlighted}
+                                          entries={this.props.entries}
+                                >
+                    <table className="grid-table fm-dialog-table">
+                        <tbody>
+                        {items}
+                        </tbody>
+                    </table>
+                </utils.JScrollPane>
+            );
+        } else {
+            return (
+                <div className="dialog-empty-block dialog-fm folder">
+                    <div className="dialog-empty-pad">
+                        <div className="dialog-empty-icon"></div>
+                        <div className="dialog-empty-header">
+                            {__(l[782])}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
     }
 });
 var CloudBrowserDialog = React.createClass({

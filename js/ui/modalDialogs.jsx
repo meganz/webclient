@@ -176,6 +176,7 @@ var BrowserEntries = React.createClass({
     },
     getInitialState: function() {
         return {
+            'highlighted': [],
             'selected': []
         }
     },
@@ -183,14 +184,15 @@ var BrowserEntries = React.createClass({
         e.stopPropagation();
         e.preventDefault();
 
-        this.setState({'selected': [node.h]});
+        this.setState({'highlighted': [node.h]});
+        // If folder selected
         if (this.props.folderSelectNotAllowed === true && node.t === 1) {
-            // halt on folder selection
-
-            return;
+            this.setState({'selected': []});
+            this.props.onSelected([]);
+        } else {
+            this.setState({'selected': [node.h]});
+            this.props.onSelected([node.h]);
         }
-        this.setState({'selected': [node.h]});
-        this.props.onSelected([node.h]);
     },
     onEntryDoubleClick: function(e, node) {
         var self = this;
@@ -200,7 +202,7 @@ var BrowserEntries = React.createClass({
 
         if (node.t === 1) {
             // expand folder
-            self.setState({'selected': []});
+            self.setState({'selected': [], 'highlighted': []});
             self.props.onSelected([]);
             self.props.onExpand(node);
             self.forceUpdate();
@@ -228,7 +230,7 @@ var BrowserEntries = React.createClass({
             }
 
             var isFolder = node.t === 1;
-            var isSelected = self.state.selected.indexOf(node.h) !== -1;
+            var isHighlighted = self.state.highlighted.indexOf(node.h) !== -1;
 
             var tooltipElement = null;
 
@@ -264,7 +266,7 @@ var BrowserEntries = React.createClass({
 
             items.push(
                 <tr
-                    className={(isFolder ? " folder" :"") + (isSelected ? " ui-selected" : "")}
+                    className={(isFolder ? " folder" :"") + (isHighlighted ? " ui-selected" : "")}
                     onClick={(e) => {
                         self.onEntryClick(e, node);
                     }}
@@ -286,6 +288,7 @@ var BrowserEntries = React.createClass({
         });
         return <utils.JScrollPane className="fm-dialog-grid-scroll"
                                   selected={this.state.selected}
+                                  highlighted={this.state.highlighted}
                                   entries={this.props.entries}
                         >
             <table className="grid-table fm-dialog-table">
@@ -311,6 +314,7 @@ var CloudBrowserDialog = React.createClass({
                 'name', 'asc'
             ],
             'selected': [],
+            'highlighted': [],
             'currentlyViewedEntry': M.RootID
         }
     },
@@ -430,9 +434,10 @@ var CloudBrowserDialog = React.createClass({
             })(p);
         } while (p = M.d[M.d[p.h].p]);
 
+
         return (
             <ModalDialog
-                title={__("Add from your Cloud Drive")}
+                title={__(l[8011])}
                 className={classes}
                 onClose={() => {
                     self.props.onClose(self);
@@ -464,8 +469,10 @@ var CloudBrowserDialog = React.createClass({
                         },
             ]}>
                 <div className="fm-breadcrumbs-block">
-                    {breadcrumb}
-                    <div className="clear"></div>
+                    <div className="breadcrumbs-wrapper">
+                        {breadcrumb}
+                        <div className="clear"></div>
+                    </div>
                 </div>
 
                 <table className="grid-table-header fm-dialog-table">

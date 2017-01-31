@@ -9808,8 +9808,8 @@ React.makeElement = React['createElement'];
 	                    }
 	                    buttons.push(React.makeElement(
 	                        'div',
-	                        { className: classes, key: k, onClick: function onClick() {
-	                                button.callback();
+	                        { className: classes, key: k, onClick: function onClick(e) {
+	                                button.callback.call(e.target);
 	                            } },
 	                        icon,
 	                        button.text

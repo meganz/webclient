@@ -811,15 +811,14 @@ var Help = (function() {
             var $this = $(this);
             e.preventDefault();
 
-            if (!$this.is('.disabled')) {
-                var url = $this.data('href');
+            if (!$this.is('.disabled') && $this.data('href')) {
+                var url = getCleanSitePath($this.data('href').replace('https://mega.nz', ''));
                 if (url === 'support' && !u_type) {
                     login_next = url;
                     url = "login";
                 }
                 // Log that they clicked on the panel
                 api_req({ a: 'log', e: 99621, m: 'Help2 client selection panel used' });
-                url = url.replace('#','');
                 loadSubPage(url);
             }
         });

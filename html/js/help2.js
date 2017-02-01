@@ -106,11 +106,26 @@ var Help = (function() {
         $elements = $elements || $('.updateSelected.current');
         $elements.removeClass('current');
         $element.addClass('current');
-        $($element.data('update'))
+        var $link = $($element.data('update'))
             .parent().
                 find('.active').removeClass('active').end()
             .end()
             .addClass('active');
+
+        delay('help2:selectMenuItem', function() {
+            var newpage = getCleanSitePath($link.data('state'));
+            if (newpage !== page && page.substr(0, 4) === 'help') {
+                page = newpage;
+
+                try {
+                    history.pushState({subpage: newpage}, "", "/" + newpage);
+                }
+                catch (ex) {
+                    skipHashChange = true;
+                    location.hash = '#' + newpage;
+                }
+            }
+        }, 1350);
     }
 
 
@@ -583,11 +598,11 @@ var Help = (function() {
             });
 
             $('.support-link-icon').rebind('click', function() {
-                var parts = getSitePath.split(/\//);
+                var parts = getSitePath().split('/');
                 parts.pop();
                 parts.push($(this).parents('.support-article').attr('id'));
 
-                var link   = parts.join('/');
+                var link   = getBaseUrl() + parts.join('/');
                 var $input = $('.share-help').removeClass('hidden')
                     .find('input').val(link)
                     .focus().select();
@@ -811,15 +826,14 @@ var Help = (function() {
             var $this = $(this);
             e.preventDefault();
 
-            if (!$this.is('.disabled')) {
-                var url = $this.data('href');
+            if (!$this.is('.disabled') && $this.data('href')) {
+                var url = getCleanSitePath($this.data('href').replace('https://mega.nz', ''));
                 if (url === 'support' && !u_type) {
                     login_next = url;
                     url = "login";
                 }
                 // Log that they clicked on the panel
                 api_req({ a: 'log', e: 99621, m: 'Help2 client selection panel used' });
-                url = url.replace('#','');
                 loadSubPage(url);
             }
         });

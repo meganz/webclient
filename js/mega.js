@@ -9579,7 +9579,7 @@ var mobileDownload = {
         var fileSize = numOfBytes(fileSizeBytes);
         var fileSizeFormatted = fileSize.size + ' ' + fileSize.unit;
         var fileIconName = fileIcon(node);
-        var fileIconPath = 'images/mobile/extensions/' + fileIconName + '.png';
+        var fileIconPath = staticpath + 'images/mobile/extensions/' + fileIconName + '.png';
 
         // Set file name, size and image
         this.$overlay.find('.filename').text(fileName);

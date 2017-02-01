@@ -6515,6 +6515,10 @@
         "text": "Enter an e-mail or contact",
         "context": ""
     },
+    "5913": {
+        "text": "You can easily add new contacts by email or import existing contacts from other services.",
+        "context": ""
+    },
     "5914": {
         "text": "My conversations",
         "context": ""
@@ -15355,10 +15359,6 @@
         "text": "Date created",
         "context": "A table column header for the date when a file was created."
     },
-    "16170": {
-        "text": "There is an unknown error in the download path. Please try again and if continues failing contact support@mega.nz. [{0}]",
-        "context": "A dialog message which is displayed when the process\/request to download a file\/folder failed because of an unknown error in the download path.\r\nPlease preserve the [{0}] code because is for including the error code or the error message at runtime."
-    },
     "16171": {
         "text": "There is an unknown error in the download path. Please try again and if it continues to fail, please contact support@mega.nz. [{0}]",
         "context": "A dialog message which is displayed when the process\/request to download a file\/folder failed because of an unknown error in the download path.\r\nPlease preserve the [{0}] code because is for including the error code or the error message at runtime."
@@ -15622,5 +15622,37 @@
     "16259": {
         "text": "Auto-away",
         "context": "A header in the Chat settings. This changes the user's status to Away after some time of inactivity."
+    },
+    "16262": {
+        "text": "Set my status to Away after %1 minutes of inactivity.",
+        "context": "This setting allows the user to change their Chat presence status automatically. Please leave the %1 in the translation as this will be replaced with a text box where the user can set the number of minutes."
+    },
+    "16263": {
+        "text": "MEGAcmd provides GUI-less access to the MEGA cloud. It supports all operations on your MEGA account through a set of powerful commands.\r\n                ",
+        "context": "A description of new MEGAcmd app. GUI-less means only terminal access (no Graphical User Interface)."
+    },
+    "16264": {
+        "text": "Interactive",
+        "context": "A title on the MEGAcmd page explaining the advantage of the MEGAcmd app where users can use MEGA by typing on a command line terminal."
+    },
+    "16265": {
+        "text": "A versatile command shell.",
+        "context": "A description on the MEGAcmd page explaining the advantage of the MEGAcmd app where users can use MEGA by typing on a command line terminal."
+    },
+    "16266": {
+        "text": "Scriptable",
+        "context": "A title on the MEGAcmd page explaining the advantage of the MEGAcmd app where users can use MEGA by typing on a command line terminal."
+    },
+    "16267": {
+        "text": "Execute commands from a shell, script or another program.",
+        "context": "A description on the MEGAcmd page explaining the advantage of the MEGAcmd app where users can use MEGA by typing on a command line terminal, using a script or other program."
+    },
+    "16268": {
+        "text": "Import contacts...",
+        "context": "A button label which allows user to import contacts from the Gmail service."
+    },
+    "16269": {
+        "text": "Use the New Folder button to create a new folder.",
+        "context": "This message is shown on the Copy and Move dialogs when there are no folders available."
     }
 }

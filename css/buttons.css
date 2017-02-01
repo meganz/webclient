@@ -197,16 +197,6 @@
     -webkit-border-radius: 4px;
     border-radius: 4px;
 }
-.default-grey-button:after {
-    -webkit-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.45);
-    -moz-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.45);
-    box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.45);
-}
-.default-grey-button:not(.disabled):hover {
-    -webkit-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.15);
-    -moz-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.15);
-    box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.15);
-}
 .default-white-button.small-text {
     font-size: 13px;
 }
@@ -216,6 +206,16 @@
     box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
 }
 .default-white-button:not(.tiny-button):not(.disabled):hover {
+    -webkit-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.15);
+    -moz-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.15);
+    box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.15);
+}
+.default-grey-button:after {
+    -webkit-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.45);
+    -moz-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.45);
+    box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.45);
+}
+.default-grey-button:not(.disabled):hover {
     -webkit-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.15);
     -moz-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.15);
     box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.15);

@@ -1,16 +1,55 @@
-.fm-dialog-footer {
-    height: 56px;
-    background-color: #F6F6F6;
+.fm-dialog-footer, .fm-move-bottom-block, .fm-share-bottom-block, .fm-notifications-bottom, .top-login-bott-gray-block, .fm-mega-dialog-bottom, .create-folder-bottom, .default-dialog-bottom {
+    height: 57px;
+    background-color: white;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    -webkit-border-bottom-left-radius: 7px;
-    -moz-border-radius-bottomleft: 7px;
-    border-bottom-left-radius: 7px;
-    -webkit-border-bottom-right-radius: 7px;
-    -moz-border-radius-bottomright: 7px;
-    border-bottom-right-radius: 7px;
+    -webkit-border-bottom-left-radius: 8px;
+    -moz-border-radius-bottomleft: 8px;
+    border-bottom-left-radius: 8px;
+    -webkit-border-bottom-right-radius: 8px;
+    -moz-border-radius-bottomright: 8px;
+    border-bottom-right-radius: 8px;
     padding: 12px 12px 0 12px;
+    border-top: 1px solid rgba(0,0,0,0.1);
+    position: relative;
+}
+.top-login-bott-gray-block {
+    margin: 0 -15px 0 -15px;
+    padding: 5px 15px 0 15px;
+}
+.fm-move-bottom-block, .fm-share-bottom-block, .fm-notifications-bottom {
+    padding: 0 12px 0 12px;
+}
+.fm-mega-dialog-bottom, .create-folder-bottom, .default-dialog-bottom {
+    margin: 12px -12px -12px -12px;
+    padding: 0 12px 0 0;
+}
+.credentials-warning-dialog .fm-mega-dialog-bottom {
+    margin: 0;
+}
+.key-signature-warning-dialog .fm-mega-dialog-bottom {
+    margin: 12px 0 -12px;
+}
+.notification-popup .fm-notifications-bottom {
+    height: 34px;
+}
+.browsers-dialog .fm-notifications-bottom {
+    padding: 0 20px 0 14px;
+}
+.share-dialog .fm-notifications-bottom {
+    position: static;
+}
+.languages-dialog .fm-notifications-bottom {
+    bottom: 0;
+    left: 0;
+    position: absolute;
+    right: 0;
+}
+.fm-dialog-footer-txt {
+    text-align: center;
+    line-height: 31px;
+    color: #999;
 }
 /* Send Contact Dialog */
 .fm-dialog.send-contact {
@@ -51,10 +90,6 @@
 .contacts-search .user-card-name span {
     margin-top: -4px;
     color: #666666;
-}
-.contacts-search-footer {
-    height: 46px;
-    display: block;
 }
 .contacts-search-footer em {
     display: block;

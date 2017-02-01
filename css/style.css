@@ -385,12 +385,6 @@ a.nlanguage-lnk.language-template {
 .languages-dialog .show-more-languages:hover .round-arrow span {
     opacity: 1;
 }
-.languages-dialog .fm-notifications-bottom {
-    bottom: 0;
-    left: 0;
-    position: absolute;
-    right: 0;
-}
 .languages-dialog .nlanguage-lnk .beta {
     border: 1px solid rgba(192, 199, 203, 0.3);
     border-radius: 7px;
@@ -8034,19 +8028,6 @@ table {
     margin: 34px 12px 12px 12px;
     position: relative;
 }
-.create-folder-bottom, .default-dialog-bottom {
-    height: 56px;
-    background-color: #F6F6F6;
-    margin: 12px -12px -12px -12px;
-    display: none;
-    -webkit-border-bottom-left-radius: 8px;
-    -moz-border-radius-bottomleft: 8px;
-    border-bottom-left-radius: 8px;
-    -webkit-border-bottom-right-radius: 8px;
-    -moz-border-radius-bottomright: 8px;
-    border-bottom-right-radius: 8px;
-    padding-right: 12px;
-}
 .create-folder-bottom .default-white-button, .create-folder-bottom .default-grey-button, .default-dialog-bottom .default-white-button, .default-dialog-bottom .default-grey-button {
     margin-top: 12px;
     min-width: 20px;
@@ -9084,14 +9065,17 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     overflow: visible;
 }
 .notification-header {
-    height: 32px;
+    height: 34px;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     text-align: center;
+    position: relative;
+    z-index: 1;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
 }
 .notification-txt {
-    line-height: 31px;
+    line-height: 32px;
     font-size: 13px;
     float: left;
     color: #BF1900;
@@ -9102,7 +9086,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     display: inline-block;
     padding: 0 0 0 26px;
     background-image: url(../images/mega/top-sprite_v2.png);
-    background-position: -8px -511px;
+    background-position: -8px -510px;
     background-repeat: no-repeat;
     float: none;
 }
@@ -9368,30 +9352,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .fm-move-dialog-list {
     padding: 15px 0
 }
-.fm-move-bottom-block, .fm-share-bottom-block, .fm-notifications-bottom {
-    background-color: #F6F6F6;
-    height: 56px;
-    -webkit-border-bottom-left-radius: 8px;
-    -moz-border-radius-bottomleft: 8px;
-    border-bottom-left-radius: 8px;
-    -webkit-border-bottom-right-radius: 8px;
-    -moz-border-radius-bottomright: 8px;
-    border-bottom-right-radius: 8px;
-    position: relative;
-    padding: 0 12px;
-}
 .fm-notifications-bottom .default-white-button {
     margin-top: 12px;
-}
-.notification-popup .fm-notifications-bottom {
-    height: 32px;
-    background-color: white;
-}
-.browsers-dialog .fm-notifications-bottom {
-    padding: 0 20px 0 14px;
-}
-.share-dialog .fm-notifications-bottom {
-    position: static;
 }
 .fm-dialog-button.dialog-newfolder-button {
     float: left;
@@ -9796,7 +9758,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     height: 60px;
     width: 60px;
     float: left;
-    margin: 26px 19px 0 19px;
+    margin: 19px 19px 15px 19px;
     background-repeat: no-repeat;
     background-image: url(../images/mega/files-icons_v2.svg);
     background-position: 0 0;
@@ -9813,6 +9775,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     color: #666666;
     vertical-align: top;
     padding-bottom: 5px;
+    margin-top: -3px;
 }
 .export-item-title {
     display: table-cell;
@@ -13055,25 +13018,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     padding: 3px 0 13px 0;
     margin: 0 0 0 0;
 }
-.top-login-bott-gray-block {
-    background-color: #F6F6F6;
-    margin: 0 -15px 0 -15px;
-    padding: 5px 15px 0 15px;
-    -webkit-border-bottom-left-radius: 6px;
-    -moz-border-radius-bottomleft: 6px;
-    border-bottom-left-radius: 6px;
-    height: 56px;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-}
 .top-login-bott-gray-block .default-white-button {
     margin-top: 7px;
-}
-.pro-login-dialog .top-login-bott-gray-block {
-    -webkit-border-bottom-right-radius: 8px;
-    -moz-border-radius-bottomright: 8px;
-    border-bottom-right-radius: 8px;
 }
 .pro-login-dialog .login-notification-icon {
     display: none;
@@ -22265,19 +22211,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 .fm-mega-dialog.dialog .fm-dialog-close, .fm-mega-dialog.dialog .nw-fm-dialog-title {
     display: block;
 }
-.fm-mega-dialog-bottom {
-    height: 56px;
-    background-color: #F6F6F6;
-    margin: 12px -12px -12px -12px;
-    display: block;
-    -webkit-border-bottom-left-radius: 7px;
-    -moz-border-radius-bottomleft: 7px;
-    border-bottom-left-radius: 7px;
-    -webkit-border-bottom-right-radius: 7px;
-    -moz-border-radius-bottomright: 7px;
-    border-bottom-right-radius: 7px;
-    padding-right: 12px;
-}
 /**
   * PRO upgrade, new flow styling for the login/register popups and buttons
   */
@@ -22706,10 +22639,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 .credentials-warning-dialog .fm-mega-dialog-pad {
     margin: 12px 0 0 0;
 }
-.credentials-warning-dialog .fm-mega-dialog-bottom {
-    background-color: #eee;
-    margin: 0;
-}
 .credentials-warning-dialog {
     background-color: #fff;
     width: 600px;
@@ -22852,9 +22781,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 }
 .key-signature-warning-dialog .fm-mega-dialog-pad {
     margin: 12px 0;
-}
-.key-signature-warning-dialog .fm-mega-dialog-bottom {
-    margin: 12px 0 -12px;
 }
 .key-signature-warning-dialog {
     background-color: #fff;

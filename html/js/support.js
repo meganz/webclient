@@ -23,7 +23,7 @@ var support = (function() {
     function submit() {
         var opts = {
             a: 'sse', // send support email
-            m: $.trim($textarea.val() + extraData), // message
+            m: $.trim($textarea.val()), // message
             t: $subject.find('.active').data('value') // type
         };
         if (opts.m.replace(/\s+/g, '').length <= minLetters) {
@@ -34,6 +34,9 @@ var support = (function() {
                     $textarea.focus();
                 });
             return false;
+        }
+        if (extraData) {
+            opts.m += "\n\n" + $.trim(extraData);
         }
 
         $button.hide();

@@ -4192,21 +4192,13 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .inbound-share {
     background-position: -15px -7106px;
 }
-.nw-fm-tree-item:hover > .nw-fm-tree-folder.inbound-share,
-.nw-fm-tree-item.selected > .nw-fm-tree-folder.inbound-share,
-.nw-fm-tree-item.dragover > .nw-fm-tree-folder.inbound-share {
+.nw-fm-tree-item:hover > .nw-fm-tree-folder.inbound-share, .nw-fm-tree-item.selected > .nw-fm-tree-folder.inbound-share, .nw-fm-tree-item.dragover > .nw-fm-tree-folder.inbound-share {
     background-position: -15px -7166px;
 }
-.nw-fm-tree-item.expanded > .nw-fm-tree-folder.inbound-share,
-.nw-fm-tree-item.opened > .nw-fm-tree-folder.inbound-share {
+.nw-fm-tree-item.expanded > .nw-fm-tree-folder.inbound-share, .nw-fm-tree-item.opened > .nw-fm-tree-folder.inbound-share {
     background-position: -15px -7136px;
 }
-.nw-fm-tree-item.expanded:hover > .nw-fm-tree-folder.inbound-share,
-.nw-fm-tree-item.opened:hover > .nw-fm-tree-folder.inbound-share,
-.nw-fm-tree-item.selected.expanded > .nw-fm-tree-folder.inbound-share,
-.nw-fm-tree-item.selected.opened > .nw-fm-tree-folder.inbound-share,
-.nw-fm-tree-item.expanded.dragover > .nw-fm-tree-folder.inbound-share,
-.nw-fm-tree-item.opened.dragover > .nw-fm-tree-folder.inbound-share {
+.nw-fm-tree-item.expanded:hover > .nw-fm-tree-folder.inbound-share, .nw-fm-tree-item.opened:hover > .nw-fm-tree-folder.inbound-share, .nw-fm-tree-item.selected.expanded > .nw-fm-tree-folder.inbound-share, .nw-fm-tree-item.selected.opened > .nw-fm-tree-folder.inbound-share, .nw-fm-tree-item.expanded.dragover > .nw-fm-tree-folder.inbound-share, .nw-fm-tree-item.opened.dragover > .nw-fm-tree-folder.inbound-share {
     background-position: -15px -7196px;
 }
 .nw-contact-item, .add-contact-item {
@@ -7590,7 +7582,7 @@ table {
     vertical-align: top;
 }
 .fm-breadcrumbs:not(:first-child) .right-arrow-bg.invisible {
-    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -moz-opacity: 0;
     -khtml-opacity: 0;
     opacity: 0;
@@ -11379,7 +11371,7 @@ table {
     float: left;
     height: 18px;
     background-color: #13E03C;
-    border:1px solid transparent;
+    border: 1px solid transparent;
     color: white;
     font-size: 12px;
     text-transform: uppercase;
@@ -20401,8 +20393,10 @@ span.incoming-call-name {
     margin-left: 138px;
 }
 .shared-details-pad {
-    float: left;
     padding-top: 28px;
+    overflow: hidden;
+    min-width: 630px;
+    position: relative;
 }
 .shared-details-folder-name, .contact-details-user-name {
     font-size: 25px;
@@ -20420,6 +20414,11 @@ span.incoming-call-name {
     max-width: -webkit-calc(100% - 56px);
     max-width: -moz-calc(100% - 56px);
     max-width: calc(100% - 56px);
+}
+.shared-details-folder-name {
+    max-width: -webkit-calc(100% - 216px);
+    max-width: -moz-calc(100% - 216px);
+    max-width: calc(100% - 216px);
 }
 .fm-dialog .shared-details-folder-name, .fm-dialog .contact-details-user-name {
     max-width: 100%;
@@ -20447,6 +20446,7 @@ span.incoming-call-name {
     background-color: white;
     margin-top: -1px;
     position: relative;
+    max-width: 710px;
 }
 .contact-top-details .nw-contact-block-avatar {
     float: left;
@@ -20558,7 +20558,7 @@ span.incoming-call-name {
     padding-right: 0;
 }
 .contact-details-pad {
-    margin: 0 255px 0 205px;
+    margin: 0 255px 10px 205px;
     padding-top: 44px;
     vertical-align: top;
     position: relative;
@@ -20569,6 +20569,7 @@ span.incoming-call-name {
 }
 .contact-details-pad .onlinestatus {
     height: 16px;
+    margin-bottom: 20px;
 }
 .contact-details-email {
     font-size: 13px;
@@ -20578,13 +20579,17 @@ span.incoming-call-name {
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
+        white-space: nowrap;
+    overflow: hidden;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
 }
 .contact-details-pad .nw-contact-status {
     margin: 6px 6px 0 0;
 }
-.contact-details-pad .fm-remove-contact, .contact-details-pad .fm-start-conversation, .contact-details-pad .fm-send-files, .contact-details-pad .fm-share-folders {
+.contact-details-pad .default-white-button {
     float: left;
-    margin: 20px 0 0 0;
+    margin: 0 0 10px 0;
 }
 .fm-question {
     display: none;
@@ -20636,9 +20641,23 @@ span.incoming-call-name {
 }
 .shared-details-buttons {
     right: 0;
+    top: 0;
     position: absolute;
-    margin: 75px 18px 0 0;
+    margin: 75px 0 0 0;
+    padding: 0 18px 0 0;
     background-color: white;
+}
+.shared-details-buttons::before {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 100%;
+    left: -20px;
+    top: 0;
+    background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIwIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmZmZmZmYiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+    background: -moz-linear-gradient(left, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%);
+    background: -webkit-linear-gradient(left, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%);
+    background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%);
 }
 .shared-details-buttons .default-white-button {
     min-width: 20px;
@@ -20647,6 +20666,10 @@ span.incoming-call-name {
     height: -webkit-calc(100% - 121px);
     height: -moz-calc(100% - 121px);
     height: calc(100% - 121px);
+}
+.shared-details-pad .fm-chat-user-info {
+    float: none;
+    margin: 7px 0 0 48px;
 }
 .fm-blocks-view.shared-folder-content {
     padding: 12px;
@@ -22043,7 +22066,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     background-color: #FAFAFA;
 }
 .dialog-empty-block.dialog-fm {
-    height:312px;
+    height: 312px;
     display: block;
 }
 .move-dialog-button {
@@ -22062,12 +22085,12 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     background-position: center -2818px;
 }
 .shared-with-me .dialog-empty-icon {
-        background-position: center -2968px;
+    background-position: center -2968px;
 }
 .rubbish-bin .dialog-empty-icon {
     background-position: center -3118px;
 }
-.dialog-empty-header{
+.dialog-empty-header {
     font-size: 18px;
     line-height: 24px;
     color: #777777;
@@ -22075,7 +22098,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     padding: 10px 12px 0 12px;
 }
 .dialog-empty-pad {
-    position:absolute;
+    position: absolute;
     top: 50%;
     width: 100%;
     margin-top: -82px;

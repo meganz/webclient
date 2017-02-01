@@ -7544,9 +7544,8 @@ function reCalcMenuPosition(m, x, y, ico) {
         return;
     };
 
-    // submenus are absolutely positioned, which means that they are relative to first parent, positioned other then static
-    // first parent, which is NOT a .contains-submenu element (it's previous in same level)
-    var horPos = function(n) {// used for submenues
+    // // used for submenues, submenues are relatively positioned to first parent
+    var horPos = function(n) {
         var top;
         var nTop = parseInt(n.css('padding-top'));
         var tB = parseInt(n.css('border-top-width'));
@@ -7584,27 +7583,14 @@ function reCalcMenuPosition(m, x, y, ico) {
             cor = 3;
         }
 
-        // context menu bottom coordinate
-        var cmBot = dPos.y + cmH + TOP_MARGIN;
-        var overTop = 0;
-
-        // comming out of the window bottom, try to draw on top of clicked element
-        if (cmBot > maxY) {
-            dPos.y = y - ico.y - 6;// additional pixels to align with -icon
-            cor++;
-
-            var cmTop = dPos.y - cmH;
-
-            // comming out of the window top
-            if (cmTop < minY) {
-                // var tmp = $('.files-menu.context');
-                m.addClass('context-scrolling-block');
-                m.get(0).addEventListener('mousemove', scrollMegaSubMenu);
-
-                m.addClass('mega-height');
-                m.css({'height': wH - 2*TOP_MARGIN + 'px'});
+        // draw to the top
+		if (hMax > maxY) {
+			dPos.y = y - cmH - 6;
+            if (dPos.y < TOP_MARGIN) {
+                dPos.y = TOP_MARGIN;
             }
-        }
+			cor++;
+		}
     }
     else if (ico === 'submenu') {// submenues
         var n = m.next('.dropdown.body.submenu');
@@ -7664,6 +7650,7 @@ function reCalcMenuPosition(m, x, y, ico) {
         if (wMax > maxX) {
             dPos.x = maxX - cmW;// align with right side
         }
+
         if (hMax > maxY) {
             dPos.y = maxY - cmH;// align with bottom
         }
@@ -7715,30 +7702,25 @@ function setBordersRadius(m, c)
 }
 
 // Scroll menus which height is bigger then window.height
-function scrollMegaSubMenu(e)
-{
+function scrollMegaSubMenu(e) {
     var ey = e.pageY;
     var c = $(e.target).closest('.dropdown.body.submenu');
     var pNode = c.children(':first')[0];
 
-    if (typeof pNode !== 'undefined')
-    {
+    if (typeof pNode !== 'undefined') {
         var h = pNode.offsetHeight;
         var dy = h * 0.1;// 10% dead zone at the begining and at the bottom
         var pos = getHtmlElemPos(pNode, true);
         var py = (ey - pos.y - dy) / (h - dy * 2);
-        if (py > 1)
-        {
+        if (py > 1) {
             py = 1;
             c.children('.context-bottom-arrow').addClass('disabled');
         }
-        else if (py < 0)
-        {
+        else if (py < 0) {
             py = 0;
             c.children('.context-top-arrow').addClass('disabled');
         }
-        else
-        {
+        else {
             c.children('.context-bottom-arrow,.context-top-arrow').removeClass('disabled');
         }
         pNode.scrollTop = py * (pNode.scrollHeight - h);

@@ -494,7 +494,8 @@ var CloudBrowserDialog = React.createClass({
                         {
                             "label": self.props.selectLabel,
                             "key": "select",
-                            "className": "default-grey-button " + (self.state.selected.length === 0 ? "disabled" : null),
+                            "className": "default-grey-button "
+                                + (self.state.selected.length === 0 ? "disabled" : null),
                             "onClick": function(e) {
                                 if (self.state.selected.length > 0) {
                                     self.props.onSelected(self.state.selected);

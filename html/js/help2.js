@@ -103,6 +103,17 @@ var Help = (function() {
         if (isScrolling) {
             return;
         }
+        if ($element[0] && $element[0].id) {
+            var parts = getUrlParts();
+            // the url normally includes, 'help', 'client', 'webclient', and 'section'/'question'
+            // set the first one as selected by default if it only has 'help', 'client', 'webclient'.
+            if (parts.length > 3) {
+                parts.pop();
+            }
+            parts.push($element[0].id);
+            var url = parts.join('/');
+            window.history.pushState("", "", '/'+url);
+        }
         $elements = $elements || $('.updateSelected.current');
         $elements.removeClass('current');
         $element.addClass('current');
@@ -552,7 +563,7 @@ var Help = (function() {
 
             args.shift();
             var question = "";
-            if (args.length === 3) {
+            if (args.length === 3 || args.length === 2) {
                 question = args.pop();
             } else if (args.length !== 1) {
                 loadSubPage('help');

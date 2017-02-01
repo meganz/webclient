@@ -482,7 +482,7 @@ var CloudBrowserDialog = React.createClass({
                             }
                         },
             ]}>
-                <div className="fm-breadcrumbs-block">
+                <div className="fm-breadcrumbs-block add-from-cloud">
                     <div className="breadcrumbs-wrapper">
                         {breadcrumb}
                         <div className="clear"></div>

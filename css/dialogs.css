@@ -111,6 +111,10 @@
     height: 46px;
     margin: 0 0 11px 0;
     padding: 22px 0 0 2px;
+    overflow: hidden;
+}
+.fm-dialog .breadcrumbs-wrapper {
+    position:absolute;
 }
 .fm-dialog-table.grid-table tr:nth-child(odd) td {
     background-color: rgba(255,255,255,1);

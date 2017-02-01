@@ -7513,6 +7513,7 @@ function adjustContextMenuPosition(e, m)
 * @param y {Number} Coordinate y of cursor or clicked element
 * @param ico {Object} JSON format {x, y}, width and height of clicked element
 */
+/* jshint -W074 */
 function reCalcMenuPosition(m, x, y, ico) {
 
     var TOP_MARGIN = 12;
@@ -7523,7 +7524,9 @@ function reCalcMenuPosition(m, x, y, ico) {
     var wW = window.innerWidth;
     var maxX = wW - SIDE_MARGIN;// max horizontal coordinate, right side of window
     var maxY = wH - TOP_MARGIN;// max vertical coordinate, bottom side of window
-    var minX = SIDE_MARGIN + $('div.nw-fm-left-icons-panel').outerWidth();// min horizontal coordinate, left side of right panel
+
+    // min horizontal coordinate, left side of right panel
+    var minX = SIDE_MARGIN + $('div.nw-fm-left-icons-panel').outerWidth();
     var minY = TOP_MARGIN;// min vertical coordinate, top side of window
     var wMax = x + cmW;// coordinate of context menu right edge
     var hMax = y + cmH;// coordinate of context menu bottom edge
@@ -7584,13 +7587,13 @@ function reCalcMenuPosition(m, x, y, ico) {
         }
 
         // draw to the top
-		if (hMax > maxY) {
-			dPos.y = y - cmH - 6;
+        if (hMax > maxY) {
+            dPos.y = y - cmH - 6;
             if (dPos.y < TOP_MARGIN) {
                 dPos.y = TOP_MARGIN;
             }
-			cor++;
-		}
+            cor++;
+        }
     }
     else if (ico === 'submenu') {// submenues
         var n = m.next('.dropdown.body.submenu');
@@ -7660,6 +7663,7 @@ function reCalcMenuPosition(m, x, y, ico) {
 
     return {'x': dPos.x, 'y': dPos.y};
 }
+/* jshint -W074 */
 
 // corner position 0 means default
 function setBordersRadius(m, c)

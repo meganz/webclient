@@ -1,7 +1,7 @@
 .tiny-icon, .semi-small-icon, .small-icon, .medium-icon, .semi-big-icon, .big-icon, .huge-icon {
     width: 20px;
     height: 20px;
-    background-image: url(../images/mega/new-chat-sprite-v3.svg);
+    background-image: url(../images/mega/new-chat-sprite-v4.svg);
     background-repeat: no-repeat;
     background-position: -2px -1446px;
     display: inline-block;
@@ -12,7 +12,7 @@
     height: 184px;
     margin: 21px auto;
     display: block;
-    background-image: url(../images/mega/new-chat-sprite-v3.svg);
+    background-image: url(../images/mega/new-chat-sprite-v4.svg);
     background-repeat: no-repeat;
     background-position: center -1838px;
 }
@@ -122,7 +122,10 @@
     background-position: -3px -462px;
 }
 .small-icon.writing-pen {
-    background-position: -3px -347px;
+    background-position: -53px -347px;
+}
+.small-icon.clear-arrow {
+    background-position: -83px -1400px;
 }
 .small-icon.quotes {
     background-position: -3px -389px;
@@ -263,6 +266,9 @@
 .dropdown-item .small-icon.grey-chain {
     background-position: -3px -2761px;
 }
+.dropdown-item .small-icon.writing-pen {
+    background-position: -3px -347px;
+}
 .dropdown-item:hover .small-icon.conversations {
     background-position: -3px -3092px;
 }
@@ -333,7 +339,7 @@
     width: 32px;
     height: 32px;
     display: block;
-    background-image: url(../images/mega/new-chat-sprite-v3.svg);
+    background-image: url(../images/mega/new-chat-sprite-v4.svg);
     background-repeat: no-repeat;
     -moz-border-radius: 100%;
     -webkit-border-radius: 100%;

@@ -341,6 +341,38 @@ var CloudBrowserDialog = React.createClass({
             this.setState({'sortBy': [colId, "asc"]});
         }
     },
+    resizeBreadcrumbs: function() {
+        var $breadcrumbs = $('.fm-breadcrumbs-block.add-from-cloud');
+        var $breadcrumbsWrapper = $breadcrumbs.find('.breadcrumbs-wrapper');
+
+        setTimeout(function() {
+            var breadcrumbsWidth = $breadcrumbs.outerWidth();
+            var $el = $breadcrumbs.find('.right-arrow-bg');
+            var i = 0;
+            var j = 0;
+            $el.removeClass('short-foldername ultra-short-foldername invisible');
+
+            while ($breadcrumbsWrapper.outerWidth() > breadcrumbsWidth) {
+                if (i < $el.length - 1) {
+                    $($el[i]).addClass('short-foldername');
+                    i++;
+                } else if (j < $el.length - 1) {
+                    $($el[j]).addClass('ultra-short-foldername');
+                    j++;
+                } else if (!$($el[j]).hasClass('short-foldername')) {
+                    $($el[j]).addClass('short-foldername');
+                } else {
+                    $($el[j]).addClass('ultra-short-foldername');
+                    break;
+                }
+            }
+        }, 0);
+    },
+    componentDidUpdate: function(prevProps, prevState) {
+        if (prevState.currentlyViewedEntry !== this.state.currentlyViewedEntry) {
+            this.resizeBreadcrumbs();
+        }
+    },
     getEntries: function() {
         var self = this;
         var entries = [];
@@ -441,7 +473,7 @@ var CloudBrowserDialog = React.createClass({
                         self.setState({'currentlyViewedEntry': p.h, 'selected': []});
                         self.props.onSelected([]);
                     }}>
-                        <span className="right-arrow-bg">
+                        <span className="right-arrow-bg invisible">
                             <span>{p.h === M.RootID ? __("Cloud Drive") : p.name}</span>
                         </span>
                     </a>

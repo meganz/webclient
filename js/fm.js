@@ -7506,13 +7506,13 @@ function adjustContextMenuPosition(e, m)
 }
 
 /**
-* function reCaclMenuPosition
-*
-* @param m {Object} jQuery object of context menu or child class
-* @param x {Number} Coordinate x of cursor or clicked element
-* @param y {Number} Coordinate y of cursor or clicked element
-* @param ico {Object} JSON format {x, y}, width and height of clicked element
-*/
+ * Calculates coordinates where context menu will be shown
+ * @param {Object} m jQuery object of context menu or child class
+ * @param {Number} x Coordinate x of cursor or clicked element
+ * @param {Number} y Coordinate y of cursor or clicked element
+ * @param {Object} ico JSON {x, y} width and height of element clicked on
+ * @returns {Object} Coordinates {x, y} where context menu will be drawn
+ */
 /* jshint -W074 */
 function reCalcMenuPosition(m, x, y, ico) {
 
@@ -7547,7 +7547,12 @@ function reCalcMenuPosition(m, x, y, ico) {
         return;
     };
 
-    // // used for submenues, submenues are relatively positioned to first parent
+    /**
+     * Calculates top position of submenu
+     * Submenu is relatively positioned to the first sibling element
+     * @param {Object} n jQuery object, submenu of hovered element
+     * @returns {String} top Top coordinate in pixels for submenu
+     */
     var horPos = function(n) {
         var top;
         var nTop = parseInt(n.css('padding-top'));

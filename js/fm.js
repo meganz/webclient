@@ -7940,10 +7940,11 @@ function sectionUIopen(id) {
     } else {
         tmpId = id;
     }
-    $('.nw-fm-left-icon.' + tmpId).addClass('active');
-    $('.content-panel.' + tmpId).addClass('active');
+    $('.nw-fm-left-icon.' + String(tmpId).replace(/[^\w-]/g, '')).addClass('active');
+    $('.content-panel.' + String(tmpId).replace(/[^\w-]/g, '')).addClass('active');
     $('.fm-left-menu').removeClass(
-        'cloud-drive folder-link shared-with-me rubbish-bin contacts conversations opc ipc inbox account dashboard transfers'
+        'cloud-drive folder-link shared-with-me rubbish-bin contacts ' +
+        'conversations opc ipc inbox account dashboard transfers'
     ).addClass(tmpId);
     $('.fm.fm-right-header, .fm-import-to-cloudrive, .fm-download-as-zip').addClass('hidden');
     $('.fm-import-to-cloudrive, .fm-download-as-zip').unbind('click');
@@ -8092,9 +8093,8 @@ function sectionUIopen(id) {
         }
         else {
             $('.section').addClass('hidden');
-            $('.section.' + id).removeClass('hidden');
+            $('.section.' + String(id).replace(/[^\w-]/g, '')).removeClass('hidden');
         }
-
     }
 }
 
@@ -8628,7 +8628,7 @@ function handleDialogContent(dialogTabClass, parentTag, newFolderButton, dialogP
     if ($.onImportCopyNodes && (!newFolderButton || (dialogPrefix !== 'copy'))) {
 
         // XXX: Ideally show some notification that importing from folder link to anything else than the cloud isn't supported.
-        $('.copy-dialog-button.' + dialogTabClass).fadeOut(200).fadeIn(100);
+        $('.copy-dialog-button.' + String(dialogTabClass).replace(/[^\w-]/g, '')).fadeOut(200).fadeIn(100);
         // clicking the shares tab deactivates the "Import" button, restore it.
         $('.dialog-copy-button').removeClass('disabled');
         $.mcselected = $.mcselected || M.RootID;

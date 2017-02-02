@@ -5767,7 +5767,7 @@ function MegaData()
     this.transferFromMegaCoNz = function()
     {
         // Get site transfer data from after the hash in the URL
-        var urlParts = /#sitetransfer!(.*)/.exec(window.location);
+        var urlParts = /sitetransfer!(.*)/.exec(window.location);
 
         if (urlParts) {
 

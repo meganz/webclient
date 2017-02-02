@@ -20446,7 +20446,7 @@ span.incoming-call-name {
     background-color: white;
     margin-top: -1px;
     position: relative;
-    max-width: 710px;
+    min-width: 710px;
 }
 .contact-top-details .nw-contact-block-avatar {
     float: left;

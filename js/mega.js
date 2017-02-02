@@ -4196,7 +4196,7 @@ function MegaData()
             this.su[s.u][h] = 1;
         }
         else if (d) {
-            console.log('nodeShare failed for node:', h, s, ignoreDB);
+            console.warn('nodeShare failed for node:', h, s, ignoreDB);
         }
     };
 
@@ -6154,34 +6154,51 @@ var nodesinflight = {};  // number of nodes being processed in the worker for sc
 // enqueue parsed actionpacket
 function sc_packet(a) {
     if ((a.a == 's' || a.a == 's2') && a.k) {
+        /**
+         * There are two occasions where `crypto_process_sharekey()` must not be called:
+         *
+         * 1. `a.k` is symmetric (AES), `a.u` is set and `a.u != u_handle`
+         *    (because the resulting sharekey would be rubbish)
+         *
+         * 2. `a.k` is asymmetric (RSA), `a.u` is set and `a.u != u_handle`
+         *    (because we either get a rubbish sharekey or an RSA exception from asmcrypto)
+         */
+        var prockey = false;
+
         if (a.k.length > 43) {
             if (!a.u || a.u === u_handle) {
                 // RSA-keyed share command targeted to u_handle: run through worker
                 rsasharekeys[a.n] = true;
-
-                if (workers) {
-                    a.scqi = scqhead++;     // set scq slot number
-
-                    var p = a.scqi % workers.length;
-
-                    // pin the nodes of this share to the same worker
-                    // (it is the only one that knows the sharekey)
-                    shareworker[a.n] = p;
-
-                    workers[p].postMessage(a);
-                    return;
-                }
+                prockey = true;
             }
         }
         else {
-            if (!a.o || a.o === u_handle) {
-                var k = crypto_process_sharekey(a.n, a.k);
+            prockey = (!a.o || a.o === u_handle);
+        }
 
-                if (k !== false) {
-                    a.k = k;
-                    crypto_setsharekey(a.n, k, true);
-                }
-                else console.log("Failed to decrypt RSA share key for " + a.n + ": " + a.k);
+        if (prockey) {
+            if (workers && rsasharekeys[a.n]) {
+                // set scq slot number
+                a.scqi = scqhead++;
+
+                var p = a.scqi % workers.length;
+
+                // pin the nodes of this share to the same worker
+                // (it is the only one that knows the sharekey)
+                shareworker[a.n] = p;
+
+                workers[p].postMessage(a);
+                return;
+            }
+
+            var k = crypto_process_sharekey(a.n, a.k);
+
+            if (k !== false) {
+                a.k = k;
+                crypto_setsharekey(a.n, k, true);
+            }
+            else {
+                console.warn("Failed to decrypt RSA share key for " + a.n + ": " + a.k);
             }
         }
     }
@@ -7077,6 +7094,10 @@ function initworkerpool() {
             break;
         }
     }
+
+    if (d) {
+        console.debug('initworkerpool', workerURL, workers && workers.length);
+    }
 }
 
 // queue a DB invalidation-plus-reload request to the FMDB subsystem
@@ -7612,7 +7633,7 @@ function dbfetchfm() {
 
                     fmdb.get('s', function(r){
                         for (i = r.length; i--; ) {
-                            if (r[i].o.length == 11) {
+                            if (r[i].su) {
                                 // this is an inbound share
                                 M.c.shares[r[i].t] = r[i];
                                 if (r[i].sk) {
@@ -8437,7 +8458,14 @@ function processPS(pendingShares, ignoreDB) {
                 M.delPS(pendingContactId, nodeHandle);
 
                 if (ps.op) {
-                    M.nodeShare(nodeHandle, ps);
+                    M.nodeShare(nodeHandle, {
+                        h: ps.n,
+                        o: ps.n,
+                        p: ps.p,
+                        u: ps.u,
+                        r: ps.r,
+                        ts: ps.ts
+                    });
                 }
 
                 if (M.opc && M.opc[ps.p]) {

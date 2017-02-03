@@ -781,7 +781,7 @@ Object.defineProperty(this, 'mBroadcaster', {
                             + (this.master ? 'MASTER':'SLAVE'));
 
                         console.debug(String(ua));
-                        console.debug(browserdetails(ua).prod);
+                        console.debug(browserdetails(ua).prod + u_handle);
                     }
                     cb(this.master);
                     cb = null;

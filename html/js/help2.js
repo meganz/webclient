@@ -103,17 +103,6 @@ var Help = (function() {
         if (isScrolling) {
             return;
         }
-        if ($element[0] && $element[0].id) {
-            var parts = getUrlParts();
-            // the url normally includes, 'help', 'client', 'webclient', and 'section'/'question'
-            // set the first one as selected by default if it only has 'help', 'client', 'webclient'.
-            if (parts.length > 3) {
-                parts.pop();
-            }
-            parts.push($element[0].id);
-            var url = parts.join('/');
-            window.history.pushState("", "", '/' + url);
-        }
         $elements = $elements || $('.updateSelected.current');
         $elements.removeClass('current');
         $element.addClass('current');
@@ -124,7 +113,18 @@ var Help = (function() {
             .addClass('active');
 
         delay('help2:selectMenuItem', function() {
-            var newpage = getCleanSitePath($link.data('state'));
+            var state = $link.data('state');
+            if (!state && $link.data('to')) {
+                var parts = getUrlParts();
+                // the url normally includes, 'help', 'client', 'webclient', and 'section'/'question'
+                // set the first one as selected by default if it only has 'help', 'client', 'webclient'.
+                if (parts.length > 3) {
+                    parts.pop();
+                }
+                parts.push($element[0].id);
+                state = parts.join('/');
+            }
+            var newpage = getCleanSitePath(state);
             if (newpage !== page && page.substr(0, 4) === 'help') {
                 page = newpage;
 

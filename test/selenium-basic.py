@@ -15,6 +15,7 @@ Requirements:
 This test runner will work with both Python 2.7 as well as 3.x.
 """
 
+from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -25,7 +26,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import NoAlertPresentException
-import unittest, time, re, sys, argparse, tempfile
+import unittest, time, re, os, sys, argparse, tempfile
 
 username=None
 password=None
@@ -42,9 +43,11 @@ base_url="https://smoketest.static.mega.co.nz"
 #        0005  Switch Sections
 #        0006  Context Actions
 #        0007  Settings
+#        0008  Recovery Key
 #        0011  Blog
 #        0013  Filelink
 #        0014  Folderlink
+#        0015  Help
 #        0999  Logout
 #        1000  Ephemeral
 
@@ -52,7 +55,7 @@ class MegaTest(unittest.TestCase):
     def setUp(self):
         chrome_options = Options()
         chrome_options.add_argument("--lang=en")
-        chrome_options.add_argument("--window-size=1277,744")
+        chrome_options.add_argument("--window-size=1270,812")
         chrome_options.add_experimental_option("prefs", {'download.prompt_for_download': 'false',
                                                          'download.default_directory': tempfile.gettempdir()})
         self.driver = webdriver.Chrome(chrome_options=chrome_options)
@@ -108,10 +111,10 @@ class MegaTest(unittest.TestCase):
         self.waitfor_visibility(".fm-empty-trashbin .fm-empty-cloud-txt")
         # 
         # Test: 0004  Reload
-        driver.find_element_by_css_selector("#topmenu .top-icon.menu").click()
+        driver.find_element_by_css_selector(".top-icon.menu").click()
         self.on_visibleclick("div.top-menu-item.refresh-item")
         self.waitfor_visibility("div.fm-notification-warning")
-        self.assertRegexpMatches(driver.find_element_by_css_selector("div.fm-notification-warning").text, r"^Are you sure you want to continue[\s\S]$")
+        self.assertEqual("Are you sure you want to continue?", driver.find_element_by_css_selector("div.fm-notification-warning").text)
         driver.find_element_by_css_selector(".fm-dialog.confirmation-dialog .notification-button.confirm").click()
         self.waitfor_text(".loading-info li.step1.loading", "Requesting account data")
         self.waitfor_visibility(".fm-empty-trashbin .fm-empty-cloud-txt")
@@ -246,8 +249,17 @@ class MegaTest(unittest.TestCase):
         driver.find_element_by_css_selector("div.account-history-drop-items.session100-").click()
         self.waitfor_invisibility(".dark-overlay")
         # 
+        # Test: 0008  Recovery Key
+        driver.find_element_by_css_selector(".top-icon.menu").click()
+        self.on_visibleclick("div.top-menu-item.backup")
+        self.waitfor_text("h3.main-italic-header", "Backup your master encryption key")
+        self.assertEqual("MEGA-RECOVERYKEY.txt (22 bytes)", driver.find_element_by_css_selector(".backup-file-info > span").text)
+        self.assertTrue(22 == len(driver.find_element_by_css_selector("#backup_keyinput").get_attribute("value")))
+        self.assertEqual("Your password unlocks your Recovery Key", driver.find_element_by_css_selector(".main-left-block h5.main-italic-header").text)
+        self.assertEqual("Save Recovery Key as text file", driver.find_element_by_css_selector(".main-right-block h5.main-italic-header span").text)
+        # 
         # Test: 0011  Blog
-        driver.find_element_by_css_selector("#topmenu .top-icon.menu").click()
+        driver.find_element_by_css_selector(".top-icon.menu").click()
         self.on_visibleclick("div.top-menu-item.blog")
         self.waitfor_invisibility(".dark-overlay")
         self.assertEqual("Archive", driver.find_element_by_css_selector("h1").text)
@@ -263,7 +275,11 @@ class MegaTest(unittest.TestCase):
         self.assertEqual("The file you are trying to download is no longer available.", driver.find_element_by_css_selector("div.download.error-title").text)
         self.assertFalse(driver.find_element_by_css_selector(".download-button.to-clouddrive").is_displayed())
         # FileLink - Download
-        driver.get(self.base_url + "#!84Vl0ADI!Fj9EOhlQu4mN_ZwlUNIHCD6xc2xMKCEjSFvEEvypx9o")
+        driver.get(self.base_url + "#!84Vl0ADI")
+        self.waitfor_text(".fm-dialog.dlkey-dialog .fm-dialog-title", "Enter decryption key")
+        driver.find_element_by_css_selector(".fm-dialog.dlkey-dialog input").clear()
+        driver.find_element_by_css_selector(".fm-dialog.dlkey-dialog input").send_keys("Fj9EOhlQu4mN_ZwlUNIHCD6xc2xMKCEjSFvEEvypx9o")
+        driver.find_element_by_css_selector(".fm-dialog.dlkey-dialog .default-white-button").click()
         self.waitfor_visibility(".download-button.throught-browser")
         self.assertTrue(driver.find_element_by_css_selector(".download-button.to-clouddrive").is_displayed())
         self.assertEqual("file4.bin", driver.find_element_by_css_selector(".download.info-txt.big-txt.filename").text)
@@ -316,8 +332,60 @@ class MegaTest(unittest.TestCase):
         driver.find_element_by_css_selector(".fm-dialog.remove-dialog .notification-button.confirm").click()
         self.waitfor_nottext("span.tranfer-filetype-txt", "111.importTest")
         # 
+        # Test: 0015  Help
+        driver.find_element_by_css_selector(".top-icon.menu").click()
+        self.on_visibleclick("div.top-menu-item.help")
+        # wait for help to load...
+        self.waitfor_text("div.section-title", "How can we help you today?")
+        # check search suggestions
+        driver.find_element_by_css_selector("input.search.ui-autocomplete-input").send_keys("webDAV")
+        self.waitfor_text(".support-search-container .ui-front > li", "Can I upload data using FTP, SFTP, webDAV or similar?")
+        # check main sections
+        self.assertEqual("Mobile Apps", driver.find_element_by_css_selector("#container .mobile-block").text)
+        self.fire_mouseover(By.CSS_SELECTOR, "#container .mobile-block")
+        self.waitfor_visibility(".block-mobile-device .iOS-mobile-block.link")
+        self.assertTrue(driver.find_element_by_css_selector(".block-mobile-device .android-mobile-block.link").is_displayed())
+        self.assertTrue(driver.find_element_by_css_selector(".block-mobile-device .window-mobile-block.link").is_displayed())
+        self.assertEqual("Web Client", driver.find_element_by_css_selector("div[data-href='#help/client/webclient']").text)
+        self.assertEqual("MEGAsync", driver.find_element_by_css_selector("div[data-href='#help/client/megasync']").text)
+        self.assertEqual("MEGAchat", driver.find_element_by_css_selector("div[data-href='#help/client/megachat']").text)
+        # view webclient section
+        driver.find_element_by_css_selector("div.block-webclient").click()
+        self.waitfor_text("div.d-section-title > a", "Getting Started")
+        self.fire_mouseover(By.CSS_SELECTOR, "#section-security-and-privacy > div")
+        driver.find_element_by_css_selector("#section-security-and-privacy > div").click()
+        self.waitfor_text("#security-and-privacy > div.d-section-title > a", "Security and Privacy")
+        self.assertEqual("How does the encryption work?", driver.find_element_by_css_selector("#security-and-privacy ul.d-section-items > li > a").text)
+        driver.find_element_by_css_selector("#security-and-privacy ul.d-section-items > li > a").click()
+        self.waitfor_text("div.feedback-heading", "Did you find this helpful?")
+        self.assertEqual("Articles", driver.find_element_by_css_selector("div.helpsection-grayheading").text)
+        # ensure 'Share Article' does work.
+        driver.find_element_by_css_selector(".support-link-icon").click()
+        self.waitfor_text(".fm-dialog.share-help .fm-dialog-title", "Share the Article")
+        self.assertEqual("https://mega.nz/help/client/webclient/security-and-privacy/how-does-the-encryption-work", driver.find_element_by_css_selector(".fm-dialog.share-help input").get_attribute("value"))
+        driver.find_element_by_css_selector(".fm-dialog.share-help .fm-dialog-close").click()
+        # go to the support section from the help acticle
+        driver.find_element_by_css_selector("div.support-email-icon").click()
+        self.waitfor_text(".about-top-block h1", "Get support")
+        # try to submit the empty form, it must fail
+        driver.find_element_by_css_selector(".new-bottom-pages.support .contact-new-button").click()
+        self.waitfor_text(".fm-dialog.warning-dialog-a .fm-dialog-title span", "Message too short")
+        # go back to the help section (browser navigation)
+        driver.back()
+        self.waitfor_text("div.support-article-heading", "How does the encryption work?")
+        # go back to the webclient section
+        driver.find_element_by_css_selector(".support-go-back.link").click()
+        # try the top-search (inline overlay)
+        driver.find_element_by_css_selector("div.support-search-heading").click()
+        self.waitfor_text(".search-section .popular-question-title", "Frequently Asked Questions")
+        self.assertEqual("How can we help you today?", driver.find_element_by_css_selector(".search-section .section-title").text)
+        self.assertTrue(driver.find_element_by_css_selector(".search-section ul.popular-question-items").is_displayed())
+        # close the search overlay, and check the webclient section subtitle
+        driver.find_element_by_css_selector(".search-section .close-icon").click()
+        self.waitfor_text(".howto-section-subtitle", "MEGA in your web browser - no installs necessary.")
+        # 
         # Test: 0999  Logout
-        driver.find_element_by_css_selector("#topmenu .top-icon.menu").click()
+        driver.find_element_by_css_selector(".top-icon.menu").click()
         self.on_visibleclick("div.top-menu-item.logout")
         self.waitfor_invisibility(".dark-overlay")
         # 
@@ -360,7 +428,8 @@ class MegaTest(unittest.TestCase):
         driver.find_element_by_css_selector(".top-login-button").click()
         self.waitfor_text(".fm-dialog.confirmation-dialog .fm-notification-warning", "This action will delete all your data.")
         driver.find_element_by_css_selector(".fm-dialog.confirmation-dialog .notification-button.confirm").click()
-        self.waitfor_invisibility(".dark-overlay")
+        # we should go to /login by logging out
+        self.waitfor_text(".register-st2-txt-block h5.main-italic-header", "Your account is only as secure as your computer.")
 
     def is_element_present(self, how, what):
         try: self.driver.find_element(by=how, value=what)
@@ -435,7 +504,20 @@ class MegaTest(unittest.TestCase):
             return alert_text
         finally: self.accept_next_alert = True
 
+    def take_screenshot(self, name, path=None):
+        now = datetime.now();
+        if path is None:
+            path = os.path.join(tempfile.gettempdir(), 'selenium')
+        path = os.path.join(os.path.abspath(path), now.strftime("%Y%m%d"))
+        if not os.path.exists(path):
+            os.makedirs(path)
+        path = os.path.join(path, now.strftime("%H%M%S.%f.")+name)
+        self.driver.get_screenshot_as_file(path)
+        return path
+
     def tearDown(self):
+        if sys.exc_info()[0]:
+            self.take_screenshot("error.png")
         self.driver.quit()
         self.assertEqual([], self.verificationErrors)
 

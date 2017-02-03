@@ -112,7 +112,7 @@ var Help = (function() {
             }
             parts.push($element[0].id);
             var url = parts.join('/');
-            window.history.pushState("", "", '/'+url);
+            window.history.pushState("", "", '/' + url);
         }
         $elements = $elements || $('.updateSelected.current');
         $elements.removeClass('current');

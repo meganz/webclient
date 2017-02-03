@@ -121,7 +121,7 @@ var Help = (function() {
                 if (parts.length > 3) {
                     parts.pop();
                 }
-                parts.push($element[0].id);
+                parts.push(String($link.data('to')).replace(/^[/#]+/, ''));
                 state = parts.join('/');
             }
             var newpage = getCleanSitePath(state);

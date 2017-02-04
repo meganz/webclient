@@ -57,7 +57,7 @@ function startMega() {
 
     if (silent_loading) {
         jsl = [];
-        Soon(silent_loading);
+        onIdle(silent_loading);
         silent_loading = false;
         return false;
     }
@@ -1862,7 +1862,38 @@ function topmenuUI() {
                     e.stopPropagation();
                 }
                 else {
-                    loadSubPage('fm/search/' + val);
+                    loadingDialog.show();
+                    var promise = new MegaPromise();
+
+                    if (!M.nn) {
+                        M.nn = Object.create(null);
+
+                        promise = fmdb.get('nn')
+                            .always(function(r) {
+                                for (var i = r.length; i--;) {
+                                    M.nn[r[i].h] = r[i].n;
+                                }
+                            });
+                    }
+                    else {
+                        promise.resolve();
+                    }
+
+                    promise.always(function() {
+                        var filter = M.getFilterBySearchFn(val);
+                        var handles = [];
+
+                        for (var h in M.nn) {
+                            if (!M.d[h] && filter({name: M.nn[h]})) {
+                                handles.push(h);
+                            }
+                        }
+
+                        dbfetch.coll(handles).always(function() {
+                            loadingDialog.hide();
+                            loadSubPage('fm/search/' + val);
+                        });
+                    });
                 }
             }
         }
@@ -2043,7 +2074,7 @@ function parsepage(pagehtml, pp) {
 
     clickURLs();
 
-    Soon(mainScroll);
+    onIdle(mainScroll);
     $(window).rebind('resize.subpage', function (e) {
         if (page !== 'start' && page !== 'download') {
             mainScroll();

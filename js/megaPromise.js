@@ -282,7 +282,7 @@ MegaPromise.prototype.wait = function(callback) {
     this.$deferred.always(function() {
         var args = toArray.apply(null, arguments);
 
-        setTimeout(function() {
+        onIdle(function() {
             callback.apply(null, args);
         });
     });

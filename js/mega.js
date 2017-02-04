@@ -63,6 +63,7 @@ if (typeof loadingDialog === 'undefined') {
             this.hide();
             this.nest = 0;
         }
+        return !this.nest;
     };
 }
 if (typeof loadingInitDialog === 'undefined') {
@@ -241,6 +242,7 @@ function MegaData()
         this.opc = {};
         this.ipc = {};
         this.ps = {};
+        this.nn = false;
         this.sn = false;
         this.filter = false;
         this.sortfn = false;
@@ -752,29 +754,32 @@ function MegaData()
         }
 
         if (str) {
-            // Simple glob/wildcard support.
-            // spaces are replaced with *, and * moved to regexp's .* matching
-            var regex;
-            str = str.replace(/\s+/g, '*');
-
-            if (str.indexOf('*') !== -1) {
-                try {
-                    regex = RegExp(str.replace(/(\W)/g, '\\$1').replace(/\\\*/g, '.*'), 'i');
-                }
-                catch (ex) {}
-            }
-
-            if (regex) {
-                this.filterBy(function(node) {
-                    return regex.test(node.name);
-                });
-            }
-            else {
-                this.filterBy(function(node) {
-                    return (node.name && node.name.toLowerCase().indexOf(str) !== -1);
-                });
-            }
+            this.filterBy(this.getFilterBySearchFn(str));
         }
+    };
+
+    this.getFilterBySearchFn = function(searchTerm) {
+        // Simple glob/wildcard support.
+        // spaces are replaced with *, and * moved to regexp's .* matching
+        var regex;
+        var str = String(searchTerm).toLowerCase().replace(/\s+/g, '*');
+
+        if (str.indexOf('*') !== -1) {
+            try {
+                regex = RegExp(str.replace(/(\W)/g, '\\$1').replace(/\\\*/g, '.*'), 'i');
+            }
+            catch (ex) {}
+        }
+
+        if (regex) {
+            return function(node) {
+                return regex.test(node.name);
+            };
+        }
+
+        return function(node) {
+            return (node.name && node.name.toLowerCase().indexOf(str) !== -1);
+        };
     };
 
     this.hasInboxItems = function() {
@@ -1402,7 +1407,7 @@ function MegaData()
         $('.fm-files-view-icon').removeClass('hidden');
 
         if (d) {
-            console.log('openFolder()', M.currentdirid, id, force, loadfm.loaded);
+            console.warn('openFolder()', M.currentdirid, id, force, loadfm.loaded);
         }
 
         if (!loadfm.loaded) {
@@ -2063,7 +2068,7 @@ function MegaData()
             }
         }
 
-        var btd = 0;
+        var btd = d > 0;
         if (btd) {
             console.group('BUILDTREE for "' + n.h + '"');
         }
@@ -2708,7 +2713,12 @@ function MegaData()
 
             if (fmdb) {
                 fmdb.del('f', h);
+                fmdb.del('nn', h);
                 fmdb.del('ph', h);
+            }
+
+            if (M.nn) {
+                delete M.nn[h];
             }
 
             if (M.d[h]) {
@@ -2746,16 +2756,11 @@ function MegaData()
             // Handle Inbox/RubbishBin UI changes
             delay('fmtopUI', fmtopUI);
 
-            if (M.currentdirid === 'shares' && !M.viewmode) {
-                M.openFolder('shares', 1);
-            }
-            else {
-                // Update M.v it's used for at least preview slideshow
-                for (var k = M.v.length; k--;) {
-                    if (M.v[k].h === h) {
-                        M.v.splice(k, 1);
-                        break;
-                    }
+            // Update M.v it's used for at least preview slideshow
+            for (var k = M.v.length; k--;) {
+                if (M.v[k].h === h) {
+                    M.v.splice(k, 1);
+                    break;
                 }
             }
         }
@@ -4019,6 +4024,17 @@ function MegaData()
                 if (n.hash) {
                     fmdb.add('h', {h: n.h, c: n.hash});
                 }
+
+                if (n.name) {
+                    fmdb.add('nn', {
+                        h: n.h,
+                        d: {h: n.h, n: n.name}
+                    });
+                }
+            }
+
+            if (M.nn && n.name) {
+                M.nn[n.h] = n.name;
             }
 
             // sync missingkeys with this node's key status
@@ -4922,15 +4938,31 @@ function MegaData()
             return M.d[handle];
         }
 
-        for (var i in M.v) {
-            if (M.v.hasOwnProperty(i)) {
-                if (M.v[i].h === handle) {
-                    return M.v[i];
-                }
+        for (var i = M.v.length; i--;) {
+            if (M.v[i].h === handle) {
+                return M.v[i];
             }
         }
 
         return false;
+    };
+
+    /**
+     * Retrieve the parent of an ufs node
+     * @param {String|Object} node The node or its handle
+     * @return {Object} The parent handle, of false if not found
+     */
+    this.getNodeParent = function(node) {
+        if (typeof node === 'string') {
+            node = this.getNodeByHandle(node);
+        }
+
+        if (node && node.su) {
+            // This might be a nested inshare, only return the parent as long it does exists.
+            return M.d[node.p] ? node.p : 'shares';
+        }
+
+        return node && node.p || false;
     };
 
     /**
@@ -6806,16 +6838,13 @@ function execsc() {
                     if ($.dialog === 'properties') {
                         propertiesDialog();
                     }
-                    
+
                     if (scsharesuiupd) {
                         onIdle(function() {
                             M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
 
                             if (M.currentrootid === 'shares') {
-                                M.openFolder(M.currentdirid, true)
-                                    .always(function() {
-                                        loadingDialog.hide(); // TODO: from leaveShare, check if ok..
-                                    });
+                                M.openFolder(M.currentdirid, true);
                             }
                         });
 
@@ -7059,7 +7088,7 @@ function execsc() {
                                         if (a.u === u_handle) {
                                             // incoming share
                                             if (d) {
-                                                console.log('Incoming share ' + a.n + " revoked");
+                                                console.log('Incoming share ' + a.n + " revoked.", n.su, M.d[n.p]);
                                             }
 
                                             if (M.d[n.p]) {
@@ -7223,11 +7252,6 @@ function execsc() {
                             delete scnodes[i].scni;
                             M.addNode(scnodes[i]);
                         }
-                    }
-
-                    if (typeof M.scAckQueue[a.i] === 'function') {
-                        M.scAckQueue[a.i]();
-                        delete M.scAckQueue[a.i];
                     }
                     break;
 
@@ -7478,6 +7502,15 @@ function execsc() {
                         console.log('Ignoring unsupported SC command', a);
                     }
             }
+        }
+
+        // If there is any listener waiting for acknowledge from API, dispatch it.
+        if (typeof M.scAckQueue[a.i] === 'function') {
+            if (d) {
+                console.debug('execsc: dispatching ' + a.i);
+            }
+            onIdle(M.scAckQueue[a.i]);
+            delete M.scAckQueue[a.i];
         }
 
         tickcount++;
@@ -7732,8 +7765,8 @@ function tree_ok0(ok) {
 /**
  * Emplace node into M.d and M.c
  *
- * @param {Object} node  The node to add
- * @param {Boolean} noc  Whether adding to M.c should be skipped, only used by fetchchildren!
+ * @param {Object}  node   The node to add
+ * @param {Boolean} [noc]  Whether adding to M.c should be skipped, only used by fetchchildren!
  */
 function emplacenode(node, noc) {
     if (node.p) {
@@ -7905,6 +7938,13 @@ function worker_procmsg(ev) {
                     d : ev.data
                 });
 
+                if (ev.data.name) {
+                    fmdb.add('nn', {
+                        h: ev.data.h,
+                        d: {h: ev.data.h, n: ev.data.name}
+                    });
+                }
+
                 if (ev.data.hash) {
                     fmdb.add('h', {h: ev.data.h, c: ev.data.hash});
                 }
@@ -7992,6 +8032,7 @@ function loadfm(force) {
                     mk  : '&h',         // missing node keys - handle
                     u   : '&u',         // users - handle
                     h   : '&h, c',      // hashes - handle, checksum
+                    nn  : '&h',         // node names - handle
                     ph  : '&h',         // exported links - handle
                     opc : '&p',         // outgoing pending contact - id
                     ipc : '&p',         // incoming pending contact - id

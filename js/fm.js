@@ -668,7 +668,7 @@ function initUI() {
     transferPanelUI();
     UIkeyevents();
     addContactUI();
-    Soon(topmenuUI);
+    onIdle(topmenuUI);
 
     $('.fm-files-view-icon').rebind('click', function() {
 
@@ -1370,8 +1370,8 @@ function removeUInode(h, parent) {
     }
 
     if (M.currentdirid === h || isCircular(h, M.currentdirid) === true) {
-        parent = parent || Object(M.getNodeByHandle(h)).p || RootbyId(h);
-        M.openFolder(parent);
+        parent = parent || M.getNodeParent(n || h) || RootbyId(h);
+        return M.openFolder(parent);
     }
 }
 
@@ -2103,6 +2103,8 @@ function ephemeralDialog(msg) {
 // leave incoming share h
 // FIXME: implement sn tagging to prevent race condition
 function leaveShare(h) {
+    var promise = new MegaPromise();
+
     if (d) {
         console.log('leaveShare', h);
     }
@@ -2113,13 +2115,24 @@ function leaveShare(h) {
     }
 
     if (M.d[h] && M.d[h].su) {
-        loadingDialog.show(); // this will be hidden somewhere else after processing the action-packet
+        loadingDialog.show();
 
-        api_req({ a: 'd', n: h/*, i: requesti*/ });
+        var idtag = mRandomToken('ls');
+        api_req({a: 'd', n: h, i: idtag});
+
+        M.scAckQueue[idtag] = function() {
+            loadingDialog.hide();
+            promise.resolve(h);
+        };
     }
-    else if (d) {
-        console.warn('Cannot leaveShare', h);
+    else {
+        if (d) {
+            console.warn('Cannot leaveShare', h);
+        }
+        promise.reject();
     }
+
+    return promise;
 }
 
 function fmremove() {
@@ -2133,15 +2146,13 @@ function fmremove() {
             });
 
             if (doRemoveShare) {
-                var removeSharePromise;
+                var promises = [];
 
                 for (var i = handles.length; i--;) {
-                    removeSharePromise = removeShare(handles[i], false, i);
+                    promises.push(leaveShare(handles[i]));
                 }
 
-                removeSharePromise.always(function() {
-                    promise.linkDoneAndFailTo(M.openFolder('shares', true));
-                });
+                promise.linkDoneAndFailTo(MegaPromise.allDone(promises));
             }
             else {
                 fmremovesync();
@@ -2749,7 +2760,7 @@ function initContextUI() {
         $.clearTransferPanel();
         fm_tfsupdate();
 
-        Soon(function() {
+        onIdle(function() {
             // XXX: better way to stretch the scrollbar?
             $(window).trigger('resize');
         });
@@ -3401,7 +3412,7 @@ function dashboardUI() {
         // Fill rest of widgets
         dashboardUI.updateWidgets();
 
-        Soon(fm_resize_handler);
+        onIdle(fm_resize_handler);
         initTreeScroll();
     });
 }
@@ -5726,7 +5737,7 @@ function gridUI() {
         $.selectddUIgrid = '.files-grid-view.fm .grid-scrolling-table';
 
     $.selectddUIitem = 'tr';
-    Soon(selectddUI);
+    onIdle(selectddUI);
 
     if (d)
         console.timeEnd('gridUI');
@@ -7388,7 +7399,7 @@ function contextMenuUI(e, ll) {
                 $(menuCMI).filter('.copy-item').hide();
             }
             else if (items['.getlink-item']) {
-                Soon(setContextMenuGetLinkText);
+                onIdle(setContextMenuGetLinkText);
             }
         }
         else {
@@ -12549,9 +12560,9 @@ function sharedFolderUI() {
             $('.fm-leave-share').addClass('hidden');
         }
 
-        Soon(function() {
+        onIdle(function() {
             $(window).trigger('resize');
-            Soon(fm_resize_handler);
+            onIdle(fm_resize_handler);
         });
     }
 

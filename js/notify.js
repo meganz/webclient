@@ -299,7 +299,7 @@ var notify = {
         notify.$popup.removeClass('hidden');
         notify.$popupIcon.addClass('active');
         topPopupAlign('.top-icon.notification', notify.$popup, 40);
-    
+
         // Render and show notifications currently in list
         notify.renderNotifications();
     },
@@ -487,9 +487,8 @@ var notify = {
 
         // Add click handler for the 'Contact relationship established' notification
         this.$popup.find('.nt-contact-accepted').rebind('click', function() {
-
             // Redirect to the contact's page
-            document.location.hash = '#fm/' + $(this).attr('data-contact-handle');
+            loadSubPage('fm/' + $(this).attr('data-contact-handle'));
             notify.closePopup();
         });
     },
@@ -551,7 +550,9 @@ var notify = {
             notify.markAllNotificationsAsSeen();
 
             // Redirect to payment history
-            document.location.hash = '#fm/account/history';
+            loadSubPage('fm/account/history');
+
+
         });
     },
 
@@ -567,7 +568,7 @@ var notify = {
             notify.markAllNotificationsAsSeen();
 
             // Redirect to pro page
-            document.location.hash = '#pro';
+            loadSubPage('pro');
         });
     },
 

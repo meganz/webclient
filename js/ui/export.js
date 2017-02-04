@@ -339,7 +339,7 @@ var exportPassword = {
 
                 // On button click, go to the Pro page
                 $proButton.rebind('click', function() {
-                    document.location.hash = 'pro';
+                    loadSubPage('pro');
                 });
             }
             else {
@@ -644,7 +644,8 @@ var exportPassword = {
 
             // Add a click handler for the close button to return to the home page (or cloud drive if logged in)
             $closeButton.rebind('click', function() {
-                location.hash = '';
+                loadSubPage('');
+                return false;
             });
 
             // Add click handler for Decrypt button
@@ -792,7 +793,7 @@ var exportPassword = {
                 $password.val('');
 
                 // On success, redirect to actual file/folder link
-                location.hash = url;
+                loadSubPage(url);
             });
         }
     },  // Decrypt functions
@@ -1739,8 +1740,15 @@ var exportExpiry = {
 
         // No need to perform an API call if this folder was already exported (Ie, we're updating)
         if (share.h === nodeId) {
-            return self._getExportLinkRequest(nodeId);
+            if (!M.d[nodeId].t || u_sharekeys[nodeId]) {
+                return self._getExportLinkRequest(nodeId);
+            }
+
+            if (d) {
+                console.warn('Missing sharekey for "%s" - relying on s2 to obtain it...', nodeId);
+            }
         }
+        // FIXME: check this
 
         // Get all child nodes of root folder with nodeId
         M.getNodes(nodeId, true)
@@ -1807,7 +1815,7 @@ var exportExpiry = {
             nodeId: nodeId,
             callback: function(result) {
                 if (typeof result !== 'number') {
-                    M.nodeShare(this.nodeId, { h: this.nodeId, r: 0, u: 'EXP', ts: unixtime() });
+                    M.nodeShare(this.nodeId, { h: this.nodeId, r: 0, u: 'EXP', ts: unixtime(), ph: result });
                     var n;
                     if (fmdb && (n = M.d[this.nodeId])) {
                         n.ph = result;

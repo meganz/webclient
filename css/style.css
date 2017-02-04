@@ -241,9 +241,8 @@ a, a:link, a:visited, a:hover, a:active, a:focus img, a:focus img {
     border-radius: 100%;
     float: left;
     margin: 6px 0 0 12px;
-    background-color: #d90007;
     background-position: -6px -383px;
-    background-image: url(../images/mega/top-sprite_v1.png);
+    background-image: url(../images/mega/top-sprite_v2.png);
     background-repeat: no-repeat;
     cursor: pointer;
     display: none;
@@ -313,7 +312,7 @@ a.nlanguage-lnk.language-template {
     margin: 16px 0 0 0;
     background-position: 0px -1037px;
     background-position: -2px -286px;
-    background-image: url(../images/mega/top-sprite_v1.png);
+    background-image: url(../images/mega/top-sprite_v2.png);
     background-repeat: no-repeat;
 }
 .nlanguage-bottom a, .nlanguage-bottom a:link, .nlanguage-bottom a:visited, .nlanguage-bottom a:hover, .nlanguage-bottom a:active {
@@ -365,7 +364,7 @@ a.nlanguage-lnk.language-template {
     vertical-align: middle;
 }
 .languages-dialog .show-more-languages .round-arrow span {
-    background-image: url(../images/mega/top-sprite_v1.png);
+    background-image: url(../images/mega/top-sprite_v2.png);
     background-position: -13px -1108px;
     background-repeat: no-repeat;
     display: inline-block;
@@ -1287,7 +1286,7 @@ input.radioOn, input.radioOff {
     padding-top: 6px;
     max-width: -webkit-calc(100% - 30px);
     max-width: -moz-calc(100% - 30px);
-    max-width:  calc(100% - 30px);
+    max-width: calc(100% - 30px);
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -2141,6 +2140,8 @@ a.nt-settings-button:hover span {
 .jspContainer {
     overflow: hidden;
     position: relative;
+    min-height: 100%;
+    min-width: 100%;
 }
 .jspPane {
     position: absolute;
@@ -3804,6 +3805,7 @@ label.iPhoneCheckLabelOff span {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
+    min-width: 100%;
 }
 .fm-left-menu.dashboard + .nw-tree-panel-header + .fm-tree-panel {
     height: 100%;
@@ -4193,16 +4195,24 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .nw-fm-tree-item.opened.selected .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.opened.dragover .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.opened:hover .nw-fm-tree-folder.shared-folder, .nw-fm-tree-item.opened.selected .nw-fm-tree-shared-folder, .nw-fm-tree-item.opened.dragover .nw-fm-tree-shared-folder, .nw-fm-tree-item.opened:hover .nw-fm-tree-shared-folder, .rubbish-bin .nw-fm-tree-item.opened.selected .nw-fm-tree-folder.shared-folder, .rubbish-bin .nw-fm-tree-item.opened.dragover .nw-fm-tree-folder.shared-folder, .rubbish-bin .nw-fm-tree-item.opened:hover .nw-fm-tree-folder.shared-folder, .rubbish-bin .nw-fm-tree-item.opened.selected .nw-fm-tree-shared-folder, .rubbish-bin .nw-fm-tree-item.opened.dragover .nw-fm-tree-shared-folder, .rubbish-bin .nw-fm-tree-item.opened:hover .nw-fm-tree-shared-folder {
     background-position: -15px -7538px;
 }
-.shared-with-me .nw-fm-tree-item .nw-fm-tree-folder, .shared-details-block .transfer-filtype-icon.folder {
+.inbound-share {
     background-position: -15px -7106px;
 }
-.shared-with-me .nw-fm-tree-item.expanded .nw-fm-tree-folder, .shared-with-me .nw-fm-tree-item.opened .nw-fm-tree-folder {
-    background-position: -15px -7136px;
-}
-.shared-with-me .nw-fm-tree-item.selected .nw-fm-tree-folder, .shared-with-me .nw-fm-tree-item.dragover .nw-fm-tree-folder, .shared-with-me .nw-fm-tree-item:hover .nw-fm-tree-folder {
+.nw-fm-tree-item:hover > .nw-fm-tree-folder.inbound-share,
+.nw-fm-tree-item.selected > .nw-fm-tree-folder.inbound-share,
+.nw-fm-tree-item.dragover > .nw-fm-tree-folder.inbound-share {
     background-position: -15px -7166px;
 }
-.shared-with-me .nw-fm-tree-item.opened.selected .nw-fm-tree-folder, .shared-with-me .nw-fm-tree-item.dragover.opened .nw-fm-tree-folder, .shared-with-me .nw-fm-tree-item.opened:hover .nw-fm-tree-folder, .shared-with-me .nw-fm-tree-item.expanded.selected .nw-fm-tree-folder, .shared-with-me .nw-fm-tree-item.dragover.expanded .nw-fm-tree-folder, .shared-with-me .nw-fm-tree-item.expanded:hover .nw-fm-tree-folder {
+.nw-fm-tree-item.expanded > .nw-fm-tree-folder.inbound-share,
+.nw-fm-tree-item.opened > .nw-fm-tree-folder.inbound-share {
+    background-position: -15px -7136px;
+}
+.nw-fm-tree-item.expanded:hover > .nw-fm-tree-folder.inbound-share,
+.nw-fm-tree-item.opened:hover > .nw-fm-tree-folder.inbound-share,
+.nw-fm-tree-item.selected.expanded > .nw-fm-tree-folder.inbound-share,
+.nw-fm-tree-item.selected.opened > .nw-fm-tree-folder.inbound-share,
+.nw-fm-tree-item.expanded.dragover > .nw-fm-tree-folder.inbound-share,
+.nw-fm-tree-item.opened.dragover > .nw-fm-tree-folder.inbound-share {
     background-position: -15px -7196px;
 }
 .nw-contact-item, .add-contact-item {
@@ -4843,7 +4853,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     height: 14px;
     right: 25px;
     top: 9px;
-    background-image: url(../images/mega/top-sprite_v1.png);
+    background-image: url(../images/mega/top-sprite_v2.png);
     background-position: -12px -1303px;
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     -moz-opacity: 0.5;
@@ -4899,7 +4909,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     width: 24px;
     height: 24px;
     display: block;
-    background-image: url(../images/mega/top-sprite_v1.png);
+    background-image: url(../images/mega/top-sprite_v2.png);
     background-repeat: no-repeat;
     -webkit-transition: all 200ms ease-in-out;
     -moz-transition: all 200ms ease-in-out;
@@ -6225,7 +6235,7 @@ th.grid-first-th {
     background-position: center top;
     margin: -38px 0 0 -47px;
 }
-.shared-folder-content .block-view-file-type.folder, .contact-details-view .block-view-file-type.folder-shared {
+.block-view-file-type.folder.inbound-share, .contact-details-view .block-view-file-type.folder-shared {
     background-image: url(../images/mega/shared-sprite_v5.svg);
     background-repeat: no-repeat;
     background-position: center 3px;
@@ -6658,13 +6668,16 @@ table {
 .transfer-filtype-icon.font, .search-path-icon-span.font {
     background-position: -61px -1196px;
 }
-.transfer-filtype-icon.folder, .search-path-icon-span.folder, .transfer-filtype-icon.folder-shared, .search-path-icon-span.folder-shared {
+.transfer-filtype-icon.folder, .transfer-filtype-icon.inbound-share, .search-path-icon-span.folder, .transfer-filtype-icon.folder-shared, .search-path-icon-span.folder-shared {
     background-image: url(../images/mega/nw-fm-sprite_v20.svg);
     background-position: -14px -7465px;
     background-repeat: no-repeat;
 }
 .transfer-filtype-icon.folder-shared, .search-path-icon-span.folder-shared {
     background-position: -14px -7566px;
+}
+.transfer-filtype-icon.inbound-share {
+    background-position: -14px -7106px;
 }
 .rename-input-bl .transfer-filtype-icon.folder, .rename-input-bl .transfer-filtype-icon.folder-shared {
     background-image: url(../images/mega/dialogs-sprite_v12.svg);
@@ -7205,12 +7218,12 @@ table {
     line-height: 0;
     margin-left: -4px;
 }
-.fm-flags-icon img, .fm-browsers-icon img {
+.fm-flags-icon img {
     margin: 7px 0 0 2px;
     width: auto;
 }
 .fm-browsers-icon img {
-    margin: 4px 0 0 0px;
+    margin: 5px 0 0 0px;
     width: auto;
 }
 .tranfer-filetype-txt, .fm-browsers-txt, .fm-flags-txt, .fm-member-icon-txt {
@@ -9083,7 +9096,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     color: #999999;
     display: inline-block;
     padding: 0 0 0 26px;
-    background-image: url(../images/mega/top-sprite_v1.png);
+    background-image: url(../images/mega/top-sprite_v2.png);
     background-position: -8px -511px;
     background-repeat: no-repeat;
     float: none;
@@ -9468,6 +9481,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     position: relative;
+    text-align: left;
 }
 .default-select::before, .ui-selectmenu-button::before {
     content: '';
@@ -9491,6 +9505,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
     overflow: hidden;
+    position: relative;
 }
 .fm-share-dropdown {
     margin: 10px -20px 0 0;
@@ -9523,6 +9538,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     left: -4px;
     right: auto;
     overflow: hidden;
+    text-align: left;
 }
 .default-select-dropdown .jspDrag {
     width: 4px;
@@ -10872,6 +10888,9 @@ table {
     white-space: pre-line;
     height: 18px;
 }
+.transfers-form .fm-account-header {
+    height: auto;
+}
 .fm-account-header.big {
     font-size: 18px;
     padding: 18px 0 0 0;
@@ -11384,8 +11403,9 @@ table {
 .active-session-txt, .current-session-txt, .expired-session-txt, .settings-logout {
     display: block;
     float: left;
-    height: 16px;
+    height: 18px;
     background-color: #13E03C;
+    border:1px solid transparent;
     color: white;
     font-size: 12px;
     text-transform: uppercase;
@@ -11399,7 +11419,10 @@ table {
     -moz-transition: background-color 200ms ease-in-out;
     -o-transition: background-color 200ms ease-in-out;
     -ms-transition: background-color 200ms ease-in-out;
-    transition: background-color 200ms
+    transition: background-color 200ms;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
 .active-session-txt, .current-session-txt, .expired-session-txt {
     text-align: center;
@@ -11541,7 +11564,7 @@ table {
     padding-top: 10px;
     max-width: 50%;
 }
-.chart-warning, .chart-warning.red {
+.chart-warning {
     font-size: 14px;
     line-height: 18px;
     color: #333333;
@@ -11549,6 +11572,7 @@ table {
     padding: 0 0 0 8px;
     margin: 21px 0 1px 0;
     position: relative;
+    cursor: pointer;
 }
 .chart-warning a {
     color: #D90007;
@@ -11570,8 +11594,19 @@ table {
     left: 165px;
     top: 26px;
 }
+.exceeded .chart-indicator {
+    background-color: #cc0006;
+    left: 180px;
+    display: block;
+}
 .going-out .chart-indicator {
     display: block;
+}
+.going-out .big-icon.cloud {
+    background-position: 0px -11804px;
+}
+.going-out .chart.progressbars span::before {
+    background-color: #ffa500;
 }
 .exceeded .big-icon.cloud {
     background-position: 0px -10934px;
@@ -11872,7 +11907,7 @@ table {
 }
 .st-main-block > .jspContainer .jspPane, .main-scroll-block > .jspContainer .jspPane {
     min-height: 100%;
-    min-width: 980px;
+    min-width: 100%;
     width: 100% !important;
     position: relative;
 }
@@ -12679,7 +12714,7 @@ body.new-startpage {
     color: white;
     line-height: 23px;
     padding: 6px 0 11px 26px;
-    background-image: url(../images/mega/top-sprite_v1.png);
+    background-image: url(../images/mega/top-sprite_v2.png);
     background-repeat: no-repeat;
     background-position: -11px -729px;
     margin: 0;
@@ -12692,7 +12727,7 @@ body.new-startpage {
     width: 26px;
     height: 26px;
     float: right;
-    background-image: url(../images/mega/top-sprite_v1.png);
+    background-image: url(../images/mega/top-sprite_v2.png);
     background-repeat: no-repeat;
     background-position: -6px -854px;
     margin: 5px 0 0 9px;
@@ -12756,7 +12791,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    padding: 30px 0;
+    padding: 20px 0;
 }
 .nw-bottom-column:nth-child(1) {
     min-width: 177px;
@@ -12910,7 +12945,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     margin-left: 0;
 }
 .top-login-warning-arrow {
-    background-image: url(../images/mega/top-sprite_v1.png);
+    background-image: url(../images/mega/top-sprite_v2.png);
     background-position: 2px -420px;
     background-repeat: no-repeat;
     width: 30px;
@@ -13151,7 +13186,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     line-height: 28px;
     padding-left: 36px;
     color: white;
-    background-image: url(../images/mega/top-sprite_v1.png);
+    background-image: url(../images/mega/top-sprite_v2.png);
     background-position: -4px -1261px;
     background-repeat: no-repeat;
     font-size: 14px;
@@ -14238,27 +14273,15 @@ h5.main-italic-header {
     border: 2px solid #d9d9d9;
     margin: 8px;
 }
-body:not(.en):not(.ar):not(.fr):not(.de):not(.dk):not(.se):not(.fi):not(.pl):not(.cz):not(.sl):not(.hu):not(.jp):not(.cn):not(.ct):not(.kr):not(.ar):not(.he):not(.id):not(.sg):not(.tr):not(.hr):not(.sr):not(.th):not(.fa):not(.ee):not(.tl):not(.vi) .reg-st3-big-txt {
-    font-size: 20px;
-    line-height: 26px;
+body.ru .reg-st3-big-txt {
+    font-size: 16px;
 }
-body:not(.en):not(.ar):not(.fr):not(.de):not(.dk):not(.se):not(.fi):not(.pl):not(.cz):not(.sl):not(.hu):not(.jp):not(.cn):not(.ct):not(.kr):not(.ar):not(.he):not(.id):not(.sg):not(.tr):not(.hr):not(.sr):not(.th):not(.fa):not(.ee):not(.tl):not(.vi) .reg-st3-big-txt span, body:not(.en):not(.ar):not(.fr):not(.de):not(.dk):not(.se):not(.fi):not(.pl):not(.cz):not(.sl):not(.hu):not(.jp):not(.cn):not(.ct):not(.kr):not(.ar):not(.he):not(.id):not(.sg):not(.tr):not(.hr):not(.sr):not(.th):not(.fa):not(.ee):not(.tl):not(.vi) .reg-st3-mid-txt, body.key.de .reg-st3-big-txt span, body.key.de .reg-st3-mid-txt, body.key.hu .reg-st3-big-txt span, body.key.hu .reg-st3-mid-txt, body.key.fr .reg-st3-big-txt span, body.key.fr .reg-st3-mid-txt, body.key.se .reg-st3-big-txt span, body.key.se .reg-st3-mid-txt, body.key.dk .reg-st3-big-txt span, body.key.dk .reg-st3-mid-txt, body.key.ee .reg-st3-big-txt span, body.key.ee .reg-st3-mid-txt, body.key.fi .reg-st3-big-txt span, body.key.fi .reg-st3-mid-txt, body.key.hr .reg-st3-big-txt span, body.key.hr .reg-st3-mid-txt, body.key.sl .reg-st3-big-txt span, body.key.sl .reg-st3-mid-txt, body.key.sr .reg-st3-big-txt span, body.key.sr .reg-st3-mid-txt, body.key.vi .reg-st3-big-txt span, body.key.vi .reg-st3-mid-txt {
+body.de .reg-st3-mid-txt, body.de.key .free .reg-st3-big-txt span, body.br .reg-st3-mid-txt, body.br.key .free .reg-st3-big-txt span, body.nl.key .reg-st3-mid-txt, body.nl.key .free .reg-st3-big-txt span, body.tr.key .reg-st3-mid-txt, body.tr.key .free .reg-st3-big-txt span, body.es .reg-st3-mid-txt, body.es.key .free .reg-st3-big-txt span, body.it.key .reg-st3-mid-txt, body.it.key .free .reg-st3-big-txt span, body.ro .reg-st3-mid-txt, body.ro.key .free .reg-st3-big-txt span, body.ru .reg-st3-mid-txt, body.ru.key .free .reg-st3-big-txt span, body.bg .reg-st3-mid-txt, body.bg.key .free .reg-st3-big-txt span, body.pl.key .reg-st3-mid-txt, body.pl.key .free .reg-st3-big-txt span, body.sr.key .reg-st3-mid-txt, body.sr.key .free .reg-st3-big-txt span, body.fa.key .reg-st3-mid-txt, body.fa.key .free .reg-st3-big-txt span, body.se.key .reg-st3-mid-txt, body.se.key .free .reg-st3-big-txt span, body.tl.key .reg-st3-mid-txt, body.tl.key .free .reg-st3-big-txt span, body.fi.key .reg-st3-mid-txt, body.fi.key .free .reg-st3-big-txt span, body.sk .reg-st3-mid-txt, body.sk.key .free .reg-st3-big-txt span, body.uk.key .reg-st3-mid-txt, body.uk.key .free .reg-st3-big-txt span {
     font-size: 13px;
+    line-height: 36px;
 }
-body:not(.en):not(.ar):not(.fr):not(.de):not(.dk):not(.cz):not(.hu):not(.jp):not(.cn):not(.ct):not(.kr):not(.ar):not(.he):not(.id):not(.sg):not(.sr):not(.th):not(.fa):not(.ee):not(.tl) .reg-st3-storage, body:not(.en):not(.ar):not(.fr):not(.de):not(.dk):not(.cz):not(.hu):not(.jp):not(.cn):not(.ct):not(.kr):not(.ar):not(.he):not(.id):not(.sg):not(.sr):not(.th):not(.fa):not(.ee):not(.tl) .reg-st3-bandwidth {
-    padding-left: 20px;
-    padding-right: 20px;
-}
-body.key.ka .reg-st3-big-txt, body.key.ka .reg-st3-mid-txt, body.key.uk .reg-st3-big-txt, body.key.uk .reg-st3-mid-txt {
-    float: none;
-    height: 22px;
-    line-height: 20px;
-}
-body.key.ka .reg-st3-storage, body.key.uk .reg-st3-storage {
-    padding-top: 8px;
-}
-body.key.ka .reg-st3-bandwidth, body.key.uk .reg-st3-bandwidth {
-    padding-top: 2px;
+body.de .reg-st3-bandwidth .reg-st3-mid-txt, body.br .reg-st3-bandwidth .reg-st3-mid-txt, body.nl.key .reg-st3-bandwidth .reg-st3-mid-txt, body.tr.key .reg-st3-bandwidth .reg-st3-mid-txt, body.es .reg-st3-bandwidth .reg-st3-mid-txt, body.it.key .reg-st3-bandwidth .reg-st3-mid-txt, body.ro .reg-st3-bandwidth .reg-st3-mid-txt, body.ru .reg-st3-bandwidth .reg-st3-mid-txt, body.bg .reg-st3-bandwidth .reg-st3-mid-txt, body.pl.key .reg-st3-bandwidth .reg-st3-mid-txt, body.sr.key .reg-st3-bandwidth .reg-st3-mid-txt, body.fa.key .reg-st3-bandwidth .reg-st3-mid-txt, body.se.key .reg-st3-bandwidth .reg-st3-mid-txt, body.tl.key .reg-st3-bandwidth .reg-st3-mid-txt, body.fi.key .reg-st3-bandwidth .reg-st3-mid-txt, body.sk .reg-st3-bandwidth .reg-st3-mid-txt, body.uk.key .reg-st3-bandwidth .reg-st3-mid-txt {
+    font-size: 13px;
 }
 .no .membership-new-offer text, .kr .membership-new-offer text, .ct .membership-new-offer text {
     transform: translate(37.500000px, 39.000000px) rotate(-45.000000deg) translate(-27.500000px, -39.000000px) !important;
@@ -15009,13 +15032,6 @@ body.key.ka .reg-st3-bandwidth, body.key.uk .reg-st3-bandwidth {
     line-height: 20px;
     right: 11px;
     margin: 33px 0 0 0;
-}
-.th .reg-st3-mid-txt {
-    font-size: 14px;
-}
-.ar .reg-st3-mid-txt {
-    font-size: 17px;
-    line-height: 20px;
 }
 .reg-st3-percents {
     text-align: center;
@@ -17874,7 +17890,7 @@ code, c {
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     background-color: #5b5a59;
-    background-image: url(../images/mega/top-sprite_v1.png);
+    background-image: url(../images/mega/top-sprite_v2.png);
     background-position: -9px -941px;
     background-repeat: no-repeat;
     margin: 8px 0 0 240px;
@@ -20923,7 +20939,7 @@ ul.token-input-list-mega li input, .multiple-input input {
 li.token-input-token-mega {
     overflow: hidden;
     height: 20px;
-    line-height: 18px;
+    line-height: 19px;
     margin: 6px 3px 2px 3px;
     padding: 0 20px 0 24px;
     background-color: white;
@@ -22473,7 +22489,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     display: inline-block;
     border-radius: 12px;
     text-transform: uppercase;
-    background-image: url(../images/mega/top-sprite_v1.png);
+    background-image: url(../images/mega/top-sprite_v2.png);
     background-repeat: no-repeat;
     background-position: -6px -981px;
     color: rgba(255,255,255,0.7) !important;
@@ -23479,7 +23495,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
     display: none;
     border-radius: 4px;
     -moz-border-radius: 4px;
-    -webkit-border-radius: 4px; 
+    -webkit-border-radius: 4px;
     -webkit-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.15);
     -moz-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.15);
     box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.15);
@@ -23492,7 +23508,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
     background: #fff none repeat scroll 0 0;
     border-radius: 4px;
     -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;    
+    -webkit-border-radius: 4px;
     color: #888787;
     display: block;
     font-family: "source_sans_proregular", Arial;
@@ -24168,17 +24184,24 @@ body.pro:after {
 }
 .megasync-dropdown {
     width: 280px;
-    height: 32px;
-    background-color: white;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
+    float: none;
     margin: 63px auto 55px auto;
-    text-align: left;
-    -moz-box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
-    -webkit-box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
-    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
     display: none;
+}
+.megacmd-dropdown {
+    width: 228px;
+    float: none;
+    margin: 40px auto 5px auto;
+}
+.megacmd-linux .sync-radio-buttons {
+    width: 228px;
+    margin: 0 auto;
+}
+.default-dropdown-item.icon {
+    padding: 0 30px 0 34px;
+    background-image: url(../images/mega/download-sprite-v6.png);
+    background-position: 0 64px;
+    background-repeat: no-repeat;
 }
 .sync-bottom-block .megasync-dropdown {
     margin: 0px;
@@ -24186,62 +24209,29 @@ body.pro:after {
 .linux .megasync-dropdown {
     display: block;
 }
-.megasync-dropdown span, .megasync-dropdown-link {
-    padding: 0 30px 0 11px;
-    background-image: url(../images/mega/download-sprite-v6.png);
-    background-position: right -1811px;
-    color: #666666;
-    background-repeat: no-repeat;
-    font-size: 14px;
-    line-height: 32px;
-    height: 32px;
-    display: block;
-    position: relative;
-    z-index: 20;
-    cursor: pointer;
-    white-space: nowrap;
-    -o-text-overflow: ellipsis;
-    text-overflow: ellipsis;
-    overflow: hidden;
-}
-.megasync-dropdown-link {
-    padding-left: 34px;
-    background-color: rgba(255,255,255,0);
-    -webkit-transition: background-color 200ms ease-in-out;
-    -moz-transition: background-color 200ms ease-in-out;
-    -o-transition: background-color 200ms ease-in-out;
-    -ms-transition: background-color 200ms ease-in-out;
-    transition: background-color 200ms ease-in-out;
-}
-.megasync-dropdown-link:hover {
-    background-color: rgba(0,0,0,0.05);
-}
-.megasync-dropdown-link.centos {
+.default-dropdown-item.centos {
     background-position: 10px -1921px;
 }
-.megasync-dropdown-link.debian {
+.default-dropdown-item.debian {
     background-position: 10px -1982px;
 }
-.megasync-dropdown-link.elementary, .megasync-dropdown-link.elementaryosfreya {
+.default-dropdown-item.elementary, .default-dropdown-item.elementaryosfreya {
     background-position: 10px -1952px;
 }
-.megasync-dropdown-link.fedora {
+.default-dropdown-item.fedora {
     background-position: 10px -2132px;
 }
-.megasync-dropdown-link.mint {
+.default-dropdown-item.mint {
     background-position: 10px -2102px;
 }
-.megasync-dropdown-link.opensuse {
+.default-dropdown-item.opensuse {
     background-position: 10px -2072px;
 }
-.megasync-dropdown-link.redhat {
+.default-dropdown-item.redhat {
     background-position: 10px -2042px;
 }
-.megasync-dropdown-link.ubuntu {
+.default-dropdown-item.ubuntu {
     background-position: 10px -2012px;
-}
-.megasync-dropdown span.active {
-    background-position: right -1883px;
 }
 .megasync-close {
     width: 14px;
@@ -24280,49 +24270,17 @@ body.pro:after {
     font-size: 13px;
     cursor: default;
 }
-.megasync-dropdown-list {
-    width: 288px;
-    position: absolute;
-    left: 50%;
-    margin: 0 0 0 -144px;
-    -moz-border-radius: 8px;
-    -webkit-border-radius: 8px;
-    border-radius: 8px;
-    background-color: rgba(0,0,0,0.15);
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    padding: 4px;
-    z-index: 10;
-    top: 122px;
+.default-select-dropdown .jspContainer .jspPane {
+    min-width: 100%;
+    max-width: 100% !important;
 }
-.megasync-dropdown-list .jspPane {
-    min-width: 280px;
-    max-width: 280px;
-}
-.megasync-dropdown-pad {
-    background-color: white;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
-    text-align: left;
-    -webkit-box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
-    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    padding: 36px 0 4px 0;
-}
-.megasync-dropdown-scroll .jspVerticalBar {
-    width: 10px;
-}
-.megasync-list-arrow {
+.mega-list-arrow {
     height: 23px;
     background-image: url(../images/mega/download-sprite-v6.png);
     background-position: center -2171px;
     cursor: pointer;
 }
-.megasync-list-arrow.inactive {
+.mega-list-arrow.inactive {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     -moz-opacity: 0.3;
     -khtml-opacity: 0.3;
@@ -24574,7 +24532,7 @@ body.pro:after {
     color: white;
     text-decoration: underline;
     white-space: nowrap;
-    padding-left: 3px;
+    padding-left: 0;
     cursor: pointer;
 }
 .toast-button:hover {
@@ -26206,7 +26164,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', e
     font-size: 16px;
 }
 /* User select */
-.selectable, .selectable *, input, textarea, .fm-dialog p, .properties-file-link, .contact-fingerprint-txt *, .fingerprint-txt, .contact-details-user-name, .contact-details-email, .nw-contact-name, .fm-breadcrumbs.contact .right-arrow-bg span, div.new-download-file-title, .dev-nw *, .fmholder .dev-nw div, .fmholder div.new-affiliate-bg1 *, .fmholder div.main-mid-pad.new-bottom-pages *, .collected-data li, .export-item-title, .grid-table.vouchers *, .export-item-title, .properties-file-txt, .wire-transfer-details *, .blog-new-full *, div div.new-download-file-title, div div.nt-info-txt, div div.nt-main-date, .new-right-content-block *, .ff-right-block *, .pro-gray-block *, .sync-white-bl *, .sync-top-txt, .sync-top-txt-block *, .blog-new-full *, .fingerprint > span, .fm-account-main table *, .fm-account-main label, .fm-account-main div:not(.default-big-button):not(.default-button), .fm-account-main div:not(.default-big-button):not(.default-button) + span, .new-bottom-pages *, .file-link-info, .nw-conversations-name, .active-folder-link .tranfer-filetype-txt, .active-folder-link .nw-fm-tree-folder, .active-folder-link .file-block-title, .fm-breadcrumbs span span, .export-item-title, .export-link-gray-txt, .message.text-block, .user-card-name:not(.message), .user-card-name:not(.message) span, .user-card-email, .message.data-title, .download.info-txt, .fm-account-main a, .fm-account-main span, .fingerprint-txt span, .membership-big-txt.email {
+.selectable, .selectable *, input, textarea, .fm-dialog p, .properties-file-link, .contact-fingerprint-txt *, .fingerprint-txt, .contact-details-user-name, .contact-details-email, .nw-contact-name, .fm-breadcrumbs.contact .right-arrow-bg span, div.new-download-file-title, .dev-nw *, .fmholder .dev-nw div, .fmholder div.new-affiliate-bg1 *, .fmholder div.main-mid-pad.new-bottom-pages *, .collected-data li, .export-item-title, .grid-table.vouchers *, .export-item-title, .properties-file-txt, .wire-transfer-details *, .blog-new-full *, div div.new-download-file-title, div div.nt-info-txt, div div.nt-main-date, .new-right-content-block *, .ff-right-block *, .pro-gray-block *, .sync-white-bl *, .sync-top-txt, .sync-top-txt-block *, .blog-new-full *, .fingerprint > span, .fm-account-main table *, .fm-account-main label, .fm-account-main div:not(.default-big-button):not(.default-button), .fm-account-main div:not(.default-big-button):not(.default-button) + span, .new-bottom-pages *, .file-link-info, .nw-conversations-name, .active-folder-link .tranfer-filetype-txt, .active-folder-link .nw-fm-tree-folder, .active-folder-link .file-block-title, .fm-breadcrumbs span span, .export-item-title, .export-link-gray-txt, .message.text-block, .user-card-name:not(.message), .user-card-name:not(.message) span, .user-card-email, .message.data-title, .download.info-txt, .fm-account-main a, .fm-account-main span, .fingerprint-txt span, .membership-big-txt.email, .properties-txt-pad *, .grid-scrolling-table td * {
     -webkit-touch-callout: text !important;
     -webkit-user-select: text !important;
     -khtml-user-select: text !important;
@@ -26227,17 +26185,23 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', e
 }
 }
 
-@media only screen and (max-width: 1296px) {
-body.key.ru .reg-st3-big-txt, body.key.ru .reg-st3-mid-txt, body.key.hu .reg-st3-big-txt, body.key.hu .reg-st3-mid-txt, body.key.sr .reg-st3-big-txt, body.key.sr .reg-st3-mid-txt {
+@media only screen and (max-width: 1268px) {
+body.key.de .reg-st3-big-txt, body.key.de .reg-st3-mid-txt, body.key.br .reg-st3-big-txt, body.key.br .reg-st3-mid-txt, body.key.nl .reg-st3-big-txt, body.key.nl .reg-st3-mid-txt, body.key.tr .reg-st3-big-txt, body.key.tr .reg-st3-mid-txt, body.key.es .reg-st3-big-txt, body.key.es .reg-st3-mid-txt, body.key.it .reg-st3-big-txt, body.key.it .reg-st3-mid-txt, body.key.ro .reg-st3-big-txt, body.key.ro .reg-st3-mid-txt, body.key.vi .reg-st3-big-txt, body.key.vi .reg-st3-mid-txt, body.key.ru .reg-st3-big-txt, body.key.ru .reg-st3-mid-txt, body.key.bg .reg-st3-big-txt, body.key.bg .reg-st3-mid-txt, body.key.pl .reg-st3-big-txt, body.key.pl .reg-st3-mid-txt, body.key.sr .reg-st3-big-txt, body.key.sr .reg-st3-mid-txt, body.key.fa .reg-st3-big-txt, body.key.fa .reg-st3-mid-txt, body.key.sk .reg-st3-big-txt, body.key.sk .reg-st3-mid-txt {
     float: none;
-    height: 22px;
-    line-height: 20px;
+    height: 24px;
+    line-height: 24px;
 }
-body.key.ru .reg-st3-storage, body.key.hu .reg-st3-storage, body.key.sr .reg-st3-storage {
-    padding-top: 8px;
+body.key.de .reg-st3-storage, body.key.br .reg-st3-storage, body.key.nl .reg-st3-storage, body.key.tr .reg-st3-storage, body.key.es .reg-st3-storage, body.key.it .reg-st3-storage, body.key.ro .reg-st3-storage, body.key.vi .reg-st3-storage, body.key.ru .reg-st3-storage, body.key.bg .reg-st3-storage, body.key.pl .reg-st3-storage, body.key.sr .reg-st3-storage, body.key.fa .reg-st3-storage, body.key.sk .reg-st3-storage {
+    padding-top: 7px;
+    height: 44px;
 }
-body.key.ru .reg-st3-bandwidth, body.key.hu .reg-st3-bandwidth, body.key.sr .reg-st3-bandwidth {
-    padding-top: 2px;
+body.key.de .reg-st3-bandwidth, body.key.br .reg-st3-bandwidth, body.key.nl .reg-st3-bandwidth, body.key.tr .reg-st3-bandwidth, body.key.es .reg-st3-bandwidth, body.key.it .reg-st3-bandwidth, body.key.ro .reg-st3-bandwidth, body.key.vi .reg-st3-bandwidth, body.key.ru .reg-st3-bandwidth, body.key.bg .reg-st3-bandwidth, body.key.pl .reg-st3-bandwidth, body.key.sr .reg-st3-bandwidth, body.key.fa .reg-st3-bandwidth, body.key.sk .reg-st3-bandwidth {
+    padding-top: 5px;
+    height: 48px;
+}
+body.key.vi .reg-st3-mid-txt, body.key.vi .reg-st3-mid-txt {
+    font-size: 14px;
+    line-height: 22px;
 }
 }
 
@@ -26263,34 +26227,9 @@ body.key.ru .reg-st3-bandwidth, body.key.hu .reg-st3-bandwidth, body.key.sr .reg
     -webkit-border-radius: 12px;
     border-radius: 12px;
 }
-}
-
-@media only screen and (max-width: 1188px) {
-.key .reg-st3-big-txt {
-    font-size: 20px;
-    line-height: 26px;
-}
-.key .reg-st3-big-txt span, .key .reg-st3-mid-txt {
+body.key.th .reg-st3-mid-txt, body.key.th .reg-st3-mid-txt, body.key.id .reg-st3-mid-txt, body.key.id .reg-st3-mid-txt, body.key.fr .reg-st3-mid-txt, body.key.fr .reg-st3-mid-txt, body.key.jp .reg-st3-mid-txt, body.key.jp .reg-st3-mid-txt, body.key.sl .reg-st3-mid-txt, body.key.sl .reg-st3-mid-txt {
     font-size: 14px;
-}
-body.key:not(.en):not(.ar):not(.se):not(.jp):not(.cn):not(.ct):not(.kr):not(.ar):not(.he):not(.id):not(.sg):not(.th):not(.fa):not(.tl) .reg-st3-big-txt span, body.key:not(.en):not(.ar):not(.se):not(.jp):not(.cn):not(.ct):not(.kr):not(.ar):not(.he):not(.id):not(.sg):not(.th):not(.fa):not(.tl) .reg-st3-mid-txt {
-    font-size: 13px;
-    line-height: 26px;
-    vertical-align: top;
-}
-body.key:not(.en):not(.ar):not(.se):not(.jp):not(.cn):not(.ct):not(.kr):not(.ar):not(.he):not(.id):not(.sg):not(.th):not(.fa):not(.tl) .reg-st3-storage {
-    padding-top: 8px;
-}
-body.key:not(.en):not(.ar):not(.se):not(.jp):not(.cn):not(.ct):not(.kr):not(.ar):not(.he):not(.id):not(.sg):not(.th):not(.fa):not(.tl) .reg-st3-bandwidth {
-    padding-top: 2px;
-}
-body.key:not(.en):not(.ar):not(.se):not(.jp):not(.cn):not(.ct):not(.kr):not(.ar):not(.he):not(.id):not(.sg):not(.th):not(.fa):not(.tl) .reg-st3-big-txt {
-    font-size: 20px;
-}
-body.key:not(.en):not(.ar):not(.se):not(.jp):not(.cn):not(.ct):not(.kr):not(.ar):not(.he):not(.id):not(.sg):not(.th):not(.tl) .reg-st3-big-txt, body.key:not(.en):not(.ar):not(.se):not(.jp):not(.cn):not(.ct):not(.kr):not(.ar):not(.he):not(.id):not(.sg):not(.th):not(.tl) .reg-st3-mid-txt {
-    float: none;
-    height: 20px;
-    line-height: 20px;
+    line-height: 34px;
 }
 }
 

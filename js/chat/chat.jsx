@@ -19,7 +19,7 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
             if (!megaChat.chats[roomOrUserHash + "@conference." + megaChat.options.xmppDomain]) {
                 // chat not found
                 setTimeout(function () {
-                    window.location = '#fm/chat';
+                    loadSubPage('fm/chat');
                     M.openFolder('chat');
                 }, 100);
                 return;
@@ -28,7 +28,7 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
         else {
             if (!M.u[roomOrUserHash]) {
                 setTimeout(function () {
-                    window.location = '#fm/chat';
+                    loadSubPage('fm/chat');
                     M.openFolder('chat');
                 }, 100);
                 return;
@@ -458,16 +458,16 @@ Chat.prototype.init = function() {
     
 
     // UI events
-    $(document.body).undelegate('.top-user-status-item', 'mousedown.megachat');
+    $(document.body).undelegate('.top-user-status-popup .tick-item', 'mousedown.megachat');
 
-    $(document.body).delegate('.top-user-status-item', 'mousedown.megachat', function() {
+    $(document.body).delegate('.top-user-status-popup .tick-item', 'mousedown.megachat', function(e) {
         var presence = $(this).data("presence");
         self._myPresence = presence;
 
         localStorage.megaChatPresence = presence;
         localStorage.megaChatPresenceMtime = unixtime();
 
-        $('.top-user-status-popup').removeClass("active");
+        $('.top-user-status-popup').addClass("hidden");
 
         if (self.karere.getConnectionState() != Karere.CONNECTION_STATE.CONNECTED && presence != Karere.PRESENCE.OFFLINE) {
             self.karere._myPresence = presence;
@@ -479,7 +479,6 @@ Chat.prototype.init = function() {
                     shard.reconnect();
                 });
             });
-            return true;
         }
         else {
             if (presence === Karere.PRESENCE.OFFLINE) {
@@ -566,7 +565,7 @@ Chat.prototype.init = function() {
         if (!appContainer) {
             $(window).rebind('hashchange.delayedChatUiInit', function() {
                 if (typeof($.leftPaneResizable) === 'undefined' || !fminitialized) {
-                    // delay the chat init a bit more! specially for the case of a user getting from #pro -> #fm, which
+                    // delay the chat init a bit more! specially for the case of a user getting from /pro -> /fm, which
                     // for some unknown reason, stopped working and delayed the init of $.leftPaneResizable
                     return;
                 }
@@ -1080,7 +1079,7 @@ Chat.prototype.renderMyStatus = function() {
     // reset
     var $status = $('.activity-status-block .activity-status');
 
-    $('.top-user-status-popup .top-user-status-item').removeClass("active");
+    $('.top-user-status-popup .tick-item').removeClass("active");
 
 
     $status
@@ -1117,19 +1116,19 @@ Chat.prototype.renderMyStatus = function() {
 
 
     if (cssClass === 'online') {
-        $('.top-user-status-popup .top-user-status-item[data-presence="chat"]').addClass("active");
+        $('.top-user-status-popup .tick-item[data-presence="chat"]').addClass("active");
     }
     else if (cssClass === 'away') {
-        $('.top-user-status-popup .top-user-status-item[data-presence="away"]').addClass("active");
+        $('.top-user-status-popup .tick-item[data-presence="away"]').addClass("active");
     }
     else if (cssClass === 'busy') {
-        $('.top-user-status-popup .top-user-status-item[data-presence="dnd"]').addClass("active");
+        $('.top-user-status-popup .tick-item[data-presence="dnd"]').addClass("active");
     }
     else if (cssClass === 'offline') {
-        $('.top-user-status-popup .top-user-status-item[data-presence="unavailable"]').addClass("active");
+        $('.top-user-status-popup .tick-item[data-presence="unavailable"]').addClass("active");
     }
     else {
-        $('.top-user-status-popup .top-user-status-item[data-presence="unavailable"]').addClass("active");
+        $('.top-user-status-popup .tick-item[data-presence="unavailable"]').addClass("active");
     }
 
     $status.addClass(
@@ -1601,7 +1600,7 @@ Chat.prototype.getChatNum = function(idx) {
  * Called when the BOSH service url is requested for Karere to connect. Should return a full URL to the actual
  * BOSH service that should be used for connecting the current user.
  */
-Chat.prototype.getXmppServiceUrl = function() {
+Chat.prototype.getXmppServiceUrl = function(timeout) {
     var self = this;
 
     if (localStorage.megaChatUseSandbox) {
@@ -1613,7 +1612,10 @@ Chat.prototype.getXmppServiceUrl = function() {
     else {
         var $promise = new MegaPromise();
 
-        $.get("https://" + self.options.loadbalancerService + "/?service=xmpp")
+        $.ajax("https://" + self.options.loadbalancerService + "/?service=xmpp", {
+            method: "GET",
+            timeout: timeout ? timeout : 10000
+            })
             .done(function(r) {
                 if (r.xmpp && r.xmpp.length > 0) {
                     var randomHost = array_random(r.xmpp);

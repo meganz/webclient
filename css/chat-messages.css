@@ -20,6 +20,7 @@
     position: relative;
     background-color: #fafafa;
     margin-right: 256px;
+    overflow: hidden;
 }
 .conversation-panel.group-chat .messages-block {
     height: -webkit-calc(100% - 38px);

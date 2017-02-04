@@ -119,7 +119,7 @@ var alarm = {
                 alarm.hidden = 1;
 
                 // Go to the Pro page
-                document.location.hash = 'pro';
+                loadSubPage('pro');
             });
         }
     },
@@ -168,7 +168,7 @@ var alarm = {
                 // Hide the dialog and go to register page
                 $dialog.addClass('hidden');
                 $button.removeClass('active');
-                document.location.hash = 'register';
+                loadSubPage('register');
             });
         }
     },
@@ -306,7 +306,7 @@ var alarm = {
                 api_req({ a: 'log', e: 99608, m: 'User chose a new plan from the plan expiry dialog' });
 
                 // Go to the first step of the Pro page so they can choose a new plan
-                document.location.hash = 'pro';
+                loadSubPage('pro');
             });
         },
 
@@ -334,7 +334,7 @@ var alarm = {
                 var proLink = (proNum === 4) ? 'lite' : proNum;
 
                 // Go to the second step of the Pro page which will pre-populate the details
-                document.location.hash = 'pro_' + proLink;
+                loadSubPage('pro_' + proLink);
             });
         },
 

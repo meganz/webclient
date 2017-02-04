@@ -105,7 +105,7 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
         try {
             if (!fmdb.db) {
                 var todrop = [];
-                var dbpfx = 'fm4_';
+                var dbpfx = 'fm6_';
 
                 // enumerate databases and collect those not prefixed with 'dbpfx'
                 // (which is the current format)
@@ -222,14 +222,26 @@ FMDB.prototype.dropall = function fmdb_dropall(dbs, cb) {
     }
     else {
         var fmdb = this;
-        var db = dbs.pop();
-
-        (new Dexie(db)).delete().then(function(){
-            fmdb.logger.log("Deleted IndexedDB " + db);
-        }).catch(function(err){
-            fmdb.logger.error("Unable to delete IndexedDB " + db, err);
-        }).finally(function(){
+        var db = new Dexie(dbs.pop());
+        var next = function(ev) {
+            next = function() {};
+            if (ev && ev.type === 'blocked') {
+                fmdb.logger.warn('Cannot delete blocked indexedDB: ' + db.name);
+            }
             fmdb.dropall(dbs, cb);
+        };
+
+        // If the DB is blocked, Dexie will try to delete it as soon there are no locks on it.
+        // However, we'll resolve immediately without waiting for it, since that will happen in
+        // an undetermined amount of time which needless to say is an odd UX experience...
+        db.on('blocked', next);
+
+        db.delete().then(function() {
+            fmdb.logger.log("Deleted IndexedDB " + db.name);
+        }).catch(function(err){
+            fmdb.logger.error("Unable to delete IndexedDB " + db.name, err);
+        }).finally(function() {
+            next();
         });
     }
 };
@@ -492,15 +504,6 @@ FMDB.prototype.stripnode = Object.freeze({
         return t;
     },
 
-    s : function(s) {
-        var t = { o : s.o, t : s.t };
-
-        delete s.o;
-        delete s.t;
-
-        return t;
-    },
-
     ua : function(ua, index) {
         delete ua.k;
     },
@@ -531,22 +534,6 @@ FMDB.prototype.restorenode = Object.freeze({
         if (!f.ar && f.k && typeof f.k == 'object') f.ar = {};
     },
 
-    s : function(f, index) {
-        var t = index.o_t.indexOf('*');
-        if (t >= 0) {
-            f.o = index.o_t.substr(0, t);
-            f.t = index.o_t.substr(t + 1);
-        }
-    },
-
-    ps : function(ps, index) {
-        var t = index.h_p.indexOf('*');
-        if (t >= 0) {
-            ps.h = index.h_p.substr(0, t);
-            ps.p = index.h_p.substr(t + 1);
-        }
-    },
-
     ph : function(ph, index) {
         ph.h = index.h;
     },
@@ -558,6 +545,7 @@ FMDB.prototype.restorenode = Object.freeze({
     chatqueuedmsgs : function(chatqueuedmsgs, index) {
         chatqueuedmsgs.k = index.k;
     },
+
     pta: function(pta, index) {
         pta.k = index.k;
     },

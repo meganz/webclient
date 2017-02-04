@@ -369,7 +369,7 @@ function initUI() {
     }
     $('.not-logged .fm-not-logged-button.create-account').rebind('click', function()
     {
-        document.location.hash = 'register';
+        loadSubPage('register');
     });
 
     $('.fm-dialog-overlay').rebind('click.fm', function()
@@ -843,10 +843,10 @@ function initUI() {
                 ephemeralDialog(l[7687]);
             }
             else if ($(this).hasClass('dashboard')) {
-                document.location.hash = 'fm/dashboard';
+                loadSubPage('fm/dashboard');
             }
             else {
-                document.location.hash = 'fm/account';
+                loadSubPage('fm/account');
             }
             return false;
         }
@@ -1856,8 +1856,8 @@ function addContactUI() {
 
     $('.fm-add-user').rebind('click', function() {
 
-        var $this = $(this),
-            $d = $('.add-user-popup');
+        var $this = $(this);
+        var $d = $('.add-user-popup');
 
         $.hideContextMenu();
         $.dialog = 'add-contact-popup';
@@ -1875,6 +1875,7 @@ function addContactUI() {
         else {
             $('.add-user-popup .import-contacts-dialog').fadeOut(0);
             $('.import-contacts-link').removeClass('active');
+            clearScrollPanel('.add-user-popup');
             $this.addClass('active');
             $d.removeClass('hidden dialog');
             $('.add-user-popup .multiple-input .token-input-token-mega').remove();
@@ -2094,50 +2095,31 @@ function ephemeralDialog(msg) {
 
     msgDialog('confirmation', l[998], msg + ' ' + l[999], l[1000], function(e) {
         if (e) {
-            document.location.hash = 'register';
+            loadSubPage('register');
         }
     });
 }
 
-/**
- * Removes the user from the share
- *
- * @param {String}  shareId     The share id
- * @param {Boolean} [nfk]       Keep foreign key..
- * @param {Boolean} [norender]  do not invoke buildtree/openFolder
- * @returns {MegaPromise}
- */
-function removeShare(shareId, nfk, norender) {
-    var promise;
-
+// leave incoming share h
+// FIXME: implement sn tagging to prevent race condition
+function leaveShare(h) {
     if (d) {
-        console.log('removeShare', shareId);
+        console.log('leaveShare', h);
     }
 
-    if (!nfk) {
-        api_updfkey(shareId);
+    // leaving inner nested shares is not allowed: walk to the share root
+    while (M.d[h] && M.d[M.d[h].p]) {
+        h = M.d[h].p;
     }
 
-    M.delNode(shareId, true);   // must not update DB pre-API
-    api_req({ a: 'd', n: shareId/*, i: requesti*/ });
+    if (M.d[h] && M.d[h].su) {
+        loadingDialog.show(); // this will be hidden somewhere else after processing the action-packet
 
-    if (!norender) {
-
-        promise = M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
-
-        if ((M.currentdirid === shareId) || (isCircular(shareId, M.currentdirid) === true)) {
-            promise.pipe(function() {
-                return M.openFolder(RootbyId(shareId));
-            });
-        }
+        api_req({ a: 'd', n: h/*, i: requesti*/ });
     }
-    else {
-        promise = MegaPromise.resolve();
+    else if (d) {
+        console.warn('Cannot leaveShare', h);
     }
-
-    delete u_sharekeys[shareId];
-
-    return promise;
 }
 
 function fmremove() {
@@ -2147,7 +2129,7 @@ function fmremove() {
     dbfetch.coll(handles)
         .always(function() {
             var doRemoveShare = handles.some(function(h) {
-                return M.d[h] && M.d[h].p.length === 11;
+                return M.d[h] && M.d[h].su;
             });
 
             if (doRemoveShare) {
@@ -2178,7 +2160,7 @@ function fmremovesync() {
     for (var i in $.selected) {
         var n = M.d[$.selected[i]];
 
-        if (n && n.p.length === 11) {
+        if (n && n.su) {
             removesharecnt++;
         }
         else if (String($.selected[i]).length === 11) {
@@ -2194,7 +2176,7 @@ function fmremovesync() {
 
     if (removesharecnt) {
         for (var i in $.selected) {
-            removeShare($.selected[i]);
+            leaveShare($.selected[i]);
         }
         M.openFolder('shares', true);
     }
@@ -2223,7 +2205,7 @@ function fmremovesync() {
                     if (M.c[selected]) {
                         Object.keys(M.c[selected])
                             .forEach(function(sharenode) {
-                                removeShare(sharenode, 1);
+                                leaveShare(sharenode);
                             });
                     }
 
@@ -2566,6 +2548,7 @@ function initContextUI() {
             // this is used like identifier when key with key code 27 is pressed
             $.dialog = 'share';
             $.hideContextMenu();
+            clearScrollPanel('.share-dialog');
 
             // Show the share dialog
             $shareDialog.removeClass('hidden');
@@ -2576,7 +2559,6 @@ function initContextUI() {
 
             fm_showoverlay();
             handleShareDialogContent();
-
         }
     });
 
@@ -2629,7 +2611,7 @@ function initContextUI() {
 
         if (user_handle.length === 1) {
             if (!$this.is(".disabled") && user_handle) {
-                window.location = "#fm/chat/" + user_handle;
+                loadSubPage('fm/chat/' + user_handle);
             }
         }
         else {
@@ -2643,7 +2625,7 @@ function initContextUI() {
         var room;
 
         if (!$this.is(".disabled") && user_handle) {
-            window.location = "#fm/chat/" + user_handle;
+            loadSubPage('fm/chat/' + user_handle);
             room = megaChat.createAndShowPrivateRoomFor(user_handle);
             if (room) {
                 room.startAudioCall();
@@ -2657,7 +2639,7 @@ function initContextUI() {
         var room;
 
         if (!$this.is(".disabled") && user_handle) {
-            window.location = "#fm/chat/" + user_handle;
+            loadSubPage('fm/chat/' + user_handle);
             room = megaChat.createAndShowPrivateRoomFor(user_handle);
             if (room) {
                 room.startVideoCall();
@@ -2697,7 +2679,7 @@ function initContextUI() {
     $('.labels .dropdown-colour-item').click(function() {
         var labelId = parseInt(this.dataset.labelId);
 
-        if (labelId && (RightsbyID($.selected[0]) > 1)) {
+        if (labelId && (rightsById($.selected[0]) > 1)) {
             M.colourLabeling($.selected, labelId);
         }
     });
@@ -2933,7 +2915,7 @@ function fmtopUI() {
             }
         }
         else if (String(M.currentdirid).length === 8
-                && RightsbyID(M.currentdirid) > 0) {
+                && rightsById(M.currentdirid) > 0) {
 
             $('.fm-new-folder').removeClass('hidden');
             $('.fm-file-upload').removeClass('hidden');
@@ -3032,7 +3014,7 @@ function dashboardUI() {
          $('.account.widget.recovery-key').removeClass('hidden');
          // Button on dashboard to backup their master key
         $('.backup-master-key').rebind('click', function() {
-            document.location.hash = 'backup';
+            loadSubPage('backup');
         });
     }
 
@@ -3051,6 +3033,11 @@ function dashboardUI() {
     else {
         $('.account.membership-plan').text(l[435]);
     }
+
+    // update avatar
+    $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', true));
+    $('.fm-avatar img').attr('src', useravatar.mine());
+
 
     // Show first name or last name
     if (u_attr.firstname) {
@@ -3119,7 +3106,10 @@ function dashboardUI() {
     // Account data
     M.accountData(function(account) {
 
-        var perc, perc_c, b_exceeded, s_exceeded;
+        var perc;
+        var perc_c;
+        var b_exceeded;
+        var s_exceeded;
 
         // Show ballance
         $('.account.left-pane.balance-info').text(l[7108]);
@@ -3193,7 +3183,7 @@ function dashboardUI() {
 
         /* Registration date, bandwidth notification link */
         $('.dashboard .button.upgrade-account, .bandwidth-info a').rebind('click', function() {
-            window.location.hash = 'pro';
+            loadSubPage('pro');
         });
         $('.account.left-pane.reg-date-info').text(l[16128]);
         $('.account.left-pane.reg-date-val').text(time2date(u_attr.since, 2));
@@ -3202,6 +3192,7 @@ function dashboardUI() {
         /* New Used Bandwidth chart */
         var base = account.downbw_used;
         var max  = 1.5 * 1024 * 1024 * 1024;
+        var $bandwidthChart = $('.fm-account-blocks.bandwidth');
         if (u_attr.p) {
             max = account.bw;
             base += account.servbw_used;
@@ -3215,86 +3206,96 @@ function dashboardUI() {
         if (perc_c > 100) {
             perc_c = 100;
         }
-        else if (perc > 99) {
-            $('.fm-account-blocks.bandwidth').addClass('exceeded');
+        if (perc_c > 99) {
+            $bandwidthChart.addClass('exceeded');
             b_exceeded = 1;
         }
-
         var deg =  230 * perc_c / 100;
 
         // Used Bandwidth chart
         if (deg <= 180) {
-            $('.bandwidth .main-chart.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
+            $bandwidthChart.find('.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
+            $bandwidthChart.find('.right-chart span').removeAttr('style');
         }
         else {
-            $('.bandwidth .main-chart.left-chart span').css('transform', 'rotate(180deg)');
-            $('.bandwidth .main-chart.right-chart span').css('transform', 'rotate(' + (deg - 180) + 'deg)');
+            $bandwidthChart.find('.left-chart span').css('transform', 'rotate(180deg)');
+            $bandwidthChart.find('.right-chart span').css('transform', 'rotate(' + (deg - 180) + 'deg)');
         }
 
         // Maximum bandwidth
         var b2 = bytesToSize(max, 0).split(' ');
-        $('.bandwidth .chart.data .size-txt').text(bytesToSize(base, 0));
-        $('.bandwidth .chart.data .pecents-txt').text((b2[0]));
-        $('.bandwidth .chart.data .gb-txt').text((b2[1]));
+        $bandwidthChart.find('.chart.data .size-txt').text(bytesToSize(base, 0));
+        $bandwidthChart.find('.chart.data .pecents-txt').text((b2[0]));
+        $bandwidthChart.find('.chart.data .gb-txt').text((b2[1]));
         if (u_attr.p || M.maf) {
-            $('.bandwidth .chart.data .perc-txt').text(perc_c + '%');
+            $bandwidthChart.find('.chart.data .perc-txt').text(perc_c + '%');
         }
         else {
-            $('.bandwidth .chart.data span:not(.size-txt)').text('');
-            $('.bandwidth .chart.data .pecents-txt').text(l[5801]);
+            $bandwidthChart.find('.chart.data span:not(.size-txt)').text('');
+            $bandwidthChart.find('.chart.data .pecents-txt').text(l[5801]);
         }
         /* End of New Used Bandwidth chart */
 
 
         /* New Used Storage chart */
+        var $storageChart = $('.fm-account-blocks.storage');
         perc = Math.round(account.space_used / account.space * 100);
         perc_c = perc;
         if (perc_c > 100) {
             perc_c = 100;
-        } else if (perc > 99) {
-            $('.fm-account-blocks.storage').addClass('exceeded');
+        }
+        if (perc_c > 99) {
+            $storageChart.addClass('exceeded');
             s_exceeded = 1;
-        } else if (perc > 80) {
-            $('.fm-account-blocks.storage').addClass('going-out');
+        }
+        else if (perc_c > 80) {
+            $storageChart.addClass('going-out');
         }
 
         var deg =  230 * perc_c / 100;
 
         // Used space chart
         if (deg <= 180) {
-            $('.storage .main-chart.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
+            $storageChart.find('.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
+            $storageChart.find('.right-chart span').removeAttr('style');
         }
         else {
-            $('.storage .main-chart.left-chart span').css('transform', 'rotate(180deg)');
-            $('.storage .main-chart.right-chart span').css('transform', 'rotate(' + (deg - 180) + 'deg)');
+            $storageChart.find('.left-chart span').css('transform', 'rotate(180deg)');
+            $storageChart.find('.right-chart span').css('transform', 'rotate(' + (deg - 180) + 'deg)');
         }
 
         // Maximum disk space
         var b2 = bytesToSize(account.space, 0).split(' ');
-        $('.storage .chart.data .pecents-txt').text((b2[0]));
-        $('.storage .chart.data .gb-txt').text((b2[1]));
-        $('.storage .chart.data .perc-txt').text(perc_c + '%');
-        $('.storage .chart.data .size-txt').text(bytesToSize(account.space_used));
+        $storageChart.find('.chart.data .pecents-txt').text((b2[0]));
+        $storageChart.find('.chart.data .gb-txt').text((b2[1]));
+        $storageChart.find('.chart.data .perc-txt').text(perc_c + '%');
+        $storageChart.find('.chart.data .size-txt').text(bytesToSize(account.space_used));
         /* End of New Used Storage chart */
 
 
         /* Charts warning notifications */
-        $('.dashboard .chart-warning:not(.hidden)').addClass('hidden');
+        var $chartsBlock = $('.account.widget.content');
+        $chartsBlock.find('.chart-warning:not(.hidden)').addClass('hidden');
         if (b_exceeded && s_exceeded) {
             // Bandwidth and Storage quota exceeded
-            $('.dashboard .chart-warning.storage-and-bandwidth').removeClass('hidden');
+            $chartsBlock.find('.chart-warning.storage-and-bandwidth').removeClass('hidden');
         }
         else if (s_exceeded) {
             // Storage quota exceeded
-            $('.dashboard .chart-warning.storage').removeClass('hidden');
+            $chartsBlock.find('.chart-warning.storage').removeClass('hidden');
         }
         else if (b_exceeded) {
             // Bandwidth quota exceeded
-            $('.dashboard .chart-warning.bandwidth').removeClass('hidden');
+            $chartsBlock.find('.chart-warning.bandwidth').removeClass('hidden');
         }
-        else if (perc > 97) {
+        else if (perc_c > 80) {
             // Running out of cloud space
-            $('.dashboard .chart-warning.out-of-space').removeClass('hidden');
+            $chartsBlock.find('.chart-warning.out-of-space').removeClass('hidden');
+        }
+        if (b_exceeded || s_exceeded || perc_c > 80) {
+            $chartsBlock.find('.chart-warning').rebind('click', function() {
+                loadSubPage('pro');
+            });
         }
         /* End of Charts warning notifications */
 
@@ -3388,7 +3389,7 @@ function dashboardUI() {
                     achievementsListDialog();
                 }
                 else {
-                    location.hash = '#pro';
+                    loadSubPage('pro');
                 }
                 return false;
             });
@@ -3471,10 +3472,10 @@ dashboardUI.updateChatWidget = function() {
     }
     $('.chat-widget .account.data-item, .chat-widget .account.widget.title')
         .rebind('click.chatlink', function() {
-            window.location = '#fm/chat';
+            loadSubPage('fm/chat');
         });
     $('.chat-widget .add-contacts').rebind('click.chatlink', function() {
-        window.location = '#fm/chat';
+        loadSubPage('fm/chat');
         Soon(function() {
             $('.conversations .small-icon.white-medium-plus').parent().trigger('click');
         });
@@ -3518,7 +3519,6 @@ Object.freeze(dashboardUI);
 
 
 function accountUI() {
-
     var sectionClass;
 
     $('.fm-account-notifications').removeClass('hidden');
@@ -3552,10 +3552,14 @@ function accountUI() {
     M.accountData(function(account) {
         loadingDialog.hide();
 
-        var perc, warning, perc_c;
-        var id = document.location.hash;
+        var perc;
+        var warning;
+        var perc_c;
+        var b_exceeded;
+        var s_exceeded;
+        var id = getSitePath();
 
-        if (id === '#fm/account/advanced') {
+        if (id === '/fm/account/advanced') {
             $('.fm-account-settings').removeClass('hidden');
             sectionClass = 'advanced';
 
@@ -3586,15 +3590,15 @@ function accountUI() {
                 }
             }
         }
-        else if (id === '#fm/account') {
+        else if (id === '/fm/account') {
             $('.fm-account-profile').removeClass('hidden');
             sectionClass = 'account-s';
         }
-        else if (id === '#fm/account/history') {
+        else if (id === '/fm/account/history') {
             $('.fm-account-history').removeClass('hidden');
             sectionClass = 'history';
         }
-        else if (id === '#fm/account/reseller' && M.account.reseller) {
+        else if (id === '/fm/account/reseller' && M.account.reseller) {
             $('.fm-account-reseller').removeClass('hidden');
             sectionClass = 'reseller';
         }
@@ -3683,7 +3687,7 @@ function accountUI() {
             $('.default-white-button.upgrade-to-pro')
                 .removeClass('hidden')
                 .rebind('click', function() {
-                    window.location.hash = 'pro';
+                    loadSubPage('pro');
                 });
         }
 
@@ -3695,6 +3699,7 @@ function accountUI() {
         /* New Used Bandwidth chart */
         var base = account.downbw_used;
         var max  = 1.5 * 1024 * 1024 * 1024;
+        var $bandwidthChart = $('.fm-account-blocks.bandwidth');
         if (u_attr.p) {
             max = account.bw;
             base += account.servbw_used;
@@ -3705,68 +3710,107 @@ function accountUI() {
         }
         perc   = Math.round(base * 100 / max) || 1;
         perc_c = perc;
-        if (perc_c > 100)
+        if (perc_c > 100) {
             perc_c = 100;
-        if (perc > 99)
-            $('.fm-account-blocks.bandwidth').addClass('exceeded');
+        }
+        if (perc_c > 99) {
+            $bandwidthChart.addClass('exceeded');
+            b_exceeded = 1;
+        }
 
         var deg =  230 * perc_c / 100;
 
-        /* Used Bandwidth chart */
+        // Used Bandwidth chart
         if (deg <= 180) {
-            $('.bandwidth .main-chart.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
+            $bandwidthChart.find('.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
+            $bandwidthChart.find('.right-chart span').removeAttr('style');
         }
         else {
-            $('.bandwidth .main-chart.left-chart span').css('transform', 'rotate(180deg)');
-            $('.bandwidth .main-chart.right-chart span').css('transform', 'rotate(' + (deg - 180) + 'deg)');
+            $bandwidthChart.find('.left-chart span').css('transform', 'rotate(180deg)');
+            $bandwidthChart.find('.right-chart span').css('transform', 'rotate(' + (deg - 180) + 'deg)');
         }
 
         // Maximum bandwidth
         var b2 = bytesToSize(account.bw, 0).split(' ');
-        $('.bandwidth .chart.data .size-txt').text(bytesToSize(account.servbw_used + account.downbw_used, 0));
-        $('.bandwidth .chart.data .pecents-txt').text((b2[0]));
-        $('.bandwidth .chart.data .gb-txt').text((b2[1]));
+        $bandwidthChart.find('.chart.data .size-txt').text(bytesToSize(account.servbw_used + account.downbw_used, 0));
+        $bandwidthChart.find('.chart.data .pecents-txt').text((b2[0]));
+        $bandwidthChart.find('.chart.data .gb-txt').text((b2[1]));
         if (u_attr.p || M.maf) {
-            $('.bandwidth .chart.data .perc-txt').text(perc_c + '%');
+            $bandwidthChart.find('.chart.data .perc-txt').text(perc_c + '%');
         }
         else {
-            $('.bandwidth .chart.data span:not(.size-txt)').text('');
-            $('.bandwidth .chart.data .pecents-txt').text(l[5801]);
+            $bandwidthChart.find('.chart.data span:not(.size-txt)').text('');
+            $bandwidthChart.find('.chart.data .pecents-txt').text(l[5801]);
         }
 
         /* End of New Used Bandwidth chart */
 
 
         /* New Used space */
+        var $storageChart = $('.fm-account-blocks.storage');
+        var $storageData = $('.account.data-block.storage-data');
+        $storageData.removeClass('exceeded');
         perc = Math.round(account.space_used / account.space * 100);
         perc_c = perc;
-        if (perc_c > 100)
+        if (perc_c > 100) {
             perc_c = 100;
-        if (perc > 99) {
-            $('.account.data-block.storage-data').addClass('exceeded');
-            $('.storage-data .button.upgrade-account, .storage-data.chart-warning')
-                .rebind('click', function() {
-                    window.location.hash = 'pro';
-                })
+        }
+        if (perc_c > 99) {
+            s_exceeded = 1;
+            $storageChart.addClass('exceeded');
+            $storageData.addClass('exceeded');
+        }
+        else if (perc_c > 80) {
+            $storageChart.addClass('going-out');
         }
 
         var deg =  230 * perc_c / 100;
 
-        /* Used space chart */
+        // Used space chart
         if (deg <= 180) {
-            $('.storage .main-chart.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
+            $storageChart.find('.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
+            $storageChart.find('.right-chart span').removeAttr('style');
         }
         else {
-            $('.storage .main-chart.left-chart span').css('transform', 'rotate(180deg)');
-            $('.storage .main-chart.right-chart span').css('transform', 'rotate(' + (deg - 180) + 'deg)');
+            $storageChart.find('.left-chart span').css('transform', 'rotate(180deg)');
+            $storageChart.find('.right-chart span').css('transform', 'rotate(' + (deg - 180) + 'deg)');
         }
 
         // Maximum disk space
         var b2 = bytesToSize(account.space, 0).split(' ');
-        $('.storage .chart.data .pecents-txt').text(b2[0]);
-        $('.storage .chart.data .gb-txt').text(b2[1]);
-        $('.storage .chart.data .perc-txt').text(perc_c + '%');
-        $('.storage .chart.data .size-txt').text(bytesToSize(account.space_used));
+        $storageChart.find('.chart.data .pecents-txt').text(b2[0]);
+        $storageChart.find('.chart.data .gb-txt').text(b2[1]);
+        $storageChart.find('.chart.data .perc-txt').text(perc_c + '%');
+        $storageChart.find('.chart.data .size-txt').text(bytesToSize(account.space_used));
+
+        // Charts warning notifications
+        var $chartsBlock = $('.account.data-block.charts');
+        $chartsBlock.find('.chart-warning:not(.hidden)').addClass('hidden');
+        if (b_exceeded && s_exceeded) {
+            // Bandwidth and Storage quota exceeded
+            $chartsBlock.find('.chart-warning.storage-and-bandwidth').removeClass('hidden');
+        }
+        else if (s_exceeded) {
+            // Storage quota exceeded
+            $chartsBlock.find('.chart-warning.storage').removeClass('hidden');
+        }
+        else if (b_exceeded) {
+            // Bandwidth quota exceeded
+            $chartsBlock.find('.chart-warning.bandwidth').removeClass('hidden');
+        }
+        else if (perc_c > 80) {
+            // Running out of cloud space
+            $chartsBlock.find('.chart-warning.out-of-space').removeClass('hidden');
+        }
+        if (b_exceeded || s_exceeded || perc_c > 80) {
+            $chartsBlock.find('.chart-warning').rebind('click', function() {
+                loadSubPage('pro');
+            });
+            $storageData.find('.chart-warning, .upgrade-account.button').rebind('click', function() {
+                loadSubPage('pro');
+            });
+        }
+        /* End of Charts warning notifications */
 
 
         $('.account.quota-txt.used-space')
@@ -4035,7 +4079,7 @@ function accountUI() {
 
         $('.fm-account-main .pro-upgrade').rebind('click', function(e)
         {
-            window.location.hash = 'pro';
+            loadSubPage('pro');
         });
         $('.account.plan-info.balance span').safeHTML('&euro; @@', account.balance[0][0]);
         var a = 0;
@@ -4147,6 +4191,7 @@ function accountUI() {
         $('.fm-close-all-sessions').rebind('click', function() {
 
             loadingDialog.show();
+            var $this = $(this);
             var $activeSessionsRows = $('.active-session-txt').parents('tr');
 
             // Expire all sessions but not the current one
@@ -4156,6 +4201,7 @@ function accountUI() {
                     $activeSessionsRows.find('.settings-logout').remove();
                     $activeSessionsRows.find('.active-session-txt').removeClass('active-session-txt')
                         .addClass('expired-session-txt').text(l[1664]);
+                    $this.hide();
                     loadingDialog.hide();
                 }
             });
@@ -5077,7 +5123,7 @@ function accountUI() {
 
         $('.fm-purchase-voucher,.default-white-button.topup').rebind('click', function(e)
         {
-            document.location.hash = 'resellers';
+            loadSubPage('resellers');
         });
 
         if (is_extension || ssl_needed())
@@ -5128,6 +5174,8 @@ function accountUI() {
 
         $.tresizer();
 
+        clickURLs();
+
     }, 1);
 
     // Show first name or last name
@@ -5161,11 +5209,11 @@ function accountUI() {
     }
 
     $('.editprofile').rebind('click', function() {
-        document.location.hash = 'fm/account';
+        loadSubPage('fm/account');
     });
 
     $('.rubbish-bin-link').rebind('click', function() {
-        document.location.hash = 'fm/rubbish';
+        loadSubPage('fm/rubbish');
     });
 
     // Cancel account button on main Account page
@@ -5214,26 +5262,26 @@ function accountUI() {
 
     // Button on main Account page to backup their master key
     $('.backup-master-key').rebind('click', function() {
-        document.location.hash = 'backup';
+        loadSubPage('backup');
     });
 
     $('.fm-account-button').rebind('click', function() {
         if ($(this).attr('class').indexOf('active') == -1) {
             switch (true) {
                 case ($(this).hasClass('account-s')):
-                    document.location.hash = 'fm/account';
+                    loadSubPage('fm/account');
                     break;
                 case ($(this).hasClass('advanced')):
-                    document.location.hash = 'fm/account/advanced';
+                    loadSubPage('fm/account/advanced');
                     break;
                 case ($(this).hasClass('notifications')):
-                    document.location.hash = 'fm/account/notifications';
+                    loadSubPage('fm/account/notifications');
                     break;
                 case ($(this).hasClass('history')):
-                    document.location.hash = 'fm/account/history';
+                    loadSubPage('fm/account/history');
                     break;
                 case ($(this).hasClass('reseller')):
-                    document.location.hash = 'fm/account/reseller';
+                    loadSubPage('fm/account/reseller');
                     break;
             }
         }
@@ -5607,19 +5655,12 @@ function gridUI() {
     });
 
     // enable add star on first column click (make favorite)
-    $('.grid-table.fm tr td:first-child').rebind('click', function() {
-        var id = [$(this).parent().attr('id')];
-        var newFavState = Number(!M.isFavourite(id));
-        M.favourite(id, newFavState);
-    });
-
-    // enable add star on first column click (make favorite)
-    $('.grid-table.shared-with-me tr td:first-child').rebind('click', function() {
+    $('.grid-table.shared-with-me tr td:first-child,.grid-table.fm tr td:first-child').rebind('click', function() {
         var id = [$(this).parent().attr('id')];
         var newFavState = Number(!M.isFavourite(id));
 
         // Handling favourites is allowed for full permissions shares only
-        if (RightsbyID(id) > 1) {
+        if (rightsById(id) > 1) {
             M.favourite(id, newFavState);
         }
     });
@@ -5758,7 +5799,7 @@ function FMShortcuts() {
             return false; // stop prop.
         } else if (charCode == 8) {
             var $items = selectionManager.get_selected();
-            if ($items.size() == 0 || (RightsbyID(M.currentdirid || '') | 0) < 1) {
+            if ($items.size() === 0 || (rightsById(M.currentdirid || '') | 0) < 1) {
                 return; // dont do anything.
             }
 
@@ -6280,14 +6321,16 @@ function UIkeyevents() {
                 quickFinder.disable_if_active();
             }
         }
-        else if (e.keyCode == 46 && s.length > 0 && !$.dialog && RightsbyID(M.currentdirid) > 1) {
+        else if ((e.keyCode === 46) && (s.length > 0)
+            && !$.dialog && rightsById(M.currentdirid) > 1) {
             $.selected = [];
             s.each(function(i, e) {
                 $.selected.push($(e).attr('id'));
             });
             fmremove();
         }
-        else if (e.keyCode == 46 && selPanel.length > 0 && !$.dialog && RightsbyID(M.currentdirid) > 1) {
+        else if ((e.keyCode === 46) && (selPanel.length > 0)
+            && !$.dialog && rightsById(M.currentdirid) > 1) {
             var selected = [];
             selPanel.each(function() {
                 selected.push($(this).attr('id'));
@@ -6361,7 +6404,7 @@ function UIkeyevents() {
                 $.warningCallback(true);
             }
         }
-        else if ((e.keyCode === 113 /* F2 */) && (s.length > 0) && !$.dialog && RightsbyID(M.currentdirid) > 1) {
+        else if ((e.keyCode === 113 /* F2 */) && (s.length > 0) && !$.dialog && rightsById(M.currentdirid) > 1) {
             $.selected = [];
             s.each(function(i, e) {
                 $.selected.push($(e).attr('id'));
@@ -7095,12 +7138,12 @@ function menuItems() {
         sourceRoot = RootbyId($.selected[0]);
 
     // Show Rename action in case that only one item is selected
-    if (($.selected.length === 1) && (RightsbyID($.selected[0]) > 1)) {
+    if (($.selected.length === 1) && (rightsById($.selected[0]) > 1)) {
         items['.rename-item'] = 1;
     }
 
     if (((Object.keys($.selected)).length < 2)
-            && (RightsbyID($.selected[0]) > 1)) {
+            && (rightsById($.selected[0]) > 1)) {
 
         items['.add-star-item'] = 1;
 
@@ -7117,34 +7160,27 @@ function menuItems() {
 
     selItem = M.d[$.selected[0]];
 
-    if (selItem && (selItem.p.length === 11)) {
+    if (selItem && selItem.su && !M.d[selItem.p]) {
         items['.removeshare-item'] = 1;
     }
-    else if (RightsbyID($.selected[0]) > 1) {
+    else if (rightsById($.selected[0]) > 1) {
         items['.move-item']   = 1;
         items['.remove-item'] = 1;
     }
 
-    if (selItem && ($.selected.length === 1) && selItem.t) {
-        items['.open-item'] = 1;
-    }
+    if (selItem && $.selected.length === 1) {
+        if (selItem.t) {
+            if (M.currentdirid !== selItem.h) {
+                items['.open-item'] = 1;
+            }
 
-    if (
-        selItem
-        && ($.selected.length === 1)
-        && is_image(selItem)
-        ) {
-        items['.preview-item'] = 1;
-    }
-
-    if (
-        selItem
-        && (sourceRoot === M.RootID)
-        && ($.selected.length === 1)
-        && selItem.t
-        && !folderlink
-        ) {
-        items['.sh4r1ng-item'] = 1;
+            if (sourceRoot === M.RootID && !folderlink) {
+                items['.sh4r1ng-item'] = 1;
+            }
+        }
+        else if (is_image(selItem)) {
+            items['.preview-item'] = 1;
+        }
     }
 
     if ((sourceRoot === M.RootID) && !folderlink) {
@@ -7185,9 +7221,7 @@ function menuItems() {
         delete items['.copy-item'];
         delete items['.add-star-item'];
         delete items['.colour-label-items'];
-        if (u_type) {
-            items['.import-item'] = 1;
-        }
+        items['.import-item'] = 1;
     }
 
     return items;
@@ -7216,7 +7250,7 @@ function contextMenuUI(e, ll) {
     if (ll === 2) {
 
         // Enable upload item menu for clould-drive, don't show it for rubbish and rest of crew
-        if (RightsbyID(M.currentdirid) && (M.currentrootid !== M.RubbishID)) {
+        if (rightsById(M.currentdirid) && (M.currentrootid !== M.RubbishID)) {
             $(menuCMI).filter('.dropdown-item').hide();
             $(menuCMI).filter('.fileupload-item,.newfolder-item').show();
 
@@ -7430,8 +7464,8 @@ function setContextMenuGetLinkText() {
 
     // Set the text for the 'Get/Update link/s' and 'Remove link/s' context menu items
     var $contextMenu = $('.dropdown.body');
-    $contextMenu.find('.getlink-menu-text').text(getLinkText);
-    $contextMenu.find('.removelink-menu-text').text(removeLinkText);
+    $contextMenu.find('.getlink-item span').text(getLinkText);
+    $contextMenu.find('.removelink-item span').text(removeLinkText);
 }
 
 /**
@@ -7896,7 +7930,7 @@ function treeUIexpand(id, force)
                 $tree.addClass('expanded');
             }
 
-            delay('treeUI', treeUI);
+            delay(treeUI);
         });
 }
 
@@ -7925,10 +7959,11 @@ function sectionUIopen(id) {
     } else {
         tmpId = id;
     }
-    $('.nw-fm-left-icon.' + tmpId).addClass('active');
-    $('.content-panel.' + tmpId).addClass('active');
+    $('.nw-fm-left-icon.' + String(tmpId).replace(/[^\w-]/g, '')).addClass('active');
+    $('.content-panel.' + String(tmpId).replace(/[^\w-]/g, '')).addClass('active');
     $('.fm-left-menu').removeClass(
-        'cloud-drive folder-link shared-with-me rubbish-bin contacts conversations opc ipc inbox account dashboard transfers'
+        'cloud-drive folder-link shared-with-me rubbish-bin contacts ' +
+        'conversations opc ipc inbox account dashboard transfers'
     ).addClass(tmpId);
     $('.fm.fm-right-header, .fm-import-to-cloudrive, .fm-download-as-zip').addClass('hidden');
     $('.fm-import-to-cloudrive, .fm-download-as-zip').unbind('click');
@@ -8077,9 +8112,8 @@ function sectionUIopen(id) {
         }
         else {
             $('.section').addClass('hidden');
-            $('.section.' + id).removeClass('hidden');
+            $('.section.' + String(id).replace(/[^\w-]/g, '')).removeClass('hidden');
         }
-
     }
 }
 
@@ -8123,7 +8157,7 @@ function treeUIopen(id, event, ignoreScroll, dragOver, DragOpen) {
         var ids = M.getPath(id);
         var i = 1;
         while (i < ids.length) {
-            if (M.d[ids[i]]) {
+            if (M.d[ids[i]] && ids[i].length === 8) {
                 treeUIexpand(ids[i], 1);
             }
             i++;
@@ -8171,7 +8205,7 @@ function treeUIopen(id, event, ignoreScroll, dragOver, DragOpen) {
             }, 50);
         }
     }
-    treeUI();
+    delay(treeUI);
 }
 
 function fm_hideoverlay() {
@@ -8468,8 +8502,8 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
         $('#msgDialog').addClass('notification-dialog');
         title = l[5841];
         msg = '<p>' + escapeHTML(l[5842]) + '</p>\n' +
-            '<a class="top-login-button" href="#login">' + escapeHTML(l[171]) + '</a>\n' +
-            '<a class="create-account-button" href="#register">' + escapeHTML(l[1076]) + '</a><br/>';
+            '<a class="top-login-button clickurl" href="/login">' + escapeHTML(l[171]) + '</a>\n' +
+            '<a class="create-account-button clickurl" href="/register">' + escapeHTML(l[1076]) + '</a><br/>';
 
         var $selectedPlan = $('.reg-st3-membership-bl.selected');
         var plan = 1;
@@ -8489,6 +8523,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
     $('#msgDialog .fm-dialog-title span').text(title);
 
     $('#msgDialog .fm-notification-info p').safeHTML(msg);
+    clickURLs();
     if (submsg) {
         $('#msgDialog .fm-notification-warning').text(submsg);
         $('#msgDialog .fm-notification-warning').show();
@@ -8568,22 +8603,26 @@ function handleDialogTabContent(dialogTabClass, parentTag, dialogPrefix, htmlCon
  * @param {String} dialogName Dialog name i.e. { copy, move }.
  */
 function disableReadOnlySharedFolders(dialogName) {
-
-    var nodeId, accessRight, rootParentDirId,
-        $mcTreeSub = $("#mctreesub_shares"),
-        $ro = $('.' + dialogName + '-dialog-tree-panel.shared-with-me .dialog-content-block span[id^="mctreea_"]');
+    var $ro = $('.' + dialogName + '-dialog-tree-panel.shared-with-me .dialog-content-block span[id^="mctreea_"]');
+    var targets = $.selected || [];
 
     $ro.each(function(i, v) {
-        nodeId = $(v).attr('id').replace('mctreea_', '');
+        var node = M.d[$(v).attr('id').replace('mctreea_', '')];
 
-        // Apply access right of root parent dir to all subfolders
-        rootParentDirId = $("#mctreea_" + nodeId).parentsUntil($mcTreeSub).last().attr('id').replace('mctreeli_', '');
-
-        if (M.d[rootParentDirId]) {
-            accessRight = M.d[rootParentDirId].r;
+        while (node && !node.su) {
+            node = M.d[node.p];
         }
 
-        if (!accessRight || (accessRight === 0)) {
+        if (node) {
+            for (i = targets.length; i--;) {
+                if (isCircular(node.h, targets[i])) {
+                    node = null;
+                    break;
+                }
+            }
+        }
+
+        if (!node || !node.r) {
             $(v).addClass('disabled');
         }
     });
@@ -8608,7 +8647,10 @@ function handleDialogContent(dialogTabClass, parentTag, newFolderButton, dialogP
     if ($.onImportCopyNodes && (!newFolderButton || (dialogPrefix !== 'copy'))) {
 
         // XXX: Ideally show some notification that importing from folder link to anything else than the cloud isn't supported.
-        $('.copy-dialog-button.' + dialogTabClass).fadeOut(200).fadeIn(100);
+        $('.copy-dialog-button.' + String(dialogTabClass).replace(/[^\w-]/g, '')).fadeOut(200).fadeIn(100);
+        // clicking the shares tab deactivates the "Import" button, restore it.
+        $('.dialog-copy-button').removeClass('disabled');
+        $.mcselected = $.mcselected || M.RootID;
 
         return;
     }
@@ -9104,6 +9146,12 @@ function initShareDialogMultiInputPlugin() {
                         $shareDialog.find('.token-input-input-token-mega input').focus();
                     }, 0);
                 }
+
+                $('.fm-dialog.share-dialog').position({
+                    'my': 'center center',
+                    'at': 'center center',
+                    'of': $(window)
+                });
             },
             onDelete: function() {
 
@@ -9152,6 +9200,12 @@ function initShareDialogMultiInputPlugin() {
                     // Disable group permission change drop down list
                     $('.share-dialog .permissions-icon').addClass('disabled');
                 }
+
+                $('.fm-dialog.share-dialog').position({
+                    'my': 'center center',
+                    'at': 'center center',
+                    'of': $(window)
+                });
             }
         });
 }
@@ -9546,14 +9600,17 @@ function closeImportContactNotification(c) {
 
 function clearScrollPanel(from) {
     var j = $(from + ' .multiple-input').jScrollPane().data();
+
     if (j && j.jsp) {
         j.jsp.destroy();
     }
+
     $(from + ' .multiple-input .jspPane').unwrap();
     $(from + ' .multiple-input .jspPane:first-child').unwrap();
 
     // remove share dialog contacts, jScrollPane
     j = $(from + ' .share-dialog-contacts').jScrollPane().data();
+
     if (j && j.jsp) {
         j.jsp.destroy();
     }
@@ -9611,12 +9668,9 @@ function closeDialog() {
         $('.add-contact-multiple-input').tokenInput("clearOnCancel");
         $('.share-multiple-input').tokenInput("clearOnCancel");
 
-        clearScrollPanel('.add-user-popup');
-
         // share dialog
         $('.share-dialog-contact-bl').remove();
         $('.import-contacts-service').removeClass('imported');
-        clearScrollPanel('.share-dialog');
 
         // share dialog permission menu
         $('.permissions-menu').fadeOut(0);
@@ -10506,6 +10560,7 @@ function megaSyncDialog() {
             $this.attr('checked', false);
         }
     });
+    clickURLs();
 };
 
 function firefoxDialog(close)
@@ -10549,6 +10604,8 @@ function firefoxDialog(close)
             $(this).attr('checked', false);
         }
     });
+
+    clickURLs();
 }
 
 function browserDialog(close) {
@@ -11175,6 +11232,7 @@ function bottomPageDialog(close, pp, hh) {
 
     $('.bp-body', $dialog).jScrollPane({showArrows: true, arrowSize: 5, animateScroll: true, verticalDragMinHeight: 50});
     jScrollFade('.bp-body');
+    clickURLs();
 }
 
 /**
@@ -12209,7 +12267,7 @@ function fm_importflnodes(nodes)
                 .done(function(nodes) {
 
                     $.onImportCopyNodes = nodes;
-                    location.hash       = 'fm';
+                    loadSubPage('fm');
                 });
 
             $(document).one('onInitContextUI', SoonFc(function(e) {
@@ -12405,15 +12463,13 @@ mega.utils.findDupes = function() {
     loadingDialog.show();
     Soon(function() {
         M.overrideModes = 1;
-        location.hash = '#fm/search/~findupes';
+        loadSubPage('fm/search/~findupes');
     });
 };
 
 function sharedFolderUI() {
-    /* jshint -W074 */
     var nodeData = M.d[M.currentdirid];
     var browsingSharedContent = false;
-    var c;
 
     // Browsing shared content
     if ($('.shared-details-block').length > 0) {
@@ -12425,22 +12481,9 @@ function sharedFolderUI() {
         browsingSharedContent = true;
     }
 
-    // Checks it's not a contact, contacts handles are 11 chars long
-    // file/folder handles are 8 chars long
-    if (!nodeData || (nodeData.p.length !== 11)) {
-
-        // [<current selection handle>, 'owners handle', 'tab name']
-        var p = M.getPath(M.currentdirid);
-        nodeData = null;
-
-        if (p[p.length - 1] === 'shares') {
-            c = M.d[p[0]];
-            nodeData = M.d[p[p.length - 3]];
-
-            if (!nodeData || (nodeData.p.length !== 11)) {
-                nodeData = 0;
-            }
-        }
+    // are we in an inshare?
+    while (nodeData && !nodeData.su) {
+        nodeData = M.d[nodeData.p];
     }
 
     if (nodeData) {
@@ -12451,6 +12494,7 @@ function sharedFolderUI() {
 
         // Handle of initial share owner
         var ownersHandle = nodeData.su;
+        var folderName = (M.d[M.currentdirid] || nodeData).name;
         var displayName = htmlentities(M.getNameByHandle(ownersHandle));
         var avatar = useravatar.contact(M.d[ownersHandle], 'nw-contact-avatar');
 
@@ -12479,7 +12523,7 @@ function sharedFolderUI() {
                 + '<div class="shared-details-icon"></div>'
                 + '<div class="shared-details-info-block">'
                     + '<div class="shared-details-pad">'
-                        + '<div class="shared-details-folder-name">' + htmlentities((c || nodeData).name) + '</div>'
+                        + '<div class="shared-details-folder-name">' + htmlentities(folderName) + '</div>'
                         + '<a href="javascript:;" class="grid-url-arrow"></a>'
                         + '<div class="shared-folder-access' + rightsclass + '">' + rights + '</div>'
                         + '<div class="clear"></div>'
@@ -12500,6 +12544,11 @@ function sharedFolderUI() {
 
         $(rightPanelView).addClass('shared-folder-content');
 
+        if (M.d[M.currentdirid] !== nodeData || M.d[nodeData.p]) {
+            // hide leave-share under non-root shares
+            $('.fm-leave-share').addClass('hidden');
+        }
+
         Soon(function() {
             $(window).trigger('resize');
             Soon(fm_resize_handler);
@@ -12507,7 +12556,6 @@ function sharedFolderUI() {
     }
 
     return browsingSharedContent;
-    /* jshint -W074 */
 }
 
 function userFingerprint(userid, callback) {
@@ -12690,7 +12738,7 @@ function contactUI() {
             $('.dropdown.body').addClass('arrange-to-front');
             e.currentTarget = $(this);
             e.calculatePosition = true;
-            $.selected = [location.hash.replace('#fm/', '')];
+            $.selected = [getSitePath().replace('/fm/', '')];
             searchPath();
             if (!$(this).hasClass('active')) {
                 contextMenuUI(e, 4);
@@ -12754,8 +12802,7 @@ function contactUI() {
 
             // Bind the "Start conversation" button
             $('.fm-start-conversation').rebind('click.megaChat', function() {
-
-                window.location = '#fm/chat/' + u_h;
+                loadSubPage('fm/chat/' + u_h);
                 return false;
             });
         }
@@ -13106,7 +13153,9 @@ var cancelSubscriptionDialog = {
                     cancelSubscriptionDialog.$accountPageCancelButton.addClass('hidden');
                     cancelSubscriptionDialog.exipryTextBlock.text(l[987]);
                     cancelSubscriptionDialog.exipryDateBlock
-                        .safeHTML('<a href="#fm/account/history">' + time2date(account.expiry, 2) + '</a>');
+                        .safeHTML('<a href="/fm/account/history" class="clickurl">@@</a>',
+                            time2date(account.expiry, 2));
+                        clickURLs();
                     cancelSubscriptionDialog.exipryDateBlock.find('a').rebind('click', function() {
                         document.location = $(this).attr('href');
                     });

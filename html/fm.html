@@ -59,10 +59,10 @@
         </span>
         <a class="dropdown-item send-to-contact-item"><i class="small-icon"></i>[$6860]</a>
         <a class="dropdown-item getlink-item">
-            <i class="small-icon context get-link"></i>[$59]
+            <i class="small-icon context get-link"></i><span>[$59]</span>
         </a>
         <a class="dropdown-item removelink-item">
-            <i class="small-icon context remove-link"></i>[$6821]
+            <i class="small-icon context remove-link"></i><span>[$6821]</span>
         </a>
         <a class="dropdown-item sh4r1ng-item"><i class="small-icon context share"></i>[$60]</a>
         <a class="dropdown-item shared-folder-item"><i class="small-icon context share"></i>[$6775]</a>
@@ -252,7 +252,7 @@
 
         </div>
 
-        <div class="fm-left-panel">
+        <div class="fm-left-panel hidden">
             <div class="left-pane-drag-handle"></div>
 
             <!--Sorting menu for each section. !-->
@@ -418,7 +418,7 @@
 
         <div id="topmenu"></div>
 
-        <div class="section conversations">
+        <div class="section conversations hidden">
         </div>
 
         <div class="fm-right-files-block">
@@ -552,7 +552,7 @@
                     <div class="fm-empty-contacts-bg"></div>
                     <div class="fm-empty-cloud-txt">[$5737]</div>
                     <div class="fm-empty-description">
-                        Worry not! You can easily add new contacts by email or import existing contacts from other services.
+                        [$5913]
                     </div>
                     <div class="fm-empty-button">
                         [$71]...
@@ -1040,7 +1040,7 @@
                                                   [$7354]
                                               </div>
                                               <div class="account plan-info right-textalign expiry">
-                                                  <a href="#fm/account/history">
+                                                  <a href="/fm/account/history" class="clickurl">
                                                       [$987] <span class="red">September 1st 2013</span>
                                                   </a>
                                               </div>
@@ -1583,7 +1583,7 @@
                                                   [$7354]
                                               </div>
                                               <div class="account plan-info right-textalign expiry">
-                                                  <a href="#fm/account/history">
+                                                  <a href="/fm/account/history" class="clickurl">
                                                       [$987] <span class="red">September 1st 2013</span>
                                                   </a>
                                               </div>
@@ -1617,11 +1617,12 @@
                               </div>
                               <div class="clear"></div>
 
-                              <div class="account data-block half-sized">
+                              <div class="account data-block charts half-sized first">
 
                                      <div class="fm-account-blocks storage left">
                                         <div class="fm-account-header">[$16119]</div>
                                         <div class="account chart-block">
+                                            <div class="chart-indicator"></div>
                                             <div class="chart icon"><i class="big-icon cloud"></i></div>
                                             <div class="account chart body">
                                                 <div class="account chart overlay"><span></span><span></span></div>
@@ -1643,6 +1644,7 @@
                                       <div class="fm-account-blocks bandwidth right">
                                         <div class="fm-account-header">[$16120]</div>
                                         <div class="account chart-block">
+                                            <div class="chart-indicator"></div>
                                             <div class="chart icon"><i class="big-icon speedometer"></i></div>
                                             <div class="account chart body">
                                                 <div class="account chart overlay"><span></span><span></span></div>
@@ -1662,14 +1664,17 @@
                                       </div>
 
                                       <div class="clear"></div>
-                                      <div class="account upgrade-account hidden">
-                                        <div class="account upgrade-button-info">
-                                            [$16135]
-                                        </div>
-                                        <div class="account upgrade-button-bl">
-                                            <div class="button default-white-button pro-upgrade">[$920]</div>
-                                        </div>
-                                        <div class="clear"></div>
+                                      <div class="chart-warning out-of-space hidden">
+                                          [$16135]
+                                      </div>
+                                      <div class="chart-warning red storage hidden">
+                                          [$16136]
+                                      </div>
+                                      <div class="chart-warning red bandwidth hidden">
+                                          [$16137]
+                                      </div>
+                                      <div class="chart-warning red storage-and-bandwidth hidden">
+                                          [$16138]
                                       </div>
                               </div>
                         </div>
@@ -1841,6 +1846,7 @@
                                 <div class="fm-account-blocks bandwidth">
                                     <div class="fm-account-header">[$16122]</div>
                                     <div class="account chart-block">
+                                        <div class="chart-indicator"></div>
                                         <div class="chart icon"><i class="big-icon speedometer"></i></div>
                                         <div class="account chart body">
                                             <div class="account chart overlay"><span></span><span></span></div>
@@ -2188,6 +2194,7 @@
                             <div class="fm-account-blocks bandwidth right">
                               <div class="fm-account-header">[$16120]</div>
                               <div class="account chart-block">
+                                  <div class="chart-indicator"></div>
                                   <div class="chart icon"><i class="big-icon speedometer"></i></div>
                                   <div class="account chart body">
                                       <div class="account chart overlay"><span></span><span></span></div>

@@ -142,7 +142,7 @@ describe("Transfers Unit Test", function() {
         file.name = 'foo.bin';
         file.owner = {gid: gid};
         file.ul_key = new Array(6);
-        for (i = 6; i--;) {
+        for (var i = 6; i--;) {
             file.ul_key[i] = rand(0x100000000);
         }
         file.ul_keyNonce = JSON.stringify(file.ul_key);

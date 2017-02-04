@@ -6515,6 +6515,10 @@
         "text": "Enter an e-mail or contact",
         "context": ""
     },
+    "5913": {
+        "text": "You can easily add new contacts by email or import existing contacts from other services.",
+        "context": ""
+    },
     "5914": {
         "text": "My conversations",
         "context": ""
@@ -15355,10 +15359,6 @@
         "text": "Date created",
         "context": "A table column header for the date when a file was created."
     },
-    "16170": {
-        "text": "There is an unknown error in the download path. Please try again and if continues failing contact support@mega.nz. [{0}]",
-        "context": "A dialog message which is displayed when the process\/request to download a file\/folder failed because of an unknown error in the download path.\r\nPlease preserve the [{0}] code because is for including the error code or the error message at runtime."
-    },
     "16171": {
         "text": "There is an unknown error in the download path. Please try again and if it continues to fail, please contact support@mega.nz. [{0}]",
         "context": "A dialog message which is displayed when the process\/request to download a file\/folder failed because of an unknown error in the download path.\r\nPlease preserve the [{0}] code because is for including the error code or the error message at runtime."
@@ -15374,5 +15374,285 @@
     "16174": {
         "text": "Date Modified",
         "context": "A table column header for the date when a file was modified."
+    },
+    "16175": {
+        "text": "Subscription Expires On",
+        "context": "A label on the My Account page indicating the expiration date of a PRO account. This is shown if they do not have a recurring subscription (e.g. the purchased a one-off plan for a specific time period) or the recurring subscription was recently canceled so they still have some time remaining on their plan."
+    },
+    "16176": {
+        "text": "Paste",
+        "context": "A button which allows the user to paste a file\/folder into another folder."
+    },
+    "16177": {
+        "text": "Remaining Downloads",
+        "context": "A label to indicate the number of remaining downloads."
+    },
+    "16178": {
+        "text": "download speed",
+        "context": "A label to indicate the actual current download speed."
+    },
+    "16179": {
+        "text": "Remaining Uploads",
+        "context": "A label to indicate the number of remaining uploads."
+    },
+    "16180": {
+        "text": "upload speed",
+        "context": "A label to indicate the actual current upload speed."
+    },
+    "16181": {
+        "text": "PAUSED",
+        "context": "A label to indicate a global paused (temporarily halted) state for all active file transfers."
+    },
+    "16182": {
+        "text": "Resume download",
+        "context": "A button label to resume the actual download."
+    },
+    "16183": {
+        "text": "Pause Download",
+        "context": "A button label to pause the actual download."
+    },
+    "16184": {
+        "text": "Resume upload",
+        "context": "A button label to resume the actual upload."
+    },
+    "16185": {
+        "text": "Pause upload",
+        "context": "A button label to pause the actual upload."
+    },
+    "16186": {
+        "text": "You are syncing a local folder formatted with a FAT filesystem. That filesystem has deficiencies managing big files and modification times that can cause synchronization problems (e.g. when daylight saving changes), so it's strongly recommended that you only sync folders formatted with more reliable filesystems like NTFS (more information [A]here[\/A]).",
+        "context": "A message which is shown to the user to inform them when they are trying to sync a folder formatted with the FAT filesystem."
+    },
+    "16187": {
+        "text": "Download rate limit",
+        "context": "A label to indicate the actual bandwidth limit for downloads."
+    },
+    "16188": {
+        "text": "Number of parallel TCP connections per transfer:",
+        "context": "A label to indicate the actual number of parallel TCP connections used by MEGAsync. Keep the colon in the translation."
+    },
+    "16189": {
+        "text": "When you finish this assistant, you will be able to sync additional folders using the settings dialog.",
+        "context": "A label to inform the user about the possibility to add new synchronisations through the settings dialog once the initial setup wizard is at the final stage."
+    },
+    "16190": {
+        "text": "Active Transfers",
+        "context": "A label of a tab to access and see all active transfers."
+    },
+    "16192": {
+        "text": "This message has been deleted",
+        "context": "A log message in a chat to indicate that the message has been deleted by the user."
+    },
+    "16194": {
+        "text": "[A] was removed from the group chat by [B].",
+        "context": "A log message in a chat conversation to tell the reader that a participant [A] was removed from the group chat by the moderator [B]. Please keep [A] and [B], they will be replaced by the participant and the moderator names at runtime. For example: Alice was removed from the group chat by Frank."
+    },
+    "16195": {
+        "text": "[A] left the group chat.",
+        "context": "A log message in the chat conversation to tell the reader that a participant [A] left the group chat. For example: Alice left the group chat."
+    },
+    "16196": {
+        "text": "[A] joined the group chat by invitation from [B].",
+        "context": "A log message in a chat conversation to tell the reader that a participant [A] was added to the chat by a moderator [B]. Please keep the [A] and [B] placeholders, they will be replaced by the participant and the moderator names at runtime. For example: Alice joined the group chat by invitation from Frank."
+    },
+    "16197": {
+        "text": "[A] cleared the chat history.",
+        "context": "A log message in the chat conversation to tell the reader that a participant [A] cleared the history of the chat. For example, Alice cleared the chat history."
+    },
+    "16198": {
+        "text": "[A] was changed to [B] by [C].",
+        "context": "A log message in a chat to display that a participant's permission was changed and by whom. This message begins with the user's name who receive the permission change [A]. [B] will be replaced with the permission name (such as Moderator or Read-only) and [C] will be replaced with the person who did it. Please keep the [A], [B] and [C] placeholders, they will be replaced at runtime. For example: Alice Jones was changed to Moderator by John Smith."
+    },
+    "16199": {
+        "text": "[A] changed group chat name to '[B]'.",
+        "context": "A log message in the chat conversation to tell the reader that a participant [A] changed group chat name to [B]. Please keep the [A] and '[B]' placeholders, they will be replaced at runtime. For example: Alice changed group chat name to 'MEGA'."
+    },
+    "16200": {
+        "text": "Voice and Video Calls",
+        "context": "Section title of a button where you can enable mobile data for voice and video calls."
+    },
+    "16201": {
+        "text": "Use Mobile Data",
+        "context": "Title next to a switch button (On-Off) to allow using mobile data (Roaming) for a feature."
+    },
+    "16202": {
+        "text": "You can chat with your contacts, share files and make voice and video calls.",
+        "context": "Footer text to explain the meaning of the chat 'Online' status."
+    },
+    "16203": {
+        "text": "You will appear offline to your contacts and you will not be able to chat with them.",
+        "context": "Footer text to explain the meaning of the chat 'Offline' status."
+    },
+    "16204": {
+        "text": "Send Message",
+        "context": "Title to perform the action of sending a message to a contact."
+    },
+    "16205": {
+        "text": "Verify Credentials",
+        "context": "Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact's fingerprint credentials. The fingerprint credentials are cryptographic identification for the account, a piece of information about the identity of the account."
+    },
+    "16206": {
+        "text": "Close Chat",
+        "context": "Button title that allows the user to close a chat."
+    },
+    "16207": {
+        "text": "Contact Credentials",
+        "context": "Label title above the fingerprint credentials of a user's contact. A credential in this case is a stored piece of information representing the identity of the contact"
+    },
+    "16208": {
+        "text": "Your Credentials",
+        "context": "Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity. The fingerprint credentials are  a cryptographic identifier for your account."
+    },
+    "16209": {
+        "text": "Start Conversation",
+        "context": "start a chat\/conversation"
+    },
+    "16210": {
+        "text": "Group",
+        "context": "Title of a menu button which allows users to start a conversation creating a 'Group' chat."
+    },
+    "16211": {
+        "text": "Group Info",
+        "context": "Title of section where you can see the chat group information and the options that you can do with it. Like 'Notifications' or 'Leave Group' and also the participants of the group"
+    },
+    "16212": {
+        "text": "Group Chat",
+        "context": "Label title for a group chat"
+    },
+    "16213": {
+        "text": "Change Group Avatar",
+        "context": "Title of the action that allows you to change the avatar of a group chat. (Change the picture associated with the group)"
+    },
+    "16214": {
+        "text": "Mute",
+        "context": "A button label. The button allows the user to mute a conversation."
+    },
+    "16216": {
+        "text": "Leave Group",
+        "context": "Button title that allows the user to leave a group chat."
+    },
+    "16217": {
+        "text": "Participants",
+        "context": "Label to describe the section where you can see the participants of a group chat"
+    },
+    "16218": {
+        "text": "Conversation with %@",
+        "context": "Chat conversation header with user %@. Please leave %@ as it is."
+    },
+    "16219": {
+        "text": "Chat not found",
+        "context": "Alert message shown when a chat does not exist"
+    },
+    "16220": {
+        "text": "%@ is typing ...",
+        "context": "A typing indicator in the chat. Please leave the %@ which will be automatically replaced with the user's name at runtime."
+    },
+    "16221": {
+        "text": "Add label %1",
+        "context": "Information text for the user which tells them they can mark a folder or file with its own color. Example: Add label \"Red\". Please leave the %1 placeholder as it is because it will be replaced by the color name e.g. Red, Green, Blue etc."
+    },
+    "16222": {
+        "text": "Remove label %1",
+        "context": "Information text for the user that let's the user know that they can remove a colour from a folder or file that was already marked. Example: Remove label \"Red\". Please leave the %1 placeholder as it is because it will be replaced by the colour name e.g. Red, Green Blue etc."
+    },
+    "16223": {
+        "text": "Red",
+        "context": "A user can mark a folder or file with its own colour. The full string is: Add label \"Red\"."
+    },
+    "16224": {
+        "text": "Orange",
+        "context": "A user can mark a folder or file with its own colour. The full string is: Add label \"Orange\"."
+    },
+    "16225": {
+        "text": "Yellow",
+        "context": "A user can mark a folder or file with its own colour. The full string is: Add label \"Yellow\"."
+    },
+    "16226": {
+        "text": "Green",
+        "context": "A user can mark a folder or file with its own colour. The full string is: Add label \"Green\"."
+    },
+    "16227": {
+        "text": "Blue",
+        "context": "A user can mark a folder or file with its own colour. The full string is: Add label \"Blue\"."
+    },
+    "16228": {
+        "text": "Purple",
+        "context": "A user can mark a folder or file with its own colour. The full string is: Add label \"Purple\"."
+    },
+    "16229": {
+        "text": "Grey",
+        "context": "A user can mark a folder or file with its own colour. The full string is: Add label \"Grey\"."
+    },
+    "16230": {
+        "text": "Resume downloads",
+        "context": "Label to resume the download queue. (String as short as possible)"
+    },
+    "16231": {
+        "text": "Pause Downloads",
+        "context": "Label to pause the download queue. (String as short as possible)"
+    },
+    "16232": {
+        "text": "Resume uploads",
+        "context": "Label to resume the upload queue. (String as short as possible)"
+    },
+    "16233": {
+        "text": "Pause uploads",
+        "context": "Label to pause the upload queue. (String as short as possible)"
+    },
+    "16234": {
+        "text": "Blocked file: %1",
+        "context": "Label to show the blocked file that has stopped the synchronization engine. %1 will be replaced with the file name, so do not modify the %1 please."
+    },
+    "16235": {
+        "text": "Pause downloads",
+        "context": "Label to pause the download queue. (String as short as possible)"
+    },
+    "16243": {
+        "text": "You will no longer have access to this conversation",
+        "context": "Alert text that explains what it means to be confirming the action 'Leave'. (i.e. what will happen to the user if they choose to leave the chat - they won't be able to see or access it anymore)"
+    },
+    "16257": {
+        "text": "Chat is disabled",
+        "context": "A title which is shown when the chat is disabled."
+    },
+    "16258": {
+        "text": "Status appearance",
+        "context": "A header in the Chat settings. This section allows the user to select their presence status (Online, Away, Busy, Offline) which will be set automatically after they log in."
+    },
+    "16259": {
+        "text": "Auto-away",
+        "context": "A header in the Chat settings. This changes the user's status to Away after some time of inactivity."
+    },
+    "16262": {
+        "text": "Set my status to Away after %1 minutes of inactivity.",
+        "context": "This setting allows the user to change their Chat presence status automatically. Please leave the %1 in the translation as this will be replaced with a text box where the user can set the number of minutes."
+    },
+    "16263": {
+        "text": "MEGAcmd provides GUI-less access to the MEGA cloud. It supports all operations on your MEGA account through a set of powerful commands.\r\n                ",
+        "context": "A description of new MEGAcmd app. GUI-less means only terminal access (no Graphical User Interface)."
+    },
+    "16264": {
+        "text": "Interactive",
+        "context": "A title on the MEGAcmd page explaining the advantage of the MEGAcmd app where users can use MEGA by typing on a command line terminal."
+    },
+    "16265": {
+        "text": "A versatile command shell.",
+        "context": "A description on the MEGAcmd page explaining the advantage of the MEGAcmd app where users can use MEGA by typing on a command line terminal."
+    },
+    "16266": {
+        "text": "Scriptable",
+        "context": "A title on the MEGAcmd page explaining the advantage of the MEGAcmd app where users can use MEGA by typing on a command line terminal."
+    },
+    "16267": {
+        "text": "Execute commands from a shell, script or another program.",
+        "context": "A description on the MEGAcmd page explaining the advantage of the MEGAcmd app where users can use MEGA by typing on a command line terminal, using a script or other program."
+    },
+    "16268": {
+        "text": "Import contacts...",
+        "context": "A button label which allows user to import contacts from the Gmail service."
+    },
+    "16269": {
+        "text": "Use the New Folder button to create a new folder.",
+        "context": "This message is shown on the Copy and Move dialogs when there are no folders available."
     }
 }

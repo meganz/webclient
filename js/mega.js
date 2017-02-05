@@ -3827,9 +3827,11 @@ function MegaData()
                     }
 
                     if (fmdb && !ignoreDB) {
+                        M.c.shares[n.h].t = n.h;
                         fmdb.add('s', { o_t: n.su + '*' + n.h,
                                           d: M.c.shares[n.h]
                         });
+                        delete M.c.shares[n.h].t;
                     }
                 }
             }
@@ -7426,8 +7428,12 @@ function worker_procmsg(ev) {
             for (h in M.c.shares) {
                 if (u_sharekeys[h]) M.c.shares[h].sk = a32_to_base64(u_sharekeys[h][0]);
 
-                if (fmdb) fmdb.add('s', { o_t : M.c.shares[h].su + '*' + h,
+                if (fmdb) {
+                    M.c.shares[h].t = h;
+                    fmdb.add('s', { o_t : M.c.shares[h].su + '*' + h,
                                           d : M.c.shares[h] });
+                    delete M.c.shares[h].t;
+                }
             }
 
             loadfm_callback(residualfm);

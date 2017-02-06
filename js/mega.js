@@ -2996,8 +2996,8 @@ function MegaData()
                     gridUI();
                 }
             }
-            delay(treeUI);
-            delay(fmtopUI);
+            fmtopUI();
+            onIdle(treeUI);
         };
 
         var apiReq = function(handle) {
@@ -3832,9 +3832,11 @@ function MegaData()
                     }
 
                     if (fmdb && !ignoreDB) {
+                        M.c.shares[n.h].t = n.h;
                         fmdb.add('s', { o_t: n.su + '*' + n.h,
                                           d: M.c.shares[n.h]
                         });
+                        delete M.c.shares[n.h].t;
                     }
                 }
             }
@@ -7431,8 +7433,12 @@ function worker_procmsg(ev) {
             for (h in M.c.shares) {
                 if (u_sharekeys[h]) M.c.shares[h].sk = a32_to_base64(u_sharekeys[h][0]);
 
-                if (fmdb) fmdb.add('s', { o_t : M.c.shares[h].su + '*' + h,
+                if (fmdb) {
+                    M.c.shares[h].t = h;
+                    fmdb.add('s', { o_t : M.c.shares[h].su + '*' + h,
                                           d : M.c.shares[h] });
+                    delete M.c.shares[h].t;
+                }
             }
 
             loadfm_callback(residualfm);
@@ -8929,6 +8935,9 @@ function loadfm_done(mDBload) {
         if (hideLoadingDialog) {
             loadingDialog.hide();
             loadingInitDialog.hide();
+            // Reposition UI elements right after hiding the loading overlay,
+            // without waiting for the lazy $.tresizer() triggered by MegaRender
+            fm_resize_handler(true);
         }
 
         // -0x800e0fff indicates a call to loadfm() when it was already loaded

@@ -11,6 +11,7 @@ Run this script with the --help flag for further details.
 Requirements:
     - Selenium Python Webdriver: pip install -U selenium
     - WebDriver for Chrome: https://sites.google.com/a/chromium.org/chromedriver/home
+    - Pillow for visual diffs: pip install pillow
 
 This test runner will work with both Python 2.7 as well as 3.x.
 """
@@ -27,6 +28,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import NoAlertPresentException
 import unittest, time, re, os, sys, argparse, tempfile
+from PIL import ImageChops, Image
 
 username=None
 password=None
@@ -56,6 +58,7 @@ class MegaTest(unittest.TestCase):
         chrome_options = Options()
         chrome_options.add_argument("--lang=en")
         chrome_options.add_argument("--window-size=1270,812")
+        chrome_options.add_argument('--user-agent=Mozilla/5.0 (Selenium; %s) Chrome/256.3.14' % webdriver.__version__)
         chrome_options.add_experimental_option("prefs", {'download.prompt_for_download': 'false',
                                                          'download.default_directory': tempfile.gettempdir()})
         self.driver = webdriver.Chrome(chrome_options=chrome_options)
@@ -65,6 +68,7 @@ class MegaTest(unittest.TestCase):
         self.accept_next_alert = True
         self.wait30 = WebDriverWait(self.driver,30)
         self.wait10 = WebDriverWait(self.driver,10)
+        self.path = os.path.dirname(os.path.realpath(__file__))
 
     def test_suite(self):
         driver = self.driver
@@ -72,6 +76,8 @@ class MegaTest(unittest.TestCase):
         #
         # Test: 0001  Login
         self.waitfor_visibility("div.st-social-block > a.st-bottom-button.st-facebook-button")
+        self.visual_diff('homepage.png')
+        self.driver.execute_script("""localStorage.testChatDisabled=1""")
         driver.find_element_by_link_text("Login").click()
         driver.find_element_by_id("login-name").clear()
         driver.find_element_by_id("login-name").send_keys(username)
@@ -109,6 +115,7 @@ class MegaTest(unittest.TestCase):
         self.waitfor_text(".fm-notification-warning", "You cannot undo this action.")
         driver.find_element_by_css_selector(".fm-dialog.clear-bin-dialog .notification-button.confirm").click()
         self.waitfor_visibility(".fm-empty-trashbin .fm-empty-cloud-txt")
+        self.visual_diff('rubbish.png')
         # 
         # Test: 0004  Reload
         driver.find_element_by_css_selector(".top-icon.menu").click()
@@ -274,9 +281,11 @@ class MegaTest(unittest.TestCase):
         self.waitfor_visibility("div.download.error-title")
         self.assertEqual("The file you are trying to download is no longer available.", driver.find_element_by_css_selector("div.download.error-title").text)
         self.assertFalse(driver.find_element_by_css_selector(".download-button.to-clouddrive").is_displayed())
+        self.visual_diff('filelink-takedown.png')
         # FileLink - Download
         driver.get(self.base_url + "#!84Vl0ADI")
         self.waitfor_text(".fm-dialog.dlkey-dialog .fm-dialog-title", "Enter decryption key")
+        self.visual_diff('filelink-keydialog.png')
         driver.find_element_by_css_selector(".fm-dialog.dlkey-dialog input").clear()
         driver.find_element_by_css_selector(".fm-dialog.dlkey-dialog input").send_keys("Fj9EOhlQu4mN_ZwlUNIHCD6xc2xMKCEjSFvEEvypx9o")
         driver.find_element_by_css_selector(".fm-dialog.dlkey-dialog .default-white-button").click()
@@ -300,10 +309,9 @@ class MegaTest(unittest.TestCase):
         driver.find_element_by_css_selector(".fm-dialog.dlkey-dialog input").send_keys("moe6GANiPRawdt3ZUFLp4g")
         driver.find_element_by_css_selector(".fm-dialog.dlkey-dialog .default-white-button").click()
         driver.refresh()
-        self.waitfor_visibility(".nw-fm-tree-header.folder-link")
-        self.assertEqual("111.importTest", driver.find_element_by_css_selector("div.nw-tree-panel-header span").text)
-        self.assertEqual("Download as ZIP", driver.find_element_by_css_selector(".fm-download-as-zip span").text)
-        self.assertEqual("Import to my cloud drive", driver.find_element_by_css_selector(".fm-import-to-cloudrive span").text)
+        self.waitfor_text(".grid-table-header .arrow.ts", "Date created")
+        self.assertEqual("Import to my cloud drive", driver.find_element_by_css_selector(".fm-import-to-cloudrive").text)
+        self.visual_diff('folderlink.png')
         # FolderLink - Download as ZIP
         driver.find_element_by_css_selector(".fm-download-as-zip").click()
         driver.find_element_by_css_selector(".fm-main.default.active-folder-link .nw-fm-left-icon.transfers").click()
@@ -340,6 +348,7 @@ class MegaTest(unittest.TestCase):
         # check search suggestions
         driver.find_element_by_css_selector("input.search.ui-autocomplete-input").send_keys("webDAV")
         self.waitfor_text(".support-search-container .ui-front > li", "Can I upload data using FTP, SFTP, webDAV or similar?")
+        self.visual_diff('help2.png')
         # check main sections
         self.assertEqual("Mobile Apps", driver.find_element_by_css_selector("#container .mobile-block").text)
         self.fire_mouseover(By.CSS_SELECTOR, "#container .mobile-block")
@@ -359,6 +368,7 @@ class MegaTest(unittest.TestCase):
         driver.find_element_by_css_selector("#security-and-privacy ul.d-section-items > li > a").click()
         self.waitfor_text("div.feedback-heading", "Did you find this helpful?")
         self.assertEqual("Articles", driver.find_element_by_css_selector("div.helpsection-grayheading").text)
+        self.visual_diff('help2-webclient.png')
         # ensure 'Share Article' does work.
         driver.find_element_by_css_selector(".support-link-icon").click()
         self.waitfor_text(".fm-dialog.share-help .fm-dialog-title", "Share the Article")
@@ -367,6 +377,7 @@ class MegaTest(unittest.TestCase):
         # go to the support section from the help acticle
         driver.find_element_by_css_selector("div.support-email-icon").click()
         self.waitfor_text(".about-top-block h1", "Get support")
+        self.visual_diff('help2-support.png')
         # try to submit the empty form, it must fail
         driver.find_element_by_css_selector(".new-bottom-pages.support .contact-new-button").click()
         self.waitfor_text(".fm-dialog.warning-dialog-a .fm-dialog-title span", "Message too short")
@@ -399,6 +410,7 @@ class MegaTest(unittest.TestCase):
         driver.find_element_by_css_selector(".fm-dialog.confirmation-dialog .notification-button.confirm").click()
         # wait for TOS dialog and click Agree
         self.waitfor_text(".fm-dialog.bottom-pages-dialog .fm-dialog-title", "Terms of Service")
+        self.visual_diff('ephemeral-tos.png')
         driver.find_element_by_css_selector(".fm-dialog.bottom-pages-dialog .fm-bp-agree").click()
         # move to the transfers panel and wait for the upload to finish
         driver.find_element_by_css_selector(".fm-main.default .nw-fm-left-icon.transfers").click()
@@ -406,6 +418,7 @@ class MegaTest(unittest.TestCase):
         # on upload completion, we should get a warning about using an ephemeral session
         self.waitfor_text(".top-warning-popup .warning-header", "You are using an ephemeral session.")
         self.assertEqual("Register now", driver.find_element_by_css_selector(".top-warning-popup .warning-button span").text)
+        self.visual_diff('ephemeral-transfers.png')
         # move back to the cloud and check stuff there
         driver.find_element_by_css_selector(".fm-main.default .nw-fm-left-icon.cloud-drive").click()
         self.waitfor_text("tr.file span.tranfer-filetype-txt", "test.txt")
@@ -430,6 +443,7 @@ class MegaTest(unittest.TestCase):
         driver.find_element_by_css_selector(".fm-dialog.confirmation-dialog .notification-button.confirm").click()
         # we should go to /login by logging out
         self.waitfor_text(".register-st2-txt-block h5.main-italic-header", "Your account is only as secure as your computer.")
+        self.visual_diff('login.png')
 
     def is_element_present(self, how, what):
         try: self.driver.find_element(by=how, value=what)
@@ -504,16 +518,33 @@ class MegaTest(unittest.TestCase):
             return alert_text
         finally: self.accept_next_alert = True
 
-    def take_screenshot(self, name, path=None):
+    def take_screenshot(self, name, path=None, unique=True):
         now = datetime.now();
         if path is None:
-            path = os.path.join(tempfile.gettempdir(), 'selenium')
-        path = os.path.join(os.path.abspath(path), now.strftime("%Y%m%d"))
+            path = os.path.join(tempfile.gettempdir(), 'selenium', now.strftime("%Y%m%d"))
         if not os.path.exists(path):
             os.makedirs(path)
-        path = os.path.join(path, now.strftime("%H%M%S.%f.")+name)
+        if unique is True:
+            name = now.strftime("%H%M%S.%f.") + name
+        path = os.path.join(path, name)
         self.driver.get_screenshot_as_file(path)
         return path
+
+    def visual_diff(self, name):
+        path = os.path.join(self.path, 'selenium')
+        file = os.path.join(path, name)
+        if os.path.exists(file):
+            path = self.take_screenshot(name)
+            original = Image.open(file)
+            current = Image.open(path)
+            diff = ImageChops.difference(original, current)
+            if diff.getbbox():
+                path = os.path.join(os.path.dirname(path), 'vdiff.' + name)
+                diff.save(path)
+                raise Exception('Visual difference found, saved to ' + path)
+            os.remove(path)
+        else:
+            self.take_screenshot(name, path, False)
 
     def tearDown(self):
         if sys.exc_info()[0]:

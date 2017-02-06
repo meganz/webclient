@@ -12291,8 +12291,8 @@ function savecomplete(id)
  * width, height, position, etc).
  * This is why we do a on('resize') handler which handles the resize of the generic layout of Mega's FM.
  */
-function fm_resize_handler() {
-    if ($.tresizer.last === -1) {
+function fm_resize_handler(force) {
+    if ($.tresizer.last === -1 && force !== true) {
         return;
     }
     if (d) {

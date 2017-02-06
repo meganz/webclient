@@ -318,6 +318,9 @@ delay.cancel = function(aProcID) {
 };
 
 function jScrollFade(id) {
+    if (is_selenium) {
+        return;
+    }
 
     $(id + ' .jspTrack').rebind('mouseover', function(e) {
         $(this).find('.jspDrag').addClass('jspActive');
@@ -3679,9 +3682,6 @@ mega.utils.reload = function megaUtilsReload() {
                 if (!is_extension && jj)  {
                     localStorage.jj = jj;
                 }
-                if (mcd) {
-                    localStorage.testChatDisabled = 1;
-                }
             }
             if (apipath) {
                 // restore api path across reloads, only for debugging purposes...
@@ -3689,6 +3689,9 @@ mega.utils.reload = function megaUtilsReload() {
             }
         }
 
+        if (mcd) {
+            localStorage.testChatDisabled = 1;
+        }
         if (hashLogic) {
             localStorage.hashLogic = 1;
         }

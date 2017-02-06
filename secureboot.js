@@ -1987,7 +1987,7 @@ else if (!b_u)
         subpages['F!'] = ['fm_mobile', 'fm_mobile_js'];
         subpages['fm'] = ['fm_mobile', 'fm_mobile_js'];
     }
-
+	if (page == 'megacmd') page = 'cmd';
 
     if (page)
     {

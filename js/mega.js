@@ -3820,18 +3820,16 @@ function MegaData()
                         if (k !== false) crypto_setsharekey(n.h, k, ignoreDB);
                     }
 
-                    M.c.shares[n.h] = { su: n.su, r: n.r };
+                    M.c.shares[n.h] = { su: n.su, r: n.r, t: n.h };
 
                     if (u_sharekeys[n.h]) {
                         M.c.shares[n.h].sk = a32_to_base64(u_sharekeys[n.h][0]);
                     }
 
                     if (fmdb && !ignoreDB) {
-                        M.c.shares[n.h].t = n.h;
                         fmdb.add('s', { o_t: n.su + '*' + n.h,
                                           d: M.c.shares[n.h]
                         });
-                        delete M.c.shares[n.h].t;
                     }
                 }
             }
@@ -7381,7 +7379,7 @@ function worker_procmsg(ev) {
         else {
             // maintain special incoming shares index
             if (ev.data.su) {
-                M.c.shares[ev.data.h] = { su : ev.data.su, r : ev.data.r };
+                M.c.shares[ev.data.h] = { su : ev.data.su, r : ev.data.r, t: ev.data.h };
 
                 if (u_sharekeys[ev.data.h]) {
                     M.c.shares[ev.data.h].sk = u_sharekeys[ev.data.h][0];
@@ -7418,7 +7416,7 @@ function worker_procmsg(ev) {
         if (d) console.log("Worker done, " + dumpsremaining + " remaining");
 
         if (ev.data.sharekeys) {
-            for (var h in ev.data.sharekeys) {
+            for (h in ev.data.sharekeys) {
                 crypto_setsharekey(h, ev.data.sharekeys[h]);
             }
         }
@@ -7429,10 +7427,8 @@ function worker_procmsg(ev) {
                 if (u_sharekeys[h]) M.c.shares[h].sk = a32_to_base64(u_sharekeys[h][0]);
 
                 if (fmdb) {
-                    M.c.shares[h].t = h;
                     fmdb.add('s', { o_t : M.c.shares[h].su + '*' + h,
                                           d : M.c.shares[h] });
-                    delete M.c.shares[h].t;
                 }
             }
 

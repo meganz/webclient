@@ -562,6 +562,7 @@ function MegaData()
     this.doSort = function(n, d) {
         $('.grid-table-header .arrow').removeClass('asc desc');
 
+        n = String(n).replace(/\W/g, '');
         if (d > 0) {
             $('.arrow.' + n).addClass('desc');
         }
@@ -882,14 +883,14 @@ function MegaData()
             // this event is triggered for a specific resource/device (fullJid), so we need to get the presen for the
             // user's devices, which is aggregated by Karere already
             status = megaChat.karere.getPresence(megaChat.getJidFromNodeId(u.u));
-            var e = $('.ustatus.' + u.u);
+            var e = $('.ustatus.' + String(u.u).replace(/[^\w-]/g, ''));
             if (e.length > 0) {
                 $(e).removeClass('offline online busy away');
                 $(e).addClass(this.onlineStatusClass(status)[1]);
             }
-            var e = $('.fm-chat-user-status.' + u.u);
+            e = $('.fm-chat-user-status.' + String(u.u).replace(/[^\w-]/g, ''));
             if (e.length > 0) {
-                $(e).html(this.onlineStatusClass(status)[0]);
+                $(e).safeHTML(this.onlineStatusClass(status)[0]);
             }
 
             if (
@@ -1713,7 +1714,7 @@ function MegaData()
                     + onlinestatus[1] + '" id="contact_' + htmlentities(activeContacts[i].u)
                     + '"><div class="nw-contact-status"></div><div class="nw-contact-name">'
                     + htmlentities(name)
-                    + ' <a href="#" class="button start-chat-button"><span></span></a></div></div>';
+                    + ' <a class="button start-chat-button"><span></span></a></div></div>';
                 }
                 $('.fm-start-chat-dropdown').addClass('hidden');
             }
@@ -2990,8 +2991,8 @@ function MegaData()
                     gridUI();
                 }
             }
-            delay(treeUI);
-            delay(fmtopUI);
+            fmtopUI();
+            onIdle(treeUI);
         };
 
         var apiReq = function(handle) {
@@ -3819,7 +3820,7 @@ function MegaData()
                         if (k !== false) crypto_setsharekey(n.h, k, ignoreDB);
                     }
 
-                    M.c.shares[n.h] = { su: n.su, r: n.r };
+                    M.c.shares[n.h] = { su: n.su, r: n.r, t: n.h };
 
                     if (u_sharekeys[n.h]) {
                         M.c.shares[n.h].sk = a32_to_base64(u_sharekeys[n.h][0]);
@@ -4195,7 +4196,7 @@ function MegaData()
             this.su[s.u][h] = 1;
         }
         else if (d) {
-            console.log('nodeShare failed for node:', h, s, ignoreDB);
+            console.warn('nodeShare failed for node:', h, s, ignoreDB);
         }
     };
 
@@ -5766,7 +5767,7 @@ function MegaData()
     this.transferFromMegaCoNz = function()
     {
         // Get site transfer data from after the hash in the URL
-        var urlParts = /#sitetransfer!(.*)/.exec(window.location);
+        var urlParts = /sitetransfer!(.*)/.exec(window.location);
 
         if (urlParts) {
 
@@ -6153,34 +6154,51 @@ var nodesinflight = {};  // number of nodes being processed in the worker for sc
 // enqueue parsed actionpacket
 function sc_packet(a) {
     if ((a.a == 's' || a.a == 's2') && a.k) {
+        /**
+         * There are two occasions where `crypto_process_sharekey()` must not be called:
+         *
+         * 1. `a.k` is symmetric (AES), `a.u` is set and `a.u != u_handle`
+         *    (because the resulting sharekey would be rubbish)
+         *
+         * 2. `a.k` is asymmetric (RSA), `a.u` is set and `a.u != u_handle`
+         *    (because we either get a rubbish sharekey or an RSA exception from asmcrypto)
+         */
+        var prockey = false;
+
         if (a.k.length > 43) {
             if (!a.u || a.u === u_handle) {
                 // RSA-keyed share command targeted to u_handle: run through worker
                 rsasharekeys[a.n] = true;
-
-                if (workers) {
-                    a.scqi = scqhead++;     // set scq slot number
-
-                    var p = a.scqi % workers.length;
-
-                    // pin the nodes of this share to the same worker
-                    // (it is the only one that knows the sharekey)
-                    shareworker[a.n] = p;
-
-                    workers[p].postMessage(a);
-                    return;
-                }
+                prockey = true;
             }
         }
         else {
-            if (!a.o || a.o === u_handle) {
-                var k = crypto_process_sharekey(a.n, a.k);
+            prockey = (!a.o || a.o === u_handle);
+        }
 
-                if (k !== false) {
-                    a.k = k;
-                    crypto_setsharekey(a.n, k, true);
-                }
-                else console.log("Failed to decrypt RSA share key for " + a.n + ": " + a.k);
+        if (prockey) {
+            if (workers && rsasharekeys[a.n]) {
+                // set scq slot number
+                a.scqi = scqhead++;
+
+                var p = a.scqi % workers.length;
+
+                // pin the nodes of this share to the same worker
+                // (it is the only one that knows the sharekey)
+                shareworker[a.n] = p;
+
+                workers[p].postMessage(a);
+                return;
+            }
+
+            var k = crypto_process_sharekey(a.n, a.k);
+
+            if (k !== false) {
+                a.k = k;
+                crypto_setsharekey(a.n, k, true);
+            }
+            else {
+                console.warn("Failed to decrypt RSA share key for " + a.n + ": " + a.k);
             }
         }
     }
@@ -7076,6 +7094,10 @@ function initworkerpool() {
             break;
         }
     }
+
+    if (d) {
+        console.debug('initworkerpool', workerURL, workers && workers.length);
+    }
 }
 
 // queue a DB invalidation-plus-reload request to the FMDB subsystem
@@ -7357,7 +7379,7 @@ function worker_procmsg(ev) {
         else {
             // maintain special incoming shares index
             if (ev.data.su) {
-                M.c.shares[ev.data.h] = { su : ev.data.su, r : ev.data.r };
+                M.c.shares[ev.data.h] = { su : ev.data.su, r : ev.data.r, t: ev.data.h };
 
                 if (u_sharekeys[ev.data.h]) {
                     M.c.shares[ev.data.h].sk = u_sharekeys[ev.data.h][0];
@@ -7394,7 +7416,7 @@ function worker_procmsg(ev) {
         if (d) console.log("Worker done, " + dumpsremaining + " remaining");
 
         if (ev.data.sharekeys) {
-            for (var h in ev.data.sharekeys) {
+            for (h in ev.data.sharekeys) {
                 crypto_setsharekey(h, ev.data.sharekeys[h]);
             }
         }
@@ -7404,8 +7426,10 @@ function worker_procmsg(ev) {
             for (h in M.c.shares) {
                 if (u_sharekeys[h]) M.c.shares[h].sk = a32_to_base64(u_sharekeys[h][0]);
 
-                if (fmdb) fmdb.add('s', { o_t : M.c.shares[h].su + '*' + h,
+                if (fmdb) {
+                    fmdb.add('s', { o_t : M.c.shares[h].su + '*' + h,
                                           d : M.c.shares[h] });
+                }
             }
 
             loadfm_callback(residualfm);
@@ -7611,7 +7635,7 @@ function dbfetchfm() {
 
                     fmdb.get('s', function(r){
                         for (i = r.length; i--; ) {
-                            if (r[i].o.length == 11) {
+                            if (r[i].su) {
                                 // this is an inbound share
                                 M.c.shares[r[i].t] = r[i];
                                 if (r[i].sk) {
@@ -8436,7 +8460,14 @@ function processPS(pendingShares, ignoreDB) {
                 M.delPS(pendingContactId, nodeHandle);
 
                 if (ps.op) {
-                    M.nodeShare(nodeHandle, ps);
+                    M.nodeShare(nodeHandle, {
+                        h: ps.n,
+                        o: ps.n,
+                        p: ps.p,
+                        u: ps.u,
+                        r: ps.r,
+                        ts: ps.ts
+                    });
                 }
 
                 if (M.opc && M.opc[ps.p]) {
@@ -8895,6 +8926,9 @@ function loadfm_done(mDBload) {
         if (hideLoadingDialog) {
             loadingDialog.hide();
             loadingInitDialog.hide();
+            // Reposition UI elements right after hiding the loading overlay,
+            // without waiting for the lazy $.tresizer() triggered by MegaRender
+            fm_resize_handler(true);
         }
 
         // -0x800e0fff indicates a call to loadfm() when it was already loaded
@@ -9146,7 +9180,7 @@ Object.defineProperty(mega, 'achievem', {
                 this.rebind('click', function() {
                     if (action) {
                         switch (action[0]) {
-                            case '#':
+                            case '/':
                                 loadSubPage(action);
                                 break;
 
@@ -9282,14 +9316,14 @@ Object.defineProperty(mega, 'achievem', {
 
 (function(o) {
     var map = {
-        /*  1 */ 'WELCOME':     'ach-create-account:#register',
+        /*  1 */ 'WELCOME':     'ach-create-account:/register',
         /*  2 */ 'TOUR':        'ach-take-tour',
         /*  3 */ 'INVITE':      'ach-invite-friend:~inviteFriendDialog',
-        /*  4 */ 'SYNCINSTALL': 'ach-install-megasync:#sync',
-        /*  5 */ 'APPINSTALL':  'ach-install-mobile-app:#mobile',
+        /*  4 */ 'SYNCINSTALL': 'ach-install-megasync:/sync',
+        /*  5 */ 'APPINSTALL':  'ach-install-mobile-app:/mobile',
         /*  6 */ 'VERIFYE164':  'ach-verify-number',
-        /*  7 */ 'GROUPCHAT':   'ach-group-chat:#fm/chat',
-        /*  8 */ 'FOLDERSHARE': 'ach-share-folder:#fm/contacts'
+        /*  7 */ 'GROUPCHAT':   'ach-group-chat:/fm/chat',
+        /*  8 */ 'FOLDERSHARE': 'ach-share-folder:/fm/contacts'
     };
     var mapToAction = Object.create(null);
     var mapToElement = Object.create(null);

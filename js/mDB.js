@@ -102,7 +102,7 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
         try {
             if (!fmdb.db) {
                 var todrop = [];
-                var dbpfx = 'fm5_';
+                var dbpfx = 'fm8_';
 
                 // enumerate databases and collect those not prefixed with 'dbpfx'
                 // (which is the current format)
@@ -486,15 +486,6 @@ FMDB.prototype.stripnode = Object.freeze({
         return t;
     },
 
-    s : function(s) {
-        var t = { o : s.o, t : s.t };
-
-        delete s.o;
-        delete s.t;
-
-        return t;
-    },
-
     ua : function(ua, index) {
         delete ua.k;
     },
@@ -525,22 +516,6 @@ FMDB.prototype.restorenode = Object.freeze({
         if (!f.ar && f.k && typeof f.k == 'object') f.ar = {};
     },
 
-    s : function(f, index) {
-        var t = index.o_t.indexOf('*');
-        if (t >= 0) {
-            f.o = index.o_t.substr(0, t);
-            f.t = index.o_t.substr(t + 1);
-        }
-    },
-
-    ps : function(ps, index) {
-        var t = index.h_p.indexOf('*');
-        if (t >= 0) {
-            ps.h = index.h_p.substr(0, t);
-            ps.p = index.h_p.substr(t + 1);
-        }
-    },
-
     ph : function(ph, index) {
         ph.h = index.h;
     },
@@ -552,6 +527,7 @@ FMDB.prototype.restorenode = Object.freeze({
     chatqueuedmsgs : function(chatqueuedmsgs, index) {
         chatqueuedmsgs.k = index.k;
     },
+
     pta: function(pta, index) {
         pta.k = index.k;
     },

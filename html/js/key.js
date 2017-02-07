@@ -19,10 +19,10 @@ function ui_keycomplete() {
     $('.key3').removeClass('hidden');
 
     if ((typeof (u_attr.p) !== 'undefined') && (u_attr.p >= 1 && u_attr.p <= 4)) {
-        document.location.hash = 'fm';
+        loadSubPage('fm');
     }
     else {
         localStorage.keycomplete = true;
-        document.location.hash = 'pro';
+        loadSubPage('pro');
     }
 }

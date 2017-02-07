@@ -75,7 +75,7 @@ React.makeElement = React['createElement'];
 	            if (!megaChat.chats[roomOrUserHash + "@conference." + megaChat.options.xmppDomain]) {
 
 	                setTimeout(function () {
-	                    window.location = '#fm/chat';
+	                    loadSubPage('fm/chat');
 	                    M.openFolder('chat');
 	                }, 100);
 	                return;
@@ -83,7 +83,7 @@ React.makeElement = React['createElement'];
 	        } else {
 	            if (!M.u[roomOrUserHash]) {
 	                setTimeout(function () {
-	                    window.location = '#fm/chat';
+	                    loadSubPage('fm/chat');
 	                    M.openFolder('chat');
 	                }, 100);
 	                return;
@@ -1238,7 +1238,7 @@ React.makeElement = React['createElement'];
 	    return this.chats[this.chats.keys()[idx]];
 	};
 
-	Chat.prototype.getXmppServiceUrl = function () {
+	Chat.prototype.getXmppServiceUrl = function (timeout) {
 	    var self = this;
 
 	    if (localStorage.megaChatUseSandbox) {
@@ -1248,7 +1248,10 @@ React.makeElement = React['createElement'];
 	    } else {
 	        var $promise = new MegaPromise();
 
-	        $.get("https://" + self.options.loadbalancerService + "/?service=xmpp").done(function (r) {
+	        $.ajax("https://" + self.options.loadbalancerService + "/?service=xmpp", {
+	            method: "GET",
+	            timeout: timeout ? timeout : 10000
+	        }).done(function (r) {
 	            if (r.xmpp && r.xmpp.length > 0) {
 	                var randomHost = array_random(r.xmpp);
 	                if (webSocketsSupport) {
@@ -1612,7 +1615,7 @@ React.makeElement = React['createElement'];
 	    mixins: [MegaRenderMixin, RenderDebugger],
 	    conversationClicked: function conversationClicked(room, e) {
 
-	        window.location = room.getRoomUrl();
+	        loadSubPage(room.getRoomUrl());
 	        e.stopPropagation();
 	    },
 	    currentCallClicked: function currentCallClicked(e) {
@@ -1622,7 +1625,7 @@ React.makeElement = React['createElement'];
 	        }
 	    },
 	    contactClicked: function contactClicked(contact, e) {
-	        window.location = "#fm/chat/" + contact.u;
+	        loadSubPage("fm/chat/" + contact.u);
 	        e.stopPropagation();
 	    },
 	    endCurrentCall: function endCurrentCall(e) {
@@ -1723,7 +1726,7 @@ React.makeElement = React['createElement'];
 	    },
 	    startChatClicked: function startChatClicked(selected) {
 	        if (selected.length === 1) {
-	            window.location = "#fm/chat/" + selected[0];
+	            loadSubPage("fm/chat/" + selected[0]);
 	            this.props.megaChat.createAndShowPrivateRoomFor(selected[0]);
 	        } else {
 	            this.props.megaChat.createAndShowGroupRoomFor(selected);
@@ -1907,7 +1910,7 @@ React.makeElement = React['createElement'];
 	                        { style: leftPanelStyles },
 	                        React.makeElement(
 	                            "div",
-	                            { className: "content-panel conversations" + (window.location.hash.indexOf("/chat") !== -1 ? " active" : "") },
+	                            { className: "content-panel conversations" + (getSitePath().indexOf("/chat") !== -1 ? " active" : "") },
 	                            React.makeElement(ConversationsList, { chats: this.props.megaChat.chats, megaChat: this.props.megaChat, contacts: this.props.contacts })
 	                        )
 	                    )
@@ -3876,7 +3879,7 @@ React.makeElement = React['createElement'];
 	                }
 	                moreDropdowns.unshift(React.makeElement(DropdownsUI.DropdownItem, {
 	                    key: "view", icon: "human-profile", label: __(l[8866]), onClick: function onClick() {
-	                        window.location = '#fm/' + contact.u;
+	                        loadSubPage('fm/' + contact.u);
 	                    } }));
 	            }
 
@@ -6819,7 +6822,7 @@ React.makeElement = React['createElement'];
 
 	        var conversations = [];
 
-	        if (window.location.hash === "#fm/chat") {
+	        if (getSitePath() === "/fm/chat") {
 
 	            var activeFound = false;
 	            self.props.conversations.forEach(function (chatRoom) {
@@ -7930,7 +7933,7 @@ React.makeElement = React['createElement'];
 	    mixins: [MegaRenderMixin, RenderDebugger],
 	    getDefaultProps: function getDefaultProps() {
 	        return {
-	            'textareaMaxHeight': 100
+	            'textareaMaxHeight': "40%"
 	        };
 	    },
 	    getInitialState: function getInitialState() {
@@ -8292,6 +8295,21 @@ React.makeElement = React['createElement'];
 	            maintainPosition: false
 	        });
 	    },
+	    getTextareaMaxHeight: function getTextareaMaxHeight() {
+	        var self = this;
+	        var textareaMaxHeight = self.props.textareaMaxHeight;
+
+	        if (String(textareaMaxHeight).indexOf("%") > -1) {
+	            textareaMaxHeight = (parseInt(textareaMaxHeight.replace("%", "")) || 0) / 100;
+	            if (textareaMaxHeight === 0) {
+	                textareaMaxHeight = 100;
+	            } else {
+	                var $messagesContainer = $('.messages-block:visible');
+	                textareaMaxHeight = $messagesContainer.height() * textareaMaxHeight;
+	            }
+	        }
+	        return textareaMaxHeight;
+	    },
 	    updateScroll: function updateScroll(keyEvents) {
 	        var self = this;
 
@@ -8303,7 +8321,8 @@ React.makeElement = React['createElement'];
 
 	        var $textarea = $('textarea:first', $node);
 	        var $textareaClone = $('.message-preview', $node);
-	        var textareaMaxHeight = self.props.textareaMaxHeight;
+	        var textareaMaxHeight = self.getTextareaMaxHeight();
+
 	        var $textareaScrollBlock = $('.textarea-scroll', $node);
 
 	        var textareaContent = $textarea.val();
@@ -8445,7 +8464,7 @@ React.makeElement = React['createElement'];
 	        };
 
 	        var textareaScrollBlockStyles = {
-	            height: Math.min(self.state.textareaHeight, self.props.textareaMaxHeight)
+	            height: Math.min(self.state.textareaHeight, self.getTextareaMaxHeight())
 	        };
 
 	        return React.makeElement(
@@ -9466,7 +9485,7 @@ React.makeElement = React['createElement'];
 	                                        icon: 'human-profile',
 	                                        label: __(l[5868]),
 	                                        onClick: function onClick() {
-	                                            window.location = "#fm/" + contact.u;
+	                                            loadSubPage("fm/" + contact.u);
 	                                        }
 	                                    }),
 	                                    React.makeElement('hr', null),
@@ -9475,7 +9494,7 @@ React.makeElement = React['createElement'];
 	                                        icon: 'conversations',
 	                                        label: __(l[8632]),
 	                                        onClick: function onClick() {
-	                                            window.location = "#fm/chat/" + contact.u;
+	                                            loadSubPage("fm/chat/" + contact.u);
 	                                        }
 	                                    }),
 	                                    deleteButtonOptional ? React.makeElement('hr', null) : null,
@@ -9844,8 +9863,8 @@ React.makeElement = React['createElement'];
 	                    }
 	                    buttons.push(React.makeElement(
 	                        'div',
-	                        { className: classes, key: k, onClick: function onClick() {
-	                                button.callback();
+	                        { className: classes, key: k, onClick: function onClick(e) {
+	                                button.callback.call(e.target);
 	                            } },
 	                        icon,
 	                        button.text
@@ -10573,7 +10592,7 @@ React.makeElement = React['createElement'];
 	    'LEFT': 250
 	};
 
-	ChatRoom.prototype._retrieveTurnServerFromLoadBalancer = function () {
+	ChatRoom.prototype._retrieveTurnServerFromLoadBalancer = function (timeout) {
 	    var self = this;
 
 	    var $promise = new MegaPromise();
@@ -10583,7 +10602,10 @@ React.makeElement = React['createElement'];
 	    if (self.megaChat.rtc && self.megaChat.rtc.ownAnonId) {
 	        anonId = self.megaChat.rtc.ownAnonId;
 	    }
-	    $.get("https://" + self.megaChat.options.loadbalancerService + "/?service=turn&anonid=" + anonId).done(function (r) {
+	    $.ajax("https://" + self.megaChat.options.loadbalancerService + "/?service=turn&anonid=" + anonId, {
+	        method: "GET",
+	        timeout: timeout ? timeout : 10000
+	    }).done(function (r) {
 	        if (r.turn && r.turn.length > 0) {
 	            var servers = [];
 	            r.turn.forEach(function (v) {
@@ -10868,7 +10890,7 @@ React.makeElement = React['createElement'];
 	        mc.chats.remove(roomJid);
 
 	        if (!noRedirect) {
-	            window.location = '#fm/chat';
+	            loadSubPage('fm/chat');
 	        }
 	    });
 	};
@@ -10912,7 +10934,7 @@ React.makeElement = React['createElement'];
 	};
 
 	ChatRoom.prototype.setActive = function () {
-	    window.location = this.getRoomUrl();
+	    loadSubPage(this.getRoomUrl());
 	};
 
 	ChatRoom.prototype.getRoomUrl = function () {
@@ -10921,10 +10943,10 @@ React.makeElement = React['createElement'];
 	        var participants = self.getParticipantsExceptMe();
 	        var contact = self.megaChat.getContactFromJid(participants[0]);
 	        if (contact) {
-	            return "#fm/chat/" + contact.u;
+	            return "fm/chat/" + contact.u;
 	        }
 	    } else if (self.type === "group") {
-	        return "#fm/chat/g/" + self.roomJid.split("@")[0];
+	        return "fm/chat/g/" + self.roomJid.split("@")[0];
 	    } else {
 	        throw new Error("Can't get room url for unknown room type.");
 	    }
@@ -10933,7 +10955,7 @@ React.makeElement = React['createElement'];
 	ChatRoom.prototype.activateWindow = function () {
 	    var self = this;
 
-	    window.location = self.getRoomUrl();
+	    loadSubPage(self.getRoomUrl());
 	};
 
 	ChatRoom.prototype.hide = function () {

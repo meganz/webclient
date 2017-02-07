@@ -494,6 +494,11 @@
     background-image: url(../images/mega/nw-fm-sprite_v20.svg);
     background-position: -10px -10781px;
 }
+.medium-icon.down-arrow {
+    background-image: url(../images/mega/megacmd-sprite.png);
+    background-position: 0 -79px;
+    width: 18px;
+}
 .huge-white-icon.achievement {
     background-image: url(../images/mega/account-sprite.png);
     width: 72px;
@@ -667,7 +672,7 @@
     background-position: -15px -11404px;
 }
 .tiny-icon.membership-status {
-    background-image: url(../images/mega/top-sprite_v1.png);
+    background-image: url(../images/mega/top-sprite_v2.png);
     background-position: -10px -979px;
     width: 16px;
 }
@@ -684,11 +689,11 @@
     background-position: -10px -1059px;
 }
 .semi-small-icon.grey-mega {
-    background-image: url(../images/mega/top-sprite_v1.png);
+    background-image: url(../images/mega/top-sprite_v2.png);
     background-position: -10px -326px;
 }
 .semi-small-icon.yellow-triangle {
-    background-image: url(../images/mega/top-sprite_v1.png);
+    background-image: url(../images/mega/top-sprite_v2.png);
     background-position: -10px -1266px;
 }
 .small-icon.dark-grey-plus {

@@ -221,7 +221,7 @@ var NetworkTesting = (function() {
         var parts = url.match(/#!([^!]{4,})/);
 
         if (typeof window.onsupport === "function") {
-            document.location = "#support";
+            loadSubPage('support');
             return;
         }
 

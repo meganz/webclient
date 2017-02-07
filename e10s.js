@@ -11,6 +11,26 @@
 		"mega.nz"    : 1,
 		"me.ga"      : 1
 	};
+	const pathToHash = function(l) {
+		var path = String(l.hash || l.pathname).substr(1);
+
+		if (!path || (!~path.indexOf('.') && path.substr(0,5) !== 'linux')) {
+			
+			return '#' + path + l.search;
+		}
+
+		return l.hash + l.search;
+	};
+	const shouldLoad = function(l) {
+		var hash;
+
+		if ((l.protocol === 'https:' || l.protocol === 'http:') && _hosts[l.host]) {
+			
+			hash = pathToHash(l);
+		}
+
+		return hash;
+	};
 	var mID = String(Components.stack.filename).split("=").pop();
 
 	addMessageListener("MEGA:"+mID+":bcast", m =>
@@ -28,11 +48,12 @@
 		var doc = ev.originalTarget;
 		if (mID && doc.nodeName === "#document")
 		{
+			var hash;
 			var l = doc.location;
 
-			if ((l.protocol === 'https:' || l.protocol === 'http:') && _hosts[l.host] && l.pathname === '/')
+			if ((hash = shouldLoad(l)))
 			{
-				l = 'mega:' + (l.hash ? l.hash : '');
+				l = 'mega:' + hash;
 
 				try
 				{
@@ -48,7 +69,7 @@
 					== Services.appinfo.PROCESS_TYPE_CONTENT
 					|| l.host === 'bug1305316.nz') {
 
-				sendSyncMessage('MEGA:'+mID+':loadURI', 'mega:' + (l.hash ? l.hash : ''));
+				sendSyncMessage('MEGA:'+mID+':loadURI', 'mega:' + pathToHash(l));
 			}
 			else if (l.host === 'adf.ly') {
 				var win = doc.defaultView;

@@ -108,11 +108,8 @@ var mobilefm = {
         var $folderName = $fileManagerHeader.find('.fm-header-txt span');
         var $folderSize = $fileManagerHeader.find('.fm-folder-size');
 
-        // Get the number of parts in the URL hash. The root folder link will have 3, sub folders will have 4
-        var numUrlParts = window.location.hash.split('!').length;
-
         // If this is the root folder link, hide the back button, show a folder icon and the folder size
-        if (numUrlParts === 3) {
+        if (M.RootID === M.currentdirid) {
 
             // Get the full size of the folder including sub directories
             var fileSizesTotal = this.getFullSizeOfFolder();

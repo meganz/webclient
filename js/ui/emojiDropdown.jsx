@@ -393,12 +393,12 @@ var DropdownEmojiSelector = React.createClass({
         var categoryIcons = {
             "frequently_used": "clock-icon",
             "people": "smile-icon",
-            "objects": "objects-icon",
-            "activity": "bowling-ball-icon",
-            "nature": "sun-icon",
-            "travel": "earth-icon",
-            "symbols": "percents-icon",
-            "food": "wineglass-icon",
+            "nature": "leaf-icon",
+            "food": "cutlery-icon",
+            "activity": "ball-icon",
+            "travel": "car-icon",
+            "objects": "bulb-icon",
+            "symbols": "heart-icon",
             "flags": "flag-icon",
         };
 

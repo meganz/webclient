@@ -70,7 +70,7 @@
     color: rgba(0,0,0, 0.3)
 }
 .popup-footer.emoji .button i {
-    margin-top: 5px;
+    margin-top: 6px;
 }
 
 img.emoji {
@@ -121,7 +121,7 @@ img.emoji.big {
     content: " ";
     display: block;
     position: relative;
-    bottom: -6px;
+    bottom: -4px;
     left: -2px;
     width: 36px;
     height: 2px;

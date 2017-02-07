@@ -169,6 +169,19 @@ Unless otherwise noted, they were released under a [MIT License].
 > make check
 > ```
 
+
+---
+[twemoji.noutf.js]: Twitter Emoji
+
+> NB: We had to fork the project and remove the UTF characters from twemoji.js, so we are using the repo:
+> https://github.com/meganz/twemoji
+> 
+> ```bash
+> git clone https://github.com/meganz/twemoji
+> cd twemoji
+> cp twemoji.js twemoji.noutf.js
+> search & replace any utf character with ""
+> ```
 ---
 
 [MIT License]: <https://opensource.org/licenses/MIT>

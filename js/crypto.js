@@ -3905,6 +3905,11 @@ function crypto_reportmissingkey(n) {
     if (typeof n.k == 'string') {
         var change = false;
 
+        if (!missingkeys[n.h]) {
+            missingkeys[n.h] = {};
+            change = true;
+        }
+
         for (var p = 8; (p = n.k.indexOf(':', p)) >= 0; p += 32) {
             if (p == 8 || n.k[p - 9] == '/') {
                 var id = n.k.substr(p - 8, 8);
@@ -3927,11 +3932,6 @@ function crypto_reportmissingkey(n) {
         }
     }
     else {
-        if (!missingkeys[n.h]) {
-            missingkeys[n.h] = {};
-            change = true;
-        }
-
         console.error('invalid-missingkey ' + n.h, change);
 
         srvlog2('invalid-missingkey', n.h, typeof n.k, Object(n.k).length | 0);

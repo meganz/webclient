@@ -1,7 +1,7 @@
 .tiny-icon, .semi-small-icon, .small-icon, .medium-icon, .semi-big-icon, .big-icon, .huge-icon {
     width: 20px;
     height: 20px;
-    background-image: url(../images/mega/new-chat-sprite-v3.svg);
+    background-image: url(../images/mega/new-chat-sprite-v5.svg);
     background-repeat: no-repeat;
     background-position: -2px -1446px;
     display: inline-block;
@@ -12,7 +12,7 @@
     height: 184px;
     margin: 21px auto;
     display: block;
-    background-image: url(../images/mega/new-chat-sprite-v3.svg);
+    background-image: url(../images/mega/new-chat-sprite-v5.svg);
     background-repeat: no-repeat;
     background-position: center -1838px;
 }
@@ -192,25 +192,31 @@
     background-position: -2px -3200px;
 }
 .small-icon.smile-icon {
-    background-position: -32px -3200px;
+    background-position: -34px -3200px;
 }
-.small-icon.sun-icon {
-    background-position: -62px -3200px;
+.small-icon.leaf-icon {
+    background-position: -66px -3200px;
 }
-.small-icon.wineglass-icon {
-    background-position: -92px -3200px;
+.small-icon.cutlery  {
+    background-position: -98px -3200px;
 }
-.small-icon.present-icon {
-    background-position: -122px -3200px;
+.small-icon.ball-icon {
+    background-position: -130px -3200px;
 }
 .small-icon.bowling-ball-icon {
-    background-position: -152px -3200px;
+    background-position: -162px -3200px;
 }
-.small-icon.earth-icon {
-    background-position: -182px -3200px;
+.small-icon.car-icon {
+    background-position: -2px -3230px;
 }
-.small-icon.percents-icon {
-    background-position: -212px -3200px;
+.small-icon.bulb-icon {
+    background-position: -34px -3230px;
+}
+.small-icon.heart-icon {
+    background-position: -66px -3230px;
+}
+.small-icon.flag-icon {
+    background-position: -98px -3230px;
 }
 .square-button.active .small-icon.clock-icon {
     background-position: -2px -3230px;
@@ -333,7 +339,7 @@
     width: 32px;
     height: 32px;
     display: block;
-    background-image: url(../images/mega/new-chat-sprite-v3.svg);
+    background-image: url(../images/mega/new-chat-sprite-v5.svg);
     background-repeat: no-repeat;
     -moz-border-radius: 100%;
     -webkit-border-radius: 100%;

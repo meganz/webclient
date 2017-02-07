@@ -99,3 +99,31 @@ img.emoji.big {
     height: 12px;
     margin-bottom: -1px;
 }
+
+
+/** new hover/active styles for the emoji dropdown **/
+.button.square-button i {
+    opacity: 0.3;
+}
+.button.square-button:hover {
+    background-color: transparent;
+}
+.button.square-button:hover i {
+    opacity: 0.5;
+}
+.button.square-button.active {
+    background-color: transparent;
+}
+.button.square-button.active i {
+    opacity: 0.5;
+}
+.button.square-button.active:after {
+    content: " ";
+    display: block;
+    position: relative;
+    bottom: -6px;
+    left: -2px;
+    width: 36px;
+    height: 2px;
+    background-color: rgb(255, 051, 058);
+}

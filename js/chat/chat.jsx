@@ -1793,6 +1793,13 @@ Chat.prototype.updateDashboard = function() {
 };
 
 
+/**
+ * Warning: The data returned by this function is loaded directly and not hash-checked like in the secureboot.js. So
+ * please use carefully and escape EVERYTHING that is loaded thru this.
+ *
+ * @param name
+ * @returns {MegaPromise}
+ */
 Chat.prototype.getEmojiDataSet = function(name) {
     var self = this;
     assert(name === "categories" || name === "emojis", "Invalid emoji dataset name passed.");

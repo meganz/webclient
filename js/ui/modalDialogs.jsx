@@ -342,7 +342,7 @@ var CloudBrowserDialog = React.createClass({
         }
     },
     resizeBreadcrumbs: function() {
-        var $breadcrumbs = $('.fm-breadcrumbs-block.add-from-cloud');
+        var $breadcrumbs = $('.fm-breadcrumbs-block.add-from-cloud', this.findDOMNode());
         var $breadcrumbsWrapper = $breadcrumbs.find('.breadcrumbs-wrapper');
 
         setTimeout(function() {

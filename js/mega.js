@@ -6173,8 +6173,11 @@ function sc_packet(a) {
         if (a.k.length > 43) {
             if (!a.u || a.u === u_handle) {
                 // RSA-keyed share command targeted to u_handle: run through worker
-                rsasharekeys[a.n] = true;
-                prockey = true;
+                prockey = !a.o || a.o !== u_handle;
+
+                if (prockey) {
+                    rsasharekeys[a.n] = true;
+                }
             }
         }
         else {

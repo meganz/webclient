@@ -1714,7 +1714,7 @@ function MegaData()
                     + onlinestatus[1] + '" id="contact_' + htmlentities(activeContacts[i].u)
                     + '"><div class="nw-contact-status"></div><div class="nw-contact-name">'
                     + htmlentities(name)
-                    + ' <a href="#" class="button start-chat-button"><span></span></a></div></div>';
+                    + ' <a class="button start-chat-button"><span></span></a></div></div>';
                 }
                 $('.fm-start-chat-dropdown').addClass('hidden');
             }
@@ -3825,18 +3825,16 @@ function MegaData()
                         if (k !== false) crypto_setsharekey(n.h, k, ignoreDB);
                     }
 
-                    M.c.shares[n.h] = { su: n.su, r: n.r };
+                    M.c.shares[n.h] = { su: n.su, r: n.r, t: n.h };
 
                     if (u_sharekeys[n.h]) {
                         M.c.shares[n.h].sk = a32_to_base64(u_sharekeys[n.h][0]);
                     }
 
                     if (fmdb && !ignoreDB) {
-                        M.c.shares[n.h].t = n.h;
                         fmdb.add('s', { o_t: n.su + '*' + n.h,
                                           d: M.c.shares[n.h]
                         });
-                        delete M.c.shares[n.h].t;
                     }
                 }
             }
@@ -7386,7 +7384,7 @@ function worker_procmsg(ev) {
         else {
             // maintain special incoming shares index
             if (ev.data.su) {
-                M.c.shares[ev.data.h] = { su : ev.data.su, r : ev.data.r };
+                M.c.shares[ev.data.h] = { su : ev.data.su, r : ev.data.r, t: ev.data.h };
 
                 if (u_sharekeys[ev.data.h]) {
                     M.c.shares[ev.data.h].sk = u_sharekeys[ev.data.h][0];
@@ -7423,7 +7421,7 @@ function worker_procmsg(ev) {
         if (d) console.log("Worker done, " + dumpsremaining + " remaining");
 
         if (ev.data.sharekeys) {
-            for (var h in ev.data.sharekeys) {
+            for (h in ev.data.sharekeys) {
                 crypto_setsharekey(h, ev.data.sharekeys[h]);
             }
         }
@@ -7434,10 +7432,8 @@ function worker_procmsg(ev) {
                 if (u_sharekeys[h]) M.c.shares[h].sk = a32_to_base64(u_sharekeys[h][0]);
 
                 if (fmdb) {
-                    M.c.shares[h].t = h;
                     fmdb.add('s', { o_t : M.c.shares[h].su + '*' + h,
                                           d : M.c.shares[h] });
-                    delete M.c.shares[h].t;
                 }
             }
 
@@ -9189,7 +9185,7 @@ Object.defineProperty(mega, 'achievem', {
                 this.rebind('click', function() {
                     if (action) {
                         switch (action[0]) {
-                            case '#':
+                            case '/':
                                 loadSubPage(action);
                                 break;
 
@@ -9325,14 +9321,14 @@ Object.defineProperty(mega, 'achievem', {
 
 (function(o) {
     var map = {
-        /*  1 */ 'WELCOME':     'ach-create-account:#register',
+        /*  1 */ 'WELCOME':     'ach-create-account:/register',
         /*  2 */ 'TOUR':        'ach-take-tour',
         /*  3 */ 'INVITE':      'ach-invite-friend:~inviteFriendDialog',
-        /*  4 */ 'SYNCINSTALL': 'ach-install-megasync:#sync',
-        /*  5 */ 'APPINSTALL':  'ach-install-mobile-app:#mobile',
+        /*  4 */ 'SYNCINSTALL': 'ach-install-megasync:/sync',
+        /*  5 */ 'APPINSTALL':  'ach-install-mobile-app:/mobile',
         /*  6 */ 'VERIFYE164':  'ach-verify-number',
-        /*  7 */ 'GROUPCHAT':   'ach-group-chat:#fm/chat',
-        /*  8 */ 'FOLDERSHARE': 'ach-share-folder:#fm/contacts'
+        /*  7 */ 'GROUPCHAT':   'ach-group-chat:/fm/chat',
+        /*  8 */ 'FOLDERSHARE': 'ach-share-folder:/fm/contacts'
     };
     var mapToAction = Object.create(null);
     var mapToElement = Object.create(null);

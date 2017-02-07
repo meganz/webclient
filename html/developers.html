@@ -6,7 +6,7 @@
 <div class="account-mid-block dev-block ltr">
   <div class="main_bg_image">
     <div class="register-mid-pad">
-      <div class="account-left-block"> <a href="#dev" class="account-link selected" id="a_dev"> <span class="account-link-arrow"></span> <span class="dev-new-icon dev-new-home">Home</span> </a> <a href="#sdk" class="account-link"  id="a_dev_sdk"> <span class="account-link-arrow"></span> <span class="dev-new-icon dev-new-core">C++ SDK</span> </a> <a href="#doc" class="account-link" id="a_dev_doc"> <span class="account-link-arrow"></span> <span class="dev-new-icon dev-new-doc">Documentation</span> </a>
+      <div class="account-left-block"> <a href="/dev" class="account-link selected" id="a_dev"> <span class="account-link-arrow"></span> <span class="dev-new-icon dev-new-home">Home</span> </a> <a href="/sdk" class="account-link"  id="a_dev_sdk"> <span class="account-link-arrow"></span> <span class="dev-new-icon dev-new-core">C++ SDK</span> </a> <a href="/doc" class="account-link" id="a_dev_doc"> <span class="account-link-arrow"></span> <span class="dev-new-icon dev-new-doc">Documentation</span> </a>
         <div class="dev-new-submenu hidden"> <a class="dev-new-submenu-item"> <span class="dev-new-submenu-pad"> <span class="dev-new-submenu-txt" id="docmenu_1"> Preface </span> </span> </a> <a class="dev-new-submenu-item"> <span class="dev-new-submenu-pad"> <span class="dev-new-submenu-txt" id="docmenu_5"> Programming model </span> </span> </a> <a class="dev-new-submenu-item"> <span class="dev-new-submenu-pad"> <span class="dev-new-submenu-txt"  id="docmenu_6"> Implementation </span> </span> </a> <a class="dev-new-submenu-item last"> <span class="dev-new-submenu-pad"> <span class="dev-new-submenu-txt" id="docmenu_7"> Development process </span> </span> </a> <a class="dev-new-submenu-item last"> <span class="dev-new-submenu-pad"> <span class="dev-new-submenu-txt" id="docmenu_8"> Planned future enhancements </span> </span> </a> <a class="dev-new-submenu-item last"> <span class="dev-new-submenu-pad"> <span class="dev-new-submenu-txt" id="docmenu_9"> Method/callback overview </span> </span> </a> <a class="dev-new-submenu-item last"> <span class="dev-new-submenu-pad"> <span class="dev-new-submenu-txt" id="docmenu_10"> Error codes </span> </span> </a> <a class="dev-new-submenu-item last"> <span class="dev-new-submenu-pad"> <span class="dev-new-submenu-txt" id="docmenu_11"> Under the hood </span> </span> </a> </div>
         <div class="clear"></div>
       </div>
@@ -19,14 +19,14 @@
               <div class="dev-new-img-bl"> <img alt="" src="{staticpath}images/mega/dev-img1.png" /> </div>
               <div class="dev-new-header"> C++ Client Access Engine </div>
               <div class="dev-new-description"> The software layer that shields your application from the complexities of MEGA's cryptography, API and I/O. </div>
-              <a href="#sdk" class="dev-new-red-button"> Get the Code</a>
+              <a href="/sdk" class="dev-new-red-button"> Get the Code</a>
               <div class="clear"></div>
             </div>
             <div class="dev-new-right-bl">
               <div class="dev-new-img-bl"> <img alt="" src="{staticpath}images/mega/dev-img2.png" /> </div>
               <div class="dev-new-header"> Documentation </div>
               <div class="dev-new-description"> Getting started: Integration guide, data structures, methods and callbacks, error codes, and more! </div>
-              <a href="#doc" class="dev-new-red-button"> View documentation</a>
+              <a href="/doc" class="dev-new-red-button"> View documentation</a>
               <div class="clear"></div>
             </div>
             <div class="clear"></div>
@@ -49,7 +49,7 @@
               <h2>Key Management</h2>
               <p>Each MEGA client application needs a valid key to access the API. Please use a separate key for each of your applications.</p>
               <div class="clear"></div>
-              <a href="#" class="dev-new-red-button" id="dev_createapbtn"> Create an App</a>
+              <a class="dev-new-red-button" id="dev_createapbtn"> Create an App</a>
               <div class="clear"></div>
             </div>
             <div class="dev-new-core-block">
@@ -69,7 +69,7 @@
           <div id="dev_app">
             <div class="dev-new-top-block">
               <h1 id="sdk_apptitle"></h1>
-              <a href="#" class="dev-new-delete">Delete App</a>
+              <a class="dev-new-delete">Delete App</a>
               <div class="clear"></div>
             </div>
             <div class="dev-new-core-div app-header"></div>
@@ -109,7 +109,7 @@
                 <input value="ACME Inc." id="sdk_apppublisher" />
               </div>
               <div class="clear"></div>
-              <div class="dev-new-app-buttons"> <a href="#" class="dev-core-button" id="sdkapp_updatebtn">Update</a> <a href="#" class="dev-core-button gray" id="sdkapp_cancelbtn">Cancel</a>
+              <div class="dev-new-app-buttons"> <a class="dev-core-button" id="sdkapp_updatebtn">Update</a> <a class="dev-core-button gray" id="sdkapp_cancelbtn">Cancel</a>
                 <div class="clear"></div>
               </div>
             </div>
@@ -130,7 +130,7 @@
               </ul>
               <h2>4 Thanks, but why C++? I am using C, Objective C, C#, Java, Scala, Python, Ruby, Perl, PHP, VB...</h2>
               <p>The requirement to integrate with projects that compile to native code rules out all languages that rely on specific interpreters or runtime environments. C, being the "lingua franca" of nearly all modern systems, would have been the obvious choice, but the code compactness and readability benefits provided by C++'s syntactic sugar and template library are well worth the minor additional integration overhead. We will work with interested developers to add MEGA support to their preferred environments by way of native code modules/extensions (rather than by porting the functionality to the target language itself). Please contact us at <a href="mailto:developers@mega.nz">developers@mega.nz</a> if you are willing and able to contribute to a particular integration effort.</p>
-              <h2 id="doc_5">5.	Programming model</h2>
+              <h2 id="doc_5">5. Programming model</h2>
               <h2>5.1 Interaction</h2>
               <p>The application submits requests to the client access engine through nonblocking calls to methods of the MegaClient object and signals events to the application by invoking methods of an object of its implementation of the MegaApp interface.</p>
               <h2>5.2 Files and folders</h2>
@@ -292,7 +292,7 @@
               <p>Files can have <i>attributes</i>. Only the original creator of a file can update its attributes. All nodes referencing the same <i>encrypted</i> file see the same attributes. Attributes carry a 16-bit type field. The client access engine supports attaching file attributes during or after the upload and their bulk retrieval.</p>
               <h2>6.3.5 Thumbnails</h2>
               <p>All applications capable of uploading image files <i>should</i> add thumbnails in the process (remember that there is no way for us to do this on the server side). Thumbnails are stored as type 0 file attributes and should be 120p*120p JPEGs compressed to around 3-4 KB. The sample application supplied with the SDK demonstrates how to do this using the <a href="http://freeimage.sourceforge.net/" target="_new">FreeImage</a> library. As the extraction of a thumbnail from a large image can take a considerable amount of time, it is also suggested to perform this in separate worker threads to avoid stalling the application.</p>
-              <h2>6.4	Quota enforcement</h2>
+              <h2>6.4   Quota enforcement</h2>
               <p>There are two types of quota limitations an application can encounter during its operation: Storage and bandwidth.  MEGA, by policy, is quite generous on both, which means that only a small fraction of your user base will ever run out of quota, but it is essential that if it happens, the situation is handled correctly - the user needs to be informed about the reason for his upload or download failing rather than being left in the dark with what looks like a malfunction.</p>
               <h2>6.4.1 Storage quota</h2>
               <p>An upload will be rejected with error
@@ -306,7 +306,7 @@
                 <c>quota_exceeded()</c>
                 callback, and the download will retry automatically until bandwidth quota becomes available.</p>
               <h2>6.5 API access authorization</h2>
-              <p>To access the MEGA API, applications need to present a valid API key, which can be obtained free of charge from <a href="#sdk">https://mega.nz/#sdk</a>. Please see the <a href="#sdkterms">SDK terms of service</a> for details.</p>
+              <p>To access the MEGA API, applications need to present a valid API key, which can be obtained free of charge from <a href="/sdk">https://mega.nz/sdk</a>. Please see the <a href="/sdkterms">SDK terms of service</a> for details.</p>
               <h2 id="doc_7">7 Development process</h2>
               <p>The release of the C++ SDK is merely a starting point, and it will evolve over time. We'd like to hear from developers actually using it in their applications - if you find bugs, design flaws or other shortcomings, please get in touch at <a href="mailto:developers@mega.nz">developers@mega.nz</a>. MEGA is hiring, so be prepared to receive an offer if your feedback indicates that you are a bright mind.</p>
               <p>A developer forum and source code repository will be made available soon.</p>
@@ -553,7 +553,7 @@
               <p>Callback: none (does not interact with the server, proceed with calling
                 <c>fetchnodes()</c>
                 )</p>
-              <h2>9.3	Fetching the session's nodes and users</h2>
+              <h2>9.3   Fetching the session's nodes and users</h2>
               <p>Method:
                 <c>void fetchnodes()</c>
               </p>
@@ -719,7 +719,7 @@
                 yourself, but you still need to process the transfer callbacks. A transfer is considered failed if no bytes were transmitted for at least XFERTIMEOUT deciseconds, in which case it will be aborted and repeated indefinitely with exponential backoff.</p>
               <p>The main benefit of using the engine-supplied transfer queueing is not the reduced application complexity, but the built-in overlapping transfer pipelining that reduces the impact of transitions between files on your overall throughput.</p>
               <h2>9.10 Adding nodes</h2>
-              <p>Nodes can be added to 
+              <p>Nodes can be added to
                 putnodes_result(error e, targettype t, NewNode* nn) </p>
               <p>Method:
                 <c>void putnodes(handle parenthandle, NewNode* newnodes, int numnodes)</c>
@@ -762,7 +762,7 @@
               <p>Callback: node_updated(client,nodes,count) - nodes were added, updated or removed</p>
               <p>Callback: notify_retry(client,time) - specifies time in decisecons until the next retry</p>
               <p>Callback: reload(client,reason) - possible inconsistency, reload account state</p>
-              <h2 id="doc_10">10	Error codes</h2>
+              <h2 id="doc_10">10    Error codes</h2>
               <ul>
                 <li>API_OK (0): Success</li>
                 <li>API_EINTERNAL (-1): An internal error has occurred. Please submit a bug report, detailing the exact circumstances in which this error occurred.</li>
@@ -811,7 +811,7 @@
               <p>While a request is executed, all users that may be affected by it are locked. This includes the requesting user and all users that are in a shared folder relationship and/or in the contact list. A request may return the error code EAGAIN in the event of a failed locking attempt or a temporary server-side malfunction. The request is likely to complete when retried. Client applications must implement exponential backoff (with user-triggerable immediate retry) and should inform the user of a possible server or network issue if the EAGAIN condition persists or no response is received for more than a few seconds.</p>
               <p>A successfully executed request returns an array of result objects, with each result appearing in the same array index location as the corresponding command.</p>
               <h2>11.6.1 Request URL format</h2>
-              <p> Target URL: <a href="#doc">https://g.api.mega.co.nz/cs?id=sequence_number&ak=appkey&&#91;&sid=sessionid|&n=node&#93;</a></p>
+              <p> Target URL: <a href="/doc">https://g.api.mega.co.nz/cs?id=sequence_number&ak=appkey&&#91;&sid=sessionid|&n=node&#93;</a></p>
               <ul>
                 <li>sequence_number is a session-unique number that is incremented per dispatched request (but not changed when requests are repeated in response to network issues or EAGAIN)</li>
                 <li>appkey is the application's key</li>
@@ -830,7 +830,7 @@
               <h2>11.7 Server-client requests</h2>
               <p>As a server cannot reliably establish a connection to a client, server-client requests have to be polled by the latter through a blocking read loop.</p>
               <h2>11.7.1 Request URL format</h2>
-              <p>Target URL: <a href="#doc">https://g.api.mega.co.nz/sc?id=sequence_reference&#91;&sid=sessionid|&n=node&#93;&#91;ssl=1&#93;</a></p>
+              <p>Target URL: <a href="/doc">https://g.api.mega.co.nz/sc?id=sequence_reference&#91;&sid=sessionid|&n=node&#93;&#91;ssl=1&#93;</a></p>
               <ul>
                 <li>sequence_reference tells the server which server-client request(s) to deliver next. It is initialized from the response to a filesystem tree fetch (f command).</li>
                 <li>sessionid is the session ID of the user session authentication mode</li>

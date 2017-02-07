@@ -20,7 +20,7 @@ var EmoticonsFilter = function(megaChat) {
             $.each(emojis, function(k, meta) {
                 var slug = ":" + meta.n + ":";
 
-                var txt = "(^|\\W?)(" + RegExpEscape(slug) + ")(?=(\\s|$))"
+                var txt = "(^|\\W?)(" + RegExpEscape(slug) + ")(?=(\\s|$))";
 
                 self.map[meta.n] = meta.u;
 
@@ -124,7 +124,7 @@ EmoticonsFilter.prototype.processHtmlMessage = function(messageContents) {
 
     // if only one emoji, make it big
     if (
-        messageContents.substr(0, 4) == "<img" &&
+        messageContents.substr(0, 4) === "<img" &&
         messageContents.substr(-1) === ">" &&
         messageContents.indexOf("<img", 1) === -1
     ) {

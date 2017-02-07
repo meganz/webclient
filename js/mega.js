@@ -2465,7 +2465,7 @@ function MegaData()
             $('.fm-right-header .fm-breadcrumbs-block').html(html);
         }
 
-        //Resizing breadcrumbs items
+        // Resizing breadcrumbs items
         function breadcrumbsResize() {
             var $fmHeader = $('.fm-right-header:visible');
             var headerWidth = $fmHeader.outerWidth();

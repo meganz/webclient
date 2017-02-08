@@ -2349,7 +2349,8 @@ function MegaData()
 
     this.pathLength = function()
     {
-        var length = $('.fm-breadcrumbs-block:visible').outerWidth() + $('.fm-header-buttons:visible').outerWidth();
+        var length = $('.fm-right-header .fm-breadcrumbs-block:visible').outerWidth()
+            + $('.fm-right-header .fm-header-buttons:visible').outerWidth();
         return length;
     };
 
@@ -2425,90 +2426,94 @@ function MegaData()
 
         if (this.currentdirid && this.currentdirid.substr(0, 5) === 'chat/') {
             var contactName = $('a.fm-tree-folder.contact.lightactive span.contact-name').text();
-            $('.fm-breadcrumbs-block').safeHTML('<a class="fm-breadcrumbs contacts has-next-button" id="path_contacts">'
-                                                + '<span class="right-arrow-bg">'
-                                                    + '<span>Contacts</span>'
-                                                + '</span></a>'
-                                            + '<a class="fm-breadcrumbs chat" id="path_'
-                                            + htmlentities(M.currentdirid.replace("chat/", "")) + '">'
-                                                + '<span class="right-arrow-bg">'
-                                                    + '<span>' + htmlentities(contactName) + '</span>'
-                                                + '</span>'
-                                            + '</a>');
+            $('.fm-right-header .fm-breadcrumbs-block').safeHTML(
+                '<a class="fm-breadcrumbs contacts has-next-button" id="path_contacts">'
+                  + '<span class="right-arrow-bg">'
+                      + '<span>Contacts</span>'
+                  + '</span></a>'
+              + '<a class="fm-breadcrumbs chat" id="path_'
+              + htmlentities(M.currentdirid.replace("chat/", "")) + '">'
+                  + '<span class="right-arrow-bg">'
+                      + '<span>' + htmlentities(contactName) + '</span>'
+                  + '</span>'
+              + '</a>');
             $('.search-files-result').addClass('hidden');
         }
         else if (this.currentdirid && this.currentdirid.substr(0, 7) === 'search/') {
-            $('.fm-breadcrumbs-block').safeHTML('<a class="fm-breadcrumbs search ui-droppable" id="'
-                                            + htmlentities(a2[i]) + '">'
-                                                + '<span class="right-arrow-bg ui-draggable">'
-                                                    + '<span>' + htmlentities(this.currentdirid.replace('search/', ''))
-                                                    + '</span>'
-                                                + '</span>'
-                                            + '</a>');
+            $('.fm-right-header .fm-breadcrumbs-block').safeHTML(
+                '<a class="fm-breadcrumbs search ui-droppable" id="'
+                    + htmlentities(a2[i]) + '">'
+                        + '<span class="right-arrow-bg ui-draggable">'
+                            + '<span>' + htmlentities(this.currentdirid.replace('search/', ''))
+                            + '</span>'
+                        + '</span>'
+                    + '</a>');
             $('.search-files-result .search-number').text(M.v.length);
             $('.search-files-result').removeClass('hidden');
             $('.search-files-result').addClass('last-button');
         }
         else if (this.currentdirid && this.currentdirid === 'opc') {
             DEBUG('Render Path OPC');
-            $('.fm-breadcrumbs-block').html(contactBreadcrumb + html);
+            $('.fm-right-header .fm-breadcrumbs-block').html(contactBreadcrumb + html);
         }
         else if (this.currentdirid && this.currentdirid === 'ipc') {
             DEBUG('Render Path IPC');
-            $('.fm-breadcrumbs-block').html(contactBreadcrumb + html);
+            $('.fm-right-header .fm-breadcrumbs-block').html(contactBreadcrumb + html);
         }
         else {
             $('.search-files-result').addClass('hidden');
-            $('.fm-breadcrumbs-block').html(html);
+            $('.fm-right-header .fm-breadcrumbs-block').html(html);
         }
 
-        $('.fm-new-folder span').text(l[68]);
-        $('.fm-file-upload span').text(l[99]);
-        $('.fm-folder-upload span').text(l[98]);
+        // Resizing breadcrumbs items
+        function breadcrumbsResize() {
+            var $fmHeader = $('.fm-right-header:visible');
+            var headerWidth = $fmHeader.outerWidth();
 
-        var headerWidth = $('.fm-right-header:visible').outerWidth();
+            $fmHeader.removeClass('long-path short-foldernames');
+            if (M.pathLength() > headerWidth) {
+                $fmHeader.addClass('long-path');
+            }
 
-        $('.fm-right-header:visible').removeClass('long-path short-foldernames');
-        if (M.pathLength() > headerWidth) {
-            $('.fm-right-header:visible').addClass('long-path');
-            $('.fm-new-folder span').text('');
-            $('.fm-file-upload span').text('');
-            $('.fm-folder-upload span').text('');
-        }
+            var $el = $fmHeader.find('.fm-breadcrumbs-block:visible .right-arrow-bg');
+            var i = 0;
+            var j = 0;
+            $el.removeClass('short-foldername ultra-short-foldername');
 
-        var el = $('.fm-breadcrumbs-block:visible .right-arrow-bg');
-        var i = 0;
-        var j = 0;
-        headerWidth = $('.fm-right-header:visible').outerWidth();
-
-        while (M.pathLength() > headerWidth) {
-            if (i < el.length - 1) {
-                $(el[i]).addClass('short-foldername');
-                i++;
-            } else if (j < el.length - 1) {
-                $(el[j]).html('');
-                j++;
-            } else if (!$(el[j]).hasClass('short-foldername')) {
-                $(el[j]).addClass('short-foldername');
-            } else {
-                $(el[j]).html('');
-                break;
+            while (M.pathLength() > headerWidth) {
+                if (i < $el.length - 1) {
+                    $($el[i]).addClass('short-foldername');
+                    i++;
+                } else if (j < $el.length - 1) {
+                    $($el[j]).addClass('ultra-short-foldername');
+                    j++;
+                } else if (!$($el[j]).hasClass('short-foldername')) {
+                    $($el[j]).addClass('short-foldername');
+                } else {
+                    $($el[j]).addClass('ultra-short-foldername');
+                    break;
+                }
             }
         }
 
-        if ($('.fm-breadcrumbs-block .fm-breadcrumbs').length > 1) {
-            $('.fm-breadcrumbs-block').removeClass('deactivated');
+        breadcrumbsResize();
+        $(window).bind('resize.fmbreadcrumbs', function() {
+            breadcrumbsResize();
+        });
+
+        if ($('.fm-right-header .fm-breadcrumbs-block .fm-breadcrumbs').length > 1) {
+            $('.fm-right-header .fm-breadcrumbs-block').removeClass('deactivated');
         }
         else {
-            $('.fm-breadcrumbs-block').addClass('deactivated');
+            $('.fm-right-header .fm-breadcrumbs-block').addClass('deactivated');
         }
 
-        $('.fm-breadcrumbs-block a').unbind('click');
-        $('.fm-breadcrumbs-block a').bind('click', function() {
+        $('.fm-right-header .fm-breadcrumbs-block a').unbind('click');
+        $('.fm-right-header .fm-breadcrumbs-block a').bind('click', function() {
             var crumbId = $(this).attr('id');
 
             // When NOT deactivated
-            if (!$('.fm-breadcrumbs-block').hasClass('deactivated')) {
+            if (!$('.fm-right-header .fm-breadcrumbs-block').hasClass('deactivated')) {
                 if (crumbId === 'path_opc' || crumbId === 'path_ipc') {
                     return false;
                 }

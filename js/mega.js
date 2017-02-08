@@ -1784,7 +1784,7 @@ function MegaData()
                     + onlinestatus[1] + '" id="contact_' + htmlentities(activeContacts[i].u)
                     + '"><div class="nw-contact-status"></div><div class="nw-contact-name">'
                     + htmlentities(name)
-                    + ' <a href="#" class="button start-chat-button"><span></span></a></div></div>';
+                    + ' <a class="button start-chat-button"><span></span></a></div></div>';
                 }
                 $('.fm-start-chat-dropdown').addClass('hidden');
             }
@@ -2456,7 +2456,8 @@ function MegaData()
 
     this.pathLength = function()
     {
-        var length = $('.fm-breadcrumbs-block:visible').outerWidth() + $('.fm-header-buttons:visible').outerWidth();
+        var length = $('.fm-right-header .fm-breadcrumbs-block:visible').outerWidth()
+            + $('.fm-right-header .fm-header-buttons:visible').outerWidth();
         return length;
     };
 
@@ -2532,90 +2533,94 @@ function MegaData()
 
         if (this.currentdirid && this.currentdirid.substr(0, 5) === 'chat/') {
             var contactName = $('a.fm-tree-folder.contact.lightactive span.contact-name').text();
-            $('.fm-breadcrumbs-block').safeHTML('<a class="fm-breadcrumbs contacts has-next-button" id="path_contacts">'
-                                                + '<span class="right-arrow-bg">'
-                                                    + '<span>Contacts</span>'
-                                                + '</span></a>'
-                                            + '<a class="fm-breadcrumbs chat" id="path_'
-                                            + htmlentities(M.currentdirid.replace("chat/", "")) + '">'
-                                                + '<span class="right-arrow-bg">'
-                                                    + '<span>' + htmlentities(contactName) + '</span>'
-                                                + '</span>'
-                                            + '</a>');
+            $('.fm-right-header .fm-breadcrumbs-block').safeHTML(
+                '<a class="fm-breadcrumbs contacts has-next-button" id="path_contacts">'
+                  + '<span class="right-arrow-bg">'
+                      + '<span>Contacts</span>'
+                  + '</span></a>'
+              + '<a class="fm-breadcrumbs chat" id="path_'
+              + htmlentities(M.currentdirid.replace("chat/", "")) + '">'
+                  + '<span class="right-arrow-bg">'
+                      + '<span>' + htmlentities(contactName) + '</span>'
+                  + '</span>'
+              + '</a>');
             $('.search-files-result').addClass('hidden');
         }
         else if (this.currentdirid && this.currentdirid.substr(0, 7) === 'search/') {
-            $('.fm-breadcrumbs-block').safeHTML('<a class="fm-breadcrumbs search ui-droppable" id="'
-                                            + htmlentities(a2[i]) + '">'
-                                                + '<span class="right-arrow-bg ui-draggable">'
-                                                    + '<span>' + htmlentities(this.currentdirid.replace('search/', ''))
-                                                    + '</span>'
-                                                + '</span>'
-                                            + '</a>');
+            $('.fm-right-header .fm-breadcrumbs-block').safeHTML(
+                '<a class="fm-breadcrumbs search ui-droppable" id="'
+                    + htmlentities(a2[i]) + '">'
+                        + '<span class="right-arrow-bg ui-draggable">'
+                            + '<span>' + htmlentities(this.currentdirid.replace('search/', ''))
+                            + '</span>'
+                        + '</span>'
+                    + '</a>');
             $('.search-files-result .search-number').text(M.v.length);
             $('.search-files-result').removeClass('hidden');
             $('.search-files-result').addClass('last-button');
         }
         else if (this.currentdirid && this.currentdirid === 'opc') {
             DEBUG('Render Path OPC');
-            $('.fm-breadcrumbs-block').html(contactBreadcrumb + html);
+            $('.fm-right-header .fm-breadcrumbs-block').html(contactBreadcrumb + html);
         }
         else if (this.currentdirid && this.currentdirid === 'ipc') {
             DEBUG('Render Path IPC');
-            $('.fm-breadcrumbs-block').html(contactBreadcrumb + html);
+            $('.fm-right-header .fm-breadcrumbs-block').html(contactBreadcrumb + html);
         }
         else {
             $('.search-files-result').addClass('hidden');
-            $('.fm-breadcrumbs-block').html(html);
+            $('.fm-right-header .fm-breadcrumbs-block').html(html);
         }
 
-        $('.fm-new-folder span').text(l[68]);
-        $('.fm-file-upload span').text(l[99]);
-        $('.fm-folder-upload span').text(l[98]);
+        // Resizing breadcrumbs items
+        function breadcrumbsResize() {
+            var $fmHeader = $('.fm-right-header:visible');
+            var headerWidth = $fmHeader.outerWidth();
 
-        var headerWidth = $('.fm-right-header:visible').outerWidth();
+            $fmHeader.removeClass('long-path short-foldernames');
+            if (M.pathLength() > headerWidth) {
+                $fmHeader.addClass('long-path');
+            }
 
-        $('.fm-right-header:visible').removeClass('long-path short-foldernames');
-        if (M.pathLength() > headerWidth) {
-            $('.fm-right-header:visible').addClass('long-path');
-            $('.fm-new-folder span').text('');
-            $('.fm-file-upload span').text('');
-            $('.fm-folder-upload span').text('');
-        }
+            var $el = $fmHeader.find('.fm-breadcrumbs-block:visible .right-arrow-bg');
+            var i = 0;
+            var j = 0;
+            $el.removeClass('short-foldername ultra-short-foldername');
 
-        var el = $('.fm-breadcrumbs-block:visible .right-arrow-bg');
-        var i = 0;
-        var j = 0;
-        headerWidth = $('.fm-right-header:visible').outerWidth();
-
-        while (M.pathLength() > headerWidth) {
-            if (i < el.length - 1) {
-                $(el[i]).addClass('short-foldername');
-                i++;
-            } else if (j < el.length - 1) {
-                $(el[j]).html('');
-                j++;
-            } else if (!$(el[j]).hasClass('short-foldername')) {
-                $(el[j]).addClass('short-foldername');
-            } else {
-                $(el[j]).html('');
-                break;
+            while (M.pathLength() > headerWidth) {
+                if (i < $el.length - 1) {
+                    $($el[i]).addClass('short-foldername');
+                    i++;
+                } else if (j < $el.length - 1) {
+                    $($el[j]).addClass('ultra-short-foldername');
+                    j++;
+                } else if (!$($el[j]).hasClass('short-foldername')) {
+                    $($el[j]).addClass('short-foldername');
+                } else {
+                    $($el[j]).addClass('ultra-short-foldername');
+                    break;
+                }
             }
         }
 
-        if ($('.fm-breadcrumbs-block .fm-breadcrumbs').length > 1) {
-            $('.fm-breadcrumbs-block').removeClass('deactivated');
+        breadcrumbsResize();
+        $(window).bind('resize.fmbreadcrumbs', function() {
+            breadcrumbsResize();
+        });
+
+        if ($('.fm-right-header .fm-breadcrumbs-block .fm-breadcrumbs').length > 1) {
+            $('.fm-right-header .fm-breadcrumbs-block').removeClass('deactivated');
         }
         else {
-            $('.fm-breadcrumbs-block').addClass('deactivated');
+            $('.fm-right-header .fm-breadcrumbs-block').addClass('deactivated');
         }
 
-        $('.fm-breadcrumbs-block a').unbind('click');
-        $('.fm-breadcrumbs-block a').bind('click', function() {
+        $('.fm-right-header .fm-breadcrumbs-block a').unbind('click');
+        $('.fm-right-header .fm-breadcrumbs-block a').bind('click', function() {
             var crumbId = $(this).attr('id');
 
             // When NOT deactivated
-            if (!$('.fm-breadcrumbs-block').hasClass('deactivated')) {
+            if (!$('.fm-right-header .fm-breadcrumbs-block').hasClass('deactivated')) {
                 if (crumbId === 'path_opc' || crumbId === 'path_ipc') {
                     return false;
                 }
@@ -3064,8 +3069,8 @@ function MegaData()
                     gridUI();
                 }
             }
-            delay(treeUI);
-            delay(fmtopUI);
+            fmtopUI();
+            onIdle(treeUI);
         };
 
         var apiReq = function(handle) {
@@ -4043,7 +4048,7 @@ function MegaData()
                         if (k !== false) crypto_setsharekey(n.h, k, ignoreDB);
                     }
 
-                    M.c.shares[n.h] = { su: n.su, r: n.r };
+                    M.c.shares[n.h] = { su: n.su, r: n.r, t: n.h };
 
                     if (u_sharekeys[n.h]) {
                         M.c.shares[n.h].sk = a32_to_base64(u_sharekeys[n.h][0]);
@@ -6639,8 +6644,11 @@ function sc_packet(a) {
         if (a.k.length > 43) {
             if (!a.u || a.u === u_handle) {
                 // RSA-keyed share command targeted to u_handle: run through worker
-                rsasharekeys[a.n] = true;
-                prockey = true;
+                prockey = !a.o || a.o !== u_handle;
+
+                if (prockey) {
+                    rsasharekeys[a.n] = true;
+                }
             }
         }
         else {
@@ -7882,7 +7890,7 @@ function worker_procmsg(ev) {
         else {
             // maintain special incoming shares index
             if (ev.data.su) {
-                M.c.shares[ev.data.h] = { su : ev.data.su, r : ev.data.r };
+                M.c.shares[ev.data.h] = { su : ev.data.su, r : ev.data.r, t: ev.data.h };
 
                 if (u_sharekeys[ev.data.h]) {
                     M.c.shares[ev.data.h].sk = u_sharekeys[ev.data.h][0];
@@ -7919,7 +7927,7 @@ function worker_procmsg(ev) {
         if (d) console.log("Worker done, " + dumpsremaining + " remaining");
 
         if (ev.data.sharekeys) {
-            for (var h in ev.data.sharekeys) {
+            for (h in ev.data.sharekeys) {
                 crypto_setsharekey(h, ev.data.sharekeys[h]);
             }
         }
@@ -7929,8 +7937,10 @@ function worker_procmsg(ev) {
             for (h in M.c.shares) {
                 if (u_sharekeys[h]) M.c.shares[h].sk = a32_to_base64(u_sharekeys[h][0]);
 
-                if (fmdb) fmdb.add('s', { o_t : M.c.shares[h].su + '*' + h,
+                if (fmdb) {
+                    fmdb.add('s', { o_t : M.c.shares[h].su + '*' + h,
                                           d : M.c.shares[h] });
+                }
             }
 
             loadfm_callback(residualfm);
@@ -9242,6 +9252,9 @@ function loadfm_done(mDBload) {
         if (hideLoadingDialog) {
             loadingDialog.hide();
             loadingInitDialog.hide();
+            // Reposition UI elements right after hiding the loading overlay,
+            // without waiting for the lazy $.tresizer() triggered by MegaRender
+            fm_resize_handler(true);
         }
 
         // -0x800e0fff indicates a call to loadfm() when it was already loaded
@@ -9543,7 +9556,7 @@ Object.defineProperty(mega, 'achievem', {
                 this.rebind('click', function() {
                     if (action) {
                         switch (action[0]) {
-                            case '#':
+                            case '/':
                                 loadSubPage(action);
                                 break;
 
@@ -9679,14 +9692,14 @@ Object.defineProperty(mega, 'achievem', {
 
 (function(o) {
     var map = {
-        /*  1 */ 'WELCOME':     'ach-create-account:#register',
+        /*  1 */ 'WELCOME':     'ach-create-account:/register',
         /*  2 */ 'TOUR':        'ach-take-tour',
         /*  3 */ 'INVITE':      'ach-invite-friend:~inviteFriendDialog',
-        /*  4 */ 'SYNCINSTALL': 'ach-install-megasync:#sync',
-        /*  5 */ 'APPINSTALL':  'ach-install-mobile-app:#mobile',
+        /*  4 */ 'SYNCINSTALL': 'ach-install-megasync:/sync',
+        /*  5 */ 'APPINSTALL':  'ach-install-mobile-app:/mobile',
         /*  6 */ 'VERIFYE164':  'ach-verify-number',
-        /*  7 */ 'GROUPCHAT':   'ach-group-chat:#fm/chat',
-        /*  8 */ 'FOLDERSHARE': 'ach-share-folder:#fm/contacts'
+        /*  7 */ 'GROUPCHAT':   'ach-group-chat:/fm/chat',
+        /*  8 */ 'FOLDERSHARE': 'ach-share-folder:/fm/contacts'
     };
     var mapToAction = Object.create(null);
     var mapToElement = Object.create(null);

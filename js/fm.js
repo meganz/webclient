@@ -8584,8 +8584,8 @@ function handleDialogTabContent(dialogTabClass, parentTag, dialogPrefix, htmlCon
         .safeHTML(html);
 
     // Empty message, no items available
-    if (!$(prefix + '-dialog-tree-panel' + tabClass + ' .dialog-content-block ' + parentTag).length){
-        $(prefix + '-dialog-empty' + tabClass).addClass('active');
+    if (!$(prefix + '-dialog-tree-panel' + tabClass + ' .dialog-content-block ' + parentTag).children().length) {
+        $(prefix + '.dialog-empty-block' + tabClass).addClass('active');
         $(prefix + '-dialog-tree-panel' + tabClass + ' ' + prefix + '-dialog-panel-header').addClass('hidden');
     }
 
@@ -8655,11 +8655,11 @@ function handleDialogContent(dialogTabClass, parentTag, newFolderButton, dialogP
         return;
     }
     $('.' + dialogPrefix + '-dialog-txt').removeClass('active');
-    $('.' + dialogPrefix + '-dialog-empty').removeClass('active');
     $('.' + dialogPrefix + '-dialog-button').removeClass('active');
     $('.' + dialogPrefix + '-dialog-tree-panel').removeClass('active');
     $('.' + dialogPrefix + '-dialog-panel-arrows').removeClass('active');
     $('.' + dialogPrefix + '-dialog .dialog-sorting-menu').addClass('hidden');
+    $('.' + dialogPrefix + '.dialog-empty-block').removeClass('active');
 
     $('.dialog-' + dialogPrefix + '-button span').text(buttonLabel);
 
@@ -12326,8 +12326,8 @@ function savecomplete(id)
  * width, height, position, etc).
  * This is why we do a on('resize') handler which handles the resize of the generic layout of Mega's FM.
  */
-function fm_resize_handler() {
-    if ($.tresizer.last === -1) {
+function fm_resize_handler(force) {
+    if ($.tresizer.last === -1 && force !== true) {
         return;
     }
     if (d) {

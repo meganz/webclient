@@ -275,7 +275,7 @@ var ConversationRightArea = React.createClass({
                         {endCallButton}
 
                         {
-                            <div className={"link-button red " + (dontShowTruncateButton ? "disabled" : "")}
+                            <div className={"link-button " + (dontShowTruncateButton ? "disabled" : "")}
                                  onClick={(e) => {
                                      if ($(e.target).closest('.disabled').size() > 0) {
                                          return false;
@@ -284,7 +284,7 @@ var ConversationRightArea = React.createClass({
                                         self.props.onTruncateClicked();
                                      }
                             }}>
-                                <i className="small-icon rounded-stop"></i>
+                                <i className="small-icon clear-arrow"></i>
                                 {__(l[8871])}
                             </div>
                         }

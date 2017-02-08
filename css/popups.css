@@ -2,9 +2,6 @@
     padding: 0;
 }
 /* Search contacts popup */
-.popup.dropdown.body.contacts-search, .popup.dropdown.body.add-participant-selector {
-    padding: 0 0 7px 0;
-}
 .popup.add-participant-selector {
     right: 12px;
     left: auto !important;
@@ -20,6 +17,10 @@
     position: relative;
     z-index: 10;
     padding: 0 0 0 40px;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
 .contacts-search-header input, .search-block.emoji-one input {
     font-size: 14px;

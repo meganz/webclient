@@ -4272,7 +4272,7 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
     function _init() {
         // if (d) console.log('Initializing Rubbish-Bin Cleaning Scheduler');
 
-        updId = mBroadcaster.addListener('fmconfig:rubsched', _update);
+        // updId = mBroadcaster.addListener('fmconfig:rubsched', _update);
         if (fmconfig.rubsched) {
             timer = setInterval(function() {
                 _proc();

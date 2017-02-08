@@ -3766,10 +3766,10 @@ React.makeElement = React['createElement'];
 	            if (!self.state.selected || self.state.selected.length === 0) {
 	                footer = React.makeElement(
 	                    "div",
-	                    { className: "contacts-search-footer" },
+	                    { className: "fm-dialog-footer" },
 	                    React.makeElement(
-	                        "em",
-	                        null,
+	                        "div",
+	                        { className: "fm-dialog-footer-txt" },
 	                        self.props.nothingSelectedButtonLabel ? self.props.nothingSelectedButtonLabel : __(l[8889])
 	                    )
 	                );
@@ -4196,7 +4196,7 @@ React.makeElement = React['createElement'];
 	                        endCallButton,
 	                        React.makeElement(
 	                            "div",
-	                            { className: "link-button red " + (dontShowTruncateButton ? "disabled" : ""),
+	                            { className: "link-button " + (dontShowTruncateButton ? "disabled" : ""),
 	                                onClick: function onClick(e) {
 	                                    if ($(e.target).closest('.disabled').size() > 0) {
 	                                        return false;
@@ -4205,7 +4205,7 @@ React.makeElement = React['createElement'];
 	                                        self.props.onTruncateClicked();
 	                                    }
 	                                } },
-	                            React.makeElement("i", { className: "small-icon rounded-stop" }),
+	                            React.makeElement("i", { className: "small-icon clear-arrow" }),
 	                            __(l[8871])
 	                        ),
 	                        room.type === "group" ? React.makeElement(
@@ -5897,7 +5897,7 @@ React.makeElement = React['createElement'];
 
 	            footer = React.makeElement(
 	                "div",
-	                { className: "fm-dialog-footer" },
+	                { className: "fm-dialog-footer white" },
 	                extraFooterElements,
 	                buttons,
 	                React.makeElement("div", { className: "clear" })
@@ -5972,6 +5972,7 @@ React.makeElement = React['createElement'];
 
 	    getInitialState: function getInitialState() {
 	        return {
+	            'highlighted': [],
 	            'selected': []
 	        };
 	    },
@@ -5979,12 +5980,15 @@ React.makeElement = React['createElement'];
 	        e.stopPropagation();
 	        e.preventDefault();
 
-	        if (this.props.folderSelectNotAllowed === true && node.t === 1) {
+	        this.setState({ 'highlighted': [node.h] });
 
-	            return;
+	        if (this.props.folderSelectNotAllowed === true && node.t === 1) {
+	            this.setState({ 'selected': [] });
+	            this.props.onSelected([]);
+	        } else {
+	            this.setState({ 'selected': [node.h] });
+	            this.props.onSelected([node.h]);
 	        }
-	        this.setState({ 'selected': [node.h] });
-	        this.props.onSelected([node.h]);
 	    },
 	    onEntryDoubleClick: function onEntryDoubleClick(e, node) {
 	        var self = this;
@@ -5994,9 +5998,10 @@ React.makeElement = React['createElement'];
 
 	        if (node.t === 1) {
 
-	            self.setState({ 'selected': [] });
+	            self.setState({ 'selected': [], 'highlighted': [] });
 	            self.props.onSelected([]);
 	            self.props.onExpand(node);
+	            self.forceUpdate();
 	        } else {
 	            self.onEntryClick(e, node);
 	            self.props.onSelected(self.state.selected);
@@ -6020,7 +6025,7 @@ React.makeElement = React['createElement'];
 	            }
 
 	            var isFolder = node.t === 1;
-	            var isSelected = self.state.selected.indexOf(node.h) !== -1;
+	            var isHighlighted = self.state.highlighted.indexOf(node.h) !== -1;
 
 	            var tooltipElement = null;
 
@@ -6070,7 +6075,7 @@ React.makeElement = React['createElement'];
 	            items.push(React.makeElement(
 	                "tr",
 	                {
-	                    className: (isFolder ? " folder" : "") + (isSelected ? " ui-selected" : ""),
+	                    className: (isFolder ? " folder" : "") + (isHighlighted ? " ui-selected" : ""),
 	                    onClick: function onClick(e) {
 	                        self.onEntryClick(e, node);
 	                    },
@@ -6101,19 +6106,40 @@ React.makeElement = React['createElement'];
 	                )
 	            ));
 	        });
-	        return React.makeElement(
-	            utils.JScrollPane,
-	            { className: "fm-dialog-grid-scroll", selected: this.state.selected },
-	            React.makeElement(
-	                "table",
-	                { className: "grid-table fm-dialog-table" },
+	        if (items.length > 0) {
+	            return React.makeElement(
+	                utils.JScrollPane,
+	                { className: "fm-dialog-grid-scroll",
+	                    selected: this.state.selected,
+	                    highlighted: this.state.highlighted,
+	                    entries: this.props.entries
+	                },
 	                React.makeElement(
-	                    "tbody",
-	                    null,
-	                    items
+	                    "table",
+	                    { className: "grid-table fm-dialog-table" },
+	                    React.makeElement(
+	                        "tbody",
+	                        null,
+	                        items
+	                    )
 	                )
-	            )
-	        );
+	            );
+	        } else {
+	            return React.makeElement(
+	                "div",
+	                { className: "dialog-empty-block dialog-fm folder" },
+	                React.makeElement(
+	                    "div",
+	                    { className: "dialog-empty-pad" },
+	                    React.makeElement("div", { className: "dialog-empty-icon" }),
+	                    React.makeElement(
+	                        "div",
+	                        { className: "dialog-empty-header" },
+	                        __(l[782])
+	                    )
+	                )
+	            );
+	        }
 	    }
 	});
 	var CloudBrowserDialog = React.createClass({
@@ -6131,6 +6157,7 @@ React.makeElement = React['createElement'];
 	        return {
 	            'sortBy': ['name', 'asc'],
 	            'selected': [],
+	            'highlighted': [],
 	            'currentlyViewedEntry': M.RootID
 	        };
 	    },
@@ -6139,6 +6166,38 @@ React.makeElement = React['createElement'];
 	            this.setState({ 'sortBy': [colId, this.state.sortBy[1] === "asc" ? "desc" : "asc"] });
 	        } else {
 	            this.setState({ 'sortBy': [colId, "asc"] });
+	        }
+	    },
+	    resizeBreadcrumbs: function resizeBreadcrumbs() {
+	        var $breadcrumbs = $('.fm-breadcrumbs-block.add-from-cloud', this.findDOMNode());
+	        var $breadcrumbsWrapper = $breadcrumbs.find('.breadcrumbs-wrapper');
+
+	        setTimeout(function () {
+	            var breadcrumbsWidth = $breadcrumbs.outerWidth();
+	            var $el = $breadcrumbs.find('.right-arrow-bg');
+	            var i = 0;
+	            var j = 0;
+	            $el.removeClass('short-foldername ultra-short-foldername invisible');
+
+	            while ($breadcrumbsWrapper.outerWidth() > breadcrumbsWidth) {
+	                if (i < $el.length - 1) {
+	                    $($el[i]).addClass('short-foldername');
+	                    i++;
+	                } else if (j < $el.length - 1) {
+	                    $($el[j]).addClass('ultra-short-foldername');
+	                    j++;
+	                } else if (!$($el[j]).hasClass('short-foldername')) {
+	                    $($el[j]).addClass('short-foldername');
+	                } else {
+	                    $($el[j]).addClass('ultra-short-foldername');
+	                    break;
+	                }
+	            }
+	        }, 0);
+	    },
+	    componentDidUpdate: function componentDidUpdate(prevProps, prevState) {
+	        if (prevState.currentlyViewedEntry !== this.state.currentlyViewedEntry) {
+	            this.resizeBreadcrumbs();
 	        }
 	    },
 	    getEntries: function getEntries() {
@@ -6238,7 +6297,7 @@ React.makeElement = React['createElement'];
 	                        } },
 	                    React.makeElement(
 	                        "span",
-	                        { className: "right-arrow-bg" },
+	                        { className: "right-arrow-bg invisible" },
 	                        React.makeElement(
 	                            "span",
 	                            null,
@@ -6252,7 +6311,7 @@ React.makeElement = React['createElement'];
 	        return React.makeElement(
 	            ModalDialog,
 	            {
-	                title: __("Add from your Cloud Drive"),
+	                title: __(l[8011]),
 	                className: classes,
 	                onClose: function onClose() {
 	                    self.props.onClose(self);
@@ -6261,7 +6320,7 @@ React.makeElement = React['createElement'];
 	                buttons: [{
 	                    "label": self.props.selectLabel,
 	                    "key": "select",
-	                    "className": self.state.selected.length === 0 ? "disabled" : null,
+	                    "className": "default-grey-button " + (self.state.selected.length === 0 ? "disabled" : null),
 	                    "onClick": function onClick(e) {
 	                        if (self.state.selected.length > 0) {
 	                            self.props.onSelected(self.state.selected);
@@ -6281,9 +6340,13 @@ React.makeElement = React['createElement'];
 	                }] },
 	            React.makeElement(
 	                "div",
-	                { className: "fm-breadcrumbs-block" },
-	                breadcrumb,
-	                React.makeElement("div", { className: "clear" })
+	                { className: "fm-breadcrumbs-block add-from-cloud" },
+	                React.makeElement(
+	                    "div",
+	                    { className: "breadcrumbs-wrapper" },
+	                    breadcrumb,
+	                    React.makeElement("div", { className: "clear" })
+	                )
 	            ),
 	            React.makeElement(
 	                "table",

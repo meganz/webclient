@@ -76,7 +76,7 @@ function getCleanSitePath(path) {
     }
     catch (e) {}
 
-    path = path.replace(/^[/#]+|[^\w-]+$/g, '');
+    path = path.replace(/^[/#]+|\/+$/g, '');
 
     return path;
 }

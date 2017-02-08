@@ -103,21 +103,29 @@ img.emoji.big {
 
 /** new hover/active styles for the emoji dropdown **/
 .button.square-button i {
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
+    -moz-opacity: 0.3;
+    -khtml-opacity: 0.3;
     opacity: 0.3;
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
 }
 .button.square-button:hover {
     background-color: transparent;
 }
-.button.square-button:hover i {
+.button.square-button:hover i, .button.square-button.active i {
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
+    -moz-opacity: 0.5;
+    -khtml-opacity: 0.5;
     opacity: 0.5;
 }
 .button.square-button.active {
     background-color: transparent;
 }
-.button.square-button.active i {
-    opacity: 0.5;
-}
-.button.square-button.active:after {
+.button.square-button:after {
     content: " ";
     display: block;
     position: relative;
@@ -125,5 +133,12 @@ img.emoji.big {
     left: -2px;
     width: 36px;
     height: 2px;
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 100ms ease-in-out;
+    transition: all 200ms ease-in-out;
+}
+.button.square-button.active:after {
     background-color: rgb(255, 051, 058);
 }

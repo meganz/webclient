@@ -313,13 +313,13 @@ var ContactPickerWidget = React.createClass({
             };
 
             if (!self.state.selected || self.state.selected.length === 0) {
-                footer = <div className="contacts-search-footer">
-                    <em>{
+                footer = <div className="fm-dialog-footer">
+                    <div className="fm-dialog-footer-txt">{
                         self.props.nothingSelectedButtonLabel ?
                             self.props.nothingSelectedButtonLabel
                             :
                             __(l[8889])
-                    }</em>
+                    }</div>
                 </div>;
             }
             else if (self.state.selected.length === 1) {

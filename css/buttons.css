@@ -197,16 +197,6 @@
     -webkit-border-radius: 4px;
     border-radius: 4px;
 }
-.default-grey-button:after {
-    -webkit-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.45);
-    -moz-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.45);
-    box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.45);
-}
-.default-grey-button:not(.disabled):hover {
-    -webkit-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.15);
-    -moz-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.15);
-    box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.15);
-}
 .default-white-button.small-text {
     font-size: 13px;
 }
@@ -216,6 +206,16 @@
     box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
 }
 .default-white-button:not(.tiny-button):not(.disabled):hover {
+    -webkit-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.15);
+    -moz-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.15);
+    box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.15);
+}
+.default-grey-button:after {
+    -webkit-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.45);
+    -moz-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.45);
+    box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.45);
+}
+.default-grey-button:not(.disabled):hover {
     -webkit-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.15);
     -moz-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.15);
     box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.15);
@@ -323,10 +323,10 @@
 .blue.big-button:hover {
     background-color: #2BA6DE;
 }
-.default-white-button.left {
+.default-white-button.left, .default-grey-button.left {
     margin-right: 12px;
 }
-.default-white-button.right {
+.default-white-button.right, .default-grey-button.right {
     margin-left: 12px;
 }
 .red {

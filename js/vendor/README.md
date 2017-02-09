@@ -178,7 +178,7 @@ Unless otherwise noted, they were released under a [MIT License].
 > 
 > ```bash
 > git clone https://github.com/meganz/twemoji
-> cd twemoji
+> cd twemoji/2/
 > cp twemoji.js twemoji.noutf.js
 > search & replace any utf character with ""
 > ```

@@ -27,12 +27,12 @@
             '</table>',
 
             // Icon view mode
-            '<a class="file-block">' +
+            '<a class="data-block-view">' +
                 '<span class="file-status-icon"></span>' +
                 '<span class="data-item-icon"></span>' +
-                '<span class="file-settings-icon"></span>' +
-                '<span class="file-icon-area">' +
+                '<span class="data-block-bg">' +
                     '<span class="block-view-file-type"><img/></span>' +
+                    '<span class="file-settings-icon"></span>' +
                 '</span>' +
                 '<span class="file-block-title"></span>' +
             '</a>'
@@ -71,12 +71,12 @@
             '</table>',
 
             // Icon view mode
-            '<a class="file-block folder">' +
+            '<a class="data-block-view folder">' +
                 '<span class="file-status-icon"></span>' +
                 '<span class="shared-folder-access"></span>' +
-                '<span class="file-settings-icon"></span>' +
-                '<span class="file-icon-area">' +
+                '<span class="data-block-bg">' +
                     '<span class="block-view-file-type"></span>' +
+                    '<span class="file-settings-icon"></span>' +
                 '</span>' +
                 '<span class="shared-folder-info-block">' +
                     '<span class="shared-folder-name"></span>' +
@@ -112,7 +112,7 @@
             '</table>',
 
             // Icon view mode
-            '<a class="file-block ustatus">' +
+            '<a class="data-block-view ustatus">' +
                 '<span class="file-settings-icon"></span>' +
                 '<span class="shared-folder-info-block">' +
                     '<span class="u-card-data">' +
@@ -148,12 +148,12 @@
             '</table>',
 
             // Icon view mode
-            '<a class="file-block folder">' +
+            '<a class="data-block-view folder">' +
                 '<span class="file-status-icon"></span>' +
-                '<span class="file-settings-icon"></span>' +
                 '<span class="shared-folder-access"></span>' +
-                '<span class="file-icon-area">' +
+                '<span class="data-block-bg">' +
                     '<span class="block-view-file-type folder-shared"><img/></span>' +
+                    '<span class="file-settings-icon"></span>' +
                 '</span>' +
                 '<span class="file-block-title"></span>' +
             '</a>'

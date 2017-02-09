@@ -256,8 +256,8 @@ var BrowserEntries = React.createClass({
                             <img alt=""
                                  className={"thumbnail-placeholder " + node.h}
                                  src={src}
-                                 width="120"
-                                 height="120"
+                                 width="156"
+                                 height="156"
                             />
                         </div>
                     </Tooltips.Contents>

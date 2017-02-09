@@ -1547,14 +1547,14 @@ function sharedUInode(nodeHandle) {
         $('.grid-table.fm #' + nodeHandle + ' .transfer-filtype-icon').addClass(icon);
 
         // Update right panel selected node with appropriate icon for block view
-        $('#' + nodeHandle + '.file-block .block-view-file-type').addClass(icon);
+        $('#' + nodeHandle + '.data-block-view .block-view-file-type').addClass(icon);
     }
 
     // If no shares are available, remove share icon from left panel, right panel (list and block view)
     if (!bAvailShares) {
         $('#treea_' + nodeHandle + ' .nw-fm-tree-folder').removeClass('shared-folder'); // Left panel
         $('.grid-table.fm #' + nodeHandle + ' .transfer-filtype-icon').removeClass('folder-shared'); // Right panel list view
-        $('#' + nodeHandle + '.file-block .block-view-file-type').removeClass('folder-shared'); // Right panel block view
+        $('#' + nodeHandle + '.data-block-view .block-view-file-type').removeClass('folder-shared'); // Right panel block view
     }
 
     // If no export link is available, remove export link from left and right panels (list and block view)
@@ -2648,7 +2648,7 @@ function initContextUI() {
         M.favourite($.selected, newFavState);
 
         if (M.viewmode) {
-            $('.file-block').removeClass('ui-selected');
+            $('.fm-blocks-view .data-block-view').removeClass('ui-selected');
         }
         else {
             $('.grid-table.fm tr').removeClass('ui-selected');
@@ -5632,14 +5632,14 @@ function gridUI() {
     }
 
     $('.fm .grid-table-header th').rebind('contextmenu', function(e) {
-        $('.file-block').removeClass('ui-selected');
+        $('.fm-blocks-view .data-block-view').removeClass('ui-selected');
         $.selected = [];
         $.hideTopMenu();
         return !!contextMenuUI(e, 6);
     });
 
     $('.files-grid-view, .fm-empty-cloud, .fm-empty-folder').rebind('contextmenu.fm', function(e) {
-        $('.file-block').removeClass('ui-selected');
+        $('.fm-blocks-view .data-block-view').removeClass('ui-selected');
         $.selected = [];
         $.hideTopMenu();
         return !!contextMenuUI(e, 2);
@@ -6089,7 +6089,7 @@ var SelectionManager = function($selectable) {
 
         var $selectables = $(
             [
-                ".file-block",
+                ".data-block-view",
                 "tr.ui-draggable",
                 "tr.ui-selectee",
                 ".contact-block-view.ui-draggable",
@@ -6119,7 +6119,7 @@ var SelectionManager = function($selectable) {
 
         var $selected = $(
             [
-                ".file-block",
+                ".data-block-view",
                 "tr.ui-draggable",
                 "tr.ui-selectee",
                 ".contact-block-view.ui-draggable"
@@ -6185,7 +6185,7 @@ function UIkeyevents() {
 
         var sl = false, s;
         if (M.viewmode) {
-            s = $('.file-block.ui-selected');
+            s = $('.fm-blocks-view .data-block-view.ui-selected');
         }
         else {
             s = $('.grid-table tr.ui-selected');
@@ -6205,8 +6205,8 @@ function UIkeyevents() {
          * other day :)
          */
         if (!$.dialog && !slideshowid && M.viewmode == 1) {
-            var items_per_row = Math.floor($('.file-block').parent().outerWidth() / $('.file-block:first').outerWidth(true));
-            var total_rows = Math.ceil($('.file-block').size() / items_per_row);
+            var items_per_row = Math.floor($('.data-block-view').parent().outerWidth() / $('.data-block-view:first').outerWidth(true));
+            var total_rows = Math.ceil($('.data-block-view').size() / items_per_row);
 
             if (e.keyCode == 37) {
                 // left
@@ -6216,11 +6216,11 @@ function UIkeyevents() {
                     s.removeClass("ui-selected");
                 }
                 var $target_element = null;
-                if (current.length > 0 && current.prev(".file-block").length > 0) {
-                    $target_element = current.prev(".file-block");
+                if (current.length > 0 && current.prev('.data-block-view').length > 0) {
+                    $target_element = current.prev('.data-block-view');
                 }
                 else {
-                    $target_element = $('.file-block:last');
+                    $target_element = $('.data-block-view:last');
                 }
                 if ($target_element) {
                     $target_element.addClass('ui-selected');
@@ -6235,14 +6235,14 @@ function UIkeyevents() {
                     s.removeClass("ui-selected");
                 }
                 var $target_element = null;
-                var next = current.next(".file-block");
+                var next = current.next('.data-block-view');
 
                 // clear old selection if no shiftKey
                 if (next.length > 0) {
                     $target_element = next;
                 }
                 else {
-                    $target_element = $('.file-block:first');
+                    $target_element = $('.data-block-view:first');
                 }
                 if ($target_element) {
                     $target_element.addClass('ui-selected');
@@ -6253,7 +6253,7 @@ function UIkeyevents() {
             // up & down
             else if (e.keyCode == 38 || e.keyCode == 40) {
                 var current = selectionManager.get_currently_selected("first"),
-                    current_idx = $.elementInArray(current, $('.file-block')) + 1;
+                    current_idx = $.elementInArray(current, $('.data-block-view')) + 1;
 
                 if (!e.shiftKey) {
                     s.removeClass("ui-selected");
@@ -6273,7 +6273,7 @@ function UIkeyevents() {
 
                 // calc the index of the target element
                 var target_element_num = ((target_row - 1) * items_per_row) + (current_col - 1),
-                    $target = $('.file-block:eq(' + target_element_num + ')');
+                    $target = $('.data-block-view:eq(' + target_element_num + ')');
 
                 $target.addClass("ui-selected");
                 selectionManager.set_currently_selected($target);
@@ -6404,7 +6404,7 @@ function UIkeyevents() {
         }
         else if (e.keyCode == 65 && e.ctrlKey && !$.dialog) {
             $('.grid-table.fm tr').addClass('ui-selected');
-            $('.file-block').addClass('ui-selected');
+            $('.fm-blocks-view .data-block-view').addClass('ui-selected');
         }
         else if (e.keyCode == 37 && slideshowid) {
             slideshow_prev();
@@ -6792,7 +6792,7 @@ function iconUI(aQuiet)
 
     $('.fm-blocks-view, .shared-blocks-view').rebind('contextmenu.blockview', function(e)
     {
-        $('.file-block').removeClass('ui-selected');
+        $('.fm-blocks-view .data-block-view').removeClass('ui-selected');
         selectionManager.clear(); // is this required? don't we have a support for a multi-selection context menu?
         $.selected = [];
         $.hideTopMenu();
@@ -7348,7 +7348,7 @@ function contextMenuUI(e, ll) {
             return false;
         }
         else if (currNodeClass
-            && (currNodeClass.indexOf('file-block') > -1
+            && (currNodeClass.indexOf('data-block-view') > -1
             || currNodeClass.indexOf('folder') > -1
             || currNodeClass.indexOf('fm-tree-folder') > -1)
             || id) {

@@ -1,69 +1,143 @@
 .data-block-view {
-	width: 128px;
+	width: 160px;
 	display: block;
+    font-size: 0;
+    line-height: 0;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	-moz-border-radius: 8px;
-	-webkit-border-radius: 8px;
-	border-radius: 8px;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
 	float: left;
 	position: relative;
 	cursor: default;
+    text-align: center;
 	background-color: white;
-	-webkit-transition: all 20ms ease-in-out;
-	-moz-transition: all 20ms ease-in-out;
-	-o-transition: all 20ms ease-in-out;
-	-ms-transition: all 20ms ease-in-out;
-	transition: all 20ms ease-in-out;
-	padding: 4px;
+	-webkit-transition: all 100ms ease-in-out;
+	-moz-transition: all 100ms ease-in-out;
+	-o-transition: all 100ms ease-in-out;
+	-ms-transition: all 100ms ease-in-out;
+	transition: all 100ms ease-in-out;
+	padding: 2px;
 }
-.data-block-view::before {
+.data-block-view.medium {
+    width: 128px;
+}
+.fm-blocks-view .data-block-view {
+    margin: 12px 0 0 12px;
+}
+.data-block-view::before, .data-block-view::after {
 	content: '';
 	position: absolute;
 	width: 100%;
 	height: 100%;
 	top: 0;
 	left: 0;
-	-moz-border-radius: 8px;
-	-webkit-border-radius: 8px;
-	border-radius: 8px;
-	-webkit-box-shadow: 0px 1px 1.5px 0px rgba(0,0,0,0.3);
-	-moz-box-shadow: 0px 1px 1.5px 0px rgba(0,0,0,0.3);
-	box-shadow: 0px 1px 1.5px 0px rgba(0,0,0,0.3);
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+	-webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.1);
+	-moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.1);
+	box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.1);
 	background-color: white;
 }
-.data-block-view.ui-selected, .data-block-view .ui-selecting, .data-block-view.dragover {
+.data-block-view::after {
+    -webkit-box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
+    -moz-box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
+    background-color: transparent;
+}
+.data-block-view.ui-selected, .data-block-view.ui-selecting, .data-block-view.dragover {
 	-webkit-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.1);
 	-moz-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.1);
 	box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.1);
 	background-color: rgba(0,0,0,0.1);
 }
 .data-block-bg {
-	height: 120px;
-	display: block;
-	background-color: #FAFAFA;
+	height: 156px;
+    width: 156px;
+	display: table-cell;
+    font-size: 0;
 	overflow: hidden;
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;
-	border-radius: 4px;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	border-radius: 2px;
 	position: relative;
-	-webkit-transition: all 20ms ease-in-out;
-	-moz-transition: all 20ms ease-in-out;
-	-o-transition: all 20ms ease-in-out;
-	-ms-transition: all 20ms ease-in-out;
-	transition: all 20ms ease-in-out;
+	-webkit-transition: all 100ms ease-in-out;
+	-moz-transition: all 100ms ease-in-out;
+	-o-transition: all 100ms ease-in-out;
+	-ms-transition: all 100ms ease-in-out;
+	transition: all 100ms ease-in-out;
 	overflow: hidden;
+    text-align:center;
+    vertical-align: middle;
+    position:relative;
+}
+.data-block-view.medium .data-block-bg {
+    height: 124px;
+    width: 124px;
 }
 .data-block-bg img {
-	width: 100%;
-	height: 100%;
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;
-	border-radius: 4px;
+	max-width: 100%;
+	max-height: 100%;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	border-radius: 2px;
+    vertical-align: middle;
+    -webkit-transition: all 100ms ease-in-out;
+	-moz-transition: all 100ms ease-in-out;
+	-o-transition: all 100ms ease-in-out;
+	-ms-transition: all 100ms ease-in-out;
+	transition: all 100ms ease-in-out;
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=75);
+    -moz-opacity: 0.75;
+    -khtml-opacity: 0.75;
+    opacity: 0.75;
+    position:relative;
 }
-.data-block-view.active .data-block-bg, .data-block-view:hover .data-block-bg {
+.data-block-bg .img-overlay {
+    position:absolute;
+    width: 156px;
+    height: 88px;
+    -webkit-transition: all 100ms ease-in-out;
+	-moz-transition: all 100ms ease-in-out;
+	-o-transition: all 100ms ease-in-out;
+	-ms-transition: all 100ms ease-in-out;
+	transition: all 100ms ease-in-out;
+    -moz-border-radius-topright: 2px;
+    -webkit-border-top-right-radius: 2px;
+    border-top-right-radius: 2px;
+    -moz-border-radius-bottomright: 2px;
+    -webkit-border-bottom-right-radius: 2px;
+    border-bottom-right-radius: 2px;
+    background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIwLjUiLz4KICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIwIi8+CiAgPC9saW5lYXJHcmFkaWVudD4KICA8cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMSIgaGVpZ2h0PSIxIiBmaWxsPSJ1cmwoI2dyYWQtdWNnZy1nZW5lcmF0ZWQpIiAvPgo8L3N2Zz4=);
+background: -moz-linear-gradient(top, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0) 100%);
+background: -webkit-linear-gradient(top, rgba(255,255,255,0.5) 0%,rgba(255,255,255,0) 100%);
+background: linear-gradient(to bottom, rgba(255,255,255,0.5) 0%,rgba(255,255,255,0) 100%);
+filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+    -moz-opacity: 1;
+    -khtml-opacity: 1;
+    opacity: 1;
+    z-index: 1;
+}
+.data-block-view.active .data-block-bg, .data-block-view:hover .data-block-bg,
+.data-block-view.ui-selected .data-block-bg, .data-block-view.ui-selecting .data-block-bg, .data-block-view.dragover .data-block-bg {
 	background-color: rgba(0,0,0,0.05);
+}
+.data-block-view.active .data-block-bg img, .data-block-view:hover .data-block-bg img,
+.data-block-view.ui-selected .data-block-bg img, .data-block-view.ui-selecting .data-block-bg img, .data-block-view.dragover .data-block-bg img {
+filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+    -moz-opacity: 1;
+    -khtml-opacity: 1;
+    opacity: 1;
+}
+.data-block-view.active .img-overlay, .data-block-view:hover .img-overlay,
+.data-block-view.ui-selected  .img-overlay, .data-block-view.ui-selecting  .img-overlay, .data-block-view.dragover  .img-overlay {
+filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+    -moz-opacity: 0;
+    -khtml-opacity: 0;
+    opacity: 0;
 }
 .data-block-view.medium .default-white-button.tiny-button {
 	float: none;

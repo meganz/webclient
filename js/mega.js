@@ -1225,8 +1225,8 @@ function MegaData()
             }
         });
 
-        $('.file-block .file-settings-icon').rebind('click', function(e) {
-            var target = $(this).parents('.file-block');
+        $('.data-block-view .file-settings-icon, .fm-blocks-view').rebind('click', function(e) {
+            var target = $(this).parents('.data-block-view');
             if (target.attr('class').indexOf('ui-selected') == -1) {
                 target.parent().find('a').removeClass('ui-selected');
             }
@@ -2983,7 +2983,7 @@ function MegaData()
 
                 if (M.RubbishID === M.currentdirid) {
                     $('.grid-table.fm tr').remove();
-                    $('.file-block').remove();
+                    $('.fm-blocks-view .data-block-view').remove();
                     $('.fm-empty-trashbin').removeClass('hidden');
                 }
             }
@@ -3016,7 +3016,7 @@ function MegaData()
 
                         if (sel) {
                             $('.grid-table.fm#' + h).remove();
-                            $('#' + h + '.file-block').remove();
+                            $('#' + h + '.data-block-view').remove();
                         }
                     }
 
@@ -3852,7 +3852,7 @@ function MegaData()
 
             // DOM update, left and right panel in 'Cloud Drive' tab
             $('.grid-table.fm #' + itemHandle + ' .tranfer-filetype-txt').text(newItemName);
-            $('#' + itemHandle + '.file-block .file-block-title').text(newItemName);
+            $('#' + itemHandle + '.data-block-view .file-block-title').text(newItemName);
 
             // DOM update, left and right panel in "Shared with me' tab
             $('#treea_' + itemHandle + ' span:nth-child(2)').text(newItemName);
@@ -3978,7 +3978,7 @@ function MegaData()
      */
     this.favouriteDomUpdate = function(node, favState) {
         var $gridView  = $('#' + node.h + ' .grid-status-icon');
-        var $blockView = $('#' + node.h + '.file-block .file-status-icon');
+        var $blockView = $('#' + node.h + '.data-block-view .file-status-icon');
 
         if (favState) {// Add favourite
             $gridView.addClass('star');

@@ -3902,7 +3902,7 @@ var newmissingkeys = false;
 
 // whenever a node fails to decrypt, call this.
 function crypto_reportmissingkey(n) {
-    if (!M.d[n.h] || typeof M.d[n.h] == 'string') {
+    if (!M.d[n.h] || typeof M.d[n.h].k === 'string') {
         var change = false;
 
         if (!missingkeys[n.h]) {

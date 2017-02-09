@@ -195,6 +195,7 @@ ConnectionRetryManager.prototype.gotConnected = function(){
             self._connectionState = ConnectionRetryManager.CONNECTION_STATE.DISCONNECTED;
         }
     });
+    $(self).trigger('onConnected');
 };
 
 /**
@@ -203,12 +204,12 @@ ConnectionRetryManager.prototype.gotConnected = function(){
  * @param waitForPromise
  * @returns {MegaPromise|*}
  */
-ConnectionRetryManager.prototype.startedConnecting = function(waitForPromise){
+ConnectionRetryManager.prototype.startedConnecting = function(waitForPromise, delayed){
     var self = this;
 
     self._$connectingPromise = createTimeoutPromise(function() {
         return self.options.functions.isConnected();
-    }, 100, self.options.connectTimeout, undefined, waitForPromise)
+    }, 100, self.options.connectTimeout + (delayed ? delayed : 0), undefined, waitForPromise)
         .always(function() {
             delete self._$connectingPromise;
         })
@@ -224,6 +225,8 @@ ConnectionRetryManager.prototype.startedConnecting = function(waitForPromise){
 ConnectionRetryManager.prototype.doConnectionRetry = function(immediately){
     var self = this;
 
+
+    self.logger.error("doConnectionRetry", immediately);
 
     if (self._$connectingPromise && self._connectionRetries >= self.options.maxConnectionRetries) {
         self._$connectingPromise.reject(arguments);
@@ -261,7 +264,7 @@ ConnectionRetryManager.prototype.doConnectionRetry = function(immediately){
 
 
         self._lastConnectionRetryTime = unixtime();
-        return self.startedConnecting();
+        return self.startedConnecting(undefined, self.options.restartConnectionRetryTimeout);
     }
     else {
         var connectionRetryTimeout = (
@@ -297,7 +300,7 @@ ConnectionRetryManager.prototype.doConnectionRetry = function(immediately){
 
         self._lastConnectionRetryTime = unixtime();
 
-        return self.startedConnecting();
+        return self.startedConnecting(undefined, connectionRetryTimeout);
     }
 };
 /**
@@ -347,8 +350,16 @@ ConnectionRetryManager.prototype.requiresConnection = function() {
     var self = this;
 
     if (!self.options.functions.isConnectedOrConnecting()) {
-        self.doConnectionRetry(true);
-        return self._$connectingPromise;
+        var connectedPromise = new MegaPromise();
+        $(self).one('onConnected', function() {
+            connectedPromise.resolve();
+        });
+
+        if (self.getConnectionState() === ConnectionRetryManager.CONNECTION_STATE.DISCONNECTED) {
+            self.doConnectionRetry(true);
+        }
+
+        return connectedPromise;
     }
     else {
         return MegaPromise.resolve();

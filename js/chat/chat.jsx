@@ -1084,7 +1084,7 @@ Chat.prototype.renderMyStatus = function() {
 
     var presence = self.karere.getConnectionState() === Karere.CONNECTION_STATE.CONNECTED ?
                 self.plugins.presencedIntegration.getPresence() :
-                UserPresence.PRESENCE.ONLINE;
+                UserPresence.PRESENCE.OFFLINE;
 
     var cssClass = PresencedIntegration.presenceToCssClass(
         presence

@@ -2975,9 +2975,10 @@ mThumbHandler.add('SVG', function SVGThumbHandler(ab, cb) {
         canvas.height = image.height;
         canvas.width = image.width;
         ctx.drawImage(image, 0, 0);
-        cb(dataURLToAB(canvas.toDataURL('image/jpeg')));
+        cb(dataURLToAB(canvas.toDataURL('image/png')));
     };
-    image.src = 'data:image/svg+xml;charset-utf-8,' + encodeURIComponent(ab_to_str(ab));
+    image.src = 'data:image/svg+xml;charset=utf-8,'
+        + encodeURIComponent(ab_to_str(ab).replace(/foreignObject|script/g, 'desc'));
 });
 
 var storedattr = {};

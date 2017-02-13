@@ -424,8 +424,8 @@ body.pro:after {
     background-position: center -50px;
     background-size: 60px auto;
 }
-.empty-icon, .fm-empty-cloud-bg, .fm-empty-folder-bg, .fm-empty-conversations-bg, .fm-empty-incoming-bg, .fm-empty-contacts-bg, .fm-invalid-folder-bg, .fm-empty-folder-link-bg, .fm-empty-trashbin-bg, .fm-empty-transfers-bg, .fm-empty-search-bg {
-    background-image: url(../images/mega/empty-sprite_v2@2x.png);
+.empty-icon, .fm-empty-cloud-bg, .fm-empty-folder-bg, .fm-empty-conversations-bg, .fm-empty-incoming-bg, .fm-empty-contacts-bg, .fm-invalid-folder-bg, .fm-empty-folder-link-bg, .fm-empty-trashbin-bg, .fm-empty-transfers-bg, .fm-empty-search-bg, .dialog-empty-icon {
+    background-image: url(../images/mega/empty-sprite_v3@2x.png);
     background-size: 294px auto;
 }
 .membership-icon-old {

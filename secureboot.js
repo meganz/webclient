@@ -30,6 +30,7 @@ if (typeof process !== 'undefined') {
         // localStorage.jj = 1;
     }
 }
+var is_selenium = !ua.indexOf('mozilla/5.0 (selenium; ');
 var is_karma = /^localhost:987[6-9]/.test(window.top.location.host);
 var is_chrome_firefox = document.location.protocol === 'chrome:'
     && document.location.host === 'mega' || document.location.protocol === 'mega:';
@@ -75,7 +76,7 @@ function getCleanSitePath(path) {
     }
     catch (e) {}
 
-    path = path.replace(/^[/#]+|[^\w-]+$/g, '');
+    path = path.replace(/^[/#]+|\/+$/g, '');
 
     return path;
 }
@@ -781,7 +782,7 @@ Object.defineProperty(this, 'mBroadcaster', {
                             + (this.master ? 'MASTER':'SLAVE'));
 
                         console.debug(String(ua));
-                        console.debug(browserdetails(ua).prod);
+                        console.debug(browserdetails(ua).prod + u_handle);
                     }
                     cb(this.master);
                     cb = null;
@@ -1986,7 +1987,7 @@ else if (!b_u)
         subpages['F!'] = ['fm_mobile', 'fm_mobile_js'];
         subpages['fm'] = ['fm_mobile', 'fm_mobile_js'];
     }
-
+	if (page == 'megacmd') page = 'cmd';
 
     if (page)
     {

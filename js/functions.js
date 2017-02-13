@@ -318,6 +318,9 @@ delay.cancel = function(aProcID) {
 };
 
 function jScrollFade(id) {
+    if (is_selenium) {
+        return;
+    }
 
     $(id + ' .jspTrack').rebind('mouseover', function(e) {
         $(this).find('.jspDrag').addClass('jspActive');
@@ -561,7 +564,7 @@ function populate_l() {
     l[8440] = l[8440].replace('[A]', '<a href="https://github.com/meganz/">').replace('[/A]', '</a>');
     l[8440] = l[8440].replace('[A2]', '<a href="/contact" class="clickurl">').replace('[/A2]', '</a>');
     l[8441] = l[8441].replace('[A]', '<a href="mailto:bugs@mega.nz">').replace('[/A]', '</a>');
-    l[8441] = l[8441].replace('[A2]', '<a href="https://mega.nz/#blog_8">').replace('[/A2]', '</a>');
+    l[8441] = l[8441].replace('[A2]', '<a href="https://mega.nz/blog_8">').replace('[/A2]', '</a>');
     l[5931] = l[5931].replace('[A]', '<a class="red" href="/fm/account" class="clickurl">').replace('[/A]', '</a>');
     l[8644] = l[8644].replace('[S]', '<span class="green">').replace('[/S]', '</span>');
     l[8651] = l[8651].replace('%1', '<span class="header-pro-plan"></span>');
@@ -616,12 +619,12 @@ function populate_l() {
     l[16116] = l[16116].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[16119] = l[16119].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[16120] = l[16120].replace('[S]', '<span>').replace('[/S]', '</span>');
-    l[16123] = l[16123].replace('[S]', '<span>').replace('[/S]', '</span>').replace('[A]', '<a href="#pro">').replace('[/A]', '</a>').replace('[BR]', '<br />');
-    l[16124] = l[16124].replace('[S]', '<span>').replace('[/S]', '</span>').replace('[A]', '<a href="#pro">').replace('[/A]', '</a>').replace('[BR]', '<br />');
+    l[16123] = l[16123].replace('[S]', '<span>').replace('[/S]', '</span>').replace('[A]', '<a href="/pro">').replace('[/A]', '</a>').replace('[BR]', '<br />');
+    l[16124] = l[16124].replace('[S]', '<span>').replace('[/S]', '</span>').replace('[A]', '<a href="/pro">').replace('[/A]', '</a>').replace('[BR]', '<br />');
     l[16135] = l[16135].replace('[BR]', '<br />');
-    l[16136] = l[16136].replace('[A]', '<a href="#pro">').replace('[/A]', '</a>');
-    l[16137] = l[16137].replace('[A]', '<a href="#pro">').replace('[/A]', '</a>');
-    l[16138] = l[16138].replace('[A]', '<a href="#pro">').replace('[/A]', '</a>');
+    l[16136] = l[16136].replace('[A]', '<a href="/pro">').replace('[/A]', '</a>');
+    l[16137] = l[16137].replace('[A]', '<a href="/pro">').replace('[/A]', '</a>');
+    l[16138] = l[16138].replace('[A]', '<a href="/pro">').replace('[/A]', '</a>');
     l[16164] = l[16164].replace('[S]', '<a class="red">').replace('[/S]', '</a>').replace('[BR]', '<br/>');
     l[16167] = l[16167].replace('[S]', '<a href="/mobile" class="clickurl">').replace('[/S]', '</a>');
 
@@ -3679,9 +3682,6 @@ mega.utils.reload = function megaUtilsReload() {
                 if (!is_extension && jj)  {
                     localStorage.jj = jj;
                 }
-                if (mcd) {
-                    localStorage.testChatDisabled = 1;
-                }
             }
             if (apipath) {
                 // restore api path across reloads, only for debugging purposes...
@@ -3689,6 +3689,9 @@ mega.utils.reload = function megaUtilsReload() {
             }
         }
 
+        if (mcd) {
+            localStorage.testChatDisabled = 1;
+        }
         if (hashLogic) {
             localStorage.hashLogic = 1;
         }
@@ -4269,7 +4272,7 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
     function _init() {
         // if (d) console.log('Initializing Rubbish-Bin Cleaning Scheduler');
 
-        updId = mBroadcaster.addListener('fmconfig:rubsched', _update);
+        // updId = mBroadcaster.addListener('fmconfig:rubsched', _update);
         if (fmconfig.rubsched) {
             timer = setInterval(function() {
                 _proc();

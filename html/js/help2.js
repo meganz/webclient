@@ -113,7 +113,18 @@ var Help = (function() {
             .addClass('active');
 
         delay('help2:selectMenuItem', function() {
-            var newpage = getCleanSitePath($link.data('state'));
+            var state = $link.data('state');
+            if (!state && $link.data('to')) {
+                var parts = getUrlParts();
+                // the url normally includes, 'help', 'client', 'webclient', and 'section'/'question'
+                // set the first one as selected by default if it only has 'help', 'client', 'webclient'.
+                if (parts.length > 3) {
+                    parts.pop();
+                }
+                parts.push(String($link.data('to')).replace(/^[/#]+/, ''));
+                state = parts.join('/');
+            }
+            var newpage = getCleanSitePath(state);
             if (newpage !== page && page.substr(0, 4) === 'help') {
                 page = newpage;
 
@@ -200,7 +211,7 @@ var Help = (function() {
         $('.d-section-items a, .popular-question-items a').rebind('click',function(e) {
             var url = $(this).attr('href') || $(this).data('fxhref');
             if (url) {
-                loadSubPage(String(url).replace('#', ''));
+                loadSubPage(url);
                 return false;
             }
         });
@@ -487,11 +498,21 @@ var Help = (function() {
 
     var urls = {
         "search": function(args) {
-            args[1] = args[1].replace(/%([0-9a-f]+)/g, function(all, number) {
-                return String.fromCharCode(parseInt(number, 16));
-            });
-            args[1] = args[1].replace(/[\+\-]/g, " ");
-            var articles = idx.search.search(args[1], {
+            var searchTerm = String(args[1]);
+
+            if (searchTerm.indexOf('%25') >= 0) {
+                do {
+                    searchTerm = searchTerm.replace(/%25/g, '%');
+                } while (searchTerm.indexOf('%25') >= 0);
+            }
+            try {
+                searchTerm = decodeURIComponent(searchTerm);
+            }
+            catch (e) {}
+
+            searchTerm = searchTerm.replace(/[+-]/g, " ");
+
+            var articles = idx.search.search(searchTerm, {
                 fields: {
                     title: {boost: 2, bool: "AND"},
                     body: {boost: 1},
@@ -505,7 +526,7 @@ var Help = (function() {
 
             parsepage(Data.help_search_tpl.html);
 
-            $('#help2-main .search').val(args[1]);
+            $('#help2-main .search').val(searchTerm);
 
             if (articles.length === 0) {
                 $('.search-404-block').show();
@@ -514,8 +535,6 @@ var Help = (function() {
                 $('.search-404-block').hide();
                 $('.main-search-pad,.sidebar-menu-container').show();
             }
-
-
 
             articles.reverse().map(function(article) {
                 var $article = $('<div>').addClass("search-result link content-by-tags")
@@ -546,7 +565,6 @@ var Help = (function() {
                 });
 
                 $article.prependTo('.main-search-pad');
-
             });
 
             tagsPerDocument(articles).map(function(tag) {
@@ -567,7 +585,7 @@ var Help = (function() {
 
             args.shift();
             var question = "";
-            if (args.length === 3) {
+            if (args.length === 3 || args.length === 2) {
                 question = args.pop();
             } else if (args.length !== 1) {
                 loadSubPage('help');
@@ -585,24 +603,20 @@ var Help = (function() {
             parsepage(data.html);
 
             $('.support-email-icon').rebind('click', function() {
-                var parts = getSitePath().split(/\//);
-                parts.pop();
-                parts.push($(this).parents('.support-article').attr('id'));
+                var parts = getUrlParts($(this).parents('.support-article').attr('id'));
                 window.helpOrigin = parts.join('/');
-                var support = '#support';
+                var newpage = 'support';
                 if (!u_type) {
-                    login_next = support;
-                    support    = "#login";
+                    login_next = newpage;
+                    newpage = "login";
                 }
-                loadSubPage('support');
+                loadSubPage(newpage);
             });
 
             $('.support-link-icon').rebind('click', function() {
-                var parts = getSitePath().split('/');
-                parts.pop();
-                parts.push($(this).parents('.support-article').attr('id'));
+                var parts = getUrlParts($(this).parents('.support-article').attr('id'));
 
-                var link   = getBaseUrl() + parts.join('/');
+                var link = 'https://mega.nz/' + parts.join('/');
                 var $input = $('.share-help').removeClass('hidden')
                     .find('input').val(link)
                     .focus().select();
@@ -629,9 +643,9 @@ var Help = (function() {
 
             if (question) {
                 $currentQuestion = $('#' + question);
-                Later(function() {
+                setTimeout(function() {
                     scrollTo($currentQuestion);
-                });
+                }, 400);
             }
         },
         "welcome": function welcome(args) {
@@ -639,8 +653,15 @@ var Help = (function() {
         }
     };
 
-    function getUrlParts() {
-        return getSitePath().split('/').map(String.trim).filter(String);
+    function getUrlParts(section) {
+        var parts = getSitePath().split('/').map(String.trim).filter(String);
+
+        if (section) {
+            parts.pop();
+            parts.push(section);
+        }
+
+        return parts;
     }
 
 

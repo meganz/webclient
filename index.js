@@ -2077,7 +2077,7 @@ function loadSubPage(tpage, event)
         gifSlider.clear();
     }
 
-    if (silent_loading || tpage === page) {
+    if (silent_loading) {
         return false;
     }
 
@@ -2096,6 +2096,10 @@ function loadSubPage(tpage, event)
         if ($.infoscroll) {
             startpageMain();
         }
+        return false;
+    }
+
+    if ((tpage === page) && !folderlink) {
         return false;
     }
 

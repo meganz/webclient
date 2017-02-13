@@ -7596,7 +7596,7 @@ function reCalcMenuPosition(m, x, y, ico) {
         }
 
         // draw to the top
-        if (hMax > maxY) {
+        if (hMax > (maxY - TOP_MARGIN)) {
             dPos.y = y - cmH - 6;
             if (dPos.y < TOP_MARGIN) {
                 dPos.y = TOP_MARGIN;

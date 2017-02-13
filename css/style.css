@@ -6148,6 +6148,21 @@ th.grid-first-th {
 }
 .file-block-scrolling, .contacts-blocks-scrolling, .shared-blocks-scrolling {
     height: 100%;
+    height: -webkit-calc(100% - 25px);
+    height: -moz-calc(100% - 25px);
+    height: calc(100% - 25px);
+}
+.blocks-view-data {
+    height: 25px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    border-top: 1px solid rgba(0,0,0,0.1);
+    background-color: white;
+    text-align: center;
+    font-size: 14px;
+    line-height: 24px;
+    color: #666666;
 }
 .file-block-scrolling .jspPane:after, .contacts-blocks-scrolling .jspPane:after, .shared-blocks-scrolling .jspPane:after {
     clear: both;
@@ -6159,18 +6174,13 @@ th.grid-first-th {
     width: 160px;
     height: 160px;
 }
-.fm-blocks-view.shared-view .block-view-file-type.folder, .shared-blocks-view .block-view-file-type.folder, .fm-blocks-view.contacts-view .block-view-file-type.folder, .contacts-blocks-view .block-view-file-type.folder {
-    width: 94px;
-    height: 77px;
+.fm-blocks-view.shared-view .block-view-file-type.folder, .shared-blocks-view .block-view-file-type.folder, .fm-blocks-view.contacts-view .block-view-file-type.folder, .contacts-blocks-view .block-view-file-type.folder, .block-view-file-type.folder.inbound-share, .contact-details-view .block-view-file-type.folder-shared {
+    width: 82px;
+    height: 84px;
+    margin: -42px 0 0 -41px;
     background-image: url(../images/mega/shared-sprite_v6.svg);
     background-repeat: no-repeat;
-    background-position: center top;
-    margin: -38px 0 0 -47px;
-}
-.block-view-file-type.folder.inbound-share, .contact-details-view .block-view-file-type.folder-shared {
-    background-image: url(../images/mega/shared-sprite_v6.svg);
-    background-repeat: no-repeat;
-    background-position: center 3px;
+    background-position: center 2px;
 }
 .file-icon-area {
     width: 120px;
@@ -6358,8 +6368,9 @@ th.grid-first-th {
     bottom: 4px;
     z-index: 10;
 }
-.contacts-blocks-scrolling .file-settings-icon, .shared-blocks-scrolling .file-settings-icon {
-    bottom: 55px;
+.contacts-blocks-scrolling .file-settings-icon {
+    right: 6px;
+    bottom: 56px;
 }
 .grid-url-arrow::before, .file-settings-icon::before, .clear-transfer-icon::before {
     content: '';
@@ -20535,7 +20546,7 @@ span.incoming-call-name {
 }
 .shared-details-pad .shared-folder-access {
     float: left;
-    margin: 8px 0 0 8px;
+    margin: 7px 0 0 8px;
 }
 .shared-details-pad .nw-contact-avatar {
     margin: 10px 0 0 0px;
@@ -26250,8 +26261,8 @@ body.key.th .reg-st3-mid-txt, body.key.th .reg-st3-mid-txt, body.key.id .reg-st3
     opacity: 0.4;
 }
 .avatar-wrapper.verified.square .verified_icon, .fm-blocks-view .avatar-wrapper.verified .verified_icon {
-    right: 5px;
-    top: 5px;
+    right: 6px;
+    top: 6px;
 }
 .avatar-wrapper .verified_icon {
     display: none;

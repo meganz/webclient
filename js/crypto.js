@@ -2975,9 +2975,10 @@ mThumbHandler.add('SVG', function SVGThumbHandler(ab, cb) {
         canvas.height = image.height;
         canvas.width = image.width;
         ctx.drawImage(image, 0, 0);
-        cb(dataURLToAB(canvas.toDataURL('image/jpeg')));
+        cb(dataURLToAB(canvas.toDataURL('image/png')));
     };
-    image.src = 'data:image/svg+xml;charset-utf-8,' + encodeURIComponent(ab_to_str(ab));
+    image.src = 'data:image/svg+xml;charset=utf-8,'
+        + encodeURIComponent(ab_to_str(ab).replace(/foreignObject|script/g, 'desc'));
 });
 
 var storedattr = {};
@@ -3902,7 +3903,7 @@ var newmissingkeys = false;
 
 // whenever a node fails to decrypt, call this.
 function crypto_reportmissingkey(n) {
-    if (typeof n.k == 'string') {
+    if (!M.d[n.h] || typeof M.d[n.h].k === 'string') {
         var change = false;
 
         if (!missingkeys[n.h]) {
@@ -3934,7 +3935,7 @@ function crypto_reportmissingkey(n) {
     else {
         console.error('invalid-missingkey ' + n.h, change);
 
-        srvlog2('invalid-missingkey', n.h, typeof n.k, Object(n.k).length | 0);
+        //srvlog2('invalid-missingkey', n.h, typeof n.k, Object(n.k).length | 0);
     }
 }
 

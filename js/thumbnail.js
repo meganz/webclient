@@ -187,17 +187,11 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
             ThumbFR.onload = function(e) {
                 var orientation;
                 var u8 = new Uint8Array(ThumbFR.result);
-                var dv = new DataView(u8.buffer);
 
                 if (u8.byteLength < 4) {
                     console.error('Unable to create thumbnail, data too short...');
                     return;
                 }
-
-                if (dv.getUint32(0) === 0x89504e47) {
-                    img.isPNG = true;
-                }
-                dv = undefined;
 
                 img.dataSize = u8.byteLength;
                 img.is64bit = browserdetails(ua).is64bit;
@@ -361,6 +355,12 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
 
 function __render_thumb(img, u8, orientation, blob) {
     if (u8) {
+        var dv = new DataView(u8.buffer || u8);
+        if (dv.getUint32(0) === 0x89504e47) {
+            img.isPNG = true;
+        }
+        dv = undefined;
+
         if (orientation === undefined || orientation < 1 || orientation > 8) {
             if (d) {
                 console.time('exif');

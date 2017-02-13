@@ -28,9 +28,9 @@
 
             // Icon view mode
             '<a class="data-block-view">' +
-                '<span class="file-status-icon"></span>' +
-                '<span class="data-item-icon"></span>' +
-                '<span class="data-block-bg">' +
+                '<span class="data-block-bg ">' +
+                    '<span class="file-status-icon indicator"></span>' +
+                    '<span class="data-item-icon indicator"></span>' +
                     '<span class="block-view-file-type"><img/></span>' +
                     '<span class="file-settings-icon"></span>' +
                 '</span>' +
@@ -72,9 +72,9 @@
 
             // Icon view mode
             '<a class="data-block-view folder">' +
-                '<span class="file-status-icon"></span>' +
-                '<span class="shared-folder-access"></span>' +
                 '<span class="data-block-bg">' +
+                    '<span class="file-status-icon indicator"></span>' +
+                    '<span class="shared-folder-access indicator"></span>' +
                     '<span class="block-view-file-type"></span>' +
                     '<span class="file-settings-icon"></span>' +
                 '</span>' +
@@ -149,9 +149,9 @@
 
             // Icon view mode
             '<a class="data-block-view folder">' +
-                '<span class="file-status-icon"></span>' +
-                '<span class="shared-folder-access"></span>' +
                 '<span class="data-block-bg">' +
+                    '<span class="file-status-icon indicator"></span>' +
+                    '<span class="shared-folder-access indicator"></span>' +
                     '<span class="block-view-file-type folder-shared"><img/></span>' +
                     '<span class="file-settings-icon"></span>' +
                 '</span>' +

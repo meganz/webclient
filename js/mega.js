@@ -9574,7 +9574,7 @@ function fm_thumbnail_render(n) {
         }
         imgNodes.each(function(k, imgNode) {
             imgNode.setAttribute('src', thumbnails[n.h]);
-            imgNode.parentNode.classList.add('thumb');
+            imgNode.parentNode.parentNode.classList.add('thumb');
         });
     }
 }

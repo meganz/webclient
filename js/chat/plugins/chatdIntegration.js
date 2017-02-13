@@ -826,7 +826,7 @@ ChatdIntegration.prototype._parseMessage = function(chatRoom, message) {
                     if (v.fa && (icon === "graphic" || icon === "image")) {
                         var imagesListKey = message.messageId + "_" + v.h;
                         if (!chatRoom.images.exists(imagesListKey)) {
-                            v.k = imagesListKey;
+                            v.id = imagesListKey;
                             v.delay = message.delay;
                             chatRoom.images.push(v);
                         }

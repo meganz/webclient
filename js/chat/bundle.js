@@ -9374,7 +9374,7 @@ React.makeElement = React['createElement'];
 	                            if (v.fa && (icon === "graphic" || icon === "image")) {
 	                                var imagesListKey = message.messageId + "_" + v.h;
 	                                if (!chatRoom.images.exists(imagesListKey)) {
-	                                    v.k = imagesListKey;
+	                                    v.id = imagesListKey;
 	                                    v.delay = message.delay;
 	                                    chatRoom.images.push(v);
 	                                }
@@ -10583,7 +10583,7 @@ React.makeElement = React['createElement'];
 	    this.callIsActive = false;
 	    this.shownMessages = {};
 	    this.attachments = new MegaDataMap(this);
-	    this.images = new MegaDataSortedMap("k", "delay", this);
+	    this.images = new MegaDataSortedMap("id", "delay", this);
 
 	    this.options = {
 

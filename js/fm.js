@@ -7531,6 +7531,10 @@ function reCalcMenuPosition(m, x, y, ico) {
     var wMax = x + cmW;// coordinate of context menu right edge
     var hMax = y + cmH;// coordinate of context menu bottom edge
 
+    var top = 'auto';
+    var left = '100%';
+    var right = 'auto';
+
     var overlapParentMenu = function(n) {
         var tre = wW - wMax;// to right edge
         var tle = x - minX - SIDE_MARGIN;// to left edge
@@ -7614,10 +7618,6 @@ function reCalcMenuPosition(m, x, y, ico) {
             n.addClass('mega-height');
             n.css({'height': nmH + 'px'});
         }
-
-        var top = 'auto';
-        var left = '100%';
-        var right = 'auto';
 
         top = horPos(n);
         if (m.parent().parent('.left-position').length === 0) {

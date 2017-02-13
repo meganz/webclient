@@ -4486,9 +4486,25 @@ function accountUI() {
             }
         });
 
-        $('#account-firstname,#account-lastname,#account-phonenumber').rebind('keyup', function(e)
-        {
-            $('.fm-account-save-block').removeClass('hidden');
+        $('#account-firstname').on('input', function() {
+            var $fasb = $('.fm-account-save-block');
+
+            if ($(this).val().trim().length > 0) {
+                $fasb.removeClass('hidden');
+            }
+            else {
+                $fasb.addClass('hidden');
+            }
+        });
+
+        $('#account-lastname,#account-phonenumber').rebind('keyup.settingsGeneral', function(e) {
+            var $fasm = $('.fm-account-save-block');
+            if ($('#account-firstname').val().trim().length > 0) {
+                $fasm.removeClass('hidden');
+            }
+            else {
+                $fasm.addClass('hidden');
+            }
         });
         $('.fm-account-cancel').rebind('click', function(e)
         {
@@ -13104,8 +13120,7 @@ function bindDropdownEvents($dropdown, saveOption, contentBlock) {
         }
     });
 
-    $dropdownsItem.rebind('click', function(e)
-    {
+    $dropdownsItem.rebind('click.settingsGeneral', function(e) {
         var $this = $(this);
         if (!$this.hasClass('active')) {
             var $select = $(this).closest('.default-select');
@@ -13115,8 +13130,10 @@ function bindDropdownEvents($dropdown, saveOption, contentBlock) {
             $this.addClass('active');
             $select.find('span').text($this.text());
 
-            //Save changes for account page
-            if (saveOption) {
+            var nameLen = $('#account-firstname').val().trim().length;
+
+            // Save changes for account page
+            if (saveOption && nameLen) {
                 $('.fm-account-save-block').removeClass('hidden');
             }
         }

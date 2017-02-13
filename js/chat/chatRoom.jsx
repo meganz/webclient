@@ -726,7 +726,12 @@ ChatRoom.prototype.isActive = function() {
 };
 
 ChatRoom.prototype.setActive = function() {
-    loadSubPage(this.getRoomUrl());
+    // We need to delay this, since it can get called BY openFolder and it would then call again openFolder, which
+    // would cause .currentdirid to not be set correctly.
+    var self = this;
+    Soon(function() {
+        loadSubPage(self.getRoomUrl());
+    });
 };
 
 

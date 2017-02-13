@@ -1826,7 +1826,9 @@ Chat.prototype.getEmojiDataSet = function(name) {
         self._emojiDataLoading[name].done(function(data) {
             self._emojiData[name] = data;
             delete self._emojiDataLoading[name];
-        })
+        }).fail(function() {
+            delete self._emojiDataLoading[name];
+        });
 
         return self._emojiDataLoading[name];
     }

@@ -64,14 +64,13 @@ var DropdownEmojiSelector = React.createClass({
     getInitialState: function() {
         var self = this;
 
-        window.$emojiDropdown = self;
-
         return {
             'previewEmoji': null,
             'searchValue': '',
             'browsingCategory': false,
             'isActive': false,
             'isLoading': true,
+            'loadFailed': false,
             'visibleCategories': "0"
         }
     },
@@ -154,9 +153,7 @@ var DropdownEmojiSelector = React.createClass({
             var self = this;
             if (
                 nextState.isLoading === true &&
-                !nextState.data_categories &&
-                !nextState.data_emoijs &&
-                !self.loadingPromise
+                (!self.data_categories || !self.data_emojis)
             ) {
                 self.loadingPromise = MegaPromise.allDone([
                     megaChat.getEmojiDataSet('categories')
@@ -168,7 +165,18 @@ var DropdownEmojiSelector = React.createClass({
                             self.data_emojis = emojis;
                         })
                 ])
-                    .done(function () {
+                    .done(function (results) {
+                        if (
+                            (!results[0] || results[0][1] && results[0][1] === "error") ||
+                            (!results[1] || results[1][1] && results[1][1] === "error")
+                        ) {
+                            if (d) {
+                                console.error("Emoji loading failed.", results);
+                            }
+                            self.setState({'loadFailed': true, 'isLoading': false});
+                            return;
+                        }
+
                         // custom categories order
                         self.data_categories.push('frequently_used');
                         self.data_categoriesWithCustomOrder = []
@@ -320,6 +328,10 @@ var DropdownEmojiSelector = React.createClass({
     _onScrollChanged: function(scrollPositionY, stateObj) {
         var self = this;
 
+        if (!self.data_categoriesWithCustomOrder) {
+            return;
+        }
+        
         if (scrollPositionY === false) {
             scrollPositionY = self.scrollableArea.getScrollPositionY();
         }
@@ -488,7 +500,10 @@ var DropdownEmojiSelector = React.createClass({
         var popupContents = null;
 
         if (self.state.isActive === true) {
-            if (self.state.isLoading === true && !self.data_emojiByCategory) {
+            if (self.state.loadFailed === true) {
+                popupContents = <div className="loading">{l[1514]}</div>;
+            }
+            else if (self.state.isLoading === true && !self.data_emojiByCategory) {
                 popupContents = <div className="loading">{l[5533]}</div>;
             }
             else {
@@ -502,6 +517,7 @@ var DropdownEmojiSelector = React.createClass({
         return <DropdownsUI.Dropdown
             className="popup emoji" {...self.props} ref="dropdown"
             isLoading={self.state.isLoading}
+            loadFailed={self.state.loadFailed}
             visibleCategories={this.state.visibleCategories}
             onActiveChange={(newValue) => {
                 // reset state if the dropdown is hidden

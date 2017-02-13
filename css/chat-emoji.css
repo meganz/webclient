@@ -142,3 +142,6 @@ img.emoji.big {
 .button.square-button.active:after {
     background-color: rgb(255, 051, 058);
 }
+.button.square-button.emoji {
+    cursor: pointer;
+}

@@ -2145,6 +2145,17 @@ function loadSubPage(tpage, event)
     else {
         init_page();
     }
+
+    // Since pushState does not trigger ANY event, we need to trigger one manually.
+    // And because our code had already been made to work properly with 'hashchange', to make it compatible with not
+    // requiring any changes, we simply trigger a fake 'hashchange' event.
+    // NOTE: Typically, some parts of that code, could had been changed to listen for 'resize', however, resize event
+    // handlers, should NEVER do anything CPU/GPU intensive, mean while, 'hashchange' (page changed) ones are ok to do
+    // it. So despite that it may sound like a good idea to replace all hashchange -> resize event handlers, it
+    // would be a very bad idea in terms of the architecture of the webclient
+    if (window.location.toString().indexOf("#") === -1) {
+        $(window).trigger('hashchange');
+    }
 }
 
 

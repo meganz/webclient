@@ -1411,6 +1411,8 @@ React.makeElement = React['createElement'];
 	        self._emojiDataLoading[name].done(function (data) {
 	            self._emojiData[name] = data;
 	            delete self._emojiDataLoading[name];
+	        }).fail(function () {
+	            delete self._emojiDataLoading[name];
 	        });
 
 	        return self._emojiDataLoading[name];
@@ -7493,14 +7495,13 @@ React.makeElement = React['createElement'];
 	    getInitialState: function getInitialState() {
 	        var self = this;
 
-	        window.$emojiDropdown = self;
-
 	        return {
 	            'previewEmoji': null,
 	            'searchValue': '',
 	            'browsingCategory': false,
 	            'isActive': false,
 	            'isLoading': true,
+	            'loadFailed': false,
 	            'visibleCategories': "0"
 	        };
 	    },
@@ -7574,12 +7575,19 @@ React.makeElement = React['createElement'];
 	        }
 	        if (nextState.isActive === true) {
 	            var self = this;
-	            if (nextState.isLoading === true && !nextState.data_categories && !nextState.data_emoijs && !self.loadingPromise) {
+	            if (nextState.isLoading === true && (!self.data_categories || !self.data_emojis)) {
 	                self.loadingPromise = MegaPromise.allDone([megaChat.getEmojiDataSet('categories').done(function (categories) {
 	                    self.data_categories = categories;
 	                }), megaChat.getEmojiDataSet('emojis').done(function (emojis) {
 	                    self.data_emojis = emojis;
-	                })]).done(function () {
+	                })]).done(function (results) {
+	                    if (!results[0] || results[0][1] && results[0][1] === "error" || !results[1] || results[1][1] && results[1][1] === "error") {
+	                        if (d) {
+	                            console.error("Emoji loading failed.", results);
+	                        }
+	                        self.setState({ 'loadFailed': true, 'isLoading': false });
+	                        return;
+	                    }
 
 	                    self.data_categories.push('frequently_used');
 	                    self.data_categoriesWithCustomOrder = [];
@@ -7709,6 +7717,10 @@ React.makeElement = React['createElement'];
 	    },
 	    _onScrollChanged: function _onScrollChanged(scrollPositionY, stateObj) {
 	        var self = this;
+
+	        if (!self.data_categoriesWithCustomOrder) {
+	            return;
+	        }
 
 	        if (scrollPositionY === false) {
 	            scrollPositionY = self.scrollableArea.getScrollPositionY();
@@ -7875,7 +7887,13 @@ React.makeElement = React['createElement'];
 	        var popupContents = null;
 
 	        if (self.state.isActive === true) {
-	            if (self.state.isLoading === true && !self.data_emojiByCategory) {
+	            if (self.state.loadFailed === true) {
+	                popupContents = React.makeElement(
+	                    "div",
+	                    { className: "loading" },
+	                    l[1514]
+	                );
+	            } else if (self.state.isLoading === true && !self.data_emojiByCategory) {
 	                popupContents = React.makeElement(
 	                    "div",
 	                    { className: "loading" },
@@ -7893,6 +7911,7 @@ React.makeElement = React['createElement'];
 	            _extends({
 	                className: "popup emoji" }, self.props, { ref: "dropdown",
 	                isLoading: self.state.isLoading,
+	                loadFailed: self.state.loadFailed,
 	                visibleCategories: this.state.visibleCategories,
 	                onActiveChange: function onActiveChange(newValue) {
 

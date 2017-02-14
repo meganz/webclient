@@ -191,7 +191,6 @@ var DropdownEmojiSelector = React.createClass({
                         var frequentlyUsedEmojisMeta = {};
                         self.data_emojis.forEach(function(emoji) {
                             var cat = emoji.c;
-                            delete emoji.c;
                             if (!self.data_emojiByCategory[cat]) {
                                 self.data_emojiByCategory[cat] = [];
                             }

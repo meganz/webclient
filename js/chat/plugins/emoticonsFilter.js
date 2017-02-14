@@ -171,3 +171,25 @@ EmoticonsFilter.prototype.processOutgoingMessage = function(e, messageObject) {
 
     messageObject.textContents = messageObject.contents = contents;
 };
+
+EmoticonsFilter.prototype.fromUtfToShort = function(s) {
+    var self = this;
+    var cached = {};
+    return s.replace(/[^\x00-\x7F]{1,}/g,function(match, pos) {
+        if (cached[match]) {
+            return ":" + cached[match] + ":";
+        }
+        var found = false;
+        Object.keys(self.map).forEach(function(slug) {
+            var utf = self.map[slug];
+            cached[utf] = slug;
+
+            if (!found && utf === match) {
+                found = slug;
+                return false;
+            }
+        });
+
+        return found ? (":" + found  + ":") : match;
+    });
+};

@@ -797,7 +797,7 @@ function checkUserLogin() {
                     }
                     else {
                         $promise.reject(false);
-                        console.error("Failed to retrieve last interaction cache from attrib, response: ", err);
+                        console.error("Failed to retrieve last interaction cache from attrib, response: ", res);
                     }
                 })
                 .fail(function(res) {

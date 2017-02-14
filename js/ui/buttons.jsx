@@ -31,7 +31,10 @@ var Button = React.createClass({
                 }
             });
 
-            $(window).rebind('hashchange.button' + self.getUniqueId(), function(e) {
+            if (self._pageChangeListener) {
+                mBroadcaster.removeListener(self._pageChangeListener);
+            }
+            mBroadcaster.addListener('pagechange', function() {
                 if (self.state.focused === true) {
                     self.onBlur();
                 }
@@ -104,7 +107,9 @@ var Button = React.createClass({
             $(document).unbind('closeDropdowns.' + this.getUniqueId());
             document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
 
-            $(window).unbind('hashchange.button' + this.getUniqueId());
+            if (this._pageChangeListener) {
+                mBroadcaster.removeListener(this._pageChangeListener);
+            }
             this.forceUpdate();
         }
 

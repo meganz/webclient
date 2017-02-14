@@ -7600,7 +7600,6 @@ React.makeElement = React['createElement'];
 	                    var frequentlyUsedEmojisMeta = {};
 	                    self.data_emojis.forEach(function (emoji) {
 	                        var cat = emoji.c;
-	                        delete emoji.c;
 	                        if (!self.data_emojiByCategory[cat]) {
 	                            self.data_emojiByCategory[cat] = [];
 	                        }
@@ -9106,9 +9105,12 @@ React.makeElement = React['createElement'];
 
 	                var messageDisplayBlock;
 	                if (self.state.editing === true) {
+	                    var msgContents = message.textContents ? message.textContents : message.contents;
+	                    msgContents = megaChat.plugins.emoticonsFilter.fromUtfToShort(msgContents);
+
 	                    messageDisplayBlock = React.makeElement(TypingAreaUI.TypingArea, {
 	                        iconClass: 'small-icon writing-pen textarea-icon',
-	                        initialText: message.textContents ? message.textContents : message.contents,
+	                        initialText: msgContents,
 	                        chatRoom: self.props.message.chatRoom,
 	                        showButtons: true,
 	                        className: 'edit-typing-area',
@@ -9122,7 +9124,11 @@ React.makeElement = React['createElement'];
 
 	                            if (self.props.onEditDone) {
 	                                Soon(function () {
-	                                    self.props.onEditDone(messageContents);
+	                                    var tmpMessageObj = {
+	                                        'contents': messageContents
+	                                    };
+	                                    megaChat.plugins.emoticonsFilter.processOutgoingMessage({}, tmpMessageObj);
+	                                    self.props.onEditDone(tmpMessageObj.contents);
 	                                    self.forceUpdate();
 	                                });
 	                            }

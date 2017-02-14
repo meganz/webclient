@@ -2145,6 +2145,7 @@ function loadSubPage(tpage, event)
     else {
         init_page();
     }
+    mBroadcaster.sendMessage('pagechange');
 }
 
 

@@ -7505,31 +7505,45 @@ function adjustContextMenuPosition(e, m)
     return true;
 }
 
-function reCalcMenuPosition(m, x, y, ico)
-{
+/**
+ * Calculates coordinates where context menu will be shown
+ * @param {Object} m jQuery object of context menu or child class
+ * @param {Number} x Coordinate x of cursor or clicked element
+ * @param {Number} y Coordinate y of cursor or clicked element
+ * @param {Object} ico JSON {x, y} width and height of element clicked on
+ * @returns {Object} Coordinates {x, y} where context menu will be drawn
+ */
+/* jshint -W074 */
+function reCalcMenuPosition(m, x, y, ico) {
+
     var TOP_MARGIN = 12;
     var SIDE_MARGIN = 12;
-    var cmW = m.outerWidth(), cmH = m.outerHeight();// dimensions without margins calculated
-    var wH = window.innerHeight, wW = window.innerWidth;
-    var maxX = wW - SIDE_MARGIN;// max horizontal
-    var maxY = wH - TOP_MARGIN;// max vertical
-    var minX = SIDE_MARGIN + $('div.nw-fm-left-icons-panel').outerWidth();// min horizontal
-    var minY = TOP_MARGIN;// min vertical
-    var wMax = x + cmW;// coordinate of right edge
-    var hMax = y + cmH;// coordinate of bottom edge
+    var cmW = m.outerWidth();// dimensions without margins calculated
+    var cmH = m.outerHeight();// dimensions without margins calculated
+    var wH = window.innerHeight;
+    var wW = window.innerWidth;
+    var maxX = wW - SIDE_MARGIN;// max horizontal coordinate, right side of window
+    var maxY = wH - TOP_MARGIN;// max vertical coordinate, bottom side of window
 
-    var overlapParentMenu = function(n)
-    {
+    // min horizontal coordinate, left side of right panel
+    var minX = SIDE_MARGIN + $('div.nw-fm-left-icons-panel').outerWidth();
+    var minY = TOP_MARGIN;// min vertical coordinate, top side of window
+    var wMax = x + cmW;// coordinate of context menu right edge
+    var hMax = y + cmH;// coordinate of context menu bottom edge
+
+    var top = 'auto';
+    var left = '100%';
+    var right = 'auto';
+
+    var overlapParentMenu = function(n) {
         var tre = wW - wMax;// to right edge
         var tle = x - minX - SIDE_MARGIN;// to left edge
 
-        if (tre >= tle)
-        {
+        if (tre >= tle) {
             n.addClass('overlap-right');
             n.css({'top': top, 'left': (maxX - x - nmW) + 'px'});
         }
-        else
-        {
+        else {
             n.addClass('overlap-left');
             n.css({'top': top, 'right': (wMax - nmW - minX) + 'px'});
         }
@@ -7537,57 +7551,65 @@ function reCalcMenuPosition(m, x, y, ico)
         return;
     };
 
-    // submenus are absolutely positioned, which means that they are relative to first parent, positioned other then static
-    // first parent, which is NOT a .contains-submenu element (it's previous in same level)
-    var horPos = function(n)// used for submenues
-    {
+    /**
+     * Calculates top position of submenu
+     * Submenu is relatively positioned to the first sibling element
+     * @param {Object} n jQuery object, submenu of hovered element
+     * @returns {String} top Top coordinate in pixels for submenu
+     */
+    var horPos = function(n) {
         var top;
         var nTop = parseInt(n.css('padding-top'));
         var tB = parseInt(n.css('border-top-width'));
         var pPos = m.position();
-
         var b = y + nmH - (nTop - tB);// bottom of submenu
         var mP = m.closest('.dropdown.body.submenu');
-        var pT = 0, bT = 0, pE = 0;
-        if (mP.length)
-        {
+        var pT = 0;
+        var bT = 0;
+        var pE = 0;
+
+        if (mP.length) {
             pE = mP.offset();
             pT = parseInt(mP.css('padding-top'));
             bT = parseInt(mP.css('border-top-width'));
         }
-        if (b > maxY)
+        if (b > maxY) {
             top = (maxY - nmH + nTop - tB) - pE.top + 'px';
-        else
+        }
+        else {
             top = pPos.top - tB + 'px';
+        }
 
         return top;
     };
 
-    var dPos;
+    var dPos;// new context menu position
     var cor;// corner, check setBordersRadius for more info
-    if (typeof ico === 'object')// draw context menu relative to file-settings-icon
-    {
+    if (typeof ico === 'object') {// draw context menu relative to file-settings-icon
         cor = 1;
         dPos = {'x': x - 2, 'y': y + ico.y + 8};// position for right-bot
-        if (wMax > maxX)// draw to the left
-        {
+
+        // draw to the left
+        if (wMax > maxX) {
             dPos.x = x - cmW + ico.x + 2;// additional pixels to align with -icon
             cor = 3;
         }
-        if (hMax > maxY)// draw to the top
-        {
-            dPos.y = y - cmH;// additional pixels to align with -icon
+
+        // draw to the top
+        if (hMax > (maxY - TOP_MARGIN)) {
+            dPos.y = y - cmH - 6;
+            if (dPos.y < TOP_MARGIN) {
+                dPos.y = TOP_MARGIN;
+            }
             cor++;
         }
     }
-    else if (ico === 'submenu')// submenues
-    {
+    else if (ico === 'submenu') {// submenues
         var n = m.next('.dropdown.body.submenu');
         var nmW = n.outerWidth();// margin not calculated
         var nmH = n.outerHeight();// margins not calculated
 
-        if (nmH > (maxY - TOP_MARGIN))// Handle huge menu
-        {
+        if (nmH > (maxY - TOP_MARGIN)) {// Handle huge menu
             nmH = maxY - TOP_MARGIN;
             var tmp = document.getElementById('csb_' + m.attr('id').replace('fi_', ''));
             $(tmp).addClass('context-scrolling-block');
@@ -7597,30 +7619,28 @@ function reCalcMenuPosition(m, x, y, ico)
             n.css({'height': nmH + 'px'});
         }
 
-        var top = 'auto', left = '100%', right = 'auto';
-
         top = horPos(n);
-        if (m.parent().parent('.left-position').length === 0)
-        {
-            if (maxX >= (wMax + nmW))
+        if (m.parent().parent('.left-position').length === 0) {
+            if (maxX >= (wMax + nmW)) {
                 left = 'auto', right = '100%';
-            else if (minX <= (x - nmW))
+            }
+            else if (minX <= (x - nmW)) {
                 n.addClass('left-position');
-            else
-            {
+            }
+            else {
                 overlapParentMenu(n);
 
                 return true;
             }
         }
-        else
-        {
-            if (minX <= (x - nmW))
+        else {
+            if (minX <= (x - nmW)) {
                 n.addClass('left-position');
-            else if (maxX >= (wMax + nmW))
+            }
+            else if (maxX >= (wMax + nmW)) {
                 left = 'auto', right = '100%';
-            else
-            {
+            }
+            else {
                 overlapParentMenu(n);
 
                 return true;
@@ -7629,22 +7649,26 @@ function reCalcMenuPosition(m, x, y, ico)
 
         return {'top': top, 'left': left, 'right': right};
     }
-    else// right click
-    {
+    else {// right click
         cor = 0;
         dPos = {'x': x, 'y': y};
-        if (x < minX)
+        if (x < minX) {
             dPos.x = minX;// left side alignment
-        if (wMax > maxX)
-            dPos.x = maxX - cmW;// align with right side, 12px from it
-        if (hMax > maxY)
-            dPos.y = maxY - cmH;// align with bottom, 12px from it
+        }
+        if (wMax > maxX) {
+            dPos.x = maxX - cmW;// align with right side
+        }
+
+        if (hMax > maxY) {
+            dPos.y = maxY - cmH;// align with bottom
+        }
     }
 
     setBordersRadius(m, cor);
 
     return {'x': dPos.x, 'y': dPos.y};
 }
+/* jshint -W074 */
 
 // corner position 0 means default
 function setBordersRadius(m, c)
@@ -7687,30 +7711,25 @@ function setBordersRadius(m, c)
 }
 
 // Scroll menus which height is bigger then window.height
-function scrollMegaSubMenu(e)
-{
+function scrollMegaSubMenu(e) {
     var ey = e.pageY;
     var c = $(e.target).closest('.dropdown.body.submenu');
     var pNode = c.children(':first')[0];
 
-    if (typeof pNode !== 'undefined')
-    {
+    if (typeof pNode !== 'undefined') {
         var h = pNode.offsetHeight;
         var dy = h * 0.1;// 10% dead zone at the begining and at the bottom
         var pos = getHtmlElemPos(pNode, true);
         var py = (ey - pos.y - dy) / (h - dy * 2);
-        if (py > 1)
-        {
+        if (py > 1) {
             py = 1;
             c.children('.context-bottom-arrow').addClass('disabled');
         }
-        else if (py < 0)
-        {
+        else if (py < 0) {
             py = 0;
             c.children('.context-top-arrow').addClass('disabled');
         }
-        else
-        {
+        else {
             c.children('.context-bottom-arrow,.context-top-arrow').removeClass('disabled');
         }
         pNode.scrollTop = py * (pNode.scrollHeight - h);

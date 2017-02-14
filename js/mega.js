@@ -1616,7 +1616,6 @@ function MegaData()
             }
             else {
                 if (window.location.pathname !== "/"+newHashLocation && !pfid) {
-                    history.pushState({ fmpage: newHashLocation }, "", "/"+newHashLocation);
                     loadSubPage(newHashLocation);
                 }
                 else if (pfid && document.location.hash !== '#'+newHashLocation) {

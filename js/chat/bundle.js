@@ -7566,6 +7566,8 @@ React.makeElement = React['createElement'];
 	        );
 	    },
 	    componentWillUpdate: function componentWillUpdate(nextProps, nextState) {
+	        window.$emojiDropdown = this;
+
 	        if (nextState.searchValue !== this.state.searchValue || nextState.browsingCategories !== this.state.browsingCategories) {
 	            this._cachedNodes = {};
 	            if (this.scrollableArea) {
@@ -7575,7 +7577,7 @@ React.makeElement = React['createElement'];
 	        }
 	        if (nextState.isActive === true) {
 	            var self = this;
-	            if (nextState.isLoading === true && (!self.data_categories || !self.data_emojis)) {
+	            if (nextState.isLoading === true || !self.loadingPromise && (!self.data_categories || !self.data_emojis)) {
 	                self.loadingPromise = MegaPromise.allDone([megaChat.getEmojiDataSet('categories').done(function (categories) {
 	                    self.data_categories = categories;
 	                }), megaChat.getEmojiDataSet('emojis').done(function (emojis) {
@@ -7629,6 +7631,19 @@ React.makeElement = React['createElement'];
 	                    self.setState({ 'isLoading': false });
 	                });
 	            }
+	        } else if (nextState.isActive === false) {
+	            var self = this;
+
+	            if (self.data_emojis) {
+
+	                self.data_emojis.forEach(function (emoji) {
+	                    delete emoji.element;
+	                });
+	            }
+	            self.data_emojis = null;
+	            self.data_categories = null;
+	            self.data_emojiByCategory = null;
+	            self.loadingPromise = null;
 	        }
 	    },
 	    onSearchChange: function onSearchChange(e) {

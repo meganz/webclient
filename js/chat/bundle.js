@@ -11068,7 +11068,11 @@ React.makeElement = React['createElement'];
 	};
 
 	ChatRoom.prototype.setActive = function () {
-	    loadSubPage(this.getRoomUrl());
+
+	    var self = this;
+	    Soon(function () {
+	        loadSubPage(self.getRoomUrl());
+	    });
 	};
 
 	ChatRoom.prototype.getRoomUrl = function () {

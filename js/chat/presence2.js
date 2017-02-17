@@ -1,6 +1,7 @@
 // presenced client layer
 
-// presence = new UserPresence(u_handle, can_webrtc, can_mobilepush, connectedcb, peerpresencecb, savesettingscb, updateuicb)
+// presence = new UserPresence(u_handle, can_webrtc, can_mobilepush, connectedcb, peerpresencecb, savesettingscb,
+// updateuicb)
 
 // *** capability flags (identifying static client properties):
 
@@ -21,7 +22,8 @@
 
 // presence.ui_setautoaway(timeout)
 // (call this when the user changes the auto-away setting)
-// timeout in seconds (max. 16777214), -1 means "always online" (checkmark not set), 0 means "always away" (timeout field empty)
+// timeout in seconds (max. 16777214), -1 means "always online" (checkmark not set), 0 means "always away" (timeout
+// field empty)
 
 // presence.ui_setpersist(active)
 // (call this when the user checks/unchecks the persist-if-offline setting)
@@ -252,11 +254,11 @@ UserPresence.prototype.reconnect = function presence_reconnect(self) {
                 this.up.retrytimeout = 0;
                 this.up.open = true;
 
-                this.up.connectedcb(true);
-
                 // reinitialise remote state
                 // HELLO version 1 with fixed client capability flags
                 this.up.sendstring("\1\1" + this.up.capabilities);
+
+                this.up.connectedcb(true);
 
                 // only update override if user made a change that is not yet confirmed
                 if (this.up.overridechanged) {
@@ -299,6 +301,7 @@ UserPresence.prototype.reconnect = function presence_reconnect(self) {
         };
 
         self.s.onerror = function () {
+            self.logger.error("websocket closed - error:", arguments);
             $(self).trigger('onDisconnected');
 
             if (self.keepalivesendtimer) {
@@ -575,6 +578,7 @@ UserPresence.prototype.ui_setautoaway = function presence_ui_setautoaway(timeout
 UserPresence.prototype.ui_setpersist = function presence_ui_setpersist(persist) {
     if (persist != this.persist) {
         this.persist = persist;
+        this.autoawaytimeout = -1;
 
         if (!persist) {
             // translate current UI status to non-persistent settings
@@ -653,7 +657,7 @@ UserPresence.prototype.ui_settings = function presence_ui_settings(settings) {
     }
 };
 
-if (localStorage.presencedDebug) {
+if (true /* intentional: until we get this to be a bit more stable */ || localStorage.presencedDebug) {
     Object.keys(UserPresence.prototype).forEach(function(fn) {
         var origFn = UserPresence.prototype[fn];
         UserPresence.prototype[fn] = function() {

@@ -783,6 +783,15 @@ function uaPacketParser(attrName, userHandle, ownActionPacket, version) {
                 delete pubEd25519[userHandle];
                 crypt.getPubEd25519(userHandle);
             }
+            else if (attrName === '*!pr') {
+                // Presence settings were updated.
+                if (
+                    typeof(megaChat) !== 'undefined' &&
+                    typeof(megaChat.plugins.presencedIntegration) !== 'undefined'
+                ) {
+                    megaChat.plugins.presencedIntegration._updateSettingsFromAttribute();
+                }
+            }
             else if (
                 (attrName.substr(0, 2) === '+!' || attrName.substr(0, 2) === '^!') &&
                 attribCache.bitMapsManager.exists(attrName.substr(2))

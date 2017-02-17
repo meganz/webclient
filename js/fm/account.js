@@ -4,12 +4,16 @@ accountUI.initCheckbox = function(className, $container, currentValue, onChangeC
 
     $wrapperDiv.rebind('click.checkbox', function() {
         if ($input.hasClass('checkboxOn')) {
-            accountUI.initCheckbox.uncheck($input, $wrapperDiv);
-            onChangeCb(false);
+            var res = onChangeCb(false);
+            if (res !== false) {
+                accountUI.initCheckbox.uncheck($input, $wrapperDiv);
+            }
         }
         else {
-            accountUI.initCheckbox.check($input, $wrapperDiv);
-            onChangeCb(true);
+            var res = onChangeCb(true);
+            if (res !== false) {
+                accountUI.initCheckbox.check($input, $wrapperDiv);
+            }
         }
     });
     if (currentValue === true || currentValue === 1) {
@@ -78,6 +82,9 @@ accountUI.advancedSection = function() {
                 _initPresenceRadio(presence);
             }
         });
+        $(presenceInt).rebind('settingsUIUpdated.settings', function(e, autoawaytimeout, persist) {
+            accountUI.advancedSection();
+        });
         $(presenceInt.userPresence).rebind('onDisconnected.settings', function(e) {
             _initPresenceRadio(UserPresence.PRESENCE.OFFLINE);
         });
@@ -85,8 +92,21 @@ accountUI.advancedSection = function() {
 
     _initPresenceRadio(presenceInt.getPresence(u_handle));
 
-    accountUI.initCheckbox('autoaway', $sectionContainerChat, presenceInt.getAutoaway() !== false, function(newVal) {
+    var persistChangeRequestedHandler = function(newVal) {
 
+        if (newVal !== true) {
+            presenceInt.setPersistOff();
+        }
+        else {
+            presenceInt.setPersistOn();
+
+            if (presenceInt.getAutoaway() !== false) {
+                autoawayChangeRequestHandler(false);
+            }
+        }
+    };
+
+    var autoawayChangeRequestHandler = function(newVal) {
         if (newVal !== true) {
             $('input#autoaway', $sectionContainerChat).attr('disabled', 1).addClass('disabled');
             presenceInt.setAutoawayOff();
@@ -94,25 +114,35 @@ accountUI.advancedSection = function() {
         else {
             $('input#autoaway', $sectionContainerChat).removeAttr('disabled').removeClass('disabled');
             presenceInt.setAutoaway($('input#autoaway', $sectionContainerChat).val());
+            persistChangeRequestedHandler(false);
         }
-    });
+    };
 
-    accountUI.initCheckbox('persist-presence', $sectionContainerChat, presenceInt.getPersist(), function(newVal) {
+    accountUI.initCheckbox(
+        'persist-presence',
+        $sectionContainerChat,
+        presenceInt.getPersist(),
+        persistChangeRequestedHandler
+    );
 
-        if (newVal !== true) {
-            presenceInt.setPersistOff();
-        }
-        else {
-            $('input#autoaway', $sectionContainerChat).removeAttr('disabled').removeClass('disabled');
-            presenceInt.setPersistOn();
-        }
-    });
+    accountUI.initCheckbox(
+        'autoaway',
+        $sectionContainerChat,
+        presenceInt.getAutoaway() !== false,
+        autoawayChangeRequestHandler
+    );
+
+
 
     if (presenceInt.getAutoaway() === false) {
         $('input#autoaway', $sectionContainerChat).attr('disabled', 1).addClass('disabled');
     }
+    else {
+        $('input#autoaway', $sectionContainerChat).removeAttr('disabled').removeClass('disabled');
+    }
 
-    var lastValidNumber = 15;
+
+    var lastValidNumber = presenceInt.getAutoaway() ? presenceInt.getAutoaway() : 5;
     $('input#autoaway', $sectionContainerChat)
         .rebind('change.dashboard', function() {
             var val = parseInt($(this).val());
@@ -127,5 +157,5 @@ accountUI.advancedSection = function() {
                 presenceInt.setAutoaway(lastValidNumber);
             });
         })
-        .val(presenceInt.getAutoaway() ? presenceInt.getAutoaway() : lastValidNumber);
+        .val(lastValidNumber);
 };

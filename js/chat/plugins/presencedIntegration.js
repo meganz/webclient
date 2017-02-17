@@ -121,19 +121,7 @@ PresencedIntegration.prototype.init = function() {
         false,
         function presencedIntegration_connectedcb(isConnected) {
             self.logger.debug(isConnected ? "connected" : "disconnected");
-            mega.attr.get(u_handle, 'pr', false, true)
-                .done(function(val) {
-                    self.userPresence.ui_settings(val[0]);
-                })
-                .fail(function(err) {
-                    if (err === -9) {
-                        self.userPresence.ui_setautoaway(15 * 60);
-                        self.userPresence.ui_setpersist(false);
-                    }
-                    else {
-                        self.logger.error("Retrieving of 'pr' attribute failed: ", err);
-                    }
-                });
+            self._updateSettingsFromAttribute();
         },
         self._peerstatuscb.bind(self),
         function(str) {
@@ -237,6 +225,15 @@ PresencedIntegration.prototype._updateuicb = function presencedIntegration_updat
             megaChat.karere.setPresence(targetKarerePresence);
         }
     }
+
+    if (self.getAutoaway()) {
+        self._initAutoawayEvents();
+    }
+    else {
+        self._destroyAutoawayEvents();
+    }
+
+    $(self).trigger('settingsUIUpdated', [autoawaytimeout, persist]);
 
     $(self).trigger(
         'onPeerStatus',
@@ -388,9 +385,11 @@ PresencedIntegration.prototype._savepresencecb = function(str) {
 }
 PresencedIntegration.prototype.setAutoaway = function(minutes) {
     var s = minutes * 60;
+    this._initAutoawayEvents();
     this.userPresence.ui_setautoaway(s);
 };
 PresencedIntegration.prototype.setAutoawayOff = function() {
+    this._destroyAutoawayEvents();
     this.userPresence.ui_setautoaway(-1);
 };
 
@@ -412,4 +411,38 @@ PresencedIntegration.prototype.setPersistOff = function() {
 
 PresencedIntegration.prototype.getPersist = function() {
     return this.userPresence.persist;
+};
+
+PresencedIntegration.prototype._updateSettingsFromAttribute = function() {
+    var self = this;
+    mega.attr.get(u_handle, 'pr', false, true)
+        .done(function(val) {
+            self.userPresence.ui_settings(val[0]);
+        })
+        .fail(function(err) {
+            if (err === -9) {
+                self.userPresence.ui_setautoaway(15 * 60);
+                self.userPresence.ui_setpersist(false);
+            }
+            else {
+                self.logger.error("Retrieving of 'pr' attribute failed: ", err);
+            }
+        });
+};
+
+PresencedIntegration.prototype._initAutoawayEvents = function() {
+    console.error("presencedInt._initAutoawayEvents");
+
+    var self = this;
+    $(document.body).rebind('mousemove.presencedInt keypress.presencedInt', function() {
+        delay('ui_signalactivity', function() {
+            self.userPresence.ui_signalactivity();
+        }, 1000);
+    });
+};
+PresencedIntegration.prototype._destroyAutoawayEvents = function() {
+    console.error("presencedInt._desotryAutoawayEvnts");
+
+    $(document.body).unbind('mousemove.presencedInt');
+    $(document.body).unbind('keypress.presencedInt');
 };

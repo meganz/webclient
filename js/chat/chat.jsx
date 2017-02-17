@@ -344,6 +344,9 @@ Chat.prototype.init = function() {
         // update M.u
         var contact = self.getContactFromJid(eventObject.getFromJid());
 
+        if (!contact) {
+            return;
+        }
         console.error(
             "karere.onPresence",
             contact.u,

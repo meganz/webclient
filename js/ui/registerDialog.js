@@ -180,7 +180,7 @@
                             else {
                                 loadingDialog.hide();
                                 u_type = r;
-                                document.location.hash = 'fm'; // TODO: fixme
+                                loadSubPage('fm');
                             }
                         }
                     };

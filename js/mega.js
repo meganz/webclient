@@ -562,6 +562,7 @@ function MegaData()
     this.doSort = function(n, d) {
         $('.grid-table-header .arrow').removeClass('asc desc');
 
+        n = String(n).replace(/\W/g, '');
         if (d > 0) {
             $('.arrow.' + n).addClass('desc');
         }
@@ -888,7 +889,7 @@ function MegaData()
 
             var e = $('.fm-chat-user-status.' + u.u);
             if (e.length > 0) {
-                $(e).html(this.onlineStatusClass(status)[0]);
+                $(e).safeHTML(this.onlineStatusClass(status)[0]);
             }
 
             if (
@@ -1517,8 +1518,8 @@ function MegaData()
                 viewmode = fmconfig.viewmodes[id];
             }
             else {
-                for (var i in M.v) {
-                    if (is_image(M.v[i])) {
+                for (var i = this.v.length; i--;) {
+                    if (is_image(this.v[i])) {
                         viewmode = 1;
                         break;
                     }
@@ -1617,12 +1618,12 @@ function MegaData()
             }
             else {
                 if (window.location.pathname !== "/"+newHashLocation && !pfid) {
-                    history.pushState({ fmpage: newHashLocation }, "", "/"+newHashLocation);
+                    loadSubPage(newHashLocation);
                 }
                 else if (pfid && document.location.hash !== '#'+newHashLocation) {
                     history.pushState({ fmpage: newHashLocation }, "", "#"+newHashLocation);
+                    page = newHashLocation;
                 }
-                page = newHashLocation;
             }
         }
         catch (ex) {
@@ -1715,7 +1716,7 @@ function MegaData()
                     + onlinestatus[1] + '" id="contact_' + htmlentities(activeContacts[i].u)
                     + '"><div class="nw-contact-status"></div><div class="nw-contact-name">'
                     + htmlentities(name)
-                    + ' <a href="#" class="button start-chat-button"><span></span></a></div></div>';
+                    + ' <a class="button start-chat-button"><span></span></a></div></div>';
                 }
                 $('.fm-start-chat-dropdown').addClass('hidden');
             }
@@ -2350,7 +2351,8 @@ function MegaData()
 
     this.pathLength = function()
     {
-        var length = $('.fm-breadcrumbs-block:visible').outerWidth() + $('.fm-header-buttons:visible').outerWidth();
+        var length = $('.fm-right-header .fm-breadcrumbs-block:visible').outerWidth()
+            + $('.fm-right-header .fm-header-buttons:visible').outerWidth();
         return length;
     };
 
@@ -2426,90 +2428,94 @@ function MegaData()
 
         if (this.currentdirid && this.currentdirid.substr(0, 5) === 'chat/') {
             var contactName = $('a.fm-tree-folder.contact.lightactive span.contact-name').text();
-            $('.fm-breadcrumbs-block').safeHTML('<a class="fm-breadcrumbs contacts has-next-button" id="path_contacts">'
-                                                + '<span class="right-arrow-bg">'
-                                                    + '<span>Contacts</span>'
-                                                + '</span></a>'
-                                            + '<a class="fm-breadcrumbs chat" id="path_'
-                                            + htmlentities(M.currentdirid.replace("chat/", "")) + '">'
-                                                + '<span class="right-arrow-bg">'
-                                                    + '<span>' + htmlentities(contactName) + '</span>'
-                                                + '</span>'
-                                            + '</a>');
+            $('.fm-right-header .fm-breadcrumbs-block').safeHTML(
+                '<a class="fm-breadcrumbs contacts has-next-button" id="path_contacts">'
+                  + '<span class="right-arrow-bg">'
+                      + '<span>Contacts</span>'
+                  + '</span></a>'
+              + '<a class="fm-breadcrumbs chat" id="path_'
+              + htmlentities(M.currentdirid.replace("chat/", "")) + '">'
+                  + '<span class="right-arrow-bg">'
+                      + '<span>' + htmlentities(contactName) + '</span>'
+                  + '</span>'
+              + '</a>');
             $('.search-files-result').addClass('hidden');
         }
         else if (this.currentdirid && this.currentdirid.substr(0, 7) === 'search/') {
-            $('.fm-breadcrumbs-block').safeHTML('<a class="fm-breadcrumbs search ui-droppable" id="'
-                                            + htmlentities(a2[i]) + '">'
-                                                + '<span class="right-arrow-bg ui-draggable">'
-                                                    + '<span>' + htmlentities(this.currentdirid.replace('search/', ''))
-                                                    + '</span>'
-                                                + '</span>'
-                                            + '</a>');
+            $('.fm-right-header .fm-breadcrumbs-block').safeHTML(
+                '<a class="fm-breadcrumbs search ui-droppable" id="'
+                    + htmlentities(a2[i]) + '">'
+                        + '<span class="right-arrow-bg ui-draggable">'
+                            + '<span>' + htmlentities(this.currentdirid.replace('search/', ''))
+                            + '</span>'
+                        + '</span>'
+                    + '</a>');
             $('.search-files-result .search-number').text(M.v.length);
             $('.search-files-result').removeClass('hidden');
             $('.search-files-result').addClass('last-button');
         }
         else if (this.currentdirid && this.currentdirid === 'opc') {
             DEBUG('Render Path OPC');
-            $('.fm-breadcrumbs-block').html(contactBreadcrumb + html);
+            $('.fm-right-header .fm-breadcrumbs-block').html(contactBreadcrumb + html);
         }
         else if (this.currentdirid && this.currentdirid === 'ipc') {
             DEBUG('Render Path IPC');
-            $('.fm-breadcrumbs-block').html(contactBreadcrumb + html);
+            $('.fm-right-header .fm-breadcrumbs-block').html(contactBreadcrumb + html);
         }
         else {
             $('.search-files-result').addClass('hidden');
-            $('.fm-breadcrumbs-block').html(html);
+            $('.fm-right-header .fm-breadcrumbs-block').html(html);
         }
 
-        $('.fm-new-folder span').text(l[68]);
-        $('.fm-file-upload span').text(l[99]);
-        $('.fm-folder-upload span').text(l[98]);
+        // Resizing breadcrumbs items
+        function breadcrumbsResize() {
+            var $fmHeader = $('.fm-right-header:visible');
+            var headerWidth = $fmHeader.outerWidth();
 
-        var headerWidth = $('.fm-right-header:visible').outerWidth();
+            $fmHeader.removeClass('long-path short-foldernames');
+            if (M.pathLength() > headerWidth) {
+                $fmHeader.addClass('long-path');
+            }
 
-        $('.fm-right-header:visible').removeClass('long-path short-foldernames');
-        if (M.pathLength() > headerWidth) {
-            $('.fm-right-header:visible').addClass('long-path');
-            $('.fm-new-folder span').text('');
-            $('.fm-file-upload span').text('');
-            $('.fm-folder-upload span').text('');
-        }
+            var $el = $fmHeader.find('.fm-breadcrumbs-block:visible .right-arrow-bg');
+            var i = 0;
+            var j = 0;
+            $el.removeClass('short-foldername ultra-short-foldername');
 
-        var el = $('.fm-breadcrumbs-block:visible .right-arrow-bg');
-        var i = 0;
-        var j = 0;
-        headerWidth = $('.fm-right-header:visible').outerWidth();
-
-        while (M.pathLength() > headerWidth) {
-            if (i < el.length - 1) {
-                $(el[i]).addClass('short-foldername');
-                i++;
-            } else if (j < el.length - 1) {
-                $(el[j]).html('');
-                j++;
-            } else if (!$(el[j]).hasClass('short-foldername')) {
-                $(el[j]).addClass('short-foldername');
-            } else {
-                $(el[j]).html('');
-                break;
+            while (M.pathLength() > headerWidth) {
+                if (i < $el.length - 1) {
+                    $($el[i]).addClass('short-foldername');
+                    i++;
+                } else if (j < $el.length - 1) {
+                    $($el[j]).addClass('ultra-short-foldername');
+                    j++;
+                } else if (!$($el[j]).hasClass('short-foldername')) {
+                    $($el[j]).addClass('short-foldername');
+                } else {
+                    $($el[j]).addClass('ultra-short-foldername');
+                    break;
+                }
             }
         }
 
-        if ($('.fm-breadcrumbs-block .fm-breadcrumbs').length > 1) {
-            $('.fm-breadcrumbs-block').removeClass('deactivated');
+        breadcrumbsResize();
+        $(window).bind('resize.fmbreadcrumbs', function() {
+            breadcrumbsResize();
+        });
+
+        if ($('.fm-right-header .fm-breadcrumbs-block .fm-breadcrumbs').length > 1) {
+            $('.fm-right-header .fm-breadcrumbs-block').removeClass('deactivated');
         }
         else {
-            $('.fm-breadcrumbs-block').addClass('deactivated');
+            $('.fm-right-header .fm-breadcrumbs-block').addClass('deactivated');
         }
 
-        $('.fm-breadcrumbs-block a').unbind('click');
-        $('.fm-breadcrumbs-block a').bind('click', function() {
+        $('.fm-right-header .fm-breadcrumbs-block a').unbind('click');
+        $('.fm-right-header .fm-breadcrumbs-block a').bind('click', function() {
             var crumbId = $(this).attr('id');
 
             // When NOT deactivated
-            if (!$('.fm-breadcrumbs-block').hasClass('deactivated')) {
+            if (!$('.fm-right-header .fm-breadcrumbs-block').hasClass('deactivated')) {
                 if (crumbId === 'path_opc' || crumbId === 'path_ipc') {
                     return false;
                 }
@@ -2992,8 +2998,8 @@ function MegaData()
                     gridUI();
                 }
             }
-            delay(treeUI);
-            delay(fmtopUI);
+            fmtopUI();
+            onIdle(treeUI);
         };
 
         var apiReq = function(handle) {
@@ -3821,7 +3827,7 @@ function MegaData()
                         if (k !== false) crypto_setsharekey(n.h, k, ignoreDB);
                     }
 
-                    M.c.shares[n.h] = { su: n.su, r: n.r };
+                    M.c.shares[n.h] = { su: n.su, r: n.r, t: n.h };
 
                     if (u_sharekeys[n.h]) {
                         M.c.shares[n.h].sk = a32_to_base64(u_sharekeys[n.h][0]);
@@ -4197,7 +4203,7 @@ function MegaData()
             this.su[s.u][h] = 1;
         }
         else if (d) {
-            console.log('nodeShare failed for node:', h, s, ignoreDB);
+            console.warn('nodeShare failed for node:', h, s, ignoreDB);
         }
     };
 
@@ -5455,7 +5461,7 @@ function MegaData()
                     hideMEGAsyncDialog();
 
                     if (!syncData) {
-                        location.hash = '#sync';
+                        loadSubPage('sync');
                     }
                     // if the user is running MEGAsync 3.0+
                     else if (!syncData.verNotMeet) {
@@ -5768,7 +5774,7 @@ function MegaData()
     this.transferFromMegaCoNz = function()
     {
         // Get site transfer data from after the hash in the URL
-        var urlParts = /#sitetransfer!(.*)/.exec(window.location);
+        var urlParts = /sitetransfer!(.*)/.exec(window.location);
 
         if (urlParts) {
 
@@ -5786,7 +5792,7 @@ function MegaData()
                 // If the user is already logged in here with the same account
                 // we can avoid a lot and just take them to the correct page
                 if (JSON.stringify(u_k) === JSON.stringify(urlParts[0])) {
-                    window.location.hash = urlParts[2];
+                    loadSubPage(urlParts[2]);
                     return false;
                 }
 
@@ -5794,11 +5800,11 @@ function MegaData()
                 // hash they came from e.g. a folder link may not be valid for this account so just load the file manager.
                 else if (u_k && (JSON.stringify(u_k) !== JSON.stringify(urlParts[0]))) {
                     if (!urlParts[2] || String(urlParts[2]).match(/^fm/)) {
-                        window.location.hash = 'fm';
+                        loadSubPage('fm');
                         return false;
                     }
                     else {
-                        window.location.hash = urlParts[2];
+                        loadSubPage(urlParts[2]);
                         return false;
                     }
                 }
@@ -5822,8 +5828,8 @@ function MegaData()
 
                 var _goToPage = function() {
                     loadingDialog.hide();
-                    window.location.hash = toPage;
-                }
+                    loadSubPage(toPage);
+                };
 
                 var _rawXHR = function(url, data, callback) {
                     mega.utils.xhr(url, JSON.stringify([data]))
@@ -6155,34 +6161,54 @@ var nodesinflight = {};  // number of nodes being processed in the worker for sc
 // enqueue parsed actionpacket
 function sc_packet(a) {
     if ((a.a == 's' || a.a == 's2') && a.k) {
+        /**
+         * There are two occasions where `crypto_process_sharekey()` must not be called:
+         *
+         * 1. `a.k` is symmetric (AES), `a.u` is set and `a.u != u_handle`
+         *    (because the resulting sharekey would be rubbish)
+         *
+         * 2. `a.k` is asymmetric (RSA), `a.u` is set and `a.u != u_handle`
+         *    (because we either get a rubbish sharekey or an RSA exception from asmcrypto)
+         */
+        var prockey = false;
+
         if (a.k.length > 43) {
-            if (a.u === u_handle) {
+            if (!a.u || a.u === u_handle) {
                 // RSA-keyed share command targeted to u_handle: run through worker
-                rsasharekeys[a.n] = true;
+                prockey = !a.o || a.o !== u_handle;
 
-                if (workers) {
-                    a.scqi = scqhead++;     // set scq slot number
-
-                    var p = a.scqi % workers.length;
-
-                    // pin the nodes of this share to the same worker
-                    // (it is the only one that knows the sharekey)
-                    shareworker[a.n] = p;
-
-                    workers[p].postMessage(a);
-                    return;
+                if (prockey) {
+                    rsasharekeys[a.n] = true;
                 }
             }
         }
         else {
-            if (!a.o || a.o === u_handle) {
-                var k = crypto_process_sharekey(a.n, a.k);
+            prockey = (!a.o || a.o === u_handle);
+        }
 
-                if (k !== false) {
-                    a.k = k;
-                    crypto_setsharekey(a.n, k, true);
-                }
-                else console.log("Failed to decrypt RSA share key for " + a.n + ": " + a.k);
+        if (prockey) {
+            if (workers && rsasharekeys[a.n]) {
+                // set scq slot number
+                a.scqi = scqhead++;
+
+                var p = a.scqi % workers.length;
+
+                // pin the nodes of this share to the same worker
+                // (it is the only one that knows the sharekey)
+                shareworker[a.n] = p;
+
+                workers[p].postMessage(a);
+                return;
+            }
+
+            var k = crypto_process_sharekey(a.n, a.k);
+
+            if (k !== false) {
+                a.k = k;
+                crypto_setsharekey(a.n, k, true);
+            }
+            else {
+                console.warn("Failed to decrypt RSA share key for " + a.n + ": " + a.k);
             }
         }
     }
@@ -6596,10 +6622,6 @@ function execsc() {
                                         n.su = a.o;
                                         M.nodeUpdated(n);
 
-                                        scinshare.skip = true;
-                                    }
-                                    else if (!Array.isArray(a.k)) {
-                                        srvlog('Skipping share action-packet with invalid key.');
                                         scinshare.skip = true;
                                     }
                                     else {
@@ -7082,6 +7104,10 @@ function initworkerpool() {
             break;
         }
     }
+
+    if (d) {
+        console.debug('initworkerpool', workerURL, workers && workers.length);
+    }
 }
 
 // queue a DB invalidation-plus-reload request to the FMDB subsystem
@@ -7363,7 +7389,7 @@ function worker_procmsg(ev) {
         else {
             // maintain special incoming shares index
             if (ev.data.su) {
-                M.c.shares[ev.data.h] = { su : ev.data.su, r : ev.data.r };
+                M.c.shares[ev.data.h] = { su : ev.data.su, r : ev.data.r, t: ev.data.h };
 
                 if (u_sharekeys[ev.data.h]) {
                     M.c.shares[ev.data.h].sk = u_sharekeys[ev.data.h][0];
@@ -7400,7 +7426,7 @@ function worker_procmsg(ev) {
         if (d) console.log("Worker done, " + dumpsremaining + " remaining");
 
         if (ev.data.sharekeys) {
-            for (var h in ev.data.sharekeys) {
+            for (h in ev.data.sharekeys) {
                 crypto_setsharekey(h, ev.data.sharekeys[h]);
             }
         }
@@ -7410,8 +7436,10 @@ function worker_procmsg(ev) {
             for (h in M.c.shares) {
                 if (u_sharekeys[h]) M.c.shares[h].sk = a32_to_base64(u_sharekeys[h][0]);
 
-                if (fmdb) fmdb.add('s', { o_t : M.c.shares[h].su + '*' + h,
+                if (fmdb) {
+                    fmdb.add('s', { o_t : M.c.shares[h].su + '*' + h,
                                           d : M.c.shares[h] });
+                }
             }
 
             loadfm_callback(residualfm);
@@ -7617,7 +7645,7 @@ function dbfetchfm() {
 
                     fmdb.get('s', function(r){
                         for (i = r.length; i--; ) {
-                            if (r[i].o.length == 11) {
+                            if (r[i].su) {
                                 // this is an inbound share
                                 M.c.shares[r[i].t] = r[i];
                                 if (r[i].sk) {
@@ -7665,7 +7693,7 @@ function dbfetchfm() {
     });
 }
 
-function RightsbyID(id) {
+function rightsById(id) {
 
     if (folderlink || (id && id.length > 8)) {
         return false;
@@ -7777,7 +7805,7 @@ function ddtype(ids, toid, alt) {
             // to a contact, always allow a copy (inbox drop)
             r = 'copy';
         }
-        else if (totype == 'shares' && RightsbyID(toid)) {
+        else if (totype === 'shares' && rightsById(toid)) {
             if (fromtype == 'shares') {
                 if (sharer(fromid) === sharer(toid)) {
                     if (isCircular(fromid, toid)) {
@@ -7785,7 +7813,7 @@ function ddtype(ids, toid, alt) {
                         return false;
                     }
 
-                    r = (RightsbyID(fromid) > 1) ? 'move' : 'copy';
+                    r = (rightsById(fromid) > 1) ? 'move' : 'copy';
                 }
                 else {
                     r = 'copy';
@@ -8442,7 +8470,14 @@ function processPS(pendingShares, ignoreDB) {
                 M.delPS(pendingContactId, nodeHandle);
 
                 if (ps.op) {
-                    M.nodeShare(nodeHandle, ps);
+                    M.nodeShare(nodeHandle, {
+                        h: ps.n,
+                        o: ps.n,
+                        p: ps.p,
+                        u: ps.u,
+                        r: ps.r,
+                        ts: ps.ts
+                    });
                 }
 
                 if (M.opc && M.opc[ps.p]) {
@@ -8651,7 +8686,7 @@ function folderreqerr()
 
     msgDialog('warninga', l[1043], l[1044] + '<ul><li>' + l[1045] + '</li><li>' + l[247] + '</li><li>' + l[1046] + '</li>', false, function()
     {
-        location.hash = '#login'; // if the user is logged-in, he'll be redirected to the cloud
+        loadSubPage('login'); // if the user is logged-in, he'll be redirected to the cloud
 
         // FIXME: no location.reload() should be needed..
         location.reload();
@@ -8771,7 +8806,7 @@ function loadfm_callback(res) {
 
             return mKeyDialog(pfid, true, true)
                 .fail(function() {
-                    location.hash = 'start';
+                    loadSubPage('start');
                 });
         }
 
@@ -8901,6 +8936,9 @@ function loadfm_done(mDBload) {
         if (hideLoadingDialog) {
             loadingDialog.hide();
             loadingInitDialog.hide();
+            // Reposition UI elements right after hiding the loading overlay,
+            // without waiting for the lazy $.tresizer() triggered by MegaRender
+            fm_resize_handler(true);
         }
 
         // -0x800e0fff indicates a call to loadfm() when it was already loaded
@@ -9152,8 +9190,8 @@ Object.defineProperty(mega, 'achievem', {
                 this.rebind('click', function() {
                     if (action) {
                         switch (action[0]) {
-                            case '#':
-                                location.hash = action;
+                            case '/':
+                                loadSubPage(action);
                                 break;
 
                             case '~':
@@ -9288,14 +9326,14 @@ Object.defineProperty(mega, 'achievem', {
 
 (function(o) {
     var map = {
-        /*  1 */ 'WELCOME':     'ach-create-account:#register',
+        /*  1 */ 'WELCOME':     'ach-create-account:/register',
         /*  2 */ 'TOUR':        'ach-take-tour',
         /*  3 */ 'INVITE':      'ach-invite-friend:~inviteFriendDialog',
-        /*  4 */ 'SYNCINSTALL': 'ach-install-megasync:#sync',
-        /*  5 */ 'APPINSTALL':  'ach-install-mobile-app:#mobile',
+        /*  4 */ 'SYNCINSTALL': 'ach-install-megasync:/sync',
+        /*  5 */ 'APPINSTALL':  'ach-install-mobile-app:/mobile',
         /*  6 */ 'VERIFYE164':  'ach-verify-number',
-        /*  7 */ 'GROUPCHAT':   'ach-group-chat:#fm/chat',
-        /*  8 */ 'FOLDERSHARE': 'ach-share-folder:#fm/contacts'
+        /*  7 */ 'GROUPCHAT':   'ach-group-chat:/fm/chat',
+        /*  8 */ 'FOLDERSHARE': 'ach-share-folder:/fm/contacts'
     };
     var mapToAction = Object.create(null);
     var mapToElement = Object.create(null);
@@ -9526,13 +9564,20 @@ function fm_thumbnails()
 
 function fm_thumbnail_render(n) {
     if (n && thumbnails[n.h]) {
-        var imgNode = document.getElementById(n.h);
 
-        if (imgNode && (imgNode = imgNode.querySelector('img'))) {
+        // one thumbnail can eventually be rendered multiple times in the DOM, for example when:
+        // 1) is shared multiple times in the same chat room
+        // 2) was rendered in some of the other FM tabs and not cleaned up properly.
+        // This is why we generate this a bit extensive, but (legacy) compatible selector
+        // Note: Because node IDs can start with a number, I'd changed this to use jQuery instead of querySelectorAll
+        var imgNodes = $('#' + n.h + " img");
+        if (imgNodes.length > 0) {
             n.seen = 2;
+        }
+        imgNodes.each(function(k, imgNode) {
             imgNode.setAttribute('src', thumbnails[n.h]);
             imgNode.parentNode.classList.add('thumb');
-        }
+        });
     }
 }
 // jscs:enable
@@ -9580,7 +9625,7 @@ var mobileDownload = {
         var fileSize = numOfBytes(fileSizeBytes);
         var fileSizeFormatted = fileSize.size + ' ' + fileSize.unit;
         var fileIconName = fileIcon(node);
-        var fileIconPath = 'images/mobile/extensions/' + fileIconName + '.png';
+        var fileIconPath = staticpath + 'images/mobile/extensions/' + fileIconName + '.png';
 
         // Set file name, size and image
         this.$overlay.find('.filename').text(fileName);
@@ -9847,3 +9892,87 @@ var mobileDownload = {
         }
     }
 };
+
+
+(function() {
+    mBroadcaster.once('boot_done', function() {
+        if (
+            ua.details.browser === "Safari" ||
+            ua.details.browser === "Edge" ||
+            ua.details.browser === "Internet Explorer"
+        ) {
+            return;
+        }
+        // Didn't found a better place for this, so I'm leaving it here...
+        // This is basically a proxy of on paste, that would trigger a new event, which would receive the actual
+        // File object, name, etc.
+        $(document).on('paste', function (event) {
+            if (ua.details.browser === "Safari") {
+                // Safari is not supported
+                return;
+            }
+            else if (
+                ua.details.browser.toLowerCase().indexOf("explorer")  !== -1 ||
+                ua.details.browser.toLowerCase().indexOf("edge")  !== -1
+            ) {
+                // IE is not supported
+                return;
+            }
+
+            var items = (event.clipboardData || event.originalEvent.clipboardData).items;
+            if (!items && event.originalEvent.clipboardData && event.originalEvent.clipboardData.files) {
+                // safari
+                items = event.originalEvent.clipboardData.files;
+            }
+            var fileName = false;
+
+            var blob = null;
+            if (items) {
+                if (ua.details.browser === "Firefox" && items.length === 2) {
+                    // trying to paste an image, but .. FF does not have support for that. (It adds the file icon as
+                    // the image, which is a BAD UX, so .. halt now!)
+                    return;
+                }
+                for (var i = 0; i < items.length; i++) {
+                    if (items[i].type.indexOf("image") === 0) {
+                        if (items[i] instanceof File) {
+                            // Safari, using .files
+                            blob = items[i];
+                        }
+                        else {
+                            blob = items[i].getAsFile();
+                        }
+                    }
+                    else if (items[i].kind === "string") {
+                        items[i].getAsString(function (str) {
+                            fileName = str;
+                        });
+                    }
+                }
+            }
+
+            if (blob !== null) {
+                if (fileName) {
+                    // we've got the name of the file...
+                    blob.name = fileName;
+                }
+
+                if (!blob.name) {
+                    // no name found..generate dummy name.
+                    var ext = blob.type.replace("image/", "").toLowerCase();
+                    fileName = blob.name = "image." + (ext === "jpeg" ? "jpg" : ext);
+                }
+
+                var simulatedEvent = new $.Event("pastedimage");
+                $(window).trigger(simulatedEvent, [blob, fileName]);
+
+                // was this event handled and preventing default? if yes, prevent the raw event from pasting the
+                // file name text
+                if (simulatedEvent.isDefaultPrevented()) {
+                    event.preventDefault();
+                    return false;
+                }
+            }
+        });
+    });
+})();

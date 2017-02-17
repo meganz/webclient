@@ -2658,7 +2658,7 @@ function initContextUI() {
     $('.labels .dropdown-colour-item').click(function() {
         var labelId = parseInt(this.dataset.labelId);
 
-        if (labelId && (RightsbyID($.selected[0]) > 1)) {
+        if (labelId && (rightsById($.selected[0]) > 1)) {
             M.colourLabeling($.selected, labelId);
         }
     });
@@ -2894,7 +2894,7 @@ function fmtopUI() {
             }
         }
         else if (String(M.currentdirid).length === 8
-                && RightsbyID(M.currentdirid) > 0) {
+                && rightsById(M.currentdirid) > 0) {
 
             $('.fm-new-folder').removeClass('hidden');
             $('.fm-file-upload').removeClass('hidden');
@@ -5648,19 +5648,12 @@ function gridUI() {
     });
 
     // enable add star on first column click (make favorite)
-    $('.grid-table.fm tr td:first-child').rebind('click', function() {
-        var id = [$(this).parent().attr('id')];
-        var newFavState = Number(!M.isFavourite(id));
-        M.favourite(id, newFavState);
-    });
-
-    // enable add star on first column click (make favorite)
-    $('.grid-table.shared-with-me tr td:first-child').rebind('click', function() {
+    $('.grid-table.shared-with-me tr td:first-child,.grid-table.fm tr td:first-child').rebind('click', function() {
         var id = [$(this).parent().attr('id')];
         var newFavState = Number(!M.isFavourite(id));
 
         // Handling favourites is allowed for full permissions shares only
-        if (RightsbyID(id) > 1) {
+        if (rightsById(id) > 1) {
             M.favourite(id, newFavState);
         }
     });
@@ -5799,7 +5792,7 @@ function FMShortcuts() {
             return false; // stop prop.
         } else if (charCode == 8) {
             var $items = selectionManager.get_selected();
-            if ($items.size() == 0 || (RightsbyID(M.currentdirid || '') | 0) < 1) {
+            if ($items.size() === 0 || (rightsById(M.currentdirid || '') | 0) < 1) {
                 return; // dont do anything.
             }
 
@@ -5846,7 +5839,10 @@ var QuickFinder = function(searchable_elements, containers) {
     var next_idx = 0;
 
     // hide on page change
-    $(window).rebind('hashchange.quickfinder', function() {
+    if (QuickFinder._pageChangeListenerId) {
+        mBroadcaster.removeListener(QuickFinder._pageChangeListenerId);
+    }
+    QuickFinder._pageChangeListenerId = mBroadcaster.addListener('pagechange', function () {
         if (self.is_active()) {
             self.deactivate();
         }
@@ -6321,14 +6317,16 @@ function UIkeyevents() {
                 quickFinder.disable_if_active();
             }
         }
-        else if (e.keyCode == 46 && s.length > 0 && !$.dialog && RightsbyID(M.currentdirid) > 1) {
+        else if ((e.keyCode === 46) && (s.length > 0)
+            && !$.dialog && rightsById(M.currentdirid) > 1) {
             $.selected = [];
             s.each(function(i, e) {
                 $.selected.push($(e).attr('id'));
             });
             fmremove();
         }
-        else if (e.keyCode == 46 && selPanel.length > 0 && !$.dialog && RightsbyID(M.currentdirid) > 1) {
+        else if ((e.keyCode === 46) && (selPanel.length > 0)
+            && !$.dialog && rightsById(M.currentdirid) > 1) {
             var selected = [];
             selPanel.each(function() {
                 selected.push($(this).attr('id'));
@@ -6402,7 +6400,7 @@ function UIkeyevents() {
                 $.warningCallback(true);
             }
         }
-        else if ((e.keyCode === 113 /* F2 */) && (s.length > 0) && !$.dialog && RightsbyID(M.currentdirid) > 1) {
+        else if ((e.keyCode === 113 /* F2 */) && (s.length > 0) && !$.dialog && rightsById(M.currentdirid) > 1) {
             $.selected = [];
             s.each(function(i, e) {
                 $.selected.push($(e).attr('id'));
@@ -7127,12 +7125,12 @@ function menuItems() {
         sourceRoot = RootbyId($.selected[0]);
 
     // Show Rename action in case that only one item is selected
-    if (($.selected.length === 1) && (RightsbyID($.selected[0]) > 1)) {
+    if (($.selected.length === 1) && (rightsById($.selected[0]) > 1)) {
         items['.rename-item'] = 1;
     }
 
     if (((Object.keys($.selected)).length < 2)
-            && (RightsbyID($.selected[0]) > 1)) {
+            && (rightsById($.selected[0]) > 1)) {
 
         items['.add-star-item'] = 1;
 
@@ -7152,7 +7150,7 @@ function menuItems() {
     if (selItem && selItem.su && !M.d[selItem.p]) {
         items['.removeshare-item'] = 1;
     }
-    else if (RightsbyID($.selected[0]) > 1) {
+    else if (rightsById($.selected[0]) > 1) {
         items['.move-item']   = 1;
         items['.remove-item'] = 1;
     }
@@ -7239,7 +7237,7 @@ function contextMenuUI(e, ll) {
     if (ll === 2) {
 
         // Enable upload item menu for clould-drive, don't show it for rubbish and rest of crew
-        if (RightsbyID(M.currentdirid) && (M.currentrootid !== M.RubbishID)) {
+        if (rightsById(M.currentdirid) && (M.currentrootid !== M.RubbishID)) {
             $(menuCMI).filter('.dropdown-item').hide();
             $(menuCMI).filter('.fileupload-item,.newfolder-item').show();
 
@@ -7512,31 +7510,45 @@ function adjustContextMenuPosition(e, m)
     return true;
 }
 
-function reCalcMenuPosition(m, x, y, ico)
-{
+/**
+ * Calculates coordinates where context menu will be shown
+ * @param {Object} m jQuery object of context menu or child class
+ * @param {Number} x Coordinate x of cursor or clicked element
+ * @param {Number} y Coordinate y of cursor or clicked element
+ * @param {Object} ico JSON {x, y} width and height of element clicked on
+ * @returns {Object} Coordinates {x, y} where context menu will be drawn
+ */
+/* jshint -W074 */
+function reCalcMenuPosition(m, x, y, ico) {
+
     var TOP_MARGIN = 12;
     var SIDE_MARGIN = 12;
-    var cmW = m.outerWidth(), cmH = m.outerHeight();// dimensions without margins calculated
-    var wH = window.innerHeight, wW = window.innerWidth;
-    var maxX = wW - SIDE_MARGIN;// max horizontal
-    var maxY = wH - TOP_MARGIN;// max vertical
-    var minX = SIDE_MARGIN + $('div.nw-fm-left-icons-panel').outerWidth();// min horizontal
-    var minY = TOP_MARGIN;// min vertical
-    var wMax = x + cmW;// coordinate of right edge
-    var hMax = y + cmH;// coordinate of bottom edge
+    var cmW = m.outerWidth();// dimensions without margins calculated
+    var cmH = m.outerHeight();// dimensions without margins calculated
+    var wH = window.innerHeight;
+    var wW = window.innerWidth;
+    var maxX = wW - SIDE_MARGIN;// max horizontal coordinate, right side of window
+    var maxY = wH - TOP_MARGIN;// max vertical coordinate, bottom side of window
 
-    var overlapParentMenu = function(n)
-    {
+    // min horizontal coordinate, left side of right panel
+    var minX = SIDE_MARGIN + $('div.nw-fm-left-icons-panel').outerWidth();
+    var minY = TOP_MARGIN;// min vertical coordinate, top side of window
+    var wMax = x + cmW;// coordinate of context menu right edge
+    var hMax = y + cmH;// coordinate of context menu bottom edge
+
+    var top = 'auto';
+    var left = '100%';
+    var right = 'auto';
+
+    var overlapParentMenu = function(n) {
         var tre = wW - wMax;// to right edge
         var tle = x - minX - SIDE_MARGIN;// to left edge
 
-        if (tre >= tle)
-        {
+        if (tre >= tle) {
             n.addClass('overlap-right');
             n.css({'top': top, 'left': (maxX - x - nmW) + 'px'});
         }
-        else
-        {
+        else {
             n.addClass('overlap-left');
             n.css({'top': top, 'right': (wMax - nmW - minX) + 'px'});
         }
@@ -7544,57 +7556,65 @@ function reCalcMenuPosition(m, x, y, ico)
         return;
     };
 
-    // submenus are absolutely positioned, which means that they are relative to first parent, positioned other then static
-    // first parent, which is NOT a .contains-submenu element (it's previous in same level)
-    var horPos = function(n)// used for submenues
-    {
+    /**
+     * Calculates top position of submenu
+     * Submenu is relatively positioned to the first sibling element
+     * @param {Object} n jQuery object, submenu of hovered element
+     * @returns {String} top Top coordinate in pixels for submenu
+     */
+    var horPos = function(n) {
         var top;
         var nTop = parseInt(n.css('padding-top'));
         var tB = parseInt(n.css('border-top-width'));
         var pPos = m.position();
-
         var b = y + nmH - (nTop - tB);// bottom of submenu
         var mP = m.closest('.dropdown.body.submenu');
-        var pT = 0, bT = 0, pE = 0;
-        if (mP.length)
-        {
+        var pT = 0;
+        var bT = 0;
+        var pE = 0;
+
+        if (mP.length) {
             pE = mP.offset();
             pT = parseInt(mP.css('padding-top'));
             bT = parseInt(mP.css('border-top-width'));
         }
-        if (b > maxY)
+        if (b > maxY) {
             top = (maxY - nmH + nTop - tB) - pE.top + 'px';
-        else
+        }
+        else {
             top = pPos.top - tB + 'px';
+        }
 
         return top;
     };
 
-    var dPos;
+    var dPos;// new context menu position
     var cor;// corner, check setBordersRadius for more info
-    if (typeof ico === 'object')// draw context menu relative to file-settings-icon
-    {
+    if (typeof ico === 'object') {// draw context menu relative to file-settings-icon
         cor = 1;
         dPos = {'x': x - 2, 'y': y + ico.y + 8};// position for right-bot
-        if (wMax > maxX)// draw to the left
-        {
+
+        // draw to the left
+        if (wMax > maxX) {
             dPos.x = x - cmW + ico.x + 2;// additional pixels to align with -icon
             cor = 3;
         }
-        if (hMax > maxY)// draw to the top
-        {
-            dPos.y = y - cmH;// additional pixels to align with -icon
+
+        // draw to the top
+        if (hMax > (maxY - TOP_MARGIN)) {
+            dPos.y = y - cmH - 6;
+            if (dPos.y < TOP_MARGIN) {
+                dPos.y = TOP_MARGIN;
+            }
             cor++;
         }
     }
-    else if (ico === 'submenu')// submenues
-    {
+    else if (ico === 'submenu') {// submenues
         var n = m.next('.dropdown.body.submenu');
         var nmW = n.outerWidth();// margin not calculated
         var nmH = n.outerHeight();// margins not calculated
 
-        if (nmH > (maxY - TOP_MARGIN))// Handle huge menu
-        {
+        if (nmH > (maxY - TOP_MARGIN)) {// Handle huge menu
             nmH = maxY - TOP_MARGIN;
             var tmp = document.getElementById('csb_' + m.attr('id').replace('fi_', ''));
             $(tmp).addClass('context-scrolling-block');
@@ -7604,30 +7624,28 @@ function reCalcMenuPosition(m, x, y, ico)
             n.css({'height': nmH + 'px'});
         }
 
-        var top = 'auto', left = '100%', right = 'auto';
-
         top = horPos(n);
-        if (m.parent().parent('.left-position').length === 0)
-        {
-            if (maxX >= (wMax + nmW))
+        if (m.parent().parent('.left-position').length === 0) {
+            if (maxX >= (wMax + nmW)) {
                 left = 'auto', right = '100%';
-            else if (minX <= (x - nmW))
+            }
+            else if (minX <= (x - nmW)) {
                 n.addClass('left-position');
-            else
-            {
+            }
+            else {
                 overlapParentMenu(n);
 
                 return true;
             }
         }
-        else
-        {
-            if (minX <= (x - nmW))
+        else {
+            if (minX <= (x - nmW)) {
                 n.addClass('left-position');
-            else if (maxX >= (wMax + nmW))
+            }
+            else if (maxX >= (wMax + nmW)) {
                 left = 'auto', right = '100%';
-            else
-            {
+            }
+            else {
                 overlapParentMenu(n);
 
                 return true;
@@ -7636,22 +7654,26 @@ function reCalcMenuPosition(m, x, y, ico)
 
         return {'top': top, 'left': left, 'right': right};
     }
-    else// right click
-    {
+    else {// right click
         cor = 0;
         dPos = {'x': x, 'y': y};
-        if (x < minX)
+        if (x < minX) {
             dPos.x = minX;// left side alignment
-        if (wMax > maxX)
-            dPos.x = maxX - cmW;// align with right side, 12px from it
-        if (hMax > maxY)
-            dPos.y = maxY - cmH;// align with bottom, 12px from it
+        }
+        if (wMax > maxX) {
+            dPos.x = maxX - cmW;// align with right side
+        }
+
+        if (hMax > maxY) {
+            dPos.y = maxY - cmH;// align with bottom
+        }
     }
 
     setBordersRadius(m, cor);
 
     return {'x': dPos.x, 'y': dPos.y};
 }
+/* jshint -W074 */
 
 // corner position 0 means default
 function setBordersRadius(m, c)
@@ -7694,30 +7716,25 @@ function setBordersRadius(m, c)
 }
 
 // Scroll menus which height is bigger then window.height
-function scrollMegaSubMenu(e)
-{
+function scrollMegaSubMenu(e) {
     var ey = e.pageY;
     var c = $(e.target).closest('.dropdown.body.submenu');
     var pNode = c.children(':first')[0];
 
-    if (typeof pNode !== 'undefined')
-    {
+    if (typeof pNode !== 'undefined') {
         var h = pNode.offsetHeight;
         var dy = h * 0.1;// 10% dead zone at the begining and at the bottom
         var pos = getHtmlElemPos(pNode, true);
         var py = (ey - pos.y - dy) / (h - dy * 2);
-        if (py > 1)
-        {
+        if (py > 1) {
             py = 1;
             c.children('.context-bottom-arrow').addClass('disabled');
         }
-        else if (py < 0)
-        {
+        else if (py < 0) {
             py = 0;
             c.children('.context-top-arrow').addClass('disabled');
         }
-        else
-        {
+        else {
             c.children('.context-bottom-arrow,.context-top-arrow').removeClass('disabled');
         }
         pNode.scrollTop = py * (pNode.scrollHeight - h);
@@ -7947,10 +7964,11 @@ function sectionUIopen(id) {
     } else {
         tmpId = id;
     }
-    $('.nw-fm-left-icon.' + tmpId).addClass('active');
-    $('.content-panel.' + tmpId).addClass('active');
+    $('.nw-fm-left-icon.' + String(tmpId).replace(/[^\w-]/g, '')).addClass('active');
+    $('.content-panel.' + String(tmpId).replace(/[^\w-]/g, '')).addClass('active');
     $('.fm-left-menu').removeClass(
-        'cloud-drive folder-link shared-with-me rubbish-bin contacts conversations opc ipc inbox account dashboard transfers'
+        'cloud-drive folder-link shared-with-me rubbish-bin contacts ' +
+        'conversations opc ipc inbox account dashboard transfers'
     ).addClass(tmpId);
     $('.fm.fm-right-header, .fm-import-to-cloudrive, .fm-download-as-zip').addClass('hidden');
     $('.fm-import-to-cloudrive, .fm-download-as-zip').unbind('click');
@@ -8099,9 +8117,8 @@ function sectionUIopen(id) {
         }
         else {
             $('.section').addClass('hidden');
-            $('.section.' + id).removeClass('hidden');
+            $('.section.' + String(id).replace(/[^\w-]/g, '')).removeClass('hidden');
         }
-
     }
 }
 
@@ -8572,8 +8589,8 @@ function handleDialogTabContent(dialogTabClass, parentTag, dialogPrefix, htmlCon
         .safeHTML(html);
 
     // Empty message, no items available
-    if (!$(prefix + '-dialog-tree-panel' + tabClass + ' .dialog-content-block ' + parentTag).length){
-        $(prefix + '-dialog-empty' + tabClass).addClass('active');
+    if (!$(prefix + '-dialog-tree-panel' + tabClass + ' .dialog-content-block ' + parentTag).children().length) {
+        $(prefix + '.dialog-empty-block' + tabClass).addClass('active');
         $(prefix + '-dialog-tree-panel' + tabClass + ' ' + prefix + '-dialog-panel-header').addClass('hidden');
     }
 
@@ -8635,7 +8652,7 @@ function handleDialogContent(dialogTabClass, parentTag, newFolderButton, dialogP
     if ($.onImportCopyNodes && (!newFolderButton || (dialogPrefix !== 'copy'))) {
 
         // XXX: Ideally show some notification that importing from folder link to anything else than the cloud isn't supported.
-        $('.copy-dialog-button.' + dialogTabClass).fadeOut(200).fadeIn(100);
+        $('.copy-dialog-button.' + String(dialogTabClass).replace(/[^\w-]/g, '')).fadeOut(200).fadeIn(100);
         // clicking the shares tab deactivates the "Import" button, restore it.
         $('.dialog-copy-button').removeClass('disabled');
         $.mcselected = $.mcselected || M.RootID;
@@ -8643,11 +8660,11 @@ function handleDialogContent(dialogTabClass, parentTag, newFolderButton, dialogP
         return;
     }
     $('.' + dialogPrefix + '-dialog-txt').removeClass('active');
-    $('.' + dialogPrefix + '-dialog-empty').removeClass('active');
     $('.' + dialogPrefix + '-dialog-button').removeClass('active');
     $('.' + dialogPrefix + '-dialog-tree-panel').removeClass('active');
     $('.' + dialogPrefix + '-dialog-panel-arrows').removeClass('active');
     $('.' + dialogPrefix + '-dialog .dialog-sorting-menu').addClass('hidden');
+    $('.' + dialogPrefix + '.dialog-empty-block').removeClass('active');
 
     $('.dialog-' + dialogPrefix + '-button span').text(buttonLabel);
 
@@ -12298,8 +12315,8 @@ function savecomplete(id)
  * width, height, position, etc).
  * This is why we do a on('resize') handler which handles the resize of the generic layout of Mega's FM.
  */
-function fm_resize_handler() {
-    if ($.tresizer.last === -1) {
+function fm_resize_handler(force) {
+    if ($.tresizer.last === -1 && force !== true) {
         return;
     }
     if (d) {

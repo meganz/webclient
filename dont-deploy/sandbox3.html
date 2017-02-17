@@ -71,7 +71,12 @@
         // localStorage.contextmenu = '1';
 
         // Load script files separately for easier debugging
-        // localStorage.jj = '1';
+        if (window.location.search.indexOf('jj=') > -1) {
+            localStorage.jj = '1';
+        }
+        if (window.location.search.indexOf('jj=2') > -1) {
+            localStorage.jjnocache = '1';
+        }
 
         // localStorage.stopOnAssertFail = '1';
 

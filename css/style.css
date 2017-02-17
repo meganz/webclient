@@ -241,9 +241,8 @@ a, a:link, a:visited, a:hover, a:active, a:focus img, a:focus img {
     border-radius: 100%;
     float: left;
     margin: 6px 0 0 12px;
-    background-color: #d90007;
     background-position: -6px -383px;
-    background-image: url(../images/mega/top-sprite_v1.png);
+    background-image: url(../images/mega/top-sprite_v2.png);
     background-repeat: no-repeat;
     cursor: pointer;
     display: none;
@@ -313,7 +312,7 @@ a.nlanguage-lnk.language-template {
     margin: 16px 0 0 0;
     background-position: 0px -1037px;
     background-position: -2px -286px;
-    background-image: url(../images/mega/top-sprite_v1.png);
+    background-image: url(../images/mega/top-sprite_v2.png);
     background-repeat: no-repeat;
 }
 .nlanguage-bottom a, .nlanguage-bottom a:link, .nlanguage-bottom a:visited, .nlanguage-bottom a:hover, .nlanguage-bottom a:active {
@@ -365,7 +364,7 @@ a.nlanguage-lnk.language-template {
     vertical-align: middle;
 }
 .languages-dialog .show-more-languages .round-arrow span {
-    background-image: url(../images/mega/top-sprite_v1.png);
+    background-image: url(../images/mega/top-sprite_v2.png);
     background-position: -13px -1108px;
     background-repeat: no-repeat;
     display: inline-block;
@@ -385,12 +384,6 @@ a.nlanguage-lnk.language-template {
 }
 .languages-dialog .show-more-languages:hover .round-arrow span {
     opacity: 1;
-}
-.languages-dialog .fm-notifications-bottom {
-    bottom: 0;
-    left: 0;
-    position: absolute;
-    right: 0;
 }
 .languages-dialog .nlanguage-lnk .beta {
     border: 1px solid rgba(192, 199, 203, 0.3);
@@ -899,7 +892,7 @@ a.account-manage-button:hover {
     background-color: rgba(255,255,255,1);
     -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
     box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     background-position: -6px -10648px;
     background-repeat: no-repeat;
 }
@@ -1067,7 +1060,7 @@ a.account-manage-button:hover {
     height: 40px;
 }
 .free .fm-right-block:not(.active-achievements) .bandwidth .chart.data .perc-txt, .free .fm-right-account-block:not(.active-achievements) .bandwidth .chart.data .perc-txt {
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     background-position: -10px -11854px;
     width: 30px;
 }
@@ -3891,7 +3884,7 @@ label.iPhoneCheckLabelOff span {
     height: 24px;
     left: 10px;
     top: 6px;
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     background-position: -1px -3036px;
     background-repeat: no-repeat;
 }
@@ -4103,7 +4096,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     cursor: default;
 }
 .nw-fm-tree-item.contains-folders .nw-fm-arrow-icon {
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     background-repeat: no-repeat;
     background-position: center -9911px;
     cursor: pointer;
@@ -4133,7 +4126,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     line-height: 24px;
     color: #666666;
     height: 24px;
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     background-position: -15px -7465px;
     background-repeat: no-repeat;
     -o-text-overflow: ellipsis;
@@ -4204,21 +4197,13 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .inbound-share {
     background-position: -15px -7106px;
 }
-.nw-fm-tree-item:hover > .nw-fm-tree-folder.inbound-share,
-.nw-fm-tree-item.selected > .nw-fm-tree-folder.inbound-share,
-.nw-fm-tree-item.dragover > .nw-fm-tree-folder.inbound-share {
+.nw-fm-tree-item:hover > .nw-fm-tree-folder.inbound-share, .nw-fm-tree-item.selected > .nw-fm-tree-folder.inbound-share, .nw-fm-tree-item.dragover > .nw-fm-tree-folder.inbound-share {
     background-position: -15px -7166px;
 }
-.nw-fm-tree-item.expanded > .nw-fm-tree-folder.inbound-share,
-.nw-fm-tree-item.opened > .nw-fm-tree-folder.inbound-share {
+.nw-fm-tree-item.expanded > .nw-fm-tree-folder.inbound-share, .nw-fm-tree-item.opened > .nw-fm-tree-folder.inbound-share {
     background-position: -15px -7136px;
 }
-.nw-fm-tree-item.expanded:hover > .nw-fm-tree-folder.inbound-share,
-.nw-fm-tree-item.opened:hover > .nw-fm-tree-folder.inbound-share,
-.nw-fm-tree-item.selected.expanded > .nw-fm-tree-folder.inbound-share,
-.nw-fm-tree-item.selected.opened > .nw-fm-tree-folder.inbound-share,
-.nw-fm-tree-item.expanded.dragover > .nw-fm-tree-folder.inbound-share,
-.nw-fm-tree-item.opened.dragover > .nw-fm-tree-folder.inbound-share {
+.nw-fm-tree-item.expanded:hover > .nw-fm-tree-folder.inbound-share, .nw-fm-tree-item.opened:hover > .nw-fm-tree-folder.inbound-share, .nw-fm-tree-item.selected.expanded > .nw-fm-tree-folder.inbound-share, .nw-fm-tree-item.selected.opened > .nw-fm-tree-folder.inbound-share, .nw-fm-tree-item.expanded.dragover > .nw-fm-tree-folder.inbound-share, .nw-fm-tree-item.opened.dragover > .nw-fm-tree-folder.inbound-share {
     background-position: -15px -7196px;
 }
 .nw-contact-item, .add-contact-item {
@@ -4252,7 +4237,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 }
 .fm-add-user-scrolling .nw-contact-item {
     padding-right: 32px;
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     background-position: right -2907px;
     background-repeat: no-repeat;
 }
@@ -4277,7 +4262,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     margin: 12px;
     border: 2px solid #d9d9d9;
     padding: 0 10px 0 32px;
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     background-position: -10px -2969px;
     background-repeat: no-repeat;
     -moz-border-radius: 5px;
@@ -4294,7 +4279,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     color: #868686;
 }
 .verified .nw-contact-verified-icon {
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     background-position: -19px -2827px;
     background-repeat: no-repeat;
     position: absolute;
@@ -4409,7 +4394,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     position: absolute;
     width: 16px;
     height: 16px;
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     z-index: 10;
     background-position: -11px -2244px;
     -webkit-box-sizing: border-box;
@@ -4489,7 +4474,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     position: absolute;
     right: 2px;
     top: 6px;
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     background-repeat: no-repeat;
     background-position: -12px -9768px;
     cursor: pointer;
@@ -4859,7 +4844,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     height: 14px;
     right: 25px;
     top: 9px;
-    background-image: url(../images/mega/top-sprite_v1.png);
+    background-image: url(../images/mega/top-sprite_v2.png);
     background-position: -12px -1303px;
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     -moz-opacity: 0.5;
@@ -4915,7 +4900,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     width: 24px;
     height: 24px;
     display: block;
-    background-image: url(../images/mega/top-sprite_v1.png);
+    background-image: url(../images/mega/top-sprite_v2.png);
     background-repeat: no-repeat;
     -webkit-transition: all 200ms ease-in-out;
     -moz-transition: all 200ms ease-in-out;
@@ -5589,7 +5574,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     display: block;
 }
 .nw-fm-search-icon {
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     background-repeat: no-repeat;
     background-position: -11px -7882px;
     position: absolute;
@@ -5635,7 +5620,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     height: 48px;
     content: '';
     position: absolute;
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     background-repeat: no-repeat;
     background-position: -100px -100px;
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
@@ -5780,7 +5765,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     position: absolute;
     top: 49px;
     width: 36px;
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     background-repeat: no-repeat;
     background-position: center -848px;
 }
@@ -5947,7 +5932,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 .transfer-table-header th:nth-child(8), .transfer-table td:nth-child(8), .dndc-sort .transfer-table td:nth-child(8) {
     display: none;
 }
-.fm-right-files-block td, .fm-right-files-block th, .fm-transfers-block td, .fm-transfers-block th, .account.tab-content td, .account.tab-content th {
+.fm-right-files-block td, .fm-right-files-block th, .fm-transfers-block td, .fm-transfers-block th, .account.tab-content td, .account.tab-content th, .grid-table-header th {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -6023,7 +6008,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     height: -moz-calc(100% - 211px);
     height: calc(100% - 211px);
 }
-.fm-right-files-block th::after, .account.tab-content th::after, .transfer-table-wrapper th::after {
+.fm-right-files-block th::after, .account.tab-content th::after, .transfer-table-wrapper th::after, .grid-table-header th::after {
     content: '';
     position: absolute;
     right: 0;
@@ -6042,14 +6027,14 @@ th.grid-first-th {
 .grid-table.contacts td:first-child, .contacts-view .grid-table-header th:first-child {
     padding: 0 10px 0 16px;
 }
-.fm-right-files-block th:last-child::after, .account.tab-content th:last-child::after, .transfer-table-wrapper th:last-child::after, .transfer-table-wrapper th:first-child::after {
+.fm-right-files-block th:last-child::after, .account.tab-content th:last-child::after, .transfer-table-wrapper th:last-child::after, .transfer-table-wrapper th:first-child::after, .grid-table-header th:last-child::after {
     display: none;
 }
 .arrow.desc.grid-header-star, .arrow.asc.grid-header-star, .grid-header-star {
     height: 24px;
     width: 30px;
     display: block;
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     background-repeat: no-repeat;
     background-position: -7px -1468px;
 }
@@ -6089,7 +6074,7 @@ th.grid-first-th {
     height: 24px;
     width: 25px;
     display: block;
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     background-repeat: no-repeat;
     background-position: -7px -1494px;
     background-size: auto;
@@ -6131,13 +6116,13 @@ th.grid-first-th {
     background-position: -181px -963px;
 }
 .undecryptable.nw-fm-tree-item .data-item-icon {
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     background-repeat: no-repeat;
     background-size: auto;
     background-position: -15px -2639px;
 }
 .undecryptable .grid-status-icon, .undecryptable .grid-status-icon.star {
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     background-repeat: no-repeat;
     background-size: auto;
     background-position: -9px -2637px;
@@ -6492,7 +6477,7 @@ th.grid-first-th {
 }
 .grid-url-arrow::after, .file-settings-icon::after, .clear-transfer-icon::after {
     content: '';
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     background-repeat: no-repeat;
     background-position: -18px -7788px;
     -webkit-transition: opacity 200ms ease-in-out;
@@ -6556,6 +6541,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     vertical-align: top;
     font-size: 13px;
     cursor: default;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
 .grid-table.shared-with-me td, .grid-table.contacts td, .contact-requests-grid td, .sent-requests-grid td {
     vertical-align: middle;
@@ -6690,7 +6678,7 @@ table {
     background-position: -61px -1196px;
 }
 .transfer-filtype-icon.folder, .transfer-filtype-icon.inbound-share, .search-path-icon-span.folder, .transfer-filtype-icon.folder-shared, .search-path-icon-span.folder-shared {
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     background-position: -14px -7465px;
     background-repeat: no-repeat;
 }
@@ -7326,7 +7314,7 @@ table {
     -moz-border-radius: 100%;
     -webkit-border-radius: 100%;
     border-radius: 100%;
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     background-repeat: no-repeat;
 }
 .transfer-table tr:nth-child(odd) td .transfer-type::before {
@@ -7398,7 +7386,7 @@ table {
     display: block;
     left: 0;
     top: 6px;
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     background-repeat: no-repeat;
     background-position: -15px -700px;
     position: absolute;
@@ -7424,7 +7412,7 @@ table {
 .transfer-table .eta {
     min-width: 100px;
     display: inline-block;
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     background-position: -15px -724px;
     background-repeat: no-repeat;
     text-indent: 17px;
@@ -7441,7 +7429,7 @@ table {
     text-indent: 18px;
 }
 .transfer-table .eta.unknown::before {
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     background-position: 0 -4172px;
     background-repeat: no-repeat;
     content: '';
@@ -7516,6 +7504,11 @@ table {
 .fm-right-header .link-button, .fm-transfers-header .link-button {
     margin-top: 8px;
     font-size: 14px;
+    -webkit-transition: opacity 200ms ease-in-out, color 200ms ease-in-out;
+    -moz-transition: opacity 200ms ease-in-out, color 200ms ease-in-out;
+    -o-transition: opacity 200ms ease-in-out, color 200ms ease-in-out;
+    -ms-transition: opacity 200ms ease-in-out, color 200ms ease-in-out;
+    transition: opacity 200ms ease-in-out, color 200ms ease-in-out;
 }
 .fm-right-header .link-button > .small-icon {
     margin-right: 6px;
@@ -7565,17 +7558,18 @@ table {
 .fm-breadcrumbs:first-child:not(.account) .right-arrow-bg span {
     display: none;
 }
-.fm-breadcrumbs.shared-with-me .right-arrow-bg, .fm-breadcrumbs.contacts .right-arrow-bg {
+.fm-breadcrumbs.shared-with-me:first-child .right-arrow-bg, .fm-breadcrumbs.contacts:first-child .right-arrow-bg {
     background-image: url(../images/mega/shared-sprite_v5.svg);
     background-repeat: no-repeat;
-    background-position: 2px -502px;
-    padding: 0 0 0 38px;
 }
-.fm-breadcrumbs.cloud-drive .right-arrow-bg {
+.fm-breadcrumbs.shared-with-me:first-child .right-arrow-bg {
+    background-position: 2px -503px;
+}
+.fm-breadcrumbs:first-child .right-arrow-bg {
     padding: 0 0 0 38px;
 }
 .fm-breadcrumbs.contacts .right-arrow-bg {
-    background-position: 2px -936px;
+    background-position: 3px -936px;
 }
 .fm-breadcrumbs.conversations .right-arrow-bg {
     background-position: -1px -9386px;
@@ -7584,22 +7578,20 @@ table {
     display: none;
 }
 .fm-breadcrumbs.has-next-button, a.fm-breadcrumbs.has-next-button, .fm-share-breadcrumbs.has-next-button, a.fm-share-breadcrumbs.has-next-button {
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     background-repeat: no-repeat;
-    background-position: right -1433px;
+    background-position: right -1434px;
 }
 .fm-breadcrumbs .right-arrow-bg, .fm-share-breadcrumbs .right-arrow-bg {
     line-height: 20px;
-    color: #777777;
+    color: #666666;
     font-size: 14px;
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
-    background-repeat: no-repeat;
-    background-position: 5px -1000px;
-    cursor: pointer;
-    padding: 1px 0 0 38px;
+    cursor: default;
+    padding: 1px 0 0 10px;
     display: block;
     height: 24px;
     overflow: hidden;
+    background-position: 5px -1001px;
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
     display: inline-block;
@@ -7608,6 +7600,20 @@ table {
     -khtml-opacity: 0.83;
     opacity: 0.83;
     vertical-align: top;
+}
+.fm-breadcrumbs:not(:first-child) .right-arrow-bg.invisible {
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+    -moz-opacity: 0;
+    -khtml-opacity: 0;
+    opacity: 0;
+}
+.fm-breadcrumbs:first-child .right-arrow-bg, .fm-share-breadcrumbs:first-child .right-arrow-bg {
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-repeat: no-repeat;
+}
+.fm-breadcrumbs.has-next-button .right-arrow-bg, .fm-share-breadcrumbs.has-next-button .right-arrow-bg {
+    color: #999999;
+    cursor: pointer;
 }
 .deactivated .fm-breadcrumbs .right-arrow-bg, .deactivated .fm-share-breadcrumbs .right-arrow-bg {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
@@ -7621,6 +7627,9 @@ table {
 }
 .fm-breadcrumbs .right-arrow-bg.short-foldername {
     max-width: 110px;
+}
+.fm-breadcrumbs .right-arrow-bg.ultra-short-foldername {
+    max-width: 40px;
 }
 .deactivated .fm-breadcrumbs .right-arrow-bg {
     cursor: default;
@@ -7655,7 +7664,7 @@ table {
     font-size: 13px;
     color: #333333;
     padding: 0 20px 0 22px;
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     background-repeat: no-repeat;
     background-position: -2px -3304px;
     float: right;
@@ -7712,42 +7721,29 @@ table {
 .empty-requests-pad .fm-empty-cloud-txt {
     margin-top: 0;
 }
-.fm-breadcrumbs.folder .right-arrow-bg, .fm-breadcrumbs.shared-folder .right-arrow-bg, .fm-breadcrumbs.contact .right-arrow-bg {
-    background-image: url(../images/mega/shared-sprite_v5.svg);
-    background-repeat: no-repeat;
-    background-position: 2px -622px;
-}
-.ultra-long-path .fm-breadcrumbs.folder .right-arrow-bg, .ultra-long-path .fm-breadcrumbs.shared-folder .right-arrow-bg, .ultra-long-path .fm-breadcrumbs.contact .right-arrow-bg {
-    padding: 0px 8px 0px 32px;
-}
 .fm-breadcrumbs.shared-folder .right-arrow-bg {
     background-position: 2px -542px;
 }
 .fm-breadcrumbs.messages .right-arrow-bg {
-    background-position: 7px -6718px;
+    background-position: 7px -6719px;
 }
 .fm-breadcrumbs.folder-link .right-arrow-bg {
-    background-position: -3px -9815px;
+    background-position: -3px -9816px;
 }
 .fm-dialog-breadcrumbs.shared-folder .right-arrow-bg {
     background-position: 2px -539px;
 }
-.fm-breadcrumbs.contact .right-arrow-bg {
-    background-position: 2px -976px;
-    padding: 0 8px 0 38px;
-}
 .fm-breadcrumbs.rubbish-bin .right-arrow-bg {
     background-position: 8px -8036px;
-    padding: 0 10px 0 27px;
 }
 .fm-breadcrumbs.account .right-arrow-bg {
-    background-position: -2px -10357px;
+    background-position: -2px -10358px;
 }
 .fm-breadcrumbs.rubbish-bin .right-arrow-bg span {
     display: none;
 }
 .fm-dialog-breadcrumbs.contact .right-arrow-bg {
-    background-position: 2px -973px;
+    background-position: 2px -974px;
 }
 .fm-breadcrumbs.shared-with-me .right-arrow-bg span, .fm-dialog-breadcrumbs.shared-with-me .right-arrow-bg span, .fm-breadcrumbs.contacts .right-arrow-bg span, .fm-dialog-breadcrumbs.contacts .right-arrow-bg span {
     display: none;
@@ -7758,7 +7754,7 @@ table {
     display: block;
     float: right;
     margin: 9px 11px 0 24px;
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     background-repeat: no-repeat;
     -webkit-transition: opacity 200ms ease-in-out;
     -moz-transition: opacity 200ms ease-in-out;
@@ -7874,7 +7870,7 @@ table {
     margin-top: -171px;
 }
 .fm-empty-cloud-bg, .fm-empty-folder-bg, .fm-empty-conversations-bg, .fm-empty-incoming-bg, .fm-empty-contacts-bg, .fm-invalid-folder-bg, .fm-empty-folder-link-bg, .fm-empty-trashbin-bg, .fm-empty-transfers-bg, .fm-empty-search-bg {
-    background-image: url(../images/mega/empty-sprite_v2.png);
+    background-image: url(../images/mega/empty-sprite_v3.png);
     background-repeat: no-repeat;
 }
 .fm-empty-cloud-bg {
@@ -8050,19 +8046,6 @@ table {
     margin: 34px 12px 12px 12px;
     position: relative;
 }
-.create-folder-bottom, .default-dialog-bottom {
-    height: 56px;
-    background-color: #F6F6F6;
-    margin: 12px -12px -12px -12px;
-    display: none;
-    -webkit-border-bottom-left-radius: 8px;
-    -moz-border-radius-bottomleft: 8px;
-    border-bottom-left-radius: 8px;
-    -webkit-border-bottom-right-radius: 8px;
-    -moz-border-radius-bottomright: 8px;
-    border-bottom-right-radius: 8px;
-    padding-right: 12px;
-}
 .create-folder-bottom .default-white-button, .create-folder-bottom .default-grey-button, .default-dialog-bottom .default-white-button, .default-dialog-bottom .default-grey-button {
     margin-top: 12px;
     min-width: 20px;
@@ -8074,7 +8057,7 @@ table {
     display: block !important;
 }
 .create-folder-size-icon, .add-user-size-icon {
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     background-position: center -5509px;
     background-repeat: no-repeat;
     width: 20px;
@@ -8129,7 +8112,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     position: absolute;
     width: 19px;
     height: 18px;
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     background-repeat: no-repeat;
     background-position: -14px -10610px;
     right: 6px;
@@ -8434,7 +8417,7 @@ color: white;
     width: 18px;
     height: 18px;
     position: absolute;
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     background-repeat: no-repeat;
     margin: 20px 0 0 -22px;
 }
@@ -8542,7 +8525,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     width: 45px;
 }
 .nw-fm-dialog-title, .fm-dialog-title {
-    font-size: 20px;
+    font-size: 16px;
     line-height: 20px;
     color: #999999;
     padding: 15px 33px 2px 33px;
@@ -9100,14 +9083,17 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     overflow: visible;
 }
 .notification-header {
-    height: 32px;
+    height: 34px;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     text-align: center;
+    position: relative;
+    z-index: 1;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
 }
 .notification-txt {
-    line-height: 31px;
+    line-height: 32px;
     font-size: 13px;
     float: left;
     color: #BF1900;
@@ -9117,8 +9103,8 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     color: #999999;
     display: inline-block;
     padding: 0 0 0 26px;
-    background-image: url(../images/mega/top-sprite_v1.png);
-    background-position: -8px -511px;
+    background-image: url(../images/mega/top-sprite_v2.png);
+    background-position: -8px -510px;
     background-repeat: no-repeat;
     float: none;
 }
@@ -9384,30 +9370,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .fm-move-dialog-list {
     padding: 15px 0
 }
-.fm-move-bottom-block, .fm-share-bottom-block, .fm-notifications-bottom {
-    background-color: #F6F6F6;
-    height: 56px;
-    -webkit-border-bottom-left-radius: 8px;
-    -moz-border-radius-bottomleft: 8px;
-    border-bottom-left-radius: 8px;
-    -webkit-border-bottom-right-radius: 8px;
-    -moz-border-radius-bottomright: 8px;
-    border-bottom-right-radius: 8px;
-    position: relative;
-    padding: 0 12px;
-}
 .fm-notifications-bottom .default-white-button {
     margin-top: 12px;
-}
-.notification-popup .fm-notifications-bottom {
-    height: 32px;
-    background-color: white;
-}
-.browsers-dialog .fm-notifications-bottom {
-    padding: 0 20px 0 14px;
-}
-.share-dialog .fm-notifications-bottom {
-    position: static;
 }
 .fm-dialog-button.dialog-newfolder-button {
     float: left;
@@ -9440,7 +9404,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     width: 22px;
     height: 12px;
     background-position: center -6062px;
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     background-repeat: no-repeat;
     margin: -12px 0 0 5px;
 }
@@ -9474,7 +9438,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .fm-share-contacts-body .ui-selected .add-contact-pad {
     background-position: right -2860px;
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     background-repeat: no-repeat;
 }
 .fm-share-dropdown, .share-dialog-permissions, .share-dialog-icon.permissions-icon, .fm-dialogs-select, .default-select, .ui-selectmenu-button {
@@ -9495,13 +9459,14 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     border-radius: 4px;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     background-repeat: no-repeat;
     background-position: right -8359px;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     position: relative;
+    text-align: left;
 }
 .default-select::before, .ui-selectmenu-button::before {
     content: '';
@@ -9525,6 +9490,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
     overflow: hidden;
+    position: relative;
 }
 .fm-share-dropdown {
     margin: 10px -20px 0 0;
@@ -9557,6 +9523,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     left: -4px;
     right: auto;
     overflow: hidden;
+    text-align: left;
 }
 .default-select-dropdown .jspDrag {
     width: 4px;
@@ -9809,7 +9776,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     height: 60px;
     width: 60px;
     float: left;
-    margin: 26px 19px 0 19px;
+    margin: 19px 19px 15px 19px;
     background-repeat: no-repeat;
     background-image: url(../images/mega/files-icons_v2.svg);
     background-position: 0 0;
@@ -9826,6 +9793,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     color: #666666;
     vertical-align: top;
     padding-bottom: 5px;
+    margin-top: -3px;
 }
 .export-item-title {
     display: table-cell;
@@ -10620,7 +10588,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
     margin: 0 0 0 -6px;
     position: absolute;
     top: 6px;
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     background-position: center -8343px;
     background-position: right -1288px;
     background-repeat: no-repeat;
@@ -10696,11 +10664,11 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
     background-color: rgba(255,255,255,0.1);
 }
 .sorting-menu-item.active, .sorting-menu-item.selected {
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     color: rgba(255,255,255,1);
 }
 .sorting-menu-arrow {
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     background-repeat: no-repeat;
     background-position: left -7998px;
     position: absolute;
@@ -10726,7 +10694,7 @@ table {
 }
 .transfer-table-header th:first-child span {
     display: block;
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     background-repeat: no-repeat;
     background-position: -6px -4019px;
     height: 24px;
@@ -11195,7 +11163,7 @@ table {
     width: 25px;
     height: 13px;
     position: absolute;
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     background-position: center -6063px;
     background-repeat: no-repeat;
     margin: -20px 0 0 -12px;
@@ -11430,7 +11398,7 @@ table {
     float: left;
     height: 18px;
     background-color: #13E03C;
-    border:1px solid transparent;
+    border: 1px solid transparent;
     color: white;
     font-size: 12px;
     text-transform: uppercase;
@@ -11469,11 +11437,11 @@ table {
     text-align: left;
 }
 .fm-close-all-sessions span {
-    background: rgba(255, 255, 255, 1) url(../images/mega/nw-fm-sprite_v20.svg) no-repeat scroll -18px -5468px;
+    background: rgba(255, 255, 255, 1) url(../images/mega/nw-fm-sprite_v21.svg) no-repeat scroll -18px -5468px;
     padding-left: 20px;
 }
 .settings-logout {
-    background: #ccc url(../images/mega/nw-fm-sprite_v20.svg) no-repeat scroll 5px -8423px;
+    background: #ccc url(../images/mega/nw-fm-sprite_v21.svg) no-repeat scroll 5px -8423px;
     cursor: pointer;
     float: right;
     margin-right: 26px;
@@ -11776,7 +11744,7 @@ table {
     -ms-transition: all 200ms ease-in-out;
     transition: all 200ms ease-in-out;
     margin: 2px 0 0 0;
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     background-position: -13px -11775px;
     background-repeat: no-repeat;
     cursor: pointer;
@@ -11932,7 +11900,7 @@ table {
 }
 .st-main-block > .jspContainer .jspPane, .main-scroll-block > .jspContainer .jspPane {
     min-height: 100%;
-    min-width: 980px;
+    min-width: 100%;
     width: 100% !important;
     position: relative;
 }
@@ -12739,7 +12707,7 @@ body.new-startpage {
     color: white;
     line-height: 23px;
     padding: 6px 0 11px 26px;
-    background-image: url(../images/mega/top-sprite_v1.png);
+    background-image: url(../images/mega/top-sprite_v2.png);
     background-repeat: no-repeat;
     background-position: -11px -729px;
     margin: 0;
@@ -12752,7 +12720,7 @@ body.new-startpage {
     width: 26px;
     height: 26px;
     float: right;
-    background-image: url(../images/mega/top-sprite_v1.png);
+    background-image: url(../images/mega/top-sprite_v2.png);
     background-repeat: no-repeat;
     background-position: -6px -854px;
     margin: 5px 0 0 9px;
@@ -12816,7 +12784,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    padding: 30px 0;
+    padding: 20px 0;
 }
 .nw-bottom-column:nth-child(1) {
     min-width: 177px;
@@ -12970,7 +12938,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     margin-left: 0;
 }
 .top-login-warning-arrow {
-    background-image: url(../images/mega/top-sprite_v1.png);
+    background-image: url(../images/mega/top-sprite_v2.png);
     background-position: 2px -420px;
     background-repeat: no-repeat;
     width: 30px;
@@ -13075,25 +13043,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     padding: 3px 0 13px 0;
     margin: 0 0 0 0;
 }
-.top-login-bott-gray-block {
-    background-color: #F6F6F6;
-    margin: 0 -15px 0 -15px;
-    padding: 5px 15px 0 15px;
-    -webkit-border-bottom-left-radius: 6px;
-    -moz-border-radius-bottomleft: 6px;
-    border-bottom-left-radius: 6px;
-    height: 56px;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-}
 .top-login-bott-gray-block .default-white-button {
     margin-top: 7px;
-}
-.pro-login-dialog .top-login-bott-gray-block {
-    -webkit-border-bottom-right-radius: 8px;
-    -moz-border-radius-bottomright: 8px;
-    border-bottom-right-radius: 8px;
 }
 .pro-login-dialog .login-notification-icon {
     display: none;
@@ -13211,7 +13162,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     line-height: 28px;
     padding-left: 36px;
     color: white;
-    background-image: url(../images/mega/top-sprite_v1.png);
+    background-image: url(../images/mega/top-sprite_v2.png);
     background-position: -4px -1261px;
     background-repeat: no-repeat;
     font-size: 14px;
@@ -17915,7 +17866,7 @@ code, c {
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     background-color: #5b5a59;
-    background-image: url(../images/mega/top-sprite_v1.png);
+    background-image: url(../images/mega/top-sprite_v2.png);
     background-position: -9px -941px;
     background-repeat: no-repeat;
     margin: 8px 0 0 240px;
@@ -18843,7 +18794,7 @@ div.new-bottom-pages li, div.new-bottom-pages p {
 .arrow:not(.grid-header-star) {
     cursor: pointer;
     background-position: right top;
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     background-repeat: no-repeat;
     padding: 0 15px 0 0;
     display: block;
@@ -19010,7 +18961,7 @@ a.ff-extension-button:hover {
 }
 .search-path-icon.cloud-drive {
     background-position: -5px -999px;
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
 }
 .search-path-icon.folder {
     background-position: -9px -622px;
@@ -19022,7 +18973,7 @@ a.ff-extension-button:hover {
 }
 .search-path-icon.recycle-item {
     background-position: -1px -8035px;
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
 }
 .search-path-icon.contacts-item {
     background-position: -6px -935px;
@@ -19030,7 +18981,7 @@ a.ff-extension-button:hover {
 }
 .search-path-icon.inbox-item {
     background-position: -3px -6717px;
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
 }
 .search-path-icon img {
     width: 24px;
@@ -19049,7 +19000,7 @@ a.ff-extension-button:hover {
     width: 10px;
     height: 30px;
     background-repeat: no-repeat;
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     background-position: right -1430px;
     margin: 0 4px 0 0;
 }
@@ -20153,7 +20104,7 @@ span.incoming-call-name {
     display: inline-block;
 }
 .star .incoming-contact-info span.incoming-call-name {
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     background-position: right -6265px;
     background-repeat: no-repeat;
     padding-right: 25px;
@@ -20469,8 +20420,10 @@ span.incoming-call-name {
     margin-left: 138px;
 }
 .shared-details-pad {
-    float: left;
     padding-top: 28px;
+    overflow: hidden;
+    min-width: 630px;
+    position: relative;
 }
 .shared-details-folder-name, .contact-details-user-name {
     font-size: 25px;
@@ -20488,6 +20441,11 @@ span.incoming-call-name {
     max-width: -webkit-calc(100% - 56px);
     max-width: -moz-calc(100% - 56px);
     max-width: calc(100% - 56px);
+}
+.shared-details-folder-name {
+    max-width: -webkit-calc(100% - 216px);
+    max-width: -moz-calc(100% - 216px);
+    max-width: calc(100% - 216px);
 }
 .fm-dialog .shared-details-folder-name, .fm-dialog .contact-details-user-name {
     max-width: 100%;
@@ -20515,6 +20473,7 @@ span.incoming-call-name {
     background-color: white;
     margin-top: -1px;
     position: relative;
+    min-width: 710px;
 }
 .contact-top-details .nw-contact-block-avatar {
     float: left;
@@ -20626,7 +20585,7 @@ span.incoming-call-name {
     padding-right: 0;
 }
 .contact-details-pad {
-    margin: 0 255px 0 205px;
+    margin: 0 255px 10px 205px;
     padding-top: 44px;
     vertical-align: top;
     position: relative;
@@ -20637,6 +20596,7 @@ span.incoming-call-name {
 }
 .contact-details-pad .onlinestatus {
     height: 16px;
+    margin-bottom: 20px;
 }
 .contact-details-email {
     font-size: 13px;
@@ -20646,13 +20606,17 @@ span.incoming-call-name {
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
+        white-space: nowrap;
+    overflow: hidden;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
 }
 .contact-details-pad .nw-contact-status {
     margin: 6px 6px 0 0;
 }
-.contact-details-pad .fm-remove-contact, .contact-details-pad .fm-start-conversation, .contact-details-pad .fm-send-files, .contact-details-pad .fm-share-folders {
+.contact-details-pad .default-white-button {
     float: left;
-    margin: 20px 0 0 0;
+    margin: 0 0 10px 0;
 }
 .fm-question {
     display: none;
@@ -20704,9 +20668,23 @@ span.incoming-call-name {
 }
 .shared-details-buttons {
     right: 0;
+    top: 0;
     position: absolute;
-    margin: 75px 18px 0 0;
+    margin: 75px 0 0 0;
+    padding: 0 18px 0 0;
     background-color: white;
+}
+.shared-details-buttons::before {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 100%;
+    left: -20px;
+    top: 0;
+    background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIwIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmZmZmZmYiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+    background: -moz-linear-gradient(left, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%);
+    background: -webkit-linear-gradient(left, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%);
+    background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%);
 }
 .shared-details-buttons .default-white-button {
     min-width: 20px;
@@ -20715,6 +20693,10 @@ span.incoming-call-name {
     height: -webkit-calc(100% - 121px);
     height: -moz-calc(100% - 121px);
     height: calc(100% - 121px);
+}
+.shared-details-pad .fm-chat-user-info {
+    float: none;
+    margin: 7px 0 0 48px;
 }
 .fm-blocks-view.shared-folder-content {
     padding: 12px;
@@ -22075,7 +22057,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     width: 244px;
     float: left;
     background-color: rgba(0,0,0,0.15);
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     background-repeat: no-repeat;
     cursor: pointer;
 }
@@ -22104,9 +22086,15 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 .copy-dialog-button.rubbish-bin.active, .move-dialog-button.rubbish-bin.active {
     background-color: rgba(49,181,0,1);
 }
-.copy-dialog-empty.cloud-drive, .copy-dialog-empty.shared-with-me, .copy-dialog-empty.conversations, .move-dialog-empty.cloud-drive, .move-dialog-empty.shared-with-me, .move-dialog-empty.conversations, .move-dialog-empty.rubbish-bin {
+.dialog-empty-block {
     height: 240px;
+    position: relative;
     display: none;
+    background-color: #FAFAFA;
+}
+.dialog-empty-block.dialog-fm {
+    height: 312px;
+    display: block;
 }
 .move-dialog-button {
     width: 158px;
@@ -22114,29 +22102,35 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 .move-dialog-button.shared-with-me {
     width: 160px;
 }
-.copy-dialog-empty-icon, .move-dialog-empty-icon {
-    height: 166px;
-    background-image: url(../images/mega/dialogs-sprite_v12.svg);
-    background-position: center -867px;
+.dialog-empty-icon {
+    height: 128px;
+    background-image: url(../images/mega/empty-sprite_v3.png);
+    background-position: center -2677px;
     background-repeat: no-repeat;
 }
-.shared-with-me .copy-dialog-empty-icon, .shared-with-me .move-dialog-empty-icon {
-    background-position: center -1037px;
+.folder.dialog-empty-icon {
+    background-position: center -2818px;
 }
-.conversations .copy-dialog-empty-icon, .conversations .move-dialog-empty-icon {
-    background-position: center -1187px;
+.shared-with-me .dialog-empty-icon {
+    background-position: center -2968px;
 }
-.rubbish-bin .copy-dialog-empty-icon, .rubbish-bin .move-dialog-empty-icon {
-    background-position: center -1352px;
+.rubbish-bin .dialog-empty-icon {
+    background-position: center -3118px;
 }
-.copy-dialog-empty-header, .move-dialog-empty-header {
-    font-size: 19px;
+.dialog-empty-header {
+    font-size: 18px;
     line-height: 24px;
-    color: #CCCCCC;
+    color: #777777;
     text-align: center;
-    padding: 0 12px;
+    padding: 10px 12px 0 12px;
 }
-.copy-dialog-empty-txt, .move-dialog-empty-txt {
+.dialog-empty-pad {
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    margin-top: -82px;
+}
+.dialog-empty-txt {
     font-size: 13px;
     padding-top: 3px;
     line-height: 21px;
@@ -22176,6 +22170,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 }
 .dialog-tree-panel-scroll {
     height: 168px;
+    min-width: 100%;
 }
 .fm-dialog-body .nw-conversations-item {
     padding-left: 13px;
@@ -22199,8 +22194,11 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 .copy-dialog-txt.active, .move-dialog-txt.active {
     display: inline;
 }
-.copy-dialog-empty.active, .copy-dialog-tree-panel.active, .move-dialog-empty.active, .move-dialog-tree-panel.active, .share-dialog-tree-panel.active {
+.dialog-empty-block.active, .copy-dialog-tree-panel.active, .move-dialog-tree-panel.active, .share-dialog-tree-panel.active {
     display: block;
+}
+.dialog-content-block {
+    min-width: 100%;
 }
 .overlayed .main-blur-block {
     filter: blur(0.25em);
@@ -22237,7 +22235,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     margin: 12px 12px 12px 12px
 }
 .fm-mega-dialog-size-icon {
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     background-position: center -5509px;
     background-repeat: no-repeat;
     width: 20px;
@@ -22268,19 +22266,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
 }
 .fm-mega-dialog.dialog .fm-dialog-close, .fm-mega-dialog.dialog .nw-fm-dialog-title {
     display: block;
-}
-.fm-mega-dialog-bottom {
-    height: 56px;
-    background-color: #F6F6F6;
-    margin: 12px -12px -12px -12px;
-    display: block;
-    -webkit-border-bottom-left-radius: 7px;
-    -moz-border-radius-bottomleft: 7px;
-    border-bottom-left-radius: 7px;
-    -webkit-border-bottom-right-radius: 7px;
-    -moz-border-radius-bottomright: 7px;
-    border-bottom-right-radius: 7px;
-    padding-right: 12px;
 }
 /**
   * PRO upgrade, new flow styling for the login/register popups and buttons
@@ -22514,7 +22499,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     display: inline-block;
     border-radius: 12px;
     text-transform: uppercase;
-    background-image: url(../images/mega/top-sprite_v1.png);
+    background-image: url(../images/mega/top-sprite_v2.png);
     background-repeat: no-repeat;
     background-position: -6px -981px;
     color: rgba(255,255,255,0.7) !important;
@@ -22710,10 +22695,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 .credentials-warning-dialog .fm-mega-dialog-pad {
     margin: 12px 0 0 0;
 }
-.credentials-warning-dialog .fm-mega-dialog-bottom {
-    background-color: #eee;
-    margin: 0;
-}
 .credentials-warning-dialog {
     background-color: #fff;
     width: 600px;
@@ -22856,9 +22837,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
 }
 .key-signature-warning-dialog .fm-mega-dialog-pad {
     margin: 12px 0;
-}
-.key-signature-warning-dialog .fm-mega-dialog-bottom {
-    margin: 12px 0 -12px;
 }
 .key-signature-warning-dialog {
     background-color: #fff;
@@ -24069,7 +24047,7 @@ body.pro:after {
 }
 .transfer-bar-overlay div {
     display: block;
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     background-repeat: no-repeat;
     background-position: -13px -564px;
     background-color: rgba(255,255,255,0.7);
@@ -24209,17 +24187,24 @@ body.pro:after {
 }
 .megasync-dropdown {
     width: 280px;
-    height: 32px;
-    background-color: white;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
+    float: none;
     margin: 63px auto 55px auto;
-    text-align: left;
-    -moz-box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
-    -webkit-box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
-    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
     display: none;
+}
+.megacmd-dropdown {
+    width: 228px;
+    float: none;
+    margin: 40px auto 5px auto;
+}
+.megacmd-linux .sync-radio-buttons {
+    width: 228px;
+    margin: 0 auto;
+}
+.default-dropdown-item.icon {
+    padding: 0 30px 0 34px;
+    background-image: url(../images/mega/download-sprite-v6.png);
+    background-position: 0 64px;
+    background-repeat: no-repeat;
 }
 .sync-bottom-block .megasync-dropdown {
     margin: 0px;
@@ -24227,62 +24212,29 @@ body.pro:after {
 .linux .megasync-dropdown {
     display: block;
 }
-.megasync-dropdown span, .megasync-dropdown-link {
-    padding: 0 30px 0 11px;
-    background-image: url(../images/mega/download-sprite-v6.png);
-    background-position: right -1811px;
-    color: #666666;
-    background-repeat: no-repeat;
-    font-size: 14px;
-    line-height: 32px;
-    height: 32px;
-    display: block;
-    position: relative;
-    z-index: 20;
-    cursor: pointer;
-    white-space: nowrap;
-    -o-text-overflow: ellipsis;
-    text-overflow: ellipsis;
-    overflow: hidden;
-}
-.megasync-dropdown-link {
-    padding-left: 34px;
-    background-color: rgba(255,255,255,0);
-    -webkit-transition: background-color 200ms ease-in-out;
-    -moz-transition: background-color 200ms ease-in-out;
-    -o-transition: background-color 200ms ease-in-out;
-    -ms-transition: background-color 200ms ease-in-out;
-    transition: background-color 200ms ease-in-out;
-}
-.megasync-dropdown-link:hover {
-    background-color: rgba(0,0,0,0.05);
-}
-.megasync-dropdown-link.centos {
+.default-dropdown-item.centos {
     background-position: 10px -1921px;
 }
-.megasync-dropdown-link.debian {
+.default-dropdown-item.debian {
     background-position: 10px -1982px;
 }
-.megasync-dropdown-link.elementary, .megasync-dropdown-link.elementaryosfreya {
+.default-dropdown-item.elementary, .default-dropdown-item.elementaryosfreya {
     background-position: 10px -1952px;
 }
-.megasync-dropdown-link.fedora {
+.default-dropdown-item.fedora {
     background-position: 10px -2132px;
 }
-.megasync-dropdown-link.mint {
+.default-dropdown-item.mint {
     background-position: 10px -2102px;
 }
-.megasync-dropdown-link.opensuse {
+.default-dropdown-item.opensuse {
     background-position: 10px -2072px;
 }
-.megasync-dropdown-link.redhat {
+.default-dropdown-item.redhat {
     background-position: 10px -2042px;
 }
-.megasync-dropdown-link.ubuntu {
+.default-dropdown-item.ubuntu {
     background-position: 10px -2012px;
-}
-.megasync-dropdown span.active {
-    background-position: right -1883px;
 }
 .megasync-close {
     width: 14px;
@@ -24321,49 +24273,17 @@ body.pro:after {
     font-size: 13px;
     cursor: default;
 }
-.megasync-dropdown-list {
-    width: 288px;
-    position: absolute;
-    left: 50%;
-    margin: 0 0 0 -144px;
-    -moz-border-radius: 8px;
-    -webkit-border-radius: 8px;
-    border-radius: 8px;
-    background-color: rgba(0,0,0,0.15);
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    padding: 4px;
-    z-index: 10;
-    top: 122px;
+.default-select-dropdown .jspContainer .jspPane {
+    min-width: 100%;
+    max-width: 100% !important;
 }
-.megasync-dropdown-list .jspPane {
-    min-width: 280px;
-    max-width: 280px;
-}
-.megasync-dropdown-pad {
-    background-color: white;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
-    text-align: left;
-    -webkit-box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
-    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    padding: 36px 0 4px 0;
-}
-.megasync-dropdown-scroll .jspVerticalBar {
-    width: 10px;
-}
-.megasync-list-arrow {
+.mega-list-arrow {
     height: 23px;
     background-image: url(../images/mega/download-sprite-v6.png);
     background-position: center -2171px;
     cursor: pointer;
 }
-.megasync-list-arrow.inactive {
+.mega-list-arrow.inactive {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     -moz-opacity: 0.3;
     -khtml-opacity: 0.3;
@@ -24891,7 +24811,7 @@ div.camera-bottom-txt {
     height: 24px;
     left: 11px;
     top: 12px;
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     background-repeat: no-repeat;
     background-position: -11px -10099px;
 }
@@ -25954,7 +25874,7 @@ div.camera-bottom-txt {
     top: 50%;
 }
 .empty-icon {
-    background-image: url(../images/mega/empty-sprite_v2.png);
+    background-image: url(../images/mega/empty-sprite_v3.png);
     background-repeat: no-repeat;
     height: 185px;
 }
@@ -26521,7 +26441,7 @@ body.key.th .reg-st3-mid-txt, body.key.th .reg-st3-mid-txt, body.key.id .reg-st3
     -moz-border-radius: 100%;
     -webkit-border-radius: 100%;
     border-radius: 100%;
-    background-image: url(../images/mega/new-chat-sprite-v3.svg);
+    background-image: url(../images/mega/new-chat-sprite-v4.svg);
     background-repeat: no-repeat;
     background-position: -7px -1353px;
     -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.1);

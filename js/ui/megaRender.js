@@ -279,9 +279,24 @@
             get: function() {
                 if (!maxItemsInView) {
                     if (this.viewmode) {
+                        var width, height;
                         var $fm = $('.fm-blocks-view.fm');
-                        var row = Math.floor($fm.width() / 140);
-                        maxItemsInView = row * Math.ceil($fm.height() / 164) + row;
+                        if ($fm.hasClass('hidden')) {
+                            width = (
+                                window.innerWidth -
+                                (fmconfig.leftPaneWidth || 200) -
+                                48 /* left-icons-pane */
+                            );
+                            height = (
+                                window.innerHeight - 72 /* top-head */
+                            );
+                        }
+                        else {
+                            width = $fm.width();
+                            height = $fm.height();
+                        }
+                        var row = Math.floor(width / 140);
+                        maxItemsInView = row * Math.ceil(height / 164) + row;
                     }
                     else {
                         maxItemsInView = Math.ceil($('.files-grid-view.fm').height() / 24 * 1.4);

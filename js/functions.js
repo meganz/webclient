@@ -318,6 +318,9 @@ delay.cancel = function(aProcID) {
 };
 
 function jScrollFade(id) {
+    if (is_selenium) {
+        return;
+    }
 
     $(id + ' .jspTrack').rebind('mouseover', function(e) {
         $(this).find('.jspDrag').addClass('jspActive');
@@ -561,7 +564,7 @@ function populate_l() {
     l[8440] = l[8440].replace('[A]', '<a href="https://github.com/meganz/">').replace('[/A]', '</a>');
     l[8440] = l[8440].replace('[A2]', '<a href="/contact" class="clickurl">').replace('[/A2]', '</a>');
     l[8441] = l[8441].replace('[A]', '<a href="mailto:bugs@mega.nz">').replace('[/A]', '</a>');
-    l[8441] = l[8441].replace('[A2]', '<a href="https://mega.nz/#blog_8">').replace('[/A2]', '</a>');
+    l[8441] = l[8441].replace('[A2]', '<a href="https://mega.nz/blog_8">').replace('[/A2]', '</a>');
     l[5931] = l[5931].replace('[A]', '<a class="red" href="/fm/account" class="clickurl">').replace('[/A]', '</a>');
     l[8644] = l[8644].replace('[S]', '<span class="green">').replace('[/S]', '</span>');
     l[8651] = l[8651].replace('%1', '<span class="header-pro-plan"></span>');
@@ -616,12 +619,12 @@ function populate_l() {
     l[16116] = l[16116].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[16119] = l[16119].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[16120] = l[16120].replace('[S]', '<span>').replace('[/S]', '</span>');
-    l[16123] = l[16123].replace('[S]', '<span>').replace('[/S]', '</span>').replace('[A]', '<a href="#pro">').replace('[/A]', '</a>').replace('[BR]', '<br />');
-    l[16124] = l[16124].replace('[S]', '<span>').replace('[/S]', '</span>').replace('[A]', '<a href="#pro">').replace('[/A]', '</a>').replace('[BR]', '<br />');
+    l[16123] = l[16123].replace('[S]', '<span>').replace('[/S]', '</span>').replace('[A]', '<a href="/pro">').replace('[/A]', '</a>').replace('[BR]', '<br />');
+    l[16124] = l[16124].replace('[S]', '<span>').replace('[/S]', '</span>').replace('[A]', '<a href="/pro">').replace('[/A]', '</a>').replace('[BR]', '<br />');
     l[16135] = l[16135].replace('[BR]', '<br />');
-    l[16136] = l[16136].replace('[A]', '<a href="#pro">').replace('[/A]', '</a>');
-    l[16137] = l[16137].replace('[A]', '<a href="#pro">').replace('[/A]', '</a>');
-    l[16138] = l[16138].replace('[A]', '<a href="#pro">').replace('[/A]', '</a>');
+    l[16136] = l[16136].replace('[A]', '<a href="/pro">').replace('[/A]', '</a>');
+    l[16137] = l[16137].replace('[A]', '<a href="/pro">').replace('[/A]', '</a>');
+    l[16138] = l[16138].replace('[A]', '<a href="/pro">').replace('[/A]', '</a>');
     l[16164] = l[16164].replace('[S]', '<a class="red">').replace('[/S]', '</a>').replace('[BR]', '<br/>');
     l[16167] = l[16167].replace('[S]', '<a href="/mobile" class="clickurl">').replace('[/S]', '</a>');
 
@@ -664,19 +667,6 @@ function divscroll(el) {
     if (page === 'start') {
         start_menu(el);
     }
-}
-
-function removeHash() {
-    var scrollV, scrollH, loc = window.location;
-
-    // Prevent scrolling by storing the page's current scroll offset
-    scrollV = document.body.scrollTop;
-    scrollH = document.body.scrollLeft;
-    loc.hash = "";
-
-    // Restore the scroll offset, should be flicker free
-    document.body.scrollTop = scrollV;
-    document.body.scrollLeft = scrollH;
 }
 
 function browserdetails(useragent) {
@@ -889,6 +879,13 @@ function browserdetails(useragent) {
     else {
         details.engine = 'Unknown';
     }
+
+    // Product info to quickly access relevant info.
+    details.prod = details.name + ' [' + details.engine + ']'
+        + (details.brand ? '[' + details.brand + ']' : '')
+        + '[' + details.version + ']'
+        + (details.isExtension ? '[E:' + details.isExtension + ']' : '')
+        + '[' + (details.is64bit ? 'x64' : 'x32') + ']';
 
     return details;
 }
@@ -2269,14 +2266,14 @@ function mKeyDialog(ph, fl, keyr) {
             // Remove the ! from the key which is exported from the export dialog
             key = key.replace('!', '');
 
-            var newHash = (fl ? '#F!' : '#!') + ph + '!' + key;
+            var newHash = (fl ? '/F!' : '/!') + ph + '!' + key;
 
             if (getSitePath() !== newHash) {
                 promise.resolve(key);
 
                 fm_hideoverlay();
                 $('.fm-dialog.dlkey-dialog').addClass('hidden');
-                location.hash = newHash;
+                loadSubPage(newHash);
             }
         }
         else {
@@ -3685,9 +3682,6 @@ mega.utils.reload = function megaUtilsReload() {
                 if (!is_extension && jj)  {
                     localStorage.jj = jj;
                 }
-                if (mcd) {
-                    localStorage.testChatDisabled = 1;
-                }
             }
             if (apipath) {
                 // restore api path across reloads, only for debugging purposes...
@@ -3695,6 +3689,9 @@ mega.utils.reload = function megaUtilsReload() {
             }
         }
 
+        if (mcd) {
+            localStorage.testChatDisabled = 1;
+        }
         if (hashLogic) {
             localStorage.hashLogic = 1;
         }
@@ -4275,7 +4272,7 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
     function _init() {
         // if (d) console.log('Initializing Rubbish-Bin Cleaning Scheduler');
 
-        updId = mBroadcaster.addListener('fmconfig:rubsched', _update);
+        // updId = mBroadcaster.addListener('fmconfig:rubsched', _update);
         if (fmconfig.rubsched) {
             timer = setInterval(function() {
                 _proc();
@@ -4812,9 +4809,14 @@ function passwordManager(form) {
     $(form).rebind('submit', function() {
         setTimeout(function() {
             var path  = getSitePath();
-            var title = document.title;
             history.replaceState({ success: true }, '', "index.html#" + document.location.hash.substr(1));
-            if (hashLogic) path = getSitePath().replace('/','/#');
+            if (hashLogic) {
+                path = getSitePath().replace('/', '/#');
+
+                if (location.href.substr(0, 19) === 'chrome-extension://') {
+                    path = path.replace('/#', '/mega/secure.html#');
+                }
+            }
             history.replaceState({ success: true, subpage: path.replace('#','').replace('/','') }, '', path);
             $(form).find('input').val('');
         }, 1000);
@@ -5434,13 +5436,15 @@ mega.utils.redirectToApp = function($selector) {
         redirect();
     }
     else {
+        var path = getSitePath().substr(1);
+
         switch (ua.details.os) {
             case 'Windows Phone':
-                window.location = "mega://" + location.hash.substr(1);
+                window.location = "mega://" + path;
                 break;
 
             case 'Android':
-                var intent = 'intent://' + location.hash
+                var intent = 'intent://#' + path
                     + '/#Intent;scheme=mega;package=mega.privacy.android.app;end';
                 document.location = intent;
                 break;

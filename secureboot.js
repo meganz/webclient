@@ -30,6 +30,7 @@ if (typeof process !== 'undefined') {
         // localStorage.jj = 1;
     }
 }
+var is_selenium = !ua.indexOf('mozilla/5.0 (selenium; ');
 var is_karma = /^localhost:987[6-9]/.test(window.top.location.host);
 var is_chrome_firefox = document.location.protocol === 'chrome:'
     && document.location.host === 'mega' || document.location.protocol === 'mega:';
@@ -44,6 +45,50 @@ function isMobile()
     var mobile = ['iphone','ipad','android','blackberry','nokia','opera mini','windows mobile','windows phone','iemobile','mobile safari','bb10; touch'];
     for (var i in mobile) if (ua.indexOf(mobile[i]) > 0) return true;
     return false;
+}
+
+function getSitePath() {
+	var hash = location.hash.replace('#', '');
+
+	if (hashLogic || hash.substr(0, 2) === 'F!' || hash[0] === '!') {
+		return '/' + hash;
+	}
+
+	return document.location.pathname;
+}
+
+// remove dangling characters from the pathname/hash
+function getCleanSitePath(path) {
+    if (path === undefined) {
+        path = getSitePath();
+    }
+
+    if (path.indexOf('%25') >= 0) {
+        do {
+            path = path.replace(/%25/g, '%');
+        } while (path.indexOf('%25') >= 0);
+    }
+    if (path.indexOf('%21') >= 0) {
+        path = path.replace(/%21/g, '!');
+    }
+    try {
+        path = decodeURIComponent(path);
+    }
+    catch (e) {}
+
+    path = path.replace(/^[/#]+|\/+$/g, '');
+
+    return path;
+}
+
+function clickURLs() {
+    $('a.clickurl').rebind('click', function() {
+        var url = $(this).attr('href') || $(this).data('fxhref');
+        if (url) {
+            loadSubPage(url.substr(1));
+            return false;
+        }
+    });
 }
 
 function geoStaticpath(eu)
@@ -477,6 +522,8 @@ if (!b_u && is_extension)
 
 
 var page;
+var locSearch = location.search;
+
 if (hashLogic) {
     // legacy support:
     page = document.location.hash;
@@ -485,19 +532,18 @@ else if (document.location.hash.substr(1,2) === 'F!' || document.location.hash.s
     // folder or file link: always keep the hash URL to ensure that keys remain client side
     page = document.location.hash;
     // history.replaceState so that back button works in new URL paradigm
-    history.replaceState({subpage: document.location.hash.replace('#', '')}, "", document.location.hash);
-}
-else if (document.location.hash.length > 0) {
-    // history.replaceState for legacy hash requests to new URL paradigm
-    page = document.location.hash;
-    history.replaceState({subpage: page.replace('#', '')}, "", '/' + page.replace('#', ''));
+    history.replaceState({subpage: page.replace('#', '')}, "", page);
 }
 else {
-    // new URL paradigm, look for desired page in the location.pathname:
-    page = document.location.pathname;
-    if (page.substr(0, 1) == '/') {
-        page = page.substr(1, page.length - 1);
+    if (document.location.hash.length > 0) {
+        // history.replaceState for legacy hash requests to new URL paradigm
+        page = document.location.hash;
     }
+    else {
+        // new URL paradigm, look for desired page in the location.pathname:
+        page = document.location.pathname;
+    }
+    page = getCleanSitePath(page);
     history.replaceState({subpage: page}, "", '/' + page);
 }
 page = page.replace('#','');
@@ -734,6 +780,9 @@ Object.defineProperty(this, 'mBroadcaster', {
                     if (d) {
                         console.log('CROSSTAB COMMUNICATION INITIALIZED AS '
                             + (this.master ? 'MASTER':'SLAVE'));
+
+                        console.debug(String(ua));
+                        console.debug(browserdetails(ua).prod + u_handle);
                     }
                     cb(this.master);
                     cb = null;
@@ -1707,6 +1756,7 @@ else if (!b_u)
         jsl.push({f:'css/avatars.css', n: 'avatars_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/icons.css', n: 'icons_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/buttons.css', n: 'buttons_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/bottom-pages.css', n: 'bottom-pages_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/dropdowns.css', n: 'dropdowns_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/dialogs.css', n: 'dialogs_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/popups.css', n: 'popups_css', j:2,w:5,c:1,d:1,cache:1});
@@ -1818,6 +1868,8 @@ else if (!b_u)
         'help_js': {f:'html/js/help2.js', n: 'help_js', j:1},
         'sync': {f:'html/sync.html', n: 'sync', j:0},
         'sync_js': {f:'html/js/sync.js', n: 'sync_js', j:1},
+        'cmd': {f:'html/megacmd.html', n: 'cmd', j:0},
+        'megacmd_js': {f:'html/js/megacmd.js', n: 'megacmd_js', j:1},
         'cms_snapshot_js': {f:'js/cmsSnapshot.js', n: 'cms_snapshot_js', j:1},
         'mobile': {f:'html/mobile.html', n: 'mobile', j:0},
         'support_js': {f:'html/js/support.js', n: 'support_js', j:1},
@@ -1915,6 +1967,7 @@ else if (!b_u)
         'takedown': ['takedown'],
         'mobile': ['mobile'],
         'sync': ['sync','sync_js', 'megasync_js'],
+        'cmd': ['cmd','megacmd_js'],
         'support': ['support_js', 'support'],
         'contact': ['contact'],
         'dev': ['dev','dev_js','sdkterms'],
@@ -1936,7 +1989,7 @@ else if (!b_u)
         subpages['F!'] = ['fm_mobile', 'fm_mobile_js'];
         subpages['fm'] = ['fm_mobile', 'fm_mobile_js'];
     }
-
+	if (page == 'megacmd') page = 'cmd';
 
     if (page)
     {
@@ -2111,7 +2164,10 @@ else if (!b_u)
             {
                 jsl_current += jsl[jsi].w || 1;
                 jsl_progress();
-                if (++jslcomplete == jsl.length) initall();
+                if (++jslcomplete == jsl.length) {
+                    jsl_done = true;
+                    initall();
+                }
                 else
                 {
                     // mozRunAsync(next.bind(this, jsli++));
@@ -2397,7 +2453,14 @@ else if (!b_u)
             } else {
                 boot_done();
             }
-            if (jsar.length) evalscript_url(jsar);
+            if (jsar.length) {
+                if (is_chrome_firefox) {
+                    console.error('jsar must be empty here...');
+                }
+                else {
+                    evalscript_url(jsar);
+                }
+            }
             jsar=undefined;
             cssar=undefined;
         }

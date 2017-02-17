@@ -1786,6 +1786,10 @@ function api_send(q) {
 
     q.xhr.cancelled = false;
 
+    if (chunked_method === 2 && typeof Uint8Array.prototype.indexOf !== 'function') {
+        chunked_method = 0;
+    }
+
     if (q.split && chunked_method == 2) {
         // use chunked fetch with JSONSplitter input type Uint8Array
         q.splitter = new JSONSplitter(q.split, q.xhr, true);
@@ -2971,9 +2975,10 @@ mThumbHandler.add('SVG', function SVGThumbHandler(ab, cb) {
         canvas.height = image.height;
         canvas.width = image.width;
         ctx.drawImage(image, 0, 0);
-        cb(dataURLToAB(canvas.toDataURL('image/jpeg')));
+        cb(dataURLToAB(canvas.toDataURL('image/png')));
     };
-    image.src = 'data:image/svg+xml;charset-utf-8,' + encodeURIComponent(ab_to_str(ab));
+    image.src = 'data:image/svg+xml;charset=utf-8,'
+        + encodeURIComponent(ab_to_str(ab).replace(/foreignObject|script/g, 'desc'));
 });
 
 var storedattr = {};
@@ -3010,7 +3015,7 @@ function api_storefileattr(id, type, key, data, ctx) {
         ssl: use_ssl
     };
 
-    if (M.d[ctx.handle] && RightsbyID(ctx.handle) > 1) {
+    if (M.d[ctx.handle] && rightsById(ctx.handle) > 1) {
         req.h = handle;
     }
 
@@ -3720,7 +3725,7 @@ function api_pfaerror(handle) {
     }
 
     // Got access denied, store 'f' attr to prevent subsequent attemps
-    if (node && RightsbyID(node.h) > 1 && node.f !== u_handle) {
+    if (node && rightsById(node.h) > 1 && node.f !== u_handle) {
         node.f = u_handle;
         return api_setattr(node);
     }
@@ -3898,14 +3903,14 @@ var newmissingkeys = false;
 
 // whenever a node fails to decrypt, call this.
 function crypto_reportmissingkey(n) {
-    var change = false;
+    if (!M.d[n.h] || typeof M.d[n.h].k === 'string') {
+        var change = false;
 
-    if (!missingkeys[n.h]) {
-        missingkeys[n.h] = {};
-        change = true;
-    }
+        if (!missingkeys[n.h]) {
+            missingkeys[n.h] = {};
+            change = true;
+        }
 
-    if (typeof n.k == 'string') {
         for (var p = 8; (p = n.k.indexOf(':', p)) >= 0; p += 32) {
             if (p == 8 || n.k[p - 9] == '/') {
                 var id = n.k.substr(p - 8, 8);
@@ -3919,18 +3924,18 @@ function crypto_reportmissingkey(n) {
                 }
             }
         }
+
+        if (change) {
+            newmissingkeys = true;
+            if (fmdb) fmdb.add('mk', { h : n.h,
+                                       d : { s : Object.keys(missingkeys[n.h]) }
+                                     });
+        }
     }
     else {
         console.error('invalid-missingkey ' + n.h, change);
 
-        srvlog2('invalid-missingkey', n.h, typeof n.k, Object(n.k).length | 0);
-    }
-
-    if (change) {
-        newmissingkeys = true;
-        if (fmdb) fmdb.add('mk', { h : n.h,
-                                   d : { s : Object.keys(missingkeys[n.h]) }
-                                 });
+        //srvlog2('invalid-missingkey', n.h, typeof n.k, Object(n.k).length | 0);
     }
 }
 

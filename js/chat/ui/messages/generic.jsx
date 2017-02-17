@@ -325,7 +325,7 @@ var GenericConversationMessage = React.createClass({
                             if (v.fa && (icon === "graphic" || icon === "image")) {
                                 var imagesListKey = message.messageId + "_" + v.h;
                                 if (!chatRoom.images.exists(imagesListKey)) {
-                                    v.k = imagesListKey;
+                                    v.id = imagesListKey;
                                     v.delay = message.delay;
                                     chatRoom.images.push(v);
                                 }
@@ -914,7 +914,7 @@ var GenericConversationMessage = React.createClass({
                         icon = <i className={"small-icon " + button.icon}></i>;
                     }
                     buttons.push(
-                        <div className={classes} key={k}  onClick={(() => { button.callback(); })}>
+                        <div className={classes} key={k}  onClick={((e) => { button.callback.call(e.target); })}>
                             {icon}
                             {button.text}
                         </div>

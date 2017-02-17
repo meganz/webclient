@@ -882,7 +882,7 @@ var proPage = {
      */
     getUrlParam: function(paramToGet) {
 
-        var hash = location.hash.substr(1);
+        var hash = getSitePath().substr(1) + locSearch;
         var index = hash.indexOf(paramToGet + '=');
         var param = hash.substr(index).split('&')[0].split('=')[1];
 

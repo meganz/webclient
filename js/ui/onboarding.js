@@ -69,7 +69,13 @@
 
     Onboarding.prototype.reinit = function() {
         var self = this;
-        $(window).rebind('resize.onboarding hashchange.onboarding', function() {
+        if (self._pageChangeListener) {
+            mBroadcaster.removeListener(self._pageChangeListener);
+        }
+        self._pageChangeListener = mBroadcaster.addListener('pagechange', function() {
+            self.eventuallyRenderClickHandlers();
+        });
+        $(window).rebind('resize.onboarding', function() {
             self.eventuallyRenderClickHandlers();
         });
 
@@ -380,7 +386,10 @@
      */
     Onboarding.prototype.destroy = function() {
         var self = this;
-        $(window).unbind('hashchange.onboarding');
+        if (self._pageChangeListener) {
+            mBroadcaster.removeListener(self._pageChangeListener);
+        }
+
         $(window).unbind('resize.onboarding');
 
         if (!self.screens) {

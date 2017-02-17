@@ -36,11 +36,6 @@ var avatars = {};
 
 
 
-function getSitePath() {
-    if (hashLogic) return '/' + document.location.hash.replace('#','');
-    else return document.location.pathname;
-}
-
 var pro_json = '[[["N02zLAiWqRU",1,500,1024,1,"9.99","EUR"],["zqdkqTtOtGc",1,500,1024,12,"99.99","EUR"],["j-r9sea9qW4",2,2048,4096,1,"19.99","EUR"],["990PKO93JQU",2,2048,4096,12,"199.99","EUR"],["bG-i_SoVUd0",3,4096,8182,1,"29.99","EUR"],["e4dkakbTRWQ",3,4096,8182,12,"299.99","EUR"]]]';
 
 pages['placeholder'] = '((TOP))<div class="main-scroll-block"><div class="main-pad-block">' +
@@ -49,29 +44,8 @@ pages['placeholder'] = '((TOP))<div class="main-scroll-block"><div class="main-p
 function startMega() {
     if (!hashLogic) {
         $(window).rebind('popstate.mega', function(event) {
-            var state = event.originalEvent.state;
-            if (folderlink) {
-                flhashchange = true;
-            }
-
-            if (state && state.subpage)
-            {
-              dlid=false;
-              page = state.subpage;
-              init_page();
-            }
-            else if (state && state.fmpage)
-            {
-              dlid=false;
-              page = state.fmpage;
-              init_page();
-            }
-            else
-            {
-                dlid=false;
-                page = '';
-                init_page();
-            }
+            var state = event.originalEvent.state || {};
+            loadSubPage(state.subpage || state.fmpage || location.hash, event);
         });
     }
 
@@ -348,7 +322,7 @@ function init_page() {
         }
 
         n_h = pfid;
-        if (!flhashchange || pfkey !== oldPFKey) {
+        if (!flhashchange || pfkey !== oldPFKey || pfkey === false) {
             if (pfkey) {
                 api_setfolder(n_h);
                 if (waitxhr) {
@@ -713,8 +687,6 @@ function init_page() {
 
         function doRenderHelp() {
 
-            console.log('reRenderHelp()');
-
             if (window.helpTemplate) {
                 parsepage(window.helpTemplate);
                 init_help();
@@ -936,6 +908,10 @@ function init_page() {
         init_sync();
         topmenuUI();
         mainScroll();
+    }
+    else if (page == 'cmd') {
+        parsepage(pages['cmd']);
+        initMegacmd();
     }
     else if (page == 'mobile') {
         parsepage(pages['mobile']);
@@ -1745,6 +1721,10 @@ function topmenuUI() {
                 loadSubPage('sync');
                 return false;
             }
+            else if (className.indexOf('cmd') > -1) {
+                loadSubPage('cmd');
+                return false;
+            }
             else if (className.indexOf('help') > -1) {
                 loadSubPage('help');
                 return false;
@@ -2078,17 +2058,6 @@ function parsepage(pagehtml, pp) {
     clickURLs();
 }
 
-function clickURLs()
-{
-    $('a.clickurl').rebind('click', function() {
-        var url = $(this).attr('href') || $(this).data('fxhref');
-        if (url) {
-            loadSubPage(url.substr(1));
-            return false;
-        }
-    });
-}
-
 function parsetopmenu() {
     var top = pages['top'].replace(/{staticpath}/g, staticpath);
     if (document.location.href.substr(0, 19) == 'chrome-extension://') {
@@ -2100,17 +2069,13 @@ function parsetopmenu() {
 }
 
 
-
-function loadSubPage(tpage)
+function loadSubPage(tpage, event)
 {
-    if (tpage[0] === '#' || tpage[0] === '/') {
-        tpage = tpage.substr(1);
-    }
+    tpage = getCleanSitePath(tpage);
 
     if (typeof gifSlider !== 'undefined' && tpage[0] !== '!') {
         gifSlider.clear();
     }
-
 
     if (silent_loading) {
         return false;
@@ -2127,10 +2092,14 @@ function loadSubPage(tpage)
         return false;
     }
 
-    if ((tpage == '#' || tpage == '' || tpage == 'start') && page == 'start' ) {
+    if ((!tpage || tpage === 'start') && page === 'start') {
         if ($.infoscroll) {
             startpageMain();
         }
+        return false;
+    }
+
+    if ((tpage === page) && !folderlink) {
         return false;
     }
 
@@ -2151,16 +2120,8 @@ function loadSubPage(tpage)
     }
 
     if (page) {
-        if (page.indexOf('%25') !== -1) {
-            do {
-                page = page.replace(/%25/g, '%');
-            } while (page.indexOf('%25') !== -1);
-        }
-        if (page.indexOf('%21') !== -1) {
-            page = page.replace(/%21/g, '!');
-        }
         for (var p in subpages) {
-            if (page && page.substr(0, p.length) == p) {
+            if (page.substr(0, p.length) === p) {
                 for (var i in subpages[p]) {
                     if (!jsl_loaded[jsl2[subpages[p][i]].n]) {
                         jsl.push(jsl2[subpages[p][i]]);
@@ -2170,10 +2131,10 @@ function loadSubPage(tpage)
         }
     }
 
-    if (hashLogic) {
+    if (hashLogic || page.substr(0, 2) === 'F!' || page[0] === '!') {
         document.location.hash = '#' + page;
     }
-    else {
+    else if (!event || event.type !== 'popstate') {
         history.pushState({ subpage: page }, "", "/"+page);
     }
 
@@ -2184,6 +2145,7 @@ function loadSubPage(tpage)
     else {
         init_page();
     }
+    mBroadcaster.sendMessage('pagechange');
 }
 
 
@@ -2193,19 +2155,9 @@ window.onhashchange = function() {
         return false;
     }
     if (hashLogic) {
-        hash = location.hash;
-        if (hash) {
-            var newpage = hash.replace('#', '');
-
-            if (newpage) {
-                try {
-                    newpage = decodeURIComponent(newpage);
-                }
-                catch (e) {}
-            }
-            if (newpage !== page) {
-                loadSubPage(newpage);
-            }
+        hash = getCleanSitePath(location.hash);
+        if (hash !== page) {
+            loadSubPage(hash);
         }
     }
 };

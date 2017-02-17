@@ -123,18 +123,16 @@ function crypto_decryptnode(n) {
 
     if (typeof n.k == 'string') {
         // inbound share root? set parent to sharing user; extract & store sharekey.
-        if (n.su) {
-            if (n.sk) {
-                key = crypto_process_sharekey(n.h, n.sk);
+        if (n.su && typeof n.sk == 'string') {
+            key = crypto_process_sharekey(n.h, n.sk);
 
-                if (key) {
-                    if (key.length != 4 && key.length != 8) {
-                        srvlog2('invalid-aes-key-size', n.h, n.k.length, n.sk.length, key.length);
-                    }
-                    else {
-                        delete n.sk;
-                        u_sharekeys[n.h] = [key, new sjcl.cipher.aes(key)];
-                    }
+            if (key) {
+                if (key.length != 4 && key.length != 8) {
+                    srvlog2('invalid-aes-key-size', n.h, n.k.length, n.sk.length, key.length);
+                }
+                else {
+                    delete n.sk;
+                    u_sharekeys[n.h] = [key, new sjcl.cipher.aes(key)];
                 }
             }
         }

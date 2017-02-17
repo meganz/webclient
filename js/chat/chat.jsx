@@ -521,9 +521,11 @@ Chat.prototype.init = function() {
         }
     });
 
-    $(window).unbind('hashchange.megaChat' + this.instanceId);
+    if (this._pageChangeListener) {
+        mBroadcaster.removeListener(this._pageChangeListener)
+    }
     var lastOpenedRoom = null;
-    $(window).bind('hashchange.megaChat' + this.instanceId, function() {
+    this._pageChangeListener = mBroadcaster.addListener('pagechange', function() {
         var room = self.getCurrentRoom();
 
         if (room && !room.isCurrentlyActive && room.roomJid != lastOpenedRoom) { // opened window, different then one from the chat ones
@@ -587,7 +589,10 @@ Chat.prototype.init = function() {
     }
     else {
         if (!appContainer) {
-            $(window).rebind('hashchange.delayedChatUiInit', function() {
+            if (self._appInitPageChangeListener) {
+                mBroadcaster.removeListener(self._appInitPageChangeListener);
+            }
+            self._appInitPageChangeListener = mBroadcaster.addListener('pagechange', function() {
                 if (typeof($.leftPaneResizable) === 'undefined' || !fminitialized) {
                     // delay the chat init a bit more! specially for the case of a user getting from /pro -> /fm, which
                     // for some unknown reason, stopped working and delayed the init of $.leftPaneResizable
@@ -596,7 +601,9 @@ Chat.prototype.init = function() {
                 appContainer = document.querySelector('.section.conversations');
                 if (appContainer) {
                     initAppUI();
-                    $(window).unbind('hashchange.delayedChatUiInit');
+                    if (self._appInitPageChangeListener) {
+                        mBroadcaster.removeListener(self._appInitPageChangeListener);
+                    }
                 }
             });
         }

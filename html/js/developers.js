@@ -214,7 +214,7 @@ function dev_renderapps()
 		if (sdk_apps[key])
 		{
 			sdk_apps[key] = sdk_apps[key];
-			apps_table += '<tr><td><img alt="" src="' + staticpath + 'images/mega/app-icon.png" style="width:18px;" >' + htmlentities(sdk_apps[key].name) + '</td><td>' + htmlentities(key) +'</td><td>' + status + '</td><td class="last"><a href="#" id="sdk_app_' + htmlentities(key) + '" return false;" class="dev-cog"></a></td></tr>';
+			apps_table += '<tr><td><img alt="" src="' + staticpath + 'images/mega/app-icon.png" style="width:18px;" >' + htmlentities(sdk_apps[key].name) + '</td><td>' + htmlentities(key) +'</td><td>' + status + '</td><td class="last"><a id="sdk_app_' + htmlentities(key) + '" return false;" class="dev-cog"></a></td></tr>';
 			i++;
 		}
 	}

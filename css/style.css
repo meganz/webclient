@@ -236,6 +236,9 @@ a, a:link, a:visited, a:hover, a:active, a:focus img, a:focus img {
     background-color: #fafafa;
     position: relative;
 }
+.bottom-pages .top-head {
+    background-color: #FFFFFF;
+}
 .logo {
     width: 24px;
     height: 24px;
@@ -264,6 +267,9 @@ a, a:link, a:visited, a:hover, a:active, a:focus img, a:focus img {
     left: 0;
     background-color: rgba(0,0,0,0.1);
     position: absolute;
+}
+.bottom-pages .top-head::after {
+    background-color: rgba(0,0,0,0.05);
 }
 .nlanguage-popup {
     position: absolute;
@@ -7136,6 +7142,10 @@ table {
     vertical-align: middle;
     text-align: center;
 }
+.thumb.video .block-view-file-type, .thumb.video .img-block, .img-block.thumb.video {
+    background-color: block;
+    background-image: none;
+}
 .transfer-filtype-icon img, .fm-browsers-icon img, .fm-flags-icon img, .fm-member-icon img {
     width: 24px;
     border: 0;
@@ -11849,6 +11859,9 @@ table {
     width: 412px;
     margin: -108px 0 0 -206px;
 }
+.download.content-block.thumb {
+    margin-top: -131px;
+}
 .download.main-pad {
     display: table;
     height: 170px;
@@ -11867,6 +11880,154 @@ table {
 }
 .download.file-info {
     margin-left: 95px;
+}
+.thumb .download.file-info {
+    margin-left: 151px;
+    padding: 4px 0 0 0;
+}
+.download.thumb-block {
+    width: 128px;
+    height: 128px;
+    background-color: white;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    padding: 2px;
+    display: none;
+    float: left;
+    position: relative;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+.download.thumb-block::before, .download.thumb-block::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.1);
+    -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.1);
+    box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.1);
+    background-color: white;
+}
+.download.thumb-pad {
+    width: 124px;
+    height: 124px;
+    background-position: 0 0, 0 14px, 14px -14px, -14px 0px;
+    background-image: linear-gradient(45deg, rgba(222,222,222,0.72) 25%, transparent 25%), linear-gradient(-45deg, rgba(222,222,222,0.72) 25%, transparent 25%), linear-gradient(45deg, transparent 75%, rgba(222,222,222,0.72) 75%), linear-gradient(-45deg, transparent 75%, rgba(222,222,222,0.72) 75%);
+    background-repeat: repeat;
+    background-size: 28px 28px;
+    display: table-cell;
+    font-size: 0;
+    line-height: 0;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    border-radius: 2px;
+    overflow: hidden;
+    text-align: center;
+    vertical-align: middle;
+    position: relative;
+    -webkit-transition: opacity 200ms
+}
+.download.thumb-hover-icon {
+    width: 40px;
+    height: 40px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin: -20px 0 0 -20px;
+    background-image: url(../images/mega/icons-sprite_v2.png);
+    background-position: -135px -680px;
+    z-index: 1;
+ease-in-out;
+    -moz-transition: opacity 200ms ease-in-out;
+    -o-transition: opacity 200ms ease-in-out;
+    -ms-transition: opacity 200ms ease-in-out;
+    transition: opacity 200ms ease-in-out;
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+    -moz-opacity: 0;
+    -khtml-opacity: 0;
+    opacity: 0;
+}
+.download.thumb-block:hover .thumb-hover-icon {
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+    -moz-opacity: 1;
+    -khtml-opacity: 1;
+    opacity: 1;
+}
+.video .download.thumb-hover-icon {
+    background-position: -90px -680px;
+}
+.video .download.thumb-pad {
+    background-image: none;
+    background-color: black;
+}
+.download.thumb-pad img {
+    max-width: 100%;
+    max-height: 100%;
+}
+.download.thumb-block::after {
+    -webkit-box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
+    -moz-box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
+    background-color: transparent;
+}
+.thumb .download.thumb-block {
+    display: block;
+}
+.video-thumb-detalis {
+    font-size: 12px;
+    line-height: 20px;
+    color: white;
+    width: 100%;
+    bottom: 2px;
+    -moz-transition: opacity 200ms ease-in-out;
+    -o-transition: opacity 200ms ease-in-out;
+    -ms-transition: opacity 200ms ease-in-out;
+    transition: opacity 200ms ease-in-out;
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+    -moz-opacity: 1;
+    -khtml-opacity: 1;
+    opacity: 1;
+    position: absolute;
+    text-align: left;
+    display: none;
+}
+.thumb.video .video-thumb-detalis {
+    display: block;
+}
+.download.thumb-block:hover .video-thumb-detalis {
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+    -moz-opacity: 0;
+    -khtml-opacity: 0;
+    opacity: 0;
+}
+.video-thumb-detalis i {
+    margin: 0 0 0 2px;
+}
+.download.content-block.thumb .block-view-file-type {
+    display: none;
+}
+.download.viewer-lnk {
+    font-size: 14px;
+    line-height: 18px;
+    color: #FF333A;
+    display: none;
+    margin: 17px 0 4px 0;
+    cursor: pointer;
+}
+.download.viewer-lnk i {
+    display: inline-block;
+    margin: 1px 7px 0 3px;
+}
+.thumb.img .download.viewer-lnk.img, .thumb.video .download.viewer-lnk.video {
+    display: block;
 }
 .download.info-txt.big-txt {
     font-size: 20px;
@@ -11901,7 +12062,7 @@ table {
     color: black;
 }
 .download.buttons-block {
-    margin: 23px 0 0 0;
+    margin: 36px 0 0 0;
     font-size: 0;
     white-space: nowrap;
 }
@@ -11964,6 +12125,34 @@ table {
     background-color: #777777;
 }
 .button.download-button.light-red {
+}
+.button.download-button:first-child {
+    margin: 0;
+}
+.download.bottom-buttons {
+    position: absolute;
+    width: 100%;
+    width: -webkit-calc(100% - 600px);
+    width: -moz-calc(100% - 600px);
+    width: calc(100% - 600px);
+    text-align: center;
+    height: 130px;
+    border-top: 1px solid #FAFAFA;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    left: 300px;
+    bottom: 36px;
+    padding: 34px 0 0 0;
+    z-index: 10;
+}
+.button.download-button.down-arrow, .button.download-button.to-clouddrive {
+    background-image: url(../images/mega/download-sprite-v6.png);
+    background-repeat: no-repeat;
+    background-position: 18px -124px;
+    padding-left: 56px;
+}
+.button.download-button.down-arrow.downloading {
     background-color: rgba( 255,51,58,0.8);
 }
 .button.download-button.light-red:hover {
@@ -11996,34 +12185,6 @@ table {
 }
 .button.download-button.red.downloading {
     color: rgba(217,0,7,1);
-}
-.button.download-button:first-child {
-    margin: 0;
-}
-.download.bottom-buttons {
-    position: absolute;
-    width: 100%;
-    width: -webkit-calc(100% - 600px);
-    width: -moz-calc(100% - 600px);
-    width: calc(100% - 600px);
-    text-align: center;
-    height: 130px;
-    border-top: 2px solid #F2F2F2;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    left: 300px;
-    bottom: 36px;
-    padding: 34px 0 0 0;
-    z-index: 10;
-}
-.button.download-button.down-arrow, .button.download-button.to-clouddrive {
-    background-image: url(../images/mega/download-sprite-v6.png);
-    background-repeat: no-repeat;
-    background-position: 18px -124px;
-    padding-left: 56px;
-}
-.button.download-button.down-arrow.downloading {
     background-position: 18px -384px;
 }
 .button.download-button.to-clouddrive {
@@ -12519,7 +12680,7 @@ body.new-startpage {
 }
 .st-gray-block {
     position: relative;
-    background-color: #f2f2f2;
+    background-color: #FAFAFA;
 }
 .st-devices-icon {
     width: 400px;
@@ -12657,7 +12818,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    background-color: #f2f2f2;
+    background-color: #FAFAFA;
     border-top: 1px solid white;
     height: 258px;
     overflow: hidden;
@@ -15889,7 +16050,7 @@ span.browsers-update {
     margin: 0 0 0 48px;
 }
 .pro-gray-block {
-    background-color: #f2f2f2;
+    background-color: #FAFAFA;
     margin-top: 23px;
 }
 .pro-mid-header {
@@ -16111,7 +16272,7 @@ span.browsers-update {
     padding: 49px 20px 49px 20px;
 }
 .gray-bg {
-    background-color: #f2f2f2;
+    background-color: #FAFAFA;
 }
 .white-bg {
     background-color: white;
@@ -16132,9 +16293,9 @@ span.browsers-update {
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
-    -moz-border-radius: 8px;
-    -webkit-border-radius: 8px;
-    border-radius: 8px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
     text-align: left;
     white-space: nowrap;
     position: relative;
@@ -16525,7 +16686,7 @@ strong, b {
     padding: 5px 0 15px 16px;
 }
 .about-top-block {
-    background-color: #f2f2f2;
+    background-color: #FAFAFA;
 }
 .about-top-block p {
     padding: 8px 0 10px 0;
@@ -17406,7 +17567,7 @@ a.contact-new-button:hover {
 .dev-nw-gray {
     width: 100%;
     height: 100%;
-    background-color: #f2f2f2;
+    background-color: #FAFAFA;
     position: absolute;
     right: 50%;
     margin-right: 240px;
@@ -19827,7 +19988,7 @@ a.blog-article-button {
     width: 100%;
     position: absolute;
     bottom: 36px;
-    padding: 32px 28px 0 28px;
+    padding: 34px 28px 0 28px;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
@@ -19965,9 +20126,6 @@ a.blog-article-button {
 .products-bottom-block .win-phone-button {
     width: 234px;
 }
-.products-bottom-block .win-phone-button:hover {
-    width: 240px;
-}
 .products-bottom-block .ff-bott-button {
     min-width: 234px;
     width: 234px;
@@ -19980,14 +20138,6 @@ a.blog-article-button {
 }
 .products-bottom-block .sync-button.hidden, .products-bottom-block .chrome-app-button.hidden, .products-bottom-block .ios-button.hidden, .products-bottom-block .google-play-button.hidden, .products-bottom-block .ff-bott-button.hidden, .products-bottom-block .win-phone-button.hidden {
     display: none;
-}
-.products-bottom-block .ff-bott-button:hover {
-    min-width: 238px;
-    width: 238px;
-}
-.products-bottom-block .sync-button:hover, .products-bottom-block .chrome-app-button:hover, .products-bottom-block .ios-button:hover, .products-bottom-block .google-play-button:hover, .products-bottom-block .ff-bott-button:hover, .products-bottom-block .win-phone-button:hover {
-    border-color: #DB3200;
-    min-width: 240px;
 }
 .products-left-block rect, .products-right-block rect {
     fill: rgba(255,55,255,0);

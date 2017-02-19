@@ -87,7 +87,7 @@
     vertical-align: middle;
     position: relative;
 }
-.data-block-view .thumb .block-view-file-type::before {
+.data-block-view .thumb:not(.video) .block-view-file-type::before {
     position: absolute;
     content: '';
     width: 156px;

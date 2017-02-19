@@ -33,6 +33,10 @@
                     '<span class="data-item-icon indicator"></span>' +
                     '<span class="block-view-file-type"><img/></span>' +
                     '<span class="file-settings-icon"></span>' +
+                    '<div class="video-thumb-detalis">' +
+                        '<i class="small-icon small-play-icon"></i>' +
+                        '<span></span>' +
+                    ' </div>' +
                 '</span>' +
                 '<span class="file-block-title"></span>' +
             '</a>'
@@ -77,6 +81,10 @@
                     '<span class="shared-folder-access indicator"></span>' +
                     '<span class="block-view-file-type"></span>' +
                     '<span class="file-settings-icon"></span>' +
+                    '<div class="video-thumb-detalis">' +
+                        '<i class="small-icon small-play-icon"></i>' +
+                        '<span></span>' +
+                    ' </div>' +
                 '</span>' +
                 '<span class="shared-folder-info-block">' +
                     '<span class="shared-folder-name"></span>' +
@@ -154,6 +162,10 @@
                     '<span class="shared-folder-access indicator"></span>' +
                     '<span class="block-view-file-type folder-shared"><img/></span>' +
                     '<span class="file-settings-icon"></span>' +
+                    '<div class="video-thumb-detalis">' +
+                        '<i class="small-icon small-play-icon"></i>' +
+                        '<span></span>' +
+                    ' </div>' +
                 '</span>' +
                 '<span class="file-block-title"></span>' +
             '</a>'

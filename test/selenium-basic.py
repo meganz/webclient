@@ -30,6 +30,7 @@ from selenium.common.exceptions import NoAlertPresentException
 import unittest, time, re, os, sys, argparse, tempfile
 from PIL import ImageChops, Image
 
+vdiffs=False
 username=None
 password=None
 base_url="https://smoketest.static.mega.co.nz"
@@ -205,7 +206,7 @@ class MegaTest(unittest.TestCase):
         self.fire_contextmenu(By.CSS_SELECTOR, "span.tranfer-filetype-txt")
         self.on_visibleclick("a.dropdown-item.copy-item")
         self.waitfor_visibility(".fm-dialog.copy-dialog")
-        self.assertEqual("My folders", driver.find_element_by_css_selector(".copy-dialog-panel-header span").text)
+        self.assertTrue(driver.find_element_by_css_selector(".copy-dialog-button.cloud-drive.active").is_displayed())
         driver.find_element_by_css_selector(".fm-dialog.copy-dialog .dialog-copy-button").click()
         for i in range(60):
             try:
@@ -531,6 +532,8 @@ class MegaTest(unittest.TestCase):
         return path
 
     def visual_diff(self, name):
+        if vdiffs is not True:
+            return
         path = os.path.join(self.path, 'selenium')
         file = os.path.join(path, name)
         if os.path.exists(file):
@@ -564,6 +567,8 @@ if __name__ == "__main__":
                         help='The password for the given username.')
     parser.add_argument('-b', '--baseurl', default=None,
                         help='The base url to perform the tests over.')
+    parser.add_argument('-v', '--vdiffs', action='store_true',
+                        help='Perform visual diff tests.')
     args, leftovers = parser.parse_known_args()
 
     username = args.username
@@ -572,5 +577,8 @@ if __name__ == "__main__":
     del sys.argv[1:3]
     if args.baseurl is not None:
         base_url = args.baseurl
+        del sys.argv[1:3]
+    if args.vdiffs:
+        vdiffs = True
         del sys.argv[1:3]
     unittest.main()

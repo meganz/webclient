@@ -5837,7 +5837,10 @@ var QuickFinder = function(searchable_elements, containers) {
     var next_idx = 0;
 
     // hide on page change
-    $(window).rebind('hashchange.quickfinder', function() {
+    if (QuickFinder._pageChangeListenerId) {
+        mBroadcaster.removeListener(QuickFinder._pageChangeListenerId);
+    }
+    QuickFinder._pageChangeListenerId = mBroadcaster.addListener('pagechange', function () {
         if (self.is_active()) {
             self.deactivate();
         }

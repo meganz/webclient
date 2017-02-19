@@ -472,9 +472,11 @@ React.makeElement = React['createElement'];
 	        }
 	    });
 
-	    $(window).unbind('hashchange.megaChat' + this.instanceId);
+	    if (this._pageChangeListener) {
+	        mBroadcaster.removeListener(this._pageChangeListener);
+	    }
 	    var lastOpenedRoom = null;
-	    $(window).bind('hashchange.megaChat' + this.instanceId, function () {
+	    this._pageChangeListener = mBroadcaster.addListener('pagechange', function () {
 	        var room = self.getCurrentRoom();
 
 	        if (room && !room.isCurrentlyActive && room.roomJid != lastOpenedRoom) {
@@ -529,7 +531,10 @@ React.makeElement = React['createElement'];
 	        return;
 	    } else {
 	        if (!appContainer) {
-	            $(window).rebind('hashchange.delayedChatUiInit', function () {
+	            if (self._appInitPageChangeListener) {
+	                mBroadcaster.removeListener(self._appInitPageChangeListener);
+	            }
+	            self._appInitPageChangeListener = mBroadcaster.addListener('pagechange', function () {
 	                if (typeof $.leftPaneResizable === 'undefined' || !fminitialized) {
 
 	                    return;
@@ -537,7 +542,9 @@ React.makeElement = React['createElement'];
 	                appContainer = document.querySelector('.section.conversations');
 	                if (appContainer) {
 	                    initAppUI();
-	                    $(window).unbind('hashchange.delayedChatUiInit');
+	                    if (self._appInitPageChangeListener) {
+	                        mBroadcaster.removeListener(self._appInitPageChangeListener);
+	                    }
 	                }
 	            });
 	        } else {
@@ -2977,7 +2984,10 @@ React.makeElement = React['createElement'];
 	                }
 	            });
 
-	            $(window).rebind('hashchange.button' + self.getUniqueId(), function (e) {
+	            if (self._pageChangeListener) {
+	                mBroadcaster.removeListener(self._pageChangeListener);
+	            }
+	            mBroadcaster.addListener('pagechange', function () {
 	                if (self.state.focused === true) {
 	                    self.onBlur();
 	                }
@@ -3045,7 +3055,9 @@ React.makeElement = React['createElement'];
 	            $(document).unbind('closeDropdowns.' + this.getUniqueId());
 	            document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
 
-	            $(window).unbind('hashchange.button' + this.getUniqueId());
+	            if (this._pageChangeListener) {
+	                mBroadcaster.removeListener(this._pageChangeListener);
+	            }
 	            this.forceUpdate();
 	        }
 	    },
@@ -11056,7 +11068,11 @@ React.makeElement = React['createElement'];
 	};
 
 	ChatRoom.prototype.setActive = function () {
-	    loadSubPage(this.getRoomUrl());
+
+	    var self = this;
+	    Soon(function () {
+	        loadSubPage(self.getRoomUrl());
+	    });
 	};
 
 	ChatRoom.prototype.getRoomUrl = function () {

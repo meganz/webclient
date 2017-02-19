@@ -6582,9 +6582,9 @@ function execsc() {
                                                 delete u_sharekeys[a.n];
 
                                                 if (fmdb) {
-                                                    M.nodeUpdated(n);
                                                     fmdb.del('s', a.u + '*' + a.n);
                                                 }
+                                                M.nodeUpdated(n);
                                             }
                                             else {
                                                 // toplevel share: delete entire tree

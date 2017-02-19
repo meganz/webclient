@@ -12997,7 +12997,7 @@ function bindDropdownEvents($dropdown, saveOption) {
     $('#fmholder, .fm-dialog').rebind('click.defaultselect', function(e) {
 
         // ToDo: Narrow this condition and find main reason why it's made
-        if (!$(e.target).hasClass('default-select')) {
+        if (!$(e.target).parents('.default-select').length && !$(e.target).hasClass('default-select')) {
             $selectBlock = $('.default-select.active');
             $selectBlock.find('.default-select-dropdown').fadeOut(200);
             $selectBlock.removeClass('active');

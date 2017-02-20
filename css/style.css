@@ -4328,10 +4328,10 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     background-color: #13E03C;
 }
 .away .nw-contact-status, .away .properties-contact-status {
-    background-color: #FFD200;
+    background-color: #FFA500;
 }
 .busy .nw-contact-status, .busy .properties-contact-status {
-    background-color: #FFA500;
+    background-color: #EB4444;
 }
 .offline .nw-contact-status, .offline .properties-contact-status {
     background-color: #666666;

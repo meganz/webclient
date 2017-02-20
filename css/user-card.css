@@ -23,21 +23,18 @@
 	border-color: #13E03C;
 }
 .away.user-card-presence {
-	background-color: #FFD200;
-	border-color: #FFD200;
-}
-.busy.user-card-presence {
 	background-color: #FFA500;
 	border-color: #FFA500;
 }
-.offline.user-card-presence {
-	background-color: #666666;
-	border-color: #666666;
+.busy.user-card-presence {
+	background-color: #EB4444;
+	border-color: #EB4444;
 }
 .offline.user-card-presence {
 	background-color: #666666;
 	border-color: #666666;
 }
+
 .user-card-presence.big {
 	width: 16px;
 	height: 16px;

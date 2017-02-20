@@ -12020,6 +12020,8 @@ function slideshow(id, close)
         $overlay.addClass('hidden');
         if ($(document).fullScreen()) {
             $(document).fullScreen(false);
+            $(document).unbind('mousemove.mediaviewer');
+            $overlay.removeClass('fullscreen mouse-idle');
         }
         for (var i in dl_queue)
         {

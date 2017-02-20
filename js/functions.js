@@ -3412,22 +3412,22 @@ mega.utils.sortObjFn = function(key, order, alternativeFn) {
             bVal = b[key];
         }
 
-        if (typeof aVal == 'string' && typeof bVal == 'string') {
+        if (typeof aVal === 'string' && typeof bVal === 'string') {
             return aVal.localeCompare(bVal) * currentOrder;
         }
-        else if (typeof aVal == 'string' && typeof bVal == 'undefined') {
+        else if (typeof aVal === 'string' && typeof bVal === 'undefined') {
             return 1 * currentOrder;
         }
-        else if (typeof aVal == 'undefined' && typeof bVal == 'string') {
+        else if (typeof aVal === 'undefined' && typeof bVal === 'string') {
             return -1 * currentOrder;
         }
-        else if (typeof aVal == 'number' && typeof bVal == 'undefined') {
+        else if (typeof aVal === 'number' && typeof bVal === 'undefined') {
             return 1 * currentOrder;
         }
-        else if (typeof aVal == 'undefined' && typeof bVal == 'number') {
+        else if (typeof aVal === 'undefined' && typeof bVal === 'number') {
             return -1 * currentOrder;
         }
-        else if (typeof aVal == 'undefined' && typeof bVal == 'undefined') {
+        else if (typeof aVal === 'undefined' && typeof bVal === 'undefined') {
             if (alternativeFn) {
                 return alternativeFn(a, b, currentOrder);
             }
@@ -3435,7 +3435,7 @@ mega.utils.sortObjFn = function(key, order, alternativeFn) {
                 return -1 * currentOrder;
             }
         }
-        else if (typeof aVal == 'number' && typeof bVal == 'number') {
+        else if (typeof aVal === 'number' && typeof bVal === 'number') {
             var _a = aVal || 0;
             var _b = bVal || 0;
             if (_a > _b) {
@@ -3445,7 +3445,7 @@ mega.utils.sortObjFn = function(key, order, alternativeFn) {
                 return -1 * currentOrder;
             } else {
                 if (alternativeFn) {
-                    return alternativeFn(a, b, currentOrder)
+                    return alternativeFn(a, b, currentOrder);
                 }
                 else {
                     return 0;

@@ -5025,7 +5025,7 @@ function MegaData()
                     $overlay.find('.viewer-error').addClass('hidden');
                     $overlay.find('.viewer-pending').addClass('hidden');
 
-                    deg =  360 * perc_c / 100;
+                    deg =  360 * perc / 100;
                     if (deg <= 180) {
                         $chart.find('.left-chart p').css('transform', 'rotate(' + deg + 'deg)');
                         $chart.find('.right-chart p').removeAttr('style');

@@ -12010,6 +12010,7 @@ function slideshow_prev()
 function slideshow(id, close)
 {
     var $overlay = $('.viewer-overlay');
+    var timeout;
 
     if (d)
         console.log('slideshow', id, close, slideshowid);
@@ -12019,6 +12020,7 @@ function slideshow(id, close)
         slideshowid = false;
         $overlay.addClass('hidden');
         if ($(document).fullScreen()) {
+            clearTimeout(timeout);
             $(document).fullScreen(false);
             $(document).unbind('mousemove.mediaviewer');
             $overlay.removeClass('fullscreen mouse-idle');
@@ -12066,7 +12068,6 @@ function slideshow(id, close)
         $overlay.find('.viewer-button.fullscreen').addClass('hidden');
     }
     else {
-        var timeout;
 
         $overlay.find('.viewer-button.fullscreen').removeClass('hidden').rebind('click', function(e)
         {

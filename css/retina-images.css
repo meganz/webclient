@@ -26,14 +26,6 @@ body.pro:after {
     background-image: url(../images/mega/chat-sprite@2x.png?v=2);
     background-size: 72px auto;
 }
-.slideshow-progress {
-    background-image: url(../images/mega/gallery-pr-bar@2x.png);
-    background-size: 222px auto;
-}
-.slideshow-icon, .slideshow-download span, .slideshow-prev-icon, .slideshow-next-icon, .slideshow-pending, .slideshow-error-icon, .slideshow-error-button, .slideshow-progress-icon {
-    background-image: url(../images/mega/slideshow-sprite@2x.png?v=1);
-    background-size: 276px auto;
-}
 .sync-top-logo, .sync-short-block li, .sync-help-center {
     background-image: url(../images/mega/sync-nw-v3@2x.png);
     background-size: 168px auto;
@@ -468,7 +460,7 @@ body.pro:after {
     background-image: url(../images/mega/chat-static-sprite-v1@2x.png);
     background-size: 68px auto;
 }
-.small-icon.context, .dropdown-item.contains-submenu::before, .dropdown-colour-item::after, .download.thumb-hover-icon, .small-icon.red-lens, .small-icon.red-play, .small-icon.small-play-icon {
+.small-icon.context, .dropdown-item.contains-submenu::before, .dropdown-colour-item::after, .download.thumb-hover-icon, .small-icon.red-lens, .small-icon.red-play, .small-icon.small-play-icon, .medium-icon.icons-img, .viewer-mid-button {
     background-image: url(../images/mega/icons-sprite_v2@2x.png);
     background-size: 262px auto;
 }

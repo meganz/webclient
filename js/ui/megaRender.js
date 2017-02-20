@@ -35,7 +35,7 @@
                     '<span class="file-settings-icon"></span>' +
                     '<div class="video-thumb-detalis">' +
                         '<i class="small-icon small-play-icon"></i>' +
-                        '<span></span>' +
+                        '<span>00:00</span>' +
                     ' </div>' +
                 '</span>' +
                 '<span class="file-block-title"></span>' +
@@ -83,7 +83,7 @@
                     '<span class="file-settings-icon"></span>' +
                     '<div class="video-thumb-detalis">' +
                         '<i class="small-icon small-play-icon"></i>' +
-                        '<span></span>' +
+                        '<span>00:00</span>' +
                     ' </div>' +
                 '</span>' +
                 '<span class="shared-folder-info-block">' +
@@ -164,7 +164,7 @@
                     '<span class="file-settings-icon"></span>' +
                     '<div class="video-thumb-detalis">' +
                         '<i class="small-icon small-play-icon"></i>' +
-                        '<span></span>' +
+                        '<span>00:00</span>' +
                     ' </div>' +
                 '</span>' +
                 '<span class="file-block-title"></span>' +

@@ -1233,9 +1233,8 @@ function showTransferToast(t_type, t_length, isPaused) {
         $('.transfer .toast-button').rebind('click', function(e)
         {
             $('.toast-notification').removeClass('visible second');
-            if (!$('.slideshow-dialog').hasClass('hidden')) {
-                $('.slideshow-dialog').addClass('hidden');
-                $('.slideshow-overlay').addClass('hidden');
+            if (!$('.viewer-overlay').hasClass('hidden')) {
+                $('.viewer-overlay').addClass('hidden');
             }
             // M.openFolder('transfers', true);
             $('.nw-fm-left-icon.transfers').click();
@@ -11931,6 +11930,7 @@ var slideshowid;
 
 function slideshowsteps()
 {
+    var $stepsBlock = $('.viewer-overlay .viewer-images-num');
     var forward = [], backward = [], ii = [], ci;
     // Loop through available items and extract images
     for (var i in M.v) {
@@ -11948,6 +11948,7 @@ function slideshowsteps()
     if (len > 1)
     {
         var n = ii.indexOf(ci);
+        $stepsBlock.removeClass('hidden');
         switch (n)
         {
             // last
@@ -11965,6 +11966,11 @@ function slideshowsteps()
                 forward.push(M.v[ii[n + 1]].h);
                 backward.push(M.v[ii[n - 1]].h);
         }
+        $stepsBlock.find('.first').text(n + 1);
+        $stepsBlock.find('.last').text(len);
+    }
+    else {
+        $stepsBlock.addClass('hidden');
     }
     return {backward: backward, forward: forward};
 }
@@ -12003,14 +12009,18 @@ function slideshow_prev()
 
 function slideshow(id, close)
 {
+    var $overlay = $('.viewer-overlay');
+
     if (d)
         console.log('slideshow', id, close, slideshowid);
 
     if (close)
     {
         slideshowid = false;
-        $('.slideshow-dialog').addClass('hidden');
-        $('.slideshow-overlay').addClass('hidden');
+        $overlay.addClass('hidden');
+        if ($(document).fullScreen()) {
+            $(document).fullScreen(false);
+        }
         for (var i in dl_queue)
         {
             if (dl_queue[i] && dl_queue[i].id == id)
@@ -12026,15 +12036,13 @@ function slideshow(id, close)
     }
 
     var n = M.getNodeByHandle(id);
-    if (!n || RootbyId(id) === 'shares' || folderlink)
-    {
-        $('.slideshow-getlink').hide();
-        $('.slideshow-line').hide();
+
+    // Get link icon
+    if (!n || RootbyId(id) === 'shares' || folderlink) {
+        $overlay.find('.viewer-button.getlink').addClass('hidden');
     }
-    else
-    {
-        $('.slideshow-line').show();
-        $('.slideshow-getlink').show().rebind('click', function() {
+    else {
+        $overlay.find('.viewer-button.getlink').removeClass('hidden').rebind('click', function() {
 
             if (u_type === 0) {
                 ephemeralDialog(l[1005]);
@@ -12044,28 +12052,103 @@ function slideshow(id, close)
             }
         });
     }
-    $('.slideshow-dialog .close-slideshow,.slideshow-overlay,.slideshow-error-close').rebind('click', function(e)
+
+    // Close icon
+    $overlay.find('.viewer-button.close,.viewer-error-close').rebind('click', function(e)
     {
         slideshow(id, 1);
     });
-    if (!n)
-        return;
 
-    $('.slideshow-filename').text(n.name);
-    $('.slideshow-image').attr('src', '').width(0).height(0);
-    $('.slideshow-pending').removeClass('hidden');
-    $('.slideshow-progress').addClass('hidden');
-    $('.slideshow-error').addClass('hidden');
-    $('.slideshow-image-bl').addClass('hidden');
-    $('.slideshow-prev-button,.slideshow-next-button').removeClass('active');
+    // Fullscreen icon
+    if ($(document).fullScreen() === null) {
+        $overlay.find('.viewer-button.fullscreen').addClass('hidden');
+    }
+    else {
+        var timeout;
+
+        $overlay.find('.viewer-button.fullscreen').removeClass('hidden').rebind('click', function(e)
+        {
+            if ($(document).fullScreen()) {
+                $(document).fullScreen(false);
+            }
+            else {
+                $(document).fullScreen(true);
+            }
+        });
+        $(document).rebind('fullscreenchange.mediaviewer', function() {
+            if (!$(document).fullScreen()) {
+                clearTimeout(timeout);
+
+                $(document).unbind('mousemove.mediaviewer');
+                $overlay.find('.viewer-button.fullscreen i').switchClass('lowscreen', 'fullscreen');
+                $overlay.removeClass('fullscreen mouse-idle');
+            }
+            else {
+                $overlay.addClass('fullscreen');
+                $overlay.find('.viewer-button.fullscreen i').switchClass('fullscreen', 'lowscreen');
+
+                // Hide buttons for mouse idle
+                $(document).bind('mousemove.mediaviewer', function() {
+                    clearTimeout(timeout);
+                    $overlay.removeClass('mouse-idle');
+
+                    timeout = setTimeout(function() {
+                        $overlay.addClass('mouse-idle');
+                    }, 3000);
+                });
+            }
+        });
+        
+    }
+
+    // Favourite icon
+    if (!n || folderlink) {
+        $overlay.find('.viewer-button.favourite').addClass('hidden');
+    }
+    else {
+       $overlay.find('.viewer-button.favourite').removeClass('hidden').rebind('click', function() {
+            var newFavState = Number(!M.isFavourite(id));
+
+            M.favourite(id, newFavState);
+
+            if (newFavState) {
+                $(this).find('i').switchClass('heart', 'broken-heart');
+            }
+            else {
+                $(this).find('i').switchClass('broken-heart', 'heart');
+            }
+        });
+    }
+    if (!n) {
+        return;
+    }
+
+    // Change favourite icon
+    if (n.fav) {
+        $overlay.find('.viewer-button.favourite i').switchClass('heart', 'broken-heart');
+    }
+    else {
+        $overlay.find('.viewer-button.favourite i').switchClass('broken-heart', 'heart');
+    }
+
+    $overlay.find('.viewer-filename').text(n.name);
+    $overlay.find('.viewer-image-bl img').attr('src', '');
+    $overlay.find('.viewer-pending').removeClass('hidden');
+    $overlay.find('.viewer-progress').addClass('hidden');
+    $overlay.find('.viewer-error').addClass('hidden');
+    $overlay.find('.viewer-image-bl').addClass('hidden');
+    $overlay.find('.viewer-mid-button.prev,.viewer-mid-button.next').removeClass('active');
+    $overlay.find('.viewer-progress p').removeAttr('style');
 
     slideshowid = id;
     var steps = slideshowsteps();
-    if (steps.backward.length > 0)
-        $('.slideshow-prev-button').addClass('active');
-    if (steps.forward.length > 0)
-        $('.slideshow-next-button').addClass('active');
-    $('.slideshow-prev-button,.slideshow-next-button').rebind('click', function(e)
+    if (steps.backward.length > 0) {
+        $overlay.find('.viewer-mid-button.prev').addClass('active');
+    }
+    if (steps.forward.length > 0) {
+        $overlay.find('.viewer-mid-button.next').addClass('active');
+    }
+    $overlay.find('.viewer-mid-button.prev, .viewer-mid-button.next').rebind('click', function(e)
     {
         var c = $(this).attr('class');
         if (c && c.indexOf('active') > -1)
@@ -12078,7 +12161,7 @@ function slideshow(id, close)
         }
     });
 
-    $('.slideshow-download').rebind('click', function() {
+    $overlay.find('.viewer-button.download').rebind('click', function() {
 
         for (var i in dl_queue) {
             if (dl_queue[i] && dl_queue[i].id === slideshowid) {
@@ -12104,8 +12187,7 @@ function slideshow(id, close)
         fetchsrc(id);
     }
 
-    $('.slideshow-overlay').removeClass('hidden');
-    $('.slideshow-dialog').removeClass('hidden');
+    $overlay.removeClass('hidden');
 }
 
 function fetchnext()
@@ -12165,29 +12247,21 @@ function fetchsrc(id)
 function previewsrc(src)
 {
     var img = new Image();
+    var $overlay = $('.viewer-overlay');
     img.onload = function()
     {
-        if (this.height > $(window).height() - 100)
-        {
-            var factor = this.height / ($(window).height() - 100);
-            this.height = $(window).height() - 100;
-            this.width = Math.round(this.width / factor);
+        var w = this.width;
+        var  h = this.height;
+        if ((w < 960) && (w < $(window).width() - 382) && (h < 522) && (h < $(window).height() - 222)) {
+            $overlay.find('.viewer-image-bl').addClass('default-state');
         }
-        var w = this.width, h = this.height;
-        if (w < 700)
-            w = 700;
-        if (h < 500)
-            h = 500;
-        $('.slideshow-image').attr('src', this.src);
-        $('.slideshow-dialog').css('margin-top', h / 2 * -1);
-        $('.slideshow-dialog').css('margin-left', w / 2 * -1);
-        $('.slideshow-image').width(this.width);
-        $('.slideshow-image').height(this.height);
-        $('.slideshow-dialog').width(w);
-        $('.slideshow-dialog').height(h);
-        $('.slideshow-image-bl').removeClass('hidden');
-        $('.slideshow-pending').addClass('hidden');
-        $('.slideshow-progress').addClass('hidden');
+        else {
+            $overlay.find('.viewer-image-bl').removeClass('default-state');
+        }
+        $overlay.find('.viewer-image-bl img').attr('src', this.src);
+        $overlay.find('.viewer-image-bl').removeClass('hidden');
+        $overlay.find('.viewer-pending').addClass('hidden');
+        $overlay.find('.viewer-progress').addClass('hidden');
     };
     img.src = src;
 }

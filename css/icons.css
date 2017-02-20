@@ -505,6 +505,33 @@
     background-position: 0 -79px;
     width: 18px;
 }
+.medium-icon.icons-img {
+    background-image: url(../images/mega/icons-sprite_v2.png);
+}
+.medium-icon.icons-img.close {
+        background-position: -47px -687px;
+}
+.medium-icon.icons-img.chain {
+        background-position: -237px -129px;
+}
+.medium-icon.icons-img.arrow-in-circle {
+        background-position: -47px -631px;
+}
+.medium-icon.icons-img.heart {
+    background-position: -237px -495px;
+}
+.medium-icon.icons-img.broken-heart {
+    background-position: -237px -99px;
+}
+.medium-icon.icons-img.fullscreen {
+        background-position: -95px -580px;
+}
+.medium-icon.icons-img.lowscreen {
+        background-position: -141px -580px;
+}
+.medium-icon.icons-img.refresh {
+            background-position: -237px -347px;
+}
 .huge-white-icon.achievement {
     background-image: url(../images/mega/account-sprite.png);
     width: 72px;
@@ -861,7 +888,16 @@
     height: 22px;
     margin: 0 13px 1px -1px;
 }
-.small-icon.context.cloud {
+.small-icon.context.cloud {}
+.dropdown-item:hover .small-icon.context.download-as-zip {
+    background-position: -141px -499px;
+}
+.dropdown-item:hover .small-icon.context.labels, .dropdown-item.opened .small-icon.context.labels {
+    background-position: -141px -99px;
+}
+.dropdown-item:hover .small-icon.context.download, .dropdown-item.opened .small-icon.context.download {
+    background-position: -141px -138px;
+
     background-position: -102px -30px;
 }
 .small-icon.context.folder-item {
@@ -873,15 +909,6 @@
 /* hovers*/
 .dropdown-item:hover .small-icon.context.standart-download {
     background-position: -41px -499px;
-}
-.dropdown-item:hover .small-icon.context.download-as-zip {
-    background-position: -141px -499px;
-}
-.dropdown-item:hover .small-icon.context.labels, .dropdown-item.opened .small-icon.context.labels {
-    background-position: -141px -99px;
-}
-.dropdown-item:hover .small-icon.context.download, .dropdown-item.opened .small-icon.context.download {
-    background-position: -141px -138px;
 }
 .dropdown-item:hover .small-icon.context.get-link {
     background-position: -240px -133px;

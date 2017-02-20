@@ -280,58 +280,28 @@ function MegaData()
     };
 
     this.getSortByNameFn = function() {
-        var sortfn;
+        var self = this;
 
-        if (typeof Intl !== 'undefined' && Intl.Collator) {
-            var intl = new Intl.Collator('co', { numeric: true });
+        return function(a, b, d) {
+            // reusing the getNameByHandle code for converting contact's name/email to renderable string
+            var itemA = self.getNameByHandle(a.h);
+            var itemB  = self.getNameByHandle(b.h);
 
-            sortfn = function(a, b, d) {
-
-                // a.m part is related to contacts only. In case that user doesn't
-                // have defined first or last name then email address will be used
-                // for comparasion. Files and folders doesn't have .m field but
-                // it's not possible to rename them to null i.e. '', => no side effects.
-                var itemA = ((typeof a.name === 'string') && (a.name.length)) ? a.name : a.m;
-                var itemB = ((typeof b.name === 'string') && (b.name.length)) ? b.name : b.m;
-
-                return intl.compare(itemA, itemB) * d;
-            };
-        }
-        else {
-            sortfn = function(a, b, d) {
-
-                // a.m part is related to contacts only. In case that user doesn't
-                // have defined first or last name then email address will be used
-                // for comparasion. Files and folders doesn't have .m field but
-                // it's not possible to rename them to null i.e. '' => no side effects.
-                var itemA = ((typeof a.name === 'string') && (a.name.length)) ? a.name : a.m || '';
-                var itemB = ((typeof b.name === 'string') && (b.name.length)) ? b.name : b.m || '';
-
-                return itemA.localeCompare(itemB) * d;
-            };
-        }
-
-        return sortfn;
+            return mega.utils.compareStrings(itemA, itemB, d);
+        };
     };
 
     this.sortByName = function(d) {
-        if (typeof Intl !== 'undefined' && Intl.Collator) {
-            var intl = new Intl.Collator('co', { numeric: true });
+        var self = this;
 
-            this.sortfn = function(a, b, d) {
-                return intl.compare(a.name, b.name) * d;
-            };
+        this.sortfn = function(a, b, d) {
+            // reusing the getNameByHandle code for converting contact's name/email to renderable string
+
+            var itemA = self.getNameByHandle(a.h);
+            var itemB  = self.getNameByHandle(b.h);
+            return mega.utils.compareStrings(itemA, itemB, d);
         }
-        else
-        {
-            this.sortfn = function(a,b,d)
-            {
-                if (typeof a.name == 'string' && typeof b.name == 'string')
-                    return a.name.localeCompare(b.name) * d;
-                else
-                    return -1;
-            };
-        }
+
         this.sortd = d;
         this.sort();
     };
@@ -473,11 +443,13 @@ function MegaData()
             else if (statusa > statusb) {
                 return 1 * d;
             }
-            else if ((typeof a.name === 'string') && (typeof b.name === 'string')) {
-                return a.name.localeCompare(b.name) * d;
-            }
             else {
-                return 0;
+                // if status is the same for both, compare names.
+                return mega.utils.compareStrings(
+                    M.getNameByHandle(a.h).toLowerCase(),
+                    M.getNameByHandle(b.h).toLowerCase(),
+                    d
+                );
             }
         };
 
@@ -491,6 +463,7 @@ function MegaData()
     };
 
     this.getSortByInteractionFn = function() {
+        var self = this;
 
         var sortfn;
 
@@ -500,7 +473,16 @@ function MegaData()
                 // Since the M.sort is using a COPY of the data,
                 // we need an up-to-date .ts value directly from M.u[...]
                 return M.u[r.h].ts;
-            }, d
+            },
+            d,
+            function (a, b, d) {
+                // fallback to string/name matching in case last interaction is the same
+                return mega.utils.compareStrings(
+                    self.getNameByHandle(a.h).toLowerCase(),
+                    self.getNameByHandle(b.h).toLowerCase(),
+                    d
+                );
+            }
         );
 
         return sortfn;

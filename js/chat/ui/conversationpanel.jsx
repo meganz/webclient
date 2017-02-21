@@ -1414,7 +1414,6 @@ var ConversationPanel = React.createClass({
                 });
             }
 
-            var selected = [];
             sendContactDialog = <ModalDialogsUI.SelectContactDialog
                 megaChat={room.megaChat}
                 chatRoom={room}
@@ -1424,10 +1423,7 @@ var ConversationPanel = React.createClass({
                     self.setState({'sendContactDialog': false});
                     selected = [];
                 }}
-                onSelected={(nodes) => {
-                    selected = nodes;
-                }}
-                onSelectClicked={() => {
+                onSelectClicked={(selected) => {
                     self.setState({'sendContactDialog': false});
 
                     room.attachContacts(selected);

@@ -480,26 +480,14 @@ Chat.prototype.init = function() {
             });
         }
         else {
-            if (presence === Karere.PRESENCE.OFFLINE) {
-                self.karere.setPresence(presence, undefined, localStorage.megaChatPresenceMtime);
-                self.karere.connectionRetryManager.resetConnectionRetries();
-                self.karere.disconnect();
-                localStorage.userPresenceIsOffline = 1;
-            }
-            else {
-                self.karere.connectionRetryManager.resetConnectionRetries();
-                self.karere.setPresence(presence, undefined, localStorage.megaChatPresenceMtime);
-            }
+            self.karere.connectionRetryManager.resetConnectionRetries();
+            self.karere.setPresence(presence, undefined, localStorage.megaChatPresenceMtime);
         }
 
         // presenced integration
         var targetPresence = PresencedIntegration.cssClassToPresence(presence);
-        if (targetPresence === UserPresence.PRESENCE.OFFLINE) {
-            self.userPresence.disconnect(true);
-        }
-        else {
-            self.plugins.presencedIntegration.setPresence(targetPresence);
-        }
+
+        self.plugins.presencedIntegration.setPresence(targetPresence);
 
 
         // connection management - chatd shards, presenced
@@ -510,14 +498,6 @@ Chat.prototype.init = function() {
                 var v = self.plugins.chatdIntegration.chatd.shards[k];
                 v.connectionRetryManager.requiresConnection();
             });
-        }
-        if (presence === Karere.PRESENCE.OFFLINE) {
-            Object.keys(self.plugins.chatdIntegration.chatd.shards).forEach(function(k) {
-                var v = self.plugins.chatdIntegration.chatd.shards[k];
-                v.connectionRetryManager.options.functions.forceDisconnect(v.connectionRetryManager);
-            });
-            var presenceConnMan = self.plugins.presencedIntegration.userPresence.connectionRetryManager;
-            presenceConnMan.options.functions.forceDisconnect(presenceConnMan);
         }
     });
 

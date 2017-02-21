@@ -156,9 +156,7 @@ var UserPresence = function userpresence(
                  */
                 isUserForcedDisconnect: function(connectionRetryManager) {
                     return (
-                        self.canceled === true ||
-                        localStorage.megaChatPresence === "unavailable" ||
-                        localStorage.userPresenceIsOffline === "1"
+                        self.canceled === true
                     );
                 }
             }

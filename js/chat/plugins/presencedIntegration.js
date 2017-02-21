@@ -161,9 +161,9 @@ PresencedIntegration.prototype.init = function() {
         });
     });
 
-    if (!localStorage.userPresenceIsOffline) {
+    // if (!localStorage.userPresenceIsOffline) {
         userPresence.connectionRetryManager.requiresConnection();
-    }
+    // }
 };
 
 PresencedIntegration.prototype._updateuicb = function presencedIntegration_updateuicb(
@@ -326,16 +326,22 @@ PresencedIntegration.prototype.setPresence = function(presence) {
             });
     }
     else if (presence === UserPresence.PRESENCE.OFFLINE) {
+        localStorage.removeItem("userPresenceIsOffline");
+
         localStorage.userPresenceIsOffline = 1;
+
         localStorage.removeItem("megaChatPresence"); // legacy
-        self.userPresence.canceled = true;
+
+
+        // self.userPresence.canceled = true;
 
         self.userPresence.connectionRetryManager.requiresConnection()
             .done(function() {
-                self.userPresence.disconnect(true);
+                self.userPresence.ui_setstatus(UserPresence.PRESENCE.OFFLINE);
             });
+
         self.megaChat.karere.disconnect();
-        self._presence = {};
+        // self._presence = {};
     }
 };
 

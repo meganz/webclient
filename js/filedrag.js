@@ -114,8 +114,17 @@
     }
 
     var dir_inflight = 0;
-    var file_inflight = 0;
     var filedrag_u = [];
+
+    function pushUpload() {
+        if (!--dir_inflight && $.dostart) {
+            addupload(filedrag_u);
+            filedrag_u = [];
+            if (page === 'start') {
+                start_upload();
+            }
+        }
+    }
 
     function traverseFileTree(item, path) {
         path = path || "";
@@ -127,13 +136,7 @@
                 }
                 file.path = path;
                 filedrag_u.push(file);
-                if (--dir_inflight == 0 && $.dostart) {
-                    addupload(filedrag_u);
-                    filedrag_u = [];
-                    if (page == 'start') {
-                        start_upload();
-                    }
-                }
+                pushUpload();
             });
         }
         else if (item.isDirectory) {
@@ -150,10 +153,7 @@
                         dirReaderIterator();
                     }
                     else {
-                        if (!--dir_inflight) {
-                            addupload(filedrag_u);
-                            filedrag_u = [];
-                        }
+                        pushUpload();
                     }
                 });
             };

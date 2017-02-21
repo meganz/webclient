@@ -3754,13 +3754,6 @@ function MegaData()
 
                     M.account = ctx.account;
 
-                    if (M.maf) {
-                        // Add achieved storage quota
-                        ctx.account.space += M.maf.storage.current;
-                        // Add achieved transfer quota
-                        ctx.account.bw += M.maf.transfer.current;
-                    }
-
                     if (ctx.cb)
                         ctx.cb(ctx.account);
                 }

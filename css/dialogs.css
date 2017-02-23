@@ -801,3 +801,116 @@ li.token-input-token-invite .input-close {
 .chat-rename-dialog .rename-input-bl {
     margin-bottom: 10px;
 }
+/* Storage dialog */
+.fm-dialog.storage-dialog {
+    width: 644px;
+    margin: -270px 0 0 -322px;
+    background-color: #FAFAFA;
+}
+.fm-dialog.storage-dialog.achievements {
+    margin: -307px 0 0 -322px;
+}
+.fm-dialog.storage-dialog.almost-full {
+    margin: -225px 0 0 -322px;
+}
+.fm-dialog-body.storage-dialog {
+    padding: 0 48px 19px 48px;
+    text-align: center;
+}
+.storage-dialog.body-header {
+    font-size: 20px;
+    line-height: 25px;
+    color: #666666;
+    max-width: 360px;
+    margin: 0 auto;
+    padding-bottom: 24px;
+}
+.storage-dialog.body-header span, .storage-dialog.body-p span, .storage-dialog.body-p a {
+    font-family: 'source_sans_prosemibold';
+}
+.storage-dialog.body-p {
+    font-size: 16px;
+    line-height: 20px;
+    color: #666666;
+    padding: 0 5px 12px 5px;
+}
+.storage-dialog.body-p a {
+    color: #D90007;
+    cursor: pointer;
+}
+.storage-dialog.body-p.medium {
+    font-size: 14px;
+    line-height: 18px;
+    padding: 2px 0 0 0;
+}
+.storage-dialog.body-p.small {
+    font-size: 12px;
+    line-height: 15px;
+    color: #999999;
+    padding: 12px 0 15px 0;
+}
+.storage-dialog.body-p.small.top-pad {
+    padding: 24px 0 0 0;
+}
+.storage-dialog.divider-txt {
+    padding: 16px 0 13px 0;
+    position: relative;
+    font-size: 16px;
+    line-height: 20px;
+    color: #999999;
+    margin-top: 12px;
+}
+.storage-dialog.divider-txt::before {
+    content: '';
+    position: absolute;
+    height: 1px;
+    background-color: rgba(0,0,0,0.1);
+    left: 0;
+    top: 28px;
+    width: 100%;
+}
+.storage-dialog.divider-txt span {
+    background-color: #FAFAFA;
+    padding: 0 16px;
+    display: inline-block;
+    position: relative;
+}
+.fm-dialog-title.big {
+    font-size: 20px;
+}
+.storage-dialog .huge-icon {
+    margin: 14px;
+}
+.storage-dialog .button.big {
+    padding: 0 20px;
+    min-width: 180px;
+}
+.storage-dialog.achievements-bl, .achievements .storage-dialog.no-achievements-bl {
+    display: none;
+}
+.achievements .storage-dialog.achievements-bl {
+    display: block;
+}
+.storage-dialog.body-p.small i {
+    vertical-align: top;
+    display: inline-block;
+    margin: -2px 0 0 0;
+}
+.almost-full .fm-dialog-body.storage-dialog.full, .full .fm-dialog-body.storage-dialog.almost-full, 
+.almost-full.achievements .default-white-button.skip, .almost-full .default-white-button.get-bonuses {
+    display: none;
+}
+.almost-full .fm-dialog-body.storage-dialog.almost-full {
+    display:block;
+}
+.almost-full.achievements .default-white-button.get-bonuses {
+    display: inline-block;
+}
+.storage-dialog.buttons-block {
+    padding: 12px 0 0 0;
+    
+}
+.almost-full .fm-dialog-body.storage-dialog {
+        padding-bottom: 24px;
+}
+/* end of Storage dialog */

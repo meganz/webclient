@@ -489,7 +489,7 @@
     width: 18px;
 }
 .huge-white-icon.achievement {
-    background-image: url(../images/mega/account-sprite.png);
+    background-image: url(../images/mega/account-sprite_v2.png);
     width: 72px;
     height: 72px;
 }
@@ -945,3 +945,15 @@
     background-position: -140px -331px;
 }
 /* End of Context menu icons */
+.huge-icon.storage-icon {
+    background-image: url(../images/mega/account-sprite@2x.png);
+    background-position: 20px -771px;
+    background-repeat: no-repeat;
+}
+.huge-icon.storage-icon.full {
+    background-position: 20px -651px;
+}
+.semi-small-icon.rocket {
+    background-image: url(../images/mega/account-sprite@2x.png);
+    background-position: -156px -619px;
+}

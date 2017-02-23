@@ -6116,6 +6116,70 @@ th.grid-first-th {
 .linked .data-item-icon, .taken-down.linked .data-item-icon, .undecryptable.nw-fm-tree-item .data-item-icon {
     display: block;
 }
+/* FM notification */
+.fm-notification-block {
+    display: none;
+    height: 24px;
+    text-align: center;
+    color: white;
+    font-size: 14px;
+    line-height: 23px;
+    background-color: #FF333A;
+    padding: 0 40px;
+    position:relative;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: normal;
+}
+.fm-notification-block.almost-full {
+    background-color: #fbedb6;
+    color: #333333;
+    
+}
+.fm-notification-block.almost-full a {
+    color: #333333;
+    
+}
+.fm-notification-close {
+    width: 24px;
+    height: 24px;
+    background-position: -55px -4827px;
+    background-image: url(../images/mega/dialogs-sprite_v12.svg);
+    background-repeat: no-repeat;
+    position:absolute;
+    right: 10px;
+    top: 0;
+    cursor: pointer;
+    z-index: 1;
+}
+.fm-notification-block span {
+    font-family: 'source_sans_prosemibold';
+}
+.fm-notification-block a {
+    font-family: 'source_sans_prosemibold';
+    text-decoration:underline;
+    cursor: pointer;
+}
+.fm-notification-block a:hover {
+    text-decoration: none;
+}
+.fm-notification.full .visible-notification .fm-notification-block.full, .fm-notification.almost-full .visible-notification .fm-notification-block.almost-full {
+    display: block;
+}
+.fm-notification .fm-blocks-view.fm, .fm-notification .files-grid-view.fm, .fm-notification .shared-grid-view, .fm-notification .shared-grid-view, .fm-notification .shared-blocks-view {
+    height: 100%;
+    height: -webkit-calc(100% - 60px);
+    height: -moz-calc(100% - 60px);
+    height: calc(100% - 60px);
+}
+.fm-notification .fm-empty-incoming, .fm-notification .fm-empty-trashbin, .fm-notification .fm-empty-cloud {
+    height: 100%;
+    height: -webkit-calc(100% - 61px);
+    height: -moz-calc(100% - 61px);
+    height: calc(100% - 61px);
+}
+/* End of FM notification */
 .fm-blocks-view, .fm-contacts-blocks-view, .fm-blocks-view.shared-view, .shared-details-block, .shared-blocks-view, .fm-blocks-view.contacts-view, .contacts-details-block, .contacts-blocks-view {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -11642,7 +11706,7 @@ table {
     width: 52px;
     height: 52px;
     float: left;
-    background-image: url(../images/mega/account-sprite.png);
+    background-image: url(../images/mega/account-sprite_v2.png);
     background-position: -2px -464px;
     background-repeat: no-repeat;
     margin-left: -2px;
@@ -11735,7 +11799,7 @@ table {
     background-color: rgba(119,119,119,1);
 }
 .dropdown.transfer-icon {
-    background-image: url(../images/mega/account-sprite.png);
+    background-image: url(../images/mega/account-sprite_v2.png);
     background-repeat: no-repeat;
     background-position: -3px -554px;
     width: 68px;

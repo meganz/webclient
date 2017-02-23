@@ -476,8 +476,8 @@ body.pro:after {
     background-image: url("../images/mega/help2/welcome_icons@2x.png");
     background-size: 250px auto;
 }
-.huge-white-icon.achievement, .account.bonuses-icon, .dropdown.transfer-icon {
-    background-image: url(../images/mega/account-sprite@2x.png);
+.huge-white-icon.achievement, .account.bonuses-icon, .dropdown.transfer-icon, .huge-icon.storage-icon, .semi-small-icon.rocket {
+    background-image: url(../images/mega/account-sprite_v2@2x.png);
     background-size: 172px auto;
 }
 .huge-icon.achievement {

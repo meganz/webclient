@@ -9334,7 +9334,7 @@ React.makeElement = React['createElement'];
 
 	                    var files = [];
 
-	                    attachmentMeta.forEach(function (v) {
+	                    attachmentMeta.forEach(function (v, attachmentKey) {
 	                        var startDownload = function startDownload() {
 	                            M.addDownload([v]);
 	                        };
@@ -9466,11 +9466,13 @@ React.makeElement = React['createElement'];
 	                                        delay('thumbnails', fm_thumbnails, 90);
 	                                    }
 	                                    src = window.noThumbURI || '';
+
+	                                    v.imgId = "thumb" + message.messageId + "_" + attachmentKey + "_" + v.h;
 	                                }
 
 	                                preview = src ? React.makeElement(
 	                                    'div',
-	                                    { id: v.h, className: 'shared-link img-block' },
+	                                    { id: v.imgId, className: 'shared-link img-block' },
 	                                    React.makeElement('div', { className: 'img-overlay', onClick: startPreview }),
 	                                    React.makeElement(
 	                                        'div',

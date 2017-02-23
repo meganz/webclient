@@ -9554,20 +9554,13 @@ function fm_thumbnails()
 
 function fm_thumbnail_render(n) {
     if (n && thumbnails[n.h]) {
+        var imgNode = document.getElementById(n.imgId || n.h);
 
-        // one thumbnail can eventually be rendered multiple times in the DOM, for example when:
-        // 1) is shared multiple times in the same chat room
-        // 2) was rendered in some of the other FM tabs and not cleaned up properly.
-        // This is why we generate this a bit extensive, but (legacy) compatible selector
-        // Note: Because node IDs can start with a number, I'd changed this to use jQuery instead of querySelectorAll
-        var imgNodes = $('#' + n.h + " img");
-        if (imgNodes.length > 0) {
+        if (imgNode && (imgNode = imgNode.querySelector('img'))) {
             n.seen = 2;
-        }
-        imgNodes.each(function(k, imgNode) {
             imgNode.setAttribute('src', thumbnails[n.h]);
             imgNode.parentNode.classList.add('thumb');
-        });
+        }
     }
 }
 // jscs:enable

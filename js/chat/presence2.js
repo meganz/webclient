@@ -319,10 +319,10 @@ UserPresence.prototype.reconnect = function presence_reconnect(self) {
 
         self.s.onmessage = function (m) {
             if (!this.canceled) {
-                // console.error(
-                //     "PRESENCE INCOMING: ",
-                //     ab_to_base64(m.data)
-                // );
+                console.error(
+                    "PRESENCE INCOMING: ",
+                    ab_to_base64(m.data)
+                );
 
                 var u = new Uint8Array(m.data);
                 var p = 0;
@@ -465,10 +465,10 @@ UserPresence.prototype.sendstring = function presence_sendstring(s) {
         u[i] = s.charCodeAt(i);
     }
 
-    // console.error(
-    //     "PRESENCE OUTGOING: ",
-    //     ab_to_base64(u.buffer)
-    // );
+    console.error(
+        "PRESENCE OUTGOING: ",
+        ab_to_base64(u.buffer)
+    );
 
     this.s.send(u);
 };

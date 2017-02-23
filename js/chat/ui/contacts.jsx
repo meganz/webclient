@@ -308,11 +308,11 @@ var ContactPickerWidget = React.createClass({
                 $(document).trigger('closeDropdowns');
 
                 if (self.props.onSelectDone) {
-                    self.props.onSelectDone(self.state.selected);
+                    self.props.onSelectDone(self.props.selected);
                 }
             };
 
-            if (!self.state.selected || self.state.selected.length === 0) {
+            if (!self.props.selected || self.props.selected.length === 0) {
                 footer = <div className="fm-dialog-footer">
                     <div className="fm-dialog-footer-txt">{
                         self.props.nothingSelectedButtonLabel ?
@@ -322,7 +322,7 @@ var ContactPickerWidget = React.createClass({
                     }</div>
                 </div>;
             }
-            else if (self.state.selected.length === 1) {
+            else if (self.props.selected.length === 1) {
                 footer = <div className="contacts-search-footer">
                     <div className="fm-dialog-footer">
                         <a href="javascript:;" className="default-white-button right" onClick={onSelectDoneCb}>
@@ -331,7 +331,7 @@ var ContactPickerWidget = React.createClass({
                     </div>
                 </div>
             }
-            else if (self.state.selected.length > 1) {
+            else if (self.props.selected.length > 1) {
                 footer = <div className="contacts-search-footer">
                     <div className="fm-dialog-footer">
                         <a href="javascript:;" className="default-white-button right" onClick={onSelectDoneCb}>
@@ -380,7 +380,7 @@ var ContactPickerWidget = React.createClass({
             }
 
             var selectedClass = "";
-            if (self.state.selected && self.state.selected.indexOf(v.u) !== -1) {
+            if (self.props.selected && self.props.selected.indexOf(v.u) !== -1) {
                 selectedClass = "selected";
             }
             contacts.push(
@@ -400,7 +400,7 @@ var ContactPickerWidget = React.createClass({
 
                             $(document).trigger('closeDropdowns');
 
-                            var sel = self.state.selected;
+                            var sel = self.props.selected;
                             if (sel.indexOf(contact.u) === -1) {
                                 sel.push(contact.u);
                             }
@@ -417,21 +417,16 @@ var ContactPickerWidget = React.createClass({
                             }
                         }
                         else {
-                            var sel = self.state.selected;
+                            var sel = self.props.selected;
                             if (!sel) {
                                 sel = [];
                             }
-                            if (self.state.selected.indexOf(contact.u) > -1) {
+                            if (self.props.selected.indexOf(contact.u) > -1) {
                                 removeValue(sel, contact.u, false);
                             }
                             else {
                                 sel.push(contact.u);
                             }
-
-
-                            self.setState({'selected': sel});
-
-                            self.forceUpdate();
 
                             if (self.props.onSelect) {
                                 self.props.onSelect(contact, e);
@@ -476,7 +471,7 @@ var ContactPickerWidget = React.createClass({
                 />
             </div>
 
-            <utils.JScrollPane className="contacts-search-scroll">
+            <utils.JScrollPane className="contacts-search-scroll" selected={this.state.selected}>
                 <div style={innerDivStyles}>
                     {contacts}
                 </div>

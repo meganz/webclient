@@ -347,11 +347,6 @@ Chat.prototype.init = function() {
         if (!contact) {
             return;
         }
-        console.error(
-            "karere.onPresence",
-            contact.u,
-            megaChat.karere.getPresence(megaChat.getJidFromNodeId(contact.u))
-        );
 
         if (contact) {
             var presencedPresence = self.plugins.presencedIntegration.getPresence(contact.u);

@@ -1,3 +1,10 @@
+accountUI.disableElement = function(element) {
+    $(element).addClass('disabled').attr('disabled', 1);
+};
+accountUI.enableElement = function(element) {
+    $(element).removeClass('disabled').removeAttr('disabled');
+};
+
 accountUI.initCheckbox = function(className, $container, currentValue, onChangeCb) {
     var $wrapperDiv = $('.' + className, $container);
     var $input = $('input[type="checkbox"]', $wrapperDiv);
@@ -99,22 +106,22 @@ accountUI.advancedSection = function() {
         }
         else {
             presenceInt.setPersistOn();
-
-            if (presenceInt.getAutoaway() !== false) {
-                autoawayChangeRequestHandler(false);
-            }
         }
     };
 
     var autoawayChangeRequestHandler = function(newVal) {
         if (newVal !== true) {
-            $('input#autoaway', $sectionContainerChat).attr('disabled', 1).addClass('disabled');
+            accountUI.disableElement($('input#autoaway', $sectionContainerChat));
             presenceInt.setAutoawayOff();
         }
         else {
-            $('input#autoaway', $sectionContainerChat).removeAttr('disabled').removeClass('disabled');
-            presenceInt.setAutoaway($('input#autoaway', $sectionContainerChat).val());
-            persistChangeRequestedHandler(false);
+            if (presenceInt.getPresence() !== UserPresence.PRESENCE.AWAY) {
+                accountUI.enableElement($('input#autoaway', $sectionContainerChat));
+                presenceInt.setAutoaway($('input#autoaway', $sectionContainerChat).val());
+            }
+            else {
+                return false;
+            }
         }
     };
 
@@ -135,10 +142,10 @@ accountUI.advancedSection = function() {
 
 
     if (presenceInt.getAutoaway() === false) {
-        $('input#autoaway', $sectionContainerChat).attr('disabled', 1).addClass('disabled');
+        accountUI.disableElement($('input#autoaway', $sectionContainerChat));
     }
     else {
-        $('input#autoaway', $sectionContainerChat).removeAttr('disabled').removeClass('disabled');
+        accountUI.enableElement($('input#autoaway', $sectionContainerChat));
     }
 
 

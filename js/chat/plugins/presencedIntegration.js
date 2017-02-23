@@ -393,6 +393,10 @@ PresencedIntegration.prototype.setAutoaway = function(minutes) {
     var s = minutes * 60;
     this._initAutoawayEvents();
     this.userPresence.ui_setautoaway(s);
+
+    if (this.getPersist()) {
+        this.setPersistOff();
+    }
 };
 PresencedIntegration.prototype.setAutoawayOff = function() {
     this._destroyAutoawayEvents();
@@ -409,6 +413,10 @@ PresencedIntegration.prototype.getAutoaway = function() {
 
 PresencedIntegration.prototype.setPersistOn = function() {
     this.userPresence.ui_setpersist(true);
+
+    if (this.getAutoaway() !== false) {
+        this.setAutoawayOff();
+    }
 };
 
 PresencedIntegration.prototype.setPersistOff = function() {

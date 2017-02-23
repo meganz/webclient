@@ -319,10 +319,10 @@ UserPresence.prototype.reconnect = function presence_reconnect(self) {
 
         self.s.onmessage = function (m) {
             if (!this.canceled) {
-                console.error(
-                    "PRESENCE INCOMING: ",
-                    ab_to_base64(m.data)
-                );
+                // console.error(
+                //     "PRESENCE INCOMING: ",
+                //     ab_to_base64(m.data)
+                // );
 
                 var u = new Uint8Array(m.data);
                 var p = 0;
@@ -338,13 +338,14 @@ UserPresence.prototype.reconnect = function presence_reconnect(self) {
                             break;
 
                         case 2: // OPCODE_STATUSOVERRIDE
-                            if ((this.up.persist ? this.up.ui_presencelevel : 0) === u[1]) {
+                            if ((this.up.persist ? this.up.ui_presencelevel : 0) === u[p+1]) {
                                 // the override matches what we wanted to set - clear changed flag
                                 this.up.overridechanged = false;
                             }
                             else {
-                                if (u[1]) {
-                                    this.up.ui_presencelevel = u[1];
+                                if (u[p+1]) {
+                                    console.error('this.up.ui_presencelevel = ', this.up.ui_presencelevel, [u[p], u[p+1]]);
+                                    this.up.ui_presencelevel = u[p+1];
                                     this.up.persist = true;
                                 }
                                 else {
@@ -358,9 +359,15 @@ UserPresence.prototype.reconnect = function presence_reconnect(self) {
                             break;
 
                         case 6: // OPCODE_PEERSTATUS
+                            var userhash = ab_to_base64(new Uint8Array(u.buffer, p+2, 8));
+                            var presence = u[p + 1] & 0xf;
+                            var isWebrtcFlag = u[p + 1] & 0x80;
+
                             if (this.up.peerstatuscb) {
                                 this.up.peerstatuscb(
-                                    ab_to_base64(new Uint8Array(u.buffer, p+2, 8)), u[p + 1] & 0xf, u[p + 1] & 0x80
+                                    userhash,
+                                    presence,
+                                    isWebrtcFlag
                                 );
                             }
                             p += 10;
@@ -458,10 +465,10 @@ UserPresence.prototype.sendstring = function presence_sendstring(s) {
         u[i] = s.charCodeAt(i);
     }
 
-    console.error(
-        "PRESENCE OUTGOING: ",
-        ab_to_base64(u.buffer)
-    );
+    // console.error(
+    //     "PRESENCE OUTGOING: ",
+    //     ab_to_base64(u.buffer)
+    // );
 
     this.s.send(u);
 };
@@ -517,6 +524,7 @@ UserPresence.prototype.keepalivetimeout = function presence_keepalivetimeout(sel
 };
 
 UserPresence.prototype.ui_setstatus = function presence_ui_setstatus(presencelevel) {
+    console.error('UserPresence.prototype.ui_setstatus', presencelevel);
     this.ui_presencelevel = presencelevel;
 
     if (!this.persist) {
@@ -548,6 +556,7 @@ UserPresence.prototype.ui_setautoaway = function presence_ui_setautoaway(timeout
 
     if (!timeout) {
         // zero timeout: we're always away
+        console.error('ui_setautoaway, ui_presencelevel =', 'AWAY');
         this.ui_presencelevel = UserPresence.PRESENCE.AWAY;
     }
 
@@ -583,6 +592,7 @@ UserPresence.prototype.ui_setpersist = function presence_ui_setpersist(persist) 
             if (this.ui_presencelevel == UserPresence.PRESENCE.OFFLINE) {
                 // cannot do OFFLINE without persistence
                 this.ui_presencelevel = UserPresence.PRESENCE.AWAY;
+                console.error('OFFLINE -> AWAY');
             }
 
             // update flags
@@ -647,6 +657,8 @@ UserPresence.prototype.ui_settings = function presence_ui_settings(settings) {
                        + (settings.charCodeAt(1) << 8)
                        + (settings.charCodeAt(2) << 16)
                        - 1;
+
+    console.error("got settings from pr: ", autoawaytimeout);
 
     if (autoawaytimeout != this.autoawaytimeout) {
         this.autoawaytimeout = autoawaytimeout;

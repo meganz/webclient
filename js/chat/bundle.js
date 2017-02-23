@@ -8196,16 +8196,10 @@ React.makeElement = React['createElement'];
 	        var $container = $(ReactDOM.findDOMNode(self));
 	        var val = $.trim($('.chat-textarea:visible textarea:visible', $container).val());
 
-	        if (val.length > 0) {
-	            if (self.onConfirmTrigger(val) !== true) {
-	                self.setState({ typedMessage: "" });
-	            }
-	            self.triggerOnUpdate();
-	            return;
-	        } else {
-
-	            self.onCancelClicked(e);
+	        if (self.onConfirmTrigger(val) !== true) {
+	            self.setState({ typedMessage: "" });
 	        }
+	        self.triggerOnUpdate();
 	    },
 	    onConfirmTrigger: function onConfirmTrigger(val) {
 	        var result = this.props.onConfirm(val);

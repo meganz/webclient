@@ -913,7 +913,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
     var chatRoomId = chatRoom.roomJid.split("@")[0];
 
     chatRoom.rebind('typing.chatdInt', function() {
-        self.broadcast(chatRoom, 1);
+        self.broadcast(chatRoom, String.fromCharCode(1));
     });
 
     self.chatd.rebind('onBroadcast.chatdInt' + chatRoomId, function(e, eventData) {

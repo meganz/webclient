@@ -8110,18 +8110,22 @@ React.makeElement = React['createElement'];
 	        var self = this;
 	        var room = this.props.chatRoom;
 
-	        if (!self.typingTimeout) {
-	            if (room && room.state === ChatRoom.STATE.READY && !self.iAmTyping) {
-	                self.iAmTyping = true;
-	                room.megaChat.karere.sendIsComposing(room.roomJid);
-	            }
-	        } else if (self.typingTimeout) {
-	            clearTimeout(self.typingTimeout);
+	        if (self.stoppedTypingTimeout) {
+	            clearTimeout(self.stoppedTypingTimeout);
 	        }
 
-	        self.typingTimeout = setTimeout(function () {
-	            self.stoppedTyping();
-	        }, 2000);
+	        self.stoppedTypingTimeout = setTimeout(function () {
+	            if (room && self.iAmTyping) {
+	                self.iAmTyping = false;
+	                delete self.lastTypingStamp;
+	            }
+	        }, 4000);
+
+	        if (room && !self.iAmTyping || room && self.iAmTyping && unixtime() - self.lastTypingStamp >= 4) {
+	            self.iAmTyping = true;
+	            self.lastTypingStamp = unixtime();
+	            room.trigger('typing');
+	        }
 	    },
 	    triggerOnUpdate: function triggerOnUpdate(forced) {
 	        var self = this;
@@ -8156,28 +8160,6 @@ React.makeElement = React['createElement'];
 	            self.onUpdateThrottling = setTimeout(function () {
 	                self.props.onUpdate();
 	            }, 70);
-	        }
-	    },
-	    stoppedTyping: function stoppedTyping() {
-	        if (this.props.disabled) {
-	            return;
-	        }
-
-	        var self = this;
-	        var room = this.props.chatRoom;
-
-	        if (self.typingTimeout) {
-	            clearTimeout(self.typingTimeout);
-	            self.typingTimeout = null;
-	        }
-
-	        if (self.iAmTyping) {
-
-	            self.triggerOnUpdate();
-	        }
-	        if (room && room.state === ChatRoom.STATE.READY && self.iAmTyping === true) {
-	            room.megaChat.karere.sendComposingPaused(room.roomJid);
-	            self.iAmTyping = false;
 	        }
 	    },
 	    onCancelClicked: function onCancelClicked(e) {
@@ -8238,7 +8220,6 @@ React.makeElement = React['createElement'];
 	            if (self.onConfirmTrigger(val) !== true) {
 	                self.setState({ typedMessage: "" });
 	            }
-	            self.stoppedTyping();
 	            e.preventDefault();
 	            e.stopPropagation();
 	            return;
@@ -8263,20 +8244,17 @@ React.makeElement = React['createElement'];
 	            return;
 	        } else if (key === 13) {
 	            if ($.trim(val).length === 0) {
-	                self.stoppedTyping();
 	                e.preventDefault();
 	            }
 	        } else if (key === 38) {
 	            if ($.trim(val).length === 0) {
 	                if (self.props.onUpEditPressed && self.props.onUpEditPressed() === true) {
-	                    self.stoppedTyping();
 	                    e.preventDefault();
 	                    return;
 	                }
 	            }
 	        } else if (key === 27) {
 	            if (self.props.showButtons === true) {
-	                self.stoppedTyping();
 	                e.preventDefault();
 	                self.onCancelClicked(e);
 	                return;
@@ -8663,7 +8641,7 @@ React.makeElement = React['createElement'];
 	    mixins: [MegaRenderMixin],
 	    getInitialState: function getInitialState() {
 	        return {
-	            currentlyTyping: []
+	            currentlyTyping: {}
 	        };
 	    },
 	    componentWillMount: function componentWillMount() {
@@ -8671,59 +8649,43 @@ React.makeElement = React['createElement'];
 	        var chatRoom = self.props.chatRoom;
 	        var megaChat = self.props.chatRoom.megaChat;
 
-	        megaChat.karere.bind("onComposingMessage.whosTyping" + chatRoom.roomJid, function (e, eventObject) {
+	        chatRoom.bind("onParticipantTyping.whosTyping", function (e, user_handle) {
 	            if (!self.isMounted()) {
 	                return;
 	            }
-	            if (Karere.getNormalizedFullJid(eventObject.getFromJid()) === megaChat.karere.getJid()) {
+	            if (user_handle === u_handle) {
 	                return;
 	            }
 
-	            var room = megaChat.chats[eventObject.getRoomJid()];
-	            if (room.roomJid == chatRoom.roomJid) {
-	                var currentlyTyping = self.state.currentlyTyping;
-	                var u_h = megaChat.getContactFromJid(Karere.getNormalizedBareJid(eventObject.getFromJid())).u;
+	            var currentlyTyping = clone(self.state.currentlyTyping);
+	            var u_h = user_handle;
 
-	                if (u_h === u_handle) {
+	            if (u_h === u_handle) {
 
-	                    return;
-	                }
+	                return;
+	            } else if (!M.u[u_h]) {
 
-	                currentlyTyping.push(u_h);
-	                currentlyTyping = array_unique(currentlyTyping);
-	                self.setState({
-	                    currentlyTyping: currentlyTyping
-	                });
-	                self.forceUpdate();
-	            }
-	        });
-
-	        megaChat.karere.rebind("onPausedMessage.whosTyping" + chatRoom.roomJid, function (e, eventObject) {
-	            var room = megaChat.chats[eventObject.getRoomJid()];
-
-	            if (!self.isMounted()) {
 	                return;
 	            }
-	            if (Karere.getNormalizedFullJid(eventObject.getFromJid()) === megaChat.karere.getJid()) {
-	                return;
+	            if (currentlyTyping[u_h]) {
+	                clearTimeout(currentlyTyping[u_h][1]);
 	            }
 
-	            if (room.roomJid === chatRoom.roomJid) {
-	                var currentlyTyping = self.state.currentlyTyping;
-	                var u_h = megaChat.getContactFromJid(Karere.getNormalizedBareJid(eventObject.getFromJid())).u;
-	                if (u_h === u_handle) {
-
-	                    return;
+	            var timer = setTimeout(function () {
+	                if (self.state.currentlyTyping[u_h]) {
+	                    var newState = clone(self.state.currentlyTyping);
+	                    delete newState[u_h];
+	                    self.setState({ currentlyTyping: newState });
 	                }
+	            }, 5000);
 
-	                if (currentlyTyping.indexOf(u_h) > -1) {
-	                    removeValue(currentlyTyping, u_h);
-	                    self.setState({
-	                        currentlyTyping: currentlyTyping
-	                    });
-	                    self.forceUpdate();
-	                }
-	            }
+	            currentlyTyping[u_h] = [unixtime(), timer];
+
+	            self.setState({
+	                currentlyTyping: currentlyTyping
+	            });
+
+	            self.forceUpdate();
 	        });
 	    },
 	    componentWillUnmount: function componentWillUnmount() {
@@ -8731,16 +8693,15 @@ React.makeElement = React['createElement'];
 	        var chatRoom = self.props.chatRoom;
 	        var megaChat = chatRoom.megaChat;
 
-	        megaChat.karere.bind("onComposingMessage." + chatRoom.roomJid);
-	        megaChat.karere.unbind("onPausedMessage." + chatRoom.roomJid);
+	        chatRoom.unbind("onParticipantTyping.whosTyping");
 	    },
 	    render: function render() {
 	        var self = this;
 
 	        var typingElement = null;
 
-	        if (self.state.currentlyTyping.length > 0) {
-	            var names = self.state.currentlyTyping.map(function (u_h) {
+	        if (Object.keys(self.state.currentlyTyping).length > 0) {
+	            var names = Object.keys(self.state.currentlyTyping).map(function (u_h) {
 	                var avatarMeta = generateAvatarMeta(u_h);
 	                return avatarMeta.fullName.split(" ")[0];
 	            });

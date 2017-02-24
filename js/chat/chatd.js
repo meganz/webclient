@@ -747,14 +747,10 @@ Chatd.Shard.prototype.exec = function(a) {
             case Chatd.Opcode.BROADCAST:
                 self.keepAliveTimerRestart();
 
-                var chatId = base64urlencode(cmd.substr(1, 8));
-                var userId = base64urlencode(cmd.substr(9, 8));
-                var bCastCode = cmd.substr(17, 1);
-
                 self.chatd.trigger('onBroadcast', {
-                    chatId: chatId,
-                    userId: userId,
-                    bCastCode: bCastCode
+                    chatId: base64urlencode(cmd.substr(1, 8)),
+                    userId: base64urlencode(cmd.substr(9, 8)),
+                    bCastCode: cmd.substr(17, 1)
                 });
 
                 len = 18;

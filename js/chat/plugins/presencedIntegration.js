@@ -121,12 +121,8 @@ PresencedIntegration.prototype.init = function() {
         false,
         function presencedIntegration_connectedcb(isConnected) {
             self.logger.debug(isConnected ? "connected" : "disconnected");
-            self._updateSettingsFromAttribute();
         },
         self._peerstatuscb.bind(self),
-        function(str) {
-            self._savepresencecb(str);
-        },
         self._updateuicb.bind(self)
     );
 
@@ -175,7 +171,6 @@ PresencedIntegration.prototype._updateuicb = function presencedIntegration_updat
 
     self.logger.debug("updateuicb", presence, autoawaytimeout, persist);
     console.error('updateuicb', arguments);
-
 
     self._presence[u_handle] = presence;
 
@@ -385,10 +380,6 @@ PresencedIntegration.prototype.getPresenceAsText = function(u_h, pres) {
     return constStateToText(UserPresence.PRESENCE, pres);
 };
 
-PresencedIntegration.prototype._savepresencecb = function(str) {
-    console.error('_savepresencecb ', str);
-    mega.attr.set('pr', [str], false, true);
-}
 PresencedIntegration.prototype.setAutoaway = function(minutes) {
     var s = minutes * 60;
     this._initAutoawayEvents();
@@ -398,6 +389,7 @@ PresencedIntegration.prototype.setAutoaway = function(minutes) {
         this.setPersistOff();
     }
 };
+
 PresencedIntegration.prototype.setAutoawayOff = function() {
     this._destroyAutoawayEvents();
     this.userPresence.ui_setautoaway(-1);
@@ -425,23 +417,6 @@ PresencedIntegration.prototype.setPersistOff = function() {
 
 PresencedIntegration.prototype.getPersist = function() {
     return this.userPresence.persist;
-};
-
-PresencedIntegration.prototype._updateSettingsFromAttribute = function() {
-    var self = this;
-    mega.attr.get(u_handle, 'pr', false, true)
-        .done(function(val) {
-            self.userPresence.ui_settings(val[0]);
-        })
-        .fail(function(err) {
-            if (err === -9) {
-                self.userPresence.ui_setautoaway(15 * 60);
-                self.userPresence.ui_setpersist(false);
-            }
-            else {
-                self.logger.error("Retrieving of 'pr' attribute failed: ", err);
-            }
-        });
 };
 
 PresencedIntegration.prototype._initAutoawayEvents = function() {

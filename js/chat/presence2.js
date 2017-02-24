@@ -1,7 +1,6 @@
 // presenced client layer
 
-// presence = new UserPresence(u_handle, can_webrtc, can_mobilepush, connectedcb, peerpresencecb, savesettingscb,
-// updateuicb)
+// presence = new UserPresence(u_handle, can_webrtc, can_mobilepush, connectedcb, peerpresencecb, updateuicb)
 
 // *** capability flags (identifying static client properties):
 
@@ -28,15 +27,8 @@
 // presence.ui_setpersist(active)
 // (call this when the user checks/unchecks the persist-if-offline setting)
 
-// presence.ui_settings(settings)
-// (call this immediately after login with the binary string from the user attribute "pr" and
-// upon any actionpacket-driven change of that attribute)
-
-// savesettingscb(settings)
-// (when this callback is invoked, save the settings - a binary string - to user attribute "pr")
-
 // updateuicb(presencelevel, autoawaytimeout, overridelag)
-// when this callback is invoke, update the UI accordingly (if autoawaytimeout < 0, uncheck auto away option)
+// when this callback is invoked, update the UI accordingly (if autoawaytimeout < 0, uncheck auto away option)
 
 // presence.ui_signalactivity()
 // (call this whenever the user presses a key or moves the mouse)
@@ -61,7 +53,6 @@ var UserPresence = function userpresence(
     can_mobilepush,
     connectedcb,
     peerstatuscb,
-    savesettingscb,
     updateuicb
 ) {
     if (!(this instanceof userpresence)) {
@@ -89,6 +80,9 @@ var UserPresence = function userpresence(
     this.override = false;
     this.overridechanged = false;
 
+    // autoaway timeout and related changed flag
+    this.autoawaytimeout = 300;
+    this.autoawaychanged = false;
 
     // console logging
     this.logger = MegaLogger.getLogger('UserPresence');
@@ -182,21 +176,16 @@ var UserPresence = function userpresence(
     // last flags command to be issued after a reconnect
     this.lastflagscmd = false;
 
-    // user adjusted persistent status locally
-    this.overridechanged = false;
-
     // user has timed out into autoaway status
     this.autoaway = false;
 
     // callbacks
     this.connectedcb = connectedcb;   // called when the connection to presenced is going up or down
     this.peerstatuscb = peerstatuscb; // called when any peer's status changes (including for self)
-    this.savesettingscb = savesettingscb; // called when settings need to be saved in user attribute "pr"
     this.updateuicb = updateuicb;     // called when the UI needs to be updated
 
     // UI-related state (defaults will be overridden by first call to ui_settings() and by presenced after connect)
     this.persist = false;               // override active
-    this.autoawaytimeout = 300;         // auto-away timeout
     this.ui_presencelevel = UserPresence.PRESENCE.ONLINE;
 };
 
@@ -373,6 +362,22 @@ UserPresence.prototype.reconnect = function presence_reconnect(self) {
                             p += 10;
                             break;
 
+                        case 7: // OPCODE_AUTOAWAYSETTING
+                            var newautoawaytimeout = u[p+1] + (u[p+2] << 8);
+                            if (newautoawaytimeout == 65535) newautoawaytimeout = -1;
+
+                            if (this.up.autoawaytimeout == newautoawaytimeout) {
+                                this.up.autoawaychanged = false;
+                            }
+                            else {
+                                this.up.autoawaytimeout = newautoawaytimeout;
+                                this.up.ui_signalactivity(true);
+                                this.up.updateui();
+                            }
+
+                            p += 3;
+                            break;
+
                         default:
                             console.error("Fatal - unknown opcode: " + u[p]);
                             // reload forcefully, as we are probably out of date
@@ -487,11 +492,17 @@ UserPresence.prototype.sendpeerupdate = function presence_sendpeerupdate(peerstr
     this.sendstring(peerstring);
 };
 
-// call this whenever persist or ui_presencelevel changes
 UserPresence.prototype.sendoverride = function presence_sendoverride() {
     if (this.open) {
         this.overridechanged = true;    // this will be reset once the server responds with the same status
         this.sendstring("\2" + String.fromCharCode(this.persist ? this.ui_presencelevel : 0));
+    }
+};
+
+UserPresence.prototype.sendautoaway = function presence_sendautoaway() {
+    if (this.open) {
+        this.autoawaychanged = true;    // this will be reset once the server responds with the same status
+        this.sendstring("\7" + String.fromCharCode(this.autoawaytimeout & 0xff) + String.fromCharCode(this.autoawaytimeout >> 8));
     }
 };
 
@@ -554,6 +565,10 @@ UserPresence.prototype.ui_setautoaway = function presence_ui_setautoaway(timeout
         timeout = -1;
     }
 
+    if (timeout > 65534) {
+        timeout = 65534;
+    }
+
     if (!timeout) {
         // zero timeout: we're always away
         console.error('ui_setautoaway, ui_presencelevel =', 'AWAY');
@@ -572,13 +587,8 @@ UserPresence.prototype.ui_setautoaway = function presence_ui_setautoaway(timeout
         this.sendoverride();
     }
 
+    this.sendautoaway();
     this.updateui();
-
-    timeout++;
-
-    this.savesettingscb(String.fromCharCode(timeout & 0xff)
-                      + String.fromCharCode((timeout >> 8) & 0xff)
-                      + String.fromCharCode((timeout >> 16) & 0xff));
 };
 
 // activate persistent mode
@@ -650,21 +660,6 @@ UserPresence.prototype.autoaway = function presence_autoaway(self) {
 UserPresence.prototype.updateui = function presence_updateui() {
     // we have status override active, disable auto-AWAY
     this.updateuicb(this.ui_presencelevel, this.autoawaytimeout, this.persist);
-};
-
-UserPresence.prototype.ui_settings = function presence_ui_settings(settings) {
-    var autoawaytimeout = settings.charCodeAt(0)
-                       + (settings.charCodeAt(1) << 8)
-                       + (settings.charCodeAt(2) << 16)
-                       - 1;
-
-    console.error("got settings from pr: ", autoawaytimeout);
-
-    if (autoawaytimeout != this.autoawaytimeout) {
-        this.autoawaytimeout = autoawaytimeout;
-        this.ui_signalactivity(true);
-        this.updateui();
-    }
 };
 
 if (true /* intentional: until we get this to be a bit more stable */ || localStorage.presencedDebug) {

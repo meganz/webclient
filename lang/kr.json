@@ -3913,6 +3913,12 @@
     "16267": "\uc258, \uc2a4\ud06c\ub9bd\ud2b8 \ub610\ub294 \ub2e4\ub978 \ud504\ub85c\uadf8\ub7a8\uc5d0\uc11c \uba85\ub839 \uc2e4\ud589",
     "16268": "\uc5f0\ub77d\ucc98 \ub4e4\uc5ec\uc624\uae30...",
     "16269": "\uc0c8 \ud3f4\ub354\ub97c \ub9cc\ub4e4\ub824\uba74 \uc0c8 \ud3f4\ub354 \ubc84\ud2bc\uc744 \uc774\uc6a9\ud558\uc138\uc694.",
+    "16270": "Automatically backup your photos to the Cloud Drive",
+    "16271": "You can upgrade later in My Account",
+    "16272": "Transfers tooltip:",
+    "16273": "Automatically show the transfers tooltip when a transfer is active.",
+    "16274": "View Image",
+    "16275": "Play Video",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

@@ -15654,5 +15654,29 @@
     "16269": {
         "text": "Use the New Folder button to create a new folder.",
         "context": "This message is shown on the Copy and Move dialogs when there are no folders available."
+    },
+    "16270": {
+        "text": "Automatically backup your photos to the Cloud Drive",
+        "context": "Some text shown to explain what 'Enable Camera Uploads' means."
+    },
+    "16271": {
+        "text": "You can upgrade later in My Account",
+        "context": "Some text shown under the button 'Skip' to explain that you can upgrade your account later in the section 'My Account'."
+    },
+    "16272": {
+        "text": "Transfers tooltip:",
+        "context": "A heading in the Account Settings - Transfers section. This section lets the user toggle an option to show the transfer tooltip when a transfer is active."
+    },
+    "16273": {
+        "text": "Automatically show the transfers tooltip when a transfer is active.",
+        "context": "This text is next to a checkbox toggle in the Account Settings - Transfers section. It allows the site to show a tooltip with a progress bar when a file transfer is active."
+    },
+    "16274": {
+        "text": "View Image",
+        "context": "The title of a button which allows the user to open the image in the media \/ image viewer."
+    },
+    "16275": {
+        "text": "Play Video",
+        "context": "The title of a button which allows the user to open the video in a media \/ video player."
     }
 }

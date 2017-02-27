@@ -3913,6 +3913,12 @@
     "16267": "Spou\u0161t\u011bjte p\u0159\u00edkazy z prost\u0159ed\u00ed, skriptu nebo jin\u00e9ho programu.",
     "16268": "Importovat kontakty...",
     "16269": "Pou\u017eijte tla\u010d\u00edtko Nov\u00e1 slo\u017eka pro vytvo\u0159en\u00ed nov\u00e9 slo\u017eky.",
+    "16270": "Automatically backup your photos to the Cloud Drive",
+    "16271": "You can upgrade later in My Account",
+    "16272": "Transfers tooltip:",
+    "16273": "Automatically show the transfers tooltip when a transfer is active.",
+    "16274": "View Image",
+    "16275": "Play Video",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

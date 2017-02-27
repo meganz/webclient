@@ -3913,6 +3913,12 @@
     "16267": "Esegui comandi da una shell, uno script o un altro programma.",
     "16268": "Importa contatti...",
     "16269": "Usa il pulsante Nuova cartella per creare una nuova cartella.",
+    "16270": "Automatically backup your photos to the Cloud Drive",
+    "16271": "You can upgrade later in My Account",
+    "16272": "Transfers tooltip:",
+    "16273": "Automatically show the transfers tooltip when a transfer is active.",
+    "16274": "View Image",
+    "16275": "Play Video",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

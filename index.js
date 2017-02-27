@@ -1393,9 +1393,8 @@ function topmenuUI() {
     if (u_type) {
         $('.top-menu-item.logout,.top-menu-item.backup').removeClass('hidden');
         $('.top-menu-item.account').removeClass('hidden');
-        if (avatar) {
-            $('.fm-avatar img').attr('src', avatar);
-        }
+        $('.fm-avatar').safeHTML(useravatar.contact(u_handle, '', 'div'));
+
         $('.top-login-button').hide();
         $('.membership-status').show();
         $('.top-change-language').hide();

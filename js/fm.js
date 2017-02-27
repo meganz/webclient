@@ -3015,7 +3015,7 @@ function dashboardUI() {
 
     // update avatar
     $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', true));
-    $('.fm-avatar img').attr('src', useravatar.mine());
+    $('.fm-avatar').safeHTML(useravatar.contact(u_handle, '', 'div'));
 
 
     // Show first name or last name
@@ -4456,7 +4456,7 @@ function accountUI() {
             u_attr.country = $('.default-select.country .default-dropdown-item.active').attr('data-value');
 
             $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', true));
-            $('.fm-avatar img').attr('src', useravatar.mine());
+            $('.fm-avatar').safeHTML(useravatar.contact(u_handle, '', 'div'));
 
             api_req({
                 a : 'up',
@@ -5149,7 +5149,7 @@ function accountUI() {
 
                     useravatar.invalidateAvatar(u_handle);
                     $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', true));
-                    $('.fm-avatar img').attr('src', useravatar.mine());
+                    $('.fm-avatar').safeHTML(useravatar.contact(u_handle, '', 'div'));
                     $('.fm-account-remove-avatar').hide();
                 }
             });
@@ -5504,7 +5504,7 @@ function avatarDialog(close)
                 useravatar.setUserAvatar(u_handle, data, this.outputFormat);
 
                 $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', true));
-                $('.fm-avatar img').attr('src', useravatar.mine());
+                $('.fm-avatar').safeHTML(useravatar.contact(u_handle, '', 'div'));
                 avatarDialog(1);
             },
             onImageUpload: function()

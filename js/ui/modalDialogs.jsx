@@ -504,8 +504,6 @@ var CloudBrowserDialog = React.createClass({
 
         var buttons = [];
 
-        window.asdf = self;
-
         if (!folderIsHighlighted) {
             buttons.push(
                 {
@@ -630,7 +628,6 @@ var SelectContactDialog = React.createClass({
         if (this.props.onSelected) {
             this.props.onSelected(nodes);
         }
-        this.forceUpdate();
     },
     onSelectClicked: function() {
         this.props.onSelectClicked();
@@ -679,31 +676,8 @@ var SelectContactDialog = React.createClass({
                 megaChat={self.props.megaChat}
                 contacts={self.props.contacts}
                 exclude={self.props.exclude}
-                onClick={(contact, e) => {
-                    var contactHash = contact.h;
-
-                        // differentiate between a click and a double click.
-                        if (contactHash === self.lastClicked && (new Date() - self.clickTime) < 500) {
-                            // is a double click
-                            self.onSelected([contact.h]);
-                            self.props.onSelectClicked([contact.h]);
-                        }
-                        else {
-                            var selected = clone(self.state.selected);
-
-                            // is a single click
-                            if (self.state.selected.indexOf(contactHash) === -1) {
-                                selected.push(contact.h);
-                                self.onSelected(selected);
-                            }
-                            else {
-                                removeValue(selected, contactHash);
-                                self.onSelected(selected);
-                            }
-                        }
-                        self.clickTime = new Date();
-                        self.lastClicked = contactHash;
-                }}
+                onSelectDone={self.props.onSelectClicked}
+                onSelected={self.onSelected}
                 selected={self.state.selected}
                 headerClasses="left-aligned"
                 />

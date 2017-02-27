@@ -167,6 +167,11 @@ var DropdownContactsSelector = React.createClass({
             requiresUpdateOnResize: true
         };
     },
+    getInitialState: function() {
+        return {
+            'selected': this.props.selected ? this.props.selected : []
+        }
+    },
     specificShouldComponentUpdate: function(nextProps, nextState) {
         if (this.props.active != nextProps.active) {
             return true;
@@ -177,10 +182,23 @@ var DropdownContactsSelector = React.createClass({
         else if (this.state && this.state.active != nextState.active) {
             return true;
         }
+        else if (this.state && JSON.stringify(this.state.selected) != JSON.stringify(nextState.selected)) {
+            return true;
+        }
         else {
             // not sure, leave to the render mixing to decide.
             return undefined;
         }
+    },
+    onSelected: function(nodes) {
+        this.setState({'selected': nodes});
+        if (this.props.onSelected) {
+            this.props.onSelected(nodes);
+        }
+        this.forceUpdate();
+    },
+    onSelectClicked: function() {
+        this.props.onSelectClicked();
     },
     render: function() {
         var self = this;
@@ -203,11 +221,7 @@ var DropdownContactsSelector = React.createClass({
                     multipleSelectedButtonLabel={this.props.multipleSelectedButtonLabel}
                     singleSelectedButtonLabel={this.props.singleSelectedButtonLabel}
                     nothingSelectedButtonLabel={this.props.nothingSelectedButtonLabel}
-                    onClick={(contact, e) => {
-                            this.props.onClick(contact, e);
-                            this.props.closeDropdown();
-                        }
-                    } />
+                    />
         </Dropdown>;
     }
 });

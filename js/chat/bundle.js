@@ -3293,6 +3293,11 @@ React.makeElement = React['createElement'];
 	            requiresUpdateOnResize: true
 	        };
 	    },
+	    getInitialState: function getInitialState() {
+	        return {
+	            'selected': this.props.selected ? this.props.selected : []
+	        };
+	    },
 	    specificShouldComponentUpdate: function specificShouldComponentUpdate(nextProps, nextState) {
 	        if (this.props.active != nextProps.active) {
 	            return true;
@@ -3300,14 +3305,24 @@ React.makeElement = React['createElement'];
 	            return true;
 	        } else if (this.state && this.state.active != nextState.active) {
 	            return true;
+	        } else if (this.state && JSON.stringify(this.state.selected) != JSON.stringify(nextState.selected)) {
+	            return true;
 	        } else {
 
 	            return undefined;
 	        }
 	    },
+	    onSelected: function onSelected(nodes) {
+	        this.setState({ 'selected': nodes });
+	        if (this.props.onSelected) {
+	            this.props.onSelected(nodes);
+	        }
+	        this.forceUpdate();
+	    },
+	    onSelectClicked: function onSelectClicked() {
+	        this.props.onSelectClicked();
+	    },
 	    render: function render() {
-	        var _this = this;
-
 	        var self = this;
 
 	        return React.makeElement(
@@ -3329,11 +3344,8 @@ React.makeElement = React['createElement'];
 	                onSelectDone: this.props.onSelectDone,
 	                multipleSelectedButtonLabel: this.props.multipleSelectedButtonLabel,
 	                singleSelectedButtonLabel: this.props.singleSelectedButtonLabel,
-	                nothingSelectedButtonLabel: this.props.nothingSelectedButtonLabel,
-	                onClick: function onClick(contact, e) {
-	                    _this.props.onClick(contact, e);
-	                    _this.props.closeDropdown();
-	                } })
+	                nothingSelectedButtonLabel: this.props.nothingSelectedButtonLabel
+	            })
 	        );
 	    }
 	});
@@ -3961,7 +3973,7 @@ React.makeElement = React['createElement'];
 	    getInitialState: function getInitialState() {
 	        return {
 	            'searchValue': '',
-	            'selected': this.props.selected ? this.props.selected : []
+	            'selected': false
 	        };
 	    },
 	    getDefaultProps: function getDefaultProps() {
@@ -3990,11 +4002,11 @@ React.makeElement = React['createElement'];
 	                $(document).trigger('closeDropdowns');
 
 	                if (self.props.onSelectDone) {
-	                    self.props.onSelectDone(self.props.selected);
+	                    self.props.onSelectDone(self.state.selected);
 	                }
 	            };
 
-	            if (!self.props.selected || self.props.selected.length === 0) {
+	            if (!self.state.selected || self.state.selected.length === 0) {
 	                footer = React.makeElement(
 	                    "div",
 	                    { className: "fm-dialog-footer" },
@@ -4004,7 +4016,7 @@ React.makeElement = React['createElement'];
 	                        self.props.nothingSelectedButtonLabel ? self.props.nothingSelectedButtonLabel : __(l[8889])
 	                    )
 	                );
-	            } else if (self.props.selected.length === 1) {
+	            } else if (self.state.selected.length === 1) {
 	                footer = React.makeElement(
 	                    "div",
 	                    { className: "contacts-search-footer" },
@@ -4018,7 +4030,7 @@ React.makeElement = React['createElement'];
 	                        )
 	                    )
 	                );
-	            } else if (self.props.selected.length > 1) {
+	            } else if (self.state.selected.length > 1) {
 	                footer = React.makeElement(
 	                    "div",
 	                    { className: "contacts-search-footer" },
@@ -4061,54 +4073,41 @@ React.makeElement = React['createElement'];
 	            }
 
 	            var selectedClass = "";
-	            if (self.props.selected && self.props.selected.indexOf(v.u) !== -1) {
+	            if (self.state.selected && self.state.selected.indexOf(v.u) !== -1) {
 	                selectedClass = "selected";
 	            }
 	            contacts.push(React.makeElement(ContactCard, {
 	                contact: v,
 	                className: "contacts-search " + selectedClass,
-	                onDoubleClick: function onDoubleClick(contact, e) {
-	                    if (!self.props.multiple) {
-	                        if (self.props.onClick) {
-	                            self.props.onClick(contact, e);
-	                        }
-	                    } else {
-	                        if (self.props.onSelect) {
-	                            self.props.onSelect(contact, e);
-	                        }
 
-	                        $(document).trigger('closeDropdowns');
-
-	                        var sel = self.props.selected;
-	                        if (sel.indexOf(contact.u) === -1) {
-	                            sel.push(contact.u);
-	                        }
-
-	                        if (self.props.onSelectDone) {
-	                            self.props.onSelectDone(sel);
-	                        }
-	                    }
-	                },
 	                onClick: function onClick(contact, e) {
-	                    if (!self.props.multiple) {
-	                        if (self.props.onClick) {
-	                            self.props.onClick(contact, e);
-	                        }
-	                    } else {
-	                        var sel = self.props.selected;
-	                        if (!sel) {
-	                            sel = [];
-	                        }
-	                        if (self.props.selected.indexOf(contact.u) > -1) {
-	                            removeValue(sel, contact.u, false);
-	                        } else {
-	                            sel.push(contact.u);
-	                        }
+	                    var contactHash = contact.h;
 
-	                        if (self.props.onSelect) {
-	                            self.props.onSelect(contact, e);
+	                    if (contactHash === self.lastClicked && new Date() - self.clickTime < 500) {
+
+	                        if (self.props.onSelected) {
+	                            self.props.onSelected([contact.h]);
 	                        }
+	                        self.props.onSelectDone([contact.h]);
+	                        return;
+	                    } else {
+	                        var selected = clone(self.state.selected || []);
+
+	                        if (selected.indexOf(contactHash) === -1) {
+	                            selected.push(contact.h);
+	                            if (self.props.onSelected) {
+	                                self.props.onSelected(selected);
+	                            }
+	                        } else {
+	                            removeValue(selected, contactHash);
+	                            if (self.props.onSelected) {
+	                                self.props.onSelected(selected);
+	                            }
+	                        }
+	                        self.setState({ 'selected': selected });
 	                    }
+	                    self.clickTime = new Date();
+	                    self.lastClicked = contactHash;
 	                },
 	                noContextMenu: true,
 	                key: v.u
@@ -7477,8 +7476,6 @@ React.makeElement = React['createElement'];
 
 	        var buttons = [];
 
-	        window.asdf = self;
-
 	        if (!folderIsHighlighted) {
 	            buttons.push({
 	                "label": self.props.selectLabel,
@@ -7601,7 +7598,6 @@ React.makeElement = React['createElement'];
 	        if (this.props.onSelected) {
 	            this.props.onSelected(nodes);
 	        }
-	        this.forceUpdate();
 	    },
 	    onSelectClicked: function onSelectClicked() {
 	        this.props.onSelectClicked();
@@ -7647,27 +7643,8 @@ React.makeElement = React['createElement'];
 	                megaChat: self.props.megaChat,
 	                contacts: self.props.contacts,
 	                exclude: self.props.exclude,
-	                onClick: function onClick(contact, e) {
-	                    var contactHash = contact.h;
-
-	                    if (contactHash === self.lastClicked && new Date() - self.clickTime < 500) {
-
-	                        self.onSelected([contact.h]);
-	                        self.props.onSelectClicked([contact.h]);
-	                    } else {
-	                        var selected = clone(self.state.selected);
-
-	                        if (self.state.selected.indexOf(contactHash) === -1) {
-	                            selected.push(contact.h);
-	                            self.onSelected(selected);
-	                        } else {
-	                            removeValue(selected, contactHash);
-	                            self.onSelected(selected);
-	                        }
-	                    }
-	                    self.clickTime = new Date();
-	                    self.lastClicked = contactHash;
-	                },
+	                onSelectDone: self.props.onSelectClicked,
+	                onSelected: self.onSelected,
 	                selected: self.state.selected,
 	                headerClasses: "left-aligned"
 	            })

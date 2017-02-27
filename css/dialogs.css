@@ -813,6 +813,9 @@ li.token-input-token-invite .input-close {
 .fm-dialog.storage-dialog.almost-full {
     margin: -225px 0 0 -322px;
 }
+.fm-dialog.storage-dialog.almost-full.achievements {
+    margin: -235px 0 0 -322px;
+}
 .fm-dialog-body.storage-dialog {
     padding: 0 48px 19px 48px;
     text-align: center;
@@ -896,21 +899,14 @@ li.token-input-token-invite .input-close {
     display: inline-block;
     margin: -2px 0 0 0;
 }
-.almost-full .fm-dialog-body.storage-dialog.full, .full .fm-dialog-body.storage-dialog.almost-full, 
-.almost-full.achievements .default-white-button.skip, .almost-full .default-white-button.get-bonuses {
+.almost-full .fm-dialog-body.storage-dialog.full, .full .fm-dialog-body.storage-dialog.almost-full {
     display: none;
-}
-.almost-full .fm-dialog-body.storage-dialog.almost-full {
-    display:block;
-}
-.almost-full.achievements .default-white-button.get-bonuses {
-    display: inline-block;
 }
 .storage-dialog.buttons-block {
     padding: 12px 0 0 0;
-    
+    font-size: 0;
 }
 .almost-full .fm-dialog-body.storage-dialog {
-        padding-bottom: 24px;
+    padding-bottom: 24px;
 }
 /* end of Storage dialog */

@@ -6126,7 +6126,7 @@ th.grid-first-th {
     line-height: 23px;
     background-color: #FF333A;
     padding: 0 40px;
-    position:relative;
+    position: relative;
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
     overflow: hidden;
@@ -6135,11 +6135,9 @@ th.grid-first-th {
 .fm-notification-block.almost-full {
     background-color: #fbedb6;
     color: #333333;
-    
 }
 .fm-notification-block.almost-full a {
     color: #333333;
-    
 }
 .fm-notification-close {
     width: 24px;
@@ -6147,7 +6145,7 @@ th.grid-first-th {
     background-position: -55px -4827px;
     background-image: url(../images/mega/dialogs-sprite_v12.svg);
     background-repeat: no-repeat;
-    position:absolute;
+    position: absolute;
     right: 10px;
     top: 0;
     cursor: pointer;
@@ -6158,7 +6156,7 @@ th.grid-first-th {
 }
 .fm-notification-block a {
     font-family: 'source_sans_prosemibold';
-    text-decoration:underline;
+    text-decoration: underline;
     cursor: pointer;
 }
 .fm-notification-block a:hover {

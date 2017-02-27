@@ -5748,7 +5748,7 @@ React.makeElement = React['createElement'];
 	    },
 
 	    uploadFromComputer: function uploadFromComputer() {
-	        $('#fileselect3').trigger('click');
+	        $('#fileselect1').trigger('click');
 	    },
 	    refreshUI: function refreshUI() {
 	        var self = this;

@@ -745,7 +745,7 @@ var ConversationPanel = React.createClass({
     },
 
     uploadFromComputer: function() {
-        $('#fileselect3').trigger('click')
+        $('#fileselect1').trigger('click')
     },
     refreshUI: function() {
         var self = this;

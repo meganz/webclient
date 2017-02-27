@@ -100,24 +100,23 @@ accountUI.advancedSection = function() {
     _initPresenceRadio(presenceInt.getPresence(u_handle));
 
     var persistChangeRequestedHandler = function(newVal) {
-
         if (newVal !== true) {
-            presenceInt.setPersistOff();
+            presenceInt.togglePresenceOrAutoaway(true)
         }
         else {
-            presenceInt.setPersistOn();
+            presenceInt.togglePresenceOrAutoaway(-1);
         }
     };
 
     var autoawayChangeRequestHandler = function(newVal) {
         if (newVal !== true) {
             accountUI.disableElement($('input#autoaway', $sectionContainerChat));
-            presenceInt.setAutoawayOff();
+            presenceInt.togglePresenceOrAutoaway(-1);
         }
         else {
             if (presenceInt.getPresence() !== UserPresence.PRESENCE.AWAY) {
                 accountUI.enableElement($('input#autoaway', $sectionContainerChat));
-                presenceInt.setAutoaway($('input#autoaway', $sectionContainerChat).val());
+                presenceInt.togglePresenceOrAutoaway($('input#autoaway', $sectionContainerChat).val());
             }
             else {
                 return false;
@@ -154,14 +153,14 @@ accountUI.advancedSection = function() {
         .rebind('change.dashboard', function() {
             var val = parseInt($(this).val());
             if (val > 0) {
-                presenceInt.setAutoaway(val);
+                presenceInt.togglePresenceOrAutoaway(val);
                 lastValidNumber = val;
             }
         })
         .rebind('blur.dashboard', function() {
             $(this).val(lastValidNumber);
             Soon(function() {
-                presenceInt.setAutoaway(lastValidNumber);
+                presenceInt.togglePresenceOrAutoaway(lastValidNumber);
             });
         })
         .val(lastValidNumber);

@@ -382,12 +382,19 @@ PresencedIntegration.prototype.getPresenceAsText = function(u_h, pres) {
 
 PresencedIntegration.prototype.setAutoaway = function(minutes) {
     var s = minutes * 60;
+
     this._initAutoawayEvents();
     this.userPresence.ui_setautoaway(s);
+};
 
-    if (this.getPersist()) {
-        this.setPersistOff();
+PresencedIntegration.prototype.setAutoawayOn = function() {
+    var timeout = this.userPresence.autoawaytimeout;
+    if (timeout === -1) {
+        timeout = 5 * 60;
     }
+
+
+    this.setAutoaway(timeout);
 };
 
 PresencedIntegration.prototype.setAutoawayOff = function() {
@@ -405,10 +412,6 @@ PresencedIntegration.prototype.getAutoaway = function() {
 
 PresencedIntegration.prototype.setPersistOn = function() {
     this.userPresence.ui_setpersist(true);
-
-    if (this.getAutoaway() !== false) {
-        this.setAutoawayOff();
-    }
 };
 
 PresencedIntegration.prototype.setPersistOff = function() {
@@ -429,9 +432,31 @@ PresencedIntegration.prototype._initAutoawayEvents = function() {
         }, 1000);
     });
 };
+
 PresencedIntegration.prototype._destroyAutoawayEvents = function() {
     console.error("presencedInt._desotryAutoawayEvnts");
 
     $(document.body).unbind('mousemove.presencedInt');
     $(document.body).unbind('keypress.presencedInt');
+};
+
+/**
+ * Helper function for toggling the "radio"-like feature of autoaway and persist modes
+ *
+ * @param val {Number} -1 for disabled auto away, but persist = on, 0-N for auto away on, persist off, true for
+ * autoaway on with previously stored autoawaytimeout
+ */
+PresencedIntegration.prototype.togglePresenceOrAutoaway = function(val) {
+    if (val === -1) {
+        this.setPersistOn();
+        this.setAutoawayOff();
+    }
+    else if (val === true) {
+        this.setPersistOff();
+        this.setAutoawayOn();
+    }
+    else {
+        this.setPersistOff();
+        this.setAutoaway(val);
+    }
 };

@@ -338,6 +338,7 @@ UserPresence.prototype.reconnect = function presence_reconnect(self) {
                                     this.up.persist = true;
                                 }
                                 else {
+                                    console.error('persist = false');
                                     this.up.persist = false;
                                 }
 

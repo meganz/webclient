@@ -11423,8 +11423,7 @@ function inviteFriendDialog(close) {
 
     if (!$('.achievement-dialog.input').tokenInput("getSettings")) {
         initInviteDialogMultiInputPlugin();
-
-        locFmt = "Encourage your friend to register and install a MEGA app. As long as your friend uses the same email address as you've entered, you will receive your free [S]@@[/S] of storage space and [S]@@[/S] of transfer quota.".replace(/\[S\]/g, '<span class="red">').replace(/\[\/S\]/g, '</span>');
+        locFmt = "Invite as many friends or coworkers as you want. For every signup under the invited email address, you will receive [S]@@[/S] of complimentary storage plus [S]@@[/S] of transfer volume, provided that the new user installs either MEGAsync or a mobile app and starts using MEGA (your free quota will be credited once we confirm the activity of the new account, which can take a few days).".replace(/\[S\]/g, '<span class="red">').replace(/\[\/S\]/g, '</span>');
         $('.success-content .info-body p:first', $dialog).safeHTML(locFmt, bytesToSize(maf[0], 0), bytesToSize(maf[1], 0));
     }
 

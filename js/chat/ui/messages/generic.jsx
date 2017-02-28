@@ -271,7 +271,7 @@ var GenericConversationMessage = React.createClass({
 
                     var files = [];
 
-                    attachmentMeta.forEach(function(v) {
+                    attachmentMeta.forEach(function(v, attachmentKey) {
                         var startDownload = function() {
                             M.addDownload([v]);
                         };
@@ -405,9 +405,11 @@ var GenericConversationMessage = React.createClass({
                                         delay('thumbnails', fm_thumbnails, 90);
                                     }
                                     src = window.noThumbURI || '';
+
+                                    v.imgId = "thumb" + message.messageId + "_" + attachmentKey + "_" + v.h;
                                 }
 
-                                preview =  (src ? (<div id={v.h} className="shared-link img-block">
+                                preview =  (src ? (<div id={v.imgId} className="shared-link img-block">
                                     <div className="img-overlay" onClick={startPreview}></div>
                                     <div className="button overlay-button" onClick={startPreview}>
                                         <i className="huge-white-icon loupe"></i>

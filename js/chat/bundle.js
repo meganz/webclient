@@ -3985,11 +3985,11 @@ React.makeElement = React['createElement'];
 	                $(document).trigger('closeDropdowns');
 
 	                if (self.props.onSelectDone) {
-	                    self.props.onSelectDone(self.state.selected);
+	                    self.props.onSelectDone(self.props.selected);
 	                }
 	            };
 
-	            if (!self.state.selected || self.state.selected.length === 0) {
+	            if (!self.props.selected || self.props.selected.length === 0) {
 	                footer = React.makeElement(
 	                    "div",
 	                    { className: "fm-dialog-footer" },
@@ -3999,7 +3999,7 @@ React.makeElement = React['createElement'];
 	                        self.props.nothingSelectedButtonLabel ? self.props.nothingSelectedButtonLabel : __(l[8889])
 	                    )
 	                );
-	            } else if (self.state.selected.length === 1) {
+	            } else if (self.props.selected.length === 1) {
 	                footer = React.makeElement(
 	                    "div",
 	                    { className: "contacts-search-footer" },
@@ -4013,7 +4013,7 @@ React.makeElement = React['createElement'];
 	                        )
 	                    )
 	                );
-	            } else if (self.state.selected.length > 1) {
+	            } else if (self.props.selected.length > 1) {
 	                footer = React.makeElement(
 	                    "div",
 	                    { className: "contacts-search-footer" },
@@ -4056,7 +4056,7 @@ React.makeElement = React['createElement'];
 	            }
 
 	            var selectedClass = "";
-	            if (self.state.selected && self.state.selected.indexOf(v.u) !== -1) {
+	            if (self.props.selected && self.props.selected.indexOf(v.u) !== -1) {
 	                selectedClass = "selected";
 	            }
 	            contacts.push(React.makeElement(ContactCard, {
@@ -4074,7 +4074,7 @@ React.makeElement = React['createElement'];
 
 	                        $(document).trigger('closeDropdowns');
 
-	                        var sel = self.state.selected;
+	                        var sel = self.props.selected;
 	                        if (sel.indexOf(contact.u) === -1) {
 	                            sel.push(contact.u);
 	                        }
@@ -4090,19 +4090,15 @@ React.makeElement = React['createElement'];
 	                            self.props.onClick(contact, e);
 	                        }
 	                    } else {
-	                        var sel = self.state.selected;
+	                        var sel = self.props.selected;
 	                        if (!sel) {
 	                            sel = [];
 	                        }
-	                        if (self.state.selected.indexOf(contact.u) > -1) {
+	                        if (self.props.selected.indexOf(contact.u) > -1) {
 	                            removeValue(sel, contact.u, false);
 	                        } else {
 	                            sel.push(contact.u);
 	                        }
-
-	                        self.setState({ 'selected': sel });
-
-	                        self.forceUpdate();
 
 	                        if (self.props.onSelect) {
 	                            self.props.onSelect(contact, e);
@@ -4153,7 +4149,7 @@ React.makeElement = React['createElement'];
 	            ),
 	            React.makeElement(
 	                utils.JScrollPane,
-	                { className: "contacts-search-scroll" },
+	                { className: "contacts-search-scroll", selected: this.state.selected },
 	                React.makeElement(
 	                    "div",
 	                    { style: innerDivStyles },
@@ -5747,7 +5743,7 @@ React.makeElement = React['createElement'];
 	    },
 
 	    uploadFromComputer: function uploadFromComputer() {
-	        $('#fileselect3').trigger('click');
+	        $('#fileselect1').trigger('click');
 	    },
 	    refreshUI: function refreshUI() {
 	        var self = this;
@@ -6310,7 +6306,6 @@ React.makeElement = React['createElement'];
 	                });
 	            }
 
-	            var selected = [];
 	            sendContactDialog = React.makeElement(ModalDialogsUI.SelectContactDialog, {
 	                megaChat: room.megaChat,
 	                chatRoom: room,
@@ -6320,10 +6315,7 @@ React.makeElement = React['createElement'];
 	                    self.setState({ 'sendContactDialog': false });
 	                    selected = [];
 	                },
-	                onSelected: function onSelected(nodes) {
-	                    selected = nodes;
-	                },
-	                onSelectClicked: function onSelectClicked() {
+	                onSelectClicked: function onSelectClicked(selected) {
 	                    self.setState({ 'sendContactDialog': false });
 
 	                    room.attachContacts(selected);
@@ -7596,12 +7588,14 @@ React.makeElement = React['createElement'];
 	    },
 	    getInitialState: function getInitialState() {
 	        return {
-	            'selected': []
+	            'selected': this.props.selected ? this.props.selected : []
 	        };
 	    },
 	    onSelected: function onSelected(nodes) {
 	        this.setState({ 'selected': nodes });
-	        this.props.onSelected(nodes);
+	        if (this.props.onSelected) {
+	            this.props.onSelected(nodes);
+	        }
 	        this.forceUpdate();
 	    },
 	    onSelectClicked: function onSelectClicked() {
@@ -7617,6 +7611,7 @@ React.makeElement = React['createElement'];
 	            {
 	                title: __("Send Contact"),
 	                className: classes,
+	                selected: self.state.selected,
 	                onClose: function onClose() {
 	                    self.props.onClose(self);
 	                },
@@ -7626,9 +7621,10 @@ React.makeElement = React['createElement'];
 	                    "className": self.state.selected.length === 0 ? "disabled" : null,
 	                    "onClick": function onClick(e) {
 	                        if (self.state.selected.length > 0) {
-	                            self.props.onSelected(self.state.selected);
-	                            self.props.onHighlighted([]);
-	                            self.props.onSelectClicked();
+	                            if (self.props.onSelected) {
+	                                self.props.onSelected(self.state.selected);
+	                            }
+	                            self.props.onSelectClicked(self.state.selected);
 	                        }
 	                        e.preventDefault();
 	                        e.stopPropagation();
@@ -7649,22 +7645,23 @@ React.makeElement = React['createElement'];
 	                onClick: function onClick(contact, e) {
 	                    var contactHash = contact.h;
 
-	                    if (new Date() - self.clickTime < 500) {
+	                    if (contactHash === self.lastClicked && new Date() - self.clickTime < 500) {
 
 	                        self.onSelected([contact.h]);
-	                        self.props.onHighlighted([]);
-	                        self.props.onSelectClicked();
+	                        self.props.onSelectClicked([contact.h]);
 	                    } else {
+	                        var selected = clone(self.state.selected);
 
 	                        if (self.state.selected.indexOf(contactHash) === -1) {
-	                            self.state.selected.push(contact.h);
-	                            self.onSelected(self.state.selected);
+	                            selected.push(contact.h);
+	                            self.onSelected(selected);
 	                        } else {
-	                            removeValue(self.state.selected, contactHash);
-	                            self.onSelected(self.state.selected);
+	                            removeValue(selected, contactHash);
+	                            self.onSelected(selected);
 	                        }
 	                    }
 	                    self.clickTime = new Date();
+	                    self.lastClicked = contactHash;
 	                },
 	                selected: self.state.selected,
 	                headerClasses: "left-aligned"
@@ -8194,16 +8191,10 @@ React.makeElement = React['createElement'];
 	        var $container = $(ReactDOM.findDOMNode(self));
 	        var val = $.trim($('.chat-textarea:visible textarea:visible', $container).val());
 
-	        if (val.length > 0) {
-	            if (self.onConfirmTrigger(val) !== true) {
-	                self.setState({ typedMessage: "" });
-	            }
-	            self.triggerOnUpdate();
-	            return;
-	        } else {
-
-	            self.onCancelClicked(e);
+	        if (self.onConfirmTrigger(val) !== true) {
+	            self.setState({ typedMessage: "" });
 	        }
+	        self.triggerOnUpdate();
 	    },
 	    onConfirmTrigger: function onConfirmTrigger(val) {
 	        var result = this.props.onConfirm(val);
@@ -9338,7 +9329,7 @@ React.makeElement = React['createElement'];
 
 	                    var files = [];
 
-	                    attachmentMeta.forEach(function (v) {
+	                    attachmentMeta.forEach(function (v, attachmentKey) {
 	                        var startDownload = function startDownload() {
 	                            M.addDownload([v]);
 	                        };
@@ -9470,11 +9461,13 @@ React.makeElement = React['createElement'];
 	                                        delay('thumbnails', fm_thumbnails, 90);
 	                                    }
 	                                    src = window.noThumbURI || '';
+
+	                                    v.imgId = "thumb" + message.messageId + "_" + attachmentKey + "_" + v.h;
 	                                }
 
 	                                preview = src ? React.makeElement(
 	                                    'div',
-	                                    { id: v.h, className: 'shared-link img-block' },
+	                                    { id: v.imgId, className: 'shared-link img-block' },
 	                                    React.makeElement('div', { className: 'img-overlay', onClick: startPreview }),
 	                                    React.makeElement(
 	                                        'div',

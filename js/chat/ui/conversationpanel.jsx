@@ -745,7 +745,7 @@ var ConversationPanel = React.createClass({
     },
 
     uploadFromComputer: function() {
-        $('#fileselect3').trigger('click')
+        $('#fileselect1').trigger('click')
     },
     refreshUI: function() {
         var self = this;
@@ -1414,7 +1414,6 @@ var ConversationPanel = React.createClass({
                 });
             }
 
-            var selected = [];
             sendContactDialog = <ModalDialogsUI.SelectContactDialog
                 megaChat={room.megaChat}
                 chatRoom={room}
@@ -1424,10 +1423,7 @@ var ConversationPanel = React.createClass({
                     self.setState({'sendContactDialog': false});
                     selected = [];
                 }}
-                onSelected={(nodes) => {
-                    selected = nodes;
-                }}
-                onSelectClicked={() => {
+                onSelectClicked={(selected) => {
                     self.setState({'sendContactDialog': false});
 
                     room.attachContacts(selected);

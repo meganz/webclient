@@ -6263,60 +6263,50 @@ React.makeElement = React['createElement'];
 	    componentDidUpdate: function componentDidUpdate(prevProps, prevState) {
 	        if (prevState.currentlyViewedEntry !== this.state.currentlyViewedEntry) {
 	            this.resizeBreadcrumbs();
+
+	            var handle = this.state.currentlyViewedEntry;
+	            if (!M.d[handle] || M.d[handle].t && !M.c[handle]) {
+	                var self = this;
+
+	                dbfetch.get(handle).always(function () {
+	                    self.setState({ entries: self.getEntries() });
+	                });
+	                return;
+	            }
 	        }
+
+	        this.setState({ entries: null });
 	    },
 	    getEntries: function getEntries() {
 	        var self = this;
-	        var entries = [];
-
-	        obj_values(M.d).forEach(function (v) {
-	            if (v.p === self.state.currentlyViewedEntry) {
-	                entries.push(v);
-	            }
+	        var order = self.state.sortBy[1] === "asc" ? 1 : -1;
+	        var entries = Object.keys(M.c[self.state.currentlyViewedEntry] || {}).map(function (h) {
+	            return M.d[h];
 	        });
-	        var sortKey;
-	        var order = 1;
+	        var sortFunc;
 
 	        if (self.state.sortBy[0] === "name") {
-	            sortKey = "name";
+	            sortFunc = M.getSortByNameFn();
 	        } else if (self.state.sortBy[0] === "size") {
-	            sortKey = "s";
-	        } else if (self.state.sortBy[0] === "grid-header-star") {
-	            sortKey = "fav";
+	            sortFunc = M.getSortBySizeFn();
+	        } else {
+	            sortFunc = M.getSortByFavFn();
 	        }
 
-	        order = self.state.sortBy[1] === "asc" ? 1 : -1;
-
 	        entries.sort(function (a, b) {
-
-	            if (sortKey === "name") {
-	                return (a[sortKey] ? a[sortKey] : "").localeCompare(b[sortKey]) * order;
-	            } else {
-	                var _a = a[sortKey] || 0;
-	                var _b = b[sortKey] || 0;
-	                if (_a > _b) {
-	                    return 1 * order;
-	                }
-	                if (_a < _b) {
-	                    return -1 * order;
-	                }
-
-	                return 0;
-	            }
+	            return sortFunc(a, b, order);
 	        });
 
-	        var files = [];
 	        var folders = [];
 
-	        entries.forEach(function (v) {
-	            if (v.t === 1) {
-	                folders.push(v);
-	            } else if (v.t === 0) {
-	                files.push(v);
+	        for (var i = entries.length; i--;) {
+	            if (entries[i].t) {
+	                folders.unshift(entries[i]);
+	                entries.splice(i, 1);
 	            }
-	        });
+	        }
 
-	        return folders.concat(files);
+	        return folders.concat(entries);
 	    },
 	    onSelected: function onSelected(nodes) {
 	        this.setState({ 'selected': nodes });
@@ -6337,6 +6327,7 @@ React.makeElement = React['createElement'];
 	    },
 	    render: function render() {
 	        var self = this;
+	        var entries = self.state.entries || self.getEntries();
 
 	        var classes = "add-from-cloud " + self.props.className;
 
@@ -6376,7 +6367,7 @@ React.makeElement = React['createElement'];
 	                        React.makeElement(
 	                            "span",
 	                            null,
-	                            p.h === M.RootID ? __("Cloud Drive") : p.name
+	                            p.h === M.RootID ? __(l[164]) : p.name
 	                        )
 	                    )
 	                ));
@@ -6467,13 +6458,13 @@ React.makeElement = React['createElement'];
 	                        "tr",
 	                        null,
 	                        React.makeElement(BrowserCol, { id: "grid-header-star", sortBy: self.state.sortBy, onClick: self.toggleSortBy }),
-	                        React.makeElement(BrowserCol, { id: "name", label: __("Name"), sortBy: self.state.sortBy, onClick: self.toggleSortBy }),
-	                        React.makeElement(BrowserCol, { id: "size", label: __("Size"), sortBy: self.state.sortBy, onClick: self.toggleSortBy })
+	                        React.makeElement(BrowserCol, { id: "name", label: __(l[86]), sortBy: self.state.sortBy, onClick: self.toggleSortBy }),
+	                        React.makeElement(BrowserCol, { id: "size", label: __(l[87]), sortBy: self.state.sortBy, onClick: self.toggleSortBy })
 	                    )
 	                )
 	            ),
 	            React.makeElement(BrowserEntries, {
-	                entries: self.getEntries(),
+	                entries: entries,
 	                onExpand: function onExpand(node) {
 	                    self.onSelected([]);
 	                    self.onHighlighted([]);
@@ -10638,6 +10629,7 @@ React.makeElement = React['createElement'];
 
 	    var nodesMeta = [];
 	    $.each(ids, function (k, nodeId) {
+
 	        var node = M.d[nodeId];
 	        nodesMeta.push({
 	            'u': node.u,

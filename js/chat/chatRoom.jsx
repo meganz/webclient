@@ -916,7 +916,7 @@ ChatRoom.prototype.sendMessage = function(message, meta) {
 
 
     self.appendMessage(eventObject);
-    
+
     self._sendMessageToTransport(eventObject)
         .done(function(internalId) {
             eventObject.internalId = internalId;
@@ -1060,6 +1060,7 @@ ChatRoom.prototype.attachContacts = function(ids) {
 
     var nodesMeta = [];
     $.each(ids, function(k, nodeId) {
+        // TODO: @lp this should be M.u instead of M.d ?
         var node = M.d[nodeId];
         nodesMeta.push({
             'u': node.u,
@@ -1202,7 +1203,7 @@ ChatRoom.prototype.recover = function() {
     var $startChatPromise;
     if (self.state !== ChatRoom.STATE.LEFT) {
         self.setState(ChatRoom.STATE.JOINING, true);
-        $startChatPromise = self.megaChat.karere.startChat([], self.type, 
+        $startChatPromise = self.megaChat.karere.startChat([], self.type,
             self.roomJid.split("@")[0], (self.type === "private" ? false : undefined));
 
         self.megaChat.trigger("onRoomCreated", [self]); // re-initialise plugins

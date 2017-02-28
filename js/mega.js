@@ -376,15 +376,24 @@ function MegaData()
 
     this.sortBySize = function(d)
     {
-        this.sortfn = function(a, b, d)
-        {
-            if (typeof a.s !== 'undefined' && typeof b.s !== 'undefined' && a.s < b.s)
-                return -1 * d;
-            else
-                return 1 * d;
-        }
+        this.sortfn = this.getSortBySizeFn();
         this.sortd = d;
         this.sort();
+    };
+
+    this.getSortBySizeFn = function() {
+        var nameSort = this.getSortByNameFn();
+
+        return function(a, b, d) {
+            if (a.s !== undefined && b.s !== undefined) {
+                if (a.s < b.s) {
+                    return -1 * d;
+                }
+                return 1 * d;
+            }
+            // fallback to sorting by name (folders)
+            return nameSort(a, b, 1);
+        };
     };
 
     this.sortByType = function(d)

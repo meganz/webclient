@@ -4596,6 +4596,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     display: block;
     margin: 4px 11px 0 0;
     position: relative;
+    cursor: pointer;
 }
 .fm-avatar .avatar {
     height: 28px;

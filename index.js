@@ -1911,11 +1911,11 @@ function topmenuUI() {
     $topHeader.find('.fm-avatar').rebind('click', function() {
 
         // If the user has an avatar already set, take them to the profile page where they can change or remove it
-        if ($(this).find('img').attr('src').indexOf('blob:') > -1) {
+        if ($(this).find('img').length > 0) {
             loadSubPage('fm/account/profile');
         }
         else {
-            // Otherwise if they don't have an avatar, open the change avatar dialog
+            // Otherwise if they don't have an avatar, open the change avatar dialog;
             avatarDialog();
         }
     });

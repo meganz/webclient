@@ -449,14 +449,11 @@ PresencedIntegration.prototype._destroyAutoawayEvents = function() {
 PresencedIntegration.prototype.togglePresenceOrAutoaway = function(val) {
     if (val === -1) {
         this.setPersistOn();
-        this.setAutoawayOff();
     }
     else if (val === true) {
-        this.setPersistOff();
         this.setAutoawayOn();
     }
     else {
-        this.setPersistOff();
         this.setAutoaway(val);
     }
 };

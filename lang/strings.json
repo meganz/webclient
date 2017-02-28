@@ -2183,6 +2183,10 @@
         "text": "Share folders with your contacts and see their updates in real time.",
         "context": ""
     },
+    "1070": {
+        "text": "How it works",
+        "context": ""
+    },
     "1073": {
         "text": "Membership Plans",
         "context": ""
@@ -15692,7 +15696,7 @@
         "context": ""
     },
     "16279": {
-        "text": "When you install MEGAsync you get %1 of complimentary storage space plus %2 of transfer volume, both valid for [%3] months. MEGAsync is available for Windows, macOS and most Linux distros.",
+        "text": "When you install MEGAsync you get %1 of complimentary storage space plus %2 of transfer volume, both valid for %3 months. MEGAsync is available for Windows, macOS and most Linux distros.",
         "context": "Both %1 and %2 would be replaced with amounts, for example \"50 GB\" and %3 a numeric value for the number of months"
     },
     "16280": {
@@ -15700,7 +15704,7 @@
         "context": ""
     },
     "16281": {
-        "text": "When you install our mobile app you get %1 of complimentary storage space plus %2 transfer volume, both valid for [%3] months. We provide mobile apps for iOS, Android & Windows Phone.",
+        "text": "When you install our mobile app you get %1 of complimentary storage space plus %2 transfer volume, both valid for %3 months. We provide mobile apps for iOS, Android & Windows Phone.",
         "context": "Both %1 and %2 would be replaced with amounts, for example \"50 GB\" and %3 a numeric value for the number of months"
     },
     "16282": {
@@ -15827,6 +15831,10 @@
         "text": "It looks like you\u2019re running out of storage.",
         "context": "A dialog message that informs the user that their cloud storage is almost full."
     },
+    "16313": {
+        "text": "[A]Upgrade now[\/A] to a [S]PRO Lite[\/S] account and don\u2019t worry about running out of storage. [S]For %1\u20ac a month you get 200 GB of storage[\/S] and 1 TB of transfer quota.",
+        "context": "Informs the user that their storage is almost full and it's better to buy PRO account. Please leave the placeholders [A], [\/A], [S], [\/S] and %1 as they are. There is also no need to translate \"PRO Lite\"."
+    },
     "16314": {
         "text": "You can unlock more free storage and transfer quota by completing more achievements.",
         "context": "A dialog message that informs the user that he can get more storage\/transfer quota by completing achievements."
@@ -15834,5 +15842,49 @@
     "16315": {
         "text": "[S]Cloud Drive is full.[\/S] Upgrade now to a PRO account and get [S]up to 4TB (4000 GB)[\/S] of cloud storage space.",
         "context": "A message informing the user that they\u2019ve reached the full capacity of their Cloud Drive for a Free account. Please leave [S], [\/S] as it is which is used to bolden the text."
+    },
+    "16316": {
+        "text": "[S]Cloud Drive is almost full.[\/S] [A]Upgrade now[\/A] to a PRO account and get [S]up to 4TB (4000 GB)[\/S] of cloud storage space.",
+        "context": "Informs the user that they\u2019ve almost reached the full capacity of their Cloud Drive for a Free account. Please leave the [S], [\/S], [A], [\/A] placeholders as they are."
+    },
+    "16317": {
+        "text": "Your friend needs to register for a free account on MEGA and [S]install at least one MEGA client application[\/S] (either the sync client or one of our mobile apps)",
+        "context": ""
+    },
+    "16318": {
+        "text": "You can notify your friend through any method. You will earn the quota if you have entered your friend's email here prior to them registering with that address.",
+        "context": ""
+    },
+    "16319": {
+        "text": "Insert your friend's email(s):",
+        "context": ""
+    },
+    "16320": {
+        "text": "Thanks! We have sent that user an invitation email.",
+        "context": ""
+    },
+    "16321": {
+        "text": "You can now:",
+        "context": "headline of various things the user can now do, such as pasting a URL to the invited user."
+    },
+    "16322": {
+        "text": "Direct URL to MEGAsync:",
+        "context": "URL stands for Uniform Resource Locator, i.e. a web addresss"
+    },
+    "16323": {
+        "text": "Direct URL to our mobile apps:",
+        "context": "URL stands for Uniform Resource Locator, i.e. a web addresss"
+    },
+    "16325": {
+        "text": "Get [S]%1[\/S] free storage and [S]%2[\/S] of transfer quota for each friend who installs a MEGA app",
+        "context": "%1 and %2 are replaced by some amount, eg \"50GB\""
+    },
+    "16326": {
+        "text": "Invite as many friends or coworkers as you want. For every signup under the invited email address, you will receive [S]%1[\/S] of complimentary storage plus [S]%2[\/S] of transfer volume, provided that the new user installs either MEGAsync or a mobile app and starts using MEGA (your free quota will be credited once we confirm the activity of the new account, which can take a few days).",
+        "context": ""
+    },
+    "16327": {
+        "text": "Encourage your friend to register and install a MEGA app. As long as your friend uses the same email address as you've entered, you will receive your free [S]%1[\/S] of storage space and [S]%2[\/S] of transfer quota.",
+        "context": ""
     }
 }

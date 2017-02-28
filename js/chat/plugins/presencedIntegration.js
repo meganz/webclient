@@ -164,12 +164,13 @@ PresencedIntegration.prototype.init = function() {
 
 PresencedIntegration.prototype._updateuicb = function presencedIntegration_updateuicb(
     presence,
+    autoaway,
     autoawaytimeout,
     persist
 ) {
     var self = this;
 
-    self.logger.debug("updateuicb", presence, autoawaytimeout, persist);
+    self.logger.debug("updateuicb", presence, autoaway, autoawaytimeout, persist);
     console.error('updateuicb', arguments);
 
     self._presence[u_handle] = presence;
@@ -228,7 +229,7 @@ PresencedIntegration.prototype._updateuicb = function presencedIntegration_updat
         self._destroyAutoawayEvents();
     }
 
-    $(self).trigger('settingsUIUpdated', [autoawaytimeout, persist]);
+    $(self).trigger('settingsUIUpdated', [autoaway, autoawaytimeout, persist]);
 
     $(self).trigger(
         'onPeerStatus',
@@ -381,33 +382,27 @@ PresencedIntegration.prototype.getPresenceAsText = function(u_h, pres) {
 };
 
 PresencedIntegration.prototype.setAutoaway = function(minutes) {
-    var s = minutes * 60;
+    // no need to do this here - the UI callback is always called
+    //this._initAutoawayEvents();
 
-    this._initAutoawayEvents();
-    this.userPresence.ui_setautoaway(s);
+    this.userPresence.ui_setautoaway(true, minutes*60);
 };
 
 PresencedIntegration.prototype.setAutoawayOn = function() {
-    var timeout = this.userPresence.autoawaytimeout;
-    if (timeout === -1) {
-        timeout = 5 * 60;
-    }
-
-
-    this.setAutoaway(timeout);
+    this.setAutoaway(true, this.userPresence.seconds());
 };
 
 PresencedIntegration.prototype.setAutoawayOff = function() {
-    this._destroyAutoawayEvents();
-    this.userPresence.ui_setautoaway(-1);
+    // no need to do this here - the UI callback is always called
+    //this._destroyAutoawayEvents();
+
+    this.userPresence.ui_setautoaway(false, this.userPresence.seconds());
 };
 
 PresencedIntegration.prototype.getAutoaway = function() {
-    return (
-        this.userPresence.autoawaytimeout > -1 ?
-            this.userPresence.autoawaytimeout / 60 :
-            false
-    );
+    return (this.userPresence.autoawaytimeout & 0x8000) ?
+            false :
+            Math.floor(this.userPresence.seconds()/60);
 };
 
 PresencedIntegration.prototype.setPersistOn = function() {
@@ -449,14 +444,11 @@ PresencedIntegration.prototype._destroyAutoawayEvents = function() {
 PresencedIntegration.prototype.togglePresenceOrAutoaway = function(val) {
     if (val === -1) {
         this.setPersistOn();
-        this.setAutoawayOff();
     }
     else if (val === true) {
-        this.setPersistOff();
         this.setAutoawayOn();
     }
     else {
-        this.setPersistOff();
         this.setAutoaway(val);
     }
 };

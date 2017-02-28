@@ -548,22 +548,24 @@ UserPresence.prototype.ui_setstatus = function presence_ui_setstatus(presencelev
     console.error('UserPresence.prototype.ui_setstatus', presencelevel);
     this.ui_presencelevel = presencelevel;
 
-    if (!this.persist) {
+    if (presencelevel == UserPresence.PRESENCE.OFFLINE) {
+        // user wants to appear offline: activate persistence
+        // (which is the only way this can be achieved short of really going offline)
+        this.persist = true;
+    }
+
+    if (this.persist) {
+        this.sendoverride();
+    }
+    else {
         if (presencelevel == UserPresence.PRESENCE.AWAY) {
             // user chose AWAY: disable auto-away if set
             this.autoawaytimeout |= 0x8000;
         }
-        else {
-            if (presencelevel == UserPresence.PRESENCE.OFFLINE) {
-                // user wants to appear offline: activate persistence
-                // (which is the only way this can be achieved short of really going offline)
-                this.persist = true;
-            }
-        }
+        this.ui_signalactivity(true);
+        this.sendautoaway();
     }
 
-    this.ui_signalactivity(true);
-    this.sendoverride();
     this.updateui();
 };
 
@@ -624,11 +626,7 @@ UserPresence.prototype.ui_setpersist = function presence_ui_setpersist(persist) 
     if (persist != this.persist) {
         this.persist = persist;
 
-        if (persist) {
-            // activating persistence always deactivates autoaway
-            this.autoawaytimeout |= 0x8000;
-        }
-        else {
+        if (!persist) {
             // translate current UI status to non-persistent settings
             if (this.ui_presencelevel == UserPresence.PRESENCE.OFFLINE) {
                 // cannot do OFFLINE without persistence
@@ -649,7 +647,7 @@ UserPresence.prototype.ui_setpersist = function presence_ui_setpersist(persist) 
 UserPresence.prototype.ui_signalactivity = function presence_ui_signalactivity(force) {
     if (this.autoawaytimer) {
         // stop timer if running for more than 50 seconds or no longer needed
-        if (!this.autoawaytimeout || this.autoawaytimeout & 0x8000) {
+        if (this.override || !this.autoawaytimeout || this.autoawaytimeout & 0x8000) {
             // (no longer needed)
             this.lastuiactivity = 0;
         }
@@ -665,7 +663,7 @@ UserPresence.prototype.ui_signalactivity = function presence_ui_signalactivity(f
     }
 
     // start timer if not running and timeout set
-    if (!this.autoawaytimer && this.autoawaytimeout > 0 && !(this.autoawaytimeout & 0x8000)) {
+    if (!this.override && !this.autoawaytimer && this.autoawaytimeout > 0 && !(this.autoawaytimeout & 0x8000)) {
         this.autoawaytimer = setTimeout(this.autoaway, this.seconds()*1000, this);
     }
 
@@ -690,7 +688,7 @@ UserPresence.prototype.autoaway = function presence_autoaway(self) {
 // update UI with the current internal state
 UserPresence.prototype.updateui = function presence_updateui() {
     // we have status override active, disable auto-AWAY
-    this.updateuicb(this.ui_presencelevel, !(this.autoawaytimeout & 0x8000), this.seconds(), this.persist);
+    this.updateuicb(this.ui_presencelevel, !this.persist && !(this.autoawaytimeout & 0x8000), this.seconds(), this.persist);
 };
 
 if (PRESENCE2_DEBUG) {

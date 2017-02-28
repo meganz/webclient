@@ -91,6 +91,20 @@ function parseHTMLfmt(markup) {
 }
 
 /**
+ * Handy printf-style parseHTML to apply escapeHTML
+ * @param {String} markup The HTML fragment to parse.
+ * @param {...*} var_args
+ */
+function parseHTMLfmt2(markup) {
+    if (arguments.length > 1) {
+        for (var idx = arguments.length; --idx > 0;) {
+            markup = markup.replace(RegExp('%' + idx, 'g'), escapeHTML(arguments[idx]));
+        }
+    }
+    return parseHTML(markup);
+}
+
+/**
  * Safely inject an HTML fragment using parseHTML()
  * @param {string} markup The HTML fragment to parse.
  * @param {...*} var_args
@@ -107,7 +121,12 @@ function parseHTMLfmt(markup) {
                     value: function $afeCall(markup) {
                         var i = 0;
                         var l = this.length;
-                        markup = parseHTMLfmt.apply(null, arguments);
+                        if (markup === '%n') {
+                            markup = parseHTMLfmt2.apply(null, toArray.apply(null, arguments).slice(1));
+                        }
+                        else {
+                            markup = parseHTMLfmt.apply(null, arguments);
+                        }
                         while (l > i) {
                             $(this[i++])[origFunc](markup.cloneNode(true));
                         }

@@ -19,16 +19,15 @@
 // presence.ui_setstatus(presencelevel)
 // (call this when the user selects a new presence level from the menu or the UI)
 
-// presence.ui_setautoaway(timeout)
+// presence.ui_setautoaway(checkmark, timeout)
 // (call this when the user changes the auto-away setting)
-// timeout in seconds (max. 16777214), -1 means "always online" (checkmark not set), 0 means "always away" (timeout
-// field empty)
+// timeout in seconds, checkmark set + 0 timeout means "always away"
 
 // presence.ui_setpersist(active)
 // (call this when the user checks/unchecks the persist-if-offline setting)
 
-// updateuicb(presencelevel, autoawaytimeout, overridelag)
-// when this callback is invoked, update the UI accordingly (if autoawaytimeout < 0, uncheck auto away option)
+// updateuicb(presencelevel, autoawaycheckmark, autoawaytimeout, overridecheckmark)
+// when this callback is invoked, update the UI accordingly
 
 // presence.ui_signalactivity()
 // (call this whenever the user presses a key or moves the mouse)
@@ -80,7 +79,7 @@ var UserPresence = function userpresence(
     this.override = false;
     this.overridechanged = false;
 
-    // autoaway timeout and related changed flag
+    // autoaway timeout (bit 15: inverted checkmark) and related changed flag
     this.autoawaytimeout = 300;
     this.autoawaychanged = false;
 
@@ -365,7 +364,6 @@ UserPresence.prototype.reconnect = function presence_reconnect(self) {
 
                         case 7: // OPCODE_AUTOAWAYSETTING
                             var newautoawaytimeout = u[p+1] + (u[p+2] << 8);
-                            if (newautoawaytimeout == 65535) newautoawaytimeout = -1;
 
                             if (this.up.autoawaytimeout == newautoawaytimeout) {
                                 this.up.autoawaychanged = false;
@@ -541,8 +539,8 @@ UserPresence.prototype.ui_setstatus = function presence_ui_setstatus(presencelev
 
     if (!this.persist) {
         if (presencelevel == UserPresence.PRESENCE.AWAY) {
-            // user chose AWAY: disable online status
-            this.autoawaytimeout = -1;
+            // user chose AWAY: disable auto-away if set
+            this.autoawaytimeout |= 0x8000;
         }
         else {
             if (presencelevel == UserPresence.PRESENCE.OFFLINE) {
@@ -558,20 +556,38 @@ UserPresence.prototype.ui_setstatus = function presence_ui_setstatus(presencelev
     this.updateui();
 };
 
-// timeout < 0: checkmark unchecked (always online/dnd)
-// timeout == 0: checkmark checked, but no or 0 timeout (always away)
-// timeout > 0: checkmark checked and timeout > 0 set
-UserPresence.prototype.ui_setautoaway = function presence_ui_setautoaway(timeout) {
-    if (timeout < 0) {
-        timeout = -1;
-    }
+UserPresence.prototype.seconds = function presence_seconds() {
+    var t = this.autoawaytimeout & 0x7fff;
 
-    if (timeout > 65534) {
-        timeout = 65534;
+    if (t <= 600) return t;
+    return (t-600)*10+600;
+}
+
+// checkmark checked, but 0 timeout: always AWAY if online, otherwise potentially offlin
+UserPresence.prototype.ui_setautoaway = function presence_ui_setautoaway(active, timeout) {
+    if (timeout === undefined) {
+        // preserve existing
+        timeout = this.autoawaytimeout & 0x7fff;
+    }
+    else {
+        timeout = Math.floor(timeout);
+
+        // one-second resolution up to 10 minutes; ten-second resolution > 10 minutes 
+        if (timeout >= 600) {
+            timeout = Math.floor((timeout-600)/10)+600;
+        }
+
+        // overflow protection - maximum auto-away timeout: (32767-600)*10+600 seconds == 3.73 days
+        if (timeout > 0x7fff) {
+            timeout = 0x7fff;
+        }
+
+        // bit 15 encodes the inverted auto-away active checkmark
+        if (!active) timeout += 0x8000;
     }
 
     if (!timeout) {
-        // zero timeout: we're always away
+        // zero timeout with checkmark set: we're always away
         console.error('ui_setautoaway, ui_presencelevel =', 'AWAY');
         this.ui_presencelevel = UserPresence.PRESENCE.AWAY;
     }
@@ -582,8 +598,8 @@ UserPresence.prototype.ui_setautoaway = function presence_ui_setautoaway(timeout
     // update flags, reset/start timer
     this.ui_signalactivity(true);
 
-    // disable persistence, if it was enabled
-    if (this.persist) {
+    // disable persistence if it was enabled and autoaway was activated
+    if (this.persist && !(timeout & 0x8000)) {
         this.persist = false;
         this.sendoverride();
     }
@@ -596,9 +612,12 @@ UserPresence.prototype.ui_setautoaway = function presence_ui_setautoaway(timeout
 UserPresence.prototype.ui_setpersist = function presence_ui_setpersist(persist) {
     if (persist != this.persist) {
         this.persist = persist;
-        this.autoawaytimeout = -1;
 
-        if (!persist) {
+        if (persist) {
+            // activating persistence always deactivates autoaway
+            this.autoawaytimeout |= 0x8000;
+        }
+        else {
             // translate current UI status to non-persistent settings
             if (this.ui_presencelevel == UserPresence.PRESENCE.OFFLINE) {
                 // cannot do OFFLINE without persistence
@@ -619,7 +638,7 @@ UserPresence.prototype.ui_setpersist = function presence_ui_setpersist(persist) 
 UserPresence.prototype.ui_signalactivity = function presence_ui_signalactivity(force) {
     if (this.autoawaytimer) {
         // stop timer if running for more than 50 seconds or no longer needed
-        if (this.autoawaytimeout <= 0) {
+        if (!this.autoawaytimeout || this.autoawaytimeout & 0x8000) {
             // (no longer needed)
             this.lastuiactivity = 0;
         }
@@ -635,11 +654,11 @@ UserPresence.prototype.ui_signalactivity = function presence_ui_signalactivity(f
     }
 
     // start timer if not running and timeout set
-    if (!this.autoawaytimer && this.autoawaytimeout > 0) {
-        this.autoawaytimer = setTimeout(this.autoaway, this.autoawaytimeout*1000, this);
+    if (!this.autoawaytimer && this.autoawaytimeout > 0 && !(this.autoawaytimeout & 0x8000)) {
+        this.autoawaytimer = setTimeout(this.autoaway, this.seconds()*1000, this);
     }
 
-    if (force || !this.persist && this.autoaway && this.autoawaytimeout >= 0) {
+    if (force || !this.persist && this.autoaway && !(this.autoawaytimeout & 0x8000)) {
         // volatile online/do not disturb with auto-away and auto-offline/away
         this.autoaway = false;
         this.sendflags(
@@ -660,7 +679,7 @@ UserPresence.prototype.autoaway = function presence_autoaway(self) {
 // update UI with the current internal state
 UserPresence.prototype.updateui = function presence_updateui() {
     // we have status override active, disable auto-AWAY
-    this.updateuicb(this.ui_presencelevel, this.autoawaytimeout, this.persist);
+    this.updateuicb(this.ui_presencelevel, !(this.autoawaytimeout & 0x8000), this.seconds(), this.persist);
 };
 
 if (true /* intentional: until we get this to be a bit more stable */ || localStorage.presencedDebug) {

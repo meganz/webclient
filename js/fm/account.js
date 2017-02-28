@@ -66,8 +66,19 @@ accountUI.initRadio.setValue = function(className, newVal, $container) {
     $input.parent().addClass('radioOn').removeClass('radioOff');
 };
 
-accountUI.advancedSection = function() {
+accountUI.advancedSection = function(autoaway, autoawaytimeout, persist) {
     var presenceInt = megaChat.plugins.presencedIntegration;
+
+    // FIXME - hack
+    if (autoaway === undefined) {
+        $(presenceInt).rebind('settingsUIUpdated.settings', function(e, autoaway, autoawaytimeout, persist) {
+            accountUI.advancedSection(autoaway, autoawaytimeout, persist);
+        });
+
+        presenceInt.userPresence.updateui();
+        return;
+    }
+
     // chat
     var $sectionContainerChat = $('.account.tab-content.chat');
 
@@ -82,15 +93,14 @@ accountUI.advancedSection = function() {
         );
     };
 
-
     if (typeof (megaChat) !== 'undefined' && typeof(presenceInt) !== 'undefined') {
         $(presenceInt).rebind('onPeerStatus.settings', function(e, handle, presence) {
             if (handle === u_handle) {
                 _initPresenceRadio(presence);
             }
         });
-        $(presenceInt).rebind('settingsUIUpdated.settings', function(e, autoawaytimeout, persist) {
-            accountUI.advancedSection();
+        $(presenceInt).rebind('settingsUIUpdated.settings', function(e, autoaway, autoawaytimeout, persist) {
+            accountUI.advancedSection(autoaway, autoawaytimeout, persist);
         });
         $(presenceInt.userPresence).rebind('onDisconnected.settings', function(e) {
             _initPresenceRadio(UserPresence.PRESENCE.OFFLINE);
@@ -100,68 +110,47 @@ accountUI.advancedSection = function() {
     _initPresenceRadio(presenceInt.getPresence(u_handle));
 
     var persistChangeRequestedHandler = function(newVal) {
-        if (newVal !== true) {
-            presenceInt.togglePresenceOrAutoaway(true)
-        }
-        else {
-            presenceInt.togglePresenceOrAutoaway(-1);
-        }
+        presenceInt.userPresence.ui_setpersist(newVal);
     };
 
     var autoawayChangeRequestHandler = function(newVal) {
-        if (newVal !== true) {
-            accountUI.disableElement($('input#autoaway', $sectionContainerChat));
-            presenceInt.togglePresenceOrAutoaway(-1);
-        }
-        else {
-            if (presenceInt.getPresence() !== UserPresence.PRESENCE.AWAY) {
-                accountUI.enableElement($('input#autoaway', $sectionContainerChat));
-                presenceInt.togglePresenceOrAutoaway($('input#autoaway', $sectionContainerChat).val());
-            }
-            else {
-                return false;
-            }
-        }
+        presenceInt.userPresence.ui_setautoaway(newVal);
     };
 
-    accountUI.initCheckbox(
-        'persist-presence',
-        $sectionContainerChat,
-        presenceInt.getPersist(),
-        persistChangeRequestedHandler
-    );
+    if (autoawaytimeout !== false) {
+        accountUI.initCheckbox(
+            'persist-presence',
+            $sectionContainerChat,
+            persist,
+            persistChangeRequestedHandler
+        );
 
-    accountUI.initCheckbox(
-        'autoaway',
-        $sectionContainerChat,
-        presenceInt.getAutoaway() !== false,
-        autoawayChangeRequestHandler
-    );
+        accountUI.initCheckbox(
+            'autoaway',
+            $sectionContainerChat,
+            autoaway,
+            autoawayChangeRequestHandler
+        );
 
-
-
-    if (presenceInt.getAutoaway() === false) {
-        accountUI.disableElement($('input#autoaway', $sectionContainerChat));
-    }
-    else {
+        // always editable for user comfort - FIXME: when value is changed, set checkmark
         accountUI.enableElement($('input#autoaway', $sectionContainerChat));
+
+        var lastValidNumber = Math.floor(autoawaytimeout/60);
+        $('input#autoaway', $sectionContainerChat)
+            .rebind('change.dashboard', function() {
+                var val = parseInt($(this).val());
+                if (val > 0) {
+                    presenceInt.userPresence.ui_setautoaway(true, val*60);
+                    lastValidNumber = val;
+                }
+            })
+            .rebind('blur.dashboard', function() {
+                // FIXME: remove? fix?
+/*                $(this).val(lastValidNumber);
+                Soon(function() {
+                    presenceInt.togglePresenceOrAutoaway(lastValidNumber);
+                });*/
+            })
+            .val(lastValidNumber);
     }
-
-
-    var lastValidNumber = presenceInt.getAutoaway() ? presenceInt.getAutoaway() : 5;
-    $('input#autoaway', $sectionContainerChat)
-        .rebind('change.dashboard', function() {
-            var val = parseInt($(this).val());
-            if (val > 0) {
-                presenceInt.togglePresenceOrAutoaway(val);
-                lastValidNumber = val;
-            }
-        })
-        .rebind('blur.dashboard', function() {
-            $(this).val(lastValidNumber);
-            Soon(function() {
-                presenceInt.togglePresenceOrAutoaway(lastValidNumber);
-            });
-        })
-        .val(lastValidNumber);
 };

@@ -888,12 +888,13 @@ function init_page() {
     }
     else if (page.substr(0, 7) === 'payment') {
 
+        // Load the Pro page in the background
         parsepage(pages['pro']);
         init_pro();
 
-        console.log('zzzz page', page);
+        // Process the return URL from the payment provider and show a success/failure dialog if applicable
+        proPage.processReturnUrlFromProvider(page);
     }
-
     else if (page == 'credits') {
         parsepage(pages['credits']);
         var html = '';

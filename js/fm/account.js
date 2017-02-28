@@ -69,7 +69,7 @@ accountUI.initRadio.setValue = function(className, newVal, $container) {
 accountUI.advancedSection = function(autoaway, autoawaytimeout, persist) {
     var presenceInt = megaChat.plugins.presencedIntegration;
 
-    // FIXME - hack
+    // Only call this if the call of this function is the first one, made by fm.js -> accountUI
     if (autoaway === undefined) {
         $(presenceInt).rebind('settingsUIUpdated.settings', function(e, autoaway, autoawaytimeout, persist) {
             accountUI.advancedSection(autoaway, autoawaytimeout, persist);
@@ -132,10 +132,11 @@ accountUI.advancedSection = function(autoaway, autoawaytimeout, persist) {
             autoawayChangeRequestHandler
         );
 
-        // always editable for user comfort - FIXME: when value is changed, set checkmark
+        // always editable for user comfort -
         accountUI.enableElement($('input#autoaway', $sectionContainerChat));
 
         var lastValidNumber = Math.floor(autoawaytimeout/60);
+        // when value is changed, set checkmark
         $('input#autoaway', $sectionContainerChat)
             .rebind('change.dashboard', function() {
                 var val = parseInt($(this).val());
@@ -145,11 +146,9 @@ accountUI.advancedSection = function(autoaway, autoawaytimeout, persist) {
                 }
             })
             .rebind('blur.dashboard', function() {
-                // FIXME: remove? fix?
-/*                $(this).val(lastValidNumber);
-                Soon(function() {
-                    presenceInt.togglePresenceOrAutoaway(lastValidNumber);
-                });*/
+                // the goal of the following line is to reset the value of the field if the entered data is invalid
+                // after the user removes focus from it (and set the internally set value)
+                $(this).val(presenceInt.userPresence.seconds() / 60);
             })
             .val(lastValidNumber);
     }

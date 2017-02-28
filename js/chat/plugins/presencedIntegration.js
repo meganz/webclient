@@ -381,41 +381,12 @@ PresencedIntegration.prototype.getPresenceAsText = function(u_h, pres) {
     return constStateToText(UserPresence.PRESENCE, pres);
 };
 
-PresencedIntegration.prototype.setAutoaway = function(minutes) {
-    // no need to do this here - the UI callback is always called
-    //this._initAutoawayEvents();
-
-    this.userPresence.ui_setautoaway(true, minutes*60);
-};
-
-PresencedIntegration.prototype.setAutoawayOn = function() {
-    this.setAutoaway(true, this.userPresence.seconds());
-};
-
-PresencedIntegration.prototype.setAutoawayOff = function() {
-    // no need to do this here - the UI callback is always called
-    //this._destroyAutoawayEvents();
-
-    this.userPresence.ui_setautoaway(false, this.userPresence.seconds());
-};
-
 PresencedIntegration.prototype.getAutoaway = function() {
     return (this.userPresence.autoawaytimeout & 0x8000) ?
             false :
             Math.floor(this.userPresence.seconds()/60);
 };
 
-PresencedIntegration.prototype.setPersistOn = function() {
-    this.userPresence.ui_setpersist(true);
-};
-
-PresencedIntegration.prototype.setPersistOff = function() {
-    this.userPresence.ui_setpersist(false);
-};
-
-PresencedIntegration.prototype.getPersist = function() {
-    return this.userPresence.persist;
-};
 
 PresencedIntegration.prototype._initAutoawayEvents = function() {
     console.error("presencedInt._initAutoawayEvents");
@@ -433,22 +404,4 @@ PresencedIntegration.prototype._destroyAutoawayEvents = function() {
 
     $(document.body).unbind('mousemove.presencedInt');
     $(document.body).unbind('keypress.presencedInt');
-};
-
-/**
- * Helper function for toggling the "radio"-like feature of autoaway and persist modes
- *
- * @param val {Number} -1 for disabled auto away, but persist = on, 0-N for auto away on, persist off, true for
- * autoaway on with previously stored autoawaytimeout
- */
-PresencedIntegration.prototype.togglePresenceOrAutoaway = function(val) {
-    if (val === -1) {
-        this.setPersistOn();
-    }
-    else if (val === true) {
-        this.setAutoawayOn();
-    }
-    else {
-        this.setAutoaway(val);
-    }
 };

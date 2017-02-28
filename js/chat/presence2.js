@@ -46,6 +46,9 @@
 
 // peerpresencecb(userhandle, presencelevel, can_webrtc) will be called with any change of peer presence
 
+// DEBUG flag
+PRESENCE2_DEBUG = true /* intentional: until we get this to be a bit more stable */ || localStorage.presencedDebug;
+
 var UserPresence = function userpresence(
     userhandle,
     can_webrtc,
@@ -73,6 +76,9 @@ var UserPresence = function userpresence(
     this.peers = Object.create(null);
 
     // WebRTC/push notification capability flags
+    // fixed client capability flags
+    // 0x80 - client can be called with WebRTC
+    // 0x40 - client can be woken up with push notifications
     this.capabilities = String.fromCharCode(((can_webrtc && 0x80) | (can_mobilepush && 0x40)));
 
     // current override and "changed locally, try to push to server" flag
@@ -167,10 +173,6 @@ var UserPresence = function userpresence(
     // auto-AWAY timer
     this.autoawaytimer = false;
 
-    // fixed client capability flags
-    // 0x80 - client can be called with WebRTC
-    // 0x40 - client can be woken up with push notifications
-    this.capabilities = 0;
 
     // last flags command to be issued after a reconnect
     this.lastflagscmd = false;
@@ -307,10 +309,14 @@ UserPresence.prototype.reconnect = function presence_reconnect(self) {
 
         self.s.onmessage = function (m) {
             if (!this.canceled) {
-                console.error(
-                    "PRESENCE INCOMING: ",
-                    ab_to_base64(m.data)
-                );
+                if (PRESENCE2_DEBUG) {
+                    console.error(
+                        (new Date()).toISOString(),
+                        "PRESENCE INCOMING:",
+                        "\nb64:", ab_to_base64(m.data),"\n",
+                        JSON.stringify(self.incomingDataAsReadableCommand(m.data), null, 4, "\t")
+                    );
+                }
 
                 var u = new Uint8Array(m.data);
                 var p = 0;
@@ -469,10 +475,14 @@ UserPresence.prototype.sendstring = function presence_sendstring(s) {
         u[i] = s.charCodeAt(i);
     }
 
-    console.error(
-        "PRESENCE OUTGOING: ",
-        ab_to_base64(u.buffer)
-    );
+    if (PRESENCE2_DEBUG) {
+        console.error(
+            (new Date()).toISOString(),
+            "PRESENCE OUTGOING:",
+            "\nb64:", ab_to_base64(u.buffer),"\n",
+            JSON.stringify(this.outgoingDataAsReadableCommand(u.buffer), null, 4, "\t")
+        );
+    }
 
     this.s.send(u);
 };
@@ -507,7 +517,8 @@ UserPresence.prototype.sendautoaway = function presence_sendautoaway() {
 
 UserPresence.prototype.sendflags = function presence_sendflags(online, dnd) {
     if (this.open) {
-        this.lastflagscmd = "\3" + String.fromCharCode((online ? 1 : 0) | (dnd ? 2 : 0));
+        this.lastflagscmd = "\3" +
+            String.fromCharCode((online ? 1 : 0) | (dnd ? 2 : 0));
         this.sendstring(this.lastflagscmd);
     }
 };
@@ -682,7 +693,7 @@ UserPresence.prototype.updateui = function presence_updateui() {
     this.updateuicb(this.ui_presencelevel, !(this.autoawaytimeout & 0x8000), this.seconds(), this.persist);
 };
 
-if (true /* intentional: until we get this to be a bit more stable */ || localStorage.presencedDebug) {
+if (PRESENCE2_DEBUG) {
     Object.keys(UserPresence.prototype).forEach(function(fn) {
         var origFn = UserPresence.prototype[fn];
         UserPresence.prototype[fn] = function() {
@@ -696,5 +707,218 @@ if (true /* intentional: until we get this to be a bit more stable */ || localSt
         };
     });
 }
+
+/**
+ * This is a development-only method that is used for converting the binary commands to readable strings (array/list of
+ * strings)
+ *
+ * @param ab
+ */
+UserPresence.prototype.incomingDataAsReadableCommand = function(ab) {
+    // copy the 'ab' instead of modifying it
+    var u = new Uint8Array(ab.slice(0));
+    var p = 0;
+
+    var output = [];
+    while (p < u.length) {
+
+        switch (u[p]) {
+            case 0: // OPCODE_KEEPALIVE
+                output.push([
+                    "OPCODE_KEEPALIVE"
+                ]);
+                p++;
+                break;
+
+            case 2: // OPCODE_STATUSOVERRIDE
+                if ((this.persist ? this.ui_presencelevel : 0) === u[p+1]) {
+                    output.push([
+                        "OPCODE_STATUSOVERRIDE", "overridechanged = false"
+                    ]);
+                }
+                else {
+                    if (u[p+1]) {
+                        output.push([
+                            "OPCODE_STATUSOVERRIDE",
+                            "persist = true",
+                            "ui_presencelevel = " + u[p+1]
+                        ]);
+                    }
+                    else {
+                        output.push([
+                            "OPCODE_STATUSOVERRIDE", "persist = false"
+                        ]);
+                    }
+                }
+                p += 2;
+                break;
+
+            case 6: // OPCODE_PEERSTATUS
+                var userhash = ab_to_base64(new Uint8Array(u.buffer, p+2, 8));
+                var presence = u[p + 1] & 0xf;
+                var isWebrtcFlag = u[p + 1] & 0x80;
+
+                output.push([
+                    "OPCODE_PEERSTATUS",
+                    "userhash = " + userhash,
+                    "presence = " + presence,
+                    "isWebrtcFlag = " + isWebrtcFlag === true ? "true" : "false"
+                ]);
+
+
+                p += 10;
+                break;
+
+            case 7: // OPCODE_AUTOAWAYSETTING
+                var newautoawaytimeout = u[p+1] + (u[p+2] << 8);
+
+                if (this.autoawaytimeout == newautoawaytimeout) {
+                    output.push([
+                        "OPCODE_AUTOAWAYSETTING",
+                        "autoawaychanged = false"
+                    ]);
+
+
+                }
+                else {
+                    output.push([
+                        "OPCODE_AUTOAWAYSETTING",
+                        "autoawaytimeout = " + newautoawaytimeout
+                    ]);
+                }
+
+                p += 3;
+                break;
+
+            default:
+                output.push("Fatal - unknown opcode: " + u[p]);
+                // kill the loop.
+                return output;
+        }
+    }
+
+    if (p != u.length) {
+        output.put("Fatal - bad framing");
+    }
+    return output;
+};
+
+/**
+ * This is a development-only method that is used for converting the binary commands to readable strings (array/list of
+ * strings)
+ *
+ * @param ab
+ */
+UserPresence.prototype.outgoingDataAsReadableCommand = function(ab) {
+    // copy the 'ab' instead of modifying it
+    var u = new Uint8Array(ab.slice(0));
+    var p = 0;
+
+    // opcodes:
+    /*
+     0 - keep alive ping, no extra data
+     \1\1 - hello, capabilities (String.fromCharCode(((can_webrtc && 0x80) | (can_mobilepush && 0x40))))
+     2 - override, true/false
+     3 - flags, online (true - 1/false) | dnd (true - 2/false)
+     4 - add peer, num of peers (4 bytes), peerstring (every peer id is 8 bytes)
+     5 - delete peer, num of peers, peerstring
+     7 - autoaway, enabled/disabled, autoaway timeout value (seconds)
+     */
+    var output = [];
+    while (p < u.length) {
+
+        switch (u[p]) {
+            case 0: // KEEPALIVE
+                output.push([
+                    "KEEPALIVE"
+                ]);
+                p++;
+                break;
+
+            case 1: // HELLO
+                output.push([
+                    "HELLO",
+                    "webrtc = " + (u[p+2] & 0x80 ? "true" : "false"),
+                    "can_mobilepush = " + (u[p+2] & 0x40 ? "true" : "false"),
+                ]);
+                p += 3
+                break;
+
+            case 2: // STATUSOVERRIDE
+                output.push([
+                    "STATUSOVERRIDE", "override = " + (u[p+1] === 1 ? "true" : "false")
+                ]);
+
+                p += 2;
+                break;
+
+            case 3: // FLAGS
+                output.push([
+                    "FLAGS",
+                    "online = " + (!!(u[p+1] & 1)),
+                    "dnd = " + (!!(u[p+1] & 2)),
+                ]);
+
+                p += 2;
+                break;
+
+            case 4: // FLAGS
+            case 5:
+                var numpeers = (
+                    u[p+1]
+                    + (u[p+2] << 8)
+                    + (u[p+3] << 16)
+                    + (u[p+4] << 24)
+                );
+
+                var peers = [];
+                for (var i = 0; i < numpeers; i++) {
+                    peers.push(
+                        ab_to_base64(
+                            u
+                                .subarray(
+                                    p + 5 + (i * 8),
+                                    p + 5 + ((i + 1) * 8)
+                                )
+                        )
+                    );
+                }
+                output.push([
+                    "PEERUPDATE",
+                    u[p] === 4 ? "add" : "delete",
+                    "peers:", peers.join(", ")
+                ]);
+
+
+                p += 5 + numpeers * 8;
+                break;
+
+            case 7: // AUTOAWAY
+                var timeout = u[p+1] + (u[p+2] << 8);
+                if (timeout > 600) {
+                    timeout = (timeout-600)*10+600;
+                }
+
+                output.push([
+                    "AUTOAWAY",
+                    "autoaway enabled? = " + !(timeout & 0x8000),
+                    "autoaway seconds = " + timeout,
+                ]);
+
+                p += 3
+                break;
+
+            default:
+                output.push("Fatal - unknown opcode: " + u[p]);
+                // kill the loop.
+                return output;
+        }
+    }
+
+    if (p != u.length) {
+        output.put("Fatal - bad framing");
+    }
+    return output;
+};
 
 Object.freeze(UserPresence.prototype);

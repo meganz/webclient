@@ -876,7 +876,7 @@ function init_page() {
         });
         mainScroll();
     }
-    else if (page.substr(0, 3) == 'pro') {
+    else if (page.substr(0, 3) === 'pro') {
         var tmp = page.split('/uao=');
         if (tmp.length > 1) {
             mega.uaoref = decodeURIComponent(tmp[1]);
@@ -885,6 +885,15 @@ function init_page() {
         }
         parsepage(pages['pro']);
         init_pro();
+    }
+    else if (page.substr(0, 7) === 'payment') {
+
+        // Load the Pro page in the background
+        parsepage(pages['pro']);
+        init_pro();
+
+        // Process the return URL from the payment provider and show a success/failure dialog if applicable
+        proPage.processReturnUrlFromProvider(page);
     }
     else if (page == 'credits') {
         parsepage(pages['credits']);
@@ -1323,7 +1332,7 @@ function topmenuUI() {
     }
 
     $('.top-icon.warning').addClass('hidden');
-    $('.top-menu-item.upgrade-your-account.green,.top-menu-item.backup').addClass('hidden');
+    $('.top-menu-item.upgrade-your-account,.top-menu-item.backup').addClass('hidden');
     $('.top-menu-item.logout').addClass('hidden');
     $('.top-menu-item.register,.top-menu-item.login').addClass('hidden');
     $('.top-menu-item.account').addClass('hidden');
@@ -1426,7 +1435,7 @@ function topmenuUI() {
             }
 
             // Show the 'Upgrade your account' button in the main menu for all
-            $('.top-menu-item.upgrade-your-account.green').addClass('hidden');
+            $('.top-menu-item.upgrade-your-account').removeClass('hidden');
             $('.membership-icon-pad .membership-big-txt.plan-txt').text(purchasedPlan);
             $('.membership-icon-pad .membership-icon').attr('class', 'membership-icon pro' + u_attr.p);
             $('.membership-status-block i').attr('class', 'tiny-icon membership-status ' + cssClass);
@@ -1435,8 +1444,8 @@ function topmenuUI() {
         }
         else {
             // Show the free badge
-            $('.top-menu-item.upgrade-your-account.green').removeClass('hidden');
-            $('.membership-icon').attr('class','membership-icon');
+            $('.top-menu-item.upgrade-your-account').removeClass('hidden');
+            $('.membership-icon').attr('class', 'membership-icon');
             $('.top-menu-item.account .right-el').text('FREE');
             $('.membership-status').attr('class', 'tiny-icon membership-status free');
             $('.membership-popup').removeClass('pro-popup');
@@ -1474,7 +1483,7 @@ function topmenuUI() {
             }
         }
 
-        $('.top-menu-item.upgrade-your-account.green').addClass('hidden');
+        $('.top-menu-item.upgrade-your-account').addClass('hidden');
         $('.membership-status-block').hide();
         $('.top-icon.notification').hide();
         $('.top-icon.achievements').hide();

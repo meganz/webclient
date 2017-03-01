@@ -91,6 +91,20 @@ function parseHTMLfmt(markup) {
 }
 
 /**
+ * Handy printf-style parseHTML to apply escapeHTML
+ * @param {String} markup The HTML fragment to parse.
+ * @param {...*} var_args
+ */
+function parseHTMLfmt2(markup) {
+    if (arguments.length > 1) {
+        for (var idx = arguments.length; --idx > 0;) {
+            markup = markup.replace(RegExp('%' + idx, 'g'), escapeHTML(arguments[idx]));
+        }
+    }
+    return parseHTML(markup);
+}
+
+/**
  * Safely inject an HTML fragment using parseHTML()
  * @param {string} markup The HTML fragment to parse.
  * @param {...*} var_args
@@ -107,7 +121,12 @@ function parseHTMLfmt(markup) {
                     value: function $afeCall(markup) {
                         var i = 0;
                         var l = this.length;
-                        markup = parseHTMLfmt.apply(null, arguments);
+                        if (markup === '%n') {
+                            markup = parseHTMLfmt2.apply(null, toArray.apply(null, arguments).slice(1));
+                        }
+                        else {
+                            markup = parseHTMLfmt.apply(null, arguments);
+                        }
                         while (l > i) {
                             $(this[i++])[origFunc](markup.cloneNode(true));
                         }
@@ -585,7 +604,6 @@ function populate_l() {
     l[8849] = l[8849].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[1389] = l[1389].replace('[B]', '').replace('[/B]', '').replace('[A]', '<span>').replace('[/A]', '</span>');
     l[8912] = l[8912].replace('[B]', '<span>').replace('[/B]', '</span>');
-    l[8944] = l[8944].replace('[BR]', '<br>').replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8846] = l[8846].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8847] = l[8847].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8950] = l[8950].replace('[S]', '<span>').replace('[/S]', '</span>');
@@ -625,7 +643,7 @@ function populate_l() {
     l[16136] = l[16136].replace('[A]', '<a href="/pro">').replace('[/A]', '</a>');
     l[16137] = l[16137].replace('[A]', '<a href="/pro">').replace('[/A]', '</a>');
     l[16138] = l[16138].replace('[A]', '<a href="/pro">').replace('[/A]', '</a>');
-    l[16164] = l[16164].replace('[S]', '<a class="red">').replace('[/S]', '</a>').replace('[BR]', '<br/>');
+    l[16165] = l[16165].replace('[S]', '<a class="red">').replace('[/S]', '</a>').replace('[BR]', '<br/>');
     l[16167] = l[16167].replace('[S]', '<a href="/mobile" class="clickurl">').replace('[/S]', '</a>');
 
     l['year'] = new Date().getFullYear();

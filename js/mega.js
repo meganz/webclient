@@ -3735,13 +3735,6 @@ function MegaData()
 
                     M.account = ctx.account;
 
-                    if (M.maf) {
-                        // Add achieved storage quota
-                        ctx.account.space += M.maf.storage.current;
-                        // Add achieved transfer quota
-                        ctx.account.bw += M.maf.transfer.current;
-                    }
-
                     if (ctx.cb)
                         ctx.cb(ctx.account);
                 }
@@ -9211,12 +9204,11 @@ Object.defineProperty(mega, 'achievem', {
                         value: time
                     };
 
-                    // TODO: translate this
                     switch (unit) {
-                        case 'd': result.utxt = (time < 2) ? 'day'   : 'days';    break;
-                        case 'w': result.utxt = (time < 2) ? 'week'  : 'weeks';   break;
-                        case 'm': result.utxt = (time < 2) ? 'month' : 'months';  break;
-                        case 'y': result.utxt = (time < 2) ? 'year'  : 'years';   break;
+                        case 'd': result.utxt = (time < 2) ? l[930]   : l[16290];  break;
+                        case 'w': result.utxt = (time < 2) ? l[16292] : l[16293];  break;
+                        case 'm': result.utxt = (time < 2) ? l[913]   : l[6788];   break;
+                        case 'y': result.utxt = (time < 2) ? l[932]   : l[16294];  break;
                     }
 
                     out = out || data;
@@ -9240,19 +9232,10 @@ Object.defineProperty(mega, 'achievem', {
                         setExpiry(data[ach.a]);
                     }
                     var exp = setExpiry(mafr[ach.r] || data[ach.a], ach);
-
                     var ts = ach.ts * 1000;
-                    var date = moment(ts);
-
-                    switch (exp.unit) {
-                        case 'd': date.add(exp.value, 'days');    break;
-                        case 'w': date.add(exp.value, 'weeks');   break;
-                        case 'm': date.add(exp.value, 'months');  break;
-                        case 'y': date.add(exp.value, 'years');   break;
-                    }
 
                     ach.date = new Date(ts);
-                    ach.left = Math.round(date.diff(ach.date) / 86400000);
+                    ach.left = Math.round((ach.e * 1000 - Date.now()) / 86400000);
 
                     if (data[ach.a].rwds) {
                         data[ach.a].rwds.push(ach);
@@ -9542,20 +9525,13 @@ function fm_thumbnails()
 
 function fm_thumbnail_render(n) {
     if (n && thumbnails[n.h]) {
+        var imgNode = document.getElementById(n.imgId || n.h);
 
-        // one thumbnail can eventually be rendered multiple times in the DOM, for example when:
-        // 1) is shared multiple times in the same chat room
-        // 2) was rendered in some of the other FM tabs and not cleaned up properly.
-        // This is why we generate this a bit extensive, but (legacy) compatible selector
-        // Note: Because node IDs can start with a number, I'd changed this to use jQuery instead of querySelectorAll
-        var imgNodes = $('#' + n.h + " img");
-        if (imgNodes.length > 0) {
+        if (imgNode && (imgNode = imgNode.querySelector('img'))) {
             n.seen = 2;
-        }
-        imgNodes.each(function(k, imgNode) {
             imgNode.setAttribute('src', thumbnails[n.h]);
             imgNode.parentNode.classList.add('thumb');
-        });
+        }
     }
 }
 // jscs:enable

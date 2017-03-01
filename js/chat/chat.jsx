@@ -3,6 +3,7 @@ var ReactDOM = require("react-dom");
 var ConversationsUI = require("./ui/conversations.jsx");
 var ChatRoom = require('./chatRoom.jsx');
 
+var EMOJI_DATASET_VERSION = 1;
 
 var chatui;
 var webSocketsSupport = typeof(WebSocket) !== 'undefined';
@@ -1795,6 +1796,48 @@ Chat.prototype._destroyAllChatsFromChatd = function() {
 Chat.prototype.updateDashboard = function() {
     if (M.currentdirid === 'dashboard') {
         delay('dashboard:updchat', dashboardUI.updateChatWidget);
+    }
+};
+
+
+/**
+ * Warning: The data returned by this function is loaded directly and not hash-checked like in the secureboot.js. So
+ * please use carefully and escape EVERYTHING that is loaded thru this.
+ *
+ * @param name
+ * @returns {MegaPromise}
+ */
+Chat.prototype.getEmojiDataSet = function(name) {
+    var self = this;
+    assert(name === "categories" || name === "emojis", "Invalid emoji dataset name passed.");
+
+    if (!self._emojiDataLoading) {
+        self._emojiDataLoading = {};
+    }
+    if (!self._emojiData) {
+        self._emojiData = {};
+    }
+
+    if (self._emojiData[name]) {
+        return MegaPromise.resolve(
+            self._emojiData[name]
+        );
+    }
+    else if (self._emojiDataLoading[name]) {
+        return self._emojiDataLoading[name];
+    }
+    else {
+        self._emojiDataLoading[name] = MegaPromise.asMegaPromiseProxy(
+            $.getJSON(staticpath + "js/chat/emojidata/" + name + ".json?v=" + EMOJI_DATASET_VERSION)
+        );
+        self._emojiDataLoading[name].done(function(data) {
+            self._emojiData[name] = data;
+            delete self._emojiDataLoading[name];
+        }).fail(function() {
+            delete self._emojiDataLoading[name];
+        });
+
+        return self._emojiDataLoading[name];
     }
 };
 

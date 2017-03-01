@@ -935,6 +935,8 @@ ChatRoom.prototype._sendMessageToTransport = function(messageObject) {
     var self = this;
     var megaChat = this.megaChat;
 
+    megaChat.trigger('onBeforeSendMessage', messageObject);
+
     var messageMeta = messageObject.getMeta() ? messageObject.getMeta() : {};
     if (messageMeta.isDeleted && messageMeta.isDeleted === true) {
         return MegaPromise.reject();

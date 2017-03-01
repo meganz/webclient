@@ -3392,7 +3392,7 @@ mega.utils.execCommandUsable = function() {
  * dynamic value for the object
  * @param [order] {Number} 1 for asc, -1 for desc sorting
  * @param [alternativeFn] {Function} Optional function to be used for comparison of A and B if both are equal or
- * undefined
+ *      undefined
  * @returns {Function}
  */
 mega.utils.sortObjFn = function(key, order, alternativeFn) {
@@ -3457,6 +3457,14 @@ mega.utils.sortObjFn = function(key, order, alternativeFn) {
 };
 
 
+/**
+ * This is an utility function that would simply do a localCompare OR use Intl.Collator for comparing 2 strings.
+ *
+ * @param a {String} String A
+ * @param b {String} String B
+ * @param d {Number} -1 or 1, for inversing the direction for when used for sorting (which is most of the cases)
+ * @returns {number}
+ */
 mega.utils.compareStrings = function megaUtilsCompareStrings(a, b, d) {
     if (typeof Intl !== 'undefined' && Intl.Collator) {
         var intl = new Intl.Collator('co', { numeric: true });

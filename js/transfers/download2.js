@@ -891,7 +891,7 @@ var dlmanager = {
         uiCheckboxes($dialog, 'ignoreLimitedBandwidth').removeClass('hidden');
 
         $('.header-after-icon', $dialog).text(l[16164]);
-        $('.p-after-icon', $dialog).safeHTML(l[8944]);
+        $('.p-after-icon', $dialog).safeHTML(l[16165]);
 
         api_req({ a: 'log', e: 99617, m: 'qbq' });
 

@@ -604,7 +604,6 @@ function populate_l() {
     l[8849] = l[8849].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[1389] = l[1389].replace('[B]', '').replace('[/B]', '').replace('[A]', '<span>').replace('[/A]', '</span>');
     l[8912] = l[8912].replace('[B]', '<span>').replace('[/B]', '</span>');
-    l[8944] = l[8944].replace('[BR]', '<br>').replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8846] = l[8846].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8847] = l[8847].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8950] = l[8950].replace('[S]', '<span>').replace('[/S]', '</span>');
@@ -644,7 +643,7 @@ function populate_l() {
     l[16136] = l[16136].replace('[A]', '<a href="/pro">').replace('[/A]', '</a>');
     l[16137] = l[16137].replace('[A]', '<a href="/pro">').replace('[/A]', '</a>');
     l[16138] = l[16138].replace('[A]', '<a href="/pro">').replace('[/A]', '</a>');
-    l[16164] = l[16164].replace('[S]', '<a class="red">').replace('[/S]', '</a>').replace('[BR]', '<br/>');
+    l[16165] = l[16165].replace('[S]', '<a class="red">').replace('[/S]', '</a>').replace('[BR]', '<br/>');
     l[16167] = l[16167].replace('[S]', '<a href="/mobile" class="clickurl">').replace('[/S]', '</a>');
 
     l['year'] = new Date().getFullYear();

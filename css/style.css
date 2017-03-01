@@ -9504,6 +9504,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .default-select-scroll {
     max-height: 288px;
     overflow: hidden;
+    position: relative;
+    z-index: 1;
 }
 .permissions-menu, .fm-dialogs-dropdown {
     background-image: none;

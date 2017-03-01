@@ -3973,6 +3973,7 @@
     "16327": "Encourage your friend to register and install a MEGA app. As long as your friend uses the same email address as you've entered, you will receive your free [S]%1[\/S] of storage space and [S]%2[\/S] of transfer quota.",
     "16328": "Do you want to hide this dialog when transfers are ongoing?",
     "16329": "Use Settings -> Advanced -> Transfers to enable it again.",
+    "16330": "Secure communication using user-controlled end-to-end encryption for text chat (mobile apps and in the browser) and voice \/ video (currently only in the browser; mobile coming soon), unified across all your devices.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

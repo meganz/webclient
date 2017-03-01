@@ -3973,6 +3973,7 @@
     "16327": "Encourage your friend to register and install a MEGA app. As long as your friend uses the same email address as you've entered, you will receive your free [S]%1[\/S] of storage space and [S]%2[\/S] of transfer quota.",
     "16328": "\u60a8\u60f3\u8981\u65bc\u50b3\u8f38\u6b63\u5728\u9032\u884c\u6642\uff0c\u96b1\u85cf\u6b64\u65e5\u8a8c\u8a18\u9304\u55ce\uff1f",
     "16329": "\u8acb\u81f3 \u8a2d\u5b9a -> \u9032\u968e ->\u50b3\u8f38 \u518d\u6b21\u555f\u7528\u5b83\u3002",
+    "16330": "Secure communication using user-controlled end-to-end encryption for text chat (mobile apps and in the browser) and voice \/ video (currently only in the browser; mobile coming soon), unified across all your devices.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

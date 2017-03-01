@@ -3973,6 +3973,7 @@
     "16327": "Encouragez vos amis \u00e0 s'inscrire et \u00e0 installer une appli MEGA. Tant que votre ami utilisera la m\u00eame adresse courriel que celle que vous avez saisie, vous recevrez vos [S]%1[\/S] d'espace de stockage gratuit et [S]%2[\/S] de quota de transfert.",
     "16328": "Souhaitez-vous cacher cette bo\u00eete de dialogue quand les transferts sont en cours?",
     "16329": "Utiliser Param\u00e8tres -> Avanc\u00e9 -> Transferts pour la r\u00e9activer",
+    "16330": "Une communication s\u00e9curis\u00e9e utilisant un chiffrement de bout en bout contr\u00f4l\u00e9 par l'utilisateur pour le dialogue texte (applis mobiles et dans le navigateur) et le dialogue vocal ou vid\u00e9o (seulement dans le navigateur actuellement, \u00e0 venir pour les appareils mobiles), unifi\u00e9e pour tous les appareils.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

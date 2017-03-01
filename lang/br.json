@@ -3859,7 +3859,7 @@
     "16187": "Limite de taxa de transfer\u00eancia",
     "16188": "N\u00famero de conex\u00f5es TCP paralelas por transfer\u00eancia:",
     "16189": "Quando voc\u00ea terminar este assistente, voc\u00ea ser\u00e1 capaz de sincronizar pastas adicionais usando a caixa de di\u00e1logo de configura\u00e7\u00f5es.",
-    "16190": "Ativar as transfer\u00eancias",
+    "16190": "Transfer\u00eancias ativas",
     "16192": "Esta mensagem foi eliminada",
     "16194": "[A] Foi removido do grupo de bate-papo por [B].",
     "16195": "[A] Deixou o bate-papo do grupo.",
@@ -3973,6 +3973,7 @@
     "16327": "Incentive seu amigo a se registrar e instalar um aplicativo MEGA. Contanto que seu amigo use o mesmo endere\u00e7o de e-mail que voc\u00ea entrou, voc\u00ea receber\u00e1 seu livre [S]%1[\/S] de espa\u00e7o de armazenamento [S]%2[\/S] da quota de transfer\u00eancia.",
     "16328": "Pretende ocultar esta caixa de di\u00e1logo quando as transfer\u00eancias est\u00e3o em curso?",
     "16329": "Usar configura\u00e7\u00f5es -> Avan\u00e7ado -> Transferir para ativ\u00e1-lo novamente",
+    "16330": "Secure communication using user-controlled end-to-end encryption for text chat (mobile apps and in the browser) and voice \/ video (currently only in the browser; mobile coming soon), unified across all your devices.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

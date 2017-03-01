@@ -1445,7 +1445,7 @@ function topmenuUI() {
         else {
             // Show the free badge
             $('.top-menu-item.upgrade-your-account').removeClass('hidden');
-            $('.membership-icon').attr('class','membership-icon');
+            $('.membership-icon').attr('class', 'membership-icon');
             $('.top-menu-item.account .right-el').text('FREE');
             $('.membership-status').attr('class', 'tiny-icon membership-status free');
             $('.membership-popup').removeClass('pro-popup');

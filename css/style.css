@@ -4797,7 +4797,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     color: #999999 !important;
     padding-left: 15px;
 }
-.top-menu-item.green, .upgrade-your-account.green:hover {
+.free .top-menu-item.upgrade-your-account, .free .top-menu-item.upgrade-your-account:hover {
     color: #31B500;
 }
 .top-menu-divider {
@@ -11231,7 +11231,10 @@ table {
     display: table;
     table-layout: fixed;
     width: 100%;
-    padding: 0 0 0 0;
+    padding: 0 0 20px 0;
+}
+.free .account-form-wraper, .low-width .account-form-wraper {
+    padding: 0;
 }
 .active-achievements .account-form-wraper {
     margin: 0 0 41px 0;
@@ -11498,6 +11501,9 @@ table {
 .account.left-pane .button {
     margin: 7px 0 0 0;
     max-width: 100%;
+}
+.button.upgrade-account, .button.upgrade-to-pro {
+    text-transform: capitalize;
 }
 .account.left-pane .default-grey-button {
     height: 32px;
@@ -25276,7 +25282,7 @@ div.camera-bottom-txt {
     width: 100%;
     margin: 14px 0 29px 0;
 }
-.active-achievements .account.plan-info-block, .low-width .account.plan-info-block {
+.active-achievements .account.plan-info-block {
     margin: 14px 0 8px 0;
 }
 .account.plan-comment {
@@ -25353,6 +25359,7 @@ div.camera-bottom-txt {
 }
 .free .min-pad .button.default-white-button {
     margin-top: 0;
+    margin-bottom: 8px;
 }
 .fm-account-sections {
     height: 100%;

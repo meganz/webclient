@@ -3460,18 +3460,19 @@ mega.utils.sortObjFn = function(key, order, alternativeFn) {
 /**
  * This is an utility function that would simply do a localCompare OR use Intl.Collator for comparing 2 strings.
  *
- * @param a {String} String A
- * @param b {String} String B
- * @param d {Number} -1 or 1, for inversing the direction for when used for sorting (which is most of the cases)
- * @returns {number}
+ * @param stringA {String} String A
+ * @param stringB {String} String B
+ * @param direction {Number} -1 or 1, for inversing the direction for sorting (which is most of the cases)
+ * @returns {Number}
  */
-mega.utils.compareStrings = function megaUtilsCompareStrings(a, b, d) {
+mega.utils.compareStrings = function megaUtilsCompareStrings(stringA, stringB, direction) {
+
     if (typeof Intl !== 'undefined' && Intl.Collator) {
         var intl = new Intl.Collator('co', { numeric: true });
-        return intl.compare(a || "", b || "") * d;
+        return intl.compare(stringA || '', stringB || '') * direction;
     }
     else {
-        return (a || "").localeCompare(b || "") * d;
+        return (stringA || '').localeCompare(stringB || '') * direction;
     }
 };
 

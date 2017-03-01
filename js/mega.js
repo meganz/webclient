@@ -296,7 +296,6 @@ function MegaData()
 
         this.sortfn = function(a, b, d) {
             // reusing the getNameByHandle code for converting contact's name/email to renderable string
-
             var itemA = self.getNameByHandle(a.h);
             var itemB  = self.getNameByHandle(b.h);
             return mega.utils.compareStrings(itemA, itemB, d);

@@ -13402,11 +13402,16 @@ function removeFromMultiInputDDL(dialog, item) {
                     type = M.lastActiveTab || 'cloud-drive';
                 }
 
-                // Show all items in sort dialog in case contacts tab is choosen
+                // Show only contacts related sorting options
                 if (type === 'contacts') {
                     menu.find('.sorting-item-divider,.sorting-menu-item').removeClass('hidden');
+                    menu.find(
+                            '*[data-by="fav"],' +
+                            '*[data-by="created"]'
+                        ).addClass('hidden');
                 }
                 else { // Hide status and last-interaction sorting options in sort dialog
+                    menu.find('.sorting-item-divider,.sorting-menu-item').removeClass('hidden');
                     menu.find('*[data-by=status],*[data-by=last-interaction]').addClass('hidden');
                 }
 

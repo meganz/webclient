@@ -3409,9 +3409,11 @@ mega.utils.execCommandUsable = function() {
  * @param key {String|Function} the name of the property that will be used for the sorting OR a func that will return a
  * dynamic value for the object
  * @param [order] {Number} 1 for asc, -1 for desc sorting
+ * @param [alternativeFn] {Function} Optional function to be used for comparison of A and B if both are equal or
+ *      undefined
  * @returns {Function}
  */
-mega.utils.sortObjFn = function(key, order) {
+mega.utils.sortObjFn = function(key, order, alternativeFn) {
     if (!order) {
         order = 1;
     }
@@ -3420,43 +3422,76 @@ mega.utils.sortObjFn = function(key, order) {
         var currentOrder = tmpOrder ? tmpOrder : order;
 
         if ($.isFunction(key)) {
-            a = key(a);
-            b = key(b);
+            aVal = key(a);
+            bVal = key(b);
         }
         else {
-            a = a[key];
-            b = b[key];
+            aVal = a[key];
+            bVal = b[key];
         }
 
-        if (typeof a == 'string' && typeof b == 'string') {
-            return a.localeCompare(b) * currentOrder;
+        if (typeof aVal === 'string' && typeof bVal === 'string') {
+            return aVal.localeCompare(bVal) * currentOrder;
         }
-        else if (typeof a == 'string' && typeof b == 'undefined') {
+        else if (typeof aVal === 'string' && typeof bVal === 'undefined') {
             return 1 * currentOrder;
         }
-        else if (typeof a == 'undefined' && typeof b == 'string') {
+        else if (typeof aVal === 'undefined' && typeof bVal === 'string') {
             return -1 * currentOrder;
         }
-        else if (typeof a == 'number' && typeof b == 'undefined') {
+        else if (typeof aVal === 'number' && typeof bVal === 'undefined') {
             return 1 * currentOrder;
         }
-        else if (typeof a == 'undefined' && typeof b == 'number') {
+        else if (typeof aVal === 'undefined' && typeof bVal === 'number') {
             return -1 * currentOrder;
         }
-        else if (typeof a == 'number' && typeof b == 'number') {
-            var _a = a || 0;
-            var _b = b || 0;
+        else if (typeof aVal === 'undefined' && typeof bVal === 'undefined') {
+            if (alternativeFn) {
+                return alternativeFn(a, b, currentOrder);
+            }
+            else {
+                return -1 * currentOrder;
+            }
+        }
+        else if (typeof aVal === 'number' && typeof bVal === 'number') {
+            var _a = aVal || 0;
+            var _b = bVal || 0;
             if (_a > _b) {
                 return 1 * currentOrder;
             }
             if (_a < _b) {
                 return -1 * currentOrder;
             } else {
-                return 0;
+                if (alternativeFn) {
+                    return alternativeFn(a, b, currentOrder);
+                }
+                else {
+                    return 0;
+                }
             }
         }
         else return 0;
     };
+};
+
+
+/**
+ * This is an utility function that would simply do a localCompare OR use Intl.Collator for comparing 2 strings.
+ *
+ * @param stringA {String} String A
+ * @param stringB {String} String B
+ * @param direction {Number} -1 or 1, for inversing the direction for sorting (which is most of the cases)
+ * @returns {Number}
+ */
+mega.utils.compareStrings = function megaUtilsCompareStrings(stringA, stringB, direction) {
+
+    if (typeof Intl !== 'undefined' && Intl.Collator) {
+        var intl = new Intl.Collator('co', { numeric: true });
+        return intl.compare(stringA || '', stringB || '') * direction;
+    }
+    else {
+        return (stringA || '').localeCompare(stringB || '') * direction;
+    }
 };
 
 /**

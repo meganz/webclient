@@ -474,9 +474,11 @@ React.makeElement = React['createElement'];
 	        }
 	    });
 
-	    $(window).unbind('hashchange.megaChat' + this.instanceId);
+	    if (this._pageChangeListener) {
+	        mBroadcaster.removeListener(this._pageChangeListener);
+	    }
 	    var lastOpenedRoom = null;
-	    $(window).bind('hashchange.megaChat' + this.instanceId, function () {
+	    this._pageChangeListener = mBroadcaster.addListener('pagechange', function () {
 	        var room = self.getCurrentRoom();
 
 	        if (room && !room.isCurrentlyActive && room.roomJid != lastOpenedRoom) {
@@ -531,7 +533,10 @@ React.makeElement = React['createElement'];
 	        return;
 	    } else {
 	        if (!appContainer) {
-	            $(window).rebind('hashchange.delayedChatUiInit', function () {
+	            if (self._appInitPageChangeListener) {
+	                mBroadcaster.removeListener(self._appInitPageChangeListener);
+	            }
+	            self._appInitPageChangeListener = mBroadcaster.addListener('pagechange', function () {
 	                if (typeof $.leftPaneResizable === 'undefined' || !fminitialized) {
 
 	                    return;
@@ -539,7 +544,9 @@ React.makeElement = React['createElement'];
 	                appContainer = document.querySelector('.section.conversations');
 	                if (appContainer) {
 	                    initAppUI();
-	                    $(window).unbind('hashchange.delayedChatUiInit');
+	                    if (self._appInitPageChangeListener) {
+	                        mBroadcaster.removeListener(self._appInitPageChangeListener);
+	                    }
 	                }
 	            });
 	        } else {
@@ -3006,7 +3013,10 @@ React.makeElement = React['createElement'];
 	                }
 	            });
 
-	            $(window).rebind('hashchange.button' + self.getUniqueId(), function (e) {
+	            if (self._pageChangeListener) {
+	                mBroadcaster.removeListener(self._pageChangeListener);
+	            }
+	            mBroadcaster.addListener('pagechange', function () {
 	                if (self.state.focused === true) {
 	                    self.onBlur();
 	                }
@@ -3074,7 +3084,9 @@ React.makeElement = React['createElement'];
 	            $(document).unbind('closeDropdowns.' + this.getUniqueId());
 	            document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
 
-	            $(window).unbind('hashchange.button' + this.getUniqueId());
+	            if (this._pageChangeListener) {
+	                mBroadcaster.removeListener(this._pageChangeListener);
+	            }
 	            this.forceUpdate();
 	        }
 	    },
@@ -3761,11 +3773,11 @@ React.makeElement = React['createElement'];
 	                $(document).trigger('closeDropdowns');
 
 	                if (self.props.onSelectDone) {
-	                    self.props.onSelectDone(self.state.selected);
+	                    self.props.onSelectDone(self.props.selected);
 	                }
 	            };
 
-	            if (!self.state.selected || self.state.selected.length === 0) {
+	            if (!self.props.selected || self.props.selected.length === 0) {
 	                footer = React.makeElement(
 	                    "div",
 	                    { className: "fm-dialog-footer" },
@@ -3775,7 +3787,7 @@ React.makeElement = React['createElement'];
 	                        self.props.nothingSelectedButtonLabel ? self.props.nothingSelectedButtonLabel : __(l[8889])
 	                    )
 	                );
-	            } else if (self.state.selected.length === 1) {
+	            } else if (self.props.selected.length === 1) {
 	                footer = React.makeElement(
 	                    "div",
 	                    { className: "contacts-search-footer" },
@@ -3789,7 +3801,7 @@ React.makeElement = React['createElement'];
 	                        )
 	                    )
 	                );
-	            } else if (self.state.selected.length > 1) {
+	            } else if (self.props.selected.length > 1) {
 	                footer = React.makeElement(
 	                    "div",
 	                    { className: "contacts-search-footer" },
@@ -3832,7 +3844,7 @@ React.makeElement = React['createElement'];
 	            }
 
 	            var selectedClass = "";
-	            if (self.state.selected && self.state.selected.indexOf(v.u) !== -1) {
+	            if (self.props.selected && self.props.selected.indexOf(v.u) !== -1) {
 	                selectedClass = "selected";
 	            }
 	            contacts.push(React.makeElement(ContactCard, {
@@ -3850,7 +3862,7 @@ React.makeElement = React['createElement'];
 
 	                        $(document).trigger('closeDropdowns');
 
-	                        var sel = self.state.selected;
+	                        var sel = self.props.selected;
 	                        if (sel.indexOf(contact.u) === -1) {
 	                            sel.push(contact.u);
 	                        }
@@ -3866,19 +3878,15 @@ React.makeElement = React['createElement'];
 	                            self.props.onClick(contact, e);
 	                        }
 	                    } else {
-	                        var sel = self.state.selected;
+	                        var sel = self.props.selected;
 	                        if (!sel) {
 	                            sel = [];
 	                        }
-	                        if (self.state.selected.indexOf(contact.u) > -1) {
+	                        if (self.props.selected.indexOf(contact.u) > -1) {
 	                            removeValue(sel, contact.u, false);
 	                        } else {
 	                            sel.push(contact.u);
 	                        }
-
-	                        self.setState({ 'selected': sel });
-
-	                        self.forceUpdate();
 
 	                        if (self.props.onSelect) {
 	                            self.props.onSelect(contact, e);
@@ -3929,7 +3937,7 @@ React.makeElement = React['createElement'];
 	            ),
 	            React.makeElement(
 	                utils.JScrollPane,
-	                { className: "contacts-search-scroll" },
+	                { className: "contacts-search-scroll", selected: this.state.selected },
 	                React.makeElement(
 	                    "div",
 	                    { style: innerDivStyles },
@@ -4648,6 +4656,7 @@ React.makeElement = React['createElement'];
 	            messagesToggledInCall: false,
 	            sendContactDialog: false,
 	            confirmDeleteDialog: false,
+	            pasteImageConfirmDialog: false,
 	            messageToBeDeleted: null,
 	            editing: false
 	        };
@@ -4815,6 +4824,15 @@ React.makeElement = React['createElement'];
 	                    }
 	                });
 	            }
+	        }
+
+	        if (self.isMounted() && self.$messages && self.isComponentEventuallyVisible()) {
+	            $(window).rebind('pastedimage.chatRoom', function (e, blob, fileName) {
+	                if (self.isMounted() && self.$messages && self.isComponentEventuallyVisible()) {
+	                    self.setState({ 'pasteImageConfirmDialog': [blob, fileName, URL.createObjectURL(blob)] });
+	                    e.preventDefault();
+	                }
+	            });
 	        }
 	    },
 	    handleWindowResize: function handleWindowResize(e, scrollToBottom) {
@@ -5208,7 +5226,6 @@ React.makeElement = React['createElement'];
 	                });
 	            }
 
-	            var selected = [];
 	            sendContactDialog = React.makeElement(ModalDialogsUI.SelectContactDialog, {
 	                megaChat: room.megaChat,
 	                chatRoom: room,
@@ -5218,10 +5235,7 @@ React.makeElement = React['createElement'];
 	                    self.setState({ 'sendContactDialog': false });
 	                    selected = [];
 	                },
-	                onSelected: function onSelected(nodes) {
-	                    selected = nodes;
-	                },
-	                onSelectClicked: function onSelectClicked() {
+	                onSelectClicked: function onSelectClicked(selected) {
 	                    self.setState({ 'sendContactDialog': false });
 
 	                    room.attachContacts(selected);
@@ -5280,6 +5294,51 @@ React.makeElement = React['createElement'];
 	                        hideActionButtons: true,
 	                        initTextScrolling: true
 	                    })
+	                )
+	            );
+	        }
+
+	        var pasteImageConfirmDialog = null;
+	        if (self.state.pasteImageConfirmDialog) {
+	            confirmDeleteDialog = React.makeElement(
+	                ModalDialogsUI.ConfirmDialog,
+	                {
+	                    megaChat: room.megaChat,
+	                    chatRoom: room,
+	                    title: __("Confirm paste"),
+	                    name: "paste-image-chat",
+	                    onClose: function onClose() {
+	                        self.setState({ 'pasteImageConfirmDialog': false });
+	                    },
+	                    onConfirmClicked: function onConfirmClicked() {
+	                        var meta = self.state.pasteImageConfirmDialog;
+	                        if (!meta) {
+	                            return;
+	                        }
+
+	                        M.addUpload([meta[0]]);
+
+	                        self.setState({
+	                            'pasteImageConfirmDialog': false
+	                        });
+	                    }
+	                },
+	                React.makeElement(
+	                    "div",
+	                    { className: "fm-dialog-content" },
+	                    React.makeElement(
+	                        "div",
+	                        { className: "dialog secondary-header" },
+	                        __("Please confirm that you want to upload this image and share it in this chat room.")
+	                    ),
+	                    React.makeElement("img", { src: self.state.pasteImageConfirmDialog[2], style: {
+	                            maxWidth: "90%",
+	                            height: "auto",
+	                            margin: '10px auto',
+	                            display: 'block',
+	                            border: '1px solid #ccc',
+	                            borderRadius: '4px'
+	                        } })
 	                )
 	            );
 	        }
@@ -5983,6 +6042,9 @@ React.makeElement = React['createElement'];
 	        e.preventDefault();
 
 	        this.setState({ 'highlighted': [node.h] });
+	        if (this.props.onHighlighted) {
+	            this.props.onHighlighted([node.h]);
+	        }
 
 	        if (this.props.folderSelectNotAllowed === true && node.t === 1) {
 	            this.setState({ 'selected': [] });
@@ -6002,6 +6064,7 @@ React.makeElement = React['createElement'];
 
 	            self.setState({ 'selected': [], 'highlighted': [] });
 	            self.props.onSelected([]);
+	            self.props.onHighlighted([]);
 	            self.props.onExpand(node);
 	            self.forceUpdate();
 	        } else {
@@ -6151,6 +6214,7 @@ React.makeElement = React['createElement'];
 	    getDefaultProps: function getDefaultProps() {
 	        return {
 	            'selectLabel': __(l[8023]),
+	            'openLabel': __(l[1710]),
 	            'cancelLabel': __(l[82]),
 	            'hideable': true
 	        };
@@ -6259,6 +6323,13 @@ React.makeElement = React['createElement'];
 	        this.setState({ 'selected': nodes });
 	        this.props.onSelected(nodes);
 	    },
+	    onHighlighted: function onHighlighted(nodes) {
+	        this.setState({ 'highlighted': nodes });
+
+	        if (this.props.onHighlighted) {
+	            this.props.onHighlighted(nodes);
+	        }
+	    },
 	    onAttachClicked: function onAttachClicked() {
 	        this.props.onAttachClicked();
 	    },
@@ -6269,6 +6340,8 @@ React.makeElement = React['createElement'];
 	        var self = this;
 
 	        var classes = "add-from-cloud " + self.props.className;
+
+	        var folderIsHighlighted = false;
 
 	        var breadcrumb = [];
 
@@ -6295,7 +6368,8 @@ React.makeElement = React['createElement'];
 	                            e.preventDefault();
 	                            e.stopPropagation();
 	                            self.setState({ 'currentlyViewedEntry': p.h, 'selected': [] });
-	                            self.props.onSelected([]);
+	                            self.onSelected([]);
+	                            self.onHighlighted([]);
 	                        } },
 	                    React.makeElement(
 	                        "span",
@@ -6310,6 +6384,62 @@ React.makeElement = React['createElement'];
 	            })(p);
 	        } while (p = M.d[M.d[p.h].p]);
 
+	        self.state.highlighted.forEach(function (nodeId) {
+	            if (M.d[nodeId] && M.d[nodeId].t === 1) {
+	                folderIsHighlighted = true;
+	            }
+	        });
+
+	        var buttons = [];
+
+	        window.asdf = self;
+
+	        if (!folderIsHighlighted) {
+	            buttons.push({
+	                "label": self.props.selectLabel,
+	                "key": "select",
+	                "className": "default-grey-button " + (self.state.selected.length === 0 ? "disabled" : null),
+	                "onClick": function onClick(e) {
+	                    if (self.state.selected.length > 0) {
+	                        self.props.onSelected(self.state.selected);
+	                        self.props.onAttachClicked();
+	                    }
+	                    e.preventDefault();
+	                    e.stopPropagation();
+	                }
+	            });
+	        } else if (folderIsHighlighted) {
+	            buttons.push({
+	                "label": self.props.openLabel,
+	                "key": "select",
+	                "className": "default-grey-button",
+	                "onClick": function onClick(e) {
+	                    if (self.state.highlighted.length > 0) {
+	                        self.setState({ 'currentlyViewedEntry': self.state.highlighted[0]
+	                        });
+	                        self.onSelected([]);
+	                        self.onHighlighted([]);
+	                        self.browserEntries.setState({
+	                            'selected': [],
+	                            'highlighted': []
+	                        });
+	                    }
+	                    e.preventDefault();
+	                    e.stopPropagation();
+	                }
+	            });
+	        }
+
+	        buttons.push({
+	            "label": self.props.cancelLabel,
+	            "key": "cancel",
+	            "onClick": function onClick(e) {
+	                self.props.onClose(self);
+	                e.preventDefault();
+	                e.stopPropagation();
+	            }
+	        });
+
 	        return React.makeElement(
 	            ModalDialog,
 	            {
@@ -6319,27 +6449,7 @@ React.makeElement = React['createElement'];
 	                    self.props.onClose(self);
 	                },
 	                popupDidMount: self.onPopupDidMount,
-	                buttons: [{
-	                    "label": self.props.selectLabel,
-	                    "key": "select",
-	                    "className": "default-grey-button " + (self.state.selected.length === 0 ? "disabled" : null),
-	                    "onClick": function onClick(e) {
-	                        if (self.state.selected.length > 0) {
-	                            self.props.onSelected(self.state.selected);
-	                            self.props.onAttachClicked();
-	                        }
-	                        e.preventDefault();
-	                        e.stopPropagation();
-	                    }
-	                }, {
-	                    "label": self.props.cancelLabel,
-	                    "key": "cancel",
-	                    "onClick": function onClick(e) {
-	                        self.props.onClose(self);
-	                        e.preventDefault();
-	                        e.stopPropagation();
-	                    }
-	                }] },
+	                buttons: buttons },
 	            React.makeElement(
 	                "div",
 	                { className: "fm-breadcrumbs-block add-from-cloud" },
@@ -6368,11 +6478,17 @@ React.makeElement = React['createElement'];
 	            React.makeElement(BrowserEntries, {
 	                entries: self.getEntries(),
 	                onExpand: function onExpand(node) {
+	                    self.onSelected([]);
+	                    self.onHighlighted([]);
 	                    self.setState({ 'currentlyViewedEntry': node.h });
 	                },
 	                folderSelectNotAllowed: self.props.folderSelectNotAllowed,
 	                onSelected: self.onSelected,
-	                onAttachClicked: self.onAttachClicked
+	                onHighlighted: self.onHighlighted,
+	                onAttachClicked: self.onAttachClicked,
+	                ref: function ref(browserEntries) {
+	                    self.browserEntries = browserEntries;
+	                }
 	            })
 	        );
 	    }
@@ -6392,12 +6508,14 @@ React.makeElement = React['createElement'];
 	    },
 	    getInitialState: function getInitialState() {
 	        return {
-	            'selected': []
+	            'selected': this.props.selected ? this.props.selected : []
 	        };
 	    },
 	    onSelected: function onSelected(nodes) {
 	        this.setState({ 'selected': nodes });
-	        this.props.onSelected(nodes);
+	        if (this.props.onSelected) {
+	            this.props.onSelected(nodes);
+	        }
 	        this.forceUpdate();
 	    },
 	    onSelectClicked: function onSelectClicked() {
@@ -6413,6 +6531,7 @@ React.makeElement = React['createElement'];
 	            {
 	                title: __("Send Contact"),
 	                className: classes,
+	                selected: self.state.selected,
 	                onClose: function onClose() {
 	                    self.props.onClose(self);
 	                },
@@ -6422,8 +6541,10 @@ React.makeElement = React['createElement'];
 	                    "className": self.state.selected.length === 0 ? "disabled" : null,
 	                    "onClick": function onClick(e) {
 	                        if (self.state.selected.length > 0) {
-	                            self.props.onSelected(self.state.selected);
-	                            self.props.onSelectClicked();
+	                            if (self.props.onSelected) {
+	                                self.props.onSelected(self.state.selected);
+	                            }
+	                            self.props.onSelectClicked(self.state.selected);
 	                        }
 	                        e.preventDefault();
 	                        e.stopPropagation();
@@ -6444,21 +6565,23 @@ React.makeElement = React['createElement'];
 	                onClick: function onClick(contact, e) {
 	                    var contactHash = contact.h;
 
-	                    if (new Date() - self.clickTime < 500) {
+	                    if (contactHash === self.lastClicked && new Date() - self.clickTime < 500) {
 
 	                        self.onSelected([contact.h]);
-	                        self.props.onSelectClicked();
+	                        self.props.onSelectClicked([contact.h]);
 	                    } else {
+	                        var selected = clone(self.state.selected);
 
 	                        if (self.state.selected.indexOf(contactHash) === -1) {
-	                            self.state.selected.push(contact.h);
-	                            self.onSelected(self.state.selected);
+	                            selected.push(contact.h);
+	                            self.onSelected(selected);
 	                        } else {
-	                            removeValue(self.state.selected, contactHash);
-	                            self.onSelected(self.state.selected);
+	                            removeValue(selected, contactHash);
+	                            self.onSelected(selected);
 	                        }
 	                    }
 	                    self.clickTime = new Date();
+	                    self.lastClicked = contactHash;
 	                },
 	                selected: self.state.selected,
 	                headerClasses: "left-aligned"
@@ -6989,16 +7112,10 @@ React.makeElement = React['createElement'];
 	        var $container = $(ReactDOM.findDOMNode(self));
 	        var val = $.trim($('.chat-textarea:visible textarea:visible', $container).val());
 
-	        if (val.length > 0) {
-	            if (self.onConfirmTrigger(val) !== true) {
-	                self.setState({ typedMessage: "" });
-	            }
-	            self.triggerOnUpdate();
-	            return;
-	        } else {
-
-	            self.onCancelClicked(e);
+	        if (self.onConfirmTrigger(val) !== true) {
+	            self.setState({ typedMessage: "" });
 	        }
+	        self.triggerOnUpdate();
 	    },
 	    onConfirmTrigger: function onConfirmTrigger(val) {
 	        var result = this.props.onConfirm(val);
@@ -8637,7 +8754,7 @@ React.makeElement = React['createElement'];
 
 	                    var files = [];
 
-	                    attachmentMeta.forEach(function (v) {
+	                    attachmentMeta.forEach(function (v, attachmentKey) {
 	                        var startDownload = function startDownload() {
 	                            M.addDownload([v]);
 	                        };
@@ -8680,7 +8797,7 @@ React.makeElement = React['createElement'];
 	                            if (v.fa && (icon === "graphic" || icon === "image")) {
 	                                var imagesListKey = message.messageId + "_" + v.h;
 	                                if (!chatRoom.images.exists(imagesListKey)) {
-	                                    v.k = imagesListKey;
+	                                    v.id = imagesListKey;
 	                                    v.delay = message.delay;
 	                                    chatRoom.images.push(v);
 	                                }
@@ -8769,11 +8886,13 @@ React.makeElement = React['createElement'];
 	                                        delay('thumbnails', fm_thumbnails, 90);
 	                                    }
 	                                    src = window.noThumbURI || '';
+
+	                                    v.imgId = "thumb" + message.messageId + "_" + attachmentKey + "_" + v.h;
 	                                }
 
 	                                preview = src ? React.makeElement(
 	                                    'div',
-	                                    { id: v.h, className: 'shared-link img-block' },
+	                                    { id: v.imgId, className: 'shared-link img-block' },
 	                                    React.makeElement('div', { className: 'img-overlay', onClick: startPreview }),
 	                                    React.makeElement(
 	                                        'div',
@@ -9896,7 +10015,7 @@ React.makeElement = React['createElement'];
 	    this.callIsActive = false;
 	    this.shownMessages = {};
 	    this.attachments = new MegaDataMap(this);
-	    this.images = new MegaDataSortedMap("k", "delay", this);
+	    this.images = new MegaDataSortedMap("id", "delay", this);
 
 	    this.options = {
 
@@ -10369,7 +10488,11 @@ React.makeElement = React['createElement'];
 	};
 
 	ChatRoom.prototype.setActive = function () {
-	    loadSubPage(this.getRoomUrl());
+
+	    var self = this;
+	    Soon(function () {
+	        loadSubPage(self.getRoomUrl());
+	    });
 	};
 
 	ChatRoom.prototype.getRoomUrl = function () {

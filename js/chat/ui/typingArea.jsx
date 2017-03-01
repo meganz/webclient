@@ -150,18 +150,10 @@ var TypingArea = React.createClass({
         var $container = $(ReactDOM.findDOMNode(self));
         var val = $.trim($('.chat-textarea:visible textarea:visible', $container).val());
 
-        if (val.length > 0) {
-            if (self.onConfirmTrigger(val) !== true) {
-                self.setState({typedMessage: ""});
-            }
-            self.triggerOnUpdate();
-            return;
+        if (self.onConfirmTrigger(val) !== true) {
+            self.setState({typedMessage: ""});
         }
-        else {
-            // if the val is empty, then trigger a cancel edit message...
-            self.onCancelClicked(e);
-        }
-
+        self.triggerOnUpdate();
     },
     onConfirmTrigger: function(val) {
         var result = this.props.onConfirm(val);

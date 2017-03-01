@@ -2975,10 +2975,15 @@ mThumbHandler.add('SVG', function SVGThumbHandler(ab, cb) {
         canvas.height = image.height;
         canvas.width = image.width;
         ctx.drawImage(image, 0, 0);
-        cb(dataURLToAB(canvas.toDataURL('image/jpeg')));
+        cb(dataURLToAB(canvas.toDataURL('image/png')));
     };
-    image.src = 'data:image/svg+xml;charset-utf-8,' + encodeURIComponent(ab_to_str(ab));
+    image.src = 'data:image/svg+xml;charset=utf-8,'
+        + encodeURIComponent(ab_to_str(ab).replace(/foreignObject|script/g, 'desc'));
 });
+
+if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop()) | 0) < 56) {
+    delete mThumbHandler.sup.SVG;
+}
 
 var storedattr = {};
 var faxhrs = [];
@@ -3902,7 +3907,7 @@ var newmissingkeys = false;
 
 // whenever a node fails to decrypt, call this.
 function crypto_reportmissingkey(n) {
-    if (typeof n.k == 'string') {
+    if (!M.d[n.h] || typeof M.d[n.h].k === 'string') {
         var change = false;
 
         if (!missingkeys[n.h]) {
@@ -3934,7 +3939,7 @@ function crypto_reportmissingkey(n) {
     else {
         console.error('invalid-missingkey ' + n.h, change);
 
-        srvlog2('invalid-missingkey', n.h, typeof n.k, Object(n.k).length | 0);
+        //srvlog2('invalid-missingkey', n.h, typeof n.k, Object(n.k).length | 0);
     }
 }
 
@@ -4483,15 +4488,15 @@ function api_strerror(errno) {
     };
 
     // returns the position after the end of the JSON string at o or -1 if none found
-    // must be called with s[o] == '"', or will never terminate
-    JSONSplitter.prototype.stringre = /^"(((?=\\)\\(["\\\/bfnrt]|u[0-9a-fA-F]{4}))|[^"\\\0-\x1F\x7F]+)*$/;
-
+    // (does not perform a full validity check on the string)
     JSONSplitter.prototype.strend = function strend(s, o) {
         var oo = o;
 
-        // (we do not set lastIndex and use RegExp.exec() with /g due to the potentially enormous length of s)
+        // find non-escaped "
         while ((oo = s.indexOf(this.fromchar('"'), oo+1)) >= 0) {
-            if (this.stringre.test(this.tostring(this.sub(s, o, oo-o)))) {
+            for (var e = oo; this.tochar(s[--e]) == '\\'; );
+
+            if ((oo-e) & 1) {
                 return oo+1;
             }
         }

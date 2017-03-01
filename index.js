@@ -322,8 +322,8 @@ function init_page() {
         }
 
         n_h = pfid;
-        if (!flhashchange || pfkey !== oldPFKey || pfkey === false) {
-            if (pfkey) {
+        if (!flhashchange || pfkey !== oldPFKey || pfkey.length !== 22) {
+            if (pfkey.length === 22) {
                 api_setfolder(n_h);
                 if (waitxhr) {
                     waitsc();
@@ -334,10 +334,12 @@ function init_page() {
                 // Insert placeholder page while waiting for user input
                 parsepage(pages['placeholder']);
 
-                return mKeyDialog(pfid, true)
+                mKeyDialog(pfid, true, pfkey)
                     .fail(function() {
                         loadSubPage('start');
                     });
+                pfkey = false;
+                return;
             }
         }
         if (pfhandle) {
@@ -2145,6 +2147,7 @@ function loadSubPage(tpage, event)
     else {
         init_page();
     }
+    mBroadcaster.sendMessage('pagechange');
 }
 
 

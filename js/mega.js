@@ -1616,7 +1616,6 @@ function MegaData()
             }
             else {
                 if (window.location.pathname !== "/"+newHashLocation && !pfid) {
-                    history.pushState({ fmpage: newHashLocation }, "", "/"+newHashLocation);
                     loadSubPage(newHashLocation);
                 }
                 else if (pfid && document.location.hash !== '#'+newHashLocation) {
@@ -3754,13 +3753,6 @@ function MegaData()
                         ctx.account.downbw_used = 0;
 
                     M.account = ctx.account;
-
-                    if (M.maf) {
-                        // Add achieved storage quota
-                        ctx.account.space += M.maf.storage.current;
-                        // Add achieved transfer quota
-                        ctx.account.bw += M.maf.transfer.current;
-                    }
 
                     if (ctx.cb)
                         ctx.cb(ctx.account);
@@ -6583,9 +6575,9 @@ function execsc() {
                                                 delete u_sharekeys[a.n];
 
                                                 if (fmdb) {
-                                                    M.nodeUpdated(n);
                                                     fmdb.del('s', a.u + '*' + a.n);
                                                 }
+                                                M.nodeUpdated(n);
                                             }
                                             else {
                                                 // toplevel share: delete entire tree
@@ -9231,12 +9223,11 @@ Object.defineProperty(mega, 'achievem', {
                         value: time
                     };
 
-                    // TODO: translate this
                     switch (unit) {
-                        case 'd': result.utxt = (time < 2) ? 'day'   : 'days';    break;
-                        case 'w': result.utxt = (time < 2) ? 'week'  : 'weeks';   break;
-                        case 'm': result.utxt = (time < 2) ? 'month' : 'months';  break;
-                        case 'y': result.utxt = (time < 2) ? 'year'  : 'years';   break;
+                        case 'd': result.utxt = (time < 2) ? l[930]   : l[16290];  break;
+                        case 'w': result.utxt = (time < 2) ? l[16292] : l[16293];  break;
+                        case 'm': result.utxt = (time < 2) ? l[913]   : l[6788];   break;
+                        case 'y': result.utxt = (time < 2) ? l[932]   : l[16294];  break;
                     }
 
                     out = out || data;
@@ -9260,19 +9251,10 @@ Object.defineProperty(mega, 'achievem', {
                         setExpiry(data[ach.a]);
                     }
                     var exp = setExpiry(mafr[ach.r] || data[ach.a], ach);
-
                     var ts = ach.ts * 1000;
-                    var date = moment(ts);
-
-                    switch (exp.unit) {
-                        case 'd': date.add(exp.value, 'days');    break;
-                        case 'w': date.add(exp.value, 'weeks');   break;
-                        case 'm': date.add(exp.value, 'months');  break;
-                        case 'y': date.add(exp.value, 'years');   break;
-                    }
 
                     ach.date = new Date(ts);
-                    ach.left = Math.round(date.diff(ach.date) / 86400000);
+                    ach.left = Math.round((ach.e * 1000 - Date.now()) / 86400000);
 
                     if (data[ach.a].rwds) {
                         data[ach.a].rwds.push(ach);
@@ -9562,7 +9544,7 @@ function fm_thumbnails()
 
 function fm_thumbnail_render(n) {
     if (n && thumbnails[n.h]) {
-        var imgNode = document.getElementById(n.h);
+        var imgNode = document.getElementById(n.imgId || n.h);
 
         if (imgNode && (imgNode = imgNode.querySelector('img'))) {
             n.seen = 2;
@@ -9883,3 +9865,87 @@ var mobileDownload = {
         }
     }
 };
+
+
+(function() {
+    mBroadcaster.once('boot_done', function() {
+        if (
+            ua.details.browser === "Safari" ||
+            ua.details.browser === "Edge" ||
+            ua.details.browser === "Internet Explorer"
+        ) {
+            return;
+        }
+        // Didn't found a better place for this, so I'm leaving it here...
+        // This is basically a proxy of on paste, that would trigger a new event, which would receive the actual
+        // File object, name, etc.
+        $(document).on('paste', function (event) {
+            if (ua.details.browser === "Safari") {
+                // Safari is not supported
+                return;
+            }
+            else if (
+                ua.details.browser.toLowerCase().indexOf("explorer")  !== -1 ||
+                ua.details.browser.toLowerCase().indexOf("edge")  !== -1
+            ) {
+                // IE is not supported
+                return;
+            }
+
+            var items = (event.clipboardData || event.originalEvent.clipboardData).items;
+            if (!items && event.originalEvent.clipboardData && event.originalEvent.clipboardData.files) {
+                // safari
+                items = event.originalEvent.clipboardData.files;
+            }
+            var fileName = false;
+
+            var blob = null;
+            if (items) {
+                if (ua.details.browser === "Firefox" && items.length === 2) {
+                    // trying to paste an image, but .. FF does not have support for that. (It adds the file icon as
+                    // the image, which is a BAD UX, so .. halt now!)
+                    return;
+                }
+                for (var i = 0; i < items.length; i++) {
+                    if (items[i].type.indexOf("image") === 0) {
+                        if (items[i] instanceof File) {
+                            // Safari, using .files
+                            blob = items[i];
+                        }
+                        else {
+                            blob = items[i].getAsFile();
+                        }
+                    }
+                    else if (items[i].kind === "string") {
+                        items[i].getAsString(function (str) {
+                            fileName = str;
+                        });
+                    }
+                }
+            }
+
+            if (blob !== null) {
+                if (fileName) {
+                    // we've got the name of the file...
+                    blob.name = fileName;
+                }
+
+                if (!blob.name) {
+                    // no name found..generate dummy name.
+                    var ext = blob.type.replace("image/", "").toLowerCase();
+                    fileName = blob.name = "image." + (ext === "jpeg" ? "jpg" : ext);
+                }
+
+                var simulatedEvent = new $.Event("pastedimage");
+                $(window).trigger(simulatedEvent, [blob, fileName]);
+
+                // was this event handled and preventing default? if yes, prevent the raw event from pasting the
+                // file name text
+                if (simulatedEvent.isDefaultPrevented()) {
+                    event.preventDefault();
+                    return false;
+                }
+            }
+        });
+    });
+})();

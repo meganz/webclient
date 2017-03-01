@@ -185,6 +185,9 @@ var BrowserEntries = React.createClass({
         e.preventDefault();
 
         this.setState({'highlighted': [node.h]});
+        if (this.props.onHighlighted) {
+            this.props.onHighlighted([node.h]);
+        }
         // If folder selected
         if (this.props.folderSelectNotAllowed === true && node.t === 1) {
             this.setState({'selected': []});
@@ -204,6 +207,7 @@ var BrowserEntries = React.createClass({
             // expand folder
             self.setState({'selected': [], 'highlighted': []});
             self.props.onSelected([]);
+            self.props.onHighlighted([]);
             self.props.onExpand(node);
             self.forceUpdate();
         }
@@ -319,6 +323,7 @@ var CloudBrowserDialog = React.createClass({
     getDefaultProps: function() {
         return {
             'selectLabel': __(l[8023]),
+            'openLabel': __(l[1710]),
             'cancelLabel': __(l[82]),
             'hideable': true
         }
@@ -435,6 +440,13 @@ var CloudBrowserDialog = React.createClass({
         this.setState({'selected': nodes});
         this.props.onSelected(nodes);
     },
+    onHighlighted: function(nodes) {
+        this.setState({'highlighted': nodes});
+
+        if (this.props.onHighlighted) {
+            this.props.onHighlighted(nodes);
+        }
+    },
     onAttachClicked: function() {
         this.props.onAttachClicked();
     },
@@ -445,6 +457,8 @@ var CloudBrowserDialog = React.createClass({
         var self = this;
 
         var classes = "add-from-cloud " + self.props.className;
+
+        var folderIsHighlighted = false;
 
         var breadcrumb = [];
 
@@ -471,7 +485,8 @@ var CloudBrowserDialog = React.createClass({
                         e.preventDefault();
                         e.stopPropagation();
                         self.setState({'currentlyViewedEntry': p.h, 'selected': []});
-                        self.props.onSelected([]);
+                        self.onSelected([]);
+                        self.onHighlighted([]);
                     }}>
                         <span className="right-arrow-bg invisible">
                             <span>{p.h === M.RootID ? __("Cloud Drive") : p.name}</span>
@@ -481,6 +496,70 @@ var CloudBrowserDialog = React.createClass({
             })(p);
         } while (p = M.d[M.d[p.h].p]);
 
+        self.state.highlighted.forEach(function(nodeId) {
+            if (M.d[nodeId] && M.d[nodeId].t === 1) {
+                folderIsHighlighted = true;
+            }
+        });
+
+        var buttons = [];
+
+        window.asdf = self;
+
+        if (!folderIsHighlighted) {
+            buttons.push(
+                {
+                    "label": self.props.selectLabel,
+                    "key": "select",
+                    "className": "default-grey-button "
+                    + (self.state.selected.length === 0 ? "disabled" : null),
+                    "onClick": function(e) {
+                        if (self.state.selected.length > 0) {
+                            self.props.onSelected(self.state.selected);
+                            self.props.onAttachClicked();
+                        }
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                }
+            )
+        }
+        else if (folderIsHighlighted) {
+            buttons.push(
+                {
+                    "label": self.props.openLabel,
+                    "key": "select",
+                    "className": "default-grey-button",
+                    "onClick": function(e) {
+                        if (self.state.highlighted.length > 0) {
+                            self.setState({'currentlyViewedEntry':
+                                self.state.highlighted[0]
+                            });
+                            self.onSelected([]);
+                            self.onHighlighted([]);
+                            self.browserEntries.setState({
+                                'selected': [],
+                                'highlighted': []
+                            });
+                        }
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                }
+            )
+        }
+
+        buttons.push(
+            {
+                "label": self.props.cancelLabel,
+                "key": "cancel",
+                "onClick": function(e) {
+                    self.props.onClose(self);
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            }
+        );
 
         return (
             <ModalDialog
@@ -490,31 +569,7 @@ var CloudBrowserDialog = React.createClass({
                     self.props.onClose(self);
                 }}
                 popupDidMount={self.onPopupDidMount}
-                buttons={[
-                        {
-                            "label": self.props.selectLabel,
-                            "key": "select",
-                            "className": "default-grey-button "
-                                + (self.state.selected.length === 0 ? "disabled" : null),
-                            "onClick": function(e) {
-                                if (self.state.selected.length > 0) {
-                                    self.props.onSelected(self.state.selected);
-                                    self.props.onAttachClicked();
-                                }
-                                e.preventDefault();
-                                e.stopPropagation();
-                            }
-                        },
-                        {
-                            "label": self.props.cancelLabel,
-                            "key": "cancel",
-                            "onClick": function(e) {
-                                self.props.onClose(self);
-                                e.preventDefault();
-                                e.stopPropagation();
-                            }
-                        },
-            ]}>
+                buttons={buttons}>
                 <div className="fm-breadcrumbs-block add-from-cloud">
                     <div className="breadcrumbs-wrapper">
                         {breadcrumb}
@@ -536,11 +591,19 @@ var CloudBrowserDialog = React.createClass({
                 <BrowserEntries
                     entries={self.getEntries()}
                     onExpand={(node) => {
+                        self.onSelected([]);
+                        self.onHighlighted([]);
                         self.setState({'currentlyViewedEntry': node.h});
                     }}
                     folderSelectNotAllowed={self.props.folderSelectNotAllowed}
                     onSelected={self.onSelected}
+                    onHighlighted={self.onHighlighted}
                     onAttachClicked={self.onAttachClicked}
+                    ref={
+                        (browserEntries) => {
+                            self.browserEntries = browserEntries;
+                        }
+                    }
                 />
             </ModalDialog>
         );
@@ -559,12 +622,14 @@ var SelectContactDialog = React.createClass({
     },
     getInitialState: function() {
         return {
-            'selected': []
+            'selected': this.props.selected ? this.props.selected : []
         }
     },
     onSelected: function(nodes) {
         this.setState({'selected': nodes});
-        this.props.onSelected(nodes);
+        if (this.props.onSelected) {
+            this.props.onSelected(nodes);
+        }
         this.forceUpdate();
     },
     onSelectClicked: function() {
@@ -580,6 +645,7 @@ var SelectContactDialog = React.createClass({
             <ModalDialog
                 title={__("Send Contact")}
                 className={classes}
+                selected={self.state.selected}
                 onClose={() => {
                     self.props.onClose(self);
                 }}
@@ -590,8 +656,10 @@ var SelectContactDialog = React.createClass({
                             "className": self.state.selected.length === 0 ? "disabled" : null,
                             "onClick": function(e) {
                                 if (self.state.selected.length > 0) {
-                                    self.props.onSelected(self.state.selected);
-                                    self.props.onSelectClicked();
+                                    if (self.props.onSelected) {
+                                        self.props.onSelected(self.state.selected);
+                                    }
+                                    self.props.onSelectClicked(self.state.selected);
                                 }
                                 e.preventDefault();
                                 e.stopPropagation();
@@ -615,24 +683,26 @@ var SelectContactDialog = React.createClass({
                     var contactHash = contact.h;
 
                         // differentiate between a click and a double click.
-                        if ((new Date() - self.clickTime) < 500) {
+                        if (contactHash === self.lastClicked && (new Date() - self.clickTime) < 500) {
                             // is a double click
                             self.onSelected([contact.h]);
-                            self.props.onSelectClicked();
+                            self.props.onSelectClicked([contact.h]);
                         }
                         else {
+                            var selected = clone(self.state.selected);
+
                             // is a single click
                             if (self.state.selected.indexOf(contactHash) === -1) {
-                                self.state.selected.push(contact.h);
-                                self.onSelected(self.state.selected);
+                                selected.push(contact.h);
+                                self.onSelected(selected);
                             }
                             else {
-                                removeValue(self.state.selected, contactHash);
-                                self.onSelected(self.state.selected);
+                                removeValue(selected, contactHash);
+                                self.onSelected(selected);
                             }
                         }
                         self.clickTime = new Date();
-
+                        self.lastClicked = contactHash;
                 }}
                 selected={self.state.selected}
                 headerClasses="left-aligned"

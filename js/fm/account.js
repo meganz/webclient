@@ -105,7 +105,14 @@ accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, pe
 
     // Only call this if the call of this function is the first one, made by fm.js -> accountUI
     if (autoaway === undefined) {
-        $(presenceInt).rebind('settingsUIUpdated.settings', function(e, autoaway, autoawaylock, autoawaytimeout, persist, persistlock) {
+        $(presenceInt).rebind('settingsUIUpdated.settings', function(
+            e,
+            autoaway,
+            autoawaylock,
+            autoawaytimeout,
+            persist,
+            persistlock
+        ) {
             accountUI.advancedSection(autoaway, autoawaylock, autoawaytimeout, persist, persistlock);
         });
 
@@ -133,7 +140,14 @@ accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, pe
                 _initPresenceRadio(presence);
             }
         });
-        $(presenceInt).rebind('settingsUIUpdated.settings', function(e, autoaway, autoawaylock, autoawaytimeout, persist, persistlock) {
+        $(presenceInt).rebind('settingsUIUpdated.settings', function(
+            e,
+            autoaway,
+            autoawaylock,
+            autoawaytimeout,
+            persist,
+            persistlock
+        ) {
             accountUI.advancedSection(autoaway, autoawaylock, autoawaytimeout, persist, persistlock);
         });
     }

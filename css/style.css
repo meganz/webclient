@@ -4797,7 +4797,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     color: #999999 !important;
     padding-left: 15px;
 }
-.top-menu-item.green, .upgrade-your-account.green:hover {
+.free .top-menu-item.upgrade-your-account, .free .top-menu-item.upgrade-your-account:hover {
     color: #31B500;
 }
 .top-menu-divider {

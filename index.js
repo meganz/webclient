@@ -1332,7 +1332,7 @@ function topmenuUI() {
     }
 
     $('.top-icon.warning').addClass('hidden');
-    $('.top-menu-item.upgrade-your-account.green,.top-menu-item.backup').addClass('hidden');
+    $('.top-menu-item.upgrade-your-account,.top-menu-item.backup').addClass('hidden');
     $('.top-menu-item.logout').addClass('hidden');
     $('.top-menu-item.register,.top-menu-item.login').addClass('hidden');
     $('.top-menu-item.account').addClass('hidden');
@@ -1435,7 +1435,7 @@ function topmenuUI() {
             }
 
             // Show the 'Upgrade your account' button in the main menu for all
-            $('.top-menu-item.upgrade-your-account.green').addClass('hidden');
+            $('.top-menu-item.upgrade-your-account').removeClass('hidden');
             $('.membership-icon-pad .membership-big-txt.plan-txt').text(purchasedPlan);
             $('.membership-icon-pad .membership-icon').attr('class', 'membership-icon pro' + u_attr.p);
             $('.membership-status-block i').attr('class', 'tiny-icon membership-status ' + cssClass);
@@ -1444,7 +1444,7 @@ function topmenuUI() {
         }
         else {
             // Show the free badge
-            $('.top-menu-item.upgrade-your-account.green').removeClass('hidden');
+            $('.top-menu-item.upgrade-your-account').removeClass('hidden');
             $('.membership-icon').attr('class','membership-icon');
             $('.top-menu-item.account .right-el').text('FREE');
             $('.membership-status').attr('class', 'tiny-icon membership-status free');
@@ -1483,7 +1483,7 @@ function topmenuUI() {
             }
         }
 
-        $('.top-menu-item.upgrade-your-account.green').addClass('hidden');
+        $('.top-menu-item.upgrade-your-account').addClass('hidden');
         $('.membership-status-block').hide();
         $('.top-icon.notification').hide();
         $('.top-icon.achievements').hide();

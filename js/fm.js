@@ -3607,7 +3607,7 @@ function accountUI() {
 
             $('.account.plan-info.accounttype span').text(planText);
             $('.small-icon.membership').addClass('pro' + planNum);
-            $('.default-white-button.upgrade-to-pro').addClass('hidden');
+            $('.default-white-button.upgrade-to-pro span').text(l[433]);
 
             // Subscription
             if (account.stype == 'S') {
@@ -3669,14 +3669,13 @@ function accountUI() {
             $('.account.plan-info.expiry').text(l[436]);
             $('.btn-cancel').addClass('hidden');
             $('.account.plan-info-row.bandwidth').hide();
-            $('.default-white-button.upgrade-to-pro')
-                .removeClass('hidden')
-                .rebind('click', function() {
-                    loadSubPage('pro');
-                });
+            $('.default-white-button.upgrade-to-pro span').text(l[5814]);
         }
 
-
+        // Upgrade Account Button
+        $('.default-white-button.upgrade-to-pro').rebind('click', function() {
+            loadSubPage('pro');
+        });
 
         // Maximum disk space
         $('.account.plan-info.storage span').text(bytesToSize(account.space, 0));

@@ -15894,5 +15894,9 @@
     "16329": {
         "text": "Use Settings -> Advanced -> Transfers to enable it again.",
         "context": "This message is shown in a confirmation dialog for ongoing transfers. It explains how to re-enable the ongoing transfers popup dialog."
+    },
+    "16330": {
+        "text": "Secure communication using user-controlled end-to-end encryption for text chat (mobile apps and in the browser) and voice \/ video (currently only in the browser; mobile coming soon), unified across all your devices.",
+        "context": "Describes chat features"
     }
 }

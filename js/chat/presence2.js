@@ -314,8 +314,10 @@ UserPresence.prototype.reconnect = function presence_reconnect(self) {
                     console.error(
                         (new Date()).toISOString(),
                         "PRESENCE INCOMING:",
-                        "\nb64:", ab_to_base64(m.data),"\n",
-                        JSON.stringify(self.incomingDataAsReadableCommand(m.data), null, 4, "\t")
+                        UserPresence.commandDebugDataAsPrettyString(
+                            self.incomingDataAsReadableCommand(m.data)
+                        ),
+                        "b64:", ab_to_base64(m.data)
                     );
                 }
 
@@ -464,8 +466,10 @@ UserPresence.prototype.sendstring = function presence_sendstring(s) {
         console.error(
             (new Date()).toISOString(),
             "PRESENCE OUTGOING:",
-            "\nb64:", ab_to_base64(u.buffer),"\n",
-            JSON.stringify(this.outgoingDataAsReadableCommand(u.buffer), null, 4, "\t")
+            UserPresence.commandDebugDataAsPrettyString(
+                this.outgoingDataAsReadableCommand(u.buffer)
+            ),
+            "b64:", ab_to_base64(u.buffer)
         );
     }
 
@@ -640,6 +644,18 @@ if (PRESENCE2_DEBUG) {
     });
 }
 
+UserPresence.commandDebugDataAsPrettyString = function(arr) {
+    var out = "";
+    arr.forEach(function(cmd) {
+        var cmdName = cmd.shift();
+        out += cmdName + " => (";
+        out += cmd.map(function(args) {
+            return JSON.stringify(args)
+        }).join(",");
+        out += ")\n";
+    })
+    return out;
+};
 /**
  * This is a development-only method that is used for converting the binary commands to readable strings (array/list of
  * strings)
@@ -671,7 +687,7 @@ UserPresence.prototype.incomingDataAsReadableCommand = function(ab) {
                     "OPCODE_PEERSTATUS",
                     "userhash = " + userhash,
                     "presence = " + presence,
-                    "isWebrtcFlag = " + isWebrtcFlag === true ? "true" : "false"
+                    "isWebrtcFlag = " + isWebrtcFlag
                 ]);
 
 
@@ -688,9 +704,20 @@ UserPresence.prototype.incomingDataAsReadableCommand = function(ab) {
                     ]);
                 }
                 else {
+                    var presence = (newprefs & 3)+UserPresence.PRESENCE.OFFLINE;
+                    var persist = !!(newprefs & 4);
+                    var autoawayactive = !(newprefs & 8);
+                    var autoawaytimeout = newprefs >> 4;
+                    if (autoawaytimeout > 600) {
+                        autoawaytimeout = Math.floor((autoawaytimeout-600)/60)+600;
+                    }
+
                     output.push([
                         "OPCODE_PREFS",
-                        "prefs = " + newprefs
+                        "presence = " + constStateToText(UserPresence.PRESENCE, presence),
+                        "persist = " + persist,
+                        "autoawayactive = " + autoawayactive,
+                        "autoawaytimeout = " + autoawaytimeout,
                     ]);
                 }
 
@@ -792,19 +819,26 @@ UserPresence.prototype.outgoingDataAsReadableCommand = function(ab) {
                 break;
 
             case 7: // PREFS
-                var timeout = u[p+1] + (u[p+2] << 8);
+                var newprefs = u[p+1] + (u[p+2] << 8);
 
-                var flags = timeout & 15;
-                timeout >>= 4;
+                var flags = newprefs & 15;
 
-                if (timeout > 600) {
-                    timeout = (timeout-600)*60+600;
+                var presence = (newprefs & 3)+UserPresence.PRESENCE.OFFLINE;
+                var persist = !!(newprefs & 4);
+                var autoawayactive = !(newprefs & 8);
+                var autoawaytimeout = newprefs >> 4;
+                if (autoawaytimeout > 600) {
+                    autoawaytimeout = Math.floor((autoawaytimeout-600)/60)+600;
                 }
+
 
                 output.push([
                     "PREFS",
                     "prefs flags = " + flags,
-                    "prefs seconds = " + timeout,
+                    "presence = " + constStateToText(UserPresence.PRESENCE, presence),
+                    "persist = " + persist,
+                    "autoawayactive = " + autoawayactive,
+                    "autoawaytimeout = " + autoawaytimeout,
                 ]);
 
                 p += 3

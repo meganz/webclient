@@ -10,6 +10,10 @@ accountUI.initCheckbox = function(className, $container, currentValue, onChangeC
     var $input = $('input[type="checkbox"]', $wrapperDiv);
 
     $wrapperDiv.rebind('click.checkbox', function() {
+        if ($wrapperDiv.is('.disabled')) {
+            return;
+        }
+
         if ($input.hasClass('checkboxOn')) {
             var res = onChangeCb(false);
             if (res !== false) {
@@ -41,6 +45,15 @@ accountUI.initCheckbox.uncheck = function($input, $wrapperDiv) {
     $wrapperDiv.removeClass('checkboxOn').addClass('checkboxOff');
 };
 
+accountUI.initCheckbox.enable = function(className, $container) {
+    var $wrapperDiv = $('.' + className, $container);
+    $wrapperDiv.removeClass('disabled');
+};
+accountUI.initCheckbox.disable = function(className, $container) {
+    var $wrapperDiv = $('.' + className, $container);
+    $wrapperDiv.addClass('disabled');
+};
+
 accountUI.initRadio = function(className, $container, currentValue, onChangeCb) {
     $('.' + className, $container).removeClass('radioOn').addClass('radioOff');
 
@@ -57,14 +70,35 @@ accountUI.initRadio = function(className, $container, currentValue, onChangeCb) 
     accountUI.initRadio.setValue(className, currentValue, $container);
 };
 accountUI.initRadio.setValue = function(className, newVal, $container) {
+    var $input = $('input.' + className + '[value="' + newVal + '"]', $container);
+    if ($input.is('.disabled')) {
+        return;
+    }
+
     $('.' + className + '.radioOn', $container)
         .addClass('radioOff').removeClass('radioOn');
 
-    var $input = $('input.' + className + '[value="' + newVal + '"]', $container)
+
+    $input
         .removeClass('radioOff').addClass('radioOn')
         .attr('checked', 1);
+
     $input.parent().addClass('radioOn').removeClass('radioOff');
 };
+
+
+accountUI.initRadio.disable = function($input) {
+    $('input.[value="' + newVal + '"]', $container)
+        .addClass('disabled')
+        .attr('disabled', 1);
+};
+
+accountUI.initRadio.enable = function(value, $container) {
+    $('input.[value="' + newVal + '"]', $container)
+        .removeClass('disabled')
+        .removeAttr('disabled');
+};
+
 
 accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, persist, persistlock) {
     var presenceInt = megaChat.plugins.presencedIntegration;
@@ -102,9 +136,6 @@ accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, pe
         $(presenceInt).rebind('settingsUIUpdated.settings', function(e, autoaway, autoawaylock, autoawaytimeout, persist, persistlock) {
             accountUI.advancedSection(autoaway, autoawaylock, autoawaytimeout, persist, persistlock);
         });
-        $(presenceInt.userPresence).rebind('onDisconnected.settings', function(e) {
-            _initPresenceRadio(UserPresence.PRESENCE.OFFLINE);
-        });
     }
 
     _initPresenceRadio(presenceInt.getPresence(u_handle));
@@ -118,8 +149,6 @@ accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, pe
     };
 
     if (autoawaytimeout !== false) {
-        // FIXME: prevent changes to persist-presence and autoaway
-        // if persistlock/autoawaylock are set
 
         accountUI.initCheckbox(
             'persist-presence',
@@ -128,11 +157,24 @@ accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, pe
             persistChangeRequestedHandler
         );
 
+
+        // prevent changes to persist-presence if persistlock is set
+        accountUI.initCheckbox[autoawaylock ? "disable" : "enable"](
+            'persist-presence',
+            $sectionContainerChat
+        );
+
         accountUI.initCheckbox(
             'autoaway',
             $sectionContainerChat,
             autoaway,
             autoawayChangeRequestHandler
+        );
+
+        // prevent changes to autoaway if autoawaylock is set
+        accountUI.initCheckbox[autoawaylock ? "disable" : "enable"](
+            'autoaway',
+            $sectionContainerChat
         );
 
         // always editable for user comfort -

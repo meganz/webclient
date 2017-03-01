@@ -225,9 +225,6 @@ ConnectionRetryManager.prototype.startedConnecting = function(waitForPromise, de
 ConnectionRetryManager.prototype.doConnectionRetry = function(immediately){
     var self = this;
 
-
-    self.logger.error("doConnectionRetry", immediately);
-
     if (self._$connectingPromise && self._connectionRetries >= self.options.maxConnectionRetries) {
         self._$connectingPromise.reject(arguments);
     }

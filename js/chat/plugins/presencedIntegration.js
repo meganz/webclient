@@ -62,11 +62,6 @@ var PresencedIntegration = function(megaChat) {
         }
     });
 
-
-    $(self.userPresence).rebind('onDisconnected.presencedInt', function() {
-        console.error('yup, onDiss2');
-        self.trigger('onDisconnected');
-    });
     return self;
 };
 
@@ -121,6 +116,15 @@ PresencedIntegration.prototype.init = function() {
         false,
         function presencedIntegration_connectedcb(isConnected) {
             self.logger.debug(isConnected ? "connected" : "disconnected");
+
+            // set my own presence
+            M.u.forEach(function(v, k) {
+                if (k !== u_handle) {
+                    v.presence = 'unavailable';
+                }
+            });
+
+            megaChat.renderMyStatus();
         },
         self._peerstatuscb.bind(self),
         self._updateuicb.bind(self)
@@ -150,12 +154,6 @@ PresencedIntegration.prototype.init = function() {
         userPresence.addremovepeers(contactHashes);
     });
 
-    $(userPresence).rebind('onDisconnected.presencedIntegration', function(e) {
-        // set my own presence
-        M.u.forEach(function(v, k) {
-            v.presence = 'unavailable';
-        });
-    });
 
     // if (!localStorage.userPresenceIsOffline) {
         userPresence.connectionRetryManager.requiresConnection();
@@ -168,7 +166,7 @@ PresencedIntegration.prototype._updateuicb = function presencedIntegration_updat
     autoawaylock,
     autoawaytimeout,
     persist,
-    persistlock,
+    persistlock
 ) {
     var self = this;
 

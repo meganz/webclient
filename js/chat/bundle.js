@@ -344,7 +344,6 @@ React.makeElement = React['createElement'];
 	        if (!contact) {
 	            return;
 	        }
-	        console.error("karere.onPresence", contact.u, megaChat.karere.getPresence(megaChat.getJidFromNodeId(contact.u)));
 
 	        if (contact) {
 	            var presencedPresence = self.plugins.presencedIntegration.getPresence(contact.u);
@@ -454,23 +453,13 @@ React.makeElement = React['createElement'];
 	                });
 	            });
 	        } else {
-	            if (presence === Karere.PRESENCE.OFFLINE) {
-	                self.karere.setPresence(presence, undefined, localStorage.megaChatPresenceMtime);
-	                self.karere.connectionRetryManager.resetConnectionRetries();
-	                self.karere.disconnect();
-	                localStorage.userPresenceIsOffline = 1;
-	            } else {
-	                self.karere.connectionRetryManager.resetConnectionRetries();
-	                self.karere.setPresence(presence, undefined, localStorage.megaChatPresenceMtime);
-	            }
+	            self.karere.connectionRetryManager.resetConnectionRetries();
+	            self.karere.setPresence(presence, undefined, localStorage.megaChatPresenceMtime);
 	        }
 
 	        var targetPresence = PresencedIntegration.cssClassToPresence(presence);
-	        if (targetPresence === UserPresence.PRESENCE.OFFLINE) {
-	            self.userPresence.disconnect(true);
-	        } else {
-	            self.plugins.presencedIntegration.setPresence(targetPresence);
-	        }
+
+	        self.plugins.presencedIntegration.setPresence(targetPresence);
 
 	        if (presence !== Karere.PRESENCE.OFFLINE) {
 
@@ -478,14 +467,6 @@ React.makeElement = React['createElement'];
 	                var v = self.plugins.chatdIntegration.chatd.shards[k];
 	                v.connectionRetryManager.requiresConnection();
 	            });
-	        }
-	        if (presence === Karere.PRESENCE.OFFLINE) {
-	            Object.keys(self.plugins.chatdIntegration.chatd.shards).forEach(function (k) {
-	                var v = self.plugins.chatdIntegration.chatd.shards[k];
-	                v.connectionRetryManager.options.functions.forceDisconnect(v.connectionRetryManager);
-	            });
-	            var presenceConnMan = self.plugins.presencedIntegration.userPresence.connectionRetryManager;
-	            presenceConnMan.options.functions.forceDisconnect(presenceConnMan);
 	        }
 	    });
 

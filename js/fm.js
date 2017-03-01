@@ -13066,7 +13066,8 @@ function bindDropdownEvents($dropdown, saveOption, contentBlock) {
             if (jsp && $activeDropdownItem.length) {
                 jsp.scrollToElement($activeDropdownItem);
             }
-        } else {
+        }
+        else if (!$(e.target).parents('.jspVerticalBar').length) {
             $this.find('.default-select-dropdown').addClass('hidden');
             $this.removeClass('active');
         }

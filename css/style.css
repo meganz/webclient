@@ -9499,7 +9499,11 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     width: 4px;
 }
 .default-select-dropdown .jspVerticalBar {
-    width: 6px;
+    width: auto;
+}
+.default-select-dropdown .jspTrack {
+    padding: 0 2px 0 8px;
+    
 }
 .default-select-scroll {
     max-height: 288px;

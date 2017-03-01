@@ -103,12 +103,13 @@ Chatd.Opcode = {
     'RANGE' : 9,
     'NEWMSGID' : 10,
     'REJECT' : 11,
+    'BROADCAST' : 12,
     'HISTDONE' : 13,
     'NEWKEY' : 17,
     'KEYID' : 18,
     'JOINRANGEHIST' : 19,
     'MSGUPDX' : 20,
-    'MSGID' : 21
+    'MSGID' : 21,
 };
 
 // privilege levels
@@ -743,6 +744,18 @@ Chatd.Shard.prototype.exec = function(a) {
                 len = 18;
                 break;
 
+            case Chatd.Opcode.BROADCAST:
+                self.keepAliveTimerRestart();
+
+                self.chatd.trigger('onBroadcast', {
+                    chatId: base64urlencode(cmd.substr(1, 8)),
+                    userId: base64urlencode(cmd.substr(9, 8)),
+                    bCastCode: cmd.substr(17, 1)
+                });
+
+                len = 18;
+                break;
+
             case Chatd.Opcode.HISTDONE:
                 self.keepAliveTimerRestart();
                 self.logger.log("History retrieval finished: " + base64urlencode(cmd.substr(1,8)));
@@ -1107,6 +1120,13 @@ Chatd.Messages.prototype.clearpending = function() {
     this.sendingbuf = {};
 };
 
+Chatd.Messages.prototype.broadcast = function(bCastCode) {
+    var self = this;
+    var chatId = self.chatId;
+
+    this.chatd.cmd(Chatd.Opcode.BROADCAST, chatId, base64urldecode(u_handle) + bCastCode);
+};
+
 /**
  * Resend all (OR only a specific) messages
  * @param [restore] {Boolean}
@@ -1270,6 +1290,14 @@ Chatd.prototype.msgmodify = function(chatId, userid, msgid, updated, keyid, msg)
     // an existing message has been modified
     if (this.chatIdMessages[chatId]) {
         this.chatIdMessages[chatId].msgmodify(userid, msgid, updated, keyid, msg);
+    }
+};
+
+// send broadcast
+Chatd.prototype.broadcast = function(chatId, bCastCode) {
+    // an existing message has been modified
+    if (this.chatIdMessages[chatId]) {
+        this.chatIdMessages[chatId].broadcast(bCastCode);
     }
 };
 

@@ -173,7 +173,7 @@ accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, pe
 
 
         // prevent changes to persist-presence if persistlock is set
-        accountUI.initCheckbox[autoawaylock ? "disable" : "enable"](
+        accountUI.initCheckbox[persistlock ? "disable" : "enable"](
             'persist-presence',
             $sectionContainerChat
         );

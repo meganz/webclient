@@ -550,12 +550,12 @@ UserPresence.prototype.prefs = function presence_prefs() {
 
 // checkmark checked, but 0 timeout: always AWAY if online, otherwise potentially offlin
 UserPresence.prototype.ui_setautoaway = function presence_ui_setautoaway(active, timeout) {
-    if (timeout !== undefined) {
-        if (this.autoawaytimeout == timeout && !this.autoawayactive == !active) return;
-        this.autoawaytimeout = timeout;
+    if (active) {
+        this.persist = false;
     }
-    else {
-        if (!this.autoawayactive == !active) return;
+
+    if (timeout !== undefined) {
+        this.autoawaytimeout = timeout;
     }
 
     this.autoawayactive = active;

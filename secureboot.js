@@ -1896,12 +1896,13 @@ else if (!b_u)
             'chat_feedback_css':{f:'css/chat-feedback.css', n: 'chat_feedback_css', j:2,'w':5,'c':1,'cache':1,'d':1},
             'chat_calls_css':{f:'css/chat-calls.css', n: 'chat_calls_css', j:2,'w':5,'c':1,'cache':1,'d':1},
             'chat_common_css':{f:'css/chat-common.css', n: 'chat_common_css', j:2,'w':5,'c':1,'cache':1,'d':1},
-            'chat_emojione_css':{f:'css/chat-emojione.css', n: 'chat_emojione_css', j:2,'w':5,'c':1,'cache':1,'d':1},
+            'chat_emoji_css':{f:'css/chat-emoji.css', n: 'chat_emoji_css', j:2,'w':2,'c':1,'cache':1,'d':1},
 
             /* chat related js */
             'react_js': {f:'js/vendor/react.js', n: 'react_js', j:1},
             'reactdom_js': {f:'js/vendor/react-dom.js', n: 'reactdom_js', j:1},
             'meganotifications_js': {f:'js/megaNotifications.js', n: 'meganotifications_js', j:1},
+            'twemoji_js': {f:'js/vendor/twemoji.noutf.js', n: 'twemoji_js', j:1},
             'ionsound_js': {f:'js/vendor/ion.sound.js', n: 'ionsound_js', j:1},
             'favico_js': {f:'js/vendor/favico.js', n: 'favico_js', j:1},
             'autolinker_js': {f:'js/vendor/autolinker.js', n: 'autolinker_js', j:1},

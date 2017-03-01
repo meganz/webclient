@@ -81,13 +81,20 @@ var UserPresence = function userpresence(
     // 0x40 - client can be woken up with push notifications
     this.capabilities = String.fromCharCode(((can_webrtc && 0x80) | (can_mobilepush && 0x40)));
 
-    // current override and "changed locally, try to push to server" flag
-    this.override = false;
-    this.overridechanged = false;
+    // desired appearance
+    this.presence = UserPresence.PRESENCE.ONLINE;
 
-    // autoaway timeout (bit 15: inverted checkmark) and related changed flag
+    // persist presence even when offline
+    this.persist = false;
+
+    // autoaway timeout active flag
+    this.autoawayactive = true;
+
+    // autoaway timeout
     this.autoawaytimeout = 300;
-    this.autoawaychanged = false;
+
+    // user prefs changed
+    this.prefschanged = false;
 
     // console logging
     this.logger = MegaLogger.getLogger('UserPresence');
@@ -170,32 +177,26 @@ var UserPresence = function userpresence(
     this.keepalivechecktimer = false;
     this.KEEPALIVETIMEOUT = 30000;
 
-    // auto-AWAY timer
+    // autoaway timer
     this.autoawaytimer = false;
 
+    // local user was inactive (setflags(false) was called)
+    this.wasinactive = true;
 
     // last flags command to be issued after a reconnect
     this.lastflagscmd = false;
-
-    // user has timed out into autoaway status
-    this.autoaway = false;
 
     // callbacks
     this.connectedcb = connectedcb;   // called when the connection to presenced is going up or down
     this.peerstatuscb = peerstatuscb; // called when any peer's status changes (including for self)
     this.updateuicb = updateuicb;     // called when the UI needs to be updated
-
-    // UI-related state (defaults will be overridden by first call to ui_settings() and by presenced after connect)
-    this.persist = false;               // override active
-    this.ui_presencelevel = UserPresence.PRESENCE.ONLINE;
 };
 
-
 UserPresence.PRESENCE = {
-    'OFFLINE': 1,   // grey
-    'AWAY': 2,      // yellow
-    'ONLINE':  3,   // green
-    'DND':  4      // red
+    OFFLINE: 1, // grey
+    AWAY:    2, // yellow
+    ONLINE:  3, // green
+    DND:     4  // red
 };
 
 UserPresence.prototype.reconnect = function presence_reconnect(self) {
@@ -331,36 +332,14 @@ UserPresence.prototype.reconnect = function presence_reconnect(self) {
                             p++;
                             break;
 
-                        case 2: // OPCODE_STATUSOVERRIDE
-                            if ((this.up.persist ? this.up.ui_presencelevel : 0) === u[p+1]) {
-                                // the override matches what we wanted to set - clear changed flag
-                                this.up.overridechanged = false;
-                            }
-                            else {
-                                if (u[p+1]) {
-                                    console.error('this.up.ui_presencelevel = ', this.up.ui_presencelevel, [u[p], u[p+1]]);
-                                    this.up.ui_presencelevel = u[p+1];
-                                    this.up.persist = true;
-                                }
-                                else {
-                                    console.error('persist = false');
-                                    this.up.persist = false;
-                                }
-
-                                this.up.ui_signalactivity(true);
-                                this.up.updateui();
-                            }
-                            p += 2;
-                            break;
-
                         case 6: // OPCODE_PEERSTATUS
-                            var userhash = ab_to_base64(new Uint8Array(u.buffer, p+2, 8));
+                            var user = ab_to_base64(new Uint8Array(u.buffer, p+2, 8));
                             var presence = u[p + 1] & 0xf;
                             var isWebrtcFlag = u[p + 1] & 0x80;
 
                             if (this.up.peerstatuscb) {
                                 this.up.peerstatuscb(
-                                    userhash,
+                                    user,
                                     presence,
                                     isWebrtcFlag
                                 );
@@ -368,14 +347,20 @@ UserPresence.prototype.reconnect = function presence_reconnect(self) {
                             p += 10;
                             break;
 
-                        case 7: // OPCODE_AUTOAWAYSETTING
-                            var newautoawaytimeout = u[p+1] + (u[p+2] << 8);
+                        case 7: // OPCODE_PREFS
+                            var newprefs = u[p+1] + (u[p+2] << 8);
 
-                            if (this.up.autoawaytimeout == newautoawaytimeout) {
-                                this.up.autoawaychanged = false;
+                            if (newprefs == this.up.prefs()) {
+                                this.up.prefschanged = false;
                             }
                             else {
-                                this.up.autoawaytimeout = newautoawaytimeout;
+                                this.up.presence = (newprefs & 3)+UserPresence.PRESENCE.OFFLINE;
+                                this.up.persist = !!(newprefs & 4);
+                                this.up.autoawayactive = !(newprefs & 8);
+                                this.up.autoawaytimeout = newprefs >> 4;
+                                if (this.up.autoawaytimeout > 600) {
+                                    this.up.autoawaytimeout = Math.floor((this.up.autoawaytimeout-600)/60)+600;
+                                }
                                 this.up.ui_signalactivity(true);
                                 this.up.updateui();
                             }
@@ -501,24 +486,17 @@ UserPresence.prototype.sendpeerupdate = function presence_sendpeerupdate(peerstr
     this.sendstring(peerstring);
 };
 
-UserPresence.prototype.sendoverride = function presence_sendoverride() {
+UserPresence.prototype.sendprefs = function presence_sendprefs() {
     if (this.open) {
-        this.overridechanged = true;    // this will be reset once the server responds with the same status
-        this.sendstring("\2" + String.fromCharCode(this.persist ? this.ui_presencelevel : 0));
+        var prefs = this.prefs();
+        this.prefschanged = true;    // this will be reset once the server responds with the same status
+        this.sendstring("\7" + String.fromCharCode(prefs & 0xff) + String.fromCharCode(prefs >> 8));
     }
 };
 
-UserPresence.prototype.sendautoaway = function presence_sendautoaway() {
+UserPresence.prototype.sendflags = function presence_sendflags(active) {
     if (this.open) {
-        this.autoawaychanged = true;    // this will be reset once the server responds with the same status
-        this.sendstring("\7" + String.fromCharCode(this.autoawaytimeout & 0xff) + String.fromCharCode(this.autoawaytimeout >> 8));
-    }
-};
-
-UserPresence.prototype.sendflags = function presence_sendflags(online, dnd) {
-    if (this.open) {
-        this.lastflagscmd = "\3" +
-            String.fromCharCode((online ? 1 : 0) | (dnd ? 2 : 0));
+        this.lastflagscmd = "\3" + String.fromCharCode(active ? 1 : 0);
         this.sendstring(this.lastflagscmd);
     }
 };
@@ -544,80 +522,43 @@ UserPresence.prototype.keepalivetimeout = function presence_keepalivetimeout(sel
     self.reconnect();
 };
 
-UserPresence.prototype.ui_setstatus = function presence_ui_setstatus(presencelevel) {
-    console.error('UserPresence.prototype.ui_setstatus', presencelevel);
-    this.ui_presencelevel = presencelevel;
+UserPresence.prototype.ui_setstatus = function presence_ui_setstatus(presence) {
+    console.error('UserPresence.prototype.ui_setstatus', presence);
 
-    if (presencelevel == UserPresence.PRESENCE.OFFLINE) {
-        // user wants to appear offline: activate persistence
-        // (which is the only way this can be achieved short of really going offline)
-        this.persist = true;
-    }
+    if (presence != this.presence) {
+        this.presence = presence;
 
-    if (this.persist) {
-        this.sendoverride();
-    }
-    else {
-        if (presencelevel == UserPresence.PRESENCE.AWAY) {
-            // user chose AWAY: disable auto-away if set
-            this.autoawaytimeout |= 0x8000;
-        }
         this.ui_signalactivity(true);
-        this.sendautoaway();
+        this.sendprefs();
+        this.updateui();
     }
-
-    this.updateui();
 };
 
-UserPresence.prototype.seconds = function presence_seconds() {
-    var t = this.autoawaytimeout & 0x7fff;
+UserPresence.prototype.prefs = function presence_prefs() {
+    var t = this.autoawaytimeout;
 
-    if (t <= 600) return t;
-    return (t-600)*10+600;
+    if (t > 600) {
+        t = 600+Math.floor((t-600)/60);
+    }
+
+    return (t << 4)+(this.autoawayactive ? 0 : 8)+(this.persist ? 4 : 0)+this.presence-UserPresence.PRESENCE.OFFLINE;
 }
 
 // checkmark checked, but 0 timeout: always AWAY if online, otherwise potentially offlin
 UserPresence.prototype.ui_setautoaway = function presence_ui_setautoaway(active, timeout) {
-    if (timeout === undefined) {
-        // preserve existing
-        timeout = this.autoawaytimeout & 0x7fff;
+    if (timeout !== undefined) {
+        if (this.autoawaytimeout == timeout && !this.autoawayactive == !active) return;
+        this.autoawaytimeout = timeout;
     }
     else {
-        timeout = Math.floor(timeout);
-
-        // one-second resolution up to 10 minutes; ten-second resolution > 10 minutes 
-        if (timeout >= 600) {
-            timeout = Math.floor((timeout-600)/10)+600;
-        }
-
-        // overflow protection - maximum auto-away timeout: (32767-600)*10+600 seconds == 3.73 days
-        if (timeout > 0x7fff) {
-            timeout = 0x7fff;
-        }
-
-        // bit 15 encodes the inverted auto-away active checkmark
-        if (!active) timeout += 0x8000;
+        if (!this.autoawayactive == !active) return;
     }
 
-    if (!timeout) {
-        // zero timeout with checkmark set: we're always away
-        console.error('ui_setautoaway, ui_presencelevel =', 'AWAY');
-        this.ui_presencelevel = UserPresence.PRESENCE.AWAY;
-    }
-
-    this.autoawaytimeout = timeout;
-    this.autoaway = true;
+    this.autoawayactive = active;
 
     // update flags, reset/start timer
     this.ui_signalactivity(true);
-
-    // disable persistence if it was enabled and autoaway was activated
-    if (this.persist && !(timeout & 0x8000)) {
-        this.persist = false;
-        this.sendoverride();
-    }
-
-    this.sendautoaway();
+    this.sendprefs();
     this.updateui();
 };
 
@@ -626,19 +567,8 @@ UserPresence.prototype.ui_setpersist = function presence_ui_setpersist(persist) 
     if (persist != this.persist) {
         this.persist = persist;
 
-        if (!persist) {
-            // translate current UI status to non-persistent settings
-            if (this.ui_presencelevel == UserPresence.PRESENCE.OFFLINE) {
-                // cannot do OFFLINE without persistence
-                this.ui_presencelevel = UserPresence.PRESENCE.AWAY;
-                console.error('OFFLINE -> AWAY');
-            }
-
-            // update flags
-            this.ui_signalactivity(true);
-        }
-
-        this.sendoverride();
+        this.ui_signalactivity(true);
+        this.sendprefs();
         this.updateui();
     }
 };
@@ -647,7 +577,7 @@ UserPresence.prototype.ui_setpersist = function presence_ui_setpersist(persist) 
 UserPresence.prototype.ui_signalactivity = function presence_ui_signalactivity(force) {
     if (this.autoawaytimer) {
         // stop timer if running for more than 50 seconds or no longer needed
-        if (this.override || !this.autoawaytimeout || this.autoawaytimeout & 0x8000) {
+        if (this.override || !this.autoawaytimeout || !this.autoawayactive) {
             // (no longer needed)
             this.lastuiactivity = 0;
         }
@@ -663,32 +593,36 @@ UserPresence.prototype.ui_signalactivity = function presence_ui_signalactivity(f
     }
 
     // start timer if not running and timeout set
-    if (!this.override && !this.autoawaytimer && this.autoawaytimeout > 0 && !(this.autoawaytimeout & 0x8000)) {
-        this.autoawaytimer = setTimeout(this.autoaway, this.seconds()*1000, this);
+    if (!this.persist && !this.autoawaytimer && this.autoawaytimeout > 0 && this.autoawayactive) {
+        this.autoawaytimer = setTimeout(this.autoaway, this.autoawaytimeout*1000, this);
     }
 
-    if (force || !this.persist && this.autoaway && !(this.autoawaytimeout & 0x8000)) {
-        // volatile online/do not disturb with auto-away and auto-offline/away
-        this.autoaway = false;
-        this.sendflags(
-            this.ui_presencelevel == UserPresence.PRESENCE.ONLINE,
-            this.ui_presencelevel == UserPresence.PRESENCE.DND
-        );
+    if (force || !this.persist && this.wasinactive) {
+        this.sendflags(true);
+        this.wasinactive = false;
     }
 };
 
-// auto-AWAY timer has fired
+// autoaway timer has fired
 UserPresence.prototype.autoaway = function presence_autoaway(self) {
     // cancel volatile status flags (DND/ONLINE) and timer
-    self.sendflags(false, false);
+    self.sendflags(false);
     self.autoawaytimer = false;
-    self.autoaway = true;
+    self.wasinactive = true;
 };
 
 // update UI with the current internal state
 UserPresence.prototype.updateui = function presence_updateui() {
-    // we have status override active, disable auto-AWAY
-    this.updateuicb(this.ui_presencelevel, !this.persist && !(this.autoawaytimeout & 0x8000), this.seconds(), this.persist);
+    this.updateuicb(this.presence,
+                    this.autoawayactive
+                        && !this.persist
+                        && this.presence != UserPresence.PRESENCE.OFFLINE
+                        && this.presence != UserPresence.PRESENCE.AWAY,
+                    this.presence == UserPresence.PRESENCE.OFFLINE
+                    || this.presence == UserPresence.PRESENCE.AWAY,
+                    this.autoawaytimeout,
+                    this.persist || this.presence == UserPresence.PRESENCE.OFFLINE,
+                    this.presence == UserPresence.PRESENCE.OFFLINE);
 };
 
 if (PRESENCE2_DEBUG) {
@@ -728,29 +662,6 @@ UserPresence.prototype.incomingDataAsReadableCommand = function(ab) {
                 p++;
                 break;
 
-            case 2: // OPCODE_STATUSOVERRIDE
-                if ((this.persist ? this.ui_presencelevel : 0) === u[p+1]) {
-                    output.push([
-                        "OPCODE_STATUSOVERRIDE", "overridechanged = false"
-                    ]);
-                }
-                else {
-                    if (u[p+1]) {
-                        output.push([
-                            "OPCODE_STATUSOVERRIDE",
-                            "persist = true",
-                            "ui_presencelevel = " + u[p+1]
-                        ]);
-                    }
-                    else {
-                        output.push([
-                            "OPCODE_STATUSOVERRIDE", "persist = false"
-                        ]);
-                    }
-                }
-                p += 2;
-                break;
-
             case 6: // OPCODE_PEERSTATUS
                 var userhash = ab_to_base64(new Uint8Array(u.buffer, p+2, 8));
                 var presence = u[p + 1] & 0xf;
@@ -767,21 +678,19 @@ UserPresence.prototype.incomingDataAsReadableCommand = function(ab) {
                 p += 10;
                 break;
 
-            case 7: // OPCODE_AUTOAWAYSETTING
-                var newautoawaytimeout = u[p+1] + (u[p+2] << 8);
+            case 7: // OPCODE_PREFS
+                var newprefs = u[p+1] + (u[p+2] << 8);
 
-                if (this.autoawaytimeout == newautoawaytimeout) {
+                if (newprefs == this.prefs()) {
                     output.push([
-                        "OPCODE_AUTOAWAYSETTING",
-                        "autoawaychanged = false"
+                        "OPCODE_PREFS",
+                        "prefs unchanged"
                     ]);
-
-
                 }
                 else {
                     output.push([
-                        "OPCODE_AUTOAWAYSETTING",
-                        "autoawaytimeout = " + newautoawaytimeout
+                        "OPCODE_PREFS",
+                        "prefs = " + newprefs
                     ]);
                 }
 
@@ -816,11 +725,10 @@ UserPresence.prototype.outgoingDataAsReadableCommand = function(ab) {
     /*
      0 - keep alive ping, no extra data
      \1\1 - hello, capabilities (String.fromCharCode(((can_webrtc && 0x80) | (can_mobilepush && 0x40))))
-     2 - override, true/false
-     3 - flags, online (true - 1/false) | dnd (true - 2/false)
+     3 - flags, user active (true - 1/false)
      4 - add peer, num of peers (4 bytes), peerstring (every peer id is 8 bytes)
      5 - delete peer, num of peers, peerstring
-     7 - autoaway, enabled/disabled, autoaway timeout value (seconds)
+     7 - prefs, enabled/disabled, autoaway timeout value (seconds)
      */
     var output = [];
     while (p < u.length) {
@@ -840,14 +748,6 @@ UserPresence.prototype.outgoingDataAsReadableCommand = function(ab) {
                     "can_mobilepush = " + (u[p+2] & 0x40 ? "true" : "false"),
                 ]);
                 p += 3
-                break;
-
-            case 2: // STATUSOVERRIDE
-                output.push([
-                    "STATUSOVERRIDE", "override = " + (u[p+1] === 1 ? "true" : "false")
-                ]);
-
-                p += 2;
                 break;
 
             case 3: // FLAGS
@@ -891,16 +791,20 @@ UserPresence.prototype.outgoingDataAsReadableCommand = function(ab) {
                 p += 5 + numpeers * 8;
                 break;
 
-            case 7: // AUTOAWAY
+            case 7: // PREFS
                 var timeout = u[p+1] + (u[p+2] << 8);
+
+                var flags = timeout & 15;
+                timeout >>= 4;
+
                 if (timeout > 600) {
-                    timeout = (timeout-600)*10+600;
+                    timeout = (timeout-600)*60+600;
                 }
 
                 output.push([
-                    "AUTOAWAY",
-                    "autoaway enabled? = " + !(timeout & 0x8000),
-                    "autoaway seconds = " + timeout,
+                    "PREFS",
+                    "prefs flags = " + flags,
+                    "prefs seconds = " + timeout,
                 ]);
 
                 p += 3

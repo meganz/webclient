@@ -66,13 +66,13 @@ accountUI.initRadio.setValue = function(className, newVal, $container) {
     $input.parent().addClass('radioOn').removeClass('radioOff');
 };
 
-accountUI.advancedSection = function(autoaway, autoawaytimeout, persist) {
+accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, persist, persistlock) {
     var presenceInt = megaChat.plugins.presencedIntegration;
 
     // Only call this if the call of this function is the first one, made by fm.js -> accountUI
     if (autoaway === undefined) {
-        $(presenceInt).rebind('settingsUIUpdated.settings', function(e, autoaway, autoawaytimeout, persist) {
-            accountUI.advancedSection(autoaway, autoawaytimeout, persist);
+        $(presenceInt).rebind('settingsUIUpdated.settings', function(e, autoaway, autoawaylock, autoawaytimeout, persist, persistlock) {
+            accountUI.advancedSection(autoaway, autoawaylock, autoawaytimeout, persist, persistlock);
         });
 
         presenceInt.userPresence.updateui();
@@ -99,8 +99,8 @@ accountUI.advancedSection = function(autoaway, autoawaytimeout, persist) {
                 _initPresenceRadio(presence);
             }
         });
-        $(presenceInt).rebind('settingsUIUpdated.settings', function(e, autoaway, autoawaytimeout, persist) {
-            accountUI.advancedSection(autoaway, autoawaytimeout, persist);
+        $(presenceInt).rebind('settingsUIUpdated.settings', function(e, autoaway, autoawaylock, autoawaytimeout, persist, persistlock) {
+            accountUI.advancedSection(autoaway, autoawaylock, autoawaytimeout, persist, persistlock);
         });
         $(presenceInt.userPresence).rebind('onDisconnected.settings', function(e) {
             _initPresenceRadio(UserPresence.PRESENCE.OFFLINE);
@@ -118,6 +118,9 @@ accountUI.advancedSection = function(autoaway, autoawaytimeout, persist) {
     };
 
     if (autoawaytimeout !== false) {
+        // FIXME: prevent changes to persist-presence and autoaway
+        // if persistlock/autoawaylock are set
+
         accountUI.initCheckbox(
             'persist-presence',
             $sectionContainerChat,
@@ -148,7 +151,7 @@ accountUI.advancedSection = function(autoaway, autoawaytimeout, persist) {
             .rebind('blur.dashboard', function() {
                 // the goal of the following line is to reset the value of the field if the entered data is invalid
                 // after the user removes focus from it (and set the internally set value)
-                $(this).val(presenceInt.userPresence.seconds() / 60);
+                $(this).val(presenceInt.userPresence.autoawaytimeout / 60);
             })
             .val(lastValidNumber);
     }

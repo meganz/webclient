@@ -165,12 +165,14 @@ PresencedIntegration.prototype.init = function() {
 PresencedIntegration.prototype._updateuicb = function presencedIntegration_updateuicb(
     presence,
     autoaway,
+    autoawaylock,
     autoawaytimeout,
-    persist
+    persist,
+    persistlock,
 ) {
     var self = this;
 
-    self.logger.debug("updateuicb", presence, autoaway, autoawaytimeout, persist);
+    self.logger.debug("updateuicb", presence, autoaway, autoawaylock, autoawaytimeout, persist, persistlock);
     console.error('updateuicb', arguments);
 
     self._presence[u_handle] = presence;
@@ -229,7 +231,7 @@ PresencedIntegration.prototype._updateuicb = function presencedIntegration_updat
         self._destroyAutoawayEvents();
     }
 
-    $(self).trigger('settingsUIUpdated', [autoaway, autoawaytimeout, persist]);
+    $(self).trigger('settingsUIUpdated', [autoaway, autoawaylock, autoawaytimeout, persist, persistlock]);
 
     $(self).trigger(
         'onPeerStatus',
@@ -382,11 +384,8 @@ PresencedIntegration.prototype.getPresenceAsText = function(u_h, pres) {
 };
 
 PresencedIntegration.prototype.getAutoaway = function() {
-    return (this.userPresence.autoawaytimeout & 0x8000) ?
-            false :
-            Math.floor(this.userPresence.seconds()/60);
+    return this.userPresence.autoawayactive;
 };
-
 
 PresencedIntegration.prototype._initAutoawayEvents = function() {
     console.error("presencedInt._initAutoawayEvents");

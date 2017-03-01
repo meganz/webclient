@@ -3669,7 +3669,7 @@ function accountUI() {
             $('.account.plan-info.expiry').text(l[436]);
             $('.btn-cancel').addClass('hidden');
             $('.account.plan-info-row.bandwidth').hide();
-            $('.default-white-button.upgrade-to-pro span').text(l[5814]);
+            $('.default-white-button.upgrade-to-pro span').text(l[5549]);
         }
 
         // Upgrade Account Button

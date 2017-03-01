@@ -11497,6 +11497,9 @@ table {
     margin: 7px 0 0 0;
     max-width: 100%;
 }
+.button.upgrade-account, .button.upgrade-to-pro {
+    text-transform: capitalize;
+}
 .account.left-pane .default-grey-button {
     height: 32px;
     line-height: 31px;

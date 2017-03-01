@@ -9,6 +9,7 @@ var ModalDialogsUI = require('./../../ui/modalDialogs.jsx');
 var DropdownsUI = require('./../../ui/dropdowns.jsx');
 var ContactsUI = require('./../ui/contacts.jsx');
 var ConversationsUI = require('./../ui/conversations.jsx');
+var DropdownEmojiSelector = require('./../../ui/emojiDropdown.jsx').DropdownEmojiSelector;
 
 var TypingArea = React.createClass({
     mixins: [MegaRenderMixin, RenderDebugger],
@@ -623,8 +624,8 @@ var TypingArea = React.createClass({
                         icon="smiling-face"
                         disabled={this.props.disabled}
                     >
-                        <DropdownsUI.DropdownEmojiSelector
-                            className="popup emoji-one"
+                        <DropdownEmojiSelector
+                            className="popup emoji"
                             vertOffset={12}
                             onClick={self.onEmojiClicked}
                         />

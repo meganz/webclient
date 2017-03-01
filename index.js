@@ -876,7 +876,7 @@ function init_page() {
         });
         mainScroll();
     }
-    else if (page.substr(0, 3) == 'pro') {
+    else if (page.substr(0, 3) === 'pro') {
         var tmp = page.split('/uao=');
         if (tmp.length > 1) {
             mega.uaoref = decodeURIComponent(tmp[1]);
@@ -885,6 +885,15 @@ function init_page() {
         }
         parsepage(pages['pro']);
         init_pro();
+    }
+    else if (page.substr(0, 7) === 'payment') {
+
+        // Load the Pro page in the background
+        parsepage(pages['pro']);
+        init_pro();
+
+        // Process the return URL from the payment provider and show a success/failure dialog if applicable
+        proPage.processReturnUrlFromProvider(page);
     }
     else if (page == 'credits') {
         parsepage(pages['credits']);

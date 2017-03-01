@@ -64,7 +64,7 @@
     background-color: #EEEEEE;
 }
 .dropdown.body.popup {
-    width: 360px;
+    width: 402px;
     padding: 0;
 }
 .dropdown.body:not(.white-context-menu)::before {

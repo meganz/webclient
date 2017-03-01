@@ -13041,8 +13041,8 @@ function bindDropdownEvents($dropdown, saveOption, contentBlock) {
             contentBlockHeight = $contentBlock.height();
             dropdownHeight = $dropdown.outerHeight();
             dropdownBottPos = contentBlockHeight - (dropdownOffset + dropdownHeight);
-            
-            if (contentBlockHeight < (dropdownHeight + 20)) {alert(dropdownOffset);
+
+            if (contentBlockHeight < (dropdownHeight + 20)) {
                 $dropdown.css({
                     'margin-top': '-' + (dropdownOffset - 10) + 'px',
                     'height': (contentBlockHeight - 20) + 'px'

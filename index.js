@@ -1402,9 +1402,8 @@ function topmenuUI() {
     if (u_type) {
         $('.top-menu-item.logout,.top-menu-item.backup').removeClass('hidden');
         $('.top-menu-item.account').removeClass('hidden');
-        if (avatar) {
-            $('.fm-avatar img').attr('src', avatar);
-        }
+        $('.fm-avatar').safeHTML(useravatar.contact(u_handle, '', 'div'));
+
         $('.top-login-button').hide();
         $('.membership-status').show();
         $('.top-change-language').hide();
@@ -1921,11 +1920,11 @@ function topmenuUI() {
     $topHeader.find('.fm-avatar').rebind('click', function() {
 
         // If the user has an avatar already set, take them to the profile page where they can change or remove it
-        if ($(this).find('img').attr('src').indexOf('blob:') > -1) {
+        if ($(this).find('img').length > 0) {
             loadSubPage('fm/account/profile');
         }
         else {
-            // Otherwise if they don't have an avatar, open the change avatar dialog
+            // Otherwise if they don't have an avatar, open the change avatar dialog;
             avatarDialog();
         }
     });

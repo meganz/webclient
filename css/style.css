@@ -4594,37 +4594,24 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     width: 28px;
     float: right;
     display: block;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
     margin: 4px 11px 0 0;
-    -moz-border-radius: 100%;
-    -webkit-border-radius: 100%;
-    border-radius: 100%;
-    line-height: 0;
-    overflow: hidden;
-    cursor: pointer;
-    line-height: 23px;
-    color: white;
-    text-align: center;
-    font-family: 'source_sans_prosemibold';
-    font-size: 17px;
-    border: 2px solid rgba(255,255,255,1);
     position: relative;
+    cursor: pointer;
+}
+.fm-avatar .avatar {
+    height: 28px;
+    width: 28px;
+    margin: 0;
     -webkit-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
     -moz-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
     box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
-    -webkit-transition: border-color 200ms ease-in-out;
-    -moz-transition: border-color 200ms ease-in-out;
-    -o-transition: border-color 200ms ease-in-out;
-    -ms-transition: border-color 200ms ease-in-out;
-    transition: border-color 200ms ease-in-out;
-    -webkit-background-clip: padding-box;
-    -moz-background-clip: padding-box;
-    background-clip: padding-box;
+    font-size: 17px;
+    line-height: 23px;
 }
-.fm-avatar:hover {
-    border: 2px solid rgba(255,255,255,1);
+.fm-avatar .avatar::before {
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
 }
 .fm-avatar::after {
     content: '';
@@ -4969,6 +4956,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .fm-avatar img {
     width: 24px;
+    height: 24px;
     border: 0;
     -moz-border-radius: 100%;
     -webkit-border-radius: 100%;
@@ -8128,6 +8116,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     line-height: 31px;
     margin-top: 0;
     font-size: 13px;
+    height: 31px;
     color: #666666;
     padding: 0 10px 0 42px;
     margin: 0;
@@ -8338,6 +8327,7 @@ color: white;
     background-image: none;
     font-size: 14px;
     line-height: 31px;
+    height: 31px;
     color: #333333;
 }
 .fm-account-input input:-webkit-autofill {
@@ -9511,11 +9501,17 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     width: 4px;
 }
 .default-select-dropdown .jspVerticalBar {
-    width: 6px;
+    width: auto;
+}
+.default-select-dropdown .jspTrack {
+    padding: 0 2px 0 8px;
+    
 }
 .default-select-scroll {
     max-height: 288px;
     overflow: hidden;
+    position: relative;
+    z-index: 1;
 }
 .permissions-menu, .fm-dialogs-dropdown {
     background-image: none;

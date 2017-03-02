@@ -3015,7 +3015,7 @@ function dashboardUI() {
 
     // update avatar
     $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', true));
-    $('.fm-avatar img').attr('src', useravatar.mine());
+    $('.fm-avatar').safeHTML(useravatar.contact(u_handle, '', 'div'));
 
 
     // Show first name or last name
@@ -4409,7 +4409,7 @@ function accountUI() {
         $('.default-select.country .default-select-scroll').safeHTML(html);
 
         // Bind Dropdowns events
-        bindDropdownEvents($('.fm-account-main .default-select'), 1);
+        bindDropdownEvents($('.fm-account-main .default-select'), 1, '.account.tab-content');
 
         // Cache selectors
         var $newEmail = $('#account-email');
@@ -4485,7 +4485,7 @@ function accountUI() {
             u_attr.country = $('.default-select.country .default-dropdown-item.active').attr('data-value');
 
             $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', true));
-            $('.fm-avatar img').attr('src', useravatar.mine());
+            $('.fm-avatar').safeHTML(useravatar.contact(u_handle, '', 'div'));
 
             api_req({
                 a : 'up',
@@ -5138,7 +5138,7 @@ function accountUI() {
             for (var i in prices)
                 voucheroptions += '<div class="default-dropdown-item" data-value="' + htmlentities(prices[i]) + '">&euro;' + htmlentities(prices[i]) + ' voucher</div>';
             $('.default-select.vouchertype .default-select-scroll').html(voucheroptions);
-            bindDropdownEvents($('.default-select.vouchertype'));
+            bindDropdownEvents($('.default-select.vouchertype'), 0, '.account.tab-content');
         }
 
         $('.fm-purchase-voucher,.default-white-button.topup').rebind('click', function(e)
@@ -5178,7 +5178,7 @@ function accountUI() {
 
                     useravatar.invalidateAvatar(u_handle);
                     $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', true));
-                    $('.fm-avatar img').attr('src', useravatar.mine());
+                    $('.fm-avatar').safeHTML(useravatar.contact(u_handle, '', 'div'));
                     $('.fm-account-remove-avatar').hide();
                 }
             });
@@ -5552,7 +5552,7 @@ function avatarDialog(close)
                 useravatar.setUserAvatar(u_handle, data, this.outputFormat);
 
                 $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', true));
-                $('.fm-avatar img').attr('src', useravatar.mine());
+                $('.fm-avatar').safeHTML(useravatar.contact(u_handle, '', 'div'));
                 avatarDialog(1);
             },
             onImageUpload: function()
@@ -13007,30 +13007,48 @@ function FMResizablePane(element, opts) {
  *
  * @param {Selector} $dropdown  Class .dropdown elements selector
  * @param {String}   saveOption Addition option for account page only. Allows to show "Show changes" notification
+ * @param {String}   classname/id of  content block for dropdown aligment
  */
-function bindDropdownEvents($dropdown, saveOption) {
+function bindDropdownEvents($dropdown, saveOption, contentBlock) {
 
     var $dropdownsItem = $dropdown.find('.default-dropdown-item');
+    var $contentBlock = contentBlock ? $(contentBlock) : $(window);
 
     $($dropdown).rebind('click', function(e)
     {
         var $this = $(this);
         if (!$this.hasClass('active')) {
-            var bottPos, jsp,
-                scrollBlock = '#' + $this.attr('id') + ' .default-select-scroll',
-                $dropdown = $this.find('.default-select-dropdown'),
-                $activeDropdownItem = $this.find('.default-dropdown-item.active');
+            var jsp;
+            var scrollBlock = '#' + $this.attr('id') + ' .default-select-scroll';
+            var $dropdown = $this.find('.default-select-dropdown');
+            var $activeDropdownItem = $this.find('.default-dropdown-item.active');
+            var dropdownOffset;
+            var dropdownBottPos;
+            var dropdownHeight;
+            var contentBlockHeight;
 
             //Show select dropdown
-            $('.active .default-select-dropdown').fadeOut(200);
+            $('.active .default-select-dropdown').addClass('hidden');
             $this.addClass('active');
-            $dropdown.css('margin-top', '0px');
-            $dropdown.fadeIn(200);
+            $dropdown.removeAttr('style');
+            $dropdown.removeClass('hidden');
 
             //Dropdown position relative to the window
-            bottPos = $(window).height() - ($dropdown.offset().top + $dropdown.outerHeight());
-            if (bottPos < 50) {
-                $dropdown.css('margin-top', '-' + (60 - bottPos) + 'px');
+            dropdownOffset = $dropdown.offset().top - $contentBlock.offset().top;
+            contentBlockHeight = $contentBlock.height();
+            dropdownHeight = $dropdown.outerHeight();
+            dropdownBottPos = contentBlockHeight - (dropdownOffset + dropdownHeight);
+
+            if (contentBlockHeight < (dropdownHeight + 20)) {
+                $dropdown.css({
+                    'margin-top': '-' + (dropdownOffset - 10) + 'px',
+                    'height': (contentBlockHeight - 20) + 'px'
+                });
+            }
+            else if (dropdownBottPos < 10) {
+                $dropdown.css({
+                    'margin-top': '-' + (10 - dropdownBottPos) + 'px'
+                });
             }
 
             //Dropdown scrolling initialization
@@ -13045,8 +13063,9 @@ function bindDropdownEvents($dropdown, saveOption) {
             if (jsp && $activeDropdownItem.length) {
                 jsp.scrollToElement($activeDropdownItem);
             }
-        } else {
-            $this.find('.default-select-dropdown').fadeOut(200);
+        }
+        else if (!$(e.target).parents('.jspVerticalBar').length) {
+            $this.find('.default-select-dropdown').addClass('hidden');
             $this.removeClass('active');
         }
     });
@@ -13072,9 +13091,9 @@ function bindDropdownEvents($dropdown, saveOption) {
     $('#fmholder, .fm-dialog').rebind('click.defaultselect', function(e) {
 
         // ToDo: Narrow this condition and find main reason why it's made
-        if (!$(e.target).hasClass('default-select')) {
+        if (!$(e.target).parents('.default-select').length && !$(e.target).hasClass('default-select')) {
             $selectBlock = $('.default-select.active');
-            $selectBlock.find('.default-select-dropdown').fadeOut(200);
+            $selectBlock.find('.default-select-dropdown').addClass('hidden');
             $selectBlock.removeClass('active');
         }
     });

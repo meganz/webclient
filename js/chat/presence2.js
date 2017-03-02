@@ -250,8 +250,8 @@ UserPresence.prototype.reconnect = function presence_reconnect(self) {
                 this.up.connectedcb(true);
 
                 // only update override if user made a change that is not yet confirmed
-                if (this.up.overridechanged) {
-                    this.up.sendoverride();
+                if (this.up.prefschanged) {
+                    this.up.sendprefs();
                 }
 
                 // ...and then restore the dynamic status flags
@@ -548,7 +548,6 @@ UserPresence.prototype.prefs = function presence_prefs() {
     return (t << 4)+(this.autoawayactive ? 0 : 8)+(this.persist ? 4 : 0)+this.presence-UserPresence.PRESENCE.OFFLINE;
 }
 
-// checkmark checked, but 0 timeout: always AWAY if online, otherwise potentially offlin
 UserPresence.prototype.ui_setautoaway = function presence_ui_setautoaway(active, timeout) {
     if (active) {
         this.persist = false;
@@ -579,9 +578,15 @@ UserPresence.prototype.ui_setpersist = function presence_ui_setpersist(persist) 
 
 // signal user activity (reset auto-away timer and set ONLINE/DND flags)
 UserPresence.prototype.ui_signalactivity = function presence_ui_signalactivity(force) {
+    var timeout = !this.persist
+                && this.presence != UserPresence.PRESENCE.OFFLINE
+                && this.presence != UserPresence.PRESENCE.AWAY
+                && this.autoawaytimeout
+                && this.autoawayactive;
+
     if (this.autoawaytimer) {
         // stop timer if running for more than 50 seconds or no longer needed
-        if (this.override || !this.autoawaytimeout || !this.autoawayactive) {
+        if (!timeout) {
             // (no longer needed)
             this.lastuiactivity = 0;
         }
@@ -596,14 +601,23 @@ UserPresence.prototype.ui_signalactivity = function presence_ui_signalactivity(f
         }
     }
 
-    // start timer if not running and timeout set
-    if (!this.persist && !this.autoawaytimer && this.autoawaytimeout > 0 && this.autoawayactive) {
+    if (timeout && !this.autoawaytimer) {
+        // start timer if not running and timeout needed
         this.autoawaytimer = setTimeout(this.autoaway, this.autoawaytimeout*1000, this);
     }
 
-    if (force || !this.persist && this.wasinactive) {
-        this.sendflags(true);
-        this.wasinactive = false;
+    if (!this.persist && this.presence != UserPresence.PRESENCE.OFFLINE) {
+        // the activity flag matters - set or reset it
+        if (this.presence != UserPresence.PRESENCE.AWAY) {
+            if (force || this.wasinactive) {
+                this.sendflags(true);
+                this.wasinactive = false;
+            }
+        }
+        else {
+            this.sendflags(false);
+            this.wasinacive = true;
+        }
     }
 };
 
@@ -656,6 +670,7 @@ UserPresence.commandDebugDataAsPrettyString = function(arr) {
     })
     return out;
 };
+
 /**
  * This is a development-only method that is used for converting the binary commands to readable strings (array/list of
  * strings)

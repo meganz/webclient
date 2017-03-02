@@ -527,8 +527,6 @@ UserPresence.prototype.keepalivetimeout = function presence_keepalivetimeout(sel
 };
 
 UserPresence.prototype.ui_setstatus = function presence_ui_setstatus(presence) {
-    console.error('UserPresence.prototype.ui_setstatus', presence);
-
     if (presence != this.presence) {
         this.presence = presence;
 
@@ -656,6 +654,7 @@ UserPresence.commandDebugDataAsPrettyString = function(arr) {
     })
     return out;
 };
+
 /**
  * This is a development-only method that is used for converting the binary commands to readable strings (array/list of
  * strings)
@@ -686,7 +685,7 @@ UserPresence.prototype.incomingDataAsReadableCommand = function(ab) {
                 output.push([
                     "OPCODE_PEERSTATUS",
                     "userhash = " + userhash,
-                    "presence = " + presence,
+                    "presence = " + constStateToText(UserPresence.PRESENCE, presence),
                     "isWebrtcFlag = " + isWebrtcFlag
                 ]);
 

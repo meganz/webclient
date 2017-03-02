@@ -328,16 +328,12 @@ PresencedIntegration.prototype.setPresence = function(presence) {
 
         localStorage.removeItem("megaChatPresence"); // legacy
 
-
-        // self.userPresence.canceled = true;
-
         self.userPresence.connectionRetryManager.requiresConnection()
             .done(function() {
                 self.userPresence.ui_setstatus(UserPresence.PRESENCE.OFFLINE);
             });
 
         self.megaChat.karere.disconnect();
-        // self._presence = {};
     }
 };
 

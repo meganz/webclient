@@ -62,7 +62,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
     this.callIsActive = false;
     this.shownMessages = {};
     this.attachments = new MegaDataMap(this);
-    this.images = new MegaDataSortedMap("k", "delay", this);
+    this.images = new MegaDataSortedMap("id", "delay", this);
 
     this.options = {
 
@@ -726,7 +726,12 @@ ChatRoom.prototype.isActive = function() {
 };
 
 ChatRoom.prototype.setActive = function() {
-    loadSubPage(this.getRoomUrl());
+    // We need to delay this, since it can get called BY openFolder and it would then call again openFolder, which
+    // would cause .currentdirid to not be set correctly.
+    var self = this;
+    Soon(function() {
+        loadSubPage(self.getRoomUrl());
+    });
 };
 
 
@@ -929,6 +934,8 @@ ChatRoom.prototype.sendMessage = function(message, meta) {
 ChatRoom.prototype._sendMessageToTransport = function(messageObject) {
     var self = this;
     var megaChat = this.megaChat;
+
+    megaChat.trigger('onBeforeSendMessage', messageObject);
 
     var messageMeta = messageObject.getMeta() ? messageObject.getMeta() : {};
     if (messageMeta.isDeleted && messageMeta.isDeleted === true) {

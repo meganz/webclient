@@ -826,7 +826,7 @@ ChatdIntegration.prototype._parseMessage = function(chatRoom, message) {
                     if (v.fa && (icon === "graphic" || icon === "image")) {
                         var imagesListKey = message.messageId + "_" + v.h;
                         if (!chatRoom.images.exists(imagesListKey)) {
-                            v.k = imagesListKey;
+                            v.id = imagesListKey;
                             v.delay = message.delay;
                             chatRoom.images.push(v);
                         }
@@ -911,6 +911,23 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
     var self = this;
 
     var chatRoomId = chatRoom.roomJid.split("@")[0];
+
+    chatRoom.rebind('typing.chatdInt', function() {
+        self.broadcast(chatRoom, String.fromCharCode(1));
+    });
+
+    self.chatd.rebind('onBroadcast.chatdInt' + chatRoomId, function(e, eventData) {
+        var foundChatRoom = self._getChatRoomFromEventData(eventData);
+
+        if (!foundChatRoom) {
+            self.logger.warn("Room not found for: ", e, eventData);
+            return;
+        }
+
+        if (foundChatRoom.roomJid === chatRoom.roomJid) {
+            foundChatRoom.trigger('onParticipantTyping', [eventData.userId, eventData.bCastCode]);
+        }
+    });
 
     self.chatd.rebind('onRoomConnected.chatdInt' + chatRoomId, function(e, eventData) {
         var foundChatRoom = self._getChatRoomFromEventData(eventData);
@@ -1588,6 +1605,15 @@ ChatdIntegration.prototype.discardMessage = function(chatRoom, msgId) {
         // debugger;
     }
     return self.chatd.discard(msgId, rawChatId);
+};
+
+
+
+ChatdIntegration.prototype.broadcast = function(chatRoom, broadCastCode) {
+    var self = this;
+    var rawChatId = base64urldecode(chatRoom.chatId);
+    var chatMessages = self.chatd.chatIdMessages[rawChatId];
+    return self.chatd.broadcast(rawChatId, broadCastCode);
 };
 
 

@@ -3,6 +3,7 @@ var ReactDOM = require("react-dom");
 var ConversationsUI = require("./ui/conversations.jsx");
 var ChatRoom = require('./chatRoom.jsx');
 
+var EMOJI_DATASET_VERSION = 1;
 
 var chatui;
 var webSocketsSupport = typeof(WebSocket) !== 'undefined';
@@ -497,9 +498,11 @@ Chat.prototype.init = function() {
         }
     });
 
-    $(window).unbind('hashchange.megaChat' + this.instanceId);
+    if (this._pageChangeListener) {
+        mBroadcaster.removeListener(this._pageChangeListener)
+    }
     var lastOpenedRoom = null;
-    $(window).bind('hashchange.megaChat' + this.instanceId, function() {
+    this._pageChangeListener = mBroadcaster.addListener('pagechange', function() {
         var room = self.getCurrentRoom();
 
         if (room && !room.isCurrentlyActive && room.roomJid != lastOpenedRoom) { // opened window, different then one from the chat ones
@@ -563,7 +566,10 @@ Chat.prototype.init = function() {
     }
     else {
         if (!appContainer) {
-            $(window).rebind('hashchange.delayedChatUiInit', function() {
+            if (self._appInitPageChangeListener) {
+                mBroadcaster.removeListener(self._appInitPageChangeListener);
+            }
+            self._appInitPageChangeListener = mBroadcaster.addListener('pagechange', function() {
                 if (typeof($.leftPaneResizable) === 'undefined' || !fminitialized) {
                     // delay the chat init a bit more! specially for the case of a user getting from /pro -> /fm, which
                     // for some unknown reason, stopped working and delayed the init of $.leftPaneResizable
@@ -572,7 +578,9 @@ Chat.prototype.init = function() {
                 appContainer = document.querySelector('.section.conversations');
                 if (appContainer) {
                     initAppUI();
-                    $(window).unbind('hashchange.delayedChatUiInit');
+                    if (self._appInitPageChangeListener) {
+                        mBroadcaster.removeListener(self._appInitPageChangeListener);
+                    }
                 }
             });
         }
@@ -1788,6 +1796,48 @@ Chat.prototype._destroyAllChatsFromChatd = function() {
 Chat.prototype.updateDashboard = function() {
     if (M.currentdirid === 'dashboard') {
         delay('dashboard:updchat', dashboardUI.updateChatWidget);
+    }
+};
+
+
+/**
+ * Warning: The data returned by this function is loaded directly and not hash-checked like in the secureboot.js. So
+ * please use carefully and escape EVERYTHING that is loaded thru this.
+ *
+ * @param name
+ * @returns {MegaPromise}
+ */
+Chat.prototype.getEmojiDataSet = function(name) {
+    var self = this;
+    assert(name === "categories" || name === "emojis", "Invalid emoji dataset name passed.");
+
+    if (!self._emojiDataLoading) {
+        self._emojiDataLoading = {};
+    }
+    if (!self._emojiData) {
+        self._emojiData = {};
+    }
+
+    if (self._emojiData[name]) {
+        return MegaPromise.resolve(
+            self._emojiData[name]
+        );
+    }
+    else if (self._emojiDataLoading[name]) {
+        return self._emojiDataLoading[name];
+    }
+    else {
+        self._emojiDataLoading[name] = MegaPromise.asMegaPromiseProxy(
+            $.getJSON(staticpath + "js/chat/emojidata/" + name + ".json?v=" + EMOJI_DATASET_VERSION)
+        );
+        self._emojiDataLoading[name].done(function(data) {
+            self._emojiData[name] = data;
+            delete self._emojiDataLoading[name];
+        }).fail(function() {
+            delete self._emojiDataLoading[name];
+        });
+
+        return self._emojiDataLoading[name];
     }
 };
 

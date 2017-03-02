@@ -249,28 +249,6 @@ var astroPayDialog = {
 
 function init_pro()
 {
-    // Detect if there exists a verify get parameter
-    var verifyUrlParam = proPage.getUrlParam('verify');
-
-    // If it exists we need to do extra things
-    if (typeof verifyUrlParam !== 'undefined') {
-
-        // We are required to do paysafecard verification
-        if (verifyUrlParam === 'paysafe') {
-            paysafecard.verify();
-        }
-
-        // Show another dialog
-        if (verifyUrlParam === 'astropay') {
-            astroPayDialog.showPendingPayment();
-        }
-
-        // If returning from an Ecomprocessing payment
-        if (verifyUrlParam.indexOf('ecp') > -1) {
-            addressDialog.showPaymentResult(verifyUrlParam);
-        }
-    }
-
     if (localStorage.keycomplete) {
         $('body').addClass('key');
         localStorage.removeItem('keycomplete');
@@ -743,6 +721,37 @@ var proPage = {
     // Overlay for loading/processing/redirecting
     $backgroundOverlay: null,
     $loadingOverlay: null,
+
+    /**
+     * Processes a return URL from the payment provider in form of /payment-{providername}-{status} e.g.
+     * /payment-ecp-success
+     * /payment-ecp-failure
+     * /payment-astropay-pending
+     * /payment-paysafecard-saleidXXX
+     * @param {String} page The requested page from index.js e.g. payment-ecp-success etc
+     */
+    processReturnUrlFromProvider: function(page) {
+
+        // Get the provider we are returning from and the status
+        var pageParts = page.split('-');
+        var provider = pageParts[1];
+        var status = pageParts[2];
+
+        // If returning from an paysafecard payment, do a verification on the sale ID
+        if (provider === 'paysafecard') {
+            paysafecard.verify(status);
+        }
+
+        // If returning from an AstroPay payment, show a pending payment dialog
+        else if (provider === 'astropay') {
+            astroPayDialog.showPendingPayment();
+        }
+
+        // If returning from an Ecomprocessing payment, show a success or failure dialog
+        else if (provider === 'ecp') {
+            addressDialog.showPaymentResult(status);
+        }
+    },
 
     /**
     * Update the state when a payment has been received to show their new Pro Level
@@ -2233,38 +2242,37 @@ var paysafecard = {
     },
 
     /**
-     * We have been redirected back to mega with the 'okUrl'. We need to ask the API to verify the payment succeeded as per
-     * paysafecard's requirements, which they enforce with integration tests we must pass... so yeap, gotta do this.
+     * We have been redirected back to mega with the 'okUrl'. We need to ask the API to verify the payment
+     * succeeded as per paysafecard's requirements, which they enforce with integration tests we must pass.
+     * @param {String} saleIdString A string containing the sale ID e.g. saleid32849023423
      */
-    verify: function() {
-        var saleidstring = proPage.getUrlParam('saleidstring');
-        if (typeof saleidstring !== 'undefined') {
+    verify: function(saleIdString) {
 
-            // Make the vpay API request to follow up on this sale
-            var requestData = {
-                'a': 'vpay',                            // Credit Card Store
-                't': this.gatewayId,                    // The paysafecard gateway
-                'saleidstring': saleidstring            // Required by the API to know what to investigate
-            };
+        // Remove the saleid string to just get the ID to check
+        var saleId = saleIdString.replace('saleid', '');
 
-            var parent = this;
+        // Make the vpay API request to follow up on this sale
+        var requestData = {
+            'a': 'vpay',                      // Credit Card Store
+            't': this.gatewayId,              // The paysafecard gateway
+            'saleidstring': saleId            // Required by the API to know what to investigate
+        };
 
-            api_req(requestData, {
-                callback: function (result) {
+        api_req(requestData, {
+            callback: function (result) {
 
-                    // If negative API number
-                    if ((typeof result === 'number') && (result < 0)) {
-                        // Something went wrong with the payment, either card association or actually debitting it.
-                        parent.showPaymentError();
-                    }
-                    else {
-                        // Continue to account screen
-                        loadSubPage('account');
-                    }
+                // If negative API number
+                if ((typeof result === 'number') && (result < 0)) {
+
+                    // Something went wrong with the payment, either card association or actually debitting it
+                    paysafecard.showPaymentError();
                 }
-            });
-        }
-        return false;
+                else {
+                    // Continue to account screen
+                    loadSubPage('account');
+                }
+            }
+        });
     }
 };
 
@@ -2670,7 +2678,7 @@ var addressDialog = {
         $backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
 
         // On successful payment
-        if (verifyUrlParam === 'ecp-success') {
+        if (verifyUrlParam === 'success') {
 
             // Show the success
             $pendingOverlay.removeClass('hidden');

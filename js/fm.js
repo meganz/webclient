@@ -3047,7 +3047,7 @@ function dashboardUI() {
 
     // update avatar
     $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', true));
-    $('.fm-avatar img').attr('src', useravatar.mine());
+    $('.fm-avatar').safeHTML(useravatar.contact(u_handle, '', 'div'));
 
 
     // Show first name or last name
@@ -3633,7 +3633,6 @@ function accountUI() {
 
             $('.account.plan-info.accounttype span').text(planText);
             $('.small-icon.membership').addClass('pro' + planNum);
-            $('.default-white-button.upgrade-to-pro').addClass('hidden');
 
             // Subscription
             if (account.stype == 'S') {
@@ -3695,14 +3694,12 @@ function accountUI() {
             $('.account.plan-info.expiry').text(l[436]);
             $('.btn-cancel').addClass('hidden');
             $('.account.plan-info-row.bandwidth').hide();
-            $('.default-white-button.upgrade-to-pro')
-                .removeClass('hidden')
-                .rebind('click', function() {
-                    loadSubPage('pro');
-                });
         }
 
-
+        // Upgrade Account Button
+        $('.default-white-button.upgrade-to-pro').rebind('click', function() {
+            loadSubPage('pro');
+        });
 
         // Maximum disk space
         $('.account.plan-info.storage span').text(bytesToSize(account.space, 0));
@@ -3954,9 +3951,14 @@ function accountUI() {
                                 $('.progress-indicator', $transferItem).addClass('active');
 
                                 if (idx !== ach.ACH_INVITE) {
-                                    $('.progress-title', $transferItem)
-                                        .safeAppend('<span class="red-txt">&nbsp;(@@)</span>',
-                                            '%1 days left'.replace('%1', data.rwd.left));
+                                    if (data.rwd.e) {
+                                        $('.progress-title', $transferItem)
+                                            .safeAppend('<span class="red-txt">&nbsp;(@@)</span>',
+                                                data.rwd.left > 0
+                                                    ? l[16284].replace('%1', data.rwd.left)
+                                                    : l[1664]
+                                            );
+                                    }
                                 }
                                 else {
                                     if (base > 1) {
@@ -3964,7 +3966,7 @@ function accountUI() {
                                         $transferItem
                                             .css('cursor', 'pointer')
                                             .attr('title',
-                                                'Achieved %1 times, click for status.'.replace('%1', base));
+                                                l[16285].replace('%1', base));
                                     }
                                 }
                             }
@@ -3979,6 +3981,22 @@ function accountUI() {
                             $('.rewards .reward:last-child', $cell).addClass('hidden');
                         }
 
+                        if (!$cell.hasClass('localized')) {
+                            $cell.addClass('localized');
+
+                            var $desc = $cell.find('.description');
+                            var text = String($desc.text()).trim().replace('[%3]', '%3');
+
+                            if (!data[1]) {
+                                // one-reward
+                                $desc.safeHTML('%n', text, bytesToSize(data[0], 0), data.expiry.value);
+                            }
+                            else {
+                                $desc.safeHTML('%n', text, bytesToSize(data[0], 0),
+                                    bytesToSize(data[1], 0), data.expiry.value);
+                            }
+                        }
+
                         if (idx === ach.ACH_INVITE) {
                             ach.bind.call($('.button', $cell), ach.mapToAction[idx]);
 
@@ -3991,7 +4009,7 @@ function accountUI() {
                                     $storageItem
                                         .css('cursor', 'pointer')
                                         .attr('title',
-                                            'Achieved %1 times, click for status.'.replace('%1', base));
+                                            l[16285].replace('%1', base));
                                 }
                             }
                         }
@@ -3999,16 +4017,29 @@ function accountUI() {
                             // Achieved
                             storageCurrentValue += storageValue;
                             $('.progress-indicator', $storageItem).addClass('active');
-                            $('.progress-title', $storageItem)
-                                .safeAppend('<span class="red-txt">&nbsp;(@@)</span>', '%1 days left'.replace('%1', data.rwd.left));
+                            if (data.rwd.e) {
+                                $('.progress-title', $storageItem)
+                                    .safeAppend('<span class="red-txt">&nbsp;(@@)</span>',
+                                        data.rwd.left > 0
+                                            ? l[16284].replace('%1', data.rwd.left)
+                                            : l[1664]
+                                    );
+                            }
 
                             $('.status', $cell)
                                 .safeHTML(
                                     '<div class="achievement-complete">@@</div>' +
                                     '<div class="achievement-date">@@ <span class="red-txt">(@@)</span></div>' +
                                     '<div class="clear"></div>',
-                                    'Achieved', data.rwd.date.toLocaleDateString(),
-                                    '%1 days left'.replace('%1', data.rwd.left));
+                                    l[16286], data.rwd.date.toLocaleDateString(),
+                                    data.rwd.left > 0
+                                        ? l[16284].replace('%1', data.rwd.left)
+                                        : l[1664]
+                                );
+
+                            if (!data.rwd.e) {
+                                $('.status .achievement-date .red-txt', $cell).addClass('hidden');
+                            }
 
                             if (data.rwd.left < 1) {
                                 $storageItem.addClass('disabled');
@@ -4023,19 +4054,18 @@ function accountUI() {
                 }
             }
 
-
             // For free users only show base quota for storage and remove it for bandwidth.
             // For pro users replace base quota by pro quota
             if (u_attr.p) {
                 var $baseq = $('.achievements-block .data-block.storage .baseq');
                 storageBaseQuota = maf.storage.base;
                 $('.progress-txt', $baseq).text(bytesToSize(storageBaseQuota, 0));
-                $('.progress-title', $baseq).text('PRO Base Quota');
+                $('.progress-title', $baseq).text(l[16299]);
 
                 transferBaseQuota = maf.transfer.base;
                 $baseq = $('.achievements-block .data-block.transfer .baseq');
                 $('.progress-txt', $baseq).text(bytesToSize(transferBaseQuota, 0));
-                $('.progress-title', $baseq).text('PRO Base Quota');
+                $('.progress-title', $baseq).text(l[16299]);
             }
             else {
                 storageBaseQuota = maf.storage.base;
@@ -4043,12 +4073,12 @@ function accountUI() {
             }
 
             $('.account.plan-info.bandwidth .plan-comment')
-                .text('%1 base quota + %2'
+                .text(l[16300]
                     .replace('%1', bytesToSize(transferBaseQuota, 0))
                     .replace('%2', bytesToSize(transferCurrentValue, 0))
                 );
             $('.account.plan-info.storage .plan-comment')
-                .text('%1 base quota + %2'
+                .text(l[16300]
                     .replace('%1', bytesToSize(storageBaseQuota, 0))
                     .replace('%2', bytesToSize(storageCurrentValue, 0))
                 );
@@ -4067,19 +4097,18 @@ function accountUI() {
             storageBaseQuota = Math.round(storageBaseQuota * 100 / storageMaxValue);
             transferBaseQuota = Math.round(transferBaseQuota * 100 / transferMaxValue);
 
-            // TODO: l[]
-            var quotaTxt = '[S]@@[/S] of @@'.replace('[S]', '<span>').replace('[/S]', '</span>');
+            var quotaTxt = l[16301].replace('[S]', '<span>').replace('[/S]', '</span>');
 
             var $achBlock = $('.account.achievements-block');
             var $quotaTxt = $('.account.quota-txt.storage', $achBlock);
 
-            $quotaTxt.safeHTML(quotaTxt,
+            $quotaTxt.safeHTML('%n', quotaTxt,
                 bytesToSize(storageCurrentValue, 0),
                 bytesToSize(storageMaxValue, 0));
 
             $quotaTxt = $('.account.quota-txt.transfer', $achBlock);
 
-            $quotaTxt.safeHTML(quotaTxt,
+            $quotaTxt.safeHTML('%n', quotaTxt,
                 bytesToSize(transferCurrentValue, 0),
                 bytesToSize(transferMaxValue, 0));
         }
@@ -4400,7 +4429,7 @@ function accountUI() {
         $('.default-select.country .default-select-scroll').safeHTML(html);
 
         // Bind Dropdowns events
-        bindDropdownEvents($('.fm-account-main .default-select'), 1);
+        bindDropdownEvents($('.fm-account-main .default-select'), 1, '.account.tab-content');
 
         // Cache selectors
         var $newEmail = $('#account-email');
@@ -4476,7 +4505,7 @@ function accountUI() {
             u_attr.country = $('.default-select.country .default-dropdown-item.active').attr('data-value');
 
             $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', true));
-            $('.fm-avatar img').attr('src', useravatar.mine());
+            $('.fm-avatar').safeHTML(useravatar.contact(u_handle, '', 'div'));
 
             api_req({
                 a : 'up',
@@ -5129,7 +5158,7 @@ function accountUI() {
             for (var i in prices)
                 voucheroptions += '<div class="default-dropdown-item" data-value="' + htmlentities(prices[i]) + '">&euro;' + htmlentities(prices[i]) + ' voucher</div>';
             $('.default-select.vouchertype .default-select-scroll').html(voucheroptions);
-            bindDropdownEvents($('.default-select.vouchertype'));
+            bindDropdownEvents($('.default-select.vouchertype'), 0, '.account.tab-content');
         }
 
         $('.fm-purchase-voucher,.default-white-button.topup').rebind('click', function(e)
@@ -5169,7 +5198,7 @@ function accountUI() {
 
                     useravatar.invalidateAvatar(u_handle);
                     $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', true));
-                    $('.fm-avatar img').attr('src', useravatar.mine());
+                    $('.fm-avatar').safeHTML(useravatar.contact(u_handle, '', 'div'));
                     $('.fm-account-remove-avatar').hide();
                 }
             });
@@ -5309,6 +5338,25 @@ function accountUI() {
             $sectionBlock.find('.account.tab-lnk.active').removeClass('active');
             $this.addClass('active');
             $(window).trigger('resize');
+
+            Soon(function() {
+                if (currentTab === 'achievements') {
+                    var minHeight = 0;
+                    var $achTable = $('.account.data-block .achievements-table');
+
+                    if (!$achTable.hasClass('achfulldesch')) {
+                        $achTable.addClass('achfulldesch')
+
+                        $('.achievement-full.description:visible', $achTable)
+                            .each(function(i, e) {
+                                minHeight = Math.max(minHeight, $(e).outerHeight());
+                            })
+                            .css('min-height', minHeight + 'px');
+
+                        $(window).trigger('resize');
+                    }
+                }
+            });
         }
     });
 
@@ -5524,7 +5572,7 @@ function avatarDialog(close)
                 useravatar.setUserAvatar(u_handle, data, this.outputFormat);
 
                 $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', true));
-                $('.fm-avatar img').attr('src', useravatar.mine());
+                $('.fm-avatar').safeHTML(useravatar.contact(u_handle, '', 'div'));
                 avatarDialog(1);
             },
             onImageUpload: function()
@@ -5857,7 +5905,10 @@ var QuickFinder = function(searchable_elements, containers) {
     var next_idx = 0;
 
     // hide on page change
-    $(window).rebind('hashchange.quickfinder', function() {
+    if (QuickFinder._pageChangeListenerId) {
+        mBroadcaster.removeListener(QuickFinder._pageChangeListenerId);
+    }
+    QuickFinder._pageChangeListenerId = mBroadcaster.addListener('pagechange', function () {
         if (self.is_active()) {
             self.deactivate();
         }
@@ -7534,31 +7585,45 @@ function adjustContextMenuPosition(e, m)
     return true;
 }
 
-function reCalcMenuPosition(m, x, y, ico)
-{
+/**
+ * Calculates coordinates where context menu will be shown
+ * @param {Object} m jQuery object of context menu or child class
+ * @param {Number} x Coordinate x of cursor or clicked element
+ * @param {Number} y Coordinate y of cursor or clicked element
+ * @param {Object} ico JSON {x, y} width and height of element clicked on
+ * @returns {Object} Coordinates {x, y} where context menu will be drawn
+ */
+/* jshint -W074 */
+function reCalcMenuPosition(m, x, y, ico) {
+
     var TOP_MARGIN = 12;
     var SIDE_MARGIN = 12;
-    var cmW = m.outerWidth(), cmH = m.outerHeight();// dimensions without margins calculated
-    var wH = window.innerHeight, wW = window.innerWidth;
-    var maxX = wW - SIDE_MARGIN;// max horizontal
-    var maxY = wH - TOP_MARGIN;// max vertical
-    var minX = SIDE_MARGIN + $('div.nw-fm-left-icons-panel').outerWidth();// min horizontal
-    var minY = TOP_MARGIN;// min vertical
-    var wMax = x + cmW;// coordinate of right edge
-    var hMax = y + cmH;// coordinate of bottom edge
+    var cmW = m.outerWidth();// dimensions without margins calculated
+    var cmH = m.outerHeight();// dimensions without margins calculated
+    var wH = window.innerHeight;
+    var wW = window.innerWidth;
+    var maxX = wW - SIDE_MARGIN;// max horizontal coordinate, right side of window
+    var maxY = wH - TOP_MARGIN;// max vertical coordinate, bottom side of window
 
-    var overlapParentMenu = function(n)
-    {
+    // min horizontal coordinate, left side of right panel
+    var minX = SIDE_MARGIN + $('div.nw-fm-left-icons-panel').outerWidth();
+    var minY = TOP_MARGIN;// min vertical coordinate, top side of window
+    var wMax = x + cmW;// coordinate of context menu right edge
+    var hMax = y + cmH;// coordinate of context menu bottom edge
+
+    var top = 'auto';
+    var left = '100%';
+    var right = 'auto';
+
+    var overlapParentMenu = function(n) {
         var tre = wW - wMax;// to right edge
         var tle = x - minX - SIDE_MARGIN;// to left edge
 
-        if (tre >= tle)
-        {
+        if (tre >= tle) {
             n.addClass('overlap-right');
             n.css({'top': top, 'left': (maxX - x - nmW) + 'px'});
         }
-        else
-        {
+        else {
             n.addClass('overlap-left');
             n.css({'top': top, 'right': (wMax - nmW - minX) + 'px'});
         }
@@ -7566,57 +7631,65 @@ function reCalcMenuPosition(m, x, y, ico)
         return;
     };
 
-    // submenus are absolutely positioned, which means that they are relative to first parent, positioned other then static
-    // first parent, which is NOT a .contains-submenu element (it's previous in same level)
-    var horPos = function(n)// used for submenues
-    {
+    /**
+     * Calculates top position of submenu
+     * Submenu is relatively positioned to the first sibling element
+     * @param {Object} n jQuery object, submenu of hovered element
+     * @returns {String} top Top coordinate in pixels for submenu
+     */
+    var horPos = function(n) {
         var top;
         var nTop = parseInt(n.css('padding-top'));
         var tB = parseInt(n.css('border-top-width'));
         var pPos = m.position();
-
         var b = y + nmH - (nTop - tB);// bottom of submenu
         var mP = m.closest('.dropdown.body.submenu');
-        var pT = 0, bT = 0, pE = 0;
-        if (mP.length)
-        {
+        var pT = 0;
+        var bT = 0;
+        var pE = 0;
+
+        if (mP.length) {
             pE = mP.offset();
             pT = parseInt(mP.css('padding-top'));
             bT = parseInt(mP.css('border-top-width'));
         }
-        if (b > maxY)
+        if (b > maxY) {
             top = (maxY - nmH + nTop - tB) - pE.top + 'px';
-        else
+        }
+        else {
             top = pPos.top - tB + 'px';
+        }
 
         return top;
     };
 
-    var dPos;
+    var dPos;// new context menu position
     var cor;// corner, check setBordersRadius for more info
-    if (typeof ico === 'object')// draw context menu relative to file-settings-icon
-    {
+    if (typeof ico === 'object') {// draw context menu relative to file-settings-icon
         cor = 1;
         dPos = {'x': x - 2, 'y': y + ico.y + 8};// position for right-bot
-        if (wMax > maxX)// draw to the left
-        {
+
+        // draw to the left
+        if (wMax > maxX) {
             dPos.x = x - cmW + ico.x + 2;// additional pixels to align with -icon
             cor = 3;
         }
-        if (hMax > maxY)// draw to the top
-        {
-            dPos.y = y - cmH;// additional pixels to align with -icon
+
+        // draw to the top
+        if (hMax > (maxY - TOP_MARGIN)) {
+            dPos.y = y - cmH - 6;
+            if (dPos.y < TOP_MARGIN) {
+                dPos.y = TOP_MARGIN;
+            }
             cor++;
         }
     }
-    else if (ico === 'submenu')// submenues
-    {
+    else if (ico === 'submenu') {// submenues
         var n = m.next('.dropdown.body.submenu');
         var nmW = n.outerWidth();// margin not calculated
         var nmH = n.outerHeight();// margins not calculated
 
-        if (nmH > (maxY - TOP_MARGIN))// Handle huge menu
-        {
+        if (nmH > (maxY - TOP_MARGIN)) {// Handle huge menu
             nmH = maxY - TOP_MARGIN;
             var tmp = document.getElementById('csb_' + m.attr('id').replace('fi_', ''));
             $(tmp).addClass('context-scrolling-block');
@@ -7626,30 +7699,28 @@ function reCalcMenuPosition(m, x, y, ico)
             n.css({'height': nmH + 'px'});
         }
 
-        var top = 'auto', left = '100%', right = 'auto';
-
         top = horPos(n);
-        if (m.parent().parent('.left-position').length === 0)
-        {
-            if (maxX >= (wMax + nmW))
+        if (m.parent().parent('.left-position').length === 0) {
+            if (maxX >= (wMax + nmW)) {
                 left = 'auto', right = '100%';
-            else if (minX <= (x - nmW))
+            }
+            else if (minX <= (x - nmW)) {
                 n.addClass('left-position');
-            else
-            {
+            }
+            else {
                 overlapParentMenu(n);
 
                 return true;
             }
         }
-        else
-        {
-            if (minX <= (x - nmW))
+        else {
+            if (minX <= (x - nmW)) {
                 n.addClass('left-position');
-            else if (maxX >= (wMax + nmW))
+            }
+            else if (maxX >= (wMax + nmW)) {
                 left = 'auto', right = '100%';
-            else
-            {
+            }
+            else {
                 overlapParentMenu(n);
 
                 return true;
@@ -7658,22 +7729,26 @@ function reCalcMenuPosition(m, x, y, ico)
 
         return {'top': top, 'left': left, 'right': right};
     }
-    else// right click
-    {
+    else {// right click
         cor = 0;
         dPos = {'x': x, 'y': y};
-        if (x < minX)
+        if (x < minX) {
             dPos.x = minX;// left side alignment
-        if (wMax > maxX)
-            dPos.x = maxX - cmW;// align with right side, 12px from it
-        if (hMax > maxY)
-            dPos.y = maxY - cmH;// align with bottom, 12px from it
+        }
+        if (wMax > maxX) {
+            dPos.x = maxX - cmW;// align with right side
+        }
+
+        if (hMax > maxY) {
+            dPos.y = maxY - cmH;// align with bottom
+        }
     }
 
     setBordersRadius(m, cor);
 
     return {'x': dPos.x, 'y': dPos.y};
 }
+/* jshint -W074 */
 
 // corner position 0 means default
 function setBordersRadius(m, c)
@@ -7716,30 +7791,25 @@ function setBordersRadius(m, c)
 }
 
 // Scroll menus which height is bigger then window.height
-function scrollMegaSubMenu(e)
-{
+function scrollMegaSubMenu(e) {
     var ey = e.pageY;
     var c = $(e.target).closest('.dropdown.body.submenu');
     var pNode = c.children(':first')[0];
 
-    if (typeof pNode !== 'undefined')
-    {
+    if (typeof pNode !== 'undefined') {
         var h = pNode.offsetHeight;
         var dy = h * 0.1;// 10% dead zone at the begining and at the bottom
         var pos = getHtmlElemPos(pNode, true);
         var py = (ey - pos.y - dy) / (h - dy * 2);
-        if (py > 1)
-        {
+        if (py > 1) {
             py = 1;
             c.children('.context-bottom-arrow').addClass('disabled');
         }
-        else if (py < 0)
-        {
+        else if (py < 0) {
             py = 0;
             c.children('.context-top-arrow').addClass('disabled');
         }
-        else
-        {
+        else {
             c.children('.context-bottom-arrow,.context-top-arrow').removeClass('disabled');
         }
         pNode.scrollTop = py * (pNode.scrollHeight - h);
@@ -11363,30 +11433,56 @@ function achievementsListDialog(close) {
             if (selector) {
                 var $cell = $('.achievements-cell.' + selector, $dialog).removeClass('hidden');
 
-                var locFmt = '[S]@@[/S] storage space'.replace('[S]', '<span>').replace('[/S]', '</span>');
+                var locFmt = l[16287].replace('[S]', '<span>').replace('[/S]', '</span>');
                 $('.reward.storage .reward-txt', $cell)
-                    .safeHTML(locFmt, bytesToSize(data[0], 0));
+                    .safeHTML('%n', locFmt, bytesToSize(data[0], 0));
 
                 if (!data[1]) {
                     $cell.addClass('one-reward');
                 }
                 else {
-                    locFmt = '[S]@@[/S] transfer quota'.replace('[S]', '<span>').replace('[/S]', '</span>');
+                    locFmt = l[16288].replace('[S]', '<span>').replace('[/S]', '</span>');
                     $('.reward.bandwidth .reward-txt', $cell)
-                        .safeHTML(locFmt, bytesToSize(data[1], 0));
+                        .safeHTML('%n', locFmt, bytesToSize(data[1], 0));
+                }
+
+                if (!$cell.hasClass('localized')) {
+                    $cell.addClass('localized');
+
+                    var $desc = $cell.find('.description');
+                    var text = String($desc.text()).trim().replace('[%3]', '%3');
+
+                    if (!data[1]) {
+                        // one-reward
+                        $desc.safeHTML('%n', text, bytesToSize(data[0], 0), data.expiry.value);
+                    }
+                    else {
+                        $desc.safeHTML('%n', text, bytesToSize(data[0], 0),
+                            bytesToSize(data[1], 0), data.expiry.value);
+                    }
                 }
 
                 if (data.rwd && idx !== ach.ACH_INVITE) {
                     $cell.addClass('achived');
 
-                    locFmt = '(Expires in [S]@@[/S] @@)'.replace('[S]', '<span>').replace('[/S]', '</span>');
-                    $('.expires-txt', $cell).addClass('red').safeHTML(locFmt, data.rwd.left, 'days');
+                    locFmt = l[16289].replace('[S]', '<span>').replace('[/S]', '</span>');
+                    if (!data.rwd.e) {
+                        // this reward do not expires
+                        locFmt = '&nbsp;';
+                    }
+                    else if (data.rwd.left < 1) {
+                        // show "Expired"
+                        locFmt = l[1664];
+                    }
+                    $('.expires-txt', $cell).addClass('red').safeHTML('%n', locFmt, data.rwd.left, l[16290]);
                 }
                 else {
                     ach.bind.call($('.button', $cell), ach.mapToAction[idx]);
 
-                    locFmt = '(Expires after [S]@@[/S] @@)'.replace('[S]', '<span>').replace('[/S]', '</span>');
-                    $('.expires-txt', $cell).removeClass('red').safeHTML(locFmt, data.expiry.value, data.expiry.utxt);
+                    locFmt = l[16291].replace('[S]', '<span>').replace('[/S]', '</span>');
+                    $('.expires-txt', $cell)
+                        .removeClass('red')
+                        .safeHTML('%n', locFmt, data.expiry.value, data.expiry.utxt);
                 }
 
                 $cell.removeClass('hidden');
@@ -11438,14 +11534,16 @@ function inviteFriendDialog(close) {
     var maf = M.maf;
     maf = maf[ach.ACH_INVITE];
 
-    var locFmt = 'Get [S]@@[/S] free storage and [S]@@[/S] of transfer quota for each friend who installs a MEGA app'.replace(/\[S\]/g, '<span>').replace(/\[\/S\]/g, '</span>');
-    $('.header.default', $dialog).safeHTML(locFmt, bytesToSize(maf[0], 0), bytesToSize(maf[1], 0));
+    var locFmt = l[16325].replace(/\[S\]/g, '<span>').replace(/\[\/S\]/g, '</span>');
+    $('.header.default', $dialog).safeHTML('%n', locFmt, bytesToSize(maf[0], 0), bytesToSize(maf[1], 0));
+
+    $('.info-body p:first', $dialog).safeHTML(l[16317].replace('[S]', '<strong>').replace('[/S]', '</strong>'));
 
     if (!$('.achievement-dialog.input').tokenInput("getSettings")) {
         initInviteDialogMultiInputPlugin();
-
-        locFmt = "Encourage your friend to register and install a MEGA app. As long as your friend uses the same email address as you've entered, you will receive your free [S]@@[/S] of storage space and [S]@@[/S] of transfer quota.".replace(/\[S\]/g, '<span class="red">').replace(/\[\/S\]/g, '</span>');
-        $('.success-content .info-body p:first', $dialog).safeHTML(locFmt, bytesToSize(maf[0], 0), bytesToSize(maf[1], 0));
+        locFmt = l[16326].replace(/\[S\]/g, '<span class="red">').replace(/\[\/S\]/g, '</span>');
+        $('.success-content .info-body p:first', $dialog)
+            .safeHTML('%n', locFmt, bytesToSize(maf[0], 0), bytesToSize(maf[1], 0));
     }
 
     // Remove all previously added emails
@@ -11470,7 +11568,7 @@ function inviteFriendDialog(close) {
     $('.multiple-input .token-input-list-invite', $dialog).click();
 
     // Show "Invitation Status" button if invitations were sent before
-    if (maf && maf.rwd) {
+    if (maf && maf.rwd && 0) {
         $('.default-white-button.inline.status', $dialog)
             .removeClass('hidden')
             .rebind('click', function() {
@@ -11719,8 +11817,8 @@ function invitationStatusDialog(close) {
     var maf = M.maf;
     maf = maf[ach.ACH_INVITE];
 
-    var locFmt = "Encourage your friend to register and install a MEGA app. As long as your friend uses the same email address as you've entered, you will receive your free [S]@@[/S] of storage space and [S]@@[/S] of transfer quota.".replace(/\[S\]/g, '<span>').replace(/\[\/S\]/g, '</span>');
-    $('.hint', $dialog).safeHTML(locFmt, bytesToSize(maf[0], 0), bytesToSize(maf[1], 0));
+    var locFmt = l[16327].replace(/\[S\]/g, '<span class="red">').replace(/\[\/S\]/g, '</span>');
+    $('.hint', $dialog).safeHTML('%n', locFmt, bytesToSize(maf[0], 0), bytesToSize(maf[1], 0));
 
     // Due specific M.maf.rwds structure sorting must be done respecting it
     var getSortByMafEmailFn = function () {
@@ -11799,15 +11897,14 @@ function invitationStatusDialog(close) {
     else if (sortBy === l[16100]) {// Date Sent
         sortFn = M.getSortByDateTimeFn();
     }
+    var rwds = maf.rwds || [maf.rwd];
+    var rlen = rwds.length;
 
-    maf.rwds.sort(
+    rwds.sort(
         function (a, b) {
             return sortFn(a, b, getConfig().sortDir);
         }
     );
-
-    var rwds = maf.rwds;
-    var rlen = rwds.length;
 
     while (rlen--) {
         var rwd = rwds[rlen];
@@ -11827,9 +11924,9 @@ function invitationStatusDialog(close) {
                     l[16105]);// Quota Granted
 
                 var expiry = rwd.expiry || maf.expiry;
-                var locFmt = '(Expires in [S]@@[/S] @@)'.replace('[S]', '').replace('[/S]', '');
+                locFmt = l[16289].replace('[S]', '').replace('[/S]', '');
                 $('.status .light-grey', $tmpl)
-                    .safeHTML(locFmt, expiry.value, expiry.utxt);
+                    .safeHTML('%n', locFmt, expiry.value, expiry.utxt);
 
                 $('.icon i', $tmpl).addClass('tick');
             }
@@ -12956,30 +13053,48 @@ function FMResizablePane(element, opts) {
  *
  * @param {Selector} $dropdown  Class .dropdown elements selector
  * @param {String}   saveOption Addition option for account page only. Allows to show "Show changes" notification
+ * @param {String}   classname/id of  content block for dropdown aligment
  */
-function bindDropdownEvents($dropdown, saveOption) {
+function bindDropdownEvents($dropdown, saveOption, contentBlock) {
 
     var $dropdownsItem = $dropdown.find('.default-dropdown-item');
+    var $contentBlock = contentBlock ? $(contentBlock) : $(window);
 
     $($dropdown).rebind('click', function(e)
     {
         var $this = $(this);
         if (!$this.hasClass('active')) {
-            var bottPos, jsp,
-                scrollBlock = '#' + $this.attr('id') + ' .default-select-scroll',
-                $dropdown = $this.find('.default-select-dropdown'),
-                $activeDropdownItem = $this.find('.default-dropdown-item.active');
+            var jsp;
+            var scrollBlock = '#' + $this.attr('id') + ' .default-select-scroll';
+            var $dropdown = $this.find('.default-select-dropdown');
+            var $activeDropdownItem = $this.find('.default-dropdown-item.active');
+            var dropdownOffset;
+            var dropdownBottPos;
+            var dropdownHeight;
+            var contentBlockHeight;
 
             //Show select dropdown
-            $('.active .default-select-dropdown').fadeOut(200);
+            $('.active .default-select-dropdown').addClass('hidden');
             $this.addClass('active');
-            $dropdown.css('margin-top', '0px');
-            $dropdown.fadeIn(200);
+            $dropdown.removeAttr('style');
+            $dropdown.removeClass('hidden');
 
             //Dropdown position relative to the window
-            bottPos = $(window).height() - ($dropdown.offset().top + $dropdown.outerHeight());
-            if (bottPos < 50) {
-                $dropdown.css('margin-top', '-' + (60 - bottPos) + 'px');
+            dropdownOffset = $dropdown.offset().top - $contentBlock.offset().top;
+            contentBlockHeight = $contentBlock.height();
+            dropdownHeight = $dropdown.outerHeight();
+            dropdownBottPos = contentBlockHeight - (dropdownOffset + dropdownHeight);
+
+            if (contentBlockHeight < (dropdownHeight + 20)) {
+                $dropdown.css({
+                    'margin-top': '-' + (dropdownOffset - 10) + 'px',
+                    'height': (contentBlockHeight - 20) + 'px'
+                });
+            }
+            else if (dropdownBottPos < 10) {
+                $dropdown.css({
+                    'margin-top': '-' + (10 - dropdownBottPos) + 'px'
+                });
             }
 
             //Dropdown scrolling initialization
@@ -12994,8 +13109,9 @@ function bindDropdownEvents($dropdown, saveOption) {
             if (jsp && $activeDropdownItem.length) {
                 jsp.scrollToElement($activeDropdownItem);
             }
-        } else {
-            $this.find('.default-select-dropdown').fadeOut(200);
+        }
+        else if (!$(e.target).parents('.jspVerticalBar').length) {
+            $this.find('.default-select-dropdown').addClass('hidden');
             $this.removeClass('active');
         }
     });
@@ -13021,9 +13137,9 @@ function bindDropdownEvents($dropdown, saveOption) {
     $('#fmholder, .fm-dialog').rebind('click.defaultselect', function(e) {
 
         // ToDo: Narrow this condition and find main reason why it's made
-        if (!$(e.target).hasClass('default-select')) {
+        if (!$(e.target).parents('.default-select').length && !$(e.target).hasClass('default-select')) {
             $selectBlock = $('.default-select.active');
-            $selectBlock.find('.default-select-dropdown').fadeOut(200);
+            $selectBlock.find('.default-select-dropdown').addClass('hidden');
             $selectBlock.removeClass('active');
         }
     });
@@ -13351,11 +13467,16 @@ function removeFromMultiInputDDL(dialog, item) {
                     type = M.lastActiveTab || 'cloud-drive';
                 }
 
-                // Show all items in sort dialog in case contacts tab is choosen
+                // Show only contacts related sorting options
                 if (type === 'contacts') {
                     menu.find('.sorting-item-divider,.sorting-menu-item').removeClass('hidden');
+                    menu.find(
+                            '*[data-by="fav"],' +
+                            '*[data-by="created"]'
+                        ).addClass('hidden');
                 }
                 else { // Hide status and last-interaction sorting options in sort dialog
+                    menu.find('.sorting-item-divider,.sorting-menu-item').removeClass('hidden');
                     menu.find('*[data-by=status],*[data-by=last-interaction]').addClass('hidden');
                 }
 

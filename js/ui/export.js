@@ -1801,8 +1801,12 @@ var exportExpiry = {
         var share = M.getNodeShare(nodeId);
         var request = { a: 'l', n: nodeId, i: requesti };
 
+        if (d) {
+            console.debug('_getExportLinkRequest', share.ph, Object(M.d[nodeId]).ph, share);
+        }
+
         // No need to perform an API call if this file was already exported (Ie, we're updating)
-        if (share.h === nodeId && share.ph) {
+        if (share.h === nodeId && Object(M.d[nodeId]).ph) {
             return done(nodeId);
         }
 
@@ -1816,8 +1820,8 @@ var exportExpiry = {
             callback: function(result) {
                 if (typeof result !== 'number') {
                     M.nodeShare(this.nodeId, { h: this.nodeId, r: 0, u: 'EXP', ts: unixtime(), ph: result });
-                    var n;
-                    if (fmdb && (n = M.d[this.nodeId])) {
+                    var n = M.d[this.nodeId];
+                    if (n) {
                         n.ph = result;
                         M.nodeUpdated(n);
                     }

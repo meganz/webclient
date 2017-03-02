@@ -306,15 +306,21 @@ function MegaData()
     };
 
     this.sortByName = function(d) {
-        var self = this;
+        if (typeof Intl !== 'undefined' && Intl.Collator) {
+            var intl = new Intl.Collator('co', {numeric: true});
 
-        this.sortfn = function(a, b, d) {
-            // reusing the getNameByHandle code for converting contact's name/email to renderable string
-            var itemA = self.getNameByHandle(a.h);
-            var itemB  = self.getNameByHandle(b.h);
-            return mega.utils.compareStrings(itemA, itemB, d);
+            this.sortfn = function(a, b, d) {
+                return intl.compare(a.name, b.name) * d;
+            };
         }
-
+        else {
+            this.sortfn = function(a, b, d) {
+                if (typeof a.name === 'string' && typeof b.name === 'string') {
+                    return a.name.localeCompare(b.name) * d;
+                }
+                return -1;
+            };
+        }
         this.sortd = d;
         this.sort();
     };

@@ -102,8 +102,10 @@ var ConversationsListItem = React.createClass({
                 renderableSummary = lastMessage.getManagementMessageSummaryText();
             }
 
-            lastMessageDiv = <div className={lastMsgDivClasses}>
-                        {renderableSummary}
+            renderableSummary = htmlentities(renderableSummary);
+            renderableSummary = megaChat.plugins.emoticonsFilter.processHtmlMessage(renderableSummary);
+
+            lastMessageDiv = <div className={lastMsgDivClasses} dangerouslySetInnerHTML={{__html:renderableSummary}}>
                     </div>;
 
             var timestamp = lastMessage.delay;

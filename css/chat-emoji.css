@@ -1,0 +1,147 @@
+/*[class*=emoji-] {*/
+    /*text-indent: -9999em;*/
+    /*font-size: 14px;*/
+    /*height: 20px;*/
+    /*width: 20px;*/
+    /*top: -2px;*/
+    /*position: relative;*/
+    /*display: inline-block;*/
+    /*margin: 0 2px;*/
+    /*line-height: normal;*/
+    /*vertical-align: middle;*/
+    /*background-image: url("../images/mega/emoji-sprites-v1.png");*/
+    /*background-size: 3600%;*/
+    /*background-repeat: no-repeat;*/
+/*}*/
+.emoji.demo-icon {
+    display: block;
+    float: left;
+    top: 0;
+    margin: 14px 0 0 0;
+}
+
+.emoji.square-button {
+    margin: 3px 5px 0 5px;
+}
+.emoji.square-button span {
+    top: 6px;
+}
+.emoji.square-button img {
+    top: 5px;
+    position:relative;
+}
+.emoji-type-txt {
+    font-size: 14px;
+    line-height: 18px;
+    color:#666666;
+    text-transform:uppercase;
+    padding: 21px 11px 13px 11px;
+    
+}
+.emoji-type-txt:first-child {
+    padding: 2px 11px 15px 11px;
+}
+
+.emoji.title {
+    font-size: 14px;
+    line-height: 18px;
+    color: #666666;
+    float: left;
+    margin: 15px 0 0 10px;
+}
+
+.emoji.emoji-loading {
+    background-color: rgba(0, 0, 0, 0.02);
+    border-radius: 6px;
+}
+
+
+.emoji-preview img {
+    float: left;
+    display: inline-block;
+    vertical-align: top;
+    margin: 14px 0px 0 0 !important;
+}
+.dropdown.emoji .loading {
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    margin-top: 60%;
+    color: rgba(0,0,0, 0.3)
+}
+.popup-footer.emoji .button i {
+    margin-top: 6px;
+}
+
+img.emoji {
+    width: 20px;
+    height: 20px;
+    display:inline-block;
+    vertical-align: middle;
+    margin-top: -2px;
+    margin-left: 2px;
+    margin-right: 2px;
+}
+
+img.emoji.big {
+    width: 32px;
+    height: 32px;
+    display:inline-block;
+    vertical-align: middle;
+    margin-top: 4px;
+    margin-bottom: 8px;
+    margin-left: 2px;
+    margin-right: 2px;
+}
+
+.conversations-pane img.emoji {
+    width: 12px;
+    height: 12px;
+    margin-bottom: -1px;
+}
+
+
+/** new hover/active styles for the emoji dropdown **/
+.button.square-button i {
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
+    -moz-opacity: 0.3;
+    -khtml-opacity: 0.3;
+    opacity: 0.3;
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
+}
+.button.square-button:hover {
+    background-color: transparent;
+}
+.button.square-button:hover i, .button.square-button.active i {
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
+    -moz-opacity: 0.5;
+    -khtml-opacity: 0.5;
+    opacity: 0.5;
+}
+.button.square-button.active {
+    background-color: transparent;
+}
+.button.square-button:after {
+    content: " ";
+    display: block;
+    position: relative;
+    bottom: -4px;
+    left: -2px;
+    width: 36px;
+    height: 2px;
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 100ms ease-in-out;
+    transition: all 200ms ease-in-out;
+}
+.button.square-button.active:after {
+    background-color: rgb(255, 051, 058);
+}
+.button.square-button.emoji {
+    cursor: pointer;
+}

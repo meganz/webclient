@@ -3936,9 +3936,14 @@ function accountUI() {
                                 $('.progress-indicator', $transferItem).addClass('active');
 
                                 if (idx !== ach.ACH_INVITE) {
-                                    $('.progress-title', $transferItem)
-                                        .safeAppend('<span class="red-txt">&nbsp;(@@)</span>',
-                                            '%1 days left'.replace('%1', data.rwd.left));
+                                    if (data.rwd.e) {
+                                        $('.progress-title', $transferItem)
+                                            .safeAppend('<span class="red-txt">&nbsp;(@@)</span>',
+                                                data.rwd.left > 0
+                                                    ? l[16284].replace('%1', data.rwd.left)
+                                                    : l[1664]
+                                            );
+                                    }
                                 }
                                 else {
                                     if (base > 1) {
@@ -3946,7 +3951,7 @@ function accountUI() {
                                         $transferItem
                                             .css('cursor', 'pointer')
                                             .attr('title',
-                                                'Achieved %1 times, click for status.'.replace('%1', base));
+                                                l[16285].replace('%1', base));
                                     }
                                 }
                             }
@@ -3961,6 +3966,22 @@ function accountUI() {
                             $('.rewards .reward:last-child', $cell).addClass('hidden');
                         }
 
+                        if (!$cell.hasClass('localized')) {
+                            $cell.addClass('localized');
+
+                            var $desc = $cell.find('.description');
+                            var text = String($desc.text()).trim().replace('[%3]', '%3');
+
+                            if (!data[1]) {
+                                // one-reward
+                                $desc.safeHTML('%n', text, bytesToSize(data[0], 0), data.expiry.value);
+                            }
+                            else {
+                                $desc.safeHTML('%n', text, bytesToSize(data[0], 0),
+                                    bytesToSize(data[1], 0), data.expiry.value);
+                            }
+                        }
+
                         if (idx === ach.ACH_INVITE) {
                             ach.bind.call($('.button', $cell), ach.mapToAction[idx]);
 
@@ -3973,7 +3994,7 @@ function accountUI() {
                                     $storageItem
                                         .css('cursor', 'pointer')
                                         .attr('title',
-                                            'Achieved %1 times, click for status.'.replace('%1', base));
+                                            l[16285].replace('%1', base));
                                 }
                             }
                         }
@@ -3981,16 +4002,29 @@ function accountUI() {
                             // Achieved
                             storageCurrentValue += storageValue;
                             $('.progress-indicator', $storageItem).addClass('active');
-                            $('.progress-title', $storageItem)
-                                .safeAppend('<span class="red-txt">&nbsp;(@@)</span>', '%1 days left'.replace('%1', data.rwd.left));
+                            if (data.rwd.e) {
+                                $('.progress-title', $storageItem)
+                                    .safeAppend('<span class="red-txt">&nbsp;(@@)</span>',
+                                        data.rwd.left > 0
+                                            ? l[16284].replace('%1', data.rwd.left)
+                                            : l[1664]
+                                    );
+                            }
 
                             $('.status', $cell)
                                 .safeHTML(
                                     '<div class="achievement-complete">@@</div>' +
                                     '<div class="achievement-date">@@ <span class="red-txt">(@@)</span></div>' +
                                     '<div class="clear"></div>',
-                                    'Achieved', data.rwd.date.toLocaleDateString(),
-                                    '%1 days left'.replace('%1', data.rwd.left));
+                                    l[16286], data.rwd.date.toLocaleDateString(),
+                                    data.rwd.left > 0
+                                        ? l[16284].replace('%1', data.rwd.left)
+                                        : l[1664]
+                                );
+
+                            if (!data.rwd.e) {
+                                $('.status .achievement-date .red-txt', $cell).addClass('hidden');
+                            }
 
                             if (data.rwd.left < 1) {
                                 $storageItem.addClass('disabled');
@@ -4005,19 +4039,18 @@ function accountUI() {
                 }
             }
 
-
             // For free users only show base quota for storage and remove it for bandwidth.
             // For pro users replace base quota by pro quota
             if (u_attr.p) {
                 var $baseq = $('.achievements-block .data-block.storage .baseq');
                 storageBaseQuota = maf.storage.base;
                 $('.progress-txt', $baseq).text(bytesToSize(storageBaseQuota, 0));
-                $('.progress-title', $baseq).text('PRO Base Quota');
+                $('.progress-title', $baseq).text(l[16299]);
 
                 transferBaseQuota = maf.transfer.base;
                 $baseq = $('.achievements-block .data-block.transfer .baseq');
                 $('.progress-txt', $baseq).text(bytesToSize(transferBaseQuota, 0));
-                $('.progress-title', $baseq).text('PRO Base Quota');
+                $('.progress-title', $baseq).text(l[16299]);
             }
             else {
                 storageBaseQuota = maf.storage.base;
@@ -4025,12 +4058,12 @@ function accountUI() {
             }
 
             $('.account.plan-info.bandwidth .plan-comment')
-                .text('%1 base quota + %2'
+                .text(l[16300]
                     .replace('%1', bytesToSize(transferBaseQuota, 0))
                     .replace('%2', bytesToSize(transferCurrentValue, 0))
                 );
             $('.account.plan-info.storage .plan-comment')
-                .text('%1 base quota + %2'
+                .text(l[16300]
                     .replace('%1', bytesToSize(storageBaseQuota, 0))
                     .replace('%2', bytesToSize(storageCurrentValue, 0))
                 );
@@ -4049,19 +4082,18 @@ function accountUI() {
             storageBaseQuota = Math.round(storageBaseQuota * 100 / storageMaxValue);
             transferBaseQuota = Math.round(transferBaseQuota * 100 / transferMaxValue);
 
-            // TODO: l[]
-            var quotaTxt = '[S]@@[/S] of @@'.replace('[S]', '<span>').replace('[/S]', '</span>');
+            var quotaTxt = l[16301].replace('[S]', '<span>').replace('[/S]', '</span>');
 
             var $achBlock = $('.account.achievements-block');
             var $quotaTxt = $('.account.quota-txt.storage', $achBlock);
 
-            $quotaTxt.safeHTML(quotaTxt,
+            $quotaTxt.safeHTML('%n', quotaTxt,
                 bytesToSize(storageCurrentValue, 0),
                 bytesToSize(storageMaxValue, 0));
 
             $quotaTxt = $('.account.quota-txt.transfer', $achBlock);
 
-            $quotaTxt.safeHTML(quotaTxt,
+            $quotaTxt.safeHTML('%n', quotaTxt,
                 bytesToSize(transferCurrentValue, 0),
                 bytesToSize(transferMaxValue, 0));
         }
@@ -5291,6 +5323,25 @@ function accountUI() {
             $sectionBlock.find('.account.tab-lnk.active').removeClass('active');
             $this.addClass('active');
             $(window).trigger('resize');
+
+            Soon(function() {
+                if (currentTab === 'achievements') {
+                    var minHeight = 0;
+                    var $achTable = $('.account.data-block .achievements-table');
+
+                    if (!$achTable.hasClass('achfulldesch')) {
+                        $achTable.addClass('achfulldesch')
+
+                        $('.achievement-full.description:visible', $achTable)
+                            .each(function(i, e) {
+                                minHeight = Math.max(minHeight, $(e).outerHeight());
+                            })
+                            .css('min-height', minHeight + 'px');
+
+                        $(window).trigger('resize');
+                    }
+                }
+            });
         }
     });
 
@@ -11343,30 +11394,56 @@ function achievementsListDialog(close) {
             if (selector) {
                 var $cell = $('.achievements-cell.' + selector, $dialog).removeClass('hidden');
 
-                var locFmt = '[S]@@[/S] storage space'.replace('[S]', '<span>').replace('[/S]', '</span>');
+                var locFmt = l[16287].replace('[S]', '<span>').replace('[/S]', '</span>');
                 $('.reward.storage .reward-txt', $cell)
-                    .safeHTML(locFmt, bytesToSize(data[0], 0));
+                    .safeHTML('%n', locFmt, bytesToSize(data[0], 0));
 
                 if (!data[1]) {
                     $cell.addClass('one-reward');
                 }
                 else {
-                    locFmt = '[S]@@[/S] transfer quota'.replace('[S]', '<span>').replace('[/S]', '</span>');
+                    locFmt = l[16288].replace('[S]', '<span>').replace('[/S]', '</span>');
                     $('.reward.bandwidth .reward-txt', $cell)
-                        .safeHTML(locFmt, bytesToSize(data[1], 0));
+                        .safeHTML('%n', locFmt, bytesToSize(data[1], 0));
+                }
+
+                if (!$cell.hasClass('localized')) {
+                    $cell.addClass('localized');
+
+                    var $desc = $cell.find('.description');
+                    var text = String($desc.text()).trim().replace('[%3]', '%3');
+
+                    if (!data[1]) {
+                        // one-reward
+                        $desc.safeHTML('%n', text, bytesToSize(data[0], 0), data.expiry.value);
+                    }
+                    else {
+                        $desc.safeHTML('%n', text, bytesToSize(data[0], 0),
+                            bytesToSize(data[1], 0), data.expiry.value);
+                    }
                 }
 
                 if (data.rwd && idx !== ach.ACH_INVITE) {
                     $cell.addClass('achived');
 
-                    locFmt = '(Expires in [S]@@[/S] @@)'.replace('[S]', '<span>').replace('[/S]', '</span>');
-                    $('.expires-txt', $cell).addClass('red').safeHTML(locFmt, data.rwd.left, 'days');
+                    locFmt = l[16289].replace('[S]', '<span>').replace('[/S]', '</span>');
+                    if (!data.rwd.e) {
+                        // this reward do not expires
+                        locFmt = '&nbsp;';
+                    }
+                    else if (data.rwd.left < 1) {
+                        // show "Expired"
+                        locFmt = l[1664];
+                    }
+                    $('.expires-txt', $cell).addClass('red').safeHTML('%n', locFmt, data.rwd.left, l[16290]);
                 }
                 else {
                     ach.bind.call($('.button', $cell), ach.mapToAction[idx]);
 
-                    locFmt = '(Expires after [S]@@[/S] @@)'.replace('[S]', '<span>').replace('[/S]', '</span>');
-                    $('.expires-txt', $cell).removeClass('red').safeHTML(locFmt, data.expiry.value, data.expiry.utxt);
+                    locFmt = l[16291].replace('[S]', '<span>').replace('[/S]', '</span>');
+                    $('.expires-txt', $cell)
+                        .removeClass('red')
+                        .safeHTML('%n', locFmt, data.expiry.value, data.expiry.utxt);
                 }
 
                 $cell.removeClass('hidden');
@@ -11418,13 +11495,16 @@ function inviteFriendDialog(close) {
     var maf = M.maf;
     maf = maf[ach.ACH_INVITE];
 
-    var locFmt = 'Get [S]@@[/S] free storage and [S]@@[/S] of transfer quota for each friend who installs a MEGA app'.replace(/\[S\]/g, '<span>').replace(/\[\/S\]/g, '</span>');
-    $('.header.default', $dialog).safeHTML(locFmt, bytesToSize(maf[0], 0), bytesToSize(maf[1], 0));
+    var locFmt = l[16325].replace(/\[S\]/g, '<span>').replace(/\[\/S\]/g, '</span>');
+    $('.header.default', $dialog).safeHTML('%n', locFmt, bytesToSize(maf[0], 0), bytesToSize(maf[1], 0));
+
+    $('.info-body p:first', $dialog).safeHTML(l[16317].replace('[S]', '<strong>').replace('[/S]', '</strong>'));
 
     if (!$('.achievement-dialog.input').tokenInput("getSettings")) {
         initInviteDialogMultiInputPlugin();
-        locFmt = "Invite as many friends or coworkers as you want. For every signup under the invited email address, you will receive [S]@@[/S] of complimentary storage plus [S]@@[/S] of transfer volume, provided that the new user installs either MEGAsync or a mobile app and starts using MEGA (your free quota will be credited once we confirm the activity of the new account, which can take a few days).".replace(/\[S\]/g, '<span class="red">').replace(/\[\/S\]/g, '</span>');
-        $('.success-content .info-body p:first', $dialog).safeHTML(locFmt, bytesToSize(maf[0], 0), bytesToSize(maf[1], 0));
+        locFmt = l[16326].replace(/\[S\]/g, '<span class="red">').replace(/\[\/S\]/g, '</span>');
+        $('.success-content .info-body p:first', $dialog)
+            .safeHTML('%n', locFmt, bytesToSize(maf[0], 0), bytesToSize(maf[1], 0));
     }
 
     // Remove all previously added emails
@@ -11449,7 +11529,7 @@ function inviteFriendDialog(close) {
     $('.multiple-input .token-input-list-invite', $dialog).click();
 
     // Show "Invitation Status" button if invitations were sent before
-    if (maf && maf.rwd) {
+    if (maf && maf.rwd && 0) {
         $('.default-white-button.inline.status', $dialog)
             .removeClass('hidden')
             .rebind('click', function() {
@@ -11698,8 +11778,8 @@ function invitationStatusDialog(close) {
     var maf = M.maf;
     maf = maf[ach.ACH_INVITE];
 
-    var locFmt = "Encourage your friend to register and install a MEGA app. As long as your friend uses the same email address as you've entered, you will receive your free [S]@@[/S] of storage space and [S]@@[/S] of transfer quota.".replace(/\[S\]/g, '<span>').replace(/\[\/S\]/g, '</span>');
-    $('.hint', $dialog).safeHTML(locFmt, bytesToSize(maf[0], 0), bytesToSize(maf[1], 0));
+    var locFmt = l[16327].replace(/\[S\]/g, '<span class="red">').replace(/\[\/S\]/g, '</span>');
+    $('.hint', $dialog).safeHTML('%n', locFmt, bytesToSize(maf[0], 0), bytesToSize(maf[1], 0));
 
     // Due specific M.maf.rwds structure sorting must be done respecting it
     var getSortByMafEmailFn = function () {
@@ -11778,15 +11858,14 @@ function invitationStatusDialog(close) {
     else if (sortBy === l[16100]) {// Date Sent
         sortFn = M.getSortByDateTimeFn();
     }
+    var rwds = maf.rwds || [maf.rwd];
+    var rlen = rwds.length;
 
-    maf.rwds.sort(
+    rwds.sort(
         function (a, b) {
             return sortFn(a, b, getConfig().sortDir);
         }
     );
-
-    var rwds = maf.rwds;
-    var rlen = rwds.length;
 
     while (rlen--) {
         var rwd = rwds[rlen];
@@ -11806,9 +11885,9 @@ function invitationStatusDialog(close) {
                     l[16105]);// Quota Granted
 
                 var expiry = rwd.expiry || maf.expiry;
-                var locFmt = '(Expires in [S]@@[/S] @@)'.replace('[S]', '').replace('[/S]', '');
+                locFmt = l[16289].replace('[S]', '').replace('[/S]', '');
                 $('.status .light-grey', $tmpl)
-                    .safeHTML(locFmt, expiry.value, expiry.utxt);
+                    .safeHTML('%n', locFmt, expiry.value, expiry.utxt);
 
                 $('.icon i', $tmpl).addClass('tick');
             }

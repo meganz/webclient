@@ -9226,12 +9226,11 @@ Object.defineProperty(mega, 'achievem', {
                         value: time
                     };
 
-                    // TODO: translate this
                     switch (unit) {
-                        case 'd': result.utxt = (time < 2) ? 'day'   : 'days';    break;
-                        case 'w': result.utxt = (time < 2) ? 'week'  : 'weeks';   break;
-                        case 'm': result.utxt = (time < 2) ? 'month' : 'months';  break;
-                        case 'y': result.utxt = (time < 2) ? 'year'  : 'years';   break;
+                        case 'd': result.utxt = (time < 2) ? l[930]   : l[16290];  break;
+                        case 'w': result.utxt = (time < 2) ? l[16292] : l[16293];  break;
+                        case 'm': result.utxt = (time < 2) ? l[913]   : l[6788];   break;
+                        case 'y': result.utxt = (time < 2) ? l[932]   : l[16294];  break;
                     }
 
                     out = out || data;
@@ -9255,19 +9254,10 @@ Object.defineProperty(mega, 'achievem', {
                         setExpiry(data[ach.a]);
                     }
                     var exp = setExpiry(mafr[ach.r] || data[ach.a], ach);
-
                     var ts = ach.ts * 1000;
-                    var date = moment(ts);
-
-                    switch (exp.unit) {
-                        case 'd': date.add(exp.value, 'days');    break;
-                        case 'w': date.add(exp.value, 'weeks');   break;
-                        case 'm': date.add(exp.value, 'months');  break;
-                        case 'y': date.add(exp.value, 'years');   break;
-                    }
 
                     ach.date = new Date(ts);
-                    ach.left = Math.round(date.diff(ach.date) / 86400000);
+                    ach.left = Math.round((ach.e * 1000 - Date.now()) / 86400000);
 
                     if (data[ach.a].rwds) {
                         data[ach.a].rwds.push(ach);

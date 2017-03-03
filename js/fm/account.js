@@ -135,11 +135,6 @@ accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, pe
     };
 
     if (typeof (megaChat) !== 'undefined' && typeof(presenceInt) !== 'undefined') {
-        $(presenceInt).rebind('onPeerStatus.settings', function(e, handle, presence) {
-            if (handle === u_handle) {
-                _initPresenceRadio(presence);
-            }
-        });
         $(presenceInt).rebind('settingsUIUpdated.settings', function(
             e,
             autoaway,

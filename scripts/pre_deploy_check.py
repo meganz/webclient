@@ -15,7 +15,7 @@ import codecs
 import json
 import glob
 
-HASHING_FILE_TYPES = ['js', 'jsx', 'json', 'html', 'css']
+HASHING_FILE_TYPES = ['js', 'jsx', 'html', 'css']
 HASHING_CHECK_DIRS = ['js', 'html', 'css', 'lang']
 HASHING_IGNORE_FILES = ['secureboot.js', 'rsaasm.js']
 

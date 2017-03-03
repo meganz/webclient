@@ -7872,6 +7872,8 @@ function treeUI()
             $(e.target).is('input') ||
             $(e.target).is('textarea') ||
             $(e.target).is('.download.info-txt') ||
+            $(e.target).closest('.multiple-input').length ||
+            $(e.target).closest('.create-folder-input-bl').length ||
             $(e.target).closest('.content-panel.conversations').length ||
             $(e.target).closest('.messages.content-area').length ||
             $(e.target).closest('.chat-right-pad .user-card-data').length ||
@@ -7883,7 +7885,8 @@ function treeUI()
             $(e.target).hasClass('contact-details-email') ||
             $(e.target).hasClass('nw-conversations-name')) {
             return;
-        } else if (!localStorage.contextmenu) {
+        }
+        else if (!localStorage.contextmenu) {
             $.hideContextMenu();
             return false;
         }

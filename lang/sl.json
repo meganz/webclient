@@ -3973,7 +3973,7 @@
     "16327": "Vzpodbudite prijatelja, da se registrira in namesti eno MEGA aplikacijo. Dokler bo za registracijo prijatelj uporabil isti e-po\u0161tni naslov, kot ste ga vnesli, boste pridobili brezpla\u010dno [S]%1[\/S] shranjevalnega prostora in [S]%2[\/S] prenosne kvote.",
     "16328": "Ali \u017eelite skriti to okno, ko so prenosi v teku?",
     "16329": "Uporabite Nastavitve -> Napredno -> Prenosi za ponovno omogo\u010denje.",
-    "16330": "Secure communication using user-controlled end-to-end encryption for text chat (mobile apps and in the browser) and voice \/ video (currently only in the browser; mobile coming soon), unified across all your devices.",
+    "16330": "Varna komunikacija z uporabo uporabni\u0161ko nadzorovane enkripcije od prve do zadnje to\u010dke za tekstovni pogovor (mobilne aplikacije in v brskljalniku) ter zvo\u010dne in video komunikacije (trenutno samo v brskljalniku; mobilno prihaja kmalu), poenoteno preko vseh va\u0161ih naprav.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

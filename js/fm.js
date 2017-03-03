@@ -5138,7 +5138,7 @@ function accountUI() {
             for (var i in prices)
                 voucheroptions += '<div class="default-dropdown-item" data-value="' + htmlentities(prices[i]) + '">&euro;' + htmlentities(prices[i]) + ' voucher</div>';
             $('.default-select.vouchertype .default-select-scroll').html(voucheroptions);
-            bindDropdownEvents($('.default-select.vouchertype'), 0, '.account.tab-content');
+            bindDropdownEvents($('.default-select.vouchertype'), 0, '.fm-account-reseller');
         }
 
         $('.fm-purchase-voucher,.default-white-button.topup').rebind('click', function(e)

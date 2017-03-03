@@ -4036,10 +4036,11 @@ function accountUI() {
 
             // For free users only show base quota for storage and remove it for bandwidth.
             // For pro users replace base quota by pro quota
+            var $baseq = $('.achievements-block .data-block.storage .baseq');
+            storageBaseQuota = maf.storage.base;
+            $('.progress-txt', $baseq).text(bytesToSize(storageBaseQuota, 0));
+
             if (u_attr.p) {
-                var $baseq = $('.achievements-block .data-block.storage .baseq');
-                storageBaseQuota = maf.storage.base;
-                $('.progress-txt', $baseq).text(bytesToSize(storageBaseQuota, 0));
                 $('.progress-title', $baseq).text(l[16299]);
 
                 transferBaseQuota = maf.transfer.base;
@@ -5138,7 +5139,7 @@ function accountUI() {
             for (var i in prices)
                 voucheroptions += '<div class="default-dropdown-item" data-value="' + htmlentities(prices[i]) + '">&euro;' + htmlentities(prices[i]) + ' voucher</div>';
             $('.default-select.vouchertype .default-select-scroll').html(voucheroptions);
-            bindDropdownEvents($('.default-select.vouchertype'), 0, '.account.tab-content');
+            bindDropdownEvents($('.default-select.vouchertype'), 0, '.fm-account-reseller');
         }
 
         $('.fm-purchase-voucher,.default-white-button.topup').rebind('click', function(e)
@@ -7872,6 +7873,8 @@ function treeUI()
             $(e.target).is('input') ||
             $(e.target).is('textarea') ||
             $(e.target).is('.download.info-txt') ||
+            $(e.target).closest('.multiple-input').length ||
+            $(e.target).closest('.create-folder-input-bl').length ||
             $(e.target).closest('.content-panel.conversations').length ||
             $(e.target).closest('.messages.content-area').length ||
             $(e.target).closest('.chat-right-pad .user-card-data').length ||
@@ -7883,7 +7886,8 @@ function treeUI()
             $(e.target).hasClass('contact-details-email') ||
             $(e.target).hasClass('nw-conversations-name')) {
             return;
-        } else if (!localStorage.contextmenu) {
+        }
+        else if (!localStorage.contextmenu) {
             $.hideContextMenu();
             return false;
         }

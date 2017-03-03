@@ -258,6 +258,7 @@
 }
 .achievement-dialog.reward {
     display: inline-block;
+    position:relative;
     margin: 15px 21px 0 21px;
     text-align: left;
 }
@@ -320,7 +321,7 @@
 }
 .achievements-scroll .achievements-cell {
     display: table;
-    width: auto;
+    width: 100%;
     margin: 0 0 12px 0;
 }
 .achievements-scroll .achievements-cell.hidden {
@@ -358,7 +359,7 @@
     z-index: 1;
     vertical-align: top;
     text-align: center;
-    padding: 0 15px;
+    padding: 0 15px 32px 15px;
 }
 .achievements-scroll {
     max-height: 666px;
@@ -391,14 +392,16 @@ background: linear-gradient(to bottom, rgba(247,247,247,1) 0%,rgba(247,247,247,0
     color: #333333;
 }
 .achievement-dialog.right-block .reward {
-    margin: 0px 0 17px 10px;
+    margin: 0 0 17px 10px;
     min-width: 140px;
 }
 .achievement-dialog.right-block .reward i {
-    margin: -2px 0 0 0;
+    margin: -17px 0 0 0;
+    position:absolute;
+    top: 50%;
 }
 .achievement-dialog.right-block .reward-txt {
-    margin: -4px 0 0 13px;
+    margin: -4px 0 0 47px;
 }
 .achievements-cell-body .expires-txt {
     padding: 12px 0 0 0;
@@ -428,6 +431,7 @@ background: linear-gradient(to bottom, rgba(247,247,247,1) 0%,rgba(247,247,247,0
 }
 .one-reward .achievement-dialog.right-block {
     vertical-align: middle;
+    padding: 0 15px 0 15px;
 }
 .one-reward .achievement-dialog.right-block .reward {
     margin: 0px 0 4px 10px;

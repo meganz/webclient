@@ -22,7 +22,7 @@
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
-.contacts-search-header input, .search-block.emoji-one input {
+.contacts-search-header input, .search-block.emoji input {
     font-size: 14px;
     line-height: 24px;
     color: #666666;
@@ -76,7 +76,7 @@ color: #cccccc;
 .dropdown.popup input:focus:-ms-input-placeholder {
 color: #cccccc;
 }
-.contacts-search-header > i, .search-block.emoji-one > i {
+.contacts-search-header > i, .search-block.emoji > i {
     vertical-align: top;
     margin: 14px 3px 1px 0;
 }
@@ -131,10 +131,10 @@ color: #cccccc;
 /* End of Search contacts popup */
 
 /* Emoji one popup */
-.popup.emoji-one {
-    height: 432px;
+.popup.emoji {
+    height: 400px;
 }
-.popup-header.emoji-one, .popup-footer.emoji-one {
+.popup-header.emoji, .popup-footer.emoji {
     height: 48px;
     border-bottom: 1px solid #e5e5e5;
     -webkit-box-sizing: border-box;
@@ -144,24 +144,24 @@ color: #cccccc;
     position: relative;
     z-index: 10;
 }
-.popup-header.emoji-one {
+.popup-header.emoji {
     padding: 0 0 0 10px;
 }
-.popup-footer.emoji-one {
+.popup-footer.emoji {
     border-top: 1px solid #e5e5e5;
     border-bottom: 0;
     padding: 4px 0 0 0;
 }
-.popup-header.emoji-one input {
+.popup-header.emoji input {
     margin: 12px 0 0 14px;
 }
-.popup-scroll-area.emoji-one {
-    max-height: 336px;
+.popup-scroll-area.emoji {
+    max-height: 302px;
     position: relative;
     z-index: 10;
     overflow: hidden;
 }
-.popup-scroll-content.emoji-one {
+.popup-scroll-content.emoji {
     padding: 12px;
     min-height: 312px;
 }

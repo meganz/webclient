@@ -9,6 +9,7 @@ var ModalDialogsUI = require('./../../ui/modalDialogs.jsx');
 var DropdownsUI = require('./../../ui/dropdowns.jsx');
 var ContactsUI = require('./../ui/contacts.jsx');
 var ConversationsUI = require('./../ui/conversations.jsx');
+var DropdownEmojiSelector = require('./../../ui/emojiDropdown.jsx').DropdownEmojiSelector;
 
 var TypingArea = React.createClass({
     mixins: [MegaRenderMixin, RenderDebugger],
@@ -60,19 +61,25 @@ var TypingArea = React.createClass({
         var self = this;
         var room = this.props.chatRoom;
 
-        if (!self.typingTimeout) {
-            if (room && room.state === ChatRoom.STATE.READY && !self.iAmTyping) {
-                self.iAmTyping = true;
-                room.megaChat.karere.sendIsComposing(room.roomJid);
-            }
-        }
-        else if (self.typingTimeout) {
-            clearTimeout(self.typingTimeout);
+        if (self.stoppedTypingTimeout) {
+            clearTimeout(self.stoppedTypingTimeout);
         }
 
-        self.typingTimeout = setTimeout(function () {
-            self.stoppedTyping();
-        }, 2000);
+        self.stoppedTypingTimeout = setTimeout(function() {
+            if (room && self.iAmTyping) {
+                self.iAmTyping = false;
+                delete self.lastTypingStamp;
+            }
+        }, 4000);
+
+        if (
+            (room && !self.iAmTyping) ||
+            (room && self.iAmTyping && (unixtime() - self.lastTypingStamp) >= 4)
+        ) {
+            self.iAmTyping = true;
+            self.lastTypingStamp = unixtime();
+            room.trigger('typing');
+        }
     },
     triggerOnUpdate: function(forced) {
         var self = this;
@@ -109,28 +116,6 @@ var TypingArea = React.createClass({
             self.onUpdateThrottling = setTimeout(function() {
                 self.props.onUpdate();
             }, 70);
-        }
-    },
-    stoppedTyping: function () {
-        if (this.props.disabled) {
-            return;
-        }
-
-        var self = this;
-        var room = this.props.chatRoom;
-
-        if (self.typingTimeout) {
-            clearTimeout(self.typingTimeout);
-            self.typingTimeout = null;
-        }
-
-        if (self.iAmTyping) {
-            // only trigger event if needed.
-            self.triggerOnUpdate();
-        }
-        if (room && room.state === ChatRoom.STATE.READY && self.iAmTyping === true) {
-            room.megaChat.karere.sendComposingPaused(room.roomJid);
-            self.iAmTyping = false;
         }
     },
     onCancelClicked: function(e) {
@@ -193,7 +178,6 @@ var TypingArea = React.createClass({
             if (self.onConfirmTrigger(val) !== true) {
                 self.setState({typedMessage: ""});
             }
-            self.stoppedTyping();
             e.preventDefault();
             e.stopPropagation();
             return;
@@ -219,7 +203,6 @@ var TypingArea = React.createClass({
         }
         else if (key === 13) {
             if ($.trim(val).length === 0) {
-                self.stoppedTyping();
                 e.preventDefault();
             }
         }
@@ -227,7 +210,6 @@ var TypingArea = React.createClass({
             /* arrow up! */
             if ($.trim(val).length === 0) {
                 if (self.props.onUpEditPressed && self.props.onUpEditPressed() === true) {
-                    self.stoppedTyping();
                     e.preventDefault();
                     return;
                 }
@@ -236,7 +218,6 @@ var TypingArea = React.createClass({
         else if (key === 27) {
             /* ESC */
             if (self.props.showButtons === true) {
-                self.stoppedTyping();
                 e.preventDefault();
                 self.onCancelClicked(e);
                 return;
@@ -623,8 +604,8 @@ var TypingArea = React.createClass({
                         icon="smiling-face"
                         disabled={this.props.disabled}
                     >
-                        <DropdownsUI.DropdownEmojiSelector
-                            className="popup emoji-one"
+                        <DropdownEmojiSelector
+                            className="popup emoji"
                             vertOffset={12}
                             onClick={self.onEmojiClicked}
                         />

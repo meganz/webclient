@@ -1084,7 +1084,7 @@ function init_page() {
         }
         else {
             if (ul_queue.length > 0) {
-                openTransferpanel();
+                openTransfersPanel();
             }
 
             if (u_type === 0 && !u_attr.terms) {

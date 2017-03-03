@@ -238,7 +238,7 @@ var BrowserEntries = React.createClass({
 
             var tooltipElement = null;
 
-            var icon = <span className={"transfer-filtype-icon " + fileIcon(node)}> </span>;
+            var icon = <span className={"transfer-filetype-icon " + fileIcon(node)}> </span>;
 
             if (fileIcon(node) === "graphic" && node.fa) {
                 var src = thumbnails[node.h];
@@ -254,7 +254,7 @@ var BrowserEntries = React.createClass({
                     src = window.noThumbURI || '';
                 }
                 icon = <Tooltips.Tooltip withArrow={true}>
-                    <Tooltips.Handler className={"transfer-filtype-icon " + fileIcon(node)}> </Tooltips.Handler>
+                    <Tooltips.Handler className={"transfer-filetype-icon " + fileIcon(node)}> </Tooltips.Handler>
                     <Tooltips.Contents className={"img-preview"}>
                         <div className="dropdown img-wrapper img-block" id={node.h}>
                             <img alt=""

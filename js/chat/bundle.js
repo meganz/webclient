@@ -2491,7 +2491,7 @@ React.makeElement = React['createElement'];
 	        else if (v === null && rv === null) {
 	            return false;
 	        }
-	        
+
 	        if (typeof v._dataChangeIndex !== "undefined") {
 	            var cacheKey = this.getReactId() + "_" + v._dataChangeTrackedId + "_" + "_" + this.getElementName() +
 	                                "_" + idx;
@@ -6102,7 +6102,7 @@ React.makeElement = React['createElement'];
 
 	            var icon = React.makeElement(
 	                "span",
-	                { className: "transfer-filtype-icon " + fileIcon(node) },
+	                { className: "transfer-filetype-icon " + fileIcon(node) },
 	                " "
 	            );
 
@@ -6123,7 +6123,7 @@ React.makeElement = React['createElement'];
 	                    { withArrow: true },
 	                    React.makeElement(
 	                        Tooltips.Handler,
-	                        { className: "transfer-filtype-icon " + fileIcon(node) },
+	                        { className: "transfer-filetype-icon " + fileIcon(node) },
 	                        " "
 	                    ),
 	                    React.makeElement(

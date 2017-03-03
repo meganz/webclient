@@ -2631,16 +2631,16 @@ function percent_megatitle() {
     for (var i in dl_queue) {
         if (dl_queue.hasOwnProperty(i)) {
             var q = dl_queue[i];
-            var t = q && tp[q.zipid ? 'zip_' + q.zipid : 'dl_' + q.id];
+            var td = q && tp[q.zipid ? 'zip_' + q.zipid : 'dl_' + q.id];
 
-            if (t) {
-                dl_r += t[0];
-                dl_t += t[1];
+            if (td) {
+                dl_r += td[0];
+                dl_t += td[1];
                 if (!q.zipid || !zips[q.zipid]) {
                     if (q.zipid) {
                         zips[q.zipid] = 1;
                     }
-                    dl_s += t[2];
+                    dl_s += td[2];
                 }
             }
             else {
@@ -2651,12 +2651,12 @@ function percent_megatitle() {
 
     for (var i in ul_queue) {
         if (ul_queue.hasOwnProperty(i)) {
-            var t = tp['ul_' + ul_queue[i].id]
+            var tu = tp['ul_' + ul_queue[i].id];
 
-            if (t) {
-                ul_r += t[0];
-                ul_t += t[1];
-                ul_s += t[2];
+            if (tu) {
+                ul_r += tu[0];
+                ul_t += tu[1];
+                ul_s += tu[2];
             }
             else {
                 ul_t += ul_queue[i].size || 0;
@@ -2672,17 +2672,18 @@ function percent_megatitle() {
         ul_r += tp['ulc'] || 0
     }
 
-    var x_ul = Math.floor(ul_r / ul_t * 100) || 0,
-        x_dl = Math.floor(dl_r / dl_t * 100) || 0
+    var x_ul = Math.floor(ul_r / ul_t * 100) || 0;
+    var x_dl = Math.floor(dl_r / dl_t * 100) || 0;
+    var t;
 
     if (dl_t && ul_t) {
-        t = ' \u2191 ' + x_dl + '% \u2193 ' + x_ul + '%';
+        t = ' \u2193 ' + x_dl + '% \u2191 ' + x_ul + '%';
     }
     else if (dl_t) {
-        t = ' ' + x_dl + '%';
+        t = ' \u2193 ' + x_dl + '%';
     }
     else if (ul_t) {
-        t = ' ' + x_ul + '%';
+        t = ' \u2191 ' + x_ul + '%';
     }
     else {
         t = '';
@@ -2691,24 +2692,33 @@ function percent_megatitle() {
 
     d_deg = 360 * x_dl / 100;
     u_deg = 360 * x_ul / 100;
+
+    updateTransfersSidebarIcon(d_deg, u_deg);
+    megatitle(t);
+}
+
+function updateTransfersSidebarIcon(d_deg, u_deg) {
+    var $dl_rchart = $('.transfers .download .nw-fm-chart0.right-c p');
+    var $dl_lchart = $('.transfers .download .nw-fm-chart0.left-c p');
+    var $ul_rchart = $('.transfers .upload .nw-fm-chart0.right-c p');
+    var $ul_lchart = $('.transfers .upload .nw-fm-chart0.left-c p');
+
     if (d_deg <= 180) {
-        $('.download .nw-fm-chart0.right-c p').css('transform', 'rotate(' + d_deg + 'deg)');
-        $('.download .nw-fm-chart0.left-c p').css('transform', 'rotate(0deg)');
+        $dl_rchart.css('transform', 'rotate(' + d_deg + 'deg)');
+        $dl_lchart.css('transform', 'rotate(0deg)');
     }
     else {
-        $('.download .nw-fm-chart0.right-c p').css('transform', 'rotate(180deg)');
-        $('.download .nw-fm-chart0.left-c p').css('transform', 'rotate(' + (d_deg - 180) + 'deg)');
+        $dl_rchart.css('transform', 'rotate(180deg)');
+        $dl_lchart.css('transform', 'rotate(' + (d_deg - 180) + 'deg)');
     }
     if (u_deg <= 180) {
-        $('.upload .nw-fm-chart0.right-c p').css('transform', 'rotate(' + u_deg + 'deg)');
-        $('.upload .nw-fm-chart0.left-c p').css('transform', 'rotate(0deg)');
+        $ul_rchart.css('transform', 'rotate(' + u_deg + 'deg)');
+        $ul_lchart.css('transform', 'rotate(0deg)');
     }
     else {
-        $('.upload .nw-fm-chart0.right-c p').css('transform', 'rotate(180deg)');
-        $('.upload .nw-fm-chart0.left-c p').css('transform', 'rotate(' + (u_deg - 180) + 'deg)');
+        $ul_rchart.css('transform', 'rotate(180deg)');
+        $ul_lchart.css('transform', 'rotate(' + (u_deg - 180) + 'deg)');
     }
-
-    megatitle(t);
 }
 
 function hostname(url) {
@@ -3659,6 +3669,8 @@ mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
         ASSERT(ulQueue._running === 0, 'ulQueue._running inconsistency on completion');
         ulQueue._pending = [];
         ulQueue.setSize((fmconfig.ul_maxSlots | 0) || 4);
+
+        mega.ui.tpp.hideBlock('ul');
     }
     if (!dl_queue.some(isQueueActive)) {
         dl_queue = new DownloadQueue();
@@ -3669,6 +3681,8 @@ mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
 
         dlmanager._quotaPushBack = {};
         dlmanager._dlQuotaListener = [];
+
+        mega.ui.tpp.hideBlock('dl');
     }
 
     if (!dlmanager.isDownloading && !ulmanager.isUploading) {

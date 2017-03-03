@@ -1708,6 +1708,7 @@ else if (!b_u)
         jsl.push({f:'js/ui/publicServiceAnnouncement.js', n: 'psa_js', j:1,w:1});
         jsl.push({f:'js/ui/alarm.js', n: 'alarm_js', j:1,w:1});
         jsl.push({f:'js/ui/export.js', n: 'export_js', j:1,w:1});
+        jsl.push({f:'js/ui/transfers-popup.js', n: 'transfers_popup_js', j:1,w:1});
     } // !is_mobile
 
     // Transfers

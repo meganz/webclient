@@ -4127,11 +4127,6 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
     overflow: hidden;
-    -webkit-transition: color 150ms ease-in-out;
-    -moz-transition: color 150ms ease-in-out;
-    -o-transition: color 150ms ease-in-out;
-    -ms-transition: color 150ms ease-in-out;
-    transition: color 150ms ease-in-out;
 }
 .rubbish-bin .nw-fm-tree-folder {
     background-position: -15px -7595px;

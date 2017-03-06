@@ -790,7 +790,7 @@ function initUI() {
         importFile();
     }
 
-    $('.dropdown.body').rebind('contextmenu.dropdown', function(e) {
+    $('.dropdown.body.context').rebind('contextmenu.dropdown', function(e) {
         if (!localStorage.contextmenu)
             e.preventDefault();
     });

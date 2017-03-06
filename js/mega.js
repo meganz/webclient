@@ -2567,7 +2567,7 @@ function MegaData()
         if (this.u[n.h] && this.u[n.h] !== n) {
             for (var k in n) {
                 // merge changes from n->M.u[n.h]
-                if (n.hasOwnProperty(k) && k !== 'name') {
+                if ((n.hasOwnProperty(k) || MEGA_USER_STRUCT.hasOwnProperty(k)) && k !== 'name') {
                     this.u[n.h][k] = n[k];
                 }
             }
@@ -3152,7 +3152,9 @@ function MegaData()
 
             if (this.u[userId]) {
                 for (var key in u) {
-                    if (this.u[userId].hasOwnProperty(key) && key !== 'name')  {
+                    if (
+                        (this.u[userId].hasOwnProperty(key) || MEGA_USER_STRUCT.hasOwnProperty(key)) && key !== 'name'
+                    )  {
                         this.u[userId][key] = u[key];
                     }
                     else if (d) {
@@ -8562,7 +8564,7 @@ function processUPCO(ap) {
  */
 function process_u(u, ignoreDB) {
     for (var i in u) {
-        if (u.hasOwnProperty(i)) {
+        if (u.hasOwnProperty(i) || MEGA_USER_STRUCT.hasOwnProperty(i)) {
             if (u[i].c === 1) {
                 u[i].h = u[i].u;
                 u[i].t = 1;

@@ -2655,12 +2655,30 @@ function initContextUI() {
         }
     });
 
-    $('.labels .dropdown-colour-item').click(function() {
+    $('.labels .dropdown-colour-item').rebind('click', function() {
         var labelId = parseInt(this.dataset.labelId);
 
         if (labelId && (rightsById($.selected[0]) > 1)) {
             M.colourLabeling($.selected, labelId);
         }
+    });
+
+    $('.labels .dropdown-colour-item').rebind('mouseover', function() {
+        var labelTxt = this.dataset.labelTxt;
+        var labelInfo;
+
+        if ($(this).hasClass('active')) {
+            labelInfo = l[16222];
+        }
+        else {
+            labelInfo = l[16221];
+        }
+        labelTxt = labelInfo.replace('%1', '"' + labelTxt + '"');
+        $('.labels .dropdown-color-info').text(labelTxt).addClass('active');
+    });
+
+    $('.labels .dropdown-colour-item').rebind('mouseout', function() {
+        $('.labels .dropdown-color-info').removeClass('active');
     });
 
     $(c + '.open-item').rebind('click', function() {

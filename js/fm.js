@@ -7428,6 +7428,11 @@ function contextMenuUI(e, ll) {
         else {
             return false;
         }
+
+        //Hide Info item if properties dialog is opened
+        if ($.dialog === 'properties') {
+            $(menuCMI).filter('.properties-item').hide();
+        }
     }
     // This part of code is also executed when ll == 'undefined'
     v = m.children('.dropdown-section');

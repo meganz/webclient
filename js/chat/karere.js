@@ -738,9 +738,7 @@ makeMetaAware(Karere);
 
     Karere.prototype.forceReconnect = function() {
         var self = this;
-        if (this.getConnectionState() !== Karere.CONNECTION_STATE.DISCONNECTED) {
-            self.forceDisconnect();
-        }
+        self.forceDisconnect();
         self._jid = self._jid.split("/")[0] + "/" + self._generateNewResource();
         return self.reconnect();
     };

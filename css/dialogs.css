@@ -300,6 +300,7 @@
     line-height: 18px;
     color: #333333;
     padding: 15px 0 24px 0;
+    cursor: default;
 }
 .achievement-dialog.expires-txt.red {
     color: #FF333A;

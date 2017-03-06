@@ -28,7 +28,7 @@
     /**
      * Show the dialog
      */
-    IncomingCallDialog.prototype.show = function(username, avatarImg, sid, isVideoCall, answerAudioFn, answerVideoFn, cancelFn) {
+    IncomingCallDialog.prototype.show = function(username, avatar, sid, isVideoCall, answerAudioFn, answerVideoFn, cancelFn) {
         var self = this;
 
         if (!self.$dialog) {
@@ -48,11 +48,9 @@
 
         $('.incoming-call-name', self.$dialog).text(username);
 
-        if (avatarImg) {
-            $('.incoming-call-avatar img', self.$dialog).attr(
-                'src',
-                avatarImg
-            );
+        if (avatar) {
+            $('.incoming-call-avatar-bl', self.$dialog)
+                .safeHTML(avatar);
         }
 
 
@@ -168,7 +166,7 @@
         '</div>\n' +
         '<div class="incoming-call-avatar">\n' +
         '       <div class="incoming-call-shadow-bl"></div>\n' +
-        '       <img src="' + staticpath + 'images/mega/default-avatar.png" alt="" />\n' +
+        '       <div class="incoming-call-avatar-bl"></div>\n' +
         '</div>\n' +
         '<div class="incoming-call-username">\n' +
 		  '<span class="incoming-contact-info">\n' +

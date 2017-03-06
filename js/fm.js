@@ -3155,7 +3155,7 @@ function dashboardUI() {
             }
             else if (account.stype == 'O') {
                 // one-time or cancelled subscription
-                $('.account.left-pane.plan-date-info').text(l[987]);
+                $('.account.left-pane.plan-date-info').text(l[16175]);
                 $('.account.left-pane.plan-date-val').text(time2date(account.expiry, 2));
             }
         }

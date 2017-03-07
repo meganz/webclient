@@ -3974,6 +3974,12 @@
     "16328": "Do you want to hide this dialog when transfers are ongoing?",
     "16329": "Use Settings -> Advanced -> Transfers to enable it again.",
     "16330": "Secure communication using user-controlled end-to-end encryption for text chat (mobile apps and in the browser) and voice \/ video (currently only in the browser; mobile coming soon), unified across all your devices.",
+    "16331": "You will not receive credit for inviting someone who has used MEGA previously and you will not be notified about such a rejection.",
+    "16332": "You only qualify if:",
+    "16333": "You invited someone who has not used MEGA previously.",
+    "16334": "The new user installs at least one app and starts using MEGA.",
+    "16335": "(Usage confirmation may take a few days to complete - please be patient)",
+    "16336": "(Bonus expires in [S]%1[\/S] %2)",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

@@ -790,7 +790,7 @@ function initUI() {
         importFile();
     }
 
-    $('.dropdown.body').rebind('contextmenu.dropdown', function(e) {
+    $('.dropdown.body.context').rebind('contextmenu.dropdown', function(e) {
         if (!localStorage.contextmenu)
             e.preventDefault();
     });
@@ -2655,12 +2655,30 @@ function initContextUI() {
         }
     });
 
-    $('.labels .dropdown-colour-item').click(function() {
+    $('.labels .dropdown-colour-item').rebind('click', function() {
         var labelId = parseInt(this.dataset.labelId);
 
         if (labelId && (rightsById($.selected[0]) > 1)) {
             M.colourLabeling($.selected, labelId);
         }
+    });
+
+    $('.labels .dropdown-colour-item').rebind('mouseover', function() {
+        var labelTxt = this.dataset.labelTxt;
+        var labelInfo;
+
+        if ($(this).hasClass('active')) {
+            labelInfo = l[16222];
+        }
+        else {
+            labelInfo = l[16221];
+        }
+        labelTxt = labelInfo.replace('%1', '"' + labelTxt + '"');
+        $('.labels .dropdown-color-info').text(labelTxt).addClass('active');
+    });
+
+    $('.labels .dropdown-colour-item').rebind('mouseout', function() {
+        $('.labels .dropdown-color-info').removeClass('active');
     });
 
     $(c + '.open-item').rebind('click', function() {
@@ -3015,7 +3033,7 @@ function dashboardUI() {
 
     // update avatar
     $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', true));
-    $('.fm-avatar img').attr('src', useravatar.mine());
+    $('.fm-avatar').safeHTML(useravatar.contact(u_handle, '', 'div'));
 
 
     // Show first name or last name
@@ -3155,7 +3173,7 @@ function dashboardUI() {
             }
             else if (account.stype == 'O') {
                 // one-time or cancelled subscription
-                $('.account.left-pane.plan-date-info').text(l[987]);
+                $('.account.left-pane.plan-date-info').text(l[16175]);
                 $('.account.left-pane.plan-date-val').text(time2date(account.expiry, 2));
             }
         }
@@ -3180,15 +3198,17 @@ function dashboardUI() {
             max = M.maf.transfer.base + M.maf.transfer.current;
             base += account.servbw_used;
         }
+
         perc   = Math.round(base * 100 / max) || 1;
         perc_c = perc;
         if (perc_c > 100) {
             perc_c = 100;
         }
-        if (perc_c > 99) {
+        if (perc_c > 99 || dlmanager.isOverQuota) {
             $bandwidthChart.addClass('exceeded');
             b_exceeded = 1;
         }
+
         var deg =  230 * perc_c / 100;
 
         // Used Bandwidth chart
@@ -3206,13 +3226,16 @@ function dashboardUI() {
         $bandwidthChart.find('.chart.data .size-txt').text(bytesToSize(base, 0));
         $bandwidthChart.find('.chart.data .pecents-txt').text((b2[0]));
         $bandwidthChart.find('.chart.data .gb-txt').text((b2[1]));
-        if (u_attr.p || M.maf) {
+        if ((u_attr.p || M.maf) && b2[0] > 0) {
+            $bandwidthChart.removeClass('no-percs');
             $bandwidthChart.find('.chart.data .perc-txt').text(perc_c + '%');
         }
         else {
+            $bandwidthChart.addClass('no-percs');
             $bandwidthChart.find('.chart.data span:not(.size-txt)').text('');
             $bandwidthChart.find('.chart.data .pecents-txt').text(l[5801]);
         }
+
         /* End of New Used Bandwidth chart */
 
 
@@ -3609,7 +3632,6 @@ function accountUI() {
 
             $('.account.plan-info.accounttype span').text(planText);
             $('.small-icon.membership').addClass('pro' + planNum);
-            $('.default-white-button.upgrade-to-pro').addClass('hidden');
 
             // Subscription
             if (account.stype == 'S') {
@@ -3671,14 +3693,12 @@ function accountUI() {
             $('.account.plan-info.expiry').text(l[436]);
             $('.btn-cancel').addClass('hidden');
             $('.account.plan-info-row.bandwidth').hide();
-            $('.default-white-button.upgrade-to-pro')
-                .removeClass('hidden')
-                .rebind('click', function() {
-                    loadSubPage('pro');
-                });
         }
 
-
+        // Upgrade Account Button
+        $('.default-white-button.upgrade-to-pro').rebind('click', function() {
+            loadSubPage('pro');
+        });
 
         // Maximum disk space
         $('.account.plan-info.storage span').text(bytesToSize(account.space, 0));
@@ -3700,7 +3720,7 @@ function accountUI() {
         if (perc_c > 100) {
             perc_c = 100;
         }
-        if (perc_c > 99) {
+        if (perc_c > 99 || dlmanager.isOverQuota) {
             $bandwidthChart.addClass('exceeded');
             b_exceeded = 1;
         }
@@ -3718,14 +3738,16 @@ function accountUI() {
         }
 
         // Maximum bandwidth
-        var b2 = bytesToSize(account.bw, 0).split(' ');
-        $bandwidthChart.find('.chart.data .size-txt').text(bytesToSize(account.servbw_used + account.downbw_used, 0));
+        var b2 = bytesToSize(max, 0).split(' ');
+        $bandwidthChart.find('.chart.data .size-txt').text(bytesToSize(base, 0));
         $bandwidthChart.find('.chart.data .pecents-txt').text((b2[0]));
         $bandwidthChart.find('.chart.data .gb-txt').text((b2[1]));
-        if (u_attr.p || M.maf) {
+        if ((u_attr.p || M.maf) && b2[0] > 0) {
+            $bandwidthChart.removeClass('no-percs');
             $bandwidthChart.find('.chart.data .perc-txt').text(perc_c + '%');
         }
         else {
+            $bandwidthChart.addClass('no-percs');
             $bandwidthChart.find('.chart.data span:not(.size-txt)').text('');
             $bandwidthChart.find('.chart.data .pecents-txt').text(l[5801]);
         }
@@ -4041,10 +4063,11 @@ function accountUI() {
 
             // For free users only show base quota for storage and remove it for bandwidth.
             // For pro users replace base quota by pro quota
+            var $baseq = $('.achievements-block .data-block.storage .baseq');
+            storageBaseQuota = maf.storage.base;
+            $('.progress-txt', $baseq).text(bytesToSize(storageBaseQuota, 0));
+
             if (u_attr.p) {
-                var $baseq = $('.achievements-block .data-block.storage .baseq');
-                storageBaseQuota = maf.storage.base;
-                $('.progress-txt', $baseq).text(bytesToSize(storageBaseQuota, 0));
                 $('.progress-title', $baseq).text(l[16299]);
 
                 transferBaseQuota = maf.transfer.base;
@@ -4414,7 +4437,7 @@ function accountUI() {
         $('.default-select.country .default-select-scroll').safeHTML(html);
 
         // Bind Dropdowns events
-        bindDropdownEvents($('.fm-account-main .default-select'), 1);
+        bindDropdownEvents($('.fm-account-main .default-select'), 1, '.account.tab-content');
 
         // Cache selectors
         var $newEmail = $('#account-email');
@@ -4490,7 +4513,7 @@ function accountUI() {
             u_attr.country = $('.default-select.country .default-dropdown-item.active').attr('data-value');
 
             $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', true));
-            $('.fm-avatar img').attr('src', useravatar.mine());
+            $('.fm-avatar').safeHTML(useravatar.contact(u_handle, '', 'div'));
 
             api_req({
                 a : 'up',
@@ -5143,7 +5166,7 @@ function accountUI() {
             for (var i in prices)
                 voucheroptions += '<div class="default-dropdown-item" data-value="' + htmlentities(prices[i]) + '">&euro;' + htmlentities(prices[i]) + ' voucher</div>';
             $('.default-select.vouchertype .default-select-scroll').html(voucheroptions);
-            bindDropdownEvents($('.default-select.vouchertype'));
+            bindDropdownEvents($('.default-select.vouchertype'), 0, '.fm-account-reseller');
         }
 
         $('.fm-purchase-voucher,.default-white-button.topup').rebind('click', function(e)
@@ -5183,7 +5206,7 @@ function accountUI() {
 
                     useravatar.invalidateAvatar(u_handle);
                     $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', true));
-                    $('.fm-avatar img').attr('src', useravatar.mine());
+                    $('.fm-avatar').safeHTML(useravatar.contact(u_handle, '', 'div'));
                     $('.fm-account-remove-avatar').hide();
                 }
             });
@@ -5557,7 +5580,7 @@ function avatarDialog(close)
                 useravatar.setUserAvatar(u_handle, data, this.outputFormat);
 
                 $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', true));
-                $('.fm-avatar img').attr('src', useravatar.mine());
+                $('.fm-avatar').safeHTML(useravatar.contact(u_handle, '', 'div'));
                 avatarDialog(1);
             },
             onImageUpload: function()
@@ -7432,6 +7455,11 @@ function contextMenuUI(e, ll) {
         else {
             return false;
         }
+
+        //Hide Info item if properties dialog is opened
+        if ($.dialog === 'properties') {
+            $(menuCMI).filter('.properties-item').hide();
+        }
     }
     // This part of code is also executed when ll == 'undefined'
     v = m.children('.dropdown-section');
@@ -7877,6 +7905,8 @@ function treeUI()
             $(e.target).is('input') ||
             $(e.target).is('textarea') ||
             $(e.target).is('.download.info-txt') ||
+            $(e.target).closest('.multiple-input').length ||
+            $(e.target).closest('.create-folder-input-bl').length ||
             $(e.target).closest('.content-panel.conversations').length ||
             $(e.target).closest('.messages.content-area').length ||
             $(e.target).closest('.chat-right-pad .user-card-data').length ||
@@ -7888,7 +7918,8 @@ function treeUI()
             $(e.target).hasClass('contact-details-email') ||
             $(e.target).hasClass('nw-conversations-name')) {
             return;
-        } else if (!localStorage.contextmenu) {
+        }
+        else if (!localStorage.contextmenu) {
             $.hideContextMenu();
             return false;
         }
@@ -13012,30 +13043,48 @@ function FMResizablePane(element, opts) {
  *
  * @param {Selector} $dropdown  Class .dropdown elements selector
  * @param {String}   saveOption Addition option for account page only. Allows to show "Show changes" notification
+ * @param {String}   classname/id of  content block for dropdown aligment
  */
-function bindDropdownEvents($dropdown, saveOption) {
+function bindDropdownEvents($dropdown, saveOption, contentBlock) {
 
     var $dropdownsItem = $dropdown.find('.default-dropdown-item');
+    var $contentBlock = contentBlock ? $(contentBlock) : $(window);
 
     $($dropdown).rebind('click', function(e)
     {
         var $this = $(this);
         if (!$this.hasClass('active')) {
-            var bottPos, jsp,
-                scrollBlock = '#' + $this.attr('id') + ' .default-select-scroll',
-                $dropdown = $this.find('.default-select-dropdown'),
-                $activeDropdownItem = $this.find('.default-dropdown-item.active');
+            var jsp;
+            var scrollBlock = '#' + $this.attr('id') + ' .default-select-scroll';
+            var $dropdown = $this.find('.default-select-dropdown');
+            var $activeDropdownItem = $this.find('.default-dropdown-item.active');
+            var dropdownOffset;
+            var dropdownBottPos;
+            var dropdownHeight;
+            var contentBlockHeight;
 
             //Show select dropdown
-            $('.active .default-select-dropdown').fadeOut(200);
+            $('.active .default-select-dropdown').addClass('hidden');
             $this.addClass('active');
-            $dropdown.css('margin-top', '0px');
-            $dropdown.fadeIn(200);
+            $dropdown.removeAttr('style');
+            $dropdown.removeClass('hidden');
 
             //Dropdown position relative to the window
-            bottPos = $(window).height() - ($dropdown.offset().top + $dropdown.outerHeight());
-            if (bottPos < 50) {
-                $dropdown.css('margin-top', '-' + (60 - bottPos) + 'px');
+            dropdownOffset = $dropdown.offset().top - $contentBlock.offset().top;
+            contentBlockHeight = $contentBlock.height();
+            dropdownHeight = $dropdown.outerHeight();
+            dropdownBottPos = contentBlockHeight - (dropdownOffset + dropdownHeight);
+
+            if (contentBlockHeight < (dropdownHeight + 20)) {
+                $dropdown.css({
+                    'margin-top': '-' + (dropdownOffset - 10) + 'px',
+                    'height': (contentBlockHeight - 20) + 'px'
+                });
+            }
+            else if (dropdownBottPos < 10) {
+                $dropdown.css({
+                    'margin-top': '-' + (10 - dropdownBottPos) + 'px'
+                });
             }
 
             //Dropdown scrolling initialization
@@ -13050,8 +13099,9 @@ function bindDropdownEvents($dropdown, saveOption) {
             if (jsp && $activeDropdownItem.length) {
                 jsp.scrollToElement($activeDropdownItem);
             }
-        } else {
-            $this.find('.default-select-dropdown').fadeOut(200);
+        }
+        else if (!$(e.target).parents('.jspVerticalBar').length) {
+            $this.find('.default-select-dropdown').addClass('hidden');
             $this.removeClass('active');
         }
     });
@@ -13077,9 +13127,9 @@ function bindDropdownEvents($dropdown, saveOption) {
     $('#fmholder, .fm-dialog').rebind('click.defaultselect', function(e) {
 
         // ToDo: Narrow this condition and find main reason why it's made
-        if (!$(e.target).hasClass('default-select')) {
+        if (!$(e.target).parents('.default-select').length && !$(e.target).hasClass('default-select')) {
             $selectBlock = $('.default-select.active');
-            $selectBlock.find('.default-select-dropdown').fadeOut(200);
+            $selectBlock.find('.default-select-dropdown').addClass('hidden');
             $selectBlock.removeClass('active');
         }
     });
@@ -13407,11 +13457,16 @@ function removeFromMultiInputDDL(dialog, item) {
                     type = M.lastActiveTab || 'cloud-drive';
                 }
 
-                // Show all items in sort dialog in case contacts tab is choosen
+                // Show only contacts related sorting options
                 if (type === 'contacts') {
                     menu.find('.sorting-item-divider,.sorting-menu-item').removeClass('hidden');
+                    menu.find(
+                            '*[data-by="fav"],' +
+                            '*[data-by="created"]'
+                        ).addClass('hidden');
                 }
                 else { // Hide status and last-interaction sorting options in sort dialog
+                    menu.find('.sorting-item-divider,.sorting-menu-item').removeClass('hidden');
                     menu.find('*[data-by=status],*[data-by=last-interaction]').addClass('hidden');
                 }
 

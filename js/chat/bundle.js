@@ -3295,6 +3295,11 @@ React.makeElement = React['createElement'];
 	            requiresUpdateOnResize: true
 	        };
 	    },
+	    getInitialState: function getInitialState() {
+	        return {
+	            'selected': this.props.selected ? this.props.selected : []
+	        };
+	    },
 	    specificShouldComponentUpdate: function specificShouldComponentUpdate(nextProps, nextState) {
 	        if (this.props.active != nextProps.active) {
 	            return true;
@@ -3302,14 +3307,24 @@ React.makeElement = React['createElement'];
 	            return true;
 	        } else if (this.state && this.state.active != nextState.active) {
 	            return true;
+	        } else if (this.state && JSON.stringify(this.state.selected) != JSON.stringify(nextState.selected)) {
+	            return true;
 	        } else {
 
 	            return undefined;
 	        }
 	    },
+	    onSelected: function onSelected(nodes) {
+	        this.setState({ 'selected': nodes });
+	        if (this.props.onSelected) {
+	            this.props.onSelected(nodes);
+	        }
+	        this.forceUpdate();
+	    },
+	    onSelectClicked: function onSelectClicked() {
+	        this.props.onSelectClicked();
+	    },
 	    render: function render() {
-	        var _this = this;
-
 	        var self = this;
 
 	        return React.makeElement(
@@ -3331,11 +3346,8 @@ React.makeElement = React['createElement'];
 	                onSelectDone: this.props.onSelectDone,
 	                multipleSelectedButtonLabel: this.props.multipleSelectedButtonLabel,
 	                singleSelectedButtonLabel: this.props.singleSelectedButtonLabel,
-	                nothingSelectedButtonLabel: this.props.nothingSelectedButtonLabel,
-	                onClick: function onClick(contact, e) {
-	                    _this.props.onClick(contact, e);
-	                    _this.props.closeDropdown();
-	                } })
+	                nothingSelectedButtonLabel: this.props.nothingSelectedButtonLabel
+	            })
 	        );
 	    }
 	});
@@ -3720,7 +3732,7 @@ React.makeElement = React['createElement'];
 	    getInitialState: function getInitialState() {
 	        return {
 	            'searchValue': '',
-	            'selected': this.props.selected ? this.props.selected : []
+	            'selected': false
 	        };
 	    },
 	    getDefaultProps: function getDefaultProps() {
@@ -3749,11 +3761,11 @@ React.makeElement = React['createElement'];
 	                $(document).trigger('closeDropdowns');
 
 	                if (self.props.onSelectDone) {
-	                    self.props.onSelectDone(self.props.selected);
+	                    self.props.onSelectDone(self.state.selected);
 	                }
 	            };
 
-	            if (!self.props.selected || self.props.selected.length === 0) {
+	            if (!self.state.selected || self.state.selected.length === 0) {
 	                footer = React.makeElement(
 	                    "div",
 	                    { className: "fm-dialog-footer" },
@@ -3763,7 +3775,7 @@ React.makeElement = React['createElement'];
 	                        self.props.nothingSelectedButtonLabel ? self.props.nothingSelectedButtonLabel : __(l[8889])
 	                    )
 	                );
-	            } else if (self.props.selected.length === 1) {
+	            } else if (self.state.selected.length === 1) {
 	                footer = React.makeElement(
 	                    "div",
 	                    { className: "contacts-search-footer" },
@@ -3777,7 +3789,7 @@ React.makeElement = React['createElement'];
 	                        )
 	                    )
 	                );
-	            } else if (self.props.selected.length > 1) {
+	            } else if (self.state.selected.length > 1) {
 	                footer = React.makeElement(
 	                    "div",
 	                    { className: "contacts-search-footer" },
@@ -3820,54 +3832,41 @@ React.makeElement = React['createElement'];
 	            }
 
 	            var selectedClass = "";
-	            if (self.props.selected && self.props.selected.indexOf(v.u) !== -1) {
+	            if (self.state.selected && self.state.selected.indexOf(v.u) !== -1) {
 	                selectedClass = "selected";
 	            }
 	            contacts.push(React.makeElement(ContactCard, {
 	                contact: v,
 	                className: "contacts-search " + selectedClass,
-	                onDoubleClick: function onDoubleClick(contact, e) {
-	                    if (!self.props.multiple) {
-	                        if (self.props.onClick) {
-	                            self.props.onClick(contact, e);
-	                        }
-	                    } else {
-	                        if (self.props.onSelect) {
-	                            self.props.onSelect(contact, e);
-	                        }
 
-	                        $(document).trigger('closeDropdowns');
-
-	                        var sel = self.props.selected;
-	                        if (sel.indexOf(contact.u) === -1) {
-	                            sel.push(contact.u);
-	                        }
-
-	                        if (self.props.onSelectDone) {
-	                            self.props.onSelectDone(sel);
-	                        }
-	                    }
-	                },
 	                onClick: function onClick(contact, e) {
-	                    if (!self.props.multiple) {
-	                        if (self.props.onClick) {
-	                            self.props.onClick(contact, e);
-	                        }
-	                    } else {
-	                        var sel = self.props.selected;
-	                        if (!sel) {
-	                            sel = [];
-	                        }
-	                        if (self.props.selected.indexOf(contact.u) > -1) {
-	                            removeValue(sel, contact.u, false);
-	                        } else {
-	                            sel.push(contact.u);
-	                        }
+	                    var contactHash = contact.h;
 
-	                        if (self.props.onSelect) {
-	                            self.props.onSelect(contact, e);
+	                    if (contactHash === self.lastClicked && new Date() - self.clickTime < 500) {
+
+	                        if (self.props.onSelected) {
+	                            self.props.onSelected([contact.h]);
 	                        }
+	                        self.props.onSelectDone([contact.h]);
+	                        return;
+	                    } else {
+	                        var selected = clone(self.state.selected || []);
+
+	                        if (selected.indexOf(contactHash) === -1) {
+	                            selected.push(contact.h);
+	                            if (self.props.onSelected) {
+	                                self.props.onSelected(selected);
+	                            }
+	                        } else {
+	                            removeValue(selected, contactHash);
+	                            if (self.props.onSelected) {
+	                                self.props.onSelected(selected);
+	                            }
+	                        }
+	                        self.setState({ 'selected': selected });
 	                    }
+	                    self.clickTime = new Date();
+	                    self.lastClicked = contactHash;
 	                },
 	                noContextMenu: true,
 	                key: v.u
@@ -6368,8 +6367,6 @@ React.makeElement = React['createElement'];
 
 	        var buttons = [];
 
-	        window.asdf = self;
-
 	        if (!folderIsHighlighted) {
 	            buttons.push({
 	                "label": self.props.selectLabel,
@@ -6492,7 +6489,6 @@ React.makeElement = React['createElement'];
 	        if (this.props.onSelected) {
 	            this.props.onSelected(nodes);
 	        }
-	        this.forceUpdate();
 	    },
 	    onSelectClicked: function onSelectClicked() {
 	        this.props.onSelectClicked();
@@ -6538,27 +6534,8 @@ React.makeElement = React['createElement'];
 	                megaChat: self.props.megaChat,
 	                contacts: self.props.contacts,
 	                exclude: self.props.exclude,
-	                onClick: function onClick(contact, e) {
-	                    var contactHash = contact.h;
-
-	                    if (contactHash === self.lastClicked && new Date() - self.clickTime < 500) {
-
-	                        self.onSelected([contact.h]);
-	                        self.props.onSelectClicked([contact.h]);
-	                    } else {
-	                        var selected = clone(self.state.selected);
-
-	                        if (self.state.selected.indexOf(contactHash) === -1) {
-	                            selected.push(contact.h);
-	                            self.onSelected(selected);
-	                        } else {
-	                            removeValue(selected, contactHash);
-	                            self.onSelected(selected);
-	                        }
-	                    }
-	                    self.clickTime = new Date();
-	                    self.lastClicked = contactHash;
-	                },
+	                onSelectDone: self.props.onSelectClicked,
+	                onSelected: self.onSelected,
 	                selected: self.state.selected,
 	                headerClasses: "left-aligned"
 	            })
@@ -7002,18 +6979,22 @@ React.makeElement = React['createElement'];
 	        var self = this;
 	        var room = this.props.chatRoom;
 
-	        if (!self.typingTimeout) {
-	            if (room && room.state === ChatRoom.STATE.READY && !self.iAmTyping) {
-	                self.iAmTyping = true;
-	                room.megaChat.karere.sendIsComposing(room.roomJid);
-	            }
-	        } else if (self.typingTimeout) {
-	            clearTimeout(self.typingTimeout);
+	        if (self.stoppedTypingTimeout) {
+	            clearTimeout(self.stoppedTypingTimeout);
 	        }
 
-	        self.typingTimeout = setTimeout(function () {
-	            self.stoppedTyping();
-	        }, 2000);
+	        self.stoppedTypingTimeout = setTimeout(function () {
+	            if (room && self.iAmTyping) {
+	                self.iAmTyping = false;
+	                delete self.lastTypingStamp;
+	            }
+	        }, 4000);
+
+	        if (room && !self.iAmTyping || room && self.iAmTyping && unixtime() - self.lastTypingStamp >= 4) {
+	            self.iAmTyping = true;
+	            self.lastTypingStamp = unixtime();
+	            room.trigger('typing');
+	        }
 	    },
 	    triggerOnUpdate: function triggerOnUpdate(forced) {
 	        var self = this;
@@ -7048,28 +7029,6 @@ React.makeElement = React['createElement'];
 	            self.onUpdateThrottling = setTimeout(function () {
 	                self.props.onUpdate();
 	            }, 70);
-	        }
-	    },
-	    stoppedTyping: function stoppedTyping() {
-	        if (this.props.disabled) {
-	            return;
-	        }
-
-	        var self = this;
-	        var room = this.props.chatRoom;
-
-	        if (self.typingTimeout) {
-	            clearTimeout(self.typingTimeout);
-	            self.typingTimeout = null;
-	        }
-
-	        if (self.iAmTyping) {
-
-	            self.triggerOnUpdate();
-	        }
-	        if (room && room.state === ChatRoom.STATE.READY && self.iAmTyping === true) {
-	            room.megaChat.karere.sendComposingPaused(room.roomJid);
-	            self.iAmTyping = false;
 	        }
 	    },
 	    onCancelClicked: function onCancelClicked(e) {
@@ -7130,7 +7089,6 @@ React.makeElement = React['createElement'];
 	            if (self.onConfirmTrigger(val) !== true) {
 	                self.setState({ typedMessage: "" });
 	            }
-	            self.stoppedTyping();
 	            e.preventDefault();
 	            e.stopPropagation();
 	            return;
@@ -7155,20 +7113,17 @@ React.makeElement = React['createElement'];
 	            return;
 	        } else if (key === 13) {
 	            if ($.trim(val).length === 0) {
-	                self.stoppedTyping();
 	                e.preventDefault();
 	            }
 	        } else if (key === 38) {
 	            if ($.trim(val).length === 0) {
 	                if (self.props.onUpEditPressed && self.props.onUpEditPressed() === true) {
-	                    self.stoppedTyping();
 	                    e.preventDefault();
 	                    return;
 	                }
 	            }
 	        } else if (key === 27) {
 	            if (self.props.showButtons === true) {
-	                self.stoppedTyping();
 	                e.preventDefault();
 	                self.onCancelClicked(e);
 	                return;
@@ -8059,7 +8014,7 @@ React.makeElement = React['createElement'];
 	    mixins: [MegaRenderMixin],
 	    getInitialState: function getInitialState() {
 	        return {
-	            currentlyTyping: []
+	            currentlyTyping: {}
 	        };
 	    },
 	    componentWillMount: function componentWillMount() {
@@ -8067,59 +8022,43 @@ React.makeElement = React['createElement'];
 	        var chatRoom = self.props.chatRoom;
 	        var megaChat = self.props.chatRoom.megaChat;
 
-	        megaChat.karere.bind("onComposingMessage.whosTyping" + chatRoom.roomJid, function (e, eventObject) {
+	        chatRoom.bind("onParticipantTyping.whosTyping", function (e, user_handle) {
 	            if (!self.isMounted()) {
 	                return;
 	            }
-	            if (Karere.getNormalizedFullJid(eventObject.getFromJid()) === megaChat.karere.getJid()) {
+	            if (user_handle === u_handle) {
 	                return;
 	            }
 
-	            var room = megaChat.chats[eventObject.getRoomJid()];
-	            if (room.roomJid == chatRoom.roomJid) {
-	                var currentlyTyping = self.state.currentlyTyping;
-	                var u_h = megaChat.getContactFromJid(Karere.getNormalizedBareJid(eventObject.getFromJid())).u;
+	            var currentlyTyping = clone(self.state.currentlyTyping);
+	            var u_h = user_handle;
 
-	                if (u_h === u_handle) {
+	            if (u_h === u_handle) {
 
-	                    return;
-	                }
+	                return;
+	            } else if (!M.u[u_h]) {
 
-	                currentlyTyping.push(u_h);
-	                currentlyTyping = array_unique(currentlyTyping);
-	                self.setState({
-	                    currentlyTyping: currentlyTyping
-	                });
-	                self.forceUpdate();
-	            }
-	        });
-
-	        megaChat.karere.rebind("onPausedMessage.whosTyping" + chatRoom.roomJid, function (e, eventObject) {
-	            var room = megaChat.chats[eventObject.getRoomJid()];
-
-	            if (!self.isMounted()) {
 	                return;
 	            }
-	            if (Karere.getNormalizedFullJid(eventObject.getFromJid()) === megaChat.karere.getJid()) {
-	                return;
+	            if (currentlyTyping[u_h]) {
+	                clearTimeout(currentlyTyping[u_h][1]);
 	            }
 
-	            if (room.roomJid === chatRoom.roomJid) {
-	                var currentlyTyping = self.state.currentlyTyping;
-	                var u_h = megaChat.getContactFromJid(Karere.getNormalizedBareJid(eventObject.getFromJid())).u;
-	                if (u_h === u_handle) {
-
-	                    return;
+	            var timer = setTimeout(function () {
+	                if (self.state.currentlyTyping[u_h]) {
+	                    var newState = clone(self.state.currentlyTyping);
+	                    delete newState[u_h];
+	                    self.setState({ currentlyTyping: newState });
 	                }
+	            }, 5000);
 
-	                if (currentlyTyping.indexOf(u_h) > -1) {
-	                    removeValue(currentlyTyping, u_h);
-	                    self.setState({
-	                        currentlyTyping: currentlyTyping
-	                    });
-	                    self.forceUpdate();
-	                }
-	            }
+	            currentlyTyping[u_h] = [unixtime(), timer];
+
+	            self.setState({
+	                currentlyTyping: currentlyTyping
+	            });
+
+	            self.forceUpdate();
 	        });
 	    },
 	    componentWillUnmount: function componentWillUnmount() {
@@ -8127,16 +8066,15 @@ React.makeElement = React['createElement'];
 	        var chatRoom = self.props.chatRoom;
 	        var megaChat = chatRoom.megaChat;
 
-	        megaChat.karere.bind("onComposingMessage." + chatRoom.roomJid);
-	        megaChat.karere.unbind("onPausedMessage." + chatRoom.roomJid);
+	        chatRoom.unbind("onParticipantTyping.whosTyping");
 	    },
 	    render: function render() {
 	        var self = this;
 
 	        var typingElement = null;
 
-	        if (self.state.currentlyTyping.length > 0) {
-	            var names = self.state.currentlyTyping.map(function (u_h) {
+	        if (Object.keys(self.state.currentlyTyping).length > 0) {
+	            var names = Object.keys(self.state.currentlyTyping).map(function (u_h) {
 	                var avatarMeta = generateAvatarMeta(u_h);
 	                return avatarMeta.fullName.split(" ")[0];
 	            });

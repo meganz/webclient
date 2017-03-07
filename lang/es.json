@@ -3973,6 +3973,7 @@
     "16327": "Anima a tu amigo a registrarse e instalar una aplicaci\u00f3n MEGA. Siempre que use la misma direcci\u00f3n de correo electr\u00f3nico que has introducido, recibir\u00e1s tus [S]%1[\/S] de espacio de almacenamiento gratis y [S]%2[\/S] de cuota de transferencia.",
     "16328": "\u00bfQuieres ocultar este di\u00e1logo cuando haya transferencias en curso?",
     "16329": "Usa Ajustes -> Avanzado -> Transferencias para habilitarlo de nuevo.",
+    "16330": "Secure communication using user-controlled end-to-end encryption for text chat (mobile apps and in the browser) and voice \/ video (currently only in the browser; mobile coming soon), unified across all your devices.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

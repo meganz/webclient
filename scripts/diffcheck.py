@@ -435,7 +435,7 @@ def reduce_validator(file_line_mapping, **extra):
                                   .format(file_path, line_number, line_length))
                     break
 
-                # Analize JavaScript files...
+                # Analyse JavaScript files...
                 if file_extension in ['.js', '.jsx']:
                     fatal += inspectjs(file_path, line_number, line, result)
                     continue

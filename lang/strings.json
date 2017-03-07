@@ -1332,8 +1332,8 @@
         "context": ""
     },
     "731": {
-        "text": "The associated user account has been terminated due to multiple violations of our [A]Terms of Service[\/A].",
-        "context": ""
+        "text": "The account that created this link has been terminated due to multiple violations of our [A]Terms of Service[\/A].",
+        "context": "An error message which is shown when you open a file\/folder link (or other shared resource) and it's no longer available because the user account that created the link has been terminated due to multiple violations of our Terms of Service."
     },
     "732": {
         "text": "You are already logged into an account that is different from the one you are confirming. Please check your current session, log out, and then click on the confirmation link again.",
@@ -11616,8 +11616,8 @@
         "context": "Search contacts section header."
     },
     "8011": {
-        "text": "Add from your Cloud Drive",
-        "context": "Button label. Allows to share files(from your Cloud Drive) in chat conversation "
+        "text": "Add from my Cloud Drive",
+        "context": "Button label. Allows to share files(from my Cloud Drive) in chat conversation "
     },
     "8012": {
         "text": "Quote",
@@ -14336,8 +14336,8 @@
         "context": "A dialog message which is displayed when the process\/request to import a folder link fails."
     },
     "9045": {
-        "text": "The associated user account has been terminated due to multiple violations of our Terms of Service.",
-        "context": "An error message which is shown when you open a file\/folder link (or other shared resource) and it's no longer available because the the associated user account has been terminated due to multiple violations of our Terms of Service."
+        "text": "The account that created this link has been terminated due to multiple violations of our Terms of Service.",
+        "context": "An error message which is shown when you open a file\/folder link (or other shared resource) and it's no longer available because the user account that created the link has been terminated due to multiple violations of our Terms of Service."
     },
     "9046": {
         "text": "The account confirmation link that you are using is incomplete. Please check the link length and be sure that you have copied the entire link then try again.",
@@ -15696,7 +15696,7 @@
         "context": ""
     },
     "16279": {
-        "text": "When you install MEGAsync you get %1 of complimentary storage space plus %2 of transfer volume, both valid for %3 months. MEGAsync is available for Windows, macOS and most Linux distros.",
+        "text": "When you install MEGAsync you get %1 of complimentary storage space plus %2 of transfer quota, both valid for %3 months. MEGAsync is available for Windows, macOS and most Linux distros.",
         "context": "Both %1 and %2 would be replaced with amounts, for example \"50 GB\" and %3 a numeric value for the number of months"
     },
     "16280": {
@@ -15704,7 +15704,7 @@
         "context": ""
     },
     "16281": {
-        "text": "When you install our mobile app you get %1 of complimentary storage space plus %2 transfer volume, both valid for %3 months. We provide mobile apps for iOS, Android & Windows Phone.",
+        "text": "When you install our mobile app you get %1 of complimentary storage space plus %2 transfer quota, both valid for %3 months. We provide mobile apps for iOS, Android & Windows Phone.",
         "context": "Both %1 and %2 would be replaced with amounts, for example \"50 GB\" and %3 a numeric value for the number of months"
     },
     "16282": {
@@ -15712,7 +15712,7 @@
         "context": ""
     },
     "16283": {
-        "text": "Invite as many friends or coworkers as you want. For every signup under the invited email address, you will receive %1 of complimentary storage plus %2 of transfer volume, both valid for %3 months, provided that the new user installs either MEGAsync or a mobile app and starts using MEGA.",
+        "text": "Invite as many friends or coworkers as you want. For every signup under the invited email address, you will receive %1 of complimentary storage plus %2 of transfer quota, both valid for %3 months, provided that the new user installs either MEGAsync or a mobile app and starts using MEGA.",
         "context": "%1 and %2 would be replaced with amounts, for example \"50 GB\" and %3 would be replaced with a numeric value which represents the number of months."
     },
     "16284": {
@@ -15880,8 +15880,8 @@
         "context": "%1 and %2 are replaced by some amount, eg \"50GB\""
     },
     "16326": {
-        "text": "Invite as many friends or coworkers as you want. For every signup under the invited email address, you will receive [S]%1[\/S] of complimentary storage plus [S]%2[\/S] of transfer volume, provided that the new user installs either MEGAsync or a mobile app and starts using MEGA (your free quota will be credited once we confirm the activity of the new account, which can take a few days).",
-        "context": ""
+        "text": "Invite as many friends or coworkers as you want. For every signup under the invited email address, you will receive [S]%1[\/S] of complimentary storage plus [S]%2[\/S] of transfer quota, provided that the new user installs either MEGAsync or a mobile app and starts using MEGA (your free quota will be credited once we confirm the activity of the new account, which can take a few days).",
+        "context": "%1 and %2 would be replaced with amounts, for example \"50 GB\"."
     },
     "16327": {
         "text": "Encourage your friend to register and install a MEGA app. As long as your friend uses the same email address as you've entered, you will receive your free [S]%1[\/S] of storage space and [S]%2[\/S] of transfer quota.",
@@ -15894,5 +15894,9 @@
     "16329": {
         "text": "Use Settings -> Advanced -> Transfers to enable it again.",
         "context": "This message is shown in a confirmation dialog for ongoing transfers. It explains how to re-enable the ongoing transfers popup dialog."
+    },
+    "16330": {
+        "text": "Secure communication using user-controlled end-to-end encryption for text chat (mobile apps and in the browser) and voice \/ video (currently only in the browser; mobile coming soon), unified across all your devices.",
+        "context": "Describes chat features"
     }
 }

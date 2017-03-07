@@ -3212,15 +3212,17 @@ function dashboardUI() {
             max = M.maf.transfer.base + M.maf.transfer.current;
             base += account.servbw_used;
         }
+
         perc   = Math.round(base * 100 / max) || 1;
         perc_c = perc;
         if (perc_c > 100) {
             perc_c = 100;
         }
-        if (perc_c > 99) {
+        if (perc_c > 99 || dlmanager.isOverQuota) {
             $bandwidthChart.addClass('exceeded');
             b_exceeded = 1;
         }
+
         var deg =  230 * perc_c / 100;
 
         // Used Bandwidth chart
@@ -3238,13 +3240,16 @@ function dashboardUI() {
         $bandwidthChart.find('.chart.data .size-txt').text(bytesToSize(base, 0));
         $bandwidthChart.find('.chart.data .pecents-txt').text((b2[0]));
         $bandwidthChart.find('.chart.data .gb-txt').text((b2[1]));
-        if (u_attr.p || M.maf) {
+        if ((u_attr.p || M.maf) && b2[0] > 0) {
+            $bandwidthChart.removeClass('no-percs');
             $bandwidthChart.find('.chart.data .perc-txt').text(perc_c + '%');
         }
         else {
+            $bandwidthChart.addClass('no-percs');
             $bandwidthChart.find('.chart.data span:not(.size-txt)').text('');
             $bandwidthChart.find('.chart.data .pecents-txt').text(l[5801]);
         }
+
         /* End of New Used Bandwidth chart */
 
 
@@ -3721,7 +3726,7 @@ function accountUI() {
         if (perc_c > 100) {
             perc_c = 100;
         }
-        if (perc_c > 99) {
+        if (perc_c > 99 || dlmanager.isOverQuota) {
             $bandwidthChart.addClass('exceeded');
             b_exceeded = 1;
         }
@@ -3739,14 +3744,16 @@ function accountUI() {
         }
 
         // Maximum bandwidth
-        var b2 = bytesToSize(account.bw, 0).split(' ');
-        $bandwidthChart.find('.chart.data .size-txt').text(bytesToSize(account.servbw_used + account.downbw_used, 0));
+        var b2 = bytesToSize(max, 0).split(' ');
+        $bandwidthChart.find('.chart.data .size-txt').text(bytesToSize(base, 0));
         $bandwidthChart.find('.chart.data .pecents-txt').text((b2[0]));
         $bandwidthChart.find('.chart.data .gb-txt').text((b2[1]));
-        if (u_attr.p || M.maf) {
+        if ((u_attr.p || M.maf) && b2[0] > 0) {
+            $bandwidthChart.removeClass('no-percs');
             $bandwidthChart.find('.chart.data .perc-txt').text(perc_c + '%');
         }
         else {
+            $bandwidthChart.addClass('no-percs');
             $bandwidthChart.find('.chart.data span:not(.size-txt)').text('');
             $bandwidthChart.find('.chart.data .pecents-txt').text(l[5801]);
         }
@@ -4056,10 +4063,11 @@ function accountUI() {
 
             // For free users only show base quota for storage and remove it for bandwidth.
             // For pro users replace base quota by pro quota
+            var $baseq = $('.achievements-block .data-block.storage .baseq');
+            storageBaseQuota = maf.storage.base;
+            $('.progress-txt', $baseq).text(bytesToSize(storageBaseQuota, 0));
+
             if (u_attr.p) {
-                var $baseq = $('.achievements-block .data-block.storage .baseq');
-                storageBaseQuota = maf.storage.base;
-                $('.progress-txt', $baseq).text(bytesToSize(storageBaseQuota, 0));
                 $('.progress-title', $baseq).text(l[16299]);
 
                 transferBaseQuota = maf.transfer.base;
@@ -5158,7 +5166,7 @@ function accountUI() {
             for (var i in prices)
                 voucheroptions += '<div class="default-dropdown-item" data-value="' + htmlentities(prices[i]) + '">&euro;' + htmlentities(prices[i]) + ' voucher</div>';
             $('.default-select.vouchertype .default-select-scroll').html(voucheroptions);
-            bindDropdownEvents($('.default-select.vouchertype'), 0, '.account.tab-content');
+            bindDropdownEvents($('.default-select.vouchertype'), 0, '.fm-account-reseller');
         }
 
         $('.fm-purchase-voucher,.default-white-button.topup').rebind('click', function(e)
@@ -7904,6 +7912,8 @@ function treeUI()
             $target.is('input') ||
             $target.is('textarea') ||
             $target.is('.download.info-txt') ||
+            $target.closest('.multiple-input').length ||
+            $target.closest('.create-folder-input-bl').length ||
             $target.closest('.content-panel.conversations').length ||
             $target.closest('.messages.content-area').length ||
             $target.closest('.chat-right-pad .user-card-data').length ||
@@ -7915,7 +7925,8 @@ function treeUI()
             $target.hasClass('contact-details-email') ||
             $target.hasClass('nw-conversations-name')) {
             return;
-        } else if (!localStorage.contextmenu) {
+        }
+        else if (!localStorage.contextmenu) {
             $.hideContextMenu();
             return false;
         }

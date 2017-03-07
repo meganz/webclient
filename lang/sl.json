@@ -3974,6 +3974,12 @@
     "16328": "Ali \u017eelite skriti to okno, ko so prenosi v teku?",
     "16329": "Uporabite Nastavitve -> Napredno -> Prenosi za ponovno omogo\u010denje.",
     "16330": "Varna komunikacija z uporabo uporabni\u0161ko nadzorovane enkripcije od prve do zadnje to\u010dke za tekstovni pogovor (mobilne aplikacije in v brskljalniku) ter zvo\u010dne in video komunikacije (trenutno samo v brskljalniku; mobilno prihaja kmalu), poenoteno preko vseh va\u0161ih naprav.",
+    "16331": "You will not receive credit for inviting someone who has used MEGA previously and you will not be notified about such a rejection.",
+    "16332": "You only qualify if:",
+    "16333": "You invited someone who has not used MEGA previously.",
+    "16334": "The new user installs at least one app and starts using MEGA.",
+    "16335": "(Usage confirmation may take a few days to complete - please be patient)",
+    "16336": "(Bonus expires in [S]%1[\/S] %2)",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

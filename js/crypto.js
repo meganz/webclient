@@ -3941,10 +3941,14 @@ function crypto_reportmissingkey(n) {
                                      });
         }
     }
-    else {
-        console.error('invalid-missingkey ' + n.h, change);
+    else if (d) {
+        var mk = window._mkshxx = window._mkshxx || {};
+        mk[n.h] = 1;
 
-        //srvlog2('invalid-missingkey', n.h, typeof n.k, Object(n.k).length | 0);
+        delay('debug::mkshkk', function() {
+            console.debug('crypto_reportmissingkey', Object.keys(mk));
+            window._mkshxx = undefined;
+        }, 4100);
     }
 }
 

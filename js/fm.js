@@ -7559,7 +7559,7 @@ function disableCircularTargets(pref) {
                 // Disable parent dir
                 $(pref + node.p).addClass('disabled');
             }
-            else if (d && node.t < 2) {
+            else if (d && node.t < 2 && (node.h !== M.RootID /*folderlink*/)) {
                 console.error('disableCircularTargets: parent-less node!', handle, pref);
             }
         }

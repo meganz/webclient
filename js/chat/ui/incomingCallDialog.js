@@ -28,7 +28,15 @@
     /**
      * Show the dialog
      */
-    IncomingCallDialog.prototype.show = function(username, avatar, sid, isVideoCall, answerAudioFn, answerVideoFn, cancelFn) {
+    IncomingCallDialog.prototype.show = function(
+            username,
+            avatar,
+            sid,
+            isVideoCall,
+            answerAudioFn,
+            answerVideoFn,
+            cancelFn
+        ) {
         var self = this;
 
         if (!self.$dialog) {

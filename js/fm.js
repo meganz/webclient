@@ -790,7 +790,7 @@ function initUI() {
         importFile();
     }
 
-    $('.dropdown.body').rebind('contextmenu.dropdown', function(e) {
+    $('.dropdown.body.context').rebind('contextmenu.dropdown', function(e) {
         if (!localStorage.contextmenu)
             e.preventDefault();
     });
@@ -2655,12 +2655,30 @@ function initContextUI() {
         }
     });
 
-    $('.labels .dropdown-colour-item').click(function() {
+    $('.labels .dropdown-colour-item').rebind('click', function() {
         var labelId = parseInt(this.dataset.labelId);
 
         if (labelId && (rightsById($.selected[0]) > 1)) {
             M.colourLabeling($.selected, labelId);
         }
+    });
+
+    $('.labels .dropdown-colour-item').rebind('mouseover', function() {
+        var labelTxt = this.dataset.labelTxt;
+        var labelInfo;
+
+        if ($(this).hasClass('active')) {
+            labelInfo = l[16222];
+        }
+        else {
+            labelInfo = l[16221];
+        }
+        labelTxt = labelInfo.replace('%1', '"' + labelTxt + '"');
+        $('.labels .dropdown-color-info').text(labelTxt).addClass('active');
+    });
+
+    $('.labels .dropdown-colour-item').rebind('mouseout', function() {
+        $('.labels .dropdown-color-info').removeClass('active');
     });
 
     $(c + '.open-item').rebind('click', function() {
@@ -3155,7 +3173,7 @@ function dashboardUI() {
             }
             else if (account.stype == 'O') {
                 // one-time or cancelled subscription
-                $('.account.left-pane.plan-date-info').text(l[987]);
+                $('.account.left-pane.plan-date-info').text(l[16175]);
                 $('.account.left-pane.plan-date-val').text(time2date(account.expiry, 2));
             }
         }
@@ -7434,6 +7452,11 @@ function contextMenuUI(e, ll) {
         }
         else {
             return false;
+        }
+
+        //Hide Info item if properties dialog is opened
+        if ($.dialog === 'properties') {
+            $(menuCMI).filter('.properties-item').hide();
         }
     }
     // This part of code is also executed when ll == 'undefined'

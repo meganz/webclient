@@ -120,7 +120,10 @@
     right: -6px;
     top: -5px;
 }
+.small-rounded-avatar .avatar-letter {
+    color: white;
+}
 .user-card-verified.big {
 	border: 0;
-	background-position: -5px -1351px;
+	background-position: -7px -1353px;
 }

@@ -1701,6 +1701,7 @@ a.blog-button:hover {
     font-size: 31px;
     line-height: 42px;
     margin: 0;
+    color: white;
 }
 .notification-item .avatar img {
     width: 44px;
@@ -4346,7 +4347,6 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     display: block;
     font-size: 24px;
     line-height: 31px;
-    color: white;
     text-align: center;
     font-family: 'source_sans_prolight';
     display: block;
@@ -4370,6 +4370,9 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 }
 .nw-contact-avatar {
     margin-bottom: 6px;
+}
+.nw-contact-avatar span {
+    color: white;
 }
 .fm-tree-panel .nw-contact-avatar, .email .nw-contact-avatar::before, .gmail .nw-contact-avatar::before {
     display: none;
@@ -4602,6 +4605,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
     font-size: 17px;
     line-height: 23px;
+}
+.fm-avatar .avatar span {
+    color: white;
 }
 .fm-avatar .avatar::before {
     -webkit-box-shadow: none;
@@ -9500,7 +9506,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .default-select-dropdown .jspTrack {
     padding: 0 2px 0 8px;
-    
 }
 .default-select-scroll {
     max-height: 288px;
@@ -11094,6 +11099,7 @@ table {
     height: 100%;
     text-align: center;
     line-height: 130px;
+    color: white;
 }
 .fm-account-avatar .avatar-wrapper::before {
     width: 136px;
@@ -20116,6 +20122,20 @@ span.incoming-call-name {
     position: relative;
     background-color: #f2f2f2;
 }
+.incoming-call-avatar .avatar-wrapper {
+    width: 132px;
+    height: 132px;
+    border: 0;
+    margin: 0;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+    font-size: 72px;
+    line-height: 130px;
+}
+.incoming-call-avatar .avatar-wrapper span {
+    color: white;
+}
 .incoming-call-avatar img {
     width: 132px;
     height: 132px;
@@ -20519,7 +20539,8 @@ span.incoming-call-name {
     color: white;
     line-height: 94px;
     text-align: center;
-    font-size: 45px;
+    font-size: 55px;
+    font-family: 'source_sans_prolight', Arial;
     -moz-border-radius: 100%;
     -webkit-border-radius: 100%;
     border-radius: 100%;
@@ -20529,6 +20550,7 @@ span.incoming-call-name {
 .fingerprint-avatar img, .fingerprint-avatar .avatar-wrapper {
     width: 96px;
     height: 96px;
+    color: white;
 }
 .fingerprint-code {
     float: right;
@@ -20581,7 +20603,7 @@ span.incoming-call-name {
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
-        white-space: nowrap;
+    white-space: nowrap;
     overflow: hidden;
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
@@ -21093,7 +21115,6 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     position: absolute;
     left: 0;
     top: 0;
-    color: white;
     line-height: 16px;
     font-size: 10px;
     text-align: center;
@@ -21101,6 +21122,9 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     -webkit-border-radius: 100%;
     border-radius: 100%;
     text-transform: uppercase;
+}
+.search-avatar span, .pending-indicator span {
+    color: white;
 }
 .pending-indicator {
     display: none;

@@ -20536,7 +20536,8 @@ span.incoming-call-name {
     color: white;
     line-height: 94px;
     text-align: center;
-    font-size: 45px;
+    font-size: 55px;
+    font-family: 'source_sans_prolight', Arial;
     -moz-border-radius: 100%;
     -webkit-border-radius: 100%;
     border-radius: 100%;
@@ -20546,6 +20547,7 @@ span.incoming-call-name {
 .fingerprint-avatar img, .fingerprint-avatar .avatar-wrapper {
     width: 96px;
     height: 96px;
+    color: white;
 }
 .fingerprint-code {
     float: right;

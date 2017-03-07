@@ -3180,15 +3180,17 @@ function dashboardUI() {
             max = M.maf.transfer.base + M.maf.transfer.current;
             base += account.servbw_used;
         }
+
         perc   = Math.round(base * 100 / max) || 1;
         perc_c = perc;
         if (perc_c > 100) {
             perc_c = 100;
         }
-        if (perc_c > 99) {
+        if (perc_c > 99 || dlmanager.isOverQuota) {
             $bandwidthChart.addClass('exceeded');
             b_exceeded = 1;
         }
+
         var deg =  230 * perc_c / 100;
 
         // Used Bandwidth chart
@@ -3206,13 +3208,16 @@ function dashboardUI() {
         $bandwidthChart.find('.chart.data .size-txt').text(bytesToSize(base, 0));
         $bandwidthChart.find('.chart.data .pecents-txt').text((b2[0]));
         $bandwidthChart.find('.chart.data .gb-txt').text((b2[1]));
-        if (u_attr.p || M.maf) {
+        if ((u_attr.p || M.maf) && b2[0] > 0) {
+            $bandwidthChart.removeClass('no-percs');
             $bandwidthChart.find('.chart.data .perc-txt').text(perc_c + '%');
         }
         else {
+            $bandwidthChart.addClass('no-percs');
             $bandwidthChart.find('.chart.data span:not(.size-txt)').text('');
             $bandwidthChart.find('.chart.data .pecents-txt').text(l[5801]);
         }
+
         /* End of New Used Bandwidth chart */
 
 
@@ -3695,7 +3700,7 @@ function accountUI() {
         if (perc_c > 100) {
             perc_c = 100;
         }
-        if (perc_c > 99) {
+        if (perc_c > 99 || dlmanager.isOverQuota) {
             $bandwidthChart.addClass('exceeded');
             b_exceeded = 1;
         }
@@ -3713,14 +3718,16 @@ function accountUI() {
         }
 
         // Maximum bandwidth
-        var b2 = bytesToSize(account.bw, 0).split(' ');
-        $bandwidthChart.find('.chart.data .size-txt').text(bytesToSize(account.servbw_used + account.downbw_used, 0));
+        var b2 = bytesToSize(max, 0).split(' ');
+        $bandwidthChart.find('.chart.data .size-txt').text(bytesToSize(base, 0));
         $bandwidthChart.find('.chart.data .pecents-txt').text((b2[0]));
         $bandwidthChart.find('.chart.data .gb-txt').text((b2[1]));
-        if (u_attr.p || M.maf) {
+        if ((u_attr.p || M.maf) && b2[0] > 0) {
+            $bandwidthChart.removeClass('no-percs');
             $bandwidthChart.find('.chart.data .perc-txt').text(perc_c + '%');
         }
         else {
+            $bandwidthChart.addClass('no-percs');
             $bandwidthChart.find('.chart.data span:not(.size-txt)').text('');
             $bandwidthChart.find('.chart.data .pecents-txt').text(l[5801]);
         }

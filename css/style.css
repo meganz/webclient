@@ -1056,12 +1056,12 @@ a.account-manage-button:hover {
     display: inline-block;
     height: 40px;
 }
-.free .fm-right-block:not(.active-achievements) .bandwidth .chart.data .perc-txt, .free .fm-right-account-block:not(.active-achievements) .bandwidth .chart.data .perc-txt {
+.free .fm-right-block:not(.active-achievements) .bandwidth .chart.data .perc-txt, .free .fm-right-account-block:not(.active-achievements) .bandwidth .chart.data .perc-txt, .no-percs .chart.data .perc-txt {
     background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     background-position: -10px -11854px;
     width: 30px;
 }
-.free .bandwidth .chart.data .perc-txt::before {
+.free .bandwidth .chart.data .perc-txt::before, .no-percs .chart.data .perc-txt::before {
     content: '\00a0';
 }
 .fm-account-blocks .perc-txt::after {
@@ -11563,6 +11563,9 @@ table {
     background-color: #cc0006;
     left: 180px;
     display: block;
+}
+.no-percs .chart-indicator {
+    left: 145px;
 }
 .going-out .chart-indicator {
     display: block;
@@ -25372,7 +25375,7 @@ div.camera-bottom-txt {
     height: 92px;
     display: block;
     position: absolute;
-    margin: 21px 0 0 50px;
+    margin: 19px 0 0 50px;
     background-color: white;
     z-index: 10;
 }
@@ -25383,11 +25386,11 @@ div.camera-bottom-txt {
     overflow: hidden;
     position: absolute;
     z-index: 1;
-    top: 71px;
+    top: 73px;
     left: -1px;
 }
 .account.chart.overlay span:first-child {
-    top: -7px;
+    top: -5px;
     left: 34px;
     transform: rotate(45deg);
 }
@@ -25446,6 +25449,9 @@ div.camera-bottom-txt {
 }
 .free .fm-right-block.dashboard:not(.active-achievements) .bandwidth .chart.progressbars span, .free .fm-right-account-block:not(.active-achievements) .bandwidth .chart.progressbars span {
     transform: none !important;
+}
+.free .fm-right-block.dashboard .bandwidth.exceeded .chart.progressbars span, .free .fm-right-account-block .bandwidth.exceeded .chart.progressbars span, .bandwidth.exceeded .chart.progressbars span {
+    transform: rotate(180deg) !important;
 }
 .chart.progressbars .right-chart {
     clip: rect(0, 100px, 100px, 50px);

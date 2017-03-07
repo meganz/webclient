@@ -171,7 +171,6 @@ PresencedIntegration.prototype._updateuicb = function presencedIntegration_updat
     var self = this;
 
     self.logger.debug("updateuicb", presence, autoaway, autoawaylock, autoawaytimeout, persist, persistlock);
-    console.error('updateuicb', arguments);
 
     self._presence[u_handle] = presence;
 
@@ -246,7 +245,6 @@ PresencedIntegration.prototype._peerstatuscb = function(user_hash, presence, isW
 
     self.logger.debug("peerstatuscb", user_hash, presence, isWebrtcFlag);
 
-    console.error("peerstatuscb", user_hash, presence, isWebrtcFlag);
 
     isWebrtcFlag = isWebrtcFlag === PresencedIntegration.FLAGS.IS_WEBRTC;
     self._presence[user_hash] = presence;
@@ -382,7 +380,6 @@ PresencedIntegration.prototype.getAutoaway = function() {
 };
 
 PresencedIntegration.prototype._initAutoawayEvents = function() {
-    console.error("presencedInt._initAutoawayEvents");
 
     var self = this;
     $(document.body).rebind('mousemove.presencedInt keypress.presencedInt', function() {
@@ -393,7 +390,6 @@ PresencedIntegration.prototype._initAutoawayEvents = function() {
 };
 
 PresencedIntegration.prototype._destroyAutoawayEvents = function() {
-    console.error("presencedInt._desotryAutoawayEvnts");
 
     $(document.body).unbind('mousemove.presencedInt');
     $(document.body).unbind('keypress.presencedInt');

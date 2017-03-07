@@ -641,7 +641,7 @@ UserPresence.prototype.updateui = function presence_updateui() {
                     this.presence == UserPresence.PRESENCE.OFFLINE);
 };
 
-if (PRESENCE2_DEBUG) {
+if (false && PRESENCE2_DEBUG) {
     Object.keys(UserPresence.prototype).forEach(function(fn) {
         var origFn = UserPresence.prototype[fn];
         UserPresence.prototype[fn] = function() {

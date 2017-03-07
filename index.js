@@ -1456,7 +1456,7 @@ function topmenuUI() {
         }
 
         // If the chat is disabled don't show the green status icon in the header
-        if (!megaChatIsDisabled) {
+        if (!pfid && !megaChatIsDisabled) {
             $('.activity-status-block, .activity-status-block .activity-status').show();
             if (megaChatIsReady) {
                 megaChat.renderMyStatus();

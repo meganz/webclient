@@ -3121,11 +3121,12 @@ function dashboardUI() {
             var maf = M.maf;
             var $storage = $('.account.bonuses-size.storage', $achWidget);
             var $transfer = $('.account.bonuses-size.transfer', $achWidget);
-            var storageCurrentValue = maf.storage.current + maf.storage.base;
-            var transferCurrentValue = maf.transfer.current + maf.transfer.base;
+            var storageCurrentValue = maf.storage.current /*+ maf.storage.base*/;
+            var transferCurrentValue = maf.transfer.current /*+ maf.transfer.base*/;
 
             $storage.text(bytesToSize(storageCurrentValue, 0));
             $transfer.text(bytesToSize(transferCurrentValue, 0));
+
             if (maf.storage.current > 0) {
                 $storage.removeClass('light-grey');
             }
@@ -3187,20 +3188,8 @@ function dashboardUI() {
 
 
         /* New Used Bandwidth chart */
-        var base = account.downbw_used;
-        var max  = 1.5 * 1024 * 1024 * 1024;
         var $bandwidthChart = $('.fm-account-blocks.bandwidth');
-        if (u_attr.p) {
-            max = account.bw;
-            base += account.servbw_used;
-        }
-        else if (M.maf) {
-            max = M.maf.transfer.base + M.maf.transfer.current;
-            base += account.servbw_used;
-        }
-
-        perc   = Math.round(base * 100 / max) || 1;
-        perc_c = perc;
+        perc_c = account.tfsq.perc;
         if (perc_c > 100) {
             perc_c = 100;
         }
@@ -3222,11 +3211,11 @@ function dashboardUI() {
         }
 
         // Maximum bandwidth
-        var b2 = bytesToSize(max, 0).split(' ');
-        $bandwidthChart.find('.chart.data .size-txt').text(bytesToSize(base, 0));
+        var b2 = bytesToSize(account.tfsq.max, 0).split(' ');
+        $bandwidthChart.find('.chart.data .size-txt').text(bytesToSize(account.tfsq.used, 0));
         $bandwidthChart.find('.chart.data .pecents-txt').text((b2[0]));
         $bandwidthChart.find('.chart.data .gb-txt').text((b2[1]));
-        if ((u_attr.p || M.maf) && b2[0] > 0) {
+        if ((u_attr.p || M.maf) && b2[0] > 0 && perc_c > 0) {
             $bandwidthChart.removeClass('no-percs');
             $bandwidthChart.find('.chart.data .perc-txt').text(perc_c + '%');
         }
@@ -3346,49 +3335,42 @@ function dashboardUI() {
 
 
         /* Used Bandwidth progressbar */
-        var base = account.downbw_used;
-        var max  = 1.5 * 1024 * 1024 * 1024;
+        $('.bandwidth .account.progress-bar.green')
+            .css('width', account.tfsq.perc + '%');
+        $('.bandwidth .account.progress-size.available-quota')
+            .text(bytesToSize(account.tfsq.left, 0));
+
         if (u_attr.p) {
-            max = account.bw;
-            base += account.servbw_used;
             $('.account.widget.bandwidth').addClass('enabled-pr-bar');
             $('.dashboard .account.rounded-icon.right').addClass('hidden');
-            $('.bandwidth .account.progress-size.available-quota').text(bytesToSize(max - base, 0));
-            $('.bandwidth .account.progress-bar.green').css('width', (Math.round(base * 100 / max) || 1) + '%');
         }
         else {
 
             // Show available bandwith for FREE accounts with enabled achievements
-            if (account.maf) {
-                var maxTransferQuota = maf.transfer.current + maf.transfer.base;
-
-                $('.dashboard .account.rounded-icon.right').addClass('hidden');
+            if (account.tfsq.ach) {
                 $('.account.widget.bandwidth').addClass('enabled-pr-bar');
-                $('.bandwidth .account.progress-size.available-quota').text(bytesToSize(maxTransferQuota, 0));
-                $('.bandwidth .account.progress-bar.green').css('width', (Math.round(base * 100 / maxTransferQuota) || 1) + '%');
             }
             else {
-                $('.dashboard .account.rounded-icon.right').removeClass('hidden');
                 $('.account.widget.bandwidth').removeClass('enabled-pr-bar');
-
-                /* Bandwidth notification */
-                $('.dashboard .account.rounded-icon.right').rebind('click', function() {
-                    if (!$(this).hasClass('active')) {
-                        $(this).addClass('active');
-                        $(this).find('.dropdown').removeClass('hidden');
-                    }
-                    else {
-                        $(this).removeClass('active');
-                        $(this).find('.dropdown').addClass('hidden');
-                    }
-                });
-                $('.fm-right-block.dashboard').rebind('click', function(e) {
-                    if (!$(e.target).hasClass('rounded-icon') && $('.account.rounded-icon.info').hasClass('active')) {
-                        $('.account.rounded-icon.info').removeClass('active');
-                        $('.dropdown.body.bandwidth-info').addClass('hidden');
-                    }
-                });
             }
+
+            $('.dashboard .account.rounded-icon.right').removeClass('hidden');
+            $('.dashboard .account.rounded-icon.right').rebind('click', function() {
+                if (!$(this).hasClass('active')) {
+                    $(this).addClass('active');
+                    $(this).find('.dropdown').removeClass('hidden');
+                }
+                else {
+                    $(this).removeClass('active');
+                    $(this).find('.dropdown').addClass('hidden');
+                }
+            });
+            $('.fm-right-block.dashboard').rebind('click', function(e) {
+                if (!$(e.target).hasClass('rounded-icon') && $('.account.rounded-icon.info').hasClass('active')) {
+                    $('.account.rounded-icon.info').removeClass('active');
+                    $('.dropdown.body.bandwidth-info').addClass('hidden');
+                }
+            });
 
             // Get more transfer quota button
             $('.account.widget.bandwidth .free .more-quota').rebind('click', function() {
@@ -3402,7 +3384,16 @@ function dashboardUI() {
                 return false;
             });
         }
-        $('.bandwidth .account.progress-size.base-quota').text(bytesToSize(base, 0));
+
+        if (account.tfsq.used > 0) {
+            $('.account.widget.bandwidth').removeClass('hidden');
+            $('.fm-account-blocks.bandwidth.right').removeClass('hidden');
+            $('.bandwidth .account.progress-size.base-quota').text(bytesToSize(account.tfsq.used, 0));
+        }
+        else {
+            $('.account.widget.bandwidth').addClass('hidden');
+            $('.fm-account-blocks.bandwidth.right').addClass('hidden');
+        }
 
         /* End of Used Bandwidth progressbar */
 
@@ -3702,19 +3693,9 @@ function accountUI() {
         $('.account.plan-info.storage span').text(bytesToSize(account.space, 0));
 
         /* New Used Bandwidth chart */
-        var base = account.downbw_used;
-        var max  = 1.5 * 1024 * 1024 * 1024;
         var $bandwidthChart = $('.fm-account-blocks.bandwidth');
-        if (u_attr.p) {
-            max = account.bw;
-            base += account.servbw_used;
-        }
-        else if (M.maf) {
-            max = M.maf.transfer.base + M.maf.transfer.current;
-            base += account.servbw_used;
-        }
-        perc   = Math.round(base * 100 / max) || 1;
-        perc_c = perc;
+
+        perc_c = account.tfsq.perc;
         if (perc_c > 100) {
             perc_c = 100;
         }
@@ -3736,11 +3717,11 @@ function accountUI() {
         }
 
         // Maximum bandwidth
-        var b2 = bytesToSize(max, 0).split(' ');
-        $bandwidthChart.find('.chart.data .size-txt').text(bytesToSize(base, 0));
+        var b2 = bytesToSize(account.tfsq.max, 0).split(' ');
+        $bandwidthChart.find('.chart.data .size-txt').text(bytesToSize(account.tfsq.used, 0));
         $bandwidthChart.find('.chart.data .pecents-txt').text((b2[0]));
         $bandwidthChart.find('.chart.data .gb-txt').text((b2[1]));
-        if ((u_attr.p || M.maf) && b2[0] > 0) {
+        if ((u_attr.p || M.maf) && b2[0] > 0 && perc_c > 0) {
             $bandwidthChart.removeClass('no-percs');
             $bandwidthChart.find('.chart.data .perc-txt').text(perc_c + '%');
         }
@@ -3933,7 +3914,13 @@ function accountUI() {
                     var data = maf[idx];
                     var selector = ach.mapToElement[idx];
                     if (selector) {
-                        var base = (Object(data.rwds).length || 1);
+                        var base = 0;
+                        var rwds = data.rwds || [data.rwd];
+                        for (i = rwds.length; i--;) {
+                            if (rwds[i] && rwds[i].left > 0) {
+                                base++;
+                            }
+                        }
                         var storageValue = (data[0] * base);
                         var $cell = $('.' + selector, $achTable).closest('.achievements-cell');
                         var $storageItem = $('.progress-item.' + selector, $achStorage).removeClass('hidden');
@@ -3942,18 +3929,20 @@ function accountUI() {
                         $transferItem.parent().removeClass('hidden');
 
                         storageMaxValue += storageValue;
-                        $('.progress-txt', $storageItem).text(bytesToSize(storageValue, 0));
+                        $('.progress-txt', $storageItem).text(bytesToSize(data[0] * (base || 1), 0));
 
                         $('.rewards .reward:first-child .reward-txt', $cell).safeHTML(bytesToSize(data[0], 0, 2));
                         if (data[1]) {
                             var transferValue = (data[1] * base);
 
                             transferMaxValue += transferValue;
-                            $('.progress-txt', $transferItem).text(bytesToSize(transferValue, 0));
+                            $('.progress-txt', $transferItem).text(bytesToSize(data[1] * (base || 1), 0));
 
                             if (data.rwd) {
-                                transferCurrentValue += transferValue;
-                                $('.progress-indicator', $transferItem).addClass('active');
+                                if (data.rwd.left > 0) {
+                                    transferCurrentValue += transferValue;
+                                    $('.progress-indicator', $transferItem).addClass('active');
+                                }
 
                                 if (idx !== ach.ACH_INVITE) {
                                     if (data.rwd.e) {
@@ -3966,13 +3955,15 @@ function accountUI() {
                                     }
                                 }
                                 else {
-                                    if (base > 1) {
+                                    /* re-enable once the invite status dialog is brought back
+                                     if (base) {
                                         ach.bind.call($transferItem, '~invitationStatusDialog');
                                         $transferItem
                                             .css('cursor', 'pointer')
                                             .attr('title',
                                                 l[16285].replace('%1', base));
                                     }
+                                     */
                                 }
                             }
 
@@ -4006,22 +3997,28 @@ function accountUI() {
                             ach.bind.call($('.button', $cell), ach.mapToAction[idx]);
 
                             if (data.rwd) {
-                                storageCurrentValue += storageValue;
-                                $('.progress-indicator', $storageItem).addClass('active');
+                                if (storageValue) {
+                                    storageCurrentValue += storageValue;
+                                    $('.progress-indicator', $storageItem).addClass('active');
+                                }
 
-                                if (base > 1) {
+                                /* re-enable once the invite status dialog is brought back
+                                 if (base) {
                                     ach.bind.call($storageItem, '~invitationStatusDialog');
                                     $storageItem
                                         .css('cursor', 'pointer')
                                         .attr('title',
                                             l[16285].replace('%1', base));
                                 }
+                                 */
                             }
                         }
                         else if (data.rwd) {
                             // Achieved
-                            storageCurrentValue += storageValue;
-                            $('.progress-indicator', $storageItem).addClass('active');
+                            if (data.rwd.left > 0) {
+                                storageCurrentValue += storageValue;
+                                $('.progress-indicator', $storageItem).addClass('active');
+                            }
                             if (data.rwd.e) {
                                 $('.progress-title', $storageItem)
                                     .safeAppend('<span class="red-txt">&nbsp;(@@)</span>',
@@ -4089,34 +4086,27 @@ function accountUI() {
                     .replace('%2', bytesToSize(storageCurrentValue, 0))
                 );
 
-            storageMaxValue += storageBaseQuota;
             storageCurrentValue += storageBaseQuota;
-            transferMaxValue += transferBaseQuota;
             transferCurrentValue += transferBaseQuota;
 
             $('.account.plan-info.bandwidth span').text(bytesToSize(transferCurrentValue, 0));
             $('.account.plan-info.storage span').text(bytesToSize(storageCurrentValue, 0));
 
-            storageMaxValue = Math.max(50 * (1024 * 1024 * 1024), storageMaxValue * 1.3);
-            transferMaxValue = Math.max(50 * (1024 * 1024 * 1024), transferMaxValue * 1.3);
-
-            storageBaseQuota = Math.round(storageBaseQuota * 100 / storageMaxValue);
-            transferBaseQuota = Math.round(transferBaseQuota * 100 / transferMaxValue);
-
-            var quotaTxt = l[16301].replace('[S]', '<span>').replace('[/S]', '</span>');
-
             var $achBlock = $('.account.achievements-block');
-            var $quotaTxt = $('.account.quota-txt.storage', $achBlock);
-
-            $quotaTxt.safeHTML('%n', quotaTxt,
-                bytesToSize(storageCurrentValue, 0),
-                bytesToSize(storageMaxValue, 0));
-
-            $quotaTxt = $('.account.quota-txt.transfer', $achBlock);
-
-            $quotaTxt.safeHTML('%n', quotaTxt,
-                bytesToSize(transferCurrentValue, 0),
-                bytesToSize(transferMaxValue, 0));
+            if (storageCurrentValue) {
+                $('.account.quota-txt.storage', $achBlock).removeClass('hidden')
+                    .text(bytesToSize(storageCurrentValue, 0));
+            }
+            else {
+                $('.account.quota-txt.storage', $achBlock).addClass('hidden');
+            }
+            if (transferCurrentValue) {
+                $('.account.quota-txt.transfer', $achBlock).removeClass('hidden')
+                    .text(bytesToSize(transferCurrentValue, 0));
+            }
+            else {
+                $('.account.quota-txt.transfer', $achBlock).addClass('hidden');
+            }
         }
         /* End of No achievements */
 
@@ -11477,7 +11467,7 @@ function achievementsListDialog(close) {
                 if (data.rwd && idx !== ach.ACH_INVITE) {
                     $cell.addClass('achived');
 
-                    locFmt = l[16289].replace('[S]', '<span>').replace('[/S]', '</span>');
+                    locFmt = l[16336].replace('[S]', '<span>').replace('[/S]', '</span>');
                     if (!data.rwd.e) {
                         // this reward do not expires
                         locFmt = '&nbsp;';
@@ -11553,9 +11543,6 @@ function inviteFriendDialog(close) {
 
     if (!$('.achievement-dialog.input').tokenInput("getSettings")) {
         initInviteDialogMultiInputPlugin();
-        locFmt = l[16326].replace(/\[S\]/g, '<span class="red">').replace(/\[\/S\]/g, '</span>');
-        $('.success-content .info-body p:first', $dialog)
-            .safeHTML('%n', locFmt, bytesToSize(maf[0], 0), bytesToSize(maf[1], 0));
     }
 
     // Remove all previously added emails
@@ -11936,7 +11923,7 @@ function invitationStatusDialog(close) {
                     l[16105]);// Quota Granted
 
                 var expiry = rwd.expiry || maf.expiry;
-                locFmt = l[16289].replace('[S]', '').replace('[/S]', '');
+                locFmt = l[16336].replace('[S]', '').replace('[/S]', '');
                 $('.status .light-grey', $tmpl)
                     .safeHTML('%n', locFmt, expiry.value, expiry.utxt);
 
@@ -12157,7 +12144,7 @@ function slideshow(id, close)
     }
 
     var n = M.getNodeByHandle(id);
-    if (!n || RootbyId(id) === 'shares' || folderlink)
+    if (!n || !n.p || RootbyId(id) === 'shares' || folderlink)
     {
         $('.slideshow-getlink').hide();
         $('.slideshow-line').hide();

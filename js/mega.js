@@ -3593,7 +3593,7 @@ function MegaData()
     {
         var account = Object(this.account);
 
-        if (account.lastupdate > Date.now() - 300000 && cb) {
+        if (account.lastupdate > Date.now() - 30000 && cb) {
             cb(account);
         }
         else {
@@ -3735,8 +3735,30 @@ function MegaData()
 
                     M.account = ctx.account;
 
-                    if (ctx.cb)
+                    // transfers quota
+                    var tfsq = {max: account.bw, used: account.downbw_used};
+
+                    if (u_attr.p) {
+                        tfsq.used += account.servbw_used;
+                    }
+                    else if (M.maf) {
+                        tfsq.used += account.servbw_used;
+                        var max = (M.maf.transfer.base + M.maf.transfer.current);
+                        if (max) {
+                            // has achieved quota
+                            tfsq.ach = true;
+                            tfsq.max = max;
+                        }
+                    }
+
+                    tfsq.left = tfsq.max - tfsq.used;
+                    tfsq.perc = Math.round(tfsq.used * 100 / tfsq.max);
+
+                    M.account.tfsq = tfsq;
+
+                    if (ctx.cb) {
                         ctx.cb(ctx.account);
+                    }
                 }
             });
         }
@@ -9250,23 +9272,25 @@ Object.defineProperty(mega, 'achievem', {
 
                 Object.keys(data)
                     .forEach(function(k) {
-                        var ach          = data[k];
-                        var base         = Object(ach.rwds).length || 1;
-                        var storageValue = ach[0] * base;
+                        var ach = data[k];
+                        var base = 0;
+                        var rwds = ach.rwds || [ach.rwd];
+                        for (var i = rwds.length; i--;) {
+                            var rwd = rwds[i];
 
-                        if (ach.rwd) {
-                            quota.storage.current += storageValue;
+                            if (rwd && rwd.left > 0) {
+                                base++;
+                                if (ach[1]) {
+                                    quota.transfer.current += ach[1];
+                                }
+                                quota.storage.current += ach[0];
+                            }
                         }
-                        quota.storage.max += storageValue;
 
                         if (ach[1]) {
-                            var transferValue = ach[1] * base;
-
-                            if (ach.rwd) {
-                                quota.transfer.current += transferValue;
-                            }
-                            quota.transfer.max += transferValue;
+                            quota.transfer.max += ach[1] * (base || 1);
                         }
+                        quota.storage.max += ach[0] * (base || 1);
                     });
 
                 if (Object(u_attr).p) {

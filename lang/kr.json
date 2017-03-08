@@ -3974,6 +3974,12 @@
     "16328": "\uc804\uc1a1\uc774 \uc9c4\ud589\uc911\uc77c \ub54c \uc774 \ub300\ud654\ucc3d\uc744 \uc228\uae30\uc2dc\uaca0\uc2b5\ub2c8\uae4c?",
     "16329": "\ub2e4\uc2dc \ud65c\uc131\ud654\ud558\ub824\uba74 \uc124\uc815 -> \uace0\uae09 -> \uc804\uc1a1\uc5d0\uc11c \uc124\uc815\ud558\uc138\uc694.",
     "16330": "\ub2f9\uc2e0\uc758 \ubaa8\ub4e0 \uae30\uae30\uc5d0\uc11c \uc774\uc6a9\uc790\uac00 \ud1b5\uc81c\ud558\ub294 \uc885\ub2e8\uac04 \uc554\ud638\ud654\ub97c \uc774\uc6a9\ud558\uc5ec \uc548\uc804\ud558\uac8c \ubb38\uc790 \ub300\ud654 (\ubaa8\ubc14\uc77c \uc571\uacfc \ube0c\ub77c\uc6b0\uc800) \uadf8\ub9ac\uace0 \uc74c\uc131 \/ \uc601\uc0c1 (\ud604\uc7ac \ube0c\ub77c\uc6b0\uc800\uc5d0\uc11c\ub9cc \uac00\ub2a5; \uace7 \ubaa8\ubc14\uc77c\uc5d0\uc11c \uac00\ub2a5\ud574\uc9d1\ub2c8\ub2e4)\ub300\ud654\ub97c \ud558\uc138\uc694.",
+    "16331": "You will not receive credit for inviting someone who has used MEGA previously and you will not be notified about such a rejection.",
+    "16332": "You only qualify if:",
+    "16333": "You invited someone who has not used MEGA previously.",
+    "16334": "The new user installs at least one app and starts using MEGA.",
+    "16335": "(Usage confirmation may take a few days to complete - please be patient)",
+    "16336": "(Bonus expires in [S]%1[\/S] %2)",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

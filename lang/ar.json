@@ -3974,6 +3974,12 @@
     "16328": "\u0647\u0644 \u062a\u0648\u062f \u0623\u0646 \u062a\u062e\u0641\u064a \u0638\u0647\u0648\u0631 \u0647\u0630\u0647 \u0627\u0644\u0645\u062d\u0627\u062f\u062b\u0629 \u0639\u0646\u062f\u0645\u0627 \u062a\u0643\u0648\u0646 \u0639\u0645\u0644\u064a\u0627\u062a \u0627\u0644\u0646\u0642\u0644 \u0642\u064a\u062f \u0627\u0644\u062a\u0634\u063a\u064a\u0644\u061f",
     "16329": "\u0627\u0630\u0647\u0628 \u0625\u0644\u0649 \u0627\u0644\u0625\u0639\u062f\u0627\u062f\u0627\u062a -> \u0625\u0639\u062f\u0627\u062f\u0627\u062a \u0645\u062a\u0642\u062f\u0645\u0629 -> \u0639\u0645\u0644\u064a\u0627\u062a \u0627\u0644\u0646\u0642\u0644 \u0644\u062a\u0641\u0639\u064a\u0644\u0647\u0627 \u062b\u0627\u0646\u064a\u0629.",
     "16330": "Secure communication using user-controlled end-to-end encryption for text chat (mobile apps and in the browser) and voice \/ video (currently only in the browser; mobile coming soon), unified across all your devices.",
+    "16331": "You will not receive credit for inviting someone who has used MEGA previously and you will not be notified about such a rejection.",
+    "16332": "You only qualify if:",
+    "16333": "You invited someone who has not used MEGA previously.",
+    "16334": "The new user installs at least one app and starts using MEGA.",
+    "16335": "(Usage confirmation may take a few days to complete - please be patient)",
+    "16336": "(Bonus expires in [S]%1[\/S] %2)",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

@@ -335,7 +335,7 @@ UserPresence.prototype.reconnect = function presence_reconnect(self) {
                             break;
 
                         case 6: // OPCODE_PEERSTATUS
-                            var user = ab_to_base64(new Uint8Array(u.buffer, p+2, 8));
+                            var user = ab_to_base64(new Uint8Array(u.buffer, p + 2, 8));
                             var presence = u[p + 1] & 0xf;
                             var isWebrtcFlag = u[p + 1] & 0x80;
 
@@ -350,18 +350,18 @@ UserPresence.prototype.reconnect = function presence_reconnect(self) {
                             break;
 
                         case 7: // OPCODE_PREFS
-                            var newprefs = u[p+1] + (u[p+2] << 8);
+                            var newprefs = u[p + 1] + (u[p + 2] << 8);
 
                             if (newprefs == this.up.prefs()) {
                                 this.up.prefschanged = false;
                             }
                             else {
-                                this.up.presence = (newprefs & 3)+UserPresence.PRESENCE.OFFLINE;
+                                this.up.presence = (newprefs & 3) + UserPresence.PRESENCE.OFFLINE;
                                 this.up.persist = !!(newprefs & 4);
                                 this.up.autoawayactive = !(newprefs & 8);
                                 this.up.autoawaytimeout = newprefs >> 4;
                                 if (this.up.autoawaytimeout > 600) {
-                                    this.up.autoawaytimeout = Math.floor((this.up.autoawaytimeout-600)/60)+600;
+                                    this.up.autoawaytimeout = Math.floor((this.up.autoawaytimeout - 600) / 60) + 600;
                                 }
                                 this.up.ui_signalactivity(true);
                                 this.up.updateui();
@@ -433,7 +433,7 @@ UserPresence.prototype.disconnect = function(userForced) {
 UserPresence.prototype.addremovepeers = function presence_addremovepeers(peers, del) {
     var delta = '';
 
-    for (var i = peers.length; i--; ) {
+    for (var i = peers.length; i--;) {
         var u = base64urldecode(peers[i]);
         if (del && this.peers[u]) {
             delete this.peers[u];
@@ -458,7 +458,7 @@ UserPresence.prototype.sendstring = function presence_sendstring(s) {
 
     var u = new Uint8Array(s.length);
 
-    for (var i = s.length; i--; ) {
+    for (var i = s.length; i--;) {
         u[i] = s.charCodeAt(i);
     }
 
@@ -478,7 +478,7 @@ UserPresence.prototype.sendstring = function presence_sendstring(s) {
 
 // must be called with the binary representation of the userid delta
 UserPresence.prototype.sendpeerupdate = function presence_sendpeerupdate(peerstring, del) {
-    var num = peerstring.length/8;
+    var num = peerstring.length / 8;
 
     peerstring = (del ? "\5" : "\4") // opcode
         + String.fromCharCode(num & 0xff)
@@ -515,7 +515,7 @@ UserPresence.prototype.sendkeepalive = function presence_sendkeepalive(self) {
     }
 
     self.sendstring("\0");
-    self.keepalivesendtimer = setTimeout(self.sendkeepalive, self.KEEPALIVETIMEOUT-5000, self);
+    self.keepalivesendtimer = setTimeout(self.sendkeepalive, self.KEEPALIVETIMEOUT - 5000, self);
 
     if (!self.keepalivechecktimer) {
         self.keepalivechecktimer = setTimeout(self.keepalivetimeout, self.KEEPALIVETIMEOUT, self);
@@ -540,11 +540,12 @@ UserPresence.prototype.prefs = function presence_prefs() {
     var t = this.autoawaytimeout;
 
     if (t > 600) {
-        t = 600+Math.floor((t-600)/60);
+        t = 600 + Math.floor((t - 600) / 60);
     }
 
-    return (t << 4)+(this.autoawayactive ? 0 : 8)+(this.persist ? 4 : 0)+this.presence-UserPresence.PRESENCE.OFFLINE;
-}
+    return (t << 4) + (this.autoawayactive ? 0 : 8) + (this.persist ? 4 : 0) + this.presence
+        - UserPresence.PRESENCE.OFFLINE;
+};
 
 UserPresence.prototype.ui_setautoaway = function presence_ui_setautoaway(active, timeout) {
     if (active) {
@@ -591,7 +592,7 @@ UserPresence.prototype.ui_signalactivity = function presence_ui_signalactivity(f
 
         var t = Date.now();
 
-        if (t-this.lastuiactivity > 50000) {
+        if (t - this.lastuiactivity > 50000) {
             this.lastuiactivity = t;
 
             clearTimeout(this.autoawaytimer);
@@ -601,7 +602,7 @@ UserPresence.prototype.ui_signalactivity = function presence_ui_signalactivity(f
 
     if (timeout && !this.autoawaytimer) {
         // start timer if not running and timeout needed
-        this.autoawaytimer = setTimeout(this.autoaway, this.autoawaytimeout*1000, this);
+        this.autoawaytimer = setTimeout(this.autoaway, this.autoawaytimeout * 1000, this);
     }
 
     if (!this.persist && this.presence != UserPresence.PRESENCE.OFFLINE) {
@@ -693,7 +694,7 @@ UserPresence.prototype.incomingDataAsReadableCommand = function(ab) {
                 break;
 
             case 6: // OPCODE_PEERSTATUS
-                var userhash = ab_to_base64(new Uint8Array(u.buffer, p+2, 8));
+                var userhash = ab_to_base64(new Uint8Array(u.buffer, p + 2, 8));
                 var presence = u[p + 1] & 0xf;
                 var isWebrtcFlag = u[p + 1] & 0x80;
 
@@ -709,7 +710,7 @@ UserPresence.prototype.incomingDataAsReadableCommand = function(ab) {
                 break;
 
             case 7: // OPCODE_PREFS
-                var newprefs = u[p+1] + (u[p+2] << 8);
+                var newprefs = u[p + 1] + (u[p + 2] << 8);
 
                 if (newprefs == this.prefs()) {
                     output.push([
@@ -718,12 +719,12 @@ UserPresence.prototype.incomingDataAsReadableCommand = function(ab) {
                     ]);
                 }
                 else {
-                    var presence = (newprefs & 3)+UserPresence.PRESENCE.OFFLINE;
+                    var presence = (newprefs & 3) + UserPresence.PRESENCE.OFFLINE;
                     var persist = !!(newprefs & 4);
                     var autoawayactive = !(newprefs & 8);
                     var autoawaytimeout = newprefs >> 4;
                     if (autoawaytimeout > 600) {
-                        autoawaytimeout = Math.floor((autoawaytimeout-600)/60)+600;
+                        autoawaytimeout = Math.floor((autoawaytimeout - 600) / 60) + 600;
                     }
 
                     output.push([
@@ -785,17 +786,17 @@ UserPresence.prototype.outgoingDataAsReadableCommand = function(ab) {
             case 1: // HELLO
                 output.push([
                     "HELLO",
-                    "webrtc = " + (u[p+2] & 0x80 ? "true" : "false"),
-                    "can_mobilepush = " + (u[p+2] & 0x40 ? "true" : "false"),
+                    "webrtc = " + (u[p + 2] & 0x80 ? "true" : "false"),
+                    "can_mobilepush = " + (u[p + 2] & 0x40 ? "true" : "false"),
                 ]);
-                p += 3
+                p += 3;
                 break;
 
             case 3: // FLAGS
                 output.push([
                     "FLAGS",
-                    "online = " + (!!(u[p+1] & 1)),
-                    "dnd = " + (!!(u[p+1] & 2)),
+                    "online = " + (!!(u[p + 1] & 1)),
+                    "dnd = " + (!!(u[p + 1] & 2)),
                 ]);
 
                 p += 2;
@@ -804,10 +805,10 @@ UserPresence.prototype.outgoingDataAsReadableCommand = function(ab) {
             case 4: // FLAGS
             case 5:
                 var numpeers = (
-                    u[p+1]
-                    + (u[p+2] << 8)
-                    + (u[p+3] << 16)
-                    + (u[p+4] << 24)
+                    u[p + 1]
+                    + (u[p + 2] << 8)
+                    + (u[p + 3] << 16)
+                    + (u[p + 4] << 24)
                 );
 
                 var peers = [];
@@ -833,16 +834,16 @@ UserPresence.prototype.outgoingDataAsReadableCommand = function(ab) {
                 break;
 
             case 7: // PREFS
-                var newprefs = u[p+1] + (u[p+2] << 8);
+                var newprefs = u[p + 1] + (u[p + 2] << 8);
 
                 var flags = newprefs & 15;
 
-                var presence = (newprefs & 3)+UserPresence.PRESENCE.OFFLINE;
+                var presence = (newprefs & 3) + UserPresence.PRESENCE.OFFLINE;
                 var persist = !!(newprefs & 4);
                 var autoawayactive = !(newprefs & 8);
                 var autoawaytimeout = newprefs >> 4;
                 if (autoawaytimeout > 600) {
-                    autoawaytimeout = Math.floor((autoawaytimeout-600)/60)+600;
+                    autoawaytimeout = Math.floor((autoawaytimeout - 600) / 60) + 600;
                 }
 
 
@@ -855,7 +856,7 @@ UserPresence.prototype.outgoingDataAsReadableCommand = function(ab) {
                     "autoawaytimeout = " + autoawaytimeout,
                 ]);
 
-                p += 3
+                p += 3;
                 break;
 
             default:

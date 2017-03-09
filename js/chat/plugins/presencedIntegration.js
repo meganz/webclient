@@ -155,9 +155,7 @@ PresencedIntegration.prototype.init = function() {
     });
 
 
-    // if (!localStorage.userPresenceIsOffline) {
-        userPresence.connectionRetryManager.requiresConnection();
-    // }
+    userPresence.connectionRetryManager.requiresConnection();
 };
 
 PresencedIntegration.prototype._updateuicb = function presencedIntegration_updateuicb(

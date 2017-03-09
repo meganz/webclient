@@ -4498,12 +4498,12 @@ function accountUI() {
         });
 
         $('#account-lastname,#account-phonenumber').rebind('keyup.settingsGeneral', function(e) {
-            var $fasm = $('.fm-account-save-block');
+            var $fasb = $('.fm-account-save-block');
             if ($('#account-firstname').val().trim().length > 0) {
-                $fasm.removeClass('hidden');
+                $fasb.removeClass('hidden');
             }
             else {
-                $fasm.addClass('hidden');
+                $fasb.addClass('hidden');
             }
         });
         $('.fm-account-cancel').rebind('click', function(e)

@@ -2898,13 +2898,14 @@ React.makeElement = React['createElement'];
 	    isAtBottom: function isAtBottom() {
 	        return this.findDOMNode().scrollTop === this.getScrollHeight();
 	    },
+	    isCloseToBottom: function isCloseToBottom(minPixelsOff) {
+	        return this.getScrollHeight() - this.getScrollPositionY() <= minPixelsOff;
+	    },
 	    getScrolledPercentY: function getScrolledPercentY() {
-	        var $elem = $(this.findDOMNode());
-	        return 100 / this.getScrollHeight() * $elem[0].scrollTop;
+	        return 100 / this.getScrollHeight() * this.findDOMNode().scrollTop;
 	    },
 	    getScrollPositionY: function getScrollPositionY() {
-	        var $elem = $(this.findDOMNode());
-	        return $elem[0].scrollTop;
+	        return this.findDOMNode().scrollTop;
 	    },
 	    scrollToPercentY: function scrollToPercentY(posPerc, skipReinitialised) {
 	        var $elem = $(this.findDOMNode());
@@ -4896,7 +4897,7 @@ React.makeElement = React['createElement'];
 	        var isAtTop = ps.isAtTop();
 	        var isAtBottom = ps.isAtBottom();
 
-	        if (isAtBottom === true) {
+	        if (ps.isCloseToBottom(30) === true) {
 	            self.scrolledToBottom = true;
 	        } else {
 	            self.scrolledToBottom = false;
@@ -4978,7 +4979,7 @@ React.makeElement = React['createElement'];
 	            if (localStorage.megaChatPresence !== 'unavailable') {
 	                self.loadingShown = true;
 	            }
-	        } else if (self.props.chatRoom.messagesBuff.joined === true && (self.props.chatRoom.messagesBuff.messages.length === 0 || !self.props.chatRoom.messagesBuff.haveMoreHistory())) {
+	        } else if (self.props.chatRoom.messagesBuff.joined === true) {
 	            delete self.loadingShown;
 	            var headerText = self.props.chatRoom.messagesBuff.messages.length === 0 ? __(l[8002]) : __(l[8002]);
 

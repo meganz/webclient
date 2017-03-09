@@ -47,7 +47,7 @@
 // peerpresencecb(userhandle, presencelevel, can_webrtc) will be called with any change of peer presence
 
 // DEBUG flag
-PRESENCE2_DEBUG = true /* intentional: until we get this to be a bit more stable */ || localStorage.presencedDebug;
+PRESENCE2_DEBUG = localStorage.presencedDebug;
 
 var UserPresence = function userpresence(
     userhandle,

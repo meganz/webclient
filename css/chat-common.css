@@ -243,3 +243,14 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     display: block;
 }
 /* End of Old chat stuff */
+
+
+.autoaway-wrapper, .persist-presence-wrapper {
+    min-height: 32px;
+}
+.autoaway-wrapper.hidden, .persist-presence-wrapper.hidden {
+    display: block;
+}
+.autoaway-wrapper.hidden > *, .persist-presence-wrapper.hidden > * {
+    display: none;
+}

@@ -662,10 +662,11 @@ UserPresence.commandDebugDataAsPrettyString = function(arr) {
         var cmdName = cmd.shift();
         out += cmdName + " => (";
         out += cmd.map(function(args) {
-            return JSON.stringify(args)
+            return JSON.stringify(args);
         }).join(",");
         out += ")\n";
-    })
+    });
+
     return out;
 };
 

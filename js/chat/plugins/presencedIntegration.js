@@ -272,9 +272,6 @@ PresencedIntegration.prototype._peerstatuscb = function(user_hash, presence, isW
         contact.presence = status;
     }
 
-    if (user_hash === u_handle) {
-        self._updateuicb(presence);
-    }
     $(self).trigger(
         'onPeerStatus',
         [

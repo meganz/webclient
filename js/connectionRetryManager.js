@@ -195,6 +195,10 @@ ConnectionRetryManager.prototype.gotConnected = function(){
             self._connectionState = ConnectionRetryManager.CONNECTION_STATE.DISCONNECTED;
         }
     });
+
+    if (self._$connectingPromise) {
+        self._$connectingPromise.verify();
+    }
     $(self).trigger('onConnected');
 };
 
@@ -222,12 +226,18 @@ ConnectionRetryManager.prototype.startedConnecting = function(waitForPromise, de
 /**
  * Force a connection retry
  */
-ConnectionRetryManager.prototype.doConnectionRetry = function(immediately){
+ConnectionRetryManager.prototype.doConnectionRetry = function(immediately) {
     var self = this;
 
-    if (self._$connectingPromise && self._connectionRetries >= self.options.maxConnectionRetries) {
-        self._$connectingPromise.reject(arguments);
+    if (self._$connectingPromise) {
+        if (self._connectionRetries >= self.options.maxConnectionRetries) {
+            self._$connectingPromise.reject(arguments);
+        }
+        else if (!immediately) {
+            return self._$connectingPromise;
+        }
     }
+
 
     if (self.options.functions.isUserForcedDisconnect()) {
         return MegaPromise.reject();
@@ -305,7 +315,7 @@ ConnectionRetryManager.prototype.doConnectionRetry = function(immediately){
  * @returns {boolean}
  * @private
  */
-ConnectionRetryManager.prototype._connectionRetryUI = function(){
+ConnectionRetryManager.prototype._connectionRetryUI = function() {
     var self = this;
 
     if (

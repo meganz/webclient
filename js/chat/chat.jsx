@@ -365,8 +365,6 @@ Chat.prototype.init = function() {
                 // Sync presence across devices (will check the delayed val!)
                 if (bareJid === self.karere.getBareJid()) {
                     if (eventObject.getDelay() && eventObject.getDelay() >= parseFloat(localStorage.megaChatPresenceMtime) && self._myPresence != eventObject.getShow()) {
-                        self._myPresence = eventObject.getShow();
-
                         self.karere.setPresence(
                             eventObject.getShow(),
                             undefined,
@@ -1068,8 +1066,11 @@ Chat.prototype.renderMyStatus = function() {
 
 
 
-    var presence = self.karere.getConnectionState() === Karere.CONNECTION_STATE.CONNECTED ?
-                self.plugins.presencedIntegration.getPresence() :
+    var actualPresence = self.plugins.presencedIntegration.getPresence();
+
+    var userPresenceConRetMan = megaChat.userPresence.connectionRetryManager;
+    var presence = userPresenceConRetMan.getConnectionState() === ConnectionRetryManager.CONNECTION_STATE.CONNECTED ?
+                actualPresence :
                 UserPresence.PRESENCE.OFFLINE;
 
     var cssClass = PresencedIntegration.presenceToCssClass(
@@ -1081,25 +1082,24 @@ Chat.prototype.renderMyStatus = function() {
         self.karere.getConnectionState() === Karere.CONNECTION_STATE.DISCONNECTED ||
         self.karere.getConnectionState() === Karere.CONNECTION_STATE.AUTHFAIL ||
         self.karere.getConnectionState() === Karere.CONNECTION_STATE.DISCONNECTING ||
-        self.userPresence
-            .connectionRetryManager
-            .getConnectionState() === ConnectionRetryManager.CONNECTION_STATE.DISCONNECTED
+        userPresenceConRetMan.getConnectionState() === ConnectionRetryManager.CONNECTION_STATE.DISCONNECTED
     ) {
         cssClass = "offline";
     }
 
 
-
-    if (cssClass === 'online') {
+    // use the actual presence for ticking the dropdown's items, since the user can be auto away/reconnecting,
+    // but his actual presence's settings to be set to online/away/busy/etc
+    if (actualPresence === UserPresence.PRESENCE.ONLINE) {
         $('.top-user-status-popup .tick-item[data-presence="chat"]').addClass("active");
     }
-    else if (cssClass === 'away') {
+    else if (actualPresence === UserPresence.PRESENCE.AWAY) {
         $('.top-user-status-popup .tick-item[data-presence="away"]').addClass("active");
     }
-    else if (cssClass === 'busy') {
+    else if (actualPresence === UserPresence.PRESENCE.DND) {
         $('.top-user-status-popup .tick-item[data-presence="dnd"]').addClass("active");
     }
-    else if (cssClass === 'offline') {
+    else if (actualPresence === UserPresence.PRESENCE.OFFLINE) {
         $('.top-user-status-popup .tick-item[data-presence="unavailable"]').addClass("active");
     }
     else {
@@ -1115,8 +1115,7 @@ Chat.prototype.renderMyStatus = function() {
         (
             self.karere.getConnectionState() === Karere.CONNECTION_STATE.CONNECTING ||
             (
-                self.userPresence.connectionRetryManager
-                    .getConnectionState() === ConnectionRetryManager.CONNECTION_STATE.CONNECTING
+                userPresenceConRetMan.getConnectionState() === ConnectionRetryManager.CONNECTION_STATE.CONNECTING
             )
         )
     ) {

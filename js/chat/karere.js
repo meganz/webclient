@@ -1699,11 +1699,16 @@ makeMetaAware(Karere);
      * @param [delay] Number unix timestamp that should be used for sending a urn:xmpp:delay w/ the presence stanza
      */
     Karere.prototype.setPresence = function(presence, status, delay) {
+        var self = this;
+        if (self._myPresence === presence) {
+            return;
+        }
+
         presence = presence || "chat";
         status = status || "";
         delay = delay ? parseFloat(delay) : undefined;
 
-        var self = this;
+
 
         self._myPresence = presence;
 

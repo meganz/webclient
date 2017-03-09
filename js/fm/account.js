@@ -101,6 +101,13 @@ accountUI.initRadio.enable = function(value, $container) {
 
 
 accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, persist, persistlock) {
+    if (typeof(megaChat) === 'undefined' && typeof(autoaway) === 'undefined') {
+        // accountUI.advanced section was called too early, e.g. before chat's initialisation...delay the init.
+        Soon(function() {
+            accountUI.advancedSection();
+        });
+        return;
+    }
     var presenceInt = megaChat.plugins.presencedIntegration;
 
     // Only call this if the call of this function is the first one, made by fm.js -> accountUI
@@ -173,6 +180,13 @@ accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, pe
             $sectionContainerChat
         );
 
+        if (persistlock === true) {
+            $('.persist-presence-wrapper', $sectionContainerChat).addClass('hidden');
+        }
+        else {
+            $('.persist-presence-wrapper', $sectionContainerChat).removeClass('hidden');
+        }
+
         accountUI.initCheckbox(
             'autoaway',
             $sectionContainerChat,
@@ -185,6 +199,13 @@ accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, pe
             'autoaway',
             $sectionContainerChat
         );
+
+        if (autoawaylock === true) {
+            $('.autoaway-wrapper', $sectionContainerChat).addClass('hidden');
+        }
+        else {
+            $('.autoaway-wrapper', $sectionContainerChat).removeClass('hidden');
+        }
 
         // always editable for user comfort -
         accountUI.enableElement($('input#autoaway', $sectionContainerChat));

@@ -4440,6 +4440,11 @@ function accountUI() {
         // Cache selectors
         var $newEmail = $('#account-email');
         var $emailInfoMessage = $('.fm-account-change-email');
+        var $personalInfoBlock = $('.profile-form.first');
+        var $firstNameField = $personalInfoBlock.find('#account-firstname');
+        var $saveBlock = $('.fm-account-save-block');
+        var $cancelButton = $saveBlock.find('.fm-account-cancel');
+        var $saveButton = $saveBlock.find('.fm-account-save');
 
         // Reset change email fields after change
         $newEmail.val('');
@@ -4467,7 +4472,8 @@ function accountUI() {
 
             if (mail === "") {
                 $passwords.removeAttr('disabled').parents('.account.data-block').removeClass('disabled');
-            } else {
+            }
+            else {
                 $passwords.attr('disabled', 'disabled').parents('.account.data-block').addClass('disabled');
             }
 
@@ -4481,41 +4487,41 @@ function accountUI() {
 
             // Show save button
             if (mail !== u_attr.email) {
-                $('.profile-form.first').addClass('email-confirm');
-                $('.fm-account-save-block').removeClass('hidden');
+                $personalInfoBlock.addClass('email-confirm');
+                $saveBlock.removeClass('hidden');
             }
         });
 
-        $('#account-firstname').on('input', function() {
-            var $fasb = $('.fm-account-save-block');
+        $firstNameField.on('input', function() {
 
             if ($(this).val().trim().length > 0) {
-                $fasb.removeClass('hidden');
+                $saveBlock.removeClass('hidden');
             }
             else {
-                $fasb.addClass('hidden');
+                $saveBlock.addClass('hidden');
             }
         });
 
-        $('#account-lastname,#account-phonenumber').rebind('keyup.settingsGeneral', function(e) {
-            var $fasb = $('.fm-account-save-block');
-            if ($('#account-firstname').val().trim().length > 0) {
-                $fasb.removeClass('hidden');
+        $('#account-lastname, #account-phonenumber').rebind('keyup.settingsGeneral', function() {
+
+            if ($firstNameField.val().trim().length > 0) {
+                $saveBlock.removeClass('hidden');
             }
             else {
-                $fasb.addClass('hidden');
+                $saveBlock.addClass('hidden');
             }
         });
-        $('.fm-account-cancel').rebind('click', function(e)
+
+        $cancelButton.rebind('click', function()
         {
             $passwords.removeAttr('disabled').parents('.account.data-block').removeClass('disabled');
             $newEmail.removeAttr('disabled').parents('.account.data-block').removeClass('disabled');
-            $('.fm-account-save-block').addClass('hidden');
-            $('.profile-form.first').removeClass('email-confirm');
+            $saveBlock.addClass('hidden');
+            $personalInfoBlock.removeClass('email-confirm');
             accountUI();
         });
 
-        $('.fm-account-save').rebind('click', function()
+        $saveButton.rebind('click', function()
         {
             $passwords.removeAttr('disabled').parents('.account.data-block').removeClass('disabled');
             $newEmail.removeAttr('disabled').parents('.account.data-block').removeClass('disabled');

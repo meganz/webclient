@@ -1720,11 +1720,18 @@ React.makeElement = React['createElement'];
 	                }
 	                contact = chatRoom.megaChat.getContactFromJid(contact);
 
-	                if (contact && contact.c === 0) {
+	                if (contact) {
+	                    if (!chatRoom.privateReadOnlyChat && contact.c === 0) {
 
-	                    Soon(function () {
-	                        chatRoom.privateReadOnlyChat = true;
-	                    });
+	                        Soon(function () {
+	                            chatRoom.privateReadOnlyChat = true;
+	                        });
+	                    } else if (chatRoom.privateReadOnlyChat && contact.c !== 0) {
+
+	                        Soon(function () {
+	                            chatRoom.privateReadOnlyChat = false;
+	                        });
+	                    }
 	                }
 	            }
 
@@ -4663,7 +4670,7 @@ React.makeElement = React['createElement'];
 	    },
 
 	    uploadFromComputer: function uploadFromComputer() {
-	        $('#fileselect3').trigger('click');
+	        $('#fileselect1').trigger('click');
 	    },
 	    refreshUI: function refreshUI() {
 	        var self = this;

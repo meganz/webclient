@@ -3974,6 +3974,12 @@
     "16328": "Souhaitez-vous cacher cette bo\u00eete de dialogue quand les transferts sont en cours?",
     "16329": "Utiliser Param\u00e8tres -> Avanc\u00e9 -> Transferts pour la r\u00e9activer",
     "16330": "Une communication s\u00e9curis\u00e9e utilisant un chiffrement de bout en bout contr\u00f4l\u00e9 par l'utilisateur pour le dialogue texte (applis mobiles et dans le navigateur) et le dialogue vocal ou vid\u00e9o (seulement dans le navigateur actuellement, \u00e0 venir pour les appareils mobiles), unifi\u00e9e pour tous les appareils.",
+    "16331": "Vous ne recevrez aucun cr\u00e9dit si vous invitez quelqu'un qui a utilis\u00e9 MEGA auparavant et un tel rejet ne vous sera pas signal\u00e9.",
+    "16332": "Vous vous qualifiez seulement si :",
+    "16333": "Vous avez invit\u00e9 quelqu'un qui n'a pas utilis\u00e9 MEGA pr\u00e9c\u00e9demment.",
+    "16334": "Le nouvel utilisateur installe au moins une appli et commence \u00e0 utiliser MEGA.",
+    "16335": "(La confirmation de l'utilisation pourrait prendre quelques jours. Veuillez faire preuve de patience)",
+    "16336": "(Le bonus arrive \u00e0 expiration dans [S]%1[\/S] %2)",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

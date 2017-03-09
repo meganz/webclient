@@ -15898,5 +15898,29 @@
     "16330": {
         "text": "Secure communication using user-controlled end-to-end encryption for text chat (mobile apps and in the browser) and voice \/ video (currently only in the browser; mobile coming soon), unified across all your devices.",
         "context": "Describes chat features"
+    },
+    "16331": {
+        "text": "You will not receive credit for inviting someone who has used MEGA previously and you will not be notified about such a rejection.",
+        "context": "A message which is shown once someone has invited a friend as part of the achievements program."
+    },
+    "16332": {
+        "text": "You only qualify if:",
+        "context": "A message shown on the invite friend dialog for the achievements program. The user may only receive the referral bonus if they meet the requirements listed below."
+    },
+    "16333": {
+        "text": "You invited someone who has not used MEGA previously.",
+        "context": "A list item explaining the criteria for getting the bonus storage quota. This is shown once someone has invited a friend as part of the achievements program."
+    },
+    "16334": {
+        "text": "The new user installs at least one app and starts using MEGA.",
+        "context": "A list item explaining the criteria for getting the bonus storage quota. This is shown once someone has invited a friend as part of the achievements program."
+    },
+    "16335": {
+        "text": "(Usage confirmation may take a few days to complete - please be patient)",
+        "context": "A message shown once someone has invited a friend as part of the achievements program. The user should wait a few days before the friend invite can be determined as authentic and then they will receive more storage quota."
+    },
+    "16336": {
+        "text": "(Bonus expires in [S]%1[\/S] %2)",
+        "context": ""
     }
 }

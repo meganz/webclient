@@ -6327,6 +6327,7 @@ React.makeElement = React['createElement'];
 	    },
 	    render: function render() {
 	        var self = this;
+
 	        var entries = self.state.entries || self.getEntries();
 
 	        var classes = "add-from-cloud " + self.props.className;
@@ -8700,7 +8701,7 @@ React.makeElement = React['createElement'];
 	                        }
 
 	                        var addToCloudDrive = function addToCloudDrive() {
-	                            M.injectNodes(v, M.RootID, false, function (res) {
+	                            M.injectNodes(v, M.RootID, function (res) {
 	                                if (res === 0) {
 	                                    msgDialog('info', __(l[8005]), __(l[8006]));
 	                                }

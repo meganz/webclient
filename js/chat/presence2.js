@@ -377,9 +377,11 @@ UserPresence.prototype.reconnect = function presence_reconnect(self) {
                                 this.up.persist = !!(newprefs & 4);
                                 this.up.autoawayactive = !(newprefs & 8);
                                 this.up.autoawaytimeout = newprefs >> 4;
+
                                 if (this.up.autoawaytimeout > 600) {
-                                    this.up.autoawaytimeout = Math.floor((this.up.autoawaytimeout - 600) / 60) + 600;
+                                    this.up.autoawaytimeout = Math.floor((this.up.autoawaytimeout - 600) * 60) + 600;
                                 }
+
                                 this.up.ui_signalactivity(true);
                                 this.up.updateui();
                             }

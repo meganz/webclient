@@ -1,6 +1,6 @@
 // presenced client layer
 
-// presence = new UserPresence(u_handle, can_webrtc, can_mobilepush, connectedcb, peerpresencecb, updateuicb)
+// presence = new UserPresence(u_handle, can_webrtc, can_mobilepush, connectedcb, peerpresencecb, updateuicb, prefschangedcb)
 
 // *** capability flags (identifying static client properties):
 
@@ -29,6 +29,10 @@
 // updateuicb(presencelevel, autoawaycheckmark, autoawaytimeout, overridecheckmark)
 // when this callback is invoked, update the UI accordingly
 
+// prefschangedcb(changed)
+// indicates whether unconfirmed changes to the user preferences exist (blink visual online status while
+// changed == true)
+
 // presence.ui_signalactivity()
 // (call this whenever the user presses a key or moves the mouse)
 
@@ -55,7 +59,8 @@ var UserPresence = function userpresence(
     can_mobilepush,
     connectedcb,
     peerstatuscb,
-    updateuicb
+    updateuicb,
+    prefschangedcb
 ) {
     if (!(this instanceof userpresence)) {
         return new userpresence(userhandle);
@@ -190,6 +195,7 @@ var UserPresence = function userpresence(
     this.connectedcb = connectedcb;   // called when the connection to presenced is going up or down
     this.peerstatuscb = peerstatuscb; // called when any peer's status changes (including for self)
     this.updateuicb = updateuicb;     // called when the UI needs to be updated
+    this.prefschangedcb = prefschangedcb;  // called when the user sets new prefs and when presenced confirms them
 };
 
 UserPresence.PRESENCE = {
@@ -353,6 +359,10 @@ UserPresence.prototype.reconnect = function presence_reconnect(self) {
                             var newprefs = u[p + 1] + (u[p + 2] << 8);
 
                             if (newprefs == this.up.prefs()) {
+                                if (this.prefschangedcb) {
+                                    this.prefschangedcb(false);
+                                }
+
                                 this.up.prefschanged = false;
                             }
                             else {
@@ -491,9 +501,10 @@ UserPresence.prototype.sendpeerupdate = function presence_sendpeerupdate(peerstr
 };
 
 UserPresence.prototype.sendprefs = function presence_sendprefs() {
+    this.prefschanged = true;    // this will be reset once the server responds with the same status
+
     if (this.open) {
         var prefs = this.prefs();
-        this.prefschanged = true;    // this will be reset once the server responds with the same status
         this.sendstring("\7" + String.fromCharCode(prefs & 0xff) + String.fromCharCode(prefs >> 8));
     }
 };
@@ -528,6 +539,10 @@ UserPresence.prototype.keepalivetimeout = function presence_keepalivetimeout(sel
 
 UserPresence.prototype.ui_setstatus = function presence_ui_setstatus(presence) {
     if (presence != this.presence) {
+        if (this.prefschangedcb) {
+            this.prefschangedcb(true);
+        }
+
         this.presence = presence;
 
         this.ui_signalactivity(true);
@@ -557,6 +572,10 @@ UserPresence.prototype.ui_setautoaway = function presence_ui_setautoaway(active,
     }
 
     this.autoawayactive = active;
+
+    if (this.prefschangedcb) {
+        this.prefschangedcb(true);
+    }
 
     // update flags, reset/start timer
     this.ui_signalactivity(true);

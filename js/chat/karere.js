@@ -198,14 +198,35 @@ var Karere = function(user_options) {
 
 
     self.bind("onConnected", function() {
+        console.error('karere is connected: ', self.getJid());
         self.connectionRetryManager.gotConnected();
     });
+
+    var clearDelayedReconnectTimeout = function() {
+        if (self._delayedConnectTimeout) {
+            clearTimeout(self._delayedConnectTimeout);
+            self._delayedConnectTimeout = null;
+        }
+    };
 
     self.connectionRetryManager = new ConnectionRetryManager(
         {
             functions: {
                 reconnect: function(connectionRetryManager) {
-                    return self.forceReconnect();
+                    if (connectionRetryManager._connectionRetries > 1) {
+                        clearDelayedReconnectTimeout();
+                        var megaPromise = new MegaPromise();
+                        // because of the bug in ejabberd, force delay any connection retry
+                        self._delayedConnectTimeout = setTimeout(function() {
+                            clearDelayedReconnectTimeout();
+                            megaPromise.linkDoneAndFailTo(self.forceReconnect());
+                        }, 2000);
+
+                        return megaPromise;
+                    }
+                    else {
+                        return self.forceReconnect();
+                    }
                 },
                 /**
                  * A Callback that will trigger the 'forceDisconnect' procedure for this type of connection (Karere/Chatd/etc)
@@ -891,7 +912,7 @@ makeMetaAware(Karere);
             localStorage.karereIdx = 0;
         }
 
-        return localStorage.karereIdx;
+        return localStorage.karereIdx + rand_range(1, 999999);
     };
 
     /**

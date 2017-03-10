@@ -348,7 +348,7 @@ React.makeElement = React['createElement'];
 	        }
 
 	        if (contact) {
-	            var presencedPresence = self.plugins.presencedIntegration.getPresence(contact.u);
+	            var presencedPresence = contact.u !== u_handle ? self.plugins.presencedIntegration.getPresence(contact.u) : self.plugins.presencedIntegration.getMyPresence();
 
 	            if (typeof presencedPresence === 'undefined') {
 	                if (!contact.presenceMtime || parseFloat(contact.presenceMtime) < eventObject.getDelay()) {
@@ -900,14 +900,14 @@ React.makeElement = React['createElement'];
 
 	    $status.removeClass('online').removeClass('away').removeClass('busy').removeClass('offline').removeClass('black');
 
-	    var actualPresence = self.plugins.presencedIntegration.getPresence();
+	    var actualPresence = self.plugins.presencedIntegration.getMyPresenceSetting();
 
 	    var userPresenceConRetMan = megaChat.userPresence.connectionRetryManager;
-	    var presence = userPresenceConRetMan.getConnectionState() === ConnectionRetryManager.CONNECTION_STATE.CONNECTED ? actualPresence : UserPresence.PRESENCE.OFFLINE;
+	    var presence = self.plugins.presencedIntegration.getMyPresence();
 
 	    var cssClass = PresencedIntegration.presenceToCssClass(presence);
 
-	    if (self.karere.getConnectionState() === Karere.CONNECTION_STATE.DISCONNECTED || self.karere.getConnectionState() === Karere.CONNECTION_STATE.AUTHFAIL || self.karere.getConnectionState() === Karere.CONNECTION_STATE.DISCONNECTING || userPresenceConRetMan.getConnectionState() === ConnectionRetryManager.CONNECTION_STATE.DISCONNECTED) {
+	    if (userPresenceConRetMan.getConnectionState() !== ConnectionRetryManager.CONNECTION_STATE.CONNECTED) {
 	        cssClass = "offline";
 	    }
 

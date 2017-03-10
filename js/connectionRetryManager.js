@@ -12,12 +12,39 @@ var ConnectionRetryManager = function(opts, parentLogger) {
     self._lastConnectionRetryTime = 0;
     self._connectionRetryInProgress = null;
     self._connectionRetries = 0;
-    self._connectionState = ConnectionRetryManager.CONNECTION_STATE.DISCONNECTED;
-    self.logger = new MegaLogger("connectionRetryManager", {}, parentLogger);
+    if (localStorage.connectionRetryManagerDebug) {
+        var _connectionState = ConnectionRetryManager.CONNECTION_STATE.DISCONNECTED;
+        Object.defineProperty(self, "_connectionState", {
+            get: function() { return _connectionState; },
+            set: function(newValue) {
+                if (_connectionState !== newValue) {
+                    self.logger.warn(
+                        "_connectionState = " + constStateToText(ConnectionRetryManager.CONNECTION_STATE, newValue)
+                    );
+
+                    _connectionState = newValue;
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+    }
+    else {
+        self._connectionState = ConnectionRetryManager.CONNECTION_STATE.DISCONNECTED;
+    }
+
+    var loggerName = "connectionRetryManager";
+    if (parentLogger) {
+        loggerName = (parentLogger.name ? parentLogger.name : parentLogger) + ":" + loggerName;
+    }
+
+    self.logger = new MegaLogger(loggerName, {});
 
     self.options = $.extend({}, ConnectionRetryManager.DEFAULT_OPTS, opts);
 
     self._instanceIdx = ConnectionRetryManager._instanceIdx++;
+
+    self._isOffline = false;
 
     return self;
 };
@@ -58,9 +85,9 @@ ConnectionRetryManager.DEFAULT_OPTS = {
 
     // TODO: CONNECTION RETRY REFACTORING
     /**
-     * 10 mins timeout after the maxConnectionRetries is reached.
+     * 15 seconds timeout after the maxConnectionRetries is reached.
      */
-    restartConnectionRetryTimeout: (10 * 1000 * 60),
+    restartConnectionRetryTimeout: (15 * 1000),
 
     // TODO: CONNECTION RETRY REFACTORING
     /**
@@ -73,7 +100,7 @@ ConnectionRetryManager.DEFAULT_OPTS = {
     /**
      * Maximum connection retry in case of error OR timeout
      */
-    maxConnectionRetries: 50,
+    maxConnectionRetries: 10,
 
     functions: {
         /**
@@ -152,15 +179,23 @@ ConnectionRetryManager.prototype.gotDisconnected = function(){
         $(document).rebind("mousemove.megaChatRetry" + self._instanceIdx, function() {
             self._connectionRetryUI();
         });
+
         $(window).unbind("offline.megaChatRetry" + self._instanceIdx);
         $(window).rebind("online.megaChatRetry" + self._instanceIdx, function() {
+            self._isOffline = false;
             if (
                 !self.options.functions.isUserForcedDisconnect() &&
                 !self.options.functions.isConnected()
             ) {
-                self.doConnectionRetry(true);
+                // delay the retry a bit, so that the OS can properly reconnect (e.g. on wifi networks)
+                setTimeout(function() {
+                    self.doConnectionRetry(true);
+                }, 3000);
             }
+
+            $(window).unbind("online.megaChatRetry" + self._instanceIdx);
         });
+
         if (!self._connectionRetryInProgress) {
             self.doConnectionRetry();
         }
@@ -168,6 +203,8 @@ ConnectionRetryManager.prototype.gotDisconnected = function(){
     else {
         self._connectionState = ConnectionRetryManager.CONNECTION_STATE.DISCONNECTED;
     }
+
+    $(self).trigger('onDisconnected');
 };
 
 /**
@@ -188,12 +225,16 @@ ConnectionRetryManager.prototype.gotConnected = function(){
     }
     //console.error(self._instanceIdx, "unbind mouse move");
     $(document).unbind("mousemove.megaChatRetry" + self._instanceIdx);
+
     $(window).unbind("online.megaChatRetry" + self._instanceIdx);
     $(window).rebind("offline.megaChatRetry" + self._instanceIdx, function() {
+        self._isOffline = true;
         if (!self.options.functions.isUserForcedDisconnect()) {
             self.options.functions.forceDisconnect(self);
             self._connectionState = ConnectionRetryManager.CONNECTION_STATE.DISCONNECTED;
+            self.gotDisconnected();
         }
+        $(window).unbind("offline.megaChatRetry" + self._instanceIdx);
     });
 
     if (self._$connectingPromise) {
@@ -229,6 +270,11 @@ ConnectionRetryManager.prototype.startedConnecting = function(waitForPromise, de
 ConnectionRetryManager.prototype.doConnectionRetry = function(immediately) {
     var self = this;
 
+    if (self._isOffline) {
+        // in case the OS/browser had reported that we are online, it does not make sense to proceed trying to
+        // reconnect.
+        return MegaPromise.reject();
+    }
     if (self._$connectingPromise) {
         if (self._connectionRetries >= self.options.maxConnectionRetries) {
             self._$connectingPromise.reject(arguments);

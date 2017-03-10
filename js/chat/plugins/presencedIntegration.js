@@ -35,7 +35,7 @@ var PresencedIntegration = function(megaChat) {
             }
 
             args.push("[" + fn + "]");
-            console.warn.apply(console, args);
+            console.debug.apply(console, args);
         };
     }
     else {
@@ -110,6 +110,8 @@ PresencedIntegration.cssClassToPresence = function(strPresence) {
 
 PresencedIntegration.prototype.init = function() {
     var self = this;
+    var megaChat = self.megaChat;
+
     var userPresence = new UserPresence(
         u_handle,
         !!RTC,
@@ -130,7 +132,7 @@ PresencedIntegration.prototype.init = function() {
         self._updateuicb.bind(self)
     );
 
-    var megaChat = self.megaChat;
+
 
 
     /**
@@ -144,14 +146,25 @@ PresencedIntegration.prototype.init = function() {
 
         var contactHashes = [];
         M.u.forEach(function(v, k) {
-            if (k !== u_handle && v.c !== 0) {
+            if (k === u_handle) {
+                return;
+            }
+
+            if (v.c !== 0) {
                 contactHashes.push(k);
             }
 
             v.presence = 'unavailable';
         });
 
+        M.u[u_handle].presence = self.getMyPresenceSetting();
+
         userPresence.addremovepeers(contactHashes);
+    });
+
+    $(userPresence).rebind('onDisconnected.presencedIntegration', function(e) {
+        M.u[u_handle].presence = "unavailable";
+        self.megaChat.renderMyStatus();
     });
 
 
@@ -173,16 +186,16 @@ PresencedIntegration.prototype._updateuicb = function presencedIntegration_updat
     self._presence[u_handle] = presence;
 
     var status;
-    if (presence == UserPresence.PRESENCE.OFFLINE) {
+    if (presence === UserPresence.PRESENCE.OFFLINE) {
         status = 'offline';
     }
-    else if (presence == UserPresence.PRESENCE.AWAY) {
+    else if (presence === UserPresence.PRESENCE.AWAY) {
         status = 'away';
     }
-    else if (presence == UserPresence.PRESENCE.DND) {
+    else if (presence === UserPresence.PRESENCE.DND) {
         status = 'dnd';
     }
-    else if (presence == UserPresence.PRESENCE.ONLINE) {
+    else if (presence === UserPresence.PRESENCE.ONLINE) {
         status = 'available';
     }
     else {
@@ -251,16 +264,16 @@ PresencedIntegration.prototype._peerstatuscb = function(user_hash, presence, isW
     var contact = M.u[user_hash];
     if (contact) {
         var status;
-        if (presence == UserPresence.PRESENCE.OFFLINE) {
+        if (presence === UserPresence.PRESENCE.OFFLINE) {
             status = 'offline';
         }
-        else if (presence == UserPresence.PRESENCE.AWAY) {
+        else if (presence === UserPresence.PRESENCE.AWAY) {
             status = 'away';
         }
-        else if (presence == UserPresence.PRESENCE.DND) {
+        else if (presence === UserPresence.PRESENCE.DND) {
             status = 'dnd';
         }
-        else if (presence == UserPresence.PRESENCE.ONLINE) {
+        else if (presence === UserPresence.PRESENCE.ONLINE) {
             status = 'available';
         }
         else {
@@ -388,4 +401,24 @@ PresencedIntegration.prototype._destroyAutoawayEvents = function() {
 
     $(document.body).unbind('mousemove.presencedInt');
     $(document.body).unbind('keypress.presencedInt');
+};
+
+/**
+ * This method would simply return the last known user's setting for the presence. E.g. the user can be OFFLINE,
+ * but since he did set his last presence to ONLINE, this method would return ONLINE
+ */
+PresencedIntegration.prototype.getMyPresenceSetting = function() {
+    return this.getPresence();
+};
+
+/**
+ * This method would return the actual presence of the current user, e.g. even if he had set his presence to ONLINE,
+ * but he is right now offline (connection issue, etc) this method would return OFFLINE (the opposite of what
+ * .getMyPresenceSetting() does).
+ */
+PresencedIntegration.prototype.getMyPresence = function() {
+    var conRetMan = this.megaChat.userPresence.connectionRetryManager;
+    return conRetMan.getConnectionState() !== ConnectionRetryManager.CONNECTION_STATE.CONNECTED ?
+        UserPresence.PRESENCE.OFFLINE :
+        this.getPresence();
 };

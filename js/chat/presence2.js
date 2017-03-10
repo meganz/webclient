@@ -1,6 +1,8 @@
 // presenced client layer
 
-// presence = new UserPresence(u_handle, can_webrtc, can_mobilepush, connectedcb, peerpresencecb, updateuicb, prefschangedcb)
+// presence = new UserPresence(
+//      u_handle, can_webrtc, can_mobilepush, connectedcb, peerpresencecb, updateuicb, prefschangedcb
+// )
 
 // *** capability flags (identifying static client properties):
 
@@ -212,10 +214,10 @@ UserPresence.prototype.reconnect = function presence_reconnect(self) {
 
     if (self.s) {
         self.canceled = true;
-        self.s.close();
         self.s.onclose = undefined;
         self.s.onerror = undefined;
         self.s.onopen = undefined;
+        self.s.close();
         self.s = false;
 
         if (self.open) {
@@ -281,6 +283,11 @@ UserPresence.prototype.reconnect = function presence_reconnect(self) {
         };
 
         self.s.onclose = function () {
+            if (self.s.readyState === 1) {
+                // not really closed, but something weird happened (or a bug in chrome?), so force close!
+                self.s.close();
+            }
+
             $(self).trigger('onDisconnected');
 
             if (self.keepalivesendtimer) {

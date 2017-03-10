@@ -889,6 +889,10 @@ React.makeElement = React['createElement'];
 	    if (!self.is_initialized) {
 	        return;
 	    }
+	    if (typeof megaChat.userPresence === 'undefined') {
+
+	        return;
+	    }
 
 	    var $status = $('.activity-status-block .activity-status');
 

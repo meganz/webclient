@@ -1050,6 +1050,10 @@ Chat.prototype.renderMyStatus = function() {
     if (!self.is_initialized) {
         return;
     }
+    if (typeof(megaChat.userPresence) === 'undefined') {
+        // still initialising...
+        return;
+    }
 
     // reset
     var $status = $('.activity-status-block .activity-status');

@@ -12156,7 +12156,7 @@ function slideshow(id, close)
     }
 
     var n = M.getNodeByHandle(id);
-    if (!n || RootbyId(id) === 'shares' || folderlink)
+    if (!n || !n.p || RootbyId(id) === 'shares' || folderlink)
     {
         $('.slideshow-getlink').hide();
         $('.slideshow-line').hide();

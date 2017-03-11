@@ -198,7 +198,6 @@ var Karere = function(user_options) {
 
 
     self.bind("onConnected", function() {
-        console.error('karere is connected: ', self.getJid());
         self.connectionRetryManager.gotConnected();
     });
 

@@ -100,8 +100,6 @@ mega.ui.tpp = (function () {
         if (!$.isEmptyObject($tppDlg) && visible) {
             $tppDlg.hide(opts.duration);
             setStatus(false);
-            setQueueLength(0, 'dl');
-            setQueueLength(0, 'ul');
         }
     };
 

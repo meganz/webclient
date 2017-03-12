@@ -60,6 +60,11 @@
     width: 48px;
     height: 48px;
 }
+.semi-huge-icon {
+    width: 64px;
+    height: 64px;
+    display: inline-block;
+}
 .huge-icon {
     width: 140px;
     height: 140px;
@@ -489,7 +494,7 @@
     width: 18px;
 }
 .huge-white-icon.achievement {
-    background-image: url(../images/mega/account-sprite_v2.png);
+    background-image: url(../images/mega/account-sprite_v3.png);
     width: 72px;
     height: 72px;
 }
@@ -946,7 +951,7 @@
 }
 /* End of Context menu icons */
 .huge-icon.storage-icon {
-    background-image: url(../images/mega/account-sprite@2x.png);
+    background-image: url(../images/mega/account-sprite_v3.png);
     background-position: 20px -771px;
     background-repeat: no-repeat;
 }
@@ -954,6 +959,18 @@
     background-position: 20px -651px;
 }
 .semi-small-icon.rocket {
-    background-image: url(../images/mega/account-sprite@2x.png);
+    background-image: url(../images/mega/account-sprite_v3.png);
     background-position: -156px -619px;
+}
+.semi-huge-icon.green-tick {
+    background-image: url(../images/mega/account-sprite_v3.png);
+    background-position: 0 -1045px;
+}
+.semi-big-icon.blue-cloud {
+    background-image: url(../images/mega/account-sprite_v3.png);
+    background-position: -100px -984px;
+}
+.semi-big-icon.green-speedometer {
+    background-image: url(../images/mega/account-sprite_v3.png);
+    background-position: -100px -1032px;
 }

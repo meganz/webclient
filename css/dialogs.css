@@ -305,10 +305,9 @@
 .achievement-dialog.expires-txt.red {
     color: #FF333A;
 }
-.achievement-dialog .default-white-button {
+.achievement-dialog .default-grey-button {
     display: inline-block;
     margin: 0 10px 0 10px;
-    color: #777777;
     min-width: 102px;
 }
 /* End of Achievement dialog */
@@ -363,7 +362,7 @@
     padding: 0 15px 32px 15px;
 }
 .achievements-scroll {
-    max-height: 666px;
+    max-height: 508px;
     overflow: hidden;
 }
 .achievements-scroll .jspContainer::before {
@@ -380,8 +379,22 @@
     background: linear-gradient(to bottom, rgba(247,247,247,1) 0%, rgba(247,247,247,0) 100%);
     z-index: 10;
 }
-.achievements-list-dialog .acivements-content {
+.achievements-list-dialog .achievements-list {
     padding: 10px 24px 12px 24px;
+}
+.achievements-list-head {
+    font-size: 20px;
+    line-height: 25px;
+    text-align:center;
+    color: #666666;
+    padding: 42px 25px 16px 25px;
+}
+.achievements-list-info {
+    font-size: 16px;
+    line-height: 20px;
+    text-align:center;
+    color: #777777;
+    padding: 0 54px 35px 54px;
 }
 .achievement-full.expires-txt {
     font-size: 14px;
@@ -420,14 +433,14 @@
 .achived .achievement-dialog.status-block .button {
     display: none;
 }
-.achievement-dialog.status-txt {
+.achievement-dialog.achieved-icon {
     font-size: 18px;
     color: #31B500;
     line-height: 26px;
     text-transform: uppercase;
     display: none;
 }
-.achived .achievement-dialog.status-txt {
+.achived .achievement-dialog.achieved-icon {
     display: block;
 }
 .one-reward .achievement-dialog.right-block {
@@ -437,14 +450,8 @@
 .one-reward .achievement-dialog.right-block .reward {
     margin: 0px 0 4px 10px;
 }
-.one-reward .right-block .reward.bandwidth {
+.one-reward .right-block .reward.bandwidth, .achived .achievement-dialog.right-block .reward {
     display: none;
-}
-.achived .achievement-dialog.right-block .reward {
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
-    -moz-opacity: 0.5;
-    -khtml-opacity: 0.5;
-    opacity: 0.5;
 }
 /* End of Achievements list dialog */
 

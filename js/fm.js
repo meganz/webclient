@@ -3897,7 +3897,8 @@ function accountUI() {
             $('.achievements-table .achievements-cell').addClass('hidden');
             var $items = $('.account.progress-list.achievem .progress-item')
                 .not('.baseq').addClass('hidden');
-            $items.find('.progress-indicator').removeClass('active');
+            $items.removeClass('achieved');
+            $('.data-block.achievements-data').removeClass('has-completed');
             $('.progress-title span', $items).remove();
 
             var $achStorage = $('.account.progress-list.achievem.storage');
@@ -3929,6 +3930,7 @@ function accountUI() {
                         var $cell = $('.' + selector, $achTable).closest('.achievements-cell');
                         var $storageItem = $('.progress-item.' + selector, $achStorage).removeClass('hidden');
                         var $transferItem = $('.progress-item.' + selector, $achTransfer).removeClass('hidden');
+                        var $achievementsBl = $('.account.achievements-data');
                         $storageItem.parent().removeClass('hidden');
                         $transferItem.parent().removeClass('hidden');
 
@@ -3945,8 +3947,10 @@ function accountUI() {
                             if (data.rwd) {
                                 if (data.rwd.left > 0) {
                                     transferCurrentValue += transferValue;
-                                    $('.progress-indicator', $transferItem).addClass('active');
+                                    $transferItem.addClass('achieved');
+                                    $achievementsBl.addClass('has-completed');
                                 }
+
 
                                 if (idx !== ach.ACH_INVITE) {
                                     if (data.rwd.e) {
@@ -3998,12 +4002,12 @@ function accountUI() {
                         }
 
                         if (idx === ach.ACH_INVITE) {
-                            ach.bind.call($('.button', $cell), ach.mapToAction[idx]);
+                            ach.bind.call($('.button, .achievement-full.title', $cell), ach.mapToAction[idx]);
 
                             if (data.rwd) {
                                 if (storageValue) {
                                     storageCurrentValue += storageValue;
-                                    $('.progress-indicator', $storageItem).addClass('active');
+                                    $storageItem.addClass('achieved');
                                 }
 
                                 /* re-enable once the invite status dialog is brought back
@@ -4021,8 +4025,14 @@ function accountUI() {
                             // Achieved
                             if (data.rwd.left > 0) {
                                 storageCurrentValue += storageValue;
-                                $('.progress-indicator', $storageItem).addClass('active');
+                                $storageItem.addClass('achieved');
+
+                                if ($cell.parent('.available-achievements').length > 0) {
+                                    $cell.addClass('achieved');
+                                    $('.completed-achievements').append($cell);
+                                }
                             }
+
                             if (data.rwd.e) {
                                 $('.progress-title', $storageItem)
                                     .safeAppend('<span class="red-txt">&nbsp;(@@)</span>',
@@ -4043,6 +4053,7 @@ function accountUI() {
                                         : l[1664]
                                 );
 
+
                             if (!data.rwd.e) {
                                 $('.status .achievement-date .red-txt', $cell).addClass('hidden');
                             }
@@ -4053,7 +4064,7 @@ function accountUI() {
                             }
                         }
                         else {
-                            ach.bind.call($('.button', $cell), ach.mapToAction[idx]);
+                            ach.bind.call($('.button, .achievement-full.title', $cell), ach.mapToAction[idx]);
                         }
                         $cell.removeClass('hidden');
                     }
@@ -5360,25 +5371,6 @@ function accountUI() {
             $sectionBlock.find('.account.tab-lnk.active').removeClass('active');
             $this.addClass('active');
             $(window).trigger('resize');
-
-            Soon(function() {
-                if (currentTab === 'achievements') {
-                    var minHeight = 0;
-                    var $achTable = $('.account.data-block .achievements-table');
-
-                    if (!$achTable.hasClass('achfulldesch')) {
-                        $achTable.addClass('achfulldesch')
-
-                        $('.achievement-full.description:visible', $achTable)
-                            .each(function(i, e) {
-                                minHeight = Math.max(minHeight, $(e).outerHeight());
-                            })
-                            .css('min-height', minHeight + 'px');
-
-                        $(window).trigger('resize');
-                    }
-                }
-            });
         }
     });
 
@@ -11502,7 +11494,7 @@ function achievementsListDialog(close) {
     $dialog.removeClass('hidden');
 
     // Init scroll
-    $contentBlock = $dialog.find('.acivements-content');
+    $contentBlock = $dialog.find('.achievements-list');
 
     if ($dialog.outerHeight() > bodyHeight) {
         $scrollBlock.css('max-height', bodyHeight - 60);

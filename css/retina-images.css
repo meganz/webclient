@@ -473,11 +473,11 @@ body.pro:after {
     background-size: 262px auto;
 }
 #help2-main .ui-autocomplete .client {
-    background-image: url("../images/mega/help2/welcome_icons@2x.png");
+    background-image: url(../images/mega/help2/welcome_icons@2x.png);
     background-size: 250px auto;
 }
-.huge-white-icon.achievement, .account.bonuses-icon, .dropdown.transfer-icon, .huge-icon.storage-icon, .semi-small-icon.rocket {
-    background-image: url(../images/mega/account-sprite_v2@2x.png);
+.huge-white-icon.achievement, .account.bonuses-icon, .dropdown.transfer-icon, .huge-icon.storage-icon, .semi-small-icon.rocket, .semi-huge-icon.green-tick, .semi-big-icon.blue-cloud, .semi-big-icon.green-speedometer, .achieved .account.progress-indicator, .achievement-complete::after {
+    background-image: url(../images/mega/account-sprite_v3@2x.png);
     background-size: 172px auto;
 }
 .huge-icon.achievement {

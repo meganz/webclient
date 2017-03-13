@@ -772,7 +772,6 @@
                     }
 
                     if (this.chatIsReady) {
-                        console.error("megaRender presence: ", aHandle, aNode.presence);
                         props.onlineStatus = M.onlineStatusClass(aNode.presence ? aNode.presence : "unavailable");
 
                         if (props.onlineStatus) {
@@ -817,7 +816,6 @@
                 }
 
                 if (this.chatIsReady) {
-                    console.error("megaRender presence: ", aHandle, aNode.presence);
                     props.onlineStatus = M.onlineStatusClass(aNode.presence ? aNode.presence : "unavailable");
 
                     if (props.onlineStatus) {

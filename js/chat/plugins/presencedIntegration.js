@@ -142,6 +142,14 @@ PresencedIntegration.prototype.init = function() {
     megaChat.userPresence = self.userPresence = userPresence;
 
     $(userPresence).rebind('onConnected.presencedIntegration', function(e) {
+        // simply trust presence2.js and enable autoaway if its enabled initially in the code
+        if (self.getAutoaway()) {
+            self._initAutoawayEvents();
+        }
+        else {
+            self._destroyAutoawayEvents();
+        }
+
         // set my own presence
 
         var contactHashes = [];

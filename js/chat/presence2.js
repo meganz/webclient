@@ -103,6 +103,9 @@ var UserPresence = function userpresence(
     // user prefs changed
     this.prefschanged = false;
 
+    // new instance
+    this.starting = true;
+
     // console logging
     this.logger = MegaLogger.getLogger('UserPresence');
 
@@ -384,6 +387,12 @@ UserPresence.prototype.reconnect = function presence_reconnect(self) {
 
                                 this.up.ui_signalactivity(true);
                                 this.up.updateui();
+                            }
+
+                            // set up things according to the user's prefs if we're a fresh client
+                            if (this.up.starting) {
+                                this.up.starting = false;
+                                this.up.ui_signalactivity();
                             }
 
                             p += 3;

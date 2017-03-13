@@ -49,6 +49,7 @@ var PresencedIntegration = function(megaChat) {
     self._is_mobile = {};
     self._is_webrtc = {};
     self._presence = {};
+    self._wasNeverConnected = true;
 
     megaChat.unbind("onInit.karerePing");
     megaChat.bind("onInit.karerePing", function(e) {
@@ -142,6 +143,20 @@ PresencedIntegration.prototype.init = function() {
     megaChat.userPresence = self.userPresence = userPresence;
 
     $(userPresence).rebind('onConnected.presencedIntegration', function(e) {
+        // trigger a signalactivity if we are connecting for the first time.
+        if (self._wasNeverConnected) {
+            delete self._wasNeverConnected;
+            megaChat.userPresence.ui_signalactivity();
+        }
+
+        // simply trust presence2.js and enable autoaway if its enabled initially in the code
+        if (self.getAutoaway()) {
+            self._initAutoawayEvents();
+        }
+        else {
+            self._destroyAutoawayEvents();
+        }
+
         // set my own presence
 
         var contactHashes = [];

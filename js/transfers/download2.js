@@ -878,9 +878,11 @@ var dlmanager = {
         loadingDialog.hide();
         this.onLimitedBandwidth = function() {
             if (callback) {
-                $('a.red', $dialog).unbind('click');
+                $dialog.removeClass('registered achievements');
+                $('.bottom-tips a', $dialog).unbind('click');
                 $('.continue', $dialog).unbind('click');
                 $('.upgrade', $dialog).unbind('click');
+                $('.get-more-bonuses', $dialog).unbind('click');
                 Soon(callback);
                 callback = $dialog = undefined;
             }
@@ -890,18 +892,35 @@ var dlmanager = {
         fm_showoverlay();
         uiCheckboxes($dialog, 'ignoreLimitedBandwidth').removeClass('hidden');
 
-        $('.header-after-icon', $dialog).text(l[16164]);
-        $('.p-after-icon', $dialog).safeHTML(l[16165]);
+        if (u_type) {
+            $dialog.addClass('registered');
+            if (u_attr.flags.ach) {
+                $dialog.addClass('achievements');
+                $('.get-more-bonuses', $dialog).rebind('click', function() {
+                    closeDialog();
+                    loadingDialog.show();
+
+                    M.accountData(function(account) {
+                        loadingDialog.hide();
+
+                        if (account.maf) {
+                            achievementsListDialog();
+                        }
+                    });
+                });
+            }
+        }
 
         api_req({ a: 'log', e: 99617, m: 'qbq' });
 
-        $('a.red', $dialog).rebind('click', function() {
-            open(getAppBaseUrl() + '#pro');
+        $('.bottom-tips a', $dialog).rebind('click', function() {
+            open(getAppBaseUrl() +
+                'help/client/webclient/cloud-drive/' +
+                'how-do-you-regulate-transfer-quota-bandwidth-utilisation'
+            );
         });
 
-        $('.continue', $dialog).rebind('click', this.onLimitedBandwidth.bind(this))
-            .find('span')
-            .text(res === 2 ? l[8946] : l[8945]);
+        $('.continue', $dialog).rebind('click', this.onLimitedBandwidth.bind(this));
 
         $('.upgrade', $dialog).rebind('click', function() {
 
@@ -924,8 +943,7 @@ var dlmanager = {
                     }
                 }
             });
-        })
-        .find('span').text(res === 2 ? l[8954] : l[1108]);
+        });
     },
 
     showOverQuotaDialog: function DM_quotaDialog(dlTask) {

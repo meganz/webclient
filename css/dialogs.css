@@ -190,25 +190,34 @@
 
 /* Limited available bandwidth dialog */
 .fm-dialog.limited-bandwidth-dialog {
-    min-width: 484px;
-    margin: -196px 0 0 -242px;
+    min-width: 604px;
+    margin: -222px 0 0 -302px;
+}
+.limited-bandwidth-dialog .registered, .limited-bandwidth-dialog.registered .not-registered, .limited-bandwidth-dialog .dialog.big-buttons-block .get-more-bonuses {
+    display: none;
+}
+.limited-bandwidth-dialog.registered .registered {
+    display: block;
+}
+.limited-bandwidth-dialog.achievements .dialog.big-buttons-block .get-more-bonuses {
+    display: inline-block;
 }
 .dialog-top-icon {
-    margin: 34px 0 17px 0;
+    margin: 26px 0 17px 0;
 }
-.dialog.header-after-icon {
+.dialog.header-before-icon {
     font-size: 20px;
     line-height: 25px;
     color: #666666;
-    font-family: 'source_sans_prolight';
-    padding: 15px 0 8px 0;
+    padding: 12px 0 8px 0;
 }
 .dialog.p-after-icon {
     font-size: 14px;
-    line-height: 18px;
+    line-height: 24px;
     color: #666666;
-    padding: 15px 0 0 0;
-    margin: 0 0 0 0;
+    padding: 5px 0 0 0;
+    margin: 0 auto;
+    max-width: 504px;
 }
 .dialog.p-after-icon span {
     color: #FF333A;
@@ -223,7 +232,24 @@
     margin: 0 6px;
 }
 .fm-dialog-body .centered-checkbox {
-    padding: 0 0 10px 0;
+    padding: 2px 0 10px 0;
+}
+.dialog.bottom-tips {
+    font-size: 12px;
+    line-height: 15px;
+    color: #999999;
+    text-align:center;
+    padding: 0 0 0 0;
+}
+.dialog.bottom-tips span {
+    display:block;
+    padding: 2px 0 5px 0;
+}
+.dialog.bottom-tips a {
+    color: #FF333A;
+    cursor: pointer;
+    display: inline-block;
+    margin-bottom: 12px;
 }
 /* End of Limited available bandwidth dialog */
 

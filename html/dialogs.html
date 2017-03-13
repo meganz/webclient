@@ -2596,22 +2596,33 @@
 
 <div class="fm-dialog limited-bandwidth-dialog hidden">
     <div class="fm-dialog-body centered-content">
-        <i class="big-90px-icon speedometer dialog-top-icon"></i>
-        <!-- [$8943] !-->
-        <div class="dialog header-after-icon">[$16164]</div>
+        <div class="dialog header-before-icon">[$16164]</div>
+        
+        <i class="big-104px-icon speedometer almost-full dialog-top-icon"></i>
+        
         <p class="dialog p-after-icon">
-            [$16165]
+            <!-- [$16356] - Your queued download exceeds the current transfer quota available for your account and may therefore be interrupted. !-->
+            <!-- [$16357] - Your queued download exceeds the current transfer quota available for IP address and may therefore be interrupted. !-->
+            <span class="registered">[$16356]</span>
+            <span class="not-registered">[$16357]</span>
         </p>
 
         <div class="dialog big-buttons-block">
+            <!-- [$6826] - Continue !-->
             <!-- [$8945] - Continue without account !-->
-            <!-- [$8946] - Continue with your free account !-->
             <div class="default-big-button button-without-outline continue">
-                <span>[$8945]</span>
+                <span class="registered">[$6826]</span>
+                <span class="not-registered">[$8945]</span>
             </div>
-            <!-- [$1108] !-->
+            <!-- [$16309] - Get more bonuses !-->
+            <!-- [$16352] - Register for bonuses !-->
+            <div class="default-big-button button-without-outline get-more-bonuses">
+                <span class="label-with-icon registered"><i class="medium-icon rocket"></i>[$16309]</span>
+                <span class="not-registered">[$16309]</span>
+            </div>
+            <!-- [$16353] - See our plans !-->
             <div class="default-big-button button-without-outline grey-gradient upgrade">
-                <span>[$968]</span>
+                <span>[$16353]</span>
             </div>
         </div>
 
@@ -2621,6 +2632,12 @@
             </div>
             <label for="limit-warning-checkbox" class="radio-txt medium">[$229]</label>
         </div>
+        
+        <div class="dialog bottom-tips">
+            <span>[$16355]</span>
+            <a>[$16354]</a>
+        </div>
+        
     </div>
 </div>
 

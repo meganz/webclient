@@ -1399,6 +1399,12 @@ function topmenuUI() {
     // Show version in top menu
     $('.top-mega-version').text('v. ' + mega.utils.getSiteVersion());
 
+    // Show achievements if enabled
+    mega.achievem.enabled()
+        .done(function() {
+            $('.top-icon.achievements').show();
+        });
+
     if (u_type) {
         $('.top-menu-item.logout,.top-menu-item.backup').removeClass('hidden');
         $('.top-menu-item.account').removeClass('hidden');
@@ -1410,10 +1416,6 @@ function topmenuUI() {
         $('.create-account-button').hide();
         $('.membership-status-block').show();
         $('.top-icon.notification').show();
-        if (u_attr.flags.ach) {
-            $('.top-icon.achievements').show();
-        }
-
 
         // If a Lite/Pro plan has been purchased
         if (u_attr.p) {
@@ -1604,15 +1606,7 @@ function topmenuUI() {
     });
 
     $('.top-icon.achievements').rebind('click', function() {
-        loadingDialog.show();
-
-        M.accountData(function(account) {
-            loadingDialog.hide();
-
-            if (account.maf) {
-                achievementsListDialog();
-            }
-        });
+        mega.achievem.achievementsListDialog();
     });
 
     $('.top-icon.menu, .top-icon.close').rebind('click', function () {

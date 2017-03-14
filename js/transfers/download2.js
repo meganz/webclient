@@ -894,22 +894,16 @@ var dlmanager = {
 
         if (u_type) {
             $dialog.addClass('registered');
-            if (u_attr.flags.ach) {
+        }
+
+        mega.achievem.enabled()
+            .done(function() {
                 $dialog.addClass('achievements');
                 $('.get-more-bonuses', $dialog).rebind('click', function() {
                     closeDialog();
-                    loadingDialog.show();
-
-                    M.accountData(function(account) {
-                        loadingDialog.hide();
-
-                        if (account.maf) {
-                            achievementsListDialog();
-                        }
-                    });
+                    mega.achievem.achievementsListDialog();
                 });
-            }
-        }
+            });
 
         api_req({ a: 'log', e: 99617, m: 'qbq' });
 

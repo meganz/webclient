@@ -3588,7 +3588,6 @@ function MegaData()
         return promise;
     };
 
-
     this.accountData = function(cb, blockui)
     {
         var account = Object(this.account);
@@ -6735,6 +6734,10 @@ function execsc() {
                         M.scAckQueue[a.i]();
                         delete M.scAckQueue[a.i];
                     }
+
+                    if (!pfid && u_type) {
+                        mega.checkStorageQuota();
+                    }
                     break;
 
                 case 'u':
@@ -6846,9 +6849,14 @@ function execsc() {
                     // node deletion
                     M.delNode(a.n);
 
-                    // Only show a notification if we did not trigger the action ourselves
-                    if (!pfid && u_attr && a.ou !== u_attr.u) {
-                        notify.notifyFromActionPacket(a);
+                    if (!pfid) {
+                        // Only show a notification if we did not trigger the action ourselves
+                        if (u_attr && a.ou !== u_attr.u) {
+                            notify.notifyFromActionPacket(a);
+                        }
+                        if (u_type) {
+                            mega.checkStorageQuota();
+                        }
                     }
                     break;
 
@@ -8920,6 +8928,9 @@ function loadfm_done(mDBload) {
 
             // load report - time to fm after last byte received
             mega.loadReport.ttfm = Date.now() - mega.loadReport.ttfm;
+
+            // setup fm-notifications such as 'full' or 'almost-full' if needed.
+            mega.checkStorageQuota(50);
         }
         else {
             mega.loadReport.ttfm = -1;
@@ -9052,297 +9063,6 @@ function fm_requestfolderid(h, name, ulparams)
 {
     return createFolder(h, name, ulparams);
 }
-
-var isNativeObject = function(obj) {
-    var objConstructorText = obj.constructor.toString();
-    return objConstructorText.indexOf("[native code]") !== -1 && objConstructorText.indexOf("Object()") === -1;
-};
-
-function clone(obj)
-{
-
-    if (null == obj || "object" != typeof obj)
-        return obj;
-    if (obj instanceof Date)
-    {
-        var copy = new Date();
-        copy.setTime(obj.getTime());
-        return copy;
-    }
-    if (obj instanceof Array)
-    {
-
-        var copy = [];
-        for (var i = 0, len = obj.length; i < len; i++) {
-            copy[i] = clone(obj[i]);
-        }
-        return copy;
-    }
-    if (obj instanceof Object)
-    {
-        var copy = {};
-        for (var attr in obj)
-        {
-            if (obj.hasOwnProperty(attr)) {
-                if (!(obj[attr] instanceof Object)) {
-                    copy[attr] = obj[attr];
-                }
-                else if (obj[attr] instanceof Array) {
-                    copy[attr] = clone(obj[attr]);
-                }
-                else if (!isNativeObject(obj[attr])) {
-                    copy[attr] = clone(obj[attr]);
-                }
-                else if ($.isFunction(obj[attr])) {
-                    copy[attr] = obj[attr];
-                }
-                else {
-                    copy[attr] = {};
-                }
-            }
-        }
-
-        return copy;
-    }
-}
-
-function balance2pro(callback)
-{
-    api_req({a: 'uq', pro: 1},
-    {
-        cb: callback,
-        callback: function(res, ctx)
-        {
-            if (typeof res == 'object' && res['balance'] && res['balance'][0])
-            {
-                var pjson = JSON.parse(pro_json);
-
-                for (var i in pjson[0])
-                {
-                    if (pjson[0][i][5] == res['balance'][0][0])
-                    {
-                        api_req({a: 'uts', it: 0, si: pjson[0][i][0], p: pjson[0][i][5], c: pjson[0][i][6]},
-                        {
-                            cb: ctx.cb,
-                            callback: function(res, ctx)
-                            {
-                                if (typeof res == 'number' && res < 0 && ctx.cb)
-                                    ctx.cb(false);
-                                else
-                                {
-                                    api_req({a: 'utc', s: [res], m: 0},
-                                    {
-                                        cb: ctx.cb,
-                                        callback: function(res, ctx)
-                                        {
-                                            if (ctx.cb)
-                                                ctx.cb(true);
-                                            u_checklogin({checkloginresult: function(u_ctx, r)
-                                                {
-                                                    if (M.account)
-                                                        M.account.lastupdate = 0;
-                                                    u_type = r;
-                                                    topmenuUI();
-                                                    if (u_attr.p)
-                                                        msgDialog('info', l[1047], l[1048]);
-                                                }});
-                                        }
-                                    });
-                                }
-                            }
-                        });
-                    }
-                }
-            }
-        }
-    });
-}
-
-// MEGA Achievements
-Object.defineProperty(mega, 'achievem', {
-    value: Object.create(null, {
-        RWDLVL: { value: 0 },
-
-        toString: {
-            value: function toString(ach) {
-                if (ach !== undefined) {
-                    var res = Object.keys(this)
-                        .filter(function(v) {
-                            return this[v] === ach;
-                        }.bind(this));
-
-                    return String(res);
-                }
-
-                return '[object MegaAchievements]';
-            }
-        },
-
-        bind: {
-            value: function bind(action) {
-                this.rebind('click', function() {
-                    if (action) {
-                        switch (action[0]) {
-                            case '/':
-                                loadSubPage(action);
-                                break;
-
-                            case '~':
-                                var fn = action.substr(1);
-                                if (typeof window[fn] === 'function') {
-                                    if (fn.toLowerCase().indexOf('dialog') > 0) {
-                                        closeDialog();
-                                    }
-                                    window[fn]();
-                                }
-                                break;
-                        }
-                    }
-                    return false;
-                });
-            }
-        },
-
-        prettify: {
-            value: function prettify(maf) {
-                var data  = Object(clone(maf.u));
-                var quota = {
-                    storage: {base: 0, current: 0, max: 0},
-                    transfer: {base: 0, current: 0, max: 0}
-                };
-
-                var setExpiry = function(data, out) {
-                    var time = String(data[2]).split('');
-                    var unit = time.pop();
-                    time = time.join('') | 0;
-
-                    if (time === 1 && unit === 'y') {
-                        time = 12;
-                        unit = 'm';
-                    }
-
-                    var result = {
-                        unit: unit,
-                        value: time
-                    };
-
-                    switch (unit) {
-                        case 'd': result.utxt = (time < 2) ? l[930]   : l[16290];  break;
-                        case 'w': result.utxt = (time < 2) ? l[16292] : l[16293];  break;
-                        case 'm': result.utxt = (time < 2) ? l[913]   : l[6788];   break;
-                        case 'y': result.utxt = (time < 2) ? l[932]   : l[16294];  break;
-                    }
-
-                    out = out || data;
-                    out.expiry = result;
-                    return result;
-                };
-
-                Object.keys(data)
-                    .forEach(function(k) {
-                        setExpiry(data[k]);
-                    });
-
-                var mafr = Object(maf.r);
-                var mafa = Object(maf.a);
-                var alen = mafa.length;
-                while (alen--) {
-                    var ach = clone(mafa[alen]);
-
-                    if (!data[ach.a]) {
-                        data[ach.a] = Object(clone(mafr[ach.r]));
-                        setExpiry(data[ach.a]);
-                    }
-                    var exp = setExpiry(mafr[ach.r] || data[ach.a], ach);
-                    var ts = ach.ts * 1000;
-
-                    ach.date = new Date(ts);
-                    ach.left = Math.round((ach.e * 1000 - Date.now()) / 86400000);
-
-                    if (data[ach.a].rwds) {
-                        data[ach.a].rwds.push(ach);
-                    }
-                    else if (data[ach.a].rwd) {
-                        data[ach.a].rwds = [data[ach.a].rwd, ach];
-                    }
-                    else {
-                        data[ach.a].rwd = ach;
-                    }
-                }
-
-                Object.keys(data)
-                    .forEach(function(k) {
-                        var ach = data[k];
-                        var base = 0;
-                        var rwds = ach.rwds || [ach.rwd];
-                        for (var i = rwds.length; i--;) {
-                            var rwd = rwds[i];
-
-                            if (rwd && rwd.left > 0) {
-                                base++;
-                                if (ach[1]) {
-                                    quota.transfer.current += ach[1];
-                                }
-                                quota.storage.current += ach[0];
-                            }
-                        }
-
-                        if (ach[1]) {
-                            quota.transfer.max += ach[1] * (base || 1);
-                        }
-                        quota.storage.max += ach[0] * (base || 1);
-                    });
-
-                if (Object(u_attr).p) {
-                    quota.storage.base  = Object(M.account).space;
-                    quota.transfer.base = Object(M.account).bw;
-                }
-                else {
-                    quota.storage.base = maf.s;
-                }
-
-                data = Object.create(quota, Object.getOwnPropertyDescriptors(data));
-
-                return data;
-            }
-        }
-    })
-});
-
-(function(o) {
-    var map = {
-        /*  1 */ 'WELCOME':     'ach-create-account:/register',
-        /*  2 */ 'TOUR':        'ach-take-tour',
-        /*  3 */ 'INVITE':      'ach-invite-friend:~inviteFriendDialog',
-        /*  4 */ 'SYNCINSTALL': 'ach-install-megasync:/sync',
-        /*  5 */ 'APPINSTALL':  'ach-install-mobile-app:/mobile',
-        /*  6 */ 'VERIFYE164':  'ach-verify-number',
-        /*  7 */ 'GROUPCHAT':   'ach-group-chat:/fm/chat',
-        /*  8 */ 'FOLDERSHARE': 'ach-share-folder:/fm/contacts'
-    };
-    var mapToAction = Object.create(null);
-    var mapToElement = Object.create(null);
-
-    Object.keys(map).forEach(function(k, idx) {
-        Object.defineProperty(o, 'ACH_' + k, {
-            value: idx + 1,
-            enumerable: true
-        });
-
-        var tmp = map[k].split(':');
-        mapToAction[idx + 1] = tmp[1];
-        mapToElement[idx + 1] = tmp[0];
-    });
-
-    Object.defineProperty(o, 'mapToAction', {
-        value: Object.freeze(mapToAction)
-    });
-    Object.defineProperty(o, 'mapToElement', {
-        value: Object.freeze(mapToElement)
-    });
-
-    Object.freeze(o);
-})(mega.achievem);
 
 
 // jscs:disable

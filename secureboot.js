@@ -1662,6 +1662,7 @@ else if (!b_u)
         jsl.push({f:'js/megaDbEncryptionPlugin.js', n: 'megadbenc_js', j:1,w:5});
         jsl.push({f:'js/megaDb.js', n: 'megadb_js', j:1,w:5});
         jsl.push({f:'js/idbkvstorage.js', n: 'idbkvstorage_js', j: 1, w: 5});
+        jsl.push({f:'js/achievements.js', n: 'achievements_js', j: 1, w: 5});
 
         jsl.push({f:'js/tlvstore.js', n: 'tlvstore_js', j:1});
         jsl.push({f:'js/vendor/jsbn.js', n: 'jsbn_js', j:1, w:2});

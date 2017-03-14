@@ -336,6 +336,53 @@ delay.cancel = function(aProcID) {
     return false;
 };
 
+
+var isNativeObject = function(obj) {
+    var objConstructorText = obj.constructor.toString();
+    return objConstructorText.indexOf("[native code]") !== -1 && objConstructorText.indexOf("Object()") === -1;
+};
+
+function clone(obj) {
+
+    if (typeof obj !== 'object' || obj === null) {
+        return obj;
+    }
+    if (obj instanceof Date) {
+        return new Date(obj.getTime());
+    }
+    if (Array.isArray(obj)) {
+        var arr = new Array(obj.length);
+        for (var i = obj.length; i--; ) {
+            arr[i] = clone(obj[i]);
+        }
+        return arr;
+    }
+    if (obj instanceof Object) {
+        var copy = {};
+        for (var attr in obj) {
+            if (obj.hasOwnProperty(attr)) {
+                if (!(obj[attr] instanceof Object)) {
+                    copy[attr] = obj[attr];
+                }
+                else if (Array.isArray(obj[attr])) {
+                    copy[attr] = clone(obj[attr]);
+                }
+                else if (!isNativeObject(obj[attr])) {
+                    copy[attr] = clone(obj[attr]);
+                }
+                else if ($.isFunction(obj[attr])) {
+                    copy[attr] = obj[attr];
+                }
+                else {
+                    copy[attr] = {};
+                }
+            }
+        }
+
+        return copy;
+    }
+}
+
 function jScrollFade(id) {
     if (is_selenium) {
         return;
@@ -484,8 +531,10 @@ function megatitle(nperc) {
 }
 
 function populate_l() {
+    var i;
+
     if (d) {
-        for (var i = 24000 ; i-- ;) {
+        for (i = 24000; i--;) {
             l[i] = (l[i] || '(translation-missing)');
         }
     }
@@ -631,20 +680,26 @@ function populate_l() {
     l[12487] = l[12487].replace('[A2]', '<a href="" class="red linux">').replace('[/A2]', '</a>');
     l[12488] = l[12488].replace('[A]', '<a>').replace('[/A]', '</a>').replace('[BR]', '<br>');
     l[12489] = l[12489].replace('[I]', '<i>').replace('[/I]', '</i>').replace('[I]', '<i>').replace('[/I]', '</i>');
-    l[15536] = l[15536].replace('[B]', '<b>').replace('[/B]', '</b>');
-    l[16106] = l[16106].replace('[B]', '<b>').replace('[/B]', '</b>');
-    l[16107] = l[16107].replace('[S]', '<span>').replace('[/S]', '</span>');
-    l[16116] = l[16116].replace('[S]', '<span>').replace('[/S]', '</span>');
-    l[16119] = l[16119].replace('[S]', '<span>').replace('[/S]', '</span>');
-    l[16120] = l[16120].replace('[S]', '<span>').replace('[/S]', '</span>');
-    l[16123] = l[16123].replace('[S]', '<span>').replace('[/S]', '</span>').replace('[A]', '<a href="/pro">').replace('[/A]', '</a>').replace('[BR]', '<br />');
-    l[16124] = l[16124].replace('[S]', '<span>').replace('[/S]', '</span>').replace('[A]', '<a href="/pro">').replace('[/A]', '</a>').replace('[BR]', '<br />');
-    l[16135] = l[16135].replace('[BR]', '<br />');
-    l[16136] = l[16136].replace('[A]', '<a href="/pro">').replace('[/A]', '</a>');
-    l[16137] = l[16137].replace('[A]', '<a href="/pro">').replace('[/A]', '</a>');
-    l[16138] = l[16138].replace('[A]', '<a href="/pro">').replace('[/A]', '</a>');
     l[16165] = l[16165].replace('[S]', '<a class="red">').replace('[/S]', '</a>').replace('[BR]', '<br/>');
     l[16167] = l[16167].replace('[S]', '<a href="/mobile" class="clickurl">').replace('[/S]', '</a>');
+    l[16310] = escapeHTML(l[16310]).replace('[I]', '<i class="semi-small-icon rocket"></i>');
+
+    var common = [
+        15536, 16106, 16107, 16116, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138,
+        16303, 16304, 16313, 16315, 16316,
+    ];
+    for (i = common.length; i--;) {
+        var num = common[i];
+
+        l[num] = escapeHTML(l[num])
+            .replace(/\[S\]/g, '<span>')
+            .replace(/\[\/S\]/g, '</span>')
+            .replace(/\[BR\]/g, '<br/>')
+            .replace(/\[B\]/g, '<b>')
+            .replace(/\[\/B\]/g, '</b>')
+            .replace(/\[A\]/g, '<a href="/pro">')
+            .replace(/\[\/A\]/g, '</a>');
+    }
 
     l['year'] = new Date().getFullYear();
     date_months = [

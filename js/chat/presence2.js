@@ -28,7 +28,7 @@
 // presence.ui_setpersist(active)
 // (call this when the user checks/unchecks the persist-if-offline setting)
 
-// updateuicb(presencelevel, autoawaycheckmark, autoawaytimeout, overridecheckmark)
+// updateuicb(presence, autoaway, autoawaylock, autoawaytimeout, persist, persistlock)
 // when this callback is invoked, update the UI accordingly
 
 // prefschangedcb(changed)
@@ -615,8 +615,7 @@ UserPresence.prototype.ui_setpersist = function presence_ui_setpersist(persist) 
 // signal user activity (reset auto-away timer and set ONLINE/DND flags)
 UserPresence.prototype.ui_signalactivity = function presence_ui_signalactivity(force) {
     var timeout = !this.persist
-                && this.presence != UserPresence.PRESENCE.OFFLINE
-                && this.presence != UserPresence.PRESENCE.AWAY
+                && this.presence == UserPresence.PRESENCE.ONLINE
                 && this.autoawaytimeout
                 && this.autoawayactive;
 
@@ -667,16 +666,13 @@ UserPresence.prototype.autoaway = function presence_autoaway(self) {
 
 // update UI with the current internal state
 UserPresence.prototype.updateui = function presence_updateui() {
+    // adjust visual UI status according to the current constellation
     this.updateuicb(this.presence,
-                    this.autoawayactive
-                        && !this.persist
-                        && this.presence != UserPresence.PRESENCE.OFFLINE
-                        && this.presence != UserPresence.PRESENCE.AWAY,
-                    this.presence == UserPresence.PRESENCE.OFFLINE
-                    || this.presence == UserPresence.PRESENCE.AWAY,
+                    this.autoawayactive && !this.persist,
+                    false,
                     this.autoawaytimeout,
                     this.persist || this.presence == UserPresence.PRESENCE.OFFLINE,
-                    this.presence == UserPresence.PRESENCE.OFFLINE);
+                    false);
 };
 
 if (false && PRESENCE2_DEBUG) {

@@ -506,6 +506,10 @@ UserPresence.prototype.sendstring = function presence_sendstring(s) {
 
 // must be called with the binary representation of the userid delta
 UserPresence.prototype.sendpeerupdate = function presence_sendpeerupdate(peerstring, del) {
+    if (peerstring === '') {
+        return;
+    }
+
     var num = peerstring.length / 8;
 
     peerstring = (del ? "\5" : "\4") // opcode

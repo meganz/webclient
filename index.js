@@ -1399,12 +1399,6 @@ function topmenuUI() {
     // Show version in top menu
     $('.top-mega-version').text('v. ' + mega.utils.getSiteVersion());
 
-    // Show achievements if enabled
-    mega.achievem.enabled()
-        .done(function() {
-            $('.top-icon.achievements').show();
-        });
-
     if (u_type) {
         $('.top-menu-item.logout,.top-menu-item.backup').removeClass('hidden');
         $('.top-menu-item.account').removeClass('hidden');
@@ -1416,6 +1410,12 @@ function topmenuUI() {
         $('.create-account-button').hide();
         $('.membership-status-block').show();
         $('.top-icon.notification').show();
+
+        // Show the rocket icon if achievements are enabled
+        mega.achievem.enabled()
+            .done(function() {
+                $('.top-icon.achievements').show();
+            });
 
         // If a Lite/Pro plan has been purchased
         if (u_attr.p) {

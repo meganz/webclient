@@ -293,7 +293,7 @@ PresencedIntegration.prototype._peerstatuscb = function(user_hash, presence, isW
     else {
         // unknown contact, add it to the contact list.
         M.u.set(
-            contactHash,
+            user_hash,
             new MegaDataObject(MEGA_USER_STRUCT, true, {
                 'h': user_hash,
                 'u': user_hash,

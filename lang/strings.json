@@ -15796,7 +15796,7 @@
         "context": "A dialog message that informs the user that their cloud storage is full."
     },
     "16304": {
-        "text": "[A]Upgrade now[\/A] and keep enjoying secure, end-to-end encrypted cloud storage.\r\nPRO accounts get [S]up to 4 TB (4000 GB) of storage[\/S] and 8 TB of transfers bandwidth that they can share with users downloading their files.",
+        "text": "[A]Upgrade now[\/A] and keep enjoying secure, end-to-end encrypted cloud storage.\r\nPRO accounts get [S]up to 4 TB (4096 GB) of storage[\/S] and 8 TB of transfer quota that they can share with users downloading their files.",
         "context": "A dialog message indicating what you can get with a PRO plan. Please leave the placeholders [A], [\/A], [S], [\/S] as they are."
     },
     "16305": {
@@ -15840,11 +15840,11 @@
         "context": "A dialog message that informs the user that he can get more storage\/transfer quota by completing achievements."
     },
     "16315": {
-        "text": "[S]Cloud Drive is full.[\/S] Upgrade now to a PRO account and get [S]up to 4TB (4000 GB)[\/S] of cloud storage space.",
+        "text": "[S]Cloud Drive is full.[\/S] [A]Upgrade now[\/A] to a PRO account and get [S]up to 4TB (4096 GB)[\/S] of cloud storage space.",
         "context": "A message informing the user that they\u2019ve reached the full capacity of their Cloud Drive for a Free account. Please leave [S], [\/S] as it is which is used to bolden the text."
     },
     "16316": {
-        "text": "[S]Cloud Drive is almost full.[\/S] [A]Upgrade now[\/A] to a PRO account and get [S]up to 4TB (4000 GB)[\/S] of cloud storage space.",
+        "text": "[S]Cloud Drive is almost full.[\/S] [A]Upgrade now[\/A] to a PRO account and get [S]up to 4TB (4096 GB)[\/S] of cloud storage space.",
         "context": "Informs the user that they\u2019ve almost reached the full capacity of their Cloud Drive for a Free account. Please leave the [S], [\/S], [A], [\/A] placeholders as they are."
     },
     "16317": {
@@ -15922,5 +15922,97 @@
     "16336": {
         "text": "(Bonus expires in [S]%1[\/S] %2)",
         "context": ""
+    },
+    "16337": {
+        "text": "Storage Quota earned",
+        "context": "The header of a block which contains information about the storage quota bonus the user has already received for completed achievements."
+    },
+    "16339": {
+        "text": "Transfer Quota earned",
+        "context": "The header of a block which contains information about the transfer quota bonus the user has already received for completed achievements."
+    },
+    "16341": {
+        "text": "[B]Get 50 GBs free storage[\/B] when you create an account with us. For the full featured experience, download our app or use the site on a PC.",
+        "context": "An introductory sentence on the homepage of the mobile web site. It implies that the best experience comes from using the mobile apps, or the website when viewed on a PC\/desktop rather than a phone."
+    },
+    "16342": {
+        "text": "Link",
+        "context": "A button on the mobile web site to create a public link."
+    },
+    "16343": {
+        "text": "Enter your email",
+        "context": "This line is used as placeholder text on a login form input."
+    },
+    "16344": {
+        "text": "Enter your password",
+        "context": "This is used as placeholder text on the mobile web login form."
+    },
+    "16345": {
+        "text": "Log in",
+        "context": "An action button on the mobile web site which will sign the user into the website."
+    },
+    "16346": {
+        "text": "The folder you are trying to view is no longer available.",
+        "context": "A message in an error dialog in the mobile web site. This error can occur when the folder link is removed or the link is subject to a takedown notice."
+    },
+    "16347": {
+        "text": "File deleted",
+        "context": "A toast notification which is shown on the mobile web site to say that the file has been deleted successfully."
+    },
+    "16348": {
+        "text": "Failed to copy, try copying manually.",
+        "context": "A toast message which is shown when the process to copy the public link failed. It asks the user to manually copy the link text."
+    },
+    "16349": {
+        "text": "Invalid email and\/or password.",
+        "context": "An error message which is shown in a dialog in the mobile web site. This tells the user either that their email address, password or both were incorrect."
+    },
+    "16350": {
+        "text": "Please try again.",
+        "context": "A message on an error dialog asking the user to try their last action again. E.g. try logging in again."
+    },
+    "16351": {
+        "text": "The email was re-sent successfully.",
+        "context": "A dialog message to say that the registration confirmation email was sent again successfully to the user (for a second time)"
+    },
+    "16352": {
+        "text": "Register for bonuses",
+        "context": "A button label which informs the user that they can get transfer quota bonuses after registration."
+    },
+    "16353": {
+        "text": "See our plans",
+        "context": "A button label which leads to page where the user can buy a PRO plan."
+    },
+    "16354": {
+        "text": "Learn more",
+        "context": "A link which leads to the help center where the user can get more information."
+    },
+    "16355": {
+        "text": "Tip: This limit can be dynamic and depends on the amount of unused bandwidth we have available.",
+        "context": "An information message about limited transfer quota."
+    },
+    "16356": {
+        "text": "Your queued download exceeds the current transfer quota available for your account and may therefore be interrupted.",
+        "context": "An information message about limited transfer quota."
+    },
+    "16357": {
+        "text": "Your queued download exceeds the current transfer quota available for your IP address and therefore may be interrupted.",
+        "context": "An information message about limited transfer quota."
+    },
+    "16358": {
+        "text": "[S]Cloud Drive is full.[\/S] [A]Upgrade now[\/A] and get [S]up to 4TB (4096 GB)[\/S] of cloud storage space.",
+        "context": "A message informing the user that they\u2019ve reached the full capacity of their Cloud Drive. It informs the user the maximum amount of storage space they can get by upgrading."
+    },
+    "16359": {
+        "text": "[S]Cloud Drive is almost full.[\/S] [A]Upgrade now[\/A] and get [S]up to 4TB (4096 GB)[\/S] of cloud storage space.",
+        "context": "A message informing the user that they\u2019ve nearly reached the full capacity of their Cloud Drive (i.e. not quite reached their limit yet). It informs the user the maximum amount of storage space they can get by upgrading."
+    },
+    "16360": {
+        "text": "You've reached the full capacity of your Cloud Drive.",
+        "context": "A dialog message that informs the user that their cloud storage is full"
+    },
+    "16361": {
+        "text": "[A]Upgrade now[\/A] and don't worry about running out of storage.",
+        "context": "Informs the user that their storage is almost full and it is time for the user to consider upgrading. This message is intended for users who are already PRO, so does not mention PRO accounts."
     }
 }

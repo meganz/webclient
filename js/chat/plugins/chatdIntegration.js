@@ -774,6 +774,7 @@ ChatdIntegration._ensureNamesAreLoaded = function(users) {
                     })
                 );
                 M.syncUsersFullname(userId);
+                megaChat.processNewUser(userId);
             }
             else {
                 M.syncUsersFullname(userId);

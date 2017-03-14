@@ -511,6 +511,7 @@ var GenericConversationMessage = React.createClass({
                                 'm': contact.email ? contact.email : contactEmail,
                                 'c': 0
                             }));
+                            megaChat.processNewUser(userId);
                         }
                         else if (M.u[contact.u] && !M.u[contact.u].m) {
                             // if already added from group chat...add the email, 

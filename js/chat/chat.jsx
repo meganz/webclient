@@ -1269,6 +1269,7 @@ Chat.prototype.openChat = function(jids, type, chatId, chatShard, chatdUrl, setA
                     })
                 );
                 M.syncUsersFullname(contactHash);
+                self.processNewUser(contactHash);
             }
         });
     }

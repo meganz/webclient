@@ -1015,7 +1015,7 @@ var ConversationPanel = React.createClass({
 
 
         // turn on/off auto scroll to bottom.
-        if (isAtBottom === true) {
+        if (ps.isCloseToBottom(30) === true) {
             self.scrolledToBottom = true;
         }
         else {
@@ -1125,10 +1125,7 @@ var ConversationPanel = React.createClass({
             }
         }
         else if (
-            self.props.chatRoom.messagesBuff.joined === true && (
-                self.props.chatRoom.messagesBuff.messages.length === 0 ||
-                !self.props.chatRoom.messagesBuff.haveMoreHistory()
-            )
+            self.props.chatRoom.messagesBuff.joined === true
         ) {
             delete self.loadingShown;
             var headerText = (

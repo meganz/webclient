@@ -1164,6 +1164,13 @@ mega.achievem.parseAccountAchievements = function parseAccountAchievements() {
         $('.achievements-block .data-block.transfer .baseq').addClass('hidden');
     }
 
+    $('.account.data-block .btn-achievements')
+        .removeClass('hidden')
+        .rebind('click', function() {
+            $('.account.tab-lnk.achievements').trigger('click');
+            return false;
+        });
+
     $('.account.plan-info.bandwidth .plan-comment')
         .text(l[16300]
             .replace('%1', bytesToSize(transferBaseQuota, 0))

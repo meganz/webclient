@@ -3660,6 +3660,7 @@ function accountUI() {
                             $('.account.data-block .btn-cancel').removeClass('hidden').rebind('click', function() {
                                 cancelSubscriptionDialog.init();
                             });
+                            $('.account.data-block .btn-achievements').addClass('hidden');
                         }
                     }
                 });

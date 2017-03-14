@@ -24972,7 +24972,6 @@ div.camera-bottom-txt {
     float: none;
 }
 .account.progress-list {
-    display: table;
     padding: 15px 0 14px 0;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -25189,6 +25188,7 @@ div.camera-bottom-txt {
     display: block;
     padding-top: 40px;
     padding-left: 0;
+    margin: 0;
 }
 .achievements-status-header {
     font-size: 18px;

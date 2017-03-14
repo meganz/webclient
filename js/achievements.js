@@ -385,7 +385,7 @@ mega.achievem.achievementsListDialog = function achievementsListDialog(close) {
                 }
 
                 if (data.rwd && idx !== ach.ACH_INVITE) {
-                    $cell.addClass('achived');
+                    $cell.addClass('achieved');
 
                     locFmt = l[16336].replace('[S]', '<span>').replace('[/S]', '</span>');
                     if (!data.rwd.e) {

@@ -456,7 +456,7 @@
     display: inline-block;
     min-width: 126px;
 }
-.achived .achievement-dialog.status-block .button {
+.achieved .achievement-dialog.status-block .button {
     display: none;
 }
 .achievement-dialog.achieved-icon {
@@ -464,17 +464,17 @@
     line-height: 0;
     display: none;
 }
-.achived .achievement-dialog.achieved-icon {
+.achieved .achievement-dialog.achieved-icon {
     display: block;
 }
-.one-reward .achievement-dialog.right-block, .achived .achievement-dialog.right-block {
+.one-reward .achievement-dialog.right-block, .achieved .achievement-dialog.right-block {
     vertical-align: middle;
     padding: 0 15px 0 15px;
 }
 .one-reward .achievement-dialog.right-block .reward {
     margin: 0px 0 4px 10px;
 }
-.one-reward .right-block .reward.bandwidth, .achived .achievement-dialog.right-block .reward {
+.one-reward .right-block .reward.bandwidth, .achieved .achievement-dialog.right-block .reward {
     display: none;
 }
 /* End of Achievements list dialog */

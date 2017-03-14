@@ -270,24 +270,25 @@ PresencedIntegration.prototype._peerstatuscb = function(user_hash, presence, isW
     self._is_webrtc[user_hash] = isWebrtcFlag;
 
     var contact = M.u[user_hash];
-    if (contact) {
-        var status;
-        if (presence === UserPresence.PRESENCE.OFFLINE) {
-            status = 'offline';
-        }
-        else if (presence === UserPresence.PRESENCE.AWAY) {
-            status = 'away';
-        }
-        else if (presence === UserPresence.PRESENCE.DND) {
-            status = 'dnd';
-        }
-        else if (presence === UserPresence.PRESENCE.ONLINE) {
-            status = 'available';
-        }
-        else {
-            status = 'unavailable';
-        }
+    var status;
+    if (presence === UserPresence.PRESENCE.OFFLINE) {
+        status = 'offline';
+    }
+    else if (presence === UserPresence.PRESENCE.AWAY) {
+        status = 'away';
+    }
+    else if (presence === UserPresence.PRESENCE.DND) {
+        status = 'dnd';
+    }
+    else if (presence === UserPresence.PRESENCE.ONLINE) {
+        status = 'available';
+    }
+    else {
+        status = 'unavailable';
+    }
 
+
+    if (contact) {
         contact.presence = status;
     }
     else {
@@ -301,6 +302,8 @@ PresencedIntegration.prototype._peerstatuscb = function(user_hash, presence, isW
                 'c': 0
             })
         );
+        contact = M.u[user_hash];
+        contact.presence = status;
         M.syncUsersFullname(user_hash);
     }
 
@@ -373,14 +376,8 @@ PresencedIntegration.prototype.addContact = function(u_h) {
 PresencedIntegration.prototype.removeContact = function(u_h) {
     this.logger.debug("removeContact", u_h);
 
-    if (
-        this.userPresence.connectionRetryManager.getConnectionState()
-        ===
-        ConnectionRetryManager.CONNECTION_STATE.CONNECTED
-    ) {
-        this.userPresence.addremovepeers([u_h], true);
-        this._peerstatuscb(u_h, UserPresence.PRESENCE.OFFLINE, false);
-    }
+    this.userPresence.addremovepeers([u_h], true);
+    this._peerstatuscb(u_h, UserPresence.PRESENCE.OFFLINE, false);
 };
 
 PresencedIntegration.prototype.getPresence = function(u_h) {

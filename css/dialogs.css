@@ -460,16 +460,14 @@
     display: none;
 }
 .achievement-dialog.achieved-icon {
-    font-size: 18px;
-    color: #31B500;
-    line-height: 26px;
-    text-transform: uppercase;
+    font-size: 0;
+    line-height: 0;
     display: none;
 }
 .achived .achievement-dialog.achieved-icon {
     display: block;
 }
-.one-reward .achievement-dialog.right-block {
+.one-reward .achievement-dialog.right-block, .achived .achievement-dialog.right-block {
     vertical-align: middle;
     padding: 0 15px 0 15px;
 }

@@ -367,13 +367,7 @@ PresencedIntegration.prototype.setPresence = function(presence) {
 PresencedIntegration.prototype.addContact = function(u_h) {
     this.logger.debug("addContact", u_h);
 
-    if (
-        this.userPresence.connectionRetryManager.getConnectionState()
-            ===
-        ConnectionRetryManager.CONNECTION_STATE.CONNECTED
-    ) {
-        this.userPresence.addremovepeers([u_h]);
-    }
+    this.userPresence.addremovepeers([u_h]);
 };
 
 PresencedIntegration.prototype.removeContact = function(u_h) {

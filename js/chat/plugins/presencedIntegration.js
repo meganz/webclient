@@ -290,6 +290,19 @@ PresencedIntegration.prototype._peerstatuscb = function(user_hash, presence, isW
 
         contact.presence = status;
     }
+    else {
+        // unknown contact, add it to the contact list.
+        M.u.set(
+            contactHash,
+            new MegaDataObject(MEGA_USER_STRUCT, true, {
+                'h': user_hash,
+                'u': user_hash,
+                'm': '',
+                'c': 0
+            })
+        );
+        M.syncUsersFullname(user_hash);
+    }
 
     $(self).trigger(
         'onPeerStatus',

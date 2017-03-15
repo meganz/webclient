@@ -29,11 +29,11 @@ Object.defineProperty(mega, 'achievem', {
 
                             case '~':
                                 var fn = action.substr(1);
-                                if (typeof window[fn] === 'function') {
+                                if (typeof mega.achievem[fn] === 'function') {
                                     if (fn.toLowerCase().indexOf('dialog') > 0) {
                                         closeDialog();
                                     }
-                                    window[fn]();
+                                    mega.achievem[fn]();
                                 }
                                 break;
                         }
@@ -1037,15 +1037,15 @@ mega.achievem.parseAccountAchievements = function parseAccountAchievements() {
                             }
                         }
                         else {
-                            /* re-enable once the invite status dialog is brought back
-                             if (base) {
-                             ach.bind.call($transferItem, '~invitationStatusDialog');
-                             $transferItem
-                             .css('cursor', 'pointer')
-                             .attr('title',
-                             l[16285].replace('%1', base));
-                             }
-                             */
+                            if (base) {
+                                ach.bind.call($transferItem, '~invitationStatusDialog');
+                                 /* re-enable once the invite status dialog is brought back
+                                  $transferItem
+                                  .css('cursor', 'pointer')
+                                  .attr('title',
+                                  l[16285].replace('%1', base));
+                                  */
+                            }
                         }
                     }
 
@@ -1084,15 +1084,15 @@ mega.achievem.parseAccountAchievements = function parseAccountAchievements() {
                             $storageItem.addClass('achieved');
                         }
 
-                        /* re-enable once the invite status dialog is brought back
-                         if (base) {
-                         ach.bind.call($storageItem, '~invitationStatusDialog');
-                         $storageItem
-                         .css('cursor', 'pointer')
-                         .attr('title',
-                         l[16285].replace('%1', base));
-                         }
-                         */
+                        if (base) {
+                            ach.bind.call($storageItem, '~invitationStatusDialog');
+                             /* re-enable once the invite status dialog is brought back
+                              $storageItem
+                              .css('cursor', 'pointer')
+                              .attr('title',
+                              l[16285].replace('%1', base));
+                              */
+                        }
                     }
                 }
                 else if (data.rwd) {
@@ -1147,7 +1147,7 @@ mega.achievem.parseAccountAchievements = function parseAccountAchievements() {
 
     // For free users only show base quota for storage and remove it for bandwidth.
     // For pro users replace base quota by pro quota
-    var $baseq = $('.achievements-block .data-block.storage .baseq');
+    var $baseq = $('.achievements-block .data-block.storage .baseq').addClass('achieved');
     storageBaseQuota = maf.storage.base;
     $('.progress-txt', $baseq).text(bytesToSize(storageBaseQuota, 0));
 

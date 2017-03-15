@@ -275,7 +275,7 @@ var ConversationRightArea = React.createClass({
                         {endCallButton}
 
                         {
-                            <div className={"link-button red " + (dontShowTruncateButton ? "disabled" : "")}
+                            <div className={"link-button " + (dontShowTruncateButton ? "disabled" : "")}
                                  onClick={(e) => {
                                      if ($(e.target).closest('.disabled').size() > 0) {
                                          return false;
@@ -284,7 +284,7 @@ var ConversationRightArea = React.createClass({
                                         self.props.onTruncateClicked();
                                      }
                             }}>
-                                <i className="small-icon rounded-stop"></i>
+                                <i className="small-icon clear-arrow"></i>
                                 {__(l[8871])}
                             </div>
                         }
@@ -738,6 +738,7 @@ var ConversationPanel = React.createClass({
             messagesToggledInCall: false,
             sendContactDialog: false,
             confirmDeleteDialog: false,
+            pasteImageConfirmDialog: false,
             messageToBeDeleted: null,
             editing: false
         };
@@ -918,6 +919,15 @@ var ConversationPanel = React.createClass({
                     }
                 });
             }
+        }
+
+        if (self.isMounted() && self.$messages && self.isComponentEventuallyVisible()) {
+            $(window).rebind('pastedimage.chatRoom', function (e, blob, fileName) {
+                if (self.isMounted() && self.$messages && self.isComponentEventuallyVisible()) {
+                    self.setState({'pasteImageConfirmDialog': [blob, fileName, URL.createObjectURL(blob)]});
+                    e.preventDefault();
+                }
+            });
         }
     },
     handleWindowResize: function(e, scrollToBottom) {
@@ -1404,7 +1414,6 @@ var ConversationPanel = React.createClass({
                 });
             }
 
-            var selected = [];
             sendContactDialog = <ModalDialogsUI.SelectContactDialog
                 megaChat={room.megaChat}
                 chatRoom={room}
@@ -1414,10 +1423,7 @@ var ConversationPanel = React.createClass({
                     self.setState({'sendContactDialog': false});
                     selected = [];
                 }}
-                onSelected={(nodes) => {
-                    selected = nodes;
-                }}
-                onSelectClicked={() => {
+                onSelectClicked={(selected) => {
                     self.setState({'sendContactDialog': false});
 
                     room.attachContacts(selected);
@@ -1489,6 +1495,48 @@ var ConversationPanel = React.createClass({
                 </div>
             </ModalDialogsUI.ConfirmDialog>
         }
+
+        var pasteImageConfirmDialog = null;
+        if (self.state.pasteImageConfirmDialog) {
+            confirmDeleteDialog = <ModalDialogsUI.ConfirmDialog
+                megaChat={room.megaChat}
+                chatRoom={room}
+                title={__("Confirm paste")}
+                name="paste-image-chat"
+                onClose={() => {
+                    self.setState({'pasteImageConfirmDialog': false});
+                }}
+                onConfirmClicked={() => {
+                    var meta = self.state.pasteImageConfirmDialog;
+                    if (!meta) {
+                        return;
+                    }
+
+                    M.addUpload([meta[0]]);
+
+                    self.setState({
+                        'pasteImageConfirmDialog': false
+                    });
+                }}
+            >
+                <div className="fm-dialog-content">
+
+                    <div className="dialog secondary-header">
+                        {__("Please confirm that you want to upload this image and share it in this chat room.")}
+                    </div>
+
+                    <img src={self.state.pasteImageConfirmDialog[2]} style={{
+                        maxWidth: "90%",
+                        height: "auto",
+                        margin: '10px auto',
+                        display: 'block',
+                        border: '1px solid #ccc',
+                        borderRadius: '4px'
+                    }} />
+                </div>
+            </ModalDialogsUI.ConfirmDialog>
+        }
+
 
         var confirmTruncateDialog = null;
         if (self.state.truncateDialog === true) {
@@ -1898,7 +1946,7 @@ var ConversationPanels = React.createClass({
 
         var conversations = [];
 
-        if (window.location.hash === "#fm/chat") {
+        if (getSitePath() === "/fm/chat") {
             // do we need to "activate" an conversation?
             var activeFound = false;
             self.props.conversations.forEach(function (chatRoom) {

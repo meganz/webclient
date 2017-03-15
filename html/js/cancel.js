@@ -42,7 +42,7 @@
         $.dialog = self.opt.dlgName;
 
         // Button close account listener
-        $(self.opt.dialogClass + ' .fm-dialog-button.close-account').rebind('click', function(e) {
+        $(self.opt.dialogClass + ' .close-account').rebind('click', function(e) {
 
             loadingDialog.show();
 
@@ -69,9 +69,9 @@
         });
 
         // Cancel button listener
-        $(self.opt.dialogClass + ' .fm-dialog-button.cancel').rebind('click', function() {
+        $(self.opt.dialogClass + ' .cancel').rebind('click', function() {
             loadingDialog.hide();
-            document.location.hash = 'fm/account';
+            loadSubPage('fm/account');
         });
 
         // Keyboard button listener <Enter key>
@@ -80,18 +80,18 @@
             var key = e.wich || e.keyCode;
 
             if (key === 13) {
-                $(self.opt.dialogClass + ' .fm-dialog-button.close-account').click();
+                $(self.opt.dialogClass + ' .close-account').click();
             }
         });
     };
 
     /**
      * _accountClosure, closes account
-     * 
+     *
      * @param {string} url code
      * @param {string} email
      * @param {string} hash
-     * 
+     *
      */
     AccountClosure.prototype._accountClosure = function(code, email, hash) {
         var self = this;
@@ -106,12 +106,12 @@
             if (code === 0) {
                 // Account successfully canceled/deleted
                 msgDialog('warninga', l[6188], l[6189], '', function() {
-                    document.location.hash = 'login';
+                    loadSubPage('login');
                 });
             }
             else if (code === EEXPIRED || code === ENOENT) {
                 msgDialog('warninga', l[6184], l[6185], '', function() {
-                    document.location.hash = 'fm/account';
+                    loadSubPage('fm/account');
                 });
             }
         }}, code, email, hash);
@@ -119,9 +119,9 @@
 
     /**
      * _getEmail, query server for email using given url code
-     * 
+     *
      * @param {callback} on success call this function
-     * 
+     *
      */
     AccountClosure.prototype._getEmail = function(_handleFeedbackCallback, callback_obj) {
         var self = this;
@@ -132,13 +132,13 @@
                     if (res === EEXPIRED) {
                         loadingDialog.hide();
                         msgDialog('warninga', l[6184], l[6185], '', function() {
-                            document.location.hash = 'fm/account';
+                            loadSubPage('fm/account');
                         });
                     }
                     else {
                         loadingDialog.hide();
                         msgDialog('warninga', l[6186], l[6187], '', function() {
-                            document.location.hash = 'fm/account';
+                            loadSubPage('fm/account');
                         });
                     }
                 }
@@ -158,7 +158,7 @@
         u_logout(true);
         closeDialog();
         $('.reset-success-st3').removeClass('active');
-        document.location.hash = 'login';
+        loadSubPage('login');
         document.location.reload();
     };
 
@@ -186,9 +186,9 @@
         else if (btnId === 'res6_div') {
             text = "MEGA has under-delivered on its promise";
         }
-        
+
         comment = $('.feedback-textarea-bl textarea').val();
-        
+
         return text + ' | ' + comment;
     };
 
@@ -200,7 +200,7 @@
     };
 
     AccountClosure.prototype._handleFeedback = function(_accountClosureCallback, obj) {
-        
+
         // Reset feedback dialog to default state
         $(obj.opt.fbDlgClass + ' .radioOn').attr('class', 'radioOff');
         $(obj.opt.fbDlgClass + ' .radio-txt').removeClass('active');
@@ -215,7 +215,7 @@
         $.dialog = obj.opt.fbDlgName;
 
         // Send feedback button listener
-        $(obj.opt.fbDlgClass + ' .fm-dialog-button.feedback-submit').rebind('click', function() {
+        $(obj.opt.fbDlgClass + ' .feedback-submit').rebind('click', function() {
 
             obj.opt.feedbackText = obj._prepareJsonString(obj._gatherFeedback());
             api_req({'a': 'clog', 't': obj.opt.fbType, 'd': obj.opt.feedbackText});
@@ -223,20 +223,20 @@
             if (_accountClosureCallback) {
                 _accountClosureCallback(obj.opt.code, obj.opt.email, obj.opt.secret.toString());
             }
-            
+
             obj._deleteLeftovers();
         });
 
         // Cancel button listener
-        $(obj.opt.fbDlgClass + ' .fm-dialog-button.cancel').rebind('click', function() {
+        $(obj.opt.fbDlgClass + ' .cancel').rebind('click', function() {
 
             obj.opt.feedbackText = obj._prepareJsonString("User did NOT provide feedback.");
             api_req({'a': 'clog', 't': obj.opt.fbType, 'd': obj.opt.feedbackText});
-            
+
             if (_accountClosureCallback) {
                 _accountClosureCallback(obj.opt.code, obj.opt.email, obj.opt.secret.toString());
             }
-            
+
             obj._deleteLeftovers();
         });
 
@@ -246,7 +246,7 @@
             var key = e.wich || e.keyCode;
 
             if (key === 13) {
-                $(obj.opt.fbDlgClass + ' .fm-dialog-button.feedback-button').click();
+                $(obj.opt.fbDlgClass + ' .feedback-button').click();
             }
         });
 

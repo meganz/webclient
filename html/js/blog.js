@@ -134,7 +134,7 @@ function blog_load() {
         blogcontent += blog_pager();
         $('.blog-new-left').safeHTML(blogcontent);
         $('.blog-new-read-more, .blog-new-item img, .blog-new-item h2').rebind('click', function() {
-            location.hash = '#blog_' + $(this).parents('.blog-new-item').data('blogid');
+            loadSubPage('blog_' + $(this).parents('.blog-new-item').data('blogid'));
         });
         $('.blog-pagination-button').rebind('click', function() {
             var c = $(this).attr('class');
@@ -232,7 +232,7 @@ function blog_searchmath(post, keyword) {
 
 
 function blog_search() {
-    document.location.hash = '#blogsearch/' + encodeURIComponent($('#blog_searchinput').val());
+    loadSubPage('blogsearch/' + encodeURIComponent($('#blog_searchinput').val()));
 }
 
 function blog_month(t) {
@@ -260,12 +260,13 @@ function blog_archive() {
         if (blogmonths.hasOwnProperty(mm)) {
             mm = escapeHTML(mm);
             var y = ' ' + mm.split('_')[0] + ' ';
-            blogarchive += '<a href="#blog_' + mm + '" class="blog-new-archive-lnk">'
+            blogarchive += '<a href="/blog_' + mm + '" class="blog-new-archive-lnk clickurl">'
                 + date_months[parseInt(mm.split('_')[1]) - 1]
                 + y + ' <span class="blog-archive-number">' + escapeHTML(blogmonths[mm]) + '</span></a>';
         }
     }
     $('#blog_archive').safeHTML(blogarchive);
+    clickURLs();
 }
 
 
@@ -336,7 +337,7 @@ var eventHandlers = [
 ];
 
 if (typeof mobileblog !== 'undefined') {
-    var blogid = document.location.hash.substr(1).replace('blog_', '');
+    var blogid = getSitePath().substr(1).replace('blog_', '');
     unsigned_blogposts(function() {
 
         var i = "post_" + blogid;
@@ -354,8 +355,8 @@ if (typeof mobileblog !== 'undefined') {
             '<div class="main-content-block blog-new">' +
                 '<div class="blog-new-full empty-bottom">' +
                     '<h2 id="blogarticle_title">' + escapeHTML(blogposts[i].h) + '</h2>' +
-                    '<a href="#blog_22" id="blog_prev" class="blog-new-forward" style="opacity: 0.4;"></a>' +
-                    '<a href="#blog_21" id="blog_next" class="blog-new-back active" style="opacity: 1;"></a>' +
+                    '<a href="/blog_22" id="blog_prev" class="blog-new-forward clickurl" style="opacity: 0.4;"></a>' +
+                    '<a href="/blog_21" id="blog_next" class="blog-new-back clickurl active" style="opacity: 1;"></a>'+
                     '<div class="clear"></div>' +
                     '<div class="blog-new-small" id="blogarticle_date">' + blogdate + '</div>' +
                     '<div class="blog-new-date-div"></div>' +
@@ -375,6 +376,8 @@ if (typeof mobileblog !== 'undefined') {
         // XXX: This is ran on mobile devices with no access to $.safeHTML(), thus quick&dirty workaround
         document.body.innerHTML = markup.replace(/<\/?(?:html\:)?script[^>]*?>/gi, '')
             .replace(RegExp(' (' + eventHandlers.join("|") + ')', 'g'), ' data-dummy');
+
+        clickURLs();
 
         if (window.android) {
             document.body.className = 'android blog';

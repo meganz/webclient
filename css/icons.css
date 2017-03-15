@@ -1,7 +1,7 @@
-.tiny-icon, .small-icon, .medium-icon, .semi-big-icon, .big-icon {
+.tiny-icon, .semi-small-icon, .small-icon, .medium-icon, .semi-big-icon, .big-icon, .huge-icon {
     width: 20px;
     height: 20px;
-    background-image: url(../images/mega/new-chat-sprite-v3.svg);
+    background-image: url(../images/mega/new-chat-sprite-v5.svg);
     background-repeat: no-repeat;
     background-position: -2px -1446px;
     display: inline-block;
@@ -12,7 +12,7 @@
     height: 184px;
     margin: 21px auto;
     display: block;
-    background-image: url(../images/mega/new-chat-sprite-v3.svg);
+    background-image: url(../images/mega/new-chat-sprite-v5.svg);
     background-repeat: no-repeat;
     background-position: center -1838px;
 }
@@ -29,10 +29,10 @@
     opacity: 0.6;
 }
 .link-button.red > .small-icon {
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
-    -moz-opacity: 0.8;
-    -khtml-opacity: 0.8;
-    opacity: 0.8;
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
+    -moz-opacity: 0.7;
+    -khtml-opacity: 0.7;
+    opacity: 0.7;
 }
 .link-button:not(.disabled):hover > .small-icon, .link-button.active > .small-icon, .link-button.red:hover > .small-icon, .link-button.red.active > .small-icon {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
@@ -43,6 +43,10 @@
 .tiny-icon {
     width: 12px;
     height: 16px;
+}
+.semi-small-icon {
+    width: 18px;
+    height: 18px;
 }
 .medium-icon {
     width: 28px;
@@ -55,6 +59,10 @@
 .big-icon {
     width: 48px;
     height: 48px;
+}
+.huge-icon {
+    width: 140px;
+    height: 140px;
 }
 .white-medium-plus {
     background-position: -2px -1447px;
@@ -114,7 +122,10 @@
     background-position: -3px -462px;
 }
 .small-icon.writing-pen {
-    background-position: -3px -347px;
+    background-position: -53px -347px;
+}
+.small-icon.clear-arrow {
+    background-position: -83px -1400px;
 }
 .small-icon.quotes {
     background-position: -3px -389px;
@@ -184,50 +195,33 @@
     background-position: -2px -3200px;
 }
 .small-icon.smile-icon {
-    background-position: -32px -3200px;
+    background-position: -34px -3200px;
 }
-.small-icon.sun-icon {
-    background-position: -62px -3200px;
+.small-icon.leaf-icon {
+    background-position: -66px -3200px;
 }
-.small-icon.wineglass-icon {
-    background-position: -92px -3200px;
+.small-icon.cutlery-icon  {
+    background-position: -98px -3200px;
 }
-.small-icon.present-icon {
-    background-position: -122px -3200px;
+.small-icon.ball-icon {
+    background-position: -130px -3200px;
 }
 .small-icon.bowling-ball-icon {
-    background-position: -152px -3200px;
+    background-position: -162px -3200px;
 }
-.small-icon.earth-icon {
-    background-position: -182px -3200px;
-}
-.small-icon.percents-icon {
-    background-position: -212px -3200px;
-}
-.square-button.active .small-icon.clock-icon {
+.small-icon.car-icon {
     background-position: -2px -3230px;
 }
-.square-button.active .small-icon.smile-icon {
-    background-position: -32px -3230px;
+.small-icon.bulb-icon {
+    background-position: -34px -3230px;
 }
-.square-button.active .small-icon.sun-icon {
-    background-position: -62px -3230px;
+.small-icon.heart-icon {
+    background-position: -66px -3230px;
 }
-.square-button.active .small-icon.wineglass-icon {
-    background-position: -92px -3230px;
+.small-icon.flag-icon {
+    background-position: -98px -3230px;
 }
-.square-button.active .small-icon.present-icon {
-    background-position: -122px -3230px;
-}
-.square-button.active .small-icon.bowling-ball-icon {
-    background-position: -152px -3230px;
-}
-.square-button.active .small-icon.earth-icon {
-    background-position: -182px -3230px;
-}
-.square-button.active .small-icon.percents-icon {
-    background-position: -212px -3230px;
-}
+
 .dropdown-item .small-icon.rounded-grey-plus {
     background-position: -3px -3131px;
 }
@@ -254,6 +248,9 @@
 }
 .dropdown-item .small-icon.grey-chain {
     background-position: -3px -2761px;
+}
+.dropdown-item .small-icon.writing-pen {
+    background-position: -3px -347px;
 }
 .dropdown-item:hover .small-icon.conversations {
     background-position: -3px -3092px;
@@ -306,6 +303,18 @@
 .dropdown-item:hover .small-icon.play-icon {
     background-position: -2px -1193px;
 }
+.dropdown-item .small-icon.audio-call {
+    background-position: -104px -38px;
+}
+.dropdown-item:hover .small-icon.audio-call {
+    background-position: -154px -38px;
+}
+.dropdown-item .small-icon.video-call {
+    background-position: -104px -74px;
+}
+.dropdown-item:hover .small-icon.video-call {
+    background-position: -154px -74px;
+}
 .dashed-conversation {
     background-position: 1px -1644px;
 }
@@ -313,7 +322,7 @@
     width: 32px;
     height: 32px;
     display: block;
-    background-image: url(../images/mega/new-chat-sprite-v3.svg);
+    background-image: url(../images/mega/new-chat-sprite-v5.svg);
     background-repeat: no-repeat;
     -moz-border-radius: 100%;
     -webkit-border-radius: 100%;
@@ -443,7 +452,496 @@
     vertical-align: top;
 }
 .big-90px-icon.speedometer {
-    background-image: url(../images/mega/dialogs-sprite_v11.svg);
+    background-image: url(../images/mega/dialogs-sprite_v12.svg);
     background-repeat: no-repeat;
     background-position: center -5633px;
 }
+.small-icon.membership {
+    background-image: url(../images/mega/top-login-sprite_v7.png);
+    background-repeat: no-repeat;
+    background-position: center -2094px;
+    position: relative;
+    height: 22px;
+}
+.small-icon.membership.pro4 {
+    background-position: center -2124px;
+}
+.small-icon.membership.pro1 {
+    background-position: center -2154px;
+}
+.small-icon.membership.pro2 {
+    background-position: center -2184px;
+}
+.small-icon.membership.pro3 {
+    background-position: center -2214px;
+}
+.tiny-icon.cog {
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-position: -17px -10463px;
+}
+.medium-icon.rocket {
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-position: -10px -10781px;
+}
+.medium-icon.down-arrow {
+    background-image: url(../images/mega/megacmd-sprite.png);
+    background-position: 0 -79px;
+    width: 18px;
+}
+.huge-white-icon.achievement {
+    background-image: url(../images/mega/account-sprite.png);
+    width: 72px;
+    height: 72px;
+}
+.huge-white-icon.achievement.ach-create-account {
+    background-position: 0 -86px;
+}
+.huge-white-icon.achievement.ach-install-megasync {
+    background-position: -104px -86px;
+}
+.huge-white-icon.achievement.ach-install-mobile-app {
+    background-position: 0 -175px;
+}
+.huge-white-icon.achievement.ach-take-tour {
+    background-position: -104px -175px;
+}
+.huge-white-icon.achievement.ach-verify-number {
+    background-position: 0 -264px;
+}
+.huge-white-icon.achievement.ach-invite-friend {
+    background-position: -104px -264px;
+}
+.huge-white-icon.achievement.ach-group-chat {
+    background-position: 0 -353px;
+}
+.huge-white-icon.achievement.ach-share-folder {
+    background-position: -104px -353px;
+}
+.big-icon.cloud {
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-position: 0px -10734px;
+}
+.big-icon.speedometer {
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-position: 0px -10684px;
+}
+.semi-big-icon.cloud-up {
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-position: -7px -10390px;
+}
+.semi-big-icon.cloud-down {
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-position: -7px -10420px;
+}
+.medium-icon.cloud {
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-position: -11px -10817px;
+    width: 24px;
+    height: 24px;
+}
+.medium-icon.speedometer {
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-position: -11px -10851px;
+    width: 24px;
+    height: 24px;
+}
+.small-icon.grey-chain {
+    background-position: -3px -2971px;
+}
+.small-icon.grey-plus {
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-position: -14px -10991px;
+}
+.semi-small-icon.file {
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-position: -4px -11021px;
+}
+.semi-small-icon.folder {
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-position: -4px -11047px;
+}
+.semi-small-icon.left-arrow {
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-position: -29px -11019px;
+}
+.semi-small-icon.right-arrow {
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-position: -29px -11045px;
+}
+.semi-small-icon.rubbish {
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-position: -4px -11073px;
+}
+.semi-small-icon.rubbish-arrows {
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-position: -3px -11073px;
+}
+.semi-small-icon.linked {
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-position: -28px -11071px;
+}
+.semi-small-icon.star {
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-position: -4px -11097px;
+}
+.semi-small-icon.cloud {
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-position: -3px -11895px;
+}
+.semi-small-icon.down-arrow {
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-position: -29px -11895px;
+}
+.semi-small-icon.left-arrow-with-dot {
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-position: -2px -11916px;
+}
+.semi-small-icon.circle {
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-position: -3px -11937px;
+}
+.huge-icon.achievement {
+    background-image: url(../images/mega/big-achievements.png);
+}
+.ach-create-account .huge-icon.achievement {
+    background-position: -2px 6px;
+}
+.ach-install-megasync .huge-icon.achievement {
+    background-position: -152px 6px;
+}
+.ach-install-mobile-app .huge-icon.achievement {
+    background-position: -302px 6px;
+}
+.ach-take-tour .huge-icon.achievement {
+    background-position: -2px -144px;
+}
+.ach-invite-friend .huge-icon.achievement {
+    background-position: -152px -144px;
+}
+.ach-verify-number .huge-icon.achievement {
+    background-position: -302px -144px;
+}
+.ach-group-chat .huge-icon.achievement {
+    background-position: -2px -294px;
+}
+.ach-share-folder .huge-icon.achievement {
+    background-position: -152px -294px;
+}
+.green-tick .huge-icon.achievement {
+    background-position: -2px -444px;
+}
+.semi-big-icon.cloud {
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-position: -9px -11163px;
+}
+.exceeded .semi-big-icon.cloud {
+    background-position: -9px -11234px;
+}
+.semi-big-icon.speedometer {
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-position: -9px -11128px;
+}
+.exceeded .semi-big-icon.speedometer {
+    background-position: -9px -11199px;
+}
+.semi-small-icon.tick {
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-position: -15px -11322px;
+}
+.semi-small-icon.dots {
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-position: -15px -11288px;
+}
+.semi-small-icon.rounded-arrow {
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-position: -15px -11363px;
+}
+.semi-small-icon.exclamation-point {
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-position: -15px -11404px;
+}
+.tiny-icon.membership-status {
+    background-image: url(../images/mega/top-sprite_v2.png);
+    background-position: -10px -979px;
+    width: 16px;
+}
+.tiny-icon.membership-status.lite {
+    background-position: -10px -999px;
+}
+.tiny-icon.membership-status.pro1 {
+    background-position: -10px -1019px;
+}
+.tiny-icon.membership-status.pro2 {
+    background-position: -10px -1039px;
+}
+.tiny-icon.membership-status.pro3 {
+    background-position: -10px -1059px;
+}
+.semi-small-icon.grey-mega {
+    background-image: url(../images/mega/top-sprite_v2.png);
+    background-position: -10px -326px;
+}
+.semi-small-icon.yellow-triangle {
+    background-image: url(../images/mega/top-sprite_v2.png);
+    background-position: -10px -1266px;
+}
+.small-icon.dark-grey-plus {
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-position: -14px -11545px;
+}
+.small-icon.small-red-cross {
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-position: -14px -11624px;
+}
+.small-icon.file-upload {
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-position: -14px -11585px;
+}
+.small-icon.folder-upload {
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-position: -14px -11705px;
+}
+.small-icon.import-to-cloud {
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-position: -13px -4701px;
+}
+.small-icon.download-as-zip {
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-position: -13px -4733px;
+}
+.small-icon.pause-icon {
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-position: -14px -11505px;
+}
+.small-icon.play-icon {
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-position: -13px -11745px;
+}
+.small-icon.refresh-icon {
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-position: -14px -11665px;
+}
+/* Context menu icons */
+.small-icon.context {
+    background-image: url(../images/mega/icons-sprite.png);
+}
+.small-icon.context.standart-download {
+    background-position: -1px -499px;
+}
+.small-icon.context.download-as-zip {
+    background-position: -101px -499px;
+}
+.small-icon.context.labels {
+    background-position: -101px -99px;
+}
+.small-icon.context.download {
+    background-position: -101px -138px;
+}
+.small-icon.context.get-link {
+    background-position: -200px -133px;
+    width: 22px;
+    margin: 0 13px 1px -1px;
+}
+.small-icon.context.remove-link {
+    background-position: -200px -165px;
+    width: 22px;
+    margin: 0 13px 1px -1px;
+}
+.small-icon.context.share {
+    background-position: -99px -172px;
+    width: 23px;
+    margin: 0 12px 1px -1px;
+}
+.small-icon.context.conversation {
+    background-position: -1px -146px;
+}
+.small-icon.context.handset {
+    background-position: -1px -333px;
+}
+.small-icon.context.videocam {
+    background-position: -1px -365px;
+}
+.small-icon.context.writing-pen {
+    background-position: -202px -226px;
+}
+.small-icon.context.position-arrows {
+    background-position: -200px -258px;
+    width: 22px;
+    margin: 0 13px 1px -1px;
+}
+.small-icon.context.cloned-files {
+    background-position: -202px -288px;
+    height: 24px;
+}
+.small-icon.context.plus {
+    background-position: -201px -391px;
+}
+.small-icon.context.file-upload {
+    background-position: -201px -429px;
+}
+.small-icon.context.folder-upload {
+    background-position: -201px -461px;
+}
+.small-icon.context.remove-to-bin {
+    background-position: -200px -322px;
+    width: 22px;
+    margin: 0 13px 1px -1px;
+}
+.small-icon.context.loupe {
+    background-position: -102px 1px;
+}
+.small-icon.context.open-folder {
+    background-position: -202px -32px;
+}
+.small-icon.context.info {
+    background-position: -202px -71px;
+}
+.small-icon.context.heart {
+    background-position: -202px -499px;
+}
+.small-icon.context.broken-heart {
+    background-position: -202px -103px;
+}
+.small-icon.context.leave-share {
+    background-position: -100px -539px;
+}
+.small-icon.context.red-cross {
+    background-position: -102px -212px;
+}
+.small-icon.context.pause {
+    background-position: -1px -39px;
+}
+.small-icon.context.play {
+    background-position: -1px 1px;
+}
+.small-icon.context.move-up {
+    background-position: -1px -78px;
+}
+.small-icon.context.move-down {
+    background-position: -1px -110px;
+}
+.small-icon.context.small-refresh {
+    background-position: -202px 2px;
+}
+.small-icon.context.network-diagnostic {
+    background-position: -201px -538px;
+}
+.small-icon.context.aim {
+    background-position: -100px -60px;
+    width: 22px;
+    height: 22px;
+    margin: 0 13px 1px -1px;
+}
+.small-icon.context.cloud {
+    background-position: -102px -30px;
+}
+.small-icon.context.folder-item {
+    background-position: -100px -291px;
+}
+.small-icon.context.shared-folder-item {
+    background-position: -100px -331px;
+}
+/* hovers*/
+.dropdown-item:hover .small-icon.context.standart-download {
+    background-position: -41px -499px;
+}
+.dropdown-item:hover .small-icon.context.download-as-zip {
+    background-position: -141px -499px;
+}
+.dropdown-item:hover .small-icon.context.labels, .dropdown-item.opened .small-icon.context.labels {
+    background-position: -141px -99px;
+}
+.dropdown-item:hover .small-icon.context.download, .dropdown-item.opened .small-icon.context.download {
+    background-position: -141px -138px;
+}
+.dropdown-item:hover .small-icon.context.get-link {
+    background-position: -240px -133px;
+}
+.dropdown-item:hover .small-icon.context.remove-link {
+    background-position: -240px -165px;
+}
+.dropdown-item:hover .small-icon.context.share {
+    background-position: -139px -172px;
+}
+.dropdown-item:hover .small-icon.context.conversation {
+    background-position: -41px -146px;
+}
+.dropdown-item:hover .small-icon.context.handset {
+    background-position: -41px -333px;
+}
+.dropdown-item:hover .small-icon.context.videocam {
+    background-position: -41px -365px;
+}
+.dropdown-item:hover .small-icon.context.writing-pen {
+    background-position: -242px -226px;
+}
+.dropdown-item:hover .small-icon.context.position-arrows, .dropdown-item.opened .small-icon.context.position-arrows {
+    background-position: -240px -258px;
+}
+.dropdown-item:hover .small-icon.context.cloned-files {
+    background-position: -242px -288px;
+}
+.dropdown-item:hover .small-icon.context.plus {
+    background-position: -241px -391px;
+}
+.dropdown-item:hover .small-icon.context.file-upload {
+    background-position: -241px -429px;
+}
+.dropdown-item:hover .small-icon.context.folder-upload {
+    background-position: -241px -461px;
+}
+.dropdown-item:hover .small-icon.context.remove-to-bin {
+    background-position: -240px -322px;
+}
+.dropdown-item:hover .small-icon.context.loupe {
+    background-position: -142px 1px;
+}
+.dropdown-item:hover .small-icon.context.open-folder {
+    background-position: -242px -32px;
+}
+.dropdown-item:hover .small-icon.context.info {
+    background-position: -242px -71px;
+}
+.dropdown-item:hover .small-icon.context.heart {
+    background-position: -242px -499px;
+}
+.dropdown-item:hover .small-icon.context.broken-heart {
+    background-position: -242px -103px;
+}
+.dropdown-item:hover .small-icon.context.red-cross {
+    background-position: -142px -212px;
+}
+.dropdown-item:hover .small-icon.context.pause {
+    background-position: -41px -39px;
+}
+.dropdown-item:hover .small-icon.context.play {
+    background-position: -41px 1px;
+}
+.dropdown-item:hover .small-icon.context.move-up {
+    background-position: -41px -78px;
+}
+.dropdown-item:hover .small-icon.context.move-down {
+    background-position: -41px -110px;
+}
+.dropdown-item:hover .small-icon.context.small-refresh {
+    background-position: -242px 2px;
+}
+.dropdown-item:hover .small-icon.context.network-diagnostic {
+    background-position: -241px -538px;
+}
+.dropdown-item:hover .small-icon.context.leave-share {
+    background-position: -140px -539px;
+}
+.dropdown-item:hover .small-icon.context.aim {
+    background-position: -140px -60px;
+}
+.dropdown-item:hover .small-icon.context.cloud, .dropdown-item.opened .small-icon.context.cloud {
+    background-position: -142px -30px;
+}
+.dropdown-item:hover .small-icon.context.folder-item, .dropdown-item.opened .small-icon.context.folder-item {
+    background-position: -140px -291px;
+}
+.dropdown-item:hover .small-icon.context.shared-folder-item, .dropdown-item.opened .small-icon.context.shared-folder-item {
+    background-position: -140px -331px;
+}
+/* End of Context menu icons */

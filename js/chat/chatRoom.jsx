@@ -62,7 +62,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
     this.callIsActive = false;
     this.shownMessages = {};
     this.attachments = new MegaDataMap(this);
-    this.images = new MegaDataSortedMap("k", "delay", this);
+    this.images = new MegaDataSortedMap("id", "delay", this);
 
     this.options = {
 
@@ -234,7 +234,7 @@ ChatRoom.STATE = {
     'LEFT': 250
 };
 
-ChatRoom.prototype._retrieveTurnServerFromLoadBalancer = function() {
+ChatRoom.prototype._retrieveTurnServerFromLoadBalancer = function(timeout) {
     var self = this;
 
     var $promise = new MegaPromise();
@@ -244,7 +244,10 @@ ChatRoom.prototype._retrieveTurnServerFromLoadBalancer = function() {
     if (self.megaChat.rtc && self.megaChat.rtc.ownAnonId) {
         anonId = self.megaChat.rtc.ownAnonId;
     }
-    $.get("https://" + self.megaChat.options.loadbalancerService + "/?service=turn&anonid=" + anonId)
+    $.ajax("https://" + self.megaChat.options.loadbalancerService + "/?service=turn&anonid=" + anonId, {
+        method: "GET",
+        timeout: timeout ? timeout : 10000
+    })
         .done(function(r) {
             if (r.turn && r.turn.length > 0) {
                 var servers = [];
@@ -668,7 +671,7 @@ ChatRoom.prototype.destroy = function(notifyOtherDevices, noRedirect) {
         mc.chats.remove(roomJid);
 
         if (!noRedirect) {
-            window.location = '#fm/chat';
+            loadSubPage('fm/chat');
         }
     });
 };
@@ -723,7 +726,12 @@ ChatRoom.prototype.isActive = function() {
 };
 
 ChatRoom.prototype.setActive = function() {
-    window.location = this.getRoomUrl();
+    // We need to delay this, since it can get called BY openFolder and it would then call again openFolder, which
+    // would cause .currentdirid to not be set correctly.
+    var self = this;
+    Soon(function() {
+        loadSubPage(self.getRoomUrl());
+    });
 };
 
 
@@ -733,11 +741,11 @@ ChatRoom.prototype.getRoomUrl = function() {
         var participants = self.getParticipantsExceptMe();
         var contact = self.megaChat.getContactFromJid(participants[0]);
         if (contact) {
-            return "#fm/chat/" + contact.u;
+            return "fm/chat/" + contact.u;
         }
     }
     else if (self.type === "group") {
-            return "#fm/chat/g/" + self.roomJid.split("@")[0];
+            return "fm/chat/g/" + self.roomJid.split("@")[0];
     }
     else {
         throw new Error("Can't get room url for unknown room type.");
@@ -750,7 +758,7 @@ ChatRoom.prototype.getRoomUrl = function() {
 ChatRoom.prototype.activateWindow = function() {
     var self = this;
 
-    window.location = self.getRoomUrl();
+    loadSubPage(self.getRoomUrl());
 };
 
 /**
@@ -839,6 +847,7 @@ ChatRoom.prototype.appendMessage = function(message) {
 
     self.shownMessages[message.messageId] = true;
 
+    self.megaChat.updateDashboard();
     //self.trackDataChange();
 };
 
@@ -925,6 +934,8 @@ ChatRoom.prototype.sendMessage = function(message, meta) {
 ChatRoom.prototype._sendMessageToTransport = function(messageObject) {
     var self = this;
     var megaChat = this.megaChat;
+
+    megaChat.trigger('onBeforeSendMessage', messageObject);
 
     var messageMeta = messageObject.getMeta() ? messageObject.getMeta() : {};
     if (messageMeta.isDeleted && messageMeta.isDeleted === true) {

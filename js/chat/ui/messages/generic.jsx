@@ -271,7 +271,7 @@ var GenericConversationMessage = React.createClass({
 
                     var files = [];
 
-                    attachmentMeta.forEach(function(v) {
+                    attachmentMeta.forEach(function(v, attachmentKey) {
                         var startDownload = function() {
                             M.addDownload([v]);
                         };
@@ -325,7 +325,7 @@ var GenericConversationMessage = React.createClass({
                             if (v.fa && (icon === "graphic" || icon === "image")) {
                                 var imagesListKey = message.messageId + "_" + v.h;
                                 if (!chatRoom.images.exists(imagesListKey)) {
-                                    v.k = imagesListKey;
+                                    v.id = imagesListKey;
                                     v.delay = message.delay;
                                     chatRoom.images.push(v);
                                 }
@@ -405,9 +405,11 @@ var GenericConversationMessage = React.createClass({
                                         delay('thumbnails', fm_thumbnails, 90);
                                     }
                                     src = window.noThumbURI || '';
+
+                                    v.imgId = "thumb" + message.messageId + "_" + attachmentKey + "_" + v.h;
                                 }
 
-                                preview =  (src ? (<div id={v.h} className="shared-link img-block">
+                                preview =  (src ? (<div id={v.imgId} className="shared-link img-block">
                                     <div className="img-overlay" onClick={startPreview}></div>
                                     <div className="button overlay-button" onClick={startPreview}>
                                         <i className="huge-white-icon loupe"></i>
@@ -533,7 +535,7 @@ var GenericConversationMessage = React.createClass({
                                         icon="human-profile"
                                         label={__(l[5868])}
                                         onClick={() => {
-                                            window.location = "#fm/" + contact.u;
+                                            loadSubPage("fm/" + contact.u);
                                         }}
                                     />
                                     <hr/>
@@ -541,14 +543,14 @@ var GenericConversationMessage = React.createClass({
                                      icon="rounded-grey-plus"
                                      label={__(l[8631])}
                                      onClick={() => {
-                                     window.location = "#fm/" + contact.u;
+                                     loadSubPage("fm/" + contact.u);
                                      }}
                                      />*/}
                                     <DropdownsUI.DropdownItem
                                         icon="conversations"
                                         label={__(l[8632])}
                                         onClick={() => {
-                                            window.location = "#fm/chat/" + contact.u;
+                                            loadSubPage("fm/chat/" + contact.u);
                                         }}
                                     />
                                     {deleteButtonOptional ? <hr /> : null}
@@ -720,9 +722,12 @@ var GenericConversationMessage = React.createClass({
 
                 var messageDisplayBlock;
                 if (self.state.editing === true) {
+                    var msgContents = message.textContents ? message.textContents : message.contents;
+                    msgContents = megaChat.plugins.emoticonsFilter.fromUtfToShort(msgContents);
+
                     messageDisplayBlock = <TypingAreaUI.TypingArea
                         iconClass="small-icon writing-pen textarea-icon"
-                        initialText={message.textContents ? message.textContents : message.contents}
+                        initialText={msgContents}
                         chatRoom={self.props.message.chatRoom}
                         showButtons={true}
                         className="edit-typing-area"
@@ -736,7 +741,11 @@ var GenericConversationMessage = React.createClass({
 
                             if (self.props.onEditDone) {
                                 Soon(function() {
-                                    self.props.onEditDone(messageContents);
+                                    var tmpMessageObj = {
+                                        'contents': messageContents
+                                    };
+                                    megaChat.plugins.emoticonsFilter.processOutgoingMessage({}, tmpMessageObj);
+                                    self.props.onEditDone(tmpMessageObj.contents);
                                     self.forceUpdate();
                                 });
                             }
@@ -914,7 +923,7 @@ var GenericConversationMessage = React.createClass({
                         icon = <i className={"small-icon " + button.icon}></i>;
                     }
                     buttons.push(
-                        <div className={classes} key={k}  onClick={(() => { button.callback(); })}>
+                        <div className={classes} key={k}  onClick={((e) => { button.callback.call(e.target); })}>
                             {icon}
                             {button.text}
                         </div>

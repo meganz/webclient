@@ -33,15 +33,15 @@ var Secureboot = function() {
                 if (line.trim().match(/^(\}.+)?(if|else)/)) {
                     /* We must break the group, there is an if */
                     if (line.trim().match(/^if/)) {
-                        lines.push('jsl.push({f:"\0.js"})');
+                        lines.push('jsl.push({f:"\0.jsx"})');
                     }
                     line = line.replace(/else(\s*if)?/, 'if (true)');
                     line = line.replace(/\(.+\)/, '(true)');
                 }
                 lines.push(line);
                 // detect any } OR } // comment to break the current group
-                if (line.trim() == "}" || line.trim().indexOf("} //") !== -1) {
-                    lines.push('jsl.push({f:"\0.js"})');
+                if (line.trim()[0] == "}") {
+                    lines.push('jsl.push({f:"\0.jsx"})');
                 }
             }
         }
@@ -197,13 +197,13 @@ var Secureboot = function() {
 
     ns.getJS = function() {
         return jsl.filter(function(f) {
-            return f.f.match(/js$/);
+            return f.f.match(/jsx?$/);
         });
     };
 
     ns.getCSS = function() {
         return jsl.filter(function(f) {
-            return f.f.match(/css$/);
+            return f.f.match(/(?:css|jsx)$/);
         });
     };
 
@@ -219,12 +219,17 @@ var Secureboot = function() {
         var groups = [];
         var size = 0;
         this.getCSS().forEach(function(f) {
-            if (size > fileLimit) {
-                size = 0;
+            if (f.f == "\0.jsx") {
                 groups.push(null);
+                size = 0;
+            } else {
+                if (size > fileLimit) {
+                    size = 0;
+                    groups.push(null);
+                }
+                groups.push(f.f);
+                size += fs.statSync(f.f)['size'];
             }
-            groups.push(f.f);
-            size += fs.statSync(f.f)['size'];
         });
         groups.push(null);
 
@@ -280,7 +285,7 @@ var Secureboot = function() {
         var groups = [];
         var size = 0;
         this.getJS().forEach(function(f) {
-            if (f.f == "\0.js") {
+            if (f.f == "\0.jsx") {
                 groups.push(null);
                 size = 0;
             } else {

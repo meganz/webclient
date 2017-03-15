@@ -1399,7 +1399,7 @@ CallManager.prototype.startCall = function(chatRoom, mediaOptions) {
         chatRoom.callSession.endCall();
     }
 
-    var $promise = chatRoom._retrieveTurnServerFromLoadBalancer();
+    var $promise = chatRoom._retrieveTurnServerFromLoadBalancer(4000);
 
     $promise.always(function() {
         var req = chatRoom.megaChat.rtc.startMediaCall(participants[0], mediaOptions);

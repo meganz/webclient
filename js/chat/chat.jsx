@@ -3,6 +3,7 @@ var ReactDOM = require("react-dom");
 var ConversationsUI = require("./ui/conversations.jsx");
 var ChatRoom = require('./chatRoom.jsx');
 
+var EMOJI_DATASET_VERSION = 1;
 
 var chatui;
 var webSocketsSupport = typeof(WebSocket) !== 'undefined';
@@ -19,7 +20,7 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
             if (!megaChat.chats[roomOrUserHash + "@conference." + megaChat.options.xmppDomain]) {
                 // chat not found
                 setTimeout(function () {
-                    window.location = '#fm/chat';
+                    loadSubPage('fm/chat');
                     M.openFolder('chat');
                 }, 100);
                 return;
@@ -28,7 +29,7 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
         else {
             if (!M.u[roomOrUserHash]) {
                 setTimeout(function () {
-                    window.location = '#fm/chat';
+                    loadSubPage('fm/chat');
                     M.openFolder('chat');
                 }, 100);
                 return;
@@ -146,8 +147,7 @@ var Chat = function() {
         'xmppDomain': xmppDomain,
         'loadbalancerService': 'gelb.karere.mega.nz',
         'fallbackXmppServers': [
-             "https://xmpp270n001.karere.mega.nz/ws",
-             "https://xmpp270n002.karere.mega.nz/ws"
+             "https://xmpp.karere.mega.nz/ws",
         ],
         'rtcSession': {
             'crypto': {
@@ -198,32 +198,7 @@ var Chat = function() {
             iceServers:[
                 // {urls: ['stun:stun.l.google.com:19302']},
                 {
-                    urls: ['turn:trn270n001.karere.mega.nz:3478?transport=udp'],   // Luxembourg
-                    username: "inoo20jdnH",
-                    credential: '02nNKDBkkS'
-                },
-                {
-                    urls: ['turn:trn270n002.karere.mega.nz:3478?transport=udp'],   // Luxembourg
-                    username: "inoo20jdnH",
-                    credential: '02nNKDBkkS'
-                },
-                {
-                    urls: ['turn:trn302n001.karere.mega.nz:3478?transport=udp'],   // Montreal, Canada
-                    username: "inoo20jdnH",
-                    credential: '02nNKDBkkS'
-                },
-                {
-                    urls: ['turn:trn302n002.karere.mega.nz:3478?transport=udp'],   // Montreal, Canada
-                    username: "inoo20jdnH",
-                    credential: '02nNKDBkkS'
-                },
-                {
-                    urls: ['turn:trn530n002.karere.mega.nz:3478?transport=udp'],   // NZ
-                    username: "inoo20jdnH",
-                    credential: '02nNKDBkkS'
-                },
-                {
-                    urls: ['turn:trn530n003.karere.mega.nz:3478?transport=udp'],   // NZ
+                    urls: ['turn:trn.karere.mega.nz:3478?transport=udp'],   // Luxembourg
                     username: "inoo20jdnH",
                     credential: '02nNKDBkkS'
                 }
@@ -241,8 +216,8 @@ var Chat = function() {
             'emoticonShortcutsFilter': EmoticonShortcutsFilter,
             'emoticonsFilter': EmoticonsFilter,
             'callFeedback': CallFeedback,
-            'karerePing': KarerePing,
-            'persistedTypeArea': PersistedTypeArea
+            'karerePing': KarerePing
+            // 'persistedTypeArea': PersistedTypeArea
         },
         'chatNotificationOptions': {
             'textMessages': {
@@ -484,16 +459,16 @@ Chat.prototype.init = function() {
     
 
     // UI events
-    $(document.body).undelegate('.top-user-status-item', 'mousedown.megachat');
+    $(document.body).undelegate('.top-user-status-popup .tick-item', 'mousedown.megachat');
 
-    $(document.body).delegate('.top-user-status-item', 'mousedown.megachat', function() {
+    $(document.body).delegate('.top-user-status-popup .tick-item', 'mousedown.megachat', function(e) {
         var presence = $(this).data("presence");
         self._myPresence = presence;
 
         localStorage.megaChatPresence = presence;
         localStorage.megaChatPresenceMtime = unixtime();
 
-        $('.top-user-status-popup').removeClass("active");
+        $('.top-user-status-popup').addClass("hidden");
 
         if (self.karere.getConnectionState() != Karere.CONNECTION_STATE.CONNECTED && presence != Karere.PRESENCE.OFFLINE) {
             self.karere._myPresence = presence;
@@ -505,7 +480,6 @@ Chat.prototype.init = function() {
                     shard.reconnect();
                 });
             });
-            return true;
         }
         else {
             if (presence === Karere.PRESENCE.OFFLINE) {
@@ -524,9 +498,11 @@ Chat.prototype.init = function() {
         }
     });
 
-    $(window).unbind('hashchange.megaChat' + this.instanceId);
+    if (this._pageChangeListener) {
+        mBroadcaster.removeListener(this._pageChangeListener)
+    }
     var lastOpenedRoom = null;
-    $(window).bind('hashchange.megaChat' + this.instanceId, function() {
+    this._pageChangeListener = mBroadcaster.addListener('pagechange', function() {
         var room = self.getCurrentRoom();
 
         if (room && !room.isCurrentlyActive && room.roomJid != lastOpenedRoom) { // opened window, different then one from the chat ones
@@ -590,16 +566,21 @@ Chat.prototype.init = function() {
     }
     else {
         if (!appContainer) {
-            $(window).rebind('hashchange.delayedChatUiInit', function() {
+            if (self._appInitPageChangeListener) {
+                mBroadcaster.removeListener(self._appInitPageChangeListener);
+            }
+            self._appInitPageChangeListener = mBroadcaster.addListener('pagechange', function() {
                 if (typeof($.leftPaneResizable) === 'undefined' || !fminitialized) {
-                    // delay the chat init a bit more! specially for the case of a user getting from #pro -> #fm, which
+                    // delay the chat init a bit more! specially for the case of a user getting from /pro -> /fm, which
                     // for some unknown reason, stopped working and delayed the init of $.leftPaneResizable
                     return;
                 }
                 appContainer = document.querySelector('.section.conversations');
                 if (appContainer) {
                     initAppUI();
-                    $(window).unbind('hashchange.delayedChatUiInit');
+                    if (self._appInitPageChangeListener) {
+                        mBroadcaster.removeListener(self._appInitPageChangeListener);
+                    }
                 }
             });
         }
@@ -650,6 +631,8 @@ Chat.prototype.init = function() {
         room.bind("onChatShown", function() {
             $('.conversations-main-listing').addClass("hidden");
         });
+
+        self.updateDashboard();
     });
     self.on('onRoomDestroy', function(e, room) {
         if (room.type === "private") {
@@ -821,6 +804,8 @@ Chat.prototype.updateSectionUnreadCount = function() {
                 .addClass('hidden');
         }
         self._lastUnreadCount = unreadCount;
+
+        self.updateDashboard();
     }
 };
 /**
@@ -1102,7 +1087,7 @@ Chat.prototype.renderMyStatus = function() {
     // reset
     var $status = $('.activity-status-block .activity-status');
 
-    $('.top-user-status-popup .top-user-status-item').removeClass("active");
+    $('.top-user-status-popup .tick-item').removeClass("active");
 
 
     $status
@@ -1139,19 +1124,19 @@ Chat.prototype.renderMyStatus = function() {
 
 
     if (cssClass === 'online') {
-        $('.top-user-status-popup .top-user-status-item[data-presence="chat"]').addClass("active");
+        $('.top-user-status-popup .tick-item[data-presence="chat"]').addClass("active");
     }
     else if (cssClass === 'away') {
-        $('.top-user-status-popup .top-user-status-item[data-presence="away"]').addClass("active");
+        $('.top-user-status-popup .tick-item[data-presence="away"]').addClass("active");
     }
     else if (cssClass === 'busy') {
-        $('.top-user-status-popup .top-user-status-item[data-presence="dnd"]').addClass("active");
+        $('.top-user-status-popup .tick-item[data-presence="dnd"]').addClass("active");
     }
     else if (cssClass === 'offline') {
-        $('.top-user-status-popup .top-user-status-item[data-presence="unavailable"]').addClass("active");
+        $('.top-user-status-popup .tick-item[data-presence="unavailable"]').addClass("active");
     }
     else {
-        $('.top-user-status-popup .top-user-status-item[data-presence="unavailable"]').addClass("active");
+        $('.top-user-status-popup .tick-item[data-presence="unavailable"]').addClass("active");
     }
 
     $status.addClass(
@@ -1623,7 +1608,7 @@ Chat.prototype.getChatNum = function(idx) {
  * Called when the BOSH service url is requested for Karere to connect. Should return a full URL to the actual
  * BOSH service that should be used for connecting the current user.
  */
-Chat.prototype.getXmppServiceUrl = function() {
+Chat.prototype.getXmppServiceUrl = function(timeout) {
     var self = this;
 
     if (localStorage.megaChatUseSandbox) {
@@ -1635,7 +1620,10 @@ Chat.prototype.getXmppServiceUrl = function() {
     else {
         var $promise = new MegaPromise();
 
-        $.get("https://" + self.options.loadbalancerService + "/?service=xmpp")
+        $.ajax("https://" + self.options.loadbalancerService + "/?service=xmpp", {
+            method: "GET",
+            timeout: timeout ? timeout : 10000
+            })
             .done(function(r) {
                 if (r.xmpp && r.xmpp.length > 0) {
                     var randomHost = array_random(r.xmpp);
@@ -1805,6 +1793,53 @@ Chat.prototype._destroyAllChatsFromChatd = function() {
     });
 };
 
+Chat.prototype.updateDashboard = function() {
+    if (M.currentdirid === 'dashboard') {
+        delay('dashboard:updchat', dashboardUI.updateChatWidget);
+    }
+};
+
+
+/**
+ * Warning: The data returned by this function is loaded directly and not hash-checked like in the secureboot.js. So
+ * please use carefully and escape EVERYTHING that is loaded thru this.
+ *
+ * @param name
+ * @returns {MegaPromise}
+ */
+Chat.prototype.getEmojiDataSet = function(name) {
+    var self = this;
+    assert(name === "categories" || name === "emojis", "Invalid emoji dataset name passed.");
+
+    if (!self._emojiDataLoading) {
+        self._emojiDataLoading = {};
+    }
+    if (!self._emojiData) {
+        self._emojiData = {};
+    }
+
+    if (self._emojiData[name]) {
+        return MegaPromise.resolve(
+            self._emojiData[name]
+        );
+    }
+    else if (self._emojiDataLoading[name]) {
+        return self._emojiDataLoading[name];
+    }
+    else {
+        self._emojiDataLoading[name] = MegaPromise.asMegaPromiseProxy(
+            $.getJSON(staticpath + "js/chat/emojidata/" + name + ".json?v=" + EMOJI_DATASET_VERSION)
+        );
+        self._emojiDataLoading[name].done(function(data) {
+            self._emojiData[name] = data;
+            delete self._emojiDataLoading[name];
+        }).fail(function() {
+            delete self._emojiDataLoading[name];
+        });
+
+        return self._emojiDataLoading[name];
+    }
+};
 
 window.Chat = Chat;
 window.chatui = chatui;

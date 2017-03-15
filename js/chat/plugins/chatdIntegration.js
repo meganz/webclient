@@ -438,11 +438,11 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
                 if (chatRoom.lastActivity === 0) {
                     chatRoom.lastActivity = unixtime();
                 }
-                window.location = chatRoom.getRoomUrl();
+                loadSubPage(chatRoom.getRoomUrl());
             }
 
             if (wasActive) {
-                window.location = chatRoom.getRoomUrl();
+                loadSubPage(chatRoom.getRoomUrl());
             }
         }
         else {
@@ -696,6 +696,10 @@ ChatdIntegration._ensureKeysAreLoaded = function(messages, users) {
 
     if (Array.isArray(messages)) {
         messages.forEach(function (msgObject) {
+            if (typeof(msgObject.userId) === "undefined" || msgObject.userId === null) {
+                return;
+            }
+
             if (msgObject.userId === strongvelope.COMMANDER) {
                 return;
             }
@@ -721,6 +725,10 @@ ChatdIntegration._ensureKeysAreLoaded = function(messages, users) {
     }
     if (Array.isArray(users)) {
         users.forEach(function (userId) {
+            if (typeof(userId) === "undefined" || userId === null) {
+                return;
+            }
+
             if (userId === strongvelope.COMMANDER) {
                 return;
             }
@@ -818,7 +826,7 @@ ChatdIntegration.prototype._parseMessage = function(chatRoom, message) {
                     if (v.fa && (icon === "graphic" || icon === "image")) {
                         var imagesListKey = message.messageId + "_" + v.h;
                         if (!chatRoom.images.exists(imagesListKey)) {
-                            v.k = imagesListKey;
+                            v.id = imagesListKey;
                             v.delay = message.delay;
                             chatRoom.images.push(v);
                         }
@@ -903,6 +911,23 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
     var self = this;
 
     var chatRoomId = chatRoom.roomJid.split("@")[0];
+
+    chatRoom.rebind('typing.chatdInt', function() {
+        self.broadcast(chatRoom, String.fromCharCode(1));
+    });
+
+    self.chatd.rebind('onBroadcast.chatdInt' + chatRoomId, function(e, eventData) {
+        var foundChatRoom = self._getChatRoomFromEventData(eventData);
+
+        if (!foundChatRoom) {
+            self.logger.warn("Room not found for: ", e, eventData);
+            return;
+        }
+
+        if (foundChatRoom.roomJid === chatRoom.roomJid) {
+            foundChatRoom.trigger('onParticipantTyping', [eventData.userId, eventData.bCastCode]);
+        }
+    });
 
     self.chatd.rebind('onRoomConnected.chatdInt' + chatRoomId, function(e, eventData) {
         var foundChatRoom = self._getChatRoomFromEventData(eventData);
@@ -1367,26 +1392,27 @@ ChatdIntegration.prototype.decryptTopic = function(chatRoom) {
     var self = this;
     if (chatRoom && chatRoom.ct && chatRoom.protocolHandler) {
         var parsedMessage = strongvelope._parseMessageContent(base64urldecode(chatRoom.ct));
-
-        var promises = [];
-        promises.push(
-            ChatdIntegration._ensureKeysAreLoaded(undefined, [parsedMessage.invitor])
-        );
-        var _runTopicDecryption = function() {
-            try {
-                var decryptedCT = chatRoom.protocolHandler.decryptFrom(base64urldecode(chatRoom.ct));
-                if (decryptedCT) {
-                    chatRoom.topic = decryptedCT.payload;
+        if (parsedMessage) {
+            var promises = [];
+            promises.push(
+                ChatdIntegration._ensureKeysAreLoaded(undefined, [parsedMessage.invitor])
+            );
+            var _runTopicDecryption = function() {
+                try {
+                    var decryptedCT = chatRoom.protocolHandler.decryptFrom(base64urldecode(chatRoom.ct));
+                    if (decryptedCT) {
+                        chatRoom.topic = decryptedCT.payload;
+                    }
+                } catch (e) {
+                    self.logger.error("Could not decrypt topic: ", e);
                 }
-            } catch (e) {
-                self.logger.error("Could not decrypt topic: ", e);
-            }
-        };
-        MegaPromise.allDone(promises).done(
-            function () {
-                _runTopicDecryption();
-            }
-        );
+            };
+            MegaPromise.allDone(promises).done(
+                function () {
+                    _runTopicDecryption();
+                }
+            );
+        }
     }
 };
 
@@ -1579,6 +1605,15 @@ ChatdIntegration.prototype.discardMessage = function(chatRoom, msgId) {
         // debugger;
     }
     return self.chatd.discard(msgId, rawChatId);
+};
+
+
+
+ChatdIntegration.prototype.broadcast = function(chatRoom, broadCastCode) {
+    var self = this;
+    var rawChatId = base64urldecode(chatRoom.chatId);
+    var chatMessages = self.chatd.chatIdMessages[rawChatId];
+    return self.chatd.broadcast(rawChatId, broadCastCode);
 };
 
 

@@ -251,19 +251,16 @@ var exportPassword = {
          */
         loadPasswordEstimatorLibrary: function() {
 
-            if (typeof zxcvbn === 'undefined' && !silent_loading) {
+            if (typeof zxcvbn === 'undefined') {
 
                 // Show loading spinner
                 var $loader = this.$dialog.find('.estimator-loading-icon').addClass('loading');
 
                 // On completion of loading, hide the loading spinner
-                silent_loading = function() {
-                    $loader.removeClass('loading');
-                };
-
-                // Load the library
-                jsl.push(jsl2['zxcvbn_js']);
-                jsl_start();
+                mega.utils.require('zxcvbn_js')
+                    .done(function() {
+                        $loader.removeClass('loading');
+                    });
             }
         },
 
@@ -342,7 +339,7 @@ var exportPassword = {
 
                 // On button click, go to the Pro page
                 $proButton.rebind('click', function() {
-                    document.location.hash = 'pro';
+                    loadSubPage('pro');
                 });
             }
             else {
@@ -647,7 +644,8 @@ var exportPassword = {
 
             // Add a click handler for the close button to return to the home page (or cloud drive if logged in)
             $closeButton.rebind('click', function() {
-                location.hash = '';
+                loadSubPage('');
+                return false;
             });
 
             // Add click handler for Decrypt button
@@ -795,7 +793,7 @@ var exportPassword = {
                 $password.val('');
 
                 // On success, redirect to actual file/folder link
-                location.hash = url;
+                loadSubPage(url);
             });
         }
     },  // Decrypt functions
@@ -1738,16 +1736,21 @@ var exportExpiry = {
     ExportLink.prototype._getFolderExportLinkRequest = function(nodeId) {
 
         var self = this;
-        var childNodes = [];
         var share = M.getNodeShare(nodeId);
 
         // No need to perform an API call if this folder was already exported (Ie, we're updating)
         if (share.h === nodeId) {
-            return self._getExportLinkRequest(nodeId);
+            if (!M.d[nodeId].t || u_sharekeys[nodeId]) {
+                return self._getExportLinkRequest(nodeId);
+            }
+
+            if (d) {
+                console.warn('Missing sharekey for "%s" - relying on s2 to obtain it...', nodeId);
+            }
         }
 
         // Get all child nodes of root folder with nodeId
-        childNodes = fm_getnodes(nodeId);
+        var childNodes = fm_getnodes(nodeId);
         childNodes.push(nodeId);
 
         var sharePromise = api_setshare(nodeId, [{ u: 'EXP', r: 0 }], childNodes);
@@ -1796,8 +1799,12 @@ var exportExpiry = {
         var share = M.getNodeShare(nodeId);
         var request = { a: 'l', n: nodeId, i: requesti };
 
+        if (d) {
+            console.debug('_getExportLinkRequest', share.ph, Object(M.d[nodeId]).ph, share);
+        }
+
         // No need to perform an API call if this file was already exported (Ie, we're updating)
-        if (share.h === nodeId && share.ph) {
+        if (share.h === nodeId && Object(M.d[nodeId]).ph) {
             return done(nodeId);
         }
 
@@ -1810,9 +1817,9 @@ var exportExpiry = {
             nodeId: nodeId,
             callback: function(result) {
                 if (typeof result !== 'number') {
-                    M.nodeShare(this.nodeId, { h: this.nodeId, r: 0, u: 'EXP', ts: unixtime() });
-                    var n;
-                    if (fmdb && (n = M.d[this.nodeId])) {
+                    M.nodeShare(this.nodeId, { h: this.nodeId, r: 0, u: 'EXP', ts: unixtime(), ph: result });
+                    var n = M.d[this.nodeId];
+                    if (n) {
                         n.ph = result;
                         M.nodeUpdated(n);
                     }
@@ -2007,7 +2014,7 @@ var exportExpiry = {
             if (M.d[nodeId].fav === 1) {
 
                 // Remove favourite (star)
-                M.favourite(nodeId, true);
+                M.favourite(nodeId, 0);
             }
             self.addTakenDownIcon(nodeId);
         }

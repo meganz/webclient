@@ -116,7 +116,7 @@ var attribCache = false;
                     res = mega.attr.handleLegacyCacheAndDecryption(res, thePromise, attribute);
                 }
 
-                if (d) {
+                if (d > 1 || is_karma) {
                     var loggerValueOutput = pub ? JSON.stringify(res) : '-- hidden --';
                     if (loggerValueOutput.length > 256) {
                         loggerValueOutput = loggerValueOutput.substr(0, 256) + '...';
@@ -128,8 +128,10 @@ var attribCache = false;
             }
             else {
                 // Got back an error (a number).
-                logger.warn(tag + 'attribute "%s" for user "%s" could not be retrieved: %d!',
-                    attribute, userhandle, res);
+                if (d > 1 || is_karma) {
+                    logger.warn(tag + 'attribute "%s" for user "%s" could not be retrieved: %d!',
+                        attribute, userhandle, res);
+                }
                 thePromise.reject(res);
             }
 
@@ -803,7 +805,7 @@ function uaPacketParser(attrName, userHandle, ownActionPacket, version) {
 
 if (is_karma) {
     window.M = new MegaData();
-    attribCache = new IndexedDBKVStorage('attrib', { murSeed: 0x800F0002 });
+    attribCache = new IndexedDBKVStorage('ua', { murSeed: 0x800F0002 });
     attribCache.syncNameTimer = {};
     attribCache.uaPacketParser = uaPacketParser;
     attribCache.bitMapsManager = new MegaDataBitMapManager();

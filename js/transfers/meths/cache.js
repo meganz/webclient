@@ -8,7 +8,7 @@
  * you accept this licence. If you do not accept the licence,
  * do not access the code.
  *
- * Words used in the Mega Limited Terms of Service [https://mega.nz/#terms]
+ * Words used in the Mega Limited Terms of Service [https://mega.nz/terms]
  * have the same meaning in this licence. Where there is any inconsistency
  * between this licence and those Terms of Service, these terms prevail.
  *
@@ -134,7 +134,12 @@ function CacheIO(dl_id, dl) {
 
         if (this.is_zip || !dl.zipid) {
             __max_chunk_size = Math.min(size + 4194304, __max_chunk_size);
-            u8buf = new Uint8Array(__max_chunk_size);
+            try {
+                u8buf = new Uint8Array(__max_chunk_size);
+            }
+            catch (ex) {
+                return dlFatalError(dl, ex);
+            }
 
             IO = new dlMethod(dl_id, dl);
             IO.begin = this.begin;

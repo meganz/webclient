@@ -61,7 +61,8 @@ function FMDB(plainname, schema, channelmap) {
     this.cantransact = -1;
 
     // initialise additional channels
-    for (var i in obj_values(this.channelmap)) {
+    for (var i in this.channelmap) {
+        i = this.channelmap[i];
         this.head[i] = 0;
         this.tail[i] = 0;
         this.pending[i] = {};
@@ -101,12 +102,13 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
         try {
             if (!fmdb.db) {
                 var todrop = [];
+                var dbpfx = 'fm8_';
 
-                // enumerate databases and collect those not prefixed with fm_
+                // enumerate databases and collect those not prefixed with 'dbpfx'
                 // (which is the current format)
                 Dexie.getDatabaseNames(function(r) {
                     for (var i = r.length; i--;) {
-                        if (r[i].substr(0,3) != 'fm_') {
+                        if (r[i].substr(0, dbpfx.length) != dbpfx) {
                             todrop.push(r[i]);
                         }
                     }
@@ -115,10 +117,14 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
                         fmdb.logger.log("Deleting obsolete DBs: " + todrop.join(', '));
                     }
 
-                    fmdb.drop(todrop, function() {
+                    fmdb.dropall(todrop, function() {
                         // start inter-tab heartbeat
                         // fmdb.beacon();
-                        fmdb.db = new Dexie('fm_' + fmdb.name);
+                        fmdb.db = new Dexie(dbpfx + fmdb.name);
+
+                        // save the db name for our getDatabaseNames polyfill
+                        localStorage['_$mdb$' + dbpfx + fmdb.name] = Date.now();
+
                         fmdb.db.version(1).stores(fmdb.schema);
                         fmdb.db.open().then(function(){
                             fmdb.get('_sn', function(r){
@@ -164,24 +170,63 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
     }
 };
 
-// drop databases
-FMDB.prototype.drop = function fmdb_drop(dbs, cb) {
+// drop database
+FMDB.prototype.drop = function fmdb_drop() {
+    var promise = new MegaPromise();
+
+    if (!this.db) {
+        promise.resolve();
+    }
+    else {
+        var fmdb = this;
+
+        this.invalidate(function() {
+
+            fmdb.db.delete().then(function() {
+                fmdb.logger.debug("IndexedDB deleted...");
+            }).catch(function(err) {
+                fmdb.logger.error("Unable to delete IndexedDB!", err);
+            }).finally(function() {
+                promise.resolve();
+            });
+
+            this.db = null;
+        });
+    }
+
+    return promise;
+};
+
+// drop random databases
+FMDB.prototype.dropall = function fmdb_dropall(dbs, cb) {
     if (!dbs || !dbs.length) {
         cb();
     }
     else {
         var fmdb = this;
-        var db = dbs.pop();
+        var db = new Dexie(dbs.pop());
+        var next = function(ev) {
+            next = function() {};
+            if (ev && ev.type === 'blocked') {
+                fmdb.logger.warn('Cannot delete blocked indexedDB: ' + db.name);
+            }
+            fmdb.dropall(dbs, cb);
+        };
 
-        (new Dexie(db)).delete().then(function(){
-            fmdb.logger.log("Deleted IndexedDB " + db);
+        // If the DB is blocked, Dexie will try to delete it as soon there are no locks on it.
+        // However, we'll resolve immediately without waiting for it, since that will happen in
+        // an undetermined amount of time which needless to say is an odd UX experience...
+        db.on('blocked', next);
+
+        db.delete().then(function() {
+            fmdb.logger.log("Deleted IndexedDB " + db.name);
         }).catch(function(err){
-            fmdb.logger.error("Unable to delete IndexedDB " + db, err);
-        }).finally(function(){
-            fmdb.drop(dbs, cb);
+            fmdb.logger.error("Unable to delete IndexedDB " + db.name, err);
+        }).finally(function() {
+            next();
         });
     }
-}
+};
 
 // enqueue a table write - type 0 == addition, type 1 == deletion
 // IndexedDB activity is triggered once we have at least 1000 pending rows or the sn
@@ -374,7 +419,7 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                     // (we have to keep it for the transactional case because it needs to
                     // be visible to the pending updates search that getbykey() performs)
                     if (!fmdb.state) {
-                        delete fmdb.inflight[fmdb.inflight.t++];
+                        delete fmdb.inflight[fmdb.inflight.t-1];
                     }
 
                     // loop back to write more pending data (or to commit the transaction)
@@ -441,21 +486,16 @@ FMDB.prototype.stripnode = Object.freeze({
         return t;
     },
 
-    s : function(s) {
-        var t = { o : s.o, t : s.t };
-
-        delete s.o;
-        delete s.t;
-
-        return t;
-    },
-
-    attrib : function(attrib, index) {
-        delete attrib.k;
+    ua : function(ua, index) {
+        delete ua.k;
     },
 
     chatqueuedmsgs : function(chatqueuedmsgs, index) {
         delete chatqueuedmsgs.k;
+    },
+
+    pta: function(pta, index) {
+        delete pta.k;
     }
 });
 
@@ -476,28 +516,25 @@ FMDB.prototype.restorenode = Object.freeze({
         if (!f.ar && f.k && typeof f.k == 'object') f.ar = {};
     },
 
-    s : function(f, index) {
-        var t = index.o_t.indexOf('*');
-        if (t >= 0) {
-            f.o = index.o_t.substr(0, t);
-            f.t = index.o_t.substr(t + 1);
-        }
+    ph : function(ph, index) {
+        ph.h = index.h;
     },
 
-    ps : function(ps, index) {
-        var t = index.h_p.indexOf('*');
-        if (t >= 0) {
-            ps.h = index.h_p.substr(0, t);
-            ps.p = index.h_p.substr(t + 1);
-        }
-    },
-
-    attrib : function(attrib, index) {
-        attrib.k = index.k;
+    ua : function(ua, index) {
+        ua.k = index.k;
     },
 
     chatqueuedmsgs : function(chatqueuedmsgs, index) {
         chatqueuedmsgs.k = index.k;
+    },
+
+    pta: function(pta, index) {
+        pta.k = index.k;
+    },
+
+    h: function(out, index) {
+        out.h = index.h;
+        out.hash = index.c;
     },
 
     mk : function(mk, index) {
@@ -803,7 +840,7 @@ Object.freeze(FMDB.prototype);
 
 
 function mDBcls() {
-    if (Object(window.fmdb).hasOwnProperty('db')) {
+    if (fmdb && fmdb.db) {
         fmdb.db.close();
     }
     fmdb = null;
@@ -866,6 +903,9 @@ mBroadcaster.once('startMega', function __idb_setup() {
                                     if (idx == 'hash') {
                                         list[length++] = i.substr(0, i.length - 5);
                                     }
+                                }
+                                else if (i.substr(0, 6) === '_$mdb$') {
+                                    list[length++] = i.substr(6);
                                 }
                             }
 

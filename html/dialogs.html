@@ -51,8 +51,8 @@
         </div>
 
         <div class="default-dialog-bottom">
-            <div class="fm-dialog-button red close-account"><span>[$6221]</span></div>
-            <div class="fm-dialog-button cancel"><span>[$82]</span></div>
+            <div class="default-white-button right red close-account"><span>[$6221]</span></div>
+            <div class="default-white-button right cancel"><span>[$82]</span></div>
             <div class="clear"></div>
         </div>
 
@@ -101,8 +101,8 @@
         </form>
 
         <div class="default-dialog-bottom">
-            <div class="fm-dialog-button feedback-submit"><span>[$1694]</span></div>
-            <div class="fm-dialog-button cancel"><span>[$148]</span></div>
+            <div class="default-white-button right feedback-submit"><span>[$1694]</span></div>
+            <div class="default-white-button right cancel"><span>[$148]</span></div>
             <div class="clear"></div>
         </div>
 
@@ -131,7 +131,7 @@
             <div class="fm-dialog-chrome-clipboard">
                 <div id="chromeclipboard1" class="selectable"></div>
             </div>
-            <div class="fm-dialog-button copy-to-clipboard"><span>[$63]</span></div>
+            <div class="default-white-button right copy-to-clipboard"><span>[$63]</span></div>
             <div class="clear"></div>
         </div>
     </div>
@@ -179,8 +179,8 @@
             </table>
         </div>
         <div class="default-dialog-bottom">
-            <div class="fm-dialog-new-folder-button disabled"><span>[$9037]</span></div>
-            <div class="create-folder-button-cancel dialog"><span>[$82]</span></div>
+            <div class="fm-dialog-new-folder-button default-white-button right disabled"><span>[$9037]</span></div>
+            <div class="create-folder-button-cancel default-white-button right"><span>[$82]</span></div>
         </div>
     </div>
 </div>
@@ -188,14 +188,14 @@
 <div class="fm-dialog create-folder-dialog filled-input hidden">
     <div class="fm-dialog-close"></div>
     <div class="nw-fm-dialog-title">[$68]</div>
+    <div class="create-folder-size-icon short-size"></div>
     <div class="create-folder-pad">
-        <div class="create-folder-size-icon short-size"></div>
         <div class="create-folder-input-bl">
             <input name="dialog-new-folder" type="text" value="[$157]" placeholder="[$157]" autofocus/>
         </div>
         <div class="create-folder-bottom">
-            <div class="fm-dialog-new-folder-button"><span>[$455]</span></div>
-            <div class="create-folder-button-cancel dialog"><span>[$82]</span></div>
+            <div class="fm-dialog-new-folder-button default-white-button right"><span>[$455]</span></div>
+            <div class="create-folder-button-cancel default-white-button right"><span>[$82]</span></div>
             <div class="clear"></div>
         </div>
     </div>
@@ -221,7 +221,7 @@
             </div>
         </div>
         <div class="default-dialog-bottom">
-            <div class="fm-dialog-new-folder-button"><span>[$1027]</span></div>
+            <div class="fm-dialog-new-folder-button default-white-button right"><span>[$1027]</span></div>
         </div>
     </div>
 </div>
@@ -247,8 +247,9 @@
             <div class="password-link-decrypt-error"></div>
         </div>
         <div class="default-dialog-bottom">
-            <div class="fm-dialog-new-folder-button decrypt-link-button">
-                <span><i class="decrypt-text">[$1027]</i> <i class="decryption-in-progress hidden"></i></span>
+            <div class="fm-dialog-new-folder-button default-white-button right decrypt-link-button">
+                <span class="decrypt-text">[$1027]</span>
+                <i class="small-icon decryption-in-progress hidden"></i>
             </div>
         </div>
     </div>
@@ -292,8 +293,8 @@
             <input name="dialog-rename" type="text" value="[$157]" />
         </div>
         <div class="default-dialog-bottom">
-            <div class="rename-dialog-button rename"><span>[$61]</span></div>
-            <div class="rename-dialog-button cancel"><span>[$82]</span></div>
+            <div class="rename-dialog-button rename default-white-button right"><span>[$61]</span></div>
+            <div class="rename-dialog-button cancel default-white-button right"><span>[$82]</span></div>
             <div class="clear"></div>
         </div>
 
@@ -372,44 +373,41 @@
             </div>
         </div>
         <!-- Please add "active" classname to necessary "copy-dialog-empty" block !-->
-        <div class="copy-dialog-empty cloud-drive">
-            <div class="copy-dialog-empty-icon"></div>
-            <div class="copy-dialog-empty-header">
-                [$783]
-            </div>
-            <div class="copy-dialog-empty-txt">
-                Worry not! You can easily create a new folder  below. Right there, on the left hand side.
-            </div>
-        </div>
-        <div class="copy-dialog-empty shared-with-me">
-            <div class="copy-dialog-empty-icon"></div>
-            <div class="copy-dialog-empty-header">
-                [$79] [$1348]
-            </div>
-            <div class="copy-dialog-empty-txt">
-                [$1018] [$1348]
+        <div class="dialog-empty-block copy cloud-drive">
+            <div class="dialog-empty-pad">
+                <div class="dialog-empty-icon"></div>
+                <div class="dialog-empty-header">
+                    [$1343]
+                </div>
             </div>
         </div>
-        <div class="copy-dialog-empty conversations">
-            <div class="copy-dialog-empty-icon"></div>
-            <div class="copy-dialog-empty-header">
-                [$6772]
+        <div class="dialog-empty-block copy shared-with-me">
+            <div class="dialog-empty-pad">
+                <div class="dialog-empty-icon"></div>
+                <div class="dialog-empty-header">
+                    [$6871]
+                </div>
             </div>
-            <div class="copy-dialog-empty-txt">
-                [$981]
+        </div>
+        <div class="dialog-empty-block copy conversations">
+            <div class="dialog-empty-pad">
+                <div class="dialog-empty-icon"></div>
+                <div class="dialog-empty-header">
+                    [$6772]
+                </div>
             </div>
         </div>
 
     </div>
     <!--Buttons-->
     <div class="fm-notifications-bottom">
-        <div class="fm-dialog-button dialog-newfolder-button">
+        <div class="default-white-button left dialog-newfolder-button">
             <span>[$68]</span>
         </div>
-        <div class="fm-dialog-button dialog-copy-button">
+        <div class="default-white-button right dialog-copy-button">
             <span>[$1990]</span>
         </div>
-        <div class="fm-dialog-button dialog-cancel-button">
+        <div class="default-white-button right dialog-cancel-button">
             <span>[$82]</span>
         </div>
 
@@ -497,44 +495,41 @@
             </div>
         </div>
         <!-- Please add "active" classname to necessary "move-dialog-empty" block !-->
-        <div class="move-dialog-empty cloud-drive">
-            <div class="move-dialog-empty-icon"></div>
-            <div class="move-dialog-empty-header">
-                [$783]
-            </div>
-            <div class="move-dialog-empty-txt">
-                Worry not! You can easily create a new folder  below. Right there, on the left hand side.
-            </div>
-        </div>
-        <div class="move-dialog-empty shared-with-me">
-            <div class="move-dialog-empty-icon"></div>
-            <div class="move-dialog-empty-header">
-                [$79] [$1348]
-            </div>
-            <div class="move-dialog-empty-txt">
-                [$1018] [$1348]
+        <div class="dialog-empty-block move cloud-drive">
+            <div class="dialog-empty-pad">
+                <div class="dialog-empty-icon"></div>
+                <div class="dialog-empty-header">
+                    [$1343]
+                </div>
             </div>
         </div>
-        <div class="move-dialog-empty rubbish-bin">
-            <div class="move-dialog-empty-icon"></div>
-            <div class="move-dialog-empty-header">
-                [$1018]
+        <div class="dialog-empty-block move shared-with-me">
+            <div class="dialog-empty-pad">
+                <div class="dialog-empty-icon"></div>
+                <div class="dialog-empty-header">
+                    [$6871]
+                </div>
             </div>
-            <div class="move-dialog-empty-txt">
-                [$979]
+        </div>
+        <div class="dialog-empty-block move rubbish-bin">
+            <div class="dialog-empty-pad">
+                <div class="dialog-empty-icon"></div>
+                <div class="dialog-empty-header">
+                    [$7740]
+                </div>
             </div>
         </div>
 
     </div>
     <!--Buttons-->
     <div class="fm-notifications-bottom">
-        <div class="fm-dialog-button dialog-newfolder-button">
+        <div class="default-white-button left dialog-newfolder-button">
             <span>[$68]</span>
         </div>
-        <div class="fm-dialog-button dialog-move-button">
+        <div class="default-white-button right dialog-move-button">
             <span>[$62]</span>
         </div>
-        <div class="fm-dialog-button dialog-cancel-button">
+        <div class="default-white-button right dialog-cancel-button">
             <span>[$82]</span>
         </div>
         <div class="clear"></div>
@@ -566,8 +561,8 @@
             <div class="checkdiv checkboxOff"> <input type="checkbox" name="confirmation-checkbox" id="confirmation-checkbox" class="checkboxOff"> </div>
             <label for="export-checkbox" class="radio-txt">[$229]</label>
         </div>
-        <div class="fm-dialog-button notification-button"><span>[$1018]</span></div>
-        <div class="fm-dialog-button notification-button"><span>[$82]</span></div>
+        <div class="default-white-button right notification-button"><span>[$1018]</span></div>
+        <div class="default-white-button right notification-button"><span>[$82]</span></div>
         <div class="clear"></div>
     </div>
 </div>
@@ -637,8 +632,9 @@
                         </div>
                     </div>
                     <div class="password-protect-error"></div>
-                    <div class="fm-dialog-button encrypt-link-button">
-                        <span><i class="encrypt-text">[$9061]</i> <i class="encryption-in-progress hidden"></i></span>
+                    <div class="default-white-button left fm-dialog-button encrypt-link-button">
+                        <span class="encrypt-text">[$9061]</span>
+                        <i class="small-icon encryption-in-progress hidden"></i>
                     </div>
                 </div>
                 <div class="disabled-overlay hidden"></div>
@@ -654,7 +650,7 @@
         <div class="export-description hidden">
             [$7682]
         </div>
-        <div class="fm-dialog-button links-button copy-to-clipboard" id="clipboardbtn1">
+        <div class="default-white-button right links-button copy-to-clipboard" id="clipboardbtn1">
             <span></span>
         </div>
         <div class="clear"></div>
@@ -736,7 +732,7 @@
     <div class="fm-notifications-bottom">
         <div class="checkboxOff"> <input type="checkbox" name="browsers-checkbox" id="browsers-checkbox" class="checkboxOff"> </div>
         <label for="browsers-checkbox" class="radio-txt">[$229]</label>
-        <div class="fm-dialog-button browsers-button"><span>[$148]</span></div>
+        <div class="default-white-button right browsers-button"><span>[$148]</span></div>
         <div class="clear"></div>
     </div>
 </div>
@@ -758,7 +754,7 @@
     <div class="fm-notifications-bottom">
         <div class="checkboxOff"> <input type="checkbox" name="chrome-checkbox" id="chrome-checkbox" class="checkboxOff"> </div>
         <label for="chrome-checkbox" class="radio-txt">[$229]</label>
-        <div class="fm-dialog-button browsers-button"><span>[$148]</span></div>
+        <div class="default-white-button right browsers-button"><span>[$148]</span></div>
         <div class="clear"></div>
     </div>
 </div>
@@ -827,19 +823,20 @@
     </div>
 </div>
 
-<div class="fm-dialog terms-dialog hidden">
+<div class="fm-dialog bottom-pages-dialog hidden">
     <div class="fm-dialog-header">
-        <div class="fm-dialog-title">[$385]</div>
+        <div class="fm-dialog-title"></div>
         <div class="fm-dialog-close"></div>
         <div class="clear"></div>
     </div>
-    <div class="terms-body">
-        <div class="terms-main">
+    <div class="bp-body">
+        <div class="bp-main">
         </div>
     </div>
     <div class="fm-notifications-bottom">
-        <div class="fm-dialog-button fm-terms-agree"><span>[$1037]</span></div>
-        <div class="fm-dialog-button fm-terms-cancel"><span>[$82]</span></div>
+        <div class="default-white-button right fm-bp-agree"><span>[$1037]</span></div>
+        <div class="default-white-button right fm-bp-cancel"><span>[$82]</span></div>
+        <div class="default-white-button right fm-bp-close"><span>[$148]</span></div>
         <div class="clear"></div>
     </div>
 </div>
@@ -868,7 +865,7 @@
         </a>
     </div>
     <div class="fm-notifications-bottom">
-        <div class="fm-dialog-button fm-languages-save"><span>[$776]</span></div>
+        <div class="default-white-button right fm-languages-save"><span>[$776]</span></div>
         <div class="nlanguage-bottom"> [$671] <a href="mailto:translate@mega.nz">[$672]</a> </div>
         <div class="clear"></div>
     </div>
@@ -890,7 +887,7 @@
         </div>
     </div>
     <div class="fm-notifications-bottom">
-        <div class="fm-dialog-button notification-button">
+        <div class="default-white-button right notification-button">
             <div class="download-save-your-file">
             </div>
             <span>[$241]</span>
@@ -912,7 +909,7 @@
             <div class="ff-extension-txt">
                 Please install our extension for improved download performance and added security. Unfortunately, there is a <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=939510" class="red" target="_blank" rel="noreferrer">bug</a> in the current version of Firefox that will cause excessive memory consumption during and after large downloads.
             </div>
-            <a href="#firefox" class="ff-extension-button">
+            <a href="/firefox" class="ff-extension-button clickurl">
                 [$1178]
             </a>
             <div class="clear"></div>
@@ -922,7 +919,7 @@
     <div class="fm-notifications-bottom">
         <div class="checkboxOff"> <input type="checkbox" name="firefox-checkbox" id="firefox-checkbox" class="checkboxOff"> </div>
         <label for="firefox-checkbox" class="radio-txt">[$229]</label>
-        <div class="fm-dialog-button close-button">
+        <div class="default-white-button right close-button">
             <span>[$148]</span>
         </div>
         <div class="clear"></div>
@@ -937,7 +934,7 @@
     </div>
     <div class="content">
         <div class="txt">[$7236]</div>
-        <a class="button" href="#sync">
+        <a class="button clickurl" href="/sync">
             <span class="icon"></span>
             <span class="button-txt">[$5565] [$1626]</span>
         </a>
@@ -947,7 +944,7 @@
             <input type="checkbox" name="megasync-checkbox" id="megasync-checkbox" class="checkboxOff">
         </div>
         <label for="megasync-checkbox" class="radio-txt">[$229]</label>
-        <div class="fm-dialog-button close-button">
+        <div class="default-white-button right close-button">
             <span>[$148]</span>
         </div>
         <div class="clear"></div>
@@ -1005,11 +1002,41 @@
 
 </div>
 
-<div class="add-user-popup dialog hidden">
+<div class="create-new-folder dropdown body popup dropdown-arrow hidden">
+    <i class="dropdown-white-arrow"></i>
+    <div class="create-folder-size-icon full-size"></div>
+    <div class="create-folder-pad">
+        <div class="create-folder-input-bl">
+            <input type="text" value="[$157]" placeholder="[$157]" autofocus/>
+        </div>
+        <a class="create-folder-button"><span>[$455]</span></a>
+        <div class="clear"></div>
+        <div class="create-folder-bottom">
+            <div class="create-folder-button default-white-button right"><span>[$455]</span></div>
+            <div class="create-folder-button-cancel popup default-grey-button right"><span>[$82]</span></div>
+            <div class="clear"></div>
+        </div>
+    </div>
+    <div class="create-folder-loader hidden">
+        <div class="cr-fountaing">
+            <div class="fountaing-circle cr-fountaing_1"></div>
+            <div class="fountaing-circle cr-fountaing_2"></div>
+            <div class="fountaing-circle cr-fountaing_3"></div>
+            <div class="fountaing-circle cr-fountaing_4"></div>
+            <div class="fountaing-circle cr-fountaing_5"></div>
+            <div class="fountaing-circle cr-fountaing_6"></div>
+            <div class="fountaing-circle cr-fountaing_7"></div>
+            <div class="fountaing-circle cr-fountaing_8"></div>
+        </div>
+    </div>
+</div>
+
+<div class="add-user-popup dialog dropdown body popup dropdown-arrow hidden">
+    <i class="dropdown-white-arrow"></i>
     <div class="fm-dialog-close"></div>
     <div class="nw-fm-dialog-title">[$71]</div>
+    <div class="add-user-size-icon full-size"></div>
     <div class="add-user-popup-pad">
-        <div class="add-user-size-icon full-size"></div>
         <div class="add-user-icon">
             <div class="multiple-input-warning">
                 <div class="arrow"></div>
@@ -1049,8 +1076,8 @@
                 </span>
               </div>
             </div>
-            <div class="add-user-popup-button add"><span>[$155]</span></div>
-            <div class="add-user-popup-button cancel"><span>[$82]</span></div>
+            <div class="add-user-popup-button default-white-button right add"><span>[$155]</span></div>
+            <div class="add-user-popup-button default-white-button right cancel"><span>[$82]</span></div>
         </div>
     </div>
 </div>
@@ -1104,10 +1131,10 @@
            <span></span>
            l[7534]
         </div>
-        <div class="fm-dialog-button dialog-share-button">
+        <div class="default-white-button right dialog-share-button">
             <span>[$726]</span>
         </div>
-        <div class="fm-dialog-button dialog-cancel-button">
+        <div class="default-white-button right dialog-cancel-button">
             <span>[$82]</span>
         </div>
         <div class="clear"></div>
@@ -1157,10 +1184,10 @@
 
     </div>
     <div class="default-dialog-bottom">
-        <div class="fm-dialog-button dialog-approve-button">
+        <div class="default-white-button right dialog-approve-button">
             <span>[$6777]</span>
         </div>
-        <div class="fm-dialog-button dialog-skip-button">
+        <div class="default-white-button right dialog-skip-button">
             <span>[$1379]</span>
         </div>
         <div class="clear"></div>
@@ -1211,9 +1238,9 @@
     </div>
   </div>
   <div class="fm-notifications-bottom">
-    <div class="fm-dialog-button dialog-newfolder-button"> <span>[$68]</span> </div>
-    <div class="fm-dialog-button dialog-share-button"> <span>[$726]</span> </div>
-    <div class="fm-dialog-button dialog-cancel-button"> <span>[$148]</span> </div>
+    <div class="default-white-button left dialog-newfolder-button"> <span>[$68]</span> </div>
+    <div class="default-white-button right dialog-share-button"> <span>[$726]</span> </div>
+    <div class="default-white-button right dialog-cancel-button"> <span>[$148]</span> </div>
     <div class="clear"></div>
   </div>
 </div><!-- END. Share with contact dialog -->
@@ -1221,7 +1248,7 @@
 
 
 
-<div class="top-login-popup fm-dialog pro-login-dialog">
+<div class="top-login-popup fm-dialog pro-login-dialog hidden">
 
     <div class="fm-dialog-header">
         <div class="fm-dialog-title">[$190]</div>
@@ -1262,14 +1289,14 @@
         </div>
 
         <div class="top-login-forgot-pass-bl">
-              <a class="top-login-forgot-pass" href="#recovery">[$1934]</a>
+              <a class="top-login-forgot-pass clickurl" href="/recovery">[$1934]</a>
               <div class="clear"></div>
         </div>
         <div class="top-login-bott-gray-block">
           <div class="checkboxOn login-checkbox"></div>
           <label class="radio-txt">[$192]</label>
 
-          <div class="top-dialog-login-button"><span>[$171] <i><span class="loading-gif"></span></i></span></div>
+          <div class="default-white-button right top-dialog-login-button"><span>[$171] <i><span class="loading-gif"></span></i></span></div>
           <div class="clear"></div>
         </div>
     </div>
@@ -1293,7 +1320,7 @@
 </div>
 
 
-<div class="top-login-popup fm-dialog pro-register-dialog">
+<div class="top-login-popup fm-dialog pro-register-dialog hidden">
     <div class="fm-dialog-header">
         <div class="fm-dialog-title">[$5840]</div>
         <div class="fm-dialog-close"></div>
@@ -1411,10 +1438,10 @@
         <div class="clear"></div>
     </div>
     <div class="fm-notifications-bottom">
-        <div class="fm-dialog-button notification-button"><span>[$1018]</span></div>
-        <div class="fm-dialog-button notification-button"><span>[$82]</span></div>
-        <div class="fm-dialog-button pro-login"><span>[$171]</span></div>
-        <div class="fm-dialog-button pro-register"><span>[$1076]</span></div>
+        <div class="default-white-button right notification-button"><span>[$1018]</span></div>
+        <div class="default-white-button right notification-button"><span>[$82]</span></div>
+        <div class="default-white-button right pro-login"><span>[$171]</span></div>
+        <div class="default-white-button right pro-register"><span>[$1076]</span></div>
         <div class="clear"></div>
     </div>
 </div>
@@ -1532,7 +1559,8 @@
                     <div class="description">
                         [$7690]
                     </div>
-                    <div class="fm-dialog-button fm-dialog-button-green reset-credentials-button">
+                    <div class="default-white-button right green reset-credentials-button">
+                        <i class="small-icon refresh-circle"></i>
                         <span>[$742]</span>
                     </div>
                 </div>
@@ -1547,7 +1575,7 @@
                     <div class="description">
                         [$7693]
                     </div>
-                    <div class="fm-dialog-button fm-dialog-button-green verify-contact-button">
+                    <div class="default-white-button right green verify-contact-button">
                         <span>[$1960]...</span>
                     </div>
                 </div>
@@ -1682,11 +1710,17 @@
 
         <div class="payment-plan-price"><span class="price">9.99</span> &euro;</div>
         <div class="clear"></div>
-        
+
         <div class="payment-note-first recurring">
-            <span class="duration">[$10628]</span> [$10630]
+            <span class="duration">[$10628]</span> [$10630]<br>
+            <br>
+            [$16106]
         </div>
-        <div class="payment-note-first one-time hidden">[$10631]</div>
+        <div class="payment-note-first one-time hidden">
+            [$10631]<br>
+            <br>
+            [$16106]
+        </div>
 
         <div class="payment-half-block first">
             <div class="payment-form-title">[$10632]:</div>
@@ -1700,7 +1734,7 @@
             <div class="fm-account-input">
                 <input class="city" type="text" value="" placeholder="[$565]" tabindex="5">
             </div>
-            <select id="address-dialog-countries" class="countries" tabindex="6">
+            <select id="address-dialog-countries" class="countries default-select" tabindex="6">
                 <option value="">[$481]</option>
             </select>
             <div class="fm-account-input code">
@@ -1720,7 +1754,7 @@
             <div class="fm-account-input">
                 <input class="address2" type="text" value="" placeholder="[$561] 2 ([$2028])" tabindex="4">
             </div>
-            <select id="address-dialog-states" class="states" tabindex="8" disabled>
+            <select id="address-dialog-states" class="states default-select" tabindex="8" disabled>
                 <option value="">[$7352]</option>
             </select>
             <div class="payment-buy-now">[$6190]</div>
@@ -1912,8 +1946,8 @@
             [$6998]
         </div>
         <div class="default-dialog-bottom">
-            <div class="fm-dialog-button continue-cancel-subscription disabled"><span>[$507]</span></div>
-            <div class="fm-dialog-button cancel"><span>[$822]</span></div>
+            <div class="default-white-button right continue-cancel-subscription disabled"><span>[$507]</span></div>
+            <div class="default-white-button right cancel"><span>[$822]</span></div>
             <div class="clear"></div>
         </div>
     </div>
@@ -1941,17 +1975,15 @@
             [$7138]<br/>
             [$7139]
         </div>
-        <div class="megasync-dropdown">
+        <div class="default-select megasync-dropdown">
             <span>[$7086]</span>
-        </div>
-        <div class="megasync-dropdown-list hidden">
-            <div class="megasync-dropdown-pad">
-                <div class="megasync-dropdown-scroll">
-                    <div class="megasync-scr-pad">
-                        <div class="megasync-dropdown-link centos">CentOS 7.0</div>
+            <div class="megasync-dropdown-list default-select-dropdown hidden">
+                    <div class="megasync-dropdown-scroll">
+                        <div class="megasync-scr-pad">
+                            <div class="default-dropdown-item icon centos">CentOS 7.0</div>
+                        </div>
                     </div>
-                </div>
-                <div class="megasync-list-arrow hidden"></div>
+                    <div class="mega-list-arrow hidden"></div>
             </div>
         </div>
         <div class="megasync-table">
@@ -2137,7 +2169,7 @@
 
 <div class="fm-dialog bandwidth-quota hidden">
      <div class="fm-dialog-header">
-       <div class="fm-dialog-title">[$17]</div>
+       <div class="fm-dialog-title">[$16161]</div>
        <div class="fm-dialog-close"></div>
        <div class="clear"></div>
      </div>
@@ -2179,8 +2211,8 @@
         </div>
      </div>
      <div class="fm-notifications-bottom">
-        <div class="fm-dialog-button quota-upgrade-button"><span>[$230]</span></div>
-        <div class="fm-dialog-button quota-later-button"><span>[$8637]</span></div>
+        <div class="default-white-button right quota-upgrade-button"><span>[$230]</span></div>
+        <div class="default-white-button right quota-later-button"><span>[$8637]</span></div>
         <div class="clear"></div>
      </div>
 </div>
@@ -2190,7 +2222,7 @@
     <div class="bandwidth-back-button">
         back
     </div>
-    <div class="nw-fm-dialog-title">[$6989]<span></span></div>
+    <div class="nw-fm-dialog-title">[$16162]<span></span></div>
 
     <div class="step1-block">
         <div class="bandwidth-header">[$7100]</div>
@@ -2225,7 +2257,7 @@
                     </div>
                     <div class="reg-st3-bandwidth">
                         <div class="reg-st3-big-txt">1 <span>TB</span></div>
-                        <div class="reg-st3-mid-txt">[$496]</div>
+                        <div class="reg-st3-mid-txt">[$16120]</div>
                         <div class="clear"></div>
                     </div>
                     <div class="membership-button"><span>[$1523]</span></div>
@@ -2245,7 +2277,7 @@
                     </div>
                     <div class="reg-st3-bandwidth">
                         <div class="reg-st3-big-txt">2 <span>TB</span></div>
-                        <div class="reg-st3-mid-txt">[$496]</div>
+                        <div class="reg-st3-mid-txt">[$16120]</div>
                         <div class="clear"></div>
                     </div>
                     <div class="membership-button"><span>[$1523]</span></div>
@@ -2265,7 +2297,7 @@
                     </div>
                     <div class="reg-st3-bandwidth">
                         <div class="reg-st3-big-txt">4 <span>TB</span></div>
-                        <div class="reg-st3-mid-txt">[$496]</div>
+                        <div class="reg-st3-mid-txt">[$16120]</div>
                         <div class="clear"></div>
                     </div>
                     <div class="membership-button"><span>[$1523]</span></div>
@@ -2285,7 +2317,7 @@
                     </div>
                     <div class="reg-st3-bandwidth">
                         <div class="reg-st3-big-txt">8 <span>TB</span></div>
-                        <div class="reg-st3-mid-txt">[$496]</div>
+                        <div class="reg-st3-mid-txt">[$16120]</div>
                         <div class="clear"></div>
                     </div>
                     <div class="membership-button"><span>[$1523]</span></div>
@@ -2294,7 +2326,7 @@
             <div class="clear"></div>
         </div>
         <div class="bandwidth-text-bl first">
-            <span class="star"></span> [$7098]
+            <span class="star"></span> [$16163]
         </div>
         <div class="bandwidth-text-bl second">[$7099]</div>
         <div class="clear"></div>
@@ -2392,8 +2424,8 @@
         </div>
     </div>
     <div class="fm-notifications-bottom">
-        <div class="fm-dialog-button accept"><span>[$870]</span></div>
-        <div class="fm-dialog-button cancel"><span>[$1597]</span></div>
+        <div class="default-white-button right accept"><span>[$870]</span></div>
+        <div class="default-white-button right cancel"><span>[$1597]</span></div>
         <a class="powered-by-astropay" href="https://www.astropay.com/" target="_blank"></a>
         <div class="clear"></div>
     </div>
@@ -2429,8 +2461,8 @@
         </p>
     </div>
     <div class="fm-notifications-bottom">
-        <div class="fm-dialog-button accept"><span>[$7645]</span></div>
-        <div class="fm-dialog-button cancel"><span>[$7646]</span></div>
+        <div class="default-white-button right accept"><span>[$7645]</span></div>
+        <div class="default-white-button right cancel"><span>[$7646]</span></div>
         <div class="clear"></div>
     </div>
 </div>
@@ -2462,7 +2494,7 @@
                         <div class="reg-st3-big-txt">
                             <span class="quota-amount"></span> <span class="quota-unit"></span>
                         </div>
-                        <div class="reg-st3-mid-txt">[$496]</div>
+                        <div class="reg-st3-mid-txt">[$16120]</div>
                         <div class="clear"></div>
                     </div>
                 </div>
@@ -2566,21 +2598,20 @@
     <div class="fm-dialog-body centered-content">
         <i class="big-90px-icon speedometer dialog-top-icon"></i>
         <!-- [$8943] !-->
-        <div class="dialog header-after-icon">Limited available bandwidth</div>
-        <!-- [$8944]. We need to replace: [BR] by <br />, [S] by <span>, [/S] by </span  !-->
+        <div class="dialog header-after-icon">[$16164]</div>
         <p class="dialog p-after-icon">
-            Your transfer may be interrupted.
-            <br /><a class="red">Get a PRO account</a> for increased bandwidth quota.</p>
+            [$16165]
+        </p>
 
         <div class="dialog big-buttons-block">
             <!-- [$8945] - Continue without account !-->
             <!-- [$8946] - Continue with your free account !-->
             <div class="default-big-button button-without-outline continue">
-                <span>Continue without account</span>
+                <span>[$8945]</span>
             </div>
             <!-- [$1108] !-->
             <div class="default-big-button button-without-outline grey-gradient upgrade">
-                <span>Create account</span>
+                <span>[$968]</span>
             </div>
         </div>
 
@@ -2590,5 +2621,599 @@
             </div>
             <label for="limit-warning-checkbox" class="radio-txt medium">[$229]</label>
         </div>
+    </div>
+</div>
+
+<div class="fm-dialog achievement-dialog hidden">
+    <div class="fm-dialog-close"></div>
+    <div class="fm-dialog-header">
+        <div class="fm-dialog-title">Create an account in MEGA</div>
+    </div>
+    <div class="fm-dialog-body achievement-dialog centered-content">
+        <div class="achievement-dialog top-icon">
+            <i class="huge-icon achievement"></i>
+        </div>
+        <div class="achievement-dialog header">
+            Congratulations! You've just unlocked:
+        </div>
+        <div class="achievement-dialog reward storage">
+            <i class="big-icon cloud"></i>
+            <div class="achievement-dialog reward-txt">
+            <!-- do NOT translate this, it's on the JS side -->
+                <span>XX GB</span>
+                storage space
+            </div>
+        </div>
+        <div class="achievement-dialog reward bandwidth">
+            <i class="big-icon speedometer"></i>
+            <div class="achievement-dialog reward-txt">
+            <!-- do NOT translate this, it's on the JS side -->
+                <span>XX GB</span>
+                transfer quota
+            </div>
+        </div>
+        <div class="achievement-dialog description">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+        </div>
+        <div class="achievement-dialog expires-txt red">
+            <!-- do NOT translate this, it's on the JS side -->
+            (Expires in <span>XX</span> months)
+        </div>
+        <div class="button default-white-button semi-big continue">
+            Continue
+        </div>
+    </div>
+</div>
+
+<div class="fm-dialog achievements-list-dialog hidden">
+    <div class="fm-dialog-close"></div>
+    <div class="fm-dialog-header">
+        <div class="fm-dialog-title">MEGA Achievements</div>
+    </div>
+    <div class="achievements-scroll">
+        <div class="acivements-content">
+
+            <!-- Add class "achived", "one-reward" !-->
+            <div class="achievements-cell ach-create-account">
+                <div class="achievements-cell-body">
+                    <div class="achievement-dialog left-icon">
+                        <i class="huge-icon achievement"></i>
+                    </div>
+                    <div class="achievement-full info">
+                        <div class="achievement-full title">
+                            [$16276]
+                        </div>
+                        <div class="achievement-full description">
+                            [$16277]
+                        </div>
+                        <div class="achievement-dialog expires-txt red">
+            <!-- do NOT translate this, it's on the JS side -->
+                            (Expires in <span>2</span> months)
+                        </div>
+                    </div>
+
+                    <div class="achievement-dialog right-block">
+                        <div class="achievement-dialog reward storage">
+                            <i class="semi-big-icon cloud"></i>
+                            <div class="achievement-dialog reward-txt">
+            <!-- do NOT translate this, it's on the JS side -->
+                                <span>XX GB</span>
+                                storage space
+                            </div>
+                        </div>
+                        <div class="achievement-dialog reward bandwidth">
+                            <i class="semi-big-icon speedometer"></i>
+                            <div class="achievement-dialog reward-txt">
+            <!-- do NOT translate this, it's on the JS side -->
+                                <span>XX GB</span>
+                                Transfer
+                            </div>
+                        </div>
+                        <div class="achievement-dialog status-block">
+                            <div class="button default-white-button">
+                                [$170]
+                            </div>
+                            <div class="achievement-dialog status-txt">
+                                [$726]!
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Add class "achived", "one-reward" !-->
+            <div class="achievements-cell ach-install-megasync">
+                <div class="achievements-cell-body">
+                    <div class="achievement-dialog left-icon">
+                        <i class="huge-icon achievement"></i>
+                    </div>
+                    <div class="achievement-full info">
+                        <div class="achievement-full title">
+                            [$16278]
+                        </div>
+                        <div class="achievement-full description">
+                            [$16279]
+                        </div>
+                        <div class="achievement-dialog expires-txt">
+            <!-- do NOT translate this, it's on the JS side -->
+                            (Expires after <span>12</span> months)
+                        </div>
+                    </div>
+                    <div class="achievement-dialog right-block">
+                        <div class="achievement-dialog reward storage">
+                            <i class="semi-big-icon cloud"></i>
+                            <div class="achievement-dialog reward-txt">
+            <!-- do NOT translate this, it's on the JS side -->
+                                <span>XX GB</span>
+                                storage space
+                            </div>
+                        </div>
+                        <div class="achievement-dialog reward bandwidth">
+                            <i class="semi-big-icon speedometer"></i>
+                            <div class="achievement-dialog reward-txt">
+            <!-- do NOT translate this, it's on the JS side -->
+                                <span>XX GB</span>
+                                Transfer
+                            </div>
+                        </div>
+                        <div class="achievement-dialog status-block">
+                            <div class="button default-white-button">
+                                [$16295]
+                            </div>
+                            <div class="achievement-dialog status-txt">
+                                [$726]!
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add class "achived", "one-reward" !-->
+            <div class="achievements-cell ach-install-mobile-app">
+                <div class="achievements-cell-body">
+                    <div class="achievement-dialog left-icon">
+                        <i class="huge-icon achievement"></i>
+                    </div>
+                    <div class="achievement-full info">
+                        <div class="achievement-full title">
+                            [$16280]
+                        </div>
+                        <div class="achievement-full description">
+                            [$16281]
+                        </div>
+                        <div class="achievement-dialog expires-txt">
+            <!-- do NOT translate this, it's on the JS side -->
+                            (Expires after <span>12</span> months)
+                        </div>
+                    </div>
+                    <div class="achievement-dialog right-block">
+                        <div class="achievement-dialog reward storage">
+                            <i class="semi-big-icon cloud"></i>
+                            <div class="achievement-dialog reward-txt">
+            <!-- do NOT translate this, it's on the JS side -->
+                                <span>XX GB</span>
+                                storage space
+                            </div>
+                        </div>
+                        <div class="achievement-dialog reward bandwidth">
+                            <i class="semi-big-icon speedometer"></i>
+                            <div class="achievement-dialog reward-txt">
+            <!-- do NOT translate this, it's on the JS side -->
+                                <span>XX GB</span>
+                                Transfer
+                            </div>
+                        </div>
+                        <div class="achievement-dialog status-block">
+                            <div class="button default-white-button">
+                                [$16295]
+                            </div>
+                            <div class="achievement-dialog status-txt">
+                                [$726]!
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add class "achived", "one-reward" !-->
+            <div class="achievements-cell ach-take-tour">
+                <div class="achievements-cell-body">
+                    <div class="achievement-dialog left-icon">
+                        <i class="huge-icon achievement"></i>
+                    </div>
+                    <div class="achievement-full info">
+                        <div class="achievement-full title">
+                            Take the MEGA tour
+                        </div>
+                        <div class="achievement-full description">
+                            Dada
+                        </div>
+                        <div class="achievement-dialog expires-txt">
+            <!-- do NOT translate this, it's on the JS side -->
+                            (Expires after <span>12</span> months)
+                        </div>
+                    </div>
+                    <div class="achievement-dialog right-block">
+                        <div class="achievement-dialog reward storage">
+                            <i class="semi-big-icon cloud"></i>
+                            <div class="achievement-dialog reward-txt">
+            <!-- do NOT translate this, it's on the JS side -->
+                                <span>XX GB</span>
+                                storage space
+                            </div>
+                        </div>
+                        <div class="achievement-dialog reward bandwidth">
+                            <i class="semi-big-icon speedometer"></i>
+                            <div class="achievement-dialog reward-txt">
+            <!-- do NOT translate this, it's on the JS side -->
+                                <span>XX GB</span>
+                                Transfer
+                            </div>
+                        </div>
+                        <div class="achievement-dialog status-block">
+                            <div class="button default-white-button">
+                                Action
+                            </div>
+                            <div class="achievement-dialog status-txt">
+                                [$726]!
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add class "achived", "one-reward" !-->
+            <div class="achievements-cell ach-invite-friend">
+                <div class="achievements-cell-body">
+                    <div class="achievement-dialog left-icon">
+                        <i class="huge-icon achievement"></i>
+                    </div>
+                    <div class="achievement-full info">
+                        <div class="achievement-full title">
+                            [$16282]
+                        </div>
+                        <div class="achievement-full description">
+                            [$16283]
+                        </div>
+                        <div class="achievement-dialog expires-txt">
+            <!-- do NOT translate this, it's on the JS side -->
+                            (Expires after <span>12</span> months)
+                        </div>
+                    </div>
+                    <div class="achievement-dialog right-block">
+                        <div class="achievement-dialog reward storage">
+                            <i class="semi-big-icon cloud"></i>
+                            <div class="achievement-dialog reward-txt">
+            <!-- do NOT translate this, it's on the JS side -->
+                                <span>XX GB</span>
+                                storage space
+                            </div>
+                        </div>
+                        <div class="achievement-dialog reward bandwidth">
+                            <i class="semi-big-icon speedometer"></i>
+                            <div class="achievement-dialog reward-txt">
+            <!-- do NOT translate this, it's on the JS side -->
+                                <span>XX GB</span>
+                                Transfer
+                            </div>
+                        </div>
+                        <div class="achievement-dialog status-block">
+                            <div class="button default-white-button">
+                                [$8726]
+                            </div>
+                            <div class="achievement-dialog status-txt">
+                                [$726]!
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add class "achived", "one-reward" !-->
+            <div class="achievements-cell ach-verify-number">
+                <div class="achievements-cell-body">
+                    <div class="achievement-dialog left-icon">
+                        <i class="huge-icon achievement"></i>
+                    </div>
+                    <div class="achievement-full info">
+                        <div class="achievement-full title">
+                            Create an account in MEGA
+                        </div>
+                        <div class="achievement-full description">
+                            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                        </div>
+                        <div class="achievement-dialog expires-txt">
+            <!-- do NOT translate this, it's on the JS side -->
+                            (Expires after <span>12</span> months)
+                        </div>
+                    </div>
+                    <div class="achievement-dialog right-block">
+                        <div class="achievement-dialog reward storage">
+                            <i class="semi-big-icon cloud"></i>
+                            <div class="achievement-dialog reward-txt">
+            <!-- do NOT translate this, it's on the JS side -->
+                                <span>XX GB</span>
+                                storage space
+                            </div>
+                        </div>
+                        <div class="achievement-dialog reward bandwidth">
+                            <i class="semi-big-icon speedometer"></i>
+                            <div class="achievement-dialog reward-txt">
+            <!-- do NOT translate this, it's on the JS side -->
+                                <span>XX GB</span>
+                                Transfer
+                            </div>
+                        </div>
+                        <div class="achievement-dialog status-block">
+                            <div class="button default-white-button">
+                                Action
+                            </div>
+                            <div class="achievement-dialog status-txt">
+                                [$726]!
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add class "achived", "one-reward" !-->
+            <div class="achievements-cell ach-group-chat">
+                <div class="achievements-cell-body">
+                    <div class="achievement-dialog left-icon">
+                        <i class="huge-icon achievement"></i>
+                    </div>
+                    <div class="achievement-full info">
+                        <div class="achievement-full title">
+                            Create an account in MEGA
+                        </div>
+                        <div class="achievement-full description">
+                            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                        </div>
+                        <div class="achievement-dialog expires-txt">
+            <!-- do NOT translate this, it's on the JS side -->
+                            (Expires after <span>12</span> months)
+                        </div>
+                    </div>
+                    <div class="achievement-dialog right-block">
+                        <div class="achievement-dialog reward storage">
+                            <i class="semi-big-icon cloud"></i>
+                            <div class="achievement-dialog reward-txt">
+            <!-- do NOT translate this, it's on the JS side -->
+                                <span>XX GB</span>
+                                storage space
+                            </div>
+                        </div>
+                        <div class="achievement-dialog reward bandwidth">
+                            <i class="semi-big-icon speedometer"></i>
+                            <div class="achievement-dialog reward-txt">
+            <!-- do NOT translate this, it's on the JS side -->
+                                <span>XX GB</span>
+                                Transfer
+                            </div>
+                        </div>
+                        <div class="achievement-dialog status-block">
+                            <div class="button default-white-button">
+                                Action
+                            </div>
+                            <div class="achievement-dialog status-txt">
+                                [$726]!
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add class "achived", "one-reward" !-->
+            <div class="achievements-cell ach-share-folder">
+                <div class="achievements-cell-body">
+                    <div class="achievement-dialog left-icon">
+                        <i class="huge-icon achievement"></i>
+                    </div>
+                    <div class="achievement-full info">
+                        <div class="achievement-full title">
+                            Create an account in MEGA
+                        </div>
+                        <div class="achievement-full description">
+                            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                        </div>
+                        <div class="achievement-dialog expires-txt">
+            <!-- do NOT translate this, it's on the JS side -->
+                            (Expires after <span>12</span> months)
+                        </div>
+                    </div>
+                    <div class="achievement-dialog right-block">
+                        <div class="achievement-dialog reward storage">
+                            <i class="semi-big-icon cloud"></i>
+                            <div class="achievement-dialog reward-txt">
+            <!-- do NOT translate this, it's on the JS side -->
+                                <span>XX GB</span>
+                                storage space
+                            </div>
+                        </div>
+                        <div class="achievement-dialog reward bandwidth">
+                            <i class="semi-big-icon speedometer"></i>
+                            <div class="achievement-dialog reward-txt">
+            <!-- do NOT translate this, it's on the JS side -->
+                                <span>XX GB</span>
+                                Transfer
+                            </div>
+                        </div>
+                        <div class="achievement-dialog status-block">
+                            <div class="button default-white-button">
+                                Action
+                            </div>
+                            <div class="achievement-dialog status-txt">
+                                [$726]!
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<!-- Please add "success" class !-->
+<div class="fm-dialog invite-dialog hidden">
+    <div class="fm-dialog-close"></div>
+    <div class="fm-dialog-header">
+        <div class="fm-dialog-title">[$16282]</div>
+    </div>
+    <div class="fm-dialog-body achievement-dialog centered-content">
+        <div class="achievement-dialog default-content">
+            <div class="achievement-dialog top-icon ach-invite-friend">
+                <i class="huge-icon achievement"></i>
+            </div>
+            <div class="achievement-dialog header default">
+                <!-- do NOT translate this, it's on the JS side -->
+                Get <span>X GB</span>  free storage and <span>X GB</span> of Transfer for each friend that installs a MEGA app
+            </div>
+            <div class="achievement-dialog green-header">
+                [$1070]
+            </div>
+            <div class="achievement-dialog info-block">
+                <div class="achievement-dialog info-icon">
+                    <i class="huge-white-icon achievement ach-create-account"></i>
+                </div>
+                <div class="achievement-dialog info-body">
+                    <p>
+                        [$16317]
+                    </p>
+                    <p class="italic">
+                        [$16318]
+                    </p>
+                </div>
+            </div>
+            <div class="achievement-dialog input-header">
+                [$16319]
+            </div>
+            <div class="achievement-dialog input-field multiple-input emails">
+                <input type="text" class="achievement-dialog input" name="" id="ach-invite-dialog-input" />
+                <div class="clear"></div>
+            </div>
+            <div class="achievement-dialog input-info">
+                [$9093]
+            </div>
+        </div>
+        <div class="achievement-dialog success-content">
+            <div class="achievement-dialog top-icon green-tick">
+                <i class="huge-icon achievement"></i>
+            </div>
+            <div class="achievement-dialog header">
+                [$16320]
+            </div>
+            <div class="achievement-dialog green-header">
+                [$16321]
+            </div>
+            <div class="achievement-dialog info-block">
+                <div class="achievement-dialog info-body">
+                    <p>
+                <!-- do NOT translate this, it's on the JS side -->
+						Encourage your friend to register and install a MEGA app. As long as your friend uses the same email address as you've entered, you will receive you <span class="red">free <span>XXGB</span> of Transfer</span>.
+                    </p>
+                    <div class="achievement-dialog links-block">
+                        <div class="achievement-dialog input-label">
+                            [$16322]
+                        </div>
+                        <div class="achievement-dialog input-label">
+                            [$16323]
+                        </div>
+                    </div>
+                    <div class="achievement-dialog links-block inputs">
+                        <div class="achievement-dialog input-field">
+                            <input type="text" class="achievement-dialog input" value="https://mega.nz/sync" readonly>
+                        </div>
+                        <div class="achievement-dialog input-field">
+                            <input type="text" class="achievement-dialog input" value="https://mega.nz/mobile" readonly>
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+            </div>
+        </div>
+        <div class="button default-grey-button inline back hidden">
+            [$822]
+        </div>
+        <div class="button default-grey-button inline disabled send">
+            [$1940]
+        </div>
+        <div class="button default-white-button inline status hidden">
+            <!--Invitation Status-->[$16101]
+        </div>
+    </div>
+</div>
+
+<div class="fm-dialog invitation-dialog hidden">
+    <div class="fm-dialog-close"></div>
+    <div class="fm-dialog-header">
+        <div class="fm-dialog-title"><!--Invitation Status-->[$16101]</div>
+    </div>
+    <div class="fm-dialog-body invitation-dialog">
+        <div class="invitation-dialog table">
+            <div class="invitation-dialog table-row header">
+                <div class="invitation-dialog table-cell">
+                </div>
+                <div class="invitation-dialog table-cell">
+                    <span>[$7434]</span><!-- Email -->
+                </div>
+                <div class="invitation-dialog table-cell">
+                    <span>[$89]</span><!-- Status -->
+                </div>
+                <div class="invitation-dialog table-cell">
+                    <span class="asc">[$16100]</span><!-- Date Sent -->
+                </div>
+            </div>
+        </div>
+        <div class="invitation-dialog table-scroll">
+            <div class="invitation-dialog table-bg">
+                <div class="invitation-dialog table">
+
+                    <div class="invitation-dialog table-row">
+                        <div class="invitation-dialog table-cell icon">
+                            <i class="semi-small-icon"></i>
+                        </div>
+                        <div class="invitation-dialog table-cell email">
+                            <strong></strong>
+                        </div>
+                        <div class="invitation-dialog table-cell status">
+                            <span>
+                            </span>
+                        </div>
+                        <div class="invitation-dialog table-cell date">
+                            <div class="button default-white-button small-square-button">
+                                <i class="semi-small-icon rounded-arrow"></i>
+                            </div>
+                            <span></span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="invitation-dialog table-info hint">
+            <!-- do NOT translate this, it's on the JS side -->
+            Encourage your friend to register and install a MEGA app. As long as your friend uses the same email address as you've entered, you will receive your free <span>XGB</span> of storage space and <span>XGB</span> of Transfer.
+        </div>
+        <div class="button default-white-button inline invite-more">
+            <!--Invite more friends-->[$16102]
+        </div>
+        <div class="button default-white-button inline reinvite-all">
+            <!--Reinvite all pending-->[$16103]
+        </div>
+    </div>
+</div>
+
+<div class="dropdown body popup dropdown-arrow down-arrow fm-voucher-popup hidden">
+    <div class="fm-voucher-body">
+        <div class="fm-dialog-new-folder-input active">
+            <div class="fm-dialog-new-folder-pad"><input name="dialog-voucher" type="text" value="[$487]" /></div>
+        </div>
+        <div class="fm-voucher-button"><span>[$458]</span></div>
+    </div>
+    <div class="fm-voucher-bottom">
+        <div class="fm-purchase-voucher"><span>[$457]</span></div>
     </div>
 </div>

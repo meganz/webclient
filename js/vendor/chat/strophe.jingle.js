@@ -669,19 +669,37 @@ var JinglePlugin = {
         if (sess.state != 'ended')
         {
             if (!nosend)
-                sess.sendTerminate(reason||'term', text);
-            sess.terminate();
+            {
+                // Wait for ack before actually terminating, as we may end up
+                // terminating webrtc before the peer has received the hangup
+                // signalling, which would lead the peer client think it's
+                // a network error
+                var terminated = false;
+                setTimeout(function() {
+                   if (!terminated) {
+                       sess.terminate();
+                       terminated = true;
+                   }
+                }, 2000);
+                sess.sendTerminate(reason||'term', text, function() {
+                    if (terminated) {
+                        return;
+                    }
+                    sess.terminate();
+                    terminated = true;
+                });
+            }
         }
         delete this.sessions[sess.sid];
-        if (sess.fileTransferHandler)
+        if (sess.fileTransferHandler) {
             sess.fileTransferHandler.remove(reason, text);
-         else
+        } else {
             try {
                 this.onCallTerminated.call(this.eventHandler, sess, reason||'term', text, errInfo);
             } catch(e) {
                 console.error('Jingle.onCallTerminated() threw an exception:', e.stack);
             }
-
+        }
         return true;
     },
     sendTerminateNoSession: function(sid, to, reason, text) {

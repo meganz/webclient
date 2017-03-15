@@ -1,16 +1,55 @@
-.fm-dialog-footer {
-    height: 56px;
-    background-color: #F6F6F6;
+.fm-dialog-footer, .fm-move-bottom-block, .fm-share-bottom-block, .fm-notifications-bottom, .top-login-bott-gray-block, .fm-mega-dialog-bottom, .create-folder-bottom, .default-dialog-bottom {
+    height: 57px;
+    background-color: white;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    -webkit-border-bottom-left-radius: 7px;
-    -moz-border-radius-bottomleft: 7px;
-    border-bottom-left-radius: 7px;
-    -webkit-border-bottom-right-radius: 7px;
-    -moz-border-radius-bottomright: 7px;
-    border-bottom-right-radius: 7px;
+    -webkit-border-bottom-left-radius: 8px;
+    -moz-border-radius-bottomleft: 8px;
+    border-bottom-left-radius: 8px;
+    -webkit-border-bottom-right-radius: 8px;
+    -moz-border-radius-bottomright: 8px;
+    border-bottom-right-radius: 8px;
     padding: 12px 12px 0 12px;
+    border-top: 1px solid rgba(0,0,0,0.1);
+    position: relative;
+}
+.top-login-bott-gray-block {
+    margin: 0 -15px 0 -15px;
+    padding: 5px 15px 0 15px;
+}
+.fm-move-bottom-block, .fm-share-bottom-block, .fm-notifications-bottom {
+    padding: 0 12px 0 12px;
+}
+.fm-mega-dialog-bottom, .create-folder-bottom, .default-dialog-bottom {
+    margin: 12px -12px -12px -12px;
+    padding: 0 12px 0 0;
+}
+.credentials-warning-dialog .fm-mega-dialog-bottom {
+    margin: 0;
+}
+.key-signature-warning-dialog .fm-mega-dialog-bottom {
+    margin: 12px 0 -12px;
+}
+.notification-popup .fm-notifications-bottom {
+    height: 34px;
+}
+.browsers-dialog .fm-notifications-bottom {
+    padding: 0 20px 0 14px;
+}
+.share-dialog .fm-notifications-bottom {
+    position: static;
+}
+.languages-dialog .fm-notifications-bottom {
+    bottom: 0;
+    left: 0;
+    position: absolute;
+    right: 0;
+}
+.fm-dialog-footer-txt {
+    text-align: center;
+    line-height: 31px;
+    color: #999;
 }
 /* Send Contact Dialog */
 .fm-dialog.send-contact {
@@ -52,10 +91,6 @@
     margin-top: -4px;
     color: #666666;
 }
-.contacts-search-footer {
-    height: 46px;
-    display: block;
-}
 .contacts-search-footer em {
     display: block;
     color: #2ba6de;
@@ -69,26 +104,18 @@
 /* Add From Cloud Dialog */
 .fm-dialog.add-from-cloud {
     width: 644px;
-    margin: -246px 0 0 -322px;
+    margin: -247px 0 0 -322px;
 }
 .fm-dialog .fm-breadcrumbs-block {
     float: none;
-    height: 40px;
-    margin: 0 0 19px 0;
-    padding: 22px 0 0 16px;
+    height: 46px;
+    margin: 0 0 11px 0;
+    padding: 22px 0 0 2px;
+    overflow: hidden;
+    position:relative;
 }
-.fm-dialog .fm-breadcrumbs-block:not(.long-path) .cloud-drive .right-arrow-bg {
-    padding: 0 7px 0 8px;
-    background-image: none;
-}
-.fm-dialog .fm-breadcrumbs .right-arrow-bg {
-    font-size: 13px;
-}
-.fm-dialog .fm-breadcrumbs:first-child .right-arrow-bg span {
-    display: block;
-}
-.fm-dialog .long-path .fm-breadcrumbs .right-arrow-bg span {
-    display: none;
+.fm-dialog .breadcrumbs-wrapper {
+    position:absolute;
 }
 .fm-dialog-table.grid-table tr:nth-child(odd) td {
     background-color: rgba(255,255,255,1);
@@ -200,18 +227,576 @@
 }
 /* End of Limited available bandwidth dialog */
 
+/* Achievement dialog */
+.fm-dialog.achievement-dialog {
+    width: 484px;
+    margin: -242px 0 0 -242px;
+    background-color: #FAFAFA;
+    font-size: 0;
+}
+.achievement-dialog.top-icon {
+    padding: 5px 0 21px 0;
+}
+.achievement-dialog.fm-dialog-body {
+    padding: 12px 48px 24px 48px;
+}
+.fm-dialog-body.centered-content {
+    font-size: 0;
+}
+.achievement-dialog.header {
+    font-size: 20px;
+    line-height: 30px;
+    color: #666666;
+    padding: 0;
+    height: 60px;
+    display: table-cell;
+    width: 544px;
+}
+.achievement-dialog.header span {
+    color: #FF333A;
+    border-bottom: 2px solid #FF333A;
+}
+.achievement-dialog.reward {
+    display: inline-block;
+    position:relative;
+    margin: 15px 21px 0 21px;
+    text-align: left;
+}
+.achievement-dialog.reward.hidden {
+    display: none;
+}
+.achievement-dialog.reward i {
+    vertical-align: top;
+}
+.achievement-dialog.reward-txt {
+    display: inline-block;
+    font-size: 14px;
+    line-height: 17px;
+    color: #777777;
+    vertical-align: top;
+    margin: 6px 0 0 15px;
+}
+.achievement-dialog.reward-txt span {
+    font-size: 18px;
+    line-height: 18px;
+    display: block;
+    text-transform: uppercase;
+    color: #2BA6DE;
+}
+.achievement-dialog.reward.storage span {
+    color: #2BA6DE;
+}
+.achievement-dialog.reward.bandwidth span {
+    color: #31B500;
+}
+.achievement-dialog.description {
+    padding: 18px 0 0 0;
+    font-size: 14px;
+    line-height: 18px;
+    color: #666666;
+}
+.achievement-dialog.expires-txt {
+    font-size: 14px;
+    line-height: 18px;
+    color: #333333;
+    padding: 15px 0 24px 0;
+}
+.achievement-dialog.expires-txt.red {
+    color: #FF333A;
+}
+.achievement-dialog .default-white-button {
+    display: inline-block;
+    margin: 0 10px 0 10px;
+    color: #777777;
+    min-width: 102px;
+}
+/* End of Achievement dialog */
 
+
+/* Achievements list dialog */
+.fm-dialog.achievements-list-dialog {
+    width: 964px;
+    margin: -354px 0 0 -482px;
+    background-color: #f7f7f7;
+}
+.achievements-scroll .achievements-cell {
+    display: table;
+    width: 100%;
+    margin: 0 0 12px 0;
+}
+.achievements-scroll .achievements-cell.hidden {
+    display: none;
+}
+.achievements-cell-body {
+    display: table-row;
+}
+.achievements-list-dialog .achievement-full.info {
+    margin: 0;
+    padding: 0 36px 0 0;
+}
+.achievement-dialog.left-icon {
+    display: table-cell;
+    width: 200px;
+    position: relative;
+    z-index: 1;
+    vertical-align: middle;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    padding-left: 18px;
+}
+.achievement-dialog.left-icon i {
+    margin: -5px 0;
+}
+.achievement-dialog.right-block {
+    display: table-cell;
+    width: 223px;
+    border-left: 1px solid #e5e5e5;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 1;
+    vertical-align: top;
+    text-align: center;
+    padding: 0 15px 32px 15px;
+}
+.achievements-scroll {
+    max-height: 666px;
+    overflow: hidden;
+}
+.achievements-scroll .jspContainer::before {
+    content: '';
+    display: block;
+    width: 100%;
+    height: 8px;
+    left: 0;
+    top: 0;
+    position: absolute;
+    background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2Y3ZjdmNyIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmN2Y3ZjciIHN0b3Atb3BhY2l0eT0iMCIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+background: -moz-linear-gradient(top, rgba(247,247,247,1) 0%, rgba(247,247,247,0) 100%);
+background: -webkit-linear-gradient(top, rgba(247,247,247,1) 0%,rgba(247,247,247,0) 100%);
+background: linear-gradient(to bottom, rgba(247,247,247,1) 0%,rgba(247,247,247,0) 100%);
+    z-index: 10;
+}
+.achievements-list-dialog .acivements-content {
+    padding: 10px 24px 12px 24px;
+}
+.achievement-full.expires-txt {
+    font-size: 14px;
+    line-height: 18px;
+    color: #333333;
+    padding: 10px 0 0 0;
+}
+.achievement-full.expires-txt.red {
+    color: #333333;
+}
+.achievement-dialog.right-block .reward {
+    margin: 0 0 17px 10px;
+    min-width: 140px;
+}
+.achievement-dialog.right-block .reward i {
+    margin: -17px 0 0 0;
+    position:absolute;
+    top: 50%;
+}
+.achievement-dialog.right-block .reward-txt {
+    margin: -4px 0 0 47px;
+}
+.achievements-cell-body .expires-txt {
+    padding: 12px 0 0 0;
+}
+.achievement-dialog.status-block {
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+    left: 0;
+}
+.achievement-dialog.status-block .button {
+    display: inline-block;
+    min-width: 126px;
+}
+.achived .achievement-dialog.status-block .button {
+    display: none;
+}
+.achievement-dialog.status-txt {
+    font-size: 18px;
+    color: #31B500;
+    line-height: 26px;
+    text-transform: uppercase;
+    display: none;
+}
+.achived .achievement-dialog.status-txt {
+    display: block;
+}
+.one-reward .achievement-dialog.right-block {
+    vertical-align: middle;
+    padding: 0 15px 0 15px;
+}
+.one-reward .achievement-dialog.right-block .reward {
+    margin: 0px 0 4px 10px;
+}
+.one-reward .right-block .reward.bandwidth {
+    display: none;
+}
+.achived .achievement-dialog.right-block .reward {
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
+    -moz-opacity: 0.5;
+    -khtml-opacity: 0.5;
+    opacity: 0.5;
+}
+/* End of Achievements list dialog */
+
+/* Invite a friend dialog */
+.fm-dialog.invite-dialog {
+    width: 644px;
+    margin: -329px 0 0 -322px;
+    background-color: #FAFAFA;
+}
+.fm-dialog.invite-dialog.success {
+    margin: -338px 0 0 -322px;
+}
+.invite-dialog .header {
+    margin-top: -5px;
+}
+.invite-dialog .fm-dialog-body {
+    padding-bottom: 36px;
+}
+.achievement-dialog.green-header {
+    font-size: 16px;
+    line-height: 20px;
+    color: #54BCA9;
+    display: inline-block;
+    position: relative;
+    background-color: #FAFAFA;
+    padding: 21px 10px 0 10px;
+}
+.achievement-dialog.info-block {
+    display: table;
+    width: 100%;
+    border-top: 1px solid rgba(0,0,0,0.1);
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    margin: -12px 0 0 0;
+}
+.achievement-dialog.info-icon {
+    display: table-cell;
+    width: 88px;
+    vertical-align: middle;
+    text-align: left;
+}
+.achievement-dialog.info-icon i {
+    margin-left: -2px;
+}
+.achievement-dialog.info-body {
+    display: table-cell;
+    vertical-align: middle;
+    text-align: left;
+    padding: 18px 0;
+}
+.achievement-dialog.info-body p {
+    padding: 6px 0;
+    margin: 0;
+    font-size: 14px;
+    line-height: 18px;
+    color: #666666;
+}
+.achievement-dialog.info-body p strong {
+    color: #333333;
+}
+.achievement-dialog.info-body p.italic {
+    font-style: italic;
+    color: #999999;
+}
+.achievement-dialog.info-body p .red {
+    color: #FF333A;
+}
+.achievement-dialog.input-header {
+    font-size: 16px;
+    line-height: 20px;
+    color: #666666;
+    padding: 16px 0 16px 0;
+}
+.achievement-dialog.input-field {
+    max-height: 64px;
+    min-height: 32px;
+    background-color: rgba(0,0,0,0.05);
+    border: 1px solid transparent;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    padding: 0 10px 0 10px;
+    height: auto !important;
+    cursor: text;
+    text-align: center;
+    overflow: hidden;
+}
+.active .achievement-dialog.input-field {
+    background-color: white;
+    border: 1px solid rgba(0,0,0,0.2);
+}
+.achievement-dialog.input-field ul {
+    padding: 0 10px 0 10px;
+    font-size: 0;
+    line-height: 0;
+}
+.achievement-dialog.input-field li {
+    overflow: hidden;
+    height: 30px;
+    line-height: 18px;
+    margin: 0;
+    padding: 0;
+    cursor: default;
+    font-size: 14px;
+    color: #333333;
+    padding: 6px 18px 0 4px;
+    display: inline-block;
+    white-space: nowrap;
+    position: relative;
+    max-width: 100%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+li.token-input-token-invite .input-close {
+    top: 6px;
+}
+.achievement-dialog.input-field input {
+    border: 0;
+    width: 100px;
+    padding: 0;
+    background-color: transparent;
+    font-size: 14px;
+    line-height: 18px;
+    color: #333333;
+    margin: 0;
+    padding: 0;
+    -webkit-appearance: caret;
+    font-family: 'source_sans_proregular', Arial;
+}
+.achievement-dialog.input-field input.tiny {
+    width: 0 !important;
+}
+.achievement-dialog.input-info.red, .achievement-dialog.input-field input.red {
+    color: #E54C51;
+}
+.achievement-dialog.input-info, .achievement-dialog.success-info {
+    font-size: 12px;
+    line-height: 15px;
+    color: #999999;
+    padding: 12px 0 15px 0;
+}
+.achievement-dialog.success-info {
+    padding: 23px 0 26px 0;
+}
+.achievement-dialog.success-content, .success .achievement-dialog.default-content, .invite-dialog .default-grey-button.back, .invite-dialog.success .default-grey-button.send {
+    display: none;
+}
+.success .achievement-dialog.success-content {
+    display: block;
+}
+.invite-dialog.success .default-grey-button.back {
+    display: inline-block;
+}
+.achievement-dialog .default-white-button.hidden {
+    display: none;
+}
+.achievement-dialog.links-block {
+    float: left;
+    width: 50%;
+    padding: 14px 12px 2px 0;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.achievement-dialog.links-block.inputs {
+    float: left;
+    width: 50%;
+    padding: 14px 0 2px 12px;
+}
+.achievement-dialog.links-block input {
+    width: 100%;
+    margin-top: 6px;
+}
+.achievement-dialog.links-block .input-field {
+    margin: 16px 0;
+    padding: 0 14px 0 14px;
+}
+.achievement-dialog.links-block .input-label {
+    margin: 16px 0;
+    height: 32px;
+    font-size: 14px;
+    line-height: 32px;
+    text-align: right;
+    color: #333333;
+    font-family: 'source_sans_prosemibold', Arial;
+}
+/* End of Invite a friend dialog */
+
+/* Invitation status dialog */
+.fm-dialog.invitation-dialog {
+    width: 724px;
+    margin: -303px 0 0 -362px;
+    background-color: #FAFAFA;
+}
+.fm-dialog-body.invitation-dialog {
+    padding: 14px 0 36px 0;
+    text-align: center;
+}
+.invitation-dialog.table {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+    text-align: left;
+}
+.invitation-dialog.table-row {
+    display: table-row;
+}
+.invitation-dialog.table-cell {
+    font-size: 13px;
+    line-height: 18px;
+    color: #666666;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    display: table-cell;
+    vertical-align: middle;
+    height: 48px;
+    border-left: 1px dashed rgba(0,0,0,0.1);
+    padding: 0 12px 0 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    position: relative;
+}
+.invitation-dialog.table-cell *:not(.button) {
+    white-space: nowrap;
+    overflow: hidden;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+}
+.invitation-dialog.table-cell span {
+    display: block;
+}
+.invitation-dialog.table-cell:first-child {
+    border-left: 0;
+    width: 35px;
+    padding: 0 9px;
+}
+.invitation-dialog.table-cell:nth-child(3) {
+    width: 170px;
+}
+.invitation-dialog.table-cell:nth-child(4) {
+    width: 190px;
+}
+.invitation-dialog.table-row.header .table-cell {
+    font-size: 13px;
+    line-height: 16px;
+    height: 25px;
+    color: #666666;
+    height: 16px;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    border-left: 1px solid rgba(0,0,0,0.1);
+    padding: 0 12px 4px 12px;
+    display: table-cell;
+}
+.invitation-dialog.table-cell strong {
+    font-size: 14px;
+}
+.invitation-dialog.table-cell .dark-grey {
+    color: #333333;
+}
+.invitation-dialog.table-cell .light-grey {
+    color: #999999;
+}
+.invitation-dialog.table-cell .green {
+    color: #31B500;
+    font-size: 13px;
+}
+.invitation-dialog.table-cell .green {
+    color: #31B500;
+    font-size: 13px;
+}
+.invitation-dialog.table-cell .orange {
+    color: #FFA500;
+    font-size: 13px;
+}
+.invitation-dialog.table-cell.small {
+    color: #999999;
+}
+.invitation-dialog.table-cell span {
+    display: block;
+    cursor: pointer;
+    margin-right: 8px;
+}
+.invitation-dialog.table-cell span.desc {
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-position: right -11445px;
+    background-repeat: no-repeat;
+}
+.invitation-dialog.table-cell span.asc {
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
+    background-position: right -11475px;
+    background-repeat: no-repeat;
+}
+.invitation-dialog.table-scroll {
+    height: 385px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+.invitation-dialog.table-bg {
+    min-height: 100%;
+    background: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI5MCIgaGVpZ2h0PSI5NiI+CjxyZWN0IHdpZHRoPSI5MCIgaGVpZ2h0PSI0OCIgZmlsbD0iI2Y1ZjVmNSI+PC9yZWN0Pgo8cmVjdCB3aWR0aD0iOTAiIGhlaWdodD0iNDgiIGZpbGw9IndoaXRlIj48L3JlY3Q+Cjwvc3ZnPg==");
+}
+.invitation-dialog.table-info {
+    font-size: 14px;
+    line-height: 18px;
+    color: #666666;
+    padding: 24px 48px 23px 48px;
+    text-align: left;
+}
+.invitation-dialog.table-info span {
+    color: #FF333A;
+}
+.invitation-dialog .default-grey-button, .invitation-dialog .default-white-button:not(.small-square-button) {
+    padding: 0 24px;
+}
+.invitation-dialog.table-cell .small-square-button {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    margin: -12px 0 0 0;
+}
+.invitation-dialog.table-cell .small-square-button span {
+    margin-right: 30px;
+}
+/* End of Invitation status dialog */
+
+.fm-dialog.create-folder-dialog {
+    width: 360px;
+    margin:-67px 0 0 -180px;
+}
 .fm-dialog.chat-rename-dialog {
     left: 50%;
     top: 50%;
-    transform: translate(-50%,-50%);
+    transform: translate(-50%, -50%);
 }
-
 .chat-rename-dialog input {
     padding-left: 10px;
     width: 260px;
 }
-
 .chat-rename-dialog .rename-input-bl {
     margin-bottom: 10px;
 }

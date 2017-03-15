@@ -19,6 +19,7 @@ e10s.js
 fileapi.js
 aesasm.js
 keygen.js
+makecache.js
 karma.conf.js
 nacl-fast.js
 js/cmsSnapshot.js
@@ -27,3 +28,4 @@ js/transfers/meths/firefox-extension.js
 contrib/Electron/main.js
 *.sh
 *.xml
+js/chat/emojidata/emojis.json

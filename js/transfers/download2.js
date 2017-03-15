@@ -8,7 +8,7 @@
  * you accept this licence. If you do not accept the licence,
  * do not access the code.
  *
- * Words used in the Mega Limited Terms of Service [https://mega.nz/#terms]
+ * Words used in the Mega Limited Terms of Service [https://mega.nz/terms]
  * have the same meaning in this licence. Where there is any inconsistency
  * between this licence and those Terms of Service, these terms prevail.
  *
@@ -334,7 +334,6 @@ var dlmanager = {
 
                     dlmanager.isOverQuota = false;
                     dlmanager.isOverFreeQuota = false;
-                    delete localStorage.awaitingConfirmationAccount;
                     return ctx.next(false, res, attr, ctx.object);
                 }
             }
@@ -838,7 +837,7 @@ var dlmanager = {
             });
     },
 
-    showOverQuotaRegisterDialog: function DM_quotaDialog(dlTask) {
+    showOverQuotaRegisterDialog: function DM_freeQuotaDialog(dlTask) {
 
         this._setOverQuotaState(dlTask);
 
@@ -848,6 +847,12 @@ var dlmanager = {
             return delay('overfreequota:retry', this._onQuotaRetry.bind(this, true), 1200);
         }
         this.isOverFreeQuota = true;
+
+        if (localStorage.awaitingConfirmationAccount) {
+            var accountData = JSON.parse(localStorage.awaitingConfirmationAccount);
+            this.logger.debug('showOverQuotaRegisterDialog: awaitingConfirmationAccount!');
+            return mega.ui.sendSignupLinkDialog(accountData);
+        }
 
         api_req({ a: 'log', e: 99613, m: 'efq' });
 
@@ -879,13 +884,14 @@ var dlmanager = {
                 Soon(callback);
                 callback = $dialog = undefined;
             }
+            delete this.onLimitedBandwidth;
         };
 
         fm_showoverlay();
         uiCheckboxes($dialog, 'ignoreLimitedBandwidth').removeClass('hidden');
 
-        $('.header-after-icon', $dialog).text(l[8943]);
-        $('.p-after-icon', $dialog).safeHTML(l[8944]);
+        $('.header-after-icon', $dialog).text(l[16164]);
+        $('.p-after-icon', $dialog).safeHTML(l[16165]);
 
         api_req({ a: 'log', e: 99617, m: 'qbq' });
 
@@ -893,7 +899,7 @@ var dlmanager = {
             open(getAppBaseUrl() + '#pro');
         });
 
-        $('.continue', $dialog).rebind('click', callback)
+        $('.continue', $dialog).rebind('click', this.onLimitedBandwidth.bind(this))
             .find('span')
             .text(res === 2 ? l[8946] : l[8945]);
 
@@ -1357,24 +1363,19 @@ function fm_tfsupdate() {
     }
     M.pendingTransfers = i + u;
     var t;
-    var sep = "\u202F";
-    var l   = String(tfse.domPanelTitle.textContent).trim().split(sep)[0];
     if (i && u) {
         t = '\u2191 ' + u + ' \u2193 ' + i;
     }
     else if (i) {
-        t = i;
+        t =  '\u2193 ' + i;
     }
     else if (u) {
-        t = u;
+        t = '\u2191 ' + u;
     }
     else {
         t = '';
     }
-    if (t) {
-        t = sep + ' ' + t;
-    }
-    tfse.domPanelTitle.textContent = (l + t);
+    tfse.domPanelTitle.textContent = (t);
 }
 
 

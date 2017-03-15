@@ -180,7 +180,7 @@
                             else {
                                 loadingDialog.hide();
                                 u_type = r;
-                                document.location.hash = 'fm'; // TODO: fixme
+                                loadSubPage('fm');
                             }
                         }
                     };
@@ -275,6 +275,10 @@
         var closeRegisterDialog = function() {
             closeDialog();
             $(window).unbind('resize.proregdialog');
+
+            if (options.onDialogClosed) {
+                options.onDialogClosed($dialog);
+            }
         };
 
         dialogBodyScroll();
@@ -288,6 +292,9 @@
         });
 
         $('*', $dialog).removeClass('incorrect'); // <- how bad idea is that "*" there?
+
+        // this might gets binded from init_page() which will conflict here..
+        $('.login-register-input').unbind('click');
 
         // controls
         $('.fm-dialog-close', $dialog)
@@ -373,28 +380,29 @@
             $('.password-status-warning', $dialog).css('margin-left',
                 ($('.password-status-warning', $dialog).width() / 2 * -1) - 13);
             reposition();
+            dialogBodyScroll();
         };
 
-        if (typeof zxcvbn === 'undefined' && !silent_loading) {
+        if (typeof zxcvbn === 'undefined') {
             $('.login-register-input.password', $dialog).addClass('loading');
 
-            silent_loading = function() {
-                $('.login-register-input.password', $dialog).removeClass('loading');
-                registerpwcheck();
-            };
-            jsl.push(jsl2['zxcvbn_js']);
-            jsl_start();
+            mega.utils.require('zxcvbn_js')
+                .done(function() {
+                    $('.login-register-input.password', $dialog).removeClass('loading');
+                    registerpwcheck();
+                });
         }
 
         $('#register-password', $dialog).rebind('keyup.proRegister', function(e) {
             registerpwcheck();
         });
+
         $('.password-status-icon', $dialog).rebind('mouseover.proRegister', function(e) {
             if ($(this).parents('.strong-password').length === 0) {
                 $('.password-status-warning', $dialog).removeClass('hidden');
             }
-
         });
+
         $('.password-status-icon', $dialog).rebind('mouseout.proRegister', function(e) {
             if ($(this).parents('.strong-password').length === 0) {
                 $('.password-status-warning', $dialog).addClass('hidden');
@@ -418,7 +426,7 @@
                     $('.register-check').removeClass('checkboxOff');
                     $('.register-check').addClass('checkboxOn');
                 };
-                termsDialog();
+                bottomPageDialog(false, 'terms'); // show terms dialog
                 return false;
             });
     }

@@ -763,6 +763,11 @@ var proPage = {
         else if (provider === 'ecp') {
             addressDialog.showPaymentResult(status);
         }
+
+        // Sabadell needs to also show success or failure
+        else if (provider === 'sabadell') {
+            sabadell.showPaymentResult(status);
+        }
     },
 
     /**

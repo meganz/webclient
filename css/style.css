@@ -13703,7 +13703,7 @@ h5.main-italic-header {
 }
 .register-st3-main-bl, .register-st5-main-bl {
     margin: 0 -8px;
-    padding: 40px 0 32px;
+    padding: 40px 0 14px;
     position: relative;
 }
 .register-st4-main-bl {
@@ -26909,4 +26909,20 @@ opacity: 0.2;
  50% {
 opacity: 1;
 }
+}
+
+.red-star-img {
+    background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMiIgaGVpZ2h0PSIxMSI+PGcgZmlsbD0ibm9uZSI+PGcgZmlsbD0iI0Q5MDAwNyI+PHBhdGggZD0iTTIuMjUgMTFMMy4zIDYuOTMgMCA0LjRsNC4zMy0uNTNMNiAwbDEuNjcgMy44N0wxMiA0LjQgOC43IDYuOTMgOS43NSAxMSA2IDguODJ6Ii8+PC9nPjwvZz48L3N2Zz4=);
+    width: 12px;
+    height: 11px;
+    margin-left: 8px;
+    margin-right: 4px;
+    display: inline-block;
+}
+
+.reg-st3-txt-achprogram {
+    font-size: 16px;
+    font-family: 'source_sans_proregular';
+    margin-top: 14px;
+    color: #666666;
 }

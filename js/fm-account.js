@@ -1,5 +1,4 @@
 function accountUI() {
-    var sectionClass;
 
     $('.fm-account-notifications').removeClass('hidden');
     $('.fm-account-button').removeClass('active');
@@ -38,6 +37,54 @@ function accountUI() {
         var b_exceeded;
         var s_exceeded;
         var id = getSitePath();
+        var pid = String(id).replace('/fm/account/', '');
+        var sectionClass;
+        var tabSection;
+
+        if (pid.indexOf('-notifications') > 0) {
+            tabSection = pid.split('-').shift();
+        }
+        else {
+            switch (pid) {
+                case 'payment':
+                case 'achievements':
+                case 'email-and-pass':
+                    id = '/fm/account';
+                    tabSection = pid;
+                    break;
+
+                case 'notifications':
+                    tabSection = 'cloud-drive';
+                    break;
+
+                case 'advanced':
+                case 'transfers':
+                case 'file-management':
+                    id = '/fm/account/advanced';
+                    tabSection = pid;
+
+                    if (pid === 'file-management') {
+                        tabSection = 'fm';
+                    }
+                    else if (pid === 'advanced') {
+                        tabSection = 'ui';
+                    }
+                    break;
+
+                default:
+                    tabSection = 'general';
+            }
+        }
+
+        $('.account.tab-content').addClass('hidden');
+        $('.account.tab-lnk.active').removeClass('active');
+
+        if (tabSection) {
+            tabSection = tabSection.replace(/[^\w-]/g, '');
+
+            $('.account.tab-content.' + tabSection).removeClass('hidden');
+            $('.account.tab-lnk[data-tab="' + tabSection + '"]').addClass('active');
+        }
 
         if (id === '/fm/account/advanced') {
             $('.fm-account-settings').removeClass('hidden');
@@ -75,11 +122,11 @@ function accountUI() {
             sectionClass = 'account-s';
         }
         else if (id === '/fm/account/history') {
-            $('.fm-account-history').removeClass('hidden');
+            $('.fm-account-history').removeClass('hidden').find('.account.tab-content').removeClass('hidden');
             sectionClass = 'history';
         }
         else if (id === '/fm/account/reseller' && M.account.reseller) {
-            $('.fm-account-reseller').removeClass('hidden');
+            $('.fm-account-reseller').removeClass('hidden').find('.account.tab-content').removeClass('hidden');
             sectionClass = 'reseller';
         }
         else {
@@ -1611,12 +1658,37 @@ function accountUI() {
             var $this = $(this);
             var $sectionBlock = $this.closest('.fm-account-sections');
             var currentTab = $this.attr('data-tab');
+            var page = 'fm/account/' + currentTab;
 
-            $sectionBlock.find('.account.tab-content:not(.hidden)').addClass('hidden');
-            $sectionBlock.find('.account.tab-content.' + currentTab).removeClass('hidden');
-            $sectionBlock.find('.account.tab-lnk.active').removeClass('active');
-            $this.addClass('active');
-            $(window).trigger('resize');
+            if ($sectionBlock.hasClass('fm-account-settings')) {
+                if (currentTab === 'ui') {
+                    page = 'fm/account/advanced';
+                }
+                else if (currentTab === 'fm') {
+                    page = 'fm/account/file-management';
+                }
+            }
+            else if ($sectionBlock.hasClass('fm-account-notifications')) {
+                if (currentTab === 'cloud-drive') {
+                    page = 'fm/account/notifications';
+                }
+                else {
+                    page = 'fm/account/' + currentTab + '-notifications';
+                }
+            }
+            else if ($sectionBlock.hasClass('fm-account-profile')) {
+                if (currentTab === 'general') {
+                    page = 'fm/account';
+                }
+            }
+            loadSubPage(page);
+            return false;
+
+            // $sectionBlock.find('.account.tab-content:not(.hidden)').addClass('hidden');
+            // $sectionBlock.find('.account.tab-content.' + currentTab).removeClass('hidden');
+            // $sectionBlock.find('.account.tab-lnk.active').removeClass('active');
+            // $this.addClass('active');
+            // $(window).trigger('resize');
         }
     });
 

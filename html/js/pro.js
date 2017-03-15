@@ -684,6 +684,15 @@ function pro_pay() {
             }
             else if (pro_paymentmethod.indexOf('sabadell') === 0) {
                 pro_m = sabadell.gatewayId; // 17
+
+                // Get the value for whether the user wants the plan to renew automatically
+                var autoRenewCheckedValue = $('.membership-step2 .renewal-options-list input:checked').val();
+
+                // If the provider supports recurring payments and the user wants the plan to renew automatically
+                if (autoRenewCheckedValue === 'yes') {
+                    extra.recurring = true;
+                }
+
             }
 
             // Update the last payment provider ID for the 'psts' action packet. If the provider e.g. bitcoin

@@ -278,6 +278,19 @@
     display: table-cell;
     width: 544px;
 }
+.achievement-dialog ol {
+    padding: 3px 0 5px 13px;
+    margin: 0;
+}
+.achievement-dialog ol li {
+    font-size: 14px;
+    line-height: 18px;
+    color: #666666;
+    padding: 2px 0;
+    white-space: normal;
+    display: list-item;
+    list-style: decimal;
+}
 .achievement-dialog.header span {
     color: #FF333A;
     border-bottom: 2px solid #FF333A;
@@ -477,16 +490,24 @@
 .one-reward .right-block .reward.bandwidth, .achieved .achievement-dialog.right-block .reward {
     display: none;
 }
+@media only screen and (max-height:  740px) {
+.achievements-scroll {
+    max-height: 448px;
+}
+.fm-dialog.achievements-list-dialog {
+    margin-top: -314px;
+}
+}
 /* End of Achievements list dialog */
 
 /* Invite a friend dialog */
 .fm-dialog.invite-dialog {
     width: 644px;
-    margin: -329px 0 0 -322px;
+    margin: -353px 0 0 -322px;
     background-color: #FAFAFA;
 }
 .fm-dialog.invite-dialog.success {
-    margin: -338px 0 0 -322px;
+    margin: -326px 0 0 -322px;
 }
 .invite-dialog .header {
     margin-top: -5px;
@@ -632,6 +653,7 @@ li.token-input-token-invite .input-close {
 }
 .success .achievement-dialog.success-content {
     display: block;
+    margin-bottom: 31px;
 }
 .invite-dialog.success .default-grey-button.back {
     display: inline-block;
@@ -650,21 +672,21 @@ li.token-input-token-invite .input-close {
 .achievement-dialog.links-block.inputs {
     float: left;
     width: 50%;
-    padding: 14px 0 2px 12px;
+    padding: 14px 0 11px 12px;
 }
 .achievement-dialog.links-block input {
     width: 100%;
     margin-top: 6px;
 }
 .achievement-dialog.links-block .input-field {
-    margin: 16px 0;
+    margin: 16px 0 0 0;
     padding: 0 14px 0 14px;
 }
 .achievement-dialog.links-block .input-label {
-    margin: 16px 0;
-    height: 32px;
+    margin: 24px 0 0px 0;
+    height: 24px;
     font-size: 14px;
-    line-height: 32px;
+    line-height: 16px;
     text-align: right;
     color: #333333;
     font-family: 'source_sans_prosemibold', Arial;

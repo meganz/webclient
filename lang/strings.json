@@ -867,10 +867,6 @@
         "text": "Storage",
         "context": "Label for Storage space used. Maintain capital letters in each word."
     },
-    "496": {
-        "text": "Bandwidth",
-        "context": "Text listed before the amount of bandwidth a user gets with a certain package. For example: \"8TB Bandwidth\". Can also be translated as data transfer."
-    },
     "498": {
         "text": "per month",
         "context": ""
@@ -1683,10 +1679,6 @@
         "text": "Massive storage space",
         "context": ""
     },
-    "916": {
-        "text": "Generous bandwidth quota",
-        "context": ""
-    },
     "918": {
         "text": "Monthly",
         "context": ""
@@ -1835,10 +1827,6 @@
         "text": "Please enter a valid password.",
         "context": ""
     },
-    "973": {
-        "text": "Used bandwidth",
-        "context": "a header above statistics for the utilized bandwidth for a users"
-    },
     "974": {
         "text": "Manage your account",
         "context": "button to manage your account"
@@ -1966,10 +1954,6 @@
     "1008": {
         "text": "PRO transfer quota exceeded.",
         "context": "PRO refers to the paid membership, which is often \"PRO\" in the same language. "
-    },
-    "1009": {
-        "text": "Need more bandwidth?",
-        "context": ""
     },
     "1010": {
         "text": "Storage quota exceeded.",
@@ -2122,14 +2106,6 @@
     "1051": {
         "text": "Never",
         "context": ""
-    },
-    "1053": {
-        "text": "Bandwidth quota almost exceeded.",
-        "context": ""
-    },
-    "1054": {
-        "text": "You will need to wait [X] until more bandwidth is assigned to you.",
-        "context": "[X] will be replaced with a time, for example: 30 minutes, or 2 hours."
     },
     "1055": {
         "text": "Don't want to wait?",
@@ -6263,10 +6239,6 @@
         "text": "Get fully encrypted access anywhere, anytime.",
         "context": "Message shown on the app's start animation to explain what MEGA ACCESS means"
     },
-    "5834": {
-        "text": "MEGA is a secure cloud storage service with 50 GB free storage space.\r\n\r\nInside the app you can upgrade your storage space & bandwidth quota by subscribing to MEGA PRO with a monthly or yearly subscription.\r\nSubscriptions are \u20ac9.99 (US$10.99) per month or \u20ac99.99 (US$119.99) per year.\r\nThis subscription gives you 500 GB of storage space and 1000 GB of bandwidth per month.\r\nSubscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. You can switch off the automatic renewal of your MEGA PRO subscription no later than 24 hours before your next subscription payment is due via your iTunes account settings page. To manage your subscriptions, simply click on the App Store icon on your handset, sign in with your Apple ID at the bottom of the page (if you haven't already done so) and then click View\r\nID. You'll be taken to your account page where you can scroll down to Manage App Subscriptions. From here, you can select your\r\nMEGA PRO subscription and view your scheduled renewal date, choose a different subscription package or toggle the on-off switch to\r\noff to disable the auto-renewal of your subscription.\r\n\r\nTerms of Service:\r\nhttps:\/\/mega.nz\/ios_terms.html\r\nPrivacy policy:\r\nhttps:\/\/mega.nz\/ios_privacy.html",
-        "context": "MEGA description. Please adjust the new line position accordingly"
-    },
     "5835": {
         "text": "With PhotoSync, the photos you take with your iPhone will be automatically backed up to MEGA.\nYou can use WiFi or cellular connection and by enabling Background mode the app will upload photos when your location changes significantly.\n\nPasscode lock adds a new layer of security by requiring a four-digit passcode to be entered every time the app is launched. This will protect your files even if your iPhone falls into the wrong hands. There is also an option to erase all data and logout if the wrong password is entered over 10 times.\n\nVarious bug fixes and speed improvements.\n\nYour feedback is very important to us and, although we might not answer every email, we read each and every one.\n\nAlso, your 5-stars rating in the AppStore is always appreciated.",
         "context": "MEGA description. Please adjust the new line position accordingly"
@@ -6302,10 +6274,6 @@
     "5843": {
         "text": "You are already logged in. You can only create one MEGA account.",
         "context": ""
-    },
-    "5845": {
-        "text": "bandwidth used",
-        "context": "will be preppended by a number, for example: \"500 MB bandwidth used\""
     },
     "5847": {
         "text": "Your purchase was successful. However, to finish the account creation process, you would need to activate your account by clicking on the link sent to your email.",
@@ -8787,14 +8755,6 @@
         "text": "UNLIMITED",
         "context": "File Size: UNLIMITED"
     },
-    "7098": {
-        "text": "Your download could not proceed because it would take you over the current free transfer allowance for your IP address. This limit is dynamic and depends on the amount of unused bandwidth we have available.",
-        "context": "Information on the over bandwidth quota dialog."
-    },
-    "7099": {
-        "text": "The IP address you are using has utilised %1 of data transfer in the last 6 hours, which took you over our current limit. To remove this limit, you can [A]upgrade to PRO[\/A], which will give you your own bandwidth package and also ample extra storage space. ",
-        "context": "Information on the over bandwidth quota dialog.\r\n\r\n%1 is the amount of bandwidth they have used e.g. 532 MB."
-    },
     "7100": {
         "text": "Please upgrade to PRO to continue immediately, or wait %1 to continue for free. ",
         "context": "Information on the over bandwidth quota dialog.\r\n\r\n%1 is the number of minutes they need to wait."
@@ -10582,10 +10542,6 @@
     "7572": {
         "text": "Storage %@",
         "context": "Storage related with the MEGA PRO account level you can subscribe"
-    },
-    "7573": {
-        "text": "Bandwidth %@",
-        "context": "Bandwich related with the MEGA PRO account level you can subscribe"
     },
     "7574": {
         "text": "%.2f %@ per month",
@@ -12643,65 +12599,33 @@
         "text": "You have been suspended due to Terms of Service violations.",
         "context": "A warning for serious infringers who have had their accounts suspended. This is shown to them during login in a dialog."
     },
-    "8604": {
-        "text": "This gives you 500 GB of storage space and 2 TB of bandwidth per month for one year.",
-        "context": "A description of the in-app purchase for the PRO I annual plan (only one year and no recurring subscription) in the Windows Phone store."
-    },
     "8605": {
         "text": "PRO I annual plan",
         "context": "Title of the in-app purchase for the PRO I annual plan in the Windows Phone store. This gives them only one year and no subscription."
-    },
-    "8606": {
-        "text": "This gives you 500 GB of storage space and 2 TB of bandwidth for one month.",
-        "context": "A description of the in-app purchase for the PRO I monthly plan (only one month and no subscription) in the Windows Phone store."
     },
     "8607": {
         "text": "PRO I monthly plan",
         "context": "Title of the in-app purchase for the PRO 1 monthly plan in the Windows Phone store. This gives them only one month and no subscription."
     },
-    "8608": {
-        "text": "This gives you 2 TB of storage space and 4 TB of bandwidth per month for one year.",
-        "context": "A description of the in-app purchase for the PRO II annual plan (only one year and no recurring subscription) in the Windows Phone store."
-    },
     "8609": {
         "text": "PRO II annual plan",
         "context": "Title of the in-app purchase for the PRO II annual plan in the Windows Phone store. This gives them only one year and no subscription."
-    },
-    "8610": {
-        "text": "This gives you 2 TB of storage space and 4 TB of bandwidth for one month.",
-        "context": "A description of the in-app purchase for the PRO II monthly plan (only one month and no subscription) in the Windows Phone store."
     },
     "8611": {
         "text": "PRO II monthly plan",
         "context": "Title of the in-app purchase for the PRO II monthly plan in the Windows Phone store. This gives them only one month and no subscription."
     },
-    "8612": {
-        "text": "This gives you 4 TB of storage space and 8 TB of bandwidth per month for one year.",
-        "context": "A description of the in-app purchase for the PRO III annual plan (only one year and no recurring subscription) in the Windows Phone store."
-    },
     "8613": {
         "text": "PRO III annual plan",
         "context": "Title of the in-app purchase for the PRO III annual plan in the Windows Phone store. This gives them only one year and no subscription."
-    },
-    "8614": {
-        "text": "This gives you 4 TB of storage space and 8 TB of bandwidth for one month.",
-        "context": "A description of the in-app purchase for the PRO III monthly plan (only one month and no subscription) in the Windows Phone store."
     },
     "8615": {
         "text": "PRO III monthly plan",
         "context": "Title of the in-app purchase for the PRO III monthly plan in the Windows Phone store. This gives them only one month and no subscription."
     },
-    "8616": {
-        "text": "This gives you 200 GB of storage space and 1 TB of bandwidth per month for one year.",
-        "context": "A description of the in-app purchase for the PRO LITE annual plan (only one year and no recurring subscription) in the Windows Phone store."
-    },
     "8617": {
         "text": "LITE annual plan",
         "context": "Title of the in-app purchase for the LITE annual plan in the Windows Phone store. This gives them only one year and no subscription."
-    },
-    "8618": {
-        "text": "This gives you 200 GB of storage space and 1 TB of bandwidth for one month.",
-        "context": "A description of the in-app purchase for the PRO LITE monthly plan (only one month and no subscription) in the Windows Phone store."
     },
     "8619": {
         "text": "LITE monthly plan",
@@ -13926,14 +13850,6 @@
     "8942": {
         "text": "Importing folder...",
         "context": "Progress indicator message when importing a folder - (String as short as possible)."
-    },
-    "8943": {
-        "text": "Limited available bandwidth",
-        "context": "Warning header. Informs user that bandwidth is limited for current membership plan."
-    },
-    "8944": {
-        "text": "Your transfer may be interrupted.[BR]\r\n[S]Get a PRO account[\/S] for increased bandwidth quota.",
-        "context": "Informs user that bandwidth is limited for current membership plan. User can buy PRO plan to increase bandwidth quota.\r\n\r\nPlease leave [BR], [S], [\/S] as it is."
     },
     "8945": {
         "text": "Continue without account",
@@ -15171,14 +15087,6 @@
         "text": "Transfer Quota",
         "context": "The header\/title of a block\/section which contains information about the user's used\/available transfer allowance for their account."
     },
-    "16123": {
-        "text": "[S]Used base quota[\/S] is the free transfer allowance for the IP address you are using. The free limitation is dynamic and depends on the amount of unused bandwidth we have available.[BR] You can increase your quota by [A]Upgrading to PRO[\/A].",
-        "context": "Some information about the base transfer quota which is available for free accounts. Please leave the tags [S], [\/S], [A], [\/A] and [BR]."
-    },
-    "16124": {
-        "text": "[S]Used base quota[\/S] is the free transfer allowance for the IP address you are using. The free limitation is dynamic and depends on the amount of unused bandwidth we have available.[BR] You can increase your quota by completing [S]Account Achievements[\/S] or by [A]Upgrading to PRO[\/A].",
-        "context": "Some information about base transfer quota which is available for free accounts. Please leave the [S], [\/S], [A], [\/A] and [BR] tags."
-    },
     "16125": {
         "text": "Used quota for the last 6 hours:",
         "context": "The used quota is the free transfer allowance for the IP address the user is currently using."
@@ -15330,10 +15238,6 @@
     "16162": {
         "text": "Free transfer quota exceeded",
         "context": "Free users have a limited transfer quota and when exceeded this message will be shown during the download. If you have difficulty translating \"quota\" you could also translate \"Transfer limit exceeded\" or \"Data limit exceeded\"."
-    },
-    "16163": {
-        "text": "Your download could not proceed because it would take you over the current free transfer allowance for your IP address. This limit is dynamic and depends on the amount of unused bandwidth we have available.",
-        "context": "A warning message which is displayed about why the user's download cannot proceed. The reason is because they would be over their transfer quota."
     },
     "16164": {
         "text": "Limited available transfer quota",
@@ -15982,10 +15886,6 @@
     "16354": {
         "text": "Learn more",
         "context": "A link which leads to the help center where the user can get more information."
-    },
-    "16355": {
-        "text": "Tip: This limit can be dynamic and depends on the amount of unused bandwidth we have available.",
-        "context": "An information message about limited transfer quota."
     },
     "16356": {
         "text": "Your queued download exceeds the current transfer quota available for your account and may therefore be interrupted.",

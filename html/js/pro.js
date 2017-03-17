@@ -252,6 +252,11 @@ function init_pro()
     if (localStorage.keycomplete) {
         $('body').addClass('key');
         localStorage.removeItem('keycomplete');
+
+        mega.achievem.enabled()
+            .done(function() {
+                $('.red-star-img, .reg-st3-txt-achprogram').removeClass('hidden');
+            });
     }
     else {
         $('body').addClass('pro');

@@ -867,6 +867,10 @@
         "text": "Storage",
         "context": "Label for Storage space used. Maintain capital letters in each word."
     },
+    "496": {
+        "text": "Transfer quota",
+        "context": "Some text listed after the amount of transfer quota a user gets with a certain package. For example: \"8 TB Transfer quota\"."
+    },
     "498": {
         "text": "per month",
         "context": ""
@@ -6275,6 +6279,10 @@
         "text": "You are already logged in. You can only create one MEGA account.",
         "context": ""
     },
+    "5845": {
+        "text": "transfer quota used",
+        "context": "This is the amount of bandwidth (transfer quota) that the user has used. This will be prepended by a number, for example, \"500 MB bandwidth used\"."
+    },
     "5847": {
         "text": "Your purchase was successful. However, to finish the account creation process, you would need to activate your account by clicking on the link sent to your email.",
         "context": ""
@@ -8754,6 +8762,14 @@
     "7094": {
         "text": "UNLIMITED",
         "context": "File Size: UNLIMITED"
+    },
+    "7098": {
+        "text": "Your download could not proceed because it would take you over the current free transfer allowance for your IP address. This limit is dynamic and depends on the amount of unused transfer quota we have available.",
+        "context": "Information on the over bandwidth quota dialog."
+    },
+    "7099": {
+        "text": "The IP address you are using has utilised %1 of data transfer in the last 6 hours, which took you over our current limit. To remove this limit, you can [A]upgrade to PRO[\/A], which will give you your own transfer quota package and also ample extra storage space. ",
+        "context": "Information on the over bandwidth quota dialog. Please leave the %1 placeholder which is the amount of bandwidth they have used e.g. 532 MB."
     },
     "7100": {
         "text": "Please upgrade to PRO to continue immediately, or wait %1 to continue for free. ",
@@ -12599,33 +12615,65 @@
         "text": "You have been suspended due to Terms of Service violations.",
         "context": "A warning for serious infringers who have had their accounts suspended. This is shown to them during login in a dialog."
     },
+    "8604": {
+        "text": "This gives you 500 GB of storage space and 2 TB of transfer quota per month for one year.",
+        "context": "A description of the in-app purchase for the PRO I annual plan (only one year and no recurring subscription) in the Windows Phone store."
+    },
     "8605": {
         "text": "PRO I annual plan",
         "context": "Title of the in-app purchase for the PRO I annual plan in the Windows Phone store. This gives them only one year and no subscription."
+    },
+    "8606": {
+        "text": "This gives you 500 GB of storage space and 2 TB of transfer quota for one month.",
+        "context": "A description of the in-app purchase for the PRO I monthly plan (only one month and no subscription) in the Windows Phone store."
     },
     "8607": {
         "text": "PRO I monthly plan",
         "context": "Title of the in-app purchase for the PRO 1 monthly plan in the Windows Phone store. This gives them only one month and no subscription."
     },
+    "8608": {
+        "text": "This gives you 2 TB of storage space and 4 TB of transfer quota per month for one year.",
+        "context": "A description of the in-app purchase for the PRO II annual plan (only one year and no recurring subscription) in the Windows Phone store."
+    },
     "8609": {
         "text": "PRO II annual plan",
         "context": "Title of the in-app purchase for the PRO II annual plan in the Windows Phone store. This gives them only one year and no subscription."
+    },
+    "8610": {
+        "text": "This gives you 2 TB of storage space and 4 TB of transfer quota for one month.",
+        "context": "A description of the in-app purchase for the PRO II monthly plan (only one month and no subscription) in the Windows Phone store."
     },
     "8611": {
         "text": "PRO II monthly plan",
         "context": "Title of the in-app purchase for the PRO II monthly plan in the Windows Phone store. This gives them only one month and no subscription."
     },
+    "8612": {
+        "text": "This gives you 4 TB of storage space and 8 TB of transfer quota per month for one year.",
+        "context": "A description of the in-app purchase for the PRO III annual plan (only one year and no recurring subscription) in the Windows Phone store."
+    },
     "8613": {
         "text": "PRO III annual plan",
         "context": "Title of the in-app purchase for the PRO III annual plan in the Windows Phone store. This gives them only one year and no subscription."
+    },
+    "8614": {
+        "text": "This gives you 4 TB of storage space and 8 TB of transfer quota for one month.",
+        "context": "A description of the in-app purchase for the PRO III monthly plan (only one month and no subscription) in the Windows Phone store."
     },
     "8615": {
         "text": "PRO III monthly plan",
         "context": "Title of the in-app purchase for the PRO III monthly plan in the Windows Phone store. This gives them only one month and no subscription."
     },
+    "8616": {
+        "text": "This gives you 200 GB of storage space and 1 TB of transfer quota per month for one year.",
+        "context": "A description of the in-app purchase for the PRO LITE annual plan (only one year and no recurring subscription) in the Windows Phone store."
+    },
     "8617": {
         "text": "LITE annual plan",
         "context": "Title of the in-app purchase for the LITE annual plan in the Windows Phone store. This gives them only one year and no subscription."
+    },
+    "8618": {
+        "text": "This gives you 200 GB of storage space and 1 TB of transfer quota for one month.",
+        "context": "A description of the in-app purchase for the PRO LITE monthly plan (only one month and no subscription) in the Windows Phone store."
     },
     "8619": {
         "text": "LITE monthly plan",
@@ -13850,6 +13898,14 @@
     "8942": {
         "text": "Importing folder...",
         "context": "Progress indicator message when importing a folder - (String as short as possible)."
+    },
+    "8943": {
+        "text": "Limited transfer quota available ",
+        "context": "A warning header. This informs the user that bandwidth (transfer quota) is limited for their current membership plan."
+    },
+    "8944": {
+        "text": "Your transfer may be interrupted.[BR]\r\n[S]Get a PRO account[\/S] for an increased transfer quota.",
+        "context": "Informs the user that bandwidth (transfer quota) is limited for their current membership plan. The user can buy a PRO plan to increase their transfer quota. Please leave [BR], [S], [\/S] placeholders as they are."
     },
     "8945": {
         "text": "Continue without account",
@@ -15087,6 +15143,14 @@
         "text": "Transfer Quota",
         "context": "The header\/title of a block\/section which contains information about the user's used\/available transfer allowance for their account."
     },
+    "16123": {
+        "text": "[S]Used base quota[\/S] is the free transfer allowance for the IP address you are using. The free limitation is dynamic and depends on the amount of unused transfer quota we have available.[BR] You can increase your quota by [A]Upgrading to PRO[\/A].",
+        "context": "Some information about the base transfer quota which is available for free accounts. Please leave the placeholder tags [S], [\/S], [A], [\/A] and [BR]."
+    },
+    "16124": {
+        "text": "[S]Used base quota[\/S] is the free transfer allowance for the IP address you are using. The free limitation is dynamic and depends on the amount of unused transfer quota we have available.[BR] You can increase your quota by completing [S]Account Achievements[\/S] or by [A]Upgrading to PRO[\/A].",
+        "context": "Some information about base transfer quota which is available for free accounts. Please leave the [S], [\/S], [A], [\/A] and [BR] placeholder tags."
+    },
     "16125": {
         "text": "Used quota for the last 6 hours:",
         "context": "The used quota is the free transfer allowance for the IP address the user is currently using."
@@ -15238,6 +15302,10 @@
     "16162": {
         "text": "Free transfer quota exceeded",
         "context": "Free users have a limited transfer quota and when exceeded this message will be shown during the download. If you have difficulty translating \"quota\" you could also translate \"Transfer limit exceeded\" or \"Data limit exceeded\"."
+    },
+    "16163": {
+        "text": "Your download could not proceed because it would take you over the current free transfer allowance for your IP address. This limit is dynamic and depends on the amount of unused transfer quota we have available.",
+        "context": "A warning message which is displayed about why the user's download cannot proceed. The reason is because they would be over their transfer quota."
     },
     "16164": {
         "text": "Limited available transfer quota",
@@ -15910,5 +15978,21 @@
     "16361": {
         "text": "[A]Upgrade now[\/A] and don't worry about running out of storage.",
         "context": "Informs the user that their storage is almost full and it is time for the user to consider upgrading. This message is intended for users who are already PRO, so does not mention PRO accounts."
+    },
+    "16362": {
+        "text": "Subject to your participation in our achievements program.",
+        "context": "A message shown at registration time when users have to select their plan. The FREE 50 GB plan is subject to the achievements program."
+    },
+    "16363": {
+        "text": "Your easy route to more storage & transfer quota on MEGA",
+        "context": "This is the Achievements dialog header. A user is able to increase free storage and transfer quota by completing achievements."
+    },
+    "16364": {
+        "text": "You can maintain a generous free storage and transfer allowance by completing any of the actions outlined below.",
+        "context": "Information on the Achievements dialog. The user is able to increase free storage and transfer quota by completing achievements."
+    },
+    "16365": {
+        "text": "MEGA Achievements",
+        "context": "A dialog header. The user is able to increase the amount of free storage and transfer quota by completing achievements like installing MEGAsync, or an app etc."
     }
 }

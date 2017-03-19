@@ -15889,15 +15889,23 @@
     },
     "16336": {
         "text": "(Bonus expires in [S]%1[\/S] %2)",
-        "context": ""
+        "context": "%1 will be replaced by a numeric value and %2 will be \"days\" or \"months\", for example (Expires in [S]10[\/S] days)"
     },
     "16337": {
         "text": "Storage Quota earned",
         "context": "The header of a block which contains information about the storage quota bonus the user has already received for completed achievements."
     },
+    "16338": {
+        "text": "Summary of the achievements completed and the storage quota bonus already received ",
+        "context": "Information about completed achievements and earned bonuses."
+    },
     "16339": {
         "text": "Transfer Quota earned",
         "context": "The header of a block which contains information about the transfer quota bonus the user has already received for completed achievements."
+    },
+    "16340": {
+        "text": "Summary of the achievements completed and the transfer quota bonus already received ",
+        "context": "Information about completed achievements and earned bonuses."
     },
     "16341": {
         "text": "[B]Get 50 GBs free storage[\/B] when you create an account with us. For the full featured experience, download our app or use the site on a PC.",

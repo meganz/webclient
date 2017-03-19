@@ -3687,6 +3687,7 @@ mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
         dlmanager._dlQuotaListener = [];
 
         mega.ui.tpp.hideBlock('dl');
+        mega.ui.tpp.setIndex(0, 'dl');
         mega.ui.tpp.setProgress(0, 'dl');
     }
 

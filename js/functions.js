@@ -2665,15 +2665,17 @@ function percent_megatitle() {
     }
     if (dl_t) {
         dl_t += tp['dlc'] || 0;
-        dl_r += tp['dlc'] || 0
+        dl_r += tp['dlc'] || 0;
     }
     if (ul_t) {
         ul_t += tp['ulc'] || 0;
-        ul_r += tp['ulc'] || 0
+        ul_r += tp['ulc'] || 0;
     }
 
     var x_ul = Math.floor(ul_r / ul_t * 100) || 0;
+    mega.ui.tpp.setProgress(x_ul, 'ul');
     var x_dl = Math.floor(dl_r / dl_t * 100) || 0;
+    mega.ui.tpp.setProgress(x_dl, 'dl');
     var t;
 
     if (dl_t && ul_t) {
@@ -3671,6 +3673,8 @@ mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
         ulQueue.setSize((fmconfig.ul_maxSlots | 0) || 4);
 
         mega.ui.tpp.hideBlock('ul');
+        mega.ui.tpp.setIndex(0, 'ul');
+        mega.ui.tpp.setProgress(0, 'ul');
     }
     if (!dl_queue.some(isQueueActive)) {
         dl_queue = new DownloadQueue();
@@ -3683,6 +3687,7 @@ mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
         dlmanager._dlQuotaListener = [];
 
         mega.ui.tpp.hideBlock('dl');
+        mega.ui.tpp.setProgress(0, 'dl');
     }
 
     if (!dlmanager.isDownloading && !ulmanager.isUploading) {

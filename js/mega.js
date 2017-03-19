@@ -4712,6 +4712,7 @@ function MegaData()
 
                         if (node) {
                             addNode(node);
+                            mega.ui.tpp.setTotal(1, 'dl');
                         }
                     }
                 };
@@ -5029,8 +5030,8 @@ function MegaData()
                     $tr.find('.speed').addClass('unknown').text('');
                 }
 
-                mega.ui.tpp.updateBlock('dl', perc, bps);
-                delay('percent_megatitle', percent_megatitle);
+                mega.ui.tpp.updateBlock('dl', bps);
+                delay('percent_megatitle', percent_megatitle, 50);
 
                 if (page.substr(0, 2) !== 'fm') {
                     $('.widget-block').removeClass('hidden');
@@ -5541,6 +5542,7 @@ function MegaData()
             ul_queue.push(f);
             ttl.left--;
             added++;
+            mega.ui.tpp.setTotal(1, 'ul');
 
             if (uldl_hold) {
                 fm_tfspause('ul_' + ul_id);
@@ -5585,8 +5587,9 @@ function MegaData()
             $('.transfer-table').prepend($tr);
             delay('fm_tfsupdate', fm_tfsupdate); // this will call $.transferHeader()
         }
-        if (!bl || !ul.starttime)
+        if (!bl || !ul.starttime) {
             return false;
+        }
         var retime = bps > 1000 ? (bt - bl) / bps : -1;
         var transferDeg = 0;
         if (!$.transferprogress)
@@ -5615,8 +5618,8 @@ function MegaData()
                 $tr.find('.speed').addClass('unknown').text('');
             }
 
-            mega.ui.tpp.updateBlock('ul', perc, bps);
-            delay('percent_megatitle', percent_megatitle);
+            mega.ui.tpp.updateBlock('ul', bps);
+            delay('percent_megatitle', percent_megatitle, 50);
 
             if (page.substr(0, 2) !== 'fm') {
                 $('.widget-block').removeClass('hidden');

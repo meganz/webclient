@@ -24,32 +24,57 @@ mega.ui.tpp = (function () {
         queue: {
             ul: {
                 index: 1,
-                total: 0
+                total: 0,
+                progress: 0
             },
             dl: {
                 index: 1,
-                total: 0
+                total: 0,
+                progress: 0
             }
         }
     };
 
     /**
-     * Set number of items currently pending in queue
-     * @param {Number} length Number of items in queue
+     * Set total number of items in queue
+     * @param {Number} value Number of items +/-
      * @param {String} bl i.e. ['dl', 'ul'] download/upload block
      */
-    var setQueueLength = function setQueueLength(length, bl) {
-        opts.queue[bl].total = length;
+    var setTotal = function setTotal(value, bl) {
+        if (value) {
+            opts.queue[bl].total += value;
+        }
+        else {
+            opts.queue[bl].total = value;
+        }
     };
 
     /**
-     * Get number of items currently pending in queue
+     * Get total number of items in queue
      * @param {String} bl i.e. ['dl', 'ul'] download/upload block
      * @returns {Number} Items in queue
      */
-    var getQueueLength = function getQueueLength(bl) {
+    var getTotal = function getTotal(bl) {
         var result = opts.queue[bl].total;
 
+        return result;
+    };
+
+    /**
+     * Set number of items currently pending in queue
+     * @param {Number} percent Global progress in percents
+     * @param {String} bl i.e. ['dl', 'ul'] download/upload block
+     */
+    var setProgress = function setProgress(percent, bl) {
+        opts.queue[bl].progress = percent;
+    };
+
+    /**
+     * Set number of items currently pending in queue
+     * @param {String} bl i.e. ['dl', 'ul'] download/upload block
+     */
+    var getProgress = function getProgress(bl) {
+        var result = opts.queue[bl].progress;
         return result;
     };
 
@@ -128,42 +153,54 @@ mega.ui.tpp = (function () {
      * @param {String} block i.e. ['dl', 'ul']
      */
     var getIndex = function getIndex(block) {
-        var index = 0;
+        var result = opts.queue[block].index;
 
-        if (typeof $.transferprogress === 'object') {
-            var inProgress = Object.keys($.transferprogress);
+        return result;
+        // var index = 0;
 
-            if (block === 'ul') {
-                index = inProgress.filter(function(value) {
-                    if (value.indexOf('ul_') !== -1) {
-                        return value;
-                    }
-                }).length;
-                // index = ul_queue.filter(isQueueActive).length;
-            }
-            else {
-                index = inProgress.filter(function(value) {
-                    if ((value.indexOf('dl_') !== -1) || (value.indexOf('zip_') !== -1)) {
-                        return value;
-                    }
-                }).length;
-                // index = Object.keys(GlobalProgress).filter(function(k) {
-                //     return k[0] !== 'u'; }).length;
-            }
+        // if (typeof $.transferprogress === 'object') {
+        //     var inProgress = Object.keys($.transferprogress);
+
+        //     if (block === 'ul') {
+        //         index = inProgress.filter(function(value) {
+        //             if (value.indexOf('ul_') !== -1) {
+        //                 return value;
+        //             }
+        //         }).length;
+        //         // index = ul_queue.filter(isQueueActive).length;
+        //     }
+        //     else {
+        //         index = inProgress.filter(function(value) {
+        //             if ((value.indexOf('dl_') !== -1) || (value.indexOf('zip_') !== -1)) {
+        //                 return value;
+        //             }
+        //         }).length;
+        //         // index = Object.keys(GlobalProgress).filter(function(k) {
+        //         //     return k[0] !== 'u'; }).length;
+        //     }
+        // }
+
+        // return index;
+    };
+
+    var setIndex = function setIndex(value, block) {
+        if (value) {
+            opts.queue[block].index += value;
         }
-
-        return index;
+        else {
+            opts.queue[block].index = value;
+        }
     };
 
     /**
      * Updates progress bar of transfers popup diaog, with cumulative percentage for dl/ul
      * @param {String} blk i.e. ['dl', 'ul']
-     * @param {Number} perc Percentage of cumulative download progress
      * @param {Number} bps Cumulative download speed in bytes
      */
-    var updateBlock = function updateBlock(blk, perc, bps) {
-        var len = getQueueLength(blk).toString();
+    var updateBlock = function updateBlock(blk, bps) {
+        var len = getTotal(blk).toString();
         var index = getIndex(blk).toString();
+        var perc = getProgress(blk).toString();
         var speed;
 
         speed = numOfBytes(bps, 1);
@@ -190,8 +227,9 @@ mega.ui.tpp = (function () {
         // var dlg = (bl === 'dl') ? '$dlBlock' : '$ulBlock';
         var name = '';
         var index = getIndex(bl).toString();
-        var total = getQueueLength(bl).toString();
+        var total = getTotal(bl).toString();
         var type = ext[fileext(name)];
+        var perc = getProgress(bl);
 
         if (typeof type === 'undefined') {
             type = ext['*'][0];// general
@@ -207,7 +245,7 @@ mega.ui.tpp = (function () {
         opts.dlg[bl].$.name.text(name);
         opts.dlg[bl].$.crr.text(index);
         opts.dlg[bl].$.num.text(total);
-        opts.dlg[bl].$.prg.css('width', '0%');
+        opts.dlg[bl].$.prg.css('width', perc + '%');
         opts.dlg[bl].$.spd.text(l[1042]);
         opts.dlg[bl].$.stxt.text('');
         opts.dlg[bl].$.tfi
@@ -219,6 +257,7 @@ mega.ui.tpp = (function () {
      *
      */
     var start = function start(queue, bl) {
+        setIndex(1, bl);
         _init(queue, bl);
         showBlock(bl);
         show();
@@ -279,9 +318,11 @@ mega.ui.tpp = (function () {
         start: start,
         showBlock: showBlock,
         hideBlock: hideBlock,
+        setTotal: setTotal,
+        isVisible: isVisible,
         updateBlock: updateBlock,
-        setQLen: setQueueLength,
-        isVisible: isVisible
+        setProgress: setProgress,
+        setIndex: setIndex
     };
 
 })();// END tpp, transfers popup dialog

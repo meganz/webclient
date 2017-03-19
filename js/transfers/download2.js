@@ -1362,9 +1362,6 @@ function fm_tfsupdate() {
         }
     }
 
-    mega.ui.tpp.setQLen(i, 'dl');
-    mega.ui.tpp.setQLen(u, 'ul');
-
     M.pendingTransfers = i + u;
     var t;
     if (i && u) {

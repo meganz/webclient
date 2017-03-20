@@ -448,22 +448,14 @@ PresencedIntegration.prototype.eventuallyRemovePeer = function(user_handle, chat
     var binUserHandle = base64urldecode(user_handle);
 
     if (!foundInOtherChatRooms && megaChat.userPresence.peers[binUserHandle]) {
-        megaChat.userPresence.addremovepeers([binUserHandle], true);
-        console.error('eventuallyRemovePeer', user_handle, 'removed');
-    }
-    else {
-        console.error('eventuallyRemovePeer', user_handle, 'not removed');
+        megaChat.userPresence.addremovepeers([user_handle], true);
     }
 };
 
 PresencedIntegration.prototype.eventuallyAddPeer = function(user_handle) {
     var binUserHandle = base64urldecode(user_handle);
 
-    if (megaChat.userPresence.peers[binUserHandle]) {
-        console.error('eventuallyAddPeer', user_handle, 'added');
-        megaChat.userPresence.addremovepeers([binUserHandle]);
-    }
-    else {
-        console.error('eventuallyAddPeer', user_handle, 'not added');
+    if (!megaChat.userPresence.peers[binUserHandle]) {
+        megaChat.userPresence.addremovepeers([user_handle]);
     }
 };

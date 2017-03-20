@@ -522,6 +522,11 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
                         if (included.length > 0) {
                             ChatdIntegration._ensureKeysAreLoaded([], included);
                             ChatdIntegration._ensureNamesAreLoaded(included);
+                            included.forEach(function(handle) {
+                                if (M.u[handle] && M.u[handle].c === 0) {
+                                    megaChat.processNewUser(handle);
+                                }
+                            });
                         }
 
                         chatRoom.trackDataChange();
@@ -806,7 +811,6 @@ ChatdIntegration._ensureNamesAreLoaded = function(users) {
                     })
                 );
                 M.syncUsersFullname(userId);
-                megaChat.processNewUser(userId);
             }
             else {
                 M.syncUsersFullname(userId);

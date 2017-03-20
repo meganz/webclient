@@ -434,3 +434,36 @@ PresencedIntegration.prototype.getMyPresence = function() {
         UserPresence.PRESENCE.OFFLINE :
         this.getPresence();
 };
+
+
+PresencedIntegration.prototype.eventuallyRemovePeer = function(user_handle, chatRoom) {
+    var foundInOtherChatRooms = false;
+    var megaChat = self.megaChat;
+    megaChat.chats.forEach(function(testChatRoom) {
+        if (testChatRoom !== chatRoom && typeof(testChatRoom.members[user_handle]) !== 'undefined') {
+            foundInOtherChatRooms = true;
+        }
+    });
+
+    var binUserHandle = base64urldecode(user_handle);
+
+    if (!foundInOtherChatRooms && megaChat.userPresence.peers[binUserHandle]) {
+        megaChat.userPresence.addremovepeers([binUserHandle], true);
+        console.error('eventuallyRemovePeer', user_handle, 'removed');
+    }
+    else {
+        console.error('eventuallyRemovePeer', user_handle, 'not removed');
+    }
+};
+
+PresencedIntegration.prototype.eventuallyAddPeer = function(user_handle) {
+    var binUserHandle = base64urldecode(user_handle);
+
+    if (megaChat.userPresence.peers[binUserHandle]) {
+        console.error('eventuallyAddPeer', user_handle, 'added');
+        megaChat.userPresence.addremovepeers([binUserHandle]);
+    }
+    else {
+        console.error('eventuallyAddPeer', user_handle, 'not added');
+    }
+};

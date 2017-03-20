@@ -355,6 +355,11 @@ UserPresence.prototype.reconnect = function presence_reconnect(self) {
                             var presence = u[p + 1] & 0xf;
                             var isWebrtcFlag = u[p + 1] & 0x80;
 
+                            var userBin = base64urldecode(user);
+                            if (!this.up.peers[userBin]) {
+                                this.up.peers[userBin] = true;
+                            }
+
                             if (this.up.peerstatuscb) {
                                 this.up.peerstatuscb(
                                     user,
@@ -460,6 +465,8 @@ UserPresence.prototype.disconnect = function(userForced) {
 
 UserPresence.prototype.addremovepeers = function presence_addremovepeers(peers, del) {
     var delta = '';
+
+    console.error('addremovepeers', peers, del ? 'delete' : 'add');
 
     for (var i = peers.length; i--;) {
         var u = base64urldecode(peers[i]);

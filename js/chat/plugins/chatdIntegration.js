@@ -464,6 +464,17 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
                             excluded.push(v.u);
                             delete chatRoom.members[v.u];
                             if (v.u === u_handle) {
+                                if (typeof(chatRoom.megaChat.plugins.presencedIntegration) !== 'undefined') {
+                                    Object.keys(chatRoom.members).forEach(function(user_handle) {
+                                        // not a real contact?
+                                        if (M.u[user_handle].c === 0) {
+                                            chatRoom.megaChat.plugins.presencedIntegration.eventuallyRemovePeer(
+                                                user_handle,
+                                                chatRoom
+                                            );
+                                        }
+                                    });
+                                }
                                 chatRoom.leave(false);
                                 // i had left, also do a chatd.leave!
                                 self.chatd.leave(
@@ -476,12 +487,33 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
                                     }
                                 }
                             }
+                            else {
+                                // someone else left the room
+                                if (
+                                    M.u[v.u].c === 0 &&
+                                    typeof(chatRoom.megaChat.plugins.presencedIntegration) !== 'undefined'
+                                ) {
+                                    chatRoom.megaChat.plugins.presencedIntegration.eventuallyRemovePeer(
+                                        v.u,
+                                        chatRoom
+                                    );
+                                }
+                            }
                         }
                         else {
                             included.push(v.u);
                             chatRoom.members[v.u] = v.p;
                             if (v.u === u_handle && v.p !== 0) {
                                 chatRoom.privateReadOnlyChat = false;
+                            }
+                            if (
+                                M.u[v.u] &&
+                                M.u[v.u].c === 0 &&
+                                typeof(chatRoom.megaChat.plugins.presencedIntegration) !== 'undefined'
+                            ) {
+                                chatRoom.megaChat.plugins.presencedIntegration.eventuallyAddPeer(
+                                    v.u
+                                );
                             }
                         }
                     });
@@ -986,6 +1018,16 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                         chatRoom.protocolHandler.addParticipant(eventData.userId);
                         // also add to our list
                         chatRoom.members[eventData.userId] = eventData.priv;
+
+                        if (
+                            M.u[eventData.userId] &&
+                            M.u[eventData.userId].c === 0 &&
+                            typeof(chatRoom.megaChat.plugins.presencedIntegration) !== 'undefined'
+                        ) {
+                            chatRoom.megaChat.plugins.presencedIntegration.eventuallyAddPeer(
+                                eventData.userId
+                            );
+                        }
                         $(chatRoom).trigger('onMembersUpdated');
                     }
                     self.waitForProtocolHandler(chatRoom, addParticipant);
@@ -1001,6 +1043,17 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                     chatRoom.protocolHandler.removeParticipant(eventData.userId);
                     // also remove from our list
                     delete chatRoom.members[eventData.userId];
+
+                    if (
+                        M.u[eventData.userId].c === 0 &&
+                        typeof(chatRoom.megaChat.plugins.presencedIntegration) !== 'undefined'
+                    ) {
+                        chatRoom.megaChat.plugins.presencedIntegration.eventuallyRemovePeer(
+                            eventData.userId,
+                            chatRoom
+                        );
+                    }
+
                     $(chatRoom).trigger('onMembersUpdated');
                 }
                 self.waitForProtocolHandler(chatRoom, deleteParticipant);

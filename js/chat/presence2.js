@@ -355,6 +355,11 @@ UserPresence.prototype.reconnect = function presence_reconnect(self) {
                             var presence = u[p + 1] & 0xf;
                             var isWebrtcFlag = u[p + 1] & 0x80;
 
+                            var userBin = base64urldecode(user);
+                            if (!this.up.peers[userBin]) {
+                                this.up.peers[userBin] = true;
+                            }
+
                             if (this.up.peerstatuscb) {
                                 this.up.peerstatuscb(
                                     user,
@@ -506,6 +511,10 @@ UserPresence.prototype.sendstring = function presence_sendstring(s) {
 
 // must be called with the binary representation of the userid delta
 UserPresence.prototype.sendpeerupdate = function presence_sendpeerupdate(peerstring, del) {
+    if (peerstring === '') {
+        return;
+    }
+
     var num = peerstring.length / 8;
 
     peerstring = (del ? "\5" : "\4") // opcode

@@ -2195,7 +2195,7 @@ var sabadell = {
         $backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
 
         // On successful payment
-        if (verifyUrlParam === 'sabadell-success') {
+        if (verifyUrlParam === 'success') {
 
             // Show the success
             $pendingOverlay.removeClass('hidden');

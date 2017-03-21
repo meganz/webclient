@@ -14771,6 +14771,12 @@ body.de .reg-st3-bandwidth .reg-st3-mid-txt, body.br .reg-st3-bandwidth .reg-st3
 .provider-icon.sabadell {
     background-position: 0 -4080px;
 }
+.provider-icon.sabadellVI {
+    background-position: 0 -3360px;
+}
+.provider-icon.sabadellMC {
+    background-position: 0 -1980px;
+}
 .membership-new-offer text {
     font-weight: normal;
 }

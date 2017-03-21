@@ -692,7 +692,6 @@ function pro_pay() {
                 if (autoRenewCheckedValue === 'yes') {
                     extra.recurring = true;
                 }
-
             }
 
             // Update the last payment provider ID for the 'psts' action packet. If the provider e.g. bitcoin
@@ -2168,12 +2167,10 @@ var sabadell = {
      */
     redirectToSite: function(utcResult) {
 
-        // DynamicPay
-        // We need to redirect to their site via a post, so we are building a form :\
+        // We need to redirect to their site via a post, so we are building a form
         var form = $("<form id='pay_form' name='pay_form' action='" + utcResult.EUR['url'] + "' method='post'></form>");
 
-        for (var key in utcResult.EUR['postdata'])
-        {
+        for (var key in utcResult.EUR['postdata']) {
             var input = $("<input type='hidden' name='" + key + "' value='" + utcResult.EUR['postdata'][key] + "' />");
             form.append(input);
             $('body').append(form);
@@ -2211,7 +2208,7 @@ var sabadell = {
                 if (M.account) {
                     M.account.lastupdate = 0;
                 }
-                window.location.hash = 'fm/account/history';
+                loadSubPage('fm/account/history');
             });
         }
         else {

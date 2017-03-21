@@ -8935,7 +8935,6 @@ React.makeElement = React['createElement'];
 	                                'm': contact.email ? contact.email : contactEmail,
 	                                'c': 0
 	                            }));
-	                            megaChat.processNewUser(userId);
 	                        } else if (M.u[contact.u] && !M.u[contact.u].m) {
 
 	                            M.u[contact.u].m = contact.email ? contact.email : contactEmail;

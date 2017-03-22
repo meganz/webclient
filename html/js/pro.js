@@ -2168,7 +2168,8 @@ var sabadell = {
     redirectToSite: function(utcResult) {
 
         // We need to redirect to their site via a post, so we are building a form
-        var form = $("<form id='pay_form' name='pay_form' action='" + utcResult.EUR['url'] + "' method='post'></form>");
+        var url = utcResult.EUR['url'];
+        var form = $("<form id='pay_form' name='pay_form' action='" + url + "' method='post'></form>");
 
         for (var key in utcResult.EUR['postdata']) {
             var input = $("<input type='hidden' name='" + key + "' value='" + utcResult.EUR['postdata'][key] + "' />");

@@ -683,6 +683,11 @@ function populate_l() {
     l[16165] = l[16165].replace('[S]', '<a class="red">').replace('[/S]', '</a>').replace('[BR]', '<br/>');
     l[16167] = l[16167].replace('[S]', '<a href="/mobile" class="clickurl">').replace('[/S]', '</a>');
     l[16310] = escapeHTML(l[16310]).replace('[I]', '<i class="semi-small-icon rocket"></i>');
+    //l[16375] = l[16375].replace('[S]', '<span>').replace('[/S]', '</span>');
+    //l[16382] = l[16382].replace('[S]', '<span>').replace('[/S]', '</span>').replace('[P]', '<p>').replace('[/P]', '</p>');
+    //l[16383] = l[16383].replace('[S]', '<span>').replace('[/S]', '</span>');
+    //l[16384] = l[16384].replace('[S]', '<span>').replace('[/S]', '</span>');
+    //l[16385] = l[16385].replace('[S]', '<span>').replace('[/S]', '</span>');
 
     var common = [
         15536, 16106, 16107, 16116, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138,

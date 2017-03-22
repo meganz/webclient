@@ -290,7 +290,7 @@ function init_pro()
 
     if (!m)
     {
-        $('.membership-step1 .membership-button').rebind('click', function() {
+        $('.membership-step1 .membership-pad-bl').rebind('click', function() {
 
             var $planBlocks = $('.reg-st3-membership-bl');
             var $selectedPlan = $(this).closest('.reg-st3-membership-bl');
@@ -373,43 +373,6 @@ function init_pro()
 
         if (lang !== 'en') $('.reg-st3-save-txt').addClass(lang);
         if (lang == 'fr') $('.reg-st3-big-txt').each(function(e,o){$(o).html($(o).html().replace('GB','Go').replace('TB','To'));});
-
-        $('.membership-step1 .reg-st3-membership-bl').unbind('click');
-        $('.membership-step1 .reg-st3-membership-bl').bind('click',function(e)
-        {
-            $('.reg-st3-membership-bl').removeClass('selected');
-            $(this).addClass('selected');
-        });
-
-        $('.membership-step1 .reg-st3-membership-bl').unbind('dblclick');
-        $('.membership-step1 .reg-st3-membership-bl').bind('dblclick',function(e)
-        {
-            $('.reg-st3-membership-bl').removeClass('selected');
-            $(this).addClass('selected');
-
-            account_type_num = $(this).attr('data-payment');
-
-            if (account_type_num === '0') {
-                if (page === 'fm') {
-                    loadSubPage('start');
-                } else {
-                    loadSubPage('fm');
-                }
-                return false;
-            }
-
-            $(this).clone().appendTo( '.membership-selected-block');
-
-            var proPlanName = $(this).find('.reg-st3-bott-title.title').html();
-            $('.membership-step2 .pro span').html(proPlanName);
-
-            // Update header text with plan
-            var $selectedPlanHeader = $('.membership-step2 .main-italic-header.pro');
-            var selectedPlanText = $selectedPlanHeader.html().replace('%1', proPlanName);
-            $selectedPlanHeader.html(selectedPlanText);
-
-            pro_next_step(proPlanName);
-        });
 
         $('.pro-bottom-button').unbind('click');
         $('.pro-bottom-button').bind('click',function(e)

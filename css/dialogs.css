@@ -253,6 +253,69 @@
 }
 /* End of Limited available bandwidth dialog */
 
+/* Transfer quota exceeded dialog */
+.fm-dialog.limited-bandwidth-dialog.exceeded:not(.achievements):not(.pro) {
+    min-width: 964px;
+    margin: -326px 0 0 -482px;
+}
+.limited-bandwidth-dialog .plan-blocks, .exceeded:not(.achievements):not(.pro) .limited-bl, .big-104px-icon.full, .exceeded .big-104px-icon.almost-full,
+.dialog.header-before-icon.exceeded, .exceeded .dialog.header-before-icon.limited, .limited-bandwidth-dialog .fm-dialog-close {
+    display: none;
+}
+.exceeded:not(.achievements):not(.pro) .plan-blocks, .exceeded .dialog.header-before-icon.exceeded, .exceeded:not(.achievements):not(.pro) .fm-dialog-close {
+    display: block;
+}
+.exceeded:not(.pro) .big-104px-icon.full, .exceeded:not(.achievements):not(.pro) .dialog.bottom-tips span {
+    display: inline-block;
+}
+.dialog.transfer-overquota-txt {
+    font-size: 14px;
+    line-height: 25px;
+    color: #666666;
+    padding: 17px 0 22px 0;
+    
+}
+.dialog.transfer-overquota-txt span {
+    font-size: 20px;
+    color: #333333;
+    border-bottom: 2px solid #FF333A;
+}
+.dialog.transfer-overquota-txt span span {
+    color: #777777;
+    border: 0;
+}
+.exceeded:not(.achievements):not(.pro) .dialog.p-after-icon {
+    max-width: none;
+}
+.dialog.transfer-plans {
+    padding: 16px 0 0 0;
+}
+.fm-dialog .reg-st3-bott-title {
+    font-size: 16px;
+        padding: 16px 10px;
+}
+.fm-dialog .reg-st3-bott-title.price {
+    font-size: 40px;
+    line-height: 40px;
+        padding-top: 14px;
+}
+.fm-dialog .reg-st3-bott-title span.small {
+    font-size: 32px;
+}
+.fm-dialog .reg-st3-bott-title span.period {
+    margin-top: -1px;
+}
+.fm-dialog .reg-st3-storage, .fm-dialog .reg-st3-bandwidth {
+    padding: 20px 24px 0 24px;
+}
+.fm-dialog .reg-st3-mid-txt {
+    line-height: 17px;
+}
+.fm-dialog .reg-st3-bandwidth {
+    padding-bottom: 17px;
+}
+/* End of Transfer quota exceeded dialog */
+
 /* Achievement dialog */
 .fm-dialog.achievement-dialog {
     width: 484px;

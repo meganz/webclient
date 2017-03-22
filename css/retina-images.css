@@ -336,8 +336,8 @@ body.pro:after {
     background-image: url(../images/mega/top-login-sprite_v7@2x.png);
     background-size: 48px auto;
 }
-.reg-success-icon, .reg-st3-save-icon, .reg-st3-membership-icon, .membership-icon, .loginrequired-dialog .fm-notification-icon, .file-status-icon.star, .taken-down .file-status-icon, .taken-down .grid-status-icon, .contact-status-icon.star, .grid-status-icon.star, .linked .data-item-icon, .taken-down .data-item-icon, .toast-icon, .resend-email-button {
-    background-image: url(../images/mega/register-big-sprite-v9@2x.png);
+.reg-success-icon, .reg-st3-save-icon, .reg-st3-membership-icon, .membership-icon, .loginrequired-dialog .fm-notification-icon, .file-status-icon.star, .taken-down .file-status-icon, .taken-down .grid-status-icon, .contact-status-icon.star, .grid-status-icon.star, .linked .data-item-icon, .taken-down .data-item-icon, .toast-icon, .resend-email-button, .reg-st3-storage::before, .reg-st3-bandwidth::before, .pro-icon, .pro-bottom-info-header::before {
+    background-image: url(../images/mega/register-big-sprite-v10@2x.png);
     background-size: 200px auto;
 }
 .reg-st5-key-gen, .reg-st5-info-icon {
@@ -356,7 +356,7 @@ body.pro:after {
     background-image: url(../images/mega/browsers-page@2x.png);
     background-size: 892px auto;
 }
-.pro-icons-block, .membership-question-mark span, .membership-date, .membership-st2-select span, .membership-payment-icon, .membership-radio-label, .astropay-dialog .powered-by-astropay {
+.membership-question-mark span, .membership-date, .membership-st2-select span, .membership-payment-icon, .membership-radio-label, .astropay-dialog .powered-by-astropay {
     background-image: url(../images/mega/pro-new-sprite-v8@2x.png);
     background-size: 755px auto;
 }

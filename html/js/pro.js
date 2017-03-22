@@ -682,6 +682,17 @@ function pro_pay() {
                 pro_m = addressDialog.gatewayId;
                 extra = addressDialog.extraDetails;
             }
+            else if (pro_paymentmethod.indexOf('sabadell') === 0) {
+                pro_m = sabadell.gatewayId; // 17
+
+                // Get the value for whether the user wants the plan to renew automatically
+                var autoRenewCheckedValue = $('.membership-step2 .renewal-options-list input:checked').val();
+
+                // If the provider supports recurring payments and the user wants the plan to renew automatically
+                if (autoRenewCheckedValue === 'yes') {
+                    extra.recurring = true;
+                }
+            }
 
             // Update the last payment provider ID for the 'psts' action packet. If the provider e.g. bitcoin
             // needs a redirect after confirmation action packet it will redirect to the account page.
@@ -750,6 +761,11 @@ var proPage = {
         // If returning from an Ecomprocessing payment, show a success or failure dialog
         else if (provider === 'ecp') {
             addressDialog.showPaymentResult(status);
+        }
+
+        // Sabadell needs to also show success or failure
+        else if (provider === 'sabadell') {
+            sabadell.showPaymentResult(status);
         }
     },
 
@@ -1720,6 +1736,10 @@ var proPage = {
             case directReseller.gatewayId:
                 directReseller.redirectToSite(utcResult);
                 break;
+
+            case sabadell.gatewayId:
+                sabadell.redirectToSite(utcResult);
+                break;
         }
     }
 };
@@ -2130,6 +2150,79 @@ var unionPay = {
             form.append(input);
             $('body').append(form);
             form.submit();
+        }
+    }
+};
+
+/**
+ * Code for Sabadell Spanish Bank
+ */
+var sabadell = {
+
+    gatewayId: 17,
+
+    /**
+     * Redirect to the site
+     * @param {Object} utcResult
+     */
+    redirectToSite: function(utcResult) {
+
+        // We need to redirect to their site via a post, so we are building a form
+        var url = utcResult.EUR['url'];
+        var form = $("<form id='pay_form' name='pay_form' action='" + url + "' method='post'></form>");
+
+        for (var key in utcResult.EUR['postdata']) {
+            var input = $("<input type='hidden' name='" + key + "' value='" + utcResult.EUR['postdata'][key] + "' />");
+            form.append(input);
+            $('body').append(form);
+            form.submit();
+        }
+    },
+
+    /**
+     * Show the payment result of success or failure after coming back from the Sabadell site
+     * @param {String} verifyUrlParam The URL parameter e.g. 'sabadell-success' or 'sabadell-failure'
+     */
+    showPaymentResult: function(verifyUrlParam) {
+
+        var $backgroundOverlay = $('.fm-dialog-overlay');
+        var $pendingOverlay = $('.payment-result.pending.alternate');
+        var $failureOverlay = $('.payment-result.failed');
+
+        // Show the overlay
+        $backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+
+        // On successful payment
+        if (verifyUrlParam === 'success') {
+
+            // Show the success
+            $pendingOverlay.removeClass('hidden');
+
+            // Add click handlers for 'Go to my account' and Close buttons
+            $pendingOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
+
+                // Hide the overlay
+                $backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+                $pendingOverlay.addClass('hidden');
+
+                // Make sure it fetches new account data on reload
+                if (M.account) {
+                    M.account.lastupdate = 0;
+                }
+                loadSubPage('fm/account/history');
+            });
+        }
+        else {
+            // Show the failure overlay
+            $failureOverlay.removeClass('hidden');
+
+            // On click of the 'Try again' or Close buttons, hide the overlay
+            $failureOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
+
+                // Hide the overlay
+                $backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+                $failureOverlay.addClass('hidden');
+            });
         }
     }
 };

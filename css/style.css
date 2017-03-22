@@ -14553,7 +14553,7 @@ body.de .reg-st3-bandwidth .reg-st3-mid-txt, body.br .reg-st3-bandwidth .reg-st3
     margin-right: 4px;
 }
 .provider-icon {
-    background-image: url("../images/mega/payment-provider-icons-v2.png");
+    background-image: url("../images/mega/payment-provider-icons-v3.png");
     background-position: 0 0;
     background-repeat: no-repeat;
     display: inline-block;
@@ -14776,6 +14776,15 @@ body.de .reg-st3-bandwidth .reg-st3-mid-txt, body.br .reg-st3-bandwidth .reg-st3
 }
 .provider-icon.directresellerAlipay {
     background-position: 0 -4020px;
+}
+.provider-icon.sabadell {
+    background-position: 0 -4080px;
+}
+.provider-icon.sabadellVI {
+    background-position: 0 -3360px;
+}
+.provider-icon.sabadellMC {
+    background-position: 0 -1980px;
 }
 .membership-new-offer text {
     font-weight: normal;

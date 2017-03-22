@@ -5394,6 +5394,10 @@ function getGatewayName(gatewayId, gatewayOpt) {
             name: 'ecp',                    // E-Comprocessing
             displayName: l[6952] + ' (ECP)' // Credit card (ECP)
         },
+        17: {
+            name: 'sabadell',
+            displayName: 'Sabadell'
+        },
         999: {
             name: 'wiretransfer',
             displayName: l[6198]    // Wire transfer

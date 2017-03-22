@@ -14,14 +14,16 @@ accountUI.initCheckbox = function(className, $container, currentValue, onChangeC
             return;
         }
 
+        var res;
+
         if ($input.hasClass('checkboxOn')) {
-            var res = onChangeCb(false);
+            res = onChangeCb(false);
             if (res !== false) {
                 accountUI.initCheckbox.uncheck($input, $wrapperDiv);
             }
         }
         else {
-            var res = onChangeCb(true);
+            res = onChangeCb(true);
             if (res !== false) {
                 accountUI.initCheckbox.check($input, $wrapperDiv);
             }

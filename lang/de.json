@@ -3990,8 +3990,8 @@
     "16352": "Bonusprogramm",
     "16353": "Verf\u00fcgbare PRO-Pakete",
     "16354": "Weitere Informationen zu diesem Thema",
-    "16356": "Your queued download exceeds the current transfer quota available for your account and may therefore be interrupted.",
-    "16357": "Your queued download exceeds the current transfer quota available for your IP address and therefore may be interrupted.",
+    "16356": "Die zu \u00fcbertragende Datenmenge \u00fcberschreitet das verbleibende Transfervolumen Ihres Accounts. Die \u00dcbertragung k\u00f6nnte daher unterbrochen werden.",
+    "16357": "Die zu \u00fcbertragende Datenmenge \u00fcberschreitet das verbleibende Freivolumen Ihrer IP-Adresse. Die \u00dcbertragung k\u00f6nnte daher unterbrochen werden.",
     "16358": "[S]Ihr Cloud-Speicher ist voll.[\/S] [A]Wechseln Sie jetzt[\/A] und erhalten Sie [S]bis zu 4 TB (4096 GB)[\/S] Speicherplatz in der Cloud.",
     "16359": "[S]Ihr Cloud-Speicher ist fast voll.[\/S] [A]Wechseln Sie jetzt[\/A] und erhalten Sie [S]bis zu 4 TB (4096 GB)[\/S] Speicherplatz in der Cloud.",
     "16360": "Ihr Cloudspeicher ist voll.",
@@ -4012,6 +4012,7 @@
     "16383": "N\u00fctzliche [S]Zusatzfunktionen[\/S] ",
     "16384": "Gro\u00dfz\u00fcgiges [S]Transfervolumen[\/S]",
     "16386": "PRO-Account aufstocken",
+    "16387": "Gew\u00e4hlten Status dauerhaft - auch bei vollst\u00e4ndigem Verbindungsabbruch - anzeigen",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

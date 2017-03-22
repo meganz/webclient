@@ -16050,5 +16050,9 @@
     "16386": {
         "text": "Upgrade your PRO account",
         "context": "A button label. The button allows the user to upgrade their account."
+    },
+    "16387": {
+        "text": "Always show selected status appearance, even when I disconnect.",
+        "context": "An option in the Chat settings. When enabled, the user's status\/presence would stay the same even if they disconnected."
     }
 }

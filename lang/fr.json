@@ -4012,6 +4012,7 @@
     "16383": "[S]Riche en fonctions[\/S]",
     "16384": "Un [S]quota de transfert[\/S] g\u00e9n\u00e9reux",
     "16386": "Surclasser votre compte PRO",
+    "16387": "Always show selected status appearance, even when I disconnect.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

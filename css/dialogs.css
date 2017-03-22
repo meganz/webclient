@@ -259,13 +259,13 @@
     margin: -326px 0 0 -482px;
 }
 .limited-bandwidth-dialog .plan-blocks, .exceeded:not(.achievements):not(.pro) .limited-bl, .big-104px-icon.full, .exceeded .big-104px-icon.almost-full,
-.dialog.header-before-icon.exceeded, .exceeded .dialog.header-before-icon.limited, .limited-bandwidth-dialog .fm-dialog-close {
+.dialog.header-before-icon.exceeded, .exceeded .dialog.header-before-icon.limited, .limited-bandwidth-dialog .fm-dialog-close, .default-big-button.upgrade.pro, .exceeded.pro .default-big-button.upgrade, .exceeded.pro .default-big-button.continue, .exceeded.pro .dialog.p-after-icon, .dialog.pro-exceeded-bl, .dialog.ransfer-slider, .dialog,pro-exceeded-slider {
     display: none;
 }
-.exceeded:not(.achievements):not(.pro) .plan-blocks, .exceeded .dialog.header-before-icon.exceeded, .exceeded:not(.achievements):not(.pro) .fm-dialog-close {
+.exceeded:not(.achievements):not(.pro) .plan-blocks, .exceeded .dialog.header-before-icon.exceeded, .exceeded:not(.achievements):not(.pro) .fm-dialog-close, .pro.exceeded .dialog.pro-exceeded-bl, exceeded.pro.slider .dialog.ransfer-slider, .slider-enabled .dialog,pro-exceeded-slider {
     display: block;
 }
-.exceeded:not(.pro) .big-104px-icon.full, .exceeded:not(.achievements):not(.pro) .dialog.bottom-tips span {
+.exceeded:not(.pro) .big-104px-icon.full, .exceeded:not(.achievements):not(.pro) .dialog.bottom-tips span, .exceeded.pro .default-big-button.upgrade.pro {
     display: inline-block;
 }
 .dialog.transfer-overquota-txt {
@@ -313,6 +313,66 @@
 }
 .fm-dialog .reg-st3-bandwidth {
     padding-bottom: 17px;
+}
+.dialog.pro-exceeded-txt {
+    font-size: 14px;
+    line-height:24px;
+    color: #666666;
+    padding: 0 0 0 0;
+}
+.fm-dialog .dialog.pro-exceeded-txt {
+    display: inline-block;
+    max-width: 504px;
+}
+.limited-bandwidth-dialog .account.chart-block {
+    display: inline-block;
+    margin: 2px 0 19px 0;
+    padding: 18px 0 0 0;
+    text-align: left;
+    font-size: 16px;
+}
+ .exceeded.pro .dialog.big-buttons-block {
+    display: inline-block;
+    margin: 2px 0 19px 0;
+    padding: 16px 0 0 0;
+    text-align: left;
+}
+.exceeded.pro .bandwidth .chart.data .perc-txt::before {
+    display: none;
+}
+.exceeded.pro .chart.progressbars span {
+    transform: rotate(180deg);
+}
+.exceeded.pro .chart.progressbars span::before {
+    background-color: #D90007;
+}
+.fm-dialog.limited-bandwidth-dialog.pro.exceeded {
+    margin-top: -223px;
+}
+.dialog-slider-txt {
+    text-align:center;
+    font-size:20px;
+    line-height:25px;
+    text-align:center;
+    position:relative;
+}
+.dialog-slider-txt::before {
+    content:'';
+    display:block;
+    position:absolute;
+    width: 100%;
+    height: 1px;
+    background-color: rgba(0,0,0,0,1);
+    top:0;
+    left:0;
+}
+.dialog-slider-txt span {
+    padding: 0 15px;
+    background-color:white;
+    position:relative;
+    font-size:20px;
+    line-height:25px;
+    color: #666666;
 }
 /* End of Transfer quota exceeded dialog */
 

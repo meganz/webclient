@@ -13737,7 +13737,7 @@ h5.main-italic-header {
     position: relative;
 }
 .membership-step2 .register-st3-main-bl, .membership-step2 .register-st5-main-bl {
-    margin: 0 -1px 0 0;
+    margin: 0 -2px 0 0;
 }
 .register-st4-main-bl {
     margin: 0;
@@ -14466,7 +14466,7 @@ background: linear-gradient(to bottom, rgba(250,250,250,0.3) 0%,rgba(238,238,238
 .membership-step2 .reg-st3-membership-bl {
     box-sizing: border-box;
     float: none;
-    width:221px;
+    width:220px;
     text-align: right;
     margin: -32px 0 0 12px;
     padding: 0;

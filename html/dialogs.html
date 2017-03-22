@@ -2606,33 +2606,159 @@
             <span class="registered">[$16356]</span>
             <span class="not-registered">[$16357]</span>
         </p>
-
-        <div class="dialog big-buttons-block">
-            <!-- [$6826] - Continue !-->
-            <!-- [$8945] - Continue without account !-->
-            <div class="default-big-button button-without-outline continue">
-                <span class="registered">[$6826]</span>
-                <span class="not-registered">[$8945]</span>
+        
+        <div class="dialog pro-exceeded-bl">
+            
+            <div class="fm-account-blocks bandwidth">
+              <div class="account chart-block">
+                  <div class="chart icon"><i class="big-icon speedometer"></i></div>
+                  <div class="account chart body">
+                      <div class="account chart overlay"><span></span><span></span></div>
+                      <div class="account chart progressbars">
+                        <div class="chart0 main-chart right-chart"><span></span></div>
+                        <div class="chart0 main-chart left-chart"><span></span></div>
+                      </div>
+                  </div>
+                  <div class="account chart data">
+                      <span class="perc-txt">100 %</span>
+                      <span class="size-txt">500 GB</span>
+                      <span class="of-txt">[$5528]</span>
+                      <span class="pecents-txt">0</span>
+                      <span class="gb-txt">GB</span>
+                  </div>
+              </div>
             </div>
-            <!-- [$16309] - Get more bonuses !-->
-            <!-- [$16352] - Register for bonuses !-->
-            <div class="default-big-button button-without-outline get-more-bonuses">
-                <span class="label-with-icon registered"><i class="medium-icon rocket"></i>[$16309]</span>
-                <span class="not-registered">[$16309]</span>
+            <div class="dialog pro-exceeded-txt">
+                [$16356]
             </div>
-            <!-- [$16353] - See our plans !-->
-            <div class="default-big-button button-without-outline grey-gradient upgrade">
-                <span>[$16353]</span>
+           
+        </div>
+        
+        <div class="dialog limited-bl">
+            <div class="dialog big-buttons-block">
+                <!-- [$6826] - Continue !-->
+                <!-- [$8945] - Continue without account !-->
+                <div class="default-big-button button-without-outline continue">
+                    <span class="registered">[$6826]</span>
+                    <span class="not-registered">[$8945]</span>
+                </div>
+                <!-- [$16309] - Get more bonuses !-->
+                <!-- [$16352] - Register for bonuses !-->
+                <div class="default-big-button button-without-outline get-more-bonuses">
+                    <span class="label-with-icon registered"><i class="medium-icon rocket"></i>[$16309]</span>
+                    <span class="not-registered">[$16309]</span>
+                </div>
+                <!-- [$16353] - See our plans !-->
+                <div class="default-big-button button-without-outline grey-gradient upgrade">
+                    <span>[$16353]</span>
+                </div>
+                <!-- [$16386] - Upgrade your PRO account !-->
+                <div class="default-big-button button-without-outline grey-gradient upgrade pro">
+                    <span>[$16386]</span>
+                </div>
+            </div>
+            
+            <div class="dialog pro-exceeded-slider">
+                <div class="dialog transfer-slider">
+                    <div class="dialog-slider-txt">
+                        <span>[$174]</span>
+                    </div>
+                </div>
+                <div id="bandwidth-slider-dialog"></div>
+                <div class="slider numbers val1">0 <span>%</span></div>
+                <div class="slider numbers val2 last">100 <span>%</span></div>
+                <div class="clear"></div>
+            </div>
+            
+            <div class="centered-checkbox dialog-bottom">
+                <div class="checkdiv checkboxOff">
+                    <input type="checkbox" name="limit-warning-checkbox" id="limit-warning-checkbox" class="checkboxOff">
+                </div>
+                <label for="limit-warning-checkbox" class="radio-txt medium">[$229]</label>
             </div>
         </div>
-
-        <div class="centered-checkbox dialog-bottom">
-            <div class="checkdiv checkboxOff">
-                <input type="checkbox" name="limit-warning-checkbox" id="limit-warning-checkbox" class="checkboxOff">
+        
+        <div class="plan-blocks step1-block">
+            <div class="dialog transfer-plans">
+                <div class="reg-st3-membership-bl pro4 selected" data-payment="lite">
+                    <div class="membership-pad-bl">
+                        <div class="reg-st3-bott-title title">[$6234]</div>
+                        <div class="membership-gray-block">
+                            <div class="reg-st3-bott-title price"><span class="num">4<span class="small">.99 &euro;</span></span><span class="period">/[$913]</span></div>
+                        </div>
+                        <div class="reg-st3-storage">
+                            <div class="reg-st3-big-txt">200 <span>GB</span></div>
+                            <div class="reg-st3-mid-txt">[$495]</div>
+                            <div class="clear"></div>
+                        </div>
+                        <div class="reg-st3-bandwidth">
+                            <div class="reg-st3-big-txt">1 <span>TB</span></div>
+                            <div class="reg-st3-mid-txt">[$16120]</div>
+                            <div class="clear"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="reg-st3-membership-bl pro1" data-payment="1">
+                    <div class="membership-pad-bl">
+                        <div class="reg-st3-bott-title title">[$5819]</div>
+                        <div class="membership-gray-block">
+                            <div class="reg-st3-bott-title price"><span class="num">9<span class="small">.99 &euro;</span></span><span class="period">/[$913]</span></div>
+                        </div>
+                        <div class="reg-st3-storage">
+                            <div class="reg-st3-big-txt">500 <span>GB</span></div>
+                            <div class="reg-st3-mid-txt">[$495]</div>
+                            <div class="clear"></div>
+                        </div>
+                        <div class="reg-st3-bandwidth">
+                            <div class="reg-st3-big-txt">2 <span>TB</span></div>
+                            <div class="reg-st3-mid-txt">[$16120]</div>
+                            <div class="clear"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="reg-st3-membership-bl pro2" data-payment="2">
+                    <div class="membership-pad-bl">
+                        <div class="reg-st3-bott-title title">[$6125]</div>
+                        <div class="membership-gray-block">
+                            <div class="reg-st3-bott-title price"><span class="num">19<span class="small">.99 &euro;</span></span><span class="period">/[$913]</span></div>
+                        </div>
+                        <div class="reg-st3-storage">
+                            <div class="reg-st3-big-txt">2 <span>TB</span></div>
+                            <div class="reg-st3-mid-txt">[$495]</div>
+                            <div class="clear"></div>
+                        </div>
+                        <div class="reg-st3-bandwidth">
+                            <div class="reg-st3-big-txt">4 <span>TB</span></div>
+                            <div class="reg-st3-mid-txt">[$16120]</div>
+                            <div class="clear"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="reg-st3-membership-bl pro3" data-payment="3">
+                    <div class="membership-pad-bl">
+                        <div class="reg-st3-bott-title title">[$6126]</div>
+                        <div class="membership-gray-block">
+                            <div class="reg-st3-bott-title price"><span class="num">29<span class="small">.99 &euro;</span></span><span class="period">/[$913]</span></div>
+                        </div>
+                        <div class="reg-st3-storage">
+                            <div class="reg-st3-big-txt">4 <span>TB</span></div>
+                            <div class="reg-st3-mid-txt">[$495]</div>
+                            <div class="clear"></div>
+                        </div>
+                        <div class="reg-st3-bandwidth">
+                            <div class="reg-st3-big-txt">8 <span>TB</span></div>
+                            <div class="reg-st3-mid-txt">[$16120]</div>
+                            <div class="clear"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="clear"></div>
             </div>
-            <label for="limit-warning-checkbox" class="radio-txt medium">[$229]</label>
+            
+            <div class="dialog transfer-overquota-txt">[$7100]</div>
+            
         </div>
-
+        
         <div class="dialog bottom-tips">
             <span>[$16355]</span>
             <a>[$16354]</a>

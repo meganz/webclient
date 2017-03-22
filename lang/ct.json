@@ -3973,9 +3973,9 @@
     "16335": "(\u4ecb\u7d39\u4f7f\u7528\u7684\u734e\u52f5\u53ef\u80fd\u9700\u8981\u5e7e\u5929\u624d\u80fd\u5b8c\u6210\u78ba\u8a8d - \u8acb\u8010\u5fc3\u7b49\u5019)",
     "16336": "(\u734e\u52f5\u5c07\u65bc [S]%1[\/S] %2 \u5167\u5230\u671f)",
     "16337": "\u60a8\u5df2\u7372\u5f97\u66f4\u591a\u7684\u5132\u5b58\u7a7a\u9593",
-    "16338": "Summary of the achievements completed and the storage quota bonus already received ",
+    "16338": "\u5df2\u5b8c\u6210\u7684\u6311\u6230\u548c\u5df2\u7372\u5f97\u7684\u64f4\u589e\u7a7a\u9593\u734e\u52f5",
     "16339": "\u60a8\u5df2\u7372\u5f97\u66f4\u5927\u7684\u50b3\u8f38\u983b\u5bec",
-    "16340": "Summary of the achievements completed and the transfer quota bonus already received ",
+    "16340": "\u5df2\u5b8c\u6210\u7684\u6311\u6230\u548c\u5df2\u7372\u5f97\u7684\u50b3\u8f38\u914d\u984d\u734e\u52f5",
     "16341": "\u60a8\u5efa\u7acb\u5e33\u6236\u5f8c\uff0c\u4fbf\u53ef[B]\u53d6\u5f9750GB\u7684\u514d\u8cbb\u5132\u5b58\u7a7a\u9593[\/B]\u3002 \u6b32\u4eab\u53d7\u5168\u529f\u80fd\u5b8c\u6574\u9ad4\u9a57\uff0c\u8acb\u4e0b\u8f09\u6211\u5011\u7684\u61c9\u7528\u7a0b\u5f0f\u6216\u5728\u96fb\u8166\u4e0a\u4f7f\u7528\u6211\u5011\u7684\u7db2\u7ad9\u3002",
     "16342": "\u9023\u7d50",
     "16343": "\u8acb\u8f38\u5165\u60a8\u7684\u96fb\u5b50\u4fe1\u7bb1",
@@ -4000,6 +4000,18 @@
     "16363": "\u8f15\u9b06\u7372\u5f97\u66f4\u591aMEGA\u7684\u5132\u5b58\u7a7a\u9593\u8207\u50b3\u8f38\u914d\u984d",
     "16364": "\u60a8\u53ef\u4ee5\u5b8c\u6210\u4e0b\u65b9\u6240\u5217\u4e4b\u6311\u6230\uff0c\u4ee5\u7372\u5f97\u514d\u8cbb\u5132\u5b58\u7a7a\u9593\u548c\u50b3\u8f38\u914d\u984d\u734e\u52f5",
     "16365": "MEGA\u734e\u52f5\u6311\u6230",
+    "16368": "MEGA is a secure cloud storage service that gives you 50 GB free storage space. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.",
+    "16369": "Upload your files from your smartphone or tablet, then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.",
+    "16370": "The encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Recovery Key backed up) or you will lose access to your stored files.",
+    "16371": "Inside the app you can upgrade your storage space and transfer quota with a monthly or yearly subscription.",
+    "16372": "PRO LITE subscription: \u20ac4.99 (US$4.99) per month or \u20ac49.99 (US$49.99) per year gives you 200 GB of storage space and 1 TB of transfer quota per month.PRO I subscription: \u20ac9.99 (US$9.99) per month or \u20ac99.99 (US$99.99) per year gives you 500 GB of storage space and 2 TB of transfer quota per month.PRO II subscription: \u20ac19.99 (US$19.99) per month or \u20ac199.99 (US$199.99) per year gives you 2 TB of storage space and 4 TB of transfer quota per month.PRO III subscription: \u20ac29.99 (US$29.99) per month or \u20ac299.99 (US$299.99) per year gives you 4 TB of storage space and 8 TB of transfer quota per month.",
+    "16373": "For more info, please check our website:Mobile - https:\/\/mega.nz\/mobile_terms.html - https:\/\/mega.nz\/mobile_privacy.htmlDesktop - https:\/\/mega.nz\/",
+    "16374": "Note: For desktop access to your files, MEGA needs to use HTML5 compatible browsers to handle our advanced features. We recommend Mozilla Firefox and Google Chrome. The mobile versions of browsers cannot access the MEGA cloud storage system yet.",
+    "16375": "Massive [S]storage space[\/S]",
+    "16381": "Notes regarding transfers and your account type:",
+    "16383": "Fully [S]featured[\/S]",
+    "16384": "Generous [S]transfer quota[\/S]",
+    "16386": "Upgrade your PRO account",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4245,6 +4257,7 @@
         "failed-to-copy-try-manually": 16348,
         "invalid-email-or-password": 16349,
         "please-try-again": 16350,
-        "email-sent-successfully": 16351
+        "email-sent-successfully": 16351,
+        "always-show-selected-presence-even-when-disconnected": 16387
     }
 }

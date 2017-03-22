@@ -16002,5 +16002,53 @@
     "16365": {
         "text": "MEGA Achievements",
         "context": "A dialog header. The user is able to increase the amount of free storage and transfer quota by completing achievements like installing MEGAsync, or an app etc."
+    },
+    "16368": {
+        "text": "MEGA is a secure cloud storage service that gives you 50 GB free storage space. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.",
+        "context": "Paragraph 1 of the general description of MEGA shown on the apps stores in Android, iOS and Windows Phone."
+    },
+    "16369": {
+        "text": "Upload your files from your smartphone or tablet, then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.",
+        "context": "Paragraph 2 of the general description of MEGA shown on the apps stores in Android, iOS and Windows Phone."
+    },
+    "16370": {
+        "text": "The encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Recovery Key backed up) or you will lose access to your stored files.",
+        "context": "Paragraph 3 of the general description of MEGA which is shown on the app stores in Android, iOS and Windows Phone."
+    },
+    "16371": {
+        "text": "Inside the app you can upgrade your storage space and transfer quota with a monthly or yearly subscription.",
+        "context": "Paragraph 4 of the general description of MEGA which is shown on the app stores in Android, iOS and Windows Phone."
+    },
+    "16372": {
+        "text": "PRO LITE subscription: \u20ac4.99 (US$4.99) per month or \u20ac49.99 (US$49.99) per year gives you 200 GB of storage space and 1 TB of transfer quota per month.\nPRO I subscription: \u20ac9.99 (US$9.99) per month or \u20ac99.99 (US$99.99) per year gives you 500 GB of storage space and 2 TB of transfer quota per month.\nPRO II subscription: \u20ac19.99 (US$19.99) per month or \u20ac199.99 (US$199.99) per year gives you 2 TB of storage space and 4 TB of transfer quota per month.\nPRO III subscription: \u20ac29.99 (US$29.99) per month or \u20ac299.99 (US$299.99) per year gives you 4 TB of storage space and 8 TB of transfer quota per month.",
+        "context": "Paragraph 5 of the general description of MEGA which is shown on the apps stores in Android, iOS and Windows Phone. Please keep the multiple line format."
+    },
+    "16373": {
+        "text": "For more info, please check our website:\nMobile - https:\/\/mega.nz\/mobile_terms.html - https:\/\/mega.nz\/mobile_privacy.html\nDesktop - https:\/\/mega.nz\/",
+        "context": "Paragraph 6 of the general description of MEGA which is shown on the app stores in Android, iOS and Windows Phone. Please keep the multiple line format."
+    },
+    "16374": {
+        "text": "Note: For desktop access to your files, MEGA needs to use HTML5 compatible browsers to handle our advanced features. We recommend Mozilla Firefox and Google Chrome. The mobile versions of browsers cannot access the MEGA cloud storage system yet.",
+        "context": "Paragraph 7 of the general description of MEGA which is shown on the app stores in Android, iOS and Windows Phone."
+    },
+    "16375": {
+        "text": "Massive [S]storage space[\/S]",
+        "context": "A title of a text block describing a benefit of MEGA's storage."
+    },
+    "16381": {
+        "text": "Notes regarding transfers and your account type:",
+        "context": "A sentence introducing a list of notes about transfer quota, transfer speed and PRO\/Free accounts."
+    },
+    "16383": {
+        "text": "Fully [S]featured[\/S]",
+        "context": "Title of a text block which describes PRO only features."
+    },
+    "16384": {
+        "text": "Generous [S]transfer quota[\/S]",
+        "context": "A title of a text block describing MEGA's transfer volume limit."
+    },
+    "16386": {
+        "text": "Upgrade your PRO account",
+        "context": "A button label. The button allows the user to upgrade their account."
     }
 }

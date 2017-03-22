@@ -56,10 +56,9 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
         megaChat.refreshConversations();
 
 
-        if (localStorage.userPresenceIsOffline !== "unavailable") {
-            if (megaChat.karere.getConnectionState() != Karere.CONNECTION_STATE.CONNECTED) {
-                megaChat.connect();
-            }
+
+        if (megaChat.karere.getConnectionState() != Karere.CONNECTION_STATE.CONNECTED) {
+            megaChat.connect();
         }
 
         if (roomType === "private") {
@@ -591,16 +590,11 @@ Chat.prototype.init = function() {
 
     $('.activity-status-block, .activity-status').show();
 
-    if (!localStorage.userPresenceIsOffline) {
-        self.connect()
-            .always(function() {
-                self.renderMyStatus();
-            });
-    }
-    else {
-        self.renderMyStatus();
-    }
 
+    self.connect()
+        .always(function() {
+            self.renderMyStatus();
+        });
 
 
     if (self.karere.getConnectionState() === Karere.CONNECTION_STATE.DISCONNECTED || self.karere.getConnectionState() === Karere.CONNECTION_STATE.AUTHFAIL) {
@@ -1112,12 +1106,9 @@ Chat.prototype.renderMyStatus = function() {
     );
 
     if (
-        !localStorage.userPresenceIsOffline &&
+        self.karere.getConnectionState() === Karere.CONNECTION_STATE.CONNECTING ||
         (
-            self.karere.getConnectionState() === Karere.CONNECTION_STATE.CONNECTING ||
-            (
-                userPresenceConRetMan.getConnectionState() === ConnectionRetryManager.CONNECTION_STATE.CONNECTING
-            )
+            userPresenceConRetMan.getConnectionState() === ConnectionRetryManager.CONNECTION_STATE.CONNECTING
         )
     ) {
         $status.parent()

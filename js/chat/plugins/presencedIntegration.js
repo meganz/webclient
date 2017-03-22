@@ -216,10 +216,7 @@ PresencedIntegration.prototype._updateuicb = function presencedIntegration_updat
     var xmppPresence = megaChat.karere.getPresence(megaChat.karere.getJid());
     var targetKarerePresence = false;
 
-    if (status === 'offline' && xmppPresence) {
-        megaChat.karere.disconnect();
-    }
-    else if (status === 'away' && xmppPresence !== 'away') {
+    if (status === 'away' && xmppPresence !== 'away') {
         targetKarerePresence = Karere.PRESENCE.AWAY;
     }
     else if (status === 'dnd' && xmppPresence !== 'dnd') {
@@ -356,7 +353,7 @@ PresencedIntegration.prototype.setPresence = function(presence) {
     else if (presence === UserPresence.PRESENCE.OFFLINE) {
         localStorage.removeItem("userPresenceIsOffline");
 
-        localStorage.userPresenceIsOffline = 1;
+        // localStorage.userPresenceIsOffline = 1;
 
         localStorage.removeItem("megaChatPresence"); // legacy
 
@@ -364,8 +361,6 @@ PresencedIntegration.prototype.setPresence = function(presence) {
             .done(function() {
                 self.userPresence.ui_setstatus(UserPresence.PRESENCE.OFFLINE);
             });
-
-        self.megaChat.karere.disconnect();
     }
 };
 

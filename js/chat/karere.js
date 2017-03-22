@@ -272,7 +272,7 @@ var Karere = function(user_options) {
                  */
                 isUserForcedDisconnect: function(connectionRetryManager) {
                     return (
-                        self.destroying === true || localStorage.userPresenceIsOffline === "1"
+                        self.destroying === true
                     );
                 }
             }

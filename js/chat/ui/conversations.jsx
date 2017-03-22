@@ -139,7 +139,7 @@ var ConversationsListItem = React.createClass({
                     chatRoom.messagesBuff.messagesHistoryIsLoading() ||
                     chatRoom.messagesBuff.joined === false
                     ) ? (
-                        !localStorage.userPresenceIsOffline ? l[7006] : ""
+                        l[7006]
                     ) :
                     l[8000]
             );

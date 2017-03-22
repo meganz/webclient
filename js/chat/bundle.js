@@ -8995,14 +8995,27 @@ React.makeElement = React['createElement'];
 	                                        icon: 'rounded-grey-plus',
 	                                        label: __(l[71]),
 	                                        onClick: function onClick() {
-	                                            M.inviteContact(M.u[u_handle].m, contactEmail);
+	                                            var exists = false;
+	                                            Object.keys(M.opc).forEach(function (k) {
+	                                                if (!exists && M.opc[k].m === contactEmail) {
+	                                                    exists = true;
+	                                                    return false;
+	                                                }
+	                                            });
 
-	                                            var title = l[150];
+	                                            if (exists) {
+	                                                closeDialog();
+	                                                msgDialog('warningb', '', l[7413]);
+	                                            } else {
+	                                                M.inviteContact(M.u[u_handle].m, contactEmail);
 
-	                                            var msg = l[5898].replace('[X]', contactEmail);
+	                                                var title = l[150];
 
-	                                            closeDialog();
-	                                            msgDialog('info', title, msg);
+	                                                var msg = l[5898].replace('[X]', contactEmail);
+
+	                                                closeDialog();
+	                                                msgDialog('info', title, msg);
+	                                            }
 	                                        }
 	                                    }),
 	                                    deleteButtonOptional ? React.makeElement('hr', null) : null,

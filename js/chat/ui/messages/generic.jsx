@@ -573,18 +573,32 @@ var GenericConversationMessage = React.createClass({
                                         icon="rounded-grey-plus"
                                         label={__(l[71])}
                                         onClick={() => {
-                                            M.inviteContact(M.u[u_handle].m, contactEmail);
+                                            var exists = false;
+                                            Object.keys(M.opc).forEach(function(k) {
+                                                if (!exists && M.opc[k].m === contactEmail) {
+                                                    exists = true;
+                                                    return false;
+                                                }
+                                            });
 
-                                            // Contact invited
-                                            var title = l[150];
+                                            if (exists) {
+                                                closeDialog();
+                                                msgDialog('warningb', '', l[7413]);
+                                            }
+                                            else {
+                                                M.inviteContact(M.u[u_handle].m, contactEmail);
 
-                                            // The user [X] has been invited and will appear in your contact list once
-                                            // accepted."
-                                            var msg = l[5898].replace('[X]', contactEmail);
+                                                // Contact invited
+                                                var title = l[150];
+
+                                                // The user [X] has been invited and will appear in your contact list once
+                                                // accepted."
+                                                var msg = l[5898].replace('[X]', contactEmail);
 
 
-                                            closeDialog();
-                                            msgDialog('info', title, msg);
+                                                closeDialog();
+                                                msgDialog('info', title, msg);
+                                            }
                                         }}
                                     />
                                     {deleteButtonOptional ? <hr /> : null}

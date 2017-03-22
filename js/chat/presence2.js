@@ -302,6 +302,9 @@ UserPresence.prototype.reconnect = function presence_reconnect(self) {
                 clearTimeout(self.keepalivechecktimer);
                 self.keepalivechecktimer = false;
             }
+            if (self.connectedcb) {
+                self.connectedcb(false);
+            }
             self.connectionRetryManager.gotDisconnected();
         };
 
@@ -321,6 +324,10 @@ UserPresence.prototype.reconnect = function presence_reconnect(self) {
 
             if (!this.canceled) {
                 self.connectionRetryManager.doConnectionRetry();
+            }
+
+            if (self.connectedcb) {
+                self.connectedcb(false);
             }
         };
 
@@ -461,6 +468,11 @@ UserPresence.prototype.disconnect = function(userForced) {
     self.connectionRetryManager.gotDisconnected();
 
     $(self).trigger('onDisconnected');
+    // on FF, the onclose/onerror won't get triggered, maybe because of the websocket is waiting for the "close"
+    // packet to be sent correctly
+    if (self.connectedcb) {
+        self.connectedcb(false);
+    }
 };
 
 UserPresence.prototype.addremovepeers = function presence_addremovepeers(peers, del) {

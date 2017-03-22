@@ -117,6 +117,8 @@ PresencedIntegration.prototype.init = function() {
         !!RTC,
         false,
         function presencedIntegration_connectedcb(isConnected) {
+            // Tip: This cb can be called multiple times with the same isConnected argument, e.g. twice in case of
+            // error + close or going offline (if supported by the browser) and then properly closing the socket
             self.logger.debug(isConnected ? "connected" : "disconnected");
 
             // set my own presence

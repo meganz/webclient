@@ -1720,9 +1720,6 @@ makeMetaAware(Karere);
      */
     Karere.prototype.setPresence = function(presence, status, delay) {
         var self = this;
-        if (self._myPresence === presence) {
-            return;
-        }
 
         presence = presence || "chat";
         status = status || "";

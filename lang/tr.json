@@ -4000,6 +4000,18 @@
     "16363": "Daha fazla depolama alan\u0131 & aktarma kotas\u0131 elde etmenin kolay yolu",
     "16364": "A\u015fa\u011f\u0131da \u00f6zetlenmi\u015f eylemleri tamamlayarak \u00fccretsiz c\u00f6mert depolama ve aktarma limitine sahip olabilirsiniz.",
     "16365": "MEGA Ba\u015far\u0131mlar\u0131",
+    "16368": "MEGA size 50 GB bo\u015f alan sa\u011flayan g\u00fcvenli bir bulut depolama hizmetidir. Di\u011fer bulut depolama sa\u011flay\u0131c\u0131lar\u0131ndan farkl\u0131 olarak, verileriniz yaln\u0131zca istemci cihazlar\u0131n\u0131z taraf\u0131ndan \u015fifrelenir ve \u015fifre \u00e7\u00f6z\u00fcl\u00fcr ve \u015fifreler asla taraf\u0131m\u0131zca \u00e7\u00f6z\u00fclmez.",
+    "16369": "Upload your files from your smartphone or tablet, then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.",
+    "16370": "\u015eifreleme i\u015flemi, parolan\u0131za eri\u015femedi\u011fimiz veya parolan\u0131z\u0131 s\u0131f\u0131rlayamad\u0131\u011f\u0131m\u0131z anlam\u0131na gelir. O nedenle MUTLAKA hat\u0131rlamal\u0131s\u0131n\u0131z (Kurtarma Anahtar\u0131n\u0131z\u0131 yedeklemedi\u011finiz s\u00fcrece) veya kay\u0131tl\u0131 dosyalar\u0131n\u0131za eri\u015fimi kaybedeceksiniz.",
+    "16371": "Uygulaman\u0131n i\u00e7inde depolama alan\u0131n\u0131z\u0131 y\u00fckseltebilir ve kotay\u0131 ayl\u0131k veya y\u0131ll\u0131k abonelik ile aktarabilirsiniz.",
+    "16372": "PRO LITE subscription: \u20ac4.99 (US$4.99) per month or \u20ac49.99 (US$49.99) per year gives you 200 GB of storage space and 1 TB of transfer quota per month.PRO I subscription: \u20ac9.99 (US$9.99) per month or \u20ac99.99 (US$99.99) per year gives you 500 GB of storage space and 2 TB of transfer quota per month.PRO II subscription: \u20ac19.99 (US$19.99) per month or \u20ac199.99 (US$199.99) per year gives you 2 TB of storage space and 4 TB of transfer quota per month.PRO III subscription: \u20ac29.99 (US$29.99) per month or \u20ac299.99 (US$299.99) per year gives you 4 TB of storage space and 8 TB of transfer quota per month.",
+    "16373": "Daha fazla bilgi i\u00e7in web sitemizi kontrol edin:Mobil - https:\/\/mega.nz\/mobile_terms.html - https:\/\/mega.nz\/mobile_privacy.htmlMasa\u00fcst\u00fc - https:\/\/mega.nz\/",
+    "16374": "Not: Dosyalar\u0131n\u0131za masa\u00fcst\u00fcnden eri\u015fmek ve MEGA'n\u0131n geli\u015fmi\u015f \u00f6zellikleri i\u015fleyebilmesi i\u00e7in HTML5 uyumlu taray\u0131c\u0131lar\u0131 kullanmas\u0131 gerekir. Mozilla Firefox ve Google Chrome'u \u00f6neriyoruz. Taray\u0131c\u0131lar\u0131n mobil s\u00fcr\u00fcmleri hen\u00fcz MEGA bulut depolama sistemine eri\u015femiyor.",
+    "16375": "B\u00fcy\u00fck [S]depolama alan\u0131[\/S]",
+    "16381": "Aktar\u0131mlar ve hesap t\u00fcr\u00fcn\u00fczle ilgili notlar:",
+    "16383": "Tam [S]\u00f6zellikli[\/S]",
+    "16384": "C\u00f6mert [S]aktar\u0131m kotas\u0131[\/S]",
+    "16386": "PRO hesab\u0131n\u0131z\u0131 y\u00fckseltin",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4245,6 +4257,7 @@
         "failed-to-copy-try-manually": 16348,
         "invalid-email-or-password": 16349,
         "please-try-again": 16350,
-        "email-sent-successfully": 16351
+        "email-sent-successfully": 16351,
+        "always-show-selected-presence-even-when-disconnected": 16387
     }
 }

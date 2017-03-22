@@ -4012,6 +4012,7 @@
     "16383": "Fully [S]featured[\/S]",
     "16384": "Generous [S]transfer quota[\/S]",
     "16386": "Upgrade your PRO account",
+    "16387": "Always show selected status appearance, even when I disconnect.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

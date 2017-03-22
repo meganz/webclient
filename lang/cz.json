@@ -4012,6 +4012,7 @@
     "16383": "Spousta [S]funkc\u00ed[\/S]",
     "16384": "\u0160t\u011bdr\u00e1 [S]kv\u00f3ta p\u0159enosu[\/S]",
     "16386": "Upgradujte sv\u016fj \u00fa\u010det PRO",
+    "16387": "Always show selected status appearance, even when I disconnect.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

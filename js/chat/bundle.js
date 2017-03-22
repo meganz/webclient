@@ -109,10 +109,8 @@ React.makeElement = React['createElement'];
 
 	        megaChat.refreshConversations();
 
-	        if (localStorage.userPresenceIsOffline !== "unavailable") {
-	            if (megaChat.karere.getConnectionState() != Karere.CONNECTION_STATE.CONNECTED) {
-	                megaChat.connect();
-	            }
+	        if (megaChat.karere.getConnectionState() != Karere.CONNECTION_STATE.CONNECTED) {
+	            megaChat.connect();
 	        }
 
 	        if (roomType === "private") {
@@ -553,13 +551,9 @@ React.makeElement = React['createElement'];
 
 	    $('.activity-status-block, .activity-status').show();
 
-	    if (!localStorage.userPresenceIsOffline) {
-	        self.connect().always(function () {
-	            self.renderMyStatus();
-	        });
-	    } else {
+	    self.connect().always(function () {
 	        self.renderMyStatus();
-	    }
+	    });
 
 	    if (self.karere.getConnectionState() === Karere.CONNECTION_STATE.DISCONNECTED || self.karere.getConnectionState() === Karere.CONNECTION_STATE.AUTHFAIL) {
 	        self.karere.authSetup(self.getJidFromNodeId(u_handle), self.getMyXMPPPassword());
@@ -925,7 +919,7 @@ React.makeElement = React['createElement'];
 
 	    $status.addClass(cssClass);
 
-	    if (!localStorage.userPresenceIsOffline && (self.karere.getConnectionState() === Karere.CONNECTION_STATE.CONNECTING || userPresenceConRetMan.getConnectionState() === ConnectionRetryManager.CONNECTION_STATE.CONNECTING)) {
+	    if (self.karere.getConnectionState() === Karere.CONNECTION_STATE.CONNECTING || userPresenceConRetMan.getConnectionState() === ConnectionRetryManager.CONNECTION_STATE.CONNECTING) {
 	        $status.parent().addClass("fadeinout");
 	    } else {
 	        $status.parent().removeClass("fadeinout");
@@ -1561,7 +1555,7 @@ React.makeElement = React['createElement'];
 	        } else {
 	            var lastMsgDivClasses = "conversation-message";
 
-	            var emptyMessage = ChatdIntegration.mcfHasFinishedPromise.state() !== 'resolved' || chatRoom.messagesBuff.messagesHistoryIsLoading() || chatRoom.messagesBuff.joined === false ? !localStorage.userPresenceIsOffline ? l[7006] : "" : l[8000];
+	            var emptyMessage = ChatdIntegration.mcfHasFinishedPromise.state() !== 'resolved' || chatRoom.messagesBuff.messagesHistoryIsLoading() || chatRoom.messagesBuff.joined === false ? l[7006] : l[8000];
 
 	            if (ChatdIntegration.mcfHasFinishedPromise.state() === 'pending') {
 	                if (!ChatdIntegration.mcfHasFinishedPromise._trackDataChangeAttached) {
@@ -4965,9 +4959,7 @@ React.makeElement = React['createElement'];
 	        var messagesList = [];
 
 	        if (self.isRetrievingHistoryViaScrollPull && !self.loadingShown || self.props.chatRoom.messagesBuff.messagesHistoryIsLoading() === true || self.props.chatRoom.messagesBuff.joined === false || self.props.chatRoom.messagesBuff.joined === true && self.props.chatRoom.messagesBuff.haveMessages === true && self.props.chatRoom.messagesBuff.messagesHistoryIsLoading() === true) {
-	            if (!localStorage.userPresenceIsOffline) {
-	                self.loadingShown = true;
-	            }
+	            self.loadingShown = true;
 	        } else if (self.props.chatRoom.messagesBuff.joined === true) {
 	            delete self.loadingShown;
 	            var headerText = self.props.chatRoom.messagesBuff.messages.length === 0 ? __(l[8002]) : __(l[8002]);

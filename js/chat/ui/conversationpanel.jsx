@@ -1120,9 +1120,7 @@ var ConversationPanel = React.createClass({
                 self.props.chatRoom.messagesBuff.messagesHistoryIsLoading() === true
             )
         ) {
-            if (!localStorage.userPresenceIsOffline) {
-                self.loadingShown = true;
-            }
+            self.loadingShown = true;
         }
         else if (
             self.props.chatRoom.messagesBuff.joined === true

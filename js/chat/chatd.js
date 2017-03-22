@@ -169,9 +169,7 @@ Chatd.prototype.addshard = function(chatId, shard, url) {
 
     // attempt a connection ONLY if this is a new shard.
     if (newshard) {
-        if (!localStorage.userPresenceIsOffline) {
-            this.shards[shard].reconnect();
-        }
+        this.shards[shard].reconnect();
     }
 
     return newshard;
@@ -286,7 +284,7 @@ Chatd.Shard = function(chatd, shard) {
                  */
                 isUserForcedDisconnect: function(connectionRetryManager) {
                     return (
-                        self.chatd.destroyed === true || localStorage.userPresenceIsOffline ||
+                        self.chatd.destroyed === true ||
                             self.destroyed === true
                     );
                 }

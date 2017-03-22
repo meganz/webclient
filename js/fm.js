@@ -3571,6 +3571,8 @@ function accountUI() {
             $('.fm-account-settings').removeClass('hidden');
             sectionClass = 'advanced';
 
+            accountUI.advancedSection();
+
             $('#network-testing-button').rebind('click', function() {
                 mega.utils.require('network_js')
                     .then(function() {
@@ -12837,7 +12839,7 @@ function contactUI() {
 
         var onlinestatus = M.onlineStatusClass(
             megaChatIsReady &&
-            megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h))
+            M.u[u_h] ? M.u[u_h].presence : "unavailable"
         );
 
         $('.contact-top-details .nw-contact-block-avatar').empty().append( avatar.removeClass('avatar').addClass('square') );

@@ -957,13 +957,38 @@ var dlmanager = {
             return;
         }
 
-        fm_showoverlay();
-        $dialog.removeClass('hidden')
-            .find('.bandwidth-header')
+        $dialog.find('.transfer-overquota-txt')
             .safeHTML(l[7100].replace('%1', '<span class="hidden countdown"></span>'))
             .end();
 
-        $dialog.find('.bandwidth-text-bl.second').addClass('hidden');
+        $dialog.removeClass('registered achievements exceeded pro');
+        $('.bottom-tips a', $dialog).unbind('click');
+        $('.continue', $dialog).unbind('click');
+        $('.upgrade', $dialog).unbind('click');
+        $('.get-more-bonuses', $dialog).unbind('click');
+
+        if (u_type) {
+            $dialog.addClass('registered');
+
+            if (u_attr.p) {
+                $dialog.addClass('pro');
+            }
+        }
+
+        mega.achievem.enabled()
+            .done(function() {
+                $dialog.addClass('achievements');
+                $('.get-more-bonuses', $dialog).rebind('click', function() {
+                    closeDialog();
+                    mega.achievem.achievementsListDialog();
+                });
+            });
+
+        // TODO: init checkbox
+        //uiCheckboxes($dialog, 'ignoreOverQuotaDialog').removeClass('hidden');
+
+        $dialog.addClass('exceeded').removeClass('hidden');
+
         this._overquotaInfo();
 
         var doCloseModal = function closeModal() {

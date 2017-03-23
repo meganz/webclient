@@ -283,6 +283,10 @@
     font-size: 20px;
     color: #333333;
     border-bottom: 2px solid #FF333A;
+    padding: 0 2px;
+}
+.dialog.transfer-overquota-txt span.countdown {
+    margin: 0 5px;
 }
 .dialog.transfer-overquota-txt span span {
     color: #777777;

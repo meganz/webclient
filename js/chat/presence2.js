@@ -496,7 +496,7 @@ UserPresence.prototype.addremovepeers = function presence_addremovepeers(peers, 
 };
 
 UserPresence.prototype.sendstring = function presence_sendstring(s) {
-    if (!this.s) {
+    if (!this.s || this.s.readyState !== 1) {
         console.error("Called UserPresence.sendstring when offline.");
         return;
     }

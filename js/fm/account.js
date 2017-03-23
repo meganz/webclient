@@ -110,6 +110,7 @@ accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, pe
         });
         return;
     }
+
     var presenceInt = megaChat.plugins.presencedIntegration;
 
     // Only call this if the call of this function is the first one, made by fm.js -> accountUI
@@ -217,6 +218,13 @@ accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, pe
         $('input#autoaway', $sectionContainerChat)
             .rebind('change.dashboard', function() {
                 var val = parseInt($(this).val());
+                if (val > 3505) {
+                    val = 3505;
+                }
+                else if (val < 0) {
+                    val = 5;
+                }
+
                 if (val > 0) {
                     presenceInt.userPresence.ui_setautoaway(true, val*60);
                     lastValidNumber = val;

@@ -11032,6 +11032,19 @@ table {
 .account.radio-buttons {
     padding: 9px 0 22px 0;/*width: 530px;*/
 }
+.account.radio-buttons .text-with-inputs {
+    padding-top: 0;
+}
+.account.radio-buttons .text-with-inputs .checkdiv {
+    float: none;
+    display: inline-block;
+    margin: 0px 10px -3px 20px;
+}
+.account.radio-buttons .text-with-inputs .account-counter-number {
+    float: none;
+    display: inline-block;
+    margin: 0 10px -10px 10px;
+}
 .account.radio-buttons hr {
     clear: both;
     padding: 12px 0 0 0;

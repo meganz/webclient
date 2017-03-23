@@ -110,6 +110,34 @@ accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, pe
         });
         return;
     }
+
+    var $onlineOption = $('.account.chat .online-translation');
+    
+    if ($onlineOption.length > 0) {
+
+        var html = escapeHTML(
+            'Online, %1 but change my status appearance to Away (yellow) after %2 minute(s) of inactivity.'
+        )
+            .replace(
+                '%1',
+                '<span class="checkdiv checkboxOn autoaway">' +
+                    '<input type="checkbox" name="set-auto-away" id="set-auto-away" class="checkboxOn" checked="">' +
+                '</span>'
+            )
+            .replace(
+                '%2',
+                '<span class="account-counter-number short">' +
+                    '<input type="text" value="5" id="autoaway" />' +
+                '</span>'
+            );
+
+        $onlineOption
+            .safeHTML(
+                html
+            )
+            .removeClass('online-translation');
+    }
+
     var presenceInt = megaChat.plugins.presencedIntegration;
 
     // Only call this if the call of this function is the first one, made by fm.js -> accountUI
@@ -217,6 +245,13 @@ accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, pe
         $('input#autoaway', $sectionContainerChat)
             .rebind('change.dashboard', function() {
                 var val = parseInt($(this).val());
+                if (val > 3505) {
+                    val = 3505;
+                }
+                else if (val < 0) {
+                    val = 5;
+                }
+
                 if (val > 0) {
                     presenceInt.userPresence.ui_setautoaway(true, val*60);
                     lastValidNumber = val;

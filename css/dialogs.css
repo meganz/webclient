@@ -238,11 +238,11 @@
     font-size: 12px;
     line-height: 15px;
     color: #999999;
-    text-align:center;
+    text-align: center;
     padding: 0 0 0 0;
 }
 .dialog.bottom-tips span {
-    display:block;
+    display: block;
     padding: 2px 0 5px 0;
 }
 .dialog.bottom-tips a {
@@ -258,11 +258,16 @@
     min-width: 964px;
     margin: -326px 0 0 -482px;
 }
-.limited-bandwidth-dialog .plan-blocks, .exceeded:not(.achievements):not(.pro) .limited-bl, .big-104px-icon.full, .exceeded .big-104px-icon.almost-full,
-.dialog.header-before-icon.exceeded, .exceeded .dialog.header-before-icon.limited, .limited-bandwidth-dialog .fm-dialog-close, .default-big-button.upgrade.pro, .exceeded.pro .default-big-button.upgrade, .exceeded.pro .default-big-button.continue, .exceeded.pro .dialog.p-after-icon, .dialog.pro-exceeded-bl, .dialog.ransfer-slider, .dialog,pro-exceeded-slider {
+.fm-dialog.limited-bandwidth-dialog.exceeded.pro {
+    margin-top: -212px;
+}
+.fm-dialog.limited-bandwidth-dialog.exceeded.pro.slider {
+    margin-top: -287px;
+}
+.limited-bandwidth-dialog .plan-blocks, .exceeded:not(.achievements):not(.pro) .limited-bl, .big-104px-icon.full, .exceeded .big-104px-icon.almost-full, .dialog.header-before-icon.exceeded, .exceeded .dialog.header-before-icon.limited, .limited-bandwidth-dialog .fm-dialog-close, .default-big-button.upgrade.pro, .exceeded.pro .default-big-button.upgrade, .exceeded.pro .default-big-button.continue, .exceeded.pro .dialog.p-after-icon, .dialog.pro-exceeded-bl, .dialog.ransfer-slider, .dialog.pro-exceeded-slider {
     display: none;
 }
-.exceeded:not(.achievements):not(.pro) .plan-blocks, .exceeded .dialog.header-before-icon.exceeded, .exceeded:not(.achievements):not(.pro) .fm-dialog-close, .pro.exceeded .dialog.pro-exceeded-bl, exceeded.pro.slider .dialog.ransfer-slider, .slider-enabled .dialog,pro-exceeded-slider {
+.exceeded:not(.achievements):not(.pro) .plan-blocks, .exceeded .dialog.header-before-icon.exceeded, .exceeded:not(.achievements):not(.pro) .fm-dialog-close, .pro.exceeded .dialog.pro-exceeded-bl, .slider .dialog.pro-exceeded-slider {
     display: block;
 }
 .exceeded:not(.pro) .big-104px-icon.full, .exceeded:not(.achievements):not(.pro) .dialog.bottom-tips span, .exceeded.pro .default-big-button.upgrade.pro {
@@ -273,7 +278,6 @@
     line-height: 25px;
     color: #666666;
     padding: 17px 0 22px 0;
-    
 }
 .dialog.transfer-overquota-txt span {
     font-size: 20px;
@@ -292,12 +296,12 @@
 }
 .fm-dialog .reg-st3-bott-title {
     font-size: 16px;
-        padding: 16px 10px;
+    padding: 16px 10px;
 }
 .fm-dialog .reg-st3-bott-title.price {
     font-size: 40px;
     line-height: 40px;
-        padding-top: 14px;
+    padding-top: 14px;
 }
 .fm-dialog .reg-st3-bott-title span.small {
     font-size: 32px;
@@ -316,7 +320,7 @@
 }
 .dialog.pro-exceeded-txt {
     font-size: 14px;
-    line-height:24px;
+    line-height: 24px;
     color: #666666;
     padding: 0 0 0 0;
 }
@@ -326,16 +330,19 @@
 }
 .limited-bandwidth-dialog .account.chart-block {
     display: inline-block;
-    margin: 2px 0 19px 0;
+    margin: 4px 0 19px 0;
     padding: 18px 0 0 0;
     text-align: left;
     font-size: 16px;
 }
- .exceeded.pro .dialog.big-buttons-block {
+.exceeded.pro .dialog.big-buttons-block {
     display: inline-block;
-    margin: 2px 0 19px 0;
+    margin: 2px 0 1px 0;
     padding: 16px 0 0 0;
     text-align: left;
+}
+.exceeded.pro .dialog.bottom-tips a {
+    margin-bottom: 8px;
 }
 .exceeded.pro .bandwidth .chart.data .perc-txt::before {
     display: none;
@@ -350,29 +357,55 @@
     margin-top: -223px;
 }
 .dialog-slider-txt {
-    text-align:center;
-    font-size:20px;
-    line-height:25px;
-    text-align:center;
-    position:relative;
+    text-align: center;
+    font-size: 20px;
+    line-height: 25px;
+    margin: 22px auto 0 auto;
+    max-width: 504px;
+    position: relative;
 }
 .dialog-slider-txt::before {
-    content:'';
-    display:block;
-    position:absolute;
+    content: '';
+    display: block;
+    position: absolute;
     width: 100%;
     height: 1px;
-    background-color: rgba(0,0,0,0,1);
-    top:0;
-    left:0;
+    background-color: rgba(0,0,0,0.1);
+    top: 13px;
+    left: 0;
+}
+.dialog.pro-slider-description {
+    font-size: 14px;
+    line-height: 18px;
+    color: #666666;
+    padding: 13px 0 0 0;
+    display: inline-block;
+    max-width: 504px;
+}
+.fm-dialog .bandwith-settings .slider.numbers.val2 {
+    margin-left: 359px;
+}
+.fm-dialog .bandwith-settings {
+    width: 504px;
+    margin: 0 auto 0 auto;
+}
+.fm-dialog .ui-slider.ui-widget-content {
+    width: 504px;
+    margin: 15px auto 0 auto;
 }
 .dialog-slider-txt span {
     padding: 0 15px;
-    background-color:white;
-    position:relative;
-    font-size:20px;
-    line-height:25px;
+    background-color: white;
+    position: relative;
+    font-size: 20px;
+    line-height: 25px;
     color: #666666;
+}
+.fm-dialog.exceeded.pro.slider .radio-txt {
+    padding-top: 8px;
+}
+.fm-dialog.exceeded.pro.slider .checkboxOff, .fm-dialog.exceeded.pro.slider .checkboxOn {
+    margin-top: 10px;
 }
 /* End of Transfer quota exceeded dialog */
 
@@ -547,14 +580,14 @@
 .achievements-list-head {
     font-size: 20px;
     line-height: 25px;
-    text-align:center;
+    text-align: center;
     color: #666666;
     padding: 42px 25px 16px 25px;
 }
 .achievements-list-info {
     font-size: 16px;
     line-height: 20px;
-    text-align:center;
+    text-align: center;
     color: #777777;
     padding: 0 54px 35px 54px;
 }
@@ -613,6 +646,7 @@
 .one-reward .right-block .reward.bandwidth, .achieved .achievement-dialog.right-block .reward {
     display: none;
 }
+
 @media only screen and (max-height:  740px) {
 .achievements-scroll {
     max-height: 448px;

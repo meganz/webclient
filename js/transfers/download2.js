@@ -797,8 +797,8 @@ var dlmanager = {
             self.onOverQuotaProClicked = true;
             delay('overquota:uqft', self._overquotaInfo.bind(self), 30000);
 
-            if ($(this).hasClass('membership-button')) {
-                open(getAppBaseUrl() + '#pro_' + $(this).parents('.reg-st3-membership-bl').data('payment'));
+            if ($(this).hasClass('reg-st3-membership-bl')) {
+                loadSubPage('pro_' + $(this).data('payment'));
             }
             else {
                 open(getAppBaseUrl() + '#pro');

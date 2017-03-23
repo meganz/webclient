@@ -90,6 +90,8 @@ function accountUI() {
             $('.fm-account-settings').removeClass('hidden');
             sectionClass = 'advanced';
 
+            accountUI.advancedSection();
+
             $('#network-testing-button').rebind('click', function() {
                 mega.utils.require('network_js')
                     .then(function() {

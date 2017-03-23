@@ -243,3 +243,17 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     display: block;
 }
 /* End of Old chat stuff */
+
+.autoaway-wrapper, .autoaway-wrapper > * {
+    float: left
+}
+.account.chat .pre-label {
+    padding-right: 0;
+}
+.account.chat .pre-label.comma {
+    padding-right: 12px;
+}
+.account.chat .online-radio-button {
+    margin-top: -6px;
+    min-height: 38px;
+}

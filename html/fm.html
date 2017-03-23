@@ -1682,6 +1682,7 @@
                         <div class="account tab-lnk active" data-tab="ui">[$16158]</div>
                         <div class="account tab-lnk" data-tab="transfers">[$1346]</div>
                         <div class="account tab-lnk" data-tab="fm">[$16159]</div>
+                        <div class="account tab-lnk" data-tab="chat">[$7997]</div>
                         <div class="clear"></div>
                     </div>
 
@@ -1954,6 +1955,53 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <div class="account tab-content chat hidden">
+                         <div class="account data-block">
+                            <div class="fm-account-header">Status appearance<!-- [$16258] !--></div>
+                            <div class="account radio-buttons bottom-pad">
+
+                                <div class="chatstatus radioOn"><input type="radio" class="chatstatus radioOn" value="3"></div>
+                                <div class="radio-txt online-radio-button">
+                                    <label class="pre-label radio-txt">[$5923]</label>
+                                    <span class="autoaway-wrapper">
+                                        <label class="pre-label radio-txt comma">,</label>
+                                        <span class="checkdiv checkboxOn autoaway">
+                                            <input type="checkbox" name="set-auto-away" id="set-auto-away" class="checkboxOn" checked="">
+                                        </span>
+                                        <label for="set-auto-away" class="radio-txt">but change my status appearance to Away (yellow) after<!-- [$16260] !--></label>
+                                        <span class="account-counter-number short">
+                                            <input type="text" value="5" id="autoaway" />
+                                        </span>
+                                        <span class="radio-txt">minute(s) of inactivity.<!-- [$16261] !--></span>
+                                    </span>
+                                </div>
+
+                                <hr />
+                                <div class="chatstatus radioOff"><input type="radio" class="chatstatus radioOff" value="2"></div>
+                                <div class="radio-txt">[$5924]</div>
+                                <hr />
+                                <div class="chatstatus radioOff"><input type="radio" class="chatstatus radioOff" value="4"></div>
+                                <div class="radio-txt">[$5925]</div>
+                                <hr />
+                                <div class="chatstatus radioOff"><input type="radio" class="chatstatus radioOff" value="1"></div>
+                                <div class="radio-txt">[$5926]</div>
+                                <div class="clear"></div>
+                            </div>
+
+                            <div class="account radio-buttons bottom-pad">
+                                <div class="persist-presence-wrapper">
+                                    <div class="checkdiv checkboxOn persist-presence">
+                                        <input type="checkbox" name="persist-presence" id="persist-presence" class="checkboxOn" checked="">
+                                    </div>
+                                    <label for="persist-presence" class="radio-txt">Always show selected status appearance, even when I disconnect <!-- [$16387] !--></label>
+                                    <div class="clear"></div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    
                 </div>
 
                 <div class="fm-account-history hidden fm-account-sections">

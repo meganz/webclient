@@ -112,9 +112,10 @@ accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, pe
     }
 
     var $onlineOption = $('.account.chat .online-translation');
-    
+
     if ($onlineOption.length > 0) {
 
+        // l[16389]
         var html = escapeHTML(
             'Online, %1 but change my status appearance to Away (yellow) after %2 minute(s) of inactivity.'
         )

@@ -765,17 +765,12 @@ var dlmanager = {
                             timeLeft += 3600;
                         }
                     }
-                    if (!res.rtt && size > 0) {
-                        var limit = bytesToSize(size);
-                        var hours = res.tah.length;
-                        this._overquotaShowVariables(limit, hours);
-                    }
                 }
 
                 clearInterval(this._overQuotaTimeLeftTick);
                 delay('overquota:retry', this._onQuotaRetry.bind(this), timeLeft * 1000);
 
-                var $dialog = $('.fm-dialog.bandwidth-dialog.overquota');
+                var $dialog = $('.fm-dialog.limited-bandwidth-dialog');
                 this._overquotaClickListeners($dialog);
 
                 if ($dialog.is(':visible')) {
@@ -798,25 +793,13 @@ var dlmanager = {
             delay('overquota:uqft', self._overquotaInfo.bind(self), 30000);
 
             if ($(this).hasClass('reg-st3-membership-bl')) {
-                loadSubPage('pro_' + $(this).data('payment'));
+                open(getAppBaseUrl() + '#pro_' + $(this).data('payment'));
             }
             else {
-                open(getAppBaseUrl() + '#pro');
+                open(getAppBaseUrl() + 'pro');
             }
         };
-        $dialog.find('.membership-button').rebind('click', onclick);
-        $('#bwd-utp-xz1').rebind('click', onclick);
-    },
-
-    _overquotaShowVariables: function(dlQuotaLimit, dlQuotaHours) {
-        $('.fm-dialog.bandwidth-dialog.overquota .bandwidth-text-bl.second').removeClass('hidden')
-            .safeHTML(
-                l[7099]
-                    .replace("6", dlQuotaHours)
-                    .replace('%1', dlQuotaLimit)
-                    .replace("[A]", '<a class="red" id="bwd-utp-xz1" style="cursor:pointer">')
-                    .replace('[/A]', '</a>')
-            );
+        $dialog.find('.reg-st3-membership-bl').rebind('click', onclick);
     },
 
     _setOverQuotaState: function DM_setOverQuotaState(dlTask) {
@@ -878,7 +861,7 @@ var dlmanager = {
         loadingDialog.hide();
         this.onLimitedBandwidth = function() {
             if (callback) {
-                $dialog.removeClass('registered achievements');
+                $dialog.removeClass('registered achievements exceeded pro slider');
                 $('.bottom-tips a', $dialog).unbind('click');
                 $('.continue', $dialog).unbind('click');
                 $('.upgrade', $dialog).unbind('click');
@@ -909,7 +892,7 @@ var dlmanager = {
 
         $('.bottom-tips a', $dialog).rebind('click', function() {
             open(getAppBaseUrl() +
-                'help/client/webclient/cloud-drive/' +
+                '#help/client/webclient/cloud-drive/' +
                 'how-do-you-regulate-transfer-quota-bandwidth-utilisation'
             );
         });
@@ -946,9 +929,13 @@ var dlmanager = {
             return this.showOverQuotaRegisterDialog(dlTask);
         }
 
-        var $dialog = $('.fm-dialog.bandwidth-dialog.overquota');
+        var $dialog = $('.limited-bandwidth-dialog');
         var $button = $dialog.find('.fm-dialog-close');
         var $overlay = $('.fm-dialog-overlay');
+
+        loadingDialog.hide();
+
+        fm_showoverlay();
 
         this._setOverQuotaState(dlTask);
 
@@ -961,7 +948,7 @@ var dlmanager = {
             .safeHTML(l[7100].replace('%1', '<span class="hidden countdown"></span>'))
             .end();
 
-        $dialog.removeClass('registered achievements exceeded pro');
+        $dialog.removeClass('registered achievements exceeded pro slider');
         $('.bottom-tips a', $dialog).unbind('click');
         $('.continue', $dialog).unbind('click');
         $('.upgrade', $dialog).unbind('click');
@@ -972,6 +959,22 @@ var dlmanager = {
 
             if (u_attr.p) {
                 $dialog.addClass('pro');
+
+                M.accountData(function(account) {
+                    var max = account.bw;
+                    var base = account.downbw_used + account.servbw_used;
+                    var b2 = bytesToSize(max, 0).split(' ');
+
+                    $('.chart.data .size-txt', $dialog).text(bytesToSize(base, 0));
+                    $('.chart.data .pecents-txt', $dialog).text((b2[0]));
+                    $('.chart.data .gb-txt', $dialog).text((b2[1]));
+                    $('.fm-account-blocks.bandwidth', $dialog).removeClass('no-percs');
+                    $('.chart.data .perc-txt', $dialog).text('100%');
+                    
+                    //TODO: init slider
+                    //$dialog.addClass('slider');
+                    //$('#bandwidth-slider').slider({ ... });
+                });
             }
         }
 
@@ -984,7 +987,7 @@ var dlmanager = {
                 });
             });
 
-        // TODO: init checkbox
+        //TODO: init checkbox
         //uiCheckboxes($dialog, 'ignoreOverQuotaDialog').removeClass('hidden');
 
         $dialog.addClass('exceeded').removeClass('hidden');
@@ -999,6 +1002,32 @@ var dlmanager = {
             fm_hideoverlay();
             return false;
         };
+
+        $('.bottom-tips a', $dialog).rebind('click', function() {
+            open(getAppBaseUrl() + '#help/client/webclient/cloud-drive/' +
+                'how-do-you-regulate-transfer-quota-bandwidth-utilisation'
+            );
+        });
+
+        $('.continue', $dialog).rebind('click.quota', doCloseModal);
+
+        $('.upgrade', $dialog).rebind('click.quota', function() {
+
+            closeDialog();
+            open(getAppBaseUrl() + '#pro');
+
+            mega.ui.showRegisterDialog({
+                onAccountCreated: function(gotLoggedIn, accountData) {
+                    if (gotLoggedIn) {
+                        doCloseModal();
+                    }
+                    else {
+                        localStorage.awaitingConfirmationAccount = JSON.stringify(accountData);
+                        mega.ui.sendSignupLinkDialog(accountData);
+                    }
+                }
+            });
+        });
 
         $button.rebind('click.quota', doCloseModal);
         $overlay.rebind('click.quota', doCloseModal);

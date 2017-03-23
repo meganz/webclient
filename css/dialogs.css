@@ -219,9 +219,6 @@
     margin: 0 auto;
     max-width: 504px;
 }
-.dialog.p-after-icon span {
-    color: #FF333A;
-}
 .dialog.big-buttons-block {
     font-size: 0;
     padding: 24px 0 4px 0;
@@ -352,7 +349,7 @@
     display: none;
 }
 .exceeded.pro .chart.progressbars span {
-    transform: rotate(180deg);
+    transform: rotate(180deg) !important;
 }
 .exceeded.pro .chart.progressbars span::before {
     background-color: #D90007;

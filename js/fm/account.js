@@ -102,7 +102,7 @@ accountUI.initRadio.enable = function(value, $container) {
 };
 
 
-accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, persist, persistlock) {debugger
+accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, persist, persistlock) {
     // TODO: FIXME, make accountUI elements not dependant!
     if (!megaChatIsReady) {
         // accountUI.advanced section was called too early, e.g. before chat's initialisation...delay the init.

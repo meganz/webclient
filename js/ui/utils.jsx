@@ -219,10 +219,10 @@ var RenderTo = React.createClass({
             $(this.popup).css(this.props.style);
         }
         this.props.element.appendChild(this.popup);
+        this._renderLayer();
         if (this.props.popupDidMount) {
             this.props.popupDidMount(this.popup);
         }
-        this._renderLayer();
     },
     componentDidUpdate: function() {
         this._renderLayer();

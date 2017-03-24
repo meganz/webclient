@@ -2151,10 +2151,10 @@ React.makeElement = React['createElement'];
 	            $(this.popup).css(this.props.style);
 	        }
 	        this.props.element.appendChild(this.popup);
+	        this._renderLayer();
 	        if (this.props.popupDidMount) {
 	            this.props.popupDidMount(this.popup);
 	        }
-	        this._renderLayer();
 	    },
 	    componentDidUpdate: function componentDidUpdate() {
 	        this._renderLayer();
@@ -5312,14 +5312,23 @@ React.makeElement = React['createElement'];
 	                        { className: "dialog secondary-header" },
 	                        __("Please confirm that you want to upload this image and share it in this chat room.")
 	                    ),
-	                    React.makeElement("img", { src: self.state.pasteImageConfirmDialog[2], style: {
+	                    React.makeElement("img", {
+	                        src: self.state.pasteImageConfirmDialog[2],
+	                        style: {
 	                            maxWidth: "90%",
 	                            height: "auto",
+	                            maxHeight: $(document).outerHeight() * 0.3,
 	                            margin: '10px auto',
 	                            display: 'block',
 	                            border: '1px solid #ccc',
 	                            borderRadius: '4px'
-	                        } })
+	                        },
+	                        onLoad: function onLoad(e) {
+	                            $(e.target).parents('.paste-image-chat').position({
+	                                of: $(document.body)
+	                            });
+	                        }
+	                    })
 	                )
 	            );
 	        }
@@ -5890,6 +5899,13 @@ React.makeElement = React['createElement'];
 	    },
 	    onPopupDidMount: function onPopupDidMount(elem) {
 	        this.domNode = elem;
+
+	        $(elem).css({
+	            'margin': 'auto'
+	        }).position({
+	            of: $(document.body)
+	        });
+
 	        if (this.props.popupDidMount) {
 
 	            this.props.popupDidMount(elem);

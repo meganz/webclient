@@ -1380,7 +1380,7 @@ else if (!b_u)
             }
             dump.m = dump.m.replace(/\s+/g, ' ');
 
-            if (!window.jsl_done) {
+            if (!window.jsl_done && !window.u_checked) {
                 // Alert the user if there was an uncaught exception while
                 // loading the site, this should only happen on some fancy
                 // browsers other than what we use during development, and

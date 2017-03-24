@@ -102,16 +102,26 @@ accountUI.initRadio.enable = function(value, $container) {
 };
 
 
-accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, persist, persistlock) {
-    if (typeof(megaChat) === 'undefined' && typeof(autoaway) === 'undefined') {
+accountUI.advancedSection = function(autoaway, autoawaylock, autoawaytimeout, persist, persistlock) {debugger
+    // TODO: FIXME, make accountUI elements not dependant!
+    if (!megaChatIsReady) {
         // accountUI.advanced section was called too early, e.g. before chat's initialisation...delay the init.
-        Soon(function() {
-            accountUI.advancedSection();
-        });
+        var args = toArray.apply(null, arguments);
+        setTimeout(function() {
+            accountUI.advancedSection.apply(accountUI, args);
+        }, 700);
         return;
     }
 
     var presenceInt = megaChat.plugins.presencedIntegration;
+
+    if (!presenceInt || !presenceInt.userPresence) {
+        setTimeout(function() {
+            throw new Error('presenceInt is not ready...');
+        });
+        return;
+        // ^ FIXME too..!
+    }
 
     // Only call this if the call of this function is the first one, made by fm.js -> accountUI
     if (autoaway === undefined) {

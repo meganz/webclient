@@ -384,13 +384,21 @@ PresencedIntegration.prototype.setPresence = function(presence) {
 PresencedIntegration.prototype.addContact = function(u_h) {
     this.logger.debug("addContact", u_h);
 
-    this.userPresence.addremovepeers([u_h]);
+    if (this.userPresence) {
+        // can happen in case there is a queued/cached action packet that triggers add contact, before the chat had
+        // fully loaded and initialised
+        this.userPresence.addremovepeers([u_h]);
+    }
 };
 
 PresencedIntegration.prototype.removeContact = function(u_h) {
     this.logger.debug("removeContact", u_h);
 
-    this.userPresence.addremovepeers([u_h], true);
+    if (this.userPresence) {
+        // can happen in case there is a queued/cached action packet that triggers add contact, before the chat had
+        // fully loaded and initialised
+        this.userPresence.addremovepeers([u_h], true);
+    }
     this._peerstatuscb(u_h, UserPresence.PRESENCE.OFFLINE, false);
 };
 
@@ -424,7 +432,6 @@ PresencedIntegration.prototype._initAutoawayEvents = function() {
 };
 
 PresencedIntegration.prototype._destroyAutoawayEvents = function() {
-
     $(document.body).unbind('mousemove.presencedInt');
     $(document.body).unbind('keypress.presencedInt');
 };
@@ -443,6 +450,10 @@ PresencedIntegration.prototype.getMyPresenceSetting = function() {
  * .getMyPresenceSetting() does).
  */
 PresencedIntegration.prototype.getMyPresence = function() {
+    if (!this.megaChat.userPresence) {
+        return;
+    }
+
     var conRetMan = this.megaChat.userPresence.connectionRetryManager;
     return conRetMan.getConnectionState() !== ConnectionRetryManager.CONNECTION_STATE.CONNECTED ?
         UserPresence.PRESENCE.OFFLINE :

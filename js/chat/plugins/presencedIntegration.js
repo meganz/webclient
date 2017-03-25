@@ -121,6 +121,10 @@ PresencedIntegration.prototype.init = function() {
             // error + close or going offline (if supported by the browser) and then properly closing the socket
             self.logger.debug(isConnected ? "connected" : "disconnected");
 
+            if (!u_handle) {
+                // may be a logout or reload!
+                return;
+            }
             // set my own presence
             M.u.forEach(function(v, k) {
                 if (k !== u_handle) {
@@ -144,6 +148,10 @@ PresencedIntegration.prototype.init = function() {
     megaChat.userPresence = self.userPresence = userPresence;
 
     $(userPresence).rebind('onConnected.presencedIntegration', function(e) {
+        if (!u_handle || !M.u[u_handle]) {
+            // a logout was triggered in the same moment just before the connect
+            return;
+        }
         // simply trust presence2.js and enable autoaway if its enabled initially in the code
         if (self.getAutoaway()) {
             self._initAutoawayEvents();
@@ -156,7 +164,7 @@ PresencedIntegration.prototype.init = function() {
 
         var contactHashes = [];
         M.u.forEach(function(v, k) {
-            if (k === u_handle) {
+            if (k === u_handle || !v) {
                 return;
             }
 
@@ -173,6 +181,11 @@ PresencedIntegration.prototype.init = function() {
     });
 
     $(userPresence).rebind('onDisconnected.presencedIntegration', function(e) {
+        if (!u_handle || !M.u[u_handle]) {
+            // may be a logout or reload!
+            return;
+        }
+
         M.u[u_handle].presence = "unavailable";
         self.megaChat.renderMyStatus();
     });
@@ -189,6 +202,10 @@ PresencedIntegration.prototype._updateuicb = function presencedIntegration_updat
     persist,
     persistlock
 ) {
+    if (!u_handle) {
+        // u_handle was cleared by menu reload / logout
+        return;
+    }
     var self = this;
 
     self.logger.debug("updateuicb", presence, autoaway, autoawaylock, autoawaytimeout, persist, persistlock);
@@ -367,13 +384,21 @@ PresencedIntegration.prototype.setPresence = function(presence) {
 PresencedIntegration.prototype.addContact = function(u_h) {
     this.logger.debug("addContact", u_h);
 
-    this.userPresence.addremovepeers([u_h]);
+    if (this.userPresence) {
+        // can happen in case there is a queued/cached action packet that triggers add contact, before the chat had
+        // fully loaded and initialised
+        this.userPresence.addremovepeers([u_h]);
+    }
 };
 
 PresencedIntegration.prototype.removeContact = function(u_h) {
     this.logger.debug("removeContact", u_h);
 
-    this.userPresence.addremovepeers([u_h], true);
+    if (this.userPresence) {
+        // can happen in case there is a queued/cached action packet that triggers add contact, before the chat had
+        // fully loaded and initialised
+        this.userPresence.addremovepeers([u_h], true);
+    }
     this._peerstatuscb(u_h, UserPresence.PRESENCE.OFFLINE, false);
 };
 
@@ -407,7 +432,6 @@ PresencedIntegration.prototype._initAutoawayEvents = function() {
 };
 
 PresencedIntegration.prototype._destroyAutoawayEvents = function() {
-
     $(document.body).unbind('mousemove.presencedInt');
     $(document.body).unbind('keypress.presencedInt');
 };
@@ -426,6 +450,10 @@ PresencedIntegration.prototype.getMyPresenceSetting = function() {
  * .getMyPresenceSetting() does).
  */
 PresencedIntegration.prototype.getMyPresence = function() {
+    if (!this.megaChat.userPresence) {
+        return;
+    }
+
     var conRetMan = this.megaChat.userPresence.connectionRetryManager;
     return conRetMan.getConnectionState() !== ConnectionRetryManager.CONNECTION_STATE.CONNECTED ?
         UserPresence.PRESENCE.OFFLINE :

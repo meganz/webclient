@@ -1380,7 +1380,7 @@ else if (!b_u)
             }
             dump.m = dump.m.replace(/\s+/g, ' ');
 
-            if (!window.jsl_done) {
+            if (!window.jsl_done && !window.u_checked) {
                 // Alert the user if there was an uncaught exception while
                 // loading the site, this should only happen on some fancy
                 // browsers other than what we use during development, and
@@ -1739,6 +1739,7 @@ else if (!b_u)
         jsl.push({f:'js/fm.js', n: 'fm_js', j:1,w:12});
         jsl.push({f:'js/fm-dashboard.js', n: 'fmdashboard_js', j:1,w:5});
         jsl.push({f:'js/fm-account.js', n: 'fmaccount_js', j:1,w:5});
+        jsl.push({f:'js/fm/account.js', n: 'fm_account_js', j:1});
         jsl.push({f:'js/ui/miniui.js', n: 'miniui_js', j:1});
 
         jsl.push({f:'html/start.html', n: 'start', j:0});
@@ -1940,7 +1941,6 @@ else if (!b_u)
             'karere_js': {f:'js/chat/karere.js', n: 'karere_js', j:1},
             'chat_messages_Js': {f:'js/chat/messages.js', n: 'chat_messages_Js', j:1},
             'presence2_js': {f:'js/chat/presence2.js', n: 'presence2_js', j:1},
-            'fm_account_js': {f:'js/fm/account.js', n: 'fm_account_js', j:1},
             'chat_react_minified_js': {f:'js/chat/bundle.js', n: 'chat_react_minified_js', j:1}
         }
     };

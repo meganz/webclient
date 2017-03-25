@@ -15963,6 +15963,10 @@
         "text": "Learn more",
         "context": "A link which leads to the help center where the user can get more information."
     },
+    "16355": {
+        "text": "Tip: This limit can be dynamic and depends on the amount of unused bandwidth we have available.",
+        "context": "An information message about limited transfer quota."
+    },
     "16356": {
         "text": "Your queued download exceeds the current transfer quota available for your account and may therefore be interrupted.",
         "context": "An information message about limited transfer quota."
@@ -16035,6 +16039,14 @@
         "text": "Massive [S]storage space[\/S]",
         "context": "A title of a text block describing a benefit of MEGA's storage."
     },
+    "16378": {
+        "text": "Leave behind the transfer volume limits associated with free accounts and enjoy an increased transfer allowance.",
+        "context": "A description of the extra transfer quota a user receives if they upgrade to a PRO plan."
+    },
+    "16380": {
+        "text": "Access PRO only features like setting password protection and expiration dates for public files.",
+        "context": "A description of MEGA features available only with a PRO plan."
+    },
     "16381": {
         "text": "Notes regarding transfers and your account type:",
         "context": "A sentence introducing a list of notes about transfer quota, transfer speed and PRO\/Free accounts."
@@ -16047,6 +16059,10 @@
         "text": "Generous [S]transfer quota[\/S]",
         "context": "A title of a text block describing MEGA's transfer volume limit."
     },
+    "16385": {
+        "text": "Starting at 200 GB base storage and scalable up to 4 TB. If you need something specially crafted to your needs try a [S]custom plan[\/S].",
+        "context": "A description of the storage capacity a user can have if they purchase a PRO plan."
+    },
     "16386": {
         "text": "Upgrade your PRO account",
         "context": "A button label. The button allows the user to upgrade their account."
@@ -16054,5 +16070,13 @@
     "16387": {
         "text": "Always show selected status appearance, even when I disconnect.",
         "context": "An option in the Chat settings. When enabled, the user's status\/presence would stay the same even if they disconnected."
+    },
+    "16388": {
+        "text": "You may want to change your settings for granting transfer quota to downloading users.",
+        "context": "Transfer quota slider description. Allows changing transfer quota for users. This means other users (downloaders) can use the user's transfer quota."
+    },
+    "16389": {
+        "text": "Online, %1 but change my status appearance to Away (yellow) after %2 minute(s) of inactivity.",
+        "context": "Allows the user to set his presence to Online, but if the checkbox is checked and if he is idle for X minutes, they would be set automatically to Away. The placeholder %1 will be replaced with a checkbox and the placeholder %2 with a text input containing the number of minutes."
     }
 }

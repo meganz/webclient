@@ -688,6 +688,18 @@ function populate_l() {
     //l[16383] = l[16383].replace('[S]', '<span>').replace('[/S]', '</span>');
     //l[16384] = l[16384].replace('[S]', '<span>').replace('[/S]', '</span>');
     //l[16385] = l[16385].replace('[S]', '<span>').replace('[/S]', '</span>');
+    l[16389] = escapeHTML(l[16389]).replace(
+                 '%1',
+                 '<span class="checkdiv checkboxOn autoaway">' +
+                     '<input type="checkbox" name="set-auto-away" id="set-auto-away" class="checkboxOn" checked="">' +
+                 '</span>'
+               )
+               .replace(
+                 '%2',
+                 '<span class="account-counter-number short">' +
+                     '<input type="text" value="5" id="autoaway" />' +
+                 '</span>'
+               );
 
     var common = [
         15536, 16106, 16107, 16116, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138,
@@ -4096,6 +4108,11 @@ mega.utils.logout = function megaUtilsLogout() {
         if (fmdb && fmconfig.dbDropOnLogout) {
             step++;
             fmdb.drop().always(finishLogout);
+        }
+        if (!megaChatIsDisabled) {
+            if (typeof(megaChat) !== 'undefined' && typeof(megaChat.userPresence) !== 'undefined') {
+                megaChat.userPresence.disconnect();
+            }
         }
         if (u_privk && !loadfm.loading) {
             // Use the 'Session Management Logout' API call to kill the current session

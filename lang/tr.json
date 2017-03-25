@@ -3990,6 +3990,7 @@
     "16352": "Bonuslar i\u00e7in kaydolun",
     "16353": "Paketlerimizi g\u00f6r\u00fcnt\u00fcleyin",
     "16354": "Dahas\u0131",
+    "16355": "\u0130pucu: Bu limit dinamiktir ve elimizde kullan\u0131lmam\u0131\u015f olan bant geni\u015fli\u011fine ba\u011fl\u0131d\u0131r.",
     "16356": "Kuyruktaki indirmeleriniz hesab\u0131n\u0131z i\u00e7in bulunmakta olan aktarma kotas\u0131n\u0131 ge\u00e7mektedir ve bu nedenle aksat\u0131labilir.",
     "16357": "Kuyruktaki indirmeleriniz IP adresiniz i\u00e7in kalan aktarma kotas\u0131n\u0131 ge\u00e7mekte ve bundan dolay\u0131 aksat\u0131labilir.",
     "16358": "[S]Bulut S\u00fcr\u00fcc\u00fc dolu.[\/S] [A]\u015eimdi y\u00fckseltin[\/A] ve [S]4 TB'a (4096 GB)[\/S] kadar bulut depolama alan\u0131 al\u0131n.",
@@ -4008,11 +4009,16 @@
     "16373": "Daha fazla bilgi i\u00e7in web sitemizi kontrol edin:Mobil - https:\/\/mega.nz\/mobile_terms.html - https:\/\/mega.nz\/mobile_privacy.htmlMasa\u00fcst\u00fc - https:\/\/mega.nz\/",
     "16374": "Not: Dosyalar\u0131n\u0131za masa\u00fcst\u00fcnden eri\u015fmek ve MEGA'n\u0131n geli\u015fmi\u015f \u00f6zellikleri i\u015fleyebilmesi i\u00e7in HTML5 uyumlu taray\u0131c\u0131lar\u0131 kullanmas\u0131 gerekir. Mozilla Firefox ve Google Chrome'u \u00f6neriyoruz. Taray\u0131c\u0131lar\u0131n mobil s\u00fcr\u00fcmleri hen\u00fcz MEGA bulut depolama sistemine eri\u015femiyor.",
     "16375": "B\u00fcy\u00fck [S]depolama alan\u0131[\/S]",
+    "16378": "\u00dccretsiz hesaplarla ili\u015fkilendirilmi\u015f aktarma birim limitlerini arkada b\u0131rak\u0131n ve artt\u0131r\u0131lm\u0131\u015f aktarma \u00f6dene\u011finin tad\u0131n\u0131 \u00e7\u0131kar\u0131n.",
+    "16380": "Parola korumas\u0131 koymak ve herkese a\u00e7\u0131k dosyalar i\u00e7in s\u00fcre koymak gibi PRO'ya \u00f6zg\u00fcn \u00f6zelliklere eri\u015fin",
     "16381": "Aktar\u0131mlar ve hesap t\u00fcr\u00fcn\u00fczle ilgili notlar:",
     "16383": "Tam [S]\u00f6zellikli[\/S]",
     "16384": "C\u00f6mert [S]aktar\u0131m kotas\u0131[\/S]",
+    "16385": "200 GB ile ba\u015flayan ve 4 TB'a kadar \u00e7\u0131kabilen depolama. E\u011fer ihtiya\u00e7lar\u0131n\u0131z\u0131 \u00f6zel bir \u015fekilde kar\u015f\u0131layacak paket gerekiyorsa [S]\u00f6zel paket[\/S] deneyin.",
     "16386": "PRO hesab\u0131n\u0131z\u0131 y\u00fckseltin",
     "16387": "Ba\u011fl\u0131 olmad\u0131\u011f\u0131mda bile, her zaman se\u00e7ilen durum g\u00f6r\u00fcnt\u00fcs\u00fcn\u00fc g\u00f6ster.",
+    "16388": "\u0130ndiren kullan\u0131c\u0131lar i\u00e7in izin verilen aktarma kotas\u0131n\u0131 de\u011fi\u015ftirmek isteyebilirsiniz.",
+    "16389": "\u00c7evrimi\u00e7i, %1 ama %2 dakika aktivite olmaz ise durumumu D\u0131\u015farda (sar\u0131) olarak de\u011fi\u015ftir.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4259,6 +4265,7 @@
         "invalid-email-or-password": 16349,
         "please-try-again": 16350,
         "email-sent-successfully": 16351,
-        "always-show-selected-presence-even-when-disconnected": 16387
+        "always-show-selected-presence-even-when-disconnected": 16387,
+        "online-autoaway-checkbox-field": 16389
     }
 }

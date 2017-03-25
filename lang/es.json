@@ -3990,6 +3990,7 @@
     "16352": "Reg\u00edstrate y obt\u00e9n bonos",
     "16353": "Descubre nuestros planes",
     "16354": "Saber m\u00e1s",
+    "16355": "Truco: Este l\u00edmite puede ser din\u00e1mico y depende de la cantidad de ancho de banda no utilizada que tengamos disponible.",
     "16356": "Tu descarga en cola supera la cuota de transferencia actual disponible para tu cuenta, y podr\u00eda interrumpirse.",
     "16357": "Tu descarga en cola supera la cuota de transferencia actual disponible para tu IP, y podr\u00eda interrumpirse.",
     "16358": "[S]El Disco est\u00e1 lleno.[\/S] [A]Actualiza ahora[\/A] y obt\u00e9n [S]hasta 4TB (4096 GB)[\/S] de espacio de almacenamiento en la nube.",
@@ -4008,11 +4009,16 @@
     "16373": "Para m\u00e1s informaci\u00f3n, consulta nuestro sitio web:M\u00f3vil - https:\/\/mega.nz\/mobile_terms.html - https:\/\/mega.nz\/mobile_privacy.htmlEscritorio - https:\/\/mega.nz\/",
     "16374": "Nota: Para acceder a tus archivos desde escritorio, MEGA necesita utilizar navegadores compatibles con HTML5 que puedan utilizar nuestras funciones avanzadas. Recomendamos Mozilla Firefox y Google Chrome. Las versiones m\u00f3viles de los navegadores no pueden acceder a\u00fan al sistema de almacenamiento en la nube MEGA.",
     "16375": "Masivo [S]espacio de almacenamiento[\/S]",
+    "16378": "Deja atr\u00e1s los l\u00edmites de transferencia asociados a las cuentas gratuitas y disfruta de un aumento de asignaci\u00f3n de transferencia.",
+    "16380": "Accede a funcionalidades PRO como configurar la protecci\u00f3n por contrase\u00f1a o las fechas de caducidad de los archivos p\u00fablicos.",
     "16381": "Notas sobre transferencias y tu tipo de cuenta:",
     "16383": "Completa [S]funcionalidad[\/S]",
     "16384": "Generosa [S]cuota de transferencia[\/S]",
+    "16385": "A partir de una base de 200 GB de almacenamiento y escalable hasta 4 TB. Si necesitas algo a medida para tus necesidades, prueba un [S]plan personalizado[\/S].",
     "16386": "Actualiza tu cuenta PRO",
     "16387": "Mostrar siempre la apariencia de estado seleccionada, incluso cuando me desconecte.",
+    "16388": "Quiz\u00e1 quieras cambiar la configuraci\u00f3n para conceder cuota de transferencia a los usuarios que descargan.",
+    "16389": "En l\u00ednea, %1, pero cambiar mi estado a Ausente (amarillo) tras %2 minuto(s) de inactividad.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4259,6 +4265,7 @@
         "invalid-email-or-password": 16349,
         "please-try-again": 16350,
         "email-sent-successfully": 16351,
-        "always-show-selected-presence-even-when-disconnected": 16387
+        "always-show-selected-presence-even-when-disconnected": 16387,
+        "online-autoaway-checkbox-field": 16389
     }
 }

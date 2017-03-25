@@ -3990,6 +3990,7 @@
     "16352": "\u05d4\u05d9\u05e8\u05e9\u05dd \u05dc\u05d1\u05d5\u05e0\u05d5\u05e1\u05d9\u05dd",
     "16353": "\u05e6\u05e4\u05d4 \u05d1\u05ea\u05db\u05e0\u05d9\u05d5\u05ea \u05e9\u05dc\u05e0\u05d5",
     "16354": "\u05e7\u05e8\u05d0 \u05e2\u05d5\u05d3",
+    "16355": "Tip: This limit can be dynamic and depends on the amount of unused bandwidth we have available.",
     "16356": "Your queued download exceeds the current transfer quota available for your account and may therefore be interrupted.",
     "16357": "Your queued download exceeds the current transfer quota available for your IP address and therefore may be interrupted.",
     "16358": "[S]\u05d4\u05d0\u05d7\u05e1\u05d5\u05df \u05de\u05dc\u05d0.[\/S] [A] \u05e9\u05d3\u05e8\u05d2 \u05e2\u05db\u05e9\u05d9\u05d5[\/A] \u05d5\u05e7\u05d1\u05dc [S]4TB (4096 GB)[\/S] \u05e9 \u05de\u05e7\u05d5\u05dd \u05d0\u05d7\u05e1\u05d5\u05df \u05d1\u05e2\u05e0\u05df.",
@@ -4008,11 +4009,16 @@
     "16373": "For more info, please check our website:Mobile - https:\/\/mega.nz\/mobile_terms.html - https:\/\/mega.nz\/mobile_privacy.htmlDesktop - https:\/\/mega.nz\/",
     "16374": "Note: For desktop access to your files, MEGA needs to use HTML5 compatible browsers to handle our advanced features. We recommend Mozilla Firefox and Google Chrome. The mobile versions of browsers cannot access the MEGA cloud storage system yet.",
     "16375": "Massive [S]storage space[\/S]",
+    "16378": "Leave behind the transfer volume limits associated with free accounts and enjoy an increased transfer allowance.",
+    "16380": "Access PRO only features like setting password protection and expiration dates for public files.",
     "16381": "Notes regarding transfers and your account type:",
     "16383": "Fully [S]featured[\/S]",
     "16384": "Generous [S]transfer quota[\/S]",
+    "16385": "Starting at 200 GB base storage and scalable up to 4 TB. If you need something specially crafted to your needs try a [S]custom plan[\/S].",
     "16386": "Upgrade your PRO account",
     "16387": "Always show selected status appearance, even when I disconnect.",
+    "16388": "You may want to change your settings for granting transfer quota to downloading users.",
+    "16389": "Online, %1 but change my status appearance to Away (yellow) after %2 minute(s) of inactivity.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4259,6 +4265,7 @@
         "invalid-email-or-password": 16349,
         "please-try-again": 16350,
         "email-sent-successfully": 16351,
-        "always-show-selected-presence-even-when-disconnected": 16387
+        "always-show-selected-presence-even-when-disconnected": 16387,
+        "online-autoaway-checkbox-field": 16389
     }
 }

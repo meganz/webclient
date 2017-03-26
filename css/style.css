@@ -1510,7 +1510,7 @@ a.blog-button:hover {
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     border-radius: 4px;
-    background-color: #FF333A;
+    background-color: #D90007;
     color: white;
     font-size: 12px;
     line-height: 14px;
@@ -4797,7 +4797,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     height: 24px;
 }
 .top-menu-item.active {
-    border-color: #FF333A;
+    border-color: #D90007;
 }
 .top-submenu {
     max-height: 0;
@@ -5409,7 +5409,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     background-color: rgba(43,166,222,1);
 }
 .fm-left-menu.dashboard {
-    background-color: #FF333A;
+    background-color: #D90007;
     display: none;
 }
 .transfers .nw-fm-tree-header span {
@@ -5419,7 +5419,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     background-color: rgba(49,181,0,1);
 }
 .fm-left-menu.cloud-drive, .fm-left-menu.notifications, .fm-left-menu.folder-link {
-    background-color: #FF333A;
+    background-color: #D90007;
 }
 .fm-left-menu.transfers {
     background-color: #E0E0E0;
@@ -5784,7 +5784,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     border-color: rgba(97,210,255,1);
 }
 .nw-fm-left-icon.dashboard.active .nw-fm-left-border {
-    border-color: #FF333A;
+    border-color: #D90007;
 }
 .nw-fm-left-icon.rubbish-bin.active .nw-fm-left-border {
     border-color: #13E03C;
@@ -10893,7 +10893,7 @@ table {
     margin: 0 0 -9px 0;
 }
 .account.data-txt span {
-    color: #FF333A;
+    color: #D90007;
 }
 .fm-account-header .semi-big-icon {
     vertical-align: top;
@@ -11008,7 +11008,7 @@ table {
     margin-bottom: -1px;
 }
 .account.tab-lnk.active {
-    border-color: #FF333A;
+    border-color: #D90007;
     color: #333333;
 }
 .account.tab-lnk.achievements, .active-achievements .account.tab-lnk.payment {
@@ -24739,7 +24739,7 @@ a.opensource-icon-txt.coming-soon {
     padding-top: 35px;
 }
 .megasync-info a {
-    color: #FF333A;
+    color: #D90007;
     cursor: pointer;
 }
 .camera-access {
@@ -25020,8 +25020,8 @@ div.camera-bottom-txt {
     border-radius: 100%;
 }
 .account.progress-indicator.active {
-    border-color: #FF333A;
-    background-color: #FF333A;
+    border-color: #D90007;
+    background-color: #D90007;
 }
 .account.progress-indicator.grey.active, .account.progress-bar.grey {
     background-color: #666666;
@@ -25232,12 +25232,12 @@ div.camera-bottom-txt {
     margin: 0 0 -18px 0;
 }
 .red-star {
-    color: #FF333A;
+    color: #D90007;
 }
 .account .progress-title.star::after {
     content: ' *';
     display: inline;
-    color: #FF333A;
+    color: #D90007;
 }
 .achievement-full.description {
     font-size: 14px;
@@ -26029,7 +26029,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', e
     background-repeat: no-repeat;
 }
 .bottom-info.content h4 {
-    color: #FF333A;
+    color: #D90007;
     font-size: 24px;
     line-height: 26px;
     font-family: 'source_sans_prolight';

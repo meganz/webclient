@@ -1045,7 +1045,7 @@ function accountUI() {
             $('#bandwidth-slider').slider({
                 min: 0, max: 100, range: 'min', value: bandwidthLimit,
                 change: function(e, ui) {
-                    if (M.currentdirid === 'account/advanced') {
+                    if (M.currentdirid === 'account/transfers') {
                         bandwidthLimit = ui.value;
 
                         if (parseInt(localStorage.bandwidthLimit) !== bandwidthLimit) {
@@ -1091,7 +1091,7 @@ function accountUI() {
         $('#slider-range-max').slider({
             min: 1, max: 6, range: "min", value: fmconfig.dl_maxSlots || 4,
             change: function(e, ui) {
-                if (M.currentdirid === 'account/advanced' && ui.value !== fmconfig.dl_maxSlots) {
+                if (M.currentdirid === 'account/transfers' && ui.value !== fmconfig.dl_maxSlots) {
                     mega.config.setn('dl_maxSlots', ui.value);
                     dlQueue.setSize(fmconfig.dl_maxSlots);
                 }
@@ -1107,7 +1107,7 @@ function accountUI() {
         $('#slider-range-max2').slider({
             min: 1, max: 6, range: "min", value: fmconfig.ul_maxSlots || 4,
             change: function(e, ui) {
-                if (M.currentdirid === 'account/advanced' && ui.value !== fmconfig.ul_maxSlots) {
+                if (M.currentdirid === 'account/transfers' && ui.value !== fmconfig.ul_maxSlots) {
                     mega.config.setn('ul_maxSlots', ui.value);
                     ulQueue.setSize(fmconfig.ul_maxSlots);
                 }

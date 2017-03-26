@@ -304,8 +304,15 @@ function init_pro()
             if (account_type_num === '0') {
                 if (page === 'fm') {
                     loadSubPage('start');
-                } else {
+                }
+                else {
                     loadSubPage('fm');
+                }
+                if (localStorage.gotOverquotaWithAchievements) {
+                    onIdle(function() {
+                        mega.achievem.achievementsListDialog();
+                    });
+                    delete localStorage.gotOverquotaWithAchievements;
                 }
                 return false;
             }

@@ -683,11 +683,6 @@ function populate_l() {
     l[16165] = l[16165].replace('[S]', '<a class="red">').replace('[/S]', '</a>').replace('[BR]', '<br/>');
     l[16167] = l[16167].replace('[S]', '<a href="/mobile" class="clickurl">').replace('[/S]', '</a>');
     l[16310] = escapeHTML(l[16310]).replace('[I]', '<i class="semi-small-icon rocket"></i>');
-    //l[16375] = l[16375].replace('[S]', '<span>').replace('[/S]', '</span>');
-    //l[16382] = l[16382].replace('[S]', '<span>').replace('[/S]', '</span>').replace('[P]', '<p>').replace('[/P]', '</p>');
-    //l[16383] = l[16383].replace('[S]', '<span>').replace('[/S]', '</span>');
-    //l[16384] = l[16384].replace('[S]', '<span>').replace('[/S]', '</span>');
-    //l[16385] = l[16385].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[16389] = escapeHTML(l[16389]).replace(
                  '%1',
                  '<span class="checkdiv checkboxOn autoaway">' +
@@ -703,19 +698,17 @@ function populate_l() {
 
     var common = [
         15536, 16106, 16107, 16116, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138,
-        16303, 16304, 16313, 16315, 16316,
+        16303, 16304, 16313, 16315, 16316, 16375, 16382, 16383, 16384, 16385,
     ];
     for (i = common.length; i--;) {
         var num = common[i];
 
         l[num] = escapeHTML(l[num])
-            .replace(/\[S\]/g, '<span>')
-            .replace(/\[\/S\]/g, '</span>')
+            .replace(/\[S\]/g, '<span>').replace(/\[\/S\]/g, '</span>')
+            .replace(/\[P\]/g, '<p>'   ).replace(/\[\/P\]/g, '</p>')
+            .replace(/\[B\]/g, '<b>'   ).replace(/\[\/B\]/g, '</b>')
             .replace(/\[BR\]/g, '<br/>')
-            .replace(/\[B\]/g, '<b>')
-            .replace(/\[\/B\]/g, '</b>')
-            .replace(/\[A\]/g, '<a href="/pro">')
-            .replace(/\[\/A\]/g, '</a>');
+            .replace(/\[A\]/g, '<a href="/pro">').replace(/\[\/A\]/g, '</a>');
     }
 
     l['year'] = new Date().getFullYear();
@@ -3052,7 +3045,11 @@ function getBaseUrl() {
  */
 function getAppBaseUrl() {
     var l = location;
-    return (l.origin !== 'null' && l.origin || (l.protocol + '//' + l.hostname)) + l.pathname;
+    var base = (l.origin !== 'null' && l.origin || (l.protocol + '//' + l.hostname));
+    if (is_extension) {
+        base += l.pathname;
+    }
+    return base;
 }
 
 /**
@@ -4822,7 +4819,7 @@ var watchdog = Object.freeze({
 
             case 'setrsa':
                 if (typeof dlmanager === 'object'
-                        && dlmanager.isOverFreeQuota) {
+                        && (dlmanager.isOverFreeQuota || dlmanager.onOverquotaWithAchievements)) {
 
                     var sid = strg.data[1];
                     var type = strg.data[0];

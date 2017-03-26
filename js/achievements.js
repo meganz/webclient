@@ -312,20 +312,14 @@ mega.achievem.achievementDialog = function achievementDialog(title, close) {
 
 /**
  * Show achievements list dialog
- * @param {String} close dialog parameter
+ * @param {Function} [onDialogClosed] function to invoke when the [x] is clicked
  */
-mega.achievem.achievementsListDialog = function achievementsListDialog(close) {
+mega.achievem.achievementsListDialog = function achievementsListDialog(onDialogClosed) {
     var $dialog = $('.fm-dialog.achievements-list-dialog');
     var $scrollBlock = $dialog.find('.achievements-scroll');
     var bodyHeight = $('body').height();
     var $contentBlock;
 
-    if (close) {
-        $.dialog = false;
-        fm_hideoverlay();
-        $dialog.addClass('hidden');
-        return true;
-    }
     if (!M.maf) {
         loadingDialog.show();
 
@@ -333,14 +327,23 @@ mega.achievem.achievementsListDialog = function achievementsListDialog(close) {
             loadingDialog.hide();
 
             if (M.maf) {
-                achievementsListDialog();
+                achievementsListDialog(onDialogClosed);
             }
         });
         return true;
     }
     $.dialog = 'achievements';
 
-    $dialog.find('.fm-dialog-close').rebind('click', achievementsListDialog);
+    $dialog.find('.fm-dialog-close')
+        .rebind('click', function() {
+            if (onDialogClosed) {
+                Soon(onDialogClosed);
+            }
+            $.dialog = false;
+            fm_hideoverlay();
+            $dialog.addClass('hidden');
+            return false;
+        });
 
     // hide everything until seen on the api reply (maf)
     $('.achievements-cell', $dialog).addClass('hidden');
@@ -1265,6 +1268,7 @@ mega.checkStorageQuota = function checkStorageQuota(timeout) {
                     return false;
                 });
                 $('.fm-dialog-close, .button.skip', $strgdlg).rebind('click', function() {
+                    fm_hideoverlay();
                     $strgdlg.addClass('hidden');
                 });
 

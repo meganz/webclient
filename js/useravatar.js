@@ -46,7 +46,7 @@ var useravatar = (function() {
         while (len--) {
             var color = '.color' + (len + 1);
             css += color + ', .nw-contact-avatar' + color + ', .contacts-avatar' + color
-                + ', .avatar' + color + ' { background-color: ' + _colors[len] + '; }';
+                + ', .avatar' + color + ' { background-color: ' + _colors[len] + '; color: ' + _colors[len] + '; }';
         }
 
         css = mObjectURL([css], 'text/css');
@@ -124,7 +124,7 @@ var useravatar = (function() {
             '<' + element + ' data-color="color' + s.colorIndex + '" class="avatar-wrapper ' +
                 className + ' ' + id + ' color' + s.colorIndex + '">' +
                 '<span>' +
-                    '<i class="verified_icon"></i>' + s.letters + 
+                    '<i class="verified_icon"></i>' + s.letters +
                 '</span>'  +
             '</' + element + '>';
     }
@@ -183,7 +183,7 @@ var useravatar = (function() {
             var isVerified = (verifyState.method >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON);
 
             if (isVerified) {
-                $('.avatar-wrapper.' + userHandle).addClass('verified');
+                $('.avatar-wrapper.' + userHandle.replace(/[^\w-]/g, '')).addClass('verified');
             }
         }).always(function() {
             delete pendingVerifyQuery[userHandle];
@@ -267,10 +267,11 @@ var useravatar = (function() {
                 .safeHTML($avatar.html());
         }
 
-        $('.avatar-wrapper.' + user).each(updateAvatar);
+        $('.avatar-wrapper.' + user.replace(/[^\w-]/g, '')).each(updateAvatar);
 
         if ((M.u[user] || {}).m) {
-            $('.avatar-wrapper.' + M.u[user].m.replace(/[\.@]/g, "\\$1")).each(updateAvatar);
+            var eem = String(M.u[user].m).replace(/[^\w@.,+-]/g, '').replace(/\W/g, '\\$&');
+            $('.avatar-wrapper.' + eem).each(updateAvatar);
         }
     };
 

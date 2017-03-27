@@ -438,11 +438,11 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
                 if (chatRoom.lastActivity === 0) {
                     chatRoom.lastActivity = unixtime();
                 }
-                window.location = chatRoom.getRoomUrl();
+                loadSubPage(chatRoom.getRoomUrl());
             }
 
             if (wasActive) {
-                window.location = chatRoom.getRoomUrl();
+                loadSubPage(chatRoom.getRoomUrl());
             }
         }
         else {
@@ -464,6 +464,17 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
                             excluded.push(v.u);
                             delete chatRoom.members[v.u];
                             if (v.u === u_handle) {
+                                if (typeof(chatRoom.megaChat.plugins.presencedIntegration) !== 'undefined') {
+                                    Object.keys(chatRoom.members).forEach(function(user_handle) {
+                                        // not a real contact?
+                                        if (M.u[user_handle].c === 0) {
+                                            chatRoom.megaChat.plugins.presencedIntegration.eventuallyRemovePeer(
+                                                user_handle,
+                                                chatRoom
+                                            );
+                                        }
+                                    });
+                                }
                                 chatRoom.leave(false);
                                 // i had left, also do a chatd.leave!
                                 self.chatd.leave(
@@ -476,12 +487,33 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
                                     }
                                 }
                             }
+                            else {
+                                // someone else left the room
+                                if (
+                                    M.u[v.u].c === 0 &&
+                                    typeof(chatRoom.megaChat.plugins.presencedIntegration) !== 'undefined'
+                                ) {
+                                    chatRoom.megaChat.plugins.presencedIntegration.eventuallyRemovePeer(
+                                        v.u,
+                                        chatRoom
+                                    );
+                                }
+                            }
                         }
                         else {
                             included.push(v.u);
                             chatRoom.members[v.u] = v.p;
                             if (v.u === u_handle && v.p !== 0) {
                                 chatRoom.privateReadOnlyChat = false;
+                            }
+                            if (
+                                M.u[v.u] &&
+                                M.u[v.u].c === 0 &&
+                                typeof(chatRoom.megaChat.plugins.presencedIntegration) !== 'undefined'
+                            ) {
+                                chatRoom.megaChat.plugins.presencedIntegration.eventuallyAddPeer(
+                                    v.u
+                                );
                             }
                         }
                     });
@@ -490,6 +522,11 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
                         if (included.length > 0) {
                             ChatdIntegration._ensureKeysAreLoaded([], included);
                             ChatdIntegration._ensureNamesAreLoaded(included);
+                            included.forEach(function(handle) {
+                                if (M.u[handle] && M.u[handle].c === 0) {
+                                    megaChat.processNewUser(handle);
+                                }
+                            });
                         }
 
                         chatRoom.trackDataChange();
@@ -826,7 +863,7 @@ ChatdIntegration.prototype._parseMessage = function(chatRoom, message) {
                     if (v.fa && (icon === "graphic" || icon === "image")) {
                         var imagesListKey = message.messageId + "_" + v.h;
                         if (!chatRoom.images.exists(imagesListKey)) {
-                            v.k = imagesListKey;
+                            v.id = imagesListKey;
                             v.delay = message.delay;
                             chatRoom.images.push(v);
                         }
@@ -912,6 +949,23 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
 
     var chatRoomId = chatRoom.roomJid.split("@")[0];
 
+    chatRoom.rebind('typing.chatdInt', function() {
+        self.broadcast(chatRoom, String.fromCharCode(1));
+    });
+
+    self.chatd.rebind('onBroadcast.chatdInt' + chatRoomId, function(e, eventData) {
+        var foundChatRoom = self._getChatRoomFromEventData(eventData);
+
+        if (!foundChatRoom) {
+            self.logger.warn("Room not found for: ", e, eventData);
+            return;
+        }
+
+        if (foundChatRoom.roomJid === chatRoom.roomJid) {
+            foundChatRoom.trigger('onParticipantTyping', [eventData.userId, eventData.bCastCode]);
+        }
+    });
+
     self.chatd.rebind('onRoomConnected.chatdInt' + chatRoomId, function(e, eventData) {
         var foundChatRoom = self._getChatRoomFromEventData(eventData);
 
@@ -968,6 +1022,16 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                         chatRoom.protocolHandler.addParticipant(eventData.userId);
                         // also add to our list
                         chatRoom.members[eventData.userId] = eventData.priv;
+
+                        if (
+                            M.u[eventData.userId] &&
+                            M.u[eventData.userId].c === 0 &&
+                            typeof(chatRoom.megaChat.plugins.presencedIntegration) !== 'undefined'
+                        ) {
+                            chatRoom.megaChat.plugins.presencedIntegration.eventuallyAddPeer(
+                                eventData.userId
+                            );
+                        }
                         $(chatRoom).trigger('onMembersUpdated');
                     }
                     self.waitForProtocolHandler(chatRoom, addParticipant);
@@ -983,6 +1047,17 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                     chatRoom.protocolHandler.removeParticipant(eventData.userId);
                     // also remove from our list
                     delete chatRoom.members[eventData.userId];
+
+                    if (
+                        M.u[eventData.userId].c === 0 &&
+                        typeof(chatRoom.megaChat.plugins.presencedIntegration) !== 'undefined'
+                    ) {
+                        chatRoom.megaChat.plugins.presencedIntegration.eventuallyRemovePeer(
+                            eventData.userId,
+                            chatRoom
+                        );
+                    }
+
                     $(chatRoom).trigger('onMembersUpdated');
                 }
                 self.waitForProtocolHandler(chatRoom, deleteParticipant);
@@ -1588,6 +1663,15 @@ ChatdIntegration.prototype.discardMessage = function(chatRoom, msgId) {
         // debugger;
     }
     return self.chatd.discard(msgId, rawChatId);
+};
+
+
+
+ChatdIntegration.prototype.broadcast = function(chatRoom, broadCastCode) {
+    var self = this;
+    var rawChatId = base64urldecode(chatRoom.chatId);
+    var chatMessages = self.chatd.chatIdMessages[rawChatId];
+    return self.chatd.broadcast(rawChatId, broadCastCode);
 };
 
 

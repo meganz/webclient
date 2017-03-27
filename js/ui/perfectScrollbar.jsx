@@ -167,13 +167,14 @@ var PerfectScrollbar = React.createClass({
     isAtBottom: function() {
         return this.findDOMNode().scrollTop === this.getScrollHeight();
     },
+    isCloseToBottom: function(minPixelsOff) {
+        return (this.getScrollHeight() - this.getScrollPositionY()) <= minPixelsOff;
+    },
     getScrolledPercentY: function() {
-        var $elem = $(this.findDOMNode());
-        return 100/this.getScrollHeight() * $elem[0].scrollTop;
+        return 100/this.getScrollHeight() * this.findDOMNode().scrollTop;
     },
     getScrollPositionY: function() {
-        var $elem = $(this.findDOMNode());
-        return $elem[0].scrollTop;
+        return this.findDOMNode().scrollTop;
     },
     scrollToPercentY: function(posPerc, skipReinitialised) {
         var $elem = $(this.findDOMNode());

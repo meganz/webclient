@@ -223,6 +223,7 @@ function u_logout(logout) {
                 megaChat.destroy( /* isLogout: */ true);
 
                 localStorage.removeItem("megaChatPresence");
+                localStorage.removeItem("userPresenceIsOffline");
                 localStorage.removeItem("megaChatPresenceMtime");
             }
         }
@@ -558,8 +559,8 @@ function isEphemeral() {
  */
 function checkUserLogin() {
     if (!u_type) {
-        login_next = document.location.hash;
-        document.location.hash = "#login";
+        login_next = getSitePath();
+        loadSubPage('login');
         return true;
     }
 
@@ -797,7 +798,7 @@ function checkUserLogin() {
                     }
                     else {
                         $promise.reject(false);
-                        console.error("Failed to retrieve last interaction cache from attrib, response: ", err);
+                        console.error("Failed to retrieve last interaction cache from attrib, response: ", res);
                     }
                 })
                 .fail(function(res) {

@@ -94,7 +94,7 @@
         if (d) {
             console.log(e);
         }
-        // if (folderlink || RightsbyID(M.currentdirid) < 1) return false;
+        // if (folderlink || rightsById(M.currentdirid) < 1) return false;
         e.stopPropagation();
         e.preventDefault();
         setTimeout(function() {
@@ -114,8 +114,17 @@
     }
 
     var dir_inflight = 0;
-    var file_inflight = 0;
     var filedrag_u = [];
+
+    function pushUpload() {
+        if (!--dir_inflight && $.dostart) {
+            addupload(filedrag_u);
+            filedrag_u = [];
+            if (page === 'start') {
+                start_upload();
+            }
+        }
+    }
 
     function traverseFileTree(item, path) {
         path = path || "";
@@ -127,13 +136,7 @@
                 }
                 file.path = path;
                 filedrag_u.push(file);
-                if (--dir_inflight == 0 && $.dostart) {
-                    addupload(filedrag_u);
-                    filedrag_u = [];
-                    if (page == 'start') {
-                        start_upload();
-                    }
-                }
+                pushUpload();
             });
         }
         else if (item.isDirectory) {
@@ -150,10 +153,7 @@
                         dirReaderIterator();
                     }
                     else {
-                        if (!--dir_inflight) {
-                            addupload(filedrag_u);
-                            filedrag_u = [];
-                        }
+                        pushUpload();
                     }
                 });
             };
@@ -188,7 +188,7 @@
                 u_type = r;
                 u_checked = true;
                 loadingDialog.hide();
-                document.location.hash = 'fm';
+                loadSubPage('fm');
             }
         }, true);
     }
@@ -233,7 +233,7 @@
                 (
                     M.currentdirid !== 'dashboard' &&
                     M.currentdirid !== 'transfers' &&
-                    (RightsbyID(targetid) | 0) < 1
+                    (rightsById(targetid) | 0) < 1
                 )
             ) &&
             String(M.currentdirid).indexOf("chat/") === -1
@@ -393,3 +393,21 @@
     }
 
 })(this);
+
+// Selenium helper to fake a drop event
+function fakeDropEvent(target) {
+    // hash: "MTIzNAAAAAAAAAAAAAAAAAOLqRY"
+    var file = new File(['1234'], 'test.txt', {
+        type: "application/octet-stream",
+        lastModified: 1485195382
+    });
+
+    var ev = document.createEvent("HTMLEvents");
+    ev.initEvent("drop", true, true);
+    ev.dataTransfer = {
+        files: [file]
+    };
+
+    target = target || document.getElementById("startholder");
+    target.dispatchEvent(ev);
+}

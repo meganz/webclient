@@ -241,7 +241,7 @@ var astroPayDialog = {
             if (M.account) {
                 M.account.lastupdate = 0;
             }
-            window.location.hash = 'fm/account/history';
+            loadSubPage('fm/account/history');
         });
     }
 };
@@ -249,28 +249,6 @@ var astroPayDialog = {
 
 function init_pro()
 {
-    // Detect if there exists a verify get parameter
-    var verifyUrlParam = proPage.getUrlParam('verify');
-
-    // If it exists we need to do extra things
-    if (typeof verifyUrlParam !== 'undefined') {
-
-        // We are required to do paysafecard verification
-        if (verifyUrlParam === 'paysafe') {
-            paysafecard.verify();
-        }
-
-        // Show another dialog
-        if (verifyUrlParam === 'astropay') {
-            astroPayDialog.showPendingPayment();
-        }
-
-        // If returning from an Ecomprocessing payment
-        if (verifyUrlParam.indexOf('ecp') > -1) {
-            addressDialog.showPaymentResult(verifyUrlParam);
-        }
-    }
-
     if (localStorage.keycomplete) {
         $('body').addClass('key');
         localStorage.removeItem('keycomplete');
@@ -296,9 +274,9 @@ function init_pro()
             }
         });
     }
-    if (document.location.hash.indexOf('#pro/') > -1)
+    if (getSitePath().indexOf('pro/') > -1)
     {
-        localStorage.affid = document.location.hash.replace('#pro/','');
+        localStorage.affid = getSitePath().replace('pro/','');
         localStorage.affts = new Date().getTime();
     }
 
@@ -320,9 +298,9 @@ function init_pro()
 
             if (account_type_num === '0') {
                 if (page === 'fm') {
-                    document.location.hash = '#start';
+                    loadSubPage('start');
                 } else {
-                    document.location.hash = '#fm';
+                    loadSubPage('fm');
                 }
                 return false;
             }
@@ -408,9 +386,9 @@ function init_pro()
 
             if (account_type_num === '0') {
                 if (page === 'fm') {
-                    document.location.hash = '#start';
+                    loadSubPage('start');
                 } else {
-                    document.location.hash = '#fm';
+                    loadSubPage('fm');
                 }
                 return false;
             }
@@ -431,7 +409,7 @@ function init_pro()
         $('.pro-bottom-button').unbind('click');
         $('.pro-bottom-button').bind('click',function(e)
         {
-            document.location.hash = 'contact';
+            loadSubPage('contact');
         });
     }
 
@@ -475,9 +453,14 @@ function pro_next_step(proPlanName) {
     if (proPlanName !== 'lite') {
         proPlanName = proPlanName.length;
     }
-    if (location.hash.split('_').pop() != proPlanName) {
-        window.skipHashChange = true;
-        location.hash = 'pro_' + proPlanName;
+    if (getSitePath().split('_').pop() != proPlanName) {
+        if (hashLogic) {
+            window.skipHashChange = true;
+            location.hash = 'pro_' + proPlanName;
+        }
+        else {
+            history.pushState({ subpage: 'pro_' + proPlanName }, "", 'pro_' + proPlanName);
+        }
     }
 
     var currentDate = new Date(),
@@ -488,10 +471,12 @@ function pro_next_step(proPlanName) {
 
     // Add hyperlink to mobile payment providers at top of #pro page step 2
     var $otherPaymentProviders = $('.membership-step2 .other-payment-providers');
-    var linkHtml = $otherPaymentProviders.html().replace('[A]', '<a href="#mobile">');
+    var linkHtml = $otherPaymentProviders.html().replace('[A]', '<a href="/mobile" class="clickurl">');
     linkHtml = linkHtml.replace('[/A]', '</a>');
     linkHtml = linkHtml.replace('Android', '');
     $otherPaymentProviders.safeHTML(linkHtml);
+
+    clickURLs();
 
     // Stylise the "PURCHASE" text in the 3rd instruction
     var $paymentInstructions = $('.membership-step2 .payment-instructions');
@@ -697,6 +682,17 @@ function pro_pay() {
                 pro_m = addressDialog.gatewayId;
                 extra = addressDialog.extraDetails;
             }
+            else if (pro_paymentmethod.indexOf('sabadell') === 0) {
+                pro_m = sabadell.gatewayId; // 17
+
+                // Get the value for whether the user wants the plan to renew automatically
+                var autoRenewCheckedValue = $('.membership-step2 .renewal-options-list input:checked').val();
+
+                // If the provider supports recurring payments and the user wants the plan to renew automatically
+                if (autoRenewCheckedValue === 'yes') {
+                    extra.recurring = true;
+                }
+            }
 
             // Update the last payment provider ID for the 'psts' action packet. If the provider e.g. bitcoin
             // needs a redirect after confirmation action packet it will redirect to the account page.
@@ -738,6 +734,42 @@ var proPage = {
     $loadingOverlay: null,
 
     /**
+     * Processes a return URL from the payment provider in form of /payment-{providername}-{status} e.g.
+     * /payment-ecp-success
+     * /payment-ecp-failure
+     * /payment-astropay-pending
+     * /payment-paysafecard-saleidXXX
+     * @param {String} page The requested page from index.js e.g. payment-ecp-success etc
+     */
+    processReturnUrlFromProvider: function(page) {
+
+        // Get the provider we are returning from and the status
+        var pageParts = page.split('-');
+        var provider = pageParts[1];
+        var status = pageParts[2];
+
+        // If returning from an paysafecard payment, do a verification on the sale ID
+        if (provider === 'paysafecard') {
+            paysafecard.verify(status);
+        }
+
+        // If returning from an AstroPay payment, show a pending payment dialog
+        else if (provider === 'astropay') {
+            astroPayDialog.showPendingPayment();
+        }
+
+        // If returning from an Ecomprocessing payment, show a success or failure dialog
+        else if (provider === 'ecp') {
+            addressDialog.showPaymentResult(status);
+        }
+
+        // Sabadell needs to also show success or failure
+        else if (provider === 'sabadell') {
+            sabadell.showPaymentResult(status);
+        }
+    },
+
+    /**
     * Update the state when a payment has been received to show their new Pro Level
     * @param {Object} actionPacket The action packet {'a':'psts', 'p':<prolevel>, 'r':<s for success or f for failure>}
     */
@@ -762,7 +794,7 @@ var proPage = {
 
             // If last payment was Bitcoin, we need to redirect to the account page
             if (this.lastPaymentProviderId === 4) {
-                window.location.hash = 'fm/account/history';
+                loadSubPage('fm/account/history');
             }
         }
     },
@@ -821,12 +853,16 @@ var proPage = {
 
             // Replace text with proper link
             var $linkText = $noPlansSuitable.find('.no-plans-suitable-text');
-            var newLinkText = $linkText.html().replace('[A]', '<a href="#contact">').replace('[/A]', '</a>');
-            $linkText.html(newLinkText);
+            var newLinkText = $linkText.html()
+                .replace('[A]', '<a href="/contact" class="clickurl">')
+                .replace('[/A]', '</a>');
+            $linkText.safeHTML(newLinkText);
+
+            clickURLs();
 
             // Redirect to #contact
             $noPlansSuitable.find('.btn-request-plan').rebind('click', function() {
-                document.location.hash = 'contact';
+                loadSubPage('contact');
             });
         }
     },
@@ -871,7 +907,7 @@ var proPage = {
      */
     getUrlParam: function(paramToGet) {
 
-        var hash = location.hash.substr(1);
+        var hash = getSitePath().substr(1) + locSearch;
         var index = hash.indexOf(paramToGet + '=');
         var param = hash.substr(index).split('&')[0].split('=')[1];
 
@@ -1700,6 +1736,10 @@ var proPage = {
             case directReseller.gatewayId:
                 directReseller.redirectToSite(utcResult);
                 break;
+
+            case sabadell.gatewayId:
+                sabadell.redirectToSite(utcResult);
+                break;
         }
     }
 };
@@ -1768,9 +1808,11 @@ var voucherDialog = {
 
         // Translate text
         var html = this.$dialog.find('.voucher-information-help').html();
-            html = html.replace('[A]', '<a href="#resellers" class="voucher-reseller-link">');
+            html = html.replace('[A]', '<a href="/resellers" class="voucher-reseller-link clickurl">');
             html = html.replace('[/A]', '</a>');
         this.$dialog.find('.voucher-information-help').html(html);
+
+        clickURLs();
 
         // Reset state to hide voucher input
         voucherDialog.$dialog.find('.voucher-input-container').fadeOut('fast', function() {
@@ -2018,7 +2060,7 @@ var voucherDialog = {
             if (M.account) {
                 M.account.lastupdate = 0;
             }
-            window.location.hash = 'fm/account/history';
+            loadSubPage('fm/account/history');
         });
     }
 };
@@ -2108,6 +2150,79 @@ var unionPay = {
             form.append(input);
             $('body').append(form);
             form.submit();
+        }
+    }
+};
+
+/**
+ * Code for Sabadell Spanish Bank
+ */
+var sabadell = {
+
+    gatewayId: 17,
+
+    /**
+     * Redirect to the site
+     * @param {Object} utcResult
+     */
+    redirectToSite: function(utcResult) {
+
+        // We need to redirect to their site via a post, so we are building a form
+        var url = utcResult.EUR['url'];
+        var form = $("<form id='pay_form' name='pay_form' action='" + url + "' method='post'></form>");
+
+        for (var key in utcResult.EUR['postdata']) {
+            var input = $("<input type='hidden' name='" + key + "' value='" + utcResult.EUR['postdata'][key] + "' />");
+            form.append(input);
+            $('body').append(form);
+            form.submit();
+        }
+    },
+
+    /**
+     * Show the payment result of success or failure after coming back from the Sabadell site
+     * @param {String} verifyUrlParam The URL parameter e.g. 'sabadell-success' or 'sabadell-failure'
+     */
+    showPaymentResult: function(verifyUrlParam) {
+
+        var $backgroundOverlay = $('.fm-dialog-overlay');
+        var $pendingOverlay = $('.payment-result.pending.alternate');
+        var $failureOverlay = $('.payment-result.failed');
+
+        // Show the overlay
+        $backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+
+        // On successful payment
+        if (verifyUrlParam === 'success') {
+
+            // Show the success
+            $pendingOverlay.removeClass('hidden');
+
+            // Add click handlers for 'Go to my account' and Close buttons
+            $pendingOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
+
+                // Hide the overlay
+                $backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+                $pendingOverlay.addClass('hidden');
+
+                // Make sure it fetches new account data on reload
+                if (M.account) {
+                    M.account.lastupdate = 0;
+                }
+                loadSubPage('fm/account/history');
+            });
+        }
+        else {
+            // Show the failure overlay
+            $failureOverlay.removeClass('hidden');
+
+            // On click of the 'Try again' or Close buttons, hide the overlay
+            $failureOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
+
+                // Hide the overlay
+                $backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+                $failureOverlay.addClass('hidden');
+            });
         }
     }
 };
@@ -2206,7 +2321,7 @@ var paysafecard = {
     showConnectionError: function() {
         msgDialog('warninga', l[7235], l[7233], '', function() {
             proPage.hideLoadingOverlay();
-            document.location.hash = "pro"; // redirect to remove any query parameters from the url
+            loadSubPage('pro'); // redirect to remove any query parameters from the url
         });
     },
 
@@ -2215,43 +2330,42 @@ var paysafecard = {
      */
     showPaymentError: function() {
         msgDialog('warninga', l[7235], l[7234], '', function() {
-            document.location.hash = "pro"; // redirect to remove any query parameters from the url
+            loadSubPage('pro'); // redirect to remove any query parameters from the url
         });
     },
 
     /**
-     * We have been redirected back to mega with the 'okUrl'. We need to ask the API to verify the payment succeeded as per
-     * paysafecard's requirements, which they enforce with integration tests we must pass... so yeap, gotta do this.
+     * We have been redirected back to mega with the 'okUrl'. We need to ask the API to verify the payment
+     * succeeded as per paysafecard's requirements, which they enforce with integration tests we must pass.
+     * @param {String} saleIdString A string containing the sale ID e.g. saleid32849023423
      */
-    verify: function() {
-        var saleidstring = proPage.getUrlParam('saleidstring');
-        if (typeof saleidstring !== 'undefined') {
+    verify: function(saleIdString) {
 
-            // Make the vpay API request to follow up on this sale
-            var requestData = {
-                'a': 'vpay',                            // Credit Card Store
-                't': this.gatewayId,                    // The paysafecard gateway
-                'saleidstring': saleidstring            // Required by the API to know what to investigate
-            };
+        // Remove the saleid string to just get the ID to check
+        var saleId = saleIdString.replace('saleid', '');
 
-            var parent = this;
+        // Make the vpay API request to follow up on this sale
+        var requestData = {
+            'a': 'vpay',                      // Credit Card Store
+            't': this.gatewayId,              // The paysafecard gateway
+            'saleidstring': saleId            // Required by the API to know what to investigate
+        };
 
-            api_req(requestData, {
-                callback: function (result) {
+        api_req(requestData, {
+            callback: function (result) {
 
-                    // If negative API number
-                    if ((typeof result === 'number') && (result < 0)) {
-                        // Something went wrong with the payment, either card association or actually debitting it.
-                        parent.showPaymentError();
-                    }
-                    else {
-                        // Continue to account screen
-                        document.location.hash = "account";
-                    }
+                // If negative API number
+                if ((typeof result === 'number') && (result < 0)) {
+
+                    // Something went wrong with the payment, either card association or actually debitting it
+                    paysafecard.showPaymentError();
                 }
-            });
-        }
-        return false;
+                else {
+                    // Continue to account screen
+                    loadSubPage('account');
+                }
+            }
+        });
     }
 };
 
@@ -2657,7 +2771,7 @@ var addressDialog = {
         $backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
 
         // On successful payment
-        if (verifyUrlParam === 'ecp-success') {
+        if (verifyUrlParam === 'success') {
 
             // Show the success
             $pendingOverlay.removeClass('hidden');
@@ -2673,7 +2787,7 @@ var addressDialog = {
                 if (M.account) {
                     M.account.lastupdate = 0;
                 }
-                window.location.hash = 'fm/account/history';
+                loadSubPage('fm/account/history');
             });
         }
         else {
@@ -3111,7 +3225,7 @@ var cardDialog = {
             if (M.account) {
                 M.account.lastupdate = 0;
             }
-            window.location.hash = 'fm/account/history';
+            loadSubPage('fm/account/history');
         });
     },
 
@@ -3473,13 +3587,15 @@ function showLoginDialog(email) {
     $('.top-login-forgot-pass', $dialog).unbind('click');
     $('.top-login-forgot-pass', $dialog).bind('click',function(e)
     {
-        document.location.hash = 'recovery';
+        loadSubPage('recovery');
     });
 
     $('.top-dialog-login-button', $dialog).unbind('click');
     $('.top-dialog-login-button', $dialog).bind('click',function(e) {
         doProLogin($dialog);
     });
+
+    clickURLs();
 };
 
 var doProLogin = function($dialog) {

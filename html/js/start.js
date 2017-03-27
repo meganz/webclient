@@ -72,8 +72,9 @@ function init_start() {
     });
     $('.st-bottom-scroll-button.scrolldown').rebind('click', function(event) {
         if (page === 'download') {
-            document.location.hash = '#mega';
-        } else {
+            loadSubPage('mega');
+        }
+        else {
             startpageScroll();
         }
     });
@@ -94,7 +95,7 @@ function init_start() {
     if (page === 'start') {
         InitFileDrag();
     }
-    if (document.location.hash === '#info') {
+    if (getSitePath() === '/info') {
         startpageScroll(1);
     }
 }
@@ -166,18 +167,20 @@ function megainfotxt() {
 
     $('.st-apps-icon').rebind('click', function(e) {
         if ($(this).hasClass('mobile')) {
-            document.location.hash = 'mobile';
+            loadSubPage('mobile');
         }
         else if ($(this).hasClass('sync')) {
-            document.location.hash = 'sync';
+            loadSubPage('sync');
         }
         else if ($(this).hasClass('browser')) {
-            document.location.hash = 'plugin';
+            loadSubPage('plugin');
         }
         else if ($(this).hasClass('chat')) {
-            document.location.hash = 'blog_22';
+            loadSubPage('blog_22');
         }
     });
+
+    clickURLs();
 }
 
 
@@ -202,9 +205,6 @@ function startpageMain() {
         var el = '.st-mid-white-block';
         $(el).removeClass('active');
         $.startscrolling = false;
-        if (page === 'start') {
-            document.location.hash = '#';
-        }
     }, 295);
 }
 

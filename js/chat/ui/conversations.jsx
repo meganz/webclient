@@ -102,8 +102,10 @@ var ConversationsListItem = React.createClass({
                 renderableSummary = lastMessage.getManagementMessageSummaryText();
             }
 
-            lastMessageDiv = <div className={lastMsgDivClasses}>
-                        {renderableSummary}
+            renderableSummary = htmlentities(renderableSummary);
+            renderableSummary = megaChat.plugins.emoticonsFilter.processHtmlMessage(renderableSummary);
+
+            lastMessageDiv = <div className={lastMsgDivClasses} dangerouslySetInnerHTML={{__html:renderableSummary}}>
                     </div>;
 
             var timestamp = lastMessage.delay;
@@ -137,7 +139,7 @@ var ConversationsListItem = React.createClass({
                     chatRoom.messagesBuff.messagesHistoryIsLoading() ||
                     chatRoom.messagesBuff.joined === false
                     ) ? (
-                        localStorage.megaChatPresence !== 'unavailable' ? l[7006] : ""
+                        l[7006]
                     ) :
                     l[8000]
             );
@@ -205,7 +207,7 @@ var ConversationsList = React.createClass({
     mixins: [MegaRenderMixin, RenderDebugger],
     conversationClicked: function(room, e) {
 
-        window.location = room.getRoomUrl();
+        loadSubPage(room.getRoomUrl());
         e.stopPropagation();
     },
     currentCallClicked: function(e) {
@@ -215,7 +217,7 @@ var ConversationsList = React.createClass({
         }
     },
     contactClicked: function(contact, e) {
-        window.location = "#fm/chat/" + contact.u;
+        loadSubPage("fm/chat/" + contact.u);
         e.stopPropagation();
     },
     endCurrentCall: function(e) {
@@ -277,11 +279,19 @@ var ConversationsList = React.createClass({
                 }
                 contact = chatRoom.megaChat.getContactFromJid(contact);
 
-                if (contact && contact.c === 0) {
-                    // a non-contact conversation, e.g. contact removed - mark as read only
-                    Soon(function () {
-                        chatRoom.privateReadOnlyChat = true;
-                    });
+                if (contact) {
+                    if (!chatRoom.privateReadOnlyChat && contact.c === 0) {
+                        // a non-contact conversation, e.g. contact removed - mark as read only
+                        Soon(function () {
+                            chatRoom.privateReadOnlyChat = true;
+                        });
+                    }
+                    else if (chatRoom.privateReadOnlyChat && contact.c !== 0) {
+                        // a non-contact conversation, e.g. contact removed - mark as read only
+                        Soon(function () {
+                            chatRoom.privateReadOnlyChat = false;
+                        });
+                    }
                 }
             }
 
@@ -319,7 +329,7 @@ var ConversationsApp = React.createClass({
     },
     startChatClicked: function(selected) {
         if (selected.length === 1) {
-            window.location = "#fm/chat/" + selected[0];
+            loadSubPage("fm/chat/" + selected[0]);
             this.props.megaChat.createAndShowPrivateRoomFor(selected[0]);
         }
         else {
@@ -523,7 +533,8 @@ var ConversationsApp = React.createClass({
                         <PerfectScrollbar style={leftPanelStyles}>
                             <div className={
                                 "content-panel conversations" + (
-                                    window.location.hash.indexOf("/chat") !== -1 ? " active" : ""
+                                    
+									getSitePath().indexOf("/chat") !== -1 ? " active" : ""
                                 )
                             }>
                                 <ConversationsList chats={this.props.megaChat.chats} megaChat={this.props.megaChat} contacts={this.props.contacts} />

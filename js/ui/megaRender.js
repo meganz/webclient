@@ -279,9 +279,24 @@
             get: function() {
                 if (!maxItemsInView) {
                     if (this.viewmode) {
+                        var width, height;
                         var $fm = $('.fm-blocks-view.fm');
-                        var row = Math.floor($fm.width() / 140);
-                        maxItemsInView = row * Math.ceil($fm.height() / 164) + row;
+                        if ($fm.hasClass('hidden')) {
+                            width = (
+                                window.innerWidth -
+                                (fmconfig.leftPaneWidth || 200) -
+                                48 /* left-icons-pane */
+                            );
+                            height = (
+                                window.innerHeight - 72 /* top-head */
+                            );
+                        }
+                        else {
+                            width = $fm.width();
+                            height = $fm.height();
+                        }
+                        var row = Math.floor(width / 140);
+                        maxItemsInView = row * Math.ceil(height / 164) + row;
                     }
                     else {
                         maxItemsInView = Math.ceil($('.files-grid-view.fm').height() / 24 * 1.4);
@@ -647,6 +662,10 @@
                 var props = {classNames: []};
                 var share = M.getNodeShare(aNode);
 
+                if (aNode.su) {
+                    props.classNames.push('inbound-share');
+                }
+
                 if (aNode.t) {
                     props.type = l[1049];
                     props.icon = 'folder';
@@ -721,7 +740,6 @@
                 var avatar;
                 var props = this.nodeProperties['*'].call(this, aNode, aHandle, false);
 
-                props.shareUser = aNode.su;
                 props.userHandle = aNode.su || aNode.p;
                 props.userName = M.getNameByHandle(props.userHandle);
 
@@ -754,9 +772,12 @@
                     }
 
                     if (this.chatIsReady) {
-                        var jid = megaChat.getJidFromNodeId(props.userHandle);
+                        props.onlineStatus = M.onlineStatusClass(aNode.presence ? aNode.presence : "unavailable");
 
-                        props.onlineStatus = M.onlineStatusClass(megaChat.karere.getPresence(jid));
+                        if (props.onlineStatus) {
+                            props.classNames.push(props.onlineStatus[1]);
+                        }
+
                     }
 
                     if (aExtendedInfo !== false) {
@@ -795,13 +816,12 @@
                 }
 
                 if (this.chatIsReady) {
-                    var jid = megaChat.getJidFromNodeId(aHandle);
-
-                    props.onlineStatus = M.onlineStatusClass(megaChat.karere.getPresence(jid));
+                    props.onlineStatus = M.onlineStatusClass(aNode.presence ? aNode.presence : "unavailable");
 
                     if (props.onlineStatus) {
                         props.classNames.push(props.onlineStatus[1]);
                     }
+
                 }
 
                 props.classNames.push(aHandle);

@@ -1,16 +1,55 @@
-.fm-dialog-footer {
-    height: 56px;
-    background-color: #F6F6F6;
+.fm-dialog-footer, .fm-move-bottom-block, .fm-share-bottom-block, .fm-notifications-bottom, .top-login-bott-gray-block, .fm-mega-dialog-bottom, .create-folder-bottom, .default-dialog-bottom {
+    height: 57px;
+    background-color: white;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    -webkit-border-bottom-left-radius: 7px;
-    -moz-border-radius-bottomleft: 7px;
-    border-bottom-left-radius: 7px;
-    -webkit-border-bottom-right-radius: 7px;
-    -moz-border-radius-bottomright: 7px;
-    border-bottom-right-radius: 7px;
+    -webkit-border-bottom-left-radius: 8px;
+    -moz-border-radius-bottomleft: 8px;
+    border-bottom-left-radius: 8px;
+    -webkit-border-bottom-right-radius: 8px;
+    -moz-border-radius-bottomright: 8px;
+    border-bottom-right-radius: 8px;
     padding: 12px 12px 0 12px;
+    border-top: 1px solid rgba(0,0,0,0.1);
+    position: relative;
+}
+.top-login-bott-gray-block {
+    margin: 0 -15px 0 -15px;
+    padding: 5px 15px 0 15px;
+}
+.fm-move-bottom-block, .fm-share-bottom-block, .fm-notifications-bottom {
+    padding: 0 12px 0 12px;
+}
+.fm-mega-dialog-bottom, .create-folder-bottom, .default-dialog-bottom {
+    margin: 12px -12px -12px -12px;
+    padding: 0 12px 0 0;
+}
+.credentials-warning-dialog .fm-mega-dialog-bottom {
+    margin: 0;
+}
+.key-signature-warning-dialog .fm-mega-dialog-bottom {
+    margin: 12px 0 -12px;
+}
+.notification-popup .fm-notifications-bottom {
+    height: 34px;
+}
+.browsers-dialog .fm-notifications-bottom {
+    padding: 0 20px 0 14px;
+}
+.share-dialog .fm-notifications-bottom {
+    position: static;
+}
+.languages-dialog .fm-notifications-bottom {
+    bottom: 0;
+    left: 0;
+    position: absolute;
+    right: 0;
+}
+.fm-dialog-footer-txt {
+    text-align: center;
+    line-height: 31px;
+    color: #999;
 }
 /* Send Contact Dialog */
 .fm-dialog.send-contact {
@@ -52,10 +91,6 @@
     margin-top: -4px;
     color: #666666;
 }
-.contacts-search-footer {
-    height: 46px;
-    display: block;
-}
 .contacts-search-footer em {
     display: block;
     color: #2ba6de;
@@ -69,26 +104,18 @@
 /* Add From Cloud Dialog */
 .fm-dialog.add-from-cloud {
     width: 644px;
-    margin: -246px 0 0 -322px;
+    margin: -247px 0 0 -322px;
 }
 .fm-dialog .fm-breadcrumbs-block {
     float: none;
-    height: 40px;
-    margin: 0 0 19px 0;
-    padding: 22px 0 0 16px;
+    height: 46px;
+    margin: 0 0 11px 0;
+    padding: 22px 0 0 2px;
+    overflow: hidden;
+    position: relative;
 }
-.fm-dialog .fm-breadcrumbs-block:not(.long-path) .cloud-drive .right-arrow-bg {
-    padding: 0 7px 0 8px;
-    background-image: none;
-}
-.fm-dialog .fm-breadcrumbs .right-arrow-bg {
-    font-size: 13px;
-}
-.fm-dialog .fm-breadcrumbs:first-child .right-arrow-bg span {
-    display: block;
-}
-.fm-dialog .long-path .fm-breadcrumbs .right-arrow-bg span {
-    display: none;
+.fm-dialog .breadcrumbs-wrapper {
+    position: absolute;
 }
 .fm-dialog-table.grid-table tr:nth-child(odd) td {
     background-color: rgba(255,255,255,1);
@@ -231,6 +258,7 @@
 }
 .achievement-dialog.reward {
     display: inline-block;
+    position: relative;
     margin: 15px 21px 0 21px;
     text-align: left;
 }
@@ -272,6 +300,7 @@
     line-height: 18px;
     color: #333333;
     padding: 15px 0 24px 0;
+    cursor: default;
 }
 .achievement-dialog.expires-txt.red {
     color: #FF333A;
@@ -293,7 +322,7 @@
 }
 .achievements-scroll .achievements-cell {
     display: table;
-    width: auto;
+    width: 100%;
     margin: 0 0 12px 0;
 }
 .achievements-scroll .achievements-cell.hidden {
@@ -331,7 +360,7 @@
     z-index: 1;
     vertical-align: top;
     text-align: center;
-    padding: 0 15px;
+    padding: 0 15px 32px 15px;
 }
 .achievements-scroll {
     max-height: 666px;
@@ -346,9 +375,9 @@
     top: 0;
     position: absolute;
     background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2Y3ZjdmNyIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmN2Y3ZjciIHN0b3Atb3BhY2l0eT0iMCIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
-background: -moz-linear-gradient(top, rgba(247,247,247,1) 0%, rgba(247,247,247,0) 100%);
-background: -webkit-linear-gradient(top, rgba(247,247,247,1) 0%,rgba(247,247,247,0) 100%);
-background: linear-gradient(to bottom, rgba(247,247,247,1) 0%,rgba(247,247,247,0) 100%);
+    background: -moz-linear-gradient(top, rgba(247,247,247,1) 0%, rgba(247,247,247,0) 100%);
+    background: -webkit-linear-gradient(top, rgba(247,247,247,1) 0%, rgba(247,247,247,0) 100%);
+    background: linear-gradient(to bottom, rgba(247,247,247,1) 0%, rgba(247,247,247,0) 100%);
     z-index: 10;
 }
 .achievements-list-dialog .acivements-content {
@@ -364,14 +393,16 @@ background: linear-gradient(to bottom, rgba(247,247,247,1) 0%,rgba(247,247,247,0
     color: #333333;
 }
 .achievement-dialog.right-block .reward {
-    margin: 0px 0 17px 10px;
+    margin: 0 0 17px 10px;
     min-width: 140px;
 }
 .achievement-dialog.right-block .reward i {
-    margin: -2px 0 0 0;
+    margin: -17px 0 0 0;
+    position: absolute;
+    top: 50%;
 }
 .achievement-dialog.right-block .reward-txt {
-    margin: -4px 0 0 13px;
+    margin: -4px 0 0 47px;
 }
 .achievements-cell-body .expires-txt {
     padding: 12px 0 0 0;
@@ -401,6 +432,7 @@ background: linear-gradient(to bottom, rgba(247,247,247,1) 0%,rgba(247,247,247,0
 }
 .one-reward .achievement-dialog.right-block {
     vertical-align: middle;
+    padding: 0 15px 0 15px;
 }
 .one-reward .achievement-dialog.right-block .reward {
     margin: 0px 0 4px 10px;
@@ -709,12 +741,12 @@ li.token-input-token-invite .input-close {
     margin-right: 8px;
 }
 .invitation-dialog.table-cell span.desc {
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     background-position: right -11445px;
     background-repeat: no-repeat;
 }
 .invitation-dialog.table-cell span.asc {
-    background-image: url(../images/mega/nw-fm-sprite_v20.svg);
+    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     background-position: right -11475px;
     background-repeat: no-repeat;
 }
@@ -755,7 +787,7 @@ li.token-input-token-invite .input-close {
 
 .fm-dialog.create-folder-dialog {
     width: 360px;
-    margin:-67px 0 0 -180px;
+    margin: -67px 0 0 -180px;
 }
 .fm-dialog.chat-rename-dialog {
     left: 50%;

@@ -8,7 +8,7 @@
  * you accept this licence. If you do not accept the licence,
  * do not access the code.
  *
- * Words used in the Mega Limited Terms of Service [https://mega.nz/#terms]
+ * Words used in the Mega Limited Terms of Service [https://mega.nz/terms]
  * have the same meaning in this licence. Where there is any inconsistency
  * between this licence and those Terms of Service, these terms prevail.
  *
@@ -890,8 +890,8 @@ var dlmanager = {
         fm_showoverlay();
         uiCheckboxes($dialog, 'ignoreLimitedBandwidth').removeClass('hidden');
 
-        $('.header-after-icon', $dialog).text(l[8943]);
-        $('.p-after-icon', $dialog).safeHTML(l[8944]);
+        $('.header-after-icon', $dialog).text(l[16164]);
+        $('.p-after-icon', $dialog).safeHTML(l[16165]);
 
         api_req({ a: 'log', e: 99617, m: 'qbq' });
 

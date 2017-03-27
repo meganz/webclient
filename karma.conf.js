@@ -177,6 +177,7 @@ module.exports = function(config) {
         '*.js': ['coverage'],
         'js/*.js': ['coverage'],
         'js/ui/*.js': ['coverage'],
+        'js/transfers/**/*.js': ['coverage'],
         'html/js/*.js': ['coverage'],
         'js/chat/**/!(bundle)*.js': ['coverage']
     },

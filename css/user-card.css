@@ -23,21 +23,18 @@
 	border-color: #13E03C;
 }
 .away.user-card-presence {
-	background-color: #FFD200;
-	border-color: #FFD200;
-}
-.busy.user-card-presence {
 	background-color: #FFA500;
 	border-color: #FFA500;
 }
-.offline.user-card-presence {
-	background-color: #666666;
-	border-color: #666666;
+.busy.user-card-presence {
+	background-color: #EB4444;
+	border-color: #EB4444;
 }
 .offline.user-card-presence {
 	background-color: #666666;
 	border-color: #666666;
 }
+
 .user-card-presence.big {
 	width: 16px;
 	height: 16px;
@@ -107,7 +104,7 @@
     -webkit-border-radius: 100%;
     border-radius: 100%;
     float: left;
-	background-image: url(../images/mega/new-chat-sprite-v3.svg);
+	background-image: url(../images/mega/new-chat-sprite-v5.svg);
     background-repeat: no-repeat;
     background-position: -7px -1353px;
     -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.1);
@@ -120,7 +117,10 @@
     right: -6px;
     top: -5px;
 }
+.small-rounded-avatar .avatar-letter {
+    color: white;
+}
 .user-card-verified.big {
 	border: 0;
-	background-position: -5px -1351px;
+	background-position: -7px -1353px;
 }

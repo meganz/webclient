@@ -336,7 +336,7 @@ function browserDownload() {
             dlmanager.isDownloading = true;
             dl_queue.push(fdl_queue_var);
         }
-        $.dlhash = window.location.hash;
+        $.dlhash = getSitePath();
     }
 }
 
@@ -413,7 +413,7 @@ function megasyncOverlay() {
 
     $('.megasync-info-txt a', $this).rebind('click', function(e) {
         $this.addClass('hidden');
-        document.location.hash = 'pro';
+        loadSubPage('pro');
     });
 
     $('.megasync-close, .fm-dialog-close', $this).rebind('click', function(e) {
@@ -535,8 +535,7 @@ function start_import()
     dl_import = dlpage_ph;
 
     if (u_type) {
-        document.location.hash = 'fm';
-
+        loadSubPage('fm');
         if (fminitialized) {
             importFile();
         }
@@ -566,7 +565,7 @@ function start_anoimport()
             u_type = r;
             u_checked=true;
             loadingDialog.hide();
-            document.location.hash = 'fm';
+            loadSubPage('fm');
         }
     },true);
 }
@@ -647,7 +646,7 @@ function sync_switchOS(os)
     }
     else if (os == 'linux')
     {
-        syncurl = '#sync';
+        syncurl = '/sync';
         var ostxt = 'For Linux';
         if (l[1158].indexOf('Windows') > -1) ostxt = l[1158].replace('Windows','Linux');
         if (l[1158].indexOf('Mac') > -1) ostxt = l[1158].replace('Mac','Linux');
@@ -655,15 +654,13 @@ function sync_switchOS(os)
         $('.sync-bottom-txt').safeHTML('Also available for <a href="" class="red windows">Windows</a> and <a href="" class="red mac">Mac</a>');
         $('.sync-button').removeClass('mac linux').addClass('linux');
         $('.sync-button').attr('href',syncurl);
-
     }
-    $('.sync-bottom-txt a').unbind('click');
-    $('.sync-bottom-txt a').bind('click',function(e)
+    $('.sync-bottom-txt a').rebind('click',function(e)
     {
         var c = $(this).attr('class');
         if (c && c.indexOf('windows') > -1) sync_switchOS('windows');
         else if (c && c.indexOf('mac') > -1) sync_switchOS('mac');
-        else if (c && c.indexOf('linux') > -1) document.location.hash = 'sync';
+        else if (c && c.indexOf('linux') > -1) loadSubPage('sync');
         return false;
     });
 }
@@ -779,7 +776,7 @@ var gifSlider = {
             {
                 name: 'video-chat',         // Name & CSS class of the GIF
                 animationLength: 12120,     // Length of the GIF animation in milliseconds
-                href: '#register',          // Page link you go to when clicked
+                href: '/blog_38',           // Page link you go to when clicked
                 title: 5875,                // Title for above the GIF shown in red
                 description: 5876,          // Description next to the title
                 imageSrc: null,             // The image path
@@ -788,7 +785,7 @@ var gifSlider = {
             {
                 name: 'sync-client',
                 animationLength: 12130,
-                href: '#sync',
+                href: '/sync',
                 title: 1626,
                 description: 1086,
                 imageSrc: null,
@@ -801,7 +798,7 @@ var gifSlider = {
             {
                 name: 'browser-extension-firefox',
                 animationLength: 12080,
-                href: '#firefox',
+                href: '/firefox',
                 title: 1088,
                 description: 1929,
                 imageSrc: null,
@@ -810,7 +807,7 @@ var gifSlider = {
             {
                 name: 'browser-extension-chrome',
                 animationLength: 12090,
-                href: '#chrome',
+                href: '/chrome',
                 title: 1088,
                 description: 1929,
                 imageSrc: null,
@@ -819,7 +816,7 @@ var gifSlider = {
             {
                 name: 'mobile-app',
                 animationLength: 15190,
-                href: '#mobile',
+                href: '/mobile',
                 title: 955,
                 description: 1930,
                 imageSrc: null,

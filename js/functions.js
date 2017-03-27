@@ -52,7 +52,7 @@ function parseHTML(markup, forbidStyle, doc, baseURI, isXML) {
                 baseURI = parseHTML.baseURIs[href];
             }
             // XXX: parseFragment() removes href attributes with a hash mask
-            markup = String(markup).replace(/\shref="#/g, ' data-fxhref="#');
+            markup = String(markup).replace(/\shref="[#\/]/g, ' data-fxhref="#');
             return mozParserUtils.parseFragment(markup, flags, Boolean(isXML),
                                                 baseURI, doc.documentElement);
         }
@@ -91,6 +91,20 @@ function parseHTMLfmt(markup) {
 }
 
 /**
+ * Handy printf-style parseHTML to apply escapeHTML
+ * @param {String} markup The HTML fragment to parse.
+ * @param {...*} var_args
+ */
+function parseHTMLfmt2(markup) {
+    if (arguments.length > 1) {
+        for (var idx = arguments.length; --idx > 0;) {
+            markup = markup.replace(RegExp('%' + idx, 'g'), escapeHTML(arguments[idx]));
+        }
+    }
+    return parseHTML(markup);
+}
+
+/**
  * Safely inject an HTML fragment using parseHTML()
  * @param {string} markup The HTML fragment to parse.
  * @param {...*} var_args
@@ -107,7 +121,12 @@ function parseHTMLfmt(markup) {
                     value: function $afeCall(markup) {
                         var i = 0;
                         var l = this.length;
-                        markup = parseHTMLfmt.apply(null, arguments);
+                        if (markup === '%n') {
+                            markup = parseHTMLfmt2.apply(null, toArray.apply(null, arguments).slice(1));
+                        }
+                        else {
+                            markup = parseHTMLfmt.apply(null, arguments);
+                        }
                         while (l > i) {
                             $(this[i++])[origFunc](markup.cloneNode(true));
                         }
@@ -120,7 +139,8 @@ function parseHTMLfmt(markup) {
                                         open(getAppBaseUrl() + $(this).data('fxhref'));
                                     }
                                     else {
-                                        location.hash = $(this).data('fxhref');
+
+                                        loadSubPage($(this).data('fxhref').replace('#', ''));
                                     }
                                 }
                             });
@@ -317,6 +337,9 @@ delay.cancel = function(aProcID) {
 };
 
 function jScrollFade(id) {
+    if (is_selenium) {
+        return;
+    }
 
     $(id + ' .jspTrack').rebind('mouseover', function(e) {
         $(this).find('.jspDrag').addClass('jspActive');
@@ -474,6 +497,13 @@ function populate_l() {
     if (lang === 'en') {
         l[1] = 'Go PRO';
     }
+
+    if (lang == 'en') l[509] = 'The Privacy Company';
+    else {
+        l[509] = l[509].toLowerCase();
+        l[509] = l[509].charAt(0).toUpperCase() + l[509].slice(1);
+    }
+
     l[8634] = l[8634].replace("[S]", "<span class='red'>").replace("[/S]", "</span>");
     l[8762] = l[8762].replace("[S]", "<span class='red'>").replace("[/S]", "</span>");
     l[438] = l[438].replace('[X]', '');
@@ -494,24 +524,25 @@ function populate_l() {
     l['472a'] = l[472].replace('[X]', 10);
     l['472b'] = l[472].replace('[X]', 100);
     l['472c'] = l[472].replace('[X]', 250);
-    l['208a'] = l[208].replace('[A]', '<a href="#terms" class="red">');
+    l['208a'] = l[208].replace('[A]', '<a href="/terms" class="red clickurl">');
     l['208a'] = l['208a'].replace('[/A]', '</a>');
-    l[208] = l[208].replace('[A]', '<a href="#terms">');
+    l[208] = l[208].replace('[A]', '<a href="/terms" class="clickurl">');
     l[208] = l[208].replace('[/A]', '</a>');
-    l[517] = l[517].replace('[A]', '<a href="#help">').replace('[/A]', '</a>');
-    l[521] = l[521].replace('[A]', '<a href="#copyright">').replace('[/A]', '</a>');
+    l[517] = l[517].replace('[A]', '<a href="/help" class="clickurl">').replace('[/A]', '</a>');
+    l[521] = l[521].replace('[A]', '<a href="/copyright" class="clickurl">').replace('[/A]', '</a>');
     l[553] = l[553].replace('[A]', '<a href="mailto:resellers@mega.nz">').replace('[/A]', '</a>');
-    l[555] = l[555].replace('[A]', '<a href="#terms">').replace('[/A]', '</a>');
+    l[555] = l[555].replace('[A]', '<a href="/terms" class="clickurl">').replace('[/A]', '</a>');
     l[754] = l[754].replace('[A]',
         '<a href="http://www.google.com/chrome" target="_blank" rel="noreferrer" style="color:#D9290B;">');
     l[754] = l[754].replace('[/A]', '</a>');
-    l[871] = l[871].replace('[B]',
-        '<strong>').replace('[/B]', '</strong>').replace('[A]', '<a href="#pro">').replace('[/A]', '</a>');
+    l[871] = l[871].replace('[B]', '<strong>')
+        .replace('[/B]', '</strong>')
+        .replace('[A]', '<a href="/pro" class="clickurl">').replace('[/A]', '</a>');
     l[924] = l[924].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[501] = l[501].replace('17', '').replace('%', '');
     l[1066] = l[1066].replace('[A]', '<a class="red">').replace('[/A]', '</a>');
     l[1067] = l[1067].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
-    l[1094] = l[1094].replace('[A]', '<a href="#plugin">').replace('[/A]', '</a>');
+    l[1094] = l[1094].replace('[A]', '<a href="/plugin" class="clickurl">').replace('[/A]', '</a>');
     l[1095] = l[1095].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[1133] = l[1133].replace('[A]',
         '<a href="http://en.wikipedia.org/wiki/Entropy" target="_blank" rel="noreferrer">').replace('[/A]', '</a>');
@@ -521,27 +552,27 @@ function populate_l() {
     l[1148] = l[1148].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[6978] = l[6978].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[1151] = l[1151].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
-    l[731] = l[731].replace('[A]', '<a href="#terms">').replace('[/A]', '</a>');
+    l[731] = l[731].replace('[A]', '<a href="/terms" class="clickurl">').replace('[/A]', '</a>');
     if (lang === 'en') {
         l[965] = 'Legal & policies';
     }
     l[1159] = l[1159].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[1171] = l[1171].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[1185] = l[1185].replace('[X]', '<strong>MEGA.crx</strong>');
-    l[1212] = l[1212].replace('[A]', '<a href="#sdk" class="red">').replace('[/A]', '</a>');
-    l[1274] = l[1274].replace('[A]', '<a href="#takedown">').replace('[/A]', '</a>');
-    l[1275] = l[1275].replace('[A]', '<a href="#copyright">').replace('[/A]', '</a>');
+    l[1212] = l[1212].replace('[A]', '<a href="/sdk" class="red clickurl">').replace('[/A]', '</a>');
+    l[1274] = l[1274].replace('[A]', '<a href="/takedown" class="clickurl">').replace('[/A]', '</a>');
+    l[1275] = l[1275].replace('[A]', '<a href="/copyright" class="clickurl">').replace('[/A]', '</a>');
     l[1201] = l[1201].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[1208] = l[1208].replace('[B]', '<strong>').replace('[/B]', '</strong>');
     l[1915] = l[1915].replace('[A]',
         '<a class="red" href="https://chrome.google.com/webstore/detail/mega/bigefpfhnfcobdlfbedofhhaibnlghod" target="_blank" rel="noreferrer">')
             .replace('[/A]', '</a>');
-    l[1936] = l[1936].replace('[A]', '<a href="#backup">').replace('[/A]', '</a>');
-    l[1942] = l[1942].replace('[A]', '<a href="#backup">').replace('[/A]', '</a>');
+    l[1936] = l[1936].replace('[A]', '<a href="/backup" class="clickurl">').replace('[/A]', '</a>');
+    l[1942] = l[1942].replace('[A]', '<a href="/backup" class="clickurl">').replace('[/A]', '</a>');
     l[1943] = l[1943].replace('[A]', '<a href="mailto:support@mega.nz">').replace('[/A]', '</a>');
     l[1948] = l[1948].replace('[A]', '<a href="mailto:support@mega.nz">').replace('[/A]', '</a>');
-    l[1957] = l[1957].replace('[A]', '<a href="#recovery">').replace('[/A]', '</a>');
-    l[1965] = l[1965].replace('[A]', '<a href="#recovery">').replace('[/A]', '</a>');
+    l[1957] = l[1957].replace('[A]', '<a href="/recovery" class="clickurl">').replace('[/A]', '</a>');
+    l[1965] = l[1965].replace('[A]', '<a href="/recovery" class="clickurl">').replace('[/A]', '</a>');
     l[1982] = l[1982].replace('[A]', '<font style="color:#D21F00;">').replace('[/A]', '</font>');
     l[1993] = l[1993].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[122] = l[122].replace('five or six hours', '<span class="red">five or six hours</span>');
@@ -550,10 +581,10 @@ function populate_l() {
     l[8427] = l[8427].replace('[S]', '<span class="red">').replace('[/S]', '</span>');
     l[8428] = l[8428].replace('[A]', '<a class="red">').replace('[/A]', '</a>');
     l[8440] = l[8440].replace('[A]', '<a href="https://github.com/meganz/">').replace('[/A]', '</a>');
-    l[8440] = l[8440].replace('[A2]', '<a href="#contact">').replace('[/A2]', '</a>');
+    l[8440] = l[8440].replace('[A2]', '<a href="/contact" class="clickurl">').replace('[/A2]', '</a>');
     l[8441] = l[8441].replace('[A]', '<a href="mailto:bugs@mega.nz">').replace('[/A]', '</a>');
-    l[8441] = l[8441].replace('[A2]', '<a href="https://mega.nz/#blog_8">').replace('[/A2]', '</a>');
-    l[5931] = l[5931].replace('[A]', '<a class="red" href="#fm/account">').replace('[/A]', '</a>');
+    l[8441] = l[8441].replace('[A2]', '<a href="https://mega.nz/blog_8">').replace('[/A2]', '</a>');
+    l[5931] = l[5931].replace('[A]', '<a class="red" href="/fm/account" class="clickurl">').replace('[/A]', '</a>');
     l[8644] = l[8644].replace('[S]', '<span class="green">').replace('[/S]', '</span>');
     l[8651] = l[8651].replace('%1', '<span class="header-pro-plan"></span>');
     l[8653] = l[8653].replace('[S]', '<span class="renew-text">').replace('[/S]', '</span>');
@@ -573,7 +604,6 @@ function populate_l() {
     l[8849] = l[8849].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[1389] = l[1389].replace('[B]', '').replace('[/B]', '').replace('[A]', '<span>').replace('[/A]', '</span>');
     l[8912] = l[8912].replace('[B]', '<span>').replace('[/B]', '</span>');
-    l[8944] = l[8944].replace('[BR]', '<br>').replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8846] = l[8846].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8847] = l[8847].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8950] = l[8950].replace('[S]', '<span>').replace('[/S]', '</span>');
@@ -581,16 +611,16 @@ function populate_l() {
     l[8952] = l[8952].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[9030] = l[9030].replace('[S]', '<strong>').replace('[/S]', '</strong>');
     l[9036] = l[9036].replace('[S]', '<strong>').replace('[/S]', '</strong>');
-    l[10631] = l[10631].replace('[A]', '<a href="#general" target="_blank">').replace('[/A]', '</a>');
-    l[10630] = l[10630].replace('[A]', '<a href="#general" target="_blank">').replace('[/A]', '</a>');
-    l[10634] = l[10634].replace('[A]', '<a href="#support" target="_blank">').replace('[/A]', '</a>');
+    l[10631] = l[10631].replace('[A]', '<a href="/general" class="clickurl" target="_blank">').replace('[/A]', '</a>');
+    l[10630] = l[10630].replace('[A]', '<a href="/general" class="clickurl" target="_blank">').replace('[/A]', '</a>');
+    l[10634] = l[10634].replace('[A]', '<a href="/support" class="clickurl" target="_blank">').replace('[/A]', '</a>');
     l[10635] = l[10635].replace('[B]', '"<b>').replace('[/B]', '</b>"');
     l[10636] = l[10636].replace('[A]', '<a href="mailto:support@mega.nz">').replace('[/A]', '</a>').replace('%1', 2);
     l[10644] = l[10644].replace('[A]', '<a href="mailto:support@mega.nz">').replace('[/A]', '</a>');
-    l[10646] = l[10646].replace('[A]', '<a href="#account">').replace('[/A]', '</a>');
-    l[10650] = l[10650].replace('[A]', '<a href="#account">').replace('[/A]', '</a>');
+    l[10646] = l[10646].replace('[A]', '<a href="/account" class="clickurl">').replace('[/A]', '</a>');
+    l[10650] = l[10650].replace('[A]', '<a href="/account" class="clickurl">').replace('[/A]', '</a>');
     l[10656] = l[10656].replace('[A]', '<a href="mailto:support@mega.nz">').replace('[/A]', '</a>');
-    l[10658] = l[10658].replace('[A]', '<a href="#terms">').replace('[/A]', '</a>');
+    l[10658] = l[10658].replace('[A]', '<a href="/terms" class="clickurl">').replace('[/A]', '</a>');
     l[12482] = l[12482].replace('[B]', '<b>').replace('[/B]', '</b>');
     l[12483] = l[12483].replace('[BR]', '<br>');
     l[12485] = l[12485].replace('[A1]', '<a href="" class="red mac">').replace('[/A1]', '</a>');
@@ -607,14 +637,26 @@ function populate_l() {
     l[16116] = l[16116].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[16119] = l[16119].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[16120] = l[16120].replace('[S]', '<span>').replace('[/S]', '</span>');
-    l[16123] = l[16123].replace('[S]', '<span>').replace('[/S]', '</span>').replace('[A]', '<a href="#pro">').replace('[/A]', '</a>').replace('[BR]', '<br />');
-    l[16124] = l[16124].replace('[S]', '<span>').replace('[/S]', '</span>').replace('[A]', '<a href="#pro">').replace('[/A]', '</a>').replace('[BR]', '<br />');
+    l[16123] = l[16123].replace('[S]', '<span>').replace('[/S]', '</span>').replace('[A]', '<a href="/pro">').replace('[/A]', '</a>').replace('[BR]', '<br />');
+    l[16124] = l[16124].replace('[S]', '<span>').replace('[/S]', '</span>').replace('[A]', '<a href="/pro">').replace('[/A]', '</a>').replace('[BR]', '<br />');
     l[16135] = l[16135].replace('[BR]', '<br />');
-    l[16136] = l[16136].replace('[A]', '<a href="#pro">').replace('[/A]', '</a>');
-    l[16137] = l[16137].replace('[A]', '<a href="#pro">').replace('[/A]', '</a>');
-    l[16138] = l[16138].replace('[A]', '<a href="#pro">').replace('[/A]', '</a>');
-    l[16164] = l[16164].replace('[S]', '<a class="red">').replace('[/S]', '</a>').replace('[BR]', '<br/>');
-    l[16167] = l[16167].replace('[S]', '<a href="#mobile page">').replace('[/S]', '</a>');
+    l[16136] = l[16136].replace('[A]', '<a href="/pro">').replace('[/A]', '</a>');
+    l[16137] = l[16137].replace('[A]', '<a href="/pro">').replace('[/A]', '</a>');
+    l[16138] = l[16138].replace('[A]', '<a href="/pro">').replace('[/A]', '</a>');
+    l[16165] = l[16165].replace('[S]', '<a class="red">').replace('[/S]', '</a>').replace('[BR]', '<br/>');
+    l[16167] = l[16167].replace('[S]', '<a href="/mobile" class="clickurl">').replace('[/S]', '</a>');
+    l[16389] = l[16389].replace(
+                 '%1',
+                 '<span class="checkdiv checkboxOn autoaway">' +
+                     '<input type="checkbox" name="set-auto-away" id="set-auto-away" class="checkboxOn" checked="">' +
+                 '</span>'
+               )
+               .replace(
+                 '%2',
+                 '<span class="account-counter-number short">' +
+                     '<input type="text" value="5" id="autoaway" />' +
+                 '</span>'
+               );
 
     l['year'] = new Date().getFullYear();
     date_months = [
@@ -655,19 +697,6 @@ function divscroll(el) {
     if (page === 'start') {
         start_menu(el);
     }
-}
-
-function removeHash() {
-    var scrollV, scrollH, loc = window.location;
-
-    // Prevent scrolling by storing the page's current scroll offset
-    scrollV = document.body.scrollTop;
-    scrollH = document.body.scrollLeft;
-    loc.hash = "";
-
-    // Restore the scroll offset, should be flicker free
-    document.body.scrollTop = scrollV;
-    document.body.scrollLeft = scrollH;
 }
 
 function browserdetails(useragent) {
@@ -880,6 +909,13 @@ function browserdetails(useragent) {
     else {
         details.engine = 'Unknown';
     }
+
+    // Product info to quickly access relevant info.
+    details.prod = details.name + ' [' + details.engine + ']'
+        + (details.brand ? '[' + details.brand + ']' : '')
+        + '[' + details.version + ']'
+        + (details.isExtension ? '[E:' + details.isExtension + ']' : '')
+        + '[' + (details.is64bit ? 'x64' : 'x32') + ']';
 
     return details;
 }
@@ -2166,6 +2202,10 @@ function CreateWorkers(url, message, size) {
         }
     }
 
+    if (!is_karma && !is_extension) {
+        url = '/' + url;
+    }
+
     function create(i) {
         var w;
 
@@ -2256,14 +2296,14 @@ function mKeyDialog(ph, fl, keyr) {
             // Remove the ! from the key which is exported from the export dialog
             key = key.replace('!', '');
 
-            var newHash = (fl ? '#F!' : '#!') + ph + '!' + key;
+            var newHash = (fl ? '/F!' : '/!') + ph + '!' + key;
 
-            if (location.hash !== newHash) {
+            if (getSitePath() !== newHash) {
                 promise.resolve(key);
 
                 fm_hideoverlay();
                 $('.fm-dialog.dlkey-dialog').addClass('hidden');
-                location.hash = newHash;
+                loadSubPage(newHash);
             }
         }
         else {
@@ -3381,9 +3421,11 @@ mega.utils.execCommandUsable = function() {
  * @param key {String|Function} the name of the property that will be used for the sorting OR a func that will return a
  * dynamic value for the object
  * @param [order] {Number} 1 for asc, -1 for desc sorting
+ * @param [alternativeFn] {Function} Optional function to be used for comparison of A and B if both are equal or
+ *      undefined
  * @returns {Function}
  */
-mega.utils.sortObjFn = function(key, order) {
+mega.utils.sortObjFn = function(key, order, alternativeFn) {
     if (!order) {
         order = 1;
     }
@@ -3392,43 +3434,76 @@ mega.utils.sortObjFn = function(key, order) {
         var currentOrder = tmpOrder ? tmpOrder : order;
 
         if ($.isFunction(key)) {
-            a = key(a);
-            b = key(b);
+            aVal = key(a);
+            bVal = key(b);
         }
         else {
-            a = a[key];
-            b = b[key];
+            aVal = a[key];
+            bVal = b[key];
         }
 
-        if (typeof a == 'string' && typeof b == 'string') {
-            return a.localeCompare(b) * currentOrder;
+        if (typeof aVal === 'string' && typeof bVal === 'string') {
+            return aVal.localeCompare(bVal) * currentOrder;
         }
-        else if (typeof a == 'string' && typeof b == 'undefined') {
+        else if (typeof aVal === 'string' && typeof bVal === 'undefined') {
             return 1 * currentOrder;
         }
-        else if (typeof a == 'undefined' && typeof b == 'string') {
+        else if (typeof aVal === 'undefined' && typeof bVal === 'string') {
             return -1 * currentOrder;
         }
-        else if (typeof a == 'number' && typeof b == 'undefined') {
+        else if (typeof aVal === 'number' && typeof bVal === 'undefined') {
             return 1 * currentOrder;
         }
-        else if (typeof a == 'undefined' && typeof b == 'number') {
+        else if (typeof aVal === 'undefined' && typeof bVal === 'number') {
             return -1 * currentOrder;
         }
-        else if (typeof a == 'number' && typeof b == 'number') {
-            var _a = a || 0;
-            var _b = b || 0;
+        else if (typeof aVal === 'undefined' && typeof bVal === 'undefined') {
+            if (alternativeFn) {
+                return alternativeFn(a, b, currentOrder);
+            }
+            else {
+                return -1 * currentOrder;
+            }
+        }
+        else if (typeof aVal === 'number' && typeof bVal === 'number') {
+            var _a = aVal || 0;
+            var _b = bVal || 0;
             if (_a > _b) {
                 return 1 * currentOrder;
             }
             if (_a < _b) {
                 return -1 * currentOrder;
             } else {
-                return 0;
+                if (alternativeFn) {
+                    return alternativeFn(a, b, currentOrder);
+                }
+                else {
+                    return 0;
+                }
             }
         }
         else return 0;
     };
+};
+
+
+/**
+ * This is an utility function that would simply do a localCompare OR use Intl.Collator for comparing 2 strings.
+ *
+ * @param stringA {String} String A
+ * @param stringB {String} String B
+ * @param direction {Number} -1 or 1, for inversing the direction for sorting (which is most of the cases)
+ * @returns {Number}
+ */
+mega.utils.compareStrings = function megaUtilsCompareStrings(stringA, stringB, direction) {
+
+    if (typeof Intl !== 'undefined' && Intl.Collator) {
+        var intl = new Intl.Collator('co', { numeric: true });
+        return intl.compare(stringA || '', stringB || '') * direction;
+    }
+    else {
+        return (stringA || '').localeCompare(stringB || '') * direction;
+    }
 };
 
 /**
@@ -3660,7 +3735,7 @@ mega.utils.reload = function megaUtilsReload() {
             u_storage.sid = u_sid;
             u_storage.privk = privk;
             u_storage.k = u_key;
-            u_storage.wasloggedin = true;
+            localStorage.wasloggedin = true;
         }
 
         if (debug) {
@@ -3672,14 +3747,18 @@ mega.utils.reload = function megaUtilsReload() {
                 if (!is_extension && jj)  {
                     localStorage.jj = jj;
                 }
-                if (mcd) {
-                    localStorage.testChatDisabled = 1;
-                }
             }
             if (apipath) {
                 // restore api path across reloads, only for debugging purposes...
                 localStorage.apipath = apipath;
             }
+        }
+
+        if (mcd) {
+            localStorage.testChatDisabled = 1;
+        }
+        if (hashLogic) {
+            localStorage.hashLogic = 1;
         }
 
         localStorage.force = true;
@@ -3970,6 +4049,11 @@ mega.utils.logout = function megaUtilsLogout() {
             step++;
             fmdb.drop().always(finishLogout);
         }
+        if (!megaChatIsDisabled) {
+            if (typeof(megaChat) !== 'undefined' && typeof(megaChat.userPresence) !== 'undefined') {
+                megaChat.userPresence.disconnect();
+            }
+        }
         if (u_privk && !loadfm.loading) {
             // Use the 'Session Management Logout' API call to kill the current session
             api_req({ 'a': 'sml' }, { callback: finishLogout });
@@ -4258,7 +4342,7 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
     function _init() {
         // if (d) console.log('Initializing Rubbish-Bin Cleaning Scheduler');
 
-        updId = mBroadcaster.addListener('fmconfig:rubsched', _update);
+        // updId = mBroadcaster.addListener('fmconfig:rubsched', _update);
         if (fmconfig.rubsched) {
             timer = setInterval(function() {
                 _proc();
@@ -4838,10 +4922,16 @@ function passwordManager(form) {
     }
     $(form).rebind('submit', function() {
         setTimeout(function() {
-            var path  = document.location.pathname;
-            var title = document.title;
+            var path  = getSitePath();
             history.replaceState({ success: true }, '', "index.html#" + document.location.hash.substr(1));
-            history.replaceState({ success: true }, '', path + "#" + document.location.hash.substr(1));
+            if (hashLogic) {
+                path = getSitePath().replace('/', '/#');
+
+                if (location.href.substr(0, 19) === 'chrome-extension://') {
+                    path = path.replace('/#', '/mega/secure.html#');
+                }
+            }
+            history.replaceState({ success: true, subpage: path.replace('#','').replace('/','') }, '', path);
             $(form).find('input').val('');
         }, 1000);
         return false;
@@ -5365,6 +5455,10 @@ function getGatewayName(gatewayId, gatewayOpt) {
             name: 'ecp',                    // E-Comprocessing
             displayName: l[6952] + ' (ECP)' // Credit card (ECP)
         },
+        17: {
+            name: 'sabadell',
+            displayName: 'Sabadell'
+        },
         999: {
             name: 'wiretransfer',
             displayName: l[6198]    // Wire transfer
@@ -5460,13 +5554,15 @@ mega.utils.redirectToApp = function($selector) {
         redirect();
     }
     else {
+        var path = getSitePath().substr(1);
+
         switch (ua.details.os) {
             case 'Windows Phone':
-                window.location = "mega://" + location.hash.substr(1);
+                window.location = "mega://" + path;
                 break;
 
             case 'Android':
-                var intent = 'intent://' + location.hash
+                var intent = 'intent://#' + path
                     + '/#Intent;scheme=mega;package=mega.privacy.android.app;end';
                 document.location = intent;
                 break;

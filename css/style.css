@@ -942,24 +942,27 @@ a.account-manage-button:hover {
     padding: 0 0 16px 0;
 }
 .account-counter-number input {
-    background-color: white;
+    background-color: rgba(0,0,0,0.05);
     width: 100%;
     outline: none;
     font-size: 14px;
-    color: #868686;
+    color: #333333;
+    border: 0;
     margin: 0;
-    border: 1px solid #d9d9d9;
     text-align: center;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     height: 32px;
-    line-height: 25px;
+    line-height: 27px;
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
     border-radius: 5px;
     text-align: center;
     box-sizing: border-box;
     padding: 0 10px;
+}
+.account-counter-number.short input {
+    padding: 0 3px;
 }
 .account-counter-percents {
     float: left;
@@ -1191,8 +1194,10 @@ a.account-manage-button:hover {
 }
 .account-counter-number {
     width: 60px;
-    padding: 0 12px 0 8px;
-    margin-top: 1px;
+    margin: 0 12px 0 -23px;
+}
+.account-counter-number.short {
+    width: 38px;
 }
 div.radioOn, div.radioOff {
     float: left;
@@ -4320,10 +4325,10 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     background-color: #13E03C;
 }
 .away .nw-contact-status, .away .properties-contact-status {
-    background-color: #FFD200;
+    background-color: #FFA500;
 }
 .busy .nw-contact-status, .busy .properties-contact-status {
-    background-color: #FFA500;
+    background-color: #EB4444;
 }
 .offline .nw-contact-status, .offline .properties-contact-status {
     background-color: #666666;
@@ -5017,6 +5022,16 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     -moz-box-shadow: 0px 0px 0px 2px #13E03C;
     box-shadow: 0px 0px 0px 2px #13E03C;
 }
+.activity-status.top.away:hover::before, .active .activity-status.top.away::before {
+    -webkit-box-shadow: 0px 0px 0px 2px #FFA500;
+    -moz-box-shadow: 0px 0px 0px 2px #FFA500;
+    box-shadow: 0px 0px 0px 2px #FFA500;
+}
+.activity-status.top.busy:hover::before, .active .activity-status.top.busy::before {
+    -webkit-box-shadow: 0px 0px 0px 2px #EB4444;
+    -moz-box-shadow: 0px 0px 0px 2px #EB4444;
+    box-shadow: 0px 0px 0px 2px #EB4444;
+}
 .activity-status.top.offline:hover::before, .active .activity-status.top.offline::before {
     -webkit-box-shadow: 0px 0px 0px 2px #666666;
     -moz-box-shadow: 0px 0px 0px 2px #666666;
@@ -5037,6 +5052,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     width: 8px;
     display: inline-block;
     margin: 0px 8px 0 -2px;
+    -webkit-box-shadow: 0px 0px 0px 2px transparent;
+    -moz-box-shadow: 0px 0px 0px 2px transparent;
+    box-shadow: 0px 0px 0px 2px transparent;
 }
 .contact-status {
     float: left;
@@ -5057,10 +5075,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     background-color: #13E03C;
 }
 .activity-status.away, .contact-status.away-status {
-    background-color: #FFD200;
+    background-color: #FFA500;
 }
 .activity-status.busy, .contact-status.busy-status {
-    background-color: #FFA500;
+    background-color: #EB4444;
 }
 .activity-status.offline, .contact-status.offline-status {
     background-color: #666666;
@@ -5069,7 +5087,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     background-color: black;
 }
 .dropdown-item:hover .activity-status {
-    background-color: white;
+    -webkit-box-shadow: 0px 0px 0px 2px #FFFFFF;
+    -moz-box-shadow: 0px 0px 0px 2px #FFFFFF;
+    box-shadow: 0px 0px 0px 2px #FFFFFF;
 }
 .membership-status-block {
     float: right;
@@ -10954,15 +10974,15 @@ table {
 }
 .account.tab-content {
     position: relative;
-    height: -webkit-calc(100% - 38px);
-    height: -moz-calc(100% -38px);
-    height: calc(100% - 38px);
+    height: -webkit-calc(100% - 37px);
+    height: -moz-calc(100% -37px);
+    height: calc(100% - 37px);
     background-color: white;
 }
 .account.tabs-bl {
     background-color: #fafafa;
     border-bottom: 1px solid #eaeaea;
-    padding: 6px 16px 0 12px;
+    padding: 5px 16px 0 12px;
 }
 .account.tabs-bl .default-grey-button {
     margin-top: 1px;
@@ -11012,6 +11032,26 @@ table {
 }
 .account.radio-buttons {
     padding: 9px 0 22px 0;/*width: 530px;*/
+}
+.account.radio-buttons .text-with-inputs {
+    padding-top: 0;
+}
+.account.radio-buttons .text-with-inputs .checkdiv {
+    float: none;
+    display: inline-block;
+    margin: 0px 10px -3px 20px;
+}
+.account.radio-buttons .text-with-inputs .account-counter-number {
+    float: none;
+    display: inline-block;
+    margin: 0 10px -10px 10px;
+}
+.account.radio-buttons hr {
+    clear: both;
+    padding: 12px 0 0 0;
+    margin: 0;
+    border:0;
+    height: autol
 }
 .account.radio-buttons.bottom-pad {
     padding-bottom: 41px;
@@ -14557,7 +14597,7 @@ body.de .reg-st3-bandwidth .reg-st3-mid-txt, body.br .reg-st3-bandwidth .reg-st3
     margin-right: 4px;
 }
 .provider-icon {
-    background-image: url("../images/mega/payment-provider-icons-v2.png");
+    background-image: url("../images/mega/payment-provider-icons-v3.png");
     background-position: 0 0;
     background-repeat: no-repeat;
     display: inline-block;
@@ -14780,6 +14820,15 @@ body.de .reg-st3-bandwidth .reg-st3-mid-txt, body.br .reg-st3-bandwidth .reg-st3
 }
 .provider-icon.directresellerAlipay {
     background-position: 0 -4020px;
+}
+.provider-icon.sabadell {
+    background-position: 0 -4080px;
+}
+.provider-icon.sabadellVI {
+    background-position: 0 -3360px;
+}
+.provider-icon.sabadellMC {
+    background-position: 0 -1980px;
 }
 .membership-new-offer text {
     font-weight: normal;

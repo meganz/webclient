@@ -355,6 +355,7 @@ var dlmanager = {
 
                     dlmanager.isOverQuota = false;
                     dlmanager.isOverFreeQuota = false;
+                    $('.limited-bandwidth-dialog .fm-dialog-close').trigger('click');
                     return ctx.next(false, res, attr, ctx.object);
                 }
             }
@@ -676,7 +677,7 @@ var dlmanager = {
         this.setUserFlags();
 
         var ids = dlmanager.getCurrentDownloads();
-        $('.limited-bandwidth-dialog .fm-dialog-close').trigger('click');
+        // $('.limited-bandwidth-dialog .fm-dialog-close').trigger('click');
 
         if (this.onOverquotaWithAchievements) {
             closeDialog();
@@ -1035,6 +1036,11 @@ var dlmanager = {
 
         if ($dialog.is(':visible')) {
             this.logger.info('showOverQuotaDialog', 'visible already.');
+            return;
+        }
+
+        if ($('.fm-dialog.achievements-list-dialog').is(':visible')) {
+            this.logger.info('showOverQuotaDialog', 'Achievements dialog visible.');
             return;
         }
 

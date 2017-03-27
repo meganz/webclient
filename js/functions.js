@@ -695,6 +695,9 @@ function populate_l() {
                      '<input type="text" value="5" id="autoaway" />' +
                  '</span>'
                );
+    //l[16390] = l[16390].replace('[S]', '<span class="red">').replace('[/S]', '</span>');
+    //l[16391] = l[16391].replace('[S]', '<span class="red">').replace('[/S]', '</span>');
+    //l[16392] = l[16392].replace('[S]', '<span class="red">').replace('[/S]', '</span>');
 
     var common = [
         15536, 16106, 16107, 16116, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138,

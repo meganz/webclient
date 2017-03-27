@@ -104,7 +104,7 @@ Chatd.Opcode = {
     'KEYID' : 18,
     'JOINRANGEHIST' : 19,
     'MSGUPDX' : 20,
-    'MSGID' : 21,
+    'MSGID' : 21
 };
 
 // privilege levels
@@ -466,6 +466,7 @@ Chatd.Shard.prototype.clearpending = function() {
 
 Chatd.Shard.prototype.restore = function() {
     var self = this;
+    console.error('restore for: ', this.chatIds);
     for (var chatId in this.chatIds) {
         self.chatd.chatIdMessages[chatId].restore();
     }

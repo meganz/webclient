@@ -200,8 +200,6 @@ Chatd.Shard = function(chatd, shard) {
 
     self.keepAliveTimer = null;
 
-    self.needRestore = true;
-
     self.destroyed = false;
 
     self.connectionRetryManager = new ConnectionRetryManager(
@@ -464,11 +462,11 @@ Chatd.Shard.prototype.clearpending = function() {
     }
 };
 
-Chatd.Shard.prototype.restore = function() {
+Chatd.Shard.prototype.restoreIfNeeded = function(chatId) {
     var self = this;
-    console.error('restore for: ', this.chatIds);
-    for (var chatId in this.chatIds) {
+    if (self.chatd.chatIdMessages[chatId] && self.chatd.chatIdMessages[chatId].needsRestore) {
         self.chatd.chatIdMessages[chatId].restore();
+        self.chatd.chatIdMessages[chatId].needsRestore = false;
     }
 };
 
@@ -755,10 +753,7 @@ Chatd.Shard.prototype.exec = function(a) {
             case Chatd.Opcode.HISTDONE:
                 self.keepAliveTimerRestart();
                 self.logger.log("History retrieval finished: " + base64urlencode(cmd.substr(1,8)));
-                if (self.needRestore) {
-                    self.restore();
-                    self.needRestore = false;
-                }
+                self.restoreIfNeeded(cmd.substr(1,8));
 
                 self.chatd.trigger('onMessagesHistoryDone',
                     {
@@ -989,6 +984,8 @@ Chatd.Messages = function(chatd, chatId) {
     this.sendingList = [];
     // expired message list
     this.expired = {};
+
+    this.needsRestore = true;
 };
 
 Chatd.Messages.prototype.submit = function(messages, keyId) {

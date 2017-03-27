@@ -1,8 +1,6 @@
 /**
  * Shared, Local Key Value Storage.
  * To be used for storing local (non-api persisted data, mostly non-critical data).
- * Note: https://bugs.chromium.org/p/chromium/issues/detail?id=675372 eventual 2-3s delay may happen between a
- * setItem, getItem, keys, removeItem, etc promises are resolved.
  *
  * @param name {String}
  * @param manualFlush {bool} by default disabled, note: NOT tested/used yet.
@@ -95,9 +93,8 @@ var SharedLocalKVStorage = function(name, manualFlush, broadcaster) {
 /**
  * Worst case scenario of an inactive tab, that is heavily throttled by Chrome, so we need to set the query time out
  * when running in realworld cases to a bit higher value.
- * Read more: https://bugs.chromium.org/p/chromium/issues/detail?id=675372;
  */
-SharedLocalKVStorage.DEFAULT_QUERY_TIMEOUT = is_karma ? 100 : (
+SharedLocalKVStorage.DEFAULT_QUERY_TIMEOUT = (
     window.chrome ? 10000 : 1000
 );
 

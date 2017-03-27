@@ -1,14 +1,4 @@
 describe("SharedLocalKVStorage Unit Test", function() {
-    // DON'T RUN THOSE TEST ON CHROME, until https://bugs.chromium.org/p/chromium/issues/detail?id=675372 gets fixed
-
-    if (window.chrome && document.hidden) {
-        console.error(
-            "Detected Google Chrome with an inactive tab/window. Halting SLKVStorage tests, because of:",
-            "https://bugs.chromium.org/p/chromium/issues/detail?id=675372"
-        );
-        return;
-    }
-
     localStorage.SharedLocalKVStorageDebug = 1;
 
     var shouldDropDatabases = [];
@@ -159,7 +149,7 @@ describe("SharedLocalKVStorage Unit Test", function() {
 
         pq.whenFinished(function() {
             promiseHelpers.testWaitForAllPromises(function() {
-                (new SharedLocalKVStorage.Utils.DexieStorage("test1", false, "whatever")).destroy().always(function() {
+                (new SharedLocalKVStorage.Utils.DexieStorage("test2", false, "whatever")).destroy().always(function() {
                     done();
                 });
             });
@@ -206,7 +196,7 @@ describe("SharedLocalKVStorage Unit Test", function() {
                 var rej = function() { promise.reject(arguments); };
                 var res = function() { promise.resolve(arguments); };
 
-                var dexieStorage = new SharedLocalKVStorage.Utils.DexieStorage("test1", false, "whatever");
+                var dexieStorage = new SharedLocalKVStorage.Utils.DexieStorage("test2", false, "whatever");
 
                 var allInserts = [];
                 dexieStorage.clear().always(function() {
@@ -228,7 +218,7 @@ describe("SharedLocalKVStorage Unit Test", function() {
 
                             setTimeout(function() {
                                 // reopen
-                                dexieStorage = new SharedLocalKVStorage.Utils.DexieStorage("test1", false, "whatever");
+                                dexieStorage = new SharedLocalKVStorage.Utils.DexieStorage("test2", false, "whatever");
 
                                 promiseHelpers.expectPromiseToBeResolved(
                                     dexieStorage.keys(),
@@ -236,7 +226,7 @@ describe("SharedLocalKVStorage Unit Test", function() {
                                 )
                                     .fail(rej)
                                     .always(function() {
-                                        dexieStorage.clear().always(res);
+                                        dexieStorage.destroy().always(res);
                                     });
                             }, 300);
                         });
@@ -250,7 +240,7 @@ describe("SharedLocalKVStorage Unit Test", function() {
     });
 
     it("basic single master set -> get item test", function(done) {
-        var kvStorage = new SharedLocalKVStorage.Utils.DexieStorage("test1");
+        var kvStorage = new SharedLocalKVStorage.Utils.DexieStorage("test3");
         dropOnFinished(kvStorage);
         kvStorage.setItem('test', 'test123').dumpToConsole("test=test123");
 
@@ -260,7 +250,7 @@ describe("SharedLocalKVStorage Unit Test", function() {
     });
 
     it("basic single master set -> remove -> {getItem - fail, removeItem - fail} test", function(done) {
-        var kvStorage = new SharedLocalKVStorage.Utils.DexieStorage("test1");
+        var kvStorage = new SharedLocalKVStorage.Utils.DexieStorage("test4");
         dropOnFinished(kvStorage);
 
         kvStorage.setItem('test', 'test123');
@@ -274,12 +264,12 @@ describe("SharedLocalKVStorage Unit Test", function() {
 
 
     it("basic single master - open -> set -> close -> get (persistence test)", function(done) {
-        var kvStorage = new SharedLocalKVStorage.Utils.DexieStorage("test1");
+        var kvStorage = new SharedLocalKVStorage.Utils.DexieStorage("test5");
         kvStorage.setItem('test', 'test123')
             .done(function() {
                 kvStorage.close();
 
-                var kvStorage2 = new SharedLocalKVStorage.Utils.DexieStorage("test1");
+                var kvStorage2 = new SharedLocalKVStorage.Utils.DexieStorage("test5");
                 dropOnFinished(kvStorage2);
 
                 promiseHelpers.expectPromiseToBeResolved(
@@ -294,7 +284,7 @@ describe("SharedLocalKVStorage Unit Test", function() {
 
 
     it("comprehensive single master test", function(done) {
-        var kvStorage = new SharedLocalKVStorage.Utils.DexieStorage("test1");
+        var kvStorage = new SharedLocalKVStorage.Utils.DexieStorage("test6");
         dropOnFinished(kvStorage);
 
         kvStorage.setItem("test", "test1");
@@ -331,7 +321,7 @@ describe("SharedLocalKVStorage Unit Test", function() {
     });
 
     it("basic single master test - clear (async)", function(done) {
-        var kvStorage = new SharedLocalKVStorage.Utils.DexieStorage("test1");
+        var kvStorage = new SharedLocalKVStorage.Utils.DexieStorage("test7");
 
         dropOnFinished(kvStorage);
 
@@ -351,7 +341,7 @@ describe("SharedLocalKVStorage Unit Test", function() {
     });
 
     it("basic single master test - clear (sync)", function(done) {
-        var kvStorage = new SharedLocalKVStorage.Utils.DexieStorage("test1");
+        var kvStorage = new SharedLocalKVStorage.Utils.DexieStorage("test8");
 
         dropOnFinished(kvStorage);
 
@@ -386,7 +376,7 @@ describe("SharedLocalKVStorage Unit Test", function() {
         connector.addTab(broadcaster);
         connector.setMaster("tab1");
 
-        var sharedLocalKvInstance = new SharedLocalKVStorage("test1", false, broadcaster);
+        var sharedLocalKvInstance = new SharedLocalKVStorage("test9", false, broadcaster);
 
         dropOnFinished(sharedLocalKvInstance);
 
@@ -433,11 +423,11 @@ describe("SharedLocalKVStorage Unit Test", function() {
 
         connector.setMaster("tab1");
 
-        var sharedLocalKvInstance1 = new SharedLocalKVStorage("test1", false, broadcaster1);
+        var sharedLocalKvInstance1 = new SharedLocalKVStorage("test10", false, broadcaster1);
 
-        var sharedLocalKvInstance2 = new SharedLocalKVStorage("test1", false, broadcaster2);
+        var sharedLocalKvInstance2 = new SharedLocalKVStorage("test10", false, broadcaster2);
 
-        var sharedLocalKvInstance3 = new SharedLocalKVStorage("test1", false, broadcaster3);
+        var sharedLocalKvInstance3 = new SharedLocalKVStorage("test10", false, broadcaster3);
 
 
 
@@ -512,11 +502,11 @@ describe("SharedLocalKVStorage Unit Test", function() {
 
         connector.setMaster("tab1");
 
-        var sharedLocalKvInstance1 = new SharedLocalKVStorage("test1", false, broadcaster1);
+        var sharedLocalKvInstance1 = new SharedLocalKVStorage("test11", false, broadcaster1);
 
-        var sharedLocalKvInstance2 = new SharedLocalKVStorage("test1", false, broadcaster2);
+        var sharedLocalKvInstance2 = new SharedLocalKVStorage("test11", false, broadcaster2);
 
-        var sharedLocalKvInstance3 = new SharedLocalKVStorage("test1", false, broadcaster3);
+        var sharedLocalKvInstance3 = new SharedLocalKVStorage("test11", false, broadcaster3);
 
 
 
@@ -624,11 +614,11 @@ describe("SharedLocalKVStorage Unit Test", function() {
 
         connector.setMaster("tab1");
 
-        var sharedLocalKvInstance1 = new SharedLocalKVStorage("test1", false, broadcaster1);
+        var sharedLocalKvInstance1 = new SharedLocalKVStorage("test12", false, broadcaster1);
 
-        var sharedLocalKvInstance2 = new SharedLocalKVStorage("test1", false, broadcaster2);
+        var sharedLocalKvInstance2 = new SharedLocalKVStorage("test12", false, broadcaster2);
 
-        var sharedLocalKvInstance3 = new SharedLocalKVStorage("test1", false, broadcaster3);
+        var sharedLocalKvInstance3 = new SharedLocalKVStorage("test12", false, broadcaster3);
 
 
         dropOnFinished(sharedLocalKvInstance1);
@@ -729,11 +719,11 @@ describe("SharedLocalKVStorage Unit Test", function() {
 
         connector.setMaster("tab1");
 
-        var sharedLocalKvInstance1 = new SharedLocalKVStorage("test1", false, broadcaster1);
+        var sharedLocalKvInstance1 = new SharedLocalKVStorage("test13", false, broadcaster1);
 
-        var sharedLocalKvInstance2 = new SharedLocalKVStorage("test1", false, broadcaster2);
+        var sharedLocalKvInstance2 = new SharedLocalKVStorage("test13", false, broadcaster2);
 
-        var sharedLocalKvInstance3 = new SharedLocalKVStorage("test1", false, broadcaster3);
+        var sharedLocalKvInstance3 = new SharedLocalKVStorage("test13", false, broadcaster3);
 
 
         dropOnFinished(sharedLocalKvInstance1);

@@ -4715,7 +4715,6 @@ function MegaData()
 
                         if (node) {
                             addNode(node);
-                            mega.ui.tpp.setTotal(1, 'dl');
                         }
                     }
                 };
@@ -4801,6 +4800,7 @@ function MegaData()
             else {
                 zipname = (zipname || ('Archive-' + Math.random().toString(16).slice(-4))) + '.zip';
             }
+            mega.ui.tpp.setTotal(1, 'dl');
         }
         else {
             z = false;
@@ -4860,6 +4860,7 @@ function MegaData()
 
             if (!z) {
                 this.putToTransferTable(n, ttl);
+                mega.ui.tpp.setTotal(1, 'dl');
             }
         }
 

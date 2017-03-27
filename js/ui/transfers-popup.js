@@ -23,12 +23,12 @@ mega.ui.tpp = (function () {
         duration: 500,
         queue: {
             ul: {
-                index: 1,
+                index: 0,
                 total: 0,
                 progress: 0
             },
             dl: {
-                index: 1,
+                index: 0,
                 total: 0,
                 progress: 0
             }
@@ -45,7 +45,7 @@ mega.ui.tpp = (function () {
             opts.queue[bl].total += value;
         }
         else {
-            opts.queue[bl].total = value;
+            opts.queue[bl].total = 0;
         }
     };
 
@@ -188,7 +188,7 @@ mega.ui.tpp = (function () {
             opts.queue[block].index += value;
         }
         else {
-            opts.queue[block].index = value;
+            opts.queue[block].index = 0;
         }
     };
 

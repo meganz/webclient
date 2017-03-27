@@ -3686,6 +3686,7 @@ mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
 
         mega.ui.tpp.hideBlock('ul');
         mega.ui.tpp.setIndex(0, 'ul');
+        mega.ui.tpp.setTotal(0, 'ul');
         mega.ui.tpp.setProgress(0, 'ul');
     }
     if (!dl_queue.some(isQueueActive)) {
@@ -3700,6 +3701,7 @@ mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
 
         mega.ui.tpp.hideBlock('dl');
         mega.ui.tpp.setIndex(0, 'dl');
+        mega.ui.tpp.setTotal(0, 'dl');
         mega.ui.tpp.setProgress(0, 'dl');
     }
 

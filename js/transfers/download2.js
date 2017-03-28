@@ -1117,7 +1117,9 @@ var dlmanager = {
             $dialog.addClass('hidden');
             $button.unbind('click.quota');
             $overlay.unbind('click.quota');
-            fm_hideoverlay();
+            if ($.dialog !== 'achievements') {
+                fm_hideoverlay();
+            }
             return false;
         };
 

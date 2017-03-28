@@ -1520,14 +1520,23 @@ var ConversationPanel = React.createClass({
                         {__("Please confirm that you want to upload this image and share it in this chat room.")}
                     </div>
 
-                    <img src={self.state.pasteImageConfirmDialog[2]} style={{
-                        maxWidth: "90%",
-                        height: "auto",
-                        margin: '10px auto',
-                        display: 'block',
-                        border: '1px solid #ccc',
-                        borderRadius: '4px'
-                    }} />
+                    <img
+                        src={self.state.pasteImageConfirmDialog[2]}
+                        style={{
+                            maxWidth: "90%",
+                            height: "auto",
+                            maxHeight: $(document).outerHeight() * 0.3,
+                            margin: '10px auto',
+                            display: 'block',
+                            border: '1px solid #ccc',
+                            borderRadius: '4px'
+                        }}
+                        onLoad={function(e) {
+                            $(e.target).parents('.paste-image-chat').position({
+                                of: $(document.body)
+                            });
+                        }}
+                    />
                 </div>
             </ModalDialogsUI.ConfirmDialog>
         }

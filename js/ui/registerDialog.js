@@ -9,10 +9,12 @@
             options.onCreatingAccount($dialog);
         }
         loadingDialog.show();
+        $dialog.addClass('arrange-to-back');
 
         if (u_type > 0) {
             msgDialog('warninga', l[135], l[5843]);
             loadingDialog.hide();
+            $dialog.removeClass('arrange-to-back');
             return false;
         }
 
@@ -20,6 +22,7 @@
             var rv = {};
             var done = function(login) {
                 loadingDialog.hide();
+                $dialog.removeClass('arrange-to-back');
                 $('.pro-register-dialog').addClass('hidden');
                 $('.fm-dialog.registration-page-success').unbind('click');
 
@@ -65,6 +68,7 @@
                         var ctx = {
                             checkloginresult: function(ctx, r) {
                                 loadingDialog.hide();
+                                $dialog.removeClass('arrange-to-back');
 
                                 if (!r) {
                                     $('.login-register-input.email', $dialog).addClass('incorrect');
@@ -92,6 +96,7 @@
                     }
                     else {
                         loadingDialog.hide();
+                        $dialog.removeClass('arrange-to-back');
                         msgDialog('warninga', 'Error', l[200], res);
                     }
                 }
@@ -161,16 +166,19 @@
         if (!err && typeof zxcvbn === 'undefined') {
             msgDialog('warninga', l[135], l[1115] + '<br>' + l[1116]);
             loadingDialog.hide();
+            $dialog.removeClass('arrange-to-back');
             return false;
         }
         else if (!err) {
             if ($('.register-check', $dialog).hasClass('checkboxOff')) {
                 msgDialog('warninga', l[1117], l[1118]);
                 loadingDialog.hide();
+                $dialog.removeClass('arrange-to-back');
             }
             else {
                 if (localStorage.signupcode) {
                     loadingDialog.show();
+                    $dialog.addClass('arrange-to-back');
                     u_storage = init_storage(localStorage);
                     var ctx = {
                         checkloginresult: function(u_ctx, r) {
@@ -179,6 +187,7 @@
                             }
                             else {
                                 loadingDialog.hide();
+                                $dialog.removeClass('arrange-to-back');
                                 u_type = r;
                                 loadSubPage('fm');
                             }
@@ -195,6 +204,7 @@
                 }
                 else if (u_type === false) {
                     loadingDialog.show();
+                    $dialog.addClass('arrange-to-back');
                     u_storage = init_storage(localStorage);
                     u_checklogin({
                         checkloginresult: function(u_ctx, r) {
@@ -210,6 +220,7 @@
         }
         if (err) {
             loadingDialog.hide();
+            $dialog.removeClass('arrange-to-back');
         }
     }
 

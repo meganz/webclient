@@ -8739,11 +8739,11 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     width: 480px;
     margin: -200px 0 0 -240px;
 }
+.fm-dialog.arrange-to-back {
+    z-index: 900;
+}
 .fm-dialog.properties-dialog.arrange-to-back {
     z-index: 1101; /* fm-dialog-overlay's zindex+1 */
-}
-.fm-dialog.copy-dialog.arrange-to-back, .fm-dialog.move-dialog.arrange-to-back {
-    z-index: 900;
 }
 .arrange-to-front, .dropdown.context.arrange-to-front {
     z-index: 1300;
@@ -13978,7 +13978,7 @@ background: linear-gradient(to bottom, rgba(250,250,250,0.3) 0%,rgba(238,238,238
 }
 .pro-bottom-info p span {
     color: #FF333A;
-    
+
 }
 .main-mid-pad.q-m {
     padding-top: 14px;

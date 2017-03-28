@@ -5,6 +5,11 @@
     // ^ zxcvbn stuff..
 
     function doProRegister($dialog) {
+        var hideOverlay = function() {
+            loadingDialog.hide();
+            $dialog.removeClass('arrange-to-back');
+        };
+
         if (options.onCreatingAccount) {
             options.onCreatingAccount($dialog);
         }
@@ -12,17 +17,15 @@
         $dialog.addClass('arrange-to-back');
 
         if (u_type > 0) {
+            hideOverlay();
             msgDialog('warninga', l[135], l[5843]);
-            loadingDialog.hide();
-            $dialog.removeClass('arrange-to-back');
             return false;
         }
 
         var registeraccount = function() {
             var rv = {};
             var done = function(login) {
-                loadingDialog.hide();
-                $dialog.removeClass('arrange-to-back');
+                hideOverlay();
                 $('.pro-register-dialog').addClass('hidden');
                 $('.fm-dialog.registration-page-success').unbind('click');
 
@@ -67,8 +70,7 @@
                         var uh = stringhash(rv.email.toLowerCase(), passwordaes);
                         var ctx = {
                             checkloginresult: function(ctx, r) {
-                                loadingDialog.hide();
-                                $dialog.removeClass('arrange-to-back');
+                                hideOverlay();
 
                                 if (!r) {
                                     $('.login-register-input.email', $dialog).addClass('incorrect');
@@ -95,8 +97,7 @@
                         u_login(ctx, rv.email, rv.password, uh, true);
                     }
                     else {
-                        loadingDialog.hide();
-                        $dialog.removeClass('arrange-to-back');
+                        hideOverlay();
                         msgDialog('warninga', 'Error', l[200], res);
                     }
                 }
@@ -164,30 +165,26 @@
         }
 
         if (!err && typeof zxcvbn === 'undefined') {
+            hideOverlay();
             msgDialog('warninga', l[135], l[1115] + '<br>' + l[1116]);
-            loadingDialog.hide();
-            $dialog.removeClass('arrange-to-back');
             return false;
         }
         else if (!err) {
             if ($('.register-check', $dialog).hasClass('checkboxOff')) {
+                hideOverlay();
                 msgDialog('warninga', l[1117], l[1118]);
-                loadingDialog.hide();
-                $dialog.removeClass('arrange-to-back');
             }
             else {
                 if (localStorage.signupcode) {
-                    loadingDialog.show();
-                    $dialog.addClass('arrange-to-back');
                     u_storage = init_storage(localStorage);
                     var ctx = {
                         checkloginresult: function(u_ctx, r) {
+                            hideOverlay();
+
                             if (typeof r[0] === 'number' && r[0] < 0) {
                                 msgDialog('warningb', l[135], l[200]);
                             }
                             else {
-                                loadingDialog.hide();
-                                $dialog.removeClass('arrange-to-back');
                                 u_type = r;
                                 loadSubPage('fm');
                             }
@@ -203,8 +200,7 @@
                     delete localStorage.signupcode;
                 }
                 else if (u_type === false) {
-                    loadingDialog.show();
-                    $dialog.addClass('arrange-to-back');
+                    hideOverlay();
                     u_storage = init_storage(localStorage);
                     u_checklogin({
                         checkloginresult: function(u_ctx, r) {
@@ -219,8 +215,7 @@
             }
         }
         if (err) {
-            loadingDialog.hide();
-            $dialog.removeClass('arrange-to-back');
+            hideOverlay();
         }
     }
 

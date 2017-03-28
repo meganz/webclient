@@ -752,12 +752,12 @@ Chatd.Shard.prototype.exec = function(a) {
 
             case Chatd.Opcode.HISTDONE:
                 self.keepAliveTimerRestart();
-                self.logger.log("History retrieval finished: " + base64urlencode(cmd.substr(1,8)));
-                self.restoreIfNeeded(cmd.substr(1,8));
+                self.logger.log("History retrieval finished: " + base64urlencode(cmd.substr(1, 8)));
+                self.restoreIfNeeded(cmd.substr(1, 8));
 
                 self.chatd.trigger('onMessagesHistoryDone',
                     {
-                        chatId: base64urlencode(cmd.substr(1,8))
+                        chatId: base64urlencode(cmd.substr(1, 8))
                     }
                 );
                 len = 9;

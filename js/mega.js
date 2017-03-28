@@ -4938,6 +4938,7 @@ function MegaData()
     this.dlprogress = function(id, perc, bl, bt, kbps, dl_queue_num, force)
     {
         var st;
+        var tmpId = id;
         if (dl_queue[dl_queue_num].zipid)
         {
             id = 'zip_' + dl_queue[dl_queue_num].zipid;
@@ -5034,9 +5035,9 @@ function MegaData()
                     $tr.find('.speed').addClass('unknown').text('');
                 }
 
-                // mega.ui.tpp.updateBlock('dl', bps);
-                percent_megatitle();
-                // delay('percent_megatitle', percent_megatitle, 50);
+                mega.ui.tpp.setTransfered(id, bl, 'dl');
+                mega.ui.tpp.updateBlock('dl');
+                delay('percent_megatitle', percent_megatitle, 50);
 
                 if (page.substr(0, 2) !== 'fm') {
                     $('.widget-block').removeClass('hidden');
@@ -5236,6 +5237,7 @@ function MegaData()
         if (typeof dl_queue[dl.pos] === 'object') {
             fm_tfsupdate(); // this will call $.transferHeader()
             M.dlprogress(id, 0, 0, 0, 0, dl.pos);
+            mega.ui.tpp.setTime(NOW(), 'dl');
             mega.ui.tpp.start(dl, 'dl');
         }
     }
@@ -5623,8 +5625,9 @@ function MegaData()
                 $tr.find('.speed').addClass('unknown').text('');
             }
 
-            // mega.ui.tpp.updateBlock(bps, 'ul');
-            delay('percent_megatitle', percent_megatitle);
+            mega.ui.tpp.setTransfered(id, bl, 'ul');
+            mega.ui.tpp.updateBlock('ul');
+            delay('percent_megatitle', percent_megatitle, 50);
 
             if (page.substr(0, 2) !== 'fm') {
                 $('.widget-block').removeClass('hidden');
@@ -5739,6 +5742,7 @@ function MegaData()
         ul.starttime = new Date().getTime();
         fm_tfsupdate();// this will call $.transferHeader()
         M.ulprogress(ul, 0, 0, 0);
+        mega.ui.tpp.setTime(NOW(), 'ul');
         mega.ui.tpp.start(ul, 'ul');
     };
 

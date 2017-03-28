@@ -28,7 +28,7 @@ mega.ui.tpp = (function () {
                 progress: 0,
                 bps: 0,
                 time: 0,// Start time in ms
-                curr: []
+                curr: {}
             },
             dl: {
                 index: 0,
@@ -36,7 +36,7 @@ mega.ui.tpp = (function () {
                 progress: 0,
                 bps: 0,
                 time: 0,// Start time in ms
-                curr: []
+                curr: {}
             }
         }
     };
@@ -69,10 +69,10 @@ mega.ui.tpp = (function () {
     /**
      * Set number of items currently pending in queue
      * @param {Number} percent Global progress in percents
-     * @param {String} bl i.e. ['dl', 'ul'] download/upload block
+     * @param {String} blk i.e. ['dl', 'ul'] download/upload block
      */
-    var setTotalProgress = function setTotalProgress(percent, bl) {
-        opts.queue[bl].progress = percent;
+    var setTotalProgress = function setTotalProgress(percent, blk) {
+        opts.queue[blk].progress = percent;
     };
 
     /**
@@ -211,17 +211,16 @@ mega.ui.tpp = (function () {
      * @param {String} blk i.e ['dl', 'ul'] download or upload
      * @return {Number} Amount of transfered data
      */
-    var getTransfered = function setTransfered(blk) {
-        var arr = opts.queue[blk].curr;
-        var result = arr.reduce(function(a, b) {
-            var val = a;
+    var getTransfered = function getTransfered(blk) {
+        var obj = opts.queue[blk].curr;
+        var result = 0;
 
-            if (b) {
-                val = a + b;
+        for (var key in obj) {
+            if (obj.hasOwnProperty(key)) {
+                result += obj[key];
+
             }
-
-            return val;
-        });
+        }
 
         return result;
     };
@@ -234,7 +233,7 @@ mega.ui.tpp = (function () {
     var getAvgSpeed = function getAvgSpeed(blk) {
         var result = 0;
         var speed = getTransfered(blk);
-        var time = Date.now() - getTime();
+        var time = Math.ceil((Date.now() - getTime(blk)) / 1000);// Seconds
 
         result = Math.floor(speed / time);
 
@@ -243,21 +242,20 @@ mega.ui.tpp = (function () {
 
     /**
      * Updates progress bar of transfers popup diaog, with cumulative percentage for dl/ul
-     * @param {Number} bps Cumulative download speed in bytes
      * @param {String} blk i.e. ['dl', 'ul'] download or upload
      */
-    var updateBlock = function updateBlock(bps, blk) {
+    var updateBlock = function updateBlock(blk) {
         var len = getTotal(blk).toString();
         var index = getIndex(blk).toString();
         var perc = getProgress(blk).toString();
-        var avgSpeed = getAvgSpeed();
+        var avgSpeed = getAvgSpeed(blk);
         var speed;
 
-        speed = numOfBytes(avgSpeed);
+        speed = numOfBytes(avgSpeed, 1);
         opts.dlg[blk].$.prg.css('width', perc + '%');
         opts.dlg[blk].$.num.text(len);
         opts.dlg[blk].$.crr.text(index);
-        if (speed.size !== 0) {
+        if (speed.size === 0) {
             opts.dlg[blk].$.stxt.text('');
             opts.dlg[blk].$.spd.text(l[1042]);
         }
@@ -375,9 +373,10 @@ mega.ui.tpp = (function () {
         setTotal: setTotal,
         isVisible: isVisible,
         updateBlock: updateBlock,
-        setTotalrogress: setTotalProgress,
+        setTotalProgress: setTotalProgress,
         setIndex: setIndex,
-        setTransfered: setTransfered
+        setTransfered: setTransfered,
+        setTime: setTime
     };
 
 })();// END tpp, transfers popup dialog

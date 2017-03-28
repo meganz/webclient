@@ -4644,6 +4644,8 @@ var watchdog = Object.freeze({
     queryQueue: {},
     // Holds query replies if cached
     replyCache: {},
+    // waiting queries
+    waitingQueries: {},
 
     /** setup watchdog/webstorage listeners */
     setup: function() {
@@ -4673,9 +4675,13 @@ var watchdog = Object.freeze({
      * @param {String} what Parameter
      * @param {String} timeout ms
      * @param {String} cache   preserve result
+     * @param {Object} [data]   data to be sent with the query
+     * @param {bool} [expectsSingleAnswer]   pass true if your query is expected to receive only single answer (this
+     * would speed up and resolve the returned promise when the first answer is received and won't wait for the full
+     * `timeout` to gather more replies)
      * @return {MegaPromise}
      */
-    query: function(what, timeout, cache) {
+    query: function(what, timeout, cache, data, expectsSingleAnswer) {
         var self = this;
         var token = mRandomToken();
         var promise = new MegaPromise();
@@ -4695,20 +4701,42 @@ var watchdog = Object.freeze({
             }
             this.queryQueue[token] = [];
 
+            var tmpData;
+            if (!data) {
+                tmpData = {};
+            }
+            else {
+                tmpData = clone(data);
+            }
+            tmpData['reply'] = token;
+
             Soon(function() {
-                self.notify('Q!' + what, { reply: token });
+                self.notify('Q!' + what, tmpData);
             });
 
-            // wait for reply and fullfil/reject the promise
-            setTimeout(function() {
-                if (self.queryQueue[token].length) {
-                    promise.resolve(self.queryQueue[token]);
-                }
-                else {
-                    promise.reject(EACCESS);
-                }
-                delete self.queryQueue[token];
-            }, timeout || 200);
+            if (!expectsSingleAnswer) {
+                // wait for reply and fullfil/reject the promise
+                setTimeout(function () {
+                    if (self.queryQueue[token].length) {
+                        promise.resolve(self.queryQueue[token]);
+                    }
+                    else {
+                        promise.reject(EACCESS);
+                    }
+                    delete self.queryQueue[token];
+                }, timeout || 200);
+            }
+            else {
+                promise.timer = setTimeout(function () {
+                    if (promise.state() === 'pending') {
+                        promise.reject(EACCESS);
+                        delete self.queryQueue[token];
+                        delete self.waitingQueries[token];
+                    }
+                }, timeout || 200);
+
+                self.waitingQueries[token] = promise;
+            }
         }
         else {
             promise = MegaPromise.reject(EEXIST);
@@ -4743,6 +4771,21 @@ var watchdog = Object.freeze({
                 }
                 if (this.replyCache[strg.data.query]) {
                     this.replyCache[strg.data.query].push(strg.data.value);
+                }
+                // if there is a promise in .waitingQueries, that means that this query is expecting only 1 response
+                // so we can resolve it immediately.
+                if (this.waitingQueries[strg.data.token]) {
+                    var self = this;
+
+                    clearTimeout(this.waitingQueries[strg.data.token].timer);
+                    this.waitingQueries[strg.data.token]
+                        .always(function() {
+                            // cleanup after all other done/always/fail handlers...
+                            delete self.waitingQueries[strg.data.token];
+                            delete self.queryQueue[strg.data.token];
+                        })
+                        .resolve([strg.data.value]);
+
                 }
                 break;
 
@@ -4828,8 +4871,9 @@ var watchdog = Object.freeze({
                 }
                 break;
 
-            case 'idbchange':
-                mBroadcaster.sendMessage('idbchange:' + strg.data.name, [strg.data.key, strg.data.value]);
+            default:
+                mBroadcaster.sendMessage("watchdog:" + msg, strg);
+
                 break;
         }
 

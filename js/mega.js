@@ -1721,11 +1721,6 @@ function MegaData()
 
                     $('.dropdown-item', m).removeClass("disabled");
 
-                    if ($userDiv.is(".offline")) {
-                        $('.dropdown-item.startaudio-item, .dropdown-item.startvideo-item', m)
-                            .addClass("disabled");
-                    }
-
                     $this.addClass('active');
                     var y = $this.offset().top + 21;
                     m
@@ -1761,7 +1756,7 @@ function MegaData()
                 var $triggeredBy = $this.parent().data("triggeredBy");
                 var $userDiv = $triggeredBy.parent().parent();
 
-                if (!$this.is(".disabled") && !$userDiv.is(".offline")) {
+                if (!$this.is(".disabled")) {
                     var user_handle = $userDiv.attr('id').replace("contact_", "");
 
                     loadSubPage("fm/chat/" + user_handle);
@@ -1777,7 +1772,7 @@ function MegaData()
                 var $triggeredBy = $this.parent().data("triggeredBy");
                 var $userDiv = $triggeredBy.parent().parent();
 
-                if (!$this.is(".disabled") && !$userDiv.is(".offline")) {
+                if (!$this.is(".disabled")) {
                     var user_handle = $userDiv.attr('id').replace("contact_", "");
 
                     loadSubPage("fm/chat/" + user_handle);

@@ -5034,8 +5034,9 @@ function MegaData()
                     $tr.find('.speed').addClass('unknown').text('');
                 }
 
-                mega.ui.tpp.updateBlock('dl', bps);
-                delay('percent_megatitle', percent_megatitle, 50);
+                // mega.ui.tpp.updateBlock('dl', bps);
+                percent_megatitle();
+                // delay('percent_megatitle', percent_megatitle, 50);
 
                 if (page.substr(0, 2) !== 'fm') {
                     $('.widget-block').removeClass('hidden');
@@ -5622,8 +5623,8 @@ function MegaData()
                 $tr.find('.speed').addClass('unknown').text('');
             }
 
-            mega.ui.tpp.updateBlock('ul', bps);
-            delay('percent_megatitle', percent_megatitle, 50);
+            // mega.ui.tpp.updateBlock(bps, 'ul');
+            delay('percent_megatitle', percent_megatitle);
 
             if (page.substr(0, 2) !== 'fm') {
                 $('.widget-block').removeClass('hidden');

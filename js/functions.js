@@ -2685,9 +2685,13 @@ function percent_megatitle() {
     }
 
     var x_ul = Math.floor(ul_r / ul_t * 100) || 0;
-    mega.ui.tpp.setProgress(x_ul, 'ul');
+    mega.ui.tpp.setTotalProgress(x_ul, 'ul');
+    var avgUlSpeed = Math.floor(ul_r / ul_s);
+    mega.ui.tpp.updateBlock(avgUlSpeed, 'ul');
     var x_dl = Math.floor(dl_r / dl_t * 100) || 0;
-    mega.ui.tpp.setProgress(x_dl, 'dl');
+    mega.ui.tpp.setTotalProgress(x_dl, 'dl');
+    var avgDlSpeed = Math.floor(dl_r / dl_s);
+    mega.ui.tpp.updateBlock(avgDlSpeed, 'dl');
     var t;
 
     if (dl_t && ul_t) {
@@ -3687,7 +3691,8 @@ mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
         mega.ui.tpp.hideBlock('ul');
         mega.ui.tpp.setIndex(0, 'ul');
         mega.ui.tpp.setTotal(0, 'ul');
-        mega.ui.tpp.setProgress(0, 'ul');
+        mega.ui.tpp.setTotalProgress(0, 'ul');
+        mega.ui.tpp.setTransfered(-1, 0, 'ul');
     }
     if (!dl_queue.some(isQueueActive)) {
         dl_queue = new DownloadQueue();
@@ -3702,7 +3707,8 @@ mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
         mega.ui.tpp.hideBlock('dl');
         mega.ui.tpp.setIndex(0, 'dl');
         mega.ui.tpp.setTotal(0, 'dl');
-        mega.ui.tpp.setProgress(0, 'dl');
+        mega.ui.tpp.setTotalProgress(0, 'dl');
+        mega.ui.tpp.setTransfered(-1, 0, 'dl');
     }
 
     if (!dlmanager.isDownloading && !ulmanager.isUploading) {

@@ -25,12 +25,18 @@ mega.ui.tpp = (function () {
             ul: {
                 index: 0,
                 total: 0,
-                progress: 0
+                progress: 0,
+                bps: 0,
+                time: 0,// Start time in ms
+                curr: []
             },
             dl: {
                 index: 0,
                 total: 0,
-                progress: 0
+                progress: 0,
+                bps: 0,
+                time: 0,// Start time in ms
+                curr: []
             }
         }
     };
@@ -65,7 +71,7 @@ mega.ui.tpp = (function () {
      * @param {Number} percent Global progress in percents
      * @param {String} bl i.e. ['dl', 'ul'] download/upload block
      */
-    var setProgress = function setProgress(percent, bl) {
+    var setTotalProgress = function setTotalProgress(percent, bl) {
         opts.queue[bl].progress = percent;
     };
 
@@ -156,33 +162,31 @@ mega.ui.tpp = (function () {
         var result = opts.queue[block].index;
 
         return result;
-        // var index = 0;
-
-        // if (typeof $.transferprogress === 'object') {
-        //     var inProgress = Object.keys($.transferprogress);
-
-        //     if (block === 'ul') {
-        //         index = inProgress.filter(function(value) {
-        //             if (value.indexOf('ul_') !== -1) {
-        //                 return value;
-        //             }
-        //         }).length;
-        //         // index = ul_queue.filter(isQueueActive).length;
-        //     }
-        //     else {
-        //         index = inProgress.filter(function(value) {
-        //             if ((value.indexOf('dl_') !== -1) || (value.indexOf('zip_') !== -1)) {
-        //                 return value;
-        //             }
-        //         }).length;
-        //         // index = Object.keys(GlobalProgress).filter(function(k) {
-        //         //     return k[0] !== 'u'; }).length;
-        //     }
-        // }
-
-        // return index;
     };
 
+    /**
+     * Set dl/ul start time
+     * @param {Number} Timestamp in ms
+     * @param {String} block i.e. ['dl', 'ul'] download or upload
+     */
+    var setTime = function setTime(value, blk) {
+        opts.queue[blk].time = value;
+    };
+
+    /**
+     * Get dl/ul start time
+     * @param {String} block i.e. ['dl', 'ul'] download or upload
+     */
+    var getTime = function getTime(blk) {
+        var result = opts.queue[blk].time;
+
+        return result;
+    };
+
+    /**
+     * Set index of latest started dl/ul item from queue
+     * @param {String} block i.e. ['dl', 'ul'] download or upload
+     */
     var setIndex = function setIndex(value, block) {
         if (value) {
             opts.queue[block].index += value;
@@ -193,21 +197,67 @@ mega.ui.tpp = (function () {
     };
 
     /**
-     * Updates progress bar of transfers popup diaog, with cumulative percentage for dl/ul
-     * @param {String} blk i.e. ['dl', 'ul']
-     * @param {Number} bps Cumulative download speed in bytes
+     * Set number of dl/ul bytes for given id
+     * @param {Number} id Id of dl/ul
+     * @param {Number} value dl/ul number of bytes
+     * @param {String} blk i.e ['dl', 'ul'] download or upload
      */
-    var updateBlock = function updateBlock(blk, bps) {
+    var setTransfered = function setTransfered(id, value, blk) {
+        opts.queue[blk].curr[id] = value;
+    };
+
+    /**
+     * Get number of dl/ul bytes for given id
+     * @param {String} blk i.e ['dl', 'ul'] download or upload
+     * @return {Number} Amount of transfered data
+     */
+    var getTransfered = function setTransfered(blk) {
+        var arr = opts.queue[blk].curr;
+        var result = arr.reduce(function(a, b) {
+            var val = a;
+
+            if (b) {
+                val = a + b;
+            }
+
+            return val;
+        });
+
+        return result;
+    };
+
+    /**
+     * Calculates avg spped for block
+     * @param {String} blk i.e. ['dl', 'ul'] download or upload
+     * @returns {Number} dl/ul average speed in bytes per second
+     */
+    var getAvgSpeed = function getAvgSpeed(blk) {
+        var result = 0;
+        var speed = getTransfered(blk);
+        var time = Date.now() - getTime();
+
+        result = Math.floor(speed / time);
+
+        return result;
+    };
+
+    /**
+     * Updates progress bar of transfers popup diaog, with cumulative percentage for dl/ul
+     * @param {Number} bps Cumulative download speed in bytes
+     * @param {String} blk i.e. ['dl', 'ul'] download or upload
+     */
+    var updateBlock = function updateBlock(bps, blk) {
         var len = getTotal(blk).toString();
         var index = getIndex(blk).toString();
         var perc = getProgress(blk).toString();
+        var avgSpeed = getAvgSpeed();
         var speed;
 
-        speed = numOfBytes(bps, 1);
+        speed = numOfBytes(avgSpeed);
         opts.dlg[blk].$.prg.css('width', perc + '%');
         opts.dlg[blk].$.num.text(len);
         opts.dlg[blk].$.crr.text(index);
-        if (speed.size === 0) {
+        if (speed.size !== 0) {
             opts.dlg[blk].$.stxt.text('');
             opts.dlg[blk].$.spd.text(l[1042]);
         }
@@ -220,8 +270,8 @@ mega.ui.tpp = (function () {
     /**
      * Initialize transfer popup dialogs progress bar, file icon, name, speed,
      * current file index and total number of files in queue of dl or ul block
-     * @param {Object} queue Download queue
-     * @param {String} bl i.e. ['dl', 'ul']
+     * @param {Object} queue Download or upload queue
+     * @param {String} bl i.e. ['dl', 'ul'] download or upload
      */
     var _init = function _init(queue, bl) {
         // var dlg = (bl === 'dl') ? '$dlBlock' : '$ulBlock';
@@ -254,13 +304,17 @@ mega.ui.tpp = (function () {
     };
 
     /**
-     *
+     * Show tpp popup and dl/ul block
+     * @param {Object} queue Download or upload queue
+     * @param {String} bl i.e. ['dl', 'ul'] download or upload
      */
     var start = function start(queue, bl) {
         setIndex(1, bl);
-        _init(queue, bl);
-        showBlock(bl);
-        show();
+        if (getIndex(bl) === 1) {
+            _init(queue, bl);
+            showBlock(bl);
+            show();
+        }
     };
 
     mBroadcaster.addListener('fm:initialized', function() {
@@ -321,8 +375,9 @@ mega.ui.tpp = (function () {
         setTotal: setTotal,
         isVisible: isVisible,
         updateBlock: updateBlock,
-        setProgress: setProgress,
-        setIndex: setIndex
+        setTotalrogress: setTotalProgress,
+        setIndex: setIndex,
+        setTransfered: setTransfered
     };
 
 })();// END tpp, transfers popup dialog

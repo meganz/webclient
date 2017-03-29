@@ -3945,7 +3945,7 @@
     "16307": "Dica: Mantenha seu lixo vazio para otimizar o uso do armazenamento.",
     "16308": "Voc\u00ea pode desbloquear mais armazenamento gratuito e cota de transfer\u00eancia usando nossos produtos. Simples. F\u00e1cil.",
     "16309": "Obtenha mais b\u00f4nus",
-    "16310": "Dica: Verifique todos os b\u00f4nus dispon\u00edveis no Painel ou clique em [I]",
+    "16310": "Tip: Check all your available bonuses in the [A]Dashboard[\/A] or click [I]",
     "16311": "Armazenamento quase cheio",
     "16312": "Parece que voc\u00ea est\u00e1 ficando sem armazenamento.",
     "16313": "[A]Atualize agora[\/A] para uma conta [S]PRO Lite[\/S] e n\u00e3o se preocupe em ficar sem armazenamento. [S]Para %1\u20ac por m\u00eas, voc\u00ea recebe 200 GB de armazenamento[\/S] e 1 TB de cota de transfer\u00eancia.",
@@ -4019,7 +4019,7 @@
     "16388": "Conv\u00e9m alterar as configura\u00e7\u00f5es para conceder a cota de transfer\u00eancia para usu\u00e1rios que fazem o download.",
     "16389": "Online, %1 mas mudar minha apar\u00eancia de status para Ausente (amarelo) depois de %2 minuto(s) de inatividade.",
     "16390": "[S]Transfer quota[\/S] is the total volume of data transfered between MEGA and your system each month.",
-    "16391": "[S]Transfer speed[\/S] is unrelated to Transfer quota. The quality of your file transfers\u2019 velocity can be affected by many factors beyond our control, such as your local network and your Internet Service Provider. MEGA always processes file transfers at the maximum possible speed regardless of your account status.",
+    "16391": "[S]Transfer speed[\/S] is unrelated to Transfer quota. The quality of your file transfers' speed can be affected by many factors beyond our control, such as your local network and your Internet Service Provider. MEGA always processes file transfers at the maximum possible speed regardless of your account status.",
     "16392": "[S]PRO and Free accounts[\/S] enjoy the same fast transfer speed.",
     "alias": {
         "shared-with-me": 5589,

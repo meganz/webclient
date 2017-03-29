@@ -3945,7 +3945,7 @@
     "16307": "Tip: Keep your Rubbish Bin empty to optimise storage usage.",
     "16308": "You can unlock more free storage and transfer quota by using our products. Simple. Easy.",
     "16309": "Get more bonuses",
-    "16310": "Tip: Check all your available bonuses in the Dashboard or click [I]",
+    "16310": "Tip: Check all your available bonuses in the [A]Dashboard[\/A] or click [I]",
     "16311": "Storage Almost Full",
     "16312": "It looks like you\u2019re running out of storage.",
     "16313": "[A]Upgrade now[\/A] to a [S]PRO Lite[\/S] account and don't worry about running out of storage. [S]For \u20ac%1 a month you get 200 GB of storage[\/S] and 1 TB of transfer quota.",
@@ -4019,7 +4019,7 @@
     "16388": "You may want to change your settings for granting transfer quota to downloading users.",
     "16389": "Online, %1 but change my status appearance to Away (yellow) after %2 minute(s) of inactivity.",
     "16390": "[S]Transfer quota[\/S] is the total volume of data transfered between MEGA and your system each month.",
-    "16391": "[S]Transfer speed[\/S] is unrelated to Transfer quota. The quality of your file transfers\u2019 velocity can be affected by many factors beyond our control, such as your local network and your Internet Service Provider. MEGA always processes file transfers at the maximum possible speed regardless of your account status.",
+    "16391": "[S]Transfer speed[\/S] is unrelated to Transfer quota. The quality of your file transfers' speed can be affected by many factors beyond our control, such as your local network and your Internet Service Provider. MEGA always processes file transfers at the maximum possible speed regardless of your account status.",
     "16392": "[S]PRO and Free accounts[\/S] enjoy the same fast transfer speed.",
     "alias": {
         "shared-with-me": 5589,

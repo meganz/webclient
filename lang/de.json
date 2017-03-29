@@ -3945,7 +3945,7 @@
     "16307": "Hinweis: Reduzieren Sie Ihren Speicherverbrauch durch regelm\u00e4\u00dfige Leerung Ihres Papierkorbs!",
     "16308": "Erhalten Sie zus\u00e4tzliche Speicher- und Transferboni - ganz einfach, indem Sie unsere Produkte nutzen.",
     "16309": "Boni verdienen",
-    "16310": "Hinweis: Pr\u00fcfen Sie Ihre verf\u00fcgbaren Boni in der Bonusverwaltung oder klicken Sie [I]",
+    "16310": "Tip: Check all your available bonuses in the [A]Dashboard[\/A] or click [I]",
     "16311": "Ihr Cloudspeicher ist fast voll",
     "16312": "Ihnen geht der Speicherplatz aus.",
     "16313": "[A]Wechseln Sie jetzt[\/A] zu einem [S]PRO Lite[\/S]-Plan und vergessen Sie Ihre Speicherplatzsorgen! [S]F\u00fcr %1\u20ac pro Monat erhalten Sie 200 GB Speicherplatz[\/S] und 1 TB Transfervolumen.",
@@ -4019,7 +4019,7 @@
     "16388": "Bitte \u00fcberpr\u00fcfen Sie auch die Einstellung f\u00fcr die Nutzung Ihres Transfervolumens durch Dritte.",
     "16389": "Online, %1 aber mit automatischen Wechsel auf Abwesend (gelb) nach %2 Minute(n)",
     "16390": "[S]Transfer quota[\/S] is the total volume of data transfered between MEGA and your system each month.",
-    "16391": "[S]Transfer speed[\/S] is unrelated to Transfer quota. The quality of your file transfers\u2019 velocity can be affected by many factors beyond our control, such as your local network and your Internet Service Provider. MEGA always processes file transfers at the maximum possible speed regardless of your account status.",
+    "16391": "[S]Transfer speed[\/S] is unrelated to Transfer quota. The quality of your file transfers' speed can be affected by many factors beyond our control, such as your local network and your Internet Service Provider. MEGA always processes file transfers at the maximum possible speed regardless of your account status.",
     "16392": "[S]PRO and Free accounts[\/S] enjoy the same fast transfer speed.",
     "alias": {
         "shared-with-me": 5589,

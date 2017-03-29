@@ -1288,12 +1288,23 @@ mega.showOverStorageQuota = function(perc) {
             .rebind('click', function() {
                 $('.fm-main').removeClass('fm-notification almost-full full');
             });
+
+        mega.achievem.enabled()
+            .done(function() {
+                $strgdlg.addClass('achievements')
+                    .find('.semi-small-icon.rocket')
+                    .rebind('click', function() {
+                        closeDialog();
+                        mega.achievem.achievementsListDialog();
+                        return false;
+                    });
+            });
+
+        clickURLs();
+        $('a.gotorub').attr('href', '/fm/' + M.RubbishID);
+
+        if (Object(u_attr).p) {
+            $('.choose-plan', $strgdlg).text(l[16386]);
+        }
     }
-
-    mega.achievem.enabled()
-        .done(function() {
-            $('.fm-dialog.storage-dialog').addClass('achievements');
-        });
-
-    clickURLs();
 };

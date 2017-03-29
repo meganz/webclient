@@ -682,8 +682,11 @@ function populate_l() {
     l[12489] = l[12489].replace('[I]', '<i>').replace('[/I]', '</i>').replace('[I]', '<i>').replace('[/I]', '</i>');
     l[16165] = l[16165].replace('[S]', '<a class="red">').replace('[/S]', '</a>').replace('[BR]', '<br/>');
     l[16167] = l[16167].replace('[S]', '<a href="/mobile" class="clickurl">').replace('[/S]', '</a>');
-    l[16306] = escapeHTML(l[16306]).replace('[A]', '<a href="/fm/rubbish" class="clickurl">').replace('[/A]', '</a>');
-    l[16310] = escapeHTML(l[16310]).replace('[I]', '<i class="semi-small-icon rocket"></i>');
+    l[16306] = escapeHTML(l[16306])
+        .replace('[A]', '<a href="/fm/rubbish" class="clickurl gotorub">').replace('[/A]', '</a>');
+    l[16310] = escapeHTML(l[16310])
+        .replace('[A]', '<a href="/fm/dashboard" class="clickurl">').replace('[/A]', '</a>')
+        .replace('[I]', '<i class="semi-small-icon rocket"></i>');
     l[16389] = escapeHTML(l[16389]).replace(
                  '%1',
                  '<span class="checkdiv checkboxOn autoaway">' +

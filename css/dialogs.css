@@ -1105,6 +1105,9 @@ li.token-input-token-invite .input-close {
 .achievements .storage-dialog.achievements-bl {
     display: block;
 }
+.storage-dialog.body-p i.rocket {
+    cursor: pointer;
+}
 .storage-dialog.body-p.small a {
     color: #999999;
     cursor: pointer;

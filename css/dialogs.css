@@ -112,10 +112,10 @@
     margin: 0 0 11px 0;
     padding: 22px 0 0 2px;
     overflow: hidden;
-    position:relative;
+    position: relative;
 }
 .fm-dialog .breadcrumbs-wrapper {
-    position:absolute;
+    position: absolute;
 }
 .fm-dialog-table.grid-table tr:nth-child(odd) td {
     background-color: rgba(255,255,255,1);
@@ -258,6 +258,7 @@
 }
 .achievement-dialog.reward {
     display: inline-block;
+    position: relative;
     margin: 15px 21px 0 21px;
     text-align: left;
 }
@@ -299,6 +300,7 @@
     line-height: 18px;
     color: #333333;
     padding: 15px 0 24px 0;
+    cursor: default;
 }
 .achievement-dialog.expires-txt.red {
     color: #FF333A;
@@ -320,7 +322,7 @@
 }
 .achievements-scroll .achievements-cell {
     display: table;
-    width: auto;
+    width: 100%;
     margin: 0 0 12px 0;
 }
 .achievements-scroll .achievements-cell.hidden {
@@ -358,7 +360,7 @@
     z-index: 1;
     vertical-align: top;
     text-align: center;
-    padding: 0 15px;
+    padding: 0 15px 32px 15px;
 }
 .achievements-scroll {
     max-height: 666px;
@@ -373,9 +375,9 @@
     top: 0;
     position: absolute;
     background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2Y3ZjdmNyIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmN2Y3ZjciIHN0b3Atb3BhY2l0eT0iMCIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
-background: -moz-linear-gradient(top, rgba(247,247,247,1) 0%, rgba(247,247,247,0) 100%);
-background: -webkit-linear-gradient(top, rgba(247,247,247,1) 0%,rgba(247,247,247,0) 100%);
-background: linear-gradient(to bottom, rgba(247,247,247,1) 0%,rgba(247,247,247,0) 100%);
+    background: -moz-linear-gradient(top, rgba(247,247,247,1) 0%, rgba(247,247,247,0) 100%);
+    background: -webkit-linear-gradient(top, rgba(247,247,247,1) 0%, rgba(247,247,247,0) 100%);
+    background: linear-gradient(to bottom, rgba(247,247,247,1) 0%, rgba(247,247,247,0) 100%);
     z-index: 10;
 }
 .achievements-list-dialog .acivements-content {
@@ -391,14 +393,16 @@ background: linear-gradient(to bottom, rgba(247,247,247,1) 0%,rgba(247,247,247,0
     color: #333333;
 }
 .achievement-dialog.right-block .reward {
-    margin: 0px 0 17px 10px;
+    margin: 0 0 17px 10px;
     min-width: 140px;
 }
 .achievement-dialog.right-block .reward i {
-    margin: -2px 0 0 0;
+    margin: -17px 0 0 0;
+    position: absolute;
+    top: 50%;
 }
 .achievement-dialog.right-block .reward-txt {
-    margin: -4px 0 0 13px;
+    margin: -4px 0 0 47px;
 }
 .achievements-cell-body .expires-txt {
     padding: 12px 0 0 0;
@@ -428,6 +432,7 @@ background: linear-gradient(to bottom, rgba(247,247,247,1) 0%,rgba(247,247,247,0
 }
 .one-reward .achievement-dialog.right-block {
     vertical-align: middle;
+    padding: 0 15px 0 15px;
 }
 .one-reward .achievement-dialog.right-block .reward {
     margin: 0px 0 4px 10px;
@@ -782,7 +787,7 @@ li.token-input-token-invite .input-close {
 
 .fm-dialog.create-folder-dialog {
     width: 360px;
-    margin:-67px 0 0 -180px;
+    margin: -67px 0 0 -180px;
 }
 .fm-dialog.chat-rename-dialog {
     left: 50%;

@@ -861,15 +861,14 @@ function MegaData()
 
     this.onlineStatusEvent = function(u, status) {
         if (u && megaChatIsReady) {
-            // this event is triggered for a specific resource/device (fullJid), so we need to get the presen for the
-            // user's devices, which is aggregated by Karere already
-            status = megaChat.karere.getPresence(megaChat.getJidFromNodeId(u.u));
-            var e = $('.ustatus.' + String(u.u).replace(/[^\w-]/g, ''));
+            console.error('onlineStatusEvent', u.u, status);
+            var e = $('.ustatus.' + u.u);
             if (e.length > 0) {
                 $(e).removeClass('offline online busy away');
                 $(e).addClass(this.onlineStatusClass(status)[1]);
             }
-            e = $('.fm-chat-user-status.' + String(u.u).replace(/[^\w-]/g, ''));
+
+            var e = $('.fm-chat-user-status.' + u.u);
             if (e.length > 0) {
                 $(e).safeHTML(this.onlineStatusClass(status)[0]);
             }
@@ -886,6 +885,9 @@ function MegaData()
             if (getSitePath() === "/fm/" + u.u) {
                 // re-render the contact view page if the presence had changed
                 contactUI();
+            }
+            if (u && u.u === u_handle) {
+                megaChat.renderMyStatus();
             }
         }
     };
@@ -1678,9 +1680,10 @@ function MegaData()
         // status can be: "online"/"away"/"busy"/"offline"
         for (i in activeContacts) {
             if (activeContacts.hasOwnProperty(i)) {
-                if (megaChatIsReady) {
-                    var jId = megaChat.getJidFromNodeId(activeContacts[i].u);
-                    onlinestatus = M.onlineStatusClass(megaChat.karere.getPresence(jId));
+                if (megaChatIsReady && activeContacts[i].u) {
+                    onlinestatus = M.onlineStatusClass(
+                        activeContacts[i].presence ? activeContacts[i].presence : 'unavailable'
+                    );
                 }
                 else {
                     onlinestatus = [l[5926], 'offline'];

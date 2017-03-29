@@ -139,7 +139,7 @@ var ConversationsListItem = React.createClass({
                     chatRoom.messagesBuff.messagesHistoryIsLoading() ||
                     chatRoom.messagesBuff.joined === false
                     ) ? (
-                        localStorage.megaChatPresence !== 'unavailable' ? l[7006] : ""
+                        l[7006]
                     ) :
                     l[8000]
             );
@@ -279,11 +279,19 @@ var ConversationsList = React.createClass({
                 }
                 contact = chatRoom.megaChat.getContactFromJid(contact);
 
-                if (contact && contact.c === 0) {
-                    // a non-contact conversation, e.g. contact removed - mark as read only
-                    Soon(function () {
-                        chatRoom.privateReadOnlyChat = true;
-                    });
+                if (contact) {
+                    if (!chatRoom.privateReadOnlyChat && contact.c === 0) {
+                        // a non-contact conversation, e.g. contact removed - mark as read only
+                        Soon(function () {
+                            chatRoom.privateReadOnlyChat = true;
+                        });
+                    }
+                    else if (chatRoom.privateReadOnlyChat && contact.c !== 0) {
+                        // a non-contact conversation, e.g. contact removed - mark as read only
+                        Soon(function () {
+                            chatRoom.privateReadOnlyChat = false;
+                        });
+                    }
                 }
             }
 

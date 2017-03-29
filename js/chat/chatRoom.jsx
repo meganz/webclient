@@ -1027,18 +1027,11 @@ ChatRoom.prototype.attachNodes = function(ids) {
                 var node = M.d[nodeId];
                 nodesMeta.push({
                     'h': node.h,
-                    'key': node.key,
                     'k': node.k,
-                    'a': node.a,
                     't': node.t,
                     'name': node.name,
                     's': node.s,
                     'fa': node.fa,
-                    'ar': {
-                        'n': node.ar.n,
-                        't': node.ar.t,
-                        'c': node.ar.c
-                    },
                     'ts': node.ts
                 });
             });

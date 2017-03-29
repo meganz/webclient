@@ -645,6 +645,18 @@ function populate_l() {
     l[16138] = l[16138].replace('[A]', '<a href="/pro">').replace('[/A]', '</a>');
     l[16165] = l[16165].replace('[S]', '<a class="red">').replace('[/S]', '</a>').replace('[BR]', '<br/>');
     l[16167] = l[16167].replace('[S]', '<a href="/mobile" class="clickurl">').replace('[/S]', '</a>');
+    l[16389] = l[16389].replace(
+                 '%1',
+                 '<span class="checkdiv checkboxOn autoaway">' +
+                     '<input type="checkbox" name="set-auto-away" id="set-auto-away" class="checkboxOn" checked="">' +
+                 '</span>'
+               )
+               .replace(
+                 '%2',
+                 '<span class="account-counter-number short">' +
+                     '<input type="text" value="5" id="autoaway" />' +
+                 '</span>'
+               );
 
     l['year'] = new Date().getFullYear();
     date_months = [
@@ -4037,6 +4049,11 @@ mega.utils.logout = function megaUtilsLogout() {
             step++;
             fmdb.drop().always(finishLogout);
         }
+        if (!megaChatIsDisabled) {
+            if (typeof(megaChat) !== 'undefined' && typeof(megaChat.userPresence) !== 'undefined') {
+                megaChat.userPresence.disconnect();
+            }
+        }
         if (u_privk && !loadfm.loading) {
             // Use the 'Session Management Logout' API call to kill the current session
             api_req({ 'a': 'sml' }, { callback: finishLogout });
@@ -5393,6 +5410,10 @@ function getGatewayName(gatewayId, gatewayOpt) {
         16: {
             name: 'ecp',                    // E-Comprocessing
             displayName: l[6952] + ' (ECP)' // Credit card (ECP)
+        },
+        17: {
+            name: 'sabadell',
+            displayName: 'Sabadell'
         },
         999: {
             name: 'wiretransfer',

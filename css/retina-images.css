@@ -15,7 +15,7 @@ body.pro:after {
     background-image: url("../images/mega/bitcoin-v7@2x.png");
 }
 .provider-icon {
-    background-image: url(../images/mega/payment-provider-icons-v2@2x.png);
+    background-image: url(../images/mega/payment-provider-icons-v3@2x.png);
     background-size: 20px auto;
 }
 .fm-dialog.cancel-subscription-st2 .blue-success-icon {
@@ -409,7 +409,7 @@ body.pro:after {
     background-size: 356px auto;
 }
 .loading-info li::after {
-    background-image: url(../images/mega/loading-sprite_v3@2x.png);
+    background-image: url(../images/mega/loading-sprite_v4@2x.png);
     background-size: 222px auto;
 }
 .powered-logo, .powered-arrow {

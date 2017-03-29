@@ -790,7 +790,7 @@ function initUI() {
         importFile();
     }
 
-    $('.dropdown.body').rebind('contextmenu.dropdown', function(e) {
+    $('.dropdown.body.context').rebind('contextmenu.dropdown', function(e) {
         if (!localStorage.contextmenu)
             e.preventDefault();
     });
@@ -2655,12 +2655,30 @@ function initContextUI() {
         }
     });
 
-    $('.labels .dropdown-colour-item').click(function() {
+    $('.labels .dropdown-colour-item').rebind('click', function() {
         var labelId = parseInt(this.dataset.labelId);
 
         if (labelId && (rightsById($.selected[0]) > 1)) {
             M.colourLabeling($.selected, labelId);
         }
+    });
+
+    $('.labels .dropdown-colour-item').rebind('mouseover', function() {
+        var labelTxt = this.dataset.labelTxt;
+        var labelInfo;
+
+        if ($(this).hasClass('active')) {
+            labelInfo = l[16222];
+        }
+        else {
+            labelInfo = l[16221];
+        }
+        labelTxt = labelInfo.replace('%1', '"' + labelTxt + '"');
+        $('.labels .dropdown-color-info').text(labelTxt).addClass('active');
+    });
+
+    $('.labels .dropdown-colour-item').rebind('mouseout', function() {
+        $('.labels .dropdown-color-info').removeClass('active');
     });
 
     $(c + '.open-item').rebind('click', function() {
@@ -3155,7 +3173,7 @@ function dashboardUI() {
             }
             else if (account.stype == 'O') {
                 // one-time or cancelled subscription
-                $('.account.left-pane.plan-date-info').text(l[987]);
+                $('.account.left-pane.plan-date-info').text(l[16175]);
                 $('.account.left-pane.plan-date-val').text(time2date(account.expiry, 2));
             }
         }
@@ -3180,15 +3198,17 @@ function dashboardUI() {
             max = M.maf.transfer.base + M.maf.transfer.current;
             base += account.servbw_used;
         }
+
         perc   = Math.round(base * 100 / max) || 1;
         perc_c = perc;
         if (perc_c > 100) {
             perc_c = 100;
         }
-        if (perc_c > 99) {
+        if (perc_c > 99 || dlmanager.isOverQuota) {
             $bandwidthChart.addClass('exceeded');
             b_exceeded = 1;
         }
+
         var deg =  230 * perc_c / 100;
 
         // Used Bandwidth chart
@@ -3206,13 +3226,16 @@ function dashboardUI() {
         $bandwidthChart.find('.chart.data .size-txt').text(bytesToSize(base, 0));
         $bandwidthChart.find('.chart.data .pecents-txt').text((b2[0]));
         $bandwidthChart.find('.chart.data .gb-txt').text((b2[1]));
-        if (u_attr.p || M.maf) {
+        if ((u_attr.p || M.maf) && b2[0] > 0) {
+            $bandwidthChart.removeClass('no-percs');
             $bandwidthChart.find('.chart.data .perc-txt').text(perc_c + '%');
         }
         else {
+            $bandwidthChart.addClass('no-percs');
             $bandwidthChart.find('.chart.data span:not(.size-txt)').text('');
             $bandwidthChart.find('.chart.data .pecents-txt').text(l[5801]);
         }
+
         /* End of New Used Bandwidth chart */
 
 
@@ -3548,6 +3571,8 @@ function accountUI() {
             $('.fm-account-settings').removeClass('hidden');
             sectionClass = 'advanced';
 
+            accountUI.advancedSection();
+
             $('#network-testing-button').rebind('click', function() {
                 mega.utils.require('network_js')
                     .then(function() {
@@ -3695,7 +3720,7 @@ function accountUI() {
         if (perc_c > 100) {
             perc_c = 100;
         }
-        if (perc_c > 99) {
+        if (perc_c > 99 || dlmanager.isOverQuota) {
             $bandwidthChart.addClass('exceeded');
             b_exceeded = 1;
         }
@@ -3713,14 +3738,16 @@ function accountUI() {
         }
 
         // Maximum bandwidth
-        var b2 = bytesToSize(account.bw, 0).split(' ');
-        $bandwidthChart.find('.chart.data .size-txt').text(bytesToSize(account.servbw_used + account.downbw_used, 0));
+        var b2 = bytesToSize(max, 0).split(' ');
+        $bandwidthChart.find('.chart.data .size-txt').text(bytesToSize(base, 0));
         $bandwidthChart.find('.chart.data .pecents-txt').text((b2[0]));
         $bandwidthChart.find('.chart.data .gb-txt').text((b2[1]));
-        if (u_attr.p || M.maf) {
+        if ((u_attr.p || M.maf) && b2[0] > 0) {
+            $bandwidthChart.removeClass('no-percs');
             $bandwidthChart.find('.chart.data .perc-txt').text(perc_c + '%');
         }
         else {
+            $bandwidthChart.addClass('no-percs');
             $bandwidthChart.find('.chart.data span:not(.size-txt)').text('');
             $bandwidthChart.find('.chart.data .pecents-txt').text(l[5801]);
         }
@@ -4036,10 +4063,11 @@ function accountUI() {
 
             // For free users only show base quota for storage and remove it for bandwidth.
             // For pro users replace base quota by pro quota
+            var $baseq = $('.achievements-block .data-block.storage .baseq');
+            storageBaseQuota = maf.storage.base;
+            $('.progress-txt', $baseq).text(bytesToSize(storageBaseQuota, 0));
+
             if (u_attr.p) {
-                var $baseq = $('.achievements-block .data-block.storage .baseq');
-                storageBaseQuota = maf.storage.base;
-                $('.progress-txt', $baseq).text(bytesToSize(storageBaseQuota, 0));
                 $('.progress-title', $baseq).text(l[16299]);
 
                 transferBaseQuota = maf.transfer.base;
@@ -4414,6 +4442,11 @@ function accountUI() {
         // Cache selectors
         var $newEmail = $('#account-email');
         var $emailInfoMessage = $('.fm-account-change-email');
+        var $personalInfoBlock = $('.profile-form.first');
+        var $firstNameField = $personalInfoBlock.find('#account-firstname');
+        var $saveBlock = $('.fm-account-save-block');
+        var $cancelButton = $saveBlock.find('.fm-account-cancel');
+        var $saveButton = $saveBlock.find('.fm-account-save');
 
         // Reset change email fields after change
         $newEmail.val('');
@@ -4441,7 +4474,8 @@ function accountUI() {
 
             if (mail === "") {
                 $passwords.removeAttr('disabled').parents('.account.data-block').removeClass('disabled');
-            } else {
+            }
+            else {
                 $passwords.attr('disabled', 'disabled').parents('.account.data-block').addClass('disabled');
             }
 
@@ -4455,25 +4489,41 @@ function accountUI() {
 
             // Show save button
             if (mail !== u_attr.email) {
-                $('.profile-form.first').addClass('email-confirm');
-                $('.fm-account-save-block').removeClass('hidden');
+                $personalInfoBlock.addClass('email-confirm');
+                $saveBlock.removeClass('hidden');
             }
         });
 
-        $('#account-firstname,#account-lastname,#account-phonenumber').rebind('keyup', function(e)
-        {
-            $('.fm-account-save-block').removeClass('hidden');
+        $firstNameField.on('input', function() {
+
+            if ($(this).val().trim().length > 0) {
+                $saveBlock.removeClass('hidden');
+            }
+            else {
+                $saveBlock.addClass('hidden');
+            }
         });
-        $('.fm-account-cancel').rebind('click', function(e)
+
+        $('#account-lastname, #account-phonenumber').rebind('keyup.settingsGeneral', function() {
+
+            if ($firstNameField.val().trim().length > 0) {
+                $saveBlock.removeClass('hidden');
+            }
+            else {
+                $saveBlock.addClass('hidden');
+            }
+        });
+
+        $cancelButton.rebind('click', function()
         {
             $passwords.removeAttr('disabled').parents('.account.data-block').removeClass('disabled');
             $newEmail.removeAttr('disabled').parents('.account.data-block').removeClass('disabled');
-            $('.fm-account-save-block').addClass('hidden');
-            $('.profile-form.first').removeClass('email-confirm');
+            $saveBlock.addClass('hidden');
+            $personalInfoBlock.removeClass('email-confirm');
             accountUI();
         });
 
-        $('.fm-account-save').rebind('click', function()
+        $saveButton.rebind('click', function()
         {
             $passwords.removeAttr('disabled').parents('.account.data-block').removeClass('disabled');
             $newEmail.removeAttr('disabled').parents('.account.data-block').removeClass('disabled');
@@ -5138,7 +5188,7 @@ function accountUI() {
             for (var i in prices)
                 voucheroptions += '<div class="default-dropdown-item" data-value="' + htmlentities(prices[i]) + '">&euro;' + htmlentities(prices[i]) + ' voucher</div>';
             $('.default-select.vouchertype .default-select-scroll').html(voucheroptions);
-            bindDropdownEvents($('.default-select.vouchertype'), 0, '.account.tab-content');
+            bindDropdownEvents($('.default-select.vouchertype'), 0, '.fm-account-reseller');
         }
 
         $('.fm-purchase-voucher,.default-white-button.topup').rebind('click', function(e)
@@ -7427,6 +7477,11 @@ function contextMenuUI(e, ll) {
         else {
             return false;
         }
+
+        //Hide Info item if properties dialog is opened
+        if ($.dialog === 'properties') {
+            $(menuCMI).filter('.properties-item').hide();
+        }
     }
     // This part of code is also executed when ll == 'undefined'
     v = m.children('.dropdown-section');
@@ -7872,6 +7927,8 @@ function treeUI()
             $(e.target).is('input') ||
             $(e.target).is('textarea') ||
             $(e.target).is('.download.info-txt') ||
+            $(e.target).closest('.multiple-input').length ||
+            $(e.target).closest('.create-folder-input-bl').length ||
             $(e.target).closest('.content-panel.conversations').length ||
             $(e.target).closest('.messages.content-area').length ||
             $(e.target).closest('.chat-right-pad .user-card-data').length ||
@@ -7883,7 +7940,8 @@ function treeUI()
             $(e.target).hasClass('contact-details-email') ||
             $(e.target).hasClass('nw-conversations-name')) {
             return;
-        } else if (!localStorage.contextmenu) {
+        }
+        else if (!localStorage.contextmenu) {
             $.hideContextMenu();
             return false;
         }
@@ -12781,7 +12839,7 @@ function contactUI() {
 
         var onlinestatus = M.onlineStatusClass(
             megaChatIsReady &&
-            megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h))
+            M.u[u_h] ? M.u[u_h].presence : "unavailable"
         );
 
         $('.contact-top-details .nw-contact-block-avatar').empty().append( avatar.removeClass('avatar').addClass('square') );
@@ -13070,8 +13128,7 @@ function bindDropdownEvents($dropdown, saveOption, contentBlock) {
         }
     });
 
-    $dropdownsItem.rebind('click', function(e)
-    {
+    $dropdownsItem.rebind('click.settingsGeneral', function(e) {
         var $this = $(this);
         if (!$this.hasClass('active')) {
             var $select = $(this).closest('.default-select');
@@ -13081,8 +13138,10 @@ function bindDropdownEvents($dropdown, saveOption, contentBlock) {
             $this.addClass('active');
             $select.find('span').text($this.text());
 
-            //Save changes for account page
-            if (saveOption) {
+            var nameLen = $('#account-firstname').val().trim().length;
+
+            // Save changes for account page
+            if (saveOption && nameLen) {
                 $('.fm-account-save-block').removeClass('hidden');
             }
         }

@@ -57,18 +57,6 @@ var Karere = function(user_options) {
         if (self.getConnectionState() === Karere.CONNECTION_STATE.CONNECTED) {
             self.destroying = true;
 
-            var msg = $pres({
-                type: 'unavailable'
-            });
-
-
-
-            self.connection.send(msg);
-
-            self.connection.flush();
-
-            self.connection.sync = true;
-
             self.connection.disconnect();
 
             self.logger.warn("flushing out and disconnecting onbeforeunload");
@@ -213,11 +201,37 @@ var Karere = function(user_options) {
         self.connectionRetryManager.gotConnected();
     });
 
+    var clearDelayedReconnectTimeout = function() {
+        if (self._delayedConnectTimeout) {
+            clearTimeout(self._delayedConnectTimeout);
+            self._delayedConnectTimeout = null;
+        }
+    };
+
     self.connectionRetryManager = new ConnectionRetryManager(
         {
+            minConnectionRetryTimeout: 1500,
             functions: {
                 reconnect: function(connectionRetryManager) {
-                    return self.forceReconnect();
+                    if (connectionRetryManager._connectionRetries > 1) {
+                        clearDelayedReconnectTimeout();
+                        var megaPromise = new MegaPromise();
+                        // because of the bug in ejabberd, force delay any connection retry
+                        self._delayedConnectTimeout = setTimeout(function() {
+                            clearDelayedReconnectTimeout();
+                            if (self.getConnectionState() === Karere.CONNECTION_STATE.CONNECTED) {
+                                megaPromise.resolve();
+                            }
+                            else {
+                                megaPromise.linkDoneAndFailTo(self.forceReconnect());
+                            }
+                        }, 2000);
+
+                        return megaPromise;
+                    }
+                    else {
+                        return self.forceReconnect();
+                    }
                 },
                 /**
                  * A Callback that will trigger the 'forceDisconnect' procedure for this type of connection (Karere/Chatd/etc)
@@ -264,7 +278,7 @@ var Karere = function(user_options) {
                  */
                 isUserForcedDisconnect: function(connectionRetryManager) {
                     return (
-                        self.destroying === true || localStorage.megaChatPresence === "unavailable"
+                        self.destroying === true
                     );
                 }
             }
@@ -903,7 +917,7 @@ makeMetaAware(Karere);
             localStorage.karereIdx = 0;
         }
 
-        return localStorage.karereIdx;
+        return localStorage.karereIdx + rand_range(1, 999999);
     };
 
     /**
@@ -1711,12 +1725,13 @@ makeMetaAware(Karere);
      * @param [delay] Number unix timestamp that should be used for sending a urn:xmpp:delay w/ the presence stanza
      */
     Karere.prototype.setPresence = function(presence, status, delay) {
+        var self = this;
 
         presence = presence || "chat";
         status = status || "";
         delay = delay ? parseFloat(delay) : undefined;
 
-        var self = this;
+
 
         self._myPresence = presence;
 

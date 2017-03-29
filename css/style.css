@@ -941,24 +941,27 @@ a.account-manage-button:hover {
     padding: 0 0 16px 0;
 }
 .account-counter-number input {
-    background-color: white;
+    background-color: rgba(0,0,0,0.05);
     width: 100%;
     outline: none;
     font-size: 14px;
-    color: #868686;
+    color: #333333;
+    border: 0;
     margin: 0;
-    border: 1px solid #d9d9d9;
     text-align: center;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     height: 32px;
-    line-height: 25px;
+    line-height: 27px;
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
     border-radius: 5px;
     text-align: center;
     box-sizing: border-box;
     padding: 0 10px;
+}
+.account-counter-number.short input {
+    padding: 0 3px;
 }
 .account-counter-percents {
     float: left;
@@ -1056,12 +1059,12 @@ a.account-manage-button:hover {
     display: inline-block;
     height: 40px;
 }
-.free .fm-right-block:not(.active-achievements) .bandwidth .chart.data .perc-txt, .free .fm-right-account-block:not(.active-achievements) .bandwidth .chart.data .perc-txt {
+.free .fm-right-block:not(.active-achievements) .bandwidth .chart.data .perc-txt, .free .fm-right-account-block:not(.active-achievements) .bandwidth .chart.data .perc-txt, .no-percs .chart.data .perc-txt {
     background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     background-position: -10px -11854px;
     width: 30px;
 }
-.free .bandwidth .chart.data .perc-txt::before {
+.free .bandwidth .chart.data .perc-txt::before, .no-percs .chart.data .perc-txt::before {
     content: '\00a0';
 }
 .fm-account-blocks .perc-txt::after {
@@ -1190,8 +1193,10 @@ a.account-manage-button:hover {
 }
 .account-counter-number {
     width: 60px;
-    padding: 0 12px 0 8px;
-    margin-top: 1px;
+    margin: 0 12px 0 -23px;
+}
+.account-counter-number.short {
+    width: 38px;
 }
 div.radioOn, div.radioOff {
     float: left;
@@ -1505,7 +1510,7 @@ a.blog-button:hover {
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     border-radius: 4px;
-    background-color: #FF333A;
+    background-color: #D90007;
     color: white;
     font-size: 12px;
     line-height: 14px;
@@ -1701,6 +1706,7 @@ a.blog-button:hover {
     font-size: 31px;
     line-height: 42px;
     margin: 0;
+    color: white;
 }
 .notification-item .avatar img {
     width: 44px;
@@ -4127,11 +4133,6 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
     overflow: hidden;
-    -webkit-transition: color 150ms ease-in-out;
-    -moz-transition: color 150ms ease-in-out;
-    -o-transition: color 150ms ease-in-out;
-    -ms-transition: color 150ms ease-in-out;
-    transition: color 150ms ease-in-out;
 }
 .rubbish-bin .nw-fm-tree-folder {
     background-position: -15px -7595px;
@@ -4323,10 +4324,10 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     background-color: #13E03C;
 }
 .away .nw-contact-status, .away .properties-contact-status {
-    background-color: #FFD200;
+    background-color: #FFA500;
 }
 .busy .nw-contact-status, .busy .properties-contact-status {
-    background-color: #FFA500;
+    background-color: #EB4444;
 }
 .offline .nw-contact-status, .offline .properties-contact-status {
     background-color: #666666;
@@ -4351,7 +4352,6 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     display: block;
     font-size: 24px;
     line-height: 31px;
-    color: white;
     text-align: center;
     font-family: 'source_sans_prolight';
     display: block;
@@ -4375,6 +4375,9 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 }
 .nw-contact-avatar {
     margin-bottom: 6px;
+}
+.nw-contact-avatar span {
+    color: white;
 }
 .fm-tree-panel .nw-contact-avatar, .email .nw-contact-avatar::before, .gmail .nw-contact-avatar::before {
     display: none;
@@ -4608,6 +4611,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     font-size: 17px;
     line-height: 23px;
 }
+.fm-avatar .avatar span {
+    color: white;
+}
 .fm-avatar .avatar::before {
     -webkit-box-shadow: none;
     -moz-box-shadow: none;
@@ -4791,7 +4797,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     height: 24px;
 }
 .top-menu-item.active {
-    border-color: #FF333A;
+    border-color: #D90007;
 }
 .top-submenu {
     max-height: 0;
@@ -5015,6 +5021,16 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     -moz-box-shadow: 0px 0px 0px 2px #13E03C;
     box-shadow: 0px 0px 0px 2px #13E03C;
 }
+.activity-status.top.away:hover::before, .active .activity-status.top.away::before {
+    -webkit-box-shadow: 0px 0px 0px 2px #FFA500;
+    -moz-box-shadow: 0px 0px 0px 2px #FFA500;
+    box-shadow: 0px 0px 0px 2px #FFA500;
+}
+.activity-status.top.busy:hover::before, .active .activity-status.top.busy::before {
+    -webkit-box-shadow: 0px 0px 0px 2px #EB4444;
+    -moz-box-shadow: 0px 0px 0px 2px #EB4444;
+    box-shadow: 0px 0px 0px 2px #EB4444;
+}
 .activity-status.top.offline:hover::before, .active .activity-status.top.offline::before {
     -webkit-box-shadow: 0px 0px 0px 2px #666666;
     -moz-box-shadow: 0px 0px 0px 2px #666666;
@@ -5035,6 +5051,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     width: 8px;
     display: inline-block;
     margin: 0px 8px 0 -2px;
+    -webkit-box-shadow: 0px 0px 0px 2px transparent;
+    -moz-box-shadow: 0px 0px 0px 2px transparent;
+    box-shadow: 0px 0px 0px 2px transparent;
 }
 .contact-status {
     float: left;
@@ -5055,10 +5074,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     background-color: #13E03C;
 }
 .activity-status.away, .contact-status.away-status {
-    background-color: #FFD200;
+    background-color: #FFA500;
 }
 .activity-status.busy, .contact-status.busy-status {
-    background-color: #FFA500;
+    background-color: #EB4444;
 }
 .activity-status.offline, .contact-status.offline-status {
     background-color: #666666;
@@ -5067,7 +5086,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     background-color: black;
 }
 .dropdown-item:hover .activity-status {
-    background-color: white;
+    -webkit-box-shadow: 0px 0px 0px 2px #FFFFFF;
+    -moz-box-shadow: 0px 0px 0px 2px #FFFFFF;
+    box-shadow: 0px 0px 0px 2px #FFFFFF;
 }
 .membership-status-block {
     float: right;
@@ -5388,7 +5409,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     background-color: rgba(43,166,222,1);
 }
 .fm-left-menu.dashboard {
-    background-color: #FF333A;
+    background-color: #D90007;
     display: none;
 }
 .transfers .nw-fm-tree-header span {
@@ -5398,7 +5419,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     background-color: rgba(49,181,0,1);
 }
 .fm-left-menu.cloud-drive, .fm-left-menu.notifications, .fm-left-menu.folder-link {
-    background-color: #FF333A;
+    background-color: #D90007;
 }
 .fm-left-menu.transfers {
     background-color: #E0E0E0;
@@ -5763,7 +5784,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     border-color: rgba(97,210,255,1);
 }
 .nw-fm-left-icon.dashboard.active .nw-fm-left-border {
-    border-color: #FF333A;
+    border-color: #D90007;
 }
 .nw-fm-left-icon.rubbish-bin.active .nw-fm-left-border {
     border-color: #13E03C;
@@ -9505,7 +9526,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .default-select-dropdown .jspTrack {
     padding: 0 2px 0 8px;
-    
 }
 .default-select-scroll {
     max-height: 288px;
@@ -10873,7 +10893,7 @@ table {
     margin: 0 0 -9px 0;
 }
 .account.data-txt span {
-    color: #FF333A;
+    color: #D90007;
 }
 .fm-account-header .semi-big-icon {
     vertical-align: top;
@@ -10953,15 +10973,15 @@ table {
 }
 .account.tab-content {
     position: relative;
-    height: -webkit-calc(100% - 38px);
-    height: -moz-calc(100% -38px);
-    height: calc(100% - 38px);
+    height: -webkit-calc(100% - 37px);
+    height: -moz-calc(100% -37px);
+    height: calc(100% - 37px);
     background-color: white;
 }
 .account.tabs-bl {
     background-color: #fafafa;
     border-bottom: 1px solid #eaeaea;
-    padding: 6px 16px 0 12px;
+    padding: 5px 16px 0 12px;
 }
 .account.tabs-bl .default-grey-button {
     margin-top: 1px;
@@ -10988,7 +11008,7 @@ table {
     margin-bottom: -1px;
 }
 .account.tab-lnk.active {
-    border-color: #FF333A;
+    border-color: #D90007;
     color: #333333;
 }
 .account.tab-lnk.achievements, .active-achievements .account.tab-lnk.payment {
@@ -11011,6 +11031,26 @@ table {
 }
 .account.radio-buttons {
     padding: 9px 0 22px 0;/*width: 530px;*/
+}
+.account.radio-buttons .text-with-inputs {
+    padding-top: 0;
+}
+.account.radio-buttons .text-with-inputs .checkdiv {
+    float: none;
+    display: inline-block;
+    margin: 0px 10px -3px 20px;
+}
+.account.radio-buttons .text-with-inputs .account-counter-number {
+    float: none;
+    display: inline-block;
+    margin: 0 10px -10px 10px;
+}
+.account.radio-buttons hr {
+    clear: both;
+    padding: 12px 0 0 0;
+    margin: 0;
+    border:0;
+    height: autol
 }
 .account.radio-buttons.bottom-pad {
     padding-bottom: 41px;
@@ -11099,6 +11139,7 @@ table {
     height: 100%;
     text-align: center;
     line-height: 130px;
+    color: white;
 }
 .fm-account-avatar .avatar-wrapper::before {
     width: 136px;
@@ -11568,6 +11609,9 @@ table {
     background-color: #cc0006;
     left: 180px;
     display: block;
+}
+.no-percs .chart-indicator {
+    left: 145px;
 }
 .going-out .chart-indicator {
     display: block;
@@ -14549,7 +14593,7 @@ body.de .reg-st3-bandwidth .reg-st3-mid-txt, body.br .reg-st3-bandwidth .reg-st3
     margin-right: 4px;
 }
 .provider-icon {
-    background-image: url("../images/mega/payment-provider-icons-v2.png");
+    background-image: url("../images/mega/payment-provider-icons-v3.png");
     background-position: 0 0;
     background-repeat: no-repeat;
     display: inline-block;
@@ -14772,6 +14816,15 @@ body.de .reg-st3-bandwidth .reg-st3-mid-txt, body.br .reg-st3-bandwidth .reg-st3
 }
 .provider-icon.directresellerAlipay {
     background-position: 0 -4020px;
+}
+.provider-icon.sabadell {
+    background-position: 0 -4080px;
+}
+.provider-icon.sabadellVI {
+    background-position: 0 -3360px;
+}
+.provider-icon.sabadellMC {
+    background-position: 0 -1980px;
 }
 .membership-new-offer text {
     font-weight: normal;
@@ -20118,6 +20171,20 @@ span.incoming-call-name {
     position: relative;
     background-color: #f2f2f2;
 }
+.incoming-call-avatar .avatar-wrapper {
+    width: 132px;
+    height: 132px;
+    border: 0;
+    margin: 0;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+    font-size: 72px;
+    line-height: 130px;
+}
+.incoming-call-avatar .avatar-wrapper span {
+    color: white;
+}
 .incoming-call-avatar img {
     width: 132px;
     height: 132px;
@@ -20521,7 +20588,8 @@ span.incoming-call-name {
     color: white;
     line-height: 94px;
     text-align: center;
-    font-size: 45px;
+    font-size: 55px;
+    font-family: 'source_sans_prolight', Arial;
     -moz-border-radius: 100%;
     -webkit-border-radius: 100%;
     border-radius: 100%;
@@ -20531,6 +20599,7 @@ span.incoming-call-name {
 .fingerprint-avatar img, .fingerprint-avatar .avatar-wrapper {
     width: 96px;
     height: 96px;
+    color: white;
 }
 .fingerprint-code {
     float: right;
@@ -20583,7 +20652,7 @@ span.incoming-call-name {
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
-        white-space: nowrap;
+    white-space: nowrap;
     overflow: hidden;
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
@@ -21095,7 +21164,6 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     position: absolute;
     left: 0;
     top: 0;
-    color: white;
     line-height: 16px;
     font-size: 10px;
     text-align: center;
@@ -21103,6 +21171,9 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     -webkit-border-radius: 100%;
     border-radius: 100%;
     text-transform: uppercase;
+}
+.search-avatar span, .pending-indicator span {
+    color: white;
 }
 .pending-indicator {
     display: none;
@@ -24668,7 +24739,7 @@ a.opensource-icon-txt.coming-soon {
     padding-top: 35px;
 }
 .megasync-info a {
-    color: #FF333A;
+    color: #D90007;
     cursor: pointer;
 }
 .camera-access {
@@ -24949,8 +25020,8 @@ div.camera-bottom-txt {
     border-radius: 100%;
 }
 .account.progress-indicator.active {
-    border-color: #FF333A;
-    background-color: #FF333A;
+    border-color: #D90007;
+    background-color: #D90007;
 }
 .account.progress-indicator.grey.active, .account.progress-bar.grey {
     background-color: #666666;
@@ -25161,12 +25232,12 @@ div.camera-bottom-txt {
     margin: 0 0 -18px 0;
 }
 .red-star {
-    color: #FF333A;
+    color: #D90007;
 }
 .account .progress-title.star::after {
     content: ' *';
     display: inline;
-    color: #FF333A;
+    color: #D90007;
 }
 .achievement-full.description {
     font-size: 14px;
@@ -25377,7 +25448,7 @@ div.camera-bottom-txt {
     height: 92px;
     display: block;
     position: absolute;
-    margin: 21px 0 0 50px;
+    margin: 19px 0 0 50px;
     background-color: white;
     z-index: 10;
 }
@@ -25388,11 +25459,11 @@ div.camera-bottom-txt {
     overflow: hidden;
     position: absolute;
     z-index: 1;
-    top: 71px;
+    top: 73px;
     left: -1px;
 }
 .account.chart.overlay span:first-child {
-    top: -7px;
+    top: -5px;
     left: 34px;
     transform: rotate(45deg);
 }
@@ -25451,6 +25522,9 @@ div.camera-bottom-txt {
 }
 .free .fm-right-block.dashboard:not(.active-achievements) .bandwidth .chart.progressbars span, .free .fm-right-account-block:not(.active-achievements) .bandwidth .chart.progressbars span {
     transform: none !important;
+}
+.free .fm-right-block.dashboard .bandwidth.exceeded .chart.progressbars span, .free .fm-right-account-block .bandwidth.exceeded .chart.progressbars span, .bandwidth.exceeded .chart.progressbars span {
+    transform: rotate(180deg) !important;
 }
 .chart.progressbars .right-chart {
     clip: rect(0, 100px, 100px, 50px);
@@ -25955,7 +26029,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', e
     background-repeat: no-repeat;
 }
 .bottom-info.content h4 {
-    color: #FF333A;
+    color: #D90007;
     font-size: 24px;
     line-height: 26px;
     font-family: 'source_sans_prolight';

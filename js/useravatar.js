@@ -46,7 +46,7 @@ var useravatar = (function() {
         while (len--) {
             var color = '.color' + (len + 1);
             css += color + ', .nw-contact-avatar' + color + ', .contacts-avatar' + color
-                + ', .avatar' + color + ' { background-color: ' + _colors[len] + '; }';
+                + ', .avatar' + color + ' { background-color: ' + _colors[len] + '; color: ' + _colors[len] + '; }';
         }
 
         css = mObjectURL([css], 'text/css');

@@ -15759,10 +15759,6 @@
         "text": "Storage Full",
         "context": "Dialog header. Informs user that he\u2019ve reached the full capacity of Cloud Drive for Free accounts."
     },
-    "16303": {
-        "text": "",
-        "context": "A dialog message that informs the user that their cloud storage is full."
-    },
     "16304": {
         "text": "[A]Upgrade now[\/A] and keep enjoying secure, end-to-end encrypted cloud storage. \r\nPRO accounts get [S]up to 4 TB (4096 GB) of storage[\/S] and 8 TB of transfer quota that they can share with users downloading their files.",
         "context": "A dialog message indicating what you can get with a PRO plan. Please leave the placeholders [A], [\/A], [S], [\/S] as they are."
@@ -15772,7 +15768,7 @@
         "context": "Button label. Allow user to check available PRO plans."
     },
     "16306": {
-        "text": "Delete old files that you no longer need to free up some space.",
+        "text": "Delete old files and [A]clear your Rubbish Bin[\/A] to free up some space.",
         "context": "A dialog message that informs the user how to free up cloud drive space."
     },
     "16307": {

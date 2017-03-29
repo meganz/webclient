@@ -15784,7 +15784,7 @@
         "context": "Button label. Allows user to get more storage\/transfer quotas by executing achievements."
     },
     "16310": {
-        "text": "Tip: Check all your available bonuses in the Dashboard or click [I]",
+        "text": "Tip: Check all your available bonuses in the [A]Dashboard[\/A] or click [I]",
         "context": "A dialog message that informs the user that they may have outstanding achievements, which may increase storage quota. Please leave the [I] placeholder as it is because it will be replaced by an icon."
     },
     "16311": {
@@ -16080,7 +16080,7 @@
         "context": "A note about MEGA's transfer quota. Please leave the placeholders [S] and [\/S] which are used to stylise the text."
     },
     "16391": {
-        "text": "[S]Transfer speed[\/S] is unrelated to Transfer quota. The quality of your file transfers\u2019 velocity can be affected by many factors beyond our control, such as your local network and your Internet Service Provider. MEGA always processes file transfers at the maximum possible speed regardless of your account status.",
+        "text": "[S]Transfer speed[\/S] is unrelated to Transfer quota. The quality of your file transfers' speed can be affected by many factors beyond our control, such as your local network and your Internet Service Provider. MEGA always processes file transfers at the maximum possible speed regardless of your account status.",
         "context": "A note about transfer speed. Please leave the placeholders [S] and [\/S] which are used to stylise the text."
     },
     "16392": {

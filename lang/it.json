@@ -3945,7 +3945,7 @@
     "16307": "Consiglio: Tieni il tuo Cestino vuoto per ottimizzare l'uso dello spazio.",
     "16308": "Puoi sbloccare pi\u00f9 spazio e quota di trasferimento usando i nostri prodotti. Semplice e facile.",
     "16309": "Ottieni pi\u00f9 bonus",
-    "16310": "Consiglio: controlla tutti i tuoi bonus disponibili nella Dashboard o clicca su [I]",
+    "16310": "Tip: Check all your available bonuses in the [A]Dashboard[\/A] or click [I]",
     "16311": "Archivio quasi pieno",
     "16312": "Sembra che tu stia per esaurire il tuo spazio.",
     "16313": "[A]Aggiorna ora[\/A] ad un account [S]PRO Lite[\/S] e non preoccuparti di superare lo spazio. [S]Per \u20ac%1 al mese puoi avere 200GB di spazio[\/S] ed 1TB di quota di trasferimento.",
@@ -4019,7 +4019,7 @@
     "16388": "Potresti voler cambiare le tue impostazioni per garantire una banda di trasferimento agli utenti che scaricano i tuoi file.",
     "16389": "Online, %1 ma cambia il mio stato in Lontano (giallo) dopo %2 minuto\/i di inattivit\u00e0.",
     "16390": "[S]Transfer quota[\/S] is the total volume of data transfered between MEGA and your system each month.",
-    "16391": "[S]Transfer speed[\/S] is unrelated to Transfer quota. The quality of your file transfers\u2019 velocity can be affected by many factors beyond our control, such as your local network and your Internet Service Provider. MEGA always processes file transfers at the maximum possible speed regardless of your account status.",
+    "16391": "[S]Transfer speed[\/S] is unrelated to Transfer quota. The quality of your file transfers' speed can be affected by many factors beyond our control, such as your local network and your Internet Service Provider. MEGA always processes file transfers at the maximum possible speed regardless of your account status.",
     "16392": "[S]PRO and Free accounts[\/S] enjoy the same fast transfer speed.",
     "alias": {
         "shared-with-me": 5589,

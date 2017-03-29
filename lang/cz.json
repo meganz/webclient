@@ -3945,7 +3945,7 @@
     "16307": "Tip: Udr\u017eujte Ko\u0161 pr\u00e1zdn\u00fd pro optimalizaci vyu\u017eit\u00ed \u00falo\u017ei\u0161t\u011b.",
     "16308": "V\u00edce bezplatn\u00e9ho \u00falo\u017ei\u0161t\u011b a kv\u00f3ty p\u0159enosu m\u016f\u017eete odemknout pou\u017e\u00edv\u00e1n\u00edm na\u0161ich produkt\u016f. Jednoduch\u00e9. Snadn\u00e9.",
     "16309": "Z\u00edskat v\u00edce bonus\u016f",
-    "16310": "Tip: Zkontrolujte v\u0161echny sv\u00e9 dostupn\u00e9 bonusy na N\u00e1st\u011bnce nebo klikn\u011bte na [I]",
+    "16310": "Tip: Check all your available bonuses in the [A]Dashboard[\/A] or click [I]",
     "16311": "\u00dalo\u017ei\u0161t\u011b je t\u00e9m\u011b\u0159 pln\u00e9",
     "16312": "Zd\u00e1 se, \u017ee v\u00e1m doch\u00e1z\u00ed \u00falo\u017ei\u0161t\u011b.",
     "16313": "[A]Upgradujte nyn\u00ed[\/A] na \u00fa\u010det [S]PRO Lite[\/S] a neob\u00e1vejte se toho, \u017ee v\u00e1m dojde \u00falo\u017ei\u0161t\u011b. [S]Za %1 \u20ac m\u011bs\u00ed\u010dn\u011b z\u00edsk\u00e1te 200 GB \u00falo\u017ei\u0161t\u011b[\/S]a 1 TB kv\u00f3ty p\u0159enosu.                ",
@@ -4019,7 +4019,7 @@
     "16388": "Mo\u017en\u00e1 budete cht\u00edt zm\u011bnit nastaven\u00ed pro ud\u011blen\u00ed kv\u00f3ty p\u0159enosu pro stahuj\u00edc\u00ed u\u017eivatele.",
     "16389": "Online, %1 ale zm\u011bnit m\u016fj zobrazovan\u00fd stav na Pry\u010d (\u017elut\u00fd) po %2 minut\u00e1ch neaktivity.",
     "16390": "[S]Transfer quota[\/S] is the total volume of data transfered between MEGA and your system each month.",
-    "16391": "[S]Transfer speed[\/S] is unrelated to Transfer quota. The quality of your file transfers\u2019 velocity can be affected by many factors beyond our control, such as your local network and your Internet Service Provider. MEGA always processes file transfers at the maximum possible speed regardless of your account status.",
+    "16391": "[S]Transfer speed[\/S] is unrelated to Transfer quota. The quality of your file transfers' speed can be affected by many factors beyond our control, such as your local network and your Internet Service Provider. MEGA always processes file transfers at the maximum possible speed regardless of your account status.",
     "16392": "[S]\u00da\u010det PRO a bezplatn\u00fd \u00fa\u010det[\/S] maj\u00ed stejnou rychlost p\u0159enosu.",
     "alias": {
         "shared-with-me": 5589,

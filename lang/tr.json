@@ -3940,7 +3940,7 @@
     "16301": "%2'tan [S]%1[\/S]",
     "16302": "Depolama Dolu",
     "16303": "[S]\u00dccretsiz[\/S] hesap i\u00e7in Bulut S\u00fcr\u00fcc\u00fcs\u00fc limitine eri\u015ftiniz.",
-    "16304": "[A]\u015eimdi y\u00fckseltin[\/A] ve g\u00fcvenli, u\u00e7tan-uca \u015fifrelenmi\u015f bulut depolama alan\u0131n\u0131n keyfini \u00e7\u0131kar\u0131n. PRO hesaplar  [S]4 TB'a kadar (4096 GB) depolama alan\u0131[\/S] ve dosyalar\u0131n\u0131 indiren ki\u015filerle payla\u015fabilecekleri 8TB aktarma bantgeni\u015fli\u011fine sahip olabilirler.                ",
+    "16304": "[A]\u015eimdi y\u00fckseltin[\/A] ve g\u00fcvenli, u\u00e7tan-uca \u015fifrelenmi\u015f bulut depolama alan\u0131n\u0131n keyfini \u00e7\u0131kar\u0131n. PRO hesaplar  [S]4 TB'a kadar (4000 GB) depolama alan\u0131[\/S] ve dosyalar\u0131n\u0131 indiren ki\u015filerle payla\u015fabilecekleri 8TB aktarma bantgeni\u015fli\u011fine sahip olabilirler.                ",
     "16305": "Paket se\u00e7in",
     "16306": "Yer a\u00e7mak i\u00e7in ihtiyac\u0131n\u0131z olmayan eski dosyalar\u0131 silin.",
     "16307": "\u00d6neri: Depolama kullan\u0131m\u0131n\u0131 optimize etmek i\u00e7in \u00c7\u00f6p Kutunuzu s\u0131k s\u0131k bo\u015falt\u0131n.",
@@ -4019,6 +4019,9 @@
     "16387": "Ba\u011fl\u0131 olmad\u0131\u011f\u0131mda bile, her zaman se\u00e7ilen durum g\u00f6r\u00fcnt\u00fcs\u00fcn\u00fc g\u00f6ster.",
     "16388": "\u0130ndiren kullan\u0131c\u0131lar i\u00e7in izin verilen aktarma kotas\u0131n\u0131 de\u011fi\u015ftirmek isteyebilirsiniz.",
     "16389": "\u00c7evrimi\u00e7i, %1 ama %2 dakika aktivite olmaz ise durumumu D\u0131\u015farda (sar\u0131) olarak de\u011fi\u015ftir.",
+    "16390": "[S]Transfer quota[\/S] is the total volume of data transfered between MEGA and your system each month.",
+    "16391": "[S]Transfer speed[\/S] is unrelated to Transfer quota. The quality of your file transfers\u2019 velocity can be affected by many factors beyond our control, such as your local network and your Internet Service Provider. MEGA always processes file transfers at the maximum possible speed regardless of your account status.",
+    "16392": "[S]PRO and Free accounts[\/S] enjoy the same fast transfer speed.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

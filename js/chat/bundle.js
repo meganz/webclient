@@ -232,8 +232,8 @@ React.makeElement = React['createElement'];
 	            'emoticonsFilter': EmoticonsFilter,
 	            'callFeedback': CallFeedback,
 	            'karerePing': KarerePing,
-	            "presencedIntegration": PresencedIntegration
-
+	            'presencedIntegration': PresencedIntegration,
+	            'persistedTypeArea': PersistedTypeArea
 	        },
 	        'chatNotificationOptions': {
 	            'textMessages': {
@@ -2151,10 +2151,10 @@ React.makeElement = React['createElement'];
 	            $(this.popup).css(this.props.style);
 	        }
 	        this.props.element.appendChild(this.popup);
+	        this._renderLayer();
 	        if (this.props.popupDidMount) {
 	            this.props.popupDidMount(this.popup);
 	        }
-	        this._renderLayer();
 	    },
 	    componentDidUpdate: function componentDidUpdate() {
 	        this._renderLayer();
@@ -5312,14 +5312,23 @@ React.makeElement = React['createElement'];
 	                        { className: "dialog secondary-header" },
 	                        __("Please confirm that you want to upload this image and share it in this chat room.")
 	                    ),
-	                    React.makeElement("img", { src: self.state.pasteImageConfirmDialog[2], style: {
+	                    React.makeElement("img", {
+	                        src: self.state.pasteImageConfirmDialog[2],
+	                        style: {
 	                            maxWidth: "90%",
 	                            height: "auto",
+	                            maxHeight: $(document).outerHeight() * 0.3,
 	                            margin: '10px auto',
 	                            display: 'block',
 	                            border: '1px solid #ccc',
 	                            borderRadius: '4px'
-	                        } })
+	                        },
+	                        onLoad: function onLoad(e) {
+	                            $(e.target).parents('.paste-image-chat').position({
+	                                of: $(document.body)
+	                            });
+	                        }
+	                    })
 	                )
 	            );
 	        }
@@ -5890,6 +5899,13 @@ React.makeElement = React['createElement'];
 	    },
 	    onPopupDidMount: function onPopupDidMount(elem) {
 	        this.domNode = elem;
+
+	        $(elem).css({
+	            'margin': 'auto'
+	        }).position({
+	            of: $(document.body)
+	        });
+
 	        if (this.props.popupDidMount) {
 
 	            this.props.popupDidMount(elem);
@@ -7215,17 +7231,21 @@ React.makeElement = React['createElement'];
 
 	        if (this.props.persist && megaChat.plugins.persistedTypeArea) {
 	            if (!initialText) {
-	                megaChat.plugins.persistedTypeArea.hasPersistedTypedValue(chatRoom).done(function () {
-	                    megaChat.plugins.persistedTypeArea.getPersistedTypedValue(chatRoom).done(function (r) {
-	                        if (self.state.typedMessage !== r) {
+	                megaChat.plugins.persistedTypeArea.getPersistedTypedValue(chatRoom).done(function (r) {
+	                    if (typeof r != 'undefined') {
+	                        if (!self.state.typedMessage && self.state.typedMessage !== r) {
 	                            self.setState({
 	                                'typedMessage': r
 	                            });
 	                        }
-	                    });
+	                    }
+	                }).fail(function (e) {
+	                    if (d) {
+	                        console.warn("Failed to retrieve persistedTypeArea value for", chatRoom, "with error:", e);
+	                    }
 	                });
 	            }
-	            megaChat.plugins.persistedTypeArea.data.rebind('onChange.typingArea' + self.getUniqueId(), function (e, k, v) {
+	            $(megaChat.plugins.persistedTypeArea.data).rebind('onChange.typingArea' + self.getUniqueId(), function (e, k, v) {
 	                if (chatRoom.roomJid.split("@")[0] == k) {
 	                    self.setState({ 'typedMessage': v ? v : "" });
 	                    self.triggerOnUpdate(true);

@@ -155,16 +155,6 @@ ChatdIntegration.prototype.retrieveChatsFromApi = function() {
                     allPromises.push(
                         self.openChatFromApi(actionPacket, true)
                     );
-                    if (typeof mSDB === 'object' && !pfkey) {
-                        var roomInfo = {
-                            'id': actionPacket.id,
-                            'cs': actionPacket.cs,
-                            'g': actionPacket.g,
-                            'u': clone(actionPacket.u),
-                            'ct': actionPacket.ct ? actionPacket.ct : null
-                        };
-                        mSDB.add('mcf', roomInfo);
-                    }
                 });
 
                 ChatdIntegration.mcfHasFinishedPromise.resolve();
@@ -327,11 +317,6 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
         'ct': actionPacket.ct ? actionPacket.ct : null
     };
 
-    if (isMcf === false) {
-        if (typeof mSDB === 'object') {
-            mSDB.add('mcf', roomInfo);
-        }
-    }
     loadingDialog.hide();
 
     if (actionPacket.active === 0) {
@@ -410,9 +395,6 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
                 });
 
                 if (foundMeLeaving) {
-                    if (typeof mSDB === 'object') {
-                        mSDB.del('mcf', actionPacket.id);
-                    }
                     return masterPromise.reject();
                 }
             }
@@ -480,12 +462,6 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
                                 self.chatd.leave(
                                     base64urldecode(actionPacket.id)
                                 );
-
-                                if (isMcf === false) {
-                                    if (typeof mSDB === 'object') {
-                                        mSDB.del('mcf', roomInfo.id);
-                                    }
-                                }
                             }
                             else {
                                 // someone else left the room

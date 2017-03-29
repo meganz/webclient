@@ -660,7 +660,7 @@ function mObjectURL(data, type)
 
 Object.defineProperty(this, 'mBroadcaster', {
     writable: false,
-    value: Object.freeze({
+    value: {
     _topics : {},
 
     addListener: function mBroadcaster_addListener(topic, options) {
@@ -800,9 +800,14 @@ Object.defineProperty(this, 'mBroadcaster', {
             this.listen(setup);
             this.notify('ping');
 
+            // if multiple tabs are reloaded/opened at the same time
+            // they would both see .ctInstances as === 0, so we need to increase this
+            // as earlier as possible, e.g. now.
+            localStorage.ctInstances = (parseInt(localStorage.ctInstances) || 0) + 1;
+
             setTimeout(function() {
                 setup();
-            }, !parseInt(localStorage.ctInstances) ? 0 : 2000);
+            }, parseInt(localStorage.ctInstances) === 1 ? 0 : 2000);
         },
 
         listen: function crossTab_listen(aListener) {
@@ -834,7 +839,15 @@ Object.defineProperty(this, 'mBroadcaster', {
             if (this.ctID) {
                 var wasMaster = this.master;
                 if (wasMaster) {
-                    localStorage.ctInstances--;
+                    var current = parseInt(localStorage.ctInstances);
+                    if (current > 1) {
+                        // only decrease ctInstnaces if its > 1, so that we would never
+                        // get into a case when ctInstances is < 0
+                        localStorage.ctInstances--;
+                    }
+                    else {
+                        localStorage.ctInstances = 0;
+                    }
                     localStorage['mCrossTabRef_' + u_handle] = this.master;
                     delete this.master;
                 } else if (d) {
@@ -865,10 +878,10 @@ Object.defineProperty(this, 'mBroadcaster', {
             mBroadcaster.sendMessage('crossTab:master', this.master);
 
             // (function liveLoop(tag) {
-                // if (tag === mBroadcaster.crossTab.master) {
-                    // localStorage['mCrossTabRef_' + u_handle] = Date.now();
-                    // setTimeout(liveLoop, 6e3, tag);
-                // }
+            // if (tag === mBroadcaster.crossTab.master) {
+            // localStorage['mCrossTabRef_' + u_handle] = Date.now();
+            // setTimeout(liveLoop, 6e3, tag);
+            // }
             // })(this.master);
         },
 
@@ -928,13 +941,20 @@ Object.defineProperty(this, 'mBroadcaster', {
                             }
                         }
                     }
+                default:
+                    mBroadcaster.sendMessage('crossTab:' + msg, strg);
+
                     break;
             }
 
             delete localStorage[ev.key];
         }
     }
-})});
+}});
+
+if (!is_karma) {
+    Object.freeze(mBroadcaster);
+}
 
 
 var sh = [];
@@ -1659,9 +1679,8 @@ else if (!b_u)
         jsl.push({f:'js/mouse.js', n: 'mouse_js', j:1});
         jsl.push({f:'js/datastructs.js', n: 'datastructs_js', j:1});
         jsl.push({f:'js/vendor/db.js', n: 'db_js', j:1,w:5});
-        jsl.push({f:'js/megaDbEncryptionPlugin.js', n: 'megadbenc_js', j:1,w:5});
-        jsl.push({f:'js/megaDb.js', n: 'megadb_js', j:1,w:5});
         jsl.push({f:'js/idbkvstorage.js', n: 'idbkvstorage_js', j: 1, w: 5});
+        jsl.push({f:'js/sharedlocalkvstorage.js', n: 'sharedlocalkvstorage_js', j: 1, w: 5});
         jsl.push({f:'js/achievements.js', n: 'achievements_js', j: 1, w: 5});
 
         jsl.push({f:'js/tlvstore.js', n: 'tlvstore_js', j:1});
@@ -1806,7 +1825,8 @@ else if (!b_u)
     if (!is_mobile
             && (
                 typeof Number.isNaN !== 'function' ||
-                typeof Set === 'undefined'
+                typeof Set === 'undefined' ||
+                !Object.assign
             )
     ) {
 

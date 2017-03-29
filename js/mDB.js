@@ -108,7 +108,8 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
                 // (which is the current format)
                 Dexie.getDatabaseNames(function(r) {
                     for (var i = r.length; i--;) {
-                        if (r[i].substr(0, dbpfx.length) != dbpfx) {
+                        // drop only fmX related databases and skip slkv's
+                        if (r[i].substr(0, dbpfx.length) !== dbpfx && r[i].substr(0,4) !== "slkv") {
                             todrop.push(r[i]);
                         }
                     }
@@ -488,14 +489,6 @@ FMDB.prototype.stripnode = Object.freeze({
 
     ua : function(ua, index) {
         delete ua.k;
-    },
-
-    chatqueuedmsgs : function(chatqueuedmsgs, index) {
-        delete chatqueuedmsgs.k;
-    },
-
-    pta: function(pta, index) {
-        delete pta.k;
     }
 });
 
@@ -523,15 +516,6 @@ FMDB.prototype.restorenode = Object.freeze({
     ua : function(ua, index) {
         ua.k = index.k;
     },
-
-    chatqueuedmsgs : function(chatqueuedmsgs, index) {
-        chatqueuedmsgs.k = index.k;
-    },
-
-    pta: function(pta, index) {
-        pta.k = index.k;
-    },
-
     h: function(out, index) {
         out.h = index.h;
         out.hash = index.c;

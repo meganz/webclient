@@ -210,6 +210,7 @@ var Karere = function(user_options) {
 
     self.connectionRetryManager = new ConnectionRetryManager(
         {
+            minConnectionRetryTimeout: 1500,
             functions: {
                 reconnect: function(connectionRetryManager) {
                     if (connectionRetryManager._connectionRetries > 1) {
@@ -218,7 +219,12 @@ var Karere = function(user_options) {
                         // because of the bug in ejabberd, force delay any connection retry
                         self._delayedConnectTimeout = setTimeout(function() {
                             clearDelayedReconnectTimeout();
-                            megaPromise.linkDoneAndFailTo(self.forceReconnect());
+                            if (self.getConnectionState() === Karere.CONNECTION_STATE.CONNECTED) {
+                                megaPromise.resolve();
+                            }
+                            else {
+                                megaPromise.linkDoneAndFailTo(self.forceReconnect());
+                            }
                         }, 2000);
 
                         return megaPromise;

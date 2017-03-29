@@ -3945,7 +3945,7 @@
     "16307": "\u63d0\u793a\uff1a\u4fdd\u6301\u5783\u573e\u7bb1\u6e05\u7a7a\u72b6\u6001\u4ee5\u4f18\u5316\u5b58\u50a8\u4f7f\u7528\u91cf",
     "16308": "\u901a\u8fc7\u4f7f\u7528\u6211\u4eec\u7684\u4ea7\u54c1\uff0c\u4f60\u53ef\u4ee5\u89e3\u9501\u66f4\u591a\u7684\u514d\u8d39\u7a7a\u95f4\u53ca\u4f20\u8f93\u91cf\uff0c\u7b80\u5355\uff0c\u65b9\u4fbf",
     "16309": "\u83b7\u5f97\u66f4\u591a\u7684\u5956\u52b1",
-    "16310": "\u63d0\u793a\uff1a\u5728\u4eea\u8868\u76d8\u4e2d\u67e5\u770b\u4f60\u6240\u6709\u53ef\u7528\u7684\u5956\u52b1\u6216\u8005\u70b9\u51fb[l]",
+    "16310": "Tip: Check all your available bonuses in the [A]Dashboard[\/A] or click [I]",
     "16311": "\u5b58\u50a8\u7a7a\u95f4\u51e0\u4e4e\u5df2\u6ee1",
     "16312": "\u770b\u4e0a\u53bb\u4f60\u7684\u5b58\u50a8\u7a7a\u95f4\u5c06\u4f1a\u7528\u5b8c",
     "16313": "[A]\u73b0\u5728\u5347\u7ea7[\/A]\u81f3\u4e00\u4e2a[S]PRO Lite\u8d26\u6237[\/S]\u4e14\u4e0d\u7528\u62c5\u5fc3\u5b58\u50a8\u4f7f\u7528\u8fc7\u91cf\u3002[S]\u4e00\u4e2a\u6708%1\u6b27\u5143\u4f60\u5c06\u83b7\u53d6200GB\u5b58\u50a8\u7a7a\u95f4[\/S]\u53ca1TB\u7684\u4f20\u8f93\u91cf",
@@ -4019,7 +4019,7 @@
     "16388": "You may want to change your settings for granting transfer quota to downloading users.",
     "16389": "Online, %1 but change my status appearance to Away (yellow) after %2 minute(s) of inactivity.",
     "16390": "[S]Transfer quota[\/S] is the total volume of data transfered between MEGA and your system each month.",
-    "16391": "[S]Transfer speed[\/S] is unrelated to Transfer quota. The quality of your file transfers\u2019 velocity can be affected by many factors beyond our control, such as your local network and your Internet Service Provider. MEGA always processes file transfers at the maximum possible speed regardless of your account status.",
+    "16391": "[S]Transfer speed[\/S] is unrelated to Transfer quota. The quality of your file transfers' speed can be affected by many factors beyond our control, such as your local network and your Internet Service Provider. MEGA always processes file transfers at the maximum possible speed regardless of your account status.",
     "16392": "[S]PRO and Free accounts[\/S] enjoy the same fast transfer speed.",
     "alias": {
         "shared-with-me": 5589,

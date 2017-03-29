@@ -3940,7 +3940,7 @@
     "16301": "[S]%1[\/S] de %2",
     "16302": "Armazenamento completo",
     "16303": "Voc\u00ea alcan\u00e7ou a capacidade total do Cloud Drive para uma conta [S]gratuita[\/S].",
-    "16304": "[A]Atualize agora[\/A] e continue desfrutando de um armazenamento em nuvem criptografado seguro e de ponta a ponta.As contas PRO recebem [S]at\u00e9 4 TB (4000 GB) de armazenamento[\/S] e 8 TB de quota de transfer\u00eancia que podem compartilhar com os usu\u00e1rios que baixam seus arquivos.                ",
+    "16304": "[A]Atualize agora[\/A] e continue desfrutando de um armazenamento em nuvem criptografado seguro e de ponta a ponta. As contas PRO recebem [S]at\u00e9 4 TB (4000 GB) de armazenamento[\/S] e 8 TB de largura de banda de transfer\u00eancias que podem ser compartilhadas com os usu\u00e1rios que baixam seus arquivos.                ",
     "16305": "Escolha um plano",
     "16306": "Exclua os arquivos antigos que voc\u00ea n\u00e3o precisa mais liberar algum espa\u00e7o.",
     "16307": "Dica: Mantenha seu lixo vazio para otimizar o uso do armazenamento.",
@@ -4019,6 +4019,9 @@
     "16387": "Sempre mostrar\u00e1 a apar\u00eancia de status selecionada, mesmo quando eu desconectar.",
     "16388": "Conv\u00e9m alterar as configura\u00e7\u00f5es para conceder a cota de transfer\u00eancia para usu\u00e1rios que fazem o download.",
     "16389": "Online, %1 mas mudar minha apar\u00eancia de status para Ausente (amarelo) depois de %2 minuto(s) de inatividade.",
+    "16390": "[S]Transfer quota[\/S] is the total volume of data transfered between MEGA and your system each month.",
+    "16391": "[S]Transfer speed[\/S] is unrelated to Transfer quota. The quality of your file transfers\u2019 velocity can be affected by many factors beyond our control, such as your local network and your Internet Service Provider. MEGA always processes file transfers at the maximum possible speed regardless of your account status.",
+    "16392": "[S]PRO and Free accounts[\/S] enjoy the same fast transfer speed.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

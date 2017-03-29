@@ -3940,7 +3940,7 @@
     "16301": "[S]%1[\/S] de %2",
     "16302": "Almacenamiento Lleno",
     "16303": "Has alcanzado la capacidad total de Disco para tu cuenta [S]Gratis[\/S].",
-    "16304": "[A]Actualiza ahora[\/A] y sigue disfrutando de un almacenamiento en la nube seguro y cifrado punto a punto.Las cuentas PRO obtienen [S]hasta 4 TB (4000 GB) de almacenamiento[\/S] y 8 TB de cuota de transferencia que pueden compartir con los usuarios que descarguen sus archivos.",
+    "16304": "[A]Actualizar ahora[\/A] y sigue disfrutando de un almacenamiento en la nube seguro cifrado punto a punto. Las cuentas PRO obtienen [S]hasta 4 TB (4000 GB) de almacenamiento[\/S] y 8 TB de ancho de banda de transferencia que pueden compartir con los usuarios que descargan sus archivos.                ",
     "16305": "Elige un plan",
     "16306": "Elimina los archivos antiguos que ya no necesites para liberar algo de espacio.",
     "16307": "Truco: Mant\u00e9n la Papelera vac\u00eda para optimizar el uso del almacenamiento.",
@@ -4019,6 +4019,9 @@
     "16387": "Mostrar siempre la apariencia de estado seleccionada, incluso cuando me desconecte.",
     "16388": "Quiz\u00e1 quieras cambiar la configuraci\u00f3n para conceder cuota de transferencia a los usuarios que descargan.",
     "16389": "En l\u00ednea, %1, pero cambiar mi estado a Ausente (amarillo) tras %2 minuto(s) de inactividad.",
+    "16390": "[S]Transfer quota[\/S] is the total volume of data transfered between MEGA and your system each month.",
+    "16391": "[S]Transfer speed[\/S] is unrelated to Transfer quota. The quality of your file transfers\u2019 velocity can be affected by many factors beyond our control, such as your local network and your Internet Service Provider. MEGA always processes file transfers at the maximum possible speed regardless of your account status.",
+    "16392": "[S]PRO and Free accounts[\/S] enjoy the same fast transfer speed.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

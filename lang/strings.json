@@ -15764,7 +15764,7 @@
         "context": "A dialog message that informs the user that their cloud storage is full."
     },
     "16304": {
-        "text": "[A]Upgrade now[\/A] and keep enjoying secure, end-to-end encrypted cloud storage.\r\nPRO accounts get [S]up to 4 TB (4096 GB) of storage[\/S] and 8 TB of transfer quota that they can share with users downloading their files.",
+        "text": "[A]Upgrade now[\/A] and keep enjoying secure, end-to-end encrypted cloud storage. \r\nPRO accounts get [S]up to 4 TB (4096 GB) of storage[\/S] and 8 TB of transfer quota that they can share with users downloading their files.",
         "context": "A dialog message indicating what you can get with a PRO plan. Please leave the placeholders [A], [\/A], [S], [\/S] as they are."
     },
     "16305": {
@@ -16078,5 +16078,17 @@
     "16389": {
         "text": "Online, %1 but change my status appearance to Away (yellow) after %2 minute(s) of inactivity.",
         "context": "Allows the user to set his presence to Online, but if the checkbox is checked and if he is idle for X minutes, they would be set automatically to Away. The placeholder %1 will be replaced with a checkbox and the placeholder %2 with a text input containing the number of minutes."
+    },
+    "16390": {
+        "text": "[S]Transfer quota[\/S] is the total volume of data transfered between MEGA and your system each month.",
+        "context": "A note about MEGA's transfer quota. Please leave the placeholders [S] and [\/S] which are used to stylise the text."
+    },
+    "16391": {
+        "text": "[S]Transfer speed[\/S] is unrelated to Transfer quota. The quality of your file transfers\u2019 velocity can be affected by many factors beyond our control, such as your local network and your Internet Service Provider. MEGA always processes file transfers at the maximum possible speed regardless of your account status.",
+        "context": "A note about transfer speed. Please leave the placeholders [S] and [\/S] which are used to stylise the text."
+    },
+    "16392": {
+        "text": "[S]PRO and Free accounts[\/S] enjoy the same fast transfer speed.",
+        "context": "A note about MEGA's fast transfer speed. Please leave the placeholder [S] and [\/S] tags which will be used to stylise the text."
     }
 }

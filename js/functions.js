@@ -682,6 +682,7 @@ function populate_l() {
     l[12489] = l[12489].replace('[I]', '<i>').replace('[/I]', '</i>').replace('[I]', '<i>').replace('[/I]', '</i>');
     l[16165] = l[16165].replace('[S]', '<a class="red">').replace('[/S]', '</a>').replace('[BR]', '<br/>');
     l[16167] = l[16167].replace('[S]', '<a href="/mobile" class="clickurl">').replace('[/S]', '</a>');
+    l[16306] = escapeHTML(l[16306]).replace('[A]', '<a href="/fm/rubbish" class="clickurl">').replace('[/A]', '</a>');
     l[16310] = escapeHTML(l[16310]).replace('[I]', '<i class="semi-small-icon rocket"></i>');
     l[16389] = escapeHTML(l[16389]).replace(
                  '%1',
@@ -700,8 +701,8 @@ function populate_l() {
     l[16392] = escapeHTML(l[16392]).replace('[S]', '<span class="red">').replace('[/S]', '</span>');
 
     var common = [
-        15536, 16106, 16107, 16116, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138,
-        16303, 16304, 16313, 16315, 16316, 16358, 16359, 16361, 16375, 16382, 16383, 16384, 16385,
+        15536, 16106, 16107, 16116, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315,
+        16316, 16358, 16359, 16360, 16361, 16375, 16382, 16383, 16384, 16385,
     ];
     for (i = common.length; i--;) {
         var num = common[i];

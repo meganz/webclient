@@ -6160,6 +6160,9 @@ th.grid-first-th {
 .fm-notification-block.almost-full a {
     color: #333333;
 }
+.fm-notification-block.full a {
+    color: #FFFFFF;
+}
 .fm-notification-close {
     width: 24px;
     height: 24px;
@@ -14958,6 +14961,9 @@ background: linear-gradient(to bottom, rgba(250,250,250,0.3) 0%,rgba(238,238,238
     padding: 10px 0;
     float: left;
     max-width: 866px;
+}
+.reg-st3-top-txt-block .red {
+    cursor: default;
 }
 .sync-top-txt-block {
     padding: 10px 0 50px 0;

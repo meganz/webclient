@@ -1255,7 +1255,7 @@ mega.showOverStorageQuota = function(perc) {
         var $strgdlg = $('.fm-dialog.storage-dialog').removeClass('hidden full almost-full');
         fm_showoverlay();
 
-        if (perc > 98) {
+        if (perc > 99) {
             $('.fm-main').addClass('fm-notification full');
             $strgdlg.addClass('full');
         }

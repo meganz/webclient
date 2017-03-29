@@ -3940,7 +3940,7 @@
     "16301": "[S]%1[\/S] od %2",
     "16302": "Zmanjkalo prostora",
     "16303": "Dosegli ste polno kapaciteto svojega prostora v oblaku za [S]brezpla\u010dni[\/S] ra\u010dun. ",
-    "16304": "[A]Nadgradite sedaj[\/A] in \u0161e naprej u\u017eivajte v varnem, od prve do zadnje to\u010dke kriptiranem shranjevanju v oblaku. PRO ra\u010duni dobijo [S]do 4 TB (4096 GB) prostora[\/S] in 8 TB prenosne kvote, ki jo lahko delite z uporabniki, ki prevzemajo va\u0161e datoteke",
+    "16304": "[A]Nadgradite sedaj[\/A] in \u0161e naprej u\u017eivajte v varnem, od prve do zadnje to\u010dke kriptiranem shranjevanju v oblaku.PRO ra\u010duni dobijo [S]do 4 TB (4000 GB) prostora[\/S] in 8 TB prenosne kvote, ki jo lahko delite z uporabniki, ki prevzemajo va\u0161e datoteke",
     "16305": "Izberite plan",
     "16306": "Izbri\u0161ite stare datoteke, ki jih ne rabite ve\u010d, da sprostite nekaj prostora.",
     "16307": "Nasvet: Redno \u010distite svoj ko\u0161, da optimizirate uporabo shranjevalnega prostora.",
@@ -4019,6 +4019,9 @@
     "16387": "Vedno prika\u017ei izbran prikaz statusa, tudi \u010de se odklopim.",
     "16388": "Morda boste \u017eeleli spremeniti svoje nastavitve, kako odobravate prenosno kvoto uporabnikom, ki prevzemajo od vas.",
     "16389": "Prisoten, %1 a spremeni moj prikaz statusa na Odsoten (rumeno) po %2 minutah neaktivnosti.",
+    "16390": "[S]Transfer quota[\/S] is the total volume of data transfered between MEGA and your system each month.",
+    "16391": "[S]Transfer speed[\/S] is unrelated to Transfer quota. The quality of your file transfers\u2019 velocity can be affected by many factors beyond our control, such as your local network and your Internet Service Provider. MEGA always processes file transfers at the maximum possible speed regardless of your account status.",
+    "16392": "[S]PRO and Free accounts[\/S] enjoy the same fast transfer speed.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

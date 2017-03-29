@@ -3940,7 +3940,7 @@
     "16301": "[S]%1[\/S] de %2",
     "16302": "L'espace de stockage est plein",
     "16303": "Vous avez atteint la pleine capacit\u00e9 de votre disque nuagique pour un compte [S]gratuit[\/S]. ",
-    "16304": "[A]Surclassez votre compte maintenant[\/A] et continuez \u00e0 b\u00e9n\u00e9ficier d'un espace de stockage nuagique s\u00e9curis\u00e9, chiffr\u00e9 de bout en bout.Les comptes PRO obtiennent [S]jusqu'\u00e0 4 To (4 096 Go) d'espace de stockage[\/S] et 8 To de quota de transfert qu'ils peuvent partager avec les utilisateurs qui t\u00e9l\u00e9chargent leurs fichiers.",
+    "16304": "[A]Surclassez votre compte maintenant [\/A] et continuez \u00e0 b\u00e9n\u00e9ficier and keep enjoying secure, end-to-end encrypted cloud storage. PRO accounts get [S]up to 4 TB (4000 GB) of storage[\/S] and 8 TB of transfers bandwidth that they can share with users downloading their files.                ",
     "16305": "Choisir un abonnement",
     "16306": "Supprimez les anciens fichiers dont vous n'avez plus besoin pour lib\u00e9rer de l'espace.",
     "16307": "Astuce : assurez-vous que votre corbeille est vide afin d'optimiser l'utilisation de votre espace de stockage.",
@@ -4019,6 +4019,9 @@
     "16387": "Toujours afficher l'\u00e9tat s\u00e9lectionn\u00e9, m\u00eame quand je me d\u00e9connecte.",
     "16388": "Vous pouvez changer vos param\u00e8tres d'attribution de votre quota de transfert aux utilisateurs qui t\u00e9l\u00e9chargent.",
     "16389": "En Ligne, %1 mais changer mon \u00e9tat de connexion \u00e0 Absent (jaune) apr\u00e8s %2 minute(s) d'inactivit\u00e9.",
+    "16390": "[S]Transfer quota[\/S] is the total volume of data transfered between MEGA and your system each month.",
+    "16391": "[S]Transfer speed[\/S] is unrelated to Transfer quota. The quality of your file transfers\u2019 velocity can be affected by many factors beyond our control, such as your local network and your Internet Service Provider. MEGA always processes file transfers at the maximum possible speed regardless of your account status.",
+    "16392": "[S]PRO and Free accounts[\/S] enjoy the same fast transfer speed.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

@@ -15960,7 +15960,7 @@
         "context": "A link which leads to the help center where the user can get more information."
     },
     "16355": {
-        "text": "Tip: This limit can be dynamic and depends on the amount of unused bandwidth we have available.",
+        "text": "Tip: This limit is dynamic and depends on the amount of unused bandwidth we have available.",
         "context": "An information message about limited transfer quota."
     },
     "16356": {

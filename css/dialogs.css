@@ -1105,6 +1105,12 @@ li.token-input-token-invite .input-close {
 .achievements .storage-dialog.achievements-bl {
     display: block;
 }
+.storage-dialog.body-p.small a {
+    color: #999999;
+    cursor: pointer;
+    text-decoration: underline;
+    font-family: 'source_sans_proregular', Arial;
+}
 .storage-dialog.body-p.small i {
     vertical-align: top;
     display: inline-block;

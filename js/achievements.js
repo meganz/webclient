@@ -1222,66 +1222,78 @@ mega.checkStorageQuota = function checkStorageQuota(timeout) {
         mega.api.req({a: 'uq', strg: 1, qc: 1}).done(function(data) {
             var perc = Math.round(data.cstrg / data.mstrg * 100);
 
-            if (u_attr.p) {
-                // update texts with "for free accounts" sentences removed.
-                $('.fm-notification-block.full').safeHTML(l[16358]);
-                $('.fm-notification-block.almost-full')
-                    .safeHTML('<div class="fm-notification-close"></div>' + l[16359]);
-                $('.fm-dialog-body.storage-dialog.full .body-header').safeHTML(l[16360]);
-                $('.fm-dialog-body.storage-dialog.almost-full .no-achievements-bl .body-p').safeHTML(l[16361]);
-                $('.fm-dialog-body.storage-dialog.almost-full .achievements-bl .body-p')
-                    .safeHTML(l[16361] + ' ' + l[16314]);
-            }
-            else {
-                $('.fm-dialog-body.storage-dialog.almost-full .no-achievements-bl .body-p')
-                    .safeHTML(l[16313].replace('%1', (4.99).toLocaleString()));
-                $('.fm-dialog-body.storage-dialog.almost-full .achievements-bl .body-p')
-                    .safeHTML(l[16313].replace('%1', (4.99).toLocaleString()) + ' ' + l[16314]);
-            }
-
-            if (perc > 90) {
-                var $strgdlg = $('.fm-dialog.storage-dialog').removeClass('hidden');
-                fm_showoverlay();
-
-                if (perc > 98) {
-                    $('.fm-main').addClass('fm-notification full');
-                    $strgdlg.addClass('full');
-                }
-                else {
-                    $('.fm-main').addClass('fm-notification almost-full');
-                    $strgdlg.addClass('almost-full');
-                }
-
-                $('.button', $strgdlg).rebind('click', function() {
-                    var $this = $(this);
-
-                    fm_hideoverlay();
-                    $strgdlg.addClass('hidden');
-
-                    if ($this.hasClass('choose-plan')) {
-                        loadSubPage('pro');
-                    }
-                    else if ($this.hasClass('get-bonuses')) {
-                        mega.achievem.achievementsListDialog();
-                    }
-
-                    return false;
-                });
-                $('.fm-dialog-close, .button.skip', $strgdlg).rebind('click', function() {
-                    fm_hideoverlay();
-                    $strgdlg.addClass('hidden');
-                });
-
-                $('.fm-notification-block .fm-notification-close')
-                    .rebind('click', function() {
-                        $('.fm-main').removeClass('fm-notification almost-full full');
-                    });
-            }
-
-            mega.achievem.enabled()
-                .done(function() {
-                    $('.fm-dialog.storage-dialog').addClass('achievements');
-                });
+            mega.showOverStorageQuota(perc);
         });
     }, timeout || 30000);
+};
+
+/**
+ * Show storage overquota dialog
+ * @param {Number} perc percent
+ */
+mega.showOverStorageQuota = function(perc) {
+    $('.fm-main').removeClass('almost-full full');
+
+    if (u_attr.p) {
+        // update texts with "for free accounts" sentences removed.
+        $('.fm-notification-block.full').safeHTML(l[16358]);
+        $('.fm-notification-block.almost-full')
+            .safeHTML('<div class="fm-notification-close"></div>' + l[16359]);
+        $('.fm-dialog-body.storage-dialog.full .body-header').safeHTML(l[16360]);
+        $('.fm-dialog-body.storage-dialog.almost-full .no-achievements-bl .body-p').safeHTML(l[16361]);
+        $('.fm-dialog-body.storage-dialog.almost-full .achievements-bl .body-p')
+            .safeHTML(l[16361] + ' ' + l[16314]);
+    }
+    else {
+        $('.fm-dialog-body.storage-dialog.almost-full .no-achievements-bl .body-p')
+            .safeHTML(l[16313].replace('%1', (4.99).toLocaleString()));
+        $('.fm-dialog-body.storage-dialog.almost-full .achievements-bl .body-p')
+            .safeHTML(l[16313].replace('%1', (4.99).toLocaleString()) + ' ' + l[16314]);
+    }
+
+    if (perc > 90) {
+        var $strgdlg = $('.fm-dialog.storage-dialog').removeClass('hidden full almost-full');
+        fm_showoverlay();
+
+        if (perc > 98) {
+            $('.fm-main').addClass('fm-notification full');
+            $strgdlg.addClass('full');
+        }
+        else {
+            $('.fm-main').addClass('fm-notification almost-full');
+            $strgdlg.addClass('almost-full');
+        }
+
+        $('.button', $strgdlg).rebind('click', function() {
+            var $this = $(this);
+
+            fm_hideoverlay();
+            $strgdlg.addClass('hidden');
+
+            if ($this.hasClass('choose-plan')) {
+                loadSubPage('pro');
+            }
+            else if ($this.hasClass('get-bonuses')) {
+                mega.achievem.achievementsListDialog();
+            }
+
+            return false;
+        });
+        $('.fm-dialog-close, .button.skip', $strgdlg).rebind('click', function() {
+            fm_hideoverlay();
+            $strgdlg.addClass('hidden');
+        });
+
+        $('.fm-notification-block .fm-notification-close')
+            .rebind('click', function() {
+                $('.fm-main').removeClass('fm-notification almost-full full');
+            });
+    }
+
+    mega.achievem.enabled()
+        .done(function() {
+            $('.fm-dialog.storage-dialog').addClass('achievements');
+        });
+
+    clickURLs();
 };

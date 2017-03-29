@@ -695,13 +695,13 @@ function populate_l() {
                      '<input type="text" value="5" id="autoaway" />' +
                  '</span>'
                );
-    //l[16390] = l[16390].replace('[S]', '<span class="red">').replace('[/S]', '</span>');
-    //l[16391] = l[16391].replace('[S]', '<span class="red">').replace('[/S]', '</span>');
-    //l[16392] = l[16392].replace('[S]', '<span class="red">').replace('[/S]', '</span>');
+    l[16390] = escapeHTML(l[16390]).replace('[S]', '<span class="red">').replace('[/S]', '</span>');
+    l[16391] = escapeHTML(l[16391]).replace('[S]', '<span class="red">').replace('[/S]', '</span>');
+    l[16392] = escapeHTML(l[16392]).replace('[S]', '<span class="red">').replace('[/S]', '</span>');
 
     var common = [
         15536, 16106, 16107, 16116, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138,
-        16303, 16304, 16313, 16315, 16316, 16375, 16382, 16383, 16384, 16385,
+        16303, 16304, 16313, 16315, 16316, 16358, 16359, 16361, 16375, 16382, 16383, 16384, 16385,
     ];
     for (i = common.length; i--;) {
         var num = common[i];
@@ -711,7 +711,7 @@ function populate_l() {
             .replace(/\[P\]/g, '<p>'   ).replace(/\[\/P\]/g, '</p>')
             .replace(/\[B\]/g, '<b>'   ).replace(/\[\/B\]/g, '</b>')
             .replace(/\[BR\]/g, '<br/>')
-            .replace(/\[A\]/g, '<a href="/pro">').replace(/\[\/A\]/g, '</a>');
+            .replace(/\[A\]/g, '<a href="/pro" class="clickurl">').replace(/\[\/A\]/g, '</a>');
     }
 
     l['year'] = new Date().getFullYear();

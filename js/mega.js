@@ -3429,6 +3429,9 @@ function MegaData()
                     if (promise) {
                         return promise.reject(res);
                     }
+                    if (res == EOVERQUOTA) {
+                        return mega.showOverStorageQuota(99);
+                    }
                     return msgDialog('warninga', l[135], l[47], api_strerror(res));
                 }
 

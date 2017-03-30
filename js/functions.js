@@ -687,6 +687,7 @@ function populate_l() {
     l[16310] = escapeHTML(l[16310])
         .replace('[A]', '<a href="/fm/dashboard" class="clickurl">').replace('[/A]', '</a>')
         .replace('[I]', '<i class="semi-small-icon rocket"></i>');
+    l[16385] = escapeHTML(l[16390]).replace('[S]', '').replace('[/S]', '');
     l[16389] = escapeHTML(l[16389]).replace(
                  '%1',
                  '<span class="checkdiv checkboxOn autoaway">' +
@@ -705,7 +706,7 @@ function populate_l() {
 
     var common = [
         15536, 16106, 16107, 16116, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315,
-        16316, 16358, 16359, 16360, 16361, 16375, 16382, 16383, 16384, 16385,
+        16316, 16358, 16359, 16360, 16361, 16375, 16382, 16383, 16384
     ];
     for (i = common.length; i--;) {
         var num = common[i];

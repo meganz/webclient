@@ -687,7 +687,6 @@ function populate_l() {
     l[16310] = escapeHTML(l[16310])
         .replace('[A]', '<a href="/fm/dashboard" class="clickurl">').replace('[/A]', '</a>')
         .replace('[I]', '<i class="semi-small-icon rocket"></i>');
-    l[16385] = escapeHTML(l[16385]).replace('[S]', '').replace('[/S]', '');
     l[16389] = escapeHTML(l[16389]).replace(
                  '%1',
                  '<span class="checkdiv checkboxOn autoaway">' +
@@ -703,6 +702,7 @@ function populate_l() {
     l[16390] = escapeHTML(l[16390]).replace('[S]', '<span class="red">').replace('[/S]', '</span>');
     l[16391] = escapeHTML(l[16391]).replace('[S]', '<span class="red">').replace('[/S]', '</span>');
     l[16392] = escapeHTML(l[16392]).replace('[S]', '<span class="red">').replace('[/S]', '</span>');
+    //l[16393] = l[16393].replace('[A]', '<a class="red" href="mailto:support@mega.nz">').replace('[/A]', '</a>');
 
     var common = [
         15536, 16106, 16107, 16116, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315,

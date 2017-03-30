@@ -5133,23 +5133,6 @@ React.makeElement = React['createElement'];
 	                                self.lastScrollPositionPerc = 1;
 	                            } else if (messageContents) {
 	                                room.megaChat.plugins.chatdIntegration.updateMessage(room, v.internalId ? v.internalId : v.orderValue, messageContents);
-	                                if (v.textContents) {
-	                                    v.textContents = messageContents;
-	                                }
-	                                if (v.contents) {
-	                                    v.contents = messageContents;
-	                                }
-	                                if (v.emoticonShortcutsProcessed) {
-	                                    v.emoticonShortcutsProcessed = false;
-	                                }
-	                                if (v.emoticonsProcessed) {
-	                                    v.emoticonsProcessed = false;
-	                                }
-	                                if (v.messageHtml) {
-	                                    delete v.messageHtml;
-	                                }
-
-	                                $(v).trigger('onChange', [v, "textContents", "", messageContents]);
 
 	                                self.messagesListScrollable.scrollToBottom(true);
 	                                self.lastScrollPositionPerc = 1;

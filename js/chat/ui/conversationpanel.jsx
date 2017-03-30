@@ -1320,32 +1320,6 @@ var ConversationPanel = React.createClass({
                                         v.internalId ? v.internalId : v.orderValue,
                                         messageContents
                                     );
-                                    if (v.textContents) {
-                                        v.textContents = messageContents;
-                                    }
-                                    if (v.contents) {
-                                        v.contents = messageContents;
-                                    }
-                                    if (v.emoticonShortcutsProcessed) {
-                                        v.emoticonShortcutsProcessed = false;
-                                    }
-                                    if (v.emoticonsProcessed) {
-                                        v.emoticonsProcessed = false;
-                                    }
-                                    if (v.messageHtml) {
-                                        delete v.messageHtml;
-                                    }
-
-
-                                    $(v).trigger(
-                                        'onChange',
-                                        [
-                                            v,
-                                            "textContents",
-                                            "",
-                                            messageContents
-                                        ]
-                                    );
 
                                     self.messagesListScrollable.scrollToBottom(true);
                                     self.lastScrollPositionPerc = 1;

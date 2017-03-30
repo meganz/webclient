@@ -203,7 +203,13 @@ mega.ui.tpp = (function () {
      * @param {String} blk i.e ['dl', 'ul'] download or upload
      */
     var setTransfered = function setTransfered(id, value, blk) {
-        opts.queue[blk].curr[id] = value;
+
+        if (id === -1) {
+            opts.queue[blk].curr = {};
+        }
+        else {
+            opts.queue[blk].curr[id] = value;
+        }
     };
 
     /**
@@ -233,7 +239,8 @@ mega.ui.tpp = (function () {
     var getAvgSpeed = function getAvgSpeed(blk) {
         var result = 0;
         var speed = getTransfered(blk);
-        var time = Math.ceil((Date.now() - getTime(blk)) / 1000);// Seconds
+        // var time = Math.ceil((Date.now() - getTime(blk)) / 1000);// Seconds
+        var time = (Date.now() - getTime(blk)) / 1000;// Seconds
 
         result = Math.floor(speed / time);
 
@@ -315,6 +322,15 @@ mega.ui.tpp = (function () {
         }
     };
 
+    var reset = function reset(blk) {
+        hideBlock(blk);
+        setTime(0, blk);
+        setIndex(0, blk);
+        setTotal(0, blk);
+        setTotalProgress(0, blk);
+        setTransfered(-1, 0, blk);
+    };
+
     mBroadcaster.addListener('fm:initialized', function() {
         var blk = '';
 
@@ -376,7 +392,9 @@ mega.ui.tpp = (function () {
         setTotalProgress: setTotalProgress,
         setIndex: setIndex,
         setTransfered: setTransfered,
-        setTime: setTime
+        setTime: setTime,
+        getTime: getTime,
+        reset: reset
     };
 
 })();// END tpp, transfers popup dialog

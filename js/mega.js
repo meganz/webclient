@@ -5237,7 +5237,9 @@ function MegaData()
         if (typeof dl_queue[dl.pos] === 'object') {
             fm_tfsupdate(); // this will call $.transferHeader()
             M.dlprogress(id, 0, 0, 0, 0, dl.pos);
-            mega.ui.tpp.setTime(NOW(), 'dl');
+            if (mega.ui.tpp.getTime('dl') === 0) {
+                mega.ui.tpp.setTime(NOW(), 'dl');
+            }
             mega.ui.tpp.start(dl, 'dl');
         }
     }
@@ -5742,7 +5744,9 @@ function MegaData()
         ul.starttime = new Date().getTime();
         fm_tfsupdate();// this will call $.transferHeader()
         M.ulprogress(ul, 0, 0, 0);
-        mega.ui.tpp.setTime(NOW(), 'ul');
+        if (mega.ui.tpp.getTime('ul') === 0) {
+            mega.ui.tpp.setTime(NOW(), 'ul');
+        }
         mega.ui.tpp.start(ul, 'ul');
     };
 

@@ -3684,11 +3684,7 @@ mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
         ulQueue._pending = [];
         ulQueue.setSize((fmconfig.ul_maxSlots | 0) || 4);
 
-        mega.ui.tpp.hideBlock('ul');
-        mega.ui.tpp.setIndex(0, 'ul');
-        // mega.ui.tpp.setTotal(0, 'ul');
-        mega.ui.tpp.setTotalProgress(0, 'ul');
-        mega.ui.tpp.setTransfered(-1, 0, 'ul');
+        mega.ui.tpp.reset('ul');
     }
     if (!dl_queue.some(isQueueActive)) {
         dl_queue = new DownloadQueue();
@@ -3700,11 +3696,7 @@ mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
         dlmanager._quotaPushBack = {};
         dlmanager._dlQuotaListener = [];
 
-        mega.ui.tpp.hideBlock('dl');
-        mega.ui.tpp.setIndex(0, 'dl');
-        // mega.ui.tpp.setTotal(0, 'dl');
-        mega.ui.tpp.setTotalProgress(0, 'dl');
-        mega.ui.tpp.setTransfered(-1, 0, 'dl');
+        mega.ui.tpp.reset('dl');
     }
 
     if (!dlmanager.isDownloading && !ulmanager.isUploading) {

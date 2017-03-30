@@ -142,8 +142,8 @@ Object.defineProperty(mega, 'achievem', {
                     });
 
                 if (Object(u_attr).p) {
-                    quota.storage.base = Object(M.account).space;
-                    quota.transfer.base = Object(M.account).bw;
+                    quota.storage.base = Object(M.account).space - quota.storage.current;
+                    quota.transfer.base = Object(M.account).bw - quota.transfer.current;
                 }
                 else {
                     quota.storage.base = maf.s;
@@ -1222,7 +1222,7 @@ mega.checkStorageQuota = function checkStorageQuota(timeout) {
         mega.api.req({a: 'uq', strg: 1, qc: 1}).done(function(data) {
             var perc = Math.round(data.cstrg / data.mstrg * 100);
 
-            mega.showOverStorageQuota(perc);
+            mega.showOverStorageQuota(perc, data.cstrg, data.mstrg);
         });
     }, timeout || 30000);
 };
@@ -1230,8 +1230,10 @@ mega.checkStorageQuota = function checkStorageQuota(timeout) {
 /**
  * Show storage overquota dialog
  * @param {Number} perc percent
+ * @param {Number} [cstrg] Current storage usage
+ * @param {Number} [mstrg] Maximum storage.
  */
-mega.showOverStorageQuota = function(perc) {
+mega.showOverStorageQuota = function(perc, cstrg, mstrg) {
     $('.fm-main').removeClass('almost-full full');
 
     if (u_attr.p) {
@@ -1262,6 +1264,27 @@ mega.showOverStorageQuota = function(perc) {
         else {
             $('.fm-main').addClass('fm-notification almost-full');
             $strgdlg.addClass('almost-full');
+
+            // Storage chart and info
+            var strQuotaLimit = bytesToSize(mstrg, 0).split(' ');
+            var strQuotaUsed = bytesToSize(cstrg);
+            var deg = 230 * perc / 100;
+            var $storageChart = $('.fm-account-blocks.storage', $strgdlg);
+
+            // Storage space chart
+            if (deg <= 180) {
+                $storageChart.find('.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
+                $storageChart.find('.right-chart span').removeAttr('style');
+            }
+            else {
+                $storageChart.find('.left-chart span').css('transform', 'rotate(180deg)');
+                $storageChart.find('.right-chart span').css('transform', 'rotate(' + (deg - 180) + 'deg)');
+            }
+
+            $('.chart.data .size-txt', $strgdlg).text(strQuotaUsed);
+            $('.chart.data .pecents-txt', $strgdlg).text(strQuotaLimit[0]);
+            $('.chart.data .gb-txt', $strgdlg).text(strQuotaLimit[1]);
+            $('.chart.data .perc-txt', $strgdlg).text(perc + '%');
         }
 
         $('.button', $strgdlg).rebind('click', function() {

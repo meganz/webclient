@@ -976,3 +976,9 @@
 .big-104px-icon.speedometer.almost-full {
     background-position: 2px -1139px;
 }
+.big-icon.almost-full-storage {
+    background-position: -121px -790px;
+    width: 52px;
+    height: 52px;
+    background-image: url(../images/mega/account-sprite_v3.png);
+}

@@ -255,11 +255,8 @@
     min-width: 964px;
     margin: -326px 0 0 -482px;
 }
-.fm-dialog.limited-bandwidth-dialog.exceeded.pro {
-    margin-top: -212px;
-}
 .fm-dialog.limited-bandwidth-dialog.exceeded.pro.slider {
-    margin-top: -287px;
+    margin-top: -282px;
 }
 .limited-bandwidth-dialog .plan-blocks, .exceeded:not(.achievements):not(.pro) .limited-bl, .big-104px-icon.full, .exceeded .big-104px-icon.almost-full, .dialog.header-before-icon.exceeded, .exceeded .dialog.header-before-icon.limited, .limited-bandwidth-dialog .fm-dialog-close, .default-big-button.upgrade.pro, .exceeded.pro .default-big-button.upgrade, .exceeded.pro .default-big-button.continue, .exceeded.pro .dialog.p-after-icon, .dialog.pro-exceeded-bl, .dialog.ransfer-slider, .dialog.pro-exceeded-slider {
     display: none;
@@ -323,24 +320,30 @@
     font-size: 14px;
     line-height: 24px;
     color: #666666;
-    padding: 0 0 0 0;
+    padding: 0 0 6px 0;
 }
 .fm-dialog .dialog.pro-exceeded-txt {
     display: inline-block;
     max-width: 504px;
 }
-.limited-bandwidth-dialog .account.chart-block {
+.limited-bandwidth-dialog .account.chart-block, .storage-dialog .account.chart-block {
     display: inline-block;
-    margin: 4px 0 19px 0;
+    margin: 11px 0 20px 0;
     padding: 18px 0 0 0;
     text-align: left;
     font-size: 16px;
 }
+.storage-dialog .account.chart-block {
+    margin: 16px 0 33px 0;
+}
 .exceeded.pro .dialog.big-buttons-block {
     display: inline-block;
-    margin: 2px 0 1px 0;
+    margin: 2px 0 10px 0;
     padding: 16px 0 0 0;
     text-align: left;
+}
+.exceeded.pro.slider .dialog.big-buttons-block {
+    margin: 2px 0 1px 0;
 }
 .exceeded.pro .dialog.bottom-tips a {
     margin-bottom: 8px;
@@ -355,7 +358,7 @@
     background-color: #D90007;
 }
 .fm-dialog.limited-bandwidth-dialog.pro.exceeded {
-    margin-top: -223px;
+    margin-top: -210px;
 }
 .dialog-slider-txt {
     text-align: center;
@@ -1128,5 +1131,20 @@ li.token-input-token-invite .input-close {
 }
 .almost-full .fm-dialog-body.storage-dialog {
     padding-bottom: 24px;
+}
+.storage-dialog.almost-full .chart.progressbars span::before {
+    background-color: #FFA500;    
+}
+.storage-dialog.almost-full .chart.data .perc-txt {
+    color: #FFA500;    
+}
+.storage-dialog .account.chart.overlay, .storage-dialog .account.chart.body::after {
+    background-color: #FAFAFA;
+}
+.storage-dialog .account.chart.overlay span::after {
+    border-color: #FAFAFA;
+}
+.chart.icon .big-icon.almost-full-storage {
+    margin: -2px;
 }
 /* end of Storage dialog */

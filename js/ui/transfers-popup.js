@@ -166,8 +166,8 @@ mega.ui.tpp = (function () {
 
     /**
      * Set dl/ul start time
-     * @param {Number} Timestamp in ms
-     * @param {String} block i.e. ['dl', 'ul'] download or upload
+     * @param {Number} value Timestamp in ms
+     * @param {String} blk i.e. ['dl', 'ul'] download or upload
      */
     var setTime = function setTime(value, blk) {
         opts.queue[blk].time = value;
@@ -175,7 +175,7 @@ mega.ui.tpp = (function () {
 
     /**
      * Get dl/ul start time
-     * @param {String} block i.e. ['dl', 'ul'] download or upload
+     * @param {String} blk i.e. ['dl', 'ul'] download or upload
      */
     var getTime = function getTime(blk) {
         var result = opts.queue[blk].time;
@@ -185,6 +185,7 @@ mega.ui.tpp = (function () {
 
     /**
      * Set index of latest started dl/ul item from queue
+     * @param {Number} value Index of current dl/ul file
      * @param {String} block i.e. ['dl', 'ul'] download or upload
      */
     var setIndex = function setIndex(value, block) {

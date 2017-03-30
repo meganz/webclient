@@ -249,28 +249,6 @@ var astroPayDialog = {
 
 function init_pro()
 {
-    // Detect if there exists a verify get parameter
-    var verifyUrlParam = proPage.getUrlParam('verify');
-
-    // If it exists we need to do extra things
-    if (typeof verifyUrlParam !== 'undefined') {
-
-        // We are required to do paysafecard verification
-        if (verifyUrlParam === 'paysafe') {
-            paysafecard.verify();
-        }
-
-        // Show another dialog
-        if (verifyUrlParam === 'astropay') {
-            astroPayDialog.showPendingPayment();
-        }
-
-        // If returning from an Ecomprocessing payment
-        if (verifyUrlParam.indexOf('ecp') > -1) {
-            addressDialog.showPaymentResult(verifyUrlParam);
-        }
-    }
-
     if (localStorage.keycomplete) {
         $('body').addClass('key');
         localStorage.removeItem('keycomplete');
@@ -704,6 +682,17 @@ function pro_pay() {
                 pro_m = addressDialog.gatewayId;
                 extra = addressDialog.extraDetails;
             }
+            else if (pro_paymentmethod.indexOf('sabadell') === 0) {
+                pro_m = sabadell.gatewayId; // 17
+
+                // Get the value for whether the user wants the plan to renew automatically
+                var autoRenewCheckedValue = $('.membership-step2 .renewal-options-list input:checked').val();
+
+                // If the provider supports recurring payments and the user wants the plan to renew automatically
+                if (autoRenewCheckedValue === 'yes') {
+                    extra.recurring = true;
+                }
+            }
 
             // Update the last payment provider ID for the 'psts' action packet. If the provider e.g. bitcoin
             // needs a redirect after confirmation action packet it will redirect to the account page.
@@ -743,6 +732,42 @@ var proPage = {
     // Overlay for loading/processing/redirecting
     $backgroundOverlay: null,
     $loadingOverlay: null,
+
+    /**
+     * Processes a return URL from the payment provider in form of /payment-{providername}-{status} e.g.
+     * /payment-ecp-success
+     * /payment-ecp-failure
+     * /payment-astropay-pending
+     * /payment-paysafecard-saleidXXX
+     * @param {String} page The requested page from index.js e.g. payment-ecp-success etc
+     */
+    processReturnUrlFromProvider: function(page) {
+
+        // Get the provider we are returning from and the status
+        var pageParts = page.split('-');
+        var provider = pageParts[1];
+        var status = pageParts[2];
+
+        // If returning from an paysafecard payment, do a verification on the sale ID
+        if (provider === 'paysafecard') {
+            paysafecard.verify(status);
+        }
+
+        // If returning from an AstroPay payment, show a pending payment dialog
+        else if (provider === 'astropay') {
+            astroPayDialog.showPendingPayment();
+        }
+
+        // If returning from an Ecomprocessing payment, show a success or failure dialog
+        else if (provider === 'ecp') {
+            addressDialog.showPaymentResult(status);
+        }
+
+        // Sabadell needs to also show success or failure
+        else if (provider === 'sabadell') {
+            sabadell.showPaymentResult(status);
+        }
+    },
 
     /**
     * Update the state when a payment has been received to show their new Pro Level
@@ -1711,6 +1736,10 @@ var proPage = {
             case directReseller.gatewayId:
                 directReseller.redirectToSite(utcResult);
                 break;
+
+            case sabadell.gatewayId:
+                sabadell.redirectToSite(utcResult);
+                break;
         }
     }
 };
@@ -2126,6 +2155,79 @@ var unionPay = {
 };
 
 /**
+ * Code for Sabadell Spanish Bank
+ */
+var sabadell = {
+
+    gatewayId: 17,
+
+    /**
+     * Redirect to the site
+     * @param {Object} utcResult
+     */
+    redirectToSite: function(utcResult) {
+
+        // We need to redirect to their site via a post, so we are building a form
+        var url = utcResult.EUR['url'];
+        var form = $("<form id='pay_form' name='pay_form' action='" + url + "' method='post'></form>");
+
+        for (var key in utcResult.EUR['postdata']) {
+            var input = $("<input type='hidden' name='" + key + "' value='" + utcResult.EUR['postdata'][key] + "' />");
+            form.append(input);
+            $('body').append(form);
+            form.submit();
+        }
+    },
+
+    /**
+     * Show the payment result of success or failure after coming back from the Sabadell site
+     * @param {String} verifyUrlParam The URL parameter e.g. 'sabadell-success' or 'sabadell-failure'
+     */
+    showPaymentResult: function(verifyUrlParam) {
+
+        var $backgroundOverlay = $('.fm-dialog-overlay');
+        var $pendingOverlay = $('.payment-result.pending.alternate');
+        var $failureOverlay = $('.payment-result.failed');
+
+        // Show the overlay
+        $backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+
+        // On successful payment
+        if (verifyUrlParam === 'success') {
+
+            // Show the success
+            $pendingOverlay.removeClass('hidden');
+
+            // Add click handlers for 'Go to my account' and Close buttons
+            $pendingOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
+
+                // Hide the overlay
+                $backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+                $pendingOverlay.addClass('hidden');
+
+                // Make sure it fetches new account data on reload
+                if (M.account) {
+                    M.account.lastupdate = 0;
+                }
+                loadSubPage('fm/account/history');
+            });
+        }
+        else {
+            // Show the failure overlay
+            $failureOverlay.removeClass('hidden');
+
+            // On click of the 'Try again' or Close buttons, hide the overlay
+            $failureOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
+
+                // Hide the overlay
+                $backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+                $failureOverlay.addClass('hidden');
+            });
+        }
+    }
+};
+
+/**
  * Code for Fortumo mobile payments
  */
 var fortumo = {
@@ -2233,38 +2335,37 @@ var paysafecard = {
     },
 
     /**
-     * We have been redirected back to mega with the 'okUrl'. We need to ask the API to verify the payment succeeded as per
-     * paysafecard's requirements, which they enforce with integration tests we must pass... so yeap, gotta do this.
+     * We have been redirected back to mega with the 'okUrl'. We need to ask the API to verify the payment
+     * succeeded as per paysafecard's requirements, which they enforce with integration tests we must pass.
+     * @param {String} saleIdString A string containing the sale ID e.g. saleid32849023423
      */
-    verify: function() {
-        var saleidstring = proPage.getUrlParam('saleidstring');
-        if (typeof saleidstring !== 'undefined') {
+    verify: function(saleIdString) {
 
-            // Make the vpay API request to follow up on this sale
-            var requestData = {
-                'a': 'vpay',                            // Credit Card Store
-                't': this.gatewayId,                    // The paysafecard gateway
-                'saleidstring': saleidstring            // Required by the API to know what to investigate
-            };
+        // Remove the saleid string to just get the ID to check
+        var saleId = saleIdString.replace('saleid', '');
 
-            var parent = this;
+        // Make the vpay API request to follow up on this sale
+        var requestData = {
+            'a': 'vpay',                      // Credit Card Store
+            't': this.gatewayId,              // The paysafecard gateway
+            'saleidstring': saleId            // Required by the API to know what to investigate
+        };
 
-            api_req(requestData, {
-                callback: function (result) {
+        api_req(requestData, {
+            callback: function (result) {
 
-                    // If negative API number
-                    if ((typeof result === 'number') && (result < 0)) {
-                        // Something went wrong with the payment, either card association or actually debitting it.
-                        parent.showPaymentError();
-                    }
-                    else {
-                        // Continue to account screen
-                        loadSubPage('account');
-                    }
+                // If negative API number
+                if ((typeof result === 'number') && (result < 0)) {
+
+                    // Something went wrong with the payment, either card association or actually debitting it
+                    paysafecard.showPaymentError();
                 }
-            });
-        }
-        return false;
+                else {
+                    // Continue to account screen
+                    loadSubPage('account');
+                }
+            }
+        });
     }
 };
 
@@ -2670,7 +2771,7 @@ var addressDialog = {
         $backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
 
         // On successful payment
-        if (verifyUrlParam === 'ecp-success') {
+        if (verifyUrlParam === 'success') {
 
             // Show the success
             $pendingOverlay.removeClass('hidden');

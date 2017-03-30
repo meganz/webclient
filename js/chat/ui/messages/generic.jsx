@@ -271,7 +271,7 @@ var GenericConversationMessage = React.createClass({
 
                     var files = [];
 
-                    attachmentMeta.forEach(function(v) {
+                    attachmentMeta.forEach(function(v, attachmentKey) {
                         var startDownload = function() {
                             M.addDownload([v]);
                         };
@@ -405,9 +405,11 @@ var GenericConversationMessage = React.createClass({
                                         delay('thumbnails', fm_thumbnails, 90);
                                     }
                                     src = window.noThumbURI || '';
+
+                                    v.imgId = "thumb" + message.messageId + "_" + attachmentKey + "_" + v.h;
                                 }
 
-                                preview =  (src ? (<div id={v.h} className="shared-link img-block">
+                                preview =  (src ? (<div id={v.imgId} className="shared-link img-block">
                                     <div className="img-overlay" onClick={startPreview}></div>
                                     <div className="button overlay-button" onClick={startPreview}>
                                         <i className="huge-white-icon loupe"></i>
@@ -569,18 +571,33 @@ var GenericConversationMessage = React.createClass({
                                         icon="rounded-grey-plus"
                                         label={__(l[71])}
                                         onClick={() => {
-                                            M.inviteContact(M.u[u_handle].m, contactEmail);
+                                            var exists = false;
+                                            Object.keys(M.opc).forEach(function(k) {
+                                                if (!exists && M.opc[k].m === contactEmail) {
+                                                    exists = true;
+                                                    return false;
+                                                }
+                                            });
 
-                                            // Contact invited
-                                            var title = l[150];
+                                            if (exists) {
+                                                closeDialog();
+                                                msgDialog('warningb', '', l[7413]);
+                                            }
+                                            else {
+                                                M.inviteContact(M.u[u_handle].m, contactEmail);
 
-                                            // The user [X] has been invited and will appear in your contact list once
-                                            // accepted."
-                                            var msg = l[5898].replace('[X]', contactEmail);
+                                                // Contact invited
+                                                var title = l[150];
+
+                                                // The user [X] has been invited and will appear in your contact list
+                                                // once
+                                                // accepted."
+                                                var msg = l[5898].replace('[X]', contactEmail);
 
 
-                                            closeDialog();
-                                            msgDialog('info', title, msg);
+                                                closeDialog();
+                                                msgDialog('info', title, msg);
+                                            }
                                         }}
                                     />
                                     {deleteButtonOptional ? <hr /> : null}
@@ -718,9 +735,12 @@ var GenericConversationMessage = React.createClass({
 
                 var messageDisplayBlock;
                 if (self.state.editing === true) {
+                    var msgContents = message.textContents ? message.textContents : message.contents;
+                    msgContents = megaChat.plugins.emoticonsFilter.fromUtfToShort(msgContents);
+
                     messageDisplayBlock = <TypingAreaUI.TypingArea
                         iconClass="small-icon writing-pen textarea-icon"
-                        initialText={message.textContents ? message.textContents : message.contents}
+                        initialText={msgContents}
                         chatRoom={self.props.message.chatRoom}
                         showButtons={true}
                         className="edit-typing-area"
@@ -734,7 +754,11 @@ var GenericConversationMessage = React.createClass({
 
                             if (self.props.onEditDone) {
                                 Soon(function() {
-                                    self.props.onEditDone(messageContents);
+                                    var tmpMessageObj = {
+                                        'contents': messageContents
+                                    };
+                                    megaChat.plugins.emoticonsFilter.processOutgoingMessage({}, tmpMessageObj);
+                                    self.props.onEditDone(tmpMessageObj.contents);
                                     self.forceUpdate();
                                 });
                             }

@@ -280,58 +280,27 @@ function MegaData()
     };
 
     this.getSortByNameFn = function() {
-        var sortfn;
+        var self = this;
 
-        if (typeof Intl !== 'undefined' && Intl.Collator) {
-            var intl = new Intl.Collator('co', { numeric: true });
+        return function(a, b, d) {
+            // reusing the getNameByHandle code for converting contact's name/email to renderable string
+            var itemA = self.getNameByHandle(a.h);
+            var itemB  = self.getNameByHandle(b.h);
 
-            sortfn = function(a, b, d) {
-
-                // a.m part is related to contacts only. In case that user doesn't
-                // have defined first or last name then email address will be used
-                // for comparasion. Files and folders doesn't have .m field but
-                // it's not possible to rename them to null i.e. '', => no side effects.
-                var itemA = ((typeof a.name === 'string') && (a.name.length)) ? a.name : a.m;
-                var itemB = ((typeof b.name === 'string') && (b.name.length)) ? b.name : b.m;
-
-                return intl.compare(itemA, itemB) * d;
-            };
-        }
-        else {
-            sortfn = function(a, b, d) {
-
-                // a.m part is related to contacts only. In case that user doesn't
-                // have defined first or last name then email address will be used
-                // for comparasion. Files and folders doesn't have .m field but
-                // it's not possible to rename them to null i.e. '' => no side effects.
-                var itemA = ((typeof a.name === 'string') && (a.name.length)) ? a.name : a.m || '';
-                var itemB = ((typeof b.name === 'string') && (b.name.length)) ? b.name : b.m || '';
-
-                return itemA.localeCompare(itemB) * d;
-            };
-        }
-
-        return sortfn;
+            return mega.utils.compareStrings(itemA, itemB, d);
+        };
     };
 
     this.sortByName = function(d) {
-        if (typeof Intl !== 'undefined' && Intl.Collator) {
-            var intl = new Intl.Collator('co', { numeric: true });
+        var self = this;
 
-            this.sortfn = function(a, b, d) {
-                return intl.compare(a.name, b.name) * d;
-            };
+        this.sortfn = function(a, b, d) {
+            // reusing the getNameByHandle code for converting contact's name/email to renderable string
+            var itemA = self.getNameByHandle(a.h);
+            var itemB  = self.getNameByHandle(b.h);
+            return mega.utils.compareStrings(itemA, itemB, d);
         }
-        else
-        {
-            this.sortfn = function(a,b,d)
-            {
-                if (typeof a.name == 'string' && typeof b.name == 'string')
-                    return a.name.localeCompare(b.name) * d;
-                else
-                    return -1;
-            };
-        }
+
         this.sortd = d;
         this.sort();
     };
@@ -473,11 +442,13 @@ function MegaData()
             else if (statusa > statusb) {
                 return 1 * d;
             }
-            else if ((typeof a.name === 'string') && (typeof b.name === 'string')) {
-                return a.name.localeCompare(b.name) * d;
-            }
             else {
-                return 0;
+                // if status is the same for both, compare names.
+                return mega.utils.compareStrings(
+                    M.getNameByHandle(a.h).toLowerCase(),
+                    M.getNameByHandle(b.h).toLowerCase(),
+                    d
+                );
             }
         };
 
@@ -491,6 +462,7 @@ function MegaData()
     };
 
     this.getSortByInteractionFn = function() {
+        var self = this;
 
         var sortfn;
 
@@ -500,7 +472,16 @@ function MegaData()
                 // Since the M.sort is using a COPY of the data,
                 // we need an up-to-date .ts value directly from M.u[...]
                 return M.u[r.h].ts;
-            }, d
+            },
+            d,
+            function (a, b, d) {
+                // fallback to string/name matching in case last interaction is the same
+                return mega.utils.compareStrings(
+                    self.getNameByHandle(a.h).toLowerCase(),
+                    self.getNameByHandle(b.h).toLowerCase(),
+                    d
+                );
+            }
         );
 
         return sortfn;
@@ -880,15 +861,14 @@ function MegaData()
 
     this.onlineStatusEvent = function(u, status) {
         if (u && megaChatIsReady) {
-            // this event is triggered for a specific resource/device (fullJid), so we need to get the presen for the
-            // user's devices, which is aggregated by Karere already
-            status = megaChat.karere.getPresence(megaChat.getJidFromNodeId(u.u));
-            var e = $('.ustatus.' + String(u.u).replace(/[^\w-]/g, ''));
+            console.error('onlineStatusEvent', u.u, status);
+            var e = $('.ustatus.' + u.u);
             if (e.length > 0) {
                 $(e).removeClass('offline online busy away');
                 $(e).addClass(this.onlineStatusClass(status)[1]);
             }
-            e = $('.fm-chat-user-status.' + String(u.u).replace(/[^\w-]/g, ''));
+
+            var e = $('.fm-chat-user-status.' + u.u);
             if (e.length > 0) {
                 $(e).safeHTML(this.onlineStatusClass(status)[0]);
             }
@@ -905,6 +885,9 @@ function MegaData()
             if (getSitePath() === "/fm/" + u.u) {
                 // re-render the contact view page if the presence had changed
                 contactUI();
+            }
+            if (u && u.u === u_handle) {
+                megaChat.renderMyStatus();
             }
         }
     };
@@ -1697,9 +1680,10 @@ function MegaData()
         // status can be: "online"/"away"/"busy"/"offline"
         for (i in activeContacts) {
             if (activeContacts.hasOwnProperty(i)) {
-                if (megaChatIsReady) {
-                    var jId = megaChat.getJidFromNodeId(activeContacts[i].u);
-                    onlinestatus = M.onlineStatusClass(megaChat.karere.getPresence(jId));
+                if (megaChatIsReady && activeContacts[i].u) {
+                    onlinestatus = M.onlineStatusClass(
+                        activeContacts[i].presence ? activeContacts[i].presence : 'unavailable'
+                    );
                 }
                 else {
                     onlinestatus = [l[5926], 'offline'];
@@ -3753,13 +3737,6 @@ function MegaData()
                         ctx.account.downbw_used = 0;
 
                     M.account = ctx.account;
-
-                    if (M.maf) {
-                        // Add achieved storage quota
-                        ctx.account.space += M.maf.storage.current;
-                        // Add achieved transfer quota
-                        ctx.account.bw += M.maf.transfer.current;
-                    }
 
                     if (ctx.cb)
                         ctx.cb(ctx.account);
@@ -9244,12 +9221,11 @@ Object.defineProperty(mega, 'achievem', {
                         value: time
                     };
 
-                    // TODO: translate this
                     switch (unit) {
-                        case 'd': result.utxt = (time < 2) ? 'day'   : 'days';    break;
-                        case 'w': result.utxt = (time < 2) ? 'week'  : 'weeks';   break;
-                        case 'm': result.utxt = (time < 2) ? 'month' : 'months';  break;
-                        case 'y': result.utxt = (time < 2) ? 'year'  : 'years';   break;
+                        case 'd': result.utxt = (time < 2) ? l[930]   : l[16290];  break;
+                        case 'w': result.utxt = (time < 2) ? l[16292] : l[16293];  break;
+                        case 'm': result.utxt = (time < 2) ? l[913]   : l[6788];   break;
+                        case 'y': result.utxt = (time < 2) ? l[932]   : l[16294];  break;
                     }
 
                     out = out || data;
@@ -9273,19 +9249,10 @@ Object.defineProperty(mega, 'achievem', {
                         setExpiry(data[ach.a]);
                     }
                     var exp = setExpiry(mafr[ach.r] || data[ach.a], ach);
-
                     var ts = ach.ts * 1000;
-                    var date = moment(ts);
-
-                    switch (exp.unit) {
-                        case 'd': date.add(exp.value, 'days');    break;
-                        case 'w': date.add(exp.value, 'weeks');   break;
-                        case 'm': date.add(exp.value, 'months');  break;
-                        case 'y': date.add(exp.value, 'years');   break;
-                    }
 
                     ach.date = new Date(ts);
-                    ach.left = Math.round(date.diff(ach.date) / 86400000);
+                    ach.left = Math.round((ach.e * 1000 - Date.now()) / 86400000);
 
                     if (data[ach.a].rwds) {
                         data[ach.a].rwds.push(ach);
@@ -9575,20 +9542,13 @@ function fm_thumbnails()
 
 function fm_thumbnail_render(n) {
     if (n && thumbnails[n.h]) {
+        var imgNode = document.getElementById(n.imgId || n.h);
 
-        // one thumbnail can eventually be rendered multiple times in the DOM, for example when:
-        // 1) is shared multiple times in the same chat room
-        // 2) was rendered in some of the other FM tabs and not cleaned up properly.
-        // This is why we generate this a bit extensive, but (legacy) compatible selector
-        // Note: Because node IDs can start with a number, I'd changed this to use jQuery instead of querySelectorAll
-        var imgNodes = $('#' + n.h + " img");
-        if (imgNodes.length > 0) {
+        if (imgNode && (imgNode = imgNode.querySelector('img'))) {
             n.seen = 2;
-        }
-        imgNodes.each(function(k, imgNode) {
             imgNode.setAttribute('src', thumbnails[n.h]);
             imgNode.parentNode.parentNode.classList.add('thumb');
-        });
+        }
     }
 }
 // jscs:enable

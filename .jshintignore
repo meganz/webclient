@@ -28,3 +28,4 @@ js/transfers/meths/firefox-extension.js
 contrib/Electron/main.js
 *.sh
 *.xml
+js/chat/emojidata/emojis.json

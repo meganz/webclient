@@ -43,6 +43,10 @@ PROJECT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__),
                                             os.path.pardir))
 PATH_SPLITTER = re.compile(r'\\|/')
 
+UTF_ALLOWED_FILES = [
+    'js/chat/emojidata/emojis.json'
+]
+
 def get_git_line_sets(base, target):
     """
     Obtains the Git diff between the base and target to identify the lines that
@@ -392,7 +396,7 @@ def reduce_validator(file_line_mapping, **extra):
         file_extension = os.path.splitext(file_path)[-1]
 
         if not any([n in file_path for n in special_chars_exclude]):
-            if analyse_files_for_special_chars(file_path, result):
+            if file_path not in UTF_ALLOWED_FILES and analyse_files_for_special_chars(file_path, result):
                 fatal += 1
                 break
 
@@ -431,7 +435,7 @@ def reduce_validator(file_line_mapping, **extra):
                                   .format(file_path, line_number, line_length))
                     break
 
-                # Analize JavaScript files...
+                # Analyse JavaScript files...
                 if file_extension in ['.js', '.jsx']:
                     fatal += inspectjs(file_path, line_number, line, result)
                     continue

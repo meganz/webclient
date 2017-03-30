@@ -91,6 +91,20 @@ function parseHTMLfmt(markup) {
 }
 
 /**
+ * Handy printf-style parseHTML to apply escapeHTML
+ * @param {String} markup The HTML fragment to parse.
+ * @param {...*} var_args
+ */
+function parseHTMLfmt2(markup) {
+    if (arguments.length > 1) {
+        for (var idx = arguments.length; --idx > 0;) {
+            markup = markup.replace(RegExp('%' + idx, 'g'), escapeHTML(arguments[idx]));
+        }
+    }
+    return parseHTML(markup);
+}
+
+/**
  * Safely inject an HTML fragment using parseHTML()
  * @param {string} markup The HTML fragment to parse.
  * @param {...*} var_args
@@ -107,7 +121,12 @@ function parseHTMLfmt(markup) {
                     value: function $afeCall(markup) {
                         var i = 0;
                         var l = this.length;
-                        markup = parseHTMLfmt.apply(null, arguments);
+                        if (markup === '%n') {
+                            markup = parseHTMLfmt2.apply(null, toArray.apply(null, arguments).slice(1));
+                        }
+                        else {
+                            markup = parseHTMLfmt.apply(null, arguments);
+                        }
                         while (l > i) {
                             $(this[i++])[origFunc](markup.cloneNode(true));
                         }
@@ -585,7 +604,6 @@ function populate_l() {
     l[8849] = l[8849].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[1389] = l[1389].replace('[B]', '').replace('[/B]', '').replace('[A]', '<span>').replace('[/A]', '</span>');
     l[8912] = l[8912].replace('[B]', '<span>').replace('[/B]', '</span>');
-    l[8944] = l[8944].replace('[BR]', '<br>').replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8846] = l[8846].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8847] = l[8847].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8950] = l[8950].replace('[S]', '<span>').replace('[/S]', '</span>');
@@ -625,8 +643,20 @@ function populate_l() {
     l[16136] = l[16136].replace('[A]', '<a href="/pro">').replace('[/A]', '</a>');
     l[16137] = l[16137].replace('[A]', '<a href="/pro">').replace('[/A]', '</a>');
     l[16138] = l[16138].replace('[A]', '<a href="/pro">').replace('[/A]', '</a>');
-    l[16164] = l[16164].replace('[S]', '<a class="red">').replace('[/S]', '</a>').replace('[BR]', '<br/>');
+    l[16165] = l[16165].replace('[S]', '<a class="red">').replace('[/S]', '</a>').replace('[BR]', '<br/>');
     l[16167] = l[16167].replace('[S]', '<a href="/mobile" class="clickurl">').replace('[/S]', '</a>');
+    l[16389] = l[16389].replace(
+                 '%1',
+                 '<span class="checkdiv checkboxOn autoaway">' +
+                     '<input type="checkbox" name="set-auto-away" id="set-auto-away" class="checkboxOn" checked="">' +
+                 '</span>'
+               )
+               .replace(
+                 '%2',
+                 '<span class="account-counter-number short">' +
+                     '<input type="text" value="5" id="autoaway" />' +
+                 '</span>'
+               );
 
     l['year'] = new Date().getFullYear();
     date_months = [
@@ -3391,9 +3421,11 @@ mega.utils.execCommandUsable = function() {
  * @param key {String|Function} the name of the property that will be used for the sorting OR a func that will return a
  * dynamic value for the object
  * @param [order] {Number} 1 for asc, -1 for desc sorting
+ * @param [alternativeFn] {Function} Optional function to be used for comparison of A and B if both are equal or
+ *      undefined
  * @returns {Function}
  */
-mega.utils.sortObjFn = function(key, order) {
+mega.utils.sortObjFn = function(key, order, alternativeFn) {
     if (!order) {
         order = 1;
     }
@@ -3402,43 +3434,76 @@ mega.utils.sortObjFn = function(key, order) {
         var currentOrder = tmpOrder ? tmpOrder : order;
 
         if ($.isFunction(key)) {
-            a = key(a);
-            b = key(b);
+            aVal = key(a);
+            bVal = key(b);
         }
         else {
-            a = a[key];
-            b = b[key];
+            aVal = a[key];
+            bVal = b[key];
         }
 
-        if (typeof a == 'string' && typeof b == 'string') {
-            return a.localeCompare(b) * currentOrder;
+        if (typeof aVal === 'string' && typeof bVal === 'string') {
+            return aVal.localeCompare(bVal) * currentOrder;
         }
-        else if (typeof a == 'string' && typeof b == 'undefined') {
+        else if (typeof aVal === 'string' && typeof bVal === 'undefined') {
             return 1 * currentOrder;
         }
-        else if (typeof a == 'undefined' && typeof b == 'string') {
+        else if (typeof aVal === 'undefined' && typeof bVal === 'string') {
             return -1 * currentOrder;
         }
-        else if (typeof a == 'number' && typeof b == 'undefined') {
+        else if (typeof aVal === 'number' && typeof bVal === 'undefined') {
             return 1 * currentOrder;
         }
-        else if (typeof a == 'undefined' && typeof b == 'number') {
+        else if (typeof aVal === 'undefined' && typeof bVal === 'number') {
             return -1 * currentOrder;
         }
-        else if (typeof a == 'number' && typeof b == 'number') {
-            var _a = a || 0;
-            var _b = b || 0;
+        else if (typeof aVal === 'undefined' && typeof bVal === 'undefined') {
+            if (alternativeFn) {
+                return alternativeFn(a, b, currentOrder);
+            }
+            else {
+                return -1 * currentOrder;
+            }
+        }
+        else if (typeof aVal === 'number' && typeof bVal === 'number') {
+            var _a = aVal || 0;
+            var _b = bVal || 0;
             if (_a > _b) {
                 return 1 * currentOrder;
             }
             if (_a < _b) {
                 return -1 * currentOrder;
             } else {
-                return 0;
+                if (alternativeFn) {
+                    return alternativeFn(a, b, currentOrder);
+                }
+                else {
+                    return 0;
+                }
             }
         }
         else return 0;
     };
+};
+
+
+/**
+ * This is an utility function that would simply do a localCompare OR use Intl.Collator for comparing 2 strings.
+ *
+ * @param stringA {String} String A
+ * @param stringB {String} String B
+ * @param direction {Number} -1 or 1, for inversing the direction for sorting (which is most of the cases)
+ * @returns {Number}
+ */
+mega.utils.compareStrings = function megaUtilsCompareStrings(stringA, stringB, direction) {
+
+    if (typeof Intl !== 'undefined' && Intl.Collator) {
+        var intl = new Intl.Collator('co', { numeric: true });
+        return intl.compare(stringA || '', stringB || '') * direction;
+    }
+    else {
+        return (stringA || '').localeCompare(stringB || '') * direction;
+    }
 };
 
 /**
@@ -3983,6 +4048,11 @@ mega.utils.logout = function megaUtilsLogout() {
         if (fmdb && fmconfig.dbDropOnLogout) {
             step++;
             fmdb.drop().always(finishLogout);
+        }
+        if (!megaChatIsDisabled) {
+            if (typeof(megaChat) !== 'undefined' && typeof(megaChat.userPresence) !== 'undefined') {
+                megaChat.userPresence.disconnect();
+            }
         }
         if (u_privk && !loadfm.loading) {
             // Use the 'Session Management Logout' API call to kill the current session
@@ -4574,6 +4644,8 @@ var watchdog = Object.freeze({
     queryQueue: {},
     // Holds query replies if cached
     replyCache: {},
+    // waiting queries
+    waitingQueries: {},
 
     /** setup watchdog/webstorage listeners */
     setup: function() {
@@ -4603,9 +4675,13 @@ var watchdog = Object.freeze({
      * @param {String} what Parameter
      * @param {String} timeout ms
      * @param {String} cache   preserve result
+     * @param {Object} [data]   data to be sent with the query
+     * @param {bool} [expectsSingleAnswer]   pass true if your query is expected to receive only single answer (this
+     * would speed up and resolve the returned promise when the first answer is received and won't wait for the full
+     * `timeout` to gather more replies)
      * @return {MegaPromise}
      */
-    query: function(what, timeout, cache) {
+    query: function(what, timeout, cache, data, expectsSingleAnswer) {
         var self = this;
         var token = mRandomToken();
         var promise = new MegaPromise();
@@ -4625,20 +4701,42 @@ var watchdog = Object.freeze({
             }
             this.queryQueue[token] = [];
 
+            var tmpData;
+            if (!data) {
+                tmpData = {};
+            }
+            else {
+                tmpData = clone(data);
+            }
+            tmpData['reply'] = token;
+
             Soon(function() {
-                self.notify('Q!' + what, { reply: token });
+                self.notify('Q!' + what, tmpData);
             });
 
-            // wait for reply and fullfil/reject the promise
-            setTimeout(function() {
-                if (self.queryQueue[token].length) {
-                    promise.resolve(self.queryQueue[token]);
-                }
-                else {
-                    promise.reject(EACCESS);
-                }
-                delete self.queryQueue[token];
-            }, timeout || 200);
+            if (!expectsSingleAnswer) {
+                // wait for reply and fullfil/reject the promise
+                setTimeout(function () {
+                    if (self.queryQueue[token].length) {
+                        promise.resolve(self.queryQueue[token]);
+                    }
+                    else {
+                        promise.reject(EACCESS);
+                    }
+                    delete self.queryQueue[token];
+                }, timeout || 200);
+            }
+            else {
+                promise.timer = setTimeout(function () {
+                    if (promise.state() === 'pending') {
+                        promise.reject(EACCESS);
+                        delete self.queryQueue[token];
+                        delete self.waitingQueries[token];
+                    }
+                }, timeout || 200);
+
+                self.waitingQueries[token] = promise;
+            }
         }
         else {
             promise = MegaPromise.reject(EEXIST);
@@ -4673,6 +4771,21 @@ var watchdog = Object.freeze({
                 }
                 if (this.replyCache[strg.data.query]) {
                     this.replyCache[strg.data.query].push(strg.data.value);
+                }
+                // if there is a promise in .waitingQueries, that means that this query is expecting only 1 response
+                // so we can resolve it immediately.
+                if (this.waitingQueries[strg.data.token]) {
+                    var self = this;
+
+                    clearTimeout(this.waitingQueries[strg.data.token].timer);
+                    this.waitingQueries[strg.data.token]
+                        .always(function() {
+                            // cleanup after all other done/always/fail handlers...
+                            delete self.waitingQueries[strg.data.token];
+                            delete self.queryQueue[strg.data.token];
+                        })
+                        .resolve([strg.data.value]);
+
                 }
                 break;
 
@@ -4758,8 +4871,9 @@ var watchdog = Object.freeze({
                 }
                 break;
 
-            case 'idbchange':
-                mBroadcaster.sendMessage('idbchange:' + strg.data.name, [strg.data.key, strg.data.value]);
+            default:
+                mBroadcaster.sendMessage("watchdog:" + msg, strg);
+
                 break;
         }
 
@@ -5340,6 +5454,10 @@ function getGatewayName(gatewayId, gatewayOpt) {
         16: {
             name: 'ecp',                    // E-Comprocessing
             displayName: l[6952] + ' (ECP)' // Credit card (ECP)
+        },
+        17: {
+            name: 'sabadell',
+            displayName: 'Sabadell'
         },
         999: {
             name: 'wiretransfer',

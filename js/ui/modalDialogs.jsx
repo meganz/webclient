@@ -62,6 +62,16 @@ var ModalDialog = React.createClass({
     },
     onPopupDidMount: function(elem) {
         this.domNode = elem;
+
+        // always center modal dialogs after they are mounted
+        $(elem)
+            .css({
+                'margin': 'auto'
+            })
+            .position({
+                of: $(document.body)
+            });
+
         if (this.props.popupDidMount) {
             // bubble up...
             this.props.popupDidMount(elem);
@@ -504,8 +514,6 @@ var CloudBrowserDialog = React.createClass({
 
         var buttons = [];
 
-        window.asdf = self;
-
         if (!folderIsHighlighted) {
             buttons.push(
                 {
@@ -622,13 +630,14 @@ var SelectContactDialog = React.createClass({
     },
     getInitialState: function() {
         return {
-            'selected': []
+            'selected': this.props.selected ? this.props.selected : []
         }
     },
     onSelected: function(nodes) {
         this.setState({'selected': nodes});
-        this.props.onSelected(nodes);
-        this.forceUpdate();
+        if (this.props.onSelected) {
+            this.props.onSelected(nodes);
+        }
     },
     onSelectClicked: function() {
         this.props.onSelectClicked();
@@ -643,6 +652,7 @@ var SelectContactDialog = React.createClass({
             <ModalDialog
                 title={__("Send Contact")}
                 className={classes}
+                selected={self.state.selected}
                 onClose={() => {
                     self.props.onClose(self);
                 }}
@@ -653,9 +663,10 @@ var SelectContactDialog = React.createClass({
                             "className": self.state.selected.length === 0 ? "disabled" : null,
                             "onClick": function(e) {
                                 if (self.state.selected.length > 0) {
-                                    self.props.onSelected(self.state.selected);
-                                    self.props.onHighlighted([]);
-                                    self.props.onSelectClicked();
+                                    if (self.props.onSelected) {
+                                        self.props.onSelected(self.state.selected);
+                                    }
+                                    self.props.onSelectClicked(self.state.selected);
                                 }
                                 e.preventDefault();
                                 e.stopPropagation();
@@ -675,30 +686,8 @@ var SelectContactDialog = React.createClass({
                 megaChat={self.props.megaChat}
                 contacts={self.props.contacts}
                 exclude={self.props.exclude}
-                onClick={(contact, e) => {
-                    var contactHash = contact.h;
-
-                        // differentiate between a click and a double click.
-                        if ((new Date() - self.clickTime) < 500) {
-                            // is a double click
-                            self.onSelected([contact.h]);
-                            self.props.onHighlighted([]);
-                            self.props.onSelectClicked();
-                        }
-                        else {
-                            // is a single click
-                            if (self.state.selected.indexOf(contactHash) === -1) {
-                                self.state.selected.push(contact.h);
-                                self.onSelected(self.state.selected);
-                            }
-                            else {
-                                removeValue(self.state.selected, contactHash);
-                                self.onSelected(self.state.selected);
-                            }
-                        }
-                        self.clickTime = new Date();
-
-                }}
+                onSelectDone={self.props.onSelectClicked}
+                onSelected={self.onSelected}
                 selected={self.state.selected}
                 headerClasses="left-aligned"
                 />

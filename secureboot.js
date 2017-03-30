@@ -479,7 +479,7 @@ if (!b_u && is_extension)
     {
         bootstaticpath = 'chrome://mega/content/';
         urlrootfile = 'secure.html';
-        if (d) {
+        if (d > 1) {
             staticpath = bootstaticpath;
         }
         else {
@@ -660,7 +660,7 @@ function mObjectURL(data, type)
 
 Object.defineProperty(this, 'mBroadcaster', {
     writable: false,
-    value: Object.freeze({
+    value: {
     _topics : {},
 
     addListener: function mBroadcaster_addListener(topic, options) {
@@ -800,9 +800,14 @@ Object.defineProperty(this, 'mBroadcaster', {
             this.listen(setup);
             this.notify('ping');
 
+            // if multiple tabs are reloaded/opened at the same time
+            // they would both see .ctInstances as === 0, so we need to increase this
+            // as earlier as possible, e.g. now.
+            localStorage.ctInstances = (parseInt(localStorage.ctInstances) || 0) + 1;
+
             setTimeout(function() {
                 setup();
-            }, !parseInt(localStorage.ctInstances) ? 0 : 2000);
+            }, parseInt(localStorage.ctInstances) === 1 ? 0 : 2000);
         },
 
         listen: function crossTab_listen(aListener) {
@@ -834,7 +839,15 @@ Object.defineProperty(this, 'mBroadcaster', {
             if (this.ctID) {
                 var wasMaster = this.master;
                 if (wasMaster) {
-                    localStorage.ctInstances--;
+                    var current = parseInt(localStorage.ctInstances);
+                    if (current > 1) {
+                        // only decrease ctInstnaces if its > 1, so that we would never
+                        // get into a case when ctInstances is < 0
+                        localStorage.ctInstances--;
+                    }
+                    else {
+                        localStorage.ctInstances = 0;
+                    }
                     localStorage['mCrossTabRef_' + u_handle] = this.master;
                     delete this.master;
                 } else if (d) {
@@ -865,10 +878,10 @@ Object.defineProperty(this, 'mBroadcaster', {
             mBroadcaster.sendMessage('crossTab:master', this.master);
 
             // (function liveLoop(tag) {
-                // if (tag === mBroadcaster.crossTab.master) {
-                    // localStorage['mCrossTabRef_' + u_handle] = Date.now();
-                    // setTimeout(liveLoop, 6e3, tag);
-                // }
+            // if (tag === mBroadcaster.crossTab.master) {
+            // localStorage['mCrossTabRef_' + u_handle] = Date.now();
+            // setTimeout(liveLoop, 6e3, tag);
+            // }
             // })(this.master);
         },
 
@@ -928,13 +941,20 @@ Object.defineProperty(this, 'mBroadcaster', {
                             }
                         }
                     }
+                default:
+                    mBroadcaster.sendMessage('crossTab:' + msg, strg);
+
                     break;
             }
 
             delete localStorage[ev.key];
         }
     }
-})});
+}});
+
+if (!is_karma) {
+    Object.freeze(mBroadcaster);
+}
 
 
 var sh = [];
@@ -1380,7 +1400,7 @@ else if (!b_u)
             }
             dump.m = dump.m.replace(/\s+/g, ' ');
 
-            if (!window.jsl_done) {
+            if (!window.jsl_done && !window.u_checked) {
                 // Alert the user if there was an uncaught exception while
                 // loading the site, this should only happen on some fancy
                 // browsers other than what we use during development, and
@@ -1659,9 +1679,8 @@ else if (!b_u)
         jsl.push({f:'js/mouse.js', n: 'mouse_js', j:1});
         jsl.push({f:'js/datastructs.js', n: 'datastructs_js', j:1});
         jsl.push({f:'js/vendor/db.js', n: 'db_js', j:1,w:5});
-        jsl.push({f:'js/megaDbEncryptionPlugin.js', n: 'megadbenc_js', j:1,w:5});
-        jsl.push({f:'js/megaDb.js', n: 'megadb_js', j:1,w:5});
         jsl.push({f:'js/idbkvstorage.js', n: 'idbkvstorage_js', j: 1, w: 5});
+        jsl.push({f:'js/sharedlocalkvstorage.js', n: 'sharedlocalkvstorage_js', j: 1, w: 5});
 
         jsl.push({f:'js/tlvstore.js', n: 'tlvstore_js', j:1});
         jsl.push({f:'js/vendor/jsbn.js', n: 'jsbn_js', j:1, w:2});
@@ -1736,6 +1755,7 @@ else if (!b_u)
     if (!is_mobile) {
         jsl.push({f:'css/style.css', n: 'style_css', j:2,w:30,c:1,d:1,cache:1});
         jsl.push({f:'js/fm.js', n: 'fm_js', j:1,w:12});
+        jsl.push({f:'js/fm/account.js', n: 'fm_account_js', j:1});
         jsl.push({f:'js/ui/miniui.js', n: 'miniui_js', j:1});
 
         jsl.push({f:'html/start.html', n: 'start', j:0});
@@ -1803,7 +1823,8 @@ else if (!b_u)
     if (!is_mobile
             && (
                 typeof Number.isNaN !== 'function' ||
-                typeof Set === 'undefined'
+                typeof Set === 'undefined' ||
+                !Object.assign
             )
     ) {
 
@@ -1897,12 +1918,13 @@ else if (!b_u)
             'chat_feedback_css':{f:'css/chat-feedback.css', n: 'chat_feedback_css', j:2,'w':5,'c':1,'cache':1,'d':1},
             'chat_calls_css':{f:'css/chat-calls.css', n: 'chat_calls_css', j:2,'w':5,'c':1,'cache':1,'d':1},
             'chat_common_css':{f:'css/chat-common.css', n: 'chat_common_css', j:2,'w':5,'c':1,'cache':1,'d':1},
-            'chat_emojione_css':{f:'css/chat-emojione.css', n: 'chat_emojione_css', j:2,'w':5,'c':1,'cache':1,'d':1},
+            'chat_emoji_css':{f:'css/chat-emoji.css', n: 'chat_emoji_css', j:2,'w':2,'c':1,'cache':1,'d':1},
 
             /* chat related js */
             'react_js': {f:'js/vendor/react.js', n: 'react_js', j:1},
             'reactdom_js': {f:'js/vendor/react-dom.js', n: 'reactdom_js', j:1},
             'meganotifications_js': {f:'js/megaNotifications.js', n: 'meganotifications_js', j:1},
+            'twemoji_js': {f:'js/vendor/twemoji.noutf.js', n: 'twemoji_js', j:1},
             'ionsound_js': {f:'js/vendor/ion.sound.js', n: 'ionsound_js', j:1},
             'favico_js': {f:'js/vendor/favico.js', n: 'favico_js', j:1},
             'autolinker_js': {f:'js/vendor/autolinker.js', n: 'autolinker_js', j:1},
@@ -1931,10 +1953,12 @@ else if (!b_u)
             'chatnotifications_js': {f:'js/chat/plugins/chatNotifications.js', n: 'chatnotifications_js', j:1},
             'callfeedback_js': {f:'js/chat/plugins/callFeedback.js', n: 'callfeedback_js', j:1},
             'persistedTypeArea_js': {f:'js/chat/plugins/persistedTypeArea.js', n: 'persistedTypeArea_js', j:1, w:1},
+            'presencedIntegration_js': {f:'js/chat/plugins/presencedIntegration.js', n: 'presInt_js', j:1, w:1},
             'keo_js': {f:'js/chat/karereEventObjects.js', n: 'keo_js', j:1},
             'crm_js': {f:'js/connectionRetryManager.js', n: 'crm_js', j:1},
             'karere_js': {f:'js/chat/karere.js', n: 'karere_js', j:1},
             'chat_messages_Js': {f:'js/chat/messages.js', n: 'chat_messages_Js', j:1},
+            'presence2_js': {f:'js/chat/presence2.js', n: 'presence2_js', j:1},
             'chat_react_minified_js': {f:'js/chat/bundle.js', n: 'chat_react_minified_js', j:1}
         }
     };
@@ -2474,7 +2498,7 @@ else if (!b_u)
     if (document.location.href.substr(0,19) == 'chrome-extension://')  istaticpath = '../';
     else if (is_chrome_firefox) istaticpath = 'chrome://mega/content/';
 
-    mCreateElement('style', {type: 'text/css'}, 'body').textContent = '.div, span, input {outline: none;}.hidden {display: none;}.clear {clear: both;margin: 0px;padding: 0px;display: block;}.loading-main-block {width: 100%;height: 100%;overflow: auto;font-family:Arial, Helvetica, sans-serif;}.loading-mid-white-block {height: 100%;width:100%;}.loading-cloud {width: 222px;height: 158px;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v3.png);background-repeat: no-repeat;background-position: 0 0;position:absolute;left:50%;top:50%;margin:-79px 0 0 -111px;}.loading-m-block{width:60px;height:60px;position:absolute; left:81px;top:65px;background-color:white;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v3.png);background-repeat: no-repeat;background-position: -81px -65px;border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;z-index:10;}.loading-percentage { width: 80px;height: 80px; background-color: #e1e1e1;position: absolute;-moz-border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;overflow: hidden;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v3.png);background-repeat: no-repeat;background-position: -70px -185px;left:71px;top:55px;}.loading-percentage ul {list-style-type: none;}.loading-percentage li {position: absolute;top: 0px;}.loading-percentage p, .loading-percentage li, .loading-percentage ul{width: 80px;height: 80px;padding: 0;margin: 0;}.loading-percentage span {display: block;width: 40px;height: 80px;}.loading-percentage ul :nth-child(odd) {clip: rect(0px, 80px, 80px, 40px);}.loading-percentage ul :nth-child(even) {clip: rect(0px, 40px, 80px, 0px);}.loading-percentage .right-c span {-moz-border-radius-topleft: 40px;-moz-border-radius-bottomleft: 40px;-webkit-border-top-left-radius: 40px;-webkit-border-bottom-left-radius: 40px;border-top-left-radius: 40px;border-bottom-left-radius: 40px;background-color:#dc0000;}.loading-percentage .left-c span {margin-left: 40px;-moz-border-radius-topright: 40px;-moz-border-radius-bottomright: 40px;-webkit-border-top-right-radius: 40px;-webkit-border-bottom-right-radius: 40px;border-top-right-radius: 40px;border-bottom-right-radius: 40px;background-color:#dc0000;}.loading-main-bottom {max-width: 940px;width: 100%;position: absolute;bottom: 20px;left: 50%;margin: 0 0 0 -470px;text-align: center;}.loading-bottom-button {height: 29px;width: 29px;float: left;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v3.png);background-repeat: no-repeat;cursor: pointer;}.st-social-block-load {position: absolute;bottom: 20px;left: 0;width: 100%;height: 43px;text-align: center;}.st-bottom-button {height: 24px;width: 24px;margin: 0 8px;display: inline-block;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v3.png);background-repeat: no-repeat;background-position:11px -405px;cursor: pointer;-moz-border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;-webkit-transition: all 200ms ease-in-out;-moz-transition: background-color 200ms ease-in-out;-o-transition: background-color 200ms ease-in-out;-ms-transition: background-color 200ms ease-in-out;transition: background-color 200ms ease-in-out;background-color:#999999;}.st-bottom-button.st-google-button {background-position: 11px -405px;}.st-bottom-button.st-google-button {background-position: -69px -405px;}.st-bottom-button.st-twitter-button{background-position: -29px -405px;}.st-bottom-button:hover {background-color:#334f8d;}.st-bottom-button.st-twitter-button:hover {background-color:#1a96f0;}.st-bottom-button.st-google-button:hover {background-color:#d0402a;}@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {.maintance-block, .loading-percentage, .loading-m-block, .loading-cloud, .loading-bottom-button,.st-bottom-button, .st-bottom-scroll-button {background-image: url(' + istaticpath + 'images/mega/loading-sprite_v3@2x.png);    background-size: 222px auto;}}';
+    mCreateElement('style', {type: 'text/css'}, 'body').textContent = '.div, span, input {outline: none;}.hidden {display: none;}.clear {clear: both;margin: 0px;padding: 0px;display: block;}.loading-main-block {width: 100%;height: 100%;overflow: auto;font-family:Arial, Helvetica, sans-serif;}.loading-mid-white-block {height: 100%;width:100%;}.loading-cloud {width: 222px;height: 158px;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v4.png);background-repeat: no-repeat;background-position: 0 0;position:absolute;left:50%;top:50%;margin:-79px 0 0 -111px;}.loading-m-block{width:60px;height:60px;position:absolute; left:81px;top:65px;background-color:white;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v4.png);background-repeat: no-repeat;background-position: -81px -65px;border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;z-index:10;}.loading-percentage { width: 80px;height: 80px; background-color: #e1e1e1;position: absolute;-moz-border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;overflow: hidden;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v4.png);background-repeat: no-repeat;background-position: -70px -185px;left:71px;top:55px;}.loading-percentage ul {list-style-type: none;}.loading-percentage li {position: absolute;top: 0px;}.loading-percentage p, .loading-percentage li, .loading-percentage ul{width: 80px;height: 80px;padding: 0;margin: 0;}.loading-percentage span {display: block;width: 40px;height: 80px;}.loading-percentage ul :nth-child(odd) {clip: rect(0px, 80px, 80px, 40px);}.loading-percentage ul :nth-child(even) {clip: rect(0px, 40px, 80px, 0px);}.loading-percentage .right-c span {-moz-border-radius-topleft: 40px;-moz-border-radius-bottomleft: 40px;-webkit-border-top-left-radius: 40px;-webkit-border-bottom-left-radius: 40px;border-top-left-radius: 40px;border-bottom-left-radius: 40px;background-color:#dc0000;}.loading-percentage .left-c span {margin-left: 40px;-moz-border-radius-topright: 40px;-moz-border-radius-bottomright: 40px;-webkit-border-top-right-radius: 40px;-webkit-border-bottom-right-radius: 40px;border-top-right-radius: 40px;border-bottom-right-radius: 40px;background-color:#dc0000;}.loading-main-bottom {max-width: 940px;width: 100%;position: absolute;bottom: 20px;left: 50%;margin: 0 0 0 -470px;text-align: center;}.loading-bottom-button {height: 29px;width: 29px;float: left;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v4.png);background-repeat: no-repeat;cursor: pointer;}.st-social-block-load {position: absolute;bottom: 20px;left: 0;width: 100%;height: 43px;text-align: center;}.st-bottom-button {height: 24px;width: 24px;margin: 0 8px;display: inline-block;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v4.png);background-repeat: no-repeat;background-position:11px -405px;cursor: pointer;-moz-border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;-webkit-transition: all 200ms ease-in-out;-moz-transition: background-color 200ms ease-in-out;-o-transition: background-color 200ms ease-in-out;-ms-transition: background-color 200ms ease-in-out;transition: background-color 200ms ease-in-out;background-color:#999999;}.st-bottom-button.st-google-button {background-position: 11px -405px;}.st-bottom-button.st-google-button {background-position: -69px -405px;}.st-bottom-button.st-twitter-button{background-position: -29px -405px;}.st-bottom-button:hover {background-color:#334f8d;}.st-bottom-button.st-twitter-button:hover {background-color:#1a96f0;}.st-bottom-button.st-google-button:hover {background-color:#d0402a;}@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {.maintance-block, .loading-percentage, .loading-m-block, .loading-cloud, .loading-bottom-button,.st-bottom-button, .st-bottom-scroll-button {background-image: url(' + istaticpath + 'images/mega/loading-sprite_v4@2x.png);    background-size: 222px auto;}}';
 
     mCreateElement('div', { "class": "loading-main-block", id: "loading"}, 'body')
         .innerHTML =

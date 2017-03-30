@@ -784,9 +784,12 @@
                     }
 
                     if (this.chatIsReady) {
-                        var jid = megaChat.getJidFromNodeId(props.userHandle);
+                        props.onlineStatus = M.onlineStatusClass(aNode.presence ? aNode.presence : "unavailable");
 
-                        props.onlineStatus = M.onlineStatusClass(megaChat.karere.getPresence(jid));
+                        if (props.onlineStatus) {
+                            props.classNames.push(props.onlineStatus[1]);
+                        }
+
                     }
 
                     if (aExtendedInfo !== false) {
@@ -825,13 +828,12 @@
                 }
 
                 if (this.chatIsReady) {
-                    var jid = megaChat.getJidFromNodeId(aHandle);
-
-                    props.onlineStatus = M.onlineStatusClass(megaChat.karere.getPresence(jid));
+                    props.onlineStatus = M.onlineStatusClass(aNode.presence ? aNode.presence : "unavailable");
 
                     if (props.onlineStatus) {
                         props.classNames.push(props.onlineStatus[1]);
                     }
+
                 }
 
                 props.classNames.push(aHandle);

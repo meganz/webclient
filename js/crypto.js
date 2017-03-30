@@ -2213,6 +2213,14 @@ function api_resetkeykey(ctx, c, key, email, pw) {
 }
 
 function api_resetkeykey2(res, ctx) {
+    try {
+        api_resetkeykey3(res, ctx);
+    }
+    catch (ex) {
+        ctx.result(EKEY);
+    }
+}
+function api_resetkeykey3(res, ctx) {
     if (typeof res === 'string') {
         var privk = a32_to_str(decrypt_key(new sjcl.cipher.aes(ctx.k), base64_to_a32(res)));
 
@@ -4318,7 +4326,6 @@ function api_strerror(errno) {
         }
     };
 })(this);
-
 
 (function() {
     var backgroundNacl = {};

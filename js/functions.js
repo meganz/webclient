@@ -687,7 +687,7 @@ function populate_l() {
     l[16310] = escapeHTML(l[16310])
         .replace('[A]', '<a href="/fm/dashboard" class="clickurl">').replace('[/A]', '</a>')
         .replace('[I]', '<i class="semi-small-icon rocket"></i>');
-    l[16385] = escapeHTML(l[16390]).replace('[S]', '').replace('[/S]', '');
+    l[16385] = escapeHTML(l[16385]).replace('[S]', '').replace('[/S]', '');
     l[16389] = escapeHTML(l[16389]).replace(
                  '%1',
                  '<span class="checkdiv checkboxOn autoaway">' +

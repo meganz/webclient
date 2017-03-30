@@ -142,8 +142,8 @@ Object.defineProperty(mega, 'achievem', {
                     });
 
                 if (Object(u_attr).p) {
-                    quota.storage.base = Object(M.account).space - quota.storage.current;
-                    quota.transfer.base = Object(M.account).bw - quota.transfer.current;
+                    quota.storage.base = Object(M.account).pstrg;
+                    quota.transfer.base = Object(M.account).pxfer;
                 }
                 else {
                     quota.storage.base = maf.s;

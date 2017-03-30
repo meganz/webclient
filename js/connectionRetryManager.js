@@ -102,6 +102,11 @@ ConnectionRetryManager.DEFAULT_OPTS = {
      */
     maxConnectionRetries: 10,
 
+    /**
+     * The minimum conncetion retry timeout, even if immediate = true
+     */
+    minConnectionRetryTimeout: 0,
+
     functions: {
         /**
          * A Callback that will trigger the 'connect' procedure for this type of connection (Karere/Chatd/etc)
@@ -315,7 +320,6 @@ ConnectionRetryManager.prototype.doConnectionRetry = function(immediately) {
             self.options.restartConnectionRetryTimeout
         );
 
-
         self._lastConnectionRetryTime = unixtime();
         return self.startedConnecting(undefined, self.options.restartConnectionRetryTimeout);
     }
@@ -342,6 +346,8 @@ ConnectionRetryManager.prototype.doConnectionRetry = function(immediately) {
             self._connectionRetryInProgress = null;
         }
 
+        connectionRetryTimeout = Math.max(self.options.minConnectionRetryTimeout, connectionRetryTimeout);
+
         self._connectionRetryInProgress = setTimeout(function() {
             if (!self.options.functions.isConnected()) {
                 self.options.functions.reconnect(self);
@@ -349,7 +355,6 @@ ConnectionRetryManager.prototype.doConnectionRetry = function(immediately) {
             } else {
             }
         }, connectionRetryTimeout);
-
 
         self._lastConnectionRetryTime = unixtime();
 

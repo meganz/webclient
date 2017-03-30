@@ -62,6 +62,16 @@ var ModalDialog = React.createClass({
     },
     onPopupDidMount: function(elem) {
         this.domNode = elem;
+
+        // always center modal dialogs after they are mounted
+        $(elem)
+            .css({
+                'margin': 'auto'
+            })
+            .position({
+                of: $(document.body)
+            });
+
         if (this.props.popupDidMount) {
             // bubble up...
             this.props.popupDidMount(elem);

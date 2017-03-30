@@ -77,8 +77,10 @@ module.exports = function(config) {
         'js/crypto.js',
         'js/megaPromise.js',
         'js/idbkvstorage.js',
-        'js/megaDbEncryptionPlugin.js',
-        'js/megaDb.js',
+        'js/vendor/dexie.js',
+        'sjcl.js',
+        'js/mDB.js',
+        'js/sharedlocalkvstorage.js',
         'js/paycrypt.js',
         'js/attr.js',
         'js/account.js',
@@ -138,6 +140,12 @@ module.exports = function(config) {
         'js/network-testing.js',
 
         {pattern: 'test/chat/transcripts/*.json', included: false},
+
+        // == Test utilities ==
+        'test/utilities/fakebroadcaster.js',
+        'test/utilities/promises.js',
+
+
 
         // == Tests ==
         // Dependency-based load order of library modules.

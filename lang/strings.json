@@ -1768,7 +1768,7 @@
         "context": "Section name for the \"My Account\" section.\nPreferably one or two words. There is little space for this."
     },
     "952": {
-        "text": "Most devices can't download files greater than 4GB. Your download will probably fail.",
+        "text": "Most devices can't download files greater than 4 GB. Your download will probably fail.",
         "context": "Warning message"
     },
     "953": {
@@ -4520,7 +4520,7 @@
         "context": "When a user attempt to download a file larger than 1GB using Firefox, he will be prompted with a dialog asking him to install our browser extension with this text."
     },
     "1933": {
-        "text": "To download files larger than 1GB, please install MEGAsync, Google Chrome or Opera.",
+        "text": "To download files larger than 1 GB, please install MEGAsync, Google Chrome or Opera.",
         "context": ""
     },
     "1934": {
@@ -5040,11 +5040,11 @@
         "context": "Title of the dialog displayed when a user want to save a image to the 'saved pictures' album, asking for confirmation to do it - (String as short as possible)."
     },
     "5526": {
-        "text": "MEGA is a secure cloud storage service that gives you 50GB for free.Unlike other cloud storage providers, your data is encrypted and decrypted by the client devices only and never by us.\r\nYour data is accessible any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.\r\nThe cloud in your pocket. Access and stream your files from your smartphone or tablet. Upload and sync your media to the cloud.\r\nSearch, store, download, stream, view, share, rename or delete your files. It's all there - in the palm of your hands.\r\nFor more info, please check our website: https:\/\/mega.nz\/",
+        "text": "MEGA is a secure cloud storage service that gives you 50 GB for free.Unlike other cloud storage providers, your data is encrypted and decrypted by the client devices only and never by us.\r\nYour data is accessible any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.\r\nThe cloud in your pocket. Access and stream your files from your smartphone or tablet. Upload and sync your media to the cloud.\r\nSearch, store, download, stream, view, share, rename or delete your files. It's all there - in the palm of your hands.\r\nFor more info, please check our website: https:\/\/mega.nz\/",
         "context": "Full description text of the app in the Google Play page of the app"
     },
     "5527": {
-        "text": "MEGA is Cloud Storage with Powerful Always-On Privacy. 50GB for free",
+        "text": "MEGA is Cloud Storage with Powerful Always-On Privacy. 50 GB for free",
         "context": "Short description text of the app in the Google Play page of the app"
     },
     "5528": {
@@ -9280,7 +9280,7 @@
         "context": "A dialog box heading, when the user has tried to pay, but something has gone wrong."
     },
     "7236": {
-        "text": "To download files larger than 1GB or to upload folders, please install our MEGAsync client. This will allow easy, automated syncing between your computer and your MEGA cloud drive.",
+        "text": "To download files larger than 1 GB or to upload folders, please install our MEGAsync client. This will allow easy, automated syncing between your computer and your MEGA cloud drive.",
         "context": "Description in a popup dialog when they are trying to download a file larger than 1GB using the browser."
     },
     "7241": {
@@ -12732,7 +12732,7 @@
         "context": "A button label. The button allows the user to leave the conversation."
     },
     "8634": {
-        "text": "Log in or create an account to [S]get 50GB FREE[\/S] cloud storage and to receive messages from your friends and coworkers.",
+        "text": "Log in or create an account to [S]get 50 GB FREE[\/S] cloud storage and to receive messages from your friends and coworkers.",
         "context": "Some information for users that are not logged in. Please leave the [S] and [\/S] placeholder tags as they will be replaced at runtime."
     },
     "8635": {
@@ -13208,7 +13208,7 @@
         "context": "A title which is shown under the action that allows you to save several images to your camera roll."
     },
     "8762": {
-        "text": "Create an account to [S]get 50GB FREE[\/S] cloud storage and to receive messages from your friends and coworkers.",
+        "text": "Create an account to [S]get 50 GB FREE[\/S] cloud storage and to receive messages from your friends and coworkers.",
         "context": "A message on the cloud drive screen when they are on an ephemeral session and they have no files or folders in their account. This prompts them to register an account for extra features. Please keep the [S] and [\/S] tags which will be used to style that text red at runtime."
     },
     "8763": {
@@ -13928,15 +13928,15 @@
         "context": "Mobile-webclient, downloads page.\r\n\r\nOnce a download has finished downloading through the mobile browser, clicking this button will open the downloaded file in the mobile browser itself."
     },
     "8950": {
-        "text": "Install our mobile app to get [S]free 50GB encrypted cloud storage![\/S]",
+        "text": "Install our mobile app to get [S]free 50 GB encrypted cloud storage![\/S]",
         "context": "Mobile-webclient, downloads page.\r\n\r\nWhile downloading through the mobile browser, this message is shown to users to encourage installing our app.\r\n\r\n[S] is replaced with <span> and the text within turns red."
     },
     "8951": {
-        "text": "This file is too large to open in your mobile browser. Please install our mobile app for [S]unlimited file size support, and free 50GB cloud storage![\/S]",
+        "text": "This file is too large to open in your mobile browser. Please install our mobile app for [S]unlimited file size support, and free 50 GB cloud storage![\/S]",
         "context": "Mobile-webclient, downloads page.\r\n\r\nWhen viewing a download link through the mobile browser, and the filesize exceeds an stated limit. \r\n\r\n[S] is replaced with <span> and the text within turns red."
     },
     "8952": {
-        "text": "This file could not be opened in your mobile browser. Please install our mobile app for [S]unlimited file size and type support, and free 50GB cloud storage![\/S]",
+        "text": "This file could not be opened in your mobile browser. Please install our mobile app for [S]unlimited file size and type support, and free 50 GB cloud storage![\/S]",
         "context": "Mobile-webclient, downloads page.\r\n\r\nWhen viewing a download link through the mobile browser, and the file-type cannot be handled through the mobile browser itself. (The message is shown BEFORE trying to download the file)\r\n\r\n[S] is replaced with <span> and the text within turns red."
     },
     "8953": {
@@ -15759,12 +15759,8 @@
         "text": "Storage Full",
         "context": "Dialog header. Informs user that he\u2019ve reached the full capacity of Cloud Drive for Free accounts."
     },
-    "16303": {
-        "text": "You\u2019ve reached the full capacity of your Cloud Drive for a [S]Free[\/S] account.",
-        "context": "A dialog message that informs the user that their cloud storage is full."
-    },
     "16304": {
-        "text": "[A]Upgrade now[\/A] and keep enjoying secure, end-to-end encrypted cloud storage.\r\nPRO accounts get [S]up to 4 TB (4096 GB) of storage[\/S] and 8 TB of transfer quota that they can share with users downloading their files.",
+        "text": "[A]Upgrade now[\/A] and keep enjoying secure, end-to-end encrypted cloud storage. \r\nPRO accounts get [S]up to 4 TB (4096 GB) of storage[\/S] and 8 TB of transfer quota that they can share with users downloading their files.",
         "context": "A dialog message indicating what you can get with a PRO plan. Please leave the placeholders [A], [\/A], [S], [\/S] as they are."
     },
     "16305": {
@@ -15772,7 +15768,7 @@
         "context": "Button label. Allow user to check available PRO plans."
     },
     "16306": {
-        "text": "Delete old files that you no longer need to free up some space.",
+        "text": "Delete old files and [A]clear your Rubbish Bin[\/A] to free up some space.",
         "context": "A dialog message that informs the user how to free up cloud drive space."
     },
     "16307": {
@@ -15788,7 +15784,7 @@
         "context": "Button label. Allows user to get more storage\/transfer quotas by executing achievements."
     },
     "16310": {
-        "text": "Tip: Check all your available bonuses in the Dashboard or click [I]",
+        "text": "Tip: Check all your available bonuses in the [A]Dashboard[\/A] or click [I]",
         "context": "A dialog message that informs the user that they may have outstanding achievements, which may increase storage quota. Please leave the [I] placeholder as it is because it will be replaced by an icon."
     },
     "16311": {
@@ -15800,7 +15796,7 @@
         "context": "A dialog message that informs the user that their cloud storage is almost full."
     },
     "16313": {
-        "text": "[A]Upgrade now[\/A] to a [S]PRO Lite[\/S] account and don\u2019t worry about running out of storage. [S]For %1\u20ac a month you get 200 GB of storage[\/S] and 1 TB of transfer quota.",
+        "text": "[A]Upgrade now[\/A] to a [S]PRO Lite[\/S] account and don't worry about running out of storage. [S]For \u20ac%1 a month you get 200 GB of storage[\/S] and 1 TB of transfer quota.",
         "context": "Informs the user that their storage is almost full and it's better to buy PRO account. Please leave the placeholders [A], [\/A], [S], [\/S] and %1 as they are. There is also no need to translate \"PRO Lite\"."
     },
     "16314": {
@@ -15808,11 +15804,11 @@
         "context": "A dialog message that informs the user that he can get more storage\/transfer quota by completing achievements."
     },
     "16315": {
-        "text": "[S]Cloud Drive is full.[\/S] [A]Upgrade now[\/A] to a PRO account and get [S]up to 4TB (4096 GB)[\/S] of cloud storage space.",
-        "context": "A message informing the user that they\u2019ve reached the full capacity of their Cloud Drive for a Free account. Please leave [S], [\/S] as it is which is used to bolden the text."
+        "text": "[S]Your account is full.[\/S] [A]Upgrade now[\/A] to a PRO account and get [S]up to 4 TB (4096 GB)[\/S] of cloud storage space.",
+        "context": "A message informing the user that they've reached the full capacity of their accounts. Please leave [S], [\/S] as it is which is used to bolden the text."
     },
     "16316": {
-        "text": "[S]Cloud Drive is almost full.[\/S] [A]Upgrade now[\/A] to a PRO account and get [S]up to 4TB (4096 GB)[\/S] of cloud storage space.",
+        "text": "[S]Cloud Drive is almost full.[\/S] [A]Upgrade now[\/A] to a PRO account and get [S]up to 4 TB (4096 GB)[\/S] of cloud storage space.",
         "context": "Informs the user that they\u2019ve almost reached the full capacity of their Cloud Drive for a Free account. Please leave the [S], [\/S], [A], [\/A] placeholders as they are."
     },
     "16317": {
@@ -15964,7 +15960,7 @@
         "context": "A link which leads to the help center where the user can get more information."
     },
     "16355": {
-        "text": "Tip: This limit can be dynamic and depends on the amount of unused bandwidth we have available.",
+        "text": "Tip: This limit is dynamic and depends on the amount of unused bandwidth we have available.",
         "context": "An information message about limited transfer quota."
     },
     "16356": {
@@ -15976,15 +15972,15 @@
         "context": "An information message about limited transfer quota."
     },
     "16358": {
-        "text": "[S]Cloud Drive is full.[\/S] [A]Upgrade now[\/A] and get [S]up to 4TB (4096 GB)[\/S] of cloud storage space.",
-        "context": "A message informing the user that they\u2019ve reached the full capacity of their Cloud Drive. It informs the user the maximum amount of storage space they can get by upgrading."
+        "text": "[S]Your account is full.[\/S] [A]Upgrade now[\/A] and get [S]up to 4 TB (4096 GB)[\/S] of cloud storage space.",
+        "context": "A message informing the user that they've reached the full capacity of their accounts. It informs the user the maximum amount of storage space they can get by upgrading."
     },
     "16359": {
-        "text": "[S]Cloud Drive is almost full.[\/S] [A]Upgrade now[\/A] and get [S]up to 4TB (4096 GB)[\/S] of cloud storage space.",
+        "text": "[S]Cloud Drive is almost full.[\/S] [A]Upgrade now[\/A] and get [S]up to 4 TB (4096 GB)[\/S] of cloud storage space.",
         "context": "A message informing the user that they\u2019ve nearly reached the full capacity of their Cloud Drive (i.e. not quite reached their limit yet). It informs the user the maximum amount of storage space they can get by upgrading."
     },
     "16360": {
-        "text": "You've reached the full capacity of your Cloud Drive.",
+        "text": "You've reached the full capacity of your account.",
         "context": "A dialog message that informs the user that their cloud storage is full"
     },
     "16361": {
@@ -16078,5 +16074,17 @@
     "16389": {
         "text": "Online, %1 but change my status appearance to Away (yellow) after %2 minute(s) of inactivity.",
         "context": "Allows the user to set his presence to Online, but if the checkbox is checked and if he is idle for X minutes, they would be set automatically to Away. The placeholder %1 will be replaced with a checkbox and the placeholder %2 with a text input containing the number of minutes."
+    },
+    "16390": {
+        "text": "[S]Transfer quota[\/S] is the total volume of data transfered between MEGA and your system each month.",
+        "context": "A note about MEGA's transfer quota. Please leave the placeholders [S] and [\/S] which are used to stylise the text."
+    },
+    "16391": {
+        "text": "[S]Transfer speed[\/S] is unrelated to Transfer quota. The quality of your file transfers' speed can be affected by many factors beyond our control, such as your local network and your Internet Service Provider. MEGA always processes file transfers at the maximum possible speed regardless of your account status.",
+        "context": "A note about transfer speed. Please leave the placeholders [S] and [\/S] which are used to stylise the text."
+    },
+    "16392": {
+        "text": "[S]PRO and Free accounts[\/S] enjoy the same fast transfer speed.",
+        "context": "A note about MEGA's fast transfer speed. Please leave the placeholder [S] and [\/S] tags which will be used to stylise the text."
     }
 }

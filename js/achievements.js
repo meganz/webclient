@@ -1234,6 +1234,7 @@ mega.checkStorageQuota = function checkStorageQuota(timeout) {
  * @param {Number} [mstrg] Maximum storage.
  */
 mega.showOverStorageQuota = function(perc, cstrg, mstrg) {
+    var prevState = $('.fm-main').is('.almost-full, .full');
     $('.fm-main').removeClass('almost-full full');
 
     if (u_attr.p) {
@@ -1254,8 +1255,7 @@ mega.showOverStorageQuota = function(perc, cstrg, mstrg) {
     }
 
     if (perc > 90) {
-        var $strgdlg = $('.fm-dialog.storage-dialog').removeClass('hidden full almost-full');
-        fm_showoverlay();
+        var $strgdlg = $('.fm-dialog.storage-dialog').removeClass('full almost-full');
 
         if (perc > 99) {
             $('.fm-main').addClass('fm-notification full');
@@ -1328,6 +1328,12 @@ mega.showOverStorageQuota = function(perc, cstrg, mstrg) {
 
         if (Object(u_attr).p) {
             $('.choose-plan', $strgdlg).text(l[16386]);
+        }
+
+        // if another dialog wasn't opened previously
+        if (!prevState) {
+            fm_showoverlay();
+            $strgdlg.removeClass('hidden');
         }
     }
 };

@@ -3705,7 +3705,7 @@
     "10657": "Groupe Mega",
     "10658": "Les [A]Conditions G\u00e9n\u00e9rales d'Utilisation de Mega[\/A] s'applique pour Mega Limited et ses soci\u00e9t\u00e9s affili\u00e9es, filiales et revendeurs, y compris :",
     "10659": "Code Postal",
-    "10660": "D\u00e9sactiver les conseils futurs",
+    "10660": "D\u00e9sactiver les astuces futurs",
     "10661": "Vous pouvez [B]ajouter et g\u00e9rer des contacts[\/B] dans l'onglet Contacts pour ensuite discuter et partager des fichiers en toute s\u00e9curit\u00e9 gr\u00e2ce \u00e0 MEGAchat.",
     "10662": "\u00c9changez en toute s\u00e9curit\u00e9 avec votre famille, vos amis et vos coll\u00e8gues en utilisant notre solution de communication par messages texte, audio et vid\u00e9o avec le chiffrement de bout-en-bout contr\u00f4l\u00e9 par l'utilisateur.",
     "10663": "... et [X] autres",
@@ -3941,11 +3941,11 @@
     "16302": "L'espace de stockage est plein",
     "16304": "[A]Surclassez votre compte maintenant [\/A] et continuez \u00e0 b\u00e9n\u00e9ficier and keep enjoying secure, end-to-end encrypted cloud storage. PRO accounts get [S]up to 4 TB (4000 GB) of storage[\/S] and 8 TB of transfers bandwidth that they can share with users downloading their files.                ",
     "16305": "Choisir un abonnement",
-    "16306": "Delete old files and [A]clear your Rubbish Bin[\/A] to free up some space.",
-    "16307": "Astuce : assurez-vous que votre corbeille est vide afin d'optimiser l'utilisation de votre espace de stockage.",
+    "16306": "Supprimez des anciens fichiers et [A]videz votre corbeille[\/A] pour lib\u00e9rer de l'espace.",
+    "16307": "Conseil : assurez-vous que votre corbeille est vide afin d'optimiser l'utilisation de votre espace de stockage.",
     "16308": "Vous pouvez d\u00e9verrouiller plus d'espace de stockage et de quota de transfert gratuits en utilisant nos produits. Simple. Facile.",
     "16309": "Obtenir d'autres primes",
-    "16310": "Tip: Check all your available bonuses in the [A]Dashboard[\/A] or click [I]",
+    "16310": "Conseil : v\u00e9rifiez toutes vos primes disponibles quand le [A]tableau de bord[\/A] ou cliquez sur [I]              ",
     "16311": "L'espace de stockage est presque plein",
     "16312": "Il semble que vous \u00eates \u00e0 court d'espace de stockage.",
     "16313": "[A]Passez maintenant[\/A] \u00e0 un compte [S]PRO l\u00e9ger[\/S] et ne craigniez plus d'\u00eatre \u00e0 court d'espace. [S]Pour %1 \u20ac par mois, vous obtenez 200 Go d'espace de stockage[\/S] et 1 To de quota de transfert.                ",
@@ -3989,7 +3989,7 @@
     "16352": "Obtenir des primes",
     "16353": "Voir nos offres",
     "16354": "En apprendre plus",
-    "16355": "Conseil : cette limite peut \u00eatre dynamique et d\u00e9pend du montant de bande passante inutilis\u00e9e \u00e0 notre disposition.",
+    "16355": "Conseil : cette limite est dynamique et d\u00e9pend du montant de bande passante inutilis\u00e9e \u00e0 notre disposition.",
     "16356": "Votre t\u00e9l\u00e9chargement en attente d\u00e9passe le quota de transfert actuel disponible de votre compte et pourrait par cons\u00e9quent \u00eatre interrompu.",
     "16357": "Votre t\u00e9l\u00e9chargement en attente d\u00e9passe le quota de transfert actuel disponible de votre adresse IP et pourrait par cons\u00e9quent \u00eatre interrompu.",
     "16358": "[S]Votre compte est plein.[\/S] [A]Surclassez votre compte maintenant[\/A] et obtenez [S]jusqu'\u00e0 4 To (4 096 Go)[\/S] d'espace de stockage nuagique.             ",
@@ -4019,8 +4019,10 @@
     "16388": "Vous pouvez changer vos param\u00e8tres d'attribution de votre quota de transfert aux utilisateurs qui t\u00e9l\u00e9chargent.",
     "16389": "En Ligne, %1 mais changer mon \u00e9tat de connexion \u00e0 Absent (jaune) apr\u00e8s %2 minute(s) d'inactivit\u00e9.",
     "16390": "Le [S]quota de transfert[\/S] est le volume total de donn\u00e9es transf\u00e9r\u00e9es entre MEGA et votre syst\u00e8me chaque mois.",
-    "16391": "La [S]vitesse de transfert[\/S] n'est pas reli\u00e9e au quota de transfert. La vitesse de transfert de vos fichiers peut \u00eatre affect\u00e9e par de nombreux facteurs hors de notre contr\u00f4le, tels que votre r\u00e9seau local et votre fournisseur d'acc\u00e8s \u00e0 Internet. MEGA traite toujours les transferts de fichiers \u00e0 la vitesse maximale possible. quel que soit votre \u00e9tat de compte.",
+    "16391": "La [S]vitesse de transfert[\/S] n'est pas reli\u00e9e au quota de transfert. La vitesse de transfert de vos fichiers peut \u00eatre affect\u00e9e par de nombreux facteurs hors de notre contr\u00f4le, tels que votre r\u00e9seau local et votre fournisseur d'acc\u00e8s \u00e0 Internet. MEGA traite toujours les transferts de fichiers \u00e0 la vitesse maximale possible quel que soit votre \u00e9tat de compte.                ",
     "16392": "Les [S]comptes PRO et gratuits[\/S] b\u00e9n\u00e9ficient de la m\u00eame vitesse rapide de transfert.",
+    "16393": "Starting at 200 GB base storage and scalable up to 4 TB. If you require more than that, please [A]contact us[\/A].",
+    "16394": "No files in your [S]Cloud Drive[\/S].",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4268,6 +4270,7 @@
         "please-try-again": 16350,
         "email-sent-successfully": 16351,
         "always-show-selected-presence-even-when-disconnected": 16387,
-        "online-autoaway-checkbox-field": 16389
+        "online-autoaway-checkbox-field": 16389,
+        "no-files-in-cloud-drive": 16394
     }
 }

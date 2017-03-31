@@ -3941,11 +3941,11 @@
     "16302": "Zmanjkalo prostora",
     "16304": "[A]Nadgradite sedaj[\/A] in \u0161e naprej u\u017eivajte v varnem, od prve do zadnje to\u010dke kriptiranem shranjevanju v oblaku. PRO ra\u010duni dobijo [S]do 4 TB (4096 GB) prostora[\/S] in 8 TB prenosne kvote, ki jo lahko delite z uporabniki, ki prevzemajo va\u0161e datoteke",
     "16305": "Izberite plan",
-    "16306": "Delete old files and [A]clear your Rubbish Bin[\/A] to free up some space.",
+    "16306": "Izbri\u0161ite stare datoteke in [A]o\u010distite svoj ko\u0161[\/A], da sprostite nekaj prostora.",
     "16307": "Nasvet: Redno \u010distite svoj ko\u0161, da optimizirate uporabo shranjevalnega prostora.",
     "16308": "Ve\u010d prostora za shranjevanje in vi\u0161jo prenosno kvoto lahko dose\u017eete z uporabo na\u0161ih storitev. Preprosto. Lahko.",
     "16309": "Pridobite ve\u010d bonusov",
-    "16310": "Tip: Check all your available bonuses in the [A]Dashboard[\/A] or click [I]",
+    "16310": "Nasvet: Preverite vse bonuse, ki so na voljo, v [A]Nadzorni plo\u0161\u010di[\/A] ali kliknite [I]",
     "16311": "Prostor skoraj poln",
     "16312": "Ka\u017ee, da vam zmanjkuje prostora.",
     "16313": "[A]Nadgradite sedaj[\/A] v [S]PRO Lite[\/S] ra\u010dun in ne skrbite ve\u010d, da bi vam zmanjkalo prostora za shranjevanje. [S]Za \u20ac%1 na mesec dobite 200 GB prostora[\/S] in 1 TB prenosne kvote.",
@@ -3989,7 +3989,7 @@
     "16352": "Registrirajte se za bonuse",
     "16353": "Poglejte na\u0161e naro\u010dnine",
     "16354": "Ve\u010d informacij",
-    "16355": "Nasvet: ta omejitev je lahko dinami\u010dna in je odvisna od koli\u010dine neuporabljene pasovne \u0161irine, ki jo imamo na voljo.",
+    "16355": "Nasvet: ta omejitev je dinami\u010dna in je odvisna od koli\u010dine neuporabljene pasovne \u0161irine, ki jo imamo na voljo.",
     "16356": "Va\u0161i prevzemi v \u010dakanju presegajo trenutno prenosno kvoto, ki je na voljo za va\u0161 ra\u010dun, in bodo lahko prekinjeni.",
     "16357": "Va\u0161i prevzemi v \u010dakanju presegajo trenutno prenosno kvoto, ki je na voljo za va\u0161 IP naslov, in bodo lahko prekinjeni.",
     "16358": "[S]Va\u0161 ra\u010dun je poln.[\/S] [A]Nadgradite sedaj[\/A] in pridobite [S]do 4 TB (4096 GB)[\/S] prostora za shranjevanje v oblaku.",
@@ -4021,6 +4021,8 @@
     "16390": "[S]Prenosna kvota[\/S] je celotna koli\u010dina prene\u0161enih podatkov, ki se prena\u0161ajo med MEGA in va\u0161im sistemom vsak mesec. ",
     "16391": "[S]Prenosna hitrost[\/S] ni povezana s prenosno kvoto. Kvaliteta prenosne hitrosti va\u0161ih prenosov datotek je odvisna od mnogih faktorjev, ki jih nimamo pod nadzorom, kot je va\u0161e lokalno omre\u017eje in va\u0161 ponudnik interneta. MEGA vedno procesira prenose podatkov na najvi\u0161ji mo\u017eni hitrosti, ne glede na status va\u0161ega ra\u010duna.",
     "16392": "[S]PRO in brezpla\u010dni ra\u010duni[\/S] u\u017eivajo enako visoke hitrosti prenosa.",
+    "16393": "Starting at 200 GB base storage and scalable up to 4 TB. If you require more than that, please [A]contact us[\/A].",
+    "16394": "No files in your [S]Cloud Drive[\/S].",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4268,6 +4270,7 @@
         "please-try-again": 16350,
         "email-sent-successfully": 16351,
         "always-show-selected-presence-even-when-disconnected": 16387,
-        "online-autoaway-checkbox-field": 16389
+        "online-autoaway-checkbox-field": 16389,
+        "no-files-in-cloud-drive": 16394
     }
 }

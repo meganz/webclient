@@ -4021,6 +4021,8 @@
     "16390": "La [S]Cuota de transferencia[\/S] es el volumen total de datos transferidos cada mes entre MEGA y tu sistema.",
     "16391": "[S]La Velocidad de Transferencia[\/S] no tiene relaci\u00f3n con la Cuota de Transferencia. La calidad de la velocidad de las transferencias de archivos puede verse afectada por muchos factores fuera de nuestro control, ta\u00f1es como la red local o tu proveedor de servicios de Internet. MEGA siempre procesa las transferencias de archivos a la m\u00e1xima velocidad posible, independientemente del estado de tu cuenta.",
     "16392": "Las cuentas [S]PRO y Gratis[\/S] disfrutan de una velocidad de transferencia igualmente r\u00e1pida.",
+    "16393": "Starting at 200 GB base storage and scalable up to 4 TB. If you require more than that, please [A]contact us[\/A].",
+    "16394": "No files in your [S]Cloud Drive[\/S].",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4268,6 +4270,7 @@
         "please-try-again": 16350,
         "email-sent-successfully": 16351,
         "always-show-selected-presence-even-when-disconnected": 16387,
-        "online-autoaway-checkbox-field": 16389
+        "online-autoaway-checkbox-field": 16389,
+        "no-files-in-cloud-drive": 16394
     }
 }

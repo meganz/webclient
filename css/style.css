@@ -25244,9 +25244,9 @@ div.camera-bottom-txt {
 .achieved .achievement-left-side {
     border: 0;
 }
-.achieved .achievement-full.rewards, .achieved .achievement-full.description {
+/*.achieved .achievement-full.rewards, .achieved .achievement-full.description {
     display: none;
-}
+}*/
 .achieved .achievement-full.info {
     padding-bottom: 40px;
     margin-left: 112px;

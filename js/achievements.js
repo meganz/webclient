@@ -400,6 +400,19 @@ mega.achievem.achievementsListDialog = function achievementsListDialog(onDialogC
                         locFmt = l[1664];
                     }
                     $('.expires-txt', $cell).addClass('red').safeHTML('%n', locFmt, data.rwd.left, l[16290]);
+
+                    locFmt = '';
+                    switch (idx) {
+                        case ach.ACH_WELCOME:     locFmt = l[16395]; break;
+                        case ach.ACH_SYNCINSTALL: locFmt = l[16396]; break;
+                        case ach.ACH_APPINSTALL:  locFmt = l[16397]; break;
+                    }
+
+                    $('.description', $cell)
+                        .text(locFmt
+                            .replace('%1', bytesToSize(data[0], 0))
+                            .replace('%2', bytesToSize(data[1], 0))
+                        );
                 }
                 else {
                     ach.bind.call($('.button', $cell), ach.mapToAction[idx]);

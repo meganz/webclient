@@ -16086,5 +16086,25 @@
     "16392": {
         "text": "[S]PRO and Free accounts[\/S] enjoy the same fast transfer speed.",
         "context": "A note about MEGA's fast transfer speed. Please leave the placeholder [S] and [\/S] tags which will be used to stylise the text."
+    },
+    "16393": {
+        "text": "Starting at 200 GB base storage and scalable up to 4 TB. If you require more than that, please [A]contact us[\/A].",
+        "context": "A description of the storage capacity a user can have if they purchase a PRO plan."
+    },
+    "16394": {
+        "text": "No files in your [S]Cloud Drive[\/S].",
+        "context": "A message which is displayed in an empty Cloud Drive for the mobile website. Please leave the [S] and [\/S] placeholders as they will be used to bolden the text."
+    },
+    "16395": {
+        "text": "You have received %1 storage space as your free registration bonus.",
+        "context": "Message shown on the achievements dialog for achieved achievements, %1 is replaced with e.g. 20 GB"
+    },
+    "16396": {
+        "text": "You have received %1 storage space and %2 transfer quota for installing MEGAsync.",
+        "context": "Message shown on the achievements dialog for achieved achievements, %1 and %2 are replaced with e.g. 20 GB"
+    },
+    "16397": {
+        "text": "You have received %1 storage space and %2 transfer quota for installing our mobile app.",
+        "context": "Message shown on the achievements dialog for achieved achievements, %1 and %2 are replaced with e.g. 20 GB"
     }
 }

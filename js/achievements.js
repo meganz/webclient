@@ -142,8 +142,8 @@ Object.defineProperty(mega, 'achievem', {
                     });
 
                 if (Object(u_attr).p) {
-                    quota.storage.base = Object(M.account).space - quota.storage.current;
-                    quota.transfer.base = Object(M.account).bw - quota.transfer.current;
+                    quota.storage.base = Object(M.account).pstrg;
+                    quota.transfer.base = Object(M.account).pxfer;
                 }
                 else {
                     quota.storage.base = maf.s;
@@ -400,6 +400,19 @@ mega.achievem.achievementsListDialog = function achievementsListDialog(onDialogC
                         locFmt = l[1664];
                     }
                     $('.expires-txt', $cell).addClass('red').safeHTML('%n', locFmt, data.rwd.left, l[16290]);
+
+                    locFmt = '';
+                    switch (idx) {
+                        case ach.ACH_WELCOME:     locFmt = l[16395]; break;
+                        case ach.ACH_SYNCINSTALL: locFmt = l[16396]; break;
+                        case ach.ACH_APPINSTALL:  locFmt = l[16397]; break;
+                    }
+
+                    $('.description', $cell)
+                        .text(locFmt
+                            .replace('%1', bytesToSize(data[0], 0))
+                            .replace('%2', bytesToSize(data[1], 0))
+                        );
                 }
                 else {
                     ach.bind.call($('.button', $cell), ach.mapToAction[idx]);

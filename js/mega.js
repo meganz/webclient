@@ -7642,7 +7642,11 @@ function dbfetchfm() {
                                     processPS(r, true);
 
                                     fmdb.get('mcf', function(r){
-                                        loadfm.chatmcf = r;
+                                        if (r.length > 0) {
+                                            // only set chatmcf is there is anything returned
+                                            // if not, this would force the chat to do a 'mcf' call
+                                            loadfm.chatmcf = r;
+                                        }
 
                                         mega.loadReport.procNodeCount = Object.keys(M.d || {}).length;
                                         mega.loadReport.procNodes     = Date.now() - mega.loadReport.stepTimeStamp;

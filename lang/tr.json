@@ -4023,6 +4023,9 @@
     "16392": "[S]PRO ve \u00dccretsiz Hesaplar[\/S] ayn\u0131 y\u00fcksek h\u0131zl\u0131 aktarma h\u0131z\u0131n\u0131n tad\u0131n\u0131 \u00e7\u0131kar\u0131rlar.",
     "16393": "Starting at 200 GB base storage and scalable up to 4 TB. If you require more than that, please [A]contact us[\/A].",
     "16394": "No files in your [S]Cloud Drive[\/S].",
+    "16395": "You have received %1 storage space as your free registration bonus.",
+    "16396": "You have received %1 storage space and %2 transfer quota for installing MEGAsync.",
+    "16397": "You have received %1 storage space and %2 transfer quota for installing our mobile app.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

@@ -2086,6 +2086,22 @@ function array_random(arr) {
 }
 
 /**
+ * Convert Array to Object
+ * @param {Array|String} arr The array
+ * @param {*} [value] Optional value to assign to objects
+ * @returns {Object}
+ */
+function array_toobject(arr, value) {
+    if (!Array.isArray(arr)) {
+        arr = [arr];
+    }
+    return arr.reduce(function(obj, key, idx) {
+        obj[key] = value !== undefined ? value : ((idx | 0) + 1);
+        return obj;
+    }, Object.create(null));
+}
+
+/**
  * Simple method that will convert Mega user ids to base32 strings (that should be used when doing XMPP auth)
  *
  * @param handle {string} mega user id
@@ -4945,7 +4961,9 @@ var watchdog = Object.freeze({
         delete localStorage[ev.key];
     }
 });
-watchdog.setup();
+mBroadcaster.once('boot_done', function() {
+    watchdog.setup();
+});
 
 /**
  * Simple alias that will return a random number in the range of: a < b

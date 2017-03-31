@@ -3633,6 +3633,67 @@ function MegaData()
                         ctx.account.reseller = res.reseller;
                         ctx.account.prices = res.prices;
 
+                        // Prepare storage footprint stats.
+                        var cstrgn = ctx.account.cstrgn = Object(ctx.account.cstrgn);
+                        var stats = ctx.account.stats = Object.create(null);
+                        var groups = [M.RootID, M.InboxID, M.RubbishID];
+                        var root = array_toobject(groups);
+                        var exp = Object(M.su.EXP);
+
+                        groups = groups.concat(['inshares', 'outshares', 'links']);
+                        for (var i = groups.length; i--;) {
+                            stats[groups[i]] = array_toobject(['items', 'bytes', 'files', 'folders'], 0);
+                            // stats[groups[i]].nodes = [];
+                        }
+
+                        for (var handle in cstrgn) {
+                            var data = cstrgn[handle];
+                            var target = 'outshares';
+
+                            if (root[handle]) {
+                                target = handle;
+                            }
+                            else if (M.c.shares[handle]) {
+                                target = 'inshares';
+                            }
+                            // stats[target].nodes.push(handle);
+
+                            if (exp[handle] && !M.getNodeShareUsers(handle, 'EXP').length) {
+                                continue;
+                            }
+
+                            stats[target].items++;
+                            stats[target].bytes += data[0];
+                            stats[target].files += data[1];
+                            stats[target].folders += data[2];
+                        }
+
+                        // calculate root's folders size
+                        if (M.c[M.RootID]) {
+                            var t = Object.keys(M.c[M.RootID]);
+                            var s = Object(stats[M.RootID]);
+
+                            s.fsize = s.bytes;
+                            for (var i = t.length; i--;) {
+                                var node = M.d[t[i]] || false;
+
+                                if (!node.t) {
+                                    s.fsize -= node.s;
+                                }
+                            }
+                        }
+
+                        // calculate filelinks items/size
+                        var links = stats.links;
+                        Object.keys(exp)
+                            .filter(function(h) {
+                                return !M.d[h].t;
+                            })
+                            .forEach(function(h) {
+                                links.files++;
+                                links.bytes += M.d[h] && M.d[h].s || 0;
+                            });
+
                         // If a subscription, get the timestamp it will be renewed
                         if (res.stype === 'S') {
                             ctx.account.srenew = res.srenew;
@@ -4513,116 +4574,18 @@ function MegaData()
     };
 
     /**
-     * Recursively retrieve node properties
-     * @param {String|Array} aNodes  ufs-node handle, or a list of them
-     */
-    this.getNodeProperties = function(aNodes) {
-        var res = {
-            favs: { cnt: 0, size: 0 },
-            links: { cnt: 0, size: 0 },
-            files: { cnt: 0, size: 0 },
-            folders: { cnt: 0, size: 0 },
-            oshares: { cnt: 0, size: 0 },
-        };
-
-        var forEach = function(nodes) {
-            var node;
-            var size;
-
-            for (var i = 0; i < nodes.length; i++) {
-                node = M.d[nodes[i]];
-
-                if (node) {
-                    if (node.t) {
-                        size = 0;
-
-                        if (M.c[node.h]) {
-                            var fs = res.folders.size;
-                            size = res.files.size;
-
-                            forEach(Object.keys(M.c[node.h]));
-                            size = (res.files.size - size);
-                            res.folders.size = fs;
-                        }
-
-                        if (M.getNodeShareUsers(node, 'EXP').length) {
-                            res.oshares.cnt++;
-                            res.oshares.size += size;
-                        }
-
-                        res.folders.cnt++;
-                        res.folders.size += size;
-                    }
-                    else {
-                        size = node.s || 0;
-
-                        res.files.cnt++;
-                        res.files.size += size;
-
-                        if (node.ph) {
-                            res.links.cnt++;
-                            res.links.size += size;
-                        }
-                        if (node.fav) {
-                            res.favs.cnt++;
-                            res.favs.size += size;
-                        }
-                    }
-                }
-            }
-        };
-
-        if (!Array.isArray(aNodes)) {
-            if (M.c[aNodes]) {
-                aNodes = Object.keys(M.c[aNodes]);
-            }
-            else {
-                aNodes = [aNodes];
-            }
-        }
-
-        forEach(aNodes);
-
-        return res;
-    };
-
-    /**
      * Retrieve dashboard statistics data
      */
     this.getDashboardData = function() {
-        var res = this.getNodeProperties(M.RootID);
+        var res = Object.create(null);
+        var s = M.account.stats;
 
-        [M.RubbishID, 'shares']
-            .forEach(function(handle) {
-                var key = 'rubbish';
-                var tmp = M.getNodeProperties(handle);
-
-                // remove unwanted properties
-                ['favs', 'links', 'oshares']
-                    .forEach(function(k) {
-                        if (d && tmp[k].cnt) {
-                            console.warn('getDashboardData: Found "%s" items for "%s"', k, handle);
-                        }
-                        delete tmp[k];
-                    });
-
-                tmp.cnt = tmp.files.cnt;
-                tmp.size = tmp.folders.size;
-
-                tmp.files = tmp.files.cnt;
-                tmp.folders = tmp.folders.cnt;
-
-                if (handle === 'shares') {
-                    key = 'ishares';
-                    tmp.cnt = Object.keys(M.c.shares || {}).length;
-                }
-                else if (!M.c[handle]) {
-                    // The rubbish is empty
-                    tmp.folders = 0;
-                }
-
-                res[key] = tmp;
-            });
+        res.files = {cnt: s[M.RootID].files, size: s[M.RootID].bytes};
+        res.folders = {cnt: s[M.RootID].folders, size: s[M.RootID].fsize};
+        res.rubbish = {cnt: s[M.RubbishID].files, size: s[M.RubbishID].bytes};
+        res.ishares = {cnt: s.inshares.items, size: s.inshares.bytes};
+        res.oshares = {cnt: s.outshares.items, size: s.outshares.bytes};
+        res.links = {cnt: s.links.files, size: s.links.bytes};
 
         return res;
     };

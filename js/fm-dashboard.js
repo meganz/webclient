@@ -291,17 +291,12 @@ function dashboardUI() {
 
 
         /* Used Storage progressbar */
-        var c = account.cstrgn, k = Object.keys(c), iSharesBytes = 0;
         var percents = [
-            100 * c[k[0]][0] / account.space,
-            100 * c[k[2]][0] / account.space,
-            0,
-            100 * c[k[1]][0] / account.space
+            100 * account.stats[M.RootID].bytes / account.space,
+            100 * account.stats[M.RubbishID].bytes / account.space,
+            100 * account.stats.inshares.bytes / account.space,
+            100 * account.stats[M.InboxID].bytes / account.space
         ];
-        for (var i = 3; i < k.length; ++i) {
-            iSharesBytes += c[k[i]][0];
-            percents[2] += (100 * c[k[i]][0] / account.space);
-        }
         for (var i = 0; i < 4; i++) {
             var $percBlock = $('.storage .account.progress-perc.pr' + i);
             if (percents[i] > 0) {
@@ -313,22 +308,21 @@ function dashboardUI() {
                 $percBlock.parent().addClass('empty');
             }
         }
-        var prSize;
         // Cloud drive
         $('.account.progress-size.cloud-drive').text(
-            prSize = c[k[0]][0] > 0 ? bytesToSize(c[k[0]][0]) : '-'
+            account.stats[M.RootID].bytes > 0 ? bytesToSize(account.stats[M.RootID].bytes) : '-'
         );
         // Rubbish bin
         $('.account.progress-size.rubbish-bin').text(
-            prSize = c[k[2]][0] > 0 ? bytesToSize(c[k[2]][0]) : '-'
+            account.stats[M.RubbishID].bytes > 0 ? bytesToSize(account.stats[M.RubbishID].bytes) : '-'
         );
         // Incoming shares
         $('.account.progress-size.incoming-shares').text(
-            prSize = iSharesBytes > 0 ? bytesToSize(iSharesBytes) : '-'
+            account.stats.inshares.bytes ? bytesToSize(account.stats.inshares.bytes) : '-'
         );
         // Inbox
         $('.account.progress-size.inbox').text(
-            prSize = c[k[1]][0] > 0 ? bytesToSize(c[k[1]][0]) : '-'
+            account.stats[M.InboxID].bytes > 0 ? bytesToSize(account.stats[M.InboxID].bytes) : '-'
         );
         /* End of Used Storage progressbar */
 
@@ -485,8 +479,8 @@ dashboardUI.updateCloudDataWidget = function() {
     var folder1 = 834;
     var folders = 832;
     var data = M.getDashboardData();
-    var locale = [files, folders, files, folders, folders, files, files];
-    var map = ['files', 'folders', 'rubbish', 'ishares', 'oshares', 'links', 'favs'];
+    var locale = [files, folders, files, folders, folders, files];
+    var map = ['files', 'folders', 'rubbish', 'ishares', 'oshares', 'links'];
     var intl = typeof Intl !== 'undefined' && Intl.NumberFormat && new Intl.NumberFormat();
 
     $('.data-float-bl').find('.data-item')

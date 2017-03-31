@@ -1266,6 +1266,9 @@ var proPage = {
             $step2.find('.renewal-option').addClass('hidden');
         }
 
+        // Reorder options numbering
+        $step2.find('.number:visible').each(function(idx, node) { $(node).text(idx + 1); });
+
         // Show recurring info box next to Purchase button and update dialog text for recurring
         if (recurringEnabled) {
             $step2.find('.subscription-instructions').removeClass('hidden');

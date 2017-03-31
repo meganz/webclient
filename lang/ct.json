@@ -4021,6 +4021,11 @@
     "16390": " [S]\u50b3\u8f38\u914d\u984d[\/S] \u662f\u6bcf\u500b\u6708\u60a8\u7684\u7cfb\u7d71\u8207MEGA\u4e4b\u9593\u8cc7\u6599\u7684\u7e3d\u50b3\u8f38\u91cf",
     "16391": "[S]Transfer speed[\/S] is unrelated to Transfer quota. The quality of your file transfers' speed can be affected by many factors beyond our control, such as your local network and your Internet Service Provider. MEGA always processes file transfers at the maximum possible speed regardless of your account status.",
     "16392": "[S]PRO\u5c08\u696d\u7248 \u4ee5\u53ca \u514d\u8cbb\u7248[\/S] \u4eab\u53d7\u540c\u6a23\u5feb\u901f\u7684\u50b3\u8f38\u901f\u5ea6",
+    "16393": "Starting at 200 GB base storage and scalable up to 4 TB. If you require more than that, please [A]contact us[\/A].",
+    "16394": "No files in your [S]Cloud Drive[\/S].",
+    "16395": "You have received %1 storage space as your free registration bonus.",
+    "16396": "You have received %1 storage space and %2 transfer quota for installing MEGAsync.",
+    "16397": "You have received %1 storage space and %2 transfer quota for installing our mobile app.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4268,6 +4273,7 @@
         "please-try-again": 16350,
         "email-sent-successfully": 16351,
         "always-show-selected-presence-even-when-disconnected": 16387,
-        "online-autoaway-checkbox-field": 16389
+        "online-autoaway-checkbox-field": 16389,
+        "no-files-in-cloud-drive": 16394
     }
 }

@@ -15144,11 +15144,11 @@
         "context": "The header\/title of a block\/section which contains information about the user's used\/available transfer allowance for their account."
     },
     "16123": {
-        "text": "[S]Used base quota[\/S] is the free transfer allowance for the IP address you are using. The free limitation is dynamic and depends on the amount of unused bandwidth we have available.[BR] You can increase your quota by [A]Upgrading to PRO[\/A].",
+        "text": "[S]Transfer quota usage[\/S] is recorded by IP address for free accounts (and may include other users on the same IP). The transfer quota for free accounts is dynamic and depends on the amount of unused bandwidth we have available.[BR] You can increase your quota by [A]Upgrading to PRO[\/A].",
         "context": "Some information about the base transfer quota which is available for free accounts. Please leave the placeholder tags [S], [\/S], [A], [\/A] and [BR]."
     },
     "16124": {
-        "text": "[S]Used base quota[\/S] is the free transfer allowance for the IP address you are using. The free limitation is dynamic and depends on the amount of unused bandwidth we have available.[BR] You can increase your quota by completing [S]Account Achievements[\/S] or by [A]Upgrading to PRO[\/A].",
+        "text": "[S]Transfer quota usage[\/S] is recorded by IP address for free accounts (and may include other users on the same IP). The transfer quota for free accounts is dynamic and depends on the amount of unused bandwidth we have available.[BR] You can increase your quota by completing [S]Account Achievements[\/S] or by [A]Upgrading to PRO[\/A].",
         "context": "Some information about base transfer quota which is available for free accounts. Please leave the [S], [\/S], [A], [\/A] and [BR] placeholder tags."
     },
     "16125": {

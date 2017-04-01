@@ -23,6 +23,21 @@ Object.defineProperty(mega, 'achievem', {
                 this.rebind('click', function() {
                     if (action) {
                         switch (action[0]) {
+                            case '!':
+                                var pf = navigator.platform.toUpperCase();
+                                if (pf.indexOf('WIN') !== -1) {
+                                    window.location = 'https://mega.nz/MEGAsyncSetup.exe';
+                                    break;
+                                }
+
+                                if (pf.indexOf('MAC') !== -1) {
+                                    window.location = 'https://mega.nz/MEGAsyncSetup.dmg';
+                                    break;
+                                }
+
+                                action = 'sync';
+                                /** Fallthrough */
+
                             case '/':
                                 loadSubPage(action);
                                 break;
@@ -162,7 +177,7 @@ Object.defineProperty(mega, 'achievem', {
         /*  1 */ 'WELCOME'     : 'ach-create-account:/register',
         /*  2 */ 'TOUR'        : 'ach-take-tour',
         /*  3 */ 'INVITE'      : 'ach-invite-friend:~inviteFriendDialog',
-        /*  4 */ 'SYNCINSTALL' : 'ach-install-megasync:/sync',
+        /*  4 */ 'SYNCINSTALL' : 'ach-install-megasync:!',
         /*  5 */ 'APPINSTALL'  : 'ach-install-mobile-app:/mobile',
         /*  6 */ 'VERIFYE164'  : 'ach-verify-number',
         /*  7 */ 'GROUPCHAT'   : 'ach-group-chat:/fm/chat',

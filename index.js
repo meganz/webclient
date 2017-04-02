@@ -61,9 +61,6 @@ function startMega() {
         silent_loading = false;
         return false;
     }
-    else {
-        populate_l();
-    }
 
     if (pages['dialogs']) {
         $('body').safeAppend(translate(pages['dialogs'].replace(/{staticpath}/g, staticpath)));

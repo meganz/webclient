@@ -530,7 +530,7 @@ function megatitle(nperc) {
     }
 }
 
-function populate_l() {
+mBroadcaster.once('startMega', function populate_l() {
     var i;
 
     if (d) {
@@ -725,7 +725,7 @@ function populate_l() {
         l[408], l[409], l[410], l[411], l[412], l[413],
         l[414], l[415], l[416], l[417], l[418], l[419]
     ].map(escapeHTML);
-}
+});
 
 function showmoney(number) {
     number = number.toString();

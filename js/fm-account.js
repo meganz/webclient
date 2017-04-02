@@ -57,6 +57,7 @@ function accountUI() {
                     tabSection = 'cloud-drive';
                     break;
 
+                case 'chat':
                 case 'advanced':
                 case 'transfers':
                 case 'file-management':

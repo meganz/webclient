@@ -1463,16 +1463,18 @@ function api_setsid(sid) {
 
         if (typeof dlmanager === 'object') {
 
-            if (dlmanager.isOverQuota) {
+            if (!dlmanager.onOverquotaWithAchievements) {
+                if (dlmanager.isOverQuota) {
 
-                if (!dlmanager.isOverFreeQuota) {
-                    dlmanager.uqFastTrack = 1;
-                    dlmanager._overquotaInfo();
+                    if (!dlmanager.isOverFreeQuota) {
+                        dlmanager.uqFastTrack = 1;
+                        dlmanager._overquotaInfo();
+                    }
                 }
-            }
 
-            if (typeof dlmanager.onLimitedBandwidth === 'function') {
-                dlmanager.onLimitedBandwidth();
+                if (typeof dlmanager.onLimitedBandwidth === 'function') {
+                    dlmanager.onLimitedBandwidth();
+                }
             }
         }
         sid = 'sid=' + sid;

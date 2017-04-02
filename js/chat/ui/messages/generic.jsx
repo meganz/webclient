@@ -294,7 +294,7 @@ var GenericConversationMessage = React.createClass({
                         }
 
                         var addToCloudDrive = function() {
-                            M.injectNodes(v, M.RootID, false, function(res) {
+                            M.injectNodes(v, M.RootID, function(res) {
                                 if (res === 0) {
                                     msgDialog(
                                         'info',
@@ -513,7 +513,7 @@ var GenericConversationMessage = React.createClass({
                             }));
                         }
                         else if (M.u[contact.u] && !M.u[contact.u].m) {
-                            // if already added from group chat...add the email, 
+                            // if already added from group chat...add the email,
                             // since that contact got shared in a chat room
                             M.u[contact.u].m = contact.email ? contact.email : contactEmail;
                         }
@@ -781,13 +781,13 @@ var GenericConversationMessage = React.createClass({
                         textMessage = textMessage + " <em>" + __(l[8887]) + "</em>";
                     }
                     if (self.props.initTextScrolling) {
-                        messageDisplayBlock = 
+                        messageDisplayBlock =
                             <utils.JScrollPane className="message text-block scroll">
                                 <div className="message text-scroll" dangerouslySetInnerHTML={{__html:textMessage}}>
                                 </div>
                             </utils.JScrollPane>;
                     } else {
-                        messageDisplayBlock = 
+                        messageDisplayBlock =
                             <div className="message text-block" dangerouslySetInnerHTML={{__html:textMessage}}></div>;
                     }
                 }
@@ -867,7 +867,7 @@ var GenericConversationMessage = React.createClass({
                 var tmpMsg = textMessage[0].replace("[X]", htmlentities(M.getNameByHandle(contact.u)));
 
                 if (message.currentCallCounter) {
-                    tmpMsg += " " + 
+                    tmpMsg += " " +
                         textMessage[1].replace("[X]", "[[ " + secToDuration(message.currentCallCounter)) + "]] "
                 }
                 textMessage = tmpMsg;
@@ -955,7 +955,7 @@ var GenericConversationMessage = React.createClass({
             }
 
             return (
-                <div className={message.messageId + " message body" + additionalClasses} 
+                <div className={message.messageId + " message body" + additionalClasses}
                      data-id={"id" + message.messageId}>
                     <div className="feedback round-icon-block">
                         <i className={"round-icon " + message.cssClass}></i>

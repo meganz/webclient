@@ -60,6 +60,11 @@
     width: 48px;
     height: 48px;
 }
+.semi-huge-icon {
+    width: 64px;
+    height: 64px;
+    display: inline-block;
+}
 .huge-icon {
     width: 140px;
     height: 140px;
@@ -445,16 +450,11 @@
 .big-icon.nwse-inset-resize, .button.active .big-icon.nwse-resize {
     background-position: -14px -3537px;
 }
-.big-90px-icon {
-    width: 90px;
-    height: 90px;
+.big-104px-icon {
+    width: 104px;
+    height: 104px;
     display: inline-block;
     vertical-align: top;
-}
-.big-90px-icon.speedometer {
-    background-image: url(../images/mega/dialogs-sprite_v12.svg);
-    background-repeat: no-repeat;
-    background-position: center -5633px;
 }
 .small-icon.membership {
     background-image: url(../images/mega/top-login-sprite_v7.png);
@@ -480,8 +480,8 @@
     background-position: -17px -10463px;
 }
 .medium-icon.rocket {
-    background-image: url(../images/mega/nw-fm-sprite_v21.svg);
-    background-position: -10px -10781px;
+    background-image: url(/images/mega/top-sprite_v2.png);
+    background-position: -7px -16px;
 }
 .medium-icon.down-arrow {
     background-image: url(../images/mega/megacmd-sprite.png);
@@ -489,7 +489,7 @@
     width: 18px;
 }
 .huge-white-icon.achievement {
-    background-image: url(../images/mega/account-sprite.png);
+    background-image: url(../images/mega/account-sprite_v3.png);
     width: 72px;
     height: 72px;
 }
@@ -945,3 +945,40 @@
     background-position: -140px -331px;
 }
 /* End of Context menu icons */
+.huge-icon.storage-icon {
+    background-image: url(../images/mega/account-sprite_v3.png);
+    background-position: 20px -771px;
+    background-repeat: no-repeat;
+}
+.huge-icon.storage-icon.full {
+    background-position: 20px -651px;
+}
+.semi-small-icon.rocket {
+    background-image: url(../images/mega/account-sprite_v3.png);
+    background-position: -156px -619px;
+}
+.semi-huge-icon.green-tick {
+    background-image: url(../images/mega/account-sprite_v3.png);
+    background-position: 0 -1045px;
+}
+.semi-big-icon.blue-cloud {
+    background-image: url(../images/mega/account-sprite_v3.png);
+    background-position: -100px -984px;
+}
+.semi-big-icon.green-speedometer {
+    background-image: url(../images/mega/account-sprite_v3.png);
+    background-position: -100px -1032px;
+}
+.big-104px-icon.speedometer {
+    background-image: url(../images/mega/account-sprite_v3.png);
+    background-position: 2px -1269px;
+}
+.big-104px-icon.speedometer.almost-full {
+    background-position: 2px -1139px;
+}
+.big-icon.almost-full-storage {
+    background-position: -121px -790px;
+    width: 52px;
+    height: 52px;
+    background-image: url(../images/mega/account-sprite_v3.png);
+}

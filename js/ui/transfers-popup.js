@@ -334,9 +334,10 @@ mega.ui.tpp = (function () {
 
     mBroadcaster.addListener('fm:initialized', function() {
         var blk = '';
+        var isEph = isEphemeral();
 
         // Check if tpp used before, if not force usage
-        if (typeof fmconfig.tpp === 'undefined') {
+        if ((typeof fmconfig.tpp === 'undefined') || isEph) {
             mega.config.set('tpp', true);
         }
 
@@ -357,18 +358,29 @@ mega.ui.tpp = (function () {
             opts.dlg[blk].$.tfi = opts.dlg[blk].$.find('.transfer-filetype-icon');
         }
 
-        // Close button, Ongoing Transfers Popup Dialog
-        $('.transfer-widget.popup .fm-dialog-close.small').rebind('click.tpp_close', function() {
-            msgDialog('confirmation', '', l[16328], l[16329], function(e) {
-                if (e) {
-                    mega.config.setn('tpp', false);
-                }
+        // If ephemeral, then hide close button for ongoing transfers popup dialog
+        if (isEph) {
+            $('.transfer-widget.popup .fm-dialog-close.small').addClass('hidden');
+        }
+        else {
+
+            // Close button, Ongoing Transfers Popup Dialog
+            $('.transfer-widget.popup .fm-dialog-close.small').rebind('click.tpp_close', function() {
+                msgDialog('confirmation', '', l[16328], l[16329], function(e) {
+                    if (e) {
+                        mega.config.setn('tpp', false);
+                    }
+                });
             });
-        });
+        }
     });
 
     mBroadcaster.addListener('fmconfig:tpp', function(value) {
+
         opts.enabled = value;
+        if (isEphemeral()) {
+            opts.enabled = true;
+        }
         var visible = isVisible();
 
         if (!$.isEmptyObject(opts.dlg.$)) {

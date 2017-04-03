@@ -186,108 +186,7 @@ function dashboardUI() {
         $('.account.left-pane.reg-date-val').text(time2date(u_attr.since, 2));
 
 
-        /* New Used Bandwidth chart */
-        var $bandwidthChart = $('.fm-account-blocks.bandwidth');
-        perc_c = account.tfsq.perc;
-        if (perc_c > 100) {
-            perc_c = 100;
-        }
-        if (perc_c > 99 || dlmanager.isOverQuota) {
-            $bandwidthChart.addClass('exceeded');
-            b_exceeded = 1;
-        }
-
-        var deg = 230 * perc_c / 100;
-
-        // Used Bandwidth chart
-        if (deg <= 180) {
-            $bandwidthChart.find('.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
-            $bandwidthChart.find('.right-chart span').removeAttr('style');
-        }
-        else {
-            $bandwidthChart.find('.left-chart span').css('transform', 'rotate(180deg)');
-            $bandwidthChart.find('.right-chart span').css('transform', 'rotate(' + (deg - 180) + 'deg)');
-        }
-
-        // Maximum bandwidth
-        var b2 = bytesToSize(account.tfsq.max, 0).split(' ');
-        $bandwidthChart.find('.chart.data .size-txt').text(bytesToSize(account.tfsq.used, 0));
-        $bandwidthChart.find('.chart.data .pecents-txt').text((b2[0]));
-        $bandwidthChart.find('.chart.data .gb-txt').text((b2[1]));
-        if ((u_attr.p || M.maf) && b2[0] > 0 && perc_c > 0) {
-            $bandwidthChart.removeClass('no-percs');
-            $bandwidthChart.find('.chart.data .perc-txt').text(perc_c + '%');
-        }
-        else {
-            $bandwidthChart.addClass('no-percs');
-            $bandwidthChart.find('.chart.data span:not(.size-txt)').text('');
-            $bandwidthChart.find('.chart.data .pecents-txt').text(l[5801]);
-        }
-
-        /* End of New Used Bandwidth chart */
-
-
-        /* New Used Storage chart */
-        var $storageChart = $('.fm-account-blocks.storage');
-        perc = Math.round(account.space_used / account.space * 100);
-        perc_c = perc;
-        if (perc_c > 100) {
-            perc_c = 100;
-        }
-        if (perc_c > 99) {
-            $storageChart.addClass('exceeded');
-            s_exceeded = 1;
-        }
-        else if (perc_c > 80) {
-            $storageChart.addClass('going-out');
-        }
-
-        var deg = 230 * perc_c / 100;
-
-        // Used space chart
-        if (deg <= 180) {
-            $storageChart.find('.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
-            $storageChart.find('.right-chart span').removeAttr('style');
-        }
-        else {
-            $storageChart.find('.left-chart span').css('transform', 'rotate(180deg)');
-            $storageChart.find('.right-chart span').css('transform', 'rotate(' + (deg - 180) + 'deg)');
-        }
-
-        // Maximum disk space
-        var b2 = bytesToSize(account.space, 0).split(' ');
-        $storageChart.find('.chart.data .pecents-txt').text((b2[0]));
-        $storageChart.find('.chart.data .gb-txt').text((b2[1]));
-        $storageChart.find('.chart.data .perc-txt').text(perc_c + '%');
-        $storageChart.find('.chart.data .size-txt').text(bytesToSize(account.space_used));
-        /* End of New Used Storage chart */
-
-
-        /* Charts warning notifications */
-        var $chartsBlock = $('.account.widget.content');
-        $chartsBlock.find('.chart-warning:not(.hidden)').addClass('hidden');
-        if (b_exceeded && s_exceeded) {
-            // Bandwidth and Storage quota exceeded
-            $chartsBlock.find('.chart-warning.storage-and-bandwidth').removeClass('hidden');
-        }
-        else if (s_exceeded) {
-            // Storage quota exceeded
-            $chartsBlock.find('.chart-warning.storage').removeClass('hidden');
-        }
-        else if (b_exceeded) {
-            // Bandwidth quota exceeded
-            $chartsBlock.find('.chart-warning.bandwidth').removeClass('hidden');
-        }
-        else if (perc_c > 80) {
-            // Running out of cloud space
-            $chartsBlock.find('.chart-warning.out-of-space').removeClass('hidden');
-        }
-        if (b_exceeded || s_exceeded || perc_c > 80) {
-            $chartsBlock.find('.chart-warning').rebind('click', function() {
-                loadSubPage('pro');
-            });
-        }
-        /* End of Charts warning notifications */
+        accountUI.fillCharts(account, true);
 
 
         /* Used Storage progressbar */
@@ -378,7 +277,7 @@ function dashboardUI() {
             });
         }
 
-        if (account.tfsq.used > 0) {
+        if (account.tfsq.used > 0 || Object(u_attr).p || account.tfsq.ach) {
             $('.account.widget.bandwidth').removeClass('hidden');
             $('.fm-account-blocks.bandwidth.right').removeClass('hidden');
             $('.bandwidth .account.progress-size.base-quota').text(bytesToSize(account.tfsq.used, 0));

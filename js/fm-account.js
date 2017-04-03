@@ -1755,9 +1755,14 @@ accountUI.fillCharts = function(account, onDashboard) {
     $bandwidthChart.find('.chart.data .size-txt').text(bytesToSize(account.tfsq.used, 0));
     $bandwidthChart.find('.chart.data .pecents-txt').text((b2[0]));
     $bandwidthChart.find('.chart.data .gb-txt').text((b2[1]));
-    if ((u_attr.p || account.tfsq.ach) && b2[0] > 0 && perc_c > 0) {
-        $bandwidthChart.removeClass('no-percs');
-        $bandwidthChart.find('.chart.data .perc-txt').text(perc_c + '%');
+    if ((u_attr.p || account.tfsq.ach) && b2[0] > 0) {
+        if (perc_c > 0) {
+            $bandwidthChart.removeClass('no-percs');
+            $bandwidthChart.find('.chart.data .perc-txt').text(perc_c + '%');
+        }
+        else {
+            $bandwidthChart.addClass('no-percs');
+        }
     }
     else {
         $bandwidthChart.addClass('no-percs');

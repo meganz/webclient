@@ -277,7 +277,7 @@ function dashboardUI() {
             });
         }
 
-        if (account.tfsq.used > 0 || Object(u_attr).p) {
+        if (account.tfsq.used > 0 || Object(u_attr).p || account.tfsq.ach) {
             $('.account.widget.bandwidth').removeClass('hidden');
             $('.fm-account-blocks.bandwidth.right').removeClass('hidden');
             $('.bandwidth .account.progress-size.base-quota').text(bytesToSize(account.tfsq.used, 0));

@@ -16106,5 +16106,17 @@
     "16397": {
         "text": "You have received %1 storage space and %2 transfer quota for installing our mobile app.",
         "context": "Message shown on the achievements dialog for achieved achievements, %1 and %2 are replaced with e.g. 20 GB"
+    },
+    "16400": {
+        "text": "Account base quota",
+        "context": "The user's achieved base quota"
+    },
+    "16401": {
+        "text": "Account registration bonus",
+        "context": "achievement type"
+    },
+    "16402": {
+        "text": "Unlocked bonuses:",
+        "context": "Header of block with achievements bonuses."
     }
 }

@@ -4026,6 +4026,9 @@
     "16395": "You have received %1 storage space as your free registration bonus.",
     "16396": "Sie haben f\u00fcr die erfolgreiche Installation von MEGAsync %1 Speicherplatz und %2 Transfervolumen erhalten.",
     "16397": "Sie haben f\u00fcr die erfolgreiche Installation unserer Mobil-App %1 Speicherplatz und %2 Transfervolumen erhalten.",
+    "16400": "Account base quota",
+    "16401": "Account registration bonus",
+    "16402": "Unlocked bonuses:",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

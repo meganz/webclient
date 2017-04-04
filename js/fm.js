@@ -1005,7 +1005,7 @@ function transferPanelContextMenu(target)
     }
 }
 
-function openTransferpanel()
+function openTransfersPanel()
 {
     $.tresizer();
     $('.nw-fm-left-icon.transfers').addClass('transfering');
@@ -1175,7 +1175,7 @@ function openTransferpanel()
 }
 
 function showTransferToast(t_type, t_length, isPaused) {
-    if (!$('.fmholder').hasClass('transfer-panel-opened')) {
+    if ((M.currentdirid !== 'transfers') && (fmconfig.tpp === false)) {
         var $toast,
             $second_toast,
             timer,
@@ -1530,7 +1530,7 @@ function sharedUInode(nodeHandle) {
         var icon = fileIcon(M.d[nodeHandle]);
 
         // Update right panel selected node with appropriate icon for list view
-        $('.grid-table.fm #' + nodeHandle + ' .transfer-filtype-icon').addClass(icon);
+        $('.grid-table.fm #' + nodeHandle + ' .transfer-filetype-icon').addClass(icon);
 
         // Update right panel selected node with appropriate icon for block view
         $('#' + nodeHandle + '.file-block .block-view-file-type').addClass(icon);
@@ -1538,9 +1538,15 @@ function sharedUInode(nodeHandle) {
 
     // If no shares are available, remove share icon from left panel, right panel (list and block view)
     if (!bAvailShares) {
-        $('#treea_' + nodeHandle + ' .nw-fm-tree-folder').removeClass('shared-folder'); // Left panel
-        $('.grid-table.fm #' + nodeHandle + ' .transfer-filtype-icon').removeClass('folder-shared'); // Right panel list view
-        $('#' + nodeHandle + '.file-block .block-view-file-type').removeClass('folder-shared'); // Right panel block view
+
+        // Left panel
+        $('#treea_' + nodeHandle + ' .nw-fm-tree-folder').removeClass('shared-folder');
+
+        // Right panel list view
+        $('.grid-table.fm #' + nodeHandle + ' .transfer-filetype-icon').removeClass('folder-shared');
+
+        // Right panel block view
+        $('#' + nodeHandle + '.file-block .block-view-file-type').removeClass('folder-shared');
     }
 
     // If no export link is available, remove export link from left and right panels (list and block view)
@@ -4136,7 +4142,12 @@ function selectddUI() {
                     if (n) {
                         $.selected.push(id);
                         if (max > i) {
-                            html.push('<div class="transfer-filtype-icon ' + fileIcon(n) + ' tranfer-filetype-txt dragger-entry">' + str_mtrunc(htmlentities(n.name)) + '</div>');
+                            html.push(
+                                '<div class="transfer-filetype-icon '
+                                + fileIcon(n) + ' tranfer-filetype-txt dragger-entry">'
+                                + str_mtrunc(htmlentities(n.name))
+                                + '</div>'
+                            );
                         }
                     }
                 });
@@ -4538,11 +4549,15 @@ function transferPanelUI()
     };
 
     $.transferClose = function() {
+        if (M.pendingTransfers) {
+            mega.ui.tpp.show();
+        }
         $('.nw-fm-left-icon.transfers').removeClass('active');
         $('#fmholder').removeClass('transfer-panel-opened');
     };
 
     $.transferOpen = function(force) {
+        mega.ui.tpp.hide();
         if (force || !$('.nw-fm-left-icon.transfers').hasClass('active')) {
             $('.nw-fm-left-icon').removeClass('active');
             $('.nw-fm-left-icon.transfers').addClass('active');
@@ -5337,8 +5352,13 @@ function treeUI()
                 var id = $(e.target).attr('id');
                 if (id)
                     id = id.replace('treea_', '');
-                if (id && M.d[id])
-                    html = ('<div class="transfer-filtype-icon ' + fileIcon(M.d[id]) + ' tranfer-filetype-txt dragger-entry">' + str_mtrunc(htmlentities(M.d[id].name)) + '</div>');
+                if (id && M.d[id]) {
+                    html = (
+                        '<div class="transfer-filetype-icon '
+                        + fileIcon(M.d[id]) + ' tranfer-filetype-txt dragger-entry">'
+                        + str_mtrunc(htmlentities(M.d[id].name)) + '</div>'
+                    );
+                }
                 $('#draghelper .dragger-icon').remove();
                 $('#draghelper .dragger-content').html(html);
                 $('body').addClass('dragging');
@@ -5827,7 +5847,7 @@ function renameDialog() {
 
         $('.rename-dialog input').val(n.name);
         var ext = fileext(n.name);
-        $('.rename-dialog .transfer-filtype-icon').attr('class', 'transfer-filtype-icon ' + fileIcon(n));
+        $('.rename-dialog .transfer-filetype-icon').attr('class', 'transfer-filetype-icon ' + fileIcon(n));
         if (!n.t && ext.length > 0) {
             $('.rename-dialog input')[0].selectionStart = 0;
             $('.rename-dialog input')[0].selectionEnd = $('.rename-dialog input').val().length - ext.length - 1;
@@ -9298,6 +9318,10 @@ function fm_resize_handler(force) {
         $('.fm-right-files-block, .fm-right-account-block, .fm-right-block.dashboard').css({
             'margin-left': ($('.fm-left-panel:visible').width() + $('.nw-fm-left-icons-panel').width()) + "px"
         });
+        
+        if (mega.ui.tpp.isVisible()) {
+            $('.popup.transfer-widget:visible').width($('.fm-left-panel:visible').width() - 8);
+        }
     }
 
     if (M.currentrootid === 'shares') {

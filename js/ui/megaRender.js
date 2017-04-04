@@ -13,7 +13,7 @@
                         '<span class="grid-status-icon"></span>' +
                     '</td>' +
                     '<td>' +
-                        '<span class="transfer-filtype-icon"></span>' +
+                        '<span class="transfer-filetype-icon"></span>' +
                         '<span class="tranfer-filetype-txt"></span>' +
                     '</td>' +
                     '<td width="100" class="size"></td>' +
@@ -867,7 +867,7 @@
                     aTemplate.querySelector('.time').textContent = aProperties.time;
                     aTemplate.querySelector('.tranfer-filetype-txt').textContent = aProperties.name;
 
-                    tmp = aTemplate.querySelector('.transfer-filtype-icon');
+                    tmp = aTemplate.querySelector('.transfer-filetype-icon');
                     tmp.classList.add(aProperties.icon);
                 }
                 this.addClasses(tmp, aProperties.classNames);

@@ -1102,6 +1102,29 @@ function accountUI() {
             mega.config.setn('dlThroughMEGAsync', dlThroughMEGAsync);
         });
 
+        if (fmconfig.tpp || (typeof fmconfig.tpp === 'undefined')) {
+            var $cbTpp = $('#transfers-tooltip');// Checkbox transfers popup
+
+            $cbTpp.switchClass('checkboxOff', 'checkboxOn').prop('checked', true);
+            $cbTpp.parent().switchClass('checkboxOff', 'checkboxOn');
+        }
+
+        $('#transfers-tooltip').rebind('click.tpp_enable_disable', function() {
+            var $this = $(this);
+
+            if (fmconfig.tpp || (typeof fmconfig.tpp === 'undefined')) {
+                $this.switchClass('checkboxOn', 'checkboxOff');
+                $this.parent().switchClass('checkboxOn', 'checkboxOff');
+                mega.config.setn('tpp', false);
+            }
+            else {
+                $this.switchClass('checkboxOff', 'checkboxOn').prop('checked', true);
+                $this.parent().switchClass('checkboxOff', 'checkboxOn');
+                mega.config.setn('tpp', true);
+            }
+
+        });
+
         $('.dbDropOnLogout').removeClass('radioOn').addClass('radioOff');
         i = 21;
         if (fmconfig.dbDropOnLogout) {

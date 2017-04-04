@@ -248,3 +248,4 @@ contrib/local_config.py
 #############
 
 nbproject/
+.vscode

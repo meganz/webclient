@@ -1526,6 +1526,7 @@ function fm_tfsupdate() {
             ++i;
         }
     }
+
     M.pendingTransfers = i + u;
     var t;
     if (i && u) {
@@ -1539,10 +1540,10 @@ function fm_tfsupdate() {
     }
     else {
         t = '';
+        mega.ui.tpp.hide();
     }
     tfse.domPanelTitle.textContent = (t);
 }
-
 
 var dlQueue = new TransferQueue(function _downloader(task, done) {
     if (!task.dl) {

@@ -705,7 +705,7 @@ function MegaData()
                             else {
                                 color = ("00" + color.toString(16)).slice(-6);
 
-                                $this.find('.transfer-filtype-icon')
+                                $this.find('.transfer-filetype-icon')
                                     .css('background-color', '#' + color);
                             }
                         }
@@ -4637,7 +4637,7 @@ function MegaData()
             + '<td><div class="transfer-type download">'
             + '<ul><li class="right-c"><p><span></span></p></li><li class="left-c"><p><span></span></p></li></ul>'
             + '</div>' + flashhtml + '</td>'
-            + '<td><span class="transfer-filtype-icon ' + fileIcon(node) + '"></span>'
+            + '<td><span class="transfer-filetype-icon ' + fileIcon(node) + '"></span>'
             + '<span class="tranfer-filetype-txt">' + htmlentities(node.name) + '</span></td>'
             + '<td>' + filetype(node.name) + '</td>'
             + '<td>' + bytesToSize(node.s) + '</td>'
@@ -4787,6 +4787,7 @@ function MegaData()
             else {
                 zipname = (zipname || ('Archive-' + Math.random().toString(16).slice(-4))) + '.zip';
             }
+            mega.ui.tpp.setTotal(1, 'dl');
         }
         else {
             z = false;
@@ -4846,6 +4847,7 @@ function MegaData()
 
             if (!z) {
                 this.putToTransferTable(n, ttl);
+                mega.ui.tpp.setTotal(1, 'dl');
             }
         }
 
@@ -4873,7 +4875,7 @@ function MegaData()
                 + '<td><div class="transfer-type download">'
                 + '<ul><li class="right-c"><p><span></span></p></li><li class="left-c"><p><span></span></p></li></ul>'
                 + '</div>' + flashhtml + '</td>'
-                + '<td><span class="transfer-filtype-icon ' + fileIcon({name: 'archive.zip'}) + '"></span>'
+                + '<td><span class="transfer-filetype-icon ' + fileIcon({name: 'archive.zip'}) + '"></span>'
                 + '<span class="tranfer-filetype-txt">' + htmlentities(zipname) + '</span></td>'
                 + '<td>' + filetype({name: 'archive.zip'}) + '</td>'
                 + '<td>' + bytesToSize(zipsize) + '</td>'
@@ -4908,7 +4910,7 @@ function MegaData()
         if (!isZIP || zipSize) {
             M.addDownloadToast = ['d', isZIP ? 1 : added, isPaused];
         }
-        openTransferpanel();
+        openTransfersPanel();
         initGridScrolling();
         initFileblocksScrolling();
         initTreeScroll();
@@ -4923,6 +4925,7 @@ function MegaData()
     this.dlprogress = function(id, perc, bl, bt, kbps, dl_queue_num, force)
     {
         var st;
+        var tmpId = id;
         if (dl_queue[dl_queue_num].zipid)
         {
             id = 'zip_' + dl_queue[dl_queue_num].zipid;
@@ -5018,14 +5021,17 @@ function MegaData()
                 else {
                     $tr.find('.speed').addClass('unknown').text('');
                 }
-                delay('percent_megatitle', percent_megatitle);
 
-                if (page.substr(0, 2) !== 'fm')
-                {
+                mega.ui.tpp.setTransfered(id, bl, 'dl');
+                mega.ui.tpp.updateBlock('dl');
+                delay('percent_megatitle', percent_megatitle, 50);
+
+                if (page.substr(0, 2) !== 'fm') {
                     $('.widget-block').removeClass('hidden');
                     $('.widget-block').show();
-                    if (!ulmanager.isUploading)
+                    if (!ulmanager.isUploading) {
                         $('.widget-circle').attr('class', 'widget-circle percents-' + perc);
+                    }
                     $('.widget-icon.downloading').removeClass('hidden');
                     $('.widget-speed-block.dlspeed').text(bytesToSize(bps, 1) + '/s');
                     $('.widget-block').addClass('active');
@@ -5212,13 +5218,19 @@ function MegaData()
             .addClass('transfer-initiliazing')
             .find('.transfer-status').text(l[1042]);
 
-        delay('fm_tfsupdate', fm_tfsupdate); // this will call $.transferHeader()
         dl.st = NOW();
         ASSERT(typeof dl_queue[dl.pos] === 'object', 'No dl_queue entry for the provided dl...');
         ASSERT(typeof dl_queue[dl.pos] !== 'object' || dl.n == dl_queue[dl.pos].n, 'No matching dl_queue entry...');
-        if (typeof dl_queue[dl.pos] === 'object')
+        if (typeof dl_queue[dl.pos] === 'object') {
+            fm_tfsupdate(); // this will call $.transferHeader()
             M.dlprogress(id, 0, 0, 0, 0, dl.pos);
+            if (mega.ui.tpp.getTime('dl') === 0) {
+                mega.ui.tpp.setTime(NOW(), 'dl');
+            }
+            mega.ui.tpp.start(dl, 'dl');
+        }
     }
+
     this.mobileuploads = [];
 
     this.doFlushTransfersDynList = function(aNumNodes) {
@@ -5512,7 +5524,7 @@ function MegaData()
                 + '<td><div class="transfer-type upload">'
                 + '<ul><li class="right-c"><p><span></span></p></li><li class="left-c"><p><span></span></p></li></ul>'
                 + '</div></td>'
-                + '<td><span class="transfer-filtype-icon ' + fileIcon({name: f.name}) + '"></span>'
+                + '<td><span class="transfer-filetype-icon ' + fileIcon({name: f.name}) + '"></span>'
                 + '<span class="tranfer-filetype-txt">' + htmlentities(f.name) + '</span></td>'
                 + '<td>' + filetype(f.name) + '</td>'
                 + '<td>' + bytesToSize(filesize) + '</td>'
@@ -5526,6 +5538,7 @@ function MegaData()
             ul_queue.push(f);
             ttl.left--;
             added++;
+            mega.ui.tpp.setTotal(1, 'ul');
 
             if (uldl_hold) {
                 fm_tfspause('ul_' + ul_id);
@@ -5548,7 +5561,7 @@ function MegaData()
         }
         else {
             showTransferToast('u', added);
-            openTransferpanel();
+            openTransfersPanel();
             delay('fm_tfsupdate', fm_tfsupdate); // this will call $.transferHeader()
         }
 
@@ -5560,8 +5573,7 @@ function MegaData()
         }
     }
 
-    this.ulprogress = function(ul, perc, bl, bt, bps)
-    {
+    this.ulprogress = function(ul, perc, bl, bt, bps) {
         var id  = ul.id;
         var $tr = $('#ul_' + id);
         if (!$tr.hasClass('transfer-started')) {
@@ -5571,8 +5583,9 @@ function MegaData()
             $('.transfer-table').prepend($tr);
             delay('fm_tfsupdate', fm_tfsupdate); // this will call $.transferHeader()
         }
-        if (!bl || !ul.starttime)
+        if (!bl || !ul.starttime) {
             return false;
+        }
         var retime = bps > 1000 ? (bt - bl) / bps : -1;
         var transferDeg = 0;
         if (!$.transferprogress)
@@ -5600,10 +5613,12 @@ function MegaData()
             } else {
                 $tr.find('.speed').addClass('unknown').text('');
             }
-            // $.transferHeader();
 
-            if (page.substr(0, 2) !== 'fm')
-            {
+            mega.ui.tpp.setTransfered(id, bl, 'ul');
+            mega.ui.tpp.updateBlock('ul');
+            delay('percent_megatitle', percent_megatitle, 50);
+
+            if (page.substr(0, 2) !== 'fm') {
                 $('.widget-block').removeClass('hidden');
                 $('.widget-block').show();
                 $('.widget-circle').attr('class', 'widget-circle percents-' + perc);
@@ -5612,7 +5627,7 @@ function MegaData()
                 $('.widget-block').addClass('active');
             }
         }
-        delay('percent_megatitle', percent_megatitle);
+
     }
 
     this.ulcomplete = function(ul, h, k)
@@ -5702,8 +5717,7 @@ function MegaData()
         });
     }
 
-    this.ulstart = function(ul)
-    {
+    this.ulstart = function(ul) {
         var id = ul.id;
 
         if (d) {
@@ -5714,9 +5728,13 @@ function MegaData()
             .addClass('transfer-initiliazing')
             .find('.transfer-status').text(l[1042]);
 
-        delay('fm_tfsupdate', fm_tfsupdate); // this will call $.transferHeader()
         ul.starttime = new Date().getTime();
+        fm_tfsupdate();// this will call $.transferHeader()
         M.ulprogress(ul, 0, 0, 0);
+        if (mega.ui.tpp.getTime('ul') === 0) {
+            mega.ui.tpp.setTime(NOW(), 'ul');
+        }
+        mega.ui.tpp.start(ul, 'ul');
     };
 
     this.cloneChatNode = function(n, keepParent) {

@@ -721,6 +721,14 @@
     background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     background-position: -14px -11665px;
 }
+.small-icon.green-arrow {
+    background-image: url(../images/mega/register-big-sprite-v11.png);
+    background-position: 0px -56px;
+}
+.small-icon.blue-arrow {
+    background-image: url(../images/mega/register-big-sprite-v11.png);
+    background-position: 0px -99px;
+}
 /* Context menu icons */
 .small-icon.context {
     background-image: url(../images/mega/icons-sprite.png);

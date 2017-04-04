@@ -4026,6 +4026,9 @@
     "16395": "Obdr\u017eeli jste %1 prostoru \u00falo\u017ei\u0161t\u011b jako bonus za bezplatnou registraci.",
     "16396": "Obdr\u017eeli jste %1 prostoru \u00falo\u017ei\u0161t\u011b a %2 kv\u00f3ty p\u0159enosu za instalaci MEGAsync.",
     "16397": "Obdr\u017eeli jste %1 prostoru \u00falo\u017ei\u0161t\u011b a %2 kv\u00f3ty p\u0159enosu za instalaci na\u0161\u00ed mobiln\u00ed aplikace.",
+    "16400": "Account base quota",
+    "16401": "Account registration bonus",
+    "16402": "Unlocked bonuses:",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

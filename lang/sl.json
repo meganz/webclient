@@ -4026,6 +4026,9 @@
     "16395": "Prejeli ste %1 prostora za shranjevanje kot brezpla\u010dni bonus za registracijo.",
     "16396": "Prejeli ste %1 prostora za shranjevanje in %2 prenosne kvote za namestitev MEAsync.",
     "16397": "Prejeli ste %1 prostora za shranjevanje in %2 prenosne kvote za namestitev na\u0161e mobilne aplikacije.",
+    "16400": "Account base quota",
+    "16401": "Account registration bonus",
+    "16402": "Unlocked bonuses:",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

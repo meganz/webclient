@@ -15680,8 +15680,8 @@
         "context": ""
     },
     "16283": {
-        "text": "Invite as many friends or coworkers as you want. For every signup under the invited email address, you will receive %1 of complimentary storage plus %2 of transfer quota, both valid for %3 months, provided that the new user installs either MEGAsync or a mobile app and starts using MEGA.",
-        "context": "%1 and %2 would be replaced with amounts, for example \"50 GB\" and %3 would be replaced with a numeric value which represents the number of months."
+        "text": "Invite as many friends or coworkers as you want. For every signup under the invited email address, you will receive %1 of complimentary storage plus %2 of transfer quota, both valid for %3 days, provided that the new user installs either MEGAsync or a mobile app and starts using MEGA.",
+        "context": "%1 and %2 would be replaced with amounts, for example \"50 GB\" and %3 would be replaced with a numeric value which represents the number of days."
     },
     "16284": {
         "text": "%1 days left",

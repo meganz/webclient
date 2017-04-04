@@ -8967,9 +8967,11 @@ function slideshow(id, close)
                     clearTimeout(timeout);
                     $overlay.removeClass('mouse-idle');
 
-                    timeout = setTimeout(function() {
-                        $overlay.addClass('mouse-idle');
-                    }, 3000);
+                    if ($overlay.hasClass('fullscreen')) {
+                        timeout = setTimeout(function() {
+                            $overlay.addClass('mouse-idle');
+                        }, 3000);
+                    }
                 });
             }
         });

@@ -26,12 +26,12 @@ Object.defineProperty(mega, 'achievem', {
                             case '!':
                                 var pf = navigator.platform.toUpperCase();
                                 if (pf.indexOf('WIN') !== -1) {
-                                    window.location = 'https://mega.nz/MEGAsyncSetup.exe';
+                                    open('https://mega.nz/MEGAsyncSetup.exe');
                                     break;
                                 }
 
                                 if (pf.indexOf('MAC') !== -1) {
-                                    window.location = 'https://mega.nz/MEGAsyncSetup.dmg';
+                                    open('https://mega.nz/MEGAsyncSetup.dmg');
                                     break;
                                 }
 
@@ -1265,7 +1265,7 @@ mega.showOverStorageQuota = function(perc, cstrg, mstrg) {
     var prevState = $('.fm-main').is('.almost-full, .full');
     $('.fm-main').removeClass('almost-full full');
 
-    if (u_attr.p) {
+    if (Object(u_attr).p) {
         // update texts with "for free accounts" sentences removed.
         $('.fm-notification-block.full').safeHTML(l[16358]);
         $('.fm-notification-block.almost-full')

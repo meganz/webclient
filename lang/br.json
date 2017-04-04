@@ -4026,6 +4026,9 @@
     "16395": "Voc\u00ea recebeu %1 em espa\u00e7o de armazenamento como seu b\u00f4nus do seu registro gratuito.",
     "16396": "Voc\u00ea recebeu %1 espa\u00e7o de armazenamento e %2 em cota de transfer\u00eancia por instalar o MEGAsync.",
     "16397": "Voc\u00ea recebeu %1 em espa\u00e7o de armazenamento e %2 em cota de transfer\u00eancia por ter instalado o nosso aplicativo para dispositivos m\u00f3veis.",
+    "16400": "Account base quota",
+    "16401": "Account registration bonus",
+    "16402": "Unlocked bonuses:",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

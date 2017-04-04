@@ -4026,6 +4026,9 @@
     "16395": "\ubb34\ub8cc \uac00\uc785 \ubcf4\ub108\uc2a4\ub85c %1\uc758 \uc800\uc7a5 \uacf5\uac04\uc744 \ubc1b\uc558\uc2b5\ub2c8\ub2e4.",
     "16396": "MEGAsync\ub97c \uc124\uce58\ud558\uc5ec %1\uc758 \uc800\uc7a5 \uacf5\uac04\uacfc %2\uc758 \uc804\uc1a1 \ud55c\ub3c4\ub97c \ubc1b\uc558\uc2b5\ub2c8\ub2e4.",
     "16397": "\ubaa8\ubc14\uc77c \uc571\uc744 \uc124\uce58\ud558\uc5ec %1\uc758 \uc800\uc7a5 \uacf5\uac04\uacfc %2\uc758 \uc804\uc1a1 \ud55c\ub3c4\ub97c \ubc1b\uc558\uc2b5\ub2c8\ub2e4.",
+    "16400": "Account base quota",
+    "16401": "Account registration bonus",
+    "16402": "Unlocked bonuses:",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

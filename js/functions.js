@@ -336,6 +336,53 @@ delay.cancel = function(aProcID) {
     return false;
 };
 
+
+var isNativeObject = function(obj) {
+    var objConstructorText = obj.constructor.toString();
+    return objConstructorText.indexOf("[native code]") !== -1 && objConstructorText.indexOf("Object()") === -1;
+};
+
+function clone(obj) {
+
+    if (typeof obj !== 'object' || obj === null) {
+        return obj;
+    }
+    if (obj instanceof Date) {
+        return new Date(obj.getTime());
+    }
+    if (Array.isArray(obj)) {
+        var arr = new Array(obj.length);
+        for (var i = obj.length; i--; ) {
+            arr[i] = clone(obj[i]);
+        }
+        return arr;
+    }
+    if (obj instanceof Object) {
+        var copy = {};
+        for (var attr in obj) {
+            if (obj.hasOwnProperty(attr)) {
+                if (!(obj[attr] instanceof Object)) {
+                    copy[attr] = obj[attr];
+                }
+                else if (Array.isArray(obj[attr])) {
+                    copy[attr] = clone(obj[attr]);
+                }
+                else if (!isNativeObject(obj[attr])) {
+                    copy[attr] = clone(obj[attr]);
+                }
+                else if ($.isFunction(obj[attr])) {
+                    copy[attr] = obj[attr];
+                }
+                else {
+                    copy[attr] = {};
+                }
+            }
+        }
+
+        return copy;
+    }
+}
+
 function jScrollFade(id) {
     if (is_selenium) {
         return;
@@ -483,9 +530,11 @@ function megatitle(nperc) {
     }
 }
 
-function populate_l() {
+mBroadcaster.once('startMega', function populate_l() {
+    var i;
+
     if (d) {
-        for (var i = 24000 ; i-- ;) {
+        for (i = 24000; i--;) {
             l[i] = (l[i] || '(translation-missing)');
         }
     }
@@ -631,21 +680,14 @@ function populate_l() {
     l[12487] = l[12487].replace('[A2]', '<a href="" class="red linux">').replace('[/A2]', '</a>');
     l[12488] = l[12488].replace('[A]', '<a>').replace('[/A]', '</a>').replace('[BR]', '<br>');
     l[12489] = l[12489].replace('[I]', '<i>').replace('[/I]', '</i>').replace('[I]', '<i>').replace('[/I]', '</i>');
-    l[15536] = l[15536].replace('[B]', '<b>').replace('[/B]', '</b>');
-    l[16106] = l[16106].replace('[B]', '<b>').replace('[/B]', '</b>');
-    l[16107] = l[16107].replace('[S]', '<span>').replace('[/S]', '</span>');
-    l[16116] = l[16116].replace('[S]', '<span>').replace('[/S]', '</span>');
-    l[16119] = l[16119].replace('[S]', '<span>').replace('[/S]', '</span>');
-    l[16120] = l[16120].replace('[S]', '<span>').replace('[/S]', '</span>');
-    l[16123] = l[16123].replace('[S]', '<span>').replace('[/S]', '</span>').replace('[A]', '<a href="/pro">').replace('[/A]', '</a>').replace('[BR]', '<br />');
-    l[16124] = l[16124].replace('[S]', '<span>').replace('[/S]', '</span>').replace('[A]', '<a href="/pro">').replace('[/A]', '</a>').replace('[BR]', '<br />');
-    l[16135] = l[16135].replace('[BR]', '<br />');
-    l[16136] = l[16136].replace('[A]', '<a href="/pro">').replace('[/A]', '</a>');
-    l[16137] = l[16137].replace('[A]', '<a href="/pro">').replace('[/A]', '</a>');
-    l[16138] = l[16138].replace('[A]', '<a href="/pro">').replace('[/A]', '</a>');
     l[16165] = l[16165].replace('[S]', '<a class="red">').replace('[/S]', '</a>').replace('[BR]', '<br/>');
     l[16167] = l[16167].replace('[S]', '<a href="/mobile" class="clickurl">').replace('[/S]', '</a>');
-    l[16389] = l[16389].replace(
+    l[16306] = escapeHTML(l[16306])
+        .replace('[A]', '<a href="/fm/rubbish" class="clickurl gotorub">').replace('[/A]', '</a>');
+    l[16310] = escapeHTML(l[16310])
+        .replace('[A]', '<a href="/fm/dashboard" class="clickurl">').replace('[/A]', '</a>')
+        .replace('[I]', '<i class="semi-small-icon rocket"></i>');
+    l[16389] = escapeHTML(l[16389]).replace(
                  '%1',
                  '<span class="checkdiv checkboxOn autoaway">' +
                      '<input type="checkbox" name="set-auto-away" id="set-auto-away" class="checkboxOn" checked="">' +
@@ -657,13 +699,33 @@ function populate_l() {
                      '<input type="text" value="5" id="autoaway" />' +
                  '</span>'
                );
+    l[16390] = escapeHTML(l[16390]).replace('[S]', '<span class="red">').replace('[/S]', '</span>');
+    l[16391] = escapeHTML(l[16391]).replace('[S]', '<span class="red">').replace('[/S]', '</span>');
+    l[16392] = escapeHTML(l[16392]).replace('[S]', '<span class="red">').replace('[/S]', '</span>');
+    l[16393] = escapeHTML(l[16393])
+        .replace('[A]', '<a class="red" href="mailto:support@mega.nz">').replace('[/A]', '</a>');
+
+    var common = [
+        15536, 16106, 16107, 16116, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315,
+        16316, 16358, 16359, 16360, 16361, 16375, 16382, 16383, 16384
+    ];
+    for (i = common.length; i--;) {
+        var num = common[i];
+
+        l[num] = escapeHTML(l[num])
+            .replace(/\[S\]/g, '<span>').replace(/\[\/S\]/g, '</span>')
+            .replace(/\[P\]/g, '<p>'   ).replace(/\[\/P\]/g, '</p>')
+            .replace(/\[B\]/g, '<b>'   ).replace(/\[\/B\]/g, '</b>')
+            .replace(/\[BR\]/g, '<br/>')
+            .replace(/\[A\]/g, '<a href="/pro" class="clickurl">').replace(/\[\/A\]/g, '</a>');
+    }
 
     l['year'] = new Date().getFullYear();
     date_months = [
         l[408], l[409], l[410], l[411], l[412], l[413],
         l[414], l[415], l[416], l[417], l[418], l[419]
     ].map(escapeHTML);
-}
+});
 
 function showmoney(number) {
     number = number.toString();
@@ -2025,6 +2087,22 @@ function array_random(arr) {
 }
 
 /**
+ * Convert Array to Object
+ * @param {Array|String} arr The array
+ * @param {*} [value] Optional value to assign to objects
+ * @returns {Object}
+ */
+function array_toobject(arr, value) {
+    if (!Array.isArray(arr)) {
+        arr = [arr];
+    }
+    return arr.reduce(function(obj, key, idx) {
+        obj[key] = value !== undefined ? value : ((idx | 0) + 1);
+        return obj;
+    }, Object.create(null));
+}
+
+/**
  * Simple method that will convert Mega user ids to base32 strings (that should be used when doing XMPP auth)
  *
  * @param handle {string} mega user id
@@ -2992,7 +3070,11 @@ function getBaseUrl() {
  */
 function getAppBaseUrl() {
     var l = location;
-    return (l.origin !== 'null' && l.origin || (l.protocol + '//' + l.hostname)) + l.pathname;
+    var base = (l.origin !== 'null' && l.origin || (l.protocol + '//' + l.hostname));
+    if (is_extension) {
+        base += l.pathname;
+    }
+    return base;
 }
 
 /**
@@ -4805,7 +4887,7 @@ var watchdog = Object.freeze({
 
             case 'setrsa':
                 if (typeof dlmanager === 'object'
-                        && dlmanager.isOverFreeQuota) {
+                        && (dlmanager.isOverFreeQuota || dlmanager.onOverquotaWithAchievements)) {
 
                     var sid = strg.data[1];
                     var type = strg.data[0];
@@ -4880,7 +4962,9 @@ var watchdog = Object.freeze({
         delete localStorage[ev.key];
     }
 });
-watchdog.setup();
+mBroadcaster.once('boot_done', function() {
+    watchdog.setup();
+});
 
 /**
  * Simple alias that will return a random number in the range of: a < b

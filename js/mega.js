@@ -8899,7 +8899,9 @@ function loadfm_done(mDBload) {
             mega.loadReport.ttfm = Date.now() - mega.loadReport.ttfm;
 
             // setup fm-notifications such as 'full' or 'almost-full' if needed.
-            mega.checkStorageQuota(50);
+            if (!pfid && u_type) {
+                mega.checkStorageQuota(50);
+            }
         }
         else {
             mega.loadReport.ttfm = -1;

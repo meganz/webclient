@@ -578,7 +578,7 @@ mega.achievem.initInviteDialogMultiInputPlugin = function initInviteDialogMultiI
             resetInfoText();
         },
         onReady: function() {// Called once on dialog initialization
-            var $input = $this.find('li input').eq(0);
+            var $input = $dialog.find('li input').eq(0);
 
             $input.rebind('keyup click', function() {
                 var value = $.trim($input.val());

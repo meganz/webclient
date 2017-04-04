@@ -1555,6 +1555,9 @@ function simpleStringHashCode(str) {
  */
 function createTimeoutPromise(validateFunction, tick, timeout,
                               resolveRejectArgs, waitForPromise) {
+    var tickInterval = false;
+    var timeoutTimer = false;
+
     var $promise = new MegaPromise();
     resolveRejectArgs = resolveRejectArgs || [];
     if (!$.isArray(resolveRejectArgs)) {
@@ -1573,11 +1576,11 @@ function createTimeoutPromise(validateFunction, tick, timeout,
     };
 
     var startTimerChecks = function() {
-        var tickInterval = setInterval(function() {
+        tickInterval = setInterval(function() {
             $promise.verify();
         }, tick);
 
-        var timeoutTimer = setTimeout(function() {
+        timeoutTimer = setTimeout(function() {
             if (validateFunction()) {
                 if (window.d && typeof(window.promisesDebug) !== 'undefined') {
                     console.debug("Resolving timeout promise",
@@ -1594,22 +1597,32 @@ function createTimeoutPromise(validateFunction, tick, timeout,
             }
         }, timeout);
 
-        // stop any running timers and timeouts
-        $promise.always(function() {
-            clearInterval(tickInterval);
-            clearTimeout(timeoutTimer);
-        });
-
         $promise.verify();
     };
+
+    // stop any running timers and timeouts
+    $promise.always(function() {
+        if (tickInterval !== false) {
+            clearInterval(tickInterval);
+        }
+
+        if (timeoutTimer !== false) {
+            clearTimeout(timeoutTimer);
+        }
+    });
+
 
     if (!waitForPromise || !waitForPromise.done) {
         startTimerChecks();
     }
     else {
-        waitForPromise.always(function() {
-            startTimerChecks();
-        });
+        waitForPromise
+            .done(function() {
+                startTimerChecks();
+            })
+            .fail(function() {
+                $promise.reject();
+            });
     }
 
     return $promise;

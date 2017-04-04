@@ -15656,7 +15656,7 @@
         "context": ""
     },
     "16277": {
-        "text": "Create your free account and get %1 of complimentary storage space, valid for %2 months.",
+        "text": "Create your free account and get %1 of complimentary storage space, valid for %2 days.",
         "context": "%1 would be replaced with the amount and %2 would be replaced with a numeric value"
     },
     "16278": {
@@ -15664,7 +15664,7 @@
         "context": ""
     },
     "16279": {
-        "text": "When you install MEGAsync you get %1 of complimentary storage space plus %2 of transfer quota, both valid for %3 months. MEGAsync is available for Windows, macOS and most Linux distros.",
+        "text": "When you install MEGAsync you get %1 of complimentary storage space plus %2 of transfer quota, both valid for %3 days. MEGAsync is available for Windows, macOS and most Linux distros.",
         "context": "Both %1 and %2 would be replaced with amounts, for example \"50 GB\" and %3 a numeric value for the number of months"
     },
     "16280": {
@@ -15672,7 +15672,7 @@
         "context": ""
     },
     "16281": {
-        "text": "When you install our mobile app you get %1 of complimentary storage space plus %2 transfer quota, both valid for %3 months. We provide mobile apps for iOS, Android & Windows Phone.",
+        "text": "When you install our mobile app you get %1 of complimentary storage space plus %2 transfer quota, both valid for %3 days. We provide mobile apps for iOS, Android & Windows Phone.",
         "context": "Both %1 and %2 would be replaced with amounts, for example \"50 GB\" and %3 a numeric value for the number of months"
     },
     "16282": {

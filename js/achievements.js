@@ -578,18 +578,18 @@ mega.achievem.initInviteDialogMultiInputPlugin = function initInviteDialogMultiI
             resetInfoText();
         },
         onReady: function() {// Called once on dialog initialization
-            var $input = $this.find('li input').eq(0);
+            var $input = $dialog.find('li input').eq(0);
 
             $input.rebind('keyup click', function() {
                 var value = $.trim($input.val());
-                var $wrapper = $('.achievement-dialog.multiple-input');
+                var $wrapper = $('.multiple-input', $dialog);
                 if ($wrapper.find('.share-added-contact').length > 0 || checkMail(value) === false) {
-                    $wrapper.find('li input').eq(0).removeClass('red');
-                    $('.achievement-dialog.input-info').removeClass('red').text(l[9093]);
-                    $('.invite-dialog .default-grey-button.send').removeClass('disabled');
+                    $input.removeClass('red');
+                    $('.input-info',$dialog).removeClass('red').text(l[9093]);
+                    $('.default-grey-button.send', $dialog).removeClass('disabled');
                 }
                 else {
-                    $('.invite-dialog .default-grey-button.send').addClass('disabled');
+                    $('.default-grey-button.send', $dialog).addClass('disabled');
                 }
                 // TODO: scroll more then 64px of .input-field block
             });

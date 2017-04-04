@@ -3785,8 +3785,8 @@
     "16120": "[S]\u0627\u0644\u0646\u0642\u0644[\/S]",
     "16121": "\u0627\u0644\u0645\u0633\u0627\u062d\u0629 \u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645\u0629",
     "16122": "\u062d\u0635\u0629 \u0627\u0644\u0646\u0642\u0644",
-    "16123": "[S]Used base quota[\/S] is the free transfer allowance for the IP address you are using. The free limitation is dynamic and depends on the amount of unused transfer quota we have available.[BR] You can increase your quota by [A]Upgrading to PRO[\/A].",
-    "16124": "[S]Used base quota[\/S] is the free transfer allowance for the IP address you are using. The free limitation is dynamic and depends on the amount of unused transfer quota we have available.[BR] You can increase your quota by completing [S]Account Achievements[\/S] or by [A]Upgrading to PRO[\/A].",
+    "16123": "[S]Transfer quota usage[\/S] is recorded by IP address for free accounts (and may include other users on the same IP). The transfer quota for free accounts is dynamic and depends on the amount of unused bandwidth we have available.[BR] You can increase your quota by [A]Upgrading to PRO[\/A].",
+    "16124": "[S]Transfer quota usage[\/S] is recorded by IP address for free accounts (and may include other users on the same IP). The transfer quota for free accounts is dynamic and depends on the amount of unused bandwidth we have available.[BR] You can increase your quota by completing [S]Account Achievements[\/S] or by [A]Upgrading to PRO[\/A].",
     "16125": "\u0627\u0644\u062d\u0635\u0629 \u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645\u0629 \u0644\u0644\u0633\u0627\u0639\u0627\u062a \u0627\u0644\u0633\u062a\u0629 \u0627\u0644\u0623\u062e\u064a\u0631\u0629 ",
     "16126": "\u0627\u0644\u062d\u0635\u0648\u0644 \u0639\u0644\u0649 \u0627\u0644\u0645\u0632\u064a\u062f \u0645\u0646 \u062d\u0635\u0629 \u0627\u0644\u0646\u0642\u0644 ",
     "16127": "\u062d\u0635\u0629 \u0627\u0644\u062a\u062e\u0632\u064a\u0646 ",
@@ -3825,7 +3825,7 @@
     "16160": "\u062d\u0635\u0629 \u0646\u0642\u0644 \u0633\u062e\u064a\u0629 ",
     "16161": "\u062d\u0635\u0629 \u0627\u0644\u0646\u0642\u0644 \u062a\u0645 \u062a\u062e\u0637\u064a\u0647\u0627 ",
     "16162": "\u062d\u0635\u0629 \u0627\u0644\u0646\u0642\u0644 \u0627\u0644\u0645\u062c\u0627\u0646\u064a\u0629 \u062a\u0645 \u062a\u062e\u0637\u064a\u0647\u0627 ",
-    "16163": "Your download could not proceed because it would take you over the current free transfer allowance for your IP address. This limit is dynamic and depends on the amount of unused transfer quota we have available.",
+    "16163": "Your download could not proceed because it would take you over the current free transfer allowance for your IP address. This limit is dynamic and depends on the amount of unused bandwidth we have available.",
     "16164": "\u062d\u0635\u0629 \u0646\u0642\u0644 \u0645\u062a\u0648\u0641\u0631\u0629 \u0628\u0634\u0643\u0644 \u0645\u062d\u062f\u0648\u062f ",
     "16165": "\u0639\u0645\u0644\u064a\u0627\u062a \u0627\u0644\u0646\u0642\u0644 \u0631\u0628\u0645\u0627 \u062a\u0646\u0642\u0637\u0639.[BR] [S]\u0627\u062d\u0635\u0644 \u0639\u0644 \u062d\u0633\u0627\u0628 \u0628\u0631\u0648[\/S] \u0644\u0632\u064a\u0627\u062f\u0629 \u062d\u0635\u0629 \u0627\u0644\u0646\u0642\u0644 \u0644\u062f\u064a\u0643.",
     "16166": "\u0627\u0644\u0628\u0627\u0642\u0629 ",
@@ -4021,6 +4021,11 @@
     "16390": "[S]Transfer quota[\/S] is the total volume of data transfered between MEGA and your system each month.",
     "16391": "[S]Transfer speed[\/S] is unrelated to Transfer quota. The quality of your file transfers' speed can be affected by many factors beyond our control, such as your local network and your Internet Service Provider. MEGA always processes file transfers at the maximum possible speed regardless of your account status.",
     "16392": "[S]PRO and Free accounts[\/S] enjoy the same fast transfer speed.",
+    "16393": "Starting at 200 GB base storage and scalable up to 4 TB. If you require more than that, please [A]contact us[\/A].",
+    "16394": "No files in your [S]Cloud Drive[\/S].",
+    "16395": "You have received %1 storage space as your free registration bonus.",
+    "16396": "You have received %1 storage space and %2 transfer quota for installing MEGAsync.",
+    "16397": "You have received %1 storage space and %2 transfer quota for installing our mobile app.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4268,6 +4273,7 @@
         "please-try-again": 16350,
         "email-sent-successfully": 16351,
         "always-show-selected-presence-even-when-disconnected": 16387,
-        "online-autoaway-checkbox-field": 16389
+        "online-autoaway-checkbox-field": 16389,
+        "no-files-in-cloud-drive": 16394
     }
 }

@@ -2190,7 +2190,7 @@
     "7090": "Uso de Recursos:",
     "7093": "Tama\u00f1o de Archivo:",
     "7094": "ILIMITADO",
-    "7098": "Tu descarga no pudo continuar porque te llevar\u00eda a sobrepasar la asignaci\u00f3n de transferencia gratuita actual para tu direcci\u00f3n IP. Este l\u00edmite es din\u00e1mico y depende de la cantidad de cuota de transferencia no utilizada que tenemos disponible en cada momento.",
+    "7098": "Tu descarga no se ha podido procesar porque te llevar\u00eda por encima de la actual transferencia permitida para tu IP. Este l\u00edmite es din\u00e1mico y depende de la cantidad de ancho de banda no utilizado que tengamos disponible.",
     "7099": "The IP address you are using has utilised %1 of data transfer in the last 6 hours, which took you over our current limit. To remove this limit, you can [A]upgrade to PRO[\/A], which will give you your own transfer quota package and also ample extra storage space. ",
     "7100": "Por favor hazte PRO para continuar ahora mismo, o espera %1 para continuar gratis.",
     "7101": "Continuar transferencias",
@@ -3785,8 +3785,8 @@
     "16120": "[S]Transferencia[\/S]",
     "16121": "Almacenamiento utilizado",
     "16122": "Cuota de Transferencia",
-    "16123": "La [S]cuota base utilizada[\/S] es la asignaci\u00f3n de transferencia gratuita para la direcci\u00f3n IP que est\u00e1s utilizando. El l\u00edmite gratuito es din\u00e1mico y depende de la cantidad de cuota de transferencia que tengamos disponible.[BR] Puedes aumentar tu cuota [A]Actualizando a PRO[\/A].",
-    "16124": "[S]La cuota base utilizada[\/S] es la asignaci\u00f3n de transferencia gratuita para la direcci\u00f3n IP que est\u00e1s utilizando. La limitaci\u00f3n gratuita es din\u00e1mica, y depende de la cantidad de cuota de transferencia no utilizada que tengamos disponible.[BR] Puedes aumentar tu cuota completando [S]Logros de cuenta[\/S] o [A]Actualizando a PRO[\/A].",
+    "16123": "La [S]cuota de base utilizada[\/S] es la asignaci\u00f3n de transferencia gratuita para la direcci\u00f3n IP que est\u00e1s utilizando. Este valor es din\u00e1mico y depende de la cantidad de cuota de transferencia no utilizada que tenemos disponible en cada momento.[BR] Puedes aumentar tu cuota [A]Actualizando a PRO[\/A].",
+    "16124": "La [S]cuota de base utilizada[\/S] es la asignaci\u00f3n de transferencia gratuita para la direcci\u00f3n IP que est\u00e1s utilizando. Este valor es din\u00e1mico y depende de la cantidad de cuota de transferencia no utilizada que tenemos disponible en cada momento.[BR] Puedes aumentar tu cuota completando [S]Logros de cuenta[\/S] o [A]Actualizando a PRO[\/A].",
     "16125": "Cuota utilizada durante las \u00faltimas 6 horas:",
     "16126": "Obt\u00e9n m\u00e1s cuota de transferencia",
     "16127": "Cuota de Almacenamiento",
@@ -3825,7 +3825,7 @@
     "16160": "Generosa cuota de transferencia",
     "16161": "Cuota de transferencia excedida",
     "16162": "Cuota de transferencia gratuita superada",
-    "16163": "Tu descarga no pudo continuar porque te llevar\u00eda a sobrepasar la asignaci\u00f3n de transferencia gratuita actual para tu direcci\u00f3n IP. Este l\u00edmite es din\u00e1mico y depende de la cantidad de cuota de transferencia no utilizada que tenemos disponible en cada momento.                ",
+    "16163": "Tu descarga no pudo continuar porque te llevar\u00eda a sobrepasar la asignaci\u00f3n de transferencia gratuita actual para tu direcci\u00f3n IP. Este l\u00edmite es din\u00e1mico y depende de la cantidad de cuota de transferencia no utilizada que tenemos disponible en cada momento.",
     "16164": "Cuota de transferencia disponible limitada",
     "16165": "Tu transferencia podr\u00eda interrumpirse.[BR][S]Obt\u00e9n una cuenta PRO[\/S] para aumentar la cuota de transferencia.",
     "16166": "Plan",
@@ -4021,6 +4021,11 @@
     "16390": "La [S]Cuota de transferencia[\/S] es el volumen total de datos transferidos cada mes entre MEGA y tu sistema.",
     "16391": "[S]La Velocidad de Transferencia[\/S] no tiene relaci\u00f3n con la Cuota de Transferencia. La calidad de la velocidad de las transferencias de archivos puede verse afectada por muchos factores fuera de nuestro control, ta\u00f1es como la red local o tu proveedor de servicios de Internet. MEGA siempre procesa las transferencias de archivos a la m\u00e1xima velocidad posible, independientemente del estado de tu cuenta.",
     "16392": "Las cuentas [S]PRO y Gratis[\/S] disfrutan de una velocidad de transferencia igualmente r\u00e1pida.",
+    "16393": "Starting at 200 GB base storage and scalable up to 4 TB. If you require more than that, please [A]contact us[\/A].",
+    "16394": "No files in your [S]Cloud Drive[\/S].",
+    "16395": "You have received %1 storage space as your free registration bonus.",
+    "16396": "You have received %1 storage space and %2 transfer quota for installing MEGAsync.",
+    "16397": "You have received %1 storage space and %2 transfer quota for installing our mobile app.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4268,6 +4273,7 @@
         "please-try-again": 16350,
         "email-sent-successfully": 16351,
         "always-show-selected-presence-even-when-disconnected": 16387,
-        "online-autoaway-checkbox-field": 16389
+        "online-autoaway-checkbox-field": 16389,
+        "no-files-in-cloud-drive": 16394
     }
 }

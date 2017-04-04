@@ -3785,8 +3785,8 @@
     "16120": "[S]\u00d6verf\u00f6r[\/S]",
     "16121": "Anv\u00e4nt utrymme",
     "16122": "\u00d6verf\u00f6ringskvot ",
-    "16123": "[S]Used base quota[\/S] is the free transfer allowance for the IP address you are using. The free limitation is dynamic and depends on the amount of unused transfer quota we have available.[BR] You can increase your quota by [A]Upgrading to PRO[\/A].",
-    "16124": "[S]Used base quota[\/S] is the free transfer allowance for the IP address you are using. The free limitation is dynamic and depends on the amount of unused transfer quota we have available.[BR] You can increase your quota by completing [S]Account Achievements[\/S] or by [A]Upgrading to PRO[\/A].",
+    "16123": "[S]Transfer quota usage[\/S] is recorded by IP address for free accounts (and may include other users on the same IP). The transfer quota for free accounts is dynamic and depends on the amount of unused bandwidth we have available.[BR] You can increase your quota by [A]Upgrading to PRO[\/A].",
+    "16124": "[S]Transfer quota usage[\/S] is recorded by IP address for free accounts (and may include other users on the same IP). The transfer quota for free accounts is dynamic and depends on the amount of unused bandwidth we have available.[BR] You can increase your quota by completing [S]Account Achievements[\/S] or by [A]Upgrading to PRO[\/A].",
     "16125": "Anv\u00e4nd kvot f\u00f6r de senaste 6 timmar:",
     "16126": "F\u00e5 mer kvot\u00f6verf\u00f6ring",
     "16127": "Lagringskvot ",
@@ -4021,6 +4021,11 @@
     "16390": "[S]Transfer quota[\/S] is the total volume of data transfered between MEGA and your system each month.",
     "16391": "[S]Transfer speed[\/S] is unrelated to Transfer quota. The quality of your file transfers' speed can be affected by many factors beyond our control, such as your local network and your Internet Service Provider. MEGA always processes file transfers at the maximum possible speed regardless of your account status.",
     "16392": "[S]PRO and Free accounts[\/S] enjoy the same fast transfer speed.",
+    "16393": "Starting at 200 GB base storage and scalable up to 4 TB. If you require more than that, please [A]contact us[\/A].",
+    "16394": "No files in your [S]Cloud Drive[\/S].",
+    "16395": "You have received %1 storage space as your free registration bonus.",
+    "16396": "You have received %1 storage space and %2 transfer quota for installing MEGAsync.",
+    "16397": "You have received %1 storage space and %2 transfer quota for installing our mobile app.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4268,6 +4273,7 @@
         "please-try-again": 16350,
         "email-sent-successfully": 16351,
         "always-show-selected-presence-even-when-disconnected": 16387,
-        "online-autoaway-checkbox-field": 16389
+        "online-autoaway-checkbox-field": 16389,
+        "no-files-in-cloud-drive": 16394
     }
 }

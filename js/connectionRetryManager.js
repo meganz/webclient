@@ -220,7 +220,7 @@ ConnectionRetryManager.prototype.gotConnected = function(){
     var self = this;
 
     if (localStorage.connectionRetryManagerDebug) {
-        self.logger.warn("got connected");
+        self.logger.warn("got connected", self.logger.name + "#" + self._connectionRetries);
     }
 
     self._connectionState = ConnectionRetryManager.CONNECTION_STATE.CONNECTED;
@@ -254,6 +254,10 @@ ConnectionRetryManager.prototype.gotConnected = function(){
     });
 
     if (self._$connectingPromise) {
+        if (localStorage.connectionRetryManagerDebug) {
+            self.logger.error("got connected, triggering verify:", self.logger.name);
+        }
+
         self._$connectingPromise.verify();
     }
     $(self).trigger('onConnected');
@@ -263,25 +267,37 @@ ConnectionRetryManager.prototype.gotConnected = function(){
  * Should be called from the integration code when a connection had started connecting.
  *
  * @param waitForPromise
+ * @param [delayed] {Number}
+ * @param [name] {String} optional name for the debugging output of createTimeoutPromise
  * @returns {MegaPromise|*}
  */
-ConnectionRetryManager.prototype.startedConnecting = function(waitForPromise, delayed){
+ConnectionRetryManager.prototype.startedConnecting = function(waitForPromise, delayed, name) {
     var self = this;
 
-    self._$connectingPromise = createTimeoutPromise(function() {
-        return self.options.functions.isConnected();
-    }, 100, self.options.connectTimeout + (delayed ? delayed : 0), undefined, waitForPromise)
+    self._$connectingPromise = createTimeoutPromise(
+        function() {
+            return self.options.functions.isConnected();
+        },
+        500,
+        self.options.connectTimeout + (delayed ? delayed : 0),
+        undefined,
+        waitForPromise,
+        name
+    )
         .always(function() {
             delete self._$connectingPromise;
         })
         .done(function() {
             if (localStorage.connectionRetryManagerDebug) {
-                self.logger.warn("startedConnecting succeeded.");
+                self.logger.warn("startedConnecting succeeded.", self.logger.name + "#" + self._connectionRetries);
             }
         })
         .fail(function() {
             if (localStorage.connectionRetryManagerDebug) {
-                self.logger.warn("startedConnecting failed, retrying.");
+                self.logger.warn(
+                    "startedConnecting failed, retrying.",
+                    self.logger.name + "#" + self._connectionRetries
+                );
             }
             self.doConnectionRetry();
         });
@@ -343,7 +359,11 @@ ConnectionRetryManager.prototype.doConnectionRetry = function(immediately) {
         );
 
         self._lastConnectionRetryTime = unixtime();
-        return self.startedConnecting(undefined, self.options.restartConnectionRetryTimeout);
+        return self.startedConnecting(
+            undefined,
+            self.options.restartConnectionRetryTimeout,
+            self.logger.name + "#" + self._connectionRetries
+        );
     }
     else {
         if (immediately === true) {
@@ -376,14 +396,22 @@ ConnectionRetryManager.prototype.doConnectionRetry = function(immediately) {
             if (!self.options.functions.isConnected()) {
                 self.options.functions.reconnect(self);
                 self._connectionState = ConnectionRetryManager.CONNECTION_STATE.CONNECTING;
-            } else {
             }
         }, connectionRetryTimeout);
 
         self._lastConnectionRetryTime = unixtime();
 
-        self.logger.warn("calling startedConnecting: ", connectionRetryTimeout);
-        return self.startedConnecting(undefined, connectionRetryTimeout);
+        if (localStorage.connectionRetryManagerDebug) {
+            self.logger.warn(
+                "calling startedConnecting: ",
+                connectionRetryTimeout, self.logger.name + "#" + self._connectionRetries
+            );
+        }
+        return self.startedConnecting(
+            undefined,
+            connectionRetryTimeout,
+            self.logger.name + "#" + self._connectionRetries
+        );
     }
 };
 /**

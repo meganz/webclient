@@ -365,7 +365,6 @@ Chatd.Shard.prototype.reconnect = function() {
     self.s.onerror = function(e) {
         self.logger.error("WebSocket error:", e);
         clearTimeout(self.keepAliveTimer);
-        self.connectionRetryManager.doConnectionRetry();
 
         self.chatd.trigger('onError', {
             shard: self

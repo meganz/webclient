@@ -1551,10 +1551,11 @@ function simpleStringHashCode(str) {
  * @param timeout {int}
  * @param [resolveRejectArgs] {(Array|*)} args that will be used to call back .resolve/.reject
  * @param [waitForPromise] {(MegaPromise|$.Deferred)} Before starting the timer, we will wait for this promise to be rej/res first.
+ * @param [name] {String} optional name for the debug output of the error/debug messages
  * @returns {Deferred}
  */
 function createTimeoutPromise(validateFunction, tick, timeout,
-                              resolveRejectArgs, waitForPromise) {
+                              resolveRejectArgs, waitForPromise, name) {
     var tickInterval = false;
     var timeoutTimer = false;
 
@@ -1567,8 +1568,8 @@ function createTimeoutPromise(validateFunction, tick, timeout,
     $promise.verify = function() {
         if (validateFunction()) {
             if (window.d && typeof(window.promisesDebug) !== 'undefined') {
-                console.debug("Resolving timeout promise",
-                    timeout, "ms", "at", (new Date()),
+                console.debug("Resolving timeout promise", name,
+                    timeout, "ms", "at", (new Date()).toISOString(),
                     validateFunction, resolveRejectArgs);
             }
             $promise.resolve.apply($promise, resolveRejectArgs);
@@ -1583,15 +1584,15 @@ function createTimeoutPromise(validateFunction, tick, timeout,
         timeoutTimer = setTimeout(function() {
             if (validateFunction()) {
                 if (window.d && typeof(window.promisesDebug) !== 'undefined') {
-                    console.debug("Resolving timeout promise",
-                        timeout, "ms", "at", (new Date()),
+                    console.debug("Resolving timeout promise", name,
+                        timeout, "ms", "at", (new Date()).toISOString(),
                         validateFunction, resolveRejectArgs);
                 }
                 $promise.resolve.apply($promise, resolveRejectArgs);
             }
             else {
-                console.error("Timed out after waiting",
-                    timeout, "ms", "at", (new Date()),
+                console.error("Timed out after waiting", name,
+                    timeout, "ms", "at", (new Date()).toISOString(), $promise.state(),
                     validateFunction, resolveRejectArgs);
                 $promise.reject.apply($promise, resolveRejectArgs);
             }

@@ -8976,7 +8976,7 @@ function slideshow(id, close)
         for (var i in dl_queue) {
             if (dl_queue[i] && dl_queue[i].id === slideshowid) {
                 dl_queue[i].preview = false;
-                openTransferpanel();
+                openTransfersPanel();
                 return;
             }
         }
@@ -9318,7 +9318,7 @@ function fm_resize_handler(force) {
         $('.fm-right-files-block, .fm-right-account-block, .fm-right-block.dashboard').css({
             'margin-left': ($('.fm-left-panel:visible').width() + $('.nw-fm-left-icons-panel').width()) + "px"
         });
-        
+
         if (mega.ui.tpp.isVisible()) {
             $('.popup.transfer-widget:visible').width($('.fm-left-panel:visible').width() - 8);
         }

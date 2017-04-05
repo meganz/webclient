@@ -3766,7 +3766,9 @@ mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
         ulQueue._pending = [];
         ulQueue.setSize((fmconfig.ul_maxSlots | 0) || 4);
 
-        mega.ui.tpp.reset('ul');
+        if (page !== 'download') {
+            mega.ui.tpp.reset('ul');
+        }
     }
     if (!dl_queue.some(isQueueActive)) {
         dl_queue = new DownloadQueue();
@@ -3778,7 +3780,9 @@ mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
         dlmanager._quotaPushBack = {};
         dlmanager._dlQuotaListener = [];
 
-        mega.ui.tpp.reset('dl');
+        if (page !== 'download') {
+            mega.ui.tpp.reset('dl');
+        }
     }
 
     if (!dlmanager.isDownloading && !ulmanager.isUploading) {

@@ -651,6 +651,10 @@ function init_page() {
         parsepage(pages['login']);
         init_login();
     }
+    else if (page === 'achievements') {
+        loadSubPage('fm/account/achievements');
+        return false;
+    }
     else if (page == 'account') {
         loadSubPage('fm/account');
         return false;

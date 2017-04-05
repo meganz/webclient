@@ -376,6 +376,10 @@ function init_page() {
         page = 'newpw';
     }
 
+    if ((pfkey || dlkey) && location.hash[0] !== '#') {
+        return location.replace(getAppBaseUrl());
+    }
+
 
 
     blogmonth = false;

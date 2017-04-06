@@ -285,7 +285,7 @@ CallSession.prototype.onWaitingResponseIncoming = function(e, eventData) {
             self.logger.error("Contact not found: ", participants[0]);
         } else {
 
-            var avatar = useravatar.imgUrl(contact.u);
+            var avatar = useravatar.contact(contact.u, '', 'div');
 
             // callOptions, can be == {} in the cases then the user does not have/have not provided access
             // to the cam & mic

@@ -12,12 +12,7 @@ var Chatd = function(userId, options) {
     self.chatIdMessages = {};
 
     // local cache of the Message object
-    self.messagesQueueKvStorage = new IndexedDBKVStorage("chatqueuedmsgs", {
-            murSeed: 0x800F0002
-        });
-
-    // preload
-    self.messagesQueueKvStorage.prefillMemCache(fmdb);
+    self.messagesQueueKvStorage = new SharedLocalKVStorage("chatqueuedmsgs");
 
     /**
      * Set to true when this chatd instance is (being) destroyed
@@ -109,7 +104,7 @@ Chatd.Opcode = {
     'KEYID' : 18,
     'JOINRANGEHIST' : 19,
     'MSGUPDX' : 20,
-    'MSGID' : 21,
+    'MSGID' : 21
 };
 
 // privilege levels
@@ -169,9 +164,7 @@ Chatd.prototype.addshard = function(chatId, shard, url) {
 
     // attempt a connection ONLY if this is a new shard.
     if (newshard) {
-        if (localStorage.megaChatPresence !== "unavailable") {
-            this.shards[shard].reconnect();
-        }
+        this.shards[shard].reconnect();
     }
 
     return newshard;
@@ -206,8 +199,6 @@ Chatd.Shard = function(chatd, shard) {
     );
 
     self.keepAliveTimer = null;
-
-    self.needRestore = true;
 
     self.destroyed = false;
 
@@ -286,7 +277,7 @@ Chatd.Shard = function(chatd, shard) {
                  */
                 isUserForcedDisconnect: function(connectionRetryManager) {
                     return (
-                        self.chatd.destroyed === true || localStorage.megaChatPresence === "unavailable" ||
+                        self.chatd.destroyed === true ||
                             self.destroyed === true
                     );
                 }
@@ -406,6 +397,8 @@ Chatd.Shard.prototype.disconnect = function() {
     self.s = null;
 
     clearTimeout(self.keepAliveTimer);
+
+    self.connectionRetryManager.gotDisconnected();
 };
 
 Chatd.Shard.prototype.multicmd = function(cmds) {
@@ -469,10 +462,11 @@ Chatd.Shard.prototype.clearpending = function() {
     }
 };
 
-Chatd.Shard.prototype.restore = function() {
+Chatd.Shard.prototype.restoreIfNeeded = function(chatId) {
     var self = this;
-    for (var chatId in this.chatIds) {
+    if (self.chatd.chatIdMessages[chatId] && self.chatd.chatIdMessages[chatId].needsRestore) {
         self.chatd.chatIdMessages[chatId].restore();
+        self.chatd.chatIdMessages[chatId].needsRestore = false;
     }
 };
 
@@ -758,15 +752,12 @@ Chatd.Shard.prototype.exec = function(a) {
 
             case Chatd.Opcode.HISTDONE:
                 self.keepAliveTimerRestart();
-                self.logger.log("History retrieval finished: " + base64urlencode(cmd.substr(1,8)));
-                if (self.needRestore) {
-                    self.restore();
-                    self.needRestore = false;
-                }
+                self.logger.log("History retrieval finished: " + base64urlencode(cmd.substr(1, 8)));
+                self.restoreIfNeeded(cmd.substr(1, 8));
 
                 self.chatd.trigger('onMessagesHistoryDone',
                     {
-                        chatId: base64urlencode(cmd.substr(1,8))
+                        chatId: base64urlencode(cmd.substr(1, 8))
                     }
                 );
                 len = 9;
@@ -993,6 +984,8 @@ Chatd.Messages = function(chatd, chatId) {
     this.sendingList = [];
     // expired message list
     this.expired = {};
+
+    this.needsRestore = true;
 };
 
 Chatd.Messages.prototype.submit = function(messages, keyId) {
@@ -1582,7 +1575,6 @@ Chatd.Messages.prototype.confirmkey = function(keyid) {
                     'updated' : v.updated,
                     'type' : v.type
                 });
-                self.chatd.messagesQueueKvStorage.flush();
             }
         })
     );
@@ -1662,7 +1654,6 @@ Chatd.Messages.prototype.persist = function(messagekey) {
                     'updated' : self.sendingbuf[num][Chatd.MsgField.UPDATED],
                     'type' : self.sendingbuf[num][Chatd.MsgField.TYPE]
                 });
-                self.chatd.messagesQueueKvStorage.flush();
             }
         });
     }
@@ -1679,7 +1670,6 @@ Chatd.Messages.prototype.persist = function(messagekey) {
                 'updated' : self.sendingbuf[num][Chatd.MsgField.UPDATED],
                 'type' : self.sendingbuf[num][Chatd.MsgField.TYPE]
             });
-            self.chatd.messagesQueueKvStorage.flush();
         }
     }
 };
@@ -1689,7 +1679,6 @@ Chatd.Messages.prototype.removefrompersist = function(messagekey) {
     var self = this;
     var cacheKey = base64urlencode(self.chatId) + ":" + messagekey;
     self.chatd.messagesQueueKvStorage.removeItem(cacheKey);
-    self.chatd.messagesQueueKvStorage.flush();
 };
 
 // restore persisted messages to sending buffer
@@ -1760,6 +1749,7 @@ Chatd.Messages.prototype.restore = function() {
             }
         })
     );
+
     var _resendPending = function() {
         if (iskey) {
             trivialkeys.push(self.getmessagekey(previouskeyid, Chatd.MsgType.KEY));

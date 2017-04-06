@@ -61,9 +61,6 @@ function startMega() {
         silent_loading = false;
         return false;
     }
-    else {
-        populate_l();
-    }
 
     if (pages['dialogs']) {
         $('body').safeAppend(translate(pages['dialogs'].replace(/{staticpath}/g, staticpath)));
@@ -379,6 +376,10 @@ function init_page() {
         page = 'newpw';
     }
 
+    if ((pfkey || dlkey) && location.hash[0] !== '#') {
+        return location.replace(getAppBaseUrl());
+    }
+
 
 
     blogmonth = false;
@@ -653,6 +654,10 @@ function init_page() {
         }
         parsepage(pages['login']);
         init_login();
+    }
+    else if (page === 'achievements') {
+        loadSubPage('fm/account/achievements');
+        return false;
     }
     else if (page == 'account') {
         loadSubPage('fm/account');
@@ -1084,7 +1089,7 @@ function init_page() {
         }
         else {
             if (ul_queue.length > 0) {
-                openTransferpanel();
+                openTransfersPanel();
             }
 
             if (u_type === 0 && !u_attr.terms) {
@@ -1410,10 +1415,12 @@ function topmenuUI() {
         $('.create-account-button').hide();
         $('.membership-status-block').show();
         $('.top-icon.notification').show();
-        if (u_attr.flags.ach) {
-            $('.top-icon.achievements').show();
-        }
 
+        // Show the rocket icon if achievements are enabled
+        mega.achievem.enabled()
+            .done(function() {
+                $('.top-icon.achievements').show();
+            });
 
         // If a Lite/Pro plan has been purchased
         if (u_attr.p) {
@@ -1456,7 +1463,7 @@ function topmenuUI() {
         }
 
         // If the chat is disabled don't show the green status icon in the header
-        if (!megaChatIsDisabled) {
+        if (!pfid && !megaChatIsDisabled) {
             $('.activity-status-block, .activity-status-block .activity-status').show();
             if (megaChatIsReady) {
                 megaChat.renderMyStatus();
@@ -1604,15 +1611,7 @@ function topmenuUI() {
     });
 
     $('.top-icon.achievements').rebind('click', function() {
-        loadingDialog.show();
-
-        M.accountData(function(account) {
-            loadingDialog.hide();
-
-            if (account.maf) {
-                achievementsListDialog();
-            }
-        });
+        mega.achievem.achievementsListDialog();
     });
 
     $('.top-icon.menu, .top-icon.close').rebind('click', function () {

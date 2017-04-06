@@ -252,6 +252,11 @@ function init_pro()
     if (localStorage.keycomplete) {
         $('body').addClass('key');
         localStorage.removeItem('keycomplete');
+
+        mega.achievem.enabled()
+            .done(function() {
+                $('.red-star-img, .reg-st3-txt-achprogram').removeClass('hidden');
+            });
     }
     else {
         $('body').addClass('pro');
@@ -285,7 +290,7 @@ function init_pro()
 
     if (!m)
     {
-        $('.membership-step1 .membership-button').rebind('click', function() {
+        $('.membership-step1 .membership-pad-bl').rebind('click', function() {
 
             var $planBlocks = $('.reg-st3-membership-bl');
             var $selectedPlan = $(this).closest('.reg-st3-membership-bl');
@@ -299,8 +304,15 @@ function init_pro()
             if (account_type_num === '0') {
                 if (page === 'fm') {
                     loadSubPage('start');
-                } else {
+                }
+                else {
                     loadSubPage('fm');
+                }
+                if (localStorage.gotOverquotaWithAchievements) {
+                    onIdle(function() {
+                        mega.achievem.achievementsListDialog();
+                    });
+                    delete localStorage.gotOverquotaWithAchievements;
                 }
                 return false;
             }
@@ -368,43 +380,6 @@ function init_pro()
 
         if (lang !== 'en') $('.reg-st3-save-txt').addClass(lang);
         if (lang == 'fr') $('.reg-st3-big-txt').each(function(e,o){$(o).html($(o).html().replace('GB','Go').replace('TB','To'));});
-
-        $('.membership-step1 .reg-st3-membership-bl').unbind('click');
-        $('.membership-step1 .reg-st3-membership-bl').bind('click',function(e)
-        {
-            $('.reg-st3-membership-bl').removeClass('selected');
-            $(this).addClass('selected');
-        });
-
-        $('.membership-step1 .reg-st3-membership-bl').unbind('dblclick');
-        $('.membership-step1 .reg-st3-membership-bl').bind('dblclick',function(e)
-        {
-            $('.reg-st3-membership-bl').removeClass('selected');
-            $(this).addClass('selected');
-
-            account_type_num = $(this).attr('data-payment');
-
-            if (account_type_num === '0') {
-                if (page === 'fm') {
-                    loadSubPage('start');
-                } else {
-                    loadSubPage('fm');
-                }
-                return false;
-            }
-
-            $(this).clone().appendTo( '.membership-selected-block');
-
-            var proPlanName = $(this).find('.reg-st3-bott-title.title').html();
-            $('.membership-step2 .pro span').html(proPlanName);
-
-            // Update header text with plan
-            var $selectedPlanHeader = $('.membership-step2 .main-italic-header.pro');
-            var selectedPlanText = $selectedPlanHeader.html().replace('%1', proPlanName);
-            $selectedPlanHeader.html(selectedPlanText);
-
-            pro_next_step(proPlanName);
-        });
 
         $('.pro-bottom-button').unbind('click');
         $('.pro-bottom-button').bind('click',function(e)
@@ -682,6 +657,17 @@ function pro_pay() {
                 pro_m = addressDialog.gatewayId;
                 extra = addressDialog.extraDetails;
             }
+            else if (pro_paymentmethod.indexOf('sabadell') === 0) {
+                pro_m = sabadell.gatewayId; // 17
+
+                // Get the value for whether the user wants the plan to renew automatically
+                var autoRenewCheckedValue = $('.membership-step2 .renewal-options-list input:checked').val();
+
+                // If the provider supports recurring payments and the user wants the plan to renew automatically
+                if (autoRenewCheckedValue === 'yes') {
+                    extra.recurring = true;
+                }
+            }
 
             // Update the last payment provider ID for the 'psts' action packet. If the provider e.g. bitcoin
             // needs a redirect after confirmation action packet it will redirect to the account page.
@@ -750,6 +736,11 @@ var proPage = {
         // If returning from an Ecomprocessing payment, show a success or failure dialog
         else if (provider === 'ecp') {
             addressDialog.showPaymentResult(status);
+        }
+
+        // Sabadell needs to also show success or failure
+        else if (provider === 'sabadell') {
+            sabadell.showPaymentResult(status);
         }
     },
 
@@ -1275,6 +1266,9 @@ var proPage = {
             $step2.find('.renewal-option').addClass('hidden');
         }
 
+        // Reorder options numbering
+        $step2.find('.number:visible').each(function(idx, node) { $(node).text(idx + 1); });
+
         // Show recurring info box next to Purchase button and update dialog text for recurring
         if (recurringEnabled) {
             $step2.find('.subscription-instructions').removeClass('hidden');
@@ -1720,6 +1714,10 @@ var proPage = {
             case directReseller.gatewayId:
                 directReseller.redirectToSite(utcResult);
                 break;
+
+            case sabadell.gatewayId:
+                sabadell.redirectToSite(utcResult);
+                break;
         }
     }
 };
@@ -2130,6 +2128,79 @@ var unionPay = {
             form.append(input);
             $('body').append(form);
             form.submit();
+        }
+    }
+};
+
+/**
+ * Code for Sabadell Spanish Bank
+ */
+var sabadell = {
+
+    gatewayId: 17,
+
+    /**
+     * Redirect to the site
+     * @param {Object} utcResult
+     */
+    redirectToSite: function(utcResult) {
+
+        // We need to redirect to their site via a post, so we are building a form
+        var url = utcResult.EUR['url'];
+        var form = $("<form id='pay_form' name='pay_form' action='" + url + "' method='post'></form>");
+
+        for (var key in utcResult.EUR['postdata']) {
+            var input = $("<input type='hidden' name='" + key + "' value='" + utcResult.EUR['postdata'][key] + "' />");
+            form.append(input);
+            $('body').append(form);
+            form.submit();
+        }
+    },
+
+    /**
+     * Show the payment result of success or failure after coming back from the Sabadell site
+     * @param {String} verifyUrlParam The URL parameter e.g. 'sabadell-success' or 'sabadell-failure'
+     */
+    showPaymentResult: function(verifyUrlParam) {
+
+        var $backgroundOverlay = $('.fm-dialog-overlay');
+        var $pendingOverlay = $('.payment-result.pending.alternate');
+        var $failureOverlay = $('.payment-result.failed');
+
+        // Show the overlay
+        $backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+
+        // On successful payment
+        if (verifyUrlParam === 'success') {
+
+            // Show the success
+            $pendingOverlay.removeClass('hidden');
+
+            // Add click handlers for 'Go to my account' and Close buttons
+            $pendingOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
+
+                // Hide the overlay
+                $backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+                $pendingOverlay.addClass('hidden');
+
+                // Make sure it fetches new account data on reload
+                if (M.account) {
+                    M.account.lastupdate = 0;
+                }
+                loadSubPage('fm/account/history');
+            });
+        }
+        else {
+            // Show the failure overlay
+            $failureOverlay.removeClass('hidden');
+
+            // On click of the 'Try again' or Close buttons, hide the overlay
+            $failureOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
+
+                // Hide the overlay
+                $backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+                $failureOverlay.addClass('hidden');
+            });
         }
     }
 };

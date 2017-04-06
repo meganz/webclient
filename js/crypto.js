@@ -1463,16 +1463,18 @@ function api_setsid(sid) {
 
         if (typeof dlmanager === 'object') {
 
-            if (dlmanager.isOverQuota) {
+            if (!dlmanager.onOverquotaWithAchievements) {
+                if (dlmanager.isOverQuota) {
 
-                if (!dlmanager.isOverFreeQuota) {
-                    dlmanager.uqFastTrack = 1;
-                    dlmanager._overquotaInfo();
+                    if (!dlmanager.isOverFreeQuota) {
+                        dlmanager.uqFastTrack = 1;
+                        dlmanager._overquotaInfo();
+                    }
                 }
-            }
 
-            if (typeof dlmanager.onLimitedBandwidth === 'function') {
-                dlmanager.onLimitedBandwidth();
+                if (typeof dlmanager.onLimitedBandwidth === 'function') {
+                    dlmanager.onLimitedBandwidth();
+                }
             }
         }
         sid = 'sid=' + sid;
@@ -2213,6 +2215,14 @@ function api_resetkeykey(ctx, c, key, email, pw) {
 }
 
 function api_resetkeykey2(res, ctx) {
+    try {
+        api_resetkeykey3(res, ctx);
+    }
+    catch (ex) {
+        ctx.result(EKEY);
+    }
+}
+function api_resetkeykey3(res, ctx) {
     if (typeof res === 'string') {
         var privk = a32_to_str(decrypt_key(new sjcl.cipher.aes(ctx.k), base64_to_a32(res)));
 
@@ -4331,7 +4341,6 @@ function api_strerror(errno) {
         }
     };
 })(this);
-
 
 (function() {
     var backgroundNacl = {};

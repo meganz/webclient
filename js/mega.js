@@ -734,7 +734,7 @@ function MegaData()
                             else {
                                 color = ("00" + color.toString(16)).slice(-6);
 
-                                $this.find('.transfer-filtype-icon')
+                                $this.find('.transfer-filetype-icon')
                                     .css('background-color', '#' + color);
                             }
                         }
@@ -893,15 +893,14 @@ function MegaData()
 
     this.onlineStatusEvent = function(u, status) {
         if (u && megaChatIsReady) {
-            // this event is triggered for a specific resource/device (fullJid), so we need to get the presen for the
-            // user's devices, which is aggregated by Karere already
-            status = megaChat.karere.getPresence(megaChat.getJidFromNodeId(u.u));
-            var e = $('.ustatus.' + String(u.u).replace(/[^\w-]/g, ''));
+            console.error('onlineStatusEvent', u.u, status);
+            var e = $('.ustatus.' + u.u);
             if (e.length > 0) {
                 $(e).removeClass('offline online busy away');
                 $(e).addClass(this.onlineStatusClass(status)[1]);
             }
-            e = $('.fm-chat-user-status.' + String(u.u).replace(/[^\w-]/g, ''));
+
+            var e = $('.fm-chat-user-status.' + u.u);
             if (e.length > 0) {
                 $(e).safeHTML(this.onlineStatusClass(status)[0]);
             }
@@ -918,6 +917,9 @@ function MegaData()
             if (getSitePath() === "/fm/" + u.u) {
                 // re-render the contact view page if the presence had changed
                 contactUI();
+            }
+            if (u && u.u === u_handle) {
+                megaChat.renderMyStatus();
             }
         }
     };
@@ -1768,9 +1770,10 @@ function MegaData()
         // status can be: "online"/"away"/"busy"/"offline"
         for (i in activeContacts) {
             if (activeContacts.hasOwnProperty(i)) {
-                if (megaChatIsReady) {
-                    var jId = megaChat.getJidFromNodeId(activeContacts[i].u);
-                    onlinestatus = M.onlineStatusClass(megaChat.karere.getPresence(jId));
+                if (megaChatIsReady && activeContacts[i].u) {
+                    onlinestatus = M.onlineStatusClass(
+                        activeContacts[i].presence ? activeContacts[i].presence : 'unavailable'
+                    );
                 }
                 else {
                     onlinestatus = [l[5926], 'offline'];
@@ -3542,6 +3545,9 @@ function MegaData()
                     if (promise) {
                         return promise.reject(res);
                     }
+                    if (res == EOVERQUOTA) {
+                        return mega.showOverStorageQuota(100);
+                    }
                     return msgDialog('warninga', l[135], l[47], api_strerror(res));
                 }
 
@@ -3772,12 +3778,11 @@ function MegaData()
         return promise;
     };
 
-
     this.accountData = function(cb, blockui)
     {
         var account = Object(this.account);
 
-        if (account.lastupdate > Date.now() - 20000 && cb) {
+        if (account.lastupdate > Date.now() - 30000 && cb) {
             cb(account);
         }
         else {
@@ -3807,6 +3812,20 @@ function MegaData()
                         ctx.account.servbw_used = Math.round(res.csxfer);
                         ctx.account.downbw_used = Math.round(res.caxfer);
                         ctx.account.servbw_limit = res.srvratio;
+
+                        // Prepare storage footprint stats.
+                        var cstrgn = ctx.account.cstrgn = Object(ctx.account.cstrgn);
+                        var stats = ctx.account.stats = Object.create(null);
+                        var groups = [M.RootID, M.InboxID, M.RubbishID];
+                        var root = array_toobject(groups);
+                        var exp = Object(M.su.EXP);
+
+                        groups = groups.concat(['inshares', 'outshares', 'links']);
+                        for (var i = groups.length; i--;) {
+                            stats[groups[i]] = array_toobject(['items', 'bytes', 'files', 'folders'], 0);
+                            // stats[groups[i]].nodes = [];
+                        }
+
 
                         // Prepare storage footprint stats.
                         var cstrgn = ctx.account.cstrgn = Object(ctx.account.cstrgn);
@@ -3976,8 +3995,30 @@ function MegaData()
 
                     M.account = ctx.account;
 
-                    if (ctx.cb)
+                    // transfers quota
+                    var tfsq = {max: account.bw, used: account.downbw_used};
+
+                    if (u_attr.p) {
+                        tfsq.used += account.servbw_used;
+                    }
+                    else if (M.maf) {
+                        tfsq.used += account.servbw_used;
+                        var max = (M.maf.transfer.base + M.maf.transfer.current);
+                        if (max) {
+                            // has achieved quota
+                            tfsq.ach = true;
+                            tfsq.max = max;
+                        }
+                    }
+
+                    tfsq.left = tfsq.max - tfsq.used;
+                    tfsq.perc = Math.round(tfsq.used * 100 / tfsq.max);
+
+                    M.account.tfsq = tfsq;
+
+                    if (ctx.cb) {
                         ctx.cb(ctx.account);
+                    }
                 }
             });
         }
@@ -5017,7 +5058,7 @@ function MegaData()
             + '<td><div class="transfer-type download">'
             + '<ul><li class="right-c"><p><span></span></p></li><li class="left-c"><p><span></span></p></li></ul>'
             + '</div>' + flashhtml + '</td>'
-            + '<td><span class="transfer-filtype-icon ' + fileIcon(node) + '"></span>'
+            + '<td><span class="transfer-filetype-icon ' + fileIcon(node) + '"></span>'
             + '<span class="tranfer-filetype-txt">' + htmlentities(node.name) + '</span></td>'
             + '<td>' + filetype(node.name) + '</td>'
             + '<td>' + bytesToSize(node.s) + '</td>'
@@ -5177,6 +5218,7 @@ function MegaData()
             else {
                 zipname = (zipname || ('Archive-' + Math.random().toString(16).slice(-4))) + '.zip';
             }
+            mega.ui.tpp.setTotal(1, 'dl');
         }
         else {
             z = false;
@@ -5236,6 +5278,7 @@ function MegaData()
 
             if (!z) {
                 this.putToTransferTable(n, ttl);
+                mega.ui.tpp.setTotal(1, 'dl');
             }
         }
 
@@ -5263,7 +5306,7 @@ function MegaData()
                 + '<td><div class="transfer-type download">'
                 + '<ul><li class="right-c"><p><span></span></p></li><li class="left-c"><p><span></span></p></li></ul>'
                 + '</div>' + flashhtml + '</td>'
-                + '<td><span class="transfer-filtype-icon ' + fileIcon({name: 'archive.zip'}) + '"></span>'
+                + '<td><span class="transfer-filetype-icon ' + fileIcon({name: 'archive.zip'}) + '"></span>'
                 + '<span class="tranfer-filetype-txt">' + htmlentities(zipname) + '</span></td>'
                 + '<td>' + filetype({name: 'archive.zip'}) + '</td>'
                 + '<td>' + bytesToSize(zipsize) + '</td>'
@@ -5298,7 +5341,7 @@ function MegaData()
         if (!isZIP || zipSize) {
             M.addDownloadToast = ['d', isZIP ? 1 : added, isPaused];
         }
-        openTransferpanel();
+        openTransfersPanel();
         initGridScrolling();
         initFileblocksScrolling();
         initTreeScroll();
@@ -5313,6 +5356,7 @@ function MegaData()
     this.dlprogress = function(id, perc, bl, bt, kbps, dl_queue_num, force)
     {
         var st;
+        var tmpId = id;
         if (dl_queue[dl_queue_num].zipid)
         {
             id = 'zip_' + dl_queue[dl_queue_num].zipid;
@@ -5408,21 +5452,25 @@ function MegaData()
                 else {
                     $tr.find('.speed').addClass('unknown').text('');
                 }
-                delay('percent_megatitle', percent_megatitle);
 
-                if (page.substr(0, 2) !== 'fm')
-                {
+                if (page.substr(0, 2) !== 'fm') {
                     $('.widget-block').removeClass('hidden');
                     $('.widget-block').show();
-                    if (!ulmanager.isUploading)
+                    if (!ulmanager.isUploading) {
                         $('.widget-circle').attr('class', 'widget-circle percents-' + perc);
+                    }
                     $('.widget-icon.downloading').removeClass('hidden');
                     $('.widget-speed-block.dlspeed').text(bytesToSize(bps, 1) + '/s');
                     $('.widget-block').addClass('active');
                 }
+                else {
+                    mega.ui.tpp.setTransfered(id, bl, 'dl');
+                    mega.ui.tpp.updateBlock('dl');
+                }
+                delay('percent_megatitle', percent_megatitle, 50);
             }
         }
-    }
+    };
 
     this.dlcomplete = function(dl)
     {
@@ -5602,13 +5650,19 @@ function MegaData()
             .addClass('transfer-initiliazing')
             .find('.transfer-status').text(l[1042]);
 
-        delay('fm_tfsupdate', fm_tfsupdate); // this will call $.transferHeader()
         dl.st = NOW();
         ASSERT(typeof dl_queue[dl.pos] === 'object', 'No dl_queue entry for the provided dl...');
         ASSERT(typeof dl_queue[dl.pos] !== 'object' || dl.n == dl_queue[dl.pos].n, 'No matching dl_queue entry...');
-        if (typeof dl_queue[dl.pos] === 'object')
+        if (typeof dl_queue[dl.pos] === 'object') {
+            fm_tfsupdate(); // this will call $.transferHeader()
             M.dlprogress(id, 0, 0, 0, 0, dl.pos);
+            if (mega.ui.tpp.getTime('dl') === 0) {
+                mega.ui.tpp.setTime(NOW(), 'dl');
+            }
+            mega.ui.tpp.start(dl, 'dl');
+        }
     }
+
     this.mobileuploads = [];
 
     this.doFlushTransfersDynList = function(aNumNodes) {
@@ -5902,7 +5956,7 @@ function MegaData()
                 + '<td><div class="transfer-type upload">'
                 + '<ul><li class="right-c"><p><span></span></p></li><li class="left-c"><p><span></span></p></li></ul>'
                 + '</div></td>'
-                + '<td><span class="transfer-filtype-icon ' + fileIcon({name: f.name}) + '"></span>'
+                + '<td><span class="transfer-filetype-icon ' + fileIcon({name: f.name}) + '"></span>'
                 + '<span class="tranfer-filetype-txt">' + htmlentities(f.name) + '</span></td>'
                 + '<td>' + filetype(f.name) + '</td>'
                 + '<td>' + bytesToSize(filesize) + '</td>'
@@ -5916,6 +5970,7 @@ function MegaData()
             ul_queue.push(f);
             ttl.left--;
             added++;
+            mega.ui.tpp.setTotal(1, 'ul');
 
             if (uldl_hold) {
                 fm_tfspause('ul_' + ul_id);
@@ -5938,7 +5993,7 @@ function MegaData()
         }
         else {
             showTransferToast('u', added);
-            openTransferpanel();
+            openTransfersPanel();
             delay('fm_tfsupdate', fm_tfsupdate); // this will call $.transferHeader()
         }
 
@@ -5950,8 +6005,7 @@ function MegaData()
         }
     }
 
-    this.ulprogress = function(ul, perc, bl, bt, bps)
-    {
+    this.ulprogress = function(ul, perc, bl, bt, bps) {
         var id  = ul.id;
         var $tr = $('#ul_' + id);
         if (!$tr.hasClass('transfer-started')) {
@@ -5961,8 +6015,9 @@ function MegaData()
             $('.transfer-table').prepend($tr);
             delay('fm_tfsupdate', fm_tfsupdate); // this will call $.transferHeader()
         }
-        if (!bl || !ul.starttime)
+        if (!bl || !ul.starttime) {
             return false;
+        }
         var retime = bps > 1000 ? (bt - bl) / bps : -1;
         var transferDeg = 0;
         if (!$.transferprogress)
@@ -5990,10 +6045,12 @@ function MegaData()
             } else {
                 $tr.find('.speed').addClass('unknown').text('');
             }
-            // $.transferHeader();
 
-            if (page.substr(0, 2) !== 'fm')
-            {
+            mega.ui.tpp.setTransfered(id, bl, 'ul');
+            mega.ui.tpp.updateBlock('ul');
+            delay('percent_megatitle', percent_megatitle, 50);
+
+            if (page.substr(0, 2) !== 'fm') {
                 $('.widget-block').removeClass('hidden');
                 $('.widget-block').show();
                 $('.widget-circle').attr('class', 'widget-circle percents-' + perc);
@@ -6002,7 +6059,7 @@ function MegaData()
                 $('.widget-block').addClass('active');
             }
         }
-        delay('percent_megatitle', percent_megatitle);
+
     }
 
     this.ulcomplete = function(ul, h, k)
@@ -6092,8 +6149,7 @@ function MegaData()
         });
     }
 
-    this.ulstart = function(ul)
-    {
+    this.ulstart = function(ul) {
         var id = ul.id;
 
         if (d) {
@@ -6104,9 +6160,13 @@ function MegaData()
             .addClass('transfer-initiliazing')
             .find('.transfer-status').text(l[1042]);
 
-        delay('fm_tfsupdate', fm_tfsupdate); // this will call $.transferHeader()
         ul.starttime = new Date().getTime();
+        fm_tfsupdate();// this will call $.transferHeader()
         M.ulprogress(ul, 0, 0, 0);
+        if (mega.ui.tpp.getTime('ul') === 0) {
+            mega.ui.tpp.setTime(NOW(), 'ul');
+        }
+        mega.ui.tpp.start(ul, 'ul');
     };
 
     this.cloneChatNode = function(n, keepParent) {
@@ -7241,6 +7301,10 @@ function execsc() {
                             M.addNode(scnodes[i]);
                         }
                     }
+
+                    if (!pfid && u_type) {
+                        mega.checkStorageQuota();
+                    }
                     break;
 
                 case 'u':
@@ -7352,9 +7416,14 @@ function execsc() {
                     // node deletion
                     M.delNode(a.n);
 
-                    // Only show a notification if we did not trigger the action ourselves
-                    if (!pfid && u_attr && a.ou !== u_attr.u) {
-                        notify.notifyFromActionPacket(a);
+                    if (!pfid) {
+                        // Only show a notification if we did not trigger the action ourselves
+                        if (u_attr && a.ou !== u_attr.u) {
+                            notify.notifyFromActionPacket(a);
+                        }
+                        if (u_type) {
+                            mega.checkStorageQuota();
+                        }
                     }
                     break;
 
@@ -9386,6 +9455,11 @@ function loadfm_done(mDBload) {
 
                 // load report - time to fm after last byte received
                 mega.loadReport.ttfm = Date.now() - mega.loadReport.ttfm;
+                
+                // setup fm-notifications such as 'full' or 'almost-full' if needed.
+                if (!pfid && u_type) {
+                    mega.checkStorageQuota(50);
+                }
             }
             else {
                 mega.loadReport.ttfm = -1;
@@ -9455,383 +9529,6 @@ function fm_requestfolderid(h, name, ulparams)
     return createFolder(h, name, ulparams);
 }
 
-var isNativeObject = function(obj) {
-    var objConstructorText = obj.constructor.toString();
-    return objConstructorText.indexOf("[native code]") !== -1 && objConstructorText.indexOf("Object()") === -1;
-};
-
-function clone(obj)
-{
-
-    if (null == obj || "object" != typeof obj)
-        return obj;
-    if (obj instanceof Date)
-    {
-        var copy = new Date();
-        copy.setTime(obj.getTime());
-        return copy;
-    }
-    if (obj instanceof Array)
-    {
-
-        var copy = [];
-        for (var i = 0, len = obj.length; i < len; i++) {
-            copy[i] = clone(obj[i]);
-        }
-        return copy;
-    }
-    if (obj instanceof Object)
-    {
-        var copy = {};
-        for (var attr in obj)
-        {
-            if (obj.hasOwnProperty(attr)) {
-                if (!(obj[attr] instanceof Object)) {
-                    copy[attr] = obj[attr];
-                }
-                else if (obj[attr] instanceof Array) {
-                    copy[attr] = clone(obj[attr]);
-                }
-                else if (!isNativeObject(obj[attr])) {
-                    copy[attr] = clone(obj[attr]);
-                }
-                else if ($.isFunction(obj[attr])) {
-                    copy[attr] = obj[attr];
-                }
-                else {
-                    copy[attr] = {};
-                }
-            }
-        }
-
-        return copy;
-    }
-}
-
-function balance2pro(callback)
-{
-    api_req({a: 'uq', pro: 1},
-    {
-        cb: callback,
-        callback: function(res, ctx)
-        {
-            if (typeof res == 'object' && res['balance'] && res['balance'][0])
-            {
-                var pjson = JSON.parse(pro_json);
-
-                for (var i in pjson[0])
-                {
-                    if (pjson[0][i][5] == res['balance'][0][0])
-                    {
-                        api_req({a: 'uts', it: 0, si: pjson[0][i][0], p: pjson[0][i][5], c: pjson[0][i][6]},
-                        {
-                            cb: ctx.cb,
-                            callback: function(res, ctx)
-                            {
-                                if (typeof res == 'number' && res < 0 && ctx.cb)
-                                    ctx.cb(false);
-                                else
-                                {
-                                    api_req({a: 'utc', s: [res], m: 0},
-                                    {
-                                        cb: ctx.cb,
-                                        callback: function(res, ctx)
-                                        {
-                                            if (ctx.cb)
-                                                ctx.cb(true);
-                                            u_checklogin({checkloginresult: function(u_ctx, r)
-                                                {
-                                                    if (M.account)
-                                                        M.account.lastupdate = 0;
-                                                    u_type = r;
-                                                    topmenuUI();
-                                                    if (u_attr.p)
-                                                        msgDialog('info', l[1047], l[1048]);
-                                                }});
-                                        }
-                                    });
-                                }
-                            }
-                        });
-                    }
-                }
-            }
-        }
-    });
-}
-
-// MEGA Achievements
-Object.defineProperty(mega, 'achievem', {
-    value: Object.create(null, {
-        RWDLVL: { value: 0 },
-
-        toString: {
-            value: function toString(ach) {
-                if (ach !== undefined) {
-                    var res = Object.keys(this)
-                        .filter(function(v) {
-                            return this[v] === ach;
-                        }.bind(this));
-
-                    return String(res);
-                }
-
-                return '[object MegaAchievements]';
-            }
-        },
-
-        bind: {
-            value: function bind(action) {
-                this.rebind('click', function() {
-                    if (action) {
-                        switch (action[0]) {
-                            case '/':
-                                loadSubPage(action);
-                                break;
-
-                            case '~':
-                                var fn = action.substr(1);
-                                if (typeof window[fn] === 'function') {
-                                    if (fn.toLowerCase().indexOf('dialog') > 0) {
-                                        closeDialog();
-                                    }
-                                    window[fn]();
-                                }
-                                break;
-                        }
-                    }
-                    return false;
-                });
-            }
-        },
-
-        prettify: {
-            value: function prettify(maf) {
-                var data  = Object(clone(maf.u));
-                var quota = {
-                    storage: {base: 0, current: 0, max: 0},
-                    transfer: {base: 0, current: 0, max: 0}
-                };
-
-                var setExpiry = function(data, out) {
-                    var time = String(data[2]).split('');
-                    var unit = time.pop();
-                    time = time.join('') | 0;
-
-                    if (time === 1 && unit === 'y') {
-                        time = 12;
-                        unit = 'm';
-                    }
-
-                    var result = {
-                        unit: unit,
-                        value: time
-                    };
-
-                    switch (unit) {
-                        case 'd': result.utxt = (time < 2) ? l[930]   : l[16290];  break;
-                        case 'w': result.utxt = (time < 2) ? l[16292] : l[16293];  break;
-                        case 'm': result.utxt = (time < 2) ? l[913]   : l[6788];   break;
-                        case 'y': result.utxt = (time < 2) ? l[932]   : l[16294];  break;
-                    }
-
-                    out = out || data;
-                    out.expiry = result;
-                    return result;
-                };
-
-                Object.keys(data)
-                    .forEach(function(k) {
-                        setExpiry(data[k]);
-                    });
-
-                var mafr = Object(maf.r);
-                var mafa = Object(maf.a);
-                var alen = mafa.length;
-                while (alen--) {
-                    var ach = clone(mafa[alen]);
-
-                    if (!data[ach.a]) {
-                        data[ach.a] = Object(clone(mafr[ach.r]));
-                        setExpiry(data[ach.a]);
-                    }
-                    var exp = setExpiry(mafr[ach.r] || data[ach.a], ach);
-                    var ts = ach.ts * 1000;
-
-                    ach.date = new Date(ts);
-                    ach.left = Math.round((ach.e * 1000 - Date.now()) / 86400000);
-
-                    if (data[ach.a].rwds) {
-                        data[ach.a].rwds.push(ach);
-                    }
-                    else if (data[ach.a].rwd) {
-                        data[ach.a].rwds = [data[ach.a].rwd, ach];
-                    }
-                    else {
-                        data[ach.a].rwd = ach;
-                    }
-                }
-
-                Object.keys(data)
-                    .forEach(function(k) {
-                        var ach          = data[k];
-                        var base         = Object(ach.rwds).length || 1;
-                        var storageValue = ach[0] * base;
-
-                        if (ach.rwd) {
-                            quota.storage.current += storageValue;
-                        }
-                        quota.storage.max += storageValue;
-
-                        if (ach[1]) {
-                            var transferValue = ach[1] * base;
-
-                            if (ach.rwd) {
-                                quota.transfer.current += transferValue;
-                            }
-                            quota.transfer.max += transferValue;
-                        }
-                    });
-
-                if (Object(u_attr).p) {
-                    quota.storage.base  = Object(M.account).space;
-                    quota.transfer.base = Object(M.account).bw;
-                }
-                else {
-                    quota.storage.base = maf.s;
-                }
-
-                data = Object.create(quota, Object.getOwnPropertyDescriptors(data));
-
-                return data;
-            }
-        }
-    })
-});
-
-(function(o) {
-    var map = {
-        /*  1 */ 'WELCOME':     'ach-create-account:/register',
-        /*  2 */ 'TOUR':        'ach-take-tour',
-        /*  3 */ 'INVITE':      'ach-invite-friend:~inviteFriendDialog',
-        /*  4 */ 'SYNCINSTALL': 'ach-install-megasync:/sync',
-        /*  5 */ 'APPINSTALL':  'ach-install-mobile-app:/mobile',
-        /*  6 */ 'VERIFYE164':  'ach-verify-number',
-        /*  7 */ 'GROUPCHAT':   'ach-group-chat:/fm/chat',
-        /*  8 */ 'FOLDERSHARE': 'ach-share-folder:/fm/contacts'
-    };
-    var mapToAction = Object.create(null);
-    var mapToElement = Object.create(null);
-
-    Object.keys(map).forEach(function(k, idx) {
-        Object.defineProperty(o, 'ACH_' + k, {
-            value: idx + 1,
-            enumerable: true
-        });
-
-        var tmp = map[k].split(':');
-        mapToAction[idx + 1] = tmp[1];
-        mapToElement[idx + 1] = tmp[0];
-    });
-
-    Object.defineProperty(o, 'mapToAction', {
-        value: Object.freeze(mapToAction)
-    });
-    Object.defineProperty(o, 'mapToElement', {
-        value: Object.freeze(mapToElement)
-    });
-
-    Object.freeze(o);
-})(mega.achievem);
-
-// Account Notifications (preferences)
-(function(map) {
-    var _enum = [];
-    var _tag = 'ACCNOTIF_';
-
-    Object.keys(map)
-        .forEach(function(k) {
-            map[k] = map[k].map(function(m) {
-                return k.toUpperCase() + '_' + m.toUpperCase();
-            });
-
-            var rsv = 0;
-            var memb = clone(map[k]);
-
-            while (memb.length < 10) {
-                memb.push(k.toUpperCase() + '_RSV' + (++rsv));
-            }
-
-            if (memb.length > 10) {
-                throw new Error('Stack overflow..');
-            }
-
-            _enum = _enum.concat(memb);
-        });
-
-    makeEnum(_enum, _tag, mega);
-
-    Object.defineProperty(mega, 'notif', {
-        value: Object.freeze((function(flags) {
-            function check(flag, tag) {
-                if (typeof flag === 'string') {
-                    if (tag !== undefined) {
-                        flag = tag + '_' + flag;
-                    }
-                    flag = String(flag).toUpperCase();
-                    flag = mega[flag] || mega[_tag + flag] || 0;
-                }
-                return flag;
-            }
-            return {
-                get flags() {
-                    return flags;
-                },
-
-                setup: function setup(oldFlags) {
-                    if (oldFlags === undefined) {
-                        // Initialize account notifications to defaults (all enabled)
-                        assert(!fmconfig.anf, 'Account notification flags already set');
-
-                        Object.keys(map)
-                            .forEach(function(k) {
-                                var grp = map[k];
-                                var len = grp.length;
-
-                                while (len--) {
-                                    this.set(grp[len]);
-                                }
-                            }.bind(this));
-                    }
-                    else {
-                        flags = oldFlags;
-                    }
-                },
-
-                has: function has(flag, tag) {
-                    return flags & check(flag, tag);
-                },
-
-                set: function set(flag, tag) {
-                    flags |= check(flag, tag);
-                    mega.config.set('anf', flags);
-                },
-
-                unset: function unset(flag, tag) {
-                    flags &= ~check(flag, tag);
-                    mega.config.set('anf', flags);
-                }
-            };
-        })(0))
-    });
-
-    _enum = undefined;
-
-})({
-    chat: ['ENABLED'],
-    cloud: ['ENABLED', 'NEWSHARE', 'DELSHARE', 'NEWFILES'],
-    contacts: ['ENABLED', 'FCRIN', 'FCRACPT', 'FCRDEL']
-});
 
 // jscs:disable
 // jshint ignore:start

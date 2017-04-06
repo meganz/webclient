@@ -112,10 +112,10 @@
     margin: 0 0 11px 0;
     padding: 22px 0 0 2px;
     overflow: hidden;
-    position:relative;
+    position: relative;
 }
 .fm-dialog .breadcrumbs-wrapper {
-    position:absolute;
+    position: absolute;
 }
 .fm-dialog-table.grid-table tr:nth-child(odd) td {
     background-color: rgba(255,255,255,1);
@@ -190,28 +190,34 @@
 
 /* Limited available bandwidth dialog */
 .fm-dialog.limited-bandwidth-dialog {
-    min-width: 484px;
-    margin: -196px 0 0 -242px;
+    min-width: 604px;
+    margin: -222px 0 0 -302px;
+}
+.limited-bandwidth-dialog .registered, .limited-bandwidth-dialog.registered .not-registered, .limited-bandwidth-dialog .dialog.big-buttons-block .get-more-bonuses {
+    display: none;
+}
+.limited-bandwidth-dialog.registered .registered {
+    display: block;
+}
+.limited-bandwidth-dialog.achievements .dialog.big-buttons-block .get-more-bonuses {
+    display: inline-block;
 }
 .dialog-top-icon {
-    margin: 34px 0 17px 0;
+    margin: 26px 0 17px 0;
 }
-.dialog.header-after-icon {
+.dialog.header-before-icon {
     font-size: 20px;
     line-height: 25px;
     color: #666666;
-    font-family: 'source_sans_prolight';
-    padding: 15px 0 8px 0;
+    padding: 12px 0 8px 0;
 }
 .dialog.p-after-icon {
     font-size: 14px;
-    line-height: 18px;
+    line-height: 24px;
     color: #666666;
-    padding: 15px 0 0 0;
-    margin: 0 0 0 0;
-}
-.dialog.p-after-icon span {
-    color: #FF333A;
+    padding: 5px 0 0 0;
+    margin: 0 auto;
+    max-width: 504px;
 }
 .dialog.big-buttons-block {
     font-size: 0;
@@ -223,9 +229,189 @@
     margin: 0 6px;
 }
 .fm-dialog-body .centered-checkbox {
-    padding: 0 0 10px 0;
+    padding: 2px 0 10px 0;
+}
+.dialog.bottom-tips {
+    font-size: 12px;
+    line-height: 15px;
+    color: #999999;
+    text-align: center;
+    padding: 0 0 0 0;
+}
+.dialog.bottom-tips span {
+    display: block;
+    padding: 2px 0 5px 0;
+}
+.dialog.bottom-tips a {
+    color: #FF333A;
+    cursor: pointer;
+    display: inline-block;
+    margin-bottom: 12px;
 }
 /* End of Limited available bandwidth dialog */
+
+/* Transfer quota exceeded dialog */
+.fm-dialog.limited-bandwidth-dialog.exceeded:not(.achievements):not(.pro) {
+    min-width: 964px;
+    margin: -326px 0 0 -482px;
+}
+.fm-dialog.limited-bandwidth-dialog.exceeded.pro.slider {
+    margin-top: -282px;
+}
+.limited-bandwidth-dialog .plan-blocks, .exceeded:not(.achievements):not(.pro) .limited-bl, .big-104px-icon.full, .exceeded .big-104px-icon.almost-full, .dialog.header-before-icon.exceeded, .exceeded .dialog.header-before-icon.limited, .limited-bandwidth-dialog .fm-dialog-close, .default-big-button.upgrade.pro, .exceeded.pro .default-big-button.upgrade, .exceeded.pro .default-big-button.continue, .exceeded.pro .dialog.p-after-icon, .dialog.pro-exceeded-bl, .dialog.ransfer-slider, .dialog.pro-exceeded-slider {
+    display: none;
+}
+.exceeded:not(.achievements):not(.pro) .plan-blocks, .exceeded .dialog.header-before-icon.exceeded, .exceeded:not(.achievements):not(.pro) .fm-dialog-close, .pro.exceeded .dialog.pro-exceeded-bl, .slider .dialog.pro-exceeded-slider {
+    display: block;
+}
+.exceeded:not(.pro) .big-104px-icon.full, .exceeded:not(.achievements):not(.pro) .dialog.bottom-tips span, .exceeded.pro .default-big-button.upgrade.pro {
+    display: inline-block;
+}
+.dialog.transfer-overquota-txt {
+    font-size: 14px;
+    line-height: 25px;
+    color: #666666;
+    padding: 17px 0 22px 0;
+}
+.dialog.transfer-overquota-txt span {
+    font-size: 20px;
+    color: #333333;
+    border-bottom: 2px solid #FF333A;
+    padding: 0 2px;
+}
+.dialog.transfer-overquota-txt span.countdown {
+    margin: 0 5px;
+}
+.dialog.transfer-overquota-txt span span {
+    color: #777777;
+    border: 0;
+}
+.exceeded:not(.achievements):not(.pro) .dialog.p-after-icon {
+    max-width: none;
+}
+.dialog.transfer-plans {
+    padding: 16px 0 0 0;
+}
+.fm-dialog .reg-st3-bott-title {
+    font-size: 16px;
+    padding: 16px 10px;
+}
+.fm-dialog .reg-st3-bott-title.price {
+    font-size: 40px;
+    line-height: 40px;
+    padding-top: 14px;
+}
+.fm-dialog .reg-st3-bott-title span.small {
+    font-size: 32px;
+}
+.fm-dialog .reg-st3-bott-title span.period {
+    margin-top: -1px;
+}
+.fm-dialog .reg-st3-storage, .fm-dialog .reg-st3-bandwidth {
+    padding: 20px 24px 0 24px;
+}
+.fm-dialog .reg-st3-mid-txt {
+    line-height: 17px;
+}
+.fm-dialog .reg-st3-bandwidth {
+    padding-bottom: 17px;
+}
+.dialog.pro-exceeded-txt {
+    font-size: 14px;
+    line-height: 24px;
+    color: #666666;
+    padding: 0 0 6px 0;
+}
+.fm-dialog .dialog.pro-exceeded-txt {
+    display: inline-block;
+    max-width: 504px;
+}
+.limited-bandwidth-dialog .account.chart-block, .storage-dialog .account.chart-block {
+    display: inline-block;
+    margin: 11px 0 20px 0;
+    padding: 18px 0 0 0;
+    text-align: left;
+    font-size: 16px;
+}
+.storage-dialog .account.chart-block {
+    margin: 16px 0 33px 0;
+}
+.exceeded.pro .dialog.big-buttons-block {
+    display: inline-block;
+    margin: 2px 0 10px 0;
+    padding: 16px 0 0 0;
+    text-align: left;
+}
+.exceeded.pro.slider .dialog.big-buttons-block {
+    margin: 2px 0 1px 0;
+}
+.exceeded.pro .dialog.bottom-tips a {
+    margin-bottom: 8px;
+}
+.exceeded.pro .bandwidth .chart.data .perc-txt::before {
+    display: none;
+}
+.exceeded.pro .chart.progressbars span {
+    transform: rotate(180deg) !important;
+}
+.exceeded.pro .chart.progressbars span::before {
+    background-color: #D90007;
+}
+.fm-dialog.limited-bandwidth-dialog.pro.exceeded {
+    margin-top: -210px;
+}
+.dialog-slider-txt {
+    text-align: center;
+    font-size: 20px;
+    line-height: 25px;
+    margin: 22px auto 0 auto;
+    max-width: 504px;
+    position: relative;
+}
+.dialog-slider-txt::before {
+    content: '';
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 1px;
+    background-color: rgba(0,0,0,0.1);
+    top: 13px;
+    left: 0;
+}
+.dialog.pro-slider-description {
+    font-size: 14px;
+    line-height: 18px;
+    color: #666666;
+    padding: 13px 0 0 0;
+    display: inline-block;
+    max-width: 504px;
+}
+.fm-dialog .bandwith-settings .slider.numbers.val2 {
+    margin-left: 359px;
+}
+.fm-dialog .bandwith-settings {
+    width: 504px;
+    margin: 0 auto 0 auto;
+}
+.fm-dialog .ui-slider.ui-widget-content {
+    width: 504px;
+    margin: 15px auto 0 auto;
+}
+.dialog-slider-txt span {
+    padding: 0 15px;
+    background-color: white;
+    position: relative;
+    font-size: 20px;
+    line-height: 25px;
+    color: #666666;
+}
+.fm-dialog.exceeded.pro.slider .radio-txt {
+    padding-top: 8px;
+}
+.fm-dialog.exceeded.pro.slider .checkboxOff, .fm-dialog.exceeded.pro.slider .checkboxOn {
+    margin-top: 10px;
+}
+/* End of Transfer quota exceeded dialog */
 
 /* Achievement dialog */
 .fm-dialog.achievement-dialog {
@@ -252,13 +438,26 @@
     display: table-cell;
     width: 544px;
 }
+.achievement-dialog ol {
+    padding: 3px 0 5px 13px;
+    margin: 0;
+}
+.achievement-dialog ol li {
+    font-size: 14px;
+    line-height: 18px;
+    color: #666666;
+    padding: 2px 0;
+    white-space: normal;
+    display: list-item;
+    list-style: decimal;
+}
 .achievement-dialog.header span {
     color: #FF333A;
     border-bottom: 2px solid #FF333A;
 }
 .achievement-dialog.reward {
     display: inline-block;
-    position:relative;
+    position: relative;
     margin: 15px 21px 0 21px;
     text-align: left;
 }
@@ -300,14 +499,14 @@
     line-height: 18px;
     color: #333333;
     padding: 15px 0 24px 0;
+    cursor: default;
 }
 .achievement-dialog.expires-txt.red {
     color: #FF333A;
 }
-.achievement-dialog .default-white-button {
+.achievement-dialog .default-grey-button {
     display: inline-block;
     margin: 0 10px 0 10px;
-    color: #777777;
     min-width: 102px;
 }
 /* End of Achievement dialog */
@@ -362,7 +561,7 @@
     padding: 0 15px 32px 15px;
 }
 .achievements-scroll {
-    max-height: 666px;
+    max-height: 508px;
     overflow: hidden;
 }
 .achievements-scroll .jspContainer::before {
@@ -374,13 +573,27 @@
     top: 0;
     position: absolute;
     background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2Y3ZjdmNyIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmN2Y3ZjciIHN0b3Atb3BhY2l0eT0iMCIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
-background: -moz-linear-gradient(top, rgba(247,247,247,1) 0%, rgba(247,247,247,0) 100%);
-background: -webkit-linear-gradient(top, rgba(247,247,247,1) 0%,rgba(247,247,247,0) 100%);
-background: linear-gradient(to bottom, rgba(247,247,247,1) 0%,rgba(247,247,247,0) 100%);
+    background: -moz-linear-gradient(top, rgba(247,247,247,1) 0%, rgba(247,247,247,0) 100%);
+    background: -webkit-linear-gradient(top, rgba(247,247,247,1) 0%, rgba(247,247,247,0) 100%);
+    background: linear-gradient(to bottom, rgba(247,247,247,1) 0%, rgba(247,247,247,0) 100%);
     z-index: 10;
 }
-.achievements-list-dialog .acivements-content {
+.achievements-list-dialog .achievements-list {
     padding: 10px 24px 12px 24px;
+}
+.achievements-list-head {
+    font-size: 20px;
+    line-height: 25px;
+    text-align: center;
+    color: #666666;
+    padding: 42px 25px 16px 25px;
+}
+.achievements-list-info {
+    font-size: 16px;
+    line-height: 20px;
+    text-align: center;
+    color: #777777;
+    padding: 0 54px 35px 54px;
 }
 .achievement-full.expires-txt {
     font-size: 14px;
@@ -397,7 +610,7 @@ background: linear-gradient(to bottom, rgba(247,247,247,1) 0%,rgba(247,247,247,0
 }
 .achievement-dialog.right-block .reward i {
     margin: -17px 0 0 0;
-    position:absolute;
+    position: absolute;
     top: 50%;
 }
 .achievement-dialog.right-block .reward-txt {
@@ -416,45 +629,46 @@ background: linear-gradient(to bottom, rgba(247,247,247,1) 0%,rgba(247,247,247,0
     display: inline-block;
     min-width: 126px;
 }
-.achived .achievement-dialog.status-block .button {
+.achieved .achievement-dialog.status-block .button {
     display: none;
 }
-.achievement-dialog.status-txt {
-    font-size: 18px;
-    color: #31B500;
-    line-height: 26px;
-    text-transform: uppercase;
+.achievement-dialog.achieved-icon {
+    font-size: 0;
+    line-height: 0;
     display: none;
 }
-.achived .achievement-dialog.status-txt {
+.achieved .achievement-dialog.achieved-icon {
     display: block;
 }
-.one-reward .achievement-dialog.right-block {
+.one-reward .achievement-dialog.right-block, .achieved .achievement-dialog.right-block {
     vertical-align: middle;
     padding: 0 15px 0 15px;
 }
 .one-reward .achievement-dialog.right-block .reward {
     margin: 0px 0 4px 10px;
 }
-.one-reward .right-block .reward.bandwidth {
+.one-reward .right-block .reward.bandwidth, .achieved .achievement-dialog.right-block .reward {
     display: none;
 }
-.achived .achievement-dialog.right-block .reward {
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
-    -moz-opacity: 0.5;
-    -khtml-opacity: 0.5;
-    opacity: 0.5;
+
+@media only screen and (max-height:  740px) {
+.achievements-scroll {
+    max-height: 448px;
+}
+.fm-dialog.achievements-list-dialog {
+    margin-top: -314px;
+}
 }
 /* End of Achievements list dialog */
 
 /* Invite a friend dialog */
 .fm-dialog.invite-dialog {
     width: 644px;
-    margin: -329px 0 0 -322px;
+    margin: -353px 0 0 -322px;
     background-color: #FAFAFA;
 }
 .fm-dialog.invite-dialog.success {
-    margin: -338px 0 0 -322px;
+    margin: -326px 0 0 -322px;
 }
 .invite-dialog .header {
     margin-top: -5px;
@@ -600,6 +814,7 @@ li.token-input-token-invite .input-close {
 }
 .success .achievement-dialog.success-content {
     display: block;
+    margin-bottom: 31px;
 }
 .invite-dialog.success .default-grey-button.back {
     display: inline-block;
@@ -618,21 +833,21 @@ li.token-input-token-invite .input-close {
 .achievement-dialog.links-block.inputs {
     float: left;
     width: 50%;
-    padding: 14px 0 2px 12px;
+    padding: 14px 0 11px 12px;
 }
 .achievement-dialog.links-block input {
     width: 100%;
     margin-top: 6px;
 }
 .achievement-dialog.links-block .input-field {
-    margin: 16px 0;
+    margin: 16px 0 0 0;
     padding: 0 14px 0 14px;
 }
 .achievement-dialog.links-block .input-label {
-    margin: 16px 0;
-    height: 32px;
+    margin: 24px 0 0px 0;
+    height: 24px;
     font-size: 14px;
-    line-height: 32px;
+    line-height: 16px;
     text-align: right;
     color: #333333;
     font-family: 'source_sans_prosemibold', Arial;
@@ -786,7 +1001,7 @@ li.token-input-token-invite .input-close {
 
 .fm-dialog.create-folder-dialog {
     width: 360px;
-    margin:-67px 0 0 -180px;
+    margin: -67px 0 0 -180px;
 }
 .fm-dialog.chat-rename-dialog {
     left: 50%;
@@ -800,3 +1015,136 @@ li.token-input-token-invite .input-close {
 .chat-rename-dialog .rename-input-bl {
     margin-bottom: 10px;
 }
+/* Storage dialog */
+.fm-dialog.storage-dialog {
+    width: 644px;
+    margin: -270px 0 0 -322px;
+    background-color: #FAFAFA;
+}
+.fm-dialog.storage-dialog.achievements {
+    margin: -307px 0 0 -322px;
+}
+.fm-dialog.storage-dialog.almost-full {
+    margin: -225px 0 0 -322px;
+}
+.fm-dialog.storage-dialog.almost-full.achievements {
+    margin: -235px 0 0 -322px;
+}
+.fm-dialog-body.storage-dialog {
+    padding: 0 48px 19px 48px;
+    text-align: center;
+}
+.storage-dialog.body-header {
+    font-size: 20px;
+    line-height: 25px;
+    color: #666666;
+    max-width: 420px;
+    margin: 0 auto;
+    padding-bottom: 24px;
+}
+.storage-dialog.body-header span, .storage-dialog.body-p span, .storage-dialog.body-p a {
+    font-family: 'source_sans_prosemibold';
+}
+.storage-dialog.body-p {
+    font-size: 16px;
+    line-height: 20px;
+    color: #666666;
+    padding: 0 5px 12px 5px;
+}
+.storage-dialog.body-p a {
+    color: #D90007;
+    cursor: pointer;
+}
+.storage-dialog.body-p.medium {
+    font-size: 14px;
+    line-height: 18px;
+    padding: 2px 0 0 0;
+}
+.storage-dialog.body-p.small {
+    font-size: 12px;
+    line-height: 15px;
+    color: #999999;
+    padding: 12px 0 15px 0;
+}
+.storage-dialog.body-p.small.top-pad {
+    padding: 24px 0 0 0;
+}
+.storage-dialog.divider-txt {
+    padding: 16px 0 13px 0;
+    position: relative;
+    font-size: 16px;
+    line-height: 20px;
+    color: #999999;
+    margin-top: 12px;
+}
+.storage-dialog.divider-txt::before {
+    content: '';
+    position: absolute;
+    height: 1px;
+    background-color: rgba(0,0,0,0.1);
+    left: 0;
+    top: 28px;
+    width: 100%;
+}
+.storage-dialog.divider-txt span {
+    background-color: #FAFAFA;
+    padding: 0 16px;
+    display: inline-block;
+    position: relative;
+}
+.fm-dialog-title.big {
+    font-size: 20px;
+}
+.storage-dialog .huge-icon {
+    margin: 14px;
+}
+.storage-dialog .button.big {
+    padding: 0 20px;
+    min-width: 180px;
+}
+.storage-dialog.achievements-bl, .achievements .storage-dialog.no-achievements-bl {
+    display: none;
+}
+.achievements .storage-dialog.achievements-bl {
+    display: block;
+}
+.storage-dialog.body-p i.rocket {
+    cursor: pointer;
+}
+.storage-dialog.body-p.small a {
+    color: #999999;
+    cursor: pointer;
+    text-decoration: underline;
+    font-family: 'source_sans_proregular', Arial;
+}
+.storage-dialog.body-p.small i {
+    vertical-align: top;
+    display: inline-block;
+    margin: -2px 0 0 0;
+}
+.almost-full .fm-dialog-body.storage-dialog.full, .full .fm-dialog-body.storage-dialog.almost-full {
+    display: none;
+}
+.storage-dialog.buttons-block {
+    padding: 12px 0 0 0;
+    font-size: 0;
+}
+.almost-full .fm-dialog-body.storage-dialog {
+    padding-bottom: 24px;
+}
+.storage-dialog.almost-full .chart.progressbars span::before {
+    background-color: #FFA500;    
+}
+.storage-dialog.almost-full .chart.data .perc-txt {
+    color: #FFA500;    
+}
+.storage-dialog .account.chart.overlay, .storage-dialog .account.chart.body::after {
+    background-color: #FAFAFA;
+}
+.storage-dialog .account.chart.overlay span::after {
+    border-color: #FAFAFA;
+}
+.chart.icon .big-icon.almost-full-storage {
+    margin: -2px;
+}
+/* end of Storage dialog */

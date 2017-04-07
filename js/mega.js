@@ -6941,8 +6941,8 @@ function execsc() {
                         else if (Array.isArray(loadfm.chatmcf)) {
                             loadfm.chatmcf.push(a);
                         }
-                        else if (d) {
-                            console.error('FIXME: unable to parse mcc packet');
+                        else {
+                            srvlog('@lp unable to parse mcc packet');
                         }
                     }
                     if (fmdb) {

@@ -83,6 +83,10 @@ function accountUI() {
         if (tabSection) {
             tabSection = tabSection.replace(/[^\w-]/g, '');
 
+            if (tabSection === 'achievements' && !account.maf) {
+                tabSection = 'general';
+            }
+
             $('.account.tab-content.' + tabSection).removeClass('hidden');
             $('.account.tab-lnk[data-tab="' + tabSection + '"]').addClass('active');
         }

@@ -2096,6 +2096,7 @@ function ephemeralDialog(msg) {
 // FIXME: implement sn tagging to prevent race condition
 function leaveShare(h) {
     var promise = new MegaPromise();
+
     if (d) {
         console.log('leaveShare', h);
     }
@@ -2106,7 +2107,7 @@ function leaveShare(h) {
     }
 
     if (M.d[h] && M.d[h].su) {
-        loadingDialog.show(); // this will be hidden somewhere else after processing the action-packet
+        loadingDialog.show();
 
         var idtag = mRandomToken('ls');
         api_req({a: 'd', n: h, i: idtag});

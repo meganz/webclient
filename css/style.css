@@ -26854,7 +26854,6 @@ table.speed-table {
 .fm-dialog-button.encrypt-link-button {
     display: inline-block;
     float: none;
-    margin-left: -2px;
     margin-top: -2px;
 }
 .fm-dialog-button.encrypt-link-button .encrypt-text.encrypted, .fm-dialog-new-folder-button.decrypt-link-button .decrypt-text.decrypted {

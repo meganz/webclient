@@ -24574,9 +24574,6 @@ body.pro:after {
     -webkit-border-radius: inherit;
     border-radius: inherit;
 }
-.toast-notification.clipboard, .toast-notification.clipboard:hover {
-    background-color: #777;
-}
 .toast-notification.visible {
     margin-bottom: 0;
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);

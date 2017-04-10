@@ -455,7 +455,7 @@
             })
             .bind("keyup keydown blur update", resize_input)
             // Fix of paste issue. These is bug in tokenInut lib.
-            .bind("input", function() {
+            .bind("input.testerresize", function() {
                 $(this).trigger("keydown");
             })
             .keydown(function(event) {

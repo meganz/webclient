@@ -5199,12 +5199,14 @@ function reCalcMenuPosition(m, x, y, ico) {
 
         if (nmH > (maxY - TOP_MARGIN)) {// Handle huge menu
             nmH = maxY - TOP_MARGIN;
-            var tmp = document.getElementById('csb_' + m.attr('id').replace('fi_', ''));
-            $(tmp).addClass('context-scrolling-block');
-            tmp.addEventListener('mousemove', scrollMegaSubMenu);
+            var tmp = document.getElementById('csb_' + String(m.attr('id')).replace('fi_', ''));
+            if (tmp) {
+                $(tmp).addClass('context-scrolling-block');
+                tmp.addEventListener('mousemove', scrollMegaSubMenu);
 
-            n.addClass('mega-height');
-            n.css({'height': nmH + 'px'});
+                n.addClass('mega-height');
+                n.css({'height': nmH + 'px'});
+            }
         }
 
         top = horPos(n);

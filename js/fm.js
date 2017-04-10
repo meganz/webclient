@@ -2882,9 +2882,6 @@ function fmtopUI() {
                 console.log('Inbox');
             }
         }
-        else if (M.currentrootid === 'shares') {
-            $('.fm-right-files-block').addClass('visible-notification');
-        }
         else if (M.currentdirid === 'contacts'
                 || M.currentdirid === 'ipc'
                 || M.currentdirid === 'opc'
@@ -2927,7 +2924,9 @@ function fmtopUI() {
                 $('.fm-file-upload').addClass('last-button');
             }
         }
-
+        else if (M.currentrootid === 'shares') {
+            $('.fm-right-files-block').addClass('visible-notification');
+        }
     }
     $('.fm-clearbin-button').rebind('click', function() {
         doClearbin(false);

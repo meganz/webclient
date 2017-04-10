@@ -4027,10 +4027,8 @@ React.makeElement = React['createElement'];
 
 	        var startAudioCallButton = React.makeElement(
 	            "div",
-	            { className: "link-button" + (!contact.presence ? " disabled" : ""), onClick: function onClick() {
-	                    if (contact.presence && contact.presence !== "offline") {
-	                        room.startAudioCall();
-	                    }
+	            { className: "link-button", onClick: function onClick() {
+	                    room.startAudioCall();
 	                } },
 	            React.makeElement("i", { className: "small-icon audio-call" }),
 	            __(l[5896])
@@ -4038,10 +4036,8 @@ React.makeElement = React['createElement'];
 
 	        var startVideoCallButton = React.makeElement(
 	            "div",
-	            { className: "link-button" + (!contact.presence ? " disabled" : ""), onClick: function onClick() {
-	                    if (contact.presence && contact.presence !== "offline") {
-	                        room.startVideoCall();
-	                    }
+	            { className: "link-button", onClick: function onClick() {
+	                    room.startVideoCall();
 	                } },
 	            React.makeElement("i", { className: "small-icon video-call" }),
 	            __(l[5897])

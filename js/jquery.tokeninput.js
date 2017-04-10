@@ -454,6 +454,10 @@
                 $('.multiple-input *').removeClass('red');
             })
             .bind("keyup keydown blur update", resize_input)
+            // Fix of paste issue. These is bug in tokenInut lib.
+            .bind("input", function() {
+                $(this).trigger("keydown");
+            })
             .keydown(function(event) {
 
                 var previous_token,

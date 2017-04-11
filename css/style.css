@@ -24574,9 +24574,6 @@ body.pro:after {
     -webkit-border-radius: inherit;
     border-radius: inherit;
 }
-.toast-notification.clipboard, .toast-notification.clipboard:hover {
-    background-color: #777;
-}
 .toast-notification.visible {
     margin-bottom: 0;
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
@@ -26857,7 +26854,6 @@ table.speed-table {
 .fm-dialog-button.encrypt-link-button {
     display: inline-block;
     float: none;
-    margin-left: -2px;
     margin-top: -2px;
 }
 .fm-dialog-button.encrypt-link-button .encrypt-text.encrypted, .fm-dialog-new-folder-button.decrypt-link-button .decrypt-text.decrypted {

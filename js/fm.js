@@ -8074,6 +8074,7 @@ function createFolderDialog(close)
             createFolder($.cftarget, v);
             createFolderDialog(1);
         }
+        $('.create-folder-dialog input').val('');
     });
 
     fm_showoverlay();

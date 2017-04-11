@@ -86,6 +86,7 @@
             soundLoop: false,
             soundVolume: null,
             icon: null,
+            anfFlag: false,
             params: {}
         },
         textMessages: {
@@ -95,7 +96,8 @@
         soundsPreload: true,
         soundsVolume: 1,
         showFaviconCounter: true,
-        desktopNotifications: true
+        desktopNotifications: true,
+        anfFlag: false
     };
 
     /**
@@ -253,17 +255,21 @@
         }
 
         if (unread === true || self.options.alwaysPlaySound === true) {
-            if (self.options.sound) {
-                ion.sound.stop(self.options.sound);
-                ion.sound.play(self.options.sound, {
-                    loop: self.options.soundLoop,
-                    volume: self.options.soundVolume !== null ? self.options.soundVolume : self.megaNotifications.options.soundsVolume
-                });
+            if (self.options.anfFlag && mega.notif.has(self.options.anfFlag) !== 0) {
+                if (self.options.sound) {
+                    ion.sound.stop(self.options.sound);
+                    ion.sound.play(self.options.sound, {
+                        loop: self.options.soundLoop,
+                        volume: self.options.soundVolume !== null ? self.options.soundVolume : self.megaNotifications.options.soundsVolume
+                    });
+                }
             }
         }
 
         if (unread === true) {
-            self._showDesktopNotification();
+            if (self.options.anfFlag && mega.notif.has(self.options.anfFlag) !== 0) {
+                self._showDesktopNotification();
+            }
         }
 
         self.megaNotifications.trigger('onAfterNotificationCreated', self);
@@ -336,6 +342,10 @@
                 var title = $.isFunction(textMessage.title) ? textMessage.title(self, params) : textMessage.title;
                 var body = $.isFunction(textMessage.body) ? textMessage.body(self, params) : textMessage.body;
                 var icon = $.isFunction(textMessage.icon) ? textMessage.icon(self, params) : textMessage.icon;
+
+                if (icon === null) {
+                    icon = undefined;
+                }
 
                 self._desktopNotification = new Notification(title, {
                     body: body,

@@ -1,342 +1,165 @@
 /**
  * IndexedDB Key/Value Storage
- *
- * @param name {String} this should be a unique name of the db table to be used for the storage (IndexedDBKVStorage
- * will automatically add the u_handle as a suffix, so no need to add that when passing the argument here)
- *
- * @constructor
  */
-var IndexedDBKVStorage = function(name, dbOpts) {
-    var self = this;
-    self.name = name;
-    self.db = null;
-    self.dbName = null;
-    self.logger = new MegaLogger("IDBKVStorage[" + name + "]");
-    self._memCache = {};
-    self.dbOpts = dbOpts;
+
+// (the name must exist in the FMDB schema with index 'k')
+var IndexedDBKVStorage = function(name) {
+    this.name = name;
+    this.logger = new MegaLogger("IDBKVStorage[" + name + "]");
+    this.destroy();
 };
 
+// sets fmdb reference and prefills the memory cache from the DB
+// (call this ONCE as soon as the user-specific IndexedDB is open)
+// (this is robust against an undefined fmdb reference)
+IndexedDBKVStorage.prototype.prefillMemCache = function(fmdb) {
+    var self = this;
+    this.fmdb = fmdb;
 
-/**
- * Internal wrapper/decorator that guarantees that the DB would be available and ready before the `fn` is executed.
- * Uses MegaPromise to always return a proxy promise and while the db is connecting (if that is the case) it will
- * wait and THEN execute the `fn` and link the result (resolve/reject) to the returned proxy promise.
- *
- * @param fn {Function} The function to be executed WHEN the DB is ready. Must return a promise.
- * @returns {MegaPromise}
- * @private
- */
+    var promise = new MegaPromise();
 
-IndexedDBKVStorage._requiresDbConn = function __IDBKVRequiresDBConnWrapper(fn) {
-    return function __requiresDBConnWrapper() {
-        var self = this;
-        var args = arguments;
-        var promise = new MegaPromise();
+    if (fmdb) {
+        fmdb.get(this.name, function(r){
+            for (var i = r.length; i--; ) {
+                self.dbcache[r[i].k] = r[i].v;
+            }
 
-        if (!u_handle) {
-            promise.reject();
+            promise.resolve();
+        });
+    }
+    else promise.resolve();
+
+    return promise;
+};
+
+// flush new items / deletions to the DB (in channel 0, this should
+// be followed by call to setsn())
+// will be a no-op if no fmdb set
+IndexedDBKVStorage.prototype.flush = function() {
+    if (this.fmdb) {
+        for (var k in this.delcache) {
+            this.fmdb.del(this.name, k);
+            delete this.dbcache[k];
+        }
+        this.delcache = Object.create(null);
+
+        for (var k in this.newcache) {
+            this.fmdb.add(this.name, { k : k, d : { v : this.newcache[k] }});
+            this.dbcache[k] = this.newcache[k];
+        }
+        this.newcache = Object.create(null);
+    }
+};
+
+// set item in DB/cache
+// (must only be called in response to an API response triggered by an actionpacket)
+// FIXME: convert to synchronous operation
+IndexedDBKVStorage.prototype.setItem = function __IDBKVSetItem(k, v) {
+    var promise = new MegaPromise();
+
+    delete this.delcache[k];
+    this.newcache[k] = v;
+
+    promise.resolve([k, v]);
+
+    return promise;
+};
+
+// get item - if not found, promise will be rejected
+// FIXME: convert to synchronous operation
+IndexedDBKVStorage.prototype.getItem = function __IDBKVGetItem(k) {
+    var promise = new MegaPromise();
+
+    if (!this.delcache[k]) {
+        if (typeof(this.newcache[k]) != 'undefined') {
+            // record recently (over)written
+            promise.resolve(this.newcache[k]);
             return promise;
         }
-
-        if (self.dbName !== self.name + "_" + u_handle) {
-            if (self.db && self.db.dbState === MegaDB.DB_STATE.INITIALIZED) {
-                self.db.close();
-            }
-            self.db = new MegaDB(
-                self.name,
-                u_handle,
-                {
-                    kv: {
-                        key: { keyPath: "k"   },
-                        indexes: {
-                            k: { unique: true }
-                        }
-                    }
-                },
-                $.extend(
-                    {},
-                    {
-                        plugins: MegaDB.DB_PLUGIN.ENCRYPTION
-                    },
-                    self.dbOpts
-                )
-            );
-            self.dbName = self.name + "_" + u_handle;
-
-            self.db.one('onDbStateReady', function __onDbStateReady() {
-                self._prefillMemCache()
-                    .always(function() {
-                        promise.linkDoneAndFailTo(
-                            fn.apply(self, args)
-                        );
-                    });
-            });
-            self.db.one('onDbStateFailed', function __onDbStateFailed() {
-                self.logger.error("Failed to init IndexedDBKVStorage because of indexedDB init fail.");
-                promise.reject();
-            });
-        }
         else {
-            if (!self.db || self.db.dbState === MegaDB.DB_STATE.CLOSED) {
-                promise.reject(ENOENT);
+            // record available in DB
+            if (typeof(this.dbcache[k]) != 'undefined') {
+                promise.resolve(this.dbcache[k]);
+                return promise;
             }
-            else if (self.db.dbState === MegaDB.DB_STATE.INITIALIZED) {
-                self._prefillMemCache()
-                    .always(function() {
-                        promise.linkDoneAndFailTo(
-                            fn.apply(self, args)
-                        );
-                    });
-            }
-            else if (self.db.dbState === MegaDB.DB_STATE.FAILED_TO_INITIALIZE) {
-                // Most likely, Firefox in incognito mode.
-                promise.reject(EACCESS);
-            }
-            else {
-                // If it's OPENING state, wait for either success or failure
-                self.db.one('onDbStateReady', function __onDbStateReady() {
-                    self._prefillMemCache()
-                        .always(function() {
-                            promise.linkDoneAndFailTo(
-                                fn.apply(self, args)
-                            );
-                        });
-                });
-                self.db.one('onDbStateFailed', function __onDbStateFailed() {
-                    self.logger.error("Failed to init IndexedDBKVStorage because of indexedDB init fail.");
-                    promise.reject(EFAILED);
-                });
-            }
-
         }
+    }
 
-        return promise;
-    };
+    // record deleted or unavailable
+    promise.reject();
+    return promise;
 };
 
-/**
- * This function would be called after the db is connected and would prefill the ._memCache with all values, to save
- * some CPU cycles from indexedDB lookups later.
- *
- * @private
- */
-IndexedDBKVStorage.prototype._prefillMemCache = function() {
-    var self = this;
+// check if item exists
+IndexedDBKVStorage.prototype.hasItem = function __IDBKVHasItem(k) {
+    var promise = new MegaPromise();
 
-    // already filled.
-    if (Object.keys(self._memCache).length > 0) {
+    if (!this.delcache[k] && (typeof(this.newcache[k]) != 'undefined' || typeof(this.dbcache[k]) != 'undefined')) {
         return MegaPromise.resolve();
     }
-    if (self._cacheIsBeingPrefilled) {
-        return this._cacheIsBeingPrefilled;
-    }
 
-    var done = false;
-    var masterPromise = this._cacheIsBeingPrefilled = createTimeoutPromise(function() {
-        return done === true;
-    }, 100, 10000);
-
-    self.db
-        .query('kv')
-        .execute()
-        .done(function(r) {
-            if (r && Array.isArray(r)) {
-                r.forEach(function(obj) {
-                    self._memCache[obj.k] = obj.v;
-                });
-                done = true;
-                masterPromise.verify();
-            }
-        });
-
-    masterPromise.always(function() {
-        delete self._cacheIsBeingPrefilled;
-    });
-
-    return masterPromise;
-
+    return MegaPromise.reject();
 };
 
-/**
- * Set item
- *
- * @param k {String} A unique key for this value to be stored by. In case that it already exists in the DB it will be
- * replaced (as you would expect from a k/v storage...)
- * @param v {*} Anything can be stored in the KV storage (note: this value will/should be automatically and
- * transparently encrypted by the MegaDBEncryptionPlugin)
- *
- * @returns {MegaPromise}
- */
-IndexedDBKVStorage.prototype.setItem = IndexedDBKVStorage._requiresDbConn(function __IDBKVSetItem(k, v) {
-    var promise = new MegaPromise();
-
-    this._memCache[k] = v;
-
-    this.db.addOrUpdate(
-        'kv',
-        {
-            'k': k,
-            'v': v
-        }
-    )
-        .done(function __setItemDone() {
-            promise.resolve([k, v]);
-        })
-        .fail(function __setItemFail() {
-            promise.reject([k, v]);
-        });
-
-    return promise;
-});
-
-/**
- * Retrieve item.
- * Note: If the item is NOT found, the returned promise will be rejected.
- *
- * @param k {String} The unique key of the item in the db
- *
- * @returns {MegaPromise}
- */
-IndexedDBKVStorage.prototype.getItem = IndexedDBKVStorage._requiresDbConn(function __IDBKVGetItem(k) {
-    var self = this;
+// remove item from DB/cache
+// (must only be called in response to an API response triggered by an actionpacket)
+// FIXME: convert to synchronous operation
+IndexedDBKVStorage.prototype.removeItem = function __IDBKVRemoveItem(k) {
+    this.delcache[k] = true;
+    delete this.newcache[k];
 
     var promise = new MegaPromise();
-
-    if (typeof(self._memCache[k]) !== 'undefined') {
-        return MegaPromise.resolve(self._memCache[k]);
-    }
-
-    self.db.getByIndex(
-        'kv',
-        k
-    )
-        .done(function __getItemDone(r) {
-            if (typeof r === 'undefined' || r.length === 0) {
-                promise.reject();
-            }
-            else {
-                self._memCache[k] = r.v;
-                promise.resolve(r.v);
-            }
-        })
-        .fail(function __getItemFail() {
-            promise.reject();
-        });
-
+    promise.resolve();
     return promise;
-});
+};
 
-/**
- * Remove item by key
- *
- * @param k {String} The unique key of the item in the db
- *
- * @returns {MegaPromise}
- */
-IndexedDBKVStorage.prototype.removeItem = IndexedDBKVStorage._requiresDbConn(function __IDBKVRemoveItem(k) {
-    if (typeof(this._memCache[k]) !== 'undefined') {
-        delete this._memCache[k];
+// iterate over all items, with prefix
+// FIXME: convert to synchronous operation
+IndexedDBKVStorage.prototype.eachPrefixItem = function __IDBKVEachItem(prefix, cb) {
+    for (var k in this.newcache) {
+        if (!this.delcache[k]) cb(this.newcache[k], k);
     }
 
-    return this.db.remove(
-        'kv',
-        k
-    );
-});
+    for (var k in this.dbcache) {
+        if (!this.delcache[k] && typeof this.newcache[k] == 'undefined') cb(this.dbcache[k], k);
+    }
 
-/**
- * Clear ALL items from the DB
- *
- * @type {MegaPromise}
- */
-IndexedDBKVStorage.prototype.clear = IndexedDBKVStorage._requiresDbConn(function __IDBKVClear() {
-    this._memCache = {};
+    return MegaPromise.resolve();
+};
 
-    return this.db.clear(
-        'kv'
-    );
-});
-
-/**
- * Destroy cache (and drop db)
- *
- * @type {MegaPromise}
- */
+// FIXME: check if this gets called for caches other than the ua attribCache
+// - if that is the case, also clear the underlying DB table
 IndexedDBKVStorage.prototype.destroy = function __IDBKVDestroy() {
-    var self = this;
-    self._memCache = {};
-
-    if (self.db && self.db.dbState !== MegaDB.DB_STATE.CLOSED) {
-        return self.db.drop();
-    }
-
-    return MegaPromise.resolve();
+    this.dbcache = Object.create(null);     // items that reside in the DB
+    this.newcache = Object.create(null);    // new items that are pending flushing to the DB
+    this.delcache = Object.create(null);    // delete items that are pending deletion from the DB
 };
 
 /**
- * Check if item with key `k` exists in the DB.
- * The returned promise will be resolved IF the item exists OR rejected if the item does NOT exist.
- *
- * @param k {String} The unique key of the item in the db
- *
+ * Clear DB contents.
  * @returns {MegaPromise}
  */
-IndexedDBKVStorage.prototype.hasItem = IndexedDBKVStorage._requiresDbConn(function __IDBKVHasItem(k) {
+IndexedDBKVStorage.prototype.clear = function __IDBKVClear() {
+    var self = this;
+    var fmdb = this.fmdb;
     var promise = new MegaPromise();
 
-    if (typeof(this._memCache[k]) !== 'undefined') {
-        return MegaPromise.resolve();
+    this.destroy();
+
+    if (fmdb && Object(fmdb.db).hasOwnProperty(this.name)) {
+
+        fmdb.db[this.name].clear().then(function() {
+            self.logger.debug("Table cleared.");
+        }).catch(function(err) {
+            self.logger.error("Unable to clear table!", err);
+        }).finally(function() {
+            promise.resolve();
+        });
+    }
+    else {
+        promise.reject();
     }
 
-    this.db.get(
-        'kv',
-        k
-    )
-        .done(function __hasItemDone(r) {
-            if (typeof r === 'undefined' || r.length === 0) {
-                promise.reject();
-            }
-            else {
-                promise.resolve();
-            }
-        })
-        .fail(function __hasItemFail() {
-            promise.reject();
-        });
-
     return promise;
-});
-
-
-/**
- * Loops across all items in db
- *
- * @param cb {Function}
- */
-IndexedDBKVStorage.prototype.eachItem = IndexedDBKVStorage._requiresDbConn(function __IDBKVEachItem(cb) {
-    var self = this;
-
-    Object.keys(this._memCache).forEach(function(k) {
-        cb(self._memCache[k], k);
-    });
-
-    return MegaPromise.resolve();
-});
-
-/**
- * Loops across all items that their key starts with `prefix` in db
- *
- * @param prefix {String}
- * @param cb {Function}
- */
-IndexedDBKVStorage.prototype.eachPrefixItem = IndexedDBKVStorage._requiresDbConn(function __IDBKVEachItem(prefix, cb) {
-    var self = this;
-
-    Object.keys(this._memCache).forEach(function(k) {
-        if (k.indexOf(prefix) === 0) {
-            cb(self._memCache[k], k);
-        }
-    });
-
-    return MegaPromise.resolve();
-});
+};
+makeObservable(IndexedDBKVStorage);

@@ -38,13 +38,13 @@ function dologin() {
                             else if (typeof res[0] === 'string') {
                                 if (u_type) {
                                     if (login_next) {
-                                        document.location.hash = login_next;
+                                        loadSubPage(login_next);
                                     }
                                     else if (page !== 'login') {
                                         init_page();
                                     }
                                     else {
-                                        document.location.hash = 'fm';
+                                        loadSubPage('fm');
                                     }
                                     login_next = false;
                                     document.title = 'MEGA';
@@ -111,6 +111,14 @@ function doConfirm(email, password, callback) {
                             ctx.callback2();
                         }
                     }
+                    else if ((typeof res === 'number') && (res === -11)) {
+                        if (u_type === 0) {// Ephemeral session
+                            msgDialog("warninga", l[2480], l[12439]);
+                        }
+                        else {
+                            msgDialog("warninga", l[2480], l[12440]);
+                        }
+                    }
                     else {
                         alert(l[200]);
                     }
@@ -151,7 +159,7 @@ function postLogin(email, password, remember, callback) {
 
 function pagelogin() {
     var e = $('#login-name2').val();
-    if (e === '' || e === l[195] || checkMail(e)) {
+    if (e === '' || checkMail(e)) {
         $('.login-register-input.email').addClass('incorrect');
         $('#login-name2').focus();
     }
@@ -165,6 +173,11 @@ function pagelogin() {
         if ($('.loginwarning-checkbox').hasClass('checkboxOn')) {
             localStorage.hideloginwarning = 1;
         }
+        var remember;
+        // XXX: Set remember on by default if confirming a freshly created account
+        if (confirmok || $('.login-check').hasClass('checkboxOn')) {
+            remember = 1;
+        }
 
         if (confirmok) {
             doConfirm($('#login-name2').val(), $('#login-password2').val(), function() {
@@ -176,16 +189,12 @@ function pagelogin() {
                     }
                     else if (r) {
                         u_type = r;
-                        document.location.hash = 'key';
+                        loadSubPage('key');
                     }
                 });
             });
         }
         else {
-            var remember;
-            if ($('.login-check').hasClass('checkboxOn')) {
-                remember = 1;
-            }
             postLogin($('#login-name2').val(), $('#login-password2').val(), remember, function(r) {
                 loadingDialog.hide();
 
@@ -196,13 +205,13 @@ function pagelogin() {
                     u_type = r;
                     passwordManager('#login_form');
                     if (login_next) {
-                        document.location.hash = login_next;
+                        loadSubPage(login_next);
                     }
                     else if (page !== 'login') {
                         init_page();
                     }
                     else {
-                        document.location.hash = 'fm';
+                        loadSubPage('fm');
                     }
                     login_next = false;
                 }
@@ -237,6 +246,7 @@ function init_login() {
         $('.register-st2-button-arrow').text(l[1131]);
         $('.main-italic-header.login').text(l[1131]);
         $('.main-top-info-text').text(l[378]);
+        $('.login-check').addClass('hidden').next().addClass('hidden');
     }
     else {
         $('.register-st2-button').addClass('active');
@@ -255,9 +265,7 @@ function init_login() {
     });
 
     $('#login-password2, #login-name2').rebind('keydown', function(e) {
-        if ($('#login-name2').val() !== ''
-                && $('#login-name2').val() !== l[195]
-                && $('#login-password2').val() !== '') {
+        if ($('#login-name2').val() !== '' && $('#login-password2').val() !== '') {
             $('.register-st2-button').addClass('active');
         }
         $('.login-register-input.password').removeClass('incorrect');
@@ -283,11 +291,11 @@ function init_login() {
     });
 
     $('.top-login-forgot-pass').rebind('click', function(e) {
-        document.location.hash = 'recovery';
+        loadSubPage('recovery');
     });
 
     $('.login-page-create-new span').rebind('click', function(e) {
-        document.location.hash = 'register';
+        loadSubPage('register');
     });
 
     $('.login-register-input').rebind('click', function(e) {
@@ -321,19 +329,19 @@ function postlogin() {
                 document.getElementById('login_email').value = '';
                 u_type = r;
                 if (page === 'login') {
-                    if (document.location.hash === '#fm') {
+                    if (getSitePath().substr(0,3) == '/fm') {
                         page = 'fm';
                         init_page();
                     }
                     else {
                         if (login_next) {
-                            document.location.hash = login_next;
+                            loadSubPage(login_next);
                         }
                         else if (page !== 'login') {
                             init_page();
                         }
                         else {
-                            document.location.hash = 'fm';
+                            loadSubPage('fm');
                         }
                         login_next = false;
                         document.title = 'MEGA';

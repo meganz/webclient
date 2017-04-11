@@ -30,7 +30,7 @@ from fabric.api import *
 env.target_dir = '/var/www'
 
 BETA_HOST = 'deployer@beta.mega.nz'
-BETA_DEV_HOST = 'deployer@beta.developers.mega.co.nz'
+BETA_DEV_HOST = 'deployer@beta.developers.mega.co.nz:28999'
 SANDBOX3_HOST = 'deployer@sandbox3.developers.mega.co.nz'
 
 
@@ -71,8 +71,8 @@ def deploy():
         with cd("logger"):
             run("git pull -u")
         version = run("cat current_ver.txt")
-        print("Latest version deployed: {}".format(version)) 
- 
+        print("Latest version deployed: {}".format(version))
+
 
 def _build_chat_bundle(target_dir):
     """
@@ -105,10 +105,10 @@ def dev(build_bundle=False, branch_name=''):
     # Get the current branch if not passed in
     if branch_name == '':
         branch_name = local('git rev-parse --abbrev-ref HEAD', capture=True)
-    
+
     # Get the remote path e.g. /var/www/xxx-branch-name
     remote_branch_path = os.path.join(env.target_dir, branch_name)
-    
+
     # Clone the repo into /var/www/xxx-branch-name
     # but not the full git history to save on storage space
     with cd(env.target_dir):
@@ -116,12 +116,12 @@ def dev(build_bundle=False, branch_name=''):
                      ' git@code.developers.mega.co.nz:web/webclient.git'
                      ' {} -b {}'.format(branch_name, branch_name),
                      warn_only=True)
-        
+
         # If successful
         if result.return_code == 0:
             # Show last commit from the branch
             with cd(remote_branch_path):
-                run('git log -1') 
+                run('git log -1')
 
             # Output beta server test link
             print('\nCloned branch {} to {}'
@@ -147,13 +147,16 @@ def dev(build_bundle=False, branch_name=''):
         if build_bundle:
             _build_chat_bundle(remote_branch_path)
 
-        # Provide test link and version info.
-        host_name = env.host_string.split('@')[-1]
+        # Keep just the hostname e.g. deployer@beta.developers.mega.co.nz:28999 -> beta.developers.mega.co.nz
+        host_name = env.host_string.split('@')[-1].split(':')[0]
+
         boot_html = ('sandbox3' if env.host_string == SANDBOX3_HOST
                      else 'devboot-beta')
-        print('Test link:\n    https://{host}/{branch_name}'
+
+        # Provide test link and version info.
+        print('Test link:\n    https://{branch_name}.{host}'
                 '/dont-deploy/sandbox3.html?apipath=prod'
-                .format(host=host_name,
+                .format(host=host_name.replace("beta.", ""),
                         branch_name=branch_name,
                         boot_html=boot_html))
-        print("Latest version deployed:\n    {}".format(version)) 
+        print("Latest version deployed:\n    {}".format(version))

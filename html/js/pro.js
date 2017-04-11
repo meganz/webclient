@@ -43,7 +43,7 @@ var astroPayDialog = {
         // Cache DOM reference for lookup in other functions
         this.$dialog = $('.fm-dialog.astropay-dialog');
         this.$backgroundOverlay = $('.fm-dialog-overlay');
-        this.$pendingOverlay = $('.payment-result.pending');
+        this.$pendingOverlay = $('.payment-result.pending.original');
 
         // Store the provider details
         this.selectedProvider = selectedProvider;
@@ -120,7 +120,7 @@ var astroPayDialog = {
     initCloseButton: function() {
 
         // Initialise the close and cancel buttons
-        this.$dialog.find('.fm-dialog-close, .fm-dialog-button.cancel').rebind('click', function() {
+        this.$dialog.find('.fm-dialog-close, .cancel').rebind('click', function() {
 
             // Hide the overlay and dialog
             astroPayDialog.hideDialog();
@@ -137,7 +137,7 @@ var astroPayDialog = {
      */
     initConfirmButton: function() {
 
-        this.$dialog.find('.fm-dialog-button.accept').rebind('click', function() {
+        this.$dialog.find('.accept').rebind('click', function() {
 
             // Store the full name and tax number entered
             astroPayDialog.fullName = $.trim(astroPayDialog.$dialog.find('#astropay-name-field').val());
@@ -168,6 +168,23 @@ var astroPayDialog = {
 
         var url = utcResult.EUR['url'];
         window.location = url;
+    },
+
+    /**
+     * Process the result from the API User Transaction Complete call
+     * @param {Object} utcResult The results from the UTC call
+     */
+    processUtcResult: function(utcResult) {
+
+        // If successful AstroPay result, redirect
+        if (utcResult.EUR.url) {
+            astroPayDialog.redirectToSite(utcResult);
+        }
+        else {
+            // Hide the loading animation and show an error
+            proPage.hideLoadingOverlay();
+            astroPayDialog.showError(utcResult);
+        }
     },
 
     /**
@@ -207,7 +224,7 @@ var astroPayDialog = {
     showPendingPayment: function() {
 
         this.$backgroundOverlay = $('.fm-dialog-overlay');
-        this.$pendingOverlay = $('.payment-result.pending');
+        this.$pendingOverlay = $('.payment-result.pending.original');
 
         // Show the success
         this.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
@@ -224,7 +241,7 @@ var astroPayDialog = {
             if (M.account) {
                 M.account.lastupdate = 0;
             }
-            window.location.hash = 'fm/account/history';
+            loadSubPage('fm/account/history');
         });
     }
 };
@@ -232,26 +249,14 @@ var astroPayDialog = {
 
 function init_pro()
 {
-    // Detect if there exists a verify get parameter
-    var verifyUrlParam = proPage.getUrlParam('verify');
-
-    // If it exists we need to do extra things
-    if (typeof verifyUrlParam !== 'undefined') {
-
-        // We are required to do paysafecard verification
-        if (verifyUrlParam === "paysafe") {
-            paysafecard.verify();
-        }
-
-        // Show another dialog
-        if (verifyUrlParam === 'astropay') {
-            astroPayDialog.showPendingPayment();
-        }
-    }
-
     if (localStorage.keycomplete) {
         $('body').addClass('key');
         localStorage.removeItem('keycomplete');
+
+        mega.achievem.enabled()
+            .done(function() {
+                $('.red-star-img, .reg-st3-txt-achprogram').removeClass('hidden');
+            });
     }
     else {
         $('body').addClass('pro');
@@ -274,9 +279,9 @@ function init_pro()
             }
         });
     }
-    if (document.location.hash.indexOf('#pro/') > -1)
+    if (getSitePath().indexOf('pro/') > -1)
     {
-        localStorage.affid = document.location.hash.replace('#pro/','');
+        localStorage.affid = getSitePath().replace('pro/','');
         localStorage.affts = new Date().getTime();
     }
 
@@ -285,7 +290,7 @@ function init_pro()
 
     if (!m)
     {
-        $('.membership-step1 .membership-button').rebind('click', function() {
+        $('.membership-step1 .membership-pad-bl').rebind('click', function() {
 
             var $planBlocks = $('.reg-st3-membership-bl');
             var $selectedPlan = $(this).closest('.reg-st3-membership-bl');
@@ -298,9 +303,16 @@ function init_pro()
 
             if (account_type_num === '0') {
                 if (page === 'fm') {
-                    document.location.hash = '#start';
-                } else {
-                    document.location.hash = '#fm';
+                    loadSubPage('start');
+                }
+                else {
+                    loadSubPage('fm');
+                }
+                if (localStorage.gotOverquotaWithAchievements) {
+                    onIdle(function() {
+                        mega.achievem.achievementsListDialog();
+                    });
+                    delete localStorage.gotOverquotaWithAchievements;
                 }
                 return false;
             }
@@ -369,47 +381,10 @@ function init_pro()
         if (lang !== 'en') $('.reg-st3-save-txt').addClass(lang);
         if (lang == 'fr') $('.reg-st3-big-txt').each(function(e,o){$(o).html($(o).html().replace('GB','Go').replace('TB','To'));});
 
-        $('.membership-step1 .reg-st3-membership-bl').unbind('click');
-        $('.membership-step1 .reg-st3-membership-bl').bind('click',function(e)
-        {
-            $('.reg-st3-membership-bl').removeClass('selected');
-            $(this).addClass('selected');
-        });
-
-        $('.membership-step1 .reg-st3-membership-bl').unbind('dblclick');
-        $('.membership-step1 .reg-st3-membership-bl').bind('dblclick',function(e)
-        {
-            $('.reg-st3-membership-bl').removeClass('selected');
-            $(this).addClass('selected');
-
-            account_type_num = $(this).attr('data-payment');
-
-            if (account_type_num === '0') {
-                if (page === 'fm') {
-                    document.location.hash = '#start';
-                } else {
-                    document.location.hash = '#fm';
-                }
-                return false;
-            }
-
-            $(this).clone().appendTo( '.membership-selected-block');
-
-            var proPlanName = $(this).find('.reg-st3-bott-title.title').html();
-            $('.membership-step2 .pro span').html(proPlanName);
-
-            // Update header text with plan
-            var $selectedPlanHeader = $('.membership-step2 .main-italic-header.pro');
-            var selectedPlanText = $selectedPlanHeader.html().replace('%1', proPlanName);
-            $selectedPlanHeader.html(selectedPlanText);
-
-            pro_next_step(proPlanName);
-        });
-
         $('.pro-bottom-button').unbind('click');
         $('.pro-bottom-button').bind('click',function(e)
         {
-            document.location.hash = 'contact';
+            loadSubPage('contact');
         });
     }
 
@@ -453,9 +428,14 @@ function pro_next_step(proPlanName) {
     if (proPlanName !== 'lite') {
         proPlanName = proPlanName.length;
     }
-    if (location.hash.split('_').pop() != proPlanName) {
-        window.skipHashChange = true;
-        location.hash = 'pro_' + proPlanName;
+    if (getSitePath().split('_').pop() != proPlanName) {
+        if (hashLogic) {
+            window.skipHashChange = true;
+            location.hash = 'pro_' + proPlanName;
+        }
+        else {
+            history.pushState({ subpage: 'pro_' + proPlanName }, "", 'pro_' + proPlanName);
+        }
     }
 
     var currentDate = new Date(),
@@ -466,10 +446,12 @@ function pro_next_step(proPlanName) {
 
     // Add hyperlink to mobile payment providers at top of #pro page step 2
     var $otherPaymentProviders = $('.membership-step2 .other-payment-providers');
-    var linkHtml = $otherPaymentProviders.html().replace('[A]', '<a href="#mobile">');
+    var linkHtml = $otherPaymentProviders.html().replace('[A]', '<a href="/mobile" class="clickurl">');
     linkHtml = linkHtml.replace('[/A]', '</a>');
     linkHtml = linkHtml.replace('Android', '');
     $otherPaymentProviders.safeHTML(linkHtml);
+
+    clickURLs();
 
     // Stylise the "PURCHASE" text in the 3rd instruction
     var $paymentInstructions = $('.membership-step2 .payment-instructions');
@@ -547,6 +529,9 @@ function pro_continue()
         if (pro_paymentmethod === 'perfunctio') {
             cardDialog.init();
         }
+        else if (pro_paymentmethod.indexOf('ecp') === 0) {
+            addressDialog.init();
+        }
         else if (pro_paymentmethod === 'voucher') {
             voucherDialog.init();
         }
@@ -570,29 +555,17 @@ function pro_pay() {
         aff = localStorage.affid;
     }
 
-    // Only show old loading dialog if needing to setup bitcoin invoice
-    if (pro_paymentmethod === 'bitcoin') {
-        showLoadingDialog();
-    }
-
-    // If using account balance show loading dialog
-    else if (pro_paymentmethod === 'pro_prepaid') {
-        loadingDialog.show();
-    }
-
-    // Otherwise if credit card, show bouncing coin while loading
-    else if (pro_paymentmethod === 'perfunctio') {
-        cardDialog.closeDialogAndShowProcessing();
-    }
-
-    // Otherwise if Union Pay, show bouncing coin while loading
-    else if ((pro_paymentmethod === 'dynamicpay') || (pro_paymentmethod === 'paysafecard') || (pro_paymentmethod === 'directreseller')) {
-        proPage.showLoadingOverlay('transferring');
-    }
-
-    // Otherwise if AstroPay, show bouncing coin while loading
-    else if (pro_paymentmethod.indexOf('astropay') > -1) {
-        proPage.showLoadingOverlay('transferring');
+    // Show different loading animation text depending on the payment methods
+    switch (pro_paymentmethod) {
+        case 'bitcoin':
+            proPage.showLoadingOverlay('loading');
+            break;
+        case 'pro_prepaid':
+        case 'perfunctio':
+            proPage.showLoadingOverlay('processing');
+            break;
+        default:
+            proPage.showLoadingOverlay('transferring');
     }
 
     // Data for API request
@@ -604,7 +577,7 @@ function pro_pay() {
     var fromBandwidthDialog = ((Date.now() - parseInt(localStorage.seenOverQuotaDialog)) < 2 * 36e5) ? 1 : 0;
 
     // uts = User Transaction Sale
-    var uts = {
+    var utsRequest = {
         a:  'uts',
         it:  0,
         si:  apiId,
@@ -615,9 +588,11 @@ function pro_pay() {
         bq:  fromBandwidthDialog
     };
     if (mega.uaoref) {
-        uts.uao = escapeHTML(mega.uaoref);
+        utsRequest.uao = escapeHTML(mega.uaoref);
     }
-    api_req(uts, {
+
+    // Setup the transaction
+    api_req(utsRequest, {
         callback: function (utsResult) {
 
             // Store the sale ID to check with API later
@@ -626,148 +601,90 @@ function pro_pay() {
             // Extra gateway specific details for UTC call
             var extra = {};
 
-            if (typeof saleId == 'number' && saleId < 0)
-            {
-                loadingDialog.hide();
-                alert(l[200]);
+            // Show an error
+            if ((typeof saleId === 'number') && (saleId < 0)) {
+
+                // Hide the loading overlay and show an error
+                proPage.hideLoadingOverlay();
+                msgDialog('warninga', l[7235], l[200] + ' ' + l[253]);   // Something went wrong. Try again later...
+                return false;
             }
-            else
-            {
-                if (pro_paymentmethod === 'voucher' || pro_paymentmethod === 'pro_prepaid') {
-                    pro_m = 0;
-                }
-                else if (pro_paymentmethod === 'bitcoin') {
-                    pro_m = 4;
-                }
-                else if (pro_paymentmethod === 'perfunctio') {
-                    pro_m = 8;
-                }
-                else if (pro_paymentmethod === 'dynamicpay') {
-                    pro_m = 5;
-                }
-                else if (pro_paymentmethod === 'fortumo') {
-                    // pro_m = 6;
-                    // Fortumo does not do a utc request, we immediately redirect
-                    fortumo.redirectToSite(saleId);
-                    return false;
-                }
-                else if (pro_paymentmethod === 'infobip') {
-                    // pro_m = 9;
-                    // Centili does not do a utc request, we immediately redirect
-                    centili.redirectToSite(saleId);
-                    return false;
-                }
-                else if (pro_paymentmethod === 'paysafecard') {
-                    pro_m = 10;
-                }
-                else if (pro_paymentmethod === 'tpay') {
-                    pro_m = tpay.gatewayId; // 14
-                }
-                else if (pro_paymentmethod === 'directreseller') {
-                    pro_m = directReseller.gatewayId; // 15
-                }
 
-                // If AstroPay, send extra details
-                else if (pro_paymentmethod.indexOf('astropay') > -1) {
-                    pro_m = astroPayDialog.gatewayId;
-                    extra.bank = astroPayDialog.selectedProvider.extra.code;
-                    extra.cpf = astroPayDialog.taxNumber;
-                    extra.name = astroPayDialog.fullName;
-                }
-
-                // Update the last payment provider ID for the 'psts' action packet. If the provider e.g. bitcoin
-                // needs a redirect after confirmation action packet it will redirect to the account page.
-                proPage.lastPaymentProviderId = pro_m;
-
-                // utc = User Transaction Complete
-                // s = sale ID
-                // m = pro number
-                // bq = bandwidth quota triggered
-                api_req({ a : 'utc', s: [saleId], m: pro_m, bq: fromBandwidthDialog, extra: extra },
-                {
-                    callback : function (utcResult)
-                    {
-                        // If using prepaid balance
-                        if (pro_m === 0) {
-
-                            // Hide the loading dialog
-                            loadingDialog.hide();
-
-                            // If an error code
-                            if (typeof utcResult === 'number' && utcResult < 0) {
-                                if (utcResult == EOVERQUOTA) {
-                                    alert(l[514]);
-                                }
-                                else {
-                                    alert(l[200]);
-                                }
-                            }
-                            else {
-                                // Show success dialog
-                                voucherDialog.showSuccessfulPayment();
-                            }
-                        }
-                        else {
-                            // If Dynamic/Union Pay provider then redirect to their site
-                            if ((pro_m === 5) && utcResult && utcResult.EUR) {
-                                unionPay.redirectToSite(utcResult);
-                            }
-
-                            // If Bitcoin provider then show the Bitcoin invoice dialog
-                            else if ((pro_m === 4) && utcResult && utcResult.EUR) {
-                                bitcoinDialog.showInvoice(utcResult.EUR);
-                            }
-
-                            // If bitcoin failure
-                            else if ((pro_m === 4) && (!utcResult || !utcResult.EUR)) {
-                                bitcoinDialog.showBitcoinProviderFailureDialog();
-                            }
-
-                            // Pay for credit card
-                            else if ((pro_m === 8) && utcResult && (utcResult.EUR.res === 'S')) {
-                                cardDialog.showSuccessfulPayment(utcResult);
-                            }
-
-                            // Show credit card failure
-                            else if ((pro_m === 8) && (!utcResult || (utcResult.EUR.res === 'FP') || (utcResult.EUR.res === 'FI'))) {
-                                cardDialog.showFailureOverlay(utcResult);
-                            }
-
-                            // If paysafecard provider then redirect to their site
-                            else if (pro_m === 10)
-                            {
-                                if (utcResult && utcResult.EUR) {
-                                    paysafecard.redirectToSite(utcResult);
-                                }
-                                else {
-                                    paysafecard.showConnectionError();
-                                }
-                            }
-
-                            // Otherwise if AstroPay, redirect
-                            else if (pro_m === astroPayDialog.gatewayId) {
-                                if (utcResult && utcResult.EUR && utcResult.EUR.url) {
-                                    astroPayDialog.redirectToSite(utcResult);
-                                }
-                                else {
-                                    proPage.hideLoadingOverlay();
-                                    astroPayDialog.showError(utcResult);
-                                }
-                            }
-
-                            // If tpay, redirect over there
-                            else if (pro_m === tpay.gatewayId) {
-                                tpay.redirectToSite(utcResult);
-                            }
-
-                            // If 6media, redirect to the site
-                            else if (pro_m === directReseller.gatewayId) {
-                                directReseller.redirectToSite(utcResult);
-                            }
-                        }
-                    }
-                });
+            if (pro_paymentmethod === 'voucher' || pro_paymentmethod === 'pro_prepaid') {
+                pro_m = 0;
             }
+            else if (pro_paymentmethod === 'bitcoin') {
+                pro_m = 4;
+            }
+            else if (pro_paymentmethod === 'perfunctio') {
+                pro_m = 8;
+            }
+            else if (pro_paymentmethod === 'dynamicpay') {
+                pro_m = 5;
+            }
+            else if (pro_paymentmethod === 'fortumo') {
+                // pro_m = 6;
+                // Fortumo does not do a utc request, we immediately redirect
+                fortumo.redirectToSite(saleId);
+                return false;
+            }
+            else if (pro_paymentmethod === 'infobip') {
+                // pro_m = 9;
+                // Centili does not do a utc request, we immediately redirect
+                centili.redirectToSite(saleId);
+                return false;
+            }
+            else if (pro_paymentmethod === 'paysafecard') {
+                pro_m = 10;
+            }
+            else if (pro_paymentmethod === 'tpay') {
+                pro_m = tpay.gatewayId; // 14
+            }
+            else if (pro_paymentmethod.indexOf('directreseller') === 0) {
+                pro_m = directReseller.gatewayId; // 15
+            }
+
+            // If AstroPay, send extra details
+            else if (pro_paymentmethod.indexOf('astropay') > -1) {
+                pro_m = astroPayDialog.gatewayId;
+                extra.bank = astroPayDialog.selectedProvider.extra.code;
+                extra.cpf = astroPayDialog.taxNumber;
+                extra.name = astroPayDialog.fullName;
+            }
+
+            // If Ecomprocessing, send extra details
+            else if (pro_paymentmethod.indexOf('ecp') === 0) {
+                pro_m = addressDialog.gatewayId;
+                extra = addressDialog.extraDetails;
+            }
+            else if (pro_paymentmethod.indexOf('sabadell') === 0) {
+                pro_m = sabadell.gatewayId; // 17
+
+                // Get the value for whether the user wants the plan to renew automatically
+                var autoRenewCheckedValue = $('.membership-step2 .renewal-options-list input:checked').val();
+
+                // If the provider supports recurring payments and the user wants the plan to renew automatically
+                if (autoRenewCheckedValue === 'yes') {
+                    extra.recurring = true;
+                }
+            }
+
+            // Update the last payment provider ID for the 'psts' action packet. If the provider e.g. bitcoin
+            // needs a redirect after confirmation action packet it will redirect to the account page.
+            proPage.lastPaymentProviderId = pro_m;
+
+            // Complete the transaction
+            api_req({
+                a: 'utc',                   // User Transaction Complete
+                s: [saleId],                // Sale ID
+                m: pro_m,                   // Gateway number
+                bq: fromBandwidthDialog,    // Log for bandwidth quota triggered
+                extra: extra                // Extra information for the specific gateway
+            }, {
+                callback: function(utcResult) {
+                    proPage.processUtcResults(utcResult);
+                }
+            });
         }
     });
 }
@@ -790,6 +707,42 @@ var proPage = {
     // Overlay for loading/processing/redirecting
     $backgroundOverlay: null,
     $loadingOverlay: null,
+
+    /**
+     * Processes a return URL from the payment provider in form of /payment-{providername}-{status} e.g.
+     * /payment-ecp-success
+     * /payment-ecp-failure
+     * /payment-astropay-pending
+     * /payment-paysafecard-saleidXXX
+     * @param {String} page The requested page from index.js e.g. payment-ecp-success etc
+     */
+    processReturnUrlFromProvider: function(page) {
+
+        // Get the provider we are returning from and the status
+        var pageParts = page.split('-');
+        var provider = pageParts[1];
+        var status = pageParts[2];
+
+        // If returning from an paysafecard payment, do a verification on the sale ID
+        if (provider === 'paysafecard') {
+            paysafecard.verify(status);
+        }
+
+        // If returning from an AstroPay payment, show a pending payment dialog
+        else if (provider === 'astropay') {
+            astroPayDialog.showPendingPayment();
+        }
+
+        // If returning from an Ecomprocessing payment, show a success or failure dialog
+        else if (provider === 'ecp') {
+            addressDialog.showPaymentResult(status);
+        }
+
+        // Sabadell needs to also show success or failure
+        else if (provider === 'sabadell') {
+            sabadell.showPaymentResult(status);
+        }
+    },
 
     /**
     * Update the state when a payment has been received to show their new Pro Level
@@ -816,7 +769,7 @@ var proPage = {
 
             // If last payment was Bitcoin, we need to redirect to the account page
             if (this.lastPaymentProviderId === 4) {
-                window.location.hash = 'fm/account/history';
+                loadSubPage('fm/account/history');
             }
         }
     },
@@ -875,12 +828,16 @@ var proPage = {
 
             // Replace text with proper link
             var $linkText = $noPlansSuitable.find('.no-plans-suitable-text');
-            var newLinkText = $linkText.html().replace('[A]', '<a href="#contact">').replace('[/A]', '</a>');
-            $linkText.html(newLinkText);
+            var newLinkText = $linkText.html()
+                .replace('[A]', '<a href="/contact" class="clickurl">')
+                .replace('[/A]', '</a>');
+            $linkText.safeHTML(newLinkText);
+
+            clickURLs();
 
             // Redirect to #contact
             $noPlansSuitable.find('.btn-request-plan').rebind('click', function() {
-                document.location.hash = 'contact';
+                loadSubPage('contact');
             });
         }
     },
@@ -925,7 +882,7 @@ var proPage = {
      */
     getUrlParam: function(paramToGet) {
 
-        var hash = location.hash.substr(1);
+        var hash = getSitePath().substr(1) + locSearch;
         var index = hash.indexOf(paramToGet + '=');
         var param = hash.substr(index).split('&')[0].split('=')[1];
 
@@ -1015,9 +972,10 @@ var proPage = {
                 var primaryGatewayOptions = gatewayOptions.splice(0, 6);
                 var secondaryGatewayOptions = gatewayOptions;
 
-                // Show payment duration e.g. month or year radio options
+                // Show payment duration (e.g. month or year) and renewal option radio options
                 proPage.renderPlanDurationOptions();
                 proPage.initPlanDurationClickHandler();
+                proPage.initRenewalOptionClickHandler();
 
                 // Render the two groups
                 proPage.renderPaymentProviderOptions(primaryGatewayOptions, 'primary');
@@ -1179,7 +1137,7 @@ var proPage = {
             var lastPayment = alarm.planExpired.lastPayment;
             var gatewayId = lastPayment.gw;
 
-            // Get the gateway name, if it's an Astropay subgateway, then it will have it's own name
+            // Get the gateway name, if it's a subgateway, then it will have it's own name
             var gatewayInfo = getGatewayName(gatewayId);
             var extraData = (typeof lastPayment.gwd !== 'undefined') ? lastPayment.gwd : null;
             var gatewayName = (typeof lastPayment.gwd !== 'undefined') ? extraData.gwname : gatewayInfo.name;
@@ -1236,33 +1194,109 @@ var proPage = {
      */
     updateTextDependingOnRecurring: function() {
 
+        var $step2 = $('.membership-step2');
+        var $paymentDialog = $('.payment-dialog');
+        var $paymentAddressDialog = $('.payment-address-dialog');
+
         // Update whether this selected option is recurring or one-time
-        var $selectDurationOption = $('.duration-options-list .membership-radio.checked');
-        var $mainPrice = $('.membership-bott-price');
-        var selectedGatewayName = $('.payment-options-list input:checked').val();
+        var $selectDurationOption = $step2.find('.duration-options-list .membership-radio.checked');
+        var selectedGatewayName = $step2.find('.payment-options-list input:checked').val();
         var selectedProvider = proPage.allGateways.filter(function(val) {
             return (val.gatewayName === selectedGatewayName);
         })[0];
 
+        // Set text to subscribe or purchase
         var planIndex = $selectDurationOption.parent().attr('data-plan-index');
         var currentPlan = membershipPlans[planIndex];
         var numOfMonths = currentPlan[UTQA_RESPONSE_INDEX_MONTHS];
-        var subscribeOrPurchase = (selectedProvider.supportsRecurring) ? l[6172] : l[6190].toLowerCase();
+        var price = currentPlan[UTQA_RESPONSE_INDEX_PRICE] + ' \u20ac';     // 0.00 EUR symbol
 
-        // Set to /month, /year or /one time next to the price
-        if (selectedProvider.supportsRecurring && (numOfMonths === 1)) {
-            $mainPrice.find('.period').text('/' + l[913]);
+        // Get the value for whether the user wants the plan to renew automatically
+        var recurringEnabled = false;
+        var autoRenewCheckedValue = $step2.find('.renewal-options-list input:checked').val();
+
+        // If the provider supports recurring payments and the user wants the plan to renew automatically
+        if (selectedProvider.supportsRecurring && (autoRenewCheckedValue === 'yes')) {
+            recurringEnabled = true;
         }
-        else if (selectedProvider.supportsRecurring && (numOfMonths > 1)) {
-            $mainPrice.find('.period').text('/' + l[932]);
+
+        // Set text
+        var subscribeOrPurchase = (recurringEnabled) ? l[6172] : l[6190].toLowerCase();
+        var recurringOrNonRecurring = (recurringEnabled) ? '(' + l[6965] + ')' : l[6941];
+        var recurringMonthlyOrAnnuallyMessage = (numOfMonths === 1) ? l[10628] : l[10629];
+        var autoRenewMonthOrYearQuestion = (numOfMonths === 1) ? l[10638] : l[10639];
+        var chargeInfoDuration = l[10642].replace('%1', price);
+
+        // Find the pricing period in the pricing box and the plan duration options
+        var $sidePanelPeriod = $step2.find('.reg-st3-bott-title.price .period');
+
+        // Change the charge information below the recurring yes/no question
+        if ((recurringEnabled) && (numOfMonths === 1)) {
+            chargeInfoDuration = l[10640].replace('%1', price);     // You will be charged 0.00 monthly.
+        }
+        else if ((recurringEnabled) && (numOfMonths === 12)) {
+            chargeInfoDuration = l[10641].replace('%1', price);     // You will be charged 0.00 annually.
+        }
+
+        // Set to monthly or annually in the pricing box on the right
+        if (recurringEnabled) {
+            if (numOfMonths === 1) {
+                $sidePanelPeriod.text('/' + l[918]);  // monthly
+            }
+            else {
+                $sidePanelPeriod.text('/' + l[919]);  // annually
+            }
         }
         else {
-            $mainPrice.find('.period').text('/' + l[6809]);
+            if (numOfMonths === 1) {
+                $sidePanelPeriod.text('/' + l[913]);  // month
+            }
+            else {
+                $sidePanelPeriod.text('/' + l[932]);  // year
+            }
+        }
+
+        // Always show the extra Question 3 recurring option section if the provider supports recurring.
+        // The user can then toggle whether they want a recurring plan or not with the radio buttons.
+        if (selectedProvider.supportsRecurring) {
+            $step2.find('.renewal-option').removeClass('hidden');
+        }
+        else {
+            // Otherwise it's a one off only provider, hide the extra information
+            $step2.find('.renewal-option').addClass('hidden');
+        }
+
+        // Reorder options numbering
+        $step2.find('.number:visible').each(function(idx, node) { $(node).text(idx + 1); });
+
+        // Show recurring info box next to Purchase button and update dialog text for recurring
+        if (recurringEnabled) {
+            $step2.find('.subscription-instructions').removeClass('hidden');
+            $step2.find('.subscription-instructions').rebind('click', function() {
+                bottomPageDialog(false, 'general', l[1712]);
+            });
+            $paymentAddressDialog.find('.payment-note-first.recurring').removeClass('hidden');
+            $paymentAddressDialog.find('.payment-note-first.one-time').addClass('hidden');
+        }
+        else {
+            // Hide recurring info box next to Purchase button and update dialog text for one-time
+            $step2.find('.subscription-instructions').addClass('hidden');
+            $paymentAddressDialog.find('.payment-note-first.recurring').addClass('hidden');
+            $paymentAddressDialog.find('.payment-note-first.one-time').removeClass('hidden');
         }
 
         // Update depending on recurring or one off payment
-        $('.membership-bott-button').safeHTML(subscribeOrPurchase);
-        $('.payment-dialog .payment-buy-now').safeHTML(subscribeOrPurchase);
+        $step2.find('.membership-bott-button').text(subscribeOrPurchase);
+        $step2.find('.payment-instructions .purchase').text(subscribeOrPurchase);
+        $step2.find('.choose-renewal .duration-text').text(autoRenewMonthOrYearQuestion);
+        $step2.find('.charge-information').text(chargeInfoDuration);
+        $paymentDialog.find('.payment-buy-now').text(subscribeOrPurchase);
+        $paymentAddressDialog.find('.payment-buy-now').text(subscribeOrPurchase);
+        $paymentAddressDialog.find('.payment-note-first.recurring .duration').text(recurringMonthlyOrAnnuallyMessage);
+        $paymentAddressDialog.find('.payment-plan-txt .recurring').text(recurringOrNonRecurring);
+
+        // Re-initialise the main page scrolling as extra content could have changed the height
+        mainScroll();
     },
 
     /**
@@ -1271,22 +1305,9 @@ var proPage = {
     renderPlanDurationOptions: function() {
 
         // Sort plan durations by lowest number of months first
-        membershipPlans.sort(function (planA, planB) {
+        this.sortMembershipPlans();
 
-            var numOfMonthsPlanA = planA[UTQA_RESPONSE_INDEX_MONTHS];
-            var numOfMonthsPlanB = planB[UTQA_RESPONSE_INDEX_MONTHS];
-
-            if (numOfMonthsPlanA < numOfMonthsPlanB) {
-                return -1;
-            }
-            if (numOfMonthsPlanA > numOfMonthsPlanB) {
-                return 1;
-            }
-
-            return 0;
-        });
-
-        // Clear the radio options, incase they revisted the page
+        // Clear the radio options, in case they revisted the page
         $('.duration-options-list .payment-duration:not(.template)').remove();
 
         // Loop through the available plan durations for the current membership plan
@@ -1365,6 +1386,27 @@ var proPage = {
     },
 
     /**
+     * Sorts plan durations by lowest number of months first
+     */
+    sortMembershipPlans: function() {
+
+        membershipPlans.sort(function (planA, planB) {
+
+            var numOfMonthsPlanA = planA[UTQA_RESPONSE_INDEX_MONTHS];
+            var numOfMonthsPlanB = planB[UTQA_RESPONSE_INDEX_MONTHS];
+
+            if (numOfMonthsPlanA < numOfMonthsPlanB) {
+                return -1;
+            }
+            if (numOfMonthsPlanA > numOfMonthsPlanB) {
+                return 1;
+            }
+
+            return 0;
+        });
+    },
+
+    /**
      * Add click handler for the radio buttons which are used for selecting the plan/subscription duration
      */
     initPlanDurationClickHandler: function() {
@@ -1394,6 +1436,33 @@ var proPage = {
     },
 
     /**
+     * Add click handler for the radio buttons which are used for selecting the plan/subscription duration
+     */
+    initRenewalOptionClickHandler: function() {
+
+        var $renewalOptions = $('.renewal-options-list .renewal-option');
+
+        // Add click handler
+        $renewalOptions.rebind('click', function() {
+
+            var $this = $(this);
+
+            // Remove checked state on the other buttons
+            $renewalOptions.find('.membership-radio').removeClass('checked');
+            $renewalOptions.find('.membership-radio-label').removeClass('checked');
+            $renewalOptions.find('input').prop('checked', false);
+
+            // Add checked state to just to the clicked one
+            $this.find('.membership-radio').addClass('checked');
+            $this.find('.membership-radio-label').addClass('checked');
+            $this.find('input').prop('checked', true);
+
+            // Update the wording for one-time or recurring
+            proPage.updateTextDependingOnRecurring();
+        });
+    },
+
+    /**
      * Updates the main price
      * @param {Number} planIndex The array index of the plan in membershipPlans
      */
@@ -1411,31 +1480,35 @@ var proPage = {
 
         // Get the current plan price
         var price = currentPlan[UTQA_RESPONSE_INDEX_PRICE].split('.');
-        
+
         // If less than 12 months is selected, use the monthly base price instead
         if (numOfMonths !== 12) {
             price = currentPlan[UTQA_RESPONSE_INDEX_MONTHLYBASEPRICE].split('.');
         }
         var dollars = price[0];
         var cents = price[1];
-        
+
         // Get the current plan's bandwidth, then convert the number to 'x GBs' or 'x TBs'
         var bandwidthGigabytes = currentPlan[UTQA_RESPONSE_INDEX_TRANSFER];
         var bandwidthBytes = bandwidthGigabytes * 1024 * 1024 * 1024;
         var bandwidthFormatted = numOfBytes(bandwidthBytes, 0);
         var bandwidthSizeRounded = Math.round(bandwidthFormatted.size);
-        
+
         // Set selectors
-        var $pricingBox = $('.membership-step2 .membership-pad-bl');
+        var $step2 = $('.membership-step2');
+        var $pricingBox = $step2.find('.membership-pad-bl');
         var $priceNum = $pricingBox.find('.reg-st3-bott-title.price .num');
         var $pricePeriod = $pricingBox.find('.reg-st3-bott-title.price .period');
         var $bandwidthAmount = $pricingBox.find('.bandwidth-amount');
         var $bandwidthUnit = $pricingBox.find('.bandwidth-unit');
-        
+
+        // Update the charge information for question 3
+        $step2.find('.charge-information .amount').text(dollars + '.' + cents);
+
         // Update the price of the plan and the /month or /year next to the price box
         $priceNum.safeHTML(dollars + '<span class="small">.' + cents + ' &euro;</span>');
         $pricePeriod.text('/' + monthOrYearWording);
-        
+
         // Update bandwidth
         $bandwidthAmount.text(bandwidthSizeRounded);
         $bandwidthUnit.text(bandwidthFormatted.unit);
@@ -1449,6 +1522,7 @@ var proPage = {
 
         var $durationOptionsList = $('.duration-options-list');
         var $durationOptions = $durationOptionsList.find('.payment-duration:not(.template)');
+        var selectedPlanIndex = $durationOptionsList.find('.membership-radio.checked').parent().attr('data-plan-index');
         var selectedGatewayName = $('.payment-options-list input:checked').val();
         var selectedProvider = proPage.allGateways.filter(function(val) {
             return (val.gatewayName === selectedGatewayName);
@@ -1457,6 +1531,7 @@ var proPage = {
         // Reset all options, they will be hidden or checked again if necessary below
         $durationOptions.removeClass('hidden');
         $durationOptions.find('.membership-radio').removeClass('checked');
+        $durationOptions.find('.membership-radio-label').removeClass('checked');
         $durationOptions.find('input').removeAttr('checked', 'checked');
 
         // Loop through renewal period options (1 month, 1 year)
@@ -1479,11 +1554,20 @@ var proPage = {
             }
         });
 
-        // Select the first remaining option that is not hidden
-        var $firstOption = $durationOptionsList.find('.payment-duration:not(.template, .hidden)').first();
-        var newPlanIndex = $firstOption.attr('data-plan-index');
-        $firstOption.find('.membership-radio').addClass('checked');
-        $firstOption.find('input').attr('checked', 'checked');
+        // Select the first remaining option or previously selected (if its not hidden)
+        var $newDurationOption;
+        var newPlanIndex;
+        $newDurationOption = $durationOptionsList.find('[data-plan-index=' + selectedPlanIndex + ']');
+        if ($newDurationOption.length && !$newDurationOption.hasClass('hidden')) {
+            newPlanIndex = selectedPlanIndex;
+        }
+        else {
+            $newDurationOption = $durationOptionsList.find('.payment-duration:not(.template, .hidden)').first();
+            newPlanIndex = $newDurationOption.attr('data-plan-index');
+        }
+        $newDurationOption.find('.membership-radio').addClass('checked');
+        $newDurationOption.find('.membership-radio-label').addClass('checked');
+        $newDurationOption.find('input').attr('checked', 'checked');
 
         // Update the text for one-time or recurring
         proPage.updateMainPrice(newPlanIndex);
@@ -1557,6 +1641,84 @@ var proPage = {
         }
 
         return monthsWording;
+    },
+
+    /**
+     * Process results from the API User Transaction Complete call
+     * @param {Object|Number} utcResult The results from the UTC call or a negative number on failure
+     */
+    processUtcResults: function(utcResult) {
+
+        // Check for insufficient balance error, other errors will fall through
+        if ((typeof utcResult === 'number') && (utcResult === EOVERQUOTA) && (pro_m === voucherDialog.gatewayId)) {
+
+            // Hide the loading animation and show an error
+            proPage.hideLoadingOverlay();
+            msgDialog('warninga', l[6804], l[514], '');             // Insufficient balance, try again...
+            return false;
+        }
+
+        // If other negative number response from the API
+        else if ((typeof utcResult === 'number') && (utcResult < 0)) {
+
+            // Hide the loading animation and show an error
+            proPage.hideLoadingOverlay();
+            msgDialog('warninga', l[7235], l[200] + ' ' + l[253]);   // Something went wrong. Try later...
+            return false;
+        }
+
+        // Handle results for different payment providers
+        switch (pro_m) {
+
+            // If using prepaid balance
+            case voucherDialog.gatewayId:
+                voucherDialog.showSuccessfulPayment();
+                break;
+
+            // If Bitcoin provider then show the Bitcoin invoice dialog
+            case bitcoinDialog.gatewayId:
+                bitcoinDialog.processUtcResult(utcResult);
+                break;
+
+            // If Dynamic/Union Pay provider then redirect to their site
+            case unionPay.gatewayId:
+                unionPay.redirectToSite(utcResult);
+                break;
+
+            // If credit card provider
+            case cardDialog.gatewayId:
+                cardDialog.processUtcResult(utcResult);
+                break;
+
+            // If paysafecard provider then redirect to their site
+            case paysafecard.gatewayId:
+                paysafecard.redirectToSite(utcResult);
+                break;
+
+            // If AstroPay result, redirect
+            case astroPayDialog.gatewayId:
+                astroPayDialog.processUtcResult(utcResult);
+                break;
+
+            // If Ecomprocessing result, redirect
+            case addressDialog.gatewayId:
+                addressDialog.processUtcResult(utcResult);
+                break;
+
+            // If tpay, redirect over there
+            case tpay.gatewayId:
+                tpay.redirectToSite(utcResult);
+                break;
+
+            // If 6media, redirect to the site
+            case directReseller.gatewayId:
+                directReseller.redirectToSite(utcResult);
+                break;
+
+            case sabadell.gatewayId:
+                sabadell.redirectToSite(utcResult);
+                break;
+        }
     }
 };
 
@@ -1569,6 +1731,9 @@ var voucherDialog = {
     $dialog: null,
     $backgroundOverlay: null,
     $successOverlay: null,
+
+    /** The gateway ID for using prepaid balance */
+    gatewayId: 0,
 
     /**
      * Initialisation of the dialog
@@ -1621,9 +1786,11 @@ var voucherDialog = {
 
         // Translate text
         var html = this.$dialog.find('.voucher-information-help').html();
-            html = html.replace('[A]', '<a href="#resellers" class="voucher-reseller-link">');
+            html = html.replace('[A]', '<a href="/resellers" class="voucher-reseller-link clickurl">');
             html = html.replace('[/A]', '</a>');
         this.$dialog.find('.voucher-information-help').html(html);
+
+        clickURLs();
 
         // Reset state to hide voucher input
         voucherDialog.$dialog.find('.voucher-input-container').fadeOut('fast', function() {
@@ -1851,6 +2018,9 @@ var voucherDialog = {
         var proPlan = getProPlan(proNum);
         var successMessage = l[6962].replace('%1', '<span>' + proPlan + '</span>');
 
+        // Hide the loading animation
+        proPage.hideLoadingOverlay();
+
         // Show the success
         voucherDialog.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
         voucherDialog.$successOverlay.removeClass('hidden');
@@ -1868,7 +2038,7 @@ var voucherDialog = {
             if (M.account) {
                 M.account.lastupdate = 0;
             }
-            window.location.hash = 'fm/account/history';
+            loadSubPage('fm/account/history');
         });
     }
 };
@@ -1884,7 +2054,7 @@ var wireTransferDialog = {
     /**
      * Open and setup the dialog
      */
-    init: function() {
+    init: function(onCloseCallback) {
 
         // Close the pro register dialog if it's already open
         $('.pro-register-dialog').removeClass('active').addClass('hidden');
@@ -1907,6 +2077,11 @@ var wireTransferDialog = {
         this.$dialog.find('.btn-close-dialog').rebind('click', function() {
             wireTransferDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
             wireTransferDialog.$dialog.removeClass('active').addClass('hidden');
+
+            if (onCloseCallback) {
+                onCloseCallback();
+            }
+            return false;
         });
 
         // If logged in, pre-populate email address into wire transfer details
@@ -1920,7 +2095,12 @@ var wireTransferDialog = {
 
         // Update plan price in the dialog
         var proPrice = selectedProPackage[5];
-        this.$dialog.find('.amount').text(proPrice);
+        if (proPrice) {
+            this.$dialog.find('.amount').text(proPrice).closest('tr').removeClass('hidden');
+        }
+        else {
+            this.$dialog.find('.amount').closest('tr').addClass('hidden');
+        }
     }
 };
 
@@ -1928,6 +2108,9 @@ var wireTransferDialog = {
  * Code for Dynamic/Union Pay
  */
 var unionPay = {
+
+    /** The gateway ID for using Union Pay */
+    gatewayId: 5,
 
     /**
      * Redirect to the site
@@ -1945,6 +2128,79 @@ var unionPay = {
             form.append(input);
             $('body').append(form);
             form.submit();
+        }
+    }
+};
+
+/**
+ * Code for Sabadell Spanish Bank
+ */
+var sabadell = {
+
+    gatewayId: 17,
+
+    /**
+     * Redirect to the site
+     * @param {Object} utcResult
+     */
+    redirectToSite: function(utcResult) {
+
+        // We need to redirect to their site via a post, so we are building a form
+        var url = utcResult.EUR['url'];
+        var form = $("<form id='pay_form' name='pay_form' action='" + url + "' method='post'></form>");
+
+        for (var key in utcResult.EUR['postdata']) {
+            var input = $("<input type='hidden' name='" + key + "' value='" + utcResult.EUR['postdata'][key] + "' />");
+            form.append(input);
+            $('body').append(form);
+            form.submit();
+        }
+    },
+
+    /**
+     * Show the payment result of success or failure after coming back from the Sabadell site
+     * @param {String} verifyUrlParam The URL parameter e.g. 'sabadell-success' or 'sabadell-failure'
+     */
+    showPaymentResult: function(verifyUrlParam) {
+
+        var $backgroundOverlay = $('.fm-dialog-overlay');
+        var $pendingOverlay = $('.payment-result.pending.alternate');
+        var $failureOverlay = $('.payment-result.failed');
+
+        // Show the overlay
+        $backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+
+        // On successful payment
+        if (verifyUrlParam === 'success') {
+
+            // Show the success
+            $pendingOverlay.removeClass('hidden');
+
+            // Add click handlers for 'Go to my account' and Close buttons
+            $pendingOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
+
+                // Hide the overlay
+                $backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+                $pendingOverlay.addClass('hidden');
+
+                // Make sure it fetches new account data on reload
+                if (M.account) {
+                    M.account.lastupdate = 0;
+                }
+                loadSubPage('fm/account/history');
+            });
+        }
+        else {
+            // Show the failure overlay
+            $failureOverlay.removeClass('hidden');
+
+            // On click of the 'Try again' or Close buttons, hide the overlay
+            $failureOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
+
+                // Hide the overlay
+                $backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+                $failureOverlay.addClass('hidden');
+            });
         }
     }
 };
@@ -1998,23 +2254,24 @@ var directReseller = {
         var params = utcResult['EUR']['params'];
         params = atob(params);
 
-        // Gary at 6media
-        if (provider === 1) {
-            // Must perform a country test, as Gary has a different url for Japan
-            var country = utcResult['EUR']['cc'];
-            var baseurl = 'https://mega.and1.tw/zh_tw/order_mega.php?';
+        var baseurls = [
+            '',
+            'https://mega.and1.tw/', // 6media
+            'https://mega.bwm-mediasoft.com/mega.php5?', // BWM Mediasoft
+            'https://my.hosting.co.uk/' // Hosting.co.uk
+        ];
 
-            // Check that country is defined, as originally the API did not provide it
-            if (typeof country !== 'undefined') {
-                if (country.toLowerCase() === 'jp') {
-                    baseurl = 'https://mega.and1.tw/jp/order_mega.php?';
-                }
+        if (provider >= 1 && provider <= 3)
+        {
+            var baseurl = baseurls[provider];
+            var urlmod = utcResult['EUR']['urlmod'];
+
+            // If the urlmod is not defined then we use the fully hardcoded url above,
+            // otherwise the API is adjusting the end of it.
+            if (typeof urlmod !== 'undefined') {
+                baseurl += urlmod;
             }
             window.location =  baseurl + params;
-        }
-        // BWM Mediasoft
-        else if (provider === 2) {
-            window.location = 'https://mega.bwm-mediasoft.com/mega.php5?' + params;
         }
     }
 };
@@ -2024,6 +2281,7 @@ var directReseller = {
  */
 var paysafecard = {
 
+    /** The gateway ID for using paysafecard */
     gatewayId: 10,
 
     /**
@@ -2041,7 +2299,7 @@ var paysafecard = {
     showConnectionError: function() {
         msgDialog('warninga', l[7235], l[7233], '', function() {
             proPage.hideLoadingOverlay();
-            document.location.hash = "pro"; // redirect to remove any query parameters from the url
+            loadSubPage('pro'); // redirect to remove any query parameters from the url
         });
     },
 
@@ -2050,43 +2308,42 @@ var paysafecard = {
      */
     showPaymentError: function() {
         msgDialog('warninga', l[7235], l[7234], '', function() {
-            document.location.hash = "pro"; // redirect to remove any query parameters from the url
+            loadSubPage('pro'); // redirect to remove any query parameters from the url
         });
     },
 
     /**
-     * We have been redirected back to mega with the 'okUrl'. We need to ask the API to verify the payment succeeded as per
-     * paysafecard's requirements, which they enforce with integration tests we must pass... so yeap, gotta do this.
+     * We have been redirected back to mega with the 'okUrl'. We need to ask the API to verify the payment
+     * succeeded as per paysafecard's requirements, which they enforce with integration tests we must pass.
+     * @param {String} saleIdString A string containing the sale ID e.g. saleid32849023423
      */
-    verify: function() {
-        var saleidstring = proPage.getUrlParam('saleidstring');
-        if (typeof saleidstring !== 'undefined') {
+    verify: function(saleIdString) {
 
-            // Make the vpay API request to follow up on this sale
-            var requestData = {
-                'a': 'vpay',                            // Credit Card Store
-                't': this.gatewayId,                    // The paysafecard gateway
-                'saleidstring': saleidstring            // Required by the API to know what to investigate
-            };
+        // Remove the saleid string to just get the ID to check
+        var saleId = saleIdString.replace('saleid', '');
 
-            var parent = this;
+        // Make the vpay API request to follow up on this sale
+        var requestData = {
+            'a': 'vpay',                      // Credit Card Store
+            't': this.gatewayId,              // The paysafecard gateway
+            'saleidstring': saleId            // Required by the API to know what to investigate
+        };
 
-            api_req(requestData, {
-                callback: function (result) {
+        api_req(requestData, {
+            callback: function (result) {
 
-                    // If negative API number
-                    if ((typeof result === 'number') && (result < 0)) {
-                        // Something went wrong with the payment, either card association or actually debitting it.
-                        parent.showPaymentError();
-                    }
-                    else {
-                        // Continue to account screen
-                        document.location.hash = "account";
-                    }
+                // If negative API number
+                if ((typeof result === 'number') && (result < 0)) {
+
+                    // Something went wrong with the payment, either card association or actually debitting it
+                    paysafecard.showPaymentError();
                 }
-            });
-        }
-        return false;
+                else {
+                    // Continue to account screen
+                    loadSubPage('account');
+                }
+            }
+        });
     }
 };
 
@@ -2106,6 +2363,427 @@ var centili = {
 };
 
 /**
+ * A dialog to capture the billing name and address before redirecting off-site
+ */
+var addressDialog = {
+
+    /** Cached jQuery selectors */
+    $dialog: null,
+    $backgroundOverlay: null,
+    $pendingOverlay: null,
+
+    /** The gateway ID for Ecomprocessing */
+    gatewayId: 16,
+
+    /** Extra details for the API 'utc' call */
+    extraDetails: {},
+
+    /**
+     * Open and setup the dialog
+     */
+    init: function() {
+        this.showDialog();
+        this.initStateDropDown();
+        this.initCountryDropDown();
+        this.initCountryDropdownChangeHandler();
+        this.initBuyNowButton();
+        this.initCloseButton();
+    },
+
+    /**
+     * Display the dialog
+     */
+    showDialog: function() {
+
+        // Cache DOM reference for lookup in other functions
+        this.$dialog = $('.fm-dialog.payment-address-dialog');
+        this.$backgroundOverlay = $('.fm-dialog-overlay');
+
+        // Get the selected package
+        var selectedPlanIndex = $('.duration-options-list .membership-radio.checked').parent().attr('data-plan-index');
+        var selectedPackage = membershipPlans[selectedPlanIndex];
+
+        // Get the selected Pro plan details
+        var proNum = selectedPackage[UTQA_RESPONSE_INDEX_ACCOUNTLEVEL];
+        var proPlan = getProPlan(proNum);
+        var proPrice = selectedPackage[UTQA_RESPONSE_INDEX_PRICE];
+        var numOfMonths = selectedPackage[UTQA_RESPONSE_INDEX_MONTHS];
+        var monthsWording = proPage.getNumOfMonthsWording(numOfMonths);
+
+        // Update template
+        this.$dialog.find('.plan-icon').removeClass('pro1 pro2 pro3 pro4').addClass('pro' + proNum);
+        this.$dialog.find('.payment-plan-title').text(proPlan);
+        this.$dialog.find('.payment-plan-txt .duration').text(monthsWording);
+        this.$dialog.find('.payment-plan-price .price').text(proPrice);
+
+        // Show the black background overlay and the dialog
+        this.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+        this.$dialog.removeClass('hidden');
+    },
+
+    /**
+     * Creates a list of state names with the ISO 3166-1-alpha-2 code as the option value
+     */
+    initStateDropDown: function() {
+
+        var stateOptions = '';
+        var $statesSelect = this.$dialog.find('.states');
+
+        // Build options
+        $.each(isoStates, function(isoCode, stateName) {
+
+            // Create the option and set the ISO code and state name
+            var $stateOption = $('<option>').val(isoCode).text(stateName);
+
+            // Append the HTML to the list of options
+            stateOptions += $stateOption.prop('outerHTML');
+        });
+
+        // Render the states and update the text when a state is selected
+        $statesSelect.append(stateOptions);
+
+        // Initialise the jQueryUI selectmenu
+        $statesSelect.selectmenu({
+            position: {
+                my: "left top-18",
+                at: "left bottom-18",
+                collision: "flip"  // default is ""
+            }
+        });
+    },
+
+    /**
+     * Creates a list of country names with the ISO 3166-1-alpha-2 code as the option value
+     */
+    initCountryDropDown: function() {
+
+        var countryOptions = '';
+        var $countriesSelect = this.$dialog.find('.countries');
+
+        // Build options
+        $.each(isoCountries, function(isoCode, countryName) {
+
+            // Create the option and set the ISO code and country name
+            var $countryOption = $('<option>').val(isoCode).text(countryName);
+
+            // Append the HTML to the list of options
+            countryOptions += $countryOption.prop('outerHTML');
+        });
+
+        // Render the countries and update the text when a country is selected
+        $countriesSelect.append(countryOptions);
+
+        // Initialise the jQueryUI selectmenu
+        $countriesSelect.selectmenu({
+            position: {
+                my: "left top-18",
+                at: "left bottom-18",
+                collision: "flip"  // default is ""
+            }
+        });
+    },
+
+    /**
+     * Initialises a change handler for the country dropdown. When the country changes to US or
+     * Canada it should enable the State dropdown. Otherwise it should disable the dropdown.
+     * Only states from the selected country should be shown.
+     */
+    initCountryDropdownChangeHandler: function() {
+
+        var $countriesSelect = this.$dialog.find('.countries');
+        var $statesSelect = this.$dialog.find('.states');
+        var $stateSelectmenuButton = this.$dialog.find('#address-dialog-states-button');
+
+        // On dropdown option change
+        $countriesSelect.selectmenu({
+            change: function(event, ui) {
+
+                // Get the selected country ISO code e.g. CA
+                var selectedCountryCode = ui.item.value;
+
+                // Reset states dropdown to default and select first option
+                $statesSelect.find('option:first-child').prop('disabled', false).prop('selected', true);
+
+                // If Canada or United States is selected
+                if ((selectedCountryCode === 'CA') || (selectedCountryCode === 'US')) {
+
+                    // Loop through all the states
+                    $statesSelect.find('option').each(function() {
+
+                        // Get just the country code from the state code e.g. CA-QC
+                        var $stateOption = $(this);
+                        var stateCode = $stateOption.val();
+                        var countryCode = stateCode.substr(0, 2);
+
+                        // If it's a match, show it
+                        if (countryCode === selectedCountryCode) {
+                            $stateOption.prop('disabled', false);
+                        }
+                        else {
+                            // Otherwise hide it
+                            $stateOption.prop('disabled', true);
+                        }
+                    });
+
+                    // Refresh the selectmenu to show/hide disabled options and enable the dropdown so it works
+                    $statesSelect.selectmenu('refresh');
+                    $statesSelect.selectmenu('enable');
+                }
+                else {
+                    // Refresh the selectmenu to show the selected first option (State) then disable the dropdown
+                    $statesSelect.selectmenu('refresh');
+                    $statesSelect.selectmenu('disable');
+                }
+
+                // Remove any previous validation error
+                $stateSelectmenuButton.removeClass('error');
+            }
+        });
+    },
+
+    /**
+     * Initialise the button for buy now
+     */
+    initBuyNowButton: function() {
+
+        // Add the click handler to redirect off site
+        this.$dialog.find('.payment-buy-now').rebind('click', function() {
+
+            addressDialog.validateAndPay();
+        });
+    },
+
+    /**
+     * Initialise the X (close) button in the top right corner of the dialog
+     */
+    initCloseButton: function() {
+
+        // Add the click handler to hide the dialog and the black overlay
+        this.$dialog.find('.btn-close-dialog').rebind('click', function() {
+
+            addressDialog.closeDialog();
+        });
+    },
+
+    /**
+     * Closes the dialog
+     */
+    closeDialog: function() {
+
+        this.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+        this.$dialog.removeClass('active').addClass('hidden');
+    },
+
+    /**
+     * Collects the form details and validates the form
+     */
+    validateAndPay: function() {
+
+        // Selectors for form text fields
+        var fields = ['first-name', 'last-name', 'address1', 'address2', 'city', 'postcode'];
+        var fieldValues = {};
+
+        // Get the values from the inputs
+        for (var i = 0; i < fields.length; i++) {
+
+            // Get the form field value
+            var fieldName = fields[i];
+            var fieldValue = this.$dialog.find('.' + fieldName).val();
+
+            // Trim the text
+            fieldValues[fieldName] = $.trim(fieldValue);
+        }
+
+        // Get the values from the dropdowns
+        var $stateSelect = this.$dialog.find('.states');
+        var $countrySelect = this.$dialog.find('.countries');
+        var $stateSelectmenuButton = this.$dialog.find('#address-dialog-states-button');
+        var $countrySelectmenuButton = this.$dialog.find('#address-dialog-countries-button');
+        var state = $stateSelect.val();
+        var country = $countrySelect.val();
+
+        // Selectors for error handling
+        var $errorMessage = this.$dialog.find('.error-message');
+        var $allInputs = this.$dialog.find('.fm-account-input, .ui-selectmenu-button');
+
+        // Reset state of past error messages
+        var stateNotSet = false;
+        $errorMessage.addClass('hidden');
+        $allInputs.removeClass('error');
+
+        // Add red border around the missing fields
+        $.each(fieldValues, function(fieldName, value) {
+
+            // Make sure the value is set, if not add the class (ignoring address2 field which is not compulsory)
+            if ((!value) && (fieldName !== 'address2')) {
+                addressDialog.$dialog.find('.' + fieldName).parent().addClass('error');
+            }
+        });
+
+        // Add red border around the missing country selectmenu
+        if (!country) {
+            $countrySelectmenuButton.addClass('error');
+        }
+
+        // If the country is US or Canada then the State is also required field
+        if (((country === 'US') || (country === 'CA')) && !state) {
+            $stateSelectmenuButton.addClass('error');
+            stateNotSet = true;
+        }
+
+        // Check all required fields
+        if (!fieldValues['first-name'] || !fieldValues['last-name'] || !fieldValues['address1'] ||
+                !fieldValues['city'] || !fieldValues['postcode'] || !country || stateNotSet) {
+
+            // Show a general error and exit early if they are not complete
+            $errorMessage.removeClass('hidden');
+            return false;
+        }
+
+        // Send to the API
+        this.proceedToPay(fieldValues, state, country);
+    },
+
+    /**
+     * Setup the payment details to send to the API
+     * @param {Object} fieldValues The form field names and their values
+     * @param {type} state The value of the state dropdown
+     * @param {type} country The value of the country dropdown
+     */
+    proceedToPay: function(fieldValues, state, country) {
+
+        // Set details for the UTC call
+        this.extraDetails.first_name = fieldValues['first-name'];
+        this.extraDetails.last_name = fieldValues['last-name'];
+        this.extraDetails.address1 = fieldValues['address1'];
+        this.extraDetails.address2 = fieldValues['address2'];
+        this.extraDetails.city = fieldValues['city'];
+        this.extraDetails.zip_code = fieldValues['postcode'];
+        this.extraDetails.country = country;
+        this.extraDetails.recurring = false;
+
+        // If the country is US or Canada, add the state by stripping the country code off e.g. to get QC from CA-QC
+        if ((country === 'US') || (country === 'CA')) {
+            this.extraDetails.state = state.substr(3);
+        }
+
+        // Get the value for whether the user wants the plan to renew automatically
+        var autoRenewCheckedValue = $('.membership-step2 .renewal-options-list input:checked').val();
+
+        // If the provider supports recurring payments and the user wants the plan to renew automatically
+        if (autoRenewCheckedValue === 'yes') {
+            this.extraDetails.recurring = true;
+        }
+
+        // Hide the dialog so the loading one will show, then proceed to pay
+        this.$dialog.addClass('hidden');
+        pro_pay();
+    },
+
+    /**
+     * Redirect to the site
+     * @param {String} utcResult containing the url to redirect to
+     */
+    redirectToSite: function(utcResult) {
+
+        var url = utcResult.EUR['url'];
+        window.location = url + '?lang=' + lang;
+    },
+
+    /**
+     * Process the result from the API User Transaction Complete call
+     * @param {Object} utcResult The results from the UTC call
+     */
+    processUtcResult: function(utcResult) {
+        if (utcResult.EUR.url) {
+            this.redirectToSite(utcResult);
+        }
+        else {
+            // Hide the loading animation and show the error
+            proPage.hideLoadingOverlay();
+            this.showError(utcResult);
+        }
+    },
+
+    /**
+     * Something has gone wrong with the API and Ecomprocessing setup
+     * @param {Object} utcResult The result from the UTC API call with error codes
+     */
+    showError: function(utcResult) {
+
+        // Generic error: Oops, something went wrong. Please try again later.
+        var message = l[200] + ' ' + l[253];
+
+        // Transaction could not be initiated due to connection problems...
+        if (utcResult.EUR.error === EINTERNAL) {
+            message = l[7233];
+        }
+
+        // Please complete the payment details correctly.
+        else if (utcResult.EUR.error === EARGS) {
+            message = l[6959];
+        }
+
+        // You have too many incomplete payments in the last 12 hours...
+        else if (utcResult.EUR.error === ETEMPUNAVAIL) {
+            message = l[7982];
+        }
+
+        // Show error dialog
+        msgDialog('warninga', l[7235], message, '', function() {
+            addressDialog.showDialog();
+        });
+    },
+
+    /**
+     * Show the payment result of success or failure after coming back from Ecomprocessing
+     * @param {String} verifyUrlParam The URL parameter e.g. 'ecp-success' or 'ecp-failure'
+     */
+    showPaymentResult: function(verifyUrlParam) {
+
+        var $backgroundOverlay = $('.fm-dialog-overlay');
+        var $pendingOverlay = $('.payment-result.pending.alternate');
+        var $failureOverlay = $('.payment-result.failed');
+
+        // Show the overlay
+        $backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
+
+        // On successful payment
+        if (verifyUrlParam === 'success') {
+
+            // Show the success
+            $pendingOverlay.removeClass('hidden');
+
+            // Add click handlers for 'Go to my account' and Close buttons
+            $pendingOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
+
+                // Hide the overlay
+                $backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+                $pendingOverlay.addClass('hidden');
+
+                // Make sure it fetches new account data on reload
+                if (M.account) {
+                    M.account.lastupdate = 0;
+                }
+                loadSubPage('fm/account/history');
+            });
+        }
+        else {
+            // Show the failure overlay
+            $failureOverlay.removeClass('hidden');
+
+            // On click of the 'Try again' or Close buttons, hide the overlay
+            $failureOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
+
+                // Hide the overlay
+                $backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+                $failureOverlay.addClass('hidden');
+            });
+        }
+    }
+};
+
+/**
  * Credit card payment dialog
  */
 var cardDialog = {
@@ -2116,10 +2794,10 @@ var cardDialog = {
     $failureOverlay: null,
     $loadingOverlay: null,
 
-    // Flag to prevent accidental double payments
+    /** Flag to prevent accidental double payments */
     paymentInProcess: false,
 
-    // The RSA public key to encrypt data to be stored on the Secure Processing Unit (SPU)
+    /** The RSA public key to encrypt data to be stored on the Secure Processing Unit (SPU) */
     publicKey: [
         atob(
             "wfvbeFkjArOsHvAjXAJqve/2z/nl2vaZ+0sBj8V6U7knIow6y3/6KJ" +
@@ -2133,6 +2811,9 @@ var cardDialog = {
         "\u0001\u0000\u0001",   // Exponent 65537
         2048                    // Key size in bits
     ],
+
+    /** The gateway ID for using Credit cards */
+    gatewayId: 8,
 
     /**
      * Open and setup the dialog
@@ -2180,9 +2861,9 @@ var cardDialog = {
 
         // Update the Pro plan details
         this.$dialog.find('.plan-icon').removeClass('pro1 pro2 pro3 pro4').addClass('pro' + proNum);
-        this.$dialog.find('.payment-plan-title').html(proPlan);
-        this.$dialog.find('.payment-plan-price').html(proPrice + '&euro;');
-        this.$dialog.find('.payment-plan-txt').html(monthsWording + ' ' + l[6965] + ' ');
+        this.$dialog.find('.payment-plan-title').text(proPlan);
+        this.$dialog.find('.payment-plan-price').text(proPrice + '\u20AC');
+        this.$dialog.find('.payment-plan-txt').text(monthsWording + ' ' + l[6965] + ' ');
 
         // Remove rogue colon in translation text
         var statePlaceholder = this.$dialog.find('.state-province').attr('placeholder').replace(':', '');
@@ -2262,7 +2943,7 @@ var cardDialog = {
         var $countriesDropDown = $countriesSelect.find('.default-select-scroll');
 
         // Build options
-        $.each(isocountries, function(isoCode, countryName) {
+        $.each(isoCountries, function(isoCode, countryName) {
             countryOptions += '<div class="default-dropdown-item " data-value="' + isoCode + '">' + countryName + '</div>';
         });
 
@@ -2434,6 +3115,9 @@ var cardDialog = {
             'hash': cardDataHashHex
         };
 
+        // Close the dialog
+        cardDialog.$dialog.removeClass('active').addClass('hidden');
+
         // Proceed with payment
         api_req(requestData, {
             callback: function (result) {
@@ -2463,12 +3147,23 @@ var cardDialog = {
     },
 
     /**
-     * Close the card dialog and show the loading overlay
+     * Process the result from the API User Transaction Complete call
+     * @param {Object} utcResult The results from the UTC call
      */
-    closeDialogAndShowProcessing: function() {
+    processUtcResult: function(utcResult) {
 
-        cardDialog.$dialog.removeClass('active').addClass('hidden');
-        proPage.showLoadingOverlay('processing');
+        // Hide the loading animation
+        proPage.hideLoadingOverlay();
+
+        // Show credit card success
+        if (utcResult.EUR.res === 'S') {
+            cardDialog.showSuccessfulPayment(utcResult);
+        }
+
+        // Show credit card failure
+        else if ((utcResult.EUR.res === 'FP') || (utcResult.EUR.res === 'FI')) {
+            cardDialog.showFailureOverlay(utcResult);
+        }
     },
 
     /**
@@ -2508,7 +3203,7 @@ var cardDialog = {
             if (M.account) {
                 M.account.lastupdate = 0;
             }
-            window.location.hash = 'fm/account/history';
+            loadSubPage('fm/account/history');
         });
     },
 
@@ -2621,10 +3316,14 @@ var cardDialog = {
  */
 var bitcoinDialog = {
 
-    // Timer for counting down the time till when the price expires
+    /** Timer for counting down the time till when the price expires */
     countdownIntervalId: 0,
 
+    /** Original HTML of the Bitcoin dialog before modifications */
     dialogOriginalHtml: '',
+
+    /** The gateway ID for using Bitcoin */
+    gatewayId: 4,
 
     /**
      * Step 3 in plan purchase with Bitcoin
@@ -2649,12 +3348,11 @@ var bitcoinDialog = {
 
         // Cache selectors
         var $dialogBackgroundOverlay = $('.fm-dialog-overlay');
-        var $bitcoinLoadingDialog = $('.pro-register-paypal-dialog');
         var $bitcoinDialog = $('.bitcoin-invoice-dialog');
-                
+
         // If this is the first open
         if (bitcoinDialog.dialogOriginalHtml === '') {
-            
+
             // Clone the HTML for the original dialog so it can be reset upon re-opening
             bitcoinDialog.dialogOriginalHtml = $bitcoinDialog.html();
         }
@@ -2688,10 +3386,9 @@ var bitcoinDialog = {
             // End countdown timer
             clearInterval(bitcoinDialog.countdownIntervalId);
         });
-        
+
         // Make background overlay darker and show the dialog
-        $dialogBackgroundOverlay.addClass('bitcoin-invoice-dialog-overlay');
-        $bitcoinLoadingDialog.addClass('hidden');
+        $dialogBackgroundOverlay.addClass('bitcoin-invoice-dialog-overlay').removeClass('hidden');
         $bitcoinDialog.removeClass('hidden');
     },
 
@@ -2725,10 +3422,10 @@ var bitcoinDialog = {
      * @returns {Number} Returns the interval id
      */
     setCoundownTimer: function(dialog, expiryTime) {
-        
+
         // Clear old countdown timer if they have re-opened the page
         clearInterval(bitcoinDialog.countdownIntervalId);
-        
+
         // Count down the time to price expiration
         bitcoinDialog.countdownIntervalId = setInterval(function() {
 
@@ -2777,13 +3474,31 @@ var bitcoinDialog = {
     },
 
     /**
+     * Process the result from the API User Transaction Complete call
+     * @param {Object} utcResult The results from the UTC call
+     */
+    processUtcResult: function(utcResult) {
+
+        // Hide the loading animation
+        proPage.hideLoadingOverlay();
+
+        // Show the Bitcoin invoice dialog
+        if (typeof utcResult.EUR === 'object') {
+            bitcoinDialog.showInvoice(utcResult.EUR);
+        }
+        else {
+            bitcoinDialog.showBitcoinProviderFailureDialog();
+        }
+    },
+
+    /**
      * Show a failure dialog if the provider can't be contacted
      */
     showBitcoinProviderFailureDialog: function() {
 
         var $dialogBackgroundOverlay = $('.fm-dialog-overlay');
         var $bitcoinFailureDialog = $('.bitcoin-provider-failure-dialog');
-        
+
         // Add styles for the dialog
         $bitcoinFailureDialog.removeClass('hidden');
         $dialogBackgroundOverlay.addClass('bitcoin-invoice-dialog-overlay').removeClass('hidden');
@@ -2827,12 +3542,10 @@ function showLoginDialog(email) {
         });
 
     $('.input-email', $dialog)
-        .data('placeholder', l[195])
-        .val(email || l[195]);
+        .val(email || '');
 
     $('.input-password', $dialog)
-        .data('placeholder', l[909])
-        .val(l[909]);
+        .val('');
 
     uiPlaceholders($dialog);
     uiCheckboxes($dialog);
@@ -2852,13 +3565,15 @@ function showLoginDialog(email) {
     $('.top-login-forgot-pass', $dialog).unbind('click');
     $('.top-login-forgot-pass', $dialog).bind('click',function(e)
     {
-        document.location.hash = 'recovery';
+        loadSubPage('recovery');
     });
 
     $('.top-dialog-login-button', $dialog).unbind('click');
     $('.top-dialog-login-button', $dialog).bind('click',function(e) {
         doProLogin($dialog);
     });
+
+    clickURLs();
 };
 
 var doProLogin = function($dialog) {
@@ -2877,8 +3592,16 @@ var doProLogin = function($dialog) {
         checkloginresult: function(ctx,r)
         {
             loadingDialog.hide();
-
-            if (r == EBLOCKED)
+            var e = $('#login-name', $dialog).val();
+            if (e === '' || checkMail(e)) {
+                $('.top-login-input-block.e-mail', $dialog).addClass('incorrect');
+                $('#login-name', $dialog).val('');
+                $('#login-name', $dialog).focus();
+            }
+            else if ($('#login-password', $dialog).val() === '') {
+                $('.top-login-input-block.password', $dialog).addClass('incorrect');
+            }
+            else if (r === EBLOCKED)
             {
                 alert(l[730]);
             }
@@ -2899,8 +3622,9 @@ var doProLogin = function($dialog) {
             }
             else
             {
-                $('#login-password', $dialog).val('');
-                alert(l[201]);
+                $('.top-login-pad', $dialog).addClass('both-incorrect-inputs');
+                $('.top-login-input-tooltip.both-incorrect', $dialog).addClass('active');
+                $('#login-password', $dialog).select();
             }
         }
     };
@@ -2958,78 +3682,6 @@ function showRegisterDialog() {
     });
 };
 
-var paypalTimeout = null;
-function showLoadingDialog(url) {
-
-    clearTimeout(paypalTimeout);
-
-    $('.pro-register-dialog')
-        .removeClass('active')
-        .addClass('hidden');
-
-    $('.fm-dialog-overlay').removeClass('hidden');
-
-    var $dialog = $('.fm-dialog.pro-register-paypal-dialog');
-
-    var reposition = function() {
-        $dialog.css({
-            'margin-left': -1 * ($dialog.outerWidth() / 2),
-            'margin-top': -1 * ($dialog.outerHeight() / 2)
-        });
-    };
-    reposition();
-
-
-    var fadeOutInLoop = function($elm) {
-        $elm
-            .animate({
-                'opacity': 0.2
-            }, 600)
-            .animate({'opacity': 1}, 1000, function() {
-                fadeOutInLoop($elm);
-            });
-    };
-
-    fadeOutInLoop($('.pro-register-paypal-dialog .reg-success-icon'));
-
-    $dialog
-        .addClass('active')
-        .removeClass('hidden');
-
-    if (url) {
-        megaAnalytics.log("pro", "proceedingToPaypal");
-
-        paypalTimeout = setTimeout(function () {
-            document.location = url;
-        }, 3000);
-    }
-
-}
-function redirectToPaypalHide() {
-    $('.fm-dialog.pro-register-paypal-dialog')
-        .removeClass('active')
-        .addClass('hidden');
-
-    $('.fm-dialog-overlay').addClass('hidden');
-}
-
-var proceedToPaypal = function() {
-
-    if (pro_package) {
-        var cls = pro_package
-            .replace("_month", "")
-            .replace("_year", "");
-
-        $('.reg-st3-membership-bl').removeClass('selected')
-        $('.reg-st3-membership-bl.' + cls).addClass('selected');
-
-        u_type=1;
-    }
-
-    pro_continue();
-};
-
-
 var signupPromptDialog = null;
 var showSignupPromptDialog = function() {
     if (!signupPromptDialog) {
@@ -3050,16 +3702,16 @@ var showSignupPromptDialog = function() {
 
             // custom buttons, because of the styling
             $('.fm-notification-info',this.$dialog)
-                .html('<p>' + l[5842] + '</p>');
+                .safeHTML('<p>@@</p>', l[5842]);
 
-            $('.fm-dialog-button.pro-login', this.$dialog)
+            $('.pro-login', this.$dialog)
                 .rebind('click.loginrequired', function() {
                     signupPromptDialog.hide();
                     showLoginDialog();
                     return false;
                 });
 
-            $('.fm-dialog-button.pro-register', this.$dialog)
+            $('.pro-register', this.$dialog)
                 .rebind('click.loginrequired', function() {
                     signupPromptDialog.hide();
 
@@ -3098,4 +3750,4 @@ var showSignupPromptDialog = function() {
         .removeClass('plan3')
         .removeClass('plan4')
         .addClass('plan' + plan);
-}
+};

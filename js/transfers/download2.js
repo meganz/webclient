@@ -8,7 +8,7 @@
  * you accept this licence. If you do not accept the licence,
  * do not access the code.
  *
- * Words used in the Mega Limited Terms of Service [https://mega.nz/#terms]
+ * Words used in the Mega Limited Terms of Service [https://mega.nz/terms]
  * have the same meaning in this licence. Where there is any inconsistency
  * between this licence and those Terms of Service, these terms prevail.
  *
@@ -59,6 +59,27 @@ var dlmanager = {
     dlZipID: 0,
     gotHSTS: false,
     logger: MegaLogger.getLogger('dlmanager'),
+
+    /**
+     * Set user flags for the limitation dialogs.
+     * @alias dlmanager.lmtUserFlags
+     */
+    setUserFlags: function() {
+        this.lmtUserFlags = 0;
+
+        if (u_type) {
+            this.lmtUserFlags |= this.LMT_ISREGISTERED;
+
+            if (Object(u_attr).p) {
+                this.lmtUserFlags |= this.LMT_ISPRO;
+            }
+        }
+
+        mega.achievem.enabled()
+            .done(function() {
+                dlmanager.lmtUserFlags |= dlmanager.LMT_HASACHIEVEMENTS;
+            });
+    },
 
     newUrl: function DM_newUrl(dl, callback) {
         var gid = dl.dl_id || dl.ph;
@@ -334,7 +355,7 @@ var dlmanager = {
 
                     dlmanager.isOverQuota = false;
                     dlmanager.isOverFreeQuota = false;
-                    delete localStorage.awaitingConfirmationAccount;
+                    $('.limited-bandwidth-dialog .fm-dialog-close').trigger('click');
                     return ctx.next(false, res, attr, ctx.object);
                 }
             }
@@ -653,9 +674,23 @@ var dlmanager = {
 
     _onQuotaRetry: function DM_onQuotaRetry(getNewUrl, sid) {
         delay.cancel('overquota:retry');
+        this.setUserFlags();
 
         var ids = dlmanager.getCurrentDownloads();
-        $('.fm-dialog.bandwidth-dialog .fm-dialog-close').trigger('click');
+        // $('.limited-bandwidth-dialog .fm-dialog-close').trigger('click');
+
+        if (this.onOverquotaWithAchievements) {
+            closeDialog();
+            topmenuUI();
+
+            mega.achievem.achievementsListDialog(function() {
+                if (dlmanager.onLimitedBandwidth) {
+                    dlmanager.onLimitedBandwidth();
+                }
+            });
+            delete this.onOverquotaWithAchievements;
+            return;
+        }
 
         if (this.isOverFreeQuota) {
             closeDialog();
@@ -766,17 +801,12 @@ var dlmanager = {
                             timeLeft += 3600;
                         }
                     }
-                    if (!res.rtt && size > 0) {
-                        var limit = bytesToSize(size);
-                        var hours = res.tah.length;
-                        this._overquotaShowVariables(limit, hours);
-                    }
                 }
 
                 clearInterval(this._overQuotaTimeLeftTick);
                 delay('overquota:retry', this._onQuotaRetry.bind(this), timeLeft * 1000);
 
-                var $dialog = $('.fm-dialog.bandwidth-dialog.overquota');
+                var $dialog = $('.fm-dialog.limited-bandwidth-dialog');
                 this._overquotaClickListeners($dialog);
 
                 if ($dialog.is(':visible')) {
@@ -792,32 +822,81 @@ var dlmanager = {
         });
     },
 
-    _overquotaClickListeners: function($dialog) {
+    _overquotaClickListeners: function($dialog, flags, preWarning) {
         var self = this;
         var onclick = function onProClicked() {
             self.onOverQuotaProClicked = true;
             delay('overquota:uqft', self._overquotaInfo.bind(self), 30000);
 
-            if ($(this).hasClass('membership-button')) {
-                open(getAppBaseUrl() + '#pro_' + $(this).parents('.reg-st3-membership-bl').data('payment'));
+            if ($(this).hasClass('reg-st3-membership-bl')) {
+                open(getAppBaseUrl() + '#pro_' + $(this).data('payment'));
             }
             else {
                 open(getAppBaseUrl() + '#pro');
             }
         };
-        $dialog.find('.membership-button').rebind('click', onclick);
-        $('#bwd-utp-xz1').rebind('click', onclick);
-    },
 
-    _overquotaShowVariables: function(dlQuotaLimit, dlQuotaHours) {
-        $('.fm-dialog.bandwidth-dialog.overquota .bandwidth-text-bl.second').removeClass('hidden')
-            .safeHTML(
-                l[7099]
-                    .replace("6", dlQuotaHours)
-                    .replace('%1', dlQuotaLimit)
-                    .replace("[A]", '<a class="red" id="bwd-utp-xz1" style="cursor:pointer">')
-                    .replace('[/A]', '</a>')
+        if (preWarning) {
+            $('.msg-overquota', $dialog).addClass('hidden');
+            $('.msg-prewarning', $dialog).removeClass('hidden');
+
+            $('.continue', $dialog)
+                .removeAttr('style')
+                .rebind('click', this.onLimitedBandwidth.bind(this));
+
+            $('.upgrade', $dialog).rebind('click', function() {
+
+                closeDialog();
+
+                if (preWarning > 1) {
+                    loadingDialog.show();
+                    open(getAppBaseUrl() + '#pro');
+                    return false;
+                }
+
+                dlmanager.showRegisterDialog4ach($dialog, flags);
+            });
+        }
+        else {
+            $('.msg-overquota', $dialog).removeClass('hidden');
+            $('.msg-prewarning', $dialog).addClass('hidden');
+
+            $('.continue', $dialog).attr('style', 'display:none');
+
+            $('.upgrade', $dialog).rebind('click', onclick);
+            $dialog.find('.reg-st3-membership-bl').rebind('click', onclick);
+        }
+
+        $('.bottom-tips a', $dialog).rebind('click', function() {
+            open(getAppBaseUrl() +
+                '#help/client/webclient/cloud-drive/' +
+                'how-do-you-regulate-transfer-quota-bandwidth-utilisation'
             );
+        });
+
+        if (flags & this.LMT_ISREGISTERED) {
+            $dialog.addClass('registered');
+        }
+
+        if (flags & this.LMT_HASACHIEVEMENTS) {
+            $dialog.addClass('achievements');
+            $('.get-more-bonuses', $dialog).rebind('click', function() {
+                closeDialog();
+
+                if (flags & dlmanager.LMT_ISREGISTERED) {
+                    mega.achievem.achievementsListDialog(function() {
+                        if (dlmanager.onLimitedBandwidth) {
+                            dlmanager.onLimitedBandwidth();
+                        }
+                    });
+                }
+                else {
+                    dlmanager.showRegisterDialog4ach($dialog, flags);
+                }
+            });
+
+            localStorage.gotOverquotaWithAchievements = 1;
+        }
     },
 
     _setOverQuotaState: function DM_setOverQuotaState(dlTask) {
@@ -838,7 +917,7 @@ var dlmanager = {
             });
     },
 
-    showOverQuotaRegisterDialog: function DM_quotaDialog(dlTask) {
+    showOverQuotaRegisterDialog: function DM_freeQuotaDialog(dlTask) {
 
         this._setOverQuotaState(dlTask);
 
@@ -848,6 +927,12 @@ var dlmanager = {
             return delay('overfreequota:retry', this._onQuotaRetry.bind(this, true), 1200);
         }
         this.isOverFreeQuota = true;
+
+        if (localStorage.awaitingConfirmationAccount) {
+            var accountData = JSON.parse(localStorage.awaitingConfirmationAccount);
+            this.logger.debug('showOverQuotaRegisterDialog: awaitingConfirmationAccount!');
+            return mega.ui.sendSignupLinkDialog(accountData);
+        }
 
         api_req({ a: 'log', e: 99613, m: 'efq' });
 
@@ -867,68 +952,83 @@ var dlmanager = {
         });
     },
 
-    showLimitedBandwidthDialog: function(res, callback) {
+    /**
+     * Wrapper around mega.ui.showRegisterDialog()
+     * @param {jQuery} [$dialog]   The parent dialog
+     * @param {Number} [flags]     Limitation flags
+     */
+    showRegisterDialog4ach: function DM_showRegisterDialog($dialog, flags) {
+        if (flags & this.LMT_HASACHIEVEMENTS) {
+            this.onOverquotaWithAchievements = true;
+        }
+        mega.ui.showRegisterDialog({
+            onAccountCreated: function(gotLoggedIn, accountData) {
+                if (gotLoggedIn) {
+                    if (dlmanager.onLimitedBandwidth) {
+                        dlmanager.onLimitedBandwidth();
+                    }
+                    else {
+                        console.error('This should not be reached..');
+                    }
+                }
+                else {
+                    localStorage.awaitingConfirmationAccount = JSON.stringify(accountData);
+                    mega.ui.sendSignupLinkDialog(accountData);
+                }
+            },
+            onDialogClosed: function() {
+                if ($dialog) {
+                    fm_showoverlay();
+                    $dialog.removeClass('hidden');
+                }
+                delete dlmanager.onOverquotaWithAchievements;
+            }
+        });
+    },
+
+    showLimitedBandwidthDialog: function(res, callback, flags) {
         var $dialog = $('.limited-bandwidth-dialog');
 
         loadingDialog.hide();
         this.onLimitedBandwidth = function() {
             if (callback) {
-                $('a.red', $dialog).unbind('click');
+                $dialog.removeClass('registered achievements exceeded pro slider');
+                $('.bottom-tips a', $dialog).unbind('click');
                 $('.continue', $dialog).unbind('click');
                 $('.upgrade', $dialog).unbind('click');
+                $('.get-more-bonuses', $dialog).unbind('click');
                 Soon(callback);
                 callback = $dialog = undefined;
             }
+            delete this.onLimitedBandwidth;
         };
 
         fm_showoverlay();
         uiCheckboxes($dialog, 'ignoreLimitedBandwidth').removeClass('hidden');
 
-        $('.header-after-icon', $dialog).text(l[8943]);
-        $('.p-after-icon', $dialog).safeHTML(l[8944]);
+        flags = flags !== undefined ? flags : this.lmtUserFlags;
+
+        if (d) {
+            // as per ticket 6446
+            // /* 01 */ flags = this.LMT_ISREGISTERED | this.LMT_HASACHIEVEMENTS;
+            // /* 02 */ flags = this.LMT_HASACHIEVEMENTS;
+            // /* 03 */ flags = 0;
+            // /* 04 */ flags = this.LMT_ISREGISTERED;
+        }
 
         api_req({ a: 'log', e: 99617, m: 'qbq' });
 
-        $('a.red', $dialog).rebind('click', function() {
-            open(getAppBaseUrl() + '#pro');
-        });
-
-        $('.continue', $dialog).rebind('click', callback)
-            .find('span')
-            .text(res === 2 ? l[8946] : l[8945]);
-
-        $('.upgrade', $dialog).rebind('click', function() {
-
-            closeDialog();
-
-            if (res === 2) {
-                loadingDialog.show();
-                open(getAppBaseUrl() + '#pro');
-                return false;
-            }
-
-            mega.ui.showRegisterDialog({
-                onAccountCreated: function(gotLoggedIn, accountData) {
-                    if (gotLoggedIn) {
-                        dlmanager.onLimitedBandwidth();
-                    }
-                    else {
-                        localStorage.awaitingConfirmationAccount = JSON.stringify(accountData);
-                        mega.ui.sendSignupLinkDialog(accountData);
-                    }
-                }
-            });
-        })
-        .find('span').text(res === 2 ? l[8954] : l[1108]);
+        this._overquotaClickListeners($dialog, flags, res || true);
     },
 
-    showOverQuotaDialog: function DM_quotaDialog(dlTask) {
+    showOverQuotaDialog: function DM_quotaDialog(dlTask, flags) {
 
         if (this.efq) {
             return this.showOverQuotaRegisterDialog(dlTask);
         }
+        loadingDialog.hide();
 
-        var $dialog = $('.fm-dialog.bandwidth-dialog.overquota');
+        var $dialog = $('.limited-bandwidth-dialog');
         var $button = $dialog.find('.fm-dialog-close');
         var $overlay = $('.fm-dialog-overlay');
 
@@ -939,13 +1039,77 @@ var dlmanager = {
             return;
         }
 
+        if ($('.fm-dialog.achievements-list-dialog').is(':visible')) {
+            this.logger.info('showOverQuotaDialog', 'Achievements dialog visible.');
+            return;
+        }
+
         fm_showoverlay();
-        $dialog.removeClass('hidden')
-            .find('.bandwidth-header')
+        $dialog
+            .removeClass('registered achievements exceeded pro slider')
+            .find('.transfer-overquota-txt')
             .safeHTML(l[7100].replace('%1', '<span class="hidden countdown"></span>'))
             .end();
 
-        $dialog.find('.bandwidth-text-bl.second').addClass('hidden');
+        flags = flags !== undefined ? flags : this.lmtUserFlags;
+
+        if (d) {
+            // as per ticket 6446
+            // /* 05 */ flags = this.LMT_ISREGISTERED | this.LMT_HASACHIEVEMENTS;
+            // /* 06 */ flags = this.LMT_HASACHIEVEMENTS;
+            // /* 07 */ flags = 0;
+            // /* 08 */ flags = this.LMT_ISREGISTERED;
+            // /* 09 */ flags = this.LMT_ISREGISTERED | this.LMT_ISPRO | this.LMT_HASACHIEVEMENTS;
+            // /* 10 */ flags = this.LMT_ISREGISTERED | this.LMT_ISPRO;
+        }
+
+        if (flags & this.LMT_ISPRO) {
+            $dialog.addClass('pro');
+
+            loadingDialog.show();
+            if (M.account) {
+                // Force data retrieval from API
+                M.account.lastupdate = 0;
+            }
+            M.accountData(function(account) {
+                var tfsQuotaLimit = bytesToSize(account.bw, 0).split(' ');
+                var tfsQuotaUsed = (account.downbw_used + account.servbw_used);
+                var perc = Math.min(100, Math.ceil(tfsQuotaUsed * 100 / account.bw));
+
+                $('.chart.data .size-txt', $dialog).text(bytesToSize(tfsQuotaUsed, 0));
+                $('.chart.data .pecents-txt', $dialog).text(tfsQuotaLimit[0]);
+                $('.chart.data .gb-txt', $dialog).text(tfsQuotaLimit[1]);
+                $('.fm-account-blocks.bandwidth', $dialog).removeClass('no-percs');
+                $('.chart.data .perc-txt', $dialog).text(perc + '%');
+
+                // if they granted quota to other users
+                if (account.servbw_limit > 0) {
+                    $dialog.addClass('slider');
+
+                    $('.bandwidth-slider', $dialog).slider({
+                        min: 0, max: 100, range: 'min', value: account.servbw_limit,
+                        change: function(e, ui) {
+                            if (ui.value < account.servbw_limit) {
+                                // retry download if less quota was chosen...
+                                loadingDialog.show();
+                                mega.api.req({a: 'up', srvratio: ui.value})
+                                    .always(function() {
+                                        loadingDialog.hide();
+                                        dlmanager._onQuotaRetry(true);
+                                    });
+                            }
+                        }
+                    });
+                }
+
+                loadingDialog.hide();
+                $dialog.addClass('exceeded').removeClass('hidden');
+            });
+        }
+        else {
+            $dialog.addClass('exceeded').removeClass('hidden');
+        }
+
         this._overquotaInfo();
 
         var doCloseModal = function closeModal() {
@@ -953,14 +1117,16 @@ var dlmanager = {
             $dialog.addClass('hidden');
             $button.unbind('click.quota');
             $overlay.unbind('click.quota');
-            fm_hideoverlay();
+            if ($.dialog !== 'achievements') {
+                fm_hideoverlay();
+            }
             return false;
         };
 
         $button.rebind('click.quota', doCloseModal);
         $overlay.rebind('click.quota', doCloseModal);
 
-        this._overquotaClickListeners($dialog);
+        this._overquotaClickListeners($dialog, flags);
     },
 
     getCurrentDownloads: function() {
@@ -1064,6 +1230,11 @@ var dlmanager = {
         return promise;
     }
 };
+
+/** @name dlmanager.LMT_ISPRO */
+/** @name dlmanager.LMT_ISREGISTERED */
+/** @name dlmanager.LMT_HASACHIEVEMENTS */
+makeEnum(['ISREGISTERED', 'ISPRO', 'HASACHIEVEMENTS'], 'LMT_', dlmanager);
 
 // TODO: move the next functions to fm.js when no possible conflicts
 function fm_tfsorderupd() {
@@ -1302,27 +1473,34 @@ function fm_tfsupdate() {
     var i = 0;
     var u = 0;
 
-    // Move completed transfers to the bottom
-    var $completed = $('.transfer-table tr.transfer-completed');
-    var completedLen = $completed.length;
-    $('.transfer-table').append($completed);
+    var tfse = M.getTransferElements();
+    if (!tfse) {
+        return false;
+    }
+    var domTable = tfse.domTable;
 
-    // Remove completed transfers filling the whole table
-    if ($('.transfer-table tr:first').hasClass('transfer-completed')) {
-        var trLen = M.getTransferTableLengths().size;
-        if (completedLen >= trLen) {
-            if (completedLen > 50) {
-                $('.transfer-table tr.transfer-completed')
-                    .slice(0, trLen)
-                    .fadeOut(function() {
-                        $(this).remove();
-                    });
+    var domCompleted = domTable.querySelectorAll('tr.transfer-completed');
+    var completedLen = domCompleted.length;
+    if (completedLen) {
+        var ttl    = M.getTransferTableLengths();
+        var parent = domCompleted[0].parentNode;
+
+        if (completedLen + 4 > ttl.size || M.pendingTransfers > 50 + ttl.used * 4) {
+            // Remove completed transfers filling the whole table
+            while (completedLen--) {
+                parent.removeChild(domCompleted[completedLen]);
             }
-            $('.transfer-scrolling-table').trigger('jsp-scroll-y.tfsdynlist', [0, 0, 1]);
+            mBroadcaster.sendMessage('tfs-dynlist-flush');
+        }
+        else {
+            // Move completed transfers to the bottom
+            while (completedLen--) {
+                parent.appendChild(domCompleted[completedLen]);
+            }
         }
     }
     if ($.transferHeader) {
-        $.transferHeader();
+        $.transferHeader(tfse);
     }
 
     /*$('.transfer-table span.row-number').each(function() {
@@ -1332,8 +1510,13 @@ function fm_tfsupdate() {
             ++u;
         }
     });*/
-    var $trs = $('.transfer-table tr').not('.transfer-completed');
-    u = $trs.find('.transfer-type.upload').length;
+    var $trs = domTable.querySelectorAll('tr:not(.transfer-completed)');
+    i = $trs.length;
+    while (i--) {
+        if ($trs[i].classList.contains('transfer-upload')) {
+            ++u;
+        }
+    }
     i = $trs.length - u;
     for (var k in M.tfsdomqueue) {
         if (k[0] === 'u') {
@@ -1343,26 +1526,21 @@ function fm_tfsupdate() {
             ++i;
         }
     }
+    M.pendingTransfers = i + u;
     var t;
-    var sep = "\u202F";
-    var $tpt = $('.transfer-panel-title');
-    var l = $.trim($tpt.text()).split(sep)[0];
     if (i && u) {
         t = '\u2191 ' + u + ' \u2193 ' + i;
     }
     else if (i) {
-        t = i;
+        t =  '\u2193 ' + i;
     }
     else if (u) {
-        t = u;
+        t = '\u2191 ' + u;
     }
     else {
         t = '';
     }
-    if (t) {
-        t = sep + ' ' + t;
-    }
-    $tpt.text(l + t);
+    tfse.domPanelTitle.textContent = (t);
 }
 
 

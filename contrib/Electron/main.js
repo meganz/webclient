@@ -1,7 +1,7 @@
 "use strict";
 
-const app = require('app'); // Module to control application life.
-const BrowserWindow = require('browser-window'); // Module to create native browser window.
+const app = require('electron').app; // Module to control application life.
+const BrowserWindow = require('electron').BrowserWindow; // Module to create native browser window.
 
 // Report crashes to our server.
 // require('crash-reporter').start();
@@ -30,7 +30,7 @@ app.on('ready', function() {
         });
 
     // and load the index.html of the app.
-    mainWindow.loadUrl('file://' + __dirname + '/app/index.html');
+    mainWindow.loadURL('file://' + __dirname + '/app/index.html');
 
     // Open the devtools.
     mainWindow.openDevTools();

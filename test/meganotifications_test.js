@@ -25,6 +25,9 @@ describe("MegaNotifications Unit Test", function() {
         });
         sandbox.stub(window, 'bootstaticpath', './');
 
+        // Initialize notifications
+        mega.notif.setup(fmconfig.anf);
+
         var _notification = function() {
             this.close = function() {};
             sinon.spy(this, 'close');
@@ -40,6 +43,7 @@ describe("MegaNotifications Unit Test", function() {
         });
 
         megaNotifications = new MegaNotifications({
+            anfFlag: 'chat_enabled',
             textMessages: {
                 'type1': {
                     'title': 'type1 title',
@@ -70,6 +74,7 @@ describe("MegaNotifications Unit Test", function() {
         var n = megaNotifications.notify(
             "type1",
             {
+                anfFlag: 'chat_enabled',
                 incrementCounter: true
             },
             true
@@ -104,6 +109,7 @@ describe("MegaNotifications Unit Test", function() {
         var n = megaNotifications.notify(
             "type1",
             {
+                anfFlag: 'chat_enabled',
                 incrementCounter: true,
                 sound: 'type1-sound',
                 soundLoop: true
@@ -154,6 +160,7 @@ describe("MegaNotifications Unit Test", function() {
         var n = megaNotifications.notify(
             "type1",
             {
+                anfFlag: 'chat_enabled',
                 incrementCounter: true,
                 sound: 'type1-sound',
                 soundLoop: true
@@ -168,6 +175,7 @@ describe("MegaNotifications Unit Test", function() {
         n = megaNotifications.notify(
             "type1",
             {
+                anfFlag: 'chat_enabled',
                 incrementCounter: true,
                 sound: 'type1-sound',
                 soundLoop: true

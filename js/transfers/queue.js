@@ -8,7 +8,7 @@
  * you accept this licence. If you do not accept the licence,
  * do not access the code.
  *
- * Words used in the Mega Limited Terms of Service [https://mega.nz/#terms]
+ * Words used in the Mega Limited Terms of Service [https://mega.nz/terms]
  * have the same meaning in this licence. Where there is any inconsistency
  * between this licence and those Terms of Service, these terms prevail.
  *
@@ -71,6 +71,10 @@ function MegaQueue(worker, limit, name) {
 inherits(MegaQueue, MegaEvents);
 
 MegaQueue.weakRef = [];
+
+MegaQueue.prototype.getSize = function() {
+    return this._limit;
+};
 
 MegaQueue.prototype.setSize = function(size) {
     this._limit = size;
@@ -490,7 +494,7 @@ TransferQueue.prototype.pause = function(gid) {
             $.transferprogress[gid][2] = 0; // reset speed
         }
         if (page !== 'download') {
-            Soon(percent_megatitle);
+            delay('percent_megatitle', percent_megatitle);
         }
     }
     else if (d) {
@@ -542,6 +546,7 @@ TransferQueue.prototype.push = function(cl) {
 
     if (localStorage.ignoreLimitedBandwidth) {
         showToast();
+        dlmanager.setUserFlags();
         return MegaQueue.prototype.push.apply(this, arguments);
     }
 
@@ -574,6 +579,9 @@ TransferQueue.prototype.push = function(cl) {
 
             // this will include currently-downloading and the ClassFiles in hold atm.
             size += dlmanager.getCurrentDownloadsSize();
+
+            // Set user flags, registered, pro, achievements
+            dlmanager.setUserFlags();
 
             // Fire "Query bandwidth quota"
             api_req({a: 'qbq', s: size}, {

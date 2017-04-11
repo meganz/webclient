@@ -219,7 +219,7 @@ var ContactCard = React.createClass({
                 moreDropdowns.unshift(
                     <DropdownsUI.DropdownItem
                             key="view" icon="human-profile" label={__(l[8866])} onClick={() => {
-                                window.location = '#fm/' + contact.u;
+                                loadSubPage('fm/' + contact.u);
                             }} />
                 );
             }
@@ -279,7 +279,7 @@ var ContactPickerWidget = React.createClass({
     getInitialState: function() {
         return {
             'searchValue': '',
-            'selected': this.props.selected ? this.props.selected : []
+            'selected': false,
         }
     },
     getDefaultProps: function() {
@@ -313,13 +313,13 @@ var ContactPickerWidget = React.createClass({
             };
 
             if (!self.state.selected || self.state.selected.length === 0) {
-                footer = <div className="contacts-search-footer">
-                    <em>{
+                footer = <div className="fm-dialog-footer">
+                    <div className="fm-dialog-footer-txt">{
                         self.props.nothingSelectedButtonLabel ?
                             self.props.nothingSelectedButtonLabel
                             :
                             __(l[8889])
-                    }</em>
+                    }</div>
                 </div>;
             }
             else if (self.state.selected.length === 1) {
@@ -387,56 +387,39 @@ var ContactPickerWidget = React.createClass({
                 <ContactCard
                     contact={v}
                     className={"contacts-search " + selectedClass}
-                    onDoubleClick={(contact, e) => {
-                        if (!self.props.multiple) {
-                            if (self.props.onClick) {
-                                self.props.onClick(contact, e);
-                            }
-                        }
-                        else {
-                            if (self.props.onSelect) {
-                                self.props.onSelect(contact, e);
-                            }
 
-                            $(document).trigger('closeDropdowns');
-
-                            var sel = self.state.selected;
-                            if (sel.indexOf(contact.u) === -1) {
-                                sel.push(contact.u);
-                            }
-
-                            if (self.props.onSelectDone) {
-                                self.props.onSelectDone(sel);
-                            }
-                        }
-                    }}
                     onClick={(contact, e) => {
-                        if (!self.props.multiple) {
-                            if (self.props.onClick) {
-                                self.props.onClick(contact, e);
+                        var contactHash = contact.h;
+
+                        // differentiate between a click and a double click.
+                        if (contactHash === self.lastClicked && (new Date() - self.clickTime) < 500) {
+                            // is a double click
+                            if (self.props.onSelected) {
+                                self.props.onSelected([contact.h]);
                             }
+                            self.props.onSelectDone([contact.h]);
+                            return;
                         }
                         else {
-                            var sel = self.state.selected;
-                            if (!sel) {
-                                sel = [];
-                            }
-                            if (self.state.selected.indexOf(contact.u) > -1) {
-                                removeValue(sel, contact.u, false);
+                            var selected = clone(self.state.selected || []);
+
+                            // is a single click
+                            if (selected.indexOf(contactHash) === -1) {
+                                selected.push(contact.h);
+                                if (self.props.onSelected) {
+                                    self.props.onSelected(selected);
+                                }
                             }
                             else {
-                                sel.push(contact.u);
+                                removeValue(selected, contactHash);
+                                if (self.props.onSelected) {
+                                    self.props.onSelected(selected);
+                                }
                             }
-
-
-                            self.setState({'selected': sel});
-
-                            self.forceUpdate();
-
-                            if (self.props.onSelect) {
-                                self.props.onSelect(contact, e);
-                            }
+                            self.setState({'selected': selected});
                         }
+                        self.clickTime = new Date();
+                        self.lastClicked = contactHash;
                     }}
                     noContextMenu={true}
                     key={v.u}
@@ -476,7 +459,7 @@ var ContactPickerWidget = React.createClass({
                 />
             </div>
 
-            <utils.JScrollPane className="contacts-search-scroll">
+            <utils.JScrollPane className="contacts-search-scroll" selected={this.state.selected}>
                 <div style={innerDivStyles}>
                     {contacts}
                 </div>

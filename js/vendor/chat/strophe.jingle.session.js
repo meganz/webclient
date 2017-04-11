@@ -18,7 +18,6 @@ function JingleSession(me, peerjid, sid, connection, sessStream, mutedState) {
     this.remoteStream = null;
     this.localSDP = null;
     this.remoteSDP = null;
-    this.remoteStreams = [];
     this.startTime = null;
     this.stopTime = null;
     this.media_constraints = null;
@@ -60,7 +59,10 @@ initiate: function(isInitiator) {
 
     //console.log('create PeerConnection ' + JSON.stringify(self.ice_config));
     try {
-        self.peerconnection = new RTC.peerconnection({iceServers: self.iceServers}, self.pc_constraints);
+        self.peerconnection = new RTC.peerconnection(
+            { iceServers: RTC.fixupIceServers(self.iceServers) },
+            self.pc_constraints
+        );
         if ((RTC.Stats === undefined) && (typeof statsGlobalInit === 'function'))
             statsGlobalInit(self.peerconnection);
     } catch (e) {
@@ -90,14 +92,28 @@ initiate: function(isInitiator) {
         }
         self.sendIceCandidate(event.candidate);
     };
-    self.peerconnection.onaddstream = function (event) {
-        self.remoteStream = event.stream;
-        self.remoteStreams.push(event.stream);
-        self.jingle.onRemoteStreamAdded(self, event);
-    };
+
+/*
+    The track-by-track approach does not signal when the whole stream is assembled.
+    It's very inconvenient when managing things at the stream/connection
+    level (like here), and may get undeprecated. See
+    https://lists.w3.org/Archives/Public/public-webrtc/2015Jun/0069.html
+
+    if (window.RTCTrackEvent) { // New API
+        self.peerconnection.ontrack = function(event) {
+            self.remoteStream = event.streams[0];
+            self.jingle.onRemoteStreamAdded(self, self.remoteStream);
+        };
+    } else { //Legacy API
+*/
+        self.peerconnection.onaddstream = function(event) {
+            self.remoteStream = event.stream;
+            self.jingle.onRemoteStreamAdded(self, self.remoteStream);
+        };
+//    }
+
     self.peerconnection.onremovestream = function (event) {
         self.remoteStream = null;
-        // FIXME: remove from self.remoteStreams
         self.jingle.onRemoteStreamRemoved(self, event);
     };
     self.peerconnection.onsignalingstatechange = function (event) {
@@ -176,9 +192,10 @@ accept: function (cb) {
 
 terminate: function (reason) {
     this.state = 'ended';
-    if (this.peerconnection)
-    {
-        this.peerconnection.close();
+    if (this.peerconnection) {
+        if (this.peerconnection.signallingState !== 'closed') {
+            this.peerconnection.close();
+        }
         this.peerconnection = null;
     }
 },
@@ -595,7 +612,7 @@ createdAnswer: function (sdp, cb, provisional) {
     }
 },
 
-sendTerminate: function (reason, text) {
+sendTerminate: function (reason, text, callback) {
     var self = this,
         term = $iq({to: self.peerjid,
                type: 'set'})
@@ -610,7 +627,7 @@ sendTerminate: function (reason, text) {
         term.up().c('text').t(text);
     }
 
-    self.sendIq(term, 'terminate', function() {});
+    self.sendIq(term, 'terminate', callback ? callback : function() {});
     self.jingle.connection.flush();
     debugLog("sent TERMINATE to", self.peerjid);
 },

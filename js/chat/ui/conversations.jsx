@@ -10,7 +10,6 @@ var DropdownsUI = require('./../../ui/dropdowns.jsx');
 var ContactsUI = require('./../ui/contacts.jsx');
 var ConversationPanelUI = require("./../ui/conversationpanel.jsx");
 
-
 var ConversationsListItem = React.createClass({
     mixins: [MegaRenderMixin, RenderDebugger],
     componentWillMount: function() {
@@ -103,8 +102,10 @@ var ConversationsListItem = React.createClass({
                 renderableSummary = lastMessage.getManagementMessageSummaryText();
             }
 
-            lastMessageDiv = <div className={lastMsgDivClasses}>
-                        {renderableSummary}
+            renderableSummary = htmlentities(renderableSummary);
+            renderableSummary = megaChat.plugins.emoticonsFilter.processHtmlMessage(renderableSummary);
+
+            lastMessageDiv = <div className={lastMsgDivClasses} dangerouslySetInnerHTML={{__html:renderableSummary}}>
                     </div>;
 
             var timestamp = lastMessage.delay;
@@ -138,11 +139,19 @@ var ConversationsListItem = React.createClass({
                     chatRoom.messagesBuff.messagesHistoryIsLoading() ||
                     chatRoom.messagesBuff.joined === false
                     ) ? (
-                        localStorage.megaChatPresence !== 'unavailable' ? l[7006] : ""
+                        l[7006]
                     ) :
                     l[8000]
             );
 
+            if (ChatdIntegration.mcfHasFinishedPromise.state() === 'pending') {
+                if (!ChatdIntegration.mcfHasFinishedPromise._trackDataChangeAttached) {
+                    ChatdIntegration.mcfHasFinishedPromise.always(function () {
+                        megaChat.chats.trackDataChange();
+                    });
+                    ChatdIntegration.mcfHasFinishedPromise._trackDataChangeAttached = true;
+                }
+            }
 
             lastMessageDiv =
                 <div>
@@ -198,7 +207,7 @@ var ConversationsList = React.createClass({
     mixins: [MegaRenderMixin, RenderDebugger],
     conversationClicked: function(room, e) {
 
-        window.location = room.getRoomUrl();
+        loadSubPage(room.getRoomUrl());
         e.stopPropagation();
     },
     currentCallClicked: function(e) {
@@ -208,7 +217,7 @@ var ConversationsList = React.createClass({
         }
     },
     contactClicked: function(contact, e) {
-        window.location = "#fm/chat/" + contact.u;
+        loadSubPage("fm/chat/" + contact.u);
         e.stopPropagation();
     },
     endCurrentCall: function(e) {
@@ -270,11 +279,19 @@ var ConversationsList = React.createClass({
                 }
                 contact = chatRoom.megaChat.getContactFromJid(contact);
 
-                if (contact && contact.c === 0) {
-                    // a non-contact conversation, e.g. contact removed - mark as read only
-                    Soon(function () {
-                        chatRoom.privateReadOnlyChat = true;
-                    });
+                if (contact) {
+                    if (!chatRoom.privateReadOnlyChat && contact.c === 0) {
+                        // a non-contact conversation, e.g. contact removed - mark as read only
+                        Soon(function () {
+                            chatRoom.privateReadOnlyChat = true;
+                        });
+                    }
+                    else if (chatRoom.privateReadOnlyChat && contact.c !== 0) {
+                        // a non-contact conversation, e.g. contact removed - mark as read only
+                        Soon(function () {
+                            chatRoom.privateReadOnlyChat = false;
+                        });
+                    }
                 }
             }
 
@@ -312,7 +329,7 @@ var ConversationsApp = React.createClass({
     },
     startChatClicked: function(selected) {
         if (selected.length === 1) {
-            window.location = "#fm/chat/" + selected[0];
+            loadSubPage("fm/chat/" + selected[0]);
             this.props.megaChat.createAndShowPrivateRoomFor(selected[0]);
         }
         else {
@@ -389,10 +406,10 @@ var ConversationsApp = React.createClass({
             }
         });
 
-        var lPane = $('.conversationsApp .fm-left-panel');
 
         self.fmConfigThrottling = null;
         self.fmConfigLeftPaneListener = mBroadcaster.addListener('fmconfig:leftPaneWidth', function() {
+            var lPane = $('.conversationsApp .fm-left-panel');
             clearTimeout(self.fmConfigThrottling);
             self.fmConfigThrottling = setTimeout(function fmConfigThrottlingLeftPaneResize() {
                 self.setState({
@@ -406,39 +423,51 @@ var ConversationsApp = React.createClass({
         });
 
 
-        $.leftPaneResizableChat = new FMResizablePane(lPane, $.leftPaneResizable.options);
+        var lPaneResizableInit = function() {
+            var lPane = $('.conversationsApp .fm-left-panel');
+            $.leftPaneResizableChat = new FMResizablePane(lPane, $.leftPaneResizable.options);
 
-        if (fmconfig.leftPaneWidth) {
-            lPane.width(Math.min(
-                $.leftPaneResizableChat.options.maxWidth,
-                Math.max($.leftPaneResizableChat.options.minWidth, fmconfig.leftPaneWidth)
-            ));
-        }
-
-        $($.leftPaneResizableChat).on('resize', function() {
-            var w = lPane.width();
-            if (w >= $.leftPaneResizableChat.options.maxWidth) {
-                $('.left-pane-drag-handle').css('cursor', 'w-resize')
-            } else if (w <= $.leftPaneResizableChat.options.minWidth) {
-                $('.left-pane-drag-handle').css('cursor', 'e-resize')
-            } else {
-                $('.left-pane-drag-handle').css('cursor', 'we-resize')
+            if (fmconfig.leftPaneWidth) {
+                lPane.width(Math.min(
+                    $.leftPaneResizableChat.options.maxWidth,
+                    Math.max($.leftPaneResizableChat.options.minWidth, fmconfig.leftPaneWidth)
+                ));
             }
 
-            $('.jspVerticalBar:visible').addClass('hiden-when-dragging');
-        });
+            $($.leftPaneResizableChat).on('resize', function() {
+                var w = lPane.width();
+                if (w >= $.leftPaneResizableChat.options.maxWidth) {
+                    $('.left-pane-drag-handle').css('cursor', 'w-resize')
+                } else if (w <= $.leftPaneResizableChat.options.minWidth) {
+                    $('.left-pane-drag-handle').css('cursor', 'e-resize')
+                } else {
+                    $('.left-pane-drag-handle').css('cursor', 'we-resize')
+                }
 
-        $($.leftPaneResizableChat).on('resizestop', function() {
-            $('.fm-left-panel').width(
-                lPane.width()
-            );
+                $('.jspVerticalBar:visible').addClass('hiden-when-dragging');
+            });
 
-            $('.jScrollPaneContainer:visible').trigger('forceResize');
+            $($.leftPaneResizableChat).on('resizestop', function() {
+                $('.fm-left-panel').width(
+                    lPane.width()
+                );
 
-            setTimeout(function() {
-                $('.hiden-when-dragging').removeClass('hiden-when-dragging');
-            }, 100);
-        });
+                $('.jScrollPaneContainer:visible').trigger('forceResize');
+
+                setTimeout(function() {
+                    $('.hiden-when-dragging').removeClass('hiden-when-dragging');
+                }, 100);
+            });
+        };
+
+        if (typeof($.leftPaneResizable) === 'undefined') {
+            mBroadcaster.once('fm:initialized', function() {
+                lPaneResizableInit();
+            });
+        }
+        else {
+            lPaneResizableInit();
+        }
 
         this.handleWindowResize();
 
@@ -476,7 +505,7 @@ var ConversationsApp = React.createClass({
 
         return (
             <div className="conversationsApp" key="conversationsApp">
-                <div className="fm-left-panel" style={leftPanelStyles}>
+                <div className="fm-left-panel chat-left-panel" style={leftPanelStyles}>
                     <div className="left-pane-drag-handle"></div>
 
                     <div className="fm-left-menu conversations">
@@ -504,7 +533,8 @@ var ConversationsApp = React.createClass({
                         <PerfectScrollbar style={leftPanelStyles}>
                             <div className={
                                 "content-panel conversations" + (
-                                    window.location.hash.indexOf("/chat") !== -1 ? " active" : ""
+                                    
+									getSitePath().indexOf("/chat") !== -1 ? " active" : ""
                                 )
                             }>
                                 <ConversationsList chats={this.props.megaChat.chats} megaChat={this.props.megaChat} contacts={this.props.contacts} />

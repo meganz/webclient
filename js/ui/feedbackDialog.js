@@ -193,7 +193,7 @@
                     'buttons': [
                         {
                             'label': l[148],
-                            'className': "fm-dialog-button-red collected-data-review-button-cancel",
+                            'className': "default-white-button right green collected-data-review-button-cancel",
                             'callback': function () {
                                 this.hide();
                             }

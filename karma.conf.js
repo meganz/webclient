@@ -20,7 +20,7 @@ module.exports = function(config) {
 
         // == Basics ==
         'js/vendor/jquery-2.2.1.js',
-        'js/vendor/jquery-ui-1.11.4.js',
+        'js/vendor/jquery-ui.js',
         'js/vendor/jquery.jscrollpane.js',
         'js/vendor/jquery.mousewheel.js',
         'js/vendor/jquery.fullscreen.js',
@@ -34,18 +34,19 @@ module.exports = function(config) {
         'js/vendor/jsbn.js',
         'js/vendor/jsbn2.js',
         'js/vendor/nacl-fast.js',
+        'js/vendor/dexie.js',
         // For notifications.
         'js/vendor/ion.sound.js',
         'js/vendor/favico.js',
         'js/vendor/notification.js',
         'js/vendor/moment.js',
         // Chat libraries.
+        'js/vendor/chat/strophe.jingle.adapter.js',
         'js/vendor/chat/strophe.light.js',
         'js/vendor/chat/strophe.disco.js',
         'js/vendor/chat/strophe.jingle.js',
         'js/vendor/chat/strophe.jingle.session.js',
         'js/vendor/chat/strophe.jingle.sdp.js',
-        'js/vendor/chat/strophe.jingle.adapter.js',
         'js/vendor/chat/strophe.muc.js',
         'js/vendor/chat/strophe.roster.js',
         'js/vendor/chat/wildemitter.patched.js',
@@ -56,6 +57,7 @@ module.exports = function(config) {
         'js/vendor/qrcode.js',
         'js/vendor/bitcoin-math.js',
         'js/vendor/db.js',
+        'js/vendor/megaLogger.js',
 
         // == Test helpers and test configuration ==
         'test/lang_dummy.js',
@@ -67,17 +69,20 @@ module.exports = function(config) {
         // == Our code ==
         'secureboot.js',
         'index.js',
+        'nodedec.js',
         'js/functions.js',
         'js/datastructs.js',
-        'js/vendor/megaLogger.js',
         'js/mega.js',
         'js/tlvstore.js',
         'js/crypto.js',
         'js/megaPromise.js',
         'js/idbkvstorage.js',
-        'js/megaDbEncryptionPlugin.js',
-        'js/megaDb.js',
+        'js/vendor/dexie.js',
+        'sjcl.js',
+        'js/mDB.js',
+        'js/sharedlocalkvstorage.js',
         'js/paycrypt.js',
+        'js/attr.js',
         'js/account.js',
         'js/authring.js',
         'js/fm.js',
@@ -91,7 +96,7 @@ module.exports = function(config) {
         'js/filetypes.js',
         'js/ui/miniui.js',
         'js/ui/filepicker.js',
-	'js/ui/export.js',
+        'js/ui/export.js',
         'js/ui/dialog.js',
         'js/ui/feedbackDialog.js',
         'js/ui/credentialsWarningDialog.js',
@@ -99,8 +104,6 @@ module.exports = function(config) {
         'js/notify.js',
         'js/megaNotifications.js',
         'js/vendor/avatar.js',
-        'js/countries.js',
-        'js/megaKvStorage.js',
         'js/vendor/int64.js',
         'js/cms.js',
         // Google Import Contacts
@@ -138,6 +141,12 @@ module.exports = function(config) {
 
         {pattern: 'test/chat/transcripts/*.json', included: false},
 
+        // == Test utilities ==
+        'test/utilities/fakebroadcaster.js',
+        'test/utilities/promises.js',
+
+
+
         // == Tests ==
         // Dependency-based load order of library modules.
         // modules that already follow AMD need included: false
@@ -168,6 +177,7 @@ module.exports = function(config) {
         '*.js': ['coverage'],
         'js/*.js': ['coverage'],
         'js/ui/*.js': ['coverage'],
+        'js/transfers/**/*.js': ['coverage'],
         'html/js/*.js': ['coverage'],
         'js/chat/**/!(bundle)*.js': ['coverage']
     },

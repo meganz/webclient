@@ -7,9 +7,7 @@ var Help = (function() {
     var doRender = false;
     var idx;
     var focus;
-    var popularQuestions = [];
     var allTags = [];
-    var articlesById = [];
     var titles = [];
     var isScrolling = false;
     var $window = $(window);
@@ -97,34 +95,8 @@ var Help = (function() {
         });
     }
 
-    function sortClients(client, clients) {
-
-        var isMobile = client.tags.indexOf("mobile");
-        return clients.sort(function(a, b) {
-            if (isMobile) {
-                return a.tags.indexOf("mobile") ? -1 : 1;
-            }
-
-            return a.tags.indexOf("mobile") ? 1 : -1;
-        });
-    }
-
-    var setHash = SoonFc(function(hash) {
-        if (hash !== document.location.hash) {
-            try {
-                history.pushState({}, "page 2", document.location.pathname + hash);
-            }
-            catch (ex) {
-                // Fx Extension while using `mega:` protocol...
-                skipHashChange = true;
-                location.hash = hash;
-            }
-        }
-    }, 1000);
-
-
     function url() {
-        return '#help/' + toArray.apply(null, arguments).join("/");
+        return 'help/' + toArray.apply(null, arguments).join("/");
     }
 
     function selectMenuItem($element, $elements) {
@@ -134,15 +106,37 @@ var Help = (function() {
         $elements = $elements || $('.updateSelected.current');
         $elements.removeClass('current');
         $element.addClass('current');
-        var $current = $($element.data('update'))
+        var $link = $($element.data('update'))
             .parent().
                 find('.active').removeClass('active').end()
             .end()
             .addClass('active');
-        var hash = $current.data('state');
-        if (hash) {
-            setHash(hash);
-        }
+
+        delay('help2:selectMenuItem', function() {
+            var state = $link.data('state');
+            if (!state && $link.data('to')) {
+                var parts = getUrlParts();
+                // the url normally includes, 'help', 'client', 'webclient', and 'section'/'question'
+                // set the first one as selected by default if it only has 'help', 'client', 'webclient'.
+                if (parts.length > 3) {
+                    parts.pop();
+                }
+                parts.push(String($link.data('to')).replace(/^[/#]+/, ''));
+                state = parts.join('/');
+            }
+            var newpage = getCleanSitePath(state);
+            if (newpage !== page && page.substr(0, 4) === 'help') {
+                page = newpage;
+
+                try {
+                    history.pushState({subpage: newpage}, "", "/" + newpage);
+                }
+                catch (ex) {
+                    skipHashChange = true;
+                    location.hash = '#' + newpage;
+                }
+            }
+        }, 1350);
     }
 
 
@@ -160,22 +154,6 @@ var Help = (function() {
             true
         );
         isScrolling = true;
-    }
-
-    function notFound() {
-        document.location.href = "#help";
-    }
-
-    function getClient(clientName) {
-        for (var i = 0; i < clients.length; ++i) {
-            if (clients[i].url === clientName) {
-                return clients[i];
-            }
-        }
-
-        // not found
-        notFound();
-        return false;
     }
 
     function filterContentByTag(tag) {
@@ -222,6 +200,22 @@ var Help = (function() {
         contentChanged();
     }
 
+    function patchLinks() {
+        $('.d-section-items a, .popular-question-items a').each(function(i,el) {
+            var url = $(el).attr('href') || $(el).data('fxhref');
+
+            if (url) {
+                $(el).attr('href', String(url).replace('#', '/'));
+            }
+        });
+        $('.d-section-items a, .popular-question-items a').rebind('click',function(e) {
+            var url = $(this).attr('href') || $(this).data('fxhref');
+            if (url) {
+                loadSubPage(url);
+                return false;
+            }
+        });
+    }
 
     function sidebars() {
 
@@ -241,7 +235,7 @@ var Help = (function() {
             // Log search submitted
             api_req({ a: 'log', e: 99619, m: 'Help2 regular search feature used' });
 
-            document.location.href = url("search", $(this).find('input[type="text"]').val());
+            loadSubPage(url("search", $(this).find('input[type="text"]').val()));
         });
 
         $container.find('form input[type=text]').each(function() {
@@ -249,7 +243,7 @@ var Help = (function() {
             $this.autocomplete({
                 source: function(request, response) {
                     var results = $.ui.autocomplete.filter(titles, request.term);
-                    response(results.slice(0, 6));
+                    response(results.slice(0, 7));
                 },
                 appendTo: $this.parent().parent(),
                 select: function(event, ui) {
@@ -259,16 +253,18 @@ var Help = (function() {
 
                     $('.close-icon').trigger('click');
 
-                    document.location.href = ui.item.url;
+                    loadSubPage(ui.item.url);
                 }
             });
             $this.data('ui-autocomplete')._renderItem = function(ul, item) {
-                var $icon = $("<span>").addClass(item.client.toLowerCase() + " client")
-                    .text(item.client + " :: ");
-                return $("<li>")
+
+                var $icon = $('<span>').addClass(item.client.toLowerCase() + ' client');
+                var $label = $('<span>').addClass('label-text').text(item.label);
+
+                return $('<li>')
                     .attr("data-value", item.value)
                     .append($icon)
-                    .append(item.label)
+                    .append($label)
                     .appendTo(ul);
             };
         });
@@ -312,9 +308,6 @@ var Help = (function() {
                 $deviceIcon.rotate(0, 180, 400, 'easeOutQuint');
             }
         });
-
-
-
     }
 
 
@@ -383,36 +376,28 @@ var Help = (function() {
     function homepageinteraction() {
 
         var $container = $('#help2-main');
-        var $getStartBlock = $(".getstart-block", $container);
-        var $useMegaBlock = $(".usemega-block", $container);
-        var $articleArrow = $(".article-arrow", $container);
-        var $arrowContainer = $(".browsearticle-button", $container);
-        var $getStartImg = $(".getstart-img", $container);
-        var $getStartCon = $(".getstart-content", $container);
         var $mobileDeviceBlock = $(".block-mobile-device", $container);
         var $mobileNavBlock = $(".mobile-block", $container);
         var timer;
 
-        $mobileNavBlock.rebind('mouseenter', function() {
-            timer = setTimeout(function()   {
-            $mobileDeviceBlock.fadeIn(300);
-        }, 400); })
-        .rebind('mouseleave', function() {
-            clearTimeout(timer);
-            $mobileDeviceBlock.fadeOut(200);
-        });
-
+        $mobileNavBlock
+            .rebind('mouseenter', function() {
+                timer = setTimeout(function() {
+                    $mobileDeviceBlock.fadeIn(300);
+                }, 400);
+            })
+            .rebind('mouseleave', function() {
+                clearTimeout(timer);
+                $mobileDeviceBlock.fadeOut(200);
+            });
     }
 
     function searchBarInteraction() {
 
         var $container = $('#help2-main');
         var $inputSearch = $("input.search", $container);
-        var $searchBar = $("form#support-search", $container);
         var $sideBar = $(".sidebar-menu-container", $container);
-        var $directoryBody = $(".support-info-container ", $container);
         var $autoSuggestContainer = $(".ui-autocomplete", $container);
-        var $mainTitleSection = $('.main-title-section', $container);
         var $popularQuestions = $(".search-section .popular-question-block");
 
         $inputSearch.on('focus', function () {
@@ -427,17 +412,6 @@ var Help = (function() {
         });
     }
 
-    //  Directory list functions go here.
-    function directoryInteraction() {
-
-        var $this = $(this);
-        var $container = $('#help2-main');
-        var $directoryArticle = $('.d-section-items li');
-        var $bulletPoint = $('.d-bullet-point');
-
-        // Bullet point animation when hovering
-    }
-
     // Header functions including search and go back buttons
 
     function headerInteraction() {
@@ -445,33 +419,27 @@ var Help = (function() {
         var $container = $('#help2-main');
         var $goBackContainer = $(".support-go-back", $container);
         var $goBackArrow = $(".support-go-back-icon", $container);
-        var $goBackHead = $(".support-go-back-heading", $container);
-        var $searchHead = $(".support-search-heading", $container);
-        var $searchClone = $(".support-section-header-clone .support-search");
-        var $searchCloneHeader = $(".support-section-header-clone .support-search-heading");
-        var $searchCloseHead = $('.support-search-heading-close', $container);
         var $searchContainer = $(".support-search", $container);
         var $searchMagnifyGlass = $(".support-search-icon", $container);
-        var $mainPadAnchor = $(".main-pad-container", $container);
         var $sideBar = $(".sidebar-menu-container", $container);
         var $mainTitleSection = $('.main-title-section', $container);
         var $searchHeader = $(".support-section-header", $container);
         var $cloneHeader = $(".support-section-header-clone", $container);
-        var $sideBarSlider = $(".sidebar-menu-slider", $container);
         var $closeIcon = $(".close-icon", $container);
-        var $searchOverlay = $(".search-section-header", $container);
         var $getStartTitle = $(".getstart-title-section", $container);
         var timer;
 
         // Arrow Animation for Go back block
-        $goBackContainer.rebind('mouseenter', function() {
-            timer = setTimeout(function()   {
-            $goBackArrow.animate({marginRight: 8}, 300, "easeOutQuart");
-        },  300);
-        }).rebind('mouseleave', function() {
-            clearTimeout(timer);
-            $goBackArrow.animate({marginRight: 16}, 300, "easeOutQuart");
-        });
+        $goBackContainer
+            .rebind('mouseenter', function() {
+                timer = setTimeout(function() {
+                    $goBackArrow.animate({marginRight: 8}, 300, "easeOutQuart");
+                }, 300);
+            })
+            .rebind('mouseleave', function() {
+                clearTimeout(timer);
+                $goBackArrow.animate({marginRight: 16}, 300, "easeOutQuart");
+            });
 
         $closeIcon.rebind('click', function() {
             if (($mainTitleSection.hasClass('hidden')) || ($getStartTitle.hasClass('hidden'))) {
@@ -496,7 +464,7 @@ var Help = (function() {
 
         $html.rebind('scroll.help2', function() {
             // TODO: write a cleanup function to be invoked when moving out of the #help section
-            if (String(location.hash).substr(0, 5) !== '#help') {
+            if (String(getSitePath()).substr(0, 5) !== '/help') {
                 return $html.unbind('scroll.help2');
             }
 
@@ -509,55 +477,42 @@ var Help = (function() {
             }
         }).trigger('scroll');
 
-
-        if ($searchContainer.hasClass('close')) {
-            $searchMagnifyGlass = $(".support-search-icon", $container);
-            $searchContainer.rebind('mouseenter', function() {
-                timer = setTimeout(function()   {
-                $searchMagnifyGlass.animate({
-                    marginLeft: "8",
-                    marginRight:"8"
-                }, 300, "easeOutQuart");
-
-            }, 300);
+        $searchContainer
+            .rebind('mouseenter', function() {
+                timer = setTimeout(function() {
+                    $searchMagnifyGlass.animate({
+                        marginLeft: "8",
+                        marginRight: "8"
+                    }, 300, "easeOutQuart");
+                }, 300);
             })
             .rebind('mouseleave', function() {
                 clearTimeout(timer);
                 $searchMagnifyGlass.animate({
                     marginLeft: "16",
-                    marginRight:"0"
+                    marginRight: "0"
                 }, 300, "easeOutQuart");
-
             });
-        } else {
-            $searchContainer.rebind('mouseenter', function() {
-                timer = setTimeout(function()   {
-                $searchMagnifyGlass.animate({
-                    marginLeft: "8",
-                    marginRight:"8"
-                }, 300, "easeOutQuart");
-
-            }, 300);
-            })
-            .rebind('mouseleave', function() {
-                clearTimeout(timer);
-                $searchMagnifyGlass.animate({
-                    marginLeft: "16",
-                    marginRight:"0"
-                }, 300, "easeOutQuart");
-
-            });
-        }
     }
 
 
     var urls = {
         "search": function(args) {
-            args[1] = args[1].replace(/%([0-9a-f]+)/g, function(all, number) {
-                return String.fromCharCode(parseInt(number, 16));
-            });
-            args[1] = args[1].replace(/[\+\-]/g, " ");
-            var articles = idx.search.search(args[1], {
+            var searchTerm = String(args[1]);
+
+            if (searchTerm.indexOf('%25') >= 0) {
+                do {
+                    searchTerm = searchTerm.replace(/%25/g, '%');
+                } while (searchTerm.indexOf('%25') >= 0);
+            }
+            try {
+                searchTerm = decodeURIComponent(searchTerm);
+            }
+            catch (e) {}
+
+            searchTerm = searchTerm.replace(/[+-]/g, " ");
+
+            var articles = idx.search.search(searchTerm, {
                 fields: {
                     title: {boost: 2, bool: "AND"},
                     body: {boost: 1},
@@ -571,7 +526,7 @@ var Help = (function() {
 
             parsepage(Data.help_search_tpl.html);
 
-            $('#help2-main .search').val(args[1]);
+            $('#help2-main .search').val(searchTerm);
 
             if (articles.length === 0) {
                 $('.search-404-block').show();
@@ -583,7 +538,7 @@ var Help = (function() {
 
             articles.reverse().map(function(article) {
                 var $article = $('<div>').addClass("search-result link content-by-tags")
-                    .data('href', "#help/client/" + article.id)
+                    .data('href', "help/client/" + article.id)
                     .data('tags', article.tags.map(function(w) { return tagUri(w); }));
 
                 $('<div>').addClass('search-result-title')
@@ -610,7 +565,6 @@ var Help = (function() {
                 });
 
                 $article.prependTo('.main-search-pad');
-
             });
 
             tagsPerDocument(articles).map(function(tag) {
@@ -625,47 +579,44 @@ var Help = (function() {
         "client": function(args) {
             if (args[1] === 'mobile') {
                 args[1] = 'android';
-                document.location.href = url.apply(null, args);
+                loadSubPage(url.apply(null, args));
                 return;
             }
 
             args.shift();
             var question = "";
-            if (args.length === 3) {
+            if (args.length === 3 || args.length === 2) {
                 question = args.pop();
             } else if (args.length !== 1) {
-                document.location.href = "#help/welcome";
+                loadSubPage('help');
                 return;
             }
+
+
 
             var data = Data["help_" + args.join("_")];
             if (!data) {
-                document.location.href = "#help/welcome";
+                loadSubPage('help');
                 return;
             }
-
 
             parsepage(data.html);
 
             $('.support-email-icon').rebind('click', function() {
-                var parts = document.location.href.split(/\//);
-                parts.pop();
-                parts.push($(this).parents('.support-article').attr('id'));
+                var parts = getUrlParts($(this).parents('.support-article').attr('id'));
                 window.helpOrigin = parts.join('/');
-                var support = '#support';
+                var newpage = 'support';
                 if (!u_type) {
-                    login_next = support;
-                    support    = "#login";
+                    login_next = newpage;
+                    newpage = "login";
                 }
-                document.location.href = support;
+                loadSubPage(newpage);
             });
 
             $('.support-link-icon').rebind('click', function() {
-                var parts = document.location.href.split(/\//);
-                parts.pop();
-                parts.push($(this).parents('.support-article').attr('id'));
+                var parts = getUrlParts($(this).parents('.support-article').attr('id'));
 
-                var link   = parts.join('/');
+                var link = 'https://mega.nz/' + parts.join('/');
                 var $input = $('.share-help').removeClass('hidden')
                     .find('input').val(link)
                     .focus().select();
@@ -692,9 +643,9 @@ var Help = (function() {
 
             if (question) {
                 $currentQuestion = $('#' + question);
-                Later(function() {
+                setTimeout(function() {
                     scrollTo($currentQuestion);
-                });
+                }, 400);
             }
         },
         "welcome": function welcome(args) {
@@ -702,10 +653,15 @@ var Help = (function() {
         }
     };
 
-    function getUrlParts() {
-        return document.location.hash.split(/\//).filter(function(x) {
-            return x.length > 0;
-        });
+    function getUrlParts(section) {
+        var parts = getSitePath().split('/').map(String.trim).filter(String);
+
+        if (section) {
+            parts.pop();
+            parts.push(section);
+        }
+
+        return parts;
     }
 
 
@@ -716,7 +672,13 @@ var Help = (function() {
             return urls[parts[1]](parts.slice(1));
         }
 
-        document.location.href = url("welcome");
+        if (parts.length === 1) {
+            return urls.welcome();
+        }
+
+        // init page here instead with page set as 'help' ?!
+        // document.location.href = "#help";
+        //loadSubPage('help');
     }
 
     // getVisibleElement
@@ -741,7 +703,6 @@ var Help = (function() {
 
         return args[0][0];
     }
-    //
 
     function handleScroll() {
 
@@ -750,6 +711,7 @@ var Help = (function() {
         var menuHeight = $menu.height();
         var top   = $('.help-background-block').height();
         var $elements = $('.updateSelected:visible', $main);
+        var isBottomScrolling;
 
         $window.rebind('resize.help2', function() {
             if ($('#help2-main').length === 0) {
@@ -793,49 +755,59 @@ var Help = (function() {
         });
     }
 
-    CMS.index("help_en", function(err, blobs) {
-        if (err) {
-            return alert("Invalid response from the server");
-        }
 
-        for (var name in blobs) {
-            if (blobs.hasOwnProperty(name)) {
-                blobs[name.replace(/\.[a-z]{2}$/, '')] = blobs[name];
+    ns.loadfromCMS = function(callback)
+    {
+        CMS.index("help_" + lang, function(err, blobs)
+        {
+            if (err) {
+                return alert("Invalid response from the server");
             }
-        }
 
-        Data = blobs;
-        titles = [];
-        titles = blobs.help_search.object.map(function(entry) {
-            entry.label = entry.title;
-            entry.value = entry.title;
-            entry.url   = "#help/client/" + entry.id;
-            return entry;
+            for (var name in blobs) {
+                if (blobs.hasOwnProperty(name)) {
+                    blobs[name.replace(/\.[a-z]{2}$/, '')] = blobs[name];
+                }
+            }
+
+            Data = blobs;
+            titles = blobs.help_search.object.map(function(entry) {
+                entry.label = entry.title;
+                entry.value = entry.title;
+                entry.url   = "help/client/" + entry.id;
+                return entry;
+            });
+
+
+            idx = {
+                search: elasticlunr(function() {
+                    this.setRef('pos');
+                    this.addField('title', { boost: 10 });
+                    this.addField('tags', { boost: 100 });
+                    this.addField('body');
+                }),
+                all: Data.help_search.object
+            };
+
+            Data.help_search.object.map(function(obj, id) {
+                obj.pos = id;
+                obj.tags = obj.tags.split(/, /);
+                idx.search.addDoc(obj);
+            });
+
+            ready = true;
+            if (doRender) {
+                ns.render();
+                loadingDialog.hide();
+            }
+
+            if (callback) {
+                callback();
+            }
         });
+    };
 
-
-        idx = {
-            search: elasticlunr(function() {
-                this.setRef('pos');
-                this.addField('title', { boost: 10 });
-                this.addField('tags', { boost: 100 });
-                this.addField('body');
-            }),
-            all: Data.help_search.object
-        };
-
-        Data.help_search.object.map(function(obj, id) {
-            obj.pos = id;
-            obj.tags = obj.tags.split(/, /);
-            idx.search.addDoc(obj);
-        });
-
-        ready = true;
-        if (doRender) {
-            ns.render();
-            loadingDialog.hide();
-        }
-    });
+    mBroadcaster.once('startMega', ns.loadfromCMS.bind(ns, null));
 
     var helpAlreadyLogged;
     ns.render = function() {
@@ -858,8 +830,8 @@ var Help = (function() {
         homepageinteraction();
         searchBarInteraction();
         headerInteraction();
-        directoryInteraction();
         searchAnimations();
+        patchLinks();
 
         // Log that the help page has been viewed
         if (!helpAlreadyLogged) {
@@ -875,17 +847,15 @@ var Help = (function() {
             var $this = $(this);
             e.preventDefault();
 
-            if (!$this.is('.disabled')) {
-                var url = $this.data('href');
-                if (url === '#support' && !u_type) {
+            if (!$this.is('.disabled') && $this.data('href')) {
+                var url = getCleanSitePath($this.data('href').replace('https://mega.nz', ''));
+                if (url === 'support' && !u_type) {
                     login_next = url;
-                    url = "#login";
+                    url = "login";
                 }
-
                 // Log that they clicked on the panel
                 api_req({ a: 'log', e: 99621, m: 'Help2 client selection panel used' });
-
-                document.location.href = url;
+                loadSubPage(url);
             }
         });
 

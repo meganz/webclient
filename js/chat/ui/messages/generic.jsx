@@ -52,11 +52,19 @@ var GenericConversationMessage = React.createClass({
                 });
             }
         });
+        $(self.props.message).rebind('onChange.GenericConversationMessage' + self.getUniqueId(), function() {
+            Soon(function() {
+                if (self.isMounted()) {
+                    self.eventuallyUpdate();
+                }
+            });
+        });
     },
     componentWillUnmount: function() {
         var self = this;
         var $node = $(self.findDOMNode());
         $node.unbind('onEditRequest.genericMessage');
+        $(self.props.message).unbind('onChange.GenericConversationMessage' + self.getUniqueId());
     },
     doDelete: function(e, msg) {
         e.preventDefault(e);
@@ -120,6 +128,11 @@ var GenericConversationMessage = React.createClass({
 
         if (this.props.className) {
             additionalClasses += this.props.className;
+        }
+
+        if (message.revoked) {
+            // skip doing tons of stuff and just return null, in case this message was marked as revoked.
+            return null;
         }
 
         // if this is a text msg.
@@ -258,7 +271,7 @@ var GenericConversationMessage = React.createClass({
 
                     var files = [];
 
-                    attachmentMeta.forEach(function(v) {
+                    attachmentMeta.forEach(function(v, attachmentKey) {
                         var startDownload = function() {
                             M.addDownload([v]);
                         };
@@ -281,7 +294,7 @@ var GenericConversationMessage = React.createClass({
                         }
 
                         var addToCloudDrive = function() {
-                            M.injectNodes(v, M.RootID, false, function(res) {
+                            M.injectNodes(v, M.RootID, function(res) {
                                 if (res === 0) {
                                     msgDialog(
                                         'info',
@@ -308,13 +321,11 @@ var GenericConversationMessage = React.createClass({
                         var dropdown = null;
                         var previewButtons = null;
 
-
-
                         if (!attachmentMetaInfo.revoked) {
                             if (v.fa && (icon === "graphic" || icon === "image")) {
                                 var imagesListKey = message.messageId + "_" + v.h;
                                 if (!chatRoom.images.exists(imagesListKey)) {
-                                    v.k = imagesListKey;
+                                    v.id = imagesListKey;
                                     v.delay = message.delay;
                                     chatRoom.images.push(v);
                                 }
@@ -367,9 +378,8 @@ var GenericConversationMessage = React.createClass({
                             }
                         }
                         else {
-                            dropdown = <ButtonsUI.Button
-                                className="default-white-button tiny-button disabled"
-                                icon="tiny-icon grey-down-arrow" />;
+                            // else if (attachmentMetaInfo.revoked) { ... don't show revoked files
+                            return;
                         }
 
                         var attachmentClasses = "message shared-data";
@@ -395,9 +405,11 @@ var GenericConversationMessage = React.createClass({
                                         delay('thumbnails', fm_thumbnails, 90);
                                     }
                                     src = window.noThumbURI || '';
+
+                                    v.imgId = "thumb" + message.messageId + "_" + attachmentKey + "_" + v.h;
                                 }
 
-                                preview =  (src ? (<div id={v.h} className="shared-link img-block">
+                                preview =  (src ? (<div id={v.imgId} className="shared-link img-block">
                                     <div className="img-overlay" onClick={startPreview}></div>
                                     <div className="button overlay-button" onClick={startPreview}>
                                         <i className="huge-white-icon loupe"></i>
@@ -501,7 +513,7 @@ var GenericConversationMessage = React.createClass({
                             }));
                         }
                         else if (M.u[contact.u] && !M.u[contact.u].m) {
-                            // if already added from group chat...add the email, 
+                            // if already added from group chat...add the email,
                             // since that contact got shared in a chat room
                             M.u[contact.u].m = contact.email ? contact.email : contactEmail;
                         }
@@ -523,7 +535,7 @@ var GenericConversationMessage = React.createClass({
                                         icon="human-profile"
                                         label={__(l[5868])}
                                         onClick={() => {
-                                            window.location = "#fm/" + contact.u;
+                                            loadSubPage("fm/" + contact.u);
                                         }}
                                     />
                                     <hr/>
@@ -531,14 +543,14 @@ var GenericConversationMessage = React.createClass({
                                      icon="rounded-grey-plus"
                                      label={__(l[8631])}
                                      onClick={() => {
-                                     window.location = "#fm/" + contact.u;
+                                     loadSubPage("fm/" + contact.u);
                                      }}
                                      />*/}
                                     <DropdownsUI.DropdownItem
                                         icon="conversations"
                                         label={__(l[8632])}
                                         onClick={() => {
-                                            window.location = "#fm/chat/" + contact.u;
+                                            loadSubPage("fm/chat/" + contact.u);
                                         }}
                                     />
                                     {deleteButtonOptional ? <hr /> : null}
@@ -561,18 +573,33 @@ var GenericConversationMessage = React.createClass({
                                         icon="rounded-grey-plus"
                                         label={__(l[71])}
                                         onClick={() => {
-                                            M.inviteContact(M.u[u_handle].m, contactEmail);
+                                            var exists = false;
+                                            Object.keys(M.opc).forEach(function(k) {
+                                                if (!exists && M.opc[k].m === contactEmail) {
+                                                    exists = true;
+                                                    return false;
+                                                }
+                                            });
 
-                                            // Contact invited
-                                            var title = l[150];
+                                            if (exists) {
+                                                closeDialog();
+                                                msgDialog('warningb', '', l[7413]);
+                                            }
+                                            else {
+                                                M.inviteContact(M.u[u_handle].m, contactEmail);
 
-                                            // The user [X] has been invited and will appear in your contact list once
-                                            // accepted."
-                                            var msg = l[5898].replace('[X]', contactEmail);
+                                                // Contact invited
+                                                var title = l[150];
+
+                                                // The user [X] has been invited and will appear in your contact list
+                                                // once
+                                                // accepted."
+                                                var msg = l[5898].replace('[X]', contactEmail);
 
 
-                                            closeDialog();
-                                            msgDialog('info', title, msg);
+                                                closeDialog();
+                                                msgDialog('info', title, msg);
+                                            }
                                         }}
                                     />
                                     {deleteButtonOptional ? <hr /> : null}
@@ -710,9 +737,12 @@ var GenericConversationMessage = React.createClass({
 
                 var messageDisplayBlock;
                 if (self.state.editing === true) {
+                    var msgContents = message.textContents ? message.textContents : message.contents;
+                    msgContents = megaChat.plugins.emoticonsFilter.fromUtfToShort(msgContents);
+
                     messageDisplayBlock = <TypingAreaUI.TypingArea
                         iconClass="small-icon writing-pen textarea-icon"
-                        initialText={message.textContents ? message.textContents : message.contents}
+                        initialText={msgContents}
                         chatRoom={self.props.message.chatRoom}
                         showButtons={true}
                         className="edit-typing-area"
@@ -726,8 +756,13 @@ var GenericConversationMessage = React.createClass({
 
                             if (self.props.onEditDone) {
                                 Soon(function() {
-                                    self.props.onEditDone(messageContents);
-                                    });
+                                    var tmpMessageObj = {
+                                        'contents': messageContents
+                                    };
+                                    megaChat.plugins.emoticonsFilter.processOutgoingMessage({}, tmpMessageObj);
+                                    self.props.onEditDone(tmpMessageObj.contents);
+                                    self.forceUpdate();
+                                });
                             }
 
                             return true;
@@ -746,13 +781,13 @@ var GenericConversationMessage = React.createClass({
                         textMessage = textMessage + " <em>" + __(l[8887]) + "</em>";
                     }
                     if (self.props.initTextScrolling) {
-                        messageDisplayBlock = 
+                        messageDisplayBlock =
                             <utils.JScrollPane className="message text-block scroll">
                                 <div className="message text-scroll" dangerouslySetInnerHTML={{__html:textMessage}}>
                                 </div>
                             </utils.JScrollPane>;
                     } else {
-                        messageDisplayBlock = 
+                        messageDisplayBlock =
                             <div className="message text-block" dangerouslySetInnerHTML={{__html:textMessage}}></div>;
                     }
                 }
@@ -832,7 +867,7 @@ var GenericConversationMessage = React.createClass({
                 var tmpMsg = textMessage[0].replace("[X]", htmlentities(M.getNameByHandle(contact.u)));
 
                 if (message.currentCallCounter) {
-                    tmpMsg += " " + 
+                    tmpMsg += " " +
                         textMessage[1].replace("[X]", "[[ " + secToDuration(message.currentCallCounter)) + "]] "
                 }
                 textMessage = tmpMsg;
@@ -903,7 +938,7 @@ var GenericConversationMessage = React.createClass({
                         icon = <i className={"small-icon " + button.icon}></i>;
                     }
                     buttons.push(
-                        <div className={classes} key={k}  onClick={(() => { button.callback(); })}>
+                        <div className={classes} key={k}  onClick={((e) => { button.callback.call(e.target); })}>
                             {icon}
                             {button.text}
                         </div>
@@ -920,7 +955,7 @@ var GenericConversationMessage = React.createClass({
             }
 
             return (
-                <div className={message.messageId + " message body" + additionalClasses} 
+                <div className={message.messageId + " message body" + additionalClasses}
                      data-id={"id" + message.messageId}>
                     <div className="feedback round-icon-block">
                         <i className={"round-icon " + message.cssClass}></i>

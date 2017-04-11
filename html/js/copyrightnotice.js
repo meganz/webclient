@@ -254,8 +254,9 @@ copyright.init_cn = function() {
                 escapeHTML(l[700])
                     .replace('[A1]', '<a href="mailto:copyright@mega.nz" class="red">')
                     .replace('[/A1]', '</A>')
-                    .replace('[A2]', '<a href="#copyright" class="red">')
+                    .replace('[A2]', '<a href="/copyright" class="red clickurl">')
                     .replace('[/A2]', '</A>'));
+                    clickURLs();
             $(this).val(0);
             $(this).parent().find('.affiliate-select-txt').text(l[1278]);
         }
@@ -338,17 +339,17 @@ copyright.init_cn = function() {
                     msgDialog('info',
                         escapeHTML(l[1287]), escapeHTML(l[1288]), false,
                         function(e) {
-                            document.location.hash = 'copyright';
+                            loadSubPage('copyright');
                         });
                 }
             });
         }
     });
     var markup = '<OPTION value="0"></OPTION>';
-    for (var country in isocountries) {
-        if (isocountries.hasOwnProperty(country)) {
+    for (var country in isoCountries) {
+        if (isoCountries.hasOwnProperty(country)) {
             markup += '<option value="' + escapeHTML(country) + '">'
-                + escapeHTML(isocountries[country]) + '</option>';
+                + escapeHTML(isoCountries[country]) + '</option>';
         }
     }
     $('.select.country select').safeHTML(markup);

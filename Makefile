@@ -39,6 +39,10 @@ ifeq ($(KARMA_FLAGS),)
     KARMA_FLAGS = --preprocessors=
 endif
 
+ifdef SINGLE_RUN
+    SINGLE_RUN_FLAG = "--singleRun=true"
+endif
+
 # All browsers to test with on the test-all target.
 TESTALL_BROWSERS = PhantomJS_custom,Chrome_Unlimited,Firefox
 ifeq ($(OS), Windows_NT)
@@ -58,7 +62,7 @@ test-ci: $(KARMA)
 	KARMA_FLAGS="--singleRun=true --no-colors" $(MAKE) $(SILENT_MAKE) test
 
 test-debug: $(KARMA)
-	KARMA_FLAGS="--preprocessors= --debug" $(MAKE) $(SILENT_MAKE) test
+	KARMA_FLAGS="--preprocessors= --debug ${SINGLE_RUN_FLAG}" $(MAKE) $(SILENT_MAKE) test
 
 test-all:
 	KARMA_FLAGS="--singleRun=true" BROWSER=$(TESTALL_BROWSERS) $(MAKE) $(SILENT_MAKE) test
@@ -84,6 +88,7 @@ checks: jshint jscs
 
 clean:
 	rm -rf doc/api/ coverage/ build/ test-results.xml jscpd-report.xml test/phantomjs-storage dont-deploy/ui/out/
+	rm -f css/*-group*.css js/*-group*.js js/mega-*.js css/mega-*.css node_modules/banner-*.js html/templates.json secureboot.prod.js
 
 clean-all: clean
 	rm -f $(BUILD_DEP_ALL)

@@ -224,7 +224,7 @@ jscpd-report.xml
 .tox
 js/tests/coverage
 test/phantomjs-storage
-
+test/selenium
 
 #############
 ## Miscellaneous

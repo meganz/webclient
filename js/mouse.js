@@ -135,4 +135,4 @@ function eventsCollect() {
 }
 
 // keyboard/mouse entropy
-mBroadcaster.once('startMega', eventsCollect);
+mBroadcaster.once('boot_done', eventsCollect);

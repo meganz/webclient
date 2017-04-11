@@ -12,7 +12,7 @@ var inherits = (function() {
     };
 })();
 
-makeEnum(['MDBOPEN', 'EXECSC'], 'MEGAFLAG_', window);
+makeEnum(['MDBOPEN', 'EXECSC', 'LOADINGCLOUD'], 'MEGAFLAG_', window);
 
 /**
  * Safely parse an HTML fragment, removing any executable
@@ -52,7 +52,7 @@ function parseHTML(markup, forbidStyle, doc, baseURI, isXML) {
                 baseURI = parseHTML.baseURIs[href];
             }
             // XXX: parseFragment() removes href attributes with a hash mask
-            markup = String(markup).replace(/\shref="#/g, ' data-fxhref="#');
+            markup = String(markup).replace(/\shref="[#\/]/g, ' data-fxhref="#');
             return mozParserUtils.parseFragment(markup, flags, Boolean(isXML),
                                                 baseURI, doc.documentElement);
         }
@@ -64,7 +64,9 @@ function parseHTML(markup, forbidStyle, doc, baseURI, isXML) {
     // Either we are not running the Firefox extension or the above parser
     // failed, in such case we try to mimic it using jQuery.parseHTML
     var fragment = doc.createDocumentFragment();
-    $.parseHTML(String(markup), doc)
+
+    markup = String(markup).replace(/(?!\<[a-z][^>]+)\son[a-z]+\s*=/gi, ' data-dummy=');
+    $.parseHTML(markup, doc)
         .forEach(function(node) {
             fragment.appendChild(node);
         });
@@ -89,6 +91,20 @@ function parseHTMLfmt(markup) {
 }
 
 /**
+ * Handy printf-style parseHTML to apply escapeHTML
+ * @param {String} markup The HTML fragment to parse.
+ * @param {...*} var_args
+ */
+function parseHTMLfmt2(markup) {
+    if (arguments.length > 1) {
+        for (var idx = arguments.length; --idx > 0;) {
+            markup = markup.replace(RegExp('%' + idx, 'g'), escapeHTML(arguments[idx]));
+        }
+    }
+    return parseHTML(markup);
+}
+
+/**
  * Safely inject an HTML fragment using parseHTML()
  * @param {string} markup The HTML fragment to parse.
  * @param {...*} var_args
@@ -105,7 +121,12 @@ function parseHTMLfmt(markup) {
                     value: function $afeCall(markup) {
                         var i = 0;
                         var l = this.length;
-                        markup = parseHTMLfmt.apply(null, arguments);
+                        if (markup === '%n') {
+                            markup = parseHTMLfmt2.apply(null, toArray.apply(null, arguments).slice(1));
+                        }
+                        else {
+                            markup = parseHTMLfmt.apply(null, arguments);
+                        }
                         while (l > i) {
                             $(this[i++])[origFunc](markup.cloneNode(true));
                         }
@@ -118,7 +139,8 @@ function parseHTMLfmt(markup) {
                                         open(getAppBaseUrl() + $(this).data('fxhref'));
                                     }
                                     else {
-                                        location.hash = $(this).data('fxhref');
+
+                                        loadSubPage($(this).data('fxhref').replace('#', ''));
                                     }
                                 }
                             });
@@ -283,7 +305,7 @@ function delay(aProcID, aFunction, aTimeout) {
     if (typeof aProcID === 'function') {
         aTimeout = aFunction;
         aFunction = aProcID;
-        aProcID = mRandomToken();
+        aProcID = aFunction.name || MurmurHash3(String(aFunction));
     }
 
     if (d > 1) {
@@ -314,7 +336,57 @@ delay.cancel = function(aProcID) {
     return false;
 };
 
+
+var isNativeObject = function(obj) {
+    var objConstructorText = obj.constructor.toString();
+    return objConstructorText.indexOf("[native code]") !== -1 && objConstructorText.indexOf("Object()") === -1;
+};
+
+function clone(obj) {
+
+    if (typeof obj !== 'object' || obj === null) {
+        return obj;
+    }
+    if (obj instanceof Date) {
+        return new Date(obj.getTime());
+    }
+    if (Array.isArray(obj)) {
+        var arr = new Array(obj.length);
+        for (var i = obj.length; i--; ) {
+            arr[i] = clone(obj[i]);
+        }
+        return arr;
+    }
+    if (obj instanceof Object) {
+        var copy = {};
+        for (var attr in obj) {
+            if (obj.hasOwnProperty(attr)) {
+                if (!(obj[attr] instanceof Object)) {
+                    copy[attr] = obj[attr];
+                }
+                else if (Array.isArray(obj[attr])) {
+                    copy[attr] = clone(obj[attr]);
+                }
+                else if (!isNativeObject(obj[attr])) {
+                    copy[attr] = clone(obj[attr]);
+                }
+                else if ($.isFunction(obj[attr])) {
+                    copy[attr] = obj[attr];
+                }
+                else {
+                    copy[attr] = {};
+                }
+            }
+        }
+
+        return copy;
+    }
+}
+
 function jScrollFade(id) {
+    if (is_selenium) {
+        return;
+    }
 
     $(id + ' .jspTrack').rebind('mouseover', function(e) {
         $(this).find('.jspDrag').addClass('jspActive');
@@ -458,20 +530,29 @@ function megatitle(nperc) {
     }
 }
 
-function populate_l() {
+mBroadcaster.once('startMega', function populate_l() {
+    var i;
+
     if (d) {
-        for (var i = 10000 ; i-- ;) {
+        for (i = 24000; i--;) {
             l[i] = (l[i] || '(translation-missing)');
         }
     }
-    l[0] = 'Mega Limited ' + new Date().getFullYear();
+    l[0] = 'MEGA ' + new Date().getFullYear();
     if ((lang === 'es') || (lang === 'pt') || (lang === 'sk')) {
-        l[0] = 'Mega Ltd.';
+        l[0] = 'MEGA';
     }
     l[1] = l[398];
     if (lang === 'en') {
         l[1] = 'Go PRO';
     }
+
+    if (lang == 'en') l[509] = 'The Privacy Company';
+    else {
+        l[509] = l[509].toLowerCase();
+        l[509] = l[509].charAt(0).toUpperCase() + l[509].slice(1);
+    }
+
     l[8634] = l[8634].replace("[S]", "<span class='red'>").replace("[/S]", "</span>");
     l[8762] = l[8762].replace("[S]", "<span class='red'>").replace("[/S]", "</span>");
     l[438] = l[438].replace('[X]', '');
@@ -492,24 +573,25 @@ function populate_l() {
     l['472a'] = l[472].replace('[X]', 10);
     l['472b'] = l[472].replace('[X]', 100);
     l['472c'] = l[472].replace('[X]', 250);
-    l['208a'] = l[208].replace('[A]', '<a href="#terms" class="red">');
+    l['208a'] = l[208].replace('[A]', '<a href="/terms" class="red clickurl">');
     l['208a'] = l['208a'].replace('[/A]', '</a>');
-    l[208] = l[208].replace('[A]', '<a href="#terms">');
+    l[208] = l[208].replace('[A]', '<a href="/terms" class="clickurl">');
     l[208] = l[208].replace('[/A]', '</a>');
-    l[517] = l[517].replace('[A]', '<a href="#help">').replace('[/A]', '</a>');
-    l[521] = l[521].replace('[A]', '<a href="#copyright">').replace('[/A]', '</a>');
+    l[517] = l[517].replace('[A]', '<a href="/help" class="clickurl">').replace('[/A]', '</a>');
+    l[521] = l[521].replace('[A]', '<a href="/copyright" class="clickurl">').replace('[/A]', '</a>');
     l[553] = l[553].replace('[A]', '<a href="mailto:resellers@mega.nz">').replace('[/A]', '</a>');
-    l[555] = l[555].replace('[A]', '<a href="#terms">').replace('[/A]', '</a>');
+    l[555] = l[555].replace('[A]', '<a href="/terms" class="clickurl">').replace('[/A]', '</a>');
     l[754] = l[754].replace('[A]',
         '<a href="http://www.google.com/chrome" target="_blank" rel="noreferrer" style="color:#D9290B;">');
     l[754] = l[754].replace('[/A]', '</a>');
-    l[871] = l[871].replace('[B]',
-        '<strong>').replace('[/B]', '</strong>').replace('[A]', '<a href="#pro">').replace('[/A]', '</a>');
+    l[871] = l[871].replace('[B]', '<strong>')
+        .replace('[/B]', '</strong>')
+        .replace('[A]', '<a href="/pro" class="clickurl">').replace('[/A]', '</a>');
     l[924] = l[924].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[501] = l[501].replace('17', '').replace('%', '');
     l[1066] = l[1066].replace('[A]', '<a class="red">').replace('[/A]', '</a>');
     l[1067] = l[1067].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
-    l[1094] = l[1094].replace('[A]', '<a href="#plugin">').replace('[/A]', '</a>');
+    l[1094] = l[1094].replace('[A]', '<a href="/plugin" class="clickurl">').replace('[/A]', '</a>');
     l[1095] = l[1095].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[1133] = l[1133].replace('[A]',
         '<a href="http://en.wikipedia.org/wiki/Entropy" target="_blank" rel="noreferrer">').replace('[/A]', '</a>');
@@ -519,27 +601,27 @@ function populate_l() {
     l[1148] = l[1148].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[6978] = l[6978].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[1151] = l[1151].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
-    l[731] = l[731].replace('[A]', '<a href="#terms">').replace('[/A]', '</a>');
+    l[731] = l[731].replace('[A]', '<a href="/terms" class="clickurl">').replace('[/A]', '</a>');
     if (lang === 'en') {
         l[965] = 'Legal & policies';
     }
     l[1159] = l[1159].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[1171] = l[1171].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[1185] = l[1185].replace('[X]', '<strong>MEGA.crx</strong>');
-    l[1212] = l[1212].replace('[A]', '<a href="#sdk" class="red">').replace('[/A]', '</a>');
-    l[1274] = l[1274].replace('[A]', '<a href="#takedown">').replace('[/A]', '</a>');
-    l[1275] = l[1275].replace('[A]', '<a href="#copyright">').replace('[/A]', '</a>');
+    l[1212] = l[1212].replace('[A]', '<a href="/sdk" class="red clickurl">').replace('[/A]', '</a>');
+    l[1274] = l[1274].replace('[A]', '<a href="/takedown" class="clickurl">').replace('[/A]', '</a>');
+    l[1275] = l[1275].replace('[A]', '<a href="/copyright" class="clickurl">').replace('[/A]', '</a>');
     l[1201] = l[1201].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[1208] = l[1208].replace('[B]', '<strong>').replace('[/B]', '</strong>');
     l[1915] = l[1915].replace('[A]',
         '<a class="red" href="https://chrome.google.com/webstore/detail/mega/bigefpfhnfcobdlfbedofhhaibnlghod" target="_blank" rel="noreferrer">')
             .replace('[/A]', '</a>');
-    l[1936] = l[1936].replace('[A]', '<a href="#backup">').replace('[/A]', '</a>');
-    l[1942] = l[1942].replace('[A]', '<a href="#backup">').replace('[/A]', '</a>');
+    l[1936] = l[1936].replace('[A]', '<a href="/backup" class="clickurl">').replace('[/A]', '</a>');
+    l[1942] = l[1942].replace('[A]', '<a href="/backup" class="clickurl">').replace('[/A]', '</a>');
     l[1943] = l[1943].replace('[A]', '<a href="mailto:support@mega.nz">').replace('[/A]', '</a>');
     l[1948] = l[1948].replace('[A]', '<a href="mailto:support@mega.nz">').replace('[/A]', '</a>');
-    l[1957] = l[1957].replace('[A]', '<a href="#recovery">').replace('[/A]', '</a>');
-    l[1965] = l[1965].replace('[A]', '<a href="#recovery">').replace('[/A]', '</a>');
+    l[1957] = l[1957].replace('[A]', '<a href="/recovery" class="clickurl">').replace('[/A]', '</a>');
+    l[1965] = l[1965].replace('[A]', '<a href="/recovery" class="clickurl">').replace('[/A]', '</a>');
     l[1982] = l[1982].replace('[A]', '<font style="color:#D21F00;">').replace('[/A]', '</font>');
     l[1993] = l[1993].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[122] = l[122].replace('five or six hours', '<span class="red">five or six hours</span>');
@@ -548,10 +630,10 @@ function populate_l() {
     l[8427] = l[8427].replace('[S]', '<span class="red">').replace('[/S]', '</span>');
     l[8428] = l[8428].replace('[A]', '<a class="red">').replace('[/A]', '</a>');
     l[8440] = l[8440].replace('[A]', '<a href="https://github.com/meganz/">').replace('[/A]', '</a>');
-    l[8440] = l[8440].replace('[A2]', '<a href="#contact">').replace('[/A2]', '</a>');
+    l[8440] = l[8440].replace('[A2]', '<a href="/contact" class="clickurl">').replace('[/A2]', '</a>');
     l[8441] = l[8441].replace('[A]', '<a href="mailto:bugs@mega.nz">').replace('[/A]', '</a>');
-    l[8441] = l[8441].replace('[A2]', '<a href="https://mega.nz/#blog_8">').replace('[/A2]', '</a>');
-    l[5931] = l[5931].replace('[A]', '<a class="red" href="#fm/account">').replace('[/A]', '</a>');
+    l[8441] = l[8441].replace('[A2]', '<a href="https://mega.nz/blog_8">').replace('[/A2]', '</a>');
+    l[5931] = l[5931].replace('[A]', '<a class="red" href="/fm/account" class="clickurl">').replace('[/A]', '</a>');
     l[8644] = l[8644].replace('[S]', '<span class="green">').replace('[/S]', '</span>');
     l[8651] = l[8651].replace('%1', '<span class="header-pro-plan"></span>');
     l[8653] = l[8653].replace('[S]', '<span class="renew-text">').replace('[/S]', '</span>');
@@ -570,22 +652,80 @@ function populate_l() {
     l[8848] = l[8848].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8849] = l[8849].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[1389] = l[1389].replace('[B]', '').replace('[/B]', '').replace('[A]', '<span>').replace('[/A]', '</span>');
-    l[8847] = l[8847].replace('[S]', '<span>').replace('[/S]', '</span>');
-    l[8846] = l[8846].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8912] = l[8912].replace('[B]', '<span>').replace('[/B]', '</span>');
-    l[8944] = l[8944].replace('[S]', '<a class="red">').replace('[/S]', '</a>').replace('[BR]', '<br/>');
+    l[8846] = l[8846].replace('[S]', '<span>').replace('[/S]', '</span>');
+    l[8847] = l[8847].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8950] = l[8950].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8951] = l[8951].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8952] = l[8952].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[9030] = l[9030].replace('[S]', '<strong>').replace('[/S]', '</strong>');
     l[9036] = l[9036].replace('[S]', '<strong>').replace('[/S]', '</strong>');
+    l[10631] = l[10631].replace('[A]', '<a href="/general" class="clickurl" target="_blank">').replace('[/A]', '</a>');
+    l[10630] = l[10630].replace('[A]', '<a href="/general" class="clickurl" target="_blank">').replace('[/A]', '</a>');
+    l[10634] = l[10634].replace('[A]', '<a href="/support" class="clickurl" target="_blank">').replace('[/A]', '</a>');
+    l[10635] = l[10635].replace('[B]', '"<b>').replace('[/B]', '</b>"');
+    l[10636] = l[10636].replace('[A]', '<a href="mailto:support@mega.nz">').replace('[/A]', '</a>').replace('%1', 2);
+    l[10644] = l[10644].replace('[A]', '<a href="mailto:support@mega.nz">').replace('[/A]', '</a>');
+    l[10646] = l[10646].replace('[A]', '<a href="/account" class="clickurl">').replace('[/A]', '</a>');
+    l[10650] = l[10650].replace('[A]', '<a href="/account" class="clickurl">').replace('[/A]', '</a>');
+    l[10656] = l[10656].replace('[A]', '<a href="mailto:support@mega.nz">').replace('[/A]', '</a>');
+    l[10658] = l[10658].replace('[A]', '<a href="/terms" class="clickurl">').replace('[/A]', '</a>');
+    l[12482] = l[12482].replace('[B]', '<b>').replace('[/B]', '</b>');
+    l[12483] = l[12483].replace('[BR]', '<br>');
+    l[12485] = l[12485].replace('[A1]', '<a href="" class="red mac">').replace('[/A1]', '</a>');
+    l[12485] = l[12485].replace('[A2]', '<a href="" class="red linux">').replace('[/A2]', '</a>');
+    l[12486] = l[12486].replace('[A1]', '<a href="" class="red windows">').replace('[/A1]', '</a>');
+    l[12486] = l[12486].replace('[A2]', '<a href="" class="red mac">').replace('[/A2]', '</a>');
+    l[12487] = l[12487].replace('[A1]', '<a href="" class="red windows">').replace('[/A1]', '</a>');
+    l[12487] = l[12487].replace('[A2]', '<a href="" class="red linux">').replace('[/A2]', '</a>');
+    l[12488] = l[12488].replace('[A]', '<a>').replace('[/A]', '</a>').replace('[BR]', '<br>');
+    l[12489] = l[12489].replace('[I]', '<i>').replace('[/I]', '</i>').replace('[I]', '<i>').replace('[/I]', '</i>');
+    l[16165] = l[16165].replace('[S]', '<a class="red">').replace('[/S]', '</a>').replace('[BR]', '<br/>');
+    l[16167] = l[16167].replace('[S]', '<a href="/mobile" class="clickurl">').replace('[/S]', '</a>');
+    l[16306] = escapeHTML(l[16306])
+        .replace('[A]', '<a href="/fm/rubbish" class="clickurl gotorub">').replace('[/A]', '</a>');
+    l[16310] = escapeHTML(l[16310])
+        .replace('[A]', '<a href="/fm/dashboard" class="clickurl">').replace('[/A]', '</a>')
+        .replace('[I]', '<i class="semi-small-icon rocket"></i>');
+    l[16389] = escapeHTML(l[16389]).replace(
+                 '%1',
+                 '<span class="checkdiv checkboxOn autoaway">' +
+                     '<input type="checkbox" name="set-auto-away" id="set-auto-away" class="checkboxOn" checked="">' +
+                 '</span>'
+               )
+               .replace(
+                 '%2',
+                 '<span class="account-counter-number short">' +
+                     '<input type="text" value="5" id="autoaway" />' +
+                 '</span>'
+               );
+    l[16390] = escapeHTML(l[16390]).replace('[S]', '<span class="red">').replace('[/S]', '</span>');
+    l[16391] = escapeHTML(l[16391]).replace('[S]', '<span class="red">').replace('[/S]', '</span>');
+    l[16392] = escapeHTML(l[16392]).replace('[S]', '<span class="red">').replace('[/S]', '</span>');
+    l[16393] = escapeHTML(l[16393])
+        .replace('[A]', '<a class="red" href="mailto:support@mega.nz">').replace('[/A]', '</a>');
+
+    var common = [
+        15536, 16106, 16107, 16116, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315,
+        16316, 16358, 16359, 16360, 16361, 16375, 16382, 16383, 16384
+    ];
+    for (i = common.length; i--;) {
+        var num = common[i];
+
+        l[num] = escapeHTML(l[num])
+            .replace(/\[S\]/g, '<span>').replace(/\[\/S\]/g, '</span>')
+            .replace(/\[P\]/g, '<p>'   ).replace(/\[\/P\]/g, '</p>')
+            .replace(/\[B\]/g, '<b>'   ).replace(/\[\/B\]/g, '</b>')
+            .replace(/\[BR\]/g, '<br/>')
+            .replace(/\[A\]/g, '<a href="/pro" class="clickurl">').replace(/\[\/A\]/g, '</a>');
+    }
 
     l['year'] = new Date().getFullYear();
     date_months = [
         l[408], l[409], l[410], l[411], l[412], l[413],
         l[414], l[415], l[416], l[417], l[418], l[419]
     ].map(escapeHTML);
-}
+});
 
 function showmoney(number) {
     number = number.toString();
@@ -619,19 +759,6 @@ function divscroll(el) {
     if (page === 'start') {
         start_menu(el);
     }
-}
-
-function removeHash() {
-    var scrollV, scrollH, loc = window.location;
-
-    // Prevent scrolling by storing the page's current scroll offset
-    scrollV = document.body.scrollTop;
-    scrollH = document.body.scrollLeft;
-    loc.hash = "";
-
-    // Restore the scroll offset, should be flicker free
-    document.body.scrollTop = scrollV;
-    document.body.scrollLeft = scrollH;
 }
 
 function browserdetails(useragent) {
@@ -845,37 +972,55 @@ function browserdetails(useragent) {
         details.engine = 'Unknown';
     }
 
+    // Product info to quickly access relevant info.
+    details.prod = details.name + ' [' + details.engine + ']'
+        + (details.brand ? '[' + details.brand + ']' : '')
+        + '[' + details.version + ']'
+        + (details.isExtension ? '[E:' + details.isExtension + ']' : '')
+        + '[' + (details.is64bit ? 'x64' : 'x32') + ']';
+
     return details;
 }
 
 function countrydetails(isocode) {
     var cdetails = {
-        name: isocountries[isocode],
+        name: isoCountries[isocode],
         icon: isocode.toLowerCase() + '.gif'
     };
     return cdetails;
 }
 
 /**
- * Converts a timestamp to a localised yyyy-mm-dd hh:mm format e.g. 2016-04-17 14:37
- * @param {Number} unixTime The UNIX timestamp in seconds e.g. 1464829467
- * @param {Boolean} ignoreTime If true only the date will be returned e.g. yyyy-mm-dd
- * @returns {String} Returns the date and time in yyyy-mm-dd hh:mm format by default
+ * Converts a timestamp to a readable time format - e.g. 2016-04-17 14:37
+ *
+ * @param {Number} unixTime  The UNIX timestamp in seconds e.g. 1464829467
+ * @param {Number} format    The readable time format to return
+ * @returns {String}
+ *
+ * Formats:
+ *       0: yyyy-mm-dd hh:mm
+ *       1: yyyy-mm-dd
+ *       2: dd fmn yyyy (fmn: Full month name, based on the locale)
  */
-function time2date(unixTime, ignoreTime) {
+function time2date(unixTime, format) {
 
-    var myDate = new Date(unixTime * 1000 || 0);
-    var myDateString =
-        myDate.getFullYear() + '-'
-        + ('0' + (myDate.getMonth() + 1)).slice(-2) + '-'
-        + ('0' + myDate.getDate()).slice(-2);
+    var result;
+    var date = new Date(unixTime * 1000 || 0);
 
-    if (!ignoreTime) {
-        myDateString += ' ' + ('0' + myDate.getHours()).slice(-2) + ':'
-            + ('0' + myDate.getMinutes()).slice(-2);
+    if (format === 2) {
+        result = date.getDate() + ' ' + date_months[date.getMonth()] + ' ' + date.getFullYear();
+    }
+    else {
+        result = date.getFullYear() + '-'
+               + ('0' + (date.getMonth() + 1)).slice(-2)
+               + '-' + ('0' + date.getDate()).slice(-2);
+
+        if (!format) {
+            result += ' ' + date.toTimeString().substr(0, 5);
+        }
     }
 
-    return myDateString;
+    return result;
 }
 
 // in case we need to run functions.js in a standalone (non secureboot.js) environment, we need to handle this case:
@@ -1089,15 +1234,12 @@ function numOfBytes(bytes, precision) {
 }
 
 function bytesToSize(bytes, precision, html_format) {
-    if (!bytes) {
-        return '0';
-    }
-
     var s_b = 'B';
     var s_kb = 'KB';
     var s_mb = 'MB';
     var s_gb = 'GB';
     var s_tb = 'TB';
+    var s_pb = 'PB';
 
     if (lang === 'fr') {
         s_b = 'O';
@@ -1105,21 +1247,31 @@ function bytesToSize(bytes, precision, html_format) {
         s_mb = 'Mo';
         s_gb = 'Go';
         s_tb = 'To';
+        s_pb = 'Po';
     }
 
     var kilobyte = 1024;
     var megabyte = kilobyte * 1024;
     var gigabyte = megabyte * 1024;
     var terabyte = gigabyte * 1024;
+    var petabyte = terabyte * 1024;
     var resultSize = 0;
     var resultUnit = '';
-    if (bytes > 1024 * 1024 * 1024) {
-        precision = 2;
+
+    if (precision === undefined) {
+        if (bytes > gigabyte) {
+            precision = 2;
+        }
+        else if (bytes > megabyte) {
+            precision = 1;
+        }
     }
-    else if (bytes > 1024 * 1024) {
-        precision = 1;
+
+    if (!bytes) {
+        resultSize = 0;
+        resultUnit = s_mb;
     }
-    if ((bytes >= 0) && (bytes < kilobyte)) {
+    else if ((bytes >= 0) && (bytes < kilobyte)) {
         resultSize = parseInt(bytes);
         resultUnit = s_b;
     }
@@ -1135,17 +1287,25 @@ function bytesToSize(bytes, precision, html_format) {
         resultSize = (bytes / gigabyte).toFixed(precision);
         resultUnit = s_gb;
     }
-    else if (bytes >= terabyte) {
+    else if ((bytes >= terabyte) && (bytes < petabyte)) {
         resultSize = (bytes / terabyte).toFixed(precision);
         resultUnit = s_tb;
+    }
+    else if (bytes >= petabyte) {
+        resultSize = (bytes / petabyte).toFixed(precision);
+        resultUnit = s_pb;
     }
     else {
         resultSize = parseInt(bytes);
         resultUnit = s_b;
     }
-    if (html_format) {
+    if (html_format === 2) {
+        return resultSize + '<span>' + resultUnit + '</span>';
+    }
+    else if (html_format) {
         return '<span>' + resultSize + '</span>' + resultUnit;
-    } else {
+    }
+    else {
         return resultSize + ' ' + resultUnit;
     }
 }
@@ -1215,14 +1375,14 @@ function makeObservable(kls) {
 /**
  * Instantiates an enum-like list on the provided target object
  */
-function makeEnum(aEnum, aPrefix, aTarget) {
+function makeEnum(aEnum, aPrefix, aTarget, aNorm) {
     aTarget = aTarget || {};
 
     var len = aEnum.length;
     while (len--) {
         Object.defineProperty(aTarget,
             (aPrefix || '') + String(aEnum[len]).toUpperCase(), {
-                value: 1 << len,
+                value: aNorm ? len : (1 << len),
                 enumerable: true
             });
     }
@@ -1456,23 +1616,6 @@ function createTimeoutPromise(validateFunction, tick, timeout,
 }
 
 /**
- * Simple .toArray method to be used to convert `arguments` to a normal JavaScript Array
- *
- * Please note there is a huge performance degradation when using `arguments` outside their
- * owning function, to mitigate it use this function as follow: toArray.apply(null, arguments)
- *
- * @returns {Array}
- */
-function toArray() {
-    var len = arguments.length;
-    var res = Array(len);
-    while (len--) {
-        res[len] = arguments[len];
-    }
-    return res;
-}
-
-/**
  * Date.parse with progressive enhancement for ISO 8601 <https://github.com/csnover/js-iso8601>
  * (c) 2011 Colin Snover <http://zetafleet.com>
  * Released under MIT license.
@@ -1659,6 +1802,7 @@ function ASSERT(what, msg, udata) {
     return !!what;
 }
 
+// log failures through jscrashes system
 function srvlog(msg, data, silent) {
     if (data && !(data instanceof Error)) {
         data = {
@@ -1672,6 +1816,30 @@ function srvlog(msg, data, silent) {
         window.onerror(msg, '', data ? 1 : -1, 0, data || null);
     }
 }
+
+// log failures through event id 99666
+function srvlog2(type /*, ...*/) {
+    if (d || window.exTimeLeft) {
+        var args    = toArray.apply(null, arguments);
+        var version = buildVersion.website;
+
+        if (is_extension) {
+            if (is_chrome_firefox) {
+                version = window.mozMEGAExtensionVersion || buildVersion.firefox;
+            }
+            else if (window.chrome) {
+                version = buildVersion.chrome;
+            }
+            else {
+                version = buildVersion.commit && buildVersion.commit.substr(0, 8) || '?';
+            }
+        }
+        args.unshift((is_extension ? 'e' : 'w') + (version || '-'));
+
+        api_req({a: 'log', e: 99666, m: JSON.stringify(args)});
+    }
+}
+
 
 function oDestroy(obj) {
     if (window.d) {
@@ -1919,6 +2087,22 @@ function array_random(arr) {
 }
 
 /**
+ * Convert Array to Object
+ * @param {Array|String} arr The array
+ * @param {*} [value] Optional value to assign to objects
+ * @returns {Object}
+ */
+function array_toobject(arr, value) {
+    if (!Array.isArray(arr)) {
+        arr = [arr];
+    }
+    return arr.reduce(function(obj, key, idx) {
+        obj[key] = value !== undefined ? value : ((idx | 0) + 1);
+        return obj;
+    }, Object.create(null));
+}
+
+/**
  * Simple method that will convert Mega user ids to base32 strings (that should be used when doing XMPP auth)
  *
  * @param handle {string} mega user id
@@ -2096,6 +2280,10 @@ function CreateWorkers(url, message, size) {
         }
     }
 
+    if (!is_karma && !is_extension) {
+        url = '/' + url;
+    }
+
     function create(i) {
         var w;
 
@@ -2186,14 +2374,14 @@ function mKeyDialog(ph, fl, keyr) {
             // Remove the ! from the key which is exported from the export dialog
             key = key.replace('!', '');
 
-            var newHash = (fl ? '#F!' : '#!') + ph + '!' + key;
+            var newHash = (fl ? '/F!' : '/!') + ph + '!' + key;
 
-            if (location.hash !== newHash) {
+            if (getSitePath() !== newHash) {
                 promise.resolve(key);
 
                 fm_hideoverlay();
                 $('.fm-dialog.dlkey-dialog').addClass('hidden');
-                location.hash = newHash;
+                loadSubPage(newHash);
             }
         }
         else {
@@ -2210,8 +2398,8 @@ function mKeyDialog(ph, fl, keyr) {
 }
 
 function dcTracer(ctr) {
-    var name = ctr.name,
-        proto = ctr.prototype;
+    var name = ctr.name || 'unknown',
+        proto = ctr.prototype || ctr;
     for (var fn in proto) {
         if (proto.hasOwnProperty(fn) && typeof proto[fn] === 'function') {
             console.log('Tracing ' + name + '.' + fn);
@@ -2882,7 +3070,11 @@ function getBaseUrl() {
  */
 function getAppBaseUrl() {
     var l = location;
-    return (l.origin !== 'null' && l.origin || (l.protocol + '//' + l.hostname)) + l.pathname;
+    var base = (l.origin !== 'null' && l.origin || (l.protocol + '//' + l.hostname));
+    if (is_extension) {
+        base += l.pathname;
+    }
+    return base;
 }
 
 /**
@@ -3237,6 +3429,51 @@ function assertStateChange(currentState, newState, allowedStatesMap, enumMap) {
     }
 }
 
+Object.defineProperty(mega, 'logger', {value: MegaLogger.getLogger('mega')});
+Object.defineProperty(mega.utils, 'logger', {value: MegaLogger.getLogger('utils', null, mega.logger)});
+
+Object.defineProperty(mega, 'api', {
+    value: Object.freeze({
+        logger: new MegaLogger('API'),
+
+        setDomain: function(aDomain, aSave) {
+            apipath = 'https://' + aDomain + '/';
+
+            if (aSave) {
+                localStorage.apipath = apipath;
+            }
+        },
+
+        staging: function(aSave) {
+            this.setDomain('staging.api.mega.co.nz', aSave);
+        },
+        prod: function(aSave) {
+            this.setDomain('eu.api.mega.co.nz', aSave);
+        },
+
+        req: function(params) {
+            var promise = new MegaPromise();
+
+            if (typeof params === 'string') {
+                params = {a: params};
+            }
+
+            api_req(params, {
+                callback: function(res) {
+                    if (typeof res === 'number' && res < 0) {
+                        promise.reject.apply(promise, arguments);
+                    }
+                    else {
+                        promise.resolve.apply(promise, arguments);
+                    }
+                }
+            });
+
+            return promise;
+        }
+    })
+});
+
 /**
  * execCommandUsable
  *
@@ -3248,9 +3485,14 @@ mega.utils.execCommandUsable = function() {
     var result;
 
     try {
-        result = document.execCommand('copy');
+        return document.queryCommandSupported("copy");
     }
-    catch (ex) {}
+    catch (ex) {
+        try {
+            result = document.execCommand('copy');
+        }
+        catch (ex) {}
+    }
 
     return result === false;
 };
@@ -3261,9 +3503,11 @@ mega.utils.execCommandUsable = function() {
  * @param key {String|Function} the name of the property that will be used for the sorting OR a func that will return a
  * dynamic value for the object
  * @param [order] {Number} 1 for asc, -1 for desc sorting
+ * @param [alternativeFn] {Function} Optional function to be used for comparison of A and B if both are equal or
+ *      undefined
  * @returns {Function}
  */
-mega.utils.sortObjFn = function(key, order) {
+mega.utils.sortObjFn = function(key, order, alternativeFn) {
     if (!order) {
         order = 1;
     }
@@ -3272,49 +3516,83 @@ mega.utils.sortObjFn = function(key, order) {
         var currentOrder = tmpOrder ? tmpOrder : order;
 
         if ($.isFunction(key)) {
-            a = key(a);
-            b = key(b);
+            aVal = key(a);
+            bVal = key(b);
         }
         else {
-            a = a[key];
-            b = b[key];
+            aVal = a[key];
+            bVal = b[key];
         }
 
-        if (typeof a == 'string' && typeof b == 'string') {
-            return a.localeCompare(b) * currentOrder;
+        if (typeof aVal === 'string' && typeof bVal === 'string') {
+            return aVal.localeCompare(bVal) * currentOrder;
         }
-        else if (typeof a == 'string' && typeof b == 'undefined') {
+        else if (typeof aVal === 'string' && typeof bVal === 'undefined') {
             return 1 * currentOrder;
         }
-        else if (typeof a == 'undefined' && typeof b == 'string') {
+        else if (typeof aVal === 'undefined' && typeof bVal === 'string') {
             return -1 * currentOrder;
         }
-        else if (typeof a == 'number' && typeof b == 'undefined') {
+        else if (typeof aVal === 'number' && typeof bVal === 'undefined') {
             return 1 * currentOrder;
         }
-        else if (typeof a == 'undefined' && typeof b == 'number') {
+        else if (typeof aVal === 'undefined' && typeof bVal === 'number') {
             return -1 * currentOrder;
         }
-        else if (typeof a == 'number' && typeof b == 'number') {
-            var _a = a || 0;
-            var _b = b || 0;
+        else if (typeof aVal === 'undefined' && typeof bVal === 'undefined') {
+            if (alternativeFn) {
+                return alternativeFn(a, b, currentOrder);
+            }
+            else {
+                return -1 * currentOrder;
+            }
+        }
+        else if (typeof aVal === 'number' && typeof bVal === 'number') {
+            var _a = aVal || 0;
+            var _b = bVal || 0;
             if (_a > _b) {
                 return 1 * currentOrder;
             }
             if (_a < _b) {
                 return -1 * currentOrder;
             } else {
-                return 0;
+                if (alternativeFn) {
+                    return alternativeFn(a, b, currentOrder);
+                }
+                else {
+                    return 0;
+                }
             }
         }
         else return 0;
+    };
+};
+
+
+/**
+ * This is an utility function that would simply do a localCompare OR use Intl.Collator for comparing 2 strings.
+ *
+ * @param stringA {String} String A
+ * @param stringB {String} String B
+ * @param direction {Number} -1 or 1, for inversing the direction for sorting (which is most of the cases)
+ * @returns {Number}
+ */
+mega.utils.compareStrings = function megaUtilsCompareStrings(stringA, stringB, direction) {
+
+    if (typeof Intl !== 'undefined' && Intl.Collator) {
+        var intl = new Intl.Collator('co', { numeric: true });
+        return intl.compare(stringA || '', stringB || '') * direction;
+    }
+    else {
+        return (stringA || '').localeCompare(stringB || '') * direction;
     }
 };
 
 /**
  * Promise-based XHR request
- * @param {Mixed} aURLOrOptions URL or options
- * @param {Mixed} aData         data to send, optional
+ * @param {Object|String} aURLOrOptions   URL or options
+ * @param {Object|String} [aData]         Data to send, optional
+ * @returns {MegaPromise}
  */
 mega.utils.xhr = function megaUtilsXHR(aURLOrOptions, aData) {
     /* jshint -W074 */
@@ -3474,6 +3752,7 @@ mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
         ulmanager.isUploading = false;
         ASSERT(ulQueue._running === 0, 'ulQueue._running inconsistency on completion');
         ulQueue._pending = [];
+        ulQueue.setSize((fmconfig.ul_maxSlots | 0) || 4);
     }
     if (!dl_queue.some(isQueueActive)) {
         dl_queue = new DownloadQueue();
@@ -3495,12 +3774,14 @@ mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
         M.tfsdomqueue = {};
         GlobalProgress = {};
         delete $.transferprogress;
-        fm_tfsupdate();
+        if (page !== 'download') {
+            fm_tfsupdate();
+        }
         if ($.mTransferAnalysis) {
             clearInterval($.mTransferAnalysis);
             delete $.mTransferAnalysis;
         }
-        $('.transfer-panel-title').safeHTML(l[104]);
+        $('.transfer-panel-title').text('');
         dlmanager.dlRetryInterval = 3000;
     }
 
@@ -3508,8 +3789,9 @@ mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
         dlmanager.logger.info("resetUploadDownload", ul_queue.length, dl_queue.length);
     }
 
-    fm_tfsupdate();
-    Later(percent_megatitle);
+    if (page === 'download') {
+        delay('percent_megatitle', percent_megatitle);
+    }
 };
 
 /**
@@ -3520,31 +3802,32 @@ mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
  */
 mega.utils.reload = function megaUtilsReload() {
     function _reload() {
-        var u_sid = u_storage.sid,
-            u_key = u_storage.k,
-            privk = u_storage.privk,
-            debug = u_storage.d,
-            apipath = debug ? localStorage.apipath : undefined;
-        var mcd = u_storage.testChatDisabled;
+        var u_sid = u_storage.sid;
+        var u_key = u_storage.k;
+        var privk = u_storage.privk;
+        var jj = localStorage.jj;
+        var debug = localStorage.d;
+        var mcd = localStorage.testChatDisabled;
+        var apipath = debug && localStorage.apipath;
 
         localStorage.clear();
         sessionStorage.clear();
 
-        u_storage.sid = u_sid;
-        u_storage.privk = privk;
-        u_storage.k = u_key;
-        u_storage.wasloggedin = true;
+        if (u_sid) {
+            u_storage.sid = u_sid;
+            u_storage.privk = privk;
+            u_storage.k = u_key;
+            localStorage.wasloggedin = true;
+        }
 
         if (debug) {
-            u_storage.d = 1;
-            u_storage.minLogLevel = 0;
+            localStorage.d = 1;
+            localStorage.minLogLevel = 0;
+
             if (location.host !== 'mega.nz') {
-                u_storage.dd = true;
-                if (!is_extension) {
-                    u_storage.jj = true;
-                }
-                if (mcd) {
-                    u_storage.testChatDisabled = 1;
+                localStorage.dd = true;
+                if (!is_extension && jj)  {
+                    localStorage.jj = jj;
                 }
             }
             if (apipath) {
@@ -3553,36 +3836,43 @@ mega.utils.reload = function megaUtilsReload() {
             }
         }
 
+        if (mcd) {
+            localStorage.testChatDisabled = 1;
+        }
+        if (hashLogic) {
+            localStorage.hashLogic = 1;
+        }
+
+        localStorage.force = true;
         location.reload(true);
     }
 
-    if (u_type !== 3) {
+    if (u_type !== 3 && page !== 'download') {
         stopsc();
         stopapi();
-        if (typeof mDB === 'object' && !pfid) {
-            mDBreload();
-        }
-        else {
-            loadfm(true);
-        }
+        loadfm(true);
     }
     else {
         // Show message that this operation will destroy the browser cache and reload the data stored by MEGA
         msgDialog('confirmation', l[761], l[7713], l[6994], function(doIt) {
             if (doIt) {
                 var reload = function() {
-                    if (mBroadcaster.crossTab.master) {
+                    if (mBroadcaster.crossTab.master || page === 'download') {
                         mega.utils.abortTransfers().then(function() {
                             loadingDialog.show();
                             stopsc();
                             stopapi();
 
                             MegaPromise.allDone([
-                                MegaDB.dropAllDatabases(/*u_handle*/),
                                 mega.utils.clearFileSystemStorage()
                             ]).then(function(r) {
                                     console.debug('megaUtilsReload', r);
-                                    _reload();
+                                    if (fmdb) {
+                                        fmdb.invalidate(_reload);
+                                    }
+                                    else {
+                                        _reload();
+                                    }
                                 });
                         });
                     }
@@ -3689,8 +3979,29 @@ mega.utils.neuterArrayBuffer = function neuter(ab) {
  */
 mega.utils.require = function megaUtilsRequire() {
     var files = [];
+    var args = [];
+    var logger = d && MegaLogger.getLogger('require', 0, this.logger);
 
-    toArray.apply(null, arguments).forEach(function(file) {
+    toArray.apply(null, arguments).forEach(function(rsc) {
+        // check if a group of resources was provided
+        if (jsl3[rsc]) {
+            var group = Object.keys(jsl3[rsc]);
+
+            args = args.concat(group);
+
+            // inject them into jsl2
+            for (var i = group.length; i--;) {
+                if (!jsl2[group[i]]) {
+                    (jsl2[group[i]] = jsl3[rsc][group[i]]).n = group[i];
+                }
+            }
+        }
+        else {
+            args.push(rsc);
+        }
+    });
+
+    args.forEach(function(file) {
 
         // If a plain filename, inject it into jsl2
         // XXX: Likely this will have a conflict with our current build script
@@ -3699,7 +4010,6 @@ mega.utils.require = function megaUtilsRequire() {
             var extension = filename.split('.').pop().toLowerCase();
             var name = filename.replace(/\./g, '_');
             var type;
-            var result;
 
             if (extension === 'html') {
                 type = 0;
@@ -3722,19 +4032,87 @@ mega.utils.require = function megaUtilsRequire() {
 
     if (files.length === 0) {
         // Everything is already loaded
+        if (logger) {
+            logger.debug('Nothing to load.', args);
+        }
         return MegaPromise.resolve();
     }
 
-    Array.prototype.push.apply(jsl, files);
-
     var promise = new MegaPromise();
-    silent_loading = function() {
-        promise.resolve();
-    };
-    jsl_start();
+    var rl = mega.utils.require.loading;
+    var rp = mega.utils.require.pending;
+    var loading = Object.keys(rl).length;
 
+    // Check which files are already being loaded
+    for (var i = files.length; i--;) {
+        var f = files[i];
+
+        if (rl[f.n]) {
+            // loading, remove it.
+            files.splice(i, 1);
+        }
+        else {
+            // not loading, track it.
+            rl[f.n] = mega.utils.getStack();
+        }
+    }
+
+    // hold up if other files are loading
+    if (loading) {
+        rp.push([files, promise]);
+
+        if (logger) {
+            logger.debug('Queueing %d files...', files.length, args);
+        }
+    }
+    else {
+
+        (function _load(files, promise) {
+            var onload = function() {
+                // all files have been loaded, remove them from the tracking queue
+                for (var i = files.length; i--;) {
+                    delete rl[files[i].n];
+                }
+
+                if (logger) {
+                    logger.debug('Finished loading %d files...', files.length, files);
+                }
+
+                // resolve promise, in a try/catch to ensure the caller doesn't mess us..
+                try {
+                    promise.resolve();
+                }
+                catch (ex) {
+                    (logger || console).error(ex);
+                }
+
+                // check if there is anything pending, and fire it.
+                var pending = rp.shift();
+
+                if (pending) {
+                    _load.apply(null, pending);
+                }
+            };
+
+            if (logger) {
+                logger.debug('Loading %d files...', files.length, files);
+            }
+
+            if (!files.length) {
+                // nothing to load
+                onload();
+            }
+            else {
+                Array.prototype.push.apply(jsl, files);
+                silent_loading = onload;
+                jsl_start();
+            }
+        })(files, promise);
+    }
     return promise;
 };
+mega.utils.require.pending = [];
+mega.utils.require.loading = Object.create(null);
 
 /**
  *  Kill session and Logout
@@ -3744,23 +4122,19 @@ mega.utils.logout = function megaUtilsLogout() {
         var finishLogout = function() {
             if (--step === 0) {
                 u_logout(true);
-                if (typeof aCallback === 'function') {
-                    aCallback();
-                }
-                else {
-                    document.location.reload();
-                }
+                location.reload();
             }
         }, step = 1;
 
         loadingDialog.show();
-        if (typeof mDB === 'object' && mDB.drop) {
+        if (fmdb && fmconfig.dbDropOnLogout) {
             step++;
-            mFileManagerDB.exec('drop').always(finishLogout);
+            fmdb.drop().always(finishLogout);
         }
-        if (typeof attribCache === 'object' && attribCache.db) {
-            step++;
-            attribCache.destroy().always(finishLogout);
+        if (!megaChatIsDisabled) {
+            if (typeof(megaChat) !== 'undefined' && typeof(megaChat.userPresence) !== 'undefined') {
+                megaChat.userPresence.disconnect();
+            }
         }
         if (u_privk && !loadfm.loading) {
             // Use the 'Session Management Logout' API call to kill the current session
@@ -3769,9 +4143,8 @@ mega.utils.logout = function megaUtilsLogout() {
         else {
             finishLogout();
         }
-
     });
-}
+};
 
 /**
  * Convert a version string (eg, 2.1.1) to an integer, for easier comparison
@@ -3802,12 +4175,13 @@ mega.utils.vtol = function megaUtilsVTOL(version, hex) {
 
 /**
  * Retrieve data from storage servers.
- * @param {String|Object} aData        ufs-node's handle or public link
- * @param {Number}        aStartOffset offset to start retrieveing data from
- * @param {Number}        aEndOffset   retrieve data until this offset
+ * @param {String|Object} aData           ufs-node's handle or public link
+ * @param {Number}        [aStartOffset]  offset to start retrieveing data from
+ * @param {Number}        [aEndOffset]    retrieve data until this offset
+ * @param {Function}      [aProgress]     callback function which is called with the percent complete
  * @returns {MegaPromise}
  */
-mega.utils.gfsfetch = function(aData, aStartOffset, aEndOffset) {
+mega.utils.gfsfetch = function gfsfetch(aData, aStartOffset, aEndOffset, aProgress) {
     var promise = new MegaPromise();
 
     var fetcher = function(data) {
@@ -3831,11 +4205,30 @@ mega.utils.gfsfetch = function(aData, aStartOffset, aEndOffset) {
             aStartOffset -= byteOffset;
         }
 
-        mega.utils.xhr({
+        var request = {
             method: 'POST',
             type: 'arraybuffer',
             url: data.g + '/' + aStartOffset + '-' + (aEndOffset - 1)
-        }).done(function(ev, response) {
+        };
+
+        if (typeof aProgress === 'function') {
+            request.prepare = function(xhr) {
+                xhr.addEventListener('progress', function(ev) {
+                    if (ev.lengthComputable) {
+
+                        // Calculate percentage downloaded e.g. 49.23
+                        var percentComplete = ((ev.loaded / ev.total) * 100);
+                        var bytesLoaded = ev.loaded;
+                        var bytesTotal = ev.total;
+
+                        // Pass the percent complete to the callback function
+                        aProgress(percentComplete, bytesLoaded, bytesTotal);
+                    }
+                }, false);
+            };
+        }
+
+        mega.utils.xhr(request).done(function(ev, response) {
 
             data.macs = [];
             data.writer = [];
@@ -3913,7 +4306,7 @@ mega.utils.gfsfetch = function(aData, aStartOffset, aEndOffset) {
 
             if (!key) {
                 req.n = handle;
-                key = M.getNodeByHandle(handle).key;
+                key = M.getNodeByHandle(handle).k;
             }
             else {
                 req.p = handle;
@@ -3923,7 +4316,7 @@ mega.utils.gfsfetch = function(aData, aStartOffset, aEndOffset) {
                 promise.reject(EKEY);
             }
             else {
-                api_req(req, { callback: callback });
+                api_req(req, { callback: callback }, pfid ? 1 : 0);
             }
         }
     }
@@ -4031,7 +4424,7 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
     function _init() {
         // if (d) console.log('Initializing Rubbish-Bin Cleaning Scheduler');
 
-        updId = mBroadcaster.addListener('fmconfig:rubsched', _update);
+        // updId = mBroadcaster.addListener('fmconfig:rubsched', _update);
         if (fmconfig.rubsched) {
             timer = setInterval(function() {
                 _proc();
@@ -4060,7 +4453,7 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
         }
 
         if (d) {
-            console.log('Running Rubbish-Bin Cleaning Scheduler', mode, xval);
+            console.log('Running Rubbish Bin Cleaning Scheduler', mode, xval);
             console.time('rubsched');
         }
 
@@ -4071,16 +4464,13 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
         var nodes = Object.keys(M.c[M.RubbishID] || {});
         var rubnodes = [];
 
-        for (var i in nodes) {
+        for (var i = nodes.length; i--; ) {
             var node = M.d[nodes[i]];
             if (!node) {
                 console.error('Invalid node', nodes[i]);
                 continue;
             }
-            if (node.t == 1) {
-                rubnodes = rubnodes.concat(fm_getnodes(node.h));
-            }
-            rubnodes.push(node.h);
+            rubnodes = rubnodes.concat(fm_getnodes(node.h, true));
         }
 
         rubnodes.sort(handler.sort);
@@ -4118,8 +4508,8 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
                 }
 
                 handles.map(function(handle) {
-                    M.delNode(handle);
-                    api_req({a: 'd', n: handle, i: requesti});
+                    M.delNode(handle, true);    // must not update DB pre-API
+                    api_req({a: 'd', n: handle/*, i: requesti*/});
 
                     if (inRub) {
                         $('.grid-table.fm#' + handle).remove();
@@ -4303,6 +4693,26 @@ mBroadcaster.once('startMega', function() {
     }
 });
 
+/** getOwnPropertyDescriptors polyfill */
+mBroadcaster.once('startMega', function() {
+    if (!Object.hasOwnProperty('getOwnPropertyDescriptors')) {
+        Object.defineProperty(Object, 'getOwnPropertyDescriptors', {
+            value: function getOwnPropertyDescriptors(obj) {
+                var result = {};
+
+                for (var key in obj) {
+                    if (obj.hasOwnProperty(key)) {
+                        result[key] = Object.getOwnPropertyDescriptor(obj, key);
+                    }
+                }
+
+                return result;
+            }
+        });
+    }
+});
+
+
 /**
  * Cross-tab communication using WebStorage
  */
@@ -4316,6 +4726,8 @@ var watchdog = Object.freeze({
     queryQueue: {},
     // Holds query replies if cached
     replyCache: {},
+    // waiting queries
+    waitingQueries: {},
 
     /** setup watchdog/webstorage listeners */
     setup: function() {
@@ -4345,9 +4757,13 @@ var watchdog = Object.freeze({
      * @param {String} what Parameter
      * @param {String} timeout ms
      * @param {String} cache   preserve result
+     * @param {Object} [data]   data to be sent with the query
+     * @param {bool} [expectsSingleAnswer]   pass true if your query is expected to receive only single answer (this
+     * would speed up and resolve the returned promise when the first answer is received and won't wait for the full
+     * `timeout` to gather more replies)
      * @return {MegaPromise}
      */
-    query: function(what, timeout, cache) {
+    query: function(what, timeout, cache, data, expectsSingleAnswer) {
         var self = this;
         var token = mRandomToken();
         var promise = new MegaPromise();
@@ -4367,20 +4783,42 @@ var watchdog = Object.freeze({
             }
             this.queryQueue[token] = [];
 
+            var tmpData;
+            if (!data) {
+                tmpData = {};
+            }
+            else {
+                tmpData = clone(data);
+            }
+            tmpData['reply'] = token;
+
             Soon(function() {
-                self.notify('Q!' + what, { reply: token });
+                self.notify('Q!' + what, tmpData);
             });
 
-            // wait for reply and fullfil/reject the promise
-            setTimeout(function() {
-                if (self.queryQueue[token].length) {
-                    promise.resolve(self.queryQueue[token]);
-                }
-                else {
-                    promise.reject(EACCESS);
-                }
-                delete self.queryQueue[token];
-            }, timeout || 200);
+            if (!expectsSingleAnswer) {
+                // wait for reply and fullfil/reject the promise
+                setTimeout(function () {
+                    if (self.queryQueue[token].length) {
+                        promise.resolve(self.queryQueue[token]);
+                    }
+                    else {
+                        promise.reject(EACCESS);
+                    }
+                    delete self.queryQueue[token];
+                }, timeout || 200);
+            }
+            else {
+                promise.timer = setTimeout(function () {
+                    if (promise.state() === 'pending') {
+                        promise.reject(EACCESS);
+                        delete self.queryQueue[token];
+                        delete self.waitingQueries[token];
+                    }
+                }, timeout || 200);
+
+                self.waitingQueries[token] = promise;
+            }
         }
         else {
             promise = MegaPromise.reject(EEXIST);
@@ -4416,6 +4854,21 @@ var watchdog = Object.freeze({
                 if (this.replyCache[strg.data.query]) {
                     this.replyCache[strg.data.query].push(strg.data.value);
                 }
+                // if there is a promise in .waitingQueries, that means that this query is expecting only 1 response
+                // so we can resolve it immediately.
+                if (this.waitingQueries[strg.data.token]) {
+                    var self = this;
+
+                    clearTimeout(this.waitingQueries[strg.data.token].timer);
+                    this.waitingQueries[strg.data.token]
+                        .always(function() {
+                            // cleanup after all other done/always/fail handlers...
+                            delete self.waitingQueries[strg.data.token];
+                            delete self.queryQueue[strg.data.token];
+                        })
+                        .resolve([strg.data.value]);
+
+                }
                 break;
 
             case 'Q!dlsize':
@@ -4429,6 +4882,38 @@ var watchdog = Object.freeze({
             case 'loadfm_done':
                 if (this.Strg.login === strg.origin) {
                     location.assign(location.pathname);
+                }
+                break;
+
+            case 'setrsa':
+                if (typeof dlmanager === 'object'
+                        && (dlmanager.isOverFreeQuota || dlmanager.onOverquotaWithAchievements)) {
+
+                    var sid = strg.data[1];
+                    var type = strg.data[0];
+
+                    u_storage = init_storage(localStorage);
+                    u_storage.sid = sid;
+
+                    u_checklogin({
+                        checkloginresult: function(ctx, r) {
+                            u_type = r;
+
+                            if (u_type !== type) {
+                                console.error('Unexpected user-type: got %s, expected %s', r, type);
+                            }
+
+                            if (n_h) {
+                                // set new u_sid under folderlinks
+                                api_setfolder(n_h);
+
+                                // hide ephemeral account warning
+                                alarm.hideAllWarningPopups();
+                            }
+
+                            dlmanager._onQuotaRetry(true, sid);
+                        }
+                    });
                 }
                 break;
 
@@ -4467,12 +4952,19 @@ var watchdog = Object.freeze({
                     megaChat.plugins.chatdIntegration.discardMessage(chatRoom, strg.data.messageId);
                 }
                 break;
+
+            default:
+                mBroadcaster.sendMessage("watchdog:" + msg, strg);
+
+                break;
         }
 
         delete localStorage[ev.key];
     }
 });
-watchdog.setup();
+mBroadcaster.once('boot_done', function() {
+    watchdog.setup();
+});
 
 /**
  * Simple alias that will return a random number in the range of: a < b
@@ -4504,7 +4996,7 @@ function passwordManager(form) {
     if (is_chrome_firefox) {
         var creds = passwordManager.pickFormFields(form);
         if (creds) {
-            mozLoginManager.saveLogin(creds.usr, creds.pwd);
+            mozRunAsync(mozLoginManager.saveLogin.bind(mozLoginManager, creds.usr, creds.pwd));
         }
         $(form).find('input').val('');
         return;
@@ -4514,10 +5006,16 @@ function passwordManager(form) {
     }
     $(form).rebind('submit', function() {
         setTimeout(function() {
-            var path  = document.location.pathname;
-            var title = document.title;
+            var path  = getSitePath();
             history.replaceState({ success: true }, '', "index.html#" + document.location.hash.substr(1));
-            history.replaceState({ success: true }, '', path + "#" + document.location.hash.substr(1));
+            if (hashLogic) {
+                path = getSitePath().replace('/', '/#');
+
+                if (location.href.substr(0, 19) === 'chrome-extension://') {
+                    path = path.replace('/#', '/mega/secure.html#');
+                }
+            }
+            history.replaceState({ success: true, subpage: path.replace('#','').replace('/','') }, '', path);
             $(form).find('input').val('');
         }, 1000);
         return false;
@@ -4761,10 +5259,10 @@ if (typeof sjcl !== 'undefined') {
 
         var self = this;
 
-        if ($.removedContactsFromShare.length > 0) {
+        if ($.removedContactsFromShare && ($.removedContactsFromShare.length > 0)) {
             self.removeContactFromShare();
         }
-        if ($.changedPermissions.length > 0) {
+        if ($.changedPermissions && ($.changedPermissions.length > 0)) {
             doShare($.selected[0], $.changedPermissions, true);
         }
         addContactToFolderShare();
@@ -4802,24 +5300,36 @@ if (typeof sjcl !== 'undefined') {
                     s: [{ u: userEmail, r: ''}],
                     ha: '',
                     i: requesti
+                }, {
+                    userEmail: userEmail,
+                    selectedNodeHandle: selectedNodeHandle,
+                    handleOrEmail: handleOrEmail,
+
+                    callback : function(res, ctx) {
+                        if (typeof res == 'object') {
+                            // FIXME: examine error codes in res.r, display error
+                            // to user if needed
+
+                            // If it was a user handle, the share is a full share
+                            if (M.u[ctx.handleOrEmail]) {
+                                M.delNodeShare(ctx.selectedNodeHandle, ctx.handleOrEmail);
+                                setLastInteractionWith(ctx.handleOrEmail, "0:" + unixtime());
+
+                                self.removeFromPermissionQueue(ctx.handleOrEmail);
+                            }
+                            // Pending share
+                            else {
+                                var pendingContactId = M.findOutgoingPendingContactIdByEmail(ctx.userEmail);
+                                M.deletePendingShare(ctx.selectedNodeHandle, pendingContactId);
+
+                                self.removeFromPermissionQueue(ctx.userEmail);
+                            }
+                        }
+                        else {
+                            // FIXME: display error to user
+                        }
+                    }
                 });
-
-                // If it was a user handle, the share is a full share
-                if (M.u[handleOrEmail]) {
-                    userEmail = M.u[handleOrEmail].m;
-                    M.delNodeShare(selectedNodeHandle, handleOrEmail);
-                    setLastInteractionWith(handleOrEmail, "0:" + unixtime());
-
-                    self.removeFromPermissionQueue(handleOrEmail);
-                }
-
-                // Pending share
-                else {
-                    pendingContactId = M.findOutgoingPendingContactIdByEmail(userEmail);
-                    M.deletePendingShare(selectedNodeHandle, pendingContactId);
-
-                    self.removeFromPermissionQueue(userEmail);
-                }
             });
         }
     };
@@ -5023,7 +5533,15 @@ function getGatewayName(gatewayId, gatewayOpt) {
         },
         15: {
             name: 'directreseller',
-            displayName: l[6952]
+            displayName: l[6952]    // Credit card
+        },
+        16: {
+            name: 'ecp',                    // E-Comprocessing
+            displayName: l[6952] + ' (ECP)' // Credit card (ECP)
+        },
+        17: {
+            name: 'sabadell',
+            displayName: 'Sabadell'
         },
         999: {
             name: 'wiretransfer',
@@ -5039,7 +5557,7 @@ function getGatewayName(gatewayId, gatewayOpt) {
                 (gatewayOpt.type === 'subgateway') ? gatewayOpt.gatewayName : gateways[gatewayId].name;
 
             // Direct reseller still requires the translation from above to be in its name
-            if (gatewayId === 15) {
+            if (gatewayId === 15 && gatewayOpt.type !== 'subgateway') {
                 gateways[gatewayId].displayName = gateways[gatewayId].displayName + " " + gatewayOpt.displayName;
             }
             else {
@@ -5060,6 +5578,86 @@ function getGatewayName(gatewayId, gatewayOpt) {
         displayName: 'Unknown'
     };
 }
+
+/**
+ * Redirects to the mobile app
+ * @param {Object} $selector The jQuery selector for the button
+ */
+mega.utils.redirectToApp = function($selector) {
+
+    if (is_ios) {
+        // Based off https://github.com/prabeengiri/DeepLinkingToNativeApp/
+        var ns = '.ios ';
+        var appLink = "mega://" + location.hash;
+        var events = ["pagehide", "blur", "beforeunload"];
+        var timeout = null;
+
+        var preventDialog = function(e) {
+            clearTimeout(timeout);
+            timeout = null;
+            $(window).unbind(events.join(ns) + ns);
+        };
+
+        var redirectToStore = function() {
+            window.top.location = getStoreLink();
+        };
+
+        var redirect = function() {
+            var ms = 500;
+
+            preventDialog();
+            $(window).bind(events.join(ns) + ns, preventDialog);
+
+            window.location = appLink;
+
+            // Starting with iOS 9.x, there will be a confirmation dialog asking whether we want to
+            // open the app, which turns the setTimeout trick useless because no page unloading is
+            // notified and users redirected to the app-store regardless if the app is installed.
+            // Hence, as a mean to not remove the redirection we'll increase the timeout value, so
+            // that users with the app installed will have a higher chance of confirming the dialog.
+            // If past that time they didn't, we'll redirect them anyhow which isn't ideal but
+            // otherwise users will the app NOT installed might don't know where the app is,
+            // at least if they disabled the smart-app-banner...
+            // NB: Chrome (CriOS) is not affected.
+            if (is_ios > 8 && ua.details.brand !== 'CriOS') {
+                ms = 4100;
+            }
+
+            timeout = setTimeout(redirectToStore, ms);
+        };
+
+        Soon(function() {
+            // If user navigates back to browser and clicks the button,
+            // try redirecting again.
+            $selector.rebind('click', function(e) {
+                e.preventDefault();
+                redirect();
+                return false;
+            });
+        });
+        redirect();
+    }
+    else {
+        var path = getSitePath().substr(1);
+
+        switch (ua.details.os) {
+            case 'Windows Phone':
+                window.location = "mega://" + path;
+                break;
+
+            case 'Android':
+                var intent = 'intent://#' + path
+                    + '/#Intent;scheme=mega;package=mega.privacy.android.app;end';
+                document.location = intent;
+                break;
+
+            default:
+                alert('Unknown device.');
+        }
+    }
+
+    return false;
+};
 
 /*
  * Alert about 110% zoom level in Chrome/Chromium
@@ -5135,4 +5733,28 @@ var debounce = function(func, execAsap) {
 
         timeout = requestAnimationFrame(delayed);
     };
+};
+
+/**
+ * Returns the currently running site version depending on if in development, on the live site or if in an extension
+ * @returns {String} Returns the string 'dev' if in development or the currently running version e.g. 3.7.0
+ */
+mega.utils.getSiteVersion = function() {
+
+    // Use 'dev' as the default version if in development
+    var version = 'dev';
+
+    // If this is a production version the timestamp will be set
+    if (buildVersion.timestamp !== '') {
+
+        // Use the website build version by default
+        version = buildVersion.website;
+
+        // If an extension use the version of that (because sometimes there are independent deployments of extensions)
+        if (is_extension) {
+            version = (window.chrome) ? buildVersion.chrome + ' ' + l[957] : buildVersion.firefox + ' ' + l[959];
+        }
+    }
+
+    return version;
 };

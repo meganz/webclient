@@ -34,6 +34,7 @@ var ChatdIntegration = function(megaChat) {
     self.waitingChatIdPromises = {};
     self.chatIdToRoomJid = {};
     self._cachedHandlers = {};
+    self._loadingCount = 0;
 
     // chat events
     megaChat.rebind("onInit.chatdInt", function(e) {
@@ -41,17 +42,30 @@ var ChatdIntegration = function(megaChat) {
             assert(chatRoom.type, 'missing room type');
             self._attachToChatRoom(chatRoom);
         });
-        if (fminitialized === true && ChatdIntegration.mcfHasFinishedPromise.state() === 'pending') {
-            // old db, which means that the 'mcf' is empty and the 'f' was not called.
-            // do a separate mcf call!
-            self.retrieveChatsFromApi();
+        if (ChatdIntegration.mcfHasFinishedPromise.state() === 'pending') {
+            if (fminitialized === true) {
+                // old db, which means that the 'mcf' is empty and the 'f' was not called.
+                // do a separate mcf call!
+                self.retrieveChatsFromApi();
+            }
+            else {
+                mBroadcaster.once('fm:initialized', function() {
+                    if (ChatdIntegration.mcfHasFinishedPromise.state() === 'pending') {
+                        self.retrieveChatsFromApi();
+                    }
+                });
+            }
         }
         else {
             ChatdIntegration.mcfHasFinishedPromise.done(function () {
+                var allPromises = [];
                 Object.keys(ChatdIntegration._queuedChats).forEach(function (id) {
-                    self.openChatFromApi(ChatdIntegration._queuedChats[id], true);
+                    allPromises.push(
+                        self.openChatFromApi(ChatdIntegration._queuedChats[id], true)
+                    );
                 });
                 ChatdIntegration._queuedChats = {};
+                ChatdIntegration.allChatsHadLoaded.linkDoneAndFailTo(MegaPromise.allDone(allPromises));
             });
         }
     });
@@ -106,16 +120,31 @@ var ChatdIntegration = function(megaChat) {
     return self;
 };
 
+/**
+ * Resolved/rejected when the 'mcf' response is received (either from indexedDB or api),
+ * Note: When this is resolved, chats are not yet accessible via megaChat.chats yet!
+ *
+ * @type {MegaPromise}
+ */
 ChatdIntegration.mcfHasFinishedPromise = new MegaPromise();
-ChatdIntegration.deviceId = null;
+
+/**
+ * Resolved/rejected when all chats are added to megaChat.chats, mcurls are received, etc. E.g. they are ready for
+ * renderering.
+ *
+ * @type {MegaPromise}
+ */
+ChatdIntegration.allChatsHadLoaded = new MegaPromise();
 ChatdIntegration._queuedChats = {};
 
 ChatdIntegration.prototype.retrieveChatsFromApi = function() {
     var self = this;
+    self._loadingCount++;
     asyncApiReq({a: "mcf", d: 1, v: Chatd.VERSION})
         .done(function(r) {
             self.logger.debug("MCF returned: ", r);
-            
+
+            var allPromises = [];
             // reopen chats from the MCF response.
             if (r.c) {
                 r.c.forEach(function (actionPacket) {
@@ -123,29 +152,30 @@ ChatdIntegration.prototype.retrieveChatsFromApi = function() {
                         // skip non active chats for now...
                         return;
                     }
-                    self.openChatFromApi(actionPacket, true);
-                    if (typeof mSDB === 'object' && !pfkey) {
-                        var roomInfo = {
-                            'id': actionPacket.id,
-                            'cs': actionPacket.cs,
-                            'g': actionPacket.g,
-                            'u': clone(actionPacket.u),
-                            'ct': actionPacket.ct ? actionPacket.ct : null
-                        };
-                        mSDB.add('mcf', roomInfo);
-                    }
+                    allPromises.push(
+                        self.openChatFromApi(actionPacket, true)
+                    );
                 });
-                ChatdIntegration.deviceId = r.d;
 
                 ChatdIntegration.mcfHasFinishedPromise.resolve();
+                ChatdIntegration.allChatsHadLoaded.linkDoneAndFailTo(MegaPromise.allDone(allPromises));
             }
             else {
                 ChatdIntegration.mcfHasFinishedPromise.reject(r);
+                ChatdIntegration.allChatsHadLoaded.reject();
             }
         })
         .fail(function(r) {
+            ChatdIntegration.allChatsHadLoaded.reject();
+
             if (r === EEXPIRED) {
                 self.requiresUpdate();
+            }
+        })
+        .always(function() {
+            self._loadingCount--;
+            if (self._loadingCount === 0) {
+                $(self).trigger('onMcfLoadingDone');
             }
         });
 };
@@ -272,10 +302,13 @@ ChatdIntegration.prototype.waitForProtocolHandler = function (chatRoom, cb) {
 ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
     var self = this;
 
+    var masterPromise = new MegaPromise();
     if (isMcf === false && ChatdIntegration.mcfHasFinishedPromise.state() === 'pending') {
         // 'mcf'/'f' is still loading..ANY incoming action packets, should be rejected (and never happen...)
-        return;
+        return masterPromise.reject();
     }
+    self._loadingCount++;
+
     var roomInfo = {
         'id': actionPacket.id,
         'cs': actionPacket.cs,
@@ -284,21 +317,16 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
         'ct': actionPacket.ct ? actionPacket.ct : null
     };
 
-    if (isMcf === false) {
-        if (typeof mSDB === 'object') {
-            mSDB.add('mcf', roomInfo);
-        }
-    }
     loadingDialog.hide();
 
     if (actionPacket.active === 0) {
         // skip non active chats for now...
-        return false;
+        return MegaPromise.reject();
     }
     var chatParticipants = actionPacket.u;
     if (!chatParticipants) {
         // its ok, no participants mean inactive chat, that we woudl skip...for now...
-        return false;
+        return masterPromise.reject();
     }
     var chatJids = [];
     Object.keys(chatParticipants).forEach(function(k) {
@@ -322,6 +350,8 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
     var wasActive = chatRoom ? chatRoom.isCurrentlyActive : false;
 
     var finishProcess = function() {
+        self._loadingCount--;
+
         // if the found chatRoom is in LEAVING mode...then try to reinitialise it!
 
         if (chatRoom && chatRoom.stateIsLeftOrLeaving() && actionPacket.ou !== u_handle) {
@@ -360,15 +390,12 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
             if (actionPacket.n) {
                 var foundMeLeaving = actionPacket.n.some(function(userPrivChangeEntry) {
                     if (userPrivChangeEntry.p === -1 && userPrivChangeEntry.u === u_handle) {
-                        return true;
+                        return masterPromise.reject();
                     }
                 });
 
                 if (foundMeLeaving) {
-                    if (typeof mSDB === 'object') {
-                        mSDB.del('mcf', actionPacket.id);
-                    }
-                    return;
+                    return masterPromise.reject();
                 }
             }
 
@@ -393,11 +420,11 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
                 if (chatRoom.lastActivity === 0) {
                     chatRoom.lastActivity = unixtime();
                 }
-                window.location = chatRoom.getRoomUrl();
+                loadSubPage(chatRoom.getRoomUrl());
             }
 
             if (wasActive) {
-                window.location = chatRoom.getRoomUrl();
+                loadSubPage(chatRoom.getRoomUrl());
             }
         }
         else {
@@ -419,16 +446,33 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
                             excluded.push(v.u);
                             delete chatRoom.members[v.u];
                             if (v.u === u_handle) {
+                                if (typeof(chatRoom.megaChat.plugins.presencedIntegration) !== 'undefined') {
+                                    Object.keys(chatRoom.members).forEach(function(user_handle) {
+                                        // not a real contact?
+                                        if (M.u[user_handle].c === 0) {
+                                            chatRoom.megaChat.plugins.presencedIntegration.eventuallyRemovePeer(
+                                                user_handle,
+                                                chatRoom
+                                            );
+                                        }
+                                    });
+                                }
                                 chatRoom.leave(false);
                                 // i had left, also do a chatd.leave!
                                 self.chatd.leave(
                                     base64urldecode(actionPacket.id)
                                 );
-
-                                if (isMcf === false) {
-                                    if (typeof mSDB === 'object') {
-                                        mSDB.del('mcf', roomInfo.id);
-                                    }
+                            }
+                            else {
+                                // someone else left the room
+                                if (
+                                    M.u[v.u].c === 0 &&
+                                    typeof(chatRoom.megaChat.plugins.presencedIntegration) !== 'undefined'
+                                ) {
+                                    chatRoom.megaChat.plugins.presencedIntegration.eventuallyRemovePeer(
+                                        v.u,
+                                        chatRoom
+                                    );
                                 }
                             }
                         }
@@ -438,6 +482,15 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
                             if (v.u === u_handle && v.p !== 0) {
                                 chatRoom.privateReadOnlyChat = false;
                             }
+                            if (
+                                M.u[v.u] &&
+                                M.u[v.u].c === 0 &&
+                                typeof(chatRoom.megaChat.plugins.presencedIntegration) !== 'undefined'
+                            ) {
+                                chatRoom.megaChat.plugins.presencedIntegration.eventuallyAddPeer(
+                                    v.u
+                                );
+                            }
                         }
                     });
 
@@ -445,6 +498,11 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
                         if (included.length > 0) {
                             ChatdIntegration._ensureKeysAreLoaded([], included);
                             ChatdIntegration._ensureNamesAreLoaded(included);
+                            included.forEach(function(handle) {
+                                if (M.u[handle] && M.u[handle].c === 0) {
+                                    megaChat.processNewUser(handle);
+                                }
+                            });
                         }
 
                         chatRoom.trackDataChange();
@@ -452,6 +510,7 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
                 }
             }
         }
+        return masterPromise.resolve();
     };
 
     if (!actionPacket.url && (!chatRoom || !chatRoom.chatdUrl)) {
@@ -473,6 +532,7 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
     else {
         finishProcess();
     }
+    return masterPromise;
 
 };
 
@@ -649,6 +709,10 @@ ChatdIntegration._ensureKeysAreLoaded = function(messages, users) {
 
     if (Array.isArray(messages)) {
         messages.forEach(function (msgObject) {
+            if (typeof(msgObject.userId) === "undefined" || msgObject.userId === null) {
+                return;
+            }
+
             if (msgObject.userId === strongvelope.COMMANDER) {
                 return;
             }
@@ -674,6 +738,10 @@ ChatdIntegration._ensureKeysAreLoaded = function(messages, users) {
     }
     if (Array.isArray(users)) {
         users.forEach(function (userId) {
+            if (typeof(userId) === "undefined" || userId === null) {
+                return;
+            }
+
             if (userId === strongvelope.COMMANDER) {
                 return;
             }
@@ -771,7 +839,7 @@ ChatdIntegration.prototype._parseMessage = function(chatRoom, message) {
                     if (v.fa && (icon === "graphic" || icon === "image")) {
                         var imagesListKey = message.messageId + "_" + v.h;
                         if (!chatRoom.images.exists(imagesListKey)) {
-                            v.k = imagesListKey;
+                            v.id = imagesListKey;
                             v.delay = message.delay;
                             chatRoom.images.push(v);
                         }
@@ -790,6 +858,7 @@ ChatdIntegration.prototype._parseMessage = function(chatRoom, message) {
                     var messageId = obj.messageId;
                     var attachedMsg = chatRoom.messagesBuff.messages[messageId];
 
+                    var allAttachmentsRevoked = false;
                     if (!attachedMsg) {
                         return;
                     }
@@ -798,16 +867,38 @@ ChatdIntegration.prototype._parseMessage = function(chatRoom, message) {
                         try {
                             var attc = attachedMsg.textContents;
                             var attachments = JSON.parse(attc.substr(2, attc.length));
+                            var revokedInSameMessage = 0;
                             attachments.forEach(function(node) {
                                 if (node.h === revokedNode) {
                                     foundRevokedNode = node;
                                 }
-                            })
+                                if (
+                                    chatRoom.attachments[node.h] &&
+                                    chatRoom.attachments[node.h][messageId] &&
+                                    (
+                                        chatRoom.attachments[node.h][messageId].revoked === true ||
+                                        node.h === revokedNode
+                                    )
+                                ) {
+                                    revokedInSameMessage++;
+                                }
+                            });
+                            if (revokedInSameMessage === attachments.length) {
+                                allAttachmentsRevoked = true;
+                            }
                         } catch(e) {
                         }
-                        attachedMsg.revoked = true;
+
                         obj.revoked = true;
-                        
+                        // mark the whole message as revoked if all attachments in it are marked as revoked.
+                        if (allAttachmentsRevoked) {
+                            attachedMsg.revoked = true;
+                        }
+                        else {
+                            // force re-render
+                            attachedMsg.trackDataChange();
+                        }
+
                         if (!attachedMsg.seen) {
                             attachedMsg.seen = true;
                             if (chatRoom.messagesBuff._unreadCountCache > 0) {
@@ -833,6 +924,23 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
     var self = this;
 
     var chatRoomId = chatRoom.roomJid.split("@")[0];
+
+    chatRoom.rebind('typing.chatdInt', function() {
+        self.broadcast(chatRoom, String.fromCharCode(1));
+    });
+
+    self.chatd.rebind('onBroadcast.chatdInt' + chatRoomId, function(e, eventData) {
+        var foundChatRoom = self._getChatRoomFromEventData(eventData);
+
+        if (!foundChatRoom) {
+            self.logger.warn("Room not found for: ", e, eventData);
+            return;
+        }
+
+        if (foundChatRoom.roomJid === chatRoom.roomJid) {
+            foundChatRoom.trigger('onParticipantTyping', [eventData.userId, eventData.bCastCode]);
+        }
+    });
 
     self.chatd.rebind('onRoomConnected.chatdInt' + chatRoomId, function(e, eventData) {
         var foundChatRoom = self._getChatRoomFromEventData(eventData);
@@ -890,6 +998,17 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                         chatRoom.protocolHandler.addParticipant(eventData.userId);
                         // also add to our list
                         chatRoom.members[eventData.userId] = eventData.priv;
+
+                        if (
+                            M.u[eventData.userId] &&
+                            M.u[eventData.userId].c === 0 &&
+                            typeof(chatRoom.megaChat.plugins.presencedIntegration) !== 'undefined'
+                        ) {
+                            chatRoom.megaChat.plugins.presencedIntegration.eventuallyAddPeer(
+                                eventData.userId
+                            );
+                        }
+                        $(chatRoom).trigger('onMembersUpdated');
                     }
                     self.waitForProtocolHandler(chatRoom, addParticipant);
                 }
@@ -904,6 +1023,18 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                     chatRoom.protocolHandler.removeParticipant(eventData.userId);
                     // also remove from our list
                     delete chatRoom.members[eventData.userId];
+
+                    if (
+                        M.u[eventData.userId].c === 0 &&
+                        typeof(chatRoom.megaChat.plugins.presencedIntegration) !== 'undefined'
+                    ) {
+                        chatRoom.megaChat.plugins.presencedIntegration.eventuallyRemovePeer(
+                            eventData.userId,
+                            chatRoom
+                        );
+                    }
+
+                    $(chatRoom).trigger('onMembersUpdated');
                 }
                 self.waitForProtocolHandler(chatRoom, deleteParticipant);
             }
@@ -1020,6 +1151,8 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                                             included: v.includeParticipants,
                                             excluded: v.excludeParticipants
                                         };
+                                        ChatdIntegration._ensureNamesAreLoaded(v.excludeParticipants);
+                                        ChatdIntegration._ensureNamesAreLoaded(v.includeParticipants);
                                         chatRoom.messagesBuff.messages[messageId].dialogType = "alterParticipants";
                                     }
                                 }
@@ -1263,7 +1396,6 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                 assert(u_privCu25519, 'u_privCu25519 is not loaded, null or undefined!');
                 assert(u_privEd25519, 'u_privEd25519 is not loaded, null or undefined!');
                 assert(u_pubEd25519, 'u_pubEd25519 is not loaded, null or undefined!');
-                assert(ChatdIntegration.deviceId !== null, 'deviceId not loaded.');
 
                 chatRoom.protocolHandler = new strongvelope.ProtocolHandler(
                     u_handle,
@@ -1294,26 +1426,27 @@ ChatdIntegration.prototype.decryptTopic = function(chatRoom) {
     var self = this;
     if (chatRoom && chatRoom.ct && chatRoom.protocolHandler) {
         var parsedMessage = strongvelope._parseMessageContent(base64urldecode(chatRoom.ct));
-
-        var promises = [];
-        promises.push(
-            ChatdIntegration._ensureKeysAreLoaded(undefined, [parsedMessage.invitor])
-        );
-        var _runTopicDecryption = function() {
-            try {
-                var decryptedCT = chatRoom.protocolHandler.decryptFrom(base64urldecode(chatRoom.ct));
-                if (decryptedCT) {
-                    chatRoom.topic = decryptedCT.payload;
+        if (parsedMessage) {
+            var promises = [];
+            promises.push(
+                ChatdIntegration._ensureKeysAreLoaded(undefined, [parsedMessage.invitor])
+            );
+            var _runTopicDecryption = function() {
+                try {
+                    var decryptedCT = chatRoom.protocolHandler.decryptFrom(base64urldecode(chatRoom.ct));
+                    if (decryptedCT) {
+                        chatRoom.topic = decryptedCT.payload;
+                    }
+                } catch (e) {
+                    self.logger.error("Could not decrypt topic: ", e);
                 }
-            } catch (e) {
-                self.logger.error("Could not decrypt topic: ", e);
-            }
-        };
-        MegaPromise.allDone(promises).done(
-            function () {
-                _runTopicDecryption();
-            }
-        );
+            };
+            MegaPromise.allDone(promises).done(
+                function () {
+                    _runTopicDecryption();
+                }
+            );
+        }
     }
 };
 
@@ -1506,6 +1639,20 @@ ChatdIntegration.prototype.discardMessage = function(chatRoom, msgId) {
         // debugger;
     }
     return self.chatd.discard(msgId, rawChatId);
+};
+
+
+
+ChatdIntegration.prototype.broadcast = function(chatRoom, broadCastCode) {
+    var self = this;
+    var rawChatId = base64urldecode(chatRoom.chatId);
+    var chatMessages = self.chatd.chatIdMessages[rawChatId];
+    return self.chatd.broadcast(rawChatId, broadCastCode);
+};
+
+
+ChatdIntegration.prototype.isLoading = function() {
+    return this._loadingCount > 0;
 };
 
 // decorate ALL functions which require shard to be available before executing

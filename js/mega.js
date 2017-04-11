@@ -1,5 +1,5 @@
-var newnodes;
-var maxaction;
+var newnodes = [];
+var currsn;     // current *network* sn (not to be confused with the IndexedDB/memory state)
 var fminitialized = false;
 var dl_interval, ul_interval;
 
@@ -58,18 +58,29 @@ if (typeof loadingInitDialog === 'undefined') {
     loadingInitDialog.progress = false;
     loadingInitDialog.active = false;
     loadingInitDialog.show = function() {
+        var $loadingSpinner = $('.loading-spinner');
+
+        // Folder link load
         if (pfid) {
-            $('.loading-spinner .step1').text(l[8584]);
-            $('.loading-spinner .step2').text(l[8585]);
-            $('.loading-spinner .step3').text(l[8586]);
+            $loadingSpinner.find('.step1').text(l[8584]);   // Requesting folder data
+            $loadingSpinner.find('.step2').text(l[8585]);   // Receiving folder data
+            $loadingSpinner.find('.step3').text(l[8586]);   // Decrypting folder data
         }
         else {
-            $('.loading-spinner .step1').text(l[8577]);
-            $('.loading-spinner .step2').text(l[8578]);
-            $('.loading-spinner .step3').text(l[8579]);
+            // Regular account load
+            $loadingSpinner.find('.step1').text(l[8577]);   // Requesting account data
+            $loadingSpinner.find('.step2').text(l[8578]);   // Receiving account data
+            $loadingSpinner.find('.step3').text(l[8579]);   // Decrypting
         }
+
+        // On mobile, due to reduced screen size we just want a simpler single step with the text 'Loading'
+        if (is_mobile) {
+            $loadingSpinner.find('.step1').text(l[1456]);
+        }
+
         this.hide();
         $('.light-overlay').removeClass('hidden');
+        $('body').addClass('loading');
         $('.loading-spinner:not(.manual-management)').removeClass('hidden').addClass('init active');
         this.active = true;
     };
@@ -82,12 +93,22 @@ if (typeof loadingInitDialog === 'undefined') {
             return;
         }
         if (this.progress === false) {
-            $('.loading-info li.loading').addClass('loaded').removeClass('loading');
-            $('.loading-info li.step2').addClass('loading');
+
+            // Don't show step 2 loading if on mobile
+            if (!is_mobile) {
+                $('.loading-info li.loading').addClass('loaded').removeClass('loading');
+                $('.loading-info li.step2').addClass('loading');
+            }
             $('.loader-progressbar').addClass('active');
 
+            // Load performance report
+            mega.loadReport.ttfb          = Date.now() - mega.loadReport.stepTimeStamp;
+            mega.loadReport.stepTimeStamp = Date.now();
+
             // If the PSA is visible reposition the account loading bar
-            psa.repositionAccountLoadingBar();
+            if (!is_mobile) {
+                psa.repositionAccountLoadingBar();
+            }
         }
         if (progress) {
             $('.loader-percents').width(progress + '%');
@@ -96,8 +117,12 @@ if (typeof loadingInitDialog === 'undefined') {
     };
     loadingInitDialog.step3 = function() {
         if (this.progress) {
-            $('.loading-info li.loading').addClass('loaded').removeClass('loading');
-            $('.loading-info li.step3').addClass('loading');
+
+            // Don't show step 3 loading if on mobile
+            if (!is_mobile) {
+                $('.loading-info li.loading').addClass('loaded').removeClass('loading');
+                $('.loading-info li.step3').addClass('loading');
+            }
             $('.loader-progressbar').removeClass('active').css('bottom', 0);
         }
     };
@@ -105,6 +130,7 @@ if (typeof loadingInitDialog === 'undefined') {
         this.active = false;
         this.progress = false;
         $('.light-overlay').addClass('hidden');
+        $('body').removeClass('loading');
         $('.loading-spinner:not(.manual-management)').addClass('hidden').removeClass('init active');
         $('.loading-info li').removeClass('loading loaded');
         $('.loader-progressbar').removeClass('active');
@@ -180,16 +206,17 @@ var MEGA_USER_STRUCT = {
 
 function MegaData()
 {
-    this.h = {};
-    this.csortd = -1;
-    this.csort = 'name';
-    this.tfsdomqueue = {};
+    this.h               = {};
+    this.csortd          = -1;
+    this.csort           = 'name';
+    this.tfsdomqueue     = {};
+    this.scAckQueue = {};
 
     this.reset = function()
     {
         this.d = {};
         this.v = [];
-        this.c = {};
+        this.c = { shares: {} };
 
         if (typeof MegaDataMap !== 'undefined') {
             this.u = new MegaDataMap();
@@ -253,58 +280,27 @@ function MegaData()
     };
 
     this.getSortByNameFn = function() {
-        var sortfn;
+        var self = this;
 
-        if (typeof Intl !== 'undefined' && Intl.Collator) {
-            var intl = new Intl.Collator('co', { numeric: true });
+        return function(a, b, d) {
+            // reusing the getNameByHandle code for converting contact's name/email to renderable string
+            var itemA = self.getNameByHandle(a.h);
+            var itemB  = self.getNameByHandle(b.h);
 
-            sortfn = function(a, b, d) {
-
-                // a.m part is related to contacts only. In case that user doesn't
-                // have defined first or last name then email address will be used
-                // for comparasion. Files and folders doesn't have .m field but
-                // it's not possible to rename them to null i.e. '', => no side effects.
-                var itemA = ((typeof a.name === 'string') && (a.name.length)) ? a.name : a.m;
-                var itemB = ((typeof b.name === 'string') && (b.name.length)) ? b.name : b.m;
-
-                return intl.compare(itemA, itemB) * d;
-            };
-        }
-        else {
-            sortfn = function(a, b, d) {
-
-                // a.m part is related to contacts only. In case that user doesn't
-                // have defined first or last name then email address will be used
-                // for comparasion. Files and folders doesn't have .m field but
-                // it's not possible to rename them to null i.e. '' => no side effects.
-                var itemA = ((typeof a.name === 'string') && (a.name.length)) ? a.name : a.m;
-                var itemB = ((typeof b.name === 'string') && (b.name.length)) ? b.name : b.m;
-
-                return itemA.localeCompare(itemB) * d;
-            };
-        }
-
-        return sortfn;
+            return mega.utils.compareStrings(itemA, itemB, d);
+        };
     };
 
     this.sortByName = function(d) {
-        if (typeof Intl !== 'undefined' && Intl.Collator) {
-            var intl = new Intl.Collator('co', { numeric: true });
+        var self = this;
 
-            this.sortfn = function(a, b, d) {
-                return intl.compare(a.name, b.name) * d;
-            };
+        this.sortfn = function(a, b, d) {
+            // reusing the getNameByHandle code for converting contact's name/email to renderable string
+            var itemA = self.getNameByHandle(a.h);
+            var itemB  = self.getNameByHandle(b.h);
+            return mega.utils.compareStrings(itemA, itemB, d);
         }
-        else
-        {
-            this.sortfn = function(a,b,d)
-            {
-                if (typeof a.name == 'string' && typeof b.name == 'string')
-                    return a.name.localeCompare(b.name) * d;
-                else
-                    return -1;
-            };
-        }
+
         this.sortd = d;
         this.sort();
     };
@@ -394,8 +390,8 @@ function MegaData()
     {
         this.sortfn = function(a, b, d)
         {
-            var usera = Object(M.d[a.p]);
-            var userb = Object(M.d[b.p]);
+            var usera = Object(M.d[a.su]);
+            var userb = Object(M.d[b.su]);
 
             if (typeof usera.name === 'string' && typeof userb.name === 'string') {
                 return usera.name.localeCompare(userb.name) * d;
@@ -446,11 +442,13 @@ function MegaData()
             else if (statusa > statusb) {
                 return 1 * d;
             }
-            else if ((typeof a.name === 'string') && (typeof b.name === 'string')) {
-                return a.name.localeCompare(b.name) * d;
-            }
             else {
-                return 0;
+                // if status is the same for both, compare names.
+                return mega.utils.compareStrings(
+                    M.getNameByHandle(a.h).toLowerCase(),
+                    M.getNameByHandle(b.h).toLowerCase(),
+                    d
+                );
             }
         };
 
@@ -464,6 +462,7 @@ function MegaData()
     };
 
     this.getSortByInteractionFn = function() {
+        var self = this;
 
         var sortfn;
 
@@ -473,7 +472,16 @@ function MegaData()
                 // Since the M.sort is using a COPY of the data,
                 // we need an up-to-date .ts value directly from M.u[...]
                 return M.u[r.h].ts;
-            }, d
+            },
+            d,
+            function (a, b, d) {
+                // fallback to string/name matching in case last interaction is the same
+                return mega.utils.compareStrings(
+                    self.getNameByHandle(a.h).toLowerCase(),
+                    self.getNameByHandle(b.h).toLowerCase(),
+                    d
+                );
+            }
         );
 
         return sortfn;
@@ -521,7 +529,7 @@ function MegaData()
 
         if ($('.do-sort[data-by="' + col + '"]').length > 0) {
             // swap the column label
-            $('.context-menu-item.do-sort').removeClass('selected');
+            $('.dropdown-item.do-sort').removeClass('selected');
             $('.grid-url-header').prev().find('div')
                 .removeClass().addClass('arrow ' + col)
                 .text($('.do-sort[data-by="' + col + '"]').text());
@@ -535,6 +543,7 @@ function MegaData()
     this.doSort = function(n, d) {
         $('.grid-table-header .arrow').removeClass('asc desc');
 
+        n = String(n).replace(/\W/g, '');
         if (d > 0) {
             $('.arrow.' + n).addClass('desc');
         }
@@ -592,16 +601,31 @@ function MegaData()
     };*/
 
     this.filterByParent = function(id) {
+        var i;
+        var node;
+
         if (id === 'shares') {
-            this.filterBy(function(node) {
-                return (node.p === 'shares') || (node.p && node.p.length === 11);
-            });
+            this.v = [];
+            var inshares = Object.keys(M.c.shares || {});
+            for (i = inshares.length; i--;) {
+                node = M.d[inshares[i]] || false;
+
+                if (node.su && !this.d[node.p]) {
+                    this.v.push(node);
+                }
+            }
         }
         else if (id === 'contacts') {
-            this.filterBy(function(node) {
-                // Fill M.v with active contacts only
-                return (node.p === 'contacts') && (node.c === 1);
-            });
+            this.v = [];
+            var contacts = Object.keys(M.c.contacts || {});
+            for (i = contacts.length; i--;) {
+                node = M.d[contacts[i]] || false;
+
+                if (node.c === 1) {
+                    // Fill M.v with active contacts only
+                    this.v.push(node);
+                }
+            }
         }
         // We should have a parent's childs into M.c, no need to traverse the whole M.d
         else if (M.c[id]) {
@@ -742,6 +766,9 @@ function MegaData()
 
     this.avatars = function(userPurgeList)
     {
+        if (u_type !== 3) {
+            return false;
+        }
         if (!M.c.contacts) {
             M.c.contacts = {};
         }
@@ -788,11 +815,10 @@ function MegaData()
         var ts = 0;
         if (M.d[h]) {
             if (!wantTimeStamp || !M.d[h].ts) {
+                // FIXME: include root?
                 var a = fm_getnodes(h);
-                for (var i in a) {
-                    if (!a.hasOwnProperty(i)) {
-                        continue;
-                    }
+
+                for (var i = a.length; i--; ) {
                     var n = M.d[a[i]];
                     if (n) {
                         if (ts < n.ts) {
@@ -835,17 +861,16 @@ function MegaData()
 
     this.onlineStatusEvent = function(u, status) {
         if (u && megaChatIsReady) {
-            // this event is triggered for a specific resource/device (fullJid), so we need to get the presen for the
-            // user's devices, which is aggregated by Karere already
-            status = megaChat.karere.getPresence(megaChat.getJidFromNodeId(u.u));
+            console.error('onlineStatusEvent', u.u, status);
             var e = $('.ustatus.' + u.u);
             if (e.length > 0) {
                 $(e).removeClass('offline online busy away');
                 $(e).addClass(this.onlineStatusClass(status)[1]);
             }
+
             var e = $('.fm-chat-user-status.' + u.u);
             if (e.length > 0) {
-                $(e).html(this.onlineStatusClass(status)[0]);
+                $(e).safeHTML(this.onlineStatusClass(status)[0]);
             }
 
             if (
@@ -857,9 +882,12 @@ function MegaData()
                 M.contacts();
             }
 
-            if (window.location.hash === "#fm/" + u.u) {
+            if (getSitePath() === "/fm/" + u.u) {
                 // re-render the contact view page if the presence had changed
                 contactUI();
+            }
+            if (u && u.u === u_handle) {
+                megaChat.renderMyStatus();
             }
         }
     };
@@ -881,6 +909,21 @@ function MegaData()
         value: '.files-grid-view.fm .grid-scrolling-table, .fm-blocks-view.fm .file-block-scrolling',
         configurable: false
     });
+
+    (function(self) {
+        var maf   = false;
+        var saved = 0;
+
+        Object.defineProperty(self, 'maf', {
+            get: function() {
+                if (Object(M.account).maf && saved !== M.account.maf) {
+                    saved = M.account.maf;
+                    maf   = mega.achievem.prettify(M.account.maf);
+                }
+                return maf;
+            }
+        })
+    })(this);
 
     /**
      *
@@ -933,9 +976,9 @@ function MegaData()
                         '</td>' +
                         '<td>' + ps + '</td>' +
                         '<td>' +
-                            '<div class="contact-request-button delete"><span>' + l[5858] + '</span></div>' +
-                            '<div class="contact-request-button accept"><span>' + l[5856] + '</span></div>' +
-                            '<div class="contact-request-button ignore"><span>' + l[5860] + '</span></div>' +
+                            '<div class="contact-request-button default-white-button grey-txt small right delete"><span>' + l[5858] + '</span></div>' +
+                            '<div class="contact-request-button default-white-button grey-txt small right accept"><span>' + l[5856] + '</span></div>' +
+                            '<div class="contact-request-button default-white-button grey-txt small right ignore"><span>' + l[5860] + '</span></div>' +
                             '<div class="contact-request-ignored"><span>' + l[5864] + '</span></div>' +
                             '<div class="clear"></div>' +
                         '</td>' +
@@ -1022,25 +1065,30 @@ function MegaData()
                             hideReinvite = 'hidden';
                         }
                     }
+
+                    hideOPC = (hideOPC !== '') ? ' class="' + hideOPC + '"' : '';
+                    html = '<tr id="opc_' + htmlentities(opc[i].p) + '"' + hideOPC + '>' +
+                        '<td>' +
+                            '<div class="left email">' +
+                                '<div class="nw-contact-avatar"></div>' +
+                                '<div class="fm-chat-user-info">' +
+                                    '<div class="contact-email">' + htmlentities(opc[i].m) + '</div>' +
+                                '</div>' +
+                            '</div>' +
+                            '<div class="default-white-button grey-txt small ' +
+                                'contact-request-button right cancel ' + hideCancel + '">' +
+                                    '<span>' + escapeHTML(l[5930]) + '</span>' +
+                            '</div>' +
+                            '<div class="default-white-button grey-txt small ' +
+                                'contact-request-button right reinvite ' + hideReinvite + '">' +
+                                    '<span>' + escapeHTML(l[5861]) + '</span>' +
+                            '</div>' +
+                        '</td></tr>';
+
+                    $(t).append(html);
+
+                    drawn = true;
                 }
-
-                hideOPC = (hideOPC !== '') ? ' class="' + hideOPC + '"' : '';
-                html = '<tr id="opc_' + htmlentities(opc[i].p) + '"' + hideOPC + '>\n\
-                    <td>\n\
-                        <div class="left email">\n\
-                            <div class="nw-contact-avatar"></div>\n\
-                            <div class="fm-chat-user-info">\n\
-                               <div class="contact-email">' + htmlentities(opc[i].m) + '</div>\n\
-                            </div>\n\
-                        </div>\n\
-                        <div class="contact-request-button cancel ' + hideCancel + '"><span>' + l[156] + ' ' + l[738].toLowerCase() + '</span></div>\n\
-                        <div class="contact-request-button reinvite ' + hideReinvite + '"><span>' + l[5861] + '</span></div>\n\
-                    </td>\n\
-                </tr>';
-
-                $(t).append(html);
-
-                drawn = true;
             }
 
             if (drawn) {
@@ -1065,6 +1113,12 @@ function MegaData()
 
         if (d) {
             console.time('renderMain');
+        }
+
+        // Disable aUpdate flag if a new item was added to an empty
+        // folder, so that MegaRender properly uses JSP container..
+        if (aUpdate && M.v.length === 1) {
+            aUpdate = false;
         }
 
         if (!aUpdate) {
@@ -1144,7 +1198,14 @@ function MegaData()
             e.currentTarget = target;
             cacheselect();
             searchPath();
-            contextMenuUI(e, 1);
+            if (!$(this).hasClass('active')) {
+                contextMenuUI(e, 1);
+                $(this).addClass('active');
+            }
+            else {
+                $.hideContextMenu();
+                $(this).removeClass('active');
+            }
         });
 
         $('.file-block .file-settings-icon').rebind('click', function(e) {
@@ -1158,7 +1219,14 @@ function MegaData()
             e.currentTarget = target;
             cacheselect();
             searchPath();
-            contextMenuUI(e, 1);
+            if (!$(this).hasClass('active')) {
+                $(this).addClass('active');
+                contextMenuUI(e, 1);
+            }
+            else {
+                $(this).removeClass('active');
+                $.hideContextMenu();
+            }
         });
 
         if (!u) {
@@ -1175,7 +1243,14 @@ function MegaData()
 
                 $('.shared-details-info-block .grid-url-arrow').rebind('click', function (e) {
                     prepareShareMenuHandler(e);
-                    contextMenuUI(e, 1);
+                    if (!$(this).hasClass('active')) {
+                        contextMenuUI(e, 1);
+                        $(this).addClass('active');
+                    }
+                    else {
+                        $.hideContextMenu();
+                        $(this).removeClass('active');
+                    }
                 });
 
                 $('.shared-details-info-block .fm-share-download').rebind('click', function (e) {
@@ -1184,7 +1259,14 @@ function MegaData()
                     e.clientX = $this.offset().left;
                     e.clientY = $this.offset().top + $this.height()
 
-                    contextMenuUI(e, 3);
+                    if (!$(this).hasClass('active')) {
+                        contextMenuUI(e, 3);
+                        $(this).addClass('active');
+                    }
+                    else {
+                        $.hideContextMenu();
+                        $(this).removeClass('active');
+                    }
                 });
 
                 $('.shared-details-info-block .fm-share-copy').rebind('click', function (e) {
@@ -1201,13 +1283,10 @@ function MegaData()
                 $('.shared-details-info-block .fm-leave-share').rebind('click', function (e) {
 
                     // Get the share ID from the hash in the URL
-                    var shareId = window.location.hash.replace('#fm/', '');
+                    var shareId = getSitePath().replace('/fm/', '');
 
                     // Remove user from the share
-                    removeShare (shareId);
-
-                    // Open the shares folder
-                    M.openFolder('shares', true);
+                    leaveShare(shareId);
                 });
             }
         }
@@ -1261,13 +1340,13 @@ function MegaData()
         this.buildtree({h: M.RubbishID},    this.buildtree.FORCE_REBUILD);
         this.buildtree({h: M.InboxID},    this.buildtree.FORCE_REBUILD);
         this.contacts();
-        treeUI();
+        delay(treeUI);
     };
 
     this.openFolder = function(id, force, chat) {
         var newHashLocation;
 
-        $('.fm-right-account-block').addClass('hidden');
+        $('.fm-right-account-block, .fm-right-block.dashboard').addClass('hidden');
         $('.fm-files-view-icon').removeClass('hidden');
 
         if (d) {
@@ -1279,7 +1358,14 @@ function MegaData()
             return false;
         }
 
-        if ((id !== 'notifications') && !$('.fm-main.notifications').hasClass('hidden')) {
+        if (!folderlink) {
+            // open the dashboard by default
+            /*id = id || 'dashboard';
+                disabled for now
+             */
+        }
+
+        if (!is_mobile && (id !== 'notifications') && !$('.fm-main.notifications').hasClass('hidden')) {
             notificationsUI(1);
         }
 
@@ -1294,6 +1380,7 @@ function MegaData()
         else if (id && id === this.currentdirid && !force) {// Do nothing if same path is choosen
             return false;
         }
+
 
         if (id === 'rubbish')
             id = this.RubbishID;
@@ -1327,6 +1414,8 @@ function MegaData()
         }
         else if (id && id.substr(0, 7) === 'account')
             accountUI();
+        else if (id && id.substr(0, 9) === 'dashboard')
+            dashboardUI();
         else if (id && id.substr(0, 13) === 'notifications')
             notificationsUI();
         else if (id && id.substr(0, 7) === 'search/')
@@ -1370,9 +1459,18 @@ function MegaData()
         else if (id === undefined && folderlink) {
             // Error reading shared folder link! (Eg, server gave a -11 (EACCESS) error)
             // Force cleaning the current cloud contents and showing an empty msg
-            M.renderMain();
+            if (!is_mobile) {
+                    M.renderMain();
+                }
+                else {
+                    // Trigger rendering of mobile file manager
+                    mobilefm.renderLayout();
+                }
         }
-        else if (id && (id.substr(0, 7) !== 'account') && (id.substr(0, 13) !== 'notifications')) {
+        else if (id && (id.substr(0, 7) !== 'account')
+                && (id.substr(0, 9) !== 'dashboard')
+                && (id.substr(0, 13) !== 'notifications')) {
+
             $('.fm-right-files-block').removeClass('hidden');
             if (d) {
                 console.time('time for rendering');
@@ -1401,8 +1499,8 @@ function MegaData()
                 viewmode = fmconfig.viewmodes[id];
             }
             else {
-                for (var i in M.v) {
-                    if (is_image(M.v[i])) {
+                for (var i = this.v.length; i--;) {
+                    if (is_image(this.v[i])) {
                         viewmode = 1;
                         break;
                     }
@@ -1439,7 +1537,13 @@ function MegaData()
                 }
             }
 
-            M.renderMain();
+            if (!is_mobile) {
+                    M.renderMain();
+                }
+                else {
+                    // Trigger rendering of mobile file manager
+                    mobilefm.renderLayout();
+                }
 
             if (fminitialized) {
                 var currentdirid = M.currentdirid;
@@ -1451,15 +1555,17 @@ function MegaData()
                     }
                 }
 
-                if ($('#treea_' + currentdirid).length === 0) {
-                    var n = M.d[currentdirid];
-                    if (n && n.p) {
-                        treeUIopen(n.p, false, true);
-                    }
-                }
-                treeUIopen(currentdirid, currentdirid === 'contacts');
+                if (!is_mobile) {
+                        if ($('#treea_' + currentdirid).length === 0) {
+                            var n = M.d[currentdirid];
+                            if (n && n.p) {
+                                treeUIopen(n.p, false, true);
+                            }
+                        }
+                        treeUIopen(currentdirid, currentdirid === 'contacts');
 
-                $('#treea_' + currentdirid).addClass('opened');
+                        $('#treea_' + currentdirid).addClass('opened');
+                    }
             }
             if (d) {
                 console.timeEnd('time for rendering');
@@ -1477,42 +1583,66 @@ function MegaData()
             if (this.currentdirid !== this.RootID) {
                 target = '!' +  this.currentdirid;
             }
-            newHashLocation = '#F!' + pfid + '!' + pfkey + target;
+            newHashLocation = 'F!' + pfid + '!' + pfkey + target;
             M.lastSeenFolderLink = newHashLocation;
         }
         else {
             // new hash location can be altered already by the chat logic in the previous lines in this func
             if (!newHashLocation) {
-                newHashLocation = '#fm/' + M.currentdirid;
+                newHashLocation = 'fm/' + M.currentdirid;
             }
         }
         try {
-            window.location.hash = newHashLocation;
+
+            if (hashLogic) {
+                document.location.hash = '#' + newHashLocation;
+            }
+            else {
+                if (window.location.pathname !== "/"+newHashLocation && !pfid) {
+                    loadSubPage(newHashLocation);
+                }
+                else if (pfid && document.location.hash !== '#'+newHashLocation) {
+                    history.pushState({ fmpage: newHashLocation }, "", "#"+newHashLocation);
+                    page = newHashLocation;
+                }
+            }
         }
         catch (ex) {
             console.error(ex);
         }
-        searchPath();
+        if (!is_mobile) {
+                searchPath();
 
-        var sortMenu = new mega.SortMenu();
-        sortMenu.treeSearchUI();
+                var sortMenu = new mega.SortMenu();
+                sortMenu.treeSearchUI();
+            }
 
         $(document).trigger('MegaOpenFolder');
+    };
+
+    this.getActiveContacts = function() {
+        var res = [];
+
+        if (typeof M.c.contacts === 'object') {
+            Object.keys(M.c.contacts)
+                .forEach(function(userHandle) {
+                    if (Object(M.u[userHandle]).c === 1) {
+                        res.push(userHandle);
+                    }
+                });
+        }
+
+        return res;
     };
 
     // Contacts left panel handling
     this.contacts = function() {
 
         var i;
-        var activeContacts = [];
-
-        for (i in M.c['contacts']) {
-
-            // Filter out contacts without full relationship
-            if (M.d.hasOwnProperty(i) && (M.d[i].c === 1)) {
-                activeContacts.push(M.d[i]);
-            }
-        }
+        var activeContacts = this.getActiveContacts()
+            .map(function(handle) {
+                return M.d[handle];
+            });
 
         if (typeof this.i_cache !== "object") {
             this.i_cache = {};
@@ -1550,23 +1680,24 @@ function MegaData()
         // status can be: "online"/"away"/"busy"/"offline"
         for (i in activeContacts) {
             if (activeContacts.hasOwnProperty(i)) {
-                if (megaChatIsReady) {
-                    var jId = megaChat.getJidFromNodeId(activeContacts[i].u);
-                    onlinestatus = M.onlineStatusClass(megaChat.karere.getPresence(jId));
+                if (megaChatIsReady && activeContacts[i].u) {
+                    onlinestatus = M.onlineStatusClass(
+                        activeContacts[i].presence ? activeContacts[i].presence : 'unavailable'
+                    );
                 }
                 else {
                     onlinestatus = [l[5926], 'offline'];
                 }
 
-                var name = M.getNameByHandle(activeContacts[i].u).toLowerCase();
+                var name = M.getNameByHandle(activeContacts[i].u);
 
-                if (!treesearch || name.indexOf(treesearch.toLowerCase()) > -1) {
+                if (!treesearch || name.toLowerCase().indexOf(treesearch.toLowerCase()) > -1) {
 
                     html += '<div class="nw-contact-item ui-droppable '
                     + onlinestatus[1] + '" id="contact_' + htmlentities(activeContacts[i].u)
                     + '"><div class="nw-contact-status"></div><div class="nw-contact-name">'
                     + htmlentities(name)
-                    + ' <a href="#" class="button start-chat-button"><span></span></a></div></div>';
+                    + ' <a class="button start-chat-button"><span></span></a></div></div>';
                 }
                 $('.fm-start-chat-dropdown').addClass('hidden');
             }
@@ -1588,15 +1719,15 @@ function MegaData()
                 if (!$this.is(".active")) {
                     $('.start-chat-button').removeClass('active');
 
-                    $('.context-menu-item', m).removeClass("disabled");
+                    $('.dropdown-item', m).removeClass("disabled");
 
                     if ($userDiv.is(".offline")) {
-                        $('.context-menu-item.startaudio-item, .context-menu-item.startvideo-item', m)
+                        $('.dropdown-item.startaudio-item, .dropdown-item.startvideo-item', m)
                             .addClass("disabled");
                     }
 
                     $this.addClass('active');
-                    var y = $this.offset().top - 20;
+                    var y = $this.offset().top + 21;
                     m
                         .css('top', y)
                         .removeClass('hidden')
@@ -1616,16 +1747,16 @@ function MegaData()
                 return false; // stop propagation!
             });
 
-            $('.fm-start-chat-dropdown .context-menu-item.startchat-item').rebind('click.treePanel', function() {
+            $('.fm-start-chat-dropdown .dropdown-item.startchat-item').rebind('click.treePanel', function() {
                 var $this = $(this);
 
                 if (!$this.is(".disabled")) {
                     var user_handle = $.selected && $.selected[0];
-                    window.location = "#fm/chat/" + user_handle;
+                    loadSubPage("fm/chat/" + user_handle);
                 }
             });
 
-            $('.fm-start-chat-dropdown .context-menu-item.startaudio-item').rebind('click.treePanel', function() {
+            $('.fm-start-chat-dropdown .dropdown-item.startaudio-item').rebind('click.treePanel', function() {
                 var $this = $(this);
                 var $triggeredBy = $this.parent().data("triggeredBy");
                 var $userDiv = $triggeredBy.parent().parent();
@@ -1633,7 +1764,7 @@ function MegaData()
                 if (!$this.is(".disabled") && !$userDiv.is(".offline")) {
                     var user_handle = $userDiv.attr('id').replace("contact_", "");
 
-                    window.location = "#fm/chat/" + user_handle;
+                    loadSubPage("fm/chat/" + user_handle);
                     var room = megaChat.createAndShowPrivateRoomFor(user_handle);
                     if (room) {
                         room.startAudioCall();
@@ -1641,7 +1772,7 @@ function MegaData()
                 }
             });
 
-            $('.fm-start-chat-dropdown .context-menu-item.startvideo-item').rebind('click.treePanel', function() {
+            $('.fm-start-chat-dropdown .dropdown-item.startvideo-item').rebind('click.treePanel', function() {
                 var $this = $(this);
                 var $triggeredBy = $this.parent().data("triggeredBy");
                 var $userDiv = $triggeredBy.parent().parent();
@@ -1649,7 +1780,7 @@ function MegaData()
                 if (!$this.is(".disabled") && !$userDiv.is(".offline")) {
                     var user_handle = $userDiv.attr('id').replace("contact_", "");
 
-                    window.location = "#fm/chat/" + user_handle;
+                    loadSubPage("fm/chat/" + user_handle);
                     var room = megaChat.createAndShowPrivateRoomFor(user_handle);
                     if (room) {
                         room.startVideoCall();
@@ -1678,8 +1809,7 @@ function MegaData()
 
             // Get the user handle and change to conversations screen
             var user_handle = id.replace('contact_', '');
-            window.location = '#fm/chat/' + user_handle;
-
+            loadSubPage('fm/chat/' + user_handle);
         });
     };
 
@@ -1731,7 +1861,7 @@ function MegaData()
             _a = 'treea_',
             rebuild = false,
             sharedfolder, openedc, arrowIcon,
-            ulc, expandedc, buildnode, containsc, cns, html, sExportLink,
+            ulc, expandedc, buildnode, containsc, i, node, html, sExportLink,
             fName = '',
             curItemHandle = '',
             undecryptableClass = '',
@@ -1740,6 +1870,8 @@ function MegaData()
             prefix;
 
         var share = new mega.Share({});
+
+        var inshares = n.h === 'shares';
 
         /*
          * XXX: Initially this function was designed to render new nodes only,
@@ -1764,7 +1896,7 @@ function MegaData()
                 $('.' + dialog + ' .cloud-drive .dialog-content-block').html('<ul id="mctreesub_' + htmlentities(M.RootID) + '"></ul>');
             }
         }
-        else if (n.h === 'shares') {
+        else if (inshares) {
             if (typeof dialog === 'undefined') {
                 $('.content-panel.shared-with-me').html('<ul id="treesub_shares"></ul>');
             }
@@ -1807,14 +1939,29 @@ function MegaData()
             }
         }
 
+        var btd = 0;
+        if (btd) {
+            console.group('BUILDTREE for "' + n.h + '"');
+        }
+
         if (this.c[n.h]) {
 
             folders = [];
 
-            for (var i in this.c[n.h]) {
-                if (this.d[i] && (this.d[i].t === 1)) {
-                    folders.push(this.d[i]);
+            var handles = Object.keys(this.c[n.h]);
+
+            for (i = handles.length; i--;) {
+                node = this.d[handles[i]];
+
+                if (node) {
+                    // folders, and skip subshares
+                    if (node.t && !(inshares && this.d[node.p])) {
+                        folders.push(node);
+                    }
                 }
+            }
+            if (btd) {
+                console.debug('Building tree', folders.map(function(n) { return n.h }));
             }
 
             var sortFn = this.getSortByNameFn();
@@ -1832,139 +1979,146 @@ function MegaData()
                  _sub = 'mctreesub_';
             }
 
-            for (var ii in folders) {
-                if (folders.hasOwnProperty(ii)) {
+            for (var idx = 0; idx < folders.length; idx++) {
 
-                    ulc = '';
-                    expandedc = '';
-                    buildnode = false;
-                    containsc = '';
-                    curItemHandle = folders[ii].h;
-                    cns = M.c[curItemHandle];
-                    undecryptableClass = '';
-                    titleTooltip = '';
-                    fIcon = '';
+                ulc = '';
+                expandedc = '';
+                buildnode = false;
+                containsc = '';
+                curItemHandle = folders[idx].h;
+                undecryptableClass = '';
+                titleTooltip = '';
+                fIcon = '';
 
-                    fName = folders[ii].name;
+                fName = folders[idx].name;
 
-                    if (cns) {
-                        for (var cn in cns) {
-                            /* jshint -W073 */
-                            if (M.d[cn] && M.d[cn].t) {
-                                containsc = 'contains-folders';
-                                break;
-                            }
-                            /* jshint +W073 */
+                if (this.c[curItemHandle]) {
+                    handles = Object.keys(this.c[curItemHandle]);
+                    for (i = handles.length; i--;) {
+                        node = this.d[handles[i]];
+                        if (node && node.t) {
+                            containsc = 'contains-folders';
+                            break;
                         }
                     }
-                    if (fmconfig && fmconfig.treenodes && fmconfig.treenodes[curItemHandle]) {
-                        buildnode = Boolean(containsc);
-                    }
-                    if (buildnode) {
-                        ulc = 'class="opened"';
-                        expandedc = 'expanded';
-                    }
-                    else if (Object(fmconfig.treenodes).hasOwnProperty(curItemHandle)) {
-                        fmtreenode(curItemHandle, false);
-                    }
+                }
+                if (fmconfig && fmconfig.treenodes && fmconfig.treenodes[curItemHandle]) {
+                    buildnode = !!containsc;
+                }
+                if (buildnode) {
+                    ulc = 'class="opened"';
+                    expandedc = 'expanded';
+                }
+                else if (Object(fmconfig.treenodes).hasOwnProperty(curItemHandle)) {
+                    fmtreenode(curItemHandle, false);
+                }
+
+                // Check is there a full and pending share available, exclude public link shares i.e. 'EXP'
+                if (this.d[curItemHandle].su) {
+                    sharedfolder = ' inbound-share';
+                }
+                else if (share.isShareExist([curItemHandle], true, true, false)) {
+                    sharedfolder = ' shared-folder';
+                }
+                else {
                     sharedfolder = '';
+                }
+                openedc = (M.currentdirid === curItemHandle) ? 'opened' : '';
 
-                    // Check is there a full and pending share available, exclude public link shares i.e. 'EXP'
-                    if (share.isShareExist([curItemHandle], true, true, false)) {
-                        sharedfolder = ' shared-folder';
-                    }
+                var k = $('#' + _li + curItemHandle).length;
 
-                    openedc = '';
-                    if (M.currentdirid === curItemHandle) {
-                        openedc = 'opened';
-                    }
-
-                    var k = $('#' + _li + curItemHandle).length;
-
-                    if (k) {
-                        if (containsc) {
-                            $('#' + _li + curItemHandle + ' .nw-fm-tree-item').addClass(containsc)
-                                .find('span').eq(0).addClass('nw-fm-arrow-icon');
-                        }
-                        else {
-                            $('#' + _li + curItemHandle + ' .nw-fm-tree-item').removeClass('contains-folders')
-                                .find('span').eq(0).removeClass('nw-fm-arrow-icon');
-                        }
+                if (k) {
+                    if (containsc) {
+                        $('#' + _li + curItemHandle + ' .nw-fm-tree-item').addClass(containsc)
+                            .find('span').eq(0).addClass('nw-fm-arrow-icon');
                     }
                     else {
+                        $('#' + _li + curItemHandle + ' .nw-fm-tree-item').removeClass('contains-folders')
+                            .find('span').eq(0).removeClass('nw-fm-arrow-icon');
+                    }
+                }
+                else {
 
-                        // Undecryptable node indicators
-                        if (missingkeys[curItemHandle]) {
-                            undecryptableClass = 'undecryptable';
-                            fName = l[8686];
-                            fIcon = 'generic';
+                    // Undecryptable node indicators
+                    if (missingkeys[curItemHandle]) {
+                        undecryptableClass = 'undecryptable';
+                        fName = l[8686];
+                        fIcon = 'generic';
 
-                            var exportLink = new mega.Share.ExportLink({});
-                            titleTooltip = exportLink.isTakenDown(curItemHandle) ? (l[7705] + '\n') : '';
-                            titleTooltip += l[8595];
-                        }
-
-                        sExportLink = (M.d[curItemHandle].shares && M.d[curItemHandle].shares.EXP) ? 'linked' : '';
-                        arrowIcon = '';
-
-                        if (containsc) {
-                            arrowIcon = 'class="nw-fm-arrow-icon"';
-                        }
-                        /* jshint -W043 */
-                        html = '<li id="' + _li + curItemHandle + '">\n\
-                                        <span  id="' + _a + htmlentities(curItemHandle)
-                            + '" class="nw-fm-tree-item ' + containsc + ' ' + expandedc + ' '
-                            + openedc + ' ' + sExportLink + ' ' + undecryptableClass
-                            + '" title="' + titleTooltip + '">\n\
-                                            <span ' + arrowIcon + '></span>\n\
-                                            <span class="nw-fm-tree-folder' + sharedfolder + '">' + htmlentities(fName) + '</span>\n\
-                                            <span class="data-item-icon"></span>\n\
-                                        </span>\n\
-                                        <ul id="' + _sub + curItemHandle + '" ' + ulc + '></ul>\n\
-                                    </li>';
-                        /* jshint +W043 */
-
-                        if (folders[ii - 1] && $('#' + _li + folders[ii - 1].h).length > 0) {
-                            $('#' + _li + folders[ii - 1].h).after(html);
-                        }
-                        else if (ii === 0 && $('#' + _sub + n.h + ' li').length > 0) {
-                            $($('#' + _sub + n.h + ' li')[0]).before(html);
-                        }
-                        else {
-                            $('#' + _sub + n.h).append(html);
-                        }
+                        var exportLink = new mega.Share.ExportLink({});
+                        titleTooltip = exportLink.isTakenDown(curItemHandle) ? (l[7705] + '\n') : '';
+                        titleTooltip += l[8595];
                     }
 
-                    if (_ts_l) {
-                        if (fName.toLowerCase().indexOf(_ts_l) === -1) {
-                            $('#' + _li + curItemHandle).addClass('tree-item-on-search-hidden');
+                    sExportLink = (M.d[curItemHandle].shares && M.d[curItemHandle].shares.EXP) ? 'linked' : '';
+                    arrowIcon = containsc ? 'class="nw-fm-arrow-icon"' : '';
+
+                    html = '<li id="' + _li + curItemHandle + '">' +
+                        '<span  id="' + _a + curItemHandle + '"' +
+                            ' class="nw-fm-tree-item ' + containsc + ' ' + expandedc + ' ' + openedc + ' ' +
+                                sExportLink + ' ' + undecryptableClass + '" title="' + titleTooltip + '">' +
+                            '<span ' + arrowIcon + '></span>' +
+                            '<span class="nw-fm-tree-folder' + sharedfolder + '">' + escapeHTML(fName) + '</span>' +
+                            '<span class="data-item-icon"></span>' +
+                        '</span>' +
+                        '<ul id="' + _sub + curItemHandle + '" ' + ulc + '></ul>' +
+                        '</li>';
+
+                    if (folders[idx - 1] && $('#' + _li + folders[idx - 1].h).length > 0) {
+                        if (btd) {
+                            console.debug('Buildtree, ' + curItemHandle + ' after ' + _li + folders[idx - 1].h);
                         }
-                        else {
-                            $('#' + _li + curItemHandle).parents('li').removeClass('tree-item-on-search-hidden');
-                        }
+                        $('#' + _li + folders[idx - 1].h).after(html);
                     }
-                    if (buildnode) {
-                        this.buildtree(folders[ii], dialog, stype);
+                    else if (idx === 0 && $('#' + _sub + n.h + ' li').length > 0) {
+                        if (btd) {
+                            console.debug('Buildtree, ' + curItemHandle + ' before ' + _sub + n.h);
+                        }
+                        $($('#' + _sub + n.h + ' li')[0]).before(html);
+                    }
+                    else {
+                        if (btd) {
+                            console.debug('Buildtree, ' + curItemHandle + ' append ' + _sub + n.h);
+                        }
+                        $('#' + _sub + n.h).append(html);
+                    }
+                }
+
+                if (_ts_l) {
+                    if (fName.toLowerCase().indexOf(_ts_l) === -1) {
+                        $('#' + _li + curItemHandle).addClass('tree-item-on-search-hidden');
+                    }
+                    else {
+                        $('#' + _li + curItemHandle).parents('li').removeClass('tree-item-on-search-hidden');
+                    }
+                }
+                if (buildnode) {
+                    this.buildtree(folders[idx], dialog, stype);
+                }
+
+                if (fminitialized) {
+                    var currNode = M.d[curItemHandle];
+
+                    if ((currNode && currNode.shares) || M.ps[curItemHandle]) {
+                        sharedUInode(curItemHandle);
                     }
 
-                    if (fminitialized) {
-                        var nodeHandle = curItemHandle;
-
-                        if ((M.d[nodeHandle] && M.d[nodeHandle].shares) || M.ps[nodeHandle]) {
-                            sharedUInode(nodeHandle);
-                        }
+                    if (currNode && currNode.lbl) {
+                        M.colourLabelDomUpdate(curItemHandle, currNode.lbl);
                     }
                 }
             }// END of for folders loop
         }
+
+        if (btd) {
+            console.groupEnd();
+        }
+
     };// END buildtree()
 
     this.buildtree.FORCE_REBUILD = 34675890009;
 
-    var icon = '<span class="context-menu-icon"></span>';
     var arrow = '<span class="context-top-arrow"></span><span class="context-bottom-arrow"></span>';
-    // divider & advanced
-    var adv = '<span class="context-menu-divider"></span><span class="context-menu-item advanced-item"><span class="context-menu-icon"></span>Select Location</span>';
 
     this.buildRootSubMenu = function() {
 
@@ -1975,19 +2129,21 @@ function MegaData()
         for (var h in M.c[M.RootID]) {
             if (M.d[h] && M.d[h].t) {
                 cs = ' contains-submenu';
-                sm = '<span class="context-submenu" id="sm_' + this.RootID + '"><span id="csb_' + this.RootID + '"></span>' + arrow + '</span>';
+                sm = '<span class="dropdown body submenu" id="sm_' + this.RootID + '">'
+                    + '<span id="csb_' + this.RootID + '"></span>' + arrow + '</span>';
                 break;
             }
         }
 
-        html = '<span class="context-submenu" id="sm_move"><span id="csb_move">';
-        html += '<span class="context-menu-item cloud-item' + cs + '" id="fi_' + this.RootID + '">' + icon + 'Cloud Drive' + '</span>' + sm;
-        html += '<span class="context-menu-item remove-item" id="fi_' + this.RubbishID + '">' + icon + 'Rubbish Bin' + '</span>';
-        html += adv;
-        html += arrow;
-        html += '</span></span>';
+        html = '<span class="dropdown body submenu" id="sm_move"><span id="csb_move">'
+            + '<span class="dropdown-item cloud-item' + cs + '" id="fi_' + this.RootID + '">'
+            + '<i class="small-icon context cloud"></i>' + l[164] + '</span>' + sm
+            + '<span class="dropdown-item remove-item" id="fi_' + this.RubbishID + '">'
+            + '<i class="small-icon context remove-to-bin"></i>' + l[168] + '</span>'
+            + '<hr /><span class="dropdown-item advanced-item"><i class="small-icon context aim"></i>'
+            + l[9108] + '</span>' + arrow + '</span></span>';
 
-        $('.context-menu-item.move-item').after(html);
+        $('.dropdown-item.move-item').after(html);
     };
 
     /*
@@ -2009,7 +2165,7 @@ function MegaData()
         }
 
         // Check existance of sub-menu
-        if ($('#csb_' + id + ' > .context-menu-item').length !== folders.length)  {
+        if ($('#csb_' + id + ' > .dropdown-item').length !== folders.length)  {
             // localeCompare is not supported in IE10, >=IE11 only
             // sort by name is default in the tree
             folders.sort(function(a, b) {
@@ -2028,7 +2184,8 @@ function MegaData()
                     if (M.d[h] && M.d[h].t) {
                         sub = true;
                         cs = ' contains-submenu';
-                        sm = '<span class="context-submenu" id="sm_' + fid + '"><span id="csb_' + fid + '"></span>' + arrow + '</span>';
+                        sm = '<span class="dropdown body submenu" id="sm_' + fid + '">'
+                            + '<span id="csb_' + fid + '"></span>' + arrow + '</span>';
                         break;
                     }
                 }
@@ -2045,7 +2202,9 @@ function MegaData()
                     nodeName = this.d[fid].name;
                 }
 
-                html = '<span class="context-menu-item ' + sharedFolder + cs + '" id="fi_' + fid + '">' + icon + htmlentities(nodeName) + '</span>' + sm;
+                html = '<span class="dropdown-item ' + sharedFolder + cs + '" id="fi_' + fid + '">'
+                    + '<i class="small-icon context ' + sharedFolder + '"></i>'
+                    + htmlentities(nodeName) + '</span>' + sm;
 
                 $('#csb_' + id).append(html);
             }
@@ -2118,10 +2277,16 @@ function MegaData()
 
         var result = [];
         var loop = true;
+        var inshare;
 
         while (loop) {
             if ((id === 'contacts') && (result.length > 1)) {
                 id = 'shares';
+            }
+
+            if (inshare && !M.d[id]) {
+                // we reached the inshare root, use the owner next
+                id = inshare;
             }
 
             if (
@@ -2157,6 +2322,7 @@ function MegaData()
                     break;
                 }
 
+                inshare = M.d[id].su;
                 id = this.d[id].p;
             }
         }
@@ -2166,7 +2332,8 @@ function MegaData()
 
     this.pathLength = function()
     {
-        var length = $('.fm-breadcrumbs-block:visible').outerWidth() + $('.fm-header-buttons:visible').outerWidth();
+        var length = $('.fm-right-header .fm-breadcrumbs-block:visible').outerWidth()
+            + $('.fm-right-header .fm-header-buttons:visible').outerWidth();
         return length;
     };
 
@@ -2242,90 +2409,94 @@ function MegaData()
 
         if (this.currentdirid && this.currentdirid.substr(0, 5) === 'chat/') {
             var contactName = $('a.fm-tree-folder.contact.lightactive span.contact-name').text();
-            $('.fm-breadcrumbs-block').safeHTML('<a class="fm-breadcrumbs contacts has-next-button" id="path_contacts">'
-                                                + '<span class="right-arrow-bg">'
-                                                    + '<span>Contacts</span>'
-                                                + '</span></a>'
-                                            + '<a class="fm-breadcrumbs chat" id="path_'
-                                            + htmlentities(M.currentdirid.replace("chat/", "")) + '">'
-                                                + '<span class="right-arrow-bg">'
-                                                    + '<span>' + htmlentities(contactName) + '</span>'
-                                                + '</span>'
-                                            + '</a>');
+            $('.fm-right-header .fm-breadcrumbs-block').safeHTML(
+                '<a class="fm-breadcrumbs contacts has-next-button" id="path_contacts">'
+                  + '<span class="right-arrow-bg">'
+                      + '<span>Contacts</span>'
+                  + '</span></a>'
+              + '<a class="fm-breadcrumbs chat" id="path_'
+              + htmlentities(M.currentdirid.replace("chat/", "")) + '">'
+                  + '<span class="right-arrow-bg">'
+                      + '<span>' + htmlentities(contactName) + '</span>'
+                  + '</span>'
+              + '</a>');
             $('.search-files-result').addClass('hidden');
         }
         else if (this.currentdirid && this.currentdirid.substr(0, 7) === 'search/') {
-            $('.fm-breadcrumbs-block').safeHTML('<a class="fm-breadcrumbs search ui-droppable" id="'
-                                            + htmlentities(a2[i]) + '">'
-                                                + '<span class="right-arrow-bg ui-draggable">'
-                                                    + '<span>' + htmlentities(this.currentdirid.replace('search/', ''))
-                                                    + '</span>'
-                                                + '</span>'
-                                            + '</a>');
+            $('.fm-right-header .fm-breadcrumbs-block').safeHTML(
+                '<a class="fm-breadcrumbs search ui-droppable" id="'
+                    + htmlentities(a2[i]) + '">'
+                        + '<span class="right-arrow-bg ui-draggable">'
+                            + '<span>' + htmlentities(this.currentdirid.replace('search/', ''))
+                            + '</span>'
+                        + '</span>'
+                    + '</a>');
             $('.search-files-result .search-number').text(M.v.length);
             $('.search-files-result').removeClass('hidden');
             $('.search-files-result').addClass('last-button');
         }
         else if (this.currentdirid && this.currentdirid === 'opc') {
             DEBUG('Render Path OPC');
-            $('.fm-breadcrumbs-block').html(contactBreadcrumb + html);
+            $('.fm-right-header .fm-breadcrumbs-block').html(contactBreadcrumb + html);
         }
         else if (this.currentdirid && this.currentdirid === 'ipc') {
             DEBUG('Render Path IPC');
-            $('.fm-breadcrumbs-block').html(contactBreadcrumb + html);
+            $('.fm-right-header .fm-breadcrumbs-block').html(contactBreadcrumb + html);
         }
         else {
             $('.search-files-result').addClass('hidden');
-            $('.fm-breadcrumbs-block').html(html);
+            $('.fm-right-header .fm-breadcrumbs-block').html(html);
         }
 
-        $('.fm-new-folder span').text(l[68]);
-        $('.fm-file-upload span').text(l[99]);
-        $('.fm-folder-upload span').text(l[98]);
+        // Resizing breadcrumbs items
+        function breadcrumbsResize() {
+            var $fmHeader = $('.fm-right-header:visible');
+            var headerWidth = $fmHeader.outerWidth();
 
-        var headerWidth = $('.fm-right-header:visible').outerWidth();
+            $fmHeader.removeClass('long-path short-foldernames');
+            if (M.pathLength() > headerWidth) {
+                $fmHeader.addClass('long-path');
+            }
 
-        $('.fm-right-header:visible').removeClass('long-path short-foldernames');
-        if (M.pathLength() > headerWidth) {
-            $('.fm-right-header:visible').addClass('long-path');
-            $('.fm-new-folder span').text('');
-            $('.fm-file-upload span').text('');
-            $('.fm-folder-upload span').text('');
-        }
+            var $el = $fmHeader.find('.fm-breadcrumbs-block:visible .right-arrow-bg');
+            var i = 0;
+            var j = 0;
+            $el.removeClass('short-foldername ultra-short-foldername');
 
-        var el = $('.fm-breadcrumbs-block:visible .right-arrow-bg');
-        var i = 0;
-        var j = 0;
-        headerWidth = $('.fm-right-header:visible').outerWidth();
-
-        while (M.pathLength() > headerWidth) {
-            if (i < el.length - 1) {
-                $(el[i]).addClass('short-foldername');
-                i++;
-            } else if (j < el.length - 1) {
-                $(el[j]).html('');
-                j++;
-            } else if (!$(el[j]).hasClass('short-foldername')) {
-                $(el[j]).addClass('short-foldername');
-            } else {
-                $(el[j]).html('');
-                break;
+            while (M.pathLength() > headerWidth) {
+                if (i < $el.length - 1) {
+                    $($el[i]).addClass('short-foldername');
+                    i++;
+                } else if (j < $el.length - 1) {
+                    $($el[j]).addClass('ultra-short-foldername');
+                    j++;
+                } else if (!$($el[j]).hasClass('short-foldername')) {
+                    $($el[j]).addClass('short-foldername');
+                } else {
+                    $($el[j]).addClass('ultra-short-foldername');
+                    break;
+                }
             }
         }
 
-        if ($('.fm-breadcrumbs-block .fm-breadcrumbs').length > 1) {
-            $('.fm-breadcrumbs-block').removeClass('deactivated');
+        breadcrumbsResize();
+        $(window).bind('resize.fmbreadcrumbs', function() {
+            breadcrumbsResize();
+        });
+
+        if ($('.fm-right-header .fm-breadcrumbs-block .fm-breadcrumbs').length > 1) {
+            $('.fm-right-header .fm-breadcrumbs-block').removeClass('deactivated');
         }
         else {
-            $('.fm-breadcrumbs-block').addClass('deactivated');
+            $('.fm-right-header .fm-breadcrumbs-block').addClass('deactivated');
         }
 
-        $('.fm-breadcrumbs-block a').unbind('click');
-        $('.fm-breadcrumbs-block a').bind('click', function() {
+        $('.fm-right-header .fm-breadcrumbs-block a').unbind('click');
+        $('.fm-right-header .fm-breadcrumbs-block a').bind('click', function() {
             var crumbId = $(this).attr('id');
 
             // When NOT deactivated
-            if (!$('.fm-breadcrumbs-block').hasClass('deactivated')) {
+            if (!$('.fm-right-header .fm-breadcrumbs-block').hasClass('deactivated')) {
                 if (crumbId === 'path_opc' || crumbId === 'path_ipc') {
                     return false;
                 }
@@ -2347,176 +2518,151 @@ function MegaData()
     };
 
     this.addNode = function(n, ignoreDB) {
-
-        if (!this.c['shares']) {
-            this.c['shares'] = [];
-        }
-        if (!M.d[n.p] && n.p !== 'contacts') {
-            if (n.sk) {
-                n.p = n.u;
-            }
-            else if (n.su) {
-                n.p = n.su;
-            }
-        }
-        if (n.p && n.p.length === 11 && !M.d[n.p]) {
-            var u = this.u[n.p];
+        if (n.su) {
+            var u = this.u[n.su];
             if (u) {
                 u.h = u.u;
                 u.t = 1;
                 u.p = 'contacts';
                 M.addNode(u);
             }
-            else {
-                console.log('something went wrong!', n.p, this.u[n.p]);
+            else if (d) {
+                console.warn('No user record for incoming share', n.su);
             }
         }
-        if (typeof mDB === 'object' && !ignoreDB && !pfkey) {
-            if (n instanceof MegaDataObject) {
-                mDBadd('f', clone(n.toJS()));
-            }
-            else {
-                mDBadd('f', clone(n));
-            }
-        }
+
         if (n.p) {
             if (typeof this.c[n.p] === 'undefined') {
                 this.c[n.p] = [];
             }
             this.c[n.p][n.h] = 1;
-            // maintain special incoming shares index:
-            if (n.p.length === 11) {
-                this.c['shares'][n.h] = 1;
+        }
+
+        if (n.t) {
+            if (n.t === 2) {
+                this.RootID = n.h;
+            }
+            else if (n.t === 3) {
+                this.InboxID = n.h;
+            }
+            else if (n.t === 4) {
+                this.RubbishID = n.h;
             }
         }
 
-        if (n.t === 2) {
-            this.RootID = n.h;
-        }
-        if (n.t === 3) {
-            this.InboxID = n.h;
-        }
-        if (n.t === 4) {
-            this.RubbishID = n.h;
+        if (n.t < 2) {
+            crypto_decryptnode(n);
+            M.nodeUpdated(n, ignoreDB);
         }
 
-        if (!n.c) {
-            if (n.sk && !u_sharekeys[n.h]) {
-                u_sharekeys[n.h] = crypto_process_sharekey(n.h, n.sk);
+        if (n.hash) {
+            if (!this.h[n.hash]) {
+                this.h[n.hash] = [];
             }
-
-            if (n.t !== 2 && n.t !== 3 && n.t !== 4 && n.k) {
-                if (u_kdnodecache[n.h]) {
-                    $.extend(n, u_kdnodecache[n.h]);
-                }
-                else {
-                    crypto_processkey(u_handle, u_k_aes, n);
-                }
-                if (n.key) {
-                    u_nodekeys[n.h] = n.key;
-
-                    // Update global variable which holds data about missing keys
-                    // so DOM can be updated accordingly
-                    if (missingkeys[n.h]) {
-                        delete missingkeys[n.h];
-                    }
-                }
-            }
-            else if (!n.k) {
-                if (n.a) {
-                    if (!missingkeys[n.h]) {
-                        missingkeys[n.h] = true;
-                        newmissingkeys = true;
-                    }
-                }
-            }
-            if (n.hash) {
-                if (!this.h[n.hash]) {
-                    this.h[n.hash] = [];
-                }
-                this.h[n.hash].push(n.h);
-            }
+            this.h[n.hash].push(n.h);
         }
+
         if (this.d[n.h] && this.d[n.h].shares) {
             n.shares = this.d[n.h].shares;
         }
 
         // sync data objs M.u <-> M.d
-        if (n.h.length === 11) {
-            if (this.u[n.h] !== n) {
-                if (typeof(this.u[n.h]) === 'undefined') {
-                    M.addUser(n, ignoreDB);
-                }
-                var tmpNode = n;
-                n = this.u[n.h];
+        if (this.u[n.h] && this.u[n.h] !== n) {
+            for (var k in n) {
                 // merge changes from n->M.u[n.h]
-                Object.keys(tmpNode).forEach(function(k) {
-                    if (k === "name") {
-                        return;
-                    }
-
-                    n[k] = tmpNode[k];
-                });
+                if (n.hasOwnProperty(k) && k !== 'name') {
+                    this.u[n.h][k] = n[k];
+                }
             }
+            n = this.u[n.h];
         }
 
         this.d[n.h] = n;
 
-        if (typeof newnodes !== 'undefined') {
-            newnodes.push(n);
-        }
-
         if (fminitialized) {
             // Handle Inbox/RubbishBin UI changes
             delay('fmtopUI', fmtopUI);
+
+            newnodes.push(n);
         }
 
         // $(window).trigger("megaNodeAdded", [n]);
     };
 
-    this.delNode = function(h) {
+    if (is_mobile) {
+        this.addNode = function() {
+            return false;
+        };
+    }
 
+    var delInShareQueue = Object.create(null);
+    this.delNode = function(h, ignoreDB) {
         function ds(h) {
-            removeUInode(h);
+            if (fminitialized) {
+                removeUInode(h);
+            }
             if (M.c[h] && h.length < 11) {
                 for (var h2 in M.c[h]) {
                     ds(h2);
                 }
                 delete M.c[h];
             }
-            if (typeof mDB === 'object' && !pfkey) {
-                mDBdel('f', h);
+
+            if (fmdb) {
+                fmdb.del('f', h);
+                fmdb.del('ph', h);
             }
+
             if (M.d[h]) {
+                if (M.d[h].su) {
+                    // this is an inbound share
+                    delete M.c.shares[h];
+                    delete u_sharekeys[h];
+                    delInShareQ.push(M.d[h].su + '*' + h);
+                    M.delIndex(M.d[h].su, h);
+                }
+
                 M.delIndex(M.d[h].p, h);
                 M.delHash(M.d[h]);
                 delete M.d[h];
             }
-            // Update M.v it's used for at least preview slideshow
-            for (var k in M.v) {
-                if (M.v[k].h === h) {
-                    M.v.splice(k, 1);
-                    break;
-                }
-            }
+
             // if (M.u[h]) delete M.u[h];
             if (typeof M.u[h] === 'object') {
                 M.u[h].c = 0;
             }
         }
+        var delInShareQ = delInShareQueue[h] = delInShareQueue[h] || [];
         ds(h);
 
+        if (fmdb && !ignoreDB) {
+            // Perform DB deletions once we got acknowledge from API (action-packets)
+            // which we can't do above because M.d[h] might be already deleted.
+            for (var i = delInShareQ.length; i--;) {
+                fmdb.del('s', delInShareQ[i]);
+            }
+            delete delInShareQueue[h];
+        }
         if (fminitialized) {
             // Handle Inbox/RubbishBin UI changes
             delay('fmtopUI', fmtopUI);
-        }
 
-        if (M.currentdirid === 'shares' && !M.viewmode)
-            M.openFolder('shares', 1);
+            if (M.currentdirid === 'shares' && !M.viewmode) {
+                M.openFolder('shares', 1);
+            }
+            else {
+                // Update M.v it's used for at least preview slideshow
+                for (var k = M.v.length; k--;) {
+                    if (M.v[k].h === h) {
+                        M.v.splice(k, 1);
+                        break;
+                    }
+                }
+            }
+        }
     };
 
-    this.delHash = function(n)
-    {
+    this.delHash = function(n) {
         if (n.hash && M.h[n.hash])
         {
             for (var i in M.h[n.hash])
@@ -2527,7 +2673,10 @@ function MegaData()
                     break;
                 }
             }
-            if (M.h[n.hash].length == 0)
+            if (fmdb) {
+                fmdb.del('h', n.h);
+            }
+            if (!M.h[n.hash].length)
                 delete M.h[n.hash];
         }
     };
@@ -2581,7 +2730,7 @@ function MegaData()
 //                if (opc[i].rts + TIME_FRAME <= Math.floor(new Date().getTime() / 1000)) {
                 return 0;
 //                }
-                return -12;
+                // return -12;
             }
         }
 
@@ -2633,7 +2782,10 @@ function MegaData()
             });
         }
 
-        this.inviteContactMessageHandler(proceed);
+        // In case of invite-dialog we will use notifications
+        if ($.dialog !== 'invite-friend') {
+            this.inviteContactMessageHandler(proceed);
+        }
 
         return proceed;
     };
@@ -2827,20 +2979,23 @@ function MegaData()
                     gridUI();
                 }
             }
-            treeUI();
-            delay('fmtopUI', fmtopUI);
+            fmtopUI();
+            onIdle(treeUI);
         };
 
         var apiReq = function(handle) {
-            api_req({a: 'd', n: handle, i: requesti}, {
+            api_req({a: 'd',
+                     n: handle
+                     //, i: requesti - DB update only upon receipt of actionpacket!
+                    }, {
                 callback: function(res, ctx) {
                     if (res !== 0) {
-                        console.error('Failed to remove Rubbish node.', handle, res);
+                        console.error('Failed to delete node from rubbish bin', handle, res);
                     }
                     else {
                         var h = handle;
 
-                        M.delNode(h);
+                        M.delNode(h, true);
 
                         if (sel) {
                             $('.grid-table.fm#' + h).remove();
@@ -2934,7 +3089,7 @@ function MegaData()
 
             if (self.u[userId].avatar && self.u[userId].avatar.type != "image") {
                 self.u[userId].avatar = false;
-                useravatar.loaded(userId);
+                useravatar.loaded(userId); // FIXME: why is this needed here?
             }
 
             if (userId === u_handle) {
@@ -2942,15 +3097,16 @@ function MegaData()
                 u_attr.lastname = lastName;
                 u_attr.name = self.u[userId].name;
 
-                $('.user-name').text(u_attr.firstname);
+                $('.user-name').text(u_attr.name);
 
                 $('.membership-big-txt.name:visible').text(
                     u_attr.name
                 );
 
-                if (fminitialized) {
+                // XXX: why are we invalidating avatars on first/last-name change?
+                /*if (fminitialized) {
                     M.avatars(u_handle);
-                }
+                }*/
             }
         });
     },
@@ -2960,7 +3116,7 @@ function MegaData()
      */
     this.onContactChanged = function(contact) {
         if (fminitialized) {
-            if (window.location.hash === "#fm/" + contact.u) {
+            if (getSitePath() === "/fm/" + contact.u) {
                 // re-render the contact view page if the presence had changed
                 contactUI();
             }
@@ -2979,12 +3135,13 @@ function MegaData()
                 M.contacts(); // we need to resort
             }
 
-            if (window.location.hash === "#fm/contacts") {
+            if (getSitePath() === "/fm/contacts") {
                 // re-render the contact view page if the presence had changed
                 M.openFolder('contacts', true);
             }
         }
     };
+
     /**
      * addUser, updates global .u variable with new user data
      * adds/updates user indexedDB with newest user data
@@ -3015,7 +3172,7 @@ function MegaData()
 
             this.u[userId].addChangeListener(this.onContactChanged);
 
-            if (typeof mDB === 'object' && !ignoreDB && !pfkey) {
+            if (fmdb && !ignoreDB && !pfkey) {
                 // convert MegaDataObjects -> JS
                 var cleanedUpUserData = clone(u.toJS ? u.toJS() : u);
                 delete cleanedUpUserData.presence;
@@ -3023,7 +3180,7 @@ function MegaData()
                 delete cleanedUpUserData.shortName;
                 delete cleanedUpUserData.name;
                 delete cleanedUpUserData.avatar;
-                mDBadd('u', cleanedUpUserData);
+                fmdb.add('u', { u : u.u, d : cleanedUpUserData });
             }
 
             this.syncUsersFullname(userId);
@@ -3033,8 +3190,8 @@ function MegaData()
     // Update M.opc and related localStorage
     this.addOPC = function(u, ignoreDB) {
         this.opc[u.p] = u;
-        if (typeof mSDB === 'object' && !ignoreDB && !pfkey) {
-            mSDB.add('opc', clone(u));
+        if (fmdb && !ignoreDB && !pfkey) {
+            fmdb.add('opc', { p : u.p, d : u });
         }
     };
 
@@ -3045,16 +3202,16 @@ function MegaData()
      *
      */
     this.delOPC = function(id) {
-        if (typeof mSDB === 'object' && !pfkey) {
-            mSDB.del('opc', id);
+        if (fmdb && !pfkey) {
+            fmdb.del('opc', id);
         }
     };
 
     // Update M.ipc and related localStorage
     this.addIPC = function(u, ignoreDB) {
         this.ipc[u.p] = u;
-        if (typeof mSDB === 'object' && !ignoreDB && !pfkey) {
-            mSDB.add('ipc', clone(u));
+        if (fmdb && !pfkey) {
+            fmdb.add('ipc', { p : u.p, d : u });
         }
     };
 
@@ -3065,8 +3222,8 @@ function MegaData()
      *
      */
     this.delIPC = function(id) {
-        if (typeof mSDB === 'object' && !pfkey) {
-            mSDB.del('ipc', id);
+        if (fmdb && !pfkey) {
+            fmdb.del('ipc', id);
         }
     };
 
@@ -3090,8 +3247,8 @@ function MegaData()
         }
         this.ps[ps.h][ps.p] = ps;
 
-        if (typeof mSDB === 'object' && !ignoreDB && !pfkey) {
-            mSDB.add('ps', clone(ps));
+        if (fmdb && !ignoreDB && !pfkey) {
+            fmdb.add('ps', { h_p : ps.h + '*' + ps.p, d : ps });
         }
 
         // maintain special outgoing shares index by user:
@@ -3123,10 +3280,8 @@ function MegaData()
             }
         }
 
-        // Check how removing from indexedDb works and make
-        // sure that pending share is/only removed from it
-        if (typeof mSDB === 'object' && !pfkey) {
-            mSDB.del('ps', pcrId);
+        if (fmdb && !pfkey) {
+            fmdb.del('ps', nodeId + '*' + pcrId);
         }
     };
 
@@ -3137,7 +3292,7 @@ function MegaData()
         }
 
         var sane = nodes.filter(function(node) {
-            return M.isNodeObject(node);
+            return M.isFileNode(node);
         });
 
         if (sane.length !== nodes.length) {
@@ -3168,16 +3323,22 @@ function MegaData()
     };
 
     /**
-     * @param {Array} cn                Array of nodes that needs to be copied
-     * @param {String} t                Destination node
-     * @param {Bool} del                Should we delete the node after copying? (Like a move operation)
-     * @param {Callback} callback       Callback function
-     * @param {Callback} callbackError  Callback function for custom errors handling (Optional)
+     * @param {Array}       cn            Array of nodes that needs to be copied
+     * @param {String}      t             Destination node
+     * @param {Boolean}     del           Should we delete the node after copying? (Like a move operation)
+     * @param {MegaPromise} promise       promise to notify completion on (Optional)
      */
-    this.copyNodes = function(cn, t, del, callback, callbackError) {
+    this.copyNodes = function(cn, t, del, promise) {
+        if (typeof promise === 'function') {
+            var tmp = promise;
+            promise = new MegaPromise();
+            promise.always(tmp);
+        }
+
         if ($.onImportCopyNodes && t.length === 11) {
             msgDialog('warninga', l[135], 'Operation not permitted.');
-            return false;
+            promise.reject(EARGS);
+            return promise;
         }
 
         loadingDialog.show();
@@ -3186,28 +3347,60 @@ function MegaData()
             var keyCachePromise = api_cachepubkeys([t]);
             keyCachePromise.always(function _cachepubkeyscomplete() {
                 if (u_pubkeys[t]) {
-                    M.copyNodes(cn, t, del, callback, callbackError);
+                    M.copyNodes(cn, t, del, promise);
                 }
                 else {
                     loadingDialog.hide();
                     alert(l[200]);
+
+                    // XXX: remove above alert() if promise is set?
+                    if (promise) {
+                        promise.reject(EKEY);
+                    }
                 }
             });
 
-            return false;
+            return promise;
         }
 
-        var a = this.isNodeObject(cn) ? [cn] : ($.onImportCopyNodes || fm_getcopynodes(cn, t));
+        var a = this.isFileNode(cn) ? [cn] : ($.onImportCopyNodes || fm_getcopynodes(cn, t));
         var importNodes = Object(a).length;
-        var ops = {a: 'p', t: t, n: a, i: requesti};
+        var nodesCount;
+        var sconly = importNodes > 10;   // true -> new nodes delivered via SC `t` command only
+        var ops = {a: 'p', t: t, n: a}; // FIXME: deploy API-side sn check
+
+        var onCopyNodesDone = function() {
+            loadingDialog.hide();
+            if (promise) {
+                promise.resolve(0);
+            }
+            if (!sconly) {
+                renderNew();
+            }
+
+            if (importNodes && nodesCount < importNodes) {
+                msgDialog('warninga', l[882],
+                    (nodesCount ? l[8683] : l[2507])
+                        .replace('%1', nodesCount)
+                        .replace('%2', importNodes)
+                );
+            }
+        };
+
+        if (sconly) {
+            ops.v = 3;
+            ops.i = mRandomToken('pn');
+            M.scAckQueue[ops.i] = onCopyNodesDone;
+        }
+        else {
+            // ops.v = 2;
+            ops.i = requesti;
+        }
+
         var s = fm_getsharenodes(t);
 
-        if (s.length > 0) {
-            var mn = [];
-            for (i in a) {
-                mn.push(a[i].h);
-            }
-            ops.cr = crypto_makecr(mn, s, true);
+        if (s.length) {
+            ops.cr = crypto_makecr(a, s, false);
         }
 
         if (importNodes) {
@@ -3215,129 +3408,204 @@ function MegaData()
             ops.sm = 1;
         }
 
+        // encrypt nodekeys, either by RSA or by AES, depending on whether
+        // we're sending them to a contact's inbox or not
+        // FIXME: do this in a worker
+        var c = (t || "").length == 11;
+        for (var i = a.length; i--; ) {
+            a[i].k = c ? base64urlencode(encryptto(t, a32_to_str(a[i].k)))
+                       : a32_to_base64(encrypt_key(u_k_aes, a[i].k));
+        }
+
         api_req(ops, {
             cn: cn,
             del: del,
             t: t,
+            sconly: sconly,
             callback: function(res, ctx) {
-                function onCopyNodesDone() {
-                    loadingDialog.hide();
-                    if (callback) {
-                        callback(res);
-                    }
-                    renderNew();
-
-                    if (importNodes && nodesCount < importNodes) {
-                        msgDialog('warninga', l[882],
-                            l[8683]
-                                .replace('%1', nodesCount)
-                                .replace('%2', importNodes)
-                        );
-                    }
-                }
-                var nodesCount;
 
                 if (typeof res === 'number' && res < 0) {
                     loadingDialog.hide();
-                    if (typeof callbackError === "function") {
-                        return callbackError(res);
+                    if (promise) {
+                        return promise.reject(res);
+                    }
+                    if (res == EOVERQUOTA) {
+                        return mega.showOverStorageQuota(100);
                     }
                     return msgDialog('warninga', l[135], l[47], api_strerror(res));
                 }
 
                 if (ctx.del) {
-                    var j = [];
                     for (var i in ctx.cn) {
-                        M.delNode(ctx.cn[i]);
-                        api_req({a: 'd', n: cn[i], i: requesti});
+                        M.delNode(ctx.cn[i], true); // must not update DB pre-API
+                        if (!ctx.sconly || !res[i]) {
+                            api_req({a: 'd', n: cn[i]/*, i: requesti*/});
+                        }
                     }
                 }
 
-                newnodes = [];
+                if (ctx.sconly) {
+                    nodesCount = importNodes - Object.keys(res).length;
 
-                if (res.u) {
-                    process_u(res.u, true);
-                }
-
-                if (res.f) {
-                    nodesCount = Object(res.f).length;
-                    process_f(res.f, onCopyNodesDone);
+                    // accelerate arrival of SC-conveyed new nodes by directly
+                    // issuing a fetch
+                    // (instead of waiting for waitxhr's connection to drop)
+                    getsc();
                 }
                 else {
-                    onCopyNodesDone();
+                    newnodes = [];
+
+                    if (res.u) {
+                        process_u(res.u, true);
+                    }
+
+                    if (res.f) {
+                        nodesCount = Object(res.f).length;
+                        process_f(res.f, onCopyNodesDone);
+                    }
+                    else {
+                        onCopyNodesDone();
+                    }
                 }
             }
         });
+
+        return promise;
     };
 
-    this.moveNodes = function(n, t)
-    {
+    this.moveNodes = function(n, t) {
         newnodes = [];
-        var j = [];
+        loadingDialog.show();
+
+        var pending = {value: 0};
+        var apiReq  = function(apireq, h) {
+            pending.value++;
+
+            api_req(apireq, {
+                handle: h,
+                target: t,
+                pending: pending,
+                callback: function(res, ctx) {
+                    // if the move operation succeed (res == 0), perform the actual move locally
+                    if (!res) {
+                        var node = M.getNodeByHandle(ctx.handle);
+
+                        if (node && node.p) {
+                            var h      = ctx.handle;
+                            var t      = ctx.target;
+                            var parent = node.p;
+
+                            // Update M.v it's used for slideshow preview at least
+                            for (var k = M.v.length; k--;) {
+                                if (M.v[k].h === h) {
+                                    M.v.splice(k, 1);
+                                    break;
+                                }
+                            }
+
+                            if (M.c[parent] && M.c[parent][h]) {
+                                delete M.c[parent][h];
+                            }
+                            if (typeof M.c[t] === 'undefined') {
+                                M.c[t] = [];
+                            }
+                            M.c[t][h] = 1;
+                            node.p    = t;
+                            removeUInode(h, parent);
+                            M.nodeUpdated(node);
+                            newnodes.push(node);
+                        }
+                    }
+
+                    if (!--ctx.pending.value) {
+                        if (newnodes.length) {
+                            renderNew();
+                            Soon(fmtopUI);
+                            $.tresizer();
+                            // force fmdb flush by writing the sn, so that we don't have to
+                            // wait for the packet to do so if the operation succeed here.
+                            setsn(currsn);
+                        }
+                        loadingDialog.hide();
+                    }
+                }
+            });
+        };
+
         for (var i in n) {
             var h = n[i];
-            var node = M.d[h];
-            j.push({
+
+            var apireq = {
                 a: 'm',
                 n: h,
                 t: t,
                 i: requesti
-            });
-            if (node && node.p) {
-                var parent = node.p;
-
-                if (M.c[parent] && M.c[parent][h]) {
-                    delete M.c[node.p][h];
-                }
-                // Update M.v it's used for slideshow preview at least
-                for (var k in M.v) {
-                    if (M.v[k].h === h) {
-                        M.v.splice(k, 1);
-                        break;
-                    }
-                }
-                if (typeof M.c[t] === 'undefined') {
-                    M.c[t] = [];
-                }
-                M.c[t][h] = 1;
-                this.nodeAttr({ h: h, p: t });
-                removeUInode(h, parent);
-                newnodes.push(node);
-            }
+            };
+            processmove(apireq);
+            apiReq(apireq, h);
         }
-        renderNew();
-        Soon(fmtopUI);
-        processmove(j);
-        $.tresizer();
     };
 
-    this.accountSessions = function(cb) {
-        /* x: 1, load the session ids
-           useful to expire the session from the session manager */
-        api_req({ a: 'usl', x: 1 }, {
-            account: account,
-            callback: function(res, ctx)
-            {
-                if (typeof res != 'object')
-                    res = [];
-                ctx.account.sessions = res;
-                if (typeof cb === "function") {
-                    cb();
+    /**
+     * Helper function to move nodes falling back to copy+delete under inshares.
+     *
+     * @param {String} target  The handle for the target folder to move nodes into
+     * @param {Array} [nodes]  Array of nodes to move, $.selected if none provided
+     * @returns {MegaPromise}
+     */
+    this.safeMoveNodes = function safeMoveNodes(target, nodes) {
+        var copy    = [];
+        var move    = [];
+        var promise = new MegaPromise();
+
+        nodes = nodes || $.selected || [];
+
+        var totype = treetype(target);
+
+        for (var i = nodes.length; i--;) {
+            var node = nodes[i];
+
+            var fromtype = treetype(node);
+
+            if (fromtype == totype) {
+                if (!isCircular(node, target)) {
+                    if (totype != 'shares' || sharer(node) === sharer(target)) {
+                        move.push(node);
+                    }
+                    else {
+                        copy.push(node);
+                    }
                 }
             }
-        });
+            else {
+                copy.push(node);
+            }
+        }
+
+        if (copy.length) {
+            this.copyNodes(copy, target, true);
+        }
+
+        if (move.length) {
+            this.moveNodes(move, target);
+        }
+
+        // TODO: promises support (realdbpaging)
+        return promise;
     };
 
     this.accountData = function(cb, blockui)
     {
-        if (this.account && this.account.lastupdate > new Date().getTime() - 300000 && cb)
-            cb(this.account);
-        else
-        {
-            if (blockui)
-                loadingDialog.show();
+        var account = Object(this.account);
 
-            account = {};
+        if (account.lastupdate > Date.now() - 30000 && cb) {
+            cb(account);
+        }
+        else {
+
+            if (blockui) {
+                loadingDialog.show();
+            }
 
             api_req({a: 'uq', strg: 1, xfer: 1, pro: 1}, {
                 account: account,
@@ -3364,6 +3632,67 @@ function MegaData()
                         ctx.account.balance = res.balance;
                         ctx.account.reseller = res.reseller;
                         ctx.account.prices = res.prices;
+
+                        // Prepare storage footprint stats.
+                        var cstrgn = ctx.account.cstrgn = Object(ctx.account.cstrgn);
+                        var stats = ctx.account.stats = Object.create(null);
+                        var groups = [M.RootID, M.InboxID, M.RubbishID];
+                        var root = array_toobject(groups);
+                        var exp = Object(M.su.EXP);
+
+                        groups = groups.concat(['inshares', 'outshares', 'links']);
+                        for (var i = groups.length; i--;) {
+                            stats[groups[i]] = array_toobject(['items', 'bytes', 'files', 'folders'], 0);
+                            // stats[groups[i]].nodes = [];
+                        }
+
+                        for (var handle in cstrgn) {
+                            var data = cstrgn[handle];
+                            var target = 'outshares';
+
+                            if (root[handle]) {
+                                target = handle;
+                            }
+                            else if (M.c.shares[handle]) {
+                                target = 'inshares';
+                            }
+                            // stats[target].nodes.push(handle);
+
+                            if (exp[handle] && !M.getNodeShareUsers(handle, 'EXP').length) {
+                                continue;
+                            }
+
+                            stats[target].items++;
+                            stats[target].bytes += data[0];
+                            stats[target].files += data[1];
+                            stats[target].folders += data[2];
+                        }
+
+                        // calculate root's folders size
+                        if (M.c[M.RootID]) {
+                            var t = Object.keys(M.c[M.RootID]);
+                            var s = Object(stats[M.RootID]);
+
+                            s.fsize = s.bytes;
+                            for (var i = t.length; i--;) {
+                                var node = M.d[t[i]] || false;
+
+                                if (!node.t) {
+                                    s.fsize -= node.s;
+                                }
+                            }
+                        }
+
+                        // calculate filelinks items/size
+                        var links = stats.links;
+                        Object.keys(exp)
+                            .filter(function(h) {
+                                return !M.d[h].t;
+                            })
+                            .forEach(function(h) {
+                                links.files++;
+                                links.bytes += M.d[h] && M.d[h].s || 0;
+                            });
 
                         // If a subscription, get the timestamp it will be renewed
                         if (res.stype === 'S') {
@@ -3402,6 +3731,15 @@ function MegaData()
                 }
             });
 
+            api_req({a: 'maf', v: mega.achievem.RWDLVL}, {
+                account: account,
+                callback: function(res, ctx) {
+                    if (typeof res === 'object') {
+                        ctx.account.maf = res;
+                    }
+                }
+            });
+
             api_req({a: 'utt'}, {
                 account: account,
                 callback: function(res, ctx)
@@ -3425,7 +3763,17 @@ function MegaData()
                 }
             });
 
-            this.accountSessions();
+            /* x: 1, load the session ids
+               useful to expire the session from the session manager */
+            api_req({ a: 'usl', x: 1 }, {
+                account: account,
+                callback: function(res, ctx) {
+                    if (typeof res != 'object') {
+                        res = [];
+                    }
+                    ctx.account.sessions = res;
+                }
+            });
 
             api_req({a: 'ug'}, {
                 cb: cb,
@@ -3453,8 +3801,30 @@ function MegaData()
 
                     M.account = ctx.account;
 
-                    if (ctx.cb)
+                    // transfers quota
+                    var tfsq = {max: account.bw, used: account.downbw_used};
+
+                    if (u_attr.p) {
+                        tfsq.used += account.servbw_used;
+                    }
+                    else if (M.maf) {
+                        tfsq.used += account.servbw_used;
+                        var max = (M.maf.transfer.base + M.maf.transfer.current);
+                        if (max) {
+                            // has achieved quota
+                            tfsq.ach = true;
+                            tfsq.max = max;
+                        }
+                    }
+
+                    tfsq.left = tfsq.max - tfsq.used;
+                    tfsq.perc = Math.round(tfsq.used * 100 / tfsq.max);
+
+                    M.account.tfsq = tfsq;
+
+                    if (ctx.cb) {
                         ctx.cb(ctx.account);
+                    }
                 }
             });
         }
@@ -3476,22 +3846,60 @@ function MegaData()
         }
     };
 
-    this.nodeAttr = function(attrs) {
+    this.nodeUpdated = function(n, ignoreDB) {
+        if (n.h && n.h.length == 8) {
+            if (fmdb) {
+                fmdb.add('f', { h : n.h,
+                                p : n.p,
+                                s : n.s >= 0 ? n.s : -n.t,
+                                d : n });
 
-        var node = M.d[attrs.h];
-
-        if (node) {
-            for (var i in attrs) {
-                if (attrs.hasOwnProperty(i)) {
-                    node[i] = attrs[i];
+                if (n.hash) {
+                    fmdb.add('h', {h: n.h, c: n.hash});
                 }
             }
-            if ((typeof mDB === 'object') && !pfkey) {
-                mDBadd('f', clone(node));
+
+            // sync missingkeys with this node's key status
+            if (crypto_keyok(n)) {
+                // mark as fixed if necessary
+                if (missingkeys[n.h]) crypto_keyfixed(n.h);
             }
-            if (node.key && missingkeys[node.h]) {
-                delete missingkeys[node.h];
+            else {
+                // always report missing keys as more shares may
+                // now be affected
+                if (n.k) {
+                    crypto_reportmissingkey(n);
+                }
             }
+
+            // maintain special incoming shares index
+            if (n.su) {
+                if (!M.c[n.su]) {
+                    M.c[n.su] = [];
+                }
+                M.c[n.su][n.h] = n.t + 1;
+
+                if (!M.c.shares[n.h]) {
+                    if (n.sk && !u_sharekeys[n.h]) {
+                        // extract sharekey from node's sk property
+                        var k = crypto_process_sharekey(n.h, n.sk);
+                        if (k !== false) crypto_setsharekey(n.h, k, ignoreDB);
+                    }
+
+                    M.c.shares[n.h] = { su: n.su, r: n.r, t: n.h };
+
+                    if (u_sharekeys[n.h]) {
+                        M.c.shares[n.h].sk = a32_to_base64(u_sharekeys[n.h][0]);
+                    }
+
+                    if (fmdb && !ignoreDB) {
+                        fmdb.add('s', { o_t: n.su + '*' + n.h,
+                                          d: M.c.shares[n.h]
+                        });
+                    }
+                }
+            }
+
         }
     };
 
@@ -3529,51 +3937,142 @@ function MegaData()
     };
 
     this.rename = function(itemHandle, newItemName) {
-        api_setattr(itemHandle, {name: newItemName}, true);
-        this.onRenameUIUpdate(itemHandle, newItemName);
+        var n = M.d[itemHandle];
+        if (n) {
+            n.name = newItemName;
+            api_setattr(n, mRandomToken('mv'));
+            this.onRenameUIUpdate(itemHandle, newItemName);
+        }
+    };
+
+
+    /* Colour Label context menu update
+    *
+    * @param {String} node Selected Node
+    */
+    this.colourLabelcmUpdate = function(node) {
+
+        var $items = $('.files-menu .dropdown-colour-item');
+        var value;
+
+        value = node.lbl;
+
+        // Reset label submenu
+        $items.removeClass('active');
+
+        // Add active state label`
+        if (value) {
+            $items.filter('[data-label-id=' + value + ']').addClass('active');
+        }
+    };
+
+    this.getColourClassFromId = function(id) {
+
+        return ({
+                '1': 'red', '2': 'orange', '3': 'yellow',
+                '4': 'green', '5': 'blue', '6': 'purple', '7': 'grey'
+            })[id] || '';
+    };
+
+    /**
+     * colourLabelDomUpdate
+     *
+     * @param {String} handle
+     * @param {Number} value Current labelId
+     */
+    this.colourLabelDomUpdate = function(handle, value) {
+
+        if (fminitialized) {
+            var labelId       = parseInt(value);
+            var removeClasses = 'colour-label red orange yellow blue green grey purple';
+
+            // Remove all colour label classes
+            $('#' + handle).removeClass(removeClasses);
+            $('#' + handle + ' a').removeClass(removeClasses);
+
+            if (labelId) {
+                // Add colour label classes.
+                var colourClass = 'colour-label ' + M.getColourClassFromId(labelId);
+
+                $('#' + handle).addClass(colourClass);
+                $('#' + handle + ' a').addClass(colourClass);
+            }
+        }
+    };
+
+    /*
+    * colourLabeling Handles colour labeling of nodes updates DOM and API
+    *
+    * @param {Array | string} handles Selected nodes handles
+    * @param {Integer} labelId Numeric value of label
+    */
+    this.colourLabeling = function(handles, labelId) {
+
+        var newLabelState = 0;
+
+        if (fminitialized && handles) {
+            if (!Array.isArray(handles)) {
+                handles = [handles];
+            }
+
+            $.each(handles, function(index, handle) {
+
+                var node = M.d[handle];
+                newLabelState = labelId;
+
+                if (node.lbl === labelId) {
+                    newLabelState = 0;
+                }
+                node.lbl = newLabelState;
+
+                api_setattr(node, mRandomToken('lbl'));
+                M.colourLabelDomUpdate(handle, newLabelState);
+            });
+        }
+    };
+
+    /**
+    * favouriteDomUpdate
+    *
+    * @param {Object} node      Node object
+    * @param {Number} favState  Favourites state 0 or 1
+     */
+    this.favouriteDomUpdate = function(node, favState) {
+        var $gridView  = $('#' + node.h + ' .grid-status-icon');
+        var $blockView = $('#' + node.h + '.file-block .file-status-icon');
+
+        if (favState) {// Add favourite
+            $gridView.addClass('star');
+            $blockView.addClass('star');
+        }
+        else {// Remove from favourites
+            $gridView.removeClass('star');
+            $blockView.removeClass('star');
+        }
     };
 
     /**
      * Change node favourite state.
-     * @param {Array}   handles  An array containing node handles
-     * @param {Boolean} del      User action i.e. true - delete from favorites, false - add to favorite
+     * @param {Array}   handles     An array containing node handles
+     * @param {Number}  newFavState Favourites state 0 or 1
      */
-    this.favourite = function(handles, del) {
-
-        var toRenderMain = false;
-        var newFavStarState = (del) ? 0 : 1;
+    this.favourite = function(handles, newFavState) {
         var exportLink = new mega.Share.ExportLink({});
 
-        if (!Array.isArray(handles)) {
-            handles = [handles];
-        }
-
-        $.each(handles, function(index, handle) {
-            var node = M.d[handle];
-            if (node && (node.fav !== newFavStarState)
-                    && !exportLink.isTakenDown(handle)) {
-
-                api_setattr(handle, {fav: newFavStarState});
-
-                // Add favourite
-                if (!del) {
-                    $('.grid-table.fm #' + node.h + ' .grid-status-icon').addClass('star');
-                    $('#' + node.h + '.file-block .file-status-icon').addClass('star');
-                }
-
-                // Remove from favourites
-                else {
-                    $('.grid-table.fm #' + node.h + ' .grid-status-icon').removeClass('star');
-                    $('#' + node.h + '.file-block .file-status-icon').removeClass('star');
-                }
-
-                toRenderMain = true;
+        if (fminitialized) {
+            if (!Array.isArray(handles)) {
+                handles = [handles];
             }
-        });
 
-        if (toRenderMain && M.sortmode && (M.sortmode.n === 'fav')) {
-            M.doSort('fav', M.sortmode.d);
-            M.renderMain();
+            $.each(handles, function(index, handle) {
+                var node = M.d[handle];
+
+                if (node && !exportLink.isTakenDown(handle)) {
+                    node.fav = newFavState;
+                    api_setattr(node, mRandomToken('fav'));
+                    M.favouriteDomUpdate(node, newFavState);
+                }
+            });
         }
     };
 
@@ -3586,8 +4085,8 @@ function MegaData()
      */
     this.isFavourite = function(nodesId) {
 
-        var result = false,
-            nodes = nodesId;
+        var result = false;
+        var nodes = nodesId;
 
         if (!Array.isArray(nodesId)) {
             nodes = [nodesId];
@@ -3597,7 +4096,7 @@ function MegaData()
         $.each(nodes, function(index, value) {
             if (M.d[value] && M.d[value].fav) {
                 result = true;
-                return false;// Break each loop
+                return false;// Break the loop
             }
         });
 
@@ -3683,11 +4182,11 @@ function MegaData()
     this.getNodeShare = function(node, user) {
         user = user || 'EXP';
 
-        if (typeof node !== 'object') {
+        if (typeof node != 'object') {
             node = this.getNodeByHandle(node);
         }
 
-        if (node && Object(node.shares).hasOwnProperty(user)) {
+        if (node && node.shares && user in node.shares) {
             return node.shares[user];
         }
 
@@ -3728,32 +4227,31 @@ function MegaData()
 
     this.nodeShare = function(h, s, ignoreDB) {
         if (this.d[h]) {
-            if (typeof this.d[h].shares === 'undefined') {
+            if (typeof this.d[h].shares == 'undefined') {
                 this.d[h].shares = [];
             }
 
             this.d[h].shares[s.u] = s;
-            if (typeof mDB === 'object') {
-                s['h_u'] = h + '_' + s.u;
+            if (fmdb) {
                 if (!ignoreDB && !pfkey) {
-                    mDBadd('s', clone(s));
+                    fmdb.add('s', { o_t : h + '*' + s.u, d : s });
                 }
             }
             if (fminitialized) {
                 sharedUInode(h);
             }
-            if ((typeof mDB === 'object') && !pfkey) {
+            if (fmdb && !pfkey && !ignoreDB) {
                 if (!u_sharekeys[h]) {
                     if (d && !this.getNodeShare(h)) {
-                        console.warn('INVALID OPERATION -- No share key for handle "%s"', h);
+                        console.warn('No share key for node ' + h);
                     }
                 }
                 else {
-                    mDBadd('ok', {
-                        h: h,
-                        k: a32_to_base64(encrypt_key(u_k_aes, u_sharekeys[h])),
-                        ha: crypto_handleauth(h)
-                    });
+                    fmdb.add('ok', {
+                        h : h,
+                        d : { k : a32_to_base64(encrypt_key(u_k_aes, u_sharekeys[h][0])),
+                              ha : crypto_handleauth(h) }
+                        });
                 }
             }
 
@@ -3764,46 +4262,80 @@ function MegaData()
             this.su[s.u][h] = 1;
         }
         else if (d) {
-            console.log('nodeShare failed for node:', h, s, ignoreDB);
+            console.warn('nodeShare failed for node:', h, s, ignoreDB);
         }
     };
 
-    this.delNodeShare = function(h, u) {
+    /**
+     * Delete node share.
+     * @param {String}  h    Node handle.
+     * @param {String}  u    User handle to remove the associated share
+     * @param {Boolean} okd  Whether API notified the node is no longer
+     *                       shared with anybody else and therefore the
+     *                       owner share key must be removed too.
+     */
+    this.delNodeShare = function(h, u, okd) {
+        if (this.d[h] && typeof this.d[h].shares != 'undefined') {
+            var updnode;
 
-        if (this.d[h] && typeof this.d[h].shares !== 'undefined') {
-            var a = 0;
+            if (this.su[u]) {
+                delete this.su[u][h];
+            }
+
+            if (fmdb) {
+                fmdb.del('s', h + '*' + u);
+            }
 
             api_updfkey(h);
             delete this.d[h].shares[u];
 
             if (u === 'EXP' && this.d[h].ph) {
                 delete this.d[h].ph;
-                this.nodeAttr({ h: h });
+
+                if (fmdb) {
+                    fmdb.del('ph', h);
+                }
+
+                updnode = true;
             }
 
+            var a;
             for (var i in this.d[h].shares) {
                 if (this.d[h].shares[i]) {
-                    a++;
+                    a = true;
                     break;
                 }
             }
-            if (a === 0) {
+
+            if (!a) {
                 delete this.d[h].shares;
-                M.nodeAttr({ h: h, shares: undefined });
+                updnode = true;
+            }
+
+            if (updnode) {
+                M.nodeUpdated(this.d[h]);
+
                 if (fminitialized) {
                     sharedUInode(h);
                 }
-                // XXX: Do not delete sharekeys for now...due some issue we've noticed
-                //     with missing keys...and let's see, what can go wrong doing this?
-                if (0) {
-                    delete u_sharekeys[h];
-                    if (typeof mDB === 'object') {
-                        mDBdel('ok', h);
-                    }
-                }
             }
-            if (typeof mDB === 'object') {
-                mDBdel('s', h + '_' + u);
+        }
+
+        if (okd) {
+            // The node is no longer shared with anybody, ensure it's properly cleared..
+            var users = this.getNodeShareUsers(h, 'EXP');
+
+            if (users.length) {
+                console.warn('The node ' + h + ' still has shares on it!', users);
+
+                users.forEach(function(user) {
+                    M.delNodeShare(h, user);
+                });
+            }
+
+            delete u_sharekeys[h];
+            if (fmdb) {
+                fmdb.del('ok', h);
             }
         }
     };
@@ -3886,31 +4418,27 @@ function MegaData()
         }
         else
         {
-            if (d)
-                console.log('MAKEDIR: TODO');
+            // FIXME: add support once available
         }
     }
 
-    this.getDownloadFolderNodes = function(n, md, nodes, paths)
-    {
+    this.getDownloadFolderNodes = function(n, md, nodes, paths) {
         if (md) this.makeDir(n);
 
         var subids = fm_getnodes(n);
-        for (var j in subids)
-        {
+
+        for (var j = 0; j < subids.length; j++) {
             var p = this.getPath(subids[j]);
             var path = '';
 
-            for (var k in p)
-            {
+            for (var k = 0; k < p.length; k++) {
                 if (M.d[p[k]] && M.d[p[k]].t)
                     path = fm_safename(M.d[p[k]].name) + '/' + path;
                 if (p[k] == n)
                     break;
             }
 
-            if (!M.d[subids[j]].t)
-            {
+            if (!M.d[subids[j]].t) {
                 nodes.push(subids[j]);
                 paths[subids[j]] = path;
             }
@@ -3934,6 +4462,62 @@ function MegaData()
             if (user instanceof MegaDataObject) {
                 user = user._data;
             }
+        }
+
+        if (!user && handle === u_handle) {
+            user = u_attr;
+        }
+
+        return user;
+    };
+
+    /**
+     * Retrieve an user object by its email
+     * @param {String} email The user's handle
+     * @return {Object} The user object, of false if not found
+     */
+    this.getUserByEmail = function(email) {
+        var user = false;
+
+        M.u.every(function(contact, u) {
+            if (M.u[u].m === email) {
+                // Found the user object
+                user = M.u[u];
+
+                if (user instanceof MegaDataObject) {
+                    user = user._data;
+                }
+                return false;
+            }
+            return true;
+        });
+
+        return user;
+    };
+
+    /**
+     * Retrieve an user object
+     * @param {String} str An email or handle
+     * @return {Object} The user object, of false if not found
+     */
+    this.getUser = function(str) {
+        var user = false;
+
+        if (typeof str !== 'string') {
+            // Check if it's an user object already..
+
+            if (Object(str).hasOwnProperty('u')) {
+                // Yup, likely.. let's see
+                user = this.getUserByHandle(str.u);
+            }
+        }
+        else if (str.length === 11) {
+            // It's an user handle
+            user = this.getUserByHandle(str);
+        }
+        else if (str.indexOf('@') > 0) {
+            // It's an email..
+            user = this.getUserByEmail(str);
         }
 
         return user;
@@ -3964,9 +4548,6 @@ function MegaData()
                 result = node.name;
             }
         }
-        else {
-            console.error('getNameByHandle: Unsupported handle "%s"', handle);
-        }
 
         return String(result);
     };
@@ -3993,12 +4574,29 @@ function MegaData()
     };
 
     /**
-     * Check whether an object is an ufs node
+     * Retrieve dashboard statistics data
+     */
+    this.getDashboardData = function() {
+        var res = Object.create(null);
+        var s = M.account.stats;
+
+        res.files = {cnt: s[M.RootID].files, size: s[M.RootID].bytes};
+        res.folders = {cnt: s[M.RootID].folders, size: s[M.RootID].fsize};
+        res.rubbish = {cnt: s[M.RubbishID].files, size: s[M.RubbishID].bytes};
+        res.ishares = {cnt: s.inshares.items, size: s.inshares.bytes};
+        res.oshares = {cnt: s.outshares.items, size: s.outshares.bytes};
+        res.links = {cnt: s.links.files, size: s.links.bytes};
+
+        return res;
+    };
+
+    /**
+     * Check whether an object is a file node
      * @param {String} n The object to check
      * @return {Boolean}
      */
-    this.isNodeObject = function(n) {
-        return typeof n === 'object' && Array.isArray(n.key) && n.key.length === 8;
+    this.isFileNode = function(n) {
+        return crypto_keyok(n) && !n.t;
     };
 
     /** like addToTransferTable, but can take a download object */
@@ -4006,8 +4604,9 @@ function MegaData()
         var handle = node.h || node.dl_id;
         node.name = node.name || node.n;
 
-        if (d && console.assert) {
-            console.assert(this.isNodeObject(node), 'Invalid putToTransferTable node.');
+        if (d) {
+            var isDownload = node.owner instanceof ClassFile;
+            console.assert(this.isFileNode(node) || isDownload, 'Invalid putToTransferTable node.');
         }
 
         var gid = 'dl_' + handle;
@@ -4077,20 +4676,20 @@ function MegaData()
                 var files = [];
 
                 var addNode = function(node) {
-                    var item = {
-                        t: node.t,
-                        h: node.h,
-                        p: node.p,
-                        n: base64urlencode(node.name),
-                    };
-                    if (!node.t) {
-                        item.s = node.s;
-                        item.ts = node.mtime || node.ts;
-                        if (Object(node.key).length) {
-                            item.k = a32_to_base64(node.key);
+                    if (!node.a && node.k) {
+                        var item = {
+                            t: node.t,
+                            h: node.h,
+                            p: node.p,
+                            n: base64urlencode(node.name),
+                        };
+                        if (!node.t) {
+                            item.s = node.s;
+                            item.ts = node.mtime || node.ts;
+                            item.k = a32_to_base64(node.k);
                         }
+                        files.push(item);
                     }
-                    files.push(item);
 
                     if (node.t) {
                         foreach(fm_getnodes(node.h));
@@ -4098,13 +4697,11 @@ function MegaData()
                 };
 
                 var foreach = function(nodes) {
-                    for (var i in nodes) {
-                        if (nodes.hasOwnProperty(i)) {
-                            var node = M.d[nodes[i]];
+                    for (var i = 0; i < nodes.length; i++) {
+                        var node = M.d[nodes[i]];
 
-                            if (node) {
-                                addNode(node);
-                            }
+                        if (node) {
+                            addNode(node);
                         }
                     }
                 };
@@ -4112,7 +4709,7 @@ function MegaData()
                 foreach(n);
 
                 if (!files.length) {
-                    console.error('No files...');
+                    console.error('No files');
                     return webdl();
                 }
 
@@ -4177,7 +4774,7 @@ function MegaData()
                     nodes.push(n[i]);
                 }
             }
-            else if (this.isNodeObject(n[i])) {
+            else if (this.isFileNode(n[i])) {
                 nodes.push(n[i]);
             }
         }
@@ -4208,9 +4805,9 @@ function MegaData()
         var ttl = this.getTransferTableLengths();
         for (var k in nodes) {
             /* jshint -W089 */
-            if (!nodes.hasOwnProperty(k) || !this.isNodeObject((n = M.d[nodes[k]]))) {
+            if (!nodes.hasOwnProperty(k) || !this.isFileNode((n = M.d[nodes[k]]))) {
                 n = nodes[k];
-                if (this.isNodeObject(n)) {
+                if (this.isFileNode(n)) {
                     dlmanager.logger.info('Using plain provided node object.');
                 }
                 else {
@@ -4229,7 +4826,7 @@ function MegaData()
             }
             dl_queue.push({
                 id: n.h,
-                key: n.key,
+                key: n.k,
                 n: n.name,
                 t: n.mtime || n.ts,
                 p: path,
@@ -4306,7 +4903,7 @@ function MegaData()
         if (!$.transferHeader) {
             transferPanelUI();
         }
-        $.transferHeader();
+        delay('fm_tfsupdate', fm_tfsupdate); // this will call $.transferHeader();
 
         if (!isZIP || zipSize) {
             M.addDownloadToast = ['d', isZIP ? 1 : added, isPaused];
@@ -4315,7 +4912,7 @@ function MegaData()
         initGridScrolling();
         initFileblocksScrolling();
         initTreeScroll();
-        Soon(fm_tfsupdate);
+
         if ((dlmanager.isDownloading = Boolean(dl_queue.length))) {
             $('.transfer-pause-icon').removeClass('disabled');
             $('.transfer-clear-completed').removeClass('disabled');
@@ -4372,7 +4969,7 @@ function MegaData()
             $tr.addClass('transfer-started');
             $tr.removeClass('transfer-initiliazing transfer-queued');
             $('.transfer-table').prepend($tr);
-            $.transferHeader();
+            delay('fm_tfsupdate', fm_tfsupdate); // this will call $.transferHeader();
         }
         // var eltime = (new Date().getTime()-st)/1000;
         var bps = kbps * 1000;
@@ -4401,10 +4998,16 @@ function MegaData()
                     $tr.find('.left-c p').css('transform', 'rotate(' + (transferDeg - 180) + 'deg)');
                 }
                 if (retime > 0) {
+                    var title = '';
+                    try {
+                        title = new Date((unixtime() + retime) * 1000).toLocaleString();
+                    }
+                    catch (ex) {
+                    }
                     $tr.find('.eta')
                         .text(secondsToTime(retime))
                         .removeClass('unknown')
-                        .attr('title', new Date((unixtime() + retime) * 1000).toLocaleString());
+                        .attr('title', title);
                 }
                 else {
                     $tr.find('.eta').addClass('unknown').text('');
@@ -4415,7 +5018,7 @@ function MegaData()
                 else {
                     $tr.find('.speed').addClass('unknown').text('');
                 }
-                percent_megatitle();
+                delay('percent_megatitle', percent_megatitle);
 
                 if (page.substr(0, 2) !== 'fm')
                 {
@@ -4469,19 +5072,20 @@ function MegaData()
             setTimeout(fm_chromebar, 500, $.dlheight);
             setTimeout(fm_chromebar, 1000, $.dlheight);
         }
-        var a = dl_queue.filter(isQueueActive).length;
-        if (a < 2 && !ulmanager.isUploading)
-        {
-            $('.widget-block').fadeOut('slow', function(e)
-            {
-                $('.widget-block').addClass('hidden');
-                $('.widget-block').css({opacity: 1});
-            });
+        if (page.substr(0, 2) !== 'fm') {
+            var a = dl_queue.filter(isQueueActive).length;
+            if (a < 2 && !ulmanager.isUploading) {
+                $('.widget-block').fadeOut('slow', function(e) {
+                    $('.widget-block').addClass('hidden').css({opacity: 1});
+                });
+            }
+            else if (a < 2) {
+                $('.widget-icon.downloading').addClass('hidden');
+            }
+            else {
+                $('.widget-circle').attr('class', 'widget-circle percents-0');
+            }
         }
-        else if (a < 2)
-            $('.widget-icon.downloading').addClass('hidden');
-        else
-            $('.widget-circle').attr('class', 'widget-circle percents-0');
         if ($.transferprogress && $.transferprogress[id])
         {
             if (!$.transferprogress['dlc'])
@@ -4490,8 +5094,10 @@ function MegaData()
             delete $.transferprogress[id];
         }
 
-        $.transferHeader();
-        Soon(mega.utils.resetUploadDownload);
+        delay('tfscomplete', function() {
+            mega.utils.resetUploadDownload();
+            $.tresizer();
+        });
     }
 
     this.dlbeforecomplete = function()
@@ -4596,110 +5202,140 @@ function MegaData()
     {
         var id = (dl.zipid ? 'zip_' + dl.zipid : 'dl_' + dl.dl_id);
 
+        if (M.tfsdomqueue[id]) {
+            // flush the transfer from the DOM queue
+            addToTransferTable(id, M.tfsdomqueue[id]);
+            delete M.tfsdomqueue[id];
+        }
+
         $('.transfer-table #' + id)
             .addClass('transfer-initiliazing')
             .find('.transfer-status').text(l[1042]);
 
-        Soon(fm_tfsupdate);
+        delay('fm_tfsupdate', fm_tfsupdate); // this will call $.transferHeader()
         dl.st = NOW();
         ASSERT(typeof dl_queue[dl.pos] === 'object', 'No dl_queue entry for the provided dl...');
         ASSERT(typeof dl_queue[dl.pos] !== 'object' || dl.n == dl_queue[dl.pos].n, 'No matching dl_queue entry...');
         if (typeof dl_queue[dl.pos] === 'object')
             M.dlprogress(id, 0, 0, 0, 0, dl.pos);
-        $.transferHeader();
     }
     this.mobileuploads = [];
 
-    this.dynListR = SoonFc(function()
-    {
-        function flush_cached_nodes(n)
-        {
-            n = Object.keys(M.tfsdomqueue).slice(0, n);
+    this.doFlushTransfersDynList = function(aNumNodes) {
+        aNumNodes = Object.keys(M.tfsdomqueue).slice(0, aNumNodes | 0);
 
-            if (n.length)
-            {
-                for (var i in n)
-                {
-                    i = n[i];
-                    addToTransferTable(i, M.tfsdomqueue[i], 1);
-                    delete M.tfsdomqueue[i];
-                }
+        if (aNumNodes.length) {
+            for (var i = 0, l = aNumNodes.length; i < l; ++i) {
+                var item = aNumNodes[i];
 
-                /*if (M._tfsDynlistR)
-                    clearTimeout(M._tfsDynlistR);
-                M._tfsDynlistR = setTimeout(function()
-                {
-                    delete M._tfsDynlistR;
-                    Soon(transferPanelUI);
-                    Soon(fm_tfsupdate);
-                }, 350);*/
-                $(window).trigger('resize');
+                addToTransferTable(item, M.tfsdomqueue[item], 1);
+                delete M.tfsdomqueue[item];
+            }
+
+            $.tresizer();
+        }
+    };
+
+    this.handleEvent = function(ev) {
+        if (d > 1) {
+            console.debug(ev.type, ev);
+        }
+
+        var ttl;
+        if (ev.type === 'ps-y-reach-end') {
+            ttl = M.getTransferTableLengths();
+            if (ttl.left > -100) {
+                this.doFlushTransfersDynList(ttl.size);
             }
         }
-        var $tst = $('.transfer-scrolling-table');
-        $tst.unbind('jsp-scroll-y.tfsdynlist');
+        else if (ev.type === 'tfs-dynlist-flush') {
+            ttl = M.getTransferTableLengths();
+            if (ttl.left > -10) {
+                this.doFlushTransfersDynList(ttl.size);
+            }
+        }
+    };
 
-        // if ($('#fmholder').hasClass('transfer-panel-opened'))
+    this.tfsResizeHandler = SoonFc(function() {
+
+        // if (M.currentdirid === 'transfers')
+        if (M.getTransferElements())
         {
             var T = M.getTransferTableLengths();
 
             if (d)
                 console.log('resize.tfsdynlist', JSON.stringify(T));
 
-            if (T.left > 0)
-                flush_cached_nodes(T.left + 3);
-
-            T = T.size;
-            $tst.bind('jsp-scroll-y.tfsdynlist', function(ev, pos, top, bot)
-            {
-                if (bot)
-                    flush_cached_nodes(T);
-            });
+            if (T.left > 0) {
+                M.doFlushTransfersDynList(T.left + 3);
+            }
         }
-        $tst = undefined;
     });
 
     this.getTransferTableLengths = function()
     {
-        var used = $('.transfer-table tr').length;
-        var size = Math.ceil($('.transfer-scrolling-table').height() / 24);
+        var te   = this.getTransferElements();
+        var used = te.domTable.querySelectorAll('tr').length;
+        var size = Math.ceil(parseInt(te.domScrollingTable.style.height) / 24);
 
         return {size: size, used: used, left: size - used};
     };
 
+    this.getTransferElements = function() {
+        var obj               = {};
+        obj.domTransfersBlock = document.querySelector('.fm-transfers-block');
+        if (!obj.domTransfersBlock) {
+            return false;
+        }
+        obj.domTableWrapper   = obj.domTransfersBlock.querySelector('.transfer-table-wrapper');
+        obj.domTransferHeader = obj.domTransfersBlock.querySelector('.fm-transfers-header');
+        obj.domPanelTitle     = obj.domTransferHeader.querySelector('.transfer-panel-title');
+        obj.domTableEmptyTxt  = obj.domTableWrapper.querySelector('.transfer-panel-empty-txt');
+        obj.domTableHeader    = obj.domTableWrapper.querySelector('.transfer-table-header');
+        obj.domScrollingTable = obj.domTableWrapper.querySelector('.transfer-scrolling-table');
+        obj.domTable          = obj.domScrollingTable.querySelector('.transfer-table');
+
+        this.getTransferElements = function() {
+            return obj;
+        };
+
+        return obj;
+    };
+
     function addToTransferTable(gid, elem, q)
     {
+        var te     = M.getTransferElements();
         var target = gid[0] === 'u'
-            ? $('.transfer-table tr.transfer-upload.transfer-queued:last')
-            : $('.transfer-table tr.transfer-download.transfer-queued:last');
+            ? $('tr.transfer-upload.transfer-queued:last', te.domTable)
+            : $('tr.transfer-download.transfer-queued:last', te.domTable);
 
         if (target.length) {
             target.after(elem);
         }
         else {
             if (gid[0] != 'u') {
-                target = $('.transfer-table tr.transfer-upload.transfer-queued:first');
+                target = $('tr.transfer-upload.transfer-queued:first', te.domTable);
             }
 
             if (target.length) {
                 target.before(elem);
             }
             else {
-                target = $('.transfer-table tr.transfer-completed:first');
+                target = $('tr.transfer-completed:first', te.domTable);
 
                 if (target.length) {
                     target.before(elem);
                 }
                 else {
-                    $('.transfer-table').append(elem);
+                    $(te.domTable).append(elem);
                 }
             }
         }
-        if ($.mSortableT) {
+        /*if ($.mSortableT) {
             $.mSortableT.sortable('refresh');
-        }
+        }*/
         if (!q) {
-            Soon(fm_tfsupdate);
+            delay('fm_tfsupdate', fm_tfsupdate);
         }
     }
     this.addToTransferTable = function(gid, ttl, elem)
@@ -4711,10 +5347,15 @@ function MegaData()
             logger.info('Adding Transfer', gid, JSON.stringify(T));
         }
 
-        if (this.dynListR)
+        if (this.tfsResizeHandler)
         {
-            $(window).bind('resize.tfsdynlist', this.dynListR);
-            delete this.dynListR;
+            M.getTransferElements()
+                .domScrollingTable
+                .addEventListener('ps-y-reach-end', M, {passive: true});
+            mBroadcaster.addListener('tfs-dynlist-flush', M);
+
+            $(window).bind('resize.tfsdynlist', this.tfsResizeHandler);
+            delete this.tfsResizeHandler;
         }
 
         if (T.left > 0)
@@ -4729,19 +5370,20 @@ function MegaData()
 
             if (gid[0] !== 'u')
             {
+                // keep inserting downloads as long there are uploads
                 var dl = $('.transfer-table tr.transfer-download.transfer-queued:last');
 
-                if (dl.length)
-                {
-                    // keep inserting downloads as long there are uploads
-                    // dl = +dl.closest('tr').children(':first').text();
+                if (dl.length) {
                     dl = dl.prevAll().length;
 
-                    if (dl && dl + 1 < T.used)
-                    {
-                        addToTransferTable(gid, elem);
-                        fit = true;
-                    }
+                    fit = (dl && dl + 1 < T.used);
+                }
+                else {
+                    fit = !document.querySelector('.transfer-table tr.transfer-download');
+                }
+
+                if (fit) {
+                    addToTransferTable(gid, elem);
                 }
             }
 
@@ -4754,7 +5396,7 @@ function MegaData()
     this.addUpload = function(u, ignoreWarning) {
         var flag = 'ulMegaSyncAD';
 
-        if (u.length > 99 && !ignoreWarning && !localStorage[flag]) {
+        if (u.length > 999 && !ignoreWarning && !localStorage[flag]) {
             var showMEGAsyncDialog = function(button, syncData) {
                 $('.download-button.light-red.download').safeHTML(button);
                 $('.download-button.light-white.continue').safeHTML(l[8846]);
@@ -4780,7 +5422,7 @@ function MegaData()
                     hideMEGAsyncDialog();
 
                     if (!syncData) {
-                        location.hash = '#sync';
+                        loadSubPage('sync');
                     }
                     // if the user is running MEGAsync 3.0+
                     else if (!syncData.verNotMeet) {
@@ -4825,7 +5467,7 @@ function MegaData()
             target = $.onDroppedTreeFolder;
             delete $.onDroppedTreeFolder;
         }
-        else if ($('.nw-fm-left-icon.transfers').hasClass('active')) {
+        else if (String(M.currentdirid).length !== 8) {
             target = M.lastSeenCloudFolder || M.RootID;
         }
         else {
@@ -4839,6 +5481,7 @@ function MegaData()
             if (!$.ulBunch[M.currentdirid]) {
                 $.ulBunch[M.currentdirid] = {};
             }
+            target = M.currentdirid;
         }
 
         if (uldl_hold) {
@@ -4905,9 +5548,8 @@ function MegaData()
         }
         else {
             showTransferToast('u', added);
-            $.transferHeader();
             openTransferpanel();
-            Soon(fm_tfsupdate);
+            delay('fm_tfsupdate', fm_tfsupdate); // this will call $.transferHeader()
         }
 
         setupTransferAnalysis();
@@ -4920,18 +5562,17 @@ function MegaData()
 
     this.ulprogress = function(ul, perc, bl, bt, bps)
     {
-        var id = ul.id;
-        var $tr = $('.transfer-table #ul_' + id);
+        var id  = ul.id;
+        var $tr = $('#ul_' + id);
         if (!$tr.hasClass('transfer-started')) {
             $tr.find('.transfer-status').text('');
             $tr.removeClass('transfer-initiliazing transfer-queued');
             $tr.addClass('transfer-started');
             $('.transfer-table').prepend($tr);
-            $.transferHeader();
+            delay('fm_tfsupdate', fm_tfsupdate); // this will call $.transferHeader()
         }
         if (!bl || !ul.starttime)
             return false;
-        var eltime = (new Date().getTime() - ul.starttime) / 1000;
         var retime = bps > 1000 ? (bt - bl) / bps : -1;
         var transferDeg = 0;
         if (!$.transferprogress)
@@ -4959,7 +5600,7 @@ function MegaData()
             } else {
                 $tr.find('.speed').addClass('unknown').text('');
             }
-            $.transferHeader();
+            // $.transferHeader();
 
             if (page.substr(0, 2) !== 'fm')
             {
@@ -4971,13 +5612,13 @@ function MegaData()
                 $('.widget-block').addClass('active');
             }
         }
-        percent_megatitle();
+        delay('percent_megatitle', percent_megatitle);
     }
 
     this.ulcomplete = function(ul, h, k)
     {
-        var id = ul.id;
-        var $tr = $('.transfer-table #ul_' + id);
+        var id  = ul.id;
+        var $tr = $('#ul_' + id);
 
         if ($.ulBunch && $.ulBunch[ul.target])
         {
@@ -5011,7 +5652,7 @@ function MegaData()
             showToast('megasync', l[372] + ' "' + ul.name + '" (' + l[1668] + ')');
         }
 
-        this.mobile_ul_completed = true;
+        /*this.mobile_ul_completed = true;
         for (var i in this.mobileuploads)
         {
             if (id == this.mobileuploads[i].id)
@@ -5025,24 +5666,29 @@ function MegaData()
             $('#mobileuploadtime').addClass('complete');
             $('#uploadpopbtn').text(l[726]);
             $('#mobileupload_header').text(l[1418]);
-        }
+         }*/
         $tr.removeClass('transfer-started').addClass('transfer-completed');
         $tr.find('.left-c p, .right-c p').css('transform', 'rotate(180deg)');
         $tr.find('.transfer-status').text(ul.skipfile ? l[1668] : l[1418]);
         $tr.find('.eta, .speed').text('').removeClass('unknown');
 
         ul_queue[ul.pos] = Object.freeze({});
-        var a=ul_queue.filter(isQueueActive).length;
-        if (a < 2 && !ulmanager.isUploading)
-        {
-            $('.widget-block').fadeOut('slow',function(e)
-            {
-                $('.widget-block').addClass('hidden');
-                $('.widget-block').css({opacity:1});
-            });
+
+        if (page.substr(0, 2) !== 'fm') {
+            var a = ul_queue.filter(isQueueActive).length;
+            if (a < 2 && !ulmanager.isDownloading) {
+                $('.widget-block').fadeOut('slow', function(e) {
+                    $('.widget-block').addClass('hidden').css({opacity: 1});
+                });
+            }
+            else if (a < 2) {
+                $('.widget-icon.uploading').addClass('hidden');
+            }
+            else {
+                $('.widget-circle').attr('class', 'widget-circle percents-0');
+            }
         }
-        else if (a < 2) $('.widget-icon.uploading').addClass('hidden');
-        else $('.widget-circle').attr('class','widget-circle percents-0');
+
         if ($.transferprogress && $.transferprogress['ul_'+ id])
         {
             if (!$.transferprogress['ulc']) $.transferprogress['ulc'] = 0;
@@ -5050,7 +5696,7 @@ function MegaData()
             delete $.transferprogress['ul_'+ id];
         }
         // $.transferHeader();
-        Soon(function() {
+        delay('tfscomplete', function() {
             mega.utils.resetUploadDownload();
             $.tresizer();
         });
@@ -5068,16 +5714,15 @@ function MegaData()
             .addClass('transfer-initiliazing')
             .find('.transfer-status').text(l[1042]);
 
-        Soon(fm_tfsupdate);
+        delay('fm_tfsupdate', fm_tfsupdate); // this will call $.transferHeader()
         ul.starttime = new Date().getTime();
         M.ulprogress(ul, 0, 0, 0);
-        $.transferHeader();
     };
 
     this.cloneChatNode = function(n, keepParent) {
         var n2 = clone(n);
-        n2.k = a32_to_base64(n2.key);
-        delete n2.key, n2.ph, n2.ar;
+        n2.k = a32_to_base64(n2.k);
+        delete n2.k, n2.ph, n2.ar;
         if (!keepParent)
             delete n2.p;
         return n2;
@@ -5090,7 +5735,7 @@ function MegaData()
     this.transferFromMegaCoNz = function()
     {
         // Get site transfer data from after the hash in the URL
-        var urlParts = /#sitetransfer!(.*)/.exec(window.location);
+        var urlParts = /sitetransfer!(.*)/.exec(window.location);
 
         if (urlParts) {
 
@@ -5100,7 +5745,7 @@ function MegaData()
             }
             catch (ex) {
                 console.error(ex);
-                window.location.hash = 'login';
+                loadSubPage('login');
                 return false;
             }
 
@@ -5108,7 +5753,7 @@ function MegaData()
                 // If the user is already logged in here with the same account
                 // we can avoid a lot and just take them to the correct page
                 if (JSON.stringify(u_k) === JSON.stringify(urlParts[0])) {
-                    window.location.hash = urlParts[2];
+                    loadSubPage(urlParts[2]);
                     return false;
                 }
 
@@ -5116,11 +5761,11 @@ function MegaData()
                 // hash they came from e.g. a folder link may not be valid for this account so just load the file manager.
                 else if (u_k && (JSON.stringify(u_k) !== JSON.stringify(urlParts[0]))) {
                     if (!urlParts[2] || String(urlParts[2]).match(/^fm/)) {
-                        window.location.hash = 'fm';
+                        loadSubPage('fm');
                         return false;
                     }
                     else {
-                        window.location.hash = urlParts[2];
+                        loadSubPage(urlParts[2]);
                         return false;
                     }
                 }
@@ -5144,8 +5789,8 @@ function MegaData()
 
                 var _goToPage = function() {
                     loadingDialog.hide();
-                    window.location.hash = toPage;
-                }
+                    loadSubPage(toPage);
+                };
 
                 var _rawXHR = function(url, data, callback) {
                     mega.utils.xhr(url, JSON.stringify([data]))
@@ -5190,8 +5835,6 @@ function MegaData()
                             u_checklogin(ctx, false);
                         }
                     });
-
-                // Successful transfer, continue load
                 return false;
             }
         }
@@ -5344,11 +5987,17 @@ function renderfm() {
         console.time('renderfm');
     }
 
-    initUI();
-    loadingDialog.hide();
+    if (!is_mobile) {
+        initUI();
+    }
+
     M.sortByName();
-    M.renderTree();
-    M.renderPath();
+
+    if (!is_mobile) {
+        M.renderTree();
+        M.renderPath();
+    }
+
     var c = $('#treesub_' + M.RootID).attr('class');
     if (c && c.indexOf('opened') < 0) {
         $('.fm-tree-header.cloud-drive-item').addClass('opened');
@@ -5366,7 +6015,6 @@ function renderfm() {
 }
 
 function renderNew() {
-
     var newNode, tb,
         treebuild = [],
         UImain = false,
@@ -5380,7 +6028,6 @@ function renderNew() {
     }
 
     for (var i in newnodes) {
-
         newNode = newnodes[i];
         if (newNode.h.length === 11) {
             newcontact = true;
@@ -5448,602 +6095,1338 @@ function renderNew() {
         topmenuUI();
     }
 
-    newnodes = undefined;
+    if (M.currentdirid === 'dashboard') {
+        delay('dashboard:upd', dashboardUI, 2000);
+    }
+
+    newnodes = [];
     if (d) {
         console.timeEnd('rendernew');
     }
 }
 
-/**
- * Execute response from server to client
- */
-function execsc(actionPackets, callback) {
+// execute actionpacket
+// actionpackets are received and executed strictly in order. receiving and
+// execution run concurrently (a connection drop while the execution is
+// ongoing invalidates the IndexedDB state and forces a reload!)
+var scq = {};   // hash of [actionpacket, [nodes]]
+var scqtail = 0;    // next scq index to process
+var scqhead = 0;    // next scq index to write
+var shareworker = {};   // which worker knows about which sharekeys?
 
-    var tparentid = false,
-        trights = false,
-        tmoveid = false,
-        rootsharenodes = [],
-        loadavatars = false;
+var scinflight = false; // don't run more than one execsc() "thread"
+var sccount = 0;        // number of actionpackets processed at connection loss
 
-    newnodes = [];
-    mega.flags |= window.MEGAFLAG_EXECSC;
+var nodesinflight = {};  // number of nodes being processed in the worker for scqi
 
-    // Process action packets
-    for (var i in actionPackets) {
-        var actionPacket = actionPackets[i];
+// enqueue parsed actionpacket
+function sc_packet(a) {
+    if ((a.a == 's' || a.a == 's2') && a.k) {
+        /**
+         * There are two occasions where `crypto_process_sharekey()` must not be called:
+         *
+         * 1. `a.k` is symmetric (AES), `a.u` is set and `a.u != u_handle`
+         *    (because the resulting sharekey would be rubbish)
+         *
+         * 2. `a.k` is asymmetric (RSA), `a.u` is set and `a.u != u_handle`
+         *    (because we either get a rubbish sharekey or an RSA exception from asmcrypto)
+         */
+        var prockey = false;
 
-        // If debug mode, log the packet to console
-        if (d) {
-            console.log('actionpacket', actionPacket);
-        }
+        if (a.k.length > 43) {
+            if (!a.u || a.u === u_handle) {
+                // RSA-keyed share command targeted to u_handle: run through worker
+                prockey = !a.o || a.o !== u_handle;
 
-        // If own action packet
-        if (actionPacket.i === requesti) {
-            if (d) {
-                console.log('OWN ACTION PACKET');
-            }
-
-            // If contact notification
-            if (actionPacket.a === 'c') {
-                process_u(actionPacket.u);
-
-                // Only show a notification if we did not trigger the action ourselves
-                if (actionPacket.ou !== u_attr.u) {
-                    notify.notifyFromActionPacket(actionPacket);
-                }
-
-                if (megaChatIsReady) {
-                    $.each(actionPacket.u, function (k, v) {
-                        if (v.c !== 0) {
-                            crypt.getPubRSA(v.u);
-                        }
-                        megaChat[v.c == 0 ? "processRemovedUser" : "processNewUser"](v.u);
-                    });
-                }
-            }
-
-            // Full share
-            else if (actionPacket.a === 's') {
-
-                // Used during share dialog removal of contact from share list
-                // Find out is this a full share delete
-                if (actionPacket.r === undefined) {
-
-                    // Fill DDL with removed contact
-                    if (actionPacket.u && M.u[actionPacket.u] && M.u[actionPacket.u].m) {
-                        var email = M.u[actionPacket.u].m;
-                        var contactName = M.getNameByHandle(actionPacket.u);
-
-                        addToMultiInputDropDownList('.share-multiple-input', [{ id: email, name: contactName }]);
-                        addToMultiInputDropDownList('.add-contact-multiple-input', [{ id: email, name: contactName }]);
-                    }
-                }
-
-                // Full share contains .h param
-                sharedUInode(actionPacket.h);
-            }
-
-            // Outgoing pending contact
-            else if (actionPacket.a === 'opc') {
-                processOPC([actionPacket]);
-
-                // Don't append to sent grid on deletion
-                if (!actionPacket.dts) {
-                    M.drawSentContactRequests([actionPacket]);
-                }
-            }
-
-            // Incoming pending contact
-            else if (actionPacket.a === 'ipc') {
-                processIPC([actionPacket]);
-                M.drawReceivedContactRequests([actionPacket]);
-                notify.notifyFromActionPacket(actionPacket);
-            }
-
-            // Pending shares
-            else if (actionPacket.a === 's2') {
-                processPS([actionPacket]);
-            }
-
-            // Export link (public handle)
-            else if (actionPacket.a === 'ph') {
-                processPH([actionPacket]);
-            }
-
-            // Incomming request updated
-            else if (actionPacket.a === 'upci') {
-                processUPCI([actionPacket]);
-            }
-
-            // Outgoing request updated
-            else if (actionPacket.a === 'upco') {
-                processUPCO([actionPacket]);
-
-                // If the status is accepted ('2') then this will be followed by a contact packet and we do not need to notify
-                if (actionPacket.s !== 2) {
-                    notify.notifyFromActionPacket(actionPacket);
-                }
-            }
-            else if (actionPacket.a === 'ua') {
-                var attrs = actionPacket.ua;
-                var actionPacketUserId = actionPacket.u;
-                for (var j in attrs) {
-                    if (attrs.hasOwnProperty(j)) {
-                        var attributeName = attrs[j];
-
-                        if (attributeName === '+a') {
-                            if (!loadavatars) {
-                                loadavatars = [];
-                            }
-                            loadavatars.push(actionPacketUserId);
-                        }
-                        else if (attributeName === 'firstname' || attributeName === 'lastname') {
-                            attribCache.uaPacketParser(attributeName, actionPacketUserId, true);
-                        }
-                    }
-                }
-            }
-        }// END own action packet
-        else if (actionPacket.a === 'e') {
-            var str = hex2bin(actionPacket.c || "");
-            if (str.substr(0, 5) === ".cms.") {
-                var cmsType = str.split(".")[2];
-                var cmsId = str.substr(6 + cmsType.length).split(".");
-                CMS.reRender(cmsType, cmsId);
-            }
-        }
-        else if (actionPacket.a === 'fa') {
-            M.nodeAttr({
-                h: actionPacket.n,
-                fa: actionPacket.fa
-            });
-        }
-        else if ((actionPacket.a === 's' || actionPacket.a === 's2') && !folderlink) {
-
-            var tsharekey = '';
-            var prockey = false;
-
-            if (actionPacket.o === u_handle) {
-
-                if (!actionPacket.u) {
-                    // this must be a pending share
-                    if (actionPacket.a !== 's2') {
-                        console.error('INVALID SHARE ACTION PACKET, Missing user-handle', actionPacket);
-                    }
-                }
-                // If access right are undefined then share is deleted
-                else if (typeof actionPacket.r === "undefined") {
-                    M.delNodeShare(actionPacket.n, actionPacket.u);
-                }
-                else {
-                    var handle = actionPacket.n;
-                    var shares = Object(M.d[handle]).shares || {};
-
-                    if (shares.hasOwnProperty(actionPacket.u)
-                            || (actionPacket.ha === crypto_handleauth(actionPacket.n))) {
-
-                        // I updated or created my share
-                        u_sharekeys[handle] = decrypt_key(u_k_aes, base64_to_a32(actionPacket.ok));
-                        M.nodeShare(handle, {
-                            h: actionPacket.n,
-                            r: actionPacket.r,
-                            u: actionPacket.u,
-                            ts: actionPacket.ts
-                        });
-                    }
-                }
-            }
-            else {
-                if ((typeof actionPacket.n !== 'undefined')
-                        && (typeof actionPacket.k !== 'undefined')
-                        && (typeof u_sharekeys[actionPacket.n] === 'undefined')) {
-
-                    if (!actionPacket.k) {
-                        // XXX: We need to find out which API call is causing it
-                        //      (it might be a bug in the SDK or the webclient)
-                        // How to reproduce: Delete folder with pending shares,
-                        // on client side we will have this situation
-                        srvlog('Got share action-packet with no key.');
-                    }
-                    else {
-                        u_sharekeys[actionPacket.n] = crypto_process_sharekey(actionPacket.n, actionPacket.k);
-                        tsharekey = a32_to_base64(u_k_aes.encrypt(u_sharekeys[actionPacket.n]));
-                        prockey = true;
-                    }
-                }
-
-                if (actionPacket && actionPacket.u === 'EXP') {
-                    var exportLink = new mega.Share.ExportLink({ 'nodesToProcess': [actionPacket.h] });
-                    exportLink.getExportLink();
-                }
-
-                if (typeof actionPacket.o !== 'undefined') {
-                    if (typeof actionPacket.r === "undefined") {
-                        if (d) {
-                            console.log('delete a share');
-                        }
-                        // delete a share:
-                        var n = M.d[actionPacket.n];
-                        if (n && n.p.length !== 11) {
-                            M.nodeAttr({
-                                h: actionPacket.n,
-                                r: 0,
-                                su: ''
-                            });
-                        }
-                        else {
-                            M.delNode(actionPacket.n);
-                        }
-                        if (!folderlink && actionPacket.u !== 'EXP' && fminitialized) {
-                            notify.notifyFromActionPacket({
-                                a: 'dshare',
-                                n: actionPacket.n,
-                                u: actionPacket.o
-                            });
-                        }
-                        delete u_sharekeys[actionPacket.n];
-                    }
-                    else {
-                        if (d) {
-                            console.log('I receive a share, prepare for receiving tree a');
-                        }
-                        // I receive a share, prepare for receiving tree a
-                        tparentid = actionPacket.o;
-                        trights = actionPacket.r;
-                        if (M.d[actionPacket.n]) {
-                            // update rights:
-                            M.nodeAttr({
-                                h: actionPacket.n,
-                                r: actionPacket.r,
-                                su: actionPacket.o
-                            });
-                        }
-                        else {
-                            if (d) {
-                                console.log('look up other root-share-nodes from this user');
-                            }
-                            // look up other root-share-nodes from this user:
-                            if (typeof M.c[actionPacket.o] !== 'undefined') {
-                                for (var i in M.c[actionPacket.o]) {
-                                    if (M.d[i] && M.d[i].t == 1) {
-                                        rootsharenodes[i] = 1;
-                                    }
-                                }
-                            }
-
-                            if (!folderlink && fminitialized) {
-                                notify.notifyFromActionPacket({
-                                    a: 'share',
-                                    n: actionPacket.n,
-                                    u: actionPacket.o
-                                });
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (prockey) {
-                var nodes = fm_getnodes(actionPacket.n, 1);
-                nodes.push(actionPacket.n);
-                for (var i in nodes) {
-                    var n = M.d[nodes[i]];
-
-                    if (n) {
-                        var f = {
-                            a: n.a,
-                            h: n.h,
-                            k: n.k
-                        };
-                        crypto_processkey(u_handle, u_k_aes, f);
-                        if (f.ar) {
-                            // Bug #1983: No-Key issue.
-                            n.ar = f.ar;
-                        }
-                        M.nodeAttr({
-                            h: nodes[i],
-                            name: f.name,
-                            key: f.key,
-                            sk: tsharekey
-                        });
-                        newnodes.push(M.d[n.h]);
-                    }
-                }
-            }
-
-            crypto_share_rsa2aes();
-
-            if (actionPacket.a === 's2') {
-                processPS([actionPacket]);
-            }
-
-            if (fminitialized) {
-                M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
-                sharedUInode(actionPacket.n);
-            }
-        }
-        else if (actionPacket.a === 'k' && !folderlink) {
-            if (actionPacket.sr)
-                crypto_procsr(actionPacket.sr);
-            else if (actionPacket.cr)
-                crypto_proccr(actionPacket.cr);
-            else
-                api_req({
-                    a: 'k',
-                    cr: crypto_makecr(actionPacket.n, [actionPacket.h], true)
-                });
-
-            if (fminitialized) {
-                M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
-            }
-        }
-        else if (actionPacket.a === 't') {
-            if (tparentid) {
-                for (var b in actionPacket.t.f) {
-                    if (rootsharenodes[actionPacket.t.f[b].h] && M.d[actionPacket.t.f[b].h]) {
-                        actionPacket.t.f[b].r = M.d[actionPacket.t.f[b].h].r;
-                        actionPacket.t.f[b].su = M.d[actionPacket.t.f[b].h].su;
-                        M.delNode(actionPacket.t.f[b].h);
-                    }
-                }
-
-                if (!M.d[actionPacket.t.f[0].p]) {
-                    actionPacket.t.f[0].p = tparentid;
-                }
-
-                actionPacket.t.f[0].su = tparentid;
-                actionPacket.t.f[0].r = trights;
-
-                if (tsharekey) {
-                    actionPacket.t.f[0].sk = tsharekey;
-                    tsharekey = false;
-                }
-                rootsharenodes = [];
-            }
-
-            // notification logic:
-            if (fminitialized && !folderlink && actionPacket.ou && actionPacket.ou != u_handle
-                && actionPacket.t && actionPacket.t.f && actionPacket.t.f[0]
-                && actionPacket.t.f[0].p.length < 11 && !tmoveid && !tparentid) {
-
-                var targetid = actionPacket.t.f[0].p;
-                var pnodes = [];
-                for (var i in actionPacket.t.f) {
-                    if (actionPacket.t.f[i].p === targetid) {
-                        pnodes.push({
-                            h: actionPacket.t.f[i].h,
-                            t: actionPacket.t.f[i].t
-                        });
-                    }
-                }
-                notify.notifyFromActionPacket({
-                    a: 'put',
-                    n: targetid,
-                    u: actionPacket.ou,
-                    f: pnodes
-                });
-            }
-
-            tparentid = false;
-            trights = false;
-            __process_f1(actionPacket.t.f);
-        }
-        else if (actionPacket.a === 'u') {
-            var n = M.d[actionPacket.n];
-            if (n) {
-                var f = {
-                    h : actionPacket.n,
-                    k : actionPacket.k,
-                    a : actionPacket.at
-                };
-                crypto_processkey(u_handle, u_k_aes, f);
-                if (f.key) {
-                    if (f.name !== n.name) {
-                        M.onRenameUIUpdate(n.h, f.name);
-                    }
-                    if (fminitialized && f.fav !== n.fav) {
-                        if (f.fav) {
-                            $('.grid-table.fm #' + n.h + ' .grid-status-icon').addClass('star');
-                            $('#' + n.h + '.file-block .file-status-icon').addClass('star');
-                        }
-                        else {
-                            $('.grid-table.fm #' + n.h + ' .grid-status-icon').removeClass('star');
-                            $('#' + n.h + '.file-block .file-status-icon').removeClass('star');
-                        }
-                    }
-                    M.nodeAttr({
-                        h : actionPacket.n,
-                        fav : f.fav,
-                        name : f.name,
-                        key : f.key,
-                        a : actionPacket.at
-                    });
-                }
-                if (actionPacket.cr) {
-                    crypto_proccr(actionPacket.cr);
-                }
-            }
-        }
-        else if (actionPacket.a === 'c') {
-            process_u(actionPacket.u);
-
-            // Contact is deleted on remote computer, remove contact from contacts left panel
-            if (fminitialized && actionPacket.u[0].c === 0) {
-                $('#contact_' + actionPacket.ou).remove();
-
-                $.each(actionPacket.u, function(k, v) {
-
-                    var userHandle = v.u;
-
-                    // hide the context menu if it is currently visible and this contact was removed.
-                    if ($.selected && ($.selected[0] === userHandle)) {
-
-                        // was selected
-                        $.selected = [];
-                        if ($('.context-menu.files-menu').is(":visible")) {
-                            $.hideContextMenu();
-                        }
-                    }
-                });
-
-                M.handleEmptyContactGrid();
-            }
-
-            // Only show a notification if we did not trigger the action ourselves
-            if (actionPacket.ou !== u_attr.u) {
-                notify.notifyFromActionPacket(actionPacket);
-            }
-
-            if (megaChatIsReady) {
-                $.each(actionPacket.u, function(k, v) {
-                    if (v.c !== 0) {
-                        crypt.getPubRSA(v.u);
-                    }
-                    megaChat[v.c == 0 ? "processRemovedUser" : "processNewUser"](v.u);
-                });
-            }
-        }
-        else if (actionPacket.a === 'd') {
-            M.delNode(actionPacket.n);
-
-            // Only show a notification if we did not trigger the action ourselves
-            if (actionPacket.ou !== u_attr.u) {
-                notify.notifyFromActionPacket(actionPacket);
-            }
-        }
-        else if (actionPacket.a === 'ua' && fminitialized) {
-            var attrs = actionPacket.ua;
-            var actionPacketUserId = actionPacket.u;
-            for (var j in attrs) {
-                if (attrs.hasOwnProperty(j)) {
-                    var attributeName = attrs[j];
-
-                    attribCache.uaPacketParser(attributeName, actionPacketUserId);
-                }
-            }
-        }
-        else if (actionPacket.a === 'la') {
-            notify.countAndShowNewNotifications();
-        }
-        else if (actionPacket.a === 'opc') {
-            processOPC([actionPacket]);
-
-            if (fminitialized) {
-                M.drawSentContactRequests([actionPacket]);
-            }
-        }
-        else if (actionPacket.a === 'ipc') {
-            processIPC([actionPacket]);
-
-            if (fminitialized) {
-                M.drawReceivedContactRequests([actionPacket]);
-            }
-            notify.notifyFromActionPacket(actionPacket);
-        }
-        else if (actionPacket.a === 'ph') {// Export link (public handle)
-            processPH([actionPacket]);
-
-            // Not applicable so don't return anything or it will show a blank notification
-            if (typeof actionPacket.up !== 'undefined' && typeof actionPacket.down !== 'undefined') {
-                notify.notifyFromActionPacket(actionPacket);
-            }
-        }
-        else if (actionPacket.a === 'upci') {
-            processUPCI([actionPacket]);
-        }
-        else if (actionPacket.a === 'upco') {
-            processUPCO([actionPacket]);
-
-            // If the status is accepted ('2') then this will be followed by a contact packet and we do not need to notify
-            if (actionPacket.s !== 2) {
-                notify.notifyFromActionPacket(actionPacket);
-            }
-        }
-        // Action packet to notify about payment (Payment Service Transaction Status)
-        else if (actionPacket.a === 'psts') {
-            proPage.processPaymentReceived(actionPacket);
-        }
-        // Action packet for the mcc
-        else if (actionPacket.a === 'mcc') {
-            if (!megaChatIsDisabled) {
-                if (megaChatIsReady) {
-                    $(window).trigger('onChatdChatUpdatedActionPacket', actionPacket);
-                }
-                else {
-                    ChatdIntegration._queuedChats[actionPacket.id] = actionPacket;
-                }
-            }
-        }
-        // Action packet for 'Set Email'
-        else if (actionPacket.a === 'se') {
-            var emailChangeAccepted = (actionPacket.s === 3
-                                       && typeof actionPacket.e === 'string'
-                                       && actionPacket.e.indexOf('@') !== -1);
-
-            if (emailChangeAccepted) {
-                var user = M.getUserByHandle(actionPacket.u);
-
-                if (user) {
-                    user.m = actionPacket.e;
-                    process_u([user]);
-
-                    if (actionPacket.u === u_handle) {
-                        u_attr.email = user.m;
-
-                        if (M.currentdirid === 'account/profile') {
-                            $('.nw-fm-left-icon.account').trigger('click');
-                        }
-                    }
+                if (prockey) {
+                    rsasharekeys[a.n] = true;
                 }
             }
         }
         else {
-            if (d) {
-                console.log('not processing this action packet', actionPacket);
+            prockey = (!a.o || a.o === u_handle);
+        }
+
+        if (prockey) {
+            if (workers && rsasharekeys[a.n]) {
+                // set scq slot number
+                a.scqi = scqhead++;
+
+                var p = a.scqi % workers.length;
+
+                // pin the nodes of this share to the same worker
+                // (it is the only one that knows the sharekey)
+                shareworker[a.n] = p;
+
+                workers[p].postMessage(a);
+                return;
+            }
+
+            var k = crypto_process_sharekey(a.n, a.k);
+
+            if (k !== false) {
+                a.k = k;
+                crypto_setsharekey(a.n, k, true);
+            }
+            else {
+                console.warn("Failed to decrypt RSA share key for " + a.n + ": " + a.k);
             }
         }
     }
 
-    if (newnodes.length > 0 && fminitialized) {
+    // other packet types do not warrant the worker detour
+    if (scq[scqhead]) scq[scqhead++][0] = a;
+    else scq[scqhead++] = [a, []];
+
+    // resume processing if needed
+    resumesc();
+}
+
+// submit nodes from `t` actionpacket to worker
+function sc_node(n) {
+    var p, id;
+
+    crypto_rsacheck(n);
+
+    if (!workers) {
+        crypto_decryptnode(n);
+        if (scq[scqhead]) scq[scqhead][1].push(n);
+        else scq[scqhead] = [null, [n]];
+        // sc_packet() call will follow
+        return;
+    }
+
+    // own node?
+    if (n.k && n.k.substr(0, 11) === u_handle) p = -1;
+    else {
+        // no - do we have an existing share key?
+        for (p = 8; (p = n.k.indexOf(':', p)) >= 0; ) {
+            if (++p == 9 || n.k[p-10] == '/') {
+                id = n.k.substr(p-9, 8);
+                if (shareworker[id] || u_sharekeys[id]) {
+                    break;
+                }
+            }
+        }
+    }
+
+    if (p >= 0) {
+        var pp = n.k.indexOf('/', p+21);
+
+        if (pp < 0) {
+            pp = n.k.length;
+        }
+
+        // rewrite key to the minimum
+        n.k = id + ':' + n.k.substr(p, pp-p);
+
+        if (shareworker[id] >= 0) {
+            // the key is already known to a worker
+            p = shareworker[id];
+        }
+        else {
+            // pick a pseudorandom worker (round robin)
+            p = scqhead % workers.length;
+
+            // record for future nodes in the same share
+            shareworker[id] = p;
+
+            // send sharekey
+            workers[p].postMessage({ h : id, sk : u_sharekeys[id][0] });
+        }
+    }
+    else {
+        p = scqhead % workers.length;
+    }
+
+    if (nodesinflight[scqhead]) nodesinflight[scqhead]++;
+    else nodesinflight[scqhead] = 1;
+
+    n.scni = scqhead;       // set scq slot number (sc_packet() call will follow)
+    workers[p].postMessage(n);
+}
+
+// inter-actionpacket state, gets reset in getsc()
+var scsharesuiupd;
+var loadavatars = [];
+var scinshare = Object.create(null);
+
+// if no execsc() thread is running, check if one should be, and start it if so.
+function resumesc() {
+    if (!scinflight) {
+        if (scq[scqtail] && scq[scqtail][0] && !nodesinflight[scqtail]) {
+            scinflight = true;
+            execsc();
+        }
+    }
+}
+
+// execute actionpackets from scq[scqtail] onwards
+function execsc() {
+    var n, i;
+    var tick = Date.now();
+    var tickcount = 0;
+
+    do {
+        if (!scq[scqtail] || !scq[scqtail][0] || (scq[scqtail][0].a == 't' && nodesinflight[scqtail])) {
+            // scq ran empty - nothing to do for now
+            if (d) console.log((sccount-1) + " SC command(s) processed.");
+
+            // perform post-execution UI work
+            if (newnodes.length && fminitialized) {
+                renderNew();
+            }
+
+            if (loadavatars.length) {
+                M.avatars(loadavatars);
+                loadavatars = [];
+            }
+
+            if (M.viewmode) {
+                delay('thumbnails', fm_thumbnails, 3200);
+            }
+
+            if ($.dialog === 'properties') {
+                propertiesDialog();
+            }
+
+            if (scsharesuiupd) {
+                if (fminitialized) {
+                    onIdle(function() {
+                        M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
+
+                        if (M.currentrootid === 'shares') {
+                            M.openFolder(M.currentdirid, true);
+                            loadingDialog.hide(); // TODO: from leaveShare, check if ok..
+                        }
+                    });
+                }
+
+                scsharesuiupd = false;
+            }
+
+            sccount = 0;
+            scinflight = false;
+            return;
+        }
+
+        sccount++;
+
+        var a = scq[scqtail][0];
+        var scnodes = scq[scqtail][1];
+        delete scq[scqtail++];
+
+        if (d) {
+            console.log('Received SC command ', a);
+        }
+
+        if (a.i === requesti) {
+            if (d) {
+                console.log('(triggered locally)');
+            }
+
+            switch (a.a) {
+                case 'c':
+                    // contact notification
+                    process_u(a.u);
+
+                    // only show a notification if we did not trigger the action ourselves
+                    if (!pfid && u_attr && a.ou !== u_attr.u) {
+                        notify.notifyFromActionPacket(a);
+                    }
+
+                    if (megaChatIsReady) {
+                        $.each(a.u, function (k, v) {
+                            if (v.c !== 0) {
+                                crypt.getPubRSA(v.u);
+                            }
+                            megaChat[v.c == 0 ? "processRemovedUser" : "processNewUser"](v.u);
+                        });
+                    }
+                    break;
+
+                case 's':
+                case 's2':
+                    // share modification
+                    // (used during share dialog removal of contact from share list)
+                    // is this a full share delete?
+                    if (a.r === undefined) {
+                        // fill DDL with removed contact
+                        if (a.u && M.u[a.u] && M.u[a.u].m) {
+                            var email = M.u[a.u].m;
+                            var contactName = M.getNameByHandle(a.u);
+
+                            addToMultiInputDropDownList('.share-multiple-input', [{ id: email, name: contactName }]);
+                            addToMultiInputDropDownList('.add-contact-multiple-input', [{ id: email, name: contactName }]);
+                        }
+                    }
+
+                    if (a.okd) {
+                        M.delNodeShare(a.n, a.u, a.okd);
+                    }
+
+                    if (a.a == 's2') {
+                        // store ownerkey
+                        if (fmdb) {
+                            fmdb.add('ok', { h : a.n, d : { k : a.ok, ha : a.ha } });
+                        }
+
+                        processPS([a]);
+                    }
+
+                    if (fminitialized) {
+                        // a full share contains .h param
+                        sharedUInode(a.h);
+                    }
+                    break;
+
+                case 'opc':
+                    // outgoing pending contact
+                    processOPC([a]);
+
+                    // don't append to sent grid on deletion
+                    if (!a.dts) {
+                        M.drawSentContactRequests([a]);
+                    }
+                    break;
+
+                case 'ipc':
+                    // incoming pending contact
+                    processIPC([a]);
+                    M.drawReceivedContactRequests([a]);
+                    notify.notifyFromActionPacket(a);
+                    break;
+
+                case 'ph':
+                    // exported link
+                    processPH([a]);
+                    break;
+
+                case 'upci':
+                    // update to incoming pending contact request
+                    processUPCI([a]);
+                    break;
+
+                case 'upco':
+                    // update to outgoing pending contact request
+                    processUPCO([a]);
+
+                    // request is accepted ('2') then this will be followed by a contact packet and we do not need to notify
+                    if (a.s != 2) notify.notifyFromActionPacket(a);
+                    break;
+
+                case 'ua':
+                    mega.attr.handleUserAttributeActionPackets(a, loadavatars);
+            }
+        } // end of own action packet section
+        else {
+            switch (a.a) {
+                case '_sn':
+                    // sn update?
+                    if (d) console.log("New SN: " + a.sn);
+                    setsn(a.sn);
+
+                    // rewrite accumulated RSA keys to AES to save CPU & bandwidth & space
+                    crypto_node_rsa2aes();
+
+                    // rewrite accumulated RSA keys to AES to save CPU & bandwidth & space
+                    crypto_share_rsa2aes();
+
+                    // reset state
+                    scinshare = Object.create(null);
+                    break;
+
+                case '_fm':
+                    // completed initial processing, enable UI
+                    crypto_fixmissingkeys(missingkeys);
+                    loadfm_done();
+                    break;
+
+                case 'e':
+                    // CMS update
+                    var str = hex2bin(a.c || "");
+                    if (str.substr(0, 5) === ".cms.") {
+                        var cmsType = str.split(".")[2];
+                        var cmsId = str.substr(6 + cmsType.length).split(".");
+                        CMS.reRender(cmsType, cmsId);
+                    }
+                    break;
+
+                case 'fa':
+                    // file attribute change/addition
+                    if (n = M.d[a.n]) {
+                        n.fa = a.fa;
+                        M.nodeUpdated(n);
+                    }
+                    break;
+
+                case 's':
+                case 's2':
+                    if (!folderlink) {
+                        var tsharekey = '';
+                        var prockey = false;
+
+                        if (a.o === u_handle) {
+                            // if access right are undefined, then share is deleted
+                            if (typeof a.r == 'undefined') {
+                                M.delNodeShare(a.n, a.u, a.okd);
+                            }
+                            else {
+                                var handle = a.n;
+                                var shares = Object(M.d[handle]).shares || {};
+
+                                if (a.u in shares || a.ha === crypto_handleauth(a.n)) {
+
+                                    // I updated or created my share
+                                    var k = decrypt_key(u_k_aes, base64_to_a32(a.ok));
+
+                                    if (k) {
+                                        crypto_setsharekey(handle, k);
+
+                                        if (!a.u) {
+                                            // this must be a pending share
+                                            if (a.a == 's2') {
+                                                // store ownerkey
+                                                if (fmdb) {
+                                                    fmdb.add('ok', { h : handle, d : { k : a.ok, ha : a.ha } });
+                                                }
+                                            }
+                                            else {
+                                                console.error('INVALID SHARE, missing user handle', a);
+                                            }
+                                        }
+                                        else {
+                                            M.nodeShare(handle, {
+                                                h: a.n,
+                                                r: a.r,
+                                                u: a.u,
+                                                ts: a.ts
+                                            });
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        else {
+                            if (a.n && typeof a.k != 'undefined' && !u_sharekeys[a.n]) {
+                                if (!Array.isArray(a.k)) {
+                                    // XXX: misdirected actionpackets?
+                                    srvlog('Got share action-packet with invalid key.');
+                                }
+                                else {
+                                    // a.k has been processed by the worker
+                                    crypto_setsharekey(a.n, a.k);
+                                    tsharekey = a32_to_base64(u_k_aes.encrypt(a.k));
+                                    prockey = true;
+                                }
+                            }
+
+                            if (a.u == 'EXP') {
+                                var exportLink = new mega.Share.ExportLink({ 'nodesToProcess': [a.h] });
+                                exportLink.getExportLink();
+                            }
+
+                            if ('o' in a) {
+                                if (!('r' in a)) {
+                                    // share deletion
+                                    n = M.d[a.n];
+
+                                    if (n) {
+                                        if (a.u === u_handle) {
+                                            // incoming share
+                                            if (d) {
+                                                console.log('Incoming share ' + a.n + " revoked");
+                                            }
+
+                                            if (M.d[n.p]) {
+                                                // inner share: leave nodes intact, just remove .r/.su
+                                                delete n.r;
+                                                delete n.su;
+                                                delete n.sk;
+                                                delete u_sharekeys[a.n];
+
+                                                if (fmdb) {
+                                                    fmdb.del('s', a.u + '*' + a.n);
+                                                }
+                                                M.nodeUpdated(n);
+                                            }
+                                            else {
+                                                // toplevel share: delete entire tree
+                                                // (the API will have removed all subshares at this point)
+                                                M.delNode(a.n);
+                                            }
+                                        }
+                                        else {
+                                            if (a.o === u_handle) {
+                                                M.delNodeShare(a.n, a.u);
+                                            }
+                                        }
+                                    }
+
+                                    if (!folderlink && a.u != 'EXP' && fminitialized) {
+                                        notify.notifyFromActionPacket({
+                                            a: 'dshare',
+                                            n: a.n,
+                                            u: a.o
+                                        });
+                                    }
+                                }
+                                else {
+                                    if (d) {
+                                        console.log('Inbound share, preparing for receiving its nodes');
+                                    }
+
+                                    // if the parent node already exists, all we do is setting .r/.su
+                                    // we can skip the subsequent tree; we already have the nodes
+                                    if (n = M.d[a.n]) {
+                                        n.r = a.r;
+                                        n.su = a.o;
+                                        M.nodeUpdated(n);
+
+                                        scinshare.skip = true;
+                                    }
+                                    else {
+                                        scinshare.skip = false;
+                                        scinshare.h = a.n;
+                                        scinshare.r = a.r;
+                                        scinshare.sk = a.k;
+                                        scinshare.su = a.o;
+
+                                        if (!folderlink && fminitialized) {
+                                            notify.notifyFromActionPacket({
+                                                a: 'share',
+                                                n: a.n,
+                                                u: a.o
+                                            });
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        if (prockey) {
+                            var nodes = fm_getnodes(a.n, true);
+
+                            for (i = nodes.length; i--; ) {
+                                if (n = M.d[nodes[i]]) {
+                                    if (typeof n.k == 'string') {
+                                        crypto_decryptnode(n);
+                                        newnodes.push(M.d[n.h]);
+                                    }
+                                }
+                            }
+                        }
+
+                        if (a.a == 's2') {
+                            processPS([a]);
+                        }
+
+                        if (fminitialized) {
+                            sharedUInode(a.n);
+                        }
+                        scsharesuiupd = true;
+                    }
+                    break;
+
+                case 'k':
+                    // key request
+                    if (a.sr) crypto_procsr(a.sr);
+                    if (a.cr) crypto_proccr(a.cr);
+                    // FIXME: obsolete - remove & replace
+                    /*else
+                        if (!folderlink) api_req({
+                            a: 'k',
+                            cr: crypto_makecr(actionPacket.n, [actionPacket.h], true)
+                        });*/
+
+                    scsharesuiupd = true;
+                    break;
+
+                case 't':
+                    // node tree
+                    // the nodes have been pre-parsed and stored in scnodes
+                    if (scinshare.skip) {
+                        // FIXME: do we still need to notify anything here?
+                        scinshare.skip = false;
+                        break;
+                    }
+                    var rootNode = scnodes.length && scnodes[0];
+
+                    // is this tree a new inshare with root scinshare.h? set share-relevant
+                    // attributes in its root node.
+                    if (scinshare.h) {
+                        for (i = scnodes.length; i--;) {
+                            if (scnodes[i].h === scinshare.h) {
+                                scnodes[i].su = scinshare.su;
+                                scnodes[i].r = scinshare.r;
+                                scnodes[i].sk = scinshare.sk;
+                                rootNode = scnodes[i];
+                            }
+                            else if (M.d[scnodes[i].h]) {
+                                delete scnodes[i];
+                            }
+                        }
+                        scinshare.h = false;
+                    }
+
+                    // notification logic
+                    if (fminitialized && !folderlink && a.ou && a.ou != u_handle
+                        && rootNode && rootNode.p && !rootNode.su) {
+
+                        var targetid = rootNode.p;
+                        var pnodes = [];
+
+                        for (i = 0; i < scnodes.length; i++) {
+                            if (scnodes[i] && scnodes[i].p === targetid) {
+                                pnodes.push({
+                                    h: scnodes[i].h,
+                                    t: scnodes[i].t
+                                });
+                            }
+                        }
+
+                        notify.notifyFromActionPacket({
+                            a: 'put',
+                            n: targetid,
+                            u: a.ou,
+                            f: pnodes
+                        });
+                    }
+
+                    for (i = 0; i < scnodes.length; i++) {
+                        if (scnodes[i]) {
+                            M.addNode(scnodes[i]);
+                        }
+                    }
+
+                    if (typeof M.scAckQueue[a.i] === 'function') {
+                        M.scAckQueue[a.i]();
+                        delete M.scAckQueue[a.i];
+                    }
+
+                    if (!pfid && u_type) {
+                        mega.checkStorageQuota();
+                    }
+                    break;
+
+                case 'u':
+                    // update node attributes
+                    if (n = M.d[a.n]) {
+                        var oldattr;
+                        var oldname = n.name;
+                        var oldfav = n.fav;
+                        var oldlbl = n.lbl;
+
+                        // key update - no longer supported
+                        // API sends keys only for backwards compatibility
+                        // if (a.k) n.k = a.k;
+
+                        // attribute update - replaces all existing attributes!
+                        if (a.at) {
+                            oldattr = crypto_clearattr(n);
+                            oldattr.u = n.u;
+                            oldattr.ts = n.ts;
+                            n.a = a.at;
+                        }
+
+                        // owner update
+                        if (a.u) n.u = a.u;
+
+                        // timestamp update
+                        if (a.ts) n.ts = a.ts;
+
+                        // try to decrypt new attributes
+                        crypto_decryptnode(n);
+
+                        // we got a new attribute string, but it didn't pass muster?
+                        // revert to previous state (effectively ignoring the SC command)
+                        if (a.at && n.a) {
+                            if (d) console.warn("Ignored bad attribute update for node " + a.n);
+                            crypto_restoreattr(n, oldattr);
+                            delete n.a;
+                        }
+                        else {
+                            // success - check what changed and redraw
+                            if (M.scAckQueue[a.i]) {
+                                // Triggered locally, being DOM already updated.
+                                if (d) {
+                                    console.log('scAckQueue - triggered locally.', a.i);
+                                }
+                                delete M.scAckQueue[a.i];
+                            }
+                            else if (a.at) {
+                                if (fminitialized) {
+                                    if (n.name !== oldname) {
+                                        M.onRenameUIUpdate(n.h, n.name);
+                                    }
+                                    if (n.fav !== oldfav) {
+                                        M.favouriteDomUpdate(n, n.fav);
+                                    }
+                                    if (n.lbl !== oldlbl) {
+                                        M.colourLabelDomUpdate(n.h, n.lbl);
+                                    }
+                                }
+                            }
+
+                            // save modified node
+                            M.nodeUpdated(n);
+                        }
+                    }
+                    break;
+
+                case 'c':
+                    // contact update
+                    process_u(a.u);
+
+                    // contact is deleted on remote computer, remove contact from contacts left panel
+                    if (fminitialized && a.u[0].c === 0) {
+                        $('#contact_' + a.ou).remove();
+
+                        $.each(a.u, function(k, v) {
+                            var userHandle = v.u;
+
+                            // hide the context menu if it is currently visible and this contact was removed.
+                            if ($.selected && ($.selected[0] === userHandle)) {
+
+                                // was selected
+                                $.selected = [];
+                                if ($('.dropdown.body.files-menu').is(":visible")) {
+                                    $.hideContextMenu();
+                                }
+                            }
+                        });
+
+                        M.handleEmptyContactGrid();
+                    }
+
+                    // only show a notification if we did not trigger the action ourselves
+                    if (!pfid && u_attr && a.ou !== u_attr.u) {
+                        notify.notifyFromActionPacket(a);
+                    }
+
+                    if (megaChatIsReady) {
+                        $.each(a.u, function(k, v) {
+                            if (v.c !== 0) {
+                                crypt.getPubRSA(v.u);
+                            }
+                            megaChat[v.c == 0 ? "processRemovedUser" : "processNewUser"](v.u);
+                        });
+                    }
+                    break;
+
+                case 'd':
+                    // node deletion
+                    M.delNode(a.n);
+
+                    if (!pfid) {
+                        // Only show a notification if we did not trigger the action ourselves
+                        if (u_attr && a.ou !== u_attr.u) {
+                            notify.notifyFromActionPacket(a);
+                        }
+                        if (u_type) {
+                            mega.checkStorageQuota();
+                        }
+                    }
+                    break;
+
+                case 'ua':
+                    // user attributes
+                    if (fminitialized) {
+                        var attrs = a.ua;
+                        var actionPacketUserId = a.u;
+
+                        for (var j in attrs) {
+                            var attributeName = attrs[j];
+
+                            attribCache.uaPacketParser(
+                                attributeName,
+                                actionPacketUserId,
+                                false,
+                                a.v && a.v[j] ? a.v[j] : undefined
+                            );
+                        }
+                    }
+                    break;
+
+                case 'la':
+                    // last seen/acknowledged notification sn
+                    notify.countAndShowNewNotifications();
+                    break;
+
+                case 'usc':
+                    // user state cleared - mark local DB as invalid
+                    return fm_forcerefresh();
+
+                // FIXME: duplicated code
+                case 'opc':
+                    // outgoing pending contact
+                    processOPC([a]);
+
+                    if (fminitialized) {
+                        M.drawSentContactRequests([a]);
+                    }
+                    break;
+
+                // FIXME: duplicated code
+                case 'ipc':
+                    // incoming pending contact
+                    processIPC([a]);
+
+                    if (fminitialized) {
+                        M.drawReceivedContactRequests([a]);
+                    }
+
+                    notify.notifyFromActionPacket(a);
+                    break;
+
+                // FIXME: duplicated code
+                case 'ph':
+                    // exported link
+                    processPH([a]);
+
+                    // not applicable - don't return anything, or it will show a blank notification
+                    if (typeof a.up !== 'undefined' && typeof a.down != 'undefined') {
+                        notify.notifyFromActionPacket(a);
+                    }
+                    break;
+
+                // FIXME: duplicated code
+                case 'upci':
+                    processUPCI([a]);
+                    break;
+
+                // FIXME: duplicated code
+                case 'upco':
+                    processUPCO([a]);
+
+                    // if the status is accepted ('2'), then this will be followed
+                    // by a contact packet and we do not need to notify
+                    if (a.s != 2) {
+                        notify.notifyFromActionPacket(a);
+                    }
+                    break;
+
+                case 'psts':
+                    proPage.processPaymentReceived(a);
+                    break;
+
+                case 'mcc':
+                    // MEGAchat
+                    if (!megaChatIsDisabled) {
+                        if (megaChatIsReady) {
+                            $(window).trigger('onChatdChatUpdatedActionPacket', a);
+                        }
+                        else if (typeof ChatdIntegration !== 'undefined') {
+                            ChatdIntegration._queuedChats[a.id] = a;
+                        }
+                        else if (Array.isArray(loadfm.chatmcf)) {
+                            loadfm.chatmcf.push(a);
+                        }
+                        else if (d) {
+                            console.error('FIXME: unable to parse mcc packet');
+                        }
+                    }
+                    if (fmdb) {
+                        delete a.a;
+                        fmdb.add('mcf', { id : a.id, d : a });
+                    }
+                    break;
+
+                case 'se':
+                    // set email
+                    var emailChangeAccepted = (a.s == 3
+                                               && typeof a.e == 'string'
+                                               && a.e.indexOf('@') != -1);
+
+                    if (emailChangeAccepted) {
+                        var user = M.getUserByHandle(a.u);
+
+                        if (user) {
+                            user.m = a.e;
+                            process_u([user]);
+
+                            if (a.u === u_handle) {
+                                u_attr.email = user.m;
+
+                                if (M.currentdirid === 'account/profile') {
+                                    $('.nw-fm-left-icon.account').trigger('click');
+                                }
+                            }
+                        }
+                    }
+                    break;
+
+                default:
+                    if (d) {
+                        console.log('Ignoring unsupported SC command', a);
+                    }
+            }
+        }
+
+        tickcount++;
+    } while (Date.now()-tick < 200);
+
+    if (d) console.log("Processed " + tickcount + " SC commands in the past 200 ms");
+    setTimeout(execsc, 1);
+}
+
+// a node was updated significantly: write to DB and redraw
+function fm_updated(n) {
+    M.nodeUpdated(n);
+
+    if (fminitialized) {
+        removeUInode(n.h);
+        newnodes.push(n);
+        if (M.megaRender) delete M.megaRender.nodeMap[n.h];
         renderNew();
     }
-    if (loadavatars) {
-        M.avatars(loadavatars);
-    }
-    if (M.viewmode) {
-        delay('thumbnails', fm_thumbnails, 3200);
-    }
-    if ($.dialog === 'properties') {
-        propertiesDialog();
-    }
-    getsc();
-    if (callback) {
-        Soon(callback);
-    }
-
-    mega.flags &= ~window.MEGAFLAG_EXECSC;
 }
 
-function fm_updatekey(h, k)
-{
-    var n = M.d[h];
-    if (n)
-    {
-        var f = {h: h, k: k, a: M.d[h].a};
-        crypto_processkey(u_handle, u_k_aes, f);
-        u_nodekeys[h] = f.key;
-        M.nodeAttr({h: h, name: f.name, key: f.key, k: k});
+var treelogger;
+
+// load tree for active GLOBAL context - either we load a folderlink or the user tree,
+// they never coexist, there is no encapsulation/separation of state.
+// (this "constructor" merely initialises the relevant *global* variables!)
+// FIXME: remove all global state and allow multiple client states to coexist peacefully
+function TreeFetcher() {
+    // next round-robin worker to assign
+    nextworker = 0;
+
+    // mapping of parent node to worker (to keep child nodes local to their sharekeys)
+    parentworker = {};
+
+    // worker pending state dump counter
+    dumpsremaining = 0;
+
+    // residual fm (minus ok/f elements) post-filtration
+    residualfm = false;
+
+    // console logging
+    treelogger = MegaLogger.getLogger('TreeFetcher');
+
+    // erase existing RootID
+    // reason: tree_node must set up the workers as soon as the first node of a folder
+    // link arrives, and this is how it knows that it is the first node.
+    M.RootID = false;
+}
+
+// worker pool
+var workers;
+
+function killworkerpool() {
+    // terminate existing workers
+    if (workers) {
+        var l = workers.length;
+        while (l--) {
+            workers[l].onmessage = null;
+            workers[l].terminate();
+        }
+
+        // workers === false implies "no workers available here"
+        workers = false;
+    }
+}
+function initworkerpool() {
+    killworkerpool();
+
+    workers = [];
+    var workerstate;
+
+    if (!pfid) {
+        // worker state for a user account fetch
+        workerstate = {
+            u_handle : u_handle,
+            u_privk  : u_privk,
+            u_k      : u_k,
+            d        : d
+        };
+    }
+    var workerURL = mega.nodedecBlobURI;
+    if (!workerURL) {
+        workerURL = 'nodedec.js';
+
+        if (!is_extension && !is_karma) {
+            workerURL = '/' + workerURL;
+        }
+    }
+
+    for (var i = Math.min(mega.maxWorkers, 10); i--;) {
+        try {
+            var w = new Worker(workerURL);
+
+            w.onmessage = worker_procmsg;
+            w.onerror   = function(err) {
+                console.error('[nodedec worker error]', err);
+
+                // TODO: retry gettree
+                killworkerpool();
+            };
+            if (workerstate) {
+                w.postMessage(workerstate);
+            }
+            workers.push(w);
+        }
+        catch (ex) {
+            console.error(ex);
+            if (!workers.length) {
+                workers = null;
+            }
+            break;
+        }
+    }
+
+    if (d) {
+        console.debug('initworkerpool', workerURL, workers && workers.length);
     }
 }
 
-function fm_commitkeyupdate()
-{
-    // refresh render?
+// queue a DB invalidation-plus-reload request to the FMDB subsystem
+// if it isn't up, reload directly
+// the server-side treecache is wiped (otherwise, we could run into
+// an endless loop)
+function fm_forcerefresh() {
+    localStorage.force = 1;
+
+    if (fmdb && !fmdb.crashed) {
+        execsc = function() {}; // stop further SC processing
+        fmdb.invalidate(function(){
+            location.reload();
+        });
+    }
+    else {
+        location.reload();
+    }
 }
 
-function loadfm(force)
-{
+// initiate fetch of node tree
+// FIXME: what happens when the user pastes a folder link over his loaded/loading account?
+TreeFetcher.prototype.fetch = function treefetcher_fetch(force) {
+    var req_params = {
+        a: 'f',
+        c: 1,
+        r: 1
+    };
+
+    // we disallow treecache usage if this is a forced reload
+    force = force || localStorage.force;
+    if (!force) {
+        req_params.ca = 1;
+    }
+    else if (mBroadcaster.crossTab.master) {
+        delete localStorage.force;
+    }
+
+    if (!megaChatIsDisabled && typeof Chatd !== 'undefined') {
+        req_params['cv'] = Chatd.VERSION;
+    }
+
+    api_req(req_params, {
+        progress: function(perc) {
+            loadingInitDialog.step2(parseInt(perc));    // FIXME: make generic
+
+            if (perc > 99 && !mega.loadReport.ttlb) {
+                // Load performance report -- time to last byte
+                mega.loadReport.ttlb          = Date.now() - mega.loadReport.stepTimeStamp;
+                mega.loadReport.stepTimeStamp = Date.now();
+
+                mega.loadReport.ttlb += mega.loadReport.ttfb;
+                mega.loadReport.ttfm = mega.loadReport.stepTimeStamp;
+            }
+        }
+    }, 4);
+};
+
+// triggers a full reload including wiping the remote treecache
+// (e.g. because the treecache is damaged or too old)
+function fm_fullreload(q, logMsg) {
+    if (q) {
+        api_cancel(q);
+    }
+
+    // FIXME: properly encapsulate ALL client state in an object
+    // that supports destruction.
+    // (at the moment, if we wipe the DB and then call loadfm(),
+    // there will be way too much attribute, key and chat stuff already
+    // churning away - we simply cannot just delete their databases
+    // without restarting them.
+    // until then - it's the sledgehammer method; can't be anything
+    // more surgical :(
+    localStorage.force = 1;
+
+    // done reload callback
+    var step = 1;
+    var done = function() {
+        if (!--step) {
+            location.reload();
+        }
+    };
+
+    // log event if message provided
+    if (logMsg) {
+        api_req({a: 'log', e: 99624, m: logMsg}, {callback: done});
+        step++;
+    }
+
+    if (fmdb) {
+        // bring DB to a defined state
+        fmdb.invalidate(done);
+    }
+    else {
+        done();
+    }
+}
+
+// FIXME: make part of comprehensive client state object
+var nextworker;
+var parentworker = {};
+
+// get next worker index (round robin)
+function treefetcher_getnextworker() {
+    if (nextworker >= workers.length) {
+        nextworker = 0;
+    }
+    return nextworker++;
+};
+
+// this receives the ok elements one by one as per the filter rule
+// to facilitate the decryption of outbound shares, the API now sends ok before f
+function tree_ok0(ok) {
+    if (fmdb) {
+        fmdb.add('ok', { h : ok.h, d : ok });
+    }
+
+    // bind outbound share root to specific worker, post ok element to that worker
+    // FIXME: check if nested outbound shares are returned with all shareufskeys!
+    // if that is not the case, we need to bind all ok handles to the same worker
+    if (workers) {
+        workers[parentworker[ok.h] = treefetcher_getnextworker()].postMessage(ok);
+    }
+    else if (crypto_handleauthcheck(ok.h, ok.ha)) {
+        if (d) console.log("Successfully decrypted sharekeys for " + ok.h);
+        var key = decrypt_key(u_k_aes, base64_to_a32(ok.k));
+        u_sharekeys[ok.h] = [key, new sjcl.cipher.aes(key)];
+    }
+    else {
+        treelogger.error("handleauthcheck() failed for " + ok.h);
+    }
+};
+
+// returns true if no further processing is needed
+// FIXME: move to M
+// FIXME: call from M.addNode() to avoid code duplication
+function emplacenode(node) {
+    if (node.p) {
+        // we have to add M.c[sharinguserhandle] records explicitly as
+        // node.p has ceased to be the sharing user handle
+        if (node.su) {
+            if (!M.c[node.su]) {
+                M.c[node.su] = [];
+            }
+            M.c[node.su][node.h] = node.t + 1;
+        }
+
+        if (!M.c[node.p]) {
+            M.c[node.p] = [];
+        }
+        M.c[node.p][node.h] = node.t + 1;
+        if (node.hash) {
+            if (!M.h[node.hash]) {
+                M.h[node.hash] = [];
+            }
+            M.h[node.hash].push(node.h);
+        }
+    }
+    else if (node.t > 1 && node.t < 5) {
+        M[['RootID', 'InboxID', 'RubbishID'][node.t - 2]] = node.h;
+    }
+    else {
+        console.error("Received parent-less node of type " + node.t + ": " + node.h);
+
+        srvlog2('parent-less', node.t, node.h);
+    }
+
+    M.d[node.h] = node;
+}
+
+// this receives the node objects one by one as per the filter rule
+function tree_node(node) {
+    if (pfkey && !M.RootID) {
+        // set up the workers for folder link decryption
+        workerstate = {
+            n_h   : node.h,
+            pfkey : pfkey,
+            d: d
+        };
+
+        if (workers) {
+            for (var i = workers.length; i--; ) workers[i].postMessage(workerstate);
+        }
+        else {
+            var key = base64_to_a32(pfkey);
+            u_sharekeys[node.h] = [key, new sjcl.cipher.aes(key)];
+        }
+
+        M.RootID = node.h;
+    }
+
+    crypto_rsacheck(node);
+
+    // RSA share key? need to rewrite, too.
+    if (node.sk && node.sk.length > 43) {
+        rsasharekeys[node.h] = true;
+    }
+
+    // children inherit their parents' worker bindings; unbound inshare roots receive a new binding
+    // unbound nodes go to a random worker (round-robin assignment)
+    if (!workers) {
+        crypto_decryptnode(node);
+        worker_procmsg({data: node});
+    }
+    else if (node.p && parentworker[node.p] >= 0) {
+        workers[parentworker[node.h] = parentworker[node.p]].postMessage(node);
+    }
+    else if (parentworker[node.h] >= 0) {
+        workers[parentworker[node.h]].postMessage(node);
+    }
+    else if (node.sk) {
+        workers[parentworker[node.h] = treefetcher_getnextworker()].postMessage(node);
+    }
+    else {
+        workers[treefetcher_getnextworker()].postMessage(node);
+    }
+};
+
+// FIXME: move all of these globals to a future "ClientSession" global object encapsulating
+// all state and functionality
+var residualfm;
+var dumpsremaining;
+
+// this receives the remainder of the JSON after the filter was applied
+function tree_residue(fm, ctx) {
+    // store the residual f response for perusal once all workers signal that they're done
+    residualfm = fm[0];
+
+    // request an "I am done" confirmation ({}) from all workers
+    if (workers) {
+        var i = workers.length;
+        dumpsremaining = i;
+
+        while (i--) {
+            workers[i].postMessage({});
+        }
+    }
+    else {
+        dumpsremaining = 1;
+        worker_procmsg({ data: { done: 1 } });
+    }
+
+    // (mandatory steps at the conclusion of a successful split response)
+    api_ready(this.q);
+    api_proc(this.q);
+};
+
+// process worker responses (decrypted nodes, processed actionpackets, state dumps...)
+function worker_procmsg(ev) {
+    var h;
+
+    if (ev.data.scqi >= 0) {
+        // enqueue processed actionpacket
+        if (scq[ev.data.scqi]) scq[ev.data.scqi][0] = ev.data;
+        else scq[ev.data.scqi] = [ev.data, []];
+
+        // resume processing, if appropriate and needed
+        resumesc();
+    }
+    else if (ev.data.h) {
+        // enqueue or emplace processed node
+        if (ev.data.t < 2 && !crypto_keyok(ev.data)) {
+            // report as missing
+            crypto_reportmissingkey(ev.data);
+        }
+
+        if (ev.data.scni >= 0) {
+            // enqueue processed node
+            if (scq[ev.data.scni]) scq[ev.data.scni][1].push(ev.data);
+            else scq[ev.data.scni] = [null, [ev.data]];
+
+            if (!--nodesinflight[ev.data.scni]) {
+                delete nodesinflight[ev.data.scni];
+
+                // resume processing, if appropriate and needed
+                resumesc();
+            }
+        }
+        else {
+            // maintain special incoming shares index
+            if (ev.data.su) {
+                M.c.shares[ev.data.h] = { su : ev.data.su, r : ev.data.r, t: ev.data.h };
+
+                if (u_sharekeys[ev.data.h]) {
+                    M.c.shares[ev.data.h].sk = u_sharekeys[ev.data.h][0];
+                }
+            }
+
+            if (fmdb) {
+                fmdb.add('f', {
+                    h : ev.data.h,
+                    p : ev.data.p,
+                    s : ev.data.s >= 0 ? ev.data.s : -ev.data.t,
+                    d : ev.data
+                });
+
+                if (ev.data.hash) {
+                    fmdb.add('h', {h: ev.data.h, c: ev.data.hash});
+                }
+            }
+
+            emplacenode(ev.data);
+        }
+    }
+    else if (ev.data[0] === 'console') {
+        if (d) {
+            var args = ev.data[1];
+            args.unshift('[nodedec worker]');
+            console.log.apply(console, args);
+        }
+    }
+    else if (ev.data[0] === 'srvlog2') {
+        srvlog2.apply(null, ev.data[1]);
+    }
+    else if (ev.data.done) {
+        if (d) console.log("Worker done, " + dumpsremaining + " remaining");
+
+        if (ev.data.sharekeys) {
+            for (h in ev.data.sharekeys) {
+                crypto_setsharekey(h, ev.data.sharekeys[h]);
+            }
+        }
+
+        if (!--dumpsremaining) {
+            // store incoming shares
+            for (h in M.c.shares) {
+                if (u_sharekeys[h]) M.c.shares[h].sk = a32_to_base64(u_sharekeys[h][0]);
+
+                if (fmdb) {
+                    fmdb.add('s', { o_t : M.c.shares[h].su + '*' + h,
+                                          d : M.c.shares[h] });
+                }
+            }
+
+            loadfm_callback(residualfm);
+            residualfm = false;
+        }
+    }
+    else {
+        console.error("Unidentified nodedec worker response:", ev.data);
+    }
+}
+
+// the FM DB engine (cf. mDB.js)
+var fmdb;
+
+function loadfm(force) {
     if (force) {
+        localStorage.force = true;
         loadfm.loaded = false;
     }
     if (loadfm.loaded) {
@@ -6056,65 +7439,255 @@ function loadfm(force)
             loadingInitDialog.step1();
         }
         if (!loadfm.loading) {
+            if (workers !== false) {
+                initworkerpool();
+            }
             M.reset();
-            fminitialized = false;
+
+            fminitialized  = false;
             loadfm.loading = true;
-            setTimeout(function __lazyLoadFM() {
-                var req_params = {
-                    a:'f',
-                    c:1,
-                    r:1,
-                    ca:1
-                };
-                if (!megaChatIsDisabled && typeof Chatd !== 'undefined') {
-                    req_params['cv'] = Chatd.VERSION;
-                }
-                api_req(req_params, {
-                    callback: loadfm_callback,
-                    progress: function(perc) {
-                        loadingInitDialog.step2(parseInt(perc));
-                    }
-                },n_h ? 1 : 0);
-            }, 350);
+
+            // is this a folder link? or do we have no valid cache for this session?
+            if (pfid) {
+                fmdb = false;
+                fetchfm(false);
+            }
+            else {
+                fmdb = FMDB(u_handle, {
+                    // channel 0: transactional by _sn update
+                    f   : '&h, p, s',   // nodes - handle, parent, size (negative size: type)
+                    s   : '&o_t',       // shares - origin/target; both incoming & outgoing
+                    ok  : '&h',         // ownerkeys for outgoing shares - handle
+                    mk  : '&h',         // missing node keys - handle
+                    u   : '&u',         // users - handle
+                    h   : '&h, c',      // hashes - handle, checksum
+                    ph  : '&h',         // exported links - handle
+                    opc : '&p',         // outgoing pending contact - id
+                    ipc : '&p',         // incoming pending contact - id
+                    ps  : '&h_p',       // pending share - handle/id
+                    mcf : '&id',        // chats - id
+                    ua  : '&k',         // user attributes - key (maintained by IndexedBKVStorage)
+                    _sn : '&i',         // sn - fixed index 1
+
+                    // channel 1: non-transactional (maintained by IndexedDBKVStorage)
+                    chatqueuedmsgs : '&k', // queued chat messages - k
+                    pta: '&k' // persisted type messages - k
+                }, {
+                    chatqueuedmsgs : 1,
+                    pta: 1
+                });
+
+                fmdb.init(fetchfm, localStorage.force);
+            }
         }
     }
 }
 
-function RightsbyID(id) {
+function fetchfm(sn) {
+    // we always intially fetch historical actionpactions
+    // before showing the filemanager
+    initialscfetch = true;
+
+    if (!is_mobile) {
+        // activate/prefetch attribute cache at this early stage
+        attribCache.prefillMemCache(fmdb).then(function() {
+
+            if (sn) {
+                currsn = sn;
+                dbfetchfm();
+            }
+            else {
+                // no cache requested or available - get from API
+                loadFromApi();
+            }
+        });
+    }
+    else {
+        loadFromApi();
+    }
+}
+
+/**
+ * No cache requested or available - get from API
+ */
+function loadFromApi() {
+
+    fetcher = new TreeFetcher();
+    fetcher.fetch();
+
+    mega.loadReport.mode = 2;
+
+    if (!folderlink) {
+        // dbToNet holds the time wasted trying to read local DB, and having found we have to query the server.
+        mega.loadReport.dbToNet       = Date.now() - mega.loadReport.startTime;
+        mega.loadReport.stepTimeStamp = Date.now();
+    }
+}
+
+// to reduce peak mem usage, we fetch f in 64 small chunks
+function fetchfchunked(chunk, procresult) {
+    fmdb.get('f', function(r) {
+        for (var i = r.length; i--;) emplacenode(r[i]);
+        if (chunk == 64) procresult();
+        else fetchfchunked(chunk, procresult);
+    }, 'h', b64[chunk++]);
+}
+
+function fetchfroot(/*chunk,*/ cb) {
+    // fetch the three root nodes
+    fmdb.getbykey('f', 'h', ['s', ['-2', '-3', '-4']], false, function(r) {
+        for (var i = r.length; i--; ) emplacenode(r[i]);
+        // fetch all top-level nodes
+        fmdb.getbykey('f', 'h', ['p', [M.RootID, M.InboxID, M.RubbishID]], false, function(r) {
+            var folders = [];
+            for (var i = r.length; i--; ) {
+                emplacenode(r[i]);
+                if (r[i].t == 1) folders.push(r[i].h);
+            }
+            // fetch second-level nodes (to show the little arrows in the tree)
+            // FIXME: add further loading as needed to the fmconfig processing of
+            // opened subfolders in the tree!
+            fmdb.getbykey('f', 'h', ['p', folders], false/*[[ 't', '2' ]]*/, function(r) {
+                for (var i = r.length; i--; ) emplacenode(r[i]);
+                cb();
+            });
+        });
+    });
+}
+
+// fetch all children; also, fetch path to root
+// populates M.c and M.d
+function fetchchildren(parent, cb) {
+    // is this a user handle or a non-handle? no fetching needed.
+    if (parent.length != 8) {
+        cb();
+    }
+    // have the children been fetched yet?
+    else if (!M.c[parent]) {
+        // no: do so now.
+        fmdb.getbykey('f', 'h', ['p', [parent]], false, function(r) {
+            M.c[parent] = {};
+            for (var i = r.length; i--; ) emplacenode(r[i]);
+            fetchchildren(parent, cb);
+        });
+    }
+    // has the parent been fetched yet?
+    else if (!M.d[parent]) {
+        fmdb.getbykey('f', 'h', ['h', [parent]], false, function(r) {
+            if (r.length) {
+                // parent found
+                emplacenode(r[0]);
+                fetchchildren(r[0].p, cb);
+            }
+            else {
+                // no parent found (internal error, should probably reload)
+                console.error("Parent of " + parent + " missing from DB");
+                cb();
+            }
+        });
+    }
+    else {
+        // crawl back to root (not necessary until we start purging from memory)
+        fetchchildren(M.d[parent].p, cb);
+    }
+}
+
+function dbfetchfm() {
+    var i;
+
+    loadingInitDialog.step2();
+
+    fmdb.get('ok', function(r){
+        process_ok(r, true);
+
+        // FIXME: remove this step and replace with dynamic on-demand loading
+//        fetchfroot(/*0,*/ function(r){
+        fetchfchunked(0, function(r){
+
+            mega.loadReport.recvNodes     = Date.now() - mega.loadReport.stepTimeStamp;
+            mega.loadReport.stepTimeStamp = Date.now();
+
+            fmdb.get('mk', function(r){
+                crypto_missingkeysfromdb(r);
+
+                fmdb.get('u', function(r){
+                    process_u(r, true);
+
+                    fmdb.get('s', function(r){
+                        for (i = r.length; i--; ) {
+                            if (r[i].su) {
+                                // this is an inbound share
+                                M.c.shares[r[i].t] = r[i];
+                                if (r[i].sk) {
+                                    crypto_setsharekey(r[i].t, base64_to_a32(r[i].sk), true);
+                                }
+                            }
+                            else {
+                                // this is an outbound share
+                                M.nodeShare(r[i].h, r[i], true);
+                            }
+                        }
+
+                        fmdb.get('opc', function(r){
+                            processOPC(r, true);
+
+                            fmdb.get('ipc', function(r){
+                                processIPC(r, true);
+
+                                fmdb.get('ps', function(r){
+                                    processPS(r, true);
+
+                                    fmdb.get('mcf', function(r){
+                                        loadfm.chatmcf = r;
+
+                                        mega.loadReport.procNodeCount = Object.keys(M.d || {}).length;
+                                        mega.loadReport.procNodes     = Date.now() - mega.loadReport.stepTimeStamp;
+                                        mega.loadReport.stepTimeStamp = Date.now();
+
+                                        if (!mBroadcaster.crossTab.master) {
+                                            // on a secondary tab, prevent writing to DB once we have read its contents
+                                            fmdb.crashed = 'slave';
+                                        }
+
+                                        // fetch & process new actionpackets
+                                        loadingInitDialog.step3();
+                                        getsc(true);
+                                    });
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    });
+}
+
+function rightsById(id) {
 
     if (folderlink || (id && id.length > 8)) {
         return false;
     }
 
-    var p = M.getPath(id);
+    while (M.d[id] && M.d[id].p) {
+        if (M.d[id].r >= 0) {
+            return M.d[id].r;
+        }
+        id = M.d[id].p;
+    }
 
-    if ((p[p.length - 1] === 'contacts') || (p[p.length - 1] === 'shares')) {
-        return (M.d[p[p.length - 3]] || {}).r;
-    }
-    else {
-        return 2;
-    }
+    return 2;
 }
 
-function isCircular(fromid, toid)
-{
-    var n = M.d[fromid];
-    if (n && n.t && toid != fromid)
-    {
-        var p1 = M.getPath(fromid);
-        var p2 = M.getPath(toid);
-        p1.reverse();
-        p2.reverse();
-        var c = 1;
-        for (var i in p1) {
-            if (p1[i] !== p2[i]) {
-                c = 0;
-                break;
-            }
-        }
-        return !!c;
+// returns true if h1 cannot be moved into h2 without creating circular linkage, false otherwise
+function isCircular(h1, h2) {
+    for (;;) {
+        if (h1 == h2) return true;
+
+        if (!M.d[h2]) return false;
+
+        h2 = M.d[h2].p;
     }
-    return false;
 }
 
 function RootbyId(id)
@@ -6125,192 +7698,202 @@ function RootbyId(id)
     return p[p.length - 1];
 }
 
-function ddtype(ids, toid, alt)
-{
-    if (folderlink)
-        return false;
-
-    var r = false, toid_r = RootbyId(toid);
-    for (var i in ids)
-    {
-        var fromid = ids[i], fromid_r;
-
-        if (fromid == toid || !M.d[fromid]) return false;
-        fromid_r = RootbyId(fromid);
-
-        // never allow move to own inbox, or to own contacts
-        if (toid == M.InboxID || toid == 'contacts')
-            return false;
-
-        // to a contact, always allow a copy
-        if (toid_r == 'contacts' && M.d[toid].p == 'contacts')
-            r = 'copy';
-
-        // to a shared folder, only with write rights
-        if ((toid_r == 'contacts' || toid_r == 'shares') && RightsbyID(toid) > 0)
-        {
-            if (isCircular(fromid, toid))
-                return false;
-            else
-                r = 'copy';
+// returns tree type h is in
+// FIXME: make result numeric
+function treetype(h) {
+    for (;;) {
+        if (!M.d[h]) {
+            return h;
         }
-        // cannot move or copy to the existing parent
-        if (toid == M.d[fromid].p)
-            return false;
 
-        // from own cloud to own cloud / trashbin, always move
-        if ((toid == M.RootID || toid == M.RubbishID || M.d[toid].t) && (fromid_r == M.RootID) && (toid_r == M.RootID || toid == M.RubbishID))
-        {
-            if (isCircular(fromid, toid))
-                return false;
-            else
-                r = 'move';
+        // root node reached?
+        if (M.d[h].t > 1) {
+            return 'cloud';
         }
-        // from trashbin or inbox to own cloud, always move
-        if ((fromid_r == M.RubbishID || fromid_r == M.InboxID) && toid_r == M.RootID)
-            r = 'move';
 
-        // from inbox to trashbin, always move
-        if (fromid_r == M.InboxID && toid_r == M.RubbishID)
-            r = 'move';
+        // incoming share reached? (does not need to be the outermost one)
+        if (M.d[h].su) {
+            return 'shares';
+        }
 
-        // from trashbin or inbox to a shared folder with write permission, always copy
-        if ((fromid_r == M.RubbishID || fromid_r == M.InboxID) && (toid_r == 'contacts' || toid_r == 'shares') && RightsbyID(toid) > 0)
-            r = 'copy';
+        if ('contacts shares messages opc ipc '.indexOf(M.d[h].p + ' ') >= 0) {
+            return M.d[h].p;
+        }
 
-        // copy from a share to cloud
-        if ((fromid_r == 'contacts' || fromid_r == 'shares') && (toid == M.RootID || toid_r == M.RootID))
-            r = 'copy';
-
-        // move from a share to trashbin only with full control rights (do a copy + del for proper handling)
-        if ((fromid_r == 'contacts' || fromid_r == 'shares') && toid == M.RubbishID && RightsbyID(fromid) > 1)
-            r = 'copydel';
+        h = M.d[h].p;
     }
+}
+
+// returns sharing user (or false if not in an inshare)
+function sharer(h) {
+    while (h && M.d[h]) {
+        if (M.d[h].su) {
+            return M.d[h].su;
+        }
+
+        h = M.d[h].p;
+    }
+
+    return false;
+}
+
+// FIXME: remove alt
+function ddtype(ids, toid, alt) {
+    if (folderlink) {
+        return false;
+    }
+
+    var r = false, totype = treetype(toid);
+
+    for (var i = ids.length; i--; ) {
+        var fromid = ids[i];
+
+        if (fromid === toid || !M.d[fromid]) return false;
+
+        var fromtype = treetype(fromid);
+
+        if (totype == 'cloud') {
+            if (fromtype == 'cloud') {
+                // within and between own trees, always allow move ...
+                if (isCircular(fromid, toid)) {
+                    // ... except of a folder into itself or a subfolder
+                    return false;
+                }
+
+                r = 'move';
+            }
+            else if (fromtype == 'shares') {
+                r = (toid === M.RubbishID) ? 'copydel' : 'copy';
+            }
+        }
+        else if (totype == 'contacts') {
+            if (toid == 'contacts') {
+                // never allow move to own contacts
+                return false;
+            }
+
+            // to a contact, always allow a copy (inbox drop)
+            r = 'copy';
+        }
+        else if (totype === 'shares' && rightsById(toid)) {
+            if (fromtype == 'shares') {
+                if (sharer(fromid) === sharer(toid)) {
+                    if (isCircular(fromid, toid)) {
+                        // prevent moving/copying of a folder into iself or a subfolder
+                        return false;
+                    }
+
+                    r = (rightsById(fromid) > 1) ? 'move' : 'copy';
+                }
+                else {
+                    r = 'copy';
+                }
+            }
+            else if (fromtype == 'cloud') {
+                // from cloud to a folder with write permission, always copy
+                r = 'copy';
+            }
+        }
+        else {
+            return false;
+        }
+    }
+
+    // FIXME: do not simply return the operation allowed for the last processed fromid
     return r;
 }
 
-/**
- * fm_getnodes
- *
- * Search for a subfolders.
- * @param {String} nodeId.
- * @param {Boolean} ignore Ignore .
- * @returns {Array|fm_getnodes.nodes} Array of subfolders ids. Root folder included.
- */
-function fm_getnodes(nodeId, ignore)
-{
+// returns all nodes under root (the entire tree)
+// optionally includes root itself
+// optionally prunes everything that's undecryptable - good nodes
+// under a bad parent will NOT be returned to keep the result tree-shaped.
+// FIXME: add reporting about how many nodes were dropped in the process
+function fm_getnodes(root, includeroot, excludebad) {
     var nodes = [];
+    var parents = [root], newparents;
+    var i;
 
-    function procnode(nodeId) {
-        if (M.c[nodeId]) {
-            for (var n in M.c[nodeId]) {
-                if (M.c[nodeId].hasOwnProperty(n)) {
-                    if (!M.d[n]) {
-                        if (d) {
-                            console.warn('Invalid node: ' + n, nodeId, M.c[nodeId][n]);
-                        }
-                        continue;
-                    }
-                    nodes.push(n);
-                    if (M.d[n].t === 1) {
-                        procnode(n);
-                    }
+    while (i = parents.length) {
+        newparents = [];
+
+        while (i--) {
+            // must exist and optionally be fully decrypted to qualify
+            if (M.d[parents[i]] && (!excludebad || !M.d[parents[i]].a)) {
+                nodes.push(parents[i]);
+                if (M.c[parents[i]]) {
+                    newparents = newparents.concat(Object.keys(M.c[parents[i]]));
                 }
             }
         }
+
+        parents = newparents;
     }
-    procnode(nodeId);
+
+    if (!includeroot) nodes.shift();
 
     return nodes;
 }
 
-function fm_getsharenodes(h, root)
-{
+// get all parent nodes having a u_sharekey
+// optionally, return the path root
+function fm_getsharenodes(h, root) {
     var sn = [];
     var n = M.d[h];
-    while (n && n.p)
-    {
-        if (typeof n.shares !== 'undefined' || u_sharekeys[n.h])
+
+    while (n && n.p) {
+        if (u_sharekeys[n.h])
             sn.push(n.h);
         n = M.d[n.p];
     }
-    if (root)
+
+    if (root) {
         root.handle = n && n.h;
+    }
+
     return sn;
 }
 
-function fm_getcopynodes(cn, t)
-{
-    var a=[];
-    var r=[];
-    var c=11 == (t || "").length;
-    for (var i in cn)
-    {
-        var s = fm_getnodes(cn[i]);
-        for (var j in s) r.push(s[j]);
-        r.push(cn[i]);
+// get all clean (decrypted) subtrees under cn
+// FIXME: return total number of nodes omitted because of decryption issues
+function fm_getcopynodes(cn, t) {
+    var a = [];
+    var r = [];
+    var i, j;
+
+    // add all subtrees under cn[], including the roots
+    for (i = 0; i < cn.length; i++) {
+        r = r.concat(fm_getnodes(cn[i], true, true));
     }
-    for (var i in r)
-    {
+
+    for (i = 0; i < r.length; i++) {
         var n = M.d[r[i]];
-        if (n)
-        {
-            var ar;
-            if (!n.key) {
-                console.error('fm_getcopynodes: missing node key', n);
-                continue;
+
+        // repackage/-encrypt n for processing by the `p` API
+        nn = {};
+
+        // copied folders receive a new random key
+        // copied files must retain their existing key
+        if (!n.t) nn.k = n.k;
+
+        // new node inherits all attributes
+        nn.a = ab_to_base64(crypto_makeattr(n, nn));
+
+        // new node inherits handle, parent and type
+        nn.h = n.h;
+        nn.p = n.p;
+        nn.t = n.t;
+
+        // remove parent unless child
+        for (j = 0; j < cn.length; j++) {
+            if (cn[j] === nn.h) {
+                delete nn.p;
+                break;
             }
-            if (!n.ar) {
-                console.warn('Something went wrong, missing node attr - trying to fix in the run...');
-                crypto_processkey(u_handle, u_k_aes, n);
-            }
-            if (n.ar) {
-                ar = clone(n.ar);
-            }
-            else {
-                var cnt = 0;
-                ar = {};
-                if (n.name) {
-                    ar.n = n.name;
-                    cnt++;
-                }
-                if (n.mtime) {
-                    ar.t = n.mtime;
-                    cnt++;
-                }
-                if (n.hash) {
-                    ar.c = n.hash;
-                    cnt++;
-                }
-                else if (n.t) {
-                    cnt++;
-                }
-                if (cnt !== 3) {
-                    console.error('Missing node attr property...', ar, n);
-                }
-                else {
-                    console.log('Missing node attr restored manually...');
-                }
-            }
-            if (typeof ar.fav !== 'undefined') delete ar.fav;
-            var mkat = enc_attr(ar,n.key);
-            var attr = ab_to_base64(mkat[0]);
-            var key = c ? base64urlencode(encryptto(t,a32_to_str(mkat[1])))
-                        : a32_to_base64(encrypt_key(u_k_aes,mkat[1]));
-            var nn = {h:n.h,t:n.t,a:attr,k:key};
-            var p=n.p;
-            for (var j in cn)
-            {
-                if (cn[j] == nn.h)
-                {
-                    p=false;
-                    break;
-                }
-            }
-            if (p) nn.p=p;
-            a.push(nn);
         }
+
+        a.push(nn);
     }
+
     return a;
 }
 
@@ -6389,16 +7972,17 @@ function createFolder(toid, name, ulparams) {
         }
     }
 
-    var mkat = enc_attr({n: name}, []),
-        attr = ab_to_base64(mkat[0]),
-        key = a32_to_base64(encrypt_key(u_k_aes, mkat[1])),
-        req = {a: 'p', t: toid, n: [{h: 'xxxxxxxx', t: 1, a: attr, k: key}], i: requesti},
+    var n = { name: name },
+        attr = ab_to_base64(crypto_makeattr(n)),
+        key = a32_to_base64(encrypt_key(u_k_aes, n.k)),
+        req = { a: 'p', t: toid, n: [{ h: 'xxxxxxxx', t: 1, a: attr, k: key }], i: requesti },
         sn = fm_getsharenodes(toid);
 
     if (sn.length) {
-        req.cr = crypto_makecr([mkat[1]], sn, false);
+        req.cr = crypto_makecr([n], sn, false);
         req.cr[1][0] = 'xxxxxxxx';
     }
+
     if (!ulparams) {
         loadingDialog.show();
     }
@@ -6406,12 +7990,13 @@ function createFolder(toid, name, ulparams) {
     api_req(req, {
         ulparams: ulparams,
         callback: function(res, ctx) {
-
             if (typeof res !== 'number') {
                 $('.fm-new-folder').removeClass('active');
                 $('.create-new-folder').addClass('hidden');
-                $('.create-folder-input-bl input').val('');
+                $('.create-new-folder input').val('');
                 newnodes = [];
+
+                // this is only safe once sn enforcement has been deployed
                 M.addNode(res.f[0]);
                 renderNew();
                 refreshDialogContent();
@@ -6542,8 +8127,7 @@ function doShare(nodeId, targets, dontShowShareDialog) {
     };
 
     // Get complete children directory structure for root node with id === nodeId
-    var childNodesId = fm_getnodes(nodeId);
-    childNodesId.push(nodeId);
+    var childNodesId = fm_getnodes(nodeId, true);
 
     // Create new lists of users, active (with user handle) and non existing (pending)
     targets.forEach(function(value) {
@@ -6608,142 +8192,65 @@ function doShare(nodeId, targets, dontShowShareDialog) {
     return masterPromise;
 }
 
-function processmove(jsonmove)
-{
-    var rts = [M.RootID,M.RubbishID,M.InboxID];
+// moving a foreign node (one that is not owned by u_handle) from an outshare
+// to a location not covered by any u_sharekey requires taking ownership
+// and re-encrypting its key with u_k.
+// moving a tree to a (possibly nested) outshare requires a full set of keys
+// to be provided. FIXME: record which keys are known to the API and exclude
+// those that are to reduce API traffic.
+function processmove(apireq) {
+    if (d) console.log('processmove', apireq);
 
-    if (d) console.log('processmove', jsonmove);
+    var root = {};
+    var tsharepath = fm_getsharenodes(apireq.t);
+    var nsharepath = fm_getsharenodes(apireq.n, root);
+    var movingnodes = false;
 
-    for (var i in jsonmove)
-    {
-        var root = {}, sharingnodes = fm_getsharenodes(jsonmove[i].t, root), movingnodes = 0;
+    // is the node to be moved in an outshare (or possibly multiple nested ones)?
+    if (nsharepath.length && root.handle) {
+        // yes, it is - are we moving to an outshare?
+        if (!tsharepath.length) {
+            // we are not - check for any foreign nodes being moved
+            movingnodes = fm_getnodes(apireq.n, true);
 
-        if (d) console.log('sharingnodes', sharingnodes.length, sharingnodes, root.handle);
+            var foreignnodes = [];
 
-        if (sharingnodes.length)
-        {
-            movingnodes = fm_getnodes(jsonmove[i].n);
-            movingnodes.push(jsonmove[i].n);
-            jsonmove[i].cr = crypto_makecr(movingnodes,sharingnodes,true);
+            for (var i = movingnodes.length; i--; ) {
+                if (M.d[movingnodes[i]].u != u_handle) {
+                    foreignnodes.push(movingnodes[i]);
+                }
+            }
+
+            if (foreignnodes.length) {
+                if (d) console.log('rekeying foreignnodes', foreignnodes.length);
+
+                // update all foreign nodes' keys and take ownership
+                api_updfkey(movingnodes);
+            }
         }
-        if (root.handle && rts.indexOf(root.handle) >= 0) api_updfkey(movingnodes || jsonmove[i].n);
+    }
 
-        api_req(jsonmove[i]);
+    // is the target location in any shares? add CR element.
+    if (tsharepath.length) {
+        if (!movingnodes) {
+            movingnodes = fm_getnodes(apireq.n, true);
+        }
+
+        apireq.cr = crypto_makecr(movingnodes, tsharepath, true);
     }
 }
 
-var u_kdnodecache = {};
-var kdWorker;
-
-function process_f(f, cb, retry)
-{
-    var onMainThread = localStorage.dk ? 9e11 : 200;
-    var doNewNodes = (typeof newnodes !== 'undefined');
-
-    // if (d) console.error('process_f', doNewNodes);
-
-    if (f && f.length)
-    {
-        var ncn = f, skn = [];
-        // if ($.len(u_kdnodecache)) {
-            // ncn = [];
-            // for (var i in f) {
-                // var n1 = f[i], n2 = u_kdnodecache[n1.h];
-                // if (!n1.c && (!n2 || !$.len(n2))) ncn.push(n1);
-            // }
-            // if (d) console.log('non-cached nodes', ncn.length, ncn);
-        // }
-        if (!retry && ncn.length > onMainThread) {
-            for (var i in f) {
-                if (f[i].sk) skn.push(f[i]);
-            }
-            if (skn.length) {
-                ncn = skn;
-                if (d) console.log('processing share-keys first', ncn.length, ncn);
-            }
+function process_f(f, cb) {
+    if (f) {
+        for (var i = 0; i < f.length; i++) {
+            M.addNode(f[i]);
         }
 
-        if ( ncn.length < onMainThread )
-        {
-            if (d) {
-                console.log('Processing %d-%d nodes in the main thread.', ncn.length, f.length);
-                console.time('process_f');
-            }
-            __process_f1(ncn);
-            if (skn.length) {
-                process_f(f, cb, 1);
-            }
-            else {
-                if (cb) {
-                    cb(newmissingkeys && M.checkNewMissingKeys());
-                }
-            }
-            if (d) console.timeEnd('process_f');
-        }
-        else
-        {
-            if (!kdWorker) try {
-                kdWorker = mSpawnWorker('keydec.js');
-            } catch(e) {
-                if (d) console.error(e);
-                return __process_f2(f, cb);
-            }
-
-            kdWorker.process(ncn.sort(function() { return Math.random() - 0.5}), function kdwLoad(r,j) {
-                if (d) console.log('KeyDecWorker processed %d/%d-%d nodes', $.len(r), ncn.length, f.length, r);
-                $.extend(u_kdnodecache, r);
-                if (doNewNodes) {
-                    newnodes = newnodes || [];
-                }
-                if (j.newmissingkeys || ncn === skn) {
-                    if (d && j.newmissingkeys) console.log('Got missing keys, retrying?', !retry);
-                    if (!retry) {
-                        return process_f( f, cb, 1);
-                    }
-                }
-                __process_f2(f, cb && cb.bind(this, !!j.newmissingkeys));
-            }, function kdwError(err) {
-                if (d) console.error(err);
-                if (doNewNodes) {
-                    newnodes = newnodes || [];
-                }
-                __process_f2(f, cb);
-            });
+        if (cb) {
+            cb(newmissingkeys && M.checkNewMissingKeys());
         }
     }
     else if (cb) cb();
-}
-function __process_f1(f)
-{
-    for (var i in f) M.addNode(f[i], !!$.mDBIgnoreDB);
-}
-function __process_f2(f, cb, tick)
-{
-    var max = 12000, n;
-
-    while ((n = f.pop()))
-    {
-        M.addNode(n, !!$.mDBIgnoreDB);
-
-        if (cb && --max == 0) break;
-    }
-
-    if (cb)
-    {
-        if (max) cb();
-        else {
-            var doNewNodes = (typeof newnodes !== 'undefined');
-            if (!+tick || tick > 1e3) {
-                tick = 200;
-            }
-            setTimeout(function pf2n() {
-                if (doNewNodes) {
-                    newnodes = newnodes || [];
-                }
-                __process_f2(f, cb, tick);
-            }, tick *= 1.2);
-        }
-    }
 }
 
 /**
@@ -6840,48 +8347,59 @@ function processOPC(opc, ignoreDB) {
  * @param {Object} publicHandles The Public Handles action packet i.e. a: 'ph'.
  */
 function processPH(publicHandles) {
-
     var nodeId;
     var publicHandleId;
     var timeNow = unixtime();
     var UiExportLink = fminitialized && new mega.UI.Share.ExportLink();
 
-    for (var value in publicHandles) {
-        if (publicHandles.hasOwnProperty(value)) {
-            value = publicHandles[value];
-            nodeId = value.h;
-            publicHandleId = value.ph;
+    for (var i = publicHandles.length; i--; ) {
+        value = publicHandles[i];
 
-            // Remove export link, down: 1
+        nodeId = value.h;
+        if (!M.d[nodeId]) continue;
+
+        if (fmdb) {
             if (value.d) {
-                M.delNodeShare(nodeId, 'EXP');
-
-                if (UiExportLink) {
-                    UiExportLink.removeExportLinkIcon(nodeId);
-                }
+                fmdb.del('ph', nodeId);
             }
             else {
-                var share = clone(value);
-                delete share.a;
-                delete share.i;
-                delete share.n;
-                share.ts = timeNow;
-                share.u = 'EXP';
-                share.r = 0;
+                fmdb.add('ph', { h : nodeId });
+            }
+        }
 
-                if (Object(M.d[nodeId]).ph !== publicHandleId) {
-                    M.nodeAttr({ h: nodeId, ph: publicHandleId });
-                }
-                M.nodeShare(share.h, share);
+        publicHandleId = value.ph;
 
-                if (UiExportLink) {
-                    UiExportLink.addExportLinkIcon(nodeId);
-                }
+        // remove exported link, down: 1
+        if (value.d) {
+            M.delNodeShare(nodeId, 'EXP');
+
+            if (UiExportLink) {
+                UiExportLink.removeExportLinkIcon(nodeId);
+            }
+        }
+        else {
+            var share = clone(value);
+            delete share.a;
+            delete share.i;
+            delete share.n;
+            share.ts = timeNow;
+            share.u = 'EXP';
+            share.r = 0;
+
+            if (M.d[nodeId].ph !== publicHandleId) {
+                M.d[nodeId].ph = publicHandleId;
+                M.nodeUpdated(M.d[nodeId]);
             }
 
-            if (UiExportLink && (value.down !== undefined)) {
-                UiExportLink.updateTakenDownItem(nodeId, value.down);
+            M.nodeShare(share.h, share);
+
+            if (UiExportLink) {
+                UiExportLink.addExportLinkIcon(nodeId);
             }
+        }
+
+        if (UiExportLink && (value.down !== undefined)) {
+            UiExportLink.updateTakenDownItem(nodeId, value.down);
         }
     }
 }
@@ -6892,7 +8410,6 @@ function processPH(publicHandles) {
  * @param {array.<JSON_objects>} pending shares
  */
 function processPS(pendingShares, ignoreDB) {
-
     DEBUG('processPS');
     var ps;
     var nodeHandle = '';
@@ -6901,62 +8418,62 @@ function processPS(pendingShares, ignoreDB) {
     var timeStamp = 0;
     var contactName = '';
 
-
     for (var i in pendingShares) {
-        if (pendingShares.hasOwnProperty(i)) {
-            ps = pendingShares[i];
+        ps = pendingShares[i];
 
-            // From gettree
-            if (ps.h) {
-                M.addPS(ps, ignoreDB);
-            }
+        // From gettree
+        if (ps.h) {
+            M.addPS(ps, ignoreDB);
+        }
+        // Situation different from gettree, s2 from API response, doesn't have .h attr instead have .n
+        else {
+            nodeHandle = ps.n;
+            pendingContactId = ps.p;
+            shareRights = ps.r;
+            timeStamp = ps.ts;
+            contactName = M.getNameByHandle(pendingContactId);
 
-            // Situation different from gettree, s2 from API response, doesn't have .h attr instead have .n
-            else {
-                nodeHandle = ps.n;
-                pendingContactId = ps.p;
-                shareRights = ps.r;
-                timeStamp = ps.ts;
-                contactName = M.getNameByHandle(pendingContactId);
+            // shareRights is undefined when user denies pending contact request
+            // .op is available when user accepts pending contact request and
+            // remaining pending share should be updated to full share
+            if ((typeof shareRights === 'undefined') || ps.op) {
+                M.delPS(pendingContactId, nodeHandle);
 
-                // shareRights is undefined when user denies pending contact request
-                // .op is available when user accepts pending contact request and
-                // remaining pending share should be updated to full share
-                if ((typeof shareRights === 'undefined') || ps.op) {
+                if (ps.op) {
+                    M.nodeShare(nodeHandle, {
+                        h: ps.n,
+                        o: ps.n,
+                        p: ps.p,
+                        u: ps.u,
+                        r: ps.r,
+                        ts: ps.ts
+                    });
+                }
 
-                    M.delPS(pendingContactId, nodeHandle);
-
-                    if (ps.op) {
-                        M.nodeShare(nodeHandle, ps);
-                    }
-
-                    if (M.opc && M.opc[ps.p]) {
-
-                        // Update tokenInput plugin
-                        addToMultiInputDropDownList('.share-multiple-input', [{
-                                id: M.opc[pendingContactId].m,
-                                name: contactName
-                            }]);
-                        addToMultiInputDropDownList('.add-contact-multiple-input', {
+                if (M.opc && M.opc[ps.p]) {
+                    // Update tokenInput plugin
+                    addToMultiInputDropDownList('.share-multiple-input', [{
                             id: M.opc[pendingContactId].m,
                             name: contactName
-                        });
-                    }
+                        }]);
+                    addToMultiInputDropDownList('.add-contact-multiple-input', {
+                        id: M.opc[pendingContactId].m,
+                        name: contactName
+                    });
                 }
-                else {
+            }
+            else {
+                // Add the pending share to state
+                M.addPS({
+                    'h':nodeHandle,
+                    'p':pendingContactId,
+                    'r':shareRights,
+                    'ts':timeStamp
+                }, ignoreDB);
+            }
 
-                    // Add the pending share to state
-                    M.addPS({
-                        'h':nodeHandle,
-                        'p':pendingContactId,
-                        'r':shareRights,
-                        'ts':timeStamp
-                    }, ignoreDB);
-                }
-
-                if (fminitialized) {
-                    sharedUInode(nodeHandle);
-                }
+            if (fminitialized) {
+                sharedUInode(nodeHandle);
             }
         }
     }
@@ -7042,14 +8559,14 @@ function processUPCO(ap) {
  *
  * @param {Object} u Users informations
  */
-function process_u(u) {
+function process_u(u, ignoreDB) {
     for (var i in u) {
         if (u.hasOwnProperty(i)) {
             if (u[i].c === 1) {
                 u[i].h = u[i].u;
                 u[i].t = 1;
                 u[i].p = 'contacts';
-                M.addNode(u[i]);
+                M.addNode(u[i], ignoreDB);
 
                 var contactName = M.getNameByHandle(u[i].h);
 
@@ -7058,7 +8575,7 @@ function process_u(u) {
                 addToMultiInputDropDownList('.add-contact-multiple-input', [{ id: u[i].m, name: contactName }]);
             }
             else if (M.d[u[i].u]) {
-                M.delNode(u[i].u);
+                M.delNode(u[i].u, ignoreDB);
 
                 // Update token.input plugin
                 removeFromMultiInputDDL('.share-multiple-input', { id: u[i].m, name: u[i].m });
@@ -7066,34 +8583,40 @@ function process_u(u) {
             }
 
             // Update user attributes M.u
-            M.addUser(u[i]);
+            M.addUser(u[i], ignoreDB);
+
+            if (u[i].c === 1) {
+                // sync data objs M.u <-> M.d
+                M.d[u[i].u] = M.u[u[i].u];
+            }
+        }
+    }
+
+    if (M.currentdirid === 'dashboard') {
+        delay('dashboard:updcontacts', dashboardUI.updateContactsWidget);
+    }
+}
+
+function process_ok(ok, ignoreDB) {
+    for (var i = ok.length; i--; ) {
+        if (ok[i].ha == crypto_handleauth(ok[i].h))
+        {
+            if (fmdb && !pfkey && !ignoreDB) {
+                fmdb.add('ok', { h : ok[i].h, d : ok[i] });
+            }
+            crypto_setsharekey(ok[i].h, decrypt_key(u_k_aes, base64_to_a32(ok[i].k)), ignoreDB);
         }
     }
 }
 
-function process_ok(ok, ignoreDB)
-{
-    for (var i in ok)
-    {
-        if (typeof mDB === 'object' && !pfkey && !ignoreDB)
-            mDBadd('ok', ok[i]);
-        if (ok[i].ha == crypto_handleauth(ok[i].h))
-            u_sharekeys[ok[i].h] = decrypt_key(u_k_aes, base64_to_a32(ok[i].k));
-    }
-}
-
 function processMCF(mcfResponse, ignoreDB) {
-    if (megaChatIsDisabled) {
-        console.error('chat is disabled!');
-        return;
+
+    if (typeof ChatdIntegration !== 'undefined') {
+        ChatdIntegration.requiresUpdate = true;
     }
 
     if (mcfResponse === EEXPIRED) {
-        ChatdIntegration.requiresUpdate = true;
         return;
-    }
-    else {
-        ChatdIntegration.requiresUpdate = true;
     }
 
     // reopen chats from the MCF response.
@@ -7103,28 +8626,40 @@ function processMCF(mcfResponse, ignoreDB) {
                 // skip non active chats for now...
                 return;
             }
-            if (typeof mSDB === 'object' && !pfkey && !ignoreDB) {
-                mSDB.add('mcf', clone(chatRoomInfo));
+            if (fmdb && !pfkey && !ignoreDB) {
+                fmdb.add('mcf', { id : chatRoomInfo.id, d : chatRoomInfo });
             }
 
-            ChatdIntegration._queuedChats[chatRoomInfo.id] = chatRoomInfo;
+            if (typeof ChatdIntegration !== 'undefined') {
+                ChatdIntegration._queuedChats[chatRoomInfo.id] = chatRoomInfo;
+            }
         });
-        ChatdIntegration.deviceId = mcfResponse.d;
 
-        ChatdIntegration.mcfHasFinishedPromise.resolve(mcfResponse);
+        if (typeof ChatdIntegration !== 'undefined') {
+            ChatdIntegration.deviceId = mcfResponse.d;
+
+            ChatdIntegration.mcfHasFinishedPromise.resolve(mcfResponse);
+        }
     }
-    else {
+    else if (typeof ChatdIntegration !== 'undefined') {
         ChatdIntegration.mcfHasFinishedPromise.reject(mcfResponse);
     }
 }
 
-function folderreqerr(c, e)
+function folderreqerr()
 {
     loadingDialog.hide();
+    loadingInitDialog.hide();
+
+    loadfm.loaded = false;
+    loadfm.loading = false;
+
     msgDialog('warninga', l[1043], l[1044] + '<ul><li>' + l[1045] + '</li><li>' + l[247] + '</li><li>' + l[1046] + '</li>', false, function()
     {
-        folderlink = pfid;
-        document.location.hash = '';
+        loadSubPage('login'); // if the user is logged-in, he'll be redirected to the cloud
+
+        // FIXME: no location.reload() should be needed..
+        location.reload();
     });
 }
 
@@ -7133,27 +8668,24 @@ function init_chat() {
         if (u_type && !megaChatIsReady) {
             if (d) console.log('Initializing the chat...');
 
-            try {
-                // Prevent known Strophe exceptions...
-                if (!Strophe.Websocket.prototype._unsafeOnIdle) {
-                    Strophe.Websocket.prototype._unsafeOnIdle = Strophe.Websocket.prototype._onIdle;
-                    Strophe.Websocket.prototype._onIdle = function() {
+            // XXX: Prevent known Strophe exceptions...
+            ['_onIdle', '_connect'].forEach(function(fn) {
+                var proto = Strophe.Websocket.prototype;
+                var unsafeFn = '_unsafe' + fn;
+
+                if (!proto[unsafeFn]) {
+                    proto[unsafeFn] = proto[fn];
+                    proto[fn] = function() {
                         try {
-                            this._unsafeOnIdle.apply(this, arguments);
+                            this[unsafeFn].apply(this, arguments);
                         }
                         catch (ex) {
-                            if (d) {
-                                console.error(ex);
-                            }
+                            console.error('Caught Strophe exception.', ex);
                         }
                     };
                 }
-            }
-            catch (ex) {
-                if (d) {
-                    console.error(ex);
-                }
-            }
+                proto = undefined;
+            });
 
             var _chat = new Chat();
 
@@ -7171,46 +8703,48 @@ function init_chat() {
                 }
             }
         }
-    }
-    if (folderlink) {
-        if (d) console.log('Will not initializing chat [branch:1]');
-    }
-    else if (!megaChatIsDisabled) {
-        if (pubEd25519[u_handle]) {
-            Soon(__init_chat);
+
+        if (!loadfm.loading) {
+            loadingDialog.hide();
+            loadingInitDialog.hide();
         }
-        else {
-            mBroadcaster.once('pubEd25519', __init_chat);
-            if (d) console.log('Will not initializing chat [branch:2]');
-        }
+    }
+
+    if (pfid) {
+        if (d) console.log('Will not initialize chat [branch:1]');
     }
     else {
-        if (d) console.log('Will not initializing chat [branch:3]');
+        authring.onAuthringReady('chat').done(__init_chat);
     }
 }
 
-function loadfm_callback(res, ctx) {
-
-    loadingInitDialog.step3();
-
-    if (pfkey) {
-        if (res.f && res.f[0]) {
-            M.RootID = res.f[0].h;
-            u_sharekeys[res.f[0].h] = base64_to_a32(pfkey);
-        }
-        folderlink = pfid;
-    }
-
-    if (typeof res === 'number') {
+function loadfm_callback(res) {
+    if (res[0] == '-') {
         msgDialog('warninga', l[1311], "Sorry, we were unable to retrieve the Cloud Drive contents.", api_strerror(res));
         return;
     }
 
+    loadingInitDialog.step3();
+
+    mega.loadReport.recvNodes     = Date.now() - mega.loadReport.stepTimeStamp;
+    mega.loadReport.stepTimeStamp = Date.now();
+
+    if (pfkey) {
+        folderlink = pfid;
+    }
+
+    if (res.noc) {
+        mega.loadReport.noc = res.noc;
+    }
+    if (res.tct) {
+        mega.loadReport.tct = res.tct;
+    }
+    if (res.ok && !res.ok0) {
+        // this is a legacy cached tree without an ok0 element
+        process_ok(res.ok);
+    }
     if (res.u) {
         process_u(res.u);
-    }
-    if (res.ok) {
-        process_ok(res.ok);
     }
     if (res.opc) {
         processOPC(res.opc);
@@ -7221,9 +8755,14 @@ function loadfm_callback(res, ctx) {
     if (res.ps) {
         processPS(res.ps);
     }
-    if (res.mcf && !megaChatIsDisabled) {
-        processMCF(res.mcf.c ? res.mcf.c : res.mcf);
+    if (res.mcf) {
+        // save the response to be processed later once chat files were loaded
+        loadfm.chatmcf = res.mcf.c || res.mcf;
+        // ensure the response is saved in fmdb, even if the chat is disabled or not loaded yet
+        processMCF(loadfm.chatmcf);
     }
+    M.avatars();
+    loadfm.fromapi = true;
 
     process_f(res.f, function onLoadFMDone(hasMissingKeys) {
 
@@ -7237,7 +8776,7 @@ function loadfm_callback(res, ctx) {
 
             return mKeyDialog(pfid, true, true)
                 .fail(function() {
-                    location.hash = 'start';
+                    loadSubPage('start');
                 });
         }
 
@@ -7252,26 +8791,33 @@ function loadfm_callback(res, ctx) {
             }
         }
 
-        // Handle public/export links. Why here? Make sure that M.d already exist
+        // Handle public/export links. Why here? Make sure that M.d already exists
         if (res.ph) {
             processPH(res.ph);
         }
 
-        maxaction = res.sn;
-        if (typeof mDB === 'object') {
-            localStorage[u_handle + '_maxaction'] = maxaction;
-        }
+        // decrypt hitherto undecrypted nodes
+        crypto_fixmissingkeys(missingkeys);
+
+        // commit transaction and set sn
+        setsn(res.sn);
+        currsn = res.sn;
 
         if (res.cr) {
             crypto_procmcr(res.cr);
         }
+
         if (res.sr) {
             crypto_procsr(res.sr);
         }
 
-        // Retrieve initial batch of action-packets, if any
+        mega.loadReport.procNodeCount = Object.keys(M.d || {}).length;
+        mega.loadReport.procNodes     = Date.now() - mega.loadReport.stepTimeStamp;
+        mega.loadReport.stepTimeStamp = Date.now();
+
+        // retrieve initial batch of action packets, if any
         // we'll then complete the process using loadfm_done
-        getsc();
+        getsc(true);
 
         if (hasMissingKeys) {
             srvlog('Got missing keys processing gettree...', null, true);
@@ -7280,31 +8826,96 @@ function loadfm_callback(res, ctx) {
 }
 
 /**
- * Function to be invoked when the cloud has finished loaded,
+ * Function to be invoked when the cloud has finished loading,
  * being the nodes loaded from either server or local cache.
- * @param {Boolean} mDBload whether it came from local cache.
  */
 function loadfm_done(mDBload) {
+    mDBload = mDBload || !loadfm.fromapi;
+
     loadfm.loaded = Date.now();
     loadfm.loading = false;
+    loadfm.fromapi = false;
 
-    if (d > 1) console.error('loadfm_done', mDBload, is_fm());
+    if (d > 1) console.error('loadfm_done', is_fm());
+
+    mega.loadReport.procAPs       = Date.now() - mega.loadReport.stepTimeStamp;
+    mega.loadReport.stepTimeStamp = Date.now();
+
+    if (!pfid && u_type == 3) {
+
+        // load/initialise the authentication system
+        mega.config.fetch()
+            .always(function() {
+                authring.initAuthenticationSystem();
+            });
+    }
 
     mega.config.ready(function() {
-        init_chat();
+        var hideLoadingDialog = (!is_mobile && !CMS.isLoading());
 
-        // are we actually on an #fm/* page?
-        if (is_fm() || $('.fm-main.default').is(":visible")) {
-            renderfm();
+        if ((location.host === 'mega.nz' || !megaChatIsDisabled) && !is_mobile) {
+
+            if (!pfid && u_type === 3 && !loadfm.chatloading) {
+                loadfm.chatloading = true;
+
+                mega.utils.require('chat')
+                    .always(function() {
+
+                        if (typeof ChatRoom !== 'undefined') {
+
+                            if (loadfm.chatmcf) {
+                                processMCF(loadfm.chatmcf, true);
+                                loadfm.chatmcf = null;
+                            }
+                            init_chat();
+                        }
+                        else {
+                            // FIXME: this won't be reached because the request will fail silently
+                            console.error('Chat resources failed to load...');
+                        }
+
+                        loadfm.chatloading = false;
+                        loadfm.chatloaded  = Date.now();
+                    });
+
+                if (getSitePath().substr(0, 8) === '/fm/chat') {
+                    // Keep the "decrypting" step until the chat have loaded.
+                    hideLoadingDialog = false;
+                }
+            }
         }
 
-        if (!CMS.isLoading()) {
+        mega.loadReport.fmConfigFetch = Date.now() - mega.loadReport.stepTimeStamp;
+        mega.loadReport.stepTimeStamp = Date.now();
+
+        // are we actually on an #fm/* page?
+        if (page !== 'start' && is_fm() || $('.fm-main.default').is(":visible")) {
+            renderfm();
+
+            mega.loadReport.renderfm      = Date.now() - mega.loadReport.stepTimeStamp;
+            mega.loadReport.stepTimeStamp = Date.now();
+
+            // load report - time to fm after last byte received
+            mega.loadReport.ttfm = Date.now() - mega.loadReport.ttfm;
+
+            // setup fm-notifications such as 'full' or 'almost-full' if needed.
+            mega.checkStorageQuota(50);
+        }
+        else {
+            mega.loadReport.ttfm = -1;
+            mega.loadReport.renderfm = -1;
+        }
+
+        if (hideLoadingDialog) {
             loadingDialog.hide();
             loadingInitDialog.hide();
+            // Reposition UI elements right after hiding the loading overlay,
+            // without waiting for the lazy $.tresizer() triggered by MegaRender
+            fm_resize_handler(true);
         }
 
         // -0x800e0fff indicates a call to loadfm() when it was already loaded
-        if (mDBload !== -0x800e0fff) {
+        if (!is_mobile && mDBload !== -0x800e0fff) {
             Soon(function _initialNotify() {
                 // After the first SC request all subsequent requests can generate notifications
                 notify.initialLoadComplete = true;
@@ -7315,9 +8926,52 @@ function loadfm_done(mDBload) {
                     notify.getInitialNotifications();
                 }
             });
-        }
 
-        watchdog.notify('loadfm_done', mDBload);
+            if (mBroadcaster.crossTab.master && !mega.loadReport.sent) {
+                mega.loadReport.sent = true;
+
+                var r = mega.loadReport;
+                r.totalTimeSpent = Date.now() - mega.loadReport.startTime;
+                r = [
+                    r.mode, // 1: DB, 2: API
+                    r.recvNodes, r.procNodes, r.procAPs,
+                    r.fmConfigFetch, r.renderfm,
+                    r.dbToNet | 0, // see mDB.js comment
+                    r.totalTimeSpent,
+                    Object.keys(M.d || {}).length, // total account nodes
+                    r.procNodeCount, // nodes before APs processing
+                    buildVersion.timestamp || -1, // -- VERSION TAG --
+                    navigator.hardwareConcurrency | 0, // cpu cores
+                    folderlink ? 1 : 0,
+                    pageLoadTime, // secureboot's resources load time
+                    r.ttfb | 0, // time-to-first-byte (for gettree)
+                    r.noc | 0, // tree not cached
+                    r.tct | 0, // tree compute time
+                    r.recvAPs, // time waiting to receive APs
+                    r.EAGAINs, // -3/-4s while loading
+                    r.e500s, // http err 500 while loading
+                    r.errs, // any other errors while loading
+                    workers && workers.length || -666,
+                    r.ttlb | 0, // time to last byte
+                    r.ttfm | 0, // time to fm since ttlb
+                    u_type === 3 ? (mBroadcaster.crossTab.master ? 1 : 0) : -1, // master, or slave tab?
+                ];
+
+                if (d) {
+                    console.debug('loadReport', r);
+                }
+                api_req({a: 'log', e: 99626, m: JSON.stringify(r)});
+            }
+
+            if (mDBload) {
+                M.avatars();
+            }
+        }
+        clearInterval(mega.loadReport.aliveTimer);
+        mega.flags &= ~window.MEGAFLAG_LOADINGCLOUD;
+
+//        u_kdnodecache = {};
+        watchdog.notify('loadfm_done');
     });
 }
 
@@ -7379,107 +9033,525 @@ function fm_requestfolderid(h, name, ulparams)
     return createFolder(h, name, ulparams);
 }
 
-var isNativeObject = function(obj) {
-    var objConstructorText = obj.constructor.toString();
-    return objConstructorText.indexOf("[native code]") !== -1 && objConstructorText.indexOf("Object()") === -1;
-};
 
-function clone(obj)
+// jscs:disable
+// jshint ignore:start
+var thumbnails = [];
+var thumbnailblobs = [];
+var th_requested = [];
+var fa_duplicates = {};
+var fa_reqcnt = 0;
+var fa_addcnt = 8;
+var fa_tnwait = 0;
+
+function fm_thumbnails()
 {
-
-    if (null == obj || "object" != typeof obj)
-        return obj;
-    if (obj instanceof Date)
+    var treq = {}, a = 0, max = Math.max($.rmItemsInView || 1, 71) + fa_addcnt, u = max - Math.floor(max / 3), y;
+    if (!fa_reqcnt)
+        fa_tnwait = y;
+    if (d)
+        console.time('fm_thumbnails');
+    if (M.viewmode || M.chat)
     {
-        var copy = new Date();
-        copy.setTime(obj.getTime());
-        return copy;
-    }
-    if (obj instanceof Array)
-    {
-
-        var copy = [];
-        for (var i = 0, len = obj.length; i < len; i++) {
-            copy[i] = clone(obj[i]);
-        }
-        return copy;
-    }
-    if (obj instanceof Object)
-    {
-        var copy = {};
-        for (var attr in obj)
+        for (var i in M.v)
         {
-            if (obj.hasOwnProperty(attr)) {
-                if (!(obj[attr] instanceof Object)) {
-                    copy[attr] = obj[attr];
+            var n = M.v[i];
+            if (n && !missingkeys[n.h] && n.fa && String(n.fa).indexOf(':0') > 0)
+            {
+                if (fa_tnwait == n.h && n.seen)
+                    fa_tnwait = 0;
+                // if (!fa_tnwait && !thumbnails[n.h] && !th_requested[n.h])
+                if (n.seen && !thumbnails[n.h] && !th_requested[n.h])
+                {
+                    if (typeof fa_duplicates[n.fa] == 'undefined')
+                        fa_duplicates[n.fa] = 0;
+                    else
+                        fa_duplicates[n.fa] = 1;
+                    treq[n.h] =
+                        {
+                            fa: n.fa,
+                            k: n.k
+                        };
+                    th_requested[n.h] = 1;
+
+                    if (u == a)
+                        y = n.h;
+                    if (++a > max)
+                    {
+                        if (!n.seen)
+                            break;
+                        y = n.h;
+                    }
                 }
-                else if (obj[attr] instanceof Array) {
-                    copy[attr] = clone(obj[attr]);
-                }
-                else if (!isNativeObject(obj[attr])) {
-                    copy[attr] = clone(obj[attr]);
-                }
-                else if ($.isFunction(obj[attr])) {
-                    copy[attr] = obj[attr];
-                }
-                else {
-                    copy[attr] = {};
+                else if (n.seen && n.seen !== 2)
+                {
+                    fm_thumbnail_render(n);
                 }
             }
         }
+        if (y)
+            fa_tnwait = y;
+        if (a > 0)
+        {
+            fa_reqcnt += a;
+            if (d)
+                console.log('Requesting %d thumbs (%d loaded)', a, fa_reqcnt);
 
-        return copy;
+            var rt = Date.now();
+            var cdid = M.currentdirid;
+            api_getfileattr(treq, 0, function(ctx, node, uint8arr)
+            {
+                if (uint8arr === 0xDEAD)
+                {
+                    if (d)
+                        console.log('Aborted thumbnail retrieval for ' + node);
+                    delete th_requested[node];
+                    return;
+                }
+                if (rt)
+                {
+                    if (((Date.now() - rt) > 4000) && ((fa_addcnt += u) > 300))
+                        fa_addcnt = 301;
+                    rt = 0;
+                }
+                try {
+                    var blob = new Blob([uint8arr], {type: 'image/jpeg'});
+                } catch (err) {}
+                if (blob.size < 25)
+                    blob = new Blob([uint8arr.buffer]);
+                // thumbnailblobs[node] = blob;
+                thumbnails[node] = myURL.createObjectURL(blob);
+
+                var targetNode = M.getNodeByHandle(node);
+
+                if (targetNode && targetNode.seen && M.currentdirid === cdid) {
+                    fm_thumbnail_render(targetNode);
+                }
+
+                // deduplicate in view when there is a duplicate fa:
+                if (targetNode && fa_duplicates[targetNode.fa] > 0)
+                {
+                    for (var i in M.v)
+                    {
+                        if (M.v[i].h !== node && M.v[i].fa === targetNode.fa && !thumbnails[M.v[i].h])
+                        {
+                            thumbnails[M.v[i].h] = thumbnails[node];
+                            if (M.v[i].seen && M.currentdirid === cdid)
+                                fm_thumbnail_render(M.v[i]);
+                        }
+                    }
+                }
+            });
+        }
     }
+    if (d)
+        console.timeEnd('fm_thumbnails');
 }
 
-function balance2pro(callback)
-{
-    api_req({a: 'uq', pro: 1},
-    {
-        cb: callback,
-        callback: function(res, ctx)
-        {
-            if (typeof res == 'object' && res['balance'] && res['balance'][0])
-            {
-                var pjson = JSON.parse(pro_json);
+function fm_thumbnail_render(n) {
+    if (n && thumbnails[n.h]) {
+        var imgNode = document.getElementById(n.imgId || n.h);
 
-                for (var i in pjson[0])
-                {
-                    if (pjson[0][i][5] == res['balance'][0][0])
-                    {
-                        api_req({a: 'uts', it: 0, si: pjson[0][i][0], p: pjson[0][i][5], c: pjson[0][i][6]},
-                        {
-                            cb: ctx.cb,
-                            callback: function(res, ctx)
-                            {
-                                if (typeof res == 'number' && res < 0 && ctx.cb)
-                                    ctx.cb(false);
-                                else
-                                {
-                                    api_req({a: 'utc', s: [res], m: 0},
-                                    {
-                                        cb: ctx.cb,
-                                        callback: function(res, ctx)
-                                        {
-                                            if (ctx.cb)
-                                                ctx.cb(true);
-                                            u_checklogin({checkloginresult: function(u_ctx, r)
-                                                {
-                                                    if (M.account)
-                                                        M.account.lastupdate = 0;
-                                                    u_type = r;
-                                                    topmenuUI();
-                                                    if (u_attr.p)
-                                                        msgDialog('info', l[1047], l[1048]);
-                                                }});
-                                        }
-                                    });
-                                }
-                            }
+        if (imgNode && (imgNode = imgNode.querySelector('img'))) {
+            n.seen = 2;
+            imgNode.setAttribute('src', thumbnails[n.h]);
+            imgNode.parentNode.classList.add('thumb');
+        }
+    }
+}
+// jscs:enable
+// jshint ignore:end
+
+/**
+ * Code to trigger the mobile file manager download overlay and related behaviour
+ */
+var mobileDownload = {
+
+    /** Supported max file size of 100 MB */
+    maxFileSize: 100 * (1024 * 1024),
+
+    /** Supported file types for download on mobile */
+    supportedFileTypes: {
+        docx: 'word',
+        jpeg: 'image',
+        jpg: 'image',
+        mp3: 'audio',
+        mp4: 'video',
+        pdf: 'pdf',
+        png: 'image',
+        xlsx: 'word'
+    },
+
+    /** Download start time in milliseconds */
+    startTime: null,
+
+    /** jQuery selector for the download overlay */
+    $overlay: null,
+
+    /**
+     * Initialise the overlay
+     * @param {String} nodeHandle A public or regular node handle
+     */
+    showOverlay: function(nodeHandle) {
+
+        // Store the selector as it is re-used
+        this.$overlay = $('#mobile-ui-main');
+
+        // Get initial overlay details
+        var node = M.d[nodeHandle];
+        var fileName = node.name;
+        var fileSizeBytes = node.s;
+        var fileSize = numOfBytes(fileSizeBytes);
+        var fileSizeFormatted = fileSize.size + ' ' + fileSize.unit;
+        var fileIconName = fileIcon(node);
+        var fileIconPath = staticpath + 'images/mobile/extensions/' + fileIconName + '.png';
+
+        // Set file name, size and image
+        this.$overlay.find('.filename').text(fileName);
+        this.$overlay.find('.filesize').text(fileSizeFormatted);
+        this.$overlay.find('.filetype-img').attr('src', fileIconPath);
+
+        // Initialise overlay buttons
+        this.initBrowserFileDownloadButton(nodeHandle);
+        this.initAppFileDownloadButton(nodeHandle);
+        this.initOverlayCloseButton();
+
+        // Change depending on platform and file size/type
+        this.setMobileAppInfo();
+        this.adjustMaxFileSize();
+        this.checkSupportedFile(node);
+
+        // Disable scrolling of the file manager in the background to fix a bug on iOS Safari
+        $('.mobile.fm-block').addClass('disable-scroll');
+
+        // Show the overlay
+        this.$overlay.removeClass('hidden').addClass('overlay');
+    },
+
+    /**
+     * Initialise the Open in Browser button on the file download overlay
+     * @param {String} nodeHandle The node handle for this file
+     */
+    initBrowserFileDownloadButton: function(nodeHandle) {
+
+        this.$overlay.find('.first.dl-browser').off('tap').on('tap', function() {
+
+            // Start the download
+            mobileDownload.startFileDownload(nodeHandle);
+
+            // Prevent default anchor link behaviour
+            return false;
+        });
+    },
+
+    /**
+     * Initialise the Open in Mega App button on the file download overlay
+     * @param {String} nodeHandle The node handle for this file
+     */
+    initAppFileDownloadButton: function(nodeHandle) {
+
+        this.$overlay.find('.second.dl-megaapp').off('tap').on('tap', function() {
+
+            // Start the download
+            mega.utils.redirectToApp($(this));  // ToDo: make the app start the download by node handle directly
+
+            // Prevent default anchor link behaviour
+            return false;
+        });
+    },
+
+    /**
+     * Initialises the close button on the overlay with download button options and also the download progress overlay
+     */
+    initOverlayCloseButton: function() {
+
+        var $closeButton = this.$overlay.find('.fm-dialog-close');
+
+        // Show close button for folder links
+        $closeButton.removeClass('hidden');
+
+        // Add tap handler
+        $closeButton.off('tap').on('tap', function() {
+
+            // Hide overlay with download button options
+            mobileDownload.$overlay.addClass('hidden');
+
+            // Hide downloading progress overlay
+            $('body').removeClass('downloading');
+
+            // Re-show the file manager and re-enable scrolling
+            $('.mobile.fm-block').removeClass('hidden disable-scroll');
+        });
+    },
+
+    /**
+     * Start the file download
+     * @param {String} nodeHandle The node handle for this file
+     */
+    startFileDownload: function(nodeHandle) {
+
+        // Show downloading overlay
+        $('body').addClass('downloading');
+
+        // Reset state from past downloads
+        this.$overlay.find('.download-progress').removeClass('complete');
+        this.$overlay.find('.download-percents').text('');
+        this.$overlay.find('.download-speed').text('');
+        this.$overlay.find('.download-progress span').text(l[1624] + '...');  // Downloading...
+        this.$overlay.find('.download-progress .bar').width('0%');
+
+        // Change message to 'Did you know that you can download the entire folder at once...'
+        this.$overlay.find('.file-manager-download-message').removeClass('hidden');
+
+        // Set the start time
+        this.startTime = new Date().getTime();
+
+        // Start download and show progress
+        mega.utils.gfsfetch(nodeHandle, 0, -1, this.showDownloadProgress).always(function(data) {
+
+            mobileDownload.showDownloadComplete(data, nodeHandle);
+        });
+    },
+
+    /**
+     * Download progress handler
+     * @param {Number} percentComplete The number representing the percentage complete e.g. 49.23, 51.5 etc
+     * @param {Number} bytesLoaded The number of bytes loaded so far
+     * @param {Number} bytesTotal The total number of bytes in the file
+     */
+    showDownloadProgress: function(percentComplete, bytesLoaded, bytesTotal) {
+
+        var $downloadButtonText = mobileDownload.$overlay.find('.download-progress span');
+        var $downloadProgressBar = mobileDownload.$overlay.find('.download-progress .bar');
+        var $downloadPercent = mobileDownload.$overlay.find('.download-percents');
+        var $downloadSpeed = mobileDownload.$overlay.find('.download-speed');
+
+        // Calculate the download speed
+        var percentCompleteRounded = Math.round(percentComplete);
+        var currentTime = new Date().getTime();
+        var secondsElapsed = (currentTime - mobileDownload.startTime) / 1000;
+        var bytesPerSecond = (secondsElapsed) ? (bytesLoaded / secondsElapsed) : 0;
+        var speed = numOfBytes(bytesPerSecond);
+        var speedText = speed.size + speed.unit + '/s';
+
+        // Display the download progress and speed
+        $downloadPercent.text(percentCompleteRounded + '%');
+        $downloadProgressBar.width(percentComplete + '%');
+        $downloadSpeed.text(speedText);
+
+        // If the download is complete e.g. 99/100%, change button text to Decrypting... which can take some time
+        if (percentComplete >= 99) {
+            $downloadButtonText.text(l[8579] + '...');
+        }
+    },
+
+    /**
+     * Download complete handler, activate the Open File button and let the user download the file
+     * @param {Object} data The download data
+     * @param {String} nodeHandle The node handle for this file
+     */
+    showDownloadComplete: function(data, nodeHandle) {
+
+        var $downloadButton = this.$overlay.find('.download-progress');
+        var $downloadButtonText = this.$overlay.find('.download-progress span');
+        var $downloadPercent = this.$overlay.find('.download-percents');
+        var $downloadSpeed = this.$overlay.find('.download-speed');
+
+        // Change button text to full white and hide the download percentage and speed
+        $downloadButton.addClass('complete');
+        $downloadPercent.text('');
+        $downloadSpeed.text('');
+        $downloadButtonText.text(l[8949]);  // Open File
+
+        // Make download button clickable
+        $downloadButton.off('tap').on('tap', function() {
+
+            // Get the file's mime type
+            var node = M.d[nodeHandle];
+            var fileName = node.name;
+            var mimeType = filemime(fileName);
+
+            // Create object URL to download the file to the client
+            location.href = mObjectURL([data.buffer], mimeType);
+        });
+    },
+
+    /**
+     * Change the max file size supported for various platforms based on device testing
+     */
+    adjustMaxFileSize: function() {
+
+        // If Chrome or Firefox on iOS, reduce the size to 1.3 MB
+        if ((navigator.userAgent.match(/CriOS/i)) || (navigator.userAgent.match(/FxiOS/i))) {
+            this.maxFileSize = 1.3 * (1024 * 1024);
+        }
+    },
+
+    /**
+     * Checks if the file download can be performed in the browser or shows an error overlay
+     * @param {Object} node The file node information
+     */
+    checkSupportedFile: function(node) {
+
+        var $openInBrowserButton = this.$overlay.find('.first.dl-browser');
+        var $fileTypeUnsupportedMessage = this.$overlay.find('.file-unsupported');
+        var $fileSizeUnsupportedMessage = this.$overlay.find('.file-too-large');
+
+        // Get the name, size, extension and whether supported
+        var fileName = node.name;
+        var fileSize = node.s;
+        var fileExtension = fileext(fileName);
+        var fileExtensionIsSupported = this.supportedFileTypes[fileExtension];
+
+        // Check if the download is supported
+        if ((fileSize > this.maxFileSize) || !fileExtensionIsSupported) {
+
+            // Show an error overlay
+            $('body').addClass('wrong-file');
+
+            // Remove the tap/click handler and show as greyed out
+            $openInBrowserButton.off('tap').addClass('disabled');
+
+            // Change error message
+            if (!fileExtensionIsSupported) {
+                $fileTypeUnsupportedMessage.removeClass('hidden');
+            }
+            else {
+                $fileSizeUnsupportedMessage.removeClass('hidden');
+            }
+        }
+    },
+
+    /**
+     * Gets the app store link based on the user agent
+     * @returns {String} Returns the link to the relevant app store for the user's platform
+     */
+    getStoreLink: function() {
+
+        switch (ua.details.os) {
+            case 'iPad':
+            case 'iPhone':
+                return 'https://itunes.apple.com/app/mega/id706857885';
+
+            case 'Windows Phone':
+                return 'zune://navigate/?phoneappID=1b70a4ef-8b9c-4058-adca-3b9ac8cc194a';
+
+            case 'Android':
+                return 'https://play.google.com/store/apps/details?id=mega.privacy.android.app' +
+                       '&referrer=meganzindexandroid';
+        }
+    },
+
+    /**
+     * Changes the footer image and text depending on what platform they are on
+     */
+    setMobileAppInfo: function() {
+
+        var $downloadOnAppStoreButton = $('.mobile.download-app');
+        var $appInfoBlock = $('.app-info-block');
+        var $openInBrowserButton = $('.mobile.dl-browser');
+
+        // Change the link
+        $downloadOnAppStoreButton.attr('href', this.getStoreLink());
+
+        switch (ua.details.os) {
+            case 'iPad':
+            case 'iPhone':
+                $appInfoBlock.addClass('ios');
+                break;
+
+            case 'Windows Phone':
+                $appInfoBlock.addClass('wp');
+                $openInBrowserButton.off('tap').addClass('disabled');
+                break;
+
+            case 'Android':
+                $appInfoBlock.addClass('android');
+                break;
+        }
+    }
+};
+
+
+(function() {
+    mBroadcaster.once('boot_done', function() {
+        if (
+            ua.details.browser === "Safari" ||
+            ua.details.browser === "Edge" ||
+            ua.details.browser === "Internet Explorer"
+        ) {
+            return;
+        }
+        // Didn't found a better place for this, so I'm leaving it here...
+        // This is basically a proxy of on paste, that would trigger a new event, which would receive the actual
+        // File object, name, etc.
+        $(document).on('paste', function (event) {
+            if (ua.details.browser === "Safari") {
+                // Safari is not supported
+                return;
+            }
+            else if (
+                ua.details.browser.toLowerCase().indexOf("explorer")  !== -1 ||
+                ua.details.browser.toLowerCase().indexOf("edge")  !== -1
+            ) {
+                // IE is not supported
+                return;
+            }
+
+            var items = (event.clipboardData || event.originalEvent.clipboardData).items;
+            if (!items && event.originalEvent.clipboardData && event.originalEvent.clipboardData.files) {
+                // safari
+                items = event.originalEvent.clipboardData.files;
+            }
+            var fileName = false;
+
+            var blob = null;
+            if (items) {
+                if (ua.details.browser === "Firefox" && items.length === 2) {
+                    // trying to paste an image, but .. FF does not have support for that. (It adds the file icon as
+                    // the image, which is a BAD UX, so .. halt now!)
+                    return;
+                }
+                for (var i = 0; i < items.length; i++) {
+                    if (items[i].type.indexOf("image") === 0) {
+                        if (items[i] instanceof File) {
+                            // Safari, using .files
+                            blob = items[i];
+                        }
+                        else {
+                            blob = items[i].getAsFile();
+                        }
+                    }
+                    else if (items[i].kind === "string") {
+                        items[i].getAsString(function (str) {
+                            fileName = str;
                         });
                     }
                 }
             }
-        }
+
+            if (blob !== null) {
+                if (fileName) {
+                    // we've got the name of the file...
+                    blob.name = fileName;
+                }
+
+                if (!blob.name) {
+                    // no name found..generate dummy name.
+                    var ext = blob.type.replace("image/", "").toLowerCase();
+                    fileName = blob.name = "image." + (ext === "jpeg" ? "jpg" : ext);
+                }
+
+                var simulatedEvent = new $.Event("pastedimage");
+                $(window).trigger(simulatedEvent, [blob, fileName]);
+
+                // was this event handled and preventing default? if yes, prevent the raw event from pasting the
+                // file name text
+                if (simulatedEvent.isDefaultPrevented()) {
+                    event.preventDefault();
+                    return false;
+                }
+            }
+        });
     });
-}
+})();

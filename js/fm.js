@@ -1,8 +1,18 @@
-function voucherCentering(button) {
-    var popupBlock = $('.fm-voucher-popup');
-    var rigthPosition = $('.fm-account-main').outerWidth() - $(popupBlock).outerWidth();
-    var buttonMid = button.width() / 2;
-    popupBlock.css('top', button.position().top - 141);
+function voucherCentering($button) {
+    var $popupBlock = $('.fm-voucher-popup');
+    var popupHeight = $popupBlock.outerHeight();
+
+    $popupBlock.css({
+        'top': $button.offset().top - popupHeight - 10,
+        'right': $('body').outerWidth() -$button.outerWidth() - $button.offset().left
+    });
+
+    if ($button.offset().top + 10 > popupHeight) {
+        $popupBlock.css('top', $button.offset().top - popupHeight - 10);
+    }
+    else {
+        $popupBlock.css('top', $button.offset().top + $button.outerHeight() + 10);
+    }
 }
 
 function deleteScrollPanel(from, data) {
@@ -14,10 +24,12 @@ function deleteScrollPanel(from, data) {
 
 function initAccountScroll(scroll)
 {
-    $('.fm-account-main').jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5, animateScroll: true});
-    jScrollFade('.fm-account-main');
+    $('.account.tab-content:visible').jScrollPane({
+        enableKeyboardNavigation: false, showArrows: true, arrowSize: 5, animateScroll: true
+    });
+    jScrollFade('.account.tab-content:visible');
     if (scroll) {
-        var jsp = $('.fm-account-main').data('jsp');
+        var jsp = $('.account.tab-content:visible').data('jsp');
         if (jsp) {
             jsp.scrollToBottom();
         }
@@ -343,7 +355,7 @@ function initUI() {
     }
     $('.not-logged .fm-not-logged-button.create-account').rebind('click', function()
     {
-        document.location.hash = 'register';
+        loadSubPage('register');
     });
 
     $('.fm-dialog-overlay').rebind('click.fm', function()
@@ -608,18 +620,20 @@ function initUI() {
                 $.copyids = ids;
                 $.copyt = t;
                 setTimeout(function() {
-                    M.copyNodes($.copyids, $.copyt, (dd === 'copydel'), function() {
+                    M.copyNodes($.copyids, $.copyt, (dd === 'copydel'), new MegaPromise())
+                        .done(function() {
 
-                        // Update files count...
-                        if (M.currentdirid === 'shares' && !M.viewmode) {
-                            M.openFolder('shares', 1);
-                        }
-                    }, function(error) {
-                        if (error === EOVERQUOTA) {
-                            return msgDialog('warninga', l[135], l[8435]);
-                        }
-                        return msgDialog('warninga', l[135], l[47], api_strerror(error));
-                    });
+                            // Update files count...
+                            if (M.currentdirid === 'shares' && !M.viewmode) {
+                                M.openFolder('shares', 1);
+                            }
+                        })
+                        .fail(function(error) {
+                            if (error === EOVERQUOTA) {
+                                return msgDialog('warninga', l[135], l[8435]);
+                            }
+                            return msgDialog('warninga', l[135], l[47], api_strerror(error));
+                        });
                 }, 50);
             }
             else if (dd === 'download') {
@@ -640,6 +654,7 @@ function initUI() {
     transferPanelUI();
     UIkeyevents();
     addContactUI();
+    Soon(topmenuUI);
 
     $('.fm-files-view-icon').rebind('click', function() {
 
@@ -692,19 +707,19 @@ function initUI() {
         $('.fm-start-chat-dropdown').addClass('hidden').removeClass('active');
         $('.start-chat-button').removeClass('active');
         $('.nw-tree-panel-arrows').removeClass('active');
-        $('.context-menu-item.dropdown').removeClass('active');
+        $('.dropdown-item.dropdown').removeClass('active');
         $('.fm-tree-header').removeClass('dragover');
         $('.nw-fm-tree-item').removeClass('dragover');
         $('.nw-fm-tree-item.hovered').removeClass('hovered');
 
         // Set to default
-        a = $('.context-menu.files-menu,.context-menu.download');
+        a = $('.dropdown.body.files-menu,.dropdown.body.download');
         a.addClass('hidden');
-        b = a.find('.context-submenu');
+        b = a.find('.dropdown.body.submenu');
         b.attr('style', '');
         b.removeClass('active left-position overlap-right overlap-left mega-height');
         a.find('.disabled,.context-scrolling-block').removeClass('disabled context-scrolling-block');
-        a.find('.context-menu-item.contains-submenu.opened').removeClass('opened');
+        a.find('.dropdown-item.contains-submenu.opened').removeClass('opened');
 
         // Remove all sub-menues from context-menu move-item
         $('#csb_' + M.RootID).empty();
@@ -757,13 +772,11 @@ function initUI() {
         folderlink = 0;
     }
 
-    M.avatars();
-
     if ((typeof dl_import !== 'undefined') && dl_import) {
         importFile();
     }
 
-    $('.context-menu').rebind('contextmenu', function(e) {
+    $('.dropdown.body.context').rebind('contextmenu.dropdown', function(e) {
         if (!localStorage.contextmenu)
             e.preventDefault();
     });
@@ -789,6 +802,7 @@ function initUI() {
                 'contacts':       { root: 'contacts',  prev: null },
                 'transfers':      { root: 'transfers', prev: null },
                 'account':        { root: 'account',  prev: null },
+                'dashboard':    { root: 'dashboard',  prev: null },
                 'inbox':          { root: M.InboxID,   prev: null },
                 'rubbish-bin':    { root: M.RubbishID, prev: null }
             };
@@ -810,12 +824,15 @@ function initUI() {
             }
         }
 
-        if ($(this).hasClass('account')) {
+        if ($(this).hasClass('account') || $(this).hasClass('dashboard')) {
             if (u_type === 0) {
                 ephemeralDialog(l[7687]);
             }
+            else if ($(this).hasClass('dashboard')) {
+                loadSubPage('fm/dashboard');
+            }
             else {
-                document.location.hash = 'fm/account';
+                loadSubPage('fm/account');
             }
             return false;
         }
@@ -844,29 +861,13 @@ function initUI() {
         }
     });
 
-    $('.nw-fm-left-icon').unbind('mouseover');
-    $('.nw-fm-left-icon').bind('mouseover', function() {
-        var tooltip = $(this).find('.nw-fm-left-tooltip');
-        if ($.liTooltipTimer)
-            clearTimeout($.liTooltipTimer);
-        $.liTooltipTimer = window.setTimeout(
-            function() {
-                $(tooltip).addClass('hovered');
-            }, 1000);
-    });
-
-    $('.nw-fm-left-icon').unbind('mouseout');
-    $('.nw-fm-left-icon').bind('mouseout', function() {
-        $(this).find('.nw-fm-left-tooltip').removeClass('hovered');
-        clearTimeout($.liTooltipTimer);
-    });
-
     if (dlMethod.warn && !localStorage.browserDialog && !$.browserDialog)
     {
         setTimeout(browserDialog, 2000);
     }
 
-    var lPane = $('.fm-left-panel');
+    // chat can handle the left-panel resizing on its own
+    var lPane = $('.fm-left-panel').filter(":not(.chat-left-panel)");
     $.leftPaneResizable = new FMResizablePane(lPane, {
         'direction': 'e',
         'minWidth': 200,
@@ -905,8 +906,8 @@ function transferPanelContextMenu(target)
     var file;
     var tclear;
 
-    $('.context-menu.files-menu .context-menu-item').hide();
-    var menuitems = $('.context-menu.files-menu .context-menu-item');
+    $('.dropdown.body.files-menu .dropdown-item').hide();
+    var menuitems = $('.dropdown.body.files-menu .dropdown-item');
 
     menuitems.filter('.transfer-pause,.transfer-play,.move-up,.move-down,.transfer-clear')
         .show();
@@ -996,16 +997,17 @@ function transferPanelContextMenu(target)
 
     var parent = menuitems.parent();
     parent
-        .children('.context-menu-divider').hide().end()
-        .children('.pause-item-divider').show().end()
+        .children('hr').hide().end()
+        .children('hr.pause').show().end();
 
     if (parent.height() < 56) {
-        parent.find('.pause-item-divider').hide();
+        parent.find('hr.pause').hide();
     }
 }
 
 function openTransferpanel()
 {
+    $.tresizer();
     $('.nw-fm-left-icon.transfers').addClass('transfering');
     // Start the new transfer right away even if the queue is paused?
     // XXX: Remove fm_tfspause calls at M.addDownload/addUpload to enable this
@@ -1184,7 +1186,7 @@ function showTransferToast(t_type, t_length, isPaused) {
             $toast = $('.toast-notification.download');
             $second_toast = $('.toast-notification.upload');
             if (t_length > 1) {
-                nt_txt = l[7220].replace('XX',t_length);
+                nt_txt = l[12481].replace('%1', t_length);
             } else {
                 nt_txt = l[7222];
             }
@@ -1193,7 +1195,7 @@ function showTransferToast(t_type, t_length, isPaused) {
             $toast = $('.toast-notification.upload');
             $second_toast = $('.toast-notification.download');
             if (t_length > 1) {
-                nt_txt = l[7221].replace('XX',t_length);
+                nt_txt = l[12480].replace('%1', t_length);
             } else {
                 nt_txt = l[7223];
             }
@@ -1247,15 +1249,6 @@ function showTransferToast(t_type, t_length, isPaused) {
 function hideTransferToast ($toast) {
     $toast.removeClass('visible');
     $('.toast-notification').removeClass('second');
-}
-
-function isValidShareLink()
-{
-    var valid = true;
-    for (var i in u_nodekeys) {
-        valid = valid && typeof u_nodekeys[i] == "object"
-    }
-    return valid;
 }
 
 function removeUInode(h, parent) {
@@ -1678,7 +1671,7 @@ function initAddDialogMultiInputPlugin() {
                     h2 = $multiInput.height();
 
                 // show/hide scroll box
-                if (5 <= h2 / h1 && h2 / h1 < 6) {
+                if ((5 <= h2 / h1) && (h2 / h1 < 6)) {
                     $multiInput.jScrollPane({
                         enableKeyboardNavigation: false,
                         showArrows: true,
@@ -1796,12 +1789,12 @@ function addContactUI() {
             .focus();
     }
 
-    $('.add-user-notification textarea').on('focus', function() {
+    $('.add-user-notification textarea').rebind('focus.add-user-n', function() {
         var $this = $(this);
         $this.parent().addClass('active');
     });
 
-    $('.add-user-notification textarea').on('blur', function() {
+    $('.add-user-notification textarea').rebind('blur.add-user-n', function() {
         $('.add-user-notification').removeClass('active');
     });
 
@@ -1849,8 +1842,8 @@ function addContactUI() {
 
     $('.fm-add-user').rebind('click', function() {
 
-        var $this = $(this),
-            $d = $('.add-user-popup');
+        var $this = $(this);
+        var $d = $('.add-user-popup');
 
         $.hideContextMenu();
         $.dialog = 'add-contact-popup';
@@ -1868,6 +1861,7 @@ function addContactUI() {
         else {
             $('.add-user-popup .import-contacts-dialog').fadeOut(0);
             $('.import-contacts-link').removeClass('active');
+            clearScrollPanel('.add-user-popup');
             $this.addClass('active');
             $d.removeClass('hidden dialog');
             $('.add-user-popup .multiple-input .token-input-token-mega').remove();
@@ -1875,21 +1869,14 @@ function addContactUI() {
             $('.add-user-popup-button.add').addClass('disabled');
             $('.add-user-popup .nw-fm-dialog-title').text(l[71]);
 
-            var pos = $(window).width() - $this.offset().left - $d.outerWidth() + 2;
-
-            // Positioning, not less then 8px from right side
-            if (pos > 8) {
-                $d.css('right', pos + 'px');
-            }
-            else {
-                $d.css('right', 8 + 'px');
-            }
+            topPopupAlign(this, '.add-user-popup');
 
             initTextareaScrolling($('.add-user-textarea textarea'), 39);
             focusOnInput();
         }
 
         iconSize(true);
+        return false;
     });
 
     // List of elements related to pending contacts
@@ -1912,16 +1899,14 @@ function addContactUI() {
     // fm-received-requests 'View received requests'
 
     // View received contact requests, M.ipc
-    $('.fm-received-requests, .empty-sent-requests-button').off('click');
-    $('.fm-received-requests, .empty-sent-requests-button').on('click', function() {
+    $('.fm-received-requests, .empty-sent-requests-button').rebind('click', function() {
         M.openFolder('ipc');
         $('.fm-contact-requests').removeClass('active');
         $(this).addClass('active');
     });
 
     // View sent contact requests, M.opc
-    $('.fm-contact-requests, .empty-contact-requests-button').off('click');
-    $('.fm-contact-requests, .empty-contact-requests-button').on('click', function() {
+    $('.fm-contact-requests, .empty-contact-requests-button').rebind('click', function() {
         M.openFolder('opc');
         $('.fm-received-requests').removeClass('active');
         $(this).addClass('active');
@@ -1963,14 +1948,12 @@ function addContactUI() {
         }
     });
 
-    $('.add-user-popup-button').off('click');
-    $('.add-user-popup-button').on('click', function() {
+    $('.add-user-popup-button').rebind('click', function() {
 
         addNewContact($(this));
     });
 
-    $('.add-user-popup .fm-dialog-close').off('click');
-    $('.add-user-popup .fm-dialog-close').on('click', function() {
+    $('.add-user-popup .fm-dialog-close').rebind('click', function() {
 
         fm_hideoverlay();
         $('.add-user-popup').addClass('hidden');
@@ -1978,8 +1961,7 @@ function addContactUI() {
         clearScrollPanel('.add-user-popup');
     });
 
-    $('.add-user-popup .import-contacts-service').unbind('click');
-    $('.add-user-popup .import-contacts-service').bind('click', function() {
+    $('.add-user-popup .import-contacts-service').rebind('click', function() {
 
         // NOT imported
         if (!$(this).is('.imported')) {
@@ -2000,15 +1982,13 @@ function addContactUI() {
         }
     });
 
-    $('.add-user-popup .import-contacts-link').unbind('click');
-    $('.add-user-popup .import-contacts-link').bind('click', function(e) {
+    $('.add-user-popup .import-contacts-link').rebind('click', function(e) {
 
         if (!$(this).is('.active')) {
             $('.add-user-popup .import-contacts-link').addClass('active');// Do not use this, because of doubled class
             $('.add-user-popup .import-contacts-dialog').fadeIn(200);
 
-            $('.imported-notification-close').unbind('click');
-            $('.imported-notification-close').bind('click', function()
+            $('.imported-notification-close').rebind('click', function()
             {
                 $('.imported-contacts-notification').fadeOut(200);
             });
@@ -2023,13 +2003,11 @@ function addContactUI() {
         e.preventDefault();
     });
 
-    $('.add-user-popup .import-contacts-info').unbind('mouseover');
-    $('.add-user-popup .import-contacts-info').bind('mouseover', function() {
+    $('.add-user-popup .import-contacts-info').rebind('mouseover.add-user-p', function() {
         $('.add-user-popup .import-contacts-info-txt').fadeIn(200);
     });
 
-    $('.add-user-popup .import-contacts-info').unbind('mouseout');
-    $('.add-user-popup .import-contacts-info').bind('mouseout', function() {
+    $('.add-user-popup .import-contacts-info').rebind('mouseout.add-user-p', function() {
         $('.add-user-popup .import-contacts-info-txt').fadeOut(200);
     });
 }
@@ -2103,37 +2081,31 @@ function ephemeralDialog(msg) {
 
     msgDialog('confirmation', l[998], msg + ' ' + l[999], l[1000], function(e) {
         if (e) {
-            document.location.hash = 'register';
+            loadSubPage('register');
         }
     });
 }
 
-/**
- * Removes the user from the share
- *
- * @param {String} shareId The share id
- * @param {Boolean} nfk
- */
-function removeShare(shareId, nfk) {
-
+// leave incoming share h
+// FIXME: implement sn tagging to prevent race condition
+function leaveShare(h) {
     if (d) {
-        console.log('removeShare', shareId);
+        console.log('leaveShare', h);
     }
 
-    if (!nfk) {
-        api_updfkey(shareId);
+    // leaving inner nested shares is not allowed: walk to the share root
+    while (M.d[h] && M.d[M.d[h].p]) {
+        h = M.d[h].p;
     }
 
-    M.delNode(shareId);
-    api_req({ a: 'd', n: shareId, i: requesti });
+    if (M.d[h] && M.d[h].su) {
+        loadingDialog.show(); // this will be hidden somewhere else after processing the action-packet
 
-    M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
-
-    if ((M.currentdirid === shareId) || (isCircular(shareId, M.currentdirid) === true)) {
-        M.openFolder(RootbyId(shareId));
+        api_req({ a: 'd', n: h/*, i: requesti*/ });
     }
-
-    delete u_sharekeys[shareId];
+    else if (d) {
+        console.warn('Cannot leaveShare', h);
+    }
 }
 
 function fmremove() {
@@ -2147,7 +2119,7 @@ function fmremove() {
         var n = M.d[$.selected[i]];
 
         // ToDo: Not clear what this represents
-        if (n && n.p.length === 11) {
+        if (n && n.su) {
             removesharecnt++;
         }
 
@@ -2169,7 +2141,7 @@ function fmremove() {
 
     if (removesharecnt) {
         for (var i in $.selected) {
-            removeShare($.selected[i]);
+            leaveShare($.selected[i]);
         }
         M.openFolder('shares', true);
     }
@@ -2196,9 +2168,10 @@ function fmremove() {
                 $.selected.forEach(function(selected) {
 
                     if (M.c[selected]) {
-                        M.c[selected].forEach(function(sharenode) {
-                            removeShare(sharenode, 1);
-                        });
+                        Object.keys(M.c[selected])
+                            .forEach(function(sharenode) {
+                                leaveShare(sharenode);
+                            });
                     }
 
                     api_req({ a: 'ur2', u: $.selected[i], l: '0', i: requesti });
@@ -2219,9 +2192,47 @@ function fmremove() {
             $('#msgDialog .fm-del-contact-avatar').html(avatar);
         }
     }
-    // Remove/Clean rubbih bin
+
+    // Remove selected nodes from rubbish bin
     else if (RootbyId($.selected[0]) === M.RubbishID) {
-        msgDialog('clear-bin', l[1003], l[76].replace('[X]', (filecnt + foldercnt)) + ' ' + l[77], l[1007], function(e) {
+
+        var dlgMessage = '';
+        var toastMessage = '';
+
+        if ((filecnt === 1) && (!foldercnt)) {
+            dlgMessage = l[13749];// 1 file
+            toastMessage = l[13757];
+        }
+        else if ((filecnt > 1) && (!foldercnt)) {
+            dlgMessage = l[13750].replace('%1', filecnt);
+            toastMessage = l[13758].replace('%1', filecnt);
+        }
+        else if ((!filecnt) && (foldercnt === 1)) {
+            dlgMessage = l[13751];// 1 folder
+            toastMessage = l[13759];
+        }
+        else if ((!filecnt) && (foldercnt > 1)) {
+            dlgMessage = l[13752].replace('%1', foldercnt);
+            toastMessage = l[13760].replace('%1', foldercnt);
+        }
+        else if ((filecnt === 1) && (foldercnt === 1)) {
+            dlgMessage = l[13753];// 1 file 1 folder
+            toastMessage = l[13761];
+        }
+        else if ((filecnt === 1) && (foldercnt > 1)) {
+            dlgMessage = l[13754].replace('%1', foldercnt);
+            toastMessage = l[13762].replace('%1', foldercnt);
+        }
+        else if ((filecnt > 1) && (foldercnt === 1)) {
+            dlgMessage = l[13755].replace('%1', filecnt);
+            toastMessage = l[13763].replace('%1', filecnt);
+        }
+        else if ((filecnt > 1) && (foldercnt > 1)) {
+            dlgMessage = l[13756].replace('%1', filecnt).replace('%2', foldercnt);
+            toastMessage = l[13764].replace('%1', filecnt).replace('%2', foldercnt);
+        }
+
+        msgDialog('clear-bin', l[1003], dlgMessage, l[1007], function(e) {
             if (e) {
                 var tmp = null;
                 if (String(M.currentdirid).substr(0, 7) === 'search/') {
@@ -2233,12 +2244,17 @@ function fmremove() {
                 if (tmp) {
                     M.currentdirid = tmp;
                 }
+
+                showToast('settings', toastMessage);
             }
         });
-        $('.fm-dialog-button.notification-button').each(function(i, e) {
-            if ($(e).text() === l[1018])
-                $(e).html('<span>'+l[83]+'</span>');
-        });
+
+        // ToDo: is this necessary?
+        // $('.fm-dialog-button.notification-button').each(function(i, e) {
+        //     if ($(e).text() === l[1018]) {
+        //         $(e).safeHTML('<span>@@</span>', l[83]);
+        //     }
+        // });
     }
 
     // Remove contacts
@@ -2263,23 +2279,18 @@ function fmremove() {
             }
         }
         else {
-
-            // Additional message in case that there's a shared node
-            var delShareInfo,
-
             // Contains complete directory structure of selected nodes, their ids
-            dirTree = [];
+            var selected = [], dirTree = [];
 
             for (var i in $.selected) {
-                if ($.selected.hasOwnProperty(i)) {
-                    var nodes = fm_getnodes($.selected[i], 1);
-                    nodes.unshift($.selected[i]);
-                    dirTree = dirTree.concat(nodes);
-                }
+                selected.push($.selected[i]);
+                var nodes = fm_getnodes($.selected[i], true);
+                dirTree = dirTree.concat(nodes);
             }
 
+            // Additional message in case that there's a shared node
             var share = new mega.Share({});
-            delShareInfo = share.isShareExist(dirTree, true, true, true) ? ' ' + l[1952] + ' ' + l[7410] : '';
+            var delShareInfo = share.isShareExist(dirTree, true, true, true) ? ' ' + l[1952] + ' ' + l[7410] : '';
 
             msgDialog('remove', l[1003], l[1004].replace('[X]', fm_contains(filecnt, foldercnt)) + delShareInfo, false, function(e) {
                 if (e) {
@@ -2287,32 +2298,76 @@ function fmremove() {
                         M.copyNodes($.selected, M.RubbishID, true);
                     }
                     else {
+                        var delctx = { pending : 1, selected : selected };
 
                         // Remove all shares related to selected nodes
-                        for (var selection in dirTree) {
-                            if (dirTree.hasOwnProperty(selection)) {
+                        for (var i = dirTree.length; i--; ) {
+                            var h = dirTree[i];
 
-                                // Remove regular/full share
-                                for (var share in Object(M.d[dirTree[selection]]).shares) {
-                                    if (M.d[dirTree[selection]].shares.hasOwnProperty(share)) {
-                                        api_req({ a: 's2', n:  dirTree[selection], s: [{ u: M.d[dirTree[selection]].shares[share].u, r: ''}], ha: '', i: requesti });
-                                        M.delNodeShare(dirTree[selection], M.d[dirTree[selection]].shares[share].u);
-                                        setLastInteractionWith(dirTree[selection], "0:" + unixtime());
-                                    }
-                                }
+                            // remove established shares
+                            for (var share in Object(M.d[dirTree[i]]).shares) {
+                                delctx.pending++;
+                                api_req({ a: 's2',
+                                          n: h,
+                                          s: [{ u: M.d[h].shares[share].u, r: ''}],
+                                          ha: '',
+                                          i: requesti
+                                        }, {
+                                          n: h,
+                                          u: M.d[h].shares[share].u,
+                                          delctx: delctx,
+                                          callback: function(res, ctx) {
+                                                if (typeof res == 'object') {
+                                                    // FIXME: verify error codes in res.r
+                                                    M.delNodeShare(ctx.n, ctx.u);
+                                                    setLastInteractionWith(ctx.u, "0:" + unixtime());
+                                                }
+                                                else {
+                                                    // FIXME: display error to user
+                                                }
 
-                                // Remove pending share
-                                for (var pendingUserId in M.ps[dirTree[selection]]) {
-                                    if (M.ps[dirTree[selection]].hasOwnProperty(pendingUserId)) {
-                                        api_req({ a: 's2', n:  dirTree[selection], s: [{ u: pendingUserId, r: ''}], ha: '', i: requesti });
-                                        M.deletePendingShare(dirTree[selection], pendingUserId);
+                                                if (!--ctx.delctx.pending) {
+                                                    M.moveNodes(ctx.delctx.selected, M.RubbishID);
+                                                }
+                                            }
+                                        });
+                            }
+
+                            // remove pending shares
+                            for (var pendingUserId in M.ps[h]) {
+                                var userEmailOrID = Object(M.opc[pendingUserId]).m || pendingUserId;
+                                delctx.pending++;
+                                api_req({
+                                    a: 's2',
+                                    n: h,
+                                    s: [{u: userEmailOrID, r: ''}],
+                                    ha: '',
+                                    i: requesti
+                                }, {
+                                    n: h,
+                                    u: pendingUserId,
+                                    delctx: delctx,
+                                    callback: function(res, ctx) {
+                                        if (typeof res == 'object') {
+                                            // FIXME: verify error codes in res.r
+                                            M.deletePendingShare(ctx.n, ctx.u);
+                                        }
+                                        else {
+                                            // FIXME: display error to user
+                                        }
+
+                                        if (!--ctx.delctx.pending) {
+                                            M.moveNodes(ctx.delctx.selected, M.RubbishID);
+                                        }
                                     }
-                                }
+                                });
                             }
                         }
-                        M.moveNodes($.selected, M.RubbishID);
-                    }
 
+                        if (!--delctx.pending) {
+                            M.moveNodes(delctx.selected, M.RubbishID);
+                        }
+                    }
                 }
             }, true);
         }
@@ -2360,49 +2415,23 @@ function fmremdupes(test)
 
 function initContextUI() {
 
-    var c = '.context-menu-item';
+    var c = '.dropdown.body.context .dropdown-item';
 
-    $('.context-menu-section').off('mouseover', c);
-    $('.context-menu-section').on('mouseover', c, function() {
-
-        // is move... or download...
-        if ($(this).parent().parent().is('.context-submenu')) {
-
-            // if just item hide child context-submenu
-            if (!$(this).is('.contains-submenu')) {
-                $(this).parent().children().removeClass('active opened');
-                $(this).parent().find('.context-submenu').addClass('hidden');
-            }
-        }
-
-        // Hide all submenues, for download and for move...
-        else {
-            if (!$(this).is('.contains-submenu')) {
-                $('.context-menu .context-submenu.active ').removeClass('active');
-                $('.context-menu .contains-submenu.opened').removeClass('opened');
-                $('.context-menu .context-submenu').addClass('hidden');
-            }
-        }
-    });
-
-    $('.context-menu-section').off('mouseover', '.contains-submenu');
-    $('.context-menu-section').on('mouseover', '.contains-submenu', function() {
-
+    $('.dropdown-section').off('mouseover', '.dropdown-item');
+    $('.dropdown-section').on('mouseover', '.dropdown-item', function() {
         var $this = $(this),
-            // situation when we have 2 contains-submenus in same context-submenu one near another
-            b = $this.closest('.context-submenu').find('.context-submenu,.contains-submenu').not($this.next()),
-            a = $this.next(),// context-submenu
             pos = $this.offset(),
             menuPos,
             currentId;
 
-        a.children().removeClass('active opened');
-        a.find('.context-submenu').addClass('hidden');
-        a.find('.opened').removeClass('opened');
-
-        if (b.length) {
-            b.removeClass('active opened')
-                .find('.context-submenu').addClass('hidden');
+        // Hide opened submenus
+        if (!$this.parent().parent().hasClass('submenu')) {
+            $('.dropdown-item').removeClass('opened');
+            $('.dropdown.body.submenu').removeClass('active');
+        }
+        else {
+            $this.parent().find('.dropdown-item').removeClass('opened');
+            $this.parent().find('.submenu').removeClass('active');
         }
 
         currentId = $this.attr('id');
@@ -2410,58 +2439,29 @@ function initContextUI() {
             M.buildSubMenu(currentId.replace('fi_', ''));
         }
 
-        if ($this.is('.move-item')) {
-            $('.context-menu .download-item').removeClass('opened')
-                .next().removeClass('active opened')
-                .next().find('.context-submenu').addClass('hidden');
-        }
-        if ($this.is('.download-item')) {
-            $('.context-menu .move-item').removeClass('opened')
-                .next().removeClass('active opened')
-                .next().find('.context-submenu').addClass('hidden');
-        }
-        if (!$this.is('.opened')) {
-            menuPos = reCalcMenuPosition($this, pos.left, pos.top, 'submenu'),
+        // Show necessary submenu
+        if (!$this.hasClass('opened') && $this.hasClass('contains-submenu')) {
+            menuPos = reCalcMenuPosition($this, pos.left, pos.top, 'submenu');
 
-            $this.next('.context-submenu')
+            $this.next('.submenu')
                 .css({'top': menuPos.top})
-                .addClass('active')
-                .removeClass('hidden');
+                .addClass('active');
 
             $this.addClass('opened');
         }
     });
 
-    $(c + '.cloud-item').rebind('click', function() {
-
-        var t = $(this).attr('id').replace('fi_', ''),
-            n = [];
+    var safeMoveNodes = function() {
         if (!$(this).is('.disabled')) {
-            for (var i in $.selected) {
-                if (!isCircular($.selected[i], t)) {
-                    n.push($.selected[i]);
-                }
-            }
             $.hideContextMenu();
-            M.moveNodes(n, t);
+            M.safeMoveNodes(String($(this).attr('id')).replace('fi_', ''));
         }
-    });
+    };
+    $(c + '.cloud-item').rebind('click', safeMoveNodes);
 
-    $('.context-menu.files-menu').off('click', '.folder-item');
-    $('.context-menu.files-menu').on('click', '.folder-item', function() {
-
-        var t = $(this).attr('id').replace('fi_', ''),
-            n = [];
-        if (!$(this).is('.disabled')) {
-            for (var i in $.selected) {
-                if (!isCircular($.selected[i], t)) {
-                    n.push($.selected[i]);
-                }
-            }
-            $.hideContextMenu();
-            M.moveNodes(n, t);
-        }
-    });
+    $('.dropdown.body.files-menu').off('click', '.folder-item');
+    $('.dropdown.body.files-menu').on('click', '.folder-item', safeMoveNodes);
+    safeMoveNodes = undefined;
 
     $(c + '.download-item').rebind('click', function(event) {
         var c = $(event.target).attr('class');
@@ -2478,8 +2478,6 @@ function initContextUI() {
     });
 
     $(c + '.getlink-item').rebind('click', function() {
-
-        var selectedNodeHandle;
 
         if (u_type === 0) {
             ephemeralDialog(l[1005]);
@@ -2515,6 +2513,7 @@ function initContextUI() {
             // this is used like identifier when key with key code 27 is pressed
             $.dialog = 'share';
             $.hideContextMenu();
+            clearScrollPanel('.share-dialog');
 
             // Show the share dialog
             $shareDialog.removeClass('hidden');
@@ -2525,7 +2524,6 @@ function initContextUI() {
 
             fm_showoverlay();
             handleShareDialogContent();
-
         }
     });
 
@@ -2578,7 +2576,7 @@ function initContextUI() {
 
         if (user_handle.length === 1) {
             if (!$this.is(".disabled") && user_handle) {
-                window.location = "#fm/chat/" + user_handle;
+                loadSubPage('fm/chat/' + user_handle);
             }
         }
         else {
@@ -2592,7 +2590,7 @@ function initContextUI() {
         var room;
 
         if (!$this.is(".disabled") && user_handle) {
-            window.location = "#fm/chat/" + user_handle;
+            loadSubPage('fm/chat/' + user_handle);
             room = megaChat.createAndShowPrivateRoomFor(user_handle);
             if (room) {
                 room.startAudioCall();
@@ -2606,7 +2604,7 @@ function initContextUI() {
         var room;
 
         if (!$this.is(".disabled") && user_handle) {
-            window.location = "#fm/chat/" + user_handle;
+            loadSubPage('fm/chat/' + user_handle);
             room = megaChat.createAndShowPrivateRoomFor(user_handle);
             if (room) {
                 room.startVideoCall();
@@ -2631,10 +2629,9 @@ function initContextUI() {
     });
 
     $(c + '.add-star-item').rebind('click', function() {
+        var newFavState = Number(!M.isFavourite($.selected));
 
-        var delFavourite = M.isFavourite($.selected);
-
-        M.favourite($.selected, delFavourite);
+        M.favourite($.selected, newFavState);
 
         if (M.viewmode) {
             $('.file-block').removeClass('ui-selected');
@@ -2642,6 +2639,32 @@ function initContextUI() {
         else {
             $('.grid-table.fm tr').removeClass('ui-selected');
         }
+    });
+
+    $('.labels .dropdown-colour-item').rebind('click', function() {
+        var labelId = parseInt(this.dataset.labelId);
+
+        if (labelId && (rightsById($.selected[0]) > 1)) {
+            M.colourLabeling($.selected, labelId);
+        }
+    });
+
+    $('.labels .dropdown-colour-item').rebind('mouseover', function() {
+        var labelTxt = this.dataset.labelTxt;
+        var labelInfo;
+
+        if ($(this).hasClass('active')) {
+            labelInfo = l[16222];
+        }
+        else {
+            labelInfo = l[16221];
+        }
+        labelTxt = labelInfo.replace('%1', '"' + labelTxt + '"');
+        $('.labels .dropdown-color-info').text(labelTxt).addClass('active');
+    });
+
+    $('.labels .dropdown-colour-item').rebind('mouseout', function() {
+        $('.labels .dropdown-color-info').removeClass('active');
     });
 
     $(c + '.open-item').rebind('click', function() {
@@ -2663,7 +2686,7 @@ function initContextUI() {
                 fm_tfsmove(id, -1);
             });
         $('.transfer-table tr.ui-selected').removeClass('ui-selected');
-        Soon(fm_tfsupdate);
+        delay('fm_tfsupdate', fm_tfsupdate);
     });
 
     $(c + '.move-down').rebind('click', function() {
@@ -2674,7 +2697,7 @@ function initContextUI() {
                 fm_tfsmove(id, 1);
             });
         $('.transfer-table tr.ui-selected').removeClass('ui-selected');
-        Soon(fm_tfsupdate);
+        delay('fm_tfsupdate', fm_tfsupdate);
     });
 
     $(c + '.transfer-play').rebind('click', function() {
@@ -2690,10 +2713,6 @@ function initContextUI() {
     $(c + '.transfer-pause').rebind('click', function() {
         $('.transfer-table tr.ui-selected').attrs('id').map(fm_tfspause);
         $('.transfer-table tr.ui-selected').removeClass('ui-selected');
-    });
-
-    $(c + '.select-all').rebind('click', function() {
-        selectionManager.select_all();
     });
 
     $(c + '.network-diagnostic').rebind('click', function() {
@@ -2740,12 +2759,7 @@ function createFolderUI() {
         if (c.indexOf('active') === -1) {
             b1.addClass('active');
             d1.removeClass('hidden');
-            var w1 = $(window).width() - $(this).offset().left - d1.outerWidth() + 2;
-            if (w1 > 8) {
-                d1.css('right', w1 + 'px');
-            } else {
-                d1.css('right', 8 + 'px');
-            }
+            topPopupAlign(this, '.dropdown.create-new-folder');
             $('.create-new-folder input').focus();
         }
         else {
@@ -2795,13 +2809,14 @@ function createFolderUI() {
 
         $('.fm-new-folder').addClass('active');
         $('.create-new-folder').removeClass('hidden');
+        topPopupAlign('.link-button.fm-new-folder', '.add-user-popup');
+
         createFolderDialog(1);
         $('.create-folder-dialog input').val(l[157]);
         $('.create-new-folder input').focus();
     });
 
-    $('.create-new-folder input').unbind('keyup');
-    $('.create-new-folder input').bind('keyup', function(e) {
+    $('.create-new-folder input').rebind('keyup.create-new-f', function(e) {
         $('.create-new-folder').addClass('filled-input');
         if ($(this).val() == '') {
             $('.create-new-folder').removeClass('filled-input');
@@ -2811,16 +2826,14 @@ function createFolderUI() {
         }
     });
 
-    $('.create-new-folder input').unbind('focus');
-    $('.create-new-folder input').bind('focus', function() {
+    $('.create-new-folder input').rebind('focus.create-new-f', function() {
         if ($(this).val() == l[157]) {
             $(this).val('');
         }
         $('.create-new-folder').addClass('focused');
     });
 
-    $('.create-new-folder input').unbind('blur');
-    $('.create-new-folder input').bind('blur', function() {
+    $('.create-new-folder input').rebind('blur.create-new-f', function() {
         if ($('.create-new-folder input').val() == '') {
             $('.create-new-folder input').val(l[157]);
         }
@@ -2830,15 +2843,15 @@ function createFolderUI() {
 
 function doCreateFolderUI() {
 
-    if ($('.create-folder-input-bl input').val() === '') {
-        $('.create-folder-input-bl input').animate({backgroundColor: "#d22000"}, 150, function() {
-            $('.create-folder-input-bl input').animate({backgroundColor: "white"}, 350, function() {
-                $('.create-folder-input-bl input').focus();
+    if ($('.create-new-folder input').val() === '') {
+        $('.create-new-folder input').animate({backgroundColor: "#d22000"}, 150, function() {
+            $('.create-new-folder input').animate({backgroundColor: "white"}, 350, function() {
+                $('.create-new-folder input').focus();
             });
         });
     }
     else {
-        createFolder(M.currentdirid, $('.create-folder-input-bl input').val());
+        createFolder(M.currentdirid, $('.create-new-folder input').val());
     }
 }
 
@@ -2851,17 +2864,20 @@ function fmtopUI() {
     $('.fm-clearbin-button,.fm-add-user,.fm-new-folder,.fm-file-upload,.fm-folder-upload').addClass('hidden');
     $('.fm-contact-requests,.fm-received-requests').removeClass('active');
     $('.fm-new-folder').removeClass('filled-input');
+    $('.fm-right-files-block').removeClass('visible-notification rubbish-bin');
 
     if (M.currentrootid === M.RubbishID) {
         $('.fm-clearbin-button').removeClass('hidden');
-        $('.fm-right-files-block').addClass('rubbish-bin');
+        $('.fm-right-files-block').addClass('rubbish-bin visible-notification');
     }
     else {
-        $('.fm-right-files-block').removeClass('rubbish-bin');
         if (M.currentrootid === M.InboxID) {
             if (d) {
                 console.log('Inbox');
             }
+        }
+        else if (M.currentrootid === 'shares') {
+            $('.fm-right-files-block').addClass('visible-notification');
         }
         else if (M.currentdirid === 'contacts'
                 || M.currentdirid === 'ipc'
@@ -2885,13 +2901,23 @@ function fmtopUI() {
             }
         }
         else if (String(M.currentdirid).length === 8
-                && RightsbyID(M.currentdirid) > 0) {
+                && rightsById(M.currentdirid) > 0) {
 
+            $('.fm-right-files-block').addClass('visible-notification');
             $('.fm-new-folder').removeClass('hidden');
             $('.fm-file-upload').removeClass('hidden');
             if ((is_chrome_firefox & 2) || 'webkitdirectory' in document.createElement('input')) {
                 $('.fm-folder-upload').removeClass('hidden');
-            } else {
+            }
+            else if (ua.details.engine === 'Gecko') {
+                $('.fm-folder-upload').removeClass('hidden');
+                $('input[webkitdirectory], .fm-folder-upload input')
+                    .rebind('click', function() {
+                        firefoxDialog();
+                        return false;
+                    });
+            }
+            else {
                 $('.fm-file-upload').addClass('last-button');
             }
         }
@@ -2962,1525 +2988,12 @@ function notificationsUI(close)
     $.tresizer();
 }
 
-function accountUI() {
-
-    var sectionTitle;
-    var sectionClass;
-
-    $('.fm-account-overview').removeClass('hidden');
-    $('.fm-account-button').removeClass('active');
-    $('.fm-account-sections').addClass('hidden');
-    $('.fm-right-files-block').addClass('hidden');
-    $('.section.conversations').addClass('hidden');
-    $('.fm-right-account-block').removeClass('hidden');
-    $('.nw-fm-left-icon').removeClass('active');
-    $('.nw-fm-left-icon.settings').addClass('active');
-    $('.fm-account-main').removeClass('white-bg');
-
-    if ($('.fmholder').hasClass('transfer-panel-opened')) {
-        $.transferClose();
-    }
-
-    //Destroy jScrollings in select dropdowns
-    $('.fm-account-main .default-select-scroll').each(function(i, e) {
-        $(e).parent().fadeOut(200).parent().removeClass('active');
-        deleteScrollPanel(e, 'jsp');
-    });
-
-    sectionUIopen('account');
-    if (typeof zxcvbn === 'undefined' && !silent_loading) {
-        silent_loading = accountUI;
-        jsl.push(jsl2['zxcvbn_js']);
-        return jsl_start();
-    }
-
-    M.accountData(function(account) {
-
-        var perc, warning, perc_c;
-        var id = document.location.hash;
-
-        if (id == '#fm/account/settings') {
-            $('.fm-account-settings').removeClass('hidden');
-            sectionTitle = l[823];
-            sectionClass = 'settings';
-
-            $('#network-testing-button').rebind('click', function() {
-                mega.utils.require('network_js')
-                    .then(function() {
-                        NetworkTesting.dialog();
-                    });
-            });
-
-            if (is_chrome_firefox) {
-                if (!$('#acc_dls_folder').length) {
-                    $('#acc_use_ssl').before(
-                        $('<div id="acc_dls_folder" style="margin-top:25px">' +
-                            '<div class="account-bandwidth-txt">Downloads folder:</div>' +
-                            '<input type="button" value="Browse..." style="-moz-appearance:' +
-                                'button;margin-right:12px;cursor:pointer" />' +
-                            '</div>'));
-                    var fld = mozGetDownloadsFolder();
-                    $('#acc_dls_folder').append($('<span/>').text(fld && fld.path));
-                    $('#acc_dls_folder input').click(function() {
-                        var fs = mozFilePicker(0,2);
-                        if (fs) {
-                            mozSetDownloadsFolder(fs);
-                            $(this).next().text(fs.path);
-                        }
-                    });
-                }
-            }
-        }
-        else if (id == '#fm/account/profile') {
-            $('.fm-account-main').addClass('white-bg');
-            $('.fm-account-profile').removeClass('hidden');
-            sectionTitle = l[984];
-            sectionClass = 'profile';
-        }
-        else if (id == '#fm/account/history') {
-            $('.fm-account-main').addClass('white-bg');
-            $('.fm-account-history').removeClass('hidden');
-            sectionTitle = l[985];
-            sectionClass = 'history';
-        }
-        else if (id == '#fm/account/reseller' && M.account.reseller) {
-            $('.fm-account-reseller').removeClass('hidden');
-            sectionTitle = l[6873];
-            sectionClass = 'reseller';
-        }
-        else {
-            // This is the main entry point for users who just had upgraded their accounts
-            if (isNonActivatedAccount()) {
-                alarm.nonActivatedAccount.render(true);
-            }
-
-            $('.fm-account-overview').removeClass('hidden');
-            sectionTitle = l[983];
-            sectionClass = 'overview';
-        }
-
-        $('.fm-account-button.' + sectionClass).addClass('active');
-        $('.fm-breadcrumbs.account').addClass('has-next-button');
-        $('.fm-breadcrumbs.next').attr('class', 'fm-breadcrumbs next ' + sectionClass).find('span').text(sectionTitle);
-
-        $('.fm-account-blocks .membership-icon.type').removeClass('free pro1 pro2 pro3 pro4');
-
-        if (u_attr.p) {
-
-            // LITE/PRO account
-            var planNum = u_attr.p;
-            var planText = getProPlan(planNum);
-
-            $('.membership-big-txt.accounttype').text(planText);
-            $('.fm-account-blocks .membership-icon.type').addClass('pro' + planNum);
-
-            // Subscription
-            if (account.stype == 'S') {
-                $('.fm-account-header.typetitle').text(l[434]);
-                if (account.scycle == '1 M') {
-                    $('.membership-big-txt.type').text(l[748]);
-                }
-                else if (account.scycle == '1 Y') {
-                    $('.membership-big-txt.type').text(l[749]);
-                }
-                else {
-                    $('.membership-big-txt.type').text('');
-                }
-
-                // Get the date their subscription will renew
-                var timestamp = account.srenew[0];
-                var paymentType = htmlentities('(' + account.sgw.join(',') + ')');      // Credit card etc
-
-                // Display the date their subscription will renew in format '14 March 2015 (credit card)'
-                if (timestamp > 0) {
-                    var date = new Date(timestamp * 1000);
-                    var dateString = l[6971] + ' ' + date.getDate() + ' ' + date_months[date.getMonth()] + ' ' + date.getFullYear();
-                    $('.membership-medium-txt.expiry').html(dateString + ' ' + paymentType);
-                }
-                else {
-                    // Otherwise just show payment type
-                    $('.membership-medium-txt.expiry').html(paymentType);
-                }
-
-                // Check if there are any active subscriptions
-                // ccqns = Credit Card Query Number of Subscriptions
-                api_req({ a: 'ccqns' },
-                {
-                    callback : function(numOfSubscriptions, ctx)
-                    {
-                        // If there is an active subscription
-                        if (numOfSubscriptions > 0) {
-
-                            // Show cancel button and show cancellation dialog
-                            $('.fm-account-blocks .btn-cancel').show().rebind('click', function() {
-                                cancelSubscriptionDialog.init();
-                            });
-                            $('.subscription-bl').addClass('active-subscription');
-                        }
-                    }
-                });
-            }
-            else if (account.stype == 'O') {
-
-                // one-time or cancelled subscription
-                $('.fm-account-header.typetitle').text(l[746]+':');
-                $('.membership-big-txt.type').text(l[751]);
-                $('.membership-medium-txt.expiry a').rebind('click', function() {
-                    document.location = $(this).attr('href');
-                });
-                $('.membership-medium-txt.expiry a').html(l[987] + ' ' + time2date(account.expiry));
-                $('.fm-account-blocks .btn-cancel').hide();
-                $('.subscription-bl').removeClass('active-subscription');
-            }
-        }
-        else {
-
-            // free account:
-            $('.fm-account-blocks .membership-icon.type').addClass('free');
-            $('.membership-big-txt.type').text(l[435]);
-            $('.membership-big-txt.accounttype').text(l[435]);
-            $('.membership-medium-txt.expiry').text(l[436]);
-            $('.btn-cancel').hide();
-            $('.subscription-bl').removeClass('active-subscription');
-        }
-
-        perc = Math.round((account.servbw_used+account.downbw_used)/account.bw*100);
-        perc_c=perc;
-
-        /* New Used Bandwidth bar */
-
-        var b1 = bytesToSize(account.servbw_used + account.downbw_used);
-        b1 = b1.split(' ');
-        b1[0] = Math.round(b1[0]) + ' ';
-        var b2 = bytesToSize(account.bw);
-        b2 = b2.split(' ');
-        b2[0] = Math.round(b2[0]) + ' ';
-        var b3 = bytesToSize(account.bw - (account.servbw_used + account.downbw_used));
-
-        var bandwidthDeg = 360 * perc_c / 100;
-        if (bandwidthDeg <= 180) {
-                $('.bandwidth .nw-fm-chart0.right-c p').css('transform', 'rotate(' + bandwidthDeg + 'deg)');
-        }
-        else {
-                $('.bandwidth .nw-fm-chart0.right-c p').css('transform', 'rotate(180deg)');
-                $('.bandwidth .nw-fm-chart0.left-c p').css('transform', 'rotate(' + (bandwidthDeg - 180) + 'deg)');
-        }
-
-        if (bandwidthDeg > 0) {
-            $('.bandwidth .nw-fm-percentage').removeClass('empty');
-        }
-        $('.bandwidth .nw-fm-bar0').css('width', perc_c + '%');
-
-        // Maximum bandwidth
-        $('.bandwidth .nw-fm-percents span.pecents-txt').html(htmlentities(b2[0]));
-        $('.bandwidth .nw-fm-percents span.gb-txt').html(htmlentities(b2[1]));
-        $('.bandwidth .nw-fm-percents span.perc-txt').html(perc_c + '%');
-
-        // Used bandwidth
-        $('.bandwidth .fm-bar-size.used').html(b1);
-
-        // Available bandwidth
-        $('.bandwidth .fm-bar-size.available').html(b3);
-
-        if (perc > 99) {
-            $('.fm-account-blocks.storage').addClass('exceeded');
-        }
-
-        /* End of Used Bandwidth bar */
-
-
-        perc = Math.round(account.space_used / account.space * 100);
-        perc_c = perc;
-        if (perc_c > 100)
-            perc_c = 100;
-        if (perc > 99)
-            $('.fm-account-blocks.storage').addClass('exceeded');
-
-        /* New Used space bar */
-
-        var c = account.cstrgn, k = Object.keys(c), deg = 0, iSharesBytes = 0;
-        // Array contains Cloud drive , Rubbish bin, Incoming shares, Inbox (percents)
-        var percents = [
-            100 * c[k[0]][0] / account.space,
-            100 * c[k[2]][0] / account.space,
-            0,
-            100 * c[k[1]][0] / account.space
-        ];
-        for (var i = 3 ; i < k.length ; ++i ) {
-            iSharesBytes += c[k[i]][0];
-            percents[2] += (100 * c[k[i]][0] / account.space);
-        }
-        for (i = 0; i < 4; i++) {
-            deg = deg + (360 * percents[i] / 100);
-            if (deg <= 180) {
-                $('.storage .nw-fm-chart' + i + '.right-c p').css('transform', 'rotate(' + deg + 'deg)');
-            } else {
-                $('.storage .nw-fm-chart' + i + '.right-c p').css('transform', 'rotate(180deg)');
-                $('.storage .nw-fm-chart' + i + '.left-c p').css('transform', 'rotate(' + (deg - 180) + 'deg)');
-            }
-            if (deg > 0) $('.storage .nw-fm-percentage').removeClass('empty');
-            $('.storage .nw-fm-bar' + i).css('width', percents[i] + '%');
-        }
-
-        // Maximum disk space
-        var b2 = bytesToSize(account.space);
-        b2 = b2.split(' ');
-        b2[0] = Math.round(b2[0]) + ' ';
-        $('.storage .nw-fm-percents span.pecents-txt').html(htmlentities(b2[0]));
-        $('.storage .nw-fm-percents span.gb-txt').html(htmlentities(b2[1]));
-        $('.storage .nw-fm-percents span.perc-txt').html(perc_c + '%');
-
-        // Used space
-        $('.storage .fm-bar-size.used').html(bytesToSize(account.space_used));
-        // Available space
-        b2 = account.space - account.space_used;
-        if (b2 < 0) {
-            b2 = bytesToSize(-b2) + ' over quota';
-        } else {
-            b2 = bytesToSize(b2);
-        }
-
-        $('.storage .fm-bar-size.available').html(b2);
-        // Cloud drive
-        $('.storage .fm-bar-size.cloud-drive').html(bytesToSize(c[k[0]][0]));
-        // Rubbish bin
-        $('.storage .fm-bar-size.rubbish-bin').html(bytesToSize(c[k[2]][0]));
-        // Incoming shares
-        $('.storage .fm-bar-size.incoming-shares').html(bytesToSize(iSharesBytes));
-        // Inbox
-        $('.storage .fm-bar-size.inbox').html(bytesToSize(c[k[1]][0]));
-
-        /* End of New Used space */
-
-
-        $('.fm-account-main .pro-upgrade').unbind('click');
-        $('.fm-account-main .pro-upgrade').bind('click', function(e)
-        {
-            window.location.hash = 'pro';
-        });
-        $('.membership-big-txt.balance').html('&euro; ' + htmlentities(account.balance[0][0]));
-        var a = 0;
-        if (M.c['contacts']) {
-            for (var i in M.c['contacts'])
-                a++;
-        }
-        if (!$.sessionlimit)
-            $.sessionlimit = 10;
-        if (!$.purchaselimit)
-            $.purchaselimit = 10;
-        if (!$.transactionlimit)
-            $.transactionlimit = 10;
-        if (!$.voucherlimit)
-            $.voucherlimit = 10;
-
-        $('.account-history-dropdown-button.sessions').text(l[472].replace('[X]', $.sessionlimit));
-        $('.account-history-drop-items.session10-').text(l[472].replace('[X]', 10));
-        $('.account-history-drop-items.session100-').text(l[472].replace('[X]', 100));
-        $('.account-history-drop-items.session250-').text(l[472].replace('[X]', 250));
-
-        var $passwords = $('#account-password,#account-new-password,#account-confirm-password').unbind('click');
-
-        M.account.sessions.sort(function(a, b) {
-            if (a[0] < b[0]) {
-                return 1;
-            }
-            else {
-                return -1;
-            }
-        });
-
-        $('#sessions-table-container').empty();
-        var html =
-            '<table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table sessions">' +
-            '<tr><th>' + l[479] + '</th><th>' + l[480] + '</th><th>' + l[481] + '</th><th>' + l[482] + '</th>' +
-            '<th class="no-border session-status">' + l[7664] + '</th>' +
-            '<th class="no-border logout-column">&nbsp;</th></tr>';
-        var numActiveSessions = 0;
-
-        $(account.sessions).each(function(i, el) {
-
-            if (i == $.sessionlimit) {
-                return false;
-            }
-
-            var userAgent = el[2];
-            var dateTime = htmlentities(time2date(el[0]));
-            var browser = browserdetails(userAgent);
-            var browserName = browser.nameTrans;
-            var ipAddress = htmlentities(el[3]);
-            var country = countrydetails(el[4]);
-            var currentSession = el[5];
-            var sessionId = el[6];
-            var activeSession = el[7];
-            var status = '<span class="current-session-txt">' + l[7665] + '</span>';    // Current
-
-            // Show if using an extension e.g. "Firefox on Linux (+Extension)"
-            if (browser.isExtension) {
-                browserName += ' (+' + l[7683] + ')';
-            }
-
-            // If not the current session
-            if (!currentSession) {
-                if (activeSession) {
-                    status = '<span class="active-session-txt">' + l[7666] + '</span>';     // Active
-                }
-                else {
-                    status = '<span class="expired-session-txt">' + l[1664] + '</span>';    // Expired
-                }
-            }
-
-            // If unknown country code use question mark gif
-            if (!country.icon || country.icon === '??.gif') {
-                country.icon = 'ud.gif';
-            }
-
-            // Generate row html
-            html += '<tr class="' + (currentSession ? "current" : sessionId) +  '">'
-                + '<td><span class="fm-browsers-icon"><img title="' + escapeHTML(userAgent.replace(/\s*megext/i, ''))
-                    + '" src="' + staticpath + 'images/browser/' + browser.icon
-                    + '" /></span><span class="fm-browsers-txt">' + htmlentities(browserName)
-                    + '</span></td>'
-                + '<td>' + ipAddress + '</td>'
-                + '<td><span class="fm-flags-icon"><img alt="" src="' + staticpath + 'images/flags/' + country.icon + '" style="margin-left: 0px;" /></span><span class="fm-flags-txt">' + htmlentities(country.name) + '</span></td>'
-                + '<td>' + dateTime + '</td>'
-                + '<td>' + status + '</td>';
-
-            // If the session is active show logout button
-            if (activeSession) {
-                html += '<td>' + '<span class="settings-logout">' + l[967] + '</span>' + '</td></tr>';
-            }
-            else {
-                html += '<td>&nbsp;</td>';
-            }
-
-            // If the current session or active then increment count
-            if (currentSession || activeSession) {
-                numActiveSessions++;
-            }
-        });
-        $('#sessions-table-container').safeHTML(html + '</table>');
-
-        // Don't show button to close other sessions if there's only the current session
-        if (numActiveSessions === 1) {
-            $('.fm-close-all-sessions').hide();
-        }
-
-        $('.fm-close-all-sessions').rebind('click', function() {
-
-            loadingDialog.show();
-            var $activeSessionsRows = $('.active-session-txt').parents('tr');
-
-            // Expire all sessions but not the current one
-            api_req({ a: 'usr', ko: 1 }, {
-                callback: function() {
-                    M.account = null; /* clear account cache */
-                    $activeSessionsRows.find('.settings-logout').remove();
-                    $activeSessionsRows.find('.active-session-txt').removeClass('active-session-txt')
-                        .addClass('expired-session-txt').text(l[1664]);
-                    loadingDialog.hide();
-                }
-            });
-        });
-
-        $('.settings-logout').rebind('click', function() {
-
-            var $this = $(this).parents('tr');
-            var sessionId = $this.attr('class');
-
-            if (sessionId === 'current') {
-                mLogout();
-            }
-            else {
-                loadingDialog.show();
-                /* usr - user session remove
-                 * remove a session Id from the current user,
-                 * usually other than the current session
-                 */
-                api_req({ a: 'usr', s: [sessionId] }, {
-                    callback: function(res, ctx) {
-                        M.account = null; /* clear account cache */
-                        $this.find('.settings-logout').remove();
-                        $this.find('.active-session-txt').removeClass('active-session-txt')
-                            .addClass('expired-session-txt').text(l[1664]);
-                        loadingDialog.hide();
-                    }
-                });
-            }
-        });
-
-        $('.account-history-dropdown-button.purchases').text(l[469].replace('[X]', $.purchaselimit));
-        $('.account-history-drop-items.purchase10-').text(l[469].replace('[X]', 10));
-        $('.account-history-drop-items.purchase100-').text(l[469].replace('[X]', 100));
-        $('.account-history-drop-items.purchase250-').text(l[469].replace('[X]', 250));
-
-        M.account.purchases.sort(function(a, b) {
-            if (a[1] < b[1]) {
-                return 1;
-            }
-            else {
-                return -1;
-            }
-        });
-
-        $('.grid-table.purchases tr').remove();
-        var html = '<tr><th>' + l[475] + '</th><th>' + l[476] + '</th><th>' + l[477] + '</th><th>' + l[478] + '</th></tr>';
-
-        // Render every purchase made into Purchase History on Account page
-        $(account.purchases).each(function(index, purchaseTransaction) {
-
-            if (index === $.purchaselimit) {
-                return false;// Break the loop
-            }
-
-            // Set payment method
-            var paymentMethodId = purchaseTransaction[4];
-            var paymentMethod = getGatewayName(paymentMethodId).displayName;
-
-            // Set Date/Time, Item (plan purchased), Amount, Payment Method
-            var dateTime = time2date(purchaseTransaction[1]);
-            var price = purchaseTransaction[2];
-            var proNum = purchaseTransaction[5];
-            var numOfMonths = purchaseTransaction[6];
-            var monthWording = (numOfMonths == 1) ? l[931] : 'months';  // Todo: l[6788] when generated
-            var item = getProPlan(proNum) + ' (' + numOfMonths + ' ' + monthWording + ')';
-
-            // Render table row
-            html += '<tr>'
-                 +      '<td>' + dateTime + '</td>'
-                 +      '<td>'
-                 +           '<span class="fm-member-icon">'
-                 +                '<img alt="" src="' + staticpath + 'images/mega/icons/retina/pro' + proNum + '@2x.png" />'
-                 +           '</span>'
-                 +           '<span class="fm-member-icon-txt"> ' + item + '</span>'
-                 +      '</td>'
-                 +      '<td>&euro;' + htmlentities(price) + '</td>'
-                 +      '<td>' + paymentMethod + '</td>'
-                 +  '</tr>';
-        });
-
-        $('.grid-table.purchases').html(html);
-        $('.account-history-dropdown-button.transactions').text(l[471].replace('[X]', $.transactionlimit));
-        $('.account-history-drop-items.transaction10-').text(l[471].replace('[X]', 10));
-        $('.account-history-drop-items.transaction100-').text(l[471].replace('[X]', 100));
-        $('.account-history-drop-items.transaction250-').text(l[471].replace('[X]', 250));
-
-        M.account.transactions.sort(function(a, b) {
-            if (a[1] < b[1]) {
-                return 1;
-            }
-            else {
-                return -1;
-            }
-        });
-
-        $('.grid-table.transactions tr').remove();
-        var html = '<tr><th>' + l[475] + '</th><th>' + l[484] + '</th><th>' + l[485] + '</th><th>' + l[486] + '</th></tr>';
-
-        $(account.transactions).each(function(i, el) {
-
-            if (i === $.transactionlimit) {
-                return false;
-            }
-
-            var credit = '', debit = '';
-
-            if (el[2] > 0) {
-                credit = '<span class="green">&euro;' + htmlentities(el[2]) + '</span>';
-            }
-            else {
-                debit = '<span class="red">&euro;' + htmlentities(el[2]) + '</span>';
-            }
-            html += '<tr><td>' + time2date(el[1]) + '</td><td>' + htmlentities(el[0]) + '</td><td>' + credit + '</td><td>' + debit + '</td></tr>';
-        });
-
-        $('.grid-table.transactions').html(html);
-        var i = new Date().getFullYear() - 10, html = '', sel = '';
-        $('.default-select.year span').text('YYYY');
-
-        while (i >= 1900) {
-            if (u_attr.birthyear && i == u_attr.birthyear) {
-                sel = 'active';
-                $('.default-select.year span').text(u_attr.birthyear);
-            }
-            else {
-                sel = '';
-            }
-
-            html += '<div class="default-dropdown-item ' + sel + '" data-value="' + i + '">' + i + '</div>';
-            i--;
-        }
-
-        $('.default-select.year .default-select-scroll').html(html);
-        var i = 1, html = '', sel = '';
-        $('.default-select.day span').text('DD');
-
-        while (i < 32) {
-            if (u_attr.birthday && i == u_attr.birthday) {
-                sel = 'active';
-                $('.default-select.day span').text(u_attr.birthday);
-            }
-            else {
-                sel = '';
-            }
-            html += '<div class="default-dropdown-item ' + sel + '" data-value="' + i + '">' + i + '</div>';
-            i++;
-        }
-
-        $('.default-select.day .default-select-scroll').html(html);
-        var i = 1, html = '', sel = '';
-        $('.default-select.month span').text('MM');
-
-        while (i < 13) {
-            if (u_attr.birthmonth && i == u_attr.birthmonth) {
-                sel = 'active';
-                $('.default-select.month span').text(u_attr.birthmonth);
-            }
-            else {
-                sel = '';
-            }
-            html += '<div class="default-dropdown-item ' + sel + '" data-value="' + i + '">' + i + '</div>';
-            i++;
-        }
-
-        $('.default-select.month .default-select-scroll').html(html);
-        var html = '', sel = '';
-        $('.default-select.country span').text(l[996]);
-
-        for (var country in isocountries) {
-            if (u_attr.country && country == u_attr.country) {
-                sel = 'active';
-                $('.default-select.country span').text(isocountries[country]);
-            }
-            else {
-                sel = '';
-            }
-            html += '<div class="default-dropdown-item ' + sel + '" data-value="' + country + '">' + isocountries[country] + '</div>';
-        }
-        $('.default-select.country .default-select-scroll').html(html);
-
-        // Bind Dropdowns events
-        bindDropdownEvents($('.fm-account-main .default-select'), 1);
-
-        // Cache selectors
-        var $newEmail = $('#account-email');
-        var $emailInfoMessage = $('.fm-account-change-email');
-
-        // Reset change email fields after change
-        $newEmail.val('');
-        $emailInfoMessage.addClass('hidden');
-
-        $passwords.bind('keyup', function() {
-            var texts = [];
-            $passwords.each(function() {
-                texts.push($(this).val());
-            });
-            $newEmail.val('');
-            if (texts.join("") === "") {
-                $newEmail.removeAttr('disabled').parents('.fm-account-blocks').removeClass('disabled');
-            }
-            else {
-                $newEmail.attr('disabled', 'disabled').parents('.fm-account-blocks').addClass('disabled');
-            }
-        });
-
-        // On text entry in the new email text field
-        $newEmail.rebind('keyup', function() {
-            var mail = $.trim($newEmail.val());
-
-            $passwords.val('');
-
-            if (mail === "") {
-                $passwords.removeAttr('disabled').parents('.fm-account-blocks').removeClass('disabled');
-            } else {
-                $passwords.attr('disabled', 'disabled').parents('.fm-account-blocks').addClass('disabled');
-            }
-
-            // Show information message
-            $emailInfoMessage.removeClass('hidden');
-
-            // If not valid email yet, exit
-            if (checkMail(mail)) {
-                return;
-            }
-
-            // Show save button
-            if (mail !== u_attr.email) {
-                $('.profile-form.first').addClass('email-confirm');
-                $('.fm-account-save-block').removeClass('hidden');
-            }
-        });
-
-        $('#account-firstname,#account-lastname').rebind('keyup', function(e)
-        {
-            $('.fm-account-save-block').removeClass('hidden');
-        });
-        $('.fm-account-cancel').unbind('click');
-        $('.fm-account-cancel').bind('click', function(e)
-        {
-            $passwords.removeAttr('disabled').parents('.fm-account-blocks').removeClass('disabled');
-            $newEmail.removeAttr('disabled').parents('.fm-account-blocks').removeClass('disabled');
-            $('.fm-account-save-block').addClass('hidden');
-            $('.profile-form.first').removeClass('email-confirm');
-            accountUI();
-        });
-
-        $('.fm-account-save').rebind('click', function()
-        {
-            $passwords.removeAttr('disabled').parents('.fm-account-blocks').removeClass('disabled');
-            $newEmail.removeAttr('disabled').parents('.fm-account-blocks').removeClass('disabled');
-            u_attr.firstname = $('#account-firstname').val().trim();
-            u_attr.lastname = $('#account-lastname').val().trim();
-            u_attr.birthday = $('.default-select.day .default-dropdown-item.active').attr('data-value');
-            u_attr.birthmonth = $('.default-select.month .default-dropdown-item.active').attr('data-value');
-            u_attr.birthyear = $('.default-select.year .default-dropdown-item.active').attr('data-value');
-            u_attr.country = $('.default-select.country .default-dropdown-item.active').attr('data-value');
-
-            $('.fm-account-avatar').html(useravatar.contact(u_handle));
-            $('.fm-avatar img').attr('src', useravatar.mine());
-
-            api_req({
-                a : 'up',
-                firstname  : base64urlencode(to8(u_attr.firstname)),
-                lastname   : base64urlencode(to8(u_attr.lastname)),
-                birthday   : base64urlencode(u_attr.birthday),
-                birthmonth : base64urlencode(u_attr.birthmonth),
-                birthyear  : base64urlencode(u_attr.birthyear),
-                country    : base64urlencode(u_attr.country)
-            }, {
-                callback : function(res) {
-                    if (res === u_handle) {
-                        $('.user-name').text(u_attr.firstname);
-                    }
-                }
-            });
-
-            var pws = zxcvbn($('#account-new-password').val());
-
-            if (typeof u_attr.bandwidthLimit === "number") {
-                api_req({"a":"up", "srvratio": Math.round(u_attr.bandwidthLimit) });
-            }
-
-            if (M.account.dl_maxSlots)
-            {
-                mega.config.set('dl_maxSlots', M.account.dl_maxSlots);
-                dlQueue.setSize(fmconfig.dl_maxSlots);
-                delete M.account.dl_maxSlots;
-            }
-            if (M.account.ul_maxSlots)
-            {
-                mega.config.set('ul_maxSlots', M.account.ul_maxSlots);
-                ulQueue.setSize(fmconfig.ul_maxSlots);
-                delete M.account.ul_maxSlots;
-            }
-            if (typeof M.account.ul_maxSpeed !== 'undefined')
-            {
-                mega.config.set('ul_maxSpeed', M.account.ul_maxSpeed);
-                delete M.account.ul_maxSpeed;
-            }
-            if (typeof M.account.use_ssl !== 'undefined')
-            {
-                mega.config.set('use_ssl', M.account.use_ssl);
-                localStorage.use_ssl = M.account.use_ssl;
-                use_ssl = M.account.use_ssl;
-            }
-            if (typeof M.account.ul_skipIdentical !== 'undefined')
-            {
-                mega.config.set('ul_skipIdentical', M.account.ul_skipIdentical);
-                delete M.account.ul_skipIdentical;
-            }
-            if (typeof M.account.dlThroughMEGAsync !== 'undefined') {
-                mega.config.set('dlThroughMEGAsync', M.account.dlThroughMEGAsync);
-                delete M.account.dlThroughMEGAsync;
-            }
-
-            if (typeof M.account.uisorting !== 'undefined') {
-                mega.config.set('uisorting', M.account.uisorting);
-            }
-            if (typeof M.account.uiviewmode !== 'undefined') {
-                mega.config.set('uiviewmode', M.account.uiviewmode);
-            }
-            if (typeof M.account.rubsched !== 'undefined') {
-                mega.config.set('rubsched', M.account.rubsched);
-            }
-            if (typeof M.account.font_size !== 'undefined') {
-                mega.config.set('font_size', M.account.font_size);
-                $('body').removeClass('fontsize1 fontsize2')
-                    .addClass('fontsize' + fmconfig.font_size);
-                delete M.account.font_size;
-            }
-            if ($('#account-password').val() == '' && ($('#account-new-password').val() !== '' || $('#account-confirm-password').val() !== ''))
-            {
-                msgDialog('warninga', l[135], l[719], false, function()
-                {
-                    $('#account-password').focus();
-                    $('#account-password').bind('keyup.accpwd', function() {
-                        $('.fm-account-save-block').removeClass('hidden');
-                        $('#account-password').unbind('keyup.accpwd');
-                    });
-                });
-            } else if ($('#account-password').val() !== '' && !checkMyPassword($('#account-password').val())) {
-                msgDialog('warninga', l[135], l[724], false, function() {
-                    $('#account-password').val('');
-                    $('#account-password').focus();
-                    $('#account-password').bind('keyup.accpwd', function() {
-                        $('.fm-account-save-block').removeClass('hidden');
-                        $('#account-password').unbind('keyup.accpwd');
-                    });
-                });
-            } else if ($('#account-new-password').val() !== $('#account-confirm-password').val()) {
-                msgDialog('warninga', 'Error', l[715], false, function()
-                {
-                    $('#account-new-password').val('');
-                    $('#account-confirm-password').val('');
-                    $('#account-new-password').focus();
-                });
-            }
-            else if ($('#account-password').val() !== '' && $('#account-confirm-password').val() !== '' && $('#account-new-password').val() !== '' &&  (pws.score === 0 || pws.entropy < 16)) {
-                msgDialog('warninga', 'Error', l[1129], false, function() {
-                    $('#account-new-password').val('');
-                    $('#account-confirm-password').val('');
-                    $('#account-new-password').focus();
-                });
-            } else if ($('#account-confirm-password').val() !== '' && $('#account-password').val() !== ''
-                && $('#account-confirm-password').val() !== $('#account-password').val())
-            {
-                loadingDialog.show();
-                changepw($('#account-password').val(), $('#account-confirm-password').val(), {callback: function(res)
-                    {
-                        loadingDialog.hide();
-                        if (res == EACCESS)
-                        { // pwd incorrect
-                            msgDialog('warninga', l[135], l[724], false, function()
-                            {
-                                $('#account-password').val('');
-                                $('#account-password').focus();
-                                $('#account-password').bind('keyup.accpwd', function() {
-                                    $('.fm-account-save-block').removeClass('hidden');
-                                    $('#account-password').unbind('keyup.accpwd');
-                                });
-                            });
-                        }
-                        else if (typeof res == 'number' && res < 0)
-                        { // something went wrong
-                            $passwords.val('');
-                            msgDialog('warninga', 'Error', l[6972]);
-                        }
-                        else
-                        { // success
-                            msgDialog('info', l[726], l[725], false, function()
-                            {
-                                $passwords.val('');
-                            });
-                        }
-                    }});
-            }
-            else {
-                $passwords.val('');
-            }
-
-            // Get the new email address
-            var email = $('#account-email').val().trim().toLowerCase();
-
-            // If there is text in the email field and it doesn't match the existing one
-            if ((email !== '') && (u_attr.email !== email)) {
-
-                loadingDialog.show();
-
-                // Request change of email
-                // e => new email address
-                // i => requesti (Always has the global variable requesti (last request ID))
-                api_req({ a: 'se', aa: 'a', e: email, i: requesti }, { callback : function(res) {
-
-                        loadingDialog.hide();
-
-                        if (res === -12) {
-                            return msgDialog('warninga', l[135], l[7717]);
-                        }
-
-                        fm_showoverlay();
-                        dialogPositioning('.awaiting-confirmation');
-
-                        $('.awaiting-confirmation').removeClass('hidden');
-                        $('.fm-account-save-block').addClass('hidden');
-
-                        localStorage.new_email = email;
-                    }
-                });
-
-                return;
-            }
-
-            $('.fm-account-save-block').addClass('hidden');
-            showToast('settings', l[7698]);
-            accountUI();
-        });
-        $('.current-email').html(htmlentities(u_attr.email));
-        $('#account-firstname').val(u_attr.firstname);
-        $('#account-lastname').val(u_attr.lastname);
-
-        $('.account-history-dropdown-button').rebind('click', function() {
-            $(this).addClass('active');
-            $('.account-history-dropdown').addClass('hidden');
-            $(this).next().removeClass('hidden');
-        });
-
-        $('.account-history-drop-items').rebind('click', function() {
-
-            $(this).parent().prev().removeClass('active');
-            $(this).parent().find('.account-history-drop-items').removeClass('active');
-            $(this).parent().parent().find('.account-history-dropdown-button').text($(this).text());
-
-            var c = $(this).attr('class');
-
-            if (!c) {
-                c = '';
-            }
-
-            if (c.indexOf('session10-') > -1) {
-                $.sessionlimit = 10;
-            }
-            else if (c.indexOf('session100-') > -1) {
-                $.sessionlimit = 100;
-            }
-            else if (c.indexOf('session250-') > -1) {
-                $.sessionlimit = 250;
-            }
-
-            if (c.indexOf('purchase10-') > -1) {
-                $.purchaselimit = 10;
-            }
-            else if (c.indexOf('purchase100-') > -1) {
-                $.purchaselimit = 100;
-            }
-            else if (c.indexOf('purchase250-') > -1) {
-                $.purchaselimit = 250;
-            }
-
-            if (c.indexOf('transaction10-') > -1) {
-                $.transactionlimit = 10;
-            }
-            else if (c.indexOf('transaction100-') > -1) {
-                $.transactionlimit = 100;
-            }
-            else if (c.indexOf('transaction250-') > -1) {
-                $.transactionlimit = 250;
-            }
-
-            if (c.indexOf('voucher10-') > -1) {
-                $.voucherlimit = 10;
-            }
-            else if (c.indexOf('voucher100-') > -1) {
-                $.voucherlimit = 100;
-            }
-            else if (c.indexOf('voucher250-') > -1) {
-                $.voucherlimit = 250;
-            }
-            else if (c.indexOf('voucherAll-') > -1) {
-                $.voucherlimit = 'all';
-            }
-
-            $(this).addClass('active');
-            $(this).closest('.account-history-dropdown').addClass('hidden');
-            accountUI();
-        });
-
-        // LITE/PRO account
-        if (u_attr.p) {
-            // replace 50 (percents) by real value
-            api_req({ 'a': 'uq' }, {callback: function(response) {
-                var bandwidthLimit = Math.round(response.srvratio || 0);
-                $('.bandwith-settings').removeClass('hidden');
-                $('#bandwidth-slider').slider({
-                    min: 0, max: 100, range: 'min', value: bandwidthLimit, slide: function(e, ui) {
-                        $('.slider-percentage span').text(ui.value + ' %');
-                        $('.fm-account-save-block').removeClass('hidden');
-                        u_attr.bandwidthLimit = ui.value;
-                    }
-                });
-                $('.slider-percentage span').text(bandwidthLimit + ' %');
-            }});
-        }
-
-        $('#slider-range-max').slider({
-            min: 1, max: 6, range: "min", value: fmconfig.dl_maxSlots || 4, slide: function(e, ui)
-            {
-                var uiValue = ui.value;
-                M.account.dl_maxSlots = uiValue;
-                $('.upload-settings .numbers.active').removeClass('active');
-                $('.upload-settings .numbers.val' + uiValue).addClass('active');
-                $('.fm-account-save-block').removeClass('hidden');
-            }
-        });
-        $('.upload-settings .numbers.active').removeClass('active');
-        $('.upload-settings .numbers.val' + $('#slider-range-max').slider('value')).addClass('active');
-
-        $('#slider-range-max2').slider({
-            min: 1, max: 6, range: "min", value: fmconfig.ul_maxSlots || 4, slide: function(e, ui)
-            {
-                var uiValue = ui.value;
-                M.account.ul_maxSlots = ui.value;
-                $('.download-settings .numbers.active').removeClass('active');
-                $('.download-settings .numbers.val' + uiValue).addClass('active');
-                $('.fm-account-save-block').removeClass('hidden');
-            }
-        });
-        $('.download-settings .numbers.active').removeClass('active');
-        $('.download-settings .numbers.val' + $('#slider-range-max2').slider('value')).addClass('active');
-
-        $('.ulspeedradio').removeClass('radioOn').addClass('radioOff');
-        var i = 3;
-        if ((fmconfig.ul_maxSpeed | 0) === 0) {
-            i = 1;
-        }
-        else if (fmconfig.ul_maxSpeed === -1) {
-            i = 2;
-        }
-        else {
-            $('#ulspeedvalue').val(Math.floor(fmconfig.ul_maxSpeed / 1024));
-        }
-        $('#rad' + i + '_div').removeClass('radioOff').addClass('radioOn');
-        $('#rad' + i).removeClass('radioOff').addClass('radioOn');
-        if (fmconfig.font_size) {
-            $('.uifontsize input')
-                .removeClass('radioOn').addClass('radioOff')
-                .parent()
-                .removeClass('radioOn').addClass('radioOff');
-            $('#fontsize' + fmconfig.font_size)
-                .removeClass('radioOff').addClass('radioOn')
-                .parent()
-                .removeClass('radioOff').addClass('radioOn');
-        }
-        $('.ulspeedradio input').unbind('click');
-        $('.ulspeedradio input').bind('click', function(e)
-        {
-            var id = $(this).attr('id');
-            if (id == 'rad2')
-                M.account.ul_maxSpeed = -1;
-            else if (id == 'rad1')
-                M.account.ul_maxSpeed = 0;
-            else
-            {
-                if (parseInt($('#ulspeedvalue').val()) > 0)
-                    M.account.ul_maxSpeed = parseInt($('#ulspeedvalue').val()) * 1024;
-                else
-                    M.account.ul_maxSpeed = 100 * 1024;
-            }
-            $('.ulspeedradio').removeClass('radioOn').addClass('radioOff');
-            $(this).addClass('radioOn').removeClass('radioOff');
-            $(this).parent().addClass('radioOn').removeClass('radioOff');
-            $('.fm-account-save-block').removeClass('hidden');
-        });
-        $('.uifontsize input').unbind('click');
-        $('.uifontsize input').bind('click', function(e)
-        {
-            $('body').removeClass('fontsize1 fontsize2').addClass('fontsize' + $(this).val());
-            $('.uifontsize input').removeClass('radioOn').addClass('radioOff').parent().removeClass('radioOn').addClass('radioOff');
-            $(this).removeClass('radioOff').addClass('radioOn').parent().removeClass('radioOff').addClass('radioOn');
-            M.account.font_size = $(this).val();
-            $('.fm-account-save-block').removeClass('hidden');
-        });
-        $('#ulspeedvalue').unbind('click keyup');
-        $('#ulspeedvalue').bind('click keyup', function(e)
-        {
-            $('.ulspeedradio').removeClass('radioOn').addClass('radioOff');
-            $('#rad3,#rad3_div').addClass('radioOn').removeClass('radioOff');
-            if (parseInt($('#ulspeedvalue').val()) > 0)
-                M.account.ul_maxSpeed = parseInt($('#ulspeedvalue').val()) * 1024;
-            else
-                M.account.ul_maxSpeed = 100 * 1024;
-            $('.fm-account-save-block').removeClass('hidden');
-        });
-
-        $('.ulskip').removeClass('radioOn').addClass('radioOff');
-        var i = 5;
-        if (fmconfig.ul_skipIdentical) {
-            i = 4;
-        }
-        $('#rad' + i + '_div').removeClass('radioOff').addClass('radioOn');
-        $('#rad' + i).removeClass('radioOff').addClass('radioOn');
-        $('.ulskip input').unbind('click');
-        $('.ulskip input').bind('click', function(e)
-        {
-            var id = $(this).attr('id');
-            if (id == 'rad4')
-                M.account.ul_skipIdentical = 1;
-            else if (id == 'rad5')
-                M.account.ul_skipIdentical = 0;
-            $('.ulskip').removeClass('radioOn').addClass('radioOff');
-            $(this).addClass('radioOn').removeClass('radioOff');
-            $(this).parent().addClass('radioOn').removeClass('radioOff');
-            $('.fm-account-save-block').removeClass('hidden');
-        });
-
-        $('.dlThroughMEGAsync').removeClass('radioOn').addClass('radioOff');
-        i = 19;
-        if (fmconfig.dlThroughMEGAsync) {
-            i = 18;
-        }
-        $('#rad' + i + '_div').removeClass('radioOff').addClass('radioOn');
-        $('#rad' + i).removeClass('radioOff').addClass('radioOn');
-        $('.dlThroughMEGAsync input').unbind('click');
-        $('.dlThroughMEGAsync input').bind('click', function(e)
-        {
-            var id = $(this).attr('id');
-            if (id === 'rad18') {
-                M.account.dlThroughMEGAsync = 1;
-            }
-            else if (id === 'rad19') {
-                M.account.dlThroughMEGAsync = 0;
-            }
-            $('.dlThroughMEGAsync').removeClass('radioOn').addClass('radioOff');
-            $(this).addClass('radioOn').removeClass('radioOff');
-            $(this).parent().addClass('radioOn').removeClass('radioOff');
-            $('.fm-account-save-block').removeClass('hidden');
-        });
-
-        $('.uisorting').removeClass('radioOn').addClass('radioOff');
-        var i = 8;
-        if (fmconfig.uisorting)
-            i = 9;
-        $('#rad' + i + '_div').removeClass('radioOff').addClass('radioOn');
-        $('#rad' + i).removeClass('radioOff').addClass('radioOn');
-        $('.uisorting input').unbind('click');
-        $('.uisorting input').bind('click', function(e)
-        {
-            var id = $(this).attr('id');
-            if (id == 'rad8')
-                M.account.uisorting = 0;
-            else if (id == 'rad9')
-                M.account.uisorting = 1;
-            $('.uisorting').removeClass('radioOn').addClass('radioOff');
-            $(this).addClass('radioOn').removeClass('radioOff');
-            $(this).parent().addClass('radioOn').removeClass('radioOff');
-            $('.fm-account-save-block').removeClass('hidden');
-        });
-
-        $('.uiviewmode').removeClass('radioOn').addClass('radioOff');
-        var i = 10;
-        if (fmconfig.uiviewmode)
-            i = 11;
-        $('#rad' + i + '_div').removeClass('radioOff').addClass('radioOn');
-        $('#rad' + i).removeClass('radioOff').addClass('radioOn');
-        $('.uiviewmode input').unbind('click');
-        $('.uiviewmode input').bind('click', function(e)
-        {
-            var id = $(this).attr('id');
-            if (id == 'rad10')
-                M.account.uiviewmode = 0;
-            else if (id == 'rad11')
-                M.account.uiviewmode = 1;
-            $('.uiviewmode').removeClass('radioOn').addClass('radioOff');
-            $(this).addClass('radioOn').removeClass('radioOff');
-            $(this).parent().addClass('radioOn').removeClass('radioOff');
-            $('.fm-account-save-block').removeClass('hidden');
-        });
-
-        $('.rubsched, .rubschedopt').removeClass('radioOn').addClass('radioOff');
-        var i = 13;
-        if (fmconfig.rubsched) {
-            i = 12;
-            $('#rubsched_options').removeClass('hidden');
-            var opt = String(fmconfig.rubsched).split(':');
-            $('#rad' + opt[0] + '_opt').val(opt[1]);
-            $('#rad' + opt[0] + '_div').removeClass('radioOff').addClass('radioOn');
-            $('#rad' + opt[0]).removeClass('radioOff').addClass('radioOn');
-        }
-        $('#rad' + i + '_div').removeClass('radioOff').addClass('radioOn');
-        $('#rad' + i).removeClass('radioOff').addClass('radioOn');
-        $('.rubschedopt input').rebind('click', function(e) {
-            var id = $(this).attr('id');
-            var opt = $('#' + id + '_opt').val();
-            M.account.rubsched = id.substr(3) + ':' + opt;
-            $('.rubschedopt').removeClass('radioOn').addClass('radioOff');
-            $(this).addClass('radioOn').removeClass('radioOff');
-            $(this).parent().addClass('radioOn').removeClass('radioOff');
-            $('.fm-account-save-block').removeClass('hidden');
-            initAccountScroll(1);
-        });
-        $('.rubsched_textopt').rebind('click keyup', function(e) {
-            var id = String($(this).attr('id')).split('_')[0];
-            $('.rubschedopt').removeClass('radioOn').addClass('radioOff');
-            $('#'+id+',#'+id+'_div').addClass('radioOn').removeClass('radioOff');
-            M.account.rubsched = id.substr(3) + ':' + $(this).val();
-            $('.fm-account-save-block').removeClass('hidden');
-            initAccountScroll(1);
-        });
-        $('.rubsched input').rebind('click', function(e) {
-            var id = $(this).attr('id');
-            if (id == 'rad13') {
-                M.account.rubsched = 0;
-                $('#rubsched_options').addClass('hidden');
-            }
-            else if (id == 'rad12') {
-                $('#rubsched_options').removeClass('hidden');
-                if (!fmconfig.rubsched) {
-                    M.account.rubsched = "14:15";
-                    var defOption = 14;
-                    $('#rad' + defOption + '_div').removeClass('radioOff').addClass('radioOn');
-                    $('#rad' + defOption).removeClass('radioOff').addClass('radioOn');
-                }
-            }
-            $('.rubsched').removeClass('radioOn').addClass('radioOff');
-            $(this).addClass('radioOn').removeClass('radioOff');
-            $(this).parent().addClass('radioOn').removeClass('radioOff');
-            $('.fm-account-save-block').removeClass('hidden');
-            initAccountScroll(1);
-        });
-
-        $('.redeem-voucher').unbind('click');
-        $('.redeem-voucher').bind('click', function(event)
-        {
-            var $this = $(this);
-            if ($this.attr('class').indexOf('active') == -1)
-            {
-                $('.fm-account-overlay').fadeIn(100);
-                $this.addClass('active');
-                $('.fm-voucher-popup').removeClass('hidden');
-                voucherCentering($this);
-
-                $('.fm-account-overlay, .fm-purchase-voucher, .fm-voucher-button').rebind('click.closeDialog', function() {
-                    $('.fm-account-overlay').fadeOut(100);
-                    $('.redeem-voucher').removeClass('active');
-                    $('.fm-voucher-popup').addClass('hidden');
-                });
-            }
-            else
-            {
-                $('.fm-account-overlay').fadeOut(200);
-                $this.removeClass('active');
-                $('.fm-voucher-popup').addClass('hidden');
-            }
-        });
-
-        $('.fm-voucher-body input').unbind('focus');
-        $('.fm-voucher-body input').bind('focus', function(e)
-        {
-            if ($(this).val() == l[487])
-                $(this).val('');
-        });
-
-        $('.fm-voucher-body input').unbind('blur');
-        $('.fm-voucher-body input').bind('blur', function(e)
-        {
-            if ($(this).val() == '')
-                $(this).val(l[487]);
-        });
-
-        $('.fm-voucher-button').unbind('click');
-        $('.fm-voucher-button').bind('click', function(e)
-        {
-            if ($('.fm-voucher-body input').val() == l[487])
-                msgDialog('warninga', l[135], l[1015]);
-            else
-            {
-                loadingDialog.show();
-                api_req({a: 'uavr', v: $('.fm-voucher-body input').val()},
-                {
-                    callback: function(res, ctx)
-                    {
-                        loadingDialog.hide();
-                        $('.fm-voucher-popup').addClass('hidden');
-                        $('.fm-voucher-body input').val(l[487]);
-                        if (typeof res == 'number')
-                        {
-                            if (res == -11)
-                                msgDialog('warninga', l[135], l[714]);
-                            else if (res < 0)
-                                msgDialog('warninga', l[135], l[473]);
-                            else
-                            {
-                                if (M.account)
-                                    M.account.lastupdate = 0;
-                                accountUI();
-                            }
-                        }
-                    }
-                });
-            }
-        });
-
-        $('.vouchercreate').unbind('click');
-        $('.vouchercreate').bind('click', function(e)
-        {
-            var vouchertype = $('.default-select.vouchertype .default-dropdown-item.active').attr('data-value');
-            var voucheramount = parseInt($('#account-voucheramount').val());
-            var proceed = false;
-            for (var i in M.account.prices)
-                if (M.account.prices[i][0] == vouchertype)
-                    proceed = true;
-            if (!proceed)
-            {
-                msgDialog('warninga', 'Error', 'Please select the voucher type.');
-                return false;
-            }
-            if (!voucheramount)
-            {
-                msgDialog('warninga', 'Error', 'Please enter a valid voucher amount.');
-                return false;
-            }
-            if (vouchertype === '19.99') {
-                vouchertype = '19.991';
-            }
-            loadingDialog.show();
-            api_req({a: 'uavi', d: vouchertype, n: voucheramount, c: 'EUR'},
-            {
-                callback: function(res, ctx)
-                {
-                    M.account.lastupdate = 0;
-                    accountUI();
-                }
-            });
-        });
-
-        if (M.account.reseller) {
-            var email = 'resellers@mega.nz';
-
-            $('.resellerbuy').attr('href', 'mailto:' + email)
-                .find('span').text(l[9106].replace('%1', email));
-
-            // Use 'All' or 'Last 10/100/250' for the dropdown text
-            var buttonText = ($.voucherlimit === 'all') ? l[7557] : l['466a'].replace('[X]', $.voucherlimit);
-
-            $('.fm-account-button.reseller').removeClass('hidden');
-            $('.account-history-dropdown-button.vouchers').text(buttonText);
-            $('.account-history-drop-items.voucher10-').text(l['466a'].replace('[X]', 10));
-            $('.account-history-drop-items.voucher100-').text(l['466a'].replace('[X]', 100));
-            $('.account-history-drop-items.voucher250-').text(l['466a'].replace('[X]', 250));
-
-            // Sort vouchers by most recently created at the top
-            M.account.vouchers.sort(function(a, b) {
-
-                if (a['date'] < b['date']) {
-                    return 1;
-                }
-                else {
-                    return -1;
-                }
-            });
-
-            $('.grid-table.vouchers tr').remove();
-            var html = '<tr><th>' + l[475] + '</th><th>' + l[7714] + '</th><th>' + l[477] + '</th><th>' + l[488] + '</th></tr>';
-
-            $(account.vouchers).each(function(i, el) {
-
-                // Only show the last 10, 100, 250 or if the limit is not set show all vouchers
-                if (($.voucherlimit !== 'all') && (i >= $.voucherlimit)) {
-                    return false;
-                }
-
-                var status = l[489];
-                if (el.redeemed > 0 && el.cancelled == 0 && el.revoked == 0)
-                    status = l[490] + ' ' + time2date(el.redeemed);
-                else if (el.revoked > 0 && el.cancelled > 0)
-                    status = l[491] + ' ' + time2date(el.revoked);
-                else if (el.cancelled > 0)
-                    status = l[492] + ' ' + time2date(el.cancelled);
-
-                var voucherLink = 'https://mega.nz/#voucher' + htmlentities(el.code);
-
-                html += '<tr><td>' + time2date(el.date) + '</td><td class="selectable">' + voucherLink + '</td><td>&euro; ' + htmlentities(el.amount) + '</td><td>' + status + '</td></tr>';
-            });
-            $('.grid-table.vouchers').html(html);
-            $('.default-select.vouchertype .default-select-scroll').html('');
-            var prices = [];
-            for (var i in M.account.prices) {
-                prices.push(M.account.prices[i][0]);
-            }
-            prices.sort(function(a, b) {
-                return (a - b)
-            })
-
-            var voucheroptions = '';
-            for (var i in prices)
-                voucheroptions += '<div class="default-dropdown-item" data-value="' + htmlentities(prices[i]) + '">&euro;' + htmlentities(prices[i]) + ' voucher</div>';
-            $('.default-select.vouchertype .default-select-scroll').html(voucheroptions);
-            bindDropdownEvents($('.default-select.vouchertype'));
-        }
-
-        $('.fm-purchase-voucher,.default-big-button.topup').unbind('click');
-        $('.fm-purchase-voucher,.default-big-button.topup').bind('click', function(e)
-        {
-            document.location.hash = 'resellers';
-        });
-
-        if (is_extension || ssl_needed())
-            $('#acc_use_ssl').hide();
-
-        $('.usessl').removeClass('radioOn').addClass('radioOff');
-        var i = 7;
-        if (use_ssl)
-            i = 6;
-        $('#rad' + i + '_div').removeClass('radioOff').addClass('radioOn');
-        $('#rad' + i).removeClass('radioOff').addClass('radioOn');
-        $('.usessl input').unbind('click');
-        $('.usessl input').bind('click', function(e)
-        {
-            var id = $(this).attr('id');
-            if (id == 'rad7')
-                M.account.use_ssl = 0;
-            else if (id == 'rad6')
-                M.account.use_ssl = 1;
-            $('.usessl').removeClass('radioOn').addClass('radioOff');
-            $(this).addClass('radioOn').removeClass('radioOff');
-            $(this).parent().addClass('radioOn').removeClass('radioOff');
-            $('.fm-account-save-block').removeClass('hidden');
-        });
-
-        $('.fm-account-remove-avatar,.fm-account-avatar').rebind('click', function() {
-            msgDialog('confirmation', l[1756], l[6973], false, function(e) {
-                if (e) {
-                    mega.attr.set('a', 'none', true, false);
-
-                    useravatar.invalidateAvatar(u_handle);
-                    $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle));
-                    $('.fm-avatar img').attr('src', useravatar.mine());
-                    $('.fm-account-remove-avatar').hide();
-                }
-            });
-        });
-
-        $('.fm-account-change-avatar,.fm-account-avatar').unbind('click');
-        $('.fm-account-change-avatar,.fm-account-avatar').bind('click', function(e)
-        {
-            avatarDialog();
-        });
-        $('.fm-account-avatar').html(useravatar.contact(u_handle));
-
-        $('#find-duplicate').rebind('click', mega.utils.findDupes);
-
-        $.tresizer();
-
-    }, 1);
-
-    // Show first name or last name
-    if (u_attr.firstname) {
-        $('.membership-big-txt.name').text(u_attr.firstname + ' ' + u_attr.lastname);
-    }
-    else {
-        $('.membership-big-txt.name').text(u_attr.name);
-    }
-
-    // Show email address
-    if (u_attr.email) {
-        $('.membership-big-txt.email').text(u_attr.email);
-    }
-    else {
-        $('.membership-big-txt.email').hide();
-    }
-
-    $('.editprofile').rebind('click', function() {
-        document.location.hash = 'fm/account/profile';
-    });
-
-    $('.rubbish-bin-link').rebind('click', function() {
-        document.location.hash = 'fm/rubbish';
-    });
-
-    // Cancel account button on main Account page
-    $('.cancel-account').rebind('click', function() {
-
-        // Please confirm that all your data will be deleted
-        var confirmMessage = l[1974];
-
-        // Search through their Pro plan purchase history
-        $(account.purchases).each(function(index, purchaseTransaction) {
-
-            // Get payment method name
-            var paymentMethodId = purchaseTransaction[4];
-            var paymentMethod = getGatewayName(paymentMethodId).name;
-
-            // If they have paid with iTunes or Google Play in the past
-            if ((paymentMethod === 'apple') || (paymentMethod === 'google')) {
-
-                // Update confirmation message to remind them to cancel iTunes or Google Play
-                confirmMessage += ' ' + l[8854];
-                return false;
-            }
-        });
-
-        // Ask for confirmation
-        msgDialog('confirmation', l[6181], confirmMessage, false, function(event) {
-            if (event) {
-                loadingDialog.show();
-                api_req({ a: 'erm', m: Object(M.u[u_handle]).m, t: 21 }, {
-                    callback: function(res) {
-                        loadingDialog.hide();
-                        if (res === ENOENT) {
-                            msgDialog('warningb', l[1513], l[1946]);
-                        }
-                        else if (res === 0) {
-                            handleResetSuccessDialogs('.reset-success', l[735], 'deleteaccount');
-                        }
-                        else {
-                            msgDialog('warningb', l[135], l[200]);
-                        }
-                    }
-                });
-            }
-        });
-    });
-
-    // Button on main Account page to backup their master key
-    $('.backup-master-key').rebind('click', function() {
-        document.location.hash = 'backup';
-    });
-
-    $('.fm-account-button').unbind('click');
-    $('.fm-account-button').bind('click', function() {
-        if ($(this).attr('class').indexOf('active') == -1) {
-            switch (true) {
-                case ($(this).attr('class').indexOf('overview') >= 0):
-                    document.location.hash = 'fm/account';
-                    break;
-                case ($(this).attr('class').indexOf('profile') >= 0):
-                    document.location.hash = 'fm/account/profile';
-                    break;
-                case ($(this).attr('class').indexOf('settings') >= 0):
-                    document.location.hash = 'fm/account/settings';
-                    break;
-                case ($(this).attr('class').indexOf('history') >= 0):
-                    document.location.hash = 'fm/account/history';
-                    break;
-                case ($(this).attr('class').indexOf('reseller') >= 0):
-                    document.location.hash = 'fm/account/reseller';
-                    break;
-            }
-        }
-    });
-
-    $('.account-pass-lines').attr('class', 'account-pass-lines');
-    $('#account-new-password').bind('keyup', function(el)
-    {
-        $('.account-pass-lines').attr('class', 'account-pass-lines');
-        if ($(this).val() !== '') {
-            var pws = zxcvbn($(this).val());
-            if (pws.score > 3 && pws.entropy > 75) {
-                $('.account-pass-lines').addClass('good4');
-            } else if (pws.score > 2 && pws.entropy > 50) {
-                $('.account-pass-lines').addClass('good3');
-            } else if (pws.score > 1 && pws.entropy > 40) {
-                $('.account-pass-lines').addClass('good2');
-            } else if (pws.score > 0 && pws.entropy > 15) {
-                $('.account-pass-lines').addClass('good1');
-            } else {
-                $('.account-pass-lines').addClass('weak-password');
-            }
-        }
-    });
-
-    $('#account-confirm-password').bind('keyup', function(el) {
-
-        if ($(this).val() === $('#account-new-password').val()) {
-            $('.fm-account-save-block').removeClass('hidden');
-        }
-    });
-}
 
 function handleResetSuccessDialogs(dialog, txt, dlgString) {
 
     $('.fm-dialog' + dialog + ' .reg-success-txt').text(txt);
 
-    $('.fm-dialog' + dialog + ' .fm-dialog-button').rebind('click', function() {
+    $('.fm-dialog' + dialog + ' .default-white-button').rebind('click', function() {
         $('.fm-dialog-overlay').addClass('hidden');
         $('body').removeClass('overlayed');
         $('.fm-dialog' + dialog).addClass('hidden');
@@ -4506,7 +3019,38 @@ function avatarDialog(close)
     $.dialog = 'avatar';
     $('.fm-dialog.avatar-dialog').removeClass('hidden');
     fm_showoverlay();
-    $('.avatar-body').html('<div id="avatarcrop"><div class="image-upload-and-crop-container"><div class="image-explorer-container empty"><div class="image-explorer-image-view"><img class="image-explorer-source"><div class="avatar-white-bg"></div><div class="image-explorer-mask circle-mask"></div><div class="image-explorer-drag-delegate"></div></div><div class="image-explorer-scale-slider-wrapper"><input class="image-explorer-scale-slider disabled" type="range" min="0" max="100" step="1" value="0" disabled=""></div></div><div class="fm-notifications-bottom"><input type="file" id="image-upload-and-crop-upload-field" class="image-upload-field" accept="image/jpeg, image/gif, image/png"><label for="image-upload-and-crop-upload-field" class="image-upload-field-replacement fm-account-change-avatar"><span>' + l[1016] + '</span></label><div class="fm-account-change-avatar" id="fm-change-avatar"><span>' + l[1017] + '</span></div><div  class="fm-account-change-avatar" id="fm-cancel-avatar"><span>Cancel</span></div><div class="clear"></div></div></div></div>');
+    $('.avatar-body').safeHTML(
+        '<div id="avatarcrop">' +
+            '<div class="image-upload-and-crop-container">' +
+                '<div class="image-explorer-container empty">' +
+                    '<div class="image-explorer-image-view">' +
+                        '<img class="image-explorer-source" />' +
+                        '<div class="avatar-white-bg"></div>' +
+                        '<div class="image-explorer-mask circle-mask"></div>' +
+                        '<div class="image-explorer-drag-delegate"></div>' +
+                    '</div>' +
+                    '<div class="image-explorer-scale-slider-wrapper">' +
+                        '<input class="image-explorer-scale-slider disabled" type="range" ' +
+                            'min="0" max="100" step="1" value="0" disabled="" />' +
+                    '</div>' +
+                '</div>' +
+                '<div class="fm-notifications-bottom">' +
+                    '<input type="file" id="image-upload-and-crop-upload-field" class="image-upload-field" ' +
+                        'accept="image/jpeg, image/gif, image/png" />' +
+                    '<label for="image-upload-and-crop-upload-field" ' +
+                        'class="image-upload-field-replacement default-white-button right">' +
+                        '<span>@@</span>' +
+                    '</label>' +
+                    '<div class="default-white-button right" id="fm-change-avatar">' +
+                        '<span>@@</span>' +
+                    '</div>' +
+                    '<div  class="default-white-button right" id="fm-cancel-avatar">' +
+                        '<span>@@</span>' +
+                    '</div>' +
+                    '<div class="clear"></div>' +
+                '</div>' +
+            '</div>' +
+        '</div>', l[1016], l[1017], l[82]);
     $('#fm-change-avatar').hide();
     $('#fm-cancel-avatar').hide();
     var imageCrop = new ImageUploadAndCrop($("#avatarcrop").find('.image-upload-and-crop-container'),
@@ -4524,8 +3068,8 @@ function avatarDialog(close)
                 mega.attr.set('a', ab_to_base64(data), true, false);
                 useravatar.setUserAvatar(u_handle, data, this.outputFormat);
 
-                $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle));
-                $('.fm-avatar img').attr('src', useravatar.mine());
+                $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', true));
+                $('.fm-avatar').safeHTML(useravatar.contact(u_handle, '', 'div'));
                 avatarDialog(1);
             },
             onImageUpload: function()
@@ -4539,8 +3083,7 @@ function avatarDialog(close)
 
             }
         });
-    $('#fm-cancel-avatar,.fm-dialog.avatar-dialog .fm-dialog-close').unbind('click');
-    $('#fm-cancel-avatar,.fm-dialog.avatar-dialog .fm-dialog-close').bind('click', function(e)
+    $('#fm-cancel-avatar,.fm-dialog.avatar-dialog .fm-dialog-close').rebind('click', function(e)
     {
         avatarDialog(1);
     });
@@ -4560,9 +3103,8 @@ function gridUI() {
         var headerColumn = '';
         $('.grid-table tr:first-child td:visible').each(function(i, e) {
             headerColumn = $('.grid-table-header th').get(i);
-            $(headerColumn).width($(e).width());
+            $(headerColumn).width(Math.floor($(e).width()));
         });
-        initTransferScroll();
     };
 
     $.detailsGridHeader = function() {
@@ -4571,79 +3113,38 @@ function gridUI() {
             headerColumn = $('.contact-details-view .grid-table-header th').get(i);
             $(headerColumn).width($(e).width());
         });
-        initTransferScroll();
     };
 
     $.contactGridHeader = function() {
-        var headerColumn = '',
-            i = 0,
-            w = 0,
-            el = $('.files-grid-view.contacts-view .grid-table-header th');
-        while (i < el.length) {
-            if (i !== 0) {
-                w += $(el[i]).width();
-            }
-            i++;
-        }
+        var headerColumn = '';
         $('.files-grid-view.contacts-view .grid-scrolling-table tr:first-child td').each(function(i, e) {
             headerColumn = $('.files-grid-view.contacts-view .grid-table-header th').get(i);
             $(headerColumn).width($(e).width());
         });
-        initTransferScroll();
     };
 
     $.opcGridHeader = function() {
-        var headerColumn = '',
-            i = 0,
-            w = 0,
-            el = $('.sent-requests-grid .grid-table-header th');
-        while (i < el.length) {
-            if (i !== 0) {
-                w += $(el[i]).width();
-            }
-            i++;
-        }
+        var headerColumn = '';
         $('.sent-requests-grid .grid-scrolling-table tr:first-child td').each(function(i, e) {
             headerColumn = $('.sent-requests-grid .grid-table-header th').get(i);
             $(headerColumn).width($(e).width());
         });
-        initTransferScroll();
     };
 
     $.ipcGridHeader = function() {
-        var headerColumn = '',
-            i = 0,
-            w = 0,
-            el = $('.contact-requests-grid .grid-table-header th');
-        while (i < el.length) {
-            if (i !== 0) {
-                w += $(el[i]).width();
-            }
-            i++;
-        }
+        var headerColumn = '';
         $('.contact-requests-grid .grid-scrolling-table tr:first-child td').each(function(i, e) {
             headerColumn = $('.contact-requests-grid .grid-table-header th').get(i);
             $(headerColumn).width($(e).width());
         });
-        initTransferScroll();
     };
 
     $.sharedGridHeader = function() {
-        var el = $('.shared-grid-view .grid-table-header th'),
-            headerColumn = '',
-            i = 0,
-            w = 0;
-        while (i < el.length) {
-            if (i !== 0) {
-                w += $(el[i]).width();
-            }
-            i++;
-        }
+        var el = headerColumn = '';
         $('.shared-grid-view .grid-scrolling-table tr:first-child td').each(function(i, e) {
             headerColumn = $('.shared-grid-view .grid-table-header th').get(i);
             $(headerColumn).width($(e).width());
         });
-        initTransferScroll();
     };
 
     $('.fm-blocks-view.fm').addClass('hidden');
@@ -4710,12 +3211,17 @@ function gridUI() {
     });
 
     // enable add star on first column click (make favorite)
-    $('.grid-table.fm tr td:first-child').rebind('click', function() {
+    $('.grid-table.shared-with-me tr td:first-child,.grid-table.fm tr td:first-child').rebind('click', function() {
         var id = [$(this).parent().attr('id')];
-        M.favourite(id, $('.grid-table.fm #' + id[0] + ' .grid-status-icon').hasClass('star'));
+        var newFavState = Number(!M.isFavourite(id));
+
+        // Handling favourites is allowed for full permissions shares only
+        if (rightsById(id) > 1) {
+            M.favourite(id, newFavState);
+        }
     });
 
-    $('.context-menu-item.do-sort').rebind('click', function() {
+    $('.dropdown-item.do-sort').rebind('click', function() {
         M.setLastColumn($(this).data('by'));
         M.doSort($(this).data('by'), -1);
         M.renderMain();
@@ -4724,14 +3230,40 @@ function gridUI() {
     $('.grid-table-header .arrow').rebind('click', function() {
         var c = $(this).attr('class');
         var d = 1;
-        if (c && c.indexOf('desc') > -1)
+        var pattern = '';
+
+        if (c && (c.indexOf('desc') > -1)) {
             d = -1;
+        }
 
         for (var e in M.sortRules) {
-            if (c && c.indexOf(e) > -1) {
+            if (c.indexOf(e) !== -1) {
                 M.doSort(e, d);
                 M.renderMain();
                 break;
+            }
+        }
+
+        // Stop bubbling
+        return false;
+    });
+
+    $('.grid-first-th').rebind('click', function() {
+        var c = $(this).children().first().attr('class');
+        var d = 1;
+        var pattern = '';
+
+        if (c && (c.indexOf('desc') > -1)) {
+            d = -1;
+        }
+
+        for (var e in M.sortRules) {
+            if (M.sortRules.hasOwnProperty(e)) {
+                if (c.indexOf(e) !== -1) {
+                    M.doSort(e, d);
+                    M.renderMain();
+                    break;
+                }
             }
         }
     });
@@ -4823,7 +3355,7 @@ function FMShortcuts() {
             return false; // stop prop.
         } else if (charCode == 8) {
             var $items = selectionManager.get_selected();
-            if ($items.size() == 0 || (RightsbyID(M.currentdirid || '') | 0) < 1) {
+            if ($items.size() === 0 || (rightsById(M.currentdirid || '') | 0) < 1) {
                 return; // dont do anything.
             }
 
@@ -4836,7 +3368,7 @@ function FMShortcuts() {
 
             // force remove, no confirmation
             if (e.ctrlKey || e.metaKey) {
-                $('#msgDialog:visible .fm-dialog-button.confirm').trigger('click');
+                $('#msgDialog:visible default-white-button.confirm').trigger('click');
             }
 
             return false;
@@ -4870,18 +3402,16 @@ var QuickFinder = function(searchable_elements, containers) {
     var next_idx = 0;
 
     // hide on page change
-    $(window).unbind('hashchange.quickfinder');
-    $(window).bind('hashchange.quickfinder', function() {
+    if (QuickFinder._pageChangeListenerId) {
+        mBroadcaster.removeListener(QuickFinder._pageChangeListenerId);
+    }
+    QuickFinder._pageChangeListenerId = mBroadcaster.addListener('pagechange', function () {
         if (self.is_active()) {
             self.deactivate();
         }
     });
 
-    // unbind if already bound.
-    $(window).unbind('keypress.quickFinder');
-
-    // bind
-    $(window).bind('keypress.quickFinder', function(e) {
+    $(window).rebind('keypress.quickFinder', function(e) {
 
         e = e || window.event;
         // DO NOT start the search in case that the user is typing something in a form field... (eg.g. contacts -> add
@@ -5216,8 +3746,7 @@ var SelectionManager = function($selectable) {
 var selectionManager;
 
 function UIkeyevents() {
-    $(window).unbind('keydown.uikeyevents');
-    $(window).bind('keydown.uikeyevents', function(e) {
+    $(window).rebind('keydown.uikeyevents', function(e) {
         if (e.keyCode == 9 && !$(e.target).is("input,textarea,select")) {
             return false;
         }
@@ -5235,7 +3764,7 @@ function UIkeyevents() {
             return true;
         }
 
-        if (!is_fm() && (page !== 'login')) {
+        if (!is_fm() && (page !== 'login') && (page.substr(0, 3) !== 'pro')) {
             return true;
         }
 
@@ -5316,9 +3845,9 @@ function UIkeyevents() {
 
                 $target.addClass("ui-selected");
                 selectionManager.set_currently_selected($target);
-
             }
         }
+
         if ((e.keyCode == 38) && (s.length > 0) && ($.selectddUIgrid.indexOf('.grid-scrolling-table') > -1) && !$.dialog) {
 
             // up in grid
@@ -5351,14 +3880,16 @@ function UIkeyevents() {
                 quickFinder.disable_if_active();
             }
         }
-        else if (e.keyCode == 46 && s.length > 0 && !$.dialog && RightsbyID(M.currentdirid) > 1) {
+        else if ((e.keyCode === 46) && (s.length > 0)
+            && !$.dialog && rightsById(M.currentdirid) > 1) {
             $.selected = [];
             s.each(function(i, e) {
                 $.selected.push($(e).attr('id'));
             });
             fmremove();
         }
-        else if (e.keyCode == 46 && selPanel.length > 0 && !$.dialog && RightsbyID(M.currentdirid) > 1) {
+        else if ((e.keyCode === 46) && (selPanel.length > 0)
+            && !$.dialog && rightsById(M.currentdirid) > 1) {
             var selected = [];
             selPanel.each(function() {
                 selected.push($(this).attr('id'));
@@ -5398,12 +3929,19 @@ function UIkeyevents() {
         else if ((e.keyCode === 13) && ($.dialog === 'add-contact-popup')) {
             addNewContact($('.add-user-popup-button.add'));
         }
-
         else if ((e.keyCode === 13) && ($.dialog === 'rename')) {
             doRename();
         }
+
+        // If the Esc key is pressed while the payment address dialog is visible, close it
+        else if ((e.keyCode === 27) && !$('.payment-address-dialog').hasClass('hidden')) {
+            addressDialog.closeDialog();
+        }
         else if (e.keyCode == 27 && ($.copyDialog || $.moveDialog || $.copyrightsDialog)) {
             closeDialog();
+        }
+        else if (e.keyCode == 27 && $.topMenu) {
+            topMenu(1);
         }
         else if (e.keyCode == 27 && $.dialog) {
             closeDialog();
@@ -5425,7 +3963,7 @@ function UIkeyevents() {
                 $.warningCallback(true);
             }
         }
-        else if ((e.keyCode === 113 /* F2 */) && (s.length > 0) && !$.dialog && RightsbyID(M.currentdirid) > 1) {
+        else if ((e.keyCode === 113 /* F2 */) && (s.length > 0) && !$.dialog && rightsById(M.currentdirid) > 1) {
             $.selected = [];
             s.each(function(i, e) {
                 $.selected.push($(e).attr('id'));
@@ -5472,7 +4010,7 @@ function searchPath()
             path.reverse();
             for (var i in path)
             {
-                var c,name,id=false,iconimg='';;
+                var c,name,id=false,iconimg='';
                 var n = M.d[path[i]];
                 if (path[i].length == 11 && M.u[path[i]])
                 {
@@ -5855,44 +4393,52 @@ function iconUI(aQuiet)
 
 function transferPanelUI()
 {
-    $.transferHeader = function()
+    $.transferHeader = function(tfse)
     {
-        var tt = $('.transfer-scrolling-table'),
-              tth = $('.transfer-table-header');
+        tfse                  = tfse || M.getTransferElements();
+        var domTableEmptyTxt  = tfse.domTableEmptyTxt;
+        var domTableHeader    = tfse.domTableHeader;
+        var domScrollingTable = tfse.domScrollingTable;
+        var domTable          = tfse.domTable;
+        tfse                  = undefined;
 
         // Show/Hide header if there is no items in transfer list
-        if (!$('.transfer-table tr').length)
-        {
-            $('.transfer-panel-empty-txt').removeClass('hidden');
-            tt.hide(0);
-            tth.hide(0);
+        if (domTable.querySelector('tr')) {
+            domTableEmptyTxt.classList.add('hidden');
+            domScrollingTable.style.display = '';
+            domTableHeader.style.display    = '';
         }
-        else
-        {
-            $('.transfer-panel-empty-txt').addClass('hidden');
-            tt.show(0);
-            tth.show(0);
+        else {
+            domTableEmptyTxt.classList.remove('hidden');
+            domScrollingTable.style.display = 'none';
+            domTableHeader.style.display    = 'none';
         }
 
-        $('.transfer-scrolling-table').rebind('click contextmenu', function(e)
-        {
+        $(domScrollingTable).rebind('click.tst contextmenu.tst', function(e) {
             if (!$(e.target).closest('.transfer-table').length) {
-                $('.transfer-table tr').removeClass('ui-selected');
+                $('.ui-selected', domTable).removeClass('ui-selected');
             }
         });
 
-        var $ttw = $('.transfer-table-wrapper .grid-url-arrow, .transfer-table-wrapper .clear-transfer-icon');
-        $ttw.rebind('click', function(e) {
+        var $tmp = $('.grid-url-arrow, .clear-transfer-icon', domTable);
+        $tmp.rebind('click', function(e) {
             var target = $(this).closest('tr');
             e.preventDefault();
             e.stopPropagation(); // do not treat it as a regular click on the file
-            $('.transfer-table-wrapper tr').removeClass('ui-selected');
+            $('tr', domTable).removeClass('ui-selected');
 
             if ($(this).hasClass('grid-url-arrow')) {
                 target.addClass('ui-selected');
                 e.currentTarget = target;
                 transferPanelContextMenu(target);
-                contextMenuUI(e);
+                if (!$(this).hasClass('active')) {
+                    contextMenuUI(e);
+                    $(this).addClass('active');
+                }
+                else {
+                    $.hideContextMenu();
+                    $(this).removeClass('active');
+                }
             }
             else {
                 if (!target.hasClass('.transfer-completed')) {
@@ -5907,10 +4453,12 @@ function transferPanelUI()
                     $.tresizer();
                 });
             }
-        });
-        $ttw = undefined;
 
-        $('.transfer-table tr').rebind('dblclick', function(e) {
+            return false;
+        });
+
+        $tmp = $('tr', domTable);
+        $tmp.rebind('dblclick', function(e) {
             if ($(this).hasClass('transfer-completed')) {
                 var id = String($(this).attr('id'));
                 if (id[0] === 'd') {
@@ -5929,30 +4477,27 @@ function transferPanelUI()
                     reselect(1);
                 }
             }
+            return false;
         });
 
-        $('.transfer-table tr').rebind('click contextmenu', function(e)
+        $tmp.rebind('click contextmenu', function(e)
         {
-            $('.ui-selected').filter(function() {
-                return $(this).parent('.transfer-table').length;
-            }).removeClass('ui-selected');
-
             if (e.type == 'contextmenu')
             {
-                var c = $(this).attr('class');
-                if (!c || (c && c.indexOf('ui-selected') == -1))
-                    $('.transfer-table tr').removeClass('ui-selected');
+                if (!e.ctrlKey && !e.metaKey && !e.shiftKey) {
+                    $('.ui-selected', domTable).removeClass('ui-selected');
+                }
                 $(this).addClass('ui-selected dragover');
                 transferPanelContextMenu(null);
                 return !!contextMenuUI(e);
             }
             else
             {
-                var s = $('.transfer-table tr');
-                if (e.shiftKey && s.length > 0)
+                var domNode = domTable.querySelector('tr');
+                if (e.shiftKey && domNode)
                 {
-                    var start = s[0];
-                    var end = this;
+                    var start = domNode;
+                    var end   = this;
                     if ($.TgridLastSelected && $($.TgridLastSelected).hasClass('ui-selected')) {
                         start = $.TgridLastSelected;
                     }
@@ -5960,7 +4505,7 @@ function transferPanelUI()
                         end = start;
                         start = this;
                     }
-                    $('.transfer-table tr').removeClass('ui-selected');
+                    $('.ui-selected', domTable).removeClass('ui-selected');
                     $([start, end]).addClass('ui-selected');
                     $(start).nextUntil($(end)).each(function(i, e) {
                         $(e).addClass('ui-selected');
@@ -5968,7 +4513,7 @@ function transferPanelUI()
                 }
                 else if (!e.ctrlKey && !e.metaKey)
                 {
-                    $('.transfer-table tr').removeClass('ui-selected');
+                    $('.ui-selected', domTable).removeClass('ui-selected');
                     $(this).addClass('ui-selected');
                     $.TgridLastSelected = this;
                 }
@@ -5983,33 +4528,43 @@ function transferPanelUI()
                     }
                 }
             }
+
+            return false;
         });
-        initTransferScroll();
+        $tmp = undefined;
+
+        // initTransferScroll(domScrollingTable);
+        delay('tfs-ps-update', Ps.update.bind(Ps, domScrollingTable));
     };
 
     $.transferClose = function() {
         $('.nw-fm-left-icon.transfers').removeClass('active');
-        $('.fmholder').removeClass('transfer-panel-opened');
+        $('#fmholder').removeClass('transfer-panel-opened');
     };
 
     $.transferOpen = function(force) {
         if (force || !$('.nw-fm-left-icon.transfers').hasClass('active')) {
             $('.nw-fm-left-icon').removeClass('active');
             $('.nw-fm-left-icon.transfers').addClass('active');
-            notificationsUI(1);
             $('#fmholder').addClass('transfer-panel-opened');
+            notificationsUI(1);
+            var domScrollingTable = M.getTransferElements().domScrollingTable;
+            if (!domScrollingTable.classList.contains('ps-container')) {
+                Ps.initialize(domScrollingTable, {suppressScrollX: true});
+            }
             fm_tfsupdate(); // this will call $.transferHeader();
         }
     };
 
     $.clearTransferPanel = function() {
-        if ($('.transfer-table tr').length === 0) {
+        var obj = M.getTransferElements();
+        if (!obj.domTable.querySelector('tr')) {
             $('.transfer-clear-all-icon').addClass('disabled');
             $('.transfer-pause-icon').addClass('disabled');
             $('.transfer-clear-completed').addClass('disabled');
             $('.transfer-table-header').hide();
             $('.transfer-panel-empty-txt').removeClass('hidden');
-            $('.transfer-panel-title').html(l[104]);
+            $('.transfer-panel-title').text('');
             $('.nw-fm-left-icon.transfers').removeClass('transfering').find('p').removeAttr('style');
             if (M.currentdirid === 'transfers') {
                 fm_tfsupdate();
@@ -6133,52 +4688,49 @@ function menuItems() {
         sourceRoot = RootbyId($.selected[0]);
 
     // Show Rename action in case that only one item is selected
-    if (($.selected.length === 1) && (RightsbyID($.selected[0]) > 1)) {
+    if (($.selected.length === 1) && (rightsById($.selected[0]) > 1)) {
         items['.rename-item'] = 1;
     }
 
-    if (RightsbyID($.selected[0]) > 0) {
+    if (((Object.keys($.selected)).length < 2)
+            && (rightsById($.selected[0]) > 1)) {
 
         items['.add-star-item'] = 1;
 
         if (M.isFavourite($.selected)) {
-            $('.add-star-item').html('<span class="context-menu-icon"></span>' + l[5872]);
+            $('.add-star-item').safeHTML('<i class="small-icon context broken-heart"></i>@@', l[5872]);
         }
         else {
-            $('.add-star-item').html('<span class="context-menu-icon"/></span>' + l[5871]);
-
+            $('.add-star-item').safeHTML('<i class="small-icon context heart"/></i>@@', l[5871]);
         }
+
+        items['.colour-label-items'] = 1;
+        M.colourLabelcmUpdate(M.d[$.selected[0]]);
     }
 
     selItem = M.d[$.selected[0]];
 
-    if (selItem && (selItem.p.length === 11)) {
+    if (selItem && selItem.su && !M.d[selItem.p]) {
         items['.removeshare-item'] = 1;
     }
-    else if (RightsbyID($.selected[0]) > 1) {
+    else if (rightsById($.selected[0]) > 1) {
+        items['.move-item']   = 1;
         items['.remove-item'] = 1;
     }
 
-    if (selItem && ($.selected.length === 1) && selItem.t) {
-        items['.open-item'] = 1;
-    }
+    if (selItem && $.selected.length === 1) {
+        if (selItem.t) {
+            if (M.currentdirid !== selItem.h) {
+                items['.open-item'] = 1;
+            }
 
-    if (
-        selItem
-        && ($.selected.length === 1)
-        && is_image(selItem)
-        ) {
-        items['.preview-item'] = 1;
-    }
-
-    if (
-        selItem
-        && (sourceRoot === M.RootID)
-        && ($.selected.length === 1)
-        && selItem.t
-        && !folderlink
-        ) {
-        items['.sh4r1ng-item'] = 1;
+            if (sourceRoot === M.RootID && !folderlink) {
+                items['.sh4r1ng-item'] = 1;
+            }
+        }
+        else if (is_image(selItem)) {
+            items['.preview-item'] = 1;
+        }
     }
 
     if ((sourceRoot === M.RootID) && !folderlink) {
@@ -6195,12 +4747,13 @@ function menuItems() {
         exportLink = new mega.Share.ExportLink();
         isTakenDown = exportLink.isTakenDown($.selected);
 
-        // If any of selected items is taken donw remove actions from context menu
+        // If any of selected items is taken down remove actions from context menu
         if (isTakenDown) {
             delete items['.getlink-item'];
             delete items['.removelink-item'];
             delete items['.sh4r1ng-item'];
             delete items['.add-star-item'];
+            delete items['.colour-label-items'];
         }
     }
 
@@ -6217,9 +4770,8 @@ function menuItems() {
     if (folderlink) {
         delete items['.copy-item'];
         delete items['.add-star-item'];
-        if (u_type) {
-            items['.import-item'] = 1;
-        }
+        delete items['.colour-label-items'];
+        items['.import-item'] = 1;
     }
 
     return items;
@@ -6230,10 +4782,10 @@ function contextMenuUI(e, ll) {
     var v;
     var flt;
     var items = {};
-    var m = $('.context-menu.files-menu');
+    var m = $('.dropdown.body.files-menu');
 
-    // Selection of first child level ONLY of .context-menu-item in .context-menu
-    var menuCMI = '.context-menu.files-menu .context-menu-section > .context-menu-item';
+    // Selection of first child level ONLY of .dropdown-item in .dropdown.body
+    var menuCMI = '.dropdown.body.files-menu .dropdown-section > .dropdown-item';
     var currNodeClass = $(e.currentTarget).attr('class');
     var id = $(e.currentTarget).attr('id');
 
@@ -6248,8 +4800,8 @@ function contextMenuUI(e, ll) {
     if (ll === 2) {
 
         // Enable upload item menu for clould-drive, don't show it for rubbish and rest of crew
-        if (RightsbyID(M.currentdirid) && (M.currentrootid !== M.RubbishID)) {
-            $(menuCMI).filter('.context-menu-item').hide();
+        if (rightsById(M.currentdirid) && (M.currentrootid !== M.RubbishID)) {
+            $(menuCMI).filter('.dropdown-item').hide();
             $(menuCMI).filter('.fileupload-item,.newfolder-item').show();
 
             if ((is_chrome_firefox & 2) || 'webkitdirectory' in document.createElement('input')) {
@@ -6262,8 +4814,9 @@ function contextMenuUI(e, ll) {
     }
     else if (ll === 3) {// we want just the download menu
         $(menuCMI).hide();
-        m = $('.context-menu.download');
-        menuCMI = '.context-menu.download .context-menu-item';
+        m = $('.dropdown.body.download');
+        menuCMI = '.dropdown.body.download .dropdown-item';
+        $(menuCMI).show();
     }
     else if (ll === 4 || ll === 5) {// contactUI
         $(menuCMI).hide();
@@ -6283,8 +4836,8 @@ function contextMenuUI(e, ll) {
         }
     }
     else if (ll === 6) { // sort menu
-        $('.context-menu-item').hide();
-        $('.context-menu-item.do-sort').show();
+        $('.dropdown-item').hide();
+        $('.dropdown-item.do-sort').show();
     }
     else if (ll) {// Click on item
 
@@ -6328,8 +4881,6 @@ function contextMenuUI(e, ll) {
                 $(menuCMI).filter('.startvideo-item').addClass('disabled');
             }
 
-            // Remove select-all item from context menu
-            $(m).find('.select-all').remove();
         }
         else if (currNodeClass && (currNodeClass.indexOf('cloud-drive') > -1
                     || currNodeClass.indexOf('folder-link') > -1)) {
@@ -6381,6 +4932,7 @@ function contextMenuUI(e, ll) {
                 $(menuCMI).filter('.rename-item').hide();
                 $(menuCMI).filter('.copy-item').hide();
                 $(menuCMI).filter('.getlink-item').hide();
+                $(menuCMI).filter('.colour-label-items').hide();
             }
             else if (M.getNodeShare(id).down === 1) {
                 $(menuCMI).filter('.copy-item').hide();
@@ -6392,22 +4944,28 @@ function contextMenuUI(e, ll) {
         else {
             return false;
         }
+
+        //Hide Info item if properties dialog is opened
+        if ($.dialog === 'properties') {
+            $(menuCMI).filter('.properties-item').hide();
+        }
     }
     // This part of code is also executed when ll == 'undefined'
-    v = m.children($('.context-menu-section'));
+    v = m.children('.dropdown-section');
 
-    // count all items inside section, and hide dividers if necessary
+    // Count all items inside section, and hide dividers if necessary
     v.each(function() {
-        var a = $(this).find('a.context-menu-item'),
-            b = $(this).find('.context-menu-divider'),
-            x = a.filter(function() {
+        var $this = $(this);
+        var a = $this.find('a.dropdown-item');
+        var b = $this.find('hr');
+        var x = a.filter(function() {
                 return $(this).css('display') === 'none';
             });
         if (x.length === a.length || a.length === 0) {
-            b.hide();
+            $this.addClass('hidden');
         }
         else {
-            b.show();
+            $this.removeClass('hidden');
         }
     });
 
@@ -6416,6 +4974,11 @@ function contextMenuUI(e, ll) {
     disableCircularTargets('#fi_');
 
     m.removeClass('hidden');
+
+    // Hide last divider
+    v.find('hr').removeClass('hidden');
+    m.find('.dropdown-section:visible:last hr').addClass('hidden');
+
     e.preventDefault();
 }
 
@@ -6455,9 +5018,9 @@ function setContextMenuGetLinkText() {
     var removeLinkText = (numOfExistingPublicLinks > 1) ? l[8735] : l[6821];
 
     // Set the text for the 'Get/Update link/s' and 'Remove link/s' context menu items
-    var $contextMenu = $('.context-menu');
-    $contextMenu.find('.getlink-menu-text').text(getLinkText);
-    $contextMenu.find('.removelink-menu-text').text(removeLinkText);
+    var $contextMenu = $('.dropdown.body');
+    $contextMenu.find('.getlink-item span').text(getLinkText);
+    $contextMenu.find('.removelink-item span').text(removeLinkText);
 }
 
 /**
@@ -6468,27 +5031,29 @@ function setContextMenuGetLinkText() {
  */
 function disableCircularTargets(pref) {
 
-    var nodeId;
+    var nodes = $.selected || [];
 
-    for (var s in $.selected) {
-        if ($.selected.hasOwnProperty(s)) {
-            nodeId = $.selected[s];
-            if (M.d[nodeId]) {
-                $(pref + nodeId).addClass('disabled');
-            }
+    for (var s = nodes.length; s--;) {
+        var handle = nodes[s];
+        var node = M.d[handle];
 
-            if (M.d[nodeId] && M.d[nodeId].p) {
+        if (node) {
+            $(pref + handle).addClass('disabled');
 
+            if (node.p) {
                 // Disable parent dir
-                $(pref + M.d[nodeId].p).addClass('disabled');
+                $(pref + node.p).addClass('disabled');
             }
-            else if (d) {
-                console.error('disableCircularTargets: Invalid node', nodeId, pref);
+            else if (d && node.t < 2) {
+                console.error('disableCircularTargets: parent-less node!', handle, pref);
             }
-
-            // Disable all children folders
-            disableDescendantFolders(nodeId, pref);
         }
+        else if (d) {
+            console.error('disableCircularTargets: Invalid node', handle, pref);
+        }
+
+        // Disable all children folders
+        disableDescendantFolders(handle, pref);
     }
 }
 
@@ -6513,31 +5078,45 @@ function adjustContextMenuPosition(e, m)
     return true;
 }
 
-function reCalcMenuPosition(m, x, y, ico)
-{
+/**
+ * Calculates coordinates where context menu will be shown
+ * @param {Object} m jQuery object of context menu or child class
+ * @param {Number} x Coordinate x of cursor or clicked element
+ * @param {Number} y Coordinate y of cursor or clicked element
+ * @param {Object} ico JSON {x, y} width and height of element clicked on
+ * @returns {Object} Coordinates {x, y} where context menu will be drawn
+ */
+/* jshint -W074 */
+function reCalcMenuPosition(m, x, y, ico) {
+
     var TOP_MARGIN = 12;
     var SIDE_MARGIN = 12;
-    var cmW = m.outerWidth(), cmH = m.outerHeight();// dimensions without margins calculated
-    var wH = window.innerHeight, wW = window.innerWidth;
-    var maxX = wW - SIDE_MARGIN;// max horizontal
-    var maxY = wH - TOP_MARGIN;// max vertical
-    var minX = SIDE_MARGIN + $('div.nw-fm-left-icons-panel').outerWidth();// min horizontal
-    var minY = TOP_MARGIN;// min vertical
-    var wMax = x + cmW;// coordinate of right edge
-    var hMax = y + cmH;// coordinate of bottom edge
+    var cmW = m.outerWidth();// dimensions without margins calculated
+    var cmH = m.outerHeight();// dimensions without margins calculated
+    var wH = window.innerHeight;
+    var wW = window.innerWidth;
+    var maxX = wW - SIDE_MARGIN;// max horizontal coordinate, right side of window
+    var maxY = wH - TOP_MARGIN;// max vertical coordinate, bottom side of window
 
-    this.overlapParentMenu = function()
-    {
+    // min horizontal coordinate, left side of right panel
+    var minX = SIDE_MARGIN + $('div.nw-fm-left-icons-panel').outerWidth();
+    var minY = TOP_MARGIN;// min vertical coordinate, top side of window
+    var wMax = x + cmW;// coordinate of context menu right edge
+    var hMax = y + cmH;// coordinate of context menu bottom edge
+
+    var top = 'auto';
+    var left = '100%';
+    var right = 'auto';
+
+    var overlapParentMenu = function(n) {
         var tre = wW - wMax;// to right edge
         var tle = x - minX - SIDE_MARGIN;// to left edge
 
-        if (tre >= tle)
-        {
+        if (tre >= tle) {
             n.addClass('overlap-right');
             n.css({'top': top, 'left': (maxX - x - nmW) + 'px'});
         }
-        else
-        {
+        else {
             n.addClass('overlap-left');
             n.css({'top': top, 'right': (wMax - nmW - minX) + 'px'});
         }
@@ -6545,57 +5124,65 @@ function reCalcMenuPosition(m, x, y, ico)
         return;
     };
 
-    // submenus are absolutely positioned, which means that they are relative to first parent, positioned other then static
-    // first parent, which is NOT a .contains-submenu element (it's previous in same level)
-    this.horPos = function()// used for submenues
-    {
+    /**
+     * Calculates top position of submenu
+     * Submenu is relatively positioned to the first sibling element
+     * @param {Object} n jQuery object, submenu of hovered element
+     * @returns {String} top Top coordinate in pixels for submenu
+     */
+    var horPos = function(n) {
         var top;
         var nTop = parseInt(n.css('padding-top'));
         var tB = parseInt(n.css('border-top-width'));
         var pPos = m.position();
-
         var b = y + nmH - (nTop - tB);// bottom of submenu
-        var mP = m.closest('.context-submenu');
-        var pT = 0, bT = 0, pE = 0;
-        if (mP.length)
-        {
+        var mP = m.closest('.dropdown.body.submenu');
+        var pT = 0;
+        var bT = 0;
+        var pE = 0;
+
+        if (mP.length) {
             pE = mP.offset();
             pT = parseInt(mP.css('padding-top'));
             bT = parseInt(mP.css('border-top-width'));
         }
-        if (b > maxY)
+        if (b > maxY) {
             top = (maxY - nmH + nTop - tB) - pE.top + 'px';
-        else
+        }
+        else {
             top = pPos.top - tB + 'px';
+        }
 
         return top;
     };
 
-    var dPos;
+    var dPos;// new context menu position
     var cor;// corner, check setBordersRadius for more info
-    if (typeof ico === 'object')// draw context menu relative to file-settings-icon
-    {
+    if (typeof ico === 'object') {// draw context menu relative to file-settings-icon
         cor = 1;
         dPos = {'x': x - 2, 'y': y + ico.y + 8};// position for right-bot
-        if (wMax > maxX)// draw to the left
-        {
+
+        // draw to the left
+        if (wMax > maxX) {
             dPos.x = x - cmW + ico.x + 2;// additional pixels to align with -icon
             cor = 3;
         }
-        if (hMax > maxY)// draw to the top
-        {
-            dPos.y = y - cmH;// additional pixels to align with -icon
+
+        // draw to the top
+        if (hMax > (maxY - TOP_MARGIN)) {
+            dPos.y = y - cmH - 6;
+            if (dPos.y < TOP_MARGIN) {
+                dPos.y = TOP_MARGIN;
+            }
             cor++;
         }
     }
-    else if (ico === 'submenu')// submenues
-    {
-        var n = m.next('.context-submenu');
+    else if (ico === 'submenu') {// submenues
+        var n = m.next('.dropdown.body.submenu');
         var nmW = n.outerWidth();// margin not calculated
         var nmH = n.outerHeight();// margins not calculated
 
-        if (nmH > (maxY - TOP_MARGIN))// Handle huge menu
-        {
+        if (nmH > (maxY - TOP_MARGIN)) {// Handle huge menu
             nmH = maxY - TOP_MARGIN;
             var tmp = document.getElementById('csb_' + m.attr('id').replace('fi_', ''));
             $(tmp).addClass('context-scrolling-block');
@@ -6605,31 +5192,29 @@ function reCalcMenuPosition(m, x, y, ico)
             n.css({'height': nmH + 'px'});
         }
 
-        var top = 'auto', left = '100%', right = 'auto';
-
-        top = this.horPos();
-        if (m.parent().parent('.left-position').length === 0)
-        {
-            if (maxX >= (wMax + nmW))
+        top = horPos(n);
+        if (m.parent().parent('.left-position').length === 0) {
+            if (maxX >= (wMax + nmW)) {
                 left = 'auto', right = '100%';
-            else if (minX <= (x - nmW))
+            }
+            else if (minX <= (x - nmW)) {
                 n.addClass('left-position');
-            else
-            {
-                this.overlapParentMenu();
+            }
+            else {
+                overlapParentMenu(n);
 
                 return true;
             }
         }
-        else
-        {
-            if (minX <= (x - nmW))
+        else {
+            if (minX <= (x - nmW)) {
                 n.addClass('left-position');
-            else if (maxX >= (wMax + nmW))
+            }
+            else if (maxX >= (wMax + nmW)) {
                 left = 'auto', right = '100%';
-            else
-            {
-                this.overlapParentMenu();
+            }
+            else {
+                overlapParentMenu(n);
 
                 return true;
             }
@@ -6637,22 +5222,26 @@ function reCalcMenuPosition(m, x, y, ico)
 
         return {'top': top, 'left': left, 'right': right};
     }
-    else// right click
-    {
+    else {// right click
         cor = 0;
         dPos = {'x': x, 'y': y};
-        if (x < minX)
+        if (x < minX) {
             dPos.x = minX;// left side alignment
-        if (wMax > maxX)
-            dPos.x = maxX - cmW;// align with right side, 12px from it
-        if (hMax > maxY)
-            dPos.y = maxY - cmH;// align with bottom, 12px from it
+        }
+        if (wMax > maxX) {
+            dPos.x = maxX - cmW;// align with right side
+        }
+
+        if (hMax > maxY) {
+            dPos.y = maxY - cmH;// align with bottom
+        }
     }
 
     setBordersRadius(m, cor);
 
     return {'x': dPos.x, 'y': dPos.y};
 }
+/* jshint -W074 */
 
 // corner position 0 means default
 function setBordersRadius(m, c)
@@ -6688,36 +5277,32 @@ function setBordersRadius(m, c)
         'border-top-left-radius': tl,
         'border-top-right-radius': tr,
         'border-bottom-left-radius': bl,
-        'border-bottom-right-radius': br});
+        'border-bottom-right-radius': br
+    });
 
     return true;
 }
 
 // Scroll menus which height is bigger then window.height
-function scrollMegaSubMenu(e)
-{
+function scrollMegaSubMenu(e) {
     var ey = e.pageY;
-    var c = $(e.target).closest('.context-submenu');
+    var c = $(e.target).closest('.dropdown.body.submenu');
     var pNode = c.children(':first')[0];
 
-    if (typeof pNode !== 'undefined')
-    {
+    if (typeof pNode !== 'undefined') {
         var h = pNode.offsetHeight;
         var dy = h * 0.1;// 10% dead zone at the begining and at the bottom
         var pos = getHtmlElemPos(pNode, true);
         var py = (ey - pos.y - dy) / (h - dy * 2);
-        if (py > 1)
-        {
+        if (py > 1) {
             py = 1;
             c.children('.context-bottom-arrow').addClass('disabled');
         }
-        else if (py < 0)
-        {
+        else if (py < 0) {
             py = 0;
             c.children('.context-top-arrow').addClass('disabled');
         }
-        else
-        {
+        else {
             c.children('.context-bottom-arrow,.context-top-arrow').removeClass('disabled');
         }
         pNode.scrollTop = py * (pNode.scrollHeight - h);
@@ -6809,6 +5394,8 @@ function treeUI()
             $(e.target).is('input') ||
             $(e.target).is('textarea') ||
             $(e.target).is('.download.info-txt') ||
+            $(e.target).closest('.multiple-input').length ||
+            $(e.target).closest('.create-folder-input-bl').length ||
             $(e.target).closest('.content-panel.conversations').length ||
             $(e.target).closest('.messages.content-area').length ||
             $(e.target).closest('.chat-right-pad .user-card-data').length ||
@@ -6820,7 +5407,8 @@ function treeUI()
             $(e.target).hasClass('contact-details-email') ||
             $(e.target).hasClass('nw-conversations-name')) {
             return;
-        } else if (!localStorage.contextmenu) {
+        }
+        else if (!localStorage.contextmenu) {
             $.hideContextMenu();
             return false;
         }
@@ -6899,21 +5487,12 @@ function treeUI()
     }
 }
 
-function treeUIexpand(id, force, moveDialog)
+function treeUIexpand(id, force)
 {
     M.buildtree(M.d[id]);
 
     var b = $('#treea_' + id);
     var d = b.attr('class');
-
-    if (M.currentdirid !== id)
-    {
-        var path = M.getPath(M.currentdirid), pid = {}, active_sub = false;
-        for (var i in path)
-            pid[path[i]] = i;
-        if (pid[M.currentdirid] < pid[id])
-            active_sub = true;
-    }
 
     if (d && d.indexOf('expanded') > -1 && !force)
     {
@@ -6928,7 +5507,7 @@ function treeUIexpand(id, force, moveDialog)
         b.addClass('expanded');
     }
 
-    treeUI();
+    delay(treeUI);
 }
 
 function sectionUIopen(id) {
@@ -6937,6 +5516,7 @@ function sectionUIopen(id) {
         console.log('sectionUIopen', id, folderlink);
     }
 
+    $.hideContextMenu();
     $('.nw-fm-left-icon').removeClass('active');
     if (M.hasInboxItems() === true) {
         $('.nw-fm-left-icon.inbox').removeClass('hidden');
@@ -6950,12 +5530,17 @@ function sectionUIopen(id) {
         tmpId = 'contacts';
     } else if (id === 'account') {
         tmpId = 'account';
+    } else if (id === 'dashboard') {
+        tmpId = 'dashboard';
     } else {
         tmpId = id;
     }
-    $('.nw-fm-left-icon.' + tmpId).addClass('active');
-    $('.content-panel.' + tmpId).addClass('active');
-    $('.fm-left-menu').removeClass('cloud-drive folder-link shared-with-me rubbish-bin contacts conversations opc ipc inbox account').addClass(tmpId);
+    $('.nw-fm-left-icon.' + String(tmpId).replace(/[^\w-]/g, '')).addClass('active');
+    $('.content-panel.' + String(tmpId).replace(/[^\w-]/g, '')).addClass('active');
+    $('.fm-left-menu').removeClass(
+        'cloud-drive folder-link shared-with-me rubbish-bin contacts ' +
+        'conversations opc ipc inbox account dashboard transfers'
+    ).addClass(tmpId);
     $('.fm.fm-right-header, .fm-import-to-cloudrive, .fm-download-as-zip').addClass('hidden');
     $('.fm-import-to-cloudrive, .fm-download-as-zip').unbind('click');
 
@@ -7103,9 +5688,8 @@ function sectionUIopen(id) {
         }
         else {
             $('.section').addClass('hidden');
-            $('.section.' + id).removeClass('hidden');
+            $('.section.' + String(id).replace(/[^\w-]/g, '')).removeClass('hidden');
         }
-
     }
 }
 
@@ -7133,6 +5717,8 @@ function treeUIopen(id, event, ignoreScroll, dragOver, DragOpen) {
         sectionUIopen('opc');
     } else if (id_r === 'account') {
         sectionUIopen('account');
+    } else if (id_r === 'dashboard') {
+        sectionUIopen('dashboard');
     } else if (M.RubbishID && id_r === M.RubbishID) {
         sectionUIopen('rubbish-bin');
     } else if (id_s === 'transfers') {
@@ -7147,7 +5733,7 @@ function treeUIopen(id, event, ignoreScroll, dragOver, DragOpen) {
         var ids = M.getPath(id);
         var i = 1;
         while (i < ids.length) {
-            if (M.d[ids[i]]) {
+            if (M.d[ids[i]] && ids[i].length === 8) {
                 treeUIexpand(ids[i], 1);
             }
             i++;
@@ -7195,7 +5781,7 @@ function treeUIopen(id, event, ignoreScroll, dragOver, DragOpen) {
             }, 50);
         }
     }
-    treeUI();
+    delay(treeUI);
 }
 
 function fm_hideoverlay() {
@@ -7247,8 +5833,7 @@ function renameDialog() {
             $('.rename-dialog input')[0].selectionEnd = $('.rename-dialog input').val().length - ext.length - 1;
         }
 
-        $('.rename-dialog input').unbind('focus');
-        $('.rename-dialog input').bind('focus', function() {
+        $('.rename-dialog input').rebind('focus', function() {
             var selEnd;
             $(this).closest('.rename-dialog').addClass('focused');
             var d = $(this).val().lastIndexOf('.');
@@ -7260,11 +5845,9 @@ function renameDialog() {
             }
             $(this)[0].selectionStart = 0;
             $(this)[0].selectionEnd = selEnd;
-
         });
 
-        $('.rename-dialog input').unbind('blur');
-        $('.rename-dialog input').bind('blur', function() {
+        $('.rename-dialog input').rebind('blur', function() {
             $(this).closest('.rename-dialog').removeClass('focused');
         });
 
@@ -7279,7 +5862,7 @@ function renameDialog() {
             else {
                 $('.rename-dialog').addClass('active');
             }
-            if (!n.t && ext.length > 0) {
+            /*if (!n.t && ext.length > 0) {
                 if (this.selectionStart > $('.rename-dialog input').val().length - ext.length - 2) {
                     this.selectionStart = $('.rename-dialog input').val().length - ext.length - 1;
                     this.selectionEnd = $('.rename-dialog input').val().length - ext.length - 1;
@@ -7291,7 +5874,7 @@ function renameDialog() {
                     this.selectionEnd = $('.rename-dialog input').val().length - ext.length - 1;
                     return false;
                 }
-            }
+            }*/
         });
     }
 }
@@ -7320,6 +5903,7 @@ function doRename() {
 }
 
 function msgDialog(type, title, msg, submsg, callback, checkbox) {
+    var doneButton  = l[81];
     var extraButton = String(type).split(':');
     if (extraButton.length === 1) {
         extraButton = null;
@@ -7327,6 +5911,11 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
     else {
         type = extraButton.shift();
         extraButton = extraButton.join(':');
+
+        if (extraButton[0] === '!') {
+            doneButton  = l[82];
+            extraButton = extraButton.substr(1);
+        }
     }
     $.msgDialog = type;
     $.warningCallback = callback;
@@ -7340,17 +5929,17 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
         $('#msgDialog').addClass('clear-bin-dialog');
         $('#msgDialog .icon').addClass('fm-bin-clear-icon');
         $('#msgDialog .fm-notifications-bottom')
-            .safeHTML('<div class="fm-dialog-button notification-button confirm"><span>@@</span></div>' +
-                '<div class="fm-dialog-button notification-button cancel"><span>@@</span></div>' +
+            .safeHTML('<div class="default-white-button right notification-button confirm"><span>@@</span></div>' +
+                '<div class="default-white-button right notification-button cancel"><span>@@</span></div>' +
                 '<div class="clear"></div>', l[1018], l[82]);
 
-        $('#msgDialog .fm-dialog-button').eq(0).bind('click', function() {
+        $('#msgDialog .default-white-button').eq(0).bind('click', function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(true);
             }
         });
-        $('#msgDialog .fm-dialog-button').eq(1).bind('click', function() {
+        $('#msgDialog .default-white-button').eq(1).bind('click', function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(false);
@@ -7360,17 +5949,17 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
     else if (type === 'delete-contact') {
         $('#msgDialog').addClass('delete-contact');
         $('#msgDialog .fm-notifications-bottom')
-            .safeHTML('<div class="fm-dialog-button notification-button confirm"><span>@@</span></div>' +
-                '<div class="fm-dialog-button notification-button cancel"><span>@@</span></div>' +
+            .safeHTML('<div class="default-white-button right notification-button confirm"><span>@@</span></div>' +
+                '<div class="default-white-button right notification-button cancel"><span>@@</span></div>' +
                 '<div class="clear"></div>', l[78], l[79]);
 
-        $('#msgDialog .fm-dialog-button').eq(0).bind('click', function() {
+        $('#msgDialog .default-white-button').eq(0).bind('click', function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(true);
             }
         });
-        $('#msgDialog .fm-dialog-button').eq(1).bind('click', function() {
+        $('#msgDialog .default-white-button').eq(1).bind('click', function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(false);
@@ -7380,17 +5969,17 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
     else if (type === 'warninga' || type === 'warningb' || type === 'info') {
         if (extraButton) {
             $('#msgDialog .fm-notifications-bottom')
-                .safeHTML('<div class="fm-dialog-button notification-button confirm"><span>@@</span></div>' +
-                    '<div class="fm-dialog-button notification-button cancel"><span>@@</span></div>' +
-                    '<div class="clear"></div>', l[81], extraButton);
+                .safeHTML('<div class="default-white-button right notification-button confirm"><span>@@</span></div>' +
+                    '<div class="default-white-button right notification-button cancel"><span>@@</span></div>' +
+                    '<div class="clear"></div>', doneButton, extraButton);
 
-            $('#msgDialog .fm-dialog-button').eq(0).bind('click', function() {
+            $('#msgDialog .default-white-button').eq(0).bind('click', function() {
                 closeMsg();
                 if ($.warningCallback) {
                     $.warningCallback(false);
                 }
             });
-            $('#msgDialog .fm-dialog-button').eq(1).bind('click', function() {
+            $('#msgDialog .default-white-button').eq(1).bind('click', function() {
                 closeMsg();
                 if ($.warningCallback) {
                     $.warningCallback(true);
@@ -7399,10 +5988,10 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
         }
         else {
             $('#msgDialog .fm-notifications-bottom')
-                .safeHTML('<div class="fm-dialog-button notification-button"><span>@@</span></div>' +
+                .safeHTML('<div class="default-white-button right notification-button"><span>@@</span></div>' +
                     '<div class="clear"></div>', l[81]);
 
-            $('#msgDialog .fm-dialog-button').bind('click', function() {
+            $('#msgDialog .default-white-button').bind('click', function() {
                 closeMsg();
                 if ($.warningCallback) {
                     $.warningCallback(true);
@@ -7429,18 +6018,18 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
                         'id="confirmation-checkbox" class="checkboxOff">' +
                 '</div>' +
                 '<label for="export-checkbox" class="radio-txt">@@</label></div>' +
-                '<div class="fm-dialog-button notification-button confirm"><span>@@</span></div>' +
-                '<div class="fm-dialog-button notification-button cancel"><span>@@</span></div>' +
+                '<div class="default-white-button right notification-button confirm"><span>@@</span></div>' +
+                '<div class="default-white-button right notification-button cancel"><span>@@</span></div>' +
                 '<div class="clear"></div>', l[229], l[78], l[79]);
 
-        $('#msgDialog .fm-dialog-button').eq(0).bind('click', function() {
+        $('#msgDialog .default-white-button').eq(0).bind('click', function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(true);
             }
         });
 
-        $('#msgDialog .fm-dialog-button').eq(1).bind('click', function() {
+        $('#msgDialog .default-white-button').eq(1).bind('click', function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(false);
@@ -7480,7 +6069,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
             .addClass('hidden')
             .html('');
 
-        $('#msgDialog .fm-dialog-button').bind('click', function() {
+        $('#msgDialog .default-white-button').bind('click', function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(true);
@@ -7489,8 +6078,8 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
         $('#msgDialog').addClass('notification-dialog');
         title = l[5841];
         msg = '<p>' + escapeHTML(l[5842]) + '</p>\n' +
-            '<a class="top-login-button" href="#login">' + escapeHTML(l[171]) + '</a>\n' +
-            '<a class="create-account-button" href="#register">' + escapeHTML(l[1076]) + '</a><br/>';
+            '<a class="top-login-button clickurl" href="/login">' + escapeHTML(l[171]) + '</a>\n' +
+            '<a class="create-account-button clickurl" href="/register">' + escapeHTML(l[1076]) + '</a><br/>';
 
         var $selectedPlan = $('.reg-st3-membership-bl.selected');
         var plan = 1;
@@ -7510,6 +6099,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
     $('#msgDialog .fm-dialog-title span').text(title);
 
     $('#msgDialog .fm-notification-info p').safeHTML(msg);
+    clickURLs();
     if (submsg) {
         $('#msgDialog .fm-notification-warning').text(submsg);
         $('#msgDialog .fm-notification-warning').show();
@@ -7570,8 +6160,8 @@ function handleDialogTabContent(dialogTabClass, parentTag, dialogPrefix, htmlCon
         .safeHTML(html);
 
     // Empty message, no items available
-    if (!$(prefix + '-dialog-tree-panel' + tabClass + ' .dialog-content-block ' + parentTag).length){
-        $(prefix + '-dialog-empty' + tabClass).addClass('active');
+    if (!$(prefix + '-dialog-tree-panel' + tabClass + ' .dialog-content-block ' + parentTag).children().length) {
+        $(prefix + '.dialog-empty-block' + tabClass).addClass('active');
         $(prefix + '-dialog-tree-panel' + tabClass + ' ' + prefix + '-dialog-panel-header').addClass('hidden');
     }
 
@@ -7589,22 +6179,26 @@ function handleDialogTabContent(dialogTabClass, parentTag, dialogPrefix, htmlCon
  * @param {String} dialogName Dialog name i.e. { copy, move }.
  */
 function disableReadOnlySharedFolders(dialogName) {
-
-    var nodeId, accessRight, rootParentDirId,
-        $mcTreeSub = $("#mctreesub_shares"),
-        $ro = $('.' + dialogName + '-dialog-tree-panel.shared-with-me .dialog-content-block span[id^="mctreea_"]');
+    var $ro = $('.' + dialogName + '-dialog-tree-panel.shared-with-me .dialog-content-block span[id^="mctreea_"]');
+    var targets = $.selected || [];
 
     $ro.each(function(i, v) {
-        nodeId = $(v).attr('id').replace('mctreea_', '');
+        var node = M.d[$(v).attr('id').replace('mctreea_', '')];
 
-        // Apply access right of root parent dir to all subfolders
-        rootParentDirId = $("#mctreea_" + nodeId).parentsUntil($mcTreeSub).last().attr('id').replace('mctreeli_', '');
-
-        if (M.d[rootParentDirId]) {
-            accessRight = M.d[rootParentDirId].r;
+        while (node && !node.su) {
+            node = M.d[node.p];
         }
 
-        if (!accessRight || (accessRight === 0)) {
+        if (node) {
+            for (i = targets.length; i--;) {
+                if (isCircular(node.h, targets[i])) {
+                    node = null;
+                    break;
+                }
+            }
+        }
+
+        if (!node || !node.r) {
             $(v).addClass('disabled');
         }
     });
@@ -7629,16 +6223,19 @@ function handleDialogContent(dialogTabClass, parentTag, newFolderButton, dialogP
     if ($.onImportCopyNodes && (!newFolderButton || (dialogPrefix !== 'copy'))) {
 
         // XXX: Ideally show some notification that importing from folder link to anything else than the cloud isn't supported.
-        $('.copy-dialog-button.' + dialogTabClass).fadeOut(200).fadeIn(100);
+        $('.copy-dialog-button.' + String(dialogTabClass).replace(/[^\w-]/g, '')).fadeOut(200).fadeIn(100);
+        // clicking the shares tab deactivates the "Import" button, restore it.
+        $('.dialog-copy-button').removeClass('disabled');
+        $.mcselected = $.mcselected || M.RootID;
 
         return;
     }
     $('.' + dialogPrefix + '-dialog-txt').removeClass('active');
-    $('.' + dialogPrefix + '-dialog-empty').removeClass('active');
     $('.' + dialogPrefix + '-dialog-button').removeClass('active');
     $('.' + dialogPrefix + '-dialog-tree-panel').removeClass('active');
     $('.' + dialogPrefix + '-dialog-panel-arrows').removeClass('active');
     $('.' + dialogPrefix + '-dialog .dialog-sorting-menu').addClass('hidden');
+    $('.' + dialogPrefix + '.dialog-empty-block').removeClass('active');
 
     $('.dialog-' + dialogPrefix + '-button span').text(buttonLabel);
 
@@ -7693,7 +6290,6 @@ function handleDialogContent(dialogTabClass, parentTag, newFolderButton, dialogP
     if (buttonLabel === l[1344]) {
         $('.fm-dialog.copy-dialog .share-dialog-permissions').removeClass('hidden');
         $('.dialog-newfolder-button').addClass('hidden');
-        $('.copy-dialog-button').addClass('hidden');
         $('.copy-operation-txt').text(l[1344]);
 
         $('.fm-dialog.copy-dialog .share-dialog-permissions')
@@ -7701,6 +6297,8 @@ function handleDialogContent(dialogTabClass, parentTag, newFolderButton, dialogP
                 var $btn = $(this);
                 var $menu = $('.permissions-menu', this.parentNode);
                 var $items = $('.permissions-menu-item', $menu);
+
+                $menu.removeAttr('style');
 
                 $items
                     .rebind('click', function() {
@@ -7743,7 +6341,7 @@ function shareDialogContentCheck() {
     var dc = '.share-dialog',
         itemsNum = 0,
         newItemsNum = 0,
-        $btn = $('.fm-dialog-button.dialog-share-button');
+        $btn = $('.default-white-button.dialog-share-button');
     var $groupPermissionDropDown = $('.share-dialog .permissions-icon');
 
     newItemsNum = $(dc + ' .token-input-token-mega').length;
@@ -7820,41 +6418,31 @@ function fillShareDialogWithContent() {
     $.changedPermissions = [];// GLOBAL VAR, changed permissions shared dialog
     $.removedContactsFromShare = [];// GLOBAL VAR, removed contacts from a share
 
-    var user, email, name, shareRights, html,
-        selectedNodeHandle = $.selected[0],
-        shares = M.d[selectedNodeHandle].shares,
-        pendingShares = M.ps[selectedNodeHandle];
+    var pendingShares = {};
+    var nodeHandle    = String($.selected[0]);
+    var node          = M.getNodeByHandle(nodeHandle);
+    var userHandles   = M.getNodeShareUsers(node, 'EXP');
 
-    // List users that are already use item
-    for (var userHandle in shares) {
-        if (shares.hasOwnProperty(userHandle)) {
-
-            if (Object(M.u).hasOwnProperty(userHandle)) {
-                user = M.u[userHandle];
-                email = user.m;
-                name = M.getNameByHandle(userHandle);
-                shareRights = shares[userHandle].r;
-
-                generateShareDialogRow(name, email, shareRights, userHandle);
-            }
-        }
+    if (Object(M.ps).hasOwnProperty(nodeHandle)) {
+        pendingShares = Object(M.ps[nodeHandle]);
+        userHandles   = userHandles.concat(Object.keys(pendingShares));
     }
+    var seen = {};
 
-    // Pending contact requests (pcr)
-    if (pendingShares) {
-        for (var pcrHandle in pendingShares) {
-            if (pendingShares.hasOwnProperty(pcrHandle)) {
+    userHandles.forEach(function(handle) {
+        var user = M.getUser(handle) || Object(M.opc[handle]);
 
-                // Because it's pending, we don't have user information in M.u so we have to look in the pending contact request
-                if (M.opc[pendingShares[pcrHandle].p]) {
-                    var pendingContactRequest = M.opc[pendingShares[pcrHandle].p];
-
-                    // ToDo: take care of name attribute once available
-                    generateShareDialogRow(pendingContactRequest.m, pendingContactRequest.m, pendingShares[pcrHandle].r);
-                }
-            }
+        if (!user.m) {
+            console.warn('Unknown user "%s"!', handle);
         }
-    }
+        else if (!seen[user.m]) {
+            var name  = M.getNameByHandle(handle) || user.m;
+            var share = M.getNodeShare(node, handle) || Object(pendingShares[handle]);
+
+            generateShareDialogRow(name, user.m, share.r | 0, handle);
+            seen[user.m] = 1;
+        }
+    });
 }
 
 /**
@@ -7928,7 +6516,7 @@ function handleShareDialogContent() {
 
     $('.share-dialog-icon.permissions-icon')
         .removeClass('active full-access read-and-write')
-        .html('<span></span>' + l[55])
+        .safeHTML('<span></span>' + l[55])
         .addClass('read-only');
 
     // Update dialog title text
@@ -7943,7 +6531,8 @@ function handleShareDialogContent() {
  *
  * Extract id from list of emails, preparing it for extrusion,
  * fill multi-input dropdown list with not used emails.
- * @param {String} dialog, multi-input dialog class name.
+ *
+ * @param {String} dialog multi-input dialog class name.
  */
 function updateDialogDropDownList(dialog) {
 
@@ -8133,6 +6722,12 @@ function initShareDialogMultiInputPlugin() {
                         $shareDialog.find('.token-input-input-token-mega input').focus();
                     }, 0);
                 }
+
+                $('.fm-dialog.share-dialog').position({
+                    'my': 'center center',
+                    'at': 'center center',
+                    'of': $(window)
+                });
             },
             onDelete: function() {
 
@@ -8181,6 +6776,12 @@ function initShareDialogMultiInputPlugin() {
                     // Disable group permission change drop down list
                     $('.share-dialog .permissions-icon').addClass('disabled');
                 }
+
+                $('.fm-dialog.share-dialog').position({
+                    'my': 'center center',
+                    'at': 'center center',
+                    'of': $(window)
+                });
             }
         });
 }
@@ -8212,7 +6813,7 @@ function initCopyrightsDialog(nodesToProcess) {
     $copyrightDialog.show();
 
     // Init click handler for 'I agree' / 'I disagree' buttons
-    $copyrightDialog.find('.fm-dialog-button').rebind('click', function() {
+    $copyrightDialog.find('.default-white-button').rebind('click', function() {
 
         // User disagrees with copyright warning
         if ($(this).hasClass('cancel')) {
@@ -8239,9 +6840,9 @@ function initShareDialog() {
 
     $.shareTokens = [];
 
-    if (!u_type) {
+    /*if (!u_type) {
         return; // not for ephemeral
-    }
+    }*/
 
     // Prevents double initialization of token input
     if (!$('.share-multiple-input').tokenInput("getSettings")) {
@@ -8334,7 +6935,7 @@ function initShareDialog() {
         if (handleOrEmail !== '') {
 
             // Due to pending shares, the id could be an email instead of a handle
-            userEmail = handleOrEmail;
+            userEmail = Object(M.opc[handleOrEmail]).m || handleOrEmail;
 
             $.removedContactsFromShare.push({
                 'selectedNodeHandle': selectedNodeHandle,
@@ -8450,7 +7051,7 @@ function initShareDialog() {
             $itemPermLevel
                 .removeClass(currPermLevel[0])
                 .removeClass('active')
-                .html('<span></span>' + newPermLevel[1])
+                .safeHTML('<span></span>@@', newPermLevel[1])
                 .addClass(newPermLevel[0]);
         }
         else if ($groupPermLevel.length) {// Group permission change, .permissions-icon
@@ -8478,19 +7079,19 @@ function initShareDialog() {
             $groupPermLevel
                 .removeClass(currPermLevel[0])
                 .removeClass('active')
-                .html('<span></span>' + newPermLevel[1])
+                .safeHTML('<span></span>@@', newPermLevel[1])
                 .addClass(newPermLevel[0]);
 
             /*$('.share-dialog-contact-bl .share-dialog-permissions')
                 .removeClass('read-only')
                 .removeClass('read-and-write')
                 .removeClass('full-access')
-                .html('<span></span>' + newPermLevel[1])
+                .safeHTML('<span></span>@@', newPermLevel[1])
                 .addClass(newPermLevel[0]);*/
         }
 
         if ($.changedPermissions.length > 0) {// Enable Done button
-            $('.fm-dialog-button.dialog-share-button').removeClass('disabled');
+            $('.default-white-button.dialog-share-button').removeClass('disabled');
         }
 
         $('.permissions-icon.active').removeClass('active');
@@ -8575,14 +7176,17 @@ function closeImportContactNotification(c) {
 
 function clearScrollPanel(from) {
     var j = $(from + ' .multiple-input').jScrollPane().data();
+
     if (j && j.jsp) {
         j.jsp.destroy();
     }
+
     $(from + ' .multiple-input .jspPane').unwrap();
     $(from + ' .multiple-input .jspPane:first-child').unwrap();
 
     // remove share dialog contacts, jScrollPane
     j = $(from + ' .share-dialog-contacts').jScrollPane().data();
+
     if (j && j.jsp) {
         j.jsp.destroy();
     }
@@ -8640,12 +7244,9 @@ function closeDialog() {
         $('.add-contact-multiple-input').tokenInput("clearOnCancel");
         $('.share-multiple-input').tokenInput("clearOnCancel");
 
-        clearScrollPanel('.add-user-popup');
-
         // share dialog
         $('.share-dialog-contact-bl').remove();
         $('.import-contacts-service').removeClass('imported');
-        clearScrollPanel('.share-dialog');
 
         // share dialog permission menu
         $('.permissions-menu').fadeOut(0);
@@ -9184,7 +7785,7 @@ function moveDialog() {
     });
 
     /**
-     * Create new foler button clicket inside move-dialog
+     * Create new folder button clicket inside move-dialog
      */
     $('.move-dialog .dialog-newfolder-button').rebind('click', function() {
 
@@ -9309,19 +7910,8 @@ function moveDialog() {
 
         if (typeof $.mcselected != 'undefined') {
 
-            var n = [];
-            for (var i in $.selected) {
-                if (!isCircular($.selected[i], $.mcselected)) {
-                    n.push($.selected[i]);
-                }
-            }
             closeDialog();
-            if (RootbyId($.mcselected) === 'shares') {
-                M.copyNodes(n, $.mcselected, true);
-            }
-            else {
-                M.moveNodes(n, $.mcselected);
-            }
+            M.safeMoveNodes($.mcselected);
         }
     });
 }
@@ -9403,24 +7993,21 @@ function createFolderDialog(close)
         return true;
     }
 
-    $('.create-folder-dialog input').unbind('focus');
-    $('.create-folder-dialog input').bind('focus', function() {
+    $('.create-folder-dialog input').rebind('focus', function() {
         if ($(this).val() == l[157]) {
             $('.create-folder-dialog input').val('');
         }
         $('.create-folder-dialog').addClass('focused');
     });
 
-    $('.create-folder-dialog input').unbind('blur');
-    $('.create-folder-dialog input').bind('blur', function() {
+    $('.create-folder-dialog input').rebind('blur', function() {
         if ($('.create-folder-dialog input').val() == '') {
             $('.create-folder-dialog input').val(l[157]);
         }
         $('.create-folder-dialog').removeClass('focused');
     });
 
-    $('.create-folder-dialog input').unbind('keyup');
-    $('.create-folder-dialog input').bind('keyup', function() {
+    $('.create-folder-dialog input').rebind('keyup', function() {
         if ($('.create-folder-dialog input').val() === '' || $('.create-folder-dialog input').val() === l[157]) {
             $('.create-folder-dialog').removeClass('active');
         }
@@ -9429,8 +8016,7 @@ function createFolderDialog(close)
         }
     });
 
-    $('.create-folder-dialog input').unbind('keypress');
-    $('.create-folder-dialog input').bind('keypress', function(e) {
+    $('.create-folder-dialog input').rebind('keypress', function(e) {
 
         if (e.which === 13 && $(this).val() !== '') {
             if (!$.cftarget) {
@@ -9441,7 +8027,7 @@ function createFolderDialog(close)
         }
     });
 
-    $('.create-folder-dialog .fm-dialog-close, .create-folder-button-cancel.dialog').rebind('click', function() {
+    $('.create-folder-dialog .fm-dialog-close, .create-folder-dialog .create-folder-button-cancel').rebind('click', function() {
         createFolderDialog(1);
         $('.fm-dialog').removeClass('arrange-to-back');
         $('.create-folder-dialog input').val(l[157]);
@@ -9487,13 +8073,11 @@ function chromeDialog(close)
     fm_showoverlay();
     $('.fm-dialog.chrome-dialog').removeClass('hidden');
     $.dialog = 'chrome';
-    $('.chrome-dialog .browsers-button,.chrome-dialog .fm-dialog-close').unbind('click')
-    $('.chrome-dialog .browsers-button,.chrome-dialog .fm-dialog-close').bind('click', function()
+    $('.chrome-dialog .browsers-button,.chrome-dialog .fm-dialog-close').rebind('click', function()
     {
         chromeDialog(1);
     });
-    $('#chrome-checkbox').unbind('click');
-    $('#chrome-checkbox').bind('click', function()
+    $('#chrome-checkbox').rebind('click', function()
     {
         if ($(this).attr('class').indexOf('checkboxOn') == -1)
         {
@@ -9552,6 +8136,7 @@ function megaSyncDialog() {
             $this.attr('checked', false);
         }
     });
+    clickURLs();
 };
 
 function firefoxDialog(close)
@@ -9595,6 +8180,8 @@ function firefoxDialog(close)
             $(this).attr('checked', false);
         }
     });
+
+    clickURLs();
 }
 
 function browserDialog(close) {
@@ -9613,8 +8200,7 @@ function browserDialog(close) {
         browserDialog(1);
     });
 
-    $('#browsers-checkbox').unbind('click');
-    $('#browsers-checkbox').bind('click', function() {
+    $('#browsers-checkbox').rebind('click', function() {
         if ($(this).attr('class').indexOf('checkboxOn') == -1) {
             localStorage.browserDialog = 1;
             $(this).attr('class', 'checkboxOn');
@@ -9695,6 +8281,85 @@ browserDialog.isWeak = function() {
 /* jshint -W074 */
 function propertiesDialog(close) {
 
+    /*
+    * fillPropertiesContactList, Handles node properties/info dialog contact list content
+    *
+    * @param {Object} shares Node related shares
+    * @param {Object} pendingShares Node related pending shares
+    * @param {Number} totalSharesNum
+    */
+    var fillPropertiesContactList = function(shares, pendingShares, totalSharesNum) {
+
+        var DEFAULT_CONTACTS_NUMBER = 5;
+        var counter = 0;
+        var tmpStatus = '';
+        var onlinestatus = '';
+        var user;
+        var hiddenClass = '';
+        var $shareUsers = pd.find('.properties-body .properties-context-menu')
+                        .empty()
+                        .append('<div class="properties-context-arrow"></div>');
+        var shareUsersHtml = '';
+
+        // Add contacts with full contact relation
+        for (var userId in shares) {
+            if (shares.hasOwnProperty(userId)) {
+
+                if (++counter <= DEFAULT_CONTACTS_NUMBER) {
+                    hiddenClass = '';
+                }
+                else {
+                    hiddenClass = 'hidden';
+                }
+
+                if (M.u[userId]) {
+                    user = M.u[userId];
+                    tmpStatus = megaChatIsReady && megaChat.karere.getPresence(megaChat.getJidFromNodeId(user.u));
+                    onlinestatus = M.onlineStatusClass(tmpStatus);
+                    shareUsersHtml += '<div class="properties-context-item '
+                        + onlinestatus[1] + ' ' +  hiddenClass + '">'
+                        + '<div class="properties-contact-status"></div>'
+                        + '<span>' + htmlentities(user.name || user.m) + '</span>'
+                        + '</div>';
+                }
+            }
+        }
+
+        // Add outgoing pending contacts for node handle [n.h]
+        for (userId in pendingShares) {
+            if (pendingShares.hasOwnProperty(userId)) {
+
+                if (++counter <= DEFAULT_CONTACTS_NUMBER) {
+                    hiddenClass = '';
+                }
+                else {
+                    hiddenClass = 'hidden';
+                }
+
+                if (M.opc[userId]) {
+                    user = M.opc[userId];
+                    shareUsersHtml += '<div class="properties-context-item offline ' + hiddenClass + '">'
+                        + '<div class="properties-contact-status"></div>'
+                        + '<span>' + htmlentities(user.m) + '</span>'
+                        + '</div>';
+                }
+            }
+        }
+
+        var hiddenNum = totalSharesNum - DEFAULT_CONTACTS_NUMBER;
+        var repStr = l[10663];// '... and [X] more';
+
+        if (hiddenNum > 0) {
+            shareUsersHtml += '<div class="properties-context-item show-more">'
+                + '<span>...' + repStr.replace('[X]', hiddenNum) + '</span>'
+                + '</div>';
+        }
+
+        if (shareUsersHtml !== '') {
+            $shareUsers.append(shareUsersHtml);
+        }
+    };// END of fillPropertiesContactList function
+
     var pd = $('.fm-dialog.properties-dialog');
     var c = $('.properties-elements-counter span');
 
@@ -9744,6 +8409,7 @@ function propertiesDialog(close) {
 
     $('.properties-elements-counter span').text('');
     $('.fm-dialog.properties-dialog .properties-body').rebind('click', function() {
+
         // Clicking anywhere in the dialog will close the context-menu, if open
         var e = $('.fm-dialog.properties-dialog .file-settings-icon');
         if (e.hasClass('active'))
@@ -9757,28 +8423,26 @@ function propertiesDialog(close) {
     var filecnt = 0, foldercnt = 0, size = 0, sfilecnt = 0, sfoldercnt = 0, n;
 
     for (var i in $.selected) {
-        if ($.selected.hasOwnProperty(i)) {
-            n = M.d[$.selected[i]];
-            if (!n) {
-                console.error('propertiesDialog: invalid node', $.selected[i]);
-            }
-            else if (n.t) {
-                var nodes = fm_getnodes(n.h);
-                for (i in nodes) {
-                    if (M.d[nodes[i]] && !M.d[nodes[i]].t) {
-                        size += M.d[nodes[i]].s;
-                        sfilecnt++;
-                    }
-                    else {
-                        sfoldercnt++;
-                    }
+        n = M.d[$.selected[i]];
+        if (!n) {
+            console.error('propertiesDialog: invalid node', $.selected[i]);
+        }
+        else if (n.t) {
+            var nodes = fm_getnodes(n.h);
+            for (var j = 0; j < nodes.length; j++) {
+                if (M.d[nodes[j]] && !M.d[nodes[j]].t) {
+                    size += M.d[nodes[j]].s;
+                    sfilecnt++;
                 }
-                foldercnt++;
+                else {
+                    sfoldercnt++;
+                }
             }
-            else {
-                filecnt++;
-                size += n.s;
-            }
+            foldercnt++;
+        }
+        else {
+            filecnt++;
+            size += n.s;
         }
     }
     if (!n) {
@@ -9859,38 +8523,26 @@ function propertiesDialog(close) {
             p.t6 = l[897] + ':';
             p.t7 = fm_contains(sfilecnt, sfoldercnt);
             if (pd.attr('class').indexOf('shared') > -1) {
-                var shares, susers, total = 0
-                shares = Object.keys(n.shares || {}).length
-                p.t8 = l[1036] + ':';
-                p.t9 = shares == 1 ? l[990] : l[989].replace("[X]", shares);
-                p.t11 = n.ts ? htmlentities(time2date(n.ts)) : '';
-                p.t10 = p.t11 ? l[896] : '';
-                $('.properties-elements-counter span').text(typeof n.r == "number" ? '' : shares);
-                susers = pd.find('.properties-body .properties-context-menu')
-                    .empty()
-                    .append('<div class="properties-context-arrow"></div>')
-                for (var u in n.shares) {
-                    if (M.u[u]) {
-                        var u = M.u[u]
-                        var onlinestatus = M.onlineStatusClass(megaChatIsReady && megaChat.karere.getPresence(megaChat.getJidFromNodeId(u.u)));
-                        if (++total <= 5)
-                            susers.append('<div class="properties-context-item ' + onlinestatus[1] + '">'
-                                + '<div class="properties-contact-status"></div>'
-                                + '<span>' + htmlentities(u.name || u.m) + '</span>'
-                                + '</div>');
-                    }
-                }
 
-                if (total > 5) {
-                    susers.append(
-                        '<div class="properties-context-item show-more">'
-                        + '<span>... and ' + (total - 5) + ' more</span>'
-                        + '</div>'
-                        );
-                }
+                var fullSharesNum = Object.keys(n.shares || {}).length;
+                var pendingSharesNum = Object.keys(M.ps[n.h] || {}).length;
+                var totalSharesNum = fullSharesNum + pendingSharesNum;
 
-                if (total == 0)
+                // In case that user doesn't share with other
+                // Or in case that more then one node is selected
+                // Do NOT show contact informations in property dialog
+                if ((totalSharesNum === 0) || ($.selected.length > 1)) {
                     p.hideContacts = true;
+                }
+                else {
+                    p.t8 = l[1036] + ':';
+                    p.t9 = (totalSharesNum === 1) ? l[990] : l[989].replace("[X]", totalSharesNum);
+                    p.t11 = n.ts ? htmlentities(time2date(n.ts)) : '';
+                    p.t10 = p.t11 ? l[896] : '';
+                    $('.properties-elements-counter span').text(typeof n.r === "number" ? '' : totalSharesNum);
+
+                    fillPropertiesContactList(n.shares, M.ps[n.h], totalSharesNum);
+                }
             }
             if (pd.attr('class').indexOf('shared-with-me') > -1) {
                 p.t3 = l[64];
@@ -9946,7 +8598,7 @@ function propertiesDialog(close) {
             $(this).addClass('active');
             $('.fm-dialog').addClass('arrange-to-front');
             $('.properties-dialog').addClass('arrange-to-back');
-            $('.context-menu').addClass('arrange-to-front');
+            $('.dropdown.body').addClass('arrange-to-front');
             e.currentTarget = $('#' + n.h)
             e.calculatePosition = true;
             $.selected = [n.h];
@@ -9963,7 +8615,7 @@ function propertiesDialog(close) {
     $(document).bind('MegaCloseDialog.Properties', __fsi_close);
     function __fsi_close() {
         pd.find('.file-settings-icon').removeClass('active');
-        $('.context-menu').removeClass('arrange-to-front');
+        $('.dropdown.body').removeClass('arrange-to-front');
         $('.properties-dialog').removeClass('arrange-to-back');
         $('.fm-dialog').removeClass('arrange-to-front');
         $.hideContextMenu();
@@ -9974,8 +8626,7 @@ function propertiesDialog(close) {
     }
 
     if (pd.attr('class').indexOf('shared') > -1) {
-        $('.contact-list-icon').unbind('click');
-        $('.contact-list-icon').bind('click', function() {
+        $('.contact-list-icon').rebind('click', function() {
             if ($(this).attr('class').indexOf('active') == -1) {
                 $(this).addClass('active');
                 $('.properties-context-menu').css({
@@ -9988,11 +8639,42 @@ function propertiesDialog(close) {
                 $(this).removeClass('active');
                 $('.properties-context-menu').fadeOut(200);
             }
+
+            return false;
         });
-        $('.properties-context-item').unbind('click');
-        $('.properties-context-item').bind('click', function() {
+
+        $('.properties-dialog').rebind('click', function() {
+            var $list = $('.contact-list-icon');
+            if ($list.attr('class').indexOf('active') !== -1) {
+                $list.removeClass('active');
+                $('.properties-context-menu').fadeOut(200);
+            }
+        });
+
+        // ToDo: Can we redirects to contacts page when user clicks?
+        $('.properties-context-item').rebind('click', function(e) {
             $('.contact-list-icon').removeClass('active');
             $('.properties-context-menu').fadeOut(200);
+        });
+
+        // Expands properties-context-menu so rest of contacts can be shown
+        // By default only 5 contacts is shown
+        $('.properties-context-item.show-more').rebind('click', function() {
+
+            // $('.properties-context-menu').fadeOut(200);
+            $('.properties-dialog .properties-context-item')
+                .remove('.show-more')
+                .removeClass('hidden');// un-hide rest of contacts
+
+            var $cli = $('.contact-list-icon');
+            $('.properties-context-menu').css({
+                'left': $cli.position().left + 8 + 'px',
+                'top': $cli.position().top - $('.properties-context-menu').outerHeight() - 8 + 'px',
+                'margin-left': '-' + $('.properties-context-menu').width() / 2 + 'px'
+            });
+            // $('.properties-context-menu').fadeIn(200);
+
+            return false;// Prevent bubbling
         });
     }
 
@@ -10021,68 +8703,98 @@ function propertiesDialog(close) {
 }
 /* jshint +W074 */
 
-function termsDialog(close, pp)
-{
+/**
+ * Show bottom pages dialog
+ * @param {Boolean} close dialog parameter
+ * @param {String} bottom page title
+ * @param {String} dialog header
+ */
+function bottomPageDialog(close, pp, hh) {
+    var $dialog = $('.fm-dialog.bottom-pages-dialog');
+
     if (close)
     {
-        $('.fm-dialog.terms-dialog').addClass('hidden');
+        $dialog.addClass('hidden');
         if (!$('.pro-register-dialog').is(":visible")) {
             fm_hideoverlay();
-            $.dialog=false;
+            $.dialog = false;
         }
-        if ($.termsAgree) $.termsAgree=undefined;
-        if ($.termsDeny) $.termsDeny=undefined;
+        if ($.termsAgree) $.termsAgree = undefined;
+        if ($.termsDeny) $.termsDeny = undefined;
         return false;
     }
 
-    if (!pp)
+    if (!pp) {
         pp = 'terms';
+    }
 
     $.dialog = pp;
+
+    // Show Agree/Cancel buttons for Terms dialogs
+    if (pp === 'terms' || pp === 'sdkterms') {
+        $('.fm-bp-cancel, .fm-bp-agree', $dialog).removeClass('hidden');
+        $('.fm-bp-close', $dialog).addClass('hidden');
+        $('.fm-dialog-title', $dialog).text(l[385]);
+
+        $('.fm-bp-cancel', $dialog).rebind('click', function(e)
+        {
+            if ($.termsDeny) {
+                $.termsDeny();
+            }
+            bottomPageDialog(1);
+        });
+
+        $('.fm-bp-agree', $dialog).rebind('click', function(e)
+        {
+            if ($.termsAgree) {
+                $.termsAgree();
+            }
+            bottomPageDialog(1);
+        });
+
+        $('.fm-dialog-close', $dialog).rebind('click', function(e)
+        {
+            if ($.termsDeny) {
+                $.termsDeny();
+            }
+            bottomPageDialog(1);
+        });
+    }
+    else {
+        $('.fm-bp-cancel, .fm-bp-agree', $dialog).addClass('hidden');
+        $('.fm-bp-close', $dialog).removeClass('hidden');
+        if (hh) {
+            $('.fm-dialog-title', $dialog).text(hh)
+        }
+
+        $('.fm-dialog-close, .fm-bp-close', $dialog).rebind('click', function(e)
+        {
+            bottomPageDialog(1);
+        });
+    }
 
     if (!pages[pp])
     {
         loadingDialog.show();
-        silent_loading = function()
-        {
-            loadingDialog.hide();
-            termsDialog(false, $.dialog);
-        };
-        jsl.push(jsl2[pp]);
-        jsl_start();
+        mega.utils.require(pp)
+            .done(function() {
+                loadingDialog.hide();
+                bottomPageDialog(false, $.dialog);
+            });
         return false;
     }
 
     fm_showoverlay();
-    $('.fm-dialog.terms-dialog').removeClass('hidden');
-    $('.fm-dialog.terms-dialog .terms-main').html(pages[pp].split('((TOP))')[1].split('((BOTTOM))')[0].replace('main-mid-pad new-bottom-pages', ''));
+    $dialog.removeClass('hidden');
+    $('.bp-main', $dialog).safeHTML(
+        translate(
+            pages[pp].split('((TOP))')[1].split('((BOTTOM))')[0].replace('main-mid-pad new-bottom-pages', '')
+        )
+    );
 
-    $('.terms-body').jScrollPane({showArrows: true, arrowSize: 5, animateScroll: true, verticalDragMinHeight: 50});
-    jScrollFade('.terms-body');
-
-    $('.fm-terms-cancel').unbind('click');
-    $('.fm-terms-cancel').bind('click', function(e)
-    {
-        if ($.termsDeny)
-            $.termsDeny();
-        termsDialog(1);
-    });
-
-    $('.fm-terms-agree').unbind('click');
-    $('.fm-terms-agree').bind('click', function(e)
-    {
-        if ($.termsAgree)
-            $.termsAgree();
-        termsDialog(1);
-    });
-
-    $('.terms-dialog .fm-dialog-close').unbind('click');
-    $('.terms-dialog .fm-dialog-close').bind('click', function(e)
-    {
-        if ($.termsDeny)
-            $.termsDeny();
-        termsDialog(1);
-    });
+    $('.bp-body', $dialog).jScrollPane({showArrows: true, arrowSize: 5, animateScroll: true, verticalDragMinHeight: 50});
+    jScrollFade('.bp-body');
+    clickURLs();
 }
 
 var previews = {};
@@ -10187,40 +8899,46 @@ function slideshow(id, close)
     }
 
     var n = M.getNodeByHandle(id);
-    if (n && RootbyId(id) === 'shares' || folderlink)
+    if (!n || !n.p || RootbyId(id) === 'shares' || folderlink)
     {
         $('.slideshow-getlink').hide();
         $('.slideshow-line').hide();
     }
     else
     {
-        $('.slideshow-getlink').show();
         $('.slideshow-line').show();
+        $('.slideshow-getlink').show().rebind('click', function() {
+
+            if (u_type === 0) {
+                ephemeralDialog(l[1005]);
+            }
+            else {
+                initCopyrightsDialog([slideshowid]);
+            }
+        });
     }
-    $('.slideshow-dialog .close-slideshow,.slideshow-overlay,.slideshow-error-close').unbind('click');
-    $('.slideshow-dialog .close-slideshow,.slideshow-overlay,.slideshow-error-close').bind('click', function(e)
+    $('.slideshow-dialog .close-slideshow,.slideshow-overlay,.slideshow-error-close').rebind('click', function(e)
     {
         slideshow(id, 1);
     });
     if (!n)
         return;
+
     $('.slideshow-filename').text(n.name);
-    $('.slideshow-image').attr('src', '');
+    $('.slideshow-image').attr('src', '').width(0).height(0);
     $('.slideshow-pending').removeClass('hidden');
     $('.slideshow-progress').addClass('hidden');
     $('.slideshow-error').addClass('hidden');
-    $('.slideshow-image').width(0);
-    $('.slideshow-image').height(0);
     $('.slideshow-image-bl').addClass('hidden');
     $('.slideshow-prev-button,.slideshow-next-button').removeClass('active');
+
     slideshowid = id;
     var steps = slideshowsteps();
     if (steps.backward.length > 0)
         $('.slideshow-prev-button').addClass('active');
     if (steps.forward.length > 0)
         $('.slideshow-next-button').addClass('active');
-    $('.slideshow-prev-button,.slideshow-next-button').unbind('click');
-    $('.slideshow-prev-button,.slideshow-next-button').bind('click', function(e)
+    $('.slideshow-prev-button,.slideshow-next-button').rebind('click', function(e)
     {
         var c = $(this).attr('class');
         if (c && c.indexOf('active') > -1)
@@ -10250,28 +8968,6 @@ function slideshow(id, close)
             M.addDownload([n]);
         }
     });
-
-
-    if (M.d[slideshowid]) {
-        $('.slideshow-getlink')
-            .show()
-            .rebind('click', function() {
-                if (u_type === 0) {
-                    ephemeralDialog(l[1005]);
-                }
-                else {
-                    initCopyrightsDialog([slideshowid]);
-                }
-            })
-            .next('.slideshow-line')
-                .show();
-    }
-    else {
-        $('.slideshow-getlink')
-            .hide()
-                .next('.slideshow-line')
-                    .hide();
-    }
 
     if (previews[id]) {
         previewsrc(previews[id].src);
@@ -10319,7 +9015,7 @@ function fetchsrc(id)
 
     preqs[id] = 1;
     var treq = {};
-    treq[id] = {fa: n.fa, k: n.key};
+    treq[id] = {fa: n.fa, k: n.k};
     api_getfileattr(treq, 1, function(ctx, id, uint8arr)
     {
         previewimg(id, uint8arr);
@@ -10328,10 +9024,10 @@ function fetchsrc(id)
                 console.log('Thumbnail found missing on preview, creating...', id, n);
             }
             var aes = new sjcl.cipher.aes([
-                n.key[0] ^ n.key[4],
-                n.key[1] ^ n.key[5],
-                n.key[2] ^ n.key[6],
-                n.key[3] ^ n.key[7]]);
+                n.k[0] ^ n.k[4],
+                n.k[1] ^ n.k[5],
+                n.k[2] ^ n.k[6],
+                n.k[3] ^ n.k[7]]);
             createnodethumbnail(n.h, aes, id, uint8arr);
         }
         if (id == slideshowid)
@@ -10398,131 +9094,6 @@ function previewimg(id, uint8arr)
     }
 }
 
-var thumbnails = [];
-var thumbnailblobs = [];
-var th_requested = [];
-var fa_duplicates = {};
-var fa_reqcnt = 0;
-var fa_addcnt = 8;
-var fa_tnwait = 0;
-
-function fm_thumbnails()
-{
-    var treq = {}, a = 0, max = Math.max($.rmItemsInView || 1, 71) + fa_addcnt, u = max - Math.floor(max / 3), y;
-    if (!fa_reqcnt)
-        fa_tnwait = y;
-    if (d)
-        console.time('fm_thumbnails');
-    if (M.viewmode || M.chat)
-    {
-        for (var i in M.v)
-        {
-            var n = M.v[i];
-            if (n && n.fa && String(n.fa).indexOf(':0') > 0)
-            {
-                if (fa_tnwait == n.h && n.seen)
-                    fa_tnwait = 0;
-                // if (!fa_tnwait && !thumbnails[n.h] && !th_requested[n.h])
-                if (n.seen && !thumbnails[n.h] && !th_requested[n.h])
-                {
-                    if (typeof fa_duplicates[n.fa] == 'undefined')
-                        fa_duplicates[n.fa] = 0;
-                    else
-                        fa_duplicates[n.fa] = 1;
-                    treq[n.h] =
-                        {
-                            fa: n.fa,
-                            k: n.key
-                        };
-                    th_requested[n.h] = 1;
-
-                    if (u == a)
-                        y = n.h;
-                    if (++a > max)
-                    {
-                        if (!n.seen)
-                            break;
-                        y = n.h;
-                    }
-                }
-                else if (n.seen && n.seen !== 2)
-                {
-                    fm_thumbnail_render(n);
-                }
-            }
-        }
-        if (y)
-            fa_tnwait = y;
-        if (a > 0)
-        {
-            fa_reqcnt += a;
-            if (d)
-                console.log('Requesting %d thumbs (%d loaded)', a, fa_reqcnt);
-
-            var rt = Date.now();
-            var cdid = M.currentdirid;
-            api_getfileattr(treq, 0, function(ctx, node, uint8arr)
-            {
-                if (uint8arr === 0xDEAD)
-                {
-                    if (d)
-                        console.log('Aborted thumbnail retrieval for ' + node);
-                    delete th_requested[node];
-                    return;
-                }
-                if (rt)
-                {
-                    if (((Date.now() - rt) > 4000) && ((fa_addcnt += u) > 300))
-                        fa_addcnt = 301;
-                    rt = 0;
-                }
-                try {
-                    var blob = new Blob([uint8arr], {type: 'image/jpeg'});
-                } catch (err) {}
-                if (blob.size < 25)
-                    blob = new Blob([uint8arr.buffer]);
-                // thumbnailblobs[node] = blob;
-                thumbnails[node] = myURL.createObjectURL(blob);
-
-                var targetNode = M.getNodeByHandle(node);
-
-                if (targetNode && targetNode.seen && M.currentdirid === cdid) {
-                    fm_thumbnail_render(targetNode);
-                }
-
-                // deduplicate in view when there is a duplicate fa:
-                if (targetNode && fa_duplicates[targetNode.fa] > 0)
-                {
-                    for (var i in M.v)
-                    {
-                        if (M.v[i].h !== node && M.v[i].fa === targetNode.fa && !thumbnails[M.v[i].h])
-                        {
-                            thumbnails[M.v[i].h] = thumbnails[node];
-                            if (M.v[i].seen && M.currentdirid === cdid)
-                                fm_thumbnail_render(M.v[i]);
-                        }
-                    }
-                }
-            });
-        }
-    }
-    if (d)
-        console.timeEnd('fm_thumbnails');
-}
-
-
-function fm_thumbnail_render(n) {
-    if (n && thumbnails[n.h]) {
-        var imgNode = document.getElementById(n.h);
-
-        if (imgNode && (imgNode = imgNode.querySelector('img'))) {
-            n.seen = 2;
-            imgNode.setAttribute('src', thumbnails[n.h]);
-            imgNode.parentNode.classList.add('thumb');
-        }
-    }
-}
-
 function fm_contains(filecnt, foldercnt) {
     var containstxt = l[782];
     if ((foldercnt > 1) && (filecnt > 1)) {
@@ -10554,17 +9125,24 @@ function fm_importflnodes(nodes)
         mega.ui.showLoginRequiredDialog().done(function() {
 
             $.onImportCopyNodes = fm_getcopynodes(sel);
-            document.location.hash = 'fm';
+
+            // TODO: test whether importing nodes from a folder link still works
+
+            loadSubPage('fm');
 
             $(document).one('onInitContextUI', SoonFc(function(e) {
-                if (ASSERT(M.RootID != FLRootID, 'Unexpected openFolder on Import')) {
+                if (M.RootID === FLRootID) {
+                    // TODO: How to reproduce this?
+                    console.warn('Unable to complete import, apparnetly we did not reached the cloud.');
+                }
+                else {
                     if (d) console.log('Importing Nodes...', sel, $.onImportCopyNodes);
 
                     $.selected = sel;
                     $.mcImport = true;
 
                     // XXX: ...
-                    $('.context-menu-item.copy-item').click();
+                    $('.dropdown-item.copy-item').click();
                 }
             }));
         }).fail(function(aError) {
@@ -10608,43 +9186,40 @@ function savecomplete(id)
  * width, height, position, etc).
  * This is why we do a on('resize') handler which handles the resize of the generic layout of Mega's FM.
  */
-function fm_resize_handler() {
-    if ($.tresizer.last === -1) {
+function fm_resize_handler(force) {
+    if ($.tresizer.last === -1 && force !== true) {
         return;
     }
     if (d) {
         console.time('fm_resize_handler');
     }
 
-    mega.utils.chrome110ZoomLevelNotification();
+    if (window.chrome) {
+        // XXX: Seems this 110% zoom bug got fixed as of Chrome 54?
+        mega.utils.chrome110ZoomLevelNotification();
+    }
 
-    $('.transfer-scrolling-table').css({
-        'height': (
-             $('.fm-transfers-block').outerHeight()
-                - $('.transfer-table-header').outerHeight()
-                - $('.fm-tranfers-header').outerHeight()
-        ) + "px"
-    });
+    if (ulmanager.isUploading || dlmanager.isDownloading) {
+        var tfse = M.getTransferElements();
 
-    // left panel resize logic
-    /*
-    var right_panel_margin = $('.fm-left-panel').outerWidth();
-     var resize_handle_width = $('.left-pane-drag-handle').outerWidth();
-     $('.fm-main.default > div:not(.fm-left-panel)').each(function() {
+        if (tfse) {
+            tfse.domScrollingTable.style.height = (
+                    $(tfse.domTransfersBlock).outerHeight() -
+                    $(tfse.domTableHeader).outerHeight() -
+                    $(tfse.domTransferHeader).outerHeight()
+                ) + "px";
+        }
+    }
 
-     $(this).css({
-     'margin-left':  right_panel_margin
-     });
-     });
-     */
+    if (M.currentdirid !== 'transfers') {
+        $('.files-grid-view .grid-scrolling-table, .file-block-scrolling,' +
+            ' .contacts-grid-view .contacts-grid-scrolling-table')
+            .css({
+                'width': $(document.body).outerWidth() - $('.fm-left-panel').outerWidth()
+            });
 
-    $('.files-grid-view .grid-scrolling-table, .file-block-scrolling,' +
-        ' .contacts-grid-view .contacts-grid-scrolling-table')
-        .css({
-            'width': $(document.body).outerWidth() - $('.fm-left-panel').outerWidth()
-        });
-
-    initTreeScroll();
+        initTreeScroll();
+    }
 
     if (M.currentdirid === 'contacts') {
         if (M.viewmode) {
@@ -10673,17 +9248,30 @@ function fm_resize_handler() {
     }
     else if (M.currentdirid && M.currentdirid.substr(0, 7) === 'account') {
         var $mainBlock = $('.fm-account-main');
+        $mainBlock.removeClass('low-width hi-width');
 
         if ($mainBlock.width() > 1675) {
             $mainBlock.addClass('hi-width');
         }
-        else if ($mainBlock.width() < 920) {
+        else if ($mainBlock.width() < 880) {
             $mainBlock.addClass('low-width');
-        } else {
-            $mainBlock.removeClass('low-width hi-width');
         }
-
         initAccountScroll();
+    }
+    else if (M.currentdirid && M.currentdirid.substr(0, 9) === 'dashboard') {
+        var $mainBlock = $('.fm-right-block.dashboard');
+
+        $mainBlock.removeClass('hidden ultra low-width hi-width');
+        if ($mainBlock.width() > 1675) {
+            $mainBlock.addClass('hi-width');
+        }
+        else if ($mainBlock.width() < 880 && $mainBlock.width() > 850) {
+            $mainBlock.addClass('low-width');
+        }
+        else if ($mainBlock.width() < 850) {
+            $mainBlock.addClass('ultra low-width');
+        }
+        initDashboardScroll();
     }
     else {
         if (M.viewmode) {
@@ -10698,17 +9286,19 @@ function fm_resize_handler() {
         }
     }
 
-    if (slideshowid && previews[slideshowid]) {
-        previewsrc(previews[slideshowid].src);
-    }
+    if (M.currentdirid !== 'transfers') {
+        if (slideshowid && previews[slideshowid]) {
+            previewsrc(previews[slideshowid].src);
+        }
 
-    if (megaChatIsReady && megaChat.resized) {
-        megaChat.resized();
-    }
+        if (megaChatIsReady && megaChat.resized) {
+            megaChat.resized();
+        }
 
-    $('.fm-right-files-block, .fm-right-account-block').css({
-        'margin-left': ($('.fm-left-panel:visible').width() + $('.nw-fm-left-icons-panel').width()) + "px"
-    });
+        $('.fm-right-files-block, .fm-right-account-block, .fm-right-block.dashboard').css({
+            'margin-left': ($('.fm-left-panel:visible').width() + $('.nw-fm-left-icons-panel').width()) + "px"
+        });
+    }
 
     if (M.currentrootid === 'shares') {
         var shared_block_height = $('.shared-details-block').height() - $('.shared-top-details').height();
@@ -10733,15 +9323,13 @@ mega.utils.findDupes = function() {
     loadingDialog.show();
     Soon(function() {
         M.overrideModes = 1;
-        location.hash = '#fm/search/~findupes';
+        loadSubPage('fm/search/~findupes');
     });
 };
 
 function sharedFolderUI() {
-    /* jshint -W074 */
     var nodeData = M.d[M.currentdirid];
     var browsingSharedContent = false;
-    var c;
 
     // Browsing shared content
     if ($('.shared-details-block').length > 0) {
@@ -10753,22 +9341,9 @@ function sharedFolderUI() {
         browsingSharedContent = true;
     }
 
-    // Checks it's not a contact, contacts handles are 11 chars long
-    // file/folder handles are 8 chars long
-    if (!nodeData || (nodeData.p.length !== 11)) {
-
-        // [<current selection handle>, 'owners handle', 'tab name']
-        var p = M.getPath(M.currentdirid);
-        nodeData = null;
-
-        if (p[p.length - 1] === 'shares') {
-            c = M.d[p[0]];
-            nodeData = M.d[p[p.length - 3]];
-
-            if (!nodeData || (nodeData.p.length !== 11)) {
-                nodeData = 0;
-            }
-        }
+    // are we in an inshare?
+    while (nodeData && !nodeData.su) {
+        nodeData = M.d[nodeData.p];
     }
 
     if (nodeData) {
@@ -10779,6 +9354,7 @@ function sharedFolderUI() {
 
         // Handle of initial share owner
         var ownersHandle = nodeData.su;
+        var folderName = (M.d[M.currentdirid] || nodeData).name;
         var displayName = htmlentities(M.getNameByHandle(ownersHandle));
         var avatar = useravatar.contact(M.d[ownersHandle], 'nw-contact-avatar');
 
@@ -10807,7 +9383,7 @@ function sharedFolderUI() {
                 + '<div class="shared-details-icon"></div>'
                 + '<div class="shared-details-info-block">'
                     + '<div class="shared-details-pad">'
-                        + '<div class="shared-details-folder-name">' + htmlentities((c || nodeData).name) + '</div>'
+                        + '<div class="shared-details-folder-name">' + htmlentities(folderName) + '</div>'
                         + '<a href="javascript:;" class="grid-url-arrow"></a>'
                         + '<div class="shared-folder-access' + rightsclass + '">' + rights + '</div>'
                         + '<div class="clear"></div>'
@@ -10817,9 +9393,9 @@ function sharedFolderUI() {
                         + '</div>'
                     + '</div>'
                     + '<div class="shared-details-buttons">'
-                        + '<div class="fm-leave-share"><span>' + l[5866] + '</span></div>'
-                        + '<div class="fm-share-copy"><span>' + l[63] + '</span></div>'
-                        + '<div class="fm-share-download"><span class="fm-chatbutton-arrow">' + l[58] + '</span></div>'
+                        + '<div class="fm-leave-share default-white-button right small grey-txt"><span>' + l[5866] + '</span></div>'
+                        + '<div class="fm-share-copy default-white-button right small grey-txt"><span>' + l[63] + '</span></div>'
+                        + '<div class="fm-share-download default-white-button right small grey-txt"><span class="fm-chatbutton-arrow">' + l[58] + '</span></div>'
                         + '<div class="clear"></div>'
                     + '</div>'
                     + '<div class="clear"></div>'
@@ -10828,6 +9404,11 @@ function sharedFolderUI() {
 
         $(rightPanelView).addClass('shared-folder-content');
 
+        if (M.d[M.currentdirid] !== nodeData || M.d[nodeData.p]) {
+            // hide leave-share under non-root shares
+            $('.fm-leave-share').addClass('hidden');
+        }
+
         Soon(function() {
             $(window).trigger('resize');
             Soon(fm_resize_handler);
@@ -10835,7 +9416,6 @@ function sharedFolderUI() {
     }
 
     return browsingSharedContent;
-    /* jshint -W074 */
 }
 
 function userFingerprint(userid, callback) {
@@ -10999,7 +9579,7 @@ function contactUI() {
 
         var onlinestatus = M.onlineStatusClass(
             megaChatIsReady &&
-            megaChat.karere.getPresence(megaChat.getJidFromNodeId(u_h))
+            M.u[u_h] ? M.u[u_h].presence : "unavailable"
         );
 
         $('.contact-top-details .nw-contact-block-avatar').empty().append( avatar.removeClass('avatar').addClass('square') );
@@ -11011,33 +9591,31 @@ function contactUI() {
         );
         $('.contact-top-details .contact-details-email').text(user.m);
 
-        $('.contact-details-pad .grid-url-arrow').bind('click', function(e) {
+        $('.contact-details-pad .grid-url-arrow').rebind('click', function(e) {
             e.preventDefault();
             e.stopPropagation(); // do not treat it as a regular click on the file
             // $(this).addClass('active');
-            $('.context-menu').addClass('arrange-to-front');
+            $('.dropdown.body').addClass('arrange-to-front');
             e.currentTarget = $(this);
             e.calculatePosition = true;
-            $.selected = [location.hash.replace('#fm/', '')];
+            $.selected = [getSitePath().replace('/fm/', '')];
             searchPath();
-            contextMenuUI(e, 4);
+            if (!$(this).hasClass('active')) {
+                contextMenuUI(e, 4);
+                $(this).addClass('active');
+            }
+            else {
+                $.hideContextMenu();
+                $(this).removeClass('active');
+            }
         });
 
         // Display the current fingerpring
         showAuthenticityCredentials(user);
 
         // Set authentication state of contact from authring.
-        var authringPromise = new MegaPromise();
-        if (u_authring.Ed25519) {
-            authringPromise.resolve();
-        }
-        else {
-            // First load the authentication system.
-            var authSystemPromise = authring.initAuthenticationSystem();
-            authringPromise.linkDoneAndFailTo(authSystemPromise);
-        }
-        /** To be called on settled authring promise. */
-        var _setVerifiedState = function() {
+        // To be called on settled authring promise.
+        authring.onAuthringReady('contactUI').done(function _setVerifiedState() {
 
             var handle = user.u || user;
             var verificationState = u_authring.Ed25519[handle] || {};
@@ -11053,8 +9631,7 @@ function contactUI() {
                 // Otherwise show the Verify... button.
                 enableVerifyFingerprintsButton(handle);
             }
-        };
-        authringPromise.done(_setVerifiedState);
+        });
 
         // Reset seen or verified fingerprints and re-enable the Verify button
         $('.fm-reset-stored-fingerprint').rebind('click', function() {
@@ -11085,8 +9662,7 @@ function contactUI() {
 
             // Bind the "Start conversation" button
             $('.fm-start-conversation').rebind('click.megaChat', function() {
-
-                window.location = '#fm/chat/' + u_h;
+                loadSubPage('fm/chat/' + u_h);
                 return false;
             });
         }
@@ -11147,10 +9723,10 @@ function FMResizablePane(element, opts) {
     }
 
     /**
-     * Destroy if already initialized.
+     * Already initialized.
      */
     if ($element.data('fmresizable')) {
-        $element.data('fmresizable').destroy();
+        return;
     }
 
     self.destroy = function() {
@@ -11225,53 +9801,74 @@ function FMResizablePane(element, opts) {
 }
 
 /**
- * bindDropdownEvents
+ * bindDropdownEvents Bind custom select event
  *
- * Bind Custom select event
- *
- * @param {Selector} dropdowns, elements selector.
- * @param {String} addition option for account page only. Allows to show "Show changes" notification
- *
+ * @param {Selector} $dropdown  Class .dropdown elements selector
+ * @param {String}   saveOption Addition option for account page only. Allows to show "Show changes" notification
+ * @param {String}   classname/id of  content block for dropdown aligment
  */
-function bindDropdownEvents($dropdown, saveOption) {
+function bindDropdownEvents($dropdown, saveOption, contentBlock) {
 
     var $dropdownsItem = $dropdown.find('.default-dropdown-item');
+    var $contentBlock = contentBlock ? $(contentBlock) : $(window);
 
     $($dropdown).rebind('click', function(e)
     {
         var $this = $(this);
         if (!$this.hasClass('active')) {
-            var bottPos, jsp,
-                scrollBlock = '#' + $this.attr('id') + ' .default-select-scroll',
-                $dropdown = $this.find('.default-select-dropdown'),
-                $activeDropdownItem = $this.find('.default-dropdown-item.active');
+            var jsp;
+            var scrollBlock = '#' + $this.attr('id') + ' .default-select-scroll';
+            var $dropdown = $this.find('.default-select-dropdown');
+            var $activeDropdownItem = $this.find('.default-dropdown-item.active');
+            var dropdownOffset;
+            var dropdownBottPos;
+            var dropdownHeight;
+            var contentBlockHeight;
 
-            //Show Select dropdown
-            $('.active .default-select-dropdown').fadeOut(200);
+            //Show select dropdown
+            $('.active .default-select-dropdown').addClass('hidden');
             $this.addClass('active');
-            $dropdown.css('margin-top', '0px');
-            $dropdown.fadeIn(200);
+            $dropdown.removeAttr('style');
+            $dropdown.removeClass('hidden');
 
             //Dropdown position relative to the window
-            bottPos = $(window).height() - ($dropdown.offset().top + $dropdown.outerHeight());
-            if (bottPos < 50) {
-                $dropdown.css('margin-top', '-' + (60 - bottPos) + 'px');
+            dropdownOffset = $dropdown.offset().top - $contentBlock.offset().top;
+            contentBlockHeight = $contentBlock.height();
+            dropdownHeight = $dropdown.outerHeight();
+            dropdownBottPos = contentBlockHeight - (dropdownOffset + dropdownHeight);
+
+            if (contentBlockHeight < (dropdownHeight + 20)) {
+                $dropdown.css({
+                    'margin-top': '-' + (dropdownOffset - 10) + 'px',
+                    'height': (contentBlockHeight - 20) + 'px'
+                });
+            }
+            else if (dropdownBottPos < 10) {
+                $dropdown.css({
+                    'margin-top': '-' + (10 - dropdownBottPos) + 'px'
+                });
             }
 
             //Dropdown scrolling initialization
             initSelectScrolling(scrollBlock);
             jsp = $(scrollBlock).data('jsp');
+
+            // Prevent horizontal scrolling
+            $(scrollBlock).jScrollPane({
+                contentWidth: '0px'
+            });
+
             if (jsp && $activeDropdownItem.length) {
-                jsp.scrollToElement($activeDropdownItem)
+                jsp.scrollToElement($activeDropdownItem);
             }
-        } else {
-            $this.find('.default-select-dropdown').fadeOut(200);
+        }
+        else if (!$(e.target).parents('.jspVerticalBar').length) {
+            $this.find('.default-select-dropdown').addClass('hidden');
             $this.removeClass('active');
         }
     });
 
-    $dropdownsItem.rebind('click', function(e)
-    {
+    $dropdownsItem.rebind('click.settingsGeneral', function(e) {
         var $this = $(this);
         if (!$this.hasClass('active')) {
             var $select = $(this).closest('.default-select');
@@ -11281,18 +9878,21 @@ function bindDropdownEvents($dropdown, saveOption) {
             $this.addClass('active');
             $select.find('span').text($this.text());
 
-            //Save changes for account page
-            if (saveOption) {
+            var nameLen = $('#account-firstname').val().trim().length;
+
+            // Save changes for account page
+            if (saveOption && nameLen) {
                 $('.fm-account-save-block').removeClass('hidden');
             }
         }
     });
 
-    $('#fmholder, .fm-dialog').rebind('click.defaultselect', function(e)
-    {
-        if (!$(e.target).hasClass('default-select')) {
+    $('#fmholder, .fm-dialog').rebind('click.defaultselect', function(e) {
+
+        // ToDo: Narrow this condition and find main reason why it's made
+        if (!$(e.target).parents('.default-select').length && !$(e.target).hasClass('default-select')) {
             $selectBlock = $('.default-select.active');
-            $selectBlock.find('.default-select-dropdown').fadeOut(200);
+            $selectBlock.find('.default-select-dropdown').addClass('hidden');
             $selectBlock.removeClass('active');
         }
     });
@@ -11321,135 +9921,6 @@ function selectText(elementId) {
         selection.addRange(range);
     }
 }
-
-/**
- * Dialog to cancel subscriptions
- */
-var cancelSubscriptionDialog = {
-
-    $backgroundOverlay: null,
-    $dialog: null,
-    $dialogSuccess: null,
-    $accountPageCancelButton: null,
-    $accountPageSubscriptionBlock: null,
-    $continueButton: null,
-    $cancelReason: null,
-
-    init: function() {
-
-        this.$dialog = $('.cancel-subscription-st1');
-        this.$dialogSuccess = $('.cancel-subscription-st2');
-        this.$accountPageCancelButton = $('.fm-account-blocks .btn-cancel');
-        this.$continueButton = this.$dialog.find('.continue-cancel-subscription');
-        this.$cancelReason = this.$dialog.find('.cancel-textarea textarea');
-        this.$backgroundOverlay = $('.fm-dialog-overlay');
-        this.$accountPageSubscriptionBlock = $('.subscription-bl');
-
-        // Show the dialog
-        this.$dialog.removeClass('hidden');
-        this.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
-
-        // Init textarea scrolling
-        initTextareaScrolling($('.cancel-textarea textarea'), 126);
-
-        // Init functionality
-        this.enableButtonWhenReasonEntered();
-        this.initSendingReasonToApi();
-        this.initCloseAndBackButtons();
-    },
-
-    /**
-     * Close the dialog when either the close or back buttons are clicked
-     */
-    initCloseAndBackButtons: function() {
-
-        // Close main dialog
-        this.$dialog.find('.fm-dialog-button.cancel, .fm-dialog-close').rebind('click', function() {
-            cancelSubscriptionDialog.$dialog.addClass('hidden');
-            cancelSubscriptionDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
-        });
-
-        // Prevent clicking on the background overlay which closes it unintentionally
-        cancelSubscriptionDialog.$backgroundOverlay.rebind('click', function(event) {
-            event.stopPropagation();
-        });
-    },
-
-    /**
-     * Close success dialog
-     */
-    initCloseButtonSuccessDialog: function() {
-
-        this.$dialogSuccess.find('.fm-dialog-close').rebind('click', function() {
-            cancelSubscriptionDialog.$dialogSuccess.addClass('hidden');
-            cancelSubscriptionDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
-        });
-    },
-
-    /**
-     * Make sure text has been entered before making the button available
-     */
-    enableButtonWhenReasonEntered: function() {
-
-        this.$cancelReason.rebind('keyup', function() {
-
-            // Trim for spaces
-            var reason = $(this).val();
-                reason = $.trim(reason);
-
-            // Make sure at least 1 character
-            if (reason.length > 0) {
-                cancelSubscriptionDialog.$continueButton.removeClass('disabled');
-            }
-            else {
-                cancelSubscriptionDialog.$continueButton.addClass('disabled');
-            }
-        });
-    },
-
-    /**
-     * Send the cancellation reason
-     */
-    initSendingReasonToApi: function() {
-
-        this.$continueButton.rebind('click', function() {
-
-            // Get the cancellation reason
-            var reason = cancelSubscriptionDialog.$cancelReason.val();
-
-            // Hide the dialog and show loading spinner
-            cancelSubscriptionDialog.$dialog.addClass('hidden');
-            cancelSubscriptionDialog.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
-            loadingDialog.show();
-
-            // Cancel the subscription/s
-            // cccs = Credit Card Cancel Subscriptions, r = reason
-            api_req({ a: 'cccs', r: reason }, {
-                callback: function() {
-
-                    // Reset account cache and refetch all account data to display UI
-                    // (note potential race condition if cancellation callback wasn't received in 7500ms)
-                    M.account.lastupdate = 0;
-
-                    setTimeout(function() {
-
-                        // Hide loading dialog and cancel subscription button on account page
-                        loadingDialog.hide();
-                        cancelSubscriptionDialog.$accountPageCancelButton.hide();
-                        cancelSubscriptionDialog.$accountPageSubscriptionBlock.removeClass('active-subscription');
-
-                        // Show success dialog and refresh UI
-                        cancelSubscriptionDialog.$dialogSuccess.removeClass('hidden');
-                        cancelSubscriptionDialog.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
-                        cancelSubscriptionDialog.initCloseButtonSuccessDialog();
-                        accountUI();
-
-                    }, 7500);
-                }
-            });
-        });
-    }
-};
 
 /**
  * addToMultiInputDropDownList
@@ -11520,7 +9991,7 @@ function removeFromMultiInputDDL(dialog, item) {
             $('.nw-fm-tree-header input').prop('readonly', false);
 
             // Left panel header click, show search input box
-            $('.nw-fm-tree-header').bind('click', function(e) {
+            $('.nw-fm-tree-header').rebind('click', function(e) {
 
                 var $self = $(this);
 
@@ -11538,15 +10009,12 @@ function removeFromMultiInputDDL(dialog, item) {
                 }
                 else {
                     $self.addClass('focused-input');
-                    if ($input.val() === $input.attr('placeholder')) {
-                        $input.val('');
-                        $input.focus();
-                    }
+                    $input.focus();
                 }
             }); // END left panel header click
 
             // Make a search
-            $('.nw-fm-search-icon').bind('click', function() {
+            $('.nw-fm-search-icon').rebind('click', function() {
 
                 var $self = $(this);
 
@@ -11556,7 +10024,7 @@ function removeFromMultiInputDDL(dialog, item) {
                 $self.parent().find('input').blur();
             });
 
-            $('.nw-fm-tree-header input').bind('keyup', function(e) {
+            $('.nw-fm-tree-header input').rebind('keyup', function(e) {
 
                 var $self = $(this);
 
@@ -11580,13 +10048,13 @@ function removeFromMultiInputDDL(dialog, item) {
                 treeredraw();
             });
 
-            $('.nw-fm-tree-header input').bind('blur', function() {
+            $('.nw-fm-tree-header input').rebind('blur', function() {
 
                 var $self = $(this);
 
-                if (($self.val() === $self.attr('placeholder')) || ($self.val() === '')) {
+                if ($self.val() === '') {
                     $self.parent('.nw-fm-tree-header').removeClass('focused-input filled-input');
-                    $self.val($self.attr('placeholder'));
+                    //$self.val($self.attr('placeholder'));
                 }
                 else {
                     $self.parent('.nw-fm-tree-header').removeClass('focused-input');
@@ -11611,17 +10079,24 @@ function removeFromMultiInputDDL(dialog, item) {
                 $self.addClass('active');
 
                 menu = $('.nw-sorting-menu').removeClass('hidden');
+                menu.css('right', '-' + (menu.outerWidth() - 4) + 'px');
+
                 type = treePanelType();
 
                 if (type === 'settings') {
                     type = M.lastActiveTab || 'cloud-drive';
                 }
 
-                // Show all items in sort dialog in case contacts tab is choosen
+                // Show only contacts related sorting options
                 if (type === 'contacts') {
                     menu.find('.sorting-item-divider,.sorting-menu-item').removeClass('hidden');
+                    menu.find(
+                            '*[data-by="fav"],' +
+                            '*[data-by="created"]'
+                        ).addClass('hidden');
                 }
                 else { // Hide status and last-interaction sorting options in sort dialog
+                    menu.find('.sorting-item-divider,.sorting-menu-item').removeClass('hidden');
                     menu.find('*[data-by=status],*[data-by=last-interaction]').addClass('hidden');
                 }
 

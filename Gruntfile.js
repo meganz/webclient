@@ -7,9 +7,15 @@ var Secureboot = function() {
     var content = fs.readFileSync("secureboot.js").toString().split("\n");
     var jsl = getFiles();
     var ns  = {};
+    var jsl3;
 
     function getWeight(filename) {
         return Math.round((fs.statSync(filename)['size']/fileLimit)*30);
+    }
+
+    function die() {
+        console.error.apply(console, arguments);
+        process.exit(1);
     }
 
     function getFiles() {
@@ -27,19 +33,21 @@ var Secureboot = function() {
                 if (line.trim().match(/^(\}.+)?(if|else)/)) {
                     /* We must break the group, there is an if */
                     if (line.trim().match(/^if/)) {
-                        lines.push('jsl.push({f:"\0.js"})');
+                        lines.push('jsl.push({f:"\0.jsx"})');
                     }
                     line = line.replace(/else(\s*if)?/, 'if (true)');
                     line = line.replace(/\(.+\)/, '(true)');
                 }
                 lines.push(line);
-                if (line.trim() == "}") {
-                    lines.push('jsl.push({f:"\0.js"})');
+                // detect any } OR } // comment to break the current group
+                if (line.trim()[0] == "}") {
+                    lines.push('jsl.push({f:"\0.jsx"})');
                 }
             }
         }
         var is_chrome_firefox = 0;
         var is_mobile = 0;
+
         eval(lines.join("\n"));
         return jsl;
     };
@@ -99,18 +107,103 @@ var Secureboot = function() {
                 lines.push(content[i]);
             }
         }
-        fs.writeFileSync(name, lines.join("\n"));
+        lines = lines.join("\n");
+
+        // process jsl3 entries
+        lines = lines.replace(/jsl3\s*=\s*\{[\s\S]+?var subpages/, function(m) {
+            m = m.replace('var subpages', '');
+            eval(m);
+
+            if (jsl3) {
+                var js  = {};
+                var css = {};
+                for (var group in jsl3) {
+                    var rscs = jsl3[group];
+
+                    js[group]  = [];
+                    css[group] = [];
+
+                    for (var j in rscs) {
+                        var f = rscs[j];
+
+                        if (f.j == 1) {
+                            f.n = j;
+                            js[group].push(f);
+                        }
+                        else if (f.j == 2) {
+                            f.n = j;
+                            css[group].push(f);
+                        }
+                        else {
+                            die('Unknown jsl3 resource', f);
+                        }
+                    }
+                }
+
+                var jsl3_new = {};
+                [js, css].forEach(function(r) {
+                    var length;
+                    var content;
+                    var idx   = 0;
+                    var pfx   = r === js ? 'js' : 'css';
+                    var write = function(g) {
+                        if (content.length) {
+                            var filename = pfx + '/' + g + '-group' + (++idx) + '.' + pfx;
+                            fs.writeFileSync(filename, content.join("\n"));
+
+                            if (!jsl3_new[g]) {
+                                jsl3_new[g] = {};
+                            }
+                            var name = g + '_group' + idx + '_' + pfx;
+                            jsl3_new[g][name] = {
+                                f: filename,
+                                n: name,
+                                j: (pfx[0] == 'c') + 1,
+                                w: Math.round((length/fileLimit)*30)
+                            };
+                            content = [];
+                            length  = 0;
+                        }
+                    };
+
+                    for (var g in r) {
+                        var nn  = r[g];
+                        length  = 0;
+                        content = [];
+                        idx     = 0;
+
+                        for (var i = 0; i < nn.length; i++) {
+                            var f    = nn[i];
+                            var size = fs.statSync(f.f).size;
+                            if (length + size > fileLimit) {
+                                write(g);
+                            }
+                            content.push(fs.readFileSync(f.f).toString());
+                            length += size;
+                        }
+
+                        write(g);
+                    }
+                });
+
+                m = 'jsl3 = ' + JSON.stringify(jsl3_new).replace(/"/g, "'").replace(/'(\w)':/g, '$1:') + '\n';
+            }
+
+            return m + '    var subpages';
+        });
+
+        fs.writeFileSync(name, lines);
     };
 
     ns.getJS = function() {
         return jsl.filter(function(f) {
-            return f.f.match(/js$/);
+            return f.f.match(/jsx?$/);
         });
     };
 
     ns.getCSS = function() {
         return jsl.filter(function(f) {
-            return f.f.match(/css$/);
+            return f.f.match(/(?:css|jsx)$/);
         });
     };
 
@@ -126,12 +219,17 @@ var Secureboot = function() {
         var groups = [];
         var size = 0;
         this.getCSS().forEach(function(f) {
-            if (size > fileLimit) {
-                size = 0;
+            if (f.f == "\0.jsx") {
                 groups.push(null);
+                size = 0;
+            } else {
+                if (size > fileLimit) {
+                    size = 0;
+                    groups.push(null);
+                }
+                groups.push(f.f);
+                size += fs.statSync(f.f)['size'];
             }
-            groups.push(f.f);
-            size += fs.statSync(f.f)['size'];
         });
         groups.push(null);
 
@@ -187,16 +285,17 @@ var Secureboot = function() {
         var groups = [];
         var size = 0;
         this.getJS().forEach(function(f) {
-            if (f.f == "\0.js") {
+            if (f.f == "\0.jsx") {
                 groups.push(null);
                 size = 0;
             } else {
-                if (size > fileLimit) {
+                var fsize = fs.statSync(f.f)['size'];
+                if (size + fsize > fileLimit) {
                     size = 0;
                     groups.push(null);
                 }
                 groups.push(f.f);
-                size += fs.statSync(f.f)['size'];
+                size += fsize;
             }
         });
         groups.push(null);

@@ -5,7 +5,7 @@
         options = options || {};
 
         // Already logged-in, even on ephemeral?
-        if (u_type !== false) {
+        if (u_type !== false && (!options.minUserType || u_type >= options.minUserType)) {
             Soon(function() {
                 promise.resolve();
             });
@@ -43,7 +43,7 @@
                 icon = $(this.$dialog)
                     .addClass('warning-dialog-a login').removeClass('loginrequired-dialog');
 
-                $('.fm-dialog-button.pro-login', this.$dialog)
+                $('.default-white-button.pro-login', this.$dialog)
                     .rebind('click.loginrequired', function() {
                         loginRequiredDialog.hide();
                         showLoginDialog(promise);
@@ -51,7 +51,7 @@
                         return false;
                     });
 
-                $('.fm-dialog-button.pro-register', this.$dialog)
+                $('.default-white-button.pro-register', this.$dialog)
                     .rebind('click.loginrequired', function() {
                         promise.reject();
                         return false;
@@ -101,12 +101,10 @@
             });
 
         $('.input-email', $dialog)
-            .data('placeholder', l[195])
-            .val(l[195]);
+            .val('');
 
         $('.input-password', $dialog)
-            .data('placeholder', l[909])
-            .val(l[909]);
+            .data('placeholder', l[909]);
 
         uiPlaceholders($dialog);
         uiCheckboxes($dialog);
@@ -123,7 +121,7 @@
 
         $('.top-login-forgot-pass', $dialog).rebind('click', function(e) {
             aPromise.reject();
-            document.location.hash = 'recovery';
+            loadSubPage('recovery');
         });
 
         $('.top-dialog-login-button', $dialog).rebind('click', function(e) {
@@ -131,8 +129,6 @@
         });
     }
 
-
-    
 
     function doLogin($dialog, aPromise) {
         loadingDialog.show();

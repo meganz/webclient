@@ -1,10 +1,7 @@
 // global variables holding the user's identity
-var u_handle; // user handle
-var u_k; // master key
-var u_k_aes; // master key AES engine
+// (moved to nodedec.js)
 var u_p; // prepared password
 var u_attr; // attributes
-var u_privk; // private key
 
 // log in
 // returns user type if successful, false if not
@@ -113,7 +110,7 @@ function u_checklogin3a(res, ctx) {
         u_attr = res;
         var exclude = [
             'c', 'email', 'k', 'name', 'p', 'privk', 'pubk', 's',
-            'ts', 'u', 'currk', 'flags', '*!lastPsaSeen', 'lup'
+            'ts', 'u', 'currk', 'flags', '*!lastPsaSeen', 'lup', 'since'
         ];
 
         for (var n in u_attr) {
@@ -172,6 +169,7 @@ function u_checklogin3a(res, ctx) {
                 localStorage.chatDisabled = (u_attr.flags.mcs === 0) ? '1' : '0';
             }
         }
+        u_attr.flags = Object(u_attr.flags);
 
         // If their PRO plan has expired and Last User Payment info is set, configure the dialog
         if (typeof u_attr.lup !== 'undefined') {
@@ -192,8 +190,6 @@ function u_checklogin3a(res, ctx) {
         }
 
         if (r == 3) {
-            // Load/initialise the authentication system.
-            authring.initAuthenticationSystem();
             return mBroadcaster.crossTab.initialize(function() {
                 ctx.checkloginresult(ctx, r);
             });
@@ -227,6 +223,7 @@ function u_logout(logout) {
                 megaChat.destroy( /* isLogout: */ true);
 
                 localStorage.removeItem("megaChatPresence");
+                localStorage.removeItem("userPresenceIsOffline");
                 localStorage.removeItem("megaChatPresenceMtime");
             }
         }
@@ -235,14 +232,10 @@ function u_logout(logout) {
         localStorage.removeItem('registeremail');
         localStorage.removeItem('agreedToCopyrightWarning');
 
-        if (mDBact) {
-            mDBact = false;
-            delete localStorage[u_handle + '_mDBactive'];
-        }
-        if (typeof mDBcls === 'function') {
-            mDBcls(); // resets mDBloaded
-        }
         fminitialized = false;
+        if (typeof mDBcls === 'function') {
+            mDBcls(); // close fmdb
+        }
         if (logout !== -0xDEADF) {
             watchdog.notify('logout');
         }
@@ -252,7 +245,6 @@ function u_logout(logout) {
         notify.notifications = [];
         api_setsid(false);
         u_sharekeys = {};
-        u_nodekeys = {};
         u_type = false;
         loggedout = true;
         $('#fmholder').html('');
@@ -303,6 +295,8 @@ function u_setrsa(rsakey) {
                         process_u([user]);
 
                         if (d) console.log('Account activation succeeded', user);
+
+                        watchdog.notify('setrsa', [u_type, u_sid]);
                     }
                     $promise.resolve(rsakey);
                     ui_keycomplete();
@@ -565,8 +559,8 @@ function isEphemeral() {
  */
 function checkUserLogin() {
     if (!u_type) {
-        login_next = document.location.hash;
-        document.location.hash = "#login";
+        login_next = getSitePath();
+        loadSubPage('login');
         return true;
     }
 
@@ -575,8 +569,8 @@ function checkUserLogin() {
 
 
 (function(exportScope) {
-    var _lastUserInteractionCache = false;
-    var _lastUserInteractionCacheIsLoading = false;
+    var _lastUserInteractionCache = window._lastUserInteractionCache = {};
+    var _lastUserInteractionPromiseCache = window._lastUserInteractionPromiseCache = {};
 
     /**
      * Compare and return `true` if:
@@ -593,27 +587,6 @@ function checkUserLogin() {
         return timestampA > timestampB;
     };
 
-
-    var _lastInteractionFlushThrottleTimer = null;
-    /**
-     * Used internally to throttle the updates to the API
-     * @private
-     */
-    var _flushLastInteractionData = function () {
-        assert(u_handle, "missing u_handle, can't proceed");
-
-        if (_lastInteractionFlushThrottleTimer) {
-            clearTimeout(_lastInteractionFlushThrottleTimer);
-        }
-        _lastInteractionFlushThrottleTimer = setTimeout(function () {
-            mega.attr.set(
-                "lstint",
-                _lastUserInteractionCache,
-                false,
-                true
-            );
-        }, 3 * 60000);
-    };
 
     /**
      * Set the last interaction for a contact
@@ -650,13 +623,19 @@ function checkUserLogin() {
                 else {
                     _lastUserInteractionCache[u_h] = v;
 
-                    _flushLastInteractionData();
-
                     $promise.resolve(_lastUserInteractionCache[u_h]);
 
                     M.u[u_h].ts = parseInt(v.split(":")[1], 10);
 
                     $promise.verify();
+
+                    mega.attr.setArrayAttribute(
+                        'lstint',
+                        u_h,
+                        _lastUserInteractionCache[u_h],
+                        false,
+                        true
+                    );
                 }
             })
             .fail(function (res) {
@@ -665,12 +644,17 @@ function checkUserLogin() {
                         _lastUserInteractionCache = {};
                     }
                     _lastUserInteractionCache[u_h] = v;
-
-                    _flushLastInteractionData();
-
                     $promise.resolve(_lastUserInteractionCache[u_h]);
 
                     Object(M.u[u_h]).ts = parseInt(v.split(":")[1], 10);
+
+                    mega.attr.setArrayAttribute(
+                        'lstint',
+                        u_h,
+                        _lastUserInteractionCache[u_h],
+                        false,
+                        false
+                    );
 
                     $promise.verify();
                 }
@@ -766,53 +750,8 @@ function checkUserLogin() {
             .done(_renderLastInteractionDone)
             .fail(_renderLastInteractionFail);
 
-        if (_lastUserInteractionCache === false) {
-            // load and retry logic
-
-            // loading is already in progress?
-            if (_lastUserInteractionCacheIsLoading === false) {
-                _lastUserInteractionCacheIsLoading = mega.attr.get(
-                    u_handle,
-                    'lstint',
-                    false,
-                    true
-                )
-                    .done(function (res) {
-                        if (typeof res !== 'number') {
-                            _lastUserInteractionCache = res;
-                            Object.keys(res).forEach(function(k) {
-                                // prefill in-memory M.u[...] cache!
-                                getLastInteractionWith(k);
-                            });
-
-                            // recurse, and return the data from the mem cache
-                            $promise.linkDoneAndFailTo(
-                                getLastInteractionWith(u_h)
-                            );
-                        }
-                        else {
-                            $promise.reject(false);
-                            console.error("Failed to retrieve last interaction cache from attrib, response: ", err);
-                        }
-                    })
-                    .always(function () {
-                        _lastUserInteractionCacheIsLoading = false;
-                    });
-
-                $promise.linkFailTo(_lastUserInteractionCacheIsLoading);
-            }
-            else {
-                _lastUserInteractionCacheIsLoading
-                    .done(function () {
-                        $promise.linkDoneAndFailTo(
-                            getLastInteractionWith(u_h)
-                        );
-                    });
-                $promise.linkFailTo(_lastUserInteractionCacheIsLoading);
-            }
-        }
-        else if (!_lastUserInteractionCache[u_h]) {
-            $promise.reject(false);
+        if (_lastUserInteractionPromiseCache[u_h] && _lastUserInteractionPromiseCache[u_h].state() === 'pending') {
+            return _lastUserInteractionPromiseCache[u_h];
         }
         else if (_lastUserInteractionCache[u_h]) {
             if (megaChatIsReady) {
@@ -826,6 +765,45 @@ function checkUserLogin() {
                 }
             }
             $promise.resolve(_lastUserInteractionCache[u_h]);
+        }
+        else if (
+                !_lastUserInteractionCache[u_h] &&
+                (
+                    !_lastUserInteractionPromiseCache[u_h] ||
+                    _lastUserInteractionPromiseCache[u_h].state() !== 'pending'
+                )
+            ) {
+            _lastUserInteractionPromiseCache[u_h] = mega.attr.getArrayAttribute(
+                u_handle,
+                'lstint',
+                u_h,
+                false,
+                true
+            )
+                .always(function() {
+                    _lastUserInteractionPromiseCache[u_h] = false;
+                })
+                .done(function (res) {
+                    if (typeof res !== 'number') {
+                        if (typeof res === 'undefined') {
+                            // detected legacy value which was not unserialised properly....should re-initialise as
+                            // empty value, e.g. no last interaction with that user (would be rebuilt by chat messages
+                            // and stuff)
+                            $promise.reject(false);
+                        }
+                        else {
+                            _lastUserInteractionCache[u_h] = res;
+                            $promise.resolve(res);
+                        }
+                    }
+                    else {
+                        $promise.reject(false);
+                        console.error("Failed to retrieve last interaction cache from attrib, response: ", res);
+                    }
+                })
+                .fail(function(res) {
+                    $promise.reject(res);
+                });
         }
         else {
             throw new Error("This should not happen.");
@@ -934,7 +912,7 @@ function checkUserLogin() {
      * @private
      */
     var store = function() {
-        if (!u_handle) {
+        if (!u_handle || pfid) {
             return MegaPromise.reject(EINCOMPLETE);
         }
 
@@ -984,10 +962,15 @@ function checkUserLogin() {
         if (waiter) {
             return waiter;
         }
-        waiter = new MegaPromise();
+        var promise = waiter = new MegaPromise();
 
         mega.attr.get(u_handle, 'fmconfig', false, true)
-            .always(moveLegacySettings)
+            .always(function() {
+                moveLegacySettings();
+
+                // Initialize account notifications.
+                mega.notif.setup(fmconfig.anf);
+            })
             .done(function(result) {
                 result = Object(result);
                 for (var key in result) {
@@ -1042,7 +1025,7 @@ function checkUserLogin() {
                 waiter = undefined;
             });
 
-        return waiter;
+        return promise;
     };
 
     /**
@@ -1083,7 +1066,7 @@ function checkUserLogin() {
         var push = function() {
             if (u_type === 3 && !pfid && !folderlink) {
                 // through a timer to prevent floods
-                timer = delay('fmconfig:store', store, 9701);
+                timer = delay('fmconfig:store', store, 3100);
             }
             else {
                 localStorage.fmconfig = JSON.stringify(fmconfig);
@@ -1102,6 +1085,22 @@ function checkUserLogin() {
         mBroadcaster.sendMessage('fmconfig:' + key, value);
     };
 
+    /**
+     * Same as .set, but displays a toast notification.
+     * @param {String} key          Configuration key
+     * @param {String} value        Configuration value
+     * @param {String} [toastText]  Toast notification text
+     */
+    ns.setn = function _setConfigValueToast(key, value, toastText) {
+        toastText = toastText || l[16168];
+
+        delay('fmconfig:setn', function() {
+            showToast('settings', toastText);
+
+            mega.config.set(key, value);
+        });
+    };
+
     if (is_karma) {
         mega.config = ns;
     }
@@ -1113,437 +1112,3 @@ function checkUserLogin() {
     ns = undefined;
 
 })(this);
-
-(function _userAttributeHandling(scope) {
-    "use strict";
-
-    var ns = {};
-    var logger = MegaLogger.getLogger('account');
-    var ATTRIB_CACHE_NON_CONTACT_EXP_TIME = 2 * 60 * 60;
-
-    /**
-     * Assemble property name on Mega API.
-     *
-     * @private
-     * @param attribute {String}
-     *     Name of the attribute.
-     * @param pub {Boolean|Number}
-     *     True for public attributes (default: true). -1 for "system" attributes (e.g. without prefix)
-     * @param nonHistoric {Boolean}
-     *     True for non-historic attributes (default: false).  Non-historic
-     *     attributes will overwrite the value, and not retain previous
-     *     values on the API server.
-     * @return {String}
-     */
-    var buildAttribute = function(attribute, pub, nonHistoric) {
-        if (nonHistoric === true || nonHistoric === 1) {
-            attribute = '!' + attribute;
-        }
-
-        if (pub === true || pub === undefined) {
-            attribute = '+' + attribute;
-        }
-        else if (pub !== -1) {
-            attribute = '*' + attribute;
-        }
-
-        return attribute;
-    };
-
-    /**
-     * Assemble property name for database.
-     *
-     * @private
-     * @param userHandle {String}
-     *     Mega's internal user handle.
-     * @param attribute {String}
-     *     Name of the attribute.
-     * @return {String}
-     */
-    var buildCacheKey = function(userHandle, attribute) {
-        return userHandle + "_" + attribute;
-    };
-
-    /**
-     * Retrieves a user attribute.
-     *
-     * @param userhandle {String}
-     *     Mega's internal user handle.
-     * @param attribute {String}
-     *     Name of the attribute.
-     * @param pub {Boolean|Number}
-     *     True for public attributes (default: true). -1 for "system" attributes (e.g. without prefix)
-     * @param nonHistoric {Boolean}
-     *     True for non-historic attributes (default: false).  Non-historic
-     *     attributes will overwrite the value, and not retain previous
-     *     values on the API server.
-     * @param callback {Function}
-     *     Callback function to call upon completion (default: none).
-     * @param ctx {Object}
-     *     Context, in case higher hierarchies need to inject a context
-     *     (default: none).
-     * @return {MegaPromise}
-     *     A promise that is resolved when the original asynch code is settled.
-     *     Can be used to use promises instead of callbacks for asynchronous
-     *     dependencies.
-     */
-    ns.get = function _getUserAttribute(userhandle, attribute, pub, nonHistoric, callback, ctx) {
-        assertUserHandle(userhandle);
-        var myCtx = ctx || {};
-
-        // Assemble property name on Mega API.
-        attribute = buildAttribute(attribute, pub, nonHistoric);
-
-        // Make the promise to execute the API code.
-        var thePromise = new MegaPromise();
-
-        var cacheKey = buildCacheKey(userhandle, attribute);
-
-        /**
-         * mega.attr.get::settleFunction
-         *
-         * Process result from `uga` API request, and cache it.
-         *
-         * @param {Number|Object} res The received result.
-         */
-        function settleFunction(res) {
-            if (typeof res !== 'number') {
-                // Decrypt if it's a private attribute container.
-                if (attribute.charAt(0) === '*') {
-                    try {
-                        var clearContainer = tlvstore.blockDecrypt(base64urldecode(res),
-                                                                   u_k);
-                        res = tlvstore.tlvRecordsToContainer(clearContainer, true);
-
-                        if (res === false) {
-                            res = EINTERNAL;
-                        }
-                    }
-                    catch (e) {
-                        if (e.name === 'SecurityError') {
-                            logger.error('Could not decrypt private user attribute '
-                                         + attribute + ': ' + e.message);
-                        }
-                        else {
-                            logger.error('Unexpected exception!', e);
-                            setTimeout(function() { throw e; }, 4);
-                            // debugger;
-                        }
-                        res = EINTERNAL;
-                    }
-                }
-            }
-
-            // Cache all returned values, except errors other than ENOENT
-            if (typeof res !== 'number' || res === ENOENT) {
-                var exp = 0;
-                // Only add cache expiration for attributes of non-contacts, because
-                // contact's attributes would be always in sync (using actionpackets)
-                if (userhandle !== u_handle && (!M.u[userhandle] || M.u[userhandle].c !== 1)) {
-                    exp = unixtime();
-                }
-                attribCache.setItem(cacheKey, JSON.stringify([res, exp]));
-            }
-
-            settleFunctionDone(res);
-        }
-
-        /**
-         * mega.attr.get::settleFunctionDone
-         *
-         * Fullfill the promise with the result/attribute value from either API or cache.
-         *
-         * @param {Number|Object} res    The result/attribute value.
-         * @param {Boolean} cached Whether it came from cache.
-         */
-        function settleFunctionDone(res, cached) {
-            var tag = cached ? 'Cached ' : '';
-
-            // Another conditional, the result value may have been changed.
-            if (typeof res !== 'number') {
-                if (d) {
-                    var loggerValueOutput = pub ? JSON.stringify(res) : '-- hidden --';
-                    logger.info(tag + 'Attribute "%s" for user "%s" is %s.',
-                                attribute, userhandle, loggerValueOutput);
-                }
-                thePromise.resolve(res);
-            }
-            else {
-                // Got back an error (a number).
-                if (res !== -9) {
-                    logger.warn(tag + 'attribute "%s" for user "%s" could not be retrieved: %d!',
-                        attribute, userhandle, res);
-                }
-                thePromise.reject(res);
-            }
-
-            // Finish off if we have a callback.
-            if (callback) {
-                callback(res, myCtx);
-            }
-        }
-
-        // Assemble context for this async API request.
-        myCtx.u = userhandle;
-        myCtx.ua = attribute;
-        myCtx.callback = settleFunction;
-
-        /**
-         * mega.attr.get::doApiReq
-         *
-         * Perform a `uga` API request If we are unable to retrieve the entry
-         * from the cache. If a MegaPromise is passed as argument, we'll wait
-         * for it to complete before firing the api rquest.
-         *
-         * settleFunction will be used to process the api result.
-         *
-         * @param {MegaPromise} promise Optional promise to wait for.
-         */
-        var doApiReq = function _doApiReq(promise) {
-            if (promise instanceof MegaPromise) {
-                promise.always(function() {
-                    doApiReq();
-                });
-            }
-            else {
-                api_req({'a': 'uga', 'u': userhandle, 'ua': attribute}, myCtx);
-            }
-        };
-
-        // check the cache first!
-        attribCache.getItem(cacheKey)
-            .fail(doApiReq)
-            .done(function __attribCacheGetDone(v) {
-                var result;
-
-                try {
-                    var res = JSON.parse(v);
-
-                    if ($.isArray(res)) {
-                        var exp = res[1];
-
-                        // Pick the cached entry as long it has no expiry or it hasn't expired
-                        if (!exp || exp > (unixtime() - ATTRIB_CACHE_NON_CONTACT_EXP_TIME)) {
-                            result = res[0];
-                        }
-                    }
-                }
-                catch (ex) {
-                    logger.error(ex);
-                }
-
-                if (result === undefined) {
-                    doApiReq(attribCache.removeItem(cacheKey));
-                }
-                else {
-                    settleFunctionDone(result, true);
-                }
-            });
-
-        return thePromise;
-    };
-
-    /**
-     * Removes a user attribute for oneself.
-     *
-     * @param attribute {string}
-     *     Name of the attribute.
-     * @param pub {bool}
-     *     True for public attributes (default: true).
-     * @param nonHistoric {bool}
-     *     True for non-historic attributes (default: false).  Non-historic
-     *     attributes will overwrite the value, and not retain previous
-     *     values on the API server.
-     * @return {MegaPromise}
-     *     A promise that is resolved when the original asynch code is settled.
-     */
-    ns.remove = function _removeUserAttribute(attribute, pub, nonHistoric) {
-        attribute = buildAttribute(attribute, pub, nonHistoric);
-        var cacheKey = buildCacheKey(u_handle, attribute);
-        var promise = new MegaPromise();
-
-        attribCache.removeItem(cacheKey)
-            .always(function() {
-                api_req({'a': 'upr', 'ua': attribute}, {
-                    callback: function(res) {
-                        if (typeof res !== 'number' || res < 0) {
-                            logger.warn('Error removing user attribute "%s", result: %s!', attribute, res);
-                            promise.reject(res);
-                        }
-                        else {
-                            logger.info('Removed user attribute "%s", result: ' + res, attribute);
-                            promise.resolve();
-                        }
-                    }
-                });
-            });
-
-        return promise;
-    };
-
-    /**
-     * Stores a user attribute for oneself.
-     *
-     * @param attribute {string}
-     *     Name of the attribute. The max length is 16 characters. Note that the
-     *     * and ! characters may be added so usually you only have 14 to work with.
-     * @param value {object}
-     *     Value of the user attribute. Public properties are of type {string},
-     *     private ones have to be an object with key/value pairs.
-     * @param pub {bool}
-     *     True for public attributes (default: true).
-     * @param nonHistoric {bool}
-     *     True for non-historic attributes (default: false).  Non-historic
-     *     attributes will overwrite the value, and not retain previous
-     *     values on the API server.
-     * @param callback {function}
-     *     Callback function to call upon completion (default: none). This callback
-     *     function expects two parameters: the attribute `name`, and its `value`.
-     *     In case of an error, the `value` will be undefined.
-     * @param ctx {object}
-     *     Context, in case higher hierarchies need to inject a context
-     *     (default: none).
-     * @param mode {integer}
-     *     Encryption mode. One of BLOCK_ENCRYPTION_SCHEME (default: AES_GCM_12_16).
-     * @return {MegaPromise}
-     *     A promise that is resolved when the original asynch code is settled.
-     *     Can be used to use promises instead of callbacks for asynchronous
-     *     dependencies.
-     */
-    ns.set = function _setUserAttribute(attribute, value, pub, nonHistoric, callback, ctx, mode) {
-        var myCtx = ctx || {};
-
-        var savedValue = value;
-
-        // Prepare all data needed for the call on the Mega API.
-        if (mode === undefined) {
-            mode = tlvstore.BLOCK_ENCRYPTION_SCHEME.AES_GCM_12_16;
-        }
-
-        attribute = buildAttribute(attribute, pub, nonHistoric);
-        if (attribute[0] === '*') {
-            // The value should be a key/value property container.
-            // Let's encode and encrypt it.
-            savedValue = base64urlencode(tlvstore.blockEncrypt(
-                tlvstore.containerToTlvRecords(value), u_k, mode));
-        }
-
-        // Make the promise to execute the API code.
-        var thePromise = new MegaPromise();
-
-        var cacheKey = buildCacheKey(u_handle, attribute);
-
-        // clear when the value is being sent to the API server, during that period
-        // the value should be retrieved from the server, because of potential
-        // race conditions
-        attribCache.removeItem(cacheKey);
-
-        function settleFunction(res) {
-            if (typeof res !== 'number') {
-                attribCache.setItem(cacheKey, JSON.stringify([value, 0]));
-
-                logger.info('Setting user attribute "'
-                            + attribute + '", result: ' + res);
-                thePromise.resolve(res);
-            }
-            else {
-                logger.warn('Error setting user attribute "'
-                            + attribute + '", result: ' + res + '!');
-                thePromise.reject(res);
-            }
-
-            // Finish off if we have a callback.
-            if (callback) {
-                callback(res, myCtx);
-            }
-        }
-
-        // Assemble context for this async API request.
-        myCtx.ua = attribute;
-        myCtx.callback = settleFunction;
-
-        // Fire it off.
-        var apiCall = {'a': 'up', 'i': requesti};
-        apiCall[attribute] = savedValue;
-        api_req(apiCall, myCtx);
-
-        return thePromise;
-    };
-
-
-    if (is_karma) {
-        ns._logger = logger;
-        mega.attr = ns;
-    }
-    else {
-        Object.defineProperty(mega, 'attr', {
-            value: Object.freeze(ns)
-        });
-    }
-    ns = undefined;
-
-})(this);
-
-/**
- * Process action-packet for attribute updates.
- *
- * @param {String}  attrName        Attribute name
- * @param {String}  userHandle      User handle
- * @param {Boolean} ownActionPacket Whether the action-packet was issued by myself
- */
-function uaPacketParser(attrName, userHandle, ownActionPacket) {
-    var logger = MegaLogger.getLogger('account');
-    var cacheKey = userHandle + "_" + attrName;
-
-    logger.debug('uaPacketParser: Invalidating cache entry "%s"', cacheKey);
-
-    var removeItemPromise = attribCache.removeItem(cacheKey);
-
-    removeItemPromise
-        .always(function _uaPacketParser() {
-            if (attrName === 'firstname'
-                    || attrName === 'lastname') {
-                M.u[userHandle].firstName = M.u[userHandle].lastName = "";
-                M.syncUsersFullname(userHandle);
-            }
-            else if (ownActionPacket) {
-                // atm only first/last name is processed throguh own-action-packet
-                logger.warn('uaPacketParser: Unexpected attribute "%s"', attrName);
-            }
-            else if (attrName === '+a') {
-                M.avatars(userHandle);
-            }
-            else if (attrName === '*!authring') {
-                authring.getContacts('Ed25519');
-            }
-            else if (attrName === '*!authRSA') {
-                authring.getContacts('RSA');
-            }
-            else if (attrName === '*!authCu255') {
-                authring.getContacts('Cu25519');
-            }
-            else if (attrName === '*!fmconfig') {
-                mega.config.fetch();
-            }
-            else if (attrName === '+puEd255') {
-                // pubEd25519 key was updated!
-                // force fingerprint regen.
-                delete pubEd25519[userHandle];
-                crypt.getPubEd25519(userHandle);
-            }
-            else {
-                logger.debug('uaPacketParser: No handler for "%s"', attrName);
-            }
-        });
-
-    return removeItemPromise;
-};
-
-var attribCache = false;
-
-if (is_karma) {
-    window.M = new MegaData();
-    attribCache = new IndexedDBKVStorage('attrib', { murSeed: 0x800F0002 });
-    attribCache.syncNameTimer = {};
-    attribCache.uaPacketParser = uaPacketParser;
-}

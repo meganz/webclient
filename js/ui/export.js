@@ -251,19 +251,16 @@ var exportPassword = {
          */
         loadPasswordEstimatorLibrary: function() {
 
-            if (typeof zxcvbn === 'undefined' && !silent_loading) {
+            if (typeof zxcvbn === 'undefined') {
 
                 // Show loading spinner
                 var $loader = this.$dialog.find('.estimator-loading-icon').addClass('loading');
 
                 // On completion of loading, hide the loading spinner
-                silent_loading = function() {
-                    $loader.removeClass('loading');
-                };
-
-                // Load the library
-                jsl.push(jsl2['zxcvbn_js']);
-                jsl_start();
+                mega.utils.require('zxcvbn_js')
+                    .done(function() {
+                        $loader.removeClass('loading');
+                    });
             }
         },
 
@@ -342,7 +339,7 @@ var exportPassword = {
 
                 // On button click, go to the Pro page
                 $proButton.rebind('click', function() {
-                    document.location.hash = 'pro';
+                    loadSubPage('pro');
                 });
             }
             else {
@@ -574,12 +571,12 @@ var exportPassword = {
                         // Folder
                         if (node.t) {
                             linkInfo.type = exportPassword.LINK_TYPE_FOLDER;    // 0 byte for folder link
-                            linkInfo.key = u_sharekeys[node.h];                 // 128 bit key as array of 32 bit int
+                            linkInfo.key = u_sharekeys[node.h][0];              // 128 bit key as array of 32 bit int
                         }
                         else {
                             // File
                             linkInfo.type = exportPassword.LINK_TYPE_FILE;      // 1 byte for file link
-                            linkInfo.key = node.key;                            // 256 bit key as array of 32 bit int
+                            linkInfo.key = node.k;                              // 256 bit key as array of 32 bit int
                         }
 
                         // Convert the key to a byte array (big endian), also add the link's handle and public handle
@@ -647,7 +644,8 @@ var exportPassword = {
 
             // Add a click handler for the close button to return to the home page (or cloud drive if logged in)
             $closeButton.rebind('click', function() {
-                location.hash = '';
+                loadSubPage('');
+                return false;
             });
 
             // Add click handler for Decrypt button
@@ -795,7 +793,7 @@ var exportPassword = {
                 $password.val('');
 
                 // On success, redirect to actual file/folder link
-                location.hash = url;
+                loadSubPage(url);
             });
         }
     },  // Decrypt functions
@@ -1264,6 +1262,8 @@ var exportExpiry = {
         /* jshint -W074 */
         var self = this;
         var $linksDialog = $('.fm-dialog.export-links-dialog');
+        var $linkButtons = $linksDialog.find('.link-handle, .link-decryption-key, .link-handle-and-key');
+        var $linkContent = $linksDialog.find('.export-content-block');
         var html = '';
         var scroll = '.export-link-body';
         var links = $.trim(getClipboardLinks());
@@ -1288,19 +1288,18 @@ var exportExpiry = {
 
         $.dialog = 'links';
 
-        $('.export-links-dialog').addClass('file-keys-view');
+        $linksDialog.addClass('file-keys-view');
 
         // Generate content
         html = itemExportLink();
 
         // Fill with content
-        $('.export-links-dialog .export-link-body').html(html);
+        $linksDialog.find('.export-link-body').safeHTML(html);
 
-        // Default export option is
-        $('.export-link-select, .export-content-block')
-            .removeClass('public-handle decryption-key full-link')
-            .addClass('public-handle');
-        $('.export-link-select').html($('.export-link-dropdown div.public-handle').html());
+        // Reset state from previous dialog opens and pre-select the 'Link with key' option by default
+        $linkContent.removeClass('public-handle decryption-key full-link').addClass('full-link');
+        $linkButtons.removeClass('selected');
+        $linksDialog.find('.link-handle-and-key').addClass('selected');
 
         fm_showoverlay();
 
@@ -1433,21 +1432,6 @@ var exportExpiry = {
             $('.export-links-warning').addClass('hidden');
         });
 
-        $('.export-link-select').rebind('click', function() {
-            $('.export-link-dropdown').fadeIn(200);
-
-            // Stop propagation
-            return false;
-        });
-
-        // On Export File Links and Decryption Keys
-        var $linkButtons = $('.link-handle, .link-decryption-key, .link-handle-and-key');
-        var $linkHandle = $('.link-handle');
-
-        // Reset state from previous dialog opens and pre-select the 'Link without key' option by default
-        $linkButtons.removeClass('selected');
-        $linkHandle.addClass('selected');
-
         // Add click handler
         $linkButtons.rebind('click', function() {
 
@@ -1515,22 +1499,22 @@ var exportExpiry = {
         else {
             // Otherwise add all regular links
             for (var i in handles) {
-                if (handles.hasOwnProperty(i)) {
-                    var node = M.d[handles[i]];
+                var node = M.d[handles[i]];
 
-                    // Only nodes with public handle
-                    if (node && node.ph) {
-                        if (node.t) {
-                            // Folder
-                            type = 'F';
-                            key = u_sharekeys[node.h];
-                        }
-                        else {
-                            // File
-                            type = '';
-                            key = node.key;
-                        }
+                // Only nodes with public handle
+                if (node && node.ph) {
+                    if (node.t) {
+                        // Folder
+                        type = 'F';
+                        key = u_sharekeys[node.h] && u_sharekeys[node.h][0];
+                    }
+                    else {
+                        // File
+                        type = '';
+                        key = node.k;
+                    }
 
+                    if (key) {
                         var nodeUrlWithPublicHandle = getBaseUrl() + '/#' + type + '!' + (node.ph);
                         var nodeDecryptionKey = key ? '!' + a32_to_base64(key) : '';
 
@@ -1544,6 +1528,9 @@ var exportExpiry = {
                         else if (modeDecKey) {
                             links.push(nodeDecryptionKey);
                         }
+                    }
+                    else {
+                        srvlog2('export-no-key', node.h, node.t);
                     }
                 }
             }
@@ -1598,16 +1585,21 @@ var exportExpiry = {
 
         // Shared item type is folder
         if (item.t) {
+            key = u_sharekeys[item.h] && u_sharekeys[item.h][0];
+
+            // folder key must exit, otherwise skip
+            if (!key) {
+                return '';
+            }
+
             type = 'F';
-            key = u_sharekeys[item.h];
             fileSize = '';
             folderClass = ' folder-item';
         }
-
         // Shared item type is file
         else {
             type = '';
-            key = item.key;
+            key = item.k;
             fileSize = htmlentities(bytesToSize(item.s));
         }
 
@@ -1744,16 +1736,21 @@ var exportExpiry = {
     ExportLink.prototype._getFolderExportLinkRequest = function(nodeId) {
 
         var self = this;
-        var childNodes = [];
         var share = M.getNodeShare(nodeId);
 
         // No need to perform an API call if this folder was already exported (Ie, we're updating)
         if (share.h === nodeId) {
-            return self._getExportLinkRequest(nodeId);
+            if (!M.d[nodeId].t || u_sharekeys[nodeId]) {
+                return self._getExportLinkRequest(nodeId);
+            }
+
+            if (d) {
+                console.warn('Missing sharekey for "%s" - relying on s2 to obtain it...', nodeId);
+            }
         }
 
         // Get all child nodes of root folder with nodeId
-        childNodes = fm_getnodes(nodeId);
+        var childNodes = fm_getnodes(nodeId);
         childNodes.push(nodeId);
 
         var sharePromise = api_setshare(nodeId, [{ u: 'EXP', r: 0 }], childNodes);
@@ -1802,8 +1799,12 @@ var exportExpiry = {
         var share = M.getNodeShare(nodeId);
         var request = { a: 'l', n: nodeId, i: requesti };
 
+        if (d) {
+            console.debug('_getExportLinkRequest', share.ph, Object(M.d[nodeId]).ph, share);
+        }
+
         // No need to perform an API call if this file was already exported (Ie, we're updating)
-        if (share.h === nodeId && share.ph) {
+        if (share.h === nodeId && Object(M.d[nodeId]).ph) {
             return done(nodeId);
         }
 
@@ -1815,10 +1816,13 @@ var exportExpiry = {
         api_req(request, {
             nodeId: nodeId,
             callback: function(result) {
-
                 if (typeof result !== 'number') {
-                    M.nodeShare(this.nodeId, { h: this.nodeId, r: 0, u: 'EXP', ts: unixtime() });
-                    M.nodeAttr({ h: this.nodeId, ph: result });
+                    M.nodeShare(this.nodeId, { h: this.nodeId, r: 0, u: 'EXP', ts: unixtime(), ph: result });
+                    var n = M.d[this.nodeId];
+                    if (n) {
+                        n.ph = result;
+                        M.nodeUpdated(n);
+                    }
                 }
                 else { // Error
                     self.logger.warn('_getExportLinkRequest:', this.nodeId, 'Error code: ', result);
@@ -1988,7 +1992,7 @@ var exportExpiry = {
     UiExportLink.prototype.removeExportLinkIcon = function(nodeId) {
 
         // Remove link icon from list view
-        $('#' + nodeId + ' .own-data').removeClass('linked');
+        $('#' + nodeId).removeClass('linked').find('.own-data').removeClass('linked');
 
         // Remove link icon from grid view
         $('#' + nodeId + '.file-block').removeClass('linked');
@@ -2010,7 +2014,7 @@ var exportExpiry = {
             if (M.d[nodeId].fav === 1) {
 
                 // Remove favourite (star)
-                M.favourite(nodeId, true);
+                M.favourite(nodeId, 0);
             }
             self.addTakenDownIcon(nodeId);
         }

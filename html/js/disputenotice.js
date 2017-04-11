@@ -27,7 +27,7 @@ copyright.validatePhoneNumber = function (phoneNumber) {
 
     var p = /\d[^\d]*\d[^\d]*\d[^\d]*\d/;
     var match = p.exec(phoneNumber);
-    
+
     if (match === null) {
         return false; // not at least 4 numbers, what is this thing?
     }
@@ -252,7 +252,7 @@ copyright.init_cndispute = function () {
                     msgDialog('info',
                             escapeHTML(l[1287]), escapeHTML(l[1288]), false,
                             function (e) {
-                                document.location.hash = 'dispute';
+                                loadSubPage('dispute');
                             });
                 }
             });
@@ -287,10 +287,10 @@ copyright.init_cndispute = function () {
 
     // Set up the country values
     var markup = '<OPTION value="0"></OPTION>';
-    for (var country in isocountries) {
-        if (isocountries.hasOwnProperty(country)) {
+    for (var country in isoCountries) {
+        if (isoCountries.hasOwnProperty(country)) {
             markup += '<option value="' + escapeHTML(country) + '">'
-                    + escapeHTML(isocountries[country]) + '</option>';
+                    + escapeHTML(isoCountries[country]) + '</option>';
         }
     }
     $('.cn .select.country select').safeHTML(markup);

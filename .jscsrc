@@ -104,6 +104,8 @@
 
     "maxErrors": -1,
 
+    "disallowEmptyBlocks": false,
+
     "fileExtensions": [".js", ".jsx"],
 
     "excludeFiles": [
@@ -124,10 +126,11 @@
         "scripts/**",
         "rsaasm.js",
         "sjcl.js",
+        "e10s.js",
         "fileapi.js",
         "aesasm.js",
-        "keydec.js",
         "keygen.js",
+        "makecache.js",
         "nacl-fast.js",
         "karma.conf.js",
         "js/chat/mpenc.js",

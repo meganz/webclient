@@ -62,7 +62,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
     this.callIsActive = false;
     this.shownMessages = {};
     this.attachments = new MegaDataMap(this);
-    this.images = new MegaDataSortedMap("k", "delay", this);
+    this.images = new MegaDataSortedMap("id", "delay", this);
 
     this.options = {
 
@@ -108,7 +108,7 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
             return;
         }
 
-        if (self.lastActivity && self.lastActivity > ts) {
+        if (self.lastActivity && self.lastActivity >= ts) {
             // this is an old message, DON'T update the lastActivity.
             return;
         }
@@ -149,6 +149,36 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
         }
     });
 
+    /**
+     * Manually proxy contact related data change events, for more optimal UI rerendering.
+     */
+    var membersSnapshot = {};
+    self.rebind('onMembersUpdated.chatRoomMembersSync', function() {
+        var roomRequiresUpdate = false;
+
+        Object.keys(membersSnapshot).forEach(function(u_h) {
+            var contact = M.u[u_h];
+            if (contact) {
+                contact.removeChangeListener(membersSnapshot[u_h]);
+                if (!self.members[u_h]) {
+                    roomRequiresUpdate = true;
+                }
+            }
+            delete membersSnapshot[u_h];
+        });
+
+        Object.keys(self.members).forEach(function(u_h) {
+            var contact = M.u[u_h];
+            if (contact) {
+                membersSnapshot[u_h] = contact.addChangeListener(function() {
+                    self.trackDataChange();
+                });
+            }
+        });
+        if (roomRequiresUpdate) {
+            self.trackDataChange();
+        }
+    });
 
     self.getParticipantsExceptMe().forEach(function(jid) {
         var contact = self.megaChat.getContactFromJid(jid);
@@ -204,7 +234,7 @@ ChatRoom.STATE = {
     'LEFT': 250
 };
 
-ChatRoom.prototype._retrieveTurnServerFromLoadBalancer = function() {
+ChatRoom.prototype._retrieveTurnServerFromLoadBalancer = function(timeout) {
     var self = this;
 
     var $promise = new MegaPromise();
@@ -214,7 +244,10 @@ ChatRoom.prototype._retrieveTurnServerFromLoadBalancer = function() {
     if (self.megaChat.rtc && self.megaChat.rtc.ownAnonId) {
         anonId = self.megaChat.rtc.ownAnonId;
     }
-    $.get("https://" + self.megaChat.options.loadbalancerService + "/?service=turn&anonid=" + anonId)
+    $.ajax("https://" + self.megaChat.options.loadbalancerService + "/?service=turn&anonid=" + anonId, {
+        method: "GET",
+        timeout: timeout ? timeout : 10000
+    })
         .done(function(r) {
             if (r.turn && r.turn.length > 0) {
                 var servers = [];
@@ -225,7 +258,7 @@ ChatRoom.prototype._retrieveTurnServerFromLoadBalancer = function() {
                     }
 
                     servers.push({
-                        url: 'turn:' + v.host + ':' + v.port + '?transport=' + transport,
+                        urls: ['turn:' + v.host + ':' + v.port + '?transport=' + transport],
                         username: "inoo20jdnH",
                         credential: '02nNKDBkkS'
                     });
@@ -638,7 +671,7 @@ ChatRoom.prototype.destroy = function(notifyOtherDevices, noRedirect) {
         mc.chats.remove(roomJid);
 
         if (!noRedirect) {
-            window.location = '#fm/chat';
+            loadSubPage('fm/chat');
         }
     });
 };
@@ -693,7 +726,12 @@ ChatRoom.prototype.isActive = function() {
 };
 
 ChatRoom.prototype.setActive = function() {
-    window.location = this.getRoomUrl();
+    // We need to delay this, since it can get called BY openFolder and it would then call again openFolder, which
+    // would cause .currentdirid to not be set correctly.
+    var self = this;
+    Soon(function() {
+        loadSubPage(self.getRoomUrl());
+    });
 };
 
 
@@ -703,11 +741,11 @@ ChatRoom.prototype.getRoomUrl = function() {
         var participants = self.getParticipantsExceptMe();
         var contact = self.megaChat.getContactFromJid(participants[0]);
         if (contact) {
-            return "#fm/chat/" + contact.u;
+            return "fm/chat/" + contact.u;
         }
     }
     else if (self.type === "group") {
-            return "#fm/chat/g/" + self.roomJid.split("@")[0];
+            return "fm/chat/g/" + self.roomJid.split("@")[0];
     }
     else {
         throw new Error("Can't get room url for unknown room type.");
@@ -720,7 +758,7 @@ ChatRoom.prototype.getRoomUrl = function() {
 ChatRoom.prototype.activateWindow = function() {
     var self = this;
 
-    window.location = self.getRoomUrl();
+    loadSubPage(self.getRoomUrl());
 };
 
 /**
@@ -809,6 +847,7 @@ ChatRoom.prototype.appendMessage = function(message) {
 
     self.shownMessages[message.messageId] = true;
 
+    self.megaChat.updateDashboard();
     //self.trackDataChange();
 };
 
@@ -896,6 +935,8 @@ ChatRoom.prototype._sendMessageToTransport = function(messageObject) {
     var self = this;
     var megaChat = this.megaChat;
 
+    megaChat.trigger('onBeforeSendMessage', messageObject);
+
     var messageMeta = messageObject.getMeta() ? messageObject.getMeta() : {};
     if (messageMeta.isDeleted && messageMeta.isDeleted === true) {
         return MegaPromise.reject();
@@ -976,18 +1017,11 @@ ChatRoom.prototype.attachNodes = function(ids) {
                 var node = M.d[nodeId];
                 nodesMeta.push({
                     'h': node.h,
-                    'key': node.key,
                     'k': node.k,
-                    'a': node.a,
                     't': node.t,
                     'name': node.name,
                     's': node.s,
                     'fa': node.fa,
-                    'ar': {
-                        'n': node.ar.n,
-                        't': node.ar.t,
-                        'c': node.ar.c
-                    },
                     'ts': node.ts
                 });
             });

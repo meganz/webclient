@@ -6,16 +6,21 @@ var useravatar = (function() {
     'use strict';
 
     var _colors = [
-        '#FF6A19',
-        '#5856d6',
-        '#007aff',
-        '#34aadc',
-        '#5ac8fa',
-        '#4cd964',
-        '#ff1a53',
-        '#d90007',
-        '#ff9500',
-        '#ffcc00'
+        "#69F0AE",
+        "#13E03C",
+        "#31B500",
+        "#00897B",
+        "#00ACC1",
+        "#61D2FF",
+        "#2BA6DE",
+        "#FFD300",
+        "#FFA500",
+        "#FF6F00",
+        "#E65100",
+        "#FF5252",
+        "#FF1A53",
+        "#C51162",
+        "#880E4F"
     ];
 
     var logger = MegaLogger.getLogger('useravatar');
@@ -34,34 +39,29 @@ var useravatar = (function() {
     /**
      * Take the class colors and create a inject as a CSS.
      */
-    function registerCssColors() {
-
+    Soon(function registerCssColors() {
         var css = '';
-        var color = '';
+        var len = _colors.length;
 
-        for (var i in _colors) {
-            if (!_colors.hasOwnProperty(i)) {
-                continue;
-            }
-            color = '.color' + (parseInt(i) + 1);
+        while (len--) {
+            var color = '.color' + (len + 1);
             css += color + ', .nw-contact-avatar' + color + ', .contacts-avatar' + color
-                + ', .avatar' + color + ' { background-color: '
-                + _colors[i] + '; }';
+                + ', .avatar' + color + ' { background-color: ' + _colors[len] + '; color: ' + _colors[len] + '; }';
         }
 
         css = mObjectURL([css], 'text/css');
         mCreateElement('link', { type: 'text/css', rel: 'stylesheet' }, 'head').href = css;
-    };
+    });
 
     /**
      * Return a SVG image representing the TWO-Letters avatar
-     * @private
-     * @param {String} letters
+     * @param {Object} user The user object or email
      * @returns {String}
+     * @private
      */
-    function _lettersImg(letters) {
+    function _getAvatarSVGDataURI(user) {
 
-        var s = _lettersSettings(letters);
+        var s = _getAvatarProperties(user);
         var $template = $('#avatar-svg').clone().removeClass('hidden')
             .find('svg').css('background-color', s.color).end()
             .find('text').text(s.letters).end();
@@ -69,59 +69,65 @@ var useravatar = (function() {
         $template = window.btoa(to8($template.html()));
 
         return 'data:image/svg+xml;base64,' + $template;
-    };
+    }
 
     /**
      * Return two letters and the color for a given string.
+     * @param {Object|String} user The user object or email
+     * @returns {Object}
      * @private
-     * @param {String} word
-     * @returns {String}
      */
-    function _lettersSettings(word) {
+    function _getAvatarProperties(user) {
+        user = String(user.u || user);
+        var name  = M.getNameByHandle(user) || user;
+        var color = user.charCodeAt(0) % _colors.length;
 
-        var letters = '';
-        var color   = 1;
-
-        if (word && word !== u_handle) {
-            letters = $.trim(word).toUpperCase()[0];
-            // letters[0] can be undefined in case that word == ' '...
-            if (letters) {
-                color = letters.charCodeAt(0) % _colors.length;
-            } else {
-                color = 0;
-            }
-        }
-
-        return { letters: letters, color: _colors[color], colorIndex: color + 1 };
-    };
+        return {letters: name.toUpperCase()[0], color: _colors[color], colorIndex: color + 1};
+    }
 
     /**
      * Return the HTML to represent a two letter avatar.
      *
-     * @param {String} letters The string used to generate the avatar e.g. first name, full name or email address
-     * @param {String} id The ID associate with the avatar (uid, email)
+     * @param {Object} user The user object or email
      * @param {String} className Any extra CSS classes that we want to append to the HTML
      * @param {String} element The HTML tag
-     * @return {String} Returns the HTML
+     * @returns {String} Returns the HTML
+     * @returns {Boolean} Adds addition blured background block
+     * @private
      */
-    function _letters(letters, id, className, element) {
+    function _getAvatarContent(user, className, element, bg) {
+        var id = user.u || user;
+        var bgBlock = '';
 
         if (element === 'ximg') {
-            return _lettersImg(letters);
+            return _getAvatarSVGDataURI(user);
         }
 
-        var s = _lettersSettings(letters);
+        var s = _getAvatarProperties(user);
 
         if (!_watching[id]) {
             _watching[id] = {};
         }
 
+        if (bg) {
+            bgBlock = '<div class="avatar-bg colorized">' +
+                '<span class="colorized color' + s.colorIndex + '"></span></div>';
+        }
+
         _watching[id][className] = true;
-        return '<' + element + ' data-color="color' + s.colorIndex + '" class="avatar-wrapper ' + className + ' ' + id +  ' color' + s.colorIndex + '"><span>'
-                    + '<div class="verified_icon"></div>'
-                    + s.letters
-                + '</span></' + element + '>';
-    };
+
+        id        = escapeHTML(id);
+        element   = escapeHTML(element);
+        className = escapeHTML(className);
+
+        return  bgBlock +
+            '<' + element + ' data-color="color' + s.colorIndex + '" class="avatar-wrapper ' +
+                className + ' ' + id + ' color' + s.colorIndex + '">' +
+                '<span>' +
+                    '<i class="verified_icon"></i>' + s.letters +
+                '</span>'  +
+            '</' + element + '>';
+    }
 
     /**
      * Return an image HTML from an URL.
@@ -131,48 +137,28 @@ var useravatar = (function() {
      * @param {String} className Any extra CSS classes that we want to append to the HTML
      * @param {String} type The HTML tag type
      * @returns {String} The image HTML
+     * @returns {Boolean} Adds addition blured background block
+     * @private
      */
-    function _image(url, id, className, type) {
+    function _getAvatarImageContent(url, id, className, type, bg) {
+        var bgBlock = '';
+        id        = escapeHTML(id);
+        url       = escapeHTML(url);
+        type      = escapeHTML(type);
+        className = escapeHTML(className);
 
-        return '<' + type + ' data-color="" class="avatar-wrapper ' + id + ' ' + className + '">'
-                + '<div class="verified_icon"></div>'
-                + '<img src="' + url + '">'
-         + '</' + type + '>';
-    };
-
-    /**
-     * Render an avatar based on given email. We try to find
-     * the contact object by their email, if we cannot, we render
-     * the first two letters of the email address.
-     *
-     * @param {String} email Email address
-     * @param {String} className Any extra class attribute to inject
-     * @param {String} element Wrap the output with `element` tag
-     * @returns HTML
-     */
-    function emailAvatar(email, className, element) {
-
-        var found = false;
-        // User is an email, we should look if the user
-        // exists, if it does exists we use the user Object.
-        M.u.every(function(contact, u) {
-            if (M.u[u].m === email) {
-                // Found the user object
-                found = ns.contact(M.u[u], className, element);
-                return false;
-            }
-            else {
-                return true;
-            }
-        });
-
-        if (found) {
-            return found;
+        if (bg) {
+            bgBlock = '<div class="avatar-bg">' +
+                    '<span style="background-image: url(' + url + ');"></span>' +
+                '</div>';
         }
 
-        return _letters(email.substr(0, 2), email, className, element);
+        return bgBlock +
+            '<' + type + ' data-color="" class="avatar-wrapper ' + id + ' ' + className + '">' +
+                '<i class="verified_icon"></i>' +
+                '<img src="' + url + '">' +
+            '</' + type + '>';
     }
-
 
     /**
      * Check if the current user is verified by the current user. It
@@ -180,38 +166,28 @@ var useravatar = (function() {
      * @param {String} userHandle The user handle
      * @private
      */
+    var pendingVerifyQuery = {};
     function isUserVerified(userHandle) {
-        if (u_type !== 3) {
+        if (u_type !== 3 || userHandle === u_handle || pendingVerifyQuery[userHandle]) {
             return;
         }
+        pendingVerifyQuery[userHandle] = Date.now();
 
-        if (authring.hadInitialised() === false) {
-            var authSystemPromise = authring.initAuthenticationSystem();
-            authSystemPromise.done(isUserVerified_Callback);
-        }
-        else {
-            Soon(isUserVerified_Callback);
+        if (d > 1) {
+            logger.log('isUserVerified', userHandle);
         }
 
-        function isUserVerified_Callback() {
+        authring.onAuthringReady('avatar-v').done(function isUserVerified_Callback() {
             var ed25519 = u_authring.Ed25519;
             var verifyState = ed25519 && ed25519[userHandle] || {};
             var isVerified = (verifyState.method >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON);
 
             if (isVerified) {
-                $('.avatar-wrapper.' + userHandle).addClass('verified');
+                $('.avatar-wrapper.' + userHandle.replace(/[^\w-]/g, '')).addClass('verified');
             }
-        }
-    }
-
-    /**
-     * Check if the input is an email address or not.
-     * @param {String} email The email address
-     * @returns {Boolean}
-     */
-    function isEmail(email) {
-
-        return ((typeof email === 'string') && email.match(/.+@.+/));
+        }).always(function() {
+            delete pendingVerifyQuery[userHandle];
+        });
     }
 
     /**
@@ -232,7 +208,7 @@ var useravatar = (function() {
     /**
      * Return the current user's avatar in image URL.
      */
-    ns.top = function() {
+    ns.mine = function() {
 
         if (!u_handle) {
             /* No user */
@@ -246,20 +222,6 @@ var useravatar = (function() {
             logger.error(ex);
             return '';
         }
-    };
-
-
-    /**
-     * Return the current user's avatar in image URL.
-     */
-    ns.mine = function() {
-
-        // If no user, return default avatar
-        if (!u_handle) {
-            return '';
-        }
-
-        return ns.imgUrl(u_handle);
     };
 
     /**
@@ -276,8 +238,14 @@ var useravatar = (function() {
         logger.debug('Processing loaded user-avatar', user);
 
         if (user === u_handle) {
-            // my avatar!
-            $('.fm-avatar img,.fm-account-avatar img').attr('src', ns.imgUrl(user));
+            var myavatar = ns.mine();
+
+            $('.fm-avatar img,.fm-account-avatar img').attr('src', myavatar);
+            $('.fm-account-avatar .avatar-bg span').css('background-image', 'url(' + myavatar + ')');
+            $('.fm-avatar').show();
+
+            // we recreate the top-menu on each navigation, so...
+            ns.my = myavatar;
         }
 
         if (M.u[user]) {
@@ -299,103 +267,44 @@ var useravatar = (function() {
                 .safeHTML($avatar.html());
         }
 
-        $('.avatar-wrapper.' + user).each(updateAvatar);
+        $('.avatar-wrapper.' + user.replace(/[^\w-]/g, '')).each(updateAvatar);
 
         if ((M.u[user] || {}).m) {
-            $('.avatar-wrapper.' + M.u[user].m.replace(/[\.@]/g, "\\$1")).each(updateAvatar);
+            var eem = String(M.u[user].m).replace(/[^\w@.,+-]/g, '').replace(/\W/g, '\\$&');
+            $('.avatar-wrapper.' + eem).each(updateAvatar);
         }
     };
 
     ns.generateContactAvatarMeta = function(user) {
-        if (M.u[user]) {
-            user = M.u[user];
-        }
-        else if (user === u_handle) {
-            user = u_attr;
-        }
-        else if (M.u[user]) {
-            // It's an user ID
-            user = M.u[user];
-        }
+        user = M.getUser(user) || String(user);
 
-        if (user && user.u && user.avatar) {
+        if (user.avatar) {
             return user.avatar;
         }
 
+        if (user.u) {
+            isUserVerified(user.u);
 
-        if (typeof user === 'string' && user.length > 0 && user.indexOf("@") > -1) {
-            // "@" is faster then isEmail's greping for non-contacts!
-            if (isEmail(user)) {
-                var email = user;
-                var found = false;
-                // User is an email, we should look if the user
-                // exists, if it does exists we use the user Object.
-                M.u.every(function(contact, u) {
-                    if (M.u[u].m === email) {
-                        // Found the user object
-                        found = ns.generateContactAvatarMeta(M.u[u]);
-                        return false;
-                    }
-                    else {
-                        return true;
-                    }
-                });
-
-                if (found) {
-                    return found;
-                }
-
-                return {
-                    'type': 'text',
-                    'avatar': _lettersSettings(email.substr(0, 2))
+            if (avatars[user.u]) {
+                user.avatar = {
+                    'type': 'image',
+                    'avatar': avatars[user.u].url
                 };
             }
             else {
-                return {
+                user.avatar = {
                     'type': 'text',
-                    'avatar': _lettersSettings(user.substr(0, 2))
+                    'avatar': _getAvatarProperties(user)
                 };
             }
-        }
-
-        if (!user || typeof user !== 'object' || !user.u) {
-            return {
-                'type': 'text',
-                'avatar': ''
-            };
-        }
-
-        isUserVerified(user.u);
-
-        if (avatars[user.u]) {
-            user.avatar = {
-                'type': 'image',
-                'avatar': avatars[user.u].url
-            };
 
             return user.avatar;
         }
 
-        var letters = M.getNameByHandle(user.u);
-
-        if (!letters) {
-            // XXX: not a known user?
-            letters = user.name && $.trim(user.name) || user.m || "\uFFFD";
-        }
-
-        if (user && user.u) {
-            user.avatar = {
-                'type': 'text',
-                'avatar': _lettersSettings(letters.substr(0, 2))
-            };
-            return user.avatar;
-        }
-        else {
-            return {
-                'type': 'text',
-                'avatar': _lettersSettings(letters.substr(0, 2))
-            }
-        }
+        return {
+            'type': 'text',
+            'avatar': _getAvatarProperties(user)
+        };
     };
     /**
      * Returns a contact avatar
@@ -403,48 +312,23 @@ var useravatar = (function() {
      * @param {String} className
      * @param {String} element
      * @returns {String}
+     * @returns {Boolean} Adds addition blured background block
      */
-    ns.contact = function(user, className, element) {
-        if (!className) {
-            className = 'avatar';
+    ns.contact = function(user, className, element, bg) {
+        user = M.getUser(user) || String(user);
+
+        element   = element || 'div';
+        className = className || 'avatar';
+
+        if (user.u) {
+            isUserVerified(user.u);
         }
-
-        element = element || 'div';
-
-        if (typeof user === 'string' && user.length > 0) {
-            if (isEmail(user)) {
-                return emailAvatar(user, className, element);
-            }
-            else if (user === u_handle) {
-                user = u_attr;
-            }
-            else if (M.u[user]) {
-                // It's an user ID
-                user = M.u[user];
-            }
-            else {
-                return _letters(user, user, className, element);
-            }
-        }
-
-        if (!user || typeof user !== 'object' || !user.u) {
-            return '';
-        }
-
-        isUserVerified(user.u);
 
         if (avatars[user.u]) {
-            return _image(avatars[user.u].url, user.u, className, element);
+            return _getAvatarImageContent(avatars[user.u].url, user.u, className, element, bg);
         }
 
-        var letters = M.getNameByHandle(user.u);
-
-        if (!letters) {
-            // XXX: not a known user?
-            letters = user.name && $.trim(user.name) || user.m || "\uFFFD";
-        }
-
-        return _letters(letters, user.u, className, element);
+        return _getAvatarContent(user, className, element, bg);
     };
 
     // Generic logic to retrieve and process user-avatars
@@ -583,8 +467,6 @@ var useravatar = (function() {
         }
 
     })(ns);
-
-    Soon(registerCssColors);
 
     return ns;
 })();

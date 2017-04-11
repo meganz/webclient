@@ -1650,7 +1650,8 @@ function initAddDialogMultiInputPlugin() {
             var $input = $this.parent().find('li input').eq(0);
             $input.rebind('keyup', function() {
                 var value = $.trim($input.val());
-                if ($scope.find('li.token-input-token-mega').length > 0 || checkMail(value) === false) {
+                var emailList = value.split(/[ ;,]+/);
+                if ($scope.find('li.token-input-token-mega').length > 0 || checkMail(value) === false || emailList.length > 1) {
                     $scope.find('.add-user-popup-button.add').removeClass('disabled');
                 } else {
                     $scope.find('.add-user-popup-button.add').addClass('disabled');
@@ -6697,7 +6698,8 @@ function initShareDialogMultiInputPlugin() {
                 var $this = $scope.find('li input');
                 $this.rebind('keyup', function() {
                     var value = $.trim($this.val());
-                    if ($scope.find('li.token-input-token-mega').length > 0 || checkMail(value) === false) {
+                    var emailList = value.split(/[ ;,]+/);
+                    if ($scope.find('li.token-input-token-mega').length > 0 || checkMail(value) === false || emailList.length > 1) {
                         $scope.find('.dialog-share-button').removeClass('disabled');
                     } else {
                         $scope.find('.dialog-share-button').addClass('disabled');

@@ -10003,8 +10003,17 @@ React.makeElement = React['createElement'];
 
 	        if (self.type === "private") {
 	            var targetUserJid = self.getParticipantsExceptMe()[0];
-	            var targetUserNode = self.megaChat.getContactFromJid(targetUserJid);
-	            assert(M.u, 'M.u does not exists');
+
+	            var targetUserNode;
+	            if (targetUserJid) {
+	                targetUserNode = self.megaChat.getContactFromJid(targetUserJid);
+	                assert(M.u, 'M.u does not exists');
+	            } else if (msg.userId) {
+	                targetUserNode = M.u[msg.userId];
+	            } else {
+	                console.error("Missing participant in a 1on1 room.");
+	                return;
+	            }
 
 	            assert(targetUserNode && targetUserNode.u, 'No hash found for participant');
 	            assert(M.u[targetUserNode.u], 'User not found in M.u');

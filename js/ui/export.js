@@ -165,6 +165,9 @@ var exportPassword = {
                 // Add special styling for the link text
                 $linkBlock.addClass('password-protect-link');
 
+                // Reinit link body scrolling
+                exportPassword.encrypt.reInitScrolling();
+
                 // Reposition the dialog
                 exportPassword.encrypt.repositionDialog();
             });
@@ -215,6 +218,9 @@ var exportPassword = {
 
                 // Reset encryption button state and text to 'Encrypt'
                 $encryptButtonText.removeClass('encrypted').text(l[9061]);
+                
+                // Reinit link body scrolling
+                exportPassword.encrypt.reInitScrolling();
 
                 // Reposition the dialog, and re-initialise the scrolling so it scrolls all the way to the bottom
                 exportPassword.encrypt.repositionDialog();
@@ -239,8 +245,12 @@ var exportPassword = {
          * changes. This is useful because the password links are longer and take up more lines to display.
          */
         reInitScrolling: function() {
-
-            this.$dialog.find('.export-link-body').jScrollPane({
+            var $scrollBlock = this.$dialog.find('.export-link-body');
+            var jsp = $scrollBlock.data('jsp');
+            if (jsp) {
+                jsp.destroy();
+            }
+            $scrollBlock.jScrollPane({
                 showArrows: true,
                 arrowSize: 5
             });
@@ -1304,13 +1314,11 @@ var exportExpiry = {
         fm_showoverlay();
 
         $linksDialog.removeClass('hidden');
-        $('.export-link-body').removeAttr('style');
         $('.export-links-warning').removeClass('hidden');
 
-        if ($('.export-link-body').outerHeight() === 318) {// ToDo: How did I find this integer?
-            $('.export-link-body').jScrollPane({ showArrows: true, arrowSize: 5 });
-            jScrollFade('.export-link-body');
-        }
+        $(scroll).jScrollPane({ showArrows: true, arrowSize: 5 });
+        jScrollFade(scroll);
+
         $linksDialog.css('margin-top', ($linksDialog.outerHeight() / 2) * -1);
 
         setTimeout(function() {

@@ -248,11 +248,17 @@ function init_page() {
     }
     else {
         $('body').attr('class', '');
-    }
 
-    // Recovery key has been saved
-    if (localStorage.recoverykey && !$('body').hasClass('rk-saved')) {
-        $('body').addClass('rk-saved');
+        // Recovery key has been saved
+        if (localStorage.recoverykey && !$('body').hasClass('rk-saved')) {
+            $('body').addClass('rk-saved');
+        }
+
+        // Add FM fonsize class to body
+        if (fmconfig.font_size) {
+            $('body').removeClass('fontsize1 fontsize2')
+                .addClass('fontsize' + fmconfig.font_size);
+        }
     }
 
     // Add language class to body for CSS fixes for specific language strings

@@ -5030,7 +5030,7 @@ function MegaData()
                     $('.widget-block').addClass('active');
                 }
                 else {
-                    mega.ui.tpp.setTransfered(id, bl, 'dl');
+                    mega.ui.tpp.setTransfered(id, bl, 'dl', dl_queue[dl_queue_num]);
                     mega.ui.tpp.updateBlock('dl');
                 }
                 delay('percent_megatitle', percent_megatitle, 50);
@@ -5612,7 +5612,7 @@ function MegaData()
                 $tr.find('.speed').addClass('unknown').text('');
             }
 
-            mega.ui.tpp.setTransfered(id, bl, 'ul');
+            mega.ui.tpp.setTransfered(id, bl, 'ul', ul);
             mega.ui.tpp.updateBlock('ul');
             delay('percent_megatitle', percent_megatitle, 50);
 

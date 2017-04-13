@@ -202,14 +202,23 @@ mega.ui.tpp = (function () {
      * @param {Number} id Id of dl/ul
      * @param {Number} value dl/ul number of bytes
      * @param {String} blk i.e ['dl', 'ul'] download or upload
+     * @param {Object} qe Queue Entry, either dl_queue or ul_queue instance for id
      */
-    var setTransfered = function setTransfered(id, value, blk) {
+    var setTransfered = function setTransfered(id, value, blk, qe) {
 
         if (id === -1) {
             opts.queue[blk].curr = {};
         }
         else {
             opts.queue[blk].curr[id] = value;
+        }
+
+        if (qe) {
+            var name = qe.zipname || qe.n || qe.name;
+
+            if (name && opts.dlg[blk].$.name) {
+                opts.dlg[blk].$.name.text(name);
+            }
         }
     };
 

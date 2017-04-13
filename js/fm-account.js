@@ -1106,11 +1106,15 @@ function accountUI() {
             mega.config.setn('dlThroughMEGAsync', dlThroughMEGAsync);
         });
 
+        var $cbTpp = $('#transfers-tooltip');// Checkbox transfers popup
         if (fmconfig.tpp || (typeof fmconfig.tpp === 'undefined')) {
-            var $cbTpp = $('#transfers-tooltip');// Checkbox transfers popup
 
             $cbTpp.switchClass('checkboxOff', 'checkboxOn').prop('checked', true);
             $cbTpp.parent().switchClass('checkboxOff', 'checkboxOn');
+        }
+        else {
+            $cbTpp.switchClass('checkboxOn', 'checkboxOff').prop('checked', false);
+            $cbTpp.parent().switchClass('checkboxOn', 'checkboxOff');
         }
 
         $('#transfers-tooltip').rebind('click.tpp_enable_disable', function() {

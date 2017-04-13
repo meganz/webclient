@@ -21772,6 +21772,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     margin: -1px 5px 0 0;
     float: left;
 }
+.fm-links-radio-buttons .icon {
+    margin-top: 4px;
+}
 .link-handle.selected .icon, .link-handle:hover .icon, .public-handle .file-link-block .icon {
     background-position: -5px -5432px;
 }

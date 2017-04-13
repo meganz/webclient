@@ -16232,7 +16232,55 @@
         "context": "Primary email body of welcome email sent to new users.\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [$username] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [$username], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
     },
     "16440": {
-        "text": "[1]About MEGA\r\n\r\n[2]Privacy\r\n\r\n[3]Unlike with most other cloud storage providers, only you control who has access to your data. Not even MEGA can access your data!\r\n\r\n[4]Encryption\r\n\r\n[5]Your data is encrypted on your device using your password as the encryption key. Secure collaboration with others is guaranteed through asymmetric cryptography, which means that only the end points have access.\r\n\r\n[6]Space\r\n\r\n[7]Not only is MEGA more secure than its major competitors, MEGA is also very generous in providing a whopping 50GB for free!\r\n\r\n[8]Not only is MEGA more secure than its major competitors, MEGA provides a very generous amount of free storage and transfer quota, and easy ways to achieve even more for free!",
-        "context": "Secondary email body of welcome email sent to new users.\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start."
+        "text": "[1]About MEGA\r\n\r\n[2]Privacy\r\n\r\n[3]Unlike most other cloud storage providers, only you control who has access to your data. Not even MEGA can access your data!\r\n\r\n[4]Encryption\r\n\r\n[5]Your data is encrypted on your device using your password as the encryption key. Secure collaboration with others is guaranteed through asymmetric cryptography, which means that only the end points have access.\r\n\r\n[6]Space\r\n\r\n[7]Not only is MEGA more secure than its major competitors, MEGA is also very generous in providing a whopping 50GB for free!\r\n\r\n[8]Not only is MEGA more secure than its major competitors, MEGA provides a very generous amount of free storage and transfer quota, and easy ways to [A1]achieve[\/A1] even more for free!",
+        "context": "(UPDATE: this new version includes [A1] tags around the word achieve in the final sentence)\r\nSecondary email body of welcome email sent to new users.\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start."
+    },
+    "16442": {
+        "text": "[A]Login[\/A] or [B]Create an account[\/B] to fully experience MEGA",
+        "context": "A label to allow users to login or create an account. Please keep the placeholders [A], [\/A], [B] and [\/B]."
+    },
+    "16443": {
+        "text": "USED SPACE: Data temporarily unavailable",
+        "context": "A label to show that the information related to the account usage is temporarily unavailable."
+    },
+    "16444": {
+        "text": "USED BANDWIDTH: Data temporarily unavailable",
+        "context": "A label to show that the information related to bandwidth usage is temporarily unavailable."
+    },
+    "16445": {
+        "text": "USED STORAGE %1",
+        "context": "A label to show the storage used for the account."
+    },
+    "16446": {
+        "text": "USED BANDWIDTH %1",
+        "context": "A label to show the bandwidth used for the account."
+    },
+    "16447": {
+        "text": "Scanning...",
+        "context": "A tray icon label to indicate that MEGAsync is in a scanning state."
+    },
+    "16448": {
+        "text": "Resume Transfers",
+        "context": "A label of an option to resume all paused transfers."
+    },
+    "16449": {
+        "text": "Pause Transfers",
+        "context": "A label of an option to pause all transfers."
+    },
+    "16450": {
+        "text": "Stream",
+        "context": "The text of a menu item that opens a dialog to stream files from MEGA."
+    },
+    "16451": {
+        "text": "Remove from left pane",
+        "context": "This text is shown in the context menu of the Windows File Explorer when the user right clicks in the root of a synced folder. It allows for removal of the new icon that is added to the Navigation Pane, on the left of the Windows File Explorer."
+    },
+    "16452": {
+        "text": "Please consider updating your operating system.",
+        "context": "A message to be shown when an outdated operating system is detected."
+    },
+    "16454": {
+        "text": "USED STORAGE: Data temporarily unavailable",
+        "context": "A label to show that the information related to the account usage is temporarily unavailable."
     }
 }

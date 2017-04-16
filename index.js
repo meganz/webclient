@@ -382,7 +382,7 @@ function init_page() {
         page = 'newpw';
     }
 
-    if ((pfkey || dlkey) && location.hash[0] !== '#') {
+    if ((pfkey || dlkey) && location.hash[0] !== '#' && !is_fm()) {
         return location.replace(getAppBaseUrl());
     }
 

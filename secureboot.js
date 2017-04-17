@@ -2516,8 +2516,8 @@ else if (!b_u)
             '        <div class="loading-m-block"></div>'+
             '    </div>'+
             '    <div class="st-social-block-load" id="bootbottom">'+
-            '        <a href="https://www.facebook.com/MEGAprivacy" target="_blank" class="st-bottom-button st-facebook-button"></a>'+
-            '        <a href="https://www.twitter.com/MEGAprivacy" target="_blank" class="st-bottom-button st-twitter-button"></a>'+
+            '        <a href="https://www.facebook.com/MEGAprivacy" target="_blank" rel="noopener noreferrer" class="st-bottom-button st-facebook-button"></a>'+
+            '        <a href="https://www.twitter.com/MEGAprivacy" target="_blank" rel="noopener noreferrer" class="st-bottom-button st-twitter-button"></a>'+
             '    </div>'+
             '</div>';
 

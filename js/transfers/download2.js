@@ -1706,6 +1706,7 @@ DownloadQueue.prototype.push = function() {
     dl.io.progress = 0;
     dl.io.size = dl.size;
     dl.decrypter = 0;
+    dl.n = fm_safename(dl.n);
 
     if (!dl.zipid) {
         dlmanager.dlWriter(dl);

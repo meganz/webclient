@@ -4678,7 +4678,7 @@ function MegaData()
                             t: node.t,
                             h: node.h,
                             p: node.p,
-                            n: base64urlencode(node.name),
+                            n: base64urlencode(fm_safename(node.name))
                         };
                         if (!node.t) {
                             item.s = node.s;
@@ -4779,7 +4779,7 @@ function MegaData()
         if (z) {
             z = ++dlmanager.dlZipID;
             if (M.d[n[0]] && M.d[n[0]].t && M.d[n[0]].name) {
-                zipname = M.d[n[0]].name + '.zip';
+                zipname = fm_safename(M.d[n[0]].name) + '.zip';
             }
             else {
                 zipname = (zipname || ('Archive-' + Math.random().toString(16).slice(-4))) + '.zip';
@@ -5502,6 +5502,10 @@ function MegaData()
         for (var i in u) {
             f = u[i];
             try {
+                Object.defineProperty(f, 'name', {value: fm_safename(f.name)});
+            }
+            catch (e) {}
+            try {
                 // this could throw NS_ERROR_FILE_NOT_FOUND
                 filesize = f.size;
             }
@@ -5969,6 +5973,7 @@ function fm_safename(name)
     if (name.length > 250)
         name = name.substr(0, 250) + '.' + name.split('.').pop();
     name = name.replace(/\s+/g, ' ').trim();
+    name = name.replace(/\u202E|\u200E|\u200F/g, '');
     var end = name.lastIndexOf('.');
     end = ~end && end || name.length;
     if (/^(?:CON|PRN|AUX|NUL|COM\d|LPT\d)$/i.test(name.substr(0, end)))

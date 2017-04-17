@@ -182,12 +182,16 @@ function dl_g(res) {
                 dlclickimport();
                 return false;
             }
+
+            var filename = fm_safename(fdl_file.n) || 'unknown.bin';
+            var filenameLength = filename.length;
+
             fdl_queue_var = {
                 id:     dlpage_ph,
                 ph:     dlpage_ph,
                 key:    key,
                 s:      res.s,
-                n:      fdl_file.n,
+                n:      filename,
                 size:   fdl_filesize,
                 dlkey:  dlpage_key,
                 onDownloadProgress: dlprogress,
@@ -196,9 +200,6 @@ function dl_g(res) {
                 onDownloadError: M.dlerror,
                 onBeforeDownloadComplete: function() { }
             };
-
-            var filename = htmlentities(fdl_file.n) || 'unknown';
-            var filenameLength = filename.length;
 
             $('.file-info .download.info-txt.filename').text(filename).attr('title', filename);
             $('.file-info .download.info-txt.small-txt').text(bytesToSize(res.s));

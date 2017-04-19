@@ -1811,6 +1811,20 @@ Chat.prototype.getEmojiDataSet = function(name) {
     }
 };
 
+Chat.prototype.getPresence = function(u) {
+    var self = this;
+
+    var contact = M.u[u];
+
+    if (!contact) {
+        return UserPresence.PRESENCE.OFFLINE;
+    }
+
+    return contact.u !== u_handle ?
+        self.plugins.presencedIntegration.getPresence(contact.u) :
+        self.plugins.presencedIntegration.getMyPresence();
+}
+
 window.Chat = Chat;
 window.chatui = chatui;
 

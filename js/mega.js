@@ -419,15 +419,16 @@ function MegaData()
 
     this.getSortStatus = function(u)
     {
-        var status = megaChatIsReady && megaChat.karere.getPresence(megaChat.getJidFromNodeId(u));
-        if (status == 'chat')
+        var status = megaChatIsReady && megaChat.getPresence(u);
+        if (status === UserPresence.PRESENCE.ONLINE) {
             return 1;
-        else if (status == 'dnd')
+        } else if (status === UserPresence.PRESENCE.DND) {
             return 2;
-        else if (status == 'away')
+        } else if (status === UserPresence.PRESENCE.AWAY) {
             return 3;
-        else
+        } else {
             return 4;
+        }
     };
 
     this.getSortByStatusFn = function(d) {

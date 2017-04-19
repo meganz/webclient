@@ -420,11 +420,18 @@ function MegaData()
     this.getSortStatus = function(u)
     {
         var status = megaChatIsReady && megaChat.getPresence(u);
-        if (status === UserPresence.PRESENCE.ONLINE) {
+
+        // To implement some kind of ordering we need to translate the actual UserPresence.PRESENCE.* state to an
+        // integer that would be then used for sorting (e.g. ONLINE first = return 1, OFFLINE last, return 4)
+        // PS: Because of chat is being loaded too late, we can't use the User.PRESENCE.* reference.
+        if (status === 3) {
+            // UserPresence.PRESENCE.ONLINE
             return 1;
-        } else if (status === UserPresence.PRESENCE.DND) {
+        } else if (status === 4) {
+            // UserPresence.PRESENCE.DND
             return 2;
-        } else if (status === UserPresence.PRESENCE.AWAY) {
+        } else if (status === 2) {
+            // UserPresence.PRESENCE.AWAY
             return 3;
         } else {
             return 4;

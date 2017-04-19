@@ -301,17 +301,6 @@ var ConversationRightArea = React.createClass({
                             </div>
                         ) : null
                         }
-                        { room.type === "group" && room.stateIsLeftOrLeaving() ? (
-                            <div className="link-button red" onClick={() => {
-                                if (self.props.onCloseClicked) {
-                                    self.props.onCloseClicked();
-                                }
-                            }}>
-                                <i className="small-icon rounded-stop"></i>
-                                {l[148]}
-                            </div>
-                        ) : null
-                        }
                     </div>
                 </div>
             </div>
@@ -1075,7 +1064,7 @@ var ConversationPanel = React.createClass({
         var self = this;
 
         var room = this.props.chatRoom;
-        if (!room || !room.roomJid) {
+        if (!room || !room.roomJid || room.stateIsLeftOrLeaving()) {
             return null;
         }
         // room is not active, don't waste DOM nodes, CPU and Memory (and save some avatar loading calls...)
@@ -1961,6 +1950,10 @@ var ConversationPanels = React.createClass({
         }
 
         self.props.conversations.forEach(function(chatRoom) {
+            if (chatRoom.stateIsLeftOrLeaving()) {
+                return;
+            }
+
             var otherParticipants = chatRoom.getParticipantsExceptMe();
 
             var contact;
@@ -1968,20 +1961,16 @@ var ConversationPanels = React.createClass({
                 contact = megaChat.getContactFromJid(otherParticipants[0]);
             }
 
-            // XX: Performance trick. However, scroll positions are NOT retained properly when switching conversations,
-            // so this should be done some day in the future, after we have more stable product.
-            // if (chatRoom.isCurrentlyActive) {
-                conversations.push(
-                    <ConversationPanel
-                        chatRoom={chatRoom}
-                        isActive={chatRoom.isCurrentlyActive}
-                        messagesBuff={chatRoom.messagesBuff}
-                        contacts={M.u}
-                        contact={contact}
-                        key={chatRoom.roomJid}
-                        />
-                );
-            // }
+            conversations.push(
+                <ConversationPanel
+                    chatRoom={chatRoom}
+                    isActive={chatRoom.isCurrentlyActive}
+                    messagesBuff={chatRoom.messagesBuff}
+                    contacts={M.u}
+                    contact={contact}
+                    key={chatRoom.roomJid}
+                    />
+            );
         });
 
         if (conversations.length === 0) {

@@ -655,10 +655,6 @@ ChatRoom.prototype.leave = function(triggerLeaveRequest) {
     else {
         self.setState(ChatRoom.STATE.LEFT);
     }
-
-    self.megaChat.refreshConversations();
-
-    self.trackDataChange();
 };
 
 /**
@@ -676,11 +672,11 @@ ChatRoom.prototype.destroy = function(notifyOtherDevices, noRedirect) {
         self.leave(notifyOtherDevices);
     }
 
-    Soon(function() {
-        if (self.isCurrentlyActive) {
-            self.isCurrentlyActive = false;
-        }
+    if (self.isCurrentlyActive) {
+        self.isCurrentlyActive = false;
+    }
 
+    Soon(function() {
         mc.chats.remove(roomJid);
 
         if (!noRedirect) {

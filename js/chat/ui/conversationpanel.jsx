@@ -1427,11 +1427,6 @@ var ConversationPanel = React.createClass({
                         chatdint.discardMessage(room, msg.internalId ? msg.internalId : msg.orderValue);
                     }
 
-                    msg.message = "";
-                    msg.contents = "";
-                    msg.messageHtml = "";
-                    msg.deleted = true;
-
                     self.setState({
                         'confirmDeleteDialog': false,
                         'messageToBeDeleted': false

@@ -202,7 +202,20 @@ var TypingArea = React.createClass({
             return;
         }
         else if (key === 13) {
-            if ($.trim(val).length === 0) {
+            // Alt+Enter
+            if (e.altKey) {
+                var content = element.value;
+                var cursorPos = self.getCursorPosition(element);
+                content = content.substring(0, cursorPos) + "\n" + content.substring(
+                        cursorPos,
+                        content.length
+                    );
+
+                self.setState({typedMessage: content});
+                self.onUpdateCursorPosition = cursorPos + 1;
+                e.preventDefault();
+            }
+            else if ($.trim(val).length === 0) {
                 e.preventDefault();
             }
         }
@@ -318,18 +331,28 @@ var TypingArea = React.createClass({
 
         if (this.props.persist && megaChat.plugins.persistedTypeArea) {
             if (!initialText) {
-                megaChat.plugins.persistedTypeArea.hasPersistedTypedValue(chatRoom).done(function () {
-                    megaChat.plugins.persistedTypeArea.getPersistedTypedValue(chatRoom).done(function (r) {
-                        if (self.state.typedMessage !== r) {
-                            self.setState({
-                                'typedMessage': r
-                            });
+                megaChat.plugins.persistedTypeArea.getPersistedTypedValue(chatRoom)
+                    .done(function (r) {
+                        if (typeof r != 'undefined') {
+                            if (!self.state.typedMessage && self.state.typedMessage !== r) {
+                                self.setState({
+                                    'typedMessage': r
+                                });
+                            }
+                        }
+                    })
+                    .fail(function(e) {
+                        if (d) {
+                            console.warn(
+                                "Failed to retrieve persistedTypeArea value for",
+                                chatRoom,
+                                "with error:",
+                                e
+                            );
                         }
                     });
-
-                });
             }
-            megaChat.plugins.persistedTypeArea.data.rebind(
+            $(megaChat.plugins.persistedTypeArea.data).rebind(
                 'onChange.typingArea' + self.getUniqueId(),
                 function(e, k, v) {
                     if (chatRoom.roomJid.split("@")[0] == k) {
@@ -363,6 +386,12 @@ var TypingArea = React.createClass({
         }
         else {
             this.updateScroll();
+        }
+        if (self.onUpdateCursorPosition) {
+            var $container = $(ReactDOM.findDOMNode(this));
+            var el = $('.chat-textarea:visible textarea:visible', $container)[0];
+            el.selectionStart = el.selectionEnd = self.onUpdateCursorPosition;
+            self.onUpdateCursorPosition = false;
         }
     },
     initScrolling: function() {

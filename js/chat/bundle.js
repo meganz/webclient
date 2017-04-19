@@ -109,10 +109,8 @@ React.makeElement = React['createElement'];
 
 	        megaChat.refreshConversations();
 
-	        if (localStorage.megaChatPresence !== "unavailable") {
-	            if (megaChat.karere.getConnectionState() != Karere.CONNECTION_STATE.CONNECTED) {
-	                megaChat.connect();
-	            }
+	        if (megaChat.karere.getConnectionState() != Karere.CONNECTION_STATE.CONNECTED) {
+	            megaChat.connect();
 	        }
 
 	        if (roomType === "private") {
@@ -233,8 +231,9 @@ React.makeElement = React['createElement'];
 	            'emoticonShortcutsFilter': EmoticonShortcutsFilter,
 	            'emoticonsFilter': EmoticonsFilter,
 	            'callFeedback': CallFeedback,
-	            'karerePing': KarerePing
-
+	            'karerePing': KarerePing,
+	            'presencedIntegration': PresencedIntegration,
+	            'persistedTypeArea': PersistedTypeArea
 	        },
 	        'chatNotificationOptions': {
 	            'textMessages': {
@@ -341,10 +340,19 @@ React.makeElement = React['createElement'];
 	        }
 
 	        var contact = self.getContactFromJid(eventObject.getFromJid());
+
+	        if (!contact) {
+	            return;
+	        }
+
 	        if (contact) {
-	            if (!contact.presenceMtime || parseFloat(contact.presenceMtime) < eventObject.getDelay()) {
-	                contact.presence = megaChat.karere.getPresence(megaChat.getJidFromNodeId(contact.u));
-	                contact.presenceMtime = eventObject.getDelay();
+	            var presencedPresence = contact.u !== u_handle ? self.plugins.presencedIntegration.getPresence(contact.u) : self.plugins.presencedIntegration.getMyPresence();
+
+	            if (typeof presencedPresence === 'undefined') {
+	                if (!contact.presenceMtime || parseFloat(contact.presenceMtime) < eventObject.getDelay()) {
+	                    contact.presence = megaChat.karere.getPresence(megaChat.getJidFromNodeId(contact.u));
+	                    contact.presenceMtime = eventObject.getDelay();
+	                }
 	            }
 	        }
 
@@ -353,10 +361,6 @@ React.makeElement = React['createElement'];
 
 	                if (bareJid === self.karere.getBareJid()) {
 	                    if (eventObject.getDelay() && eventObject.getDelay() >= parseFloat(localStorage.megaChatPresenceMtime) && self._myPresence != eventObject.getShow()) {
-	                        self._myPresence = eventObject.getShow();
-	                        localStorage.megaChatPresence = eventObject.getShow();
-	                        localStorage.megaChatPresenceMtime = eventObject.getDelay();
-
 	                        self.karere.setPresence(eventObject.getShow(), undefined, eventObject.getDelay());
 	                    }
 	                }
@@ -364,23 +368,6 @@ React.makeElement = React['createElement'];
 	        }
 
 	        self.renderMyStatus();
-	    });
-
-	    this.karere.bind("onDiscoCapabilities", function (e, eventObject) {
-	        var $treeElement = $('.nw-conversations-item[data-jid="' + eventObject.getFromUserBareJid() + '"]');
-
-	        $.each(eventObject.getCapabilities(), function (capability, capable) {
-	            if (capable) {
-	                $treeElement.addClass('chat-capability-' + capability);
-	            } else {
-	                $treeElement.removeClass('chat-capability-' + capability);
-	            }
-	        });
-
-	        var roomJid = $treeElement.attr('data-room-jid');
-
-	        var room = self.chats[roomJid + "@conference." + megaChat.options.xmppDomain];
-	        if (room) {}
 	    });
 
 	    var updateMyConnectionStatus = function updateMyConnectionStatus() {
@@ -396,9 +383,15 @@ React.makeElement = React['createElement'];
 	    };
 
 	    this.karere.bind("onConnected", function () {
-
-	        if (localStorage.megaChatPresence) {
-	            self.karere.setPresence(localStorage.megaChatPresence, undefined, localStorage.megaChatPresenceMtime);
+	        if (self.plugins.presencedIntegration) {
+	            var presence = self.plugins.presencedIntegration.getPresence(u_handle);
+	            if (presence === UserPresence.PRESENCE.ONLINE) {
+	                self.karere.setPresence(Karere.PRESENCE.ONLINE, undefined, localStorage.megaChatPresenceMtime);
+	            } else if (presence === UserPresence.PRESENCE.AWAY) {
+	                self.karere.setPresence(Karere.PRESENCE.AWAY, undefined, localStorage.megaChatPresenceMtime);
+	            } else if (presence === UserPresence.PRESENCE.DND) {
+	                self.karere.setPresence(Karere.PRESENCE.BUSY, undefined, localStorage.megaChatPresenceMtime);
+	            }
 	        } else {
 	            self.karere.setPresence();
 	        }
@@ -443,8 +436,7 @@ React.makeElement = React['createElement'];
 	        var presence = $(this).data("presence");
 	        self._myPresence = presence;
 
-	        localStorage.megaChatPresence = presence;
-	        localStorage.megaChatPresenceMtime = unixtime();
+	        $('.top-user-status-popup').removeClass("active");
 
 	        $('.top-user-status-popup').addClass("hidden");
 
@@ -459,18 +451,20 @@ React.makeElement = React['createElement'];
 	                });
 	            });
 	        } else {
-	            if (presence === Karere.PRESENCE.OFFLINE) {
-	                self.karere.setPresence(presence, undefined, localStorage.megaChatPresenceMtime);
-	                self.karere.connectionRetryManager.resetConnectionRetries();
-	                self.karere.disconnect();
-	                Object.keys(self.plugins.chatdIntegration.chatd.shards).forEach(function (k) {
-	                    var shard = self.plugins.chatdIntegration.chatd.shards[k];
-	                    shard.disconnect();
-	                });
-	            } else {
-	                self.karere.connectionRetryManager.resetConnectionRetries();
-	                self.karere.setPresence(presence, undefined, localStorage.megaChatPresenceMtime);
-	            }
+	            self.karere.connectionRetryManager.resetConnectionRetries();
+	            self.karere.setPresence(presence, undefined, localStorage.megaChatPresenceMtime);
+	        }
+
+	        var targetPresence = PresencedIntegration.cssClassToPresence(presence);
+
+	        self.plugins.presencedIntegration.setPresence(targetPresence);
+
+	        if (presence !== Karere.PRESENCE.OFFLINE) {
+
+	            Object.keys(self.plugins.chatdIntegration.chatd.shards).forEach(function (k) {
+	                var v = self.plugins.chatdIntegration.chatd.shards[k];
+	                v.connectionRetryManager.requiresConnection();
+	            });
 	        }
 	    });
 
@@ -557,13 +551,9 @@ React.makeElement = React['createElement'];
 
 	    $('.activity-status-block, .activity-status').show();
 
-	    if (!localStorage.megaChatPresence || localStorage.megaChatPresence != "unavailable") {
-	        self.connect().always(function () {
-	            self.renderMyStatus();
-	        });
-	    } else {
+	    self.connect().always(function () {
 	        self.renderMyStatus();
-	    }
+	    });
 
 	    if (self.karere.getConnectionState() === Karere.CONNECTION_STATE.DISCONNECTED || self.karere.getConnectionState() === Karere.CONNECTION_STATE.AUTHFAIL) {
 	        self.karere.authSetup(self.getJidFromNodeId(u_handle), self.getMyXMPPPassword());
@@ -605,11 +595,6 @@ React.makeElement = React['createElement'];
 	        if (room.callSession) {
 	            room.callSession.endCall();
 	        }
-	    });
-
-	    self.karere.rebind("onPresence.maintainUI", function (e, presenceEventData) {
-	        var contact = self.getContactFromJid(presenceEventData.getFromJid());
-	        M.onlineStatusEvent(contact, presenceEventData.getShow());
 	    });
 
 	    $(document).rebind('megaulcomplete.megaChat', function (e, ul_target, uploads) {
@@ -893,23 +878,13 @@ React.makeElement = React['createElement'];
 	    }
 	};
 
-	Chat.prototype.xmppPresenceToText = function (presence) {
-	    if (presence == Karere.PRESENCE.ONLINE || presence == Karere.PRESENCE.AVAILABLE || presence === true) {
-	        return l[5923];
-	    } else if (presence == Karere.PRESENCE.AWAY || presence == "xa") {
-	        return l[5924];
-	    } else if (presence == Karere.PRESENCE.BUSY) {
-	        return l[5925];
-	    } else if (!presence || presence == Karere.PRESENCE.OFFLINE) {
-	        return l[5926];
-	    } else {
-	        return __('Unknown');
-	    }
-	};
-
 	Chat.prototype.renderMyStatus = function () {
 	    var self = this;
 	    if (!self.is_initialized) {
+	        return;
+	    }
+	    if (typeof megaChat.userPresence === 'undefined') {
+
 	        return;
 	    }
 
@@ -919,27 +894,24 @@ React.makeElement = React['createElement'];
 
 	    $status.removeClass('online').removeClass('away').removeClass('busy').removeClass('offline').removeClass('black');
 
-	    var presence = self.karere.getConnectionState() === Karere.CONNECTION_STATE.CONNECTED ? self.karere.getPresence(self.karere.getJid()) : localStorage.megaChatPresence;
+	    var actualPresence = self.plugins.presencedIntegration.getMyPresenceSetting();
 
-	    var cssClass = self.xmppPresenceToCssClass(presence);
+	    var userPresenceConRetMan = megaChat.userPresence.connectionRetryManager;
+	    var presence = self.plugins.presencedIntegration.getMyPresence();
 
-	    if (!presence && self.karere.getConnectionState() === Karere.CONNECTION_STATE.CONNECTED) {
-	        if (!localStorage.megaChatPresence) {
-	            presence = localStorage.megaChatPresence = "chat";
-	        } else {
-	            presence = localStorage.megaChatPresence;
-	        }
-	    } else if (self.karere.getConnectionState() === Karere.CONNECTION_STATE.DISCONNECTED || self.karere.getConnectionState() === Karere.CONNECTION_STATE.AUTHFAIL || self.karere.getConnectionState() === Karere.CONNECTION_STATE.DISCONNECTING) {
+	    var cssClass = PresencedIntegration.presenceToCssClass(presence);
+
+	    if (userPresenceConRetMan.getConnectionState() !== ConnectionRetryManager.CONNECTION_STATE.CONNECTED) {
 	        cssClass = "offline";
 	    }
 
-	    if (cssClass === 'online') {
+	    if (actualPresence === UserPresence.PRESENCE.ONLINE) {
 	        $('.top-user-status-popup .tick-item[data-presence="chat"]').addClass("active");
-	    } else if (cssClass === 'away') {
+	    } else if (actualPresence === UserPresence.PRESENCE.AWAY) {
 	        $('.top-user-status-popup .tick-item[data-presence="away"]').addClass("active");
-	    } else if (cssClass === 'busy') {
+	    } else if (actualPresence === UserPresence.PRESENCE.DND) {
 	        $('.top-user-status-popup .tick-item[data-presence="dnd"]').addClass("active");
-	    } else if (cssClass === 'offline') {
+	    } else if (actualPresence === UserPresence.PRESENCE.OFFLINE) {
 	        $('.top-user-status-popup .tick-item[data-presence="unavailable"]').addClass("active");
 	    } else {
 	        $('.top-user-status-popup .tick-item[data-presence="unavailable"]').addClass("active");
@@ -947,7 +919,7 @@ React.makeElement = React['createElement'];
 
 	    $status.addClass(cssClass);
 
-	    if (self.karere.getConnectionState() === Karere.CONNECTION_STATE.CONNECTING) {
+	    if (self.karere.getConnectionState() === Karere.CONNECTION_STATE.CONNECTING || userPresenceConRetMan.getConnectionState() === ConnectionRetryManager.CONNECTION_STATE.CONNECTING) {
 	        $status.parent().addClass("fadeinout");
 	    } else {
 	        $status.parent().removeClass("fadeinout");
@@ -1051,6 +1023,7 @@ React.makeElement = React['createElement'];
 	                    'c': 0
 	                }));
 	                M.syncUsersFullname(contactHash);
+	                self.processNewUser(contactHash);
 	            }
 	        });
 	    }
@@ -1198,11 +1171,11 @@ React.makeElement = React['createElement'];
 
 	    self.logger.debug("added: ", u);
 
-	    this.karere.subscribe(megaChat.getJidFromNodeId(u), self.getMyXMPPPassword());
-
-	    if (M.u[u] && !M.u[u].presence) {
-	        M.u[u].presence = this.karere.getPresence(megaChat.getJidFromNodeId(u));
+	    if (self.plugins.presencedIntegration) {
+	        self.plugins.presencedIntegration.addContact(u);
 	    }
+
+	    this.karere.subscribe(megaChat.getJidFromNodeId(u), self.getMyXMPPPassword());
 
 	    self.renderMyStatus();
 	};
@@ -1211,6 +1184,10 @@ React.makeElement = React['createElement'];
 	    var self = this;
 
 	    self.logger.debug("removed: ", u);
+
+	    if (self.plugins.presencedIntegration) {
+	        self.plugins.presencedIntegration.removeContact(u);
+	    }
 
 	    this.karere.unsubscribe(megaChat.getJidFromNodeId(u), self.getMyXMPPPassword());
 
@@ -1370,7 +1347,6 @@ React.makeElement = React['createElement'];
 	    asyncApiReq({ 'a': 'mcf', 'v': Chatd.VERSION }).done(function (r) {
 	        r.c.forEach(function (chatRoomMeta) {
 	            if (chatRoomMeta.g === 1) {
-	                console.error("Destroying: ", chatRoomMeta.id, chatRoomMeta.g, chatRoomMeta.u);
 	                chatRoomMeta.u.forEach(function (u) {
 	                    if (u.u !== u_handle) {
 	                        api_req({
@@ -1579,7 +1555,7 @@ React.makeElement = React['createElement'];
 	        } else {
 	            var lastMsgDivClasses = "conversation-message";
 
-	            var emptyMessage = ChatdIntegration.mcfHasFinishedPromise.state() !== 'resolved' || chatRoom.messagesBuff.messagesHistoryIsLoading() || chatRoom.messagesBuff.joined === false ? localStorage.megaChatPresence !== 'unavailable' ? l[7006] : "" : l[8000];
+	            var emptyMessage = ChatdIntegration.mcfHasFinishedPromise.state() !== 'resolved' || chatRoom.messagesBuff.messagesHistoryIsLoading() || chatRoom.messagesBuff.joined === false ? l[7006] : l[8000];
 
 	            if (ChatdIntegration.mcfHasFinishedPromise.state() === 'pending') {
 	                if (!ChatdIntegration.mcfHasFinishedPromise._trackDataChangeAttached) {
@@ -2175,10 +2151,10 @@ React.makeElement = React['createElement'];
 	            $(this.popup).css(this.props.style);
 	        }
 	        this.props.element.appendChild(this.popup);
+	        this._renderLayer();
 	        if (this.props.popupDidMount) {
 	            this.props.popupDidMount(this.popup);
 	        }
-	        this._renderLayer();
 	    },
 	    componentDidUpdate: function componentDidUpdate() {
 	        this._renderLayer();
@@ -2905,13 +2881,14 @@ React.makeElement = React['createElement'];
 	    isAtBottom: function isAtBottom() {
 	        return this.findDOMNode().scrollTop === this.getScrollHeight();
 	    },
+	    isCloseToBottom: function isCloseToBottom(minPixelsOff) {
+	        return this.getScrollHeight() - this.getScrollPositionY() <= minPixelsOff;
+	    },
 	    getScrolledPercentY: function getScrolledPercentY() {
-	        var $elem = $(this.findDOMNode());
-	        return 100 / this.getScrollHeight() * $elem[0].scrollTop;
+	        return 100 / this.getScrollHeight() * this.findDOMNode().scrollTop;
 	    },
 	    getScrollPositionY: function getScrollPositionY() {
-	        var $elem = $(this.findDOMNode());
-	        return $elem[0].scrollTop;
+	        return this.findDOMNode().scrollTop;
 	    },
 	    scrollToPercentY: function scrollToPercentY(posPerc, skipReinitialised) {
 	        var $elem = $(this.findDOMNode());
@@ -4050,10 +4027,8 @@ React.makeElement = React['createElement'];
 
 	        var startAudioCallButton = React.makeElement(
 	            "div",
-	            { className: "link-button" + (!contact.presence ? " disabled" : ""), onClick: function onClick() {
-	                    if (contact.presence && contact.presence !== "offline") {
-	                        room.startAudioCall();
-	                    }
+	            { className: "link-button", onClick: function onClick() {
+	                    room.startAudioCall();
 	                } },
 	            React.makeElement("i", { className: "small-icon audio-call" }),
 	            __(l[5896])
@@ -4061,10 +4036,8 @@ React.makeElement = React['createElement'];
 
 	        var startVideoCallButton = React.makeElement(
 	            "div",
-	            { className: "link-button" + (!contact.presence ? " disabled" : ""), onClick: function onClick() {
-	                    if (contact.presence && contact.presence !== "offline") {
-	                        room.startVideoCall();
-	                    }
+	            { className: "link-button", onClick: function onClick() {
+	                    room.startVideoCall();
 	                } },
 	            React.makeElement("i", { className: "small-icon video-call" }),
 	            __(l[5897])
@@ -4903,7 +4876,7 @@ React.makeElement = React['createElement'];
 	        var isAtTop = ps.isAtTop();
 	        var isAtBottom = ps.isAtBottom();
 
-	        if (isAtBottom === true) {
+	        if (ps.isCloseToBottom(30) === true) {
 	            self.scrolledToBottom = true;
 	        } else {
 	            self.scrolledToBottom = false;
@@ -4982,10 +4955,8 @@ React.makeElement = React['createElement'];
 	        var messagesList = [];
 
 	        if (self.isRetrievingHistoryViaScrollPull && !self.loadingShown || self.props.chatRoom.messagesBuff.messagesHistoryIsLoading() === true || self.props.chatRoom.messagesBuff.joined === false || self.props.chatRoom.messagesBuff.joined === true && self.props.chatRoom.messagesBuff.haveMessages === true && self.props.chatRoom.messagesBuff.messagesHistoryIsLoading() === true) {
-	            if (localStorage.megaChatPresence !== 'unavailable') {
-	                self.loadingShown = true;
-	            }
-	        } else if (self.props.chatRoom.messagesBuff.joined === true && (self.props.chatRoom.messagesBuff.messages.length === 0 || !self.props.chatRoom.messagesBuff.haveMoreHistory())) {
+	            self.loadingShown = true;
+	        } else if (self.props.chatRoom.messagesBuff.joined === true) {
 	            delete self.loadingShown;
 	            var headerText = self.props.chatRoom.messagesBuff.messages.length === 0 ? __(l[8002]) : __(l[8002]);
 
@@ -5337,14 +5308,23 @@ React.makeElement = React['createElement'];
 	                        { className: "dialog secondary-header" },
 	                        __("Please confirm that you want to upload this image and share it in this chat room.")
 	                    ),
-	                    React.makeElement("img", { src: self.state.pasteImageConfirmDialog[2], style: {
+	                    React.makeElement("img", {
+	                        src: self.state.pasteImageConfirmDialog[2],
+	                        style: {
 	                            maxWidth: "90%",
 	                            height: "auto",
+	                            maxHeight: $(document).outerHeight() * 0.3,
 	                            margin: '10px auto',
 	                            display: 'block',
 	                            border: '1px solid #ccc',
 	                            borderRadius: '4px'
-	                        } })
+	                        },
+	                        onLoad: function onLoad(e) {
+	                            $(e.target).parents('.paste-image-chat').position({
+	                                of: $(document.body)
+	                            });
+	                        }
+	                    })
 	                )
 	            );
 	        }
@@ -5915,6 +5895,13 @@ React.makeElement = React['createElement'];
 	    },
 	    onPopupDidMount: function onPopupDidMount(elem) {
 	        this.domNode = elem;
+
+	        $(elem).css({
+	            'margin': 'auto'
+	        }).position({
+	            of: $(document.body)
+	        });
+
 	        if (this.props.popupDidMount) {
 
 	            this.props.popupDidMount(elem);
@@ -6102,7 +6089,7 @@ React.makeElement = React['createElement'];
 
 	            var icon = React.makeElement(
 	                "span",
-	                { className: "transfer-filtype-icon " + fileIcon(node) },
+	                { className: "transfer-filetype-icon " + fileIcon(node) },
 	                " "
 	            );
 
@@ -6123,7 +6110,7 @@ React.makeElement = React['createElement'];
 	                    { withArrow: true },
 	                    React.makeElement(
 	                        Tooltips.Handler,
-	                        { className: "transfer-filtype-icon " + fileIcon(node) },
+	                        { className: "transfer-filetype-icon " + fileIcon(node) },
 	                        " "
 	                    ),
 	                    React.makeElement(
@@ -7143,7 +7130,16 @@ React.makeElement = React['createElement'];
 	            e.stopPropagation();
 	            return;
 	        } else if (key === 13) {
-	            if ($.trim(val).length === 0) {
+
+	            if (e.altKey) {
+	                var content = element.value;
+	                var cursorPos = self.getCursorPosition(element);
+	                content = content.substring(0, cursorPos) + "\n" + content.substring(cursorPos, content.length);
+
+	                self.setState({ typedMessage: content });
+	                self.onUpdateCursorPosition = cursorPos + 1;
+	                e.preventDefault();
+	            } else if ($.trim(val).length === 0) {
 	                e.preventDefault();
 	            }
 	        } else if (key === 38) {
@@ -7240,17 +7236,21 @@ React.makeElement = React['createElement'];
 
 	        if (this.props.persist && megaChat.plugins.persistedTypeArea) {
 	            if (!initialText) {
-	                megaChat.plugins.persistedTypeArea.hasPersistedTypedValue(chatRoom).done(function () {
-	                    megaChat.plugins.persistedTypeArea.getPersistedTypedValue(chatRoom).done(function (r) {
-	                        if (self.state.typedMessage !== r) {
+	                megaChat.plugins.persistedTypeArea.getPersistedTypedValue(chatRoom).done(function (r) {
+	                    if (typeof r != 'undefined') {
+	                        if (!self.state.typedMessage && self.state.typedMessage !== r) {
 	                            self.setState({
 	                                'typedMessage': r
 	                            });
 	                        }
-	                    });
+	                    }
+	                }).fail(function (e) {
+	                    if (d) {
+	                        console.warn("Failed to retrieve persistedTypeArea value for", chatRoom, "with error:", e);
+	                    }
 	                });
 	            }
-	            megaChat.plugins.persistedTypeArea.data.rebind('onChange.typingArea' + self.getUniqueId(), function (e, k, v) {
+	            $(megaChat.plugins.persistedTypeArea.data).rebind('onChange.typingArea' + self.getUniqueId(), function (e, k, v) {
 	                if (chatRoom.roomJid.split("@")[0] == k) {
 	                    self.setState({ 'typedMessage': v ? v : "" });
 	                    self.triggerOnUpdate(true);
@@ -7280,6 +7280,12 @@ React.makeElement = React['createElement'];
 	            this.initScrolling();
 	        } else {
 	            this.updateScroll();
+	        }
+	        if (self.onUpdateCursorPosition) {
+	            var $container = $(ReactDOM.findDOMNode(this));
+	            var el = $('.chat-textarea:visible textarea:visible', $container)[0];
+	            el.selectionStart = el.selectionEnd = self.onUpdateCursorPosition;
+	            self.onUpdateCursorPosition = false;
 	        }
 	    },
 	    initScrolling: function initScrolling() {
@@ -8716,7 +8722,7 @@ React.makeElement = React['createElement'];
 	                        }
 
 	                        var addToCloudDrive = function addToCloudDrive() {
-	                            M.injectNodes(v, M.RootID, false, function (res) {
+	                            M.injectNodes(v, M.RootID, function (res) {
 	                                if (res === 0) {
 	                                    msgDialog('info', __(l[8005]), __(l[8006]));
 	                                }
@@ -9012,14 +9018,27 @@ React.makeElement = React['createElement'];
 	                                        icon: 'rounded-grey-plus',
 	                                        label: __(l[71]),
 	                                        onClick: function onClick() {
-	                                            M.inviteContact(M.u[u_handle].m, contactEmail);
+	                                            var exists = false;
+	                                            Object.keys(M.opc).forEach(function (k) {
+	                                                if (!exists && M.opc[k].m === contactEmail) {
+	                                                    exists = true;
+	                                                    return false;
+	                                                }
+	                                            });
 
-	                                            var title = l[150];
+	                                            if (exists) {
+	                                                closeDialog();
+	                                                msgDialog('warningb', '', l[7413]);
+	                                            } else {
+	                                                M.inviteContact(M.u[u_handle].m, contactEmail);
 
-	                                            var msg = l[5898].replace('[X]', contactEmail);
+	                                                var title = l[150];
 
-	                                            closeDialog();
-	                                            msgDialog('info', title, msg);
+	                                                var msg = l[5898].replace('[X]', contactEmail);
+
+	                                                closeDialog();
+	                                                msgDialog('info', title, msg);
+	                                            }
 	                                        }
 	                                    }),
 	                                    deleteButtonOptional ? React.makeElement('hr', null) : null,
@@ -9999,8 +10018,17 @@ React.makeElement = React['createElement'];
 
 	        if (self.type === "private") {
 	            var targetUserJid = self.getParticipantsExceptMe()[0];
-	            var targetUserNode = self.megaChat.getContactFromJid(targetUserJid);
-	            assert(M.u, 'M.u does not exists');
+
+	            var targetUserNode;
+	            if (targetUserJid) {
+	                targetUserNode = self.megaChat.getContactFromJid(targetUserJid);
+	                assert(M.u, 'M.u does not exists');
+	            } else if (msg.userId) {
+	                targetUserNode = M.u[msg.userId];
+	            } else {
+	                console.error("Missing participant in a 1on1 room.");
+	                return;
+	            }
 
 	            assert(targetUserNode && targetUserNode.u, 'No hash found for participant');
 	            assert(M.u[targetUserNode.u], 'User not found in M.u');
@@ -10617,18 +10645,11 @@ React.makeElement = React['createElement'];
 	            var node = M.d[nodeId];
 	            nodesMeta.push({
 	                'h': node.h,
-	                'key': node.key,
 	                'k': node.k,
-	                'a': node.a,
 	                't': node.t,
 	                'name': node.name,
 	                's': node.s,
 	                'fa': node.fa,
-	                'ar': {
-	                    'n': node.ar.n,
-	                    't': node.ar.t,
-	                    'c': node.ar.c
-	                },
 	                'ts': node.ts
 	            });
 	        });

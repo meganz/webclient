@@ -660,7 +660,7 @@ function mObjectURL(data, type)
 
 Object.defineProperty(this, 'mBroadcaster', {
     writable: false,
-    value: Object.freeze({
+    value: {
     _topics : {},
 
     addListener: function mBroadcaster_addListener(topic, options) {
@@ -800,9 +800,14 @@ Object.defineProperty(this, 'mBroadcaster', {
             this.listen(setup);
             this.notify('ping');
 
+            // if multiple tabs are reloaded/opened at the same time
+            // they would both see .ctInstances as === 0, so we need to increase this
+            // as earlier as possible, e.g. now.
+            localStorage.ctInstances = (parseInt(localStorage.ctInstances) || 0) + 1;
+
             setTimeout(function() {
                 setup();
-            }, !parseInt(localStorage.ctInstances) ? 0 : 2000);
+            }, parseInt(localStorage.ctInstances) === 1 ? 0 : 2000);
         },
 
         listen: function crossTab_listen(aListener) {
@@ -834,7 +839,15 @@ Object.defineProperty(this, 'mBroadcaster', {
             if (this.ctID) {
                 var wasMaster = this.master;
                 if (wasMaster) {
-                    localStorage.ctInstances--;
+                    var current = parseInt(localStorage.ctInstances);
+                    if (current > 1) {
+                        // only decrease ctInstnaces if its > 1, so that we would never
+                        // get into a case when ctInstances is < 0
+                        localStorage.ctInstances--;
+                    }
+                    else {
+                        localStorage.ctInstances = 0;
+                    }
                     localStorage['mCrossTabRef_' + u_handle] = this.master;
                     delete this.master;
                 } else if (d) {
@@ -865,10 +878,10 @@ Object.defineProperty(this, 'mBroadcaster', {
             mBroadcaster.sendMessage('crossTab:master', this.master);
 
             // (function liveLoop(tag) {
-                // if (tag === mBroadcaster.crossTab.master) {
-                    // localStorage['mCrossTabRef_' + u_handle] = Date.now();
-                    // setTimeout(liveLoop, 6e3, tag);
-                // }
+            // if (tag === mBroadcaster.crossTab.master) {
+            // localStorage['mCrossTabRef_' + u_handle] = Date.now();
+            // setTimeout(liveLoop, 6e3, tag);
+            // }
             // })(this.master);
         },
 
@@ -928,13 +941,20 @@ Object.defineProperty(this, 'mBroadcaster', {
                             }
                         }
                     }
+                default:
+                    mBroadcaster.sendMessage('crossTab:' + msg, strg);
+
                     break;
             }
 
             delete localStorage[ev.key];
         }
     }
-})});
+}});
+
+if (!is_karma) {
+    Object.freeze(mBroadcaster);
+}
 
 
 var sh = [];
@@ -1380,7 +1400,7 @@ else if (!b_u)
             }
             dump.m = dump.m.replace(/\s+/g, ' ');
 
-            if (!window.jsl_done) {
+            if (!window.jsl_done && !window.u_checked) {
                 // Alert the user if there was an uncaught exception while
                 // loading the site, this should only happen on some fancy
                 // browsers other than what we use during development, and
@@ -1659,9 +1679,9 @@ else if (!b_u)
         jsl.push({f:'js/mouse.js', n: 'mouse_js', j:1});
         jsl.push({f:'js/datastructs.js', n: 'datastructs_js', j:1});
         jsl.push({f:'js/vendor/db.js', n: 'db_js', j:1,w:5});
-        jsl.push({f:'js/megaDbEncryptionPlugin.js', n: 'megadbenc_js', j:1,w:5});
-        jsl.push({f:'js/megaDb.js', n: 'megadb_js', j:1,w:5});
         jsl.push({f:'js/idbkvstorage.js', n: 'idbkvstorage_js', j: 1, w: 5});
+        jsl.push({f:'js/sharedlocalkvstorage.js', n: 'sharedlocalkvstorage_js', j: 1, w: 5});
+        jsl.push({f:'js/achievements.js', n: 'achievements_js', j: 1, w: 5});
 
         jsl.push({f:'js/tlvstore.js', n: 'tlvstore_js', j:1});
         jsl.push({f:'js/vendor/jsbn.js', n: 'jsbn_js', j:1, w:2});
@@ -1708,6 +1728,7 @@ else if (!b_u)
         jsl.push({f:'js/ui/publicServiceAnnouncement.js', n: 'psa_js', j:1,w:1});
         jsl.push({f:'js/ui/alarm.js', n: 'alarm_js', j:1,w:1});
         jsl.push({f:'js/ui/export.js', n: 'export_js', j:1,w:1});
+        jsl.push({f:'js/ui/transfers-popup.js', n: 'transfers_popup_js', j:1,w:1});
     } // !is_mobile
 
     // Transfers
@@ -1736,6 +1757,9 @@ else if (!b_u)
     if (!is_mobile) {
         jsl.push({f:'css/style.css', n: 'style_css', j:2,w:30,c:1,d:1,cache:1});
         jsl.push({f:'js/fm.js', n: 'fm_js', j:1,w:12});
+        jsl.push({f:'js/fm-dashboard.js', n: 'fmdashboard_js', j:1,w:5});
+        jsl.push({f:'js/fm-account.js', n: 'fmaccount_js', j:1,w:5});
+        jsl.push({f:'js/fm/account.js', n: 'fm_account_js', j:1});
         jsl.push({f:'js/ui/miniui.js', n: 'miniui_js', j:1});
 
         jsl.push({f:'html/start.html', n: 'start', j:0});
@@ -1802,7 +1826,8 @@ else if (!b_u)
     if (!is_mobile
             && (
                 typeof Number.isNaN !== 'function' ||
-                typeof Set === 'undefined'
+                typeof Set === 'undefined' ||
+                !Object.assign
             )
     ) {
 
@@ -1931,10 +1956,12 @@ else if (!b_u)
             'chatnotifications_js': {f:'js/chat/plugins/chatNotifications.js', n: 'chatnotifications_js', j:1},
             'callfeedback_js': {f:'js/chat/plugins/callFeedback.js', n: 'callfeedback_js', j:1},
             'persistedTypeArea_js': {f:'js/chat/plugins/persistedTypeArea.js', n: 'persistedTypeArea_js', j:1, w:1},
+            'presencedIntegration_js': {f:'js/chat/plugins/presencedIntegration.js', n: 'presInt_js', j:1, w:1},
             'keo_js': {f:'js/chat/karereEventObjects.js', n: 'keo_js', j:1},
             'crm_js': {f:'js/connectionRetryManager.js', n: 'crm_js', j:1},
             'karere_js': {f:'js/chat/karere.js', n: 'karere_js', j:1},
             'chat_messages_Js': {f:'js/chat/messages.js', n: 'chat_messages_Js', j:1},
+            'presence2_js': {f:'js/chat/presence2.js', n: 'presence2_js', j:1},
             'chat_react_minified_js': {f:'js/chat/bundle.js', n: 'chat_react_minified_js', j:1}
         }
     };
@@ -2489,8 +2516,8 @@ else if (!b_u)
             '        <div class="loading-m-block"></div>'+
             '    </div>'+
             '    <div class="st-social-block-load" id="bootbottom">'+
-            '        <a href="https://www.facebook.com/MEGAprivacy" target="_blank" class="st-bottom-button st-facebook-button"></a>'+
-            '        <a href="https://www.twitter.com/MEGAprivacy" target="_blank" class="st-bottom-button st-twitter-button"></a>'+
+            '        <a href="https://www.facebook.com/MEGAprivacy" target="_blank" rel="noopener noreferrer" class="st-bottom-button st-facebook-button"></a>'+
+            '        <a href="https://www.twitter.com/MEGAprivacy" target="_blank" rel="noopener noreferrer" class="st-bottom-button st-twitter-button"></a>'+
             '    </div>'+
             '</div>';
 

@@ -336,6 +336,53 @@ delay.cancel = function(aProcID) {
     return false;
 };
 
+
+var isNativeObject = function(obj) {
+    var objConstructorText = obj.constructor.toString();
+    return objConstructorText.indexOf("[native code]") !== -1 && objConstructorText.indexOf("Object()") === -1;
+};
+
+function clone(obj) {
+
+    if (typeof obj !== 'object' || obj === null) {
+        return obj;
+    }
+    if (obj instanceof Date) {
+        return new Date(obj.getTime());
+    }
+    if (Array.isArray(obj)) {
+        var arr = new Array(obj.length);
+        for (var i = obj.length; i--; ) {
+            arr[i] = clone(obj[i]);
+        }
+        return arr;
+    }
+    if (obj instanceof Object) {
+        var copy = {};
+        for (var attr in obj) {
+            if (obj.hasOwnProperty(attr)) {
+                if (!(obj[attr] instanceof Object)) {
+                    copy[attr] = obj[attr];
+                }
+                else if (Array.isArray(obj[attr])) {
+                    copy[attr] = clone(obj[attr]);
+                }
+                else if (!isNativeObject(obj[attr])) {
+                    copy[attr] = clone(obj[attr]);
+                }
+                else if ($.isFunction(obj[attr])) {
+                    copy[attr] = obj[attr];
+                }
+                else {
+                    copy[attr] = {};
+                }
+            }
+        }
+
+        return copy;
+    }
+}
+
 function jScrollFade(id) {
     if (is_selenium) {
         return;
@@ -483,9 +530,11 @@ function megatitle(nperc) {
     }
 }
 
-function populate_l() {
+mBroadcaster.once('startMega', function populate_l() {
+    var i;
+
     if (d) {
-        for (var i = 24000 ; i-- ;) {
+        for (i = 24000; i--;) {
             l[i] = (l[i] || '(translation-missing)');
         }
     }
@@ -533,7 +582,7 @@ function populate_l() {
     l[553] = l[553].replace('[A]', '<a href="mailto:resellers@mega.nz">').replace('[/A]', '</a>');
     l[555] = l[555].replace('[A]', '<a href="/terms" class="clickurl">').replace('[/A]', '</a>');
     l[754] = l[754].replace('[A]',
-        '<a href="http://www.google.com/chrome" target="_blank" rel="noreferrer" style="color:#D9290B;">');
+        '<a href="http://www.google.com/chrome" target="_blank" rel="noopener noreferrer" style="color:#D9290B;">');
     l[754] = l[754].replace('[/A]', '</a>');
     l[871] = l[871].replace('[B]', '<strong>')
         .replace('[/B]', '</strong>')
@@ -545,9 +594,9 @@ function populate_l() {
     l[1094] = l[1094].replace('[A]', '<a href="/plugin" class="clickurl">').replace('[/A]', '</a>');
     l[1095] = l[1095].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[1133] = l[1133].replace('[A]',
-        '<a href="http://en.wikipedia.org/wiki/Entropy" target="_blank" rel="noreferrer">').replace('[/A]', '</a>');
+        '<a href="http://en.wikipedia.org/wiki/Entropy" target="_blank" rel="noopener noreferrer">').replace('[/A]', '</a>');
     l[1134] = l[1134].replace('[A]',
-        '<a href="http://en.wikipedia.org/wiki/Public-key_cryptography" target="_blank" rel="noreferrer">').replace('[/A]',
+        '<a href="http://en.wikipedia.org/wiki/Public-key_cryptography" target="_blank" rel="noopener noreferrer">').replace('[/A]',
         '</a>');
     l[1148] = l[1148].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[6978] = l[6978].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
@@ -565,7 +614,7 @@ function populate_l() {
     l[1201] = l[1201].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[1208] = l[1208].replace('[B]', '<strong>').replace('[/B]', '</strong>');
     l[1915] = l[1915].replace('[A]',
-        '<a class="red" href="https://chrome.google.com/webstore/detail/mega/bigefpfhnfcobdlfbedofhhaibnlghod" target="_blank" rel="noreferrer">')
+        '<a class="red" href="https://chrome.google.com/webstore/detail/mega/bigefpfhnfcobdlfbedofhhaibnlghod" target="_blank" rel="noopener noreferrer">')
             .replace('[/A]', '</a>');
     l[1936] = l[1936].replace('[A]', '<a href="/backup" class="clickurl">').replace('[/A]', '</a>');
     l[1942] = l[1942].replace('[A]', '<a href="/backup" class="clickurl">').replace('[/A]', '</a>');
@@ -631,27 +680,52 @@ function populate_l() {
     l[12487] = l[12487].replace('[A2]', '<a href="" class="red linux">').replace('[/A2]', '</a>');
     l[12488] = l[12488].replace('[A]', '<a>').replace('[/A]', '</a>').replace('[BR]', '<br>');
     l[12489] = l[12489].replace('[I]', '<i>').replace('[/I]', '</i>').replace('[I]', '<i>').replace('[/I]', '</i>');
-    l[15536] = l[15536].replace('[B]', '<b>').replace('[/B]', '</b>');
-    l[16106] = l[16106].replace('[B]', '<b>').replace('[/B]', '</b>');
-    l[16107] = l[16107].replace('[S]', '<span>').replace('[/S]', '</span>');
-    l[16116] = l[16116].replace('[S]', '<span>').replace('[/S]', '</span>');
-    l[16119] = l[16119].replace('[S]', '<span>').replace('[/S]', '</span>');
-    l[16120] = l[16120].replace('[S]', '<span>').replace('[/S]', '</span>');
-    l[16123] = l[16123].replace('[S]', '<span>').replace('[/S]', '</span>').replace('[A]', '<a href="/pro">').replace('[/A]', '</a>').replace('[BR]', '<br />');
-    l[16124] = l[16124].replace('[S]', '<span>').replace('[/S]', '</span>').replace('[A]', '<a href="/pro">').replace('[/A]', '</a>').replace('[BR]', '<br />');
-    l[16135] = l[16135].replace('[BR]', '<br />');
-    l[16136] = l[16136].replace('[A]', '<a href="/pro">').replace('[/A]', '</a>');
-    l[16137] = l[16137].replace('[A]', '<a href="/pro">').replace('[/A]', '</a>');
-    l[16138] = l[16138].replace('[A]', '<a href="/pro">').replace('[/A]', '</a>');
     l[16165] = l[16165].replace('[S]', '<a class="red">').replace('[/S]', '</a>').replace('[BR]', '<br/>');
     l[16167] = l[16167].replace('[S]', '<a href="/mobile" class="clickurl">').replace('[/S]', '</a>');
+    l[16306] = escapeHTML(l[16306])
+        .replace('[A]', '<a href="/fm/rubbish" class="clickurl gotorub">').replace('[/A]', '</a>');
+    l[16310] = escapeHTML(l[16310])
+        .replace('[A]', '<a href="/fm/dashboard" class="clickurl">').replace('[/A]', '</a>')
+        .replace('[I]', '<i class="semi-small-icon rocket"></i>');
+    l[16389] = escapeHTML(l[16389]).replace(
+                 '%1',
+                 '<span class="checkdiv checkboxOn autoaway">' +
+                     '<input type="checkbox" name="set-auto-away" id="set-auto-away" class="checkboxOn" checked="">' +
+                 '</span>'
+               )
+               .replace(
+                 '%2',
+                 '<span class="account-counter-number short">' +
+                     '<input type="text" value="5" id="autoaway" />' +
+                 '</span>'
+               );
+    l[16390] = escapeHTML(l[16390]).replace('[S]', '<span class="red">').replace('[/S]', '</span>');
+    l[16391] = escapeHTML(l[16391]).replace('[S]', '<span class="red">').replace('[/S]', '</span>');
+    l[16392] = escapeHTML(l[16392]).replace('[S]', '<span class="red">').replace('[/S]', '</span>');
+    l[16393] = escapeHTML(l[16393])
+        .replace('[A]', '<a class="red" href="mailto:support@mega.nz">').replace('[/A]', '</a>');
+
+    var common = [
+        15536, 16106, 16107, 16116, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315,
+        16316, 16358, 16359, 16360, 16361, 16375, 16382, 16383, 16384
+    ];
+    for (i = common.length; i--;) {
+        var num = common[i];
+
+        l[num] = escapeHTML(l[num])
+            .replace(/\[S\]/g, '<span>').replace(/\[\/S\]/g, '</span>')
+            .replace(/\[P\]/g, '<p>'   ).replace(/\[\/P\]/g, '</p>')
+            .replace(/\[B\]/g, '<b>'   ).replace(/\[\/B\]/g, '</b>')
+            .replace(/\[BR\]/g, '<br/>')
+            .replace(/\[A\]/g, '<a href="/pro" class="clickurl">').replace(/\[\/A\]/g, '</a>');
+    }
 
     l['year'] = new Date().getFullYear();
     date_months = [
         l[408], l[409], l[410], l[411], l[412], l[413],
         l[414], l[415], l[416], l[417], l[418], l[419]
     ].map(escapeHTML);
-}
+});
 
 function showmoney(number) {
     number = number.toString();
@@ -2013,6 +2087,22 @@ function array_random(arr) {
 }
 
 /**
+ * Convert Array to Object
+ * @param {Array|String} arr The array
+ * @param {*} [value] Optional value to assign to objects
+ * @returns {Object}
+ */
+function array_toobject(arr, value) {
+    if (!Array.isArray(arr)) {
+        arr = [arr];
+    }
+    return arr.reduce(function(obj, key, idx) {
+        obj[key] = value !== undefined ? value : ((idx | 0) + 1);
+        return obj;
+    }, Object.create(null));
+}
+
+/**
  * Simple method that will convert Mega user ids to base32 strings (that should be used when doing XMPP auth)
  *
  * @param handle {string} mega user id
@@ -2631,16 +2721,16 @@ function percent_megatitle() {
     for (var i in dl_queue) {
         if (dl_queue.hasOwnProperty(i)) {
             var q = dl_queue[i];
-            var t = q && tp[q.zipid ? 'zip_' + q.zipid : 'dl_' + q.id];
+            var td = q && tp[q.zipid ? 'zip_' + q.zipid : 'dl_' + q.id];
 
-            if (t) {
-                dl_r += t[0];
-                dl_t += t[1];
+            if (td) {
+                dl_r += td[0];
+                dl_t += td[1];
                 if (!q.zipid || !zips[q.zipid]) {
                     if (q.zipid) {
                         zips[q.zipid] = 1;
                     }
-                    dl_s += t[2];
+                    dl_s += td[2];
                 }
             }
             else {
@@ -2651,12 +2741,12 @@ function percent_megatitle() {
 
     for (var i in ul_queue) {
         if (ul_queue.hasOwnProperty(i)) {
-            var t = tp['ul_' + ul_queue[i].id]
+            var tu = tp['ul_' + ul_queue[i].id];
 
-            if (t) {
-                ul_r += t[0];
-                ul_t += t[1];
-                ul_s += t[2];
+            if (tu) {
+                ul_r += tu[0];
+                ul_t += tu[1];
+                ul_s += tu[2];
             }
             else {
                 ul_t += ul_queue[i].size || 0;
@@ -2665,24 +2755,27 @@ function percent_megatitle() {
     }
     if (dl_t) {
         dl_t += tp['dlc'] || 0;
-        dl_r += tp['dlc'] || 0
+        dl_r += tp['dlc'] || 0;
     }
     if (ul_t) {
         ul_t += tp['ulc'] || 0;
-        ul_r += tp['ulc'] || 0
+        ul_r += tp['ulc'] || 0;
     }
 
-    var x_ul = Math.floor(ul_r / ul_t * 100) || 0,
-        x_dl = Math.floor(dl_r / dl_t * 100) || 0
+    var x_ul = Math.floor(ul_r / ul_t * 100) || 0;
+    mega.ui.tpp.setTotalProgress(x_ul, 'ul');
+    var x_dl = Math.floor(dl_r / dl_t * 100) || 0;
+    mega.ui.tpp.setTotalProgress(x_dl, 'dl');
+    var t;
 
     if (dl_t && ul_t) {
-        t = ' \u2191 ' + x_dl + '% \u2193 ' + x_ul + '%';
+        t = ' \u2193 ' + x_dl + '% \u2191 ' + x_ul + '%';
     }
     else if (dl_t) {
-        t = ' ' + x_dl + '%';
+        t = ' \u2193 ' + x_dl + '%';
     }
     else if (ul_t) {
-        t = ' ' + x_ul + '%';
+        t = ' \u2191 ' + x_ul + '%';
     }
     else {
         t = '';
@@ -2691,24 +2784,33 @@ function percent_megatitle() {
 
     d_deg = 360 * x_dl / 100;
     u_deg = 360 * x_ul / 100;
+
+    updateTransfersSidebarIcon(d_deg, u_deg);
+    megatitle(t);
+}
+
+function updateTransfersSidebarIcon(d_deg, u_deg) {
+    var $dl_rchart = $('.transfers .download .nw-fm-chart0.right-c p');
+    var $dl_lchart = $('.transfers .download .nw-fm-chart0.left-c p');
+    var $ul_rchart = $('.transfers .upload .nw-fm-chart0.right-c p');
+    var $ul_lchart = $('.transfers .upload .nw-fm-chart0.left-c p');
+
     if (d_deg <= 180) {
-        $('.download .nw-fm-chart0.right-c p').css('transform', 'rotate(' + d_deg + 'deg)');
-        $('.download .nw-fm-chart0.left-c p').css('transform', 'rotate(0deg)');
+        $dl_rchart.css('transform', 'rotate(' + d_deg + 'deg)');
+        $dl_lchart.css('transform', 'rotate(0deg)');
     }
     else {
-        $('.download .nw-fm-chart0.right-c p').css('transform', 'rotate(180deg)');
-        $('.download .nw-fm-chart0.left-c p').css('transform', 'rotate(' + (d_deg - 180) + 'deg)');
+        $dl_rchart.css('transform', 'rotate(180deg)');
+        $dl_lchart.css('transform', 'rotate(' + (d_deg - 180) + 'deg)');
     }
     if (u_deg <= 180) {
-        $('.upload .nw-fm-chart0.right-c p').css('transform', 'rotate(' + u_deg + 'deg)');
-        $('.upload .nw-fm-chart0.left-c p').css('transform', 'rotate(0deg)');
+        $ul_rchart.css('transform', 'rotate(' + u_deg + 'deg)');
+        $ul_lchart.css('transform', 'rotate(0deg)');
     }
     else {
-        $('.upload .nw-fm-chart0.right-c p').css('transform', 'rotate(180deg)');
-        $('.upload .nw-fm-chart0.left-c p').css('transform', 'rotate(' + (u_deg - 180) + 'deg)');
+        $ul_rchart.css('transform', 'rotate(180deg)');
+        $ul_lchart.css('transform', 'rotate(' + (u_deg - 180) + 'deg)');
     }
-
-    megatitle(t);
 }
 
 function hostname(url) {
@@ -2980,7 +3082,11 @@ function getBaseUrl() {
  */
 function getAppBaseUrl() {
     var l = location;
-    return (l.origin !== 'null' && l.origin || (l.protocol + '//' + l.hostname)) + l.pathname;
+    var base = (l.origin !== 'null' && l.origin || (l.protocol + '//' + l.hostname));
+    if (is_extension) {
+        base += l.pathname;
+    }
+    return base;
 }
 
 /**
@@ -3659,6 +3765,10 @@ mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
         ASSERT(ulQueue._running === 0, 'ulQueue._running inconsistency on completion');
         ulQueue._pending = [];
         ulQueue.setSize((fmconfig.ul_maxSlots | 0) || 4);
+
+        if (page !== 'download') {
+            mega.ui.tpp.reset('ul');
+        }
     }
     if (!dl_queue.some(isQueueActive)) {
         dl_queue = new DownloadQueue();
@@ -3669,6 +3779,10 @@ mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
 
         dlmanager._quotaPushBack = {};
         dlmanager._dlQuotaListener = [];
+
+        if (page !== 'download') {
+            mega.ui.tpp.reset('dl');
+        }
     }
 
     if (!dlmanager.isDownloading && !ulmanager.isUploading) {
@@ -4036,6 +4150,11 @@ mega.utils.logout = function megaUtilsLogout() {
         if (fmdb && fmconfig.dbDropOnLogout) {
             step++;
             fmdb.drop().always(finishLogout);
+        }
+        if (!megaChatIsDisabled) {
+            if (typeof(megaChat) !== 'undefined' && typeof(megaChat.userPresence) !== 'undefined') {
+                megaChat.userPresence.disconnect();
+            }
         }
         if (u_privk && !loadfm.loading) {
             // Use the 'Session Management Logout' API call to kill the current session
@@ -4627,6 +4746,8 @@ var watchdog = Object.freeze({
     queryQueue: {},
     // Holds query replies if cached
     replyCache: {},
+    // waiting queries
+    waitingQueries: {},
 
     /** setup watchdog/webstorage listeners */
     setup: function() {
@@ -4656,9 +4777,13 @@ var watchdog = Object.freeze({
      * @param {String} what Parameter
      * @param {String} timeout ms
      * @param {String} cache   preserve result
+     * @param {Object} [data]   data to be sent with the query
+     * @param {bool} [expectsSingleAnswer]   pass true if your query is expected to receive only single answer (this
+     * would speed up and resolve the returned promise when the first answer is received and won't wait for the full
+     * `timeout` to gather more replies)
      * @return {MegaPromise}
      */
-    query: function(what, timeout, cache) {
+    query: function(what, timeout, cache, data, expectsSingleAnswer) {
         var self = this;
         var token = mRandomToken();
         var promise = new MegaPromise();
@@ -4678,20 +4803,42 @@ var watchdog = Object.freeze({
             }
             this.queryQueue[token] = [];
 
+            var tmpData;
+            if (!data) {
+                tmpData = {};
+            }
+            else {
+                tmpData = clone(data);
+            }
+            tmpData['reply'] = token;
+
             Soon(function() {
-                self.notify('Q!' + what, { reply: token });
+                self.notify('Q!' + what, tmpData);
             });
 
-            // wait for reply and fullfil/reject the promise
-            setTimeout(function() {
-                if (self.queryQueue[token].length) {
-                    promise.resolve(self.queryQueue[token]);
-                }
-                else {
-                    promise.reject(EACCESS);
-                }
-                delete self.queryQueue[token];
-            }, timeout || 200);
+            if (!expectsSingleAnswer) {
+                // wait for reply and fullfil/reject the promise
+                setTimeout(function () {
+                    if (self.queryQueue[token].length) {
+                        promise.resolve(self.queryQueue[token]);
+                    }
+                    else {
+                        promise.reject(EACCESS);
+                    }
+                    delete self.queryQueue[token];
+                }, timeout || 200);
+            }
+            else {
+                promise.timer = setTimeout(function () {
+                    if (promise.state() === 'pending') {
+                        promise.reject(EACCESS);
+                        delete self.queryQueue[token];
+                        delete self.waitingQueries[token];
+                    }
+                }, timeout || 200);
+
+                self.waitingQueries[token] = promise;
+            }
         }
         else {
             promise = MegaPromise.reject(EEXIST);
@@ -4727,6 +4874,21 @@ var watchdog = Object.freeze({
                 if (this.replyCache[strg.data.query]) {
                     this.replyCache[strg.data.query].push(strg.data.value);
                 }
+                // if there is a promise in .waitingQueries, that means that this query is expecting only 1 response
+                // so we can resolve it immediately.
+                if (this.waitingQueries[strg.data.token]) {
+                    var self = this;
+
+                    clearTimeout(this.waitingQueries[strg.data.token].timer);
+                    this.waitingQueries[strg.data.token]
+                        .always(function() {
+                            // cleanup after all other done/always/fail handlers...
+                            delete self.waitingQueries[strg.data.token];
+                            delete self.queryQueue[strg.data.token];
+                        })
+                        .resolve([strg.data.value]);
+
+                }
                 break;
 
             case 'Q!dlsize':
@@ -4745,7 +4907,7 @@ var watchdog = Object.freeze({
 
             case 'setrsa':
                 if (typeof dlmanager === 'object'
-                        && dlmanager.isOverFreeQuota) {
+                        && (dlmanager.isOverFreeQuota || dlmanager.onOverquotaWithAchievements)) {
 
                     var sid = strg.data[1];
                     var type = strg.data[0];
@@ -4811,15 +4973,18 @@ var watchdog = Object.freeze({
                 }
                 break;
 
-            case 'idbchange':
-                mBroadcaster.sendMessage('idbchange:' + strg.data.name, [strg.data.key, strg.data.value]);
+            default:
+                mBroadcaster.sendMessage("watchdog:" + msg, strg);
+
                 break;
         }
 
         delete localStorage[ev.key];
     }
 });
-watchdog.setup();
+mBroadcaster.once('boot_done', function() {
+    watchdog.setup();
+});
 
 /**
  * Simple alias that will return a random number in the range of: a < b
@@ -5393,6 +5558,10 @@ function getGatewayName(gatewayId, gatewayOpt) {
         16: {
             name: 'ecp',                    // E-Comprocessing
             displayName: l[6952] + ' (ECP)' // Credit card (ECP)
+        },
+        17: {
+            name: 'sabadell',
+            displayName: 'Sabadell'
         },
         999: {
             name: 'wiretransfer',

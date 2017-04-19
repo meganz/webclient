@@ -117,8 +117,20 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
 
         if (self.type === "private") {
             var targetUserJid = self.getParticipantsExceptMe()[0];
-            var targetUserNode = self.megaChat.getContactFromJid(targetUserJid);
-            assert(M.u, 'M.u does not exists');
+
+            var targetUserNode;
+            if (targetUserJid) {
+                targetUserNode = self.megaChat.getContactFromJid(targetUserJid);
+                assert(M.u, 'M.u does not exists');
+            }
+            else if(msg.userId) {
+                targetUserNode = M.u[msg.userId];
+            }
+            else {
+                console.error("Missing participant in a 1on1 room.");
+                return;
+            }
+
 
             assert(targetUserNode && targetUserNode.u, 'No hash found for participant');
             assert(M.u[targetUserNode.u], 'User not found in M.u');
@@ -141,8 +153,6 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
 
 
             assert(contactHash, 'Invalid hash for user (extracted from inc. message)');
-
-            //TODO: last interaction for group chat
         }
         else {
             throw new Error("Not implemented");
@@ -1020,18 +1030,11 @@ ChatRoom.prototype.attachNodes = function(ids) {
                 var node = M.d[nodeId];
                 nodesMeta.push({
                     'h': node.h,
-                    'key': node.key,
                     'k': node.k,
-                    'a': node.a,
                     't': node.t,
                     'name': node.name,
                     's': node.s,
                     'fa': node.fa,
-                    'ar': {
-                        'n': node.ar.n,
-                        't': node.ar.t,
-                        'c': node.ar.c
-                    },
                     'ts': node.ts
                 });
             });

@@ -85,20 +85,16 @@ var ConversationRightArea = React.createClass({
         var myPresence = room.megaChat.xmppPresenceToCssClass(M.u[u_handle].presence);
 
         var startAudioCallButton = 
-                        <div className={"link-button" + (!contact.presence? " disabled" : "")} onClick={() => {
-                            if (contact.presence && contact.presence !== "offline") {
-                                room.startAudioCall();
-                            }
+                        <div className={"link-button"} onClick={() => {
+                            room.startAudioCall();
                         }}>
             <i className="small-icon audio-call"></i>
             {__(l[5896])}
         </div>;
 
         var startVideoCallButton = 
-                    <div className={"link-button" + (!contact.presence? " disabled" : "")} onClick={() => {
-                        if (contact.presence && contact.presence !== "offline") {
-                            room.startVideoCall();
-                        }
+                    <div className={"link-button"} onClick={() => {
+                        room.startVideoCall();
                     }}>
             <i className="small-icon video-call"></i>
             {__(l[5897])}
@@ -1015,7 +1011,7 @@ var ConversationPanel = React.createClass({
 
 
         // turn on/off auto scroll to bottom.
-        if (isAtBottom === true) {
+        if (ps.isCloseToBottom(30) === true) {
             self.scrolledToBottom = true;
         }
         else {
@@ -1120,15 +1116,10 @@ var ConversationPanel = React.createClass({
                 self.props.chatRoom.messagesBuff.messagesHistoryIsLoading() === true
             )
         ) {
-            if (localStorage.megaChatPresence !== 'unavailable') {
-                self.loadingShown = true;
-            }
+            self.loadingShown = true;
         }
         else if (
-            self.props.chatRoom.messagesBuff.joined === true && (
-                self.props.chatRoom.messagesBuff.messages.length === 0 ||
-                !self.props.chatRoom.messagesBuff.haveMoreHistory()
-            )
+            self.props.chatRoom.messagesBuff.joined === true
         ) {
             delete self.loadingShown;
             var headerText = (
@@ -1525,14 +1516,23 @@ var ConversationPanel = React.createClass({
                         {__("Please confirm that you want to upload this image and share it in this chat room.")}
                     </div>
 
-                    <img src={self.state.pasteImageConfirmDialog[2]} style={{
-                        maxWidth: "90%",
-                        height: "auto",
-                        margin: '10px auto',
-                        display: 'block',
-                        border: '1px solid #ccc',
-                        borderRadius: '4px'
-                    }} />
+                    <img
+                        src={self.state.pasteImageConfirmDialog[2]}
+                        style={{
+                            maxWidth: "90%",
+                            height: "auto",
+                            maxHeight: $(document).outerHeight() * 0.3,
+                            margin: '10px auto',
+                            display: 'block',
+                            border: '1px solid #ccc',
+                            borderRadius: '4px'
+                        }}
+                        onLoad={function(e) {
+                            $(e.target).parents('.paste-image-chat').position({
+                                of: $(document.body)
+                            });
+                        }}
+                    />
                 </div>
             </ModalDialogsUI.ConfirmDialog>
         }

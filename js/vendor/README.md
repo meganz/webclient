@@ -21,6 +21,8 @@ Unless otherwise noted, they were released under a [MIT License].
 ---
 [autolinker.js]: Utility to Automatically Link URLs, Email Addresses, Phone Numbers, Twitter handles, and Hashtags in a given block of text/HTML.
 
+> **This is a fork**, [Compare the changes](https://github.com/gregjacobs/Autolinker.js/compare/master...meganz:master)
+
 ---
 [avatar.js]: Avatar Picker - A slick user experience for uploading, translating and cropping images to be used as avatars.
 
@@ -187,7 +189,7 @@ Unless otherwise noted, they were released under a [MIT License].
 [MIT License]: <https://opensource.org/licenses/MIT>
 [Emscripten]: <http://emscripten.org/>
 [asmcrypto.js]: <https://github.com/meganz/asmcrypto.js>
-[autolinker.js]: <https://github.com/gregjacobs/Autolinker.js/tree/0.12.3/dist>
+[autolinker.js]: <https://github.com/meganz/Autolinker.js>
 [avatar.js]: <https://github.com/meganz/avatar-picker>
 [bitcoin-math.js]: <https://github.com/meganz/bitcoin-math>
 [db.js]: <https://github.com/meganz/db.js>

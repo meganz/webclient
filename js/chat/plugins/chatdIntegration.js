@@ -460,6 +460,11 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
                                     });
                                 }
                                 chatRoom.leave(false);
+
+                                if (actionPacket.ou === u_handle) {
+                                    chatRoom.destroy();
+                                }
+
                                 // i had left, also do a chatd.leave!
                                 self.chatd.leave(
                                     base64urldecode(actionPacket.id)

@@ -270,8 +270,7 @@ var ConversationsList = React.createClass({
             var contact;
             if (
                 !chatRoom ||
-                !chatRoom.roomJid ||
-                chatRoom.stateIsLeftOrLeaving()
+                !chatRoom.roomJid
             ) {
                 return;
             }

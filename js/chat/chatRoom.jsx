@@ -620,10 +620,10 @@ ChatRoom.prototype.leave = function(triggerLeaveRequest) {
     var self = this;
 
     self._leaving = true;
+    self._closing = triggerLeaveRequest;
 
 
     self.members[u_handle] = 0;
-    //self.trackDataChange();
 
 
     if (triggerLeaveRequest) {

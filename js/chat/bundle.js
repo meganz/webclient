@@ -1368,6 +1368,20 @@ React.makeElement = React['createElement'];
 	    });
 	};
 
+	Chat.prototype._leaveAllGroupChats = function () {
+	    asyncApiReq({ 'a': 'mcf', 'v': Chatd.VERSION }).done(function (r) {
+	        r.c.forEach(function (chatRoomMeta) {
+	            if (chatRoomMeta.g === 1) {
+	                asyncApiReq({
+	                    "a": "mcr",
+	                    "id": chatRoomMeta.id,
+	                    "v": Chatd.VERSION
+	                });
+	            }
+	        });
+	    });
+	};
+
 	Chat.prototype.updateDashboard = function () {
 	    if (M.currentdirid === 'dashboard') {
 	        delay('dashboard:updchat', dashboardUI.updateChatWidget);
@@ -1685,7 +1699,7 @@ React.makeElement = React['createElement'];
 
 	        sortedConversations.forEach(function (chatRoom) {
 	            var contact;
-	            if (!chatRoom || !chatRoom.roomJid || chatRoom.stateIsLeftOrLeaving()) {
+	            if (!chatRoom || !chatRoom.roomJid) {
 	                return;
 	            }
 
@@ -4210,6 +4224,16 @@ React.makeElement = React['createElement'];
 	                                } },
 	                            React.makeElement("i", { className: "small-icon rounded-stop" }),
 	                            l[8633]
+	                        ) : null,
+	                        room._closing !== true && room.type === "group" && room.stateIsLeftOrLeaving() ? React.makeElement(
+	                            "div",
+	                            { className: "link-button red", onClick: function onClick() {
+	                                    if (self.props.onCloseClicked) {
+	                                        self.props.onCloseClicked();
+	                                    }
+	                                } },
+	                            React.makeElement("i", { className: "small-icon rounded-stop" }),
+	                            l[148]
 	                        ) : null
 	                    )
 	                )
@@ -4916,7 +4940,7 @@ React.makeElement = React['createElement'];
 	        var self = this;
 
 	        var room = this.props.chatRoom;
-	        if (!room || !room.roomJid || room.stateIsLeftOrLeaving()) {
+	        if (!room || !room.roomJid) {
 	            return null;
 	        }
 
@@ -5732,10 +5756,6 @@ React.makeElement = React['createElement'];
 	        }
 
 	        self.props.conversations.forEach(function (chatRoom) {
-	            if (chatRoom.stateIsLeftOrLeaving()) {
-	                return;
-	            }
-
 	            var otherParticipants = chatRoom.getParticipantsExceptMe();
 
 	            var contact;
@@ -10361,6 +10381,7 @@ React.makeElement = React['createElement'];
 	    var self = this;
 
 	    self._leaving = true;
+	    self._closing = triggerLeaveRequest;
 
 	    self.members[u_handle] = 0;
 

@@ -301,6 +301,17 @@ var ConversationRightArea = React.createClass({
                             </div>
                         ) : null
                         }
+                        { room._closing !== true && room.type === "group" && room.stateIsLeftOrLeaving() ? (
+                            <div className="link-button red" onClick={() => {
+                                if (self.props.onCloseClicked) {
+                                    self.props.onCloseClicked();
+                                }
+                            }}>
+                                <i className="small-icon rounded-stop"></i>
+                                {l[148]}
+                            </div>
+                        ) : null
+                        }
                     </div>
                 </div>
             </div>
@@ -1064,7 +1075,7 @@ var ConversationPanel = React.createClass({
         var self = this;
 
         var room = this.props.chatRoom;
-        if (!room || !room.roomJid || room.stateIsLeftOrLeaving()) {
+        if (!room || !room.roomJid) {
             return null;
         }
         // room is not active, don't waste DOM nodes, CPU and Memory (and save some avatar loading calls...)
@@ -1950,10 +1961,6 @@ var ConversationPanels = React.createClass({
         }
 
         self.props.conversations.forEach(function(chatRoom) {
-            if (chatRoom.stateIsLeftOrLeaving()) {
-                return;
-            }
-
             var otherParticipants = chatRoom.getParticipantsExceptMe();
 
             var contact;

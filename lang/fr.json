@@ -4070,6 +4070,24 @@
     "16451": "Retirer du volet de gauche",
     "16452": "Veuillez envisager de mettre votre syst\u00e8me d'exploitation \u00e0 jour",
     "16454": "ESPACE DE STOCKAGE UTILIS\u00c9 : donn\u00e9es temporairement non disponibles",
+    "16455": "Re\u00e7u de paiement MEGA",
+    "16456": "Re\u00e7u de paiement",
+    "16457": "Date de commande :",
+    "16458": "ID de commande :",
+    "16459": "No de GST :",
+    "16460": "Factur\u00e9",
+    "16461": "Mode de paiement :",
+    "16462": "Description",
+    "16463": "Prix",
+    "16464": "Total",
+    "16465": "Votre abonnement sera renouvel\u00e9 aux prix indiqu\u00e9s ci-dessus \u00e0 moins que vous ne l'annuliez sur [A1]https:\/\/mega.nz\/account[\/A1] avant la fin de la p\u00e9riode de facturation.",
+    "16466": "Si vous avez des questions ou pr\u00e9occupations concernant ce paiement, veuillez contacter notre \u00e9quipe de soutien \u00e0 [A1]support@mega.nz[\/A1] ou r\u00e9viser [A2]ici[\/A2] votre historique d'achat",
+    "16467": "Re\u00e7u de remboursement MEGA",
+    "16468": "Re\u00e7u de remboursement",
+    "16469": "Le fichier ou dossier du lien que vous tentez d'ouvrir n'a pas \u00e9t\u00e9 trouv\u00e9. Vous \u00eates probablement connect\u00e9 \u00e0 un compte diff\u00e9rent. Veuillez vous connecter au bon compte et ressayer.",
+    "16470": "Le fichier ou dossier est introuvable",
+    "16471": "The provided key is invalid.",
+    "16472": "Please check that the key is correct or ask the creator of the link again.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4318,6 +4336,8 @@
         "email-sent-successfully": 16351,
         "always-show-selected-presence-even-when-disconnected": 16387,
         "online-autoaway-checkbox-field": 16389,
-        "no-files-in-cloud-drive": 16394
+        "no-files-in-cloud-drive": 16394,
+        "provided-key-invalid": 16471,
+        "please-check-key-is-correct": 16472
     }
 }

@@ -322,9 +322,6 @@ UserPresence.prototype.reconnect = function presence_reconnect(self) {
                 self.keepalivechecktimer = false;
             }
 
-            if (!this.canceled) {
-                self.connectionRetryManager.doConnectionRetry();
-            }
 
             if (self.connectedcb) {
                 self.connectedcb(false);

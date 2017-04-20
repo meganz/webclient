@@ -216,17 +216,19 @@ Chatd.Shard = function(chatd, shard) {
                     })
                         .done(function(mcurl) {
                             self.url = mcurl;
-                            return self.reconnect();
+                            self.reconnect();
                         })
                         .fail(function(r) {
                             if (r === EEXPIRED) {
                                 if (megaChat && megaChat.plugins && megaChat.plugins.chatdIntegration) {
                                     megaChat.plugins.chatdIntegration.requiresUpdate();
+                                    return;
                                 }
                             }
+                            if (connectionRetryManager._$connectingPromise) {
+                                connectionRetryManager._$connectingPromise.reject();
+                            }
                         });
-
-
                 },
                 /**
                  * A Callback that will trigger the 'forceDisconnect' procedure for this type of connection (Karere/Chatd/etc)
@@ -363,7 +365,6 @@ Chatd.Shard.prototype.reconnect = function() {
     self.s.onerror = function(e) {
         self.logger.error("WebSocket error:", e);
         clearTimeout(self.keepAliveTimer);
-        self.connectionRetryManager.doConnectionRetry();
 
         self.chatd.trigger('onError', {
             shard: self

@@ -4070,6 +4070,24 @@
     "16451": "Remove from left pane",
     "16452": "Please consider updating your operating system.",
     "16454": "USED STORAGE: Data temporarily unavailable",
+    "16455": "\u041a\u0432\u0438\u0442\u0430\u043d\u0446\u0438\u044f \u043e\u0431 \u043e\u043f\u043b\u0430\u0442\u0435 MEGA",
+    "16456": "\u041a\u0432\u0438\u0442\u0430\u043d\u0446\u0438\u044f \u043e\u0431 \u043e\u043f\u043b\u0430\u0442\u0435",
+    "16457": "\u0414\u0430\u0442\u0430 \u0437\u0430\u043a\u0430\u0437\u0430:",
+    "16458": "\u041d\u043e\u043c\u0435\u0440 \u0437\u0430\u043a\u0430\u0437\u0430:",
+    "16459": "\u041d\u043e\u043c\u0435\u0440 GST:",
+    "16460": "\u0410\u0434\u0440\u0435\u0441",
+    "16461": "\u0421\u043f\u043e\u0441\u043e\u0431 \u043e\u043f\u043b\u0430\u0442\u044b:",
+    "16462": "\u041e\u043f\u0438\u0441\u0430\u043d\u0438\u0435",
+    "16463": "\u0426\u0435\u043d\u0430",
+    "16464": "\u0412\u0441\u0435\u0433\u043e",
+    "16465": "Your subscription will renew at the rates stated above unless you cancel it at [A1]https:\/\/mega.nz\/account[\/A1] prior to the end of the billing period.",
+    "16466": "If you have any questions or concerns regarding this payment, please contact our support team at [A1]support@mega.nz[\/A1] or review your purchase history [A2]here[\/A2]",
+    "16467": "\u0412\u043e\u0437\u0432\u0440\u0430\u0442 \u0441\u0440\u0435\u0434\u0441\u0442\u0432 MEGA",
+    "16468": "\u0412\u043e\u0437\u0432\u0440\u0430\u0442 \u0441\u0440\u0435\u0434\u0441\u0442\u0432",
+    "16469": "The file\/folder of the link that you are trying to open was not found. You are probably logged in to a different account. Please, log in to the correct account and try again.",
+    "16470": "File\/folder not found",
+    "16471": "The provided key is invalid.",
+    "16472": "Please check that the key is correct or ask the creator of the link again.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4318,6 +4336,8 @@
         "email-sent-successfully": 16351,
         "always-show-selected-presence-even-when-disconnected": 16387,
         "online-autoaway-checkbox-field": 16389,
-        "no-files-in-cloud-drive": 16394
+        "no-files-in-cloud-drive": 16394,
+        "provided-key-invalid": 16471,
+        "please-check-key-is-correct": 16472
     }
 }

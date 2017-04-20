@@ -16282,5 +16282,77 @@
     "16454": {
         "text": "USED STORAGE: Data temporarily unavailable",
         "context": "A label to show that the information related to the account usage is temporarily unavailable."
+    },
+    "16455": {
+        "text": "MEGA Payment Receipt",
+        "context": "Subject line for the payment receipt email. This gets sent to users after they have made a payment."
+    },
+    "16456": {
+        "text": "Payment Receipt",
+        "context": "Header text of the payment receipt email, sent to users after they have made a payment."
+    },
+    "16457": {
+        "text": "Order Date:",
+        "context": "Label for a field on the payment receipt email, that indicates the date of the user's order (payment) will appear next to this label."
+    },
+    "16458": {
+        "text": "Order ID:",
+        "context": "Order id label for the payment receipt email. This label indicates that the identification number for the order (payment) will appear beside it."
+    },
+    "16459": {
+        "text": "GST No:",
+        "context": "Label for a New Zealand GST tax number. GST should not be translated (the number shown will always be a New Zealand GST tax number), only the abbreviation 'No' for numero, or number.\r\nI.e. in Spanish No becomes N\u00fam, so the final string is GST N\u00fam."
+    },
+    "16460": {
+        "text": "Billed",
+        "context": "Label on the payment receipt email. This label is referring to a section of the email where the user's billing details (name, address, etc) are present."
+    },
+    "16461": {
+        "text": "Paid with:",
+        "context": "Label on the payment receipt email, referencing the details that the user made the payment with. For example, the user may have paid with a Visa card, or a certain bitcoin address, or Boleto, etc"
+    },
+    "16462": {
+        "text": "Description",
+        "context": "Label on the payment receipt email, referencing a description of the product the user purchased."
+    },
+    "16463": {
+        "text": "Price",
+        "context": "Label on the payment receipt email, referencing the section that describes the price that the user pays for the product."
+    },
+    "16464": {
+        "text": "Total",
+        "context": "Label on the payment receipt email, referencing the section that lists the total amount payable (including the price of the item and the tax)"
+    },
+    "16465": {
+        "text": "Your subscription will renew at the rates stated above unless you cancel it at [A1]https:\/\/mega.nz\/account[\/A1] prior to the end of the billing period.",
+        "context": ""
+    },
+    "16466": {
+        "text": "If you have any questions or concerns regarding this payment, please contact our support team at [A1]support@mega.nz[\/A1] or review your purchase history [A2]here[\/A2]",
+        "context": "Information on the payment receipt email that lets the user know they can contact support if they have problems, and links them to a place they can see a list of their purchases.\r\nPlease leave the [A1] [\/A1] tags in place as they will be converted into links."
+    },
+    "16467": {
+        "text": "MEGA Refund Receipt",
+        "context": "Subject line of the refund receipt email sent when a user has had a successful refund."
+    },
+    "16468": {
+        "text": "Refund Receipt",
+        "context": "Title of the refund receipt email sent to users when their refund has been successful."
+    },
+    "16469": {
+        "text": "The file\/folder of the link that you are trying to open was not found. You are probably logged in to a different account. Please, log in to the correct account and try again.",
+        "context": "Title of the dialog displayed when trying to open a link of an internal node and this node is not found in the account in which the user is logged in."
+    },
+    "16470": {
+        "text": "File\/folder not found",
+        "context": "Title of the dialog displayed when trying to open a link of an internal node and this node is not found in the account in which the user is logged in - (String as short as possible)."
+    },
+    "16471": {
+        "text": "The provided key is invalid.\r\n",
+        "context": "On a public file or folder link which does not have a decryption key, the user is asked to enter a decryption key. This is the error message shown when the decryption key entered is not correct."
+    },
+    "16472": {
+        "text": "Please check that the key is correct or ask the creator of the link again.",
+        "context": "On a public file or folder link which does not have a decryption key, the user is asked to enter a decryption key. This is a second message which is shown when the decryption key entered is not correct."
     }
 }

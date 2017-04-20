@@ -784,7 +784,9 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                 }
             }
         };
-        ChatdIntegration._ensureKeysAreLoaded(keys).always(seedKeys);
+        ChatdIntegration._waitForProtocolHandler(chatRoom, function() {
+            ChatdIntegration._ensureKeysAreLoaded(keys).always(seedKeys);
+        });
 
         if (chatRoom.roomJid === self.chatRoom.roomJid) {
             self.trackDataChange();

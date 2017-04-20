@@ -42,6 +42,7 @@ var ChatdIntegration = function(megaChat) {
             assert(chatRoom.type, 'missing room type');
             self._attachToChatRoom(chatRoom);
         });
+
         if (ChatdIntegration.mcfHasFinishedPromise.state() === 'pending') {
             if (fminitialized === true) {
                 // old db, which means that the 'mcf' is empty and the 'f' was not called.
@@ -127,6 +128,7 @@ var ChatdIntegration = function(megaChat) {
  * @type {MegaPromise}
  */
 ChatdIntegration.mcfHasFinishedPromise = new MegaPromise();
+
 
 /**
  * Resolved/rejected when all chats are added to megaChat.chats, mcurls are received, etc. E.g. they are ready for
@@ -277,7 +279,7 @@ ChatdIntegration.prototype._getKarereObjFromChatdObj = function(chatdEventObj) {
     return messageObject;
 };
 
-ChatdIntegration.prototype.waitForProtocolHandler = function (chatRoom, cb) {
+ChatdIntegration._waitForProtocolHandler = function (chatRoom, cb) {
     if (chatRoom.protocolHandler) {
         cb();
     }
@@ -1010,7 +1012,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                         }
                         $(chatRoom).trigger('onMembersUpdated');
                     }
-                    self.waitForProtocolHandler(chatRoom, addParticipant);
+                    ChatdIntegration._waitForProtocolHandler(chatRoom, addParticipant);
                 }
 
                 if (eventData.userId === u_handle) {
@@ -1036,7 +1038,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
 
                     $(chatRoom).trigger('onMembersUpdated');
                 }
-                self.waitForProtocolHandler(chatRoom, deleteParticipant);
+                ChatdIntegration._waitForProtocolHandler(chatRoom, deleteParticipant);
             }
         }
     });

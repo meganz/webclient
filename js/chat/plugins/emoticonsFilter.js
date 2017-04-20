@@ -8,29 +8,15 @@
 var EmoticonsFilter = function(megaChat) {
     var self = this;
 
-    self.emoticonsRegExp = false;
+    self.emoticonsRegExp = /((^|\W?)(:[a-zA-Z0-9\-_]+:)(?=(\s|$)))/gi;
     self.map = {};
 
     self.emoticonsLoading = megaChat.getEmojiDataSet('emojis')
         .done(function(emojis) {
             self.emojis = emojis;
-
-
-            var escapedRegExps = [];
             $.each(emojis, function(k, meta) {
-                var slug = ":" + meta.n + ":";
-
-                var txt = "(^|\\W?)(" + RegExpEscape(slug) + ")(?=(\\s|$))";
-
-                self.map[meta.n] = meta.u;
-
-                escapedRegExps.push(
-                    txt
-                );
+                self.map[meta.n.toLowerCase()] = meta.u;
             });
-
-            var regExpStr = "(" + escapedRegExps.join("|") + ")";
-            self.emoticonsRegExp = new RegExp(regExpStr, "gi");
         });
 
 
@@ -84,28 +70,17 @@ EmoticonsFilter.prototype.processHtmlMessage = function(messageContents) {
     }
 
     // convert legacy :smile: emojis to utf
-    messageContents = messageContents.replace(self.emoticonsRegExp, function(match) {
-        var foundSlug = $.trim(match.toLowerCase());
-        var textSlug = foundSlug;
+    messageContents = messageContents.replace(self.emoticonsRegExp, function(match, p1, p2, p3, p4) {
+        var foundSlug = $.trim(p3.toLowerCase());
+        // remove start/end ":"
+        foundSlug = foundSlug.substr(1).substr(0, foundSlug.length - 2);
 
-        if (foundSlug.substr(0, 1) === ":" && foundSlug.substr(-1, 1) === ":") {
-            foundSlug = foundSlug.substr(1, foundSlug.length - 2);
-        }
-        if (!self.map[foundSlug]) {
-            foundSlug = ":" + foundSlug + ":";
-        }
         var utf = self.map[foundSlug];
-
-        if (utf) {
-            if (!utf) {
-                return match;
-            }
-            var filename = twemoji.convert.toCodePoint(utf);
-
-            return utf;
-        } else {
+        if (!utf) {
             return match;
         }
+
+        return p2 + utf + p4;
     });
 
     // convert any utf emojis to images

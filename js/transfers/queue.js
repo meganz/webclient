@@ -546,6 +546,7 @@ TransferQueue.prototype.push = function(cl) {
 
     if (localStorage.ignoreLimitedBandwidth) {
         showToast();
+        dlmanager.setUserFlags();
         return MegaQueue.prototype.push.apply(this, arguments);
     }
 
@@ -578,6 +579,9 @@ TransferQueue.prototype.push = function(cl) {
 
             // this will include currently-downloading and the ClassFiles in hold atm.
             size += dlmanager.getCurrentDownloadsSize();
+
+            // Set user flags, registered, pro, achievements
+            dlmanager.setUserFlags();
 
             // Fire "Query bandwidth quota"
             api_req({a: 'qbq', s: size}, {

@@ -4027,10 +4027,8 @@ React.makeElement = React['createElement'];
 
 	        var startAudioCallButton = React.makeElement(
 	            "div",
-	            { className: "link-button" + (!contact.presence ? " disabled" : ""), onClick: function onClick() {
-	                    if (contact.presence && contact.presence !== "offline") {
-	                        room.startAudioCall();
-	                    }
+	            { className: "link-button", onClick: function onClick() {
+	                    room.startAudioCall();
 	                } },
 	            React.makeElement("i", { className: "small-icon audio-call" }),
 	            __(l[5896])
@@ -4038,10 +4036,8 @@ React.makeElement = React['createElement'];
 
 	        var startVideoCallButton = React.makeElement(
 	            "div",
-	            { className: "link-button" + (!contact.presence ? " disabled" : ""), onClick: function onClick() {
-	                    if (contact.presence && contact.presence !== "offline") {
-	                        room.startVideoCall();
-	                    }
+	            { className: "link-button", onClick: function onClick() {
+	                    room.startVideoCall();
 	                } },
 	            React.makeElement("i", { className: "small-icon video-call" }),
 	            __(l[5897])
@@ -6071,7 +6067,7 @@ React.makeElement = React['createElement'];
 
 	            var icon = React.makeElement(
 	                "span",
-	                { className: "transfer-filtype-icon " + fileIcon(node) },
+	                { className: "transfer-filetype-icon " + fileIcon(node) },
 	                " "
 	            );
 
@@ -6092,7 +6088,7 @@ React.makeElement = React['createElement'];
 	                    { withArrow: true },
 	                    React.makeElement(
 	                        Tooltips.Handler,
-	                        { className: "transfer-filtype-icon " + fileIcon(node) },
+	                        { className: "transfer-filetype-icon " + fileIcon(node) },
 	                        " "
 	                    ),
 	                    React.makeElement(
@@ -7112,7 +7108,16 @@ React.makeElement = React['createElement'];
 	            e.stopPropagation();
 	            return;
 	        } else if (key === 13) {
-	            if ($.trim(val).length === 0) {
+
+	            if (e.altKey) {
+	                var content = element.value;
+	                var cursorPos = self.getCursorPosition(element);
+	                content = content.substring(0, cursorPos) + "\n" + content.substring(cursorPos, content.length);
+
+	                self.setState({ typedMessage: content });
+	                self.onUpdateCursorPosition = cursorPos + 1;
+	                e.preventDefault();
+	            } else if ($.trim(val).length === 0) {
 	                e.preventDefault();
 	            }
 	        } else if (key === 38) {
@@ -7253,6 +7258,12 @@ React.makeElement = React['createElement'];
 	            this.initScrolling();
 	        } else {
 	            this.updateScroll();
+	        }
+	        if (self.onUpdateCursorPosition) {
+	            var $container = $(ReactDOM.findDOMNode(this));
+	            var el = $('.chat-textarea:visible textarea:visible', $container)[0];
+	            el.selectionStart = el.selectionEnd = self.onUpdateCursorPosition;
+	            self.onUpdateCursorPosition = false;
 	        }
 	    },
 	    initScrolling: function initScrolling() {
@@ -8689,7 +8700,7 @@ React.makeElement = React['createElement'];
 	                        }
 
 	                        var addToCloudDrive = function addToCloudDrive() {
-	                            M.injectNodes(v, M.RootID, false, function (res) {
+	                            M.injectNodes(v, M.RootID, function (res) {
 	                                if (res === 0) {
 	                                    msgDialog('info', __(l[8005]), __(l[8006]));
 	                                }
@@ -9985,8 +9996,17 @@ React.makeElement = React['createElement'];
 
 	        if (self.type === "private") {
 	            var targetUserJid = self.getParticipantsExceptMe()[0];
-	            var targetUserNode = self.megaChat.getContactFromJid(targetUserJid);
-	            assert(M.u, 'M.u does not exists');
+
+	            var targetUserNode;
+	            if (targetUserJid) {
+	                targetUserNode = self.megaChat.getContactFromJid(targetUserJid);
+	                assert(M.u, 'M.u does not exists');
+	            } else if (msg.userId) {
+	                targetUserNode = M.u[msg.userId];
+	            } else {
+	                console.error("Missing participant in a 1on1 room.");
+	                return;
+	            }
 
 	            assert(targetUserNode && targetUserNode.u, 'No hash found for participant');
 	            assert(M.u[targetUserNode.u], 'User not found in M.u');

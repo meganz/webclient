@@ -85,20 +85,16 @@ var ConversationRightArea = React.createClass({
         var myPresence = room.megaChat.xmppPresenceToCssClass(M.u[u_handle].presence);
 
         var startAudioCallButton = 
-                        <div className={"link-button" + (!contact.presence? " disabled" : "")} onClick={() => {
-                            if (contact.presence && contact.presence !== "offline") {
-                                room.startAudioCall();
-                            }
+                        <div className={"link-button"} onClick={() => {
+                            room.startAudioCall();
                         }}>
             <i className="small-icon audio-call"></i>
             {__(l[5896])}
         </div>;
 
         var startVideoCallButton = 
-                    <div className={"link-button" + (!contact.presence? " disabled" : "")} onClick={() => {
-                        if (contact.presence && contact.presence !== "offline") {
-                            room.startVideoCall();
-                        }
+                    <div className={"link-button"} onClick={() => {
+                        room.startVideoCall();
                     }}>
             <i className="small-icon video-call"></i>
             {__(l[5897])}

@@ -515,12 +515,12 @@ var Help = (function() {
                 return String.fromCharCode(parseInt(number, 16));
             });
             var words = search.split(((lang == 'ct') || (lang == 'jp')) ? '' : /\s+/)
-                        .filter(function(f) { return f.length; })
-                        .map(function(w) { return new RegExp(w, 'i'); });
+                        .filter(function(word) { return word.length; })// filter out empty strings.
+                        .map(function(pattern) { return new RegExp(pattern, 'i'); });
 
             var articles = idx.all.filter(function(doc) {
-                return words.filter(function(w) {
-                    return !!doc.indexedTitle.match(w) || !!doc.body.match(w);
+                return words.filter(function(target) {
+                    return !!doc.indexedTitle.match(target) || !!doc.body.match(target);
                 }).length === words.length;
             });
 

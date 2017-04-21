@@ -1368,6 +1368,20 @@ React.makeElement = React['createElement'];
 	    });
 	};
 
+	Chat.prototype._leaveAllGroupChats = function () {
+	    asyncApiReq({ 'a': 'mcf', 'v': Chatd.VERSION }).done(function (r) {
+	        r.c.forEach(function (chatRoomMeta) {
+	            if (chatRoomMeta.g === 1) {
+	                asyncApiReq({
+	                    "a": "mcr",
+	                    "id": chatRoomMeta.id,
+	                    "v": Chatd.VERSION
+	                });
+	            }
+	        });
+	    });
+	};
+
 	Chat.prototype.updateDashboard = function () {
 	    if (M.currentdirid === 'dashboard') {
 	        delay('dashboard:updchat', dashboardUI.updateChatWidget);
@@ -4211,7 +4225,7 @@ React.makeElement = React['createElement'];
 	                            React.makeElement("i", { className: "small-icon rounded-stop" }),
 	                            l[8633]
 	                        ) : null,
-	                        room.type === "group" && room.stateIsLeftOrLeaving() ? React.makeElement(
+	                        room._closing !== true && room.type === "group" && room.stateIsLeftOrLeaving() ? React.makeElement(
 	                            "div",
 	                            { className: "link-button red", onClick: function onClick() {
 	                                    if (self.props.onCloseClicked) {
@@ -10367,6 +10381,7 @@ React.makeElement = React['createElement'];
 	    var self = this;
 
 	    self._leaving = true;
+	    self._closing = triggerLeaveRequest;
 
 	    self.members[u_handle] = 0;
 
@@ -10385,6 +10400,9 @@ React.makeElement = React['createElement'];
 
 	            return self.megaChat.karere.leaveChat(self.roomJid).done(function () {
 	                self.setState(ChatRoom.STATE.LEFT);
+	                if (triggerLeaveRequest === true) {
+	                    self.destroy();
+	                }
 	            });
 	        } else {
 	            return;
@@ -10392,10 +10410,6 @@ React.makeElement = React['createElement'];
 	    } else {
 	        self.setState(ChatRoom.STATE.LEFT);
 	    }
-
-	    self.megaChat.refreshConversations();
-
-	    self.trackDataChange();
 	};
 
 	ChatRoom.prototype.destroy = function (notifyOtherDevices, noRedirect) {
@@ -10409,11 +10423,11 @@ React.makeElement = React['createElement'];
 	        self.leave(notifyOtherDevices);
 	    }
 
-	    Soon(function () {
-	        if (self.isCurrentlyActive) {
-	            self.isCurrentlyActive = false;
-	        }
+	    if (self.isCurrentlyActive) {
+	        self.isCurrentlyActive = false;
+	    }
 
+	    Soon(function () {
 	        mc.chats.remove(roomJid);
 
 	        if (!noRedirect) {

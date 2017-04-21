@@ -1763,6 +1763,20 @@ Chat.prototype._destroyAllChatsFromChatd = function() {
     });
 };
 
+Chat.prototype._leaveAllGroupChats = function() {
+    asyncApiReq({'a': 'mcf', 'v': Chatd.VERSION}).done(function(r) {
+        r.c.forEach(function(chatRoomMeta) {
+            if (chatRoomMeta.g === 1) {
+                asyncApiReq({
+                    "a":"mcr", // request identifier
+                    "id": chatRoomMeta.id, // chat id
+                    "v": Chatd.VERSION
+                });
+            }
+        })
+    });
+};
+
 Chat.prototype.updateDashboard = function() {
     if (M.currentdirid === 'dashboard') {
         delay('dashboard:updchat', dashboardUI.updateChatWidget);

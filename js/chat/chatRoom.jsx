@@ -620,10 +620,10 @@ ChatRoom.prototype.leave = function(triggerLeaveRequest) {
     var self = this;
 
     self._leaving = true;
+    self._closing = triggerLeaveRequest;
 
 
     self.members[u_handle] = 0;
-    //self.trackDataChange();
 
 
     if (triggerLeaveRequest) {
@@ -643,6 +643,9 @@ ChatRoom.prototype.leave = function(triggerLeaveRequest) {
 
             return self.megaChat.karere.leaveChat(self.roomJid).done(function () {
                 self.setState(ChatRoom.STATE.LEFT);
+                if (triggerLeaveRequest === true) {
+                    self.destroy();
+                }
             });
         }
         else {
@@ -652,10 +655,6 @@ ChatRoom.prototype.leave = function(triggerLeaveRequest) {
     else {
         self.setState(ChatRoom.STATE.LEFT);
     }
-
-    self.megaChat.refreshConversations();
-
-    self.trackDataChange();
 };
 
 /**
@@ -673,11 +672,11 @@ ChatRoom.prototype.destroy = function(notifyOtherDevices, noRedirect) {
         self.leave(notifyOtherDevices);
     }
 
-    Soon(function() {
-        if (self.isCurrentlyActive) {
-            self.isCurrentlyActive = false;
-        }
+    if (self.isCurrentlyActive) {
+        self.isCurrentlyActive = false;
+    }
 
+    Soon(function() {
         mc.chats.remove(roomJid);
 
         if (!noRedirect) {

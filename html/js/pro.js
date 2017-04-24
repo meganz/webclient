@@ -3577,13 +3577,16 @@ function showLoginDialog(email) {
 };
 
 var doProLogin = function($dialog) {
-    megaAnalytics.log("pro", "doLogin");
 
+    megaAnalytics.log('pro', 'doLogin');
     loadingDialog.show();
 
-    var button = $('.selected .membership-button').parents('.reg-st3-membership-bl').attr('class').match(/pro\d/)[0]
+    // Find the plan they clicked on before the login prompt popped up
+    var proNum = $('.reg-st3-membership-bl.selected').data('payment');
+
+    // After login, click the plan for them to go straight to step 2
     pro_do_next = function() {
-        $('.' + button + ' .membership-button').trigger('click');
+        $('.reg-st3-membership-bl.pro' + proNum + ' .membership-pad-bl').trigger('click')
         pro_do_next = null;
     };
 

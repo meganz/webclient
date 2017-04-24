@@ -8792,8 +8792,6 @@ React.makeElement = React['createElement'];
 	                                        previewButtons,
 	                                        React.makeElement(DropdownsUI.DropdownItem, { icon: 'rounded-grey-down-arrow', label: __(l[1187]),
 	                                            onClick: startDownload }),
-	                                        React.makeElement(DropdownsUI.DropdownItem, { icon: 'grey-cloud', label: __(l[8005]),
-	                                            onClick: addToCloudDrive }),
 	                                        React.makeElement('hr', null),
 	                                        React.makeElement(DropdownsUI.DropdownItem, { icon: 'red-cross', label: __(l[8909]), className: 'red',
 	                                            onClick: function onClick() {

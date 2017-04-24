@@ -1760,6 +1760,7 @@ else if (!b_u)
         jsl.push({f:'js/fm-dashboard.js', n: 'fmdashboard_js', j:1,w:5});
         jsl.push({f:'js/fm-account.js', n: 'fmaccount_js', j:1,w:5});
         jsl.push({f:'js/fm/account.js', n: 'fm_account_js', j:1});
+        jsl.push({f:'js/fm/ufssizecache.js', n: 'ufssizecache_js', j:1});
         jsl.push({f:'js/ui/miniui.js', n: 'miniui_js', j:1});
 
         jsl.push({f:'html/start.html', n: 'start', j:0});

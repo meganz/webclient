@@ -229,11 +229,19 @@ function crypto_decryptnode(n) {
     }
     else {
         if (d) {
-            console.debug("Can't extract a valid key for " + n.h);
+            vkey[n.h] = 1;
+            if (vkey.t) {
+                clearTimeout(vkey.t);
+            }
+            vkey.t = setTimeout(function() {
+                console.debug("Can't extract a valid key for", Object.keys(vkey));
+                vkey = {};
+            }, 4000);
         }
         if (missingkeys) crypto_reportmissingkey(n);
     }
 }
+var vkey = {};
 
 // generate attributes block for given node using AES-CBC with MEGA canary
 // (also generates random (folder-type) key if missing)

@@ -304,6 +304,8 @@ ChatdIntegration._waitForProtocolHandler = function (chatRoom, cb) {
 ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
     var self = this;
 
+    console.error(isMcf, actionPacket);
+
     var masterPromise = new MegaPromise();
     if (isMcf === false && ChatdIntegration.mcfHasFinishedPromise.state() === 'pending') {
         // 'mcf'/'f' is still loading..ANY incoming action packets, should be rejected (and never happen...)
@@ -423,6 +425,9 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
                     chatRoom.lastActivity = unixtime();
                 }
                 loadSubPage(chatRoom.getRoomUrl());
+            }
+            if (!chatRoom.lastActivity && actionPacket.ts) {
+                chatRoom.lastActivity = actionPacket.ts;
             }
 
             if (wasActive) {

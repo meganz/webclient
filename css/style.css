@@ -18518,6 +18518,9 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     font-size: 21px;
     line-height: 31px;
 }
+.st-apps-title .red {
+    cursor: default;
+}
 .st-apps-icon {
     background-image: url(../images/mega/new-start-full1.png);
     background-repeat: no-repeat;
@@ -18531,7 +18534,6 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     -moz-opacity: 0.55;
     -khtml-opacity: 0.55;
     opacity: 0.55;
-    cursor: pointer;
 }
 .st-apps-icon:hover {
  filter:progid:DXImageTransform.Microsoft.Alpha(opacity=100);

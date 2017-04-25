@@ -10030,6 +10030,11 @@ React.makeElement = React['createElement'];
 
 	        self.lastActivity = ts;
 
+	        if (msg.userId === u_handle) {
+	            self.didInteraction(u_handle, ts);
+	            return;
+	        }
+
 	        if (self.type === "private") {
 	            var targetUserJid = self.getParticipantsExceptMe()[0];
 
@@ -10048,7 +10053,7 @@ React.makeElement = React['createElement'];
 	            assert(M.u[targetUserNode.u], 'User not found in M.u');
 
 	            if (targetUserNode) {
-	                setLastInteractionWith(targetUserNode.u, "1:" + self.lastActivity);
+	                self.didInteraction(targetUserNode.u, self.lastActivity);
 	            }
 	        } else if (self.type === "group") {
 	            var contactHash;
@@ -10060,6 +10065,9 @@ React.makeElement = React['createElement'];
 	                contactHash = megaChat.getContactHashFromJid(msg.getFromJid());
 	            }
 
+	            if (contactHash && M.u[contactHash]) {
+	                self.didInteraction(contactHash, self.lastActivity);
+	            }
 	            assert(contactHash, 'Invalid hash for user (extracted from inc. message)');
 	        } else {
 	            throw new Error("Not implemented");
@@ -10809,6 +10817,25 @@ React.makeElement = React['createElement'];
 	};
 	ChatRoom.prototype.iAmOperator = function () {
 	    return this.type === "private" || this.members && this.members[u_handle] === 3;
+	};
+
+	ChatRoom.prototype.didInteraction = function (user_handle, ts) {
+	    var self = this;
+	    ts = ts || unixtime();
+
+	    if (user_handle === u_handle) {
+	        Object.keys(self.members).forEach(function (user_handle) {
+	            var contact = M.u[user_handle];
+	            if (contact && user_handle !== u_handle) {
+	                setLastInteractionWith(contact.u, "1:" + ts);
+	            }
+	        });
+	    } else {
+	        var contact = M.u[user_handle];
+	        if (contact && user_handle !== u_handle) {
+	            setLastInteractionWith(contact.u, "1:" + ts);
+	        }
+	    }
 	};
 
 	window.ChatRoom = ChatRoom;

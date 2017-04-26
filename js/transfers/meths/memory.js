@@ -95,6 +95,10 @@
                         .addClass('download-complete')
                         .find('.download-progress')
                         .rebind('click', function() {
+
+                            // Store a log for statistics
+                            api_req({ a: 'log', e: 99637, m: 'Downloaded and opened file on mobile webclient' });
+
                             if (navigator.userAgent.match(/CriOS/i)) {
                                 var reader = new FileReader();
                                 reader.onload = function(e) {
@@ -102,7 +106,12 @@
                                 };
                                 return reader.readAsDataURL(blob);
                             }
-                            window.open(sblob, '_blank');
+
+                            // Store a log for statistics
+                            api_req({ a: 'log', e: 99637, m: 'Downloaded and opened file on mobile webclient' });
+
+                            // Redirect to object URL to download the file to the client
+                            location.href = sblob;
                             return false;
                         });
                     $('.mobile.download-speed, .mobile.download-percents').text('');

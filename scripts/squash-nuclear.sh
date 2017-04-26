@@ -1,8 +1,10 @@
 #!/bin/bash
 #
-# This script is intended to create a binary diff (to capture image files etc) between develop and the current branch.
-# Then it will create a new branch based off that diff. It will be the user's responsibility to add the files they want
-# then push it manually to the server.
+# The nuclear squashing option. This script creates a binary diff (to capture image files etc) between develop and the
+# current branch. Then it will create a new branch based off that diff, add all the file changes to git in the current
+# directory, commit them and push everything to the server as a new branch under the same name with -squashed appended
+# to the branch name. If you do not want all files in the web directory added, try the squash-advanced.sh script
+# instead. NB: This will nuke and replace any -squashed branch under the same name on the local host and remote server.
 #
 # How to use:
 #
@@ -14,7 +16,7 @@
 # git commit (retain any history about conflicts and the fixes)
 # git push
 #
-# Now run this script e.g. ./scripts/squash-advanced.sh.
+# Now run this script e.g. ./scripts/squash-nuclear.sh.
 
 
 # Change to the path of this script, then go up a level to the main web directory. This allows the script to be
@@ -44,19 +46,31 @@ echo
 echo "2. Created diff between $target_branch and $current_branch and saved as $current_branch.diff"
 echo "---"
 
+git push origin :$current_branch-squashed
+git branch -d -f $current_branch-squashed
+echo
+echo "3. Deleted $current_branch-squashed branch if it existed"
+echo "---"
+
 git checkout -b $current_branch-squashed
 echo
-echo "3. Created new branch $current_branch-squashed"
+echo "4. Created new branch $current_branch-squashed"
 echo "---"
 
 git apply $current_branch.diff
-echo
-echo "4. Applied $current_branch.diff"
-echo "---"
-
 rm $current_branch.diff
 git status
-
 echo
-echo "5. Ready to add files, commit and push with 'git push -u origin $current_branch-squashed'"
+echo "5. Applied $current_branch.diff"
+echo "---"
+
+git add .
+echo
+echo "6. Added files. Enter commit message for the squashed branch (e.g. 5163: Ticket title):"
+read commitMessage
+
+git commit -m "$commitMessage"
+git push -u origin $current_branch-squashed
+echo
+echo "7. Pushed new branch $current_branch-squashed. All done."
 echo "---"

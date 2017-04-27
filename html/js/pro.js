@@ -2126,9 +2126,9 @@ var unionPay = {
         {
             var input = $("<input type='hidden' name='" + key + "' value='" + utcResult.EUR['postdata'][key] + "' />");
             form.append(input);
-            $('body').append(form);
-            form.submit();
         }
+        $('body').append(form);
+        form.submit();
     }
 };
 
@@ -2152,9 +2152,9 @@ var sabadell = {
         for (var key in utcResult.EUR['postdata']) {
             var input = $("<input type='hidden' name='" + key + "' value='" + utcResult.EUR['postdata'][key] + "' />");
             form.append(input);
-            $('body').append(form);
-            form.submit();
         }
+        $('body').append(form);
+        form.submit();
     },
 
     /**

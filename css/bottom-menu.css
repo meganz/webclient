@@ -1,0 +1,92 @@
+.bottom-menu.body {
+    background-color: white;
+    border-top: 1px solid rgba(0,0,0,0.05);
+}
+.bottom-menu.pad {
+    max-width: 970px;
+    padding: 43px 15px;
+    min-height: 400px;
+    margin: 0 auto;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.bottom-menu.column {
+    float: left;
+    padding-left: 15px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.bottom-menu.column:first-child {
+    padding: 0;
+}
+.bottom-menu.col1-of-6 {
+    width: 16.666666%
+}
+.bottom-menu.col2-of-6 {
+    width: 33.333333%
+}
+.bottom-menu.header {
+    font-size: 12px;
+    line-height: 18px;
+    padding: 3px 0;
+    margin: 41px 0 7px 0;
+    letter-spacing: 0.34px;
+    color: #FF333A;
+    font-family: 'source_sans_prosemibold';
+    text-transform: uppercase;
+}
+.bottom-menu.link {
+    font-size: 13px;
+    line-height: 18px;
+    color: #666666;
+    display: block;
+    padding: 3px 0;
+    margin-bottom: 8px;
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
+}
+.bottom-menu.link:hover {
+    color: #333333;
+}
+.bottom-menu.logo {
+    width: 48px;
+    height: 48px;
+    float: none;
+    -moz-border-radius: 100%;
+    -webkit-border-radius: 100%;
+    border-radius: 100%;
+    background-color: #d90007;
+    overflow: hidden;
+    margin: 27px 0 0 0;
+    background-image: url(../images/mega/startpage-sprite.png);
+    background-position: -11px -1371px;
+}
+.bottom-menu.company-info {
+    font-size: 14px;
+    line-height: 22px;
+    color: #333333;
+    padding: 29px 0 21px 0;
+}
+.bottom-menu.company-info strong {
+    font-family: 'source_sans_prosemibold';
+    font-weight: normal;
+    display: block;
+}
+.bottom-menu.social {
+    padding: 0 0 0 0;
+}
+.bottom-menu .st-bottom-button {
+    margin: 0 16px 0 0;
+}
+.bottom-menu.copyrights {
+    font-size: 13px;
+    line-height: 18px;
+    color: #666666;
+    position: absolute;
+    margin: -29px 0 0 0;
+}

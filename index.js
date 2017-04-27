@@ -2066,7 +2066,6 @@ function parsepage(pagehtml, pp) {
         mega.utils.chrome110ZoomLevelNotification();
     });
 
-    $('.nw-bottom-block').addClass(lang);
     if (typeof UIkeyevents === 'function') {
         UIkeyevents();
     }

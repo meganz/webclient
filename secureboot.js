@@ -1673,6 +1673,10 @@ else if (!b_u)
     jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
 
+    // Common CSS fixes
+    jsl.push({f:'css/startpage.css', n: 'startpage_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/bottom-menu.css', n: 'bottom-menu_css', j:2,w:5,c:1,d:1,cache:1});
+
     if (!is_mobile) {
 
         jsl.push({f:'js/mDB.js', n: 'mDB_js', j:1});

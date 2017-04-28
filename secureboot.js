@@ -50,14 +50,15 @@ function isMobile() {
         return false;
     }
 
-    // Useful for developing & testing the mobile site
-    if (localStorage.testMobileSite) {
-        return true;
-    }
-
-    // If extension
+    // If extension, not applicable
     if (is_chrome_firefox) {
         return false;
+    }
+
+    // Useful for developing & testing the mobile site (this is below the is_chrome_firefox
+    // check above because the Firefox extension has not loaded localStorage yet and it breaks
+    if (localStorage.testMobileSite) {
+        is_mobile = true;
     }
 
     var mobileStrings = [

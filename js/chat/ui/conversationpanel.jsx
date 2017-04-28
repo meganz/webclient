@@ -1316,32 +1316,39 @@ var ConversationPanel = React.createClass({
                                         v.internalId ? v.internalId : v.orderValue,
                                         messageContents
                                     );
-                                    if (v.textContents) {
-                                        v.textContents = messageContents;
-                                    }
-                                    if (v.contents) {
-                                        v.contents = messageContents;
-                                    }
-                                    if (v.emoticonShortcutsProcessed) {
-                                        v.emoticonShortcutsProcessed = false;
-                                    }
-                                    if (v.emoticonsProcessed) {
-                                        v.emoticonsProcessed = false;
-                                    }
-                                    if (v.messageHtml) {
-                                        delete v.messageHtml;
-                                    }
+
+                                    if (
+                                        v.getState &&
+                                        v.getState() === Message.STATE.NOT_SENT &&
+                                        !v.requiresManualRetry
+                                    ) {
+                                        if (v.textContents) {
+                                            v.textContents = messageContents;
+                                        }
+                                        if (v.contents) {
+                                            v.contents = messageContents;
+                                        }
+                                        if (v.emoticonShortcutsProcessed) {
+                                            v.emoticonShortcutsProcessed = false;
+                                        }
+                                        if (v.emoticonsProcessed) {
+                                            v.emoticonsProcessed = false;
+                                        }
+                                        if (v.messageHtml) {
+                                            delete v.messageHtml;
+                                        }
 
 
-                                    $(v).trigger(
-                                        'onChange',
-                                        [
-                                            v,
-                                            "textContents",
-                                            "",
-                                            messageContents
-                                        ]
-                                    );
+                                        $(v).trigger(
+                                            'onChange',
+                                            [
+                                                v,
+                                                "textContents",
+                                                "",
+                                                messageContents
+                                            ]
+                                        );
+                                    }
 
                                     self.messagesListScrollable.scrollToBottom(true);
                                     self.lastScrollPositionPerc = 1;
@@ -1449,25 +1456,32 @@ var ConversationPanel = React.createClass({
                         chatdint.discardMessage(room, msg.internalId ? msg.internalId : msg.orderValue);
                     }
 
-                    msg.message = "";
-                    msg.contents = "";
-                    msg.messageHtml = "";
-                    msg.deleted = true;
 
                     self.setState({
                         'confirmDeleteDialog': false,
                         'messageToBeDeleted': false
                     });
 
-                    $(msg).trigger(
-                        'onChange',
-                        [
-                            msg,
-                            "deleted",
-                            false,
-                            true
-                        ]
-                    );
+                    if (
+                        msg.getState &&
+                        msg.getState() === Message.STATE.NOT_SENT &&
+                        !msg.requiresManualRetry
+                    ) {
+                        msg.message = "";
+                        msg.contents = "";
+                        msg.messageHtml = "";
+                        msg.deleted = true;
+
+                        $(msg).trigger(
+                            'onChange',
+                            [
+                                msg,
+                                "deleted",
+                                false,
+                                true
+                            ]
+                        );
+                    }
 
                 }}
             >

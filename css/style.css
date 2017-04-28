@@ -3847,7 +3847,7 @@ label.iPhoneCheckLabelOff span {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    line-height: 32px;
+    line-height: 33px;
     font-size: 13px;
     color: #777777;
     padding-left: 40px;
@@ -4378,7 +4378,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .nw-contact-avatar {
     margin-bottom: 6px;
 }
-.nw-contact-avatar span {
+.nw-contact-avatar span, .share-dialog-contact-bl .avatar span {
     color: white;
 }
 .fm-tree-panel .nw-contact-avatar, .email .nw-contact-avatar::before, .gmail .nw-contact-avatar::before {
@@ -7741,8 +7741,16 @@ table {
     height: calc(100% - 36px);
     margin-top: -1px;
     position: relative;
+    white-space: nowrap;
 }
-.sent-requests-grid .grid-table tr td:first-child, .sent-requests-grid tr th:first-child {
+.contact-requests-grid td:nth-child(3) {
+     width: 400px;
+}
+.contact-requests th:nth-child(1) {
+     width: 100% !important;
+}
+.sent-requests-grid .grid-table tr td:first-child, .sent-requests-grid tr th:first-child,
+.contact-requests-grid .grid-table tr td:first-child, .contact-requests-grid tr th:first-child {
     padding: 0 12px 0 16px;
 }
 .empty-requests-pad {
@@ -20379,8 +20387,9 @@ span.incoming-call-name {
     background-color: rgba(6,160,236,1);
 }
 .contacts-view td .nw-contact-avatar, .contact-requests-grid td .nw-contact-avatar, .sent-requests-grid td .nw-contact-avatar, .shared-with-me .nw-contact-avatar {
-    float: left;
-    margin: 0;
+    position: absolute;
+    top: 6px;
+    margin:0;
 }
 .fm-chat-user-status {
     line-height: 18px;
@@ -20391,9 +20400,6 @@ span.incoming-call-name {
 }
 .sent-requests-grid td .fm-chat-user-info {
     margin: 0 0 0 44px;
-}
-.sent-requests-grid .default-white-button, .contact-requests-grid .default-white-button {
-    margin-top: 4px;
 }
 .grid-table.sent-requests td:last-child, .grid-table.contact-requests td:last-child {
     padding-right: 8px;
@@ -21192,6 +21198,9 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     box-sizing: border-box;
     white-space: nowrap;
 }
+.share-dialog-contact-bl .nw-contact-avatar {
+    margin-bottom: 0;
+}
 .share-item-bl .export-link-item {
     float: left;
     display: block;
@@ -21315,7 +21324,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     border-radius: 100%;
 }
 .email .nw-contact-avatar {
-    background-position: center -572px;
+    background-position: center -571px;
 }
 .gmail .nw-contact-avatar {
     background-position: center -674px;

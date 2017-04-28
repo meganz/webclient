@@ -143,6 +143,14 @@
     padding: 0;
     text-align: center;
     width: 75%;
+    background-color: #565656;
+    color: white;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+}
+.mobile.toast-notification::before {
+    display: none;
 }
 .mobile.toast-notification.active {
     opacity: 100;
@@ -150,5 +158,8 @@
 .mobile.toast-notification.top {
 	bottom: initial;
 	top: 8px;
+}
+.mobile.toast-notification .toast-icon {
+    display: none;
 }
 /* end of Mobile*/

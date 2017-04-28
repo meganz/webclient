@@ -8812,7 +8812,8 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
 }
 .awaiting-confirmation .reg-success-icon {
     background-position: center -1021px;
-    height: 151px;
+    height: 131px;
+    margin-bottom: 23px;
 }
 .payment-confirmation .reg-success-icon.failure {
     background-position: center -200px;

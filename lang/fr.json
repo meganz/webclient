@@ -3578,7 +3578,7 @@
     "9045": "Le compte qui a cr\u00e9\u00e9 ce lien \u00e0 \u00e9t\u00e9 annul\u00e9 \u00e0 la suite de plusieurs violations de nos conditions g\u00e9n\u00e9rales d'utilisation.",
     "9046": "Le lien de confirmation de compte que vous utilisez est incomplet. Veuillez v\u00e9rifier la longueur du lien, vous assurer d'avoir copi\u00e9 le lien entier et ressayer.",
     "9047": "Le lien que vous utilisez pour une nouvelle adh\u00e9sion est invalide.",
-    "9048": "La cl\u00e9 fournie est invalide. Veuillez v\u00e9rifier que la cl\u00e9 est correcte, ou la redemander au cr\u00e9ateur du lien.",
+    "9048": "La cl\u00e9 fournie est invalide. Veuillez vous assurer que la cl\u00e9 est bonne ou redemandez au cr\u00e9ateur du lien.",
     "9049": "Vous avez tent\u00e9 de vous connecter trop de fois. Veuillez attendre jusqu'\u00e0 %@ et ressayer.",
     "9050": "Veuillez v\u00e9rifier vos courriels et cliquer sur le lien afin de confirmer votre compte.",
     "9051": "Votre compte n'a pas encore \u00e9t\u00e9 confirm\u00e9.",
@@ -4086,8 +4086,14 @@
     "16468": "Re\u00e7u de remboursement",
     "16469": "Le fichier ou dossier du lien que vous tentez d'ouvrir n'a pas \u00e9t\u00e9 trouv\u00e9. Vous \u00eates probablement connect\u00e9 \u00e0 un compte diff\u00e9rent. Veuillez vous connecter au bon compte et ressayer.",
     "16470": "Le fichier ou dossier est introuvable",
-    "16471": "The provided key is invalid.",
-    "16472": "Please check that the key is correct or ask the creator of the link again.",
+    "16471": "La cl\u00e9 fournie est invalide.",
+    "16472": "Veuillez vous assurer que la cl\u00e9 est bonne ou redemandez au cr\u00e9ateur du lien.",
+    "16473": "[1]MEGA Achievement Expired[2]One of your achievements has expired today. Don't worry though, you can always achieve more or upgrade to a PRO account.[3]To upgrade your account to PRO, click below:",
+    "16474": "Versions pr\u00e9c\u00e9dentes",
+    "16475": "Revenir",
+    "16476": "Edited by %1 ",
+    "16477": "Renomm\u00e9 de %1 par %2",
+    "16478": "current version",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4338,6 +4344,11 @@
         "online-autoaway-checkbox-field": 16389,
         "no-files-in-cloud-drive": 16394,
         "provided-key-invalid": 16471,
-        "please-check-key-is-correct": 16472
+        "please-check-key-is-correct": 16472,
+        "file_previous_version": 16474,
+        "file_revert_version": 16475,
+        "file_version_edited_by": 16476,
+        "file_version_renamed_from": 16477,
+        "file_current_version": 16478
     }
 }

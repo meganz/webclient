@@ -16354,5 +16354,29 @@
     "16472": {
         "text": "Please check that the key is correct or ask the creator of the link again.",
         "context": "On a public file or folder link which does not have a decryption key, the user is asked to enter a decryption key. This is a second message which is shown when the decryption key entered is not correct."
+    },
+    "16473": {
+        "text": "[1]MEGA Achievement Expired\r\n\r\n[2]One of your achievements has expired today. Don't worry though, you can always achieve more or upgrade to a PRO account.\r\n\r\n[3]To upgrade your account to PRO, click below:",
+        "context": ""
+    },
+    "16474": {
+        "text": "Previous versions",
+        "context": "A button label which opens a dialog to display the full version history of the selected file."
+    },
+    "16475": {
+        "text": "Revert",
+        "context": "A button label which reverts a certain version of a file to be the current version of the selected file."
+    },
+    "16476": {
+        "text": "Edited by %1 ",
+        "context": "A message which is displayed in the version history that shows that a certain file version was edited by a particular user. Please keep the %1 placeholder which will be replaced with the email address.\r\n"
+    },
+    "16477": {
+        "text": "Renamed from %1 by %2",
+        "context": "A message which is displayed in the version history that shows that a certain file version is renamed from a previous filename by a particular user. Please keep the placeholders %1 which will be replaced by the filename and %2 which will be replaced by the email address."
+    },
+    "16478": {
+        "text": "current version",
+        "context": "A message to indicate which version is the current version."
     }
 }

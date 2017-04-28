@@ -707,7 +707,7 @@ mBroadcaster.once('startMega', function populate_l() {
 
     var common = [
         15536, 16106, 16107, 16116, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315,
-        16316, 16358, 16359, 16360, 16361, 16375, 16382, 16383, 16384
+        16316, 16341, 16358, 16359, 16360, 16361, 16375, 16382, 16383, 16384, 16394
     ];
     for (i = common.length; i--;) {
         var num = common[i];
@@ -1329,6 +1329,11 @@ function makeid(len) {
     return text;
 }
 
+/**
+ * Checks if the email address is valid
+ * @param {String} email The email address to validate
+ * @returns {Boolean} Returns true if email is invalid, false if email is fine
+ */
 function checkMail(email) {
     email = email.replace(/\+/g, '');
     var filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
@@ -3738,7 +3743,8 @@ mega.utils.hasPendingTransfers = function megaUtilsHasPendingTransfers() {
 mega.utils.abortTransfers = function megaUtilsAbortTransfers() {
     var promise = new MegaPromise();
 
-    if (!mega.utils.hasPendingTransfers()) {
+    // Mobile does not use the dlmanager/ulmanager so just resolve the promise
+    if (!mega.utils.hasPendingTransfers() || is_mobile) {
         promise.resolve();
     }
     else {
@@ -4632,7 +4638,7 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
                 return this._size < (limit * 1024 * 1024 * 1024);
             }
         }
-    }
+    };
 });
 
 /** prevent tabnabbing attacks */
@@ -5612,86 +5618,6 @@ function getGatewayName(gatewayId, gatewayOpt) {
         displayName: 'Unknown'
     };
 }
-
-/**
- * Redirects to the mobile app
- * @param {Object} $selector The jQuery selector for the button
- */
-mega.utils.redirectToApp = function($selector) {
-
-    if (is_ios) {
-        // Based off https://github.com/prabeengiri/DeepLinkingToNativeApp/
-        var ns = '.ios ';
-        var appLink = "mega://" + location.hash;
-        var events = ["pagehide", "blur", "beforeunload"];
-        var timeout = null;
-
-        var preventDialog = function(e) {
-            clearTimeout(timeout);
-            timeout = null;
-            $(window).unbind(events.join(ns) + ns);
-        };
-
-        var redirectToStore = function() {
-            window.top.location = getStoreLink();
-        };
-
-        var redirect = function() {
-            var ms = 500;
-
-            preventDialog();
-            $(window).bind(events.join(ns) + ns, preventDialog);
-
-            window.location = appLink;
-
-            // Starting with iOS 9.x, there will be a confirmation dialog asking whether we want to
-            // open the app, which turns the setTimeout trick useless because no page unloading is
-            // notified and users redirected to the app-store regardless if the app is installed.
-            // Hence, as a mean to not remove the redirection we'll increase the timeout value, so
-            // that users with the app installed will have a higher chance of confirming the dialog.
-            // If past that time they didn't, we'll redirect them anyhow which isn't ideal but
-            // otherwise users will the app NOT installed might don't know where the app is,
-            // at least if they disabled the smart-app-banner...
-            // NB: Chrome (CriOS) is not affected.
-            if (is_ios > 8 && ua.details.brand !== 'CriOS') {
-                ms = 4100;
-            }
-
-            timeout = setTimeout(redirectToStore, ms);
-        };
-
-        Soon(function() {
-            // If user navigates back to browser and clicks the button,
-            // try redirecting again.
-            $selector.rebind('click', function(e) {
-                e.preventDefault();
-                redirect();
-                return false;
-            });
-        });
-        redirect();
-    }
-    else {
-        var path = getSitePath().substr(1);
-
-        switch (ua.details.os) {
-            case 'Windows Phone':
-                window.location = "mega://" + path;
-                break;
-
-            case 'Android':
-                var intent = 'intent://#' + path
-                    + '/#Intent;scheme=mega;package=mega.privacy.android.app;end';
-                document.location = intent;
-                break;
-
-            default:
-                alert('Unknown device.');
-        }
-    }
-
-    return false;
-};
 
 /*
  * Alert about 110% zoom level in Chrome/Chromium

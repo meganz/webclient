@@ -38,20 +38,47 @@ var is_extension = is_chrome_firefox || is_electron || document.location.href.su
 var is_mobile = m = isMobile();
 var is_ios = is_mobile && (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1);
 
-function isMobile()
-{
-    if (is_chrome_firefox) return false;
 
-    var mobile = ['iphone','ipad','android','blackberry','nokia','opera mini','windows mobile','windows phone','iemobile','mobile safari','bb10; touch'];
-    for (var i in mobile) if (ua.indexOf(mobile[i]) > 0) return true;
+/**
+ * Check if the user is coming from a mobile device
+ * @returns {Boolean}
+ */
+function isMobile() {
+
+    // The blog is mobile optimised already but requires the desktop code path for now
+    if (window.location.href.indexOf('blog') > -1) {
+        return false;
+    }
+
+    // Useful for developing & testing the mobile site
+    if (localStorage.testMobileSite) {
+        return true;
+    }
+
+    // If extension
+    if (is_chrome_firefox) {
+        return false;
+    }
+
+    var mobileStrings = [
+        'iphone', 'ipad', 'android', 'blackberry', 'nokia', 'opera mini',
+        'windows mobile', 'windows phone', 'iemobile', 'mobile safari', 'bb10; touch'
+    ];
+
+    for (var i in mobileStrings) {
+        if (ua.indexOf(mobileStrings[i]) > 0) {
+            return true;
+        }
+    }
+
     return false;
 }
 
 function getSitePath() {
 	var hash = location.hash.replace('#', '');
 
-	if (hashLogic || hash.substr(0, 2) === 'F!' || hash[0] === '!') {
-		return '/' + hash;
+    if (hashLogic || hash.substr(0, 2) === 'P!' || hash.substr(0, 2) === 'F!' || hash[0] === '!') {
+        return '/' + hash;
 	}
 
 	return document.location.pathname;
@@ -528,9 +555,12 @@ if (hashLogic) {
     // legacy support:
     page = document.location.hash;
 }
-else if (document.location.hash.substr(1,2) === 'F!' || document.location.hash.substr(1,1) === '!') {
-    // folder or file link: always keep the hash URL to ensure that keys remain client side
+else if (document.location.hash.substr(1, 2) === 'P!' || document.location.hash.substr(1, 2) === 'F!' ||
+         document.location.hash.substr(1, 1) === '!') {
+
+    // Password, folder or file link: always keep the hash URL to ensure that keys remain client side
     page = document.location.hash;
+
     // history.replaceState so that back button works in new URL paradigm
     history.replaceState({subpage: page.replace('#', '')}, "", page);
 }
@@ -1129,10 +1159,6 @@ if (m || (typeof localStorage !== 'undefined' && localStorage.mobile))
     m=true;
 }
 
-if ((page.substr(0,1) === '!') || (page.substr(0,2) === 'F!')) {
-    m = false;
-}
-
 if (is_ios) {
     tmp = document.querySelector('meta[name="apple-itunes-app"]');
     if (tmp) {
@@ -1165,146 +1191,10 @@ if (is_ios) {
     }
 }
 
-if (m)
-{
-    var app,mobileblog,android,intent, ios9;
-    var link = document.createElement('link');
-    link.setAttribute('rel', 'stylesheet');
-    link.type = 'text/css';
-    link.href = staticpath + 'css/mobile-app.css';
-    document.head.appendChild(link);
-    // AMO: Markup should not be passed to `innerHTML` dynamically. -- This isnt reached for the extension, anyway
-    document.body.innerHTML = '<div class="main-scroll-block"> <div class="main-content-block"> <div class="free-green-tip"></div><div class="main-centered-bl"><div class="main-logo"></div><div class="main-head-txt" id="m_title"></div><div class="main-head-txt" id="m_desc"></div><br /><br /><a href="" class="main-button" id="m_appbtn"></a><div class="main-social hidden"><a href="https://www.facebook.com/MEGAprivacy" class="main-social-icon facebook"></a><a href="https://www.twitter.com/MEGAprivacy" class="main-social-icon twitter"></a><div class="clear"></div></div></div> </div><div class="scrolling-content"><div class="mid-logo"></div> <div class="mid-gray-block">MEGA provides free cloud storage with convenient and powerful always-on privacy </div> <div class="scrolling-block-icon encription"></div> <div class="scrolling-block-header"> End-to-end encryption </div> <div class="scrolling-block-txt">Unlike other cloud storage providers, your data is encrypted & decrypted during transfer by your client devices only and never by us. </div> <div class="scrolling-block-icon access"></div> <div class="scrolling-block-header"> Secure Global Access </div> <div class="scrolling-block-txt">Your data is accessible any time, from any device, anywhere. Only you control the keys to your files.</div> <div class="scrolling-block-icon colaboration"></div> <div class="scrolling-block-header"> Secure Collaboration </div> <div class="scrolling-block-txt">Share folders with your contacts and see their updates in real time. Online collaboration has never been more private and secure.</div> <div class="bottom-menu full-version"><div class="copyright-txt">Mega Limited ' + new Date().getFullYear() + '</div><div class="language-block"></div><div class="clear"></div><iframe src="" width="1" height="1" frameborder="0" style="width:1px; height:1px; border:none;" id="m_iframe"></iframe></div></div></div>';
-    if (page.substr(0,4) == 'blog') mobileblog=1;
-    if (ua.indexOf('windows phone') > -1 /*&& ua.indexOf('iemobile') > -1*/)
-    {
-        app='zune://navigate/?phoneappID=1b70a4ef-8b9c-4058-adca-3b9ac8cc194a';
-        document.body.className = 'wp full-mode supported';
-    }
-    else if (ua.indexOf('android') > -1)
-    {
-        app='https://play.google.com/store/apps/details?id=mega.privacy.android.app&referrer=meganzsb';
-        document.body.className = 'android full-mode supported';
-        android=1;
-
-        var ver = ua.match(/android (\d+)\.(\d+)/);
-        if (ver) {
-            var rev = ver.pop();
-            ver = ver.pop();
-            // Check for Android 2.3+
-            if (ver > 2 || (ver === 2 && rev > 3)) {
-                intent = 'intent://#' + page + '/#Intent;scheme=mega;package=mega.privacy.android.app;end';
-            }
-        }
-        if (intent && !mobileblog) {
-            document.location = intent;
-        }
-    }
-    else if (ua.indexOf('bb10') > -1)
-    {
-        app='http://appworld.blackberry.com/webstore/content/46810890/';
-        document.body.className = 'blackberry full-mode supported';
-    }
-    else if (is_ios)
-    {
-        app='https://itunes.apple.com/app/mega/id706857885';
-        document.body.className = 'ios full-mode supported';
-    }
-    else document.body.className = 'another-os full-mode unsupported';
-
-    document.getElementById('m_title').innerHTML = 'Due to our advanced end-to-end encryption we do not yet support mobile browsers.';
-    if (app)
-    {
-        document.getElementById('m_appbtn').href = app;
-        document.getElementById('m_desc').innerHTML = 'To use our service, you can either open MEGA on a desktop or laptop browser, or download the MEGA app.';
-    }
-    else
-    {
-        document.getElementById('m_desc').innerHTML = 'To use our service, you can open MEGA on a desktop or laptop browser. A dedicated app for your platform will be coming soon.';
-    }
-    if (page.substr(0,1) == '!' || page.substr(0,2) == 'F!')
-    {
-        var i = 0, prechar = '#';
-        if (ua.indexOf('windows phone') > -1) {
-            i = 1;
-            prechar = '';
-        }
-
-        if (app) {
-            document.getElementById('m_desc').innerHTML = 'To view this link, you can either open it on a desktop or laptop browser, or download the MEGA app.';
-
-            document.getElementById('m_appbtn').href += '&referrer=link';
-        }
-        if (ua.indexOf('chrome') > -1)
-        {
-            if (intent) {
-                document.getElementById('m_desc').innerHTML
-                    += '<br/><em>If you already have it installed, <a href="' + intent + '">Click here!</a></em>';
-            }
-            else {
-                setTimeout(function() {
-                    if (confirm('Do you already have the MEGA app installed?')) {
-                        document.location = intent ? intent : 'mega://#' + page;
-                    }
-                }, 2500);
-            }
-        }
-        else if (is_ios > 8) {
-            setTimeout(function() {
-                if (confirm('Do you already have the MEGA app installed?')) {
-                    document.location = 'mega://#' + page;
-                }
-            }, 1500);
-        }
-        else {
-            document.getElementById('m_iframe').src = 'mega://' + prechar + page;
-        }
-    }
-    else if (page.substr(0, 7) === 'confirm'
-            || page.substr(0, 6) === 'backup'
-            || page.substr(0, 6) === 'cancel'
-            || page.substr(0, 6) === 'verify'
-            || page.substr(0, 6) === 'fm/ipc'
-            || page.substr(0, 9) === 'newsignup'
-            || page.substr(0, 7) === 'recover'
-            || page.substr(0, 7) === 'account')
-    {
-        var prechar = '#';
-        if (ua.indexOf('windows phone') > -1) {
-            prechar = '';
-        }
-        if (ua.indexOf('chrome') > -1) {
-            window.location = 'mega://' + prechar + page;
-        }
-        else if (is_ios > 8) {
-            setTimeout(function() {
-                if (confirm('Do you already have the MEGA app installed?')) {
-                    document.location = 'mega://#' + page;
-                }
-            }, 1500);
-        }
-        else {
-            document.getElementById('m_iframe').src = 'mega://' + prechar + page;
-        }
-
-        if (intent) {
-            document.getElementById('m_title').innerHTML
-                += '<br/><em>If you already have it installed, <a href="' + intent + '">Click here!</a></em>';
-        }
-    }
-    if (mobileblog)
-    {
-        document.body.innerHTML = '';
-        mCreateElement('script', {type: 'text/javascript'}, 'head')
-            .src = ((location.host === 'mega.nz') ? '/blog.js' : 'html/js/blog.js');
-    }
-}
-else if (page == 'android')
-{
+if (page === 'android') {
     document.location = 'https://play.google.com/store/apps/details?id=mega.privacy.android.app&referrer=meganzmobileapps';
 }
-else if (!b_u)
-{
+else if (!b_u) {
     d = window.d || 0;
     jj = window.jj || 0;
     var onBetaW = location.hostname === 'beta.mega.nz' || location.hostname.indexOf("developers.") === 0;
@@ -1673,23 +1563,30 @@ else if (!b_u)
     jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
 
+    jsl.push({f:'js/mDB.js', n: 'mDB_js', j:1});
+    jsl.push({f:'js/mouse.js', n: 'mouse_js', j:1});
+    jsl.push({f:'js/datastructs.js', n: 'datastructs_js', j:1});
+    jsl.push({f:'js/vendor/db.js', n: 'db_js', j:1,w:5});
+    jsl.push({f:'js/idbkvstorage.js', n: 'idbkvstorage_js', j: 1, w: 5});
+    jsl.push({f:'js/sharedlocalkvstorage.js', n: 'sharedlocalkvstorage_js', j: 1, w: 5});
+
+    jsl.push({f:'js/tlvstore.js', n: 'tlvstore_js', j:1});
+    jsl.push({f:'js/vendor/jsbn.js', n: 'jsbn_js', j:1, w:2});
+    jsl.push({f:'js/vendor/jsbn2.js', n: 'jsbn2_js', j:1, w:2});
+    jsl.push({f:'js/vendor/nacl-fast.js', n: 'nacl_js', j:1,w:7});
+    jsl.push({f:'js/vendor/dexie.js', n: 'dexie_js', j:1,w:5});
+
+    jsl.push({f:'js/authring.js', n: 'authring_js', j:1});
+    jsl.push({f:'html/js/login.js', n: 'login_js', j:1});
+    jsl.push({f:'js/ui/export.js', n: 'export_js', j:1,w:1});
+    jsl.push({f:'html/js/key.js', n: 'key_js', j:1});
+
+    jsl.push({f:'js/useravatar.js', n: 'contact_avatar_js', j:1,w:3});
+    jsl.push({f:'css/avatars.css', n: 'avatars_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
+
     if (!is_mobile) {
-
-        jsl.push({f:'js/mDB.js', n: 'mDB_js', j:1});
-        jsl.push({f:'js/mouse.js', n: 'mouse_js', j:1});
-        jsl.push({f:'js/datastructs.js', n: 'datastructs_js', j:1});
-        jsl.push({f:'js/vendor/db.js', n: 'db_js', j:1,w:5});
-        jsl.push({f:'js/idbkvstorage.js', n: 'idbkvstorage_js', j: 1, w: 5});
-        jsl.push({f:'js/sharedlocalkvstorage.js', n: 'sharedlocalkvstorage_js', j: 1, w: 5});
         jsl.push({f:'js/achievements.js', n: 'achievements_js', j: 1, w: 5});
-
-        jsl.push({f:'js/tlvstore.js', n: 'tlvstore_js', j:1});
-        jsl.push({f:'js/vendor/jsbn.js', n: 'jsbn_js', j:1, w:2});
-        jsl.push({f:'js/vendor/jsbn2.js', n: 'jsbn2_js', j:1, w:2});
-        jsl.push({f:'js/vendor/nacl-fast.js', n: 'nacl_js', j:1,w:7});
-        jsl.push({f:'js/vendor/dexie.js', n: 'dexie_js', j:1,w:5});
-
-        jsl.push({f:'js/authring.js', n: 'authring_js', j:1});
         jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
         jsl.push({f:'js/vendor/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1, w:10});
         jsl.push({f:'js/vendor/verge.js', n: 'verge', j:1, w:5});
@@ -1702,10 +1599,11 @@ else if (!b_u)
         jsl.push({f:'js/vendor/jquery.qrcode.js', n: 'jqueryqrcode', j:1});
         jsl.push({f:'js/vendor/qrcode.js', n: 'qrcode', j:1,w:2, g: 'vendor'});
         jsl.push({f:'js/vendor/bitcoin-math.js', n: 'bitcoinmath', j:1 });
-        jsl.push({f:'js/paycrypt.js', n: 'paycrypt_js', j:1 });
 
+        // This is not used anymore, unless we process and store credit card details for renewals again
+        // jsl.push({f:'js/paycrypt.js', n: 'paycrypt_js', j:1 });
 
-        // notifications
+        // Desktop notifications
         jsl.push({f:'js/vendor/notification.js', n: 'notification_js', j:1,w:7});
 
         // Other
@@ -1727,7 +1625,6 @@ else if (!b_u)
         jsl.push({f:'js/ui/languageDialog.js', n: 'mega_js', j:1,w:7});
         jsl.push({f:'js/ui/publicServiceAnnouncement.js', n: 'psa_js', j:1,w:1});
         jsl.push({f:'js/ui/alarm.js', n: 'alarm_js', j:1,w:1});
-        jsl.push({f:'js/ui/export.js', n: 'export_js', j:1,w:1});
         jsl.push({f:'js/ui/transfers-popup.js', n: 'transfers_popup_js', j:1,w:1});
     } // !is_mobile
 
@@ -1739,10 +1636,12 @@ else if (!b_u)
     jsl.push({f:'js/transfers/meths/memory.js', n: 'dl_memory', j:1,w:3});
     jsl.push({f:'js/transfers/meths/filesystem.js', n: 'dl_chrome', j:1,w:3});
     jsl.push({f:'js/transfers/meths/mediasource.js', n: 'dl_mediasource', j:1,w:3});
+
     if (is_chrome_firefox && parseInt(Services.appinfo.version) > 27) {
         is_chrome_firefox |= 4;
         jsl.push({f:'js/transfers/meths/firefox-extension.js', n: 'dl_firefox', j:1,w:3});
     }
+
     jsl.push({f:'js/transfers/downloader.js', n: 'dl_downloader', j:1,w:3});
     jsl.push({f:'js/transfers/download2.js', n: 'dl_js', j:1,w:3});
     jsl.push({f:'js/transfers/upload2.js', n: 'upload_js', j:1,w:2});
@@ -1767,17 +1666,14 @@ else if (!b_u)
         jsl.push({f:'html/js/start.js', n: 'start_js', j:1});
         jsl.push({f:'html/bottom2.html', n: 'bottom2',j:0});
         jsl.push({f:'html/key.html', n: 'key', j:0});
-        jsl.push({f:'html/js/key.js', n: 'key_js', j:1});
         jsl.push({f:'html/pro.html', n: 'pro', j:0});
         jsl.push({f:'html/js/pro.js', n: 'pro_js', j:1});
         jsl.push({f:'html/login.html', n: 'login', j:0});
-        jsl.push({f:'html/js/login.js', n: 'login_js', j:1});
         jsl.push({f:'html/fm.html', n: 'fm', j:0,w:3});
         jsl.push({f:'html/top-login.html', n: 'top-login', j:0});
         jsl.push({f:'js/notify.js', n: 'notify_js', j:1});
         jsl.push({f:'js/popunda.js', n: 'popunda_js', j:1});
         jsl.push({f:'css/user-card.css', n: 'user_card_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/avatars.css', n: 'avatars_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/icons.css', n: 'icons_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/buttons.css', n: 'buttons_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/bottom-pages.css', n: 'bottom-pages_css', j:2,w:5,c:1,d:1,cache:1});
@@ -1785,6 +1681,7 @@ else if (!b_u)
         jsl.push({f:'css/dialogs.css', n: 'dialogs_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/popups.css', n: 'popups_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/spinners.css', n: 'spinners_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/toast.css', n: 'toast_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/data-blocks-view.css', n: 'data_blocks_view_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/help2.css', n: 'help_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j:2,w:5,c:1,d:1,cache:1});
@@ -1792,13 +1689,11 @@ else if (!b_u)
         jsl.push({f:'css/onboarding.css', n: 'onboarding_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/media-print.css', n: 'media_print_css', j:2,w:5,c:1,d:1,cache:1});
 
-        jsl.push({f:'js/useravatar.js', n: 'contact_avatar_js', j:1,w:3});
         jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
         jsl.push({f:'js/states-countries.js', n: 'states_countries_js', j:1});
         jsl.push({f:'html/dialogs.html', n: 'dialogs', j:0,w:2});
         jsl.push({f:'js/vendor/int64.js', n: 'int64_js', j:1});
         jsl.push({f:'js/transfers/zip64.js', n: 'zip_js', j:1});
-        jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
 
         jsl.push({f:'html/onboarding.html', n: 'onboarding', j:0,w:2});
         jsl.push({f:'js/ui/onboarding.js', n: 'onboarding_js', j:1,w:1});
@@ -1839,11 +1734,14 @@ else if (!b_u)
         jsl.push({f: 'js/betacrashes.js', n: 'betacrashes_js', j: 1});
     }
 
+    // Load files common to all mobile pages
     if (is_mobile) {
-        // Common to all mobile pages
-        jsl.push({f:'js/vendor/jquery.mobile.js', n: 'jquery_mobile_js', j: 1, w: 5});
-        jsl.push({f:'css/mobile-app-new.css', n: 'mobile_css', j: 2, w: 30, c: 1, d: 1, m: 1});
+        jsl.push({f:'css/mobile.css', n: 'mobile_css', j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'css/spinners.css', n: 'spinners_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
+        jsl.push({f:'css/toast.css', n: 'toast_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
+        jsl.push({f:'html/mobile.html', n: 'fm_mobile', j: 0, w: 1});
+        jsl.push({f:'js/ui/mobile.js', n: 'fm_mobile_js', j: 1, w: 1});
+        jsl.push({f:'js/vendor/jquery.mobile.js', n: 'jquery_mobile_js', j: 1, w: 5});
     }
 
     var jsl2 =
@@ -1860,8 +1758,6 @@ else if (!b_u)
         'resellers': {f:'html/resellers.html', n: 'resellers', j:0},
         'download': {f:'html/download.html', n: 'download', j:0},
         'download_js': {f:'html/js/download.js', n: 'download_js', j:1},
-        'fm_mobile': {f:'html/fm-mobile.html', n: 'fm_mobile', j:0},
-        'fm_mobile_js': {f:'js/ui/megaRenderMobile.js', n: 'fm_mobile_js', j:1},
         'network_js': {f:'js/network-testing.js', n: 'network_js', j:1},
         'dispute': {f:'html/dispute.html', n: 'dispute', j:0},
         'disputenotice': {f:'html/disputenotice.html', n: 'disputenotice', j:0},
@@ -1896,7 +1792,7 @@ else if (!b_u)
         'cmd': {f:'html/megacmd.html', n: 'cmd', j:0},
         'megacmd_js': {f:'html/js/megacmd.js', n: 'megacmd_js', j:1},
         'cms_snapshot_js': {f:'js/cmsSnapshot.js', n: 'cms_snapshot_js', j:1},
-        'mobile': {f:'html/mobile.html', n: 'mobile', j:0},
+        'mobile': {f:'html/mobile_old.html', n: 'mobile', j:0},
         'support_js': {f:'html/js/support.js', n: 'support_js', j:1},
         'support': {f:'html/support.html', n: 'support', j:0},
         'contact': {f:'html/contact.html', n: 'contact', j:0},
@@ -2011,9 +1907,7 @@ else if (!b_u)
 
     if (is_mobile) {
         // Page specific
-        subpages['!'] = ['fm_mobile', 'download_js'];
-        subpages['F!'] = ['fm_mobile', 'fm_mobile_js'];
-        subpages['fm'] = ['fm_mobile', 'fm_mobile_js'];
+        subpages['!'] = ['download_js'];
     }
 	if (page == 'megacmd') page = 'cmd';
 
@@ -2367,6 +2261,12 @@ else if (!b_u)
         var deg = 0;
         var leftProgressBlock = document.getElementById('loadinganimleft');
         var rightProgressBlock = document.getElementById('loadinganimright');
+
+        // Fix exception thrown when going from mobile web /login page to mobile web /register page
+        if (is_mobile && (rightProgressBlock === null)) {
+            return false;
+        }
+
         if ((p > jsl_perc) && (p <= 100))
         {
             jsl_perc = p;
@@ -2522,7 +2422,7 @@ else if (!b_u)
             '</div>';
 
     var u_storage, loginresponse, u_sid, dl_res;
-    u_storage = is_mobile ? {} : init_storage(localStorage.sid ? localStorage : sessionStorage);
+    u_storage = init_storage(localStorage.sid ? localStorage : sessionStorage);
 
     if ((u_sid = u_storage.sid))
     {
@@ -2589,7 +2489,7 @@ else if (!b_u)
 
         mBroadcaster.sendMessage('boot_done');
 
-        if (u_checked || is_mobile) {
+        if (u_checked) {
             startMega();
         }
         else if (loginresponse === -15) {

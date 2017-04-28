@@ -155,7 +155,7 @@ def dev(build_bundle=False, branch_name=''):
 
         # Provide test link and version info.
         print('Test link:\n    https://{branch_name}.{host}'
-                '/dont-deploy/sandbox3.html?apipath=prod'
+                '/dont-deploy/sandbox3.html?apipath=prod&jj=1'
                 .format(host=host_name.replace("beta.", ""),
                         branch_name=branch_name,
                         boot_html=boot_html))

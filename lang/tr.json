@@ -4086,8 +4086,8 @@
     "16468": "\u0130ade Makbuzu",
     "16469": "A\u00e7maya \u00e7al\u0131\u015ft\u0131\u011f\u0131n\u0131z dosya\/klas\u00f6r linki bulunamad\u0131. B\u00fcy\u00fck ihtimalle farkl\u0131 bir hesapta hesaptas\u0131n\u0131z. L\u00fctfen, do\u011fru hesaba giri\u015f yap\u0131p tekrar deneyin.",
     "16470": "Dosya\/klas\u00f6r bulunamad\u0131",
-    "16471": "Sa\u011flanan anahtar ge\u00e7ersiz.",
-    "16472": "L\u00fctfen anahtar\u0131n do\u011fru oldu\u011fundan emin olun veya link sahibine sorun.",
+    "16471": "The provided key is invalid.",
+    "16472": "Please check that the key is correct or ask the creator of the link again.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

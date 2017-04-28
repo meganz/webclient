@@ -7746,7 +7746,7 @@ table {
 .contact-requests-grid td:nth-child(3) {
      width: 400px;
 }
-.contact-requests th:nth-child(1) {
+.sent-requests-grid th:nth-child(1) {
      width: 100% !important;
 }
 .sent-requests-grid .grid-table tr td:first-child, .sent-requests-grid tr th:first-child,

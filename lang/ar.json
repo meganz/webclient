@@ -4088,6 +4088,12 @@
     "16470": "File\/folder not found",
     "16471": "The provided key is invalid.",
     "16472": "Please check that the key is correct or ask the creator of the link again.",
+    "16473": "[1]MEGA Achievement Expired[2]One of your achievements has expired today. Don't worry though, you can always achieve more or upgrade to a PRO account.[3]To upgrade your account to PRO, click below:",
+    "16474": "Previous versions",
+    "16475": "Revert",
+    "16476": "Edited by %1 ",
+    "16477": "Renamed from %1 by %2",
+    "16478": "current version",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4338,6 +4344,11 @@
         "online-autoaway-checkbox-field": 16389,
         "no-files-in-cloud-drive": 16394,
         "provided-key-invalid": 16471,
-        "please-check-key-is-correct": 16472
+        "please-check-key-is-correct": 16472,
+        "file_previous_version": 16474,
+        "file_revert_version": 16475,
+        "file_version_edited_by": 16476,
+        "file_version_renamed_from": 16477,
+        "file_current_version": 16478
     }
 }

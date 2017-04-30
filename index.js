@@ -731,6 +731,12 @@ function init_page() {
         loadSubPage('fm/account/achievements');
         return false;
     }
+    else if (page === 'fm/account/profile') {
+
+        // Handle old invalid links from emails and redirect them back to fm/account
+        loadSubPage('fm/account');
+        return false;
+    }
     else if (page == 'account') {
         loadSubPage('fm/account');
         return false;
@@ -1998,7 +2004,7 @@ function topmenuUI() {
 
         // If the user has an avatar already set, take them to the profile page where they can change or remove it
         if ($(this).find('img').length > 0) {
-            loadSubPage('fm/account/profile');
+            loadSubPage('fm/account');
         }
         else {
             // Otherwise if they don't have an avatar, open the change avatar dialog;

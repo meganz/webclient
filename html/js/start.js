@@ -26,9 +26,55 @@ function init_start() {
     if (getSitePath() === '/info') {
         startpageScroll(1);
     }
+	
+	start_counts();
 }
 
 $.jScroll = {};
+
+var start_countdata = false;
+
+function start_counts()
+{
+	if (start_countdata) return;
+	start_countdata=true;
+	api_req({"a":"dailystats"}, 
+	{ 	
+		callback: function(res) 
+		{
+			start_countdata=res;
+			start_countdata.timestamp = Date.now();
+			start_countUpdate();
+		}});
+}
+
+
+function start_countUpdate()
+{
+	var usertotal = start_countdata.confirmedusers.total;
+	var filetotal = start_countdata.files.total;
+	if (Date.now()-1000 > start_countdata.timestamp)
+	{
+		var rate = (Date.now() - start_countdata.timestamp) / 86400000;
+		usertotal += Math.round(rate * start_countdata.confirmedusers.dailydelta);
+		filetotal += Math.round(rate * start_countdata.files.dailydelta);
+	}
+	var total = String(usertotal);
+	var html = '';
+	for (var i = 0, len = total.length; i < len; i++) {
+		html += '<div class="flip-block"><div class="flip-bg">' + total[i] + '</div></div>';
+	}
+	$('.startpage.flip-wrapper.users').html(html);
+	
+	var total = String(filetotal);
+	var html = '';
+	for (var i = 0, len = total.length; i < len; i++) {
+		html += '<div class="flip-block"><div class="flip-bg">' + total[i] + '</div></div>';
+	}
+	$('.startpage.flip-wrapper.files').html(html);
+	setTimeout(start_countUpdate,100);
+}
+
 
 
 function jScrollStart() {

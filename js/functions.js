@@ -3847,6 +3847,7 @@ mega.utils.reload = function megaUtilsReload() {
         var privk = u_storage.privk;
         var jj = localStorage.jj;
         var debug = localStorage.d;
+        var lang = localStorage.lang;
         var mcd = localStorage.testChatDisabled;
         var apipath = debug && localStorage.apipath;
 
@@ -3878,6 +3879,9 @@ mega.utils.reload = function megaUtilsReload() {
 
         if (mcd) {
             localStorage.testChatDisabled = 1;
+        }
+        if (lang) {
+            localStorage.lang = lang;
         }
         if (hashLogic) {
             localStorage.hashLogic = 1;

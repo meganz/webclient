@@ -3685,7 +3685,7 @@ function MegaData()
                         ctx.account.bw = Math.round(res.mxfer);
                         ctx.account.servbw_used = Math.round(res.csxfer);
                         ctx.account.downbw_used = Math.round(res.caxfer);
-                        ctx.account.servbw_limit = res.srvratio;
+                        ctx.account.servbw_limit = Math.round(res.srvratio);
                         ctx.account.balance = res.balance;
                         ctx.account.reseller = res.reseller;
                         ctx.account.prices = res.prices;
@@ -3744,7 +3744,7 @@ function MegaData()
                         var links = stats.links;
                         Object.keys(exp)
                             .filter(function(h) {
-                                return !M.d[h].t;
+                                return M.d[h] && !M.d[h].t;
                             })
                             .forEach(function(h) {
                                 links.files++;

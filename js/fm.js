@@ -7570,17 +7570,20 @@ function moveDialog() {
  * @param {String} toastClass Custom style for the notification
  * @param {String} notification The text for the toast notification
  */
+var toastTimeout;
+
 function showToast(toastClass, notification, buttonLabel) {
 
-    var $toast, timeout;
+    var $toast;
 
     $toast = $('.toast-notification.common-toast');
     $toast.attr('class', 'toast-notification common-toast ' + toastClass)
         .find('.toast-col:first-child span').safeHTML(notification);
 
-    $toast.removeClass('hidden').addClass('visible');
+    $toast.addClass('visible');
 
-    timeout = setTimeout(function() {
+    clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(function() {
         hideToast();
     }, 7000);
 
@@ -7596,15 +7599,15 @@ function showToast(toastClass, notification, buttonLabel) {
     $(closeSelector)
         .rebind('click', function() {
             $('.toast-notification').removeClass('visible');
-            clearTimeout(timeout);
+            clearTimeout(toastTimeout);
         });
 
     $toast.rebind('mouseover', function() {
-        clearTimeout(timeout);
+        clearTimeout(toastTimeout);
     });
 
     $toast.rebind('mouseout', function() {
-        timeout = setTimeout(function() {
+        toastTimeout = setTimeout(function() {
             hideToast();
         }, 7000);
     });

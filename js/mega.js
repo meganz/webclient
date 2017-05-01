@@ -3849,12 +3849,15 @@ function MegaData()
 
                     ctx.account.lastupdate = new Date().getTime();
 
-                    if (!ctx.account.bw)
-                        ctx.account.bw = 1024 * 1024 * 1024 * 10;
-                    if (!ctx.account.servbw_used)
+                    if (!ctx.account.bw) {
+                        ctx.account.bw = 1024 * 1024 * 1024 * 1024 * 1024 * 10;
+                    }
+                    if (!ctx.account.servbw_used) {
                         ctx.account.servbw_used = 0;
-                    if (!ctx.account.downbw_used)
+                    }
+                    if (!ctx.account.downbw_used) {
                         ctx.account.downbw_used = 0;
+                    }
 
                     M.account = ctx.account;
 

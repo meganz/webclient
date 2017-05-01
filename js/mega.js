@@ -1077,20 +1077,22 @@ function MegaData()
                     hideOPC = (hideOPC !== '') ? ' class="' + hideOPC + '"' : '';
                     html = '<tr id="opc_' + htmlentities(opc[i].p) + '"' + hideOPC + '>' +
                         '<td>' +
-                            '<div class="left email">' +
-                                '<div class="nw-contact-avatar"></div>' +
-                                '<div class="fm-chat-user-info">' +
-                                    '<div class="contact-email">' + htmlentities(opc[i].m) + '</div>' +
+                                '<div class="left email">' +
+                                    '<div class="nw-contact-avatar"></div>' +
+                                    '<div class="fm-chat-user-info">' +
+                                        '<div class="contact-email">' + htmlentities(opc[i].m) + '</div>' +
+                                    '</div>' +
                                 '</div>' +
-                            '</div>' +
-                            '<div class="default-white-button grey-txt small ' +
-                                'contact-request-button right cancel ' + hideCancel + '">' +
-                                    '<span>' + escapeHTML(l[5930]) + '</span>' +
-                            '</div>' +
-                            '<div class="default-white-button grey-txt small ' +
-                                'contact-request-button right reinvite ' + hideReinvite + '">' +
-                                    '<span>' + escapeHTML(l[5861]) + '</span>' +
-                            '</div>' +
+                            '</td>' +
+                            '<td>' +
+                                '<div class="default-white-button grey-txt small ' +
+                                    'contact-request-button right cancel ' + hideCancel + '">' +
+                                        '<span>' + escapeHTML(l[5930]) + '</span>' +
+                                '</div>' +
+                                '<div class="default-white-button grey-txt small ' +
+                                    'contact-request-button right reinvite ' + hideReinvite + '">' +
+                                        '<span>' + escapeHTML(l[5861]) + '</span>' +
+                                '</div>' +
                         '</td></tr>';
 
                     $(t).append(html);

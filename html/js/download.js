@@ -225,7 +225,9 @@ function dl_g(res) {
                 $('.mobile.filename').text(str_mtrunc(filename, 30));
                 $('.mobile.filesize').text(bytesToSize(res.s));
                 $('.mobile.dl-megaapp').rebind('click', function() {
-                    mega.utils.redirectToApp($(this));
+
+                    // Start the download in the app
+                    mobile.downloadOverlay.redirectToApp($(this));
                 });
 
                 var ext = fileext(filename);
@@ -252,16 +254,13 @@ function dl_g(res) {
             }
         }
         else if (is_mobile) {
-            var mkey = prompt(l[1026]);
-
-            if (mkey) {
-                location.hash = '#!' + dlpage_ph + '!' + mkey;
-            }
-            else {
-                dlpage_key = null;
-            }
+            // Load the missing file decryption key dialog for mobile
+            parsepage(pages['fm_mobile']);
+            mobile.decryptionKeyOverlay.show(dlpage_ph, false, key);
+            return false;
         }
         else {
+            // Otherwise load the regular file decryption key dialog
             mKeyDialog(dlpage_ph, false, key)
                 .fail(function() {
                     $('.download.error-text.message').text(l[7427]).removeClass('hidden');
@@ -512,7 +511,7 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
         $('.download-info.time-txt .text').safeHTML(secondsToTime(retime, 1));
 
         if (is_mobile) {
-            $('.mobile.download-speed').text(speed.size + speed.unit + '/s');
+            $('.mobile.download-speed').text(Math.round(speed.size) + speed.unit + '/s');
         }
     }
     if (page !== 'download' || $.infoscroll)

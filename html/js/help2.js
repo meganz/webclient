@@ -510,23 +510,23 @@ var Help = (function() {
             }
             catch (e) {}
 
-            searchTerm = searchTerm.replace(/[+-]/g, " ");
+            var sText = searchTerm.replace(/[+-]/g, " ");;
+            var search = sText.replace(/%([0-9a-f]+)/g, function(all, number) {
+                return String.fromCharCode(parseInt(number, 16));
+            });
+            var words = search.split(((lang == 'ct') || (lang == 'jp')) ? '' : /\s+/)
+                        .filter(function(word) { return word.length; })// filter out empty strings.
+                        .map(function(pattern) { return new RegExp(pattern, 'i'); });
 
-            var articles = idx.search.search(searchTerm, {
-                fields: {
-                    title: {boost: 2, bool: "AND"},
-                    body: {boost: 1},
-                    tags: {boots: 3},
-                },
-                bool: "AND",
-                expand: true
-            }).map(function(result) {
-                return idx.all[result.ref];
+            var articles = idx.all.filter(function(doc) {
+                return words.filter(function(target) {
+                    return !!doc.indexedTitle.match(target) || !!doc.body.match(target);
+                }).length === words.length;
             });
 
             parsepage(Data.help_search_tpl.html);
 
-            $('#help2-main .search').val(searchTerm);
+            $('#help2-main .search').val(sText);
 
             if (articles.length === 0) {
                 $('.search-404-block').show();
@@ -792,6 +792,7 @@ var Help = (function() {
             Data.help_search.object.map(function(obj, id) {
                 obj.pos = id;
                 obj.tags = obj.tags.split(/, /);
+                obj.indexedTitle = obj.title.split("").join(" ");
                 idx.search.addDoc(obj);
             });
 

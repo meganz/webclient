@@ -1368,6 +1368,20 @@ React.makeElement = React['createElement'];
 	    });
 	};
 
+	Chat.prototype._leaveAllGroupChats = function () {
+	    asyncApiReq({ 'a': 'mcf', 'v': Chatd.VERSION }).done(function (r) {
+	        r.c.forEach(function (chatRoomMeta) {
+	            if (chatRoomMeta.g === 1) {
+	                asyncApiReq({
+	                    "a": "mcr",
+	                    "id": chatRoomMeta.id,
+	                    "v": Chatd.VERSION
+	                });
+	            }
+	        });
+	    });
+	};
+
 	Chat.prototype.updateDashboard = function () {
 	    if (M.currentdirid === 'dashboard') {
 	        delay('dashboard:updchat', dashboardUI.updateChatWidget);
@@ -1400,6 +1414,18 @@ React.makeElement = React['createElement'];
 
 	        return self._emojiDataLoading[name];
 	    }
+	};
+
+	Chat.prototype.getPresence = function (u) {
+	    var self = this;
+
+	    var contact = M.u[u];
+
+	    if (!contact) {
+	        return UserPresence.PRESENCE.OFFLINE;
+	    }
+
+	    return contact.u !== u_handle ? self.plugins.presencedIntegration.getPresence(contact.u) : self.plugins.presencedIntegration.getMyPresence();
 	};
 
 	window.Chat = Chat;
@@ -4211,7 +4237,7 @@ React.makeElement = React['createElement'];
 	                            React.makeElement("i", { className: "small-icon rounded-stop" }),
 	                            l[8633]
 	                        ) : null,
-	                        room.type === "group" && room.stateIsLeftOrLeaving() ? React.makeElement(
+	                        room._closing !== true && room.type === "group" && room.stateIsLeftOrLeaving() ? React.makeElement(
 	                            "div",
 	                            { className: "link-button red", onClick: function onClick() {
 	                                    if (self.props.onCloseClicked) {
@@ -5129,23 +5155,26 @@ React.makeElement = React['createElement'];
 	                                self.lastScrollPositionPerc = 1;
 	                            } else if (messageContents) {
 	                                room.megaChat.plugins.chatdIntegration.updateMessage(room, v.internalId ? v.internalId : v.orderValue, messageContents);
-	                                if (v.textContents) {
-	                                    v.textContents = messageContents;
-	                                }
-	                                if (v.contents) {
-	                                    v.contents = messageContents;
-	                                }
-	                                if (v.emoticonShortcutsProcessed) {
-	                                    v.emoticonShortcutsProcessed = false;
-	                                }
-	                                if (v.emoticonsProcessed) {
-	                                    v.emoticonsProcessed = false;
-	                                }
-	                                if (v.messageHtml) {
-	                                    delete v.messageHtml;
-	                                }
 
-	                                $(v).trigger('onChange', [v, "textContents", "", messageContents]);
+	                                if (v.getState && v.getState() === Message.STATE.NOT_SENT && !v.requiresManualRetry) {
+	                                    if (v.textContents) {
+	                                        v.textContents = messageContents;
+	                                    }
+	                                    if (v.contents) {
+	                                        v.contents = messageContents;
+	                                    }
+	                                    if (v.emoticonShortcutsProcessed) {
+	                                        v.emoticonShortcutsProcessed = false;
+	                                    }
+	                                    if (v.emoticonsProcessed) {
+	                                        v.emoticonsProcessed = false;
+	                                    }
+	                                    if (v.messageHtml) {
+	                                        delete v.messageHtml;
+	                                    }
+
+	                                    $(v).trigger('onChange', [v, "textContents", "", messageContents]);
+	                                }
 
 	                                self.messagesListScrollable.scrollToBottom(true);
 	                                self.lastScrollPositionPerc = 1;
@@ -5244,17 +5273,19 @@ React.makeElement = React['createElement'];
 	                            chatdint.discardMessage(room, msg.internalId ? msg.internalId : msg.orderValue);
 	                        }
 
-	                        msg.message = "";
-	                        msg.contents = "";
-	                        msg.messageHtml = "";
-	                        msg.deleted = true;
-
 	                        self.setState({
 	                            'confirmDeleteDialog': false,
 	                            'messageToBeDeleted': false
 	                        });
 
-	                        $(msg).trigger('onChange', [msg, "deleted", false, true]);
+	                        if (msg.getState && msg.getState() === Message.STATE.NOT_SENT && !msg.requiresManualRetry) {
+	                            msg.message = "";
+	                            msg.contents = "";
+	                            msg.messageHtml = "";
+	                            msg.deleted = true;
+
+	                            $(msg).trigger('onChange', [msg, "deleted", false, true]);
+	                        }
 	                    }
 	                },
 	                React.makeElement(
@@ -10367,6 +10398,7 @@ React.makeElement = React['createElement'];
 	    var self = this;
 
 	    self._leaving = true;
+	    self._closing = triggerLeaveRequest;
 
 	    self.members[u_handle] = 0;
 
@@ -10385,6 +10417,9 @@ React.makeElement = React['createElement'];
 
 	            return self.megaChat.karere.leaveChat(self.roomJid).done(function () {
 	                self.setState(ChatRoom.STATE.LEFT);
+	                if (triggerLeaveRequest === true) {
+	                    self.destroy();
+	                }
 	            });
 	        } else {
 	            return;
@@ -10392,10 +10427,6 @@ React.makeElement = React['createElement'];
 	    } else {
 	        self.setState(ChatRoom.STATE.LEFT);
 	    }
-
-	    self.megaChat.refreshConversations();
-
-	    self.trackDataChange();
 	};
 
 	ChatRoom.prototype.destroy = function (notifyOtherDevices, noRedirect) {
@@ -10409,11 +10440,11 @@ React.makeElement = React['createElement'];
 	        self.leave(notifyOtherDevices);
 	    }
 
-	    Soon(function () {
-	        if (self.isCurrentlyActive) {
-	            self.isCurrentlyActive = false;
-	        }
+	    if (self.isCurrentlyActive) {
+	        self.isCurrentlyActive = false;
+	    }
 
+	    Soon(function () {
 	        mc.chats.remove(roomJid);
 
 	        if (!noRedirect) {

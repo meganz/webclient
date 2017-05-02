@@ -218,7 +218,7 @@ var exportPassword = {
 
                 // Reset encryption button state and text to 'Encrypt'
                 $encryptButtonText.removeClass('encrypted').text(l[9061]);
-                
+
                 // Reinit link body scrolling
                 exportPassword.encrypt.reInitScrolling();
 
@@ -802,6 +802,9 @@ var exportPassword = {
                 // Clear password field
                 $password.val('');
 
+                // Add a log to see if the feature is used often
+                api_req({ a: 'log', e: 99633, m: 'Successfully decrypted password protected link on regular web' });
+
                 // On success, redirect to actual file/folder link
                 loadSubPage(url);
             });
@@ -893,11 +896,16 @@ var exportPassword = {
         var keyLengthBits = this.algorithms[algorithm]['derivedKeyLength'];
         var keyLengthBytes = keyLengthBits / 8;
 
-        // Derive the key
-        var derivedKeyBytes = asmCrypto[name].bytes(passwordBytes, saltBytes, iterations, keyLengthBytes);
+        // Give the UI some time to update on slower devices like iOS
+        setTimeout(function() {
 
-        // Pass the derived key to the callback
-        callback(derivedKeyBytes);
+            // Derive the key
+            var derivedKeyBytes = asmCrypto[name].bytes(passwordBytes, saltBytes, iterations, keyLengthBytes);
+
+            // Pass the derived key to the callback
+            callback(derivedKeyBytes);
+
+        }, 500);
     },
 
     /**
@@ -1699,6 +1707,14 @@ var exportExpiry = {
 
         var self = this;
 
+        // Add some logging for usage comparisons
+        if (is_mobile) {
+            api_req({ a: 'log', e: 99634, m: 'Created public link on mobile webclient' });
+        }
+        else {
+            api_req({ a: 'log', e: 99635, m: 'Created public link on regular webclient' });
+        }
+
         // Prompt copyright dialog and if accepted get link, otherwise stall
         if (self.options.nodesToProcess.length) {
             loadingDialog.show();
@@ -1803,6 +1819,11 @@ var exportExpiry = {
                     exportLinkDialog.linksDialog();
                 }
             }
+
+            // A hook for the mobile web to show the public link and the remove button
+            if (is_mobile) {
+                mobile.linkOverlay.showPublicLinkAndEnableButtons(nodeId);
+            }
         };
         var share = M.getNodeShare(nodeId);
         var request = { a: 'l', n: nodeId, i: requesti };
@@ -1859,6 +1880,11 @@ var exportExpiry = {
                         var UiExportLink = new mega.UI.Share.ExportLink();
                         UiExportLink.removeExportLinkIcon(this.nodeId);
                     }
+
+                    // Hook for mobile web to show that removal completed successfully and then close the dialog
+                    if (is_mobile) {
+                        mobile.linkOverlay.completeLinkRemovalProcess(this.nodeId);
+                    }
                 }
                 else {
                     // Error
@@ -1889,6 +1915,11 @@ var exportExpiry = {
                     if (self.options.updateUI) {
                         var UiExportLink = new mega.UI.Share.ExportLink();
                         UiExportLink.removeExportLinkIcon(this.nodeId);
+                    }
+
+                    // Hook for mobile web to show that removal completed successfully and then close the dialog
+                    if (is_mobile) {
+                        mobile.linkOverlay.completeLinkRemovalProcess(this.nodeId);
                     }
                 }
                 else {

@@ -43,12 +43,12 @@ if (typeof ie9 === 'undefined')
 if (typeof loadingDialog === 'undefined') {
     var loadingDialog = {};
     loadingDialog.show = function() {
-        $('.dark-overlay').show();
+        $('.dark-overlay').removeClass('hidden');
         $('.loading-spinner:not(.manual-management)').removeClass('hidden').addClass('active');
         this.active = true;
     };
     loadingDialog.hide = function() {
-        $('.dark-overlay').hide();
+        $('.dark-overlay').addClass('hidden');
         $('.loading-spinner:not(.manual-management)').addClass('hidden').removeClass('active');
         this.active = false;
    };
@@ -419,15 +419,23 @@ function MegaData()
 
     this.getSortStatus = function(u)
     {
-        var status = megaChatIsReady && megaChat.karere.getPresence(megaChat.getJidFromNodeId(u));
-        if (status == 'chat')
+        var status = megaChatIsReady && megaChat.getPresence(u);
+
+        // To implement some kind of ordering we need to translate the actual UserPresence.PRESENCE.* state to an
+        // integer that would be then used for sorting (e.g. ONLINE first = return 1, OFFLINE last, return 4)
+        // PS: Because of chat is being loaded too late, we can't use the User.PRESENCE.* reference.
+        if (status === 3) {
+            // UserPresence.PRESENCE.ONLINE
             return 1;
-        else if (status == 'dnd')
+        } else if (status === 4) {
+            // UserPresence.PRESENCE.DND
             return 2;
-        else if (status == 'away')
+        } else if (status === 2) {
+            // UserPresence.PRESENCE.AWAY
             return 3;
-        else
+        } else {
             return 4;
+        }
     };
 
     this.getSortByStatusFn = function(d) {
@@ -1069,20 +1077,22 @@ function MegaData()
                     hideOPC = (hideOPC !== '') ? ' class="' + hideOPC + '"' : '';
                     html = '<tr id="opc_' + htmlentities(opc[i].p) + '"' + hideOPC + '>' +
                         '<td>' +
-                            '<div class="left email">' +
-                                '<div class="nw-contact-avatar"></div>' +
-                                '<div class="fm-chat-user-info">' +
-                                    '<div class="contact-email">' + htmlentities(opc[i].m) + '</div>' +
+                                '<div class="left email">' +
+                                    '<div class="nw-contact-avatar"></div>' +
+                                    '<div class="fm-chat-user-info">' +
+                                        '<div class="contact-email">' + htmlentities(opc[i].m) + '</div>' +
+                                    '</div>' +
                                 '</div>' +
-                            '</div>' +
-                            '<div class="default-white-button grey-txt small ' +
-                                'contact-request-button right cancel ' + hideCancel + '">' +
-                                    '<span>' + escapeHTML(l[5930]) + '</span>' +
-                            '</div>' +
-                            '<div class="default-white-button grey-txt small ' +
-                                'contact-request-button right reinvite ' + hideReinvite + '">' +
-                                    '<span>' + escapeHTML(l[5861]) + '</span>' +
-                            '</div>' +
+                            '</td>' +
+                            '<td>' +
+                                '<div class="default-white-button grey-txt small ' +
+                                    'contact-request-button right cancel ' + hideCancel + '">' +
+                                        '<span>' + escapeHTML(l[5930]) + '</span>' +
+                                '</div>' +
+                                '<div class="default-white-button grey-txt small ' +
+                                    'contact-request-button right reinvite ' + hideReinvite + '">' +
+                                        '<span>' + escapeHTML(l[5861]) + '</span>' +
+                                '</div>' +
                         '</td></tr>';
 
                     $(t).append(html);
@@ -1109,6 +1119,23 @@ function MegaData()
      * @param {Boolean} aUpdate  Whether we're updating the list
      */
     this.renderMain = function(aUpdate) {
+
+        // If mobile render an update to the cloud
+        if (is_mobile) {
+
+            // If flag is set, just update to show new files
+            if (aUpdate) {
+                mobile.cloud.renderUpdate();
+            }
+            else {
+                // Otherwise do a full re-render
+                mobile.cloud.renderLayout();
+            }
+
+            // Don't execute any regular webclient code
+            return true;
+        }
+
         var numRenderedNodes = -1;
 
         if (d) {
@@ -1340,7 +1367,10 @@ function MegaData()
         this.buildtree({h: M.RubbishID},    this.buildtree.FORCE_REBUILD);
         this.buildtree({h: M.InboxID},    this.buildtree.FORCE_REBUILD);
         this.contacts();
-        delay(treeUI);
+
+        if (!is_mobile) {
+            delay(treeUI);
+        }
     };
 
     this.openFolder = function(id, force, chat) {
@@ -1460,12 +1490,12 @@ function MegaData()
             // Error reading shared folder link! (Eg, server gave a -11 (EACCESS) error)
             // Force cleaning the current cloud contents and showing an empty msg
             if (!is_mobile) {
-                    M.renderMain();
-                }
-                else {
-                    // Trigger rendering of mobile file manager
-                    mobilefm.renderLayout();
-                }
+                M.renderMain();
+            }
+            else {
+                // Trigger rendering of mobile file manager
+                mobile.cloud.renderLayout();
+            }
         }
         else if (id && (id.substr(0, 7) !== 'account')
                 && (id.substr(0, 9) !== 'dashboard')
@@ -1538,12 +1568,12 @@ function MegaData()
             }
 
             if (!is_mobile) {
-                    M.renderMain();
-                }
-                else {
-                    // Trigger rendering of mobile file manager
-                    mobilefm.renderLayout();
-                }
+                M.renderMain();
+            }
+            else {
+                // Trigger rendering of mobile file manager
+                mobile.cloud.renderLayout();
+            }
 
             if (fminitialized) {
                 var currentdirid = M.currentdirid;
@@ -1556,16 +1586,16 @@ function MegaData()
                 }
 
                 if (!is_mobile) {
-                        if ($('#treea_' + currentdirid).length === 0) {
-                            var n = M.d[currentdirid];
-                            if (n && n.p) {
-                                treeUIopen(n.p, false, true);
-                            }
+                    if ($('#treea_' + currentdirid).length === 0) {
+                        var n = M.d[currentdirid];
+                        if (n && n.p) {
+                            treeUIopen(n.p, false, true);
                         }
-                        treeUIopen(currentdirid, currentdirid === 'contacts');
-
-                        $('#treea_' + currentdirid).addClass('opened');
                     }
+                    treeUIopen(currentdirid, currentdirid === 'contacts');
+
+                    $('#treea_' + currentdirid).addClass('opened');
+                }
             }
             if (d) {
                 console.timeEnd('time for rendering');
@@ -1611,11 +1641,11 @@ function MegaData()
             console.error(ex);
         }
         if (!is_mobile) {
-                searchPath();
+            searchPath();
 
-                var sortMenu = new mega.SortMenu();
-                sortMenu.treeSearchUI();
-            }
+            var sortMenu = new mega.SortMenu();
+            sortMenu.treeSearchUI();
+        }
 
         $(document).trigger('MegaOpenFolder');
     };
@@ -1637,6 +1667,11 @@ function MegaData()
 
     // Contacts left panel handling
     this.contacts = function() {
+
+        // Contacts rendering not used on mobile
+        if (is_mobile) {
+            return true;
+        }
 
         var i;
         var activeContacts = this.getActiveContacts()
@@ -1850,7 +1885,7 @@ function MegaData()
         }
 
         var folders = [],
-            _ts_l = treesearch && treesearch.toLowerCase(),
+            _ts_l = (typeof treesearch !== 'undefined' && treesearch) ? treesearch.toLowerCase() : undefined,
             _li = 'treeli_',
             _sub = 'treesub_',
             _a = 'treea_',
@@ -1960,7 +1995,7 @@ function MegaData()
             }
 
             var sortFn = this.getSortByNameFn();
-            var sortDirection = $.sortTreePanel[prefix].dir;
+            var sortDirection = (is_mobile) ? 1 : $.sortTreePanel[prefix].dir;
             folders.sort(
                 function(a, b) {
                     return sortFn(a, b, sortDirection);
@@ -2091,7 +2126,7 @@ function MegaData()
                     this.buildtree(folders[idx], dialog, stype);
                 }
 
-                if (fminitialized) {
+                if (fminitialized && !is_mobile) {
                     var currNode = M.d[curItemHandle];
 
                     if ((currNode && currNode.shares) || M.ps[curItemHandle]) {
@@ -2575,8 +2610,14 @@ function MegaData()
         this.d[n.h] = n;
 
         if (fminitialized) {
+
             // Handle Inbox/RubbishBin UI changes
-            delay('fmtopUI', fmtopUI);
+            if (!is_mobile) {
+                delay('fmtopUI', fmtopUI);
+            }
+            else {
+                mobile.cloud.countAndUpdateSubFolderTotals();
+            }
 
             newnodes.push(n);
         }
@@ -2584,18 +2625,14 @@ function MegaData()
         // $(window).trigger("megaNodeAdded", [n]);
     };
 
-    if (is_mobile) {
-        this.addNode = function() {
-            return false;
-        };
-    }
-
     var delInShareQueue = Object.create(null);
     this.delNode = function(h, ignoreDB) {
         function ds(h) {
+
             if (fminitialized) {
                 removeUInode(h);
             }
+
             if (M.c[h] && h.length < 11) {
                 for (var h2 in M.c[h]) {
                     ds(h2);
@@ -2627,7 +2664,11 @@ function MegaData()
                 M.u[h].c = 0;
             }
         }
+
+        // Store parent now as it will be unavailable after deletion (the typeof checks fix a hell account exception)
+        var parent = ((typeof M.d[h] !== 'undefined') && (typeof M.d[h].p !== 'undefined')) ? M.d[h].p : undefined;
         var delInShareQ = delInShareQueue[h] = delInShareQueue[h] || [];
+
         ds(h);
 
         if (fmdb && !ignoreDB) {
@@ -2640,18 +2681,31 @@ function MegaData()
         }
         if (fminitialized) {
             // Handle Inbox/RubbishBin UI changes
-            delay('fmtopUI', fmtopUI);
+            if (!is_mobile) {
+                delay('fmtopUI', fmtopUI);
+            }
 
             if (M.currentdirid === 'shares' && !M.viewmode) {
                 M.openFolder('shares', 1);
             }
             else {
-                // Update M.v it's used for at least preview slideshow
+                // Update M.v because it's used for a lot of things
                 for (var k = M.v.length; k--;) {
                     if (M.v[k].h === h) {
                         M.v.splice(k, 1);
                         break;
                     }
+                }
+
+                // Render delete for mobile now
+                if (is_mobile) {
+                    mobile.cloud.renderDelete(h, parent);
+                }
+
+                // If in the current folder and this got removed, then we need to go back up and open the parent folder
+                if (M.currentdirid === h || isCircular(h, M.currentdirid) === true) {
+                    parent = parent || Object(M.getNodeByHandle(h)).p || RootbyId(h);
+                    M.openFolder(parent);
                 }
             }
         }
@@ -3516,9 +3570,15 @@ function MegaData()
 
                     if (!--ctx.pending.value) {
                         if (newnodes.length) {
-                            renderNew();
-                            Soon(fmtopUI);
-                            $.tresizer();
+                            if (!is_mobile) {
+                                renderNew();
+                                Soon(fmtopUI);
+                                $.tresizer();
+                            }
+                            else {
+                                // A hook for the mobile web to remove the node from the view and close the dialog
+                                mobile.deleteOverlay.completeDeletionProcess(ctx.handle);
+                            }
                             // force fmdb flush by writing the sn, so that we don't have to
                             // wait for the packet to do so if the operation succeed here.
                             setsn(currsn);
@@ -3625,7 +3685,7 @@ function MegaData()
                         ctx.account.bw = Math.round(res.mxfer);
                         ctx.account.servbw_used = Math.round(res.csxfer);
                         ctx.account.downbw_used = Math.round(res.caxfer);
-                        ctx.account.servbw_limit = res.srvratio;
+                        ctx.account.servbw_limit = Math.round(res.srvratio);
                         ctx.account.balance = res.balance;
                         ctx.account.reseller = res.reseller;
                         ctx.account.prices = res.prices;
@@ -3684,7 +3744,7 @@ function MegaData()
                         var links = stats.links;
                         Object.keys(exp)
                             .filter(function(h) {
-                                return !M.d[h].t;
+                                return M.d[h] && !M.d[h].t;
                             })
                             .forEach(function(h) {
                                 links.files++;
@@ -4234,7 +4294,7 @@ function MegaData()
                     fmdb.add('s', { o_t : h + '*' + s.u, d : s });
                 }
             }
-            if (fminitialized) {
+            if (fminitialized && !is_mobile) {
                 sharedUInode(h);
             }
             if (fmdb && !pfkey && !ignoreDB) {
@@ -4312,7 +4372,7 @@ function MegaData()
             if (updnode) {
                 M.nodeUpdated(this.d[h]);
 
-                if (fminitialized) {
+                if (fminitialized && !is_mobile) {
                     sharedUInode(h);
                 }
             }
@@ -6017,12 +6077,12 @@ function renderfm() {
     if (!is_mobile) {
         M.renderTree();
         M.renderPath();
-    }
 
-    var c = $('#treesub_' + M.RootID).attr('class');
-    if (c && c.indexOf('opened') < 0) {
-        $('.fm-tree-header.cloud-drive-item').addClass('opened');
-        $('#treesub_' + M.RootID).addClass('opened');
+        var c = $('#treesub_' + M.RootID).attr('class');
+        if (c && c.indexOf('opened') < 0) {
+            $('.fm-tree-header.cloud-drive-item').addClass('opened');
+            $('#treesub_' + M.RootID).addClass('opened');
+        }
     }
 
     M.openFolder(M.currentdirid);
@@ -6084,14 +6144,18 @@ function renderNew() {
     }
 
     if (UItree) {
-        treeUI();
+        if (!is_mobile) {
+            treeUI();
+        }
         if (M.currentrootid === 'shares') {
             M.renderTree();
         }
         if (M.currentdirid === 'shares' && !M.viewmode) {
             M.openFolder('shares', 1);
         }
-        treeUIopen(M.currentdirid);
+        if (!is_mobile) {
+            treeUIopen(M.currentdirid);
+        }
     }
     if (newcontact) {
         M.avatars();
@@ -6373,7 +6437,7 @@ function execsc() {
                     // is this a full share delete?
                     if (a.r === undefined) {
                         // fill DDL with removed contact
-                        if (a.u && M.u[a.u] && M.u[a.u].m) {
+                        if (a.u && M.u[a.u] && M.u[a.u].m && !is_mobile) {
                             var email = M.u[a.u].m;
                             var contactName = M.getNameByHandle(a.u);
 
@@ -6395,7 +6459,7 @@ function execsc() {
                         processPS([a]);
                     }
 
-                    if (fminitialized) {
+                    if (fminitialized && !is_mobile) {
                         // a full share contains .h param
                         sharedUInode(a.h);
                     }
@@ -6643,7 +6707,9 @@ function execsc() {
                         }
 
                         if (fminitialized) {
-                            sharedUInode(a.n);
+                            if (!is_mobile) {
+                                sharedUInode(a.n);
+                            }
                         }
                         scsharesuiupd = true;
                     }
@@ -7509,23 +7575,18 @@ function fetchfm(sn) {
     // before showing the filemanager
     initialscfetch = true;
 
-    if (!is_mobile) {
-        // activate/prefetch attribute cache at this early stage
-        attribCache.prefillMemCache(fmdb).then(function() {
+    // activate/prefetch attribute cache at this early stage
+    attribCache.prefillMemCache(fmdb).then(function() {
 
-            if (sn) {
-                currsn = sn;
-                dbfetchfm();
-            }
-            else {
-                // no cache requested or available - get from API
-                loadFromApi();
-            }
-        });
-    }
-    else {
-        loadFromApi();
-    }
+        if (sn) {
+            currsn = sn;
+            dbfetchfm();
+        }
+        else {
+            // no cache requested or available - get from API
+            loadFromApi();
+        }
+    });
 }
 
 /**
@@ -8309,13 +8370,14 @@ function processIPC(ipc, ignoreDB) {
                 removeFromMultiInputDDL('.share-multiple-input', { id: ipc[i].m, name: ipc[i].m });
             }
             else {
+                if (!is_mobile) {
+                    // Don't prevent contact creation when there's already IPC available
+                    // When user add contact who already sent IPC, server will automatically create full contact
+                    var contactName = M.getNameByHandle(ipc[i].p);
 
-                var contactName = M.getNameByHandle(ipc[i].p);
-
-                // Update token.input plugin
-                addToMultiInputDropDownList('.share-multiple-input', [{ id: ipc[i].m, name: contactName }]);
-                // Don't prevent contact creation when there's already IPC available
-                // When user add contact who already sent IPC, server will automatically create full contact
+                    // Update token.input plugin
+                    addToMultiInputDropDownList('.share-multiple-input', [{ id: ipc[i].m, name: contactName }]);
+                }
             }
         }
     }
@@ -8336,8 +8398,10 @@ function processOPC(opc, ignoreDB) {
             M.delOPC(opc[i].p);
 
             // Update tokenInput plugin
-            removeFromMultiInputDDL('.share-multiple-input', { id: opc[i].m, name: opc[i].m });
-            removeFromMultiInputDDL('.add-contact-multiple-input', { id: opc[i].m, name: opc[i].m });
+            if (!is_mobile) {
+                removeFromMultiInputDDL('.share-multiple-input', { id: opc[i].m, name: opc[i].m });
+                removeFromMultiInputDDL('.add-contact-multiple-input', { id: opc[i].m, name: opc[i].m });
+            }
         }
         else {
             // Search through M.opc to find duplicated e-mail with .dts
@@ -8359,8 +8423,10 @@ function processOPC(opc, ignoreDB) {
             var contactName = M.getNameByHandle(opc[i].p);
 
             // Update tokenInput plugin
-            addToMultiInputDropDownList('.share-multiple-input', [{ id: opc[i].m, name: contactName }]);
-            addToMultiInputDropDownList('.add-contact-multiple-input', [{ id: opc[i].m, name: contactName }]);
+            if (!is_mobile) {
+                addToMultiInputDropDownList('.share-multiple-input', [{ id: opc[i].m, name: contactName }]);
+                addToMultiInputDropDownList('.add-contact-multiple-input', [{ id: opc[i].m, name: contactName }]);
+            }
         }
     }
 }
@@ -8372,6 +8438,7 @@ function processOPC(opc, ignoreDB) {
  * @param {Object} publicHandles The Public Handles action packet i.e. a: 'ph'.
  */
 function processPH(publicHandles) {
+
     var nodeId;
     var publicHandleId;
     var timeNow = unixtime();
@@ -8398,7 +8465,7 @@ function processPH(publicHandles) {
         if (value.d) {
             M.delNodeShare(nodeId, 'EXP');
 
-            if (UiExportLink) {
+            if (UiExportLink && !is_mobile) {
                 UiExportLink.removeExportLinkIcon(nodeId);
             }
         }
@@ -8418,13 +8485,18 @@ function processPH(publicHandles) {
 
             M.nodeShare(share.h, share);
 
-            if (UiExportLink) {
+            if (UiExportLink && !is_mobile) {
                 UiExportLink.addExportLinkIcon(nodeId);
             }
         }
 
         if (UiExportLink && (value.down !== undefined)) {
             UiExportLink.updateTakenDownItem(nodeId, value.down);
+        }
+
+        // Update the public link icon for mobile
+        if (is_mobile) {
+            mobile.cloud.updateLinkStatus(nodeId);
         }
     }
 }
@@ -8558,16 +8630,18 @@ function processUPCO(ap) {
                     }
                 }
 
-                // Update tokenInput plugin
-                removeFromMultiInputDDL('.share-multiple-input', { id: ap[i].m, name: ap[i].m });
-                removeFromMultiInputDDL('.add-contact-multiple-input', { id: ap[i].m, name: ap[i].m });
-                $('#opc_' + psid).remove();
+                if (!is_mobile) {
+                    // Update tokenInput plugin
+                    removeFromMultiInputDDL('.share-multiple-input', { id: ap[i].m, name: ap[i].m });
+                    removeFromMultiInputDDL('.add-contact-multiple-input', { id: ap[i].m, name: ap[i].m });
+                    $('#opc_' + psid).remove();
 
-                // Update sent contact request tab, set empty message with Add contact... button
-                if ((Object.keys(M.opc).length === 0) && (M.currentdirid === 'opc')) {
-                    $('.sent-requests-grid').addClass('hidden');
-                    $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[6196]); // No requests pending at this time
-                    $('.fm-empty-contacts').removeClass('hidden');
+                    // Update sent contact request tab, set empty message with Add contact... button
+                    if ((Object.keys(M.opc).length === 0) && (M.currentdirid === 'opc')) {
+                        $('.sent-requests-grid').addClass('hidden');
+                        $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[6196]); // No requests pending at this time
+                        $('.fm-empty-contacts').removeClass('hidden');
+                    }
                 }
             }
         }
@@ -8596,15 +8670,19 @@ function process_u(u, ignoreDB) {
                 var contactName = M.getNameByHandle(u[i].h);
 
                 // Update token.input plugin
-                addToMultiInputDropDownList('.share-multiple-input', [{ id: u[i].m, name: contactName }]);
-                addToMultiInputDropDownList('.add-contact-multiple-input', [{ id: u[i].m, name: contactName }]);
+                if (!is_mobile) {
+                    addToMultiInputDropDownList('.share-multiple-input', [{ id: u[i].m, name: contactName }]);
+                    addToMultiInputDropDownList('.add-contact-multiple-input', [{ id: u[i].m, name: contactName }]);
+                }
             }
             else if (M.d[u[i].u]) {
                 M.delNode(u[i].u, ignoreDB);
 
                 // Update token.input plugin
-                removeFromMultiInputDDL('.share-multiple-input', { id: u[i].m, name: u[i].m });
-                removeFromMultiInputDDL('.add-contact-multiple-input', { id: u[i].m, name: u[i].m });
+                if (!is_mobile) {
+                    removeFromMultiInputDDL('.share-multiple-input', { id: u[i].m, name: u[i].m });
+                    removeFromMultiInputDDL('.add-contact-multiple-input', { id: u[i].m, name: u[i].m });
+                }
             }
 
             // Update user attributes M.u
@@ -8679,13 +8757,24 @@ function folderreqerr()
     loadfm.loaded = false;
     loadfm.loading = false;
 
-    msgDialog('warninga', l[1043], l[1044] + '<ul><li>' + l[1045] + '</li><li>' + l[247] + '</li><li>' + l[1046] + '</li>', false, function()
-    {
-        loadSubPage('login'); // if the user is logged-in, he'll be redirected to the cloud
+    // If desktop site show "Folder link unavailable" dialog
+    if (!is_mobile) {
+        var title = l[1043];
+        var message = l[1044] + '<ul><li>' + l[1045] + '</li><li>' + l[247] + '</li><li>' + l[1046] + '</li>';
 
-        // FIXME: no location.reload() should be needed..
-        location.reload();
-    });
+        msgDialog('warninga', title, message, false, function() {
+
+            // If the user is logged-in, he'll be redirected to the cloud
+            loadSubPage('login');
+
+            // FIXME: no location.reload() should be needed..
+            location.reload();
+        });
+    }
+    else {
+        // Show file/folder not found overlay
+        mobile.notFoundOverlay.show();
+    }
 }
 
 function init_chat() {
@@ -8799,10 +8888,18 @@ function loadfm_callback(res) {
             loadfm.loaded = false;
             loadfm.loading = false;
 
-            return mKeyDialog(pfid, true, true)
-                .fail(function() {
-                    loadSubPage('start');
-                });
+            // If on mobile, load the decryption key overlay
+            if (is_mobile) {
+                mobile.decryptionKeyOverlay.show(pfid, true, true);
+                return new MegaPromise();
+            }
+            else {
+                // Otherwise load the regular webclient decryption key dialog
+                return mKeyDialog(pfid, true, true)
+                    .fail(function() {
+                        loadSubPage('start');
+                    });
+            }
         }
 
         // If we have shares, and if a share is for this node, record it on the nodes share list
@@ -8924,7 +9021,7 @@ function loadfm_done(mDBload) {
             mega.loadReport.ttfm = Date.now() - mega.loadReport.ttfm;
 
             // setup fm-notifications such as 'full' or 'almost-full' if needed.
-            if (!pfid && u_type) {
+            if (!pfid && u_type && !is_mobile) {
                 mega.checkStorageQuota(50);
             }
         }
@@ -8942,17 +9039,19 @@ function loadfm_done(mDBload) {
         }
 
         // -0x800e0fff indicates a call to loadfm() when it was already loaded
-        if (!is_mobile && mDBload !== -0x800e0fff) {
-            Soon(function _initialNotify() {
-                // After the first SC request all subsequent requests can generate notifications
-                notify.initialLoadComplete = true;
+        if (mDBload !== -0x800e0fff) {
+            if (!is_mobile) {
+                Soon(function _initialNotify() {
+                    // After the first SC request all subsequent requests can generate notifications
+                    notify.initialLoadComplete = true;
 
-                // If this was called from the initial fm load via gettree or db load, we should request the
-                // latest notifications. These must be done after the first getSC call.
-                if (!folderlink) {
-                    notify.getInitialNotifications();
-                }
-            });
+                    // If this was called from the initial fm load via gettree or db load, we should request the
+                    // latest notifications. These must be done after the first getSC call.
+                    if (!folderlink) {
+                        notify.getInitialNotifications();
+                    }
+                });
+            }
 
             if (mBroadcaster.crossTab.master && !mega.loadReport.sent) {
                 mega.loadReport.sent = true;
@@ -9186,318 +9285,425 @@ function fm_thumbnail_render(n) {
         }
     }
 }
-// jscs:enable
-// jshint ignore:end
+
+
+function fm_contains(filecnt, foldercnt) {
+    var containstxt = l[782];
+    if ((foldercnt > 1) && (filecnt > 1)) {
+        containstxt = l[828].replace('[X1]', foldercnt).replace('[X2]', filecnt);
+    } else if ((foldercnt > 1) && (filecnt === 1)) {
+        containstxt = l[829].replace('[X]', foldercnt);
+    } else if ((foldercnt === 1) && (filecnt > 1)) {
+        containstxt = l[830].replace('[X]', filecnt);
+    } else if ((foldercnt === 1) && (filecnt === 1)) {
+        containstxt = l[831];
+    } else if (foldercnt > 1) {
+        containstxt = l[832].replace('[X]', foldercnt);
+    } else if (filecnt > 1) {
+        containstxt = l[833].replace('[X]', filecnt);
+    } else if (foldercnt === 1) {
+        containstxt = l[834];
+    } else if (filecnt === 1) {
+        containstxt = l[835];
+    }
+    return containstxt;
+}
+
 
 /**
- * Code to trigger the mobile file manager download overlay and related behaviour
+ * Performs a remove operation on a node and related items
+ * This function was moved here as-is from fm.js so mobile web can use it too.
  */
-var mobileDownload = {
+function fmremove() {
 
-    /** Supported max file size of 100 MB */
-    maxFileSize: 100 * (1024 * 1024),
+    // If on mobile we will bypass the warning dialog prompts
+    if (is_mobile) {
+        localStorage.skipDelWarning = '1';
+    }
 
-    /** Supported file types for download on mobile */
-    supportedFileTypes: {
-        docx: 'word',
-        jpeg: 'image',
-        jpg: 'image',
-        mp3: 'audio',
-        mp4: 'video',
-        pdf: 'pdf',
-        png: 'image',
-        xlsx: 'word'
-    },
+    var filecnt = 0,
+        foldercnt = 0,
+        contactcnt = 0,
+        removesharecnt = 0;
 
-    /** Download start time in milliseconds */
-    startTime: null,
+    // Loop throught selected items
+    for (var i in $.selected) {
+        var n = M.d[$.selected[i]];
 
-    /** jQuery selector for the download overlay */
-    $overlay: null,
-
-    /**
-     * Initialise the overlay
-     * @param {String} nodeHandle A public or regular node handle
-     */
-    showOverlay: function(nodeHandle) {
-
-        // Store the selector as it is re-used
-        this.$overlay = $('#mobile-ui-main');
-
-        // Get initial overlay details
-        var node = M.d[nodeHandle];
-        var fileName = node.name;
-        var fileSizeBytes = node.s;
-        var fileSize = numOfBytes(fileSizeBytes);
-        var fileSizeFormatted = fileSize.size + ' ' + fileSize.unit;
-        var fileIconName = fileIcon(node);
-        var fileIconPath = staticpath + 'images/mobile/extensions/' + fileIconName + '.png';
-
-        // Set file name, size and image
-        this.$overlay.find('.filename').text(fileName);
-        this.$overlay.find('.filesize').text(fileSizeFormatted);
-        this.$overlay.find('.filetype-img').attr('src', fileIconPath);
-
-        // Initialise overlay buttons
-        this.initBrowserFileDownloadButton(nodeHandle);
-        this.initAppFileDownloadButton(nodeHandle);
-        this.initOverlayCloseButton();
-
-        // Change depending on platform and file size/type
-        this.setMobileAppInfo();
-        this.adjustMaxFileSize();
-        this.checkSupportedFile(node);
-
-        // Disable scrolling of the file manager in the background to fix a bug on iOS Safari
-        $('.mobile.fm-block').addClass('disable-scroll');
-
-        // Show the overlay
-        this.$overlay.removeClass('hidden').addClass('overlay');
-    },
-
-    /**
-     * Initialise the Open in Browser button on the file download overlay
-     * @param {String} nodeHandle The node handle for this file
-     */
-    initBrowserFileDownloadButton: function(nodeHandle) {
-
-        this.$overlay.find('.first.dl-browser').off('tap').on('tap', function() {
-
-            // Start the download
-            mobileDownload.startFileDownload(nodeHandle);
-
-            // Prevent default anchor link behaviour
-            return false;
-        });
-    },
-
-    /**
-     * Initialise the Open in Mega App button on the file download overlay
-     * @param {String} nodeHandle The node handle for this file
-     */
-    initAppFileDownloadButton: function(nodeHandle) {
-
-        this.$overlay.find('.second.dl-megaapp').off('tap').on('tap', function() {
-
-            // Start the download
-            mega.utils.redirectToApp($(this));  // ToDo: make the app start the download by node handle directly
-
-            // Prevent default anchor link behaviour
-            return false;
-        });
-    },
-
-    /**
-     * Initialises the close button on the overlay with download button options and also the download progress overlay
-     */
-    initOverlayCloseButton: function() {
-
-        var $closeButton = this.$overlay.find('.fm-dialog-close');
-
-        // Show close button for folder links
-        $closeButton.removeClass('hidden');
-
-        // Add tap handler
-        $closeButton.off('tap').on('tap', function() {
-
-            // Hide overlay with download button options
-            mobileDownload.$overlay.addClass('hidden');
-
-            // Hide downloading progress overlay
-            $('body').removeClass('downloading');
-
-            // Re-show the file manager and re-enable scrolling
-            $('.mobile.fm-block').removeClass('hidden disable-scroll');
-        });
-    },
-
-    /**
-     * Start the file download
-     * @param {String} nodeHandle The node handle for this file
-     */
-    startFileDownload: function(nodeHandle) {
-
-        // Show downloading overlay
-        $('body').addClass('downloading');
-
-        // Reset state from past downloads
-        this.$overlay.find('.download-progress').removeClass('complete');
-        this.$overlay.find('.download-percents').text('');
-        this.$overlay.find('.download-speed').text('');
-        this.$overlay.find('.download-progress span').text(l[1624] + '...');  // Downloading...
-        this.$overlay.find('.download-progress .bar').width('0%');
-
-        // Change message to 'Did you know that you can download the entire folder at once...'
-        this.$overlay.find('.file-manager-download-message').removeClass('hidden');
-
-        // Set the start time
-        this.startTime = new Date().getTime();
-
-        // Start download and show progress
-        mega.utils.gfsfetch(nodeHandle, 0, -1, this.showDownloadProgress).always(function(data) {
-
-            mobileDownload.showDownloadComplete(data, nodeHandle);
-        });
-    },
-
-    /**
-     * Download progress handler
-     * @param {Number} percentComplete The number representing the percentage complete e.g. 49.23, 51.5 etc
-     * @param {Number} bytesLoaded The number of bytes loaded so far
-     * @param {Number} bytesTotal The total number of bytes in the file
-     */
-    showDownloadProgress: function(percentComplete, bytesLoaded, bytesTotal) {
-
-        var $downloadButtonText = mobileDownload.$overlay.find('.download-progress span');
-        var $downloadProgressBar = mobileDownload.$overlay.find('.download-progress .bar');
-        var $downloadPercent = mobileDownload.$overlay.find('.download-percents');
-        var $downloadSpeed = mobileDownload.$overlay.find('.download-speed');
-
-        // Calculate the download speed
-        var percentCompleteRounded = Math.round(percentComplete);
-        var currentTime = new Date().getTime();
-        var secondsElapsed = (currentTime - mobileDownload.startTime) / 1000;
-        var bytesPerSecond = (secondsElapsed) ? (bytesLoaded / secondsElapsed) : 0;
-        var speed = numOfBytes(bytesPerSecond);
-        var speedText = speed.size + speed.unit + '/s';
-
-        // Display the download progress and speed
-        $downloadPercent.text(percentCompleteRounded + '%');
-        $downloadProgressBar.width(percentComplete + '%');
-        $downloadSpeed.text(speedText);
-
-        // If the download is complete e.g. 99/100%, change button text to Decrypting... which can take some time
-        if (percentComplete >= 99) {
-            $downloadButtonText.text(l[8579] + '...');
+        // ToDo: Not clear what this represents
+        if (n && n.su) {
+            removesharecnt++;
         }
-    },
 
-    /**
-     * Download complete handler, activate the Open File button and let the user download the file
-     * @param {Object} data The download data
-     * @param {String} nodeHandle The node handle for this file
-     */
-    showDownloadComplete: function(data, nodeHandle) {
-
-        var $downloadButton = this.$overlay.find('.download-progress');
-        var $downloadButtonText = this.$overlay.find('.download-progress span');
-        var $downloadPercent = this.$overlay.find('.download-percents');
-        var $downloadSpeed = this.$overlay.find('.download-speed');
-
-        // Change button text to full white and hide the download percentage and speed
-        $downloadButton.addClass('complete');
-        $downloadPercent.text('');
-        $downloadSpeed.text('');
-        $downloadButtonText.text(l[8949]);  // Open File
-
-        // Make download button clickable
-        $downloadButton.off('tap').on('tap', function() {
-
-            // Get the file's mime type
-            var node = M.d[nodeHandle];
-            var fileName = node.name;
-            var mimeType = filemime(fileName);
-
-            // Create object URL to download the file to the client
-            location.href = mObjectURL([data.buffer], mimeType);
-        });
-    },
-
-    /**
-     * Change the max file size supported for various platforms based on device testing
-     */
-    adjustMaxFileSize: function() {
-
-        // If Chrome or Firefox on iOS, reduce the size to 1.3 MB
-        if ((navigator.userAgent.match(/CriOS/i)) || (navigator.userAgent.match(/FxiOS/i))) {
-            this.maxFileSize = 1.3 * (1024 * 1024);
+        // ToDo: Replace counting contact id chars with something more reliable
+        else if (String($.selected[i]).length === 11) {
+            contactcnt++;
         }
-    },
 
-    /**
-     * Checks if the file download can be performed in the browser or shows an error overlay
-     * @param {Object} node The file node information
-     */
-    checkSupportedFile: function(node) {
-
-        var $openInBrowserButton = this.$overlay.find('.first.dl-browser');
-        var $fileTypeUnsupportedMessage = this.$overlay.find('.file-unsupported');
-        var $fileSizeUnsupportedMessage = this.$overlay.find('.file-too-large');
-
-        // Get the name, size, extension and whether supported
-        var fileName = node.name;
-        var fileSize = node.s;
-        var fileExtension = fileext(fileName);
-        var fileExtensionIsSupported = this.supportedFileTypes[fileExtension];
-
-        // Check if the download is supported
-        if ((fileSize > this.maxFileSize) || !fileExtensionIsSupported) {
-
-            // Show an error overlay
-            $('body').addClass('wrong-file');
-
-            // Remove the tap/click handler and show as greyed out
-            $openInBrowserButton.off('tap').addClass('disabled');
-
-            // Change error message
-            if (!fileExtensionIsSupported) {
-                $fileTypeUnsupportedMessage.removeClass('hidden');
-            }
-            else {
-                $fileSizeUnsupportedMessage.removeClass('hidden');
-            }
+        // Folder
+        else if (n && n.t) {
+            foldercnt++;
         }
-    },
 
-    /**
-     * Gets the app store link based on the user agent
-     * @returns {String} Returns the link to the relevant app store for the user's platform
-     */
-    getStoreLink: function() {
-
-        switch (ua.details.os) {
-            case 'iPad':
-            case 'iPhone':
-                return 'https://itunes.apple.com/app/mega/id706857885';
-
-            case 'Windows Phone':
-                return 'zune://navigate/?phoneappID=1b70a4ef-8b9c-4058-adca-3b9ac8cc194a';
-
-            case 'Android':
-                return 'https://play.google.com/store/apps/details?id=mega.privacy.android.app' +
-                       '&referrer=meganzindexandroid';
-        }
-    },
-
-    /**
-     * Changes the footer image and text depending on what platform they are on
-     */
-    setMobileAppInfo: function() {
-
-        var $downloadOnAppStoreButton = $('.mobile.download-app');
-        var $appInfoBlock = $('.app-info-block');
-        var $openInBrowserButton = $('.mobile.dl-browser');
-
-        // Change the link
-        $downloadOnAppStoreButton.attr('href', this.getStoreLink());
-
-        switch (ua.details.os) {
-            case 'iPad':
-            case 'iPhone':
-                $appInfoBlock.addClass('ios');
-                break;
-
-            case 'Windows Phone':
-                $appInfoBlock.addClass('wp');
-                $openInBrowserButton.off('tap').addClass('disabled');
-                break;
-
-            case 'Android':
-                $appInfoBlock.addClass('android');
-                break;
+        // File
+        else {
+            filecnt++;
         }
     }
-};
+
+    if (removesharecnt) {
+        for (var i in $.selected) {
+            leaveShare($.selected[i]);
+        }
+        M.openFolder('shares', true);
+    }
+
+    // Remove contacts from list
+    else if (contactcnt) {
+
+        var c = $.selected.length;
+        var replaceString = '';
+        var contact = '';
+
+        if (c > 1) {
+            replaceString = c + ' ' + l[5569];
+            contact = 'contacts';
+        }
+        else {
+            replaceString = '<strong>' + htmlentities(M.d[$.selected[0]].name) + '</strong>';
+            contact = 'contact';
+        }
+
+        msgDialog('delete-contact', l[1001], l[1002].replace('[X]', replaceString), l[7872].replace('[X]', contact),
+        function(e) {
+            if (e) {
+                $.selected.forEach(function(selected) {
+
+                    if (M.c[selected]) {
+                        Object.keys(M.c[selected])
+                            .forEach(function(sharenode) {
+                                leaveShare(sharenode);
+                            });
+                    }
+
+                    api_req({ a: 'ur2', u: $.selected[i], l: '0', i: requesti });
+                    M.handleEmptyContactGrid();
+                });
+            }
+        });
+        if (c > 1) {
+            $('#msgDialog').addClass('multiple');
+            $('.fm-del-contacts-number').text($.selected.length);
+            $('#msgDialog .fm-del-contact-avatar').attr('class', 'fm-del-contact-avatar');
+            $('#msgDialog .fm-del-contact-avatar span').empty();
+        }
+        else {
+            var user = M.u[$.selected[0]],
+                avatar = useravatar.contact(user, 'avatar-remove-dialog');
+
+            $('#msgDialog .fm-del-contact-avatar').html(avatar);
+        }
+    }
+
+    // Remove selected nodes from rubbish bin
+    else if (RootbyId($.selected[0]) === M.RubbishID) {
+
+        var dlgMessage = '';
+        var toastMessage = '';
+
+        if ((filecnt === 1) && (!foldercnt)) {
+            dlgMessage = l[13749];// 1 file
+            toastMessage = l[13757];
+        }
+        else if ((filecnt > 1) && (!foldercnt)) {
+            dlgMessage = l[13750].replace('%1', filecnt);
+            toastMessage = l[13758].replace('%1', filecnt);
+        }
+        else if ((!filecnt) && (foldercnt === 1)) {
+            dlgMessage = l[13751];// 1 folder
+            toastMessage = l[13759];
+        }
+        else if ((!filecnt) && (foldercnt > 1)) {
+            dlgMessage = l[13752].replace('%1', foldercnt);
+            toastMessage = l[13760].replace('%1', foldercnt);
+        }
+        else if ((filecnt === 1) && (foldercnt === 1)) {
+            dlgMessage = l[13753];// 1 file 1 folder
+            toastMessage = l[13761];
+        }
+        else if ((filecnt === 1) && (foldercnt > 1)) {
+            dlgMessage = l[13754].replace('%1', foldercnt);
+            toastMessage = l[13762].replace('%1', foldercnt);
+        }
+        else if ((filecnt > 1) && (foldercnt === 1)) {
+            dlgMessage = l[13755].replace('%1', filecnt);
+            toastMessage = l[13763].replace('%1', filecnt);
+        }
+        else if ((filecnt > 1) && (foldercnt > 1)) {
+            dlgMessage = l[13756].replace('%1', filecnt).replace('%2', foldercnt);
+            toastMessage = l[13764].replace('%1', filecnt).replace('%2', foldercnt);
+        }
+
+        msgDialog('clear-bin', l[1003], dlgMessage, l[1007], function(e) {
+            if (e) {
+                var tmp = null;
+                if (String(M.currentdirid).substr(0, 7) === 'search/') {
+                    tmp = M.currentdirid;
+                    M.currentdirid = M.getNodeByHandle($.selected[0]).p || M.RubbishID;
+                }
+                M.clearRubbish(1);
+
+                if (tmp) {
+                    M.currentdirid = tmp;
+                }
+
+                showToast('settings', toastMessage);
+            }
+        });
+
+        // ToDo: is this necessary?
+        // $('.fm-dialog-button.notification-button').each(function(i, e) {
+        //     if ($(e).text() === l[1018]) {
+        //         $(e).safeHTML('<span>@@</span>', l[83]);
+        //     }
+        // });
+    }
+
+    // Remove contacts
+    else if (RootbyId($.selected[0]) === 'contacts') {
+        if (localStorage.skipDelWarning) {
+            M.copyNodes($.selected, M.RubbishID, 1);
+        }
+        else {
+            var title = l[1003];
+            var message = l[1004].replace('[X]', fm_contains(filecnt, foldercnt));
+
+            msgDialog('confirmation', title, message, false, function(e) {
+                    if (e) {
+                        M.copyNodes($.selected, M.RubbishID, 1);
+                    }
+                }, true
+            );
+        }
+    }
+    else {
+        if (localStorage.skipDelWarning) {
+            if (M.currentrootid === 'shares') {
+                M.copyNodes($.selected, M.RubbishID, true);
+            }
+            else {
+                M.moveNodes($.selected, M.RubbishID);
+            }
+        }
+        else {
+            // Contains complete directory structure of selected nodes, their ids
+            var selected = [], dirTree = [];
+
+            for (var i in $.selected) {
+                selected.push($.selected[i]);
+                var nodes = fm_getnodes($.selected[i], true);
+                dirTree = dirTree.concat(nodes);
+            }
+
+            // Additional message in case that there's a shared node
+            var share = new mega.Share({});
+            var delShareInfo = share.isShareExist(dirTree, true, true, true) ? ' ' + l[1952] + ' ' + l[7410] : '';
+            var title = l[1003];
+            var message = l[1004].replace('[X]', fm_contains(filecnt, foldercnt)) + delShareInfo;
+
+            msgDialog('remove', title, message, false, function(e) {
+                if (e) {
+                    if (M.currentrootid === 'shares') {
+                        M.copyNodes($.selected, M.RubbishID, true);
+                    }
+                    else {
+                        var delctx = { pending : 1, selected : selected };
+
+                        // Remove all shares related to selected nodes
+                        for (var i = dirTree.length; i--; ) {
+                            var h = dirTree[i];
+
+                            // remove established shares
+                            for (var share in Object(M.d[dirTree[i]]).shares) {
+                                delctx.pending++;
+                                api_req({ a: 's2',
+                                          n: h,
+                                          s: [{ u: M.d[h].shares[share].u, r: ''}],
+                                          ha: '',
+                                          i: requesti
+                                        }, {
+                                          n: h,
+                                          u: M.d[h].shares[share].u,
+                                          delctx: delctx,
+                                          callback: function(res, ctx) {
+                                                if (typeof res == 'object') {
+                                                    // FIXME: verify error codes in res.r
+                                                    M.delNodeShare(ctx.n, ctx.u);
+                                                    setLastInteractionWith(ctx.u, "0:" + unixtime());
+                                                }
+                                                else {
+                                                    // FIXME: display error to user
+                                                }
+
+                                                if (!--ctx.delctx.pending) {
+                                                    M.moveNodes(ctx.delctx.selected, M.RubbishID);
+                                                }
+                                            }
+                                        });
+                            }
+
+                            // remove pending shares
+                            for (var pendingUserId in M.ps[h]) {
+                                var userEmailOrID = Object(M.opc[pendingUserId]).m || pendingUserId;
+                                delctx.pending++;
+                                api_req({
+                                    a: 's2',
+                                    n: h,
+                                    s: [{u: userEmailOrID, r: ''}],
+                                    ha: '',
+                                    i: requesti
+                                }, {
+                                    n: h,
+                                    u: pendingUserId,
+                                    delctx: delctx,
+                                    callback: function(res, ctx) {
+                                        if (typeof res == 'object') {
+                                            // FIXME: verify error codes in res.r
+                                            M.deletePendingShare(ctx.n, ctx.u);
+                                        }
+                                        else {
+                                            // FIXME: display error to user
+                                        }
+
+                                        if (!--ctx.delctx.pending) {
+                                            M.moveNodes(ctx.delctx.selected, M.RubbishID);
+                                        }
+                                    }
+                                });
+                            }
+                        }
+
+                        if (!--delctx.pending) {
+                            M.moveNodes(delctx.selected, M.RubbishID);
+                        }
+                    }
+                }
+            }, true);
+        }
+    }
+}
+
+function removeUInode(h, parent) {
+
+    var n = M.d[h],
+        i = 0;
+
+    // check subfolders
+    if (n && n.t) {
+        var cns = M.c[n.p];
+        if (cns) {
+            for (var cn in cns) {
+                if (M.d[cn] && M.d[cn].t && cn !== h) {
+                    i++;
+                    break;
+                }
+            }
+        }
+    }
+
+    // Not applicable to remove here for mobile, need to wait for M.v to be updated first
+    if (is_mobile) {
+        return true;
+    }
+
+    var hasItems = !!M.v.length;
+    switch (M.currentdirid) {
+        case "shares":
+            $('#treeli_' + h).remove();// remove folder and subfolders
+            if (!hasItems) {
+                $('.files-grid-view .grid-table-header tr').remove();
+                $('.fm-empty-cloud').removeClass('hidden');
+            }
+            break;
+        case "contacts":
+
+            //Clear left panel:
+            $('#contact_' + h).fadeOut('slow', function() {
+                $(this).remove();
+            });
+
+            //Clear right panel:
+            $('.grid-table.contacts tr#' + h + ', .contacts-blocks-scrolling a#' + h)
+                .fadeOut('slow', function() {
+                    $(this).remove();
+                });
+
+            // clear the contacts grid:
+            $('.contacts-grid-view #' + h).remove();
+            if (!hasItems) {
+                $('.contacts-grid-view .contacts-grid-header tr').remove();
+                $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[784]);
+                $('.fm-empty-contacts').removeClass('hidden');
+            }
+            break;
+        case "chat":
+            if (!hasItems) {
+                $('.contacts-grid-view .contacts-grid-header tr').remove();
+                $('.fm-empty-chat').removeClass('hidden');
+            }
+            break;
+        case M.RubbishID:
+            if (i == 0 && n) {
+                $('#treea_' + n.p).removeClass('contains-folders expanded');
+            }
+
+            // Remove item
+            $('#' + h).remove();
+
+            // Remove folder and subfolders
+            $('#treeli_' + h).remove();
+            if (!hasItems) {
+                $('.contacts-grid-view .contacts-grid-header tr').remove();
+                $('.fm-empty-trashbin').removeClass('hidden');
+            }
+            break;
+        case M.RootID:
+            if (i == 0 && n) {
+                $('#treea_' + n.p).removeClass('contains-folders expanded');
+            }
+
+            // Remove item
+            $('#' + h).remove();
+
+            // Remove folder and subfolders
+            $('#treeli_' + h).remove();
+            if (!hasItems) {
+                $('.files-grid-view').addClass('hidden');
+                $('.grid-table.fm tr').remove();
+                $('.fm-empty-cloud').removeClass('hidden');
+            }
+            break;
+        default:
+            if (i == 0 && n) {
+                $('#treea_' + n.p).removeClass('contains-folders expanded');
+            }
+            $('#' + h).remove();// remove item
+            $('#treeli_' + h).remove();// remove folder and subfolders
+            if (!hasItems) {
+                if (sharedFolderUI()) {
+                    M.emptySharefolderUI();
+                }
+                else {
+                    $('.files-grid-view').addClass('hidden');
+                    $('.fm-empty-folder').removeClass('hidden');
+                }
+                $('.grid-table.fm tr').remove();
+            }
+            break;
+    }
+}
+// jscs:enable
+// jshint ignore:end
 
 
 (function() {

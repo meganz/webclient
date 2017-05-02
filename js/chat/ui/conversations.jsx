@@ -268,7 +268,10 @@ var ConversationsList = React.createClass({
 
         sortedConversations.forEach((chatRoom) => {
             var contact;
-            if (!chatRoom || !chatRoom.roomJid) {
+            if (
+                !chatRoom ||
+                !chatRoom.roomJid
+            ) {
                 return;
             }
 

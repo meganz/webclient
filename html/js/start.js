@@ -26,8 +26,6 @@ function init_start() {
     if (getSitePath() === '/info') {
         startpageScroll(1);
     }
-	
-	start_counts();
 }
 
 $.jScroll = {};
@@ -35,44 +33,67 @@ $.jScroll = {};
 var start_countdata = false;
 
 function start_counts()
-{
+{	
 	if (start_countdata) return;
 	start_countdata=true;
-	api_req({"a":"dailystats"}, 
-	{ 	
-		callback: function(res) 
-		{
-			start_countdata=res;
-			start_countdata.timestamp = Date.now();
-			start_countUpdate();
-		}});
+	start_APIcount();
 }
 
+start_APIcount_inflight=false;
+function start_APIcount() {
+	if (start_APIcount_inflight) return;
+	start_APIcount_inflight=true;
+	api_req({"a":"dailystats"}, { 	
+		callback: function(res) {
+			start_countdata=res;
+			start_countdata.timestamp = Date.now();
+			start_APIcount_inflight=false;
+			if (!start_countUpdate_inflight) start_countUpdate();	
+		}
+	});
+}
 
-function start_countUpdate()
-{
+start_countUpdate_inflight=false;
+startCountRenderData = {'users':'','files':''};
+
+
+function start_countUpdate() {
+	start_countUpdate_inflight=true;	
+	if (page !== 'start') {
+		start_countUpdate_inflight=false;
+		return false;
+	}
+
 	var usertotal = start_countdata.confirmedusers.total;
 	var filetotal = start_countdata.files.total;
-	if (Date.now()-1000 > start_countdata.timestamp)
-	{
-		var rate = (Date.now() - start_countdata.timestamp) / 86400000;
-		usertotal += Math.round(rate * start_countdata.confirmedusers.dailydelta);
-		filetotal += Math.round(rate * start_countdata.files.dailydelta);
-	}
-	var total = String(usertotal);
-	var html = '';
-	for (var i = 0, len = total.length; i < len; i++) {
-		html += '<div class="flip-block"><div class="flip-bg">' + total[i] + '</div></div>';
-	}
-	$('.startpage.flip-wrapper.users').html(html);
+	var rate = (Date.now() - start_countdata.timestamp) / 86400000;
+		
+	usertotal += Math.round(rate * start_countdata.confirmedusers.dailydelta);
+	filetotal += Math.round(rate * start_countdata.files.dailydelta);
 	
-	var total = String(filetotal);
-	var html = '';
-	for (var i = 0, len = total.length; i < len; i++) {
-		html += '<div class="flip-block"><div class="flip-bg">' + total[i] + '</div></div>';
+	start_countdata.usertotal = usertotal;
+	start_countdata.filetotal = filetotal;
+	start_countdata.ts = start_countdata.timestamp;
+	
+	function renderCounts(total,type) {
+		if (total.length == startCountRenderData[type].length) {
+			for (var i = 0, len = total.length; i < len; i++) {
+				if (startCountRenderData[type][i] !== total[i]) 
+				document.getElementById(type + '_number_' + i).innerHTML = total[i];		
+			}
+		}
+		else {
+			var html = '';
+			for (var i = 0, len = total.length; i < len; i++) {
+				html += '<div class="flip-block"><div class="flip-bg" id="' + type + '_number_' + i + '">' + total[i] + '</div></div>';
+			}
+			$('.startpage.flip-wrapper.' + type).html(html);
+		}
+		startCountRenderData[type] = total;
 	}
-	$('.startpage.flip-wrapper.files').html(html);
-	setTimeout(start_countUpdate,100);
+	renderCounts(String(usertotal),'users');	
+	renderCounts(String(filetotal),'files');
+	setTimeout(start_countUpdate,30);
 }
 
 
@@ -96,6 +117,9 @@ function jScrollStart() {
 
 
 function startpageScroll(blockSwing) {
+	
+	start_counts();
+	
     $.infoscroll = true;
     if ($.hideTopMenu) {
         $.hideTopMenu();

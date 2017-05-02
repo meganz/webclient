@@ -13288,6 +13288,11 @@ div.pro-popular-txt {
     left: 50%;
     top: 28px;
 }
+.loginrequired-dialog .fm-notification-icon {
+    background-image: url(../images/mega/startpage-sprite.png);
+    background-position: center -210px;
+    background-repeat: no-repeat;
+}
 .membership-popup .membership-icon, .fm-account-mutliple-bl .membership-icon {
     position: static;
     float: left;

@@ -2032,24 +2032,22 @@ function parsepage(pagehtml, pp) {
     if (document.location.href.substr(0, 19) == 'chrome-extension://') {
         pagehtml = pagehtml.replace(/\/#/g, '/' + urlrootfile + '#');
     }
-    $('body').removeClass('notification-body bottom-pages new-startpage');
 
-    if (page == 'start') {
-        $('body').addClass('new-startpage');
-    }
-    else {
-        $('body').addClass('bottom-pages');
-    }
+    $('body').addClass('bottom-pages');
 
     var top = parsetopmenu();
     var bmenu = pages['bottom'];
     var bmenu2 = pages['bottom2'];
+    var pagesmenu = pages['pagesmenu'];
     if (document.location.href.substr(0, 19) == 'chrome-extension://') {
         bmenu2 = bmenu2.replace(/\/#/g, '/' + urlrootfile + '#');
     }
-    pagehtml = pagehtml.replace("((MEGAINFO))", translate(pages['megainfo']).replace(/{staticpath}/g, staticpath));
-    pagehtml = pagehtml.replace("((TOP))", top);
-    pagehtml = pagehtml.replace("((BOTTOM))", translate(bmenu2));
+    pagehtml = pagehtml
+        .replace(/\(\(MEGAINFO\)\)/g, translate(pages['megainfo'])
+        .replace(/{staticpath}/g, staticpath));
+    pagehtml = pagehtml.replace(/\(\(TOP\)\)/g, top);
+    pagehtml = pagehtml.replace(/\(\(BOTTOM\)\)/g, translate(bmenu2));
+    pagehtml = pagehtml.replace(/\(\(PAGESMENU\)\)/g, translate(pagesmenu));
 
     var $container = is_mobile ? $('body') : $('#startholder');
     $container

@@ -247,7 +247,7 @@ function init_page() {
         $('body').attr('class', 'not-logged');
     }
     else {
-        $('body').attr('class', '');
+        $('body').attr('class', 'logged');
 
         // Recovery key has been saved
         if (localStorage.recoverykey && !$('body').hasClass('rk-saved')) {

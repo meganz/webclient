@@ -1,5 +1,7 @@
-
 function init_start() {
+        
+    $('.pages-nav.nav-button').removeClass('active');
+    $('.pages-nav.nav-button.overview').addClass('active');
 
     $(window).rebind('resize.startpage', function(e) {
         if (page === 'start' && $.infoscroll) {
@@ -7,24 +9,40 @@ function init_start() {
             jScrollStart();
         }
     });
-    $('.startpage.scroll-button').rebind('click', function(event) {
-        startpageScroll();
+
+    $('.button-48-height.register').rebind('click', function () {
+        loadSubPage('register');
     });
 
-    var el = '.startpage.vertical-centered-bl';
+    $('.bottom-page.scroll-button').rebind('click', function(event) {
+        bottompageScroll();
+        start_counts();
+    });
 
-    $(el).rebind('mousewheel', function(e) {
+    $('.bottom-page.vertical-centered-bl').rebind('mousewheel', function(e) {
         if (e && e.originalEvent
                 && (e.originalEvent.wheelDelta < 0
                     || e.originalEvent.deltaY > 0) && !$.infoscroll) {
-            startpageScroll();
+            bottompageScroll();
+            start_counts();
         }
     });
+    
+    $('.reg-st3-membership-bl').rebind('click', function(e) {
+        var proPlan = $(this).attr('data-payment');
+        loadSubPage('pro' + proPlan);
+    });
+
     if (page === 'start') {
         InitFileDrag();
     }
+    else if (page === 'download') {
+        $('.widget-block').hide();
+    }
+
     if (getSitePath() === '/info') {
-        startpageScroll(1);
+        bottompageScroll(1);
+        start_counts();
     }
 }
 
@@ -116,15 +134,15 @@ function start_countUpdate() {
 }
 
 function jScrollStart() {
-    $('.startpage.scroll-block').jScrollPane({
+    $('.bottom-page.scroll-block').jScrollPane({
         showArrows: true,
         arrowSize: 5,
         animateScroll: true
     });
-    jScrollFade('.startpage.scroll-block');
-    $('.startpage.scroll-block').rebind('jsp-scroll-y.back', function(event, scrollPositionY, isAtTop, isAtBottom) {
+    jScrollFade('.bottom-page.scroll-block');
+    $('.bottom-page.scroll-block').rebind('jsp-scroll-y.back', function(event, scrollPositionY, isAtTop, isAtBottom) {
         if (isAtTop && !$.scrollIgnore) {
-            startpageMain();
+            bottompageMain();
         }
         else if (!isAtTop) {
             startscrollIgnore(500);
@@ -133,62 +151,45 @@ function jScrollStart() {
 }
 
 
-function startpageScroll(blockSwing) {
-	
-	start_counts();
-	
+function bottompageScroll(blockSwing) {
     $.infoscroll = true;
     if ($.hideTopMenu) {
         $.hideTopMenu();
     }
-    var el = '.startpage.vertical-centered-bl';
-    $(el).addClass('active');
-    $('.startpage.full-block').removeClass('hidden');
 
-    if (blockSwing) {
-        $('.startpage.scroll-block').scrollTop($('.pages-nav.content-block.startpage').position().top);
-        startpageJSP();
-    }
-    else {
-        $.startscrolling = true;
-        $('.startpage.scroll-block').animate({
-            scrollTop: $('.pages-nav.content-block.startpage').position().top
-        }, '300', 'swing', function() {
-            setTimeout(startpageJSP, 50);
-            $.startscrolling = false;
-        });
-    }
-}
+    var $scrollBlock = $('.bottom-page.scroll-block');
+    var $navBlock = $('.vertical-centered-bl .pages-nav.content-block');
 
-function startpageMain() {
-    $.infoscroll = false;
-    if (page === 'download') {
-        $('.widget-block').hide();
-    }
-    var el = '.startpage.vertical-centered-cell';
-    //$(el).show();
-    $('.top-head').show();
-    deleteScrollPanel('.st-main-block', 'jsp');
-    $('.startpage.scroll-block').scrollTop($('.st-main-block').height());
     $.startscrolling = true;
-    $('.startpage.scroll-block').animate({
-        scrollTop: 0
+    $('.bottom-page.full-block').removeClass('hidden');
+
+    $scrollBlock.animate({
+        scrollTop: $navBlock.position().top
     }, '300', 'swing', function() {
-        var el = '.st-mid-white-block';
+        $('.top-head').addClass('hidden');
+        $('.bottom-page.top-bl').addClass('hidden');
+        $('.bottom-page.vertical-centered-bl').addClass('active');
+        setTimeout(jScrollStart, 50);
+        $scrollBlock.scrollTop($navBlock.position().top);
     });
-    setTimeout(function() {
-        var el = '.startpage.vertical-centered-bl';
-        $(el).removeClass('active');
-        $.startscrolling = false;
-    }, 295);
 }
 
+function bottompageMain() {
+    $.infoscroll = false;
 
-function startpageJSP() {
-    //$('.startpage.vertical-centered-cell').hide();
-    $('.top-head').hide();
-    $('.startpage.scroll-block').scrollTop(0);
-    jScrollStart();
+    deleteScrollPanel('.bottom-page.scroll-block', 'jsp');
+    $('.top-head').removeClass('hidden');
+    $('.bottom-page.top-bl').removeClass('hidden');
+    $('.bottom-page.vertical-centered-bl').removeClass('active');
+    $('.bottom-page.scroll-block')
+        .scrollTop($('.bottom-page.top-bl').height())
+        .animate({
+            scrollTop: 0
+        }, '300', 'swing', function() {
+            setTimeout(function() {
+                $.startscrolling = false;
+            }, 295);
+        });
 }
 
 
@@ -201,21 +202,3 @@ function startscrollIgnore(t) {
         $.scrollIgnore--;
     }, t);
 }
-
-function fliperInit() {
-  
-  var count = 10;
-  
-  $(".flip--top, .flip--bottom").text(count);
-  $(".flip--next, .flip--back").text(count + 1);
-  
-  
-  $(".flip--back").on('webkitAnimationIteration oanimationiteration msAnimationIteration animationiteration', function() {
-    // $("body").toggleClass("fuckingred");
-    count++
-    $(".flip--top, .flip--bottom").text(count);
-    $(".flip--next, .flip--back").text(count + 1);
-  });
-}
-
-fliperInit();

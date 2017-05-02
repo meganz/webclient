@@ -1673,9 +1673,15 @@ else if (!b_u)
     jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
 
-    // Common CSS fixes
+    // Common desktop and mobile, bottom pages
+    jsl.push({f:'css/bottom-pages.css', n: 'bottom-pages_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/startpage.css', n: 'startpage_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/bottom-menu.css', n: 'bottom-menu_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'html/start.html', n: 'start', j:0});
+    jsl.push({f:'html/pagesmenu.html', n: 'pagesmenu', j:0});
+    jsl.push({f:'html/bottom2.html', n: 'bottom2',j:0});
+    jsl.push({f:'html/megainfo.html', n: 'megainfo', j:0});
+
 
     if (!is_mobile) {
 
@@ -1766,10 +1772,7 @@ else if (!b_u)
         jsl.push({f:'js/fm/account.js', n: 'fm_account_js', j:1});
         jsl.push({f:'js/ui/miniui.js', n: 'miniui_js', j:1});
 
-        jsl.push({f:'html/start.html', n: 'start', j:0});
-        jsl.push({f:'html/megainfo.html', n: 'megainfo', j:0});
         jsl.push({f:'html/js/start.js', n: 'start_js', j:1});
-        jsl.push({f:'html/bottom2.html', n: 'bottom2',j:0});
         jsl.push({f:'html/key.html', n: 'key', j:0});
         jsl.push({f:'html/js/key.js', n: 'key_js', j:1});
         jsl.push({f:'html/pro.html', n: 'pro', j:0});
@@ -1784,7 +1787,6 @@ else if (!b_u)
         jsl.push({f:'css/avatars.css', n: 'avatars_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/icons.css', n: 'icons_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/buttons.css', n: 'buttons_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/bottom-pages.css', n: 'bottom-pages_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/dropdowns.css', n: 'dropdowns_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/dialogs.css', n: 'dialogs_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/popups.css', n: 'popups_css', j:2,w:5,c:1,d:1,cache:1});

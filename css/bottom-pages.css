@@ -1,14 +1,328 @@
-.transparent-header .top-head {
+/* Bottom pages common styles*/
+.bottom-page .top-head {
     background-color: transparent;
     position: absolute;
     width: 100%;
+    z-index: 200;
 }
-.transparent-header .top-head::after {
+.bottom-page .top-head::after {
     display: none;
 }
-.transparent-header .logo {
+.bottom-page .logo:not(.bottom-menu) {
     background-position: -6px -773px;
 }
+.transition {
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
+}
+.centered-txt {
+    text-align: center;
+}
+.right-txt-align {
+    text-align: right;
+}
+.fmholder, #fmholder {
+    height: 100%;
+    background-color: white;
+    background-image: none;
+}
+.bottom-page.scroll-block {
+    height: 100%;
+    overflow: hidden;
+    position:relative;
+}
+.bottom-page.vertical-centered-bl {
+    display: table;
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+.bottom-page.vertical-centered-bl.active {
+    height: 73px;
+}
+.bottom-page.vertical-centered-cell {
+    display: table-cell;
+    vertical-align: middle;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.bottom-page.horizontal-centered-bl {
+    max-width: 970px;
+    margin: 0 auto;
+    text-align: center;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.bottom-page.horizontal-centered-bl.side-paddings {
+    padding: 0 15px;
+}
+
+
+.bottom-page.top-header {
+    font-size: 18px;
+    line-height: 26px;
+    color: rgba(0,0,0,0.7);
+    text-align: center;
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
+    -moz-opacity: 0.8;
+    -khtml-opacity: 0.8;
+    opacity: 0.8;
+    padding: 47px 95px 0 95px;
+}
+
+.bottom-page.scroll-button {
+    font-size: 14px;
+    color: rgba(0,0,0,0.5);
+    line-height: 18px;
+    position: absolute;
+    bottom: 88px;
+    cursor: pointer;
+    width: 100px;
+    left: 50%;
+    margin: 0 0 0 -50px;
+    text-align: center;
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
+    -moz-opacity: 0.8;
+    -khtml-opacity: 0.8;
+    opacity: 0.8;
+}
+.bottom-page.scroll-button:hover {
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+    -moz-opacity: 1;
+    -khtml-opacity: 1;
+    opacity: 1;
+}
+.bottom-page.scroll-button span {
+    display: block;
+    padding: 11px 0 0 0;
+}
+.bottom-page.scroll-icon {
+    width: 18px;
+    height: 26px;
+    display: block;
+    margin: 0 auto;
+    background-image: url(../images/mega/startpage-sprite.png);
+    background-position: -110px 1px;
+    background-repeat: no-repeat;
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=64);
+    -moz-opacity: 0.64;
+    -khtml-opacity: 0.64;
+    opacity: 0.64;
+}
+.bottom-page.full-block {
+    border-top: 1px solid rgba(0,0,0,0.1);
+}
+.bottom-page.white-block {
+    background-color: white;
+    font-size: 0;
+}
+.bottom-page.grey-block {
+    background-color: #FAFAFA;
+    width: 100%;
+    overflow: hidden;
+}
+.bottom-page.mid-header {
+    font-size: 18px;
+    line-height: 32px;
+    padding: 0 0 14px 0;
+    color: #777777;
+    max-width: 780px;
+    margin: 0 auto;
+}
+.bottom-page.mid-header.red {
+    color: #EB4444;
+}
+.bottom-page.mid-header.green {
+    color: #3DB39E;
+}
+.bottom-page.mid-header.blue {
+    color: #2EA9D3;
+}
+.bottom-page.small-txt {
+    font-size: 14px;
+    line-height: 24px;
+    letter-spacing: 0.5px;
+    color: #666666;
+    padding-bottom: 10px;
+}
+.inline-block {
+    display: inline-block;
+    vertical-align: top;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.inline-block.col-2 {
+    width: 50%;
+}
+.inline-block.col-3 {
+    width: 33.333333%;
+}
+.inline-block.small-pad {
+    padding: 26px 15px;
+}
+.bottom-page.top-pad {
+    padding-top: 63px;
+}
+.bottom-page.bott-pad {
+    padding-bottom: 63px;
+}
+.bottom-page.big-header {
+    font-size: 36px;
+    line-height: 43px;
+    padding: 3px 0 16px 0;
+    color: #666666;
+}
+.bottom-page.big-header.mid-pad {
+    padding: 18px 0 34px 0;
+}
+.bottom-page.big-header.red {
+    color: #EB4444;
+}
+.bottom-page.big-header.top-pad {
+    padding-top: 27px;
+}
+.bottom-page.table {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+    text-align: left;
+}
+.bottom-page.medium-txt {
+    font-size: 18px;
+    line-height: 36px;
+    color: #777777;
+    padding-bottom: 10px;
+}
+.small-red-link {
+    color: #FF333A;
+    font-size: 14px;
+    line-height: 16px;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    display: inline-block;
+    margin: 10px 0 0 0;
+}
+.small-red-link i {
+    display: inline-block;
+    margin: 3px 0 0 9px;
+    vertical-align: top;
+    width: 8px;
+    height: 13px;
+    background-image: url(../images/mega/startpage-sprite.png);
+    background-position: -165px -7px;
+    background-repeat: no-repeat;
+}
+.bottom-page.vertical-centered-cell.left-cell {
+    width: 50%;
+}
+
+
+
+
+/* end of Bottom pages common styles*/
+
+
+
+/* Bottom pages nav bar */
+.pages-nav.content-block {
+    height: 73px;
+    background-color: white;
+}
+.vertical-centered-bl .pages-nav.content-block {
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    -webkit-box-shadow: 0px -1px 0px 0 rgba(0,0,0,0.1);
+    -moz-box-shadow: 0px -1px 0px 0 rgba(0,0,0,0.1);
+    box-shadow: 0px -1px 0px 0 rgba(0,0,0,0.1);
+}
+.pages-nav.horizontal-centered-bl {
+    max-width: 768px;
+    margin: 0 auto;
+}
+.pages-nav.nav-button {
+    width: 12.5%;
+    float: left;
+    height: 73px;
+    border-bottom: 2px solid transparent;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+.pages-nav.nav-button.active {
+    border-bottom-color: #FF333A;
+}
+.pages-nav.nav-icon {
+    display: block;
+    margin: 14px auto 7px auto;
+    width: 22px;
+    height: 24px;
+    background-image: url(../images/mega/startpage-sprite.png);
+    background-position: -0px -73px;
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
+    -moz-opacity: 0.3;
+    -khtml-opacity: 0.3;
+    opacity: 0.3;
+}
+.pages-nav.nav-icon.web {
+    background-position: -52px -73px;
+}
+.pages-nav.nav-icon.ios {
+    background-position: -104px -73px;
+}
+.pages-nav.nav-icon.android {
+    background-position: -156px -73px;
+}
+.pages-nav.nav-icon.win-mobile {
+    background-position: -208px -73px;
+}
+.pages-nav.nav-icon.sync {
+    background-position: -0px -133px;
+}
+.pages-nav.nav-icon.browsers {
+    background-position: -52px -133px;
+}
+.pages-nav.nav-icon.email {
+    background-position: -103px -133px;
+    width: 25px;
+}
+.pages-nav.nav-icon.dots {
+    background-position: -150px -133px;
+    width: 38px;
+}
+.pages-nav.nav-icon.mobile {
+    background-position: -208px -134px;
+}
+.pages-nav.nav-icon.megacmd {
+    background-position: -0px -193px;
+}
+.nav-button:hover .nav-icon, .nav-button.active .nav-icon {
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
+    -moz-opacity: 0.5;
+    -khtml-opacity: 0.5;
+    opacity: 0.5;
+}
+.pages-nav.button-label {
+    display: block;
+    font-size: 12px;
+    line-height: 14px;
+    letter-spacing: 0, 43px;
+    color: #666666;
+    text-align: center;
+}
+.pages-nav.nav-button:hover .button-label, .pages-nav.nav-button.active .button-label {
+    color: #666666;
+}
+/* end of Bottom pages nav bar */
+
+
 /* MEGAcmd */
 .megacmd-header {
     background-position: center;

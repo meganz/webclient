@@ -112,7 +112,6 @@ function start_countUpdate() {
 	renderCounts(String(Math.round(start_Lcd.users)),'users');	
 	renderCounts(String(Math.round(start_Lcd.files)),'files');
 	setTimeout(start_countUpdate,30);
-	
 	if (start_APIcountdata.timestamp+5000 < Date.now()) start_APIcount(); 
 }
 

@@ -45,36 +45,54 @@ function start_APIcount() {
 	start_APIcount_inflight=true;
 	api_req({"a":"dailystats"}, { 	
 		callback: function(res) {
-			start_countdata=res;
-			start_countdata.timestamp = Date.now();
+			start_APIcountdata=res;
+			start_APIcountdata.timestamp = Date.now();
 			start_APIcount_inflight=false;
-			if (!start_countUpdate_inflight) start_countUpdate();	
+			if (!start_countUpdate_inflight && page == 'start') start_countUpdate();	
 		}
 	});
 }
 
 start_countUpdate_inflight=false;
-startCountRenderData = {'users':'','files':''};
+startCountRenderData = {};
 
+var RandomFactorTimestamp = 0;
+var start_Lcd = {};
 
-function start_countUpdate() {
+function start_countUpdate() {	
+	if (!start_countUpdate_inflight) startCountRenderData = {'users':'','files':''};	
 	start_countUpdate_inflight=true;	
 	if (page !== 'start') {
+		start_countdata=false;
 		start_countUpdate_inflight=false;
 		return false;
+	}	
+	if (!start_Lcd.users) start_Lcd.users = start_APIcountdata.confirmedusers.total;
+	if (!start_Lcd.files) start_Lcd.files = start_APIcountdata.files.total;
+	if (!start_Lcd.ts) start_Lcd.ts = start_APIcountdata.timestamp;
+	if (!start_Lcd.timestamp) start_Lcd.timestamp = start_APIcountdata.timestamp;	
+	var filesFactor = 1;
+	var usersFactor = 1;	
+	if (start_Lcd.timestamp+10 < Date.now()) {	
+		var rate = (Date.now() - start_Lcd.timestamp) / 86400000;		
+		if (start_APIcountdata.timestamp > start_Lcd.ts+5000 && start_APIcountdata.timestamp+5000 > Date.now()) {
+			if (start_Lcd.users > start_APIcountdata.confirmedusers.total) usersFactor = 0.3;
+			else if (start_Lcd.users < start_APIcountdata.confirmedusers.total) usersFactor = 2;
+			if (start_Lcd.files > start_APIcountdata.files.total) filesFactor = 0.3;
+			else if (start_Lcd.files < start_APIcountdata.files.total) filesFactor = 2;			
+		}
+		else {
+			filesFactor = 1;
+			usersFactor = 1;
+		}			
+		if (RandomFactorTimestamp+500 < Date.now()) {
+			filesFactor *= Math.random()*.1-.05;
+			RandomFactorTimestamp = Date.now();
+		}
+		start_Lcd.users += rate * usersFactor * start_APIcountdata.confirmedusers.dailydelta;
+		start_Lcd.files += rate * filesFactor * start_APIcountdata.files.dailydelta;
+		start_Lcd.timestamp = Date.now();
 	}
-
-	var usertotal = start_countdata.confirmedusers.total;
-	var filetotal = start_countdata.files.total;
-	var rate = (Date.now() - start_countdata.timestamp) / 86400000;
-		
-	usertotal += Math.round(rate * start_countdata.confirmedusers.dailydelta);
-	filetotal += Math.round(rate * start_countdata.files.dailydelta);
-	
-	start_countdata.usertotal = usertotal;
-	start_countdata.filetotal = filetotal;
-	start_countdata.ts = start_countdata.timestamp;
-	
 	function renderCounts(total,type) {
 		if (total.length == startCountRenderData[type].length) {
 			for (var i = 0, len = total.length; i < len; i++) {
@@ -91,12 +109,12 @@ function start_countUpdate() {
 		}
 		startCountRenderData[type] = total;
 	}
-	renderCounts(String(usertotal),'users');	
-	renderCounts(String(filetotal),'files');
+	renderCounts(String(Math.round(start_Lcd.users)),'users');	
+	renderCounts(String(Math.round(start_Lcd.files)),'files');
 	setTimeout(start_countUpdate,30);
+	
+	if (start_APIcountdata.timestamp+5000 < Date.now()) start_APIcount(); 
 }
-
-
 
 function jScrollStart() {
     $('.startpage.scroll-block').jScrollPane({

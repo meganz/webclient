@@ -4004,8 +4004,6 @@
     "16369": "T\u00e9l\u00e9versez vos fichiers de votre t\u00e9l\u00e9phone intelligent ou tablette, puis recherchez, stockez, t\u00e9l\u00e9chargez, lisez en continu, visualisez, partagez, renommez ou supprimez vos fichiers n'importe quand, de n'importe quel appareil, n'importe o\u00f9. Partagez des dossiers avec vos contacts et suivez leurs modifications en temps r\u00e9el.",
     "16370": "Le processus de chiffrement signifie que nous ne pouvons pas acc\u00e9der \u00e0 votre mot de passe ni le r\u00e9initialiser. Vous DEVEZ donc le m\u00e9moriser (\u00e0 moins que vous ayez sauvegard\u00e9 votre cl\u00e9 de r\u00e9cup\u00e9ration) ou vous perdrez l'acc\u00e8s \u00e0 vos fichiers stock\u00e9s.",
     "16371": "Dans l'appli, vous pouvez surclasser votre espace de stockage et votre quota de transfert gr\u00e2ce \u00e0 un abonnement mensuel ou annuel.",
-    "16372": "Abonnement PRO L\u00c9GER : 4,99 \u20ac (4,99 $ US) par mois ou 49,99 \u20ac (49,99 $ US) par an vous donnent 200 Go d'espace de stockage et 1 To de quota de transfert par mois.Abonnement PRO I : 9,99 \u20ac (9,99 $ US) par mois ou 99,99 \u20ac (99,99 $ US) par an vous donnent 500 Go d'espace de stockage et 2 To de quota de transfert par mois.Abonnement PRO II : 19,99 \u20ac (19,99 $ US) par mois ou 199,99 \u20ac (199,99 $ US) par an vous donnent 2 To d'espace de stockage et 4 To de quota de transfert par mois.Abonnement PRO III : 29,99 \u20ac (29,99 $ US) par mois ou 299,99 \u20ac (299,99 $ US) par an vous donnent 4 To d'espace de stockage et 8 To de quota de transfert par mois.",
-    "16373": "Pour plus d'infos, veuillez visiter notre site Web :Mobile - https:\/\/mega.nz\/mobile_terms.html - https:\/\/mega.nz\/mobile_privacy.htmlOrdinateur - https:\/\/mega.nz\/",
     "16374": "Note : pour acc\u00e9der \u00e0 vos fichiers d'un ordinateur, MEGA doit utiliser un navigateur compatible HTML5 pour g\u00e9rer nos fonctions \u00e9volu\u00e9es. Nous recommandons Mozilla Firefox et Google Chrome. Les versions mobiles des navigateurs ne peuvent pas encore acc\u00e9der au service de stockage nuagique MEGA.",
     "16375": "Un vaste [S]espace de stockage[\/S]",
     "16378": "Oubliez les limites de quota de transfert li\u00e9es aux comptes gratuits et profitez de l'augmentation attribu\u00e9e aux comptes PRO.",
@@ -4039,9 +4037,9 @@
     "16415": "[1]Invitation MEGA[2]L'utilisateur dont l'adresse courriel est [R][$cred][\/R] vous a envoy\u00e9 une invitation \u00e0 adh\u00e9rer \u00e0 MEGA.[3]Rejoignez[R][$cred][\/R] sur MEGA en cliquant ci-dessous :[4]Cr\u00e9er un compte",
     "16416": "F\u00e9licitations, [$cred] a accept\u00e9 votre invitation et a commenc\u00e9 \u00e0 utiliser MEGA ! Par cons\u00e9quent, [$storageearnedgb] d'espace de stockage et [$transferearnedgb] de quota de transfert suppl\u00e9mentaires vous ont \u00e9t\u00e9 cr\u00e9dit\u00e9s, qui seront tous deux valides pendant [$durationdays] jours.",
     "16420": "Cela n'a pas fonctionn\u00e9 ! Copiez le lien ci-dessous dans votre navigateur Web :",
-    "16421": "[1]Invitation MEGA[2]L'utilisateur dont l'adresse courriel est [R][$cred][\/R] vous a envoy\u00e9 un invitation de contact.[3]Rendez-vous sur MEGA pour accepter l'invitation et vous connecter \u00e0 [R][$cred][\/R][4]Allons sur MEGA",
+    "16421": "[1]MEGA Invitation[2]The user with the email [R][$cred][\/R] has sent you a contact invitation.[3]Head to MEGA to accept the invite and get connected with [R][$cred][\/R][4]Take me to MEGA",
     "16422": "[1]MEGA[2]L'utilisateur dont l'adresse courriel est [R][$cred][\/R] attend que vous adh\u00e9riez \u00e0 MEGA.[3]C'est gratuit, facile \u00e0 mettre en place et vous obtiendrez un g\u00e9n\u00e9reux espace de stockage sur le service de stockage nuagique le plus s\u00e9curis\u00e9 au monde.[4]Adh\u00e9rer \u00e0 MEGA",
-    "16423": "[1]Invitation MEGA[2][R][$cred][\/R] veut partager un dossier avec vous.[3]Afin de recevoir des dossiers partag\u00e9s par des utilisateurs de MEGA, il vous faudra un compte MEGA. C'est gratuit, facile \u00e0 mettre en place et vous obtiendrez un g\u00e9n\u00e9reux espace de stockage sur le service de stockage nuagique le plus s\u00e9curis\u00e9 au monde.[4]Adh\u00e9rer \u00e0 MEGA[5] Veuillez prendre note que le dossier partag\u00e9 n'appara\u00eetra que si le propri\u00e9taire est connect\u00e9 \u00e0 MEGA pendant ou apr\u00e8s votre processus adh\u00e9sion. Cela est d\u00fb \u00e0 notre mod\u00e8le de chiffrement de bout en bout qui exige que le propri\u00e9taire du dossier vous transmette la cl\u00e9 secr\u00e8te du dossier de fa\u00e7on s\u00e9curis\u00e9 en utilisant la cryptographie asym\u00e9trique afin que personne ne puisse l'intercepter, pas m\u00eame MEGA.[6]Cliquez ci-dessous pour commencer dans MEGA :",
+    "16423": "[1]MEGA Invitation[2][R][$cred][\/R] wants to share a folder with you.[3]To receive shared folders from MEGA users, you will need a MEGA account. It's free and easy to set up, and you will get a generous free storage allocation on the world's most secure major cloud storage service.[4]Join MEGA[5]Please note that the shared folder will only appear if its owner is connected to MEGA during or after your signup. This is because our end-to-end encryption paradigm requires the folder owner to transmit the secret folder key to you securely using asymmetric cryptography so that nobody can intercept it, not even MEGA.[6]Click below to get started with MEGA:",
     "16424": "[1]Invitation MEGA[2][R][$cred][\/R] veut partager un dossier avec vous.[3]Rendez-vous sur MEGA pour accepter l'invitation et vous connecter \u00e0 [R][$cred][\/R][4]Allons sur MEGA",
     "16425": "[1]La v\u00e9rification de l'adresse courriel MEGA est exig\u00e9e[2]Il ne vous reste plus qu'une \u00e9tape pour activer votre compte MEGA.[3]Cliquez sur le bouton ci-dessous pour v\u00e9rifier votre adresse courriel :[4]V\u00e9rifier mon adresse courriel[5]Cliquez sur le lien ci-dessous pour v\u00e9rifier votre adresse courriel :",
     "16426": "Si vous \u00e9prouvez des difficult\u00e9s d'activation avec le lien ci-dessus, essayez de copier et coller le lien ci-dessous dans le navigateur mobile de votre appareil iOS :",
@@ -4088,12 +4086,14 @@
     "16470": "Le fichier ou dossier est introuvable",
     "16471": "La cl\u00e9 fournie est invalide.",
     "16472": "Veuillez vous assurer que la cl\u00e9 est bonne ou redemandez au cr\u00e9ateur du lien.",
-    "16473": "[1]MEGA Achievement Expired[2]One of your achievements has expired today. Don't worry though, you can always achieve more or upgrade to a PRO account.[3]To upgrade your account to PRO, click below:",
+    "16473": "[1]Un objectif MEGA est arriv\u00e9 \u00e0 expiration[2]Un de vos objectifs MEGA est arriv\u00e9 \u00e0 expiration aujourd'hui. Mais ne vous inqui\u00e9tez pas, vous pouvez toujours en atteindre d'autres ou passer \u00e0 un compte PRO.[3]Pour surclasser votre compte en PRO, cliquez ci-dessous :",
     "16474": "Versions pr\u00e9c\u00e9dentes",
     "16475": "Revenir",
-    "16476": "Edited by %1 ",
+    "16476": "Modifi\u00e9 par %1",
     "16477": "Renomm\u00e9 de %1 par %2",
-    "16478": "current version",
+    "16478": "version actuelle",
+    "16480": "Modifi\u00e9 par moi",
+    "16481": "Renomm\u00e9 de %1 par moi",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4349,6 +4349,8 @@
         "file_revert_version": 16475,
         "file_version_edited_by": 16476,
         "file_version_renamed_from": 16477,
-        "file_current_version": 16478
+        "file_current_version": 16478,
+        "file_edit_by_me": 16480,
+        "file_rename_by_me": 16481
     }
 }

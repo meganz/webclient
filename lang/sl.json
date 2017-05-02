@@ -4004,8 +4004,6 @@
     "16369": "Nalagajte svoje datoteke s pametnega telefona ali tablice, potem i\u0161\u010dite, shranjujte, prevzemajte, pretakajte, poglejte, delite, preimenujte ali bri\u0161ite svoje datoteke kadarkoli, s katerokoli napravo, kjerkoli. Delite mape s svojimi stiki in si oglejte njihove popravke v realnem \u010dasu.",
     "16370": "Enkripcijski proces pomeni, da ne moremo dostopati ali spreminjati va\u0161ega gesla, zato si ga MORATE zapomniti (razen, \u010de imate varnostno kopijo Re\u0161ilnega klju\u010da), ali pa boste izgubili dostop do svojih shranjenih datotek.",
     "16371": "Znotraj aplikacije lahko nadgradite svoj prostor za shranjevanje in prenosno kvoto z mese\u010dno ali letno naro\u010dnino.",
-    "16372": "PRO LITE naro\u010dnina: \u20ac4.99 (US$4.99) mese\u010dno ali \u20ac49.99 (US$49.99) letno ponuja 200 GB shranjevalnega prostora in 1 TB prenosne kvote na mesec.PRO I naro\u010dnina: \u20ac9.99 (US$9.99) mese\u010dno ali \u20ac99.99 (US$99.99) letno ponuja 500 GB shranjevalnega prostora in 2 TB prenosne kvote na mesec.PRO II naro\u010dnina: \u20ac19.99 (US$19.99) mese\u010dno ali \u20ac199.99 (US$199.99) letno ponuja 2 TB shranjevalnega prostora in 4 TB prenosne kvote na mesec.PRO III naro\u010dnina: \u20ac29.99 (US$29.99) mese\u010dno ali \u20ac299.99 (US$299.99) letno ponuja 4 TB shranjevalnega prostora in 8 TB prenosne kvote na mesec.",
-    "16373": "Za ve\u010d informacij poglejte na na\u0161o spletno stran: Mobilno - https:\/\/mega.nz\/mobile_terms.html - https:\/\/mega.nz\/mobile_privacy.htmlNamizno - https:\/\/mega.nz\/",
     "16374": "Obvestilo: za dostop z namiznega ra\u010dunalnika do va\u0161ih datotek, potrebuje MEGA HTML5 kompatibilne brskalnike, da lahko uporablja na\u0161e napredne mo\u017enosti. Priporo\u010damo Mozilla Firefox in Google Chrome. Mobilne verzije brskalnikov (\u0161e) ne morejo dostopati do MEGA sistema za shranjevanje v oblaku.",
     "16375": "Ogromno [S]prostora za shranjevanje[\/S]",
     "16378": "Zapustite omejitve prenosne kvote za brezpla\u010dne ra\u010dune in u\u017eivajte v povi\u0161anih dovoljenih koli\u010dinah prenosa.",
@@ -4039,9 +4037,9 @@
     "16415": "[1]MEGA Invitation[2]The user with the email [R][$cred][\/R] has sent you an invitation to join MEGA.[3]Join [R][$cred][\/R] on MEGA by clicking below:[4]Create Account",
     "16416": "Congratulations, [$cred] has accepted your invitation and started using MEGA! As a result, you have been credited [$storageearnedgb] of additional storage space and [$transferearnedgb] transfer quota, which will both be valid for [$durationdays] days.",
     "16420": "Ni delovalo? Kopirajte spodnjo povezavo v svoj brskalnik: ",
-    "16421": "[1]MEGA Invitation[2]The user with the email [R][$cred][\/R] has sent you a contact invitation.[3]Head to Mega to accept the invite and get connected with [R][$cred][\/R][4]Take me to MEGA",
+    "16421": "[1]MEGA Invitation[2]The user with the email [R][$cred][\/R] has sent you a contact invitation.[3]Head to MEGA to accept the invite and get connected with [R][$cred][\/R][4]Take me to MEGA",
     "16422": "[1]MEGA[2]The user with the email [R][$cred][\/R] is waiting for you to join MEGA.[3]It's free and easy to set up and you will get a generous free storage allocation on the world's most secure cloud storage service.[4]Join MEGA",
-    "16423": "[1]MEGA Invitation[2][R][$cred][\/R] wants to share a folder with you.[3]To receive shared folders from MEGA users, you will need a MEGA account. It's free and easy to set up, and you will get a generous free storage allocation on the world's most secure major cloud storage service.[4]Join Mega[5]Please note that the shared folder will only appear if its owner is connected to MEGA during or after your signup. This is because our end-to-end encryption paradigm requires the folder owner to transmit the secret folder key to you securely using asymmetric cryptography so that nobody can intercept it, not even MEGA.[6]Click below to get started with MEGA:",
+    "16423": "[1]MEGA Invitation[2][R][$cred][\/R] wants to share a folder with you.[3]To receive shared folders from MEGA users, you will need a MEGA account. It's free and easy to set up, and you will get a generous free storage allocation on the world's most secure major cloud storage service.[4]Join MEGA[5]Please note that the shared folder will only appear if its owner is connected to MEGA during or after your signup. This is because our end-to-end encryption paradigm requires the folder owner to transmit the secret folder key to you securely using asymmetric cryptography so that nobody can intercept it, not even MEGA.[6]Click below to get started with MEGA:",
     "16424": "[1]MEGA Invitation[2][R][$cred][\/R] wants to share a folder with you.[3]Head to MEGA to accept the invite and get started with [R][$cred][\/R][4]Take me to MEGA",
     "16425": "[1]MEGA Email Verification Required[2]You have one more step remaining to activate your MEGA account.[3]Click on the button below to verify your email address:[4]Verify my email[5]Click on the link below to verify your email address:",
     "16426": "\u010ce imate te\u017eave z aktivacijo z uporabo zgornje povezave, poskusite kopirati in prilepiti povezavo spodaj v mobilni brskalnik va\u0161e IOS naprave:",
@@ -4094,6 +4092,8 @@
     "16476": "Edited by %1 ",
     "16477": "Renamed from %1 by %2",
     "16478": "current version",
+    "16480": "Edited by me",
+    "16481": "Renamed from %1 by me",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4349,6 +4349,8 @@
         "file_revert_version": 16475,
         "file_version_edited_by": 16476,
         "file_version_renamed_from": 16477,
-        "file_current_version": 16478
+        "file_current_version": 16478,
+        "file_edit_by_me": 16480,
+        "file_rename_by_me": 16481
     }
 }

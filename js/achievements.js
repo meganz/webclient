@@ -1249,7 +1249,7 @@ Object.freeze(mega.achievem);
 mega.checkStorageQuota = function checkStorageQuota(timeout) {
     delay('checkStorageQuota', function _csq() {
         mega.api.req({a: 'uq', strg: 1, qc: 1}).done(function(data) {
-            var perc = Math.round(data.cstrg / data.mstrg * 100);
+            var perc = Math.floor(data.cstrg / data.mstrg * 100);
 
             mega.showOverStorageQuota(perc, data.cstrg, data.mstrg);
         });

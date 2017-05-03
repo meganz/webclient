@@ -424,6 +424,9 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
                 }
                 loadSubPage(chatRoom.getRoomUrl());
             }
+            if (!chatRoom.lastActivity && actionPacket.ts) {
+                chatRoom.lastActivity = actionPacket.ts;
+            }
 
             if (wasActive) {
                 loadSubPage(chatRoom.getRoomUrl());

@@ -58,6 +58,7 @@ class MegaTest(unittest.TestCase):
     def setUp(self):
         chrome_options = Options()
         chrome_options.add_argument("--lang=en")
+        chrome_options.add_argument("--no-proxy-server")
         chrome_options.add_argument("--window-size=1270,812")
         chrome_options.add_argument('--user-agent=Mozilla/5.0 (Selenium; %s) Chrome/256.3.14' % webdriver.__version__)
         chrome_options.add_experimental_option("prefs", {'download.prompt_for_download': 'false',
@@ -301,6 +302,18 @@ class MegaTest(unittest.TestCase):
             except: pass
             time.sleep(0.3)
         else: self.fail("time out: 0013  Filelink")
+        # Filelink - Import
+        driver.find_element_by_css_selector(".button.download-button.to-clouddrive").click()
+        self.waitfor_text("span.tranfer-filetype-txt", "file4.bin")
+        self.fire_contextmenu(By.CSS_SELECTOR, "span.tranfer-filetype-txt")
+        self.on_visibleclick("a.dropdown-item.remove-item")
+        for i in range(60):
+            try:
+                if re.search(r"^Are you sure that you want to move [\s\S]* to the rubbish bin[\s\S]$", driver.find_element_by_css_selector("div.fm-notification-info p").text): break
+            except: pass
+            time.sleep(0.3)
+        else: self.fail("time out: 0013  Filelink")
+        driver.find_element_by_css_selector(".fm-dialog.confirmation-dialog.remove-dialog .notification-button.confirm").click()
         #
         # Test: 0014  Folderlink
         driver.get(self.base_url + "#F!9sUAGZ4R")

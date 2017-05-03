@@ -150,7 +150,9 @@ function u_checklogin3a(res, ctx) {
             console.error('Error decoding private RSA key', e);
         }
 
-        if (typeof u_attr.ut !== 'undefined') localStorage.apiut = u_attr.ut;
+        if (typeof u_attr.ut !== 'undefined') {
+            localStorage.apiut = u_attr.ut;
+        }
 
         // Flags is a generic object for various things
         if (typeof u_attr.flags !== 'undefined') {

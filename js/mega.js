@@ -3798,7 +3798,9 @@ function MegaData()
 
                     M.account = ctx.account;
 
-                    if (res.ut) localStorage.apiut = res.ut;
+                    if (res.ut) {
+                        localStorage.apiut = res.ut;
+                    }
 
                     // transfers quota
                     var tfsq = {max: account.bw, used: account.downbw_used};

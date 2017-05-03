@@ -486,6 +486,9 @@ var mega = {
                 params += '&bb=' + parseInt(brand);
             }
 
+            var apiut = localStorage.apiut ? '&ut=' + localStorage.apiut : "";
+            params += apiut;
+
             this._urlParams = params;
         }
 

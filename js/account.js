@@ -110,7 +110,7 @@ function u_checklogin3a(res, ctx) {
         u_attr = res;
         var exclude = [
             'c', 'email', 'k', 'name', 'p', 'privk', 'pubk', 's',
-            'ts', 'u', 'currk', 'flags', '*!lastPsaSeen', 'lup', 'since'
+            'ts', 'u', 'currk', 'flags', '*!lastPsaSeen', 'lup', 'since', 'ut'
         ];
 
         for (var n in u_attr) {
@@ -148,6 +148,10 @@ function u_checklogin3a(res, ctx) {
         }
         catch (e) {
             console.error('Error decoding private RSA key', e);
+        }
+
+        if (typeof u_attr.ut !== 'undefined') {
+            localStorage.apiut = u_attr.ut;
         }
 
         // Flags is a generic object for various things

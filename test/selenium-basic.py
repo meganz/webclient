@@ -58,6 +58,7 @@ class MegaTest(unittest.TestCase):
     def setUp(self):
         chrome_options = Options()
         chrome_options.add_argument("--lang=en")
+        chrome_options.add_argument("--no-proxy-server")
         chrome_options.add_argument("--window-size=1270,812")
         chrome_options.add_argument('--user-agent=Mozilla/5.0 (Selenium; %s) Chrome/256.3.14' % webdriver.__version__)
         chrome_options.add_experimental_option("prefs", {'download.prompt_for_download': 'false',
@@ -88,7 +89,7 @@ class MegaTest(unittest.TestCase):
         self.waitfor_text(".loading-info li.step3.loading", "Decrypting")
         self.waitfor_invisibility(".loading-info li.loading")
         self.waitfor_text(".fm-file-upload span", "File Upload")
-        # 
+        #
         # Test: 0002  New Folder
         # Create new folder
         driver.find_element_by_css_selector("div.fm-new-folder").click()
@@ -109,7 +110,7 @@ class MegaTest(unittest.TestCase):
         else: self.fail("time out: 0002  New Folder")
         driver.find_element_by_css_selector(".fm-dialog.confirmation-dialog.remove-dialog .notification-button.confirm").click()
         self.waitfor_nottext("span.tranfer-filetype-txt", "000.foldertest")
-        # 
+        #
         # Test: 0004  Empty Rubbish
         driver.find_element_by_css_selector(".fm-main.default .nw-fm-left-icon.rubbish-bin").click()
         driver.find_element_by_css_selector("div.fm-clearbin-button").click()
@@ -117,7 +118,7 @@ class MegaTest(unittest.TestCase):
         driver.find_element_by_css_selector(".fm-dialog.clear-bin-dialog .notification-button.confirm").click()
         self.waitfor_visibility(".fm-empty-trashbin .fm-empty-cloud-txt")
         self.visual_diff('rubbish.png')
-        # 
+        #
         # Test: 0004  Reload
         driver.find_element_by_css_selector(".top-icon.menu").click()
         self.on_visibleclick("div.top-menu-item.refresh-item")
@@ -126,7 +127,7 @@ class MegaTest(unittest.TestCase):
         driver.find_element_by_css_selector(".fm-dialog.confirmation-dialog .notification-button.confirm").click()
         self.waitfor_text(".loading-info li.step1.loading", "Requesting account data")
         self.waitfor_visibility(".fm-empty-trashbin .fm-empty-cloud-txt")
-        # 
+        #
         # Test: 0005  Switch Sections
         # Switch to Contacts section and check that some elements are there...
         driver.find_element_by_css_selector(".fm-main.default .nw-fm-left-icon.contacts").click()
@@ -154,11 +155,11 @@ class MegaTest(unittest.TestCase):
         driver.find_element_by_css_selector("a.fm-files-view-icon.listing-view").click()
         for i in range(60):
             try:
-                if 1 == len(driver.find_elements_by_xpath("//span[@class='tranfer-filetype-txt']")): break
+                if 1 == len(driver.find_elements_by_xpath("//tr//span[@class='tranfer-filetype-txt']")): break
             except: pass
             time.sleep(0.3)
         else: self.fail("time out: 0005  Switch Sections")
-        # 
+        #
         # Test: 0006  Context Actions
         # Favourite
         self.fire_contextmenu(By.CSS_SELECTOR, "span.tranfer-filetype-txt")
@@ -210,7 +211,7 @@ class MegaTest(unittest.TestCase):
         driver.find_element_by_css_selector(".fm-dialog.copy-dialog .dialog-copy-button").click()
         for i in range(60):
             try:
-                if 2 == len(driver.find_elements_by_xpath("//span[@class='tranfer-filetype-txt']")): break
+                if 2 == len(driver.find_elements_by_xpath("//tr//span[@class='tranfer-filetype-txt']")): break
             except: pass
             time.sleep(0.3)
         else: self.fail("time out: 0006  Context Actions")
@@ -222,11 +223,11 @@ class MegaTest(unittest.TestCase):
         driver.find_element_by_css_selector(".fm-dialog.confirmation-dialog.remove-dialog .notification-button.confirm").click()
         for i in range(60):
             try:
-                if 1 == len(driver.find_elements_by_xpath("//span[@class='tranfer-filetype-txt']")): break
+                if 1 == len(driver.find_elements_by_xpath("//tr//span[@class='tranfer-filetype-txt']")): break
             except: pass
             time.sleep(0.3)
         else: self.fail("time out: 0006  Context Actions")
-        # 
+        #
         # Test: 0007  Settings
         driver.find_element_by_css_selector(".fm-main.default .nw-fm-left-icon.account").click()
         # Overview
@@ -256,7 +257,7 @@ class MegaTest(unittest.TestCase):
         driver.find_element_by_css_selector(".account-history-dropdown-button.sessions").click()
         driver.find_element_by_css_selector("div.account-history-drop-items.session100-").click()
         self.waitfor_invisibility(".dark-overlay")
-        # 
+        #
         # Test: 0008  Recovery Key
         driver.find_element_by_css_selector(".top-icon.menu").click()
         self.on_visibleclick("div.top-menu-item.backup")
@@ -265,7 +266,7 @@ class MegaTest(unittest.TestCase):
         self.assertTrue(22 == len(driver.find_element_by_css_selector("#backup_keyinput").get_attribute("value")))
         self.assertEqual("Your password unlocks your Recovery Key", driver.find_element_by_css_selector(".main-left-block h5.main-italic-header").text)
         self.assertEqual("Save Recovery Key as text file", driver.find_element_by_css_selector(".main-right-block h5.main-italic-header span").text)
-        # 
+        #
         # Test: 0011  Blog
         driver.find_element_by_css_selector(".top-icon.menu").click()
         self.on_visibleclick("div.top-menu-item.blog")
@@ -275,7 +276,7 @@ class MegaTest(unittest.TestCase):
         driver.find_element_by_link_text("Read more").click()
         self.waitfor_visibility(".blog-new-full")
         self.assertTrue(driver.find_element_by_id("blogarticle_title").is_displayed())
-        # 
+        #
         # Test: 0013  Filelink
         # FileLink - Visit TakenDown file
         driver.get(self.base_url + "#!okESgTYL!2DQn0aszTUeR8Xo-FiCY9SGyEBlQSGryKAGoaMFFZpw")
@@ -301,7 +302,19 @@ class MegaTest(unittest.TestCase):
             except: pass
             time.sleep(0.3)
         else: self.fail("time out: 0013  Filelink")
-        # 
+        # Filelink - Import
+        driver.find_element_by_css_selector(".button.download-button.to-clouddrive").click()
+        self.waitfor_text("span.tranfer-filetype-txt", "file4.bin")
+        self.fire_contextmenu(By.CSS_SELECTOR, "span.tranfer-filetype-txt")
+        self.on_visibleclick("a.dropdown-item.remove-item")
+        for i in range(60):
+            try:
+                if re.search(r"^Are you sure that you want to move [\s\S]* to the rubbish bin[\s\S]$", driver.find_element_by_css_selector("div.fm-notification-info p").text): break
+            except: pass
+            time.sleep(0.3)
+        else: self.fail("time out: 0013  Filelink")
+        driver.find_element_by_css_selector(".fm-dialog.confirmation-dialog.remove-dialog .notification-button.confirm").click()
+        #
         # Test: 0014  Folderlink
         driver.get(self.base_url + "#F!9sUAGZ4R")
         driver.refresh()
@@ -340,7 +353,7 @@ class MegaTest(unittest.TestCase):
         else: self.fail("time out: 0014  Folderlink")
         driver.find_element_by_css_selector(".fm-dialog.remove-dialog .notification-button.confirm").click()
         self.waitfor_nottext("span.tranfer-filetype-txt", "111.importTest")
-        # 
+        #
         # Test: 0015  Help
         driver.find_element_by_css_selector(".top-icon.menu").click()
         self.on_visibleclick("div.top-menu-item.help")
@@ -356,7 +369,7 @@ class MegaTest(unittest.TestCase):
         self.waitfor_visibility(".block-mobile-device .iOS-mobile-block.link")
         self.assertTrue(driver.find_element_by_css_selector(".block-mobile-device .android-mobile-block.link").is_displayed())
         self.assertTrue(driver.find_element_by_css_selector(".block-mobile-device .window-mobile-block.link").is_displayed())
-        self.assertEqual("Web Client", driver.find_element_by_css_selector("div[data-href='#help/client/webclient']").text)
+        self.assertEqual("Web client", driver.find_element_by_css_selector("div[data-href='#help/client/webclient']").text)
         self.assertEqual("MEGAsync", driver.find_element_by_css_selector("div[data-href='#help/client/megasync']").text)
         self.assertEqual("MEGAchat", driver.find_element_by_css_selector("div[data-href='#help/client/megachat']").text)
         # view webclient section
@@ -395,12 +408,12 @@ class MegaTest(unittest.TestCase):
         # close the search overlay, and check the webclient section subtitle
         driver.find_element_by_css_selector(".search-section .close-icon").click()
         self.waitfor_text(".howto-section-subtitle", "MEGA in your web browser - no installs necessary.")
-        # 
+        #
         # Test: 0999  Logout
         driver.find_element_by_css_selector(".top-icon.menu").click()
         self.on_visibleclick("div.top-menu-item.logout")
         self.waitfor_invisibility(".dark-overlay")
-        # 
+        #
         # Test: 1000  Ephemeral
         # Ephemeral account creation by drag&drop file upload
         driver.get(self.base_url + "#start")
@@ -422,9 +435,9 @@ class MegaTest(unittest.TestCase):
         self.visual_diff('ephemeral-transfers.png')
         # move back to the cloud and check stuff there
         driver.find_element_by_css_selector(".fm-main.default .nw-fm-left-icon.cloud-drive").click()
-        self.waitfor_text("tr.file span.tranfer-filetype-txt", "test.txt")
+        self.waitfor_text("tr.file span.tranfer-filetype-txt", "testfdp.exe")
         self.assertEqual("4 B", driver.find_element_by_css_selector("tr.file td.size").text)
-        self.assertEqual("Text Document", driver.find_element_by_css_selector("tr.file td.type").text)
+        self.assertEqual("Executable", driver.find_element_by_css_selector("tr.file td.type").text)
         # check the hash/checksum of the uploaded file
         self.assertEqual("MTIzNAAAAAAAAAAAAAAAAAOLqRY", self.waitfor_jsstate("M.v[0].hash"))
         # switch to other sections and check elements visibility there

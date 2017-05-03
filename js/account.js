@@ -172,7 +172,7 @@ function u_checklogin3a(res, ctx) {
         u_attr.flags = Object(u_attr.flags);
 
         // If their PRO plan has expired and Last User Payment info is set, configure the dialog
-        if (typeof u_attr.lup !== 'undefined') {
+        if ((typeof u_attr.lup !== 'undefined') && !is_mobile) {
             alarm.planExpired.lastPayment = u_attr.lup;
         }
 
@@ -236,13 +236,19 @@ function u_logout(logout) {
         if (typeof mDBcls === 'function') {
             mDBcls(); // close fmdb
         }
+
         if (logout !== -0xDEADF) {
             watchdog.notify('logout');
         }
-        slideshow(0, 1);
+
+        // The slideshow and notifications are not applicable for the mobile website
+        if (!is_mobile) {
+            slideshow(0, 1);
+            notify.notifications = [];
+        }
+
         mBroadcaster.crossTab.leave();
         u_sid = u_handle = u_k = u_attr = u_privk = u_k_aes = undefined;
-        notify.notifications = [];
         api_setsid(false);
         u_sharekeys = {};
         u_type = false;
@@ -969,7 +975,9 @@ function checkUserLogin() {
                 moveLegacySettings();
 
                 // Initialize account notifications.
-                mega.notif.setup(fmconfig.anf);
+                if (!is_mobile) {
+                    mega.notif.setup(fmconfig.anf);
+                }
             })
             .done(function(result) {
                 result = Object(result);

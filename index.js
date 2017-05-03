@@ -31,6 +31,7 @@ var register_txt = false;
 var login_next = false;
 var loggedout = false;
 var flhashchange = false;
+var folderLinkVisitLogged = false;
 var avatars = {};
 
 
@@ -44,11 +45,18 @@ pages['placeholder'] = '((TOP))<div class="main-scroll-block"><div class="main-p
 function startMega() {
     if (!hashLogic) {
         $(window).rebind('popstate.mega', function(event) {
+
+            var currentPage = page;
             var state = event.originalEvent.state || {};
+
             loadSubPage(state.subpage || state.fmpage || location.hash, event);
+
+            // If on mobile TOS page and logged in, then the cloud doesn't reload for some reason so reload
+            if (is_mobile && (currentPage === 'terms') && (typeof u_attr !== 'undefined')) {
+                window.location.reload();
+            }
         });
     }
-
 
     if (!window.M) {
         window.M = new MegaData();
@@ -213,8 +221,6 @@ function init_page() {
         }
     }
 
-
-
     if (page.substr(0, 1) === '!' && page.length > 1) {
 
         var ar = page.substr(1, page.length - 1).split('!');
@@ -324,6 +330,22 @@ function init_page() {
             pfhandle = ar[2].replace(/[^\w-]+/g, "");
         }
 
+        // If the visit to the folder link has not been logged yet
+        if (folderLinkVisitLogged === false) {
+
+            // Log to see how many public folder views on mobile webclient
+            if (is_mobile) {
+                api_req({ a: 'log', e: 99631, m: 'Loaded public folder link on mobile webclient' });
+            }
+            else {
+                // Otherwise log to see how many public folder views on regular webclient
+                api_req({ a: 'log', e: 99632, m: 'Loaded public folder link on regular webclient' });
+            }
+
+            // Don't log this again for this session
+            folderLinkVisitLogged = true;
+        }
+
         n_h = pfid;
         if (!flhashchange || pfkey !== oldPFKey || pfkey.length !== 22) {
             if (pfkey.length === 22) {
@@ -334,14 +356,22 @@ function init_page() {
                 u_n = pfid;
             }
             else {
-                // Insert placeholder page while waiting for user input
-                parsepage(pages['placeholder']);
+                // If mobile, show the decryption key overlay
+                if (is_mobile) {
+                    parsepage(pages['fm_mobile']);
+                    mobile.decryptionKeyOverlay.show(pfid, true, pfkey);
+                }
+                else {
+                    // Insert placeholder background page while waiting for user input
+                    parsepage(pages['placeholder']);
 
-                mKeyDialog(pfid, true, pfkey)
-                    .fail(function() {
-                        loadSubPage('start');
-                    });
-                pfkey = false;
+                    // Show the decryption key dialog on top
+                    mKeyDialog(pfid, true, pfkey)
+                        .fail(function() {
+                            loadSubPage('start');
+                        });
+                    pfkey = false;
+                }
                 return;
             }
         }
@@ -382,11 +412,10 @@ function init_page() {
         page = 'newpw';
     }
 
+
     if ((pfkey || dlkey) && location.hash[0] !== '#' && !is_fm()) {
         return location.replace(getAppBaseUrl());
     }
-
-
 
     blogmonth = false;
     blogsearch = false;
@@ -429,11 +458,16 @@ function init_page() {
     // Password protected link decryption dialog
     else if (page.substr(0, 2) === 'P!' && page.length > 2) {
 
-        // Insert placeholder page while waiting for user input
-        parsepage(pages['placeholder']);
-
-        // Show the decryption dialog and pass in the current URL hash
-        exportPassword.decrypt.init(page);
+        // Show the password overlay for mobile
+        if (is_mobile) {
+            parsepage(pages['fm_mobile']);
+            mobile.decryptionPasswordOverlay.show(page);
+        }
+        else {
+            // Otherwise insert background page, show the password decryption dialog and pass in the current URL hash
+            parsepage(pages['placeholder']);
+            exportPassword.decrypt.init(page);
+        }
     }
     else if (page.substr(0, 6) == 'verify') {
         parsepage(pages['change_email']);
@@ -615,42 +649,67 @@ function init_page() {
             }
         });
     }
-    else if (page == 'confirm') {
+    else if (page === 'confirm') {
+
         loadingDialog.show();
+
         var ctx = {
-            signupcodeok: function (email, name) {
+            signupcodeok: function(email) {
+
                 loadingDialog.hide();
                 confirmok = true;
                 page = 'login';
-                parsepage(pages['login']);
-                login_txt = l[378];
-                init_login();
-                $('#login-name2').val(email);
-                $('.register-st2-button').addClass('active');
-                $('#login-name2').attr('readonly', true);
-                topmenuUI();
-            },
-            signupcodebad: function (res) {
-                loadingDialog.hide();
-                if (res == EINCOMPLETE) {
-                    alert(l[703]);
-                }
-                else if (res == ENOENT) {
-                    login_txt = l[704];
+
+                if (is_mobile) {
+                    parsepage(pages['fm_mobile']);
+                    mobile.register.showConfirmAccountScreen(email);
                 }
                 else {
-                    alert(l[705] + res);
+                    parsepage(pages['login']);
+                    login_txt = l[378];
+                    init_login();
+                    $('#login-name2').val(email);
+                    $('.register-st2-button').addClass('active');
+                    $('#login-name2').attr('readonly', true);
+                    topmenuUI();
                 }
+            },
+            signupcodebad: function(res) {
+
+                loadingDialog.hide();
                 page = 'login';
-                parsepage(pages['login']);
-                init_login();
-                topmenuUI();
+
+                if (is_mobile) {
+                    parsepage(pages['fm_mobile']);
+                    mobile.register.showConfirmAccountFailure(res);
+                }
+                else {
+                    if (res === EINCOMPLETE) {
+                        alert(l[703]);
+                    }
+                    else if (res === ENOENT) {
+                        login_txt = l[704];
+                    }
+                    else {
+                        alert(l[705] + res);
+                    }
+                    parsepage(pages['login']);
+                    init_login();
+                    topmenuUI();
+                }
             }
         }
+
         verifysignupcode(confirmcode, ctx);
     }
     else if (u_type == 2) {
-        parsepage(pages['key']);
+        if (is_mobile) {
+            parsepage(pages['fm_mobile']);
+            mobile.register.showGeneratingKeysScreen();
+        }
+        else {
+            parsepage(pages['key']);
+        }
         init_key();
     }
     else if (page == 'login') {
@@ -658,11 +717,24 @@ function init_page() {
             loadSubPage('fm');
             return false;
         }
-        parsepage(pages['login']);
-        init_login();
+
+        if (is_mobile) {
+            parsepage(pages['fm_mobile']);
+            mobile.signin.show();
+        }
+        else {
+            parsepage(pages['login']);
+            init_login();
+        }
     }
     else if (page === 'achievements') {
         loadSubPage('fm/account/achievements');
+        return false;
+    }
+    else if (page === 'fm/account/profile') {
+
+        // Handle old invalid links from emails and redirect them back to fm/account
+        loadSubPage('fm/account');
         return false;
     }
     else if (page == 'account') {
@@ -678,8 +750,15 @@ function init_page() {
             loadSubPage('fm');
             return false;
         }
-        parsepage(pages['register']);
-        init_register();
+
+        if (is_mobile) {
+            parsepage(pages['fm_mobile']);
+            mobile.register.show();
+        }
+        else {
+            parsepage(pages['register']);
+            init_register();
+        }
     }
     else if (page == 'key') {
         parsepage(pages['key']);
@@ -697,32 +776,6 @@ function init_page() {
     }
     else if (page.substr(0,4) == 'help') {
         return Help.render();
-
-        function doRenderHelp() {
-
-            if (window.helpTemplate) {
-                parsepage(window.helpTemplate);
-                init_help();
-                loadingDialog.hide();
-                topmenuUI();
-                mainScroll();
-                return;
-            }
-            loadingDialog.show();
-            CMS.watch('help.' + lang, function () {
-                window.helpTemplate = null;
-                doRenderHelp();
-            });
-            CMS.get(['help.' + lang, 'help.' + lang + '.json'], function (err, content, json) {
-                helpdata = json.object
-                parsepage(window.helpTemplate = content.html);
-                init_help();
-                loadingDialog.hide();
-                topmenuUI();
-                mainScroll();
-            });
-        }
-        doRenderHelp();
     }
     else if (page == 'privacy') {
         parsepage(pages['privacy']);
@@ -851,9 +904,14 @@ function init_page() {
     else if (page === 'sourcecode') {
         parsepage(pages['sourcecode']);
     }
-    else if (page === 'terms')
-    {
-        parsepage(pages['terms']);
+    else if (page === 'terms') {
+        if (is_mobile) {
+            parsepage(pages['fm_mobile']);
+            mobile.terms.show();
+        }
+        else {
+            parsepage(pages['terms']);
+        }
     }
     else if (page === 'general') {
         parsepage(pages['general']);
@@ -1178,8 +1236,21 @@ function init_page() {
     }
     else if (typeof init_start === 'function') {
         page = 'start';
-        parsepage(pages['start'], 'start');
-        init_start();
+
+        // If mobile, show the mobile homepage
+        if (is_mobile) {
+            parsepage(pages['fm_mobile']);
+            mobile.home.show();
+        }
+        else {
+            parsepage(pages['start'], 'start');
+            init_start();
+        }
+    }
+    else if (is_mobile) {
+        // Show the mobile homepage
+        parsepage(pages['fm_mobile']);
+        mobile.home.show();
     }
     else {
         location.assign('/');
@@ -1194,7 +1265,9 @@ function init_page() {
     if (typeof alarm !== 'undefined') {
         alarm.siteUpdate.init();
     }
-    topmenuUI();
+    if (!is_mobile) {
+        topmenuUI();
+    }
     loggedout = false;
     flhashchange = false;
 }
@@ -1315,8 +1388,11 @@ function tooltiplogin() {
             else if (r) {
                 passwordManager('#form_login_header');
                 u_type = r;
-                if (login_next) {
 
+                // Logging to see how many people are signing into the regular site
+                api_req({ a: 'log', e: 99630, m: 'Completed login on regular webclient' });
+
+                if (login_next) {
                     loadSubPage(login_next);
                 }
                 else if (page !== 'login') {
@@ -1477,7 +1553,9 @@ function topmenuUI() {
         }
 
         // Show PRO plan expired warning popup (if applicable)
-        alarm.planExpired.render();
+        if (!is_mobile) {
+            alarm.planExpired.render();
+        }
     }
     else {
         if (u_type === 0 && !confirmok && page !== 'key') {
@@ -1926,7 +2004,7 @@ function topmenuUI() {
 
         // If the user has an avatar already set, take them to the profile page where they can change or remove it
         if ($(this).find('img').length > 0) {
-            loadSubPage('fm/account/profile');
+            loadSubPage('fm/account');
         }
         else {
             // Otherwise if they don't have an avatar, open the change avatar dialog;
@@ -2143,7 +2221,7 @@ function loadSubPage(tpage, event)
         }
     }
 
-    if (hashLogic || page.substr(0, 2) === 'F!' || page[0] === '!') {
+    if (hashLogic || page.substr(0, 2) === 'P!' || page.substr(0, 2) === 'F!' || page[0] === '!') {
         document.location.hash = '#' + page;
     }
     else if (!event || event.type !== 'popstate') {
@@ -2186,7 +2264,7 @@ window.onunload = function() {
     mBroadcaster.crossTab.leave();
 };
 
-if (!is_karma && !is_mobile) {
+if (!is_karma) {
     window.M = new MegaData();
     attribCache = new IndexedDBKVStorage('ua', { murSeed: 0x800F0002 });
     attribCache.syncNameTimer = {};

@@ -1825,6 +1825,26 @@ Chat.prototype.getEmojiDataSet = function(name) {
     }
 };
 
+/**
+ * Retrieve the user's presence from presenced
+ *
+ * @param u {String} u_handle of the contact you want to retrieve the presence for
+ * @returns {Number|undefined} See UserPresence.PRESENCE.* for the possible presences (undefined = offline)
+ */
+Chat.prototype.getPresence = function(u) {
+    var self = this;
+
+    var contact = M.u[u];
+
+    if (!contact) {
+        return UserPresence.PRESENCE.OFFLINE;
+    }
+
+    return contact.u !== u_handle ?
+        self.plugins.presencedIntegration.getPresence(contact.u) :
+        self.plugins.presencedIntegration.getMyPresence();
+}
+
 window.Chat = Chat;
 window.chatui = chatui;
 

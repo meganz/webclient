@@ -81,7 +81,7 @@ var emailchange = (function() {
         context = null; // wipe variable
 
         msgDialog('warninga', title, msgBody, false, function() {
-            loadSubPage('fm/account/profile');
+            loadSubPage('fm/account/email-and-pass');
         });
 
         return true;
@@ -141,7 +141,7 @@ var emailchange = (function() {
                     // Wipe out account cache data (so we can fetch the newest email address)
                     M.currentdirid = null;
                     M.account = null;
-                    loadSubPage('fm/account/profile');
+                    loadSubPage('fm/account/email-and-pass');
                     showToast('settings', l[7698]);     // You have successfully changed your profile
                 });
             }

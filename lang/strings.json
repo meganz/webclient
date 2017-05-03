@@ -16019,14 +16019,6 @@
         "text": "Inside the app you can upgrade your storage space and transfer quota with a monthly or yearly subscription.",
         "context": "Paragraph 4 of the general description of MEGA which is shown on the app stores in Android, iOS and Windows Phone."
     },
-    "16372": {
-        "text": "PRO LITE subscription: \u20ac4.99 (US$4.99) per month or \u20ac49.99 (US$49.99) per year gives you 200 GB of storage space and 1 TB of transfer quota per month.\nPRO I subscription: \u20ac9.99 (US$9.99) per month or \u20ac99.99 (US$99.99) per year gives you 500 GB of storage space and 2 TB of transfer quota per month.\nPRO II subscription: \u20ac19.99 (US$19.99) per month or \u20ac199.99 (US$199.99) per year gives you 2 TB of storage space and 4 TB of transfer quota per month.\nPRO III subscription: \u20ac29.99 (US$29.99) per month or \u20ac299.99 (US$299.99) per year gives you 4 TB of storage space and 8 TB of transfer quota per month.",
-        "context": "Paragraph 5 of the general description of MEGA which is shown on the apps stores in Android, iOS and Windows Phone. Please keep the multiple line format."
-    },
-    "16373": {
-        "text": "For more info, please check our website:\nMobile - https:\/\/mega.nz\/mobile_terms.html - https:\/\/mega.nz\/mobile_privacy.html\nDesktop - https:\/\/mega.nz\/",
-        "context": "Paragraph 6 of the general description of MEGA which is shown on the app stores in Android, iOS and Windows Phone. Please keep the multiple line format."
-    },
     "16374": {
         "text": "Note: For desktop access to your files, MEGA needs to use HTML5 compatible browsers to handle our advanced features. We recommend Mozilla Firefox and Google Chrome. The mobile versions of browsers cannot access the MEGA cloud storage system yet.",
         "context": "Paragraph 7 of the general description of MEGA which is shown on the app stores in Android, iOS and Windows Phone."
@@ -16160,16 +16152,16 @@
         "context": "Phrase used in emails, that appears after a button. If the button didn't work the user is encouraged to try the link below directly, or copied into their browser"
     },
     "16421": {
-        "text": "[1]MEGA Invitation\r\n\r\n[2]The user with the email [R][$cred][\/R] has sent you a contact invitation.\r\n\r\n[3]Head to Mega to accept the invite and get connected with [R][$cred][\/R]\r\n\r\n[4]Take me to MEGA\r\n",
-        "context": "Email body sent to registered users when other user invites them.\r\n\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [A1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
+        "text": "[1]MEGA Invitation\r\n\r\n[2]The user with the email [R][$cred][\/R] has sent you a contact invitation.\r\n\r\n[3]Head to MEGA to accept the invite and get connected with [R][$cred][\/R]\r\n\r\n[4]Take me to MEGA\r\n",
+        "context": "(edit:Mega changed to MEGA)\r\n\r\nEmail body sent to registered users when other user invites them.\r\n\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [A1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
     },
     "16422": {
         "text": "[1]MEGA\r\n\r\n[2]The user with the email [R][$cred][\/R] is waiting for you to join MEGA.\r\n\r\n[3]It's free and easy to set up and you will get a generous free storage allocation on the world's most secure cloud storage service.\r\n\r\n[4]Join MEGA\r\n",
         "context": "Email body sent to remind unregistered users that other user invites them and they haven't signed up yet.\r\n\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [A1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
     },
     "16423": {
-        "text": "[1]MEGA Invitation\r\n\r\n[2][R][$cred][\/R] wants to share a folder with you.\r\n\r\n[3]To receive shared folders from MEGA users, you will need a MEGA account. It's free and easy to set up, and you will get a generous free storage allocation on the world's most secure major cloud storage service.\r\n\r\n[4]Join Mega\r\n\r\n[5]Please note that the shared folder will only appear if its owner is connected to MEGA during or after your signup. This is because our end-to-end encryption paradigm requires the folder owner to transmit the secret folder key to you securely using asymmetric cryptography so that nobody can intercept it, not even MEGA.\r\n\r\n[6]Click below to get started with MEGA:\r\n",
-        "context": "Email body sent to unregistered users when another user invites them and has a folder to share.\r\n\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [A1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
+        "text": "[1]MEGA Invitation\r\n\r\n[2][R][$cred][\/R] wants to share a folder with you.\r\n\r\n[3]To receive shared folders from MEGA users, you will need a MEGA account. It's free and easy to set up, and you will get a generous free storage allocation on the world's most secure major cloud storage service.\r\n\r\n[4]Join MEGA\r\n\r\n[5]Please note that the shared folder will only appear if its owner is connected to MEGA during or after your signup. This is because our end-to-end encryption paradigm requires the folder owner to transmit the secret folder key to you securely using asymmetric cryptography so that nobody can intercept it, not even MEGA.\r\n\r\n[6]Click below to get started with MEGA:\r\n",
+        "context": "[4]Join Mega has been changed to [4]Join MEGA\r\n\r\nEmail body sent to unregistered users when another user invites them and has a folder to share.\r\n\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [A1] as they are)\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
     },
     "16424": {
         "text": "[1]MEGA Invitation\r\n\r\n[2][R][$cred][\/R] wants to share a folder with you.\r\n\r\n[3]Head to MEGA to accept the invite and get started with [R][$cred][\/R]\r\n\r\n[4]Take me to MEGA\r\n",
@@ -16354,5 +16346,37 @@
     "16472": {
         "text": "Please check that the key is correct or ask the creator of the link again.",
         "context": "On a public file or folder link which does not have a decryption key, the user is asked to enter a decryption key. This is a second message which is shown when the decryption key entered is not correct."
+    },
+    "16473": {
+        "text": "[1]MEGA Achievement Expired\r\n\r\n[2]One of your achievements has expired today. Don't worry though, you can always achieve more or upgrade to a PRO account.\r\n\r\n[3]To upgrade your account to PRO, click below:",
+        "context": ""
+    },
+    "16474": {
+        "text": "Previous versions",
+        "context": "A button label which opens a dialog to display the full version history of the selected file."
+    },
+    "16475": {
+        "text": "Revert",
+        "context": "A button label which reverts a certain version of a file to be the current version of the selected file."
+    },
+    "16476": {
+        "text": "Edited by %1 ",
+        "context": "A message which is displayed in the version history that shows that a certain file version was edited by a particular user. Please keep the %1 placeholder which will be replaced with the email address.\r\n"
+    },
+    "16477": {
+        "text": "Renamed from %1 by %2",
+        "context": "A message which is displayed in the version history that shows that a certain file version is renamed from a previous filename by a particular user. Please keep the placeholders %1 which will be replaced by the filename and %2 which will be replaced by the email address."
+    },
+    "16478": {
+        "text": "current version",
+        "context": "A message to indicate which version is the current version."
+    },
+    "16480": {
+        "text": "Edited by me",
+        "context": "A message which is displayed in the version history that shows that a certain file version was edited by the user themself."
+    },
+    "16481": {
+        "text": "Renamed from %1 by me",
+        "context": "A message which is displayed in the version history that shows that a certain file version is renamed from a previous file name by the user itself. Please keep the placeholder %1 which will be replaced by the filename."
     }
 }

@@ -6095,9 +6095,10 @@ th.grid-first-th {
     right: 5px;
     display: none;
 }
-.linked .data-item-icon {
+
+/*.linked .data-item-icon {
     background-position: -106px -963px;
-}
+}*/
 .taken-down .data-item-icon, .taken-down.nw-fm-tree-item .data-item-icon {
     background-position: -146px -963px;
 }
@@ -7947,6 +7948,7 @@ table {
     height: 258px;
     background-position: center -1680px;
 }
+
 .fm-empty-search-bg {
     height: 244px;
     background-position: center -2350px;
@@ -25026,7 +25028,8 @@ div.camera-bottom-txt {
 .account.pr-item {
     cursor: default;
 }
-.storage .account.pr-item, .account.storage-data .pr-item:not(.pr4) {
+
+.storage .account.pr-item, .account.storage-data .pr-item:not(.pr4), .pointer-c {
     cursor: pointer;
 }
 .account.progress-perc {
@@ -26856,4 +26859,33 @@ opacity: 1;
     font-family: 'source_sans_proregular';
     margin-top: 14px;
     color: #666666;
+}
+
+.public-links-text {
+    height: 18px;
+    width: 71px;
+    color: #666666;
+    font-family: "source_sans_proregular";
+    font-size: 14px;
+    line-height: 18px;
+}
+
+.public-links-cnt {
+    zoom: 80%;
+    height: 14px;
+    width: 21px;
+    border-radius: 4px;
+    background-color: #999999;
+    margin-left: 8px;
+    padding: 0px 6px;
+}
+
+.public-links-cnt-txt {
+    height: 18px;
+    width: 13px;
+    color: #FFFFFF;
+    font-family: "source_sans_proregular";
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 18px;
 }

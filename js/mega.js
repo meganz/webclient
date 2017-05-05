@@ -8374,7 +8374,9 @@ function processIPC(ipc, ignoreDB) {
                 }
 
                 // Update token.input plugin
-                removeFromMultiInputDDL('.share-multiple-input', { id: ipc[i].m, name: ipc[i].m });
+                if (!is_mobile) {
+                    removeFromMultiInputDDL('.share-multiple-input', { id: ipc[i].m, name: ipc[i].m });
+                }
             }
             else {
                 if (!is_mobile) {
@@ -8554,7 +8556,7 @@ function processPS(pendingShares, ignoreDB) {
                     });
                 }
 
-                if (M.opc && M.opc[ps.p]) {
+                if (M.opc && M.opc[ps.p] && !is_mobile) {
                     // Update tokenInput plugin
                     addToMultiInputDropDownList('.share-multiple-input', [{
                             id: M.opc[pendingContactId].m,

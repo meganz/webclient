@@ -1198,8 +1198,139 @@ if (is_ios) {
     }
 }
 
-if (page === 'android') {
-    document.location = 'https://play.google.com/store/apps/details?id=mega.privacy.android.app&referrer=meganzmobileapps';
+/**
+ * Some legacy secureboot mobile code that has been refactored to keep just the blog working and also redirect to the
+ * app if any confirm, cancel, verify, fm/ipc, newsignup, recover, account or backup links are clicked in the app
+ * because the new mobile site is not designed for those yet. Confirm links initiated from the mobile web will continue
+ * to be processed by the mobile web.
+ */
+if (m && (!localStorage.signUpStartedInMobileWeb) && (page.substr(0, 7) === 'confirm' ||
+    page.substr(0, 6) === 'cancel' || page.substr(0, 6) === 'verify' || page.substr(0, 6) === 'fm/ipc' ||
+    page.substr(0, 9) === 'newsignup' || page.substr(0, 7) === 'recover' || page.substr(0, 7) === 'account' ||
+    page.substr(0, 4) === 'blog') || page.substr(0, 6) === 'backup') {
+
+    var app;
+    var mobileblog;
+    var android;
+    var intent;
+    var ios9;
+    var link = document.createElement('link');
+
+    link.setAttribute('rel', 'stylesheet');
+    link.type = 'text/css';
+    link.href = staticpath + 'css/mobile-app-old.css';
+    document.head.appendChild(link);
+
+    // AMO: Markup should not be passed to `innerHTML` dynamically. -- This isnt reached for the extension, anyway
+    // jscs:disable
+    document.body.innerHTML = '<div class="main-scroll-block"><div class="main-content-block">'
+                            + '<div class="free-green-tip"></div><div class="main-centered-bl">'
+                            + '<div class="main-logo"></div><div class="main-head-txt" id="m_title"></div>'
+                            + '<div class="main-head-txt" id="m_desc"></div><br /><br />'
+                            + '<a href="" class="main-button" id="m_appbtn"></a><div class="main-social hidden">'
+                            + '<a href="https://www.facebook.com/MEGAprivacy" class="main-social-icon facebook"></a>'
+                            + '<a href="https://www.twitter.com/MEGAprivacy" class="main-social-icon twitter"></a>'
+                            + '<div class="clear"></div></div></div> </div><div class="scrolling-content">'
+                            + '<div class="mid-logo"></div><div class="mid-gray-block">MEGA provides free cloud '
+                            + 'storage with convenient and powerful always-on privacy</div>'
+                            + '<div class="scrolling-block-icon encription"></div><div class="scrolling-block-header">'
+                            + 'End-to-end encryption</div><div class="scrolling-block-txt">Unlike other cloud storage '
+                            + 'providers, your data is encrypted & decrypted during transfer by your client devices '
+                            + 'only and never by us.</div><div class="scrolling-block-icon access"></div>'
+                            + '<div class="scrolling-block-header">Secure Global Access</div>'
+                            + '<div class="scrolling-block-txt">Your data is accessible any time, from any device, '
+                            + 'anywhere. Only you control the keys to your files.</div>'
+                            + '<div class="scrolling-block-icon colaboration"></div>'
+                            + '<div class="scrolling-block-header">Secure Collaboration</div>'
+                            + '<div class="scrolling-block-txt">Share folders with your contacts and see their '
+                            + 'updates in real time. Online collaboration has never been more private and secure.'
+                            + '</div><div class="bottom-menu full-version"><div class="copyright-txt">Mega Limited '
+                            + new Date().getFullYear() + '</div><div class="language-block"></div><div class="clear">'
+                            + '</div><iframe src="" width="1" height="1" frameborder="0" style="width:1px; '
+                            + 'height:1px; border:none;" id="m_iframe"></iframe></div></div></div>';
+
+    if (page.substr(0, 4) === 'blog') {
+        mobileblog = 1;
+    }
+    if (ua.indexOf('windows phone') > -1) {
+        app = 'zune://navigate/?phoneappID=1b70a4ef-8b9c-4058-adca-3b9ac8cc194a';
+        document.body.className = 'wp full-mode supported';
+    }
+    else if (ua.indexOf('android') > -1) {
+        app = 'https://play.google.com/store/apps/details?id=mega.privacy.android.app&referrer=meganzsb';
+        document.body.className = 'android full-mode supported';
+        android = 1;
+        var ver = ua.match(/android (\d+)\.(\d+)/);
+        if (ver) {
+            var rev = ver.pop();
+            ver = ver.pop();
+            // Check for Android 2.3+
+            if (ver > 2 || (ver === 2 && rev > 3)) {
+                intent = 'intent://#' + page + '/#Intent;scheme=mega;package=mega.privacy.android.app;end';
+            }
+        }
+        if (intent && !mobileblog) {
+            document.location = intent;
+        }
+    }
+    else if (ua.indexOf('bb10') > -1) {
+        app = 'http://appworld.blackberry.com/webstore/content/46810890/';
+        document.body.className = 'blackberry full-mode supported';
+    }
+    else if (is_ios) {
+        app = 'https://itunes.apple.com/app/mega/id706857885';
+        document.body.className = 'ios full-mode supported';
+    }
+    else {
+        document.body.className = 'another-os full-mode unsupported';
+    }
+    document.getElementById('m_title').innerHTML = 'This link should be opened in the MEGA app.';
+
+    if (app) {
+        document.getElementById('m_appbtn').href = app;
+        document.getElementById('m_desc').innerHTML = 'Otherwise, you can also open the link on a '
+                                                    + 'desktop/laptop browser, or download the MEGA app.';
+    }
+    else {
+        document.getElementById('m_desc').innerHTML = 'Otherwise you can also open the link on a '
+                                                    + 'desktop/laptop browser.';
+    }
+
+    if (mobileblog) {
+        document.body.innerHTML = '';
+        mCreateElement('script', {type: 'text/javascript'}, 'head')
+            .src = ((location.host === 'mega.nz') ? '/blog.js' : 'html/js/blog.js');
+    }
+    else {
+        var prechar = '#';
+        if (ua.indexOf('windows phone') > -1) {
+            prechar = '';
+        }
+        if (ua.indexOf('chrome') > -1) {
+            window.location = 'mega://' + prechar + page;
+        }
+        else if (is_ios > 8) {
+            setTimeout(function() {
+                var text = 'This link should be opened in the MEGA app.'
+                         + 'Click OK if you already have the MEGA app installed';
+                if (confirm(text)) {
+                    document.location = 'mega://#' + page;
+                }
+            }, 1500);
+        }
+        else {
+            document.getElementById('m_iframe').src = 'mega://' + prechar + page;
+        }
+        if (intent) {
+            document.getElementById('m_title').innerHTML
+                += '<br/><em>If you already have the app installed, <a href="' + intent + '">click here!</a></em>';
+        }
+    }
+}
+// jscs:enable
+else if (page === 'android') {
+    document.location = 'https://play.google.com/store/apps/details?id=mega.privacy.android.app'
+                      + '&referrer=meganzmobileapps';
 }
 else if (!b_u) {
     d = window.d || 0;

@@ -423,7 +423,7 @@
             );
 
             if (n.t === 0) {// is file
-                $('.transfer-filtype-icon', $newNode).addClass(
+                $('.transfer-filetype-icon', $newNode).addClass(
                     fileIcon(n)
                 );
             }
@@ -431,12 +431,12 @@
                 $newNode.addClass("folder");
 
                 if (share.isShareExist([n.h], true, true, false)) {
-                    $('.transfer-filtype-icon', $newNode).addClass(
+                    $('.transfer-filetype-icon', $newNode).addClass(
                         "folder-shared"
                     );
                 }
                 else {
-                    $('.transfer-filtype-icon', $newNode).addClass(
+                    $('.transfer-filetype-icon', $newNode).addClass(
                         "folder"
                     );
                 }
@@ -536,7 +536,7 @@
      */
     FilePicker.NODE_TEMPLATE = '<tr>\n' +
 '        <td>\n' +
-'            <span class="transfer-filtype-icon"> </span>\n' +
+'            <span class="transfer-filetype-icon"> </span>\n' +
 '            <span class="tranfer-filetype-txt"></span>\n' +
         '</td>\n' +
     '</tr>';

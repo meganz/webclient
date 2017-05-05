@@ -115,16 +115,33 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
 
         self.lastActivity = ts;
 
+        if (msg.userId === u_handle) {
+            self.didInteraction(u_handle, ts);
+            return;
+        }
+
         if (self.type === "private") {
             var targetUserJid = self.getParticipantsExceptMe()[0];
-            var targetUserNode = self.megaChat.getContactFromJid(targetUserJid);
-            assert(M.u, 'M.u does not exists');
+
+            var targetUserNode;
+            if (targetUserJid) {
+                targetUserNode = self.megaChat.getContactFromJid(targetUserJid);
+                assert(M.u, 'M.u does not exists');
+            }
+            else if(msg.userId) {
+                targetUserNode = M.u[msg.userId];
+            }
+            else {
+                console.error("Missing participant in a 1on1 room.");
+                return;
+            }
+
 
             assert(targetUserNode && targetUserNode.u, 'No hash found for participant');
             assert(M.u[targetUserNode.u], 'User not found in M.u');
 
             if (targetUserNode) {
-                setLastInteractionWith(targetUserNode.u, "1:" + self.lastActivity);
+                self.didInteraction(targetUserNode.u, self.lastActivity);
             }
         }
         else if (self.type === "group") {
@@ -139,10 +156,10 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
                 contactHash = megaChat.getContactHashFromJid(msg.getFromJid());
             }
 
-
+            if (contactHash && M.u[contactHash]) {
+                self.didInteraction(contactHash, self.lastActivity);
+            }
             assert(contactHash, 'Invalid hash for user (extracted from inc. message)');
-
-            //TODO: last interaction for group chat
         }
         else {
             throw new Error("Not implemented");
@@ -610,10 +627,10 @@ ChatRoom.prototype.leave = function(triggerLeaveRequest) {
     var self = this;
 
     self._leaving = true;
+    self._closing = triggerLeaveRequest;
 
 
     self.members[u_handle] = 0;
-    //self.trackDataChange();
 
 
     if (triggerLeaveRequest) {
@@ -633,6 +650,9 @@ ChatRoom.prototype.leave = function(triggerLeaveRequest) {
 
             return self.megaChat.karere.leaveChat(self.roomJid).done(function () {
                 self.setState(ChatRoom.STATE.LEFT);
+                if (triggerLeaveRequest === true) {
+                    self.destroy();
+                }
             });
         }
         else {
@@ -642,10 +662,6 @@ ChatRoom.prototype.leave = function(triggerLeaveRequest) {
     else {
         self.setState(ChatRoom.STATE.LEFT);
     }
-
-    self.megaChat.refreshConversations();
-
-    self.trackDataChange();
 };
 
 /**
@@ -663,11 +679,11 @@ ChatRoom.prototype.destroy = function(notifyOtherDevices, noRedirect) {
         self.leave(notifyOtherDevices);
     }
 
-    Soon(function() {
-        if (self.isCurrentlyActive) {
-            self.isCurrentlyActive = false;
-        }
+    if (self.isCurrentlyActive) {
+        self.isCurrentlyActive = false;
+    }
 
+    Soon(function() {
         mc.chats.remove(roomJid);
 
         if (!noRedirect) {
@@ -1238,6 +1254,30 @@ ChatRoom.prototype.isReadOnly = function() {
 };
 ChatRoom.prototype.iAmOperator = function() {
     return this.type === "private" || this.members && this.members[u_handle] === 3;
+};
+
+/**
+ * Internal, utility function that would mark all contacts in a chat (specially for group chats), that I'd interacted
+ * with them.
+ */
+ChatRoom.prototype.didInteraction = function(user_handle, ts) {
+    var self = this;
+    ts = ts || unixtime();
+
+    if (user_handle === u_handle) {
+        Object.keys(self.members).forEach(function (user_handle) {
+            var contact = M.u[user_handle];
+            if (contact && user_handle !== u_handle) {
+                setLastInteractionWith(contact.u, "1:" + ts);
+            }
+        });
+    }
+    else {
+        var contact = M.u[user_handle];
+        if (contact && user_handle !== u_handle) {
+            setLastInteractionWith(contact.u, "1:" + ts);
+        }
+    }
 };
 
 window.ChatRoom = ChatRoom;

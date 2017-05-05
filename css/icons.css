@@ -480,7 +480,7 @@
     background-position: -17px -10463px;
 }
 .medium-icon.rocket {
-    background-image: url(/images/mega/top-sprite_v2.png);
+    background-image: url(../images/mega/top-sprite_v2.png);
     background-position: -7px -16px;
 }
 .medium-icon.down-arrow {
@@ -747,6 +747,14 @@
 .small-icon.refresh-icon {
     background-image: url(../images/mega/nw-fm-sprite_v22.svg);
     background-position: -14px -11665px;
+}
+.small-icon.green-arrow {
+    background-image: url(../images/mega/register-big-sprite-v11.png);
+    background-position: 0px -56px;
+}
+.small-icon.blue-arrow {
+    background-image: url(../images/mega/register-big-sprite-v11.png);
+    background-position: 0px -99px;
 }
 .small-icon.red-lens {
     background-image: url(../images/mega/icons-sprite_v2.png);

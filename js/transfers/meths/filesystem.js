@@ -637,7 +637,7 @@
                 }
             };
 
-            if (is_mobile && typeof zfileEntry.file === 'function') {
+            if (typeof zfileEntry.file === 'function') {
                 try {
                     return zfileEntry.file(saveFile, saveLink);
                 }

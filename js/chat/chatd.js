@@ -216,17 +216,19 @@ Chatd.Shard = function(chatd, shard) {
                     })
                         .done(function(mcurl) {
                             self.url = mcurl;
-                            return self.reconnect();
+                            self.reconnect();
                         })
                         .fail(function(r) {
                             if (r === EEXPIRED) {
                                 if (megaChat && megaChat.plugins && megaChat.plugins.chatdIntegration) {
                                     megaChat.plugins.chatdIntegration.requiresUpdate();
+                                    return;
                                 }
                             }
+                            if (connectionRetryManager._$connectingPromise) {
+                                connectionRetryManager._$connectingPromise.reject();
+                            }
                         });
-
-
                 },
                 /**
                  * A Callback that will trigger the 'forceDisconnect' procedure for this type of connection (Karere/Chatd/etc)
@@ -363,7 +365,6 @@ Chatd.Shard.prototype.reconnect = function() {
     self.s.onerror = function(e) {
         self.logger.error("WebSocket error:", e);
         clearTimeout(self.keepAliveTimer);
-        self.connectionRetryManager.doConnectionRetry();
 
         self.chatd.trigger('onError', {
             shard: self
@@ -723,9 +724,9 @@ Chatd.Shard.prototype.exec = function(a) {
             case Chatd.Opcode.REJECT:
                 self.keepAliveTimerRestart();
                 self.logger.log("Command was rejected, chatId : " +
-                    base64urlencode(cmd.substr(1,8)) +" / msgId : " +
-                    base64urlencode(cmd.substr(9,8)) +" / opcode: " +
-                    cmd.substr(17,1) + " / reason: " + cmd.substr(18,1));
+                    base64urlencode(cmd.substr(1, 8)) + " / msgId : " +
+                    base64urlencode(cmd.substr(9, 8)) + " / opcode: " +
+                    cmd.substr(17, 1).charCodeAt(0) + " / reason: " + cmd.substr(18, 1).charCodeAt(0));
 
                 if (cmd.charCodeAt(17) === Chatd.Opcode.NEWMSG) {
                     // the message was rejected
@@ -735,7 +736,7 @@ Chatd.Shard.prototype.exec = function(a) {
                     // the edit was rejected
                     self.chatd.editreject(cmd.substr(1,8), cmd.substr(9,8));
                 }
-                len = 18;
+                len = 19;
                 break;
 
             case Chatd.Opcode.BROADCAST:
@@ -832,6 +833,18 @@ Chatd.Shard.prototype.exec = function(a) {
             // remove the command from the queue, its already processed, if this is not done, 
             // the code will loop forever
             cmd = "";
+            break;
+        }
+        else if (Number.isNaN(len)) {
+            self.logger.error(
+                "FATAL: Internally got nextlen == NaN, with queued cmdlen: " + cmd.length + ". " +
+                "To stop potential loop-forever case, the next commands in the buffer were rejected!"
+            );
+
+            // remove the command from the queue, its already processed, if this is not done,
+            // the code will loop forever
+            cmd = "";
+            len = 0;
             break;
         }
 

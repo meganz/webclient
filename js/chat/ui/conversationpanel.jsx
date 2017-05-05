@@ -85,20 +85,16 @@ var ConversationRightArea = React.createClass({
         var myPresence = room.megaChat.xmppPresenceToCssClass(M.u[u_handle].presence);
 
         var startAudioCallButton = 
-                        <div className={"link-button" + (!contact.presence? " disabled" : "")} onClick={() => {
-                            if (contact.presence && contact.presence !== "offline") {
-                                room.startAudioCall();
-                            }
+                        <div className={"link-button"} onClick={() => {
+                            room.startAudioCall();
                         }}>
             <i className="small-icon audio-call"></i>
             {__(l[5896])}
         </div>;
 
         var startVideoCallButton = 
-                    <div className={"link-button" + (!contact.presence? " disabled" : "")} onClick={() => {
-                        if (contact.presence && contact.presence !== "offline") {
-                            room.startVideoCall();
-                        }
+                    <div className={"link-button"} onClick={() => {
+                        room.startVideoCall();
                     }}>
             <i className="small-icon video-call"></i>
             {__(l[5897])}
@@ -305,7 +301,7 @@ var ConversationRightArea = React.createClass({
                             </div>
                         ) : null
                         }
-                        { room.type === "group" && room.stateIsLeftOrLeaving() ? (
+                        { room._closing !== true && room.type === "group" && room.stateIsLeftOrLeaving() ? (
                             <div className="link-button red" onClick={() => {
                                 if (self.props.onCloseClicked) {
                                     self.props.onCloseClicked();
@@ -1320,32 +1316,39 @@ var ConversationPanel = React.createClass({
                                         v.internalId ? v.internalId : v.orderValue,
                                         messageContents
                                     );
-                                    if (v.textContents) {
-                                        v.textContents = messageContents;
-                                    }
-                                    if (v.contents) {
-                                        v.contents = messageContents;
-                                    }
-                                    if (v.emoticonShortcutsProcessed) {
-                                        v.emoticonShortcutsProcessed = false;
-                                    }
-                                    if (v.emoticonsProcessed) {
-                                        v.emoticonsProcessed = false;
-                                    }
-                                    if (v.messageHtml) {
-                                        delete v.messageHtml;
-                                    }
+
+                                    if (
+                                        v.getState &&
+                                        v.getState() === Message.STATE.NOT_SENT &&
+                                        !v.requiresManualRetry
+                                    ) {
+                                        if (v.textContents) {
+                                            v.textContents = messageContents;
+                                        }
+                                        if (v.contents) {
+                                            v.contents = messageContents;
+                                        }
+                                        if (v.emoticonShortcutsProcessed) {
+                                            v.emoticonShortcutsProcessed = false;
+                                        }
+                                        if (v.emoticonsProcessed) {
+                                            v.emoticonsProcessed = false;
+                                        }
+                                        if (v.messageHtml) {
+                                            delete v.messageHtml;
+                                        }
 
 
-                                    $(v).trigger(
-                                        'onChange',
-                                        [
-                                            v,
-                                            "textContents",
-                                            "",
-                                            messageContents
-                                        ]
-                                    );
+                                        $(v).trigger(
+                                            'onChange',
+                                            [
+                                                v,
+                                                "textContents",
+                                                "",
+                                                messageContents
+                                            ]
+                                        );
+                                    }
 
                                     self.messagesListScrollable.scrollToBottom(true);
                                     self.lastScrollPositionPerc = 1;
@@ -1453,25 +1456,32 @@ var ConversationPanel = React.createClass({
                         chatdint.discardMessage(room, msg.internalId ? msg.internalId : msg.orderValue);
                     }
 
-                    msg.message = "";
-                    msg.contents = "";
-                    msg.messageHtml = "";
-                    msg.deleted = true;
 
                     self.setState({
                         'confirmDeleteDialog': false,
                         'messageToBeDeleted': false
                     });
 
-                    $(msg).trigger(
-                        'onChange',
-                        [
-                            msg,
-                            "deleted",
-                            false,
-                            true
-                        ]
-                    );
+                    if (
+                        msg.getState &&
+                        msg.getState() === Message.STATE.NOT_SENT &&
+                        !msg.requiresManualRetry
+                    ) {
+                        msg.message = "";
+                        msg.contents = "";
+                        msg.messageHtml = "";
+                        msg.deleted = true;
+
+                        $(msg).trigger(
+                            'onChange',
+                            [
+                                msg,
+                                "deleted",
+                                false,
+                                true
+                            ]
+                        );
+                    }
 
                 }}
             >
@@ -1972,20 +1982,16 @@ var ConversationPanels = React.createClass({
                 contact = megaChat.getContactFromJid(otherParticipants[0]);
             }
 
-            // XX: Performance trick. However, scroll positions are NOT retained properly when switching conversations,
-            // so this should be done some day in the future, after we have more stable product.
-            // if (chatRoom.isCurrentlyActive) {
-                conversations.push(
-                    <ConversationPanel
-                        chatRoom={chatRoom}
-                        isActive={chatRoom.isCurrentlyActive}
-                        messagesBuff={chatRoom.messagesBuff}
-                        contacts={M.u}
-                        contact={contact}
-                        key={chatRoom.roomJid}
-                        />
-                );
-            // }
+            conversations.push(
+                <ConversationPanel
+                    chatRoom={chatRoom}
+                    isActive={chatRoom.isCurrentlyActive}
+                    messagesBuff={chatRoom.messagesBuff}
+                    contacts={M.u}
+                    contact={contact}
+                    key={chatRoom.roomJid}
+                    />
+            );
         });
 
         if (conversations.length === 0) {

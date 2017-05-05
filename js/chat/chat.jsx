@@ -1763,6 +1763,20 @@ Chat.prototype._destroyAllChatsFromChatd = function() {
     });
 };
 
+Chat.prototype._leaveAllGroupChats = function() {
+    asyncApiReq({'a': 'mcf', 'v': Chatd.VERSION}).done(function(r) {
+        r.c.forEach(function(chatRoomMeta) {
+            if (chatRoomMeta.g === 1) {
+                asyncApiReq({
+                    "a":"mcr", // request identifier
+                    "id": chatRoomMeta.id, // chat id
+                    "v": Chatd.VERSION
+                });
+            }
+        })
+    });
+};
+
 Chat.prototype.updateDashboard = function() {
     if (M.currentdirid === 'dashboard') {
         delay('dashboard:updchat', dashboardUI.updateChatWidget);
@@ -1810,6 +1824,26 @@ Chat.prototype.getEmojiDataSet = function(name) {
         return self._emojiDataLoading[name];
     }
 };
+
+/**
+ * Retrieve the user's presence from presenced
+ *
+ * @param u {String} u_handle of the contact you want to retrieve the presence for
+ * @returns {Number|undefined} See UserPresence.PRESENCE.* for the possible presences (undefined = offline)
+ */
+Chat.prototype.getPresence = function(u) {
+    var self = this;
+
+    var contact = M.u[u];
+
+    if (!contact) {
+        return UserPresence.PRESENCE.OFFLINE;
+    }
+
+    return contact.u !== u_handle ?
+        self.plugins.presencedIntegration.getPresence(contact.u) :
+        self.plugins.presencedIntegration.getMyPresence();
+}
 
 window.Chat = Chat;
 window.chatui = chatui;

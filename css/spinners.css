@@ -11,6 +11,10 @@
     box-sizing: border-box;
     border-top: 0;
 }
+.common-toast.settings .toast-icon {
+    -webkit-animation: rotate 2.5s infinite linear;
+    animation: rotate 2.5s infinite linear;
+}
 .fountaing, .cr-fountaing {
     position: absolute;
     width: 100px;
@@ -132,6 +136,9 @@
     margin: 18px 0 0 10px;
     -webkit-animation: rotate 0.8s infinite linear;
     animation: rotate 0.8s infinite linear;
+}
+.mobile .loading-info li::after {
+    display: none;
 }
 .loading-info li.loaded::after {
     background-position: -29px -501px;

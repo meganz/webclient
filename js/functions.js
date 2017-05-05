@@ -582,7 +582,7 @@ mBroadcaster.once('startMega', function populate_l() {
     l[553] = l[553].replace('[A]', '<a href="mailto:resellers@mega.nz">').replace('[/A]', '</a>');
     l[555] = l[555].replace('[A]', '<a href="/terms" class="clickurl">').replace('[/A]', '</a>');
     l[754] = l[754].replace('[A]',
-        '<a href="http://www.google.com/chrome" target="_blank" rel="noreferrer" style="color:#D9290B;">');
+        '<a href="http://www.google.com/chrome" target="_blank" rel="noopener noreferrer" style="color:#D9290B;">');
     l[754] = l[754].replace('[/A]', '</a>');
     l[871] = l[871].replace('[B]', '<strong>')
         .replace('[/B]', '</strong>')
@@ -594,9 +594,9 @@ mBroadcaster.once('startMega', function populate_l() {
     l[1094] = l[1094].replace('[A]', '<a href="/plugin" class="clickurl">').replace('[/A]', '</a>');
     l[1095] = l[1095].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[1133] = l[1133].replace('[A]',
-        '<a href="http://en.wikipedia.org/wiki/Entropy" target="_blank" rel="noreferrer">').replace('[/A]', '</a>');
+        '<a href="http://en.wikipedia.org/wiki/Entropy" target="_blank" rel="noopener noreferrer">').replace('[/A]', '</a>');
     l[1134] = l[1134].replace('[A]',
-        '<a href="http://en.wikipedia.org/wiki/Public-key_cryptography" target="_blank" rel="noreferrer">').replace('[/A]',
+        '<a href="http://en.wikipedia.org/wiki/Public-key_cryptography" target="_blank" rel="noopener noreferrer">').replace('[/A]',
         '</a>');
     l[1148] = l[1148].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[6978] = l[6978].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
@@ -614,7 +614,7 @@ mBroadcaster.once('startMega', function populate_l() {
     l[1201] = l[1201].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[1208] = l[1208].replace('[B]', '<strong>').replace('[/B]', '</strong>');
     l[1915] = l[1915].replace('[A]',
-        '<a class="red" href="https://chrome.google.com/webstore/detail/mega/bigefpfhnfcobdlfbedofhhaibnlghod" target="_blank" rel="noreferrer">')
+        '<a class="red" href="https://chrome.google.com/webstore/detail/mega/bigefpfhnfcobdlfbedofhhaibnlghod" target="_blank" rel="noopener noreferrer">')
             .replace('[/A]', '</a>');
     l[1936] = l[1936].replace('[A]', '<a href="/backup" class="clickurl">').replace('[/A]', '</a>');
     l[1942] = l[1942].replace('[A]', '<a href="/backup" class="clickurl">').replace('[/A]', '</a>');
@@ -707,7 +707,7 @@ mBroadcaster.once('startMega', function populate_l() {
 
     var common = [
         15536, 16106, 16107, 16116, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315,
-        16316, 16358, 16359, 16360, 16361, 16375, 16382, 16383, 16384
+        16316, 16341, 16358, 16359, 16360, 16361, 16375, 16382, 16383, 16384, 16394
     ];
     for (i = common.length; i--;) {
         var num = common[i];
@@ -1329,6 +1329,11 @@ function makeid(len) {
     return text;
 }
 
+/**
+ * Checks if the email address is valid
+ * @param {String} email The email address to validate
+ * @returns {Boolean} Returns true if email is invalid, false if email is fine
+ */
 function checkMail(email) {
     email = email.replace(/\+/g, '');
     var filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
@@ -1551,10 +1556,14 @@ function simpleStringHashCode(str) {
  * @param timeout {int}
  * @param [resolveRejectArgs] {(Array|*)} args that will be used to call back .resolve/.reject
  * @param [waitForPromise] {(MegaPromise|$.Deferred)} Before starting the timer, we will wait for this promise to be rej/res first.
+ * @param [name] {String} optional name for the debug output of the error/debug messages
  * @returns {Deferred}
  */
 function createTimeoutPromise(validateFunction, tick, timeout,
-                              resolveRejectArgs, waitForPromise) {
+                              resolveRejectArgs, waitForPromise, name) {
+    var tickInterval = false;
+    var timeoutTimer = false;
+
     var $promise = new MegaPromise();
     resolveRejectArgs = resolveRejectArgs || [];
     if (!$.isArray(resolveRejectArgs)) {
@@ -1564,8 +1573,8 @@ function createTimeoutPromise(validateFunction, tick, timeout,
     $promise.verify = function() {
         if (validateFunction()) {
             if (window.d && typeof(window.promisesDebug) !== 'undefined') {
-                console.debug("Resolving timeout promise",
-                    timeout, "ms", "at", (new Date()),
+                console.debug("Resolving timeout promise", name,
+                    timeout, "ms", "at", (new Date()).toISOString(),
                     validateFunction, resolveRejectArgs);
             }
             $promise.resolve.apply($promise, resolveRejectArgs);
@@ -1573,43 +1582,53 @@ function createTimeoutPromise(validateFunction, tick, timeout,
     };
 
     var startTimerChecks = function() {
-        var tickInterval = setInterval(function() {
+        tickInterval = setInterval(function() {
             $promise.verify();
         }, tick);
 
-        var timeoutTimer = setTimeout(function() {
+        timeoutTimer = setTimeout(function() {
             if (validateFunction()) {
                 if (window.d && typeof(window.promisesDebug) !== 'undefined') {
-                    console.debug("Resolving timeout promise",
-                        timeout, "ms", "at", (new Date()),
+                    console.debug("Resolving timeout promise", name,
+                        timeout, "ms", "at", (new Date()).toISOString(),
                         validateFunction, resolveRejectArgs);
                 }
                 $promise.resolve.apply($promise, resolveRejectArgs);
             }
             else {
-                console.error("Timed out after waiting",
-                    timeout, "ms", "at", (new Date()),
+                console.error("Timed out after waiting", name,
+                    timeout, "ms", "at", (new Date()).toISOString(), $promise.state(),
                     validateFunction, resolveRejectArgs);
                 $promise.reject.apply($promise, resolveRejectArgs);
             }
         }, timeout);
 
-        // stop any running timers and timeouts
-        $promise.always(function() {
-            clearInterval(tickInterval);
-            clearTimeout(timeoutTimer);
-        });
-
         $promise.verify();
     };
+
+    // stop any running timers and timeouts
+    $promise.always(function() {
+        if (tickInterval !== false) {
+            clearInterval(tickInterval);
+        }
+
+        if (timeoutTimer !== false) {
+            clearTimeout(timeoutTimer);
+        }
+    });
+
 
     if (!waitForPromise || !waitForPromise.done) {
         startTimerChecks();
     }
     else {
-        waitForPromise.always(function() {
-            startTimerChecks();
-        });
+        waitForPromise
+            .done(function() {
+                startTimerChecks();
+            })
+            .fail(function() {
+                $promise.reject();
+            });
     }
 
     return $promise;
@@ -2721,16 +2740,16 @@ function percent_megatitle() {
     for (var i in dl_queue) {
         if (dl_queue.hasOwnProperty(i)) {
             var q = dl_queue[i];
-            var t = q && tp[q.zipid ? 'zip_' + q.zipid : 'dl_' + q.id];
+            var td = q && tp[q.zipid ? 'zip_' + q.zipid : 'dl_' + q.id];
 
-            if (t) {
-                dl_r += t[0];
-                dl_t += t[1];
+            if (td) {
+                dl_r += td[0];
+                dl_t += td[1];
                 if (!q.zipid || !zips[q.zipid]) {
                     if (q.zipid) {
                         zips[q.zipid] = 1;
                     }
-                    dl_s += t[2];
+                    dl_s += td[2];
                 }
             }
             else {
@@ -2741,12 +2760,12 @@ function percent_megatitle() {
 
     for (var i in ul_queue) {
         if (ul_queue.hasOwnProperty(i)) {
-            var t = tp['ul_' + ul_queue[i].id]
+            var tu = tp['ul_' + ul_queue[i].id];
 
-            if (t) {
-                ul_r += t[0];
-                ul_t += t[1];
-                ul_s += t[2];
+            if (tu) {
+                ul_r += tu[0];
+                ul_t += tu[1];
+                ul_s += tu[2];
             }
             else {
                 ul_t += ul_queue[i].size || 0;
@@ -2755,24 +2774,27 @@ function percent_megatitle() {
     }
     if (dl_t) {
         dl_t += tp['dlc'] || 0;
-        dl_r += tp['dlc'] || 0
+        dl_r += tp['dlc'] || 0;
     }
     if (ul_t) {
         ul_t += tp['ulc'] || 0;
-        ul_r += tp['ulc'] || 0
+        ul_r += tp['ulc'] || 0;
     }
 
-    var x_ul = Math.floor(ul_r / ul_t * 100) || 0,
-        x_dl = Math.floor(dl_r / dl_t * 100) || 0
+    var x_ul = Math.floor(ul_r / ul_t * 100) || 0;
+    mega.ui.tpp.setTotalProgress(x_ul, 'ul');
+    var x_dl = Math.floor(dl_r / dl_t * 100) || 0;
+    mega.ui.tpp.setTotalProgress(x_dl, 'dl');
+    var t;
 
     if (dl_t && ul_t) {
-        t = ' \u2191 ' + x_dl + '% \u2193 ' + x_ul + '%';
+        t = ' \u2193 ' + x_dl + '% \u2191 ' + x_ul + '%';
     }
     else if (dl_t) {
-        t = ' ' + x_dl + '%';
+        t = ' \u2193 ' + x_dl + '%';
     }
     else if (ul_t) {
-        t = ' ' + x_ul + '%';
+        t = ' \u2191 ' + x_ul + '%';
     }
     else {
         t = '';
@@ -2781,24 +2803,33 @@ function percent_megatitle() {
 
     d_deg = 360 * x_dl / 100;
     u_deg = 360 * x_ul / 100;
+
+    updateTransfersSidebarIcon(d_deg, u_deg);
+    megatitle(t);
+}
+
+function updateTransfersSidebarIcon(d_deg, u_deg) {
+    var $dl_rchart = $('.transfers .download .nw-fm-chart0.right-c p');
+    var $dl_lchart = $('.transfers .download .nw-fm-chart0.left-c p');
+    var $ul_rchart = $('.transfers .upload .nw-fm-chart0.right-c p');
+    var $ul_lchart = $('.transfers .upload .nw-fm-chart0.left-c p');
+
     if (d_deg <= 180) {
-        $('.download .nw-fm-chart0.right-c p').css('transform', 'rotate(' + d_deg + 'deg)');
-        $('.download .nw-fm-chart0.left-c p').css('transform', 'rotate(0deg)');
+        $dl_rchart.css('transform', 'rotate(' + d_deg + 'deg)');
+        $dl_lchart.css('transform', 'rotate(0deg)');
     }
     else {
-        $('.download .nw-fm-chart0.right-c p').css('transform', 'rotate(180deg)');
-        $('.download .nw-fm-chart0.left-c p').css('transform', 'rotate(' + (d_deg - 180) + 'deg)');
+        $dl_rchart.css('transform', 'rotate(180deg)');
+        $dl_lchart.css('transform', 'rotate(' + (d_deg - 180) + 'deg)');
     }
     if (u_deg <= 180) {
-        $('.upload .nw-fm-chart0.right-c p').css('transform', 'rotate(' + u_deg + 'deg)');
-        $('.upload .nw-fm-chart0.left-c p').css('transform', 'rotate(0deg)');
+        $ul_rchart.css('transform', 'rotate(' + u_deg + 'deg)');
+        $ul_lchart.css('transform', 'rotate(0deg)');
     }
     else {
-        $('.upload .nw-fm-chart0.right-c p').css('transform', 'rotate(180deg)');
-        $('.upload .nw-fm-chart0.left-c p').css('transform', 'rotate(' + (u_deg - 180) + 'deg)');
+        $ul_rchart.css('transform', 'rotate(180deg)');
+        $ul_lchart.css('transform', 'rotate(' + (u_deg - 180) + 'deg)');
     }
-
-    megatitle(t);
 }
 
 function hostname(url) {
@@ -3712,7 +3743,8 @@ mega.utils.hasPendingTransfers = function megaUtilsHasPendingTransfers() {
 mega.utils.abortTransfers = function megaUtilsAbortTransfers() {
     var promise = new MegaPromise();
 
-    if (!mega.utils.hasPendingTransfers()) {
+    // Mobile does not use the dlmanager/ulmanager so just resolve the promise
+    if (!mega.utils.hasPendingTransfers() || is_mobile) {
         promise.resolve();
     }
     else {
@@ -3753,6 +3785,10 @@ mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
         ASSERT(ulQueue._running === 0, 'ulQueue._running inconsistency on completion');
         ulQueue._pending = [];
         ulQueue.setSize((fmconfig.ul_maxSlots | 0) || 4);
+
+        if (page !== 'download') {
+            mega.ui.tpp.reset('ul');
+        }
     }
     if (!dl_queue.some(isQueueActive)) {
         dl_queue = new DownloadQueue();
@@ -3763,6 +3799,10 @@ mega.utils.resetUploadDownload = function megaUtilsResetUploadDownload() {
 
         dlmanager._quotaPushBack = {};
         dlmanager._dlQuotaListener = [];
+
+        if (page !== 'download') {
+            mega.ui.tpp.reset('dl');
+        }
     }
 
     if (!dlmanager.isDownloading && !ulmanager.isUploading) {
@@ -3807,6 +3847,7 @@ mega.utils.reload = function megaUtilsReload() {
         var privk = u_storage.privk;
         var jj = localStorage.jj;
         var debug = localStorage.d;
+        var lang = localStorage.lang;
         var mcd = localStorage.testChatDisabled;
         var apipath = debug && localStorage.apipath;
 
@@ -3838,6 +3879,9 @@ mega.utils.reload = function megaUtilsReload() {
 
         if (mcd) {
             localStorage.testChatDisabled = 1;
+        }
+        if (lang) {
+            localStorage.lang = lang;
         }
         if (hashLogic) {
             localStorage.hashLogic = 1;
@@ -4598,7 +4642,7 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
                 return this._size < (limit * 1024 * 1024 * 1024);
             }
         }
-    }
+    };
 });
 
 /** prevent tabnabbing attacks */
@@ -5578,86 +5622,6 @@ function getGatewayName(gatewayId, gatewayOpt) {
         displayName: 'Unknown'
     };
 }
-
-/**
- * Redirects to the mobile app
- * @param {Object} $selector The jQuery selector for the button
- */
-mega.utils.redirectToApp = function($selector) {
-
-    if (is_ios) {
-        // Based off https://github.com/prabeengiri/DeepLinkingToNativeApp/
-        var ns = '.ios ';
-        var appLink = "mega://" + location.hash;
-        var events = ["pagehide", "blur", "beforeunload"];
-        var timeout = null;
-
-        var preventDialog = function(e) {
-            clearTimeout(timeout);
-            timeout = null;
-            $(window).unbind(events.join(ns) + ns);
-        };
-
-        var redirectToStore = function() {
-            window.top.location = getStoreLink();
-        };
-
-        var redirect = function() {
-            var ms = 500;
-
-            preventDialog();
-            $(window).bind(events.join(ns) + ns, preventDialog);
-
-            window.location = appLink;
-
-            // Starting with iOS 9.x, there will be a confirmation dialog asking whether we want to
-            // open the app, which turns the setTimeout trick useless because no page unloading is
-            // notified and users redirected to the app-store regardless if the app is installed.
-            // Hence, as a mean to not remove the redirection we'll increase the timeout value, so
-            // that users with the app installed will have a higher chance of confirming the dialog.
-            // If past that time they didn't, we'll redirect them anyhow which isn't ideal but
-            // otherwise users will the app NOT installed might don't know where the app is,
-            // at least if they disabled the smart-app-banner...
-            // NB: Chrome (CriOS) is not affected.
-            if (is_ios > 8 && ua.details.brand !== 'CriOS') {
-                ms = 4100;
-            }
-
-            timeout = setTimeout(redirectToStore, ms);
-        };
-
-        Soon(function() {
-            // If user navigates back to browser and clicks the button,
-            // try redirecting again.
-            $selector.rebind('click', function(e) {
-                e.preventDefault();
-                redirect();
-                return false;
-            });
-        });
-        redirect();
-    }
-    else {
-        var path = getSitePath().substr(1);
-
-        switch (ua.details.os) {
-            case 'Windows Phone':
-                window.location = "mega://" + path;
-                break;
-
-            case 'Android':
-                var intent = 'intent://#' + path
-                    + '/#Intent;scheme=mega;package=mega.privacy.android.app;end';
-                document.location = intent;
-                break;
-
-            default:
-                alert('Unknown device.');
-        }
-    }
-
-    return false;
-};
 
 /*
  * Alert about 110% zoom level in Chrome/Chromium

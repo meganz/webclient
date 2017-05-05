@@ -1005,7 +1005,7 @@ function transferPanelContextMenu(target)
     }
 }
 
-function openTransferpanel()
+function openTransfersPanel()
 {
     $.tresizer();
     $('.nw-fm-left-icon.transfers').addClass('transfering');
@@ -1175,7 +1175,7 @@ function openTransferpanel()
 }
 
 function showTransferToast(t_type, t_length, isPaused) {
-    if (!$('.fmholder').hasClass('transfer-panel-opened')) {
+    if ((M.currentdirid !== 'transfers') && (fmconfig.tpp === false)) {
         var $toast,
             $second_toast,
             timer,
@@ -1250,115 +1250,6 @@ function hideTransferToast ($toast) {
     $('.toast-notification').removeClass('second');
 }
 
-function removeUInode(h, parent) {
-
-    var n = M.d[h],
-        i = 0;
-
-    // check subfolders
-    if (n && n.t) {
-        var cns = M.c[n.p];
-        if (cns) {
-            for (var cn in cns) {
-                if (M.d[cn] && M.d[cn].t && cn !== h) {
-                    i++;
-                    break;
-                }
-            }
-        }
-    }
-
-    var hasItems = !!M.v.length;
-    switch (M.currentdirid) {
-        case "shares":
-            $('#treeli_' + h).remove();// remove folder and subfolders
-            if (!hasItems) {
-                $('.files-grid-view .grid-table-header tr').remove();
-                $('.fm-empty-cloud').removeClass('hidden');
-            }
-            break;
-        case "contacts":
-
-            //Clear left panel:
-            $('#contact_' + h).fadeOut('slow', function() {
-                $(this).remove();
-            });
-
-            //Clear right panel:
-            $('.grid-table.contacts tr#' + h + ', .contacts-blocks-scrolling a#' + h)
-                .fadeOut('slow', function() {
-                    $(this).remove();
-                });
-
-            // clear the contacts grid:
-            $('.contacts-grid-view #' + h).remove();
-            if (!hasItems) {
-                $('.contacts-grid-view .contacts-grid-header tr').remove();
-                $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[784]);
-                $('.fm-empty-contacts').removeClass('hidden');
-            }
-            break;
-        case "chat":
-            if (!hasItems) {
-                $('.contacts-grid-view .contacts-grid-header tr').remove();
-                $('.fm-empty-chat').removeClass('hidden');
-            }
-            break;
-        case M.RubbishID:
-            if (i == 0 && n) {
-                $('#treea_' + n.p).removeClass('contains-folders expanded');
-            }
-
-            // Remove item
-            $('#' + h).remove();
-
-            // Remove folder and subfolders
-            $('#treeli_' + h).remove();
-            if (!hasItems) {
-                $('.contacts-grid-view .contacts-grid-header tr').remove();
-                $('.fm-empty-trashbin').removeClass('hidden');
-            }
-            break;
-        case M.RootID:
-            if (i == 0 && n) {
-                $('#treea_' + n.p).removeClass('contains-folders expanded');
-            }
-
-            // Remove item
-            $('#' + h).remove();
-
-            // Remove folder and subfolders
-            $('#treeli_' + h).remove();
-            if (!hasItems) {
-                $('.files-grid-view').addClass('hidden');
-                $('.grid-table.fm tr').remove();
-                $('.fm-empty-cloud').removeClass('hidden');
-            }
-            break;
-        default:
-            if (i == 0 && n) {
-                $('#treea_' + n.p).removeClass('contains-folders expanded');
-            }
-            $('#' + h).remove();// remove item
-            $('#treeli_' + h).remove();// remove folder and subfolders
-            if (!hasItems) {
-                if (sharedFolderUI()) {
-                    M.emptySharefolderUI();
-                }
-                else {
-                    $('.files-grid-view').addClass('hidden');
-                    $('.fm-empty-folder').removeClass('hidden');
-                }
-                $('.grid-table.fm tr').remove();
-            }
-            break;
-    }
-
-    if (M.currentdirid === h || isCircular(h, M.currentdirid) === true) {
-        parent = parent || Object(M.getNodeByHandle(h)).p || RootbyId(h);
-        M.openFolder(parent);
-    }
-}
 
 /**
  * addContactToFolderShare
@@ -1529,7 +1420,7 @@ function sharedUInode(nodeHandle) {
         var icon = fileIcon(M.d[nodeHandle]);
 
         // Update right panel selected node with appropriate icon for list view
-        $('.grid-table.fm #' + nodeHandle + ' .transfer-filtype-icon').addClass(icon);
+        $('.grid-table.fm #' + nodeHandle + ' .transfer-filetype-icon').addClass(icon);
 
         // Update right panel selected node with appropriate icon for block view
         $('#' + nodeHandle + '.data-block-view .block-view-file-type').addClass(icon);
@@ -1537,9 +1428,15 @@ function sharedUInode(nodeHandle) {
 
     // If no shares are available, remove share icon from left panel, right panel (list and block view)
     if (!bAvailShares) {
-        $('#treea_' + nodeHandle + ' .nw-fm-tree-folder').removeClass('shared-folder'); // Left panel
-        $('.grid-table.fm #' + nodeHandle + ' .transfer-filtype-icon').removeClass('folder-shared'); // Right panel list view
-        $('#' + nodeHandle + '.data-block-view .block-view-file-type').removeClass('folder-shared'); // Right panel block view
+
+        // Left panel
+        $('#treea_' + nodeHandle + ' .nw-fm-tree-folder').removeClass('shared-folder');
+
+        // Right panel list view
+        $('.grid-table.fm #' + nodeHandle + ' .transfer-filetype-icon').removeClass('folder-shared');
+
+        // Right panel block view
+        $('#' + nodeHandle + '.data-block-view .block-view-file-type').removeClass('folder-shared');
     }
 
     // If no export link is available, remove export link from left and right panels (list and block view)
@@ -1643,7 +1540,8 @@ function initAddDialogMultiInputPlugin() {
             var $input = $this.parent().find('li input').eq(0);
             $input.rebind('keyup', function() {
                 var value = $.trim($input.val());
-                if ($scope.find('li.token-input-token-mega').length > 0 || checkMail(value) === false) {
+                var emailList = value.split(/[ ;,]+/);
+                if ($scope.find('li.token-input-token-mega').length > 0 || checkMail(value) === false || emailList.length > 1) {
                     $scope.find('.add-user-popup-button.add').removeClass('disabled');
                 } else {
                     $scope.find('.add-user-popup-button.add').addClass('disabled');
@@ -2107,271 +2005,6 @@ function leaveShare(h) {
     }
 }
 
-function fmremove() {
-    var filecnt = 0,
-        foldercnt = 0,
-        contactcnt = 0,
-        removesharecnt = 0;
-
-    // Loop throught selected items
-    for (var i in $.selected) {
-        var n = M.d[$.selected[i]];
-
-        // ToDo: Not clear what this represents
-        if (n && n.su) {
-            removesharecnt++;
-        }
-
-        // ToDo: Replace counting contact id chars with something more reliable
-        else if (String($.selected[i]).length === 11) {
-            contactcnt++;
-        }
-
-        // Folder
-        else if (n && n.t) {
-            foldercnt++;
-        }
-
-        // File
-        else {
-            filecnt++;
-        }
-    }
-
-    if (removesharecnt) {
-        for (var i in $.selected) {
-            leaveShare($.selected[i]);
-        }
-        M.openFolder('shares', true);
-    }
-
-    // Remove contacts from list
-    else if (contactcnt) {
-
-        var c = $.selected.length;
-        var replaceString = '';
-        var contact = '';
-
-        if (c > 1) {
-            replaceString = c + ' ' + l[5569];
-            contact = 'contacts';
-        }
-        else {
-            replaceString = '<strong>' + htmlentities(M.d[$.selected[0]].name) + '</strong>';
-            contact = 'contact';
-        }
-
-        msgDialog('delete-contact', l[1001], l[1002].replace('[X]', replaceString), l[7872].replace('[X]', contact),
-        function(e) {
-            if (e) {
-                $.selected.forEach(function(selected) {
-
-                    if (M.c[selected]) {
-                        Object.keys(M.c[selected])
-                            .forEach(function(sharenode) {
-                                leaveShare(sharenode);
-                            });
-                    }
-
-                    api_req({ a: 'ur2', u: $.selected[i], l: '0', i: requesti });
-                    M.handleEmptyContactGrid();
-                });
-            }
-        });
-        if (c > 1) {
-            $('#msgDialog').addClass('multiple');
-            $('.fm-del-contacts-number').text($.selected.length);
-            $('#msgDialog .fm-del-contact-avatar').attr('class', 'fm-del-contact-avatar');
-            $('#msgDialog .fm-del-contact-avatar span').empty();
-        }
-        else {
-            var user = M.u[$.selected[0]],
-                avatar = useravatar.contact(user, 'avatar-remove-dialog');
-
-            $('#msgDialog .fm-del-contact-avatar').html(avatar);
-        }
-    }
-
-    // Remove selected nodes from rubbish bin
-    else if (RootbyId($.selected[0]) === M.RubbishID) {
-
-        var dlgMessage = '';
-        var toastMessage = '';
-
-        if ((filecnt === 1) && (!foldercnt)) {
-            dlgMessage = l[13749];// 1 file
-            toastMessage = l[13757];
-        }
-        else if ((filecnt > 1) && (!foldercnt)) {
-            dlgMessage = l[13750].replace('%1', filecnt);
-            toastMessage = l[13758].replace('%1', filecnt);
-        }
-        else if ((!filecnt) && (foldercnt === 1)) {
-            dlgMessage = l[13751];// 1 folder
-            toastMessage = l[13759];
-        }
-        else if ((!filecnt) && (foldercnt > 1)) {
-            dlgMessage = l[13752].replace('%1', foldercnt);
-            toastMessage = l[13760].replace('%1', foldercnt);
-        }
-        else if ((filecnt === 1) && (foldercnt === 1)) {
-            dlgMessage = l[13753];// 1 file 1 folder
-            toastMessage = l[13761];
-        }
-        else if ((filecnt === 1) && (foldercnt > 1)) {
-            dlgMessage = l[13754].replace('%1', foldercnt);
-            toastMessage = l[13762].replace('%1', foldercnt);
-        }
-        else if ((filecnt > 1) && (foldercnt === 1)) {
-            dlgMessage = l[13755].replace('%1', filecnt);
-            toastMessage = l[13763].replace('%1', filecnt);
-        }
-        else if ((filecnt > 1) && (foldercnt > 1)) {
-            dlgMessage = l[13756].replace('%1', filecnt).replace('%2', foldercnt);
-            toastMessage = l[13764].replace('%1', filecnt).replace('%2', foldercnt);
-        }
-
-        msgDialog('clear-bin', l[1003], dlgMessage, l[1007], function(e) {
-            if (e) {
-                var tmp = null;
-                if (String(M.currentdirid).substr(0, 7) === 'search/') {
-                    tmp = M.currentdirid;
-                    M.currentdirid = M.getNodeByHandle($.selected[0]).p || M.RubbishID;
-                }
-                M.clearRubbish(1);
-
-                if (tmp) {
-                    M.currentdirid = tmp;
-                }
-
-                showToast('settings', toastMessage);
-            }
-        });
-
-        // ToDo: is this necessary?
-        // $('.fm-dialog-button.notification-button').each(function(i, e) {
-        //     if ($(e).text() === l[1018]) {
-        //         $(e).safeHTML('<span>@@</span>', l[83]);
-        //     }
-        // });
-    }
-
-    // Remove contacts
-    else if (RootbyId($.selected[0]) === 'contacts') {
-        if (localStorage.skipDelWarning) {
-            M.copyNodes($.selected, M.RubbishID, 1);
-        } else {
-            msgDialog('confirmation', l[1003], l[1004].replace('[X]', fm_contains(filecnt, foldercnt)), false, function(e) {
-                if (e) {
-                    M.copyNodes($.selected, M.RubbishID, 1);
-                }
-            }, true);
-        }
-    }
-    else {
-        if (localStorage.skipDelWarning) {
-            if (M.currentrootid === 'shares') {
-                M.copyNodes($.selected, M.RubbishID, true);
-            }
-            else {
-                M.moveNodes($.selected, M.RubbishID);
-            }
-        }
-        else {
-            // Contains complete directory structure of selected nodes, their ids
-            var selected = [], dirTree = [];
-
-            for (var i in $.selected) {
-                selected.push($.selected[i]);
-                var nodes = fm_getnodes($.selected[i], true);
-                dirTree = dirTree.concat(nodes);
-            }
-
-            // Additional message in case that there's a shared node
-            var share = new mega.Share({});
-            var delShareInfo = share.isShareExist(dirTree, true, true, true) ? ' ' + l[1952] + ' ' + l[7410] : '';
-
-            msgDialog('remove', l[1003], l[1004].replace('[X]', fm_contains(filecnt, foldercnt)) + delShareInfo, false, function(e) {
-                if (e) {
-                    if (M.currentrootid === 'shares') {
-                        M.copyNodes($.selected, M.RubbishID, true);
-                    }
-                    else {
-                        var delctx = { pending : 1, selected : selected };
-
-                        // Remove all shares related to selected nodes
-                        for (var i = dirTree.length; i--; ) {
-                            var h = dirTree[i];
-
-                            // remove established shares
-                            for (var share in Object(M.d[dirTree[i]]).shares) {
-                                delctx.pending++;
-                                api_req({ a: 's2',
-                                          n: h,
-                                          s: [{ u: M.d[h].shares[share].u, r: ''}],
-                                          ha: '',
-                                          i: requesti
-                                        }, {
-                                          n: h,
-                                          u: M.d[h].shares[share].u,
-                                          delctx: delctx,
-                                          callback: function(res, ctx) {
-                                                if (typeof res == 'object') {
-                                                    // FIXME: verify error codes in res.r
-                                                    M.delNodeShare(ctx.n, ctx.u);
-                                                    setLastInteractionWith(ctx.u, "0:" + unixtime());
-                                                }
-                                                else {
-                                                    // FIXME: display error to user
-                                                }
-
-                                                if (!--ctx.delctx.pending) {
-                                                    M.moveNodes(ctx.delctx.selected, M.RubbishID);
-                                                }
-                                            }
-                                        });
-                            }
-
-                            // remove pending shares
-                            for (var pendingUserId in M.ps[h]) {
-                                var userEmailOrID = Object(M.opc[pendingUserId]).m || pendingUserId;
-                                delctx.pending++;
-                                api_req({
-                                    a: 's2',
-                                    n: h,
-                                    s: [{u: userEmailOrID, r: ''}],
-                                    ha: '',
-                                    i: requesti
-                                }, {
-                                    n: h,
-                                    u: pendingUserId,
-                                    delctx: delctx,
-                                    callback: function(res, ctx) {
-                                        if (typeof res == 'object') {
-                                            // FIXME: verify error codes in res.r
-                                            M.deletePendingShare(ctx.n, ctx.u);
-                                        }
-                                        else {
-                                            // FIXME: display error to user
-                                        }
-
-                                        if (!--ctx.delctx.pending) {
-                                            M.moveNodes(ctx.delctx.selected, M.RubbishID);
-                                        }
-                                    }
-                                });
-                            }
-                        }
-
-                        if (!--delctx.pending) {
-                            M.moveNodes(delctx.selected, M.RubbishID);
-                        }
-                    }
-                }
-            }, true);
-        }
-    }
-}
 
 function fmremdupes(test)
 {
@@ -2875,9 +2508,6 @@ function fmtopUI() {
                 console.log('Inbox');
             }
         }
-        else if (M.currentrootid === 'shares') {
-            $('.fm-right-files-block').addClass('visible-notification');
-        }
         else if (M.currentdirid === 'contacts'
                 || M.currentdirid === 'ipc'
                 || M.currentdirid === 'opc'
@@ -2920,7 +2550,9 @@ function fmtopUI() {
                 $('.fm-file-upload').addClass('last-button');
             }
         }
-
+        else if (M.currentrootid === 'shares') {
+            $('.fm-right-files-block').addClass('visible-notification');
+        }
     }
     $('.fm-clearbin-button').rebind('click', function() {
         doClearbin(false);
@@ -4135,7 +3767,12 @@ function selectddUI() {
                     if (n) {
                         $.selected.push(id);
                         if (max > i) {
-                            html.push('<div class="transfer-filtype-icon ' + fileIcon(n) + ' tranfer-filetype-txt dragger-entry">' + str_mtrunc(htmlentities(n.name)) + '</div>');
+                            html.push(
+                                '<div class="transfer-filetype-icon '
+                                + fileIcon(n) + ' tranfer-filetype-txt dragger-entry">'
+                                + str_mtrunc(htmlentities(n.name))
+                                + '</div>'
+                            );
                         }
                     }
                 });
@@ -4537,11 +4174,15 @@ function transferPanelUI()
     };
 
     $.transferClose = function() {
+        if (M.pendingTransfers) {
+            mega.ui.tpp.show();
+        }
         $('.nw-fm-left-icon.transfers').removeClass('active');
         $('#fmholder').removeClass('transfer-panel-opened');
     };
 
     $.transferOpen = function(force) {
+        mega.ui.tpp.hide();
         if (force || !$('.nw-fm-left-icon.transfers').hasClass('active')) {
             $('.nw-fm-left-icon').removeClass('active');
             $('.nw-fm-left-icon.transfers').addClass('active');
@@ -5183,12 +4824,14 @@ function reCalcMenuPosition(m, x, y, ico) {
 
         if (nmH > (maxY - TOP_MARGIN)) {// Handle huge menu
             nmH = maxY - TOP_MARGIN;
-            var tmp = document.getElementById('csb_' + m.attr('id').replace('fi_', ''));
-            $(tmp).addClass('context-scrolling-block');
-            tmp.addEventListener('mousemove', scrollMegaSubMenu);
+            var tmp = document.getElementById('csb_' + String(m.attr('id')).replace('fi_', ''));
+            if (tmp) {
+                $(tmp).addClass('context-scrolling-block');
+                tmp.addEventListener('mousemove', scrollMegaSubMenu);
 
-            n.addClass('mega-height');
-            n.css({'height': nmH + 'px'});
+                n.addClass('mega-height');
+                n.css({'height': nmH + 'px'});
+            }
         }
 
         top = horPos(n);
@@ -5336,8 +4979,13 @@ function treeUI()
                 var id = $(e.target).attr('id');
                 if (id)
                     id = id.replace('treea_', '');
-                if (id && M.d[id])
-                    html = ('<div class="transfer-filtype-icon ' + fileIcon(M.d[id]) + ' tranfer-filetype-txt dragger-entry">' + str_mtrunc(htmlentities(M.d[id].name)) + '</div>');
+                if (id && M.d[id]) {
+                    html = (
+                        '<div class="transfer-filetype-icon '
+                        + fileIcon(M.d[id]) + ' tranfer-filetype-txt dragger-entry">'
+                        + str_mtrunc(htmlentities(M.d[id].name)) + '</div>'
+                    );
+                }
                 $('#draghelper .dragger-icon').remove();
                 $('#draghelper .dragger-content').html(html);
                 $('body').addClass('dragging');
@@ -5826,7 +5474,7 @@ function renameDialog() {
 
         $('.rename-dialog input').val(n.name);
         var ext = fileext(n.name);
-        $('.rename-dialog .transfer-filtype-icon').attr('class', 'transfer-filtype-icon ' + fileIcon(n));
+        $('.rename-dialog .transfer-filetype-icon').attr('class', 'transfer-filetype-icon ' + fileIcon(n));
         if (!n.t && ext.length > 0) {
             $('.rename-dialog input')[0].selectionStart = 0;
             $('.rename-dialog input')[0].selectionEnd = $('.rename-dialog input').val().length - ext.length - 1;
@@ -6455,7 +6103,7 @@ function generateShareDialogRow(displayNameOrEmail, email, shareRights, userHand
 
     var rowId = '',
         html = '',
-        av =  useravatar.contact(email),
+        av =  useravatar.contact(email, 'nw-contact-avatar'),
         perm = '',
         permissionLevel = 0;
 
@@ -6676,7 +6324,8 @@ function initShareDialogMultiInputPlugin() {
                 var $this = $scope.find('li input');
                 $this.rebind('keyup', function() {
                     var value = $.trim($this.val());
-                    if ($scope.find('li.token-input-token-mega').length > 0 || checkMail(value) === false) {
+                    var emailList = value.split(/[ ;,]+/);
+                    if ($scope.find('li.token-input-token-mega').length > 0 || checkMail(value) === false || emailList.length > 1) {
                         $scope.find('.dialog-share-button').removeClass('disabled');
                     } else {
                         $scope.find('.dialog-share-button').addClass('disabled');
@@ -7920,17 +7569,20 @@ function moveDialog() {
  * @param {String} toastClass Custom style for the notification
  * @param {String} notification The text for the toast notification
  */
+var toastTimeout;
+
 function showToast(toastClass, notification, buttonLabel) {
 
-    var $toast, timeout;
+    var $toast;
 
     $toast = $('.toast-notification.common-toast');
     $toast.attr('class', 'toast-notification common-toast ' + toastClass)
         .find('.toast-col:first-child span').safeHTML(notification);
 
-    $toast.removeClass('hidden').addClass('visible');
+    $toast.addClass('visible');
 
-    timeout = setTimeout(function() {
+    clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(function() {
         hideToast();
     }, 7000);
 
@@ -7946,15 +7598,15 @@ function showToast(toastClass, notification, buttonLabel) {
     $(closeSelector)
         .rebind('click', function() {
             $('.toast-notification').removeClass('visible');
-            clearTimeout(timeout);
+            clearTimeout(toastTimeout);
         });
 
     $toast.rebind('mouseover', function() {
-        clearTimeout(timeout);
+        clearTimeout(toastTimeout);
     });
 
     $toast.rebind('mouseout', function() {
-        timeout = setTimeout(function() {
+        toastTimeout = setTimeout(function() {
             hideToast();
         }, 7000);
     });
@@ -8051,6 +7703,7 @@ function createFolderDialog(close)
             createFolder($.cftarget, v);
             createFolderDialog(1);
         }
+        $('.create-folder-dialog input').val('');
     });
 
     fm_showoverlay();
@@ -9043,7 +8696,7 @@ function slideshow(id, close)
         for (var i in dl_queue) {
             if (dl_queue[i] && dl_queue[i].id === slideshowid) {
                 dl_queue[i].preview = false;
-                openTransferpanel();
+                openTransfersPanel();
                 return;
             }
         }
@@ -9172,27 +8825,6 @@ function previewimg(id, uint8arr)
     }
 }
 
-function fm_contains(filecnt, foldercnt) {
-    var containstxt = l[782];
-    if ((foldercnt > 1) && (filecnt > 1)) {
-        containstxt = l[828].replace('[X1]', foldercnt).replace('[X2]', filecnt);
-    } else if ((foldercnt > 1) && (filecnt === 1)) {
-        containstxt = l[829].replace('[X]', foldercnt);
-    } else if ((foldercnt === 1) && (filecnt > 1)) {
-        containstxt = l[830].replace('[X]', filecnt);
-    } else if ((foldercnt === 1) && (filecnt === 1)) {
-        containstxt = l[831];
-    } else if (foldercnt > 1) {
-        containstxt = l[832].replace('[X]', foldercnt);
-    } else if (filecnt > 1) {
-        containstxt = l[833].replace('[X]', filecnt);
-    } else if (foldercnt === 1) {
-        containstxt = l[834];
-    } else if (filecnt === 1) {
-        containstxt = l[835];
-    }
-    return containstxt;
-}
 
 function fm_importflnodes(nodes)
 {
@@ -9376,6 +9008,10 @@ function fm_resize_handler(force) {
         $('.fm-right-files-block, .fm-right-account-block, .fm-right-block.dashboard').css({
             'margin-left': ($('.fm-left-panel:visible').width() + $('.nw-fm-left-icons-panel').width()) + "px"
         });
+
+        if (mega.ui.tpp.isVisible()) {
+            $('.popup.transfer-widget:visible').width($('.fm-left-panel:visible').width() - 8);
+        }
     }
 
     if (M.currentrootid === 'shares') {

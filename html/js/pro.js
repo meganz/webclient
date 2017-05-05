@@ -394,8 +394,7 @@ function init_pro()
     }
 
     if (typeof window.selectedProPlan !== "undefined") {
-        $('.reg-st3-membership-bl[data-payment=' + window.selectedProPlan + ']')
-            .find('.membership-button').trigger('click');
+        $('.reg-st3-membership-bl.pro' + window.selectedProPlan + ' .membership-pad-bl').trigger('click');
         delete window.selectedProPlan;
     }
 }
@@ -2126,9 +2125,9 @@ var unionPay = {
         {
             var input = $("<input type='hidden' name='" + key + "' value='" + utcResult.EUR['postdata'][key] + "' />");
             form.append(input);
-            $('body').append(form);
-            form.submit();
         }
+        $('body').append(form);
+        form.submit();
     }
 };
 
@@ -2152,9 +2151,9 @@ var sabadell = {
         for (var key in utcResult.EUR['postdata']) {
             var input = $("<input type='hidden' name='" + key + "' value='" + utcResult.EUR['postdata'][key] + "' />");
             form.append(input);
-            $('body').append(form);
-            form.submit();
         }
+        $('body').append(form);
+        form.submit();
     },
 
     /**
@@ -3577,13 +3576,16 @@ function showLoginDialog(email) {
 };
 
 var doProLogin = function($dialog) {
-    megaAnalytics.log("pro", "doLogin");
 
+    megaAnalytics.log('pro', 'doLogin');
     loadingDialog.show();
 
-    var button = $('.selected .membership-button').parents('.reg-st3-membership-bl').attr('class').match(/pro\d/)[0]
+    // Find the plan they clicked on before the login prompt popped up
+    var proNum = $('.reg-st3-membership-bl.selected').data('payment');
+
+    // After login, click the plan for them to go straight to step 2
     pro_do_next = function() {
-        $('.' + button + ' .membership-button').trigger('click');
+        $('.reg-st3-membership-bl.pro' + proNum + ' .membership-pad-bl').trigger('click')
         pro_do_next = null;
     };
 
@@ -3610,6 +3612,10 @@ var doProLogin = function($dialog) {
                 $('#login-password', $dialog).val('');
                 $('#login-email', $dialog).val('');
                 u_type = r;
+
+                // Logging to see how many people are signing into the regular site
+                api_req({ a: 'log', e: 99630, m: 'Completed login on regular webclient' });
+
                 init_page();
                 if (pro_package) {
                     var cls = pro_package

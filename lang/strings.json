@@ -15656,7 +15656,7 @@
         "context": ""
     },
     "16277": {
-        "text": "Create your free account and get %1 of complimentary storage space, valid for %2 months.",
+        "text": "Create your free account and get %1 of complimentary storage space, valid for %2 days.",
         "context": "%1 would be replaced with the amount and %2 would be replaced with a numeric value"
     },
     "16278": {
@@ -15664,7 +15664,7 @@
         "context": ""
     },
     "16279": {
-        "text": "When you install MEGAsync you get %1 of complimentary storage space plus %2 of transfer quota, both valid for %3 months. MEGAsync is available for Windows, macOS and most Linux distros.",
+        "text": "When you install MEGAsync you get %1 of complimentary storage space plus %2 of transfer quota, both valid for %3 days. MEGAsync is available for Windows, macOS and most Linux distros.",
         "context": "Both %1 and %2 would be replaced with amounts, for example \"50 GB\" and %3 a numeric value for the number of months"
     },
     "16280": {
@@ -15672,7 +15672,7 @@
         "context": ""
     },
     "16281": {
-        "text": "When you install our mobile app you get %1 of complimentary storage space plus %2 transfer quota, both valid for %3 months. We provide mobile apps for iOS, Android & Windows Phone.",
+        "text": "When you install our mobile app you get %1 of complimentary storage space plus %2 transfer quota, both valid for %3 days. We provide mobile apps for iOS, Android & Windows Phone.",
         "context": "Both %1 and %2 would be replaced with amounts, for example \"50 GB\" and %3 a numeric value for the number of months"
     },
     "16282": {
@@ -15680,8 +15680,8 @@
         "context": ""
     },
     "16283": {
-        "text": "Invite as many friends or coworkers as you want. For every signup under the invited email address, you will receive %1 of complimentary storage plus %2 of transfer quota, both valid for %3 months, provided that the new user installs either MEGAsync or a mobile app and starts using MEGA.",
-        "context": "%1 and %2 would be replaced with amounts, for example \"50 GB\" and %3 would be replaced with a numeric value which represents the number of months."
+        "text": "Invite as many friends or coworkers as you want. For every signup under the invited email address, you will receive %1 of complimentary storage plus %2 of transfer quota, both valid for %3 days, provided that the new user installs either MEGAsync or a mobile app and starts using MEGA.",
+        "context": "%1 and %2 would be replaced with amounts, for example \"50 GB\" and %3 would be replaced with a numeric value which represents the number of days."
     },
     "16284": {
         "text": "%1 days left",
@@ -16020,11 +16020,11 @@
         "context": "Paragraph 4 of the general description of MEGA which is shown on the app stores in Android, iOS and Windows Phone."
     },
     "16372": {
-        "text": "PRO LITE subscription: \u20ac4.99 (US$4.99) per month or \u20ac49.99 (US$49.99) per year gives you 200 GB of storage space and 1 TB of transfer quota per month.\nPRO I subscription: \u20ac9.99 (US$9.99) per month or \u20ac99.99 (US$99.99) per year gives you 500 GB of storage space and 2 TB of transfer quota per month.\nPRO II subscription: \u20ac19.99 (US$19.99) per month or \u20ac199.99 (US$199.99) per year gives you 2 TB of storage space and 4 TB of transfer quota per month.\nPRO III subscription: \u20ac29.99 (US$29.99) per month or \u20ac299.99 (US$299.99) per year gives you 4 TB of storage space and 8 TB of transfer quota per month.",
+        "text": "PRO LITE subscription: \u20ac4.99 (US$4.99) per month or \u20ac49.99 (US$49.99) per year gives you 200 GB of storage space and 1 TB of transfer quota per month.\r\nPRO I subscription: \u20ac9.99 (US$9.99) per month or \u20ac99.99 (US$99.99) per year gives you 500 GB of storage space and 2 TB of transfer quota per month.\r\nPRO II subscription: \u20ac19.99 (US$19.99) per month or \u20ac199.99 (US$199.99) per year gives you 2 TB of storage space and 4 TB of transfer quota per month.\r\nPRO III subscription: \u20ac29.99 (US$29.99) per month or \u20ac299.99 (US$299.99) per year gives you 4 TB of storage space and 8 TB of transfer quota per month.",
         "context": "Paragraph 5 of the general description of MEGA which is shown on the apps stores in Android, iOS and Windows Phone. Please keep the multiple line format."
     },
     "16373": {
-        "text": "For more info, please check our website:\nMobile - https:\/\/mega.nz\/mobile_terms.html - https:\/\/mega.nz\/mobile_privacy.html\nDesktop - https:\/\/mega.nz\/",
+        "text": "For more info, please check our website:\r\nMobile - https:\/\/mega.nz\/mobile_terms.html - https:\/\/mega.nz\/mobile_privacy.html\r\nDesktop - https:\/\/mega.nz\/",
         "context": "Paragraph 6 of the general description of MEGA which is shown on the app stores in Android, iOS and Windows Phone. Please keep the multiple line format."
     },
     "16374": {
@@ -16118,5 +16118,285 @@
     "16402": {
         "text": "Unlocked bonuses:",
         "context": "Header of block with achievements bonuses."
+    },
+    "16406": {
+        "text": "[1]MEGA Account Reset\r\n\r\n[2]It looks like you have forgotten your password and do not have a backup of your Recovery Key.\r\n\r\n[3]If you proceed, the existing account under this address will be deactivated, and you will lose access to your data. The data will still be preserved for at least another 60 days. Should you remember the deactivated account's password or locate its previously exported Recovery Key, please contact [A1]support@mega.nz[\/A1] to have it restored.\r\n\r\n[4]Even if you manage to restore the deactivated account, all associated contacts and shares will remain deleted and need to be re-established.\r\n\r\n[5]Reset my Account\r\n\r\n[6]Didn't work? No worries. Copy and paste this link below into your web browser:",
+        "context": "The 'reset my account' email body received when somebody requests to park their account. MEGA needs them to click the link to confirm their password.\r\n\r\nPlease do not translate or modify anything inside square brackets (do not change [1] or [A1] )"
+    },
+    "16407": {
+        "text": "[1]Best regards,[BR]\u2014 Team MEGA",
+        "context": "The footer for our emails. Please do not translate anything inside square brackets (do not translate the [1] or the [BR]. The [BR] corresponds to a line break and will be replaced)"
+    },
+    "16408": {
+        "text": "To proceed please click the link below or copy and paste it into your web browser:",
+        "context": "A line of text within an email that guides the user to click on the link that follows, or to copy and paste it into their browser."
+    },
+    "16410": {
+        "text": "[1]MEGA Account Expiry Warning\r\n\r\n[2]We noticed that there hasn't been any activity on your MEGA account since [B][$month] [$day], [$year][\/B].\r\n\r\n[3]We would love to have you as a user, but we may [B]delete any stored data (as specified in our [A1]Terms of Service[\/A1]) if you don\u2019t log in at [A2]mega.nz[\/A2] within the next 30 (thirty) days[\/B].\r\n\r\n[4]If you have recently used MEGA but still received this email, then we are emailing you about a different account. Please compare the email address on the account you recently used to the one in this email.\r\n\r\n[5]Login at MEGA",
+        "context": "Update: The words 'close your account' have been removed.\r\n\r\nEmail body for Account expiry email. This is sent to users when they have been inactive for a long time.\r\nPlease do not translate anything inside the square brackets, just leave them alone and in the same place (i.e. do not change [1] or [A1] etc)."
+    },
+    "16412": {
+        "text": "[1]MEGA Account Expiry Final Warning\r\n\r\n[2][B]Your [A1]$megaemail[\/A1] MEGA account is due to expire in 7 days[\/B] as there has not been any activity on it since [$month] [$day], [$year].\r\n\r\n[3]We would love to have you as a user, but we may [B]delete any stored data (as specified in our [A2]Terms of Service[\/A2]) if you don\u2019t log in at [A3]mega.nz[\/A3] within the next 7 (seven) days[\/B]\r\n\r\n[4]If you have recently used MEGA but still received this email, then we are emailing you about a different account. Please compare the email address on the account you recently used to the one in this email.",
+        "context": "Update: The words 'close your account' have been removed\r\n\r\nEmail body of the final warning email we send to users who have been inactive too long.\r\n\r\nPlease do not translate the text inside the square brackets (i.e Do not change the [1], [A1] tags etc).\r\nThey will be replaced by links."
+    },
+    "16413": {
+        "text": "[1]MEGA Bonus Unlocked\r\n\r\n[2]Congratulations, we have just activated your mobile app install achievement bonus. You have earned [$storageearnedgb] storage quota and [$transferearnedgb] transfer quota, which will be valid for [$durationdays] days.\r\n\r\n[3]Need more storage or transfer quota? Let others know about the benefits of end-to-end encrypted cloud storage and invite them to MEGA!\r\n\r\n[4]Achieve More\r\n\r\n[5]To view the status of your achievements or achieve more, click below:",
+        "context": "Email body of the email sent to users who have just had their mobile app achievement activated.\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [A1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
+    },
+    "16414": {
+        "text": "[1]MEGA Install Bonus\r\n\r\n[2]Great, thanks for installing the MEGA mobile app! It can take a few days for your installation achievement bonus to be authorised. Please note that you will not receive an achievement credit if you have used a different MEGA account in the past.\r\n\r\n[3]Achievements",
+        "context": "Email body of the email sent when users install the MEGA mobile app.\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [A1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
+    },
+    "16415": {
+        "text": "[1]MEGA Invitation\r\n\r\n[2]The user with the email [R][$cred][\/R] has sent you an invitation to join MEGA.\r\n\r\n[3]Join [R][$cred][\/R] on MEGA by clicking below:\r\n\r\n[4]Create Account\r\n",
+        "context": "Email body sent to unregistered users when other user invites them.\r\n\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [A1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
+    },
+    "16416": {
+        "text": "Congratulations, [$cred] has accepted your invitation and started using MEGA! As a result, you have been credited [$storageearnedgb] of additional storage space and [$transferearnedgb] transfer quota, which will both be valid for [$durationdays] days.",
+        "context": "Email body for achievement email that gets sent to a user after they have invited somebody.\r\nPlease do not translate the text inside square brackets (i.e. leave the [$cred] etc as they are)."
+    },
+    "16420": {
+        "text": "Didn\u2019t work? Copy the link below into your web browser:",
+        "context": "Phrase used in emails, that appears after a button. If the button didn't work the user is encouraged to try the link below directly, or copied into their browser"
+    },
+    "16421": {
+        "text": "[1]MEGA Invitation\r\n\r\n[2]The user with the email [R][$cred][\/R] has sent you a contact invitation.\r\n\r\n[3]Head to MEGA to accept the invite and get connected with [R][$cred][\/R]\r\n\r\n[4]Take me to MEGA\r\n",
+        "context": "(edit:Mega changed to MEGA)\r\n\r\nEmail body sent to registered users when other user invites them.\r\n\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [A1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
+    },
+    "16422": {
+        "text": "[1]MEGA\r\n\r\n[2]The user with the email [R][$cred][\/R] is waiting for you to join MEGA.\r\n\r\n[3]It's free and easy to set up and you will get a generous free storage allocation on the world's most secure cloud storage service.\r\n\r\n[4]Join MEGA\r\n",
+        "context": "Email body sent to remind unregistered users that other user invites them and they haven't signed up yet.\r\n\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [A1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
+    },
+    "16423": {
+        "text": "[1]MEGA Invitation\r\n\r\n[2][R][$cred][\/R] wants to share a folder with you.\r\n\r\n[3]To receive shared folders from MEGA users, you will need a MEGA account. It's free and easy to set up, and you will get a generous free storage allocation on the world's most secure major cloud storage service.\r\n\r\n[4]Join MEGA\r\n\r\n[5]Please note that the shared folder will only appear if its owner is connected to MEGA during or after your signup. This is because our end-to-end encryption paradigm requires the folder owner to transmit the secret folder key to you securely using asymmetric cryptography so that nobody can intercept it, not even MEGA.\r\n\r\n[6]Click below to get started with MEGA:\r\n",
+        "context": "[4]Join Mega has been changed to [4]Join MEGA\r\n\r\nEmail body sent to unregistered users when another user invites them and has a folder to share.\r\n\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [A1] as they are)\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
+    },
+    "16424": {
+        "text": "[1]MEGA Invitation\r\n\r\n[2][R][$cred][\/R] wants to share a folder with you.\r\n\r\n[3]Head to MEGA to accept the invite and get started with [R][$cred][\/R]\r\n\r\n[4]Take me to MEGA\r\n",
+        "context": "Email body sent to registered users when another user invites them and has a folder to share.\r\n\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [A1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
+    },
+    "16425": {
+        "text": "[1]MEGA Email Verification Required\r\n\r\n[2]You have one more step remaining to activate your MEGA account.\r\n\r\n[3]Click on the button below to verify your email address:\r\n\r\n[4]Verify my email\r\n\r\n[5]Click on the link below to verify your email address:",
+        "context": "Email body of signup confirmation email when the user needs to click the link to verify their email in order to register their account and get started properly using Mega.\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [2] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start."
+    },
+    "16426": {
+        "text": "If you are having trouble activating using the above link, try copying and pasting the link below into your iOS device's mobile browser:",
+        "context": "Text for the ios signup confirmation email, that helps users try the ios-specific link format below this text."
+    },
+    "16427": {
+        "text": "[1]MEGA Account Closed\r\n\r\n[2]You have closed your [R][$megaemail][\/R] MEGA account. If you did not initiate this closure, please contact [A1]support@mega.nz[\/A1]\r\n\r\n[3]We would like to thank you once more for using MEGA. You are welcome back any time.",
+        "context": "Email body for the confirmation email sent when a user closes their account.\r\nPlease do not translate the text inside square brackets (i.e. leave the [1], [$megaemail], and [A1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
+    },
+    "16428": {
+        "text": "[1]MEGA Chat Notification\r\n\r\n[2]You have received new encrypted chat messages on MEGA chat while you were offline.\r\n\r\n[3]Chat securely at MEGA",
+        "context": "Email body for notification email sent when a user has received a chat message while they were inactive or offline.\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [2] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start."
+    },
+    "16429": {
+        "text": "[1]MEGA Account Closure\r\n\r\n[2]Caution: You have elected to close your MEGA account. The account under this email address will be permanently closed and your data deleted. This can not be undone.\r\n\r\n[3]By completing this action, you will lose access to all your uploaded data, shares, and contacts. Any remaining account balance or PRO quota will be voided.\r\n\r\n[4]If you have a paid MEGA subscription with [A1]Apple[\/A1] or [A2]Google[\/A2], then you must cancel it separately at Apple iTunes or Google Play, as MEGA is not able to cancel it for you.\r\n\r\n[5]Close my Account",
+        "context": "Email body of email sent when a user is starting the process to close their account.\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [A1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
+    },
+    "16430": {
+        "text": "[1]MEGA Confirm New Email\r\n\r\n[2]It looks like you changed your email address. We just need you to confirm your new email address by clicking the following link:\r\n\r\n[3]Confirm New Email\r\n\r\n[4]Please note that this will [B]replace your existing MEGA account email address[\/B]. You will need to log in with this new email address from now on.\r\n",
+        "context": "Email body for when a user needs to confirm their new email address. It emphasises that it will not be a second email, but will replace their current one on their Mega account.\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [A1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
+    },
+    "16431": {
+        "text": "[1]MEGA Password Recovery\r\n\r\n[2]You can easily access your MEGA account with your Recovery Key.\r\n\r\n[3]Unlock Account\r\n\r\n[4]This request originated from IP address: [R][$cred][\/R]",
+        "context": "Email body for the password reset email where the user has their Master Key (Recovery Key)\r\nPlease do not translate the text inside square brackets (i.e. leave the [1],[$cred], and [R] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
+    },
+    "16432": {
+        "text": "You can also earn more free storage and transfer quota by achieving bonuses. For example, by installing our software or inviting friends to MEGA.",
+        "context": "Paragraph in an email related to how a user can use the MEGA achievement program to get more storage and transfer quota."
+    },
+    "16433": {
+        "text": "[1]Visit [A1]mega.nz\/account[\/A1] to see a breakdown of your usage. Please note your rubbish counts toward your usage, and may need to be cleared to free up space.\r\n\r\n[2]To continue to use MEGA, please upgrade to one of our paid plans, or buy a larger plan. [B]You have 7 days left to take action[\/B]. If the account remains over quota after [R][$lastdate][\/R], MEGA will automatically clear your rubbish bin in an attempt to remedy the situation for your convenience.\r\n",
+        "context": "Email body for email sent when user has been over their storage quota limit for nearly 30 days. This is the final warning before Mega will clear their rubbish bin.\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [A1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate.\r\n"
+    },
+    "16435": {
+        "text": "[1]MEGA Password Change\r\n\r\n[2]Click on the button below to change your password.\r\n\r\n[3]Click on the link below to change your password. \r\n\r\n[4]You will need to enter your current password before you can choose a new one.\r\n\r\n[5]Change Password\r\n\r\n[6]If you didn't make this request, you can ignore and delete this email. If you need more assistance, please contact our support team at [A1]support@mega.nz[\/A1]",
+        "context": "Email body for the change password confirmation step.\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [A1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
+    },
+    "16436": {
+        "text": "[1]MEGA Password Has Been Changed\r\n\r\n[2]Your MEGA account's password has been changed. If you didn't make this request, please contact our support team at [A1]support@mega.nz[\/A1]\r\n",
+        "context": "Email body text for the email sent after the user has changed their password on MEGA.\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [A1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
+    },
+    "16437": {
+        "text": "[1]MEGA Account Suspended - Repeat Infringer\r\n\r\n[2]YOUR ACCOUNT HAS BEEN SUSPENDED OVER REPEATED ALLEGATIONS OF COPYRIGHT INFRINGEMENTS.\r\n\r\n[3]Please do not hesitate to contact us at [A1]legal@mega.nz[\/A1] if you believe the allegations are false.\r\n\r\n[4]Please be reminded that MEGA respects the copyrights of others and requires that users of the MEGA cloud service comply with the laws of copyright. You are strictly prohibited from using the MEGA cloud service to infringe copyrights. You may not upload, download, store, share, display, stream, distribute, e-mail, link to, transmit or otherwise make available any files, data, or content that infringes any copyright or other proprietary rights of any person or entity.\r\n\r\n[5]Pursuant to our Terms of Service, accounts found to be repeat infringers are subject to termination. Full details, including how to file a counter notification, are specified in MEGA's [A2]Terms of Service[\/A2], [A3]Copyright[\/A3] and [A4]Takedown Guidance[\/A4]",
+        "context": "Email body of suspension email, sent to users who have repeatedly infringed upon copyrighted materials.\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [A1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
+    },
+    "16438": {
+        "text": "[1]MEGA Claim of Alleged Infringement \/ Takedown\r\n\r\n[2]We are in receipt of a takedown notice affecting the following public link in your account:\r\n\r\n[3]Link:\r\n\r\n[4]Submitter of notice:\r\n\r\n[5]Pursuant to our Terms of Service, accounts found to be repeat infringers are subject to termination. Full details, including more information on the counter-notification process, are specified in MEGA's [A1]Terms of Service[\/A1], [A2]Copyright[\/A2] and [A3]Takedown Guidance[\/A3]\r\n\r\n[6]If you believe that your content has been wrongly disabled because you have rights to the material, then you may file a counter-notice at our [A4]dispute page[\/A4].\r\n",
+        "context": "Email body for takedown warning email when a user has had infringing content taken down due to a complaint.\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [A1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
+    },
+    "16439": {
+        "text": "[1]Welcome to MEGA\r\n\r\n[2]Hi [$username], thanks for joining MEGA, your free account is ready and you can start using MEGA now.\r\n\r\n[3][B]Warning:[\/B] Due to our advanced end-to-end encryption, it is mathematically impossible for us to recover or reset your password. If you lose your password, you will lose access to the data in your MEGA account. We highly recommend you make a backup of your Recovery Key now:\r\n\r\n[4]Back up Recovery Key\r\n\r\n[5]You can back up your Recovery Key later in your Dashboard or Account Settings\r\n\r\n[6]You have just joined many millions of like-minded users on the world's safest cloud collaboration platform.\r\n\r\n[7]Visit Mega.nz",
+        "context": "Primary email body of welcome email sent to new users.\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [$username] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [$username], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
+    },
+    "16440": {
+        "text": "[1]About MEGA\r\n\r\n[2]Privacy\r\n\r\n[3]Unlike most other cloud storage providers, only you control who has access to your data. Not even MEGA can access your data!\r\n\r\n[4]Encryption\r\n\r\n[5]Your data is encrypted on your device using your password as the encryption key. Secure collaboration with others is guaranteed through asymmetric cryptography, which means that only the end points have access.\r\n\r\n[6]Space\r\n\r\n[7]Not only is MEGA more secure than its major competitors, MEGA is also very generous in providing a whopping 50GB for free!\r\n\r\n[8]Not only is MEGA more secure than its major competitors, MEGA provides a very generous amount of free storage and transfer quota, and easy ways to [A1]achieve[\/A1] even more for free!",
+        "context": "(UPDATE: this new version includes [A1] tags around the word achieve in the final sentence)\r\nSecondary email body of welcome email sent to new users.\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start."
+    },
+    "16442": {
+        "text": "[A]Login[\/A] or [B]Create an account[\/B] to fully experience MEGA",
+        "context": "A label to allow users to login or create an account. Please keep the placeholders [A], [\/A], [B] and [\/B]."
+    },
+    "16443": {
+        "text": "USED SPACE: Data temporarily unavailable",
+        "context": "A label to show that the information related to the account usage is temporarily unavailable."
+    },
+    "16444": {
+        "text": "USED BANDWIDTH: Data temporarily unavailable",
+        "context": "A label to show that the information related to bandwidth usage is temporarily unavailable."
+    },
+    "16445": {
+        "text": "USED STORAGE %1",
+        "context": "A label to show the storage used for the account."
+    },
+    "16446": {
+        "text": "USED BANDWIDTH %1",
+        "context": "A label to show the bandwidth used for the account."
+    },
+    "16447": {
+        "text": "Scanning...",
+        "context": "A tray icon label to indicate that MEGAsync is in a scanning state."
+    },
+    "16448": {
+        "text": "Resume Transfers",
+        "context": "A label of an option to resume all paused transfers."
+    },
+    "16449": {
+        "text": "Pause Transfers",
+        "context": "A label of an option to pause all transfers."
+    },
+    "16450": {
+        "text": "Stream",
+        "context": "The text of a menu item that opens a dialog to stream files from MEGA."
+    },
+    "16451": {
+        "text": "Remove from left pane",
+        "context": "This text is shown in the context menu of the Windows File Explorer when the user right clicks in the root of a synced folder. It allows for removal of the new icon that is added to the Navigation Pane, on the left of the Windows File Explorer."
+    },
+    "16452": {
+        "text": "Please consider updating your operating system.",
+        "context": "A message to be shown when an outdated operating system is detected."
+    },
+    "16454": {
+        "text": "USED STORAGE: Data temporarily unavailable",
+        "context": "A label to show that the information related to the account usage is temporarily unavailable."
+    },
+    "16455": {
+        "text": "MEGA Payment Receipt",
+        "context": "Subject line for the payment receipt email. This gets sent to users after they have made a payment."
+    },
+    "16456": {
+        "text": "Payment Receipt",
+        "context": "Header text of the payment receipt email, sent to users after they have made a payment."
+    },
+    "16457": {
+        "text": "Order Date:",
+        "context": "Label for a field on the payment receipt email, that indicates the date of the user's order (payment) will appear next to this label."
+    },
+    "16458": {
+        "text": "Order ID:",
+        "context": "Order id label for the payment receipt email. This label indicates that the identification number for the order (payment) will appear beside it."
+    },
+    "16459": {
+        "text": "GST No:",
+        "context": "Label for a New Zealand GST tax number. GST should not be translated (the number shown will always be a New Zealand GST tax number), only the abbreviation 'No' for numero, or number.\r\nI.e. in Spanish No becomes N\u00fam, so the final string is GST N\u00fam."
+    },
+    "16460": {
+        "text": "Billed",
+        "context": "Label on the payment receipt email. This label is referring to a section of the email where the user's billing details (name, address, etc) are present."
+    },
+    "16461": {
+        "text": "Paid with:",
+        "context": "Label on the payment receipt email, referencing the details that the user made the payment with. For example, the user may have paid with a Visa card, or a certain bitcoin address, or Boleto, etc"
+    },
+    "16462": {
+        "text": "Description",
+        "context": "Label on the payment receipt email, referencing a description of the product the user purchased."
+    },
+    "16463": {
+        "text": "Price",
+        "context": "Label on the payment receipt email, referencing the section that describes the price that the user pays for the product."
+    },
+    "16464": {
+        "text": "Total",
+        "context": "Label on the payment receipt email, referencing the section that lists the total amount payable (including the price of the item and the tax)"
+    },
+    "16465": {
+        "text": "Your subscription will renew at the rates stated above unless you cancel it at [A1]https:\/\/mega.nz\/account[\/A1] prior to the end of the billing period.",
+        "context": ""
+    },
+    "16466": {
+        "text": "If you have any questions or concerns regarding this payment, please contact our support team at [A1]support@mega.nz[\/A1] or review your purchase history [A2]here[\/A2]",
+        "context": "Information on the payment receipt email that lets the user know they can contact support if they have problems, and links them to a place they can see a list of their purchases.\r\nPlease leave the [A1] [\/A1] tags in place as they will be converted into links."
+    },
+    "16467": {
+        "text": "MEGA Refund Receipt",
+        "context": "Subject line of the refund receipt email sent when a user has had a successful refund."
+    },
+    "16468": {
+        "text": "Refund Receipt",
+        "context": "Title of the refund receipt email sent to users when their refund has been successful."
+    },
+    "16469": {
+        "text": "The file\/folder of the link that you are trying to open was not found. You are probably logged in to a different account. Please, log in to the correct account and try again.",
+        "context": "Title of the dialog displayed when trying to open a link of an internal node and this node is not found in the account in which the user is logged in."
+    },
+    "16470": {
+        "text": "File\/folder not found",
+        "context": "Title of the dialog displayed when trying to open a link of an internal node and this node is not found in the account in which the user is logged in - (String as short as possible)."
+    },
+    "16471": {
+        "text": "The provided key is invalid.\r\n",
+        "context": "On a public file or folder link which does not have a decryption key, the user is asked to enter a decryption key. This is the error message shown when the decryption key entered is not correct."
+    },
+    "16472": {
+        "text": "Please check that the key is correct or ask the creator of the link again.",
+        "context": "On a public file or folder link which does not have a decryption key, the user is asked to enter a decryption key. This is a second message which is shown when the decryption key entered is not correct."
+    },
+    "16473": {
+        "text": "[1]MEGA Achievement Expired\r\n\r\n[2]One of your achievements has expired today. Don't worry though, you can always achieve more or upgrade to a PRO account.\r\n\r\n[3]To upgrade your account to PRO, click below:",
+        "context": ""
+    },
+    "16474": {
+        "text": "Previous versions",
+        "context": "A button label which opens a dialog to display the full version history of the selected file."
+    },
+    "16475": {
+        "text": "Revert",
+        "context": "A button label which reverts a certain version of a file to be the current version of the selected file."
+    },
+    "16476": {
+        "text": "Edited by %1 ",
+        "context": "A message which is displayed in the version history that shows that a certain file version was edited by a particular user. Please keep the %1 placeholder which will be replaced with the email address.\r\n"
+    },
+    "16477": {
+        "text": "Renamed from %1 by %2",
+        "context": "A message which is displayed in the version history that shows that a certain file version is renamed from a previous filename by a particular user. Please keep the placeholders %1 which will be replaced by the filename and %2 which will be replaced by the email address."
+    },
+    "16478": {
+        "text": "current version",
+        "context": "A message to indicate which version is the current version."
+    },
+    "16480": {
+        "text": "Edited by me",
+        "context": "A message which is displayed in the version history that shows that a certain file version was edited by the user themself."
+    },
+    "16481": {
+        "text": "Renamed from %1 by me",
+        "context": "A message which is displayed in the version history that shows that a certain file version is renamed from a previous file name by the user itself. Please keep the placeholder %1 which will be replaced by the filename."
+    },
+    "16482": {
+        "text": "Show me away after [X] minutes of inactivity",
+        "context": "Footer text to explain the meaning of the 'Auto-away' functionality of the user's chat status."
+    },
+    "16483": {
+        "text": "Status Persistence",
+        "context": "A label title to enable\/disable the feature of the chat status that maintains a user's chosen status even if they don't have connected devices."
+    },
+    "16484": {
+        "text": "Maintain my chosen status appearance even when I have no connected devices.",
+        "context": "Some text in the footer to explain the meaning of the 'Status Persistence' functionality of the user's chat status."
     }
 }

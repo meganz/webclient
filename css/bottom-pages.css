@@ -69,6 +69,7 @@
     background-position: 0 -271px;
 }
 .megacmd-icon-info {
+    cursor: default;
     font-size: 18px;
     line-height: 21px;
     color: #666666;

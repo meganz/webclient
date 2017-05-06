@@ -2,22 +2,22 @@
  * The language selection dialog code
  */
 var langDialog = {
-    
+
     $dialog: null,
     $overlay: null,
-    
+
     /**
      * Initialises and shows the dialog
      */
     show: function() {
-        
+
         // Cache some selectors for performance
         langDialog.$dialog = $('.fm-dialog.languages-dialog');
         langDialog.$overlay = $('.fm-dialog-overlay');
-        
+
         var $tierOneLanguages = langDialog.$dialog.find('.tier-one-languages');
         var $tierTwoLanguages = langDialog.$dialog.find('.tier-two-languages');
-        
+
         // Main tier 1 languages that we support (based on usage analysis)
         var tierOneLangCodes = [
             'es', 'en', 'br', 'ct', 'fr', 'de', 'ru', 'tr', 'it', 'ar',
@@ -30,14 +30,14 @@ var langDialog = {
             return (tierOneLangCodes.indexOf(langCode) < 0);
         });
 
-        // Generate the HTML for tier one and tier two languages (second param set to true shows beta icon) 
+        // Generate the HTML for tier one and tier two languages (second param set to true shows beta icon)
         var tierOneHtml = langDialog.renderLanguages(tierOneLangCodes, false);
         var tierTwoHtml = langDialog.renderLanguages(tierTwoLangCodes, true);
 
         // Display the HTML
         $tierOneLanguages.safeHTML(tierOneHtml);
         $tierTwoLanguages.safeHTML(tierTwoHtml);
-        
+
         // Cache some selectors for performance
         var $languageLinks = langDialog.$dialog.find('.nlanguage-lnk');
         var $showMoreLanguages = langDialog.$dialog.find('.show-more-languages');
@@ -49,7 +49,7 @@ var langDialog = {
 
             // If the extra languages section is already open
             if ($arrowIcon.hasClass('opened')) {
-                
+
                 // Extra languages hidden
                 $arrowIcon.removeClass('opened');
                 $showHideText.safeHTML(l[7657]);        // Show more languages
@@ -85,55 +85,43 @@ var langDialog = {
         });
 
         // Initialise the save button
-        langDialog.$dialog.find('.fm-languages-save').rebind('click', function() {
-            
-            langDialog.hide();
-            
-            // Get the selected code
-            var selectedLangCode = langDialog.$dialog.find('.nlanguage-lnk.selected').attr('data-lang-code');
-            
-            // If not the currently selected language, change to the selected language
-            if (selectedLangCode !== lang) {
-                localStorage.lang = selectedLangCode;
-                document.location.reload();
-            }
-        });
+        langDialog.initSaveButton();
 
         // Show different style when language is selected
         $languageLinks.rebind('click', function() {
-            
+
             $languageLinks.removeClass('selected');
             $(this).addClass('selected');
-            
+
             return false;
         });
     },
-    
+
     /**
      * Re-center the dialog vertically because the height can change when showing/hiding the extra languages
      */
     centerDialog: function() {
-        
+
         var currentHeight = langDialog.$dialog.outerHeight();
         var newTopMargin = (currentHeight / 2) * -1;
-        
+
         langDialog.$dialog.css('margin-top', newTopMargin);
     },
-    
+
     /**
      * Hides the language dialog
      * @returns {false}
      */
     hide: function() {
-        
+
         langDialog.$dialog.addClass('hidden');
         langDialog.$overlay.addClass('hidden');
         $('body').removeClass('overlayed');
         $.dialog = false;
-        
+
         return false;
     },
-    
+
     /**
      * Create the language HTML from a list of language codes
      * @param {Array} langCodes Array of language codes e.g. ['en', 'es', ...]
@@ -183,5 +171,40 @@ var langDialog = {
         }
 
         return html;
+    },
+
+    /**
+     * Initialise the Save button to set the language and reload the page
+     */
+    initSaveButton: function() {
+
+        // Initialise the save button
+        langDialog.$dialog.find('.fm-languages-save').rebind('click', function() {
+
+            langDialog.hide();
+
+            // Get the selected code
+            var selectedLangCode = langDialog.$dialog.find('.nlanguage-lnk.selected').attr('data-lang-code');
+
+            // If not the currently selected language, change to the selected language
+            if (selectedLangCode !== lang) {
+
+                // Store the new language in localStorage to be used upon reload
+                localStorage.lang = selectedLangCode;
+
+                // Set a language user attribute on the API (This is a private but unencrypted user
+                // attribute so that the API can read it and send emails in the correct language)
+                if (typeof u_attr !== 'undefined') {
+                    api_req({
+                        a: 'up',
+                        i: requesti,
+                        '^!lang': selectedLangCode      // ^ is private but not encrypted, ! is non-historic
+                    });
+                }
+
+                // Reload the site
+                document.location.reload();
+            }
+        });
     }
 };

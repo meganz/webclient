@@ -1,3 +1,29 @@
+.big-padding .fm-dialog-title {
+    padding-top: 22px;
+}
+.big-padding .fm-dialog-close {
+    right: 14px;
+    top: 19px;
+}
+.bottom-checkbox {
+    display: table-cell;
+    vertical-align: middle;
+    height: 56px;
+    position: relative;
+}
+.bottom-checkbox .checkdiv {
+    position: absolute;
+    margin-top: 0;
+    top: 20px;
+    z-index: 1;
+}
+.bottom-checkbox .radio-txt {
+    float: none;
+    padding-top: 0;
+    max-width: none;
+    line-height: 18px;
+    padding-left: 35px;
+}
 .fm-dialog-footer, .fm-move-bottom-block, .fm-share-bottom-block, .fm-notifications-bottom, .top-login-bott-gray-block, .fm-mega-dialog-bottom, .create-folder-bottom, .default-dialog-bottom {
     height: 57px;
     background-color: white;
@@ -1133,10 +1159,10 @@ li.token-input-token-invite .input-close {
     padding-bottom: 24px;
 }
 .storage-dialog.almost-full .chart.progressbars span::before {
-    background-color: #FFA500;    
+    background-color: #FFA500;
 }
 .storage-dialog.almost-full .chart.data .perc-txt {
-    color: #FFA500;    
+    color: #FFA500;
 }
 .storage-dialog .account.chart.overlay, .storage-dialog .account.chart.body::after {
     background-color: #FAFAFA;
@@ -1148,3 +1174,97 @@ li.token-input-token-invite .input-close {
     margin: -2px;
 }
 /* end of Storage dialog */
+
+
+/* Dublicate conflict dialog */
+.fm-dialog.dublicate-conflict {
+    width: 564px;
+    margin: -313px 0 0 -282px;
+}
+.dublicate-conflict.body {
+    padding: 20px 32px 9px 32px;
+}
+.dublicate-conflict.info-txt {
+    font-size: 14px;
+    line-height: 24px;
+    color: #666666;
+}
+.dublicate-conflict.info-txt strong {
+    font-family: 'source_sans_prosemibold';
+    font-weight: normal;
+    word-break: break-word;
+    display: inline-block;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    vertical-align: top;
+}
+.dublicate-conflict.info-txt.light-grey {
+    color: #999999;
+}
+.dublicate-conflict.red-header {
+    font-size: 17px;
+    line-height: 26px;
+    color: #EB4444;
+}
+.dublicate-conflict.action-block {
+    margin: 12px 0 15px 0;
+    cursor: pointer;
+}
+.dublicate-conflict.info-block {
+    padding: 9px 0;
+}
+.dublicate-conflict.file-info {
+    padding-left: 78px;
+    font-size: 0;
+    min-height: 61px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.dublicate-conflict.file-info .info-txt {
+    line-height: 20px;
+}
+.dublicate-conflict.file-name {
+    white-space: nowrap;
+    overflow: hidden;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+}
+.dublicate-conflict .export-icon {
+    margin: 2px 0 0 -4px;
+    position: absolute;
+}
+.dublicate-conflict.file-date span, .dublicate-conflict.file-date i {
+    display: inline-block;
+    vertical-align: top;
+    position: relative;
+}
+.dublicate-conflict.file-date i {
+    margin: -1px 1px 0 -4px;
+}
+.dublicate-conflict.file-date .time {
+    padding-left: 22px;
+}
+.dublicate-conflict.file-date .time::before {
+    content: '';
+    display: block;
+    position: absolute;
+    left: 10px;
+    top: 3px;
+    width: 1px;
+    height: 14px;
+    background-color: rgba(0,0,0,0.1);
+}
+.multiple-files .dublicate-conflict.file-info {
+    padding-top: 11px;
+}
+.multiple-files.dublicate-conflict .export-icon:nth-child(1) {
+    margin: 0 0 0 -4px;
+}
+.multiple-files.dublicate-conflict .export-icon:nth-child(2) {
+    margin: -8px 0 0 4px;
+}
+/* end of Dublicate conflict dialog */

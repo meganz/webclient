@@ -3744,32 +3744,50 @@ mega.utils.abortTransfers = function megaUtilsAbortTransfers() {
     var promise = new MegaPromise();
 
     // Mobile does not use the dlmanager/ulmanager so just resolve the promise
-    if (!mega.utils.hasPendingTransfers() || is_mobile) {
-        promise.resolve();
+    if (is_mobile) {
+        return promise.resolve();
     }
-    else {
-        msgDialog('confirmation', l[967], l[377] + ' ' + l[507] + '?', false, function(doIt) {
-            if (doIt) {
-                if (dlmanager.isDownloading) {
-                    dlmanager.abort(null);
-                }
-                if (ulmanager.isUploading) {
-                    ulmanager.abort(null);
-                }
 
-                mega.utils.resetUploadDownload();
-                loadingDialog.show();
-                var timer = setInterval(function() {
-                    if (!mega.utils.hasPendingTransfers()) {
-                        clearInterval(timer);
-                        promise.resolve();
-                    }
-                }, 350);
+    var abort = function() {
+        if (mBroadcaster.crossTab.master || page === 'download') {
+            if (!mega.utils.hasPendingTransfers()) {
+                promise.resolve();
             }
             else {
-                promise.reject();
+                msgDialog('confirmation', l[967], l[377] + ' ' + l[507] + '?', false, function(doIt) {
+                    if (doIt) {
+                        if (dlmanager.isDownloading) {
+                            dlmanager.abort(null);
+                        }
+                        if (ulmanager.isUploading) {
+                            ulmanager.abort(null);
+                        }
+
+                        mega.utils.resetUploadDownload();
+                        loadingDialog.show();
+                        var timer = setInterval(function() {
+                            if (!mega.utils.hasPendingTransfers()) {
+                                clearInterval(timer);
+                                promise.resolve();
+                            }
+                        }, 350);
+                    }
+                    else {
+                        promise.reject();
+                    }
+                });
             }
-        });
+        }
+        else {
+            promise.reject();
+        }
+    };
+
+    if (!mBroadcaster.crossTab.master || mBroadcaster.crossTab.slaves.length) {
+        msgDialog('warningb', l[882], l[7157], 0, abort);
+    }
+    else {
+        abort();
     }
 
     return promise;
@@ -3900,33 +3918,24 @@ mega.utils.reload = function megaUtilsReload() {
         // Show message that this operation will destroy the browser cache and reload the data stored by MEGA
         msgDialog('confirmation', l[761], l[7713], l[6994], function(doIt) {
             if (doIt) {
-                var reload = function() {
-                    if (mBroadcaster.crossTab.master || page === 'download') {
-                        mega.utils.abortTransfers().then(function() {
-                            loadingDialog.show();
-                            stopsc();
-                            stopapi();
+                mega.utils.abortTransfers().then(function() {
+                    loadingDialog.show();
+                    stopsc();
+                    stopapi();
 
-                            MegaPromise.allDone([
-                                mega.utils.clearFileSystemStorage()
-                            ]).then(function(r) {
-                                    console.debug('megaUtilsReload', r);
-                                    if (fmdb) {
-                                        fmdb.invalidate(_reload);
-                                    }
-                                    else {
-                                        _reload();
-                                    }
-                                });
-                        });
-                    }
-                };
-                if (!mBroadcaster.crossTab.master || mBroadcaster.crossTab.slaves.length) {
-                    msgDialog('warningb', l[882], l[7157], 0, reload);
-                }
-                else {
-                    reload();
-                }
+                    MegaPromise.allDone([
+                        mega.utils.clearFileSystemStorage()
+                    ]).then(function(r) {
+                        console.debug('megaUtilsReload', r);
+
+                        if (fmdb) {
+                            fmdb.invalidate(_reload);
+                        }
+                        else {
+                            _reload();
+                        }
+                    });
+                });
             }
         });
     }

@@ -16398,5 +16398,69 @@
     "16484": {
         "text": "Maintain my chosen status appearance even when I have no connected devices.",
         "context": "Some text in the footer to explain the meaning of the 'Status Persistence' functionality of the user's chat status."
+    },
+    "16485": {
+        "text": "Duplicate items",
+        "context": "Dialog header. Dialog is displayed if uploading file already exists in folder."
+    },
+    "16486": {
+        "text": "A file named %1 already exists in this location.",
+        "context": "Dialog description. Informs user that uploading file already exists. Please leave %1 as it is, it'll be replaced by file name."
+    },
+    "16487": {
+        "text": "Select the file you want to keep:",
+        "context": "User is able to select file version if uploading file already exists in folder."
+    },
+    "16488": {
+        "text": "Upload and replace",
+        "context": "Header of clickable block in Dublicate items dialog. Allows user replace the file in the destination folder with the file he is uploading."
+    },
+    "16489": {
+        "text": "Replace the file in the destination folder with the file you are uploading:",
+        "context": "Clickable block description in dublicate items dialog. Allows user replace existing file in folder by new one, which he is uploading."
+    },
+    "16490": {
+        "text": "Don\u2019t upload",
+        "context": "Header of clickable block in dublicate items dialog. Allows user keep existing file in the destination folder and don't replace it by file he is uploading."
+    },
+    "16491": {
+        "text": "No files will be changed. You will keep the file below:",
+        "context": "Clickable block description in Dublicate items dialog. Allows user keep existing file in the destination folder and don't replace it by file he is uploading."
+    },
+    "16492": {
+        "text": "Keep both files",
+        "context": "Header of clickable block in Dublicate items dialog. Allows user keep existing file in the destination folder and file he is uploading."
+    },
+    "16493": {
+        "text": "The file you are uploading will be renamed as:",
+        "context": "Clickable block description in dublicate items dialog. Allows user keep existing file in the destination folder and file he is uploading."
+    },
+    "16494": {
+        "text": "Apply this option to the next [S]2[\/S] conflicts",
+        "context": "Checkbox label in Dublicate items dialog. User is able to apply selected action for current conflict to next conflicts. Please leave [S], [\/S] as it is."
+    },
+    "16495": {
+        "text": "Move and replace",
+        "context": "Header of clickable block in Dublicate items dialog. Allows user to replace the file in the destination folder with the file he is moving to this folder."
+    },
+    "16496": {
+        "text": "Copy and replace",
+        "context": "Header of clickable block in dublicate items dialog. Allows user replace the file in the destination folder with the file he is copying to this folder."
+    },
+    "16497": {
+        "text": "Replace the file in the destination folder with the file you are moving:",
+        "context": "Clickable block description in dublicate items dialog. Allows user to replace the file in the destination folder with the file he is moving to this folder."
+    },
+    "16498": {
+        "text": "Replace the file in the destination folder with the file you are copying:",
+        "context": "Clickable block description in dublicate items dialog. Allows user replace the file in the destination folder with the file he is copying to this folder."
+    },
+    "16499": {
+        "text": "Don\u2019t move",
+        "context": "Header of clickable block in dublicate items dialog. Allows user keep existing file in the destination folder and don't replace it by file he is moving."
+    },
+    "16500": {
+        "text": "Don\u2019t copy",
+        "context": "Header of clickable block in dublicate items dialog. Allows user keep existing file in the destination folder and don't replace it by file he is copying."
     }
 }

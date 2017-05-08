@@ -1177,19 +1177,19 @@ li.token-input-token-invite .input-close {
 
 
 /* Dublicate conflict dialog */
-.fm-dialog.dublicate-conflict {
+.fm-dialog.duplicate-conflict {
     width: 564px;
     margin: -313px 0 0 -282px;
 }
-.dublicate-conflict.body {
+.duplicate-conflict.body {
     padding: 20px 32px 9px 32px;
 }
-.dublicate-conflict.info-txt {
+.duplicate-conflict.info-txt {
     font-size: 14px;
     line-height: 24px;
     color: #666666;
 }
-.dublicate-conflict.info-txt strong {
+.duplicate-conflict.info-txt strong {
     font-family: 'source_sans_prosemibold';
     font-weight: normal;
     word-break: break-word;
@@ -1201,22 +1201,22 @@ li.token-input-token-invite .input-close {
     text-overflow: ellipsis;
     vertical-align: top;
 }
-.dublicate-conflict.info-txt.light-grey {
+.duplicate-conflict.info-txt.light-grey {
     color: #999999;
 }
-.dublicate-conflict.red-header {
+.duplicate-conflict.red-header {
     font-size: 17px;
     line-height: 26px;
     color: #EB4444;
 }
-.dublicate-conflict.action-block {
+.duplicate-conflict.action-block {
     margin: 12px 0 15px 0;
     cursor: pointer;
 }
-.dublicate-conflict.info-block {
+.duplicate-conflict.info-block {
     padding: 9px 0;
 }
-.dublicate-conflict.file-info {
+.duplicate-conflict.file-info {
     padding-left: 78px;
     font-size: 0;
     min-height: 61px;
@@ -1224,31 +1224,31 @@ li.token-input-token-invite .input-close {
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
-.dublicate-conflict.file-info .info-txt {
+.duplicate-conflict.file-info .info-txt {
     line-height: 20px;
 }
-.dublicate-conflict.file-name {
+.duplicate-conflict.file-name {
     white-space: nowrap;
     overflow: hidden;
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
 }
-.dublicate-conflict .export-icon {
+.duplicate-conflict .export-icon {
     margin: 2px 0 0 -4px;
     position: absolute;
 }
-.dublicate-conflict.file-date span, .dublicate-conflict.file-date i {
+.duplicate-conflict.file-date span, .duplicate-conflict.file-date i {
     display: inline-block;
     vertical-align: top;
     position: relative;
 }
-.dublicate-conflict.file-date i {
+.duplicate-conflict.file-date i {
     margin: -1px 1px 0 -4px;
 }
-.dublicate-conflict.file-date .time {
+.duplicate-conflict.file-date .time {
     padding-left: 22px;
 }
-.dublicate-conflict.file-date .time::before {
+.duplicate-conflict.file-date .time::before {
     content: '';
     display: block;
     position: absolute;
@@ -1258,13 +1258,13 @@ li.token-input-token-invite .input-close {
     height: 14px;
     background-color: rgba(0,0,0,0.1);
 }
-.multiple-files .dublicate-conflict.file-info {
+.multiple-files .duplicate-conflict.file-info {
     padding-top: 11px;
 }
-.multiple-files.dublicate-conflict .export-icon:nth-child(1) {
+.multiple-files.duplicate-conflict .export-icon:nth-child(1) {
     margin: 0 0 0 -4px;
 }
-.multiple-files.dublicate-conflict .export-icon:nth-child(2) {
+.multiple-files.duplicate-conflict .export-icon:nth-child(2) {
     margin: -8px 0 0 4px;
 }
 /* end of Dublicate conflict dialog */

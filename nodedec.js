@@ -234,6 +234,7 @@ function crypto_decryptnode(n) {
                 clearTimeout(vkey.t);
             }
             vkey.t = setTimeout(function() {
+                delete vkey.t;
                 console.debug("Can't extract a valid key for", Object.keys(vkey));
                 vkey = {};
             }, 4000);

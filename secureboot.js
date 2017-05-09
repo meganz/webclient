@@ -1701,6 +1701,23 @@ else if (!b_u) {
     jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
 
+    jsl.push({f:'js/fm/megadata.js', n: 'fm_megadata_js', j: 1});
+    jsl.push({f:'js/fm/megadata/account.js', n: 'fm_megadata_account_js', j: 1});
+    jsl.push({f:'js/fm/megadata/avatars.js', n: 'fm_megadata_avatars_js', j: 1});
+    jsl.push({f:'js/fm/megadata/contacts.js', n: 'fm_megadata_contacts_js', j: 1});
+    jsl.push({f:'js/fm/megadata/filters.js', n: 'fm_megadata_filters_js', j: 1});
+    jsl.push({f:'js/fm/megadata/inbox.js', n: 'fm_megadata_inbox_js', j: 1});
+    jsl.push({f:'js/fm/megadata/menus.js', n: 'fm_megadata_menus_js', j: 1});
+    jsl.push({f:'js/fm/megadata/nodes.js', n: 'fm_megadata_nodes_js', j: 1});
+    jsl.push({f:'js/fm/megadata/openfolder.js', n: 'fm_megadata_openfolder_js', j: 1});
+    jsl.push({f:'js/fm/megadata/render.js', n: 'fm_megadata_render_js', j: 1});
+    jsl.push({f:'js/fm/megadata/reset.js', n: 'fm_megadata_reset_js', j: 1});
+    jsl.push({f:'js/fm/megadata/sort.js', n: 'fm_megadata_sort_js', j: 1});
+    jsl.push({f:'js/fm/megadata/transfers.js', n: 'fm_megadata_transfers_js', j: 1});
+    jsl.push({f:'js/fm/megadata/tree.js', n: 'fm_megadata_tree_js', j: 1});
+    jsl.push({f:'js/fm/megadata/utils.js', n: 'fm_megadata_utils_js', j: 1});
+
+
     jsl.push({f:'js/mDB.js', n: 'mDB_js', j:1});
     jsl.push({f:'js/mouse.js', n: 'mouse_js', j:1});
     jsl.push({f:'js/datastructs.js', n: 'datastructs_js', j:1});

@@ -83,6 +83,10 @@ function accountUI() {
         if (tabSection) {
             tabSection = tabSection.replace(/[^\w-]/g, '');
 
+            if (tabSection === 'achievements' && !account.maf) {
+                tabSection = 'general';
+            }
+
             $('.account.tab-content.' + tabSection).removeClass('hidden');
             $('.account.tab-lnk[data-tab="' + tabSection + '"]').addClass('active');
         }
@@ -1102,11 +1106,15 @@ function accountUI() {
             mega.config.setn('dlThroughMEGAsync', dlThroughMEGAsync);
         });
 
+        var $cbTpp = $('#transfers-tooltip');// Checkbox transfers popup
         if (fmconfig.tpp || (typeof fmconfig.tpp === 'undefined')) {
-            var $cbTpp = $('#transfers-tooltip');// Checkbox transfers popup
 
             $cbTpp.switchClass('checkboxOff', 'checkboxOn').prop('checked', true);
             $cbTpp.parent().switchClass('checkboxOff', 'checkboxOn');
+        }
+        else {
+            $cbTpp.switchClass('checkboxOn', 'checkboxOff').prop('checked', false);
+            $cbTpp.parent().switchClass('checkboxOn', 'checkboxOff');
         }
 
         $('#transfers-tooltip').rebind('click.tpp_enable_disable', function() {
@@ -1799,12 +1807,12 @@ accountUI.fillCharts = function(account, onDashboard) {
     var $storageChart = $('.fm-account-blocks.storage');
     var $storageData = $('.account.data-block.storage-data');
     $storageData.removeClass('exceeded');
-    perc = Math.round(account.space_used / account.space * 100);
+    perc = Math.floor(account.space_used / account.space * 100);
     perc_c = perc;
     if (perc_c > 100) {
         perc_c = 100;
     }
-    if (perc_c > 99) {
+    if (perc_c === 100) {
         s_exceeded = 1;
         $storageChart.addClass('exceeded');
         $storageData.addClass('exceeded');

@@ -93,11 +93,8 @@
 .chat-contacts-list-inner .contacts-info.body.right-chat-contact-card {
     min-height: 49px;
 }
-.chat-contacts-list-inner {
-    padding: 0 0 0 22px;
-}
 .chat-right-pad .contacts-info.body {
-    padding: 8px 0;
+    padding: 8px 0 8px 22px;
 }
 .contacts-info.body {
     padding: 6px 0;

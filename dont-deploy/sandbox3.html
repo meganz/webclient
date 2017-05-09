@@ -10,7 +10,7 @@
          * development/debugging/internal demo purposes and it should
          * not be deployed to production.
          *
-         * The devboot.html also setups the localStorage so that:
+         * This also setups the localStorage so that:
          *
          * 0) Clear the localStorage
          *
@@ -24,29 +24,22 @@
          *    running in localhost/meganz-webclient/ or customVhost/ +
          *    it will work with http OR https.
          *
-         * 3) Will enable the megaChat (<-- major thing, may change a
-         *    lot of stuff)
-         *
-         * 4) Will force the secureboot to load the actual .js files
+         * 3) Will force the secureboot to load the actual .js files
          *    instead of just pushing ALL javascript files into a single
          *    blog: (this was really helpful for debugging the JS code
          *    using the Chrome debugger).
-         *
-         * 5) Will enable stopOnAssertFail, which in case of assertion
-         *    fail (mainly in the chat.js code) will run a debugger;
-         *    (something pretty handy during development)
          */
-
         var devhost = window.location.host;
         var pathSuffix = window.location.pathname;
-        pathSuffix = pathSuffix.split("/").slice(0, -2).join("/");
 
+        pathSuffix = pathSuffix.split('/').slice(0, -2).join('/');
+
+        // Clear old localStorage data and settings
         localStorage.clear();
 
         // Add ?apipath=staging to the end of the URL if you want to
         // use the staging API, apipath=prod for the live API servers,
         // or leave blank for Sandbox 3.
-
         if (window.location.search.indexOf('apipath=staging') > -1) {
             localStorage.apipath = 'https://staging.api.mega.co.nz/';
         }
@@ -60,15 +53,36 @@
             localStorage.apipath = 'https://api-sandbox3.developers.mega.co.nz/';
         }
 
+        // Force viewing of the mobile site if requested
+        if (window.location.search.indexOf('mobile=1') > -1) {
+            localStorage.testMobileSite = '1';
+        }
+
+        // Some flags for testing the Open in App feature on mobile
+        if (window.location.search.indexOf('testOpenInApp=ios') > -1) {
+            localStorage.testOpenInApp = 'ios';
+        }
+        else if (window.location.search.indexOf('testOpenInApp=android') > -1) {
+            localStorage.testOpenInApp = 'android';
+        }
+        else if (window.location.search.indexOf('testOpenInApp=winphone') > -1) {
+            localStorage.testOpenInApp = 'winphone';
+        }
+
+        // Use old URL hash logic for everything e.g. mega.nz/#blog instead of mega.nz/blog
         if (window.location.search.indexOf('hashLogic') > -1) {
             localStorage.hashLogic = 1;
         }
-        localStorage.staticpath = window.location.protocol + "//" + devhost + pathSuffix + "/";
 
         // Disable the cryptographic hash verification logic.
         localStorage.dd = '1';
 
-        // localStorage.contextmenu = '1';
+        // Set the static path
+        localStorage.staticpath = window.location.protocol + "//" + devhost + pathSuffix + "/";
+
+        // Turn on full debugging.
+        localStorage.d = '1'; // Using console.*
+        localStorage.minLogLevel = '-1'; // Using MegaLogger, '0' = MegaLogger.LEVELS.DEBUG.
 
         // Load script files separately for easier debugging
         if (window.location.search.indexOf('jj=') > -1) {
@@ -78,23 +92,19 @@
             localStorage.jjnocache = '1';
         }
 
+        // localStorage.contextmenu = '1';
         // localStorage.stopOnAssertFail = '1';
-
-        // Turn on full debugging.
-        localStorage.d = '1'; // Using console.*
-        localStorage.minLogLevel = '0'; // Using MegaLogger, '0' = MegaLogger.LEVELS.DEBUG.
+        // localStorage.allowBreakpointsOnReload = '1';
 
         // Chat stuff.
         // localStorage.dxmpp = '1';
         // localStorage.chatDisabled = '1';
         // localStorage.testChatDisabled = '1';
 
+        // Does this still work?
         localStorage.allowBreakpointsOnReload = '1';
 
-        // Retain current hash on redirect so you can give a test link
-        // to the direct page e.g.
-        // https://beta.developers.mega.co.nz/updated-credentials-dialog/dont-deploy/sandbox3.html?apipath=prod#pro
-
+        // Retain current hash on redirect so you can give a test link to the direct page
         window.location = '../' + location.hash;
     </script>
 </head>

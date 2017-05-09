@@ -2298,7 +2298,12 @@ function api_getsid2(res, ctx) {
 
         // Check for incomplete registration
         else if (res === EINCOMPLETE) {
-            msgDialog('warningb', l[882], l[9082]); // This account has not completed the registration process yet...
+            if (is_mobile) {
+                mobile.messageOverlay.show(l[882], l[9082]);
+            }
+            else {
+                msgDialog('warningb', l[882], l[9082]); // This account has not completed the registration process...
+            }
         }
     }
     else if (typeof res === 'object') {

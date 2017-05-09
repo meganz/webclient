@@ -137,6 +137,9 @@
     -webkit-animation: rotate 0.8s infinite linear;
     animation: rotate 0.8s infinite linear;
 }
+.mobile .loading-info li::after {
+    display: none;
+}
 .loading-info li.loaded::after {
    background-position: -29px -501px;
     -webkit-animation: none;

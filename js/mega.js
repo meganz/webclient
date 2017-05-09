@@ -43,12 +43,12 @@ if (typeof ie9 === 'undefined')
 if (typeof loadingDialog === 'undefined') {
     var loadingDialog = Object.create(null);
     loadingDialog.show = function() {
-        $('.dark-overlay').show();
+        $('.dark-overlay').removeClass('hidden');
         $('.loading-spinner:not(.manual-management)').removeClass('hidden').addClass('active');
         this.active = true;
     };
     loadingDialog.hide = function() {
-        $('.dark-overlay').hide();
+        $('.dark-overlay').addClass('hidden');
         $('.loading-spinner:not(.manual-management)').addClass('hidden').removeClass('active');
         this.active = false;
     };
@@ -449,15 +449,23 @@ function MegaData()
 
     this.getSortStatus = function(u)
     {
-        var status = megaChatIsReady && megaChat.karere.getPresence(megaChat.getJidFromNodeId(u));
-        if (status == 'chat')
+        var status = megaChatIsReady && megaChat.getPresence(u);
+
+        // To implement some kind of ordering we need to translate the actual UserPresence.PRESENCE.* state to an
+        // integer that would be then used for sorting (e.g. ONLINE first = return 1, OFFLINE last, return 4)
+        // PS: Because of chat is being loaded too late, we can't use the User.PRESENCE.* reference.
+        if (status === 3) {
+            // UserPresence.PRESENCE.ONLINE
             return 1;
-        else if (status == 'dnd')
+        } else if (status === 4) {
+            // UserPresence.PRESENCE.DND
             return 2;
-        else if (status == 'away')
+        } else if (status === 2) {
+            // UserPresence.PRESENCE.AWAY
             return 3;
-        else
+        } else {
             return 4;
+        }
     };
 
     this.getSortByStatusFn = function(d) {
@@ -1102,20 +1110,22 @@ function MegaData()
                     hideOPC = (hideOPC !== '') ? ' class="' + hideOPC + '"' : '';
                     html = '<tr id="opc_' + htmlentities(opc[i].p) + '"' + hideOPC + '>' +
                         '<td>' +
-                            '<div class="left email">' +
-                                '<div class="nw-contact-avatar"></div>' +
-                                '<div class="fm-chat-user-info">' +
-                                    '<div class="contact-email">' + htmlentities(opc[i].m) + '</div>' +
+                                '<div class="left email">' +
+                                    '<div class="nw-contact-avatar"></div>' +
+                                    '<div class="fm-chat-user-info">' +
+                                        '<div class="contact-email">' + htmlentities(opc[i].m) + '</div>' +
+                                    '</div>' +
                                 '</div>' +
-                            '</div>' +
-                            '<div class="default-white-button grey-txt small ' +
-                                'contact-request-button right cancel ' + hideCancel + '">' +
-                                    '<span>' + escapeHTML(l[5930]) + '</span>' +
-                            '</div>' +
-                            '<div class="default-white-button grey-txt small ' +
-                                'contact-request-button right reinvite ' + hideReinvite + '">' +
-                                    '<span>' + escapeHTML(l[5861]) + '</span>' +
-                            '</div>' +
+                            '</td>' +
+                            '<td>' +
+                                '<div class="default-white-button grey-txt small ' +
+                                    'contact-request-button right cancel ' + hideCancel + '">' +
+                                        '<span>' + escapeHTML(l[5930]) + '</span>' +
+                                '</div>' +
+                                '<div class="default-white-button grey-txt small ' +
+                                    'contact-request-button right reinvite ' + hideReinvite + '">' +
+                                        '<span>' + escapeHTML(l[5861]) + '</span>' +
+                                '</div>' +
                         '</td></tr>';
 
                     $(t).append(html);
@@ -1142,6 +1152,23 @@ function MegaData()
      * @param {Boolean} aUpdate  Whether we're updating the list
      */
     this.renderMain = function(aUpdate) {
+
+        // If mobile render an update to the cloud
+        if (is_mobile) {
+
+            // If flag is set, just update to show new files
+            if (aUpdate) {
+                mobile.cloud.renderUpdate();
+            }
+            else {
+                // Otherwise do a full re-render
+                mobile.cloud.renderLayout();
+            }
+
+            // Don't execute any regular webclient code
+            return true;
+        }
+
         var numRenderedNodes = -1;
 
         if (d) {
@@ -1559,12 +1586,12 @@ function MegaData()
             // Error reading shared folder link! (Eg, server gave a -11 (EACCESS) error)
             // Force cleaning the current cloud contents and showing an empty msg
             if (!is_mobile) {
-                    M.renderMain();
-                }
-                else {
-                    // Trigger rendering of mobile file manager
-                    mobilefm.renderLayout();
-                }
+                M.renderMain();
+            }
+            else {
+                // Trigger rendering of mobile file manager
+                mobile.cloud.renderLayout();
+            }
         }
         else if (id && (id.substr(0, 7) !== 'account')
                 && (id.substr(0, 9) !== 'dashboard')
@@ -1640,7 +1667,7 @@ function MegaData()
                 }
                 else {
                     // Trigger rendering of mobile file manager
-                    mobilefm.renderLayout();
+                    mobile.cloud.renderLayout();
                 }
 
             if (fminitialized && !is_mobile) {
@@ -1735,6 +1762,11 @@ function MegaData()
     // Contacts left panel handling
     this.contacts = function() {
 
+        // Contacts rendering not used on mobile
+        if (is_mobile) {
+            return true;
+        }
+
         var i;
         var activeContacts = this.getActiveContacts()
             .map(function(handle) {
@@ -1818,11 +1850,6 @@ function MegaData()
 
                     $('.dropdown-item', m).removeClass("disabled");
 
-                    if ($userDiv.is(".offline")) {
-                        $('.dropdown-item.startaudio-item, .dropdown-item.startvideo-item', m)
-                            .addClass("disabled");
-                    }
-
                     $this.addClass('active');
                     var y = $this.offset().top + 21;
                     m
@@ -1858,7 +1885,7 @@ function MegaData()
                 var $triggeredBy = $this.parent().data("triggeredBy");
                 var $userDiv = $triggeredBy.parent().parent();
 
-                if (!$this.is(".disabled") && !$userDiv.is(".offline")) {
+                if (!$this.is(".disabled")) {
                     var user_handle = $userDiv.attr('id').replace("contact_", "");
 
                     loadSubPage("fm/chat/" + user_handle);
@@ -1874,7 +1901,7 @@ function MegaData()
                 var $triggeredBy = $this.parent().data("triggeredBy");
                 var $userDiv = $triggeredBy.parent().parent();
 
-                if (!$this.is(".disabled") && !$userDiv.is(".offline")) {
+                if (!$this.is(".disabled")) {
                     var user_handle = $userDiv.attr('id').replace("contact_", "");
 
                     loadSubPage("fm/chat/" + user_handle);
@@ -1989,7 +2016,7 @@ function MegaData()
     var _buildtree = function(n, dialog, stype) {*/
 
         var folders = [],
-            _ts_l = treesearch && treesearch.toLowerCase(),
+            _ts_l = (typeof treesearch !== 'undefined' && treesearch) ? treesearch.toLowerCase() : undefined,
             _li = 'treeli_',
             _sub = 'treesub_',
             _a = 'treea_',
@@ -2095,7 +2122,7 @@ function MegaData()
             }
 
             var sortFn = this.getSortByNameFn();
-            var sortDirection = $.sortTreePanel[prefix].dir;
+            var sortDirection = (is_mobile) ? 1 : $.sortTreePanel[prefix].dir;
             folders.sort(
                 function(a, b) {
                     return sortFn(a, b, sortDirection);
@@ -2220,7 +2247,7 @@ function MegaData()
                     _buildtree.call(this, folders[idx], dialog, stype);
                 }
 
-                if (fminitialized) {
+                if (fminitialized && !is_mobile) {
                     var currNode = M.d[curItemHandle];
 
                     if ((currNode && currNode.shares) || M.ps[curItemHandle]) {
@@ -2670,7 +2697,7 @@ function MegaData()
         if (this.u[n.h] && this.u[n.h] !== n) {
             for (var k in n) {
                 // merge changes from n->M.u[n.h]
-                if (n.hasOwnProperty(k) && k !== 'name') {
+                if ((n.hasOwnProperty(k) || MEGA_USER_STRUCT.hasOwnProperty(k)) && k !== 'name') {
                     this.u[n.h][k] = n[k];
                 }
             }
@@ -2680,8 +2707,14 @@ function MegaData()
         this.d[n.h] = n;
 
         if (fminitialized) {
+
             // Handle Inbox/RubbishBin UI changes
-            delay('fmtopUI', fmtopUI);
+            if (!is_mobile) {
+                delay('fmtopUI', fmtopUI);
+            }
+            else {
+                mobile.cloud.countAndUpdateSubFolderTotals();
+            }
 
             newnodes.push(n);
         }
@@ -2689,18 +2722,14 @@ function MegaData()
         // $(window).trigger("megaNodeAdded", [n]);
     };
 
-    if (is_mobile) {
-        this.addNode = function() {
-            return false;
-        };
-    }
-
     var delInShareQueue = Object.create(null);
     this.delNode = function(h, ignoreDB) {
         function ds(h) {
+
             if (fminitialized) {
                 removeUInode(h);
             }
+
             if (M.c[h] && h.length < 11) {
                 for (var h2 in M.c[h]) {
                     ds(h2);
@@ -3253,7 +3282,9 @@ function MegaData()
 
             if (this.u[userId]) {
                 for (var key in u) {
-                    if (this.u[userId].hasOwnProperty(key) && key !== 'name')  {
+                    if (
+                        (this.u[userId].hasOwnProperty(key) || MEGA_USER_STRUCT.hasOwnProperty(key)) && key !== 'name'
+                    )  {
                         this.u[userId][key] = u[key];
                     }
                     else if (d) {
@@ -3820,7 +3851,7 @@ function MegaData()
                         ctx.account.bw = Math.round(res.mxfer);
                         ctx.account.servbw_used = Math.round(res.csxfer);
                         ctx.account.downbw_used = Math.round(res.caxfer);
-                        ctx.account.servbw_limit = res.srvratio;
+                        ctx.account.servbw_limit = Math.round(res.srvratio);
 
                         // Prepare storage footprint stats.
                         var cstrgn = ctx.account.cstrgn = Object(ctx.account.cstrgn);
@@ -3890,7 +3921,7 @@ function MegaData()
                         var links = stats.links;
                         Object.keys(exp)
                             .filter(function(h) {
-                                return !M.d[h].t;
+                                return M.d[h] && !M.d[h].t;
                             })
                             .forEach(function(h) {
                                 links.files++;
@@ -3995,14 +4026,21 @@ function MegaData()
 
                     ctx.account.lastupdate = new Date().getTime();
 
-                    if (!ctx.account.bw)
-                        ctx.account.bw = 1024 * 1024 * 1024 * 10;
-                    if (!ctx.account.servbw_used)
+                    if (!ctx.account.bw) {
+                        ctx.account.bw = 1024 * 1024 * 1024 * 1024 * 1024 * 10;
+                    }
+                    if (!ctx.account.servbw_used) {
                         ctx.account.servbw_used = 0;
-                    if (!ctx.account.downbw_used)
+                    }
+                    if (!ctx.account.downbw_used) {
                         ctx.account.downbw_used = 0;
+                    }
 
                     M.account = ctx.account;
+
+                    if (res.ut) {
+                        localStorage.apiut = res.ut;
+                    }
 
                     // transfers quota
                     var tfsq = {max: account.bw, used: account.downbw_used};
@@ -4733,7 +4771,7 @@ function MegaData()
             if (updnode) {
                 M.nodeUpdated(this.d[h]);
 
-                if (fminitialized) {
+                if (fminitialized && !is_mobile) {
                     sharedUInode(h);
                 }
             }
@@ -5125,7 +5163,7 @@ function MegaData()
                             t: node.t,
                             h: node.h,
                             p: node.p,
-                            n: base64urlencode(node.name),
+                            n: base64urlencode(fm_safename(node.name))
                         };
                         if (!node.t) {
                             item.s = node.s;
@@ -5226,7 +5264,7 @@ function MegaData()
         if (z) {
             z = ++dlmanager.dlZipID;
             if (M.d[n[0]] && M.d[n[0]].t && M.d[n[0]].name) {
-                zipname = M.d[n[0]].name + '.zip';
+                zipname = fm_safename(M.d[n[0]].name) + '.zip';
             }
             else {
                 zipname = (zipname || ('Archive-' + Math.random().toString(16).slice(-4))) + '.zip';
@@ -5477,7 +5515,7 @@ function MegaData()
                     $('.widget-block').addClass('active');
                 }
                 else {
-                    mega.ui.tpp.setTransfered(id, bl, 'dl');
+                    mega.ui.tpp.setTransfered(id, bl, 'dl', dl_queue[dl_queue_num]);
                     mega.ui.tpp.updateBlock('dl');
                 }
                 delay('percent_megatitle', percent_megatitle, 50);
@@ -5949,6 +5987,10 @@ function MegaData()
         for (var i in u) {
             f = u[i];
             try {
+                Object.defineProperty(f, 'name', {value: fm_safename(f.name)});
+            }
+            catch (e) {}
+            try {
                 // this could throw NS_ERROR_FILE_NOT_FOUND
                 filesize = f.size;
             }
@@ -6059,7 +6101,7 @@ function MegaData()
                 $tr.find('.speed').addClass('unknown').text('');
             }
 
-            mega.ui.tpp.setTransfered(id, bl, 'ul');
+            mega.ui.tpp.setTransfered(id, bl, 'ul', ul);
             mega.ui.tpp.updateBlock('ul');
             delay('percent_megatitle', percent_megatitle, 50);
 
@@ -6416,6 +6458,7 @@ function fm_safename(name)
     if (name.length > 250)
         name = name.substr(0, 250) + '.' + name.split('.').pop();
     name = name.replace(/\s+/g, ' ').trim();
+    name = name.replace(/\u202E|\u200E|\u200F/g, '');
     var end = name.lastIndexOf('.');
     end = ~end && end || name.length;
     if (/^(?:CON|PRN|AUX|NUL|COM\d|LPT\d)$/i.test(name.substr(0, end)))
@@ -6966,7 +7009,7 @@ function execsc() {
                     // is this a full share delete?
                     if (a.r === undefined) {
                         // fill DDL with removed contact
-                        if (a.u && M.u[a.u] && M.u[a.u].m) {
+                        if (a.u && M.u[a.u] && M.u[a.u].m && !is_mobile) {
                             var email = M.u[a.u].m;
                             var contactName = M.getNameByHandle(a.u);
 
@@ -6988,7 +7031,7 @@ function execsc() {
                         processPS([a]);
                     }
 
-                    if (fminitialized) {
+                    if (fminitialized && !is_mobile) {
                         // a full share contains .h param
                         sharedUInode(a.h);
                     }
@@ -7236,7 +7279,9 @@ function execsc() {
                         }
 
                         if (fminitialized) {
-                            sharedUInode(a.n);
+                            if (!is_mobile) {
+                                sharedUInode(a.n);
+                            }
                         }
                         scsharesuiupd = true;
                     }
@@ -7548,8 +7593,8 @@ function execsc() {
                         else if (Array.isArray(loadfm.chatmcf)) {
                             loadfm.chatmcf.push(a);
                         }
-                        else if (d) {
-                            console.error('FIXME: unable to parse mcc packet');
+                        else {
+                            srvlog('@lp unable to parse mcc packet');
                         }
                     }
                     if (fmdb) {
@@ -8245,7 +8290,11 @@ function dbfetchfm() {
                             promise = fmdb.get(t);
                             promise.always(function(r) {
                                 if (tables[t] === 1) {
-                                    loadfm.chatmcf = r;
+                                    if (r.length > 0) {
+                                            // only set chatmcf is there is anything returned
+                                            // if not, this would force the chat to do a 'mcf' call
+                                            loadfm.chatmcf = r;
+                                        }
                                 }
                                 else {
                                     tables[t](r, true);
@@ -8783,16 +8832,19 @@ function processIPC(ipc, ignoreDB) {
                 }
 
                 // Update token.input plugin
-                removeFromMultiInputDDL('.share-multiple-input', { id: ipc[i].m, name: ipc[i].m });
+                if (!is_mobile) {
+                    removeFromMultiInputDDL('.share-multiple-input', { id: ipc[i].m, name: ipc[i].m });
+                }
             }
             else {
+                if (!is_mobile) {
+                    // Don't prevent contact creation when there's already IPC available
+                    // When user add contact who already sent IPC, server will automatically create full contact
+                    var contactName = M.getNameByHandle(ipc[i].p);
 
-                var contactName = M.getNameByHandle(ipc[i].p);
-
-                // Update token.input plugin
-                addToMultiInputDropDownList('.share-multiple-input', [{ id: ipc[i].m, name: contactName }]);
-                // Don't prevent contact creation when there's already IPC available
-                // When user add contact who already sent IPC, server will automatically create full contact
+                    // Update token.input plugin
+                    addToMultiInputDropDownList('.share-multiple-input', [{ id: ipc[i].m, name: contactName }]);
+                }
             }
         }
     }
@@ -8813,8 +8865,10 @@ function processOPC(opc, ignoreDB) {
             M.delOPC(opc[i].p);
 
             // Update tokenInput plugin
-            removeFromMultiInputDDL('.share-multiple-input', { id: opc[i].m, name: opc[i].m });
-            removeFromMultiInputDDL('.add-contact-multiple-input', { id: opc[i].m, name: opc[i].m });
+            if (!is_mobile) {
+                removeFromMultiInputDDL('.share-multiple-input', { id: opc[i].m, name: opc[i].m });
+                removeFromMultiInputDDL('.add-contact-multiple-input', { id: opc[i].m, name: opc[i].m });
+            }
         }
         else {
             // Search through M.opc to find duplicated e-mail with .dts
@@ -8836,8 +8890,10 @@ function processOPC(opc, ignoreDB) {
             var contactName = M.getNameByHandle(opc[i].p);
 
             // Update tokenInput plugin
-            addToMultiInputDropDownList('.share-multiple-input', [{ id: opc[i].m, name: contactName }]);
-            addToMultiInputDropDownList('.add-contact-multiple-input', [{ id: opc[i].m, name: contactName }]);
+            if (!is_mobile) {
+                addToMultiInputDropDownList('.share-multiple-input', [{ id: opc[i].m, name: contactName }]);
+                addToMultiInputDropDownList('.add-contact-multiple-input', [{ id: opc[i].m, name: contactName }]);
+            }
         }
     }
 }
@@ -8849,6 +8905,7 @@ function processOPC(opc, ignoreDB) {
  * @param {Object} publicHandles The Public Handles action packet i.e. a: 'ph'.
  */
 function processPH(publicHandles) {
+
     var nodeId;
     var publicHandleId;
     var timeNow = unixtime();
@@ -8875,7 +8932,7 @@ function processPH(publicHandles) {
         if (value.d) {
             M.delNodeShare(nodeId, 'EXP');
 
-            if (UiExportLink) {
+            if (UiExportLink && !is_mobile) {
                 UiExportLink.removeExportLinkIcon(nodeId);
             }
         }
@@ -8895,13 +8952,18 @@ function processPH(publicHandles) {
 
             M.nodeShare(share.h, share);
 
-            if (UiExportLink) {
+            if (UiExportLink && !is_mobile) {
                 UiExportLink.addExportLinkIcon(nodeId);
             }
         }
 
         if (UiExportLink && (value.down !== undefined)) {
             UiExportLink.updateTakenDownItem(nodeId, value.down);
+        }
+
+        // Update the public link icon for mobile
+        if (is_mobile) {
+            mobile.cloud.updateLinkStatus(nodeId);
         }
     }
 }
@@ -8952,7 +9014,7 @@ function processPS(pendingShares, ignoreDB) {
                     });
                 }
 
-                if (M.opc && M.opc[ps.p]) {
+                if (M.opc && M.opc[ps.p] && !is_mobile) {
                     // Update tokenInput plugin
                     addToMultiInputDropDownList('.share-multiple-input', [{
                             id: M.opc[pendingContactId].m,
@@ -9035,16 +9097,18 @@ function processUPCO(ap) {
                     }
                 }
 
-                // Update tokenInput plugin
-                removeFromMultiInputDDL('.share-multiple-input', { id: ap[i].m, name: ap[i].m });
-                removeFromMultiInputDDL('.add-contact-multiple-input', { id: ap[i].m, name: ap[i].m });
-                $('#opc_' + psid).remove();
+                if (!is_mobile) {
+                    // Update tokenInput plugin
+                    removeFromMultiInputDDL('.share-multiple-input', { id: ap[i].m, name: ap[i].m });
+                    removeFromMultiInputDDL('.add-contact-multiple-input', { id: ap[i].m, name: ap[i].m });
+                    $('#opc_' + psid).remove();
 
-                // Update sent contact request tab, set empty message with Add contact... button
-                if ((Object.keys(M.opc).length === 0) && (M.currentdirid === 'opc')) {
-                    $('.sent-requests-grid').addClass('hidden');
-                    $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[6196]); // No requests pending at this time
-                    $('.fm-empty-contacts').removeClass('hidden');
+                    // Update sent contact request tab, set empty message with Add contact... button
+                    if ((Object.keys(M.opc).length === 0) && (M.currentdirid === 'opc')) {
+                        $('.sent-requests-grid').addClass('hidden');
+                        $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[6196]); // No requests pending at this time
+                        $('.fm-empty-contacts').removeClass('hidden');
+                    }
                 }
             }
         }
@@ -9063,7 +9127,7 @@ function processUPCO(ap) {
  */
 function process_u(u, ignoreDB) {
     for (var i in u) {
-        if (u.hasOwnProperty(i)) {
+        if (u.hasOwnProperty(i) || MEGA_USER_STRUCT.hasOwnProperty(i)) {
             if (u[i].c === 1) {
                 u[i].h = u[i].u;
                 u[i].t = 1;
@@ -9073,15 +9137,19 @@ function process_u(u, ignoreDB) {
                 var contactName = M.getNameByHandle(u[i].h);
 
                 // Update token.input plugin
-                addToMultiInputDropDownList('.share-multiple-input', [{ id: u[i].m, name: contactName }]);
-                addToMultiInputDropDownList('.add-contact-multiple-input', [{ id: u[i].m, name: contactName }]);
+                if (!is_mobile) {
+                    addToMultiInputDropDownList('.share-multiple-input', [{ id: u[i].m, name: contactName }]);
+                    addToMultiInputDropDownList('.add-contact-multiple-input', [{ id: u[i].m, name: contactName }]);
+                }
             }
             else if (M.d[u[i].u]) {
                 M.delNode(u[i].u, ignoreDB);
 
                 // Update token.input plugin
-                removeFromMultiInputDDL('.share-multiple-input', { id: u[i].m, name: u[i].m });
-                removeFromMultiInputDDL('.add-contact-multiple-input', { id: u[i].m, name: u[i].m });
+                if (!is_mobile) {
+                    removeFromMultiInputDDL('.share-multiple-input', { id: u[i].m, name: u[i].m });
+                    removeFromMultiInputDDL('.add-contact-multiple-input', { id: u[i].m, name: u[i].m });
+                }
             }
 
             // Update user attributes M.u
@@ -9156,13 +9224,24 @@ function folderreqerr()
     loadfm.loaded = false;
     loadfm.loading = false;
 
-    msgDialog('warninga', l[1043], l[1044] + '<ul><li>' + l[1045] + '</li><li>' + l[247] + '</li><li>' + l[1046] + '</li>', false, function()
-    {
-        loadSubPage('login'); // if the user is logged-in, he'll be redirected to the cloud
+    // If desktop site show "Folder link unavailable" dialog
+    if (!is_mobile) {
+        var title = l[1043];
+        var message = l[1044] + '<ul><li>' + l[1045] + '</li><li>' + l[247] + '</li><li>' + l[1046] + '</li>';
 
-        // FIXME: no location.reload() should be needed..
-        location.reload();
-    });
+        msgDialog('warninga', title, message, false, function() {
+
+            // If the user is logged-in, he'll be redirected to the cloud
+            loadSubPage('login');
+
+            // FIXME: no location.reload() should be needed..
+            location.reload();
+        });
+    }
+    else {
+        // Show file/folder not found overlay
+        mobile.notFoundOverlay.show();
+    }
 }
 
 function init_chat() {
@@ -9278,10 +9357,18 @@ function loadfm_callback(res) {
             loadfm.loaded = false;
             loadfm.loading = false;
 
-            return mKeyDialog(pfid, true, true)
-                .fail(function() {
-                    loadSubPage('start');
-                });
+            // If on mobile, load the decryption key overlay
+            if (is_mobile) {
+                mobile.decryptionKeyOverlay.show(pfid, true, true);
+                return new MegaPromise();
+            }
+            else {
+                // Otherwise load the regular webclient decryption key dialog
+                return mKeyDialog(pfid, true, true)
+                    .fail(function() {
+                        loadSubPage('start');
+                    });
+            }
         }
 
         // If we have shares, and if a share is for this node, record it on the nodes share list
@@ -9399,17 +9486,19 @@ function loadfm_done(mDBload) {
         }
 
         // -0x800e0fff indicates a call to loadfm() when it was already loaded
-        if (!is_mobile && mDBload !== -0x800e0fff) {
-            Soon(function _initialNotify() {
-                // After the first SC request all subsequent requests can generate notifications
-                notify.initialLoadComplete = true;
+        if (mDBload !== -0x800e0fff) {
+            if (!is_mobile) {
+                Soon(function _initialNotify() {
+                    // After the first SC request all subsequent requests can generate notifications
+                    notify.initialLoadComplete = true;
 
-                // If this was called from the initial fm load via gettree or db load, we should request the
-                // latest notifications. These must be done after the first getSC call.
-                if (!folderlink) {
-                    notify.getInitialNotifications();
-                }
-            });
+                    // If this was called from the initial fm load via gettree or db load, we should request the
+                    // latest notifications. These must be done after the first getSC call.
+                    if (!folderlink) {
+                        notify.getInitialNotifications();
+                    }
+                });
+            }
 
             if (mBroadcaster.crossTab.master && !mega.loadReport.sent) {
                 mega.loadReport.sent = true;
@@ -9573,8 +9662,6 @@ function fm_requestfolderid(h, name, ulparams)
 }
 
 
-// jscs:disable
-// jshint ignore:start
 var thumbnails = Object.create(null);
 var th_requested = Object.create(null);
 var fa_duplicates = Object.create(null);
@@ -9697,318 +9784,6 @@ function fm_thumbnail_render(n) {
         }
     }
 }
-// jscs:enable
-// jshint ignore:end
-
-/**
- * Code to trigger the mobile file manager download overlay and related behaviour
- */
-var mobileDownload = {
-
-    /** Supported max file size of 100 MB */
-    maxFileSize: 100 * (1024 * 1024),
-
-    /** Supported file types for download on mobile */
-    supportedFileTypes: {
-        docx: 'word',
-        jpeg: 'image',
-        jpg: 'image',
-        mp3: 'audio',
-        mp4: 'video',
-        pdf: 'pdf',
-        png: 'image',
-        xlsx: 'word'
-    },
-
-    /** Download start time in milliseconds */
-    startTime: null,
-
-    /** jQuery selector for the download overlay */
-    $overlay: null,
-
-    /**
-     * Initialise the overlay
-     * @param {String} nodeHandle A public or regular node handle
-     */
-    showOverlay: function(nodeHandle) {
-
-        // Store the selector as it is re-used
-        this.$overlay = $('#mobile-ui-main');
-
-        // Get initial overlay details
-        var node = M.d[nodeHandle];
-        var fileName = node.name;
-        var fileSizeBytes = node.s;
-        var fileSize = numOfBytes(fileSizeBytes);
-        var fileSizeFormatted = fileSize.size + ' ' + fileSize.unit;
-        var fileIconName = fileIcon(node);
-        var fileIconPath = staticpath + 'images/mobile/extensions/' + fileIconName + '.png';
-
-        // Set file name, size and image
-        this.$overlay.find('.filename').text(fileName);
-        this.$overlay.find('.filesize').text(fileSizeFormatted);
-        this.$overlay.find('.filetype-img').attr('src', fileIconPath);
-
-        // Initialise overlay buttons
-        this.initBrowserFileDownloadButton(nodeHandle);
-        this.initAppFileDownloadButton(nodeHandle);
-        this.initOverlayCloseButton();
-
-        // Change depending on platform and file size/type
-        this.setMobileAppInfo();
-        this.adjustMaxFileSize();
-        this.checkSupportedFile(node);
-
-        // Disable scrolling of the file manager in the background to fix a bug on iOS Safari
-        $('.mobile.fm-block').addClass('disable-scroll');
-
-        // Show the overlay
-        this.$overlay.removeClass('hidden').addClass('overlay');
-    },
-
-    /**
-     * Initialise the Open in Browser button on the file download overlay
-     * @param {String} nodeHandle The node handle for this file
-     */
-    initBrowserFileDownloadButton: function(nodeHandle) {
-
-        this.$overlay.find('.first.dl-browser').off('tap').on('tap', function() {
-
-            // Start the download
-            mobileDownload.startFileDownload(nodeHandle);
-
-            // Prevent default anchor link behaviour
-            return false;
-        });
-    },
-
-    /**
-     * Initialise the Open in Mega App button on the file download overlay
-     * @param {String} nodeHandle The node handle for this file
-     */
-    initAppFileDownloadButton: function(nodeHandle) {
-
-        this.$overlay.find('.second.dl-megaapp').off('tap').on('tap', function() {
-
-            // Start the download
-            mega.utils.redirectToApp($(this));  // ToDo: make the app start the download by node handle directly
-
-            // Prevent default anchor link behaviour
-            return false;
-        });
-    },
-
-    /**
-     * Initialises the close button on the overlay with download button options and also the download progress overlay
-     */
-    initOverlayCloseButton: function() {
-
-        var $closeButton = this.$overlay.find('.fm-dialog-close');
-
-        // Show close button for folder links
-        $closeButton.removeClass('hidden');
-
-        // Add tap handler
-        $closeButton.off('tap').on('tap', function() {
-
-            // Hide overlay with download button options
-            mobileDownload.$overlay.addClass('hidden');
-
-            // Hide downloading progress overlay
-            $('body').removeClass('downloading');
-
-            // Re-show the file manager and re-enable scrolling
-            $('.mobile.fm-block').removeClass('hidden disable-scroll');
-        });
-    },
-
-    /**
-     * Start the file download
-     * @param {String} nodeHandle The node handle for this file
-     */
-    startFileDownload: function(nodeHandle) {
-
-        // Show downloading overlay
-        $('body').addClass('downloading');
-
-        // Reset state from past downloads
-        this.$overlay.find('.download-progress').removeClass('complete');
-        this.$overlay.find('.download-percents').text('');
-        this.$overlay.find('.download-speed').text('');
-        this.$overlay.find('.download-progress span').text(l[1624] + '...');  // Downloading...
-        this.$overlay.find('.download-progress .bar').width('0%');
-
-        // Change message to 'Did you know that you can download the entire folder at once...'
-        this.$overlay.find('.file-manager-download-message').removeClass('hidden');
-
-        // Set the start time
-        this.startTime = new Date().getTime();
-
-        // Start download and show progress
-        mega.utils.gfsfetch(nodeHandle, 0, -1, this.showDownloadProgress).always(function(data) {
-
-            mobileDownload.showDownloadComplete(data, nodeHandle);
-        });
-    },
-
-    /**
-     * Download progress handler
-     * @param {Number} percentComplete The number representing the percentage complete e.g. 49.23, 51.5 etc
-     * @param {Number} bytesLoaded The number of bytes loaded so far
-     * @param {Number} bytesTotal The total number of bytes in the file
-     */
-    showDownloadProgress: function(percentComplete, bytesLoaded, bytesTotal) {
-
-        var $downloadButtonText = mobileDownload.$overlay.find('.download-progress span');
-        var $downloadProgressBar = mobileDownload.$overlay.find('.download-progress .bar');
-        var $downloadPercent = mobileDownload.$overlay.find('.download-percents');
-        var $downloadSpeed = mobileDownload.$overlay.find('.download-speed');
-
-        // Calculate the download speed
-        var percentCompleteRounded = Math.round(percentComplete);
-        var currentTime = new Date().getTime();
-        var secondsElapsed = (currentTime - mobileDownload.startTime) / 1000;
-        var bytesPerSecond = (secondsElapsed) ? (bytesLoaded / secondsElapsed) : 0;
-        var speed = numOfBytes(bytesPerSecond);
-        var speedText = speed.size + speed.unit + '/s';
-
-        // Display the download progress and speed
-        $downloadPercent.text(percentCompleteRounded + '%');
-        $downloadProgressBar.width(percentComplete + '%');
-        $downloadSpeed.text(speedText);
-
-        // If the download is complete e.g. 99/100%, change button text to Decrypting... which can take some time
-        if (percentComplete >= 99) {
-            $downloadButtonText.text(l[8579] + '...');
-        }
-    },
-
-    /**
-     * Download complete handler, activate the Open File button and let the user download the file
-     * @param {Object} data The download data
-     * @param {String} nodeHandle The node handle for this file
-     */
-    showDownloadComplete: function(data, nodeHandle) {
-
-        var $downloadButton = this.$overlay.find('.download-progress');
-        var $downloadButtonText = this.$overlay.find('.download-progress span');
-        var $downloadPercent = this.$overlay.find('.download-percents');
-        var $downloadSpeed = this.$overlay.find('.download-speed');
-
-        // Change button text to full white and hide the download percentage and speed
-        $downloadButton.addClass('complete');
-        $downloadPercent.text('');
-        $downloadSpeed.text('');
-        $downloadButtonText.text(l[8949]);  // Open File
-
-        // Make download button clickable
-        $downloadButton.off('tap').on('tap', function() {
-
-            // Get the file's mime type
-            var node = M.d[nodeHandle];
-            var fileName = node.name;
-            var mimeType = filemime(fileName);
-
-            // Create object URL to download the file to the client
-            location.href = mObjectURL([data.buffer], mimeType);
-        });
-    },
-
-    /**
-     * Change the max file size supported for various platforms based on device testing
-     */
-    adjustMaxFileSize: function() {
-
-        // If Chrome or Firefox on iOS, reduce the size to 1.3 MB
-        if ((navigator.userAgent.match(/CriOS/i)) || (navigator.userAgent.match(/FxiOS/i))) {
-            this.maxFileSize = 1.3 * (1024 * 1024);
-        }
-    },
-
-    /**
-     * Checks if the file download can be performed in the browser or shows an error overlay
-     * @param {Object} node The file node information
-     */
-    checkSupportedFile: function(node) {
-
-        var $openInBrowserButton = this.$overlay.find('.first.dl-browser');
-        var $fileTypeUnsupportedMessage = this.$overlay.find('.file-unsupported');
-        var $fileSizeUnsupportedMessage = this.$overlay.find('.file-too-large');
-
-        // Get the name, size, extension and whether supported
-        var fileName = node.name;
-        var fileSize = node.s;
-        var fileExtension = fileext(fileName);
-        var fileExtensionIsSupported = this.supportedFileTypes[fileExtension];
-
-        // Check if the download is supported
-        if ((fileSize > this.maxFileSize) || !fileExtensionIsSupported) {
-
-            // Show an error overlay
-            $('body').addClass('wrong-file');
-
-            // Remove the tap/click handler and show as greyed out
-            $openInBrowserButton.off('tap').addClass('disabled');
-
-            // Change error message
-            if (!fileExtensionIsSupported) {
-                $fileTypeUnsupportedMessage.removeClass('hidden');
-            }
-            else {
-                $fileSizeUnsupportedMessage.removeClass('hidden');
-            }
-        }
-    },
-
-    /**
-     * Gets the app store link based on the user agent
-     * @returns {String} Returns the link to the relevant app store for the user's platform
-     */
-    getStoreLink: function() {
-
-        switch (ua.details.os) {
-            case 'iPad':
-            case 'iPhone':
-                return 'https://itunes.apple.com/app/mega/id706857885';
-
-            case 'Windows Phone':
-                return 'zune://navigate/?phoneappID=1b70a4ef-8b9c-4058-adca-3b9ac8cc194a';
-
-            case 'Android':
-                return 'https://play.google.com/store/apps/details?id=mega.privacy.android.app' +
-                    '&referrer=meganzindexandroid';
-        }
-    },
-
-    /**
-     * Changes the footer image and text depending on what platform they are on
-     */
-    setMobileAppInfo: function() {
-
-        var $downloadOnAppStoreButton = $('.mobile.download-app');
-        var $appInfoBlock = $('.app-info-block');
-        var $openInBrowserButton = $('.mobile.dl-browser');
-
-        // Change the link
-        $downloadOnAppStoreButton.attr('href', this.getStoreLink());
-
-        switch (ua.details.os) {
-            case 'iPad':
-            case 'iPhone':
-                $appInfoBlock.addClass('ios');
-                break;
-
-            case 'Windows Phone':
-                $appInfoBlock.addClass('wp');
-                $openInBrowserButton.off('tap').addClass('disabled');
-                break;
-
-            case 'Android':
-                $appInfoBlock.addClass('android');
-                break;
-        }
-    }
-};
 
 
 (function() {

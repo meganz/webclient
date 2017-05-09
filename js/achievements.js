@@ -580,10 +580,11 @@ mega.achievem.initInviteDialogMultiInputPlugin = function initInviteDialogMultiI
         onReady: function() {// Called once on dialog initialization
             var $input = $dialog.find('li input').eq(0);
 
-            $input.rebind('keyup click', function() {
+            $input.rebind('keyup click change', function() {
                 var value = $.trim($input.val());
+                var emailList = value.split(/[ ;,]+/);
                 var $wrapper = $('.multiple-input', $dialog);
-                if ($wrapper.find('.share-added-contact').length > 0 || checkMail(value) === false) {
+                if ($wrapper.find('.share-added-contact').length > 0 || checkMail(value) === false || emailList.length > 1) {
                     $input.removeClass('red');
                     $('.input-info',$dialog).removeClass('red').text(l[9093]);
                     $('.default-grey-button.send', $dialog).removeClass('disabled');
@@ -1248,7 +1249,7 @@ Object.freeze(mega.achievem);
 mega.checkStorageQuota = function checkStorageQuota(timeout) {
     delay('checkStorageQuota', function _csq() {
         mega.api.req({a: 'uq', strg: 1, qc: 1}).done(function(data) {
-            var perc = Math.round(data.cstrg / data.mstrg * 100);
+            var perc = Math.floor(data.cstrg / data.mstrg * 100);
 
             mega.showOverStorageQuota(perc, data.cstrg, data.mstrg);
         });

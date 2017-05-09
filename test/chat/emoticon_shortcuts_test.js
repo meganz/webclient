@@ -76,6 +76,9 @@ describe("chat.emoticon_shortcuts unit test", function() {
             ['this is a test! :D', 'this is a test! :grinning:'],
             ['this is a test! :D\na', 'this is a test! :grinning:\na'],
             ['this is a test! :D\n:D', 'this is a test! :grinning:\n:grinning:'],
+            ['this should not be changed:', 'this should not be changed:'],
+            ['this should changed d:', 'this should changed :anguished:'],
+            [':)\n:)', ':slight_smile:\n:slight_smile:'],
         ];
 
 

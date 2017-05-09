@@ -349,8 +349,6 @@ var GenericConversationMessage = React.createClass({
                                         {previewButtons}
                                         <DropdownsUI.DropdownItem icon="rounded-grey-down-arrow" label={__(l[1187])}
                                                                   onClick={startDownload}/>
-                                        <DropdownsUI.DropdownItem icon="grey-cloud" label={__(l[8005])}
-                                                                  onClick={addToCloudDrive}/>
 
                                         <hr />
 

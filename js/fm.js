@@ -1650,7 +1650,8 @@ function initAddDialogMultiInputPlugin() {
             var $input = $this.parent().find('li input').eq(0);
             $input.rebind('keyup', function() {
                 var value = $.trim($input.val());
-                if ($scope.find('li.token-input-token-mega').length > 0 || checkMail(value) === false) {
+                var emailList = value.split(/[ ;,]+/);
+                if ($scope.find('li.token-input-token-mega').length > 0 || checkMail(value) === false || emailList.length > 1) {
                     $scope.find('.add-user-popup-button.add').removeClass('disabled');
                 } else {
                     $scope.find('.add-user-popup-button.add').addClass('disabled');
@@ -2914,9 +2915,6 @@ function fmtopUI() {
                 console.log('Inbox');
             }
         }
-        else if (M.currentrootid === 'shares') {
-            $('.fm-right-files-block').addClass('visible-notification');
-        }
         else if (M.currentdirid === 'contacts'
                 || M.currentdirid === 'ipc'
                 || M.currentdirid === 'opc'
@@ -2959,7 +2957,9 @@ function fmtopUI() {
                 $('.fm-file-upload').addClass('last-button');
             }
         }
-
+        else if (M.currentrootid === 'shares') {
+            $('.fm-right-files-block').addClass('visible-notification');
+        }
     }
     $('.fm-clearbin-button').rebind('click', function() {
         doClearbin(false);
@@ -5240,12 +5240,14 @@ function reCalcMenuPosition(m, x, y, ico) {
 
         if (nmH > (maxY - TOP_MARGIN)) {// Handle huge menu
             nmH = maxY - TOP_MARGIN;
-            var tmp = document.getElementById('csb_' + m.attr('id').replace('fi_', ''));
-            $(tmp).addClass('context-scrolling-block');
-            tmp.addEventListener('mousemove', scrollMegaSubMenu);
+            var tmp = document.getElementById('csb_' + String(m.attr('id')).replace('fi_', ''));
+            if (tmp) {
+                $(tmp).addClass('context-scrolling-block');
+                tmp.addEventListener('mousemove', scrollMegaSubMenu);
 
-            n.addClass('mega-height');
-            n.css({'height': nmH + 'px'});
+                n.addClass('mega-height');
+                n.css({'height': nmH + 'px'});
+            }
         }
 
         top = horPos(n);
@@ -6520,7 +6522,7 @@ function generateShareDialogRow(displayNameOrEmail, email, shareRights, userHand
 
     var rowId = '',
         html = '',
-        av =  useravatar.contact(email),
+        av =  useravatar.contact(email, 'nw-contact-avatar'),
         perm = '',
         permissionLevel = 0;
 
@@ -6741,7 +6743,8 @@ function initShareDialogMultiInputPlugin() {
                 var $this = $scope.find('li input');
                 $this.rebind('keyup', function() {
                     var value = $.trim($this.val());
-                    if ($scope.find('li.token-input-token-mega').length > 0 || checkMail(value) === false) {
+                    var emailList = value.split(/[ ;,]+/);
+                    if ($scope.find('li.token-input-token-mega').length > 0 || checkMail(value) === false || emailList.length > 1) {
                         $scope.find('.dialog-share-button').removeClass('disabled');
                     } else {
                         $scope.find('.dialog-share-button').addClass('disabled');
@@ -7985,17 +7988,20 @@ function moveDialog() {
  * @param {String} toastClass Custom style for the notification
  * @param {String} notification The text for the toast notification
  */
+var toastTimeout;
+
 function showToast(toastClass, notification, buttonLabel) {
 
-    var $toast, timeout;
+    var $toast;
 
     $toast = $('.toast-notification.common-toast');
     $toast.attr('class', 'toast-notification common-toast ' + toastClass)
         .find('.toast-col:first-child span').safeHTML(notification);
 
-    $toast.removeClass('hidden').addClass('visible');
+    $toast.addClass('visible');
 
-    timeout = setTimeout(function() {
+    clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(function() {
         hideToast();
     }, 7000);
 
@@ -8011,15 +8017,15 @@ function showToast(toastClass, notification, buttonLabel) {
     $(closeSelector)
         .rebind('click', function() {
             $('.toast-notification').removeClass('visible');
-            clearTimeout(timeout);
+            clearTimeout(toastTimeout);
         });
 
     $toast.rebind('mouseover', function() {
-        clearTimeout(timeout);
+        clearTimeout(toastTimeout);
     });
 
     $toast.rebind('mouseout', function() {
-        timeout = setTimeout(function() {
+        toastTimeout = setTimeout(function() {
             hideToast();
         }, 7000);
     });
@@ -8116,6 +8122,7 @@ function createFolderDialog(close)
             createFolder($.cftarget, v);
             createFolderDialog(1);
         }
+        $('.create-folder-dialog input').val('');
     });
 
     fm_showoverlay();
@@ -9172,27 +9179,6 @@ function previewimg(id, uint8arr)
     }
 }
 
-function fm_contains(filecnt, foldercnt) {
-    var containstxt = l[782];
-    if ((foldercnt > 1) && (filecnt > 1)) {
-        containstxt = l[828].replace('[X1]', foldercnt).replace('[X2]', filecnt);
-    } else if ((foldercnt > 1) && (filecnt === 1)) {
-        containstxt = l[829].replace('[X]', foldercnt);
-    } else if ((foldercnt === 1) && (filecnt > 1)) {
-        containstxt = l[830].replace('[X]', filecnt);
-    } else if ((foldercnt === 1) && (filecnt === 1)) {
-        containstxt = l[831];
-    } else if (foldercnt > 1) {
-        containstxt = l[832].replace('[X]', foldercnt);
-    } else if (filecnt > 1) {
-        containstxt = l[833].replace('[X]', filecnt);
-    } else if (foldercnt === 1) {
-        containstxt = l[834];
-    } else if (filecnt === 1) {
-        containstxt = l[835];
-    }
-    return containstxt;
-}
 
 function fm_importflnodes(nodes)
 {

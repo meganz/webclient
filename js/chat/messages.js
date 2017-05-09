@@ -530,6 +530,9 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                         else if (decrypted.type === strongvelope.MESSAGE_TYPES.TRUNCATE) {
                             editedMessage.dialogType = 'truncated';
                             editedMessage.userId = decrypted.sender;
+                            editedMessage.delay = unixtime();
+                            chatRoom.lastActivity = editedMessage.delay;
+                            chatRoom.didInteraction(editedMessage.userId, chatRoom.lastActivity);
                         }
 
                         chatRoom.megaChat.plugins.chatdIntegration._parseMessage(
@@ -784,7 +787,9 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                 }
             }
         };
-        ChatdIntegration._ensureKeysAreLoaded(keys).always(seedKeys);
+        ChatdIntegration._waitForProtocolHandler(chatRoom, function() {
+            ChatdIntegration._ensureKeysAreLoaded(keys).always(seedKeys);
+        });
 
         if (chatRoom.roomJid === self.chatRoom.roomJid) {
             self.trackDataChange();

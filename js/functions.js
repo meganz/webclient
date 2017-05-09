@@ -582,7 +582,7 @@ mBroadcaster.once('startMega', function populate_l() {
     l[553] = l[553].replace('[A]', '<a href="mailto:resellers@mega.nz">').replace('[/A]', '</a>');
     l[555] = l[555].replace('[A]', '<a href="/terms" class="clickurl">').replace('[/A]', '</a>');
     l[754] = l[754].replace('[A]',
-        '<a href="http://www.google.com/chrome" target="_blank" rel="noreferrer" style="color:#D9290B;">');
+        '<a href="http://www.google.com/chrome" target="_blank" rel="noopener noreferrer" style="color:#D9290B;">');
     l[754] = l[754].replace('[/A]', '</a>');
     l[871] = l[871].replace('[B]', '<strong>')
         .replace('[/B]', '</strong>')
@@ -594,9 +594,9 @@ mBroadcaster.once('startMega', function populate_l() {
     l[1094] = l[1094].replace('[A]', '<a href="/plugin" class="clickurl">').replace('[/A]', '</a>');
     l[1095] = l[1095].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[1133] = l[1133].replace('[A]',
-        '<a href="http://en.wikipedia.org/wiki/Entropy" target="_blank" rel="noreferrer">').replace('[/A]', '</a>');
+        '<a href="http://en.wikipedia.org/wiki/Entropy" target="_blank" rel="noopener noreferrer">').replace('[/A]', '</a>');
     l[1134] = l[1134].replace('[A]',
-        '<a href="http://en.wikipedia.org/wiki/Public-key_cryptography" target="_blank" rel="noreferrer">').replace('[/A]',
+        '<a href="http://en.wikipedia.org/wiki/Public-key_cryptography" target="_blank" rel="noopener noreferrer">').replace('[/A]',
         '</a>');
     l[1148] = l[1148].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[6978] = l[6978].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
@@ -614,7 +614,7 @@ mBroadcaster.once('startMega', function populate_l() {
     l[1201] = l[1201].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[1208] = l[1208].replace('[B]', '<strong>').replace('[/B]', '</strong>');
     l[1915] = l[1915].replace('[A]',
-        '<a class="red" href="https://chrome.google.com/webstore/detail/mega/bigefpfhnfcobdlfbedofhhaibnlghod" target="_blank" rel="noreferrer">')
+        '<a class="red" href="https://chrome.google.com/webstore/detail/mega/bigefpfhnfcobdlfbedofhhaibnlghod" target="_blank" rel="noopener noreferrer">')
             .replace('[/A]', '</a>');
     l[1936] = l[1936].replace('[A]', '<a href="/backup" class="clickurl">').replace('[/A]', '</a>');
     l[1942] = l[1942].replace('[A]', '<a href="/backup" class="clickurl">').replace('[/A]', '</a>');
@@ -707,7 +707,7 @@ mBroadcaster.once('startMega', function populate_l() {
 
     var common = [
         15536, 16106, 16107, 16116, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315,
-        16316, 16358, 16359, 16360, 16361, 16375, 16382, 16383, 16384
+        16316, 16341, 16358, 16359, 16360, 16361, 16375, 16382, 16383, 16384, 16394
     ];
     for (i = common.length; i--;) {
         var num = common[i];
@@ -1329,6 +1329,11 @@ function makeid(len) {
     return text;
 }
 
+/**
+ * Checks if the email address is valid
+ * @param {String} email The email address to validate
+ * @returns {Boolean} Returns true if email is invalid, false if email is fine
+ */
 function checkMail(email) {
     email = email.replace(/\+/g, '');
     var filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
@@ -1551,10 +1556,14 @@ function simpleStringHashCode(str) {
  * @param timeout {int}
  * @param [resolveRejectArgs] {(Array|*)} args that will be used to call back .resolve/.reject
  * @param [waitForPromise] {(MegaPromise|$.Deferred)} Before starting the timer, we will wait for this promise to be rej/res first.
+ * @param [name] {String} optional name for the debug output of the error/debug messages
  * @returns {Deferred}
  */
 function createTimeoutPromise(validateFunction, tick, timeout,
-                              resolveRejectArgs, waitForPromise) {
+                              resolveRejectArgs, waitForPromise, name) {
+    var tickInterval = false;
+    var timeoutTimer = false;
+
     var $promise = new MegaPromise();
     resolveRejectArgs = resolveRejectArgs || [];
     if (!$.isArray(resolveRejectArgs)) {
@@ -1564,8 +1573,8 @@ function createTimeoutPromise(validateFunction, tick, timeout,
     $promise.verify = function() {
         if (validateFunction()) {
             if (window.d && typeof(window.promisesDebug) !== 'undefined') {
-                console.debug("Resolving timeout promise",
-                    timeout, "ms", "at", (new Date()),
+                console.debug("Resolving timeout promise", name,
+                    timeout, "ms", "at", (new Date()).toISOString(),
                     validateFunction, resolveRejectArgs);
             }
             $promise.resolve.apply($promise, resolveRejectArgs);
@@ -1573,43 +1582,53 @@ function createTimeoutPromise(validateFunction, tick, timeout,
     };
 
     var startTimerChecks = function() {
-        var tickInterval = setInterval(function() {
+        tickInterval = setInterval(function() {
             $promise.verify();
         }, tick);
 
-        var timeoutTimer = setTimeout(function() {
+        timeoutTimer = setTimeout(function() {
             if (validateFunction()) {
                 if (window.d && typeof(window.promisesDebug) !== 'undefined') {
-                    console.debug("Resolving timeout promise",
-                        timeout, "ms", "at", (new Date()),
+                    console.debug("Resolving timeout promise", name,
+                        timeout, "ms", "at", (new Date()).toISOString(),
                         validateFunction, resolveRejectArgs);
                 }
                 $promise.resolve.apply($promise, resolveRejectArgs);
             }
             else {
-                console.error("Timed out after waiting",
-                    timeout, "ms", "at", (new Date()),
+                console.error("Timed out after waiting", name,
+                    timeout, "ms", "at", (new Date()).toISOString(), $promise.state(),
                     validateFunction, resolveRejectArgs);
                 $promise.reject.apply($promise, resolveRejectArgs);
             }
         }, timeout);
 
-        // stop any running timers and timeouts
-        $promise.always(function() {
-            clearInterval(tickInterval);
-            clearTimeout(timeoutTimer);
-        });
-
         $promise.verify();
     };
+
+    // stop any running timers and timeouts
+    $promise.always(function() {
+        if (tickInterval !== false) {
+            clearInterval(tickInterval);
+        }
+
+        if (timeoutTimer !== false) {
+            clearTimeout(timeoutTimer);
+        }
+    });
+
 
     if (!waitForPromise || !waitForPromise.done) {
         startTimerChecks();
     }
     else {
-        waitForPromise.always(function() {
-            startTimerChecks();
-        });
+        waitForPromise
+            .done(function() {
+                startTimerChecks();
+            })
+            .fail(function() {
+                $promise.reject();
+            });
     }
 
     return $promise;
@@ -3517,32 +3536,51 @@ mega.utils.hasPendingTransfers = function megaUtilsHasPendingTransfers() {
 mega.utils.abortTransfers = function megaUtilsAbortTransfers() {
     var promise = new MegaPromise();
 
-    if (!mega.utils.hasPendingTransfers()) {
-        promise.resolve();
+    // Mobile does not use the dlmanager/ulmanager so just resolve the promise
+    if (is_mobile) {
+        return promise.resolve();
     }
-    else {
-        msgDialog('confirmation', l[967], l[377] + ' ' + l[507] + '?', false, function(doIt) {
-            if (doIt) {
-                if (dlmanager.isDownloading) {
-                    dlmanager.abort(null);
-                }
-                if (ulmanager.isUploading) {
-                    ulmanager.abort(null);
-                }
 
-                mega.utils.resetUploadDownload();
-                loadingDialog.show();
-                var timer = setInterval(function() {
-                    if (!mega.utils.hasPendingTransfers()) {
-                        clearInterval(timer);
-                        promise.resolve();
-                    }
-                }, 350);
+    var abort = function() {
+        if (mBroadcaster.crossTab.master || page === 'download') {
+            if (!mega.utils.hasPendingTransfers()) {
+                promise.resolve();
             }
             else {
-                promise.reject();
+                msgDialog('confirmation', l[967], l[377] + ' ' + l[507] + '?', false, function(doIt) {
+                    if (doIt) {
+                        if (dlmanager.isDownloading) {
+                            dlmanager.abort(null);
+                        }
+                        if (ulmanager.isUploading) {
+                            ulmanager.abort(null);
+                        }
+
+                        mega.utils.resetUploadDownload();
+                        loadingDialog.show();
+                        var timer = setInterval(function() {
+                            if (!mega.utils.hasPendingTransfers()) {
+                                clearInterval(timer);
+                                promise.resolve();
+                            }
+                        }, 350);
+                    }
+                    else {
+                        promise.reject();
+                    }
+                });
             }
-        });
+        }
+        else {
+            promise.reject();
+        }
+    };
+
+    if (!mBroadcaster.crossTab.master || mBroadcaster.crossTab.slaves.length) {
+        msgDialog('warningb', l[882], l[7157], 0, abort);
+    }
+    else {
+        abort();
     }
 
     return promise;
@@ -3620,6 +3658,7 @@ mega.utils.reload = function megaUtilsReload() {
         var privk = u_storage.privk;
         var jj = localStorage.jj;
         var debug = localStorage.d;
+        var lang = localStorage.lang;
         var mcd = localStorage.testChatDisabled;
         var apipath = debug && localStorage.apipath;
 
@@ -3652,6 +3691,9 @@ mega.utils.reload = function megaUtilsReload() {
         if (mcd) {
             localStorage.testChatDisabled = 1;
         }
+        if (lang) {
+            localStorage.lang = lang;
+        }
         if (hashLogic) {
             localStorage.hashLogic = 1;
         }
@@ -3669,33 +3711,24 @@ mega.utils.reload = function megaUtilsReload() {
         // Show message that this operation will destroy the browser cache and reload the data stored by MEGA
         msgDialog('confirmation', l[761], l[7713], l[6994], function(doIt) {
             if (doIt) {
-                var reload = function() {
-                    if (mBroadcaster.crossTab.master || page === 'download') {
-                        mega.utils.abortTransfers().then(function() {
-                            loadingDialog.show();
-                            stopsc();
-                            stopapi();
+                mega.utils.abortTransfers().then(function() {
+                    loadingDialog.show();
+                    stopsc();
+                    stopapi();
 
-                            MegaPromise.allDone([
-                                mega.utils.clearFileSystemStorage()
-                            ]).then(function(r) {
-                                    console.debug('megaUtilsReload', r);
-                                    if (fmdb) {
-                                        fmdb.invalidate(_reload);
-                                    }
-                                    else {
-                                        _reload();
-                                    }
-                                });
-                        });
-                    }
-                };
-                if (!mBroadcaster.crossTab.master || mBroadcaster.crossTab.slaves.length) {
-                    msgDialog('warningb', l[882], l[7157], 0, reload);
-                }
-                else {
-                    reload();
-                }
+                    MegaPromise.allDone([
+                        mega.utils.clearFileSystemStorage()
+                    ]).then(function(r) {
+                        console.debug('megaUtilsReload', r);
+
+                        if (fmdb) {
+                            fmdb.invalidate(_reload);
+                        }
+                        else {
+                            _reload();
+                        }
+                    });
+                });
             }
         });
     }
@@ -4411,7 +4444,7 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
                 return this._size < (limit * 1024 * 1024 * 1024);
             }
         }
-    }
+    };
 });
 
 /** prevent tabnabbing attacks */

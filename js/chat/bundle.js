@@ -984,6 +984,7 @@ React.makeElement = React['createElement'];
 	        jids.forEach(function (jid) {
 	            var contact = self.getContactFromJid(jid);
 	            if (!contact || contact.c !== 1 && contact.c !== 2 && contact.c !== 0) {
+
 	                allValid = false;
 	                $promise.reject();
 	                return false;

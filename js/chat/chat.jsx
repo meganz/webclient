@@ -1213,6 +1213,7 @@ Chat.prototype.openChat = function(jids, type, chatId, chatShard, chatdUrl, setA
         jids.forEach(function(jid) {
             var contact = self.getContactFromJid(jid);
             if (!contact || (contact.c !== 1 && contact.c !== 2 && contact.c !== 0)) {
+                self.logger.warn("Found invalid 1on1 chat with a non-contact: ", jid);
                 allValid = false;
                 $promise.reject();
                 return false;

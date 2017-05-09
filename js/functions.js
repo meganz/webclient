@@ -5493,7 +5493,8 @@ if (typeof sjcl !== 'undefined') {
 
 /**
  * Get a string for the payment plan number
- * @param {Number} planNum The plan number e.g. 1: PRO I, 2: PRO II, 3: PRO III, 4: LITE
+ * @param {Number} planNum The plan number e.g. 1, 2, 3, 4
+ * @returns {String} The plan name i.e. PRO I, PRO II, PRO III, LITE
  */
 function getProPlan(planNum) {
 

@@ -1176,13 +1176,12 @@ function openTransfersPanel()
 
 function showTransferToast(t_type, t_length, isPaused) {
     if ((M.currentdirid !== 'transfers') && (fmconfig.tpp === false)) {
-        var $toast,
-            $second_toast,
-            timer,
-            nt_txt;
+        var $toast;
+        var $second_toast;
+        var timer = 0;
+        var nt_txt;
 
         if (t_type != 'u') {
-            timer = dl_interval;
             $toast = $('.toast-notification.download');
             $second_toast = $('.toast-notification.upload');
             if (t_length > 1) {
@@ -1191,7 +1190,6 @@ function showTransferToast(t_type, t_length, isPaused) {
                 nt_txt = l[7222];
             }
         } else {
-            timer = ul_interval;
             $toast = $('.toast-notification.upload');
             $second_toast = $('.toast-notification.download');
             if (t_length > 1) {

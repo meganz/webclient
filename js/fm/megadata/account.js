@@ -243,3 +243,42 @@ MegaData.prototype.accountData = function(cb, blockui) {
         });
     }
 };
+
+
+function voucherData(arr) {
+    var vouchers = [];
+    var varr = arr[0];
+    var tindex = {};
+    for (var i in arr[1]) {
+        tindex[arr[1][i][0]] = arr[1][i];
+    }
+    for (var i in varr) {
+        var redeemed = 0;
+        var cancelled = 0;
+        var revoked = 0;
+        var redeem_email = '';
+        if ((varr[i].rdm) && (tindex[varr[i].rdm])) {
+            redeemed = tindex[varr[i].rdm][1];
+            redeem_email = tindex[varr[i].rdm][2];
+        }
+        if (varr[i].xl && tindex[varr[i].xl]) {
+            cancelled = tindex[varr[i].xl][1];
+        }
+        if (varr[i].rvk && tindex[varr[i].rvk]) {
+            revoked = tindex[varr[i].rvk][1];
+        }
+        vouchers.push({
+            id: varr[i].id,
+            amount: varr[i].g,
+            currency: varr[i].c,
+            iss: varr[i].iss,
+            date: tindex[varr[i].iss][1],
+            code: varr[i].v,
+            redeemed: redeemed,
+            redeem_email: redeem_email,
+            cancelled: cancelled,
+            revoked: revoked
+        });
+    }
+    return vouchers;
+}

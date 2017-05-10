@@ -1,7 +1,8 @@
 var newnodes = [];
 var currsn;     // current *network* sn (not to be confused with the IndexedDB/memory state)
 var fminitialized = false;
-var dl_interval, ul_interval;
+var requesti = makeid(10);
+var folderlink = false;
 
 var fmconfig = Object.create(null);
 if (localStorage.fmconfig) {
@@ -26,20 +27,6 @@ MegaLogger.rootLogger = new MegaLogger(
     false
 );
 
-if (typeof seqno === 'undefined')
-    var seqno = Math.floor(Math.random() * 1000000000);
-if (typeof n_h === 'undefined')
-    var n_h = false;
-if (typeof requesti === 'undefined')
-    var requesti = makeid(10);
-if (typeof folderlink === 'undefined')
-    var folderlink = false;
-if (typeof lang === 'undefined')
-    var lang = 'en';
-if (typeof Ext === 'undefined')
-    var Ext = false;
-if (typeof ie9 === 'undefined')
-    var ie9 = false;
 if (typeof loadingDialog === 'undefined') {
     var loadingDialog = Object.create(null);
     loadingDialog.show = function() {
@@ -152,44 +139,6 @@ if (typeof loadingInitDialog === 'undefined') {
     };
 }
 
-function voucherData(arr)
-{
-    var vouchers = [];
-    var varr = arr[0];
-    var tindex = {};
-    for (var i in arr[1])
-        tindex[arr[1][i][0]] = arr[1][i];
-    for (var i in varr)
-    {
-        var redeemed = 0;
-        var cancelled = 0;
-        var revoked = 0;
-        var redeem_email = '';
-        if ((varr[i].rdm) && (tindex[varr[i].rdm]))
-        {
-            redeemed = tindex[varr[i].rdm][1];
-            redeemed_email = tindex[varr[i].rdm][2];
-        }
-        if (varr[i].xl && tindex[varr[i].xl])
-            cancelled = tindex[varr[i].xl][1];
-        if (varr[i].rvk && tindex[varr[i].rvk])
-            revoked = tindex[varr[i].rvk][1];
-        vouchers.push({
-            id: varr[i].id,
-            amount: varr[i].g,
-            currency: varr[i].c,
-            iss: varr[i].iss,
-            date: tindex[varr[i].iss][1],
-            code: varr[i].v,
-            redeemed: redeemed,
-            redeem_email: redeem_email,
-            cancelled: cancelled,
-            revoked: revoked
-        });
-    }
-    return vouchers;
-}
-
 function fm_safename(name)
 {
     // http://msdn.microsoft.com/en-us/library/aa365247(VS.85)
@@ -212,20 +161,6 @@ function fm_safepath(path, file)
         path.push(fm_safename(file));
     return path;
 }
-
-function fm_matchname(p, name)
-{
-    var a = [];
-    for (var i in M.d)
-    {
-        var n = M.d[i];
-        if (n.p == p && name == n.name)
-            a.push({id: n.h, size: n.s, name: n.name});
-    }
-    return a;
-}
-
-var t;
 
 function renderfm() {
     var promise = new MegaPromise();
@@ -474,35 +409,39 @@ function sc_fetcher() {
 
 // enqueue parsed actionpacket
 function sc_packet(a) {
-    var inflight = $.len(scfetches);
-
     // set scq slot number
     a.scqi = scqhead;
 
-    // check if this packet needs nodes to be present.
-    switch (a.a) {
-        case 's':
-        case 's2':
-        case 'fa':
-        case 'u':
-        case 'd':
-            sc_fqueue(a.n, a);
-        /* fall-through */
-        case 'ph':
-            sc_fqueue(a.h, a); // s, s2, ph
-            break;
-        case 't':
-            // If no workers, all scnodes should be ready
-            // OR the scnodes are ready but not the ap set yet
-            if (!workers || (scq[scqhead] && !scq[scqhead][0])) {
-                sc_fqueuet(scqhead, a);
-            }
-            break;
+    // check if this packet needs nodes to be present,
+    // unless `fromapi` where nodes are placed in memory already as received.
+    if (!loadfm.fromapi) {
+        var inflight = $.len(scfetches);
+
+        switch (a.a) {
+            case 's':
+            case 's2':
+            case 'fa':
+            case 'u':
+            case 'd':
+                sc_fqueue(a.n, a);
+            /* fall-through */
+            case 'ph':
+                sc_fqueue(a.h, a); // s, s2, ph
+                break;
+            case 't':
+                // If no workers, all scnodes should be ready
+                // OR the scnodes are ready but not the ap set yet
+                if (!workers || (scq[scqhead] && !scq[scqhead][0])) {
+                    sc_fqueuet(scqhead, a);
+                }
+                break;
+        }
+
+        if ($.len(scfetches) !== inflight) {
+            sc_fetcher();
+        }
     }
 
-    if ($.len(scfetches) !== inflight) {
-        sc_fetcher();
-    }
     if ((a.a == 's' || a.a == 's2') && a.k) {
         /**
          * There are two occasions where `crypto_process_sharekey()` must not be called:
@@ -1910,7 +1849,7 @@ function loadfm(force) {
                     h   : '&h, c',      // hashes - handle, checksum
                     nn  : '&h',         // node names - handle
                     ph  : '&h',         // exported links - handle
-                    fld: '&h',         // folders - handle
+                    fld : '&h',         // folders - handle
                     opc : '&p',         // outgoing pending contact - id
                     ipc : '&p',         // incoming pending contact - id
                     ps  : '&h_p',       // pending share - handle/id

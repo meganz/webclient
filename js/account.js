@@ -578,6 +578,36 @@ function checkUserLogin() {
 }
 
 
+/**
+ * A reusable function that is used for processing locally/3rd party email change
+ * action packets.
+ *
+ * @param ap {Object} the actual 'se' action packet
+ */
+function processEmailChangeActionPacket(ap) {
+    // set email
+    var emailChangeAccepted = (ap.s === 3 && typeof ap.e === 'string' && ap.e.indexOf('@') !== -1);
+
+    if (emailChangeAccepted) {
+        var user = M.getUserByHandle(ap.u);
+
+        if (user) {
+            user.m = ap.e;
+            process_u([user]);
+
+            if (ap.u === u_handle) {
+                u_attr.email = user.m;
+
+                if (M.currentdirid === 'account/profile') {
+                    $('.nw-fm-left-icon.account').trigger('click');
+                }
+            }
+        }
+        // update the underlying fmdb cache
+        M.addUser(user);
+    }
+}
+
 (function(exportScope) {
     var _lastUserInteractionCache = window._lastUserInteractionCache = {};
     var _lastUserInteractionPromiseCache = window._lastUserInteractionPromiseCache = {};

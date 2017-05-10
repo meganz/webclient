@@ -118,6 +118,11 @@ var attribCache = false;
                     res = mega.attr.handleLegacyCacheAndDecryption(res, thePromise, attribute);
                 }
 
+                // Otherwise if a non-encrypted private attribute, base64 decode the data
+                else if (attribute.charAt(0) === '^') {
+                    res = base64urldecode(value);
+                }
+
                 if (d > 1 || is_karma) {
                     var loggerValueOutput = pub ? JSON.stringify(res) : '-- hidden --';
                     if (loggerValueOutput.length > 256) {
@@ -333,6 +338,11 @@ var attribCache = false;
             // Let's encode and encrypt it.
             savedValue = base64urlencode(tlvstore.blockEncrypt(
                 tlvstore.containerToTlvRecords(value), u_k, mode));
+        }
+
+        // Otherwise if a non-encrypted private attribute, base64 encode the data
+        else if (attribute[0] === '^') {
+            savedValue = base64urlencode(value);
         }
 
         // Make the promise to execute the API code.

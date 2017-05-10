@@ -191,7 +191,7 @@ function accountUI() {
 
                     // Tell them they need to cancel their plan off-site and don't show the feedback dialog
                     $cancelSubscriptionButton.removeClass('hidden').rebind('click', function() {
-                        msgDialog('warninga', l[7179], l[8854]);
+                        msgDialog('warninga', l[7179], l[16501]);
                     });
                 }
 

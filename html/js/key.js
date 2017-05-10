@@ -26,8 +26,21 @@ function ui_keycomplete() {
 
         // If mobile, log to see how many registrations are completed on mobile and load the cloud drive
         if (is_mobile) {
-            api_req({ a: 'log', e: 99627, m: 'Completed registration on mobile webclient' });
-            loadSubPage('fm');  // ToDo: change to loading the pro page when payment providers are working on mobile
+
+            // Check if they actually started the registration process on mobile web
+            if (localStorage.signUpStartedInMobileWeb) {
+
+                // Remove the flag as it's no longer needed and send a stats log
+                localStorage.removeItem('signUpStartedInMobileWeb');
+                api_req({ a: 'log', e: 99639, m: 'Started and completed registration on mobile webclient' });
+            }
+            else {
+                // Otherwise they just completed sign up on the mobile web and may have started it on a mobile app
+                api_req({ a: 'log', e: 99627, m: 'Completed registration on mobile webclient' });
+            }
+
+            // Load the cloud drive - ToDo: Change to loading the Pro page when payment providers are working on mobile
+            loadSubPage('fm');
         }
         else {
             // Otherwise log to see how many registrations are completed on regular webclient and load the Pro page

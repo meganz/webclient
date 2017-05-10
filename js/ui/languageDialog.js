@@ -195,11 +195,12 @@ var langDialog = {
                 // Set a language user attribute on the API (This is a private but unencrypted user
                 // attribute so that the API can read it and send emails in the correct language)
                 if (typeof u_attr !== 'undefined') {
-                    api_req({
-                        a: 'up',
-                        i: requesti,
-                        '^!lang': selectedLangCode      // ^ is private but not encrypted, ! is non-historic
-                    });
+                    mega.attr.set(
+                        'lang',
+                        selectedLangCode,       // E.g. en, es, pt
+                        -2,                     // Set to private private not encrypted
+                        true                    // Set to non-historic, this won't retain previous values on API server
+                    );
                 }
 
                 // Reload the site

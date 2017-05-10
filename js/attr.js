@@ -67,7 +67,9 @@ var attribCache = false;
      * @param attribute {String}
      *     Name of the attribute.
      * @param pub {Boolean|Number}
-     *     True for public attributes (default: true). -1 for "system" attributes (e.g. without prefix)
+     *     True for public attributes (default: true).
+     *     -1 for "system" attributes (e.g. without prefix)
+     *     -2 for "private non encrypted attributes"
      * @param nonHistoric {Boolean}
      *     True for non-historic attributes (default: false).  Non-historic
      *     attributes will overwrite the value, and not retain previous
@@ -242,8 +244,10 @@ var attribCache = false;
      *
      * @param attribute {string}
      *     Name of the attribute.
-     * @param pub {bool}
+     * @param pub {Boolean|Number}
      *     True for public attributes (default: true).
+     *     -1 for "system" attributes (e.g. without prefix)
+     *     -2 for "private non encrypted attributes"
      * @param nonHistoric {bool}
      *     True for non-historic attributes (default: false).  Non-historic
      *     attributes will overwrite the value, and not retain previous
@@ -284,8 +288,10 @@ var attribCache = false;
      * @param value {object}
      *     Value of the user attribute. Public properties are of type {string},
      *     private ones have to be an object with key/value pairs.
-     * @param pub {bool}
+     * @param pub {Boolean|Number}
      *     True for public attributes (default: true).
+     *     -1 for "system" attributes (e.g. without prefix)
+     *     -2 for "private non encrypted attributes"
      * @param nonHistoric {bool}
      *     True for non-historic attributes (default: false).  Non-historic
      *     attributes will overwrite the value, and not retain previous

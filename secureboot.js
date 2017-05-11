@@ -76,13 +76,12 @@ function isMobile() {
 }
 
 function getSitePath() {
-	var hash = location.hash.replace('#', '');
+    var hash = location.hash.replace('#', '');
 
-    if (hashLogic || hash.substr(0, 2) === 'P!' || hash.substr(0, 2) === 'F!' || hash[0] === '!') {
+    if (hashLogic || isPublicLink(hash)) {
         return '/' + hash;
-	}
-
-	return document.location.pathname;
+    }
+    return document.location.pathname;
 }
 
 // remove dangling characters from the pathname/hash
@@ -90,6 +89,22 @@ function getCleanSitePath(path) {
     if (path === undefined) {
         path = getSitePath();
     }
+
+    path = mURIDecode(path).replace(/^[/#]+|\/+$/g, '');
+
+    return path;
+}
+
+// Check whether the provided `page` points to a public link
+function isPublicLink(page) {
+    page = mURIDecode(page).replace(/^[/#]+/, '');
+
+    return (page[0] === '!' || page.substr(0, 2) === 'F!' || page.substr(0, 2) === 'P!') ? page : false;
+}
+
+// Safer wrapper around decodeURIComponent
+function mURIDecode(path) {
+    path = String(path);
 
     if (path.indexOf('%25') >= 0) {
         do {
@@ -103,8 +118,6 @@ function getCleanSitePath(path) {
         path = decodeURIComponent(path);
     }
     catch (e) {}
-
-    path = path.replace(/^[/#]+|\/+$/g, '');
 
     return path;
 }
@@ -560,16 +573,12 @@ var locSearch = location.search;
 
 if (hashLogic) {
     // legacy support:
-    page = document.location.hash;
+    page = getCleanSitePath(document.location.hash);
 }
-else if (document.location.hash.substr(1, 2) === 'P!' || document.location.hash.substr(1, 2) === 'F!' ||
-         document.location.hash.substr(1, 1) === '!') {
-
-    // Password, folder or file link: always keep the hash URL to ensure that keys remain client side
-    page = document.location.hash;
-
+else if ((page = isPublicLink(document.location.hash))) {
+    // folder or file link: always keep the hash URL to ensure that keys remain client side
     // history.replaceState so that back button works in new URL paradigm
-    history.replaceState({subpage: page.replace('#', '')}, "", page);
+    history.replaceState({subpage: page}, "", '#' + page);
 }
 else {
     if (document.location.hash.length > 0) {
@@ -583,7 +592,6 @@ else {
     page = getCleanSitePath(page);
     history.replaceState({subpage: page}, "", '/' + page);
 }
-page = page.replace('#','');
 
 
 if (b_u && !is_mobile) {
@@ -2051,18 +2059,6 @@ else if (!b_u) {
 
     if (page)
     {
-        if (page.indexOf('%25') !== -1)
-        {
-            do {
-                page = page.replace(/%25/g, '%');
-            } while (~page.indexOf('%25'));
-        }
-        if (page.indexOf('%21') !== -1)
-        {
-            page = page.replace(/%21/g, '!');
-            if (hashLogic) document.location.hash = page;
-            else history.replaceState({ subpage: page }, "", page);
-        }
         for (var p in subpages)
         {
             if (page.substr(0,p.length) == p)
@@ -2642,6 +2638,7 @@ else if (!b_u) {
         }
         else u_checklogin({checkloginresult:boot_auth},false);
     }
+
     if (page.substr(0,1) == '!' && page.length > 1)
     {
         dl_res = true;

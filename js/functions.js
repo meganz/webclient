@@ -3749,7 +3749,7 @@ mega.utils.abortTransfers = function megaUtilsAbortTransfers() {
     }
 
     var abort = function() {
-        if (mBroadcaster.crossTab.master || page === 'download') {
+        if (mBroadcaster.crossTab.master || page === 'download' || u_type !== 3) {
             if (!mega.utils.hasPendingTransfers()) {
                 promise.resolve();
             }
@@ -3783,7 +3783,7 @@ mega.utils.abortTransfers = function megaUtilsAbortTransfers() {
         }
     };
 
-    if (!mBroadcaster.crossTab.master || mBroadcaster.crossTab.slaves.length) {
+    if (u_type > 2 && (!mBroadcaster.crossTab.master || mBroadcaster.crossTab.slaves.length)) {
         msgDialog('warningb', l[882], l[7157], 0, abort);
     }
     else {

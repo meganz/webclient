@@ -3849,14 +3849,21 @@ function MegaData()
 
                     ctx.account.lastupdate = new Date().getTime();
 
-                    if (!ctx.account.bw)
-                        ctx.account.bw = 1024 * 1024 * 1024 * 10;
-                    if (!ctx.account.servbw_used)
+                    if (!ctx.account.bw) {
+                        ctx.account.bw = 1024 * 1024 * 1024 * 1024 * 1024 * 10;
+                    }
+                    if (!ctx.account.servbw_used) {
                         ctx.account.servbw_used = 0;
-                    if (!ctx.account.downbw_used)
+                    }
+                    if (!ctx.account.downbw_used) {
                         ctx.account.downbw_used = 0;
+                    }
 
                     M.account = ctx.account;
+
+                    if (res.ut) {
+                        localStorage.apiut = res.ut;
+                    }
 
                     // transfers quota
                     var tfsq = {max: account.bw, used: account.downbw_used};
@@ -6500,6 +6507,10 @@ function execsc() {
                     if (a.s != 2) notify.notifyFromActionPacket(a);
                     break;
 
+                case 'se':
+                    processEmailChangeActionPacket(a);
+                    break;
+
                 case 'ua':
                     mega.attr.handleUserAttributeActionPackets(a, loadavatars);
             }
@@ -7020,27 +7031,7 @@ function execsc() {
                     break;
 
                 case 'se':
-                    // set email
-                    var emailChangeAccepted = (a.s == 3
-                                               && typeof a.e == 'string'
-                                               && a.e.indexOf('@') != -1);
-
-                    if (emailChangeAccepted) {
-                        var user = M.getUserByHandle(a.u);
-
-                        if (user) {
-                            user.m = a.e;
-                            process_u([user]);
-
-                            if (a.u === u_handle) {
-                                u_attr.email = user.m;
-
-                                if (M.currentdirid === 'account/profile') {
-                                    $('.nw-fm-left-icon.account').trigger('click');
-                                }
-                            }
-                        }
-                    }
+                    processEmailChangeActionPacket(a);
                     break;
 
                 default:
@@ -8367,7 +8358,9 @@ function processIPC(ipc, ignoreDB) {
                 }
 
                 // Update token.input plugin
-                removeFromMultiInputDDL('.share-multiple-input', { id: ipc[i].m, name: ipc[i].m });
+                if (!is_mobile) {
+                    removeFromMultiInputDDL('.share-multiple-input', { id: ipc[i].m, name: ipc[i].m });
+                }
             }
             else {
                 if (!is_mobile) {
@@ -8547,7 +8540,7 @@ function processPS(pendingShares, ignoreDB) {
                     });
                 }
 
-                if (M.opc && M.opc[ps.p]) {
+                if (M.opc && M.opc[ps.p] && !is_mobile) {
                     // Update tokenInput plugin
                     addToMultiInputDropDownList('.share-multiple-input', [{
                             id: M.opc[pendingContactId].m,

@@ -394,8 +394,7 @@ function init_pro()
     }
 
     if (typeof window.selectedProPlan !== "undefined") {
-        $('.reg-st3-membership-bl[data-payment=' + window.selectedProPlan + ']')
-            .find('.membership-button').trigger('click');
+        $('.reg-st3-membership-bl.pro' + window.selectedProPlan + ' .membership-pad-bl').trigger('click');
         delete window.selectedProPlan;
     }
 }

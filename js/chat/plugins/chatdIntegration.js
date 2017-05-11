@@ -410,6 +410,9 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
                 false
             );
             chatRoom = r[1];
+            if (!chatRoom) {
+                return masterPromise.reject();
+            }
             if (actionPacket.ct) {
                 chatRoom.ct = actionPacket.ct;
             }
@@ -423,6 +426,9 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
                     chatRoom.lastActivity = unixtime();
                 }
                 loadSubPage(chatRoom.getRoomUrl());
+            }
+            if (!chatRoom.lastActivity && actionPacket.ts) {
+                chatRoom.lastActivity = actionPacket.ts;
             }
 
             if (wasActive) {

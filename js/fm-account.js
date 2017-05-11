@@ -1807,12 +1807,12 @@ accountUI.fillCharts = function(account, onDashboard) {
     var $storageChart = $('.fm-account-blocks.storage');
     var $storageData = $('.account.data-block.storage-data');
     $storageData.removeClass('exceeded');
-    perc = Math.round(account.space_used / account.space * 100);
+    perc = Math.floor(account.space_used / account.space * 100);
     perc_c = perc;
     if (perc_c > 100) {
         perc_c = 100;
     }
-    if (perc_c > 99) {
+    if (perc_c === 100) {
         s_exceeded = 1;
         $storageChart.addClass('exceeded');
         $storageData.addClass('exceeded');

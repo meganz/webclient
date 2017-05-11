@@ -16019,6 +16019,14 @@
         "text": "Inside the app you can upgrade your storage space and transfer quota with a monthly or yearly subscription.",
         "context": "Paragraph 4 of the general description of MEGA which is shown on the app stores in Android, iOS and Windows Phone."
     },
+    "16372": {
+        "text": "PRO LITE subscription: \u20ac4.99 (US$4.99) per month or \u20ac49.99 (US$49.99) per year gives you 200 GB of storage space and 1 TB of transfer quota per month.\r\nPRO I subscription: \u20ac9.99 (US$9.99) per month or \u20ac99.99 (US$99.99) per year gives you 500 GB of storage space and 2 TB of transfer quota per month.\r\nPRO II subscription: \u20ac19.99 (US$19.99) per month or \u20ac199.99 (US$199.99) per year gives you 2 TB of storage space and 4 TB of transfer quota per month.\r\nPRO III subscription: \u20ac29.99 (US$29.99) per month or \u20ac299.99 (US$299.99) per year gives you 4 TB of storage space and 8 TB of transfer quota per month.",
+        "context": "Paragraph 5 of the general description of MEGA which is shown on the apps stores in Android, iOS and Windows Phone. Please keep the multiple line format."
+    },
+    "16373": {
+        "text": "For more info, please check our website:\r\nMobile - https:\/\/mega.nz\/mobile_terms.html - https:\/\/mega.nz\/mobile_privacy.html\r\nDesktop - https:\/\/mega.nz\/",
+        "context": "Paragraph 6 of the general description of MEGA which is shown on the app stores in Android, iOS and Windows Phone. Please keep the multiple line format."
+    },
     "16374": {
         "text": "Note: For desktop access to your files, MEGA needs to use HTML5 compatible browsers to handle our advanced features. We recommend Mozilla Firefox and Google Chrome. The mobile versions of browsers cannot access the MEGA cloud storage system yet.",
         "context": "Paragraph 7 of the general description of MEGA which is shown on the app stores in Android, iOS and Windows Phone."
@@ -16124,12 +16132,12 @@
         "context": "A line of text within an email that guides the user to click on the link that follows, or to copy and paste it into their browser."
     },
     "16410": {
-        "text": "[1]MEGA Account Expiry Warning\r\n\r\n[2]We noticed that there hasn't been any activity on your MEGA account since [B][$month] [$day], [$year][\/B].\r\n\r\n[3]We would love to have you as a user, but we may [B]close your account and delete any stored data (as specified in our [A1]Terms of Service[\/A1]) if you don\u2019t log in at [A2]mega.nz[\/A2] within the next 30 (thirty) days[\/B].\r\n\r\n[4]If you have recently used MEGA but still received this email, then we are emailing you about a different account. Please compare the email address on the account you recently used to the one in this email.\r\n\r\n[5]Login at MEGA",
-        "context": "Email body for Account expiry email. This is sent to users when they have been inactive for a long time.\r\nPlease do not translate anything inside the square brackets, just leave them alone and in the same place (i.e. do not change [1] or [A1] etc)."
+        "text": "[1]MEGA Account Expiry Warning\r\n\r\n[2]We noticed that there hasn't been any activity on your MEGA account since [B][$month] [$day], [$year][\/B].\r\n\r\n[3]We would love to have you as a user, but we may [B]delete any stored data (as specified in our [A1]Terms of Service[\/A1]) if you don\u2019t log in at [A2]mega.nz[\/A2] within the next 30 (thirty) days[\/B].\r\n\r\n[4]If you have recently used MEGA but still received this email, then we are emailing you about a different account. Please compare the email address on the account you recently used to the one in this email.\r\n\r\n[5]Login at MEGA",
+        "context": "Update: The words 'close your account' have been removed.\r\n\r\nEmail body for Account expiry email. This is sent to users when they have been inactive for a long time.\r\nPlease do not translate anything inside the square brackets, just leave them alone and in the same place (i.e. do not change [1] or [A1] etc)."
     },
     "16412": {
-        "text": "[1]MEGA Account Expiry Final Warning\r\n\r\n[2][B]Your [A1]$megaemail[\/A1] MEGA account is due to expire in 7 days[\/B] as there has not been any activity on it since [$month] [$day], [$year].\r\n\r\n[3]We would love to have you as a user, but we may [B]close your account and delete any stored data (as specified in our [A2]Terms of Service[\/A2]) if you don\u2019t log in at [A3]mega.nz[\/A3] within the next 7 (seven) days[\/B]\r\n\r\n[4]If you have recently used MEGA but still received this email, then we are emailing you about a different account. Please compare the email address on the account you recently used to the one in this email.",
-        "context": "Email body of the final warning email we send to users who have been inactive too long.\r\n\r\nPlease do not translate the text inside the square brackets (i.e Do not change the [1], [A1] tags etc).\r\nThey will be replaced by links."
+        "text": "[1]MEGA Account Expiry Final Warning\r\n\r\n[2][B]Your [A1]$megaemail[\/A1] MEGA account is due to expire in 7 days[\/B] as there has not been any activity on it since [$month] [$day], [$year].\r\n\r\n[3]We would love to have you as a user, but we may [B]delete any stored data (as specified in our [A2]Terms of Service[\/A2]) if you don\u2019t log in at [A3]mega.nz[\/A3] within the next 7 (seven) days[\/B]\r\n\r\n[4]If you have recently used MEGA but still received this email, then we are emailing you about a different account. Please compare the email address on the account you recently used to the one in this email.",
+        "context": "Update: The words 'close your account' have been removed\r\n\r\nEmail body of the final warning email we send to users who have been inactive too long.\r\n\r\nPlease do not translate the text inside the square brackets (i.e Do not change the [1], [A1] tags etc).\r\nThey will be replaced by links."
     },
     "16413": {
         "text": "[1]MEGA Bonus Unlocked\r\n\r\n[2]Congratulations, we have just activated your mobile app install achievement bonus. You have earned [$storageearnedgb] storage quota and [$transferearnedgb] transfer quota, which will be valid for [$durationdays] days.\r\n\r\n[3]Need more storage or transfer quota? Let others know about the benefits of end-to-end encrypted cloud storage and invite them to MEGA!\r\n\r\n[4]Achieve More\r\n\r\n[5]To view the status of your achievements or achieve more, click below:",
@@ -16378,5 +16386,85 @@
     "16481": {
         "text": "Renamed from %1 by me",
         "context": "A message which is displayed in the version history that shows that a certain file version is renamed from a previous file name by the user itself. Please keep the placeholder %1 which will be replaced by the filename."
+    },
+    "16482": {
+        "text": "Show me away after [X] minutes of inactivity",
+        "context": "Footer text to explain the meaning of the 'Auto-away' functionality of the user's chat status."
+    },
+    "16483": {
+        "text": "Status Persistence",
+        "context": "A label title to enable\/disable the feature of the chat status that maintains a user's chosen status even if they don't have connected devices."
+    },
+    "16484": {
+        "text": "Maintain my chosen status appearance even when I have no connected devices.",
+        "context": "Some text in the footer to explain the meaning of the 'Status Persistence' functionality of the user's chat status."
+    },
+    "16485": {
+        "text": "Duplicate items",
+        "context": "Dialog header. Dialog is displayed if uploading file already exists in folder."
+    },
+    "16486": {
+        "text": "A file named %1 already exists in this location.",
+        "context": "Dialog description. Informs user that uploading file already exists. Please leave %1 as it is, it'll be replaced by file name."
+    },
+    "16487": {
+        "text": "Select the file you want to keep:",
+        "context": "User is able to select file version if uploading file already exists in folder."
+    },
+    "16488": {
+        "text": "Upload and replace",
+        "context": "Header of clickable block in Dublicate items dialog. Allows user replace the file in the destination folder with the file he is uploading."
+    },
+    "16489": {
+        "text": "Replace the file in the destination folder with the file you are uploading:",
+        "context": "Clickable block description in dublicate items dialog. Allows user replace existing file in folder by new one, which he is uploading."
+    },
+    "16490": {
+        "text": "Don't upload",
+        "context": "Header of clickable block in dublicate items dialog. Allows user keep existing file in the destination folder and don't replace it by file he is uploading."
+    },
+    "16491": {
+        "text": "No files will be changed. You will keep the file below:",
+        "context": "Clickable block description in Dublicate items dialog. Allows user keep existing file in the destination folder and don't replace it by file he is uploading."
+    },
+    "16492": {
+        "text": "Keep both files",
+        "context": "Header of clickable block in Dublicate items dialog. Allows user keep existing file in the destination folder and file he is uploading."
+    },
+    "16493": {
+        "text": "The file you are uploading will be renamed as:",
+        "context": "Clickable block description in dublicate items dialog. Allows user keep existing file in the destination folder and file he is uploading."
+    },
+    "16494": {
+        "text": "Apply this option to the next [S]2[\/S] conflicts",
+        "context": "Checkbox label in Dublicate items dialog. User is able to apply selected action for current conflict to next conflicts. Please leave [S], [\/S] as it is."
+    },
+    "16495": {
+        "text": "Move and replace",
+        "context": "Header of clickable block in Dublicate items dialog. Allows user to replace the file in the destination folder with the file he is moving to this folder."
+    },
+    "16496": {
+        "text": "Copy and replace",
+        "context": "Header of clickable block in dublicate items dialog. Allows user replace the file in the destination folder with the file he is copying to this folder."
+    },
+    "16497": {
+        "text": "Replace the file in the destination folder with the file you are moving:",
+        "context": "Clickable block description in dublicate items dialog. Allows user to replace the file in the destination folder with the file he is moving to this folder."
+    },
+    "16498": {
+        "text": "Replace the file in the destination folder with the file you are copying:",
+        "context": "Clickable block description in dublicate items dialog. Allows user replace the file in the destination folder with the file he is copying to this folder."
+    },
+    "16499": {
+        "text": "Don't move",
+        "context": "Header of clickable block in dublicate items dialog. Allows user keep existing file in the destination folder and don't replace it by file he is moving."
+    },
+    "16500": {
+        "text": "Don't copy",
+        "context": "Header of clickable block in dublicate items dialog. Allows user keep existing file in the destination folder and don't replace it by file he is copying."
+    },
+    "16501": {
+        "text": "If you previously subscribed to a PRO plan with Google Play or Apple iTunes, please manually cancel your subscriptions with them inside Google Play or the iTunes app on your device. If you need any assistance please contact [A1]support@mega.nz[\/A1] or see our [A2]help article for Android[\/A2] or our [A3]help article for iOS[\/A3].",
+        "context": "An error dialog message when the Cancel Subscription button is pressed in the My Account section of the website. This means that cancelling the subscription is not possible from the website, they must cancel with Apple or Google. Please leave the [A1], [A2] and [A3] tags as they will be replaced with links."
     }
 }

@@ -1414,6 +1414,12 @@ function tooltiplogin() {
 }
 
 function topmenuUI() {
+
+    // Not applicable for mobile
+    if (is_mobile) {
+        return false;
+    }
+
     if (u_type === 0) {
         $('.top-login-button').text(l[967]);
     }

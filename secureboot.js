@@ -90,14 +90,14 @@ function getCleanSitePath(path) {
         path = getSitePath();
     }
 
-    path = mURIDecode(String(path).replace(/^[/#]+|\/+$/g, ''));
+    path = mURIDecode(path).replace(/^[/#]+|\/+$/g, '');
 
     return path;
 }
 
 // Check whether the provided `page` points to a public link
 function isPublicLink(page) {
-    page = mURIDecode(String(page).replace(/^[/#]+/, ''));
+    page = mURIDecode(page).replace(/^[/#]+/, '');
 
     return (page[0] === '!' || page.substr(0, 2) === 'F!' || page.substr(0, 2) === 'P!') ? page : false;
 }

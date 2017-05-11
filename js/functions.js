@@ -5059,10 +5059,10 @@ function passwordManager(form) {
     }
     $(form).rebind('submit', function() {
         setTimeout(function() {
-            var path  = getSitePath();
+            var path = getSitePath();
             history.replaceState({ success: true }, '', "index.html#" + document.location.hash.substr(1));
-            if (hashLogic) {
-                path = getSitePath().replace('/', '/#');
+            if (hashLogic || isPublicLink(path)) {
+                path = path.replace('/', '/#');
 
                 if (location.href.substr(0, 19) === 'chrome-extension://') {
                     path = path.replace('/#', '/mega/secure.html#');

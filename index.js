@@ -311,7 +311,6 @@ function init_page() {
         loadingDialog.hide();
     }
 
-    var wasFolderlink = pfid;
     var oldPFKey = pfkey;
     if (page.substr(0, 2) == 'F!' && page.length > 2) {
         var ar = page.substr(2, page.length - 1).split('!');

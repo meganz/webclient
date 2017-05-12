@@ -2372,7 +2372,9 @@ function initContextUI() {
         $('.transfer-table tr.ui-selected').removeClass('ui-selected');
     });
 
-    $(document).trigger('onInitContextUI');
+    if (localStorage.folderLinkImport) {
+        onIdle(fm_importflnodes);
+    }
 }
 
 function createFolderUI() {
@@ -8756,33 +8758,54 @@ function previewimg(id, uint8arr)
 
 function fm_importflnodes(nodes)
 {
+    if (localStorage.folderLinkImport) {
+        assert(!folderlink, 'This should not happen...');
+
+        var kv = StorageDB(u_handle);
+        var key = 'import.' + localStorage.folderLinkImport;
+
+        kv.get(key)
+            .done(function(data) {
+                $.mcImport = true;
+                $.selected = data[0];
+                $.onImportCopyNodes = data[1];
+
+                if (d) {
+                    console.log('Importing Nodes...', $.selected, $.onImportCopyNodes);
+                }
+                $('.dropdown-item.copy-item').click();
+
+                kv.rem(key);
+            })
+            .fail(function(e) {
+                console.error(e);
+            });
+
+        nodes = null;
+        delete localStorage.folderLinkImport;
+    }
+
     var sel = [].concat(nodes || []);
     if (sel.length) {
         var FLRootID = M.RootID;
 
         mega.ui.showLoginRequiredDialog().done(function() {
+            loadingDialog.show();
+            localStorage.folderLinkImport = FLRootID;
 
-            $.onImportCopyNodes = fm_getcopynodes(sel);
+            StorageDB(u_handle)
+                .set('import.' + FLRootID, [sel, fm_getcopynodes(sel)])
+                .done(function() {
 
-            // TODO: test whether importing nodes from a folder link still works
-
-            loadSubPage('fm');
-
-            $(document).one('onInitContextUI', SoonFc(function(e) {
-                if (M.RootID === FLRootID) {
-                    // TODO: How to reproduce this?
-                    console.warn('Unable to complete import, apparnetly we did not reached the cloud.');
-                }
-                else {
-                    if (d) console.log('Importing Nodes...', sel, $.onImportCopyNodes);
-
-                    $.selected = sel;
-                    $.mcImport = true;
-
-                    // XXX: ...
-                    $('.dropdown-item.copy-item').click();
-                }
-            }));
+                    loadSubPage('fm');
+                })
+                .fail(function(e) {
+                    if (d) {
+                        console.error('Unable to import...', e);
+                    }
+                    loadingDialog.hide();
+                    msgDialog('warninga', l[135], l[47]);
+                });
         }).fail(function(aError) {
             // If no aError, it was canceled
             if (aError) {

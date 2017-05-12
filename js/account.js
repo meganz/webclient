@@ -1136,10 +1136,17 @@ function processEmailChangeActionPacket(ap) {
     ns.setn = function _setConfigValueToast(key, value, toastText) {
         toastText = toastText || l[16168];
 
-        delay('fmconfig:setn', function() {
-            showToast('settings', toastText);
+        delay('fmconfig:setn.' + key, function() {
+            var toast = false;
 
-            mega.config.set(key, value);
+            if (mega.config.get(key) !== value) {
+                mega.config.set(key, value);
+                toast = true;
+            }
+
+            if (toast) {
+                showToast('settings', toastText);
+            }
         });
     };
 

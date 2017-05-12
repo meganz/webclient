@@ -31,9 +31,9 @@ var megasync = (function() {
     function linuxDropdown(selected) {
 
         var is64    = browserdetails().is64bit;
-        var $dropdown = $('.megasync-dropdown'); 
-        var $select = $dropdown.find('.megasync-scr-pad').empty();
-        var $list   = $dropdown.find('.megasync-dropdown-list');
+        var $dropdown = $('.megasync .megaapp-dropdown'); 
+        var $select = $dropdown.find('.megaapp-scr-pad').empty();
+        var $list   = $dropdown.find('.megaapp-dropdown-list');
         $('.megasync-overlay').addClass('linux');
 
         if (typeof selected !== "function") {
@@ -64,10 +64,10 @@ var megasync = (function() {
             selected($(this));
         });
 
-        $('.main-pad-block').rebind('click.closesyncdropdown', function(e) {
+        $('.bottom-page.scroll-block.megasync').rebind('click.closesyncdropdown', function(e) {
             if ($dropdown.hasClass('active')) {
-                if ($(e.target).parent('.megasync-dropdown').length === 0 &&
-                        !$(e.target).hasClass('megasync-dropdown')) {
+                if ($(e.target).parent('.megaapp-dropdown').length === 0 &&
+                        !$(e.target).hasClass('megaapp-dropdown')) {
                     $dropdown.removeClass('active');
                     $list.addClass('hidden');
                 }

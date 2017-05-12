@@ -15717,7 +15717,7 @@ span.browsers-update {
 .white-bg {
     background-color: white;
 }
-.sync-button, .google-play-button, .ios-button, .ff-bott-button, .blackberry-button, .chrome-app-button, .win-phone-button {
+.google-play-button, .ios-button, .ff-bott-button, .blackberry-button, .chrome-app-button, .win-phone-button {
     min-width: 205px;
     height: 56px;
     margin: 3px 5px 3px 5px;
@@ -15747,50 +15747,6 @@ span.browsers-update {
     -webkit-box-shadow: 0px 0px 0px 2px rgba(0,0,0,0.3);
     -moz-box-shadow: 0px 0px 0px 2px rgba(0,0,0,0.3);
     box-shadow: 0px 0px 0px 2px rgba(0,0,0,0.3);
-}
-.sync-button-block .sync-button {
-    min-width: 220px;
-}
-.sync-button-block .sync-button.disabled, .sync-button-block .sync-button.disabled:hover {
- filter:progid:DXImageTransform.Microsoft.Alpha(opacity=70);
-    -moz-opacity: 0.7;
-    -khtml-opacity: 0.7;
-    opacity: 0.7;
-    cursor: default;
-    -webkit-box-shadow: 0px 0px 0px 2px rgba(0,0,0,0.3);
-    -moz-box-shadow: 0px 0px 0px 2px rgba(0,0,0,0.3);
-    box-shadow: 0px 0px 0px 2px rgba(0,0,0,0.3);
-}
-.sync-button.mac {
-    background-position: 15px -71px;
-}
-.sync-button.linux {
-    background-position: -463px -66px;
-}
-.linux-install-txt {
-    text-align: center;
-    padding: 0;
-    display: inline-block;
-    margin-top: 15px;
-    color: rgba(0,0,0,0.6);
-    font-size: 13px;
-    margin-bottom: -10px;
-    line-height: 24px;
-}
-.sync-button-block {
-    display: inline-block;
-    margin: 0 48px;
-    height: 101px;
-}
-.sync-radio-buttons {
-    padding: 5px 0 0px 0;
-}
-.nautilus-lnk {
-    display: block;
-    padding: 5px 0 8px 0;
-}
-.sync-button-block.linux {
-    padding-top: 0;
 }
 .google-play-button {
     background-position: -335px -172px;
@@ -23560,60 +23516,6 @@ body.pro:after {
 }
 .megasync-table table th:nth-child(3) span, .megasync-table table td:nth-child(3) span {
     padding: 0 0 0 41px;
-}
-.linux .megasync-info {
-    display: none;
-}
-.megasync-dropdown {
-    width: 280px;
-    float: none;
-    margin: 63px auto 55px auto;
-    display: none;
-}
-.megacmd-dropdown {
-    width: 228px;
-    float: none;
-    margin: 40px auto 5px auto;
-}
-.megacmd-linux .sync-radio-buttons {
-    width: 228px;
-    margin: 0 auto;
-}
-.default-dropdown-item.icon {
-    padding: 0 30px 0 34px;
-    background-image: url(../images/mega/download-sprite-v6.png);
-    background-position: 0 64px;
-    background-repeat: no-repeat;
-}
-.sync-bottom-block .megasync-dropdown {
-    margin: 0px;
-}
-.linux .megasync-dropdown {
-    display: block;
-}
-.default-dropdown-item.centos {
-    background-position: 10px -1921px;
-}
-.default-dropdown-item.debian {
-    background-position: 10px -1982px;
-}
-.default-dropdown-item.elementary, .default-dropdown-item.elementaryosfreya {
-    background-position: 10px -1952px;
-}
-.default-dropdown-item.fedora {
-    background-position: 10px -2132px;
-}
-.default-dropdown-item.mint {
-    background-position: 10px -2102px;
-}
-.default-dropdown-item.opensuse {
-    background-position: 10px -2072px;
-}
-.default-dropdown-item.redhat {
-    background-position: 10px -2042px;
-}
-.default-dropdown-item.ubuntu {
-    background-position: 10px -2012px;
 }
 .megasync-close {
     width: 14px;

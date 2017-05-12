@@ -61,8 +61,6 @@
 .bottom-page.horizontal-centered-bl.side-paddings {
     padding: 0 15px;
 }
-
-
 .bottom-page.top-header {
     font-size: 18px;
     line-height: 26px;
@@ -74,7 +72,9 @@
     opacity: 0.8;
     padding: 47px 95px 0 95px;
 }
-
+.bottom-page.top-header span {
+    color: #EB4444;
+}
 .bottom-page.scroll-button {
     font-size: 14px;
     color: rgba(0,0,0,0.5);
@@ -126,6 +126,13 @@
     width: 100%;
     overflow: hidden;
 }
+.bottom-page.grey-graident {
+    background: #fafafa;
+background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZhZmFmYSIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmZmZmZmYiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+background: -moz-linear-gradient(top, #fafafa 0%, #ffffff 100%);
+background: -webkit-linear-gradient(top, #fafafa 0%,#ffffff 100%);
+background: linear-gradient(to bottom, #fafafa 0%,#ffffff 100%);
+}
 .bottom-page.mid-header {
     font-size: 18px;
     line-height: 32px;
@@ -133,6 +140,9 @@
     color: #777777;
     max-width: 780px;
     margin: 0 auto;
+}
+.bottom-page.mid-header.small-pad {
+    padding: 0 0 7px 0;
 }
 .bottom-page.mid-header.red {
     color: #EB4444;
@@ -181,6 +191,9 @@
 .bottom-page.big-header.mid-pad {
     padding: 18px 0 34px 0;
 }
+.bottom-page.big-header.small-pad {
+    padding: 18px 0 27px 0;
+}
 .bottom-page.big-header.red {
     color: #EB4444;
 }
@@ -223,7 +236,32 @@
 }
 
 
-
+.bottom-page.big-icon {
+    width: 102px;
+    height: 102px;
+    margin: 10px auto 26px auto;
+    background-image: url(../images/mega/startpage-sprite.png);
+    background-position: 0 -533px;
+    background-repeat: no-repeat;
+}
+.bottom-page.big-icon.global-access {
+    background-position: -160px -533px;
+}
+.bottom-page.big-icon.secure {
+    background-position: 0 -673px;
+}
+.bottom-page.big-icon.storage {
+    background-position: -160px -673px;
+}
+.bottom-page.big-icon.transfer {
+    background-position: 0 -813px;
+}
+.bottom-page.big-icon.public {
+    background-position: -160px -813px;
+}
+.bottom-page.big-icon.registered-users {
+    background-position: 0px -953px;
+}
 
 /* end of Bottom pages common styles*/
 
@@ -232,7 +270,6 @@
 /* Bottom pages nav bar */
 .pages-nav.content-block {
     height: 73px;
-    background-color: white;
 }
 .vertical-centered-bl .pages-nav.content-block {
     width: 100%;
@@ -241,6 +278,7 @@
     -webkit-box-shadow: 0px -1px 0px 0 rgba(0,0,0,0.1);
     -moz-box-shadow: 0px -1px 0px 0 rgba(0,0,0,0.1);
     box-shadow: 0px -1px 0px 0 rgba(0,0,0,0.1);
+    background-color: rgba(255,255,255,0.9);
 }
 .pages-nav.horizontal-centered-bl {
     max-width: 768px;
@@ -324,76 +362,126 @@
 
 
 /* MEGAcmd */
-.megacmd-header {
+.megacmd .vertical-centered-bl .pages-nav.content-block {
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+}
+.bottom-page.cmd-bg {
+    background-image: url(../images/mega/megacmd-bg_v2.jpg);
+    background-repeat: no-repeat;
     background-position: center;
     background-size: cover;
-    background-image: url(../images/mega/megacmd-bg.jpg);
-    background-repeat: no-repeat;
-    padding: 128px 0 0 0;
-    text-align: center;
 }
 .megacmd-logo {
-    background-image: url(../images/mega/megacmd-sprite.png);
+    background-image: url(../images/mega/pages-sprite.png);
     background-repeat: no-repeat;
-    background-position: 0 0;
+    background-position: 0 -92px;
     width: 228px;
     height: 36px;
-    margin: 0 auto;
+    margin: 0 auto 20px auto;
 }
-.megacmd-header-txt {
-    max-width: 708px;
-    padding: 67px 0 65px 0;
-    font-size: 18px;
-    line-height: 26px;
-    text-align: center;
-    color: #333333;
-    margin: 0 auto;
+.default-select.megaapp-dropdown {
+    width: 228px;
+    float: none;
+    margin: 40px auto 5px auto;
 }
-.megacmd-button-info {
+.megaapp-button-info {
     color: #666666;
     font-size: 14px;
     line-height: 24px;
-    padding: 28px 0 38px 0;
+    padding: 28px 0 62px 0;
 }
-.megacmd-button-info a.red {
+.megaapp-button-info a.red {
     cursor: pointer;
     color: #FF333A;
 }
-.megacmd-icon {
-    width: 100px;
-    height: 100px;
-    background-image: url(../images/mega/megacmd-sprite.png);
+.bottom-page .button.default-huge-button {
+    margin-top: 65px;
+}
+.cmd-bg .top-header {
+    color: #333333;
+}
+.bottom-page.big-icon.interactive {
+    background-image: url(../images/mega/pages-sprite.png);
+    background-position: 1px -550px;
+}
+.bottom-page.big-icon.scriptable {
+    background-image: url(../images/mega/pages-sprite.png);
+    background-position: 1px -430px;
+}
+.megaapp-linux .bottom-page.radio-buttons {
+    width: 228px;
+    margin: 0 auto;
+}
+.bottom-page.radio-buttons {
+    padding: 5px 0 0px 0;
+}
+.default-dropdown-item.icon {
+    padding: 0 30px 0 34px;
+    background-image: url(../images/mega/download-sprite-v6.png);
+    background-position: 0 64px;
     background-repeat: no-repeat;
-    background-position: 0 -151px;
-    margin: 0 auto 17px auto;
 }
-.megacmd-features {
-    width: 50%;
-    float: left;
-    text-align: center;
-    padding: 100px 0 60px 11px;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
+.default-dropdown-item.centos {
+    background-position: 10px -1921px;
 }
-.megacmd-features.first {
-    padding: 100px 11px 60px 0;
+.default-dropdown-item.debian {
+    background-position: 10px -1982px;
 }
-.megacmd-icon.cogs {
-    background-position: 0 -271px;
+.default-dropdown-item.elementary, .default-dropdown-item.elementaryosfreya {
+    background-position: 10px -1952px;
 }
-.megacmd-icon-info {
-    font-size: 18px;
-    line-height: 21px;
-    color: #666666;
-    padding: 15px 0 7px 0;
+.default-dropdown-item.fedora {
+    background-position: 10px -2132px;
 }
-.megacmd-icon-info.small {
-    font-size: 14px;
-    line-height: 24px;
-    padding: 15px 0 0 0;
+.default-dropdown-item.mint {
+    background-position: 10px -2102px;
 }
-.megacmd-icon-info.red {
-    color: #FF333A;
+.default-dropdown-item.opensuse {
+    background-position: 10px -2072px;
+}
+.default-dropdown-item.redhat {
+    background-position: 10px -2042px;
+}
+.default-dropdown-item.ubuntu {
+    background-position: 10px -2012px;
+}
+@media only screen and (max-height: 685px) {
+    .linux .bottom-page.top-header {
+        padding-top: 17px;
+    }
+    .linux .default-select.megaapp-dropdown {
+        margin-top: 20px;
+    }
+    .linux .megaapp-button-info {
+        padding-bottom: 92px;
+    }
+    .linux .button.download-megacmd {
+        margin-top: 35px;
+    }
 }
 /* end of MEGAcmd */
+
+
+/* MEGAsync */
+.bottom-page.megasync-logo {
+    background-image: url(../images/mega/pages-sprite.png);
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    width: 185px;
+    height: 48px;
+    margin: 0 auto 17px auto;
+}
+.megasync .megaapp-button-info {
+    padding: 28px 0 73px 0;
+}
+.megasync.bottom-page .button.default-huge-button {
+    margin-top: 91px;
+}
+.megasync .vertical-centered-bl .pages-nav.content-block {
+    -webkit-box-shadow: 0px -1px 0px 0 rgba(0,0,0,0.05);
+    -moz-box-shadow: 0px -1px 0px 0 rgba(0,0,0,0.05);
+    box-shadow: 0px -1px 0px 0 rgba(0,0,0,0.05);
+}
+/* end of MEGAsync */

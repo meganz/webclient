@@ -111,34 +111,6 @@
     -khtml-opacity: 1;
     opacity: 1;
 }
-
-.startpage.big-icon {
-    width: 102px;
-    height: 102px;
-    margin: 10px auto 26px auto;
-    background-image: url(../images/mega/startpage-sprite.png);
-    background-position: 0 -533px;
-    background-repeat: no-repeat;
-}
-.startpage.big-icon.global-access {
-    background-position: -160px -533px;
-}
-.startpage.big-icon.secure {
-    background-position: 0 -673px;
-}
-.startpage.big-icon.storage {
-    background-position: -160px -673px;
-}
-.startpage.big-icon.transfer {
-    background-position: 0 -813px;
-}
-.startpage.big-icon.public {
-    background-position: -160px -813px;
-}
-.startpage.big-icon.registered-users {
-    background-position: 0px -953px;
-}
-
 .startpage.plans-block {
     padding: 10px 0 0 0;
     overflow: hidden;

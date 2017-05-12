@@ -134,22 +134,23 @@ function start_countUpdate() {
 }
 
 function jScrollStart() {
-    $('.bottom-page.scroll-block').jScrollPane({
-        showArrows: true,
-        arrowSize: 5,
-        animateScroll: true
-    });
-    jScrollFade('.bottom-page.scroll-block');
-    $('.bottom-page.scroll-block').rebind('jsp-scroll-y.back', function(event, scrollPositionY, isAtTop, isAtBottom) {
-        if (isAtTop && !$.scrollIgnore) {
-            bottompageMain();
-        }
-        else if (!isAtTop) {
-            startscrollIgnore(500);
-        }
-    });
+    if ($('.bottom-page.vertical-centered-bl').hasClass('active')) {
+        $('.bottom-page.scroll-block').jScrollPane({
+            showArrows: true,
+            arrowSize: 5,
+            animateScroll: true
+        });
+        jScrollFade('.bottom-page.scroll-block');
+        $('.bottom-page.scroll-block').rebind('jsp-scroll-y.back', function(event, scrollPositionY, isAtTop, isAtBottom) {
+            if (isAtTop && !$.scrollIgnore) {
+                bottompageMain();
+            }
+            else if (!isAtTop) {
+                startscrollIgnore(500);
+            }
+        });
+    }
 }
-
 
 function bottompageScroll(blockSwing) {
     $.infoscroll = true;

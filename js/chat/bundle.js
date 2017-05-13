@@ -984,6 +984,7 @@ React.makeElement = React['createElement'];
 	        jids.forEach(function (jid) {
 	            var contact = self.getContactFromJid(jid);
 	            if (!contact || contact.c !== 1 && contact.c !== 2 && contact.c !== 0) {
+
 	                allValid = false;
 	                $promise.reject();
 	                return false;
@@ -8961,7 +8962,7 @@ React.makeElement = React['createElement'];
 
 	                        var deleteButtonOptional = null;
 
-	                        if (message.userId === u_handle) {
+	                        if (message.userId === u_handle && unixtime() - message.delay < MESSAGE_NOT_EDITABLE_TIMEOUT) {
 	                            deleteButtonOptional = React.makeElement(DropdownsUI.DropdownItem, {
 	                                icon: 'red-cross',
 	                                label: __(l[1730]),

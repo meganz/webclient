@@ -439,10 +439,10 @@ function importFile() {
         a: 'p',
         t: M.RootID,
         n: [{
-                ph: dl_import,
+                ph: dl_import[0],
                 t: 0,
                 a: dl_attr,
-                k: a32_to_base64(encrypt_key(u_k_aes, base64_to_a32(dlkey).slice(0, 8)))
+                k: a32_to_base64(encrypt_key(u_k_aes, base64_to_a32(dl_import[1]).slice(0, 8)))
             }]
     }, {
         // Check response and if over quota show a special warning dialog
@@ -532,7 +532,7 @@ function dlstart(id,name,filesize)
 
 function start_import()
 {
-    dl_import = dlpage_ph;
+    dl_import = [dlpage_ph, dlkey];
 
     if (u_type) {
         loadSubPage('fm');

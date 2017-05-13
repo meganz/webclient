@@ -3542,7 +3542,7 @@ mega.utils.abortTransfers = function megaUtilsAbortTransfers() {
     }
 
     var abort = function() {
-        if (mBroadcaster.crossTab.master || page === 'download') {
+        if (mBroadcaster.crossTab.master || page === 'download' || u_type !== 3) {
             if (!mega.utils.hasPendingTransfers()) {
                 promise.resolve();
             }
@@ -3576,7 +3576,7 @@ mega.utils.abortTransfers = function megaUtilsAbortTransfers() {
         }
     };
 
-    if (!mBroadcaster.crossTab.master || mBroadcaster.crossTab.slaves.length) {
+    if (u_type > 2 && (!mBroadcaster.crossTab.master || mBroadcaster.crossTab.slaves.length)) {
         msgDialog('warningb', l[882], l[7157], 0, abort);
     }
     else {
@@ -4853,10 +4853,10 @@ function passwordManager(form) {
     }
     $(form).rebind('submit', function() {
         setTimeout(function() {
-            var path  = getSitePath();
+            var path = getSitePath();
             history.replaceState({ success: true }, '', "index.html#" + document.location.hash.substr(1));
-            if (hashLogic) {
-                path = getSitePath().replace('/', '/#');
+            if (hashLogic || isPublicLink(path)) {
+                path = path.replace('/', '/#');
 
                 if (location.href.substr(0, 19) === 'chrome-extension://') {
                     path = path.replace('/#', '/mega/secure.html#');

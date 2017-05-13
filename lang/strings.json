@@ -16420,7 +16420,7 @@
         "context": "Clickable block description in dublicate items dialog. Allows user replace existing file in folder by new one, which he is uploading."
     },
     "16490": {
-        "text": "Don\u2019t upload",
+        "text": "Don't upload",
         "context": "Header of clickable block in dublicate items dialog. Allows user keep existing file in the destination folder and don't replace it by file he is uploading."
     },
     "16491": {
@@ -16456,11 +16456,15 @@
         "context": "Clickable block description in dublicate items dialog. Allows user replace the file in the destination folder with the file he is copying to this folder."
     },
     "16499": {
-        "text": "Don\u2019t move",
+        "text": "Don't move",
         "context": "Header of clickable block in dublicate items dialog. Allows user keep existing file in the destination folder and don't replace it by file he is moving."
     },
     "16500": {
-        "text": "Don\u2019t copy",
+        "text": "Don't copy",
         "context": "Header of clickable block in dublicate items dialog. Allows user keep existing file in the destination folder and don't replace it by file he is copying."
+    },
+    "16501": {
+        "text": "If you previously subscribed to a PRO plan with Google Play or Apple iTunes, please manually cancel your subscriptions with them inside Google Play or the iTunes app on your device. If you need any assistance please contact [A1]support@mega.nz[\/A1] or see our [A2]help article for Android[\/A2] or our [A3]help article for iOS[\/A3].",
+        "context": "An error dialog message when the Cancel Subscription button is pressed in the My Account section of the website. This means that cancelling the subscription is not possible from the website, they must cancel with Apple or Google. Please leave the [A1], [A2] and [A3] tags as they will be replaced with links."
     }
 }

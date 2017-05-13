@@ -1325,6 +1325,10 @@ function execsc() {
             delete M.scAckQueue[a.i];
         }
 
+        if (a.a === 's' || a.a === 's2') {
+            mBroadcaster.sendMessage('share-packet.' + a.n, a);
+        }
+
         tickcount++;
     } while (Date.now()-tick < 200);
 

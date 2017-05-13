@@ -1257,6 +1257,7 @@ function hideTransferToast ($toast) {
  */
 function addContactToFolderShare() {
 
+    var promise = MegaPromise.resolve();
     var targets = [],
         $shareDialog = $('.share-dialog'),
         $newContacts, permissionLevel, iconPermLvl, permissionClass, selectedNode;
@@ -1266,8 +1267,6 @@ function addContactToFolderShare() {
 
         selectedNode = $.selected[0];
         $newContacts = $shareDialog.find('.token-input-list-mega .token-input-token-mega');
-
-        loadingDialog.show();
 
         // Is there a new contacts planned for addition to share
         if ($newContacts.length) {
@@ -1288,11 +1287,11 @@ function addContactToFolderShare() {
 
         // Add new contacts to folder share
         if (targets.length > 0) {
-            doShare(selectedNode, targets, true);
+            promise = doShare(selectedNode, targets, true);
         }
-
-        loadingDialog.hide();
     }
+
+    return promise;
 }
 
 /**

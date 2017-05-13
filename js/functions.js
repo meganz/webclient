@@ -5104,15 +5104,26 @@ if (typeof sjcl !== 'undefined') {
 
     Share.prototype.updateNodeShares = function() {
 
-        var self = this;
+        var promise = new MegaPromise();
 
-        if ($.removedContactsFromShare && ($.removedContactsFromShare.length > 0)) {
-            self.removeContactFromShare();
-        }
-        if ($.changedPermissions && ($.changedPermissions.length > 0)) {
-            doShare($.selected[0], $.changedPermissions, true);
-        }
-        addContactToFolderShare();
+        loadingDialog.show();
+        this.removeContactFromShare()
+            .always(function() {
+                var promises = [];
+
+                if (Object($.changedPermissions).length > 0) {
+                    promises.push(doShare($.selected[0], $.changedPermissions, true));
+                }
+                promises.push(addContactToFolderShare());
+
+                MegaPromise.allDone(promises)
+                    .always(function() {
+                        loadingDialog.hide();
+                        promise.resolve.apply(promise, arguments);
+                    });
+            });
+
+        return promise;
     };
 
 
@@ -5128,17 +5139,16 @@ if (typeof sjcl !== 'undefined') {
     Share.prototype.removeContactFromShare = function() {
 
         var self = this;
-        var userEmail = '';
-        var selectedNodeHandle = '';
-        var handleOrEmail = '';
-        var pendingContactId;
+        var promises = [];
 
-        if ($.removedContactsFromShare.length > 0) {
+        if (Object($.removedContactsFromShare).length > 0) {
 
             $.removedContactsFromShare.forEach(function(elem) {
-                userEmail = elem.userEmail;
-                selectedNodeHandle = elem.selectedNodeHandle;
-                handleOrEmail = elem.handleOrEmail;
+                var userEmail = elem.userEmail;
+                var selectedNodeHandle = elem.selectedNodeHandle;
+                var handleOrEmail = elem.handleOrEmail;
+
+                promises.push(new MegaPromise());
 
                 // The s2 api call can remove both shares and pending shares
                 api_req({
@@ -5151,9 +5161,12 @@ if (typeof sjcl !== 'undefined') {
                     userEmail: userEmail,
                     selectedNodeHandle: selectedNodeHandle,
                     handleOrEmail: handleOrEmail,
+                    promise: promises[promises.length - 1],
 
                     callback : function(res, ctx) {
-                        if (typeof res == 'object') {
+                        var promise = ctx.promise;
+
+                        if (typeof res === 'object') {
                             // FIXME: examine error codes in res.r, display error
                             // to user if needed
 
@@ -5171,14 +5184,28 @@ if (typeof sjcl !== 'undefined') {
 
                                 self.removeFromPermissionQueue(ctx.userEmail);
                             }
+
+                            // Wait for action-packet acknowledge, this is needed so that removing the last user
+                            // from a share will issue an `okd` flag which removes the associated sharekey that we
+                            // have to wait for *if* we're going to re-share to a different user next...
+                            mBroadcaster.once('share-packet.' + ctx.selectedNodeHandle, function(packet) {
+                                if (packet.okd && u_sharekeys[ctx.selectedNodeHandle]) {
+                                    console.error('The sharekey should have been removed...');
+                                }
+                                promise.resolve(packet);
+                            });
                         }
                         else {
                             // FIXME: display error to user
+
+                            promise.reject(res);
                         }
                     }
                 });
             });
         }
+
+        return MegaPromise.allDone(promises);
     };
 
     // export

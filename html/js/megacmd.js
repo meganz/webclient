@@ -67,18 +67,7 @@ function initMegacmd() {
         cmd_switchOS('windows');
     }
 
-    $('.bottom-page.scroll-button').rebind('click', function(event) {
-        bottompageScroll();
-        start_counts();
-    });
-
-    $('.bottom-page.vertical-centered-bl').rebind('mousewheel', function(e) {
-        if (e && e.originalEvent
-                && (e.originalEvent.wheelDelta < 0
-                    || e.originalEvent.deltaY > 0) && !$.infoscroll) {
-            bottompageScroll();
-        }
-    });
+    initBottompageScroll();
 
     $('.megaapp-button-info a').rebind('click', function(e) {
         if ($(this).hasClass('windows')) {
@@ -91,11 +80,6 @@ function initMegacmd() {
             cmd_switchOS('linux');
         }
         return false;
-    });
-
-    $(window).rebind('resize.megacmd', function(e) {
-        startscrollIgnore(1000);
-        jScrollStart();
     });
 }
 

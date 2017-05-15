@@ -3,35 +3,16 @@ function init_start() {
     $('.pages-nav.nav-button').removeClass('active');
     $('.pages-nav.nav-button.overview').addClass('active');
 
-    $(window).rebind('resize.startpage', function(e) {
-        if (page === 'start' && $.infoscroll) {
-            startscrollIgnore(1000);
-            jScrollStart();
-        }
-    });
-
     $('.button-48-height.register').rebind('click', function () {
         loadSubPage('register');
     });
 
-    $('.bottom-page.scroll-button').rebind('click', function(event) {
-        bottompageScroll();
-        start_counts();
-    });
-
-    $('.bottom-page.vertical-centered-bl').rebind('mousewheel', function(e) {
-        if (e && e.originalEvent
-                && (e.originalEvent.wheelDelta < 0
-                    || e.originalEvent.deltaY > 0) && !$.infoscroll) {
-            bottompageScroll();
-            start_counts();
-        }
-    });
-    
     $('.reg-st3-membership-bl').rebind('click', function(e) {
         var proPlan = $(this).attr('data-payment');
         loadSubPage('pro' + proPlan);
     });
+
+    initBottompageScroll();
 
     if (page === 'start') {
         InitFileDrag();
@@ -150,6 +131,31 @@ function jScrollStart() {
             }
         });
     }
+}
+
+function initBottompageScroll() {
+    $(window).rebind('resize.bottompage', function(e) {
+        if ($.infoscroll) {
+            startscrollIgnore(1000);
+            jScrollStart();
+        }
+    });
+
+    $('.bottom-page.scroll-button').rebind('click', function(event) {
+        bottompageScroll();
+        start_counts();
+    });
+
+    $('.bottom-page.vertical-centered-bl').rebind('mousewheel', function(e) {
+        if (e && e.originalEvent
+                && (e.originalEvent.wheelDelta < 0
+                    || e.originalEvent.deltaY > 0) && !$.infoscroll) {
+            bottompageScroll();
+            if (page === 'start' && $.infoscroll) {
+                start_counts();
+            }
+        }
+    });
 }
 
 function bottompageScroll(blockSwing) {

@@ -9346,59 +9346,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .active .fm-dialog-add-contact-input input {
     color: #9a9a9a;
 }
-.new-start-arrow-button:hover {
-    background-color: rgba(0,0,0,0.6);
-}
-.active.new-start-arrow-button {
-    background-color: rgba(0,0,0,0.3);
-    color: white;
-    text-align: center;
-    float: left;
-    margin: 0;
-    cursor: pointer;
-    height: 34px;
-    line-height: 33px;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    display: block;
-    padding: 0 37px 0 15px;
-    margin: 12px 12px 0 0;
-    -moz-border-radius: 6px;
-    -webkit-border-radius: 6px;
-    border-radius: 6px;
-    background-image: url(../images/mega/new-start-full1.png);
-    background-position: right -578px;
-    background-repeat: no-repeat;
-    -webkit-transition: background-color 200ms ease-in-out;
-    -moz-transition: background-color 200ms ease-in-out;
-    -o-transition: background-color 200ms ease-in-out;
-    -ms-transition: background-color 200ms ease-in-out;
-    transition: background-color 200ms ease-in-out;
-    cursor: pointer;
-}
-.active.new-start-arrow-button.how-it-works {
-    color: white;
-    background-position: right -578px;
-    padding: 0 15px 0 37px;
-}
-.active.new-start-arrow-button.download-now {
-    background-position: -2px -1369px;
-    padding: 0 15px 0 37px;
-}
-.active.new-start-arrow-button.download-now:hover {
-    background-position: -2px -1409px;
-}
-.active.new-start-arrow-button:hover {
-    background-color: #b2b2b2;
-    background-position: right -578px;
-    color: white;
-}
-.active.new-start-arrow-button.how-it-works:hover {
-    background-color: #6d6d6d;
-    border: 2px solid #6d6d6d;
-    background-position: -275px -554px;
-}
 .fm-move-dialog-body {
     height: 205px;
     -webkit-box-sizing: border-box;
@@ -15631,86 +15578,6 @@ span.browsers-update {
 .sync-top-txt-block h3.main-italic-header .blue {
     color: #1FA4E5;
 }
-.sync-list-txt {
-    font-size: 14px;
-    line-height: 21px;
-    color: #666666;
-    padding: 15px 0 0px 22px;
-    background-image: url(../images/mega/mobile-sprite_v7.png);
-    background-repeat: no-repeat;
-    background-position: -813px -1536px;
-}
-.sync-subheader {
-    font-size: 14px;
-    color: #666666;
-    font-family: 'source_sans_prosemibold';
-}
-.sync-icon, .mobile-icon, .ff-icon, .chrome-icon {
-    float: left;
-    width: 448px;
-    height: 200px;
-    background-image: url(../images/mega/mobile-sprite_v7.png);
-    background-repeat: no-repeat;
-    background-position: -488px -433px;
-    margin-bottom: 28px;
-}
-.mobile-icon {
-    height: 260px;
-    background-position: 20px -1096px;
-}
-.ff-icon {
-    height: 202px;
-    background-position: 0 -2px;
-    width: 320px;
-    cursor: pointer;
-}
-.chrome-icon {
-    height: 202px;
-    background-position: 0 -429px;
-    width: 320px;
-    cursor: pointer;
-}
-.ff-icon:hover, .ff-icon.hovered {
-    background-position: -550px -2px;
-}
-.sync-right-block, .mobile-right-block, .ff-right-block, .chrome-right-block {
-    margin-left: 448px;
-    margin-bottom: 28px;
-}
-.ff-right-block, .chrome-right-block {
-    margin-left: 330px;
-}
-.mobile-right-block {
-    margin-left: 485px;
-}
-.sync-list-block, .mobile-txt-block, .ff-txt-block, .chrome-txt-block {
-    height: 200px;
-    display: table-cell;
-    vertical-align: middle;
-}
-.mobile-txt-block {
-    height: 260px;
-}
-.ff-txt-block, .chrome-txt-block {
-    height: 202px;
-}
-.sync-bottom-block {
-    text-align: center;
-    padding: 49px 20px 14px 20px;
-}
-.main-mid-pad.sync-bottom-block.button {
-    padding: 49px 20px 38px 20px;
-}
-.m-client-bottom-block {
-    text-align: center;
-    padding: 27px 30px 47px 20px;
-    line-height: 0;
-    font-size: 0;
-}
-.ff-bottom-block {
-    text-align: center;
-    padding: 49px 20px 49px 20px;
-}
 .gray-bg {
     background-color: #f2f2f2;
 }
@@ -15757,63 +15624,6 @@ span.browsers-update {
     width: 247px;
     min-width: 180px;
 }
-.chrome-app-button {
-    background-image: url(../images/mega/chrome-app_v3.png);
-    background-position: center -157px;
-    background-repeat: no-repeat;
-}
-.chrome-app-logo {
-    width: 260px;
-    height: 60px;
-    margin: 38px auto 26px auto;
-    background-image: url(../images/mega/chrome-app_v3.png);
-    background-position: -230px top;
-    background-repeat: no-repeat;
-}
-.chrome-app-scr {
-    background-image: url(../images/mega/chrome-app_v3.png);
-    background-position: center -155px;
-    background-repeat: no-repeat;
-    cursor: pointer;
-    display: block;
-    height: 418px;
-    margin: 30px auto -33px auto;
-    width: 700px;
-}
-.chrome-version-info {
-    color: #e64a4d;
-    display: block;
-    font-size: 13px;
-    font-style: italic;
-    line-height: 20px;
-    margin-top: 10px;
-    text-align: center;
-    min-height: 20px;
-}
-.firefox-version-info {
-    color: #e64a4d;
-    display: block;
-    font-size: 13px;
-    font-style: italic;
-    line-height: 20px;
-    margin-bottom: 20px;
-    min-height: 20px;
-}
-a.manual-install-link {
-    font-family: 'Open Sans Semibold Italic', Arial;
-}
-.chrome-app-button.new-app {
-    background-image: url(../images/mega/download-buttons-sprite.png);
-    background-repeat: no-repeat;
-    background-position: 10px -397px;
-}
-.sync-button-txt {
-    display: block;
-}
-.new-app .sync-button-txt {
-    font-size: 17px;
-    color: #999999;
-}
 .new-app .pro-mid-header {
     padding-top: 46px;
     margin-bottom: 15px;
@@ -15847,203 +15657,6 @@ a.manual-install-link {
     -webkit-box-shadow: 0px 0px 0px 4px #DB3200;
     -moz-box-shadow: 0px 0px 0px 4px #DB3200;
     box-shadow: 0px 0px 0px 4px #DB3200;
-}
-.sync-button-txt {
-    padding-left: 70px;
-    font-size: 17px;
-    line-height: 24px;
-    color: #777777;
-    font-family: 'source_sans_prosemibold';
-    white-space: nowrap;
-}
-.ff-bottom-block .sync-button-txt {
-    color: #777777;
-    font-family: "source_sans_prosemibold";
-    font-size: 17px;
-    line-height: 20px;
-    padding-left: 70px;
-    white-space: nowrap;
-}
-.ff-bottom-block .url {
-    color: #777;
-    display: block;
-    font-size: 12px;
-    font-weight: bold;
-    margin-left: 59px;
-    text-align: center;
-}
-.sync-button-txt.small {
-    font-size: 13px;
-    line-height: 20px;
-}
-.sync-button-txt.mid {
-    font-size: 14px;
-}
-.sync-bottom-txt {
-    text-align: center;
-    font-size: 14px;
-    line-height: 21px;
-    color: #3F4646;
-    padding: 14px 0 0 0;
-}
-.chrome-warning {
-    margin-top: 14px;
-    padding-bottom: 0;
-    padding-top: 0;
-}
-.chrome-warning-hover {
-    background-color: #d32600;
-    border-radius: 15px;
-    color: #fff;
-    display: inline-block;
-    padding-left: 10px;
-    padding-right: 10px;
-}
-.chrome-warning-hover a.red {
-    color: #fff;
-    font-weight: bold;
-}
-.sync-bottom-txt.linux {
-    text-align: left;
-}
-.mobile-small-icon {
-    width: 80px;
-    height: 78px;
-    float: left;
-    background-image: url(../images/mega/mobile-sprite_v7.png);
-    background-repeat: no-repeat;
-    background-position: -465px -1122px;
-    margin: 15px 0 17px 0;
-}
-.mobile-small-icon.fully-featured {
-    background-position: -465px -1241px;
-}
-.mobile-text-block {
-    margin: 0 0 0 105px;
-    padding: 15px 0 17px 0;
-}
-.mobile-text-header {
-    font-size: 16px;
-    line-height: 25px;
-    letter-spacing: -0.1px;
-    color: #BF1900;
-    padding-bottom: 5px;
-    font-family: 'Open Sans Semibold Italic';
-}
-.mobile-text, .ff-txt, .chrome-txt {
-    font-size: 14px;
-    line-height: 25px;
-    color: #3F4646;
-}
-.ff-txt.left, .ff-txt.right, .chrome-txt.left, .chrome-txt.right {
-    width: 280px;
-    padding-top: 25px;
-}
-.chrome-bottom-block {
-    float: left;
-    width: 280px;
-    min-height: 220px;
-    border: 2px solid #e7e7e7;
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
-    border-radius: 5px;
-    background-color: white;
-    margin: 30px 0 48px 44px;
-    position: relative;
-}
-.chrome-bottom-block.first {
-    margin-left: 0;
-}
-.chrome-bottom-block .actual-links {
-    display: none;
-}
-.chrome-bottom-block .chrome-download-button:hover .actual-links > a {
-    color: #fff;
-}
-.chrome-bottom-block .actual-links > a {
-    display: block;
-    font-size: 14px;
-}
-.chrome-bottom-block .actual-links > a:hover {
-    font-weight: bold;
-}
-.chrome-bottom-block .actual-links > a:first-child {
-    margin-top: 7px;
-}
-.chrome-number {
-    width: 30px;
-    height: 30px;
-    position: absolute;
-    text-align: center;
-    line-height: 29px;
-    color: white;
-    font-size: 16px;
-    font-family: 'source_sans_probold', Arial;
-    -webkit-border-radius: 100%;
-    -moz-border-radius: 100%;
-    border-radius: 100%;
-    background-color: #b2b2b2;
-    left: 10px;
-    top: 10px;
-    z-index: 100;
-}
-.chrome-bott-icons {
-    height: 140px;
-    background-image: url(../images/mega/mobile-sprite_v7.png);
-    background-repeat: no-repeat;
-    background-position: 0 -768px;
-}
-.chrome-bott-icons.cloud {
-    background-position: 0 -766px;
-}
-.chrome-bott-icons.cog {
-    background-position: -328px -766px;
-}
-.chrome-bott-icons.file {
-    background-position: -660px -766px;
-}
-.chrome-download-button, a.chrome-download-button {
-    height: 60px;
-    display: block;
-    background-color: white;
-    margin: 10px 10px 0 10px;
-    cursor: pointer;
-    padding: 0 15px 0 70px;
-    background-image: url(../images/mega/chrome-app_v3.png);
-    background-repeat: no-repeat;
-    background-position: -644px 8px;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
-    border-radius: 5px;
-    text-align: left;
-    white-space: nowrap;
-    color: #666666;
-    font-size: 13px;
-    line-height: 21px;
-    border: 2px solid #d0d0d0;
-}
-.chrome-download-txt {
-    font-size: 17px;
-    font-family: 'source_sans_prosemibold', Arial;
-    display: block;
-    padding: 8px 0 0 0;
-}
-.chrome-download-button:hover, a.chrome-download-button:hover {
-    background-color: #DB0605;
-    border: 2px solid #DB0605;
-    background-image: url(../images/mega/mobile-sprite_v7.png);
-    background-repeat: no-repeat;
-    background-position: -4px -919px;
-    color: white;
-}
-.chrome-bottom-txt {
-    font-size: 14px;
-    line-height: 20px;
-    color: #3F4646;
-    padding: 8px 15px 10px 15px;
 }
 strong, b {
     font-family: 'source_sans_prosemibold', Arial;
@@ -18156,14 +17769,19 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     display: inline-block;
     margin: 30px 25px 25px;
     position: relative;
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
 }
 .download-megasync-dialog .button:hover {
     background-color: #b2b2b2;
-    border: 2px solid #fff;
+    border-color: #b2b2b2;
 }
 .download-megasync-dialog .icon {
-    background-image: url("../images/mega/sync-nw-v3.png");
-    background-position: -15px -1150px;
+    background-image: url(../images/mega/pages-sprite.png);
+    background-position: 2px -771px;
     background-repeat: no-repeat;
     display: block;
     height: 50px;
@@ -18173,7 +17791,7 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     width: 50px;
 }
 .download-megasync-dialog .button:hover .icon {
-    background-position: -15px -1199px;
+    background-position: 2px -821px;
 }
 .download-megasync-dialog .button-txt {
     color: #777;
@@ -18390,98 +18008,6 @@ a.ff-extension-button:hover {
     background-image: url(../images/mega/context-top.png);
     background-position: 10px -198px;
     background-repeat: no-repeat;
-    cursor: pointer;
-}
-.sync-top-logo {
-    width: 160px;
-    height: 42px;
-    background-image: url(../images/mega/sync-nw-v3.png);
-    background-position: center 1px;
-    background-repeat: no-repeat;
-    margin: 38px auto 26px auto;
-}
-.sync-top-txt {
-    font-size: 14px;
-    text-align: center;
-    color: #333333;
-    padding-bottom: 13px;
-}
-.sync-top-txt strong, .sync-short-block li strong {
-    color: #D32600;
-    font-family: 'source_sans_prosemibold', Arial;
-    font-weight: normal;
-}
-.sync-main-img {
-    width: 700px;
-    height: 446px;
-    margin: 0 auto -26px auto;
-    background-image: url(../images/mega/img_sync.png);
-    background-position: center 1px;
-    background-repeat: no-repeat;
-}
-.sync-white-bl {
-    padding: 33px 20px 18px 20px;
-    width: 980px;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-    margin: 0 auto;
-}
-.sync-short-block {
-    width: 50%;
-    float: right;
-    padding: 0 0 0 45px;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-}
-.sync-short-block:first-child {
-    padding: 0 5px 0 0;
-    float: left;
-}
-.sync-short-block ul {
-    padding: 0;
-    margin: 0;
-}
-.sync-short-block li {
-    list-style: none;
-    font-size: 14px;
-    color: #666666;
-    margin: 0;
-    padding: 7px 0 7px 25px;
-    line-height: 28px;
-    background-image: url(../images/mega/sync-nw-v3.png);
-    background-position: left -128px;
-    background-repeat: no-repeat;
-}
-.main-mid-pad.sync-bottom-block.sync-pad {
-    padding: 0 20px;
-}
-.sync-apps-block {
-    width: 50%;
-    float: left;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-    border-left: 2px solid white;
-    margin-left: -2px;
-    padding: 49px 0 40px 45px;
-}
-.sync-apps-block:first-child {
-    border-right: 2px solid white;
-    padding: 49px 45px 40px 0;
-    margin: 0;
-    border-left: 0;
-}
-.sync-help-center {
-    background-image: url(../images/mega/sync-nw-v3.png);
-    background-position: center -352px;
-    background-repeat: no-repeat;
-    text-align: center;
-    padding: 107px 0 25px 0;
-    cursor: pointer;
-}
-.sync-help-center .st-apps-title {
     cursor: pointer;
 }
 .slideshow-overlay {
@@ -23425,7 +22951,6 @@ body.pro:after {
     width: 256px;
     height: 67px;
     background-image: url(../images/mega/download-sprite-v6.png);
-    background-size: 257px auto;
     background-position: center -1479px;
     margin: 0 0 0 28px;
     display: inline-block;

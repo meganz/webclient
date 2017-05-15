@@ -20,7 +20,7 @@ function renderLinuxOptions(linuxsync) {
         $(this).parent().removeClass('radioOff').addClass('radioOn');
         $(this).attr('checked', true);
     });
-    $('.button.download-megasync').addClass('disabled');
+    $('.megasync .download-megasync').addClass('disabled');
     $('.version-select-txt').text(l[2029]);
     var ua = navigator.userAgent.toLowerCase();
     if (ua.indexOf('i686') > -1
@@ -39,7 +39,7 @@ function renderLinuxOptions(linuxsync) {
         }
     });
 
-    $('.button.download-megasync').rebind('click', function(e) {
+    $('.megasync .download-megasync').rebind('click', function(e) {
         if (!syncurl) {
             msgDialog('info', l[2029], l[2030]);
             return false;
@@ -83,18 +83,26 @@ function init_sync() {
     else {
         sync_switchOS('windows');
     }
+
+    $('.pages-nav.nav-button').removeClass('active');
+    $('.pages-nav.nav-button.sync').addClass('active');
+
+    initBottompageScroll();
 }
 
 function sync_switchOS(os) {
     var ostxt;
     $('.linuxhint').hide();
-    $('.button.download-megasync').attr('href', '');
+    $('.megasync .download-megasync')
+        .attr('href', '')
+        .removeClass('disabled');
     $('.megaapp-linux').addClass('hidden');
+    $('.bottom-page.megasync').removeClass('linux');
     syncurl = megasync.getMegaSyncUrl(os);
     if (os === 'windows') {
         $('.megaapp-button-info').safeHTML(l[12485]);
-        $('.button.download-megasync').attr('href', syncurl);
-        $('.button.download-megasync').unbind('click');
+        $('.megasync .download-megasync').attr('href', syncurl);
+        //$('.megasync .download-megasync').unbind('click');
     }
     else if (os === 'mac') {
         ostxt = l[2031];
@@ -105,10 +113,11 @@ function sync_switchOS(os) {
             ostxt = l[1158].replace('Linux', 'Mac');
         }
         $('.megaapp-button-info').safeHTML(l[12487]);
-        $('.button.download-megasync').attr('href', syncurl);
-        $('.button.download-megasync').unbind('click');
+        $('.megasync .download-megasync').attr('href', syncurl);
+        //$('.megasync .download-megasync').unbind('click');
     }
     else if (os === 'linux') {
+        $('.bottom-page.megasync').addClass('linux');
         loadingDialog.show();
         megasync.getLinuxReleases(renderLinuxOptions);
     }
@@ -138,7 +147,7 @@ function changeLinux(linuxsync, i) {
         }
 
         $('.version-select-txt').text(linuxsync[i].name);
-        $('.megasync .button.download-megasync').removeClass('disabled');
+        $('.megasync .download-megasync').removeClass('disabled');
         var platform = '64';
         var c = $('.linux32').parent().attr('class');
         if (c && c.indexOf('radioOn') > -1) {
@@ -147,7 +156,7 @@ function changeLinux(linuxsync, i) {
         syncurl = megasync.getMegaSyncUrl(linuxsync[i]['name'] + " " + platform);
         nautilusurl = megasync.getMegaSyncUrl(linuxsync[i]['name'] + " " + platform + "n");
         var filename = syncurl.split('/').pop();
-        $('.button.download-megasync').attr('href', syncurl);
+        $('.megasync .download-megasync').attr('href', syncurl);
         $('.megaapp-button-info a').attr('href', nautilusurl);
         $('.linuxhint').safeHTML('*@@: <font style="font-family:courier;">@@ @@</font>',
                                  l[1909], linuxsync[i].c, filename);
@@ -159,7 +168,7 @@ function changeLinux(linuxsync, i) {
         syncurl = false;
         nautilusurl = false;
         $('.linuxhint').hide();
-        $('.megasync .button.download-megasync').addClass('disabled');
+        $('.megasync .download-megasync').addClass('disabled');
         $('.version-select-txt').text(l[2029]);
         mainScroll();
     }

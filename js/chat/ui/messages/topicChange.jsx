@@ -43,7 +43,9 @@ var TopicChange = React.createClass({
         var text = __(l[9081])
             .replace(
                 "%s",
-                '<strong className="dark-grey-txt">"' + htmlentities(topic) + '"</strong>'
+                '<strong className="dark-grey-txt">"' +
+                    megaChat.plugins.emoticonsFilter.processHtmlMessage(htmlentities(topic)) +
+                '"</strong>'
             );
 
         

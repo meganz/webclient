@@ -6095,10 +6095,9 @@ th.grid-first-th {
     right: 5px;
     display: none;
 }
-
-/*.linked .data-item-icon {
+.linked .data-item-icon {
     background-position: -106px -963px;
-}*/
+}
 .taken-down .data-item-icon, .taken-down.nw-fm-tree-item .data-item-icon {
     background-position: -146px -963px;
 }
@@ -7614,7 +7613,7 @@ table {
     display: inline-block;
     vertical-align: top;
 }
-.fm-breadcrumbs:first-child:not(.account) .right-arrow-bg span {
+.fm-breadcrumbs:first-child:not(.account):not(.public-links) .right-arrow-bg span {
     display: none;
 }
 .fm-breadcrumbs.shared-with-me:first-child .right-arrow-bg, .fm-breadcrumbs.contacts:first-child .right-arrow-bg {
@@ -7666,7 +7665,7 @@ table {
     -khtml-opacity: 0;
     opacity: 0;
 }
-.fm-breadcrumbs:first-child .right-arrow-bg, .fm-share-breadcrumbs:first-child .right-arrow-bg {
+.fm-breadcrumbs:first-child:not(.public-links) .right-arrow-bg, .fm-share-breadcrumbs:first-child .right-arrow-bg {
     background-image: url(../images/mega/nw-fm-sprite_v21.svg);
     background-repeat: no-repeat;
 }
@@ -7674,11 +7673,20 @@ table {
     color: #999999;
     cursor: pointer;
 }
-.deactivated .fm-breadcrumbs .right-arrow-bg, .deactivated .fm-share-breadcrumbs .right-arrow-bg {
+.deactivated .fm-breadcrumbs:not(.public-links) .right-arrow-bg, .deactivated .fm-share-breadcrumbs .right-arrow-bg {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -moz-opacity: 0;
     -khtml-opacity: 0;
     opacity: 0;
+}
+.fm-breadcrumbs.public-links i {
+    position: absolute;
+    left: 12px;
+    top: 8px;
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=75);
+    -moz-opacity: 0.75;
+    -khtml-opacity: 0.75;
+    opacity: 0.75;
 }
 .fm-account-top .right-arrow-bg {
     font-size: 16px;
@@ -26860,32 +26868,19 @@ opacity: 1;
     margin-top: 14px;
     color: #666666;
 }
-
-.public-links-text {
-    height: 18px;
-    width: 71px;
-    color: #666666;
-    font-family: "source_sans_proregular";
-    font-size: 14px;
-    line-height: 18px;
-}
-
 .public-links-cnt {
-    zoom: 80%;
     height: 14px;
-    width: 21px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
     border-radius: 4px;
     background-color: #999999;
     margin-left: 8px;
-    padding: 0px 6px;
-}
-
-.public-links-cnt-txt {
-    height: 18px;
-    width: 13px;
+    padding: 0px 3px !important;
     color: #FFFFFF;
-    font-family: "source_sans_proregular";
     font-size: 12px;
-    font-weight: 600;
-    line-height: 18px;
+    line-height: 13px;
+    display: inline-block;
+    vertical-align: top;
+    margin-top: 4px;
+    margin: 4px 0 0 8px;
 }

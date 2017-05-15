@@ -7,20 +7,6 @@
     display: inline-block;
     vertical-align: top;
 }
-.linked .data-item-icon {
-    top: 7px;
-}
-.link-icon, .linked .data-item-icon {
-    width: 16px;
-    height: 10px;
-    background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxMCI+PGcgZmlsbD0ibm9uZSI+PGcgZmlsbD0iIzk5OSI+PHBhdGggZD0iTTcgMkg1QzMuMzQgMiAyIDMuMzQgMiA1YzAgMS42NSAxLjM0IDMgMyAzaDJ2MmgyVjhoMmMxLjY2IDAgMy0xLjM0IDMtMyAwLTEuNjUtMS4zNC0zLTMtM0g5VjBIN3Yyek0wIDVjMC0yLjc2IDIuMjQtNSA1LTVoNmMyLjc2IDAgNSAyLjI0IDUgNXMtMi4yNCA1LTUgNUg1Yy0yLjc2IDAtNS0yLjI0LTUtNXptNS0xaDZ2Mkg1VjR6Ii8+PC9nPjwvZz48L3N2Zz4=);
-    background-repeat: no-repeat;
-    background-position: 0px 0px;
-}
-.link-icon-blk {
-    display: inline-flex;
-    margin: 13px 16px 13px 14px;
-}
 .huge-grey-warning {
     width: 220px;
     height: 184px;

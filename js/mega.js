@@ -1510,7 +1510,6 @@ function MegaData()
             }
             else if (id === 'links') {
                 if (M.su.EXP) {
-                    $('.public-links-cnt-txt').text(Object.keys(M.su.EXP).length);
                     M.v = Object.keys(M.su.EXP)
                         .map(function(h) {
                             return M.d[h];
@@ -1518,7 +1517,6 @@ function MegaData()
                 }
                 else {
                     M.v = [];
-                    $('.public-links-cnt-txt').text(0);
                 }
             }
             else if (id.substr(0, 6) === 'search') {
@@ -2450,7 +2448,6 @@ function MegaData()
             hasnext = 'has-next-button';
         }
 
-        $('.public-links-header').addClass('hidden');
         if (this.currentdirid && this.currentdirid.substr(0, 5) === 'chat/') {
             var contactName = $('a.fm-tree-folder.contact.lightactive span.contact-name').text();
             $('.fm-right-header .fm-breadcrumbs-block').safeHTML(
@@ -2467,7 +2464,23 @@ function MegaData()
             $('.search-files-result').addClass('hidden');
         }
         else if (this.currentdirid === 'links') {
-            $('.public-links-header').removeClass('hidden');
+            $('.fm-right-header .fm-breadcrumbs-block').safeHTML(
+                '<a class="fm-breadcrumbs public-links">'
+                    + '<span class="right-arrow-bg ui-draggable">'
+                        + '<span>'
+                            + '<i class="small-icon context get-link"></i>'
+                            + 'Public Links'
+                            + '<span class="public-links-cnt">0</span>'
+                        + '</span>'
+                    + '</span>'
+                + '</a>');
+
+            if (M.su.EXP) {
+                $('.public-links-cnt').text(Object.keys(M.su.EXP).length);
+            }
+            else {
+                $('.public-links-cnt').text(0);
+            }
         }
         else if (this.currentdirid && this.currentdirid.substr(0, 7) === 'search/') {
             $('.fm-right-header .fm-breadcrumbs-block').safeHTML(

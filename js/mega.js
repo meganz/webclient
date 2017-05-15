@@ -6542,6 +6542,10 @@ function execsc() {
                     if (a.s != 2) notify.notifyFromActionPacket(a);
                     break;
 
+                case 'se':
+                    processEmailChangeActionPacket(a);
+                    break;
+
                 case 'ua':
                     mega.attr.handleUserAttributeActionPackets(a, loadavatars);
             }
@@ -7062,27 +7066,7 @@ function execsc() {
                     break;
 
                 case 'se':
-                    // set email
-                    var emailChangeAccepted = (a.s == 3
-                                               && typeof a.e == 'string'
-                                               && a.e.indexOf('@') != -1);
-
-                    if (emailChangeAccepted) {
-                        var user = M.getUserByHandle(a.u);
-
-                        if (user) {
-                            user.m = a.e;
-                            process_u([user]);
-
-                            if (a.u === u_handle) {
-                                u_attr.email = user.m;
-
-                                if (M.currentdirid === 'account/profile') {
-                                    $('.nw-fm-left-icon.account').trigger('click');
-                                }
-                            }
-                        }
-                    }
+                    processEmailChangeActionPacket(a);
                     break;
 
                 default:

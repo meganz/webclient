@@ -3042,3 +3042,6 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
     // Call the mobile version
     mobile.messageOverlay.show(msg, submsg);
 }
+
+function treeUI() {}
+function sharedUInode() {}

@@ -708,7 +708,7 @@ function execsc() {
                         processPS([a]);
                     }
 
-                    if (fminitialized && !is_mobile) {
+                    if (fminitialized) {
                         // a full share contains .h param
                         sharedUInode(a.h);
                     }
@@ -965,9 +965,7 @@ function execsc() {
                         }
 
                         if (fminitialized) {
-                            if (!is_mobile) {
-                                sharedUInode(a.n);
-                            }
+                            sharedUInode(a.n);
                         }
                         scsharesuiupd = true;
                     }

@@ -1365,7 +1365,7 @@ MegaData.prototype.delNodeShare = function(h, u, okd) {
         if (updnode) {
             M.nodeUpdated(this.d[h]);
 
-            if (fminitialized && !is_mobile) {
+            if (fminitialized) {
                 sharedUInode(h);
             }
         }

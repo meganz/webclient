@@ -1726,7 +1726,7 @@ function worker_procmsg(ev) {
             if (!--nodesinflight[ev.data.scni]) {
                 delete nodesinflight[ev.data.scni];
 
-                if (scq[ev.data.scni][0] && sc_fqueuet(ev.data.scni)) {
+                if (!loadfm.fromapi && scq[ev.data.scni][0] && sc_fqueuet(ev.data.scni)) {
                     // fetch required nodes from db
                     sc_fetcher();
                 }

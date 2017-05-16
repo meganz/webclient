@@ -1807,6 +1807,7 @@ else if (!b_u) {
     jsl.push({f:'html/transferwidget.html', n: 'transferwidget', j:0});
     jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});
     jsl.push({f:'js/fm/removenode.js', n: 'fm_removenode_js', j: 1});
+    jsl.push({f:'js/fm/ufssizecache.js', n: 'ufssizecache_js', j:1});
 
     if (!is_mobile) {
         jsl.push({f:'css/style.css', n: 'style_css', j:2,w:30,c:1,d:1,cache:1});
@@ -1814,7 +1815,6 @@ else if (!b_u) {
         jsl.push({f:'js/fm/achievements.js', n: 'achievements_js', j: 1, w: 5});
         jsl.push({f:'js/fm/dashboard.js', n: 'fmdashboard_js', j:1,w:5});
         jsl.push({f:'js/fm/account.js', n: 'fm_account_js', j:1});
-        jsl.push({f:'js/fm/ufssizecache.js', n: 'ufssizecache_js', j:1});
         jsl.push({f:'js/ui/miniui.js', n: 'miniui_js', j:1});
 
         jsl.push({f:'html/start.html', n: 'start', j:0});

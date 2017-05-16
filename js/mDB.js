@@ -105,7 +105,7 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
         try {
             if (!fmdb.db) {
                 var todrop = [];
-                var dbpfx = 'fm114_';
+                var dbpfx = 'fm11112_';
 
                 // enumerate databases and collect those not prefixed with 'dbpfx'
                 // (which is the current format)
@@ -164,7 +164,15 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
                                     fmdb.db.delete().then(function(){
                                         fmdb.db.open().then(function(){
                                             result(false);
+                                        }).catch (function (e) {
+                                            fmdb.crashed = true;
+                                            fmdb.logger.error(e);
+                                            result(false);
                                         });
+                                    }).catch (function (e) {
+                                        fmdb.crashed = true;
+                                        fmdb.logger.error(e);
+                                        result(false);
                                     });
                                 }
                             });

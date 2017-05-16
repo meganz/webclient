@@ -45,11 +45,6 @@ var is_ios = is_mobile && (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 
  */
 function isMobile() {
 
-    // The blog is mobile optimised already but requires the desktop code path for now
-    if (window.location.href.indexOf('blog') > -1) {
-        return false;
-    }
-
     // If extension, not applicable
     if (is_chrome_firefox) {
         return false;

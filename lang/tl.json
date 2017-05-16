@@ -4104,7 +4104,7 @@
     "16487": "Select the file you want to keep:",
     "16488": "Upload and replace",
     "16489": "Replace the file in the destination folder with the file you are uploading:",
-    "16490": "Don\u2019t upload",
+    "16490": "Don't upload",
     "16491": "No files will be changed. You will keep the file below:",
     "16492": "Keep both files",
     "16493": "The file you are uploading will be renamed as:",
@@ -4112,9 +4112,10 @@
     "16495": "Move and replace",
     "16496": "Copy and replace",
     "16497": "Replace the file in the destination folder with the file you are moving:",
-    "16498": "Replace the file in the destination folder with the file you are copying:",
-    "16499": "Don\u2019t move",
-    "16500": "Don\u2019t copy",
+    "16498": "Palitan ang file sa folder ng panibago:",
+    "16499": "Huwag i-move",
+    "16500": "Huwag i-copy",
+    "16501": "If you previously subscribed to a PRO plan with Google Play or Apple iTunes, please manually cancel your subscriptions with them inside Google Play or the iTunes app on your device. If you need any assistance please contact [A1]support@mega.nz[\/A1] or see our [A2]help article for Android[\/A2] or our [A3]help article for iOS[\/A3].",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4372,6 +4373,7 @@
         "file_version_renamed_from": 16477,
         "file_current_version": 16478,
         "file_edit_by_me": 16480,
-        "file_rename_by_me": 16481
+        "file_rename_by_me": 16481,
+        "cancel-subscription-dialog-message": 16501
     }
 }

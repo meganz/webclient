@@ -410,6 +410,9 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
                 false
             );
             chatRoom = r[1];
+            if (!chatRoom) {
+                return masterPromise.reject();
+            }
             if (actionPacket.ct) {
                 chatRoom.ct = actionPacket.ct;
             }

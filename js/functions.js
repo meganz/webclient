@@ -2774,7 +2774,7 @@ var obj_values = function obj_values(obj) {
     var vals = [];
 
     Object.keys(obj).forEach(function(memb) {
-        if (obj.hasOwnProperty(memb)) {
+        if (typeof obj.hasOwnProperty !== 'function' || obj.hasOwnProperty(memb)) {
             vals.push(obj[memb]);
         }
     });

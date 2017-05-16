@@ -1559,9 +1559,7 @@ function topmenuUI() {
         }
 
         // Show PRO plan expired warning popup (if applicable)
-        if (!is_mobile) {
-            alarm.planExpired.render();
-        }
+        alarm.planExpired.render();
     }
     else {
         if (u_type === 0 && !confirmok && page !== 'key') {

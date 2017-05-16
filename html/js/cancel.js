@@ -77,7 +77,7 @@
         });
 
         // Keyboard button listener <Enter key> or  <Esc>
-        $(obj.opt.passwordInputId).rebind('keypress', function(e) {
+        $(obj.opt.passwordInputId).rebind('keypress.st2_kp', function(e) {
 
             var key = e.wich || e.keyCode;
 
@@ -240,7 +240,7 @@
 
 
         // Keyboard button listener
-        $(self.opt.fbDlgClass).rebind('keypress', function(e) {
+        $(self.opt.fbDlgClass).rebind('keypress.st3_kp', function(e) {
 
             var key = e.wich || e.keyCode;
 

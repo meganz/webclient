@@ -92,6 +92,12 @@ function init_start() {
             startpageScroll();
         }
     });
+
+    // Show the home page main content immediately for search engines
+    if (is_search_engine_bot && (page === 'start')) {
+        startpageScroll();
+    }
+
     if (page === 'start') {
         InitFileDrag();
     }

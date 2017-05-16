@@ -355,7 +355,7 @@ MegaPromise.prototype.linkFailTo = function(targetPromise) {
         // Using MegaPromise.fail since it's more lightweight than the thenable
         // which creates a new deferred instance proxied back to MegaPromise...
         targetPromise.fail(function() {
-            self.resolve.apply(self, arguments);
+            self.reject.apply(self, arguments);
         });
     }
     else {

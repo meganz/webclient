@@ -86,7 +86,7 @@ var exportPassword = {
             this.$dialog = $('.export-links-dialog');
 
             // If they are a Pro user, enable the toggle button
-            if (typeof u_attr.p !== 'undefined') {
+            if (u_attr.p) {
                 this.initPasswordFeatureToggle();
             }
 
@@ -336,7 +336,7 @@ var exportPassword = {
             var $proButton = this.$dialog.find('.get-pro');
 
             // If they do not have Pro
-            if (typeof u_attr.p === 'undefined') {
+            if (!u_attr.p) {
 
                 // Hide the options initially
                 $extraOptions.addClass('hidden');
@@ -369,7 +369,7 @@ var exportPassword = {
                     $extraOptionsToggle.text(l[9064]);   // Hide options
 
                     // If they are not a Pro user, show the Get Pro button
-                    if (typeof u_attr.p === 'undefined') {
+                    if (!u_attr.p) {
                         $proButton.removeClass('hidden');
                     }
 
@@ -988,7 +988,7 @@ var exportExpiry = {
     init: function() {
 
         // If they are a pro user, enable the expiry toggle button and date picker
-        if (typeof u_attr.p !== 'undefined') {
+        if (u_attr.p) {
             exportExpiry.initExpiryFeatureToggle();
             exportExpiry.initExpiryDatePicker();
             exportExpiry.prepopulateExpiryDates();

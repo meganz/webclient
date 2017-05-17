@@ -18,6 +18,9 @@ var ua = window.navigator.userAgent.toLowerCase();
 var storage_version = '1'; // clear localStorage when version doesn't match
 var l, d = false;
 
+// Cache location.search parameters early as the URL may get rewritten later
+var locationSearchParams = location.search;
+
 var is_electron = false;
 if (typeof process !== 'undefined') {
     var mll = process.moduleLoadList || [];
@@ -535,7 +538,6 @@ var mega = {
 var hashLogic = false;
 if (localStorage.hashLogic) hashLogic=true;
 if (typeof history == 'undefined') hashLogic=true;
-
 
 var bootstaticpath = staticpath;
 var urlrootfile = '';
@@ -1650,8 +1652,8 @@ else if (!b_u) {
         var langCodeVariant = null;
 
         // If a search bot, they may set the URL as e.g. mega.nz/pro?es so get the language from that
-        if (is_search_engine_bot && location.search !== '') {
-            userLang = location.search.replace('?', '');
+        if (is_search_engine_bot && locationSearchParams !== '') {
+            userLang = locationSearchParams.replace('?', '');
         }
         else {
             // Otherwise get the user's preferred language in their browser settings

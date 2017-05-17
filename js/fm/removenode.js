@@ -104,7 +104,7 @@ function removeUInode(h, parent) {
 
     if (M.currentdirid === h || isCircular(h, M.currentdirid) === true) {
         parent = parent || M.getNodeParent(n || h) || RootbyId(h);
-        return M.openFolder(parent);
+        delay('openfolder', M.openFolder.bind(M, parent));
     }
 }
 

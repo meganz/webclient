@@ -4298,6 +4298,16 @@ function getDDhelper()
  * @returns {menuItems.items|Array}
  */
 function menuItems() {
+    var promise = new MegaPromise();
+
+    dbfetch.coll($.selected)
+        .always(function() {
+            promise.resolve(menuItemsSync());
+        });
+
+    return promise;
+}
+function menuItemsSync() {
 
     var selItem,
         items = Object.create(null),
@@ -4399,9 +4409,8 @@ function menuItems() {
 
 function contextMenuUI(e, ll) {
 
-    var v;
     var flt;
-    var items = {};
+    var async = false;
     var m = $('.dropdown.body.files-menu');
 
     // Selection of first child level ONLY of .dropdown-item in .dropdown.body
@@ -4414,6 +4423,36 @@ function contextMenuUI(e, ll) {
         return true;
     }
 
+    var showContextMenu = function() {
+        // This part of code is also executed when ll == 'undefined'
+        var v = m.children('.dropdown-section');
+
+        // Count all items inside section, and hide dividers if necessary
+        v.each(function() {
+            var $this = $(this);
+            var a = $this.find('a.dropdown-item');
+            var b = $this.find('hr');
+            var x = a.filter(function() {
+                return $(this).css('display') === 'none';
+            });
+            if (x.length === a.length || a.length === 0) {
+                $this.addClass('hidden');
+            }
+            else {
+                $this.removeClass('hidden');
+            }
+        });
+
+        adjustContextMenuPosition(e, m);
+
+        disableCircularTargets('#fi_');
+
+        m.removeClass('hidden');
+
+        // Hide last divider
+        v.find('hr').removeClass('hidden');
+        m.find('.dropdown-section:visible:last hr').addClass('hidden');
+    };
     $.hideContextMenu();
 
     // Used when right click is occured outside item, on empty canvas
@@ -4440,20 +4479,26 @@ function contextMenuUI(e, ll) {
     }
     else if (ll === 4 || ll === 5) {// contactUI
         $(menuCMI).hide();
-        items = menuItems();
 
-        delete items['.download-item'];
-        delete items['.zipdownload-item'];
-        delete items['.copy-item'];
-        delete items['.open-item'];
+        async = true;
+        menuItems()
+            .done(function(items) {
 
-        if (ll === 5) {
-            delete items['.properties-item'];
-        }
+                delete items['.download-item'];
+                delete items['.zipdownload-item'];
+                delete items['.copy-item'];
+                delete items['.open-item'];
 
-        for (var item in items) {
-            $(menuCMI).filter(item).show();
-        }
+                if (ll === 5) {
+                    delete items['.properties-item'];
+                }
+
+                for (var item in items) {
+                    $(menuCMI).filter(item).show();
+                }
+
+                onIdle(showContextMenu);
+            });
     }
     else if (ll === 6) { // sort menu
         $('.dropdown-item').hide();
@@ -4479,11 +4524,11 @@ function contextMenuUI(e, ll) {
             }
         }
 
-        if (id && !M.d[id]) {
+        /*if (id && !M.d[id]) {
 
             // exist in node list
             id = undefined;
-        }
+        }*/
 
         // In case that id belongs to contact, 11 char length
         if (id && (id.length === 11)) {
@@ -4540,26 +4585,32 @@ function contextMenuUI(e, ll) {
             || currNodeClass.indexOf('folder') > -1
             || currNodeClass.indexOf('fm-tree-folder') > -1)
             || id) {
-            items = menuItems();
-            for (var item in items) {
-                $(menuCMI).filter(item).show();
-            }
 
-            // Hide context menu items not needed for undecrypted nodes
-            if (missingkeys[id]) {
-                $(menuCMI).filter('.add-star-item').hide();
-                $(menuCMI).filter('.download-item').hide();
-                $(menuCMI).filter('.rename-item').hide();
-                $(menuCMI).filter('.copy-item').hide();
-                $(menuCMI).filter('.getlink-item').hide();
-                $(menuCMI).filter('.colour-label-items').hide();
-            }
-            else if (M.getNodeShare(id).down === 1) {
-                $(menuCMI).filter('.copy-item').hide();
-            }
-            else if (items['.getlink-item']) {
-                onIdle(setContextMenuGetLinkText);
-            }
+            async = true;
+            menuItems()
+                .done(function(items) {
+                    for (var item in items) {
+                        $(menuCMI).filter(item).show();
+                    }
+
+                    // Hide context menu items not needed for undecrypted nodes
+                    if (missingkeys[id]) {
+                        $(menuCMI).filter('.add-star-item').hide();
+                        $(menuCMI).filter('.download-item').hide();
+                        $(menuCMI).filter('.rename-item').hide();
+                        $(menuCMI).filter('.copy-item').hide();
+                        $(menuCMI).filter('.getlink-item').hide();
+                        $(menuCMI).filter('.colour-label-items').hide();
+                    }
+                    else if (M.getNodeShare(id).down === 1) {
+                        $(menuCMI).filter('.copy-item').hide();
+                    }
+                    else if (items['.getlink-item']) {
+                        onIdle(setContextMenuGetLinkText);
+                    }
+
+                    onIdle(showContextMenu);
+                });
         }
         else {
             return false;
@@ -4570,34 +4621,10 @@ function contextMenuUI(e, ll) {
             $(menuCMI).filter('.properties-item').hide();
         }
     }
-    // This part of code is also executed when ll == 'undefined'
-    v = m.children('.dropdown-section');
 
-    // Count all items inside section, and hide dividers if necessary
-    v.each(function() {
-        var $this = $(this);
-        var a = $this.find('a.dropdown-item');
-        var b = $this.find('hr');
-        var x = a.filter(function() {
-                return $(this).css('display') === 'none';
-            });
-        if (x.length === a.length || a.length === 0) {
-            $this.addClass('hidden');
-        }
-        else {
-            $this.removeClass('hidden');
-        }
-    });
-
-    adjustContextMenuPosition(e, m);
-
-    disableCircularTargets('#fi_');
-
-    m.removeClass('hidden');
-
-    // Hide last divider
-    v.find('hr').removeClass('hidden');
-    m.find('.dropdown-section:visible:last hr').addClass('hidden');
+    if (!async) {
+        showContextMenu();
+    }
 
     e.preventDefault();
 }
@@ -5121,7 +5148,7 @@ function treeUI()
 
 function treeUIexpand(id, force)
 {
-    return M.buildtree(M.d[id])
+    return M.buildtree({h: id})
         .always(function() {
             var $tree = $('#treea_' + id);
 

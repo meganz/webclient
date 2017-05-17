@@ -975,13 +975,22 @@ function init_page() {
         $('.credits-main-pad').html(html + '<div class="clear"></div>');
         mainScroll();
     }
-    else if (page === 'chrome') {
-        parsepage(pages['chrome']);
-        chromepage.init();
+    else if (page === 'browsers') {
+        parsepage(pages['browsers']);
+        browserspage.init();
     }
-    else if (page === 'firefox') {
-        parsepage(pages['firefox']);
-        firefoxpage.init();
+    else if (page === 'ios') {
+        parsepage(pages['ios']);
+    }
+    else if (page === 'android') {
+        parsepage(pages['android']);
+    }
+    else if (page === 'wp') {
+        parsepage(pages['wp']);
+    }
+    else if (page === 'megabird') {
+        parsepage(pages['megabird']);
+        megabirdpage.init();
     }
     else if (page.substr(0, 4) == 'sync') {
         parsepage(pages['sync']);
@@ -1790,8 +1799,24 @@ function topmenuUI() {
                 loadSubPage('credits');
                 return false;
             }
-            else if (className.indexOf('chrome') > -1) {
-                loadSubPage('chrome');
+            else if (className.indexOf('browsers') > -1) {
+                loadSubPage('browsers');
+                return false;
+            }
+            else if (className.indexOf('ios') > -1) {
+                loadSubPage('ios');
+                return false;
+            }
+            else if (className.indexOf('android') > -1) {
+                loadSubPage('android');
+                return false;
+            }
+            else if (className.indexOf('wp') > -1) {
+                loadSubPage('wp');
+                return false;
+            }
+            else if (className.indexOf('megabird') > -1) {
+                loadSubPage('megabird');
                 return false;
             }
             else if (className.indexOf('resellers') > -1) {
@@ -1800,10 +1825,6 @@ function topmenuUI() {
             }
             else if (className.indexOf('backup') > -1) {
                 loadSubPage('backup');
-                return false;
-            }
-            else if (className.indexOf('firefox') > -1) {
-                loadSubPage('firefox');
                 return false;
             }
             else if (className.indexOf('mobile') > -1) {

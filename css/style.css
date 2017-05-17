@@ -171,6 +171,9 @@ div, span, input, object, texarea {
 .italic {
     font-style: italic;
 }
+.left-textalign {
+    text-align: left;
+}
 .right-textalign {
     text-align: right;
 }

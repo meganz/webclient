@@ -7,25 +7,7 @@ var firefoxpage = {
      * Initialise the Chrome extension page
      */
     init: function() {
-        firefoxpage.addHoverToDownloadButton();
         firefoxpage.getServerBuildVersion();
-    },
-
-    /**
-     * Change style of Firefox Extension page on download button rollover
-     */
-    addHoverToDownloadButton: function() {
-
-        var $downloadButton = $('.ff-bott-button');
-        var $firefoxIcon = $('.ff-icon');
-
-        $downloadButton.rebind('mouseover', function () {
-            $firefoxIcon.addClass('hovered');
-        });
-
-        $downloadButton.rebind('mouseout', function () {
-            $firefoxIcon.removeClass('hovered');
-        });
     },
 
     /**

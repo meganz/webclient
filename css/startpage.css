@@ -123,9 +123,6 @@
     float: none;
     display: inline-block;
 }
-.startpage .reg-st3-membership-bl.pro4 {
-    margin: 0 0 0 7px;
-}
 .startpage.plans-info {
     font-size: 14px;
     line-height: 32px;
@@ -160,62 +157,24 @@
     background-position: -2px -1219px;
     margin: 31px auto 22px auto;
 }
-.startpage.bottom-rocket-bg {
-    background-image: url(../images/mega/startpage/rocket-bg@2x.png);
+.bottom-page.bottom-rocket-bg {
+    background-image: url(../images/mega/bottom-page/rocket-bg@2x.png);
     background-position: center bottom;
     background-repeat: no-repeat;
     background-size: 656px auto;
     padding-bottom: 397px;
 }
-
-.startpage.img-description {
-    max-width: 406px;
-    display: inline-block;
-    text-align: left;
-    width: 100%;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-}
-.startpage.left-cell .img-description {
-    padding-right: 30px;
-}
-.startpage.right-cell .img-description {
-    padding-left: 30px;
-}
-.startpage.vertical-centered-cell.right-cell {
-    text-align: right;
-}
-.startpage.img {
-    width: 100%;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-}
-.img-description .startpage.big-header {
-    padding: 0 0 32px 0;
-}
-.startpage.img.mobile-app {
+.bottom-page.img.mobile-app {
     max-width: 390px;
     padding: 37px 31px 42px 0;
 }
-.startpage.img.megasync {
+.bottom-page.img.megasync {
     max-width: 350px;
     padding: 32px 0 28px 5px;
 }
-.startpage.img.browser {
+.bottom-page.img.browser {
     max-width: 505px;
     padding: 110px 0 59px 0;
-}
-.startpage.half-sized-cell {
-    max-width: 485px;
-    padding-left: 15px;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    display: inline-block;
-    width: 100%;
-    text-align: left;
 }
 .startpage.counters {
     padding: 18px 0 22px 0;

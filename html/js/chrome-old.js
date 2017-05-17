@@ -9,7 +9,6 @@ var chromepage = {
     init: function() {
         chromepage.initManualDownloadButton();
         chromepage.initWebstoreDownloadButton();
-        chromepage.fixHeightOfBottomBlocks();
         chromepage.getServerBuildVersion();
     },
 
@@ -57,24 +56,6 @@ var chromepage = {
         }
     },
 
-    /**
-     * Set all the bottom blocks for the manual installation to the same height
-     */
-    fixHeightOfBottomBlocks: function() {
-
-        var highestBlock = 0;
-        var $bottomBlock = $('.chrome-bottom-block');
-
-        // Find the highest block
-        $bottomBlock.each(function(index, element) {
-            if ($(element).height() > highestBlock) {
-                highestBlock = $(element).height();
-            }
-        });
-
-        // Set all to the same height
-        $bottomBlock.height(highestBlock);
-    },
 
     /**
      * Get what build version is currently available from the live site

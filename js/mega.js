@@ -5926,6 +5926,22 @@ function MegaData()
             }
         }
     };
+
+    /**
+     * Checks if the logged in user's account is an account with a PRO plan
+     * @returns {Boolean} Returns true if the account has PRO, false if not
+     */
+    this.isProAccount = function() {
+
+        // The 'u_attr' variable is undefined if logged out. The PRO level property p will return 1-4 for the four PRO
+        // levels. The PRO level property is undefined if it is a regular Free account and is 0 if it is a Free
+        // account with the new Achievements logic enabled.
+        if ((typeof u_attr !== 'undefined') && (typeof u_attr.p !== 'undefined') && (u_attr.p > 0)) {
+            return true;
+        }
+
+        return false;
+    };
 }
 
 function voucherData(arr)

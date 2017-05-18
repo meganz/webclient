@@ -158,11 +158,12 @@ function accountUI() {
             $('.small-icon.membership').addClass('pro' + planNum);
 
             // Subscription
-            if (account.stype == 'S') {
+            if (account.stype === 'S') {
 
                 // Get the date their subscription will renew
-                var timestamp = account.srenew[0];
-                var paymentType = (account.sgw.length > 0) ? account.sgw[0] : '';   // Credit Card etc
+                var timestamp = (account.srenew.length > 0) ? account.srenew[0] : 0;    // Timestamp e.g. 1493337569
+                var paymentType = (account.sgw.length > 0) ? account.sgw[0] : '';       // Credit Card etc
+                var gatewayId = (account.sgwids.length > 0) ? account.sgwids[0] : null; // Gateway ID e.g. 15, 16 etc
 
                 // Display the date their subscription will renew if known
                 if (timestamp > 0) {
@@ -171,7 +172,8 @@ function accountUI() {
                     // Use format: 14 March 2015 - Credit Card
                     paymentType = dateString + ' - ' + paymentType;
 
-                    $('.account.plan-info.expiry-txt').text(l[6971]); // change placeholder 'Expires on' by 'Renews'
+                    // Change placeholder 'Expires on' to 'Renews'
+                    $('.account.plan-info.expiry-txt').text(l[6971]);
                     $('.account.plan-info.expiry').text(paymentType);
                 }
                 else {
@@ -180,21 +182,39 @@ function accountUI() {
                     $('.account.plan-info.expiry-txt').text('');
                 }
 
-                // Check if there are any active subscriptions
-                // ccqns = Credit Card Query Number of Subscriptions
-                api_req({a: 'ccqns'}, {
-                    callback: function(numOfSubscriptions, ctx) {
+                var $buttons = $('.account.buttons');
+                var $cancelSubscriptionButton = $buttons.find('.btn-cancel-sub');
+                var $achievementsButton = $buttons.find('.btn-achievements').addClass('hidden');
 
-                        // If there is an active subscription
-                        if (numOfSubscriptions > 0) {
-                            // Show cancel button and show cancellation dialog
-                            $('.account.data-block .btn-cancel').removeClass('hidden').rebind('click', function() {
-                                accountUI.cancelSubscriptionDialog.init();
-                            });
-                            $('.account.data-block .btn-achievements').addClass('hidden');
+                // If Apple or Google subscription (see getGatewayName function for codes)
+                if ((gatewayId === 2) || (gatewayId === 3)) {
+
+                    // Tell them they need to cancel their plan off-site and don't show the feedback dialog
+                    $cancelSubscriptionButton.removeClass('hidden').rebind('click', function() {
+                        msgDialog('warninga', l[7179], l[16501]);
+                    });
+                }
+
+                // Otherwise if ECP or Sabadell
+                else if ((gatewayId === 16) || (gatewayId === 17)) {
+
+                    // Check if there are any active subscriptions
+                    // ccqns = Credit Card Query Number of Subscriptions
+                    api_req({a: 'ccqns'}, {
+                        callback: function(numOfSubscriptions, ctx) {
+
+                            // If there is an active subscription
+                            if (numOfSubscriptions > 0) {
+
+                                // Show cancel button and show cancellation dialog
+                                $cancelSubscriptionButton.removeClass('hidden').rebind('click', function() {
+                                    accountUI.cancelSubscriptionDialog.init();
+                                });
+                                $achievementsButton.addClass('hidden');
+                            }
                         }
-                    }
-                });
+                    });
+                }
             }
             else if (account.stype == 'O') {
 
@@ -204,7 +224,7 @@ function accountUI() {
                 });
                 $('.account.plan-info.expiry-txt').text(l[987]);
                 $('.account.plan-info.expiry a').text(time2date(account.expiry, 2));
-                $('.account.data-block .btn-cancel').addClass('hidden');
+                $('.account.data-block .btn-cancel-sub').addClass('hidden');
             }
 
             // Maximum bandwidth
@@ -212,11 +232,10 @@ function accountUI() {
             $('.account.plan-info-row.bandwidth').show();
         }
         else {
-
             // free account:
             $('.account.plan-info.accounttype span').text(l[435]);
             $('.account.plan-info.expiry').text(l[436]);
-            $('.btn-cancel').addClass('hidden');
+            $('.btn-cancel-sub').addClass('hidden');
             $('.account.plan-info-row.bandwidth').hide();
         }
 
@@ -1885,20 +1904,25 @@ accountUI.cancelSubscriptionDialog = {
     $dialog: null,
     $dialogSuccess: null,
     $accountPageCancelButton: null,
-    $accountPageSubscriptionBlock: null,
     $continueButton: null,
     $cancelReason: null,
+    $expiryTextBlock: null,
+    $expiryDateBlock: null,
 
+    /**
+     * Initialise the dialog
+     */
     init: function() {
 
+        // Cache some selectors
         this.$dialog = $('.cancel-subscription-st1');
         this.$dialogSuccess = $('.cancel-subscription-st2');
-        this.$accountPageCancelButton = $('.fm-account-blocks .btn-cancel');
+        this.$accountPageCancelButton = $('.btn-cancel-sub');
         this.$continueButton = this.$dialog.find('.continue-cancel-subscription');
         this.$cancelReason = this.$dialog.find('.cancel-textarea textarea');
         this.$backgroundOverlay = $('.fm-dialog-overlay');
-        this.exipryTextBlock = $('.account.plan-info.expiry-txt');
-        this.exipryDateBlock = $('.account.plan-info.expiry');
+        this.$expiryTextBlock = $('.account.plan-info.expiry-txt');
+        this.$expiryDateBlock = $('.account.plan-info.expiry');
 
         // Show the dialog
         this.$dialog.removeClass('hidden');
@@ -1989,12 +2013,12 @@ accountUI.cancelSubscriptionDialog = {
                     // Hide loading dialog and cancel subscription button on account page, set exiry date
                     loadingDialog.hide();
                     self.$accountPageCancelButton.addClass('hidden');
-                    self.exipryTextBlock.text(l[987]);
-                    self.exipryDateBlock
+                    self.$expiryTextBlock.text(l[987]);
+                    self.$expiryDateBlock
                         .safeHTML('<a href="/fm/account/history" class="clickurl">@@</a>',
                             time2date(account.expiry, 2));
                     clickURLs();
-                    self.exipryDateBlock.find('a').rebind('click', function() {
+                    self.$expiryDateBlock.find('a').rebind('click', function() {
                         document.location = $(this).attr('href');
                     });
 

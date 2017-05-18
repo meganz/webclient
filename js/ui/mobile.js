@@ -326,8 +326,9 @@ mobile.cloud = {
      * Removes a node from the current view if applicable, updates the footer with the new
      * file/folder count and also shows an empty cloud drive/folder message if applicable
      * @param {String} nodeHandle The handle of the node to be removed
+     * @param {String} parentHandle The parent handle of the node to be removed
      */
-    renderDelete: function(nodeHandle) {
+    renderDelete: function(nodeHandle, parentHandle) {
 
         // Remove the node if in the current view
         $('#' + nodeHandle).remove();
@@ -336,6 +337,12 @@ mobile.cloud = {
         mobile.cloud.showEmptyCloudIfEmpty();
         mobile.cloud.countAndUpdateSubFolderTotals();
         mobile.cloud.renderFooter();
+
+        // If in the current folder and this got removed, then we need to go back up and open the parent folder
+        if (M.currentdirid === nodeHandle || isCircular(nodeHandle, M.currentdirid) === true) {
+            parentHandle = parentHandle || Object(M.getNodeByHandle(nodeHandle)).p || RootbyId(nodeHandle);
+            M.openFolder(parentHandle);
+        }
     },
 
     /**
@@ -3042,3 +3049,6 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
     // Call the mobile version
     mobile.messageOverlay.show(msg, submsg);
 }
+
+// Not needed for mobile, but called in various places
+function removeUInode(handle, parent) { }

@@ -2701,12 +2701,6 @@ function MegaData()
                 if (is_mobile) {
                     mobile.cloud.renderDelete(h, parent);
                 }
-
-                // If in the current folder and this got removed, then we need to go back up and open the parent folder
-                if (M.currentdirid === h || isCircular(h, M.currentdirid) === true) {
-                    parent = parent || Object(M.getNodeByHandle(h)).p || RootbyId(h);
-                    M.openFolder(parent);
-                }
             }
         }
     };
@@ -9599,116 +9593,6 @@ function fmremove() {
                 }
             }, true);
         }
-    }
-}
-
-function removeUInode(h, parent) {
-
-    var n = M.d[h],
-        i = 0;
-
-    // check subfolders
-    if (n && n.t) {
-        var cns = M.c[n.p];
-        if (cns) {
-            for (var cn in cns) {
-                if (M.d[cn] && M.d[cn].t && cn !== h) {
-                    i++;
-                    break;
-                }
-            }
-        }
-    }
-
-    // Not applicable to remove here for mobile, need to wait for M.v to be updated first
-    if (is_mobile) {
-        return true;
-    }
-
-    var hasItems = !!M.v.length;
-    switch (M.currentdirid) {
-        case "shares":
-            $('#treeli_' + h).remove();// remove folder and subfolders
-            if (!hasItems) {
-                $('.files-grid-view .grid-table-header tr').remove();
-                $('.fm-empty-cloud').removeClass('hidden');
-            }
-            break;
-        case "contacts":
-
-            //Clear left panel:
-            $('#contact_' + h).fadeOut('slow', function() {
-                $(this).remove();
-            });
-
-            //Clear right panel:
-            $('.grid-table.contacts tr#' + h + ', .contacts-blocks-scrolling a#' + h)
-                .fadeOut('slow', function() {
-                    $(this).remove();
-                });
-
-            // clear the contacts grid:
-            $('.contacts-grid-view #' + h).remove();
-            if (!hasItems) {
-                $('.contacts-grid-view .contacts-grid-header tr').remove();
-                $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[784]);
-                $('.fm-empty-contacts').removeClass('hidden');
-            }
-            break;
-        case "chat":
-            if (!hasItems) {
-                $('.contacts-grid-view .contacts-grid-header tr').remove();
-                $('.fm-empty-chat').removeClass('hidden');
-            }
-            break;
-        case M.RubbishID:
-            if (i == 0 && n) {
-                $('#treea_' + n.p).removeClass('contains-folders expanded');
-            }
-
-            // Remove item
-            $('#' + h).remove();
-
-            // Remove folder and subfolders
-            $('#treeli_' + h).remove();
-            if (!hasItems) {
-                $('.contacts-grid-view .contacts-grid-header tr').remove();
-                $('.fm-empty-trashbin').removeClass('hidden');
-            }
-            break;
-        case M.RootID:
-            if (i == 0 && n) {
-                $('#treea_' + n.p).removeClass('contains-folders expanded');
-            }
-
-            // Remove item
-            $('#' + h).remove();
-
-            // Remove folder and subfolders
-            $('#treeli_' + h).remove();
-            if (!hasItems) {
-                $('.files-grid-view').addClass('hidden');
-                $('.grid-table.fm tr').remove();
-                $('.fm-empty-cloud').removeClass('hidden');
-            }
-            break;
-        default:
-            if (i == 0 && n) {
-                $('#treea_' + n.p).removeClass('contains-folders expanded');
-            }
-            $('#' + h).remove();// remove item
-            $('#treeli_' + h).remove();// remove folder and subfolders
-            if (!hasItems) {
-                if (sharedFolderUI()) {
-                    M.emptySharefolderUI();
-                }
-                else {
-                    $('.files-grid-view').addClass('hidden');
-                    $('.fm-empty-folder').removeClass('hidden');
-                }
-                $('.grid-table.fm tr').remove();
-            }
-            break;
     }
 }
 // jscs:enable

@@ -114,7 +114,6 @@ var ChatRoom = function(megaChat, roomJid, type, users, ctime, lastActivity, cha
         }
 
         self.lastActivity = ts;
-
         if (msg.userId === u_handle) {
             self.didInteraction(u_handle, ts);
             return;

@@ -10045,7 +10045,6 @@ React.makeElement = React['createElement'];
 	        }
 
 	        self.lastActivity = ts;
-
 	        if (msg.userId === u_handle) {
 	            self.didInteraction(u_handle, ts);
 	            return;

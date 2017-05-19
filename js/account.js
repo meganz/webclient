@@ -693,7 +693,7 @@ function processEmailChangeActionPacket(ap) {
                         u_h,
                         _lastUserInteractionCache[u_h],
                         false,
-                        false
+                        true
                     );
 
                     $promise.verify();
@@ -794,16 +794,6 @@ function processEmailChangeActionPacket(ap) {
             return _lastUserInteractionPromiseCache[u_h];
         }
         else if (_lastUserInteractionCache[u_h]) {
-            if (megaChatIsReady) {
-                var chatRoom = megaChat.getPrivateRoom(u_h);
-
-                if (chatRoom) {
-                    var newActivity = parseInt(_lastUserInteractionCache[u_h].split(":")[1], 10);
-                    if (newActivity > chatRoom.lastActivity) {
-                        chatRoom.lastActivity = newActivity;
-                    }
-                }
-            }
             $promise.resolve(_lastUserInteractionCache[u_h]);
         }
         else if (

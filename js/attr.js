@@ -7,8 +7,30 @@ var attribCache = false;
 (function _userAttributeHandling(scope) {
     "use strict";
 
+    var ACCOUNT_LOGGER_DEBUG = localStorage.accountDebug ? true : false;
+
     var ns = {};
-    var logger = MegaLogger.getLogger('account');
+    var logger = MegaLogger.getLogger('account', {
+        'minLogLevel': function() {
+            if (ACCOUNT_LOGGER_DEBUG) {
+                return MegaLogger.LEVELS.DEBUG;
+            }
+            else {
+                return MegaLogger.LEVELS.WARN;
+            }
+        },
+        'transport': function() {
+            if (ACCOUNT_LOGGER_DEBUG) {
+                var args = toArray.apply(null, arguments);
+                args.shift();
+                return console.error.apply(console, args[0]);
+            }
+            else {
+                return MegaLogger.DEFAULT_OPTIONS.transport.apply(this, arguments);
+            }
+        }
+    });
+
     var ATTRIB_CACHE_NON_CONTACT_EXP_TIME = 2 * 60 * 60;
 
     /**
@@ -160,6 +182,8 @@ var attribCache = false;
                 attribCache.setItem(cacheKey, JSON.stringify([res, exp]));
 
                 if (res.v) {
+                    logger.debug("got new version for ", cacheKey, "from settleFunc (attr.get)", res.v);
+
                     self._versions[cacheKey] = res.v;
                 }
             }
@@ -212,6 +236,7 @@ var attribCache = false;
                             if (res[0].av) {
                                 result = res[0].av;
                                 if (res[0].v) {
+                                    logger.debug("got version from cache", cacheKey, res[0].v);
                                     self._versions[cacheKey] = res[0].v;
                                 }
                             }
@@ -342,6 +367,8 @@ var attribCache = false;
         var settleFunction = function(res) {
             if (typeof res !== 'number') {
                 attribCache.setItem(cacheKey, JSON.stringify([{"av": savedValue, "v": res[attribute]}, 0]));
+                logger.debug("clearing version for: ", cacheKey, "because of .set call");
+
                 delete self._versions[cacheKey];
 
                 logger.info('Setting user attribute "'
@@ -358,6 +385,7 @@ var attribCache = false;
                     ) {
                         logger.error('Server returned version conflict for attribute "'
                             + attribute + '", result: ' + res + ', local version:', self._versions[cacheKey]);
+                        thePromise.reject(res);
                     }
                     else {
                         // ensure that this attr's value is not cached and up-to-date.
@@ -428,7 +456,9 @@ var attribCache = false;
             var version = self._versions[cacheKey];
 
             apiCall['a'] = 'upv';
+
             if (version) {
+                logger.debug('upv attr set2', attribute, savedValue, version);
                 apiCall[attribute] = [
                     savedValue,
                     version
@@ -437,10 +467,12 @@ var attribCache = false;
                 api_req(apiCall, myCtx);
             }
             else {
+                logger.debug('no version found for', attribute, 'retrieving from attr.get (cache/api).');
                 // retrieve version/data from cache or server?
                 self.get(u_handle, attrName, pub, nonHistoric).always(function() {
                     version = self._versions[cacheKey];
 
+                    logger.debug('upv attr set2', attribute, savedValue, version);
                     apiCall['a'] = 'upv';
                     if (version) {
                         apiCall[attribute] = [
@@ -483,30 +515,139 @@ var attribCache = false;
         );
     };
 
-    ns.setArrayAttribute = function(attributeName, subkey, value, pub, nonHistoric) {
+    /**
+     * An internal list of queued setArrayAttribute operations
+     *
+     * @type {Array}
+     * @private
+     */
+    ns._queuedSetArrayAttributeOps = [];
+
+
+    /**
+     * QueuedSetArrayAttribute is used to represent an instance of a "set" op in an queue of QueuedSetArrayAttribute's.
+     * Every QueuedSetArrayAttribute can contain multiple changes to multiple keys.
+     * This is done transparently in mega.attr.setArrayAttribute.
+     *
+     * @private
+     * @param {String} attr - see mega.attr.setArrayAttribute
+     * @param {String} attributeName see mega.attr.setArrayAttribute
+     * @param {String} k initial k to be changed
+     * @param {String} v initial value to be used for the change
+     * @param {String} pub see mega.attr.setArrayAttribute
+     * @param {String} nonHistoric see mega.attr.setArrayAttribute
+     * @constructor
+     */
+    var QueuedSetArrayAttribute = function(attr, attributeName, k, v, pub, nonHistoric) {
         var self = this;
+        self.attr = attr;
+        self.attributeName = attributeName;
+        self.pub = pub;
+        self.nonHistoric = nonHistoric;
+        self.ops = [];
+        self.state = QueuedSetArrayAttribute.STATE.QUEUED;
 
         var proxyPromise = new MegaPromise();
+        proxyPromise.always(function() {
+            logger.debug("finished: ", proxyPromise.state(), self.toString());
+
+            self.state = QueuedSetArrayAttribute.STATE.DONE;
+            removeValue(self.attr._queuedSetArrayAttributeOps, self);
+
+            if (self.attr._queuedSetArrayAttributeOps.length > 0) {
+                // execute now
+                self.attr._nextQueuedSetArrayAttributeOp();
+            }
+        });
+
+        self.queueSubOp(k, v);
+
+        self.promise = proxyPromise;
+        self.attr._queuedSetArrayAttributeOps.push(self);
+        if (self.attr._queuedSetArrayAttributeOps.length === 1) {
+            // execute now
+            self.attr._nextQueuedSetArrayAttributeOp();
+        }
+    };
+
+    QueuedSetArrayAttribute.STATE = {
+        'QUEUED': 1,
+        'EXECUTING': 2,
+        'DONE': 3
+    };
+
+    /**
+     * Internal method, that is used for adding subOps, e.g. an QueuedSetArrayAttribute can contain multiple
+     * changes to a key.
+     *
+     * @private
+     * @param {String} k
+     * @param {String} v
+     */
+    QueuedSetArrayAttribute.prototype.queueSubOp = function(k, v) {
+        var self = this;
+        self.ops.push([k, v]);
+        logger.debug("QueuedSetArrayAttribute queued sub op", k, v, self.toString());
+    };
+
+    /**
+     * Debugging purposes only
+     *
+     * @returns {String}
+     */
+    QueuedSetArrayAttribute.prototype.toString = function() {
+        var self = this;
+
+        var setOps = [];
+
+        self.ops.forEach(function(entry) {
+            setOps.push(entry[0] + "=" + entry[1]);
+        });
+
+        return "QueuedSetArrayAttribute: " + buildAttribute(self.attributeName, self.pub, self.nonHistoric) + "(" +
+            setOps.join(",")
+            + ")";
+    };
+
+    /**
+     * Execute this QueuedSetArrayAttribute changes and send them to the server.
+     *
+     * @returns {MegaPromise|*}
+     */
+    QueuedSetArrayAttribute.prototype.exec = function() {
+        var self = this;
+
+        var proxyPromise = self.promise;
+        self.state = QueuedSetArrayAttribute.STATE.EXECUTING;
+
+        logger.debug("QueuedSetArrayAttribute executing: ", self.toString());
 
         var _setArrayAttribute = function(r) {
+
+            logger.debug("setting", self.toString(), r);
+
             if (r === EINTERNAL) {
                 r = {};
             }
             else if (typeof r === 'number') {
-                logger.error("Found number value for attribute: ", attributeName, " when trying to use it as" +
+                logger.error("Found number value for attribute: ", self.attributeName, " when trying to use it as " +
                     "attribute array. Halting .setArrayAttribute");
-                return MegaPromise.reject(r);
+                proxyPromise.reject(r);
+                return;
             }
             var arr = r ? r : {};
-            arr[subkey] = value;
+            self.ops.forEach(function(entry) {
+                arr[entry[0]] = entry[1];
+            });
+
             var serializedValue = arr;
 
             proxyPromise.linkDoneAndFailTo(
-                self.set(
-                    attributeName,
+                self.attr.set(
+                    self.attributeName,
                     serializedValue,
-                    pub,
-                    nonHistoric,
+                    self.pub,
+                    self.nonHistoric,
                     undefined,
                     undefined,
                     undefined,
@@ -515,8 +656,9 @@ var attribCache = false;
             );
         };
 
-        self.get(u_handle, attributeName, pub, nonHistoric)
+        self.attr.get(u_handle, self.attributeName, self.pub, self.nonHistoric)
             .done(function(r) {
+                logger.debug("QueuedSetArrayAttribute pre-get", self.toString(), r);
                 if (r === -9) {
                     _setArrayAttribute({});
                     proxyPromise.reject(r);
@@ -543,6 +685,80 @@ var attribCache = false;
         return proxyPromise;
     };
 
+    /**
+     * Try to execute next op, if such is available.
+     *
+     * @type {Function}
+     * @private
+     */
+    ns._nextQueuedSetArrayAttributeOp = SoonFc(function() {
+        var self = this;
+        var found = false;
+        self._queuedSetArrayAttributeOps.forEach(function(op) {
+            if (!found && op.state === QueuedSetArrayAttribute.STATE.QUEUED) {
+                found = op;
+            }
+        });
+
+        if (found) {
+            found.exec();
+        }
+    }, 75);
+
+
+    ns.QueuedSetArrayAttribute = QueuedSetArrayAttribute;
+
+    /**
+     * Update the value (value) of a specific key (subkey) in an "array attribute".
+     * Important note: `setArrayAttribtues` are cleverly throttled to not flood the API, but also, while being queued,
+     * multiple .setArrayAttribute('a', ...) -> .setArrayAttribute('a', ...), etc, may be executed in one single API
+     * call.
+     * For the developer, this is going to be transparently handled, since any .setArrayAttribute returns a promise and
+     * that promise would be synced with the internal queueing mechanism, so the only thing he/she needs to take care
+     * is eventually define a proper execution flow using promises.
+     *
+     * @param {String} attributeName see mega.attr.set
+     * @param {String} subkey generic
+     * @param {String} value generic
+     * @param {Integer|undefined|false} pub  see mega.attr.set
+     * @param {Integer|undefined|false} nonHistoric  see mega.attr.set
+     * @returns {MegaPromise|*}
+     */
+    ns.setArrayAttribute = function(attributeName, subkey, value, pub, nonHistoric) {
+        var self = this;
+        var found = false;
+        self._queuedSetArrayAttributeOps.forEach(function(op) {
+            if (
+                !found &&
+                op.state === QueuedSetArrayAttribute.STATE.QUEUED &&
+                op.attributeName === attributeName &&
+                op.pub === pub &&
+                op.nonHistoric === nonHistoric
+            ) {
+                found = op;
+            }
+        });
+
+        if (found && found.state === QueuedSetArrayAttribute.STATE.QUEUED) {
+            found.queueSubOp(subkey, value);
+            return found.promise;
+        }
+        else {
+            var op = new QueuedSetArrayAttribute(self, attributeName, subkey, value, pub, nonHistoric);
+            return op.promise;
+        }
+    };
+
+    /**
+     * Get a specific `subkey`'s value from an "array attribute"
+     *
+     * @param {String} userId see mega.attr.get
+     * @param {String} attributeName the actual attribtue name
+     * @param {String} subkey the actual subkey stored in that array attribute
+     * @param {Integer|undefined|false} pub see mega.attr.get
+     * @param {Integer|undefined|false} nonHistoric see mega.attr.get
+     * @returns {MegaPromise}
+     */
     ns.getArrayAttribute = function(userId, attributeName, subkey, pub, nonHistoric) {
         var self = this;
 
@@ -676,6 +892,7 @@ var attribCache = false;
             actionPacketVersion &&
             !mega.attr._versions[actionPacketUserId + "_" + attributeName]
         ) {
+            logger.debug("Got new version from ap: ", actionPacketUserId + "_" + attributeName, actionPacketVersion);
             mega.attr._versions[actionPacketUserId + "_" + attributeName] = actionPacketVersion;
         }
     };
@@ -714,7 +931,7 @@ var attribCache = false;
             }
         });
 
-        // console.error("merged: ", valObj.localValue, valObj.remoteValue, valObj.mergedValue);
+        logger.debug("merged: ", valObj.localValue, valObj.remoteValue, valObj.mergedValue);
 
 
         return true;

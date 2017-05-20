@@ -1484,17 +1484,17 @@ function api_setsid(sid) {
     }
 
     apixs[0].sid = sid;
-    apixs[2].sid = sid;
-    apixs[3].sid = sid;
+    apixs[2].sid = pfid ? '' : sid; // omit sid on sc for folderlinks
+    apixs[3].sid = pfid ? '' : sid; // omit sid on sc for folderlinks
     apixs[4].sid = sid;
 }
 
 function api_setfolder(h) {
     h = 'n=' + h;
 
-    if (u_sid) {
+    /*if (u_sid) {
         h += '&sid=' + u_sid;
-    }
+    }*/
 
     apixs[1].sid = h;
     apixs[2].sid = h;
@@ -1887,6 +1887,7 @@ function api_reqfailed(c, e) {
         Soon(function() {
             showToast('clipboard', l[19]);
         });
+        loadingInitDialog.hide();
         loadSubPage('login');
     }
     else if (c == 2 && e == ETOOMANY) {
@@ -3951,10 +3952,14 @@ function crypto_reportmissingkey(n) {
                                      });
         }
     }
-    else {
-        console.error('invalid-missingkey ' + n.h, change);
+    else if (d) {
+        var mk = window._mkshxx = window._mkshxx || {};
+        mk[n.h] = 1;
 
-        //srvlog2('invalid-missingkey', n.h, typeof n.k, Object(n.k).length | 0);
+        delay('debug::mkshkk', function() {
+            console.debug('crypto_reportmissingkey', Object.keys(mk));
+            window._mkshxx = undefined;
+        }, 4100);
     }
 }
 

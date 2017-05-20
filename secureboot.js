@@ -1465,7 +1465,7 @@ else if (!b_u) {
                     dump.m = [].concat(lns.slice(0,2), "[..!]", lns.slice(-2)).join(" ");
                 }
             }
-            dump.m = dump.m.replace(/\s+/g, ' ');
+            dump.m = (is_mobile ? '[mobile] ' : '') + dump.m.replace(/\s+/g, ' ');
 
             if (!window.jsl_done && !window.u_checked) {
                 // Alert the user if there was an uncaught exception while

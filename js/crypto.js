@@ -1490,15 +1490,15 @@ function api_setsid(sid) {
 }
 
 function api_setfolder(h) {
-    h = 'n=' + h;
+    var sid = h = 'n=' + h;
 
-    /*if (u_sid) {
-        h += '&sid=' + u_sid;
-    }*/
+    if (u_sid) {
+        sid += '&sid=' + u_sid;
+    }
 
-    apixs[1].sid = h;
-    apixs[2].sid = h;
-    apixs[4].sid = h;
+    apixs[1].sid = sid;
+    apixs[2].sid = h; // omit sid on sc for folderlinks
+    apixs[4].sid = sid;
 }
 
 function stopapi() {

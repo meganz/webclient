@@ -8758,9 +8758,7 @@ function previewimg(id, uint8arr)
 
 function fm_importflnodes(nodes)
 {
-    if (localStorage.folderLinkImport) {
-        assert(!folderlink, 'This should not happen...');
-
+    if (localStorage.folderLinkImport && !folderlink) {
         var kv = StorageDB(u_handle);
         var key = 'import.' + localStorage.folderLinkImport;
 

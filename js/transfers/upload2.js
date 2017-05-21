@@ -764,7 +764,9 @@ var ulmanager = {
         createFolder(aFile.target, fm_safepath(aFile.path), new MegaPromise())
             .always(function(target) {
                 if (typeof target === 'number') {
-                    ulmanager.logger.error('createFolder gave ' + target, api_strerror(target));
+                    if (d > 1 || String(aFile.target).indexOf('chat') === -1) {
+                        ulmanager.logger.error('createFolder gave ' + target, api_strerror(target));
+                    }
                 }
                 else {
                     ulmanager.logger.info('createFolder', aFile.target, target);

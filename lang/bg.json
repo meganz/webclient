@@ -4116,6 +4116,8 @@
     "16499": "Don't move",
     "16500": "Don't copy",
     "16501": "If you previously subscribed to a PRO plan with Google Play or Apple iTunes, please manually cancel your subscriptions with them inside Google Play or the iTunes app on your device. If you need any assistance please contact [A1]support@mega.nz[\/A1] or see our [A2]help article for Android[\/A2] or our [A3]help article for iOS[\/A3].",
+    "16514": "The file you are moving will be renamed as:",
+    "16515": "The file you are copying will be renamed as:",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

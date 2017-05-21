@@ -807,7 +807,7 @@ function init_page() {
 
         if (u_type) {
             var ac = new mega.AccountClosure();
-            ac.initAccountClosure();
+            ac.handleFeedback();
         }
         else {
             // Unable to cancel, not logged in

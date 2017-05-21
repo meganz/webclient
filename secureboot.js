@@ -1246,7 +1246,7 @@ if (is_ios) {
 if (m && (!localStorage.signUpStartedInMobileWeb) && (page.substr(0, 7) === 'confirm' ||
     page.substr(0, 6) === 'cancel' || page.substr(0, 6) === 'verify' || page.substr(0, 6) === 'fm/ipc' ||
     page.substr(0, 9) === 'newsignup' || page.substr(0, 7) === 'recover' || page.substr(0, 7) === 'account' ||
-    page.substr(0, 4) === 'blog') || page.substr(0, 6) === 'backup') {
+    page.substr(0, 4) === 'blog' || page.substr(0, 6) === 'backup')) {
 
     var app;
     var mobileblog;

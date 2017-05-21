@@ -1052,8 +1052,16 @@ function processEmailChangeActionPacket(ap) {
                 if (fmconfig.ul_maxSlots) {
                     ulQueue.setSize(fmconfig.ul_maxSlots);
                 }
+                else {
+                    mega.config.set('ul_maxSlots', 4);// Default ul slots value
+                    ulQueue.setSize(4);
+                }
                 if (fmconfig.dl_maxSlots) {
                     dlQueue.setSize(fmconfig.dl_maxSlots);
+                }
+                else {
+                    mega.config.set('dl_maxSlots', 4);// Default dl slots value
+                    dlQueue.setSize(4);
                 }
                 if (fmconfig.font_size) {
                     $('body').removeClass('fontsize1 fontsize2')

@@ -137,7 +137,16 @@
 .bottom-page.grey-block {
     background-color: #FAFAFA;
     width: 100%;
+    font-size: 0;
     overflow: hidden;
+}
+.bottom-page.grey-block {
+    background-color: #F3F3F3;
+    font-size: 0;
+}
+.bottom-page.mid-grey-block {
+    background-color: #F6F6F6;
+    font-size: 0;
 }
 .bottom-page.dots-bg {
     background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48c3ZnIHdpZHRoPSIyMHB4IiBoZWlnaHQ9IjIwcHgiIHZpZXdCb3g9IjAgMCAyMCAyMCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj4gICAgICAgIDx0aXRsZT5TbGljZSAxPC90aXRsZT4gICAgPGRlc2M+Q3JlYXRlZCB3aXRoIFNrZXRjaC48L2Rlc2M+ICAgIDxkZWZzPjwvZGVmcz4gICAgPGcgaWQ9IlBhZ2UtMSIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCIgb3BhY2l0eT0iMC4yMDI4OTg1NTEiPiAgICAgICAgPHJlY3QgaWQ9IlJlY3RhbmdsZS05IiBmaWxsPSIjMDAwMDAwIiB4PSIxOSIgeT0iMTkiIHdpZHRoPSIxIiBoZWlnaHQ9IjEiPjwvcmVjdD4gICAgPC9nPjwvc3ZnPg==);
@@ -160,10 +169,13 @@
 .bottom-page.mid-header {
     font-size: 18px;
     line-height: 32px;
-    padding: 0 0 14px 0;
+    padding: 0 15px 14px 15px;
     color: #777777;
-    max-width: 780px;
+    max-width: 810px;
     margin: 0 auto;
+        -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
 .bottom-page.mid-header.small-pad {
     padding: 0 0 7px 0;
@@ -212,8 +224,14 @@
 .bottom-page.big-top-pad {
     padding-top: 96px;
 }
+.bottom-page.huge-top-pad {
+    padding-top: 100px;
+}
 .bottom-page.bott-pad {
     padding-bottom: 63px;
+}
+.bottom-page.huge-bott-pad {
+    padding-bottom: 134px;
 }
 .bottom-page.mid-pad {
     padding: 27px 0 28px 0;
@@ -224,11 +242,19 @@
     padding: 3px 0 16px 0;
     color: #666666;
 }
+.bottom-page.big-header .light-red {
+    color: #EB4444;
+    padding-left: 20px;
+    
+}
 .bottom-page.big-header.mid-pad {
     padding: 18px 0 34px 0;
 }
 .bottom-page.big-header.small-pad {
     padding: 18px 0 27px 0;
+}
+.bottom-page.big-header.no-pad {
+    padding: 0 0 16px 0;
 }
 .bottom-page.big-header.red {
     color: #EB4444;
@@ -244,6 +270,9 @@
     font-size: 0;
     line-height: 0;
 }
+.side-txt .bottom-page.table-cell {
+    vertical-align: top;
+}
 .bottom-page.table.hidden {
     display: none;
 }
@@ -255,6 +284,14 @@
     line-height: 36px;
     color: #777777;
     padding-bottom: 10px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.bottom-page.medium-txt.low-width {
+    max-width: 738px;
+    margin: 0 auto;
+    padding: 10px 15px 10px 15px;
 }
 .medium-txt.small-lineheight {
     line-height: 24px;
@@ -340,12 +377,13 @@
     padding: 0 2px 0 0;
     max-width: none;
 }
-.right-cell .img-description.small-pad {
+.bottom-page.img-description.small-pad {
     padding: 0 12px 0 6px;
     max-width: none;
 }
 .bottom-page.right-cell {
     text-align: right;
+    width: 50%;
 }
 .bottom-page.bottom-align {
     vertical-align: bottom;
@@ -368,6 +406,12 @@
     display: inline-block;
     width: 100%;
     text-align: left;
+}
+.bottom-page.half-sized-cell.no-pad {
+    padding: 0;
+}
+.bottom-page.full-height {
+    height: 100%;
 }
 /* end of Bottom pages common styles*/
 
@@ -464,6 +508,9 @@
 .pages-nav.nav-button:hover .button-label, .pages-nav.nav-button.active .button-label {
     color: #666666;
 }
+.bottom-page.table.side-txt {
+    margin-top: 61px;
+}
 /* end of Bottom pages nav bar */
 
 
@@ -523,6 +570,18 @@
 .bottom-page.big-icon.charts {
     background-image: url(../images/mega/pages-sprite.png);
     background-position: 1px -190px;
+}
+.bottom-page.big-icon.mobile-cloud {
+    background-image: url(../images/mega/pages-sprite.png);
+    background-position: 1px -1400px;
+}
+.bottom-page.big-icon.chat {
+    background-image: url(../images/mega/pages-sprite.png);
+    background-position: 1px -1270px;
+}
+.bottom-page.big-icon.photos {
+    background-image: url(../images/mega/pages-sprite.png);
+    background-position: 1px -1530px;
 }
 .megaapp-linux .bottom-page.radio-buttons {
     width: 228px;
@@ -870,3 +929,45 @@ base64, PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJod…hlaWdodD0iMTAxIiBmaW
     margin: 30px 0 0 0;
 }
 /* end of MEGAbird */
+
+/* iOS app */
+.bottom-page.img.ios-top {
+    max-width: 92.4%;
+    max-height: 80%;
+    width: auto;
+    padding: 0 67px 73px 0;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+}
+.mobile-apps-button {
+    width: 191px;
+    height: 64px;
+    background-color: rgba(0,0,0,0.7);
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    background-image: url(../images/mega/pages-sprite.png);
+    background-repeat: no-repeat;
+    background-position: 0 -887px;
+    margin: 38px 0 77px 0;
+    cursor: pointer;
+    display: block;
+}
+.mobile-apps-button:hover {
+    background-color: rgba(0,0,0,1);
+}
+.bottom-page.img.ios2 {
+    margin-top: -32px;
+}
+.bottom-page.img.ios3 {
+    max-width: 720px;
+    margin: 20px 0 4px 0;
+}
+.bottom-page.img.ios4 {
+    max-width: 586px;
+}
+.side-txt .bottom-page.mid-pad {
+    padding: 44px 15px 28px 15px;
+}
+/* end of iOS app */

@@ -1814,11 +1814,9 @@ else if (!b_u) {
         'megabird': {f:'html/megabird.html', n: 'megabird', j:0},
         'megabird_js': {f:'html/js/megabird.js', n: 'megabird_js', j:1},
         'ios': {f:'html/ios.html', n: 'ios', j:0},
-        'ios_js': {f:'html/js/ios.js', n: 'ios_js', j:1},
         'android': {f:'html/android.html', n: 'android', j:0},
-        'android_js': {f:'html/js/android.js', n: 'android_js', j:1},
-        'wp': {f:'html/wp.html', n: 'android', j:0},
-        'wp_js': {f:'html/js/wp.js', n: 'android_js', j:1}
+        'wp': {f:'html/wp.html', n: 'wp', j:0},
+        'apps_js': {f:'html/js/apps.js', n: 'apps_js', j:1}
     };
 
     var jsl3 = {
@@ -1917,8 +1915,10 @@ else if (!b_u) {
         'redeem': ['redeem', 'redeem_js'],
         'plugin': ['browsers', 'browsers_js'],
         'browsers': ['browsers', 'browsers_js'],
-        'megabird': ['megabird', 'megabird_js']
-        
+        'megabird': ['megabird', 'megabird_js'],
+        'ios': ['ios', 'apps_js'],
+        'android': ['android', 'apps_js'],
+        'wp': ['wp', 'apps_js'],
     };
 
     if (is_mobile) {

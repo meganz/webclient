@@ -981,12 +981,15 @@ function init_page() {
     }
     else if (page === 'ios') {
         parsepage(pages['ios']);
+        mobileappspage.init();
     }
     else if (page === 'android') {
         parsepage(pages['android']);
+        mobileappspage.init();
     }
     else if (page === 'wp') {
         parsepage(pages['wp']);
+        mobileappspage.init();
     }
     else if (page === 'megabird') {
         parsepage(pages['megabird']);

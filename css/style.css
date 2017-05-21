@@ -153,12 +153,8 @@ input[type='number'] {
 input[type="search"], input[type="search"]::-webkit-search-decoration, input[type="search"]::-webkit-search-cancel-button, input[type="search"]::-webkit-search-results-button, input[type="search"]::-webkit-search-results-decoration {
  -webkit-appearance: none;
 }
-input:-webkit-autofill {
- -webkit-box-shadow:0 0 0 50px white inset;
- -webkit-text-fill-color: #878787;
-}
-input:-webkit-autofill:focus {
- -webkit-box-shadow: /*your box-shadow*/, 0 0 0 50px white inset;
+input:-webkit-autofill, input:-webkit-autofill:focus {
+ -webkit-box-shadow: 0 0 0 50px white inset;
  -webkit-text-fill-color: #878787;
 }
 div, span, input, object, texarea {
@@ -183,6 +179,7 @@ div, span, input, object, texarea {
 a, a:link, a:visited, a:hover, a:active {
     outline: none;
     text-decoration: none;
+    cursor: pointer;
 }
 strong, .bold {
     font-weight: normal;
@@ -626,9 +623,8 @@ label span.black {
     color: #1DA1E9;
     display: block;
 }
-.red, a.red, a.red:link, a.red:visited, a.red:hover, a.red:active, h1 span.red, h2 span.red, p span.red, .affiliate-input-block input.red {
+.red, a.red, a.red:link, a.red:visited, a.red:hover, a.red:active {
     color: #FF4D4A;
-    cursor: pointer;
 }
 .progressbar {
     background-color: rgba(0,0,0,0.2);

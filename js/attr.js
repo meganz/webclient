@@ -67,7 +67,9 @@ var attribCache = false;
      * @param attribute {String}
      *     Name of the attribute.
      * @param pub {Boolean|Number}
-     *     True for public attributes (default: true). -1 for "system" attributes (e.g. without prefix)
+     *     True for public attributes (default: true).
+     *     -1 for "system" attributes (e.g. without prefix)
+     *     -2 for "private non encrypted attributes"
      * @param nonHistoric {Boolean}
      *     True for non-historic attributes (default: false).  Non-historic
      *     attributes will overwrite the value, and not retain previous
@@ -114,6 +116,11 @@ var attribCache = false;
                 if (attribute.charAt(0) === '*') {
                     // legacy cache - already decrypted by tlv and stored decrypted?
                     res = mega.attr.handleLegacyCacheAndDecryption(res, thePromise, attribute);
+                }
+
+                // Otherwise if a non-encrypted private attribute, base64 decode the data
+                else if (attribute.charAt(0) === '^') {
+                    res = base64urldecode(value);
                 }
 
                 if (d > 1 || is_karma) {
@@ -242,8 +249,10 @@ var attribCache = false;
      *
      * @param attribute {string}
      *     Name of the attribute.
-     * @param pub {bool}
+     * @param pub {Boolean|Number}
      *     True for public attributes (default: true).
+     *     -1 for "system" attributes (e.g. without prefix)
+     *     -2 for "private non encrypted attributes"
      * @param nonHistoric {bool}
      *     True for non-historic attributes (default: false).  Non-historic
      *     attributes will overwrite the value, and not retain previous
@@ -284,8 +293,10 @@ var attribCache = false;
      * @param value {object}
      *     Value of the user attribute. Public properties are of type {string},
      *     private ones have to be an object with key/value pairs.
-     * @param pub {bool}
+     * @param pub {Boolean|Number}
      *     True for public attributes (default: true).
+     *     -1 for "system" attributes (e.g. without prefix)
+     *     -2 for "private non encrypted attributes"
      * @param nonHistoric {bool}
      *     True for non-historic attributes (default: false).  Non-historic
      *     attributes will overwrite the value, and not retain previous
@@ -327,6 +338,11 @@ var attribCache = false;
             // Let's encode and encrypt it.
             savedValue = base64urlencode(tlvstore.blockEncrypt(
                 tlvstore.containerToTlvRecords(value), u_k, mode));
+        }
+
+        // Otherwise if a non-encrypted private attribute, base64 encode the data
+        else if (attribute[0] === '^') {
+            savedValue = base64urlencode(value);
         }
 
         // Make the promise to execute the API code.

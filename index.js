@@ -221,14 +221,15 @@ function init_page() {
         }
     }
 
-    if (page.substr(0, 1) === '!' && page.length > 1) {
+
+    dlkey = false;
+    if (page[0] === '!' && page.length > 1) {
 
         var ar = page.substr(1, page.length - 1).split('!');
         if (ar[0]) {
             dlid = ar[0].replace(/[^\w-]+/g, "");
         }
 
-        dlkey = false;
         if (ar[1]) {
             dlkey = ar[1].replace(/[^\w-]+/g, "");
         }
@@ -310,7 +311,6 @@ function init_page() {
         loadingDialog.hide();
     }
 
-    var wasFolderlink = pfid;
     var oldPFKey = pfkey;
     if (page.substr(0, 2) == 'F!' && page.length > 2) {
         var ar = page.substr(2, page.length - 1).split('!');
@@ -412,8 +412,7 @@ function init_page() {
         page = 'newpw';
     }
 
-
-    if ((pfkey || dlkey) && location.hash[0] !== '#' && !is_fm()) {
+    if ((pfkey || dlkey) && location.hash[0] !== '#') {
         return location.replace(getAppBaseUrl());
     }
 
@@ -1559,9 +1558,7 @@ function topmenuUI() {
         }
 
         // Show PRO plan expired warning popup (if applicable)
-        if (!is_mobile) {
-            alarm.planExpired.render();
-        }
+        alarm.planExpired.render();
     }
     else {
         if (u_type === 0 && !confirmok && page !== 'key') {
@@ -2230,7 +2227,7 @@ function loadSubPage(tpage, event)
         }
     }
 
-    if (hashLogic || page.substr(0, 2) === 'P!' || page.substr(0, 2) === 'F!' || page[0] === '!') {
+    if (hashLogic || isPublicLink(page)) {
         document.location.hash = '#' + page;
     }
     else if (!event || event.type !== 'popstate') {

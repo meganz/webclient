@@ -2372,7 +2372,9 @@ function initContextUI() {
         $('.transfer-table tr.ui-selected').removeClass('ui-selected');
     });
 
-    $(document).trigger('onInitContextUI');
+    if (localStorage.folderLinkImport) {
+        onIdle(fm_importflnodes);
+    }
 }
 
 function createFolderUI() {
@@ -5868,7 +5870,7 @@ function handleDialogContent(dialogTabClass, parentTag, newFolderButton, dialogP
     var html,
         $btn = '';// Action button label
 
-    if ($.onImportCopyNodes && (!newFolderButton || (dialogPrefix !== 'copy'))) {
+    if (($.copyToShare || $.onImportCopyNodes) && (!newFolderButton || (dialogPrefix !== 'copy'))) {
 
         // XXX: Ideally show some notification that importing from folder link to anything else than the cloud isn't supported.
         $('.copy-dialog-button.' + String(dialogTabClass).replace(/[^\w-]/g, '')).fadeOut(200).fadeIn(100);
@@ -5935,7 +5937,7 @@ function handleDialogContent(dialogTabClass, parentTag, newFolderButton, dialogP
     }
 
     // If copying from contacts tab (Ie, sharing)
-    if (buttonLabel === l[1344]) {
+    if (dialogTabClass === 'cloud-drive' && M.currentrootid === 'contacts') {
         $('.fm-dialog.copy-dialog .share-dialog-permissions').removeClass('hidden');
         $('.dialog-newfolder-button').addClass('hidden');
         $('.copy-operation-txt').text(l[1344]);
@@ -6908,6 +6910,7 @@ function closeDialog() {
 
         delete $.copyDialog;
         delete $.moveDialog;
+        delete $.copyToShare;
         delete $.copyrightsDialog;
     }
     $('.fm-dialog').removeClass('arrange-to-back');
@@ -7170,14 +7173,9 @@ function copyDialog() {
         var itemTopPos = $item.offset().top;
         var $tooltip = $('.copy-dialog .contact-preview');
         var sharedNodeHandle = $(this).attr('id').replace('mctreea_', '');
-        var ownerHandle = M.d[sharedNodeHandle].u;
-        var ownerEmail = M.u[ownerHandle].m;
-        var ownerName = M.u[ownerHandle].name;
-
-        // Not allowing undefined to be shown like owner name
-        if (typeof ownerName === 'undefined') {
-            ownerName = '';
-        }
+        var ownerHandle = sharer(sharedNodeHandle);
+        var ownerEmail = Object(M.u[ownerHandle]).m || '';
+        var ownerName = Object(M.u[ownerHandle]).name || '';
 
         var html = useravatar.contact(ownerHandle, 'small-rounded-avatar', 'div') +
             '<div class="user-card-data no-status">' +
@@ -7188,6 +7186,7 @@ function copyDialog() {
 
         $tooltip.find('.contacts-info.body').safeHTML(html);
 
+        clearTimeout(copyDialogTooltipTimer);
         copyDialogTooltipTimer = setTimeout(function () {
             $tooltip.css({
                 'left': itemLeftPos + (($item.outerWidth() / 2) - ($tooltip.outerWidth() / 2))  + 'px',
@@ -7195,6 +7194,8 @@ function copyDialog() {
             });
             $tooltip.fadeIn(200);
         }, 200);
+
+        return false;
     });
 
     $('.copy-dialog .shared-with-me').off('mouseleave', '.nw-fm-tree-item');
@@ -7204,6 +7205,8 @@ function copyDialog() {
 
         clearTimeout(copyDialogTooltipTimer);
         $tooltip.hide();
+
+        return false;
     });
 
     // Handle conversations tab item selection
@@ -7519,9 +7522,9 @@ function moveDialog() {
         var itemTopPos = $item.offset().top;
         var $tooltip = $('.move-dialog .contact-preview');
         var sharedNodeHandle = $(this).attr('id').replace('mctreea_', '');
-        var ownerHandle = M.d[sharedNodeHandle].u;
-        var ownerEmail = M.u[ownerHandle].m;
-        var ownerName = M.u[ownerHandle].name;
+        var ownerHandle = sharer(sharedNodeHandle);
+        var ownerEmail = Object(M.u[ownerHandle]).m || '';
+        var ownerName = Object(M.u[ownerHandle]).name || '';
 
         // Not allowing undefined to be shown like owner name
         if (typeof ownerName === 'undefined') {
@@ -7537,6 +7540,7 @@ function moveDialog() {
 
         $tooltip.find('.contacts-info.body').safeHTML(html);
 
+        clearTimeout(moveDialogTooltipTimer);
         moveDialogTooltipTimer = setTimeout(function () {
             $tooltip.css({
                 'left': itemLeftPos + (($item.outerWidth() / 2) - ($tooltip.outerWidth() / 2))  + 'px',
@@ -7544,6 +7548,8 @@ function moveDialog() {
             });
             $tooltip.fadeIn(200);
         }, 200);
+
+        return false;
     });
 
     $('.move-dialog .shared-with-me').off('mouseleave', '.nw-fm-tree-item');
@@ -7553,6 +7559,8 @@ function moveDialog() {
 
         clearTimeout(moveDialogTooltipTimer);
         $tooltip.hide();
+
+        return false;
     });
 
     $('.move-dialog .dialog-move-button').rebind('click', function() {
@@ -8750,33 +8758,52 @@ function previewimg(id, uint8arr)
 
 function fm_importflnodes(nodes)
 {
+    if (localStorage.folderLinkImport && !folderlink) {
+        var kv = StorageDB(u_handle);
+        var key = 'import.' + localStorage.folderLinkImport;
+
+        kv.get(key)
+            .done(function(data) {
+                $.mcImport = true;
+                $.selected = data[0];
+                $.onImportCopyNodes = data[1];
+
+                if (d) {
+                    console.log('Importing Nodes...', $.selected, $.onImportCopyNodes);
+                }
+                $('.dropdown-item.copy-item').click();
+
+                kv.rem(key);
+            })
+            .fail(function(e) {
+                console.error(e);
+            });
+
+        nodes = null;
+        delete localStorage.folderLinkImport;
+    }
+
     var sel = [].concat(nodes || []);
     if (sel.length) {
         var FLRootID = M.RootID;
 
         mega.ui.showLoginRequiredDialog().done(function() {
+            loadingDialog.show();
+            localStorage.folderLinkImport = FLRootID;
 
-            $.onImportCopyNodes = fm_getcopynodes(sel);
+            StorageDB(u_handle)
+                .set('import.' + FLRootID, [sel, fm_getcopynodes(sel)])
+                .done(function() {
 
-            // TODO: test whether importing nodes from a folder link still works
-
-            loadSubPage('fm');
-
-            $(document).one('onInitContextUI', SoonFc(function(e) {
-                if (M.RootID === FLRootID) {
-                    // TODO: How to reproduce this?
-                    console.warn('Unable to complete import, apparnetly we did not reached the cloud.');
-                }
-                else {
-                    if (d) console.log('Importing Nodes...', sel, $.onImportCopyNodes);
-
-                    $.selected = sel;
-                    $.mcImport = true;
-
-                    // XXX: ...
-                    $('.dropdown-item.copy-item').click();
-                }
-            }));
+                    loadSubPage('fm');
+                })
+                .fail(function(e) {
+                    if (d) {
+                        console.error('Unable to import...', e);
+                    }
+                    loadingDialog.hide();
+                    msgDialog('warninga', l[135], l[47]);
+                });
         }).fail(function(aError) {
             // If no aError, it was canceled
             if (aError) {
@@ -9283,6 +9310,7 @@ function contactUI() {
 
             $.copyDialog = 'copy';
             $.mcselected = undefined;
+            $.copyToShare = true;
 
             handleDialogContent('cloud-drive', 'ul', true, 'copy', l[1344]);
             fm_showoverlay();

@@ -212,7 +212,7 @@ Unless otherwise noted, they were released under a [MIT License].
 [megaLogger.js]: <https://github.com/meganz/megalogger>
 [megapix.js]: <https://github.com/meganz/ios-imagefile-megapixel>
 [moment.js]: <https://github.com/moment/moment/tree/2.10.6>
-[nacl-fast.js]: <https://github.com/dchest/tweetnacl-js/tree/v0.13.1>
+[nacl-fast.js]: <https://github.com/dchest/tweetnacl-js/tree/v1.0.0>
 [notification.js]: <https://github.com/MrSwitch/notification.js/tree/v0.0.1>
 [qrcode.js]: <https://github.com/jeromeetienne/jquery-qrcode/blob/2bad93deab2f0ec66451b0cc962d56fad6fba403/src/qrcode.js>
 [react-dom.js, react.js]: https://github.com/facebook/react/tree/v0.14.8

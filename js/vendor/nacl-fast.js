@@ -7,8 +7,6 @@
 // Implementation derived from TweetNaCl version 20140427.
 // See for details: http://tweetnacl.cr.yp.to/
 
-/* jshint newcap: false */
-
 var gf = function(init) {
   var i, r = new Float64Array(16);
   if (init) for (i = 0; i < init.length; i++) r[i] = init[i];
@@ -747,7 +745,7 @@ poly1305.prototype.finish = function(mac, macpos) {
   }
   g[9] -= (1 << 13);
 
-  mask = (g[9] >>> ((2 * 8) - 1)) - 1;
+  mask = (c ^ 1) - 1;
   for (i = 0; i < 10; i++) g[i] &= mask;
   mask = ~mask;
   for (i = 0; i < 10; i++) this.h[i] = (this.h[i] & mask) | g[i];
@@ -800,7 +798,7 @@ poly1305.prototype.update = function(m, mpos, bytes) {
     this.leftover += want;
     if (this.leftover < 16)
       return;
-    this.blocks(buffer, 0, 16);
+    this.blocks(this.buffer, 0, 16);
     this.leftover = 0;
   }
 
@@ -1337,7 +1335,7 @@ function crypto_scalarmult(q, n, p) {
     d[i]=a[i]=c[i]=0;
   }
   a[0]=d[0]=1;
-  for (i=254;i>=0;--i) {
+  for (i=254; i>=0; --i) {
     r=(z[i>>>3]>>>(i&7))&1;
     sel25519(a,b,r);
     sel25519(c,d,r);
@@ -2094,45 +2092,45 @@ var crypto_secretbox_KEYBYTES = 32,
 
 nacl.lowlevel = {
   crypto_core_hsalsa20: crypto_core_hsalsa20,
-  crypto_stream_xor : crypto_stream_xor,
-  crypto_stream : crypto_stream,
-  crypto_stream_salsa20_xor : crypto_stream_salsa20_xor,
-  crypto_stream_salsa20 : crypto_stream_salsa20,
-  crypto_onetimeauth : crypto_onetimeauth,
-  crypto_onetimeauth_verify : crypto_onetimeauth_verify,
-  crypto_verify_16 : crypto_verify_16,
-  crypto_verify_32 : crypto_verify_32,
-  crypto_secretbox : crypto_secretbox,
-  crypto_secretbox_open : crypto_secretbox_open,
-  crypto_scalarmult : crypto_scalarmult,
-  crypto_scalarmult_base : crypto_scalarmult_base,
-  crypto_box_beforenm : crypto_box_beforenm,
-  crypto_box_afternm : crypto_box_afternm,
-  crypto_box : crypto_box,
-  crypto_box_open : crypto_box_open,
-  crypto_box_keypair : crypto_box_keypair,
-  crypto_hash : crypto_hash,
-  crypto_sign : crypto_sign,
-  crypto_sign_keypair : crypto_sign_keypair,
-  crypto_sign_open : crypto_sign_open,
+  crypto_stream_xor: crypto_stream_xor,
+  crypto_stream: crypto_stream,
+  crypto_stream_salsa20_xor: crypto_stream_salsa20_xor,
+  crypto_stream_salsa20: crypto_stream_salsa20,
+  crypto_onetimeauth: crypto_onetimeauth,
+  crypto_onetimeauth_verify: crypto_onetimeauth_verify,
+  crypto_verify_16: crypto_verify_16,
+  crypto_verify_32: crypto_verify_32,
+  crypto_secretbox: crypto_secretbox,
+  crypto_secretbox_open: crypto_secretbox_open,
+  crypto_scalarmult: crypto_scalarmult,
+  crypto_scalarmult_base: crypto_scalarmult_base,
+  crypto_box_beforenm: crypto_box_beforenm,
+  crypto_box_afternm: crypto_box_afternm,
+  crypto_box: crypto_box,
+  crypto_box_open: crypto_box_open,
+  crypto_box_keypair: crypto_box_keypair,
+  crypto_hash: crypto_hash,
+  crypto_sign: crypto_sign,
+  crypto_sign_keypair: crypto_sign_keypair,
+  crypto_sign_open: crypto_sign_open,
 
-  crypto_secretbox_KEYBYTES : crypto_secretbox_KEYBYTES,
-  crypto_secretbox_NONCEBYTES : crypto_secretbox_NONCEBYTES,
-  crypto_secretbox_ZEROBYTES : crypto_secretbox_ZEROBYTES,
-  crypto_secretbox_BOXZEROBYTES : crypto_secretbox_BOXZEROBYTES,
-  crypto_scalarmult_BYTES : crypto_scalarmult_BYTES,
-  crypto_scalarmult_SCALARBYTES : crypto_scalarmult_SCALARBYTES,
-  crypto_box_PUBLICKEYBYTES : crypto_box_PUBLICKEYBYTES,
-  crypto_box_SECRETKEYBYTES : crypto_box_SECRETKEYBYTES,
-  crypto_box_BEFORENMBYTES : crypto_box_BEFORENMBYTES,
-  crypto_box_NONCEBYTES : crypto_box_NONCEBYTES,
-  crypto_box_ZEROBYTES : crypto_box_ZEROBYTES,
-  crypto_box_BOXZEROBYTES : crypto_box_BOXZEROBYTES,
-  crypto_sign_BYTES : crypto_sign_BYTES,
-  crypto_sign_PUBLICKEYBYTES : crypto_sign_PUBLICKEYBYTES,
-  crypto_sign_SECRETKEYBYTES : crypto_sign_SECRETKEYBYTES,
+  crypto_secretbox_KEYBYTES: crypto_secretbox_KEYBYTES,
+  crypto_secretbox_NONCEBYTES: crypto_secretbox_NONCEBYTES,
+  crypto_secretbox_ZEROBYTES: crypto_secretbox_ZEROBYTES,
+  crypto_secretbox_BOXZEROBYTES: crypto_secretbox_BOXZEROBYTES,
+  crypto_scalarmult_BYTES: crypto_scalarmult_BYTES,
+  crypto_scalarmult_SCALARBYTES: crypto_scalarmult_SCALARBYTES,
+  crypto_box_PUBLICKEYBYTES: crypto_box_PUBLICKEYBYTES,
+  crypto_box_SECRETKEYBYTES: crypto_box_SECRETKEYBYTES,
+  crypto_box_BEFORENMBYTES: crypto_box_BEFORENMBYTES,
+  crypto_box_NONCEBYTES: crypto_box_NONCEBYTES,
+  crypto_box_ZEROBYTES: crypto_box_ZEROBYTES,
+  crypto_box_BOXZEROBYTES: crypto_box_BOXZEROBYTES,
+  crypto_sign_BYTES: crypto_sign_BYTES,
+  crypto_sign_PUBLICKEYBYTES: crypto_sign_PUBLICKEYBYTES,
+  crypto_sign_SECRETKEYBYTES: crypto_sign_SECRETKEYBYTES,
   crypto_sign_SEEDBYTES: crypto_sign_SEEDBYTES,
-  crypto_hash_BYTES : crypto_hash_BYTES
+  crypto_hash_BYTES: crypto_hash_BYTES
 };
 
 /* High-level API */
@@ -2148,50 +2146,15 @@ function checkBoxLengths(pk, sk) {
 }
 
 function checkArrayTypes() {
-  var t, i;
-  for (i = 0; i < arguments.length; i++) {
-     if ((t = Object.prototype.toString.call(arguments[i])) !== '[object Uint8Array]')
-       throw new TypeError('unexpected type ' + t + ', use Uint8Array');
+  for (var i = 0; i < arguments.length; i++) {
+    if (!(arguments[i] instanceof Uint8Array))
+      throw new TypeError('unexpected type, use Uint8Array');
   }
 }
 
 function cleanup(arr) {
   for (var i = 0; i < arr.length; i++) arr[i] = 0;
 }
-
-nacl.util = {};
-
-nacl.util.decodeUTF8 = function(s) {
-  var i, d = unescape(encodeURIComponent(s)), b = new Uint8Array(d.length);
-  for (i = 0; i < d.length; i++) b[i] = d.charCodeAt(i);
-  return b;
-};
-
-nacl.util.encodeUTF8 = function(arr) {
-  var i, s = [];
-  for (i = 0; i < arr.length; i++) s.push(String.fromCharCode(arr[i]));
-  return decodeURIComponent(escape(s.join('')));
-};
-
-nacl.util.encodeBase64 = function(arr) {
-  if (typeof btoa === 'undefined') {
-    return (new Buffer(arr)).toString('base64');
-  } else {
-    var i, s = [], len = arr.length;
-    for (i = 0; i < len; i++) s.push(String.fromCharCode(arr[i]));
-    return btoa(s.join(''));
-  }
-};
-
-nacl.util.decodeBase64 = function(s) {
-  if (typeof atob === 'undefined') {
-    return new Uint8Array(Array.prototype.slice.call(new Buffer(s, 'base64'), 0));
-  } else {
-    var i, d = atob(s), b = new Uint8Array(d.length);
-    for (i = 0; i < d.length; i++) b[i] = d.charCodeAt(i);
-    return b;
-  }
-};
 
 nacl.randomBytes = function(n) {
   var b = new Uint8Array(n);
@@ -2215,8 +2178,8 @@ nacl.secretbox.open = function(box, nonce, key) {
   var c = new Uint8Array(crypto_secretbox_BOXZEROBYTES + box.length);
   var m = new Uint8Array(c.length);
   for (var i = 0; i < box.length; i++) c[i+crypto_secretbox_BOXZEROBYTES] = box[i];
-  if (c.length < 32) return false;
-  if (crypto_secretbox_open(m, c, c.length, nonce, key) !== 0) return false;
+  if (c.length < 32) return null;
+  if (crypto_secretbox_open(m, c, c.length, nonce, key) !== 0) return null;
   return m.subarray(crypto_secretbox_ZEROBYTES);
 };
 
@@ -2298,8 +2261,6 @@ nacl.sign = function(msg, secretKey) {
 };
 
 nacl.sign.open = function(signedMsg, publicKey) {
-  if (arguments.length !== 2)
-    throw new Error('nacl.sign.open accepts 2 arguments; did you mean to use nacl.sign.detached.verify?');
   checkArrayTypes(signedMsg, publicKey);
   if (publicKey.length !== crypto_sign_PUBLICKEYBYTES)
     throw new Error('bad public key size');
@@ -2388,26 +2349,22 @@ nacl.setPRNG = function(fn) {
 (function() {
   // Initialize PRNG if environment provides CSPRNG.
   // If not, methods calling randombytes will throw.
-  var crypto;
-  if (typeof window !== 'undefined') {
-    // Browser.
-    if (window.crypto && window.crypto.getRandomValues) {
-      crypto = window.crypto; // Standard
-    } else if (window.msCrypto && window.msCrypto.getRandomValues) {
-      crypto = window.msCrypto; // Internet Explorer 11+
-    }
-    if (crypto) {
-      nacl.setPRNG(function(x, n) {
-        var i, v = new Uint8Array(n);
-        crypto.getRandomValues(v);
-        for (i = 0; i < n; i++) x[i] = v[i];
-        cleanup(v);
-      });
-    }
+  var crypto = typeof self !== 'undefined' ? (self.crypto || self.msCrypto) : null;
+  if (crypto && crypto.getRandomValues) {
+    // Browsers.
+    var QUOTA = 65536;
+    nacl.setPRNG(function(x, n) {
+      var i, v = new Uint8Array(n);
+      for (i = 0; i < n; i += QUOTA) {
+        crypto.getRandomValues(v.subarray(i, i + Math.min(n - i, QUOTA)));
+      }
+      for (i = 0; i < n; i++) x[i] = v[i];
+      cleanup(v);
+    });
   } else if (typeof require !== 'undefined') {
     // Node.js.
     crypto = require('crypto');
-    if (crypto) {
+    if (crypto && crypto.randomBytes) {
       nacl.setPRNG(function(x, n) {
         var i, v = crypto.randomBytes(n);
         for (i = 0; i < n; i++) x[i] = v[i];
@@ -2417,4 +2374,4 @@ nacl.setPRNG = function(fn) {
   }
 })();
 
-})(typeof module !== 'undefined' && module.exports ? module.exports : (window.nacl = window.nacl || {}));
+})(typeof module !== 'undefined' && module.exports ? module.exports : (self.nacl = self.nacl || {}));

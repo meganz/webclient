@@ -1187,7 +1187,9 @@ function init_page() {
                 ulQueue.pause();
                 uldl_hold = true;
 
-                bottomPageDialog(false, 'terms'); // show terms dialog
+                if (!is_mobile) {
+                    bottomPageDialog(false, 'terms'); // show terms dialog
+                }
             }
         }
         $('#topmenu').safeHTML(parsetopmenu());

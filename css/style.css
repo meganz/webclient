@@ -23551,6 +23551,7 @@ div.camera-bottom-txt {
 }
 .half-sized.right {
     float: right;
+    right: 0;
 }
 .account.data-block {
     padding: 30px 36px 29px 36px;

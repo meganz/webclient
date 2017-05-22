@@ -990,6 +990,7 @@ function init_page() {
     else if (page === 'wp') {
         parsepage(pages['wp']);
         mobileappspage.init();
+        mobileappspage.initTabs();
     }
     else if (page === 'megabird') {
         parsepage(pages['megabird']);

@@ -1195,10 +1195,7 @@ if (is_ios) {
     }
 }
 
-if (page === 'android') {
-    document.location = 'https://play.google.com/store/apps/details?id=mega.privacy.android.app&referrer=meganzmobileapps';
-}
-else if (!b_u) {
+if (!b_u) {
     d = window.d || 0;
     jj = window.jj || 0;
     var onBetaW = location.hostname === 'beta.mega.nz' || location.hostname.indexOf("developers.") === 0;

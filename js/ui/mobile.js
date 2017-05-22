@@ -2560,19 +2560,20 @@ mobile.register = {
     showConfirmEmailScreen: function(registrationVars) {
 
         var $confirmScreen = $('.registration-confirm-email');
+        var $registerScreen = $('.mobile.signin-register-block');
         var $changeEmailInput = $confirmScreen.find('.change-email input');
         var $resendButton = $confirmScreen.find('.resend-button');
 
         // Hide the current register screen and show the confirmation one
-        this.$screen.addClass('hidden');
+        $registerScreen.addClass('hidden');
         $confirmScreen.removeClass('hidden');
 
         // Set the email into the text field
         $changeEmailInput.val(registrationVars.email);
 
         // Init email input keyup and Resend button
-        this.initConfirmEmailScreenKeyup($changeEmailInput, $resendButton);
-        this.initConfirmEmailScreenResendButton($changeEmailInput, $resendButton, registrationVars);
+        mobile.register.initConfirmEmailScreenKeyup($changeEmailInput, $resendButton);
+        mobile.register.initConfirmEmailScreenResendButton($changeEmailInput, $resendButton, registrationVars);
     },
 
     /**
@@ -3050,5 +3051,11 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
     mobile.messageOverlay.show(msg, submsg);
 }
 
-// Not needed for mobile, but called in various places
-function removeUInode(handle, parent) { }
+function removeUInode(nodeHandle, parentHandle) {
+
+    // Call the mobile version
+    mobile.cloud.renderDelete(nodeHandle, parentHandle);
+}
+
+// Not required for mobile
+function fmtopUI() { }

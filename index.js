@@ -433,15 +433,22 @@ function init_page() {
             delete localStorage.awaitingConfirmationAccount;
         }
         else {
-            // Insert placeholder page while waiting for user input
-            parsepage(pages['placeholder']);
+            // Show signup link dialog for mobile
+            if (is_mobile) {
+                parsepage(pages['fm_mobile']);
+                mobile.register.showConfirmEmailScreen(acc);
+                return false;
+            }
+            else {
+                // Insert placeholder page while waiting for user input
+                parsepage(pages['placeholder']);
 
-            return mega.ui.sendSignupLinkDialog(acc, function() {
-                // The user clicked 'close', abort and start over...
-
-                delete localStorage.awaitingConfirmationAccount;
-                init_page();
-            });
+                return mega.ui.sendSignupLinkDialog(acc, function() {
+                    // The user clicked 'close', abort and start over...
+                    delete localStorage.awaitingConfirmationAccount;
+                    init_page();
+                });
+            }
         }
     }
 

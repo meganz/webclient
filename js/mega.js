@@ -2628,11 +2628,9 @@ function MegaData()
     var delInShareQueue = Object.create(null);
     this.delNode = function(h, ignoreDB) {
         function ds(h) {
-
             if (fminitialized) {
                 removeUInode(h);
             }
-
             if (M.c[h] && h.length < 11) {
                 for (var h2 in M.c[h]) {
                     ds(h2);
@@ -2665,8 +2663,6 @@ function MegaData()
             }
         }
 
-        // Store parent now as it will be unavailable after deletion (the typeof checks fix a hell account exception)
-        var parent = ((typeof M.d[h] !== 'undefined') && (typeof M.d[h].p !== 'undefined')) ? M.d[h].p : undefined;
         var delInShareQ = delInShareQueue[h] = delInShareQueue[h] || [];
 
         ds(h);
@@ -2681,25 +2677,18 @@ function MegaData()
         }
         if (fminitialized) {
             // Handle Inbox/RubbishBin UI changes
-            if (!is_mobile) {
-                delay('fmtopUI', fmtopUI);
-            }
+            delay('fmtopUI', fmtopUI);
 
             if (M.currentdirid === 'shares' && !M.viewmode) {
                 M.openFolder('shares', 1);
             }
             else {
-                // Update M.v because it's used for a lot of things
+                // Update M.v it's used for at least preview slideshow
                 for (var k = M.v.length; k--;) {
                     if (M.v[k].h === h) {
                         M.v.splice(k, 1);
                         break;
                     }
-                }
-
-                // Render delete for mobile now
-                if (is_mobile) {
-                    mobile.cloud.renderDelete(h, parent);
                 }
             }
         }

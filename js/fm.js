@@ -4300,7 +4300,7 @@ function getDDhelper()
 function menuItems() {
     var promise = new MegaPromise();
 
-    dbfetch.coll($.selected)
+    dbfetch.geta($.selected || [])
         .always(function() {
             promise.resolve(menuItemsSync());
         });
@@ -7952,9 +7952,10 @@ function propertiesDialog(close) {
         _propertiesDialog(1);
     }
     else {
-        var promise = dbfetch.coll($.selected || []);
+        var promise = dbfetch.node($.selected || []);
 
-        promise.always(function() {
+        promise.always(function(r) {
+            $.selected = r;
             _propertiesDialog();
         });
 
@@ -7963,77 +7964,36 @@ function propertiesDialog(close) {
 }
 function _propertiesDialog(close) {
 
-    /*
-    * fillPropertiesContactList, Handles node properties/info dialog contact list content
-    *
-    * @param {Object} shares Node related shares
-    * @param {Object} pendingShares Node related pending shares
-    * @param {Number} totalSharesNum
-    */
-    var fillPropertiesContactList = function(shares, pendingShares, totalSharesNum) {
+    /**
+     * fillPropertiesContactList, Handles node properties/info dialog contact list content
+     *
+     * @param {Array} users The list of users to whom we're sharing the selected nodes
+     */
+    var fillPropertiesContactList = function(users) {
 
-        var DEFAULT_CONTACTS_NUMBER = 5;
-        var counter = 0;
-        var tmpStatus = '';
-        var onlinestatus = '';
-        var user;
-        var hiddenClass = '';
+        var MAX_CONTACTS = 5;
+        var shareUsersHtml = '';
         var $shareUsers = pd.find('.properties-body .properties-context-menu')
                         .empty()
                         .append('<div class="properties-context-arrow"></div>');
-        var shareUsersHtml = '';
 
-        // Add contacts with full contact relation
-        for (var userId in shares) {
-            if (shares.hasOwnProperty(userId)) {
+        for (var i = users.length; i--;) {
+            var user = users[i];
+            var userHandle = user.u || user.p;
+            var hidden = i >= MAX_CONTACTS ? 'hidden' : '';
+            var status = M.onlineStatusClass(megaChatIsReady
+                && megaChat.karere.getPresence(megaChat.getJidFromNodeId(userHandle)));
 
-                if (++counter <= DEFAULT_CONTACTS_NUMBER) {
-                    hiddenClass = '';
-                }
-                else {
-                    hiddenClass = 'hidden';
-                }
-
-                if (M.u[userId]) {
-                    user = M.u[userId];
-                    tmpStatus = megaChatIsReady && megaChat.karere.getPresence(megaChat.getJidFromNodeId(user.u));
-                    onlinestatus = M.onlineStatusClass(tmpStatus);
-                    shareUsersHtml += '<div class="properties-context-item '
-                        + onlinestatus[1] + ' ' +  hiddenClass + '">'
-                        + '<div class="properties-contact-status"></div>'
-                        + '<span>' + htmlentities(user.name || user.m) + '</span>'
-                        + '</div>';
-                }
-            }
+            shareUsersHtml += '<div class="properties-context-item ' + status[1] + ' ' + hidden
+                + '" data-handle="' + escapeHTML(userHandle) + '">'
+                + '<div class="properties-contact-status"></div>'
+                + '<span>' + escapeHTML(M.getNameByHandle(userHandle)) + '</span>'
+                + '</div>';
         }
 
-        // Add outgoing pending contacts for node handle [n.h]
-        for (userId in pendingShares) {
-            if (pendingShares.hasOwnProperty(userId)) {
-
-                if (++counter <= DEFAULT_CONTACTS_NUMBER) {
-                    hiddenClass = '';
-                }
-                else {
-                    hiddenClass = 'hidden';
-                }
-
-                if (M.opc[userId]) {
-                    user = M.opc[userId];
-                    shareUsersHtml += '<div class="properties-context-item offline ' + hiddenClass + '">'
-                        + '<div class="properties-contact-status"></div>'
-                        + '<span>' + htmlentities(user.m) + '</span>'
-                        + '</div>';
-                }
-            }
-        }
-
-        var hiddenNum = totalSharesNum - DEFAULT_CONTACTS_NUMBER;
-        var repStr = l[10663];// '... and [X] more';
-
-        if (hiddenNum > 0) {
+        if (users.length > MAX_CONTACTS) {
             shareUsersHtml += '<div class="properties-context-item show-more">'
-                + '<span>...' + repStr.replace('[X]', hiddenNum) + '</span>'
+                + '<span>...' + escapeHTML(l[10663]).replace('[X]', users.length - MAX_CONTACTS) + '</span>'
                 + '</div>';
         }
 
@@ -8043,7 +8003,6 @@ function _propertiesDialog(close) {
     };// END of fillPropertiesContactList function
 
     var pd = $('.fm-dialog.properties-dialog');
-    var c = $('.properties-elements-counter span');
 
     $(document).unbind('MegaNodeRename.Properties');
     $(document).unbind('MegaCloseDialog.Properties');
@@ -8064,62 +8023,21 @@ function _propertiesDialog(close) {
     fm_showoverlay();
 
     pd.removeClass('hidden multiple folders-only two-elements shared shared-with-me');
-    pd.removeClass('read-only read-and-write full-access taken-down');
-
-    var exportLink = new mega.Share.ExportLink({});
-    var isTakenDown = exportLink.isTakenDown($.selected);
-    var isUndecrypted = missingkeys[$.selected];
-    var notificationText = '';
-
-    if (isTakenDown || isUndecrypted) {
-        if (isTakenDown) {
-            pd.addClass('taken-down');
-            notificationText  = l[7703] + '\n';
-        }
-        if (isUndecrypted) {
-            pd.addClass('undecryptable');
-
-            if (M.d[$.selected].t) {// folder
-                notificationText  += l[8595];
-            }
-            else {// file
-                notificationText  += l[8602];
-            }
-        }
-        showToast('clipboard', notificationText);
-    }
-
+    pd.removeClass('read-only read-and-write full-access taken-down undecryptable');
     $('.properties-elements-counter span').text('');
-    $('.fm-dialog.properties-dialog .properties-body').rebind('click', function() {
 
-        // Clicking anywhere in the dialog will close the context-menu, if open
-        var e = $('.fm-dialog.properties-dialog .file-settings-icon');
-        if (e.hasClass('active'))
-            e.click();
-    });
-
-    $('.fm-dialog.properties-dialog .fm-dialog-close').rebind('click', function() {
-        propertiesDialog(1);
-    });
-
+    var users = null;
     var filecnt = 0, foldercnt = 0, size = 0, sfilecnt = 0, sfoldercnt = 0, n;
 
-    for (var i in $.selected) {
-        n = M.d[$.selected[i]];
+    for (var i = $.selected.length; i--;) {
+        n = $.selected[i];
         if (!n) {
             console.error('propertiesDialog: invalid node', $.selected[i]);
         }
         else if (n.t) {
-            var nodes = M.getNodesSync(n.h);
-            for (var j = 0; j < nodes.length; j++) {
-                if (M.d[nodes[j]] && !M.d[nodes[j]].t) {
-                    size += M.d[nodes[j]].s;
-                    sfilecnt++;
-                }
-                else {
-                    sfoldercnt++;
-                }
-            }
+            size += n.tb;
+            sfilecnt += n.tf;
+            sfoldercnt += n.td;
             foldercnt++;
         }
         else {
@@ -8132,6 +8050,29 @@ function _propertiesDialog(close) {
         return propertiesDialog(1);
     }
 
+    var exportLink = new mega.Share.ExportLink({});
+    var isTakenDown = exportLink.isTakenDown($.selected);
+    var isUndecrypted = missingkeys[$.selected[0].h];
+    var notificationText = '';
+
+    if (isTakenDown || isUndecrypted) {
+        if (isTakenDown) {
+            pd.addClass('taken-down');
+            notificationText = l[7703] + '\n';
+        }
+        if (isUndecrypted) {
+            pd.addClass('undecryptable');
+
+            if ($.selected[0].t) {// folder
+                notificationText += l[8595];
+            }
+            else {// file
+                notificationText += l[8602];
+            }
+        }
+        showToast('clipboard', notificationText);
+    }
+
     var star = '';
     if (n.fav)
         star = ' star';
@@ -8142,7 +8083,6 @@ function _propertiesDialog(close) {
     }
 
     if (typeof n.r === "number") {
-        var cs = M.contactstatus(n.h);
         var zclass = "read-only";
 
         if (n.r === 1) {
@@ -8206,24 +8146,21 @@ function _propertiesDialog(close) {
             p.t7 = fm_contains(sfilecnt, sfoldercnt);
             if (pd.attr('class').indexOf('shared') > -1) {
 
-                var fullSharesNum = Object.keys(n.shares || {}).length;
-                var pendingSharesNum = Object.keys(M.ps[n.h] || {}).length;
-                var totalSharesNum = fullSharesNum + pendingSharesNum;
+                users = M.getSharingUsers($.selected, true);
 
                 // In case that user doesn't share with other
-                // Or in case that more then one node is selected
                 // Do NOT show contact informations in property dialog
-                if ((totalSharesNum === 0) || ($.selected.length > 1)) {
+                if (!users.length) {
                     p.hideContacts = true;
                 }
                 else {
                     p.t8 = l[1036] + ':';
-                    p.t9 = (totalSharesNum === 1) ? l[990] : l[989].replace("[X]", totalSharesNum);
+                    p.t9 = (users.length === 1) ? l[990] : l[989].replace("[X]", users.length);
                     p.t11 = n.ts ? htmlentities(time2date(n.ts)) : '';
                     p.t10 = p.t11 ? l[896] : '';
-                    $('.properties-elements-counter span').text(typeof n.r === "number" ? '' : totalSharesNum);
+                    $('.properties-elements-counter span').text(typeof n.r === "number" ? '' : users.length);
 
-                    fillPropertiesContactList(n.shares, M.ps[n.h], totalSharesNum);
+                    fillPropertiesContactList(users);
                 }
             }
             if (pd.attr('class').indexOf('shared-with-me') > -1) {
@@ -8254,7 +8191,13 @@ function _propertiesDialog(close) {
         p.t5 = ' second';
         p.t8 = l[93] + ':';
         p.t9 = l[1025];
+
+        users = M.getSharingUsers($.selected, true);
+        if (users.length) {
+            fillPropertiesContactList(users);
+        }
     }
+
     var html = '<div class="properties-small-gray">' + p.t1 + '</div>'
         +'<div class="properties-name-block"><div class="propreties-dark-txt">' + p.t2 + '</div>'
         +' <span class="file-settings-icon"><span></span></span></div>'
@@ -8272,6 +8215,19 @@ function _propertiesDialog(close) {
         $('.properties-small-gray.t10').addClass('hidden');
         $('.propreties-dark-txt.t11').addClass('hidden');
     }
+
+    $('.fm-dialog.properties-dialog .properties-body').rebind('click', function() {
+
+        // Clicking anywhere in the dialog will close the context-menu, if open
+        var e = $('.fm-dialog.properties-dialog .file-settings-icon');
+        if (e.hasClass('active')) {
+            e.click();
+        }
+    });
+
+    $('.fm-dialog.properties-dialog .fm-dialog-close').rebind('click', function() {
+        propertiesDialog(1);
+    });
 
     pd.find('.file-settings-icon').rebind('click context', function(e) {
         if ($(this).attr('class').indexOf('active') == -1) {
@@ -8333,10 +8289,11 @@ function _propertiesDialog(close) {
             }
         });
 
-        // ToDo: Can we redirects to contacts page when user clicks?
         $('.properties-context-item').rebind('click', function(e) {
             $('.contact-list-icon').removeClass('active');
             $('.properties-context-menu').fadeOut(200);
+            loadSubPage('fm/' + $(this).data('handle'));
+            return false;
         });
 
         // Expands properties-context-menu so rest of contacts can be shown
@@ -8371,7 +8328,7 @@ function _propertiesDialog(close) {
         $('.properties-file-icon').html('');
         for (var i in $.selected)
         {
-            var ico = fileIcon(M.d[$.selected[i]]);
+            var ico = fileIcon($.selected[i]);
 
             if (a <= 3)
             {

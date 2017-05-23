@@ -1261,6 +1261,54 @@ MegaData.prototype.getNodeShareUsers = function(node, exclude) {
     return result;
 };
 
+/**
+ * Collect users to whom nodes are being shared.
+ * @param {Array} nodes An array of nodes, or handles
+ * @param {Boolean} [userobj] Whether return user-objects of just their handles
+ * @returns {Array} an array of user-handles/objects
+ */
+MegaData.prototype.getSharingUsers = function(nodes, userobj) {
+    var users = [];
+
+    if (!Array.isArray(nodes)) {
+        nodes = [nodes];
+    }
+
+    for (var i = nodes.length; i--;) {
+        var node = nodes[i] || false;
+
+        // It's a handle?
+        if (typeof node === 'string') {
+            node = this.getNodeByHandle(node);
+        }
+
+        // outbound shares
+        if (node.shares) {
+            users = users.concat(M.getNodeShareUsers(node, 'EXP'));
+        }
+
+        // inbound shares
+        if (node.su) {
+            users.push(node.su);
+        }
+
+        // outbound pending shares
+        if (M.ps[node.h]) {
+            users = users.concat(Object.keys(M.ps[node.h]));
+        }
+    }
+
+    users = array_unique(users);
+
+    if (userobj) {
+        users = users.map(function(h) {
+            return M.getUserByHandle(h);
+        });
+    }
+
+    return users;
+};
+
 MegaData.prototype.nodeShare = function(h, s, ignoreDB) {
     // TODO: having moved to promises, ensure all calls are safe...
     if (!this.d[h]) {
@@ -1405,6 +1453,9 @@ MegaData.prototype.getUserByHandle = function(handle) {
         if (user instanceof MegaDataObject) {
             user = user._data;
         }
+    }
+    else if (Object(M.opc).hasOwnProperty(handle)) {
+        user = M.opc[handle];
     }
 
     if (!user && handle === u_handle) {

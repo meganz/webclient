@@ -1266,27 +1266,29 @@ Object.defineProperty(self, 'dbfetch', (function() {
         node: function fetchnode(handles) {
             var promise = new MegaPromise();
             var inflight = Object.create(null);
+            var result = [];
 
             for (var i = handles.length; i--;) {
                 if (M.d[handles[i]]) {
+                    result.push(M.d[handles[i]]);
                     handles.splice(i, 1);
                 }
-                else if (node_inflight[handles[i]]) {
+                /*else if (node_inflight[handles[i]]) {
                     inflight[handles[i]] = node_inflight[handles[i]];
                     handles.splice(i, 1);
                 }
                 else {
                     node_inflight[handles[i]] = promise;
-                }
+                }*/
             }
             // console.warn('fetchnode', arguments, handles, inflight);
 
             var masterPromise = promise;
-            if ($.len(inflight)) {
+            /*if ($.len(inflight)) {
                 masterPromise = MegaPromise.allDone(array_unique(obj_values(inflight)).concat(promise));
             }
-            else if (!handles.length) {
-                return MegaPromise.resolve([]);
+            else*/ if (!handles.length) {
+                return MegaPromise.resolve(result);
             }
 
             fmdb.getbykey('f', 'h', ['h', handles.concat()])
@@ -1299,7 +1301,7 @@ Object.defineProperty(self, 'dbfetch', (function() {
                         delete node_inflight[handles[i]];
                     }
 
-                    promise.resolve(r);
+                    promise.resolve(result.concat(r));
                 });
 
             return masterPromise;

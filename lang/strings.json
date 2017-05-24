@@ -16467,6 +16467,54 @@
         "text": "If you previously subscribed to a PRO plan with Google Play or Apple iTunes, please manually cancel your subscriptions with them inside Google Play or the iTunes app on your device. If you need any assistance please contact [A1]support@mega.nz[\/A1] or see our [A2]help article for Android[\/A2] or our [A3]help article for iOS[\/A3].",
         "context": "An error dialog message when the Cancel Subscription button is pressed in the My Account section of the website. This means that cancelling the subscription is not possible from the website, they must cancel with Apple or Google. Please leave the [A1], [A2] and [A3] tags as they will be replaced with links."
     },
+    "16502": {
+        "text": "Change Name",
+        "context": "Button title that allows the user change his name"
+    },
+    "16503": {
+        "text": "All files saved for Offline will be deleted from your device. Proceed to logout?",
+        "context": "Alert message shown when the user perform logout action and he has files in the Offline directory"
+    },
+    "16504": {
+        "text": "Your queued transfer exceeds the current transfer quota available for your account and may therefore be interrupted.",
+        "context": "Message of the dialog displayed when a user exceeds the transfer quota limits of the account (transfer overquota error)."
+    },
+    "16505": {
+        "text": "Depleted transfer quota",
+        "context": "Message of the dialog displayed when a user exceeds the transfer quota limits of the account (transfer overquota error) - (String as short as possible)."
+    },
+    "16506": {
+        "text": "Are you sure you want to cancel all the pending downloads?",
+        "context": "Message of the dialog displayed when a user wants to cancel all the pending downloads."
+    },
+    "16507": {
+        "text": "Are you sure you want to cancel all the pending uploads?",
+        "context": "Message of the dialog displayed when a user wants to cancel all the pending uploads."
+    },
+    "16508": {
+        "text": "Completing...",
+        "context": "Label for the state of a transfer when is being completing - (String as short as possible)."
+    },
+    "16509": {
+        "text": "Preparing...",
+        "context": "Label for the state of a transfer when is being preparing - (String as short as possible)."
+    },
+    "16510": {
+        "text": "Retrying...",
+        "context": "Label for the state of a transfer when is being retrying - (String as short as possible)."
+    },
+    "16511": {
+        "text": "Cancel downloads",
+        "context": "Label for any 'Cancel downloads' button, link, etc. - (String as short as possible)."
+    },
+    "16512": {
+        "text": "Cancel uploads",
+        "context": "Label for any 'Cancel uploads' button, link, etc. - (String as short as possible)."
+    },
+    "16513": {
+        "text": "No completed transfers",
+        "context": "Label for the background of an empty completed transfers page - (String as short as possible)."
+    },
     "16514": {
         "text": "The file you are moving will be renamed as:",
         "context": "Clickable block description in dublicate items dialog. Allows user keep existing file in the destination folder and file he is moving"
@@ -16474,5 +16522,9 @@
     "16515": {
         "text": "The file you are copying will be renamed as:",
         "context": "Clickable block description in dublicate items dialog. Allows user keep existing file in the destination folder and file he is copying"
+    },
+    "16516": {
+        "text": "Public Links",
+        "context": "A list item or breadcrumb title for displaying the number of publicly accessible file\/folder links a user has created in their account."
     }
 }

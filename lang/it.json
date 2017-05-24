@@ -4116,8 +4116,21 @@
     "16499": "Non muovere",
     "16500": "Non copiare",
     "16501": "Se ti sei abbonato precedentemente ad un piano PRO con Google Play o Apple iTunes, per favore cancella manualmente i tuoi abbonamenti con noi dentro le app di Google Play o Apple iTunes. Se hai bisogno di assistenza per favore contatta [A1]support@mega.nz[\/A1] o vedi il nostro [A2]articolo d'aiuto per Android[\/A2] o il nostro [A3]articolo d'aiuto per iOS[\/A3].",
-    "16514": "The file you are moving will be renamed as:",
-    "16515": "The file you are copying will be renamed as:",
+    "16502": "Cambia nome",
+    "16503": "Tutti i file salvati in Offline saranno cancellati dal tuo dispositivo. Continuare?",
+    "16504": "I trasferimenti che hai messo in coda superano la banda di trasferimento corrente disponibile per il tuo account e potrebbero essere interrotti.",
+    "16505": "Banda di trasferimento esaurita",
+    "16506": "Sei sicuro di voler annullare tutti i download in attesa?",
+    "16507": "Sei sicuro di voler annullare tutti gli upload in attesa?",
+    "16508": "Finendo...",
+    "16509": "Preparando...",
+    "16510": "Riprovando...",
+    "16511": "Annulla download",
+    "16512": "Annulla upload",
+    "16513": "Nessun trasferimento completato",
+    "16514": "Il file che stai spostando sar\u00e0 rinominato in:",
+    "16515": "Il file che stai copiando sar\u00e0 rinominato in:",
+    "16516": "Public Links",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4376,6 +4389,7 @@
         "file_current_version": 16478,
         "file_edit_by_me": 16480,
         "file_rename_by_me": 16481,
-        "cancel-subscription-dialog-message": 16501
+        "cancel-subscription-dialog-message": 16501,
+        "public-links": 16516
     }
 }

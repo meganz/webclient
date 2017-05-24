@@ -4116,8 +4116,21 @@
     "16499": "Jangan pindahkan",
     "16500": "Jangan copy",
     "16501": "Jika sebelumnya Anda berlangganan rencana PRO dengan Google Play atau Apple iTunes, abaikan langganan Anda secara manual dengan mereka di dalam Google Play atau aplikasi iTunes di perangkat Anda. Jika Anda memerlukan bantuan, hubungi [A1]support@mega.nz[\/A1] atau lihat [A2]artikel bantuan untuk Android[\/A2] atau [A3]artikel bantuan kami untuk iOS[\/A3].",
-    "16514": "The file you are moving will be renamed as:",
-    "16515": "The file you are copying will be renamed as:",
+    "16502": "Ganti Nama",
+    "16503": "Semua file yang disimpan untuk Offline akan dihapus dari perangkat Anda. Lanjutkan keluar?",
+    "16504": "Transfer antri Anda melebihi kuota transfer saat ini yang tersedia untuk akun Anda dan oleh karena itu dapat terganggu.",
+    "16505": "Kuota transfer habis",
+    "16506": "Yakin ingin membatalkan semua unduhan yang tertunda?",
+    "16507": "Yakin ingin membatalkan semua unggahan yang tertunda?",
+    "16508": "Melengkapi ...",
+    "16509": "Mempersiapkan...",
+    "16510": "Mencoba lagi ...",
+    "16511": "Batalkan unduhan",
+    "16512": "Batalkan upload",
+    "16513": "Tidak ada transfer selesai",
+    "16514": "File yang Anda pindahkan akan diganti namanya menjadi:",
+    "16515": "File yang Anda salin akan diganti namanya menjadi:",
+    "16516": "Public Links",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4376,6 +4389,7 @@
         "file_current_version": 16478,
         "file_edit_by_me": 16480,
         "file_rename_by_me": 16481,
-        "cancel-subscription-dialog-message": 16501
+        "cancel-subscription-dialog-message": 16501,
+        "public-links": 16516
     }
 }

@@ -3906,7 +3906,7 @@
     "16267": "\u0412\u0438\u043a\u043e\u043d\u0443\u0432\u0430\u0442\u0438 \u043a\u043e\u043c\u0430\u043d\u0434\u0438 \u0437 \u043a\u043e\u043c\u0430\u043d\u0434\u043d\u043e\u0433\u043e \u0440\u044f\u0434\u043a\u0430, \u0441\u043a\u0440\u0438\u043f\u0442\u0443 \u0430\u0431\u043e \u0456\u043d\u0448\u043e\u0457 \u043f\u0440\u043e\u0433\u0440\u0430\u043c\u0438.",
     "16268": "\u0406\u043c\u043f\u043e\u0440\u0442 \u043a\u043e\u043d\u0442\u0430\u043a\u0442\u0456\u0432\u2026",
     "16269": "\u0421\u043a\u043e\u0440\u0438\u0441\u0442\u0430\u0439\u0442\u0435\u0441\u044c \u043a\u043d\u043e\u043f\u043a\u043e\u044e \u041d\u043e\u0432\u0430 \u0422\u0435\u043a\u0430 \u0434\u043b\u044f \u0441\u0442\u0432\u043e\u0440\u0435\u043d\u043d\u044f \u043d\u043e\u0432\u043e\u0457 \u0442\u0435\u043a\u0438.",
-    "16270": "Automatically backup your photos to the Cloud Drive",
+    "16270": "\u0410\u0432\u0442\u043e\u043c\u0430\u0442\u0438\u0447\u043d\u0435 \u0440\u0435\u0437\u0435\u0440\u0432\u043d\u0435 \u043a\u043e\u043f\u0456\u044e\u0432\u0430\u043d\u043d\u044f \u0432\u0430\u0448\u0438\u0445 \u0444\u043e\u0442\u043e\u0433\u0440\u0430\u0444\u0456\u0439 \u043d\u0430 \u0425\u043c\u0430\u0440\u043d\u0438\u0439 \u0434\u0438\u0441\u043a",
     "16271": "You can upgrade later in My Account",
     "16272": "Transfers tooltip:",
     "16273": "Automatically show the transfers tooltip when a transfer is active.",
@@ -4116,8 +4116,21 @@
     "16499": "Don't move",
     "16500": "Don't copy",
     "16501": "If you previously subscribed to a PRO plan with Google Play or Apple iTunes, please manually cancel your subscriptions with them inside Google Play or the iTunes app on your device. If you need any assistance please contact [A1]support@mega.nz[\/A1] or see our [A2]help article for Android[\/A2] or our [A3]help article for iOS[\/A3].",
+    "16502": "Change Name",
+    "16503": "All files saved for Offline will be deleted from your device. Proceed to logout?",
+    "16504": "Your queued transfer exceeds the current transfer quota available for your account and may therefore be interrupted.",
+    "16505": "Depleted transfer quota",
+    "16506": "Are you sure you want to cancel all the pending downloads?",
+    "16507": "Are you sure you want to cancel all the pending uploads?",
+    "16508": "Completing...",
+    "16509": "Preparing...",
+    "16510": "Retrying...",
+    "16511": "Cancel downloads",
+    "16512": "Cancel uploads",
+    "16513": "No completed transfers",
     "16514": "The file you are moving will be renamed as:",
     "16515": "The file you are copying will be renamed as:",
+    "16516": "Public Links",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4376,6 +4389,7 @@
         "file_current_version": 16478,
         "file_edit_by_me": 16480,
         "file_rename_by_me": 16481,
-        "cancel-subscription-dialog-message": 16501
+        "cancel-subscription-dialog-message": 16501,
+        "public-links": 16516
     }
 }

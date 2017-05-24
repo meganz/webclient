@@ -1291,6 +1291,7 @@ input.radioOn, input.radioOff {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
+    display: block;
 }
 .fm-dialog-footer .radio-txt {
     padding-right: 0;

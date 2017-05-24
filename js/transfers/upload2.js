@@ -630,6 +630,9 @@ var ulmanager = {
                 ulmanager.ulIDToNode[ulmanager.getGID(ul_queue[ctx.ul_queue_num])] = n.h;
                 onUploadSuccess(ul_queue[ctx.ul_queue_num], n.h, ctx.faid);
             }
+            if (ctx.file._replaces) {
+                M.moveNodes([ctx.file._replaces], M.RubbishID, true);
+            }
             ctx.file.ul_failed = false;
             ctx.file.retries = 0;
             ulmanager.ulCompletePending(ctx.target);

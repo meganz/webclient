@@ -870,7 +870,7 @@ var dlmanager = {
         $('.bottom-tips a', $dialog).rebind('click', function() {
             open(getAppBaseUrl() +
                 '#help/client/webclient/cloud-drive/' +
-                'how-do-you-regulate-transfer-quota-bandwidth-utilisation'
+                'how-do-you-regulate-transfer-quota-utilisation'
             );
         });
 

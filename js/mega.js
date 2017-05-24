@@ -1459,7 +1459,7 @@ function MegaData()
                 chatui(id);
             }
         }
-        else if ((!id || !M.d[id]) && (id !== 'transfers')) {
+        else if ((!id || !M.d[id]) && (id !== 'transfers') && id !== 'links') {
             id = this.RootID;
         }
 
@@ -1507,6 +1507,17 @@ function MegaData()
             }
             if (id === 'transfers') {
                 M.v = [];
+            }
+            else if (id === 'links') {
+                if (M.su.EXP) {
+                    M.v = Object.keys(M.su.EXP)
+                        .map(function(h) {
+                            return M.d[h];
+                        });
+                }
+                else {
+                    M.v = [];
+                }
             }
             else if (id.substr(0, 6) === 'search') {
                 M.filterBySearch(M.currentdirid);
@@ -1577,7 +1588,7 @@ function MegaData()
 
             if (fminitialized) {
                 var currentdirid = M.currentdirid;
-                if (id.substr(0, 6) === 'search') {
+                if (id.substr(0, 6) === 'search' || id === 'links') {
                     currentdirid = M.RootID;
 
                     if (M.d[M.previousdirid]) {
@@ -2452,6 +2463,25 @@ function MegaData()
               + '</a>');
             $('.search-files-result').addClass('hidden');
         }
+        else if (this.currentdirid === 'links') {
+            $('.fm-right-header .fm-breadcrumbs-block').safeHTML(
+                '<a class="fm-breadcrumbs public-links">'
+                    + '<span class="right-arrow-bg ui-draggable">'
+                        + '<span>'
+                            + '<i class="small-icon context get-link"></i>'
+                            + l[16516]
+                            + '<span class="public-links-cnt">0</span>'
+                        + '</span>'
+                    + '</span>'
+                + '</a>');
+
+            if (M.su.EXP) {
+                $('.public-links-cnt').text(Object.keys(M.su.EXP).length);
+            }
+            else {
+                $('.public-links-cnt').text(0);
+            }
+        }
         else if (this.currentdirid && this.currentdirid.substr(0, 7) === 'search/') {
             $('.fm-right-header .fm-breadcrumbs-block').safeHTML(
                 '<a class="fm-breadcrumbs search ui-droppable" id="'
@@ -2467,15 +2497,15 @@ function MegaData()
         }
         else if (this.currentdirid && this.currentdirid === 'opc') {
             DEBUG('Render Path OPC');
-            $('.fm-right-header .fm-breadcrumbs-block').html(contactBreadcrumb + html);
+            $('.fm-right-header .fm-breadcrumbs-block').safeHTML(contactBreadcrumb + html);
         }
         else if (this.currentdirid && this.currentdirid === 'ipc') {
             DEBUG('Render Path IPC');
-            $('.fm-right-header .fm-breadcrumbs-block').html(contactBreadcrumb + html);
+            $('.fm-right-header .fm-breadcrumbs-block').safeHTML(contactBreadcrumb + html);
         }
         else {
             $('.search-files-result').addClass('hidden');
-            $('.fm-right-header .fm-breadcrumbs-block').html(html);
+            $('.fm-right-header .fm-breadcrumbs-block').safeHTML(html);
         }
 
         // Resizing breadcrumbs items
@@ -2660,6 +2690,10 @@ function MegaData()
             // if (M.u[h]) delete M.u[h];
             if (typeof M.u[h] === 'object') {
                 M.u[h].c = 0;
+            }
+
+            if (M.su.EXP) {
+                delete M.su.EXP[h];
             }
         }
 
@@ -3726,10 +3760,11 @@ function MegaData()
                         // calculate filelinks items/size
                         var links = stats.links;
                         Object.keys(exp)
-                            .filter(function(h) {
+                            /*.filter(function(h) {
                                 return M.d[h] && !M.d[h].t;
-                            })
+                             })*/
                             .forEach(function(h) {
+                                // XXX: use `td` once dbpaging is merged
                                 links.files++;
                                 links.bytes += M.d[h] && M.d[h].s || 0;
                             });

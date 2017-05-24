@@ -311,7 +311,6 @@ function init_page() {
         loadingDialog.hide();
     }
 
-    var wasFolderlink = pfid;
     var oldPFKey = pfkey;
     if (page.substr(0, 2) == 'F!' && page.length > 2) {
         var ar = page.substr(2, page.length - 1).split('!');
@@ -433,15 +432,22 @@ function init_page() {
             delete localStorage.awaitingConfirmationAccount;
         }
         else {
-            // Insert placeholder page while waiting for user input
-            parsepage(pages['placeholder']);
+            // Show signup link dialog for mobile
+            if (is_mobile) {
+                parsepage(pages['fm_mobile']);
+                mobile.register.showConfirmEmailScreen(acc);
+                return false;
+            }
+            else {
+                // Insert placeholder page while waiting for user input
+                parsepage(pages['placeholder']);
 
-            return mega.ui.sendSignupLinkDialog(acc, function() {
-                // The user clicked 'close', abort and start over...
-
-                delete localStorage.awaitingConfirmationAccount;
-                init_page();
-            });
+                return mega.ui.sendSignupLinkDialog(acc, function() {
+                    // The user clicked 'close', abort and start over...
+                    delete localStorage.awaitingConfirmationAccount;
+                    init_page();
+                });
+            }
         }
     }
 
@@ -808,7 +814,7 @@ function init_page() {
 
         if (u_type) {
             var ac = new mega.AccountClosure();
-            ac.initAccountClosure();
+            ac.handleFeedback();
         }
         else {
             // Unable to cancel, not logged in
@@ -1180,7 +1186,9 @@ function init_page() {
                 ulQueue.pause();
                 uldl_hold = true;
 
-                bottomPageDialog(false, 'terms'); // show terms dialog
+                if (!is_mobile) {
+                    bottomPageDialog(false, 'terms'); // show terms dialog
+                }
             }
         }
         $('#topmenu').safeHTML(parsetopmenu());
@@ -1559,9 +1567,7 @@ function topmenuUI() {
         }
 
         // Show PRO plan expired warning popup (if applicable)
-        if (!is_mobile) {
-            alarm.planExpired.render();
-        }
+        alarm.planExpired.render();
     }
     else {
         if (u_type === 0 && !confirmok && page !== 'key') {

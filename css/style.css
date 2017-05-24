@@ -8241,7 +8241,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 .active .fm-account-input input, .error .fm-account-input input {
     color: white;
 }
-.add-user-notification, .share-message, .feedback-textarea-bl, .cancel-textarea-bl {
+.add-user-notification, .share-message, .cancel-textarea-bl {
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
     border-radius: 5px;
@@ -8256,7 +8256,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     box-sizing: border-box;
     margin-top: 12px;
 }
-.feedback-textarea-bl, .cancel-textarea-bl {
+.cancel-textarea-bl {
     height: 86px;
     background-image: none;
     padding: 0;
@@ -8269,13 +8269,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
 }
 .cancel-textarea-bl {
     height: 140px;
-}
-.feedback-textarea-scroll {
-    height: 86px;
-    padding: 7px 0;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
 }
 .cancel-textarea-scroll {
     height: 140px;
@@ -8291,10 +8284,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     box-sizing: border-box;
     padding: 6px 0 5px 0;
 }
-.add-user-nt-scrolling .jspDrag, .share-message-scrolling .jspDrag, .feedback-textarea-scroll .jspDrag, .cancel-textarea-scroll .jspDrag {
+.add-user-nt-scrolling .jspDrag, .share-message-scrolling .jspDrag, .cancel-textarea-scroll .jspDrag {
     width: 4px;
 }
-.add-user-nt-scrolling textarea, .add-contact-hidden, .share-message-scrolling textarea, .share-message-hidden, .feedback-textarea-scroll textarea, .feedback-hidden, .cancel-textarea-scroll textarea, .cancel-hidden {
+.add-user-nt-scrolling textarea, .add-contact-hidden, .share-message-scrolling textarea, .share-message-hidden, .feedback-hidden, .cancel-textarea-scroll textarea, .cancel-hidden {
     border: 0;
     padding: 0;
     background-color: transparent;
@@ -8313,17 +8306,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
     font-family: 'source_sans_proregular', Arial;
     overflow: hidden;
     min-height: 39px;
-}
-.feedback-textarea {
-    height: 72px;
-    line-height: 0;
-    font-size: 0;
-}
-.feedback-textarea-scroll textarea, .feedback-hidden {
-    height: 72px;
-    min-height: 72px;
-    padding: 0 10px;
-    font-size: 13px;
 }
 .cancel-textarea {
     height: 126px;
@@ -10541,9 +10523,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
 }
 .membership-usage-txt span.green, .membership-usage-txt.green, .membership-big-txt span.green {
     color: #71AD32;
-}
-.membershtip-medium-txt .btn-cancel {
-    display: none;
 }
 .membership-question {
     font-family: Georgia, 'Times New Roman', Times, serif;

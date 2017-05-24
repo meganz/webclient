@@ -704,6 +704,14 @@ mBroadcaster.once('startMega', function populate_l() {
     l[16392] = escapeHTML(l[16392]).replace('[S]', '<span class="red">').replace('[/S]', '</span>');
     l[16393] = escapeHTML(l[16393])
         .replace('[A]', '<a class="red" href="mailto:support@mega.nz">').replace('[/A]', '</a>');
+    l[16501] = l[16501].replace('[A1]', '<a class="red" href="mailto:support@mega.nz">').replace('[/A1]', '</a>')
+                       .replace('[A2]', '<a class="red" target="_blank" href="https://mega.nz/help/client/android/'
+                              + 'accounts-pro-accounts/how-can-i-cancel-the-renewal-of-my-mega-subscription">')
+                       .replace('[/A2]', '</a>')
+                       .replace('[A3]', '<a class="red" target="_blank" href="https://mega.nz/help/client/ios/'
+                              + 'accounts-pro-accounts/how-does-mega-pro-account-subscription-work-with-apple-in-app-'
+                              + 'purchases">')
+                       .replace('[/A3]', '</a>');
 
     var common = [
         15536, 16106, 16107, 16116, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315,
@@ -5493,7 +5501,8 @@ if (typeof sjcl !== 'undefined') {
 
 /**
  * Get a string for the payment plan number
- * @param {Number} planNum The plan number e.g. 1: PRO I, 2: PRO II, 3: PRO III, 4: LITE
+ * @param {Number} planNum The plan number e.g. 1, 2, 3, 4
+ * @returns {String} The plan name i.e. PRO I, PRO II, PRO III, LITE
  */
 function getProPlan(planNum) {
 

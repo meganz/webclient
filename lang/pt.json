@@ -838,7 +838,7 @@
     "1575": "Apenas videos",
     "1577": "Adicionar pasta sincronizada",
     "1578": "Erro",
-    "1579": "Por favor seleccione uma pasta local ou uma pasta MEGA",
+    "1579": "Por favor, seleccione uma pasta local e uma pasta MEGA",
     "1580": "A pasta local seleccionada j\u00e1 est\u00e1 sincronizada",
     "1581": "A pasta sincronizada n\u00e3o pode ser dentro de outra pasta sincronizada",
     "1582": "A pasta MEGA seleccionada j\u00e1 est\u00e1 sincronizada",
@@ -4116,6 +4116,21 @@
     "16499": "Don't move",
     "16500": "Don't copy",
     "16501": "If you previously subscribed to a PRO plan with Google Play or Apple iTunes, please manually cancel your subscriptions with them inside Google Play or the iTunes app on your device. If you need any assistance please contact [A1]support@mega.nz[\/A1] or see our [A2]help article for Android[\/A2] or our [A3]help article for iOS[\/A3].",
+    "16502": "Change Name",
+    "16503": "All files saved for Offline will be deleted from your device. Proceed to logout?",
+    "16504": "Your queued transfer exceeds the current transfer quota available for your account and may therefore be interrupted.",
+    "16505": "Depleted transfer quota",
+    "16506": "Are you sure you want to cancel all the pending downloads?",
+    "16507": "Are you sure you want to cancel all the pending uploads?",
+    "16508": "Completing...",
+    "16509": "Preparing...",
+    "16510": "Retrying...",
+    "16511": "Cancel downloads",
+    "16512": "Cancel uploads",
+    "16513": "No completed transfers",
+    "16514": "The file you are moving will be renamed as:",
+    "16515": "The file you are copying will be renamed as:",
+    "16516": "Public Links",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4374,6 +4389,7 @@
         "file_current_version": 16478,
         "file_edit_by_me": 16480,
         "file_rename_by_me": 16481,
-        "cancel-subscription-dialog-message": 16501
+        "cancel-subscription-dialog-message": 16501,
+        "public-links": 16516
     }
 }

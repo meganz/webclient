@@ -2469,7 +2469,7 @@ function MegaData()
                     + '<span class="right-arrow-bg ui-draggable">'
                         + '<span>'
                             + '<i class="small-icon context get-link"></i>'
-                            + 'Public Links'
+                            + l[16516]
                             + '<span class="public-links-cnt">0</span>'
                         + '</span>'
                     + '</span>'

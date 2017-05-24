@@ -8871,27 +8871,38 @@ function previewimg(id, uint8arr)
 
 function fm_importflnodes(nodes)
 {
+    var _import = function(data) {
+        $.mcImport = true;
+        $.selected = data[0];
+        $.onImportCopyNodes = data[1];
+
+        if (d) {
+            console.log('Importing Nodes...', $.selected, $.onImportCopyNodes);
+        }
+        $('.dropdown-item.copy-item').click();
+    };
+
     if (localStorage.folderLinkImport && !folderlink) {
-        var kv = StorageDB(u_handle);
-        var key = 'import.' + localStorage.folderLinkImport;
 
-        kv.get(key)
-            .done(function(data) {
-                $.mcImport = true;
-                $.selected = data[0];
-                $.onImportCopyNodes = data[1];
+        if ($.onImportCopyNodes) {
+            _import($.onImportCopyNodes);
+        }
+        else {
+            var kv = StorageDB(u_handle);
+            var key = 'import.' + localStorage.folderLinkImport;
 
-                if (d) {
-                    console.log('Importing Nodes...', $.selected, $.onImportCopyNodes);
-                }
-                $('.dropdown-item.copy-item').click();
-
-                kv.rem(key);
-            })
-            .fail(function(e) {
-                console.error(e);
-            });
-
+            kv.get(key)
+                .done(function(data) {
+                    _import(data);
+                    kv.rem(key);
+                })
+                .fail(function(e) {
+                    if (d) {
+                        console.error(e);
+                    }
+                    msgDialog('warninga', l[135], l[47]);
+                });
+        }
         nodes = null;
         delete localStorage.folderLinkImport;
     }
@@ -8904,18 +8915,20 @@ function fm_importflnodes(nodes)
             loadingDialog.show();
             localStorage.folderLinkImport = FLRootID;
 
+            var data = [sel, fm_getcopynodes(sel)];
+
             StorageDB(u_handle)
-                .set('import.' + FLRootID, [sel, fm_getcopynodes(sel)])
+                .set('import.' + FLRootID, data)
                 .done(function() {
 
                     loadSubPage('fm');
                 })
                 .fail(function(e) {
                     if (d) {
-                        console.error('Unable to import...', e);
+                        console.warn('Cannot import using indexedDB...', e);
                     }
-                    loadingDialog.hide();
-                    msgDialog('warninga', l[135], l[47]);
+                    $.onImportCopyNodes = data;
+                    loadSubPage('fm');
                 });
         }).fail(function(aError) {
             // If no aError, it was canceled

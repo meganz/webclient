@@ -82,6 +82,35 @@
         Soon(aError.bind(window, new Error('Unknown FileSystem API.')));
     }
 
+    function checkSecurityError(e) {
+        if (Object(e).name === 'SecurityError') {
+            window.Incognito = 0xC120E;
+
+            /**
+             * Apparently indexedDBs are handled in memory on
+             * Incognito windows, which turns it a non-suitable
+             * workaround for the 496MB Blob limit :(
+
+            if (idbDownloadIO.usable()) {
+                dlMethod = idbDownloadIO;
+            }
+            else*/ if (MemoryIO.usable()) {
+                dlMethod = MemoryIO;
+            }
+            else {
+                dlMethod = FlashIO;
+            }
+            if (d) {
+                console.warn('Switching to ' + dlMethod.name);
+            }
+
+            // https://code.google.com/p/chromium/issues/detail?id=375297
+            MemoryIO.fileSizeLimit = 496 * 1024 * 1024;
+
+            return true;
+        }
+    }
+
     function clearit(storagetype, t, callback) {
         var tsec = t || 3600;
 
@@ -214,7 +243,7 @@
 
                 if (callback) {
                     setTimeout(function() {
-                        callback();
+                        callback(Object(s).name === 'SecurityError' ? s : null);
                     }, ms || 2600);
                 }
             });
@@ -492,7 +521,24 @@
                     dl_storagetype,
                     dl_filesize,
                     dl_createtmpfile,
-                    errorHandler.bind(this, 'RequestFileSystem')
+                    function(e) {
+                        if (checkSecurityError(e)) {
+                            dlFatalError(dl, e, -0xDEADBEEF, 2);
+                            onIdle(function() {
+                                if (page !== 'download') {
+                                    M.addWebDownload([dl_id]);
+                                }
+                                else {
+                                    $.doFireDownload = true;
+                                    mega.utils.resetUploadDownload();
+                                    dlinfo(dlid, dlkey, false);
+                                }
+                            });
+                        }
+                        else {
+                            errorHandler.call(this, 'RequestFileSystem', e);
+                        }
+                    }.bind(this)
                 );
             }.bind(this));
         };
@@ -672,31 +718,9 @@
                 if (window.requestFileSystem) {
                     window.requestFileSystem(0, 0x10000,
                         function(fs) {
-                            free_space();
+                            free_space(checkSecurityError);
                         },
-                        function(e) {
-                            if (e && e.name === 'SecurityError') {
-                                window.Incognito = 0xC120E;
-
-                            /* Apparently indexedDBs are handled in memory on
-                               Incognito windows, which turns it a non-suitable
-                               workaround for the 496MB Blob limit :(
-
-                                if (idbDownloadIO.usable()) {
-                                    dlMethod = idbDownloadIO;
-                                }
-                                else*/ if (MemoryIO.usable()) {
-                                    dlMethod = MemoryIO;
-                                }
-                                else {
-                                    dlMethod = FlashIO;
-                                }
-                                console.error('Switching to ' + dlMethod.name);
-
-                                // https://code.google.com/p/chromium/issues/detail?id=375297
-                                MemoryIO.fileSizeLimit = 496*1024*1024;
-                            }
-                        }
+                        checkSecurityError
                     );
                 }
                 else if (MemoryIO.usable()) {

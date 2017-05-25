@@ -1937,10 +1937,14 @@ function setTransferStatus(dl, status, ethrow, lock) {
             .text(text);
     }
     if (lock) {
-        $('.transfer-table #' + id)
+        var $tr = $('.transfer-table #' + id)
             .addClass('transfer-completed')
             .removeClass('transfer-initiliazing')
             .attr('id', 'LOCKed_' + id);
+
+        if (lock === 2) {
+            $tr.remove();
+        }
     }
     if (d) {
         console.error(status);
@@ -1950,7 +1954,7 @@ function setTransferStatus(dl, status, ethrow, lock) {
     }
 }
 
-function dlFatalError(dl, error, ethrow) {
+function dlFatalError(dl, error, ethrow, lock) {
     var m = 'This issue should be resolved ';
     if (ethrow === -0xDEADBEEF) {
         ethrow = false;
@@ -1981,7 +1985,7 @@ function dlFatalError(dl, error, ethrow) {
     });
 
     // Set transfer status and abort it
-    setTransferStatus(dl, error, ethrow, true);
+    setTransferStatus(dl, error, ethrow, lock !== undefined ? lock : true);
     dlmanager.abort(dl);
 }
 

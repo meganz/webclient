@@ -14,35 +14,32 @@
             var conflicts = [];
             var result = [];
 
-            if (M.c[target]) {
-                for (var i = files.length; i--;) {
-                    var file = files[i];
+            for (var i = files.length; i--;) {
+                var file = files[i];
 
-                    if (typeof file === 'string') {
-                        file = clone(M.d[file] || false);
-                    }
+                if (typeof file === 'string') {
+                    file = clone(M.d[file] || false);
+                }
 
-                    try {
-                        // this could throw NS_ERROR_FILE_NOT_FOUND
-                        var test = file.size;
-                    }
-                    catch (ex) {
-                        ulmanager.logger.warn(file.name, ex);
-                        continue;
-                    }
+                try {
+                    // this could throw NS_ERROR_FILE_NOT_FOUND
+                    var test = file.size;
+                }
+                catch (ex) {
+                    ulmanager.logger.warn(file.name, ex);
+                    continue;
+                }
 
+                if (M.c[target]) {
                     var found = this.getNodeByName(target, fm_safename(file.name), true);
 
                     if (found) {
                         conflicts.push([file, found]);
-                    }
-                    else {
-                        result.push(file);
+                        continue;
                     }
                 }
-            }
-            else {
-                result = files;
+
+                result.push(file);
             }
 
             var resolve = function() {

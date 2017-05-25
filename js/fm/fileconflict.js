@@ -30,7 +30,7 @@
                     continue;
                 }
 
-                if (M.c[target]) {
+                if (M.c[target] && !file.path) {
                     var found = this.getNodeByName(target, fm_safename(file.name), true);
 
                     if (found) {

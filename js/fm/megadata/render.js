@@ -357,6 +357,25 @@ MegaData.prototype.renderPath = function() {
             + '</a>');
         $('.search-files-result').addClass('hidden');
     }
+        else if (this.currentdirid === 'links') {
+            $('.fm-right-header .fm-breadcrumbs-block').safeHTML(
+                '<a class="fm-breadcrumbs public-links">'
+                    + '<span class="right-arrow-bg ui-draggable">'
+                        + '<span>'
+                            + '<i class="small-icon context get-link"></i>'
+                            + l[16516]
+                            + '<span class="public-links-cnt">0</span>'
+                        + '</span>'
+                    + '</span>'
+                + '</a>');
+
+            if (M.su.EXP) {
+                $('.public-links-cnt').text(Object.keys(M.su.EXP).length);
+            }
+            else {
+                $('.public-links-cnt').text(0);
+            }
+        }
     else if (this.currentdirid && this.currentdirid.substr(0, 7) === 'search/') {
         $('.fm-right-header .fm-breadcrumbs-block').safeHTML(
             '<a class="fm-breadcrumbs search ui-droppable" id="'
@@ -372,15 +391,15 @@ MegaData.prototype.renderPath = function() {
     }
     else if (this.currentdirid && this.currentdirid === 'opc') {
         DEBUG('Render Path OPC');
-        $('.fm-right-header .fm-breadcrumbs-block').html(contactBreadcrumb + html);
+            $('.fm-right-header .fm-breadcrumbs-block').safeHTML(contactBreadcrumb + html);
     }
     else if (this.currentdirid && this.currentdirid === 'ipc') {
         DEBUG('Render Path IPC');
-        $('.fm-right-header .fm-breadcrumbs-block').html(contactBreadcrumb + html);
+            $('.fm-right-header .fm-breadcrumbs-block').safeHTML(contactBreadcrumb + html);
     }
     else {
         $('.search-files-result').addClass('hidden');
-        $('.fm-right-header .fm-breadcrumbs-block').html(html);
+            $('.fm-right-header .fm-breadcrumbs-block').safeHTML(html);
     }
 
     // Resizing breadcrumbs items

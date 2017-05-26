@@ -4037,7 +4037,7 @@
     "16413": "[1]MEGA Bonus odklenjen[2]\u010cestitamo, aktivirali smo va\u0161 bonus za namestitev mobilne aplikacije. Pridobili ste [$storageearnedgb] shranjevalne kvote in [$transferearnedgb] prenosne kvote, ki bo veljaven [$durationdays] dni.[3]Potrebujete ve\u010d shranjevalne ali prenosne kvote? Povejte \u0161e ostalim, kak\u0161ne so prednosti shranjevanja v oblaku z enkripcijo od prve do zadnje to\u010dke in jih povabite na MEGA![4]Dose\u017eite ve\u010d[5]Da si ogledate status svojih dose\u017ekov ali za dosego novih ciljev, kliknite spodaj:",
     "16414": "[1]MEGA Namestitveni Bonus[2]Odli\u010dno, hvala, da ste namestili MEGA mobilno aplikacijo! Lahko traja nekaj dni, da avtoriziramo va\u0161 bonus za namestitev. Prosim, upo\u0161tevajte, da ne boste dobili bonusa, \u010de ste v preteklosti \u017ee uporabljali drug MEGA ra\u010dun.[3]Dose\u017eki",
     "16415": "[1]MEGA Invitation[2]The user with the email [R][$cred][\/R] has sent you an invitation to join MEGA.[3]Join [R][$cred][\/R] on MEGA by clicking below:[4]Create Account",
-    "16416": "Congratulations, [$cred] has accepted your invitation and started using MEGA! As a result, you have been credited [$storageearnedgb] of additional storage space and [$transferearnedgb] transfer quota, which will both be valid for [$durationdays] days.",
+    "16416": "\u010cestitamo, [$cred] je sprejel va\u0161e povabilo in za\u010del uporabljati MEGA! Posledi\u010dno ste dobili bonus [$storageearnedgb] dodatnega prostora za shranjevanje in [$transferearnedgb] prenosne kvote, oboje veljavno [$durationdays] dni.",
     "16420": "Ni delovalo? Kopirajte spodnjo povezavo v svoj brskalnik: ",
     "16421": "[1]MEGA Invitation[2]The user with the email [R][$cred][\/R] has sent you a contact invitation.[3]Head to MEGA to accept the invite and get connected with [R][$cred][\/R][4]Take me to MEGA",
     "16422": "[1]MEGA[2]The user with the email [R][$cred][\/R] is waiting for you to join MEGA.[3]It's free and easy to set up and you will get a generous free storage allocation on the world's most secure cloud storage service.[4]Join MEGA",
@@ -4050,7 +4050,7 @@
     "16429": "[1]MEGA Account Closure[2]Caution: You have elected to close your MEGA account. The account under this email address will be permanently closed and your data deleted. This can not be undone.[3]By completing this action, you will lose access to all your uploaded data, shares, and contacts. Any remaining account balance or PRO quota will be voided.[4]If you have a paid MEGA subscription with [A1]Apple[\/A1] or [A2]Google[\/A2], then you must cancel it separately at Apple iTunes or Google Play, as MEGA is not able to cancel it for you.[5]Close my Account",
     "16430": "[1]MEGA Confirm New Email[2]It looks like you changed your email address. We just need you to confirm your new email address by clicking the following link:[3]Confirm New Email[4]Please note that this will [B]replace your existing MEGA account email address[\/B]. You will need to log in with this new email address from now on.",
     "16431": "[1]MEGA Password Recovery[2]You can easily access your MEGA account with your Recovery Key.[3]Unlock Account[4]This request originated from IP address: [R][$cred][\/R]",
-    "16432": "You can also earn more free storage and transfer quota by achieving bonuses. For example, by installing our software or inviting friends to MEGA.",
+    "16432": "Lahko tudi zaslu\u017eite ve\u010d brezpla\u010dnega prostora za shranjevanje in prenosne kvote z doseganjem bonusov. Na primer, z namestitvijo na\u0161e programske opreme ali s povabilom prijateljev na MEGA.",
     "16433": "[1]Visit [A1]mega.nz\/account[\/A1] to see a breakdown of your usage. Please note your rubbish counts toward your usage, and may need to be cleared to free up space.[2]To continue to use MEGA, please upgrade to one of our paid plans, or buy a larger plan. [B]You have 7 days left to take action[\/B]. If the account remains over quota after [R][$lastdate][\/R], MEGA will automatically clear your rubbish bin in an attempt to remedy the situation for your convenience.",
     "16435": "[1]MEGA Password Change[2]Click on the button below to change your password.[3]Click on the link below to change your password. [4]You will need to enter your current password before you can choose a new one.[5]Change Password[6]If you didn't make this request, you can ignore and delete this email. If you need more assistance, please contact our support team at [A1]support@mega.nz[\/A1]",
     "16436": "[1]MEGA Password Has Been Changed[2]Your MEGA account's password has been changed. If you didn't make this request, please contact our support team at [A1]support@mega.nz[\/A1]",
@@ -4116,6 +4116,21 @@
     "16499": "Don't move",
     "16500": "Don't copy",
     "16501": "If you previously subscribed to a PRO plan with Google Play or Apple iTunes, please manually cancel your subscriptions with them inside Google Play or the iTunes app on your device. If you need any assistance please contact [A1]support@mega.nz[\/A1] or see our [A2]help article for Android[\/A2] or our [A3]help article for iOS[\/A3].",
+    "16502": "Change Name",
+    "16503": "All files saved for Offline will be deleted from your device. Proceed to logout?",
+    "16504": "Your queued transfer exceeds the current transfer quota available for your account and may therefore be interrupted.",
+    "16505": "Depleted transfer quota",
+    "16506": "Are you sure you want to cancel all the pending downloads?",
+    "16507": "Are you sure you want to cancel all the pending uploads?",
+    "16508": "Completing...",
+    "16509": "Preparing...",
+    "16510": "Retrying...",
+    "16511": "Cancel downloads",
+    "16512": "Cancel uploads",
+    "16513": "No completed transfers",
+    "16514": "The file you are moving will be renamed as:",
+    "16515": "The file you are copying will be renamed as:",
+    "16516": "Public Links",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4374,6 +4389,7 @@
         "file_current_version": 16478,
         "file_edit_by_me": 16480,
         "file_rename_by_me": 16481,
-        "cancel-subscription-dialog-message": 16501
+        "cancel-subscription-dialog-message": 16501,
+        "public-links": 16516
     }
 }

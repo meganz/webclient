@@ -94,6 +94,7 @@ var u_handle;
 var u_privk;
 var u_k_aes;
 var u_sharekeys = {};
+var vkey = {};
 
 function crypto_process_sharekey(handle, key) {
     if (key.length > 43) {
@@ -239,6 +240,7 @@ function crypto_decryptnode(n) {
                 vkey = {};
             }, 4000);
         }
+
         if (missingkeys) crypto_reportmissingkey(n);
     }
 }

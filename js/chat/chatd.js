@@ -1041,7 +1041,7 @@ Chatd.Messages.prototype.updatekeyid = function(keyid) {
     var self = this;
 
     this.sendingList.forEach(function(msgxid) {
-        if (!self.expired[msgxid]) {
+        if (!self.expired[msgxid] && self.sendingbuf[self.sending[msgxid]]) {
             if (self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TYPE] === Chatd.MsgType.KEY) {
                 return;
             }
@@ -1566,11 +1566,15 @@ Chatd.Messages.prototype.confirmkey = function(keyid) {
     var firstkeyxkey;
     this.sendingList.forEach(function(msgxid) {
         if ((!self.expired[msgxid]) &&
+            (self.sendingbuf[self.sending[msgxid]]) &&
                 (self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TYPE] === Chatd.MsgType.KEY)) {
             firstkeyxkey = msgxid;
             return;
         }
     });
+    if (!firstkeyxkey) {
+        return;
+    }
     var promises = [];
 
     // update keyid of the confirmed key in persistency list.
@@ -1753,11 +1757,13 @@ Chatd.Messages.prototype.restore = function() {
                     // if the message is not an edit or an edit with the original message not in the 
                     // pending list, restore it.
                     var messagekey = self.getmessagekey(v.messageId, v.type);
-                    self.sendingbuf[++self.sendingnum] =
-                        [v.messageId, v.userId, v.timestamp, v.message, v.keyId, v.updated, v.type];
-                    self.sending[messagekey] = self.sendingnum;
-                    self.sendingList.push(messagekey);
-                    count++;
+                    if (!self.sending[messagekey]) {
+                        self.sendingbuf[++self.sendingnum] =
+                            [v.messageId, v.userId, v.timestamp, v.message, v.keyId, v.updated, v.type];
+                        self.sending[messagekey] = self.sendingnum;
+                        self.sendingList.push(messagekey);
+                        count++;
+                    }
                 }
             }
         })

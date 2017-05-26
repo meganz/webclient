@@ -50,6 +50,17 @@
             if (id === 'transfers') {
                 M.v = [];
             }
+            else if (id === 'links') {
+                if (M.su.EXP) {
+                    M.v = Object.keys(M.su.EXP)
+                        .map(function(h) {
+                            return M.d[h];
+                        });
+                }
+                else {
+                    M.v = [];
+                }
+            }
             else if (id.substr(0, 6) === 'search') {
                 M.filterBySearch(M.currentdirid);
             }
@@ -119,7 +130,7 @@
 
             if (fminitialized && !is_mobile) {
                 var currentdirid = M.currentdirid;
-                if (id.substr(0, 6) === 'search') {
+                if (id.substr(0, 6) === 'search' || id === 'links') {
                     currentdirid = M.RootID;
 
                     if (M.d[M.previousdirid]) {

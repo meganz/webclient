@@ -4115,7 +4115,22 @@
     "16498": "Vervang het bestand in de bestemmings-map met het bestand die u kopieert:",
     "16499": "Niet verplaatsen",
     "16500": "Niet kopi\u00ebren",
-    "16501": "If you previously subscribed to a PRO plan with Google Play or Apple iTunes, please manually cancel your subscriptions with them inside Google Play or the iTunes app on your device. If you need any assistance please contact [A1]support@mega.nz[\/A1] or see our [A2]help article for Android[\/A2] or our [A3]help article for iOS[\/A3].",
+    "16501": "Als u zich eerder heeft geabonneerd op een PRO abonnement met Google Play of Apple iTunes, annuleer handmatig uw abonnementen in Google Play of de iTunes applicatie op uw apparaat. Als u assistentie nodig heeft neem dan contact op bij [A1]support@mega.nz[\/A1] of zie onze [A2]help artikel voor Android[\/A2] of onze [A3]help artikel voor iOS[\/A3].",
+    "16502": "Wijzig Naam",
+    "16503": "Alle bestanden opgeslagen voor Offline worden verwijderd van uw apparaat. Wilt u verder gaan om uit te loggen?",
+    "16504": "Uw wachtende overdracht overschrijdt de huidige overdrachtstegoed die beschikbaar is voor uw account en kan daardoor worden onderbroken.",
+    "16505": "Uitgeputte overdracht tegoed",
+    "16506": "Weet u zeker dat u alle wachtende downloads wilt annuleren?",
+    "16507": "Weet u zeker dat u alle wachtende uploads wilt annuleren?",
+    "16508": "Voltooien...",
+    "16509": "Voorbereiden...",
+    "16510": "Opnieuw proberen...",
+    "16511": "Annuleer downloads",
+    "16512": "Annuleer uploads",
+    "16513": "Geen voltooide overdrachten",
+    "16514": "Het bestand die u verplaatst wordt hernoemd als:",
+    "16515": "Het bestand die u kopieert wordt hernoemt als:",
+    "16516": "Public Links",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4374,6 +4389,7 @@
         "file_current_version": 16478,
         "file_edit_by_me": 16480,
         "file_rename_by_me": 16481,
-        "cancel-subscription-dialog-message": 16501
+        "cancel-subscription-dialog-message": 16501,
+        "public-links": 16516
     }
 }

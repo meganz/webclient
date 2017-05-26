@@ -1484,21 +1484,21 @@ function api_setsid(sid) {
     }
 
     apixs[0].sid = sid;
-    apixs[2].sid = sid;
-    apixs[3].sid = sid;
+    apixs[2].sid = pfid ? '' : sid; // omit sid on sc for folderlinks
+    apixs[3].sid = pfid ? '' : sid; // omit sid on sc for folderlinks
     apixs[4].sid = sid;
 }
 
 function api_setfolder(h) {
-    h = 'n=' + h;
+    var sid = h = 'n=' + h;
 
     if (u_sid) {
-        h += '&sid=' + u_sid;
+        sid += '&sid=' + u_sid;
     }
 
-    apixs[1].sid = h;
-    apixs[2].sid = h;
-    apixs[4].sid = h;
+    apixs[1].sid = sid;
+    apixs[2].sid = h; // omit sid on sc for folderlinks
+    apixs[4].sid = sid;
 }
 
 function stopapi() {
@@ -1887,6 +1887,7 @@ function api_reqfailed(c, e) {
         Soon(function() {
             showToast('clipboard', l[19]);
         });
+        loadingInitDialog.hide();
         loadSubPage('login');
     }
     else if (c == 2 && e == ETOOMANY) {

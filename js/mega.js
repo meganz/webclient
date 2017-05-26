@@ -2133,6 +2133,7 @@ function ddtype(ids, toid, alt) {
     return r;
 }
 
+
 /**
  * Create new folder on the cloud
  * @param {String} toid The handle where the folder will be created.
@@ -2164,9 +2165,15 @@ function createFolder(toid, name, ulparams) {
         else {
             msgDialog('warninga', l[135], l[47], api_strerror(error));
         }
+        return ulparams;
     };
 
     toid = toid || M.RootID;
+
+    // Prevent unneeded API calls if toid is not a valid handle
+    if ([8, 11].indexOf(String(toid).length) === -1) {
+        return reject(EACCESS);
+    }
 
     if (Array.isArray(name)) {
         name = name.map(String.trim).filter(String).slice(0);

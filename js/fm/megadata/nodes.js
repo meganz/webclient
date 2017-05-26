@@ -45,6 +45,10 @@
             if (typeof M.u[h] === 'object') {
                 M.u[h].c = 0;
             }
+
+            if (M.su.EXP) {
+                delete M.su.EXP[h];
+            }
         }
 
         var delInShareQ = delInShareQueue[h] = delInShareQueue[h] || [];

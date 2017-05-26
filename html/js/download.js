@@ -305,6 +305,11 @@ function dl_g(res) {
     else if (pf.indexOf('MAC')>=0) sync_switchOS('mac');
     else if (pf.indexOf('LINUX')>=0) sync_switchOS('linux');
     else sync_switchOS('windows');
+
+    if ($.doFireDownload) {
+        delete $.doFireDownload;
+        browserDownload();
+    }
 }
 
 function browserDownload() {

@@ -141,6 +141,11 @@ function fmremovesync() {
         foldercnt = 0,
         contactcnt = 0,
         removesharecnt = 0;
+    
+    // If on mobile we will bypass the warning dialog prompts
+    if (is_mobile) {
+        localStorage.skipDelWarning = '1';
+    }
 
     for (var i in $.selected) {
         var n = M.d[$.selected[i]];
@@ -280,11 +285,13 @@ function fmremovesync() {
     // Remove contacts
     else if (RootbyId($.selected[0]) === 'contacts') {
         if (localStorage.skipDelWarning) {
-            M.copyNodes($.selected, M.RubbishID, 1);
+            M.copyNodes($.selected, M.RubbishID, true);
         }
         else {
-            msgDialog('confirmation', l[1003], l[1004].replace('[X]', fm_contains(filecnt, foldercnt)), false,
-                function(e) {
+            var title = l[1003];
+            var message = l[1004].replace('[X]', fm_contains(filecnt, foldercnt));
+
+            msgDialog('confirmation', title, message, false, function(e) {
                     if (e) {
                         M.copyNodes($.selected, M.RubbishID, 1);
                     }
@@ -313,8 +320,10 @@ function fmremovesync() {
             // Additional message in case that there's a shared node
             var share = new mega.Share({});
             var delShareInfo = share.isShareExist(dirTree, true, true, true) ? ' ' + l[1952] + ' ' + l[7410] : '';
+            var title = l[1003];
+            var message = l[1004].replace('[X]', fm_contains(filecnt, foldercnt)) + delShareInfo;
 
-            msgDialog('remove', l[1003], l[1004].replace('[X]', fm_contains(filecnt, foldercnt)) + delShareInfo, false, function(e) {
+            msgDialog('remove', title, message, false, function(e) {
                 if (e) {
                     if (M.currentrootid === 'shares') {
                         M.copyNodes($.selected, M.RubbishID, true);

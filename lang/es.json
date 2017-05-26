@@ -4115,7 +4115,22 @@
     "16498": "Sustituir el archivo en la carpeta de destino por el archivo que est\u00e1s copiando:",
     "16499": "No mover",
     "16500": "No copiar",
-    "16501": "If you previously subscribed to a PRO plan with Google Play or Apple iTunes, please manually cancel your subscriptions with them inside Google Play or the iTunes app on your device. If you need any assistance please contact [A1]support@mega.nz[\/A1] or see our [A2]help article for Android[\/A2] or our [A3]help article for iOS[\/A3].",
+    "16501": "Si te has suscrito anteriormente a un plan PRO en Google Play o iTunes de Apple, cancela tus suscripciones manualmente desde Google Play o la aplicaci\u00f3n de iTunes de tu dispositivo. Si necesitas ayuda, ponte en contacto con [A1]support@mega.nz[\/A1] o consulta nuestro [A2]art\u00edculo de ayuda para Android[\/A2] o nuestro [A3]art\u00edculo de ayuda para iOS[\/A3].",
+    "16502": "Cambiar Nombre",
+    "16503": "Todos los archivos guardados para Desconectado se eliminar\u00e1n del dispositivo. \u00bfProcedemos a cerrar la sesi\u00f3n?",
+    "16504": "Tus transferencias en cola exceden la cuota de transferencia actual disponible para tu cuenta y, por lo tanto, podr\u00edan interrumpirse.",
+    "16505": "Cuota de transferencia agotada",
+    "16506": "\u00bfSeguro que quieres cancelar todas las descargas pendientes?",
+    "16507": "\u00bfSeguro que quieres cancelar todas las subidas pendientes?",
+    "16508": "Completando...",
+    "16509": "Preparando...",
+    "16510": "Reintentando...",
+    "16511": "Cancelar descargas",
+    "16512": "Cancelar subidas",
+    "16513": "No hay transferencias completadas",
+    "16514": "El archivo que est\u00e1s moviendo se renombrar\u00e1 a:",
+    "16515": "El archivo que est\u00e1s copiando se renombrar\u00e1 a:",
+    "16516": "Public Links",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4374,6 +4389,7 @@
         "file_current_version": 16478,
         "file_edit_by_me": 16480,
         "file_rename_by_me": 16481,
-        "cancel-subscription-dialog-message": 16501
+        "cancel-subscription-dialog-message": 16501,
+        "public-links": 16516
     }
 }

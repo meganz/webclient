@@ -112,7 +112,10 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
                 Dexie.getDatabaseNames(function(r) {
                     for (var i = r.length; i--;) {
                         // drop only fmX related databases and skip slkv's
-                        if (r[i].substr(0, dbpfx.length) !== dbpfx && r[i].substr(0,4) !== "slkv") {
+                        if (r[i].substr(0, dbpfx.length) !== dbpfx
+                                && r[i][0] !== '$'
+                                && r[i].substr(0, 4) !== "slkv") {
+
                             todrop.push(r[i]);
                         }
                     }
@@ -904,7 +907,6 @@ FMDB.prototype.beacon = function fmdb_beacon() {
         setTimeout(this.beacon.bind(this), 500);
     }
 };
-Object.freeze(FMDB.prototype);
 
 
 function mDBcls() {
@@ -914,6 +916,133 @@ function mDBcls() {
     fmdb = null;
 }
 
+
+// --------------------------------------------------------------------------
+
+/**
+ * KISS Interface for Dexie to store key/value pairs
+ * @param {String} name Database name
+ * @constructor
+ */
+function StorageDB(name) {
+    if (!(this instanceof StorageDB)) {
+        return new StorageDB(name);
+    }
+    var self = this;
+    var dbname = '$' + this.encrypt(name);
+
+    // save the db name for our getDatabaseNames polyfill
+    localStorage['_$mdb$' + dbname] = Date.now();
+
+    this.name = name;
+    this.opening = new MegaPromise();
+
+    var db = this.db = new Dexie(dbname);
+    db.version(1).stores({kv: '&k'});
+    db.open().then(function() {
+        self.opening.resolve();
+    }).catch(function(e) {
+        console.error(dbname, e);
+        self.db = null;
+        self.opening.reject(e);
+    }).finally(function() {
+        delete self.opening;
+    });
+}
+StorageDB.prototype = Object.create(FMDB.prototype);
+
+StorageDB.prototype.open = function(callback) {
+    if (this.opening) {
+        this.opening.always(callback.bind(this));
+    }
+    else {
+        callback.call(this);
+    }
+};
+StorageDB.prototype.get = function(k) {
+    var promise = new MegaPromise();
+
+    this.open(function() {
+        if (this.db) {
+            var self = this;
+
+            k = this.encrypt(k);
+            this.db.kv.get(k).then(function(store) {
+                try {
+                    return promise.resolve(JSON.parse(self.strdecrypt(store.v)));
+                }
+                catch (e) {}
+
+                promise.reject(EACCESS);
+            }).catch(function(e) {
+                promise.reject(e);
+            });
+        }
+        else {
+            promise.reject(ENOENT);
+        }
+    });
+
+    return promise;
+};
+StorageDB.prototype.set = function(k, v) {
+    var promise = new MegaPromise();
+
+    this.open(function() {
+        if (this.db) {
+            var store = {k: this.encrypt(k), v: this.strcrypt(JSON.stringify(v))};
+
+            this.db.kv.put(store).then(function() {
+                promise.resolve();
+            }).catch(function(e) {
+                promise.reject(e);
+            });
+        }
+        else {
+            promise.reject(ENOENT);
+        }
+    });
+
+    return promise;
+};
+StorageDB.prototype.rem = function(k) {
+    var promise = new MegaPromise();
+
+    this.open(function() {
+        if (this.db) {
+            var self = this;
+
+            k = this.encrypt(k);
+            this.db.kv.delete(k).then(function() {
+                self.db.kv.count(function(num) {
+                    if (num) {
+                        promise.resolve();
+                    }
+                    else {
+                        // no more entries in the db, remove it.
+
+                        self.db.delete().then(function() {
+                            promise.resolve();
+                        }).catch(function(e) {
+                            console.error(e);
+                            promise.resolve();
+                        });
+                    }
+                });
+            }).catch(function(e) {
+                promise.reject(e);
+            });
+        }
+        else {
+            promise.reject(ENOENT);
+        }
+    });
+
+    return promise;
+};
+StorageDB.prototype.encrypt = function(data) {
+    return ab_to_base64(this.strcrypt(JSON.stringify(data)));
+};
 
 // --------------------------------------------------------------------------
 

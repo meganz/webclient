@@ -274,17 +274,23 @@ FMDB.prototype.enqueue = function fmdb_enqueue(table, row, type) {
 // ch - channel to operate on
 FMDB.prototype.writepending = function fmdb_writepending(ch) {
     // exit loop if we ran out of pending writes or have crashed
-    if (this.inflight || ch < 0 || this.crashed) return;
+    if (this.inflight || ch < 0 || this.crashed || this.writing) return;
 
     // iterate all channels to find pending writes
     if (!this.pending[ch][this.tail[ch]]) return this.writepending(ch-1);
 
     var fmdb = this;
 
+    if (d) {
+        fmdb.logger.debug('writepending()', ch, fmdb.state,
+            Object(fmdb.pending[0][fmdb.tail[0]])._sn, fmdb.cantransact);
+    }
+
     if (!ch && fmdb.state < 0 && fmdb.pending[0][fmdb.tail[0]]._sn && fmdb.cantransact) {
         // if the write job is on channel 0 and already complete (has _sn set),
         // we execute it in a single transaction without first clearing sn
         fmdb.state = 1;
+        fmdb.writing = 1;
         fmdb.db.transaction('rw',
             fmdb.tables,
             function(){
@@ -301,18 +307,20 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                 if (d) {
                     fmdb.logger.log("Transaction committed");
                 }
+                fmdb.writing = 0;
                 fmdb.writepending(ch);
             }).catch(function(e){
                 if (fmdb.cantransact < 0) {
                     fmdb.logger.error("Your browser's IndexedDB implementation is bogus, disabling transactions.");
                     fmdb.cantransact = 0;
+                    fmdb.writing = 0;
                     fmdb.writepending(ch);
                 }
                 else {
                     // FIXME: retry instead? need statistics.
                     fmdb.logger.error("Transaction failed, marking DB as crashed", e);
                     fmdb.state = -1;
-                    fmdb.crashed = true;
+                    fmdb.invalidate();
                 }
             });
     }
@@ -339,7 +347,7 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                 }).catch(function(e){
                     fmdb.logger.error("SN clearing failed, marking DB as crashed", e);
                     fmdb.state = -1;
-                    fmdb.crashed = true;
+                    fmdb.invalidate();
                 });
 
             }
@@ -371,6 +379,7 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
 
                 fmdb.commit = false;
                 fmdb.state = -1;
+                fmdb.writing = 0;
                 fmdb.writepending(ch);
             }
 
@@ -395,6 +404,13 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
 
                 // all written: advance head
                 if (t.t == t.h) t.h++;
+
+                if (fmdb.crashed && !(t.t & 1)) {
+                    if (d) {
+                        fmdb.logger.warn('The DB is crashed, halting put...');
+                    }
+                    return;
+                }
 
                 if (d) {
                     fmdb.logger.log("DB " + ((t.t & 1) ? 'del' : 'put') + " with " + t[t.t].length
@@ -764,6 +780,8 @@ FMDB.prototype.clone = function fmdb_clone(o) {
 
 // reliably invalidate the current database (delete the sn)
 FMDB.prototype.invalidate = function fmdb_invalidate(cb) {
+    cb = cb || this.logger.debug.bind(this.logger, 'DB Invalidation', !this.crashed);
+
     if (this.crashed) {
         return cb();
     }

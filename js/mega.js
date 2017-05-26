@@ -3403,12 +3403,6 @@ function MegaData()
             promise.always(tmp);
         }
 
-        if ($.onImportCopyNodes && t.length === 11) {
-            msgDialog('warninga', l[135], 'Operation not permitted.');
-            promise.reject(EARGS);
-            return promise;
-        }
-
         loadingDialog.show();
 
         if (t.length === 11 && !u_pubkeys[t]) {
@@ -3431,7 +3425,7 @@ function MegaData()
             return promise;
         }
 
-        if (!cn.fileConflictData) {
+        if (!cn.fileConflictData && !$.onImportCopyNodes) {
             fileconflict.check(cn, t, 'copy')
                 .always(function(files) {
                     var names = {};
@@ -3448,8 +3442,8 @@ function MegaData()
                 });
             return promise;
         }
-        var todel = cn.fileConflictData[0];
-        var names = cn.fileConflictData[1];
+        var todel = Object(cn.fileConflictData)[0];
+        var names = Object(cn.fileConflictData)[1];
 
         var a = this.isFileNode(cn) ? [cn] : ($.onImportCopyNodes || fm_getcopynodes(cn, names));
         var importNodes = Object(a).length;

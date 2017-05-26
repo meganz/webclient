@@ -450,10 +450,17 @@ function importFile() {
                 k: a32_to_base64(encrypt_key(u_k_aes, base64_to_a32(dl_import[1]).slice(0, 8)))
             }]
     }, {
-        // Check response and if over quota show a special warning dialog
-        callback: function (result) {
-            if (result === EOVERQUOTA) {
-                alarm.overQuota.render();
+        callback: function (r) {
+            if (typeof r === 'object') {
+                $.onRenderNewSelectNode = r.f[0].h;
+            }
+            else {
+                console.error(r, api_strerror(r));
+
+                // if over quota show a special warning dialog
+                if (r === EOVERQUOTA) {
+                    alarm.overQuota.render();
+                }
             }
         }
     });
@@ -552,6 +559,12 @@ function start_import()
             }
             else {
                 loginDialog();
+
+                mBroadcaster.once('login', function() {
+                    setTimeout(function() {
+                        loadSubPage('fm');
+                    }, 750);
+                });
             }
         });
     }

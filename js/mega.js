@@ -6187,6 +6187,7 @@ function renderfm() {
 }
 
 function renderNew() {
+    var selnode;
     var newNode, tb,
         treebuild = [],
         UImain = false,
@@ -6212,6 +6213,11 @@ function renderNew() {
         }
         if (newNode.p === M.currentdirid || newNode.h === M.currentdirid) {
             UImain = true;
+
+            if ($.onRenderNewSelectNode === newNode.h) {
+                delete $.onRenderNewSelectNode;
+                selnode = newNode.h;
+            }
         }
         if (!newpath && document.getElementById('path_' + newNode.h)) {
             newpath = true;
@@ -6231,6 +6237,14 @@ function renderNew() {
         M.sort();
         M.renderMain(true);
         // M.renderPath();
+        if (selnode) {
+            Soon(function() {
+                if (M.d[selnode]) {
+                    $.selected = [selnode];
+                    reselect(M.d[selnode]);
+                }
+            });
+        }
         $.tresizer();
     }
 

@@ -172,6 +172,15 @@
                 }
                 else {
                     loginDialog();
+
+                    mBroadcaster.once('fm:initialized', function() {
+                        ulQueue.resume();
+                        uldl_hold = false;
+
+                        if (ul_queue.length > 0) {
+                            showTransferToast('u', ul_queue.length);
+                        }
+                    });
                 }
             });
         }

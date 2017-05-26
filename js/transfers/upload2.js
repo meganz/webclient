@@ -379,13 +379,6 @@ var ulmanager = {
         if (file.repair) {
             file.target = M.RubbishID;
         }
-        else if (!target && String(file.target).substr(0, 4) === 'chat') {
-            return fm_requestfolderid(null, 'My chat files', {
-                callback: SoonFc(function(meh, h) {
-                    ulmanager.ulFinalize(file, h);
-                })
-            });
-        }
 
         ASSERT(file.filekey, "*** filekey is missing ***");
 
@@ -748,49 +741,20 @@ var ulmanager = {
      *
      * @param {Object}  aFileUpload  FileUpload instance
      * @param {Object}  aFile        File API interface instance
-     * @param {Boolean} aForce       Ignore locking queue.
      */
-    ulSetup: function ulSetup(aFileUpload, aFile, aForce) {
+    ulSetup: function ulSetup(aFileUpload, aFile) {
         assert(aFileUpload.file === aFile, 'Unexpected FileUpload instance.');
         assert(aFile.hash, 'Fingerprint missing.');
 
-        if (!aForce) {
-            if (this.ulSetupQueue) {
-                return this.ulSetupQueue.push(aFileUpload);
-            }
-            this.ulSetupQueue = [];
+        var identical = this.ulIdentical(aFile);
+        this.logger.info(aFile.name, "fingerprint", M.h[aFile.hash], identical);
+
+        if (M.h[aFile.hash] || identical) {
+            this.ulDeDuplicate(aFileUpload, identical);
         }
-
-        createFolder(aFile.target, fm_safepath(aFile.path), new MegaPromise())
-            .always(function(target) {
-                if (typeof target === 'number') {
-                    if (d > 1 || String(aFile.target).indexOf('chat') === -1) {
-                        ulmanager.logger.error('createFolder gave ' + target, api_strerror(target));
-                    }
-                }
-                else {
-                    ulmanager.logger.info('createFolder', aFile.target, target);
-                    aFile.target = target;
-                }
-
-                if (ulmanager.ulSetupQueue.length) {
-                    var upload = ulmanager.ulSetupQueue.shift();
-                    Soon(ulmanager.ulSetup.bind(ulmanager, upload, upload.file, true));
-                }
-                else {
-                    ulmanager.ulSetupQueue = null;
-                }
-
-                var identical = ulmanager.ulIdentical(aFile);
-                ulmanager.logger.info(aFile.name, "fingerprint", M.h[aFile.hash], identical);
-
-                if (M.h[aFile.hash] || identical) {
-                    ulmanager.ulDeDuplicate(aFileUpload, identical);
-                }
-                else {
-                    ulmanager.ulStart(aFileUpload);
-                }
-            });
+        else {
+            this.ulStart(aFileUpload);
+        }
     }
 };
 

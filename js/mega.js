@@ -5633,75 +5633,143 @@ function MegaData()
             pauseTxt = l[1651];
         }
 
-        fileconflict.check(u, target, 'upload')
-            .done(function(u) {
+        // Foreach the queue and start uploading
+        var startUpload = function(u) {
+
+            for (var i = u.length; i--;) {
+                var f = u[i];
+                var filesize = f.size;
+
+                ul_id = ++__ul_id;
+                if (!f.flashid) {
+                    f.flashid = false;
+                }
+                f.target = f.target || target;
+                f.id = ul_id;
+
+                var gid = 'ul_' + ul_id;
+                this.addToTransferTable(gid, ttl,
+                    '<tr id="' + gid + '" class="transfer-queued transfer-upload ' + pause + '">'
+                    + '<td><div class="transfer-type upload">'
+                    + '<ul><li class="right-c"><p><span></span></p></li>'
+                    + '<li class="left-c"><p><span></span></p></li></ul>'
+                    + '</div></td>'
+                    + '<td><span class="transfer-filetype-icon ' + fileIcon({name: f.name}) + '"></span>'
+                    + '<span class="tranfer-filetype-txt">' + htmlentities(f.name) + '</span></td>'
+                    + '<td>' + filetype(f.name) + '</td>'
+                    + '<td>' + bytesToSize(filesize) + '</td>'
+                    + '<td><span class="eta"></span><span class="speed">' + pauseTxt + '</span></td>'
+                    + '<td><span class="transfer-status">' + l[7227] + '</span></td>'
+                    + '<td class="grid-url-field"><a class="grid-url-arrow"></a>'
+                    + '<a class="clear-transfer-icon"></a></td>'
+                    + '<td><span class="row-number"></span></td>'
+                    + '</tr>');
+
+                ul_queue.push(f);
+                ttl.left--;
+                added++;
+                mega.ui.tpp.setTotal(1, 'ul');
+
+                if (uldl_hold) {
+                    fm_tfspause('ul_' + ul_id);
+                }
+
+                if (onChat) {
+                    f.chatid = target;
+                    $.ulBunch[f.chatid][ul_id] = 1;
+                }
+            }
+            if (!added) {
+                ulmanager.logger.warn('Nothing added to upload.');
+                return;
+            }
+            if (!$.transferHeader) {
+                transferPanelUI();
+            }
+            if (page === 'start') {
+                ulQueue.pause();
+                uldl_hold = true;
+            }
+            else {
+                showTransferToast('u', added);
+                openTransfersPanel();
+                delay('fm_tfsupdate', fm_tfsupdate); // this will call $.transferHeader()
+            }
+
+            setupTransferAnalysis();
+            if ((ulmanager.isUploading = Boolean(ul_queue.length))) {
+                $('.transfer-pause-icon').removeClass('disabled');
+                $('.transfer-clear-completed').removeClass('disabled');
+                $('.transfer-clear-all-icon').removeClass('disabled');
+            }
+        }.bind(this);
+
+        // Prepare uploads by creating their target path beforehand as needed for the new fileconflict logic
+        var paths = Object.create(null);
+
+        for (var i = u.length; i--;) {
+            var file = u[i];
+
+            if (file.path) {
+                paths[file.path] = null;
+            }
+        }
+
+        // Make one folder at a time
+        var makeDir = function(path, target) {
+            var promise = new MegaPromise();
+            var safePath = fm_safepath(path);
+
+            if (String(target).substr(0, 4) === 'chat') {
+                target = M.RootID;
+                safePath = 'My chat files';
+            }
+
+            createFolder(target, safePath, new MegaPromise())
+                .always(function(target) {
+                    if (typeof target === 'number') {
+                        ulmanager.logger.warn('Unable to create folder "%s" on target "%s"',
+                            path, target, api_strerror(target));
+                    }
+                    else {
+                        paths[path] = target;
+                    }
+
+                    promise.resolve();
+                });
+
+            return promise;
+        };
+
+        var makeDirPromise = new MegaPromise();
+        loadingDialog.show();
+
+        (function _md(paths) {
+            var path = paths.pop();
+
+            if (path) {
+                makeDir(path, target).done(_md.bind(null, paths))
+            }
+            else {
+                makeDirPromise.resolve();
+            }
+
+        })(Object.keys(paths));
+
+        makeDirPromise
+            .done(function() {
+                loadingDialog.hide();
 
                 for (var i = u.length; i--;) {
-                    var f = u[i];
-                    var filesize = f.size;
+                    var file = u[i];
 
-                    ul_id = ++__ul_id;
-                    if (!f.flashid) {
-                        f.flashid = false;
-                    }
-                    f.target = target;
-                    f.id = ul_id;
-
-                    var gid = 'ul_' + ul_id;
-                    this.addToTransferTable(gid, ttl,
-                        '<tr id="' + gid + '" class="transfer-queued transfer-upload ' + pause + '">'
-                        + '<td><div class="transfer-type upload">'
-                        + '<ul><li class="right-c"><p><span></span></p></li>'
-                        + '<li class="left-c"><p><span></span></p></li></ul>'
-                        + '</div></td>'
-                        + '<td><span class="transfer-filetype-icon ' + fileIcon({name: f.name}) + '"></span>'
-                        + '<span class="tranfer-filetype-txt">' + htmlentities(f.name) + '</span></td>'
-                        + '<td>' + filetype(f.name) + '</td>'
-                        + '<td>' + bytesToSize(filesize) + '</td>'
-                        + '<td><span class="eta"></span><span class="speed">' + pauseTxt + '</span></td>'
-                        + '<td><span class="transfer-status">' + l[7227] + '</span></td>'
-                        + '<td class="grid-url-field"><a class="grid-url-arrow"></a>'
-                        + '<a class="clear-transfer-icon"></a></td>'
-                        + '<td><span class="row-number"></span></td>'
-                        + '</tr>');
-
-                    ul_queue.push(f);
-                    ttl.left--;
-                    added++;
-                    mega.ui.tpp.setTotal(1, 'ul');
-
-                    if (uldl_hold) {
-                        fm_tfspause('ul_' + ul_id);
-                    }
-
-                    if (onChat) {
-                        $.ulBunch[M.currentdirid][ul_id] = 1;
+                    if (paths[file.path]) {
+                        file.target = paths[file.path];
                     }
                 }
-                if (!added) {
-                    ulmanager.logger.warn('Nothing added to upload.');
-                    return;
-                }
-                if (!$.transferHeader) {
-                    transferPanelUI();
-                }
-                if (page === 'start') {
-                    ulQueue.pause();
-                    uldl_hold = true;
-                }
-                else {
-                    showTransferToast('u', added);
-                    openTransfersPanel();
-                    delay('fm_tfsupdate', fm_tfsupdate); // this will call $.transferHeader()
-                }
 
-                setupTransferAnalysis();
-                if ((ulmanager.isUploading = Boolean(ul_queue.length))) {
-                    $('.transfer-pause-icon').removeClass('disabled');
-                    $('.transfer-clear-completed').removeClass('disabled');
-                    $('.transfer-clear-all-icon').removeClass('disabled');
-                }
-            }.bind(this));
+                fileconflict.check(u, target, 'upload').done(startUpload);
+            });
     };
 
     this.ulprogress = function(ul, perc, bl, bt, bps) {
@@ -5766,9 +5834,10 @@ function MegaData()
         var id  = ul.id;
         var $tr = $('#ul_' + id);
 
-        if ($.ulBunch && $.ulBunch[ul.target])
+        if ($.ulBunch && $.ulBunch[ul.chatid])
         {
-            var ub = $.ulBunch[ul.target], p;
+            var p;
+            var ub = $.ulBunch[ul.chatid];
             ub[id] = h;
 
             for (var i in ub)
@@ -5782,7 +5851,7 @@ function MegaData()
 
             if (!p)
             {
-                var ul_target = ul.target;
+                var ul_target = ul.chatid;
                 ub = Object.keys(ub).map(function(m) { return ub[m]});
                 Soon(function() {
                     $(document).trigger('megaulcomplete', [ul_target, ub]);
@@ -9236,12 +9305,6 @@ function fmviewmode(id, e)
         viewmodes[id] = 0;
     mega.config.set('viewmodes', viewmodes);
 }
-
-function fm_requestfolderid(h, name, ulparams)
-{
-    return createFolder(h, name, ulparams);
-}
-
 
 // jscs:disable
 // jshint ignore:start

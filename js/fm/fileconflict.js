@@ -21,6 +21,11 @@
                     file = clone(M.d[file] || false);
                 }
 
+                if (!file) {
+                    console.warn('Got invalid file...');
+                    continue;
+                }
+
                 try {
                     // this could throw NS_ERROR_FILE_NOT_FOUND
                     var test = file.size;
@@ -30,8 +35,9 @@
                     continue;
                 }
 
-                if (M.c[target] && !file.path) {
-                    var found = this.getNodeByName(target, fm_safename(file.name), true);
+                var nodeTarget = file.target || target;
+                if (M.c[nodeTarget]) {
+                    var found = this.getNodeByName(nodeTarget, fm_safename(file.name), true);
 
                     if (found) {
                         conflicts.push([file, found]);
@@ -188,7 +194,7 @@
             $('.skip-button', $dialog).rebind('click', function() {
                 done(null, 0, 2);
             });
-            $('.cancel-button', $dialog).rebind('click', function() {
+            $('.cancel-button, .fm-dialog-close', $dialog).rebind('click', function() {
                 done(-0xBADF);
             });
 

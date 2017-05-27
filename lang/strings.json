@@ -16526,5 +16526,45 @@
     "16516": {
         "text": "Public Links",
         "context": "A list item or breadcrumb title for displaying the number of publicly accessible file\/folder links a user has created in their account."
+    },
+    "16517": {
+        "text": "You have successfully logged into the account %1, we will now proceed to migrate your ephemeral account contents to your Cloud Drive's Inbox.",
+        "context": "A message which is shown when an ephemeral account user tries to register an account and instead they are logged in because they used a valid existing account. What happens then is that the ephemeral account's files and folders are migrated to the logged in user's Inbox. Please leave the %1 placeholder which is replaced with an email address."
+    },
+    "16518": {
+        "text": "View on MEGA",
+        "context": "Finder context menu option to view a synced file through the web browser within your MEGA account."
+    },
+    "16519": {
+        "text": "No options available",
+        "context": "Finder context menu label when no option is available for selected items."
+    },
+    "16520": {
+        "text": "Click the toolbar item for a menu.",
+        "context": "A tooltip for MEGA finder toolbar button."
+    },
+    "16521": {
+        "text": "%i files",
+        "context": "A context menu option label to indicate the user has selected %i number of files."
+    },
+    "16522": {
+        "text": "%i folders",
+        "context": "A context menu option label to indicate the user has selected %i number of folders."
+    },
+    "16523": {
+        "text": "MEGA Finder Sync",
+        "context": "An identifying name for MEGA finder extension on macOS systems."
+    },
+    "16524": {
+        "text": "[A]Login[\/A] or [A]Create an account[\/A] to fully experience MEGA",
+        "context": "A label to inform a user that they need to login or create an account in order to use MEGAsync. Please keep the [A] and [\/A] tags."
+    },
+    "16525": {
+        "text": "Open Transfer Manager",
+        "context": "A tooltip for the button that opens the transfer manager dialog."
+    },
+    "16527": {
+        "text": "USED TRANSFERS %1",
+        "context": "A label to indicate the total used transfer quota."
     }
 }

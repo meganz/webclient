@@ -3,11 +3,11 @@ MegaData.prototype.avatars = function(userPurgeList) {
     if (u_type !== 3) {
         return false;
     }
-    if (!M.c.contacts) {
-        M.c.contacts = Object.create(null);
+    if (!this.c.contacts) {
+        this.c.contacts = Object.create(null);
     }
     if (u_handle) {
-        M.c.contacts[u_handle] = 1;
+        this.c.contacts[u_handle] = 1;
     }
 
     if (userPurgeList) {
@@ -40,5 +40,5 @@ MegaData.prototype.avatars = function(userPurgeList) {
         }
     });
 
-    delete M.c.contacts[u_handle];
+    delete this.c.contacts[u_handle];
 };

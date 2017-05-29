@@ -538,7 +538,7 @@ mega.achievem.initInviteDialogMultiInputPlugin = function initInviteDialogMultiI
     var $this = $('.achievement-dialog.multiple-input.emails input');
     var $inputWrapper = $('.achievement-dialog.multiple-input');
     var $sendButton = $dialog.find('.default-grey-button.send');
-    var contacts = getContactsEMails();
+    var contacts = M.getContactsEMails();
 
     $this.tokenInput(contacts, {
         theme: "invite",

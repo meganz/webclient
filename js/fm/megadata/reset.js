@@ -1,8 +1,16 @@
 MegaData.prototype.reset = function() {
-    this.d = {};
     this.v = [];
+    this.d = Object.create(null);
+    this.c = Object.create(null);
     this.h = Object.create(null);
-    this.c = {shares: Object.create(null)};
+    this.t = Object.create(null);
+    this.su = Object.create(null);
+    this.ps = Object.create(null);
+    this.opc = Object.create(null);
+    this.ipc = Object.create(null);
+    this.tree = Object.create(null);
+    this.c.shares = Object.create(null);
+    this.c.contacts = Object.create(null);
 
     if (typeof MegaDataMap !== 'undefined') {
         this.u = new MegaDataMap();
@@ -24,10 +32,6 @@ MegaData.prototype.reset = function() {
         });
     }
 
-    this.t = Object.create(null);
-    this.opc = {};
-    this.ipc = {};
-    this.ps = {};
     this.nn = false;
     this.sn = false;
     this.filter = false;
@@ -38,8 +42,6 @@ MegaData.prototype.reset = function() {
     this.RubbishID = undefined;
     this.InboxID = undefined;
     this.viewmode = 0; // 0 list view, 1 block view
-    this.su = Object.create(null);
-    this.tree = Object.create(null);
 
     mBroadcaster.sendMessage("MegaDataReset");
 };

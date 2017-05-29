@@ -1,4 +1,6 @@
 (function(global) {
+    "use strict";
+
     /**
      * Invoke M.openFolder() completion.
      *
@@ -18,14 +20,14 @@
             mBroadcaster.sendMessage('fm:initialized');
         }
 
-        if (M.currentrootid === M.RootID) {
-            M.lastSeenCloudFolder = M.currentdirid;
+        if (this.currentrootid === this.RootID) {
+            this.lastSeenCloudFolder = this.currentdirid;
         }
 
         $('.nw-fm-tree-item').removeClass('opened');
 
         if (this.chat) {
-            M.v = [];
+            this.v = [];
             sharedFolderUI(); // remove shares-specific UI
             //$.tresizer();
         }
@@ -33,7 +35,7 @@
             // Error reading shared folder link! (Eg, server gave a -11 (EACCESS) error)
             // Force cleaning the current cloud contents and showing an empty msg
             if (!is_mobile) {
-                M.renderMain();
+                this.renderMain();
             }
             else {
                 // Trigger rendering of mobile file manager
@@ -43,35 +45,38 @@
         else if (id && (id.substr(0, 7) !== 'account')
             && (id.substr(0, 9) !== 'dashboard')
             && (id.substr(0, 13) !== 'notifications')) {
+
             $('.fm-right-files-block').removeClass('hidden');
+
             if (d) {
                 console.time('time for rendering');
             }
+
             if (id === 'transfers') {
-                M.v = [];
+                this.v = [];
             }
             else if (id === 'links') {
-                if (M.su.EXP) {
-                    M.v = Object.keys(M.su.EXP)
+                if (this.su.EXP) {
+                    this.v = Object.keys(this.su.EXP)
                         .map(function(h) {
                             return M.d[h];
                         });
                 }
                 else {
-                    M.v = [];
+                    this.v = [];
                 }
             }
             else if (id.substr(0, 6) === 'search') {
-                M.filterBySearch(M.currentdirid);
+                this.filterBySearch(this.currentdirid);
             }
             else {
-                M.filterByParent(M.currentdirid);
+                this.filterByParent(this.currentdirid);
             }
 
             var viewmode = 0;// 0 is list view, 1 block view
-            if (M.overrideViewMode !== undefined) {
-                viewmode = M.overrideViewMode;
-                delete M.overrideViewMode;
+            if (this.overrideViewMode !== undefined) {
+                viewmode = this.overrideViewMode;
+                delete this.overrideViewMode;
             }
             else if (typeof fmconfig.uiviewmode !== 'undefined' && fmconfig.uiviewmode) {
                 if (fmconfig.viewmode) {
@@ -89,39 +94,39 @@
                     }
                 }
             }
-            M.viewmode = viewmode;
-            if (M.overrideSortMode) {
-                M.doSort(M.overrideSortMode[0], M.overrideSortMode[1]);
-                delete M.overrideSortMode;
+            this.viewmode = viewmode;
+            if (this.overrideSortMode) {
+                this.doSort(this.overrideSortMode[0], this.overrideSortMode[1]);
+                delete this.overrideSortMode;
             }
             else if (fmconfig.uisorting && fmconfig.sorting) {
-                M.doSort(fmconfig.sorting.n, fmconfig.sorting.d);
+                this.doSort(fmconfig.sorting.n, fmconfig.sorting.d);
             }
             else if (fmconfig.sortmodes && fmconfig.sortmodes[id]) {
-                M.doSort(fmconfig.sortmodes[id].n, fmconfig.sortmodes[id].d);
+                this.doSort(fmconfig.sortmodes[id].n, fmconfig.sortmodes[id].d);
             }
-            else if (M.currentdirid === 'contacts') {
-                M.doSort('status', 1);
+            else if (this.currentdirid === 'contacts') {
+                this.doSort('status', 1);
             }
             else {
-                M.doSort('name', 1);
+                this.doSort('name', 1);
             }
 
-            if (M.currentdirid === 'opc') {
+            if (this.currentdirid === 'opc') {
                 this.v = [];
-                for (var i in M.opc) {
-                    this.v.push(M.opc[i]);
+                for (var i in this.opc) {
+                    this.v.push(this.opc[i]);
                 }
             }
-            else if (M.currentdirid === 'ipc') {
+            else if (this.currentdirid === 'ipc') {
                 this.v = [];
-                for (var i in M.ipc) {
-                    this.v.push(M.ipc[i]);
+                for (var i in this.ipc) {
+                    this.v.push(this.ipc[i]);
                 }
             }
 
             if (!is_mobile) {
-                M.renderMain();
+                this.renderMain();
             }
             else {
                 // Trigger rendering of mobile file manager
@@ -129,17 +134,17 @@
             }
 
             if (fminitialized && !is_mobile) {
-                var currentdirid = M.currentdirid;
+                var currentdirid = this.currentdirid;
                 if (id.substr(0, 6) === 'search' || id === 'links') {
-                    currentdirid = M.RootID;
+                    currentdirid = this.RootID;
 
-                    if (M.d[M.previousdirid]) {
-                        currentdirid = M.previousdirid;
+                    if (this.d[this.previousdirid]) {
+                        currentdirid = this.previousdirid;
                     }
                 }
 
                 if ($('#treea_' + currentdirid).length === 0) {
-                    var n = M.d[currentdirid];
+                    var n = this.d[currentdirid];
                     if (n && n.p) {
                         treeUIopen(n.p, false, true);
                     }
@@ -165,12 +170,12 @@
                 target = '!' + this.currentdirid;
             }
             newHashLocation = 'F!' + pfid + '!' + pfkey + target;
-            M.lastSeenFolderLink = newHashLocation;
+            this.lastSeenFolderLink = newHashLocation;
         }
         else {
             // new hash location can be altered already by the chat logic in the previous lines in this func
             if (!newHashLocation) {
-                newHashLocation = 'fm/' + M.currentdirid;
+                newHashLocation = 'fm/' + this.currentdirid;
             }
         }
         try {
@@ -216,13 +221,14 @@
     MegaData.prototype.openFolder = function(id, force, chat) {
         var newHashLocation;
         var fetchdbnodes;
+        var fetchshares;
         var firstopen;
 
         $('.fm-right-account-block, .fm-right-block.dashboard').addClass('hidden');
         $('.fm-files-view-icon').removeClass('hidden');
 
         if (d) {
-            console.warn('openFolder()', M.currentdirid, id, force, loadfm.loaded);
+            console.warn('openFolder()', this.currentdirid, id, force, loadfm.loaded);
         }
 
         if (!loadfm.loaded) {
@@ -310,11 +316,14 @@
                 chatui(id);
             }
         }
-        else if (id !== 'transfers') {
+        else if (String(id).length === 11) {
+            fetchshares = !M.c[id];
+        }
+        else if (id !== 'transfers' && id !== 'links') {
             if (!id) {
                 id = this.RootID;
             }
-            else if (fmdb && (!M.d[id] || (M.d[id].t && !M.c[id]))) {
+            else if (fmdb && (!this.d[id] || (this.d[id].t && !this.c[id]))) {
                 fetchdbnodes = true;
             }
         }
@@ -339,7 +348,7 @@
                     _openFolderCompletion.call(M, id, newHashLocation, firstopen, promise);
                 });
         }
-        else if (id === 'shares') {
+        else if (fetchshares || id === 'shares') {
             dbfetch.geta(Object.keys(M.c.shares || {}))
                 .always(function() {
                     _openFolderCompletion.call(M, id, newHashLocation, firstopen, promise);

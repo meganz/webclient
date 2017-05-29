@@ -350,6 +350,8 @@ function treePanelType() {
 }
 
 function initUI() {
+    "use strict";
+
     if (d) {
         console.time('initUI');
     }
@@ -1249,120 +1251,6 @@ function hideTransferToast ($toast) {
     $('.toast-notification').removeClass('second');
 }
 
-// jscs:disable
-// jshint ignore:start
-function removeUInode(h, parent) {
-
-    var n = M.d[h],
-        i = 0;
-
-    // check subfolders
-    if (n && n.t) {
-        var cns = M.c[n.p];
-        if (cns) {
-            for (var cn in cns) {
-                if (M.d[cn] && M.d[cn].t && cn !== h) {
-                    i++;
-                    break;
-                }
-            }
-        }
-    }
-
-    var hasItems = !!M.v.length;
-    switch (M.currentdirid) {
-        case "shares":
-            $('#treeli_' + h).remove();// remove folder and subfolders
-            if (!hasItems) {
-                $('.files-grid-view .grid-table-header tr').remove();
-                $('.fm-empty-cloud').removeClass('hidden');
-            }
-            break;
-        case "contacts":
-
-            //Clear left panel:
-            $('#contact_' + h).fadeOut('slow', function() {
-                $(this).remove();
-            });
-
-            //Clear right panel:
-            $('.grid-table.contacts tr#' + h + ', .contacts-blocks-scrolling a#' + h)
-                .fadeOut('slow', function() {
-                    $(this).remove();
-                });
-
-            // clear the contacts grid:
-            $('.contacts-grid-view #' + h).remove();
-            if (!hasItems) {
-                $('.contacts-grid-view .contacts-grid-header tr').remove();
-                $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[784]);
-                $('.fm-empty-contacts').removeClass('hidden');
-            }
-            break;
-        case "chat":
-            if (!hasItems) {
-                $('.contacts-grid-view .contacts-grid-header tr').remove();
-                $('.fm-empty-chat').removeClass('hidden');
-            }
-            break;
-        case M.RubbishID:
-            if (i == 0 && n) {
-                $('#treea_' + n.p).removeClass('contains-folders expanded');
-            }
-
-            // Remove item
-            $('#' + h).remove();
-
-            // Remove folder and subfolders
-            $('#treeli_' + h).remove();
-            if (!hasItems) {
-                $('.contacts-grid-view .contacts-grid-header tr').remove();
-                $('.fm-empty-trashbin').removeClass('hidden');
-            }
-            break;
-        case M.RootID:
-            if (i == 0 && n) {
-                $('#treea_' + n.p).removeClass('contains-folders expanded');
-            }
-
-            // Remove item
-            $('#' + h).remove();
-
-            // Remove folder and subfolders
-            $('#treeli_' + h).remove();
-            if (!hasItems) {
-                $('.files-grid-view').addClass('hidden');
-                $('.grid-table.fm tr').remove();
-                $('.fm-empty-cloud').removeClass('hidden');
-            }
-            break;
-        default:
-            if (i == 0 && n) {
-                $('#treea_' + n.p).removeClass('contains-folders expanded');
-            }
-            $('#' + h).remove();// remove item
-            $('#treeli_' + h).remove();// remove folder and subfolders
-            if (!hasItems) {
-                if (sharedFolderUI()) {
-                    M.emptySharefolderUI();
-                }
-                else {
-                    $('.files-grid-view').addClass('hidden');
-                    $('.fm-empty-folder').removeClass('hidden');
-                }
-                $('.grid-table.fm tr').remove();
-            }
-            break;
-    }
-
-    if (M.currentdirid === h || isCircular(h, M.currentdirid) === true) {
-        parent = parent || Object(M.getNodeByHandle(h)).p || RootbyId(h);
-        M.openFolder(parent);
-    }
-}
-// jscs:enable
-// jshint ignore:end
-
 /**
  * addContactToFolderShare
  *
@@ -1557,62 +1445,12 @@ function sharedUInode(nodeHandle) {
 }
 
 /**
- * getContactsEMails
- *
- * Loop through all available contacts, full and pending ones (outgoing and incomming)
- * and creates a list of contacts email addresses.
- * @returns {Array} contacts, array of contacts email.
- */
-function getContactsEMails() {
-
-    var contact,
-        contacts = [];
-    var contactName = '';
-
-    // Loop through full contacts
-    M.u.forEach(function(contact) {
-        // Active contacts with email set
-        if (contact.c === 1 && contact.m) {
-            contacts.push({ id: contact.m, name: M.getNameByHandle(contact.u) });
-        }
-    });
-
-    // Loop through outgoing pending contacts
-    for (var k in M.opc) {
-        if (M.opc.hasOwnProperty(k)) {
-            contact = M.opc[k];
-            contactName = M.getNameByHandle(M.opc[k].p);
-
-            // Is contact deleted
-            if (!contact.dts) {
-                contacts.push({ id: contact.m, name: contactName });
-            }
-        }
-    }
-
-    // Loop through incomming pending contacts
-    for (var m in M.ipc) {
-        if (M.ipc.hasOwnProperty(m)) {
-            contact = M.ipc[m];
-            contactName = M.getNameByHandle(M.ipc[m].p);
-
-            // Is there a email available
-            if (contact.m) {
-                contacts.push({ id: contact.m, name: contactName });
-            }
-        }
-    }
-
-    return contacts;
-}
-
-/**
  * initAddDialogInputPlugin
  */
 function initAddDialogMultiInputPlugin() {
 
     // Plugin configuration
-    var contacts = getContactsEMails();
+    var contacts = M.getContactsEMails();
     var $this  = $('.add-contact-multiple-input');
     var $scope = $this.parents('.add-user-popup');
 
@@ -2097,6 +1935,8 @@ function ephemeralDialog(msg) {
 // leave incoming share h
 // FIXME: implement sn tagging to prevent race condition
 function leaveShare(h) {
+    "use strict";
+
     var promise = new MegaPromise();
 
     if (d) {
@@ -2130,6 +1970,7 @@ function leaveShare(h) {
 }
 
 function initContextUI() {
+    "use strict";
 
     var c = '.dropdown.body.context .dropdown-item';
 
@@ -2288,7 +2129,6 @@ function initContextUI() {
     $(c + '.startchat-item').rebind('click', function() {
         var $this = $(this);
         var user_handle = $.selected;
-
 
         if (user_handle.length === 1) {
             if (!$this.is(".disabled") && user_handle) {
@@ -2461,6 +2301,7 @@ function initContextUI() {
 }
 
 function createFolderUI() {
+    "use strict";
 
     $('.fm-new-folder').rebind('click', function(e) {
 
@@ -2560,6 +2401,7 @@ function createFolderUI() {
 }
 
 function doCreateFolderUI() {
+    "use strict";
 
     if ($('.create-new-folder input').val() === '') {
         $('.create-new-folder input').animate({backgroundColor: "#d22000"}, 150, function() {
@@ -2579,6 +2421,8 @@ function doCreateFolderUI() {
  *
  */
 function fmtopUI() {
+    "use strict";
+
     $('.fm-clearbin-button,.fm-add-user,.fm-new-folder,.fm-file-upload,.fm-folder-upload').addClass('hidden');
     $('.fm-contact-requests,.fm-received-requests').removeClass('active');
     $('.fm-new-folder').removeClass('filled-input');
@@ -2807,10 +2651,14 @@ function avatarDialog(close)
 }
 
 function gridUI() {
-    if (M.chat)
+    "use strict";
+
+    if (M.chat) {
         return;
-    if (d)
+    }
+    if (d) {
         console.time('gridUI');
+    }
     // $.gridDragging=false;
     $.gridLastSelected = false;
     $('.fm-files-view-icon.listing-view').addClass('active');
@@ -2999,10 +2847,11 @@ function gridUI() {
         $.selectddUIgrid = '.files-grid-view.fm .grid-scrolling-table';
 
     $.selectddUIitem = 'tr';
-    Soon(selectddUI);
+    onIdle(selectddUI);
 
-    if (d)
+    if (d) {
         console.timeEnd('gridUI');
+    }
 }
 
 /**
@@ -3011,6 +2860,7 @@ function gridUI() {
  * @constructor
  */
 function FMShortcuts() {
+    "use strict";
 
     var current_operation = null;
 
@@ -3108,8 +2958,9 @@ function FMShortcuts() {
  * @constructor
  */
 var QuickFinder = function(searchable_elements, containers) {
-    var self = this;
+    "use strict";
 
+    var self = this;
     var DEBUG = false;
 
     self._is_active = false; // defined as a prop of this. so that when in debug mode it can be easily accessed from
@@ -3282,8 +3133,9 @@ var quickFinder = new QuickFinder(
  * @constructor
  */
 var SelectionManager = function($selectable) {
-    var self = this;
+    "use strict";
 
+    var self = this;
     $selectable.unbind('selectableselecting');
     $selectable.unbind('selectableselected');
     $selectable.unbind('selectableunselecting');
@@ -3463,6 +3315,8 @@ var SelectionManager = function($selectable) {
 var selectionManager;
 
 function UIkeyevents() {
+    "use strict";
+
     $(window).rebind('keydown.uikeyevents', function(e) {
         if (e.keyCode == 9 && !$(e.target).is("input,textarea,select")) {
             return false;
@@ -3715,6 +3569,8 @@ function UIkeyevents() {
 
 function searchPath()
 {
+    "use strict";
+
     if (M.currentdirid && M.currentdirid.substr(0,7) == 'search/')
     {
         var sel;
@@ -3802,6 +3658,8 @@ function searchPath()
 }
 
 function selectddUI() {
+    "use strict";
+
     if (M.currentdirid && M.currentdirid.substr(0, 7) === 'account') {
         return false;
     }
@@ -4040,6 +3898,7 @@ function selectddUI() {
 
 function iconUI(aQuiet)
 {
+    "use strict";
     if (d) console.time('iconUI');
 
     $('.fm-files-view-icon.block-view').addClass('active');
@@ -4122,6 +3981,8 @@ function iconUI(aQuiet)
 
 function transferPanelUI()
 {
+    "use strict";
+
     $.transferHeader = function(tfse)
     {
         tfse                  = tfse || M.getTransferElements();
@@ -4413,6 +4274,8 @@ function getDDhelper()
  * @returns {menuItems.items|Array}
  */
 function menuItems() {
+    "use strict";
+
     var promise = new MegaPromise();
 
     dbfetch.geta($.selected || [])
@@ -4423,6 +4286,7 @@ function menuItems() {
     return promise;
 }
 function menuItemsSync() {
+    "use strict";
 
     var selItem,
         items = Object.create(null),
@@ -4523,6 +4387,7 @@ function menuItemsSync() {
 }
 
 function contextMenuUI(e, ll) {
+    "use strict";
 
     var flt;
     var async = false;
@@ -4750,6 +4615,7 @@ function contextMenuUI(e, ll) {
  * have public links already then the text will change to 'Update link/s'.
  */
 function setContextMenuGetLinkText() {
+    "use strict";
 
     var numOfExistingPublicLinks = 0;
     var numOfSelectedNodes = Object($.selected).length;
@@ -4792,6 +4658,7 @@ function setContextMenuGetLinkText() {
  * @param {String} pref, id prefix i.e. { #fi_, #mctreea_ }
  */
 function disableCircularTargets(pref) {
+    "use strict";
 
     var nodes = $.selected || [];
 
@@ -5077,6 +4944,8 @@ function scrollMegaSubMenu(e) {
 
 function treeUI()
 {
+    "use strict";
+
     //console.error('treeUI');
     if (d) {
         console.time('treeUI');
@@ -5261,8 +5130,9 @@ function treeUI()
     }
 }
 
-function treeUIexpand(id, force)
-{
+function treeUIexpand(id, force) {
+    "use strict";
+
     return M.buildtree({h: id})
         .always(function() {
             var $tree = $('#treea_' + id);
@@ -5283,6 +5153,8 @@ function treeUIexpand(id, force)
 }
 
 function sectionUIopen(id) {
+    "use strict";
+
     var tmpId;
     if (d) {
         console.log('sectionUIopen', id, folderlink);
@@ -5466,6 +5338,8 @@ function sectionUIopen(id) {
 }
 
 function treeUIopen(id, event, ignoreScroll, dragOver, DragOpen) {
+    "use strict";
+
     id = String(id);
     var id_r = RootbyId(id);
     var id_s = id.split('/')[0];
@@ -5557,6 +5431,8 @@ function treeUIopen(id, event, ignoreScroll, dragOver, DragOpen) {
 }
 
 function fm_hideoverlay() {
+    "use strict";
+
     if (!$.propertiesDialog) {
         $('.fm-dialog-overlay').addClass('hidden');
         $('body').removeClass('overlayed');
@@ -5565,11 +5441,14 @@ function fm_hideoverlay() {
 }
 
 function fm_showoverlay() {
+    "use strict";
+
     $('.fm-dialog-overlay').removeClass('hidden');
     $('body').addClass('overlayed');
 }
 
 function renameDialog() {
+    "use strict";
 
     if ($.selected.length > 0) {
         $.dialog = 'rename';
@@ -5656,6 +5535,7 @@ function renameDialog() {
  * On context menu rename
  */
 function doRename() {
+    "use strict";
 
     var itemName = $('.rename-dialog input').val();
     var handle = $.selected[0];
@@ -6195,7 +6075,7 @@ function fillShareDialogWithContent() {
     var node          = M.getNodeByHandle(nodeHandle);
     var userHandles   = M.getNodeShareUsers(node, 'EXP');
 
-    if (Object(M.ps).hasOwnProperty(nodeHandle)) {
+    if (M.ps[nodeHandle]) {
         pendingShares = Object(M.ps[nodeHandle]);
         userHandles   = userHandles.concat(Object.keys(pendingShares));
     }
@@ -6308,7 +6188,7 @@ function handleShareDialogContent() {
  */
 function updateDialogDropDownList(dialog) {
 
-    var listOfEmails = getContactsEMails(),
+    var listOfEmails = M.getContactsEMails(),
         allEmails = [],
         contacts;
 
@@ -6404,7 +6284,7 @@ function sharedPermissionLevel(value) {
 function initShareDialogMultiInputPlugin() {
 
         // Plugin configuration
-        var contacts = getContactsEMails();
+        var contacts = M.getContactsEMails();
 
         function errorMsg(msg) {
 
@@ -6610,6 +6490,7 @@ function initCopyrightsDialog(nodesToProcess) {
 }
 
 function initShareDialog() {
+    "use strict";
 
     $.shareTokens = [];
 
@@ -6916,7 +6797,6 @@ function initShareDialog() {
     });
 
     $('.share-message textarea').rebind('blur', function() {
-        var $this = $(this);
         $('.share-message').removeClass('active');
     });
 }
@@ -6966,6 +6846,7 @@ function clearScrollPanel(from) {
 }
 
 function closeDialog() {
+    "use strict";
 
     if (d) {
         MegaLogger.getLogger('closeDialog').debug($.dialog);
@@ -7047,6 +6928,7 @@ function closeDialog() {
 }
 
 function copyDialog() {
+    "use strict";
 
     var copyDialogTooltipTimer;
 
@@ -7411,6 +7293,7 @@ function copyDialog() {
 }
 
 function moveDialog() {
+    "use strict";
 
     var moveDialogTooltipTimer;
 
@@ -7703,6 +7586,7 @@ function moveDialog() {
 var toastTimeout;
 
 function showToast(toastClass, notification, buttonLabel) {
+    "use strict";
 
     var $toast;
 
@@ -7760,6 +7644,7 @@ function refreshDialogContent() {
 
 function createFolderDialog(close)
 {
+    "use strict";
     $.dialog = 'createfolder';
     if (close) {
         $.dialog = false;
@@ -7883,6 +7768,7 @@ function chromeDialog(close)
  * Open a dialog asking the user to download MEGAsync for files over 1GB
  */
 function megaSyncDialog() {
+    "use strict";
 
     // Cache selector
     var $dialog = $('.fm-dialog.download-megasync-dialog');
@@ -7924,6 +7810,8 @@ function megaSyncDialog() {
 
 function firefoxDialog(close)
 {
+    "use strict";
+
     if (close)
     {
         $.dialog = false;
@@ -8063,6 +7951,8 @@ browserDialog.isWeak = function() {
 
 /* jshint -W074 */
 function propertiesDialog(close) {
+    "use strict";
+
     if (close) {
         _propertiesDialog(1);
     }
@@ -8078,6 +7968,7 @@ function propertiesDialog(close) {
     }
 }
 function _propertiesDialog(close) {
+    "use strict";
 
     /**
      * fillPropertiesContactList, Handles node properties/info dialog contact list content
@@ -8464,6 +8355,8 @@ function _propertiesDialog(close) {
  * @param {String} dialog header
  */
 function bottomPageDialog(close, pp, hh) {
+    "use strict";
+
     var $dialog = $('.fm-dialog.bottom-pages-dialog');
 
     if (close)
@@ -8851,6 +8744,8 @@ function previewimg(id, uint8arr)
 
 function fm_importflnodes(nodes)
 {
+    "use strict";
+
     var _import = function(data) {
         $.mcImport = true;
         $.selected = data[0];
@@ -8895,20 +8790,23 @@ function fm_importflnodes(nodes)
             loadingDialog.show();
             localStorage.folderLinkImport = FLRootID;
 
-            var data = [sel, fm_getcopynodes(sel)];
+            M.getCopyNodes(sel)
+                .done(function(nodes) {
+                    var data = [sel, nodes];
 
-            StorageDB(u_handle)
-                .set('import.' + FLRootID, data)
-                .done(function() {
+                    StorageDB(u_handle)
+                        .set('import.' + FLRootID, data)
+                        .done(function() {
 
-                    loadSubPage('fm');
-                })
-                .fail(function(e) {
-                    if (d) {
-                        console.warn('Cannot import using indexedDB...', e);
-                    }
-                    $.onImportCopyNodes = data;
-                    loadSubPage('fm');
+                            loadSubPage('fm');
+                        })
+                        .fail(function(e) {
+                            if (d) {
+                                console.warn('Cannot import using indexedDB...', e);
+                            }
+                            $.onImportCopyNodes = data;
+                            loadSubPage('fm');
+                        });
                 });
         }).fail(function(aError) {
             // If no aError, it was canceled
@@ -8952,6 +8850,8 @@ function savecomplete(id)
  * This is why we do a on('resize') handler which handles the resize of the generic layout of Mega's FM.
  */
 function fm_resize_handler(force) {
+    "use strict";
+
     if ($.tresizer.last === -1 && force !== true) {
         return;
     }
@@ -9097,6 +8997,8 @@ mega.utils.findDupes = function() {
 };
 
 function sharedFolderUI() {
+    "use strict";
+
     var nodeData = M.d[M.currentdirid];
     var browsingSharedContent = false;
 
@@ -9336,6 +9238,8 @@ function fingerprintDialog(userid) {
 }
 
 function contactUI() {
+    "use strict";
+
     $('.nw-contact-item').removeClass('selected');
     $('.contact-details-pad .grid-url-arrow').unbind('click');
 
@@ -9456,6 +9360,8 @@ function contactUI() {
  * @constructor
  */
 function FMResizablePane(element, opts) {
+    "use strict";
+
     var $element = $(element);
     var self = this;
     var $self = $(this);
@@ -9725,6 +9631,8 @@ function removeFromMultiInputDDL(dialog, item) {
 }
 
 (function($, scope) {
+    "use strict";
+
     /**
      * Sort dialogs, dialogs used for sorting content in left panels, copy and move dialogs.
      *

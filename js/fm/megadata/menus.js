@@ -7,8 +7,8 @@
             sm = '',
             html = '';
 
-        for (var h in M.c[M.RootID]) {
-            if (M.d[h] && M.d[h].t) {
+        for (var h in this.c[this.RootID]) {
+            if (this.d[h] && this.d[h].t) {
                 cs = ' contains-submenu';
                 sm = '<span class="dropdown body submenu" id="sm_' + this.RootID + '">'
                     + '<span id="csb_' + this.RootID + '"></span>' + arrow + '</span>';
@@ -61,8 +61,8 @@
                 sm = '';
                 fid = folders[i].h;
 
-                for (var h in M.c[fid]) {
-                    if (M.d[h] && M.d[h].t) {
+                for (var h in this.c[fid]) {
+                    if (this.d[h] && this.d[h].t) {
                         sub = true;
                         cs = ' contains-submenu';
                         sm = '<span class="dropdown body submenu" id="sm_' + fid + '">'
@@ -72,7 +72,7 @@
                 }
 
                 sharedFolder = 'folder-item';
-                if (typeof M.d[fid].shares !== 'undefined') {
+                if (typeof this.d[fid].shares !== 'undefined') {
                     sharedFolder += ' shared-folder-item';
                 }
 

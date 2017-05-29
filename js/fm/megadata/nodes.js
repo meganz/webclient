@@ -1,63 +1,63 @@
 (function(global) {
+    "use strict";
     var delInShareQueue = Object.create(null);
 
-    MegaData.prototype.delNode = function(h, ignoreDB) {
-        function ds(h) {
-
-            if (fminitialized) {
-                removeUInode(h);
-            }
-
-            if (M.c[h] && h.length < 11) {
-                for (var h2 in M.c[h]) {
-                    ds(h2);
-                }
-                delete M.c[h];
-            }
-
-            if (fmdb) {
-                fmdb.del('f', h);
-                fmdb.del('nn', h);
-                fmdb.del('ph', h);
-            }
-
-            if (M.nn) {
-                delete M.nn[h];
-            }
-
-            if (M.d[h]) {
-                if (M.d[h].su) {
-                    // this is an inbound share
-                    delete M.c.shares[h];
-                    if (M.tree.shares) {
-                        delete M.tree.shares[h];
-                    }
-                    delete u_sharekeys[h];
-                    delInShareQ.push(M.d[h].su + '*' + h);
-                    M.delIndex(M.d[h].su, h);
-                }
-
-                M.delIndex(M.d[h].p, h);
-                M.delHash(M.d[h]);
-                delete M.d[h];
-            }
-
-            if (typeof M.u[h] === 'object') {
-                M.u[h].c = 0;
-            }
-
-            if (M.su.EXP) {
-                delete M.su.EXP[h];
-            }
+    MegaData.prototype.delNodeIterator = function(h, delInShareQ) {
+        if (fminitialized) {
+            removeUInode(h);
         }
 
+        if (this.c[h] && h.length < 11) {
+            for (var h2 in this.c[h]) {
+                this.delNodeIterator(h2, delInShareQ);
+            }
+            delete this.c[h];
+        }
+
+        if (fmdb) {
+            fmdb.del('f', h);
+            fmdb.del('nn', h);
+            fmdb.del('ph', h);
+        }
+
+        if (this.nn) {
+            delete this.nn[h];
+        }
+
+        if (this.d[h]) {
+            if (this.d[h].su) {
+                // this is an inbound share
+                delete this.c.shares[h];
+                if (this.tree.shares) {
+                    delete this.tree.shares[h];
+                }
+                delete u_sharekeys[h];
+                delInShareQ.push(this.d[h].su + '*' + h);
+                this.delIndex(this.d[h].su, h);
+            }
+
+            this.delIndex(this.d[h].p, h);
+            this.delHash(this.d[h]);
+            delete this.d[h];
+        }
+
+        if (typeof this.u[h] === 'object') {
+            this.u[h].c = 0;
+        }
+
+        if (this.su.EXP) {
+            delete this.su.EXP[h];
+        }
+    };
+
+    MegaData.prototype.delNode = function(h, ignoreDB) {
         var delInShareQ = delInShareQueue[h] = delInShareQueue[h] || [];
 
         // remove ufssizecache records
         ufsc.delNode(h, ignoreDB);
 
         // node deletion traversal
-        ds(h);
+        this.delNodeIterator(h, delInShareQ);
 
         if (fmdb && !ignoreDB) {
             // Perform DB deletions once we got acknowledge from API (action-packets)
@@ -73,9 +73,9 @@
             delay('fmtopUI', fmtopUI);
 
             // Update M.v it's used for at least preview slideshow
-            for (var k = M.v.length; k--;) {
-                if (M.v[k].h === h) {
-                    M.v.splice(k, 1);
+            for (var k = this.v.length; k--;) {
+                if (this.v[k].h === h) {
+                    this.v.splice(k, 1);
                     break;
                 }
             }
@@ -84,13 +84,15 @@
 })(this);
 
 MegaData.prototype.addNode = function(n, ignoreDB) {
+    "use strict";
+
     if (n.su) {
         var u = this.u[n.su];
         if (u) {
             u.h = u.u;
             u.t = 1;
             u.p = 'contacts';
-            M.addNode(u);
+            this.addNode(u);
         }
         else if (d) {
             console.warn('No user record for incoming share', n.su);
@@ -99,7 +101,7 @@ MegaData.prototype.addNode = function(n, ignoreDB) {
 
     if (n.t < 2) {
         crypto_decryptnode(n);
-        M.nodeUpdated(n, ignoreDB);
+        this.nodeUpdated(n, ignoreDB);
     }
     if (this.d[n.h] && this.d[n.h].shares) {
         n.shares = this.d[n.h].shares;
@@ -136,6 +138,8 @@ MegaData.prototype.addNode = function(n, ignoreDB) {
 };
 
 MegaData.prototype.delHash = function(n) {
+    "use strict";
+
     if (this.h[n.hash]) {
         delete this.h[n.hash][n.h];
         if (!this.h[n.hash].length) {
@@ -148,16 +152,18 @@ MegaData.prototype.delHash = function(n) {
 };
 
 MegaData.prototype.delIndex = function(p, h) {
-    if (M.c[p] && M.c[p][h]) {
-        delete M.c[p][h];
+    "use strict";
+
+    if (this.c[p] && this.c[p][h]) {
+        delete this.c[p][h];
     }
     var a = 0;
-    for (var i in M.c[p]) {
+    for (var i in this.c[p]) {
         a++;
         break;
     }
-    if (a == 0) {
-        delete M.c[p];
+    if (!a) {
+        delete this.c[p];
         if (fminitialized) {
             $('#treea_' + p).removeClass('contains-folders');
         }
@@ -175,17 +181,17 @@ MegaData.prototype.getPath = function(id) {
             id = 'shares';
         }
 
-        if (inshare && !M.d[id]) {
+        if (inshare && !this.d[id]) {
             // we reached the inshare root, use the owner next
             id = inshare;
         }
 
         if (
-            M.d[id]
+            this.d[id]
             || (id === 'contacts')
             || (id === 'messages')
             || (id === 'shares')
-            || (id === M.InboxID)
+            || (id === this.InboxID)
             || (id === 'opc')
             || (id === 'ipc')
         ) {
@@ -213,7 +219,7 @@ MegaData.prototype.getPath = function(id) {
                 break;
             }
 
-            inshare = M.d[id].su;
+            inshare = this.d[id].su;
             id = this.d[id].p;
         }
     }
@@ -228,7 +234,7 @@ MegaData.prototype.clearRubbish = function(sel) {
         console.time('clearRubbish');
     }
     var selids = Object.create(null);
-    var c = this.c[sel === false ? M.RubbishID : M.currentdirid];
+    var c = this.c[sel === false ? this.RubbishID : this.currentdirid];
     var reqs = 0;
 
     if (sel && $.selected) {
@@ -368,16 +374,12 @@ MegaData.prototype.injectNodes = function(nodes, target, callback) {
  * @param {Array}       [tree]        optional tree from M.getCopyNodes
  */
 MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
+    var todel = [];
+
     if (typeof promise === 'function') {
         var tmp = promise;
         promise = new MegaPromise();
         promise.always(tmp);
-    }
-
-    if ($.onImportCopyNodes && t.length === 11) {
-        msgDialog('warninga', l[135], 'Operation not permitted.');
-        promise.reject(EARGS);
-        return promise;
     }
 
     loadingDialog.pshow();
@@ -388,7 +390,7 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
             loadingDialog.phide();
 
             if (u_pubkeys[t]) {
-                M.copyNodes(cn, t, del, promise);
+                M.copyNodes(cn, t, del, promise, tree);
             }
             else {
                 alert(l[200]);
@@ -411,16 +413,46 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
             tree = $.onImportCopyNodes;
         }
         else {
-            M.getCopyNodes(cn, t)
+            // 1. get all nodes into memory
+            this.getCopyNodes(cn, t, function() {
+                    var promise = new MegaPromise();
+
+                    // 2. check for conflicts
+                    fileconflict.check(cn, t, 'copy')
+                        .always(function(files) {
+                            var names = Object.create(null);
+                            for (var i = files.length; i--;) {
+                                var n = files[i];
+
+                                names[n.h] = n.name;
+
+                                if (n._replaces) {
+                                    todel.push(n._replaces);
+                                }
+                            }
+
+                            // 3. in case of new names, provide them back to getCopyNodes
+                            promise.resolve(names);
+                        });
+
+                    return promise;
+                })
                 .always(function _(tree) {
                     assert(tree, 'No tree provided...');
+
                     loadingDialog.phide();
+
+                    // 4. Store those nodes the user want to replace
+                    tree.todel = todel.length && todel;
+
+                    // 5. Provide the final tree back to copyNodes() and continue
                     M.copyNodes(cn, t, del, promise, tree);
                 });
 
             return promise;
         }
     }
+    todel = tree.todel;
 
     var a = tree;
     var importNodes = Object(a).length;
@@ -429,6 +461,10 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
     var ops = {a: 'p', t: t, n: a}; // FIXME: deploy API-side sn check
 
     var onCopyNodesDone = function() {
+        if (todel && todel.length) {
+            M.moveNodes(todel, M.RubbishID, true);
+        }
+
         loadingDialog.phide();
         if (promise) {
             promise.resolve(0);
@@ -449,14 +485,14 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
     if (sconly) {
         ops.v = 3;
         ops.i = mRandomToken('pn');
-        M.scAckQueue[ops.i] = onCopyNodesDone;
+        this.scAckQueue[ops.i] = onCopyNodesDone;
     }
     else {
         // ops.v = 2;
         ops.i = requesti;
     }
 
-    var s = M.getShareNodesSync(t);
+    var s = this.getShareNodesSync(t);
 
     if (s.length) {
         ops.cr = crypto_makecr(a, s, false);
@@ -534,17 +570,23 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
 
 /**
  * Move nodes.
- * @param {Array} n   Array of node handles
- * @param {String} t  Target folder node handle
+ * @param {Array}   n      Array of node handles
+ * @param {String}  t      Target folder node handle
+ * @param {Boolean} quiet  omit loading overlay
  * @returns {MegaPromise}
  */
-MegaData.prototype.moveNodes = function moveNodes(n, t) {
+MegaData.prototype.moveNodes = function moveNodes(n, t, quiet) {
     var promise = new MegaPromise();
 
-    loadingDialog.pshow();
+    if (!quiet) {
+        loadingDialog.pshow();
+    }
     dbfetch.coll(n.concat(t))
         .always(function() {
+            newnodes = [];
+            var todel = [];
             var pending = {value: 0};
+            var names = Object.create(null);
             var apiReq = function(apireq, h) {
                 pending.value++;
 
@@ -583,6 +625,10 @@ MegaData.prototype.moveNodes = function moveNodes(n, t) {
                                 removeUInode(h, parent);
                                 M.nodeUpdated(node);
                                 newnodes.push(node);
+
+                                if (names[h]) {
+                                    M.rename(h, names[h]);
+                                }
                             }
                         }
 
@@ -594,14 +640,25 @@ MegaData.prototype.moveNodes = function moveNodes(n, t) {
                                 // wait for the packet to do so if the operation succeed here.
                                 setsn(currsn);
 
-                                renderPromise = renderNew();
+                                if (is_mobile) {
+                                    // A hook for the mobile web to remove the node from the view and close the dialog
+                                    mobile.deleteOverlay.completeDeletionProcess(ctx.handle);
+                                }
+                                else {
+                                    renderPromise = renderNew();
+                                }
                             }
 
                             renderPromise.always(function() {
                                 Soon(fmtopUI);
                                 $.tresizer();
 
-                                loadingDialog.phide();
+                                if (!quiet) {
+                                    loadingDialog.phide();
+                                }
+                                if (todel && todel.length) {
+                                    M.moveNodes(todel, M.RubbishID, true);
+                                }
                                 promise.resolve();
                             });
                         }
@@ -609,17 +666,36 @@ MegaData.prototype.moveNodes = function moveNodes(n, t) {
                 });
             };
 
-            for (var i = 0; i < n.length; i++) {
-                var h = n[i];
+            var foreach = function(handles) {
+                for (var i = handles.length; i--;) {
+                    var h = handles[i];
 
-                var apireq = {
-                    a: 'm',
-                    n: h,
-                    t: t,
-                    i: requesti
-                };
-                processmove(apireq);
-                apiReq(apireq, h);
+                    var apireq = {
+                        a: 'm',
+                        n: h,
+                        t: t,
+                        i: requesti
+                    };
+                    processmove(apireq);
+                    apiReq(apireq, h);
+                }
+            };
+
+            if (t !== M.RubbishID) {
+                fileconflict.check(n, t, 'move')
+                    .always(function(files) {
+                        var handles = files.map(function(n) {
+                            names[n.h] = n.name;
+                            if (n._replaces) {
+                                todel.push(n._replaces);
+                            }
+                            return n.h;
+                        });
+                        foreach(handles);
+                    });
+            }
+            else {
+                foreach(n);
             }
         });
 
@@ -705,8 +781,8 @@ MegaData.prototype.nodeUpdated = function(n, ignoreDB) {
             }
         }
 
-        if (M.nn && n.name) {
-            M.nn[n.h] = n.name;
+        if (this.nn && n.name) {
+            this.nn[n.h] = n.name;
         }
 
         // sync missingkeys with this node's key status
@@ -726,12 +802,12 @@ MegaData.prototype.nodeUpdated = function(n, ignoreDB) {
 
         // maintain special incoming shares index
         if (n.su) {
-            if (!M.c[n.su]) {
-                M.c[n.su] = [];
+            if (!this.c[n.su]) {
+                this.c[n.su] = [];
             }
-            M.c[n.su][n.h] = n.t + 1;
+            this.c[n.su][n.h] = n.t + 1;
 
-            if (!M.c.shares[n.h]) {
+            if (!this.c.shares[n.h]) {
                 if (n.sk && !u_sharekeys[n.h]) {
                     // extract sharekey from node's sk property
                     var k = crypto_process_sharekey(n.h, n.sk);
@@ -740,16 +816,16 @@ MegaData.prototype.nodeUpdated = function(n, ignoreDB) {
                     }
                 }
 
-                M.c.shares[n.h] = {su: n.su, r: n.r, t: n.h};
+                this.c.shares[n.h] = {su: n.su, r: n.r, t: n.h};
 
                 if (u_sharekeys[n.h]) {
-                    M.c.shares[n.h].sk = a32_to_base64(u_sharekeys[n.h][0]);
+                    this.c.shares[n.h].sk = a32_to_base64(u_sharekeys[n.h][0]);
                 }
 
                 if (fmdb && !ignoreDB) {
                     fmdb.add('s', {
                         o_t: n.su + '*' + n.h,
-                        d: M.c.shares[n.h]
+                        d: this.c.shares[n.h]
                     });
                 }
             }
@@ -793,7 +869,7 @@ MegaData.prototype.onRenameUIUpdate = function(itemHandle, newItemName) {
 };
 
 MegaData.prototype.rename = function(itemHandle, newItemName) {
-    var n = M.d[itemHandle];
+    var n = this.d[itemHandle];
     if (n) {
         n.name = newItemName;
         api_setattr(n, mRandomToken('mv'));
@@ -848,7 +924,7 @@ MegaData.prototype.colourLabelDomUpdate = function(handle, value) {
 
         if (labelId) {
             // Add colour label classes.
-            var colourClass = 'colour-label ' + M.getColourClassFromId(labelId);
+            var colourClass = 'colour-label ' + this.getColourClassFromId(labelId);
 
             $('#' + handle).addClass(colourClass);
             $('#' + handle + ' a').addClass(colourClass);
@@ -960,8 +1036,8 @@ MegaData.prototype.isFavourite = function(nodesId) {
 };
 
 MegaData.prototype.getNode = function(idOrObj) {
-    if (isString(idOrObj) === true && M.d[idOrObj]) {
-        return M.d[idOrObj];
+    if (isString(idOrObj) === true && this.d[idOrObj]) {
+        return this.d[idOrObj];
     }
     else if (idOrObj && typeof(idOrObj.t) !== 'undefined') {
         return idOrObj;
@@ -1014,10 +1090,10 @@ MegaData.prototype.getNodesSync = function fm_getnodessync(root, includeroot, ex
 
         while (i--) {
             // must exist and optionally be fully decrypted to qualify
-            if (M.d[parents[i]] && (!excludebad || !M.d[parents[i]].a)) {
+            if (this.d[parents[i]] && (!excludebad || !this.d[parents[i]].a)) {
                 nodes.push(parents[i]);
-                if (M.c[parents[i]]) {
-                    newparents = newparents.concat(Object.keys(M.c[parents[i]]));
+                if (this.c[parents[i]]) {
+                    newparents = newparents.concat(Object.keys(this.c[parents[i]]));
                 }
             }
         }
@@ -1036,17 +1112,28 @@ MegaData.prototype.getNodesSync = function fm_getnodessync(root, includeroot, ex
  * Get all clean (decrypted) subtrees under cn
  * FIXME: return total number of nodes omitted because of decryption issues
  *
- * @param {Array}        handles  Node handles
- * @param {Array|String} [hadd]   Additional node handles to fetch, not included in the result
+ * @param {Array}           handles Node handles
+ * @param {Array|String}    [hadd]  Additional node handles to fetch, not included in the result
+ * @param {Object|Function} [names] Object containing handle:name to perform renaming over these nodes,
+ *                                  or a function returning a promise which will be fulfilled with them.
  * @returns {MegaPromise}
  */
-MegaData.prototype.getCopyNodes = function fm_getcopynodes(handles, hadd) {
+MegaData.prototype.getCopyNodes = function fm_getcopynodes(handles, hadd, names) {
     var promise = new MegaPromise();
 
     dbfetch.coll(handles.concat(hadd || []))
         .always(function() {
-            var result = M.getCopyNodesSync(handles);
-            promise.resolve(result);
+            var sync = function(names) {
+                var result = M.getCopyNodesSync(handles, names);
+                promise.resolve(result);
+            };
+
+            if (typeof names === 'function') {
+                names().done(sync);
+            }
+            else {
+                sync(names);
+            }
         });
 
     return promise;
@@ -1056,10 +1143,11 @@ MegaData.prototype.getCopyNodes = function fm_getcopynodes(handles, hadd) {
  * Get all clean (decrypted) subtrees under cn
  * FIXME: return total number of nodes omitted because of decryption issues
  *
- * @param handles
+ * @param {Array} handles An array of node's handles
+ * @param {Object} [names] Object containing handle:name to perform renaming over these nodes
  * @returns {Array}
  */
-MegaData.prototype.getCopyNodesSync = function fm_getcopynodesync(handles) {
+MegaData.prototype.getCopyNodesSync = function fm_getcopynodesync(handles, names) {
     var a = [];
     var r = [];
     var i, j;
@@ -1086,6 +1174,12 @@ MegaData.prototype.getCopyNodesSync = function fm_getcopynodesync(handles) {
         // copied files must retain their existing key
         if (!n.t) {
             nn.k = n.k;
+        }
+
+        // check if renaming should be done
+        if (names && names[n.h]) {
+            n = clone(n);
+            n.name = fm_safename(names[n.h]);
         }
 
         // new node inherits all attributes
@@ -1139,13 +1233,13 @@ MegaData.prototype.getShareNodes = function fm_getsharenodes(h, root) {
  */
 MegaData.prototype.getShareNodesSync = function fm_getsharenodessync(h, root) {
     var sn = [];
-    var n = M.d[h];
+    var n = this.d[h];
 
     while (n && n.p) {
         if (u_sharekeys[n.h]) {
             sn.push(n.h);
         }
-        n = M.d[n.p];
+        n = this.d[n.p];
     }
 
     if (root) {
@@ -1165,7 +1259,7 @@ MegaData.prototype.getShareNodesSync = function fm_getsharenodessync(h, root) {
  * @private
  */
 MegaData.prototype._everyTypeFile = function(element, index, array) {
-    var node = M.getNode(element);
+    var node = this.getNode(element);
     return node && node.t === 0;
 };
 
@@ -1179,7 +1273,7 @@ MegaData.prototype._everyTypeFile = function(element, index, array) {
  * @private
  */
 MegaData.prototype._everyTypeFolder = function(element, index, array) {
-    var node = M.getNode(element);
+    var node = this.getNode(element);
     return node && node.t === 1;
 };
 
@@ -1220,9 +1314,11 @@ MegaData.prototype.isFolder = function(nodesId) {
  * @return {Object} the share object, or false if not found.
  */
 MegaData.prototype.getNodeShare = function(node, user) {
+    "use strict";
+
     user = user || 'EXP';
 
-    if (typeof node != 'object') {
+    if (typeof node !== 'object') {
         node = this.getNodeByHandle(node);
     }
 
@@ -1240,6 +1336,8 @@ MegaData.prototype.getNodeShare = function(node, user) {
  * @return {Array} users list
  */
 MegaData.prototype.getNodeShareUsers = function(node, exclude) {
+    "use strict";
+
     var result = [];
 
     if (typeof node !== 'object') {
@@ -1272,6 +1370,8 @@ MegaData.prototype.getNodeShareUsers = function(node, exclude) {
  * @returns {Array} an array of user-handles/objects
  */
 MegaData.prototype.getSharingUsers = function(nodes, userobj) {
+    "use strict";
+
     var users = [];
 
     if (!Array.isArray(nodes)) {
@@ -1288,7 +1388,7 @@ MegaData.prototype.getSharingUsers = function(nodes, userobj) {
 
         // outbound shares
         if (node.shares) {
-            users = users.concat(M.getNodeShareUsers(node, 'EXP'));
+            users = users.concat(this.getNodeShareUsers(node, 'EXP'));
         }
 
         // inbound shares
@@ -1297,8 +1397,8 @@ MegaData.prototype.getSharingUsers = function(nodes, userobj) {
         }
 
         // outbound pending shares
-        if (M.ps[node.h]) {
-            users = users.concat(Object.keys(M.ps[node.h]));
+        if (this.ps[node.h]) {
+            users = users.concat(Object.keys(this.ps[node.h]));
         }
     }
 
@@ -1314,6 +1414,8 @@ MegaData.prototype.getSharingUsers = function(nodes, userobj) {
 };
 
 MegaData.prototype.nodeShare = function(h, s, ignoreDB) {
+    "use strict";
+
     // TODO: having moved to promises, ensure all calls are safe...
     if (!this.d[h]) {
         return dbfetch.get(h)
@@ -1326,9 +1428,10 @@ MegaData.prototype.nodeShare = function(h, s, ignoreDB) {
                 }
             });
     }
+
     if (this.d[h]) {
-        if (typeof this.d[h].shares == 'undefined') {
-            this.d[h].shares = [];
+        if (typeof this.d[h].shares === 'undefined') {
+            this.d[h].shares = Hash('Shares');
         }
         this.d[h].shares[s.u] = s;
 
@@ -1377,7 +1480,9 @@ MegaData.prototype.nodeShare = function(h, s, ignoreDB) {
  *                       owner share key must be removed too.
  */
 MegaData.prototype.delNodeShare = function(h, u, okd) {
-    if (this.d[h] && typeof this.d[h].shares != 'undefined') {
+    "use strict";
+
+    if (this.d[h] && typeof this.d[h].shares !== 'undefined') {
         var updnode;
 
         if (this.su[u]) {
@@ -1415,7 +1520,7 @@ MegaData.prototype.delNodeShare = function(h, u, okd) {
         }
 
         if (updnode) {
-            M.nodeUpdated(this.d[h]);
+            this.nodeUpdated(this.d[h]);
 
             if (fminitialized) {
                 sharedUInode(h);
@@ -1449,17 +1554,19 @@ MegaData.prototype.delNodeShare = function(h, u, okd) {
  * @return {Object} The user object, of false if not found
  */
 MegaData.prototype.getUserByHandle = function(handle) {
+    "use strict";
+
     var user = false;
 
-    if (Object(M.u).hasOwnProperty(handle)) {
-        user = M.u[handle];
+    if (Object(this.u).hasOwnProperty(handle)) {
+        user = this.u[handle];
 
         if (user instanceof MegaDataObject) {
             user = user._data;
         }
     }
-    else if (Object(M.opc).hasOwnProperty(handle)) {
-        user = M.opc[handle];
+    else if (this.opc[handle]) {
+        user = this.opc[handle];
     }
 
     if (!user && handle === u_handle) {
@@ -1499,6 +1606,8 @@ MegaData.prototype.getUserByEmail = function(email) {
  * @return {Object} The user object, of false if not found
  */
 MegaData.prototype.getUser = function(str) {
+    "use strict";
+
     var user = false;
 
     if (typeof str !== 'string') {
@@ -1527,6 +1636,8 @@ MegaData.prototype.getUser = function(str) {
  * @return {String} the name, of an empty string if not found
  */
 MegaData.prototype.getNameByHandle = function(handle) {
+    "use strict";
+
     var result = '';
 
     handle = String(handle);
@@ -1556,13 +1667,15 @@ MegaData.prototype.getNameByHandle = function(handle) {
  * @return {Object} The node object, of false if not found
  */
 MegaData.prototype.getNodeByHandle = function(handle) {
-    if (Object(M.d).hasOwnProperty(handle)) {
-        return M.d[handle];
+    "use strict";
+
+    if (this.d[handle]) {
+        return this.d[handle];
     }
 
-    for (var i = M.v.length; i--;) {
-        if (M.v[i].h === handle) {
-            return M.v[i];
+    for (var i = this.v.length; i--;) {
+        if (this.v[i].h === handle) {
+            return this.v[i];
         }
     }
 
@@ -1575,13 +1688,15 @@ MegaData.prototype.getNodeByHandle = function(handle) {
  * @return {Object} The parent handle, of false if not found
  */
 MegaData.prototype.getNodeParent = function(node) {
+    "use strict";
+
     if (typeof node === 'string') {
         node = this.getNodeByHandle(node);
     }
 
     if (node && node.su) {
         // This might be a nested inshare, only return the parent as long it does exists.
-        return M.d[node.p] ? node.p : 'shares';
+        return this.d[node.p] ? node.p : 'shares';
     }
 
     return node && node.p || false;
@@ -1591,12 +1706,14 @@ MegaData.prototype.getNodeParent = function(node) {
  * Retrieve dashboard statistics data
  */
 MegaData.prototype.getDashboardData = function() {
-    var res = Object.create(null);
-    var s = M.account.stats;
+    "use strict";
 
-    res.files = {cnt: s[M.RootID].files, size: s[M.RootID].bytes};
-    res.folders = {cnt: s[M.RootID].folders, size: s[M.RootID].fsize};
-    res.rubbish = {cnt: s[M.RubbishID].files, size: s[M.RubbishID].bytes};
+    var res = Object.create(null);
+    var s = this.account.stats;
+
+    res.files = {cnt: s[this.RootID].files, size: s[this.RootID].bytes};
+    res.folders = {cnt: s[this.RootID].folders, size: s[this.RootID].fsize};
+    res.rubbish = {cnt: s[this.RubbishID].files, size: s[this.RubbishID].bytes};
     res.ishares = {cnt: s.inshares.items, size: s.inshares.bytes};
     res.oshares = {cnt: s.outshares.items, size: s.outshares.bytes};
     res.links = {cnt: s.links.files, size: s.links.bytes};
@@ -1610,6 +1727,8 @@ MegaData.prototype.getDashboardData = function() {
  * @return {Boolean}
  */
 MegaData.prototype.isFileNode = function(n) {
+    "use strict";
+
     return crypto_keyok(n) && !n.t;
 };
 
@@ -1623,15 +1742,19 @@ MegaData.prototype.isFileNode = function(n) {
  *
  */
 MegaData.prototype.deletePendingShare = function(nodeHandle, pendingContactId) {
+    "use strict";
+
     if (this.d[nodeHandle]) {
 
         if (this.ps[nodeHandle] && this.ps[nodeHandle][pendingContactId]) {
-            M.delPS(pendingContactId, nodeHandle);
+            this.delPS(pendingContactId, nodeHandle);
         }
     }
 };
 
 MegaData.prototype.emptySharefolderUI = function(lSel) {
+    "use strict";
+
     if (!lSel) {
         lSel = this.fsViewSel;
     }
@@ -1643,4 +1766,3 @@ MegaData.prototype.emptySharefolderUI = function(lSel) {
 
     $.tresizer();
 };
-

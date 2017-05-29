@@ -37,9 +37,9 @@ MegaData.prototype.filterByParent = function(id) {
 
     if (id === 'shares') {
         this.v = [];
-        var inshares = Object.keys(M.c.shares || {});
+        var inshares = Object.keys(this.c.shares || {});
         for (i = inshares.length; i--;) {
-            node = M.d[inshares[i]] || false;
+            node = this.d[inshares[i]] || false;
 
             if (node.su && !this.d[node.p]) {
                 this.v.push(node);
@@ -48,9 +48,9 @@ MegaData.prototype.filterByParent = function(id) {
     }
     else if (id === 'contacts') {
         this.v = [];
-        var contacts = Object.keys(M.c.contacts || {});
+        var contacts = Object.keys(this.c.contacts || {});
         for (i = contacts.length; i--;) {
-            node = M.d[contacts[i]] || false;
+            node = this.d[contacts[i]] || false;
 
             if (node.c === 1) {
                 // Fill M.v with active contacts only
@@ -59,7 +59,7 @@ MegaData.prototype.filterByParent = function(id) {
         }
     }
     // We should have a parent's childs into M.c, no need to traverse the whole M.d
-    else if (M.c[id]) {
+    else if (this.c[id]) {
         this.v = [];
         for (var handle in this.c[id]) {
             if (this.d[handle]) {
@@ -85,10 +85,10 @@ MegaData.prototype.filterBySearch = function(str) {
         if (command === 'findupes') {
             var nodesByHash = {};
 
-            for (var node in M.d) {
-                node = M.d[node];
+            for (var node in this.d) {
+                node = this.d[node];
 
-                if (node && node.hash && node.h && RootbyId(node.h) === M.RootID) {
+                if (node && node.hash && node.h && RootbyId(node.h) === this.RootID) {
                     if (!nodesByHash[node.hash]) {
                         nodesByHash[node.hash] = [];
                     }
@@ -100,19 +100,19 @@ MegaData.prototype.filterBySearch = function(str) {
                 return nodesByHash[hash].length > 1;
             });
 
-            M.v = [];
+            this.v = [];
             for (var i in dupes) {
-                M.v = M.v.concat(nodesByHash[dupes[i]]);
+                this.v = this.v.concat(nodesByHash[dupes[i]]);
             }
 
-            if (M.overrideModes) {
-                M.overrideModes = 0;
-                M.overrideViewMode = 1;
-                M.overrideSortMode = ['size', -1];
+            if (this.overrideModes) {
+                this.overrideModes = 0;
+                this.overrideViewMode = 1;
+                this.overrideSortMode = ['size', -1];
             }
 
-            // Wait for M.openFolder to finish and set colors to matching hashes
-            M.onRenderFinished = function() {
+            // Wait for this.openFolder to finish and set colors to matching hashes
+            this.onRenderFinished = function() {
                 var find = M.viewmode ? 'a' : 'tr';
                 $(window).trigger('dynlist.flush');
                 $(M.fsViewSel).find(find).each(function() {
@@ -166,8 +166,7 @@ MegaData.prototype.getFilterBySearchFn = function(searchTerm) {
         try {
             regex = RegExp(str.replace(/(\W)/g, '\\$1').replace(/\\\*/g, '.*'), 'i');
         }
-        catch (ex) {
-        }
+        catch (ex) {}
     }
 
     if (regex) {

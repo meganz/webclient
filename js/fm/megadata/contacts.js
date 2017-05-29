@@ -2,13 +2,13 @@ MegaData.prototype.contactstatus = function(h, wantTimeStamp) {
     var folders = 0;
     var files = 0;
     var ts = 0;
-    if (M.d[h]) {
-        if (!wantTimeStamp || !M.d[h].ts) {
+    if (this.d[h]) {
+        if (!wantTimeStamp || !this.d[h].ts) {
             // FIXME: include root?
-            var a = M.getNodesSync(h);
+            var a = this.getNodesSync(h);
 
             for (var i = a.length; i--;) {
-                var n = M.d[a[i]];
+                var n = this.d[a[i]];
                 if (n) {
                     if (ts < n.ts) {
                         ts = n.ts;
@@ -21,12 +21,12 @@ MegaData.prototype.contactstatus = function(h, wantTimeStamp) {
                     }
                 }
             }
-            if (!M.d[h].ts) {
-                M.d[h].ts = ts;
+            if (!this.d[h].ts) {
+                this.d[h].ts = ts;
             }
         }
         else {
-            ts = M.d[h].ts;
+            ts = this.d[h].ts;
         }
     }
 
@@ -68,7 +68,7 @@ MegaData.prototype.onlineStatusEvent = function(u, status) {
             $.sortTreePanel.contacts.by === 'status'
         ) {
             // we need to resort
-            M.contacts();
+            this.contacts();
         }
 
         if (getSitePath() === "/fm/" + u.u) {
@@ -96,7 +96,7 @@ MegaData.prototype.drawReceivedContactRequests = function(ipc, clearGrid) {
         t = '.grid-table.contact-requests';
     var contactName = '';
 
-    if (M.currentdirid === 'ipc') {
+    if (this.currentdirid === 'ipc') {
 
         if (clearGrid) {
             $(t + ' tr').remove();
@@ -106,16 +106,16 @@ MegaData.prototype.drawReceivedContactRequests = function(ipc, clearGrid) {
             id = ipc[i].p;
             // Make sure that denied and ignored requests are shown properly
             // don't be fooled, we need M.ipc here and not ipc
-            if (M.ipc[id]) {
-                if (M.ipc[id].dts || (M.ipc[id].s && (M.ipc[id].s === 3))) {
+            if (this.ipc[id]) {
+                if (this.ipc[id].dts || (this.ipc[id].s && (this.ipc[id].s === 3))) {
                     type = 'deleted';
                 }
-                else if (M.ipc[id].s && M.ipc[id].s === 1) {
+                else if (this.ipc[id].s && this.ipc[id].s === 1) {
                     type = 'ignored';
                 }
                 trClass = (type !== '') ? ' class="' + type + '"' : '';
                 email = ipc[i].m;
-                contactName = M.getNameByHandle(ipc[i].p);
+                contactName = this.getNameByHandle(ipc[i].p);
 
                 if (ipc[i].ps && ipc[i].ps !== 0) {
                     ps = '<span class="contact-request-content">' + ipc[i].ps + ' ' + l[105] + ' ' + l[813] + '</span>';
@@ -166,8 +166,8 @@ MegaData.prototype.handleEmptyContactGrid = function() {
     var haveActiveContact = false;
 
     // If focus is on contacts tab
-    if (M.currentdirid === 'contacts') {
-        M.u.forEach(function(v, k) {
+    if (this.currentdirid === 'contacts') {
+        this.u.forEach(function(v, k) {
             if (v.c === 1) {
                 haveActiveContact = true;
                 return false; // break
@@ -201,7 +201,7 @@ MegaData.prototype.drawSentContactRequests = function(opc, clearGrid) {
         utcDateNow = Math.floor(Date.now() / 1000),
         t = '.grid-table.sent-requests';
 
-    if (M.currentdirid === 'opc') {
+    if (this.currentdirid === 'opc') {
 
         if (clearGrid) {
             $(t + ' tr').remove();
@@ -264,11 +264,56 @@ MegaData.prototype.drawSentContactRequests = function(opc, clearGrid) {
 };
 
 
+/**
+ * getContactsEMails
+ *
+ * Loop through all available contacts, full and pending ones (outgoing and incomming)
+ * and creates a list of contacts email addresses.
+ * @returns {Array} contacts, array of contacts email.
+ */
+MegaData.prototype.getContactsEMails = function() {
+    var contact;
+    var contacts = [];
+    var contactName;
+
+    // Loop through full contacts
+    M.u.forEach(function(contact) {
+        // Active contacts with email set
+        if (contact.c === 1 && contact.m) {
+            contacts.push({ id: contact.m, name: M.getNameByHandle(contact.u) });
+        }
+    });
+
+    // Loop through outgoing pending contacts
+    for (var k in M.opc) {
+        contact = M.opc[k];
+        contactName = M.getNameByHandle(M.opc[k].p);
+
+        // Is contact deleted
+        if (!contact.dts) {
+            contacts.push({ id: contact.m, name: contactName });
+        }
+    }
+
+    // Loop through incomming pending contacts
+    for (var m in M.ipc) {
+        contact = M.ipc[m];
+        contactName = M.getNameByHandle(M.ipc[m].p);
+
+        // Is there a email available
+        if (contact.m) {
+            contacts.push({ id: contact.m, name: contactName });
+        }
+    }
+
+    return contacts;
+}
+
 MegaData.prototype.getActiveContacts = function() {
     var res = [];
 
-    if (typeof M.c.contacts === 'object') {
-        Object.keys(M.c.contacts)
+    if (typeof this.c.contacts === 'object') {
+        Object.keys(this.c.contacts)
             .forEach(function(userHandle) {
                 if (Object(M.u[userHandle]).c === 1) {
                     res.push(userHandle);
@@ -330,7 +375,7 @@ MegaData.prototype.contacts = function() {
     for (i in activeContacts) {
         if (activeContacts.hasOwnProperty(i)) {
             if (megaChatIsReady && activeContacts[i].u) {
-                onlinestatus = M.onlineStatusClass(
+                onlinestatus = this.onlineStatusClass(
                     activeContacts[i].presence ? activeContacts[i].presence : 'unavailable'
                 );
             }
@@ -338,7 +383,7 @@ MegaData.prototype.contacts = function() {
                 onlinestatus = [l[5926], 'offline'];
             }
 
-            var name = M.getNameByHandle(activeContacts[i].u);
+            var name = this.getNameByHandle(activeContacts[i].u);
 
             if (!treesearch || name.toLowerCase().indexOf(treesearch.toLowerCase()) > -1) {
 
@@ -487,7 +532,7 @@ MegaData.prototype.getContactByEmail = function(email) {
 MegaData.prototype.syncUsersFullname = function(userId) {
     var self = this;
 
-    if (M.u[userId].firstName || M.u[userId].lastName) {
+    if (this.u[userId].firstName || this.u[userId].lastName) {
         // already loaded.
         return;
     }
@@ -751,7 +796,7 @@ MegaData.prototype.checkInviteContactPrerequisites = function(email) {
     // Check pending invitations
     var opc = M.opc;
     for (var i in opc) {
-        if (M.opc[i].m === email) {
+        if (this.opc[i].m === email) {
 //                if (opc[i].rts + TIME_FRAME <= Math.floor(new Date().getTime() / 1000)) {
             return 0;
 //                }
@@ -927,9 +972,9 @@ MegaData.prototype.ipcRequestMessageHandler = function(errorCode) {
 };
 
 MegaData.prototype.checkIpcRequestPrerequisites = function(id) {
-    var ipc = M.ipc;
+    var ipc = this.ipc;
     for (var i in ipc) {
-        if (M.ipc[i].p === id) {
+        if (this.ipc[i].p === id) {
             return -0;
         }
     }
@@ -951,8 +996,8 @@ MegaData.prototype.ignorePendingContactRequest = function(id) {
 
 // Searches M.opc for the pending contact
 MegaData.prototype.findOutgoingPendingContactIdByEmail = function(email) {
-    for (var index in M.opc) {
-        var opc = M.opc[index];
+    for (var index in this.opc) {
+        var opc = this.opc[index];
 
         if (opc.m === email) {
             return opc.p;

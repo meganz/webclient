@@ -495,16 +495,13 @@ mobile.cloud = {
 
         // Loop through all known nodes
         for (var nodeHandle in M.d) {
-            if (M.d.hasOwnProperty(nodeHandle)) {
+            var node = M.d[nodeHandle];
+            var nodeType = node.t;
+            var nodeSize = node.s;
 
-                var node = M.d[nodeHandle];
-                var nodeType = node.t;
-                var nodeSize = node.s;
-
-                // If node is a file type, update the total
-                if (nodeType === 0) {
-                    fileSizesTotal += nodeSize;
-                }
+            // If node is a file type, update the total
+            if (nodeType === 0) {
+                fileSizesTotal += nodeSize;
             }
         }
 
@@ -689,30 +686,27 @@ mobile.cloud = {
 
         // Loop all known nodes
         for (var nodeHandle in M.d) {
-            if (M.d.hasOwnProperty(nodeHandle)) {
+            var node = M.d[nodeHandle];
+            var parentHandle = node.p;
+            var nodeType = node.t;
 
-                var node = M.d[nodeHandle];
-                var parentHandle = node.p;
-                var nodeType = node.t;
+            // If the key is not set
+            if (typeof folderAndFileCounts[parentHandle] === 'undefined') {
 
-                // If the key is not set
-                if (typeof folderAndFileCounts[parentHandle] === 'undefined') {
+                // Set the key to the parent handle and us an object to hold the number of folders and files
+                folderAndFileCounts[parentHandle] = {
+                    folders: 0,
+                    files: 0
+                };
+            }
 
-                    // Set the key to the parent handle and us an object to hold the number of folders and files
-                    folderAndFileCounts[parentHandle] = {
-                        folders: 0,
-                        files: 0
-                    };
-                }
-
-                // Increment the total for a folder found with this parent
-                if (nodeType) {
-                    folderAndFileCounts[parentHandle].folders += 1;
-                }
-                else {
-                    // Otherwise increment the total for a file found with this parent
-                    folderAndFileCounts[parentHandle].files += 1;
-                }
+            // Increment the total for a folder found with this parent
+            if (nodeType) {
+                folderAndFileCounts[parentHandle].folders += 1;
+            }
+            else {
+                // Otherwise increment the total for a file found with this parent
+                folderAndFileCounts[parentHandle].files += 1;
             }
         }
 

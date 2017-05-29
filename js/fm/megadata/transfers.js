@@ -56,22 +56,22 @@ MegaData.prototype.getDownloadFolderNodes = function(n, md, nodes, paths) {
         this.makeDir(n);
     }
 
-    var subids = M.getNodesSync(n);
+    var subids = this.getNodesSync(n);
 
     for (var j = 0; j < subids.length; j++) {
         var p = this.getPath(subids[j]);
         var path = '';
 
         for (var k = 0; k < p.length; k++) {
-            if (M.d[p[k]] && M.d[p[k]].t) {
-                path = fm_safename(M.d[p[k]].name) + '/' + path;
+            if (this.d[p[k]] && this.d[p[k]].t) {
+                path = fm_safename(this.d[p[k]].name) + '/' + path;
             }
             if (p[k] == n) {
                 break;
             }
         }
 
-        if (!M.d[subids[j]].t) {
+        if (!this.d[subids[j]].t) {
             nodes.push(subids[j]);
             paths[subids[j]] = path;
         }
@@ -226,10 +226,10 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
     if (!is_extension && !preview && !z && (dlMethod === MemoryIO || dlMethod === FlashIO)) {
         var nf = [], cbs = [];
         for (var i in n) {
-            if (M.d[n[i]] && M.d[n[i]].t) {
+            if (this.d[n[i]] && this.d[n[i]].t) {
                 var nn = [], pp = {};
                 this.getDownloadFolderNodes(n[i], false, nn, pp);
-                cbs.push(this.addDownload.bind(this, nn, 0x21f9A, pp, M.d[n[i]].name));
+                cbs.push(this.addDownload.bind(this, nn, 0x21f9A, pp, this.d[n[i]].name));
             }
             else {
                 nf.push(n[i]);
@@ -251,8 +251,8 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
     }
     else {
         for (var i in n) {
-            if (M.d[n[i]]) {
-                if (M.d[n[i]].t) {
+            if (this.d[n[i]]) {
+                if (this.d[n[i]].t) {
                     this.getDownloadFolderNodes(n[i], !!z, nodes, paths);
                 }
                 else {
@@ -267,8 +267,8 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
 
     if (z) {
         z = ++dlmanager.dlZipID;
-        if (M.d[n[0]] && M.d[n[0]].t && M.d[n[0]].name) {
-            zipname = fm_safename(M.d[n[0]].name) + '.zip';
+        if (this.d[n[0]] && this.d[n[0]].t && this.d[n[0]].name) {
+            zipname = fm_safename(this.d[n[0]].name) + '.zip';
         }
         else {
             zipname = (zipname || ('Archive-' + Math.random().toString(16).slice(-4))) + '.zip';
@@ -292,7 +292,7 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
     var ttl = this.getTransferTableLengths();
     for (var k in nodes) {
         /* jshint -W089 */
-        if (!nodes.hasOwnProperty(k) || !this.isFileNode((n = M.d[nodes[k]]))) {
+        if (!nodes.hasOwnProperty(k) || !this.isFileNode((n = this.d[nodes[k]]))) {
             n = nodes[k];
             if (this.isFileNode(n)) {
                 dlmanager.logger.info('Using plain provided node object.');
@@ -393,7 +393,7 @@ MegaData.prototype.onDownloadAdded = function(added, isPaused, isZIP, zipSize) {
     delay('fm_tfsupdate', fm_tfsupdate); // this will call $.transferHeader();
 
     if (!isZIP || zipSize) {
-        M.addDownloadToast = ['d', isZIP ? 1 : added, isPaused];
+        this.addDownloadToast = ['d', isZIP ? 1 : added, isPaused];
     }
     openTransfersPanel();
     initGridScrolling();
@@ -685,10 +685,10 @@ MegaData.prototype.dlerror = function(dl, error) {
 MegaData.prototype.dlstart = function(dl) {
     var id = (dl.zipid ? 'zip_' + dl.zipid : 'dl_' + dl.dl_id);
 
-    if (M.tfsdomqueue[id]) {
+    if (this.tfsdomqueue[id]) {
         // flush the transfer from the DOM queue
-        addToTransferTable(id, M.tfsdomqueue[id]);
-        delete M.tfsdomqueue[id];
+        addToTransferTable(id, this.tfsdomqueue[id]);
+        delete this.tfsdomqueue[id];
     }
 
     $('.transfer-table #' + id)
@@ -700,7 +700,7 @@ MegaData.prototype.dlstart = function(dl) {
     ASSERT(typeof dl_queue[dl.pos] !== 'object' || dl.n == dl_queue[dl.pos].n, 'No matching dl_queue entry...');
     if (typeof dl_queue[dl.pos] === 'object') {
         fm_tfsupdate(); // this will call $.transferHeader()
-        M.dlprogress(id, 0, 0, 0, 0, dl.pos);
+        this.dlprogress(id, 0, 0, 0, 0, dl.pos);
         if (mega.ui.tpp.getTime('dl') === 0) {
             mega.ui.tpp.setTime(NOW(), 'dl');
         }
@@ -709,14 +709,14 @@ MegaData.prototype.dlstart = function(dl) {
 };
 
 MegaData.prototype.doFlushTransfersDynList = function(aNumNodes) {
-    aNumNodes = Object.keys(M.tfsdomqueue).slice(0, aNumNodes | 0);
+    aNumNodes = Object.keys(this.tfsdomqueue).slice(0, aNumNodes | 0);
 
     if (aNumNodes.length) {
         for (var i = 0, l = aNumNodes.length; i < l; ++i) {
             var item = aNumNodes[i];
 
-            addToTransferTable(item, M.tfsdomqueue[item], 1);
-            delete M.tfsdomqueue[item];
+            addToTransferTable(item, this.tfsdomqueue[item], 1);
+            delete this.tfsdomqueue[item];
         }
 
         $.tresizer();
@@ -916,9 +916,7 @@ MegaData.prototype.addUpload = function(u, ignoreWarning) {
     }
     var target;
     var onChat;
-    var filesize;
     var added = 0;
-    var f;
     var ul_id;
     var pause = '';
     var pauseTxt = '';
@@ -928,21 +926,21 @@ MegaData.prototype.addUpload = function(u, ignoreWarning) {
         target = $.onDroppedTreeFolder;
         delete $.onDroppedTreeFolder;
     }
-    else if (String(M.currentdirid).length !== 8) {
-        target = M.lastSeenCloudFolder || M.RootID;
+    else if (String(this.currentdirid).length !== 8) {
+        target = this.lastSeenCloudFolder || this.RootID;
     }
     else {
-        target = M.currentdirid;
+        target = this.currentdirid;
     }
 
-    if ((onChat = (M.currentdirid && M.currentdirid.substr(0, 4) === 'chat'))) {
+    if ((onChat = (String(this.currentdirid).substr(0, 4) === 'chat'))) {
         if (!$.ulBunch) {
             $.ulBunch = Object.create(null);
         }
-        if (!$.ulBunch[M.currentdirid]) {
-            $.ulBunch[M.currentdirid] = Object.create(null);
+        if (!$.ulBunch[this.currentdirid]) {
+            $.ulBunch[this.currentdirid] = Object.create(null);
         }
-        target = M.currentdirid;
+        target = this.currentdirid;
     }
 
     if (uldl_hold) {
@@ -950,81 +948,143 @@ MegaData.prototype.addUpload = function(u, ignoreWarning) {
         pauseTxt = l[1651];
     }
 
-    for (var i in u) {
-        f = u[i];
-        try {
-            Object.defineProperty(f, 'name', {value: fm_safename(f.name)});
-        }
-        catch (e) {
-        }
-        try {
-            // this could throw NS_ERROR_FILE_NOT_FOUND
-            filesize = f.size;
-        }
-        catch (ex) {
-            ulmanager.logger.warn(f.name, ex);
-            continue;
-        }
-        ul_id = ++__ul_id;
-        if (!f.flashid) {
-            f.flashid = false;
-        }
-        f.target = target;
-        f.id = ul_id;
+    // Foreach the queue and start uploading
+    var startUpload = function(u) {
 
-        var gid = 'ul_' + ul_id;
-        this.addToTransferTable(gid, ttl,
-            '<tr id="' + gid + '" class="transfer-queued transfer-upload ' + pause + '">'
-            + '<td><div class="transfer-type upload">'
-            + '<ul><li class="right-c"><p><span></span></p></li><li class="left-c"><p><span></span></p></li></ul>'
-            + '</div></td>'
-            + '<td><span class="transfer-filetype-icon ' + fileIcon({name: f.name}) + '"></span>'
-            + '<span class="tranfer-filetype-txt">' + htmlentities(f.name) + '</span></td>'
-            + '<td>' + filetype(f.name) + '</td>'
-            + '<td>' + bytesToSize(filesize) + '</td>'
-            + '<td><span class="eta"></span><span class="speed">' + pauseTxt + '</span></td>'
-            + '<td><span class="transfer-status">' + l[7227] + '</span></td>'
-            + '<td class="grid-url-field"><a class="grid-url-arrow"></a>'
-            + '<a class="clear-transfer-icon"></a></td>'
-            + '<td><span class="row-number"></span></td>'
-            + '</tr>');
+        for (var i = u.length; i--;) {
+            var f = u[i];
+            var filesize = f.size;
 
-        ul_queue.push(f);
-        ttl.left--;
-        added++;
-        mega.ui.tpp.setTotal(1, 'ul');
+            ul_id = ++__ul_id;
+            if (!f.flashid) {
+                f.flashid = false;
+            }
+            f.target = f.target || target;
+            f.id = ul_id;
 
-        if (uldl_hold) {
-            fm_tfspause('ul_' + ul_id);
+            var gid = 'ul_' + ul_id;
+            this.addToTransferTable(gid, ttl,
+                '<tr id="' + gid + '" class="transfer-queued transfer-upload ' + pause + '">'
+                + '<td><div class="transfer-type upload">'
+                + '<ul><li class="right-c"><p><span></span></p></li>'
+                + '<li class="left-c"><p><span></span></p></li></ul>'
+                + '</div></td>'
+                + '<td><span class="transfer-filetype-icon ' + fileIcon({name: f.name}) + '"></span>'
+                + '<span class="tranfer-filetype-txt">' + htmlentities(f.name) + '</span></td>'
+                + '<td>' + filetype(f.name) + '</td>'
+                + '<td>' + bytesToSize(filesize) + '</td>'
+                + '<td><span class="eta"></span><span class="speed">' + pauseTxt + '</span></td>'
+                + '<td><span class="transfer-status">' + l[7227] + '</span></td>'
+                + '<td class="grid-url-field"><a class="grid-url-arrow"></a>'
+                + '<a class="clear-transfer-icon"></a></td>'
+                + '<td><span class="row-number"></span></td>'
+                + '</tr>');
+
+            ul_queue.push(f);
+            ttl.left--;
+            added++;
+            mega.ui.tpp.setTotal(1, 'ul');
+
+            if (uldl_hold) {
+                fm_tfspause('ul_' + ul_id);
+            }
+
+            if (onChat) {
+                f.chatid = target;
+                $.ulBunch[f.chatid][ul_id] = 1;
+            }
+        }
+        if (!added) {
+            ulmanager.logger.warn('Nothing added to upload.');
+            return;
+        }
+        if (!$.transferHeader) {
+            transferPanelUI();
+        }
+        if (page === 'start') {
+            ulQueue.pause();
+            uldl_hold = true;
+        }
+        else {
+            showTransferToast('u', added);
+            openTransfersPanel();
+            delay('fm_tfsupdate', fm_tfsupdate); // this will call $.transferHeader()
         }
 
-        if (onChat) {
-            $.ulBunch[M.currentdirid][ul_id] = 1;
+        setupTransferAnalysis();
+        if ((ulmanager.isUploading = Boolean(ul_queue.length))) {
+            $('.transfer-pause-icon').removeClass('disabled');
+            $('.transfer-clear-completed').removeClass('disabled');
+            $('.transfer-clear-all-icon').removeClass('disabled');
+        }
+    }.bind(this);
+
+    // Prepare uploads by creating their target path beforehand as needed for the new fileconflict logic
+    var paths = Object.create(null);
+
+    for (var i = u.length; i--;) {
+        var file = u[i];
+
+        if (file.path) {
+            paths[file.path] = null;
         }
     }
-    if (!added) {
-        ulmanager.logger.warn('Nothing added to upload.');
-        return;
-    }
-    if (!$.transferHeader) {
-        transferPanelUI();
-    }
-    if (page == 'start') {
-        ulQueue.pause();
-        uldl_hold = true;
-    }
-    else {
-        showTransferToast('u', added);
-        openTransfersPanel();
-        delay('fm_tfsupdate', fm_tfsupdate); // this will call $.transferHeader()
-    }
 
-    setupTransferAnalysis();
-    if ((ulmanager.isUploading = Boolean(ul_queue.length))) {
-        $('.transfer-pause-icon').removeClass('disabled');
-        $('.transfer-clear-completed').removeClass('disabled');
-        $('.transfer-clear-all-icon').removeClass('disabled');
-    }
+    // Make one folder at a time
+    var makeDir = function(path, target) {
+        var promise = new MegaPromise();
+        var safePath = fm_safepath(path);
+
+        if (String(target).substr(0, 4) === 'chat') {
+            target = M.RootID;
+            safePath = 'My chat files';
+        }
+
+        createFolder(target, safePath, new MegaPromise())
+            .always(function(target) {
+                if (typeof target === 'number') {
+                    ulmanager.logger.warn('Unable to create folder "%s" on target "%s"',
+                        path, target, api_strerror(target));
+                }
+                else {
+                    paths[path] = target;
+                }
+
+                promise.resolve();
+            });
+
+        return promise;
+    };
+
+    var makeDirPromise = new MegaPromise();
+    loadingDialog.show();
+
+    (function _md(paths) {
+        var path = paths.pop();
+
+        if (path) {
+            makeDir(path, target).done(_md.bind(null, paths))
+        }
+        else {
+            makeDirPromise.resolve();
+        }
+
+    })(Object.keys(paths));
+
+    makeDirPromise
+        .done(function() {
+            loadingDialog.hide();
+
+            for (var i = u.length; i--;) {
+                var file = u[i];
+
+                if (paths[file.path]) {
+                    file.target = paths[file.path];
+                }
+            }
+
+            fileconflict.check(u, target, 'upload').done(startUpload);
+        });
 };
 
 MegaData.prototype.ulprogress = function(ul, perc, bl, bt, bps) {
@@ -1183,7 +1243,7 @@ MegaData.prototype.ulstart = function(ul) {
 
     ul.starttime = new Date().getTime();
     fm_tfsupdate();// this will call $.transferHeader()
-    M.ulprogress(ul, 0, 0, 0);
+    this.ulprogress(ul, 0, 0, 0);
     if (mega.ui.tpp.getTime('ul') === 0) {
         mega.ui.tpp.setTime(NOW(), 'ul');
     }

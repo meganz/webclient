@@ -1,5 +1,5 @@
 MegaData.prototype.hasInboxItems = function() {
-    return $.len(M.c[M.InboxID] || {}) > 0;
+    return $.len(this.c[this.InboxID] || {}) > 0;
 };
 
 MegaData.prototype.getInboxUsers = function() {
@@ -13,7 +13,7 @@ MegaData.prototype.getInboxUsers = function() {
 };
 
 MegaData.prototype.getInboxItems = function() {
-    return M.getFilterBy(function(node) {
+    return this.getFilterBy(function(node) {
         return node.p === M.InboxID;
     });
 };

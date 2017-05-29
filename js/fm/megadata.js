@@ -68,6 +68,8 @@ Object.defineProperty(this, 'MEGA_USER_STRUCT', {
 
 
 function MegaData() {
+    "use strict";
+
     this.reset();
 
     this.csortd = -1;

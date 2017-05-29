@@ -94,15 +94,12 @@ MegaData.prototype.accountData = function(cb, blockui) {
                         }
                     }
 
-                    // calculate filelinks items/size
+                    // calculate public links items/size
                     var links = stats.links;
                     Object.keys(exp)
-                        .filter(function(h) {
-                            return M.d[h] && !M.d[h].t;
-                        })
                         .forEach(function(h) {
                             links.files++;
-                            links.bytes += M.d[h] && M.d[h].s || 0;
+                            links.bytes += Object(M.tree[h]).tb || M.d[h] && M.d[h].s || 0;
                         });
 
                     // If a subscription, get the timestamp it will be renewed

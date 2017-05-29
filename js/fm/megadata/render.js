@@ -3,6 +3,7 @@
  * @param {Boolean} aUpdate  Whether we're updating the list
  */
 MegaData.prototype.renderMain = function(aUpdate) {
+    "use strict";
 
     // If mobile render an update to the cloud
     if (is_mobile) {
@@ -28,13 +29,13 @@ MegaData.prototype.renderMain = function(aUpdate) {
 
     // Disable aUpdate flag if a new item was added to an empty
     // folder, so that MegaRender properly uses JSP container..
-    if (aUpdate && M.v.length === 1) {
+    if (aUpdate && this.v.length === 1) {
         aUpdate = false;
     }
 
     // Disable aUpdate flag if a new item was added to an empty
     // folder, so that MegaRender properly uses JSP container..
-    if (aUpdate && M.v.length === 1) {
+    if (aUpdate && this.v.length === 1) {
         aUpdate = false;
     }
 
@@ -100,9 +101,9 @@ MegaData.prototype.rmSetupUI = function(u) {
     }
     Soon(fmtopUI);
 
-    if (M.onRenderFinished) {
-        Soon(M.onRenderFinished);
-        delete M.onRenderFinished;
+    if (this.onRenderFinished) {
+        onIdle(this.onRenderFinished);
+        delete this.onRenderFinished;
     }
     $('.grid-scrolling-table .grid-url-arrow').rebind('click', function(e) {
         var target = $(this).closest('tr');
@@ -212,26 +213,26 @@ MegaData.prototype.rmSetupUI = function(u) {
 
 MegaData.prototype.renderShare = function(h) {
     var html = '';
-    if (M.d[h].shares) {
-        for (var u in M.d[h].shares) {
-            if (M.u[u]) {
+    if (this.d[h].shares) {
+        for (var u in this.d[h].shares) {
+            if (this.u[u]) {
                 var rt = '';
                 var sr = {r0: '', r1: '', r2: ''};
-                if (M.d[h].shares[u].r == 0) {
+                if (this.d[h].shares[u].r == 0) {
                     rt = l[55];
                     sr.r0 = ' active';
                 }
-                else if (M.d[h].shares[u].r == 1) {
+                else if (this.d[h].shares[u].r == 1) {
                     rt = l[56];
                     sr.r1 = ' active';
                 }
-                else if (M.d[h].shares[u].r == 2) {
+                else if (this.d[h].shares[u].r == 2) {
                     rt = l[57];
                     sr.r2 = ' active';
                 }
 
                 html += '<div class="add-contact-item" id="' + u + '"><div class="add-contact-pad">'
-                    + useravatar.contact(u) + 'span class="add-contact-username">' + htmlentities(M.u[u].m)
+                    + useravatar.contact(u) + 'span class="add-contact-username">' + htmlentities(this.u[u].m)
                     + '</span><div class="fm-share-dropdown">' + rt
                     + '</div><div class="fm-share-permissions-block hidden"><div class="fm-share-permissions'
                     + sr.r0 + '" id="rights_0">' + l[55] + '</div><div class="fm-share-permissions' + sr.r1
@@ -289,8 +290,8 @@ MegaData.prototype.renderPath = function() {
     for (var i in a2) {
         name = '';
         if (a2[i] === this.RootID) {
-            if (folderlink && M.d[this.RootID]) {
-                name = M.d[this.RootID].name;
+            if (folderlink && this.d[this.RootID]) {
+                name = this.d[this.RootID].name;
                 typeclass = 'folder';
             }
             else {
@@ -317,12 +318,12 @@ MegaData.prototype.renderPath = function() {
             typeclass = 'rubbish-bin';
             name = l[167];
         }
-        else if (a2[i] === 'messages' || a2[i] === M.InboxID) {
+        else if (a2[i] === 'messages' || a2[i] === this.InboxID) {
             typeclass = 'messages';
             name = l[166];
         }
         else {
-            var n = M.d[a2[i]];
+            var n = this.d[a2[i]];
             if (n && n.name) {
                 name = n.name;
             }
@@ -350,32 +351,32 @@ MegaData.prototype.renderPath = function() {
             + '<span>Contacts</span>'
             + '</span></a>'
             + '<a class="fm-breadcrumbs chat" id="path_'
-            + htmlentities(M.currentdirid.replace("chat/", "")) + '">'
+            + htmlentities(this.currentdirid.replace("chat/", "")) + '">'
             + '<span class="right-arrow-bg">'
             + '<span>' + htmlentities(contactName) + '</span>'
             + '</span>'
             + '</a>');
         $('.search-files-result').addClass('hidden');
     }
-        else if (this.currentdirid === 'links') {
-            $('.fm-right-header .fm-breadcrumbs-block').safeHTML(
-                '<a class="fm-breadcrumbs public-links">'
-                    + '<span class="right-arrow-bg ui-draggable">'
-                        + '<span>'
-                            + '<i class="small-icon context get-link"></i>'
-                            + l[16516]
-                            + '<span class="public-links-cnt">0</span>'
-                        + '</span>'
-                    + '</span>'
-                + '</a>');
+    else if (this.currentdirid === 'links') {
+        $('.fm-right-header .fm-breadcrumbs-block').safeHTML(
+            '<a class="fm-breadcrumbs public-links">'
+            + '<span class="right-arrow-bg ui-draggable">'
+            + '<span>'
+            + '<i class="small-icon context get-link"></i>'
+            + l[16516]
+            + '<span class="public-links-cnt">0</span>'
+            + '</span>'
+            + '</span>'
+            + '</a>');
 
-            if (M.su.EXP) {
-                $('.public-links-cnt').text(Object.keys(M.su.EXP).length);
-            }
-            else {
-                $('.public-links-cnt').text(0);
-            }
+        if (this.su.EXP) {
+            $('.public-links-cnt').text(Object.keys(this.su.EXP).length);
         }
+        else {
+            $('.public-links-cnt').text(0);
+        }
+    }
     else if (this.currentdirid && this.currentdirid.substr(0, 7) === 'search/') {
         $('.fm-right-header .fm-breadcrumbs-block').safeHTML(
             '<a class="fm-breadcrumbs search ui-droppable" id="'
@@ -385,7 +386,7 @@ MegaData.prototype.renderPath = function() {
             + '</span>'
             + '</span>'
             + '</a>');
-        $('.search-files-result .search-number').text(M.v.length);
+        $('.search-files-result .search-number').text(this.v.length);
         $('.search-files-result').removeClass('hidden');
         $('.search-files-result').addClass('last-button');
     }

@@ -379,13 +379,6 @@ var ulmanager = {
         if (file.repair) {
             file.target = M.RubbishID;
         }
-        else if (!target && String(file.target).substr(0, 4) === 'chat') {
-            return fm_requestfolderid(null, 'My chat files', {
-                callback: SoonFc(function(meh, h) {
-                    ulmanager.ulFinalize(file, h);
-                })
-            });
-        }
 
         ASSERT(file.filekey, "*** filekey is missing ***");
 
@@ -759,62 +752,49 @@ var ulmanager = {
             this.ulSetupQueue = [];
         }
 
-        createFolder(aFile.target, fm_safepath(aFile.path), new MegaPromise())
-            .always(function(target) {
-                if (typeof target === 'number') {
-                    if (d > 1 || String(aFile.target).indexOf('chat') === -1) {
-                        ulmanager.logger.error('createFolder gave ' + target, api_strerror(target));
-                    }
-                }
-                else {
-                    ulmanager.logger.info('createFolder', aFile.target, target);
-                    aFile.target = target;
-                }
+        var hashNode;
+        var startUpload = function _startUpload() {
 
-                var hashNode;
-                var startUpload = function _startUpload() {
+            if (ulmanager.ulSetupQueue.length) {
+                var upload = ulmanager.ulSetupQueue.shift();
+                onIdle(ulmanager.ulSetup.bind(ulmanager, upload, upload.file, true));
+            }
+            else {
+                ulmanager.ulSetupQueue = null;
+            }
 
-                    if (ulmanager.ulSetupQueue.length) {
-                        var upload = ulmanager.ulSetupQueue.shift();
-                        Soon(ulmanager.ulSetup.bind(ulmanager, upload, upload.file, true));
-                    }
-                    else {
-                        ulmanager.ulSetupQueue = null;
-                    }
+            var identical = ulmanager.ulIdentical(aFile);
+            ulmanager.logger.info(aFile.name, "fingerprint", aFile.hash, M.h[aFile.hash], identical);
 
-                    var identical = ulmanager.ulIdentical(aFile);
-                    ulmanager.logger.info(aFile.name, "fingerprint", aFile.hash, M.h[aFile.hash], identical);
+            if (M.h[aFile.hash] || identical) {
+                ulmanager.ulDeDuplicate(aFileUpload, identical, hashNode);
+            }
+            else {
+                ulmanager.ulStart(aFileUpload);
+            }
+        };
 
-                    if (M.h[aFile.hash] || identical) {
-                        ulmanager.ulDeDuplicate(aFileUpload, identical, hashNode);
-                    }
-                    else {
-                        ulmanager.ulStart(aFileUpload);
-                    }
-                };
+        var promises = [];
 
-                var promises = [];
+        if (!M.c[aFile.target]) {
+            promises.push(dbfetch.get(aFile.target, new MegaPromise()));
+        }
 
-                if (!M.c[aFile.target]) {
-                    promises.push(dbfetch.get(aFile.target, new MegaPromise()));
-                }
+        if (!M.h[hash] || !M.d[M.h[hash].first]) {
+            promises.push(
+                dbfetch.hash(aFile.hash)
+                    .always(function(node) {
+                        hashNode = node;
+                    })
+            );
+        }
 
-                if (!M.h[hash] || !M.d[M.h[hash].first]) {
-                    promises.push(
-                        dbfetch.hash(aFile.hash)
-                            .always(function(node) {
-                                hashNode = node;
-                            })
-                    );
-                }
-
-                if (promises.length) {
-                    MegaPromise.allDone(promises).wait(startUpload);
-                }
-                else {
-                    startUpload();
-                }
-            });
+        if (promises.length) {
+            MegaPromise.allDone(promises).wait(startUpload);
+        }
+        else {
+            startUpload();
+        }
     }
 };
 

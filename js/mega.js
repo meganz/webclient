@@ -3,6 +3,7 @@ var currsn;     // current *network* sn (not to be confused with the IndexedDB/m
 var fminitialized = false;
 var requesti = makeid(10);
 var folderlink = false;
+var fetcher = null;
 
 var fmconfig = Object.create(null);
 if (localStorage.fmconfig) {
@@ -163,6 +164,8 @@ function fm_safepath(path, file)
 }
 
 function renderfm() {
+    "use strict";
+
     var promise = new MegaPromise();
     var tpromise;
 
@@ -211,6 +214,8 @@ function renderfm() {
 }
 
 function renderNew() {
+    "use strict";
+
     var treebuild = Object.create(null);
     var UImain = false;
     var UItree = false;
@@ -347,6 +352,8 @@ var nodesinflight = Object.create(null); // number of nodes being processed in t
 
 // enqueue nodes needed to process packets
 function sc_fqueue(handle, packet) {
+    "use strict";
+
     if (handle && !M.d[handle]) {
         if (scwaitnodes[packet.scqi]) {
             scwaitnodes[packet.scqi]++;
@@ -365,6 +372,8 @@ function sc_fqueue(handle, packet) {
 
 // queue 't' packet nodes for db retrieval
 function sc_fqueuet(scni, packet) {
+    "use strict";
+
     var result  = 0;
     var scnodes = scq[scni] && scq[scni][1];
 
@@ -387,6 +396,8 @@ function sc_fqueuet(scni, packet) {
 
 // fetch from db the queued scfetches
 function sc_fetcher() {
+    "use strict";
+
     var queue   = scfetches;
     var handles = Object.keys(queue);
     scfetches = Object.create(null);
@@ -409,6 +420,8 @@ function sc_fetcher() {
 
 // enqueue parsed actionpacket
 function sc_packet(a) {
+    "use strict";
+
     // set scq slot number
     a.scqi = scqhead;
 
@@ -505,6 +518,8 @@ function sc_packet(a) {
 
 // submit nodes from `t` actionpacket to worker
 function sc_node(n) {
+    "use strict";
+
     var p, id;
 
     crypto_rsacheck(n);
@@ -574,6 +589,8 @@ var scinshare = Object.create(null);
 
 // if no execsc() thread is running, check if one should be, and start it if so.
 function resumesc() {
+    "use strict";
+
     if (!scinflight) {
         if (scq[scqtail] && scq[scqtail][0] && !scwaitnodes[scqtail] && !nodesinflight[scqtail]) {
             scinflight = true;
@@ -584,6 +601,8 @@ function resumesc() {
 
 // execute actionpackets from scq[scqtail] onwards
 function execsc() {
+    "use strict";
+
     var n, i;
     var tick = Date.now();
     var tickcount = 0;
@@ -1320,6 +1339,8 @@ function execsc() {
 
 // a node was updated significantly: write to DB and redraw
 function fm_updated(n) {
+    "use strict";
+
     M.nodeUpdated(n);
 
     if (fminitialized) {
@@ -1363,6 +1384,8 @@ function TreeFetcher() {
 var workers;
 
 function killworkerpool() {
+    "use strict";
+
     // terminate existing workers
     if (workers) {
         var l = workers.length;
@@ -1376,6 +1399,8 @@ function killworkerpool() {
     }
 }
 function initworkerpool() {
+    "use strict";
+
     killworkerpool();
 
     workers = [];
@@ -1434,6 +1459,8 @@ function initworkerpool() {
 // the server-side treecache is wiped (otherwise, we could run into
 // an endless loop)
 function fm_forcerefresh() {
+    "use strict";
+
     localStorage.force = 1;
 
     if (fmdb && !fmdb.crashed) {
@@ -1450,6 +1477,8 @@ function fm_forcerefresh() {
 // initiate fetch of node tree
 // FIXME: what happens when the user pastes a folder link over his loaded/loading account?
 TreeFetcher.prototype.fetch = function treefetcher_fetch(force) {
+    "use strict";
+
     var req_params = {
         a: 'f',
         c: 1,
@@ -1488,6 +1517,8 @@ TreeFetcher.prototype.fetch = function treefetcher_fetch(force) {
 // triggers a full reload including wiping the remote treecache
 // (e.g. because the treecache is damaged or too old)
 function fm_fullreload(q, logMsg) {
+    "use strict";
+
     if (q) {
         api_cancel(q);
     }
@@ -1531,6 +1562,8 @@ var parentworker = Object.create(null);
 
 // get next worker index (round robin)
 function treefetcher_getnextworker() {
+    "use strict";
+
     if (nextworker >= workers.length) {
         nextworker = 0;
     }
@@ -1540,6 +1573,8 @@ function treefetcher_getnextworker() {
 // this receives the ok elements one by one as per the filter rule
 // to facilitate the decryption of outbound shares, the API now sends ok before f
 function tree_ok0(ok) {
+    "use strict";
+
     if (fmdb) {
         fmdb.add('ok', { h : ok.h, d : ok });
     }
@@ -1567,6 +1602,8 @@ function tree_ok0(ok) {
  * @param {Boolean} [noc]  Whether adding to M.c should be skipped, only used by fetchchildren!
  */
 function emplacenode(node, noc) {
+    "use strict";
+
     if (node.p) {
         // we have to add M.c[sharinguserhandle] records explicitly as
         // node.p has ceased to be the sharing user handle
@@ -1585,7 +1622,7 @@ function emplacenode(node, noc) {
 
         if (node.hash) {
             if (!M.h[node.hash]) {
-                M.h[node.hash] = newNodeHash();
+                M.h[node.hash] = Hash();
             }
             M.h[node.hash][node.h] = 1;
         }
@@ -1606,6 +1643,8 @@ function emplacenode(node, noc) {
 
 // this receives the node objects one by one as per the filter rule
 function tree_node(node) {
+    "use strict";
+
     if (pfkey && !M.RootID) {
         // set up the workers for folder link decryption
         workerstate = {
@@ -1659,6 +1698,8 @@ var dumpsremaining;
 
 // this receives the remainder of the JSON after the filter was applied
 function tree_residue(fm, ctx) {
+    "use strict";
+
     // store the residual f response for perusal once all workers signal that they're done
     residualfm = fm[0];
 
@@ -1683,6 +1724,8 @@ function tree_residue(fm, ctx) {
 
 // process worker responses (decrypted nodes, processed actionpackets, state dumps...)
 function worker_procmsg(ev) {
+    "use strict";
+
     var h;
 
     if (ev.data.scqi >= 0) {
@@ -1797,6 +1840,8 @@ var fmdb;
 var ufsc;
 
 function loadfm(force) {
+    "use strict";
+
     if (force) {
         localStorage.force = true;
         loadfm.loaded = false;
@@ -1858,6 +1903,8 @@ function loadfm(force) {
 }
 
 function fetchfm(sn) {
+    "use strict";
+
     // we always intially fetch historical actionpactions
     // before showing the filemanager
     initialscfetch = true;
@@ -1898,6 +1945,8 @@ function fetchfm(sn) {
 }
 
 function dbfetchfm() {
+    "use strict";
+
     var i;
 
     loadingInitDialog.step2();
@@ -1994,6 +2043,7 @@ function dbfetchfm() {
 }
 
 function rightsById(id) {
+    "use strict";
 
     if (folderlink || (id && id.length > 8)) {
         return false;
@@ -2011,6 +2061,8 @@ function rightsById(id) {
 
 // returns true if h1 cannot be moved into h2 without creating circular linkage, false otherwise
 function isCircular(h1, h2) {
+    "use strict";
+
     for (;;) {
         if (h1 == h2) return true;
 
@@ -2020,10 +2072,12 @@ function isCircular(h1, h2) {
     }
 }
 
-function RootbyId(id)
-{
-    if (id)
+function RootbyId(id) {
+    "use strict";
+
+    if (id) {
         id = id.replace('chat/', '');
+    }
     var p = M.getPath(id);
     return p[p.length - 1];
 }
@@ -2031,6 +2085,8 @@ function RootbyId(id)
 // returns tree type h is in
 // FIXME: make result numeric
 function treetype(h) {
+    "use strict";
+
     for (;;) {
         if (!M.d[h]) {
             return h;
@@ -2056,6 +2112,8 @@ function treetype(h) {
 
 // returns sharing user (or false if not in an inshare)
 function sharer(h) {
+    "use strict";
+
     while (h && M.d[h]) {
         if (M.d[h].su) {
             return M.d[h].su;
@@ -2069,6 +2127,8 @@ function sharer(h) {
 
 // FIXME: remove alt
 function ddtype(ids, toid, alt) {
+    "use strict";
+
     if (folderlink) {
         return false;
     }
@@ -2142,6 +2202,7 @@ function ddtype(ids, toid, alt) {
  * @return {Object} The `ulparams`, whatever it is.
  */
 function createFolder(toid, name, ulparams) {
+    "use strict";
 
     // This will be called when the folder creation succeed, pointing
     // the caller with the handle of the deeper created folder.
@@ -2466,6 +2527,8 @@ function processmove(apireq) {
 }
 
 function process_f(f, cb) {
+    "use strict";
+
     if (f) {
         for (var i = 0; i < f.length; i++) {
             M.addNode(f[i]);
@@ -2767,9 +2830,7 @@ function processUPCO(ap) {
 
                 // Delete all matching pending shares
                 for (var k in M.ps) {
-                    if (M.ps.hasOwnProperty(k)) {
-                        M.delPS(psid, k);
-                    }
+                    M.delPS(psid, k);
                 }
 
                 if (!is_mobile) {
@@ -2801,48 +2862,50 @@ function processUPCO(ap) {
  * @param {Object} u Users informations
  */
 function process_u(u, ignoreDB) {
-    for (var i in u) {
-        if (u.hasOwnProperty(i)) {
-            if (u[i].c === 1) {
-                u[i].h = u[i].u;
-                u[i].t = 1;
-                u[i].p = 'contacts';
-                M.addNode(u[i], ignoreDB);
+    "use strict";
 
-                var contactName = M.getNameByHandle(u[i].h);
+    for (var i = 0; i < u.length; i++) {
+        if (u[i].c === 1) {
+            u[i].h = u[i].u;
+            u[i].t = 1;
+            u[i].p = 'contacts';
+            M.addNode(u[i], ignoreDB);
 
-                // Update token.input plugin
-                if (!is_mobile) {
-                    addToMultiInputDropDownList('.share-multiple-input', [{ id: u[i].m, name: contactName }]);
-                    addToMultiInputDropDownList('.add-contact-multiple-input', [{ id: u[i].m, name: contactName }]);
-                }
+            var contactName = M.getNameByHandle(u[i].h);
+
+            // Update token.input plugin
+            if (!is_mobile) {
+                addToMultiInputDropDownList('.share-multiple-input', [{id: u[i].m, name: contactName}]);
+                addToMultiInputDropDownList('.add-contact-multiple-input', [{id: u[i].m, name: contactName}]);
             }
-            else if (M.d[u[i].u]) {
-                M.delNode(u[i].u, ignoreDB);
+        }
+        else if (M.d[u[i].u]) {
+            M.delNode(u[i].u, ignoreDB);
 
-                // Update token.input plugin
-                if (!is_mobile) {
-                    removeFromMultiInputDDL('.share-multiple-input', { id: u[i].m, name: u[i].m });
-                    removeFromMultiInputDDL('.add-contact-multiple-input', { id: u[i].m, name: u[i].m });
-                }
+            // Update token.input plugin
+            if (!is_mobile) {
+                removeFromMultiInputDDL('.share-multiple-input', {id: u[i].m, name: u[i].m});
+                removeFromMultiInputDDL('.add-contact-multiple-input', {id: u[i].m, name: u[i].m});
             }
+        }
 
-            // Update user attributes M.u
-            M.addUser(u[i], ignoreDB);
+        // Update user attributes M.u
+        M.addUser(u[i], ignoreDB);
 
-            if (u[i].c === 1) {
-                // sync data objs M.u <-> M.d
-                M.d[u[i].u] = M.u[u[i].u];
-            }
+        if (u[i].c === 1) {
+            // sync data objs M.u <-> M.d
+            M.d[u[i].u] = M.u[u[i].u];
         }
     }
 
-    if (M.currentdirid === 'dashboard') {
+    /*if (M.currentdirid === 'dashboard') {
         delay('dashboard:updcontacts', dashboardUI.updateContactsWidget);
-    }
+     }*/
 }
 
 function process_ok(ok, ignoreDB) {
+    "use strict";
+
     for (var i = ok.length; i--; ) {
         if (ok[i].ha == crypto_handleauth(ok[i].h))
         {
@@ -3331,12 +3394,6 @@ function fmviewmode(id, e)
     mega.config.set('viewmodes', viewmodes);
 }
 
-function fm_requestfolderid(h, name, ulparams)
-{
-    return createFolder(h, name, ulparams);
-}
-
-
 var thumbnails = Object.create(null);
 var th_requested = Object.create(null);
 var fa_duplicates = Object.create(null);
@@ -3461,85 +3518,86 @@ function fm_thumbnail_render(n) {
 }
 
 
-(function() {
-    mBroadcaster.once('boot_done', function() {
-        if (
-            ua.details.browser === "Safari" ||
-            ua.details.browser === "Edge" ||
-            ua.details.browser === "Internet Explorer"
-        ) {
+mBroadcaster.once('boot_done', function() {
+    "use strict";
+
+    if (
+        ua.details.browser === "Safari" ||
+        ua.details.browser === "Edge" ||
+        ua.details.browser === "Internet Explorer"
+    ) {
+        return;
+    }
+
+    // Didn't found a better place for this, so I'm leaving it here...
+    // This is basically a proxy of on paste, that would trigger a new event, which would receive the actual
+    // File object, name, etc.
+    $(document).on('paste', function(event) {
+        if (ua.details.browser === "Safari") {
+            // Safari is not supported
             return;
         }
-        // Didn't found a better place for this, so I'm leaving it here...
-        // This is basically a proxy of on paste, that would trigger a new event, which would receive the actual
-        // File object, name, etc.
-        $(document).on('paste', function (event) {
-            if (ua.details.browser === "Safari") {
-                // Safari is not supported
+        else if (
+            ua.details.browser.toLowerCase().indexOf("explorer") !== -1 ||
+            ua.details.browser.toLowerCase().indexOf("edge") !== -1
+        ) {
+            // IE is not supported
+            return;
+        }
+
+        var items = (event.clipboardData || event.originalEvent.clipboardData).items;
+        if (!items && event.originalEvent.clipboardData && event.originalEvent.clipboardData.files) {
+            // safari
+            items = event.originalEvent.clipboardData.files;
+        }
+        var fileName = false;
+
+        var blob = null;
+        if (items) {
+            if (ua.details.browser === "Firefox" && items.length === 2) {
+                // trying to paste an image, but .. FF does not have support for that. (It adds the file icon as
+                // the image, which is a BAD UX, so .. halt now!)
                 return;
             }
-            else if (
-                ua.details.browser.toLowerCase().indexOf("explorer")  !== -1 ||
-                ua.details.browser.toLowerCase().indexOf("edge")  !== -1
-            ) {
-                // IE is not supported
-                return;
-            }
-
-            var items = (event.clipboardData || event.originalEvent.clipboardData).items;
-            if (!items && event.originalEvent.clipboardData && event.originalEvent.clipboardData.files) {
-                // safari
-                items = event.originalEvent.clipboardData.files;
-            }
-            var fileName = false;
-
-            var blob = null;
-            if (items) {
-                if (ua.details.browser === "Firefox" && items.length === 2) {
-                    // trying to paste an image, but .. FF does not have support for that. (It adds the file icon as
-                    // the image, which is a BAD UX, so .. halt now!)
-                    return;
-                }
-                for (var i = 0; i < items.length; i++) {
-                    if (items[i].type.indexOf("image") === 0) {
-                        if (items[i] instanceof File) {
-                            // Safari, using .files
-                            blob = items[i];
-                        }
-                        else {
-                            blob = items[i].getAsFile();
-                        }
+            for (var i = 0; i < items.length; i++) {
+                if (items[i].type.indexOf("image") === 0) {
+                    if (items[i] instanceof File) {
+                        // Safari, using .files
+                        blob = items[i];
                     }
-                    else if (items[i].kind === "string") {
-                        items[i].getAsString(function (str) {
-                            fileName = str;
-                        });
+                    else {
+                        blob = items[i].getAsFile();
                     }
                 }
-            }
-
-            if (blob !== null) {
-                if (fileName) {
-                    // we've got the name of the file...
-                    blob.name = fileName;
-                }
-
-                if (!blob.name) {
-                    // no name found..generate dummy name.
-                    var ext = blob.type.replace("image/", "").toLowerCase();
-                    fileName = blob.name = "image." + (ext === "jpeg" ? "jpg" : ext);
-                }
-
-                var simulatedEvent = new $.Event("pastedimage");
-                $(window).trigger(simulatedEvent, [blob, fileName]);
-
-                // was this event handled and preventing default? if yes, prevent the raw event from pasting the
-                // file name text
-                if (simulatedEvent.isDefaultPrevented()) {
-                    event.preventDefault();
-                    return false;
+                else if (items[i].kind === "string") {
+                    items[i].getAsString(function(str) {
+                        fileName = str;
+                    });
                 }
             }
-        });
+        }
+
+        if (blob !== null) {
+            if (fileName) {
+                // we've got the name of the file...
+                blob.name = fileName;
+            }
+
+            if (!blob.name) {
+                // no name found..generate dummy name.
+                var ext = blob.type.replace("image/", "").toLowerCase();
+                fileName = blob.name = "image." + (ext === "jpeg" ? "jpg" : ext);
+            }
+
+            var simulatedEvent = new $.Event("pastedimage");
+            $(window).trigger(simulatedEvent, [blob, fileName]);
+
+            // was this event handled and preventing default? if yes, prevent the raw event from pasting the
+            // file name text
+            if (simulatedEvent.isDefaultPrevented()) {
+                event.preventDefault();
+                return false;
+            }
+        }
     });
-})();
+});

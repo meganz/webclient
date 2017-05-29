@@ -105,7 +105,7 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
         try {
             if (!fmdb.db) {
                 var todrop = [];
-                var dbpfx = 'fm11112_';
+                var dbpfx = 'fm9_';
 
                 // enumerate databases and collect those not prefixed with 'dbpfx'
                 // (which is the current format)
@@ -262,6 +262,8 @@ FMDB.prototype.dropall = function fmdb_dropall(dbs, cb) {
 // IndexedDB activity is triggered once we have at least 1000 pending rows or the sn
 // (writing the sn - which is done last - completes the transaction and starts a new one)
 FMDB.prototype.enqueue = function fmdb_enqueue(table, row, type) {
+    "use strict";
+
     var fmdb = this;
     var c;
     var ch = fmdb.channelmap[table] || 0;
@@ -299,18 +301,28 @@ FMDB.prototype.enqueue = function fmdb_enqueue(table, row, type) {
 // FIXME: auto-retry smaller transactions? (need stats about transaction failures)
 // ch - channel to operate on
 FMDB.prototype.writepending = function fmdb_writepending(ch) {
+    "use strict";
+
     // exit loop if we ran out of pending writes or have crashed
-    if (this.inflight || ch < 0 || this.crashed) return;
+    if (this.inflight || ch < 0 || this.crashed || this.writing) {
+        return;
+    }
 
     // iterate all channels to find pending writes
     if (!this.pending[ch][this.tail[ch]]) return this.writepending(ch-1);
 
     var fmdb = this;
 
+    if (d) {
+        fmdb.logger.debug('writepending()', ch, fmdb.state,
+            Object(fmdb.pending[0][fmdb.tail[0]])._sn, fmdb.cantransact);
+    }
+
     if (!ch && fmdb.state < 0 && fmdb.pending[0][fmdb.tail[0]]._sn && fmdb.cantransact) {
         // if the write job is on channel 0 and already complete (has _sn set),
         // we execute it in a single transaction without first clearing sn
         fmdb.state = 1;
+        fmdb.writing = 1;
         fmdb.db.transaction('rw',
             fmdb.tables,
             function(){
@@ -327,18 +339,20 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                 if (d) {
                     fmdb.logger.log("Transaction committed");
                 }
+            fmdb.writing = 0;
                 fmdb.writepending(ch);
             }).catch(function(e){
                 if (fmdb.cantransact < 0) {
                     fmdb.logger.error("Your browser's IndexedDB implementation is bogus, disabling transactions.");
                     fmdb.cantransact = 0;
+                    fmdb.writing = 0;
                     fmdb.writepending(ch);
                 }
                 else {
                     // FIXME: retry instead? need statistics.
                     fmdb.logger.error("Transaction failed, marking DB as crashed", e);
                     fmdb.state = -1;
-                    fmdb.crashed = true;
+                    fmdb.invalidate();
                 }
             });
     }
@@ -365,7 +379,7 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                 }).catch(function(e){
                     fmdb.logger.error("SN clearing failed, marking DB as crashed", e);
                     fmdb.state = -1;
-                    fmdb.crashed = true;
+                    fmdb.invalidate();
                 });
 
             }
@@ -397,6 +411,7 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
 
                 fmdb.commit = false;
                 fmdb.state = -1;
+                fmdb.writing = 0;
                 fmdb.writepending(ch);
             }
 
@@ -421,6 +436,13 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
 
                 // all written: advance head
                 if (t.t == t.h) t.h++;
+
+                if (fmdb.crashed && !(t.t & 1)) {
+                    if (d) {
+                        fmdb.logger.warn('The DB is crashed, halting put...');
+                    }
+                    return;
+                }
 
                 if (d) {
                     fmdb.logger.log("DB " + ((t.t & 1) ? 'del' : 'put') + " with " + t[t.t].length
@@ -480,12 +502,16 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
 // encrypt/decrypt UNICODE string s, returns ArrayBuffer
 // FIXME: use CBC instead of ECB!
 FMDB.prototype.strcrypt = function fmdb_strcrypt(s) {
+    "use strict";
+
     var a32 = str_to_a32(to8(s));
     for (var i = (-a32.length) & 3; i--; ) a32.push(0);
     return a32_to_ab(encrypt_key(u_k_aes, a32)).buffer;
 };
 
 FMDB.prototype.strdecrypt = function fmdb_strdecrypt(ab) {
+    "use strict";
+
     if (!ab.byteLength) return '';
     var a32 = [];
     var dv = new DataView(ab);
@@ -565,6 +591,8 @@ FMDB.prototype.restorenode = Object.freeze({
 // the next addition will then start a new "transaction"
 // (large writes will not execute as an IndexedDB transaction because IndexedDB can't)
 FMDB.prototype.add = function fmdb_add(table, row) {
+    "use strict";
+
     if (this.crashed) return;
 
     if (row.d) {
@@ -597,6 +625,8 @@ FMDB.prototype.add = function fmdb_add(table, row) {
 
 // enqueue IndexedDB deletions
 FMDB.prototype.del = function fmdb_del(table, index) {
+    "use strict";
+
     if (this.crashed) return;
 
     this.enqueue(table, ab_to_base64(this.strcrypt(index)), 1);
@@ -605,6 +635,8 @@ FMDB.prototype.del = function fmdb_del(table, index) {
 // non-transactional read with subsequent deobfuscation, with optional prefix filter
 // (must NOT be used for dirty reads - use getbykey() instead)
 FMDB.prototype.get = function fmdb_get(table, key, prefix) {
+    "use strict";
+
     if (!this.up()) {
         return MegaPromise.reject([]);
     }
@@ -629,6 +661,8 @@ FMDB.prototype.get = function fmdb_get(table, key, prefix) {
 };
 
 FMDB.prototype.normaliseresult = function fmdb_normaliseresult(table, r) {
+    "use strict";
+
     var t;
 
     for (var i = r.length; i--; ) {
@@ -658,6 +692,8 @@ FMDB.prototype.normaliseresult = function fmdb_normaliseresult(table, r) {
 // (dirty reads are supported by scanning the pending writes after the IndexedDB read completes)
 // anyof and where are mutually exclusive, FIXME: add post-anyof where filtering?
 FMDB.prototype.getbykey = function fmdb_getbykey(table, index, anyof, where, limit) {
+    "use strict";
+
     if (!this.up() || anyof && !anyof[1].length) {
         return MegaPromise.reject([]);
     }
@@ -848,6 +884,8 @@ FMDB.prototype.clone = function fmdb_clone(o) {
 
 // reliably invalidate the current database (delete the sn)
 FMDB.prototype.invalidate = function fmdb_invalidate(cb) {
+    cb = cb || this.logger.debug.bind(this.logger, 'DB Invalidation', !this.crashed);
+
     if (this.crashed) {
         return cb();
     }
@@ -952,6 +990,8 @@ function StorageDB(name) {
 StorageDB.prototype = Object.create(FMDB.prototype);
 
 StorageDB.prototype.open = function(callback) {
+    "use strict";
+
     if (this.opening) {
         this.opening.always(callback.bind(this));
     }
@@ -960,6 +1000,8 @@ StorageDB.prototype.open = function(callback) {
     }
 };
 StorageDB.prototype.get = function(k) {
+    "use strict";
+
     var promise = new MegaPromise();
 
     this.open(function() {
@@ -986,6 +1028,8 @@ StorageDB.prototype.get = function(k) {
     return promise;
 };
 StorageDB.prototype.set = function(k, v) {
+    "use strict";
+
     var promise = new MegaPromise();
 
     this.open(function() {
@@ -1006,6 +1050,8 @@ StorageDB.prototype.set = function(k, v) {
     return promise;
 };
 StorageDB.prototype.rem = function(k) {
+    "use strict";
+
     var promise = new MegaPromise();
 
     this.open(function() {
@@ -1041,6 +1087,8 @@ StorageDB.prototype.rem = function(k) {
     return promise;
 };
 StorageDB.prototype.encrypt = function(data) {
+    "use strict";
+
     return ab_to_base64(this.strcrypt(JSON.stringify(data)));
 };
 
@@ -1192,6 +1240,8 @@ Object.defineProperty(self, 'dbfetch', (function() {
          * @memberOf dbfetch
          */
         root: function fetchfroot() {
+            "use strict";
+
             var promise = new MegaPromise();
 
             // fetch the three root nodes
@@ -1203,9 +1253,9 @@ Object.defineProperty(self, 'dbfetch', (function() {
                     for (var i = r.length; i--;) {
                         emplacenode(r[i]);
 
-                        if (r[i].t == 1) {
+                        /*if (r[i].t == 1) {
                             folders.push(r[i].h);
-                        }
+                        }*/
                     }
                     promise.resolve(folders);
                 });
@@ -1223,7 +1273,11 @@ Object.defineProperty(self, 'dbfetch', (function() {
          * @memberOf dbfetch
          */
         get: function fetchchildren(parent, promise) {
-            console.info('fetchchildren', parent, promise);
+            "use strict";
+
+            if (d > 1) {
+                console.info('fetchchildren', parent, promise);
+            }
             promise = promise || MegaPromise.busy();
 
             if (typeof parent !== 'string') {
@@ -1285,6 +1339,8 @@ Object.defineProperty(self, 'dbfetch', (function() {
          * @memberOf dbfetch
          */
         geta: function geta(handles, promise) {
+            "use strict";
+
             promise = promise || MegaPromise.busy();
 
             var promises = [];
@@ -1309,6 +1365,8 @@ Object.defineProperty(self, 'dbfetch', (function() {
          * @memberOf dbfetch
          */
         tree: function fetchsubtree(parents, level, promise, handles) {
+            "use strict";
+
             var p = [];
             var inflight = Object.create(null);
 
@@ -1393,6 +1451,8 @@ Object.defineProperty(self, 'dbfetch', (function() {
          * @memberOf dbfetch
          */
         node: function fetchnode(handles) {
+            "use strict";
+
             var promise = new MegaPromise();
             var inflight = Object.create(null);
             var result = [];
@@ -1444,6 +1504,8 @@ Object.defineProperty(self, 'dbfetch', (function() {
          * @memberOf dbfetch
          */
         hash: function fetchhash(hash) {
+            "use strict";
+
             var promise = new MegaPromise();
 
             if (M.h[hash] && M.d[M.h[hash].first]) {
@@ -1455,7 +1517,7 @@ Object.defineProperty(self, 'dbfetch', (function() {
                         var node = r[0];
                         if (node) {
                             // got the hash and a handle it belong to
-                            M.h[hash] = M.h[hash] || newNodeHash();
+                            M.h[hash] = M.h[hash] || Hash();
                             M.h[hash][node.h] = 1;
 
                             // retrieve the full node for this handle
@@ -1482,6 +1544,8 @@ Object.defineProperty(self, 'dbfetch', (function() {
          * @memberOf dbfetch
          */
         coll: function fetchrecursive(handles, promise) {
+            "use strict";
+
             promise = promise || MegaPromise.busy();
 
             if (!fmdb) {

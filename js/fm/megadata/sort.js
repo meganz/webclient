@@ -340,18 +340,18 @@ MegaData.prototype.doSort = function(n, d) {
         $('.arrow.' + n).addClass('asc');
     }
 
-    if (!M.sortRules[n]) {
+    if (!this.sortRules[n]) {
         throw new Error("Cannot sort by " + n);
     }
-    M.sortRules[n](d);
+    this.sortRules[n](d);
 
-    M.sortmode = {n: n, d: d};
+    this.sortmode = {n: n, d: d};
 
     if (fmconfig.uisorting) {
-        mega.config.set('sorting', M.sortmode);
+        mega.config.set('sorting', this.sortmode);
     }
     else {
-        fmsortmode(M.currentdirid, n, d);
+        fmsortmode(this.currentdirid, n, d);
     }
 };
 

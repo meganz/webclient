@@ -1221,20 +1221,6 @@ function rand(n) {
     return r[0] % n; // <- oops, it's uniformly distributed only when `n` divides 0x100000000
 }
 
-/*
-if (is_chrome_firefox) {
-    var nsIRandomGenerator = Cc["@mozilla.org/security/random-generator;1"]
-        .createInstance(Ci.nsIRandomGenerator);
-
-    var rand = function fx_rand(n) {
-        var r = nsIRandomGenerator.generateRandomBytes(4);
-        r = (r[0] << 24) | (r[1] << 16) | (r[2] << 8) | r[3];
-        if (r<0) r ^= 0x80000000;
-        return r % n; // oops, it's not uniformly distributed
-    };
-}
-*/
-
 function crypto_rsagenkey() {
     var $promise = new MegaPromise();
     var logger = MegaLogger.getLogger('crypt');
@@ -1284,8 +1270,6 @@ function crypto_rsagenkey() {
 
     return $promise;
 }
-
-/* }}} */
 
 // decrypt ArrayBuffer in CTR mode, return MAC
 function decrypt_ab_ctr(aes, ab, nonce, pos) {
@@ -1427,6 +1411,8 @@ var to8 = firefox_boost ? mozTo8 : function (unicode) {
 var apixs = [];
 
 function api_reset() {
+    "use strict";
+
     // user account API interface
     api_init(0, 'cs');
 
@@ -1458,6 +1444,8 @@ function api_esplit(e) {
 }
 
 function api_setsid(sid) {
+    "use strict";
+
     if (sid !== false) {
         watchdog.notify('setsid', sid);
 
@@ -1490,6 +1478,8 @@ function api_setsid(sid) {
 }
 
 function api_setfolder(h) {
+    "use strict";
+
     var sid = h = 'n=' + h;
 
     if (u_sid) {
@@ -1502,6 +1492,8 @@ function api_setfolder(h) {
 }
 
 function stopapi() {
+    "use strict";
+
     for (var i = apixs.length; i--;) {
         api_cancel(apixs[i]);
         apixs[i].cmds = [[], []];
@@ -1510,6 +1502,8 @@ function stopapi() {
 }
 
 function api_cancel(q) {
+    "use strict";
+
     if (q) {
         if (q.xhr) {
             // setting the "cancelled" flag ensures that
@@ -1525,6 +1519,8 @@ function api_cancel(q) {
 }
 
 function api_init(channel, service, split) {
+    "use strict";
+
     if (apixs[channel]) {
         api_cancel(apixs[channel]);
     }
@@ -1550,14 +1546,16 @@ function api_init(channel, service, split) {
 
 // queue request on API channel
 function api_req(request, context, channel) {
-    if (typeof channel == 'undefined') {
+    "use strict";
+
+    if (channel === undefined) {
         channel = 0;
     }
 
     if (d) console.log("API request on " + channel + ": " + JSON.stringify(request));
 
-    if (typeof context == 'undefined') {
-        context = {};
+    if (context === undefined) {
+        context = Object.create(null);
     }
 
     var q = apixs[channel];
@@ -1578,6 +1576,8 @@ var chunked_method = window.chrome ? (self.fetch ? 2 : 0) : -1;
 
 // this kludge emulates moz-chunked-arraybuffer with XHR-style callbacks
 function chunkedfetch(xhr, uri, postdata) {
+    "use strict";
+
     fetch(uri, { method: 'POST', body: postdata }).then(function(response) {
         var reader = response.body.getReader();
         var evt = { loaded: 0 };
@@ -1610,7 +1610,9 @@ function chunkedfetch(xhr, uri, postdata) {
 
 // send pending API request on channel q
 function api_proc(q) {
-    var logger = MegaLogger.getLogger('crypt');
+    "use strict";
+
+    var logger = d && MegaLogger.getLogger('crypt');
     if (q.setimmediate) {
         clearTimeout(q.setimmediate);
         q.setimmediate = false;
@@ -1630,7 +1632,9 @@ function api_proc(q) {
 
         q.xhr.onerror = function () {
             if (!this.cancelled) {
-                logger.debug("API request error - retrying");
+                if (logger) {
+                    logger.debug("API request error - retrying");
+                }
                 api_reqerror(q, EAGAIN, this.status);
             }
         };
@@ -1725,12 +1729,16 @@ function api_proc(q) {
                         status = true;
                     } catch (e) {
                         // bogus response, try again
-                        logger.debug("Bad JSON data in response: " + response);
+                        if (d) {
+                            logger.debug("Bad JSON data in response: " + response);
+                        }
                         t = EAGAIN;
                     }
                 }
                 else {
-                    logger.debug('API server connection failed (error ' + status + ')');
+                    if (d) {
+                        logger.debug('API server connection failed (error ' + status + ')');
+                    }
                     t = ERATELIMIT;
                 }
 
@@ -1777,10 +1785,14 @@ function api_proc(q) {
 }
 
 function api_send(q) {
-    var logger = MegaLogger.getLogger('crypt');
+    "use strict";
+
+    var logger = d && MegaLogger.getLogger('crypt');
     q.timer = false;
 
-    logger.debug("Sending API request: " + q.rawreq + " to " + q.url);
+    if (logger) {
+        logger.debug("Sending API request: " + q.rawreq + " to " + q.url);
+    }
 
     // reset number of bytes received and response size
     q.received = 0;
@@ -1866,6 +1878,8 @@ function api_ready(q) {
 var apiFloorCap = 3000;
 
 function api_retry() {
+    "use strict";
+
     for (var i = apixs.length; i--; ) {
         if (apixs[i].timer && apixs[i].backoff > apiFloorCap) {
             clearTimeout(apixs[i].timer);
@@ -1970,6 +1984,8 @@ var waitid = 0;
 var cmsNotifHandler = localStorage.cmsNotificationID || 'Nc4AFJZK';
 
 function stopsc() {
+    "use strict";
+
     if (waitxhr && waitxhr.readyState !== waitxhr.DONE) {
         waitxhr.abort();
         waitxhr = false;
@@ -1983,6 +1999,8 @@ function stopsc() {
 
 // if set, further sn updates are disallowed (the local state has become invalid)
 function setsn(sn) {
+    "use strict";
+
     // update sn in DB, triggering a "commit" of the current "transaction"
     if (fmdb) {
         attribCache.flush();
@@ -1995,6 +2013,8 @@ var initialscfetch;
 
 // last step of the streamed SC response processing
 function sc_residue(sc) {
+    "use strict";
+
     if (sc.sn) {
         // enqueue new sn
         currsn = sc.sn;
@@ -2040,6 +2060,8 @@ var gettingsc;
 // request new actionpackets and stream them to sc_packet() as they come in
 // nodes in t packets are streamed to sc_node()
 function getsc(force) {
+    "use strict";
+
     if (force || !gettingsc) {
         gettingsc = true;
 
@@ -2054,6 +2076,8 @@ function getsc(force) {
 }
 
 function waitsc() {
+    "use strict";
+
     var logger = MegaLogger.getLogger('crypt');
     var newid = ++waitid;
 
@@ -2265,6 +2289,8 @@ function api_resetkeykey3(res, ctx) {
 // Returns [decrypted master key,verified session ID(,RSA private key)] or false if API error or
 // supplied information incorrect
 function api_getsid(ctx, user, passwordkey, hash) {
+    "use strict";
+
     ctx.callback = api_getsid2;
     ctx.passwordkey = passwordkey;
 
@@ -2423,6 +2449,8 @@ function api_changepw(ctx, passwordkey, masterkey, oldpw, newpw, email) {
  * @return {MegaPromise}
  */
 function api_setattr(n, idtag) {
+    "use strict";
+
     var promise = new MegaPromise();
     var logger = MegaLogger.getLogger('crypt');
 
@@ -2690,7 +2718,7 @@ function api_setshare1(ctx, params) {
                             u_pubkeys[ctx.req.s[i].u]));
                     }
                 }
-                logger.info('Retrying share operation.')
+                logger.info('Retrying share operation.');
                 api_req(ctx.req, ctx);
 
                 return;
@@ -2703,11 +2731,11 @@ function api_setshare1(ctx, params) {
             }
         }
 
-        logger.info('Retrying share operation.')
+        logger.info('Retrying share operation.');
         api_req(ctx.req, ctx);
     };
 
-    logger.info('Invoking share operation.')
+    logger.info('Invoking share operation.');
     api_req(ctx.req, ctx);
 
     return masterPromise;
@@ -2725,7 +2753,9 @@ function crypto_handleauth(h) {
 }
 
 function crypto_keyok(n) {
-    return n && typeof n.k == 'object' && n.k.length >= (n.t ? 4 : 8);
+    "use strict";
+
+    return n && typeof n.k === 'object' && n.k.length >= (n.t ? 4 : 8);
 }
 
 function crypto_encodepubkey(pubkey) {
@@ -3001,10 +3031,10 @@ if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').po
     delete mThumbHandler.sup.SVG;
 }
 
-var storedattr = {};
-var faxhrs = [];
-var faxhrfail = {};
-var faxhrlastgood = {};
+var storedattr = Object.create(null);
+var faxhrs = Object.create(null);
+var faxhrfail = Object.create(null);
+var faxhrlastgood = Object.create(null);
 
 // data.byteLength & 15 must be 0
 function api_storefileattr(id, type, key, data, ctx) {
@@ -3012,7 +3042,7 @@ function api_storefileattr(id, type, key, data, ctx) {
 
     if (typeof ctx !== 'object') {
         if (!storedattr[id]) {
-            storedattr[id] = {};
+            storedattr[id] = Object.create(null);
         }
 
         if (key) {
@@ -3097,7 +3127,7 @@ function api_getfileattr(fa, type, procfa, errfa) {
 }
 
 function fa_handler(xhr, ctx) {
-    var logger = MegaLogger.getLogger('crypt');
+    var logger = d > 1 && MegaLogger.getLogger('crypt');
     var chunked = ctx.p && fa_handler.chunked;
 
     this.xhr = xhr;
@@ -3118,17 +3148,16 @@ function fa_handler(xhr, ctx) {
                 this.parse = this.moz_parser;
                 this.responseType = 'moz-chunked-arraybuffer';
                 break;
-                /*    case 'Internet Explorer':
+        /*  case 'Internet Explorer':
                 // Doh, all in one go :(
                     this.parse = this.stream_parser;
                     this.responseType = 'ms-stream';
                     this.stream_reader= this.msstream_reader;
-                    break;
-                */
-            case 'xChrome':
+                    break;*/
+        /*  case 'Chrome':
                 this.parse = this.stream_parser;
                 this.responseType = 'stream';
-                break;
+                break;*/
             default:
                 this.setParser('text');
             }
@@ -3147,7 +3176,9 @@ function fa_handler(xhr, ctx) {
         this.done = this.onDone;
     }
 
-    logger.debug('fah type:', this.responseType);
+    if (logger) {
+        logger.debug('fah type:', this.responseType);
+    }
 }
 fa_handler.chunked = true;
 fa_handler.abort = function () {
@@ -3178,7 +3209,7 @@ fa_handler.prototype = {
         logger.debug("Attribute storage successful for faid=" + ctx.id + ", type=" + ctx.type);
 
         if (!storedattr[ctx.id]) {
-            storedattr[ctx.id] = {};
+            storedattr[ctx.id] = Object.create(null);
         }
 
         storedattr[ctx.id][ctx.type] = ab_to_base64(response);
@@ -3356,7 +3387,7 @@ fa_handler.prototype = {
     },
 
     ab_parser: function (response, ev) {
-        var logger = MegaLogger.getLogger('crypt');
+        var logger = d > 1 && MegaLogger.getLogger('crypt');
         if (response instanceof ArrayBuffer) {
             var buffer = new Uint8Array(response),
                 dv = new DataView(response),
@@ -3386,7 +3417,9 @@ fa_handler.prototype = {
                 i += p;
             }
 
-            logger.debug('ab_parser.r', i, p, !!h, c);
+            if (logger) {
+                logger.debug('ab_parser.r', i, p, !!h, c);
+            }
 
             return i;
         }
@@ -3508,10 +3541,10 @@ function api_faerrlauncher(ctx, host) {
 }
 
 function api_fareq(res, ctx, xhr) {
-    var logger = MegaLogger.getLogger('crypt');
+    var logger = d > 1 && MegaLogger.getLogger('crypt');
     var error = typeof res === 'number' && res || '';
 
-    if (ctx.startTime) {
+    if (ctx.startTime && logger) {
         logger.debug('Reply in %dms for %s', (Date.now() - ctx.startTime), xhr.q.url);
     }
 
@@ -3554,16 +3587,19 @@ function api_fareq(res, ctx, xhr) {
             faxhrs[slot].fa_timeout = ctx.errfa && ctx.errfa.timeout;
             faxhrs[slot].fah = new fa_handler(faxhrs[slot], ctx);
 
-            logger.debug("Using file attribute channel " + slot);
+            if (logger) {
+                logger.debug("Using file attribute channel " + slot);
+            }
 
             faxhrs[slot].onprogress = function (ev) {
+                    if (logger) {
                     logger.debug('fah ' + ev.type, this.readyState, ev.loaded, ev.total,
                             typeof this.response === 'string'
                                 ? this.response.substr(0, 12).split("").map(function (n) {
                                         return (n.charCodeAt(0) & 0xff).toString(16)
                                     }).join(".")
                                 : this.response, ev);
-
+                    }
                     if (this.fa_timeout) {
                         if (this.fart) {
                             clearTimeout(this.fart);
@@ -3607,7 +3643,9 @@ function api_fareq(res, ctx, xhr) {
                         ctx.errfa(id, 1);
                     }
                     else if (!ctx.fabort) {
-                        logger.error('api_fareq', id, this);
+                        if (logger) {
+                            logger.error('api_fareq', id, this);
+                        }
 
                         api_faretry(this.ctx, ETOOERR, this.fa_host);
                     }
@@ -3671,7 +3709,9 @@ function api_fareq(res, ctx, xhr) {
                 if (!faxhrs[slot].fa_timeout) {
                     faxhrs[slot].timeout = 140000;
                     faxhrs[slot].ontimeout = function (e) {
-                        logger.error('api_fareq timeout', e);
+                        if (logger) {
+                            logger.error('api_fareq timeout', e);
+                        }
 
                         if (!faxhrfail[this.fa_host]) {
                             if (!faxhrlastgood[this.fa_host]
@@ -3689,7 +3729,9 @@ function api_fareq(res, ctx, xhr) {
 
                 faxhrs[slot].responseType = faxhrs[slot].fah.responseType;
                 if (faxhrs[slot].responseType !== faxhrs[slot].fah.responseType) {
-                    logger.error('Unsupported responseType', faxhrs[slot].fah.responseType)
+                    if (logger) {
+                        logger.error('Unsupported responseType', faxhrs[slot].fah.responseType)
+                    }
                     faxhrs[slot].fah.setParser('text');
                 }
                 if ("text" === faxhrs[slot].responseType) {
@@ -3713,7 +3755,7 @@ function api_getfa(id) {
             }
         }
     }
-    storedattr[id] = {};
+    storedattr[id] = Object.create(null);
 
     return f.length ? f.join('/') : false;
 }
@@ -3881,7 +3923,7 @@ function api_updfkeysync(sn) {
     }
 }
 
-var rsa2aes = {};
+var rsa2aes = Object.create(null);
 
 // check for an RSA node key: need to rewrite to AES for faster subsequent loading.
 function crypto_rsacheck(n) {
@@ -3903,7 +3945,7 @@ function crypto_node_rsa2aes() {
         }
     }
 
-    rsa2aes = {};
+    rsa2aes = Object.create(null);
 
     if (nk.length) {
         api_req({
@@ -4098,7 +4140,7 @@ function crypto_procmcr(mcr) {
     }
 }
 
-var rsasharekeys = {};
+var rsasharekeys = Object.create(null);
 
 function crypto_share_rsa2aes() {
     var rsr = [],
@@ -4111,7 +4153,7 @@ function crypto_share_rsa2aes() {
         }
     }
 
-    rsasharekeys = {};
+    rsasharekeys = Object.create(null);
 
     if (rsr.length) {
         api_req({
@@ -4413,6 +4455,7 @@ function api_strerror(errno) {
 // i.e.: NO whitespace, NO non-numeric/string constants ("null"), etc...)
 // accepts string and Uint8Array input, but not a mixture of the two
 (function() {
+    "use strict";
 
     var JSONSplitter = function json_splitter(filters, ctx, format_uint8array) {
         if (!(this instanceof json_splitter)) {

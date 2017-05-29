@@ -137,7 +137,7 @@ MegaData.prototype.buildtree = function _buildtree(n, dialog, stype) {
         }
     }
 
-    var btd = d > 0;
+    var btd = d > 1;
     if (btd) {
         console.group('BUILDTREE for "' + n.h + '"');
     }

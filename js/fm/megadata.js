@@ -134,4 +134,37 @@ function MegaData() {
             }
         }
     };
+
+    if (is_mobile) {
+        var dummy = function() {
+            return MegaPromise.resolve();
+        };
+        this.checkStorageQuota = dummy;
+        this.showOverStorageQuota = dummy;
+        this.initUIKeyEvents = dummy;
+        this.abortTransfers = dummy;
+        this.searchPath = dummy;
+
+        this.renderMain = function(aUpdate) {
+            if (aUpdate) {
+                mobile.cloud.renderUpdate();
+            }
+            else {
+                mobile.cloud.renderLayout();
+            }
+            return true;
+        };
+
+        var tf = [
+            "renderTree", "buildtree", "initTreePanelSorting", "treeSearchUI", "treePanelType", "addTreeUI",
+            "addTreeUIDelayed", "onTreeUIExpand", "onTreeUIOpen"
+        ];
+
+        for (var i = tf.length; i--;) {
+            this[tf[i]] = dummy;
+        }
+    }
 }
+
+MegaData.prototype = new MegaUtils();
+MegaData.prototype.constructor = MegaData;

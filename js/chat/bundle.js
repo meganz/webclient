@@ -1287,7 +1287,7 @@ React.makeElement = React['createElement'];
 	    $('.fm-right-files-block').removeClass('hidden');
 	    $('.nw-conversations-item').removeClass('selected');
 
-	    sectionUIopen('conversations');
+	    M.onSectionUIOpen('conversations');
 
 	    if (Object.keys(self.chats).length === 0) {
 	        $('.fm-empty-conversations').removeClass('hidden');
@@ -1303,7 +1303,7 @@ React.makeElement = React['createElement'];
 
 	            var sortedConversations = obj_values(self.chats.toJS());
 
-	            sortedConversations.sort(mega.utils.sortObjFn("lastActivity", -1));
+	            sortedConversations.sort(M.sortObjFn("lastActivity", -1));
 
 	            if (sortedConversations.length > 0) {
 	                var room = sortedConversations[0];
@@ -1712,7 +1712,7 @@ React.makeElement = React['createElement'];
 
 	        var sortedConversations = obj_values(this.props.chats.toJS());
 
-	        sortedConversations.sort(mega.utils.sortObjFn("lastActivity", -1));
+	        sortedConversations.sort(M.sortObjFn("lastActivity", -1));
 
 	        sortedConversations.forEach(function (chatRoom) {
 	            var contact;
@@ -2014,7 +2014,7 @@ React.makeElement = React['createElement'];
 
 	"use strict";
 
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
@@ -3892,7 +3892,7 @@ React.makeElement = React['createElement'];
 
 	            var pres = self.props.megaChat.karere.getPresence(self.props.megaChat.getJidFromNodeId(v.u));
 
-	            if (v.c == 0 || v.u == u_handle) {
+	            if (v.c != 1 || v.u == u_handle) {
 	                return;
 	            }
 
@@ -3918,20 +3918,20 @@ React.makeElement = React['createElement'];
 	                className: "contacts-search " + selectedClass,
 
 	                onClick: function onClick(contact, e) {
-	                    var contactHash = contact.h;
+	                    var contactHash = contact.u;
 
 	                    if (contactHash === self.lastClicked && new Date() - self.clickTime < 500) {
 
 	                        if (self.props.onSelected) {
-	                            self.props.onSelected([contact.h]);
+	                            self.props.onSelected([contactHash]);
 	                        }
-	                        self.props.onSelectDone([contact.h]);
+	                        self.props.onSelectDone([contactHash]);
 	                        return;
 	                    } else {
 	                        var selected = clone(self.state.selected || []);
 
 	                        if (selected.indexOf(contactHash) === -1) {
-	                            selected.push(contact.h);
+	                            selected.push(contactHash);
 	                            if (self.props.onSelected) {
 	                                self.props.onSelected(selected);
 	                            }
@@ -5368,11 +5368,21 @@ React.makeElement = React['createElement'];
 	                            return;
 	                        }
 
+	                        try {
+	                            Object.defineProperty(meta[0], 'name', {
+	                                configurable: true,
+	                                writeable: true,
+	                                value: Date.now() + '.' + M.getSafeName(meta[1] || meta[0].name)
+	                            });
+	                        } catch (e) {}
+
 	                        M.addUpload([meta[0]]);
 
 	                        self.setState({
 	                            'pasteImageConfirmDialog': false
 	                        });
+
+	                        URL.revokeObjectURL(meta[2]);
 	                    }
 	                },
 	                React.makeElement(
@@ -10524,7 +10534,7 @@ React.makeElement = React['createElement'];
 	        }
 	    }
 
-	    sectionUIopen('conversations');
+	    M.onSectionUIOpen('conversations');
 
 	    self.megaChat.currentlyOpenedChat = self.roomJid;
 	    self.megaChat.lastOpenedChat = self.roomJid;

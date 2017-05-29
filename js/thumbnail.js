@@ -33,7 +33,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
     }
 
     if (d) {
-        console.time('createthumbnail');
+        console.time('createthumbnail' + id);
     }
 
     var img = new Image();
@@ -172,13 +172,16 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
         }
 
         if (d) {
-            console.timeEnd('createthumbnail');
+            console.timeEnd('createthumbnail' + id);
         }
+
+        delete this.aes;
+        img = null;
     };
     img.onerror = function(e) {
         if (d) {
             console.error('createthumbnail error', e);
-            console.timeEnd('createthumbnail');
+            console.timeEnd('createthumbnail' + id);
         }
     };
     if (typeof FileReader !== 'undefined') {
@@ -319,7 +322,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                                 file = new Blob([u8], {
                                     type: file.type
                                 });
-                                mega.utils.neuterArrayBuffer(u8);
+                                M.neuterArrayBuffer(u8);
                                 ThumbFR.readAsArrayBuffer(file);
                             }, function(ex) {
                                 if (d) {
@@ -346,7 +349,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                 file = new Blob([new Uint8Array(imagedata)], {
                     type: 'image/jpeg'
                 });
-                mega.utils.neuterArrayBuffer(imagedata);
+                M.neuterArrayBuffer(imagedata);
             }
             ThumbFR.readAsArrayBuffer(file);
         }, 350 + Math.floor(Math.random() * 600));
@@ -378,7 +381,7 @@ function __render_thumb(img, u8, orientation, blob) {
                 type: 'image/jpg'
             });
         }
-        mega.utils.neuterArrayBuffer(u8);
+        M.neuterArrayBuffer(u8);
     }
     if (!u8 || (img.huge && img.dataSize === blob.size)) {
         if (d) {

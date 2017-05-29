@@ -264,7 +264,7 @@ var ConversationsList = React.createClass({
 
         var sortedConversations = obj_values(this.props.chats.toJS());
 
-        sortedConversations.sort(mega.utils.sortObjFn("lastActivity", -1));
+        sortedConversations.sort(M.sortObjFn("lastActivity", -1));
 
         sortedConversations.forEach((chatRoom) => {
             var contact;

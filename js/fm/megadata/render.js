@@ -5,32 +5,10 @@
 MegaData.prototype.renderMain = function(aUpdate) {
     "use strict";
 
-    // If mobile render an update to the cloud
-    if (is_mobile) {
-
-        // If flag is set, just update to show new files
-        if (aUpdate) {
-            mobile.cloud.renderUpdate();
-        }
-        else {
-            // Otherwise do a full re-render
-            mobile.cloud.renderLayout();
-        }
-
-        // Don't execute any regular webclient code
-        return true;
-    }
-
     var numRenderedNodes = -1;
 
     if (d) {
         console.time('renderMain');
-    }
-
-    // Disable aUpdate flag if a new item was added to an empty
-    // folder, so that MegaRender properly uses JSP container..
-    if (aUpdate && this.v.length === 1) {
-        aUpdate = false;
     }
 
     // Disable aUpdate flag if a new item was added to an empty
@@ -64,7 +42,7 @@ MegaData.prototype.renderMain = function(aUpdate) {
     if (numRenderedNodes) {
 
         if (!aUpdate) {
-            contactUI();
+            M.addContactUI();
 
             if (this.viewmode) {
                 fa_duplicates = Object.create(null);
@@ -84,6 +62,10 @@ MegaData.prototype.renderMain = function(aUpdate) {
     }
 };
 
+/**
+ * Helper for M.renderMain
+ * @param {Boolean} u Whether we're just updating the list
+ */
 MegaData.prototype.rmSetupUI = function(u) {
     if (this.viewmode === 1) {
         if (this.v.length > 0) {
@@ -91,13 +73,13 @@ MegaData.prototype.rmSetupUI = function(u) {
             o.find('div.clear').remove();
             o.append('<div class="clear"></div>');
         }
-        iconUI(u);
+        M.addIconUI(u);
         if (!u) {
             fm_thumbnails();
         }
     }
     else {
-        Soon(gridUI);
+        M.addGridUIDelayed();
     }
     Soon(fmtopUI);
 
@@ -105,19 +87,20 @@ MegaData.prototype.rmSetupUI = function(u) {
         onIdle(this.onRenderFinished);
         delete this.onRenderFinished;
     }
+
     $('.grid-scrolling-table .grid-url-arrow').rebind('click', function(e) {
         var target = $(this).closest('tr');
-        if (target.attr('class').indexOf('ui-selected') == -1) {
+        if (!target.hasClass('ui-selected')) {
             target.parent().find('tr').removeClass('ui-selected');
         }
         target.addClass('ui-selected');
         e.preventDefault();
         e.stopPropagation(); // do not treat it as a regular click on the file
         e.currentTarget = target;
-        cacheselect();
-        searchPath();
+        M.cacheselect();
+        M.searchPath();
         if (!$(this).hasClass('active')) {
-            contextMenuUI(e, 1);
+            M.contextMenuUI(e, 1);
             $(this).addClass('active');
         }
         else {
@@ -135,11 +118,11 @@ MegaData.prototype.rmSetupUI = function(u) {
         e.preventDefault();
         e.stopPropagation(); // do not treat it as a regular click on the file
         e.currentTarget = target;
-        cacheselect();
-        searchPath();
+        M.cacheselect();
+        M.searchPath();
         if (!$(this).hasClass('active')) {
             $(this).addClass('active');
-            contextMenuUI(e, 1);
+            M.contextMenuUI(e, 1);
         }
         else {
             $(this).removeClass('active');
@@ -162,7 +145,7 @@ MegaData.prototype.rmSetupUI = function(u) {
             $('.shared-details-info-block .grid-url-arrow').rebind('click', function(e) {
                 prepareShareMenuHandler(e);
                 if (!$(this).hasClass('active')) {
-                    contextMenuUI(e, 1);
+                    M.contextMenuUI(e, 1);
                     $(this).addClass('active');
                 }
                 else {
@@ -178,7 +161,7 @@ MegaData.prototype.rmSetupUI = function(u) {
                 e.clientY = $this.offset().top + $this.height()
 
                 if (!$(this).hasClass('active')) {
-                    contextMenuUI(e, 3);
+                    M.contextMenuUI(e, 3);
                     $(this).addClass('active');
                 }
                 else {
@@ -205,12 +188,16 @@ MegaData.prototype.rmSetupUI = function(u) {
                 var shareId = getSitePath().replace('/fm/', '');
 
                 // Remove user from the share
-                leaveShare(shareId);
+                M.leaveShare(shareId);
             });
         }
     }
 };
 
+/**
+ * Render Share Dialog contents
+ * @param {String} h Node handle
+ */
 MegaData.prototype.renderShare = function(h) {
     var html = '';
     if (this.d[h].shares) {
@@ -260,12 +247,20 @@ MegaData.prototype.renderTree = function() {
 
     promise.done(function() {
         M.contacts();
-        delay(treeUI);
+        M.addTreeUIDelayed();
     });
 
     return promise;
 };
 
+MegaData.prototype.cacheselect = function() {
+    $.selected = [];
+    $($.selectddUIgrid + ' ' + $.selectddUIitem).each(function(i, o) {
+        if ($(o).hasClass('ui-selected')) {
+            $.selected.push($(o).attr('id'));
+        }
+    });
+};
 
 MegaData.prototype.pathLength = function() {
     var length = $('.fm-right-header .fm-breadcrumbs-block:visible').outerWidth()
@@ -391,11 +386,11 @@ MegaData.prototype.renderPath = function() {
         $('.search-files-result').addClass('last-button');
     }
     else if (this.currentdirid && this.currentdirid === 'opc') {
-        DEBUG('Render Path OPC');
+        if (d) console.debug('Render Path OPC');
             $('.fm-right-header .fm-breadcrumbs-block').safeHTML(contactBreadcrumb + html);
     }
     else if (this.currentdirid && this.currentdirid === 'ipc') {
-        DEBUG('Render Path IPC');
+        if (d) console.debug('Render Path IPC');
             $('.fm-right-header .fm-breadcrumbs-block').safeHTML(contactBreadcrumb + html);
     }
     else {
@@ -473,4 +468,103 @@ MegaData.prototype.renderPath = function() {
         $('.fm-breadcrumbs:first').removeClass('folder').addClass('folder-link');
         $('.fm-breadcrumbs:first span').empty();
     }
+};
+
+MegaData.prototype.searchPath = function() {
+    "use strict";
+
+    if (M.currentdirid && M.currentdirid.substr(0, 7) === 'search/') {
+        var sel;
+
+        if (M.viewmode) {
+            sel = $('.fm-blocks-view .ui-selected');
+        }
+        else {
+            sel = $('.grid-table .ui-selected');
+        }
+
+        if (sel.length === 1) {
+            var html = '';
+            var path = M.getPath($(sel[0]).attr('id'));
+            path.reverse();
+
+            for (var i = 0; i < path.length; i++) {
+                var c, name, id = false, iconimg = '';
+                var n = M.d[path[i]];
+
+                if (path[i].length === 11 && M.u[path[i]]) {
+                    id = path[i];
+                    c = 'contacts-item';
+                    name = M.u[path[i]].m;
+                }
+                else if (path[i] === M.RootID) {
+                    id = M.RootID;
+                    c = 'cloud-drive';
+                    name = l[164];
+                }
+                else if (path[i] === M.RubbishID) {
+                    id = M.RubbishID;
+                    c = 'recycle-item';
+                    name = l[168];
+                }
+                else if (path[i] === M.InboxID) {
+                    id = M.InboxID;
+                    c = 'inbox-item';
+                    name = l[166];
+                }
+                else if (n) {
+                    id = n.h;
+                    c = '';
+                    name = n.name;
+                    if (n.t) {
+                        c = 'folder';
+                    }
+                    else {
+                        iconimg = '<span class="search-path-icon-span ' + fileIcon(n) + '"></span>';
+                    }
+                }
+                if (id) {
+                    html += '<div class="search-path-icon ' + c + '" id="spathicon_' + htmlentities(id) + '">'
+                        + iconimg + '</div><div class="search-path-txt" id="spathname_' + htmlentities(id) + '">'
+                        + htmlentities(name) + '</div>';
+
+                    if (i < path.length - 1) {
+                        html += '<div class="search-path-arrow"></div>';
+                    }
+                }
+            }
+            html += '<div class="clear"></div>';
+
+            $('.search-bottom-menu').safeHTML(html);
+            $('.fm-blocks-view,.files-grid-view').addClass('search');
+
+            $('.search-path-icon,.search-path-txt').rebind('click', function() {
+                var id = $(this).attr('id');
+
+                if (id) {
+                    var n = M.d[id.replace('spathicon_', '').replace('spathname_', '')];
+
+                    if (n) {
+                        id = n.h;
+                        $.selected = [];
+
+                        if (!n.t) {
+                            $.selected.push(id);
+                            id = n.p;
+                        }
+                        M.openFolder(id)
+                            .always(function() {
+                                if ($.selected.length) {
+                                    reselect(1);
+                                }
+                            });
+                    }
+                }
+            });
+
+            return;
+        }
+    }
+
+    $('.fm-blocks-view, .files-grid-view').removeClass('search');
 };

@@ -37,7 +37,7 @@ MegaData.prototype.getSortByNameFn = function() {
         var itemA = self.getNameByHandle(a.h);
         var itemB = self.getNameByHandle(b.h);
 
-        return mega.utils.compareStrings(itemA, itemB, d);
+        return M.compareStrings(itemA, itemB, d);
     };
 };
 
@@ -279,7 +279,7 @@ MegaData.prototype.getSortByStatusFn = function(d) {
         }
         else {
             // if status is the same for both, compare names.
-            return mega.utils.compareStrings(
+            return M.compareStrings(
                 M.getNameByHandle(a.h).toLowerCase(),
                 M.getNameByHandle(b.h).toLowerCase(),
                 d
@@ -301,17 +301,17 @@ MegaData.prototype.getSortByInteractionFn = function() {
 
     var sortfn;
 
-    sortfn = mega.utils.sortObjFn(
+    sortfn = M.sortObjFn(
         function(r) {
 
             // Since the M.sort is using a COPY of the data,
             // we need an up-to-date .ts value directly from M.u[...]
-            return M.u[r.h].ts;
+            return Object(M.u[r.h]).ts;
         },
         d,
         function(a, b, d) {
             // fallback to string/name matching in case last interaction is the same
-            return mega.utils.compareStrings(
+            return M.compareStrings(
                 self.getNameByHandle(a.h).toLowerCase(),
                 self.getNameByHandle(b.h).toLowerCase(),
                 d

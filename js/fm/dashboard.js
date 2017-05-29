@@ -14,7 +14,7 @@ function dashboardUI() {
         });
     }
 
-    sectionUIopen('dashboard');
+    M.onSectionUIOpen('dashboard');
 
     // Show Membership plan
     $('.small-icon.membership').removeClass('pro1 pro2 pro3 pro4');
@@ -53,7 +53,7 @@ function dashboardUI() {
 
     // Add-contact plus
     $('.dashboard .contacts-widget .add-contacts').rebind('click', function() {
-        addContactUI();
+        contactAddDialog();
         $('.fm-add-user').trigger('click');
         $('.add-user-size-icon').trigger('click');
         return false;
@@ -397,6 +397,10 @@ dashboardUI.updateCloudDataWidget = function() {
             }
             else if (intl) {
                 cnt = intl.format(props.cnt || 0);
+            }
+
+            if (props.xfiles > 1) {
+                str += ', ' + String(l[833]).replace('[X]', props.xfiles);
             }
 
             elm.children[1].textContent = idx < 5 ? String(str).replace('[X]', cnt) : cnt;

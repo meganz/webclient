@@ -40,7 +40,7 @@ var firefoxpage = {
             mega.updateURL + '?time=' + unixtime();
 
         // Fetch the latest current_ver.txt
-        mega.utils.xhr(updateURL)
+        M.xhr(updateURL)
             .done(function(ev, data) {
                 var serverBuildVersion = null;
 

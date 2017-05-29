@@ -60,12 +60,13 @@ MegaData.prototype.filterByParent = function(id) {
     }
     // We should have a parent's childs into M.c, no need to traverse the whole M.d
     else if (this.c[id]) {
-        this.v = [];
-        for (var handle in this.c[id]) {
-            if (this.d[handle]) {
-                this.v.push(this.d[handle]);
-            }
-        }
+        this.v = Object.keys(this.c[id])
+            .map(function(h) {
+                return M.d[h];
+            })
+            .filter(function(n) {
+                return n !== undefined;
+            });
     }
     else {
         this.filterBy(function(node) {
@@ -88,7 +89,7 @@ MegaData.prototype.filterBySearch = function(str) {
             for (var node in this.d) {
                 node = this.d[node];
 
-                if (node && node.hash && node.h && RootbyId(node.h) === this.RootID) {
+                if (node && node.hash && node.h && M.getNodeRoot(node.h) === this.RootID) {
                     if (!nodesByHash[node.hash]) {
                         nodesByHash[node.hash] = [];
                     }

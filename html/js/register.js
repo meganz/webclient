@@ -191,8 +191,10 @@ function registeraccount() {
 
         M.getCopyNodes([M.RootID], null, names)
             .done(function(nodes) {
-                $.ephNodes = nodes;
-                $.ephNodes[0].t = 1; // change RootID's t2 to t1
+                if (Array.isArray(nodes) && nodes.length) {
+                    $.ephNodes = nodes;
+                    $.ephNodes[0].t = 1; // change RootID's t2 to t1
+                }
 
                 signup();
             });
@@ -366,7 +368,7 @@ function init_register() {
     if (typeof zxcvbn === 'undefined') {
         $('.login-register-input.password').addClass('loading');
 
-        mega.utils.require('zxcvbn_js')
+        M.require('zxcvbn_js')
             .done(function() {
                 $('.login-register-input.password').removeClass('loading');
                 registerpwcheck();

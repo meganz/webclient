@@ -38,13 +38,13 @@
  * ***************** END MEGA LIMITED CODE REVIEW LICENCE ***************** */
 
 // Keep a record of active transfers.
-var GlobalProgress = {};
+var GlobalProgress = Object.create(null);
 var __ccXID = 0;
 
 if (localStorage.aTransfers) {
     Soon(function() {
         var data = {};
-        var now = NOW();
+        var now = Date.now();
         try {
             data = JSON.parse(localStorage.aTransfers);
         }
@@ -77,8 +77,8 @@ function ClassChunk(task) {
     this.failed = false;
     this.altport = false;
     // this.backoff  = 1936+Math.floor(Math.random()*2e3);
-    this.lastPing = NOW();
-    this.lastUpdate = NOW();
+    this.lastPing = Date.now();
+    this.lastUpdate = Date.now();
     this.Progress = GlobalProgress[this.gid];
     this.Progress.dl_xr = this.Progress.dl_xr || dlmanager.mGetXR(); // global download progress
     this.Progress.speed = this.Progress.speed || 1;
@@ -147,7 +147,7 @@ ClassChunk.prototype.updateProgress = function(force) {
 
     // var r = this.shouldIReportDone(force === 2);
     var r = force !== 2 ? this.shouldIReportDone() : 0x7f;
-    if (this.Progress.dl_lastprogress + 200 > NOW() && !force) {
+    if (this.Progress.dl_lastprogress + 200 > Date.now() && !force) {
         // too soon
         return false;
     }
@@ -171,7 +171,7 @@ ClassChunk.prototype.updateProgress = function(force) {
         );
 
     this.Progress.dl_prevprogress = _progress;
-    this.Progress.dl_lastprogress = NOW();
+    this.Progress.dl_lastprogress = Date.now();
 
     return r;
 };
@@ -491,6 +491,11 @@ ClassFile.prototype.run = function(task_done) {
                 dlmanager.logger.info(this + ' cancelled while initializing.');
             }
         }
+        else if (!GlobalProgress[this.gid]) {
+            if (d) {
+                dlmanager.logger.info(this + ' has no associated progress instance, cancelled while initializing?');
+            }
+        }
         else {
             if (d) {
                 dlmanager.logger.info(this + ' Adding %d tasks...', (this.dl.urls || []).length);
@@ -677,7 +682,7 @@ mBroadcaster.once('startMega', function _setupDecrypter() {
             plain = null;
             done();
         }
-    }, 4);
+    });
 
     dlmanager.logger.options.levelColors = {
         'ERROR': '#fe1111',

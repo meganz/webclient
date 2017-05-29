@@ -1,10 +1,13 @@
 MegaData.prototype.accountData = function(cb, blockui) {
+    "use strict";
+
     var account = Object(this.account);
 
     if (account.lastupdate > Date.now() - 30000 && cb) {
         cb(account);
     }
     else {
+        var mRootID = M.RootID;
 
         if (blockui) {
             loadingDialog.show();
@@ -15,7 +18,7 @@ MegaData.prototype.accountData = function(cb, blockui) {
             callback: function(res, ctx) {
                 loadingDialog.hide();
 
-                if (typeof res == 'object') {
+                if (typeof res === 'object') {
                     for (var i in res) {
                         ctx.account[i] = res[i];
                     }
@@ -30,84 +33,12 @@ MegaData.prototype.accountData = function(cb, blockui) {
                     ctx.account.downbw_used = Math.round(res.caxfer);
                     ctx.account.servbw_limit = Math.round(res.srvratio);
 
-                    // Prepare storage footprint stats.
-                    var cstrgn = ctx.account.cstrgn = Object(ctx.account.cstrgn);
-                    var stats = ctx.account.stats = Object.create(null);
-                    var groups = [M.RootID, M.InboxID, M.RubbishID];
-                    var root = array_toobject(groups);
-                    var exp = Object(M.su.EXP);
-
-                    groups = groups.concat(['inshares', 'outshares', 'links']);
-                    for (var i = groups.length; i--;) {
-                        stats[groups[i]] = array_toobject(['items', 'bytes', 'files', 'folders'], 0);
-                        // stats[groups[i]].nodes = [];
-                    }
-
-
-                    // Prepare storage footprint stats.
-                    var cstrgn = ctx.account.cstrgn = Object(ctx.account.cstrgn);
-                    var stats = ctx.account.stats = Object.create(null);
-                    var groups = [M.RootID, M.InboxID, M.RubbishID];
-                    var root = array_toobject(groups);
-                    var exp = Object(M.su.EXP);
-
-                    groups = groups.concat(['inshares', 'outshares', 'links']);
-                    for (var i = groups.length; i--;) {
-                        stats[groups[i]] = array_toobject(['items', 'bytes', 'files', 'folders'], 0);
-                        // stats[groups[i]].nodes = [];
-                    }
-
-                    for (var handle in cstrgn) {
-                        var data = cstrgn[handle];
-                        var target = 'outshares';
-
-                        if (root[handle]) {
-                            target = handle;
-                        }
-                        else if (M.c.shares[handle]) {
-                            target = 'inshares';
-                        }
-                        // stats[target].nodes.push(handle);
-
-                        if (exp[handle] && !M.getNodeShareUsers(handle, 'EXP').length) {
-                            continue;
-                        }
-
-                        stats[target].items++;
-                        stats[target].bytes += data[0];
-                        stats[target].files += data[1];
-                        stats[target].folders += data[2];
-                    }
-
-                    // calculate root's folders size
-                    if (M.c[M.RootID]) {
-                        var t = Object.keys(M.c[M.RootID]);
-                        var s = Object(stats[M.RootID]);
-
-                        s.fsize = s.bytes;
-                        for (var i = t.length; i--;) {
-                            var node = M.d[t[i]] || false;
-
-                            if (!node.t) {
-                                s.fsize -= node.s;
-                            }
-                        }
-                    }
-
-                    // calculate public links items/size
-                    var links = stats.links;
-                    Object.keys(exp)
-                        .forEach(function(h) {
-                            links.files++;
-                            links.bytes += Object(M.tree[h]).tb || M.d[h] && M.d[h].s || 0;
-                        });
-
                     // If a subscription, get the timestamp it will be renewed
                     if (res.stype === 'S') {
                         ctx.account.srenew = res.srenew;
                     }
 
-                    if (res.balance.length == 0) {
+                    if (!Object(res.balance).length) {
                         ctx.account.balance = [['0.00', 'EUR']];
                     }
 
@@ -131,7 +62,7 @@ MegaData.prototype.accountData = function(cb, blockui) {
         api_req({a: 'uavl'}, {
             account: account,
             callback: function(res, ctx) {
-                if (typeof res != 'object') {
+                if (typeof res !== 'object') {
                     res = [];
                 }
                 ctx.account.vouchers = voucherData(res);
@@ -150,7 +81,7 @@ MegaData.prototype.accountData = function(cb, blockui) {
         api_req({a: 'utt'}, {
             account: account,
             callback: function(res, ctx) {
-                if (typeof res != 'object') {
+                if (typeof res !== 'object') {
                     res = [];
                 }
                 ctx.account.transactions = res;
@@ -162,7 +93,7 @@ MegaData.prototype.accountData = function(cb, blockui) {
         api_req({a: 'utp', f: 1}, {
             account: account,
             callback: function(res, ctx) {
-                if (typeof res != 'object') {
+                if (typeof res !== 'object') {
                     res = [];
                 }
                 ctx.account.purchases = res;
@@ -174,7 +105,7 @@ MegaData.prototype.accountData = function(cb, blockui) {
         api_req({a: 'usl', x: 1}, {
             account: account,
             callback: function(res, ctx) {
-                if (typeof res != 'object') {
+                if (typeof res !== 'object') {
                     res = [];
                 }
                 ctx.account.sessions = res;
@@ -185,7 +116,7 @@ MegaData.prototype.accountData = function(cb, blockui) {
             cb: cb,
             account: account,
             callback: function(res, ctx) {
-                if (typeof res == 'object') {
+                if (typeof res === 'object') {
                     if (res.p) {
                         u_attr.p = res.p;
                         if (u_attr.p) {
@@ -194,7 +125,65 @@ MegaData.prototype.accountData = function(cb, blockui) {
                     }
                 }
 
-                ctx.account.lastupdate = new Date().getTime();
+                // Prepare storage footprint stats.
+                var cstrgn = ctx.account.cstrgn = Object(ctx.account.cstrgn);
+                var stats = ctx.account.stats = Object.create(null);
+                var groups = [M.RootID, M.InboxID, M.RubbishID];
+                var root = array_toobject(groups);
+                var exp = Object(M.su.EXP);
+
+                groups = groups.concat(['inshares', 'outshares', 'links']);
+                for (var i = groups.length; i--;) {
+                    stats[groups[i]] = array_toobject(['items', 'bytes', 'files', 'folders'], 0);
+                    // stats[groups[i]].nodes = [];
+                }
+
+                for (var handle in cstrgn) {
+                    var data = cstrgn[handle];
+                    var target = 'outshares';
+
+                    if (root[handle]) {
+                        target = handle;
+                    }
+                    else if (M.c.shares[handle]) {
+                        target = 'inshares';
+                    }
+                    // stats[target].nodes.push(handle);
+
+                    if (exp[handle] && !M.getNodeShareUsers(handle, 'EXP').length) {
+                        continue;
+                    }
+
+                    stats[target].items++;
+                    stats[target].bytes += data[0];
+                    stats[target].files += data[1];
+                    stats[target].folders += data[2];
+                }
+
+                // calculate root's folders size
+                if (M.c[M.RootID]) {
+                    var t = Object.keys(M.c[M.RootID]);
+                    var s = Object(stats[M.RootID]);
+
+                    s.fsize = s.bytes;
+                    for (var i = t.length; i--;) {
+                        var node = M.d[t[i]] || false;
+
+                        if (!node.t) {
+                            s.fsize -= node.s;
+                        }
+                    }
+                }
+
+                // calculate public links items/size
+                var links = stats.links;
+                Object.keys(exp)
+                    .forEach(function(h) {
+                        links.files++;
+                        links.bytes += Object(M.tree[h]).tb || M.d[h] && M.d[h].s || 0;
+                    });
+
+                ctx.account.lastupdate = Date.now();
 
                 if (!ctx.account.bw) {
                     ctx.account.bw = 1024 * 1024 * 1024 * 1024 * 1024 * 10;
@@ -232,6 +221,11 @@ MegaData.prototype.accountData = function(cb, blockui) {
                 tfsq.perc = Math.round(tfsq.used * 100 / tfsq.max);
 
                 M.account.tfsq = tfsq;
+
+                if (mRootID !== M.RootID) {
+                    // TODO: Check if this really could happen and fix it...
+                    console.error('mRootID changed while loading...', mRootID, M.RootID);
+                }
 
                 if (ctx.cb) {
                     ctx.cb(ctx.account);

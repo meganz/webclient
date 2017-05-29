@@ -308,3 +308,254 @@ MegaData.prototype.buildtree = function _buildtree(n, dialog, stype) {
 };
 
 MegaData.prototype.buildtree.FORCE_REBUILD = 34675890009;
+
+MegaData.prototype.initTreePanelSorting = function() {
+    "use strict";
+
+    var sections = [
+        'folder-link', 'contacts', 'conversations', 'inbox', 'shared-with-me', 'cloud-drive', 'rubbish-bin'
+    ];
+    var byType = ['name', 'status', 'last-interaction'];
+
+    $.sortTreePanel = Object.create(null);
+
+    for (var i = sections.length; i--;) {
+        var type = sections[i];
+        var byDefault = (type === 'contacts' ? "status" : "name");
+
+        $.sortTreePanel[type] = {
+            by: anyOf(byType, localStorage['sort' + type + 'By']) || byDefault,
+            dir: parseInt(anyOf(['-1', '1'], localStorage['sort' + type + 'Dir']) || '1')
+        };
+
+        var dlgKey = 'Copy' + type;
+        $.sortTreePanel[dlgKey] = {
+            by: anyOf(byType, localStorage['sort' + dlgKey + 'By']) || byDefault,
+            dir: parseInt(anyOf(['-1', '1'], localStorage['sort' + dlgKey + 'Dir']) || '1')
+        };
+
+        dlgKey = 'Move' + type;
+        $.sortTreePanel[dlgKey] = {
+            by: anyOf(byType, localStorage['sort' + dlgKey + 'By']) || byDefault,
+            dir: parseInt(anyOf(['-1', '1'], localStorage['sort' + dlgKey + 'Dir']) || '1')
+        };
+    }
+};
+
+var treesearch = false;
+MegaData.prototype.treeSearchUI = function() {
+    "use strict";
+
+    $('.nw-fm-tree-header').unbind('click');
+    $('.nw-fm-search-icon').unbind('click');
+    $('.nw-fm-tree-header input').unbind('keyup').unbind('blur');
+
+    var treeredraw = function() {
+        $('li.tree-item-on-search-hidden').removeClass('tree-item-on-search-hidden');
+
+        if (M.currentrootid === M.RootID) {
+            M.buildtree(M.d[M.RootID]);
+        }
+        if (M.currentrootid === M.InboxID) {
+            M.buildtree(M.d[M.InboxID]);
+        }
+        else if (M.currentrootid === M.RubbishID) {
+            M.buildtree({h: M.RubbishID});
+        }
+        else if (M.currentrootid === 'shares') {
+            M.buildtree({h: 'shares'});
+        }
+        else if (M.currentrootid === 'contacts') {
+            M.contacts();
+        }
+        else if (M.currentrootid === 'chat') {
+            console.log('render the entire contact list filtered by search query into the conversations list');
+        }
+        M.addTreeUI();
+    };
+
+    // Items are NOT available in left panel, hide search
+    if (!$('.fm-tree-panel .content-panel.active').find('ul li, .nw-contact-item').length) {
+        $('.nw-fm-tree-header input').prop('readonly', true);
+        $('.nw-fm-search-icon').hide();
+    }
+    else { // There's items available
+
+        // Left panel header click, show search input box
+        $('.nw-fm-tree-header').rebind('click', function(e) {
+            var $self = $(this);
+
+            var targetClass = $(e.target).attr('class'),
+                filledInput = $self.attr('class'),
+                $input = $self.find('input');
+
+            // Search icon visible
+            if (targetClass && (targetClass.indexOf('nw-fm-search-icon') > -1)) {
+
+                // Remove previous search text
+                if (filledInput && (filledInput.indexOf('filled-input') > -1)) {
+                    $self.removeClass('filled-input');
+                }
+            }
+            else {
+                $self.addClass('focused-input');
+                $input.focus();
+            }
+        }); // END left panel header click
+
+        // Make a search
+        $('.nw-fm-search-icon').show().rebind('click', function() {
+            var $self = $(this);
+
+            treesearch = false;
+            treeredraw();
+            $self.prev().val('');
+            $self.parent().find('input').blur();
+        });
+
+        $('.nw-fm-tree-header input')
+            .prop('readonly', false)
+            .rebind('keyup', function(e) {
+                var $self = $(this);
+
+                var $parentElem = $self.parent();
+
+                if (e.keyCode === 27) {
+                    $parentElem.removeClass('filled-input');
+                    $self.val('');
+                    $self.blur();
+                    treesearch = false;
+                }
+                else {
+                    $parentElem.addClass('filled-input');
+                    treesearch = $self.val();
+                }
+
+                if ($self.val() === '') {
+                    $parentElem.removeClass('filled-input');
+                }
+
+                treeredraw();
+            })
+            .rebind('blur', function() {
+                var $self = $(this);
+
+                if ($self.val() === '') {
+                    $self.parent('.nw-fm-tree-header').removeClass('focused-input filled-input');
+                }
+                else {
+                    $self.parent('.nw-fm-tree-header').removeClass('focused-input');
+                }
+            });
+    }
+
+    /**
+     * Show/hide sort dialog in left panel
+     */
+    $('.nw-tree-panel-arrows').rebind('click', function() {
+        var $self = $(this);
+        var menu, type, sortTreePanel, $sortMenuItems;
+
+        // Show sort menu
+        if (!$self.hasClass('active')) {
+
+            $.hideContextMenu();
+
+            $self.addClass('active');
+
+            menu = $('.nw-sorting-menu').removeClass('hidden');
+            menu.css('right', '-' + (menu.outerWidth() - 4) + 'px');
+
+            type = M.treePanelType();
+
+            if (type === 'settings') {
+                type = M.lastActiveTab || 'cloud-drive';
+            }
+
+            // Show only contacts related sorting options
+            if (type === 'contacts') {
+                menu.find('.sorting-item-divider,.sorting-menu-item').removeClass('hidden');
+                menu.find(
+                    '*[data-by="fav"],' +
+                    '*[data-by="created"]'
+                ).addClass('hidden');
+            }
+            else { // Hide status and last-interaction sorting options in sort dialog
+                menu.find('.sorting-item-divider,.sorting-menu-item').removeClass('hidden');
+                menu.find('*[data-by=status],*[data-by=last-interaction]').addClass('hidden');
+            }
+
+            sortTreePanel = $.sortTreePanel[type];
+
+            if (d && !sortTreePanel) {
+                console.error('No sortTreePanel', type);
+            }
+
+            $sortMenuItems = $('.sorting-menu-item').removeClass('active');
+
+            if (sortTreePanel) {
+                $sortMenuItems
+                    .filter('*[data-by=' + sortTreePanel.by + '],*[data-dir=' + sortTreePanel.dir + ']')
+                    .addClass('active');
+            }
+
+            return false; // Prevent bubbling
+        }
+
+        // Hide sort menu
+        else {
+            $self.removeClass('active');
+            $('.nw-sorting-menu').addClass('hidden');
+        }
+    });
+
+    /**
+     * React on user input when new sorting criteria is picked
+     */
+    $('.fm-left-panel .sorting-menu-item').rebind('click', function() {
+        var $self = $(this);
+        var data = $self.data();
+        var type = M.treePanelType();
+
+        if (type === 'settings') {
+            type = M.lastActiveTab || 'cloud-drive';
+        }
+
+        if (!$self.hasClass('active') && $.sortTreePanel[type]) {
+            $self.parent().find('.sorting-menu-item').removeClass('active');
+            $self.addClass('active');
+
+            $('.nw-sorting-menu').addClass('hidden');
+            $('.nw-tree-panel-arrows').removeClass('active');
+
+            if (data.dir) {
+                localStorage['sort' + type + 'Dir'] = $.sortTreePanel[type].dir = data.dir;
+            }
+            if (data.by) {
+                localStorage['sort' + type + 'By'] = $.sortTreePanel[type].by = data.by;
+            }
+
+            if (type === 'contacts') {
+                M.contacts();
+            }
+            else if (type === 'shared-with-me') {
+                M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
+            }
+            else if (type === 'inbox') {
+                M.buildtree(M.d[M.InboxID], M.buildtree.FORCE_REBUILD);
+            }
+            else if (type === 'rubbsih-bin') {
+                M.buildtree({h: M.RubbishID}, M.buildtree.FORCE_REBUILD);
+            }
+            else if ((type === 'cloud-drive') || (type === 'folder-link')) {
+                M.buildtree(M.d[M.RootID], M.buildtree.FORCE_REBUILD);
+            }
+
+            M.addTreeUI(); // reattach events
+        }
+    });
+};
+
+MegaData.prototype.treePanelType = function() {
+    return $.trim($('.nw-fm-left-icon.active').attr('class').replace(/(active|nw-fm-left-icon|ui-droppable)/g, ''));
+};

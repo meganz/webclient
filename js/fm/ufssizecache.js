@@ -59,8 +59,9 @@ UFSSizeCache.prototype.save = function(rootNode) {
         if (n) {
             if (rootNode && !this.cache[h][3] && !n.su) {
                 if (rootNode.p !== h) {
-                    console.error('Uh..oh... internal error.');
-                    debugger
+                    srvlog('UFSSizeCache Error 0xBADF', null, true);
+                    console.warn('Uh..oh... internal error, try menu->reload', rootNode.p, h, this.cache[h]);
+                    if (d > 1) debugger
                 }
                 continue;
             }
@@ -89,6 +90,7 @@ UFSSizeCache.prototype.addToDB = function(n) {
             h: n.h,
             p: n.p,
             s: n.s >= 0 ? n.s : -n.t,
+            c: n.hash || '',
             d: n
         });
     }

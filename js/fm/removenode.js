@@ -102,8 +102,8 @@ function removeUInode(h, parent) {
             break;
     }
 
-    if (M.currentdirid === h || isCircular(h, M.currentdirid) === true) {
-        parent = parent || M.getNodeParent(n || h) || RootbyId(h);
+    if (M.currentdirid === h || M.isCircular(h, M.currentdirid) === true) {
+        parent = parent || M.getNodeParent(n || h) || M.getNodeRoot(h);
         delay('openfolder', M.openFolder.bind(M, parent));
     }
 }
@@ -122,7 +122,7 @@ function fmremove() {
                 var promises = [];
 
                 for (var i = handles.length; i--;) {
-                    promises.push(leaveShare(handles[i]));
+                    promises.push(M.leaveShare(handles[i]));
                 }
 
                 promise.linkDoneAndFailTo(MegaPromise.allDone(promises));
@@ -141,7 +141,7 @@ function fmremovesync() {
         foldercnt = 0,
         contactcnt = 0,
         removesharecnt = 0;
-    
+
     // If on mobile we will bypass the warning dialog prompts
     if (is_mobile) {
         localStorage.skipDelWarning = '1';
@@ -166,7 +166,7 @@ function fmremovesync() {
 
     if (removesharecnt) {
         for (var i in $.selected) {
-            leaveShare($.selected[i]);
+            M.leaveShare($.selected[i]);
         }
         M.openFolder('shares', true);
     }
@@ -195,7 +195,7 @@ function fmremovesync() {
                         if (M.c[selected]) {
                             Object.keys(M.c[selected])
                                 .forEach(function(sharenode) {
-                                    leaveShare(sharenode);
+                                    M.leaveShare(sharenode);
                                 });
                         }
 
@@ -219,7 +219,7 @@ function fmremovesync() {
     }
 
     // Remove selected nodes from rubbish bin
-    else if (RootbyId($.selected[0]) === M.RubbishID) {
+    else if (M.getNodeRoot($.selected[0]) === M.RubbishID) {
 
         var dlgMessage = '';
         var toastMessage = '';
@@ -283,7 +283,7 @@ function fmremovesync() {
     }
 
     // Remove contacts
-    else if (RootbyId($.selected[0]) === 'contacts') {
+    else if (M.getNodeRoot($.selected[0]) === 'contacts') {
         if (localStorage.skipDelWarning) {
             M.copyNodes($.selected, M.RubbishID, true);
         }
@@ -436,7 +436,7 @@ function fmremdupes(test) {
     loadingDialog.show();
     for (i in M.d) {
         var n = M.d[i];
-        if (n && n.hash && n.h && RootbyId(n.h) === cRootID) {
+        if (n && n.hash && n.h && M.getNodeRoot(n.h) === cRootID) {
             if (!hs[n.hash]) {
                 hs[n.hash] = [];
             }

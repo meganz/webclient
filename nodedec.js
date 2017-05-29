@@ -277,7 +277,7 @@ function crypto_makeattr(n, nn) {
     if (typeof n.f != 'undefined') ar.f = n.f;
 
     try {
-        ab = str_to_ab('MEGA' + to8(JSON.stringify(ar)));
+        var ab = str_to_ab('MEGA' + to8(JSON.stringify(ar)));
     } catch (e) {
         msgDialog('warningb', l[135], e.message || e);
         throw e;

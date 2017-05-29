@@ -73,7 +73,7 @@ MegaData.prototype.onlineStatusEvent = function(u, status) {
 
         if (getSitePath() === "/fm/" + u.u) {
             // re-render the contact view page if the presence had changed
-            contactUI();
+            M.addContactUI();
         }
         if (u && u.u === u_handle) {
             megaChat.renderMyStatus();
@@ -89,7 +89,7 @@ MegaData.prototype.onlineStatusEvent = function(u, status) {
  *
  */
 MegaData.prototype.drawReceivedContactRequests = function(ipc, clearGrid) {
-    DEBUG('Draw received contacts grid.');
+    if (d) console.debug('Draw received contacts grid.');
     var html, email, ps, trClass, id,
         type = '',
         drawn = false,
@@ -193,7 +193,7 @@ MegaData.prototype.handleEmptyContactGrid = function() {
  */
 MegaData.prototype.drawSentContactRequests = function(opc, clearGrid) {
 
-    DEBUG('Draw sent invites.');
+    if (d) console.debug('Draw sent invites.');
 
     var html, hideCancel, hideReinvite, hideOPC,
         drawn = false,
@@ -337,10 +337,6 @@ MegaData.prototype.contacts = function() {
         .map(function(handle) {
             return M.d[handle];
         });
-
-    if (typeof this.i_cache !== "object") {
-        this.i_cache = {};
-    }
 
     var sortBy = $.sortTreePanel['contacts'].by;
     var sortFn;
@@ -625,7 +621,7 @@ MegaData.prototype.syncUsersFullname = function(userId) {
         if (fminitialized) {
             if (getSitePath() === "/fm/" + contact.u) {
                 // re-render the contact view page if the presence had changed
-                contactUI();
+                M.addContactUI();
             }
         }
     };
@@ -837,7 +833,7 @@ MegaData.prototype.checkInviteContactPrerequisites = function(email) {
  * look at API response code table.
  */
 MegaData.prototype.inviteContact = function(owner, target, msg) {
-    DEBUG('inviteContact');
+    if (d) console.debug('inviteContact');
     var proceed = this.checkInviteContactPrerequisites(target);
 
     if (proceed === 0) {
@@ -887,7 +883,7 @@ MegaData.prototype.inviteContactMessageHandler = function(errorCode) {
 };
 
 MegaData.prototype.cancelPendingContactRequest = function(target) {
-    DEBUG('cancelPendingContactRequest');
+    if (d) console.debug('cancelPendingContactRequest');
     var proceed = this.checkCancelContactPrerequisites(target);
 
     if (proceed === 0) {
@@ -931,7 +927,7 @@ MegaData.prototype.checkCancelContactPrerequisites = function(email) {
 
 MegaData.prototype.reinvitePendingContactRequest = function(target) {
 
-    DEBUG('reinvitePendingContactRequest');
+    if (d) console.debug('reinvitePendingContactRequest');
     api_req({'a': 'upc', 'u': target, 'aa': 'r', i: requesti});
 };
 
@@ -939,7 +935,7 @@ MegaData.prototype.reinvitePendingContactRequest = function(target) {
 // Answer on 'aa':'i', "{"a":"upc","p":"t17TPe65rMM","s":1,"uts":1416438884,"ou":"nKv9P8pn64U","i":"qHzMjvvqTY"}"
 // ToDo, update M.ipc so we can have info about ipc status for view received requests
 MegaData.prototype.ipcRequestHandler = function(id, action) {
-    DEBUG('ipcRequestHandler');
+    if (d) console.debug('ipcRequestHandler');
     var proceed = this.checkIpcRequestPrerequisites(id);
 
     if (proceed === 0) {

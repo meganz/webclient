@@ -1,23 +1,55 @@
 (function(global) {
     "use strict";
 
+    var fcv_watch = Object.create(null);
+
+    // map handle to root name
+    var maph = function(h) {
+        if (h === M.RootID) {
+            return h + ' (RootID)';
+        }
+        if (h === M.InboxID) {
+            return h + ' (InboxID)';
+        }
+        if (h === M.RubbishID) {
+            return h + ' (RubbishID)';
+        }
+
+        return h;
+    };
+
     /**
      * Invoke M.openFolder() completion.
      *
      * @param {String}      id               The folder id
      * @param {String}      newHashLocation  location change
+     * @param {Boolean}     first            Whether this is the first open call
      * @param {MegaPromise} promise          Completion promise
      * @private
      */
     var _openFolderCompletion = function(id, newHashLocation, first, promise) {
         this.previousdirid = this.currentdirid;
         this.currentdirid = id;
-        this.currentrootid = RootbyId(id);
+        this.currentrootid = this.getNodeRoot(id);
 
         if (first) {
             fminitialized = true;
             $('.top-search-bl').show();
             mBroadcaster.sendMessage('fm:initialized');
+
+            if (d) {
+                console.debug('RootID=%s, InboxID=%s, RubbishID=%s', this.RootID, this.InboxID, this.RubbishID);
+            }
+
+            fcv_watch[M.RootID] = 1;
+            fcv_watch[M.InboxID] = 1;
+            fcv_watch[M.RubbishID] = 1;
+            fcv_watch.shares = 1;
+        }
+
+        if (d) {
+            console.debug('previd=%s, currid=%s, currroot=%s',
+                maph(this.previousdirid), maph(this.currentdirid), maph(this.currentrootid));
         }
 
         if (this.currentrootid === this.RootID) {
@@ -34,13 +66,7 @@
         else if (id === undefined && folderlink) {
             // Error reading shared folder link! (Eg, server gave a -11 (EACCESS) error)
             // Force cleaning the current cloud contents and showing an empty msg
-            if (!is_mobile) {
-                this.renderMain();
-            }
-            else {
-                // Trigger rendering of mobile file manager
-                mobile.cloud.renderLayout();
-            }
+            this.renderMain();
         }
         else if (id && (id.substr(0, 7) !== 'account')
             && (id.substr(0, 9) !== 'dashboard')
@@ -125,13 +151,7 @@
                 }
             }
 
-            if (!is_mobile) {
-                this.renderMain();
-            }
-            else {
-                // Trigger rendering of mobile file manager
-                mobile.cloud.renderLayout();
-            }
+            this.renderMain();
 
             if (fminitialized && !is_mobile) {
                 var currentdirid = this.currentdirid;
@@ -146,15 +166,26 @@
                 if ($('#treea_' + currentdirid).length === 0) {
                     var n = this.d[currentdirid];
                     if (n && n.p) {
-                        treeUIopen(n.p, false, true);
+                        M.onTreeUIOpen(n.p, false, true);
                     }
                 }
-                treeUIopen(currentdirid, currentdirid === 'contacts');
+                M.onTreeUIOpen(currentdirid, currentdirid === 'contacts');
 
                 $('#treea_' + currentdirid).addClass('opened');
             }
             if (d) {
                 console.timeEnd('time for rendering');
+            }
+
+            if (fcv_watch[this.currentrootid] /*&& !(Date.now() % 10)*/) {
+                var f = 0;
+                var t = 0;
+                for (var i = this.v.length; i--;) {
+                    if (this.v[i].t) t++;
+                    else f++;
+                }
+
+                api_req({a: 'fcv', h: this.currentdirid, f: f, d: t, sn: currsn});
             }
 
             Soon(function() {
@@ -196,12 +227,9 @@
         catch (ex) {
             console.error(ex);
         }
-        if (!is_mobile) {
-            searchPath();
 
-            var sortMenu = new mega.SortMenu();
-            sortMenu.treeSearchUI();
-        }
+        M.searchPath();
+        M.treeSearchUI();
 
         promise.resolve(id);
         mBroadcaster.sendMessage('mega:openfolder');
@@ -228,7 +256,8 @@
         $('.fm-files-view-icon').removeClass('hidden');
 
         if (d) {
-            console.warn('openFolder()', this.currentdirid, id, force, loadfm.loaded);
+            console.warn('openFolder(%s, %s), currentdir=%s, fmloaded=%s',
+                maph(id), force, maph(this.currentdirid), loadfm.loaded);
         }
 
         if (!loadfm.loaded) {
@@ -244,7 +273,7 @@
         }
 
         if (!is_mobile && (id !== 'notifications') && !$('.fm-main.notifications').hasClass('hidden')) {
-            notificationsUI(1);
+            M.addNotificationsUI(1);
         }
 
         this.search = false;
@@ -287,7 +316,7 @@
                 this.chat = true;
 
                 megaChat.refreshConversations();
-                treeUI();
+                M.addTreeUI();
                 var room = megaChat.renderListing();
 
                 if (room) {
@@ -296,20 +325,20 @@
             }
         }
         else if (id && id.substr(0, 7) === 'account') {
-            accountUI();
+            M.onFileManagerReady(accountUI);
         }
         else if (id && id.substr(0, 9) === 'dashboard') {
-            dashboardUI();
+            M.onFileManagerReady(dashboardUI);
         }
         else if (id && id.substr(0, 13) === 'notifications') {
-            notificationsUI();
+            M.addNotificationsUI();
         }
         else if (id && id.substr(0, 7) === 'search/') {
             this.search = true;
         }
         else if (id && id.substr(0, 5) === 'chat/') {
             this.chat = true;
-            treeUI();
+            this.addTreeUI();
 
             if (megaChatIsReady) {
                 // XX: using the old code...for now

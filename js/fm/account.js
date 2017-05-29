@@ -19,10 +19,10 @@ function accountUI() {
         deleteScrollPanel(e, 'jsp');
     });
 
-    sectionUIopen('account');
+    M.onSectionUIOpen('account');
     if (typeof zxcvbn === 'undefined') {
         loadingDialog.show();
-        return mega.utils.require('zxcvbn_js')
+        return M.require('zxcvbn_js')
             .done(function() {
                 delay(accountUI);
             });
@@ -98,7 +98,7 @@ function accountUI() {
             accountUI.advancedSection();
 
             $('#network-testing-button').rebind('click', function() {
-                mega.utils.require('network_js')
+                M.require('network_js')
                     .then(function() {
                         NetworkTesting.dialog();
                     });
@@ -1472,7 +1472,7 @@ function accountUI() {
         });
         $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', true));
 
-        $('#find-duplicate').rebind('click', mega.utils.findDupes);
+        $('#find-duplicate').rebind('click', M.findDupes);
 
         $.tresizer();
 

@@ -44,7 +44,7 @@ function MegaPromise(fn) {
     }
 
     if (MegaPromise.debugPendingPromisesTimeout > 0) {
-        var preStack = mega.utils.getStack();
+        var preStack = M.getStack();
         setTimeout(function() {
             if (self.state() === 'pending') {
                 console.error("Pending promise found: ", self, preStack);
@@ -53,7 +53,7 @@ function MegaPromise(fn) {
     }
 
     if (MegaPromise.debugPreStack === true) {
-        self.stack = mega.utils.getStack();
+        self.stack = M.getStack();
     }
 }
 
@@ -136,11 +136,11 @@ MegaPromise.busy = function() {
 MegaPromise.getTraceableReject = function($promise, origPromise) {
     // Save the current stack pointer in case of an async call behind
     // the promise.reject (Ie, onAPIProcXHRLoad shown as initial call)
-    var preStack = d && mega.utils.getStack();
+    var preStack = d && M.getStack();
 
     return function __mpTraceableReject(aResult) {
         if (window.d > 1) {
-            var postStack = mega.utils.getStack();
+            var postStack = M.getStack();
             if (typeof console.group === 'function') {
                 console.group('PROMISE REJECTED');
             }

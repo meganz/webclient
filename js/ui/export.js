@@ -267,7 +267,7 @@ var exportPassword = {
                 var $loader = this.$dialog.find('.estimator-loading-icon').addClass('loading');
 
                 // On completion of loading, hide the loading spinner
-                mega.utils.require('zxcvbn_js')
+                M.require('zxcvbn_js')
                     .done(function() {
                         $loader.removeClass('loading');
                     });
@@ -1347,7 +1347,7 @@ var exportExpiry = {
         $span.text(l[1990]);
 
         // If a browser extension or the new HTML5 native copy/paste is available (Chrome & Firefox)
-        if (is_extension || mega.utils.execCommandUsable()) {
+        if (is_extension || M.execCommandUsable()) {
             if (!is_chrome_firefox) {
                 $('.fm-dialog-chrome-clipboard').removeClass('hidden');
             }
@@ -1364,7 +1364,13 @@ var exportExpiry = {
                     // Put the link/s in an invisible div, highlight the link/s then copy to clipboard using HTML5
                     $('#chromeclipboard').html(links);
                     selectText('chromeclipboard');
-                    success = document.execCommand('copy');
+                    try {
+                        success = document.execCommand('copy');
+                    }
+                    catch (e) {
+                        console.error(e);
+                        success = false;
+                    }
                 }
 
                 if (success) {

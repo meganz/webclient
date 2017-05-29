@@ -11,9 +11,9 @@ MegaData.prototype.makeDir = function(n) {
             if (M.d[e].t == 1 && M.d[e].p == d) {
                 var p = o || [];
                 if (!o) {
-                    p.push(fm_safename(M.d[d].name));
+                    p.push(M.getSafeName(M.d[d].name));
                 }
-                p.push(fm_safename(M.d[e].name));
+                p.push(M.getSafeName(M.d[e].name));
                 if (!getfolders(M.d[e].h, p)) {
                     dirs.push(p);
                 }
@@ -64,7 +64,7 @@ MegaData.prototype.getDownloadFolderNodes = function(n, md, nodes, paths) {
 
         for (var k = 0; k < p.length; k++) {
             if (this.d[p[k]] && this.d[p[k]].t) {
-                path = fm_safename(this.d[p[k]].name) + '/' + path;
+                path = M.getSafeName(this.d[p[k]].name) + '/' + path;
             }
             if (p[k] == n) {
                 break;
@@ -144,11 +144,11 @@ MegaData.prototype.addDownload = function(n, z, preview) {
     // fetch all nodes needed by M.getNodesSync
     dbfetch.coll(n)
         .always(function() {
-            M.addDownloadReady.apply(M, args);
+            M.addDownloadSync.apply(M, args);
         });
 };
 
-MegaData.prototype.addDownloadReady = function(n, z, preview) {
+MegaData.prototype.addDownloadSync = function(n, z, preview) {
     var args = toArray.apply(null, arguments);
     var webdl = function() {
         M.addWebDownload.apply(M, args);
@@ -173,7 +173,7 @@ MegaData.prototype.addDownloadReady = function(n, z, preview) {
                         t: node.t,
                         h: node.h,
                         p: node.p,
-                        n: base64urlencode(fm_safename(node.name))
+                        n: base64urlencode(M.getSafeName(node.name))
                     };
                     if (!node.t) {
                         item.s = node.s;
@@ -268,7 +268,7 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
     if (z) {
         z = ++dlmanager.dlZipID;
         if (this.d[n[0]] && this.d[n[0]].t && this.d[n[0]].name) {
-            zipname = fm_safename(this.d[n[0]].name) + '.zip';
+            zipname = M.getSafeName(this.d[n[0]].name) + '.zip';
         }
         else {
             zipname = (zipname || ('Archive-' + Math.random().toString(16).slice(-4))) + '.zip';
@@ -319,11 +319,11 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
             p: path,
             size: n.s,
             nauth: n_h,
-            onDownloadProgress: this.dlprogress,
-            onDownloadComplete: this.dlcomplete,
-            onBeforeDownloadComplete: this.dlbeforecomplete,
-            onDownloadError: this.dlerror,
-            onDownloadStart: this.dlstart,
+            onDownloadProgress: this.dlprogress.bind(this),
+            onDownloadComplete: this.dlcomplete.bind(this),
+            onBeforeDownloadComplete: this.dlbeforecomplete.bind(this),
+            onDownloadError: this.dlerror.bind(this),
+            onDownloadStart: this.dlstart.bind(this),
             zipid: z,
             zipname: zipname,
             preview: preview
@@ -347,7 +347,7 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
     // If regular download using Firefox and the total download is over 1GB then show the dialog
     // to use the extension, but not if they've seen the dialog before and ticked the checkbox
     if (dlMethod == MemoryIO && !localStorage.firefoxDialog && $.totalDL > 1048576000 && navigator.userAgent.indexOf('Firefox') > -1) {
-        Later(firefoxDialog);
+        later(firefoxDialog);
     }
 
     var flashhtml = '';
@@ -388,7 +388,7 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
 
 MegaData.prototype.onDownloadAdded = function(added, isPaused, isZIP, zipSize) {
     if (!$.transferHeader) {
-        transferPanelUI();
+        M.addTransferPanelUI();
     }
     delay('fm_tfsupdate', fm_tfsupdate); // this will call $.transferHeader();
 
@@ -443,7 +443,7 @@ MegaData.prototype.dlprogress = function(id, perc, bl, bt, kbps, dl_queue_num, f
         return false;
     }
     if (!$.transferprogress) {
-        $.transferprogress = {};
+        $.transferprogress = Object.create(null);
     }
     if (kbps == 0) {
         if (!force && (perc != 100 || $.transferprogress[id])) {
@@ -582,7 +582,7 @@ MegaData.prototype.dlcomplete = function(dl) {
     }
 
     delay('tfscomplete', function() {
-        mega.utils.resetUploadDownload();
+        M.resetUploadDownload();
         $.tresizer();
     });
 };
@@ -695,14 +695,14 @@ MegaData.prototype.dlstart = function(dl) {
         .addClass('transfer-initiliazing')
         .find('.transfer-status').text(l[1042]);
 
-    dl.st = NOW();
+    dl.st = Date.now();
     ASSERT(typeof dl_queue[dl.pos] === 'object', 'No dl_queue entry for the provided dl...');
     ASSERT(typeof dl_queue[dl.pos] !== 'object' || dl.n == dl_queue[dl.pos].n, 'No matching dl_queue entry...');
     if (typeof dl_queue[dl.pos] === 'object') {
         fm_tfsupdate(); // this will call $.transferHeader()
         this.dlprogress(id, 0, 0, 0, 0, dl.pos);
         if (mega.ui.tpp.getTime('dl') === 0) {
-            mega.ui.tpp.setTime(NOW(), 'dl');
+            mega.ui.tpp.setTime(Date.now(), 'dl');
         }
         mega.ui.tpp.start(dl, 'dl');
     }
@@ -818,7 +818,7 @@ MegaData.prototype.addToTransferTable = function(gid, ttl, elem) {
         mBroadcaster.addListener('tfs-dynlist-flush', M);
 
         $(window).bind('resize.tfsdynlist', this.tfsResizeHandler);
-        delete this.tfsResizeHandler;
+        this.tfsResizeHandler = null;
     }
 
     if (T.left > 0) {
@@ -999,7 +999,7 @@ MegaData.prototype.addUpload = function(u, ignoreWarning) {
             return;
         }
         if (!$.transferHeader) {
-            transferPanelUI();
+            M.addTransferPanelUI();
         }
         if (page === 'start') {
             ulQueue.pause();
@@ -1022,25 +1022,33 @@ MegaData.prototype.addUpload = function(u, ignoreWarning) {
     // Prepare uploads by creating their target path beforehand as needed for the new fileconflict logic
     var paths = Object.create(null);
 
-    for (var i = u.length; i--;) {
-        var file = u[i];
+    if (onChat) {
+        paths['My chat files'] = null;
+    }
+    else {
+        for (var i = u.length; i--;) {
+            var file = u[i];
 
-        if (file.path) {
-            paths[file.path] = null;
+            if (file.path) {
+                paths[file.path] = null;
+            }
         }
     }
 
     // Make one folder at a time
     var makeDir = function(path, target) {
         var promise = new MegaPromise();
-        var safePath = fm_safepath(path);
+        var safePath = M.getSafePath(path);
 
-        if (String(target).substr(0, 4) === 'chat') {
-            target = M.RootID;
-            safePath = 'My chat files';
+        if (safePath.length === 1) {
+            safePath = safePath[0];
         }
 
-        createFolder(target, safePath, new MegaPromise())
+        if (onChat) {
+            target = M.RootID;
+        }
+
+        M.createFolder(target, safePath, new MegaPromise())
             .always(function(target) {
                 if (typeof target === 'number') {
                     ulmanager.logger.warn('Unable to create folder "%s" on target "%s"',
@@ -1068,22 +1076,41 @@ MegaData.prototype.addUpload = function(u, ignoreWarning) {
         else {
             makeDirPromise.resolve();
         }
-
     })(Object.keys(paths));
 
     makeDirPromise
         .done(function() {
-            loadingDialog.hide();
 
             for (var i = u.length; i--;) {
                 var file = u[i];
 
-                if (paths[file.path]) {
+                if (onChat) {
+                    file.target = paths['My chat files'] || M.RootID;
+                }
+                else if (paths[file.path]) {
                     file.target = paths[file.path];
                 }
             }
 
-            fileconflict.check(u, target, 'upload').done(startUpload);
+            dbfetch.get(target)
+                .always(function(r) {
+                    loadingDialog.hide();
+
+                    if (!M.c[target] && String(target).length !== 11) {
+                        if (d) {
+                            ulmanager.logger.warn("Error dbfetch'ing target %s", target, r);
+                        }
+                        target = M.currentdirid;
+                    }
+
+                    if (onChat) {
+                        // Ignore the fileconflict dialog altogether while on the chat
+                        startUpload(u);
+                    }
+                    else {
+                        fileconflict.check(u, target, 'upload').done(startUpload);
+                    }
+                });
         });
 };
 
@@ -1103,7 +1130,7 @@ MegaData.prototype.ulprogress = function(ul, perc, bl, bt, bps) {
     var retime = bps > 1000 ? (bt - bl) / bps : -1;
     var transferDeg = 0;
     if (!$.transferprogress) {
-        $.transferprogress = {};
+        $.transferprogress = Object.create(null);
     }
     if (bl && bt && !uldl_hold) {
         // $.transferprogress[id] = Math.floor(bl/bt*100);
@@ -1149,19 +1176,19 @@ MegaData.prototype.ulcomplete = function(ul, h, k) {
     var id = ul.id;
     var $tr = $('#ul_' + id);
 
-    if ($.ulBunch && $.ulBunch[ul.target]) {
-        var ub = $.ulBunch[ul.target], p;
+    if ($.ulBunch && $.ulBunch[ul.chatid]) {
+        var ub = $.ulBunch[ul.chatid], p;
         ub[id] = h;
 
         for (var i in ub) {
-            if (ub[i] == 1) {
+            if (ub[i] === 1) {
                 p = true;
                 break;
             }
         }
 
         if (!p) {
-            var ul_target = ul.target;
+            var ul_target = ul.chatid;
             ub = Object.keys(ub).map(function(m) {
                 return ub[m]
             });
@@ -1225,7 +1252,7 @@ MegaData.prototype.ulcomplete = function(ul, h, k) {
     }
     // $.transferHeader();
     delay('tfscomplete', function() {
-        mega.utils.resetUploadDownload();
+        M.resetUploadDownload();
         $.tresizer();
     });
 };
@@ -1245,7 +1272,7 @@ MegaData.prototype.ulstart = function(ul) {
     fm_tfsupdate();// this will call $.transferHeader()
     this.ulprogress(ul, 0, 0, 0);
     if (mega.ui.tpp.getTime('ul') === 0) {
-        mega.ui.tpp.setTime(NOW(), 'ul');
+        mega.ui.tpp.setTime(Date.now(), 'ul');
     }
     mega.ui.tpp.start(ul, 'ul');
 };

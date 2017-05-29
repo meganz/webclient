@@ -724,7 +724,7 @@ ChatRoom.prototype.show = function() {
         }
     }
 
-    sectionUIopen('conversations');
+    M.onSectionUIOpen('conversations');
 
 
     self.megaChat.currentlyOpenedChat = self.roomJid;

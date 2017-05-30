@@ -136,7 +136,7 @@ var Help = (function() {
                     location.hash = '#' + newpage;
                 }
             }
-        }, 1350);
+        }, 150);
     }
 
 
@@ -587,6 +587,11 @@ var Help = (function() {
             var question = "";
             if (args.length === 3 || args.length === 2) {
                 question = args.pop();
+                if (args.length === 2) {// if this a question.
+                    if (question.lastIndexOf("-") !== -1) {
+                        question = question.substring(question.lastIndexOf("-") + 1);
+                    }
+                }
             } else if (args.length !== 1) {
                 loadSubPage('help');
                 return;

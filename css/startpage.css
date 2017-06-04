@@ -165,16 +165,18 @@
     padding-bottom: 397px;
 }
 .bottom-page.img.mobile-app {
-    max-width: 390px;
-    padding: 37px 31px 42px 0;
+    max-width: 400px;
+    padding: 37px 31px 50px 1px;
 }
 .bottom-page.img.megasync {
     max-width: 350px;
-    padding: 32px 0 28px 5px;
+    padding: 32px 0 34px 5px;
 }
 .bottom-page.img.browser {
-    max-width: 505px;
-    padding: 110px 0 59px 0;
+    max-width: 143%;
+    width: 853px;
+    padding: 76px 0 94px 0;
+    margin-left: 37px;
 }
 .startpage.counters {
     padding: 18px 0 22px 0;

@@ -11,7 +11,6 @@ var mobileappspage = {
         if (page) {
             $('.pages-nav.nav-button.'+page).addClass('active');
         }
-        initBottompageScroll();
     },
 
     initTabs: function() {
@@ -24,8 +23,7 @@ var mobileappspage = {
                 $('.bottom-page.tab-content:visible').addClass('hidden');
                 $('.bottom-page.tab-content.' + tabTitle).removeClass('hidden');
                 $this.addClass('active');
-                startscrollIgnore(1000);
-                jScrollStart();
+                initBottompageScroll();
             }
         });
     }

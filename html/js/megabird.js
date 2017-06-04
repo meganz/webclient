@@ -9,7 +9,5 @@ var megabirdpage = {
     init: function() {
         $('.pages-nav.nav-button').removeClass('active');
         $('.pages-nav.nav-button.megabird').addClass('active');
-
-        initBottompageScroll();
     }
 };

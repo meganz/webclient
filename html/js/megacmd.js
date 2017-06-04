@@ -67,8 +67,6 @@ function initMegacmd() {
         cmd_switchOS('windows');
     }
 
-    initBottompageScroll();
-
     $('.megaapp-button-info a').rebind('click', function(e) {
         if ($(this).hasClass('windows')) {
             cmd_switchOS('windows');

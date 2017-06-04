@@ -23,7 +23,6 @@ var mobileappspage = {
                 $('.bottom-page.tab-content:visible').addClass('hidden');
                 $('.bottom-page.tab-content.' + tabTitle).removeClass('hidden');
                 $this.addClass('active');
-                initBottompageScroll();
             }
         });
     }

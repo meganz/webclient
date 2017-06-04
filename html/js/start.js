@@ -12,8 +12,6 @@ function init_start() {
         loadSubPage('pro' + proPlan);
     });
 
-    initBottompageScroll();
-
     if (page === 'start') {
         InitFileDrag();
     }
@@ -108,7 +106,7 @@ function start_countUpdate() {
 	setTimeout(start_countUpdate,30);
 	if (start_APIcountdata.timestamp+5000 < Date.now()) start_APIcount(); 
 }
-
+/*
 function bottompageScroll() {
     $('.bottom-page.top-bl').height($('body').height());
     $('.bottom-page.scroll-block').jScrollPane({
@@ -126,3 +124,4 @@ function initBottompageScroll() {
         bottompageScroll()
     });
 }
+*/

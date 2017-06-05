@@ -1,9 +1,55 @@
+
 @font-face {
-    font-family: 'sfns_displayregular';
-    src: url('../fonts/sfns-system-san-francisco-webfont.eot');
-    src: url('../fonts/sfns-system-san-francisco-webfont?#iefix') format('embedded-opentype'), url('../fonts/sfns-system-san-francisco-webfont.woff') format('woff'), url('../fonts/sfns-system-san-francisco-webfont.ttf') format('truetype'), url('../fonts/sfns-system-san-francisco-webfont.svg#sfns_displayregular') format('svg'), url('../fonts/sfns-system-san-francisco-webfont.woff2') format('woff');
+    font-family: 'montserrat';
+    src: url('../fonts/montserrat-light-webfont.eot');
+    src: url('../fonts/montserrat-light-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/montserrat-light-webfont.woff2') format('woff2'),
+         url('../fonts/montserrat-light-webfont.woff') format('woff'),
+         url('../fonts/montserrat-light-webfont.ttf') format('truetype'),
+         url('../fonts/montserrat-light-webfont.svg#montserratlight') format('svg');
     font-weight: normal;
     font-style: normal;
+
+}
+@font-face {
+    font-family: 'montserrat-regular';
+    src: url('../fonts/montserrat-regular-webfont.eot');
+    src: url('../fonts/montserrat-regular-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/montserrat-regular-webfont.woff2') format('woff2'),
+         url('../fonts/montserrat-regular-webfont.woff') format('woff'),
+         url('../fonts/montserrat-regular-webfont.ttf') format('truetype'),
+         url('../fonts/montserrat-regular-webfont.svg#montserratregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+@font-face {
+    font-family: 'proxima_nova_lt';
+    src: url('../fonts/proximanova-light-webfont.eot');
+    src: url('../fonts/proximanova-light-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/proximanova-light-webfont.woff2') format('woff2'),
+         url('../fonts/proximanova-light-webfont.woff') format('woff'),
+         url('../fonts/proximanova-light-webfont.ttf') format('truetype'),
+         url('../fonts/proximanova-light-webfont.svg#proxima_nova_ltlight') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+
+
+
+@font-face {
+    font-family: 'proxima_nova_rg';
+    src: url('../fonts/proximanova-reg-webfont.eot');
+    src: url('../fonts/proximanova-reg-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/proximanova-reg-webfont.woff2') format('woff2'),
+         url('../fonts/proximanova-reg-webfont.woff') format('woff'),
+         url('../fonts/proximanova-reg-webfont.ttf') format('truetype'),
+         url('../fonts/proximanova-reg-webfont.svg#proxima_nova_rgregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
 }
 /* Bottom pages common styles*/
 .absolute-pos {
@@ -194,6 +240,10 @@
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
+.inline-block .bottom-page.mid-header {
+    padding-left: 0;
+    padding-right: 0;
+}
 .bottom-page.mid-header.small-pad {
     padding: 0 0 7px 0;
 }
@@ -202,12 +252,15 @@
 }
 .bottom-page.mid-header.red {
     color: #EB4444;
+    font-family: 'montserrat', sans-serif;
 }
 .bottom-page.mid-header.green {
     color: #3DB39E;
+    font-family: 'montserrat', sans-serif;
 }
 .bottom-page.mid-header.blue {
     color: #2EA9D3;
+    font-family: 'montserrat', sans-serif;
 }
 .bottom-page.small-txt {
     font-size: 14px;
@@ -273,7 +326,7 @@
     line-height: 43px;
     padding: 4px 0 13px 0;
     color: #666666;
-    font-family: 'sfns_displayregular', sans-serif;
+    font-family: 'montserrat', sans-serif;
 }
 .bottom-page.big-header .light-red {
     color: #EB4444;
@@ -718,7 +771,7 @@
     line-height: 44px;
     padding: 5px 0;
     color: #666666;
-    font-family: 'sfns_displayregular', sans-serif;
+    font-family: 'montserrat', sans-serif;
 }
 .bottom-page.top-title span {
     color: #E1494E;
@@ -740,6 +793,7 @@
 }
 .bottom-page .button.default-huge-button {
     margin-top: 65px;
+    font-family: 'montserrat', sans-serif;
 }
 .cmd-bg .top-header {
     color: #333333;

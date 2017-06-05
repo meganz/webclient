@@ -87,7 +87,7 @@ function init_sync() {
     $('.pages-nav.nav-button').removeClass('active');
     $('.pages-nav.nav-button.sync').addClass('active');
 
-    initBottompageScroll();
+    
 }
 
 function sync_switchOS(os) {

@@ -640,6 +640,7 @@
     letter-spacing: 0, 43px;
     color: #666666;
     text-align: center;
+    white-space: nowrap;
 }
 .pages-nav.nav-button:hover .button-label, .pages-nav.nav-button.active .button-label {
     color: #666666;

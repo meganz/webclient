@@ -96,13 +96,13 @@ var megasync = (function() {
      */
     function linuxDropdownResizeHandler() {
 
-        var $main = $('.megasync-dropdown:visible');
-        var $pane = $main.find('.megasync-dropdown-scroll');
+        var $main = $('.megaapp-dropdown:visible');
+        var $pane = $main.find('.megaapp-dropdown-scroll');
         var jsp   = $pane.data('jsp');
-        var $list = $main.find('.megasync-dropdown-list');
+        var $list = $main.find('.megaapp-dropdown-list');
         var $arrow = $main.find('.mega-list-arrow');
         var overlayHeight = $('.megasync-overlay').outerHeight();
-        var listHeight = $main.find('.megasync-scr-pad').outerHeight() + 72;
+        var listHeight = $main.find('.megaapp-scr-pad').outerHeight() + 72;
         var listPosition;
 
         if ($list.length) {

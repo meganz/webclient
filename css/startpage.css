@@ -157,12 +157,19 @@
     background-position: -2px -1219px;
     margin: 31px auto 22px auto;
 }
-.bottom-page.bottom-rocket-bg {
+.bottom-page.grey-rocket {
     background-image: url(../images/mega/bottom-page/rocket-bg@2x.png);
     background-position: center bottom;
     background-repeat: no-repeat;
     background-size: 656px auto;
-    padding-bottom: 397px;
+    height: 397px;
+}
+.bottom-page.grey-rocket span {
+    display: block;
+    font-size: 14px;
+    color: #bcbbb8;
+    text-align:center;
+    padding: 360px 0 0 0;
 }
 .bottom-page.img.mobile-app {
     max-width: 400px;

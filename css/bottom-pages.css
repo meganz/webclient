@@ -22,7 +22,6 @@
     background-position: -6px -773px;
 }
 .bottom-page.top-bl {
-    overflow: hidden;
     max-height: 900px;
 }
 .transition {
@@ -244,6 +243,9 @@
 .inline-block.mid-pad {
     padding: 26px 28px;
 }
+.bottom-page.mid-pad {
+    padding: 27px 0 28px 0;
+}
 .bottom-page.top-pad {
     padding-top: 62px;
 }
@@ -264,9 +266,6 @@
 }
 .bottom-page.huge-bott-pad {
     padding-bottom: 134px;
-}
-.bottom-page.mid-pad {
-    padding: 27px 0 28px 0;
 }
 .bottom-page.big-header {
     font-size: 36px;
@@ -307,8 +306,6 @@
     text-align: left;
     font-size: 0;
     line-height: 0;
-    max-width: 1440px;
-    margin: 0 auto;
 }
 .side-txt .bottom-page.table-cell {
     vertical-align: top;
@@ -1149,7 +1146,10 @@ base64, PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJod…hlaWdodD0iMTAxIiBmaW
     margin-top: 14px
 }
 .bottom-page.img.attach {
-    max-width: 476px;
+    width: 685px;
+    max-width: 134%;
+    padding: 0 0 0 0;
+    margin: 0 0 0 36px;
 }
 .bottom-page.img.versatile {
     max-width: 388px;
@@ -1189,13 +1189,12 @@ base64, PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJod…hlaWdodD0iMTAxIiBmaW
     background-position: 0 -1007px;
 }
 .mobile-apps-button.wp {
-    width: 216px;
+    width: 300px;
     height: 78px;
     background-position: 0 -1117px;
     -moz-border-radius: 0;
     -webkit-border-radius: 0;
     border-radius: 0;
-    background-color: transparent;
     margin-bottom: 57px;
 }
 .bottom-page.img.ios2 {
@@ -1211,8 +1210,8 @@ base64, PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJod…hlaWdodD0iMTAxIiBmaW
 }
 .bottom-page.img.ios4 {
     width: 614px;
-    max-width: 100%;
-    margin: 6px 0 0 0;
+    max-width: 120%;
+    margin: 6px 0 0 -20%;
     padding: 0 1px 0 34px;
 }
 .bottom-page.img.ios5 {
@@ -1308,7 +1307,7 @@ base64, PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJod…hlaWdodD0iMTAxIiBmaW
 }
 .bottom-page.img.android5 {
     width: 626px;
-    max-width: 111%;
-    margin: 38px 0 0 3px;
+    max-width: 121%;
+    margin: 38px 0 0 -10%;
 }
 /* end of Android app */

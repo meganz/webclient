@@ -8,6 +8,7 @@
 /* Bottom pages common styles*/
 .absolute-pos {
     position: absolute;
+    left: 0;
 }
 .bottom-page .top-head {
     background-color: transparent;
@@ -67,6 +68,8 @@
     box-sizing: border-box;
     position: relative;
     height: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
 }
 .bottom-page.vertical-centered-cell {
     vertical-align: middle;

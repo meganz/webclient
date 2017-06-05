@@ -1913,7 +1913,7 @@ if (!b_u) {
         'redeem': ['redeem', 'redeem_js'],
         'plugin': ['browsers', 'browsers_js'],
         'browsers': ['browsers', 'browsers_js'],
-        'megabird': ['megabird', 'megabird_js'],
+        'bird': ['megabird', 'megabird_js'],
         'ios': ['ios', 'apps_js'],
         'android': ['android', 'apps_js'],
         'wp': ['wp', 'apps_js'],

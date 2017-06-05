@@ -992,7 +992,7 @@ function init_page() {
         mobileappspage.init();
         mobileappspage.initTabs();
     }
-    else if (page === 'megabird') {
+    else if (page === 'bird') {
         parsepage(pages['megabird']);
         megabirdpage.init();
     }
@@ -1820,7 +1820,7 @@ function topmenuUI() {
                 return false;
             }
             else if (className.indexOf('megabird') > -1) {
-                loadSubPage('megabird');
+                loadSubPage('bird');
                 return false;
             }
             else if (className.indexOf('resellers') > -1) {

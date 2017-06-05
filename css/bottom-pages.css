@@ -68,8 +68,6 @@
     box-sizing: border-box;
     position: relative;
     height: 100%;
-    max-width: 1440px;
-    margin: 0 auto;
 }
 .bottom-page.vertical-centered-cell {
     vertical-align: middle;
@@ -309,6 +307,8 @@
     text-align: left;
     font-size: 0;
     line-height: 0;
+    max-width: 1440px;
+    margin: 0 auto;
 }
 .side-txt .bottom-page.table-cell {
     vertical-align: top;

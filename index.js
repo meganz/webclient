@@ -975,7 +975,7 @@ function init_page() {
         $('.credits-main-pad').html(html + '<div class="clear"></div>');
         mainScroll();
     }
-    else if (page === 'browsers') {
+    else if (page === 'extensions') {
         parsepage(pages['browsers']);
         browserspage.init();
     }
@@ -1803,8 +1803,8 @@ function topmenuUI() {
                 loadSubPage('credits');
                 return false;
             }
-            else if (className.indexOf('browsers') > -1) {
-                loadSubPage('browsers');
+            else if (className.indexOf('extensions') > -1) {
+                loadSubPage('extensions');
                 return false;
             }
             else if (className.indexOf('ios') > -1) {

@@ -1912,7 +1912,7 @@ if (!b_u) {
         'recover': ['reset', 'reset_js'],
         'redeem': ['redeem', 'redeem_js'],
         'plugin': ['browsers', 'browsers_js'],
-        'browsers': ['browsers', 'browsers_js'],
+        'extensions': ['browsers', 'browsers_js'],
         'bird': ['megabird', 'megabird_js'],
         'ios': ['ios', 'apps_js'],
         'android': ['android', 'apps_js'],

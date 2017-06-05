@@ -8,6 +8,7 @@
 /* Bottom pages common styles*/
 .absolute-pos {
     position: absolute;
+    left: 0;
 }
 .bottom-page .top-head {
     background-color: transparent;
@@ -306,6 +307,8 @@
     text-align: left;
     font-size: 0;
     line-height: 0;
+    max-width: 1440px;
+    margin: 0 auto;
 }
 .side-txt .bottom-page.table-cell {
     vertical-align: top;
@@ -1309,5 +1312,8 @@ base64, PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJod…hlaWdodD0iMTAxIiBmaW
     width: 626px;
     max-width: 121%;
     margin: 38px 0 0 -10%;
+}
+.android .bottom-page.top-bl, .ios .bottom-page.top-bl {
+    overflow: hidden;
 }
 /* end of Android app */

@@ -8642,10 +8642,10 @@ function slideshow(id, close)
             M.favourite(id, newFavState);
 
             if (newFavState) {
-                $(this).find('i').switchClass('heart', 'broken-heart');
+                $(this).find('i').switchClass('heart', 'red-heart');
             }
             else {
-                $(this).find('i').switchClass('broken-heart', 'heart');
+                $(this).find('i').switchClass('red-heart', 'heart');
             }
         });
     }
@@ -8655,10 +8655,10 @@ function slideshow(id, close)
 
     // Change favourite icon
     if (n.fav) {
-        $overlay.find('.viewer-button.favourite i').switchClass('heart', 'broken-heart');
+        $overlay.find('.viewer-button.favourite i').switchClass('heart', 'red-heart');
     }
     else {
-        $overlay.find('.viewer-button.favourite i').switchClass('broken-heart', 'heart');
+        $overlay.find('.viewer-button.favourite i').switchClass('red-heart', 'heart');
     }
 
     $overlay.find('.viewer-filename').text(n.name);

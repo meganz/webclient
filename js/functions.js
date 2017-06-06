@@ -704,6 +704,14 @@ mBroadcaster.once('startMega', function populate_l() {
     l[16392] = escapeHTML(l[16392]).replace('[S]', '<span class="red">').replace('[/S]', '</span>');
     l[16393] = escapeHTML(l[16393])
         .replace('[A]', '<a class="red" href="mailto:support@mega.nz">').replace('[/A]', '</a>');
+    l[16501] = l[16501].replace('[A1]', '<a class="red" href="mailto:support@mega.nz">').replace('[/A1]', '</a>')
+                       .replace('[A2]', '<a class="red" target="_blank" href="https://mega.nz/help/client/android/'
+                              + 'accounts-pro-accounts/how-can-i-cancel-the-renewal-of-my-mega-subscription">')
+                       .replace('[/A2]', '</a>')
+                       .replace('[A3]', '<a class="red" target="_blank" href="https://mega.nz/help/client/ios/'
+                              + 'accounts-pro-accounts/how-does-mega-pro-account-subscription-work-with-apple-in-app-'
+                              + 'purchases">')
+                       .replace('[/A3]', '</a>');
 
     var common = [
         15536, 16106, 16107, 16116, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315,
@@ -1929,10 +1937,14 @@ function setTransferStatus(dl, status, ethrow, lock) {
             .text(text);
     }
     if (lock) {
-        $('.transfer-table #' + id)
+        var $tr = $('.transfer-table #' + id)
             .addClass('transfer-completed')
             .removeClass('transfer-initiliazing')
             .attr('id', 'LOCKed_' + id);
+
+        if (lock === 2) {
+            $tr.remove();
+        }
     }
     if (d) {
         console.error(status);
@@ -1942,7 +1954,7 @@ function setTransferStatus(dl, status, ethrow, lock) {
     }
 }
 
-function dlFatalError(dl, error, ethrow) {
+function dlFatalError(dl, error, ethrow, lock) {
     var m = 'This issue should be resolved ';
     if (ethrow === -0xDEADBEEF) {
         ethrow = false;
@@ -1973,7 +1985,7 @@ function dlFatalError(dl, error, ethrow) {
     });
 
     // Set transfer status and abort it
-    setTransferStatus(dl, error, ethrow, true);
+    setTransferStatus(dl, error, ethrow, lock !== undefined ? lock : true);
     dlmanager.abort(dl);
 }
 
@@ -3744,32 +3756,50 @@ mega.utils.abortTransfers = function megaUtilsAbortTransfers() {
     var promise = new MegaPromise();
 
     // Mobile does not use the dlmanager/ulmanager so just resolve the promise
-    if (!mega.utils.hasPendingTransfers() || is_mobile) {
-        promise.resolve();
+    if (is_mobile) {
+        return promise.resolve();
     }
-    else {
-        msgDialog('confirmation', l[967], l[377] + ' ' + l[507] + '?', false, function(doIt) {
-            if (doIt) {
-                if (dlmanager.isDownloading) {
-                    dlmanager.abort(null);
-                }
-                if (ulmanager.isUploading) {
-                    ulmanager.abort(null);
-                }
 
-                mega.utils.resetUploadDownload();
-                loadingDialog.show();
-                var timer = setInterval(function() {
-                    if (!mega.utils.hasPendingTransfers()) {
-                        clearInterval(timer);
-                        promise.resolve();
-                    }
-                }, 350);
+    var abort = function() {
+        if (mBroadcaster.crossTab.master || page === 'download' || u_type !== 3) {
+            if (!mega.utils.hasPendingTransfers()) {
+                promise.resolve();
             }
             else {
-                promise.reject();
+                msgDialog('confirmation', l[967], l[377] + ' ' + l[507] + '?', false, function(doIt) {
+                    if (doIt) {
+                        if (dlmanager.isDownloading) {
+                            dlmanager.abort(null);
+                        }
+                        if (ulmanager.isUploading) {
+                            ulmanager.abort(null);
+                        }
+
+                        mega.utils.resetUploadDownload();
+                        loadingDialog.show();
+                        var timer = setInterval(function() {
+                            if (!mega.utils.hasPendingTransfers()) {
+                                clearInterval(timer);
+                                promise.resolve();
+                            }
+                        }, 350);
+                    }
+                    else {
+                        promise.reject();
+                    }
+                });
             }
-        });
+        }
+        else {
+            promise.reject();
+        }
+    };
+
+    if (u_type > 2 && (!mBroadcaster.crossTab.master || mBroadcaster.crossTab.slaves.length)) {
+        msgDialog('warningb', l[882], l[7157], 0, abort);
+    }
+    else {
+        abort();
     }
 
     return promise;
@@ -3900,33 +3930,24 @@ mega.utils.reload = function megaUtilsReload() {
         // Show message that this operation will destroy the browser cache and reload the data stored by MEGA
         msgDialog('confirmation', l[761], l[7713], l[6994], function(doIt) {
             if (doIt) {
-                var reload = function() {
-                    if (mBroadcaster.crossTab.master || page === 'download') {
-                        mega.utils.abortTransfers().then(function() {
-                            loadingDialog.show();
-                            stopsc();
-                            stopapi();
+                mega.utils.abortTransfers().then(function() {
+                    loadingDialog.show();
+                    stopsc();
+                    stopapi();
 
-                            MegaPromise.allDone([
-                                mega.utils.clearFileSystemStorage()
-                            ]).then(function(r) {
-                                    console.debug('megaUtilsReload', r);
-                                    if (fmdb) {
-                                        fmdb.invalidate(_reload);
-                                    }
-                                    else {
-                                        _reload();
-                                    }
-                                });
-                        });
-                    }
-                };
-                if (!mBroadcaster.crossTab.master || mBroadcaster.crossTab.slaves.length) {
-                    msgDialog('warningb', l[882], l[7157], 0, reload);
-                }
-                else {
-                    reload();
-                }
+                    MegaPromise.allDone([
+                        mega.utils.clearFileSystemStorage()
+                    ]).then(function(r) {
+                        console.debug('megaUtilsReload', r);
+
+                        if (fmdb) {
+                            fmdb.invalidate(_reload);
+                        }
+                        else {
+                            _reload();
+                        }
+                    });
+                });
             }
         });
     }
@@ -5050,10 +5071,10 @@ function passwordManager(form) {
     }
     $(form).rebind('submit', function() {
         setTimeout(function() {
-            var path  = getSitePath();
+            var path = getSitePath();
             history.replaceState({ success: true }, '', "index.html#" + document.location.hash.substr(1));
-            if (hashLogic) {
-                path = getSitePath().replace('/', '/#');
+            if (hashLogic || isPublicLink(path)) {
+                path = path.replace('/', '/#');
 
                 if (location.href.substr(0, 19) === 'chrome-extension://') {
                     path = path.replace('/#', '/mega/secure.html#');
@@ -5484,7 +5505,8 @@ if (typeof sjcl !== 'undefined') {
 
 /**
  * Get a string for the payment plan number
- * @param {Number} planNum The plan number e.g. 1: PRO I, 2: PRO II, 3: PRO III, 4: LITE
+ * @param {Number} planNum The plan number e.g. 1, 2, 3, 4
+ * @returns {String} The plan name i.e. PRO I, PRO II, PRO III, LITE
  */
 function getProPlan(planNum) {
 

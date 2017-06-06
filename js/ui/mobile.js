@@ -326,8 +326,9 @@ mobile.cloud = {
      * Removes a node from the current view if applicable, updates the footer with the new
      * file/folder count and also shows an empty cloud drive/folder message if applicable
      * @param {String} nodeHandle The handle of the node to be removed
+     * @param {String} parentHandle The parent handle of the node to be removed
      */
-    renderDelete: function(nodeHandle) {
+    renderDelete: function(nodeHandle, parentHandle) {
 
         // Remove the node if in the current view
         $('#' + nodeHandle).remove();
@@ -336,6 +337,12 @@ mobile.cloud = {
         mobile.cloud.showEmptyCloudIfEmpty();
         mobile.cloud.countAndUpdateSubFolderTotals();
         mobile.cloud.renderFooter();
+
+        // If in the current folder and this got removed, then we need to go back up and open the parent folder
+        if (M.currentdirid === nodeHandle || isCircular(nodeHandle, M.currentdirid) === true) {
+            parentHandle = parentHandle || Object(M.getNodeByHandle(nodeHandle)).p || RootbyId(nodeHandle);
+            M.openFolder(parentHandle);
+        }
     },
 
     /**
@@ -2553,19 +2560,20 @@ mobile.register = {
     showConfirmEmailScreen: function(registrationVars) {
 
         var $confirmScreen = $('.registration-confirm-email');
+        var $registerScreen = $('.mobile.signin-register-block');
         var $changeEmailInput = $confirmScreen.find('.change-email input');
         var $resendButton = $confirmScreen.find('.resend-button');
 
         // Hide the current register screen and show the confirmation one
-        this.$screen.addClass('hidden');
+        $registerScreen.addClass('hidden');
         $confirmScreen.removeClass('hidden');
 
         // Set the email into the text field
         $changeEmailInput.val(registrationVars.email);
 
         // Init email input keyup and Resend button
-        this.initConfirmEmailScreenKeyup($changeEmailInput, $resendButton);
-        this.initConfirmEmailScreenResendButton($changeEmailInput, $resendButton, registrationVars);
+        mobile.register.initConfirmEmailScreenKeyup($changeEmailInput, $resendButton);
+        mobile.register.initConfirmEmailScreenResendButton($changeEmailInput, $resendButton, registrationVars);
     },
 
     /**
@@ -3042,3 +3050,12 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
     // Call the mobile version
     mobile.messageOverlay.show(msg, submsg);
 }
+
+function removeUInode(nodeHandle, parentHandle) {
+
+    // Call the mobile version
+    mobile.cloud.renderDelete(nodeHandle, parentHandle);
+}
+
+// Not required for mobile
+function fmtopUI() { }

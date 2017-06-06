@@ -32,6 +32,7 @@
     -webkit-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.1);
     -moz-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.1);
     box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.1);
+    visibility: hidden;
 }
 .toast-notification::before {
     -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.2);
@@ -54,6 +55,7 @@
     -moz-opacity: 1;
     -khtml-opacity: 1;
     opacity: 1;
+    visibility: visible;
 }
 .toast-notification.second {
     margin-bottom: 64px;

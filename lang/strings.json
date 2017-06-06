@@ -635,6 +635,10 @@
         "text": "Account",
         "context": "Sub category of the help section"
     },
+    "405": {
+        "text": "Tools",
+        "context": "Sub category of the help section"
+    },
     "408": {
         "text": "January",
         "context": ""
@@ -16398,5 +16402,637 @@
     "16484": {
         "text": "Maintain my chosen status appearance even when I have no connected devices.",
         "context": "Some text in the footer to explain the meaning of the 'Status Persistence' functionality of the user's chat status."
+    },
+    "16485": {
+        "text": "Duplicate items",
+        "context": "Dialog header. Dialog is displayed if uploading file already exists in folder."
+    },
+    "16486": {
+        "text": "A file named %1 already exists in this location.",
+        "context": "Dialog description. Informs user that uploading file already exists. Please leave %1 as it is, it'll be replaced by file name."
+    },
+    "16487": {
+        "text": "Select the file you want to keep:",
+        "context": "User is able to select file version if uploading file already exists in folder."
+    },
+    "16488": {
+        "text": "Upload and replace",
+        "context": "Header of clickable block in Dublicate items dialog. Allows user replace the file in the destination folder with the file he is uploading."
+    },
+    "16489": {
+        "text": "Replace the file in the destination folder with the file you are uploading:",
+        "context": "Clickable block description in dublicate items dialog. Allows user replace existing file in folder by new one, which he is uploading."
+    },
+    "16490": {
+        "text": "Don't upload",
+        "context": "Header of clickable block in dublicate items dialog. Allows user keep existing file in the destination folder and don't replace it by file he is uploading."
+    },
+    "16491": {
+        "text": "No files will be changed. You will keep the file below:",
+        "context": "Clickable block description in Dublicate items dialog. Allows user keep existing file in the destination folder and don't replace it by file he is uploading."
+    },
+    "16492": {
+        "text": "Keep both files",
+        "context": "Header of clickable block in Dublicate items dialog. Allows user keep existing file in the destination folder and file he is uploading."
+    },
+    "16493": {
+        "text": "The file you are uploading will be renamed as:",
+        "context": "Clickable block description in dublicate items dialog. Allows user keep existing file in the destination folder and file he is uploading."
+    },
+    "16494": {
+        "text": "Apply this option to the next [S]2[\/S] conflicts",
+        "context": "Checkbox label in Dublicate items dialog. User is able to apply selected action for current conflict to next conflicts. Please leave [S], [\/S] as it is."
+    },
+    "16495": {
+        "text": "Move and replace",
+        "context": "Header of clickable block in Dublicate items dialog. Allows user to replace the file in the destination folder with the file he is moving to this folder."
+    },
+    "16496": {
+        "text": "Copy and replace",
+        "context": "Header of clickable block in dublicate items dialog. Allows user replace the file in the destination folder with the file he is copying to this folder."
+    },
+    "16497": {
+        "text": "Replace the file in the destination folder with the file you are moving:",
+        "context": "Clickable block description in dublicate items dialog. Allows user to replace the file in the destination folder with the file he is moving to this folder."
+    },
+    "16498": {
+        "text": "Replace the file in the destination folder with the file you are copying:",
+        "context": "Clickable block description in dublicate items dialog. Allows user replace the file in the destination folder with the file he is copying to this folder."
+    },
+    "16499": {
+        "text": "Don't move",
+        "context": "Header of clickable block in dublicate items dialog. Allows user keep existing file in the destination folder and don't replace it by file he is moving."
+    },
+    "16500": {
+        "text": "Don't copy",
+        "context": "Header of clickable block in dublicate items dialog. Allows user keep existing file in the destination folder and don't replace it by file he is copying."
+    },
+    "16501": {
+        "text": "If you previously subscribed to a PRO plan with Google Play or Apple iTunes, please manually cancel your subscriptions with them inside Google Play or the iTunes app on your device. If you need any assistance please contact [A1]support@mega.nz[\/A1] or see our [A2]help article for Android[\/A2] or our [A3]help article for iOS[\/A3].",
+        "context": "An error dialog message when the Cancel Subscription button is pressed in the My Account section of the website. This means that cancelling the subscription is not possible from the website, they must cancel with Apple or Google. Please leave the [A1], [A2] and [A3] tags as they will be replaced with links."
+    },
+    "16502": {
+        "text": "Change Name",
+        "context": "Button title that allows the user change his name"
+    },
+    "16503": {
+        "text": "All files saved for Offline will be deleted from your device. Proceed to logout?",
+        "context": "Alert message shown when the user perform logout action and he has files in the Offline directory"
+    },
+    "16504": {
+        "text": "Your queued transfer exceeds the current transfer quota available for your account and may therefore be interrupted.",
+        "context": "Message of the dialog displayed when a user exceeds the transfer quota limits of the account (transfer overquota error)."
+    },
+    "16505": {
+        "text": "Depleted transfer quota",
+        "context": "Message of the dialog displayed when a user exceeds the transfer quota limits of the account (transfer overquota error) - (String as short as possible)."
+    },
+    "16506": {
+        "text": "Are you sure you want to cancel all the pending downloads?",
+        "context": "Message of the dialog displayed when a user wants to cancel all the pending downloads."
+    },
+    "16507": {
+        "text": "Are you sure you want to cancel all the pending uploads?",
+        "context": "Message of the dialog displayed when a user wants to cancel all the pending uploads."
+    },
+    "16508": {
+        "text": "Completing...",
+        "context": "Label for the state of a transfer when is being completing - (String as short as possible)."
+    },
+    "16509": {
+        "text": "Preparing...",
+        "context": "Label for the state of a transfer when is being preparing - (String as short as possible)."
+    },
+    "16510": {
+        "text": "Retrying...",
+        "context": "Label for the state of a transfer when is being retrying - (String as short as possible)."
+    },
+    "16511": {
+        "text": "Cancel downloads",
+        "context": "Label for any 'Cancel downloads' button, link, etc. - (String as short as possible)."
+    },
+    "16512": {
+        "text": "Cancel uploads",
+        "context": "Label for any 'Cancel uploads' button, link, etc. - (String as short as possible)."
+    },
+    "16513": {
+        "text": "No completed transfers",
+        "context": "Label for the background of an empty completed transfers page - (String as short as possible)."
+    },
+    "16514": {
+        "text": "The file you are moving will be renamed as:",
+        "context": "Clickable block description in dublicate items dialog. Allows user keep existing file in the destination folder and file he is moving"
+    },
+    "16515": {
+        "text": "The file you are copying will be renamed as:",
+        "context": "Clickable block description in dublicate items dialog. Allows user keep existing file in the destination folder and file he is copying"
+    },
+    "16516": {
+        "text": "Public Links",
+        "context": "A list item or breadcrumb title for displaying the number of publicly accessible file\/folder links a user has created in their account."
+    },
+    "16517": {
+        "text": "You have successfully logged into the account %1, we will now proceed to migrate your ephemeral account contents to your Cloud Drive's Inbox.",
+        "context": "A message which is shown when an ephemeral account user tries to register an account and instead they are logged in because they used a valid existing account. What happens then is that the ephemeral account's files and folders are migrated to the logged in user's Inbox. Please leave the %1 placeholder which is replaced with an email address."
+    },
+    "16518": {
+        "text": "View on MEGA",
+        "context": "Finder context menu option to view a synced file through the web browser within your MEGA account."
+    },
+    "16519": {
+        "text": "No options available",
+        "context": "Finder context menu label when no option is available for selected items."
+    },
+    "16520": {
+        "text": "Click the toolbar item for a menu.",
+        "context": "A tooltip for MEGA finder toolbar button."
+    },
+    "16521": {
+        "text": "%i files",
+        "context": "A context menu option label to indicate the user has selected %i number of files."
+    },
+    "16522": {
+        "text": "%i folders",
+        "context": "A context menu option label to indicate the user has selected %i number of folders."
+    },
+    "16523": {
+        "text": "MEGA Finder Sync",
+        "context": "An identifying name for MEGA finder extension on macOS systems."
+    },
+    "16524": {
+        "text": "[A]Login[\/A] or [A]Create an account[\/A] to fully experience MEGA",
+        "context": "A label to inform a user that they need to login or create an account in order to use MEGAsync. Please keep the [A] and [\/A] tags."
+    },
+    "16525": {
+        "text": "Open Transfer Manager",
+        "context": "A tooltip for the button that opens the transfer manager dialog."
+    },
+    "16527": {
+        "text": "USED TRANSFERS %1",
+        "context": "A label to indicate the total used transfer quota."
+    },
+    "16528": {
+        "text": "Enter an email or MEGA contact name",
+        "context": "This is used as placeholder text for the input field on the sharing and add contact dialogs."
+    },
+    "16529": {
+        "text": "Select destination",
+        "context": "A title shown on the navigation bar to explain that the user has to choose a destination for the files and\/or folders when they copy, move, import or perform some action with the files\/folders."
+    },
+    "16530": {
+        "text": "See plans",
+        "context": "A button title to see the available PRO plans in MEGA."
+    },
+    "16531": {
+        "text": "New Message",
+        "context": "The text for a notification which is shown when the user has received a new chat message."
+    },
+    "16532": {
+        "text": "Contact Request",
+        "context": "The text of a notification which is shown when you have received a contact request."
+    },
+    "16533": {
+        "text": "New Shared Folder",
+        "context": "The text of a notification which is shown when the user has received a new shared folder."
+    },
+    "16535": {
+        "text": "Try without account",
+        "context": "Caption of the button to try MEGA without having to create an account."
+    },
+    "16536": {
+        "text": "We make secure cloud storage simple. Create an account and get [A]50 GB[\/A] free on MEGA's end-to-end encrypted cloud collaboration platform today!",
+        "context": "The introduction text users that visit the MEGA website for the first time see."
+    },
+    "16537": {
+        "text": "Scroll down",
+        "context": "Button to scroll down to the page"
+    },
+    "16538": {
+        "text": "iOS",
+        "context": "Menu button to go to the iOS product page."
+    },
+    "16539": {
+        "text": "Android",
+        "context": "Menu button for the Android product page."
+    },
+    "16540": {
+        "text": "Win Mobile",
+        "context": "Short text for \"Windows Mobile\", menu button for the \"Windows Mobile\" product."
+    },
+    "16541": {
+        "text": "Extensions",
+        "context": "Menu option and short text for \"Browser Extensions\", which leads to the browser extensions product page."
+    },
+    "16544": {
+        "text": "The MEGA iOS App",
+        "context": "Title of the iOS product page."
+    },
+    "16545": {
+        "text": "Our iOS app puts the cloud in your pocket.",
+        "context": "Descriptive text on the iOS page."
+    },
+    "16546": {
+        "text": "Access and stream your files on your iPhone or iPad, upload and sync your photos and videos, or communicate securely using our end-to-end encrypted chat.",
+        "context": "Descriptive text for the iOS product page."
+    },
+    "16547": {
+        "text": "MEGA at your fingertips",
+        "context": "Headline on the iOS page"
+    },
+    "16548": {
+        "text": "Take the full power of MEGA with you, wherever you go. Carefully engineered to provide secure data mobility.",
+        "context": "Descriptive text on the iOS product page"
+    },
+    "16549": {
+        "text": "The full MEGA experience",
+        "context": "Headline on the iOS product page."
+    },
+    "16550": {
+        "text": "Our iOS app has everything you need to securely communicate and manage your data.",
+        "context": "Descriptive text on the iOS product page."
+    },
+    "16551": {
+        "text": "Automatic Camera Uploads",
+        "context": "iOS headline"
+    },
+    "16552": {
+        "text": "Upload all your photos & videos securely for backup, sharing or to reduce storage consumption on your iPhone or iPad.",
+        "context": "iOS description"
+    },
+    "16553": {
+        "text": "MEGA decrypts your media on-the-fly so you can securely stream your audio and video files directly to your iPhone or iPad.",
+        "context": "iOS feature description."
+    },
+    "16554": {
+        "text": "Audio\/Video Streaming",
+        "context": "iOS feature headline"
+    },
+    "16555": {
+        "text": "Select files that you want to save to your iPhone or iPad, so that you can retain access without Internet connectivity.",
+        "context": "iOS description text"
+    },
+    "16556": {
+        "text": "Save Your Files Locally",
+        "context": "iOS feature headline"
+    },
+    "16557": {
+        "text": "Managing your data across multiple devices securely is smooth and easy.",
+        "context": "iOS description"
+    },
+    "16558": {
+        "text": "Accessible Anywhere",
+        "context": "iOS headline"
+    },
+    "16559": {
+        "text": "MEGAchat makes collaboration within the MEGA platform easy and secure.",
+        "context": "iOS MEGAchat introduction text"
+    },
+    "16560": {
+        "text": "End-to-End Encryption",
+        "context": "iOS MEGAchat feature headline"
+    },
+    "16561": {
+        "text": "Chats and calls are end-to-end encrypted, not even MEGA can read or listen to your communication.",
+        "context": "iOS MEGAchat feature description"
+    },
+    "16562": {
+        "text": "Group Messaging",
+        "context": "iOS MEGAchat feature headline"
+    },
+    "16563": {
+        "text": "Collaborate securely by text message with individual contacts or multiple people at once in a group chat.",
+        "context": "iOS MEGAchat feature description"
+    },
+    "16564": {
+        "text": "Contact Fingerprint Verification",
+        "context": "iOS MEGAchat feature headline"
+    },
+    "16565": {
+        "text": "Verify the cryptographic fingerprint of your contacts through a separate channel to ensure they are authentic.",
+        "context": "iOS MEGAchat feature description"
+    },
+    "16566": {
+        "text": "Audio and Video Calls",
+        "context": "iOS MEGAchat feature headline"
+    },
+    "16567": {
+        "text": "Effortlessly stay connected with our secure cross-platform audio and video calls.",
+        "context": "iOS MEGAchat feature description"
+    },
+    "16568": {
+        "text": "Coming soon!",
+        "context": "Text to indicate that a feature is coming soon"
+    },
+    "16569": {
+        "text": "Seamless File Sharing",
+        "context": "iOS MEGAchat feature headline"
+    },
+    "16570": {
+        "text": "Conveniently share files directly within a chat straight from your MEGA account or from your device storage.",
+        "context": "iOS MEGAchat feature description"
+    },
+    "16571": {
+        "text": "History Retention Control",
+        "context": "iOS MEGAchat feature description, to do with managing how chat history is kept around"
+    },
+    "16572": {
+        "text": "With MEGAchat you control your chat history and can delete it whenever you desire.",
+        "context": "iOS MEGAchat feature description"
+    },
+    "16573": {
+        "text": "The MEGA Android App",
+        "context": "Android product page headline"
+    },
+    "16574": {
+        "text": "Our Android app puts the cloud in your pocket.",
+        "context": ""
+    },
+    "16575": {
+        "text": "Access and stream your files on your phone or tablet, upload and sync your photos and videos, or communicate securely using our end-to-end encrypted chat.",
+        "context": "Android product page description"
+    },
+    "16576": {
+        "text": "Our Android app has everything you need to securely communicate and manage your data.",
+        "context": "Android descriptive text"
+    },
+    "16577": {
+        "text": "Upload all your photos & videos securely for backup, sharing or to reduce storage consumption on your phone or tablet.",
+        "context": "Android feature description"
+    },
+    "16578": {
+        "text": "MEGA decrypts your media on-the-fly so you can securely stream your audio and video files directly to your device.",
+        "context": ""
+    },
+    "16579": {
+        "text": "Select files that you want to save to your phone or tablet, so that you can retain access without Internet connectivity.",
+        "context": ""
+    },
+    "16580": {
+        "text": "Easy automated synchronisation between your computer and your MEGA account.",
+        "context": "Description on the MEGAsync product page."
+    },
+    "16581": {
+        "text": "Live Encrypted Syncing",
+        "context": "Headline on the MEGAsync product page, 'Live' implying it is always on and fully automatic."
+    },
+    "16582": {
+        "text": "Access and work with your data securely across different locations and devices. It's always on and fully automatic.",
+        "context": "Description on the MEGAsync product page"
+    },
+    "16583": {
+        "text": "You can choose to synchronise your entire MEGA account or configure multiple selective syncs between folders on your computer and folders in your MEGA account.",
+        "context": "Description on the MEGAsync product page"
+    },
+    "16584": {
+        "text": "Manage all your transfers conveniently from within the MEGAsync transfer manager. Manually upload specific files from your computer to MEGA or import MEGA links for download to your computer.",
+        "context": "Feature description on the MEGAsync product page"
+    },
+    "16585": {
+        "text": "Live Encrypted Backup",
+        "context": "MEGAsync feature headline, 'Live' implies it is always on\/available"
+    },
+    "16586": {
+        "text": "With our real-time file versioning feature, your data is always recoverable to a previous version.",
+        "context": "Feature description for the MEGAsync product page"
+    },
+    "16587": {
+        "text": "Deleted Data Retention",
+        "context": "MEGAsync feature headline"
+    },
+    "16588": {
+        "text": "MEGAsync moves deleted files to special folders on your local computer and in your MEGA account so they can be restored if you need to.",
+        "context": "MEGAsync feature description"
+    },
+    "16589": {
+        "text": "Browser Transfer Accelerator",
+        "context": "MEGAsync feature headline"
+    },
+    "16590": {
+        "text": "MEGAsync securely interacts with your browser, handling MEGA file transfers for enhanced performance.",
+        "context": "MEGAsync feature description "
+    },
+    "16591": {
+        "text": "Windows Phone app",
+        "context": "Headline for the \"Windows Phone App\" product page"
+    },
+    "16592": {
+        "text": "Our Windows Phone app puts the cloud in your pocket.",
+        "context": "Windows Phone headline"
+    },
+    "16593": {
+        "text": "Access and stream your files on your phone or tablet, upload and sync your photos and videos.",
+        "context": "Windows Phone description"
+    },
+    "16594": {
+        "text": "Universally MEGA",
+        "context": "Headline for the Universal Windows Platform app MEGA will release."
+    },
+    "16595": {
+        "text": "soon",
+        "context": "Implying a feature is coming soon, view the screenshot for context"
+    },
+    "16596": {
+        "text": "The MEGA Universal Windows App is currently being developed. You can send an email to [A]uwp@mega.nz[\/A] to request early beta access.",
+        "context": "UWP descriptive text"
+    },
+    "16597": {
+        "text": "MEGAcmd is an interactive, text console based, scriptable MEGA client.",
+        "context": "MEGAcmd product description."
+    },
+    "16598": {
+        "text": "Visit our [A]GitHub repository[\/A] for the [B]README file[\/B] with all the details.",
+        "context": "MEGAcmd description text with two links. Please carefully use the variables [A] and [B]. Also, \"README\" is likely the same in each language as it's a global term for such files."
+    },
+    "16601": {
+        "text": "A shell to interactively execute MEGA commands.",
+        "context": "MEGAcmd descriptive text"
+    },
+    "16602": {
+        "text": "Interact with MEGA from within a script or program.",
+        "context": "MEGAcmd descriptive text"
+    },
+    "16603": {
+        "text": "Browser Extensions",
+        "context": "Headline of the Browser Extensions page"
+    },
+    "16604": {
+        "text": "Install MEGA into your browser. It will reduce loading times, improve download performance and strengthen security.",
+        "context": "Browser Extensions description"
+    },
+    "16605": {
+        "text": "Download for Firefox",
+        "context": "Download button for Firefox"
+    },
+    "16606": {
+        "text": "Download for Chrome",
+        "context": "Download button for Chrome"
+    },
+    "16607": {
+        "text": "Any MEGA URL will be captured by this extension and stay local (no JavaScript will be loaded from our servers).",
+        "context": "Description of the Browser Extensions product page."
+    },
+    "16608": {
+        "text": "Secure automatic updates are provided thanks to cryptographic private key signing.",
+        "context": ""
+    },
+    "16609": {
+        "text": "MEGA extension for Thunderbird",
+        "context": "Headline for the MEGAbird product page. Both \"MEGAbird\" and \"Thunderbird\" are product names."
+    },
+    "16610": {
+        "text": "Send large files by email through MEGA with this extension for the Mozilla Thunderbird mail client.",
+        "context": "Product description of MEGAbird. \"Mozilla Thunderbird\" is a product name."
+    },
+    "16611": {
+        "text": "Download for Thunderbird",
+        "context": "Download button for the MEGAbird extension. \"Thunderbird\" is a product name."
+    },
+    "16612": {
+        "text": "Fully Integrated",
+        "context": "Feature headline for the \"MEGAbird\" product"
+    },
+    "16613": {
+        "text": "Simply configure your MEGA account in the settings and any large file you attach to an email can automatically be replaced by a MEGA link.",
+        "context": "MEGAbird description"
+    },
+    "16614": {
+        "text": "Requires the free [A]Mozilla Thunderbird[\/A] mail client.",
+        "context": "MEGAbird text with link to the \"Mozilla Thunderbird\" product."
+    },
+    "16615": {
+        "text": "FILE",
+        "context": "Label for a downloadable file, to indicate it is a XX sized file. View screenshot for context."
+    },
+    "16616": {
+        "text": "Unlike most other cloud storage providers, only you control who has access to your data. Not even MEGA can access it!",
+        "context": "Feature description on the startpage"
+    },
+    "16617": {
+        "text": "Your data is accessible anytime. Use a web browser or one of our powerful apps, available for all major platforms.",
+        "context": "Feature description for the startpage"
+    },
+    "16618": {
+        "text": "Share data and communicate with your contacts securely, and see their updates in real time.",
+        "context": "Feature description for the startpage"
+    },
+    "16619": {
+        "text": "Massive Storage Space",
+        "context": "Feature headline for the startpage"
+    },
+    "16620": {
+        "text": "Not only are we more secure than our major competitors, we also provide a more generous amount of free storage.",
+        "context": "Feature description for the startpage"
+    },
+    "16621": {
+        "text": "Encrypted Live Backup",
+        "context": "Feature headline for the startpage. 'Live' implying it is always on and fully automatic"
+    },
+    "16622": {
+        "text": "With our real-time file synchronisation and versioning features, your data is always safe and recoverable.",
+        "context": "Feature description for the startpage"
+    },
+    "16623": {
+        "text": "Public Source Code",
+        "context": "Feature headline for the startpage"
+    },
+    "16624": {
+        "text": "To enable independent verification of the correctness and integrity of our crypto model and its implementation, we publish the full source code of our client apps.",
+        "context": "Feature description for the startpage"
+    },
+    "16625": {
+        "text": "Our Plans",
+        "context": "Headline for the PRO plans on the startpage"
+    },
+    "16626": {
+        "text": "Take full advantage of MEGA with a PRO account",
+        "context": "Description of the pro plans on the startpage"
+    },
+    "16627": {
+        "text": "Discount for yearly payments",
+        "context": "Discount label for the pro packages on the start page."
+    },
+    "16628": {
+        "text": "Unlock the potential of your MEGA account",
+        "context": "Headline of the achievement block on the startpage"
+    },
+    "16629": {
+        "text": "Still want more? We have you covered with a variety of generous achievements to help you get the most out of our secure cloud collaboration platform.",
+        "context": "Description of the achievement block on the startpage."
+    },
+    "16630": {
+        "text": "Invite your friends",
+        "context": "Indicating text for when \"you invite your friends\""
+    },
+    "16631": {
+        "text": "expires after [X] days",
+        "context": "Expiration time with [X] being the variable in \"days\""
+    },
+    "16632": {
+        "text": "Free [X] after install",
+        "context": "Text how much storage is earned. The [X] variable would be replaced by for example \"20 GB\"."
+    },
+    "16633": {
+        "text": "Free [X] per invite",
+        "context": "Text indicating how much storage is earned per user invite. The [X] would be replaced with for example \"10 GB\""
+    },
+    "16634": {
+        "text": "Access and stream your files on your smartphone or tablet. Upload and sync your photos and videos. Secure end-to-end encrypted chat with your contacts.",
+        "context": "Descriptive text for the \"mobile apps\" block on the startpage."
+    },
+    "16635": {
+        "text": "Easy automated synchronisation between your computer and MEGA allows you to access and work with your data securely across different locations and devices.",
+        "context": "Descriptive text for the MEGAsync block on the start page."
+    },
+    "16636": {
+        "text": "In addition to regular browser access, we offer browser extensions for Chrome and Firefox for enhanced security, improved file transfer performance and reduced loading times.",
+        "context": "Descriptive text for the browser extensions on the start page."
+    },
+    "16637": {
+        "text": "Start being secure. Join us today!",
+        "context": "Headline on the startpage"
+    },
+    "16638": {
+        "text": "Millions of people trust MEGA to store billions of files using our state of the art infrastructure. Join them and protect your data using one of the Internet's most secure cloud and communication providers.",
+        "context": "Descriptive text on the startpage."
+    },
+    "16639": {
+        "text": "Number of registered users",
+        "context": "Label text of a real time counter which displays the live number of registered users counting."
+    },
+    "16640": {
+        "text": "Number of stored files",
+        "context": "Label text of a live counter for the total number of files stored on MEGA."
+    },
+    "16641": {
+        "text": "No one shall be subjected to arbitrary interference with his privacy, family, home or correspondence[\u2026].",
+        "context": "Legal text from the Universal Declaration of Human Rights, Article 12."
+    },
+    "16642": {
+        "text": "Everyone has the right to the protection of the law against such interference[\u2026].",
+        "context": "Text from the Universal Declaration of Human Rights, Article 12."
+    },
+    "16643": {
+        "text": "Windows Mobile",
+        "context": "Menu item"
+    },
+    "16644": {
+        "text": "Service Policy",
+        "context": "Menu item to our service policy"
+    },
+    "16645": {
+        "text": "Press & Media",
+        "context": "Menu option to our \"Press & Media\" section."
+    },
+    "16646": {
+        "text": "User-encrypted cloud services",
+        "context": "Slogan on the footer of the website. If your language accepts English slogans in general, please keep the English version. Otherwise, please translate it so that it reads as a slogan in your language."
+    },
+    "16647": {
+        "text": "The Privacy Company.",
+        "context": "Slogan on the footer of the website. If your language accepts English slogans in general, please keep the English version. Otherwise, please translate it so that it reads as a slogan in your language."
+    },
+    "16648": {
+        "text": "Universal Declaration of Human Rights, Article 12.",
+        "context": "Link to the Universal Declaration of Human Rights"
     }
 }

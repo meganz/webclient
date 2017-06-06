@@ -142,6 +142,22 @@ function registeraccount() {
                             passwordManager($('#register_form'));
                             showToast('megasync', l[8745]);
                             boot_auth(ctx, r);
+
+                            if ($.ephNodes) {
+                                // The user got logged-in when trying to register, let's migrate the ephemeral account
+                                var msg = l[16517].replace('%1', rv.email);
+
+                                msgDialog('info', l[761], msg, null, function() {
+                                    $.onImportCopyNodes = $.ephNodes;
+                                    M.copyNodes(['meh'], u_handle, false, function(e) {
+                                        if (e) {
+                                            console.error(e);
+                                            debugger
+                                        }
+                                        location.reload();
+                                    });
+                                });
+                            }
                         }
                     }
                 };
@@ -164,6 +180,13 @@ function registeraccount() {
         rv.last = $('#register-lastname').val();
         rv.email = $('#register-email').val();
         rv.name = rv.first + ' ' + rv.last;
+    }
+    if (u_type === 0) {
+        // An ephemeral account is registering, save the cloud nodes in case we need to migrate later
+        var names = Object.create(null);
+        names[M.RootID] = 'ephemeral-account';
+        $.ephNodes = fm_getcopynodes([M.RootID], names);
+        $.ephNodes[0].t = 1; // change RootID's t2 to t1
     }
     sendsignuplink(rv.name, rv.email, rv.password, ctx);
 }

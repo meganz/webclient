@@ -460,7 +460,7 @@ body.pro:after {
     background-image: url(../images/mega/chat-static-sprite-v1@2x.png);
     background-size: 68px auto;
 }
-.small-icon.context, .dropdown-item.contains-submenu::before, .dropdown-colour-item::after, .download.thumb-hover-icon, .small-icon.red-lens, .small-icon.red-play, .small-icon.small-play-icon, .medium-icon.icons-img, .viewer-mid-button {
+.small-icon.context, .dropdown-item.contains-submenu::before, .dropdown-colour-item::after, .download.thumb-hover-icon, .small-icon.red-lens, .small-icon.red-play, .small-icon.small-play-icon, .medium-icon.icons-img, .viewer-mid-button, .small-icon.clock {
     background-image: url(../images/mega/icons-sprite_v3@2x.png);
     background-size: 262px auto;
 }

@@ -115,7 +115,10 @@ var ChatdIntegration = function(megaChat) {
                 // no need to do anything, the triggered action packet would trigger the code for joining the room.
             })
             .fail(function() {
-                self.logger.error("Failed to retrieve chatd ID from API, while trying to create a new room");
+                self.logger.error(
+                    "Failed to retrieve chatd ID from API, while trying to create a new room, args:",
+                    arguments
+                );
             });
     });
     return self;
@@ -410,6 +413,9 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
                 false
             );
             chatRoom = r[1];
+            if (!chatRoom) {
+                return masterPromise.reject();
+            }
             if (actionPacket.ct) {
                 chatRoom.ct = actionPacket.ct;
             }

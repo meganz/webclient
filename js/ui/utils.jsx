@@ -244,7 +244,49 @@ var RenderTo = React.createClass({
 
 });
 
+
+var EmojiFormattedContent = React.createClass({
+    _eventuallyUpdateInternalState: function(props) {
+        if (!props) {
+            props = this.props;
+        }
+
+        assert(
+            typeof(props.children) === "string",
+            "EmojiFormattedContent received a non-string (got: " + typeof(props.children) + ") as props.children"
+        );
+
+        var str = props.children;
+        if (this._content !== str) {
+            this._content = str;
+            this._formattedContent = megaChat.plugins.emoticonsFilter.processHtmlMessage(htmlentities(str));
+        }
+    },
+    shouldComponentUpdate: function(nextProps, nextState) {
+        if (!this._isMounted) {
+            this._eventuallyUpdateInternalState();
+            return true;
+        }
+
+        if (nextProps && nextProps.children !== this.props.children) {
+            this._eventuallyUpdateInternalState(nextProps);
+            return true;
+        }
+        else {
+            return false;
+        }
+    },
+    render: function() {
+        this._eventuallyUpdateInternalState();
+        
+        return <span dangerouslySetInnerHTML={{__html: this._formattedContent}}></span>;
+    }
+});
+
+
+
 module.exports = {
     JScrollPane,
-    RenderTo
+    RenderTo,
+    EmojiFormattedContent
 };

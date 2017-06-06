@@ -109,7 +109,10 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
                 Dexie.getDatabaseNames(function(r) {
                     for (var i = r.length; i--;) {
                         // drop only fmX related databases and skip slkv's
-                        if (r[i].substr(0, dbpfx.length) !== dbpfx && r[i].substr(0,4) !== "slkv") {
+                        if (r[i].substr(0, dbpfx.length) !== dbpfx
+                                && r[i][0] !== '$'
+                                && r[i].substr(0, 4) !== "slkv") {
+
                             todrop.push(r[i]);
                         }
                     }
@@ -271,17 +274,23 @@ FMDB.prototype.enqueue = function fmdb_enqueue(table, row, type) {
 // ch - channel to operate on
 FMDB.prototype.writepending = function fmdb_writepending(ch) {
     // exit loop if we ran out of pending writes or have crashed
-    if (this.inflight || ch < 0 || this.crashed) return;
+    if (this.inflight || ch < 0 || this.crashed || this.writing) return;
 
     // iterate all channels to find pending writes
     if (!this.pending[ch][this.tail[ch]]) return this.writepending(ch-1);
 
     var fmdb = this;
 
+    if (d) {
+        fmdb.logger.debug('writepending()', ch, fmdb.state,
+            Object(fmdb.pending[0][fmdb.tail[0]])._sn, fmdb.cantransact);
+    }
+
     if (!ch && fmdb.state < 0 && fmdb.pending[0][fmdb.tail[0]]._sn && fmdb.cantransact) {
         // if the write job is on channel 0 and already complete (has _sn set),
         // we execute it in a single transaction without first clearing sn
         fmdb.state = 1;
+        fmdb.writing = 1;
         fmdb.db.transaction('rw',
             fmdb.tables,
             function(){
@@ -298,18 +307,20 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                 if (d) {
                     fmdb.logger.log("Transaction committed");
                 }
+                fmdb.writing = 0;
                 fmdb.writepending(ch);
             }).catch(function(e){
                 if (fmdb.cantransact < 0) {
                     fmdb.logger.error("Your browser's IndexedDB implementation is bogus, disabling transactions.");
                     fmdb.cantransact = 0;
+                    fmdb.writing = 0;
                     fmdb.writepending(ch);
                 }
                 else {
                     // FIXME: retry instead? need statistics.
                     fmdb.logger.error("Transaction failed, marking DB as crashed", e);
                     fmdb.state = -1;
-                    fmdb.crashed = true;
+                    fmdb.invalidate();
                 }
             });
     }
@@ -336,7 +347,7 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                 }).catch(function(e){
                     fmdb.logger.error("SN clearing failed, marking DB as crashed", e);
                     fmdb.state = -1;
-                    fmdb.crashed = true;
+                    fmdb.invalidate();
                 });
 
             }
@@ -368,6 +379,7 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
 
                 fmdb.commit = false;
                 fmdb.state = -1;
+                fmdb.writing = 0;
                 fmdb.writepending(ch);
             }
 
@@ -392,6 +404,13 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
 
                 // all written: advance head
                 if (t.t == t.h) t.h++;
+
+                if (fmdb.crashed && !(t.t & 1)) {
+                    if (d) {
+                        fmdb.logger.warn('The DB is crashed, halting put...');
+                    }
+                    return;
+                }
 
                 if (d) {
                     fmdb.logger.log("DB " + ((t.t & 1) ? 'del' : 'put') + " with " + t[t.t].length
@@ -761,6 +780,8 @@ FMDB.prototype.clone = function fmdb_clone(o) {
 
 // reliably invalidate the current database (delete the sn)
 FMDB.prototype.invalidate = function fmdb_invalidate(cb) {
+    cb = cb || this.logger.debug.bind(this.logger, 'DB Invalidation', !this.crashed);
+
     if (this.crashed) {
         return cb();
     }
@@ -820,7 +841,6 @@ FMDB.prototype.beacon = function fmdb_beacon() {
         setTimeout(this.beacon.bind(this), 500);
     }
 };
-Object.freeze(FMDB.prototype);
 
 
 function mDBcls() {
@@ -830,6 +850,133 @@ function mDBcls() {
     fmdb = null;
 }
 
+
+// --------------------------------------------------------------------------
+
+/**
+ * KISS Interface for Dexie to store key/value pairs
+ * @param {String} name Database name
+ * @constructor
+ */
+function StorageDB(name) {
+    if (!(this instanceof StorageDB)) {
+        return new StorageDB(name);
+    }
+    var self = this;
+    var dbname = '$' + this.encrypt(name);
+
+    // save the db name for our getDatabaseNames polyfill
+    localStorage['_$mdb$' + dbname] = Date.now();
+
+    this.name = name;
+    this.opening = new MegaPromise();
+
+    var db = this.db = new Dexie(dbname);
+    db.version(1).stores({kv: '&k'});
+    db.open().then(function() {
+        self.opening.resolve();
+    }).catch(function(e) {
+        console.error(dbname, e);
+        self.db = null;
+        self.opening.reject(e);
+    }).finally(function() {
+        delete self.opening;
+    });
+}
+StorageDB.prototype = Object.create(FMDB.prototype);
+
+StorageDB.prototype.open = function(callback) {
+    if (this.opening) {
+        this.opening.always(callback.bind(this));
+    }
+    else {
+        callback.call(this);
+    }
+};
+StorageDB.prototype.get = function(k) {
+    var promise = new MegaPromise();
+
+    this.open(function() {
+        if (this.db) {
+            var self = this;
+
+            k = this.encrypt(k);
+            this.db.kv.get(k).then(function(store) {
+                try {
+                    return promise.resolve(JSON.parse(self.strdecrypt(store.v)));
+                }
+                catch (e) {}
+
+                promise.reject(EACCESS);
+            }).catch(function(e) {
+                promise.reject(e);
+            });
+        }
+        else {
+            promise.reject(ENOENT);
+        }
+    });
+
+    return promise;
+};
+StorageDB.prototype.set = function(k, v) {
+    var promise = new MegaPromise();
+
+    this.open(function() {
+        if (this.db) {
+            var store = {k: this.encrypt(k), v: this.strcrypt(JSON.stringify(v))};
+
+            this.db.kv.put(store).then(function() {
+                promise.resolve();
+            }).catch(function(e) {
+                promise.reject(e);
+            });
+        }
+        else {
+            promise.reject(ENOENT);
+        }
+    });
+
+    return promise;
+};
+StorageDB.prototype.rem = function(k) {
+    var promise = new MegaPromise();
+
+    this.open(function() {
+        if (this.db) {
+            var self = this;
+
+            k = this.encrypt(k);
+            this.db.kv.delete(k).then(function() {
+                self.db.kv.count(function(num) {
+                    if (num) {
+                        promise.resolve();
+                    }
+                    else {
+                        // no more entries in the db, remove it.
+
+                        self.db.delete().then(function() {
+                            promise.resolve();
+                        }).catch(function(e) {
+                            console.error(e);
+                            promise.resolve();
+                        });
+                    }
+                });
+            }).catch(function(e) {
+                promise.reject(e);
+            });
+        }
+        else {
+            promise.reject(ENOENT);
+        }
+    });
+
+    return promise;
+};
+StorageDB.prototype.encrypt = function(data) {
+    return ab_to_base64(this.strcrypt(JSON.stringify(data)));
+};
 
 // --------------------------------------------------------------------------
 

@@ -349,8 +349,6 @@ var GenericConversationMessage = React.createClass({
                                         {previewButtons}
                                         <DropdownsUI.DropdownItem icon="rounded-grey-down-arrow" label={__(l[1187])}
                                                                   onClick={startDownload}/>
-                                        <DropdownsUI.DropdownItem icon="grey-cloud" label={__(l[8005])}
-                                                                  onClick={addToCloudDrive}/>
 
                                         <hr />
 
@@ -490,7 +488,10 @@ var GenericConversationMessage = React.createClass({
 
                         var deleteButtonOptional = null;
 
-                        if (message.userId === u_handle) {
+                        if (
+                            message.userId === u_handle &&
+                            (unixtime() - message.delay) < MESSAGE_NOT_EDITABLE_TIMEOUT
+                        ) {
                             deleteButtonOptional = <DropdownsUI.DropdownItem
                                 icon="red-cross"
                                 label={__(l[1730])}

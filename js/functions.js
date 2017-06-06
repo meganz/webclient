@@ -709,10 +709,7 @@ mBroadcaster.once('startMega', function populate_l() {
         .replace('[A]', '<a class="red" href="mailto:uwp@mega.nz">').replace('[/A]', '</a>');
 		
 	l[16598] = escapeHTML(l[16598])
-        .replace('[A]', '<a href="https://github.com/meganz/sdk/tree/master/examples/megacmd" target="_blank" class="red">').replace('[/A]', '</a>');
-		
-	l[16598] = escapeHTML(l[16598])
-        .replace('[B]', '<a href="https://github.com/meganz/sdk/blob/master/examples/megacmd/README.md" target="_blank" class="red">').replace('[/B]', '</a>');
+        .replace('[A]', '<a href="https://github.com/meganz/sdk/tree/master/examples/megacmd" target="_blank" class="red">').replace('[/A]', '</a>').replace('[B]', '<a href="https://github.com/meganz/sdk/blob/master/examples/megacmd/README.md" target="_blank" class="red">').replace('[/B]', '</a>');
 		
 	l[16614] = escapeHTML(l[16614])
         .replace('[A]', '<a href="https://www.mozilla.org/thunderbird" target="_blank">').replace('[/A]', '</a>');

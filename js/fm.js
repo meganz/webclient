@@ -720,6 +720,8 @@ function initUI() {
         b.removeClass('active left-position overlap-right overlap-left mega-height');
         a.find('.disabled,.context-scrolling-block').removeClass('disabled context-scrolling-block');
         a.find('.dropdown-item.contains-submenu.opened').removeClass('opened');
+        var cnt = $('#cm_scroll').contents();
+        $('#cm_scroll').replaceWith(cnt);
 
         // Remove all sub-menues from context-menu move-item
         $('#csb_' + M.RootID).empty();
@@ -4813,23 +4815,28 @@ function disableCircularTargets(pref) {
     }
 }
 
-function adjustContextMenuPosition(e, m)
-{
-    var mPos;// menu position
-    var mX = e.clientX, mY = e.clientY;    // mouse cursor, returns the coordinates within the application's client area at which the event occurred (as opposed to the coordinates within the page)
+/**
+ *
+ * @param {jQuery.Event} e jQuery event
+ * @param {Object} m Context menu jQuery object
+ */
+function adjustContextMenuPosition(e, m) {
 
-    if (e.type === 'click' && !e.calculatePosition)// clicked on file-settings-icon
-    {
-        var ico = {'x': e.currentTarget.context.clientWidth, 'y': e.currentTarget.context.clientHeight};
-        var icoPos = getHtmlElemPos(e.delegateTarget);// get position of clicked file-settings-icon
+    // mouse cursor, returns the coordinates within the application's client area
+    // at which the event occurred (as opposed to the coordinates within the page)
+    var mX = e.clientX, mY = e.clientY;
+    var mPos;// menu position
+
+    if ((e.type === 'click') && !e.calculatePosition) {// Clicked on file-settings-icon
+        var ico = { 'x': e.currentTarget.context.clientWidth, 'y': e.currentTarget.context.clientHeight };
+        var icoPos = getHtmlElemPos(e.delegateTarget);// Get position of clicked file-settings-icon
         mPos = reCalcMenuPosition(m, icoPos.x, icoPos.y, ico);
     }
-    else// right click
-    {
+    else {// right click
         mPos = reCalcMenuPosition(m, mX, mY);
     }
 
-    m.css({'top': mPos.y, 'left': mPos.x});// set menu position
+    m.css({ 'top': mPos.y, 'left': mPos.x });// set menu position
 
     return true;
 }
@@ -4953,7 +4960,8 @@ function reCalcMenuPosition(m, x, y, ico) {
         top = horPos(n);
         if (m.parent().parent('.left-position').length === 0) {
             if (maxX >= (wMax + nmW)) {
-                left = 'auto', right = '100%';
+                left = 'auto';
+                right = '100%';
             }
             else if (minX <= (x - nmW)) {
                 n.addClass('left-position');
@@ -4969,7 +4977,8 @@ function reCalcMenuPosition(m, x, y, ico) {
                 n.addClass('left-position');
             }
             else if (maxX >= (wMax + nmW)) {
-                left = 'auto', right = '100%';
+                left = 'auto';
+                right = '100%';
             }
             else {
                 overlapParentMenu(n);
@@ -4982,22 +4991,32 @@ function reCalcMenuPosition(m, x, y, ico) {
     }
     else {// right click
         cor = 0;
-        dPos = {'x': x, 'y': y};
-        if (x < minX) {
-            dPos.x = minX;// left side alignment
-        }
-        if (wMax > maxX) {
-            dPos.x = maxX - cmW;// align with right side
-        }
+        dPos = { 'x': x, 'y': y };
 
-        if (hMax > maxY) {
-            dPos.y = maxY - cmH;// align with bottom
-        }
+        // if ((cmH + 24) > wH) {// Handle small windows height
+            m.find('> .dropdown-section').wrapAll('<div id="cm_scroll" class="context-scrolling-block sub-menu" />');
+            m.addClass('mega-height');
+            m.css({ 'height': wH - 24 + 'px' });
+            m.on('mousemove', scrollMegaSubMenu);
+            dPos.y = 24;// align with bottom
+        // }
+        // else {
+            if (x < minX) {
+                dPos.x = minX;// left side alignment
+            }
+            if (wMax > maxX) {
+                dPos.x = maxX - cmW;// align with right side
+            }
+
+            if (hMax > maxY) {
+                dPos.y = maxY - cmH;// align with bottom
+            }
+        // }
     }
 
     setBordersRadius(m, cor);
 
-    return {'x': dPos.x, 'y': dPos.y};
+    return { 'x': dPos.x, 'y': dPos.y };
 }
 /* jshint -W074 */
 

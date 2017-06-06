@@ -1,3 +1,6 @@
+
+var achieve_data = false;
+
 function init_start() {
         
     $('.pages-nav.nav-button').removeClass('active');
@@ -20,12 +23,43 @@ function init_start() {
     }
 
     start_counts();
+	
+	$('.bottom-page.top-header').text($('.bottom-page.top-header').text().replace('[A]','').replace('[/A]',''));
+	
+	if (achieve_data) {		
+		start_achievements(achieve_data);	
+	}
+	else {		
+		$('.bottom-page.white-block.top-pad.achievements').addClass('hidden');
+		api_req({"a":"mafu","v":4235}, {
+			callback: function(res) {
+				achieve_data=res;
+				start_achievements(res);
+			}
+		});
+	}
 }
+
+
+function start_achievements(res)
+{
+	if (res && res.u && res.u[4] && res.u[5] && res.u[3]) {							
+		// enable achievements:
+		$('.bottom-page.white-block.top-pad.achievements').removeClass('hidden');	var gbt = 'GB';
+		if (lang == 'fr') gbt = 'Go';					
+		$('.achievements .megasync').html(escapeHTML(l[16632]).replace('[X]','<span class="txt-pad"><span class="big">' + Math.round(res.u[4][0]/1024/1024/1024) + '</span> '+ gbt +'</span>') + '*');
+		$('.achievements .invite').html(escapeHTML(l[16633]).replace('[X]','<span class="txt-pad"><span class="big">' + Math.round(res.u[3][0]/1024/1024/1024) + '</span> '+ gbt +'</span>') + '*');					
+		$('.achievements .mobile').html(escapeHTML(l[16632]).replace('[X]','<span class="txt-pad"><span class="big">' + Math.round(res.u[5][0]/1024/1024/1024) + '</span> '+ gbt +'</span>') + '*');					
+		$('.achievements .expiry').html('*' + escapeHTML(l[16631]).replace('[X]',parseInt(res.u[5][2].replace('d',''))));		
+		$('.bottom-page.top-header').html(escapeHTML(l[16536]).replace('[A]','').replace('[/A]','*'));
+		$('.bottom-page.asterisktext').removeClass('hidden');
+	}
+}
+
 
 var start_countdata = false;
 
-function start_counts()
-{	
+function start_counts() {
 	if (start_countdata) return;
 	start_countdata=true;
 	start_APIcount();

@@ -274,3 +274,15 @@
     color: #FF333A;
     text-decoration: none;
 }
+.bottom-page.asterisktext {
+    font-size: 14px;
+    color: #bcbbb8;
+    position: absolute;
+    width: 100%;
+    left: 0;
+    margin: -15px 0 0 0;
+    padding: 0 15px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}

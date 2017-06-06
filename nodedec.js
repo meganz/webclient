@@ -94,6 +94,7 @@ var u_handle;
 var u_privk;
 var u_k_aes;
 var u_sharekeys = {};
+var vkey = {};
 
 function crypto_process_sharekey(handle, key) {
     if (key.length > 43) {
@@ -229,8 +230,17 @@ function crypto_decryptnode(n) {
     }
     else {
         if (d) {
-            console.debug("Can't extract a valid key for " + n.h);
+            vkey[n.h] = 1;
+            if (vkey.t) {
+                clearTimeout(vkey.t);
+            }
+            vkey.t = setTimeout(function() {
+                delete vkey.t;
+                console.debug("Can't extract a valid key for", Object.keys(vkey));
+                vkey = {};
+            }, 4000);
         }
+
         if (missingkeys) crypto_reportmissingkey(n);
     }
 }

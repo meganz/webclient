@@ -1805,7 +1805,9 @@ var ConversationPanel = React.createClass({
                     {
                         self.props.chatRoom.type === "group" ?
                             <div className="chat-topic-block">
-                                {self.props.chatRoom.getRoomTitle()}
+                                <utils.EmojiFormattedContent>{
+                                    self.props.chatRoom.getRoomTitle()
+                                }</utils.EmojiFormattedContent>
                             </div> :
                             undefined
                     }

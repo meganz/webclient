@@ -25,7 +25,7 @@
 .conversation-panel.group-chat .messages-block {
     height: -webkit-calc(100% - 38px);
     height: -moz-calc(100% - 38px);
-    height: calc(100% -38px);
+    height: calc(100% - 38px);
 }
 .messages-block::before {
     display: block;

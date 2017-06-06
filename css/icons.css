@@ -731,7 +731,7 @@
 }
 /* Context menu icons */
 .small-icon.context {
-    background-image: url(../images/mega/icons-sprite.png);
+    background-image: url(../images/mega/icons-sprite_v3.png);
 }
 .small-icon.context.standart-download {
     background-position: -1px -499px;
@@ -989,4 +989,10 @@
     width: 52px;
     height: 52px;
     background-image: url(../images/mega/account-sprite_v3.png);
+}
+.small-icon.clock {
+    background-image: url(../images/mega/icons-sprite_v2.png);
+    background-position: -79px -743px;
+    width: 20px;
+    height:22px;
 }

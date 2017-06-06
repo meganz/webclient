@@ -110,7 +110,7 @@ function u_checklogin3a(res, ctx) {
         u_attr = res;
         var exclude = [
             'c', 'email', 'k', 'name', 'p', 'privk', 'pubk', 's',
-            'ts', 'u', 'currk', 'flags', '*!lastPsaSeen', 'lup', 'since'
+            'ts', 'u', 'currk', 'flags', '*!lastPsaSeen', 'lup', 'since', 'ut'
         ];
 
         for (var n in u_attr) {
@@ -148,6 +148,10 @@ function u_checklogin3a(res, ctx) {
         }
         catch (e) {
             console.error('Error decoding private RSA key', e);
+        }
+
+        if (typeof u_attr.ut !== 'undefined') {
+            localStorage.apiut = u_attr.ut;
         }
 
         // Flags is a generic object for various things
@@ -573,6 +577,36 @@ function checkUserLogin() {
     return false;
 }
 
+
+/**
+ * A reusable function that is used for processing locally/3rd party email change
+ * action packets.
+ *
+ * @param ap {Object} the actual 'se' action packet
+ */
+function processEmailChangeActionPacket(ap) {
+    // set email
+    var emailChangeAccepted = (ap.s === 3 && typeof ap.e === 'string' && ap.e.indexOf('@') !== -1);
+
+    if (emailChangeAccepted) {
+        var user = M.getUserByHandle(ap.u);
+
+        if (user) {
+            user.m = ap.e;
+            process_u([user]);
+
+            if (ap.u === u_handle) {
+                u_attr.email = user.m;
+
+                if (M.currentdirid === 'account/profile') {
+                    $('.nw-fm-left-icon.account').trigger('click');
+                }
+            }
+        }
+        // update the underlying fmdb cache
+        M.addUser(user);
+    }
+}
 
 (function(exportScope) {
     var _lastUserInteractionCache = window._lastUserInteractionCache = {};
@@ -1018,8 +1052,16 @@ function checkUserLogin() {
                 if (fmconfig.ul_maxSlots) {
                     ulQueue.setSize(fmconfig.ul_maxSlots);
                 }
+                else {
+                    mega.config.set('ul_maxSlots', 4);// Default ul slots value
+                    ulQueue.setSize(4);
+                }
                 if (fmconfig.dl_maxSlots) {
                     dlQueue.setSize(fmconfig.dl_maxSlots);
+                }
+                else {
+                    mega.config.set('dl_maxSlots', 4);// Default dl slots value
+                    dlQueue.setSize(4);
                 }
                 if (fmconfig.font_size) {
                     $('body').removeClass('fontsize1 fontsize2')
@@ -1102,10 +1144,17 @@ function checkUserLogin() {
     ns.setn = function _setConfigValueToast(key, value, toastText) {
         toastText = toastText || l[16168];
 
-        delay('fmconfig:setn', function() {
-            showToast('settings', toastText);
+        delay('fmconfig:setn.' + key, function() {
+            var toast = false;
 
-            mega.config.set(key, value);
+            if (mega.config.get(key) !== value) {
+                mega.config.set(key, value);
+                toast = true;
+            }
+
+            if (toast) {
+                showToast('settings', toastText);
+            }
         });
     };
 

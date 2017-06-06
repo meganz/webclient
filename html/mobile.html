@@ -147,6 +147,9 @@
         <div class="mobile fm-header folder-link">
             <div class="mobile fm-icon cloud left hidden"></div>
             <div class="mobile fm-icon menu right hidden"></div>
+            <div class="mobile fm-icon upload right hidden">
+                <input class="hidden" type="file" id="select-file" />
+            </div>
             <div class="mobile fm-icon back left hidden"></div>
             <div class="mobile fm-icon folder"></div>
             <div class="mobile fm-header-txt"><span>[$1456]...</span></div>
@@ -304,6 +307,33 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Upload overlay !-->
+<div class="mobile main-block hidden" id="mobile-upload">
+    <div class="mobile content-row first">
+        <div class="mobile content-cell">
+            <a class="mobile logo"></a>
+            <div class="mobile fm-dialog-close hidden"></div>
+            <div class="mobile white-block">
+                <img alt="" src="{staticpath}images/mobile/extensions/image.png" class="mobile filetype-img" />
+                <div class="mobile filename"><em>[$5533]</em></div>
+                <div class="mobile file-upload-info">
+                    <div class="mobile download-speed"></div>
+                    <div class="mobile filesize"></div>
+                    <div class="mobile upload-percents"></div>
+                </div>
+                <a class="mobile red-button first dl-browser"> <i></i> <span>[$5532]</span> </a>
+                <!-- Progressbar is hidden. "uploading" body class will show it !-->
+                <!-- Set width to ".bar" block !-->
+                <a class="mobile upload-progress">
+                    <div class="bar"></div>
+                    <span>[$8949]</span>
+                </a>
             </div>
         </div>
     </div>

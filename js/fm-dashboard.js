@@ -382,6 +382,11 @@ dashboardUI.updateCloudDataWidget = function() {
     var map = ['files', 'folders', 'rubbish', 'ishares', 'oshares', 'links'];
     var intl = typeof Intl !== 'undefined' && Intl.NumberFormat && new Intl.NumberFormat();
 
+    $('.data-item .links-s').rebind('click', function() {
+        loadSubPage('fm/links');
+        return false;
+    });
+
     $('.data-float-bl').find('.data-item')
         .each(function(idx, elm) {
             var props = data[map[idx]];
@@ -394,7 +399,7 @@ dashboardUI.updateCloudDataWidget = function() {
                 cnt = intl.format(props.cnt || 0);
             }
 
-            elm.children[1].textContent = String(str).replace('[X]', cnt);
+            elm.children[1].textContent = idx < 5 ? String(str).replace('[X]', cnt) : cnt;
             if (props.cnt > 0) {
                 elm.children[2].textContent = bytesToSize(props.size);
                 $(elm).removeClass('empty');

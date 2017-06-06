@@ -221,14 +221,15 @@ function init_page() {
         }
     }
 
-    if (page.substr(0, 1) === '!' && page.length > 1) {
+
+    dlkey = false;
+    if (page[0] === '!' && page.length > 1) {
 
         var ar = page.substr(1, page.length - 1).split('!');
         if (ar[0]) {
             dlid = ar[0].replace(/[^\w-]+/g, "");
         }
 
-        dlkey = false;
         if (ar[1]) {
             dlkey = ar[1].replace(/[^\w-]+/g, "");
         }
@@ -310,7 +311,6 @@ function init_page() {
         loadingDialog.hide();
     }
 
-    var wasFolderlink = pfid;
     var oldPFKey = pfkey;
     if (page.substr(0, 2) == 'F!' && page.length > 2) {
         var ar = page.substr(2, page.length - 1).split('!');
@@ -412,8 +412,7 @@ function init_page() {
         page = 'newpw';
     }
 
-
-    if ((pfkey || dlkey) && location.hash[0] !== '#' && !is_fm()) {
+    if ((pfkey || dlkey) && location.hash[0] !== '#') {
         return location.replace(getAppBaseUrl());
     }
 
@@ -433,15 +432,22 @@ function init_page() {
             delete localStorage.awaitingConfirmationAccount;
         }
         else {
-            // Insert placeholder page while waiting for user input
-            parsepage(pages['placeholder']);
+            // Show signup link dialog for mobile
+            if (is_mobile) {
+                parsepage(pages['fm_mobile']);
+                mobile.register.showConfirmEmailScreen(acc);
+                return false;
+            }
+            else {
+                // Insert placeholder page while waiting for user input
+                parsepage(pages['placeholder']);
 
-            return mega.ui.sendSignupLinkDialog(acc, function() {
-                // The user clicked 'close', abort and start over...
-
-                delete localStorage.awaitingConfirmationAccount;
-                init_page();
-            });
+                return mega.ui.sendSignupLinkDialog(acc, function() {
+                    // The user clicked 'close', abort and start over...
+                    delete localStorage.awaitingConfirmationAccount;
+                    init_page();
+                });
+            }
         }
     }
 
@@ -808,7 +814,7 @@ function init_page() {
 
         if (u_type) {
             var ac = new mega.AccountClosure();
-            ac.initAccountClosure();
+            ac.handleFeedback();
         }
         else {
             // Unable to cancel, not logged in
@@ -1193,7 +1199,9 @@ function init_page() {
                 ulQueue.pause();
                 uldl_hold = true;
 
-                bottomPageDialog(false, 'terms'); // show terms dialog
+                if (!is_mobile) {
+                    bottomPageDialog(false, 'terms'); // show terms dialog
+                }
             }
         }
         $('#topmenu').safeHTML(parsetopmenu());
@@ -1427,6 +1435,12 @@ function tooltiplogin() {
 }
 
 function topmenuUI() {
+
+    // Not applicable for mobile
+    if (is_mobile) {
+        return false;
+    }
+
     if (u_type === 0) {
         $('.top-login-button').text(l[967]);
     }
@@ -1566,9 +1580,7 @@ function topmenuUI() {
         }
 
         // Show PRO plan expired warning popup (if applicable)
-        if (!is_mobile) {
-            alarm.planExpired.render();
-        }
+        alarm.planExpired.render();
     }
     else {
         if (u_type === 0 && !confirmok && page !== 'key') {
@@ -2246,7 +2258,7 @@ function loadSubPage(tpage, event)
         }
     }
 
-    if (hashLogic || page.substr(0, 2) === 'P!' || page.substr(0, 2) === 'F!' || page[0] === '!') {
+    if (hashLogic || isPublicLink(page)) {
         document.location.hash = '#' + page;
     }
     else if (!event || event.type !== 'popstate') {

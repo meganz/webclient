@@ -377,7 +377,10 @@ if (typeof mobileblog !== 'undefined') {
         document.body.innerHTML = markup.replace(/<\/?(?:html\:)?script[^>]*?>/gi, '')
             .replace(RegExp(' (' + eventHandlers.join("|") + ')', 'g'), ' data-dummy');
 
-        clickURLs();
+        // Prevent blog breaking on mobile due to missing jQuery
+        if (!is_mobile) {
+            clickURLs();
+        }
 
         if (window.android) {
             document.body.className = 'android blog';

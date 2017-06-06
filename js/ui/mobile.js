@@ -98,22 +98,24 @@ var mobile = {
         var $container = $('.mobile.' + className);
         var $checkboxWrapper = $container.find('.square');
         var $checkboxInput = $checkboxWrapper.find('.checkbox');
-        var $checkboxLabel = $container.find('.text');
 
         // On clicking the checkbox or label
-        $checkboxWrapper.add($checkboxLabel).off('tap').on('tap', function() {
+        $container.off('tap').on('tap', function() {
 
             // If checked already, uncheck it
             if ($checkboxInput.is(':checked')) {
 
-                $checkboxWrapper.removeClass('checkboxOn');
+                $checkboxWrapper.addClass('checkboxOff').removeClass('checkboxOn');
                 $checkboxInput.prop('checked', false);
             }
             else {
                 // Otherwise check it
-                $checkboxWrapper.addClass('checkboxOn');
+                $checkboxWrapper.removeClass('checkboxOff').addClass('checkboxOn');
                 $checkboxInput.prop('checked', true);
             }
+
+            // Prevent double clicks
+            return false;
         });
     },
 
@@ -324,8 +326,9 @@ mobile.cloud = {
      * Removes a node from the current view if applicable, updates the footer with the new
      * file/folder count and also shows an empty cloud drive/folder message if applicable
      * @param {String} nodeHandle The handle of the node to be removed
+     * @param {String} parentHandle The parent handle of the node to be removed
      */
-    renderDelete: function(nodeHandle) {
+    renderDelete: function(nodeHandle, parentHandle) {
 
         // Remove the node if in the current view
         $('#' + nodeHandle).remove();
@@ -334,6 +337,12 @@ mobile.cloud = {
         mobile.cloud.showEmptyCloudIfEmpty();
         mobile.cloud.countAndUpdateSubFolderTotals();
         mobile.cloud.renderFooter();
+
+        // If in the current folder and this got removed, then we need to go back up and open the parent folder
+        if (M.currentdirid === nodeHandle || isCircular(nodeHandle, M.currentdirid) === true) {
+            parentHandle = parentHandle || Object(M.getNodeByHandle(nodeHandle)).p || RootbyId(nodeHandle);
+            M.openFolder(parentHandle);
+        }
     },
 
     /**
@@ -416,6 +425,7 @@ mobile.cloud = {
         var $fileManagerHeader = $('.mobile.file-manager-block .fm-header');
         var $backButton = $fileManagerHeader.find('.fm-icon.back');
         var $cloudIcon = $fileManagerHeader.find('.fm-icon.cloud');
+        var $uploadIcon = $fileManagerHeader.find('.fm-icon.upload');
         var $menuIcon = $fileManagerHeader.find('.fm-icon.menu');
         var $folderIcon = $fileManagerHeader.find('.fm-icon.folder');
         var $folderName = $fileManagerHeader.find('.fm-header-txt span');
@@ -424,6 +434,7 @@ mobile.cloud = {
         // Reset header to blank slate so only buttons/items are enabled as needed
         $backButton.addClass('hidden');
         $cloudIcon.addClass('hidden');
+        $uploadIcon.addClass('hidden');
         $menuIcon.addClass('hidden');
         $fileManagerHeader.removeClass('folder-link');
         $folderIcon.addClass('hidden');
@@ -459,7 +470,8 @@ mobile.cloud = {
             // Otherwise if this is the root folder of the regular cloud drive, show the cloud icon and text
             if (M.currentdirid === M.RootID) {
                 $cloudIcon.removeClass('hidden');
-                $folderName.text(l[164]);           // Cloud Drive
+                // $uploadIcon.removeClass('hidden');    // ToDo: re-enable when finished
+                $folderName.text(l[164]);               // Cloud Drive
             }
             else {
                 // Otherwise if a subfolder of the cloud drive, show the back button and the folder name
@@ -467,8 +479,9 @@ mobile.cloud = {
                 $folderName.text(currentFolder.name);
             }
 
-            // Show the hamburger menu
+            // Show the hamburger menu and initialise the upload button
             mobile.menu.showAndInit('cloud-drive');
+            // mobile.upload.initUploadButton();         // ToDo: re-enable when finished
         }
     },
 
@@ -760,7 +773,8 @@ mobile.cloud = {
      */
     initFileOptionsToggle: function() {
 
-        var $folderAndFileRows = $('.mobile.fm-item');
+        var $scrollBlock = $('.mobile.file-manager-block .fm-scrolling');
+        var $folderAndFileRows = $scrollBlock.find('.fm-item');
         var $fileRows = $folderAndFileRows.filter('.file');
 
         // Get the last file row and see how many options it has enabled
@@ -786,6 +800,11 @@ mobile.cloud = {
                 // Hide all expanded rows, then just toggle the state of the current row
                 $folderAndFileRows.not($currentFileRow).removeClass('expanded');
                 $currentFileRow.toggleClass('expanded');
+            }
+
+            // If the last item was clicked/tapped this may appear below the bottom status bar so scroll down more
+            if ($currentFileRow.is(':last-child')) {
+                $scrollBlock.scrollTop($scrollBlock.prop('scrollHeight'));
             }
 
             // Prevent pre clicking one of the Open in Browser/App buttons
@@ -861,7 +880,8 @@ mobile.cloud = {
      */
     initFolderOptionsToggle: function() {
 
-        var $folderAndFileRows = $('.mobile.fm-item');
+        var $scrollBlock = $('.mobile.file-manager-block .fm-scrolling');
+        var $folderAndFileRows = $scrollBlock.find('.fm-item');
         var $folderRows = $folderAndFileRows.filter('.folder');
 
         // Get the last folder row and see how many options it has enabled
@@ -887,6 +907,11 @@ mobile.cloud = {
                 // Hide all expanded rows, then just toggle the state of the current row
                 $folderAndFileRows.not($currentFolderRow).removeClass('expanded');
                 $currentFolderRow.toggleClass('expanded');
+            }
+
+            // If the last item was clicked/tapped this may appear below the bottom status bar so scroll down more
+            if ($currentFolderRow.is(':last-child')) {
+                $scrollBlock.scrollTop($scrollBlock.prop('scrollHeight'));
             }
 
             // Prevent pre clicking one of the Open in Browser/App buttons
@@ -1469,7 +1494,7 @@ mobile.downloadOverlay = {
         }
 
         // Otherwise if Android
-        else if ((ua.details.os === 'Android') || (localStorage.testOpenInApp === 'android')) {
+        else if ((ua.indexOf('android') > -1) || (localStorage.testOpenInApp === 'android')) {
             var intent = 'intent://' + redirectLink + '/#Intent;scheme=mega;package=mega.privacy.android.app;end';
             document.location = intent;
         }
@@ -1668,6 +1693,13 @@ mobile.downloadOverlay = {
         var $openInBrowserButton = this.$overlay.find('.first.dl-browser');
         var $fileTypeUnsupportedMessage = this.$overlay.find('.file-unsupported');
         var $fileSizeUnsupportedMessage = this.$overlay.find('.file-too-large');
+        var $body = $('body');
+
+        // Reset state back to default if re-opening the dialog from a previously disabled state
+        $openInBrowserButton.removeClass('disabled');
+        $fileTypeUnsupportedMessage.addClass('hidden');
+        $fileSizeUnsupportedMessage.addClass('hidden');
+        $body.removeClass('wrong-file');
 
         // Get the name, size, extension and whether supported
         var fileName = node.name;
@@ -1678,10 +1710,8 @@ mobile.downloadOverlay = {
         // Check if the download is supported
         if ((fileSize > this.maxFileSize) || !fileExtensionIsSupported) {
 
-            // Show an error overlay
-            $('body').addClass('wrong-file');
-
-            // Remove the tap/click handler and show as greyed out
+            // Show an error overlay, remove the tap/click handler and show as greyed out
+            $body.addClass('wrong-file');
             $openInBrowserButton.off('tap').addClass('disabled');
 
             // Change error message
@@ -2044,6 +2074,11 @@ mobile.messageOverlay = {
 
             // Hide the error overlay
             $overlay.addClass('hidden');
+
+            // Remove the loading spinner if on the Login page and came back from an error
+            if (page === 'login') {
+                $('.mobile.signin-button').removeClass('loading');
+            }
 
             // Prevent clicking behind
             return false;
@@ -2426,6 +2461,9 @@ mobile.register = {
 
             // Pass the details to the registration flow
             mobile.register.doRegister(firstName, lastName, email, password);
+
+            // Prevent double taps
+            return false;
         });
     },
 
@@ -2440,6 +2478,9 @@ mobile.register = {
 
         // Show loading dialog
         loadingDialog.show();
+
+        // Set a flag to check at the end of the registration process
+        localStorage.signUpStartedInMobileWeb = '1';
 
         u_storage = init_storage(localStorage);
 
@@ -2519,19 +2560,20 @@ mobile.register = {
     showConfirmEmailScreen: function(registrationVars) {
 
         var $confirmScreen = $('.registration-confirm-email');
+        var $registerScreen = $('.mobile.signin-register-block');
         var $changeEmailInput = $confirmScreen.find('.change-email input');
         var $resendButton = $confirmScreen.find('.resend-button');
 
         // Hide the current register screen and show the confirmation one
-        this.$screen.addClass('hidden');
+        $registerScreen.addClass('hidden');
         $confirmScreen.removeClass('hidden');
 
         // Set the email into the text field
         $changeEmailInput.val(registrationVars.email);
 
         // Init email input keyup and Resend button
-        this.initConfirmEmailScreenKeyup($changeEmailInput, $resendButton);
-        this.initConfirmEmailScreenResendButton($changeEmailInput, $resendButton, registrationVars);
+        mobile.register.initConfirmEmailScreenKeyup($changeEmailInput, $resendButton);
+        mobile.register.initConfirmEmailScreenResendButton($changeEmailInput, $resendButton, registrationVars);
     },
 
     /**
@@ -2621,6 +2663,9 @@ mobile.register = {
 
             // Only let them send once (until they change email again)
             $resendButton.removeClass('active');
+
+            // Prevent double taps
+            return false;
         });
     },
 
@@ -2931,6 +2976,59 @@ mobile.terms = {
 
 
 /**
+ * File upload functionality
+ */
+mobile.upload = {
+
+    /**
+     * Initialise the upload button
+     */
+    initUploadButton: function() {
+
+        var $fileInput = $('#select-file');
+        var $uploadIcon = $('.mobile.fm-icon.upload');
+        var $overlay = $('#mobile-upload');
+
+        // On the upload icon click/tap
+        $uploadIcon.off('tap').on('tap', function() {
+
+            // Open the file picker
+            $fileInput.trigger('click');
+            return false;
+        });
+
+        // When the file is selected, start the upload
+        $fileInput.off('change').on('change', function(event) {
+
+            // Pop up upload dialog
+            $overlay.removeClass('hidden').addClass('overlay');
+
+            // Get file information
+            var file = this.files[0];
+            var fileSize = numOfBytes(file.size);
+            var fileSizeFormatted = fileSize.size + ' ' + fileSize.unit;
+            var fileName = file.name;
+
+            // Get file icon
+            var fileExt = fileext(fileName);
+            var fileIconName = (ext[fileExt]) ? ext[fileExt][0] : 'generic';
+            var fileIconPath = mobile.imagePath + fileIconName + '.png';
+
+            // Display in overlay
+            $overlay.find('.filesize').text(fileSizeFormatted);
+            $overlay.find('.filename').text(fileName);
+            $overlay.find('.filetype-img').attr('src', fileIconPath);
+
+            // ToDo: initialise upload button
+
+            // Prevent double taps
+            return false;
+        });
+    }
+};
+
+
+/**
  * Some stubs to prevent exceptions in action packet processing because not all files are loaded for mobile
  */
 mega.checkStorageQuota = function() {};
@@ -2946,3 +3044,18 @@ var notify = {
     notifyFromActionPacket: function() {},
     countAndShowNewNotifications: function() {}
 };
+
+function msgDialog(type, title, msg, submsg, callback, checkbox) {
+
+    // Call the mobile version
+    mobile.messageOverlay.show(msg, submsg);
+}
+
+function removeUInode(nodeHandle, parentHandle) {
+
+    // Call the mobile version
+    mobile.cloud.renderDelete(nodeHandle, parentHandle);
+}
+
+// Not required for mobile
+function fmtopUI() { }

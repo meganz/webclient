@@ -1122,25 +1122,9 @@ base64, PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJod…hlaWdodD0iMTAxIiBmaW
     -moz-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
     box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
 }
-.bottom-page.blocks-cell-txt {
-    padding: 12px 10px 170px 48px;
-    position: relative;
-    z-index: 1;
-}
-.bottom-page.blocks-cell-txt .num {
-    width: 22px;
-    height: 22px;
-    -moz-border-radius: 100%;
-    -webkit-border-radius: 100%;
-    border-radius: 100%;
-    -webkit-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.1);
-    -moz-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.1);
-    box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.1);
-    position: absolute;
-    left: 13px;
-    top: 13px;
-    text-align: center;
-    font-size: 16px;
+.megacmd-icon-info {
+    cursor: default;
+    font-size: 18px;
     line-height: 21px;
     color: #666666;
 }

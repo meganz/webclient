@@ -704,6 +704,19 @@ mBroadcaster.once('startMega', function populate_l() {
     l[16392] = escapeHTML(l[16392]).replace('[S]', '<span class="red">').replace('[/S]', '</span>');
     l[16393] = escapeHTML(l[16393])
         .replace('[A]', '<a class="red" href="mailto:support@mega.nz">').replace('[/A]', '</a>');
+		
+	l[16596] = escapeHTML(l[16596])
+        .replace('[A]', '<a class="red" href="mailto:uwp@mega.nz">').replace('[/A]', '</a>');
+		
+	l[16598] = escapeHTML(l[16598])
+        .replace('[A]', '<a href="https://github.com/meganz/sdk/tree/master/examples/megacmd" target="_blank" class="red">').replace('[/A]', '</a>');
+		
+	l[16598] = escapeHTML(l[16598])
+        .replace('[B]', '<a href="https://github.com/meganz/sdk/blob/master/examples/megacmd/README.md" target="_blank" class="red">').replace('[/B]', '</a>');
+		
+	l[16614] = escapeHTML(l[16614])
+        .replace('[A]', '<a href="https://www.mozilla.org/thunderbird" target="_blank">').replace('[/A]', '</a>');
+		
 
     var common = [
         15536, 16106, 16107, 16116, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315,

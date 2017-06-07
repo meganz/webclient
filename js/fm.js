@@ -4930,7 +4930,7 @@ function reCalcMenuPosition(m, x, y, ico) {
     var cor;// corner, check setBordersRadius for more info
     if (typeof ico === 'object') {// draw context menu relative to file-settings-icon
         cor = 1;
-        dPos = {'x': x - 2, 'y': y + ico.y + 8};// position for right-bot
+        dPos = { 'x': x - 2, 'y': y + ico.y + 8 };// position for right-bot
 
         // draw to the left
         if (wMax > maxX) {
@@ -4938,13 +4938,23 @@ function reCalcMenuPosition(m, x, y, ico) {
             cor = 3;
         }
 
-        // draw to the top
-        if (hMax > (maxY - TOP_MARGIN)) {
-            dPos.y = y - cmH - 6;
-            if (dPos.y < TOP_MARGIN) {
-                dPos.y = TOP_MARGIN;
+        if ((cmH + 24) >= wH) {// Handle small windows height
+            m.find('> .dropdown-section').wrapAll('<div id="cm_scroll" class="context-scrolling-block" />');
+            m.append('<span class="context-top-arrow"></span><span class="context-bottom-arrow"></span>');
+            m.addClass('mega-height');
+            cmH = wH - (TOP_MARGIN * 2);
+            m.css({ 'height': wH - (TOP_MARGIN * 2) + 'px' });
+            m.on('mousemove', scrollMegaSubMenu);
+            dPos.y = wH - cmH;
+        }
+        else {
+            if (hMax > (maxY - TOP_MARGIN)) {
+                dPos.y = y - cmH - 6;
+                if (dPos.y < TOP_MARGIN) {
+                    dPos.y = TOP_MARGIN;
+                }
+                cor++;
             }
-            cor++;
         }
     }
     else if (ico === 'submenu') {// submenues

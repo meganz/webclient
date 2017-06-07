@@ -4830,7 +4830,8 @@ function adjustContextMenuPosition(e, m) {
 
     // mouse cursor, returns the coordinates within the application's client area
     // at which the event occurred (as opposed to the coordinates within the page)
-    var mX = e.clientX, mY = e.clientY;
+    var mX = e.clientX;
+    var mY = e.clientY;
     var mPos;// menu position
 
     if ((e.type === 'click') && !e.calculatePosition) {// Clicked on file-settings-icon
@@ -5003,8 +5004,8 @@ function reCalcMenuPosition(m, x, y, ico) {
             m.find('> .dropdown-section').wrapAll('<div id="cm_scroll" class="context-scrolling-block" />');
             m.append('<span class="context-top-arrow"></span><span class="context-bottom-arrow"></span>');
             m.addClass('mega-height');
-            cmH = wH - TOP_MARGIN*2;
-            m.css({ 'height': wH - TOP_MARGIN*2 + 'px' });
+            cmH = wH - (TOP_MARGIN * 2);
+            m.css({ 'height': wH - (TOP_MARGIN * 2) + 'px' });
             m.on('mousemove', scrollMegaSubMenu);
             dPos.y = wH - cmH;
         }

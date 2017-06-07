@@ -10671,7 +10671,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
 }
 .dropdown.body.submenu.mega-height > .context-scrolling-block, .dropdown.files-menu.mega-height > .context-scrolling-block {
     height: 100%;
-    overflow-y: hidden;
+    overflow: hidden;
 }
 .dropdown.body.submenu .dropdown-item {
     display: block !important;

@@ -720,8 +720,14 @@ function initUI() {
         b.removeClass('active left-position overlap-right overlap-left mega-height');
         a.find('.disabled,.context-scrolling-block').removeClass('disabled context-scrolling-block');
         a.find('.dropdown-item.contains-submenu.opened').removeClass('opened');
+
+        // Cleanup for scrollable context menu
         var cnt = $('#cm_scroll').contents();
-        $('#cm_scroll').replaceWith(cnt);
+        $('#cm_scroll').replaceWith(cnt);// Remove .context-scrollable-block
+        a.removeClass('mega-height');
+        a.find('> .context-top-arrow').remove();
+        a.find('> .context-bottom-arrow').remove();
+        a.css({ 'height': 'auto' });// In case that window is enlarged
 
         // Remove all sub-menues from context-menu move-item
         $('#csb_' + M.RootID).empty();
@@ -4902,7 +4908,7 @@ function reCalcMenuPosition(m, x, y, ico) {
         var mP = m.closest('.dropdown.body.submenu');
         var pT = 0;
         var bT = 0;
-        var pE = 0;
+        var pE = { top: 0 };
 
         if (mP.length) {
             pE = mP.offset();
@@ -4993,25 +4999,27 @@ function reCalcMenuPosition(m, x, y, ico) {
         cor = 0;
         dPos = { 'x': x, 'y': y };
 
-        // if ((cmH + 24) > wH) {// Handle small windows height
-            m.find('> .dropdown-section').wrapAll('<div id="cm_scroll" class="context-scrolling-block sub-menu" />');
+        if ((cmH + 24) >= wH) {// Handle small windows height
+            m.find('> .dropdown-section').wrapAll('<div id="cm_scroll" class="context-scrolling-block" />');
+            m.append('<span class="context-top-arrow"></span><span class="context-bottom-arrow"></span>');
             m.addClass('mega-height');
-            m.css({ 'height': wH - 24 + 'px' });
+            cmH = wH - TOP_MARGIN*2;
+            m.css({ 'height': wH - TOP_MARGIN*2 + 'px' });
             m.on('mousemove', scrollMegaSubMenu);
-            dPos.y = 24;// align with bottom
-        // }
-        // else {
-            if (x < minX) {
-                dPos.x = minX;// left side alignment
-            }
-            if (wMax > maxX) {
-                dPos.x = maxX - cmW;// align with right side
-            }
-
+            dPos.y = wH - cmH;
+        }
+        else {
             if (hMax > maxY) {
-                dPos.y = maxY - cmH;// align with bottom
+                dPos.y = wH - cmH - TOP_MARGIN;// align with bottom
             }
-        // }
+        }
+
+        if (x < minX) {
+            dPos.x = minX;// left side alignment
+        }
+        if (wMax > maxX) {
+            dPos.x = maxX - cmW;// align with right side
+        }
     }
 
     setBordersRadius(m, cor);
@@ -5062,15 +5070,20 @@ function setBordersRadius(m, c)
 
 // Scroll menus which height is bigger then window.height
 function scrollMegaSubMenu(e) {
-    var ey = e.pageY;
-    var c = $(e.target).closest('.dropdown.body.submenu');
+    var c = $(e.target).closest('.dropdown.body.mega-height');
     var pNode = c.children(':first')[0];
 
+    if (typeof pNode === 'undefined') {
+        pNode = c[0];
+    }
+
     if (typeof pNode !== 'undefined') {
+        var ey = e.pageY;
         var h = pNode.offsetHeight;
         var dy = h * 0.1;// 10% dead zone at the begining and at the bottom
         var pos = getHtmlElemPos(pNode, true);
         var py = (ey - pos.y - dy) / (h - dy * 2);
+
         if (py > 1) {
             py = 1;
             c.children('.context-bottom-arrow').addClass('disabled');
@@ -5082,6 +5095,7 @@ function scrollMegaSubMenu(e) {
         else {
             c.children('.context-bottom-arrow,.context-top-arrow').removeClass('disabled');
         }
+
         pNode.scrollTop = py * (pNode.scrollHeight - h);
     }
 }

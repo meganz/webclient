@@ -1243,7 +1243,7 @@ if (is_ios) {
  * because the new mobile site is not designed for those yet. Confirm links initiated from the mobile web will continue
  * to be processed by the mobile web.
  */
-if (m && (!localStorage.signUpStartedInMobileWeb) && (page.substr(0, 7) === 'confirm' ||
+if (m && ((!localStorage.signUpStartedInMobileWeb && page.substr(0, 7) === 'confirm') ||
     page.substr(0, 6) === 'cancel' || page.substr(0, 6) === 'verify' || page.substr(0, 6) === 'fm/ipc' ||
     page.substr(0, 9) === 'newsignup' || page.substr(0, 7) === 'recover' || page.substr(0, 7) === 'account' ||
     page.substr(0, 4) === 'blog' || page.substr(0, 6) === 'backup')) {
@@ -1350,7 +1350,7 @@ if (m && (!localStorage.signUpStartedInMobileWeb) && (page.substr(0, 7) === 'con
         }
         else if (is_ios > 8) {
             setTimeout(function() {
-                var text = 'This link should be opened in the MEGA app.'
+                var text = 'This link should be opened in the MEGA app. '
                          + 'Click OK if you already have the MEGA app installed';
                 if (confirm(text)) {
                     document.location = 'mega://#' + page;
@@ -1859,6 +1859,7 @@ else if (!b_u) {
             jsl.push({f:'js/fm-dashboard.js', n: 'fmdashboard_js', j:1,w:5});
             jsl.push({f:'js/fm-account.js', n: 'fmaccount_js', j:1,w:5});
             jsl.push({f:'js/fm/account.js', n: 'fm_account_js', j:1});
+            jsl.push({f:'js/fm/fileconflict.js', n: 'fm_fileconflict_js', j:1});
             jsl.push({f:'js/ui/miniui.js', n: 'miniui_js', j:1});
         }
 

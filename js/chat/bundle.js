@@ -1637,7 +1637,11 @@ React.makeElement = React['createElement'];
 	            React.makeElement(
 	                "div",
 	                { className: "user-card-name conversation-name" },
-	                chatRoom.getRoomTitle(),
+	                React.makeElement(
+	                    utils.EmojiFormattedContent,
+	                    null,
+	                    chatRoom.getRoomTitle()
+	                ),
 	                chatRoom.type === "private" ? React.makeElement("span", { className: "user-card-presence " + presenceClass }) : undefined
 	            ),
 	            unreadDiv,
@@ -2010,6 +2014,8 @@ React.makeElement = React['createElement'];
 
 	"use strict";
 
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 	var React = __webpack_require__(2);
@@ -2203,9 +2209,46 @@ React.makeElement = React['createElement'];
 
 	});
 
+	var EmojiFormattedContent = React.createClass({
+	    displayName: "EmojiFormattedContent",
+
+	    _eventuallyUpdateInternalState: function _eventuallyUpdateInternalState(props) {
+	        if (!props) {
+	            props = this.props;
+	        }
+
+	        assert(typeof props.children === "string", "EmojiFormattedContent received a non-string (got: " + _typeof(props.children) + ") as props.children");
+
+	        var str = props.children;
+	        if (this._content !== str) {
+	            this._content = str;
+	            this._formattedContent = megaChat.plugins.emoticonsFilter.processHtmlMessage(htmlentities(str));
+	        }
+	    },
+	    shouldComponentUpdate: function shouldComponentUpdate(nextProps, nextState) {
+	        if (!this._isMounted) {
+	            this._eventuallyUpdateInternalState();
+	            return true;
+	        }
+
+	        if (nextProps && nextProps.children !== this.props.children) {
+	            this._eventuallyUpdateInternalState(nextProps);
+	            return true;
+	        } else {
+	            return false;
+	        }
+	    },
+	    render: function render() {
+	        this._eventuallyUpdateInternalState();
+
+	        return React.makeElement("span", { dangerouslySetInnerHTML: { __html: this._formattedContent } });
+	    }
+	});
+
 	module.exports = {
 	    JScrollPane: JScrollPane,
-	    RenderTo: RenderTo
+	    RenderTo: RenderTo,
+	    EmojiFormattedContent: EmojiFormattedContent
 	};
 
 /***/ },
@@ -5599,7 +5642,11 @@ React.makeElement = React['createElement'];
 	                self.props.chatRoom.type === "group" ? React.makeElement(
 	                    "div",
 	                    { className: "chat-topic-block" },
-	                    self.props.chatRoom.getRoomTitle()
+	                    React.makeElement(
+	                        utils.EmojiFormattedContent,
+	                        null,
+	                        self.props.chatRoom.getRoomTitle()
+	                    )
 	                ) : undefined,
 	                React.makeElement(
 	                    "div",
@@ -9926,7 +9973,7 @@ React.makeElement = React['createElement'];
 
 	        var topic = message.meta.topic;
 
-	        var text = __(l[9081]).replace("%s", '<strong className="dark-grey-txt">"' + htmlentities(topic) + '"</strong>');
+	        var text = __(l[9081]).replace("%s", '<strong className="dark-grey-txt">"' + megaChat.plugins.emoticonsFilter.processHtmlMessage(htmlentities(topic)) + '"</strong>');
 
 	        messages.push(React.makeElement(
 	            "div",

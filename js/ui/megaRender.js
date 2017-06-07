@@ -391,6 +391,10 @@
                 else if (String(M.currentdirid).substr(0, 7) === 'search/') {
                     $('.fm-empty-search').removeClass('hidden');
                 }
+                else if (M.currentdirid === 'links') {
+                    // TODO: a dedicated splash
+                    $('.fm-empty-folder').removeClass('hidden');
+                }
                 else if (M.currentdirid === M.RootID && folderlink) {
                     // FIXME: implement
                     /*if (!isValidShareLink()) {

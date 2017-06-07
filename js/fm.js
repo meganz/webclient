@@ -1251,6 +1251,119 @@ function hideTransferToast ($toast) {
     $('.toast-notification').removeClass('second');
 }
 
+// jscs:disable
+// jshint ignore:start
+function removeUInode(h, parent) {
+
+    var n = M.d[h],
+        i = 0;
+
+    // check subfolders
+    if (n && n.t) {
+        var cns = M.c[n.p];
+        if (cns) {
+            for (var cn in cns) {
+                if (M.d[cn] && M.d[cn].t && cn !== h) {
+                    i++;
+                    break;
+                }
+            }
+        }
+    }
+
+    var hasItems = !!M.v.length;
+    switch (M.currentdirid) {
+        case "shares":
+            $('#treeli_' + h).remove();// remove folder and subfolders
+            if (!hasItems) {
+                $('.files-grid-view .grid-table-header tr').remove();
+                $('.fm-empty-cloud').removeClass('hidden');
+            }
+            break;
+        case "contacts":
+
+            //Clear left panel:
+            $('#contact_' + h).fadeOut('slow', function() {
+                $(this).remove();
+            });
+
+            //Clear right panel:
+            $('.grid-table.contacts tr#' + h + ', .contacts-blocks-scrolling a#' + h)
+                .fadeOut('slow', function() {
+                    $(this).remove();
+                });
+
+            // clear the contacts grid:
+            $('.contacts-grid-view #' + h).remove();
+            if (!hasItems) {
+                $('.contacts-grid-view .contacts-grid-header tr').remove();
+                $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[784]);
+                $('.fm-empty-contacts').removeClass('hidden');
+            }
+            break;
+        case "chat":
+            if (!hasItems) {
+                $('.contacts-grid-view .contacts-grid-header tr').remove();
+                $('.fm-empty-chat').removeClass('hidden');
+            }
+            break;
+        case M.RubbishID:
+            if (i == 0 && n) {
+                $('#treea_' + n.p).removeClass('contains-folders expanded');
+            }
+
+            // Remove item
+            $('#' + h).remove();
+
+            // Remove folder and subfolders
+            $('#treeli_' + h).remove();
+            if (!hasItems) {
+                $('.contacts-grid-view .contacts-grid-header tr').remove();
+                $('.fm-empty-trashbin').removeClass('hidden');
+            }
+            break;
+        case M.RootID:
+            if (i == 0 && n) {
+                $('#treea_' + n.p).removeClass('contains-folders expanded');
+            }
+
+            // Remove item
+            $('#' + h).remove();
+
+            // Remove folder and subfolders
+            $('#treeli_' + h).remove();
+            if (!hasItems) {
+                $('.files-grid-view').addClass('hidden');
+                $('.grid-table.fm tr').remove();
+                $('.fm-empty-cloud').removeClass('hidden');
+            }
+            break;
+        default:
+            if (i == 0 && n) {
+                $('#treea_' + n.p).removeClass('contains-folders expanded');
+            }
+            $('#' + h).remove();// remove item
+            $('#treeli_' + h).remove();// remove folder and subfolders
+            if (!hasItems) {
+                if (sharedFolderUI()) {
+                    M.emptySharefolderUI();
+                }
+                else {
+                    $('.files-grid-view').addClass('hidden');
+                    $('.fm-empty-folder').removeClass('hidden');
+                }
+                $('.grid-table.fm tr').remove();
+            }
+            break;
+    }
+
+    if (M.currentdirid === h || isCircular(h, M.currentdirid) === true) {
+        parent = parent || Object(M.getNodeByHandle(h)).p || RootbyId(h);
+        M.openFolder(parent);
+    }
+}
+// jscs:enable
+// jshint ignore:end
 
 /**
  * addContactToFolderShare
@@ -8758,27 +8871,38 @@ function previewimg(id, uint8arr)
 
 function fm_importflnodes(nodes)
 {
+    var _import = function(data) {
+        $.mcImport = true;
+        $.selected = data[0];
+        $.onImportCopyNodes = data[1];
+
+        if (d) {
+            console.log('Importing Nodes...', $.selected, $.onImportCopyNodes);
+        }
+        $('.dropdown-item.copy-item').click();
+    };
+
     if (localStorage.folderLinkImport && !folderlink) {
-        var kv = StorageDB(u_handle);
-        var key = 'import.' + localStorage.folderLinkImport;
 
-        kv.get(key)
-            .done(function(data) {
-                $.mcImport = true;
-                $.selected = data[0];
-                $.onImportCopyNodes = data[1];
+        if ($.onImportCopyNodes) {
+            _import($.onImportCopyNodes);
+        }
+        else {
+            var kv = StorageDB(u_handle);
+            var key = 'import.' + localStorage.folderLinkImport;
 
-                if (d) {
-                    console.log('Importing Nodes...', $.selected, $.onImportCopyNodes);
-                }
-                $('.dropdown-item.copy-item').click();
-
-                kv.rem(key);
-            })
-            .fail(function(e) {
-                console.error(e);
-            });
-
+            kv.get(key)
+                .done(function(data) {
+                    _import(data);
+                    kv.rem(key);
+                })
+                .fail(function(e) {
+                    if (d) {
+                        console.error(e);
+                    }
+                    msgDialog('warninga', l[135], l[47]);
+                });
+        }
         nodes = null;
         delete localStorage.folderLinkImport;
     }
@@ -8791,18 +8915,20 @@ function fm_importflnodes(nodes)
             loadingDialog.show();
             localStorage.folderLinkImport = FLRootID;
 
+            var data = [sel, fm_getcopynodes(sel)];
+
             StorageDB(u_handle)
-                .set('import.' + FLRootID, [sel, fm_getcopynodes(sel)])
+                .set('import.' + FLRootID, data)
                 .done(function() {
 
                     loadSubPage('fm');
                 })
                 .fail(function(e) {
                     if (d) {
-                        console.error('Unable to import...', e);
+                        console.warn('Cannot import using indexedDB...', e);
                     }
-                    loadingDialog.hide();
-                    msgDialog('warninga', l[135], l[47]);
+                    $.onImportCopyNodes = data;
+                    loadSubPage('fm');
                 });
         }).fail(function(aError) {
             // If no aError, it was canceled

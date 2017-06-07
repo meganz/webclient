@@ -186,7 +186,7 @@ var ConversationsListItem = React.createClass({
         return (
             <li className={classString} id={id} data-room-jid={roomShortJid} data-jid={contactJid} onClick={this.props.onConversationClicked}>
                 <div className="user-card-name conversation-name">
-                    {chatRoom.getRoomTitle()}
+                    <utils.EmojiFormattedContent>{chatRoom.getRoomTitle()}</utils.EmojiFormattedContent>
                     {
                         chatRoom.type === "private" ?
                             <span className={"user-card-presence " + presenceClass}></span>

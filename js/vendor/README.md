@@ -173,6 +173,14 @@ Unless otherwise noted, they were released under a [MIT License].
 
 
 ---
+[chat/base32.js]: A fork of agnoster/base32-js
+
+> NB: This is a fork of agnoster/base32-js, that supports custom alphabet
+> Forked location: https://github.com/lpetrov/base32-js
+
+
+
+---
 [twemoji.noutf.js]: Twitter Emoji
 
 > NB: We had to fork the project and remove the UTF characters from twemoji.js, so we are using the repo:
@@ -219,3 +227,4 @@ Unless otherwise noted, they were released under a [MIT License].
 [smartcrop.js]: <https://github.com/meganz/smartcrop.js>
 [zxcvbn.js]: <https://github.com/dropbox/zxcvbn/tree/1.0.1>
 [chat/strophe.light.js]: <https://github.com/strophe/strophejs>
+[chat/base32.js]: <https://github.com/lpetrov/base32-js>

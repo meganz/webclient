@@ -17,7 +17,8 @@ rm *.json
 rm lang.tar.gz
 
 # Fetch the latest translations from Babel
-wget 'https://babel.mega.co.nz/?u=Jq1EXnelOeQpj7UCaBa1&id=fetch&' -O lang.tar.gz
+data=$(php -f ./translation.php);
+wget --post-data='u=Jq1EXnelOeQpj7UCaBa1&id=fetch&s=6&ids='$data https://babel.mega.co.nz -O lang.tar.gz
 
 # Extract the tar.gz file
 tar xfvz lang.tar.gz

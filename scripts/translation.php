@@ -1,35 +1,52 @@
 <?php
 
-$eng = json_decode(file_get_contents(__DIR__ . "/../lang/en.json"), true);
-$leng = array_map('strtolower', $eng);
-$eng = array_merge(array_flip($eng), array_flip($leng));
-$html = array();
-$new = array();
+define('DIR', substr(__DIR__, 0, strlen(__DIR__) - strlen(basename(__DIR__))));
 
-foreach (glob(__DIR__ . "/../html/*.html") as $file) {
-    $html = file_get_contents($file);
-    $html = preg_replace_callback("/{{([^}]+)}}/smU", function($match) use ($eng, &$new, $file, &$html) {
-        $text = preg_replace("/[ \n\r\t]+/",  " ", $match[1]);
-        $text = trim($text);
-        $ltext = strtolower($text);
-        if ($text != strip_tags($text)) {
-            var_dump($text);exit;
-            return $match[0];
-        }
-        if (!empty($eng[$text])) {
-            return '[$' . $eng[$text]  . ']';
-        }
-        if (!empty($eng[$ltext])) {
-            return '[$' . $eng[$ltext]  . ']';
-        }
+function dirToArray($dir) {
+    $result = array();
 
-        $new[] = $text;
+    $cdir = scandir($dir);
+    foreach ($cdir as $key => $value) {
+        if (!in_array($value,array(".",".."))) {
+            if (is_dir($dir . DIRECTORY_SEPARATOR . $value)) {
+                $result = array_merge($result, dirToArray($dir . DIRECTORY_SEPARATOR . $value));
+            } else {
+                $result[] = $dir . '/' . $value;
+            }
+        }
+    }
 
-        return $match[0];
-    }, $html);
-    //file_put_contents(__DIR__  . '/' . basename($file), $html);
-    file_put_contents($file, $html);
+    return $result;
 }
 
-file_put_contents(__DIR__ . "/html.json", json_encode($html));
-file_put_contents(__DIR__ . '/new.json', json_encode(array_values(array_unique($new)), JSON_PRETTY_PRINT));
+function fetchFiles() {
+    $fileList = [];
+    foreach (func_get_args() as $file) {
+        $file = DIR . $file;
+
+        if (is_dir($file)) {
+            $fileList[] = dirToArray($file);
+        } else {
+            $fileList[] = glob($file);
+        }
+    }
+
+    return call_user_func_array('array_merge', $fileList);
+}
+
+$ids = array();
+$speical_ids = array('5875', '5876', '1626', '1086', '1088', '1929', '955', '1930');
+
+foreach (fetchFiles("js/", "*.js", "*.html", "html/") as $file) {
+    $content = file_get_contents($file);
+    preg_match_all("@\Wl\[(\d+)\]|\[\\$(\d+)\]@", $content, $numbers);
+
+    if (!empty($numbers[0])) {
+        $ids = array_merge($ids, array_filter(array_merge($numbers[1], $numbers[2])));
+    }
+}
+
+$ids = array_merge($ids, $speical_ids);
+$ids = array_unique($ids);
+asort($ids);
+echo base64_encode(implode(",", $ids));

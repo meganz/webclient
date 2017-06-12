@@ -1453,7 +1453,7 @@ base64, PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJod…hlaWdodD0iMTAxIiBmaW
     max-width: 124%;
     margin: 38px 0 0 -10.5%;
 }
-.android .bottom-page.top-bl, .ios .bottom-page.top-bl {
+.android .bottom-page.top-bl, .ios .bottom-page.top-bl, .wp .bottom-page.top-bl {
     overflow: hidden;
 }
 /* end of Android app */

@@ -54,8 +54,6 @@ function initMegacmd() {
     var pf = navigator.platform.toUpperCase();
 
     $('.download-megacmd').removeClass('disabled');
-    $('.pages-nav.nav-button').removeClass('active');
-    $('.pages-nav.nav-button.megacmd').addClass('active');
 
     if (pf.indexOf('MAC') >= 0) {
         cmd_switchOS('mac');

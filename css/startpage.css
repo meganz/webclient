@@ -14,8 +14,6 @@
 .new-startpage .top-head::after {
     display: none;
 }
-
-
 .startpage.mega-logo {
     width: 258px;
     height: 84px;
@@ -27,7 +25,7 @@
 .startpage .bottom-page.top-header {
     color: rgba(0,0,0,0.7);
     text-align: center;
-    padding: 47px 95px 0 95px;
+    padding: 47px 15px 0 15px;
 }
 .startpage.upload-cloud-icon {
     background-image: url(../images/mega/startpage-sprite.png);
@@ -112,34 +110,6 @@
     -khtml-opacity: 1;
     opacity: 1;
 }
-.startpage.plans-block {
-    padding: 10px 0 0 0;
-    overflow: hidden;
-    white-space: nowrap;
-    font-size: 0;
-}
-.startpage .reg-st3-membership-bl {
-    width: 230px;
-    margin: 0 0 0 12px;
-    float: none;
-    display: inline-block;
-}
-.startpage.plans-info {
-    font-size: 14px;
-    line-height: 32px;
-    height: 32px;
-    color: #777777;
-    display: inline-block;
-    background-color: white;
-    -moz-border-radius: 16px;
-    -webkit-border-radius: 16px;
-    border-radius: 16px;
-    -webkit-box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
-    -moz-box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
-    box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
-    padding: 0 12px;
-    margin: 24px 0 31px 0;
-}
 .startpage.medium-icon {
     width: 66px;
     height: 66px;
@@ -156,21 +126,21 @@
 }
 .startpage.medium-icon.declaration {
     background-position: -2px -1219px;
-    margin: 31px auto 22px auto;
+    margin: 27px auto 22px auto;
 }
 .bottom-page.grey-rocket {
     background-image: url(../images/mega/bottom-page/rocket-bg@2x.png);
     background-position: center bottom;
     background-repeat: no-repeat;
     background-size: 656px auto;
-    height: 397px;
+    height: 418px;
 }
 .bottom-page.grey-rocket span {
     display: block;
     font-size: 14px;
     color: #bcbbb8;
-    text-align:center;
-    padding: 360px 0 0 0;
+    text-align: center;
+    padding: 375px 0 0 0;
 }
 .bottom-page.img.mobile-app {
     max-width: 400px;
@@ -187,11 +157,13 @@
     margin-left: 37px;
 }
 .startpage.counters {
-    padding: 18px 0 22px 0;
+    padding: 18px 0 12px 0;
 }
 .startpage.flip-wrapper {
-    padding: 12px 0 0;
+    padding: 12px 0 0 0;
     font-size: 0;
+    margin: 0 -15px;
+    display: inline-block;
 }
 .flip-block {
     margin: 2px;
@@ -240,15 +212,19 @@
     font-size: 18px;
     line-height: 36px;
     color: rgba(0,0,0,0.7);
-    max-width: 780px;
+    max-width: 810px;
+    padding: 0 15px;
     margin: 0 auto;
     position: relative;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
 .startpage.quote-icon {
     position: absolute;
     width: 36px;
     height: 26px;
-    left: -1px;
+    left: 14px;
     top: -25px;
     background-image: url(../images/mega/startpage-sprite.png);
     background-position: -118px -1235px;
@@ -257,22 +233,23 @@
     left: auto;
     top: auto;
     bottom: -25px;
-    right: -1px;
+    right: 14px;
     background-position: -221px -1235px;
 }
 .startpage.declaration-lnk {
     text-align: center;
-    margin-bottom: -1px;
+    margin-bottom: -2px;
 }
 .startpage.declaration-lnk a {
-    font-size: 15px;
-    line-height: 21px;
-    display: inline-block;
+    font-size: 14px;
+    line-height: 20px;
+    display: inline;
     cursor: pointer;
     border-bottom: 2px solid #FF333A;
     padding: 0 10px;
     color: #FF333A;
     text-decoration: none;
+    font-family: 'montserrat', 'open_sans', sans-serif;
 }
 .bottom-page.asterisktext {
     font-size: 14px;
@@ -280,9 +257,124 @@
     left: 0;
     margin: -15px 0 0 0;
     padding: 0 15px;
-    visibility:visible;
+    visibility: visible;
 }
 .bottom-page.asterisktext.hidden {
     visibility: hidden;
     display: block;
+}
+
+@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
+.reg-st3-membership-icon, .membership-icon, .pro-icon, div.pro-feature-icon, .startpage.mega-logo, .startpage.upload-cloud-icon, .bottom-page.scroll-icon, .startpage.white-question, .pages-nav.nav-icon, .bottom-page.big-icon, .startpage.medium-icon, .small-red-link i, .flip-bg, .startpage.quote-icon, .bottom-menu.logo, .loginrequired-dialog .fm-notification-icon, .top-arrow-icon {
+    background-image: url(../images/mega/startpage-sprite@2x.png);
+    background-size: 267px auto;
+}
+}
+
+@media only screen and (max-width: 783px) {
+.startpage.italic-text {
+    max-width: 640px;
+}
+.startpage.counters {
+    padding: 18px 10px 12px 10px;
+}
+.bottom-page.img.mobile-app {
+    max-width: 400px;
+    padding: 46px 2.5% 39px 5%;
+}
+.bottom-page.img.megasync {
+    max-width: 350px;
+    width: 86.1%;
+    padding: 32px 0 34px 8.3%;
+}
+.bottom-page.img.browser {
+    max-width: 163%;
+    width: 853px;
+    padding: 76px 0 94px 0;
+    margin-left: 24px;
+}
+}
+
+/* Mobile size */
+@media only screen and (max-width: 565px) {
+.startpage .bottom-page.top-header {
+    padding: 44px 0 0 0;
+}
+.startpage.medium-icon {
+    margin: 11px auto 12px auto;
+}
+.bottom-page.grey-rocket {
+    height: 406px;
+}
+.bottom-page.grey-rocket span {
+    padding: 363px 0 0 0;
+}
+.bottom-page.img.mobile-app {
+    padding: 46px 0 39px 6px;
+    width: 95%;
+}
+.bottom-page.img.megasync {
+    width: 81%;
+    padding: 52px 0 30px 6px;
+}
+.bottom-page.img.browser {
+    width: 100%;
+    padding: 85px 10px 55px 10px;
+    margin-left: 0;
+}
+.startpage.flip-wrapper {
+    padding: 12px 0 32px 0;
+    margin: 0 -43px;
+}
+.startpage.italic-text {
+    padding: 0;
+    margin: -14px 0 0 0;
+}
+.startpage.medium-icon.declaration {
+    margin: 23px auto 23px auto;
+}
+.startpage.declaration-lnk {
+    margin: 0 -43px -1px -43px;
+}
+.startpage.declaration-lnk a {
+    padding: 0;
+}
+.startpage.button-48-height.try-mega {
+    display: none;
+}
+.startpage.mega-logo {
+    background-size: 216px auto;
+    background-position: -1px -211px;
+    width: 210px;
+    height: 70px
+}
+.bottom-page.asterisktext {
+    padding: 0;
+    margin: 0 -43px;
+}
+}
+
+@media only screen and (max-height: 758px) {
+.startpage.upload-cloud-icon {
+    margin: 12px auto -20px auto;
+}
+}
+
+@media only screen and (max-height: 695px) {
+.startpage.upload-cloud-icon {
+    display: none;
+}
+}
+
+@media only screen and (max-height: 640px) {
+.bottom-page.asterisktext {
+    margin-top: -35px;
+}
+}
+
+@media only screen and (max-height: 555px) {
+.bottom-page.asterisktext {
+    margin-top: -35px;
+    margin-bottom: 40px;
+}
 }

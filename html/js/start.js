@@ -2,9 +2,6 @@
 var achieve_data = false;
 
 function init_start() {
-        
-    $('.pages-nav.nav-button').removeClass('active');
-    $('.pages-nav.nav-button.overview').addClass('active');
 
     $('.button-48-height.register').rebind('click', function () {
         loadSubPage('register');

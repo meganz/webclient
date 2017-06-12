@@ -93,21 +93,6 @@ function startMega() {
     $('#pwdmanhelper input').val('');
 }
 
-function mainScroll() {
-    $('.main-scroll-block').jScrollPane({
-        showArrows: true,
-        arrowSize: 5,
-        animateScroll: true,
-        verticalDragMinHeight: 150,
-        enableKeyboardNavigation: true
-    });
-    $('.main-scroll-block').unbind('jsp-scroll-y.menu');
-    jScrollFade('.main-scroll-block');
-    if (page === 'doc' || page.substr(0, 4) === 'help' || page === 'cpage' || page === 'sdk' || page === 'dev') {
-        scrollMenu();
-    }
-}
-
 function topMenu(close) {
     if (close) {
         $.topMenu = '';
@@ -486,7 +471,6 @@ function init_page() {
                 topmenuUI();
                 loadingDialog.hide();
                 CMS.loaded('corporate');
-                mainScroll();
                 return;
             }
 
@@ -499,7 +483,6 @@ function init_page() {
                 parsepage(window.corpTemplate = content.html);
                 topmenuUI();
                 loadingDialog.hide();
-                mainScroll();
             });
         }
 
@@ -519,7 +502,6 @@ function init_page() {
                 parsepage(content.html);
                 topmenuUI();
                 loadingDialog.hide();
-                mainScroll();
             });
         }
 
@@ -902,7 +884,6 @@ function init_page() {
             $('.new-bottom-pages.about').safeHTML(html + '<div class="clear"></div>');
             topmenuUI();
             loadingDialog.hide();
-            mainScroll();
 
         });
         return;
@@ -937,7 +918,6 @@ function init_page() {
         if (lang == 'en') {
             $('#copyright_txt').text($('#copyright_txt').text().split('(i)')[0]);
             $('#copyright_en').removeClass('hidden');
-            mainScroll();
         }
     }
     else if (page === 'disputenotice') {
@@ -949,7 +929,6 @@ function init_page() {
         $('.reg-st5-complete-button').rebind('click', function (e) {
             loadSubPage('disputenotice');
         });
-        mainScroll();
     }
     else if (page.substr(0, 3) === 'pro') {
         var tmp = page.split('/uao=');
@@ -979,7 +958,6 @@ function init_page() {
             html += e.outerHTML;
         });
         $('.credits-main-pad').html(html + '<div class="clear"></div>');
-        mainScroll();
     }
     else if (page === 'extensions') {
         parsepage(pages['browsers']);
@@ -987,26 +965,21 @@ function init_page() {
     }
     else if (page === 'ios') {
         parsepage(pages['ios']);
-        mobileappspage.init();
     }
     else if (page === 'android') {
         parsepage(pages['android']);
-        mobileappspage.init();
     }
     else if (page === 'wp') {
         parsepage(pages['wp']);
-        mobileappspage.init();
-        mobileappspage.initTabs();
+        bottompage.initTabs();
     }
     else if (page === 'bird') {
         parsepage(pages['megabird']);
-        megabirdpage.init();
     }
     else if (page.substr(0, 4) == 'sync') {
         parsepage(pages['sync']);
         init_sync();
         topmenuUI();
-        mainScroll();
     }
     else if (page == 'cmd') {
         parsepage(pages['cmd']);
@@ -1052,7 +1025,6 @@ function init_page() {
         }
         dlinfo(dlid, dlkey, false);
         topmenuUI();
-        mainScroll();
     }
 
     /**
@@ -2171,13 +2143,7 @@ function parsepage(pagehtml, pp) {
 
     clickURLs();
 
-    Soon(mainScroll);
-    $(window).rebind('resize.subpage', function (e) {
-        if (page !== 'start' && page !== 'download') {
-            mainScroll();
-        }
-        mega.utils.chrome110ZoomLevelNotification();
-    });
+    bottompage.init();
 
     if (typeof UIkeyevents === 'function') {
         UIkeyevents();
@@ -2186,11 +2152,18 @@ function parsepage(pagehtml, pp) {
 }
 
 function parsetopmenu() {
-    var top = pages['top'].replace(/{staticpath}/g, staticpath);
-    if (document.location.href.substr(0, 19) == 'chrome-extension://') {
-        top = top.replace(/\/#/g, '/' + urlrootfile + '#');
+    var top;
+    if (!is_mobile) {
+        top = pages['top'].replace(/{staticpath}/g, staticpath);
+        if (document.location.href.substr(0, 19) == 'chrome-extension://') {
+            top = top.replace(/\/#/g, '/' + urlrootfile + '#');
+        }
+        top = top.replace("{avatar-top}", window.useravatar && useravatar.mine() || '');
     }
-    top = top.replace("{avatar-top}", window.useravatar && useravatar.mine() || '');
+    /* TODO: import mobile top menu */
+    else {
+        top = pages['top-mobile'];
+    }
     top = translate(top);
     return top;
 }

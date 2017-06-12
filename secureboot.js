@@ -1786,6 +1786,7 @@ else if (!b_u) {
     jsl.push({f:'css/bottom-menu.css', n: 'bottom-menu_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'html/start.html', n: 'start', j:0});
     jsl.push({f:'html/js/start.js', n: 'start_js', j:1});
+    jsl.push({f:'html/js/bottompage.js', n: 'bottompage_js', j:1});
     jsl.push({f:'html/pagesmenu.html', n: 'pagesmenu', j:0});
     jsl.push({f:'html/bottom2.html', n: 'bottom2',j:0});
     jsl.push({f:'html/megainfo.html', n: 'megainfo', j:0});
@@ -1858,6 +1859,8 @@ else if (!b_u) {
     // Everything else...
     jsl.push({f:'index.js', n: 'index', j:1,w:4});
     jsl.push({f:'html/top.html', n: 'top', j:0});
+    // TODO: include mobile top menu js stuff
+    jsl.push({f:'html/top-mobile.html', n: 'top-mobile', j:0});
     jsl.push({f:'html/transferwidget.html', n: 'transferwidget', j:0});
     jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});
 
@@ -2018,11 +2021,9 @@ else if (!b_u) {
         'browsers': {f:'html/browsers.html', n: 'browsers', j:0},
         'browsers_js': {f:'html/js/browsers.js', n: 'browsers_js', j:1},
         'megabird': {f:'html/megabird.html', n: 'megabird', j:0},
-        'megabird_js': {f:'html/js/megabird.js', n: 'megabird_js', j:1},
         'ios': {f:'html/ios.html', n: 'ios', j:0},
         'android': {f:'html/android.html', n: 'android', j:0},
-        'wp': {f:'html/wp.html', n: 'wp', j:0},
-        'apps_js': {f:'html/js/apps.js', n: 'apps_js', j:1}
+        'wp': {f:'html/wp.html', n: 'wp', j:0}
     };
 
     var jsl3 = {
@@ -2096,7 +2097,6 @@ else if (!b_u) {
         'blog': ['blog','blog_js','blogarticle','blogarticle_js'],
         'register': ['register','register_js', 'zxcvbn_js'],
         'newsignup': ['register','register_js', 'zxcvbn_js'],
-        'android': ['android'],
         'resellers': ['resellers'],
         '!': ['download','download_js', 'megasync_js'],
         'dispute': ['dispute'],
@@ -2107,8 +2107,8 @@ else if (!b_u) {
         'mega': ['mega'],
         'takedown': ['takedown'],
         'mobile': ['mobile'],
-        'sync': ['sync','sync_js', 'megasync_js'],
-        'cmd': ['cmd','megacmd_js'],
+        'sync': ['sync', 'sync_js', 'megasync_js'],
+        'cmd': ['cmd', 'megacmd_js'],
         'support': ['support_js', 'support'],
         'contact': ['contact'],
         'dev': ['dev','dev_js','sdkterms'],
@@ -2121,10 +2121,11 @@ else if (!b_u) {
         'redeem': ['redeem', 'redeem_js'],
         'plugin': ['browsers', 'browsers_js'],
         'extensions': ['browsers', 'browsers_js'],
-        'bird': ['megabird', 'megabird_js'],
-        'ios': ['ios', 'apps_js'],
-        'android': ['android', 'apps_js'],
-        'wp': ['wp', 'apps_js'],
+        'bird': ['megabird'],
+        'ios': ['ios'],
+        'android': ['android'],
+        'wp': ['wp'],
+        'android': ['android']
     };
 
     if (is_mobile) {

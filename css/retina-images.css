@@ -456,16 +456,4 @@ body.pro:after {
     background-image: url(../images/mega/top-sprite_v2@2x.png);
     background-size: 38px auto;
 }
-.medium-icon.down-arrow, .bottom-page.big-icon.interactive, .bottom-page.big-icon.scriptable, .bottom-page.big-icon.target, .bottom-page.big-icon.charts, .small-megasync-logo, .download-megasync-dialog .icon, .mobile-apps-button, .bottom-page.big-icon.mobile-cloud, .bottom-page.big-icon.chat, .bottom-page.big-icon.photos, .bottom-page.big-icon.cloud, .bottom-page.big-icon.wp, .bottom-page.tab-icon, .bottom-page.big-icon.folders, .bottom-page.big-icon.arrows, .bottom-page.big-icon.up-down, .bottom-page.big-icon.camera, .bottom-page.big-icon.player, .bottom-page.big-icon.mobile-arrow {
-    background-image: url(../images/mega/pages-sprite@2x.png);
-    background-size: 300px auto;
-}
-.reg-st3-membership-icon, .membership-icon, .pro-icon, div.pro-feature-icon, .startpage.mega-logo, .startpage.upload-cloud-icon, .bottom-page.scroll-icon, .startpage.white-question, .pages-nav.nav-icon, .bottom-page.big-icon, .startpage.medium-icon, .small-red-link i, .flip-bg, .startpage.quote-icon, .bottom-menu.logo, .loginrequired-dialog .fm-notification-icon {
-    background-image: url(../images/mega/startpage-sprite@2x.png);
-    background-size: 267px auto;
-}
-.browsers.icon {
-    background-image: url(../images/mega/extensions-sprite@2x.png);
-    background-size: 308px auto;
-}
 }

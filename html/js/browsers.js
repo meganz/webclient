@@ -7,8 +7,6 @@ var browserspage = {
      * Initialise the Chrome extension page
      */
     init: function() {
-        $('.pages-nav.nav-button').removeClass('active');
-        $('.pages-nav.nav-button.browsers').addClass('active');
         browserspage.getServerBuildVersion();
         browserspage.initChromeManualDownloadButton();
         browserspage.initChromeWebstoreDownloadButton();

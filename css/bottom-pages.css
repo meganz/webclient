@@ -89,6 +89,10 @@
     overflow-y: auto;
     position: relative;
 }
+.mobile .bottom-page.scroll-block {
+    overflow: scroll;
+    -webkit-overflow-scrolling: touch;
+}
 .bottom-page.vertical-centered-bl {
     display: table;
     width: 100%;

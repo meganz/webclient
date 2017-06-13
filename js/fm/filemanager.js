@@ -2098,22 +2098,21 @@ FileManager.prototype.addGridUI = function() {
     });
 
     $('.grid-table-header .arrow').rebind('click', function() {
-        var c = $(this).attr('class');
-        var d = 1;
+        var cls = $(this).attr('class');
+        var dir = 1;
 
-        if (c && (c.indexOf('desc') > -1)) {
-            d = -1;
+        if (cls && cls.indexOf('desc') > -1) {
+            dir = -1;
         }
 
-        for (var e in M.sortRules) {
-            if (c.indexOf(e) !== -1) {
-                M.doSort(e, d);
+        for (var sortBy in M.sortRules) {
+            if (cls.indexOf(sortBy) !== -1) {
+                M.doSort(sortBy, dir);
                 M.renderMain();
                 break;
             }
         }
 
-        // Stop bubbling
         return false;
     });
 

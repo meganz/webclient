@@ -1250,6 +1250,10 @@ function init_page() {
     if (!is_mobile) {
         topmenuUI();
     }
+    else {
+        // Initialise the mobile menu (ToDo: in future use desktop responsive main menu)
+        mobile.menu.showAndInit(page);
+    }
     loggedout = false;
     flhashchange = false;
 }

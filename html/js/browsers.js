@@ -16,7 +16,7 @@ var browserspage = {
      * Get what firefox build version is currently available from the live site
      */
     getServerBuildVersion: function() {
-        
+
         // Use update.rdf URL if in Firefox, or use the static path. Also use a timestamp query param
         // to break browser cache. Otherwise subsequent visits to the page don't show a new update.
         var updateURL = (is_chrome_firefox) ?
@@ -27,17 +27,28 @@ var browserspage = {
         mega.utils.xhr(updateURL)
             .done(function(ev, data) {
                 var serverBuildVersion = null;
+                var chromeFileSize = null;
+                var firefoxFileSize = null;
 
-                // Parse version info
+                // Try parsing version info
                 try {
+                    // Convert from JSON then get the size of the Chrome and Firefox extensions
                     serverBuildVersion = JSON.parse(data);
+                    chromeFileSize = numOfBytes(serverBuildVersion.chromeSize, 1);
+                    firefoxFileSize = numOfBytes(serverBuildVersion.firefoxSize, 1);
                 }
                 catch (ex) {}
 
                 // Display information if data was returned
                 if (serverBuildVersion) {
-                    $('.browsers.firefox .version').text(serverBuildVersion.firefox);
+
+                    // Update the Chrome version and file size information
                     $('.browsers.chrome .version').text(serverBuildVersion.chrome);
+                    $('.browsers.chrome .size').text(chromeFileSize.size + ' ' + chromeFileSize.unit);
+
+                    // Update the Firefox version and file size information
+                    $('.browsers.firefox .version').text(serverBuildVersion.firefox);
+                    $('.browsers.firefox .size').text(firefoxFileSize.size + ' ' + firefoxFileSize.unit);
                 }
             });
     },

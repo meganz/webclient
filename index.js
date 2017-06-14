@@ -1230,20 +1230,9 @@ function init_page() {
     else if (typeof init_start === 'function') {
         page = 'start';
 
-        // If mobile, show the mobile homepage
-        if (is_mobile) {
-            parsepage(pages['fm_mobile']);
-            mobile.home.show();
-        }
-        else {
-            parsepage(pages['start'], 'start');
-            init_start();
-        }
-    }
-    else if (is_mobile) {
-        // Show the mobile homepage
-        parsepage(pages['fm_mobile']);
-        mobile.home.show();
+        // Show the start/homepage
+        parsepage(pages['start'], 'start');
+        init_start();
     }
     else {
         location.assign('/');

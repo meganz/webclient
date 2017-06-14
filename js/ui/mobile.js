@@ -2904,6 +2904,10 @@ mobile.menu = {
         // On the menu's Logout button
         $logoutMenuItem.off('tap').on('tap', function() {
 
+            // Close the menu
+            $mainMenu.removeClass('active');
+            $darkOverlay.addClass('hidden').removeClass('active');
+
             // Log the user out and go back to the login page
             mega.utils.logout();
             loadSubPage('login');

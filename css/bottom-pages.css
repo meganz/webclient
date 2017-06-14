@@ -13,12 +13,16 @@
     font-style: normal;
 }
 /* Bottom pages common styles*/
+.red {
+    color: #FF4D4A;
+}
 .bottom-page .mobile.fm-header {
     display: block;
     position: absolute;
     width: 100%;
     top: 0;
     z-index: 10;
+    border: 0;
 }
 .absolute-pos {
     position: absolute;
@@ -61,6 +65,9 @@
 .bottom-page.top-bl {
     max-height: 900px;
     min-height: 555px;
+}
+.mobile .bottom-page.top-bl {
+    max-height: 1024px;
 }
 .transition {
     -webkit-transition: all 200ms ease-in-out;
@@ -304,6 +311,9 @@
 .bottom-page.top-pad {
     padding-top: 62px;
 }
+.bottom-page.small-top-pad {
+    padding-top: 11px;
+}
 .bottom-page.mid-top-pad {
     padding-top: 44px;
 }
@@ -321,6 +331,9 @@
 }
 .bottom-page.bott-pad {
     padding-bottom: 63px;
+}
+.bottom-page.small-bott-pad {
+    padding-bottom: 42px;
 }
 .bottom-page.big-bott-pad {
     padding-bottom: 88px;
@@ -477,6 +490,9 @@
 }
 .bottom-page.big-icon.transfer {
     background-position: 0 -813px;
+}
+.bottom-page.big-icon.tick {
+    background-position: -160px -953px;
 }
 .bottom-page.big-icon.folders {
     background-position: -119px -1270px;
@@ -818,11 +834,17 @@
     overflow: hidden;
     font-size: 0;
 }
+.bottom-page.plans-block.no-pad {
+    padding: 0;
+}
 .bottom-page .reg-st3-membership-bl {
     width: 230px;
     margin: 0 0 0 12px;
     float: none;
     display: inline-block;
+}
+.reg-st3-membership-bl.hidden {
+    display: none;
 }
 .bottom-page .reg-st3-membership-bl:first-child {
     margin: 0;
@@ -1487,7 +1509,7 @@ base64, PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJod…hlaWdodD0iMTAxIiBmaW
 @media only screen and (max-width: 970px) {
 .bottom-page .reg-st3-membership-bl {
     width: 252px;
-    margin: 0 0 0 -2px;
+    margin: -2px 0 0 -2px;
 }
 .bottom-page .reg-st3-membership-bl:first-child {
     margin: 0;

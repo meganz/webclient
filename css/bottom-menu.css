@@ -20,10 +20,6 @@
 .bottom-menu.column:first-child {
     padding: 0;
 }
-/* Remove rule when most pages are mobile optimised */
-.mobile .bottom-menu.col1-of-6 {
-    display: none;
-}
 .bottom-menu.col1-of-6 {
     width: 16.666666%
 }
@@ -137,3 +133,39 @@
     margin: 27px 0 0 0;
 }
 }
+/* Remove rule when most pages are mobile optimised */
+.mobile .bottom-menu.col1-of-6 {
+    display: none;
+}
+.mobile .bottom-menu.pad {
+    min-height: 10px;
+    padding: 10px 15px 23px 15px;
+    text-align: center;
+}
+.mobile .bottom-menu.col2-of-6, .mobile .bottom-menu.copyrights {
+    width: 100%;
+    left: 0;
+}
+.mobile .bottom-menu.company-info strong {
+    display: inline-block;
+}
+
+@media only screen and (max-width: 565px) {
+.mobile .bottom-menu.pad {
+    min-height: 10px;
+    padding: 10px 43px 23px 43px;
+    text-align: center;
+}
+.mobile .bottom-menu.column:first-child, .mobile .bottom-menu.copyrights {
+    padding-bottom: 0;
+    padding-left: 0;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
+    text-align: center;
+}
+.mobile .bottom-menu.company-info strong {
+    display: block;
+}
+}
+/* end */

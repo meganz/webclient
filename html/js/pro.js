@@ -324,7 +324,7 @@ function init_pro()
             $('.membership-step2 .pro span').html(proPlanName);
 
             // Update header text with plan
-            var $selectedPlanHeader = $('.membership-step2 .main-italic-header.pro');
+            var $selectedPlanHeader = $('.membership-step2 .bottom-page.semibig-header');
             var selectedPlanText = $selectedPlanHeader.html().replace('%1', proPlanName);
             $selectedPlanHeader.html(selectedPlanText);
 

@@ -156,7 +156,6 @@ function dev_init(pp, appkey) {
             }
         }
     });
-    Soon(mainScroll);
     scrollMenu();
 }
 

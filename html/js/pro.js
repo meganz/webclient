@@ -464,7 +464,6 @@ function pro_next_step(proPlanName) {
 
     $('.membership-step1').addClass('hidden');
     $('.membership-step2').removeClass('hidden');
-    mainScroll();
 
     $('.membership-date .month').text(mon);
     $('.membership-date .day').text(day);
@@ -1293,9 +1292,6 @@ var proPage = {
         $paymentAddressDialog.find('.payment-buy-now').text(subscribeOrPurchase);
         $paymentAddressDialog.find('.payment-note-first.recurring .duration').text(recurringMonthlyOrAnnuallyMessage);
         $paymentAddressDialog.find('.payment-plan-txt .recurring').text(recurringOrNonRecurring);
-
-        // Re-initialise the main page scrolling as extra content could have changed the height
-        mainScroll();
     },
 
     /**

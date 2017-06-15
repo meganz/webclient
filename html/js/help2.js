@@ -826,7 +826,6 @@ var Help = (function() {
         doRouting();
         topmenuUI();
         sidebars();
-        mainScroll();
         userfeedback();
         homepageinteraction();
         searchBarInteraction();

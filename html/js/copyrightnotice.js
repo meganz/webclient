@@ -157,7 +157,6 @@ copyright.init_cn = function() {
             '<div class="affiliate-input-block">' +
                 '<input type="text" class="copyrightwork" value="">' +
             '</div>', l[641], l[648]);
-        mainScroll();
         copyright.updateUI();
     });
     copyright.updateUI();

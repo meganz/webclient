@@ -242,7 +242,6 @@ function verify_key(key) {
 
 
 function reset_pwcheck() {
-    Soon(mainScroll);
     $('.login-register-input.password').removeClass('weak-password strong-password');
     $('.new-registration').removeClass('good1 good2 good3 good4 good5');
 

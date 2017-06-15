@@ -17,7 +17,6 @@ var support = (function() {
 
         var height = Math.max(150, $window.height() - bottomHeight - headerHeight - 200);
         $textarea.css('height', height);
-        mainScroll();
     }
 
     function submit() {

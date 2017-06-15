@@ -107,7 +107,7 @@ var support = (function() {
         }
 
         $subject.find('.default-select-scroll').safeHTML(html);
-        bindDropdownEvents($subject, 0, '.main-scroll-block');
+        bindDropdownEvents($subject, 0, '.bottom-page.scroll-block');
         $window.rebind('resize.support-textarea', resizeHandler);
         $button = $('.support a').rebind('click', submit);
 

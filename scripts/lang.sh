@@ -22,9 +22,6 @@ wget 'https://babel.mega.co.nz/?u=Jq1EXnelOeQpj7UCaBa1&id=fetch&' -O lang.tar.gz
 # Extract the tar.gz file
 tar xfvz lang.tar.gz
 
-# Delete it
-rm lang.tar.gz
-
 # Add the .json files
 git add *.json
 
@@ -43,32 +40,27 @@ git merge translations -m "Merge branch 'translations' into $currentBranch"
 # Check result of merge to see if it merged cleanly without conflicts
 mergeResult=$(git ls-files -u)
 
-echo "Current directory:"
-pwd
-
 # If there was a merge conflict
 if [ -n "$mergeResult" ]; then
     echo "Problem merging, fetching strings from Babel again to resolve conflict..."
     git status
 
-    # Fetch the latest translations from Babel
-    wget 'https://babel.mega.co.nz/?u=Jq1EXnelOeQpj7UCaBa1&id=fetch&' -O lang.tar.gz
-
-    # Extract the tar.gz file
+    # Extract the tar.gz file again
     tar xfvz lang.tar.gz
-
-    # Delete it
-    rm lang.tar.gz
 
     # Mark conflict resolved and commit changes
     git add .
     git commit --no-edit
 
     echo
-    echo "Conflicts resolved, you can now push the changes to your branch."
+    echo "Conflicts resolved, you can now push the changes."
 else
     echo
-    echo "All merged, you can now push the changes to your branch."
+    echo "All merged, you can now push the changes."
 fi
 
+# Cleanup
+rm lang.tar.gz
+
+# Show all clear
 git status

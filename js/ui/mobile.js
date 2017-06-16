@@ -84,9 +84,6 @@ var mobile = {
             loadSubPage('register');
             return false;
         });
-
-        // If the Mega icon is clicked go to the home page
-        mobile.initHeaderMegaIcon();
     },
 
     /**
@@ -148,6 +145,35 @@ var mobile = {
 
             return false;
         });
+    },
+
+    /**
+     * Changes the app store badge depending on what device they have
+     */
+    initMobileAppButton: function() {
+
+        var $appStoreButton = $('.download-app');
+
+        // Set the link
+        $appStoreButton.attr('href', mobile.downloadOverlay.getStoreLink());
+
+        // If iOS, Windows or Android show the relevant app store badge
+        switch (ua.details.os) {
+
+            case 'iPad':
+            case 'iPhone':
+                $appStoreButton.removeClass('hidden').addClass('ios');
+                break;
+
+            case 'Windows Phone':
+                $appStoreButton.removeClass('hidden').addClass('wp');
+                break;
+
+            default:
+                // Android and others
+                $appStoreButton.removeClass('hidden').addClass('android');
+                break;
+        }
     }
 };
 
@@ -2088,7 +2114,7 @@ mobile.messageOverlay = {
 
 
 /**
- * Homepage for mobile with login/register functionality
+ * Login functionality
  */
 mobile.signin = {
 
@@ -2113,11 +2139,12 @@ mobile.signin = {
         // Init events
         this.initLoginButton();
         this.initEmailPasswordKeyupEvents();
-        this.initMobileAppButton();
-
+        
         // Initialise the Remember Me checkbox, top button tabs
         mobile.initTabs('login');
         mobile.initCheckbox('remember-me');
+        mobile.initHeaderMegaIcon();
+        mobile.initMobileAppButton();
     },
 
     /**
@@ -2239,35 +2266,6 @@ mobile.signin = {
                 }
             });
         }
-    },
-
-    /**
-     * Changes the app store badge depending on what device they have
-     */
-    initMobileAppButton: function() {
-
-        var $appStoreButton = this.$screen.find('.download-app');
-
-        // Set the link
-        $appStoreButton.attr('href', mobile.downloadOverlay.getStoreLink());
-
-        // If iOS, Windows or Android show the relevant app store badge
-        switch (ua.details.os) {
-
-            case 'iPad':
-            case 'iPhone':
-                $appStoreButton.removeClass('hidden').addClass('ios');
-                break;
-
-            case 'Windows Phone':
-                $appStoreButton.removeClass('hidden').addClass('wp');
-                break;
-
-            default:
-                // Android and others
-                $appStoreButton.removeClass('hidden').addClass('android');
-                break;
-        }
     }
 };
 
@@ -2302,6 +2300,8 @@ mobile.register = {
         // Initialise the login/register tabs and the Agree to Terms of Service checkbox
         mobile.initTabs('register');
         mobile.initCheckbox('confirm-terms');
+        mobile.initHeaderMegaIcon();
+        mobile.initMobileAppButton();
 
         // Activate register button when fields are complete
         this.initKeyupEvents();

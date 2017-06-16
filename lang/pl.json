@@ -4259,6 +4259,10 @@
     "16647": "The Privacy Company.",
     "16648": "Uniwersalna Deklaracja Praw Cz\u0142owieka, Artyku\u0142 12.",
     "16649": "Save %1",
+    "16650": "Failed to view the contact details. Please try again later.",
+    "16651": "Contact details failed",
+    "16652": "Failed to show the upload options. Please try again later.",
+    "16653": "For the full featured experience, download our app or use the site on a PC.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4519,6 +4523,7 @@
         "file_rename_by_me": 16481,
         "cancel-subscription-dialog-message": 16501,
         "public-links": 16516,
-        "save-amount": 16649
+        "save-amount": 16649,
+        "for-full-featured-experience": 16653
     }
 }

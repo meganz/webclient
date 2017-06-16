@@ -2384,7 +2384,7 @@
     "7302": "windowsphone@mega.nz",
     "7303": "64",
     "7304": "Enregistrement de la carte de cr\u00e9dit...",
-    "7305": "R\u00e9cup\u00e9ration des donn\u00e9es du contact...",
+    "7305": "R\u00e9cup\u00e9ration des donn\u00e9es du contact....",
     "7306": "R\u00e9cup\u00e9ration des modes de paiement...",
     "7307": "R\u00e9cup\u00e9ration de l'URL du paiement...",
     "7308": "R\u00e9cup\u00e9ration des donn\u00e9es utilisateurs...",
@@ -4258,7 +4258,11 @@
     "16646": "Services nuagiques chiffr\u00e9s par l'utilisateur",
     "16647": "Une entreprise qui vous respecte.",
     "16648": "D\u00e9claration universelle des droits de la personne, article 12.",
-    "16649": "Save %1",
+    "16649": "\u00c9conomisez %1",
+    "16650": "\u00c9chec de visualisation des coordonn\u00e9es du contact. Veuillez ressayer plus tard.",
+    "16651": "\u00c9chec de visualisation des coordonn\u00e9es du contact",
+    "16652": "\u00c9chec d'affichage des options de t\u00e9l\u00e9versement. Veuillez ressayer plus tard.",
+    "16653": "For the full featured experience, download our app or use the site on a PC.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4519,6 +4523,7 @@
         "file_rename_by_me": 16481,
         "cancel-subscription-dialog-message": 16501,
         "public-links": 16516,
-        "save-amount": 16649
+        "save-amount": 16649,
+        "for-full-featured-experience": 16653
     }
 }

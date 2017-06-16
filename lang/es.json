@@ -2840,7 +2840,7 @@
     "7866": "Subidas",
     "7867": "Las compras In-App est\u00e1n desactivadas, por favor act\u00edvalas en la configuraci\u00f3n de iOS",
     "7868": "Subir",
-    "7869": "Este email ya ha sido registrado. Por favior, elige un email alternativo para proceder.",
+    "7869": "Este email ya ha sido registrado. Por favor, elige un email alternativo para proceder.",
     "7870": "Compartido abandonado",
     "7871": "Compartidos abandonados",
     "7872": "El acceso a carpetas compartidas contigo por [X] se perder\u00e1",
@@ -4259,6 +4259,10 @@
     "16647": "The Privacy Company.",
     "16648": "Declaraci\u00f3n Universal de Derechos Humanos, Art\u00edculo 12.",
     "16649": "Save %1",
+    "16650": "Failed to view the contact details. Please try again later.",
+    "16651": "Contact details failed",
+    "16652": "Failed to show the upload options. Please try again later.",
+    "16653": "For the full featured experience, download our app or use the site on a PC.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4519,6 +4523,7 @@
         "file_rename_by_me": 16481,
         "cancel-subscription-dialog-message": 16501,
         "public-links": 16516,
-        "save-amount": 16649
+        "save-amount": 16649,
+        "for-full-featured-experience": 16653
     }
 }

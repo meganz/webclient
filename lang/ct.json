@@ -4259,6 +4259,10 @@
     "16647": "The Privacy Company. \u6211\u5011\u6700\u91cd\u8996\u96b1\u79c1\u6b0a",
     "16648": "\u4e16\u754c\u4eba\u6b0a\u5ba3\u8a00\uff0c\u7b2c\u5341\u4e8c\u689d\u3002",
     "16649": "Save %1",
+    "16650": "Failed to view the contact details. Please try again later.",
+    "16651": "Contact details failed",
+    "16652": "Failed to show the upload options. Please try again later.",
+    "16653": "For the full featured experience, download our app or use the site on a PC.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4519,6 +4523,7 @@
         "file_rename_by_me": 16481,
         "cancel-subscription-dialog-message": 16501,
         "public-links": 16516,
-        "save-amount": 16649
+        "save-amount": 16649,
+        "for-full-featured-experience": 16653
     }
 }

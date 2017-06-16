@@ -4258,6 +4258,11 @@
     "16646": "Servizi cloud criptati",
     "16647": "La Compagnia della Privacy.",
     "16648": "Dichiarazione universale dei diritti dell'uomo, Articolo 12.",
+    "16649": "Risparmia %1",
+    "16650": "Non posso vedere i dettagli del contatto. Per favore, riprova in seguito.",
+    "16651": "Dettagli del contatto non visibili",
+    "16652": "Non posso mostrare le opzioni di aggiornamento. Per favore, riprova in seguito.",
+    "16653": "Per un'esperienza piena di opzioni, scarica la nostra app o utilizza il nostro sito su un PC.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4517,6 +4522,8 @@
         "file_edit_by_me": 16480,
         "file_rename_by_me": 16481,
         "cancel-subscription-dialog-message": 16501,
-        "public-links": 16516
+        "public-links": 16516,
+        "save-amount": 16649,
+        "for-full-featured-experience": 16653
     }
 }

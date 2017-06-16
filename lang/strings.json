@@ -16924,7 +16924,7 @@
         "context": "Feature description for the startpage"
     },
     "16621": {
-        "text": "Encrypted Live Backup",
+        "text": "Live Encrypted Backup",
         "context": "Feature headline for the startpage. 'Live' implying it is always on and fully automatic"
     },
     "16622": {
@@ -17034,5 +17034,25 @@
     "16648": {
         "text": "Universal Declaration of Human Rights, Article 12.",
         "context": "Link to the Universal Declaration of Human Rights"
+    },
+    "16649": {
+        "text": "Save %1",
+        "context": "This is a small tooltip on the Pro page displaying how much money will be saved by switching to a yearly Pro plan. Please leave the %1 placeholder which will be replaced with the amount of savings. E.g. Save 10.00 EUR."
+    },
+    "16650": {
+        "text": "Failed to view the contact details. Please try again later.",
+        "context": "A dialog message which is displayed when the process\/request to view a contact's details failed."
+    },
+    "16651": {
+        "text": "Contact details failed",
+        "context": "The title of a dialog which is displayed when the process\/request to view a contact's details failed."
+    },
+    "16652": {
+        "text": "Failed to show the upload options. Please try again later.",
+        "context": "A dialog message which is displayed when the process\/request to show the upload options failed."
+    },
+    "16653": {
+        "text": "For the full featured experience, download our app or use the site on a PC.",
+        "context": "A sentence on the Login page of the mobile web site. It implies that the best experience comes from using the mobile apps, or the website when viewed on a PC\/desktop rather than a phone."
     }
 }

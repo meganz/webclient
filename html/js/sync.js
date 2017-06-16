@@ -162,7 +162,6 @@ function changeLinux(linuxsync, i) {
                                  l[1909], linuxsync[i].c, filename);
         $('.linuxhint').show();
         syncsel = i;
-        mainScroll();
     }
     else {
         syncurl = false;

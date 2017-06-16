@@ -513,7 +513,6 @@ CMS.on('corporate', function()
         $('.new-right-content-block.' + ctype).removeClass('hidden');
         $('.new-left-menu-link').removeClass('active');
         $('#' + ctype).addClass('active');
-        mainScroll();
     } else {
         $('.new-left-menu-link:first').trigger('click');
     }

@@ -18,10 +18,6 @@ var Help = (function() {
         return tag.toLowerCase().replace(/[^a-z0-9]/g, '_');
     }
 
-    function contentChanged() {
-        $('.main-scroll-block').data('jsp').reinitialise();
-    }
-
     function tagsPerDocument(documents, isClient) {
         var tags = {};
         var tagsArr = [];
@@ -141,19 +137,7 @@ var Help = (function() {
 
 
     function scrollTo(selector) {
-        if (selector.length !== 1 || isScrolling) {
-            return;
-        }
-
-        $('.main-scroll-block').one('jsp-user-scroll-y', function() {
-            isScrolling = isScrolling === true ? false : isScrolling;
-            selectMenuItem(selector);
-        });
-        $('.main-scroll-block').data('jsp').scrollByY(
-            selector.offset().top,
-            true
-        );
-        isScrolling = true;
+        /* TODO scroll to necessary content */
     }
 
     function filterContentByTag(tag) {
@@ -705,54 +689,7 @@ var Help = (function() {
     }
 
     function handleScroll() {
-
-        var $main = $('#help2-main');
-        var $menu = $('.sidebar-menu-container:visible');
-        var menuHeight = $menu.height();
-        var top   = $('.help-background-block').height();
-        var $elements = $('.updateSelected:visible', $main);
-        var isBottomScrolling;
-
-        $window.rebind('resize.help2', function() {
-            if ($('#help2-main').length === 0) {
-                return $window.unbind('resize.help2');
-            }
-            contentChanged();
-        });
-
-        $('.main-scroll-block').rebind('jsp-scroll-y.help2', function(e, scrollPositionY, atTop, atBottom) {
-
-            if ($('#help2-main').length === 0) {
-                return $('.main-scroll-block').unbind('jsp-scroll-y.help2');
-            }
-
-            var $current = $($('.updateSelected.current')[0]);
-            var jspHeight = $main.height();
-
-            if ($current.length === 0) {
-                selectMenuItem($elements.eq(0), $current);
-            } else {
-                var $new = getVisibleElement(scrollPositionY, [$current.prev(), $current, $current.next()]);
-                if ($new && $new !== $current) {
-                    selectMenuItem($new, $current);
-                }
-            }
-
-            if (jspHeight - scrollPositionY < menuHeight) {
-                if (!isBottomScrolling) {
-                    isBottomScrolling = true;
-                    $menu.css('margin-top', scrollPositionY - 290).removeClass('fixed');
-                }
-                return;
-            }
-
-            isBottomScrolling = false;
-            if (scrollPositionY >= top) {
-                $menu.removeAttr('style').addClass('fixed');
-            } else {
-                $menu.removeClass('fixed');
-            }
-        });
+        /*TODO fix scrolling logic */
     }
 
 
@@ -826,7 +763,6 @@ var Help = (function() {
         doRouting();
         topmenuUI();
         sidebars();
-        mainScroll();
         userfeedback();
         homepageinteraction();
         searchBarInteraction();

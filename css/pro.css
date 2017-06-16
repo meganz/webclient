@@ -926,7 +926,7 @@ div.pro-feature-icon {
     margin-right: 4px;
 }
 .main-mid-pad.third-section {
-    padding: 50px 15px 47px 15px;
+    padding: 62px 15px 63px 15px;
 }
 .provider-icon {
     background-image: url("../images/mega/payment-provider-icons-v3.png");
@@ -1805,4 +1805,48 @@ div.pro-feature-icon {
     line-height: 23px;
     color: #424242;
     padding-top: 9px;
+}
+
+
+/* New PRO page styles */
+.bottom-page.top-info {
+    padding: 50px 0;
+    text-align: center;
+}
+.bottom-page.top-info .big-header {
+    padding-top: 0;
+}
+.key .bottom-page.plans-block.no-pad {
+    padding: 0 11px;
+}
+.bottom-page.blocks-div {
+    display: none;
+}
+
+
+/* end of New PRO page styles */
+
+@media only screen and (max-width: 1133px) {
+.key .reg-st3-membership-bl {
+    padding: 4px;
+    -moz-border-radius: 12px;
+    -webkit-border-radius: 12px;
+    border-radius: 12px;
+}
+}
+@media only screen and (max-width: 970px) {
+.key .bottom-page.plans-block {
+    width: auto;
+}
+.key .bottom-page.blocks-div {
+    display: block;
+}
+.key .plans .reg-st3-membership-bl {
+        width: 222px;
+    padding: 8px;
+    margin: -2px 0 0 -2px;
+}
+.key .plans .reg-st3-membership-bl:first-child {
+    margin-left: 0;
+}
 }

@@ -126,18 +126,21 @@ function topMenuScroll() {
 }
 
 function scrollMenu() {
-    $('.main-scroll-block').bind('jsp-scroll-y', function (event, scrollPositionY, isAtTop, isAtBottom) {
+    $('.bottom-page.scroll-block').scroll(function() {
         if (page === 'doc' || page.substr(0, 4) === 'help' || page === 'cpage' || page === 'sdk' || page === 'dev') {
-            var sc = scrollPositionY + 30;
-            if (isAtTop) {
-                sc = 30;
+            var $menu = $('.new-left-menu-block');
+            var topPos = $(this).scrollTop();
+            if (topPos > 0) {
+                if (topPos + $menu.outerHeight() + 106 <= $('.main-mid-pad').outerHeight()) {
+                    $menu.css('top', topPos + 50 + 'px').addClass('floating');
+                }
+                else {
+                    $menu.removeClass('floating');
+                }
             }
-            if ($('.main-scroll-block .jspPane').height() - sc - $('.new-left-menu-block').height() - $('.nw-bottom-block').height() - 100 < 0) {
-                sc = $('.main-scroll-block .jspPane').height()
-                    - $('.new-left-menu-block').height()
-                    - $('.nw-bottom-block').height() - 100;
+            else {
+                $menu.removeAttr('style');
             }
-            $('.new-left-menu-block').css('padding-top', sc + 'px');
         }
     });
 }

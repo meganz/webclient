@@ -129,6 +129,8 @@ function dev_init(pp, appkey) {
             if ($(this).hasClass('contains-submenu')) {
                 $(this).next('.new-left-submenu').removeClass('hidden');
             }
+            /* TODO: set anchors */
+            /*
             var jsp = $('.main-scroll-block').data('jsp');
             if ($(this).hasClass('preface') && jsp) {
                 jsp.scrollToY(0, 1);
@@ -154,9 +156,9 @@ function dev_init(pp, appkey) {
             else if ($(this).hasClass('underhood')) {
                 jsp.scrollToElement('#doc_12', 1);
             }
+            */
         }
     });
-    Soon(mainScroll);
     scrollMenu();
 }
 

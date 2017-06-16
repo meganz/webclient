@@ -2384,7 +2384,7 @@
     "7302": "windowsphone@mega.nz",
     "7303": "64",
     "7304": "Enregistrement de la carte de cr\u00e9dit...",
-    "7305": "R\u00e9cup\u00e9ration des donn\u00e9es du contact...",
+    "7305": "R\u00e9cup\u00e9ration des donn\u00e9es du contact....",
     "7306": "R\u00e9cup\u00e9ration des modes de paiement...",
     "7307": "R\u00e9cup\u00e9ration de l'URL du paiement...",
     "7308": "R\u00e9cup\u00e9ration des donn\u00e9es utilisateurs...",
@@ -4230,7 +4230,7 @@
     "16618": "Partagez des donn\u00e9es et communiquez avec vos contacts en toute s\u00e9curit\u00e9. Voyez leurs mises \u00e0 jour en temps r\u00e9el.",
     "16619": "Vaste espace de stockage",
     "16620": "Nous sommes non seulement plus s\u00fbrs que nos principaux comp\u00e9titeurs, mais nous offrons aussi un espace de stockage gratuit plus g\u00e9n\u00e9reux.",
-    "16621": "Sauvegarde chiffr\u00e9e instantan\u00e9e",
+    "16621": "Live Encrypted Backup",
     "16622": "Gr\u00e2ce \u00e0 nos fonctions de synchronisation et de versionnage des fichiers en temps r\u00e9el, vos donn\u00e9es sont toujours prot\u00e9g\u00e9es et r\u00e9cup\u00e9rables.",
     "16623": "Code source public",
     "16624": "Afin de permettre des v\u00e9rifications ind\u00e9pendantes de la justesse et de l'int\u00e9grit\u00e9 de notre mod\u00e8le cryptographique ainsi que de sa mise en \u0153uvre, nous publions l'int\u00e9gralit\u00e9 du code source de nos applis client.",
@@ -4258,6 +4258,11 @@
     "16646": "Services nuagiques chiffr\u00e9s par l'utilisateur",
     "16647": "Une entreprise qui vous respecte.",
     "16648": "D\u00e9claration universelle des droits de la personne, article 12.",
+    "16649": "\u00c9conomisez %1",
+    "16650": "\u00c9chec de visualisation des coordonn\u00e9es du contact. Veuillez ressayer plus tard.",
+    "16651": "\u00c9chec de visualisation des coordonn\u00e9es du contact",
+    "16652": "\u00c9chec d'affichage des options de t\u00e9l\u00e9versement. Veuillez ressayer plus tard.",
+    "16653": "For the full featured experience, download our app or use the site on a PC.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4517,6 +4522,8 @@
         "file_edit_by_me": 16480,
         "file_rename_by_me": 16481,
         "cancel-subscription-dialog-message": 16501,
-        "public-links": 16516
+        "public-links": 16516,
+        "save-amount": 16649,
+        "for-full-featured-experience": 16653
     }
 }

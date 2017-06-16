@@ -4230,7 +4230,7 @@
     "16618": "Condividi i dati e comunica in sicurezza con i tuoi contatti, e vedi i loro aggiornamenti in tempo reale.",
     "16619": "Massiccio spazio di archiviazione",
     "16620": "Non solo siamo pi\u00f9 sicuri dei nostri concorrenti maggiori, forniamo anche un quantitativo pi\u00f9 grande di spazio gratuito.",
-    "16621": "Backup live criptato",
+    "16621": "Live Encrypted Backup",
     "16622": "Con la nostra sincronizzazione e versione dei file in tempo reale, i tuoi dati sono sempre sicuri e recuperabili.",
     "16623": "Codice sorgente pubblico",
     "16624": "Per attivare le verifiche indipendenti della correttezza e integrit\u00e0 del nostro modello di criptografia e le sue implementazioni, pubblichiamo l'intero codice sorgente delle nostre applicazioni.",
@@ -4258,6 +4258,11 @@
     "16646": "Servizi cloud criptati",
     "16647": "La Compagnia della Privacy.",
     "16648": "Dichiarazione universale dei diritti dell'uomo, Articolo 12.",
+    "16649": "Save %1",
+    "16650": "Failed to view the contact details. Please try again later.",
+    "16651": "Contact details failed",
+    "16652": "Failed to show the upload options. Please try again later.",
+    "16653": "For the full featured experience, download our app or use the site on a PC.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4517,6 +4522,8 @@
         "file_edit_by_me": 16480,
         "file_rename_by_me": 16481,
         "cancel-subscription-dialog-message": 16501,
-        "public-links": 16516
+        "public-links": 16516,
+        "save-amount": 16649,
+        "for-full-featured-experience": 16653
     }
 }

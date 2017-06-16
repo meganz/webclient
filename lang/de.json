@@ -4230,7 +4230,7 @@
     "16618": "Sichere Echtzeit-Ordnerfreigaben und Direktkommunikation mit Ihren Kontakten.",
     "16619": "Platz (fast) ohne Ende",
     "16620": "Wir sind nicht nur sicherer als unsere gro\u00dfen Konkurrenten - bei uns erhalten Sie auch mehr kostenlosen Speicherplatz.",
-    "16621": "Verschl\u00fcsseltes Echtzeit-Backup",
+    "16621": "Live Encrypted Backup",
     "16622": "Unsere Echtzeit-Synchronisierung mit Versionskontrolle sch\u00fctzt Sie vor Datenverlust.",
     "16623": "Offener Quellcode",
     "16624": "Um die unabh\u00e4ngige Pr\u00fcfung der Korrektheit und Vollst\u00e4ndigkeit unseres Krypto-Modells und seiner Implementierung zu erm\u00f6glichen, ver\u00f6ffentlichen wir den Quellcode unserer Applikationen.",
@@ -4258,6 +4258,11 @@
     "16646": "Benutzerverschl\u00fcsselte Cloud-Dienste",
     "16647": "The Privacy Company.",
     "16648": "Allgemeine Erkl\u00e4rung der Menschenrechte, Art. 12",
+    "16649": "Save %1",
+    "16650": "Failed to view the contact details. Please try again later.",
+    "16651": "Contact details failed",
+    "16652": "Failed to show the upload options. Please try again later.",
+    "16653": "For the full featured experience, download our app or use the site on a PC.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4517,6 +4522,8 @@
         "file_edit_by_me": 16480,
         "file_rename_by_me": 16481,
         "cancel-subscription-dialog-message": 16501,
-        "public-links": 16516
+        "public-links": 16516,
+        "save-amount": 16649,
+        "for-full-featured-experience": 16653
     }
 }

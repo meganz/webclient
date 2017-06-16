@@ -2840,7 +2840,7 @@
     "7866": "Subidas",
     "7867": "Las compras In-App est\u00e1n desactivadas, por favor act\u00edvalas en la configuraci\u00f3n de iOS",
     "7868": "Subir",
-    "7869": "Este email ya ha sido registrado. Por favior, elige un email alternativo para proceder.",
+    "7869": "Este email ya ha sido registrado. Por favor, elige un email alternativo para proceder.",
     "7870": "Compartido abandonado",
     "7871": "Compartidos abandonados",
     "7872": "El acceso a carpetas compartidas contigo por [X] se perder\u00e1",
@@ -4020,7 +4020,7 @@
     "16388": "Quiz\u00e1 quieras cambiar la configuraci\u00f3n para conceder cuota de transferencia a los usuarios que descargan.",
     "16389": "En l\u00ednea, %1, pero cambiar mi estado a Ausente (amarillo) tras %2 minuto(s) de inactividad.",
     "16390": "La [S]Cuota de transferencia[\/S] es el volumen total de datos transferidos cada mes entre MEGA y tu sistema.",
-    "16391": "La [S]Velocidad de Transferencia[\/S] no guarda relaci\u00f3n con la Cuota de Transferencia. La calidad de la velocidad de las transferencias de archivos puede verse afectada por muchos factores fuera de nuestro control, ta\u00f1es como la red local o tu proveedor de servicios de Internet. MEGA siempre procesa las transferencias de archivos a la m\u00e1xima velocidad posible, independientemente del estado de tu cuenta.",
+    "16391": "La [S]Velocidad de Transferencia[\/S] no guarda relaci\u00f3n con la Cuota de Transferencia. La calidad de la velocidad de las transferencias de archivos puede verse afectada por muchos factores fuera de nuestro control, tales como la red local o tu proveedor de servicios de Internet. MEGA siempre procesa las transferencias de archivos a la m\u00e1xima velocidad posible, independientemente del estado de tu cuenta.",
     "16392": "Las cuentas [S]PRO y Gratis[\/S] disfrutan de una velocidad de transferencia igualmente r\u00e1pida.",
     "16393": "A partir de 200 GB de almacenamiento base y escalable hasta 4 TB. Si necesitas m\u00e1s que eso, por favor [A]cont\u00e1ctanos[\/A].",
     "16394": "No hay archivos en tu [S]Disco[\/S].",
@@ -4230,7 +4230,7 @@
     "16618": "Comparte datos y comun\u00edcate con tus contactos de forma segura, y ent\u00e9rate de sus actualizaciones a tiempo real.",
     "16619": "Espacio de Almacenamiento Masivo",
     "16620": "No s\u00f3lo somos m\u00e1s seguros que nuestros principales competidores, tambi\u00e9n ofrecemos una cantidad m\u00e1s generosa de almacenamiento gratuito.",
-    "16621": "Copia de Seguridad Cifrada",
+    "16621": "Live Encrypted Backup",
     "16622": "Con nuestras funciones de sincronizaci\u00f3n de archivos y control de versiones a tiempo real, tus datos siempre est\u00e1n seguros y son recuperables.",
     "16623": "C\u00f3digo Fuente P\u00fablico",
     "16624": "Para permitir la verificaci\u00f3n independiente de la adecuaci\u00f3n e integridad de nuestro modelo de cifrado y su implementaci\u00f3n, publicamos el c\u00f3digo fuente completo de nuestras aplicaciones cliente.",
@@ -4257,7 +4257,12 @@
     "16645": "Prensa y Medios",
     "16646": "Servicios en la nube cifrados por el usuario",
     "16647": "The Privacy Company.",
-    "16648": "Declaraci\u00f3n Universal de los Derechos Humanos, Art\u00edculo 12.",
+    "16648": "Declaraci\u00f3n Universal de Derechos Humanos, Art\u00edculo 12.",
+    "16649": "Save %1",
+    "16650": "Failed to view the contact details. Please try again later.",
+    "16651": "Contact details failed",
+    "16652": "Failed to show the upload options. Please try again later.",
+    "16653": "For the full featured experience, download our app or use the site on a PC.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4517,6 +4522,8 @@
         "file_edit_by_me": 16480,
         "file_rename_by_me": 16481,
         "cancel-subscription-dialog-message": 16501,
-        "public-links": 16516
+        "public-links": 16516,
+        "save-amount": 16649,
+        "for-full-featured-experience": 16653
     }
 }

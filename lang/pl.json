@@ -4230,7 +4230,7 @@
     "16618": "Udost\u0119pniaj dane i komunikuj si\u0119 ze swoimi kontaktami w bezpieczny spos\u00f3b.",
     "16619": "Ogromna powierzchnia na pliki",
     "16620": "Nie tylko nasze rozwi\u0105zania s\u0105 bezpieczniejsze ni\u017c u naszej konkurencji, ale r\u00f3wnie\u017c dajemy du\u017ca powierzchni\u0119 na pliki za darmo.",
-    "16621": "Zaszyfrowane kopie zapasowe",
+    "16621": "Live Encrypted Backup",
     "16622": "Dzi\u0119ki naszym rozwi\u0105zaniom, synchronizacji i wersjonowania plik\u00f3w, Twoje dane zawsze s\u0105\u00a0bezpieczne i \u0142atwe do odzyskania.",
     "16623": "Og\u00f3lnodost\u0119pny kod \u017ar\u00f3d\u0142owy",
     "16624": "Aby umo\u017cliwi\u0107 niezale\u017cn\u0105 weryfikacj\u0119 i prawid\u0142ow\u0105 implementacj\u0119 naszych mechanizm\u00f3w szyfrowania, udost\u0119pnili\u015bmy pe\u0142ny kod naszych aplikacji.",
@@ -4258,6 +4258,11 @@
     "16646": "Us\u0142ugi w chmurze zaszyfrowane przez u\u017cytkownika",
     "16647": "The Privacy Company.",
     "16648": "Uniwersalna Deklaracja Praw Cz\u0142owieka, Artyku\u0142 12.",
+    "16649": "Save %1",
+    "16650": "Failed to view the contact details. Please try again later.",
+    "16651": "Contact details failed",
+    "16652": "Failed to show the upload options. Please try again later.",
+    "16653": "For the full featured experience, download our app or use the site on a PC.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4517,6 +4522,8 @@
         "file_edit_by_me": 16480,
         "file_rename_by_me": 16481,
         "cancel-subscription-dialog-message": 16501,
-        "public-links": 16516
+        "public-links": 16516,
+        "save-amount": 16649,
+        "for-full-featured-experience": 16653
     }
 }

@@ -1218,6 +1218,18 @@ input[type='checkbox'] {
     float: none;
     padding: 20px 0 20px 37px;
 }
+.mobile.sign-in .first-message {
+	font-size: 15px;
+	line-height: 1.63;
+	color: #778187;
+	text-align: center;
+	margin: 20px auto 0 auto;
+	padding: 0 32px 0 32px;
+	max-width: 500px;
+}
+.mobile.sign-in .download-app {
+    margin: 15px auto 0 auto;
+}
 .mobile.confirm-terms {
     background-color: #f8f8f8;
     overflow: hidden;

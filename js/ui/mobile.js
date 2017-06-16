@@ -2113,6 +2113,7 @@ mobile.signin = {
         // Init events
         this.initLoginButton();
         this.initEmailPasswordKeyupEvents();
+        this.initMobileAppButton();
 
         // Initialise the Remember Me checkbox, top button tabs
         mobile.initTabs('login');
@@ -2237,6 +2238,35 @@ mobile.signin = {
                     mobile.messageOverlay.show(l[16349], l[16350]);
                 }
             });
+        }
+    },
+
+    /**
+     * Changes the app store badge depending on what device they have
+     */
+    initMobileAppButton: function() {
+
+        var $appStoreButton = this.$screen.find('.download-app');
+
+        // Set the link
+        $appStoreButton.attr('href', mobile.downloadOverlay.getStoreLink());
+
+        // If iOS, Windows or Android show the relevant app store badge
+        switch (ua.details.os) {
+
+            case 'iPad':
+            case 'iPhone':
+                $appStoreButton.removeClass('hidden').addClass('ios');
+                break;
+
+            case 'Windows Phone':
+                $appStoreButton.removeClass('hidden').addClass('wp');
+                break;
+
+            default:
+                // Android and others
+                $appStoreButton.removeClass('hidden').addClass('android');
+                break;
         }
     }
 };

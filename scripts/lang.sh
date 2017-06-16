@@ -39,3 +39,33 @@ git checkout $currentBranch
 
 # Merge translations branch into the current branch
 git merge translations -m "Merge branch 'translations' into $currentBranch"
+
+# Check result of merge to see if it merged cleanly without conflicts
+mergeResult=$(git ls-files -u)
+
+# If there was a merge conflict
+if $mergeResult; then
+    echo "Problem merging, fetching strings from Babel again to resolve conflict..."
+    git status
+    pwd
+
+    # Fetch the latest translations from Babel
+    wget 'https://babel.mega.co.nz/?u=Jq1EXnelOeQpj7UCaBa1&id=fetch&' -O lang.tar.gz
+
+    # Extract the tar.gz file
+    tar xfvz lang.tar.gz
+
+    # Delete it
+    rm lang.tar.gz
+
+    # Mark conflict resolved and commit changes
+    git add .
+    git commit --no-edit
+
+    echo
+    echo "Conflicts resolved, you can now push the changes to your branch."
+else
+    echo
+    echo "All merged, you can now push the changes to your branch."
+    git status
+fi

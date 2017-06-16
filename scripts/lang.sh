@@ -47,10 +47,9 @@ echo "Current directory:"
 pwd
 
 # If there was a merge conflict
-if $mergeResult; then
+if [ -n "$mergeResult" ]; then
     echo "Problem merging, fetching strings from Babel again to resolve conflict..."
     git status
-    
 
     # Fetch the latest translations from Babel
     wget 'https://babel.mega.co.nz/?u=Jq1EXnelOeQpj7UCaBa1&id=fetch&' -O lang.tar.gz

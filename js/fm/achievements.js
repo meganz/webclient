@@ -234,7 +234,7 @@ mega.achievem.enabled = function achievementsEnabled() {
     }
     else {
         achievementsEnabled.pending = promise;
-        mega.api.req('ach').always(notify);
+        M.req('ach').always(notify);
     }
 
     return promise;
@@ -538,7 +538,7 @@ mega.achievem.initInviteDialogMultiInputPlugin = function initInviteDialogMultiI
     var $this = $('.achievement-dialog.multiple-input.emails input');
     var $inputWrapper = $('.achievement-dialog.multiple-input');
     var $sendButton = $dialog.find('.default-grey-button.send');
-    var contacts = getContactsEMails();
+    var contacts = M.getContactsEMails();
 
     $this.tokenInput(contacts, {
         theme: "invite",
@@ -691,17 +691,15 @@ mega.achievem.initInviteDialogMultiInputPlugin = function initInviteDialogMultiI
 
         // List of email address planned for addition
         var $mails = $('.token-input-list-invite .token-input-token-invite');
-        var mailNum = $mails.length;
+        var mailNum = M.u[u_handle] && $mails.length;
 
         if (mailNum) {
-
-            var email = '';
 
             // Loop through new email list
             $mails.each(function(index, value) {
 
                 // Extract email addresses one by one
-                email = $(value).text().replace(',', '');
+                var email = $(value).text().replace(',', '');
 
                 M.inviteContact(M.u[u_handle].m, email, emailText);
             });
@@ -1239,130 +1237,3 @@ mega.achievem.parseAccountAchievements = function parseAccountAchievements() {
 
 // No one needs to mess with this externally
 Object.freeze(mega.achievem);
-
-// --------------------------------------------------------------------------
-
-/**
- * Check Storage quota.
- * @param {Number} timeout in milliseconds, defaults to 30 seconds
- */
-mega.checkStorageQuota = function checkStorageQuota(timeout) {
-    delay('checkStorageQuota', function _csq() {
-        mega.api.req({a: 'uq', strg: 1, qc: 1}).done(function(data) {
-            var perc = Math.floor(data.cstrg / data.mstrg * 100);
-
-            mega.showOverStorageQuota(perc, data.cstrg, data.mstrg);
-        });
-    }, timeout || 30000);
-};
-
-/**
- * Show storage overquota dialog
- * @param {Number} perc percent
- * @param {Number} [cstrg] Current storage usage
- * @param {Number} [mstrg] Maximum storage.
- */
-mega.showOverStorageQuota = function(perc, cstrg, mstrg) {
-    var prevState = $('.fm-main').is('.almost-full, .full');
-    $('.fm-main').removeClass('almost-full full');
-
-    if (Object(u_attr).p) {
-        // update texts with "for free accounts" sentences removed.
-        $('.fm-notification-block.full').safeHTML(l[16358]);
-        $('.fm-notification-block.almost-full')
-            .safeHTML('<div class="fm-notification-close"></div>' + l[16359]);
-        $('.fm-dialog-body.storage-dialog.full .body-header').safeHTML(l[16360]);
-        $('.fm-dialog-body.storage-dialog.almost-full .no-achievements-bl .body-p').safeHTML(l[16361]);
-        $('.fm-dialog-body.storage-dialog.almost-full .achievements-bl .body-p')
-            .safeHTML(l[16361] + ' ' + l[16314]);
-    }
-    else {
-        $('.fm-dialog-body.storage-dialog.almost-full .no-achievements-bl .body-p')
-            .safeHTML(l[16313].replace('%1', (4.99).toLocaleString()));
-        $('.fm-dialog-body.storage-dialog.almost-full .achievements-bl .body-p')
-            .safeHTML(l[16313].replace('%1', (4.99).toLocaleString()) + ' ' + l[16314]);
-    }
-
-    if (perc > 90) {
-        var $strgdlg = $('.fm-dialog.storage-dialog').removeClass('full almost-full');
-
-        if (perc > 99) {
-            $('.fm-main').addClass('fm-notification full');
-            $strgdlg.addClass('full');
-        }
-        else {
-            $('.fm-main').addClass('fm-notification almost-full');
-            $strgdlg.addClass('almost-full');
-
-            // Storage chart and info
-            var strQuotaLimit = bytesToSize(mstrg, 0).split(' ');
-            var strQuotaUsed = bytesToSize(cstrg);
-            var deg = 230 * perc / 100;
-            var $storageChart = $('.fm-account-blocks.storage', $strgdlg);
-
-            // Storage space chart
-            if (deg <= 180) {
-                $storageChart.find('.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
-                $storageChart.find('.right-chart span').removeAttr('style');
-            }
-            else {
-                $storageChart.find('.left-chart span').css('transform', 'rotate(180deg)');
-                $storageChart.find('.right-chart span').css('transform', 'rotate(' + (deg - 180) + 'deg)');
-            }
-
-            $('.chart.data .size-txt', $strgdlg).text(strQuotaUsed);
-            $('.chart.data .pecents-txt', $strgdlg).text(strQuotaLimit[0]);
-            $('.chart.data .gb-txt', $strgdlg).text(strQuotaLimit[1]);
-            $('.chart.data .perc-txt', $strgdlg).text(perc + '%');
-        }
-
-        $('.button', $strgdlg).rebind('click', function() {
-            var $this = $(this);
-
-            fm_hideoverlay();
-            $strgdlg.addClass('hidden');
-
-            if ($this.hasClass('choose-plan')) {
-                loadSubPage('pro');
-            }
-            else if ($this.hasClass('get-bonuses')) {
-                mega.achievem.achievementsListDialog();
-            }
-
-            return false;
-        });
-        $('.fm-dialog-close, .button.skip', $strgdlg).rebind('click', function() {
-            fm_hideoverlay();
-            $strgdlg.addClass('hidden');
-        });
-
-        $('.fm-notification-block .fm-notification-close')
-            .rebind('click', function() {
-                $('.fm-main').removeClass('fm-notification almost-full full');
-            });
-
-        mega.achievem.enabled()
-            .done(function() {
-                $strgdlg.addClass('achievements')
-                    .find('.semi-small-icon.rocket')
-                    .rebind('click', function() {
-                        closeDialog();
-                        mega.achievem.achievementsListDialog();
-                        return false;
-                    });
-            });
-
-        clickURLs();
-        $('a.gotorub').attr('href', '/fm/' + M.RubbishID);
-
-        if (Object(u_attr).p) {
-            $('.choose-plan', $strgdlg).text(l[16386]);
-        }
-
-        // if another dialog wasn't opened previously
-        if (!prevState) {
-            fm_showoverlay();
-            $strgdlg.removeClass('hidden');
-        }
-    }
-};

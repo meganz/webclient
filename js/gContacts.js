@@ -53,11 +53,11 @@
 
     /**
      * Calculate parameters used for google contact importing
-     * 
+     *
      */
     GContacts.prototype._calcParams = function() {
         var self = this;
-        
+
         var index = self.options.domains.indexOf(window.location.host);
         if (index !== -1) {
             self.client_id = self.options.client_ids[index].client_id;
@@ -76,7 +76,7 @@
             // failed = false
             self.options.failed = false;
        } else {
-            DEBUG('Contacts importing is NOT allowed for host', window.location.host);
+            if (d) console.debug('Contacts importing is NOT allowed for host', window.location.host);
 
             // failed = true
             self.options.failed = true;
@@ -104,7 +104,7 @@
                     var url = win.document.URL;
                     self.accessToken = self._extractQueryValue(url, 'access_token');
                     win.close();
-                    
+
                     // Importing contacts can take some time
                     loadingDialog.show();
                     self.isImported = self.getContactList(self.options.where);
@@ -119,7 +119,7 @@
      * @param {boolean} false = addContacts, true=share dialog
      */
     GContacts.prototype.getContactList = function(where) {
-        
+
         var self = this;
 
         var url = self.options.retreiveAllUrl + "?access_token=" + self.accessToken + "&v=3.0&alt=json&max-results=999";
@@ -127,16 +127,16 @@
         api_req({ a: 'prox', url: url }, {
             callback: function(res) {
                 if (typeof res == 'number') {
-                    DEBUG("Contacts importing failed.");
+                    if (d) console.debug("Contacts importing failed.");
                     return false;
-                } else {            
+                } else {
                     var gData = self._readAllEmails(res);
                     if (gData.length > 0) {
                         if (where === 'shared') {
-                            addImportedDataToSharedDialog(gData, 'gmail');
+                            addImportedDataToSharedDialog(gData);
                         }
                         else if (where === 'contacts') {
-                            addImportedDataToAddContactsDialog(gData, 'gmail');
+                            addImportedDataToAddContactsDialog(gData);
                         }
                         $('.import-contacts-dialog').fadeOut(200);
 
@@ -144,15 +144,15 @@
                     }
                     else {
                         loadingDialog.hide();
-                        DEBUG("Contacts importing canceled.");
-                        
+                        if (d) console.debug("Contacts importing canceled.");
+
                         $('.import-contacts-dialog').fadeOut(200);
 
                         self.isImported = false;
                     }
                 }
             }
-        });        
+        });
     };
 
     GContacts.prototype._xPathNameSpaceResolver = function(prefix) {
@@ -169,7 +169,7 @@
 
         var data = [];
         if (json_data && json_data.feed && json_data.feed.entry) {
-            for (var i = 0; i < json_data.feed.entry.length; i++) {            
+            for (var i = 0; i < json_data.feed.entry.length; i++) {
                 var obj = json_data.feed.entry[i];
 
                 if (obj['gd$email'] != undefined) {
@@ -177,18 +177,18 @@
                 }
             }
         }
-        
-        return data;       
+
+        return data;
     };
 
     /**
      * Token validation
-     * 
+     *
      * Tokens received on the fragment MUST be explicitly validated.
      * Failure to verify tokens acquired this way makes your application
      * more vulnerable to the confused deputy problem.
      * @param {type} accessToken
-     * 
+     *
      */
     GContacts.prototype._validateToken = function(accessToken) {
         var self = this;

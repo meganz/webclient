@@ -900,9 +900,6 @@ function processEmailChangeActionPacket(ap) {
         };
 
         for (var key in config) {
-            if (!config.hasOwnProperty(key)) {
-                continue;
-            }
             var value = config[key];
 
             if (!value && value !== 0) {

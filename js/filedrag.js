@@ -82,10 +82,31 @@
         }
         else if (e) {
             var t = $(e.target);
-            $('span.nw-fm-tree-folder').css('background-color', '');
+            $('.nw-fm-tree-item, .nw-contact-item').css('background-color', '');
+            $('.ui-selected').removeClass('ui-selected');
 
-            if (t.attr('class') == "nw-fm-tree-folder") {
+            if (t.hasClass('nw-fm-tree-folder') || t.hasClass("nw-contact-name")) {
+                t = t.parent();
+            }
+            if (t.hasClass('nw-fm-tree-item') || t.hasClass("nw-contact-item")) {
                 t.css('background-color', 'rgba(222,222,10,0.3)');
+            }
+            else if (M.viewmode) {
+                if (t.hasClass('file-block folder')) {
+                    t.addClass('ui-selected');
+                }
+            }
+            else {
+                if (t.hasClass('tranfer-filetype-txt')
+                    || t.hasClass('shared-folder-info-block')
+                    || t.parent().hasClass('shared-folder-info-block')) {
+
+                    t = t.closest('tr');
+
+                    if (t.hasClass('folder')) {
+                        t.addClass('ui-selected');
+                    }
+                }
             }
         }
     }
@@ -94,7 +115,7 @@
         if (d) {
             console.log(e);
         }
-        // if (folderlink || rightsById(M.currentdirid) < 1) return false;
+        // if (folderlink || M.getNodeRights(M.currentdirid) < 1) return false;
         e.stopPropagation();
         e.preventDefault();
         setTimeout(function() {
@@ -206,22 +227,27 @@
         $.ddhelper = undefined;
 
         var target   = $(e.target);
-        var targetid = M.currentdirid || '';
+        var targetid = M.currentdirid;
 
-        if (targetid === 'shares') {
-            if (target.hasClass("nw-fm-tree-folder")) {
-                target = target.parent();
+        if (target.hasClass("nw-fm-tree-folder") || target.hasClass("nw-contact-name")) {
+            target = target.parent();
+        }
+        if (target.hasClass("nw-fm-tree-item") || target.hasClass("nw-contact-item")) {
+            targetid = target.attr('id').split('_').pop();
+        }
+        else if (M.viewmode) {
+            if (target.hasClass('file-block folder')) {
+                targetid = target.attr('id');
             }
-            if (target.hasClass("nw-fm-tree-item")) {
-                targetid = target.attr('id').split('_').pop();
-            }
-            else {
-                target = target.closest('tr.folder.ui-droppable:visible');
+        }
+        else {
+            if (target.hasClass('tranfer-filetype-txt')
+                || target.hasClass('shared-folder-info-block')
+                || target.parent().hasClass('shared-folder-info-block')) {
 
-                if (target.length) {
-                    // Select the right-side folder
-                    target.click();
+                target = target.closest('tr');
 
+                if (target.hasClass('folder')) {
                     targetid = target.attr('id');
                 }
             }
@@ -233,7 +259,7 @@
                 (
                     M.currentdirid !== 'dashboard' &&
                     M.currentdirid !== 'transfers' &&
-                    (rightsById(targetid) | 0) < 1
+                    (M.getNodeRights(targetid) | 0) < 1
                 )
             ) &&
             String(M.currentdirid).indexOf("chat/") === -1
@@ -252,14 +278,37 @@
             }, 500);
         }
         else {
-            $('span.nw-fm-tree-folder').css('background-color', '');
+            $('.nw-fm-tree-item, .nw-contact-item').css('background-color', '');
 
-            if (target.hasClass("nw-fm-tree-folder")) {
-                var handle = target.parent().attr('id').split('_').pop();
-                $.onDroppedTreeFolder = M.d[handle] && handle;
+            if (targetid !== M.currentdirid) {
+                $.onDroppedTreeFolder = targetid;
             }
-            else if (M.currentdirid === 'shares') {
-                $.onDroppedTreeFolder = M.d[targetid] && targetid;
+            else if (M.currentdirid === 'contacts') {
+                targetid = null;
+
+                if (M.viewmode) {
+                    if (target.parent().hasClass('file-block ustatus')) {
+                        target = target.parent();
+                    }
+
+                    if (target.hasClass('file-block ustatus')) {
+                        targetid = target.attr('id');
+                    }
+                }
+                else {
+                    if (target.parent().hasClass('fm-chat-user-info')) {
+                        target = target.parent();
+                    }
+
+                    if (target.hasClass('fm-chat-user-info')) {
+                        targetid = target.closest('tr').attr('id');
+                    }
+                }
+
+                if (String(targetid).length !== 11) {
+                    return false;
+                }
+                $.onDroppedTreeFolder = targetid;
             }
         }
 
@@ -313,8 +362,11 @@
         }
         else {
             var u = [];
-            var gecko = dataTransfer && ("mozItemCount" in dataTransfer)
-                || browserdetails(ua).browser === 'Firefox';
+            var gecko = dataTransfer && ("mozItemCount" in dataTransfer) || Object(ua.details).browser === 'Firefox';
+            if (gecko && parseFloat(Object(ua.details).version) > 51) {
+                // No need to check for folder upload attempts through zero-bytes on latest Firefox versions
+                gecko = false;
+            }
             for (var i = 0, f; f = files[i]; i++) {
                 if (f.webkitRelativePath) {
                     f.path = String(f.webkitRelativePath).replace(RegExp("[\\/]"

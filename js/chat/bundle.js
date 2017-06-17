@@ -1287,7 +1287,7 @@ React.makeElement = React['createElement'];
 	    $('.fm-right-files-block').removeClass('hidden');
 	    $('.nw-conversations-item').removeClass('selected');
 
-	    sectionUIopen('conversations');
+	    M.onSectionUIOpen('conversations');
 
 	    if (Object.keys(self.chats).length === 0) {
 	        $('.fm-empty-conversations').removeClass('hidden');
@@ -1303,7 +1303,7 @@ React.makeElement = React['createElement'];
 
 	            var sortedConversations = obj_values(self.chats.toJS());
 
-	            sortedConversations.sort(mega.utils.sortObjFn("lastActivity", -1));
+	            sortedConversations.sort(M.sortObjFn("lastActivity", -1));
 
 	            if (sortedConversations.length > 0) {
 	                var room = sortedConversations[0];
@@ -1712,7 +1712,7 @@ React.makeElement = React['createElement'];
 
 	        var sortedConversations = obj_values(this.props.chats.toJS());
 
-	        sortedConversations.sort(mega.utils.sortObjFn("lastActivity", -1));
+	        sortedConversations.sort(M.sortObjFn("lastActivity", -1));
 
 	        sortedConversations.forEach(function (chatRoom) {
 	            var contact;
@@ -2014,7 +2014,7 @@ React.makeElement = React['createElement'];
 
 	"use strict";
 
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
@@ -3892,7 +3892,7 @@ React.makeElement = React['createElement'];
 
 	            var pres = self.props.megaChat.karere.getPresence(self.props.megaChat.getJidFromNodeId(v.u));
 
-	            if (v.c == 0 || v.u == u_handle) {
+	            if (v.c != 1 || v.u == u_handle) {
 	                return;
 	            }
 
@@ -3918,20 +3918,20 @@ React.makeElement = React['createElement'];
 	                className: "contacts-search " + selectedClass,
 
 	                onClick: function onClick(contact, e) {
-	                    var contactHash = contact.h;
+	                    var contactHash = contact.u;
 
 	                    if (contactHash === self.lastClicked && new Date() - self.clickTime < 500) {
 
 	                        if (self.props.onSelected) {
-	                            self.props.onSelected([contact.h]);
+	                            self.props.onSelected([contactHash]);
 	                        }
-	                        self.props.onSelectDone([contact.h]);
+	                        self.props.onSelectDone([contactHash]);
 	                        return;
 	                    } else {
 	                        var selected = clone(self.state.selected || []);
 
 	                        if (selected.indexOf(contactHash) === -1) {
-	                            selected.push(contact.h);
+	                            selected.push(contactHash);
 	                            if (self.props.onSelected) {
 	                                self.props.onSelected(selected);
 	                            }
@@ -5368,11 +5368,21 @@ React.makeElement = React['createElement'];
 	                            return;
 	                        }
 
+	                        try {
+	                            Object.defineProperty(meta[0], 'name', {
+	                                configurable: true,
+	                                writeable: true,
+	                                value: Date.now() + '.' + M.getSafeName(meta[1] || meta[0].name)
+	                            });
+	                        } catch (e) {}
+
 	                        M.addUpload([meta[0]]);
 
 	                        self.setState({
 	                            'pasteImageConfirmDialog': false
 	                        });
+
+	                        URL.revokeObjectURL(meta[2]);
 	                    }
 	                },
 	                React.makeElement(
@@ -6336,60 +6346,50 @@ React.makeElement = React['createElement'];
 	    componentDidUpdate: function componentDidUpdate(prevProps, prevState) {
 	        if (prevState.currentlyViewedEntry !== this.state.currentlyViewedEntry) {
 	            this.resizeBreadcrumbs();
+
+	            var handle = this.state.currentlyViewedEntry;
+	            if (!M.d[handle] || M.d[handle].t && !M.c[handle]) {
+	                var self = this;
+
+	                dbfetch.get(handle).always(function () {
+	                    self.setState({ entries: self.getEntries() });
+	                });
+	                return;
+	            }
 	        }
+
+	        this.setState({ entries: null });
 	    },
 	    getEntries: function getEntries() {
 	        var self = this;
-	        var entries = [];
-
-	        obj_values(M.d).forEach(function (v) {
-	            if (v.p === self.state.currentlyViewedEntry) {
-	                entries.push(v);
-	            }
+	        var order = self.state.sortBy[1] === "asc" ? 1 : -1;
+	        var entries = Object.keys(M.c[self.state.currentlyViewedEntry] || {}).map(function (h) {
+	            return M.d[h];
 	        });
-	        var sortKey;
-	        var order = 1;
+	        var sortFunc;
 
 	        if (self.state.sortBy[0] === "name") {
-	            sortKey = "name";
+	            sortFunc = M.getSortByNameFn();
 	        } else if (self.state.sortBy[0] === "size") {
-	            sortKey = "s";
-	        } else if (self.state.sortBy[0] === "grid-header-star") {
-	            sortKey = "fav";
+	            sortFunc = M.getSortBySizeFn();
+	        } else {
+	            sortFunc = M.getSortByFavFn();
 	        }
 
-	        order = self.state.sortBy[1] === "asc" ? 1 : -1;
-
 	        entries.sort(function (a, b) {
-
-	            if (sortKey === "name") {
-	                return (a[sortKey] ? a[sortKey] : "").localeCompare(b[sortKey]) * order;
-	            } else {
-	                var _a = a[sortKey] || 0;
-	                var _b = b[sortKey] || 0;
-	                if (_a > _b) {
-	                    return 1 * order;
-	                }
-	                if (_a < _b) {
-	                    return -1 * order;
-	                }
-
-	                return 0;
-	            }
+	            return sortFunc(a, b, order);
 	        });
 
-	        var files = [];
 	        var folders = [];
 
-	        entries.forEach(function (v) {
-	            if (v.t === 1) {
-	                folders.push(v);
-	            } else if (v.t === 0) {
-	                files.push(v);
+	        for (var i = entries.length; i--;) {
+	            if (entries[i].t) {
+	                folders.unshift(entries[i]);
+	                entries.splice(i, 1);
 	            }
-	        });
+	        }
 
-	        return folders.concat(files);
+	        return folders.concat(entries);
 	    },
 	    onSelected: function onSelected(nodes) {
 	        this.setState({ 'selected': nodes });
@@ -6410,6 +6410,8 @@ React.makeElement = React['createElement'];
 	    },
 	    render: function render() {
 	        var self = this;
+
+	        var entries = self.state.entries || self.getEntries();
 
 	        var classes = "add-from-cloud " + self.props.className;
 
@@ -6449,7 +6451,7 @@ React.makeElement = React['createElement'];
 	                        React.makeElement(
 	                            "span",
 	                            null,
-	                            p.h === M.RootID ? __("Cloud Drive") : p.name
+	                            p.h === M.RootID ? __(l[164]) : p.name
 	                        )
 	                    )
 	                ));
@@ -6540,13 +6542,13 @@ React.makeElement = React['createElement'];
 	                        "tr",
 	                        null,
 	                        React.makeElement(BrowserCol, { id: "grid-header-star", sortBy: self.state.sortBy, onClick: self.toggleSortBy }),
-	                        React.makeElement(BrowserCol, { id: "name", label: __("Name"), sortBy: self.state.sortBy, onClick: self.toggleSortBy }),
-	                        React.makeElement(BrowserCol, { id: "size", label: __("Size"), sortBy: self.state.sortBy, onClick: self.toggleSortBy })
+	                        React.makeElement(BrowserCol, { id: "name", label: __(l[86]), sortBy: self.state.sortBy, onClick: self.toggleSortBy }),
+	                        React.makeElement(BrowserCol, { id: "size", label: __(l[87]), sortBy: self.state.sortBy, onClick: self.toggleSortBy })
 	                    )
 	                )
 	            ),
 	            React.makeElement(BrowserEntries, {
-	                entries: self.getEntries(),
+	                entries: entries,
 	                onExpand: function onExpand(node) {
 	                    self.onSelected([]);
 	                    self.onHighlighted([]);
@@ -10532,7 +10534,7 @@ React.makeElement = React['createElement'];
 	        }
 	    }
 
-	    sectionUIopen('conversations');
+	    M.onSectionUIOpen('conversations');
 
 	    self.megaChat.currentlyOpenedChat = self.roomJid;
 	    self.megaChat.lastOpenedChat = self.roomJid;
@@ -10751,6 +10753,7 @@ React.makeElement = React['createElement'];
 
 	    var nodesMeta = [];
 	    $.each(ids, function (k, nodeId) {
+
 	        var node = M.d[nodeId];
 	        nodesMeta.push({
 	            'u': node.u,

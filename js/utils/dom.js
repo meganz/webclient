@@ -30,15 +30,13 @@ function parseHTML(markup, forbidStyle, doc, baseURI, isXML) {
             if (!baseURI) {
                 var href = getAppBaseUrl();
                 if (!parseHTML.baseURIs[href]) {
-                    parseHTML.baseURIs[href] =
-                        Services.io.newURI(href, null, null);
+                    parseHTML.baseURIs[href] = Services.io.newURI(href, null, null);
                 }
                 baseURI = parseHTML.baseURIs[href];
             }
             // XXX: parseFragment() removes href attributes with a hash mask
             markup = String(markup).replace(/\shref="[#\/]/g, ' data-fxhref="#');
-            return mozParserUtils.parseFragment(markup, flags, Boolean(isXML),
-                baseURI, doc.documentElement);
+            return mozParserUtils.parseFragment(markup, flags, Boolean(isXML), baseURI, doc.documentElement);
         }
         catch (ex) {
             mozError(ex);
@@ -56,7 +54,7 @@ function parseHTML(markup, forbidStyle, doc, baseURI, isXML) {
         });
     return fragment;
 }
-parseHTML.baseURIs = {};
+parseHTML.baseURIs = Object.create(null);
 
 /**
  * Handy printf-style parseHTML to apply escapeHTML

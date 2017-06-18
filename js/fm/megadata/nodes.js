@@ -1547,7 +1547,7 @@ MegaData.prototype.leaveShare = function(h) {
 /**
  * Retrieve node share.
  * @param {String|Object} node cloud node or handle
- * @param {String} user The user's handle
+ * @param {String} [user] The user's handle
  * @return {Object} the share object, or false if not found.
  */
 MegaData.prototype.getNodeShare = function(node, user) {

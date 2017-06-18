@@ -498,7 +498,7 @@ MegaData.prototype.dlprogress = function(id, perc, bl, bt, kbps, dl_queue_num, f
                 $tr.find('.eta').addClass('unknown').text('');
             }
             if (bps > 0) {
-                $tr.find('.speed').safeHTML(bytesToSize(bps, 1, 1) + '/s').removeClass('unknown');
+                $tr.find('.speed').html(bytesToSize(bps, 1, 1) + '/s').removeClass('unknown');
             }
             else {
                 $tr.find('.speed').addClass('unknown').text('');
@@ -1151,7 +1151,7 @@ MegaData.prototype.ulprogress = function(ul, perc, bl, bt, bps) {
             $tr.find('.eta').addClass('unknown').text('');
         }
         if (bps > 0) {
-            $tr.find('.speed').safeHTML(bytesToSize(bps, 1, 1) + '/s').removeClass('unknown');
+            $tr.find('.speed').html(bytesToSize(bps, 1, 1) + '/s').removeClass('unknown');
         }
         else {
             $tr.find('.speed').addClass('unknown').text('');

@@ -1944,7 +1944,7 @@ var exportExpiry = {
 
     /**
      * Returns true in case that any of checked items is taken down, otherwise false
-     * @param {Array} nodesId Array of strings nodes ids
+     * @param {Array|String} nodesId Array of strings nodes ids
      * @returns {Boolean}
      */
     ExportLink.prototype.isTakenDown = function(nodesId) {

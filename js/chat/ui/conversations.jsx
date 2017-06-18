@@ -341,7 +341,7 @@ var ConversationsApp = React.createClass({
     },
     componentDidMount: function() {
         var self = this;
-        
+
         window.addEventListener('resize', this.handleWindowResize);
         $(document).rebind('keydown.megaChatTextAreaFocus', function(e) {
             // prevent recursion!
@@ -536,7 +536,7 @@ var ConversationsApp = React.createClass({
                         <PerfectScrollbar style={leftPanelStyles}>
                             <div className={
                                 "content-panel conversations" + (
-                                    
+
 									getSitePath().indexOf("/chat") !== -1 ? " active" : ""
                                 )
                             }>
@@ -550,7 +550,7 @@ var ConversationsApp = React.createClass({
                     <div className="fm-empty-pad">
                         <div className="fm-empty-messages-bg"></div>
                         <div className="fm-empty-cloud-txt">{__(l[6870])}</div>
-                        <div className="fm-not-logged-text">                            
+                        <div className="fm-not-logged-text">
                             <div className="fm-not-logged-description" dangerouslySetInnerHTML={{
                                 __html: __(l[8762])
                                      .replace("[S]", "<span className='red'>")
@@ -568,7 +568,7 @@ var ConversationsApp = React.createClass({
                         {...this.props}
                         conversations={this.props.megaChat.chats}
                         />
-                        
+
                 </div>
             </div>
         );

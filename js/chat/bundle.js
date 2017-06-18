@@ -10433,7 +10433,12 @@ React.makeElement = React['createElement'];
 	    var self = this;
 	    if (this.type == "private") {
 	        var participants = self.getParticipantsExceptMe();
-	        return self.megaChat.getContactNameFromJid(participants[0]);
+	        var name = self.megaChat.getContactNameFromJid(participants[0]);
+	        if (!name) {
+	            return "";
+	        } else {
+	            return name;
+	        }
 	    } else {
 	        if (self.topic && self.topic.substr) {
 	            return self.topic.substr(0, 30);

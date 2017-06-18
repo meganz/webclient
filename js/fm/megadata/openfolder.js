@@ -185,7 +185,14 @@
                     else f++;
                 }
 
-                api_req({a: 'fcv', h: this.currentdirid, f: f, d: t, sn: currsn});
+                api_req({
+                    a: 'fcv',
+                    h: this.currentdirid,
+                    f: f,
+                    d: t,
+                    sn: currsn,
+                    db: mega.fcv_db | 0
+                });
             }
 
             Soon(function() {

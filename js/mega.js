@@ -1842,10 +1842,14 @@ function dbfetchfm() {
         var promise;
         if (mBroadcaster.crossTab.master && !localStorage.fmall) {
             promise = dbfetch.root();
+
+            mega.fcv_db = 1;
         }
         else {
             // fetch the whole cloud on slave tabs..
             promise = dbfetch.chunked(0);
+
+            mega.fcv_db = 2;
         }
 
         promise.always(function get_f(folders) {
@@ -1907,6 +1911,7 @@ function dbfetchfm() {
 
                         MegaPromise.allDone(promises).wait(function dbfetchfm_done() {
 
+                            mega.loadReport.mode = 1;
                             mega.loadReport.procNodeCount = Object.keys(M.d || {}).length;
                             mega.loadReport.procNodes     = Date.now() - mega.loadReport.stepTimeStamp;
                             mega.loadReport.stepTimeStamp = Date.now();

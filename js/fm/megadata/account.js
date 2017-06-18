@@ -2,8 +2,16 @@ MegaData.prototype.accountData = function(cb, blockui) {
     "use strict";
 
     var account = Object(this.account);
+    var reuseData = account.lastupdate > Date.now() - 30000;
 
-    if (account.lastupdate > Date.now() - 30000 && cb) {
+    if (reuseData && (!account.stats || !account.stats[M.RootID])) {
+        if (d) {
+            console.error('Track down how we get here...', M.RootID, account.stats && Object.keys(account.stats));
+        }
+        reuseData = false;
+    }
+
+    if (reuseData && cb) {
         cb(account);
     }
     else {

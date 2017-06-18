@@ -1449,7 +1449,9 @@ FileManager.prototype.initUIKeyEvents = function() {
             slideshow(slideshowid, true);
         }
         else if (e.keyCode == 27) {
-            $.hideTopMenu();
+            if ($.hideTopMenu) {
+                $.hideTopMenu();
+            }
         }
 
         if (sl && $.selectddUIgrid.indexOf('.grid-scrolling-table') > -1) {

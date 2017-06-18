@@ -101,11 +101,7 @@ function dashboardUI() {
 
     // Account data
     M.accountData(function(account) {
-
         var perc;
-        var perc_c;
-        var b_exceeded;
-        var s_exceeded;
 
         // Show ballance
         $('.account.left-pane.balance-info').text(l[7108]);
@@ -227,10 +223,8 @@ function dashboardUI() {
 
 
         /* Used Bandwidth progressbar */
-        $('.bandwidth .account.progress-bar.green')
-            .css('width', account.tfsq.perc + '%');
-        $('.bandwidth .account.progress-size.available-quota')
-            .text(bytesToSize(account.tfsq.left, 0));
+        $('.bandwidth .account.progress-bar.green').css('width', account.tfsq.perc + '%');
+        $('.bandwidth .account.progress-size.available-quota').text(bytesToSize(account.tfsq.left, 0));
 
         if (u_attr.p) {
             $('.account.widget.bandwidth').addClass('enabled-pr-bar');
@@ -292,7 +286,7 @@ function dashboardUI() {
         // Fill rest of widgets
         dashboardUI.updateWidgets();
 
-        Soon(fm_resize_handler);
+        onIdle(fm_resize_handler);
         initTreeScroll();
     });
 }

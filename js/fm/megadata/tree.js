@@ -175,6 +175,15 @@ MegaData.prototype.buildtree = function _buildtree(n, dialog, stype) {
             _sub = 'mctreesub_';
         }
 
+        if (folders.length) {
+            // render > if new folders found on an empty folder
+            ulc = $('#' + _a + n.h);
+
+            if (!ulc.hasClass('contains-folders')) {
+                ulc.addClass('contains-folders').find('span:first').addClass('nw-fm-arrow-icon');
+            }
+        }
+
         for (var idx = 0; idx < folders.length; idx++) {
 
             ulc = '';
@@ -183,10 +192,17 @@ MegaData.prototype.buildtree = function _buildtree(n, dialog, stype) {
             containsc = '';
             curItemHandle = folders[idx].h;
             undecryptableClass = '';
-            titleTooltip = '';
+            titleTooltip = [];
             fIcon = '';
 
             fName = folders[idx].name;
+
+            // Undecryptable node indicators
+            if (missingkeys[curItemHandle]) {
+                undecryptableClass = 'undecryptable';
+                fName = l[8686];
+                fIcon = 'generic';
+            }
 
             if (this.tree[curItemHandle]) {
                 containsc = 'contains-folders';
@@ -229,16 +245,16 @@ MegaData.prototype.buildtree = function _buildtree(n, dialog, stype) {
             }
             else {
 
-                // Undecryptable node indicators
-                if (missingkeys[curItemHandle]) {
-                    undecryptableClass = 'undecryptable';
-                    fName = l[8686];
-                    fIcon = 'generic';
-
-                    var exportLink = new mega.Share.ExportLink({});
-                    titleTooltip = exportLink.isTakenDown(curItemHandle) ? (l[7705] + '\n') : '';
-                    titleTooltip += l[8595];
+                if (M.getNodeShare(curItemHandle).down === 1) {
+                    // Taken down
+                    titleTooltip.push(l[7705]);
                 }
+
+                if (undecryptableClass) {
+                    // Undecryptable
+                    titleTooltip.push(l[8595]);
+                }
+                titleTooltip = titleTooltip.map(escapeHTML).join("\n");
 
                 sExportLink = Object(this.su.EXP)[curItemHandle] ? 'linked' : '';
                 arrowIcon = containsc ? 'class="nw-fm-arrow-icon"' : '';
@@ -286,7 +302,7 @@ MegaData.prototype.buildtree = function _buildtree(n, dialog, stype) {
                 _buildtree.call(this, folders[idx], dialog, stype);
             }
 
-            if (fminitialized && !is_mobile) {
+            if (fminitialized) {
                 var currNode = M.d[curItemHandle];
 
                 if ((currNode && currNode.shares) || M.ps[curItemHandle]) {

@@ -330,6 +330,8 @@ function bytesToSize(bytes, precision, html_format) {
         resultSize = parseInt(bytes);
         resultUnit = s_b;
     }
+
+    // XXX: If ever adding more HTML here, make sure it's safe and/or sanitize it.
     if (html_format === 2) {
         return resultSize + '<span>' + resultUnit + '</span>';
     }

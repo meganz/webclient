@@ -2137,7 +2137,8 @@ function parsepage(pagehtml, pp) {
 
     var $container = is_mobile ? $('body') : $('#startholder');
     $container
-        .safeHTML(translate(pages['transferwidget']) + pagehtml)
+        .safeHTML('<div class="nav-overlay"></div>' +
+            translate(pages['transferwidget']) + pagehtml)
         .show();
 
     clickURLs();

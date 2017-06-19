@@ -1207,7 +1207,7 @@ function fmtopUI() {
         }
     }
     $('.fm-clearbin-button').rebind('click', function() {
-        doClearbin(false);
+        doClearbin(true);
     });
 
     // handle the Inbox section use cases
@@ -1247,12 +1247,12 @@ function fmtopUI() {
     }
 }
 
-function doClearbin(selected)
-{
-    msgDialog('clear-bin', l[14], l[15], l[1007], function(e)
-    {
+function doClearbin(all) {
+    "use strict";
+
+    msgDialog('clear-bin', l[14], l[15], l[1007], function(e) {
         if (e) {
-            M.clearRubbish(selected);
+            M.clearRubbish(all);
         }
     });
 }

@@ -52,6 +52,19 @@
     MegaData.prototype.delNode = function(h, ignoreDB) {
         var delInShareQ = delInShareQueue[h] = delInShareQueue[h] || [];
 
+        if (fminitialized) {
+            // Handle Inbox/RubbishBin UI changes
+            delay(fmtopUI);
+
+            // Update M.v it's used for at least preview slideshow
+            for (var k = this.v.length; k--;) {
+                if (this.v[k].h === h) {
+                    this.v.splice(k, 1);
+                    break;
+                }
+            }
+        }
+
         // remove ufssizecache records
         ufsc.delNode(h, ignoreDB);
 
@@ -65,19 +78,6 @@
                 fmdb.del('s', delInShareQ[i]);
             }
             delete delInShareQueue[h];
-        }
-
-        if (fminitialized) {
-            // Handle Inbox/RubbishBin UI changes
-            delay('fmtopUI', fmtopUI);
-
-            // Update M.v it's used for at least preview slideshow
-            for (var k = this.v.length; k--;) {
-                if (this.v[k].h === h) {
-                    this.v.splice(k, 1);
-                    break;
-                }
-            }
         }
     };
 })(this);
@@ -223,98 +223,64 @@ MegaData.prototype.getPath = function(id) {
     return result;
 };
 
+/**
+ * Handle rubbish bin permanent items removal
+ * How this works?
+ * In case that param 'all' is true, then all items from rubbish are removed
+ * In case that param 'all' is false, then selected nodes/items are removed and all child nodes/items if any
+ * @param {Boolean} all To remove all or just selected nodes/items
+ */
+MegaData.prototype.clearRubbish = function(all) {
+    "use strict";
 
-MegaData.prototype.clearRubbish = function(sel) {
-    if (d) {
-        console.log('clearRubbish', sel);
-        console.time('clearRubbish');
-    }
-    var selids = Object.create(null);
-    var c = this.c[sel === false ? this.RubbishID : this.currentdirid];
-    var reqs = 0;
+    var selids;
+    var success = 0;
+    var idtag = mRandomToken('cr');
+    var promise = new MegaPromise();
 
-    if (sel && $.selected) {
-        for (var i in $.selected) {
-            if ($.selected.hasOwnProperty(i)) {
-                selids[$.selected[i]] = 1;
-            }
-        }
-    }
-
-    loadingDialog.show();
-
-    var done = function() {
-        if (d) {
-            console.timeEnd('clearRubbish');
-        }
-        loadingDialog.hide();
-
-        var hasItems = false;
-        if (sel) {
-            for (var h in c) {
-                hasItems = true;
-                break;
-            }
-        }
-
-        if (!hasItems) {
-            $('#treesub_' + M.RubbishID).remove();
-            $('.fm-tree-header.recycle-item').removeClass('contains-subfolders expanded recycle-notification');
-
-            if (M.RubbishID === M.currentdirid) {
-                $('.grid-table.fm tr').remove();
-                $('.file-block').remove();
-                $('.fm-empty-trashbin').removeClass('hidden');
-            }
-        }
-
-        if (M.RubbishID === M.currentrootid) {
-            M.addViewUI(true);
-        }
-        fmtopUI();
-        M.addTreeUIDelayed();
-    };
-
-    var apiReq = function(handle) {
-        api_req({
-            a: 'd',
-            n: handle
-            //, i: requesti - DB update only upon receipt of actionpacket!
-        }, {
-            callback: function(res, ctx) {
+    var apiReq = function apiReq(handle) {
+        api_req({a: 'd', n: handle, i: idtag}, {
+            callback: function(res) {
                 if (res !== 0) {
-                    console.error('Failed to delete node from rubbish bin', handle, res);
+                    console.warn('Failed to delete node with handle: ' + handle + ' Result: ' + res);
                 }
                 else {
-                    var h = handle;
-
-                    M.delNode(h, true);
-
-                    if (sel) {
-                        $('.grid-table.fm#' + h).remove();
-                        $('#' + h + '.file-block').remove();
-                    }
-                }
-
-                if (!--reqs) {
-                    done();
+                    success++;
                 }
             }
         });
     };
 
-    for (var h in c) {
-        if (!sel || selids[h]) {
-            reqs++;
-            apiReq(h);
-        }
+    if (all) {
+        // Completely empty rubbish
+        selids = Object.keys(this.c[M.RubbishID]);
+    }
+    else {
+        // Remove only selected items, not all at once
+        selids = $.selected || [];
     }
 
-    if (!reqs) {
-        done();
+    if (selids.length) {
+        loadingDialog.show();
+
+        M.scAckQueue[idtag] = function() {
+            loadingDialog.hide();
+
+            if (success === selids.length) {
+                promise.resolve();
+            }
+            else {
+                promise.reject(selids.length - success);
+            }
+        };
+        selids.forEach(apiReq);
     }
+    else {
+        promise.reject(EINCOMPLETE);
+    }
+
+    return promise;
 };
-
 
 // This function has a special hacky purpose, don't use it if you don't know what it does, use M.copyNodes instead.
 MegaData.prototype.injectNodes = function(nodes, target, callback) {

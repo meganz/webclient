@@ -387,10 +387,12 @@
             $('.fm-file-upload').append('<input type="file" id="fileselect1" multiple="">');
             $('.fm-folder-upload input').remove();
             $('.fm-folder-upload').append('<input type="file" id="fileselect2" webkitdirectory="" multiple="">');
-            $('.context-menu-item.fileupload-item label input').remove();
-            $('.context-menu-item.fileupload-item label').append('<input type="file" id="fileselect3" class="hidden" name="fileselect3" multiple="">');
-            $('.context-menu-item.folderupload-item label input').remove();
-            $('.context-menu-item.folderupload-item label').append('<input type="file" id="fileselect4" name="fileselect4" webkitdirectory="" multiple="" class="hidden">');
+            $('input#fileselect3').remove();
+            $('.files-menu .fileupload-item')
+                .after('<input type="file" id="fileselect3" class="hidden" name="fileselect3" multiple="">');
+            $('input#fileselect4').remove();
+            $('.files-menu .folderupload-item').after('<input type="file" id="fileselect4"' +
+                ' name="fileselect4" webkitdirectory="" multiple="" class="hidden">');
             InitFileDrag();
         }
         return true;

@@ -59,7 +59,7 @@
     line-height: 47px;
     min-width: 220px;
     margin: 0 8px;
-    padding: 0 20px;
+    padding: 0 15px;
     display: inline-block;
     background-color: rgba(102,102,102,0.7);
     -moz-border-radius: 4px;
@@ -74,6 +74,11 @@
     white-space: nowrap;
     cursor: pointer;
     font-family: 'montserrat', sans-serif;
+    -webkit-transition: background-color 200ms ease-in-out;
+    -moz-transition: background-color 200ms ease-in-out;
+    -o-transition: background-color 200ms ease-in-out;
+    -ms-transition: background-color 200ms ease-in-out;
+    transition: background-color 200ms ease-in-out;
 }
 .startpage.button-48-height:hover {
     background-color: rgba(102,102,102,1);
@@ -263,6 +268,40 @@
     visibility: hidden;
     display: block;
 }
+.mobile .startpage.button-48-height {
+    height: 64px;
+    line-height: 63px;
+}
+.mobile .startpage.button-48-height.try-mega, .mobile .startpage.upload-cloud-icon {
+    display: none;
+}
+.mobile .startpage .mobile-apps-button {
+    margin: 0 8px;
+    display: inline-block;
+    vertical-align: top;
+    min-width: 220px;
+}
+.mobile .startpage .mobile-apps-button.ios {
+    background-position: 15px -887px;
+}
+.mobile .startpage .mobile-apps-button.wp {
+    width: 220px;
+    height: 64px;
+    background-position: 5px -777px;
+    background-size: 210px auto;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+}
+.mobile .startpage .mobile-apps-button.hidden {
+    display: none;
+}
+.mobile .startpage .bottom-page.top-header {
+    padding-top: 95px;
+}
+.mobile .startpage.buttons-block {
+    padding: 123px 0 0 0;
+}
 
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
 .reg-st3-membership-icon, .membership-icon, .pro-icon, div.pro-feature-icon, .startpage.mega-logo, .startpage.upload-cloud-icon, .bottom-page.scroll-icon, .startpage.white-question, .pages-nav.nav-icon, .bottom-page.big-icon, .startpage.medium-icon, .small-red-link i, .flip-bg, .startpage.quote-icon, .bottom-menu.logo, .loginrequired-dialog .fm-notification-icon, .top-arrow-icon {
@@ -292,6 +331,12 @@
     width: 853px;
     padding: 76px 0 94px 0;
     margin-left: 24px;
+}
+}
+
+@media only screen and (max-width: 583px) {
+.mobile.not-logged .startpage .mobile-apps-button {
+    display: none;
 }
 }
 
@@ -352,11 +397,20 @@
     padding: 0;
     margin: 0 -43px;
 }
+.mobile .startpage.buttons-block {
+    padding: 49px 0 11px 0;
+}
 }
 
 @media only screen and (max-height: 758px) {
 .startpage.upload-cloud-icon {
     margin: 12px auto -20px auto;
+}
+.mobile .startpage .bottom-page.top-header {
+    padding-top: 47px;
+}
+.mobile .startpage.buttons-block {
+    padding: 63px 0 61px 0;
 }
 }
 
@@ -370,11 +424,32 @@
 .bottom-page.asterisktext {
     margin-top: -35px;
 }
+.mobile .startpage.buttons-block {
+    padding: 49px 0 11px 0;
+}
+}
+
+@media only screen and (max-height: 570px) {
+.mobile .startpage.buttons-block {
+    padding: 36px 0 25px 0;
+}
+.mobile .startpage .bottom-page.top-header {
+    padding-top: 35px;
+}
 }
 
 @media only screen and (max-height: 555px) {
 .bottom-page.asterisktext {
     margin-top: -35px;
     margin-bottom: 40px;
+}
+}
+
+@media only screen and (max-width: 386px) {
+.mobile-apps-button.wp {
+    width: 220px;
+    height: 64px;
+    background-position: 5px -777px;
+    background-size: 210px auto;
 }
 }

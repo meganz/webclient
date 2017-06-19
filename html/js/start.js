@@ -15,6 +15,9 @@ function init_start() {
     if (!is_mobile && (page === 'start')) {
         InitFileDrag();
     }
+    else if (is_mobile && (page === 'start')) {
+        mobile.initMobileAppButton();
+    }
     else if (page === 'download') {
         $('.widget-block').hide();
     }

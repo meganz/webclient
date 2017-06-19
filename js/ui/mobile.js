@@ -152,7 +152,7 @@ var mobile = {
      */
     initMobileAppButton: function() {
 
-        var $appStoreButton = $('.download-app');
+        var $appStoreButton = $('.download-app, .startpage .mobile-apps-button');
 
         // Set the link
         $appStoreButton.attr('href', mobile.downloadOverlay.getStoreLink());

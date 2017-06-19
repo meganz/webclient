@@ -554,7 +554,7 @@ ul, li {
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
-.mobile.download-progress, .mobile.upload-progress, .downloading .mobile.red-button, .uploading .mobile.red-button  {
+.mobile.download-progress, .mobile.upload-progress, .downloading .mobile.red-button, .uploading .mobile.red-button {
     display: none;
 }
 .mobile.download-progress, .mobile.upload-progress {
@@ -1219,13 +1219,13 @@ input[type='checkbox'] {
     padding: 20px 0 20px 37px;
 }
 .mobile.sign-in .first-message, .mobile.register .first-message {
-	font-size: 15px;
-	line-height: 1.63;
-	color: #778187;
-	text-align: center;
-	margin: 20px auto 0 auto;
-	padding: 0 32px 0 32px;
-	max-width: 500px;
+    font-size: 15px;
+    line-height: 1.63;
+    color: #778187;
+    text-align: center;
+    margin: 20px auto 0 auto;
+    padding: 0 32px 0 32px;
+    max-width: 500px;
 }
 .mobile.sign-in .download-app, .mobile.register .download-app {
     margin: 15px auto 0 auto;
@@ -1597,21 +1597,21 @@ div.checkboxOn, div.checkboxOff {
     font-family: 'source_sans_proregular';
 }
 .mobile.grey-textarea.decryption-password {
-	height: auto;
+    height: auto;
 }
 .mobile.grey-textarea::-webkit-input-placeholder {
-    color: #8b8a8b;
+ color: #8b8a8b;
 }
 .mobile.grey-textarea:-moz-placeholder {
-    color: #8b8a8b;
-    opacity: 1;
+ color: #8b8a8b;
+ opacity: 1;
 }
 .mobile.grey-textarea::-moz-placeholder {
-    color: #8b8a8b;
-    opacity: 1;
+ color: #8b8a8b;
+ opacity: 1;
 }
 .mobile.grey-textarea::-ms-input-placeholder {
-    color: #8b8a8b;
+ color: #8b8a8b;
 }
 .mobile.decrypt-button .decrypting-spinner {
     display: none;
@@ -1636,7 +1636,7 @@ div.checkboxOn, div.checkboxOff {
     height: 28px;
 }
 .mobile.decrypt-button.decrypting.ios {
-	background-color: #EB4444;
+    background-color: #EB4444;
     cursor: default;
     opacity: 0.6;
 }
@@ -1875,7 +1875,7 @@ div.checkboxOn, div.checkboxOff {
 .mobile.download-progress .bar, .mobile.upload-progress .bar {
     height: 54px;
 }
-.wrong-file .mobile.white-block, .downloading .mobile.white-block, .uploading .mobile.white-block  {
+.wrong-file .mobile.white-block, .downloading .mobile.white-block, .uploading .mobile.white-block {
     bottom: -66px;
 }
 .mobile.application-txt {
@@ -1966,7 +1966,7 @@ div.checkboxOn, div.checkboxOff {
 .app-info-block .mobile.download-app {
     margin-bottom: 60px;
 }
-.wrong-file .mobile.white-block, .downloading .mobile.white-block, .uploading .mobile.white-block  {
+.wrong-file .mobile.white-block, .downloading .mobile.white-block, .uploading .mobile.white-block {
     position: relative;
     bottom: -94px;
     margin: 0 0 28px 0;

@@ -1862,6 +1862,7 @@ base64, PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJod…hlaWdodD0iMTAxIiBmaW
     right: 0;
     margin: auto;
     padding: 0 37px 0 1px;
+    max-height: 75.5%;
 }
 .bottom-page.img.android-top {
     bottom: 73px;

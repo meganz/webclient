@@ -611,6 +611,7 @@ MegaData.prototype.moveNodes = function moveNodes(n, t, quiet) {
                                 var h = ctx.handle;
                                 var t = ctx.target;
                                 var parent = node.p;
+                                var tn = null;
 
                                 // Update M.v it's used for slideshow preview at least
                                 for (var k = M.v.length; k--;) {
@@ -626,10 +627,24 @@ MegaData.prototype.moveNodes = function moveNodes(n, t, quiet) {
                                 if (typeof M.c[t] === 'undefined') {
                                     M.c[t] = Object.create(null);
                                 }
+                                if (node.t) {
+                                    tn = clone(M.tree[h]);
+
+                                    if (M.tree[parent]) {
+                                        delete M.tree[parent][h];
+
+                                        if (!$.len(M.tree[parent])) {
+                                            delete M.tree[parent];
+                                        }
+                                    }
+                                }
                                 M.c[t][h] = 1;
                                 ufsc.delNode(h);
                                 node.p = t;
                                 ufsc.addNode(node);
+                                if (tn) {
+                                    M.tree[h] = tn;
+                                }
                                 removeUInode(h, parent);
                                 M.nodeUpdated(node);
                                 newnodes.push(node);
@@ -783,10 +798,10 @@ MegaData.prototype.nodeUpdated = function(n, ignoreDB) {
                 c: n.hash || '',
                 d: n
             });
+        }
 
-            if (n.t) {
-                ufsc.addTreeNode(n);
-            }
+        if (n.t) {
+            ufsc.addTreeNode(n);
         }
 
         if (this.nn && n.name) {

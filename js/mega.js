@@ -1670,7 +1670,10 @@ function worker_procmsg(ev) {
             }
 
             emplacenode(ev.data);
-            ufsc.feednode(ev.data);
+
+            if (ufsc.cache) {
+                ufsc.feednode(ev.data);
+            }
         }
     }
     else if (ev.data[0] === 'console') {

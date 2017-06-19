@@ -1431,6 +1431,7 @@ else if (!b_u) {
                         return "'" + (a.origin !== 'null' && a.origin
                             || (a.protocol + '//' + a.hostname)) + "...'";
                     })
+                    .replace(/(Cannot read property )('[\w-]{8}')/, "$1'<h>?'")
                     .replace(/(Access to '\.\.).*(' from script denied)/, '$1$2')
                     .replace(/gfs\w+\.userstorage/, 'gfs...userstorage')
                     .replace(/^Uncaught\W*(?:exception\W*)?/i, ''),

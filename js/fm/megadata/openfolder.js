@@ -180,12 +180,24 @@
             if (fcv_watch[this.currentrootid] /*&& !(Date.now() % 10)*/) {
                 var f = 0;
                 var t = 0;
+                var n = this.d[this.currentdirid] || false;
+
                 for (var i = this.v.length; i--;) {
                     if (this.v[i].t) t++;
                     else f++;
                 }
 
-                api_req({a: 'fcv', h: this.currentdirid, f: f, d: t, sn: currsn, db: mega.fcv_db | 0}, 0, pfid ? 1 : 0);
+                api_req({
+                    a: 'fcv',
+                    h: this.currentdirid,
+                    f: f,
+                    d: t,
+                    td: n.td,
+                    tf: n.tf,
+                    tb: n.tb,
+                    sn: currsn,
+                    db: mega.fcv_db | 0
+                }, {}, pfid ? 1 : 0);
             }
 
             Soon(function() {

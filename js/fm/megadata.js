@@ -111,7 +111,8 @@ function MegaData() {
         'interaction': this.sortByInteraction.bind(this),
         'access': this.sortByAccess.bind(this),
         'status': this.sortByStatus.bind(this),
-        'fav': this.sortByFav.bind(this)
+        'fav': this.sortByFav.bind(this),
+        'email': this.sortByEmail.bind(this)
     };
 
     /** EventListener interface. */

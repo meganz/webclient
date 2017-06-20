@@ -3337,7 +3337,7 @@ img.blog-new-logos {
     border: 0;
     margin: 0 0 10px 0;
     padding: 0;
-    height: 2px;
+    height: 1px;
     background-color: rgba(0,0,0,0.1);
 }
 .new-bottom-pages.investors-nw hr.pdf-div {
@@ -3385,7 +3385,7 @@ img.blog-new-logos {
     text-overflow: ellipsis;
 }
 .new-bottom-pages.investors-nw {
-    padding-bottom: 40px;
+    padding-bottom: 63px;
 }
 .investors-pdf-date {
     color: #666666;
@@ -13445,7 +13445,7 @@ h5.main-italic-header {
     padding: 46px 15px 73px 15px;
 }
 .new-bottom-pages hr, .bottom-pages-dialog .bp-main hr {
-    height: 2px;
+    height: 1px;
     background-color: #e5e5e5;
     margin: 28px -20px 6px -20px;
     padding: 0;
@@ -14791,6 +14791,10 @@ a.contact-new-button:hover {
 .new-right-content-block {
     margin-left: 241px;
     padding: 10px 0 0 50px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    min-height: 500px;
 }
 .new-left-menu-link {
     height: 40px;

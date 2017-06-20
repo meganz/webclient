@@ -32,6 +32,7 @@
     background-color: #f44;
     /*background-image: linear-gradient(-180deg, #f4f4f4 70%, #fafafa 100%);*/
     height: 240px;
+    margin-top: 36px;
 }
 #help2-main .client-heading {
     color: #bbb;

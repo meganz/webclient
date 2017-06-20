@@ -266,16 +266,6 @@ function init_page() {
         $('body').addClass('rtl');
     }
 
-    if ($.startscroll) {
-        delete $.startscroll;
-    }
-    if ($.dlscroll) {
-        delete $.dlscroll;
-    }
-    if ($.infoscroll) {
-        delete $.infoscroll;
-    }
-
     // If on the plugin page, show the page with the relevant extension for their current browser
     if (page == 'plugin') {
         page = (window.chrome) ? 'chrome' : 'firefox';
@@ -493,6 +483,8 @@ function init_page() {
         }
 
         doRenderCorpPage();
+        bottompage.init();
+        scrollMenu();
         page = 'cpage';
     }
     else if (page.substr(0, 5) == 'page_') {
@@ -2183,20 +2175,6 @@ function loadSubPage(tpage, event)
 
     if (folderlink) {
         flhashchange = true;
-    }
-
-    if (tpage == 'info' && page == 'start') {
-        if (!$.infoscroll) {
-            startpageScroll();
-        }
-        return false;
-    }
-
-    if ((!tpage || tpage === 'start') && page === 'start') {
-        if ($.infoscroll) {
-            startpageMain();
-        }
-        return false;
     }
 
     if ((tpage === page) && !folderlink) {

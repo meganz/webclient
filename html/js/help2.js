@@ -137,7 +137,12 @@ var Help = (function() {
 
 
     function scrollTo(selector) {
-        /* TODO scroll to necessary content */
+        var $target = $(selector);
+        if ($target.length ) {
+            $('.bottom-page.scroll-block').stop().animate({
+                scrollTop: $target.position().top
+            }, 1000);
+        }
     }
 
     function filterContentByTag(tag) {
@@ -799,7 +804,7 @@ var Help = (function() {
         $('#help2-main').find('.scrollTo').rebind('click', function() {
             var $this = $(this);
             if (!$this.is('.gray-inactive')) {
-                scrollTo($($(this).data('to')));
+                scrollTo('#' + $(this).data('to'));
             }
             return false;
         });

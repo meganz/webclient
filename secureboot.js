@@ -1262,7 +1262,7 @@ if (m && ((!localStorage.signUpStartedInMobileWeb && page.substr(0, 7) === 'conf
 
     // AMO: Markup should not be passed to `innerHTML` dynamically. -- This isnt reached for the extension, anyway
     // jscs:disable
-    document.body.innerHTML = '<div class="main-scroll-block"><div class="main-content-block">'
+    document.body.innerHTML = '<div class="bottom-page scroll-block"><div class="main-content-block">'
                             + '<div class="free-green-tip"></div><div class="main-centered-bl">'
                             + '<div class="main-logo"></div><div class="main-head-txt" id="m_title"></div>'
                             + '<div class="main-head-txt" id="m_desc"></div><br /><br />'

@@ -61,6 +61,28 @@ MegaData.prototype.sortByName = function(d) {
     this.sort();
 };
 
+MegaData.prototype.sortByEmail = function(d) {
+    "use strict";
+
+    if (typeof Intl !== 'undefined' && Intl.Collator) {
+        var intl = new Intl.Collator('co', {numeric: true});
+
+        this.sortfn = function(a, b, d) {
+            return intl.compare(a.m, b.m) * d;
+        };
+    }
+    else {
+        this.sortfn = function(a, b, d) {
+            if (typeof a.m === 'string' && typeof b.m === 'string') {
+                return a.m.localeCompare(b.m) * d;
+            }
+            return -1;
+        };
+    }
+    this.sortd = d;
+    this.sort();
+};
+
 MegaData.prototype.sortByModTime = function(d) {
     this.sortfn = function(a, b, d) {
         return (a.mtime < b.mtime) ? -1 * d : d;

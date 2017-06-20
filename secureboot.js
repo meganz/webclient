@@ -39,7 +39,7 @@ var is_chrome_firefox = document.location.protocol === 'chrome:'
 var is_extension = is_chrome_firefox || is_electron || document.location.href.substr(0,19) == 'chrome-extension://';
 var is_mobile = m = isMobile();
 var is_ios = is_mobile && (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1);
-
+var is_bot = !is_extension && /bot|crawl/i.test(ua);
 
 /**
  * Check if the user is coming from a mobile device
@@ -512,6 +512,11 @@ if (typeof history == 'undefined') hashLogic=true;
 
 var bootstaticpath = staticpath;
 var urlrootfile = '';
+
+// Disable hash checking for search engines to speed the site load up
+if (is_bot) {
+    nocontentcheck = true;
+}
 
 if (!b_u && is_extension)
 {
@@ -1621,12 +1626,12 @@ else if (!b_u) {
     var detectLang = function() {
 
         // Get the preferred language in their browser
-        var userLang = (navigator.languages) ? navigator.languages[0] : (navigator.language || navigator.userLanguage);
+        var userLang = null;
         var langCode = null;
         var langCodeVariant = null;
 
         // If a search bot, they may set the URL as e.g. mega.nz/pro?es so get the language from that
-        if (is_search_engine_bot && locationSearchParams !== '') {
+        if (is_bot && locationSearchParams !== '') {
             userLang = locationSearchParams.replace('?', '');
         }
         else {
@@ -1906,8 +1911,8 @@ else if (!b_u) {
         jsl.push({f:'css/mobile.css', n: 'mobile_css', j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'css/spinners.css', n: 'spinners_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
         jsl.push({f:'css/toast.css', n: 'toast_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
-        jsl.push({f:'html/mobile.html', n: 'fm_mobile', j: 0, w: 1});
-        jsl.push({f:'js/ui/mobile.js', n: 'fm_mobile_js', j: 1, w: 1});
+        jsl.push({f:'html/mobile.html', n: 'mobile', j: 0, w: 1});
+        jsl.push({f:'js/ui/mobile.js', n: 'mobile_js', j: 1, w: 1});
         jsl.push({f:'js/vendor/jquery.mobile.js', n: 'jquery_mobile_js', j: 1, w: 5});
     }
 

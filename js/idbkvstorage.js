@@ -16,18 +16,16 @@ IndexedDBKVStorage.prototype.prefillMemCache = function(fmdb) {
     var self = this;
     this.fmdb = fmdb;
 
-    var promise = new MegaPromise();
+    var promise = MegaPromise.resolve();
 
     if (fmdb) {
-        fmdb.get(this.name, function(r){
+        promise = fmdb.get(this.name);
+        promise.done(function(r) {
             for (var i = r.length; i--; ) {
                 self.dbcache[r[i].k] = r[i].v;
             }
-
-            promise.resolve();
         });
     }
-    else promise.resolve();
 
     return promise;
 };
@@ -136,7 +134,7 @@ IndexedDBKVStorage.prototype.destroy = function __IDBKVDestroy() {
 };
 
 /**
- * Clear DB contents.
+ * Clear DB Table contents.
  * @returns {MegaPromise}
  */
 IndexedDBKVStorage.prototype.clear = function __IDBKVClear() {

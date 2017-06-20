@@ -82,8 +82,12 @@
         Soon(aError.bind(window, new Error('Unknown FileSystem API.')));
     }
 
+    function isSecurityError(e) {
+        return Object(e).name === 'SecurityError';
+    }
+
     function checkSecurityError(e) {
-        if (Object(e).name === 'SecurityError') {
+        if (isSecurityError(e)) {
             window.Incognito = 0xC120E;
 
             /**
@@ -109,6 +113,27 @@
 
             return true;
         }
+    }
+
+    function onSecurityErrorSwitchMethod(dl, dl_id, e) {
+        if (checkSecurityError(e)) {
+            dlFatalError(dl, e, -0xDEADBEEF, 2);
+
+            onIdle(function() {
+                if (page !== 'download') {
+                    M.addWebDownload([dl_id]);
+                }
+                else {
+                    $.doFireDownload = true;
+                    M.resetUploadDownload();
+                    dlinfo(dlid, dlkey, false);
+                }
+            });
+
+            return true;
+        }
+
+        return false;
     }
 
     function clearit(storagetype, t, callback) {
@@ -259,7 +284,7 @@
             }
 
             if (max_retries) {
-                Later(dl_getspace.bind(this, reqsize, callback, --max_retries));
+                later(dl_getspace.bind(this, reqsize, callback, --max_retries));
             }
             else {
                 callback(aStorageType, aEvent, -1);
@@ -359,7 +384,7 @@
                 break;
             case 'InvalidStateError':
                 console.log('INVALID_STATE_ERROR in ' + type + ', retrying...');
-                Later(this.fsInitOp.bind(this));
+                later(this.fsInitOp.bind(this));
                 break;
             default:
                 console.error('Unexpected error...', e.code, e.name, e);
@@ -492,7 +517,7 @@
                     return;
                 }
 
-                if (aFail === -1) {
+                if (aFail === -1 && !isSecurityError(aEvent)) {
                     if (!$.msgDialog) {
                         srvlog('Out of HTML5 Offline Storage space (open)');
 
@@ -522,20 +547,7 @@
                     dl_filesize,
                     dl_createtmpfile,
                     function(e) {
-                        if (checkSecurityError(e)) {
-                            dlFatalError(dl, e, -0xDEADBEEF, 2);
-                            onIdle(function() {
-                                if (page !== 'download') {
-                                    M.addWebDownload([dl_id]);
-                                }
-                                else {
-                                    $.doFireDownload = true;
-                                    mega.utils.resetUploadDownload();
-                                    dlinfo(dlid, dlkey, false);
-                                }
-                            });
-                        }
-                        else {
+                        if (!onSecurityErrorSwitchMethod(dl, dl_id, e)) {
                             errorHandler.call(this, 'RequestFileSystem', e);
                         }
                     }.bind(this)
@@ -663,7 +675,7 @@
                 }
 
                 if (link) {
-                    Later(function() {
+                    later(function() {
                         myURL.revokeObjectURL(link);
                     });
                 }

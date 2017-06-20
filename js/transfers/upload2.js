@@ -51,6 +51,8 @@ var ulmanager = {
     ulPendingCompletion: [],
     ulBlockSize: 131072,
     ulBlockExtraSize: 1048576,
+    ulMaxFastTrackSize: 1048576 * 3,
+    ulMaxConcurrentSize: 1048576 * 10,
     logger: MegaLogger.getLogger('ulmanager'),
 
     // Errors megad might return while uploading
@@ -87,7 +89,7 @@ var ulmanager = {
             }
 
             delete this._multiAbort;
-            Soon(mega.utils.resetUploadDownload);
+            Soon(M.resetUploadDownload);
         }
         else {
             if (typeof gid === 'object') {
@@ -123,7 +125,7 @@ var ulmanager = {
                 ul_queue[idx] = Object.freeze({});
             });
             if (!this._multiAbort) {
-                Soon(mega.utils.resetUploadDownload);
+                Soon(M.resetUploadDownload);
             }
         }
     },
@@ -372,59 +374,62 @@ var ulmanager = {
         if (d) {
             ulmanager.logger.info(file.name, "ul_finalize", file.target, target);
         }
-
         if (is_chrome_firefox && file._close) {
             file._close();
         }
         if (file.repair) {
-            file.target = M.RubbishID;
+            file.target = target = M.RubbishID;
         }
+        target = target || file.target || M.RootID;
 
         ASSERT(file.filekey, "*** filekey is missing ***");
 
-            var n = {
-                name: file.name,
-                hash: file.hash,
-                k: file.filekey
-            };
+        var n = {
+            name: file.name,
+            hash: file.hash,
+            k: file.filekey
+        };
 
-            var ea = ab_to_base64(crypto_makeattr(n));
-            var dir = target || file.target || M.RootID;
-            var faid = file.faid ? api_getfa(file.faid) : false;
-            var req = {
-                a: 'p',
-                t: dir,
-                n: [{
+        var req = {
+            a: 'p',
+            t: target,
+            n: [
+                {
                     h: file.response,
                     t: 0,
-                    a: ea,
-                    k: a32_to_base64(encrypt_key(u_k_aes, file.filekey))
-                }],
-                i: requesti
-            };
-            if (faid) {
-                req.n[0].fa = faid;
-            }
-            if (dir) {
-                var sn = fm_getsharenodes(dir);
-                if (sn.length) {
-                    req.cr = crypto_makecr([n], sn, false);
-                    req.cr[1][0] = file.response;
+                    a: ab_to_base64(crypto_makeattr(n)),
+                    k: target.length === 11
+                        ? base64urlencode(encryptto(target, a32_to_str(file.filekey)))
+                        : a32_to_base64(encrypt_key(u_k_aes, file.filekey))
                 }
-            }
+            ],
+            i: requesti
+        };
 
-            if (d) {
-                ulmanager.logger.info(file.name, "save to dir", dir, req);
-            }
+        if (file.faid) {
+            req.n[0].fa = api_getfa(file.faid);
+        }
 
-            api_req(req, {
-                target: dir,
-                ul_queue_num: file.pos,
-                size: file.size,
-                faid: file.faid,
-                file: file,
-                callback: ulmanager.ulCompletePending2
-            });
+        if (target) {
+            var sn = M.getShareNodesSync(target);
+            if (sn.length) {
+                req.cr = crypto_makecr([n], sn, false);
+                req.cr[1][0] = file.response;
+            }
+        }
+
+        if (d) {
+            ulmanager.logger.info("Completing upload for %s, into %s", file.name, target, req);
+        }
+
+        api_req(req, {
+            target: target,
+            ul_queue_num: file.pos,
+            size: file.size,
+            faid: file.faid,
+            file: file,
+            callback: ulmanager.ulCompletePending2
+        });
     },
 
     ulGetPostURL: function UM_ul_get_posturl(File) {
@@ -510,8 +515,15 @@ var ulmanager = {
 
         if (file.repair) {
             var ul_key = file.repair;
-            file.ul_key = [ul_key[0] ^ ul_key[4], ul_key[1] ^ ul_key[5], ul_key[2]
-                ^ ul_key[6], ul_key[3] ^ ul_key[7], ul_key[4], ul_key[5]];
+
+            file.ul_key = [
+                ul_key[0] ^ ul_key[4],
+                ul_key[1] ^ ul_key[5],
+                ul_key[2] ^ ul_key[6],
+                ul_key[3] ^ ul_key[7],
+                ul_key[4],
+                ul_key[5]
+            ];
         }
         else if (!file.ul_key) {
             file.ul_key = Array(6);
@@ -522,7 +534,7 @@ var ulmanager = {
         }
 
         file.ul_keyNonce = JSON.stringify(file.ul_key);
-        file.ul_macs = [];
+        file.ul_macs = Object.create(null);
         file.totalbytessent = 0;
         file.ul_readq = [];
         file.ul_plainq = {};
@@ -603,25 +615,14 @@ var ulmanager = {
         if (d) {
             ulmanager.logger.info("ul_completepending2", res, ctx);
         }
-        if (typeof res === 'object' && res.f) {
-            var n = res.f[0];
 
-            if (ctx.faid) {
-                storedattr[ctx.faid].target = res.f[0].h;
-            }
-
-            newnodes = [];
-            process_f(res.f);
-            renderNew();
-            if (M.viewmode) {
-                fm_thumbnails();
-            }
-            if (ctx.faid) {
-                api_attachfileattr(n.h, ctx.faid);
+        var onSuccess = function(h) {
+            if (ctx.faid && h) {
+                api_attachfileattr(h, ctx.faid);
             }
             if (ul_queue[ctx.ul_queue_num]) {
-                ulmanager.ulIDToNode[ulmanager.getGID(ul_queue[ctx.ul_queue_num])] = n.h;
-                onUploadSuccess(ul_queue[ctx.ul_queue_num], n.h, ctx.faid);
+                ulmanager.ulIDToNode[ulmanager.getGID(ul_queue[ctx.ul_queue_num])] = h || ctx.target;
+                onUploadSuccess(ul_queue[ctx.ul_queue_num], h || false, ctx.faid);
             }
             if (ctx.file._replaces) {
                 M.moveNodes([ctx.file._replaces], M.RubbishID, true);
@@ -629,10 +630,32 @@ var ulmanager = {
             ctx.file.ul_failed = false;
             ctx.file.retries = 0;
             ulmanager.ulCompletePending(ctx.target);
+        };
+
+        if (typeof res === 'object' && res.f) {
+            var n = res.f[0];
+
+            if (ctx.faid) {
+                storedattr[ctx.faid].target = n.h;
+            }
+
+            newnodes = [];
+            process_f(res.f);
+            M.updFileManagerUI();
+            if (M.viewmode) {
+                fm_thumbnails();
+            }
+            onSuccess(n.h);
+        }
+        else if (res === 0) {
+            if (String(ctx.target).length !== 11) {
+                ulmanager.logger.warn('unexpected upload completion reply.');
+            }
+            onSuccess();
         }
         else {
             var fileName = htmlentities(ctx.file.name);
-            Later(mega.utils.resetUploadDownload);
+            later(M.resetUploadDownload);
             Soon(function() {
 
                 // If over quota show a special warning popup
@@ -657,7 +680,7 @@ var ulmanager = {
         }
     },
 
-    ulDeDuplicate: function UM_ul_deduplicate(File, identical) {
+    ulDeDuplicate: function UM_ul_deduplicate(File, identical, mNode) {
         var n;
         var uq = File.ul;
         if (identical && fmconfig.ul_skipIdentical) {
@@ -667,14 +690,14 @@ var ulmanager = {
             return ulmanager.ulStart(File);
         }
         else if (M.h[uq.hash]) {
-            n = M.d[M.h[uq.hash][0]];
+            n = mNode || M.d[M.h[uq.hash].first];
             // identical = n;
         }
         if (!n) {
             return ulmanager.ulStart(File);
         }
         if (d) {
-            ulmanager.logger.info(File.file.name, "ul_deduplicate", n);
+            ulmanager.logger.debug('[%s] deduplicating file %s', n.h, File.file.name, n);
         }
         api_req({
             a: 'g',
@@ -686,6 +709,9 @@ var ulmanager = {
             n: n,
             skipfile: (fmconfig.ul_skipIdentical && identical),
             callback: function(res, ctx) {
+                if (d) {
+                    ulmanager.logger.debug('[%s] deduplication result:', ctx.n.h, res.e, res, ctx.skipfile);
+                }
                 if (oIsFrozen(File)) {
                     ulmanager.logger.debug('Upload aborted on deduplication...', File);
                 }
@@ -721,15 +747,13 @@ var ulmanager = {
         var nodes = M.c[file.target];
         if (nodes) {
             for (var node in nodes) {
-                if (nodes.hasOwnProperty(node)) {
-                    node = M.d[node];
+                node = M.d[node];
 
-                    if (node
-                            && file.size === node.s
-                            && file.name === node.name
-                            && file.hash === node.hash) {
-                        return node;
-                    }
+                if (node
+                        && file.size === node.s
+                        && file.name === node.name
+                        && file.hash === node.hash) {
+                    return node;
                 }
             }
         }
@@ -741,19 +765,61 @@ var ulmanager = {
      *
      * @param {Object}  aFileUpload  FileUpload instance
      * @param {Object}  aFile        File API interface instance
+     * @param {Boolean} aForce       Ignore locking queue.
      */
-    ulSetup: function ulSetup(aFileUpload, aFile) {
+    ulSetup: function ulSetup(aFileUpload, aFile, aForce) {
         assert(aFileUpload.file === aFile, 'Unexpected FileUpload instance.');
         assert(aFile.hash, 'Fingerprint missing.');
 
-        var identical = this.ulIdentical(aFile);
-        this.logger.info(aFile.name, "fingerprint", M.h[aFile.hash], identical);
+        if (!aForce) {
+            if (this.ulSetupQueue) {
+                return this.ulSetupQueue.push(aFileUpload);
+            }
+            this.ulSetupQueue = [];
+        }
 
-        if (M.h[aFile.hash] || identical) {
-            this.ulDeDuplicate(aFileUpload, identical);
+        var hashNode;
+        var startUpload = function _startUpload() {
+
+            if (ulmanager.ulSetupQueue.length) {
+                var upload = ulmanager.ulSetupQueue.shift();
+                onIdle(ulmanager.ulSetup.bind(ulmanager, upload, upload.file, true));
+            }
+            else {
+                ulmanager.ulSetupQueue = null;
+            }
+
+            var identical = ulmanager.ulIdentical(aFile);
+            ulmanager.logger.info(aFile.name, "fingerprint", aFile.hash, M.h[aFile.hash], identical);
+
+            if (M.h[aFile.hash] || identical) {
+                ulmanager.ulDeDuplicate(aFileUpload, identical, hashNode);
+            }
+            else {
+                ulmanager.ulStart(aFileUpload);
+            }
+        };
+
+        var promises = [];
+
+        if (!M.c[aFile.target]) {
+            promises.push(dbfetch.get(aFile.target, new MegaPromise()));
+        }
+
+        if (!M.h[hash] || !M.d[M.h[hash].first]) {
+            promises.push(
+                dbfetch.hash(aFile.hash)
+                    .always(function(node) {
+                        hashNode = node;
+                    })
+            );
+        }
+
+        if (promises.length) {
+            MegaPromise.allDone(promises).wait(startUpload);
         }
         else {
-            this.ulStart(aFileUpload);
+            startUpload();
         }
     }
 };
@@ -813,7 +879,7 @@ ChunkUpload.prototype.updateprogress = function() {
     // only start measuring progress once the TCP buffers are filled
     // (assumes a modern TCP stack with a large intial window)
     if (!this.file.speedometer && this.file.progressevents > 5) {
-        this.file.speedometer = bucketspeedometer(tp);
+        this.file.speedometer = Speedometer(tp);
     }
     this.file.progressevents = (this.file.progressevents || 0) + 1;
 
@@ -897,20 +963,30 @@ ChunkUpload.prototype.onXHRready = function(xhrEvent) {
 
             if (response.byteLength === 36) {
                 var ul_key = this.file.ul_key;
-                var t = Object.keys(this.file.ul_macs);
+                var t = Object.keys(this.file.ul_macs).map(Number);
                 t.sort(function(a, b) {
-                        return parseInt(a) - parseInt(b);
-                    });
+                    return a - b;
+                });
                 for (var i = 0; i < t.length; i++) {
                     t[i] = this.file.ul_macs[t[i]];
                 }
                 var mac = condenseMacs(t, this.file.ul_key);
 
-                var filekey = [ul_key[0] ^ ul_key[4], ul_key[1] ^ ul_key[5], ul_key[2]
-                        ^ mac[0] ^ mac[1], ul_key[3] ^ mac[2]
-                        ^ mac[3], ul_key[4], ul_key[5], mac[0] ^ mac[1], mac[2] ^ mac[3]];
+                var filekey = [
+                    ul_key[0] ^ ul_key[4],
+                    ul_key[1] ^ ul_key[5],
+                    ul_key[2] ^ mac[0] ^ mac[1],
+                    ul_key[3] ^ mac[2] ^ mac[3],
+                    ul_key[4],
+                    ul_key[5],
+                    mac[0] ^ mac[1],
+                    mac[2] ^ mac[3]
+                ];
 
-                if (u_k_aes && !this.file.ulCompletingPhase) {
+                if (!u_k_aes) {
+                    console.error('No master key found...');
+                }
+                else if (!this.file.ulCompletingPhase) {
                     var u8 = new Uint8Array(response);
 
                     this.file.filekey = filekey;
@@ -919,6 +995,7 @@ ChunkUpload.prototype.onXHRready = function(xhrEvent) {
                         ? ab_to_base64(response)
                         : ab_to_str(response);
                     ulmanager.ulFinalize(this.file);
+                    u8 = undefined;
                 }
                 else {
                     ASSERT(0, 'BUG: Assigning to file.completion which is unused.');
@@ -1161,9 +1238,9 @@ FileUpload.prototype.run = function(done) {
         ulmanager.ulStartingPhase = false;
         delete file.done_starting;
 
-        if (ulmanager.ulSize < ulmanager.ulBlockExtraSize) {
+        if (ulmanager.ulSize < ulmanager.ulMaxConcurrentSize) {
 
-            if (file.size < ulmanager.ulBlockSize) {
+            if (file.size < ulmanager.ulMaxFastTrackSize) {
                 var size = ulQueue.getSize();
                 var max  = ulQueue.maxActiveTransfers;
 
@@ -1239,7 +1316,7 @@ FileUpload.prototype.run = function(done) {
 
             if (!window['!ZeroByte']) {
                 window['!ZeroByte'] = true;
-                Later(firefoxDialog);
+                later(firefoxDialog);
                 msgDialog('warninga',
                     str_mtrunc(file.name, 40), msg, l[1677] + ': ' + (e.message || e.name || e));
             }
@@ -1362,7 +1439,7 @@ mBroadcaster.once('startMega', function _setupEncrypter() {
             context.suffix = '/' + context.start + '?c=' + base64urlencode(chksum(context.bytes.buffer));
             done();
         }
-    }, 4);
+    });
 
     ulmanager.logger.options.levelColors = {
         'ERROR': '#fe1111',

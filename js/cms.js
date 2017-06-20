@@ -312,7 +312,7 @@
 
     function loadSnapshot() {
         if (!jsl_loaded['cms_snapshot_js']) {
-            mega.utils.require('cms_snapshot_js').done(snapshot_ready);
+            M.require('cms_snapshot_js').done(snapshot_ready);
         }
     }
 

@@ -54,7 +54,7 @@ function FileIO(dl_id, dl) {
         dlLinkNode.download = name;
         dlLinkNode.href = file_url;
         dlLinkNode.click();
-        Later(function() {
+        later(function() {
             myURL.revokeObjectURL(file_url);
             file_url = undefined;
         });

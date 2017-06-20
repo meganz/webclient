@@ -49,7 +49,7 @@ if [ -n "$mergeResult" ]; then
     tar xfvz lang.tar.gz
 
     # Mark conflict resolved and commit changes
-    git add .
+    git add *.json
     git commit --no-edit
 
     echo

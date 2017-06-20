@@ -102,7 +102,7 @@ var dlmanager = {
         dlQueue.pause();
         dlmanager.dlGetUrl(dl, function(error, res, o) {
             if (error) {
-                return Later(this.newUrl.bind(this, dl));
+                return later(this.newUrl.bind(this, dl));
             }
             dl.url = res.g;
 
@@ -202,7 +202,7 @@ var dlmanager = {
             }
 
             delete this._multiAbort;
-            Soon(mega.utils.resetUploadDownload);
+            Soon(M.resetUploadDownload);
         }
         else {
             if (typeof gid === 'object') {
@@ -286,7 +286,7 @@ var dlmanager = {
             }
 
             if (!this._multiAbort) {
-                Soon(mega.utils.resetUploadDownload);
+                Soon(M.resetUploadDownload);
             }
         }
     },
@@ -390,7 +390,7 @@ var dlmanager = {
 
         if (code === EKEY) {
             // TODO: Check if other codes should raise abort()
-            Later(function() {
+            later(function() {
                 dlmanager.abort(dl, true);
             });
         }
@@ -1092,7 +1092,7 @@ var dlmanager = {
                             if (ui.value < account.servbw_limit) {
                                 // retry download if less quota was chosen...
                                 loadingDialog.show();
-                                mega.api.req({a: 'up', srvratio: ui.value})
+                                M.req({a: 'up', srvratio: ui.value})
                                     .always(function() {
                                         loadingDialog.hide();
                                         dlmanager._onQuotaRetry(true);
@@ -1189,12 +1189,12 @@ var dlmanager = {
 
                     // if a min version is required, check for it
                     if (minVersion) {
-                        var runningVersion = mega.utils.vtol(is.v);
+                        var runningVersion = M.vtol(is.v);
 
                         if (typeof minVersion !== 'number'
                                 || parseInt(minVersion) !== minVersion) {
 
-                            minVersion = mega.utils.vtol(minVersion);
+                            minVersion = M.vtol(minVersion);
                         }
 
                         if (runningVersion < minVersion) {
@@ -1219,7 +1219,7 @@ var dlmanager = {
 
         if (typeof megasync === 'undefined') {
             timeout = 4000;
-            mega.utils.require('megasync_js').always(loader);
+            M.require('megasync_js').always(loader);
         }
         else {
             loader();
@@ -1706,7 +1706,7 @@ DownloadQueue.prototype.push = function() {
     dl.io.progress = 0;
     dl.io.size = dl.size;
     dl.decrypter = 0;
-    dl.n = fm_safename(dl.n);
+    dl.n = M.getSafeName(dl.n);
 
     if (!dl.zipid) {
         dlmanager.dlWriter(dl);

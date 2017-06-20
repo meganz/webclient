@@ -260,9 +260,15 @@
     font-size: 14px;
     color: #bcbbb8;
     left: 0;
-    margin: -15px 0 0 0;
+    margin: 0 0 0 0;
     padding: 0 15px;
     visibility: visible;
+    position: absolute;
+    bottom: 83px;
+    width: 100%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
 .bottom-page.asterisktext.hidden {
     visibility: hidden;
@@ -338,6 +344,9 @@
 .mobile.not-logged .startpage .mobile-apps-button {
     display: none;
 }
+.startpage.button-48-height {
+    margin: 0 -20px;
+}
 }
 
 /* Mobile size */
@@ -393,10 +402,6 @@
     width: 210px;
     height: 70px
 }
-.bottom-page.asterisktext {
-    padding: 0;
-    margin: 0 -43px;
-}
 .mobile .startpage.buttons-block {
     padding: 49px 0 11px 0;
 }
@@ -421,9 +426,6 @@
 }
 
 @media only screen and (max-height: 640px) {
-.bottom-page.asterisktext {
-    margin-top: -35px;
-}
 .mobile .startpage.buttons-block {
     padding: 49px 0 11px 0;
 }
@@ -431,19 +433,13 @@
 
 @media only screen and (max-height: 570px) {
 .mobile .startpage.buttons-block {
-    padding: 36px 0 25px 0;
+    padding: 36px 0 55px 0;
 }
 .mobile .startpage .bottom-page.top-header {
     padding-top: 35px;
 }
 }
 
-@media only screen and (max-height: 555px) {
-.bottom-page.asterisktext {
-    margin-top: -35px;
-    margin-bottom: 40px;
-}
-}
 
 @media only screen and (max-width: 386px) {
 .mobile-apps-button.wp {

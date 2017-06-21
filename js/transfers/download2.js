@@ -869,7 +869,8 @@ var dlmanager = {
 
         $('.bottom-tips a', $dialog).rebind('click', function() {
             open(getAppBaseUrl() +
-                '#help/client/webclient/cloud-drive/576ca738886688e7028b4599'
+                '#help/client/webclient/cloud-drive/' +
+                'how-do-you-regulate-transfer-quota-utilisation'
             );
         });
 

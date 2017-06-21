@@ -2,8 +2,9 @@
     /** Our trusted public keys {{{ */
     var signPubKey = {
         "__global": [
-            "O1B2FzarfqzPUDKdOiPJvfEnx3QAc+xHW16CEItjtgg=",
-            "rRHOm8BpMsYsSnSlk1AD2xxm9vKIFd\/tMoKxc35FTXQ="
+            "gVbVNtVJf210qJLe+GxWX8w9mC+WPnTPiUDjBCv9tr4=",
+            "9M\/+x5ZZJGeSVvYXC+1vXZ0sTFiGi4WpMjZ8qcQeFLs=",
+            "O1B2FzarfqzPUDKdOiPJvfEnx3QAc+xHW16CEItjtgg="
         ],
         "sync": [
             "J0K5p5rZjOjxli\/uioSP1yneQtoW2QTl3zXN\/Q3H3Mc="

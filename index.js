@@ -120,7 +120,7 @@ function topMenuScroll() {
 }
 
 function scrollMenu() {
-    $('.bottom-page.scroll-block').scroll(function() {
+    $('.bottom-page.scroll-block, .old .fmholder').scroll(function() {
         if (page === 'doc' || page.substr(0, 4) === 'help' || page === 'cpage' || page === 'sdk' || page === 'dev') {
             var $menu = $('.new-left-menu-block');
             var topPos = $(this).scrollTop();

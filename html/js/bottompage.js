@@ -15,6 +15,12 @@ var bottompage = {
         else {
             $('body').addClass('mobile');
         }
+        if (page.substr(0,4) == 'help' || page === 'cpage' || page.substr(0, 9) == 'corporate') {
+            $('body').addClass('old');   
+        }
+        else {
+            $('body').removeClass('old');
+        }  
     },
 
     initNavButtons: function() {
@@ -114,7 +120,7 @@ var bottompage = {
 
     initFloatingTop: function() {
         function topResize() {
-            var $topHeader = $('.bottom-page .top-head');
+            var $topHeader = $('.bottom-page .top-head, .old .top-head');
             if ($topHeader.hasClass('floating')) {
                 $topHeader.width($topHeader.next().outerWidth());
             }
@@ -127,8 +133,8 @@ var bottompage = {
             topResize();
         });
 
-        $('.bottom-page.scroll-block').scroll(function() {
-            var $topHeader = $('.bottom-page .top-head');
+        $('.bottom-page.scroll-block, .old .fmholder').scroll(function() {
+            var $topHeader = $('.bottom-page .top-head, .old .top-head');
             var topPos = $(this).scrollTop();
             if (topPos > 300) {
                 $topHeader.addClass('floating');

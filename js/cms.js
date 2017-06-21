@@ -506,6 +506,7 @@ CMS.on('corporate', function()
 {
     $('.new-left-menu-link').rebind('click', function() {
         loadSubPage('corporate/' + $(this).attr('id'));
+        $('.old .fmholder').animate({ scrollTop: 0 }, 0);
     });
     var ctype = getSitePath().substr(11);
     if ($('#' + ctype).length === 1) {

@@ -611,7 +611,7 @@ MegaData.prototype.moveNodes = function moveNodes(n, t, quiet) {
                                 var h = ctx.handle;
                                 var t = ctx.target;
                                 var parent = node.p;
-                                var tn = null;
+                                var tn = [];
 
                                 // Update M.v it's used for slideshow preview at least
                                 for (var k = M.v.length; k--;) {
@@ -628,7 +628,13 @@ MegaData.prototype.moveNodes = function moveNodes(n, t, quiet) {
                                     M.c[t] = Object.create(null);
                                 }
                                 if (node.t) {
-                                    tn = clone(M.tree[h]);
+                                    (function _(h) {
+                                        if (M.tree[h]) {
+                                            var k = Object.keys(M.tree[h]);
+                                            tn = tn.concat(k);
+                                            for (var i = k.length; i--;) _(k[i]);
+                                        }
+                                    })(h);
 
                                     if (M.tree[parent]) {
                                         delete M.tree[parent][h];
@@ -642,8 +648,11 @@ MegaData.prototype.moveNodes = function moveNodes(n, t, quiet) {
                                 ufsc.delNode(h);
                                 node.p = t;
                                 ufsc.addNode(node);
-                                if (tn) {
-                                    M.tree[h] = tn;
+                                for (var i = tn.length; i--;) {
+                                    var n = M.d[tn[i]];
+                                    if (n) {
+                                        ufsc.addTreeNode(n);
+                                    }
                                 }
                                 removeUInode(h, parent);
                                 M.nodeUpdated(node);

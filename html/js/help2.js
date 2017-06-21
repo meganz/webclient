@@ -139,7 +139,7 @@ var Help = (function() {
     function scrollTo(selector) {
         var $target = $(selector);
         if ($target.length ) {
-            $('.bottom-page.scroll-block').stop().animate({
+            $('.bottom-page.scroll-block, .old .fmholder').stop().animate({
                 scrollTop: $target.position().top
             }, 1000);
         }

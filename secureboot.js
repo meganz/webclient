@@ -1775,7 +1775,6 @@ else if (!b_u) {
         jsl.push({f:'js/vendor/smartcrop.js', n: 'smartcrop_js', j:1, w:7});
         jsl.push({f:'js/vendor/jquery.qrcode.js', n: 'jqueryqrcode', j:1});
         jsl.push({f:'js/vendor/qrcode.js', n: 'qrcode', j:1,w:2, g: 'vendor'});
-        jsl.push({f:'js/vendor/bitcoin-math.js', n: 'bitcoinmath', j:1 });
 
         // This is not used anymore, unless we process and store credit card details for renewals again
         // jsl.push({f:'js/paycrypt.js', n: 'paycrypt_js', j:1 });

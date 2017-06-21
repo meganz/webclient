@@ -3650,7 +3650,7 @@
     "9116": "\u79fb\u81f3\u5e95\u7aef",
     "9117": "\u5168\u90e8\u6e05\u9664",
     "9118": "\u91cd\u65b0\u4f20\u9001",
-    "9119": "Local backup: %1",
+    "9119": "\u672c\u5730\u5907\u4efd%1",
     "9120": "\u8fdc\u7a0b\u5907\u4efd%1",
     "9121": "\u6e05\u695a\u672c\u5730\u5907\u4efd",
     "9122": "\u4f60\u60f3\u73b0\u5728\u5220\u9664\u672c\u5730\u5907\u4efd\uff1f",
@@ -4263,6 +4263,7 @@
     "16651": "Contact details failed",
     "16652": "Failed to show the upload options. Please try again later.",
     "16653": "For the full featured experience, download our app or use the site on a PC.",
+    "16654": "Don't show icons on the left pane of Windows Explorer",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

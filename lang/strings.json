@@ -17054,5 +17054,9 @@
     "16653": {
         "text": "For the full featured experience, download our app or use the site on a PC.",
         "context": "A sentence on the Login page of the mobile web site. It implies that the best experience comes from using the mobile apps, or the website when viewed on a PC\/desktop rather than a phone."
+    },
+    "16654": {
+        "text": "Don't show icons on the left pane of Windows Explorer",
+        "context": "Text next to a checkbox that allows to disable\/enable the visualization of MEGAsync icons on the left pane of Windows Explorer"
     }
 }

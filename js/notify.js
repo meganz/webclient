@@ -512,8 +512,10 @@ var notify = {
             notify.markAllNotificationsAsSeen();
 
             // Open the folder
-            M.openFolder(folderId);
-            reselect(true);
+            M.openFolder(folderId)
+                .always(function() {
+                    reselect(true);
+                });
         });
     },
 
@@ -533,8 +535,10 @@ var notify = {
             notify.markAllNotificationsAsSeen();
 
             // Open the folder
-            M.openFolder(parentFolderId);
-            reselect(true);
+            M.openFolder(parentFolderId)
+                .always(function() {
+                    reselect(true);
+                });
         });
     },
 

@@ -235,7 +235,7 @@ var megasync = (function() {
             return MegaPromise.reject(ex);
         }
 
-        var promise = mega.utils.xhr({
+        var promise = M.xhr({
             url: megasyncUrl,
             data: args,
             type: 'json'

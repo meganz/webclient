@@ -595,7 +595,13 @@ ChatRoom.prototype.getRoomTitle = function() {
     var self = this;
     if (this.type == "private") {
         var participants = self.getParticipantsExceptMe();
-        return self.megaChat.getContactNameFromJid(participants[0]);
+        var name = self.megaChat.getContactNameFromJid(participants[0]);
+        if (!name) {
+            return "";
+        }
+        else {
+            return name;
+        }
     }
     else {
         if (self.topic && self.topic.substr) {
@@ -724,7 +730,7 @@ ChatRoom.prototype.show = function() {
         }
     }
 
-    sectionUIopen('conversations');
+    M.onSectionUIOpen('conversations');
 
 
     self.megaChat.currentlyOpenedChat = self.roomJid;
@@ -1069,6 +1075,7 @@ ChatRoom.prototype.attachContacts = function(ids) {
 
     var nodesMeta = [];
     $.each(ids, function(k, nodeId) {
+        // TODO: @lp this should be M.u instead of M.d ?
         var node = M.d[nodeId];
         var name = M.getNameByHandle(node.u);
 

@@ -83,7 +83,7 @@ function init_reset() {
     if (typeof zxcvbn === 'undefined') {
         $('.login-register-input.password').addClass('loading');
 
-        mega.utils.require('zxcvbn_js')
+        M.require('zxcvbn_js')
             .done(function() {
                 $('.login-register-input.password').removeClass('loading');
                 reset_pwcheck();

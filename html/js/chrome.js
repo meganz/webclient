@@ -82,7 +82,7 @@ var chromepage = {
     getServerBuildVersion: function() {
 
         // Fetch the latest current_ver.txt
-        mega.utils.xhr(mega.updateURL + '?time=' + unixtime())
+        M.xhr(mega.updateURL + '?time=' + unixtime())
             .done(function(ev, data) {
                 var serverBuildVersion = null;
 
@@ -111,8 +111,8 @@ var chromepage = {
 
         // If current build information is available (not in development) and currently using the Chrome extension
         if (buildVersion.chrome && is_extension && window.chrome) {
-            var local = mega.utils.vtol(buildVersion.chrome);
-            var remote = mega.utils.vtol(serverBuildVersion.chrome);
+            var local = M.vtol(buildVersion.chrome);
+            var remote = M.vtol(serverBuildVersion.chrome);
 
             // If the currently loaded version is older than the server build
             if (local < remote) {

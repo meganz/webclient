@@ -4230,7 +4230,7 @@
     "16618": "Share data and communicate with your contacts securely, and see their updates in real time.",
     "16619": "Massive Storage Space",
     "16620": "Not only are we more secure than our major competitors, we also provide a more generous amount of free storage.",
-    "16621": "Encrypted Live Backup",
+    "16621": "Live Encrypted Backup",
     "16622": "With our real-time file synchronisation and versioning features, your data is always safe and recoverable.",
     "16623": "Public Source Code",
     "16624": "To enable independent verification of the correctness and integrity of our crypto model and its implementation, we publish the full source code of our client apps.",
@@ -4258,6 +4258,12 @@
     "16646": "User-encrypted cloud services",
     "16647": "The Privacy Company.",
     "16648": "Universal Declaration of Human Rights, Article 12.",
+    "16649": "Save %1",
+    "16650": "Failed to view the contact details. Please try again later.",
+    "16651": "Contact details failed",
+    "16652": "Failed to show the upload options. Please try again later.",
+    "16653": "For the full featured experience, download our app or use the site on a PC.",
+    "16654": "Don't show icons on the left pane of Windows Explorer",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4517,6 +4523,8 @@
         "file_edit_by_me": 16480,
         "file_rename_by_me": 16481,
         "cancel-subscription-dialog-message": 16501,
-        "public-links": 16516
+        "public-links": 16516,
+        "save-amount": 16649,
+        "for-full-featured-experience": 16653
     }
 }

@@ -156,6 +156,7 @@
 }
 .mobile.toast-notification.active {
     opacity: 100;
+    visibility: visible;
 }
 .mobile.toast-notification.top {
 	bottom: initial;

@@ -36,34 +36,10 @@ var is_selenium = !ua.indexOf('mozilla/5.0 (selenium; ');
 var is_karma = /^localhost:987[6-9]/.test(window.top.location.host);
 var is_chrome_firefox = document.location.protocol === 'chrome:'
     && document.location.host === 'mega' || document.location.protocol === 'mega:';
-var is_extension = is_chrome_firefox || is_electron || document.location.href.substr(0, 19) === 'chrome-extension://';
-var is_search_engine_bot = isSearchEngineBot();
+var is_extension = is_chrome_firefox || is_electron || document.location.href.substr(0,19) == 'chrome-extension://';
 var is_mobile = m = isMobile();
 var is_ios = is_mobile && (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1);
-
-/**
- * Checks if a search engine spiders/robots
- * @returns {Boolean}
- */
-function isSearchEngineBot() {
-
-    // Prevent extension crashing on localStorage call
-    if (is_extension) {
-        return false;
-    }
-
-    // If testing flag is enabled, see the site as a search engine would
-    if (localStorage.testSearchEngineBot) {
-        return true;
-    }
-
-    // Checks for common bots
-    if (/bot|googlebot|crawler|spider|robot|crawling/i.test(ua)) {
-        return true;
-    }
-
-    return false;
-}
+var is_bot = !is_extension && /bot|crawl/i.test(ua);
 
 /**
  * Check if the user is coming from a mobile device
@@ -73,11 +49,6 @@ function isMobile() {
 
     // If extension, not applicable
     if (is_chrome_firefox) {
-        return false;
-    }
-
-    // If a search engine, disable the mobile site - ToDo: remove when the static pages are mobile optimised
-    if (is_search_engine_bot) {
         return false;
     }
 
@@ -543,21 +514,19 @@ var bootstaticpath = staticpath;
 var urlrootfile = '';
 
 // Disable hash checking for search engines to speed the site load up
-if (is_search_engine_bot) {
+if (is_bot) {
     nocontentcheck = true;
 }
 
-if (!b_u && is_extension) {
-
-    // Disable hash checking for the extension where JS is already inside
+if (!b_u && is_extension)
+{
     hashLogic = true;
-    nocontentcheck = true;
+    nocontentcheck=true;
 
-    if (is_chrome_firefox) {
-
+    if (is_chrome_firefox)
+    {
         bootstaticpath = 'chrome://mega/content/';
         urlrootfile = 'secure.html';
-
         if (d > 1) {
             staticpath = bootstaticpath;
         }
@@ -598,6 +567,7 @@ if (!b_u && is_extension) {
         }
     });
 }
+
 
 var page;
 var locSearch = location.search;
@@ -1431,6 +1401,7 @@ else if (!b_u) {
                         return "'" + (a.origin !== 'null' && a.origin
                             || (a.protocol + '//' + a.hostname)) + "...'";
                     })
+                    .replace(/(Cannot read property )('[\w-]{8}')/, "$1'<h>?'")
                     .replace(/(Access to '\.\.).*(' from script denied)/, '$1$2')
                     .replace(/gfs\w+\.userstorage/, 'gfs...userstorage')
                     .replace(/^Uncaught\W*(?:exception\W*)?/i, ''),
@@ -1479,6 +1450,13 @@ else if (!b_u) {
                     console.error(dump.m, arguments);
                 }
                 return;
+            }
+
+            if (dump.m.indexOf('Permission denied to access property') > -1) {
+                // Some Firefox extension is injecting some script(s)...
+                console.warn('Your account is only as secure as your computer...');
+                console.warn('Check your installed extensions and which one is injecting scripts on this page...');
+                return false;
             }
 
             if (~dump.m.indexOf('took +10s'))
@@ -1647,12 +1625,13 @@ else if (!b_u) {
      */
     var detectLang = function() {
 
+        // Get the preferred language in their browser
         var userLang = null;
         var langCode = null;
         var langCodeVariant = null;
 
         // If a search bot, they may set the URL as e.g. mega.nz/pro?es so get the language from that
-        if (is_search_engine_bot && locationSearchParams !== '') {
+        if (is_bot && locationSearchParams !== '') {
             userLang = locationSearchParams.replace('?', '');
         }
         else {
@@ -1734,18 +1713,26 @@ else if (!b_u) {
     var langFilepath = getLanguageFilePath(lang);
 
     jsl.push({f:langFilepath, n: 'lang', j:3});
-
-    // Don't load this file if this is a search bot to speed up the site
-    if (!is_search_engine_bot) {
-        jsl.push({f:'sjcl.js', n: 'sjcl_js', j:1});
-    }
+    jsl.push({f:'sjcl.js', n: 'sjcl_js', j:1});
     jsl.push({f:'nodedec.js', n: 'nodedec_js', j:1});
     jsl.push({f:'js/vendor/jquery-2.2.1.js', n: 'jquery', j:1, w:10});
     jsl.push({f:'js/vendor/jquery-ui.js', n: 'jqueryui_js', j:1, w:10});
     jsl.push({f:'js/vendor/jquery.mousewheel.js', n: 'jquerymouse_js', j:1});
     jsl.push({f:'js/vendor/jquery.jscrollpane.js', n: 'jscrollpane_js', j:1});
+    jsl.push({f:'js/jscrollpane.utils.js', n: 'jscrollpane_utils_js', j: 1});
     jsl.push({f:'js/jquery.misc.js', n: 'jquerymisc_js', j:1});
     jsl.push({f:'js/vendor/megaLogger.js', n: 'megaLogger_js', j:1});
+
+    jsl.push({f:'js/utils/browser.js', n: 'js_utils_browser_js', j: 1});
+    jsl.push({f:'js/utils/debug.js', n: 'js_utils_debug_js', j: 1});
+    jsl.push({f:'js/utils/dom.js', n: 'js_utils_dom_js', j: 1});
+    jsl.push({f:'js/utils/locale.js', n: 'js_utils_locale_js', j: 1});
+    jsl.push({f:'js/utils/pictools.js', n: 'js_utils_pictools_js', j: 1});
+    jsl.push({f:'js/utils/polyfills.js', n: 'js_utils_polyfills_js', j: 1});
+    jsl.push({f:'js/utils/stringcrypt.js', n: 'js_utils_stringcrypt_js', j: 1});
+    jsl.push({f:'js/utils/timers.js', n: 'js_utils_timers_js', j: 1});
+    jsl.push({f:'js/utils/watchdog.js', n: 'js_utils_watchdog_js', j: 1});
+    jsl.push({f:'js/utils/workers.js', n: 'js_utils_workers_js', j: 1});
 
     jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
     jsl.push({f:'js/crypto.js', n: 'crypto_js', j:1,w:5});
@@ -1766,69 +1753,61 @@ else if (!b_u) {
     jsl.push({f:'js/vendor/jsbn2.js', n: 'jsbn2_js', j:1, w:2});
     jsl.push({f:'js/vendor/nacl-fast.js', n: 'nacl_js', j:1,w:7});
     jsl.push({f:'js/vendor/dexie.js', n: 'dexie_js', j:1,w:5});
+
+    jsl.push({f:'js/authring.js', n: 'authring_js', j:1});
     jsl.push({f:'html/js/login.js', n: 'login_js', j:1});
+    jsl.push({f:'js/ui/export.js', n: 'export_js', j:1,w:1});
+    jsl.push({f:'html/js/key.js', n: 'key_js', j:1});
 
-    // Don't load these files if this is a search bot to speed up the site
-    if (!is_search_engine_bot) {
-        jsl.push({f:'js/authring.js', n: 'authring_js', j:1});
-        jsl.push({f:'js/ui/export.js', n: 'export_js', j:1,w:1});
-        jsl.push({f:'html/js/key.js', n: 'key_js', j:1});
-        jsl.push({f:'js/useravatar.js', n: 'contact_avatar_js', j:1,w:3});
-        jsl.push({f:'css/avatars.css', n: 'avatars_css', j:2,w:5,c:1,d:1,cache:1});
-    }
-
+    jsl.push({f:'js/useravatar.js', n: 'contact_avatar_js', j:1,w:3});
+    jsl.push({f:'css/avatars.css', n: 'avatars_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
 
     if (!is_mobile) {
-        jsl.push({f:'js/achievements.js', n: 'achievements_js', j: 1, w: 5});
         jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
         jsl.push({f:'js/vendor/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1, w:10});
         jsl.push({f:'js/vendor/verge.js', n: 'verge', j:1, w:5});
         jsl.push({f:'js/jquery.tokeninput.js', n: 'jquerytokeninput_js', j:1});
         jsl.push({f:'js/jquery.checkboxes.js', n: 'checkboxes_js', j:1});
+        jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});
+        jsl.push({f:'js/vendor/exif.js', n: 'exif_js', j:1, w:3});
+        jsl.push({f:'js/vendor/megapix.js', n: 'megapix_js', j:1});
+        jsl.push({f:'js/vendor/smartcrop.js', n: 'smartcrop_js', j:1, w:7});
+        jsl.push({f:'js/vendor/jquery.qrcode.js', n: 'jqueryqrcode', j:1});
+        jsl.push({f:'js/vendor/qrcode.js', n: 'qrcode', j:1,w:2, g: 'vendor'});
 
-        // Don't load these files if this is a search bot to speed up the site
-        if (!is_search_engine_bot) {
-            jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});
-            jsl.push({f:'js/vendor/exif.js', n: 'exif_js', j:1, w:3});
-            jsl.push({f:'js/vendor/megapix.js', n: 'megapix_js', j:1});
-            jsl.push({f:'js/vendor/smartcrop.js', n: 'smartcrop_js', j:1, w:7});
-            jsl.push({f:'js/vendor/jquery.qrcode.js', n: 'jqueryqrcode', j:1});
-            jsl.push({f:'js/vendor/qrcode.js', n: 'qrcode', j:1,w:2, g: 'vendor'});
-            jsl.push({f:'js/vendor/bitcoin-math.js', n: 'bitcoinmath', j:1 });
+        // This is not used anymore, unless we process and store credit card details for renewals again
+        // jsl.push({f:'js/paycrypt.js', n: 'paycrypt_js', j:1 });
 
-            // This is not used anymore, unless we process and store credit card details for renewals again
-            // jsl.push({f:'js/paycrypt.js', n: 'paycrypt_js', j:1 });
+        // Desktop notifications
+        jsl.push({f:'js/vendor/notification.js', n: 'notification_js', j:1,w:7});
 
-            // Desktop notifications
-            jsl.push({f:'js/vendor/notification.js', n: 'notification_js', j:1,w:7});
+        // Other
+        jsl.push({f:'js/vendor/moment.js', n: 'moment_js', j:1,w:1});
+        jsl.push({f:'js/vendor/perfect-scrollbar.js', n: 'ps_js', j:1,w:1});
 
-            // Other
-            jsl.push({f:'js/vendor/moment.js', n: 'moment_js', j:1,w:1});
-            jsl.push({f:'js/vendor/perfect-scrollbar.js', n: 'ps_js', j:1,w:1});
+        // Google Import Contacts
+        jsl.push({f:'js/gContacts.js', n: 'gcontacts_js', j:1,w:3});
 
-            // Google Import Contacts
-            jsl.push({f:'js/gContacts.js', n: 'gcontacts_js', j:1,w:3});
-
-            // UI Elements
-            jsl.push({f:'js/ui/megaRender.js', n: 'megarender_js', j:1,w:1});
-            jsl.push({f:'js/ui/filepicker.js', n: 'filepickerui_js', j:1,w:1});
-            jsl.push({f:'js/ui/dialog.js', n: 'dialogui_js', j:1,w:1});
-            jsl.push({f:'js/ui/credentialsWarningDialog.js', n: 'creddialogui_js', j:1,w:1});
-            jsl.push({f:'js/ui/loginRequiredDialog.js', n: 'loginrequireddialog_js', j:1,w:1});
-            jsl.push({f:'js/ui/registerDialog.js', n: 'registerdialog_js', j:1,w:1});
-            jsl.push({f:'js/ui/keySignatureWarningDialog.js', n: 'mega_js', j:1,w:7});
-            jsl.push({f:'js/ui/feedbackDialog.js', n: 'feedbackdialogui_js', j:1,w:1});
-            jsl.push({f:'js/ui/languageDialog.js', n: 'mega_js', j:1,w:7});
-            jsl.push({f:'js/ui/publicServiceAnnouncement.js', n: 'psa_js', j:1,w:1});
-            jsl.push({f:'js/ui/alarm.js', n: 'alarm_js', j:1,w:1});
-            jsl.push({f:'js/ui/transfers-popup.js', n: 'transfers_popup_js', j:1,w:1});
-        }
+        // UI Elements
+        jsl.push({f:'js/ui/megaRender.js', n: 'megarender_js', j:1,w:1});
+        jsl.push({f:'js/ui/filepicker.js', n: 'filepickerui_js', j:1,w:1});
+        jsl.push({f:'js/ui/dialog.js', n: 'dialogui_js', j:1,w:1});
+        jsl.push({f:'js/ui/credentialsWarningDialog.js', n: 'creddialogui_js', j:1,w:1});
+        jsl.push({f:'js/ui/loginRequiredDialog.js', n: 'loginrequireddialog_js', j:1,w:1});
+        jsl.push({f:'js/ui/registerDialog.js', n: 'registerdialog_js', j:1,w:1});
+        jsl.push({f:'js/ui/keySignatureWarningDialog.js', n: 'mega_js', j:1,w:7});
+        jsl.push({f:'js/ui/feedbackDialog.js', n: 'feedbackdialogui_js', j:1,w:1});
+        jsl.push({f:'js/ui/languageDialog.js', n: 'mega_js', j:1,w:7});
+        jsl.push({f:'js/ui/publicServiceAnnouncement.js', n: 'psa_js', j:1,w:1});
+        jsl.push({f:'js/ui/alarm.js', n: 'alarm_js', j:1,w:1});
+        jsl.push({f:'js/ui/transfers-popup.js', n: 'transfers_popup_js', j:1,w:1});
     } // !is_mobile
 
     // Transfers
     jsl.push({f:'js/transfers/xhr2.js', n: 'xhr_js', j:1});
     jsl.push({f:'js/transfers/queue.js', n: 'queue', j:1,w:4});
+    jsl.push({f:'js/transfers/utils.js', n: 'tutils', j:1,w:4});
     jsl.push({f:'js/transfers/meths/cache.js', n: 'dl_cache', j:1,w:3});
     jsl.push({f:'js/transfers/meths/flash.js', n: 'dl_flash', j:1,w:3});
     jsl.push({f:'js/transfers/meths/memory.js', n: 'dl_memory', j:1,w:3});
@@ -1844,24 +1823,23 @@ else if (!b_u) {
     jsl.push({f:'js/transfers/download2.js', n: 'dl_js', j:1,w:3});
     jsl.push({f:'js/transfers/upload2.js', n: 'upload_js', j:1,w:2});
 
+
     // Everything else...
     jsl.push({f:'index.js', n: 'index', j:1,w:4});
     jsl.push({f:'html/top.html', n: 'top', j:0});
     jsl.push({f:'html/transferwidget.html', n: 'transferwidget', j:0});
     jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});
+    jsl.push({f:'js/fm/removenode.js', n: 'fm_removenode_js', j: 1});
+    jsl.push({f:'js/fm/ufssizecache.js', n: 'ufssizecache_js', j:1});
 
     if (!is_mobile) {
         jsl.push({f:'css/style.css', n: 'style_css', j:2,w:30,c:1,d:1,cache:1});
         jsl.push({f:'js/fm.js', n: 'fm_js', j:1,w:12});
-
-        // Don't load these files if this is a search bot to speed up the site
-        if (!is_search_engine_bot) {
-            jsl.push({f:'js/fm-dashboard.js', n: 'fmdashboard_js', j:1,w:5});
-            jsl.push({f:'js/fm-account.js', n: 'fmaccount_js', j:1,w:5});
-            jsl.push({f:'js/fm/account.js', n: 'fm_account_js', j:1});
-            jsl.push({f:'js/fm/fileconflict.js', n: 'fm_fileconflict_js', j:1});
-            jsl.push({f:'js/ui/miniui.js', n: 'miniui_js', j:1});
-        }
+        jsl.push({f:'js/fm/achievements.js', n: 'achievements_js', j: 1, w: 5});
+        jsl.push({f:'js/fm/dashboard.js', n: 'fmdashboard_js', j:1,w:5});
+        jsl.push({f:'js/fm/account.js', n: 'fm_account_js', j:1});
+        jsl.push({f:'js/fm/fileconflict.js', n: 'fm_fileconflict_js', j:1});
+        jsl.push({f:'js/ui/miniui.js', n: 'miniui_js', j:1});
 
         jsl.push({f:'html/start.html', n: 'start', j:0});
         jsl.push({f:'html/megainfo.html', n: 'megainfo', j:0});
@@ -1873,12 +1851,8 @@ else if (!b_u) {
         jsl.push({f:'html/login.html', n: 'login', j:0});
         jsl.push({f:'html/fm.html', n: 'fm', j:0,w:3});
         jsl.push({f:'html/top-login.html', n: 'top-login', j:0});
-
-        // Don't load these files if this is a search bot to speed up the site
-        if (!is_search_engine_bot) {
-            jsl.push({f:'js/notify.js', n: 'notify_js', j:1});
-            jsl.push({f:'js/popunda.js', n: 'popunda_js', j:1});
-        }
+        jsl.push({f:'js/notify.js', n: 'notify_js', j:1});
+        jsl.push({f:'js/popunda.js', n: 'popunda_js', j:1});
         jsl.push({f:'css/user-card.css', n: 'user_card_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/icons.css', n: 'icons_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/buttons.css', n: 'buttons_css', j:2,w:5,c:1,d:1,cache:1});
@@ -1895,18 +1869,33 @@ else if (!b_u) {
         jsl.push({f:'css/onboarding.css', n: 'onboarding_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/media-print.css', n: 'media_print_css', j:2,w:5,c:1,d:1,cache:1});
 
-        // Don't load these files if this is a search bot to speed up the site
-        if (!is_search_engine_bot) {
-            jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
-            jsl.push({f:'js/states-countries.js', n: 'states_countries_js', j:1});
-            jsl.push({f:'html/dialogs.html', n: 'dialogs', j:0,w:2});
-            jsl.push({f:'js/vendor/int64.js', n: 'int64_js', j:1});
-            jsl.push({f:'js/transfers/zip64.js', n: 'zip_js', j:1});
+        jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
+        jsl.push({f:'js/states-countries.js', n: 'states_countries_js', j:1});
+        jsl.push({f:'html/dialogs.html', n: 'dialogs', j:0,w:2});
+        jsl.push({f:'js/vendor/int64.js', n: 'int64_js', j:1});
+        jsl.push({f:'js/transfers/zip64.js', n: 'zip_js', j:1});
 
-            jsl.push({f:'html/onboarding.html', n: 'onboarding', j:0,w:2});
-            jsl.push({f:'js/ui/onboarding.js', n: 'onboarding_js', j:1,w:1});
-        }
+        jsl.push({f:'html/onboarding.html', n: 'onboarding', j:0,w:2});
+        jsl.push({f:'js/ui/onboarding.js', n: 'onboarding_js', j:1,w:1});
     } // !is_mobile
+
+    // do not change the order...
+    jsl.push({f:'js/fm/filemanager.js', n: 'filemanager_js', j: 1, w: 5});
+    jsl.push({f:'js/fm/utils.js', n: 'fm_utils_js', j: 1});
+    jsl.push({f:'js/fm/megadata.js', n: 'fm_megadata_js', j: 1});
+    jsl.push({f:'js/fm/megadata/account.js', n: 'fm_megadata_account_js', j: 1});
+    jsl.push({f:'js/fm/megadata/avatars.js', n: 'fm_megadata_avatars_js', j: 1});
+    jsl.push({f:'js/fm/megadata/contacts.js', n: 'fm_megadata_contacts_js', j: 1});
+    jsl.push({f:'js/fm/megadata/filters.js', n: 'fm_megadata_filters_js', j: 1});
+    jsl.push({f:'js/fm/megadata/inbox.js', n: 'fm_megadata_inbox_js', j: 1});
+    jsl.push({f:'js/fm/megadata/menus.js', n: 'fm_megadata_menus_js', j: 1});
+    jsl.push({f:'js/fm/megadata/nodes.js', n: 'fm_megadata_nodes_js', j: 1});
+    jsl.push({f:'js/fm/megadata/openfolder.js', n: 'fm_megadata_openfolder_js', j: 1});
+    jsl.push({f:'js/fm/megadata/render.js', n: 'fm_megadata_render_js', j: 1});
+    jsl.push({f:'js/fm/megadata/reset.js', n: 'fm_megadata_reset_js', j: 1});
+    jsl.push({f:'js/fm/megadata/sort.js', n: 'fm_megadata_sort_js', j: 1});
+    jsl.push({f:'js/fm/megadata/transfers.js', n: 'fm_megadata_transfers_js', j: 1});
+    jsl.push({f:'js/fm/megadata/tree.js', n: 'fm_megadata_tree_js', j: 1});
 
     if (localStorage.makeCache) {
         jsl.push({f:'makecache.js', n: 'makecache', j:1});
@@ -1914,6 +1903,16 @@ else if (!b_u) {
 
     if (localStorage.enableDevtools) {
         jsl.push({f:'dont-deploy/transcripter/exporter.js', n: 'tse_js', j:1});
+    }
+
+    // Load files common to all mobile pages
+    if (is_mobile) {
+        jsl.push({f:'css/mobile.css', n: 'mobile_css', j: 2, w: 30, c: 1, d: 1, m: 1});
+        jsl.push({f:'css/spinners.css', n: 'spinners_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
+        jsl.push({f:'css/toast.css', n: 'toast_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
+        jsl.push({f:'html/mobile.html', n: 'mobile', j: 0, w: 1});
+        jsl.push({f:'js/ui/mobile.js', n: 'mobile_js', j: 1, w: 1});
+        jsl.push({f:'js/vendor/jquery.mobile.js', n: 'jquery_mobile_js', j: 1, w: 5});
     }
 
     // We need to keep a consistent order in loaded resources, so that if users
@@ -1941,16 +1940,6 @@ else if (!b_u) {
     // only used on beta
     if (onBetaW) {
         jsl.push({f: 'js/betacrashes.js', n: 'betacrashes_js', j: 1});
-    }
-
-    // Load files common to all mobile pages
-    if (is_mobile) {
-        jsl.push({f:'css/mobile.css', n: 'mobile_css', j: 2, w: 30, c: 1, d: 1, m: 1});
-        jsl.push({f:'css/spinners.css', n: 'spinners_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
-        jsl.push({f:'css/toast.css', n: 'toast_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
-        jsl.push({f:'html/mobile.html', n: 'fm_mobile', j: 0, w: 1});
-        jsl.push({f:'js/ui/mobile.js', n: 'fm_mobile_js', j: 1, w: 1});
-        jsl.push({f:'js/vendor/jquery.mobile.js', n: 'jquery_mobile_js', j: 1, w: 5});
     }
 
     var jsl2 =
@@ -2771,7 +2760,7 @@ function toArray() {
     return res;
 }
 
-function tryCatch(fn)
+function tryCatch(fn, onerror)
 {
     fn.foo = function __tryCatchWrapper()
     {
@@ -2779,6 +2768,10 @@ function tryCatch(fn)
             return fn.apply(this, arguments);
         } catch (e) {
             console.error(e);
+
+            if (typeof onerror === 'function') {
+                onIdle(onerror.bind(null, e));
+            }
         }
     };
     fn.foo.bar = fn;

@@ -535,7 +535,7 @@ var alarm = {
             var updateUrl = this.updateUrl + '?time=' + unixtime();
 
             // Fetch the latest current_ver.txt
-            mega.utils.xhr(updateUrl).done(function(event, data) {
+            M.xhr(updateUrl).done(function(event, data) {
 
                 // Try parse version info
                 try {
@@ -566,8 +566,8 @@ var alarm = {
             var $dialog = $('.top-warning-popup.site-update-available');
 
             // Convert versions to integers for easier comparison
-            var localVersion = mega.utils.vtol(buildVersion.website);
-            var serverVersion = mega.utils.vtol(serverBuildVersion.website);
+            var localVersion = M.vtol(buildVersion.website);
+            var serverVersion = M.vtol(serverBuildVersion.website);
 
             // Calculate the time when the update should be notified to the user (24 hours later)
             var currentTimestamp = unixtime();
@@ -640,7 +640,7 @@ var alarm = {
                 $button.removeClass('active');
 
                 // Check for pending transfers and if there are, prompt user to see if they want to continue
-                mega.utils.abortTransfers().then(function() {
+                M.abortTransfers().then(function() {
 
                     // Add a log
                     api_req({ a: 'log', e: 99612, m: 'User chose to update from site update dialog' });

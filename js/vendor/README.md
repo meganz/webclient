@@ -176,7 +176,7 @@ Unless otherwise noted, they were released under a [MIT License].
 [chat/base32.js]: A fork of agnoster/base32-js
 
 > NB: This is a fork of agnoster/base32-js, that supports custom alphabet
-> Forked location: https://github.com/lpetrov/base32-js
+> Forked location: https://github.com/meganz/base32-js
 
 
 

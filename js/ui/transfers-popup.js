@@ -115,7 +115,7 @@ mega.ui.tpp = (function () {
         var visible = isVisible();
         var enabled = isEnabled();
 
-        if (enabled && !visible && (M.currentdirid !== 'transfers') && mega.utils.hasPendingTransfers()) {
+        if (enabled && !visible && (M.currentdirid !== 'transfers') && M.hasPendingTransfers()) {
             opts.dlg.$.show(opts.duration);
             setStatus(true);
         }
@@ -151,7 +151,12 @@ mega.ui.tpp = (function () {
      * @param {String} block i.e ['dl', 'ul']
      */
     var hideBlock = function hideBlock(block) {
-        opts.dlg[block].$.addClass('hidden');
+        if (opts.dlg[block].$.addClass) {
+            opts.dlg[block].$.addClass('hidden');
+        }
+        else {
+            console.error("FIXME: TypeError: opts.dlg[block].$.addClass is not a function");
+        }
     };
 
     /**
@@ -262,6 +267,10 @@ mega.ui.tpp = (function () {
      * @param {String} blk i.e. ['dl', 'ul'] download or upload
      */
     var updateBlock = function updateBlock(blk) {
+        if (!Object(opts.dlg[blk].$).prg) {
+            console.error("FIXME: TypeError: Cannot read property 'css' of undefined");
+            return false;
+        }
         var len = getTotal(blk).toString();
         var index = getIndex(blk).toString();
         var perc = getProgress(blk).toString();

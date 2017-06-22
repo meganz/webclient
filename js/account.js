@@ -665,7 +665,8 @@ function processEmailChangeActionPacket(ap) {
 
                     $promise.resolve(_lastUserInteractionCache[u_h]);
 
-                    M.u[u_h].ts = parseInt(v.split(":")[1], 10);
+                    // TODO: check why `M.u[u_h]` might not be set...
+                    Object(M.u[u_h]).ts = parseInt(v.split(":")[1], 10);
 
                     $promise.verify();
 
@@ -890,9 +891,6 @@ function processEmailChangeActionPacket(ap) {
         };
 
         for (var key in config) {
-            if (!config.hasOwnProperty(key)) {
-                continue;
-            }
             var value = config[key];
 
             if (!value && value !== 0) {
@@ -1042,8 +1040,16 @@ function processEmailChangeActionPacket(ap) {
                 if (fmconfig.ul_maxSlots) {
                     ulQueue.setSize(fmconfig.ul_maxSlots);
                 }
+                else {
+                    mega.config.set('ul_maxSlots', 4);// Default ul slots value
+                    ulQueue.setSize(4);
+                }
                 if (fmconfig.dl_maxSlots) {
                     dlQueue.setSize(fmconfig.dl_maxSlots);
+                }
+                else {
+                    mega.config.set('dl_maxSlots', 4);// Default dl slots value
+                    dlQueue.setSize(4);
                 }
                 if (fmconfig.font_size) {
                     $('body').removeClass('fontsize1 fontsize2')
@@ -1126,10 +1132,17 @@ function processEmailChangeActionPacket(ap) {
     ns.setn = function _setConfigValueToast(key, value, toastText) {
         toastText = toastText || l[16168];
 
-        delay('fmconfig:setn', function() {
-            showToast('settings', toastText);
+        delay('fmconfig:setn.' + key, function() {
+            var toast = false;
 
-            mega.config.set(key, value);
+            if (mega.config.get(key) !== value) {
+                mega.config.set(key, value);
+                toast = true;
+            }
+
+            if (toast) {
+                showToast('settings', toastText);
+            }
         });
     };
 

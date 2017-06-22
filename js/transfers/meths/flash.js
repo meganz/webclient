@@ -90,7 +90,7 @@ function FlashIO(dl_id, dl) {
         }
 
         offset += len;
-        Later(done);
+        later(done);
     };
 
     this.download = function(name, path) {

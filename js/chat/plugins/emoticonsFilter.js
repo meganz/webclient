@@ -62,6 +62,17 @@ EmoticonsFilter.prototype.processMessage = function(e, eventData) {
     eventData.message.emoticonsProcessed = true;
 };
 
+/**
+ * Simple method of converting utf8 strings containing utf emojis, to strings containing HTML code (e.g. <img /> tags)
+ * with emojis as images.
+ *
+ * Note: any code that uses this function, should implement its own way of tracking if a message was already parsed
+ * (and skip double parsing of the same message twice, since this may create weird looking html code).
+ *
+ * Note 2: any code that uses this function, should ALWAYS take care of eventual XSS
+ *
+ * @param messageContents {string}
+ */
 EmoticonsFilter.prototype.processHtmlMessage = function(messageContents) {
     var self = this;
 

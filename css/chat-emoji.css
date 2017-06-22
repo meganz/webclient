@@ -73,7 +73,7 @@
     margin-top: 6px;
 }
 
-img.emoji {
+img.emoji, .chat-topic-block img.emoji.big, .small-info-txt img.emoji.big {
     width: 20px;
     height: 20px;
     display:inline-block;
@@ -93,6 +93,7 @@ img.emoji.big {
     margin-left: 2px;
     margin-right: 2px;
 }
+
 
 .conversations-pane img.emoji {
     width: 12px;

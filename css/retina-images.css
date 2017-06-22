@@ -468,8 +468,8 @@ body.pro:after {
     background-image: url(../images/mega/chat-static-sprite-v1@2x.png);
     background-size: 68px auto;
 }
-.small-icon.context, .dropdown-item.contains-submenu::before, .dropdown-colour-item::after {
-    background-image: url(../images/mega/icons-sprite@2x.png);
+.small-icon.context, .dropdown-item.contains-submenu::before, .dropdown-colour-item::after, .small-icon.clock {
+    background-image: url(../images/mega/icons-sprite_v3@2x.png);
     background-size: 262px auto;
 }
 #help2-main .ui-autocomplete .client {

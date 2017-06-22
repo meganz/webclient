@@ -58,14 +58,11 @@ function startMega() {
         });
     }
 
-    if (!window.M) {
-        window.M = new MegaData();
-    }
     mBroadcaster.sendMessage('startMega');
 
     if (silent_loading) {
         jsl = [];
-        Soon(silent_loading);
+        onIdle(silent_loading);
         silent_loading = false;
         return false;
     }
@@ -88,9 +85,6 @@ function startMega() {
     } else {
         mega_custom_boot_fn();
     }
-
-    mBroadcaster.sendMessage('zoomLevelCheck');
-    $('#pwdmanhelper input').val('');
 }
 
 function mainScroll() {
@@ -234,10 +228,10 @@ function init_page() {
             dlkey = ar[1].replace(/[^\w-]+/g, "");
         }
 
-        if (mega.utils.hasPendingTransfers() && $.lastSeenFilelink !== getSitePath()) {
+        if (M.hasPendingTransfers() && $.lastSeenFilelink !== getSitePath()) {
             page = 'download';
 
-            mega.utils.abortTransfers()
+            M.abortTransfers()
                 .done(function() {
                     location.reload();
                 })
@@ -311,7 +305,6 @@ function init_page() {
         loadingDialog.hide();
     }
 
-    var wasFolderlink = pfid;
     var oldPFKey = pfkey;
     if (page.substr(0, 2) == 'F!' && page.length > 2) {
         var ar = page.substr(2, page.length - 1).split('!');
@@ -359,7 +352,7 @@ function init_page() {
             else {
                 // If mobile, show the decryption key overlay
                 if (is_mobile) {
-                    parsepage(pages['fm_mobile']);
+                    parsepage(pages['mobile']);
                     mobile.decryptionKeyOverlay.show(pfid, true, pfkey);
                 }
                 else {
@@ -375,19 +368,19 @@ function init_page() {
                 }
                 return;
             }
+
+            if (fminitialized) {
+                // Clean up internal state in case we're navigating back to a folderlink
+                M.currentdirid = M.RootID = undefined;
+                delete $.onImportCopyNodes;
+                delete $.mcImport;
+            }
         }
         if (pfhandle) {
             page = 'fm/' + pfhandle;
         }
         else {
             page = 'fm';
-        }
-
-        if (fminitialized) {
-            // Clean up internal state in case we're navigating back to a folderlink
-            M.currentdirid = undefined;
-            delete $.onImportCopyNodes;
-            delete $.mcImport;
         }
     }
     else if (!flhashchange || page !== 'fm/transfers') {
@@ -433,15 +426,22 @@ function init_page() {
             delete localStorage.awaitingConfirmationAccount;
         }
         else {
-            // Insert placeholder page while waiting for user input
-            parsepage(pages['placeholder']);
+            // Show signup link dialog for mobile
+            if (is_mobile) {
+                parsepage(pages['mobile']);
+                mobile.register.showConfirmEmailScreen(acc);
+                return false;
+            }
+            else {
+                // Insert placeholder page while waiting for user input
+                parsepage(pages['placeholder']);
 
-            return mega.ui.sendSignupLinkDialog(acc, function() {
-                // The user clicked 'close', abort and start over...
-
-                delete localStorage.awaitingConfirmationAccount;
-                init_page();
-            });
+                return mega.ui.sendSignupLinkDialog(acc, function() {
+                    // The user clicked 'close', abort and start over...
+                    delete localStorage.awaitingConfirmationAccount;
+                    init_page();
+                });
+            }
         }
     }
 
@@ -460,7 +460,7 @@ function init_page() {
 
         // Show the password overlay for mobile
         if (is_mobile) {
-            parsepage(pages['fm_mobile']);
+            parsepage(pages['mobile']);
             mobile.decryptionPasswordOverlay.show(page);
         }
         else {
@@ -661,7 +661,7 @@ function init_page() {
                 page = 'login';
 
                 if (is_mobile) {
-                    parsepage(pages['fm_mobile']);
+                    parsepage(pages['mobile']);
                     mobile.register.showConfirmAccountScreen(email);
                 }
                 else {
@@ -680,7 +680,7 @@ function init_page() {
                 page = 'login';
 
                 if (is_mobile) {
-                    parsepage(pages['fm_mobile']);
+                    parsepage(pages['mobile']);
                     mobile.register.showConfirmAccountFailure(res);
                 }
                 else {
@@ -704,7 +704,7 @@ function init_page() {
     }
     else if (u_type == 2) {
         if (is_mobile) {
-            parsepage(pages['fm_mobile']);
+            parsepage(pages['mobile']);
             mobile.register.showGeneratingKeysScreen();
         }
         else {
@@ -719,7 +719,7 @@ function init_page() {
         }
 
         if (is_mobile) {
-            parsepage(pages['fm_mobile']);
+            parsepage(pages['mobile']);
             mobile.signin.show();
         }
         else {
@@ -752,7 +752,7 @@ function init_page() {
         }
 
         if (is_mobile) {
-            parsepage(pages['fm_mobile']);
+            parsepage(pages['mobile']);
             mobile.register.show();
         }
         else {
@@ -808,7 +808,7 @@ function init_page() {
 
         if (u_type) {
             var ac = new mega.AccountClosure();
-            ac.initAccountClosure();
+            ac.handleFeedback();
         }
         else {
             // Unable to cancel, not logged in
@@ -906,7 +906,7 @@ function init_page() {
     }
     else if (page === 'terms') {
         if (is_mobile) {
-            parsepage(pages['fm_mobile']);
+            parsepage(pages['mobile']);
             mobile.terms.show();
         }
         else {
@@ -1026,7 +1026,7 @@ function init_page() {
             }
         }
         if (is_mobile) {
-            parsepage(pages['fm_mobile']);
+            parsepage(pages['mobile']);
         }
         else {
             parsepage(pages['download']);
@@ -1139,7 +1139,7 @@ function init_page() {
                 M.currentdirid = id;
             }
             if (is_mobile) {
-                parsepage(pages['fm_mobile']);
+                parsepage(pages['mobile']);
             }
             else if (!is_mobile && $('#fmholder').html() === '') {
                 $('#fmholder').safeHTML(translate(pages['fm'].replace(/{staticpath}/g, staticpath)));
@@ -1180,7 +1180,9 @@ function init_page() {
                 ulQueue.pause();
                 uldl_hold = true;
 
-                bottomPageDialog(false, 'terms'); // show terms dialog
+                if (!is_mobile) {
+                    bottomPageDialog(false, 'terms'); // show terms dialog
+                }
             }
         }
         $('#topmenu').safeHTML(parsetopmenu());
@@ -1190,14 +1192,8 @@ function init_page() {
         if ($('#fmholder:visible').length == 0) {
             $('#fmholder').show();
             if (fminitialized && !is_mobile) {
-                if (M.viewmode == 1) {
-                    iconUI();
-                }
-                else {
-                    gridUI();
-                }
+                M.addViewUI();
 
-                treeUI();
                 if ($.transferHeader) {
                     $.transferHeader();
                 }
@@ -1239,7 +1235,7 @@ function init_page() {
 
         // If mobile, show the mobile homepage
         if (is_mobile) {
-            parsepage(pages['fm_mobile']);
+            parsepage(pages['mobile']);
             mobile.home.show();
         }
         else {
@@ -1249,7 +1245,7 @@ function init_page() {
     }
     else if (is_mobile) {
         // Show the mobile homepage
-        parsepage(pages['fm_mobile']);
+        parsepage(pages['mobile']);
         mobile.home.show();
     }
     else {
@@ -1265,9 +1261,7 @@ function init_page() {
     if (typeof alarm !== 'undefined') {
         alarm.siteUpdate.init();
     }
-    if (!is_mobile) {
-        topmenuUI();
-    }
+    topmenuUI();
     loggedout = false;
     flhashchange = false;
 }
@@ -1415,11 +1409,6 @@ function tooltiplogin() {
 
 function topmenuUI() {
 
-    // Not applicable for mobile
-    if (is_mobile) {
-        return false;
-    }
-
     if (u_type === 0) {
         $('.top-login-button').text(l[967]);
     }
@@ -1490,7 +1479,7 @@ function topmenuUI() {
     $('.top-menu-item.languages .right-el').text(lang);
 
     // Show version in top menu
-    $('.top-mega-version').text('v. ' + mega.utils.getSiteVersion());
+    $('.top-mega-version').text('v. ' + M.getSiteVersion());
 
     if (u_type) {
         $('.top-menu-item.logout,.top-menu-item.backup').removeClass('hidden');
@@ -1559,9 +1548,7 @@ function topmenuUI() {
         }
 
         // Show PRO plan expired warning popup (if applicable)
-        if (!is_mobile) {
-            alarm.planExpired.render();
-        }
+        alarm.planExpired.render();
     }
     else {
         if (u_type === 0 && !confirmok && page !== 'key') {
@@ -1747,10 +1734,8 @@ function topmenuUI() {
     });
 
     $('.top-menu-popup .top-menu-item').rebind('click', function () {
-        var className = $(this).attr('class');
-        if (!className) {
-            className = '';
-        }
+        var className = $(this).attr('class') || '';
+
         if (className.indexOf('submenu-item') > -1) {
             if (className.indexOf('expanded') > -1) {
                 $(this).removeClass('expanded');
@@ -1764,130 +1749,36 @@ function topmenuUI() {
                 loadingInitDialog.hide();
             }
             topMenu(1);
-            if (className.indexOf('privacycompany') > -1) {
-                loadSubPage('privacycompany');
-                return false;
+
+            var subpage;
+            var subPages = [
+                'about', 'account', 'backup', 'blog', 'chrome', 'cmd', 'contact',
+                'copyright', 'corporate', 'credits', 'doc', 'firefox', 'general',
+                'help', 'login', 'mega', 'mobile', 'privacy', 'privacycompany',
+                'register', 'resellers', 'sdk', 'sitemap', 'sourcecode', 'support',
+                'sync', 'takedown', 'terms'
+            ];
+
+            for (var i = subPages.length; i--;) {
+                if (className.indexOf(subPages[i]) > -1) {
+                    subpage = subPages[i];
+                    break;
+                }
             }
-            else if (className.indexOf('upgrade-your-account') > -1) {
+
+            if (className.indexOf('upgrade-your-account') > -1) {
                 loadSubPage('pro');
-                return false;
             }
-            else if (className.indexOf('register') > -1) {
-                loadSubPage('register');
-                return false;
-            }
-            else if (className.indexOf('login') > -1) {
-                loadSubPage('login');
-                return false;
-            }
-            else if (className.indexOf('about') > -1) {
-                loadSubPage('about');
-                return false;
-            }
-            else if (className.indexOf('corporate') > -1) {
-                loadSubPage('corporate');
-                return false;
-            }
-            else if (className.indexOf('blog') > -1) {
-                loadSubPage('blog');
-                return false;
-            }
-            else if (className.indexOf('credits') > -1) {
-                loadSubPage('credits');
-                return false;
-            }
-            else if (className.indexOf('chrome') > -1) {
-                loadSubPage('chrome');
-                return false;
-            }
-            else if (className.indexOf('resellers') > -1) {
-                loadSubPage('resellers');
-                return false;
-            }
-            else if (className.indexOf('backup') > -1) {
-                loadSubPage('backup');
-                return false;
-            }
-            else if (className.indexOf('firefox') > -1) {
-                loadSubPage('firefox');
-                return false;
-            }
-            else if (className.indexOf('mobile') > -1) {
-                loadSubPage('mobile');
-                return false;
-            }
-            else if (className.indexOf('sync') > -1) {
-                loadSubPage('sync');
-                return false;
-            }
-            else if (className.indexOf('cmd') > -1) {
-                loadSubPage('cmd');
-                return false;
-            }
-            else if (className.indexOf('help') > -1) {
-                loadSubPage('help');
-                return false;
-            }
-            else if (className.indexOf('contact') > -1) {
-                loadSubPage('contact');
-                return false;
+            else if (subpage) {
+                loadSubPage(subpage);
             }
             else if (className.indexOf('feedback') > -1) {
-
                 // Show the Feedback dialog
                 var feedbackDialog = mega.ui.FeedbackDialog.singleton($(this));
                 feedbackDialog._type = 'top-button';
             }
-            else if (className.indexOf('support') > -1) {
-                loadSubPage('support');
-                return false;
-            }
-            else if (className.indexOf('sitemap') > -1) {
-                loadSubPage('sitemap');
-                return false;
-            }
-            else if (className.indexOf('sdk') > -1) {
-                loadSubPage('sdk');
-                return false;
-            }
-            else if (className.indexOf('doc') > -1) {
-                loadSubPage('doc');
-                return false;
-            }
-            else if (className.indexOf('sourcecode') > -1) {
-                loadSubPage('sourcecode');
-                return false;
-            }
-            else if (className.indexOf('terms') > -1) {
-                loadSubPage('terms');
-                return false;
-            }
-            else if (className.indexOf('general') > -1) {
-                loadSubPage('general');
-                return false;
-            }
-            else if (className.indexOf('privacy') > -1) {
-                loadSubPage('privacy');
-                return false;
-            }
-            else if (className.indexOf('mega') > -1) {
-                loadSubPage('mega');
-                return false;
-            }
-            else if (className.indexOf('copyright') > -1) {
-                loadSubPage('copyright');
-                return false;
-            }
-            else if (className.indexOf('takedown') > -1) {
-                loadSubPage('takedown');
-                return false;
-            }
-            else if (className.indexOf('account') > -1) {
-                loadSubPage('fm/account');
-                return false;
-            }
             else if (className.indexOf('refresh') > -1) {
-                mega.utils.reload();
+                M.reload();
             }
             else if (className.indexOf('languages') > -1) {
                 langDialog.show();
@@ -1896,6 +1787,7 @@ function topmenuUI() {
                 mLogout();
             }
         }
+        return false;
     });
 
     $('.st-bottom-button').rebind('click', function () {
@@ -1961,7 +1853,38 @@ function topmenuUI() {
                     e.stopPropagation();
                 }
                 else {
-                    loadSubPage('fm/search/' + val);
+                    loadingDialog.show();
+                    var promise = new MegaPromise();
+
+                    if (!M.nn) {
+                        M.nn = Object.create(null);
+
+                        promise = fmdb.get('f')
+                            .always(function(r) {
+                                for (var i = r.length; i--;) {
+                                    M.nn[r[i].h] = r[i].name;
+                                }
+                            });
+                    }
+                    else {
+                        promise.resolve();
+                    }
+
+                    promise.always(function() {
+                        var handles = [];
+                        var filter = M.getFilterBySearchFn(val);
+
+                        for (var h in M.nn) {
+                            if (!M.d[h] && filter({name: M.nn[h]})) {
+                                handles.push(h);
+                            }
+                        }
+
+                        dbfetch.geta(handles).always(function() {
+                            loadingDialog.hide();
+                            loadSubPage('fm/search/' + val);
+                        });
+                    });
                 }
             }
         }
@@ -2058,7 +1981,7 @@ function topmenuUI() {
             loadSubPage($.dlhash);
         }
         else if (folderlink && M.lastSeenFolderLink) {
-            $(document).one('MegaOpenFolder', function() {
+            mBroadcaster.once('mega:openfolder', function() {
                 $('.nw-fm-left-icon.transfers').click();
             });
             loadSubPage(M.lastSeenFolderLink);
@@ -2088,7 +2011,9 @@ function is_fm() {
             || page.substr(0, 2) === 'fm' || page.substr(0, 7) === 'account';
     }
 
-    if (d > 1) console.error('is_fm', r, page, hash);
+    if (d > 2) {
+        console.warn('is_fm', r, page, hash);
+    }
 
     return r;
 }
@@ -2140,19 +2065,17 @@ function parsepage(pagehtml, pp) {
         .safeHTML(translate(pages['transferwidget']) + pagehtml)
         .show();
 
-    clickURLs();
-
-    Soon(mainScroll);
+    onIdle(mainScroll);
     $(window).rebind('resize.subpage', function (e) {
         if (page !== 'start' && page !== 'download') {
             mainScroll();
         }
-        mega.utils.chrome110ZoomLevelNotification();
+        M.chrome110ZoomLevelNotification();
     });
 
     $('.nw-bottom-block').addClass(lang);
-    if (typeof UIkeyevents === 'function') {
-        UIkeyevents();
+    if (typeof M.initUIKeyEvents === 'function') {
+        M.initUIKeyEvents();
     }
     clickURLs();
 }
@@ -2273,10 +2196,10 @@ window.onunload = function() {
     mBroadcaster.crossTab.leave();
 };
 
-if (!is_karma) {
-    window.M = new MegaData();
-    attribCache = new IndexedDBKVStorage('ua', { murSeed: 0x800F0002 });
+mBroadcaster.once('boot_done', function() {
+    M = new MegaData();
+    attribCache = new IndexedDBKVStorage('ua', {murSeed: 0x800F0002});
     attribCache.syncNameTimer = {};
     attribCache.uaPacketParser = uaPacketParser;
     attribCache.bitMapsManager = new MegaDataBitMapManager();
-}
+});

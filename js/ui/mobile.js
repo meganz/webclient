@@ -183,9 +183,6 @@ mobile.cloud = {
             return false;
         }
 
-        // Count the number of files in the folders
-        this.countFoldersAndFilesInFolders(false);
-
         // Render the file manager header, folders, files and footer
         this.renderHeader();
         this.renderFoldersAndFiles();
@@ -290,9 +287,6 @@ mobile.cloud = {
      */
     countAndUpdateSubFolderTotals: function() {
 
-        // Count the number of files in the folders
-        mobile.cloud.countFoldersAndFilesInFolders(true);
-
         // Loop through current view
         for (var i = 0; i < M.v.length; i++) {
 
@@ -303,14 +297,8 @@ mobile.cloud = {
             // If folder type
             if (nodeType === 1) {
 
-                var numOfFolders = 0;
-                var numOfFiles = 0;
-
-                // Check it is defined for this node, then get the number of folders and files inside the folder
-                if (typeof mobile.cloud.folderAndFileCounts[nodeHandle] !== 'undefined') {
-                    numOfFolders = mobile.cloud.folderAndFileCounts[nodeHandle].folders;
-                    numOfFiles = mobile.cloud.folderAndFileCounts[nodeHandle].files;
-                }
+                var numOfFolders = node.td;
+                var numOfFiles = node.tf;
 
                 // Translate the text for 1 file/folder or x files/folders
                 var foldersWording = (numOfFolders === 1) ? l[834] : l[832].replace('[X]', numOfFolders);
@@ -326,8 +314,9 @@ mobile.cloud = {
      * Removes a node from the current view if applicable, updates the footer with the new
      * file/folder count and also shows an empty cloud drive/folder message if applicable
      * @param {String} nodeHandle The handle of the node to be removed
+     * @param {String} parentHandle The parent handle of the node to be removed
      */
-    renderDelete: function(nodeHandle) {
+    renderDelete: function(nodeHandle, parentHandle) {
 
         // Remove the node if in the current view
         $('#' + nodeHandle).remove();
@@ -336,6 +325,12 @@ mobile.cloud = {
         mobile.cloud.showEmptyCloudIfEmpty();
         mobile.cloud.countAndUpdateSubFolderTotals();
         mobile.cloud.renderFooter();
+
+        // If in the current folder and this got removed, then we need to go back up and open the parent folder
+        if (M.currentdirid === nodeHandle || M.isCircular(nodeHandle, M.currentdirid) === true) {
+            parentHandle = parentHandle || Object(M.getNodeByHandle(nodeHandle)).p || M.getNodeRoot(nodeHandle);
+            M.openFolder(parentHandle);
+        }
     },
 
     /**
@@ -484,22 +479,7 @@ mobile.cloud = {
      */
     getFullSizeOfFolder: function() {
 
-        var fileSizesTotal = 0;
-
-        // Loop through all known nodes
-        for (var nodeHandle in M.d) {
-            if (M.d.hasOwnProperty(nodeHandle)) {
-
-                var node = M.d[nodeHandle];
-                var nodeType = node.t;
-                var nodeSize = node.s;
-
-                // If node is a file type, update the total
-                if (nodeType === 0) {
-                    fileSizesTotal += nodeSize;
-                }
-            }
-        }
+        var fileSizesTotal = Object(M.d[M.RootID]).tb;
 
         // Format the text e.g. 3 KB or 3 MB
         var fileSizesTotalFormatted = numOfBytes(fileSizesTotal);
@@ -630,14 +610,8 @@ mobile.cloud = {
     updateFolderTemplate: function($templateSelector, node) {
 
         var nodeHandle = node.h;
-        var numOfFolders = 0;
-        var numOfFiles = 0;
-
-        // Check it is defined for this node, then get the number of folders and files directly inside the folder
-        if (typeof this.folderAndFileCounts[nodeHandle] !== 'undefined') {
-            numOfFolders = this.folderAndFileCounts[nodeHandle].folders;
-            numOfFiles = this.folderAndFileCounts[nodeHandle].files;
-        }
+        var numOfFolders = node.td;
+        var numOfFiles = node.tf;
 
         // Translate the text for 1 file/folder or x files/folders
         var foldersWording = (numOfFolders === 1) ? l[834] : l[832].replace('[X]', numOfFolders);
@@ -667,53 +641,6 @@ mobile.cloud = {
     },
 
     /**
-     * Create a dictionary with the keys of the parent folder handles
-     * and the number of folders and files directly inside that folder
-     * @param {Boolean} forceUpdate If true, forces a recount e.g. after action packets have been received
-     */
-    countFoldersAndFilesInFolders: function(forceUpdate) {
-
-        // Don't count the folders and files every render, only if empty initially and after receiving action packets
-        if (!forceUpdate && (mobile.cloud.folderAndFileCounts !== null)) {
-            return false;
-        }
-
-        var folderAndFileCounts = {};
-
-        // Loop all known nodes
-        for (var nodeHandle in M.d) {
-            if (M.d.hasOwnProperty(nodeHandle)) {
-
-                var node = M.d[nodeHandle];
-                var parentHandle = node.p;
-                var nodeType = node.t;
-
-                // If the key is not set
-                if (typeof folderAndFileCounts[parentHandle] === 'undefined') {
-
-                    // Set the key to the parent handle and us an object to hold the number of folders and files
-                    folderAndFileCounts[parentHandle] = {
-                        folders: 0,
-                        files: 0
-                    };
-                }
-
-                // Increment the total for a folder found with this parent
-                if (nodeType) {
-                    folderAndFileCounts[parentHandle].folders += 1;
-                }
-                else {
-                    // Otherwise increment the total for a file found with this parent
-                    folderAndFileCounts[parentHandle].files += 1;
-                }
-            }
-        }
-
-        // Store for use later
-        mobile.cloud.folderAndFileCounts = folderAndFileCounts;
-    },
-
-    /**
      * Populate the template row for a file
      * @param {Object} $templateSelector The jQuery selector for the template
      * @param {Object} node The node object with values
@@ -727,7 +654,7 @@ mobile.cloud = {
 
         // Use the modified timestamp if available, or the MEGA created timestamp, then format date as 12 January 2016
         var modifiedTimestamp = node.mtime || node.ts;
-        var fileDate = humandate(modifiedTimestamp);
+        var fileDate = time2date(modifiedTimestamp, 2);
 
         // Map the file extension back to the image icon
         var iconName = fileIcon(node);
@@ -1005,7 +932,7 @@ mobile.deleteOverlay = {
         // Get initial overlay details
         var node = M.d[nodeHandle];
         var fileName = node.name;
-        var fileSizeBytes = node.s;
+        var fileSizeBytes = node.s || node.tb;
         var fileSize = numOfBytes(fileSizeBytes);
         var fileSizeFormatted = fileSize.size + ' ' + fileSize.unit;
         var fileIconName = fileIcon(node);
@@ -1106,7 +1033,7 @@ mobile.linkOverlay = {
         // Get initial overlay details
         var node = M.d[nodeHandle];
         var fileName = node.name;
-        var fileSizeBytes = node.s;
+        var fileSizeBytes = node.s || node.tb;
         var fileSize = numOfBytes(fileSizeBytes);
         var fileSizeFormatted = fileSize.size + ' ' + fileSize.unit;
         var fileIconName = fileIcon(node);
@@ -1590,7 +1517,7 @@ mobile.downloadOverlay = {
         this.startTime = new Date().getTime();
 
         // Start download and show progress
-        mega.utils.gfsfetch(nodeHandle, 0, -1, this.showDownloadProgress).always(function(data) {
+        M.gfsfetch(nodeHandle, 0, -1, this.showDownloadProgress).always(function(data) {
 
             mobile.downloadOverlay.showDownloadComplete(data, nodeHandle);
         });
@@ -2329,7 +2256,7 @@ mobile.register = {
             var $loader = this.$registerScreen.find('.estimator-loading-icon').addClass('loading');
 
             // On completion of loading, hide the loading spinner
-            mega.utils.require('zxcvbn_js')
+            M.require('zxcvbn_js')
                 .done(function() {
                     $loader.removeClass('loading');
                 });
@@ -2553,19 +2480,20 @@ mobile.register = {
     showConfirmEmailScreen: function(registrationVars) {
 
         var $confirmScreen = $('.registration-confirm-email');
+        var $registerScreen = $('.mobile.signin-register-block');
         var $changeEmailInput = $confirmScreen.find('.change-email input');
         var $resendButton = $confirmScreen.find('.resend-button');
 
         // Hide the current register screen and show the confirmation one
-        this.$screen.addClass('hidden');
+        $registerScreen.addClass('hidden');
         $confirmScreen.removeClass('hidden');
 
         // Set the email into the text field
         $changeEmailInput.val(registrationVars.email);
 
         // Init email input keyup and Resend button
-        this.initConfirmEmailScreenKeyup($changeEmailInput, $resendButton);
-        this.initConfirmEmailScreenResendButton($changeEmailInput, $resendButton, registrationVars);
+        mobile.register.initConfirmEmailScreenKeyup($changeEmailInput, $resendButton);
+        mobile.register.initConfirmEmailScreenResendButton($changeEmailInput, $resendButton, registrationVars);
     },
 
     /**
@@ -2897,7 +2825,7 @@ mobile.menu = {
         $logoutMenuItem.off('tap').on('tap', function() {
 
             // Log the user out and go back to the login page
-            mega.utils.logout();
+            M.logout();
             loadSubPage('login');
 
             // Show a toast notification
@@ -3023,10 +2951,8 @@ mobile.upload = {
 /**
  * Some stubs to prevent exceptions in action packet processing because not all files are loaded for mobile
  */
-mega.checkStorageQuota = function() {};
 
 mega.ui.tpp = {
-    megaUtilsResetUploadDownload: function() {},
     reset: function() {},
     setTotalProgress: function() {}
 };
@@ -3042,3 +2968,16 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
     // Call the mobile version
     mobile.messageOverlay.show(msg, submsg);
 }
+
+function removeUInode(nodeHandle, parentHandle) {
+
+    // Call the mobile version
+    mobile.cloud.renderDelete(nodeHandle, parentHandle);
+}
+
+// Not required for mobile
+function fmtopUI() {}
+function topmenuUI() {}
+function sharedUInode() {}
+function addToMultiInputDropDownList() {}
+function removeFromMultiInputDDL() {}

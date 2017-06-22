@@ -16,7 +16,7 @@ var PerfectScrollbar = require('./../../ui/perfectScrollbar.jsx').PerfectScrollb
 var ParticipantsList = require('./participantsList.jsx').ParticipantsList;
 
 var GenericConversationMessage = require('./messages/generic.jsx').GenericConversationMessage;
-var AlterParticipantsConversationMessage = 
+var AlterParticipantsConversationMessage =
     require('./messages/alterParticipants.jsx').AlterParticipantsConversationMessage;
 var TruncatedMessage = require('./messages/truncated.jsx').TruncatedMessage;
 var PrivilegeChange = require('./messages/privilegeChange.jsx').PrivilegeChange;
@@ -84,7 +84,7 @@ var ConversationRightArea = React.createClass({
 
         var myPresence = room.megaChat.xmppPresenceToCssClass(M.u[u_handle].presence);
 
-        var startAudioCallButton = 
+        var startAudioCallButton =
                         <div className={"link-button"} onClick={() => {
                             room.startAudioCall();
                         }}>
@@ -92,7 +92,7 @@ var ConversationRightArea = React.createClass({
             {__(l[5896])}
         </div>;
 
-        var startVideoCallButton = 
+        var startVideoCallButton =
                     <div className={"link-button"} onClick={() => {
                         room.startVideoCall();
                     }}>
@@ -103,7 +103,7 @@ var ConversationRightArea = React.createClass({
         if (room.isReadOnly()) {
            startAudioCallButton = startVideoCallButton = null;
         }
-        var endCallButton =     
+        var endCallButton =
                     <div className={"link-button red" + (!contact.presence? " disabled" : "")} onClick={() => {
                         if (contact.presence && contact.presence !== "offline") {
                             if (room.callSession) {
@@ -151,9 +151,9 @@ var ConversationRightArea = React.createClass({
         ) {
             dontShowTruncateButton = true;
         }
-        
+
         var membersHeader = null;
-        
+
         if (room.type === "group") {
             membersHeader = <div className="chat-right-head">
                 <div className="chat-grey-counter">
@@ -890,7 +890,7 @@ var ConversationPanel = React.createClass({
                 self.messagesListScrollable.scrollToBottom(true);
             });
         }
-        
+
         if (prevProps.isActive === false && self.props.isActive === true) {
             var $typeArea = $('.messages-textarea:visible:first', $node);
             if ($typeArea.size() === 1) {
@@ -904,7 +904,7 @@ var ConversationPanel = React.createClass({
             $input[0].selectionStart = 0;
             $input[0].selectionEnd = $input.val().length;
         }
-        
+
         if (prevState.editing === false && self.state.editing !== false) {
             if (self.messagesListScrollable) {
                 self.messagesListScrollable.reinitialise(false);
@@ -1360,7 +1360,7 @@ var ConversationPanel = React.createClass({
                                         'messageToBeDeleted': v
                                     });
                                 }
-                                
+
                                 self.setState({'editing': false});
                             }}
                             onDeleteClicked={(e, msg) => {
@@ -1428,7 +1428,7 @@ var ConversationPanel = React.createClass({
                 }}
             />
         }
-        
+
         var confirmDeleteDialog = null;
         if (self.state.confirmDeleteDialog === true) {
             confirmDeleteDialog = <ModalDialogsUI.ConfirmDialog
@@ -1445,7 +1445,7 @@ var ConversationPanel = React.createClass({
                         return;
                     }
                     var chatdint = room.megaChat.plugins.chatdIntegration;
-                    if (msg.getState() === Message.STATE.SENT || 
+                    if (msg.getState() === Message.STATE.SENT ||
                         msg.getState() === Message.STATE.DELIVERED ||
                         msg.getState() === Message.STATE.NOT_SENT) {
                         chatdint.deleteMessage(room, msg.internalId ? msg.internalId : msg.orderValue);
@@ -1517,11 +1517,22 @@ var ConversationPanel = React.createClass({
                         return;
                     }
 
+                    try {
+                        Object.defineProperty(meta[0], 'name', {
+                            configurable: true,
+                            writeable: true,
+                            value: Date.now() + '.' + M.getSafeName(meta[1] || meta[0].name)
+                        });
+                    }
+                    catch (e) {}
+
                     M.addUpload([meta[0]]);
 
                     self.setState({
                         'pasteImageConfirmDialog': false
                     });
+
+                    URL.revokeObjectURL(meta[2]);
                 }}
             >
                 <div className="fm-dialog-content">
@@ -1805,7 +1816,9 @@ var ConversationPanel = React.createClass({
                     {
                         self.props.chatRoom.type === "group" ?
                             <div className="chat-topic-block">
-                                {self.props.chatRoom.getRoomTitle()}
+                                <utils.EmojiFormattedContent>{
+                                    self.props.chatRoom.getRoomTitle()
+                                }</utils.EmojiFormattedContent>
                             </div> :
                             undefined
                     }
@@ -2006,7 +2019,7 @@ var ConversationPanels = React.createClass({
                     if (contact.u === u_handle) {
                         return;
                     }
-                    
+
                     if(contact.c === 1) {
                         var pres = self.props.megaChat.xmppPresenceToCssClass(contact.presence);
 

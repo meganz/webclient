@@ -14,7 +14,7 @@ function dashboardUI() {
         });
     }
 
-    sectionUIopen('dashboard');
+    M.onSectionUIOpen('dashboard');
 
     // Show Membership plan
     $('.small-icon.membership').removeClass('pro1 pro2 pro3 pro4');
@@ -53,7 +53,7 @@ function dashboardUI() {
 
     // Add-contact plus
     $('.dashboard .contacts-widget .add-contacts').rebind('click', function() {
-        addContactUI();
+        contactAddDialog();
         $('.fm-add-user').trigger('click');
         $('.add-user-size-icon').trigger('click');
         return false;
@@ -101,11 +101,7 @@ function dashboardUI() {
 
     // Account data
     M.accountData(function(account) {
-
         var perc;
-        var perc_c;
-        var b_exceeded;
-        var s_exceeded;
 
         // Show ballance
         $('.account.left-pane.balance-info').text(l[7108]);
@@ -227,10 +223,8 @@ function dashboardUI() {
 
 
         /* Used Bandwidth progressbar */
-        $('.bandwidth .account.progress-bar.green')
-            .css('width', account.tfsq.perc + '%');
-        $('.bandwidth .account.progress-size.available-quota')
-            .text(bytesToSize(account.tfsq.left, 0));
+        $('.bandwidth .account.progress-bar.green').css('width', account.tfsq.perc + '%');
+        $('.bandwidth .account.progress-size.available-quota').text(bytesToSize(account.tfsq.left, 0));
 
         if (u_attr.p) {
             $('.account.widget.bandwidth').addClass('enabled-pr-bar');
@@ -292,7 +286,7 @@ function dashboardUI() {
         // Fill rest of widgets
         dashboardUI.updateWidgets();
 
-        Soon(fm_resize_handler);
+        onIdle(fm_resize_handler);
         initTreeScroll();
     });
 }
@@ -382,6 +376,11 @@ dashboardUI.updateCloudDataWidget = function() {
     var map = ['files', 'folders', 'rubbish', 'ishares', 'oshares', 'links'];
     var intl = typeof Intl !== 'undefined' && Intl.NumberFormat && new Intl.NumberFormat();
 
+    $('.data-item .links-s').rebind('click', function() {
+        loadSubPage('fm/links');
+        return false;
+    });
+
     $('.data-float-bl').find('.data-item')
         .each(function(idx, elm) {
             var props = data[map[idx]];
@@ -394,7 +393,11 @@ dashboardUI.updateCloudDataWidget = function() {
                 cnt = intl.format(props.cnt || 0);
             }
 
-            elm.children[1].textContent = String(str).replace('[X]', cnt);
+            if (props.xfiles > 1) {
+                str += ', ' + String(l[833]).replace('[X]', props.xfiles);
+            }
+
+            elm.children[1].textContent = idx < 5 ? String(str).replace('[X]', cnt) : cnt;
             if (props.cnt > 0) {
                 elm.children[2].textContent = bytesToSize(props.size);
                 $(elm).removeClass('empty');

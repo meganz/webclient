@@ -310,7 +310,7 @@
                     $.rmItemsInView = (maxItemsInView | 0);
                 }
 
-                return maxItemsInView || (Math.pow(2, 32) - 1);
+                return maxItemsInView || 200;
             }
         });
 
@@ -390,6 +390,10 @@
                 }
                 else if (String(M.currentdirid).substr(0, 7) === 'search/') {
                     $('.fm-empty-search').removeClass('hidden');
+                }
+                else if (M.currentdirid === 'links') {
+                    // TODO: a dedicated splash
+                    $('.fm-empty-folder').removeClass('hidden');
                 }
                 else if (M.currentdirid === M.RootID && folderlink) {
                     // FIXME: implement

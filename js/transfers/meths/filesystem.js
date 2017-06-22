@@ -82,6 +82,60 @@
         Soon(aError.bind(window, new Error('Unknown FileSystem API.')));
     }
 
+    function isSecurityError(e) {
+        return Object(e).name === 'SecurityError';
+    }
+
+    function checkSecurityError(e) {
+        if (isSecurityError(e)) {
+            window.Incognito = 0xC120E;
+
+            /**
+             * Apparently indexedDBs are handled in memory on
+             * Incognito windows, which turns it a non-suitable
+             * workaround for the 496MB Blob limit :(
+
+            if (idbDownloadIO.usable()) {
+                dlMethod = idbDownloadIO;
+            }
+            else*/ if (MemoryIO.usable()) {
+                dlMethod = MemoryIO;
+            }
+            else {
+                dlMethod = FlashIO;
+            }
+            if (d) {
+                console.warn('Switching to ' + dlMethod.name);
+            }
+
+            // https://code.google.com/p/chromium/issues/detail?id=375297
+            MemoryIO.fileSizeLimit = 496 * 1024 * 1024;
+
+            return true;
+        }
+    }
+
+    function onSecurityErrorSwitchMethod(dl, dl_id, e) {
+        if (checkSecurityError(e)) {
+            dlFatalError(dl, e, -0xDEADBEEF, 2);
+
+            onIdle(function() {
+                if (page !== 'download') {
+                    M.addWebDownload([dl_id]);
+                }
+                else {
+                    $.doFireDownload = true;
+                    M.resetUploadDownload();
+                    dlinfo(dlid, dlkey, false);
+                }
+            });
+
+            return true;
+        }
+
+        return false;
+    }
+
     function clearit(storagetype, t, callback) {
         var tsec = t || 3600;
 
@@ -214,7 +268,7 @@
 
                 if (callback) {
                     setTimeout(function() {
-                        callback();
+                        callback(Object(s).name === 'SecurityError' ? s : null);
                     }, ms || 2600);
                 }
             });
@@ -230,7 +284,7 @@
             }
 
             if (max_retries) {
-                Later(dl_getspace.bind(this, reqsize, callback, --max_retries));
+                later(dl_getspace.bind(this, reqsize, callback, --max_retries));
             }
             else {
                 callback(aStorageType, aEvent, -1);
@@ -330,7 +384,7 @@
                 break;
             case 'InvalidStateError':
                 console.log('INVALID_STATE_ERROR in ' + type + ', retrying...');
-                Later(this.fsInitOp.bind(this));
+                later(this.fsInitOp.bind(this));
                 break;
             default:
                 console.error('Unexpected error...', e.code, e.name, e);
@@ -463,7 +517,7 @@
                     return;
                 }
 
-                if (aFail === -1) {
+                if (aFail === -1 && !isSecurityError(aEvent)) {
                     if (!$.msgDialog) {
                         srvlog('Out of HTML5 Offline Storage space (open)');
 
@@ -492,7 +546,11 @@
                     dl_storagetype,
                     dl_filesize,
                     dl_createtmpfile,
-                    errorHandler.bind(this, 'RequestFileSystem')
+                    function(e) {
+                        if (!onSecurityErrorSwitchMethod(dl, dl_id, e)) {
+                            errorHandler.call(this, 'RequestFileSystem', e);
+                        }
+                    }.bind(this)
                 );
             }.bind(this));
         };
@@ -617,7 +675,7 @@
                 }
 
                 if (link) {
-                    Later(function() {
+                    later(function() {
                         myURL.revokeObjectURL(link);
                     });
                 }
@@ -672,31 +730,9 @@
                 if (window.requestFileSystem) {
                     window.requestFileSystem(0, 0x10000,
                         function(fs) {
-                            free_space();
+                            free_space(checkSecurityError);
                         },
-                        function(e) {
-                            if (e && e.name === 'SecurityError') {
-                                window.Incognito = 0xC120E;
-
-                            /* Apparently indexedDBs are handled in memory on
-                               Incognito windows, which turns it a non-suitable
-                               workaround for the 496MB Blob limit :(
-
-                                if (idbDownloadIO.usable()) {
-                                    dlMethod = idbDownloadIO;
-                                }
-                                else*/ if (MemoryIO.usable()) {
-                                    dlMethod = MemoryIO;
-                                }
-                                else {
-                                    dlMethod = FlashIO;
-                                }
-                                console.error('Switching to ' + dlMethod.name);
-
-                                // https://code.google.com/p/chromium/issues/detail?id=375297
-                                MemoryIO.fileSizeLimit = 496*1024*1024;
-                            }
-                        }
+                        checkSecurityError
                     );
                 }
                 else if (MemoryIO.usable()) {

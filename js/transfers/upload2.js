@@ -908,7 +908,7 @@ ChunkUpload.prototype.abort = function() {
         this.xhr.abort(this.xhr.ABORT_CLEANUP);
     }
     if (GlobalProgress[this.gid]) {
-        removeValue(GlobalProgress[this.gid].working, this, 1);
+        array.remove(GlobalProgress[this.gid].working, this, 1);
     }
     else if (d && this.logger) {
         this.logger.error('This should not be reached twice or after FileUpload destroy...', this);
@@ -1152,7 +1152,7 @@ ChunkUpload.prototype.run = function(done) {
         }
         this.file.ul_reader.push(this, this.io_ready, this);
     }
-    removeValue(GlobalProgress[this.gid].working, this, 1);
+    array.remove(GlobalProgress[this.gid].working, this, 1);
     GlobalProgress[this.gid].working.push(this);
 };
 

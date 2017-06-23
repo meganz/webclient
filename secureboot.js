@@ -1724,6 +1724,7 @@ else if (!b_u) {
     jsl.push({f:'js/vendor/megaLogger.js', n: 'megaLogger_js', j:1});
 
     jsl.push({f:'js/utils/browser.js', n: 'js_utils_browser_js', j: 1});
+    jsl.push({f:'js/utils/conv.js', n: 'js_utils_conv_js', j: 1});
     jsl.push({f:'js/utils/debug.js', n: 'js_utils_debug_js', j: 1});
     jsl.push({f:'js/utils/dom.js', n: 'js_utils_dom_js', j: 1});
     jsl.push({f:'js/utils/locale.js', n: 'js_utils_locale_js', j: 1});

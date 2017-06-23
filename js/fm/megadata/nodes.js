@@ -1663,7 +1663,7 @@ MegaData.prototype.getSharingUsers = function(nodes, userobj) {
         }
     }
 
-    users = array_unique(users);
+    users = array.unique(users);
 
     if (userobj) {
         users = users.map(function(h) {

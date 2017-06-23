@@ -1240,7 +1240,7 @@ React.makeElement = React['createElement'];
 	            timeout: timeout ? timeout : 10000
 	        }).done(function (r) {
 	            if (r.xmpp && r.xmpp.length > 0) {
-	                var randomHost = array_random(r.xmpp);
+	                var randomHost = array.random(r.xmpp);
 	                if (webSocketsSupport) {
 	                    $promise.resolve("wss://" + randomHost.host + "/ws");
 	                } else {
@@ -1250,7 +1250,7 @@ React.makeElement = React['createElement'];
 	                self.logger.error("GeLB returned no results. Halting.");
 	                $promise.reject();
 	            } else {
-	                var server = array_random(self.options.fallbackXmppServers);
+	                var server = array.random(self.options.fallbackXmppServers);
 	                self.logger.error("Got empty list from the load balancing service for xmpp, will fallback to: " + server + ".");
 	                if (webSocketsSupport) {
 	                    server = server.replace("https:", "wss:").replace("/bosh", "/ws");
@@ -1258,7 +1258,7 @@ React.makeElement = React['createElement'];
 	                $promise.resolve(server);
 	            }
 	        }).fail(function () {
-	            var server = array_random(self.options.fallbackXmppServers);
+	            var server = array.random(self.options.fallbackXmppServers);
 	            self.logger.error("Could not connect to load balancing service for xmpp, will fallback to: " + server + ".");
 
 	            if (webSocketsSupport) {
@@ -2014,7 +2014,7 @@ React.makeElement = React['createElement'];
 
 	"use strict";
 
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
@@ -3678,7 +3678,7 @@ React.makeElement = React['createElement'];
 	        var self = this;
 
 	        var foundKeys = Object.keys(self.props);
-	        removeValue(foundKeys, 'dropdowns', true);
+	        array.remove(foundKeys, 'dropdowns', true);
 
 	        var shouldUpdate = undefined;
 	        foundKeys.forEach(function (k) {
@@ -3936,7 +3936,7 @@ React.makeElement = React['createElement'];
 	                                self.props.onSelected(selected);
 	                            }
 	                        } else {
-	                            removeValue(selected, contactHash);
+	                            array.remove(selected, contactHash);
 	                            if (self.props.onSelected) {
 	                                self.props.onSelected(selected);
 	                            }
@@ -4140,7 +4140,7 @@ React.makeElement = React['createElement'];
 	        if (room.isReadOnly()) {}
 	        var excludedParticipants = room.type === "group" ? room.members && Object.keys(room.members).length > 0 ? Object.keys(room.members) : room.getContactParticipants() : room.getContactParticipants();
 
-	        removeValue(excludedParticipants, u_handle, false);
+	        array.remove(excludedParticipants, u_handle, false);
 
 	        var dontShowTruncateButton = false;
 	        if (myPresence === 'offline' || !room.iAmOperator() || room.isReadOnly() || room.messagesBuff.messages.length === 0 || room.messagesBuff.messages.length === 1 && room.messagesBuff.messages.getItem(0).dialogType === "truncated") {
@@ -8438,7 +8438,7 @@ React.makeElement = React['createElement'];
 
 	        contacts = room.type === "group" ? room.members && Object.keys(room.members).length > 0 ? Object.keys(room.members) : room.getContactParticipantsExceptMe() : room.getContactParticipantsExceptMe();
 
-	        removeValue(contacts, u_handle, true);
+	        array.remove(contacts, u_handle, true);
 
 	        var firstVisibleUserNum = Math.floor(self.props.scrollPositionY / self.props.contactCardHeight);
 	        var visibleUsers = Math.ceil(self.props.scrollHeight / self.props.contactCardHeight);

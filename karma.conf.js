@@ -72,6 +72,7 @@ module.exports = function(config) {
         'nodedec.js',
         'js/utils/browser.js',
         'js/utils/debug.js',
+        'js/utils/conv.js',
         'js/utils/dom.js',
         'js/utils/locale.js',
         'js/utils/pictools.js',

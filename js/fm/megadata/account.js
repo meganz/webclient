@@ -137,12 +137,12 @@ MegaData.prototype.accountData = function(cb, blockui) {
                 var cstrgn = ctx.account.cstrgn = Object(ctx.account.cstrgn);
                 var stats = ctx.account.stats = Object.create(null);
                 var groups = [M.RootID, M.InboxID, M.RubbishID];
-                var root = array_toobject(groups);
+                var root = array.to.object(groups);
                 var exp = Object(M.su.EXP);
 
                 groups = groups.concat(['inshares', 'outshares', 'links']);
                 for (var i = groups.length; i--;) {
-                    stats[groups[i]] = array_toobject(['items', 'bytes', 'files', 'folders'], 0);
+                    stats[groups[i]] = array.to.object(['items', 'bytes', 'files', 'folders'], 0);
                     // stats[groups[i]].nodes = [];
                 }
 

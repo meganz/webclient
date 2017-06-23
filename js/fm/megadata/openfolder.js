@@ -177,7 +177,10 @@
                 console.timeEnd('time for rendering');
             }
 
-            if (fcv_watch[this.currentrootid] && this.currentdirid !== 'shares' && !(Date.now() % 10)) {
+            if (fcv_watch[this.currentrootid]
+                    && this.currentdirid !== 'shares'
+                    && (is_extension || !(Date.now() % 10))) {
+
                 var f = 0;
                 var t = 0;
                 var n = this.d[this.currentdirid] || false;
@@ -196,6 +199,8 @@
                     tf: n.tf,
                     tb: n.tb,
                     sn: currsn,
+                    fsn: mega.fcv_fsn,
+                    sc: array.pack(sc_history),
                     db: mega.fcv_db | 0
                 }, {}, pfid ? 1 : 0);
             }

@@ -787,33 +787,22 @@ MegaData.prototype.delPS = function(pcrId, nodeId) {
  *
  */
 MegaData.prototype.checkInviteContactPrerequisites = function(email) {
-    var TIME_FRAME = 60 * 60 * 24 * 14;// 14 days in seconds
+    "use strict";
 
     // Check pending invitations
     var opc = M.opc;
     for (var i in opc) {
         if (this.opc[i].m === email) {
-//                if (opc[i].rts + TIME_FRAME <= Math.floor(new Date().getTime() / 1000)) {
             return 0;
-//                }
-            // return -12;
         }
     }
-
-    // Check incoming invitations
-    // This part of code is not necessary case server handle mutial
-    // invitation and automatically translates invites into actual contacts
-//        var ipc = M.ipc;
-//        for (var i in ipc) {
-//            if (M.ipc[i].m === email) {
-//                return -10;
-//            }
-//        }
 
     // Check active contacts
     var result = 0;
     M.u.forEach(function(v, k) {
-        if (v.m === email && v.c !== 0) {
+
+        // Invite all except full contact users
+        if (v.m === email && v.c === 1) {
             result = -2;
             return false; // break;
         }

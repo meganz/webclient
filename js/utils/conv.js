@@ -51,7 +51,7 @@
      * Remove an element from an array
      * @param {Array} input The input array
      * @param {*} value The value to remove
-     * @param {Boolean} can_fail Whether the value might not be in the array
+     * @param {Boolean} [can_fail] Whether the value might not be in the array
      * @returns {Boolean} whether the value was removed
      * @memberOf array
      */

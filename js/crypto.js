@@ -1212,6 +1212,13 @@ function api_req(request, context, channel) {
 // FIXME: check for fetch on !Firefox, not just on Chrome
 var chunked_method = window.chrome ? (self.fetch ? 2 : 0) : -1;
 
+if (typeof Uint8Array.prototype.indexOf !== 'function') {
+    if (d) {
+        console.debug('No chunked method on this browser: ' + ua);
+    }
+    chunked_method = 0;
+}
+
 // this kludge emulates moz-chunked-arraybuffer with XHR-style callbacks
 function chunkedfetch(xhr, uri, postdata) {
     "use strict";
@@ -1445,10 +1452,6 @@ function api_send(q) {
 
     q.xhr.cancelled = false;
 
-    if (chunked_method === 2 && typeof Uint8Array.prototype.indexOf !== 'function') {
-        chunked_method = 0;
-    }
-
     if (q.split && chunked_method == 2) {
         // use chunked fetch with JSONSplitter input type Uint8Array
         q.splitter = new JSONSplitter(q.split, q.xhr, true);
@@ -1461,9 +1464,7 @@ function api_send(q) {
         if (q.split) {
             if (chunked_method) {
                 // FIXME: use Fetch API if more efficient than this
-                if (typeof Uint8Array.prototype.indexOf === 'function') {
-                    q.xhr.responseType = 'moz-chunked-arraybuffer';
-                }
+                q.xhr.responseType = 'moz-chunked-arraybuffer';
 
                 // first try? record success
                 if (chunked_method < 0) {

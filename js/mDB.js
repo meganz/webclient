@@ -1578,7 +1578,11 @@ Object.defineProperty(self, 'dbfetch', (function() {
             /*if ($.len(inflight)) {
              masterPromise = MegaPromise.allDone(array.unique(obj_values(inflight)).concat(promise));
             }
-            else*/ if (!handles.length) {
+             else*/
+            if (!handles.length || !fmdb) {
+                if (d && handles.length) {
+                    console.warn('Unknown nodes: ' + handles);
+                }
                 return MegaPromise.resolve(result);
             }
 

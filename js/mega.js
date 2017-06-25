@@ -1726,6 +1726,11 @@ function worker_procmsg(ev) {
 var fmdb;
 var ufsc;
 
+mBroadcaster.once('startMega', function() {
+    // Initialize ufs size cache
+    ufsc = new UFSSizeCache();
+});
+
 function loadfm(force) {
     "use strict";
 
@@ -1796,9 +1801,6 @@ function fetchfm(sn) {
     // we always intially fetch historical actionpactions
     // before showing the filemanager
     initialscfetch = true;
-
-    // ufs size cache
-    ufsc = new UFSSizeCache();
 
     var promise;
     if (is_mobile) {
@@ -1927,7 +1929,11 @@ function dbfetchfm() {
 
                             if (!mBroadcaster.crossTab.master) {
                                 // on a secondary tab, prevent writing to DB once we have read its contents
-                                fmdb.crashed = 'slave';
+                                // XXX: TypeError: Cannot create property 'crashed' on boolean 'false'
+                                // ^^^ how does `fmdb` get set to `false` here ?! :-/
+                                if (fmdb) {
+                                    fmdb.crashed = 'slave';
+                                }
                             }
 
                             // fetch & process new actionpackets

@@ -206,6 +206,10 @@ function topPopupAlign(button, popup, topPos) {
 function init_page() {
     page = page || (u_type ? 'fm' : 'start');
 
+    if (!window.M) {
+        return console.warn('Something went wrong, the initialization did not completed...');
+    }
+
     // If they are transferring from mega.co.nz
     if (page.substr(0, 13) == 'sitetransfer!') {
 

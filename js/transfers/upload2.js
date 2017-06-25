@@ -45,7 +45,7 @@ var ulmanager = {
     ulSize: 0,
     ulIDToNode: {},
     isUploading: false,
-    ulSetupQueue: null,
+    ulSetupQueue: false,
     ulStartingPhase: false,
     ulCompletingPhase: false,
     ulPendingCompletion: [],
@@ -765,11 +765,27 @@ var ulmanager = {
      *
      * @param {Object}  aFileUpload  FileUpload instance
      * @param {Object}  aFile        File API interface instance
-     * @param {Boolean} aForce       Ignore locking queue.
+     * @param {Boolean} [aForce]     Ignore locking queue.
      */
     ulSetup: function ulSetup(aFileUpload, aFile, aForce) {
-        assert(aFileUpload.file === aFile, 'Unexpected FileUpload instance.');
-        assert(aFile.hash, 'Fingerprint missing.');
+        'use strict';
+
+        var dequeue = function ulSetupDQ() {
+            if (ulmanager.ulSetupQueue.length) {
+                var upload = ulmanager.ulSetupQueue.shift();
+                onIdle(ulmanager.ulSetup.bind(ulmanager, upload, upload.file, true));
+            }
+            else {
+                ulmanager.ulSetupQueue = false;
+            }
+        };
+
+        if (!aFileUpload || !aFile || aFileUpload.file !== aFile || !aFile.hash) {
+            if (d) {
+                console.warn('Invalid upload instance, cancelled?', oIsFrozen(aFileUpload), aFileUpload, aFile);
+            }
+            return onIdle(dequeue);
+        }
 
         if (!aForce) {
             if (this.ulSetupQueue) {
@@ -780,14 +796,7 @@ var ulmanager = {
 
         var hashNode;
         var startUpload = function _startUpload() {
-
-            if (ulmanager.ulSetupQueue.length) {
-                var upload = ulmanager.ulSetupQueue.shift();
-                onIdle(ulmanager.ulSetup.bind(ulmanager, upload, upload.file, true));
-            }
-            else {
-                ulmanager.ulSetupQueue = null;
-            }
+            onIdle(dequeue);
 
             var identical = ulmanager.ulIdentical(aFile);
             ulmanager.logger.info(aFile.name, "fingerprint", aFile.hash, M.h[aFile.hash], identical);

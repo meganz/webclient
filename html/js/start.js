@@ -2,10 +2,23 @@
 var achieve_data = false;
 
 function init_start() {
-
-    $('.button-48-height.register').rebind('click', function () {
+	if (u_type > 1)
+	{
+		$('.startpage.register').text(l[164]);
+		$('.startpage.register').rebind('click', function () {
+			loadSubPage('fm');
+		});
+		
+		$('.startpage.try-mega').text(l[187]);
+		$('.startpage.try-mega').rebind('click', function () {
+			loadSubPage('fm/dashboard');
+		});
+	}
+	else {
+		$('.button-48-height.register').rebind('click', function () {
         loadSubPage('register');
-    });
+		});
+	}
 
     $('.reg-st3-membership-bl').rebind('click', function(e) {
         var proPlan = $(this).attr('data-payment');
@@ -37,6 +50,13 @@ function init_start() {
 				start_achievements(res);
 			}
 		});
+	}
+	
+	if (u_type > 0)
+	{
+		//$('.startpage.try-mega').hide();
+		
+		
 	}
 }
 

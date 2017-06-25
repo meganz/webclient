@@ -86,9 +86,7 @@
 .startpage.button-48-height.red {
     background-color: rgba(217,0,7,0.7);
 }
-.logged .startpage.button-48-height.register {
-    display: none;
-}
+
 .startpage.button-48-height.red:hover {
     background-color: rgba(217,0,7,1);
 }

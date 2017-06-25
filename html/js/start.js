@@ -34,7 +34,8 @@ function init_start() {
     else if (page === 'download') {
         $('.widget-block').hide();
     }
-
+	
+	startCountRenderData = {'users':'','files':''};
     start_counts();
 
 	$('.bottom-page.top-header').text($('.bottom-page.top-header').text().replace('[A]','').replace('[/A]',''));

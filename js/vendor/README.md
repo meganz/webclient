@@ -36,11 +36,6 @@ Unless otherwise noted, they were released under a [MIT License].
 > The bitcoin-math library is released under the [BSD 2-Clause License](https://opensource.org/licenses/BSD-2-Clause).
 
 ---
-[db.js]: Wrapper for IndexedDB to make it easier to work against, making it look more like a queryable API.
-
-> **This is a fork**, [Compare the changes](https://github.com/aaronpowell/db.js/compare/master...meganz:master)
-
----
 [dexie.js]: A Minimalistic Wrapper for IndexedDB
 
 > Released under the [Apache License Version 2.0](http://www.apache.org/licenses/).
@@ -200,7 +195,6 @@ Unless otherwise noted, they were released under a [MIT License].
 [autolinker.js]: <https://github.com/meganz/Autolinker.js>
 [avatar.js]: <https://github.com/meganz/avatar-picker>
 [bitcoin-math.js]: <https://github.com/meganz/bitcoin-math>
-[db.js]: <https://github.com/meganz/db.js>
 [dexie.js]: <https://github.com/dfahlander/Dexie.js>
 [dcraw.js]: <https://github.com/meganz/dcraw.js>
 [es6-shim]: <https://github.com/meganz/es6-shim>

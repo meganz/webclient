@@ -55,7 +55,6 @@ module.exports = function(config) {
         // Other.
         'js/vendor/autolinker.js',
         'js/vendor/qrcode.js',
-        'js/vendor/db.js',
         'js/vendor/megaLogger.js',
 
         // == Test helpers and test configuration ==

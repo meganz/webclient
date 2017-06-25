@@ -45,7 +45,7 @@ function init_start() {
 	}
 	else {
 		$('.bottom-page.white-block.top-pad.achievements').addClass('hidden');
-		api_req({"a":"mafu","v":4235}, {
+		api_req({"a":"mafu"}, {
 			callback: function(res) {
 				achieve_data=res;
 				start_achievements(res);

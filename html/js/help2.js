@@ -9,7 +9,6 @@ var Help = (function() {
     var focus;
     var allTags = [];
     var titles = [];
-    var isScrolling = false;
     var $window = $(window);
     var $currentQuestion = null;
 
@@ -59,34 +58,14 @@ var Help = (function() {
         });
 
         $('.support-search').rebind('click', function(e) {
-
             e.preventDefault();
-            var $this = $(this);
             var $container = $('#help2-main');
-            var parent = $('.main-title-section');
-            var $popularQuestions = $(".popular-question-block");
-            var $searchForm = $(".support-search-container");
-            var $getStartTitle = $(".getstart-title-section", $container);
 
-            if ($this.is('.close')) {
-                $('.support-search-heading').removeClass('hidden');
-                $('.support-search-heading-close').addClass('hidden');
-                $('.search-section').fadeOut(300);
-                $this.removeClass('close');
-                parent.removeClass('hidden');
-                $popularQuestions.fadeOut(200);
-                $searchForm.fadeOut(200);
-                $getStartTitle.removeClass('hidden');
-            } else {
-                $('.support-search-heading').addClass('hidden');
-                $('.support-search-heading-close').removeClass('hidden');
-                $('.search-section').show();
-                $this.addClass('close');
-                parent.delay(240).addClass('hidden');
-                $popularQuestions.fadeIn(500);
-                $searchForm.fadeIn(400);
-                $getStartTitle.addClass('hidden');
-
+            if ($container.hasClass('search-overlay')) {
+                $container.removeClass('search-overlay');
+            }
+            else {
+                $container.addClass('search-overlay');
             }
         });
     }
@@ -96,9 +75,6 @@ var Help = (function() {
     }
 
     function selectMenuItem($element, $elements) {
-        if (isScrolling) {
-            return;
-        }
         $elements = $elements || $('.updateSelected.current');
         $elements.removeClass('current');
         $element.addClass('current');
@@ -136,11 +112,16 @@ var Help = (function() {
     }
 
 
-    function scrollTo(selector) {
+    function helpScrollTo(selector) {
         var $target = $(selector);
-        if ($target.length ) {
+        if ($target.length) {
             $('.bottom-page.scroll-block, .old .fmholder').stop().animate({
-                scrollTop: $target.position().top
+                scrollTop: $target.position().top - 20
+            }, 1000);
+        }
+        else if ($('*[data-update="' + selector + '"]').length) {
+            $('.bottom-page.scroll-block, .old .fmholder').stop().animate({
+                scrollTop: $('*[data-update="' + selector + '"]').position().top - 20
             }, 1000);
         }
     }
@@ -431,40 +412,42 @@ var Help = (function() {
             });
 
         $closeIcon.rebind('click', function() {
-            if (($mainTitleSection.hasClass('hidden')) || ($getStartTitle.hasClass('hidden'))) {
-                $('.search-section').fadeOut(300);
-                $(".support-search").addClass('close');
-                $mainTitleSection.removeClass('hidden');
-                $('.support-search-heading').removeClass('hidden');
-                $('.support-search-heading-close').addClass('hidden');
-                $getStartTitle.removeClass('hidden');
-            }
+            var $container = $('#help2-main');
+
+            $container.removeClass('search-overlay');
         });
 
-        if ($mainTitleSection.hasClass('hidden')) {
-            $cloneHeader.hide();
-            $searchHeader.fadeIn(300);
-        } else {
-            $cloneHeader.fadeIn(300);
-            $searchHeader.hide();
-        }
+        $searchHeader.fadeIn();
+        $cloneHeader.fadeOut();
 
-        var $html = $('html,body');
+        var $scrollBlock= $('.old .fmholder');
 
-        $html.rebind('scroll.help2', function() {
+        $scrollBlock.scroll(function() {
             // TODO: write a cleanup function to be invoked when moving out of the #help section
-            if (String(getSitePath()).substr(0, 5) !== '/help') {
-                return $html.unbind('scroll.help2');
+
+            var topPos = $(this).scrollTop();
+            if (topPos > 195) {
+                if (topPos + $sideBar.outerHeight() + 115 <= $('.main-mid-pad').outerHeight()) {
+                    $sideBar.css('top', topPos + 30 + 'px').addClass('fixed');
+                }
+                else {
+                    $sideBar.removeClass('fixed');
+                }
+            }
+            else {
+                $sideBar.removeAttr('style').removeClass('fixed');
             }
 
-            if (($sideBar.hasClass('fixed')) && (($sideBar).is(":visible"))) {
+            <!-- Search header !-->
+            if (topPos > 210) {
                 $searchHeader.fadeOut(10);
                 $cloneHeader.fadeIn(300);
-            } else {
+            }
+            else {
                 $searchHeader.fadeIn(300);
                 $cloneHeader.fadeOut(10);
             }
-        }).trigger('scroll');
+        });
 
         $searchContainer
             .rebind('mouseenter', function() {
@@ -631,9 +614,9 @@ var Help = (function() {
             });
 
             if (question) {
-                $currentQuestion = $('#' + question);
+                $currentQuestion = '#' + question;
                 setTimeout(function() {
-                    scrollTo($currentQuestion);
+                    helpScrollTo($currentQuestion);
                 }, 400);
             }
         },
@@ -691,10 +674,6 @@ var Help = (function() {
         }
 
         return args[0][0];
-    }
-
-    function handleScroll() {
-        /*TODO fix scrolling logic */
     }
 
 
@@ -801,12 +780,17 @@ var Help = (function() {
             }
         });
 
-        $('#help2-main').find('.scrollTo').rebind('click', function() {
+        $('#help2-main .scrollTo').rebind('click', function() {
             var $this = $(this);
+            var $target = $($(this).data('to'));
+
             if (!$this.is('.gray-inactive')) {
-                scrollTo('#' + $(this).data('to'));
+                $('.sidebar-menu-link.active').removeClass('active');
+                $this.addClass('active');
+                $('.bottom-page.scroll-block, .old .fmholder').stop().animate({
+                    scrollTop: $target.position().top - 20
+                }, 1000);
             }
-            return false;
         });
 
         // FAQ items logging
@@ -876,7 +860,6 @@ var Help = (function() {
             }
         });
 
-        handleScroll();
     };
 
     return ns;

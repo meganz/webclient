@@ -8,19 +8,19 @@ var bottompage = {
      */
     init: function() {
         bottompage.initNavButtons();
+        if (page.substr(0,4) == 'help' || page === 'cpage' || page.substr(0, 9) == 'corporate') {
+            $('body').addClass('old');   
+        }
+        else {
+            $('body').removeClass('old');
+        }
         if (!is_mobile) {
             bottompage.initFloatingTop();
             $('body').removeClass('mobile');
         }
         else {
             $('body').addClass('mobile');
-        }
-        if (page.substr(0,4) == 'help' || page === 'cpage' || page.substr(0, 9) == 'corporate') {
-            $('body').addClass('old');   
-        }
-        else {
-            $('body').removeClass('old');
-        }  
+        } 
     },
 
     initNavButtons: function() {
@@ -134,7 +134,7 @@ var bottompage = {
         });
 
         $('.bottom-page.scroll-block, .old .fmholder').scroll(function() {
-            var $topHeader = $('.bottom-page .top-head, .old .top-head');
+            var $topHeader = $(this).find('.top-head');
             var topPos = $(this).scrollTop();
             if (topPos > 300) {
                 $topHeader.addClass('floating');

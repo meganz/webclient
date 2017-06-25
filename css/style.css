@@ -134,6 +134,8 @@ body {
     overflow: hidden;
     height: 100%;
     font-family: 'source_sans_proregular', Arial;
+    position: relative;
+    top: 0;
 }
 .hidden, div.hidden {
     display: none;
@@ -11888,14 +11890,6 @@ table {
     height: 100%;
     min-height: 590px;
     position: relative;
-}
-.main-scroll-block {
-    height: 100%;
-}
-.top-head + .main-scroll-block, .top-head + .dev-nw-gray-bg {
-    height: -webkit-calc(100% - 36px);
-    height: -moz-calc(100% - 36px);
-    height: calc(100% - 36px);
 }
 .download-mid-white-block.active, .donwload-mid-white-block.active {
     position: relative;

@@ -33,7 +33,7 @@ function translate(html) {
             else if (namespace === 'dqq') {
                 // Both of the above
                 l[match] = String(l[localeNum]).replace(/"/g, '&quot;');
-                l[match] = l[match].replace(/'/g, "\\'");
+                l[match] = String(l[match]).replace(/'/g, "\\'");
             }
 
             return l[match];

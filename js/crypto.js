@@ -2883,11 +2883,18 @@ fa_handler.prototype = {
 
                 i += 12;
                 if (ctx.h[h] && (k = ctx.k[h])) {
+                    var td;
                     var ts = buffer.subarray(i, p + i);
-                    var td = asmCrypto.AES_CBC.decrypt(ts,
-                        a32_to_ab([k[0] ^ k[4], k[1] ^ k[5], k[2] ^ k[6], k[3] ^ k[7]]), false);
 
-                    ++c;
+                    try {
+                        k = a32_to_ab([k[0] ^ k[4], k[1] ^ k[5], k[2] ^ k[6], k[3] ^ k[7]]);
+                        td = asmCrypto.AES_CBC.decrypt(ts, k, false);
+                        ++c;
+                    }
+                    catch (ex) {
+                        console.warn(ex);
+                        td = 0xDEAD;
+                    }
                     ctx.procfa(ctx, ctx.h[h], td);
                 }
                 i += p;

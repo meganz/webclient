@@ -39,7 +39,8 @@ function init_start() {
 
     $('.reg-st3-membership-bl').rebind('click', function(e) {
         var proPlan = $(this).attr('data-payment');
-        loadSubPage('pro' + proPlan);
+		if (proPlan == 4) proPlan = 'lite';
+        loadSubPage('pro_' + proPlan);
     });
 
     if (!is_mobile && (page === 'start')) {

@@ -13,25 +13,19 @@ function renderLinuxOptions(linuxsync) {
     if (l[1158].indexOf('Mac') > -1) {
         ostxt = l[1158].replace('Mac', 'Linux');
     }
-    $('.sync-button-txt.small').text(ostxt);
-    $('.sync-bottom-txt.button-txt').safeHTML(l[12486]);
-    $('.sync-bottom-txt.linux-txt')
-        .safeHTML('<span class="nautilus-lnk">' +
-            'MEGA <a href="" class="red">Nautilus extension</a> (@@)</span>', l[2028]);
-    $('.sync-button').removeClass('mac linux').addClass('linux');
-    $('.sync-button-block.linux').removeClass('hidden');
+    $('.megaapp-button-info').safeHTML(l[12486]);
+    $('.megaapp-linux').removeClass('hidden');
     $('.architecture-checkbox input').bind('click', function() {
         $('.architecture-checkbox.radioOn').removeClass('radioOn').addClass('radioOff');
         $(this).parent().removeClass('radioOff').addClass('radioOn');
         $(this).attr('checked', true);
     });
-    $('.sync-button.linux').addClass('disabled');
-    $('.sync-bottom-txt.linux-txt').css('opacity', '0.3');
+    $('.megasync .download-megasync').addClass('disabled');
     $('.version-select-txt').text(l[2029]);
     var ua = navigator.userAgent.toLowerCase();
     if (ua.indexOf('i686') > -1
             || ua.indexOf('i386') > -1 || ua.indexOf('i586') > -1) {
-        $('.sync-radio-buttons #rad1').click();
+        $('.megaapp-button-info #rad1').click();
     }
     loadingDialog.hide();
 
@@ -39,28 +33,28 @@ function renderLinuxOptions(linuxsync) {
         changeLinux(linuxsync, $element.data('client-id'));
     });
 
-    $('.sync-bottom-txt.linux-txt a').rebind('click', function(e) {
-            if (!nautilusurl) {
-                return false;
-            }
-        });
+    $('.megaapp-button-info a').rebind('click', function(e) {
+        if (!nautilusurl) {
+            return false;
+        }
+    });
 
-    $('.sync-button').rebind('click', function(e) {
-            if (!syncurl) {
-                msgDialog('info', l[2029], l[2030]);
-                return false;
-            }
-        });
+    $('.megasync .download-megasync').rebind('click', function(e) {
+        if (!syncurl) {
+            msgDialog('info', l[2029], l[2030]);
+            return false;
+        }
+    });
 
-    $('.sync-radio-buttons input').rebind('change', function(e) {
-            if (syncsel) {
-                setTimeout(function() {
-                    changeLinux(linuxsync, syncsel);
-                }, 1);
-            }
-        });
+    $('.megaapp-button-info input').rebind('change', function(e) {
+        if (syncsel) {
+            setTimeout(function() {
+                changeLinux(linuxsync, syncsel);
+            }, 1);
+        }
+    });
 
-    $('.sync-bottom-txt.button-txt a').rebind('click', function(e) {
+    $('.megaapp-button-info a').rebind('click', function(e) {
         if ($(this).hasClass('windows')) {
             sync_switchOS('windows');
         }
@@ -70,30 +64,11 @@ function renderLinuxOptions(linuxsync) {
         else if ($(this).hasClass('linux')) {
             sync_switchOS('linux');
         }
-        mainScroll();
         return false;
     });
 }
 
 function init_sync() {
-    $('.st-apps-icon.mobile').rebind('click', function() {
-        loadSubPage('mobile');
-    });
-
-    $('.st-apps-icon.browser').rebind('click', function() {
-        loadSubPage('plugin');
-    });
-
-    $('.sync-help-center').rebind('click', function(e) {
-        loadSubPage('help/client/megasync');
-    });
-    setTimeout(function() {
-        $('#syncanim').rebind('click', function(e) {
-            if (syncurl) {
-                loadSubPage(syncurl);
-            }
-        });
-    }, 1000);
     var pf = navigator.platform.toUpperCase();
 
     if (page.substr(-5) === 'linux') {
@@ -108,20 +83,26 @@ function init_sync() {
     else {
         sync_switchOS('windows');
     }
+
+    $('.pages-nav.nav-button').removeClass('active');
+    $('.pages-nav.nav-button.sync').addClass('active');
+
+    
 }
 
 function sync_switchOS(os) {
     var ostxt;
     $('.linuxhint').hide();
-    $('.sync-button').attr('href', '');
-    $('.sync-button-block.linux').addClass('hidden');
+    $('.megasync .download-megasync')
+        .attr('href', '')
+        .removeClass('disabled');
+    $('.megaapp-linux').addClass('hidden');
+    $('.bottom-page.megasync').removeClass('linux');
     syncurl = megasync.getMegaSyncUrl(os);
     if (os === 'windows') {
-        $('.sync-button-txt.small').text(l[1158]);
-        $('.sync-bottom-txt.button-txt').safeHTML(l[12485]);
-        $('.sync-button').removeClass('mac linux');
-        $('.sync-button').attr('href', syncurl);
-        $('.sync-button').unbind('click');
+        $('.megaapp-button-info').safeHTML(l[12485]);
+        $('.megasync .download-megasync').attr('href', syncurl);
+        //$('.megasync .download-megasync').unbind('click');
     }
     else if (os === 'mac') {
         ostxt = l[2031];
@@ -131,17 +112,16 @@ function sync_switchOS(os) {
         if (l[1158].indexOf('Linux') > -1) {
             ostxt = l[1158].replace('Linux', 'Mac');
         }
-        $('.sync-button-txt.small').text(ostxt);
-        $('.sync-bottom-txt.button-txt').safeHTML(l[12487]);
-        $('.sync-button').removeClass('windows linux').addClass('mac');
-        $('.sync-button').attr('href', syncurl);
-        $('.sync-button').unbind('click');
+        $('.megaapp-button-info').safeHTML(l[12487]);
+        $('.megasync .download-megasync').attr('href', syncurl);
+        //$('.megasync .download-megasync').unbind('click');
     }
     else if (os === 'linux') {
+        $('.bottom-page.megasync').addClass('linux');
         loadingDialog.show();
         megasync.getLinuxReleases(renderLinuxOptions);
     }
-    $('.sync-bottom-txt.button-txt a').rebind('click', function(e) {
+    $('.megaapp-button-info a').rebind('click', function(e) {
         if ($(this).hasClass('windows')) {
             sync_switchOS('windows');
         }
@@ -167,8 +147,7 @@ function changeLinux(linuxsync, i) {
         }
 
         $('.version-select-txt').text(linuxsync[i].name);
-        $('.sync-button.linux').removeClass('disabled');
-        $('.sync-bottom-txt.linux-txt').css('opacity', '1');
+        $('.megasync .download-megasync').removeClass('disabled');
         var platform = '64';
         var c = $('.linux32').parent().attr('class');
         if (c && c.indexOf('radioOn') > -1) {
@@ -177,20 +156,18 @@ function changeLinux(linuxsync, i) {
         syncurl = megasync.getMegaSyncUrl(linuxsync[i]['name'] + " " + platform);
         nautilusurl = megasync.getMegaSyncUrl(linuxsync[i]['name'] + " " + platform + "n");
         var filename = syncurl.split('/').pop();
-        $('.sync-button').attr('href', syncurl);
-        $('.sync-bottom-txt.linux-txt a').attr('href', nautilusurl);
+        $('.megasync .download-megasync').attr('href', syncurl);
+        $('.megaapp-button-info a').attr('href', nautilusurl);
         $('.linuxhint').safeHTML('*@@: <font style="font-family:courier;">@@ @@</font>',
                                  l[1909], linuxsync[i].c, filename);
         $('.linuxhint').show();
         syncsel = i;
-        mainScroll();
     }
     else {
         syncurl = false;
         nautilusurl = false;
         $('.linuxhint').hide();
-        $('.sync-button.linux').addClass('disabled');
-        $('.sync-bottom-txt.linux-txt').css('opacity', '0.3');
+        $('.megasync .download-megasync').addClass('disabled');
         $('.version-select-txt').text(l[2029]);
         mainScroll();
     }

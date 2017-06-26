@@ -39,8 +39,11 @@ var avatars = {};
 
 var pro_json = '[[["N02zLAiWqRU",1,500,1024,1,"9.99","EUR"],["zqdkqTtOtGc",1,500,1024,12,"99.99","EUR"],["j-r9sea9qW4",2,2048,4096,1,"19.99","EUR"],["990PKO93JQU",2,2048,4096,12,"199.99","EUR"],["bG-i_SoVUd0",3,4096,8182,1,"29.99","EUR"],["e4dkakbTRWQ",3,4096,8182,12,"299.99","EUR"]]]';
 
-pages['placeholder'] = '((TOP))<div class="main-scroll-block"><div class="main-pad-block">' +
-                       '<div class="main-mid-pad new-bottom-pages"></div></div></div>';
+pages['placeholder'] = '<div class="bottom-page scroll-block">' +
+    '((TOP))' +
+    '<div class="main-pad-block">' +
+        '<div class="main-mid-pad new-bottom-pages"></div>' +
+    '</div>';
 
 function startMega() {
     if (!hashLogic) {
@@ -87,21 +90,6 @@ function startMega() {
     }
 }
 
-function mainScroll() {
-    $('.main-scroll-block').jScrollPane({
-        showArrows: true,
-        arrowSize: 5,
-        animateScroll: true,
-        verticalDragMinHeight: 150,
-        enableKeyboardNavigation: true
-    });
-    $('.main-scroll-block').unbind('jsp-scroll-y.menu');
-    jScrollFade('.main-scroll-block');
-    if (page === 'doc' || page.substr(0, 4) === 'help' || page === 'cpage' || page === 'sdk' || page === 'dev') {
-        scrollMenu();
-    }
-}
-
 function topMenu(close) {
     if (close) {
         $.topMenu = '';
@@ -132,18 +120,21 @@ function topMenuScroll() {
 }
 
 function scrollMenu() {
-    $('.main-scroll-block').bind('jsp-scroll-y', function (event, scrollPositionY, isAtTop, isAtBottom) {
-        if (page === 'doc' || page.substr(0, 4) === 'help' || page === 'cpage' || page === 'sdk' || page === 'dev') {
-            var sc = scrollPositionY + 30;
-            if (isAtTop) {
-                sc = 30;
+    $('.bottom-page.scroll-block, .old .fmholder').scroll(function() {
+        if (page === 'doc' || page === 'cpage' || page === 'sdk' || page === 'dev') {
+            var $menu = $('.new-left-menu-block');
+            var topPos = $(this).scrollTop();
+            if (topPos > 0) {
+                if (topPos + $menu.outerHeight() + 106 <= $('.main-mid-pad').outerHeight()) {
+                    $menu.css('top', topPos + 50 + 'px').addClass('floating');
+                }
+                else {
+                    $menu.removeClass('floating');
+                }
             }
-            if ($('.main-scroll-block .jspPane').height() - sc - $('.new-left-menu-block').height() - $('.nw-bottom-block').height() - 100 < 0) {
-                sc = $('.main-scroll-block .jspPane').height()
-                    - $('.new-left-menu-block').height()
-                    - $('.nw-bottom-block').height() - 100;
+            else {
+                $menu.removeAttr('style');
             }
-            $('.new-left-menu-block').css('padding-top', sc + 'px');
         }
     });
 }
@@ -248,7 +239,7 @@ function init_page() {
         $('body').attr('class', 'not-logged');
     }
     else {
-        $('body').attr('class', '');
+        $('body').attr('class', 'logged');
 
         // Recovery key has been saved
         if (localStorage.recoverykey && !$('body').hasClass('rk-saved')) {
@@ -267,16 +258,6 @@ function init_page() {
 
     if ('-fa-ar-he-'.indexOf('-' + lang + '-') > -1) {
         $('body').addClass('rtl');
-    }
-
-    if ($.startscroll) {
-        delete $.startscroll;
-    }
-    if ($.dlscroll) {
-        delete $.dlscroll;
-    }
-    if ($.infoscroll) {
-        delete $.infoscroll;
     }
 
     // If on the plugin page, show the page with the relevant extension for their current browser
@@ -480,7 +461,6 @@ function init_page() {
                 topmenuUI();
                 loadingDialog.hide();
                 CMS.loaded('corporate');
-                mainScroll();
                 return;
             }
 
@@ -493,11 +473,12 @@ function init_page() {
                 parsepage(window.corpTemplate = content.html);
                 topmenuUI();
                 loadingDialog.hide();
-                mainScroll();
             });
         }
 
         doRenderCorpPage();
+        bottompage.init();
+        scrollMenu();
         page = 'cpage';
     }
     else if (page.substr(0, 5) == 'page_') {
@@ -513,7 +494,6 @@ function init_page() {
                 parsepage(content.html);
                 topmenuUI();
                 loadingDialog.hide();
-                mainScroll();
             });
         }
 
@@ -896,7 +876,6 @@ function init_page() {
             $('.new-bottom-pages.about').safeHTML(html + '<div class="clear"></div>');
             topmenuUI();
             loadingDialog.hide();
-            mainScroll();
 
         });
         return;
@@ -931,7 +910,6 @@ function init_page() {
         if (lang == 'en') {
             $('#copyright_txt').text($('#copyright_txt').text().split('(i)')[0]);
             $('#copyright_en').removeClass('hidden');
-            mainScroll();
         }
     }
     else if (page === 'disputenotice') {
@@ -943,7 +921,6 @@ function init_page() {
         $('.reg-st5-complete-button').rebind('click', function (e) {
             loadSubPage('disputenotice');
         });
-        mainScroll();
     }
     else if (page.substr(0, 3) === 'pro') {
         var tmp = page.split('/uao=');
@@ -973,28 +950,32 @@ function init_page() {
             html += e.outerHTML;
         });
         $('.credits-main-pad').html(html + '<div class="clear"></div>');
-        mainScroll();
     }
-    else if (page === 'chrome') {
-        parsepage(pages['chrome']);
-        chromepage.init();
+    else if (page === 'extensions') {
+        parsepage(pages['browsers']);
+        browserspage.init();
     }
-    else if (page === 'firefox') {
-        parsepage(pages['firefox']);
-        firefoxpage.init();
+    else if (page === 'ios') {
+        parsepage(pages['ios']);
+    }
+    else if (page === 'android') {
+        parsepage(pages['android']);
+    }
+    else if (page === 'wp') {
+        parsepage(pages['wp']);
+        bottompage.initTabs();
+    }
+    else if (page === 'bird') {
+        parsepage(pages['megabird']);
     }
     else if (page.substr(0, 4) == 'sync') {
         parsepage(pages['sync']);
         init_sync();
         topmenuUI();
-        mainScroll();
     }
     else if (page == 'cmd') {
         parsepage(pages['cmd']);
         initMegacmd();
-    }
-    else if (page == 'mobile') {
-        parsepage(pages['mobile']);
     }
     else if (page == 'resellers') {
         parsepage(pages['resellers']);
@@ -1033,7 +1014,6 @@ function init_page() {
         }
         dlinfo(dlid, dlkey, false);
         topmenuUI();
-        mainScroll();
     }
 
     /**
@@ -1233,20 +1213,9 @@ function init_page() {
     else if (typeof init_start === 'function') {
         page = 'start';
 
-        // If mobile, show the mobile homepage
-        if (is_mobile) {
-            parsepage(pages['mobile']);
-            mobile.home.show();
-        }
-        else {
-            parsepage(pages['start'], 'start');
-            init_start();
-        }
-    }
-    else if (is_mobile) {
-        // Show the mobile homepage
-        parsepage(pages['mobile']);
-        mobile.home.show();
+        // Show the start/homepage
+        parsepage(pages['start'], 'start');
+        init_start();
     }
     else {
         location.assign('/');
@@ -1261,7 +1230,13 @@ function init_page() {
     if (typeof alarm !== 'undefined') {
         alarm.siteUpdate.init();
     }
-    topmenuUI();
+    if (!is_mobile) {
+        topmenuUI();
+    }
+    else {
+        // Initialise the mobile menu (ToDo: in future use desktop responsive main menu)
+        mobile.menu.showAndInit(page);
+    }
     loggedout = false;
     flhashchange = false;
 }
@@ -1752,11 +1727,11 @@ function topmenuUI() {
 
             var subpage;
             var subPages = [
-                'about', 'account', 'backup', 'blog', 'chrome', 'cmd', 'contact',
-                'copyright', 'corporate', 'credits', 'doc', 'firefox', 'general',
-                'help', 'login', 'mega', 'mobile', 'privacy', 'privacycompany',
-                'register', 'resellers', 'sdk', 'sitemap', 'sourcecode', 'support',
-                'sync', 'takedown', 'terms'
+                'about', 'account', 'android', 'backup', 'blog', 'cmd', 'contact',
+                'copyright', 'corporate', 'credits', 'doc', 'extensions', 'general',
+                'help', 'ios', 'login', 'mega', 'bird', 'privacy', 'privacycompany',
+                'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode', 'support',
+                'sync', 'takedown', 'terms', 'wp'
             ];
 
             for (var i = subPages.length; i--;) {
@@ -2041,38 +2016,34 @@ function parsepage(pagehtml, pp) {
     if (document.location.href.substr(0, 19) == 'chrome-extension://') {
         pagehtml = pagehtml.replace(/\/#/g, '/' + urlrootfile + '#');
     }
-    $('body').removeClass('notification-body bottom-pages new-startpage');
 
-    if (page == 'start') {
-        $('body').addClass('new-startpage');
-    }
-    else {
-        $('body').addClass('bottom-pages');
-    }
+    $('body').addClass('bottom-pages');
 
     var top = parsetopmenu();
     var bmenu = pages['bottom'];
     var bmenu2 = pages['bottom2'];
+    var pagesmenu = pages['pagesmenu'];
     if (document.location.href.substr(0, 19) == 'chrome-extension://') {
         bmenu2 = bmenu2.replace(/\/#/g, '/' + urlrootfile + '#');
     }
-    pagehtml = pagehtml.replace("((MEGAINFO))", translate(pages['megainfo']).replace(/{staticpath}/g, staticpath));
-    pagehtml = pagehtml.replace("((TOP))", top);
-    pagehtml = pagehtml.replace("((BOTTOM))", translate(bmenu2));
+    pagehtml = pagehtml
+        .replace(/\(\(MEGAINFO\)\)/g, translate(pages['megainfo'])
+        .replace(/{staticpath}/g, staticpath));
+    pagehtml = pagehtml.replace(/\(\(TOP\)\)/g, top);
+    pagehtml = pagehtml.replace(/\(\(BOTTOM\)\)/g, translate(bmenu2));
+    pagehtml = pagehtml.replace(/\(\(PAGESMENU\)\)/g, translate(pagesmenu));
 
     var $container = is_mobile ? $('body') : $('#startholder');
     $container
-        .safeHTML(translate(pages['transferwidget']) + pagehtml)
+        .safeHTML('<div class="nav-overlay"></div>' +
+            translate(pages['transferwidget']) + pagehtml)
         .show();
 
-    onIdle(mainScroll);
     $(window).rebind('resize.subpage', function (e) {
-        if (page !== 'start' && page !== 'download') {
-            mainScroll();
-        }
         M.chrome110ZoomLevelNotification();
     });
 
+    bottompage.init();
     $('.nw-bottom-block').addClass(lang);
     if (typeof M.initUIKeyEvents === 'function') {
         M.initUIKeyEvents();
@@ -2081,11 +2052,18 @@ function parsepage(pagehtml, pp) {
 }
 
 function parsetopmenu() {
-    var top = pages['top'].replace(/{staticpath}/g, staticpath);
-    if (document.location.href.substr(0, 19) == 'chrome-extension://') {
-        top = top.replace(/\/#/g, '/' + urlrootfile + '#');
+    var top;
+    if (!is_mobile) {
+        top = pages['top'].replace(/{staticpath}/g, staticpath);
+        if (document.location.href.substr(0, 19) == 'chrome-extension://') {
+            top = top.replace(/\/#/g, '/' + urlrootfile + '#');
+        }
+        top = top.replace("{avatar-top}", window.useravatar && useravatar.mine() || '');
     }
-    top = top.replace("{avatar-top}", window.useravatar && useravatar.mine() || '');
+    /* TODO: import mobile top menu */
+    else {
+        top = pages['top-mobile'];
+    }
     top = translate(top);
     return top;
 }
@@ -2105,20 +2083,6 @@ function loadSubPage(tpage, event)
 
     if (folderlink) {
         flhashchange = true;
-    }
-
-    if (tpage == 'info' && page == 'start') {
-        if (!$.infoscroll) {
-            startpageScroll();
-        }
-        return false;
-    }
-
-    if ((!tpage || tpage === 'start') && page === 'start') {
-        if ($.infoscroll) {
-            startpageMain();
-        }
-        return false;
     }
 
     if ((tpage === page) && !folderlink) {

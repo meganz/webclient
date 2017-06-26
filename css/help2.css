@@ -750,7 +750,7 @@
     text-decoration: none;
     color: #555;
     display: block;
-    margin-top: -35px;
+    margin-top: 0;
     margin-left: 20px;
     line-height: 22px;
     cursor: pointer;
@@ -770,7 +770,7 @@
 #help2-main .search-section-header .popular-question-list, #help2-main .popular-question-list {
     width: 45%;
     display: block;
-    margin-top: 40px;
+    padding: 18px 0 48px 0;
     float: left;
 }
 #help2-main .search-section-header .popular-question-list:nth-child(2), #help2-main .popular-question-list:nth-child(2) {
@@ -779,28 +779,19 @@
 }
 #help2-main .popular-question-list ul {
     display: block;
-    margin-block-end: 1em;
-    margin-block-start: 1em;
-    padding-inline-start: 00px;
+    padding: 0 0 0 0;
+    margin: 0 0 0 0;
 }
 .help-home-page {
     background-color: #fafafa !important;
-}
-#help2-main .search-section-header .popular-question-items, #help2-main .popular-question-items {
-    -webkit-columns: 1;
-    -moz-columns: 1;
-    columns: 1;
-    column-gap: 30px;
-    -moz-column-gap: 30px;
-    -webkit-column-gap: 30px;
 }
 #help2-main .popular-question-items li {
     font-family: 'source_sans_proregular';
     font-size: 14px;
     color: #555;
-    padding-bottom: 18px;
+    padding-bottom: 0;
     position: relative;
-    margin: 4px 20px 25px 2px;
+    margin: 4px 20px 8px 2px;
 }
 #help2-main .first-support-block {
     border-top: 1px solid #e8e8e8;
@@ -1255,14 +1246,6 @@
     padding-top: 70px;
     font-size: 36px;
     line-height: 46px;
-}
-#help2-main ul.d-section-items {
-    -webkit-margin-before: 1em;
-    -webkit-margin-after: 1em;
-    -webkit-margin-start: 0;
-    -webkit-margin-end: 0;
-    -webkit-padding-start: 3px;
-    padding-inline-start: 3px;
 }
 #help2-main .d-section-items li {
     color: #666;

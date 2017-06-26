@@ -1729,7 +1729,7 @@ function topmenuUI() {
             var subPages = [
                 'about', 'account', 'android', 'backup', 'blog', 'cmd', 'contact',
                 'copyright', 'corporate', 'credits', 'doc', 'extensions', 'general',
-                'help', 'ios', 'login', 'mega', 'megabird', 'privacy', 'privacycompany',
+                'help', 'ios', 'login', 'mega', 'bird', 'privacy', 'privacycompany',
                 'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode', 'support',
                 'sync', 'takedown', 'terms', 'wp'
             ];

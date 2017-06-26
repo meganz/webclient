@@ -1106,8 +1106,6 @@
 
 /* Browsers extensions */
 .bottom-page.radial-bg {
- background: url(data:image/svg+xml;
-base64, PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJod…hlaWdodD0iMTAxIiBmaWxsPSJ1cmwoI2dyYWQtdWNnZy1nZW5lcmF0ZWQpIiAvPgo8L3N2Zz4=);
     background: -moz-radial-gradient(center, ellipse cover, rgba(255,255,255,0.9) 30%, rgba(255,255,255,0.7) 120%);
     background: -webkit-radial-gradient(center, ellipse cover, rgba(255,255,255,0.9) 30%, rgba(255,255,255,0.7) 120%);
     background: radial-gradient(ellipse at center, rgba(255,255,255,0.9) 30%, rgba(255,255,255,0.7) 120%);

@@ -1349,7 +1349,7 @@ function api_proc(q) {
                         return;
                     }
 
-                    if (d) {
+                    if (d && logger) {
                         if (d > 1 || !window.chrome || String(response).length < 512) {
                             logger.debug('API response: ', response);
                         }

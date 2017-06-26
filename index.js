@@ -333,7 +333,7 @@ function init_page() {
             else {
                 // If mobile, show the decryption key overlay
                 if (is_mobile) {
-                    parsepage(pages['fm_mobile']);
+                    parsepage(pages['mobile']);
                     mobile.decryptionKeyOverlay.show(pfid, true, pfkey);
                 }
                 else {
@@ -409,7 +409,7 @@ function init_page() {
         else {
             // Show signup link dialog for mobile
             if (is_mobile) {
-                parsepage(pages['fm_mobile']);
+                parsepage(pages['mobile']);
                 mobile.register.showConfirmEmailScreen(acc);
                 return false;
             }
@@ -441,7 +441,7 @@ function init_page() {
 
         // Show the password overlay for mobile
         if (is_mobile) {
-            parsepage(pages['fm_mobile']);
+            parsepage(pages['mobile']);
             mobile.decryptionPasswordOverlay.show(page);
         }
         else {
@@ -641,7 +641,7 @@ function init_page() {
                 page = 'login';
 
                 if (is_mobile) {
-                    parsepage(pages['fm_mobile']);
+                    parsepage(pages['mobile']);
                     mobile.register.showConfirmAccountScreen(email);
                 }
                 else {
@@ -660,7 +660,7 @@ function init_page() {
                 page = 'login';
 
                 if (is_mobile) {
-                    parsepage(pages['fm_mobile']);
+                    parsepage(pages['mobile']);
                     mobile.register.showConfirmAccountFailure(res);
                 }
                 else {
@@ -684,7 +684,7 @@ function init_page() {
     }
     else if (u_type == 2) {
         if (is_mobile) {
-            parsepage(pages['fm_mobile']);
+            parsepage(pages['mobile']);
             mobile.register.showGeneratingKeysScreen();
         }
         else {
@@ -699,7 +699,7 @@ function init_page() {
         }
 
         if (is_mobile) {
-            parsepage(pages['fm_mobile']);
+            parsepage(pages['mobile']);
             mobile.signin.show();
         }
         else {
@@ -732,7 +732,7 @@ function init_page() {
         }
 
         if (is_mobile) {
-            parsepage(pages['fm_mobile']);
+            parsepage(pages['mobile']);
             mobile.register.show();
         }
         else {
@@ -885,7 +885,7 @@ function init_page() {
     }
     else if (page === 'terms') {
         if (is_mobile) {
-            parsepage(pages['fm_mobile']);
+            parsepage(pages['mobile']);
             mobile.terms.show();
         }
         else {
@@ -1007,7 +1007,7 @@ function init_page() {
             }
         }
         if (is_mobile) {
-            parsepage(pages['fm_mobile']);
+            parsepage(pages['mobile']);
         }
         else {
             parsepage(pages['download']);
@@ -1119,7 +1119,7 @@ function init_page() {
                 M.currentdirid = id;
             }
             if (is_mobile) {
-                parsepage(pages['fm_mobile']);
+                parsepage(pages['mobile']);
             }
             else if (!is_mobile && $('#fmholder').html() === '') {
                 $('#fmholder').safeHTML(translate(pages['fm'].replace(/{staticpath}/g, staticpath)));

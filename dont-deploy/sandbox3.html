@@ -69,11 +69,6 @@
             localStorage.testOpenInApp = 'winphone';
         }
 
-        // Force viewing of the site optimised for Google etc if requested
-        if (window.location.search.indexOf('searchbot=1') > -1) {
-            localStorage.testSearchEngineBot = '1';
-        }
-
         // Use old URL hash logic for everything e.g. mega.nz/#blog instead of mega.nz/blog
         if (window.location.search.indexOf('hashLogic') > -1) {
             localStorage.hashLogic = 1;

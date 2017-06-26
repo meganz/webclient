@@ -441,6 +441,18 @@ mBroadcaster.once('startMega', function populate_l() {
 	l[16614] = escapeHTML(l[16614])
         .replace('[A]', '<a href="https://www.mozilla.org/thunderbird" target="_blank">')
         .replace('[/A]', '</a>');
+		
+	// carefully replace various strings to adhere to the new pro quotas:
+	// note: in the future we should make such strings used variables.
+	
+	l[16393] = l[16393].replace('4','8');	
+	l[16385] = l[16385].replace('4','8');	
+	l[16359] = l[16359].replace('4096','8192').replace('4','8');
+	l[16358] = l[16358].replace('4096','8192').replace('4','8');	
+	l[16316] = l[16316].replace('4096','8192').replace('4','8');
+	l[16315] = l[16315].replace('4096','8192').replace('4','8');	
+	l[16304] = l[16304].replace('4096','8192').replace('4','8');
+	l[1367] = l[1367].replace('4','8');	
 
     var common = [
         15536, 16106, 16107, 16116, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315,

@@ -1232,7 +1232,7 @@ if (m && ((!localStorage.signUpStartedInMobileWeb && page.substr(0, 7) === 'conf
 
     // AMO: Markup should not be passed to `innerHTML` dynamically. -- This isnt reached for the extension, anyway
     // jscs:disable
-    document.body.innerHTML = '<div class="main-scroll-block"><div class="main-content-block">'
+    document.body.innerHTML = '<div class="bottom-page scroll-block"><div class="main-content-block">'
                             + '<div class="free-green-tip"></div><div class="main-centered-bl">'
                             + '<div class="main-logo"></div><div class="main-head-txt" id="m_title"></div>'
                             + '<div class="main-head-txt" id="m_desc"></div><br /><br />'
@@ -1763,6 +1763,18 @@ else if (!b_u) {
     jsl.push({f:'css/avatars.css', n: 'avatars_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
 
+    // Common desktop and mobile, bottom pages
+    jsl.push({f:'css/bottom-pages.css', n: 'bottom-pages_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/pro.css', n: 'pro_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/bottom-menu.css', n: 'bottom-menu_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/startpage.css', n: 'startpage_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'html/start.html', n: 'start', j:0});
+    jsl.push({f:'html/js/start.js', n: 'start_js', j:1});
+    jsl.push({f:'html/js/bottompage.js', n: 'bottompage_js', j:1});
+    jsl.push({f:'html/pagesmenu.html', n: 'pagesmenu', j:0});
+    jsl.push({f:'html/bottom2.html', n: 'bottom2',j:0});
+    jsl.push({f:'html/megainfo.html', n: 'megainfo', j:0});
+
     if (!is_mobile) {
         jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
         jsl.push({f:'js/vendor/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1, w:10});
@@ -1827,6 +1839,8 @@ else if (!b_u) {
     // Everything else...
     jsl.push({f:'index.js', n: 'index', j:1,w:4});
     jsl.push({f:'html/top.html', n: 'top', j:0});
+    // TODO: include mobile top menu js stuff
+    jsl.push({f:'html/top-mobile.html', n: 'top-mobile', j:0});
     jsl.push({f:'html/transferwidget.html', n: 'transferwidget', j:0});
     jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});
     jsl.push({f:'js/fm/removenode.js', n: 'fm_removenode_js', j: 1});
@@ -1841,10 +1855,6 @@ else if (!b_u) {
         jsl.push({f:'js/fm/fileconflict.js', n: 'fm_fileconflict_js', j:1});
         jsl.push({f:'js/ui/miniui.js', n: 'miniui_js', j:1});
 
-        jsl.push({f:'html/start.html', n: 'start', j:0});
-        jsl.push({f:'html/megainfo.html', n: 'megainfo', j:0});
-        jsl.push({f:'html/js/start.js', n: 'start_js', j:1});
-        jsl.push({f:'html/bottom2.html', n: 'bottom2',j:0});
         jsl.push({f:'html/key.html', n: 'key', j:0});
         jsl.push({f:'html/pro.html', n: 'pro', j:0});
         jsl.push({f:'html/js/pro.js', n: 'pro_js', j:1});
@@ -1856,7 +1866,6 @@ else if (!b_u) {
         jsl.push({f:'css/user-card.css', n: 'user_card_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/icons.css', n: 'icons_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/buttons.css', n: 'buttons_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/bottom-pages.css', n: 'bottom-pages_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/dropdowns.css', n: 'dropdowns_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/dialogs.css', n: 'dialogs_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/popups.css', n: 'popups_css', j:2,w:5,c:1,d:1,cache:1});
@@ -1990,7 +1999,6 @@ else if (!b_u) {
         'cmd': {f:'html/megacmd.html', n: 'cmd', j:0},
         'megacmd_js': {f:'html/js/megacmd.js', n: 'megacmd_js', j:1},
         'cms_snapshot_js': {f:'js/cmsSnapshot.js', n: 'cms_snapshot_js', j:1},
-        'mobile': {f:'html/mobile_old.html', n: 'mobile', j:0},
         'support_js': {f:'html/js/support.js', n: 'support_js', j:1},
         'support': {f:'html/support.html', n: 'support', j:0},
         'contact': {f:'html/contact.html', n: 'contact', j:0},
@@ -1998,10 +2006,12 @@ else if (!b_u) {
         'zxcvbn_js': {f:'js/vendor/zxcvbn.js', n: 'zxcvbn_js', j:1},
         'redeem': {f:'html/redeem.html', n: 'redeem', j:0},
         'redeem_js': {f:'html/js/redeem.js', n: 'redeem_js', j:1},
-        'chrome': {f:'html/chrome.html', n: 'chrome', j:0},
-        'chrome_js': {f:'html/js/chrome.js', n: 'chrome_js', j:1},
-        'firefox': {f:'html/firefox.html', n: 'firefox', j:0},
-        'firefox_js': {f:'html/js/firefox.js', n: 'firefox_js', j:1}
+        'browsers': {f:'html/browsers.html', n: 'browsers', j:0},
+        'browsers_js': {f:'html/js/browsers.js', n: 'browsers_js', j:1},
+        'megabird': {f:'html/megabird.html', n: 'megabird', j:0},
+        'ios': {f:'html/ios.html', n: 'ios', j:0},
+        'android': {f:'html/android.html', n: 'android', j:0},
+        'wp': {f:'html/wp.html', n: 'wp', j:0}
     };
 
     var jsl3 = {
@@ -2075,7 +2085,6 @@ else if (!b_u) {
         'blog': ['blog','blog_js','blogarticle','blogarticle_js'],
         'register': ['register','register_js', 'zxcvbn_js'],
         'newsignup': ['register','register_js', 'zxcvbn_js'],
-        'android': ['android'],
         'resellers': ['resellers'],
         '!': ['download','download_js', 'megasync_js'],
         'dispute': ['dispute'],
@@ -2085,9 +2094,8 @@ else if (!b_u) {
         'privacy': ['privacy','privacycompany'],
         'mega': ['mega'],
         'takedown': ['takedown'],
-        'mobile': ['mobile'],
-        'sync': ['sync','sync_js', 'megasync_js'],
-        'cmd': ['cmd','megacmd_js'],
+        'sync': ['sync', 'sync_js', 'megasync_js'],
+        'cmd': ['cmd', 'megacmd_js'],
         'support': ['support_js', 'support'],
         'contact': ['contact'],
         'dev': ['dev','dev_js','sdkterms'],
@@ -2098,9 +2106,13 @@ else if (!b_u) {
         ],
         'recover': ['reset', 'reset_js'],
         'redeem': ['redeem', 'redeem_js'],
-        'plugin': ['chrome', 'chrome_js', 'firefox', 'firefox_js'],
-        'chrome': ['chrome', 'chrome_js'],
-        'firefox': ['firefox', 'firefox_js']
+        'plugin': ['browsers', 'browsers_js'],
+        'extensions': ['browsers', 'browsers_js'],
+        'bird': ['megabird'],
+        'ios': ['ios'],
+        'android': ['android'],
+        'wp': ['wp'],
+        'android': ['android']
     };
 
     if (is_mobile) {

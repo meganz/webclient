@@ -67,22 +67,7 @@ function render_blogarticle() {
 
     $('#blogarticle_by').safeHTML('<span>by:</span> ' + escapeHTML(by));
 
-    $('#blogarticle_post img').bind('load', function(e) {
-        $('.main-scroll-block').jScrollPane({
-            showArrows: true,
-            arrowSize: 5,
-            animateScroll: true,
-            mouseWheelSpeed: 50
-        });
-    });
-
     if (!m) {
         blog_archive();
     }
-    $('.main-scroll-block').jScrollPane({
-        showArrows: true,
-        arrowSize: 5,
-        animateScroll: true,
-        mouseWheelSpeed: 50
-    });
 }

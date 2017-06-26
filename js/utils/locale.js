@@ -431,6 +431,16 @@ mBroadcaster.once('startMega', function populate_l() {
             + 'accounts-pro-accounts/how-does-mega-pro-account-subscription-work-with-apple-in-app-'
             + 'purchases">')
         .replace('[/A3]', '</a>');
+    l[16596] = escapeHTML(l[16596])
+        .replace('[A]', '<a class="red" href="mailto:uwp@mega.nz">').replace('[/A]', '</a>');
+	l[16598] = escapeHTML(l[16598])
+        .replace('[A]', '<a href="https://github.com/meganz/sdk/tree/master/examples/megacmd" target="_blank" class="red">')
+        .replace('[/A]', '</a>')
+        .replace('[B]', '<a href="https://github.com/meganz/sdk/blob/master/examples/megacmd/README.md" target="_blank" class="red">')
+        .replace('[/B]', '</a>');
+	l[16614] = escapeHTML(l[16614])
+        .replace('[A]', '<a href="https://www.mozilla.org/thunderbird" target="_blank">')
+        .replace('[/A]', '</a>');
 
     var common = [
         15536, 16106, 16107, 16116, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315,

@@ -66,6 +66,7 @@ function init_start() {
 		api_req({"a":"mafu"}, {
 			callback: function(res) {
 				achieve_data=res;
+				console.log(achieve_data);
 				start_achievements(res);
 			}
 		});
@@ -84,10 +85,14 @@ function init_start() {
 
 
 function start_achievements(res)
-{
-	if (res && res.u && res.u[4] && res.u[5] && res.u[3]) {
+{	
+	if (res < 0) {
+		$('.bottom-page.white-block.top-pad.achievements').addClass('hidden');
+	}	
+	else if (res && res.u && res.u[4] && res.u[5] && res.u[3]) {
 		// enable achievements:
-		$('.bottom-page.white-block.top-pad.achievements').removeClass('hidden');	var gbt = 'GB';
+		$('.bottom-page.white-block.top-pad.achievements').removeClass('hidden');	
+		var gbt = 'GB';
 		if (lang == 'fr') gbt = 'Go';
 		$('.achievements .megasync').html(escapeHTML(l[16632]).replace('[X]','<span class="txt-pad"><span class="big">' + Math.round(res.u[4][0]/1024/1024/1024) + '</span> '+ gbt +'</span>') + '*');
 		$('.achievements .invite').html(escapeHTML(l[16633]).replace('[X]','<span class="txt-pad"><span class="big">' + Math.round(res.u[3][0]/1024/1024/1024) + '</span> '+ gbt +'</span>') + '*');

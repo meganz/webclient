@@ -87,7 +87,7 @@ function init_sync() {
     $('.pages-nav.nav-button').removeClass('active');
     $('.pages-nav.nav-button.sync').addClass('active');
 
-    
+
 }
 
 function sync_switchOS(os) {
@@ -169,6 +169,5 @@ function changeLinux(linuxsync, i) {
         $('.linuxhint').hide();
         $('.megasync .download-megasync').addClass('disabled');
         $('.version-select-txt').text(l[2029]);
-        mainScroll();
     }
 }

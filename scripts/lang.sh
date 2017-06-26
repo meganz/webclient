@@ -29,7 +29,7 @@ git add *.json
 git commit -m 'Updated strings from Babel'
 
 # Push it to the translations branch
-git push
+git push -u origin translations
 
 # Check out the previous branch again
 git checkout $currentBranch

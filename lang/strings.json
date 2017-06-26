@@ -17058,5 +17058,21 @@
     "16654": {
         "text": "Don't show icons on the left pane of Windows Explorer",
         "context": "Text next to a checkbox that allows to disable\/enable the visualization of MEGAsync icons on the left pane of Windows Explorer"
+    },
+    "16655": {
+        "text": "Open MEGA and sign in to continue",
+        "context": "This text is shown when you try to use a MEGA extension in iOS and you aren't logged in."
+    },
+    "16656": {
+        "text": "A log will be created in the Offline section (MEGAiOS.log). Logs can contain information related to your account.",
+        "context": "An alert message which is shown when the DEBUG mode is enabled. The .log file name does not need to be translated."
+    },
+    "16657": {
+        "text": "This could be due to the following reasons:\r\n- The folder link has been removed because of a ToS\/AUP violation.\r\n- Invalid URL \u2013 the link you are trying to access does not exist.\r\n- The folder link has been deleted by the user.",
+        "context": "An error message which is shown when a folder link doesn't exist."
+    },
+    "16658": {
+        "text": "This could be due to the following reasons:\r\n- The file has been removed because of a ToS\/AUP violation.\r\n- Invalid URL \u2013 the link you are trying to access does not exist.\r\n- The file has been deleted by the user.",
+        "context": "An error message which is shown when you open a file link and it's no longer available. It explains the reasons that could be causing it."
     }
 }

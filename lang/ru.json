@@ -4264,6 +4264,10 @@
     "16652": "\u041d\u0435 \u0443\u0434\u0430\u043b\u043e\u0441\u044c \u043f\u043e\u043a\u0430\u0437\u0430\u0442\u044c \u043e\u043f\u0446\u0438\u0438 \u0437\u0430\u0433\u0440\u0443\u0437\u043a\u0438. \u041f\u043e\u043f\u0440\u043e\u0431\u0443\u0439\u0442\u0435 \u043f\u043e\u0437\u0436\u0435.",
     "16653": "\u0414\u043b\u044f \u043f\u043e\u043b\u043d\u043e\u0446\u0435\u043d\u043d\u043e\u0433\u043e \u0438\u0441\u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u043d\u0438\u044f \u0437\u0430\u0433\u0440\u0443\u0437\u0438\u0442\u0435 \u043d\u0430\u0448\u0435 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u0435 \u0438\u043b\u0438 \u043e\u0442\u043a\u0440\u043e\u0439\u0442\u0435 \u0441\u0430\u0439\u0442 \u043d\u0430 \u041f\u041a.",
     "16654": "Don't show icons on the left pane of Windows Explorer",
+    "16655": "Open MEGA and sign in to continue",
+    "16656": "A log will be created in the Offline section (MEGAiOS.log). Logs can contain information related to your account.",
+    "16657": "This could be due to the following reasons:- The folder link has been removed because of a ToS\/AUP violation.- Invalid URL \u2013 the link you are trying to access does not exist.- The folder link has been deleted by the user.",
+    "16658": "This could be due to the following reasons:- The file has been removed because of a ToS\/AUP violation.- Invalid URL \u2013 the link you are trying to access does not exist.- The file has been deleted by the user.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

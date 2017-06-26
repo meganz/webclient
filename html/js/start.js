@@ -8,7 +8,7 @@ function init_start() {
 		$('.startpage.register').rebind('click', function () {
 			loadSubPage('fm');
 		});
-		
+
 		$('.startpage.try-mega').text(l[187]);
 		$('.startpage.try-mega').rebind('click', function () {
 			loadSubPage('fm/dashboard');
@@ -52,7 +52,7 @@ function init_start() {
     else if (page === 'download') {
         $('.widget-block').hide();
     }
-	
+
 	startCountRenderData = {'users':'','files':''};
     start_counts();
 
@@ -70,13 +70,13 @@ function init_start() {
 			}
 		});
 	}
-	
+
 	if (document.URL.indexOf('mobile') > -1)
 	{
 		setTimeout(function()
 		{
 			$('.bottom-page.scroll-block').animate({
-				scrollTop: $(".bottom-page.mobile").offset().top+500
+				scrollTop: $(".bottom-page.bott-pad.mobile").offset().top
 			}, 800);
 		},1000);
 	}

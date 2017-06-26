@@ -16,7 +16,10 @@ var seqno = Math.ceil(Math.random()*1000000000);
 var staticpath = 'https://eu.static.mega.co.nz/3/';
 var ua = window.navigator.userAgent.toLowerCase();
 var storage_version = '1'; // clear localStorage when version doesn't match
-var page = document.location.hash, l, d = false;
+var l, d = false;
+
+// Cache location.search parameters early as the URL may get rewritten later
+var locationSearchParams = location.search;
 
 var is_electron = false;
 if (typeof process !== 'undefined') {
@@ -29,19 +32,101 @@ if (typeof process !== 'undefined') {
         // localStorage.jj = 1;
     }
 }
+var is_selenium = !ua.indexOf('mozilla/5.0 (selenium; ');
 var is_karma = /^localhost:987[6-9]/.test(window.top.location.host);
 var is_chrome_firefox = document.location.protocol === 'chrome:'
     && document.location.host === 'mega' || document.location.protocol === 'mega:';
 var is_extension = is_chrome_firefox || is_electron || document.location.href.substr(0,19) == 'chrome-extension://';
 var is_mobile = m = isMobile();
 var is_ios = is_mobile && (ua.indexOf('iphone') > -1 || ua.indexOf('ipad') > -1 || ua.indexOf('ipod') > -1);
+var is_bot = !is_extension && /bot|crawl/i.test(ua);
 
-function isMobile()
-{
-    if (is_chrome_firefox) return false;
-    var mobile = ['iphone','ipad','android','blackberry','nokia','opera mini','windows mobile','windows phone','iemobile','mobile safari','bb10; touch'];
-    for (var i in mobile) if (ua.indexOf(mobile[i]) > 0) return true;
+/**
+ * Check if the user is coming from a mobile device
+ * @returns {Boolean}
+ */
+function isMobile() {
+
+    // If extension, not applicable
+    if (is_chrome_firefox) {
+        return false;
+    }
+
+    // Useful for developing & testing the mobile site (this is below the is_chrome_firefox
+    // check above because the Firefox extension has not loaded localStorage yet and it breaks
+    if (localStorage.testMobileSite) {
+        return true;
+    }
+
+    var mobileStrings = [
+        'iphone', 'ipad', 'android', 'blackberry', 'nokia', 'opera mini',
+        'windows mobile', 'windows phone', 'iemobile', 'mobile safari', 'bb10; touch'
+    ];
+
+    for (var i in mobileStrings) {
+        if (ua.indexOf(mobileStrings[i]) > 0) {
+            return true;
+        }
+    }
+
     return false;
+}
+
+function getSitePath() {
+    var hash = location.hash.replace('#', '');
+
+    if (hashLogic || isPublicLink(hash)) {
+        return '/' + hash;
+    }
+    return document.location.pathname;
+}
+
+// remove dangling characters from the pathname/hash
+function getCleanSitePath(path) {
+    if (path === undefined) {
+        path = getSitePath();
+    }
+
+    path = mURIDecode(path).replace(/^[/#]+|\/+$/g, '');
+
+    return path;
+}
+
+// Check whether the provided `page` points to a public link
+function isPublicLink(page) {
+    page = mURIDecode(page).replace(/^[/#]+/, '');
+
+    return (page[0] === '!' || page.substr(0, 2) === 'F!' || page.substr(0, 2) === 'P!') ? page : false;
+}
+
+// Safer wrapper around decodeURIComponent
+function mURIDecode(path) {
+    path = String(path);
+
+    if (path.indexOf('%25') >= 0) {
+        do {
+            path = path.replace(/%25/g, '%');
+        } while (path.indexOf('%25') >= 0);
+    }
+    if (path.indexOf('%21') >= 0) {
+        path = path.replace(/%21/g, '!');
+    }
+    try {
+        path = decodeURIComponent(path);
+    }
+    catch (e) {}
+
+    return path;
+}
+
+function clickURLs() {
+    $('a.clickurl').rebind('click', function() {
+        var url = $(this).attr('href') || $(this).data('fxhref');
+        if (url) {
+            loadSubPage(url.substr(1));
+            return false;
+        }
+    });
 }
 
 function geoStaticpath(eu)
@@ -52,8 +137,11 @@ function geoStaticpath(eu)
                 var cc_eu = 'FR DE NL ES PT DK CH IT UK GB NO SE FI PL CZ SK AT GR RO HU IE TR VA MC SM LI AD JE GG UA BG LT LV EE AX IS MA DZ LY TN EG RU BY HR SI AL ME RS KO EU FO CY IL LB SY SA JO IQ BA CV PS EH GI GL IM LU MK SJ BF BI BJ BW CF CG CM DJ ER ET GA GH GM GN GN GW KE KM LR LS MG ZA AE ML MR MT MU MV MW MZ NA NE QA RW SD SS SL SZ TD TG TZ UG YE ZA ZM ZR ZW';
                 var cc_na = 'US CA MX AG BS BB BZ CR CO CU DO GD GT GY HT HN JM NI PA KN LC VC SR TT VE IS GL AI BL VG PR VI VE CO EC CL BR BO PY UY AR GY SR PE GF FK';
                 var cc_nz = 'NZ AU FJ NC';
+				var cc_sg = 'HK TH VN ID MY BD NP MM BT IN PH LK BN';
                 var cm = String(document.cookie).match(/geoip\s*\=\s*([A-Z]{2})/);
-                if (cm && cm[1] && cc_na.indexOf(cm[1]) > -1)
+				if (cm && cm[1] && cc_sg.indexOf(cm[1]) > -1)
+                    return 'https://sg.static.mega.co.nz/3/';
+                else if (cm && cm[1] && cc_na.indexOf(cm[1]) > -1)
                     return 'https://na.static.mega.co.nz/3/';
                 else if (cm && cm[1] && cc_nz.indexOf(cm[1]) > -1)
                     return 'https://nz.static.mega.co.nz/3/';
@@ -117,6 +205,13 @@ if (!myURL) {
 if (!String.prototype.trim) {
     String.prototype.trim = function() {
         return this.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
+    };
+}
+if (!String.prototype.localeCompare) {
+    String.prototype.localeCompare = function(to) {
+        var s1 = this.toLowerCase();
+        var s2 = String(to).toLowerCase();
+        return s1 > s2 ? 1 : (s1 < s2 ? -1 : 0);
     };
 }
 if (!String.trim) {
@@ -289,7 +384,8 @@ if (!b_u) try
         nocontentcheck = true;
         var devhost = window.location.host;
         // handle subdirs
-        var pathSuffix = window.location.pathname;
+        // Disable pathSuffixes, because they are no longer supported: the webclient will now only work from root
+        var pathSuffix = '';
         pathSuffix = pathSuffix.split("/").slice(0, -1).join("/");
         // set the staticpath for debug mode
         staticpath = window.location.protocol + "//" + devhost + pathSuffix + "/";
@@ -400,17 +496,31 @@ var mega = {
                 params += '&bb=' + parseInt(brand);
             }
 
+            var apiut = localStorage.apiut ? '&ut=' + localStorage.apiut : "";
+            params += apiut;
+
             this._urlParams = params;
         }
 
         return this._urlParams;
     }
 };
+
+var hashLogic = false;
+if (localStorage.hashLogic) hashLogic=true;
+if (typeof history == 'undefined') hashLogic=true;
+
 var bootstaticpath = staticpath;
 var urlrootfile = '';
 
+// Disable hash checking for search engines to speed the site load up
+if (is_bot) {
+    nocontentcheck = true;
+}
+
 if (!b_u && is_extension)
 {
+    hashLogic = true;
     nocontentcheck=true;
 
     if (is_chrome_firefox)
@@ -457,6 +567,33 @@ if (!b_u && is_extension)
         }
     });
 }
+
+
+var page;
+var locSearch = location.search;
+
+if (hashLogic) {
+    // legacy support:
+    page = getCleanSitePath(document.location.hash);
+}
+else if ((page = isPublicLink(document.location.hash))) {
+    // folder or file link: always keep the hash URL to ensure that keys remain client side
+    // history.replaceState so that back button works in new URL paradigm
+    history.replaceState({subpage: page}, "", '#' + page);
+}
+else {
+    if (document.location.hash.length > 0) {
+        // history.replaceState for legacy hash requests to new URL paradigm
+        page = document.location.hash;
+    }
+    else {
+        // new URL paradigm, look for desired page in the location.pathname:
+        page = document.location.pathname;
+    }
+    page = getCleanSitePath(page);
+    history.replaceState({subpage: page}, "", '/' + page);
+}
+
 
 if (b_u && !is_mobile) {
     document.location = 'update.html';
@@ -569,7 +706,7 @@ function mObjectURL(data, type)
 
 Object.defineProperty(this, 'mBroadcaster', {
     writable: false,
-    value: Object.freeze({
+    value: {
     _topics : {},
 
     addListener: function mBroadcaster_addListener(topic, options) {
@@ -689,6 +826,9 @@ Object.defineProperty(this, 'mBroadcaster', {
                     if (d) {
                         console.log('CROSSTAB COMMUNICATION INITIALIZED AS '
                             + (this.master ? 'MASTER':'SLAVE'));
+
+                        console.debug(String(ua));
+                        console.debug(browserdetails(ua).prod + u_handle);
                     }
                     cb(this.master);
                     cb = null;
@@ -706,9 +846,14 @@ Object.defineProperty(this, 'mBroadcaster', {
             this.listen(setup);
             this.notify('ping');
 
+            // if multiple tabs are reloaded/opened at the same time
+            // they would both see .ctInstances as === 0, so we need to increase this
+            // as earlier as possible, e.g. now.
+            localStorage.ctInstances = (parseInt(localStorage.ctInstances) || 0) + 1;
+
             setTimeout(function() {
                 setup();
-            }, !parseInt(localStorage.ctInstances) ? 0 : 2000);
+            }, parseInt(localStorage.ctInstances) === 1 ? 0 : 2000);
         },
 
         listen: function crossTab_listen(aListener) {
@@ -740,7 +885,15 @@ Object.defineProperty(this, 'mBroadcaster', {
             if (this.ctID) {
                 var wasMaster = this.master;
                 if (wasMaster) {
-                    localStorage.ctInstances--;
+                    var current = parseInt(localStorage.ctInstances);
+                    if (current > 1) {
+                        // only decrease ctInstnaces if its > 1, so that we would never
+                        // get into a case when ctInstances is < 0
+                        localStorage.ctInstances--;
+                    }
+                    else {
+                        localStorage.ctInstances = 0;
+                    }
                     localStorage['mCrossTabRef_' + u_handle] = this.master;
                     delete this.master;
                 } else if (d) {
@@ -771,10 +924,10 @@ Object.defineProperty(this, 'mBroadcaster', {
             mBroadcaster.sendMessage('crossTab:master', this.master);
 
             // (function liveLoop(tag) {
-                // if (tag === mBroadcaster.crossTab.master) {
-                    // localStorage['mCrossTabRef_' + u_handle] = Date.now();
-                    // setTimeout(liveLoop, 6e3, tag);
-                // }
+            // if (tag === mBroadcaster.crossTab.master) {
+            // localStorage['mCrossTabRef_' + u_handle] = Date.now();
+            // setTimeout(liveLoop, 6e3, tag);
+            // }
             // })(this.master);
         },
 
@@ -834,13 +987,20 @@ Object.defineProperty(this, 'mBroadcaster', {
                             }
                         }
                     }
+                default:
+                    mBroadcaster.sendMessage('crossTab:' + msg, strg);
+
                     break;
             }
 
             delete localStorage[ev.key];
         }
     }
-})});
+}});
+
+if (!is_karma) {
+    Object.freeze(mBroadcaster);
+}
 
 
 var sh = [];
@@ -1019,15 +1179,11 @@ if (m || (typeof localStorage !== 'undefined' && localStorage.mobile))
     m=true;
 }
 
-if (location.hash.substr(1, 1) === '!') {
-    m = false;
-}
-
 if (is_ios) {
     tmp = document.querySelector('meta[name="apple-itunes-app"]');
     if (tmp) {
         tmp.setAttribute('content',
-            'app-id=706857885, app-argument=mega://' + window.location.hash);
+            'app-id=706857885, app-argument=mega://#' + page);
     }
 
     // http://whatsmyuseragent.com/Devices/iPhone-User-Agent-Strings
@@ -1055,145 +1211,141 @@ if (is_ios) {
     }
 }
 
-if (m)
-{
-    var app,mobileblog,android,intent, ios9;
+/**
+ * Some legacy secureboot mobile code that has been refactored to keep just the blog working and also redirect to the
+ * app if any confirm, cancel, verify, fm/ipc, newsignup, recover, account or backup links are clicked in the app
+ * because the new mobile site is not designed for those yet. Confirm links initiated from the mobile web will continue
+ * to be processed by the mobile web.
+ */
+if (m && ((!localStorage.signUpStartedInMobileWeb && page.substr(0, 7) === 'confirm') ||
+    page.substr(0, 6) === 'cancel' || page.substr(0, 6) === 'verify' || page.substr(0, 6) === 'fm/ipc' ||
+    page.substr(0, 9) === 'newsignup' || page.substr(0, 7) === 'recover' || page.substr(0, 7) === 'account' ||
+    page.substr(0, 4) === 'blog' || page.substr(0, 6) === 'backup')) {
+
+    var app;
+    var mobileblog;
+    var android;
+    var intent;
+    var ios9;
     var link = document.createElement('link');
+
     link.setAttribute('rel', 'stylesheet');
     link.type = 'text/css';
-    link.href = staticpath + 'css/mobile-app.css';
+    link.href = staticpath + 'css/mobile-app-old.css';
     document.head.appendChild(link);
+
     // AMO: Markup should not be passed to `innerHTML` dynamically. -- This isnt reached for the extension, anyway
-    document.body.innerHTML = '<div class="main-scroll-block"> <div class="main-content-block"> <div class="free-green-tip"></div><div class="main-centered-bl"><div class="main-logo"></div><div class="main-head-txt" id="m_title"></div><div class="main-head-txt" id="m_desc"></div><br /><br /><a href="" class="main-button" id="m_appbtn"></a><div class="main-social hidden"><a href="https://www.facebook.com/MEGAprivacy" class="main-social-icon facebook"></a><a href="https://www.twitter.com/MEGAprivacy" class="main-social-icon twitter"></a><div class="clear"></div></div></div> </div><div class="scrolling-content"><div class="mid-logo"></div> <div class="mid-gray-block">MEGA provides free cloud storage with convenient and powerful always-on privacy </div> <div class="scrolling-block-icon encription"></div> <div class="scrolling-block-header"> End-to-end encryption </div> <div class="scrolling-block-txt">Unlike other cloud storage providers, your data is encrypted & decrypted during transfer by your client devices only and never by us. </div> <div class="scrolling-block-icon access"></div> <div class="scrolling-block-header"> Secure Global Access </div> <div class="scrolling-block-txt">Your data is accessible any time, from any device, anywhere. Only you control the keys to your files.</div> <div class="scrolling-block-icon colaboration"></div> <div class="scrolling-block-header"> Secure Collaboration </div> <div class="scrolling-block-txt">Share folders with your contacts and see their updates in real time. Online collaboration has never been more private and secure.</div> <div class="bottom-menu full-version"><div class="copyright-txt">Mega Limited ' + new Date().getFullYear() + '</div><div class="language-block"></div><div class="clear"></div><iframe src="" width="1" height="1" frameborder="0" style="width:1px; height:1px; border:none;" id="m_iframe"></iframe></div></div></div>';
-    if (window.location.hash.substr(1,4) == 'blog') mobileblog=1;
-    if (ua.indexOf('windows phone') > -1 /*&& ua.indexOf('iemobile') > -1*/)
-    {
-        app='zune://navigate/?phoneappID=1b70a4ef-8b9c-4058-adca-3b9ac8cc194a';
+    // jscs:disable
+    document.body.innerHTML = '<div class="bottom-page scroll-block"><div class="main-content-block">'
+                            + '<div class="free-green-tip"></div><div class="main-centered-bl">'
+                            + '<div class="main-logo"></div><div class="main-head-txt" id="m_title"></div>'
+                            + '<div class="main-head-txt" id="m_desc"></div><br /><br />'
+                            + '<a href="" class="main-button" id="m_appbtn"></a><div class="main-social hidden">'
+                            + '<a href="https://www.facebook.com/MEGAprivacy" class="main-social-icon facebook"></a>'
+                            + '<a href="https://www.twitter.com/MEGAprivacy" class="main-social-icon twitter"></a>'
+                            + '<div class="clear"></div></div></div> </div><div class="scrolling-content">'
+                            + '<div class="mid-logo"></div><div class="mid-gray-block">MEGA provides free cloud '
+                            + 'storage with convenient and powerful always-on privacy</div>'
+                            + '<div class="scrolling-block-icon encription"></div><div class="scrolling-block-header">'
+                            + 'End-to-end encryption</div><div class="scrolling-block-txt">Unlike other cloud storage '
+                            + 'providers, your data is encrypted & decrypted during transfer by your client devices '
+                            + 'only and never by us.</div><div class="scrolling-block-icon access"></div>'
+                            + '<div class="scrolling-block-header">Secure Global Access</div>'
+                            + '<div class="scrolling-block-txt">Your data is accessible any time, from any device, '
+                            + 'anywhere. Only you control the keys to your files.</div>'
+                            + '<div class="scrolling-block-icon colaboration"></div>'
+                            + '<div class="scrolling-block-header">Secure Collaboration</div>'
+                            + '<div class="scrolling-block-txt">Share folders with your contacts and see their '
+                            + 'updates in real time. Online collaboration has never been more private and secure.'
+                            + '</div><div class="bottom-menu full-version"><div class="copyright-txt">Mega Limited '
+                            + new Date().getFullYear() + '</div><div class="language-block"></div><div class="clear">'
+                            + '</div><iframe src="" width="1" height="1" frameborder="0" style="width:1px; '
+                            + 'height:1px; border:none;" id="m_iframe"></iframe></div></div></div>';
+
+    if (page.substr(0, 4) === 'blog') {
+        mobileblog = 1;
+    }
+    if (ua.indexOf('windows phone') > -1) {
+        app = 'zune://navigate/?phoneappID=1b70a4ef-8b9c-4058-adca-3b9ac8cc194a';
         document.body.className = 'wp full-mode supported';
     }
-    else if (ua.indexOf('android') > -1)
-    {
-        app='https://play.google.com/store/apps/details?id=mega.privacy.android.app&referrer=meganzsb';
+    else if (ua.indexOf('android') > -1) {
+        app = 'https://play.google.com/store/apps/details?id=mega.privacy.android.app&referrer=meganzsb';
         document.body.className = 'android full-mode supported';
-        android=1;
-
+        android = 1;
         var ver = ua.match(/android (\d+)\.(\d+)/);
         if (ver) {
             var rev = ver.pop();
             ver = ver.pop();
             // Check for Android 2.3+
             if (ver > 2 || (ver === 2 && rev > 3)) {
-                intent = 'intent://' + location.hash + '/#Intent;scheme=mega;package=mega.privacy.android.app;end';
+                intent = 'intent://#' + page + '/#Intent;scheme=mega;package=mega.privacy.android.app;end';
             }
         }
         if (intent && !mobileblog) {
             document.location = intent;
         }
     }
-    else if (ua.indexOf('bb10') > -1)
-    {
-        app='http://appworld.blackberry.com/webstore/content/46810890/';
+    else if (ua.indexOf('bb10') > -1) {
+        app = 'http://appworld.blackberry.com/webstore/content/46810890/';
         document.body.className = 'blackberry full-mode supported';
     }
-    else if (is_ios)
-    {
-        app='https://itunes.apple.com/app/mega/id706857885';
+    else if (is_ios) {
+        app = 'https://itunes.apple.com/app/mega/id706857885';
         document.body.className = 'ios full-mode supported';
     }
-    else document.body.className = 'another-os full-mode unsupported';
+    else {
+        document.body.className = 'another-os full-mode unsupported';
+    }
+    document.getElementById('m_title').innerHTML = 'This link should be opened in the MEGA app.';
 
-    document.getElementById('m_title').innerHTML = 'Due to our advanced end-to-end encryption we do not yet support mobile browsers.';
-    if (app)
-    {
+    if (app) {
         document.getElementById('m_appbtn').href = app;
-        document.getElementById('m_desc').innerHTML = 'To use our service, you can either open MEGA on a desktop or laptop browser, or download the MEGA app.';
+        document.getElementById('m_desc').innerHTML = 'Otherwise, you can also open the link on a '
+                                                    + 'desktop/laptop browser, or download the MEGA app.';
     }
-    else
-    {
-        document.getElementById('m_desc').innerHTML = 'To use our service, you can open MEGA on a desktop or laptop browser. A dedicated app for your platform will be coming soon.';
+    else {
+        document.getElementById('m_desc').innerHTML = 'Otherwise you can also open the link on a '
+                                                    + 'desktop/laptop browser.';
     }
-    if (window.location.hash.substr(1,1) == '!' || window.location.hash.substr(1,2) == 'F!')
-    {
-        var i = 0;
-        if (ua.indexOf('windows phone') > -1) {
-            i = 1;
-        }
 
-        if (app) {
-            document.getElementById('m_desc').innerHTML = 'To view this link, you can either open it on a desktop or laptop browser, or download the MEGA app.';
-
-            document.getElementById('m_appbtn').href += '&referrer=link';
-        }
-        if (ua.indexOf('chrome') > -1)
-        {
-            if (intent) {
-                document.getElementById('m_desc').innerHTML
-                    += '<br/><em>If you already have it installed, <a href="' + intent + '">Click here!</a></em>';
-            }
-            else {
-                setTimeout(function() {
-                    if (confirm('Do you already have the MEGA app installed?')) {
-                        document.location = intent ? intent : 'mega://' + window.location.hash;
-                    }
-                }, 2500);
-            }
-        }
-        else if (is_ios > 8) {
-            setTimeout(function() {
-                if (confirm('Do you already have the MEGA app installed?')) {
-                    document.location = 'mega://' + window.location.hash;
-                }
-            }, 1500);
-        }
-        else {
-            document.getElementById('m_iframe').src = 'mega://' + window.location.hash.substr(i);
-        }
-    }
-    else if (window.location.hash.substr(1, 7) === 'confirm'
-            || window.location.hash.substr(1, 6) === 'backup'
-            || window.location.hash.substr(1, 6) === 'cancel'
-            || window.location.hash.substr(1, 6) === 'verify'
-            || window.location.hash.substr(1, 6) === 'fm/ipc'
-            || window.location.hash.substr(1, 9) === 'newsignup'
-            || window.location.hash.substr(1, 7) === 'recover'
-            || window.location.hash.substr(1, 7) === 'account')
-    {
-        var i = 0;
-        if (ua.indexOf('windows phone') > -1) {
-            i = 1;
-        }
-        if (ua.indexOf('chrome') > -1) {
-            window.location = 'mega://' + window.location.hash.substr(i);
-        }
-        else if (is_ios > 8) {
-            setTimeout(function() {
-                if (confirm('Do you already have the MEGA app installed?')) {
-                    document.location = 'mega://' + window.location.hash;
-                }
-            }, 1500);
-        }
-        else {
-            document.getElementById('m_iframe').src = 'mega://' + window.location.hash.substr(i);
-        }
-
-        if (intent) {
-            document.getElementById('m_title').innerHTML
-                += '<br/><em>If you already have it installed, <a href="' + intent + '">Click here!</a></em>';
-        }
-    }
-    if (mobileblog)
-    {
+    if (mobileblog) {
         document.body.innerHTML = '';
         mCreateElement('script', {type: 'text/javascript'}, 'head')
             .src = ((location.host === 'mega.nz') ? '/blog.js' : 'html/js/blog.js');
     }
+    else {
+        var prechar = '#';
+        if (ua.indexOf('windows phone') > -1) {
+            prechar = '';
+        }
+        if (ua.indexOf('chrome') > -1) {
+            window.location = 'mega://' + prechar + page;
+        }
+        else if (is_ios > 8) {
+            setTimeout(function() {
+                var text = 'This link should be opened in the MEGA app. '
+                         + 'Click OK if you already have the MEGA app installed';
+                if (confirm(text)) {
+                    document.location = 'mega://#' + page;
+                }
+            }, 1500);
+        }
+        else {
+            document.getElementById('m_iframe').src = 'mega://' + prechar + page;
+        }
+        if (intent) {
+            document.getElementById('m_title').innerHTML
+                += '<br/><em>If you already have the app installed, <a href="' + intent + '">click here!</a></em>';
+        }
+    }
 }
-else if (page == '#android')
-{
-    document.location = 'https://play.google.com/store/apps/details?id=mega.privacy.android.app&referrer=meganzmobileapps';
+// jscs:enable
+else if (page === 'android') {
+    document.location = 'https://play.google.com/store/apps/details?id=mega.privacy.android.app'
+                      + '&referrer=meganzmobileapps';
 }
-else if (!b_u)
-{
+else if (!b_u) {
     d = window.d || 0;
     jj = window.jj || 0;
     var onBetaW = location.hostname === 'beta.mega.nz' || location.hostname.indexOf("developers.") === 0;
@@ -1253,6 +1405,7 @@ else if (!b_u)
                         return "'" + (a.origin !== 'null' && a.origin
                             || (a.protocol + '//' + a.hostname)) + "...'";
                     })
+                    .replace(/(Cannot read property )('[\w-]{8}')/, "$1'<h>?'")
                     .replace(/(Access to '\.\.).*(' from script denied)/, '$1$2')
                     .replace(/gfs\w+\.userstorage/, 'gfs...userstorage')
                     .replace(/^Uncaught\W*(?:exception\W*)?/i, ''),
@@ -1287,9 +1440,9 @@ else if (!b_u)
                     dump.m = [].concat(lns.slice(0,2), "[..!]", lns.slice(-2)).join(" ");
                 }
             }
-            dump.m = dump.m.replace(/\s+/g, ' ');
+            dump.m = (is_mobile ? '[mobile] ' : '') + dump.m.replace(/\s+/g, ' ');
 
-            if (!window.jsl_done) {
+            if (!window.jsl_done && !window.u_checked) {
                 // Alert the user if there was an uncaught exception while
                 // loading the site, this should only happen on some fancy
                 // browsers other than what we use during development, and
@@ -1301,6 +1454,13 @@ else if (!b_u)
                     console.error(dump.m, arguments);
                 }
                 return;
+            }
+
+            if (dump.m.indexOf('Permission denied to access property') > -1) {
+                // Some Firefox extension is injecting some script(s)...
+                console.warn('Your account is only as secure as your computer...');
+                console.warn('Check your installed extensions and which one is injecting scripts on this page...');
+                return false;
             }
 
             if (~dump.m.indexOf('took +10s'))
@@ -1470,10 +1630,20 @@ else if (!b_u)
     var detectLang = function() {
 
         // Get the preferred language in their browser
-        var userLang = (navigator.languages) ? navigator.languages[0] : (navigator.language || navigator.userLanguage);
+        var userLang = null;
         var langCode = null;
         var langCodeVariant = null;
 
+        // If a search bot, they may set the URL as e.g. mega.nz/pro?es so get the language from that
+        if (is_bot && locationSearchParams !== '') {
+            userLang = locationSearchParams.replace('?', '');
+        }
+        else {
+            // Otherwise get the user's preferred language in their browser settings
+            userLang = (navigator.languages) ? navigator.languages[0] : (navigator.language || navigator.userLanguage);
+        }
+
+        // If a language can't be detected, default to English
         if (!userLang) {
             return 'en';
         }
@@ -1553,32 +1723,63 @@ else if (!b_u)
     jsl.push({f:'js/vendor/jquery-ui.js', n: 'jqueryui_js', j:1, w:10});
     jsl.push({f:'js/vendor/jquery.mousewheel.js', n: 'jquerymouse_js', j:1});
     jsl.push({f:'js/vendor/jquery.jscrollpane.js', n: 'jscrollpane_js', j:1});
+    jsl.push({f:'js/jscrollpane.utils.js', n: 'jscrollpane_utils_js', j: 1});
     jsl.push({f:'js/jquery.misc.js', n: 'jquerymisc_js', j:1});
     jsl.push({f:'js/vendor/megaLogger.js', n: 'megaLogger_js', j:1});
+
+    jsl.push({f:'js/utils/browser.js', n: 'js_utils_browser_js', j: 1});
+    jsl.push({f:'js/utils/debug.js', n: 'js_utils_debug_js', j: 1});
+    jsl.push({f:'js/utils/dom.js', n: 'js_utils_dom_js', j: 1});
+    jsl.push({f:'js/utils/locale.js', n: 'js_utils_locale_js', j: 1});
+    jsl.push({f:'js/utils/pictools.js', n: 'js_utils_pictools_js', j: 1});
+    jsl.push({f:'js/utils/polyfills.js', n: 'js_utils_polyfills_js', j: 1});
+    jsl.push({f:'js/utils/stringcrypt.js', n: 'js_utils_stringcrypt_js', j: 1});
+    jsl.push({f:'js/utils/timers.js', n: 'js_utils_timers_js', j: 1});
+    jsl.push({f:'js/utils/watchdog.js', n: 'js_utils_watchdog_js', j: 1});
+    jsl.push({f:'js/utils/workers.js', n: 'js_utils_workers_js', j: 1});
+
     jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
     jsl.push({f:'js/crypto.js', n: 'crypto_js', j:1,w:5});
     jsl.push({f:'js/account.js', n: 'user_js', j:1});
     jsl.push({f:'js/attr.js', n: 'mega_attr_js', j:1});
     jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
+    jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
+
+    jsl.push({f:'js/mDB.js', n: 'mDB_js', j:1});
+    jsl.push({f:'js/mouse.js', n: 'mouse_js', j:1});
+    jsl.push({f:'js/datastructs.js', n: 'datastructs_js', j:1});
+    jsl.push({f:'js/vendor/db.js', n: 'db_js', j:1,w:5});
+    jsl.push({f:'js/idbkvstorage.js', n: 'idbkvstorage_js', j: 1, w: 5});
+    jsl.push({f:'js/sharedlocalkvstorage.js', n: 'sharedlocalkvstorage_js', j: 1, w: 5});
+
+    jsl.push({f:'js/tlvstore.js', n: 'tlvstore_js', j:1});
+    jsl.push({f:'js/vendor/jsbn.js', n: 'jsbn_js', j:1, w:2});
+    jsl.push({f:'js/vendor/jsbn2.js', n: 'jsbn2_js', j:1, w:2});
+    jsl.push({f:'js/vendor/nacl-fast.js', n: 'nacl_js', j:1,w:7});
+    jsl.push({f:'js/vendor/dexie.js', n: 'dexie_js', j:1,w:5});
+
+    jsl.push({f:'js/authring.js', n: 'authring_js', j:1});
+    jsl.push({f:'html/js/login.js', n: 'login_js', j:1});
+    jsl.push({f:'js/ui/export.js', n: 'export_js', j:1,w:1});
+    jsl.push({f:'html/js/key.js', n: 'key_js', j:1});
+
+    jsl.push({f:'js/useravatar.js', n: 'contact_avatar_js', j:1,w:3});
+    jsl.push({f:'css/avatars.css', n: 'avatars_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
+
+    // Common desktop and mobile, bottom pages
+    jsl.push({f:'css/bottom-pages.css', n: 'bottom-pages_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/pro.css', n: 'pro_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/bottom-menu.css', n: 'bottom-menu_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/startpage.css', n: 'startpage_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'html/start.html', n: 'start', j:0});
+    jsl.push({f:'html/js/start.js', n: 'start_js', j:1});
+    jsl.push({f:'html/js/bottompage.js', n: 'bottompage_js', j:1});
+    jsl.push({f:'html/pagesmenu.html', n: 'pagesmenu', j:0});
+    jsl.push({f:'html/bottom2.html', n: 'bottom2',j:0});
+    jsl.push({f:'html/megainfo.html', n: 'megainfo', j:0});
 
     if (!is_mobile) {
-
-        jsl.push({f:'js/mDB.js', n: 'mDB_js', j:1});
-        jsl.push({f:'js/mouse.js', n: 'mouse_js', j:1});
-        jsl.push({f:'js/datastructs.js', n: 'datastructs_js', j:1});
-        jsl.push({f:'js/vendor/db.js', n: 'db_js', j:1,w:5});
-        jsl.push({f:'js/megaDbEncryptionPlugin.js', n: 'megadbenc_js', j:1,w:5});
-        jsl.push({f:'js/megaDb.js', n: 'megadb_js', j:1,w:5});
-        jsl.push({f:'js/idbkvstorage.js', n: 'idbkvstorage_js', j: 1, w: 5});
-
-        jsl.push({f:'js/tlvstore.js', n: 'tlvstore_js', j:1});
-        jsl.push({f:'js/vendor/jsbn.js', n: 'jsbn_js', j:1, w:2});
-        jsl.push({f:'js/vendor/jsbn2.js', n: 'jsbn2_js', j:1, w:2});
-        jsl.push({f:'js/vendor/nacl-fast.js', n: 'nacl_js', j:1,w:7});
-        jsl.push({f:'js/vendor/dexie.js', n: 'dexie_js', j:1,w:5});
-        jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
-
-        jsl.push({f:'js/authring.js', n: 'authring_js', j:1});
         jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
         jsl.push({f:'js/vendor/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1, w:10});
         jsl.push({f:'js/vendor/verge.js', n: 'verge', j:1, w:5});
@@ -1590,11 +1791,11 @@ else if (!b_u)
         jsl.push({f:'js/vendor/smartcrop.js', n: 'smartcrop_js', j:1, w:7});
         jsl.push({f:'js/vendor/jquery.qrcode.js', n: 'jqueryqrcode', j:1});
         jsl.push({f:'js/vendor/qrcode.js', n: 'qrcode', j:1,w:2, g: 'vendor'});
-        jsl.push({f:'js/vendor/bitcoin-math.js', n: 'bitcoinmath', j:1 });
-        jsl.push({f:'js/paycrypt.js', n: 'paycrypt_js', j:1 });
 
+        // This is not used anymore, unless we process and store credit card details for renewals again
+        // jsl.push({f:'js/paycrypt.js', n: 'paycrypt_js', j:1 });
 
-        // notifications
+        // Desktop notifications
         jsl.push({f:'js/vendor/notification.js', n: 'notification_js', j:1,w:7});
 
         // Other
@@ -1616,25 +1817,24 @@ else if (!b_u)
         jsl.push({f:'js/ui/languageDialog.js', n: 'mega_js', j:1,w:7});
         jsl.push({f:'js/ui/publicServiceAnnouncement.js', n: 'psa_js', j:1,w:1});
         jsl.push({f:'js/ui/alarm.js', n: 'alarm_js', j:1,w:1});
-        jsl.push({f:'js/ui/export.js', n: 'export_js', j:1,w:1});
+        jsl.push({f:'js/ui/transfers-popup.js', n: 'transfers_popup_js', j:1,w:1});
     } // !is_mobile
 
     // Transfers
     jsl.push({f:'js/transfers/xhr2.js', n: 'xhr_js', j:1});
     jsl.push({f:'js/transfers/queue.js', n: 'queue', j:1,w:4});
+    jsl.push({f:'js/transfers/utils.js', n: 'tutils', j:1,w:4});
     jsl.push({f:'js/transfers/meths/cache.js', n: 'dl_cache', j:1,w:3});
+    jsl.push({f:'js/transfers/meths/flash.js', n: 'dl_flash', j:1,w:3});
+    jsl.push({f:'js/transfers/meths/memory.js', n: 'dl_memory', j:1,w:3});
     jsl.push({f:'js/transfers/meths/filesystem.js', n: 'dl_chrome', j:1,w:3});
     jsl.push({f:'js/transfers/meths/mediasource.js', n: 'dl_mediasource', j:1,w:3});
-    if (is_chrome_firefox && parseInt(Services.appinfo.version) > 27)
-    {
+
+    if (is_chrome_firefox && parseInt(Services.appinfo.version) > 27) {
         is_chrome_firefox |= 4;
         jsl.push({f:'js/transfers/meths/firefox-extension.js', n: 'dl_firefox', j:1,w:3});
     }
-    else
-    {
-        jsl.push({f:'js/transfers/meths/memory.js', n: 'dl_memory', j:1,w:3});
-        jsl.push({f:'js/transfers/meths/flash.js', n: 'dl_flash', j:1,w:3});
-    }
+
     jsl.push({f:'js/transfers/downloader.js', n: 'dl_downloader', j:1,w:3});
     jsl.push({f:'js/transfers/download2.js', n: 'dl_js', j:1,w:3});
     jsl.push({f:'js/transfers/upload2.js', n: 'upload_js', j:1,w:2});
@@ -1643,8 +1843,12 @@ else if (!b_u)
     // Everything else...
     jsl.push({f:'index.js', n: 'index', j:1,w:4});
     jsl.push({f:'html/top.html', n: 'top', j:0});
+    // TODO: include mobile top menu js stuff
+    jsl.push({f:'html/top-mobile.html', n: 'top-mobile', j:0});
     jsl.push({f:'html/transferwidget.html', n: 'transferwidget', j:0});
     jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});
+    jsl.push({f:'js/fm/removenode.js', n: 'fm_removenode_js', j: 1});
+    jsl.push({f:'js/fm/ufssizecache.js', n: 'ufssizecache_js', j:1});
 
     if (!is_mobile) {
         jsl.push({f:'css/style.css', n: 'style_css', j:2,w:30,c:1,d:1,cache:1});
@@ -1653,31 +1857,29 @@ else if (!b_u)
         jsl.push({f:'js/fm/quickfinder.js', n: 'fm_quickfinder_js', j:1,w:1});
         jsl.push({f:'js/fm/selectionmanager.js', n: 'fm_selectionmanager_js', j:1,w:1});
         jsl.push({f:'js/fm.js', n: 'fm_js', j:1,w:12});
+        jsl.push({f:'js/fm/achievements.js', n: 'achievements_js', j: 1, w: 5});
+        jsl.push({f:'js/fm/dashboard.js', n: 'fmdashboard_js', j:1,w:5});
+        jsl.push({f:'js/fm/account.js', n: 'fm_account_js', j:1});
+        jsl.push({f:'js/fm/fileconflict.js', n: 'fm_fileconflict_js', j:1});
         jsl.push({f:'js/ui/miniui.js', n: 'miniui_js', j:1});
 
-        jsl.push({f:'html/start.html', n: 'start', j:0});
-        jsl.push({f:'html/megainfo.html', n: 'megainfo', j:0});
-        jsl.push({f:'html/js/start.js', n: 'start_js', j:1});
-        jsl.push({f:'html/bottom2.html', n: 'bottom2',j:0});
         jsl.push({f:'html/key.html', n: 'key', j:0});
-        jsl.push({f:'html/js/key.js', n: 'key_js', j:1});
         jsl.push({f:'html/pro.html', n: 'pro', j:0});
         jsl.push({f:'html/js/pro.js', n: 'pro_js', j:1});
         jsl.push({f:'html/login.html', n: 'login', j:0});
-        jsl.push({f:'html/js/login.js', n: 'login_js', j:1});
         jsl.push({f:'html/fm.html', n: 'fm', j:0,w:3});
         jsl.push({f:'html/top-login.html', n: 'top-login', j:0});
         jsl.push({f:'js/notify.js', n: 'notify_js', j:1});
         jsl.push({f:'js/popunda.js', n: 'popunda_js', j:1});
         jsl.push({f:'css/user-card.css', n: 'user_card_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/fm-lists.css', n: 'fm_lists_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/avatars.css', n: 'avatars_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/icons.css', n: 'icons_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/buttons.css', n: 'buttons_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/dropdowns.css', n: 'dropdowns_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/dialogs.css', n: 'dialogs_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/popups.css', n: 'popups_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/spinners.css', n: 'spinners_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/toast.css', n: 'toast_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/data-blocks-view.css', n: 'data_blocks_view_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/help2.css', n: 'help_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j:2,w:5,c:1,d:1,cache:1});
@@ -1685,22 +1887,50 @@ else if (!b_u)
         jsl.push({f:'css/onboarding.css', n: 'onboarding_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/media-print.css', n: 'media_print_css', j:2,w:5,c:1,d:1,cache:1});
 
-        jsl.push({f:'js/useravatar.js', n: 'contact_avatar_js', j:1,w:3});
         jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
         jsl.push({f:'js/states-countries.js', n: 'states_countries_js', j:1});
         jsl.push({f:'html/dialogs.html', n: 'dialogs', j:0,w:2});
         jsl.push({f:'js/vendor/int64.js', n: 'int64_js', j:1});
         jsl.push({f:'js/transfers/zip64.js', n: 'zip_js', j:1});
-        jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
 
         jsl.push({f:'html/onboarding.html', n: 'onboarding', j:0,w:2});
         jsl.push({f:'js/ui/onboarding.js', n: 'onboarding_js', j:1,w:1});
     } // !is_mobile
 
+    // do not change the order...
+    jsl.push({f:'js/fm/filemanager.js', n: 'filemanager_js', j: 1, w: 5});
+    jsl.push({f:'js/fm/utils.js', n: 'fm_utils_js', j: 1});
+    jsl.push({f:'js/fm/megadata.js', n: 'fm_megadata_js', j: 1});
+    jsl.push({f:'js/fm/megadata/account.js', n: 'fm_megadata_account_js', j: 1});
+    jsl.push({f:'js/fm/megadata/avatars.js', n: 'fm_megadata_avatars_js', j: 1});
+    jsl.push({f:'js/fm/megadata/contacts.js', n: 'fm_megadata_contacts_js', j: 1});
+    jsl.push({f:'js/fm/megadata/filters.js', n: 'fm_megadata_filters_js', j: 1});
+    jsl.push({f:'js/fm/megadata/inbox.js', n: 'fm_megadata_inbox_js', j: 1});
+    jsl.push({f:'js/fm/megadata/menus.js', n: 'fm_megadata_menus_js', j: 1});
+    jsl.push({f:'js/fm/megadata/nodes.js', n: 'fm_megadata_nodes_js', j: 1});
+    jsl.push({f:'js/fm/megadata/openfolder.js', n: 'fm_megadata_openfolder_js', j: 1});
+    jsl.push({f:'js/fm/megadata/render.js', n: 'fm_megadata_render_js', j: 1});
+    jsl.push({f:'js/fm/megadata/reset.js', n: 'fm_megadata_reset_js', j: 1});
+    jsl.push({f:'js/fm/megadata/sort.js', n: 'fm_megadata_sort_js', j: 1});
+    jsl.push({f:'js/fm/megadata/transfers.js', n: 'fm_megadata_transfers_js', j: 1});
+    jsl.push({f:'js/fm/megadata/tree.js', n: 'fm_megadata_tree_js', j: 1});
 
+    if (localStorage.makeCache) {
+        jsl.push({f:'makecache.js', n: 'makecache', j:1});
+    }
 
     if (localStorage.enableDevtools) {
         jsl.push({f:'dont-deploy/transcripter/exporter.js', n: 'tse_js', j:1});
+    }
+
+    // Load files common to all mobile pages
+    if (is_mobile) {
+        jsl.push({f:'css/mobile.css', n: 'mobile_css', j: 2, w: 30, c: 1, d: 1, m: 1});
+        jsl.push({f:'css/spinners.css', n: 'spinners_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
+        jsl.push({f:'css/toast.css', n: 'toast_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
+        jsl.push({f:'html/mobile.html', n: 'mobile', j: 0, w: 1});
+        jsl.push({f:'js/ui/mobile.js', n: 'mobile_js', j: 1, w: 1});
+        jsl.push({f:'js/vendor/jquery.mobile.js', n: 'jquery_mobile_js', j: 1, w: 5});
     }
 
     // We need to keep a consistent order in loaded resources, so that if users
@@ -1717,7 +1947,8 @@ else if (!b_u)
     if (!is_mobile
             && (
                 typeof Number.isNaN !== 'function' ||
-                typeof Set === 'undefined'
+                typeof Set === 'undefined' ||
+                !Object.assign
             )
     ) {
 
@@ -1743,8 +1974,6 @@ else if (!b_u)
         'resellers': {f:'html/resellers.html', n: 'resellers', j:0},
         'download': {f:'html/download.html', n: 'download', j:0},
         'download_js': {f:'html/js/download.js', n: 'download_js', j:1},
-        'download_mobile': {f:'html/download-mobile.html', n: 'download', j: 0},
-        'mobile_css': {f:'css/mobile-app-new.css', n: 'mobile_css', j:2,w:30,c:1,d:1,m:1},
         'network_js': {f:'js/network-testing.js', n: 'network_js', j:1},
         'dispute': {f:'html/dispute.html', n: 'dispute', j:0},
         'disputenotice': {f:'html/disputenotice.html', n: 'disputenotice', j:0},
@@ -1776,8 +2005,9 @@ else if (!b_u)
         'help_js': {f:'html/js/help2.js', n: 'help_js', j:1},
         'sync': {f:'html/sync.html', n: 'sync', j:0},
         'sync_js': {f:'html/js/sync.js', n: 'sync_js', j:1},
+        'cmd': {f:'html/megacmd.html', n: 'cmd', j:0},
+        'megacmd_js': {f:'html/js/megacmd.js', n: 'megacmd_js', j:1},
         'cms_snapshot_js': {f:'js/cmsSnapshot.js', n: 'cms_snapshot_js', j:1},
-        'mobile': {f:'html/mobile.html', n: 'mobile', j:0},
         'support_js': {f:'html/js/support.js', n: 'support_js', j:1},
         'support': {f:'html/support.html', n: 'support', j:0},
         'contact': {f:'html/contact.html', n: 'contact', j:0},
@@ -1785,10 +2015,12 @@ else if (!b_u)
         'zxcvbn_js': {f:'js/vendor/zxcvbn.js', n: 'zxcvbn_js', j:1},
         'redeem': {f:'html/redeem.html', n: 'redeem', j:0},
         'redeem_js': {f:'html/js/redeem.js', n: 'redeem_js', j:1},
-        'chrome': {f:'html/chrome.html', n: 'chrome', j:0},
-        'chrome_js': {f:'html/js/chrome.js', n: 'chrome_js', j:1},
-        'firefox': {f:'html/firefox.html', n: 'firefox', j:0},
-        'firefox_js': {f:'html/js/firefox.js', n: 'firefox_js', j:1}
+        'browsers': {f:'html/browsers.html', n: 'browsers', j:0},
+        'browsers_js': {f:'html/js/browsers.js', n: 'browsers_js', j:1},
+        'megabird': {f:'html/megabird.html', n: 'megabird', j:0},
+        'ios': {f:'html/ios.html', n: 'ios', j:0},
+        'android': {f:'html/android.html', n: 'android', j:0},
+        'wp': {f:'html/wp.html', n: 'wp', j:0}
     };
 
     var jsl3 = {
@@ -1802,12 +2034,13 @@ else if (!b_u)
             'chat_feedback_css':{f:'css/chat-feedback.css', n: 'chat_feedback_css', j:2,'w':5,'c':1,'cache':1,'d':1},
             'chat_calls_css':{f:'css/chat-calls.css', n: 'chat_calls_css', j:2,'w':5,'c':1,'cache':1,'d':1},
             'chat_common_css':{f:'css/chat-common.css', n: 'chat_common_css', j:2,'w':5,'c':1,'cache':1,'d':1},
-            'chat_emojione_css':{f:'css/chat-emojione.css', n: 'chat_emojione_css', j:2,'w':5,'c':1,'cache':1,'d':1},
+            'chat_emoji_css':{f:'css/chat-emoji.css', n: 'chat_emoji_css', j:2,'w':2,'c':1,'cache':1,'d':1},
 
             /* chat related js */
             'react_js': {f:'js/vendor/react.js', n: 'react_js', j:1},
             'reactdom_js': {f:'js/vendor/react-dom.js', n: 'reactdom_js', j:1},
             'meganotifications_js': {f:'js/megaNotifications.js', n: 'meganotifications_js', j:1},
+            'twemoji_js': {f:'js/vendor/twemoji.noutf.js', n: 'twemoji_js', j:1},
             'ionsound_js': {f:'js/vendor/ion.sound.js', n: 'ionsound_js', j:1},
             'favico_js': {f:'js/vendor/favico.js', n: 'favico_js', j:1},
             'autolinker_js': {f:'js/vendor/autolinker.js', n: 'autolinker_js', j:1},
@@ -1836,10 +2069,12 @@ else if (!b_u)
             'chatnotifications_js': {f:'js/chat/plugins/chatNotifications.js', n: 'chatnotifications_js', j:1},
             'callfeedback_js': {f:'js/chat/plugins/callFeedback.js', n: 'callfeedback_js', j:1},
             'persistedTypeArea_js': {f:'js/chat/plugins/persistedTypeArea.js', n: 'persistedTypeArea_js', j:1, w:1},
+            'presencedIntegration_js': {f:'js/chat/plugins/presencedIntegration.js', n: 'presInt_js', j:1, w:1},
             'keo_js': {f:'js/chat/karereEventObjects.js', n: 'keo_js', j:1},
             'crm_js': {f:'js/connectionRetryManager.js', n: 'crm_js', j:1},
             'karere_js': {f:'js/chat/karere.js', n: 'karere_js', j:1},
             'chat_messages_Js': {f:'js/chat/messages.js', n: 'chat_messages_Js', j:1},
+            'presence2_js': {f:'js/chat/presence2.js', n: 'presence2_js', j:1},
             'chat_react_minified_js': {f:'js/chat/bundle.js', n: 'chat_react_minified_js', j:1}
         }
     };
@@ -1859,7 +2094,6 @@ else if (!b_u)
         'blog': ['blog','blog_js','blogarticle','blogarticle_js'],
         'register': ['register','register_js', 'zxcvbn_js'],
         'newsignup': ['register','register_js', 'zxcvbn_js'],
-        'android': ['android'],
         'resellers': ['resellers'],
         '!': ['download','download_js', 'megasync_js'],
         'dispute': ['dispute'],
@@ -1869,8 +2103,8 @@ else if (!b_u)
         'privacy': ['privacy','privacycompany'],
         'mega': ['mega'],
         'takedown': ['takedown'],
-        'mobile': ['mobile'],
-        'sync': ['sync','sync_js', 'megasync_js'],
+        'sync': ['sync', 'sync_js', 'megasync_js'],
+        'cmd': ['cmd', 'megacmd_js'],
         'support': ['support_js', 'support'],
         'contact': ['contact'],
         'dev': ['dev','dev_js','sdkterms'],
@@ -1881,30 +2115,23 @@ else if (!b_u)
         ],
         'recover': ['reset', 'reset_js'],
         'redeem': ['redeem', 'redeem_js'],
-        'plugin': ['chrome', 'chrome_js', 'firefox', 'firefox_js'],
-        'chrome': ['chrome', 'chrome_js'],
-        'firefox': ['firefox', 'firefox_js']
+        'plugin': ['browsers', 'browsers_js'],
+        'extensions': ['browsers', 'browsers_js'],
+        'bird': ['megabird'],
+        'ios': ['ios'],
+        'android': ['android'],
+        'wp': ['wp'],
+        'android': ['android']
     };
 
     if (is_mobile) {
-        subpages['!'] = ['download_mobile', 'download_js', 'mobile_css'];
+        // Page specific
+        subpages['!'] = ['download_js'];
     }
+	if (page == 'megacmd') page = 'cmd';
 
     if (page)
     {
-        if (page.indexOf('%25') !== -1)
-        {
-            do {
-                page = page.replace(/%25/g, '%');
-            } while (~page.indexOf('%25'));
-        }
-        if (page.indexOf('%21') !== -1)
-        {
-            page = page.replace(/%21/g, '!');
-            document.location.hash = page;
-        }
-
-        page = page.replace('#','');
         for (var p in subpages)
         {
             if (page.substr(0,p.length) == p)
@@ -1981,8 +2208,11 @@ else if (!b_u)
             waitingToBeLoaded++;
             elem.onload = function() {
                 // if (d) console.log('jj.progress...', waitingToBeLoaded);
+
+                jsl_loaded[Object(jsl[id]).n] = 1;
                 jsl_current += Object(jsl[id]).w || 1;
                 jsl_progress();
+
                 if (--waitingToBeLoaded == 0) {
                     jj_done = true;
                     boot_done();
@@ -2039,10 +2269,15 @@ else if (!b_u)
                         createScriptTag(i, bootstaticpath + jsl[i].f + jjNoCache);
                     }
                     else if (jsl[i].j === 2) {
+
                         jj_done = false;
                         jsl[i].text = '/**/';
                         createStyleTag(i, bootstaticpath + jsl[i].f + jjNoCache);
                     }
+                }
+
+                if (!jj || !jsl[i].j || jsl[i].j > 2) {
+                    jsl_done = false;
                 }
             }
         }
@@ -2056,7 +2291,10 @@ else if (!b_u)
             {
                 jsl_current += jsl[jsi].w || 1;
                 jsl_progress();
-                if (++jslcomplete == jsl.length) initall();
+                if (++jslcomplete == jsl.length) {
+                    jsl_done = true;
+                    initall();
+                }
                 else
                 {
                     // mozRunAsync(next.bind(this, jsli++));
@@ -2230,6 +2468,12 @@ else if (!b_u)
         var deg = 0;
         var leftProgressBlock = document.getElementById('loadinganimleft');
         var rightProgressBlock = document.getElementById('loadinganimright');
+
+        // Fix exception thrown when going from mobile web /login page to mobile web /register page
+        if (is_mobile && (rightProgressBlock === null)) {
+            return false;
+        }
+
         if ((p > jsl_perc) && (p <= 100))
         {
             jsl_perc = p;
@@ -2256,16 +2500,18 @@ else if (!b_u)
             }
         }
     }
+    var cssCache=false;
     var jsl_loaded={};
-    function initall()
-    {
+    function initall() {
         var jsar = [];
         var cssar = [];
         var nodedec = {};
         //for(var i in localStorage) if (i.substr(0,6) == 'cache!') delete localStorage[i];
         for (var i in jsl)
         {
-            jsl_loaded[jsl[i].n]=1;
+            if (!jj || !jsl[i].j || jsl[i].j > 2) {
+                jsl_loaded[jsl[i].n] = 1;
+            }
             if ((jsl[i].j == 1) && (!jj))
             {
                 if (!fx_startup_cache)
@@ -2329,7 +2575,7 @@ else if (!b_u)
                 mega.nodedecBlobURI = mObjectURL(nodedec, 'text/javascript');
                 nodedec = tmp = undefined;
             }
-
+            if (localStorage.makeCache && !cssCache) cssCache=cssar;
             cssar = cssar.length && mObjectURL(cssar, "text/css");
             if (cssar)
             {
@@ -2340,7 +2586,14 @@ else if (!b_u)
             } else {
                 boot_done();
             }
-            if (jsar.length) evalscript_url(jsar);
+            if (jsar.length) {
+                if (is_chrome_firefox) {
+                    console.error('jsar must be empty here...');
+                }
+                else {
+                    evalscript_url(jsar);
+                }
+            }
             jsar=undefined;
             cssar=undefined;
         }
@@ -2355,7 +2608,7 @@ else if (!b_u)
     if (document.location.href.substr(0,19) == 'chrome-extension://')  istaticpath = '../';
     else if (is_chrome_firefox) istaticpath = 'chrome://mega/content/';
 
-    mCreateElement('style', {type: 'text/css'}, 'body').textContent = '.div, span, input {outline: none;}.hidden {display: none;}.clear {clear: both;margin: 0px;padding: 0px;display: block;}.loading-main-block {width: 100%;height: 100%;overflow: auto;font-family:Arial, Helvetica, sans-serif;}.loading-mid-white-block {height: 100%;width:100%;}.loading-cloud {width: 222px;height: 158px;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v2.png);background-repeat: no-repeat;background-position: 0 0;position:absolute;left:50%;top:50%;margin:-79px 0 0 -111px;}.loading-m-block{width:60px;height:60px;position:absolute; left:81px;top:65px;background-color:white;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v2.png);background-repeat: no-repeat;background-position: -81px -65px;border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;z-index:10;}.loading-percentage { width: 80px;height: 80px;position: absolute;-moz-border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;overflow: hidden;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v2.png);background-repeat: no-repeat;background-position: -70px -185px;left:71px;top:55px;}.loading-percentage ul {list-style-type: none;}.loading-percentage li {position: absolute;top: 0px;}.loading-percentage p, .loading-percentage li, .loading-percentage ul{width: 80px;height: 80px;padding: 0;margin: 0;}.loading-percentage span {display: block;width: 40px;height: 80px;}.loading-percentage ul :nth-child(odd) {clip: rect(0px, 80px, 80px, 40px);}.loading-percentage ul :nth-child(even) {clip: rect(0px, 40px, 80px, 0px);}.loading-percentage .right-c span {-moz-border-radius-topleft: 40px;-moz-border-radius-bottomleft: 40px;-webkit-border-top-left-radius: 40px;-webkit-border-bottom-left-radius: 40px;border-top-left-radius: 40px;border-bottom-left-radius: 40px;background-color:#dc0000;}.loading-percentage .left-c span {margin-left: 40px;-moz-border-radius-topright: 40px;-moz-border-radius-bottomright: 40px;-webkit-border-top-right-radius: 40px;-webkit-border-bottom-right-radius: 40px;border-top-right-radius: 40px;border-bottom-right-radius: 40px;background-color:#dc0000;}.loading-main-bottom {max-width: 940px;width: 100%;position: absolute;bottom: 20px;left: 50%;margin: 0 0 0 -470px;text-align: center;}.loading-bottom-button {height: 29px;width: 29px;float: left;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v2.png);background-repeat: no-repeat;cursor: pointer;}.st-social-block-load {position: absolute;bottom: 20px;left: 0;width: 100%;height: 43px;text-align: center;}.st-bottom-button {height: 29px;width: 29px;display: inline-block;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v2.png);background-repeat: no-repeat;cursor: pointer;}.st-bottom-button.st-google-button {background-position: -94px -468px;position: relative;margin: 0 5px;}.st-bottom-button.st-google-button:hover {background-position: -94px -408px;}.st-bottom-button.st-facebook-button {background-position: -49px -468px;margin: 0 5px;}.st-bottom-button.st-facebook-button:hover {background-position: -49px -408px;}.st-bottom-button.st-twitter-button {background-position: left -468px;margin: 0 5px;}.st-bottom-button.st-twitter-button:hover {    background-position: left -408px;}@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {.maintance-block, .loading-percentage, .loading-m-block, .loading-cloud, .loading-bottom-button,.st-bottom-button, .st-bottom-scroll-button {background-image: url(' + istaticpath + 'images/mega/loading-sprite_v2@2x.png);    background-size: 222px auto;}}';
+    mCreateElement('style', {type: 'text/css'}, 'body').textContent = '.div, span, input {outline: none;}.hidden {display: none;}.clear {clear: both;margin: 0px;padding: 0px;display: block;}.loading-main-block {width: 100%;height: 100%;overflow: auto;font-family:Arial, Helvetica, sans-serif;}.loading-mid-white-block {height: 100%;width:100%;}.loading-cloud {width: 222px;height: 158px;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v4.png);background-repeat: no-repeat;background-position: 0 0;position:absolute;left:50%;top:50%;margin:-79px 0 0 -111px;}.loading-m-block{width:60px;height:60px;position:absolute; left:81px;top:65px;background-color:white;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v4.png);background-repeat: no-repeat;background-position: -81px -65px;border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;z-index:10;}.loading-percentage { width: 80px;height: 80px; background-color: #e1e1e1;position: absolute;-moz-border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;overflow: hidden;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v4.png);background-repeat: no-repeat;background-position: -70px -185px;left:71px;top:55px;}.loading-percentage ul {list-style-type: none;}.loading-percentage li {position: absolute;top: 0px;}.loading-percentage p, .loading-percentage li, .loading-percentage ul{width: 80px;height: 80px;padding: 0;margin: 0;}.loading-percentage span {display: block;width: 40px;height: 80px;}.loading-percentage ul :nth-child(odd) {clip: rect(0px, 80px, 80px, 40px);}.loading-percentage ul :nth-child(even) {clip: rect(0px, 40px, 80px, 0px);}.loading-percentage .right-c span {-moz-border-radius-topleft: 40px;-moz-border-radius-bottomleft: 40px;-webkit-border-top-left-radius: 40px;-webkit-border-bottom-left-radius: 40px;border-top-left-radius: 40px;border-bottom-left-radius: 40px;background-color:#dc0000;}.loading-percentage .left-c span {margin-left: 40px;-moz-border-radius-topright: 40px;-moz-border-radius-bottomright: 40px;-webkit-border-top-right-radius: 40px;-webkit-border-bottom-right-radius: 40px;border-top-right-radius: 40px;border-bottom-right-radius: 40px;background-color:#dc0000;}.loading-main-bottom {max-width: 940px;width: 100%;position: absolute;bottom: 20px;left: 50%;margin: 0 0 0 -470px;text-align: center;}.loading-bottom-button {height: 29px;width: 29px;float: left;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v4.png);background-repeat: no-repeat;cursor: pointer;}.st-social-block-load {position: absolute;bottom: 20px;left: 0;width: 100%;height: 43px;text-align: center;}.st-bottom-button {height: 24px;width: 24px;margin: 0 8px;display: inline-block;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v4.png);background-repeat: no-repeat;background-position:11px -405px;cursor: pointer;-moz-border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;-webkit-transition: all 200ms ease-in-out;-moz-transition: background-color 200ms ease-in-out;-o-transition: background-color 200ms ease-in-out;-ms-transition: background-color 200ms ease-in-out;transition: background-color 200ms ease-in-out;background-color:#999999;}.st-bottom-button.st-google-button {background-position: 11px -405px;}.st-bottom-button.st-google-button {background-position: -69px -405px;}.st-bottom-button.st-twitter-button{background-position: -29px -405px;}.st-bottom-button:hover {background-color:#334f8d;}.st-bottom-button.st-twitter-button:hover {background-color:#1a96f0;}.st-bottom-button.st-google-button:hover {background-color:#d0402a;}@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {.maintance-block, .loading-percentage, .loading-m-block, .loading-cloud, .loading-bottom-button,.st-bottom-button, .st-bottom-scroll-button {background-image: url(' + istaticpath + 'images/mega/loading-sprite_v4@2x.png);    background-size: 222px auto;}}';
 
     mCreateElement('div', { "class": "loading-main-block", id: "loading"}, 'body')
         .innerHTML =
@@ -2370,14 +2623,13 @@ else if (!b_u)
             '        <div class="loading-m-block"></div>'+
             '    </div>'+
             '    <div class="st-social-block-load" id="bootbottom">'+
-            '        <a href="https://www.facebook.com/MEGAprivacy" target="_blank" class="st-bottom-button st-facebook-button"></a>'+
-            '        <a href="https://www.twitter.com/MEGAprivacy" target="_blank" class="st-bottom-button st-twitter-button"></a>'+
-            '    <a href="https://plus.google.com/b/108055545377490138410/" target="_blank" class="st-bottom-button st-google-button"></a>'+
+            '        <a href="https://www.facebook.com/MEGAprivacy" target="_blank" rel="noopener noreferrer" class="st-bottom-button st-facebook-button"></a>'+
+            '        <a href="https://www.twitter.com/MEGAprivacy" target="_blank" rel="noopener noreferrer" class="st-bottom-button st-twitter-button"></a>'+
             '    </div>'+
             '</div>';
 
     var u_storage, loginresponse, u_sid, dl_res;
-    u_storage = is_mobile ? {} : init_storage(localStorage.sid ? localStorage : sessionStorage);
+    u_storage = init_storage(localStorage.sid ? localStorage : sessionStorage);
 
     if ((u_sid = u_storage.sid))
     {
@@ -2417,8 +2669,18 @@ else if (!b_u)
         u_checked=true;
         startMega();
     }
+
+    var boot_done_makecache=false;
+
     function boot_done()
     {
+        if (boot_done_makecache)
+        {
+            boot_done_makecache=false;
+            makeCache();
+            return false;
+        }
+
         lxhr = dlxhr = undefined;
 
         if (d) console.log('boot_done', loginresponse === true, dl_res === true, !jsl_done, !jj_done);
@@ -2434,7 +2696,7 @@ else if (!b_u)
 
         mBroadcaster.sendMessage('boot_done');
 
-        if (u_checked || is_mobile) {
+        if (u_checked) {
             startMega();
         }
         else if (loginresponse === -15) {
@@ -2449,6 +2711,7 @@ else if (!b_u)
         }
         else u_checklogin({checkloginresult:boot_auth},false);
     }
+
     if (page.substr(0,1) == '!' && page.length > 1)
     {
         dl_res = true;
@@ -2518,7 +2781,7 @@ function toArray() {
     return res;
 }
 
-function tryCatch(fn)
+function tryCatch(fn, onerror)
 {
     fn.foo = function __tryCatchWrapper()
     {
@@ -2526,8 +2789,25 @@ function tryCatch(fn)
             return fn.apply(this, arguments);
         } catch (e) {
             console.error(e);
+
+            if (typeof onerror === 'function') {
+                onIdle(onerror.bind(null, e));
+            }
         }
     };
     fn.foo.bar = fn;
     return fn.foo;
 }
+
+var onIdle = window.requestIdleCallback || function(handler) {
+        var startTime = Date.now();
+
+        return setTimeout(function() {
+            handler({
+                didTimeout: false,
+                timeRemaining: function() {
+                    return Math.max(0, 50.0 - (Date.now() - startTime));
+                }
+            });
+        }, 1);
+    };

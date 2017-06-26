@@ -32,7 +32,7 @@ var EmoticonShortcutsFilter = function(megaChat) {
     $.each(self.shortcuts, function(shortcut, expanded) {
 
         escapedRegExps.push(
-            "(^|\\W?)(" + RegExpEscape(shortcut) + ")(?=(\\s|$))"
+            "(^|\\W)(" + RegExpEscape(shortcut) + ")(?=(\\s|$))"
         );
     });
 
@@ -42,6 +42,16 @@ var EmoticonShortcutsFilter = function(megaChat) {
 
     megaChat.bind("onBeforeRenderMessage", function(e, eventData) {
         self.processMessage(e, eventData);
+    });
+
+    megaChat.bind("onBeforeSendMessage", function(e, messageObject) {
+        var formatted = self.processMessage(e, {
+            'message': {
+                'textContents': messageObject.contents
+            }
+        });
+
+        messageObject.contents = messageObject.textContents = formatted;
     });
 
     return this;
@@ -129,4 +139,6 @@ EmoticonShortcutsFilter.prototype.processMessage = function(e, eventData) {
 
     eventData.message.messageHtml = messageContents;
     eventData.message.emoticonShortcutsProcessed = true;
+
+    return messageContents;
 };

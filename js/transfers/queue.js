@@ -8,7 +8,7 @@
  * you accept this licence. If you do not accept the licence,
  * do not access the code.
  *
- * Words used in the Mega Limited Terms of Service [https://mega.nz/#terms]
+ * Words used in the Mega Limited Terms of Service [https://mega.nz/terms]
  * have the same meaning in this licence. Where there is any inconsistency
  * between this licence and those Terms of Service, these terms prevail.
  *
@@ -546,6 +546,7 @@ TransferQueue.prototype.push = function(cl) {
 
     if (localStorage.ignoreLimitedBandwidth) {
         showToast();
+        dlmanager.setUserFlags();
         return MegaQueue.prototype.push.apply(this, arguments);
     }
 
@@ -578,6 +579,9 @@ TransferQueue.prototype.push = function(cl) {
 
             // this will include currently-downloading and the ClassFiles in hold atm.
             size += dlmanager.getCurrentDownloadsSize();
+
+            // Set user flags, registered, pro, achievements
+            dlmanager.setUserFlags();
 
             // Fire "Query bandwidth quota"
             api_req({a: 'qbq', s: size}, {

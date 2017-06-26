@@ -5,7 +5,7 @@ var recoverykey;
 function init_reset() {
     if (u_type) {
         msgDialog('warningb', l[135], l[1971], false, function(e) {
-            document.location.hash = 'help/account';
+            loadSubPage('help/account');
         });
         return false;
     }
@@ -21,12 +21,12 @@ function init_reset() {
             if (typeof res === 'number') {
                 if (res === EEXPIRED) {
                     msgDialog('warninga', l[1966], l[1967], '', function() {
-                        document.location.hash = 'recovery';
+                        loadSubPage('recovery');
                     });
                 }
                 else {
                     msgDialog('warninga', l[1968], l[1969], '', function() {
-                        document.location.hash = 'recovery';
+                        loadSubPage('recovery');
                     });
                 }
             }
@@ -80,14 +80,14 @@ function init_reset() {
         }
     });
 
-    if (typeof zxcvbn === 'undefined' && !silent_loading) {
+    if (typeof zxcvbn === 'undefined') {
         $('.login-register-input.password').addClass('loading');
-        silent_loading = function() {
-            $('.login-register-input.password').removeClass('loading');
-            reset_pwcheck();
-        };
-        jsl.push(jsl2['zxcvbn_js']);
-        jsl_start();
+
+        M.require('zxcvbn_js')
+            .done(function() {
+                $('.login-register-input.password').removeClass('loading');
+                reset_pwcheck();
+            });
     }
     else {
         $('.login-register-input.password').removeClass('loading');
@@ -143,7 +143,7 @@ function delete_reset_pw() {
             if (code === 0) {
                 msgDialog('info', l[1975], l[1976], '', function() {
                     login_email = recoveryemail;
-                    document.location.hash = 'login';
+                    loadSubPage('login');
                 });
             }
             else if (code === EKEY) {
@@ -155,7 +155,7 @@ function delete_reset_pw() {
             }
             else if (code === EEXPIRED || code === ENOENT) {
                 msgDialog('warninga', l[1966], l[1967], '', function() {
-                    document.location.hash = 'recovery';
+                    loadSubPage('recovery');
                 });
             }
         }
@@ -184,7 +184,7 @@ function recovery_reset_pw() {
             if (code === 0) {
                 msgDialog('info', l[1955], l[1981], '', function() {
                     login_email = recoveryemail;
-                    document.location.hash = 'login';
+                    loadSubPage('login');
                 });
             }
             else if (code === EKEY) {
@@ -196,7 +196,7 @@ function recovery_reset_pw() {
             }
             else if (code === EEXPIRED || code === ENOENT) {
                 msgDialog('warninga', l[1966], l[1967], '', function() {
-                    document.location.hash = 'recovery';
+                    loadSubPage('login');
                 });
             }
         }
@@ -223,7 +223,7 @@ function verify_key(key) {
             }
             else if (code === EEXPIRED || code === ENOENT) {
                 msgDialog('warninga', l[1966], l[1967], '', function() {
-                    document.location.hash = 'recovery';
+                    loadSubPage('login');
                 });
             }
             loadingDialog.hide();
@@ -242,7 +242,6 @@ function verify_key(key) {
 
 
 function reset_pwcheck() {
-    Soon(mainScroll);
     $('.login-register-input.password').removeClass('weak-password strong-password');
     $('.new-registration').removeClass('good1 good2 good3 good4 good5');
 
@@ -301,8 +300,6 @@ function reset_pwcheck() {
 
 function init_reset_pw() {
     var a = '';
-
-    Soon(mainScroll);
     $('#withkey-password,#withoutkey-password').rebind('focus', function(e) {
         $('.login-register-input.password.first').removeClass('incorrect');
         $('.login-register-input.password.confirm').removeClass('incorrect');

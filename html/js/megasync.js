@@ -31,8 +31,9 @@ var megasync = (function() {
     function linuxDropdown(selected) {
 
         var is64    = browserdetails().is64bit;
-        var $select = $('.megasync-scr-pad').empty();
-        var $list   = $('.megasync-dropdown-list');
+        var $dropdown = $('.megasync .megaapp-dropdown'); 
+        var $select = $dropdown.find('.megaapp-scr-pad').empty();
+        var $list   = $dropdown.find('.megaapp-dropdown-list');
         $('.megasync-overlay').addClass('linux');
 
         if (typeof selected !== "function") {
@@ -50,21 +51,30 @@ var megasync = (function() {
             var icon = client.name.toLowerCase().match(/([a-z]+)/i)[1];
             icon = (icon === 'red') ? 'redhat' : icon;
 
-            $('<div/>').addClass('megasync-dropdown-link ' + icon)
+            $('<div/>').addClass('default-dropdown-item icon ' + icon)
                 .text(client.name)
                 .data('client', client.name)
                 .data('client-id', id)
                 .attr('link', ns.getMegaSyncUrl(client.name + " " + (is64 ? "64" : "32")))
                 .appendTo($select);
         });
-        $('.megasync-dropdown-link').rebind('click', function() {
 
-            $('.megasync-dropdown span').removeClass('active').text($(this).text());
-            $list.addClass('hidden');
+        $('.default-dropdown-item', $dropdown).rebind('click', function() {
+            $dropdown.find('span').text($(this).text());
             selected($(this));
         });
-        $('.megasync-dropdown span').rebind('click', function() {
 
+        $('.bottom-page.scroll-block.megasync').rebind('click.closesyncdropdown', function(e) {
+            if ($dropdown.hasClass('active')) {
+                if ($(e.target).parent('.megaapp-dropdown').length === 0 &&
+                        !$(e.target).hasClass('megaapp-dropdown')) {
+                    $dropdown.removeClass('active');
+                    $list.addClass('hidden');
+                }
+            }
+        });
+
+        $dropdown.rebind('click', function() {
             var $this = $(this);
             if ($this.hasClass('active')) {
                 $this.removeClass('active');
@@ -75,8 +85,8 @@ var megasync = (function() {
                 linuxDropdownResizeHandler();
             }
         });
-        $(window).rebind('resize.linuxDropdown', function() {
 
+        $(window).rebind('resize.linuxDropdown', function() {
             linuxDropdownResizeHandler();
         });
     }
@@ -86,20 +96,21 @@ var megasync = (function() {
      */
     function linuxDropdownResizeHandler() {
 
-        var $main = $('.megasync-dropdown:visible');
-        var $pane = $('.megasync-dropdown-scroll');
+        var $main = $('.megaapp-dropdown:visible');
+        var $pane = $main.find('.megaapp-dropdown-scroll');
         var jsp   = $pane.data('jsp');
-        var $list = $('.megasync-dropdown-list');
+        var $list = $main.find('.megaapp-dropdown-list');
+        var $arrow = $main.find('.mega-list-arrow');
         var overlayHeight = $('.megasync-overlay').outerHeight();
-        var listHeight = $('.megasync-scr-pad').outerHeight() + 72;
+        var listHeight = $main.find('.megaapp-scr-pad').outerHeight() + 72;
+        var listPosition;
 
-        if ($main.parent('.sync-button-block').length) {
-            $list.css({'top': $main.position().top-10, 'left': $main.offset().left + $main.width()/2});
+        if ($list.length) {
+            listPosition = $list.offset().top;
         }
 
-        var listPosition = $list.offset().top;
         if (overlayHeight < (listHeight + listPosition)) {
-            $('.megasync-list-arrow').removeClass('hidden inactive');
+            $arrow.removeClass('hidden inactive');
             $pane.height(overlayHeight - listPosition - 72);
             $pane.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true});
 
@@ -107,9 +118,9 @@ var megasync = (function() {
             $pane.bind('jsp-arrow-change', function(event, isAtTop, isAtBottom, isAtLeft, isAtRight) {
 
                 if (isAtBottom) {
-                    $('.megasync-list-arrow').addClass('inactive');
+                    $arrow.addClass('inactive');
                 } else {
-                    $('.megasync-list-arrow').removeClass('inactive');
+                    $arrow.removeClass('inactive');
                 }
             });
 
@@ -118,8 +129,8 @@ var megasync = (function() {
                 jsp.destroy();
             }
             $pane.unbind('jsp-arrow-change');
-            $('.megasync-dropdown-scroll').removeAttr('style');
-            $('.megasync-list-arrow').addClass('hidden');
+            $arrow.removeAttr('style');
+            $arrow.addClass('hidden');
         }
     }
     // }}}
@@ -224,7 +235,7 @@ var megasync = (function() {
             return MegaPromise.reject(ex);
         }
 
-        var promise = mega.utils.xhr({
+        var promise = M.xhr({
             url: megasyncUrl,
             data: args,
             type: 'json'

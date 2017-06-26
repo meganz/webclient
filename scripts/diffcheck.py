@@ -380,8 +380,8 @@ def reduce_validator(file_line_mapping, **extra):
         an integer containing the number of failed rules.
     """
 
-    exclude = ['vendor', 'asm', 'sjcl']
-    special_chars_exclude = ['secureboot']
+    exclude = ['vendor', 'asm', 'sjcl', 'dont-deploy', 'secureboot']
+    special_chars_exclude = ['secureboot', 'test', 'emoji']
     logging.info('Analyzing modified files ...')
     result = ['\nValidator output:\n=================']
     warning = 'This is a security product. Do not add unverifiable code to the repository!'
@@ -413,6 +413,11 @@ def reduce_validator(file_line_mapping, **extra):
                           .format(file_path, warning))
             continue
 
+        if os.path.getsize(file_path) > 120000:
+            result.append('The file "{}" has turned too big, '
+                          'any new functions must be moved elsewhere.'.format(file_path))
+            continue;
+
         with open(file_path, 'r') as fd:
             # Check line lengths in file.
             line_number = 0
@@ -431,7 +436,7 @@ def reduce_validator(file_line_mapping, **extra):
                                   .format(file_path, line_number, line_length))
                     break
 
-                # Analize JavaScript files...
+                # Analyse JavaScript files...
                 if file_extension in ['.js', '.jsx']:
                     fatal += inspectjs(file_path, line_number, line, result)
                     continue

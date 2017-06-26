@@ -6,12 +6,21 @@
 }
 .section, .conversationsApp {
     width: 100%;
-    height: 100% !important;
+    height: 100%;
+}
+.section.conversations {
+    height: 100%;
+    height: -webkit-calc(100% -36px);
+    height: -moz-calc(100% - 36px);
+    height: calc(100% - 36px);
+}
+.section.conversations .fm-right-files-block {
+    height: 100%;
 }
 .nw-fm-tree-header.conversations .button {
     position: absolute;
     right: 12px;
-    top: 12px;
+    top: 6px;
     padding: 2px;
 }
 .conversation-panels, .conversation-panel {
@@ -28,7 +37,22 @@
 .chat-right-area {
     width: 256px;
     height: 100%;
-    float: right;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    background-color: white;
+    position: absolute;
+    right: 0;
+}
+.chat-right-area::after {
+    content: '';
+    width: 1px;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-color: #e1e1e1;
+    position: absolute;
+    z-index: 1;
 }
 .chat-right-area .chat-right-area {
     float: none;
@@ -69,11 +93,8 @@
 .chat-contacts-list-inner .contacts-info.body.right-chat-contact-card {
     min-height: 49px;
 }
-.chat-contacts-list-inner {
-    padding: 0 0 0 22px;
-}
 .chat-right-pad .contacts-info.body {
-    padding: 8px 0;
+    padding: 8px 0 8px 22px;
 }
 .contacts-info.body {
     padding: 6px 0;
@@ -139,24 +160,6 @@
 }
 /* Old chat stuff */
 .fm-start-chat-dropdown {
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    border-radius: 8px;
-    -moz-border-radius: 8px;
-    -webkit-border-radius: 8px;
-    background-color: #333333;
-    font-size: 13px;
-    color: #CCCCCC;
-    padding: 8px 0;
-    position: absolute;
-    z-index: 100;
-    left: -10000px;
-    -webkit-transition: opacity 100ms ease-in-out;
-    -moz-transition: opacity 100ms ease-in-out;
-    -o-transition: opacity 100ms ease-in-out;
-    -ms-transition: opacity 100ms ease-in-out;
-    transition: opacity 100ms ease-in-out;
 filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -moz-opacity: 0;
     -khtml-opacity: 0;
@@ -169,17 +172,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -moz-opacity: 1;
     -khtml-opacity: 1;
     opacity: 1;
-}
-.fm-start-chat-arrow {
-    top: -8px;
-    width: 17px;
-    height: 8px;
-    position: absolute;
-    margin: 0 -8px 0 0;
-    left: auto;
-    right: 34px;
-    background-position: -11px -420px;
-    background-image: url(../images/mega/top-sprite_v3.svg);
 }
 .fm-chat-popup-button {
     height: 32px;
@@ -248,3 +240,5 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     display: block;
 }
 /* End of Old chat stuff */
+
+

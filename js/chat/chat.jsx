@@ -3,6 +3,7 @@ var ReactDOM = require("react-dom");
 var ConversationsUI = require("./ui/conversations.jsx");
 var ChatRoom = require('./chatRoom.jsx');
 
+var EMOJI_DATASET_VERSION = 1;
 
 var chatui;
 var webSocketsSupport = typeof(WebSocket) !== 'undefined';
@@ -19,7 +20,7 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
             if (!megaChat.chats[roomOrUserHash + "@conference." + megaChat.options.xmppDomain]) {
                 // chat not found
                 setTimeout(function () {
-                    window.location = '#fm/chat';
+                    loadSubPage('fm/chat');
                     M.openFolder('chat');
                 }, 100);
                 return;
@@ -28,7 +29,7 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
         else {
             if (!M.u[roomOrUserHash]) {
                 setTimeout(function () {
-                    window.location = '#fm/chat';
+                    loadSubPage('fm/chat');
                     M.openFolder('chat');
                 }, 100);
                 return;
@@ -55,10 +56,9 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
         megaChat.refreshConversations();
 
 
-        if (localStorage.megaChatPresence !== "unavailable") {
-            if (megaChat.karere.getConnectionState() != Karere.CONNECTION_STATE.CONNECTED) {
-                megaChat.connect();
-            }
+
+        if (megaChat.karere.getConnectionState() != Karere.CONNECTION_STATE.CONNECTED) {
+            megaChat.connect();
         }
 
         if (roomType === "private") {
@@ -77,7 +77,7 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
             var $promise;
 
             chatJids.push(megaChat.karere.getBareJid());
-            var resp = megaChat.openChat(chatJids, chatJids.length === 2 ? "private" : "group", 
+            var resp = megaChat.openChat(chatJids, chatJids.length === 2 ? "private" : "group",
                 undefined, undefined, undefined, true);
 
             if (resp instanceof MegaPromise) {
@@ -146,8 +146,7 @@ var Chat = function() {
         'xmppDomain': xmppDomain,
         'loadbalancerService': 'gelb.karere.mega.nz',
         'fallbackXmppServers': [
-             "https://xmpp270n001.karere.mega.nz/ws",
-             "https://xmpp270n002.karere.mega.nz/ws"
+             "https://xmpp.karere.mega.nz/ws",
         ],
         'rtcSession': {
             'crypto': {
@@ -198,32 +197,7 @@ var Chat = function() {
             iceServers:[
                 // {urls: ['stun:stun.l.google.com:19302']},
                 {
-                    urls: ['turn:trn270n001.karere.mega.nz:3478?transport=udp'],   // Luxembourg
-                    username: "inoo20jdnH",
-                    credential: '02nNKDBkkS'
-                },
-                {
-                    urls: ['turn:trn270n002.karere.mega.nz:3478?transport=udp'],   // Luxembourg
-                    username: "inoo20jdnH",
-                    credential: '02nNKDBkkS'
-                },
-                {
-                    urls: ['turn:trn302n001.karere.mega.nz:3478?transport=udp'],   // Montreal, Canada
-                    username: "inoo20jdnH",
-                    credential: '02nNKDBkkS'
-                },
-                {
-                    urls: ['turn:trn302n002.karere.mega.nz:3478?transport=udp'],   // Montreal, Canada
-                    username: "inoo20jdnH",
-                    credential: '02nNKDBkkS'
-                },
-                {
-                    urls: ['turn:trn530n002.karere.mega.nz:3478?transport=udp'],   // NZ
-                    username: "inoo20jdnH",
-                    credential: '02nNKDBkkS'
-                },
-                {
-                    urls: ['turn:trn530n003.karere.mega.nz:3478?transport=udp'],   // NZ
+                    urls: ['turn:trn.karere.mega.nz:3478?transport=udp'],   // Luxembourg
                     username: "inoo20jdnH",
                     credential: '02nNKDBkkS'
                 }
@@ -242,6 +216,7 @@ var Chat = function() {
             'emoticonsFilter': EmoticonsFilter,
             'callFeedback': CallFeedback,
             'karerePing': KarerePing,
+            'presencedIntegration': PresencedIntegration,
             'persistedTypeArea': PersistedTypeArea
         },
         'chatNotificationOptions': {
@@ -368,10 +343,21 @@ Chat.prototype.init = function() {
 
         // update M.u
         var contact = self.getContactFromJid(eventObject.getFromJid());
+
+        if (!contact) {
+            return;
+        }
+
         if (contact) {
-            if (!contact.presenceMtime || parseFloat(contact.presenceMtime) < eventObject.getDelay()) {
-                contact.presence = megaChat.karere.getPresence(megaChat.getJidFromNodeId(contact.u));
-                contact.presenceMtime = eventObject.getDelay();
+            var presencedPresence = contact.u !== u_handle ?
+                self.plugins.presencedIntegration.getPresence(contact.u) :
+                self.plugins.presencedIntegration.getMyPresence();
+
+            if (typeof presencedPresence === 'undefined') {
+                if (!contact.presenceMtime || parseFloat(contact.presenceMtime) < eventObject.getDelay()) {
+                    contact.presence = megaChat.karere.getPresence(megaChat.getJidFromNodeId(contact.u));
+                    contact.presenceMtime = eventObject.getDelay();
+                }
             }
         }
 
@@ -380,10 +366,6 @@ Chat.prototype.init = function() {
                 // Sync presence across devices (will check the delayed val!)
                 if (bareJid === self.karere.getBareJid()) {
                     if (eventObject.getDelay() && eventObject.getDelay() >= parseFloat(localStorage.megaChatPresenceMtime) && self._myPresence != eventObject.getShow()) {
-                        self._myPresence = eventObject.getShow();
-                        localStorage.megaChatPresence = eventObject.getShow();
-                        localStorage.megaChatPresenceMtime = eventObject.getDelay();
-
                         self.karere.setPresence(
                             eventObject.getShow(),
                             undefined,
@@ -396,28 +378,6 @@ Chat.prototype.init = function() {
         }
 
         self.renderMyStatus();
-    });
-
-    // Disco capabilities updated
-    this.karere.bind("onDiscoCapabilities", function(e, eventObject) {
-        var $treeElement = $('.nw-conversations-item[data-jid="' + eventObject.getFromUserBareJid() + '"]');
-
-        $.each(eventObject.getCapabilities(), function(capability, capable) {
-            if (capable) {
-                $treeElement.addClass('chat-capability-' + capability);
-            }
-            else {
-                $treeElement.removeClass('chat-capability-' + capability);
-            }
-        });
-
-        var roomJid = $treeElement.attr('data-room-jid');
-
-        var room = self.chats[roomJid + "@conference." + megaChat.options.xmppDomain];
-        if (room) { // refresh UI if new capabilities were received.
-            // room.refreshUI();
-        }
-
     });
 
     var updateMyConnectionStatus = function() {
@@ -438,9 +398,17 @@ Chat.prototype.init = function() {
     };
 
     this.karere.bind("onConnected", function() {
-
-        if (localStorage.megaChatPresence) {
-            self.karere.setPresence(localStorage.megaChatPresence, undefined, localStorage.megaChatPresenceMtime);
+        if (self.plugins.presencedIntegration) {
+            var presence = self.plugins.presencedIntegration.getPresence(u_handle);
+            if (presence === UserPresence.PRESENCE.ONLINE) {
+                self.karere.setPresence(Karere.PRESENCE.ONLINE, undefined, localStorage.megaChatPresenceMtime);
+            }
+            else if (presence === UserPresence.PRESENCE.AWAY) {
+                self.karere.setPresence(Karere.PRESENCE.AWAY, undefined, localStorage.megaChatPresenceMtime);
+            }
+            else if (presence === UserPresence.PRESENCE.DND) {
+                self.karere.setPresence(Karere.PRESENCE.BUSY, undefined, localStorage.megaChatPresenceMtime);
+            }
         }
         else {
             self.karere.setPresence();
@@ -481,52 +449,58 @@ Chat.prototype.init = function() {
     this.karere.bind("onChatMessage", function() {
         self._onChatMessage.apply(self, arguments);
     });
-    
+
 
     // UI events
-    $(document.body).undelegate('.top-user-status-item', 'mousedown.megachat');
+    $(document.body).undelegate('.top-user-status-popup .tick-item', 'mousedown.megachat');
 
-    $(document.body).delegate('.top-user-status-item', 'mousedown.megachat', function() {
+    $(document.body).delegate('.top-user-status-popup .tick-item', 'mousedown.megachat', function(e) {
         var presence = $(this).data("presence");
         self._myPresence = presence;
 
-        localStorage.megaChatPresence = presence;
-        localStorage.megaChatPresenceMtime = unixtime();
-
         $('.top-user-status-popup').removeClass("active");
 
+        $('.top-user-status-popup').addClass("hidden");
+
+        // karere...
         if (self.karere.getConnectionState() != Karere.CONNECTION_STATE.CONNECTED && presence != Karere.PRESENCE.OFFLINE) {
             self.karere._myPresence = presence;
             self.connect().done(function() {
                 self.karere.setPresence(presence, undefined, localStorage.megaChatPresenceMtime);
-                
+
                 Object.keys(self.plugins.chatdIntegration.chatd.shards).forEach(function(k) {
                     var shard = self.plugins.chatdIntegration.chatd.shards[k];
                     shard.reconnect();
                 });
             });
-            return true;
         }
         else {
-            if (presence === Karere.PRESENCE.OFFLINE) {
-                self.karere.setPresence(presence, undefined, localStorage.megaChatPresenceMtime);
-                self.karere.connectionRetryManager.resetConnectionRetries();
-                self.karere.disconnect();
-                Object.keys(self.plugins.chatdIntegration.chatd.shards).forEach(function(k) {
-                    var shard = self.plugins.chatdIntegration.chatd.shards[k];
-                    shard.disconnect();
-                });
-            }
-            else {
-                self.karere.connectionRetryManager.resetConnectionRetries();
-                self.karere.setPresence(presence, undefined, localStorage.megaChatPresenceMtime);
-            }
+            self.karere.connectionRetryManager.resetConnectionRetries();
+            self.karere.setPresence(presence, undefined, localStorage.megaChatPresenceMtime);
+        }
+
+        // presenced integration
+        var targetPresence = PresencedIntegration.cssClassToPresence(presence);
+
+        self.plugins.presencedIntegration.setPresence(targetPresence);
+
+
+        // connection management - chatd shards, presenced
+        if (presence !== Karere.PRESENCE.OFFLINE) {
+            // going from OFFLINE -> online/away/busy, e.g. requires a connection
+
+            Object.keys(self.plugins.chatdIntegration.chatd.shards).forEach(function(k) {
+                var v = self.plugins.chatdIntegration.chatd.shards[k];
+                v.connectionRetryManager.requiresConnection();
+            });
         }
     });
 
-    $(window).unbind('hashchange.megaChat' + this.instanceId);
+    if (this._pageChangeListener) {
+        mBroadcaster.removeListener(this._pageChangeListener)
+    }
     var lastOpenedRoom = null;
-    $(window).bind('hashchange.megaChat' + this.instanceId, function() {
+    this._pageChangeListener = mBroadcaster.addListener('pagechange', function() {
         var room = self.getCurrentRoom();
 
         if (room && !room.isCurrentlyActive && room.roomJid != lastOpenedRoom) { // opened window, different then one from the chat ones
@@ -590,16 +564,21 @@ Chat.prototype.init = function() {
     }
     else {
         if (!appContainer) {
-            $(window).rebind('hashchange.delayedChatUiInit', function() {
+            if (self._appInitPageChangeListener) {
+                mBroadcaster.removeListener(self._appInitPageChangeListener);
+            }
+            self._appInitPageChangeListener = mBroadcaster.addListener('pagechange', function() {
                 if (typeof($.leftPaneResizable) === 'undefined' || !fminitialized) {
-                    // delay the chat init a bit more! specially for the case of a user getting from #pro -> #fm, which
+                    // delay the chat init a bit more! specially for the case of a user getting from /pro -> /fm, which
                     // for some unknown reason, stopped working and delayed the init of $.leftPaneResizable
                     return;
                 }
                 appContainer = document.querySelector('.section.conversations');
                 if (appContainer) {
                     initAppUI();
-                    $(window).unbind('hashchange.delayedChatUiInit');
+                    if (self._appInitPageChangeListener) {
+                        mBroadcaster.removeListener(self._appInitPageChangeListener);
+                    }
                 }
             });
         }
@@ -611,16 +590,11 @@ Chat.prototype.init = function() {
 
     $('.activity-status-block, .activity-status').show();
 
-    if (!localStorage.megaChatPresence || localStorage.megaChatPresence != "unavailable") {
-        self.connect()
-            .always(function() {
-                self.renderMyStatus();
-            });
-    }
-    else {
-        self.renderMyStatus();
-    }
 
+    self.connect()
+        .always(function() {
+            self.renderMyStatus();
+        });
 
 
     if (self.karere.getConnectionState() === Karere.CONNECTION_STATE.DISCONNECTED || self.karere.getConnectionState() === Karere.CONNECTION_STATE.AUTHFAIL) {
@@ -650,6 +624,8 @@ Chat.prototype.init = function() {
         room.bind("onChatShown", function() {
             $('.conversations-main-listing').addClass("hidden");
         });
+
+        self.updateDashboard();
     });
     self.on('onRoomDestroy', function(e, room) {
         if (room.type === "private") {
@@ -665,12 +641,6 @@ Chat.prototype.init = function() {
             room.callSession.endCall();
         }
     });
-    
-    self.karere.rebind("onPresence.maintainUI", function(e, presenceEventData) {
-        var contact = self.getContactFromJid(presenceEventData.getFromJid());
-        M.onlineStatusEvent(contact, presenceEventData.getShow());
-    });
-
 
 
     $(document).rebind('megaulcomplete.megaChat', function(e, ul_target, uploads) {
@@ -821,6 +791,8 @@ Chat.prototype.updateSectionUnreadCount = function() {
                 .addClass('hidden');
         }
         self._lastUnreadCount = unreadCount;
+
+        self.updateDashboard();
     }
 };
 /**
@@ -900,7 +872,7 @@ Chat.prototype.destroy = function(isLogout) {
     if (self.is_initialized === false) {
         return;
     }
-    
+
     self.karere.destroying = true;
     self.trigger('onDestroy', [isLogout]);
 
@@ -1067,30 +1039,6 @@ Chat.prototype.xmppPresenceToCssClass = function(presence) {
 };
 
 /**
- * Helper to convert XMPP presence from string (e.g. 'chat'), to a translated text
- *
- * @param presence {String}
- * @returns {String}
- */
-Chat.prototype.xmppPresenceToText = function(presence) {
-    if (presence == Karere.PRESENCE.ONLINE || presence == Karere.PRESENCE.AVAILABLE || presence === true) {
-        return l[5923];
-    }
-    else if (presence == Karere.PRESENCE.AWAY || presence == "xa") {
-        return l[5924];
-    }
-    else if (presence == Karere.PRESENCE.BUSY) {
-        return l[5925];
-    }
-    else if (!presence || presence == Karere.PRESENCE.OFFLINE) {
-        return l[5926];
-    }
-    else {
-        return __('Unknown');
-    }
-};
-
-/**
  * Used to re-render my own presence/status
  */
 Chat.prototype.renderMyStatus = function() {
@@ -1098,11 +1046,15 @@ Chat.prototype.renderMyStatus = function() {
     if (!self.is_initialized) {
         return;
     }
+    if (typeof(megaChat.userPresence) === 'undefined') {
+        // still initialising...
+        return;
+    }
 
     // reset
     var $status = $('.activity-status-block .activity-status');
 
-    $('.top-user-status-popup .top-user-status-item').removeClass("active");
+    $('.top-user-status-popup .tick-item').removeClass("active");
 
 
     $status
@@ -1114,51 +1066,51 @@ Chat.prototype.renderMyStatus = function() {
 
 
 
-    var presence = self.karere.getConnectionState() === Karere.CONNECTION_STATE.CONNECTED ?
-                self.karere.getPresence(self.karere.getJid()) :
-                localStorage.megaChatPresence;
+    var actualPresence = self.plugins.presencedIntegration.getMyPresenceSetting();
 
-    var cssClass = self.xmppPresenceToCssClass(
+    var userPresenceConRetMan = megaChat.userPresence.connectionRetryManager;
+    var presence = self.plugins.presencedIntegration.getMyPresence();
+
+    var cssClass = PresencedIntegration.presenceToCssClass(
         presence
     );
 
 
-    if (!presence && self.karere.getConnectionState() === Karere.CONNECTION_STATE.CONNECTED) {
-        if (!localStorage.megaChatPresence) {
-            presence = localStorage.megaChatPresence = "chat"; // default
-        }
-        else { // cached
-            presence = localStorage.megaChatPresence;
-        }
-
-    }
-    else if (self.karere.getConnectionState() === Karere.CONNECTION_STATE.DISCONNECTED || self.karere.getConnectionState() === Karere.CONNECTION_STATE.AUTHFAIL || self.karere.getConnectionState() === Karere.CONNECTION_STATE.DISCONNECTING) {
+    if (
+        userPresenceConRetMan.getConnectionState() !== ConnectionRetryManager.CONNECTION_STATE.CONNECTED
+    ) {
         cssClass = "offline";
     }
 
 
-
-    if (cssClass === 'online') {
-        $('.top-user-status-popup .top-user-status-item[data-presence="chat"]').addClass("active");
+    // use the actual presence for ticking the dropdown's items, since the user can be auto away/reconnecting,
+    // but his actual presence's settings to be set to online/away/busy/etc
+    if (actualPresence === UserPresence.PRESENCE.ONLINE) {
+        $('.top-user-status-popup .tick-item[data-presence="chat"]').addClass("active");
     }
-    else if (cssClass === 'away') {
-        $('.top-user-status-popup .top-user-status-item[data-presence="away"]').addClass("active");
+    else if (actualPresence === UserPresence.PRESENCE.AWAY) {
+        $('.top-user-status-popup .tick-item[data-presence="away"]').addClass("active");
     }
-    else if (cssClass === 'busy') {
-        $('.top-user-status-popup .top-user-status-item[data-presence="dnd"]').addClass("active");
+    else if (actualPresence === UserPresence.PRESENCE.DND) {
+        $('.top-user-status-popup .tick-item[data-presence="dnd"]').addClass("active");
     }
-    else if (cssClass === 'offline') {
-        $('.top-user-status-popup .top-user-status-item[data-presence="unavailable"]').addClass("active");
+    else if (actualPresence === UserPresence.PRESENCE.OFFLINE) {
+        $('.top-user-status-popup .tick-item[data-presence="unavailable"]').addClass("active");
     }
     else {
-        $('.top-user-status-popup .top-user-status-item[data-presence="unavailable"]').addClass("active");
+        $('.top-user-status-popup .tick-item[data-presence="unavailable"]').addClass("active");
     }
 
     $status.addClass(
         cssClass
     );
 
-    if (self.karere.getConnectionState() === Karere.CONNECTION_STATE.CONNECTING) {
+    if (
+        self.karere.getConnectionState() === Karere.CONNECTION_STATE.CONNECTING ||
+        (
+            userPresenceConRetMan.getConnectionState() === ConnectionRetryManager.CONNECTION_STATE.CONNECTING
+        )
+    ) {
         $status.parent()
             .addClass("fadeinout");
     }
@@ -1182,7 +1134,7 @@ Chat.prototype.reorderContactTree = function() {
     });
 
     folders = M.sortContacts(folders);
-    
+
     var $container = $('#treesub_contacts');
 
     var $prevNode = null;
@@ -1261,6 +1213,8 @@ Chat.prototype.openChat = function(jids, type, chatId, chatShard, chatdUrl, setA
         jids.forEach(function(jid) {
             var contact = self.getContactFromJid(jid);
             if (!contact || (contact.c !== 1 && contact.c !== 2 && contact.c !== 0)) {
+                // this can happen in case the other contact is not in the contact list anymore, e.g. parked account,
+                // removed contact, etc
                 allValid = false;
                 $promise.reject();
                 return false;
@@ -1308,6 +1262,7 @@ Chat.prototype.openChat = function(jids, type, chatId, chatShard, chatdUrl, setA
                     })
                 );
                 M.syncUsersFullname(contactHash);
+                self.processNewUser(contactHash);
             }
         });
     }
@@ -1549,12 +1504,11 @@ Chat.prototype.processNewUser = function(u) {
 
     self.logger.debug("added: ", u);
 
+    if (self.plugins.presencedIntegration) {
+        self.plugins.presencedIntegration.addContact(u);
+    }
 
     this.karere.subscribe(megaChat.getJidFromNodeId(u), self.getMyXMPPPassword());
-
-    if (M.u[u] && !M.u[u].presence) {
-        M.u[u].presence = this.karere.getPresence(megaChat.getJidFromNodeId(u));
-    }
 
     self.renderMyStatus();
 };
@@ -1568,6 +1522,10 @@ Chat.prototype.processRemovedUser = function(u) {
     var self = this;
 
     self.logger.debug("removed: ", u);
+
+    if (self.plugins.presencedIntegration) {
+        self.plugins.presencedIntegration.removeContact(u);
+    }
 
     this.karere.unsubscribe(megaChat.getJidFromNodeId(u), self.getMyXMPPPassword());
 
@@ -1623,7 +1581,7 @@ Chat.prototype.getChatNum = function(idx) {
  * Called when the BOSH service url is requested for Karere to connect. Should return a full URL to the actual
  * BOSH service that should be used for connecting the current user.
  */
-Chat.prototype.getXmppServiceUrl = function() {
+Chat.prototype.getXmppServiceUrl = function(timeout) {
     var self = this;
 
     if (localStorage.megaChatUseSandbox) {
@@ -1635,7 +1593,10 @@ Chat.prototype.getXmppServiceUrl = function() {
     else {
         var $promise = new MegaPromise();
 
-        $.get("https://" + self.options.loadbalancerService + "/?service=xmpp")
+        $.ajax("https://" + self.options.loadbalancerService + "/?service=xmpp", {
+            method: "GET",
+            timeout: timeout ? timeout : 10000
+            })
             .done(function(r) {
                 if (r.xmpp && r.xmpp.length > 0) {
                     var randomHost = array_random(r.xmpp);
@@ -1700,7 +1661,7 @@ Chat.prototype.renderListing = function() {
     $('.nw-conversations-item').removeClass('selected');
 
 
-    sectionUIopen('conversations');
+    M.onSectionUIOpen('conversations');
 
 
     if (Object.keys(self.chats).length === 0) {
@@ -1720,7 +1681,7 @@ Chat.prototype.renderListing = function() {
 
             var sortedConversations = obj_values(self.chats.toJS());
 
-            sortedConversations.sort(mega.utils.sortObjFn("lastActivity", -1));
+            sortedConversations.sort(M.sortObjFn("lastActivity", -1));
 
             if (sortedConversations.length > 0) {
                 var room = sortedConversations[0];
@@ -1783,7 +1744,6 @@ Chat.prototype._destroyAllChatsFromChatd = function() {
     asyncApiReq({'a': 'mcf', 'v': Chatd.VERSION}).done(function(r) {
         r.c.forEach(function(chatRoomMeta) {
             if (chatRoomMeta.g === 1) {
-                console.error("Destroying: ", chatRoomMeta.id, chatRoomMeta.g, chatRoomMeta.u);
                 chatRoomMeta.u.forEach(function (u) {
                     if (u.u !== u_handle) {
                         api_req({
@@ -1805,6 +1765,87 @@ Chat.prototype._destroyAllChatsFromChatd = function() {
     });
 };
 
+Chat.prototype._leaveAllGroupChats = function() {
+    asyncApiReq({'a': 'mcf', 'v': Chatd.VERSION}).done(function(r) {
+        r.c.forEach(function(chatRoomMeta) {
+            if (chatRoomMeta.g === 1) {
+                asyncApiReq({
+                    "a":"mcr", // request identifier
+                    "id": chatRoomMeta.id, // chat id
+                    "v": Chatd.VERSION
+                });
+            }
+        })
+    });
+};
+
+Chat.prototype.updateDashboard = function() {
+    if (M.currentdirid === 'dashboard') {
+        delay('dashboard:updchat', dashboardUI.updateChatWidget);
+    }
+};
+
+
+/**
+ * Warning: The data returned by this function is loaded directly and not hash-checked like in the secureboot.js. So
+ * please use carefully and escape EVERYTHING that is loaded thru this.
+ *
+ * @param name
+ * @returns {MegaPromise}
+ */
+Chat.prototype.getEmojiDataSet = function(name) {
+    var self = this;
+    assert(name === "categories" || name === "emojis", "Invalid emoji dataset name passed.");
+
+    if (!self._emojiDataLoading) {
+        self._emojiDataLoading = {};
+    }
+    if (!self._emojiData) {
+        self._emojiData = {};
+    }
+
+    if (self._emojiData[name]) {
+        return MegaPromise.resolve(
+            self._emojiData[name]
+        );
+    }
+    else if (self._emojiDataLoading[name]) {
+        return self._emojiDataLoading[name];
+    }
+    else {
+        self._emojiDataLoading[name] = MegaPromise.asMegaPromiseProxy(
+            $.getJSON(staticpath + "js/chat/emojidata/" + name + ".json?v=" + EMOJI_DATASET_VERSION)
+        );
+        self._emojiDataLoading[name].done(function(data) {
+            self._emojiData[name] = data;
+            delete self._emojiDataLoading[name];
+        }).fail(function() {
+            delete self._emojiDataLoading[name];
+        });
+
+        return self._emojiDataLoading[name];
+    }
+};
+
+/**
+ * Retrieve the user's presence from presenced
+ *
+ * @param u {String} u_handle of the contact you want to retrieve the presence for
+ * @returns {Number|undefined} See UserPresence.PRESENCE.* for the possible presences (undefined = offline)
+ */
+Chat.prototype.getPresence = function(u) {
+    var self = this;
+
+    var contact = M.u[u];
+
+    if (!contact) {
+        return UserPresence.PRESENCE.OFFLINE;
+    }
+
+    return contact.u !== u_handle ?
+        self.plugins.presencedIntegration.getPresence(contact.u) :
+        self.plugins.presencedIntegration.getMyPresence();
+}
 
 window.Chat = Chat;
 window.chatui = chatui;

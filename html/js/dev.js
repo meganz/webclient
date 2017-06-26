@@ -35,7 +35,7 @@ function dev_init(pp, appkey) {
                             dev_app();
                         }
                         else {
-                            document.location.hash = 'sdk';
+                            loadSubPage('sdk');
                         }
                     });
                 }
@@ -61,7 +61,7 @@ function dev_init(pp, appkey) {
                             localStorage.sdkterms = true;
                             $('.dev-new-button.plus-icon').click();
                         };
-                        termsDialog(false, 'sdkterms');
+                        bottomPageDialog(false, 'sdkterms');
                         return false;
                     }
                     else {
@@ -79,7 +79,7 @@ function dev_init(pp, appkey) {
                                         'key': res,
                                         'new': 1
                                     };
-                                    document.location.hash = 'sdk_' + res;
+                                    loadSubPage('sdk_' + res);
                                 }
                             }
                         });
@@ -90,7 +90,7 @@ function dev_init(pp, appkey) {
         else {
             $('.dev-new-button.plus-icon').rebind('click', function(e) {
                 login_txt = 'Please log in to manage your App Keys.';
-                document.location.hash = 'login';
+                loadSubPage('login');
             });
         }
 
@@ -100,7 +100,7 @@ function dev_init(pp, appkey) {
                     localStorage.sdkterms = true;
                     document.location = 'https://github.com/meganz/sdk';
                 };
-                termsDialog(false, 'sdkterms');
+                bottomPageDialog(false, 'sdkterms');
                 return false;
             }
         });
@@ -108,14 +108,14 @@ function dev_init(pp, appkey) {
     $('.new-left-menu-link').rebind('click', function() {
         /* jshint -W074 */
         if ($(this).hasClass('dev')) {
-            document.location.hash = 'dev';
+            loadSubPage('dev');
         }
         else if ($(this).hasClass('doc')) {
             $('.new-left-menu-link.preface').click();
-            document.location.hash = 'doc';
+            loadSubPage('doc');
         }
         else if ($(this).hasClass('sdk')) {
-            document.location.hash = 'sdk';
+            loadSubPage('sdk');
         }
         else if (!$(this).hasClass('active')) {
             if ($(this).parent().hasClass('new-left-submenu-item')) {
@@ -129,34 +129,41 @@ function dev_init(pp, appkey) {
             if ($(this).hasClass('contains-submenu')) {
                 $(this).next('.new-left-submenu').removeClass('hidden');
             }
-            var jsp = $('.main-scroll-block').data('jsp');
-            if ($(this).hasClass('preface') && jsp) {
-                jsp.scrollToY(0, 1);
+            /* TODO: set anchors */
+            var $target;
+
+            if ($(this).hasClass('preface')) {
+               $target = $('.dev-nw');
             }
             else if ($(this).hasClass('model')) {
-                jsp.scrollToElement('#doc_5', 1);
+                $target = $('#doc_5');
             }
             else if ($(this).hasClass('implementation')) {
-                jsp.scrollToElement('#doc_6', 1);
+                $target = $('#doc_6');
             }
             else if ($(this).hasClass('process')) {
-                jsp.scrollToElement('#doc_7', 1);
+               $target = $('#doc_7');
             }
             else if ($(this).hasClass('future')) {
-                jsp.scrollToElement('#doc_8', 1);
+                $target = $('#doc_8');
             }
             else if ($(this).hasClass('method')) {
-                jsp.scrollToElement('#doc_10', 1);
+                $target = $('#doc_10');
             }
             else if ($(this).hasClass('errorcodes')) {
-                jsp.scrollToElement('#doc_11', 1);
+                $target = $('#doc_11');
             }
             else if ($(this).hasClass('underhood')) {
-                jsp.scrollToElement('#doc_12', 1);
+                $target = $('#doc_12');
+            }
+
+            if ($target.length) {
+                $('.bottom-page.scroll-block, .old .fmholder').stop().animate({
+                    scrollTop: $target.position().top - 40
+                }, 1000);
             }
         }
     });
-    Soon(mainScroll);
     scrollMenu();
 }
 
@@ -220,7 +227,7 @@ function dev_app() {
 
 
     $('.reg-st5-complete-button.cancel').rebind('click', function(e) {
-        document.location.hash = 'sdk';
+        loadSubPage('sdk');
     });
 
     $('.reg-st5-complete-button.save').rebind('click', function(e) {
@@ -240,7 +247,7 @@ function dev_app() {
         }, {
             callback: function() {
                 loadingDialog.hide();
-                document.location.hash = 'sdk';
+                loadSubPage('sdk');
             }
         });
     });
@@ -260,7 +267,7 @@ function dev_app() {
                     }, {
                         callback: function() {
                             loadingDialog.hide();
-                            document.location.hash = 'sdk';
+                            loadSubPage('sdk');
                         }
                     });
                 }
@@ -268,12 +275,6 @@ function dev_app() {
     });
 
     $('.new-right-content-block.app').removeClass('hidden');
-    $('.main-scroll-block').jScrollPane({
-        showArrows: true,
-        arrowSize: 5,
-        animateScroll: true,
-        mouseWheelSpeed: 50
-    });
 }
 
 
@@ -329,12 +330,6 @@ function sdk_key_render() {
                     sdk_app = sdk_keys[i];
                 }
             }
-            document.location.hash = 'sdk_' + $(this).attr('id');
-        });
-    $('.main-scroll-block').jScrollPane({
-            showArrows: true,
-            arrowSize: 5,
-            animateScroll: true,
-            mouseWheelSpeed: 50
+            loadSubPage('sdk_' + $(this).attr('id'));
         });
 }

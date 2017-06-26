@@ -8,7 +8,7 @@ var extensions = {
     'database': [['sql', 'accdb', 'db', 'dbf', 'mdb', 'pdb'], 'Database'],
     'dreamweaver': [['dwt'], 'Database'],
     'excel': [['xls', 'xlsx', 'xlt', 'xltm'], 'Excel'],
-    'executable': [['exe', 'com', 'bin', 'apk', 'app', 'msi', 'cmd', 'gadget'], 'Executable'],
+    'executable': [['exe', 'com', 'bin', 'apk', 'app', 'msi', 'cmd', 'gadget', 'dmg'], 'Executable'],
     'fla-lang': [['as', 'ascs', 'asc'], 'ActionScript'],
     'flash': [['fla'], 'Flash'],
     'font': [['fnt', 'otf', 'ttf', 'fon'], 'Font'],

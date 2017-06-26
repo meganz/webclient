@@ -64,7 +64,6 @@
     margin: 0 0 2px 0;
 }
 .chat-textarea-scroll, .message.textarea-scroll, .textarea-scroll .textarea-wrapper {
-    max-height: 100px;
     font-size: 0;
     line-height: 0;
     position: relative;

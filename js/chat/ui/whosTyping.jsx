@@ -6,7 +6,7 @@ var WhosTyping = React.createClass({
     mixins: [MegaRenderMixin],
     getInitialState: function() {
         return {
-            currentlyTyping: []
+            currentlyTyping: {}
         };
     },
     componentWillMount: function() {
@@ -14,61 +14,45 @@ var WhosTyping = React.createClass({
         var chatRoom = self.props.chatRoom;
         var megaChat = self.props.chatRoom.megaChat;
 
-        megaChat.karere.bind("onComposingMessage.whosTyping" + chatRoom.roomJid, function(e, eventObject) {
+        chatRoom.bind("onParticipantTyping.whosTyping", function(e, user_handle) {
             if (!self.isMounted()) {
                 return;
             }
-            if (Karere.getNormalizedFullJid(eventObject.getFromJid()) === megaChat.karere.getJid()) {
+            if (user_handle === u_handle) {
                 return;
             }
 
-            var room = megaChat.chats[eventObject.getRoomJid()];
-            if (room.roomJid == chatRoom.roomJid) {
-                var currentlyTyping = self.state.currentlyTyping;
-                var u_h = megaChat.getContactFromJid(Karere.getNormalizedBareJid(eventObject.getFromJid())).u;
 
-                if (u_h === u_handle) {
-                    // not my jid, but from other device (e.g. same user handle)
-                    return;
-                }
+            var currentlyTyping = clone(self.state.currentlyTyping);
+            var u_h = user_handle;
 
-                currentlyTyping.push(
-                    u_h
-                );
-                currentlyTyping = array_unique(currentlyTyping);
-                self.setState({
-                    currentlyTyping: currentlyTyping
-                });
-                self.forceUpdate();
-            }
-        });
-
-        megaChat.karere.rebind("onPausedMessage.whosTyping" + chatRoom.roomJid, function(e, eventObject) {
-            var room = megaChat.chats[eventObject.getRoomJid()];
-
-            if (!self.isMounted()) {
+            if (u_h === u_handle) {
+                // not my jid, but from other device (e.g. same user handle)
                 return;
             }
-            if (Karere.getNormalizedFullJid(eventObject.getFromJid()) === megaChat.karere.getJid()) {
+            else if (!M.u[u_h]) {
+                // unknown user handle? no idea what to show in the "typing" are, so skip it.
                 return;
             }
-
-            if (room.roomJid === chatRoom.roomJid) {
-                var currentlyTyping = self.state.currentlyTyping;
-                var u_h = megaChat.getContactFromJid(Karere.getNormalizedBareJid(eventObject.getFromJid())).u;
-                if (u_h === u_handle) {
-                    // not my jid, but from other device (e.g. same user handle)
-                    return;
-                }
-
-                if (currentlyTyping.indexOf(u_h) > -1) {
-                    removeValue(currentlyTyping, u_h);
-                    self.setState({
-                        currentlyTyping: currentlyTyping
-                    });
-                    self.forceUpdate();
-                }
+            if (currentlyTyping[u_h]) {
+                clearTimeout(currentlyTyping[u_h][1]);
             }
+
+            var timer = setTimeout(function() {
+                if (self.state.currentlyTyping[u_h]) {
+                    var newState = clone(self.state.currentlyTyping);
+                    delete newState[u_h];
+                    self.setState({currentlyTyping: newState});
+                }
+            }, 5000);
+
+            currentlyTyping[u_h] = [unixtime(), timer];
+
+            self.setState({
+                currentlyTyping: currentlyTyping
+            });
+
+            self.forceUpdate();
         });
     },
     componentWillUnmount: function() {
@@ -76,16 +60,15 @@ var WhosTyping = React.createClass({
         var chatRoom = self.props.chatRoom;
         var megaChat = chatRoom.megaChat;
 
-        megaChat.karere.bind("onComposingMessage." + chatRoom.roomJid);
-        megaChat.karere.unbind("onPausedMessage." + chatRoom.roomJid);
+        chatRoom.unbind("onParticipantTyping.whosTyping");
     },
     render: function() {
         var self = this;
 
         var typingElement = null;
 
-        if (self.state.currentlyTyping.length > 0) {
-            var names = self.state.currentlyTyping.map((u_h) => {
+        if (Object.keys(self.state.currentlyTyping).length > 0) {
+            var names = Object.keys(self.state.currentlyTyping).map((u_h) => {
                 var avatarMeta = generateAvatarMeta(u_h);
                 return avatarMeta.fullName.split(" ")[0];
             });

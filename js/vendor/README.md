@@ -21,6 +21,8 @@ Unless otherwise noted, they were released under a [MIT License].
 ---
 [autolinker.js]: Utility to Automatically Link URLs, Email Addresses, Phone Numbers, Twitter handles, and Hashtags in a given block of text/HTML.
 
+> **This is a fork**, [Compare the changes](https://github.com/gregjacobs/Autolinker.js/compare/master...meganz:master)
+
 ---
 [avatar.js]: Avatar Picker - A slick user experience for uploading, translating and cropping images to be used as avatars.
 
@@ -83,6 +85,11 @@ Unless otherwise noted, they were released under a [MIT License].
 [jquery-ui.js]: jQuery-UI - jQuery User Interface library.
 
 > This is a custom build created from: [https://jqueryui.com/download/#!...](https://jqueryui.com/download/#!version=1.12.1&themeParams=none&components=111101011101111110100010110110001000001000000000)
+
+---
+[jquery.mobile.js]: jQuery Mobile - Make apps that are accessible on all smartphone, tablet and desktop devices.
+
+> This is a custom build created from: [http://amd-builder.jquerymobile.com...](http://amd-builder.jquerymobile.com/v1/bundle/jquery/jquery-mobile/1.4.5/jquery.mobile.custom.zip?baseUrl=js&include=jquery.mobile.ns%2Cjquery.mobile.support.touch%2Cjquery.mobile.vmouse%2Cevents%2Ftouch&exclude=jquery%2Cjson%2Cjson!..%2Fpackage.json&wrap=%7B%22startFile%22%3A%22build%2Fwrap.start%22%2C%22endFile%22%3A%22build%2Fwrap.end%22%7D&pragmasOnSave=%7B+%22jqmBuildExclude%22%3A+true+%7D&preserveLicenseComments=false&skipModuleInsertion=true&filter=..%2Fbuild%2Ffilter&mainConfigFile=js%2Frequirejs.config.js)
 
 ---
 [jquery.fullscreen.js]: This jQuery plugin provides a simple to use mechanism to control the new fullscreen mode of modern browsers.
@@ -164,12 +171,33 @@ Unless otherwise noted, they were released under a [MIT License].
 > make check
 > ```
 
+
+---
+[chat/base32.js]: A fork of agnoster/base32-js
+
+> NB: This is a fork of agnoster/base32-js, that supports custom alphabet
+> Forked location: https://github.com/meganz/base32-js
+
+
+
+---
+[twemoji.noutf.js]: Twitter Emoji
+
+> NB: We had to fork the project and remove the UTF characters from twemoji.js, so we are using the repo:
+> https://github.com/meganz/twemoji
+> 
+> ```bash
+> git clone https://github.com/meganz/twemoji
+> cd twemoji/2/
+> cp twemoji.js twemoji.noutf.js
+> search & replace any utf character with ""
+> ```
 ---
 
 [MIT License]: <https://opensource.org/licenses/MIT>
 [Emscripten]: <http://emscripten.org/>
 [asmcrypto.js]: <https://github.com/meganz/asmcrypto.js>
-[autolinker.js]: <https://github.com/gregjacobs/Autolinker.js/tree/0.12.3/dist>
+[autolinker.js]: <https://github.com/meganz/Autolinker.js>
 [avatar.js]: <https://github.com/meganz/avatar-picker>
 [bitcoin-math.js]: <https://github.com/meganz/bitcoin-math>
 [db.js]: <https://github.com/meganz/db.js>
@@ -199,3 +227,4 @@ Unless otherwise noted, they were released under a [MIT License].
 [smartcrop.js]: <https://github.com/meganz/smartcrop.js>
 [zxcvbn.js]: <https://github.com/dropbox/zxcvbn/tree/1.0.1>
 [chat/strophe.light.js]: <https://github.com/strophe/strophejs>
+[chat/base32.js]: <https://github.com/lpetrov/base32-js>

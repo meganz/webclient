@@ -612,7 +612,7 @@ createdAnswer: function (sdp, cb, provisional) {
     }
 },
 
-sendTerminate: function (reason, text) {
+sendTerminate: function (reason, text, callback) {
     var self = this,
         term = $iq({to: self.peerjid,
                type: 'set'})
@@ -627,7 +627,7 @@ sendTerminate: function (reason, text) {
         term.up().c('text').t(text);
     }
 
-    self.sendIq(term, 'terminate', function() {});
+    self.sendIq(term, 'terminate', callback ? callback : function() {});
     self.jingle.connection.flush();
     debugLog("sent TERMINATE to", self.peerjid);
 },

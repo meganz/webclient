@@ -7,21 +7,14 @@ var Help = (function() {
     var doRender = false;
     var idx;
     var focus;
-    var popularQuestions = [];
     var allTags = [];
-    var articlesById = [];
     var titles = [];
-    var isScrolling = false;
     var $window = $(window);
     var $currentQuestion = null;
 
 
     function tagUri(tag) {
         return tag.toLowerCase().replace(/[^a-z0-9]/g, '_');
-    }
-
-    function contentChanged() {
-        $('.main-scroll-block').data('jsp').reinitialise();
     }
 
     function tagsPerDocument(documents, isClient) {
@@ -65,117 +58,72 @@ var Help = (function() {
         });
 
         $('.support-search').rebind('click', function(e) {
-
             e.preventDefault();
-            var $this = $(this);
             var $container = $('#help2-main');
-            var parent = $('.main-title-section');
-            var $popularQuestions = $(".popular-question-block");
-            var $searchForm = $(".support-search-container");
-            var $getStartTitle = $(".getstart-title-section", $container);
 
-            if ($this.is('.close')) {
-                $('.support-search-heading').removeClass('hidden');
-                $('.support-search-heading-close').addClass('hidden');
-                $('.search-section').fadeOut(300);
-                $this.removeClass('close');
-                parent.removeClass('hidden');
-                $popularQuestions.fadeOut(200);
-                $searchForm.fadeOut(200);
-                $getStartTitle.removeClass('hidden');
-            } else {
-                $('.support-search-heading').addClass('hidden');
-                $('.support-search-heading-close').removeClass('hidden');
-                $('.search-section').show();
-                $this.addClass('close');
-                parent.delay(240).addClass('hidden');
-                $popularQuestions.fadeIn(500);
-                $searchForm.fadeIn(400);
-                $getStartTitle.addClass('hidden');
-
+            if ($container.hasClass('search-overlay')) {
+                $container.removeClass('search-overlay');
+            }
+            else {
+                $container.addClass('search-overlay');
             }
         });
     }
-
-    function sortClients(client, clients) {
-
-        var isMobile = client.tags.indexOf("mobile");
-        return clients.sort(function(a, b) {
-            if (isMobile) {
-                return a.tags.indexOf("mobile") ? -1 : 1;
-            }
-
-            return a.tags.indexOf("mobile") ? 1 : -1;
-        });
-    }
-
-    var setHash = SoonFc(function(hash) {
-        if (hash !== document.location.hash) {
-            try {
-                history.pushState({}, "page 2", document.location.pathname + hash);
-            }
-            catch (ex) {
-                // Fx Extension while using `mega:` protocol...
-                skipHashChange = true;
-                location.hash = hash;
-            }
-        }
-    }, 1000);
-
 
     function url() {
-        return '#help/' + toArray.apply(null, arguments).join("/");
+        return 'help/' + toArray.apply(null, arguments).join("/");
     }
 
     function selectMenuItem($element, $elements) {
-        if (isScrolling) {
-            return;
-        }
         $elements = $elements || $('.updateSelected.current');
         $elements.removeClass('current');
         $element.addClass('current');
-        var $current = $($element.data('update'))
+        var $link = $($element.data('update'))
             .parent().
                 find('.active').removeClass('active').end()
             .end()
             .addClass('active');
-        var hash = $current.data('state');
-        if (hash) {
-            setHash(hash);
-        }
-    }
 
-
-    function scrollTo(selector) {
-        if (selector.length !== 1 || isScrolling) {
-            return;
-        }
-
-        $('.main-scroll-block').one('jsp-user-scroll-y', function() {
-            isScrolling = isScrolling === true ? false : isScrolling;
-            selectMenuItem(selector);
-        });
-        $('.main-scroll-block').data('jsp').scrollByY(
-            selector.offset().top,
-            true
-        );
-        isScrolling = true;
-    }
-
-    function notFound() {
-        document.location.href = "#help";
-    }
-
-    function getClient(clientName) {
-        for (var i = 0; i < clients.length; ++i) {
-            if (clients[i].url === clientName) {
-                return clients[i];
+        delay('help2:selectMenuItem', function() {
+            var state = $link.data('state');
+            if (!state && $link.data('to')) {
+                var parts = getUrlParts();
+                // the url normally includes, 'help', 'client', 'webclient', and 'section'/'question'
+                // set the first one as selected by default if it only has 'help', 'client', 'webclient'.
+                if (parts.length > 3) {
+                    parts.pop();
+                }
+                parts.push(String($link.data('to')).replace(/^[/#]+/, ''));
+                state = parts.join('/');
             }
-        }
+            var newpage = getCleanSitePath(state);
+            if (newpage !== page && page.substr(0, 4) === 'help') {
+                page = newpage;
 
-        // not found
-        notFound();
-        return false;
+                try {
+                    history.pushState({subpage: newpage}, "", "/" + newpage);
+                }
+                catch (ex) {
+                    skipHashChange = true;
+                    location.hash = '#' + newpage;
+                }
+            }
+        }, 1350);
+    }
+
+
+    function helpScrollTo(selector) {
+        var $target = $(selector);
+        if ($target.length) {
+            $('.bottom-page.scroll-block, .old .fmholder').stop().animate({
+                scrollTop: $target.position().top - 20
+            }, 1000);
+        }
+        else if ($('*[data-update="' + selector + '"]').length) {
+            $('.bottom-page.scroll-block, .old .fmholder').stop().animate({
+                scrollTop: $('*[data-update="' + selector + '"]').position().top - 20
+            }, 1000);
+        }
     }
 
     function filterContentByTag(tag) {
@@ -222,6 +170,22 @@ var Help = (function() {
         contentChanged();
     }
 
+    function patchLinks() {
+        $('.d-section-items a, .popular-question-items a').each(function(i,el) {
+            var url = $(el).attr('href') || $(el).data('fxhref');
+
+            if (url) {
+                $(el).attr('href', String(url).replace('#', '/'));
+            }
+        });
+        $('.d-section-items a, .popular-question-items a').rebind('click',function(e) {
+            var url = $(this).attr('href') || $(this).data('fxhref');
+            if (url) {
+                loadSubPage(url);
+                return false;
+            }
+        });
+    }
 
     function sidebars() {
 
@@ -241,7 +205,7 @@ var Help = (function() {
             // Log search submitted
             api_req({ a: 'log', e: 99619, m: 'Help2 regular search feature used' });
 
-            document.location.href = url("search", $(this).find('input[type="text"]').val());
+            loadSubPage(url("search", $(this).find('input[type="text"]').val()));
         });
 
         $container.find('form input[type=text]').each(function() {
@@ -259,14 +223,14 @@ var Help = (function() {
 
                     $('.close-icon').trigger('click');
 
-                    document.location.href = ui.item.url;
+                    loadSubPage(ui.item.url);
                 }
             });
             $this.data('ui-autocomplete')._renderItem = function(ul, item) {
-                
+
                 var $icon = $('<span>').addClass(item.client.toLowerCase() + ' client');
                 var $label = $('<span>').addClass('label-text').text(item.label);
-                
+
                 return $('<li>')
                     .attr("data-value", item.value)
                     .append($icon)
@@ -314,9 +278,6 @@ var Help = (function() {
                 $deviceIcon.rotate(0, 180, 400, 'easeOutQuint');
             }
         });
-
-
-
     }
 
 
@@ -385,36 +346,28 @@ var Help = (function() {
     function homepageinteraction() {
 
         var $container = $('#help2-main');
-        var $getStartBlock = $(".getstart-block", $container);
-        var $useMegaBlock = $(".usemega-block", $container);
-        var $articleArrow = $(".article-arrow", $container);
-        var $arrowContainer = $(".browsearticle-button", $container);
-        var $getStartImg = $(".getstart-img", $container);
-        var $getStartCon = $(".getstart-content", $container);
         var $mobileDeviceBlock = $(".block-mobile-device", $container);
         var $mobileNavBlock = $(".mobile-block", $container);
         var timer;
 
-        $mobileNavBlock.rebind('mouseenter', function() {
-            timer = setTimeout(function()   {
-            $mobileDeviceBlock.fadeIn(300);
-        }, 400); })
-        .rebind('mouseleave', function() {
-            clearTimeout(timer);
-            $mobileDeviceBlock.fadeOut(200);
-        });
-
+        $mobileNavBlock
+            .rebind('mouseenter', function() {
+                timer = setTimeout(function() {
+                    $mobileDeviceBlock.fadeIn(300);
+                }, 400);
+            })
+            .rebind('mouseleave', function() {
+                clearTimeout(timer);
+                $mobileDeviceBlock.fadeOut(200);
+            });
     }
 
     function searchBarInteraction() {
 
         var $container = $('#help2-main');
         var $inputSearch = $("input.search", $container);
-        var $searchBar = $("form#support-search", $container);
         var $sideBar = $(".sidebar-menu-container", $container);
-        var $directoryBody = $(".support-info-container ", $container);
         var $autoSuggestContainer = $(".ui-autocomplete", $container);
-        var $mainTitleSection = $('.main-title-section', $container);
         var $popularQuestions = $(".search-section .popular-question-block");
 
         $inputSearch.on('focus', function () {
@@ -429,17 +382,6 @@ var Help = (function() {
         });
     }
 
-    //  Directory list functions go here.
-    function directoryInteraction() {
-
-        var $this = $(this);
-        var $container = $('#help2-main');
-        var $directoryArticle = $('.d-section-items li');
-        var $bulletPoint = $('.d-bullet-point');
-
-        // Bullet point animation when hovering
-    }
-
     // Header functions including search and go back buttons
 
     function headerInteraction() {
@@ -447,133 +389,116 @@ var Help = (function() {
         var $container = $('#help2-main');
         var $goBackContainer = $(".support-go-back", $container);
         var $goBackArrow = $(".support-go-back-icon", $container);
-        var $goBackHead = $(".support-go-back-heading", $container);
-        var $searchHead = $(".support-search-heading", $container);
-        var $searchClone = $(".support-section-header-clone .support-search");
-        var $searchCloneHeader = $(".support-section-header-clone .support-search-heading");
-        var $searchCloseHead = $('.support-search-heading-close', $container);
         var $searchContainer = $(".support-search", $container);
         var $searchMagnifyGlass = $(".support-search-icon", $container);
-        var $mainPadAnchor = $(".main-pad-container", $container);
         var $sideBar = $(".sidebar-menu-container", $container);
         var $mainTitleSection = $('.main-title-section', $container);
         var $searchHeader = $(".support-section-header", $container);
         var $cloneHeader = $(".support-section-header-clone", $container);
-        var $sideBarSlider = $(".sidebar-menu-slider", $container);
         var $closeIcon = $(".close-icon", $container);
-        var $searchOverlay = $(".search-section-header", $container);
         var $getStartTitle = $(".getstart-title-section", $container);
         var timer;
 
         // Arrow Animation for Go back block
-        $goBackContainer.rebind('mouseenter', function() {
-            timer = setTimeout(function()   {
-            $goBackArrow.animate({marginRight: 8}, 300, "easeOutQuart");
-        },  300);
-        }).rebind('mouseleave', function() {
-            clearTimeout(timer);
-            $goBackArrow.animate({marginRight: 16}, 300, "easeOutQuart");
-        });
+        $goBackContainer
+            .rebind('mouseenter', function() {
+                timer = setTimeout(function() {
+                    $goBackArrow.animate({marginRight: 8}, 300, "easeOutQuart");
+                }, 300);
+            })
+            .rebind('mouseleave', function() {
+                clearTimeout(timer);
+                $goBackArrow.animate({marginRight: 16}, 300, "easeOutQuart");
+            });
 
         $closeIcon.rebind('click', function() {
-            if (($mainTitleSection.hasClass('hidden')) || ($getStartTitle.hasClass('hidden'))) {
-                $('.search-section').fadeOut(300);
-                $(".support-search").addClass('close');
-                $mainTitleSection.removeClass('hidden');
-                $('.support-search-heading').removeClass('hidden');
-                $('.support-search-heading-close').addClass('hidden');
-                $getStartTitle.removeClass('hidden');
-            }
+            var $container = $('#help2-main');
+
+            $container.removeClass('search-overlay');
         });
 
-        if ($mainTitleSection.hasClass('hidden')) {
-            $cloneHeader.hide();
-            $searchHeader.fadeIn(300);
-        } else {
-            $cloneHeader.fadeIn(300);
-            $searchHeader.hide();
-        }
+        $searchHeader.fadeIn();
+        $cloneHeader.fadeOut();
 
-        var $html = $('html,body');
+        var $scrollBlock= $('.old .fmholder');
 
-        $html.rebind('scroll.help2', function() {
+        $scrollBlock.scroll(function() {
             // TODO: write a cleanup function to be invoked when moving out of the #help section
-            if (String(location.hash).substr(0, 5) !== '#help') {
-                return $html.unbind('scroll.help2');
+
+            var topPos = $(this).scrollTop();
+            if (topPos > 195) {
+                if (topPos + $sideBar.outerHeight() + 115 <= $('.main-mid-pad').outerHeight()) {
+                    $sideBar.css('top', topPos + 30 + 'px').addClass('fixed');
+                }
+                else {
+                    $sideBar.removeClass('fixed');
+                }
+            }
+            else {
+                $sideBar.removeAttr('style').removeClass('fixed');
             }
 
-            if (($sideBar.hasClass('fixed')) && (($sideBar).is(":visible"))) {
+            <!-- Search header !-->
+            if (topPos > 210) {
                 $searchHeader.fadeOut(10);
                 $cloneHeader.fadeIn(300);
-            } else {
+            }
+            else {
                 $searchHeader.fadeIn(300);
                 $cloneHeader.fadeOut(10);
             }
-        }).trigger('scroll');
+        });
 
-
-        if ($searchContainer.hasClass('close')) {
-            $searchMagnifyGlass = $(".support-search-icon", $container);
-            $searchContainer.rebind('mouseenter', function() {
-                timer = setTimeout(function()   {
-                $searchMagnifyGlass.animate({
-                    marginLeft: "8",
-                    marginRight:"8"
-                }, 300, "easeOutQuart");
-
-            }, 300);
+        $searchContainer
+            .rebind('mouseenter', function() {
+                timer = setTimeout(function() {
+                    $searchMagnifyGlass.animate({
+                        marginLeft: "8",
+                        marginRight: "8"
+                    }, 300, "easeOutQuart");
+                }, 300);
             })
             .rebind('mouseleave', function() {
                 clearTimeout(timer);
                 $searchMagnifyGlass.animate({
                     marginLeft: "16",
-                    marginRight:"0"
+                    marginRight: "0"
                 }, 300, "easeOutQuart");
-
             });
-        } else {
-            $searchContainer.rebind('mouseenter', function() {
-                timer = setTimeout(function()   {
-                $searchMagnifyGlass.animate({
-                    marginLeft: "8",
-                    marginRight:"8"
-                }, 300, "easeOutQuart");
-
-            }, 300);
-            })
-            .rebind('mouseleave', function() {
-                clearTimeout(timer);
-                $searchMagnifyGlass.animate({
-                    marginLeft: "16",
-                    marginRight:"0"
-                }, 300, "easeOutQuart");
-
-            });
-        }
     }
 
 
     var urls = {
         "search": function(args) {
-            args[1] = args[1].replace(/%([0-9a-f]+)/g, function(all, number) {
+            var searchTerm = String(args[1]);
+
+            if (searchTerm.indexOf('%25') >= 0) {
+                do {
+                    searchTerm = searchTerm.replace(/%25/g, '%');
+                } while (searchTerm.indexOf('%25') >= 0);
+            }
+            try {
+                searchTerm = decodeURIComponent(searchTerm);
+            }
+            catch (e) {}
+
+            var sText = searchTerm.replace(/[+-]/g, " ");;
+            var search = sText.replace(/%([0-9a-f]+)/g, function(all, number) {
                 return String.fromCharCode(parseInt(number, 16));
             });
-            args[1] = args[1].replace(/[\+\-]/g, " ");
-            var articles = idx.search.search(args[1], {
-                fields: {
-                    title: {boost: 2, bool: "AND"},
-                    body: {boost: 1},
-                    tags: {boots: 3},
-                },
-                bool: "AND",
-                expand: true
-            }).map(function(result) {
-                return idx.all[result.ref];
+            var words = search.split(((lang == 'ct') || (lang == 'jp')) ? '' : /\s+/)
+                        .filter(function(word) { return word.length; })// filter out empty strings.
+                        .map(function(pattern) { return new RegExp(pattern, 'i'); });
+
+            var articles = idx.all.filter(function(doc) {
+                return words.filter(function(target) {
+                    return !!doc.indexedTitle.match(target) || !!doc.body.match(target);
+                }).length === words.length;
             });
 
             parsepage(Data.help_search_tpl.html);
 
-            $('#help2-main .search').val(args[1]);
+            $('#help2-main .search').val(sText);
 
             if (articles.length === 0) {
                 $('.search-404-block').show();
@@ -585,7 +510,7 @@ var Help = (function() {
 
             articles.reverse().map(function(article) {
                 var $article = $('<div>').addClass("search-result link content-by-tags")
-                    .data('href', "#help/client/" + article.id)
+                    .data('href', "help/client/" + article.id)
                     .data('tags', article.tags.map(function(w) { return tagUri(w); }));
 
                 $('<div>').addClass('search-result-title')
@@ -612,7 +537,6 @@ var Help = (function() {
                 });
 
                 $article.prependTo('.main-search-pad');
-
             });
 
             tagsPerDocument(articles).map(function(tag) {
@@ -627,47 +551,44 @@ var Help = (function() {
         "client": function(args) {
             if (args[1] === 'mobile') {
                 args[1] = 'android';
-                document.location.href = url.apply(null, args);
+                loadSubPage(url.apply(null, args));
                 return;
             }
 
             args.shift();
             var question = "";
-            if (args.length === 3) {
+            if (args.length === 3 || args.length === 2) {
                 question = args.pop();
             } else if (args.length !== 1) {
-                document.location.href = "#help";
+                loadSubPage('help');
                 return;
             }
+
+
 
             var data = Data["help_" + args.join("_")];
             if (!data) {
-                document.location.href = "#help";
+                loadSubPage('help');
                 return;
             }
-
 
             parsepage(data.html);
 
             $('.support-email-icon').rebind('click', function() {
-                var parts = document.location.href.split(/\//);
-                parts.pop();
-                parts.push($(this).parents('.support-article').attr('id'));
+                var parts = getUrlParts($(this).parents('.support-article').attr('id'));
                 window.helpOrigin = parts.join('/');
-                var support = '#support';
+                var newpage = 'support';
                 if (!u_type) {
-                    login_next = support;
-                    support    = "#login";
+                    login_next = newpage;
+                    newpage = "login";
                 }
-                document.location.href = support;
+                loadSubPage(newpage);
             });
 
             $('.support-link-icon').rebind('click', function() {
-                var parts = document.location.href.split(/\//);
-                parts.pop();
-                parts.push($(this).parents('.support-article').attr('id'));
+                var parts = getUrlParts($(this).parents('.support-article').attr('id'));
 
-                var link   = parts.join('/');
+                var link = 'https://mega.nz/' + parts.join('/');
                 var $input = $('.share-help').removeClass('hidden')
                     .find('input').val(link)
                     .focus().select();
@@ -693,10 +614,10 @@ var Help = (function() {
             });
 
             if (question) {
-                $currentQuestion = $('#' + question);
-                Later(function() {
-                    scrollTo($currentQuestion);
-                });
+                $currentQuestion = '#' + question;
+                setTimeout(function() {
+                    helpScrollTo($currentQuestion);
+                }, 400);
             }
         },
         "welcome": function welcome(args) {
@@ -704,10 +625,15 @@ var Help = (function() {
         }
     };
 
-    function getUrlParts() {
-        return document.location.hash.split(/\//).filter(function(x) {
-            return x.length > 0;
-        });
+    function getUrlParts(section) {
+        var parts = getSitePath().split('/').map(String.trim).filter(String);
+
+        if (section) {
+            parts.pop();
+            parts.push(section);
+        }
+
+        return parts;
     }
 
 
@@ -722,7 +648,9 @@ var Help = (function() {
             return urls.welcome();
         }
 
-        document.location.href = "#help";
+        // init page here instead with page set as 'help' ?!
+        // document.location.href = "#help";
+        //loadSubPage('help');
     }
 
     // getVisibleElement
@@ -747,101 +675,61 @@ var Help = (function() {
 
         return args[0][0];
     }
-    //
 
-    function handleScroll() {
 
-        var $main = $('#help2-main');
-        var $menu = $('.sidebar-menu-container:visible');
-        var menuHeight = $menu.height();
-        var top   = $('.help-background-block').height();
-        var $elements = $('.updateSelected:visible', $main);
-
-        $window.rebind('resize.help2', function() {
-            if ($('#help2-main').length === 0) {
-                return $window.unbind('resize.help2');
-            }
-            contentChanged();
-        });
-
-        $('.main-scroll-block').rebind('jsp-scroll-y.help2', function(e, scrollPositionY, atTop, atBottom) {
-
-            if ($('#help2-main').length === 0) {
-                return $('.main-scroll-block').unbind('jsp-scroll-y.help2');
+    ns.loadfromCMS = function(callback)
+    {
+        CMS.index("help_" + lang, function(err, blobs)
+        {
+            if (err) {
+                return alert("Invalid response from the server");
             }
 
-            var $current = $($('.updateSelected.current')[0]);
-            var jspHeight = $main.height();
-
-            if ($current.length === 0) {
-                selectMenuItem($elements.eq(0), $current);
-            } else {
-                var $new = getVisibleElement(scrollPositionY, [$current.prev(), $current, $current.next()]);
-                if ($new && $new !== $current) {
-                    selectMenuItem($new, $current);
+            for (var name in blobs) {
+                if (blobs.hasOwnProperty(name)) {
+                    blobs[name.replace(/\.[a-z]{2}$/, '')] = blobs[name];
                 }
             }
 
-            if (jspHeight - scrollPositionY < menuHeight) {
-                if (!isBottomScrolling) {
-                    isBottomScrolling = true;
-                    $menu.css('margin-top', scrollPositionY - 290).removeClass('fixed');
-                }
-                return;
+            Data = blobs;
+            titles = blobs.help_search.object.map(function(entry) {
+                entry.label = entry.title;
+                entry.value = entry.title;
+                entry.url   = "help/client/" + entry.id;
+                return entry;
+            });
+
+
+            idx = {
+                search: elasticlunr(function() {
+                    this.setRef('pos');
+                    this.addField('title', { boost: 10 });
+                    this.addField('tags', { boost: 100 });
+                    this.addField('body');
+                }),
+                all: Data.help_search.object
+            };
+
+            Data.help_search.object.map(function(obj, id) {
+                obj.pos = id;
+                obj.tags = obj.tags.split(/, /);
+                obj.indexedTitle = obj.title.split("").join(" ");
+                idx.search.addDoc(obj);
+            });
+
+            ready = true;
+            if (doRender) {
+                ns.render();
+                loadingDialog.hide();
             }
 
-            isBottomScrolling = false;
-            if (scrollPositionY >= top) {
-                $menu.removeAttr('style').addClass('fixed');
-            } else {
-                $menu.removeClass('fixed');
+            if (callback) {
+                callback();
             }
         });
-    }
+    };
 
-    CMS.index("help_" + lang, function(err, blobs) {
-        if (err) {
-            return alert("Invalid response from the server");
-        }
-
-        for (var name in blobs) {
-            if (blobs.hasOwnProperty(name)) {
-                blobs[name.replace(/\.[a-z]{2}$/, '')] = blobs[name];
-            }
-        }
-
-        Data = blobs;
-        titles = [];
-        titles = blobs.help_search.object.map(function(entry) {
-            entry.label = entry.title;
-            entry.value = entry.title;
-            entry.url   = "#help/client/" + entry.id;
-            return entry;
-        });
-
-
-        idx = {
-            search: elasticlunr(function() {
-                this.setRef('pos');
-                this.addField('title', { boost: 10 });
-                this.addField('tags', { boost: 100 });
-                this.addField('body');
-            }),
-            all: Data.help_search.object
-        };
-
-        Data.help_search.object.map(function(obj, id) {
-            obj.pos = id;
-            obj.tags = obj.tags.split(/, /);
-            idx.search.addDoc(obj);
-        });
-
-        ready = true;
-        if (doRender) {
-            ns.render();
-            loadingDialog.hide();
-        }
-    });
+    mBroadcaster.once('startMega', ns.loadfromCMS.bind(ns, null));
 
     var helpAlreadyLogged;
     ns.render = function() {
@@ -859,13 +747,12 @@ var Help = (function() {
         doRouting();
         topmenuUI();
         sidebars();
-        mainScroll();
         userfeedback();
         homepageinteraction();
         searchBarInteraction();
         headerInteraction();
-        directoryInteraction();
         searchAnimations();
+        patchLinks();
 
         // Log that the help page has been viewed
         if (!helpAlreadyLogged) {
@@ -881,26 +768,29 @@ var Help = (function() {
             var $this = $(this);
             e.preventDefault();
 
-            if (!$this.is('.disabled')) {
-                var url = $this.data('href');
-                if (url === '#support' && !u_type) {
+            if (!$this.is('.disabled') && $this.data('href')) {
+                var url = getCleanSitePath($this.data('href').replace('https://mega.nz', ''));
+                if (url === 'support' && !u_type) {
                     login_next = url;
-                    url = "#login";
+                    url = "login";
                 }
-
                 // Log that they clicked on the panel
                 api_req({ a: 'log', e: 99621, m: 'Help2 client selection panel used' });
-
-                document.location.href = url;
+                loadSubPage(url);
             }
         });
 
-        $('#help2-main').find('.scrollTo').rebind('click', function() {
+        $('#help2-main .scrollTo').rebind('click', function() {
             var $this = $(this);
+            var $target = $($(this).data('to'));
+
             if (!$this.is('.gray-inactive')) {
-                scrollTo($($(this).data('to')));
+                $('.sidebar-menu-link.active').removeClass('active');
+                $this.addClass('active');
+                $('.bottom-page.scroll-block, .old .fmholder').stop().animate({
+                    scrollTop: $target.position().top - 20
+                }, 1000);
             }
-            return false;
         });
 
         // FAQ items logging
@@ -970,7 +860,6 @@ var Help = (function() {
             }
         });
 
-        handleScroll();
     };
 
     return ns;

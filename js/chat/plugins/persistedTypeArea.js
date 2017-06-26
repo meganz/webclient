@@ -16,25 +16,30 @@ var PersistedTypeArea = function(megaChat) {
 
     megaChat.unbind("onInit.persistedTypeArea");
     megaChat.bind("onInit.persistedTypeArea", function(e) {
-        self.data = new IndexedDBKVStorage("persistedTypeArea", {}, true);
+        self.data = new SharedLocalKVStorage("pta2");
     });
 
     // clear on logout
     megaChat.unbind("onDestroy.persistedTypeArea");
     megaChat.bind("onDestroy.persistedTypeArea", function(e) {
-        self.data.destroy();
+        self.data.destroy(true);
     });
 
 
+
+
+    self._throttledUpdate = function(key, cb) {
+        delay('ptaupdate:' + key, cb, 250);
+    };
     return self;
 };
 
 PersistedTypeArea.prototype.updatePersistedTypedValue = function(chatRoom, value) {
-    return this.data.setItem(chatRoom.roomJid.split("@")[0], value);
-};
-
-PersistedTypeArea.prototype.hasPersistedTypedValue = function(chatRoom) {
-    return this.data.hasItem(chatRoom.roomJid.split("@")[0]);
+    var self = this;
+    var k = chatRoom.roomJid.split("@")[0];
+    self._throttledUpdate(k, function() {
+        self.data.setItem(chatRoom.roomJid.split("@")[0], value);
+    });
 };
 
 PersistedTypeArea.prototype.getPersistedTypedValue = function(chatRoom) {
@@ -42,6 +47,10 @@ PersistedTypeArea.prototype.getPersistedTypedValue = function(chatRoom) {
 };
 
 PersistedTypeArea.prototype.removePersistedTypedValue = function(chatRoom) {
-    return this.data.removeItem(chatRoom.roomJid.split("@")[0]);
+    var self = this;
+    var k = chatRoom.roomJid.split("@")[0];
+    self._throttledUpdate(k, function() {
+        self.data.removeItem(k);
+    });
 };
 makeObservable(PersistedTypeArea);

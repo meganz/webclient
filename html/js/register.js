@@ -53,7 +53,7 @@ function doregister() {
                     }
                     else {
                         u_type = r;
-                        document.location.hash = 'fm';
+                        loadSubPage('fm');
                     }
                 }
             };
@@ -142,6 +142,22 @@ function registeraccount() {
                             passwordManager($('#register_form'));
                             showToast('megasync', l[8745]);
                             boot_auth(ctx, r);
+
+                            if ($.ephNodes) {
+                                // The user got logged-in when trying to register, let's migrate the ephemeral account
+                                var msg = l[16517].replace('%1', rv.email);
+
+                                msgDialog('info', l[761], msg, null, function() {
+                                    $.onImportCopyNodes = $.ephNodes;
+                                    M.copyNodes(['meh'], u_handle, false, function(e) {
+                                        if (e) {
+                                            console.error(e);
+                                            debugger
+                                        }
+                                        location.reload();
+                                    });
+                                });
+                            }
                         }
                     }
                 };
@@ -165,7 +181,27 @@ function registeraccount() {
         rv.email = $('#register-email').val();
         rv.name = rv.first + ' ' + rv.last;
     }
-    sendsignuplink(rv.name, rv.email, rv.password, ctx);
+
+    var signup = sendsignuplink.bind(null, rv.name, rv.email, rv.password, ctx);
+
+    if (u_type === 0) {
+        // An ephemeral account is registering, save the cloud nodes in case we need to migrate later
+        var names = Object.create(null);
+        names[M.RootID] = 'ephemeral-account';
+
+        M.getCopyNodes([M.RootID], null, names)
+            .done(function(nodes) {
+                if (Array.isArray(nodes) && nodes.length) {
+                    $.ephNodes = nodes;
+                    $.ephNodes[0].t = 1; // change RootID's t2 to t1
+                }
+
+                signup();
+            });
+    }
+    else {
+        signup();
+    }
 }
 
 function pageregister() {
@@ -235,7 +271,7 @@ function pageregister() {
                         else {
                             loadingDialog.hide();
                             u_type = r;
-                            document.location.hash = 'fm';
+                            loadSubPage('fm');
                         }
                     }
                 };
@@ -329,14 +365,14 @@ function init_register() {
             $('.register-check').removeClass('checkboxOff');
         }
     });
-    if (typeof zxcvbn === 'undefined' && !silent_loading) {
+    if (typeof zxcvbn === 'undefined') {
         $('.login-register-input.password').addClass('loading');
-        silent_loading = function() {
-            $('.login-register-input.password').removeClass('loading');
-            registerpwcheck();
-        };
-        jsl.push(jsl2['zxcvbn_js']);
-        jsl_start();
+
+        M.require('zxcvbn_js')
+            .done(function() {
+                $('.login-register-input.password').removeClass('loading');
+                registerpwcheck();
+            });
     }
     $('#register-password').rebind('keyup', function(e) {
         registerpwcheck();
@@ -360,7 +396,7 @@ function init_register() {
             $('.register-check').removeClass('checkboxOff');
             $('.register-check').addClass('checkboxOn');
         };
-        termsDialog();
+        bottomPageDialog(false, 'terms');
         return false;
     });
     $('.login-register-input.email,.login-register-input.password').rebind('click', function(e) {

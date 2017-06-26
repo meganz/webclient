@@ -8,7 +8,7 @@
  * you accept this licence. If you do not accept the licence,
  * do not access the code.
  *
- * Words used in the Mega Limited Terms of Service [https://mega.nz/#terms]
+ * Words used in the Mega Limited Terms of Service [https://mega.nz/terms]
  * have the same meaning in this licence. Where there is any inconsistency
  * between this licence and those Terms of Service, these terms prevail.
  *
@@ -95,6 +95,10 @@
                         .addClass('download-complete')
                         .find('.download-progress')
                         .rebind('click', function() {
+
+                            // Store a log for statistics
+                            api_req({ a: 'log', e: 99637, m: 'Downloaded and opened file on mobile webclient' });
+
                             if (navigator.userAgent.match(/CriOS/i)) {
                                 var reader = new FileReader();
                                 reader.onload = function(e) {
@@ -102,7 +106,12 @@
                                 };
                                 return reader.readAsDataURL(blob);
                             }
-                            window.open(sblob, '_blank');
+
+                            // Store a log for statistics
+                            api_req({ a: 'log', e: 99637, m: 'Downloaded and opened file on mobile webclient' });
+
+                            // Redirect to object URL to download the file to the client
+                            location.href = sblob;
                             return false;
                         });
                     $('.mobile.download-speed, .mobile.download-percents').text('');
@@ -117,7 +126,7 @@
                 dlLinkNode.download = name;
                 dlLinkNode.href = blob_url;
                 dlLinkNode.click();
-                Later(function() {
+                later(function() {
                     myURL.revokeObjectURL(blob_url);
                     blob_url = undefined;
                 });

@@ -20,25 +20,26 @@ function render_blogarticle() {
     var i = 'post_' + blogid;
 
     if (blogposts['post_' + (parseInt(blogid) - 1)]) {
-        $('#blog_prev').attr('href', '#blog_' + blogposts['post_' + (parseInt(blogid) - 1)].id);
+        $('#blog_prev').attr('href', '/blog_' + blogposts['post_' + (parseInt(blogid) - 1)].id);
         $('#blog_prev').fadeTo(0, 1);
         $('#blog_prev').addClass('active');
     }
     else {
-        $('#blog_prev').attr('href', '#blog_' + blogid);
+        $('#blog_prev').attr('href', '/blog_' + blogid);
         $('#blog_prev').fadeTo(0, 0.4);
         $('#blog_prev').removeClass('active');
     }
     if (blogposts['post_' + (parseInt(blogid) + 1)]) {
-        $('#blog_next').attr('href', '#blog_' + blogposts['post_' + (parseInt(blogid) + 1)].id);
+        $('#blog_next').attr('href', '/blog_' + blogposts['post_' + (parseInt(blogid) + 1)].id);
         $('#blog_next').fadeTo(0, 1);
         $('#blog_next').addClass('active');
     }
     else {
-        $('#blog_next').attr('href', '#blog_' + blogid);
+        $('#blog_next').attr('href', '/blog_' + blogid);
         $('#blog_next').fadeTo(0, 0.4);
         $('#blog_next').removeClass('active');
     }
+    clickURLs();
     content = '';
     if (blogposts[i].attaches.bimg) {
         content += '<img alt=""  integrity="ni:///sha-256;'
@@ -57,7 +58,7 @@ function render_blogarticle() {
     content = content.replace(/(?:{|%7B)cmspath(?:%7D|})/g, CMS.getUrl());
 
     if (!content) {
-        document.location.hash = 'blog';
+        loadSubPage('blog');
     }
     $('body').addClass('blog-new');
     $('#blogarticle_post').safeHTML(content);
@@ -66,22 +67,7 @@ function render_blogarticle() {
 
     $('#blogarticle_by').safeHTML('<span>by:</span> ' + escapeHTML(by));
 
-    $('#blogarticle_post img').bind('load', function(e) {
-        $('.main-scroll-block').jScrollPane({
-            showArrows: true,
-            arrowSize: 5,
-            animateScroll: true,
-            mouseWheelSpeed: 50
-        });
-    });
-
     if (!m) {
         blog_archive();
     }
-    $('.main-scroll-block').jScrollPane({
-        showArrows: true,
-        arrowSize: 5,
-        animateScroll: true,
-        mouseWheelSpeed: 50
-    });
 }

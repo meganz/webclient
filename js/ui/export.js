@@ -86,7 +86,7 @@ var exportPassword = {
             this.$dialog = $('.export-links-dialog');
 
             // If they are a Pro user, enable the toggle button
-            if (typeof u_attr.p !== 'undefined') {
+            if (u_attr.p) {
                 this.initPasswordFeatureToggle();
             }
 
@@ -165,6 +165,9 @@ var exportPassword = {
                 // Add special styling for the link text
                 $linkBlock.addClass('password-protect-link');
 
+                // Reinit link body scrolling
+                exportPassword.encrypt.reInitScrolling();
+
                 // Reposition the dialog
                 exportPassword.encrypt.repositionDialog();
             });
@@ -216,6 +219,9 @@ var exportPassword = {
                 // Reset encryption button state and text to 'Encrypt'
                 $encryptButtonText.removeClass('encrypted').text(l[9061]);
 
+                // Reinit link body scrolling
+                exportPassword.encrypt.reInitScrolling();
+
                 // Reposition the dialog, and re-initialise the scrolling so it scrolls all the way to the bottom
                 exportPassword.encrypt.repositionDialog();
                 exportPassword.encrypt.reInitScrolling();
@@ -239,8 +245,12 @@ var exportPassword = {
          * changes. This is useful because the password links are longer and take up more lines to display.
          */
         reInitScrolling: function() {
-
-            this.$dialog.find('.export-link-body').jScrollPane({
+            var $scrollBlock = this.$dialog.find('.export-link-body');
+            var jsp = $scrollBlock.data('jsp');
+            if (jsp) {
+                jsp.destroy();
+            }
+            $scrollBlock.jScrollPane({
                 showArrows: true,
                 arrowSize: 5
             });
@@ -251,19 +261,16 @@ var exportPassword = {
          */
         loadPasswordEstimatorLibrary: function() {
 
-            if (typeof zxcvbn === 'undefined' && !silent_loading) {
+            if (typeof zxcvbn === 'undefined') {
 
                 // Show loading spinner
                 var $loader = this.$dialog.find('.estimator-loading-icon').addClass('loading');
 
                 // On completion of loading, hide the loading spinner
-                silent_loading = function() {
-                    $loader.removeClass('loading');
-                };
-
-                // Load the library
-                jsl.push(jsl2['zxcvbn_js']);
-                jsl_start();
+                M.require('zxcvbn_js')
+                    .done(function() {
+                        $loader.removeClass('loading');
+                    });
             }
         },
 
@@ -329,7 +336,7 @@ var exportPassword = {
             var $proButton = this.$dialog.find('.get-pro');
 
             // If they do not have Pro
-            if (typeof u_attr.p === 'undefined') {
+            if (!u_attr.p) {
 
                 // Hide the options initially
                 $extraOptions.addClass('hidden');
@@ -342,7 +349,7 @@ var exportPassword = {
 
                 // On button click, go to the Pro page
                 $proButton.rebind('click', function() {
-                    document.location.hash = 'pro';
+                    loadSubPage('pro');
                 });
             }
             else {
@@ -362,7 +369,7 @@ var exportPassword = {
                     $extraOptionsToggle.text(l[9064]);   // Hide options
 
                     // If they are not a Pro user, show the Get Pro button
-                    if (typeof u_attr.p === 'undefined') {
+                    if (!u_attr.p) {
                         $proButton.removeClass('hidden');
                     }
 
@@ -647,7 +654,8 @@ var exportPassword = {
 
             // Add a click handler for the close button to return to the home page (or cloud drive if logged in)
             $closeButton.rebind('click', function() {
-                location.hash = '';
+                loadSubPage('');
+                return false;
             });
 
             // Add click handler for Decrypt button
@@ -794,8 +802,11 @@ var exportPassword = {
                 // Clear password field
                 $password.val('');
 
+                // Add a log to see if the feature is used often
+                api_req({ a: 'log', e: 99633, m: 'Successfully decrypted password protected link on regular web' });
+
                 // On success, redirect to actual file/folder link
-                location.hash = url;
+                loadSubPage(url);
             });
         }
     },  // Decrypt functions
@@ -885,11 +896,16 @@ var exportPassword = {
         var keyLengthBits = this.algorithms[algorithm]['derivedKeyLength'];
         var keyLengthBytes = keyLengthBits / 8;
 
-        // Derive the key
-        var derivedKeyBytes = asmCrypto[name].bytes(passwordBytes, saltBytes, iterations, keyLengthBytes);
+        // Give the UI some time to update on slower devices like iOS
+        setTimeout(function() {
 
-        // Pass the derived key to the callback
-        callback(derivedKeyBytes);
+            // Derive the key
+            var derivedKeyBytes = asmCrypto[name].bytes(passwordBytes, saltBytes, iterations, keyLengthBytes);
+
+            // Pass the derived key to the callback
+            callback(derivedKeyBytes);
+
+        }, 500);
     },
 
     /**
@@ -972,7 +988,7 @@ var exportExpiry = {
     init: function() {
 
         // If they are a pro user, enable the expiry toggle button and date picker
-        if (typeof u_attr.p !== 'undefined') {
+        if (u_attr.p) {
             exportExpiry.initExpiryFeatureToggle();
             exportExpiry.initExpiryDatePicker();
             exportExpiry.prepopulateExpiryDates();
@@ -1306,13 +1322,11 @@ var exportExpiry = {
         fm_showoverlay();
 
         $linksDialog.removeClass('hidden');
-        $('.export-link-body').removeAttr('style');
         $('.export-links-warning').removeClass('hidden');
 
-        if ($('.export-link-body').outerHeight() === 318) {// ToDo: How did I find this integer?
-            $('.export-link-body').jScrollPane({ showArrows: true, arrowSize: 5 });
-            jScrollFade('.export-link-body');
-        }
+        $(scroll).jScrollPane({ showArrows: true, arrowSize: 5 });
+        jScrollFade(scroll);
+
         $linksDialog.css('margin-top', ($linksDialog.outerHeight() / 2) * -1);
 
         setTimeout(function() {
@@ -1333,7 +1347,7 @@ var exportExpiry = {
         $span.text(l[1990]);
 
         // If a browser extension or the new HTML5 native copy/paste is available (Chrome & Firefox)
-        if (is_extension || mega.utils.execCommandUsable()) {
+        if (is_extension || M.execCommandUsable()) {
             if (!is_chrome_firefox) {
                 $('.fm-dialog-chrome-clipboard').removeClass('hidden');
             }
@@ -1350,7 +1364,13 @@ var exportExpiry = {
                     // Put the link/s in an invisible div, highlight the link/s then copy to clipboard using HTML5
                     $('#chromeclipboard').html(links);
                     selectText('chromeclipboard');
-                    success = document.execCommand('copy');
+                    try {
+                        success = document.execCommand('copy');
+                    }
+                    catch (e) {
+                        console.error(e);
+                        success = false;
+                    }
                 }
 
                 if (success) {
@@ -1693,6 +1713,14 @@ var exportExpiry = {
 
         var self = this;
 
+        // Add some logging for usage comparisons
+        if (is_mobile) {
+            api_req({ a: 'log', e: 99634, m: 'Created public link on mobile webclient' });
+        }
+        else {
+            api_req({ a: 'log', e: 99635, m: 'Created public link on regular webclient' });
+        }
+
         // Prompt copyright dialog and if accepted get link, otherwise stall
         if (self.options.nodesToProcess.length) {
             loadingDialog.show();
@@ -1738,37 +1766,44 @@ var exportExpiry = {
     ExportLink.prototype._getFolderExportLinkRequest = function(nodeId) {
 
         var self = this;
-        var childNodes = [];
         var share = M.getNodeShare(nodeId);
 
         // No need to perform an API call if this folder was already exported (Ie, we're updating)
         if (share.h === nodeId) {
-            return self._getExportLinkRequest(nodeId);
+            if (!M.d[nodeId].t || u_sharekeys[nodeId]) {
+                return self._getExportLinkRequest(nodeId);
+            }
+
+            if (d) {
+                console.warn('Missing sharekey for "%s" - relying on s2 to obtain it...', nodeId);
+            }
         }
+        // FIXME: check this
 
         // Get all child nodes of root folder with nodeId
-        childNodes = fm_getnodes(nodeId);
-        childNodes.push(nodeId);
+        M.getNodes(nodeId, true)
+            .always(function(childNodes) {
 
-        var sharePromise = api_setshare(nodeId, [{ u: 'EXP', r: 0 }], childNodes);
-        sharePromise.done(function _sharePromiseDone(result) {
-            if (result.r && result.r[0] === 0) {
+                var sharePromise = api_setshare(nodeId, [{u: 'EXP', r: 0}], childNodes);
+                sharePromise.done(function _sharePromiseDone(result) {
+                    if (result.r && result.r[0] === 0) {
 
-                self._getExportLinkRequest(nodeId);
+                        self._getExportLinkRequest(nodeId);
 
-                if (!self.nodesLeft) {
-                    loadingDialog.hide();
-                }
-            }
-            else {
-                self.logger.warn('_getFolderExportLinkRequest', nodeId, 'Error code: ', result);
-                loadingDialog.hide();
-            }
-        });
-        sharePromise.fail(function _sharePromiseFailed(result) {
-            self.logger.warn('Get folder link failed: ' + result);
-            // XXX: this seem to lack some handling code for this condition
-        });
+                        if (!self.nodesLeft) {
+                            loadingDialog.hide();
+                        }
+                    }
+                    else {
+                        self.logger.warn('_getFolderExportLinkRequest', nodeId, 'Error code: ', result);
+                        loadingDialog.hide();
+                    }
+                });
+                sharePromise.fail(function _sharePromiseFailed(result) {
+                    self.logger.warn('Get folder link failed: ' + result);
+                    // FIXME: this seem to lack some handling code for this condition
+                });
+            });
     };
 
     /**
@@ -1792,12 +1827,21 @@ var exportExpiry = {
                     exportLinkDialog.linksDialog();
                 }
             }
+
+            // A hook for the mobile web to show the public link and the remove button
+            if (is_mobile) {
+                mobile.linkOverlay.showPublicLinkAndEnableButtons(nodeId);
+            }
         };
         var share = M.getNodeShare(nodeId);
         var request = { a: 'l', n: nodeId, i: requesti };
 
+        if (d) {
+            console.debug('_getExportLinkRequest', share.ph, Object(M.d[nodeId]).ph, share);
+        }
+
         // No need to perform an API call if this file was already exported (Ie, we're updating)
-        if (share.h === nodeId && share.ph) {
+        if (share.h === nodeId && Object(M.d[nodeId]).ph) {
             return done(nodeId);
         }
 
@@ -1810,9 +1854,9 @@ var exportExpiry = {
             nodeId: nodeId,
             callback: function(result) {
                 if (typeof result !== 'number') {
-                    M.nodeShare(this.nodeId, { h: this.nodeId, r: 0, u: 'EXP', ts: unixtime() });
-                    var n;
-                    if (fmdb && (n = M.d[this.nodeId])) {
+                    M.nodeShare(this.nodeId, { h: this.nodeId, r: 0, u: 'EXP', ts: unixtime(), ph: result });
+                    var n = M.d[this.nodeId];
+                    if (n) {
                         n.ph = result;
                         M.nodeUpdated(n);
                     }
@@ -1843,6 +1887,11 @@ var exportExpiry = {
                     if (self.options.updateUI) {
                         var UiExportLink = new mega.UI.Share.ExportLink();
                         UiExportLink.removeExportLinkIcon(this.nodeId);
+                    }
+
+                    // Hook for mobile web to show that removal completed successfully and then close the dialog
+                    if (is_mobile) {
+                        mobile.linkOverlay.completeLinkRemovalProcess(this.nodeId);
                     }
                 }
                 else {
@@ -1875,6 +1924,11 @@ var exportExpiry = {
                         var UiExportLink = new mega.UI.Share.ExportLink();
                         UiExportLink.removeExportLinkIcon(this.nodeId);
                     }
+
+                    // Hook for mobile web to show that removal completed successfully and then close the dialog
+                    if (is_mobile) {
+                        mobile.linkOverlay.completeLinkRemovalProcess(this.nodeId);
+                    }
                 }
                 else {
                     // Error
@@ -1890,7 +1944,7 @@ var exportExpiry = {
 
     /**
      * Returns true in case that any of checked items is taken down, otherwise false
-     * @param {Array} nodesId Array of strings nodes ids
+     * @param {Array|String} nodesId Array of strings nodes ids
      * @returns {Boolean}
      */
     ExportLink.prototype.isTakenDown = function(nodesId) {
@@ -2021,7 +2075,7 @@ var exportExpiry = {
             if (M.d[nodeId].fav === 1) {
 
                 // Remove favourite (star)
-                M.favourite(nodeId, true);
+                M.favourite(nodeId, 0);
             }
             self.addTakenDownIcon(nodeId);
         }

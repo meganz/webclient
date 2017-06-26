@@ -20,7 +20,7 @@
         "context": "Error message while downloading"
     },
     "17": {
-        "text": "Bandwidth quota exceeded",
+        "text": "Transfer quota exceeded",
         "context": "Free users have limited bandwidth quota, and when exceeded this message will be shown during the download. If you have difficulty translating \"quota\" you could also translate \"Bandwidth limit exceeded\" or \"Data limit exceeded\"."
     },
     "18": {
@@ -635,6 +635,10 @@
         "text": "Account",
         "context": "Sub category of the help section"
     },
+    "405": {
+        "text": "Tools",
+        "context": "Sub category of the help section"
+    },
     "408": {
         "text": "January",
         "context": ""
@@ -868,8 +872,8 @@
         "context": "Label for Storage space used. Maintain capital letters in each word."
     },
     "496": {
-        "text": "Bandwidth",
-        "context": "Text listed before the amount of bandwidth a user gets with a certain package. For example: \"8TB Bandwidth\". Can also be translated as data transfer."
+        "text": "Transfer quota",
+        "context": "Some text listed after the amount of transfer quota a user gets with a certain package. For example: \"8 TB Transfer quota\"."
     },
     "498": {
         "text": "per month",
@@ -1332,8 +1336,8 @@
         "context": ""
     },
     "731": {
-        "text": "The associated user account has been terminated due to multiple violations of our [A]Terms of Service[\/A].",
-        "context": ""
+        "text": "The account that created this link has been terminated due to multiple violations of our [A]Terms of Service[\/A].",
+        "context": "An error message which is shown when you open a file\/folder link (or other shared resource) and it's no longer available because the user account that created the link has been terminated due to multiple violations of our Terms of Service."
     },
     "732": {
         "text": "You are already logged into an account that is different from the one you are confirming. Please check your current session, log out, and then click on the confirmation link again.",
@@ -1683,10 +1687,6 @@
         "text": "Massive storage space",
         "context": ""
     },
-    "916": {
-        "text": "Generous bandwidth quota",
-        "context": ""
-    },
     "918": {
         "text": "Monthly",
         "context": ""
@@ -1772,7 +1772,7 @@
         "context": "Section name for the \"My Account\" section.\nPreferably one or two words. There is little space for this."
     },
     "952": {
-        "text": "Most devices can't download files greater than 4GB. Your download will probably fail.",
+        "text": "Most devices can't download files greater than 4 GB. Your download will probably fail.",
         "context": "Warning message"
     },
     "953": {
@@ -1834,10 +1834,6 @@
     "970": {
         "text": "Please enter a valid password.",
         "context": ""
-    },
-    "973": {
-        "text": "Used bandwidth",
-        "context": "a header above statistics for the utilized bandwidth for a users"
     },
     "974": {
         "text": "Manage your account",
@@ -1964,12 +1960,8 @@
         "context": "Warning message in a dialog that asks for confirmation before deleting something."
     },
     "1008": {
-        "text": "PRO bandwidth quota exceeded.",
-        "context": "Pro refers to the paid membership, which is often \"Pro\" in the same language. "
-    },
-    "1009": {
-        "text": "Need more bandwidth?",
-        "context": ""
+        "text": "PRO transfer quota exceeded.",
+        "context": "PRO refers to the paid membership, which is often \"PRO\" in the same language. "
     },
     "1010": {
         "text": "Storage quota exceeded.",
@@ -2123,14 +2115,6 @@
         "text": "Never",
         "context": ""
     },
-    "1053": {
-        "text": "Bandwidth quota almost exceeded.",
-        "context": ""
-    },
-    "1054": {
-        "text": "You will need to wait [X] until more bandwidth is assigned to you.",
-        "context": "[X] will be replaced with a time, for example: 30 minutes, or 2 hours."
-    },
     "1055": {
         "text": "Don't want to wait?",
         "context": ""
@@ -2181,6 +2165,10 @@
     },
     "1068": {
         "text": "Share folders with your contacts and see their updates in real time.",
+        "context": ""
+    },
+    "1070": {
+        "text": "How it works",
         "context": ""
     },
     "1073": {
@@ -4536,7 +4524,7 @@
         "context": "When a user attempt to download a file larger than 1GB using Firefox, he will be prompted with a dialog asking him to install our browser extension with this text."
     },
     "1933": {
-        "text": "To download files larger than 1GB, please install MEGAsync, Google Chrome or Opera.",
+        "text": "To download files larger than 1 GB, please install MEGAsync, Google Chrome or Opera.",
         "context": ""
     },
     "1934": {
@@ -5047,16 +5035,20 @@
         "text": "File import failed",
         "context": "Message of the dialog displayed when fails the process\/request to import an image."
     },
+    "2508": {
+        "text": "File import failed",
+        "context": "Title of the dialog displayed when fails the process\/request to import an image - (String as short as possible)."
+    },
     "2531": {
         "text": "Save image to photos",
         "context": "Title of the dialog displayed when a user want to save a image to the 'saved pictures' album, asking for confirmation to do it - (String as short as possible)."
     },
     "5526": {
-        "text": "MEGA is a secure cloud storage service that gives you 50GB for free.Unlike other cloud storage providers, your data is encrypted and decrypted by the client devices only and never by us.\r\nYour data is accessible any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.\r\nThe cloud in your pocket. Access and stream your files from your smartphone or tablet. Upload and sync your media to the cloud.\r\nSearch, store, download, stream, view, share, rename or delete your files. It's all there - in the palm of your hands.\r\nFor more info, please check our website: https:\/\/mega.nz\/",
+        "text": "MEGA is a secure cloud storage service that gives you 50 GB for free.Unlike other cloud storage providers, your data is encrypted and decrypted by the client devices only and never by us.\r\nYour data is accessible any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.\r\nThe cloud in your pocket. Access and stream your files from your smartphone or tablet. Upload and sync your media to the cloud.\r\nSearch, store, download, stream, view, share, rename or delete your files. It's all there - in the palm of your hands.\r\nFor more info, please check our website: https:\/\/mega.nz\/",
         "context": "Full description text of the app in the Google Play page of the app"
     },
     "5527": {
-        "text": "MEGA is Cloud Storage with Powerful Always-On Privacy. 50GB for free",
+        "text": "MEGA is Cloud Storage with Powerful Always-On Privacy. 50 GB for free",
         "context": "Short description text of the app in the Google Play page of the app"
     },
     "5528": {
@@ -6255,10 +6247,6 @@
         "text": "Get fully encrypted access anywhere, anytime.",
         "context": "Message shown on the app's start animation to explain what MEGA ACCESS means"
     },
-    "5834": {
-        "text": "MEGA is a secure cloud storage service with 50 GB free storage space.\r\n\r\nInside the app you can upgrade your storage space & bandwidth quota by subscribing to MEGA PRO with a monthly or yearly subscription.\r\nSubscriptions are \u20ac9.99 (US$10.99) per month or \u20ac99.99 (US$119.99) per year.\r\nThis subscription gives you 500 GB of storage space and 1000 GB of bandwidth per month.\r\nSubscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. You can switch off the automatic renewal of your MEGA PRO subscription no later than 24 hours before your next subscription payment is due via your iTunes account settings page. To manage your subscriptions, simply click on the App Store icon on your handset, sign in with your Apple ID at the bottom of the page (if you haven't already done so) and then click View\r\nID. You'll be taken to your account page where you can scroll down to Manage App Subscriptions. From here, you can select your\r\nMEGA PRO subscription and view your scheduled renewal date, choose a different subscription package or toggle the on-off switch to\r\noff to disable the auto-renewal of your subscription.\r\n\r\nTerms of Service:\r\nhttps:\/\/mega.nz\/ios_terms.html\r\nPrivacy policy:\r\nhttps:\/\/mega.nz\/ios_privacy.html",
-        "context": "MEGA description. Please adjust the new line position accordingly"
-    },
     "5835": {
         "text": "With PhotoSync, the photos you take with your iPhone will be automatically backed up to MEGA.\nYou can use WiFi or cellular connection and by enabling Background mode the app will upload photos when your location changes significantly.\n\nPasscode lock adds a new layer of security by requiring a four-digit passcode to be entered every time the app is launched. This will protect your files even if your iPhone falls into the wrong hands. There is also an option to erase all data and logout if the wrong password is entered over 10 times.\n\nVarious bug fixes and speed improvements.\n\nYour feedback is very important to us and, although we might not answer every email, we read each and every one.\n\nAlso, your 5-stars rating in the AppStore is always appreciated.",
         "context": "MEGA description. Please adjust the new line position accordingly"
@@ -6296,8 +6284,8 @@
         "context": ""
     },
     "5845": {
-        "text": "bandwidth used",
-        "context": "will be preppended by a number, for example: \"500 MB bandwidth used\""
+        "text": "transfer quota used",
+        "context": "This is the amount of bandwidth (transfer quota) that the user has used. This will be prepended by a number, for example, \"500 MB bandwidth used\"."
     },
     "5847": {
         "text": "Your purchase was successful. However, to finish the account creation process, you would need to activate your account by clicking on the link sent to your email.",
@@ -6509,6 +6497,10 @@
     },
     "5908": {
         "text": "Enter an e-mail or contact",
+        "context": ""
+    },
+    "5913": {
+        "text": "You can easily add new contacts by email or import existing contacts from other services.",
         "context": ""
     },
     "5914": {
@@ -8428,8 +8420,8 @@
         "context": "This question is displayed on the Feedback dialog and asks the user if we can contact them for more information or clarification about their feedback."
     },
     "6989": {
-        "text": "Free bandwidth quota exceeded",
-        "context": ""
+        "text": "Free transfer quota exceeded",
+        "context": "A dialog title explaining that the user has used all of their free transfer quota (bandwidth) that is available on their free account."
     },
     "6991": {
         "text": "Clear all transfers",
@@ -8780,8 +8772,8 @@
         "context": "Information on the over bandwidth quota dialog."
     },
     "7099": {
-        "text": "The IP address you are using has utilised %1 of data transfer in the last 6 hours, which took you over our current limit. To remove this limit, you can [A]upgrade to PRO[\/A], which will give you your own bandwidth package and also ample extra storage space. ",
-        "context": "Information on the over bandwidth quota dialog.\r\n\r\n%1 is the amount of bandwidth they have used e.g. 532 MB."
+        "text": "The IP address you are using has utilised %1 of data transfer in the last 6 hours, which took you over our current limit. To remove this limit, you can [A]upgrade to PRO[\/A], which will give you your own transfer quota package and also ample extra storage space. ",
+        "context": "Information on the over bandwidth quota dialog. Please leave the %1 placeholder which is the amount of bandwidth they have used e.g. 532 MB."
     },
     "7100": {
         "text": "Please upgrade to PRO to continue immediately, or wait %1 to continue for free. ",
@@ -9255,6 +9247,10 @@
         "text": "Are you sure you want to clear all transfers?",
         "context": ""
     },
+    "7226": {
+        "text": "Rubbish-Bin Cleaning Scheduler:",
+        "context": ""
+    },
     "7227": {
         "text": "Queued",
         "context": "Text shown when one file has been selected to be downloaded but it's on the queue to be downloaded, it's pending for download"
@@ -9288,7 +9284,7 @@
         "context": "A dialog box heading, when the user has tried to pay, but something has gone wrong."
     },
     "7236": {
-        "text": "To download files larger than 1GB or to upload folders, please install our MEGAsync client. This will allow easy, automated syncing between your computer and your MEGA cloud drive.",
+        "text": "To download files larger than 1 GB or to upload folders, please install our MEGAsync client. This will allow easy, automated syncing between your computer and your MEGA cloud drive.",
         "context": "Description in a popup dialog when they are trying to download a file larger than 1GB using the browser."
     },
     "7241": {
@@ -9894,10 +9890,6 @@
     "7399": {
         "text": "File is locked.",
         "context": "While uploading a file and we can't read it because it is locked by another program\/process."
-    },
-    "7400": {
-        "text": "We strongly suggest using our sync client for vastly improved performance<br\/> uploading hundreds of files. <a>Get MEGAsync now.<\/a>",
-        "context": "Please keep : <br \/>, <a>, <\/a>\r\n<br \/> new line tag\r\n<a> - link tag"
     },
     "7401": {
         "text": "CONTINUE ANYWAY",
@@ -10570,10 +10562,6 @@
     "7572": {
         "text": "Storage %@",
         "context": "Storage related with the MEGA PRO account level you can subscribe"
-    },
-    "7573": {
-        "text": "Bandwidth %@",
-        "context": "Bandwich related with the MEGA PRO account level you can subscribe"
     },
     "7574": {
         "text": "%.2f %@ per month",
@@ -11604,8 +11592,8 @@
         "context": "Search contacts section header."
     },
     "8011": {
-        "text": "Add from your Cloud Drive",
-        "context": "Button label. Allows to share files(from your Cloud Drive) in chat conversation "
+        "text": "Add from my Cloud Drive",
+        "context": "Button label. Allows to share files(from my Cloud Drive) in chat conversation "
     },
     "8012": {
         "text": "Quote",
@@ -12307,10 +12295,6 @@
         "text": "Read more",
         "context": "Open the whole blog post"
     },
-    "8513": {
-        "text": "MEGA is a secure cloud storage service that gives you 50 GB free storage space. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\r\n\r\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.\r\n\r\nThe encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Recovery Key backed up) or you will lose access to your stored files.\r\n\r\nInside the app you can upgrade your storage space and bandwidth quota with a monthly or yearly subscription.\r\n\r\nPRO LITE subscription: \u20ac4.99 (US$4.99) per month or \u20ac49.99 (US$49.99) per year gives you 200 GB of storage space and 1 TB of bandwidth per month.\r\nPRO I subscription: \u20ac9.99 (US$9.99) per month or \u20ac99.99 (US$99.99) per year gives you 500 GB of storage space and 2 TB of bandwidth per month.\r\nPRO II subscription: \u20ac19.99 (US$19.99) per month or \u20ac199.99 (US$199.99) per year gives you 2 TB of storage space and 4 TB of bandwidth per month.\r\nPRO III subscription: \u20ac29.99 (US$29.99) per month or \u20ac299.99 (US$299.99) per year gives you 4 TB of storage space and 8 TB of bandwidth per month.\r\n\r\nFor more info, please check our website:\r\nMobile - https:\/\/mega.nz\/mobile_terms.html\thttps:\/\/mega.nz\/mobile_privacy.html\r\nDesktop - https:\/\/mega.nz\/\r\n\r\nNote: For desktop access to your files MEGA needs to use HTML5 compatible browsers to handle our advanced features. We recommend Mozilla Firefox and Google Chrome. However the mobile versions of browsers cannot access the MEGA cloud storage system.",
-        "context": "IMPORTANT: Master Key has been renamed to Recovery Key.\r\n\r\nGeneral description of MEGA shown on the apps stores in Android, iOS and Windows Phone. KEEP \"\r\n\" AND \"\t\"."
-    },
     "8514": {
         "text": "Subscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. You can switch off the automatic renewal of your MEGA PRO subscription no later than 24 hours before your next subscription payment is due via your iTunes account settings page. To manage your subscriptions, simply click on the App Store icon on your handset, sign in with your Apple ID at the bottom of the page (if you haven't already done so) and then click View ID. You'll be taken to your account page where you can scroll down to Manage App Subscriptions. From there, you can select your MEGA PRO subscription and view your scheduled renewal date, choose a different subscription package or toggle the on-off switch to off to disable the auto-renewal of your subscription.",
         "context": "Specific paragraph shown only on the App Store in iOS"
@@ -12636,7 +12620,7 @@
         "context": "A warning for serious infringers who have had their accounts suspended. This is shown to them during login in a dialog."
     },
     "8604": {
-        "text": "This gives you 500 GB of storage space and 2 TB of bandwidth per month for one year.",
+        "text": "This gives you 500 GB of storage space and 2 TB of transfer quota per month for one year.",
         "context": "A description of the in-app purchase for the PRO I annual plan (only one year and no recurring subscription) in the Windows Phone store."
     },
     "8605": {
@@ -12644,7 +12628,7 @@
         "context": "Title of the in-app purchase for the PRO I annual plan in the Windows Phone store. This gives them only one year and no subscription."
     },
     "8606": {
-        "text": "This gives you 500 GB of storage space and 2 TB of bandwidth for one month.",
+        "text": "This gives you 500 GB of storage space and 2 TB of transfer quota for one month.",
         "context": "A description of the in-app purchase for the PRO I monthly plan (only one month and no subscription) in the Windows Phone store."
     },
     "8607": {
@@ -12652,7 +12636,7 @@
         "context": "Title of the in-app purchase for the PRO 1 monthly plan in the Windows Phone store. This gives them only one month and no subscription."
     },
     "8608": {
-        "text": "This gives you 2 TB of storage space and 4 TB of bandwidth per month for one year.",
+        "text": "This gives you 2 TB of storage space and 4 TB of transfer quota per month for one year.",
         "context": "A description of the in-app purchase for the PRO II annual plan (only one year and no recurring subscription) in the Windows Phone store."
     },
     "8609": {
@@ -12660,7 +12644,7 @@
         "context": "Title of the in-app purchase for the PRO II annual plan in the Windows Phone store. This gives them only one year and no subscription."
     },
     "8610": {
-        "text": "This gives you 2 TB of storage space and 4 TB of bandwidth for one month.",
+        "text": "This gives you 2 TB of storage space and 4 TB of transfer quota for one month.",
         "context": "A description of the in-app purchase for the PRO II monthly plan (only one month and no subscription) in the Windows Phone store."
     },
     "8611": {
@@ -12668,7 +12652,7 @@
         "context": "Title of the in-app purchase for the PRO II monthly plan in the Windows Phone store. This gives them only one month and no subscription."
     },
     "8612": {
-        "text": "This gives you 4 TB of storage space and 8 TB of bandwidth per month for one year.",
+        "text": "This gives you 4 TB of storage space and 8 TB of transfer quota per month for one year.",
         "context": "A description of the in-app purchase for the PRO III annual plan (only one year and no recurring subscription) in the Windows Phone store."
     },
     "8613": {
@@ -12676,7 +12660,7 @@
         "context": "Title of the in-app purchase for the PRO III annual plan in the Windows Phone store. This gives them only one year and no subscription."
     },
     "8614": {
-        "text": "This gives you 4 TB of storage space and 8 TB of bandwidth for one month.",
+        "text": "This gives you 4 TB of storage space and 8 TB of transfer quota for one month.",
         "context": "A description of the in-app purchase for the PRO III monthly plan (only one month and no subscription) in the Windows Phone store."
     },
     "8615": {
@@ -12684,7 +12668,7 @@
         "context": "Title of the in-app purchase for the PRO III monthly plan in the Windows Phone store. This gives them only one month and no subscription."
     },
     "8616": {
-        "text": "This gives you 200 GB of storage space and 1 TB of bandwidth per month for one year.",
+        "text": "This gives you 200 GB of storage space and 1 TB of transfer quota per month for one year.",
         "context": "A description of the in-app purchase for the PRO LITE annual plan (only one year and no recurring subscription) in the Windows Phone store."
     },
     "8617": {
@@ -12692,7 +12676,7 @@
         "context": "Title of the in-app purchase for the LITE annual plan in the Windows Phone store. This gives them only one year and no subscription."
     },
     "8618": {
-        "text": "This gives you 200 GB of storage space and 1 TB of bandwidth for one month.",
+        "text": "This gives you 200 GB of storage space and 1 TB of transfer quota for one month.",
         "context": "A description of the in-app purchase for the PRO LITE monthly plan (only one month and no subscription) in the Windows Phone store."
     },
     "8619": {
@@ -12752,7 +12736,7 @@
         "context": "A button label. The button allows the user to leave the conversation."
     },
     "8634": {
-        "text": "Log in or create an account to [S]get 50GB FREE[\/S] cloud storage and to receive messages from your friends and coworkers.",
+        "text": "Log in or create an account to [S]get 50 GB FREE[\/S] cloud storage and to receive messages from your friends and coworkers.",
         "context": "Some information for users that are not logged in. Please leave the [S] and [\/S] placeholder tags as they will be replaced at runtime."
     },
     "8635": {
@@ -13228,7 +13212,7 @@
         "context": "A title which is shown under the action that allows you to save several images to your camera roll."
     },
     "8762": {
-        "text": "Create an account to [S]get 50GB FREE[\/S] cloud storage and to receive messages from your friends and coworkers.",
+        "text": "Create an account to [S]get 50 GB FREE[\/S] cloud storage and to receive messages from your friends and coworkers.",
         "context": "A message on the cloud drive screen when they are on an ephemeral session and they have no files or folders in their account. This prompts them to register an account for extra features. Please keep the [S] and [\/S] tags which will be used to style that text red at runtime."
     },
     "8763": {
@@ -13512,7 +13496,7 @@
         "context": "A label for any memory (RAM) statistics button, link, text, title, etc."
     },
     "8833": {
-        "text": "To enhance this limit, you can register an account. This will not only give you ample extra bandwidth but also 50 GB of secure storage space in the cloud - [B]for free[\/B].",
+        "text": "To enhance this limit, you can register an account. This will not only give you ample extra transfer quota but also 50 GB of secure storage space in the cloud - [B]for free[\/B].",
         "context": "A message displayed to encourage the user to register an account for extra bandwidth and free storage. Please keep the [B] and [\/B] tags as they will be used to stylise the text at runtime."
     },
     "8834": {
@@ -13920,12 +13904,12 @@
         "context": "Progress indicator message when importing a folder - (String as short as possible)."
     },
     "8943": {
-        "text": "Limited available bandwidth",
-        "context": "Warning header. Informs user that bandwidth is limited for current membership plan."
+        "text": "Limited transfer quota available ",
+        "context": "A warning header. This informs the user that bandwidth (transfer quota) is limited for their current membership plan."
     },
     "8944": {
-        "text": "Your transfer may be interrupted.[BR]\r\n[S]Get a PRO account[\/S] for increased bandwidth quota.",
-        "context": "Informs user that bandwidth is limited for current membership plan. User can buy PRO plan to increase bandwidth quota.\r\n\r\nPlease leave [BR], [S], [\/S] as it is."
+        "text": "Your transfer may be interrupted.[BR]\r\n[S]Get a PRO account[\/S] for an increased transfer quota.",
+        "context": "Informs the user that bandwidth (transfer quota) is limited for their current membership plan. The user can buy a PRO plan to increase their transfer quota. Please leave [BR], [S], [\/S] placeholders as they are."
     },
     "8945": {
         "text": "Continue without account",
@@ -13948,15 +13932,15 @@
         "context": "Mobile-webclient, downloads page.\r\n\r\nOnce a download has finished downloading through the mobile browser, clicking this button will open the downloaded file in the mobile browser itself."
     },
     "8950": {
-        "text": "Install our mobile app to get [S]free 50GB encrypted cloud storage![\/S]",
+        "text": "Install our mobile app to get [S]free 50 GB encrypted cloud storage![\/S]",
         "context": "Mobile-webclient, downloads page.\r\n\r\nWhile downloading through the mobile browser, this message is shown to users to encourage installing our app.\r\n\r\n[S] is replaced with <span> and the text within turns red."
     },
     "8951": {
-        "text": "This file is too large to open in your mobile browser. Please install our mobile app for [S]unlimited file size support, and free 50GB cloud storage![\/S]",
+        "text": "This file is too large to open in your mobile browser. Please install our mobile app for [S]unlimited file size support, and free 50 GB cloud storage![\/S]",
         "context": "Mobile-webclient, downloads page.\r\n\r\nWhen viewing a download link through the mobile browser, and the filesize exceeds an stated limit. \r\n\r\n[S] is replaced with <span> and the text within turns red."
     },
     "8952": {
-        "text": "This file could not be opened in your mobile browser. Please install our mobile app for [S]unlimited file size and type support, and free 50GB cloud storage![\/S]",
+        "text": "This file could not be opened in your mobile browser. Please install our mobile app for [S]unlimited file size and type support, and free 50 GB cloud storage![\/S]",
         "context": "Mobile-webclient, downloads page.\r\n\r\nWhen viewing a download link through the mobile browser, and the file-type cannot be handled through the mobile browser itself. (The message is shown BEFORE trying to download the file)\r\n\r\n[S] is replaced with <span> and the text within turns red."
     },
     "8953": {
@@ -14324,8 +14308,8 @@
         "context": "A dialog message which is displayed when the process\/request to import a folder link fails."
     },
     "9045": {
-        "text": "The associated user account has been terminated due to multiple violations of our Terms of Service.",
-        "context": "An error message which is shown when you open a file\/folder link (or other shared resource) and it's no longer available because the the associated user account has been terminated due to multiple violations of our Terms of Service."
+        "text": "The account that created this link has been terminated due to multiple violations of our Terms of Service.",
+        "context": "An error message which is shown when you open a file\/folder link (or other shared resource) and it's no longer available because the user account that created the link has been terminated due to multiple violations of our Terms of Service."
     },
     "9046": {
         "text": "The account confirmation link that you are using is incomplete. Please check the link length and be sure that you have copied the entire link then try again.",
@@ -15096,11 +15080,1999 @@
         "context": "The invitation status on the invitation dialog of the achievements page."
     },
     "16106": {
-        "text": "Your purchase of MEGA services will be processed by ECP for [B]Mega Europe sarl, 4 Rue Graham Bell, L-3235, Bettembourg, Luxembourg[\/B].",
-        "context": "An informational message on the payment dialog. Please leave the [B] and [\/B] tags which will be used to change the colour of the text. The text between the tags (the address) does not need to be translated. ECP is the name of a payment provider and does not need to be translated."
+        "text": "Your purchase of MEGA services will be processed for [B]Mega Europe sarl, 4 Rue Graham Bell, L-3235, Bettembourg, Luxembourg[\/B].",
+        "context": "An informational message on the payment dialog. Please leave the [B] and [\/B] tags which will be used to change the colour of the text. The text between the tags (the address) does not need to be translated."
     },
     "16107": {
         "text": "Did you know that you can download the entire folder at once if you [S]install the free MEGA app[\/S]?",
         "context": "A hint message on the download overlay after coming from a mobile folder link. Do not remove the [S] and [\/S] tags which will be used to highlight the text red."
+    },
+    "16108": {
+        "text": "Logout options:",
+        "context": "Header for new setting option which will allow users to drop indexedDB on logout"
+    },
+    "16109": {
+        "text": "Wipe all local metadata when logging out - Your next login will take longer to process.",
+        "context": "drop-local-database option, if the user selects this choice then Mega will remove all the locally encrypted data it has stored. Without this data the login process is slower."
+    },
+    "16110": {
+        "text": "Leave encrypted metadata saved locally for a faster login with your next session.",
+        "context": "drop-local-database option, if the user selects this choice then Mega will keep all the locally encrypted data it has stored. This data can be used to speed up the login process."
+    },
+    "16111": {
+        "text": "Plans & Pricing",
+        "context": "A button which leads to the section where you can see all membership plans and prices."
+    },
+    "16112": {
+        "text": "About MEGA",
+        "context": "A button which leads to a section where you can see all information about the company."
+    },
+    "16113": {
+        "text": "Privacy Company",
+        "context": "A button which leads to a section (mega.nz#privacycompany) where you can see all information about MEGA: The Privacy Company."
+    },
+    "16114": {
+        "text": "Legal and Policies",
+        "context": "A dropdown which contains links to Terms of Service, Privacy Policy and Copyright sections."
+    },
+    "16115": {
+        "text": "Cancel account",
+        "context": "A button in the My Account section. This will let the user delete\/remove\/cancel their account."
+    },
+    "16116": {
+        "text": "[S]Warning:[\/S] You will not be able to access your account data, your MEGA contacts or conversations after you confirm this action.",
+        "context": "Some warning information for the Cancel Account button. It warns the user that their data cannot be restored after deleting their account."
+    },
+    "16117": {
+        "text": "Achievements",
+        "context": "The Achievements section header\/title. This section contains information about bonuses for achieving specific goals or hitting predetermined targets."
+    },
+    "16118": {
+        "text": "Overall Usage",
+        "context": "A header\/title of a block in the My Account section. It contains information about the user's used\/available storage and transfer quotas. "
+    },
+    "16119": {
+        "text": "[S]Storage[\/S]",
+        "context": "Short for \"Storage quota\". Header of the block which contains information about used\/available storage space on the cloud drive. Please leave [S] and [\/S] as is."
+    },
+    "16120": {
+        "text": "[S]Transfer[\/S]",
+        "context": "This is short for \"Transfer quota\". It is the header\/title of block\/section which contains information about used\/available transfer quota. Please leave the [S] and [\/S] tags."
+    },
+    "16121": {
+        "text": "Used Storage",
+        "context": "A header\/title of a block\/section which contains information about the user's used storage space on their cloud drive."
+    },
+    "16122": {
+        "text": "Transfer Quota",
+        "context": "The header\/title of a block\/section which contains information about the user's used\/available transfer allowance for their account."
+    },
+    "16123": {
+        "text": "[S]Transfer quota usage[\/S] is recorded by IP address for free accounts (and may include other users on the same IP). The transfer quota for free accounts is dynamic and depends on the amount of unused bandwidth we have available.[BR] You can increase your quota by [A]Upgrading to PRO[\/A].",
+        "context": "Some information about the base transfer quota which is available for free accounts. Please leave the placeholder tags [S], [\/S], [A], [\/A] and [BR]."
+    },
+    "16124": {
+        "text": "[S]Transfer quota usage[\/S] is recorded by IP address for free accounts (and may include other users on the same IP). The transfer quota for free accounts is dynamic and depends on the amount of unused bandwidth we have available.[BR] You can increase your quota by completing [S]Account Achievements[\/S] or by [A]Upgrading to PRO[\/A].",
+        "context": "Some information about base transfer quota which is available for free accounts. Please leave the [S], [\/S], [A], [\/A] and [BR] placeholder tags."
+    },
+    "16125": {
+        "text": "Used quota for the last 6 hours:",
+        "context": "The used quota is the free transfer allowance for the IP address the user is currently using."
+    },
+    "16126": {
+        "text": "Get more transfer quota",
+        "context": "A button which allows the user to get more transfer quota by upgrading their account to PRO or by completing some Account Achievements."
+    },
+    "16127": {
+        "text": "Storage Quota",
+        "context": "A header\/title of a section which contains information about used\/available storage space on a user's cloud drive."
+    },
+    "16128": {
+        "text": "Member since",
+        "context": "Information about the account creation date. The date will be appended to the end. E.g. Member since January 1, 2016."
+    },
+    "16129": {
+        "text": "Your password is not stored by MEGA so we cannot recover it for you. For reliable access to your account we recommend that you download and save your Recovery Key in a secure place.",
+        "context": "Information for the Backup Recovery Key button which allows the user to download their recovery key. "
+    },
+    "16130": {
+        "text": "Data",
+        "context": "The header\/title of a section which contains information about files\/folders\/rubbish bin etc which are stored on the cloud drive."
+    },
+    "16131": {
+        "text": "All Files",
+        "context": "Information about all files the user has stored on MEGA."
+    },
+    "16132": {
+        "text": "All Folders",
+        "context": "Information about all the folders the user has stored on MEGA."
+    },
+    "16133": {
+        "text": "Linked Files",
+        "context": "Information about all files stored on MEGA with a public link. A public link is a link to a file which can be sent to another user to download directly and they do not need to be a registered user on MEGA. "
+    },
+    "16134": {
+        "text": "Favourited Files",
+        "context": "Information about all the user's files stored on MEGA which were marked as Favourite."
+    },
+    "16135": {
+        "text": "You're running out of cloud space.[BR] Please consider upgrading your account plan.",
+        "context": "Error message shown when you have almost used available storage. Please leave [BR] as it is."
+    },
+    "16136": {
+        "text": "Your account has exceeded its allowed storage quota. Free space on your Cloud Drive or [A]upgrade[\/A] to keep enjoying secure, end-to-end encrypted storage.",
+        "context": "An error message which is shown when the user has used more MEGA storage than they are allowed. Please leave the [A] and [\/A] tags as they will be replaced with a hyperlink."
+    },
+    "16137": {
+        "text": "Your account has exceeded its allowed transfer quota. You can wait until you have enough transfer quota available or [A]upgrade[\/A] to keep enjoying secure, end-to-end encrypted storage.",
+        "context": "An error message which is shown when the user has used more MEGA transfer quota than they are allowed. Please leave the [A] and [\/A] tags as they will be replaced with a hyperlink."
+    },
+    "16138": {
+        "text": "Your account has exceeded its allowed storage & transfer quota. You can free up space on your Cloud Drive and wait until you have enough transfer quota available or [A]upgrade[\/A] to keep enjoying secure, end-to-end encrypted storage.",
+        "context": "An error message which is shown when the user has used more MEGA storage and transfer quota than they are allowed. Please leave the [A] and [\/A] as they will be replaced with a hyperlink."
+    },
+    "16139": {
+        "text": "Email & Password",
+        "context": "A section header. The user can change their email and password in this section."
+    },
+    "16140": {
+        "text": "Payment and Plan",
+        "context": "A section header\/title. This section contains information about the user's current membership plan, account balance, storage and transfer quotas."
+    },
+    "16141": {
+        "text": "Enable",
+        "context": "A label to let the user enable\/disable a specific feature."
+    },
+    "16142": {
+        "text": "Disable",
+        "context": "A label to let the user enable\/disable a specific feature."
+    },
+    "16143": {
+        "text": "Enable Notifications",
+        "context": "The header\/title of a section where the user can turn notifications on or off."
+    },
+    "16144": {
+        "text": "Desktop Notifications",
+        "context": "A header\/title of a section where a user can turn notifications off or on."
+    },
+    "16145": {
+        "text": "New shared folder from contact",
+        "context": "A label for a checkbox which allows users to turn notifications on or off about new shared folders."
+    },
+    "16146": {
+        "text": "Access to shared folder was removed",
+        "context": "A label for a checkbox which allows the user to turn notifications on or off. This notification is about removing access to incoming shared folders by another user."
+    },
+    "16147": {
+        "text": "Contact added files to a shared folder",
+        "context": "A label for a checkbox which allows the user to turn notifications on or off about new files in incoming shared folders."
+    },
+    "16148": {
+        "text": "Someone sent you a contact request",
+        "context": "A label for checkbox which allows the user to turn notifications on or off about new contact requests."
+    },
+    "16149": {
+        "text": "When someone accepted your contact request",
+        "context": "A label for checkbox which allows the user to turn notifications on or off about accepted contact requests."
+    },
+    "16150": {
+        "text": "Someone deleted your contact request",
+        "context": "A label for a checkbox which allows the user to turn notifications on or off about deleted contact requests."
+    },
+    "16151": {
+        "text": "Tips and Hints:",
+        "context": "The header\/title of section. It contains information about MEGA tips and hints which may help user get to know MEGA and all of its functionality."
+    },
+    "16152": {
+        "text": "Our tips and hints help you get to know MEGA and all of its functionality. It's hard to learn everything all at once so you can reset those tips and hints anytime.",
+        "context": "Information about MEGA tips and hints which may help the user get to know MEGA."
+    },
+    "16153": {
+        "text": "Reset Tips and Hints",
+        "context": "This button allows re-showing the Tips and Hints which a user has already seen before."
+    },
+    "16154": {
+        "text": "Remove files older than",
+        "context": "A rubbish bin scheduler setting which allows removing old files from the rubbish bin automatically. E.g. Remove files older than 15 days."
+    },
+    "16155": {
+        "text": "Keep the Rubbish Bin under",
+        "context": "A rubbish bin scheduler setting which allows for automatic removal of files from the rubbish bin if the rubbish bin takes more space than user has set. E.g. Keep the Rubbish Bin under 2 GB."
+    },
+    "16156": {
+        "text": "Grant your transfer quota to users downloading your links:",
+        "context": "The maximum percentage of your bandwidth which is available to third party users."
+    },
+    "16157": {
+        "text": "This is the maximum percentage of your transfer quota which is available to other users downloading your links.",
+        "context": "Information for transfer quota settings. User is able to set transfer quota limit for other users. Almost same with 8844 string."
+    },
+    "16158": {
+        "text": "User Interface",
+        "context": "A section header which contains the web client user interface settings."
+    },
+    "16159": {
+        "text": "File Management",
+        "context": "A section header which contains the file management settings. These settings allow users to remove duplicate files etc."
+    },
+    "16160": {
+        "text": "Generous transfer quota",
+        "context": "Information about a MEGA advantage e.g. MEGA provides massive storage space and a generous transfer quota."
+    },
+    "16161": {
+        "text": "Transfer quota exceeded",
+        "context": "Free users have limited transfer quota and when exceeded this message will be shown during the download. If you have difficulty translating the word \"quota\" you could also translate \"Transfer limit exceeded\" or \"Data limit exceeded\"."
+    },
+    "16162": {
+        "text": "Free transfer quota exceeded",
+        "context": "Free users have a limited transfer quota and when exceeded this message will be shown during the download. If you have difficulty translating \"quota\" you could also translate \"Transfer limit exceeded\" or \"Data limit exceeded\"."
+    },
+    "16163": {
+        "text": "Your download could not proceed because it would take you over the current free transfer allowance for your IP address. This limit is dynamic and depends on the amount of unused bandwidth we have available.",
+        "context": "A warning message which is displayed about why the user's download cannot proceed. The reason is because they would be over their transfer quota."
+    },
+    "16164": {
+        "text": "Limited available transfer quota",
+        "context": "A warning header\/title. This informs the user that their transfer quota is limited for the current membership plan."
+    },
+    "16165": {
+        "text": "Your transfer may be interrupted.[BR]\r\n[S]Get a PRO account[\/S] for increased transfer quota.",
+        "context": "This informs the user that their transfer quota is limited for their current membership plan. The user can buy a PRO plan to increase their transfer quota. Please leave the [BR], [S] and [\/S] tags."
+    },
+    "16166": {
+        "text": "Plan",
+        "context": "A membership plan e.g. Free, PRO Lite, PRO I etc."
+    },
+    "16167": {
+        "text": "You can also pay via the Google Play Store, Apple App Store, Microsoft Store or Android mobile carrier billing when using our [A]MEGA apps[\/A].",
+        "context": "A message on the #pro page telling the user we also offer other payment methods. The [A] and [\/A] tags will be replaced with a hyperlink to the #mobile page so do not remove them from the translated text."
+    },
+    "16168": {
+        "text": "Saving settings...",
+        "context": "A toast notification which is shown when saving settings."
+    },
+    "16169": {
+        "text": "Date created",
+        "context": "A table column header for the date when a file was created."
+    },
+    "16171": {
+        "text": "There is an unknown error in the download path. Please try again and if it continues to fail, please contact support@mega.nz. [{0}]",
+        "context": "A dialog message which is displayed when the process\/request to download a file\/folder failed because of an unknown error in the download path.\r\nPlease preserve the [{0}] code because is for including the error code or the error message at runtime."
+    },
+    "16172": {
+        "text": "Label...",
+        "context": "Context menu item which allows to mark folders with own color label"
+    },
+    "16173": {
+        "text": "Choose colour:",
+        "context": "Context menu item which allows to choose color of selected folder"
+    },
+    "16174": {
+        "text": "Date Modified",
+        "context": "A table column header for the date when a file was modified."
+    },
+    "16175": {
+        "text": "Subscription Expires On",
+        "context": "A label on the My Account page indicating the expiration date of a PRO account. This is shown if they do not have a recurring subscription (e.g. the purchased a one-off plan for a specific time period) or the recurring subscription was recently canceled so they still have some time remaining on their plan."
+    },
+    "16176": {
+        "text": "Paste",
+        "context": "A button which allows the user to paste a file\/folder into another folder."
+    },
+    "16177": {
+        "text": "Remaining Downloads",
+        "context": "A label to indicate the number of remaining downloads."
+    },
+    "16178": {
+        "text": "download speed",
+        "context": "A label to indicate the actual current download speed."
+    },
+    "16179": {
+        "text": "Remaining Uploads",
+        "context": "A label to indicate the number of remaining uploads."
+    },
+    "16180": {
+        "text": "upload speed",
+        "context": "A label to indicate the actual current upload speed."
+    },
+    "16181": {
+        "text": "PAUSED",
+        "context": "A label to indicate a global paused (temporarily halted) state for all active file transfers."
+    },
+    "16182": {
+        "text": "Resume download",
+        "context": "A button label to resume the actual download."
+    },
+    "16183": {
+        "text": "Pause Download",
+        "context": "A button label to pause the actual download."
+    },
+    "16184": {
+        "text": "Resume upload",
+        "context": "A button label to resume the actual upload."
+    },
+    "16185": {
+        "text": "Pause upload",
+        "context": "A button label to pause the actual upload."
+    },
+    "16186": {
+        "text": "You are syncing a local folder formatted with a FAT filesystem. That filesystem has deficiencies managing big files and modification times that can cause synchronization problems (e.g. when daylight saving changes), so it's strongly recommended that you only sync folders formatted with more reliable filesystems like NTFS (more information [A]here[\/A]).",
+        "context": "A message which is shown to the user to inform them when they are trying to sync a folder formatted with the FAT filesystem."
+    },
+    "16187": {
+        "text": "Download rate limit",
+        "context": "A label to indicate the actual bandwidth limit for downloads."
+    },
+    "16188": {
+        "text": "Number of parallel TCP connections per transfer:",
+        "context": "A label to indicate the actual number of parallel TCP connections used by MEGAsync. Keep the colon in the translation."
+    },
+    "16189": {
+        "text": "When you finish this assistant, you will be able to sync additional folders using the settings dialog.",
+        "context": "A label to inform the user about the possibility to add new synchronisations through the settings dialog once the initial setup wizard is at the final stage."
+    },
+    "16190": {
+        "text": "Active Transfers",
+        "context": "A label of a tab to access and see all active transfers."
+    },
+    "16192": {
+        "text": "This message has been deleted",
+        "context": "A log message in a chat to indicate that the message has been deleted by the user."
+    },
+    "16194": {
+        "text": "[A] was removed from the group chat by [B].",
+        "context": "A log message in a chat conversation to tell the reader that a participant [A] was removed from the group chat by the moderator [B]. Please keep [A] and [B], they will be replaced by the participant and the moderator names at runtime. For example: Alice was removed from the group chat by Frank."
+    },
+    "16195": {
+        "text": "[A] left the group chat.",
+        "context": "A log message in the chat conversation to tell the reader that a participant [A] left the group chat. For example: Alice left the group chat."
+    },
+    "16196": {
+        "text": "[A] joined the group chat by invitation from [B].",
+        "context": "A log message in a chat conversation to tell the reader that a participant [A] was added to the chat by a moderator [B]. Please keep the [A] and [B] placeholders, they will be replaced by the participant and the moderator names at runtime. For example: Alice joined the group chat by invitation from Frank."
+    },
+    "16197": {
+        "text": "[A] cleared the chat history.",
+        "context": "A log message in the chat conversation to tell the reader that a participant [A] cleared the history of the chat. For example, Alice cleared the chat history."
+    },
+    "16198": {
+        "text": "[A] was changed to [B] by [C].",
+        "context": "A log message in a chat to display that a participant's permission was changed and by whom. This message begins with the user's name who receive the permission change [A]. [B] will be replaced with the permission name (such as Moderator or Read-only) and [C] will be replaced with the person who did it. Please keep the [A], [B] and [C] placeholders, they will be replaced at runtime. For example: Alice Jones was changed to Moderator by John Smith."
+    },
+    "16199": {
+        "text": "[A] changed group chat name to '[B]'.",
+        "context": "A log message in the chat conversation to tell the reader that a participant [A] changed group chat name to [B]. Please keep the [A] and '[B]' placeholders, they will be replaced at runtime. For example: Alice changed group chat name to 'MEGA'."
+    },
+    "16200": {
+        "text": "Voice and Video Calls",
+        "context": "Section title of a button where you can enable mobile data for voice and video calls."
+    },
+    "16201": {
+        "text": "Use Mobile Data",
+        "context": "Title next to a switch button (On-Off) to allow using mobile data (Roaming) for a feature."
+    },
+    "16202": {
+        "text": "You can chat with your contacts, share files and make voice and video calls.",
+        "context": "Footer text to explain the meaning of the chat 'Online' status."
+    },
+    "16203": {
+        "text": "You will appear offline to your contacts and you will not be able to chat with them.",
+        "context": "Footer text to explain the meaning of the chat 'Offline' status."
+    },
+    "16204": {
+        "text": "Send Message",
+        "context": "Title to perform the action of sending a message to a contact."
+    },
+    "16205": {
+        "text": "Verify Credentials",
+        "context": "Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact's fingerprint credentials. The fingerprint credentials are cryptographic identification for the account, a piece of information about the identity of the account."
+    },
+    "16206": {
+        "text": "Close Chat",
+        "context": "Button title that allows the user to close a chat."
+    },
+    "16207": {
+        "text": "Contact Credentials",
+        "context": "Label title above the fingerprint credentials of a user's contact. A credential in this case is a stored piece of information representing the identity of the contact"
+    },
+    "16208": {
+        "text": "Your Credentials",
+        "context": "Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity. The fingerprint credentials are  a cryptographic identifier for your account."
+    },
+    "16209": {
+        "text": "Start Conversation",
+        "context": "start a chat\/conversation"
+    },
+    "16210": {
+        "text": "Group",
+        "context": "Title of a menu button which allows users to start a conversation creating a 'Group' chat."
+    },
+    "16211": {
+        "text": "Group Info",
+        "context": "Title of section where you can see the chat group information and the options that you can do with it. Like 'Notifications' or 'Leave Group' and also the participants of the group"
+    },
+    "16212": {
+        "text": "Group Chat",
+        "context": "Label title for a group chat"
+    },
+    "16213": {
+        "text": "Change Group Avatar",
+        "context": "Title of the action that allows you to change the avatar of a group chat. (Change the picture associated with the group)"
+    },
+    "16214": {
+        "text": "Mute",
+        "context": "A button label. The button allows the user to mute a conversation."
+    },
+    "16216": {
+        "text": "Leave Group",
+        "context": "Button title that allows the user to leave a group chat."
+    },
+    "16217": {
+        "text": "Participants",
+        "context": "Label to describe the section where you can see the participants of a group chat"
+    },
+    "16218": {
+        "text": "Conversation with %@",
+        "context": "Chat conversation header with user %@. Please leave %@ as it is."
+    },
+    "16219": {
+        "text": "Chat not found",
+        "context": "Alert message shown when a chat does not exist"
+    },
+    "16220": {
+        "text": "%@ is typing ...",
+        "context": "A typing indicator in the chat. Please leave the %@ which will be automatically replaced with the user's name at runtime."
+    },
+    "16221": {
+        "text": "Add label %1",
+        "context": "Information text for the user which tells them they can mark a folder or file with its own color. Example: Add label \"Red\". Please leave the %1 placeholder as it is because it will be replaced by the color name e.g. Red, Green, Blue etc."
+    },
+    "16222": {
+        "text": "Remove label %1",
+        "context": "Information text for the user that let's the user know that they can remove a colour from a folder or file that was already marked. Example: Remove label \"Red\". Please leave the %1 placeholder as it is because it will be replaced by the colour name e.g. Red, Green Blue etc."
+    },
+    "16223": {
+        "text": "Red",
+        "context": "A user can mark a folder or file with its own colour. The full string is: Add label \"Red\"."
+    },
+    "16224": {
+        "text": "Orange",
+        "context": "A user can mark a folder or file with its own colour. The full string is: Add label \"Orange\"."
+    },
+    "16225": {
+        "text": "Yellow",
+        "context": "A user can mark a folder or file with its own colour. The full string is: Add label \"Yellow\"."
+    },
+    "16226": {
+        "text": "Green",
+        "context": "A user can mark a folder or file with its own colour. The full string is: Add label \"Green\"."
+    },
+    "16227": {
+        "text": "Blue",
+        "context": "A user can mark a folder or file with its own colour. The full string is: Add label \"Blue\"."
+    },
+    "16228": {
+        "text": "Purple",
+        "context": "A user can mark a folder or file with its own colour. The full string is: Add label \"Purple\"."
+    },
+    "16229": {
+        "text": "Grey",
+        "context": "A user can mark a folder or file with its own colour. The full string is: Add label \"Grey\"."
+    },
+    "16230": {
+        "text": "Resume downloads",
+        "context": "Label to resume the download queue. (String as short as possible)"
+    },
+    "16231": {
+        "text": "Pause Downloads",
+        "context": "Label to pause the download queue. (String as short as possible)"
+    },
+    "16232": {
+        "text": "Resume uploads",
+        "context": "Label to resume the upload queue. (String as short as possible)"
+    },
+    "16233": {
+        "text": "Pause uploads",
+        "context": "Label to pause the upload queue. (String as short as possible)"
+    },
+    "16234": {
+        "text": "Blocked file: %1",
+        "context": "Label to show the blocked file that has stopped the synchronization engine. %1 will be replaced with the file name, so do not modify the %1 please."
+    },
+    "16235": {
+        "text": "Pause downloads",
+        "context": "Label to pause the download queue. (String as short as possible)"
+    },
+    "16243": {
+        "text": "You will no longer have access to this conversation",
+        "context": "Alert text that explains what it means to be confirming the action 'Leave'. (i.e. what will happen to the user if they choose to leave the chat - they won't be able to see or access it anymore)"
+    },
+    "16257": {
+        "text": "Chat is disabled",
+        "context": "A title which is shown when the chat is disabled."
+    },
+    "16258": {
+        "text": "Status appearance",
+        "context": "A header in the Chat settings. This section allows the user to select their presence status (Online, Away, Busy, Offline) which will be set automatically after they log in."
+    },
+    "16259": {
+        "text": "Auto-away",
+        "context": "A header in the Chat settings. This changes the user's status to Away after some time of inactivity."
+    },
+    "16262": {
+        "text": "Set my status to Away after %1 minutes of inactivity.",
+        "context": "This setting allows the user to change their Chat presence status automatically. Please leave the %1 in the translation as this will be replaced with a text box where the user can set the number of minutes."
+    },
+    "16263": {
+        "text": "MEGAcmd provides GUI-less access to the MEGA cloud. It supports all operations on your MEGA account through a set of powerful commands.\r\n                ",
+        "context": "A description of new MEGAcmd app. GUI-less means only terminal access (no Graphical User Interface)."
+    },
+    "16264": {
+        "text": "Interactive",
+        "context": "A title on the MEGAcmd page explaining the advantage of the MEGAcmd app where users can use MEGA by typing on a command line terminal."
+    },
+    "16265": {
+        "text": "A versatile command shell.",
+        "context": "A description on the MEGAcmd page explaining the advantage of the MEGAcmd app where users can use MEGA by typing on a command line terminal."
+    },
+    "16266": {
+        "text": "Scriptable",
+        "context": "A title on the MEGAcmd page explaining the advantage of the MEGAcmd app where users can use MEGA by typing on a command line terminal."
+    },
+    "16267": {
+        "text": "Execute commands from a shell, script or another program.",
+        "context": "A description on the MEGAcmd page explaining the advantage of the MEGAcmd app where users can use MEGA by typing on a command line terminal, using a script or other program."
+    },
+    "16268": {
+        "text": "Import contacts...",
+        "context": "A button label which allows user to import contacts from the Gmail service."
+    },
+    "16269": {
+        "text": "Use the New Folder button to create a new folder.",
+        "context": "This message is shown on the Copy and Move dialogs when there are no folders available."
+    },
+    "16270": {
+        "text": "Automatically backup your photos to the Cloud Drive",
+        "context": "Some text shown to explain what 'Enable Camera Uploads' means."
+    },
+    "16271": {
+        "text": "You can upgrade later in My Account",
+        "context": "Some text shown under the button 'Skip' to explain that you can upgrade your account later in the section 'My Account'."
+    },
+    "16272": {
+        "text": "Transfers tooltip:",
+        "context": "A heading in the Account Settings - Transfers section. This section lets the user toggle an option to show the transfer tooltip when a transfer is active."
+    },
+    "16273": {
+        "text": "Automatically show the transfers tooltip when a transfer is active.",
+        "context": "This text is next to a checkbox toggle in the Account Settings - Transfers section. It allows the site to show a tooltip with a progress bar when a file transfer is active."
+    },
+    "16274": {
+        "text": "View Image",
+        "context": "The title of a button which allows the user to open the image in the media \/ image viewer."
+    },
+    "16275": {
+        "text": "Play Video",
+        "context": "The title of a button which allows the user to open the video in a media \/ video player."
+    },
+    "16276": {
+        "text": "Create your free MEGA account",
+        "context": ""
+    },
+    "16277": {
+        "text": "Create your free account and get %1 of complimentary storage space, valid for %2 days.",
+        "context": "%1 would be replaced with the amount and %2 would be replaced with a numeric value"
+    },
+    "16278": {
+        "text": "Install MEGAsync",
+        "context": ""
+    },
+    "16279": {
+        "text": "When you install MEGAsync you get %1 of complimentary storage space plus %2 of transfer quota, both valid for %3 days. MEGAsync is available for Windows, macOS and most Linux distros.",
+        "context": "Both %1 and %2 would be replaced with amounts, for example \"50 GB\" and %3 a numeric value for the number of months"
+    },
+    "16280": {
+        "text": "Install our mobile app",
+        "context": ""
+    },
+    "16281": {
+        "text": "When you install our mobile app you get %1 of complimentary storage space plus %2 transfer quota, both valid for %3 days. We provide mobile apps for iOS, Android & Windows Phone.",
+        "context": "Both %1 and %2 would be replaced with amounts, for example \"50 GB\" and %3 a numeric value for the number of months"
+    },
+    "16282": {
+        "text": "Invite a friend to MEGA",
+        "context": ""
+    },
+    "16283": {
+        "text": "Invite as many friends or coworkers as you want. For every signup under the invited email address, you will receive %1 of complimentary storage plus %2 of transfer quota, both valid for %3 days, provided that the new user installs either MEGAsync or a mobile app and starts using MEGA.",
+        "context": "%1 and %2 would be replaced with amounts, for example \"50 GB\" and %3 would be replaced with a numeric value which represents the number of days."
+    },
+    "16284": {
+        "text": "%1 days left",
+        "context": ""
+    },
+    "16285": {
+        "text": "Achieved %1 times, click for status.",
+        "context": ""
+    },
+    "16286": {
+        "text": "Achieved",
+        "context": ""
+    },
+    "16287": {
+        "text": "[S]%1[\/S] storage space",
+        "context": "The %1 would be replaced by the storage space amount, for example: [S]50 GB[\/S] storage space"
+    },
+    "16288": {
+        "text": "[S]%1[\/S] transfer quota",
+        "context": "The %1 would be replaced by the transfer quota amount, for example: [S]50 GB[\/S] transfer quota"
+    },
+    "16289": {
+        "text": "(Expires in [S]%1[\/S] %2)",
+        "context": "%1 will be replaced by a numeric value and %2 will be \"days\" or \"months\", for example (Expires in [S]10[\/S] days)"
+    },
+    "16290": {
+        "text": "days",
+        "context": ""
+    },
+    "16291": {
+        "text": "(Expires after [S]%1[\/S] %2)",
+        "context": "%1 will be replaced by a numeric value and %2 will be \"days\" or \"months\""
+    },
+    "16292": {
+        "text": "week",
+        "context": ""
+    },
+    "16293": {
+        "text": "weeks",
+        "context": ""
+    },
+    "16294": {
+        "text": "years",
+        "context": ""
+    },
+    "16295": {
+        "text": "Install",
+        "context": "Text placed in some button to tell the user to install something."
+    },
+    "16296": {
+        "text": "Base Quota",
+        "context": "The user's achieved base quota"
+    },
+    "16297": {
+        "text": "Registration Bonus",
+        "context": "achievement type"
+    },
+    "16298": {
+        "text": "Referral bonuses",
+        "context": "achievement type"
+    },
+    "16299": {
+        "text": "PRO Base Quota",
+        "context": "Achieved base quota for PRO users."
+    },
+    "16300": {
+        "text": "%1 base quota + %2",
+        "context": "Initial and achieved storage quota, being %1 and %2 replaced with the value, Eg: 50GB base quota + 90GB"
+    },
+    "16301": {
+        "text": "[S]%1[\/S] of %2",
+        "context": "base quota and total, Eg: [S]50GB[\/S] of 200GB"
+    },
+    "16302": {
+        "text": "Storage Full",
+        "context": "Dialog header. Informs user that he\u2019ve reached the full capacity of Cloud Drive for Free accounts."
+    },
+    "16304": {
+        "text": "[A]Upgrade now[\/A] and keep enjoying secure, end-to-end encrypted cloud storage. \r\nPRO accounts get [S]up to 4 TB (4096 GB) of storage[\/S] and 8 TB of transfer quota that they can share with users downloading their files.",
+        "context": "A dialog message indicating what you can get with a PRO plan. Please leave the placeholders [A], [\/A], [S], [\/S] as they are."
+    },
+    "16305": {
+        "text": "Choose a plan",
+        "context": "Button label. Allow user to check available PRO plans."
+    },
+    "16306": {
+        "text": "Delete old files and [A]clear your Rubbish Bin[\/A] to free up some space.",
+        "context": "A dialog message that informs the user how to free up cloud drive space."
+    },
+    "16307": {
+        "text": "Tip: Keep your Rubbish Bin empty to optimise storage usage.",
+        "context": "A dialog message to inform the user how to free up more cloud drive space."
+    },
+    "16308": {
+        "text": "You can unlock more free storage and transfer quota by using our products. Simple. Easy.",
+        "context": "A dialog message informing the user that they can get more cloud drive space by completing achievements."
+    },
+    "16309": {
+        "text": "Get more bonuses",
+        "context": "Button label. Allows user to get more storage\/transfer quotas by executing achievements."
+    },
+    "16310": {
+        "text": "Tip: Check all your available bonuses in the [A]Dashboard[\/A] or click [I]",
+        "context": "A dialog message that informs the user that they may have outstanding achievements, which may increase storage quota. Please leave the [I] placeholder as it is because it will be replaced by an icon."
+    },
+    "16311": {
+        "text": "Storage Almost Full",
+        "context": "Dialog header. Informs user that he\u2019ve almost reached the full capacity of Cloud Drive for Free accounts."
+    },
+    "16312": {
+        "text": "It looks like you\u2019re running out of storage.",
+        "context": "A dialog message that informs the user that their cloud storage is almost full."
+    },
+    "16313": {
+        "text": "[A]Upgrade now[\/A] to a [S]PRO Lite[\/S] account and don't worry about running out of storage. [S]For \u20ac%1 a month you get 200 GB of storage[\/S] and 1 TB of transfer quota.",
+        "context": "Informs the user that their storage is almost full and it's better to buy PRO account. Please leave the placeholders [A], [\/A], [S], [\/S] and %1 as they are. There is also no need to translate \"PRO Lite\"."
+    },
+    "16314": {
+        "text": "You can unlock more free storage and transfer quota by completing more achievements.",
+        "context": "A dialog message that informs the user that he can get more storage\/transfer quota by completing achievements."
+    },
+    "16315": {
+        "text": "[S]Your account is full.[\/S] [A]Upgrade now[\/A] to a PRO account and get [S]up to 4 TB (4096 GB)[\/S] of cloud storage space.",
+        "context": "A message informing the user that they've reached the full capacity of their accounts. Please leave [S], [\/S] as it is which is used to bolden the text."
+    },
+    "16316": {
+        "text": "[S]Cloud Drive is almost full.[\/S] [A]Upgrade now[\/A] to a PRO account and get [S]up to 4 TB (4096 GB)[\/S] of cloud storage space.",
+        "context": "Informs the user that they\u2019ve almost reached the full capacity of their Cloud Drive for a Free account. Please leave the [S], [\/S], [A], [\/A] placeholders as they are."
+    },
+    "16317": {
+        "text": "Your friend needs to register for a free account on MEGA and [S]install at least one MEGA client application[\/S] (either the sync client or one of our mobile apps)",
+        "context": ""
+    },
+    "16318": {
+        "text": "You can notify your friend through any method. You will earn the quota if you have entered your friend's email here prior to them registering with that address.",
+        "context": ""
+    },
+    "16319": {
+        "text": "Insert your friend's email(s):",
+        "context": ""
+    },
+    "16320": {
+        "text": "Thanks! We have sent that user an invitation email.",
+        "context": ""
+    },
+    "16321": {
+        "text": "You can now:",
+        "context": "headline of various things the user can now do, such as pasting a URL to the invited user."
+    },
+    "16322": {
+        "text": "Direct URL to MEGAsync:",
+        "context": "URL stands for Uniform Resource Locator, i.e. a web addresss"
+    },
+    "16323": {
+        "text": "Direct URL to our mobile apps:",
+        "context": "URL stands for Uniform Resource Locator, i.e. a web addresss"
+    },
+    "16325": {
+        "text": "Get [S]%1[\/S] free storage and [S]%2[\/S] of transfer quota for each friend who installs a MEGA app",
+        "context": "%1 and %2 are replaced by some amount, eg \"50GB\""
+    },
+    "16326": {
+        "text": "Invite as many friends or coworkers as you want. For every signup under the invited email address, you will receive [S]%1[\/S] of complimentary storage plus [S]%2[\/S] of transfer quota, provided that the new user installs either MEGAsync or a mobile app and starts using MEGA (your free quota will be credited once we confirm the activity of the new account, which can take a few days).",
+        "context": "%1 and %2 would be replaced with amounts, for example \"50 GB\"."
+    },
+    "16327": {
+        "text": "Encourage your friend to register and install a MEGA app. As long as your friend uses the same email address as you've entered, you will receive your free [S]%1[\/S] of storage space and [S]%2[\/S] of transfer quota.",
+        "context": ""
+    },
+    "16328": {
+        "text": "Do you want to hide this dialog when transfers are ongoing?",
+        "context": "A message in a confirmation dialog which is shown when the user clicks Close on the ongoing transfers popup dialog."
+    },
+    "16329": {
+        "text": "Use Settings -> Advanced -> Transfers to enable it again.",
+        "context": "This message is shown in a confirmation dialog for ongoing transfers. It explains how to re-enable the ongoing transfers popup dialog."
+    },
+    "16330": {
+        "text": "Secure communication using user-controlled end-to-end encryption for text chat (mobile apps and in the browser) and voice \/ video (currently only in the browser; mobile coming soon), unified across all your devices.",
+        "context": "Describes chat features"
+    },
+    "16331": {
+        "text": "You will not receive credit for inviting someone who has used MEGA previously and you will not be notified about such a rejection.",
+        "context": "A message which is shown once someone has invited a friend as part of the achievements program."
+    },
+    "16332": {
+        "text": "You only qualify if:",
+        "context": "A message shown on the invite friend dialog for the achievements program. The user may only receive the referral bonus if they meet the requirements listed below."
+    },
+    "16333": {
+        "text": "You invited someone who has not used MEGA previously.",
+        "context": "A list item explaining the criteria for getting the bonus storage quota. This is shown once someone has invited a friend as part of the achievements program."
+    },
+    "16334": {
+        "text": "The new user installs at least one app and starts using MEGA.",
+        "context": "A list item explaining the criteria for getting the bonus storage quota. This is shown once someone has invited a friend as part of the achievements program."
+    },
+    "16335": {
+        "text": "(Usage confirmation may take a few days to complete - please be patient)",
+        "context": "A message shown once someone has invited a friend as part of the achievements program. The user should wait a few days before the friend invite can be determined as authentic and then they will receive more storage quota."
+    },
+    "16336": {
+        "text": "(Bonus expires in [S]%1[\/S] %2)",
+        "context": "%1 will be replaced by a numeric value and %2 will be \"days\" or \"months\", for example (Expires in [S]10[\/S] days)"
+    },
+    "16337": {
+        "text": "Storage Quota earned",
+        "context": "The header of a block which contains information about the storage quota bonus the user has already received for completed achievements."
+    },
+    "16338": {
+        "text": "Summary of the achievements completed and the storage quota bonus already received ",
+        "context": "Information about completed achievements and earned bonuses."
+    },
+    "16339": {
+        "text": "Transfer Quota earned",
+        "context": "The header of a block which contains information about the transfer quota bonus the user has already received for completed achievements."
+    },
+    "16340": {
+        "text": "Summary of the achievements completed and the transfer quota bonus already received ",
+        "context": "Information about completed achievements and earned bonuses."
+    },
+    "16341": {
+        "text": "[B]Get 50 GBs free storage[\/B] when you create an account with us. For the full featured experience, download our app or use the site on a PC.",
+        "context": "An introductory sentence on the homepage of the mobile web site. It implies that the best experience comes from using the mobile apps, or the website when viewed on a PC\/desktop rather than a phone."
+    },
+    "16342": {
+        "text": "Link",
+        "context": "A button on the mobile web site to create a public link."
+    },
+    "16343": {
+        "text": "Enter your email",
+        "context": "This line is used as placeholder text on a login form input."
+    },
+    "16344": {
+        "text": "Enter your password",
+        "context": "This is used as placeholder text on the mobile web login form."
+    },
+    "16345": {
+        "text": "Log in",
+        "context": "An action button on the mobile web site which will sign the user into the website."
+    },
+    "16346": {
+        "text": "The folder you are trying to view is no longer available.",
+        "context": "A message in an error dialog in the mobile web site. This error can occur when the folder link is removed or the link is subject to a takedown notice."
+    },
+    "16347": {
+        "text": "File deleted",
+        "context": "A toast notification which is shown on the mobile web site to say that the file has been deleted successfully."
+    },
+    "16348": {
+        "text": "Failed to copy, try copying manually.",
+        "context": "A toast message which is shown when the process to copy the public link failed. It asks the user to manually copy the link text."
+    },
+    "16349": {
+        "text": "Invalid email and\/or password.",
+        "context": "An error message which is shown in a dialog in the mobile web site. This tells the user either that their email address, password or both were incorrect."
+    },
+    "16350": {
+        "text": "Please try again.",
+        "context": "A message on an error dialog asking the user to try their last action again. E.g. try logging in again."
+    },
+    "16351": {
+        "text": "The email was re-sent successfully.",
+        "context": "A dialog message to say that the registration confirmation email was sent again successfully to the user (for a second time)"
+    },
+    "16352": {
+        "text": "Register for bonuses",
+        "context": "A button label which informs the user that they can get transfer quota bonuses after registration."
+    },
+    "16353": {
+        "text": "See our plans",
+        "context": "A button label which leads to page where the user can buy a PRO plan."
+    },
+    "16354": {
+        "text": "Learn more",
+        "context": "A link which leads to the help center where the user can get more information."
+    },
+    "16355": {
+        "text": "Tip: This limit is dynamic and depends on the amount of unused bandwidth we have available.",
+        "context": "An information message about limited transfer quota."
+    },
+    "16356": {
+        "text": "Your queued download exceeds the current transfer quota available for your account and may therefore be interrupted.",
+        "context": "An information message about limited transfer quota."
+    },
+    "16357": {
+        "text": "Your queued download exceeds the current transfer quota available for your IP address and therefore may be interrupted.",
+        "context": "An information message about limited transfer quota."
+    },
+    "16358": {
+        "text": "[S]Your account is full.[\/S] [A]Upgrade now[\/A] and get [S]up to 4 TB (4096 GB)[\/S] of cloud storage space.",
+        "context": "A message informing the user that they've reached the full capacity of their accounts. It informs the user the maximum amount of storage space they can get by upgrading."
+    },
+    "16359": {
+        "text": "[S]Cloud Drive is almost full.[\/S] [A]Upgrade now[\/A] and get [S]up to 4 TB (4096 GB)[\/S] of cloud storage space.",
+        "context": "A message informing the user that they\u2019ve nearly reached the full capacity of their Cloud Drive (i.e. not quite reached their limit yet). It informs the user the maximum amount of storage space they can get by upgrading."
+    },
+    "16360": {
+        "text": "You've reached the full capacity of your account.",
+        "context": "A dialog message that informs the user that their cloud storage is full"
+    },
+    "16361": {
+        "text": "[A]Upgrade now[\/A] and don't worry about running out of storage.",
+        "context": "Informs the user that their storage is almost full and it is time for the user to consider upgrading. This message is intended for users who are already PRO, so does not mention PRO accounts."
+    },
+    "16362": {
+        "text": "Subject to your participation in our achievements program.",
+        "context": "A message shown at registration time when users have to select their plan. The FREE 50 GB plan is subject to the achievements program."
+    },
+    "16363": {
+        "text": "Your easy route to more storage & transfer quota on MEGA",
+        "context": "This is the Achievements dialog header. A user is able to increase free storage and transfer quota by completing achievements."
+    },
+    "16364": {
+        "text": "You can maintain a generous free storage and transfer allowance by completing any of the actions outlined below.",
+        "context": "Information on the Achievements dialog. The user is able to increase free storage and transfer quota by completing achievements."
+    },
+    "16365": {
+        "text": "MEGA Achievements",
+        "context": "A dialog header. The user is able to increase the amount of free storage and transfer quota by completing achievements like installing MEGAsync, or an app etc."
+    },
+    "16368": {
+        "text": "MEGA is a secure cloud storage service that gives you 50 GB free storage space. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.",
+        "context": "Paragraph 1 of the general description of MEGA shown on the apps stores in Android, iOS and Windows Phone."
+    },
+    "16369": {
+        "text": "Upload your files from your smartphone or tablet, then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.",
+        "context": "Paragraph 2 of the general description of MEGA shown on the apps stores in Android, iOS and Windows Phone."
+    },
+    "16370": {
+        "text": "The encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Recovery Key backed up) or you will lose access to your stored files.",
+        "context": "Paragraph 3 of the general description of MEGA which is shown on the app stores in Android, iOS and Windows Phone."
+    },
+    "16371": {
+        "text": "Inside the app you can upgrade your storage space and transfer quota with a monthly or yearly subscription.",
+        "context": "Paragraph 4 of the general description of MEGA which is shown on the app stores in Android, iOS and Windows Phone."
+    },
+    "16372": {
+        "text": "PRO LITE subscription: \u20ac4.99 (US$4.99) per month or \u20ac49.99 (US$49.99) per year gives you 200 GB of storage space and 1 TB of transfer quota per month.\r\nPRO I subscription: \u20ac9.99 (US$9.99) per month or \u20ac99.99 (US$99.99) per year gives you 500 GB of storage space and 2 TB of transfer quota per month.\r\nPRO II subscription: \u20ac19.99 (US$19.99) per month or \u20ac199.99 (US$199.99) per year gives you 2 TB of storage space and 4 TB of transfer quota per month.\r\nPRO III subscription: \u20ac29.99 (US$29.99) per month or \u20ac299.99 (US$299.99) per year gives you 4 TB of storage space and 8 TB of transfer quota per month.",
+        "context": "Paragraph 5 of the general description of MEGA which is shown on the apps stores in Android, iOS and Windows Phone. Please keep the multiple line format."
+    },
+    "16373": {
+        "text": "For more info, please check our website:\r\nMobile - https:\/\/mega.nz\/mobile_terms.html - https:\/\/mega.nz\/mobile_privacy.html\r\nDesktop - https:\/\/mega.nz\/",
+        "context": "Paragraph 6 of the general description of MEGA which is shown on the app stores in Android, iOS and Windows Phone. Please keep the multiple line format."
+    },
+    "16374": {
+        "text": "Note: For desktop access to your files, MEGA needs to use HTML5 compatible browsers to handle our advanced features. We recommend Mozilla Firefox and Google Chrome. The mobile versions of browsers cannot access the MEGA cloud storage system yet.",
+        "context": "Paragraph 7 of the general description of MEGA which is shown on the app stores in Android, iOS and Windows Phone."
+    },
+    "16375": {
+        "text": "Massive [S]storage space[\/S]",
+        "context": "A title of a text block describing a benefit of MEGA's storage."
+    },
+    "16378": {
+        "text": "Leave behind the transfer volume limits associated with free accounts and enjoy an increased transfer allowance.",
+        "context": "A description of the extra transfer quota a user receives if they upgrade to a PRO plan."
+    },
+    "16380": {
+        "text": "Access PRO only features like setting password protection and expiration dates for public files.",
+        "context": "A description of MEGA features available only with a PRO plan."
+    },
+    "16381": {
+        "text": "Notes regarding transfers and your account type:",
+        "context": "A sentence introducing a list of notes about transfer quota, transfer speed and PRO\/Free accounts."
+    },
+    "16383": {
+        "text": "Fully [S]featured[\/S]",
+        "context": "Title of a text block which describes PRO only features."
+    },
+    "16384": {
+        "text": "Generous [S]transfer quota[\/S]",
+        "context": "A title of a text block describing MEGA's transfer volume limit."
+    },
+    "16385": {
+        "text": "Starting at 200 GB base storage and scalable up to 4 TB. If you need something specially crafted to your needs try a [S]custom plan[\/S].",
+        "context": "A description of the storage capacity a user can have if they purchase a PRO plan."
+    },
+    "16386": {
+        "text": "Upgrade your PRO account",
+        "context": "A button label. The button allows the user to upgrade their account."
+    },
+    "16387": {
+        "text": "Always show selected status appearance, even when I disconnect.",
+        "context": "An option in the Chat settings. When enabled, the user's status\/presence would stay the same even if they disconnected."
+    },
+    "16388": {
+        "text": "You may want to change your settings for granting transfer quota to downloading users.",
+        "context": "Transfer quota slider description. Allows changing transfer quota for users. This means other users (downloaders) can use the user's transfer quota."
+    },
+    "16389": {
+        "text": "Online, %1 but change my status appearance to Away (yellow) after %2 minute(s) of inactivity.",
+        "context": "Allows the user to set his presence to Online, but if the checkbox is checked and if he is idle for X minutes, they would be set automatically to Away. The placeholder %1 will be replaced with a checkbox and the placeholder %2 with a text input containing the number of minutes."
+    },
+    "16390": {
+        "text": "[S]Transfer quota[\/S] is the total volume of data transfered between MEGA and your system each month.",
+        "context": "A note about MEGA's transfer quota. Please leave the placeholders [S] and [\/S] which are used to stylise the text."
+    },
+    "16391": {
+        "text": "[S]Transfer speed[\/S] is unrelated to Transfer quota. The quality of your file transfers' speed can be affected by many factors beyond our control, such as your local network and your Internet Service Provider. MEGA always processes file transfers at the maximum possible speed regardless of your account status.",
+        "context": "A note about transfer speed. Please leave the placeholders [S] and [\/S] which are used to stylise the text."
+    },
+    "16392": {
+        "text": "[S]PRO and Free accounts[\/S] enjoy the same fast transfer speed.",
+        "context": "A note about MEGA's fast transfer speed. Please leave the placeholder [S] and [\/S] tags which will be used to stylise the text."
+    },
+    "16393": {
+        "text": "Starting at 200 GB base storage and scalable up to 4 TB. If you require more than that, please [A]contact us[\/A].",
+        "context": "A description of the storage capacity a user can have if they purchase a PRO plan."
+    },
+    "16394": {
+        "text": "No files in your [S]Cloud Drive[\/S].",
+        "context": "A message which is displayed in an empty Cloud Drive for the mobile website. Please leave the [S] and [\/S] placeholders as they will be used to bolden the text."
+    },
+    "16395": {
+        "text": "You have received %1 storage space as your free registration bonus.",
+        "context": "Message shown on the achievements dialog for achieved achievements, %1 is replaced with e.g. 20 GB"
+    },
+    "16396": {
+        "text": "You have received %1 storage space and %2 transfer quota for installing MEGAsync.",
+        "context": "Message shown on the achievements dialog for achieved achievements, %1 and %2 are replaced with e.g. 20 GB"
+    },
+    "16397": {
+        "text": "You have received %1 storage space and %2 transfer quota for installing our mobile app.",
+        "context": "Message shown on the achievements dialog for achieved achievements, %1 and %2 are replaced with e.g. 20 GB"
+    },
+    "16400": {
+        "text": "Account base quota",
+        "context": "The user's achieved base quota"
+    },
+    "16401": {
+        "text": "Account registration bonus",
+        "context": "achievement type"
+    },
+    "16402": {
+        "text": "Unlocked bonuses:",
+        "context": "Header of block with achievements bonuses."
+    },
+    "16406": {
+        "text": "[1]MEGA Account Reset\r\n\r\n[2]It looks like you have forgotten your password and do not have a backup of your Recovery Key.\r\n\r\n[3]If you proceed, the existing account under this address will be deactivated, and you will lose access to your data. The data will still be preserved for at least another 60 days. Should you remember the deactivated account's password or locate its previously exported Recovery Key, please contact [A1]support@mega.nz[\/A1] to have it restored.\r\n\r\n[4]Even if you manage to restore the deactivated account, all associated contacts and shares will remain deleted and need to be re-established.\r\n\r\n[5]Reset my Account\r\n\r\n[6]Didn't work? No worries. Copy and paste this link below into your web browser:",
+        "context": "The 'reset my account' email body received when somebody requests to park their account. MEGA needs them to click the link to confirm their password.\r\n\r\nPlease do not translate or modify anything inside square brackets (do not change [1] or [A1] )"
+    },
+    "16407": {
+        "text": "[1]Best regards,[BR]\u2014 Team MEGA",
+        "context": "The footer for our emails. Please do not translate anything inside square brackets (do not translate the [1] or the [BR]. The [BR] corresponds to a line break and will be replaced)"
+    },
+    "16408": {
+        "text": "To proceed please click the link below or copy and paste it into your web browser:",
+        "context": "A line of text within an email that guides the user to click on the link that follows, or to copy and paste it into their browser."
+    },
+    "16410": {
+        "text": "[1]MEGA Account Expiry Warning\r\n\r\n[2]We noticed that there hasn't been any activity on your MEGA account since [B][$month] [$day], [$year][\/B].\r\n\r\n[3]We would love to have you as a user, but we may [B]delete any stored data (as specified in our [A1]Terms of Service[\/A1]) if you don\u2019t log in at [A2]mega.nz[\/A2] within the next 30 (thirty) days[\/B].\r\n\r\n[4]If you have recently used MEGA but still received this email, then we are emailing you about a different account. Please compare the email address on the account you recently used to the one in this email.\r\n\r\n[5]Login at MEGA",
+        "context": "Update: The words 'close your account' have been removed.\r\n\r\nEmail body for Account expiry email. This is sent to users when they have been inactive for a long time.\r\nPlease do not translate anything inside the square brackets, just leave them alone and in the same place (i.e. do not change [1] or [A1] etc)."
+    },
+    "16412": {
+        "text": "[1]MEGA Account Expiry Final Warning\r\n\r\n[2][B]Your [A1]$megaemail[\/A1] MEGA account is due to expire in 7 days[\/B] as there has not been any activity on it since [$month] [$day], [$year].\r\n\r\n[3]We would love to have you as a user, but we may [B]delete any stored data (as specified in our [A2]Terms of Service[\/A2]) if you don\u2019t log in at [A3]mega.nz[\/A3] within the next 7 (seven) days[\/B]\r\n\r\n[4]If you have recently used MEGA but still received this email, then we are emailing you about a different account. Please compare the email address on the account you recently used to the one in this email.",
+        "context": "Update: The words 'close your account' have been removed\r\n\r\nEmail body of the final warning email we send to users who have been inactive too long.\r\n\r\nPlease do not translate the text inside the square brackets (i.e Do not change the [1], [A1] tags etc).\r\nThey will be replaced by links."
+    },
+    "16413": {
+        "text": "[1]MEGA Bonus Unlocked\r\n\r\n[2]Congratulations, we have just activated your mobile app install achievement bonus. You have earned [$storageearnedgb] storage quota and [$transferearnedgb] transfer quota, which will be valid for [$durationdays] days.\r\n\r\n[3]Need more storage or transfer quota? Let others know about the benefits of end-to-end encrypted cloud storage and invite them to MEGA!\r\n\r\n[4]Achieve More\r\n\r\n[5]To view the status of your achievements or achieve more, click below:",
+        "context": "Email body of the email sent to users who have just had their mobile app achievement activated.\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [A1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
+    },
+    "16414": {
+        "text": "[1]MEGA Install Bonus\r\n\r\n[2]Great, thanks for installing the MEGA mobile app! It can take a few days for your installation achievement bonus to be authorised. Please note that you will not receive an achievement credit if you have used a different MEGA account in the past.\r\n\r\n[3]Achievements",
+        "context": "Email body of the email sent when users install the MEGA mobile app.\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [A1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
+    },
+    "16415": {
+        "text": "[1]MEGA Invitation\r\n\r\n[2]The user with the email [R][$cred][\/R] has sent you an invitation to join MEGA.\r\n\r\n[3]Join [R][$cred][\/R] on MEGA by clicking below:\r\n\r\n[4]Create Account\r\n",
+        "context": "Email body sent to unregistered users when other user invites them.\r\n\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [A1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
+    },
+    "16416": {
+        "text": "Congratulations, [$cred] has accepted your invitation and started using MEGA! As a result, you have been credited [$storageearnedgb] of additional storage space and [$transferearnedgb] transfer quota, which will both be valid for [$durationdays] days.",
+        "context": "Email body for achievement email that gets sent to a user after they have invited somebody.\r\nPlease do not translate the text inside square brackets (i.e. leave the [$cred] etc as they are)."
+    },
+    "16420": {
+        "text": "Didn\u2019t work? Copy the link below into your web browser:",
+        "context": "Phrase used in emails, that appears after a button. If the button didn't work the user is encouraged to try the link below directly, or copied into their browser"
+    },
+    "16421": {
+        "text": "[1]MEGA Invitation\r\n\r\n[2]The user with the email [R][$cred][\/R] has sent you a contact invitation.\r\n\r\n[3]Head to MEGA to accept the invite and get connected with [R][$cred][\/R]\r\n\r\n[4]Take me to MEGA\r\n",
+        "context": "(edit:Mega changed to MEGA)\r\n\r\nEmail body sent to registered users when other user invites them.\r\n\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [A1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
+    },
+    "16422": {
+        "text": "[1]MEGA\r\n\r\n[2]The user with the email [R][$cred][\/R] is waiting for you to join MEGA.\r\n\r\n[3]It's free and easy to set up and you will get a generous free storage allocation on the world's most secure cloud storage service.\r\n\r\n[4]Join MEGA\r\n",
+        "context": "Email body sent to remind unregistered users that other user invites them and they haven't signed up yet.\r\n\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [A1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
+    },
+    "16423": {
+        "text": "[1]MEGA Invitation\r\n\r\n[2][R][$cred][\/R] wants to share a folder with you.\r\n\r\n[3]To receive shared folders from MEGA users, you will need a MEGA account. It's free and easy to set up, and you will get a generous free storage allocation on the world's most secure major cloud storage service.\r\n\r\n[4]Join MEGA\r\n\r\n[5]Please note that the shared folder will only appear if its owner is connected to MEGA during or after your signup. This is because our end-to-end encryption paradigm requires the folder owner to transmit the secret folder key to you securely using asymmetric cryptography so that nobody can intercept it, not even MEGA.\r\n\r\n[6]Click below to get started with MEGA:\r\n",
+        "context": "[4]Join Mega has been changed to [4]Join MEGA\r\n\r\nEmail body sent to unregistered users when another user invites them and has a folder to share.\r\n\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [A1] as they are)\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
+    },
+    "16424": {
+        "text": "[1]MEGA Invitation\r\n\r\n[2][R][$cred][\/R] wants to share a folder with you.\r\n\r\n[3]Head to MEGA to accept the invite and get started with [R][$cred][\/R]\r\n\r\n[4]Take me to MEGA\r\n",
+        "context": "Email body sent to registered users when another user invites them and has a folder to share.\r\n\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [A1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
+    },
+    "16425": {
+        "text": "[1]MEGA Email Verification Required\r\n\r\n[2]You have one more step remaining to activate your MEGA account.\r\n\r\n[3]Click on the button below to verify your email address:\r\n\r\n[4]Verify my email\r\n\r\n[5]Click on the link below to verify your email address:",
+        "context": "Email body of signup confirmation email when the user needs to click the link to verify their email in order to register their account and get started properly using Mega.\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [2] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start."
+    },
+    "16426": {
+        "text": "If you are having trouble activating using the above link, try copying and pasting the link below into your iOS device's mobile browser:",
+        "context": "Text for the ios signup confirmation email, that helps users try the ios-specific link format below this text."
+    },
+    "16427": {
+        "text": "[1]MEGA Account Closed\r\n\r\n[2]You have closed your [R][$megaemail][\/R] MEGA account. If you did not initiate this closure, please contact [A1]support@mega.nz[\/A1]\r\n\r\n[3]We would like to thank you once more for using MEGA. You are welcome back any time.",
+        "context": "Email body for the confirmation email sent when a user closes their account.\r\nPlease do not translate the text inside square brackets (i.e. leave the [1], [$megaemail], and [A1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
+    },
+    "16428": {
+        "text": "[1]MEGA Chat Notification\r\n\r\n[2]You have received new encrypted chat messages on MEGA chat while you were offline.\r\n\r\n[3]Chat securely at MEGA",
+        "context": "Email body for notification email sent when a user has received a chat message while they were inactive or offline.\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [2] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start."
+    },
+    "16429": {
+        "text": "[1]MEGA Account Closure\r\n\r\n[2]Caution: You have elected to close your MEGA account. The account under this email address will be permanently closed and your data deleted. This can not be undone.\r\n\r\n[3]By completing this action, you will lose access to all your uploaded data, shares, and contacts. Any remaining account balance or PRO quota will be voided.\r\n\r\n[4]If you have a paid MEGA subscription with [A1]Apple[\/A1] or [A2]Google[\/A2], then you must cancel it separately at Apple iTunes or Google Play, as MEGA is not able to cancel it for you.\r\n\r\n[5]Close my Account",
+        "context": "Email body of email sent when a user is starting the process to close their account.\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [A1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
+    },
+    "16430": {
+        "text": "[1]MEGA Confirm New Email\r\n\r\n[2]It looks like you changed your email address. We just need you to confirm your new email address by clicking the following link:\r\n\r\n[3]Confirm New Email\r\n\r\n[4]Please note that this will [B]replace your existing MEGA account email address[\/B]. You will need to log in with this new email address from now on.\r\n",
+        "context": "Email body for when a user needs to confirm their new email address. It emphasises that it will not be a second email, but will replace their current one on their Mega account.\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [A1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
+    },
+    "16431": {
+        "text": "[1]MEGA Password Recovery\r\n\r\n[2]You can easily access your MEGA account with your Recovery Key.\r\n\r\n[3]Unlock Account\r\n\r\n[4]This request originated from IP address: [R][$cred][\/R]",
+        "context": "Email body for the password reset email where the user has their Master Key (Recovery Key)\r\nPlease do not translate the text inside square brackets (i.e. leave the [1],[$cred], and [R] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
+    },
+    "16432": {
+        "text": "You can also earn more free storage and transfer quota by achieving bonuses. For example, by installing our software or inviting friends to MEGA.",
+        "context": "Paragraph in an email related to how a user can use the MEGA achievement program to get more storage and transfer quota."
+    },
+    "16433": {
+        "text": "[1]Visit [A1]mega.nz\/account[\/A1] to see a breakdown of your usage. Please note your rubbish counts toward your usage, and may need to be cleared to free up space.\r\n\r\n[2]To continue to use MEGA, please upgrade to one of our paid plans, or buy a larger plan. [B]You have 7 days left to take action[\/B]. If the account remains over quota after [R][$lastdate][\/R], MEGA will automatically clear your rubbish bin in an attempt to remedy the situation for your convenience.\r\n",
+        "context": "Email body for email sent when user has been over their storage quota limit for nearly 30 days. This is the final warning before Mega will clear their rubbish bin.\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [A1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate.\r\n"
+    },
+    "16435": {
+        "text": "[1]MEGA Password Change\r\n\r\n[2]Click on the button below to change your password.\r\n\r\n[3]Click on the link below to change your password. \r\n\r\n[4]You will need to enter your current password before you can choose a new one.\r\n\r\n[5]Change Password\r\n\r\n[6]If you didn't make this request, you can ignore and delete this email. If you need more assistance, please contact our support team at [A1]support@mega.nz[\/A1]",
+        "context": "Email body for the change password confirmation step.\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [A1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
+    },
+    "16436": {
+        "text": "[1]MEGA Password Has Been Changed\r\n\r\n[2]Your MEGA account's password has been changed. If you didn't make this request, please contact our support team at [A1]support@mega.nz[\/A1]\r\n",
+        "context": "Email body text for the email sent after the user has changed their password on MEGA.\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [A1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
+    },
+    "16437": {
+        "text": "[1]MEGA Account Suspended - Repeat Infringer\r\n\r\n[2]YOUR ACCOUNT HAS BEEN SUSPENDED OVER REPEATED ALLEGATIONS OF COPYRIGHT INFRINGEMENTS.\r\n\r\n[3]Please do not hesitate to contact us at [A1]legal@mega.nz[\/A1] if you believe the allegations are false.\r\n\r\n[4]Please be reminded that MEGA respects the copyrights of others and requires that users of the MEGA cloud service comply with the laws of copyright. You are strictly prohibited from using the MEGA cloud service to infringe copyrights. You may not upload, download, store, share, display, stream, distribute, e-mail, link to, transmit or otherwise make available any files, data, or content that infringes any copyright or other proprietary rights of any person or entity.\r\n\r\n[5]Pursuant to our Terms of Service, accounts found to be repeat infringers are subject to termination. Full details, including how to file a counter notification, are specified in MEGA's [A2]Terms of Service[\/A2], [A3]Copyright[\/A3] and [A4]Takedown Guidance[\/A4]",
+        "context": "Email body of suspension email, sent to users who have repeatedly infringed upon copyrighted materials.\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [A1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
+    },
+    "16438": {
+        "text": "[1]MEGA Claim of Alleged Infringement \/ Takedown\r\n\r\n[2]We are in receipt of a takedown notice affecting the following public link in your account:\r\n\r\n[3]Link:\r\n\r\n[4]Submitter of notice:\r\n\r\n[5]Pursuant to our Terms of Service, accounts found to be repeat infringers are subject to termination. Full details, including more information on the counter-notification process, are specified in MEGA's [A1]Terms of Service[\/A1], [A2]Copyright[\/A2] and [A3]Takedown Guidance[\/A3]\r\n\r\n[6]If you believe that your content has been wrongly disabled because you have rights to the material, then you may file a counter-notice at our [A4]dispute page[\/A4].\r\n",
+        "context": "Email body for takedown warning email when a user has had infringing content taken down due to a complaint.\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [A1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [A1], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
+    },
+    "16439": {
+        "text": "[1]Welcome to MEGA\r\n\r\n[2]Hi [$username], thanks for joining MEGA, your free account is ready and you can start using MEGA now.\r\n\r\n[3][B]Warning:[\/B] Due to our advanced end-to-end encryption, it is mathematically impossible for us to recover or reset your password. If you lose your password, you will lose access to the data in your MEGA account. We highly recommend you make a backup of your Recovery Key now:\r\n\r\n[4]Back up Recovery Key\r\n\r\n[5]You can back up your Recovery Key later in your Dashboard or Account Settings\r\n\r\n[6]You have just joined many millions of like-minded users on the world's safest cloud collaboration platform.\r\n\r\n[7]Visit Mega.nz",
+        "context": "Primary email body of welcome email sent to new users.\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] and [$username] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start. The [$username], [B] tags etc will be replaced by HTML links or bold and can be moved as appropriate."
+    },
+    "16440": {
+        "text": "[1]About MEGA\r\n\r\n[2]Privacy\r\n\r\n[3]Unlike most other cloud storage providers, only you control who has access to your data. Not even MEGA can access your data!\r\n\r\n[4]Encryption\r\n\r\n[5]Your data is encrypted on your device using your password as the encryption key. Secure collaboration with others is guaranteed through asymmetric cryptography, which means that only the end points have access.\r\n\r\n[6]Space\r\n\r\n[7]Not only is MEGA more secure than its major competitors, MEGA is also very generous in providing a whopping 50GB for free!\r\n\r\n[8]Not only is MEGA more secure than its major competitors, MEGA provides a very generous amount of free storage and transfer quota, and easy ways to [A1]achieve[\/A1] even more for free!",
+        "context": "(UPDATE: this new version includes [A1] tags around the word achieve in the final sentence)\r\nSecondary email body of welcome email sent to new users.\r\nPlease do not translate the text inside square brackets (i.e. leave the [1] as they are).\r\nThe [1] tags represent the start of each section and should remain at the start."
+    },
+    "16442": {
+        "text": "[A]Login[\/A] or [B]Create an account[\/B] to fully experience MEGA",
+        "context": "A label to allow users to login or create an account. Please keep the placeholders [A], [\/A], [B] and [\/B]."
+    },
+    "16443": {
+        "text": "USED SPACE: Data temporarily unavailable",
+        "context": "A label to show that the information related to the account usage is temporarily unavailable."
+    },
+    "16444": {
+        "text": "USED BANDWIDTH: Data temporarily unavailable",
+        "context": "A label to show that the information related to bandwidth usage is temporarily unavailable."
+    },
+    "16445": {
+        "text": "USED STORAGE %1",
+        "context": "A label to show the storage used for the account."
+    },
+    "16446": {
+        "text": "USED BANDWIDTH %1",
+        "context": "A label to show the bandwidth used for the account."
+    },
+    "16447": {
+        "text": "Scanning...",
+        "context": "A tray icon label to indicate that MEGAsync is in a scanning state."
+    },
+    "16448": {
+        "text": "Resume Transfers",
+        "context": "A label of an option to resume all paused transfers."
+    },
+    "16449": {
+        "text": "Pause Transfers",
+        "context": "A label of an option to pause all transfers."
+    },
+    "16450": {
+        "text": "Stream",
+        "context": "The text of a menu item that opens a dialog to stream files from MEGA."
+    },
+    "16451": {
+        "text": "Remove from left pane",
+        "context": "This text is shown in the context menu of the Windows File Explorer when the user right clicks in the root of a synced folder. It allows for removal of the new icon that is added to the Navigation Pane, on the left of the Windows File Explorer."
+    },
+    "16452": {
+        "text": "Please consider updating your operating system.",
+        "context": "A message to be shown when an outdated operating system is detected."
+    },
+    "16454": {
+        "text": "USED STORAGE: Data temporarily unavailable",
+        "context": "A label to show that the information related to the account usage is temporarily unavailable."
+    },
+    "16455": {
+        "text": "MEGA Payment Receipt",
+        "context": "Subject line for the payment receipt email. This gets sent to users after they have made a payment."
+    },
+    "16456": {
+        "text": "Payment Receipt",
+        "context": "Header text of the payment receipt email, sent to users after they have made a payment."
+    },
+    "16457": {
+        "text": "Order Date:",
+        "context": "Label for a field on the payment receipt email, that indicates the date of the user's order (payment) will appear next to this label."
+    },
+    "16458": {
+        "text": "Order ID:",
+        "context": "Order id label for the payment receipt email. This label indicates that the identification number for the order (payment) will appear beside it."
+    },
+    "16459": {
+        "text": "GST No:",
+        "context": "Label for a New Zealand GST tax number. GST should not be translated (the number shown will always be a New Zealand GST tax number), only the abbreviation 'No' for numero, or number.\r\nI.e. in Spanish No becomes N\u00fam, so the final string is GST N\u00fam."
+    },
+    "16460": {
+        "text": "Billed",
+        "context": "Label on the payment receipt email. This label is referring to a section of the email where the user's billing details (name, address, etc) are present."
+    },
+    "16461": {
+        "text": "Paid with:",
+        "context": "Label on the payment receipt email, referencing the details that the user made the payment with. For example, the user may have paid with a Visa card, or a certain bitcoin address, or Boleto, etc"
+    },
+    "16462": {
+        "text": "Description",
+        "context": "Label on the payment receipt email, referencing a description of the product the user purchased."
+    },
+    "16463": {
+        "text": "Price",
+        "context": "Label on the payment receipt email, referencing the section that describes the price that the user pays for the product."
+    },
+    "16464": {
+        "text": "Total",
+        "context": "Label on the payment receipt email, referencing the section that lists the total amount payable (including the price of the item and the tax)"
+    },
+    "16465": {
+        "text": "Your subscription will renew at the rates stated above unless you cancel it at [A1]https:\/\/mega.nz\/account[\/A1] prior to the end of the billing period.",
+        "context": ""
+    },
+    "16466": {
+        "text": "If you have any questions or concerns regarding this payment, please contact our support team at [A1]support@mega.nz[\/A1] or review your purchase history [A2]here[\/A2]",
+        "context": "Information on the payment receipt email that lets the user know they can contact support if they have problems, and links them to a place they can see a list of their purchases.\r\nPlease leave the [A1] [\/A1] tags in place as they will be converted into links."
+    },
+    "16467": {
+        "text": "MEGA Refund Receipt",
+        "context": "Subject line of the refund receipt email sent when a user has had a successful refund."
+    },
+    "16468": {
+        "text": "Refund Receipt",
+        "context": "Title of the refund receipt email sent to users when their refund has been successful."
+    },
+    "16469": {
+        "text": "The file\/folder of the link that you are trying to open was not found. You are probably logged in to a different account. Please, log in to the correct account and try again.",
+        "context": "Title of the dialog displayed when trying to open a link of an internal node and this node is not found in the account in which the user is logged in."
+    },
+    "16470": {
+        "text": "File\/folder not found",
+        "context": "Title of the dialog displayed when trying to open a link of an internal node and this node is not found in the account in which the user is logged in - (String as short as possible)."
+    },
+    "16471": {
+        "text": "The provided key is invalid.\r\n",
+        "context": "On a public file or folder link which does not have a decryption key, the user is asked to enter a decryption key. This is the error message shown when the decryption key entered is not correct."
+    },
+    "16472": {
+        "text": "Please check that the key is correct or ask the creator of the link again.",
+        "context": "On a public file or folder link which does not have a decryption key, the user is asked to enter a decryption key. This is a second message which is shown when the decryption key entered is not correct."
+    },
+    "16473": {
+        "text": "[1]MEGA Achievement Expired\r\n\r\n[2]One of your achievements has expired today. Don't worry though, you can always achieve more or upgrade to a PRO account.\r\n\r\n[3]To upgrade your account to PRO, click below:",
+        "context": ""
+    },
+    "16474": {
+        "text": "Previous versions",
+        "context": "A button label which opens a dialog to display the full version history of the selected file."
+    },
+    "16475": {
+        "text": "Revert",
+        "context": "A button label which reverts a certain version of a file to be the current version of the selected file."
+    },
+    "16476": {
+        "text": "Edited by %1 ",
+        "context": "A message which is displayed in the version history that shows that a certain file version was edited by a particular user. Please keep the %1 placeholder which will be replaced with the email address.\r\n"
+    },
+    "16477": {
+        "text": "Renamed from %1 by %2",
+        "context": "A message which is displayed in the version history that shows that a certain file version is renamed from a previous filename by a particular user. Please keep the placeholders %1 which will be replaced by the filename and %2 which will be replaced by the email address."
+    },
+    "16478": {
+        "text": "current version",
+        "context": "A message to indicate which version is the current version."
+    },
+    "16480": {
+        "text": "Edited by me",
+        "context": "A message which is displayed in the version history that shows that a certain file version was edited by the user themself."
+    },
+    "16481": {
+        "text": "Renamed from %1 by me",
+        "context": "A message which is displayed in the version history that shows that a certain file version is renamed from a previous file name by the user itself. Please keep the placeholder %1 which will be replaced by the filename."
+    },
+    "16482": {
+        "text": "Show me away after [X] minutes of inactivity",
+        "context": "Footer text to explain the meaning of the 'Auto-away' functionality of the user's chat status."
+    },
+    "16483": {
+        "text": "Status Persistence",
+        "context": "A label title to enable\/disable the feature of the chat status that maintains a user's chosen status even if they don't have connected devices."
+    },
+    "16484": {
+        "text": "Maintain my chosen status appearance even when I have no connected devices.",
+        "context": "Some text in the footer to explain the meaning of the 'Status Persistence' functionality of the user's chat status."
+    },
+    "16485": {
+        "text": "Duplicate items",
+        "context": "Dialog header. Dialog is displayed if uploading file already exists in folder."
+    },
+    "16486": {
+        "text": "A file named %1 already exists in this location.",
+        "context": "Dialog description. Informs user that uploading file already exists. Please leave %1 as it is, it'll be replaced by file name."
+    },
+    "16487": {
+        "text": "Select the file you want to keep:",
+        "context": "User is able to select file version if uploading file already exists in folder."
+    },
+    "16488": {
+        "text": "Upload and replace",
+        "context": "Header of clickable block in Dublicate items dialog. Allows user replace the file in the destination folder with the file he is uploading."
+    },
+    "16489": {
+        "text": "Replace the file in the destination folder with the file you are uploading:",
+        "context": "Clickable block description in dublicate items dialog. Allows user replace existing file in folder by new one, which he is uploading."
+    },
+    "16490": {
+        "text": "Don't upload",
+        "context": "Header of clickable block in dublicate items dialog. Allows user keep existing file in the destination folder and don't replace it by file he is uploading."
+    },
+    "16491": {
+        "text": "No files will be changed. You will keep the file below:",
+        "context": "Clickable block description in Dublicate items dialog. Allows user keep existing file in the destination folder and don't replace it by file he is uploading."
+    },
+    "16492": {
+        "text": "Keep both files",
+        "context": "Header of clickable block in Dublicate items dialog. Allows user keep existing file in the destination folder and file he is uploading."
+    },
+    "16493": {
+        "text": "The file you are uploading will be renamed as:",
+        "context": "Clickable block description in dublicate items dialog. Allows user keep existing file in the destination folder and file he is uploading."
+    },
+    "16494": {
+        "text": "Apply this option to the next [S]2[\/S] conflicts",
+        "context": "Checkbox label in Dublicate items dialog. User is able to apply selected action for current conflict to next conflicts. Please leave [S], [\/S] as it is."
+    },
+    "16495": {
+        "text": "Move and replace",
+        "context": "Header of clickable block in Dublicate items dialog. Allows user to replace the file in the destination folder with the file he is moving to this folder."
+    },
+    "16496": {
+        "text": "Copy and replace",
+        "context": "Header of clickable block in dublicate items dialog. Allows user replace the file in the destination folder with the file he is copying to this folder."
+    },
+    "16497": {
+        "text": "Replace the file in the destination folder with the file you are moving:",
+        "context": "Clickable block description in dublicate items dialog. Allows user to replace the file in the destination folder with the file he is moving to this folder."
+    },
+    "16498": {
+        "text": "Replace the file in the destination folder with the file you are copying:",
+        "context": "Clickable block description in dublicate items dialog. Allows user replace the file in the destination folder with the file he is copying to this folder."
+    },
+    "16499": {
+        "text": "Don't move",
+        "context": "Header of clickable block in dublicate items dialog. Allows user keep existing file in the destination folder and don't replace it by file he is moving."
+    },
+    "16500": {
+        "text": "Don't copy",
+        "context": "Header of clickable block in dublicate items dialog. Allows user keep existing file in the destination folder and don't replace it by file he is copying."
+    },
+    "16501": {
+        "text": "If you previously subscribed to a PRO plan with Google Play or Apple iTunes, please manually cancel your subscriptions with them inside Google Play or the iTunes app on your device. If you need any assistance please contact [A1]support@mega.nz[\/A1] or see our [A2]help article for Android[\/A2] or our [A3]help article for iOS[\/A3].",
+        "context": "An error dialog message when the Cancel Subscription button is pressed in the My Account section of the website. This means that cancelling the subscription is not possible from the website, they must cancel with Apple or Google. Please leave the [A1], [A2] and [A3] tags as they will be replaced with links."
+    },
+    "16502": {
+        "text": "Change Name",
+        "context": "Button title that allows the user change his name"
+    },
+    "16503": {
+        "text": "All files saved for Offline will be deleted from your device. Proceed to logout?",
+        "context": "Alert message shown when the user perform logout action and he has files in the Offline directory"
+    },
+    "16504": {
+        "text": "Your queued transfer exceeds the current transfer quota available for your account and may therefore be interrupted.",
+        "context": "Message of the dialog displayed when a user exceeds the transfer quota limits of the account (transfer overquota error)."
+    },
+    "16505": {
+        "text": "Depleted transfer quota",
+        "context": "Message of the dialog displayed when a user exceeds the transfer quota limits of the account (transfer overquota error) - (String as short as possible)."
+    },
+    "16506": {
+        "text": "Are you sure you want to cancel all the pending downloads?",
+        "context": "Message of the dialog displayed when a user wants to cancel all the pending downloads."
+    },
+    "16507": {
+        "text": "Are you sure you want to cancel all the pending uploads?",
+        "context": "Message of the dialog displayed when a user wants to cancel all the pending uploads."
+    },
+    "16508": {
+        "text": "Completing...",
+        "context": "Label for the state of a transfer when is being completing - (String as short as possible)."
+    },
+    "16509": {
+        "text": "Preparing...",
+        "context": "Label for the state of a transfer when is being preparing - (String as short as possible)."
+    },
+    "16510": {
+        "text": "Retrying...",
+        "context": "Label for the state of a transfer when is being retrying - (String as short as possible)."
+    },
+    "16511": {
+        "text": "Cancel downloads",
+        "context": "Label for any 'Cancel downloads' button, link, etc. - (String as short as possible)."
+    },
+    "16512": {
+        "text": "Cancel uploads",
+        "context": "Label for any 'Cancel uploads' button, link, etc. - (String as short as possible)."
+    },
+    "16513": {
+        "text": "No completed transfers",
+        "context": "Label for the background of an empty completed transfers page - (String as short as possible)."
+    },
+    "16514": {
+        "text": "The file you are moving will be renamed as:",
+        "context": "Clickable block description in dublicate items dialog. Allows user keep existing file in the destination folder and file he is moving"
+    },
+    "16515": {
+        "text": "The file you are copying will be renamed as:",
+        "context": "Clickable block description in dublicate items dialog. Allows user keep existing file in the destination folder and file he is copying"
+    },
+    "16516": {
+        "text": "Public Links",
+        "context": "A list item or breadcrumb title for displaying the number of publicly accessible file\/folder links a user has created in their account."
+    },
+    "16517": {
+        "text": "You have successfully logged into the account %1, we will now proceed to migrate your ephemeral account contents to your Cloud Drive's Inbox.",
+        "context": "A message which is shown when an ephemeral account user tries to register an account and instead they are logged in because they used a valid existing account. What happens then is that the ephemeral account's files and folders are migrated to the logged in user's Inbox. Please leave the %1 placeholder which is replaced with an email address."
+    },
+    "16518": {
+        "text": "View on MEGA",
+        "context": "Finder context menu option to view a synced file through the web browser within your MEGA account."
+    },
+    "16519": {
+        "text": "No options available",
+        "context": "Finder context menu label when no option is available for selected items."
+    },
+    "16520": {
+        "text": "Click the toolbar item for a menu.",
+        "context": "A tooltip for MEGA finder toolbar button."
+    },
+    "16521": {
+        "text": "%i files",
+        "context": "A context menu option label to indicate the user has selected %i number of files."
+    },
+    "16522": {
+        "text": "%i folders",
+        "context": "A context menu option label to indicate the user has selected %i number of folders."
+    },
+    "16523": {
+        "text": "MEGA Finder Sync",
+        "context": "An identifying name for MEGA finder extension on macOS systems."
+    },
+    "16524": {
+        "text": "[A]Login[\/A] or [A]Create an account[\/A] to fully experience MEGA",
+        "context": "A label to inform a user that they need to login or create an account in order to use MEGAsync. Please keep the [A] and [\/A] tags."
+    },
+    "16525": {
+        "text": "Open Transfer Manager",
+        "context": "A tooltip for the button that opens the transfer manager dialog."
+    },
+    "16527": {
+        "text": "USED TRANSFERS %1",
+        "context": "A label to indicate the total used transfer quota."
+    },
+    "16528": {
+        "text": "Enter an email or MEGA contact name",
+        "context": "This is used as placeholder text for the input field on the sharing and add contact dialogs."
+    },
+    "16529": {
+        "text": "Select destination",
+        "context": "A title shown on the navigation bar to explain that the user has to choose a destination for the files and\/or folders when they copy, move, import or perform some action with the files\/folders."
+    },
+    "16530": {
+        "text": "See plans",
+        "context": "A button title to see the available PRO plans in MEGA."
+    },
+    "16531": {
+        "text": "New Message",
+        "context": "The text for a notification which is shown when the user has received a new chat message."
+    },
+    "16532": {
+        "text": "Contact Request",
+        "context": "The text of a notification which is shown when you have received a contact request."
+    },
+    "16533": {
+        "text": "New Shared Folder",
+        "context": "The text of a notification which is shown when the user has received a new shared folder."
+    },
+    "16535": {
+        "text": "Try without account",
+        "context": "Caption of the button to try MEGA without having to create an account."
+    },
+    "16536": {
+        "text": "We make secure cloud storage simple. Create an account and get [A]50 GB[\/A] free on MEGA's end-to-end encrypted cloud collaboration platform today!",
+        "context": "The introduction text users that visit the MEGA website for the first time see."
+    },
+    "16537": {
+        "text": "Scroll down",
+        "context": "Button to scroll down to the page"
+    },
+    "16538": {
+        "text": "iOS",
+        "context": "Menu button to go to the iOS product page."
+    },
+    "16539": {
+        "text": "Android",
+        "context": "Menu button for the Android product page."
+    },
+    "16540": {
+        "text": "Win Mobile",
+        "context": "Short text for \"Windows Mobile\", menu button for the \"Windows Mobile\" product."
+    },
+    "16541": {
+        "text": "Extensions",
+        "context": "Menu option and short text for \"Browser Extensions\", which leads to the browser extensions product page."
+    },
+    "16544": {
+        "text": "The MEGA iOS App",
+        "context": "Title of the iOS product page."
+    },
+    "16545": {
+        "text": "Our iOS app puts the cloud in your pocket.",
+        "context": "Descriptive text on the iOS page."
+    },
+    "16546": {
+        "text": "Access and stream your files on your iPhone or iPad, upload and sync your photos and videos, or communicate securely using our end-to-end encrypted chat.",
+        "context": "Descriptive text for the iOS product page."
+    },
+    "16547": {
+        "text": "MEGA at your fingertips",
+        "context": "Headline on the iOS page"
+    },
+    "16548": {
+        "text": "Take the full power of MEGA with you, wherever you go. Carefully engineered to provide secure data mobility.",
+        "context": "Descriptive text on the iOS product page"
+    },
+    "16549": {
+        "text": "The full MEGA experience",
+        "context": "Headline on the iOS product page."
+    },
+    "16550": {
+        "text": "Our iOS app has everything you need to securely communicate and manage your data.",
+        "context": "Descriptive text on the iOS product page."
+    },
+    "16551": {
+        "text": "Automatic Camera Uploads",
+        "context": "iOS headline"
+    },
+    "16552": {
+        "text": "Upload all your photos & videos securely for backup, sharing or to reduce storage consumption on your iPhone or iPad.",
+        "context": "iOS description"
+    },
+    "16553": {
+        "text": "MEGA decrypts your media on-the-fly so you can securely stream your audio and video files directly to your iPhone or iPad.",
+        "context": "iOS feature description."
+    },
+    "16554": {
+        "text": "Audio\/Video Streaming",
+        "context": "iOS feature headline"
+    },
+    "16555": {
+        "text": "Select files that you want to save to your iPhone or iPad, so that you can retain access without Internet connectivity.",
+        "context": "iOS description text"
+    },
+    "16556": {
+        "text": "Save Your Files Locally",
+        "context": "iOS feature headline"
+    },
+    "16557": {
+        "text": "Managing your data across multiple devices securely is smooth and easy.",
+        "context": "iOS description"
+    },
+    "16558": {
+        "text": "Accessible Anywhere",
+        "context": "iOS headline"
+    },
+    "16559": {
+        "text": "MEGAchat makes collaboration within the MEGA platform easy and secure.",
+        "context": "iOS MEGAchat introduction text"
+    },
+    "16560": {
+        "text": "End-to-End Encryption",
+        "context": "iOS MEGAchat feature headline"
+    },
+    "16561": {
+        "text": "Chats and calls are end-to-end encrypted, not even MEGA can read or listen to your communication.",
+        "context": "iOS MEGAchat feature description"
+    },
+    "16562": {
+        "text": "Group Messaging",
+        "context": "iOS MEGAchat feature headline"
+    },
+    "16563": {
+        "text": "Collaborate securely by text message with individual contacts or multiple people at once in a group chat.",
+        "context": "iOS MEGAchat feature description"
+    },
+    "16564": {
+        "text": "Contact Fingerprint Verification",
+        "context": "iOS MEGAchat feature headline"
+    },
+    "16565": {
+        "text": "Verify the cryptographic fingerprint of your contacts through a separate channel to ensure they are authentic.",
+        "context": "iOS MEGAchat feature description"
+    },
+    "16566": {
+        "text": "Audio and Video Calls",
+        "context": "iOS MEGAchat feature headline"
+    },
+    "16567": {
+        "text": "Effortlessly stay connected with our secure cross-platform audio and video calls.",
+        "context": "iOS MEGAchat feature description"
+    },
+    "16568": {
+        "text": "Coming soon!",
+        "context": "Text to indicate that a feature is coming soon"
+    },
+    "16569": {
+        "text": "Seamless File Sharing",
+        "context": "iOS MEGAchat feature headline"
+    },
+    "16570": {
+        "text": "Conveniently share files directly within a chat straight from your MEGA account or from your device storage.",
+        "context": "iOS MEGAchat feature description"
+    },
+    "16571": {
+        "text": "History Retention Control",
+        "context": "iOS MEGAchat feature description, to do with managing how chat history is kept around"
+    },
+    "16572": {
+        "text": "With MEGAchat you control your chat history and can delete it whenever you desire.",
+        "context": "iOS MEGAchat feature description"
+    },
+    "16573": {
+        "text": "The MEGA Android App",
+        "context": "Android product page headline"
+    },
+    "16574": {
+        "text": "Our Android app puts the cloud in your pocket.",
+        "context": ""
+    },
+    "16575": {
+        "text": "Access and stream your files on your phone or tablet, upload and sync your photos and videos, or communicate securely using our end-to-end encrypted chat.",
+        "context": "Android product page description"
+    },
+    "16576": {
+        "text": "Our Android app has everything you need to securely communicate and manage your data.",
+        "context": "Android descriptive text"
+    },
+    "16577": {
+        "text": "Upload all your photos & videos securely for backup, sharing or to reduce storage consumption on your phone or tablet.",
+        "context": "Android feature description"
+    },
+    "16578": {
+        "text": "MEGA decrypts your media on-the-fly so you can securely stream your audio and video files directly to your device.",
+        "context": ""
+    },
+    "16579": {
+        "text": "Select files that you want to save to your phone or tablet, so that you can retain access without Internet connectivity.",
+        "context": ""
+    },
+    "16580": {
+        "text": "Easy automated synchronisation between your computer and your MEGA account.",
+        "context": "Description on the MEGAsync product page."
+    },
+    "16581": {
+        "text": "Live Encrypted Syncing",
+        "context": "Headline on the MEGAsync product page, 'Live' implying it is always on and fully automatic."
+    },
+    "16582": {
+        "text": "Access and work with your data securely across different locations and devices. It's always on and fully automatic.",
+        "context": "Description on the MEGAsync product page"
+    },
+    "16583": {
+        "text": "You can choose to synchronise your entire MEGA account or configure multiple selective syncs between folders on your computer and folders in your MEGA account.",
+        "context": "Description on the MEGAsync product page"
+    },
+    "16584": {
+        "text": "Manage all your transfers conveniently from within the MEGAsync transfer manager. Manually upload specific files from your computer to MEGA or import MEGA links for download to your computer.",
+        "context": "Feature description on the MEGAsync product page"
+    },
+    "16585": {
+        "text": "Live Encrypted Backup",
+        "context": "MEGAsync feature headline, 'Live' implies it is always on\/available"
+    },
+    "16586": {
+        "text": "With our real-time file versioning feature, your data is always recoverable to a previous version.",
+        "context": "Feature description for the MEGAsync product page"
+    },
+    "16587": {
+        "text": "Deleted Data Retention",
+        "context": "MEGAsync feature headline"
+    },
+    "16588": {
+        "text": "MEGAsync moves deleted files to special folders on your local computer and in your MEGA account so they can be restored if you need to.",
+        "context": "MEGAsync feature description"
+    },
+    "16589": {
+        "text": "Browser Transfer Accelerator",
+        "context": "MEGAsync feature headline"
+    },
+    "16590": {
+        "text": "MEGAsync securely interacts with your browser, handling MEGA file transfers for enhanced performance.",
+        "context": "MEGAsync feature description "
+    },
+    "16591": {
+        "text": "Windows Phone app",
+        "context": "Headline for the \"Windows Phone App\" product page"
+    },
+    "16592": {
+        "text": "Our Windows Phone app puts the cloud in your pocket.",
+        "context": "Windows Phone headline"
+    },
+    "16593": {
+        "text": "Access and stream your files on your phone or tablet, upload and sync your photos and videos.",
+        "context": "Windows Phone description"
+    },
+    "16594": {
+        "text": "Universally MEGA",
+        "context": "Headline for the Universal Windows Platform app MEGA will release."
+    },
+    "16595": {
+        "text": "soon",
+        "context": "Implying a feature is coming soon, view the screenshot for context"
+    },
+    "16596": {
+        "text": "The MEGA Universal Windows App is currently being developed. You can send an email to [A]uwp@mega.nz[\/A] to request early beta access.",
+        "context": "UWP descriptive text"
+    },
+    "16597": {
+        "text": "MEGAcmd is an interactive, text console based, scriptable MEGA client.",
+        "context": "MEGAcmd product description."
+    },
+    "16598": {
+        "text": "Visit our [A]GitHub repository[\/A] for the [B]README file[\/B] with all the details.",
+        "context": "MEGAcmd description text with two links. Please carefully use the variables [A] and [B]. Also, \"README\" is likely the same in each language as it's a global term for such files."
+    },
+    "16601": {
+        "text": "A shell to interactively execute MEGA commands.",
+        "context": "MEGAcmd descriptive text"
+    },
+    "16602": {
+        "text": "Interact with MEGA from within a script or program.",
+        "context": "MEGAcmd descriptive text"
+    },
+    "16603": {
+        "text": "Browser Extensions",
+        "context": "Headline of the Browser Extensions page"
+    },
+    "16604": {
+        "text": "Install MEGA into your browser. It will reduce loading times, improve download performance and strengthen security.",
+        "context": "Browser Extensions description"
+    },
+    "16605": {
+        "text": "Download for Firefox",
+        "context": "Download button for Firefox"
+    },
+    "16606": {
+        "text": "Download for Chrome",
+        "context": "Download button for Chrome"
+    },
+    "16607": {
+        "text": "Any MEGA URL will be captured by this extension and stay local (no JavaScript will be loaded from our servers).",
+        "context": "Description of the Browser Extensions product page."
+    },
+    "16608": {
+        "text": "Secure automatic updates are provided thanks to cryptographic private key signing.",
+        "context": ""
+    },
+    "16609": {
+        "text": "MEGA extension for Thunderbird",
+        "context": "Headline for the MEGAbird product page. Both \"MEGAbird\" and \"Thunderbird\" are product names."
+    },
+    "16610": {
+        "text": "Send large files by email through MEGA with this extension for the Mozilla Thunderbird mail client.",
+        "context": "Product description of MEGAbird. \"Mozilla Thunderbird\" is a product name."
+    },
+    "16611": {
+        "text": "Download for Thunderbird",
+        "context": "Download button for the MEGAbird extension. \"Thunderbird\" is a product name."
+    },
+    "16612": {
+        "text": "Fully Integrated",
+        "context": "Feature headline for the \"MEGAbird\" product"
+    },
+    "16613": {
+        "text": "Simply configure your MEGA account in the settings and any large file you attach to an email can automatically be replaced by a MEGA link.",
+        "context": "MEGAbird description"
+    },
+    "16614": {
+        "text": "Requires the free [A]Mozilla Thunderbird[\/A] mail client.",
+        "context": "MEGAbird text with link to the \"Mozilla Thunderbird\" product."
+    },
+    "16615": {
+        "text": "FILE",
+        "context": "Label for a downloadable file, to indicate it is a XX sized file. View screenshot for context."
+    },
+    "16616": {
+        "text": "Unlike most other cloud storage providers, only you control who has access to your data. Not even MEGA can access it!",
+        "context": "Feature description on the startpage"
+    },
+    "16617": {
+        "text": "Your data is accessible anytime. Use a web browser or one of our powerful apps, available for all major platforms.",
+        "context": "Feature description for the startpage"
+    },
+    "16618": {
+        "text": "Share data and communicate with your contacts securely, and see their updates in real time.",
+        "context": "Feature description for the startpage"
+    },
+    "16619": {
+        "text": "Massive Storage Space",
+        "context": "Feature headline for the startpage"
+    },
+    "16620": {
+        "text": "Not only are we more secure than our major competitors, we also provide a more generous amount of free storage.",
+        "context": "Feature description for the startpage"
+    },
+    "16621": {
+        "text": "Live Encrypted Backup",
+        "context": "Feature headline for the startpage. 'Live' implying it is always on and fully automatic"
+    },
+    "16622": {
+        "text": "With our real-time file synchronisation and versioning features, your data is always safe and recoverable.",
+        "context": "Feature description for the startpage"
+    },
+    "16623": {
+        "text": "Public Source Code",
+        "context": "Feature headline for the startpage"
+    },
+    "16624": {
+        "text": "To enable independent verification of the correctness and integrity of our crypto model and its implementation, we publish the full source code of our client apps.",
+        "context": "Feature description for the startpage"
+    },
+    "16625": {
+        "text": "Our Plans",
+        "context": "Headline for the PRO plans on the startpage"
+    },
+    "16626": {
+        "text": "Take full advantage of MEGA with a PRO account",
+        "context": "Description of the pro plans on the startpage"
+    },
+    "16627": {
+        "text": "Discount for yearly payments",
+        "context": "Discount label for the pro packages on the start page."
+    },
+    "16628": {
+        "text": "Unlock the potential of your MEGA account",
+        "context": "Headline of the achievement block on the startpage"
+    },
+    "16629": {
+        "text": "Still want more? We have you covered with a variety of generous achievements to help you get the most out of our secure cloud collaboration platform.",
+        "context": "Description of the achievement block on the startpage Achievements can be earned by for example installing our app or inviting a user to MEGA. What the user then earns is more storage."
+    },
+    "16630": {
+        "text": "Invite your friends",
+        "context": "Indicating text for when \"you invite your friends\""
+    },
+    "16631": {
+        "text": "expires after [X] days",
+        "context": "Expiration time with [X] being the variable in \"days\""
+    },
+    "16632": {
+        "text": "Free [X] after install",
+        "context": "Text how much storage is earned. The [X] variable would be replaced by for example \"20 GB\"."
+    },
+    "16633": {
+        "text": "Free [X] per invite",
+        "context": "Text indicating how much storage is earned per user invite. The [X] would be replaced with for example \"10 GB\""
+    },
+    "16634": {
+        "text": "Access and stream your files on your smartphone or tablet. Upload and sync your photos and videos. Secure end-to-end encrypted chat with your contacts.",
+        "context": "Descriptive text for the \"mobile apps\" block on the startpage."
+    },
+    "16635": {
+        "text": "Easy automated synchronisation between your computer and MEGA allows you to access and work with your data securely across different locations and devices.",
+        "context": "Descriptive text for the MEGAsync block on the start page."
+    },
+    "16636": {
+        "text": "In addition to regular browser access, we offer browser extensions for Chrome and Firefox for enhanced security, improved file transfer performance and reduced loading times.",
+        "context": "Descriptive text for the browser extensions on the start page."
+    },
+    "16637": {
+        "text": "Start being secure. Join us today!",
+        "context": "Headline on the startpage"
+    },
+    "16638": {
+        "text": "Millions of people trust MEGA to store billions of files using our state of the art infrastructure. Join them and protect your data using one of the Internet's most secure cloud and communication providers.",
+        "context": "Descriptive text on the startpage."
+    },
+    "16639": {
+        "text": "Number of registered users",
+        "context": "Label text of a real time counter which displays the live number of registered users counting."
+    },
+    "16640": {
+        "text": "Number of stored files",
+        "context": "Label text of a live counter for the total number of files stored on MEGA."
+    },
+    "16641": {
+        "text": "No one shall be subjected to arbitrary interference with his privacy, family, home or correspondence[\u2026].",
+        "context": "Legal text from the Universal Declaration of Human Rights, Article 12."
+    },
+    "16642": {
+        "text": "Everyone has the right to the protection of the law against such interference[\u2026].",
+        "context": "Text from the Universal Declaration of Human Rights, Article 12."
+    },
+    "16643": {
+        "text": "Windows Mobile",
+        "context": "Menu item"
+    },
+    "16644": {
+        "text": "Service Policy",
+        "context": "Menu item to our service policy"
+    },
+    "16645": {
+        "text": "Press & Media",
+        "context": "Menu option to our \"Press & Media\" section."
+    },
+    "16646": {
+        "text": "User-encrypted cloud services",
+        "context": "Slogan on the footer of the website. If your language accepts English slogans in general, please keep the English version. Otherwise, please translate it so that it reads as a slogan in your language."
+    },
+    "16647": {
+        "text": "The Privacy Company.",
+        "context": "Slogan on the footer of the website. If your language accepts English slogans in general, please keep the English version. Otherwise, please translate it so that it reads as a slogan in your language."
+    },
+    "16648": {
+        "text": "Universal Declaration of Human Rights, Article 12.",
+        "context": "Link to the Universal Declaration of Human Rights"
+    },
+    "16649": {
+        "text": "Save %1",
+        "context": "This is a small tooltip on the Pro page displaying how much money will be saved by switching to a yearly Pro plan. Please leave the %1 placeholder which will be replaced with the amount of savings. E.g. Save 10.00 EUR."
+    },
+    "16650": {
+        "text": "Failed to view the contact details. Please try again later.",
+        "context": "A dialog message which is displayed when the process\/request to view a contact's details failed."
+    },
+    "16651": {
+        "text": "Contact details failed",
+        "context": "The title of a dialog which is displayed when the process\/request to view a contact's details failed."
+    },
+    "16652": {
+        "text": "Failed to show the upload options. Please try again later.",
+        "context": "A dialog message which is displayed when the process\/request to show the upload options failed."
+    },
+    "16653": {
+        "text": "For the full featured experience, download our app or use the site on a PC.",
+        "context": "A sentence on the Login page of the mobile web site. It implies that the best experience comes from using the mobile apps, or the website when viewed on a PC\/desktop rather than a phone."
+    },
+    "16654": {
+        "text": "Don't show icons on the left pane of Windows Explorer",
+        "context": "Text next to a checkbox that allows to disable\/enable the visualization of MEGAsync icons on the left pane of Windows Explorer"
+    },
+    "16655": {
+        "text": "Open MEGA and sign in to continue",
+        "context": "This text is shown when you try to use a MEGA extension in iOS and you aren't logged in."
+    },
+    "16656": {
+        "text": "A log will be created in the Offline section (MEGAiOS.log). Logs can contain information related to your account.",
+        "context": "An alert message which is shown when the DEBUG mode is enabled. The .log file name does not need to be translated."
+    },
+    "16657": {
+        "text": "This could be due to the following reasons:\r\n- The folder link has been removed because of a ToS\/AUP violation.\r\n- Invalid URL \u2013 the link you are trying to access does not exist.\r\n- The folder link has been deleted by the user.",
+        "context": "An error message which is shown when a folder link doesn't exist."
+    },
+    "16658": {
+        "text": "This could be due to the following reasons:\r\n- The file has been removed because of a ToS\/AUP violation.\r\n- Invalid URL \u2013 the link you are trying to access does not exist.\r\n- The file has been deleted by the user.",
+        "context": "An error message which is shown when you open a file link and it's no longer available. It explains the reasons that could be causing it."
     }
 }

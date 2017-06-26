@@ -62,6 +62,16 @@ var ModalDialog = React.createClass({
     },
     onPopupDidMount: function(elem) {
         this.domNode = elem;
+
+        // always center modal dialogs after they are mounted
+        $(elem)
+            .css({
+                'margin': 'auto'
+            })
+            .position({
+                of: $(document.body)
+            });
+
         if (this.props.popupDidMount) {
             // bubble up...
             this.props.popupDidMount(elem);
@@ -115,7 +125,7 @@ var ModalDialog = React.createClass({
                 );
             });
 
-            footer = <div className="fm-dialog-footer">
+            footer = <div className="fm-dialog-footer white">
                 {extraFooterElements}
                 {buttons}
                 <div className="clear"></div>
@@ -176,6 +186,7 @@ var BrowserEntries = React.createClass({
     },
     getInitialState: function() {
         return {
+            'highlighted': [],
             'selected': []
         }
     },
@@ -183,13 +194,18 @@ var BrowserEntries = React.createClass({
         e.stopPropagation();
         e.preventDefault();
 
-        if (this.props.folderSelectNotAllowed === true && node.t === 1) {
-            // halt on folder selection
-
-            return;
+        this.setState({'highlighted': [node.h]});
+        if (this.props.onHighlighted) {
+            this.props.onHighlighted([node.h]);
         }
-        this.setState({'selected': [node.h]});
-        this.props.onSelected([node.h]);
+        // If folder selected
+        if (this.props.folderSelectNotAllowed === true && node.t === 1) {
+            this.setState({'selected': []});
+            this.props.onSelected([]);
+        } else {
+            this.setState({'selected': [node.h]});
+            this.props.onSelected([node.h]);
+        }
     },
     onEntryDoubleClick: function(e, node) {
         var self = this;
@@ -199,9 +215,11 @@ var BrowserEntries = React.createClass({
 
         if (node.t === 1) {
             // expand folder
-            self.setState({'selected': []});
+            self.setState({'selected': [], 'highlighted': []});
             self.props.onSelected([]);
+            self.props.onHighlighted([]);
             self.props.onExpand(node);
+            self.forceUpdate();
         }
         else {
             self.onEntryClick(e, node);
@@ -226,11 +244,11 @@ var BrowserEntries = React.createClass({
             }
 
             var isFolder = node.t === 1;
-            var isSelected = self.state.selected.indexOf(node.h) !== -1;
+            var isHighlighted = self.state.highlighted.indexOf(node.h) !== -1;
 
             var tooltipElement = null;
 
-            var icon = <span className={"transfer-filtype-icon " + fileIcon(node)}> </span>;
+            var icon = <span className={"transfer-filetype-icon " + fileIcon(node)}> </span>;
 
             if (fileIcon(node) === "graphic" && node.fa) {
                 var src = thumbnails[node.h];
@@ -246,7 +264,7 @@ var BrowserEntries = React.createClass({
                     src = window.noThumbURI || '';
                 }
                 icon = <Tooltips.Tooltip withArrow={true}>
-                    <Tooltips.Handler className={"transfer-filtype-icon " + fileIcon(node)}> </Tooltips.Handler>
+                    <Tooltips.Handler className={"transfer-filetype-icon " + fileIcon(node)}> </Tooltips.Handler>
                     <Tooltips.Contents className={"img-preview"}>
                         <div className="dropdown img-wrapper img-block" id={node.h}>
                             <img alt=""
@@ -262,7 +280,7 @@ var BrowserEntries = React.createClass({
 
             items.push(
                 <tr
-                    className={(isFolder ? " folder" :"") + (isSelected ? " ui-selected" : "")}
+                    className={(isFolder ? " folder" :"") + (isHighlighted ? " ui-selected" : "")}
                     onClick={(e) => {
                         self.onEntryClick(e, node);
                     }}
@@ -282,21 +300,41 @@ var BrowserEntries = React.createClass({
                 </tr>
             )
         });
-        return <utils.JScrollPane className="fm-dialog-grid-scroll" selected={this.state.selected}>
-            <table className="grid-table fm-dialog-table">
-                <tbody>
-                {items}
-                </tbody>
-            </table>
-        </utils.JScrollPane>;
+        if (items.length > 0) {
+            return (
+                <utils.JScrollPane className="fm-dialog-grid-scroll"
+                                          selected={this.state.selected}
+                                          highlighted={this.state.highlighted}
+                                          entries={this.props.entries}
+                                >
+                    <table className="grid-table fm-dialog-table">
+                        <tbody>
+                        {items}
+                        </tbody>
+                    </table>
+                </utils.JScrollPane>
+            );
+        } else {
+            return (
+                <div className="dialog-empty-block dialog-fm folder">
+                    <div className="dialog-empty-pad">
+                        <div className="dialog-empty-icon"></div>
+                        <div className="dialog-empty-header">
+                            {__(l[782])}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
     }
 });
 var CloudBrowserDialog = React.createClass({
     mixins: [MegaRenderMixin],
     getDefaultProps: function() {
         return {
-            'selectLabel': __("Attach"),
-            'cancelLabel': __("Cancel"),
+            'selectLabel': __(l[8023]),
+            'openLabel': __(l[1710]),
+            'cancelLabel': __(l[82]),
             'hideable': true
         }
     },
@@ -306,6 +344,7 @@ var CloudBrowserDialog = React.createClass({
                 'name', 'asc'
             ],
             'selected': [],
+            'highlighted': [],
             'currentlyViewedEntry': M.RootID
         }
     },
@@ -317,67 +356,94 @@ var CloudBrowserDialog = React.createClass({
             this.setState({'sortBy': [colId, "asc"]});
         }
     },
+    resizeBreadcrumbs: function() {
+        var $breadcrumbs = $('.fm-breadcrumbs-block.add-from-cloud', this.findDOMNode());
+        var $breadcrumbsWrapper = $breadcrumbs.find('.breadcrumbs-wrapper');
+
+        setTimeout(function() {
+            var breadcrumbsWidth = $breadcrumbs.outerWidth();
+            var $el = $breadcrumbs.find('.right-arrow-bg');
+            var i = 0;
+            var j = 0;
+            $el.removeClass('short-foldername ultra-short-foldername invisible');
+
+            while ($breadcrumbsWrapper.outerWidth() > breadcrumbsWidth) {
+                if (i < $el.length - 1) {
+                    $($el[i]).addClass('short-foldername');
+                    i++;
+                } else if (j < $el.length - 1) {
+                    $($el[j]).addClass('ultra-short-foldername');
+                    j++;
+                } else if (!$($el[j]).hasClass('short-foldername')) {
+                    $($el[j]).addClass('short-foldername');
+                } else {
+                    $($el[j]).addClass('ultra-short-foldername');
+                    break;
+                }
+            }
+        }, 0);
+    },
+    componentDidUpdate: function(prevProps, prevState) {
+        if (prevState.currentlyViewedEntry !== this.state.currentlyViewedEntry) {
+            this.resizeBreadcrumbs();
+
+            var handle = this.state.currentlyViewedEntry;
+            if (!M.d[handle] || (M.d[handle].t && !M.c[handle])) {
+                var self = this;
+
+                dbfetch.get(handle)
+                    .always(function() {
+                        self.setState({entries: self.getEntries()});
+                    });
+                return;
+            }
+        }
+
+        // TODO: @lp check if this is really ok
+        this.setState({entries: null});
+    },
     getEntries: function() {
         var self = this;
-        var entries = [];
-
-        obj_values(M.d).forEach(function(v) {
-            if (v.p === self.state.currentlyViewedEntry) {
-                entries.push(v);
-            }
-        });
-        var sortKey;
-        var order = 1;
+        var order = self.state.sortBy[1] === "asc" ? 1 : -1;
+        var entries = Object.keys(M.c[self.state.currentlyViewedEntry] || {}).map(h => M.d[h]);
+        var sortFunc;
 
         if (self.state.sortBy[0] === "name") {
-            sortKey = "name";
+            sortFunc = M.getSortByNameFn();
         }
         else if(self.state.sortBy[0] === "size") {
-            sortKey = "s";
+            sortFunc = M.getSortBySizeFn();
         }
-        else if(self.state.sortBy[0] === "grid-header-star") {
-            sortKey = "fav";
+        else /*if(self.state.sortBy[0] === "grid-header-star")*/ {
+            sortFunc = M.getSortByFavFn();
         }
-
-        order = self.state.sortBy[1] === "asc" ? 1 : -1;
 
         entries.sort(function(a, b) {
-            // compare diff cols by diff methods... (string VS int VS int + undefined)
-            if (sortKey === "name") {
-                return ((a[sortKey] ? a[sortKey] : "").localeCompare(b[sortKey])) * order;
-            }
-            else {
-                var _a = a[sortKey] || 0;
-                var _b = b[sortKey] || 0;
-                if (_a > _b) {
-                    return 1 * order;
-                }
-                if (_a < _b) {
-                    return -1 * order;
-                }
-
-                return 0;
-            }
+            return sortFunc(a, b, order);
         });
 
         // always return first the folders and then the files
-        var files = [];
         var folders = [];
 
-        entries.forEach(function(v) {
-            if(v.t === 1) {
-                folders.push(v);
+        for (var i = entries.length; i--;) {
+            if (entries[i].t) {
+                folders.unshift(entries[i]);
+                entries.splice(i, 1);
             }
-            else if(v.t === 0) {
-                files.push(v);
-            }
-        });
+        }
 
-        return folders.concat(files);
+        return folders.concat(entries);
     },
     onSelected: function(nodes) {
         this.setState({'selected': nodes});
         this.props.onSelected(nodes);
+    },
+    onHighlighted: function(nodes) {
+        this.setState({'highlighted': nodes});
+
+        if (this.props.onHighlighted) {
+            this.props.onHighlighted(nodes);
+        }
     },
     onAttachClicked: function() {
         this.props.onAttachClicked();
@@ -387,8 +453,13 @@ var CloudBrowserDialog = React.createClass({
     },
     render: function() {
         var self = this;
+	
+	// TODO: @lp show a 'loading' in place of the "empty folder" placeholder while dbfetch'ing nodes
+        var entries = self.state.entries || self.getEntries();
 
         var classes = "add-from-cloud " + self.props.className;
+
+        var folderIsHighlighted = false;
 
         var breadcrumb = [];
 
@@ -415,72 +486,123 @@ var CloudBrowserDialog = React.createClass({
                         e.preventDefault();
                         e.stopPropagation();
                         self.setState({'currentlyViewedEntry': p.h, 'selected': []});
-                        self.props.onSelected([]);
+                        self.onSelected([]);
+                        self.onHighlighted([]);
                     }}>
-                        <span className="right-arrow-bg">
-                            <span>{p.h === M.RootID ? __("Cloud Drive") : p.name}</span>
+                        <span className="right-arrow-bg invisible">
+                            <span>{p.h === M.RootID ? __(l[164]) : p.name}</span>
                         </span>
                     </a>
                 );
             })(p);
         } while (p = M.d[M.d[p.h].p]);
 
+        self.state.highlighted.forEach(function(nodeId) {
+            if (M.d[nodeId] && M.d[nodeId].t === 1) {
+                folderIsHighlighted = true;
+            }
+        });
+
+        var buttons = [];
+
+        if (!folderIsHighlighted) {
+            buttons.push(
+                {
+                    "label": self.props.selectLabel,
+                    "key": "select",
+                    "className": "default-grey-button "
+                    + (self.state.selected.length === 0 ? "disabled" : null),
+                    "onClick": function(e) {
+                        if (self.state.selected.length > 0) {
+                            self.props.onSelected(self.state.selected);
+                            self.props.onAttachClicked();
+                        }
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                }
+            )
+        }
+        else if (folderIsHighlighted) {
+            buttons.push(
+                {
+                    "label": self.props.openLabel,
+                    "key": "select",
+                    "className": "default-grey-button",
+                    "onClick": function(e) {
+                        if (self.state.highlighted.length > 0) {
+                            self.setState({'currentlyViewedEntry':
+                                self.state.highlighted[0]
+                            });
+                            self.onSelected([]);
+                            self.onHighlighted([]);
+                            self.browserEntries.setState({
+                                'selected': [],
+                                'highlighted': []
+                            });
+                        }
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                }
+            )
+        }
+
+        buttons.push(
+            {
+                "label": self.props.cancelLabel,
+                "key": "cancel",
+                "onClick": function(e) {
+                    self.props.onClose(self);
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            }
+        );
+
         return (
             <ModalDialog
-                title={__("Add from your Cloud Drive")}
+                title={__(l[8011])}
                 className={classes}
                 onClose={() => {
                     self.props.onClose(self);
                 }}
                 popupDidMount={self.onPopupDidMount}
-                buttons={[
-                        {
-                            "label": self.props.selectLabel,
-                            "key": "select",
-                            "className": self.state.selected.length === 0 ? "disabled" : null,
-                            "onClick": function(e) {
-                                if (self.state.selected.length > 0) {
-                                    self.props.onSelected(self.state.selected);
-                                    self.props.onAttachClicked();
-                                }
-                                e.preventDefault();
-                                e.stopPropagation();
-                            }
-                        },
-                        {
-                            "label": self.props.cancelLabel,
-                            "key": "cancel",
-                            "onClick": function(e) {
-                                self.props.onClose(self);
-                                e.preventDefault();
-                                e.stopPropagation();
-                            }
-                        },
-            ]}>
-                <div className="fm-breadcrumbs-block">
-                    {breadcrumb}
-                    <div className="clear"></div>
+                buttons={buttons}>
+                <div className="fm-breadcrumbs-block add-from-cloud">
+                    <div className="breadcrumbs-wrapper">
+                        {breadcrumb}
+                        <div className="clear"></div>
+                    </div>
                 </div>
 
                 <table className="grid-table-header fm-dialog-table">
                     <tbody>
                     <tr>
                         <BrowserCol id="grid-header-star" sortBy={self.state.sortBy} onClick={self.toggleSortBy} />
-                        <BrowserCol id="name" label={__("Name")} sortBy={self.state.sortBy} onClick={self.toggleSortBy} />
-                        <BrowserCol id="size" label={__("Size")} sortBy={self.state.sortBy} onClick={self.toggleSortBy} />
+                        <BrowserCol id="name" label={__(l[86])} sortBy={self.state.sortBy} onClick={self.toggleSortBy}/>
+                        <BrowserCol id="size" label={__(l[87])} sortBy={self.state.sortBy} onClick={self.toggleSortBy}/>
                     </tr>
                     </tbody>
                 </table>
 
 
                 <BrowserEntries
-                    entries={self.getEntries()}
+                    entries={entries}
                     onExpand={(node) => {
+                        self.onSelected([]);
+                        self.onHighlighted([]);
                         self.setState({'currentlyViewedEntry': node.h});
                     }}
                     folderSelectNotAllowed={self.props.folderSelectNotAllowed}
                     onSelected={self.onSelected}
+                    onHighlighted={self.onHighlighted}
                     onAttachClicked={self.onAttachClicked}
+                    ref={
+                        (browserEntries) => {
+                            self.browserEntries = browserEntries;
+                        }
+                    }
                 />
             </ModalDialog>
         );
@@ -492,20 +614,21 @@ var SelectContactDialog = React.createClass({
     clickTime: 0,
     getDefaultProps: function() {
         return {
-            'selectLabel': __("Send"),
-            'cancelLabel': __("Cancel"),
+            'selectLabel': __(l[1940]),
+            'cancelLabel': __(l[82]),
             'hideable': true
         }
     },
     getInitialState: function() {
         return {
-            'selected': []
+            'selected': this.props.selected ? this.props.selected : []
         }
     },
     onSelected: function(nodes) {
         this.setState({'selected': nodes});
-        this.props.onSelected(nodes);
-        this.forceUpdate();
+        if (this.props.onSelected) {
+            this.props.onSelected(nodes);
+        }
     },
     onSelectClicked: function() {
         this.props.onSelectClicked();
@@ -520,6 +643,7 @@ var SelectContactDialog = React.createClass({
             <ModalDialog
                 title={__("Send Contact")}
                 className={classes}
+                selected={self.state.selected}
                 onClose={() => {
                     self.props.onClose(self);
                 }}
@@ -530,8 +654,10 @@ var SelectContactDialog = React.createClass({
                             "className": self.state.selected.length === 0 ? "disabled" : null,
                             "onClick": function(e) {
                                 if (self.state.selected.length > 0) {
-                                    self.props.onSelected(self.state.selected);
-                                    self.props.onSelectClicked();
+                                    if (self.props.onSelected) {
+                                        self.props.onSelected(self.state.selected);
+                                    }
+                                    self.props.onSelectClicked(self.state.selected);
                                 }
                                 e.preventDefault();
                                 e.stopPropagation();
@@ -551,29 +677,8 @@ var SelectContactDialog = React.createClass({
                 megaChat={self.props.megaChat}
                 contacts={self.props.contacts}
                 exclude={self.props.exclude}
-                onClick={(contact, e) => {
-                    var contactHash = contact.h;
-
-                        // differentiate between a click and a double click.
-                        if ((new Date() - self.clickTime) < 500) {
-                            // is a double click
-                            self.onSelected([contact.h]);
-                            self.props.onSelectClicked();
-                        }
-                        else {
-                            // is a single click
-                            if (self.state.selected.indexOf(contactHash) === -1) {
-                                self.state.selected.push(contact.h);
-                                self.onSelected(self.state.selected);
-                            }
-                            else {
-                                removeValue(self.state.selected, contactHash);
-                                self.onSelected(self.state.selected);
-                            }
-                        }
-                        self.clickTime = new Date();
-
-                }}
+                onSelectDone={self.props.onSelectClicked}
+                onSelected={self.onSelected}
                 selected={self.state.selected}
                 headerClasses="left-aligned"
                 />
@@ -586,8 +691,8 @@ var ConfirmDialog = React.createClass({
     mixins: [MegaRenderMixin],
     getDefaultProps: function() {
         return {
-            'confirmLabel': __("Continue"),
-            'cancelLabel': __("Cancel"),
+            'confirmLabel': __(l[6826]),
+            'cancelLabel': __(l[82]),
             'hideable': true
         }
     },

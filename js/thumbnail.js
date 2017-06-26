@@ -33,7 +33,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
     }
 
     if (d) {
-        console.time('createthumbnail');
+        console.time('createthumbnail' + id);
     }
 
     var img = new Image();
@@ -172,13 +172,16 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
         }
 
         if (d) {
-            console.timeEnd('createthumbnail');
+            console.timeEnd('createthumbnail' + id);
         }
+
+        delete this.aes;
+        img = null;
     };
     img.onerror = function(e) {
         if (d) {
             console.error('createthumbnail error', e);
-            console.timeEnd('createthumbnail');
+            console.timeEnd('createthumbnail' + id);
         }
     };
     if (typeof FileReader !== 'undefined') {
@@ -187,17 +190,11 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
             ThumbFR.onload = function(e) {
                 var orientation;
                 var u8 = new Uint8Array(ThumbFR.result);
-                var dv = new DataView(u8.buffer);
 
                 if (u8.byteLength < 4) {
                     console.error('Unable to create thumbnail, data too short...');
                     return;
                 }
-
-                if (dv.getUint32(0) === 0x89504e47) {
-                    img.isPNG = true;
-                }
-                dv = undefined;
 
                 img.dataSize = u8.byteLength;
                 img.is64bit = browserdetails(ua).is64bit;
@@ -325,7 +322,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                                 file = new Blob([u8], {
                                     type: file.type
                                 });
-                                mega.utils.neuterArrayBuffer(u8);
+                                M.neuterArrayBuffer(u8);
                                 ThumbFR.readAsArrayBuffer(file);
                             }, function(ex) {
                                 if (d) {
@@ -352,7 +349,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                 file = new Blob([new Uint8Array(imagedata)], {
                     type: 'image/jpeg'
                 });
-                mega.utils.neuterArrayBuffer(imagedata);
+                M.neuterArrayBuffer(imagedata);
             }
             ThumbFR.readAsArrayBuffer(file);
         }, 350 + Math.floor(Math.random() * 600));
@@ -361,6 +358,12 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
 
 function __render_thumb(img, u8, orientation, blob) {
     if (u8) {
+        var dv = new DataView(u8.buffer || u8);
+        if (dv.getUint32(0) === 0x89504e47) {
+            img.isPNG = true;
+        }
+        dv = undefined;
+
         if (orientation === undefined || orientation < 1 || orientation > 8) {
             if (d) {
                 console.time('exif');
@@ -378,7 +381,7 @@ function __render_thumb(img, u8, orientation, blob) {
                 type: 'image/jpg'
             });
         }
-        mega.utils.neuterArrayBuffer(u8);
+        M.neuterArrayBuffer(u8);
     }
     if (!u8 || (img.huge && img.dataSize === blob.size)) {
         if (d) {

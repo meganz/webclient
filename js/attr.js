@@ -67,7 +67,9 @@ var attribCache = false;
      * @param attribute {String}
      *     Name of the attribute.
      * @param pub {Boolean|Number}
-     *     True for public attributes (default: true). -1 for "system" attributes (e.g. without prefix)
+     *     True for public attributes (default: true).
+     *     -1 for "system" attributes (e.g. without prefix)
+     *     -2 for "private non encrypted attributes"
      * @param nonHistoric {Boolean}
      *     True for non-historic attributes (default: false).  Non-historic
      *     attributes will overwrite the value, and not retain previous
@@ -116,7 +118,12 @@ var attribCache = false;
                     res = mega.attr.handleLegacyCacheAndDecryption(res, thePromise, attribute);
                 }
 
-                if (d) {
+                // Otherwise if a non-encrypted private attribute, base64 decode the data
+                else if (attribute.charAt(0) === '^') {
+                    res = base64urldecode(value);
+                }
+
+                if (d > 1 || is_karma) {
                     var loggerValueOutput = pub ? JSON.stringify(res) : '-- hidden --';
                     if (loggerValueOutput.length > 256) {
                         loggerValueOutput = loggerValueOutput.substr(0, 256) + '...';
@@ -128,8 +135,10 @@ var attribCache = false;
             }
             else {
                 // Got back an error (a number).
-                logger.warn(tag + 'attribute "%s" for user "%s" could not be retrieved: %d!',
-                    attribute, userhandle, res);
+                if (d > 1 || is_karma) {
+                    logger.warn(tag + 'attribute "%s" for user "%s" could not be retrieved: %d!',
+                        attribute, userhandle, res);
+                }
                 thePromise.reject(res);
             }
 
@@ -240,8 +249,10 @@ var attribCache = false;
      *
      * @param attribute {string}
      *     Name of the attribute.
-     * @param pub {bool}
+     * @param pub {Boolean|Number}
      *     True for public attributes (default: true).
+     *     -1 for "system" attributes (e.g. without prefix)
+     *     -2 for "private non encrypted attributes"
      * @param nonHistoric {bool}
      *     True for non-historic attributes (default: false).  Non-historic
      *     attributes will overwrite the value, and not retain previous
@@ -282,8 +293,10 @@ var attribCache = false;
      * @param value {object}
      *     Value of the user attribute. Public properties are of type {string},
      *     private ones have to be an object with key/value pairs.
-     * @param pub {bool}
+     * @param pub {Boolean|Number}
      *     True for public attributes (default: true).
+     *     -1 for "system" attributes (e.g. without prefix)
+     *     -2 for "private non encrypted attributes"
      * @param nonHistoric {bool}
      *     True for non-historic attributes (default: false).  Non-historic
      *     attributes will overwrite the value, and not retain previous
@@ -325,6 +338,11 @@ var attribCache = false;
             // Let's encode and encrypt it.
             savedValue = base64urlencode(tlvstore.blockEncrypt(
                 tlvstore.containerToTlvRecords(value), u_k, mode));
+        }
+
+        // Otherwise if a non-encrypted private attribute, base64 encode the data
+        else if (attribute[0] === '^') {
+            savedValue = base64urlencode(value);
         }
 
         // Make the promise to execute the API code.
@@ -798,13 +816,4 @@ function uaPacketParser(attrName, userHandle, ownActionPacket, version) {
         });
 
     return removeItemPromise;
-}
-
-
-if (is_karma) {
-    window.M = new MegaData();
-    attribCache = new IndexedDBKVStorage('attrib', { murSeed: 0x800F0002 });
-    attribCache.syncNameTimer = {};
-    attribCache.uaPacketParser = uaPacketParser;
-    attribCache.bitMapsManager = new MegaDataBitMapManager();
 }

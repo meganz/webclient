@@ -3,7 +3,6 @@ var utils = require("./utils.jsx");
 var MegaRenderMixin = require("../stores/mixins.js").MegaRenderMixin;
 var RenderDebugger = require("../stores/mixins.js").RenderDebugger;
 var ContactsUI = require('./../chat/ui/contacts.jsx');
-var EMOJILIST = require('./emojilist.jsx');
 var PerfectScrollbar = require('./perfectScrollbar.jsx').PerfectScrollbar;
 
 var Dropdown = React.createClass({
@@ -167,6 +166,11 @@ var DropdownContactsSelector = React.createClass({
             requiresUpdateOnResize: true
         };
     },
+    getInitialState: function() {
+        return {
+            'selected': this.props.selected ? this.props.selected : []
+        }
+    },
     specificShouldComponentUpdate: function(nextProps, nextState) {
         if (this.props.active != nextProps.active) {
             return true;
@@ -177,10 +181,23 @@ var DropdownContactsSelector = React.createClass({
         else if (this.state && this.state.active != nextState.active) {
             return true;
         }
+        else if (this.state && JSON.stringify(this.state.selected) != JSON.stringify(nextState.selected)) {
+            return true;
+        }
         else {
             // not sure, leave to the render mixing to decide.
             return undefined;
         }
+    },
+    onSelected: function(nodes) {
+        this.setState({'selected': nodes});
+        if (this.props.onSelected) {
+            this.props.onSelected(nodes);
+        }
+        this.forceUpdate();
+    },
+    onSelectClicked: function() {
+        this.props.onSelectClicked();
     },
     render: function() {
         var self = this;
@@ -203,11 +220,7 @@ var DropdownContactsSelector = React.createClass({
                     multipleSelectedButtonLabel={this.props.multipleSelectedButtonLabel}
                     singleSelectedButtonLabel={this.props.singleSelectedButtonLabel}
                     nothingSelectedButtonLabel={this.props.nothingSelectedButtonLabel}
-                    onClick={(contact, e) => {
-                            this.props.onClick(contact, e);
-                            this.props.closeDropdown();
-                        }
-                    } />
+                    />
         </Dropdown>;
     }
 });
@@ -275,252 +288,8 @@ var DropdownItem = React.createClass({
     }
 });
 
-
-var DropdownEmojiSelector = React.createClass({
-    mixins: [MegaRenderMixin],
-    getDefaultProps: function() {
-        return {
-            'requiresUpdateOnResize': true,
-            'hideable': true
-        };
-    },
-    getInitialState: function() {
-        return {
-            'previewEmoji': null,
-            'searchValue': '',
-            'browsingCategory': false,
-            'isActive': false
-        }
-    },
-    onSearchChange: function(e) {
-        var self = this;
-        self.setState({
-            searchValue: e.target.value,
-            browsingCategory: false
-        });
-        self.refs.scrollableArea.scrollToY(0);
-    },
-    onUserScroll: function(
-        $ps,
-        elem,
-        e
-    ) {
-        if (this.state.browsingCategory) {
-            var $cat = $('.emoji-category-container[data-category-name="' + this.state.browsingCategory + '"]');
-            if (!elementInViewport($cat)) {
-                this.setState({'browsingCategory': false});
-            }
-        }
-    },
-    render: function() {
-        var self = this;
-
-        var categoryTranslations = {
-            "PEOPLE": l[8016],
-            "NATURE": l[8017],
-            "FOOD & DRINK": l[8018],
-            "CELEBRATION": l[8019],
-            "ACTIVITY": l[8020],
-            "TRAVEL & PLACES": l[8021],
-            "OBJECTS & SYMBOLS": l[8022]
-        };
-
-        var popupContents = null;
-
-        if (self.state.isActive === true) {
-            var preview;
-            if (self.state.previewEmoji) {
-                var slug = self.state.previewEmoji;
-                var emojiMeta = EMOJILIST.EMOJIS[slug];
-                var txt = ":" + slug + ":";
-                if (slug.substr(0, 1) == ":" || slug.substr(-1) == ":") {
-                    txt = slug;
-                }
-
-
-                preview = <div className="emoji-one-preview">
-                    <span className={"emoji-one demo-icon emojione-" + emojiMeta[0]}></span>
-                    <div className="emoji-one title">{txt}</div>
-                </div>;
-            }
-
-
-            var emojis = [];
-            var searchValue = self.state.searchValue;
-
-            Object.keys(EMOJILIST.EMOJI_CATEGORIES).forEach(function (categoryName) {
-                var curCategoryEmojis = [];
-                Object.keys(EMOJILIST.EMOJI_CATEGORIES[categoryName]).forEach(function (slug) {
-                    if (searchValue.length > 0) {
-                        if ((":" + slug + ":").toLowerCase().indexOf(searchValue.toLowerCase()) < 0) {
-                            return;
-                        }
-                    }
-                    var meta = EMOJILIST.EMOJIS[slug];
-
-                    curCategoryEmojis.push(
-                        <div
-                            data-emoji={slug}
-                            className="button square-button emoji-one" key={categoryName + "_" + slug}
-                            onMouseEnter={(e) => {
-                                if (self.mouseEnterTimer) {
-                                    clearTimeout(self.mouseEnterTimer);
-                                }
-
-                                e.stopPropagation();
-                                e.preventDefault();
-
-                                // delay the .setState change, because of the tons of icons we've, which are
-                                // re-rendered in case of .setState
-                                self.mouseEnterTimer = setTimeout(function() {
-                                    self.setState({'previewEmoji': slug});
-                                }, 250);
-                            }}
-                            onMouseLeave={(e) => {
-                                if (self.mouseEnterTimer) {
-                                    clearTimeout(self.mouseEnterTimer);
-                                }
-                                e.stopPropagation();
-                                e.preventDefault();
-
-                                self.setState({'previewEmoji': null});
-                            }}
-                            onClick={(e) => {
-                                if (self.props.onClick) {
-                                    self.props.onClick(e, slug, meta);
-                                }
-                            }}
-                        >
-                        <span
-                            className={"emojione-" + meta[0]}
-                            title={":" + slug + ":"}>{meta[1]}</span>
-                        </div>
-                    );
-                });
-
-                if (curCategoryEmojis.length > 0) {
-                    emojis.push(
-                        <div key={categoryName} data-category-name={categoryName} className="emoji-category-container">
-                            {emojis.length > 0 ? <div className="clear"></div> : null}
-                            <div className="emoji-type-txt">
-                                {
-                                    categoryTranslations[categoryName] ?
-                                        categoryTranslations[categoryName] :
-                                        categoryName
-                                }
-                            </div>
-
-                            <div className="clear"></div>
-                            {curCategoryEmojis}
-                            <div className="clear"></div>
-                        </div>
-                    );
-                }
-            });
-            var categoryIcons = {
-                //"FREQUENTLY USED": "clock-icon",
-                "PEOPLE": "smile-icon",
-                "NATURE": "sun-icon",
-                "FOOD & DRINK": "wineglass-icon",
-                "CELEBRATION": "present-icon",
-                "ACTIVITY": "bowling-ball-icon",
-                "TRAVEL & PLACES": "earth-icon",
-                "OBJECTS & SYMBOLS": "percents-icon"
-            };
-
-            var categoryButtons = [];
-
-            Object.keys(categoryIcons).forEach(function (categoryName) {
-                var activeClass = self.state.browsingCategory === categoryName ? " active" : "";
-
-                if (
-                    self.state.browsingCategory === false &&
-                    self.state.searchValue === '' &&
-                    categoryIcons[categoryName] === "clock-icon"
-                ) {
-                    activeClass = " active";
-                }
-
-                categoryButtons.push(
-                    <div
-                        className={"button square-button emoji-one" + (activeClass)}
-                        key={categoryIcons[categoryName]}
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            e.preventDefault();
-
-                            self.setState({browsingCategory: categoryName, searchValue: ''});
-
-                            self.refs.scrollableArea.scrollToElement(
-                                $('.emoji-category-container[data-category-name="' + categoryName + '"]:visible')[0]
-                            );
-                        }}
-                    >
-                        <i className={"small-icon " + categoryIcons[categoryName]}></i>
-                    </div>
-                );
-            });
-
-            popupContents = <div>
-                <div className="popup-header emoji-one">
-
-                    { preview ? preview : <div className="search-block emoji-one">
-                        <i className="small-icon search-icon"></i>
-                        <input type="search"
-                               placeholder={__(l[102])}
-                               ref="emojiSearchField"
-                               onChange={this.onSearchChange}
-                               value={this.state.searchValue}/>
-
-                    </div>
-                    }
-
-
-                </div>
-
-
-
-                <PerfectScrollbar
-                    className="popup-scroll-area emoji-one perfectScrollbarContainer"
-                    searchValue={this.state.searchValue}
-                    onUserScroll={this.onUserScroll}
-                    ref="scrollableArea"
-                >
-                    <div className="popup-scroll-content emoji-one">
-                        {emojis}
-                    </div>
-                </PerfectScrollbar>
-
-                <div className="popup-footer emoji-one">{categoryButtons}</div>
-            </div>;
-        }
-        else {
-            popupContents = null;
-        }
-
-        return <Dropdown
-            className="popup emoji-one" {...self.props} ref="dropdown"
-            onActiveChange={(newValue) => {
-                // reset state if the dropdown is hidden
-                if (newValue === false) {
-                    self.setState(self.getInitialState());
-                }
-                else {
-                    self.setState({'isActive': true});
-                }
-            }}
-            searchValue={self.state.searchValue}
-            browsingCategory={self.state.browsingCategory}
-            previewEmoji={self.state.previewEmoji}
-        >
-            {popupContents}
-        </Dropdown>;
-    }
-});
-
 module.exports = window.DropdownsUI = {
     Dropdown,
-    DropdownEmojiSelector,
     DropdownItem,
     DropdownContactsSelector
 };

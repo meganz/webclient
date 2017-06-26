@@ -5,21 +5,27 @@
     // ^ zxcvbn stuff..
 
     function doProRegister($dialog) {
+        var hideOverlay = function() {
+            loadingDialog.hide();
+            $dialog.removeClass('arrange-to-back');
+        };
+
         if (options.onCreatingAccount) {
             options.onCreatingAccount($dialog);
         }
         loadingDialog.show();
+        $dialog.addClass('arrange-to-back');
 
         if (u_type > 0) {
+            hideOverlay();
             msgDialog('warninga', l[135], l[5843]);
-            loadingDialog.hide();
             return false;
         }
 
         var registeraccount = function() {
             var rv = {};
             var done = function(login) {
-                loadingDialog.hide();
+                hideOverlay();
                 $('.pro-register-dialog').addClass('hidden');
                 $('.fm-dialog.registration-page-success').unbind('click');
 
@@ -64,7 +70,7 @@
                         var uh = stringhash(rv.email.toLowerCase(), passwordaes);
                         var ctx = {
                             checkloginresult: function(ctx, r) {
-                                loadingDialog.hide();
+                                hideOverlay();
 
                                 if (!r) {
                                     $('.login-register-input.email', $dialog).addClass('incorrect');
@@ -91,7 +97,7 @@
                         u_login(ctx, rv.email, rv.password, uh, true);
                     }
                     else {
-                        loadingDialog.hide();
+                        hideOverlay();
                         msgDialog('warninga', 'Error', l[200], res);
                     }
                 }
@@ -159,28 +165,28 @@
         }
 
         if (!err && typeof zxcvbn === 'undefined') {
+            hideOverlay();
             msgDialog('warninga', l[135], l[1115] + '<br>' + l[1116]);
-            loadingDialog.hide();
             return false;
         }
         else if (!err) {
             if ($('.register-check', $dialog).hasClass('checkboxOff')) {
+                hideOverlay();
                 msgDialog('warninga', l[1117], l[1118]);
-                loadingDialog.hide();
             }
             else {
                 if (localStorage.signupcode) {
-                    loadingDialog.show();
                     u_storage = init_storage(localStorage);
                     var ctx = {
                         checkloginresult: function(u_ctx, r) {
+                            hideOverlay();
+
                             if (typeof r[0] === 'number' && r[0] < 0) {
                                 msgDialog('warningb', l[135], l[200]);
                             }
                             else {
-                                loadingDialog.hide();
                                 u_type = r;
-                                document.location.hash = 'fm'; // TODO: fixme
+                                loadSubPage('fm');
                             }
                         }
                     };
@@ -194,7 +200,7 @@
                     delete localStorage.signupcode;
                 }
                 else if (u_type === false) {
-                    loadingDialog.show();
+                    hideOverlay();
                     u_storage = init_storage(localStorage);
                     u_checklogin({
                         checkloginresult: function(u_ctx, r) {
@@ -209,7 +215,7 @@
             }
         }
         if (err) {
-            loadingDialog.hide();
+            hideOverlay();
         }
     }
 
@@ -275,6 +281,10 @@
         var closeRegisterDialog = function() {
             closeDialog();
             $(window).unbind('resize.proregdialog');
+
+            if (options.onDialogClosed) {
+                options.onDialogClosed($dialog);
+            }
         };
 
         dialogBodyScroll();
@@ -288,6 +298,9 @@
         });
 
         $('*', $dialog).removeClass('incorrect'); // <- how bad idea is that "*" there?
+
+        // this might gets binded from init_page() which will conflict here..
+        $('.login-register-input').unbind('click');
 
         // controls
         $('.fm-dialog-close', $dialog)
@@ -373,28 +386,29 @@
             $('.password-status-warning', $dialog).css('margin-left',
                 ($('.password-status-warning', $dialog).width() / 2 * -1) - 13);
             reposition();
+            dialogBodyScroll();
         };
 
-        if (typeof zxcvbn === 'undefined' && !silent_loading) {
+        if (typeof zxcvbn === 'undefined') {
             $('.login-register-input.password', $dialog).addClass('loading');
 
-            silent_loading = function() {
-                $('.login-register-input.password', $dialog).removeClass('loading');
-                registerpwcheck();
-            };
-            jsl.push(jsl2['zxcvbn_js']);
-            jsl_start();
+            M.require('zxcvbn_js')
+                .done(function() {
+                    $('.login-register-input.password', $dialog).removeClass('loading');
+                    registerpwcheck();
+                });
         }
 
         $('#register-password', $dialog).rebind('keyup.proRegister', function(e) {
             registerpwcheck();
         });
+
         $('.password-status-icon', $dialog).rebind('mouseover.proRegister', function(e) {
             if ($(this).parents('.strong-password').length === 0) {
                 $('.password-status-warning', $dialog).removeClass('hidden');
             }
-
         });
+
         $('.password-status-icon', $dialog).rebind('mouseout.proRegister', function(e) {
             if ($(this).parents('.strong-password').length === 0) {
                 $('.password-status-warning', $dialog).addClass('hidden');
@@ -418,7 +432,7 @@
                     $('.register-check').removeClass('checkboxOff');
                     $('.register-check').addClass('checkboxOn');
                 };
-                termsDialog();
+                bottomPageDialog(false, 'terms'); // show terms dialog
                 return false;
             });
     }

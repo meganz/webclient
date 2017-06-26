@@ -24,10 +24,11 @@ if (typeof importScripts !== 'undefined') {
                 var k = crypto_process_sharekey(req.n, req.k);
 
                 if (k === false) {
-                    console.log("Failed to decrypt RSA share key for " + req.n + ": " + req.k);
+                    console.warn("Failed to decrypt RSA share key for " + req.n + ": " + req.k);
                 }
                 else {
                     req.k = k;
+                    u_sharekeys[req.n] = [k, new sjcl.cipher.aes(k)];
                 }
             }
             self.postMessage(req);
@@ -44,11 +45,15 @@ if (typeof importScripts !== 'undefined') {
         else if (req.ha) {
             // ownerkey (ok element)
             if (crypto_handleauthcheck(req.h, req.ha)) {
-                console.log("Successfully decrypted sharekeys for " + req.h);
+                if (d) {
+                    console.log("Successfully decrypted sharekeys for " + req.h);
+                }
                 key = decrypt_key(u_k_aes, base64_to_a32(req.k));
                 u_sharekeys[req.h] = [key, new sjcl.cipher.aes(key)];
             }
-            else console.log("handleauthcheck failed for " + req.h);
+            else if (d) {
+                console.warn("handleauthcheck failed for " + req.h);
+            }
         }
         else if (req.u_k) {
             // setup for user account
@@ -75,12 +80,6 @@ if (typeof importScripts !== 'undefined') {
             self.postMessage({ done: 1, sharekeys: u_sharekeys });
             init();
         }
-    }
-
-    var console = {
-        log: function() {
-            if (d) self.postMessage(['console', [].slice.call(arguments)]);
-        }
     };
 
     if (typeof srvlog2 === 'undefined') {
@@ -95,6 +94,7 @@ var u_handle;
 var u_privk;
 var u_k_aes;
 var u_sharekeys = {};
+var vkey = {};
 
 function crypto_process_sharekey(handle, key) {
     if (key.length > 43) {
@@ -123,8 +123,8 @@ function crypto_decryptnode(n) {
     if (typeof n.k == 'undefined' || n.name) return;
 
     if (typeof n.k == 'string') {
-        // inbound share root? exract & store sharekey.
-        if (n.sk) {
+        // inbound share root? set parent to sharing user; extract & store sharekey.
+        if (n.su && typeof n.sk == 'string') {
             key = crypto_process_sharekey(n.h, n.sk);
 
             if (key) {
@@ -134,7 +134,6 @@ function crypto_decryptnode(n) {
                 else {
                     delete n.sk;
                     u_sharekeys[n.h] = [key, new sjcl.cipher.aes(key)];
-                    n.p = n.u;
                 }
             }
         }
@@ -179,7 +178,7 @@ function crypto_decryptnode(n) {
                 }
                 else {
                     if (d) {
-                        console.log("Received invalid key length (" + k.length + "): " + n.h);
+                        console.error("Received invalid key length (" + k.length + "): " + n.h);
                     }
                     k = false;
                 }
@@ -198,13 +197,13 @@ function crypto_decryptnode(n) {
                         }
                         else {
                             if (d) {
-                                console.log("Corrupt key for node " + n.h);
+                                console.warn("Corrupt key for node " + n.h);
                             }
                         }
                     }
                     catch (e) {
                         if (d) {
-                            console.log('u_privk error: ' + e);
+                            console.error('u_privk error: ' + e);
                         }
                     }
                 }
@@ -225,15 +224,28 @@ function crypto_decryptnode(n) {
         if (n.a) crypto_procattr(n, k);
         else {
             if (d && n.t < 2) {
-                console.log('Missing attribute for node ' + n.h);
+                console.warn('Missing attribute for node ' + n.h);
             }
         }
     }
     else {
-        if (d) console.log("Can't extract a valid key for " + n.h);
+        if (d) {
+            vkey[n.h] = 1;
+            if (vkey.t) {
+                clearTimeout(vkey.t);
+            }
+            vkey.t = setTimeout(function() {
+                delete vkey.t;
+                console.debug("Can't extract a valid key for", Object.keys(vkey));
+                vkey = {};
+            }, 4000);
+        }
+
         if (missingkeys) crypto_reportmissingkey(n);
     }
 }
+var vkey = {};
+var ckey = {};
 
 // generate attributes block for given node using AES-CBC with MEGA canary
 // (also generates random (folder-type) key if missing)
@@ -265,7 +277,7 @@ function crypto_makeattr(n, nn) {
     if (typeof n.f != 'undefined') ar.f = n.f;
 
     try {
-        ab = str_to_ab('MEGA' + to8(JSON.stringify(ar)));
+        var ab = str_to_ab('MEGA' + to8(JSON.stringify(ar)));
     } catch (e) {
         msgDialog('warningb', l[135], e.message || e);
         throw e;
@@ -349,12 +361,20 @@ function crypto_procattr(n, key) {
             n.ar = o;
             delete n.a;
         }
-        else {
-            if (d) console.log("Incomplete attributes for node " + n.h);
+        else if (d) {
+            console.warn("Incomplete attributes for node " + n.h);
         }
     }
-    else {
-        if (d) console.log("Corrupted attributes or key for node " + n.h);
+    else if (d) {
+        ckey[n.h] = 1;
+        if (ckey.t) {
+            clearTimeout(ckey.t);
+        }
+        ckey.t = setTimeout(function() {
+            delete ckey.t;
+            console.debug("Corrupted attributes or key for", Object.keys(ckey));
+            ckey = {};
+        }, 4000);
     }
 }
 
@@ -411,7 +431,9 @@ function crypto_rsadecrypt(ciphertext, privkey) {
         var cleartext = asmCrypto.bytes_to_string(asmCrypto.RSA_RAW.decrypt(ciphertext, privkey));
     }
     catch (e) {
-        console.log("RSA decryption failed: " + e);
+        if (d) {
+            console.error("RSA decryption failed: " + e);
+        }
         srvlog2('rsa-dec-err', String(e), String(JSON.stringify(privkey)).length);
         return false;
     }
@@ -646,7 +668,9 @@ function dec_attr(attr, key) {
         return JSON.parse(from8(b.substr(4)));
     }
     catch (e) {
-        if (d) console.log(b, String(e));
+        if (d) {
+            console.warn(b, String(e));
+        }
         var m = b.match(/"n"\s*:\s*"((?:\\"|.)*?)(\.\w{2,4})?"/);
         var s = m && m[1];
         var l = s && s.length || 0;
@@ -686,3 +710,51 @@ function dec_attr(attr, key) {
 var from8 = firefox_boost ? mozFrom8 : function (utf8) {
     return decodeURIComponent(escape(utf8));
 };
+
+
+(function _console(global) {
+    var logFunc;
+    var dummyFunc = function() {};
+    var logging = {debug: 1, log: 1, info: 1, warn: 1, error: 1};
+
+    if (typeof importScripts !== 'undefined') {
+        logFunc = function() {
+            global.postMessage(['console', [].slice.call(arguments)]);
+        };
+    }
+
+    if (!global.console) {
+        global.console = {};
+    }
+
+    var funcs = 'clear,count,debug,dir,dirxml,error,exception,group,groupCollapsed,groupEnd,' +
+                'info,log,profile,profileEnd,table,timeline,timelineEnd,timeStamp,trace,warn';
+
+    funcs.split(',').forEach(function(fn) {
+        if (global.console[fn] === undefined) {
+            global.console[fn] = logging[fn] && logFunc || dummyFunc;
+        }
+    });
+
+    if (!global.console.assert) {
+        global.console.assert = function cassert(expr) {
+            if (!expr) {
+                global.console.error.apply(global.console, [].slice.call(arguments, 1));
+            }
+        };
+    }
+
+    if (!global.console.time) {
+        var timers = {};
+        global.console.time = function ctime(n) {
+            timers[n] = new Date().getTime()
+        };
+        global.console.timeEnd = function ctimeend(n) {
+            if (timers[n]) {
+                global.console.log(n + ': ' + (new Date().getTime() - timers[n]) + 'ms');
+                delete timers[n];
+            }
+        };
+    }
+
+})(self);

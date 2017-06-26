@@ -16,7 +16,7 @@ var PerfectScrollbar = require('./../../ui/perfectScrollbar.jsx').PerfectScrollb
 var ParticipantsList = require('./participantsList.jsx').ParticipantsList;
 
 var GenericConversationMessage = require('./messages/generic.jsx').GenericConversationMessage;
-var AlterParticipantsConversationMessage = 
+var AlterParticipantsConversationMessage =
     require('./messages/alterParticipants.jsx').AlterParticipantsConversationMessage;
 var TruncatedMessage = require('./messages/truncated.jsx').TruncatedMessage;
 var PrivilegeChange = require('./messages/privilegeChange.jsx').PrivilegeChange;
@@ -84,21 +84,17 @@ var ConversationRightArea = React.createClass({
 
         var myPresence = room.megaChat.xmppPresenceToCssClass(M.u[u_handle].presence);
 
-        var startAudioCallButton = 
-                        <div className={"link-button" + (!contact.presence? " disabled" : "")} onClick={() => {
-                            if (contact.presence && contact.presence !== "offline") {
-                                room.startAudioCall();
-                            }
+        var startAudioCallButton =
+                        <div className={"link-button"} onClick={() => {
+                            room.startAudioCall();
                         }}>
             <i className="small-icon audio-call"></i>
             {__(l[5896])}
         </div>;
 
-        var startVideoCallButton = 
-                    <div className={"link-button" + (!contact.presence? " disabled" : "")} onClick={() => {
-                        if (contact.presence && contact.presence !== "offline") {
-                            room.startVideoCall();
-                        }
+        var startVideoCallButton =
+                    <div className={"link-button"} onClick={() => {
+                        room.startVideoCall();
                     }}>
             <i className="small-icon video-call"></i>
             {__(l[5897])}
@@ -107,7 +103,7 @@ var ConversationRightArea = React.createClass({
         if (room.isReadOnly()) {
            startAudioCallButton = startVideoCallButton = null;
         }
-        var endCallButton =     
+        var endCallButton =
                     <div className={"link-button red" + (!contact.presence? " disabled" : "")} onClick={() => {
                         if (contact.presence && contact.presence !== "offline") {
                             if (room.callSession) {
@@ -155,9 +151,9 @@ var ConversationRightArea = React.createClass({
         ) {
             dontShowTruncateButton = true;
         }
-        
+
         var membersHeader = null;
-        
+
         if (room.type === "group") {
             membersHeader = <div className="chat-right-head">
                 <div className="chat-grey-counter">
@@ -275,7 +271,7 @@ var ConversationRightArea = React.createClass({
                         {endCallButton}
 
                         {
-                            <div className={"link-button red " + (dontShowTruncateButton ? "disabled" : "")}
+                            <div className={"link-button " + (dontShowTruncateButton ? "disabled" : "")}
                                  onClick={(e) => {
                                      if ($(e.target).closest('.disabled').size() > 0) {
                                          return false;
@@ -284,7 +280,7 @@ var ConversationRightArea = React.createClass({
                                         self.props.onTruncateClicked();
                                      }
                             }}>
-                                <i className="small-icon rounded-stop"></i>
+                                <i className="small-icon clear-arrow"></i>
                                 {__(l[8871])}
                             </div>
                         }
@@ -305,7 +301,7 @@ var ConversationRightArea = React.createClass({
                             </div>
                         ) : null
                         }
-                        { room.type === "group" && room.stateIsLeftOrLeaving() ? (
+                        { room._closing !== true && room.type === "group" && room.stateIsLeftOrLeaving() ? (
                             <div className="link-button red" onClick={() => {
                                 if (self.props.onCloseClicked) {
                                     self.props.onCloseClicked();
@@ -738,13 +734,14 @@ var ConversationPanel = React.createClass({
             messagesToggledInCall: false,
             sendContactDialog: false,
             confirmDeleteDialog: false,
+            pasteImageConfirmDialog: false,
             messageToBeDeleted: null,
             editing: false
         };
     },
 
     uploadFromComputer: function() {
-        $('#fileselect3').trigger('click')
+        $('#fileselect1').trigger('click')
     },
     refreshUI: function() {
         var self = this;
@@ -893,7 +890,7 @@ var ConversationPanel = React.createClass({
                 self.messagesListScrollable.scrollToBottom(true);
             });
         }
-        
+
         if (prevProps.isActive === false && self.props.isActive === true) {
             var $typeArea = $('.messages-textarea:visible:first', $node);
             if ($typeArea.size() === 1) {
@@ -907,7 +904,7 @@ var ConversationPanel = React.createClass({
             $input[0].selectionStart = 0;
             $input[0].selectionEnd = $input.val().length;
         }
-        
+
         if (prevState.editing === false && self.state.editing !== false) {
             if (self.messagesListScrollable) {
                 self.messagesListScrollable.reinitialise(false);
@@ -918,6 +915,15 @@ var ConversationPanel = React.createClass({
                     }
                 });
             }
+        }
+
+        if (self.isMounted() && self.$messages && self.isComponentEventuallyVisible()) {
+            $(window).rebind('pastedimage.chatRoom', function (e, blob, fileName) {
+                if (self.isMounted() && self.$messages && self.isComponentEventuallyVisible()) {
+                    self.setState({'pasteImageConfirmDialog': [blob, fileName, URL.createObjectURL(blob)]});
+                    e.preventDefault();
+                }
+            });
         }
     },
     handleWindowResize: function(e, scrollToBottom) {
@@ -1005,7 +1011,7 @@ var ConversationPanel = React.createClass({
 
 
         // turn on/off auto scroll to bottom.
-        if (isAtBottom === true) {
+        if (ps.isCloseToBottom(30) === true) {
             self.scrolledToBottom = true;
         }
         else {
@@ -1110,15 +1116,10 @@ var ConversationPanel = React.createClass({
                 self.props.chatRoom.messagesBuff.messagesHistoryIsLoading() === true
             )
         ) {
-            if (localStorage.megaChatPresence !== 'unavailable') {
-                self.loadingShown = true;
-            }
+            self.loadingShown = true;
         }
         else if (
-            self.props.chatRoom.messagesBuff.joined === true && (
-                self.props.chatRoom.messagesBuff.messages.length === 0 ||
-                !self.props.chatRoom.messagesBuff.haveMoreHistory()
-            )
+            self.props.chatRoom.messagesBuff.joined === true
         ) {
             delete self.loadingShown;
             var headerText = (
@@ -1315,32 +1316,39 @@ var ConversationPanel = React.createClass({
                                         v.internalId ? v.internalId : v.orderValue,
                                         messageContents
                                     );
-                                    if (v.textContents) {
-                                        v.textContents = messageContents;
-                                    }
-                                    if (v.contents) {
-                                        v.contents = messageContents;
-                                    }
-                                    if (v.emoticonShortcutsProcessed) {
-                                        v.emoticonShortcutsProcessed = false;
-                                    }
-                                    if (v.emoticonsProcessed) {
-                                        v.emoticonsProcessed = false;
-                                    }
-                                    if (v.messageHtml) {
-                                        delete v.messageHtml;
-                                    }
+
+                                    if (
+                                        v.getState &&
+                                        v.getState() === Message.STATE.NOT_SENT &&
+                                        !v.requiresManualRetry
+                                    ) {
+                                        if (v.textContents) {
+                                            v.textContents = messageContents;
+                                        }
+                                        if (v.contents) {
+                                            v.contents = messageContents;
+                                        }
+                                        if (v.emoticonShortcutsProcessed) {
+                                            v.emoticonShortcutsProcessed = false;
+                                        }
+                                        if (v.emoticonsProcessed) {
+                                            v.emoticonsProcessed = false;
+                                        }
+                                        if (v.messageHtml) {
+                                            delete v.messageHtml;
+                                        }
 
 
-                                    $(v).trigger(
-                                        'onChange',
-                                        [
-                                            v,
-                                            "textContents",
-                                            "",
-                                            messageContents
-                                        ]
-                                    );
+                                        $(v).trigger(
+                                            'onChange',
+                                            [
+                                                v,
+                                                "textContents",
+                                                "",
+                                                messageContents
+                                            ]
+                                        );
+                                    }
 
                                     self.messagesListScrollable.scrollToBottom(true);
                                     self.lastScrollPositionPerc = 1;
@@ -1352,7 +1360,7 @@ var ConversationPanel = React.createClass({
                                         'messageToBeDeleted': v
                                     });
                                 }
-                                
+
                                 self.setState({'editing': false});
                             }}
                             onDeleteClicked={(e, msg) => {
@@ -1404,7 +1412,6 @@ var ConversationPanel = React.createClass({
                 });
             }
 
-            var selected = [];
             sendContactDialog = <ModalDialogsUI.SelectContactDialog
                 megaChat={room.megaChat}
                 chatRoom={room}
@@ -1414,17 +1421,14 @@ var ConversationPanel = React.createClass({
                     self.setState({'sendContactDialog': false});
                     selected = [];
                 }}
-                onSelected={(nodes) => {
-                    selected = nodes;
-                }}
-                onSelectClicked={() => {
+                onSelectClicked={(selected) => {
                     self.setState({'sendContactDialog': false});
 
                     room.attachContacts(selected);
                 }}
             />
         }
-        
+
         var confirmDeleteDialog = null;
         if (self.state.confirmDeleteDialog === true) {
             confirmDeleteDialog = <ModalDialogsUI.ConfirmDialog
@@ -1441,7 +1445,7 @@ var ConversationPanel = React.createClass({
                         return;
                     }
                     var chatdint = room.megaChat.plugins.chatdIntegration;
-                    if (msg.getState() === Message.STATE.SENT || 
+                    if (msg.getState() === Message.STATE.SENT ||
                         msg.getState() === Message.STATE.DELIVERED ||
                         msg.getState() === Message.STATE.NOT_SENT) {
                         chatdint.deleteMessage(room, msg.internalId ? msg.internalId : msg.orderValue);
@@ -1452,25 +1456,32 @@ var ConversationPanel = React.createClass({
                         chatdint.discardMessage(room, msg.internalId ? msg.internalId : msg.orderValue);
                     }
 
-                    msg.message = "";
-                    msg.contents = "";
-                    msg.messageHtml = "";
-                    msg.deleted = true;
 
                     self.setState({
                         'confirmDeleteDialog': false,
                         'messageToBeDeleted': false
                     });
 
-                    $(msg).trigger(
-                        'onChange',
-                        [
-                            msg,
-                            "deleted",
-                            false,
-                            true
-                        ]
-                    );
+                    if (
+                        msg.getState &&
+                        msg.getState() === Message.STATE.NOT_SENT &&
+                        !msg.requiresManualRetry
+                    ) {
+                        msg.message = "";
+                        msg.contents = "";
+                        msg.messageHtml = "";
+                        msg.deleted = true;
+
+                        $(msg).trigger(
+                            'onChange',
+                            [
+                                msg,
+                                "deleted",
+                                false,
+                                true
+                            ]
+                        );
+                    }
 
                 }}
             >
@@ -1489,6 +1500,68 @@ var ConversationPanel = React.createClass({
                 </div>
             </ModalDialogsUI.ConfirmDialog>
         }
+
+        var pasteImageConfirmDialog = null;
+        if (self.state.pasteImageConfirmDialog) {
+            confirmDeleteDialog = <ModalDialogsUI.ConfirmDialog
+                megaChat={room.megaChat}
+                chatRoom={room}
+                title={__("Confirm paste")}
+                name="paste-image-chat"
+                onClose={() => {
+                    self.setState({'pasteImageConfirmDialog': false});
+                }}
+                onConfirmClicked={() => {
+                    var meta = self.state.pasteImageConfirmDialog;
+                    if (!meta) {
+                        return;
+                    }
+
+                    try {
+                        Object.defineProperty(meta[0], 'name', {
+                            configurable: true,
+                            writeable: true,
+                            value: Date.now() + '.' + M.getSafeName(meta[1] || meta[0].name)
+                        });
+                    }
+                    catch (e) {}
+
+                    M.addUpload([meta[0]]);
+
+                    self.setState({
+                        'pasteImageConfirmDialog': false
+                    });
+
+                    URL.revokeObjectURL(meta[2]);
+                }}
+            >
+                <div className="fm-dialog-content">
+
+                    <div className="dialog secondary-header">
+                        {__("Please confirm that you want to upload this image and share it in this chat room.")}
+                    </div>
+
+                    <img
+                        src={self.state.pasteImageConfirmDialog[2]}
+                        style={{
+                            maxWidth: "90%",
+                            height: "auto",
+                            maxHeight: $(document).outerHeight() * 0.3,
+                            margin: '10px auto',
+                            display: 'block',
+                            border: '1px solid #ccc',
+                            borderRadius: '4px'
+                        }}
+                        onLoad={function(e) {
+                            $(e.target).parents('.paste-image-chat').position({
+                                of: $(document.body)
+                            });
+                        }}
+                    />
+                </div>
+            </ModalDialogsUI.ConfirmDialog>
+        }
+
 
         var confirmTruncateDialog = null;
         if (self.state.truncateDialog === true) {
@@ -1743,7 +1816,9 @@ var ConversationPanel = React.createClass({
                     {
                         self.props.chatRoom.type === "group" ?
                             <div className="chat-topic-block">
-                                {self.props.chatRoom.getRoomTitle()}
+                                <utils.EmojiFormattedContent>{
+                                    self.props.chatRoom.getRoomTitle()
+                                }</utils.EmojiFormattedContent>
                             </div> :
                             undefined
                     }
@@ -1898,7 +1973,7 @@ var ConversationPanels = React.createClass({
 
         var conversations = [];
 
-        if (window.location.hash === "#fm/chat") {
+        if (getSitePath() === "/fm/chat") {
             // do we need to "activate" an conversation?
             var activeFound = false;
             self.props.conversations.forEach(function (chatRoom) {
@@ -1920,20 +1995,16 @@ var ConversationPanels = React.createClass({
                 contact = megaChat.getContactFromJid(otherParticipants[0]);
             }
 
-            // XX: Performance trick. However, scroll positions are NOT retained properly when switching conversations,
-            // so this should be done some day in the future, after we have more stable product.
-            // if (chatRoom.isCurrentlyActive) {
-                conversations.push(
-                    <ConversationPanel
-                        chatRoom={chatRoom}
-                        isActive={chatRoom.isCurrentlyActive}
-                        messagesBuff={chatRoom.messagesBuff}
-                        contacts={M.u}
-                        contact={contact}
-                        key={chatRoom.roomJid}
-                        />
-                );
-            // }
+            conversations.push(
+                <ConversationPanel
+                    chatRoom={chatRoom}
+                    isActive={chatRoom.isCurrentlyActive}
+                    messagesBuff={chatRoom.messagesBuff}
+                    contacts={M.u}
+                    contact={contact}
+                    key={chatRoom.roomJid}
+                    />
+            );
         });
 
         if (conversations.length === 0) {
@@ -1948,7 +2019,7 @@ var ConversationPanels = React.createClass({
                     if (contact.u === u_handle) {
                         return;
                     }
-                    
+
                     if(contact.c === 1) {
                         var pres = self.props.megaChat.xmppPresenceToCssClass(contact.presence);
 

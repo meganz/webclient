@@ -31,27 +31,43 @@ var register_txt = false;
 var login_next = false;
 var loggedout = false;
 var flhashchange = false;
+var folderLinkVisitLogged = false;
 var avatars = {};
+
+
+
 
 var pro_json = '[[["N02zLAiWqRU",1,500,1024,1,"9.99","EUR"],["zqdkqTtOtGc",1,500,1024,12,"99.99","EUR"],["j-r9sea9qW4",2,2048,4096,1,"19.99","EUR"],["990PKO93JQU",2,2048,4096,12,"199.99","EUR"],["bG-i_SoVUd0",3,4096,8182,1,"29.99","EUR"],["e4dkakbTRWQ",3,4096,8182,12,"299.99","EUR"]]]';
 
-pages['placeholder'] = '((TOP))<div class="main-scroll-block"><div class="main-pad-block">' +
-                       '<div class="main-mid-pad new-bottom-pages"></div></div></div>';
+pages['placeholder'] = '<div class="bottom-page scroll-block">' +
+    '((TOP))' +
+    '<div class="main-pad-block">' +
+        '<div class="main-mid-pad new-bottom-pages"></div>' +
+    '</div>';
 
 function startMega() {
-    if (!window.M) {
-        window.M = new MegaData();
+    if (!hashLogic) {
+        $(window).rebind('popstate.mega', function(event) {
+
+            var currentPage = page;
+            var state = event.originalEvent.state || {};
+
+            loadSubPage(state.subpage || state.fmpage || location.hash, event);
+
+            // If on mobile TOS page and logged in, then the cloud doesn't reload for some reason so reload
+            if (is_mobile && (currentPage === 'terms') && (typeof u_attr !== 'undefined')) {
+                window.location.reload();
+            }
+        });
     }
+
     mBroadcaster.sendMessage('startMega');
 
     if (silent_loading) {
-        silent_loading();
         jsl = [];
+        onIdle(silent_loading);
         silent_loading = false;
         return false;
-    }
-    else {
-        populate_l();
     }
 
     if (pages['dialogs']) {
@@ -72,49 +88,114 @@ function startMega() {
     } else {
         mega_custom_boot_fn();
     }
-
-    mBroadcaster.sendMessage('zoomLevelCheck');
-    $('#pwdmanhelper input').val('');
 }
 
-function mainScroll() {
-    $('.main-scroll-block').jScrollPane({
-        showArrows: true,
-        arrowSize: 5,
-        animateScroll: true,
-        verticalDragMinHeight: 150,
-        enableKeyboardNavigation: true
-    });
-    $('.main-scroll-block').unbind('jsp-scroll-y.menu');
-    jScrollFade('.main-scroll-block');
-    if (page === 'doc' || page.substr(0, 4) === 'help' || page === 'cpage' || page === 'sdk' || page === 'dev') {
-        scrollMenu();
+function topMenu(close) {
+    if (close) {
+        $.topMenu = '';
+        $('.top-icon.menu').removeClass('active');
+        $('.top-menu-popup').addClass('hidden');
+        $(window).unbind('resize.topmenu');
+    }
+    else {
+        $.topMenu = 'topmenu';
+        $('.top-icon.menu').addClass('active');
+        $('.top-menu-popup').removeClass('hidden');
+        topMenuScroll();
+        $(window).rebind('resize.topmenu', function (e) {
+            if ($('.top-icon.menu').hasClass('active')) {
+                topMenuScroll();
+            }
+        });
     }
 }
 
+function topMenuScroll() {
+    $('.top-menu-scroll').jScrollPane({
+        enableKeyboardNavigation: false,
+        showArrows: true,
+        arrowSize: 5,
+        animateScroll: true
+    });
+}
+
 function scrollMenu() {
-    $('.main-scroll-block').bind('jsp-scroll-y', function (event, scrollPositionY, isAtTop, isAtBottom) {
-        if (page === 'doc' || page.substr(0, 4) === 'help' || page === 'cpage' || page === 'sdk' || page === 'dev') {
-            var sc = scrollPositionY + 30;
-            if (isAtTop) {
-                sc = 30;
+    $('.bottom-page.scroll-block, .old .fmholder').scroll(function() {
+        if (page === 'doc' || page === 'cpage' || page === 'sdk' || page === 'dev') {
+            var $menu = $('.new-left-menu-block');
+            var topPos = $(this).scrollTop();
+            if (topPos > 0) {
+                if (topPos + $menu.outerHeight() + 106 <= $('.main-mid-pad').outerHeight()) {
+                    $menu.css('top', topPos + 50 + 'px').addClass('floating');
+                }
+                else {
+                    $menu.removeClass('floating');
+                }
             }
-            if ($('.main-scroll-block .jspPane').height() - sc - $('.new-left-menu-block').height() - $('.nw-bottom-block').height() - 100 < 0) {
-                sc = $('.main-scroll-block .jspPane').height()
-                    - $('.new-left-menu-block').height()
-                    - $('.nw-bottom-block').height() - 100;
+            else {
+                $menu.removeAttr('style');
             }
-            $('.new-left-menu-block').css('padding-top', sc + 'px');
         }
     });
 }
 
+function topPopupAlign(button, popup, topPos) {
+    $.popupAlign = function()
+    {
+        var $button = $(button),
+            $popup = $(popup),
+            $popupArrow = $popup.find('.dropdown-white-arrow'),
+            pageWidth,
+            popupRightPos,
+            arrowRightPos,
+            buttonTopPos;
+
+        if ($button.length && $popup.length) {
+            pageWidth = $('body').width();
+            $popupArrow.removeAttr('style');
+            popupRightPos = pageWidth
+                - $button.offset().left
+                - $button.outerWidth()/2
+                - $popup.outerWidth()/2;
+            if (topPos) {
+                $popup.css('top', topPos + 'px');
+            }
+            else {
+                buttonTopPos = $button.offset().top + $button.outerHeight();
+                $popup.css('top', buttonTopPos + 13 + 'px');
+            }
+
+            if (popupRightPos > 10) {
+                $popup.css('right', popupRightPos + 'px');
+            }
+            else {
+                $popup.css('right', '10px');
+                arrowRightPos = pageWidth
+                    - $button.offset().left
+                    - $button.outerWidth()/2;
+                $popupArrow.css({
+                    left: 'auto',
+                    right: arrowRightPos - 22
+                })
+            }
+        }
+    };
+
+    // If top menu is opened - set timeout to count correct positions
+    if (!$('.top-menu-popup').hasClass('hidden')) {
+        setTimeout(function() {
+            $.popupAlign();
+        }, 250);
+    } else {
+        $.popupAlign();
+    }
+}
+
+
+
 
 function init_page() {
-
-    /*if (page.substr(0, 8) == 'redirect') {
-        return location.hash = page.substr(8);
-    }*/
+    page = page || (u_type ? 'fm' : 'start');
 
     // If they are transferring from mega.co.nz
     if (page.substr(0, 13) == 'sitetransfer!') {
@@ -125,42 +206,51 @@ function init_page() {
         }
     }
 
-    if (page.substr(0, 1) === '!' && page.length > 1) {
+
+    dlkey = false;
+    if (page[0] === '!' && page.length > 1) {
+
         var ar = page.substr(1, page.length - 1).split('!');
         if (ar[0]) {
             dlid = ar[0].replace(/[^\w-]+/g, "");
         }
 
-        dlkey = false;
         if (ar[1]) {
             dlkey = ar[1].replace(/[^\w-]+/g, "");
         }
 
-        if (mega.utils.hasPendingTransfers()) {
+        if (M.hasPendingTransfers() && $.lastSeenFilelink !== getSitePath()) {
             page = 'download';
 
-            if ($.lastSeenFilelink === location.hash) {
-                return;
-            }
-
-            mega.utils.abortTransfers()
+            M.abortTransfers()
                 .done(function() {
                     location.reload();
                 })
                 .fail(function() {
-                    location.hash = $.lastSeenFilelink;
+                    loadSubPage($.lastSeenFilelink);
                 });
 
             return;
         }
-        $.lastSeenFilelink = location.hash;
+        $.lastSeenFilelink = getSitePath();
     }
 
     if (!u_type) {
         $('body').attr('class', 'not-logged');
     }
     else {
-        $('body').attr('class', '');
+        $('body').attr('class', 'logged');
+
+        // Recovery key has been saved
+        if (localStorage.recoverykey && !$('body').hasClass('rk-saved')) {
+            $('body').addClass('rk-saved');
+        }
+
+        // Add FM fonsize class to body
+        if (fmconfig.font_size) {
+            $('body').removeClass('fontsize1 fontsize2')
+                .addClass('fontsize' + fmconfig.font_size);
+        }
     }
 
     // Add language class to body for CSS fixes for specific language strings
@@ -168,16 +258,6 @@ function init_page() {
 
     if ('-fa-ar-he-'.indexOf('-' + lang + '-') > -1) {
         $('body').addClass('rtl');
-    }
-
-    if ($.startscroll) {
-        delete $.startscroll;
-    }
-    if ($.dlscroll) {
-        delete $.dlscroll;
-    }
-    if ($.infoscroll) {
-        delete $.infoscroll;
     }
 
     // If on the plugin page, show the page with the relevant extension for their current browser
@@ -195,7 +275,7 @@ function init_page() {
             && page !== 'mega'
             && page !== 'privacy' && page !== 'chrome' && page !== 'firefox') {
         register_txt = l[1291];
-        document.location.hash = 'signup' + localStorage.signupcode;
+        loadSubPage('signup' + localStorage.signupcode);
         return false;
     }
     if (!page.match(/^(blog|help|corporate|page_)/)) {
@@ -206,13 +286,6 @@ function init_page() {
         loadingDialog.hide();
     }
 
-    // If they recently tried to redeem their voucher but were not logged in or registered then direct them to the
-    // #redeem page to complete their purchase. For newly registered users this happens after key creation is complete.
-    if ((localStorage.getItem('voucher') !== null) && (u_type === 3)) {
-        document.location.hash = 'redeem';
-    }
-
-    var wasFolderlink = pfid;
     var oldPFKey = pfkey;
     if (page.substr(0, 2) == 'F!' && page.length > 2) {
         var ar = page.substr(2, page.length - 1).split('!');
@@ -224,7 +297,7 @@ function init_page() {
 
         pfkey = false;
         if (ar[1]) {
-            pfkey = ar[1].replace(/[^\w-]+/g, "");
+            pfkey = ar[1].replace(/[^\w-]+/g, "").substr(0, 22);
         }
 
         pfhandle = false;
@@ -232,9 +305,25 @@ function init_page() {
             pfhandle = ar[2].replace(/[^\w-]+/g, "");
         }
 
+        // If the visit to the folder link has not been logged yet
+        if (folderLinkVisitLogged === false) {
+
+            // Log to see how many public folder views on mobile webclient
+            if (is_mobile) {
+                api_req({ a: 'log', e: 99631, m: 'Loaded public folder link on mobile webclient' });
+            }
+            else {
+                // Otherwise log to see how many public folder views on regular webclient
+                api_req({ a: 'log', e: 99632, m: 'Loaded public folder link on regular webclient' });
+            }
+
+            // Don't log this again for this session
+            folderLinkVisitLogged = true;
+        }
+
         n_h = pfid;
-        if (!flhashchange || pfkey !== oldPFKey) {
-            if (pfkey) {
+        if (!flhashchange || pfkey !== oldPFKey || pfkey.length !== 22) {
+            if (pfkey.length === 22) {
                 api_setfolder(n_h);
                 if (waitxhr) {
                     waitsc();
@@ -242,13 +331,30 @@ function init_page() {
                 u_n = pfid;
             }
             else {
-                // Insert placeholder page while waiting for user input
-                parsepage(pages['placeholder']);
+                // If mobile, show the decryption key overlay
+                if (is_mobile) {
+                    parsepage(pages['mobile']);
+                    mobile.decryptionKeyOverlay.show(pfid, true, pfkey);
+                }
+                else {
+                    // Insert placeholder background page while waiting for user input
+                    parsepage(pages['placeholder']);
 
-                return mKeyDialog(pfid, true)
-                    .fail(function() {
-                        location.hash = 'start';
-                    });
+                    // Show the decryption key dialog on top
+                    mKeyDialog(pfid, true, pfkey)
+                        .fail(function() {
+                            loadSubPage('start');
+                        });
+                    pfkey = false;
+                }
+                return;
+            }
+
+            if (fminitialized) {
+                // Clean up internal state in case we're navigating back to a folderlink
+                M.currentdirid = M.RootID = undefined;
+                delete $.onImportCopyNodes;
+                delete $.mcImport;
             }
         }
         if (pfhandle) {
@@ -256,10 +362,6 @@ function init_page() {
         }
         else {
             page = 'fm';
-        }
-
-        if (fminitialized) {
-            M.currentdirid = undefined;
         }
     }
     else if (!flhashchange || page !== 'fm/transfers') {
@@ -285,6 +387,10 @@ function init_page() {
         page = 'newpw';
     }
 
+    if ((pfkey || dlkey) && location.hash[0] !== '#') {
+        return location.replace(getAppBaseUrl());
+    }
+
     blogmonth = false;
     blogsearch = false;
 
@@ -301,22 +407,29 @@ function init_page() {
             delete localStorage.awaitingConfirmationAccount;
         }
         else {
-            // Insert placeholder page while waiting for user input
-            parsepage(pages['placeholder']);
+            // Show signup link dialog for mobile
+            if (is_mobile) {
+                parsepage(pages['mobile']);
+                mobile.register.showConfirmEmailScreen(acc);
+                return false;
+            }
+            else {
+                // Insert placeholder page while waiting for user input
+                parsepage(pages['placeholder']);
 
-            return mega.ui.sendSignupLinkDialog(acc, function() {
-                // The user clicked 'close', abort and start over...
-
-                delete localStorage.awaitingConfirmationAccount;
-                init_page();
-            });
+                return mega.ui.sendSignupLinkDialog(acc, function() {
+                    // The user clicked 'close', abort and start over...
+                    delete localStorage.awaitingConfirmationAccount;
+                    init_page();
+                });
+            }
         }
     }
 
     if (page.substr(0, 10) == 'blogsearch') {
-        blogsearch = decodeURIComponent(page.substr(11, page.length - 2));
+        blogsearch = decodeURIComponent(page.substr(11, page.length - 1));
         if (!blogsearch) {
-            document.location.hash = 'blog';
+            loadSubPage('blog');
         }
         page = 'blog';
         parsepage(pages['blogarticle']);
@@ -326,11 +439,16 @@ function init_page() {
     // Password protected link decryption dialog
     else if (page.substr(0, 2) === 'P!' && page.length > 2) {
 
-        // Insert placeholder page while waiting for user input
-        parsepage(pages['placeholder']);
-
-        // Show the decryption dialog and pass in the current URL hash
-        exportPassword.decrypt.init(page);
+        // Show the password overlay for mobile
+        if (is_mobile) {
+            parsepage(pages['mobile']);
+            mobile.decryptionPasswordOverlay.show(page);
+        }
+        else {
+            // Otherwise insert background page, show the password decryption dialog and pass in the current URL hash
+            parsepage(pages['placeholder']);
+            exportPassword.decrypt.init(page);
+        }
     }
     else if (page.substr(0, 6) == 'verify') {
         parsepage(pages['change_email']);
@@ -343,7 +461,6 @@ function init_page() {
                 topmenuUI();
                 loadingDialog.hide();
                 CMS.loaded('corporate');
-                mainScroll();
                 return;
             }
 
@@ -356,11 +473,12 @@ function init_page() {
                 parsepage(window.corpTemplate = content.html);
                 topmenuUI();
                 loadingDialog.hide();
-                mainScroll();
             });
         }
 
         doRenderCorpPage();
+        bottompage.init();
+        scrollMenu();
         page = 'cpage';
     }
     else if (page.substr(0, 5) == 'page_') {
@@ -376,7 +494,6 @@ function init_page() {
                 parsepage(content.html);
                 topmenuUI();
                 loadingDialog.hide();
-                mainScroll();
             });
         }
 
@@ -429,13 +546,11 @@ function init_page() {
             localStorage.registeremail = email;
 
             // Redirect to the register page
-            removeHash();
-            location.hash = '#register';
+            loadSubPage('register');
         }
         else {
             // Redirect to the register page
-            removeHash();
-            location.hash = '#register';
+            loadSubPage('register');
 
             // Show message
             alert('We can\'t decipher your invite link, please check you copied the link correctly, or sign up manually with the same email address.');
@@ -458,12 +573,12 @@ function init_page() {
                     else {
                         msgDialog('warningb', l[135], l[1290]);
                     }
-                    document.location.hash = 'start';
+                    loadSubPage('start');
                 }
                 else if (u_type === false) {
                     localStorage.signupcode = signupcode;
                     localStorage.registeremail = res;
-                    document.location.hash = 'register';
+                    loadSubPage('register');
                     if (!register_txt) {
                         register_txt = l[1289];
                     }
@@ -478,7 +593,7 @@ function init_page() {
                             mLogout();
                         }
                         else {
-                            document.location.hash = '';
+                            loadSubPage('');
                         }
                     });
                 }
@@ -514,63 +629,116 @@ function init_page() {
             }
         });
     }
-    else if (page == 'confirm') {
+    else if (page === 'confirm') {
+
         loadingDialog.show();
+
         var ctx = {
-            signupcodeok: function (email, name) {
+            signupcodeok: function(email) {
+
                 loadingDialog.hide();
                 confirmok = true;
                 page = 'login';
-                parsepage(pages['login']);
-                login_txt = l[378];
-                init_login();
-                $('#login-name2').val(email);
-                $('.register-st2-button').addClass('active');
-                $('#login-name2').attr('readonly', true);
-                topmenuUI();
-            },
-            signupcodebad: function (res) {
-                loadingDialog.hide();
-                if (res == EINCOMPLETE) {
-                    alert(l[703]);
-                }
-                else if (res == ENOENT) {
-                    login_txt = l[704];
+
+                if (is_mobile) {
+                    parsepage(pages['mobile']);
+                    mobile.register.showConfirmAccountScreen(email);
                 }
                 else {
-                    alert(l[705] + res);
+                    parsepage(pages['login']);
+                    login_txt = l[378];
+                    init_login();
+                    $('#login-name2').val(email);
+                    $('.register-st2-button').addClass('active');
+                    $('#login-name2').attr('readonly', true);
+                    topmenuUI();
                 }
+            },
+            signupcodebad: function(res) {
+
+                loadingDialog.hide();
                 page = 'login';
-                parsepage(pages['login']);
-                init_login();
-                topmenuUI();
+
+                if (is_mobile) {
+                    parsepage(pages['mobile']);
+                    mobile.register.showConfirmAccountFailure(res);
+                }
+                else {
+                    if (res === EINCOMPLETE) {
+                        alert(l[703]);
+                    }
+                    else if (res === ENOENT) {
+                        login_txt = l[704];
+                    }
+                    else {
+                        alert(l[705] + res);
+                    }
+                    parsepage(pages['login']);
+                    init_login();
+                    topmenuUI();
+                }
             }
         }
+
         verifysignupcode(confirmcode, ctx);
     }
     else if (u_type == 2) {
-        parsepage(pages['key']);
+        if (is_mobile) {
+            parsepage(pages['mobile']);
+            mobile.register.showGeneratingKeysScreen();
+        }
+        else {
+            parsepage(pages['key']);
+        }
         init_key();
     }
     else if (page == 'login') {
         if (u_storage.sid) {
-            document.location.hash = '#fm';
+            loadSubPage('fm');
             return false;
         }
-        parsepage(pages['login']);
-        init_login();
+
+        if (is_mobile) {
+            parsepage(pages['mobile']);
+            mobile.signin.show();
+        }
+        else {
+            parsepage(pages['login']);
+            init_login();
+        }
+    }
+    else if (page === 'achievements') {
+        loadSubPage('fm/account/achievements');
+        return false;
+    }
+    else if (page === 'fm/account/profile') {
+
+        // Handle old invalid links from emails and redirect them back to fm/account
+        loadSubPage('fm/account');
+        return false;
     }
     else if (page == 'account') {
-        document.location.hash = 'fm/account';
+        loadSubPage('fm/account');
+        return false;
+    }
+    else if (page == 'dashboard') {
+        loadSubPage('fm/dashboard');
         return false;
     }
     else if (page == 'register') {
         if (u_storage.sid && u_type !== 0) {
-            document.location.hash = '#fm';
+            loadSubPage('fm');
             return false;
         }
-        parsepage(pages['register']);
-        init_register();
+
+        if (is_mobile) {
+            parsepage(pages['mobile']);
+            mobile.register.show();
+        }
+        else {
+            parsepage(pages['register']);
+            init_register();
+        }
     }
     else if (page == 'key') {
         parsepage(pages['key']);
@@ -586,32 +754,8 @@ function init_page() {
             $('.account-mid-block').addClass('high');
         }
     }
-    else if (page.substr(0, 4) == 'help') {
+    else if (page.substr(0,4) == 'help') {
         return Help.render();
-        function doRenderHelp() {
-            if (window.helpTemplate) {
-                parsepage(window.helpTemplate);
-                init_help();
-                loadingDialog.hide();
-                topmenuUI();
-                mainScroll();
-                return;
-            }
-            loadingDialog.show();
-            CMS.watch('help.' + lang, function () {
-                window.helpTemplate = null;
-                doRenderHelp();
-            });
-            CMS.get(['help.' + lang, 'help.' + lang + '.json'], function (err, content, json) {
-                helpdata = json.object
-                parsepage(window.helpTemplate = content.html);
-                init_help();
-                loadingDialog.hide();
-                topmenuUI();
-                mainScroll();
-            });
-        }
-        doRenderHelp();
     }
     else if (page == 'privacy') {
         parsepage(pages['privacy']);
@@ -644,7 +788,7 @@ function init_page() {
 
         if (u_type) {
             var ac = new mega.AccountClosure();
-            ac.initAccountClosure();
+            ac.handleFeedback();
         }
         else {
             // Unable to cancel, not logged in
@@ -657,7 +801,7 @@ function init_page() {
                 if (aError) {
                     alert(aError);
                 }
-                location.hash = 'start';
+                loadSubPage('start');
             });
         }
     }
@@ -667,7 +811,7 @@ function init_page() {
         if (u_type === 3) {
             wireTransferDialog
                 .init(function onClose() {
-                    location.hash = 'fm';
+                    loadSubPage('fm');
                 });
         }
         else {
@@ -680,7 +824,7 @@ function init_page() {
                     if (aError) {
                         alert(aError);
                     }
-                    location.hash = 'start';
+                    loadSubPage('start');
                 });
         }
     }
@@ -713,7 +857,7 @@ function init_page() {
             var html = '';
             var a = 4;
 
-            $('.about').safeHTML(content.html);
+            $('.new-bottom-pages.about').safeHTML(content.html);
             $('.team-person-block').sort(function () {
                 return (Math.round(Math.random()) - 0.5);
             }).each(function (i, element) {
@@ -732,7 +876,6 @@ function init_page() {
             $('.new-bottom-pages.about').safeHTML(html + '<div class="clear"></div>');
             topmenuUI();
             loadingDialog.hide();
-            mainScroll();
 
         });
         return;
@@ -741,7 +884,13 @@ function init_page() {
         parsepage(pages['sourcecode']);
     }
     else if (page === 'terms') {
-        parsepage(pages['terms']);
+        if (is_mobile) {
+            parsepage(pages['mobile']);
+            mobile.terms.show();
+        }
+        else {
+            parsepage(pages['terms']);
+        }
     }
     else if (page === 'general') {
         parsepage(pages['general']);
@@ -756,12 +905,11 @@ function init_page() {
     else if (page == 'copyright') {
         parsepage(pages['copyright']);
         $('.reg-st5-complete-button').rebind('click', function (e) {
-            document.location.hash = 'copyrightnotice';
+            loadSubPage('copyrightnotice');
         });
         if (lang == 'en') {
             $('#copyright_txt').text($('#copyright_txt').text().split('(i)')[0]);
             $('#copyright_en').removeClass('hidden');
-            mainScroll();
         }
     }
     else if (page === 'disputenotice') {
@@ -771,19 +919,27 @@ function init_page() {
     else if (page === 'dispute') {
         parsepage(pages['dispute']);
         $('.reg-st5-complete-button').rebind('click', function (e) {
-            document.location.hash = 'disputenotice';
+            loadSubPage('disputenotice');
         });
-        mainScroll();
     }
-    else if (page.substr(0, 3) == 'pro') {
+    else if (page.substr(0, 3) === 'pro') {
         var tmp = page.split('/uao=');
         if (tmp.length > 1) {
             mega.uaoref = decodeURIComponent(tmp[1]);
-            location.hash = tmp[0];
+            loadSubPage(tmp[0]);
             return;
         }
         parsepage(pages['pro']);
         init_pro();
+    }
+    else if (page.substr(0, 7) === 'payment') {
+
+        // Load the Pro page in the background
+        parsepage(pages['pro']);
+        init_pro();
+
+        // Process the return URL from the payment provider and show a success/failure dialog if applicable
+        proPage.processReturnUrlFromProvider(page);
     }
     else if (page == 'credits') {
         parsepage(pages['credits']);
@@ -794,24 +950,32 @@ function init_page() {
             html += e.outerHTML;
         });
         $('.credits-main-pad').html(html + '<div class="clear"></div>');
-        mainScroll();
     }
-    else if (page === 'chrome') {
-        parsepage(pages['chrome']);
-        chromepage.init();
+    else if (page === 'extensions') {
+        parsepage(pages['browsers']);
+        browserspage.init();
     }
-    else if (page === 'firefox') {
-        parsepage(pages['firefox']);
-        firefoxpage.init();
+    else if (page === 'ios') {
+        parsepage(pages['ios']);
+    }
+    else if (page === 'android') {
+        parsepage(pages['android']);
+    }
+    else if (page === 'wp') {
+        parsepage(pages['wp']);
+        bottompage.initTabs();
+    }
+    else if (page === 'bird') {
+        parsepage(pages['megabird']);
     }
     else if (page.substr(0, 4) == 'sync') {
         parsepage(pages['sync']);
         init_sync();
         topmenuUI();
-        mainScroll();
     }
-    else if (page == 'mobile') {
-        parsepage(pages['mobile']);
+    else if (page == 'cmd') {
+        parsepage(pages['cmd']);
+        initMegacmd();
     }
     else if (page == 'resellers') {
         parsepage(pages['resellers']);
@@ -842,10 +1006,14 @@ function init_page() {
                 }
             }
         }
-        parsepage(pages['download'], 'download');
+        if (is_mobile) {
+            parsepage(pages['mobile']);
+        }
+        else {
+            parsepage(pages['download']);
+        }
         dlinfo(dlid, dlkey, false);
         topmenuUI();
-        mainScroll();
     }
 
     /**
@@ -862,19 +1030,19 @@ function init_page() {
         // If not logged in, direct them to login or register first
         if (u_type === false) {
             login_txt = l[7712];
-            document.location.hash = 'login';
+            loadSubPage('login');
             return false;
         }
         else if (u_type < 3) {
             // If their account is ephemeral and the email is not confirmed, then show them a dialog to warn them and
             // make sure they confirm first otherwise we get lots of chargebacks from users paying in the wrong account
             msgDialog('warningb', l[8666], l[8665], false, function() {
-                location.hash = 'fm';
+                loadSubPage('fm');
             });
         }
         else {
             // Otherwise go to the Redeem page which will detect the voucher code and show a dialog
-            document.location.hash = 'redeem';
+            loadSubPage('redeem');
             return false;
         }
     }
@@ -884,6 +1052,13 @@ function init_page() {
         loadingDialog.show();
         parsepage(pages['redeem']);
         redeem.init();
+    }
+
+    // If they recently tried to redeem their voucher but were not logged in or registered then direct them to the
+    // #redeem page to complete their purchase. For newly registered users this happens after key creation is complete.
+    else if ((localStorage.getItem('voucher') !== null) && (u_type === 3)) {
+        loadSubPage('redeem');
+        return false;
     }
 
     else if (is_fm()) {
@@ -943,7 +1118,10 @@ function init_page() {
             if (id) {
                 M.currentdirid = id;
             }
-            if (!m && $('#fmholder').html() == '') {
+            if (is_mobile) {
+                parsepage(pages['mobile']);
+            }
+            else if (!is_mobile && $('#fmholder').html() === '') {
                 $('#fmholder').safeHTML(translate(pages['fm'].replace(/{staticpath}/g, staticpath)));
             }
 
@@ -955,7 +1133,7 @@ function init_page() {
         }
         else {
             if (ul_queue.length > 0) {
-                openTransferpanel();
+                openTransfersPanel();
             }
 
             if (u_type === 0 && !u_attr.terms) {
@@ -982,32 +1160,20 @@ function init_page() {
                 ulQueue.pause();
                 uldl_hold = true;
 
-                termsDialog();
+                if (!is_mobile) {
+                    bottomPageDialog(false, 'terms'); // show terms dialog
+                }
             }
         }
         $('#topmenu').safeHTML(parsetopmenu());
-
-        $('.feedback-button')
-            .removeClass("hidden")
-            .rebind("click.feedbackDialog", function () {
-                var feedbackDialog = mega.ui.FeedbackDialog.singleton($(this));
-                feedbackDialog._type = "top-button";
-
-                return false;
-            });
 
         $('#pageholder').hide();
         $('#startholder').hide();
         if ($('#fmholder:visible').length == 0) {
             $('#fmholder').show();
-            if (fminitialized) {
-                if (M.viewmode == 1) {
-                    iconUI();
-                }
-                else {
-                    gridUI();
-                }
-                treeUI();
+            if (fminitialized && !is_mobile) {
+                M.addViewUI();
+
                 if ($.transferHeader) {
                     $.transferHeader();
                 }
@@ -1037,15 +1203,17 @@ function init_page() {
     }
     else if (page.substr(0, 2) == 'fm' && !u_type) {
         if (loggedout) {
-            document.location.hash = 'start';
+            loadSubPage('start');
             return false;
         }
         login_next = page;
         login_txt = l[1298];
-        document.location.hash = 'login';
+        loadSubPage('login');
     }
     else if (typeof init_start === 'function') {
         page = 'start';
+
+        // Show the start/homepage
         parsepage(pages['start'], 'start');
         init_start();
     }
@@ -1062,34 +1230,41 @@ function init_page() {
     if (typeof alarm !== 'undefined') {
         alarm.siteUpdate.init();
     }
-    topmenuUI();
+    if (!is_mobile) {
+        topmenuUI();
+    }
+    else {
+        // Initialise the mobile menu (ToDo: in future use desktop responsive main menu)
+        mobile.menu.showAndInit(page);
+    }
     loggedout = false;
     flhashchange = false;
 }
 
 function loginDialog(close) {
+    var $dialog = $('.dropdown.top-login-popup');
     if (close) {
-        $('.top-login-popup form').empty();
-        $('.top-login-popup').removeClass('active');
+        $dialog.find('form').empty();
+        $dialog.addClass('hidden');
         return false;
     }
-    $('.top-login-popup form').replaceWith(getTemplate('top-login'));
+    $dialog.find('form').replaceWith(getTemplate('top-login'));
     if (localStorage.hideloginwarning || is_extension) {
-        $('.top-login-warning').hide();
-        $('.login-notification-icon').removeClass('hidden');
+        $dialog.find('.top-login-warning').hide();
+        $dialog.find('.login-notification-icon').removeClass('hidden');
     }
-    $('.login-checkbox,.top-login-popup .radio-txt').rebind('click', function (e) {
-        var c = $('.login-checkbox').attr('class');
+    $dialog.find('.login-checkbox, .radio-txt').rebind('click', function (e) {
+        var c = $dialog.find('.login-checkbox').attr('class');
         if (c.indexOf('checkboxOff') > -1) {
-            $('.login-checkbox').attr('class', 'login-checkbox checkboxOn');
+            $dialog.find('.login-checkbox').attr('class', 'login-checkbox checkboxOn');
         }
         else {
-            $('.login-checkbox').attr('class', 'login-checkbox checkboxOff');
+            $dialog.find('.login-checkbox').attr('class', 'login-checkbox checkboxOff');
         }
     });
 
     $('.top-login-forgot-pass').rebind('click', function (e) {
-        document.location.hash = 'recovery';
+        loadSubPage('recovery');
         loginDialog(1);
     });
 
@@ -1098,7 +1273,7 @@ function loginDialog(close) {
     });
     $('.top-login-full').rebind('click', function (e) {
         loginDialog(1);
-        document.location.hash = 'login';
+        loadSubPage('login');
     });
     $('#login-password, #login-name').rebind('keydown', function (e) {
         $('.top-login-pad').removeClass('both-incorrect-inputs');
@@ -1145,12 +1320,14 @@ function loginDialog(close) {
             $(c).addClass('checkboxOff');
         }
     });
-    $('.top-login-popup').addClass('active');
-    document.getElementById('login-name').focus();
 
+
+    $('.dropdown.top-login-popup').removeClass('hidden');
+    topPopupAlign('.top-login-button', '.dropdown.top-login-popup', 40);
     if (is_chrome_firefox) {
-        Soon(mozLoginManager.fillForm.bind(mozLoginManager, 'form_login_header'));
+        mozLoginManager.fillForm.bind(mozLoginManager, 'form_login_header');
     }
+
 }
 
 function tooltiplogin() {
@@ -1180,15 +1357,19 @@ function tooltiplogin() {
             else if (r) {
                 passwordManager('#form_login_header');
                 u_type = r;
+
+                // Logging to see how many people are signing into the regular site
+                api_req({ a: 'log', e: 99630, m: 'Completed login on regular webclient' });
+
                 if (login_next) {
-                    document.location.hash = login_next;
+                    loadSubPage(login_next);
                 }
                 else if (page !== 'login') {
-                    page = document.location.hash.substr(1);
+                    page = getSitePath().substr(1);
                     init_page();
                 }
                 else {
-                    document.location.hash = 'fm';
+                    loadSubPage('fm');
                 }
                 login_next = false;
             }
@@ -1202,65 +1383,96 @@ function tooltiplogin() {
 }
 
 function topmenuUI() {
+
     if (u_type === 0) {
         $('.top-login-button').text(l[967]);
     }
 
-    $('.warning-popup-icon').addClass('hidden');
-    $('.top-menu-item.upgrade-your-account').hide();
-    $('.top-menu-item.register,.top-menu-item.login').hide();
-    $('.top-menu-item.logout,.context-menu-divider.logout').hide();
-    $('.top-menu-item.clouddrive,.top-menu-item.account').hide();
+    $('.top-icon.warning').addClass('hidden');
+    $('.top-menu-item.upgrade-your-account,.top-menu-item.backup').addClass('hidden');
+    $('.top-menu-item.logout').addClass('hidden');
+    $('.top-menu-item.register,.top-menu-item.login').addClass('hidden');
+    $('.top-menu-item.account').addClass('hidden');
     $('.top-menu-item.refresh-item').addClass('hidden');
-    $('.activity-status,.activity-status-block').hide();
-    $('.membership-status-block').safeHTML('<div class="membership-status free">@@</div>', l[435]);
-    $('.membership-status').hide();
-    $('.top-head .user-name').hide();
+    $('.activity-status-block .activity-status,.activity-status-block').hide();
+    $('.membership-status-block i').attr('class', 'tiny-icon membership-status free');
+    $('.membership-status, .top-head .user-name, .top-icon.achievements').hide();
 
     if (fminitialized) {
-        $('.top-search-bl').show();
+        $('.top-search-bl').removeClass('hidden');
     }
     else {
-        $('.top-search-bl').hide();
+        $('.top-search-bl').addClass('hidden');
     }
 
-    var avatar;
-    // can happen on mobile (useravatar to be empty, e.g. not loaded/initialised)
-    if (typeof(useravatar) === 'undefined' || !useravatar.my) {
+    if (page === 'download') {
+        $('.top-menu-item.refresh-item').removeClass('hidden');
+    }
+
+    var avatar = window.useravatar && useravatar.my;
+    if (!avatar) {
         $('.fm-avatar').hide();
     }
-    else {
-        avatar = useravatar.my;
+
+    // Show active item in main menu
+    var section = page.split('/')[0];
+    if (section === 'fm') {
+        section = page.split('/')[1];
+    }
+    $('.top-menu-item').removeClass('active');
+
+    if (section) {
+        // just in case, a payment provider appended any ?returnurl vars
+        section = section.split("?")[0];
+        section = section.replace(/[^a-zA-Z\-\_]/g, "");
+
+        var $menuItem = $('.top-menu-item.' + section);
+        $menuItem.addClass('active');
+        if ($menuItem.parent('.top-submenu').length) {
+            $menuItem.parent('.top-submenu').prev().addClass('expanded');
+        }
+        $menuItem = undefined;
     }
 
-    // If the 'firstname' property is set, display it
-    if (u_type == 3 && u_attr.firstname) {
-        $('.top-head .user-name').text(u_attr.firstname).show();
+    if (u_type === 3) {
+        var name = '';
+
+        if (u_attr.firstname) {
+            name = u_attr.firstname;
+        }
+        if (u_attr.lastname) {
+            name += (name.length ? ' ' : '') + u_attr.lastname;
+        }
+        name = name || u_attr.name;
+
+        if (name) {
+            $('.top-head .user-name').text(name).show();
+        }
     }
 
-    // Check for pages that do not have the 'firstname' property set e.g. #about
-    else if ((u_type == 3) && (!u_attr.firstname)
-            && (typeof u_attr.name === 'string') && (u_attr.name.indexOf(' ') != -1)) {
+    // Show language in top menu
+    $('.top-menu-item.languages .right-el').text(lang);
 
-        // Try get the first name from the full 'name' property and display
-        var nameParts = u_attr.name.split(' ');
-        $('.top-head .user-name').text(nameParts[0]).show();
-    }
+    // Show version in top menu
+    $('.top-mega-version').text('v. ' + M.getSiteVersion());
 
     if (u_type) {
-
-        $('.top-menu-item.logout,.context-menu-divider.logout').show();
-        $('.top-menu-item.clouddrive,.top-menu-item.account').show();
-
-        if (avatar) {
-            $('.fm-avatar img').attr('src', avatar);
-        }
+        $('.top-menu-item.logout,.top-menu-item.backup').removeClass('hidden');
+        $('.top-menu-item.account').removeClass('hidden');
+        $('.fm-avatar').safeHTML(useravatar.contact(u_handle, '', 'div'));
 
         $('.top-login-button').hide();
         $('.membership-status').show();
         $('.top-change-language').hide();
         $('.create-account-button').hide();
         $('.membership-status-block').show();
+        $('.top-icon.notification').show();
+
+        // Show the rocket icon if achievements are enabled
+        mega.achievem.enabled()
+            .done(function() {
+                $('.top-icon.achievements').show();
+            });
 
         // If a Lite/Pro plan has been purchased
         if (u_attr.p) {
@@ -1269,26 +1481,33 @@ function topmenuUI() {
             var proNum = u_attr.p;
             var purchasedPlan = getProPlan(proNum);
 
-            // Set colour of plan
-            var cssClass = (proNum == 4) ? 'lite' : 'pro';
+            // Set colour of plan and body class
+            var cssClass;
+            $('body').removeClass('free lite');
+
+            if (proNum === 4) {
+                cssClass = 'lite';
+                $('body').addClass('lite');
+            } else {
+                cssClass = 'pro' + proNum;
+            }
 
             // Show the 'Upgrade your account' button in the main menu for all
-            $('.top-menu-item.upgrade-your-account,.context-menu-divider.upgrade-your-account').show();
-            $('.membership-icon-pad .membership-big-txt.red').text(purchasedPlan);
+            $('.top-menu-item.upgrade-your-account').removeClass('hidden');
+            $('.membership-icon-pad .membership-big-txt.plan-txt').text(purchasedPlan);
             $('.membership-icon-pad .membership-icon').attr('class', 'membership-icon pro' + u_attr.p);
-            $('.membership-status-block')
-                .safeHTML('<div class="membership-status @@">@@</div>', cssClass, purchasedPlan);
-            $('.context-menu-divider.upgrade-your-account').addClass('pro');
-            $('.membership-popup.pro-popup');
-            $('body').removeClass('free');
+            $('.membership-status-block i').attr('class', 'tiny-icon membership-status ' + cssClass);
+            $('.top-menu-item.account .right-el').text(purchasedPlan);
+            $('.membership-popup').addClass('pro-popup');
         }
         else {
             // Show the free badge
-            $('.top-menu-item.upgrade-your-account,.context-menu-divider.upgrade-your-account').show();
-            $('.context-menu-divider.upgrade-your-account').removeClass('pro lite');
-            $('.membership-status').addClass('free');
-            $('.membership-status').text(l[435]);
-            $('body').addClass('free');
+            $('.top-menu-item.upgrade-your-account').removeClass('hidden');
+            $('.membership-icon').attr('class', 'membership-icon');
+            $('.top-menu-item.account .right-el').text('FREE');
+            $('.membership-status').attr('class', 'tiny-icon membership-status free');
+            $('.membership-popup').removeClass('pro-popup');
+            $('body').removeClass('lite').addClass('free');
         }
 
         if (is_fm()) {
@@ -1296,8 +1515,8 @@ function topmenuUI() {
         }
 
         // If the chat is disabled don't show the green status icon in the header
-        if (!megaChatIsDisabled) {
-            $('.activity-status-block, .activity-status').show();
+        if (!pfid && !megaChatIsDisabled) {
+            $('.activity-status-block, .activity-status-block .activity-status').show();
             if (megaChatIsReady) {
                 megaChat.renderMyStatus();
             }
@@ -1310,7 +1529,6 @@ function topmenuUI() {
         if (u_type === 0 && !confirmok && page !== 'key') {
 
             $('.top-menu-item.register').text(l[968]);
-            $('.top-menu-item.clouddrive').show();
 
             // If they have purchased Pro but not activated yet, show a warning
             if (isNonActivatedAccount()) {
@@ -1323,12 +1541,13 @@ function topmenuUI() {
             }
         }
 
-        $('.top-menu-item.upgrade-your-account').show();
-        $('.top-menu-item.pro-item span').text(l[129]);
+        $('.top-menu-item.upgrade-your-account').addClass('hidden');
         $('.membership-status-block').hide();
+        $('.top-icon.notification').hide();
+        $('.top-icon.achievements').hide();
         $('.create-account-button').show();
         $('.create-account-button').rebind('click', function () {
-            document.location.hash = 'register';
+            loadSubPage('register');
         });
         $('.top-login-button').show();
         $('.top-login-button').rebind('click', function () {
@@ -1336,12 +1555,12 @@ function topmenuUI() {
                 mLogout();
             }
             else {
-                var c = $('.top-login-popup').attr('class');
-                if (c && c.indexOf('active') > -1) {
-                    loginDialog(1);
+                var c = $('.dropdown.top-login-popup').attr('class');
+                if (c && c.indexOf('hidden') > -1) {
+                    loginDialog();
                 }
                 else {
-                    loginDialog();
+                    loginDialog(1);
                 }
             }
         });
@@ -1352,10 +1571,12 @@ function topmenuUI() {
             // Get current language
             var $topChangeLang = $('.top-change-language');
             var $topChangeLangName = $topChangeLang.find('.top-change-language-name');
-            var languageName = ln[lang];
+
+            //TODO: Change translated values on short translated
+            //var languageName = ln[lang];
 
             // Init the top header change language button
-            $topChangeLangName.text(languageName);
+            $topChangeLangName.text(lang);
             $topChangeLang.removeClass('hidden');
             $topChangeLang.rebind('click', function() {
 
@@ -1367,19 +1588,14 @@ function topmenuUI() {
             });
         }
 
-        $('.top-menu-item.register,.context-menu-divider.register,.top-menu-item.login').show();
+        $('.top-menu-item.register,.top-menu-item.login').removeClass('hidden');
 
         if (u_type === 0) {
-            $('.top-menu-item.login').hide();
-            $('.top-menu-item.logout,.context-menu-divider.logout').show();
+            $('.top-menu-item.login').addClass('hidden');
+            $('.top-menu-item.logout').removeClass('hidden');
         }
 
-        $('.top-login-arrow').css('margin-right',
-            $('.top-menu-icon').width() + $('.create-account-button').width() +
-            ($('.top-login-button').width() / 2) + 78 + 'px');
     }
-
-    $('.top-menu-arrow').css('margin-right', $('.top-menu-icon').width() / 2 + 'px');
 
     $.hideTopMenu = function (e) {
 
@@ -1391,33 +1607,35 @@ function topmenuUI() {
         if (!e || ($(e.target).parents('.membership-popup').length == 0
                 && ((c && c.indexOf('membership-status') == -1) || !c))
                 || (c && c.indexOf('mem-button') > -1)) {
-            $('.membership-popup').removeClass('active');
+            $('.membership-popup').addClass('hidden');
             $('.membership-status-block').removeClass('active');
         }
         if (!e || ($(e.target).parents('.top-menu-popup').length == 0
-                && ((c && c.indexOf('top-menu-icon') == -1) || !c))) {
-            $('.top-menu-popup').removeClass('active');
-            $('.top-menu-icon').removeClass('active');
+                && !$(e.target).hasClass('top-menu-popup')
+                && ((c && c.indexOf('top-icon menu') == -1) || !c))) {
+            topMenu(1);
         }
         if (!e || ($(e.target).parents('.top-warning-popup').length == 0
-                && ((c && c.indexOf('warning-icon-area') == -1) || !c))) {
-            $('.top-warning-popup').removeClass('active');
+                && !$(e.target).hasClass('top-menu-popup')
+                && ((c && c.indexOf('top-icon warning') == -1) || !c))) {
+            $('.top-warning-popup').addClass('hidden');
+            $('.top-icon.warning').removeClass('active');
         }
         if (!e || ($(e.target).parents('.top-user-status-popup').length == 0
                 && ((c && c.indexOf('activity-status') == -1 && c.indexOf('loading') == -1) || !c))) {
-            $('.top-user-status-popup').removeClass('active');
+            $('.top-user-status-popup').addClass('hidden');
             $('.activity-status-block').removeClass('active');
         }
         if (!e || ($(e.target).parents('.notification-popup').length == 0
-                && ((c && c.indexOf('cloud-popup-icon') == -1) || !c))) {
+                && ((c && c.indexOf('top-icon notification') == -1) || !c))) {
 
             if (typeof notify === 'object') {
                 notify.closePopup();
             }
         }
-        if (!e || ($(e.target).parents('.top-login-popup').length == 0
+        if (!e || ($(e.target).parents('.dropdown.top-login-popup').length == 0
                 && ((c && c.indexOf('top-login-button') == -1) || !c))) {
-            $('.top-login-popup').removeClass('active');
+            $('.dropdown.top-login-popup').addClass('hidden');
         }
         if ((!e || $(e.target).parents('.create-new-folder').length == 0)
                 && (!c || c.indexOf('fm-new-folder') == -1)) {
@@ -1444,37 +1662,40 @@ function topmenuUI() {
         }
     });
 
-    $('.top-menu-icon').rebind('click', function (e) {
-        if ($(this).attr('class').indexOf('active') == -1) {
-            $(this).addClass('active');
-            $('.top-menu-popup').addClass('active');
-        }
-        else {
-            $(this).removeClass('active');
-            $('.top-menu-popup').removeClass('active');
-        }
+    $('.top-icon.achievements').rebind('click', function() {
+        mega.achievem.achievementsListDialog();
     });
-    $('.activity-status-block').rebind('click.topui', function (e) {
 
-        if ($(this).attr('class').indexOf('active') == -1) {
-            $(this).addClass('active');
-            $('.top-user-status-popup').addClass('active');
-            $('.top-user-status-popup').css('right',
-                $('.top-head').outerWidth() - $('.activity-status-block').position().left + -138 + 'px');
+    $('.top-icon.menu, .top-icon.close').rebind('click', function () {
+        topMenu();
+    });
+
+    $('.top-icon.close').rebind('click', function () {
+        topMenu(1);
+    });
+
+    $('.activity-status-block').rebind('click.topui', function (e) {
+        var $this = $(this);
+        if ($this.attr('class').indexOf('active') == -1) {
+            $this.addClass('active');
+            $('.top-user-status-popup').removeClass('hidden');
+            topPopupAlign('.activity-status-block', '.top-user-status-popup', 40);
         }
         else {
-            $(this).removeClass('active');
-            $('.top-user-status-popup').removeClass('active');
+            $this.removeClass('active');
+            $('.top-user-status-popup').addClass('hidden');
         }
     });
-    $('.top-user-status-item').rebind('click.topui', function (e) {
+    $('.top-user-status-popup .dropdown-item').rebind('click.topui', function (e) {
         if ($(this).attr('class').indexOf('active') == -1) {
-            $('.top-user-status-item').removeClass('active');
+            $('.top-user-status-popup .dropdown-item').removeClass('active');
             $(this).addClass('active');
             $('.activity-status-block').find('.activity-status')
-                .attr('class', $(this).find('.activity-status').attr('class'));
+                .attr('class', 'top ' + $(this).find('.activity-status').attr('class'));
             $('.activity-status-block').removeClass('active');
-            $('.top-user-status-popup').removeClass('active');
+
+            $('.top-user-status-popup').addClass('hidden');
+
             if (!megaChatIsReady && !megaChatIsDisabled) {
                 var presence = $(this).data("presence");
                 localStorage.megaChatPresence = presence;
@@ -1486,305 +1707,72 @@ function topmenuUI() {
             }
         }
     });
-    $('.membership-status-block').rebind('click', function (e) {
-        $('.membership-popup .membership-main-block').hide();
-        $('.membership-popup .membership-loading').show();
-
-        if ($(this).attr('class').indexOf('active') == -1) {
-            $(this).addClass('active');
-            if (u_attr.p) {
-                $('.pro-popup').addClass('active');
-            }
-            else {
-                $('.free-popup').addClass('active');
-            }
-
-            M.accountData(function (account) {
-
-                var perc, warning, perc_c;
-                var percent = {
-                    space: Math.min(100, Math.round(account.space_used / account.space * 100)),
-                    bw: Math.round((account.servbw_used + account.downbw_used) / account.bw * 100)
-                };
-
-
-                $('.membership-popup .membership-loading').hide();
-                $('.membership-popup .membership-main-block').show();
-                var $parent = $('.membership-popup.free-popup');
-
-                if (u_attr.p) {
-                    var planNum = u_attr.p;
-                    var planName = getProPlan(planNum);
-                    $parent = $('.membership-popup.pro-popup');
-
-                    $('.membership-popup.pro-popup .membership-icon').addClass('pro' + planNum);
-                    var $elm = $('.membership-popup.pro-popup .membership-icon-txt-bl .membership-medium-txt');
-                    if (account.stype !== 'S') {
-                        $elm.safeHTML('@@ <span class="red">@@</span>', l[987], time2date(account.expiry));
-                    }
-                    else if (Array.isArray(account.sgw)) {
-                        $elm.safeHTML('<span class="red">(@@)</span>', account.sgw.join(', '));
-                    }
-                    else {
-                        $elm.text('');
-                    }
-
-                    // Update current plan to PRO I, PRO II, PRO III or LITE in popup
-                    $('.membership-icon-pad .membership-big-txt.red').text(planName);
-                }
-                else {
-                    $('.membership-popup .upgrade-account').rebind('click', function () {
-                        document.location.hash = 'pro';
-                    });
-                }
-                if (account.balance
-                        && account.balance[0]
-                        && account.balance[0][0] > 0) {
-                    $parent.find('.membership-price-txt .membership-big-txt')
-                        .safeHTML('&euro; @@', account.balance[0][0]);
-                }
-                else {
-                    $parent.find('.membership-price-txt .membership-big-txt').html('&euro; 0.00');
-                }
-
-                $parent.find('.storage .membership-circle-bg.blue-circle').attr('class',
-                    'membership-circle-bg blue-circle percents-' + percent.space);
-                $parent.find('.storage .membership-circle-bg.blue-circle')
-                    .safeHTML(percent.space  + '<span class="membership-small-txt">%</span>');
-                var b1 = bytesToSize(account.space_used);
-                b1 = b1.split(' ');
-                b1[0] = Math.round(b1[0]) + ' ';
-                var b2 = bytesToSize(account.space);
-                b2 = b2.split(' ');
-                b2[0] = Math.round(b2[0]) + ' ';
-
-                warning = '';
-                if (percent.space > 99) {
-                    warning =
-                        '<div class="account-warning-icon"><span class="membership-notification"><span><span class="yellow">'
-                        + l[34] + '</span> '
-                        + l[1010] + '. ' + l[1011] + ' <a href="#pro" class="upgradelink">'
-                        + l[920] + '</a></span><span class="membership-arrow"></span></span>&nbsp;</div>';
-                }
-                else if (percent.space > 80) {
-                    warning =
-                        '<div class="account-warning-icon"><span class="membership-notification"><span><span class="yellow">'
-                        + l[34] + '</span> '
-                        + l[1012] + ' ' + l[1013] + ' <a href="#pro"  class="upgradelink">'
-                        + l[920] + '</a></span><span class="membership-arrow"></span></span>&nbsp;</div>';
-                }
-
-                var usedspace =
-                    '<span class="membership-small-txt">' + l['439a'].replace('[X1]',
-                    '<span class="blue lpxf">' + htmlentities(b1[0]) + '<span class="membership-small-txt">' +
-                    htmlentities(b1[1]) + '</span></span>').replace('[X2]',
-                        '<span class="lpxf">' + htmlentities(b2[0]) + '</span>' + ' <span class="membership-small-txt">' +
-                    htmlentities(b2[1]) + '</span>') + '</span>';
-
-                var usedspacetxt = l[799];
-                if (lang == 'de') {
-                    usedspacetxt = l[799].charAt(0).toLowerCase() + l[799].slice(1);
-                }
-
-                $parent.find('.storage .membership-usage-txt').safeHTML('<div class="membership-big-txt">' +
-                    usedspace + '</div><div class="membership-medium-txt">' + usedspacetxt +
-                    warning + '</div>');
-
-                if (percent.space > 80) {
-                    $parent.find('.storage .membership-usage-txt').addClass('exceeded');
-                }
-
-                $parent.find('.bandwidth  .membership-circle-bg.green-circle')
-                    .attr('class', 'membership-circle-bg green-circle percents-' + percent.bw);
-                $parent.find('.bandwidth  .membership-circle-bg.green-circle')
-                    .safeHTML(percent.bw + '<span class="membership-small-txt">%</span>');
-                var b1 = bytesToSize(account.servbw_used + account.downbw_used);
-                b1 = b1.split(' ');
-                b1[0] = Math.round(b1[0]) + ' ';
-                var b2 = bytesToSize(account.bw);
-                b2 = b2.split(' ');
-                b2[0] = Math.round(b2[0]) + ' ';
-
-                var waittime = '30 minutes';
-
-                warning = '';
-                if (percent.bw > 99 && !u_attr.p) {
-                    warning =
-                        '<div class="account-warning-icon"><span class="membership-notification"><span><span class="yellow">'
-                        + l[34] + '</span> <span class="red">'
-                        + l[17].toLowerCase() + '</span><br /> '
-                        + l[1054].replace('[X]',
-                            '<span class="green">' + waittime + '</span>')
-                        + ' ' + l[1055] + ' <a href="#pro"  class="upgradelink">'
-                        + l[920] + '</a></span><span class="membership-arrow"></span></span>&nbsp;</div>';
-                }
-                else if (percent.bw > 99 && u_attr.p) {
-                    warning =
-                        '<div class="account-warning-icon"><span class="membership-notification"><span><span class="yellow">'
-                        + l[34] + '</span> '
-                        + l[1008] + ' ' + l[1009] + ' <a href="#pro" class="upgradelink">'
-                        + l[920] + '</a></span><span class="membership-arrow"></span></span>&nbsp;</div>';
-                }
-                else if (percent.bw > 80) {
-                    warning =
-                        '<div class="account-warning-icon"><span class="membership-notification"><span><span class="yellow">'
-                        + l[34] + '</span> '
-                        + l[1053] + ' ' + l[1009] + ' <a href="#pro" class="upgradelink">'
-                        + l[920] + '</a></span><span class="membership-arrow"></span></span>&nbsp;</div>';
-                }
-
-                var usedbw = '<span class="membership-small-txt">' + l['439a'].replace('[X1]',
-                    '<span class="green lpxf">' + htmlentities(b1[0]) + '<span class="membership-small-txt">' +
-                    htmlentities(b1[1]) + '</span></span>').replace('[X2]',
-                    '<span class="lpxf">' + htmlentities(b2[0]) + '</span>' +
-                    ' <span class="membership-small-txt">' +
-                    htmlentities(b2[1]) + '</span>') + '</span>';
-                var usedbwtxt = l[973];
-                if (lang == 'de') {
-                    usedbwtxt = l[973].charAt(0).toLowerCase() + l[973].slice(1);
-                }
-
-                $parent.find('.bandwidth .membership-usage-txt').safeHTML('<div class="membership-big-txt">' +
-                    usedbw + '</div><div class="membership-medium-txt">' + usedbwtxt + warning + '</div>');
-
-                if (percent.bw > 80) {
-                    $parent.find('.bandwidth .membership-usage-txt').addClass('exceeded');
-                }
-
-                $('.membership-popup .mem-button').rebind('click', function (e) {
-                    document.location.hash = 'fm/account';
-                    $.hideTopMenu(e);
-                });
-            });
-        }
-        else {
-            $(this).removeClass('active');
-            if ($(this).find('.membership-status').attr('class').indexOf('free') == -1) {
-                $('.pro-popup').removeClass('active');
-            }
-            else {
-                $('.free-popup').removeClass('active');
-            }
-        }
-    });
 
     $('.top-menu-popup .top-menu-item').rebind('click', function () {
-        if ($('.light-overlay').is(':visible')) {
-            loadingInitDialog.hide();
-        }
-        $('.top-menu-popup').removeClass('active');
-        $('.top-menu-icon').removeClass('active');
+        var className = $(this).attr('class') || '';
 
-        var className = $(this).attr('class');
-        if (!className) {
-            className = '';
+        if (className.indexOf('submenu-item') > -1) {
+            if (className.indexOf('expanded') > -1) {
+                $(this).removeClass('expanded');
+            } else {
+                $(this).addClass('expanded');
+            }
+            setTimeout(topMenuScroll,200);
         }
-        if (className.indexOf('privacycompany') > -1) {
-            document.location.hash = 'privacycompany';
+        else {
+            if ($('.light-overlay').is(':visible')) {
+                loadingInitDialog.hide();
+            }
+            topMenu(1);
+
+            var subpage;
+            var subPages = [
+                'about', 'account', 'android', 'backup', 'blog', 'cmd', 'contact',
+                'copyright', 'corporate', 'credits', 'doc', 'extensions', 'general',
+                'help', 'ios', 'login', 'mega', 'bird', 'privacy', 'privacycompany',
+                'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode', 'support',
+                'sync', 'takedown', 'terms', 'wp'
+            ];
+
+            for (var i = subPages.length; i--;) {
+                if (className.indexOf(subPages[i]) > -1) {
+                    subpage = subPages[i];
+                    break;
+                }
+            }
+
+            if (className.indexOf('upgrade-your-account') > -1) {
+                loadSubPage('pro');
+            }
+            else if (subpage) {
+                loadSubPage(subpage);
+            }
+            else if (className.indexOf('feedback') > -1) {
+                // Show the Feedback dialog
+                var feedbackDialog = mega.ui.FeedbackDialog.singleton($(this));
+                feedbackDialog._type = 'top-button';
+            }
+            else if (className.indexOf('refresh') > -1) {
+                M.reload();
+            }
+            else if (className.indexOf('languages') > -1) {
+                langDialog.show();
+            }
+            else if (className.indexOf('logout') > -1) {
+                mLogout();
+            }
         }
-        else if (className.indexOf('upgrade-your-account') > -1) {
-            document.location.hash = 'pro';
-            return false;
-        }
-        else if (className.indexOf('register') > -1) {
-            document.location.hash = 'register';
-        }
-        else if (className.indexOf('login') > -1) {
-            document.location.hash = 'login';
-        }
-        else if (className.indexOf('aboutus') > -1) {
-            document.location.hash = 'about';
-        }
-        else if (className.indexOf('corporate') > -1) {
-            document.location.hash = 'corporate';
-        }
-        else if (className.indexOf('megablog') > -1) {
-            document.location.hash = 'blog';
-        }
-        else if (className.indexOf('credits') > -1) {
-            document.location.hash = 'credits';
-        }
-        else if (className.indexOf('chrome') > -1) {
-            document.location.hash = 'chrome';
-        }
-        else if (className.indexOf('resellers') > -1) {
-            document.location.hash = 'resellers';
-            return false;
-        }
-        else if (className.indexOf('firefox') > -1) {
-            document.location.hash = 'firefox';
-        }
-        else if (className.indexOf('mobile') > -1) {
-            document.location.hash = 'mobile';
-        }
-        else if (className.indexOf('sync') > -1) {
-            document.location.hash = 'sync';
-        }
-        else if (className.indexOf('help') > -1) {
-            document.location.hash = 'help';
-        } else if (className.indexOf('contact') > -1) {
-            document.location.hash = 'contact';
-        } else if (className.indexOf('support') > -1) {
-            document.location.hash = 'support';
-        }
-        else if (className.indexOf('sitemap') > -1) {
-            document.location.hash = 'sitemap';
-        }
-        else if (className.indexOf('sdk') > -1) {
-            document.location.hash = 'sdk';
-        }
-        else if (className.indexOf('doc') > -1) {
-            document.location.hash = 'doc';
-        }
-        else if (className.indexOf('source-code') > -1) {
-            document.location.hash = 'sourcecode';
-        }
-        else if (className.indexOf('terms') > -1) {
-            document.location.hash = 'terms';
-        }
-        else if (className.indexOf('general') > -1) {
-            document.location.hash = 'general';
-        }
-        else if (className.indexOf('privacypolicy') > -1) {
-            document.location.hash = 'privacy';
-        }
-        else if (className.indexOf('mega') > -1) {
-            document.location.hash = 'mega';
-        }
-        else if (className.indexOf('copyright') > -1) {
-            document.location.hash = 'copyright';
-        }
-        else if (className.indexOf('takedown') > -1) {
-            document.location.hash = 'takedown';
-        }
-        else if (className.indexOf('account') > -1) {
-            document.location.hash = 'fm/account';
-        }
-        else if (className.indexOf('refresh') > -1) {
-            mega.utils.reload();
-        }
-        else if (className.indexOf('languages') > -1) {
-            langDialog.show();
-        }
-        else if (className.indexOf('clouddrive') > -1) {
-            document.location.hash = 'fm';
-        }
-        else if (className.indexOf('logout') > -1) {
-            mLogout();
-        }
+        return false;
     });
 
-    $('.top-search-input').rebind('focus', function () {
-        $('.top-search-bl').addClass('active');
-        if ($(this).val() == l[102]) {
-            $(this).val('');
-        }
+    $('.top-search-bl').rebind('click', function () {
+        $(this).addClass('active');
+        $('.top-search-input').focus();
     });
 
     $('.top-search-input').rebind('blur', function () {
         $(this).closest('.top-search-bl').removeClass('active');
         if ($(this).val() == '') {
-            $(this).val(l[102]);
             $('.top-search-bl').removeClass('contains-value');
         }
         else {
@@ -1799,8 +1787,8 @@ function topmenuUI() {
             dn.closest(ct).show();
             $(window).trigger('resize');
         }
-        $('.top-search-input').val(l[102]);
-        $('.top-search-bl').removeClass('contains-value');
+        $('.top-search-bl').removeClass('contains-value active');
+        $('.top-search-input').val('');
     });
 
     $('.top-search-input').rebind('keyup', function _topSearchHandler(e) {
@@ -1835,29 +1823,97 @@ function topmenuUI() {
                     e.stopPropagation();
                 }
                 else {
-                    document.location.hash = 'fm/search/' + val;
+                    loadingDialog.show();
+                    var promise = new MegaPromise();
+
+                    if (!M.nn) {
+                        M.nn = Object.create(null);
+
+                        promise = fmdb.get('f')
+                            .always(function(r) {
+                                for (var i = r.length; i--;) {
+                                    M.nn[r[i].h] = r[i].name;
+                                }
+                            });
+                    }
+                    else {
+                        promise.resolve();
+                    }
+
+                    promise.always(function() {
+                        var handles = [];
+                        var filter = M.getFilterBySearchFn(val);
+
+                        for (var h in M.nn) {
+                            if (!M.d[h] && filter({name: M.nn[h]})) {
+                                handles.push(h);
+                            }
+                        }
+
+                        dbfetch.geta(handles).always(function() {
+                            loadingDialog.hide();
+                            loadSubPage('fm/search/' + val);
+                        });
+                    });
                 }
             }
         }
     });
 
-    // If the avatar in the header is clicked
+    // Hover tooltip for top-menu elements and sidebar icons
+    $('.nw-fm-left-icon, .top-icon').rebind('mouseover.nw-fm-left-icon', function() {
+        var $this    = $(this);
+        var $tooltip = $this.find('.dark-tooltip');
+        var tooltipPos;
+        var tooltipWidth;
+        var buttonPos;
+
+        if ($.liTooltipTimer) {
+            clearTimeout($.liTooltipTimer);
+        }
+        $.liTooltipTimer = window.setTimeout(
+            function() {
+                if ($tooltip.hasClass('top')) {
+                    tooltipWidth = $tooltip.outerWidth();
+                    buttonPos    = $this.position().left;
+                    tooltipPos   = buttonPos + $this.outerWidth() / 2 - tooltipWidth / 2;
+                    if ($('body').width() - (tooltipPos + tooltipWidth) > 0) {
+                        $tooltip.css({
+                            'left': tooltipPos,
+                            'right': 'auto'
+                        });
+                    }
+                    else {
+                        $tooltip.css({
+                            'left': 'auto',
+                            'right': 0
+                        });
+                    }
+                }
+                $tooltip.addClass('hovered');
+            }, 1000);
+    })
+    .rebind('mouseout.nw-fm-left-icon', function() {
+        $(this).find('.dark-tooltip').removeClass('hovered');
+        clearTimeout($.liTooltipTimer);
+    });
+
     var $topHeader = $('.top-head');
-    $topHeader.find('.fm-avatar img').rebind('click', function() {
+    $topHeader.find('.fm-avatar').rebind('click', function() {
 
         // If the user has an avatar already set, take them to the profile page where they can change or remove it
-        if ($(this).attr('src').indexOf('blob:') > -1) {
-            document.location.hash = 'fm/account/profile';
+        if ($(this).find('img').length > 0) {
+            loadSubPage('fm/account');
         }
         else {
-            // Otherwise if they don't have an avatar, open the change avatar dialog
+            // Otherwise if they don't have an avatar, open the change avatar dialog;
             avatarDialog();
         }
     });
 
     // If the user name in the header is clicked, take them to the account overview page
     $topHeader.find('.user-name').rebind('click', function() {
-        document.location.hash = 'fm/account';
+        loadSubPage('fm/account');
     });
 
     // If the main Mega M logo in the header is clicked
@@ -1867,37 +1923,41 @@ function topmenuUI() {
                 M.openFolder(M.RootID, true);
             }
             else {
-                document.location.hash =
-                    typeof u_type !== 'undefined' && +u_type > 2 ? '#fm' : '#start';
+                    loadSubPage(typeof u_type !== 'undefined' && +u_type > 2 ? 'fm/dashboard' : 'start');
             }
         }
     });
 
+    /**
+     * this is closing the EFQ email confirm dialog, if needed for something else ask before re-enabling [dc]
     if (!$('.fm-dialog.registration-page-success').hasClass('hidden')) {
         $('.fm-dialog.registration-page-success').addClass('hidden');
         $('.fm-dialog-overlay').addClass('hidden');
         $('body').removeClass('overlayed');
-    }
+    }*/
 
+    /**
+     * why was this needed here?
     if (ulmanager.isUploading || dlmanager.isDownloading) {
         $('.widget-block').removeClass('hidden');
-    }
+    }*/
 
     $('.widget-block').rebind('click', function (e) {
         if ($.infoscroll && page == 'download') {
             startpageMain();
         }
         else if ($.dlhash) {
-            document.location.hash = $.dlhash;
+            // XXX TODO FIXME check this
+            loadSubPage($.dlhash);
         }
         else if (folderlink && M.lastSeenFolderLink) {
-            $(document).one('MegaOpenFolder', function() {
+            mBroadcaster.once('mega:openfolder', function() {
                 $('.nw-fm-left-icon.transfers').click();
             });
-            location.hash = M.lastSeenFolderLink;
+            loadSubPage(M.lastSeenFolderLink);
         }
         else {
-            document.location.hash = 'fm';
+            loadSubPage('fm');
         }
     });
 
@@ -1906,10 +1966,6 @@ function topmenuUI() {
         $('.top-search-bl input').val(decodeURIComponent(M.currentdirid.substr(7)));
     }
 
-    if (u_type) {
-        $('.membership-popup-arrow').css('margin-right',
-            $('.top-menu-icon').width() + $('.membership-status-block').width() / 2 + 57 + 'px');
-    }
 
     // Initialise notification popup and tooltip
     if (typeof notify === 'object') {
@@ -1925,7 +1981,9 @@ function is_fm() {
             || page.substr(0, 2) === 'fm' || page.substr(0, 7) === 'account';
     }
 
-    if (d > 1) console.error('is_fm', r, page, hash);
+    if (d > 2) {
+        console.warn('is_fm', r, page, hash);
+    }
 
     return r;
 }
@@ -1953,68 +2011,68 @@ function parsepage(pagehtml, pp) {
     if (document.location.href.substr(0, 19) == 'chrome-extension://') {
         pagehtml = pagehtml.replace(/\/#/g, '/' + urlrootfile + '#');
     }
-    $('body').removeClass('notification-body bottom-pages new-startpage');
 
-    if (page == 'start') {
-        $('body').addClass('new-startpage');
-    }
-    else {
-        $('body').addClass('bottom-pages');
-    }
+    $('body').addClass('bottom-pages');
 
     var top = parsetopmenu();
     var bmenu = pages['bottom'];
     var bmenu2 = pages['bottom2'];
+    var pagesmenu = pages['pagesmenu'];
     if (document.location.href.substr(0, 19) == 'chrome-extension://') {
         bmenu2 = bmenu2.replace(/\/#/g, '/' + urlrootfile + '#');
     }
-    pagehtml = pagehtml.replace("((MEGAINFO))", translate(pages['megainfo']).replace(/{staticpath}/g, staticpath));
-    pagehtml = pagehtml.replace("((TOP))", top);
-    pagehtml = pagehtml.replace("((BOTTOM))", translate(bmenu2));
+    pagehtml = pagehtml
+        .replace(/\(\(MEGAINFO\)\)/g, translate(pages['megainfo'])
+        .replace(/{staticpath}/g, staticpath));
+    pagehtml = pagehtml.replace(/\(\(TOP\)\)/g, top);
+    pagehtml = pagehtml.replace(/\(\(BOTTOM\)\)/g, translate(bmenu2));
+    pagehtml = pagehtml.replace(/\(\(PAGESMENU\)\)/g, translate(pagesmenu));
 
     var $container = is_mobile ? $('body') : $('#startholder');
     $container
-        .safeHTML(translate(pages['transferwidget']) + pagehtml)
+        .safeHTML('<div class="nav-overlay"></div>' +
+            translate(pages['transferwidget']) + pagehtml)
         .show();
 
-    Soon(mainScroll);
     $(window).rebind('resize.subpage', function (e) {
-        if (page !== 'start' && page !== 'download') {
-            mainScroll();
-        }
-        mega.utils.chrome110ZoomLevelNotification();
+        M.chrome110ZoomLevelNotification();
     });
 
+    bottompage.init();
     $('.nw-bottom-block').addClass(lang);
-    if (typeof UIkeyevents === 'function') {
-        UIkeyevents();
+    if (typeof M.initUIKeyEvents === 'function') {
+        M.initUIKeyEvents();
     }
+    clickURLs();
 }
 
 function parsetopmenu() {
-    var top = pages['top'].replace(/{staticpath}/g, staticpath);
-    if (document.location.href.substr(0, 19) == 'chrome-extension://') {
-        top = top.replace(/\/#/g, '/' + urlrootfile + '#');
+    var top;
+    if (!is_mobile) {
+        top = pages['top'].replace(/{staticpath}/g, staticpath);
+        if (document.location.href.substr(0, 19) == 'chrome-extension://') {
+            top = top.replace(/\/#/g, '/' + urlrootfile + '#');
+        }
+        top = top.replace("{avatar-top}", window.useravatar && useravatar.mine() || '');
     }
-    top = top.replace("{avatar-top}", window.useravatar && useravatar.mine() || '');
+    /* TODO: import mobile top menu */
+    else {
+        top = pages['top-mobile'];
+    }
     top = translate(top);
     return top;
 }
 
-window.onhashchange = function() {
-    var tpage = document.location.hash;
 
-    if (typeof gifSlider !== 'undefined' && tpage.substr(0, 2) !== '#!') {
+function loadSubPage(tpage, event)
+{
+    tpage = getCleanSitePath(tpage);
+
+    if (typeof gifSlider !== 'undefined' && tpage[0] !== '!') {
         gifSlider.clear();
     }
 
-    if (window.skipHashChange) {
-        delete window.skipHashChange;
-        return false;
-    }
-
     if (silent_loading) {
-        document.location.hash = hash;
         return false;
     }
 
@@ -2022,20 +2080,11 @@ window.onhashchange = function() {
         flhashchange = true;
     }
 
-    if (tpage == '#info' && page == 'start') {
-        if (!$.infoscroll) {
-            startpageScroll();
-        }
+    if ((tpage === page) && !folderlink) {
         return false;
     }
 
-    if ((tpage == '#' || tpage == '' || tpage == 'start') && page == 'start' ) {
-        if ($.infoscroll) {
-            startpageMain();
-        }
-        return false;
-    }
-
+    // TODO: check what this was for and its relevance
     var overlay = document.getElementById('overlay');
     if (overlay && overlay.style.display == '' && !is_fm()) {
         document.location.hash = hash;
@@ -2043,33 +2092,18 @@ window.onhashchange = function() {
     }
 
     dlid = false;
-    hash = window.location.hash;
-    if (hash) {
-        page = hash.replace('#', '');
 
-        if (page) {
-            try {
-                page = decodeURIComponent(page);
-            }
-            catch (e) {}
-        }
+    if (tpage) {
+        page = tpage;
     }
     else {
         page = '';
     }
 
     if (page) {
-        if (page.indexOf('%25') !== -1) {
-            do {
-                page = page.replace(/%25/g, '%');
-            } while (page.indexOf('%25') !== -1);
-        }
-        if (page.indexOf('%21') !== -1) {
-            page = page.replace(/%21/g, '!');
-        }
         for (var p in subpages) {
-            if (page && page.substr(0, p.length) == p) {
-                for (i in subpages[p]) {
+            if (page.substr(0, p.length) === p) {
+                for (var i in subpages[p]) {
                     if (!jsl_loaded[jsl2[subpages[p][i]].n]) {
                         jsl.push(jsl2[subpages[p][i]]);
                     }
@@ -2078,12 +2112,34 @@ window.onhashchange = function() {
         }
     }
 
+    if (hashLogic || isPublicLink(page)) {
+        document.location.hash = '#' + page;
+    }
+    else if (!event || event.type !== 'popstate') {
+        history.pushState({ subpage: page }, "", "/"+page);
+    }
+
     if (jsl.length > 0) {
         loadingDialog.show();
         jsl_start();
     }
     else {
         init_page();
+    }
+    mBroadcaster.sendMessage('pagechange');
+}
+
+
+window.onhashchange = function() {
+    if (window.skipHashChange) {
+        delete window.skipHashChange;
+        return false;
+    }
+    if (hashLogic) {
+        hash = getCleanSitePath(location.hash);
+        if (hash !== page) {
+            loadSubPage(hash);
+        }
     }
 };
 
@@ -2099,10 +2155,10 @@ window.onunload = function() {
     mBroadcaster.crossTab.leave();
 };
 
-if (!is_karma && !is_mobile) {
-    window.M = new MegaData();
-    attribCache = new IndexedDBKVStorage('attrib', { murSeed: 0x800F0002 });
+mBroadcaster.once('boot_done', function() {
+    M = new MegaData();
+    attribCache = new IndexedDBKVStorage('ua', {murSeed: 0x800F0002});
     attribCache.syncNameTimer = {};
     attribCache.uaPacketParser = uaPacketParser;
     attribCache.bitMapsManager = new MegaDataBitMapManager();
-}
+});

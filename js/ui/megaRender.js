@@ -14,7 +14,7 @@
                         '<span class="grid-status-icon"></span>' +
                     '</td>' +
                     '<td>' +
-                        '<span class="transfer-filtype-icon"></span>' +
+                        '<span class="transfer-filetype-icon"></span>' +
                         '<span class="tranfer-filetype-txt"></span>' +
                     '</td>' +
                     '<td width="100" class="size"></td>' +
@@ -43,7 +43,7 @@
             // List view mode
             '<table>' +
                 '<tr>' +
-                    '<td width="30">' +
+                    '<td width="50">' +
                         '<span class="grid-status-icon"></span>' +
                     '</td>' +
                     '<td>' +
@@ -114,10 +114,12 @@
 
             // Icon view mode
             '<a class="file-block ustatus">' +
-                '<span class="nw-contact-status"></span>' +
                 '<span class="file-settings-icon"></span>' +
                 '<span class="shared-folder-info-block">' +
-                    '<span class="shared-folder-name"></span>' +
+                    '<span class="u-card-data">' +
+                        '<span class="shared-folder-name"></span>' +
+                        '<span class="nw-contact-status"></span>' +
+                    '</span>' +
                     '<span class="shared-folder-info"></span>' +
                 '</span>' +
             '</a>'
@@ -127,7 +129,7 @@
             // List view mode
             '<table>' +
                 '<tr>' +
-                    '<td width="30">' +
+                    '<td width="50">' +
                         '<span class="grid-status-icon"></span>' +
                     '</td>' +
                     '<td>' +
@@ -345,6 +347,10 @@
                 else if (String(M.currentdirid).substr(0, 7) === 'search/') {
                     $('.fm-empty-search').removeClass('hidden');
                 }
+                else if (M.currentdirid === 'links') {
+                    // TODO: a dedicated splash
+                    $('.fm-empty-folder').removeClass('hidden');
+                }
                 else if (M.currentdirid === M.RootID && folderlink) {
                     // FIXME: implement
                     /*if (!isValidShareLink()) {
@@ -364,6 +370,7 @@
                     $('.fm-empty-incoming').removeClass('hidden');
                 }
                 else if (M.currentrootid === M.RootID
+                        || M.currentrootid === M.RubbishID
                         || M.currentrootid === M.InboxID) {
 
                     $('.fm-empty-folder').removeClass('hidden');
@@ -374,6 +381,9 @@
                 else if (M.currentrootid === 'contacts') {
                     $('.fm-empty-incoming.contact-details-view').removeClass('hidden');
                     $('.contact-share-notification').addClass('hidden');
+                }
+                else if (this.logger) {
+                    this.logger.info('Empty folder not handled...', M.currentdirid, M.currentrootid);
                 }
             }
 
@@ -601,6 +611,10 @@
                 var props = {classNames: []};
                 var share = M.getNodeShare(aNode);
 
+                if (aNode.su) {
+                    props.classNames.push('inbound-share');
+                }
+
                 if (aNode.t) {
                     props.type = l[1049];
                     props.icon = 'folder';
@@ -660,6 +674,13 @@
                                 || (aNode.p === 'contacts' && M.contactstatus(aHandle).ts));
                         }
                     }
+
+                    // Colour label
+                    if (aNode.lbl) {
+                        var colourLabel = M.getColourClassFromId(aNode.lbl);
+                        props.classNames.push('colour-label');
+                        props.classNames.push(colourLabel);
+                    }
                 }
 
                 return props;
@@ -668,7 +689,6 @@
                 var avatar;
                 var props = this.nodeProperties['*'].call(this, aNode, aHandle, false);
 
-                props.shareUser = aNode.su;
                 props.userHandle = aNode.su || aNode.p;
                 props.userName = M.getNameByHandle(props.userHandle);
 
@@ -701,9 +721,12 @@
                     }
 
                     if (this.chatIsReady) {
-                        var jid = megaChat.getJidFromNodeId(props.userHandle);
+                        props.onlineStatus = M.onlineStatusClass(aNode.presence ? aNode.presence : "unavailable");
 
-                        props.onlineStatus = M.onlineStatusClass(megaChat.karere.getPresence(jid));
+                        if (props.onlineStatus) {
+                            props.classNames.push(props.onlineStatus[1]);
+                        }
+
                     }
 
                     if (aExtendedInfo !== false) {
@@ -713,6 +736,13 @@
 
                 if (avatar) {
                     props.avatar = parseHTML(avatar).firstChild;
+                }
+
+                // Colour label
+                if (aNode.lbl && (aNode.su !== u_handle)) {
+                    var colourLabel = M.getColourClassFromId(aNode.lbl);
+                    props.classNames.push('colour-label');
+                    props.classNames.push(colourLabel);
                 }
 
                 return props;
@@ -728,20 +758,19 @@
                     assert(Object(M.u[aHandle]).c === 1, 'Found non-active contact');
                 }
 
-                var avatar = useravatar.contact(aHandle, "nw-contact-avatar");
+                var avatar = useravatar.contact(aHandle, 'nw-contact-avatar');
 
                 if (avatar) {
                     props.avatar = parseHTML(avatar).firstChild;
                 }
 
                 if (this.chatIsReady) {
-                    var jid = megaChat.getJidFromNodeId(aHandle);
-
-                    props.onlineStatus = M.onlineStatusClass(megaChat.karere.getPresence(jid));
+                    props.onlineStatus = M.onlineStatusClass(aNode.presence ? aNode.presence : "unavailable");
 
                     if (props.onlineStatus) {
                         props.classNames.push(props.onlineStatus[1]);
                     }
+
                 }
 
                 props.classNames.push(aHandle);
@@ -780,12 +809,14 @@
                         aTemplate.querySelector('.grid-url-field').classList.add('linked');
                     }
 
-                    aTemplate.querySelector('.size').textContent = aProperties.size;
+                    if (aProperties.size !== undefined) {
+                        aTemplate.querySelector('.size').textContent = aProperties.size;
+                    }
                     aTemplate.querySelector('.type').textContent = aProperties.type;
                     aTemplate.querySelector('.time').textContent = aProperties.time;
                     aTemplate.querySelector('.tranfer-filetype-txt').textContent = aProperties.name;
 
-                    tmp = aTemplate.querySelector('.transfer-filtype-icon');
+                    tmp = aTemplate.querySelector('.transfer-filetype-icon');
                     tmp.classList.add(aProperties.icon);
                 }
                 this.addClasses(tmp, aProperties.classNames);

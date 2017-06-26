@@ -110,7 +110,7 @@ function u_checklogin3a(res, ctx) {
         u_attr = res;
         var exclude = [
             'c', 'email', 'k', 'name', 'p', 'privk', 'pubk', 's',
-            'ts', 'u', 'currk', 'flags', '*!lastPsaSeen', 'lup'
+            'ts', 'u', 'currk', 'flags', '*!lastPsaSeen', 'lup', 'since', 'ut'
         ];
 
         for (var n in u_attr) {
@@ -150,6 +150,10 @@ function u_checklogin3a(res, ctx) {
             console.error('Error decoding private RSA key', e);
         }
 
+        if (typeof u_attr.ut !== 'undefined') {
+            localStorage.apiut = u_attr.ut;
+        }
+
         // Flags is a generic object for various things
         if (typeof u_attr.flags !== 'undefined') {
 
@@ -169,9 +173,10 @@ function u_checklogin3a(res, ctx) {
                 localStorage.chatDisabled = (u_attr.flags.mcs === 0) ? '1' : '0';
             }
         }
+        u_attr.flags = Object(u_attr.flags);
 
         // If their PRO plan has expired and Last User Payment info is set, configure the dialog
-        if (typeof u_attr.lup !== 'undefined') {
+        if ((typeof u_attr.lup !== 'undefined') && !is_mobile) {
             alarm.planExpired.lastPayment = u_attr.lup;
         }
 
@@ -222,6 +227,7 @@ function u_logout(logout) {
                 megaChat.destroy( /* isLogout: */ true);
 
                 localStorage.removeItem("megaChatPresence");
+                localStorage.removeItem("userPresenceIsOffline");
                 localStorage.removeItem("megaChatPresenceMtime");
             }
         }
@@ -234,13 +240,19 @@ function u_logout(logout) {
         if (typeof mDBcls === 'function') {
             mDBcls(); // close fmdb
         }
+
         if (logout !== -0xDEADF) {
             watchdog.notify('logout');
         }
-        slideshow(0, 1);
+
+        // The slideshow and notifications are not applicable for the mobile website
+        if (!is_mobile) {
+            slideshow(0, 1);
+            notify.notifications = [];
+        }
+
         mBroadcaster.crossTab.leave();
         u_sid = u_handle = u_k = u_attr = u_privk = u_k_aes = undefined;
-        notify.notifications = [];
         api_setsid(false);
         u_sharekeys = {};
         u_type = false;
@@ -293,6 +305,8 @@ function u_setrsa(rsakey) {
                         process_u([user]);
 
                         if (d) console.log('Account activation succeeded', user);
+
+                        watchdog.notify('setrsa', [u_type, u_sid]);
                     }
                     $promise.resolve(rsakey);
                     ui_keycomplete();
@@ -555,14 +569,44 @@ function isEphemeral() {
  */
 function checkUserLogin() {
     if (!u_type) {
-        login_next = document.location.hash;
-        document.location.hash = "#login";
+        login_next = getSitePath();
+        loadSubPage('login');
         return true;
     }
 
     return false;
 }
 
+
+/**
+ * A reusable function that is used for processing locally/3rd party email change
+ * action packets.
+ *
+ * @param ap {Object} the actual 'se' action packet
+ */
+function processEmailChangeActionPacket(ap) {
+    // set email
+    var emailChangeAccepted = (ap.s === 3 && typeof ap.e === 'string' && ap.e.indexOf('@') !== -1);
+
+    if (emailChangeAccepted) {
+        var user = M.getUserByHandle(ap.u);
+
+        if (user) {
+            user.m = ap.e;
+            process_u([user]);
+
+            if (ap.u === u_handle) {
+                u_attr.email = user.m;
+
+                if (M.currentdirid === 'account/profile') {
+                    $('.nw-fm-left-icon.account').trigger('click');
+                }
+            }
+        }
+        // update the underlying fmdb cache
+        M.addUser(user);
+    }
+}
 
 (function(exportScope) {
     var _lastUserInteractionCache = window._lastUserInteractionCache = {};
@@ -621,7 +665,8 @@ function checkUserLogin() {
 
                     $promise.resolve(_lastUserInteractionCache[u_h]);
 
-                    M.u[u_h].ts = parseInt(v.split(":")[1], 10);
+                    // TODO: check why `M.u[u_h]` might not be set...
+                    Object(M.u[u_h]).ts = parseInt(v.split(":")[1], 10);
 
                     $promise.verify();
 
@@ -794,7 +839,7 @@ function checkUserLogin() {
                     }
                     else {
                         $promise.reject(false);
-                        console.error("Failed to retrieve last interaction cache from attrib, response: ", err);
+                        console.error("Failed to retrieve last interaction cache from attrib, response: ", res);
                     }
                 })
                 .fail(function(res) {
@@ -856,9 +901,6 @@ function checkUserLogin() {
         };
 
         for (var key in config) {
-            if (!config.hasOwnProperty(key)) {
-                continue;
-            }
             var value = config[key];
 
             if (!value && value !== 0) {
@@ -961,7 +1003,14 @@ function checkUserLogin() {
         var promise = waiter = new MegaPromise();
 
         mega.attr.get(u_handle, 'fmconfig', false, true)
-            .always(moveLegacySettings)
+            .always(function() {
+                moveLegacySettings();
+
+                // Initialize account notifications.
+                if (!is_mobile) {
+                    mega.notif.setup(fmconfig.anf);
+                }
+            })
             .done(function(result) {
                 result = Object(result);
                 for (var key in result) {
@@ -1001,8 +1050,16 @@ function checkUserLogin() {
                 if (fmconfig.ul_maxSlots) {
                     ulQueue.setSize(fmconfig.ul_maxSlots);
                 }
+                else {
+                    mega.config.set('ul_maxSlots', 4);// Default ul slots value
+                    ulQueue.setSize(4);
+                }
                 if (fmconfig.dl_maxSlots) {
                     dlQueue.setSize(fmconfig.dl_maxSlots);
+                }
+                else {
+                    mega.config.set('dl_maxSlots', 4);// Default dl slots value
+                    dlQueue.setSize(4);
                 }
                 if (fmconfig.font_size) {
                     $('body').removeClass('fontsize1 fontsize2')
@@ -1057,7 +1114,7 @@ function checkUserLogin() {
         var push = function() {
             if (u_type === 3 && !pfid && !folderlink) {
                 // through a timer to prevent floods
-                timer = delay('fmconfig:store', store, 9701);
+                timer = delay('fmconfig:store', store, 3100);
             }
             else {
                 localStorage.fmconfig = JSON.stringify(fmconfig);
@@ -1074,6 +1131,29 @@ function checkUserLogin() {
         }
 
         mBroadcaster.sendMessage('fmconfig:' + key, value);
+    };
+
+    /**
+     * Same as .set, but displays a toast notification.
+     * @param {String} key          Configuration key
+     * @param {String} value        Configuration value
+     * @param {String} [toastText]  Toast notification text
+     */
+    ns.setn = function _setConfigValueToast(key, value, toastText) {
+        toastText = toastText || l[16168];
+
+        delay('fmconfig:setn.' + key, function() {
+            var toast = false;
+
+            if (mega.config.get(key) !== value) {
+                mega.config.set(key, value);
+                toast = true;
+            }
+
+            if (toast) {
+                showToast('settings', toastText);
+            }
+        });
     };
 
     if (is_karma) {

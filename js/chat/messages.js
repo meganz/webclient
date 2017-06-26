@@ -337,15 +337,31 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         if (chatRoom.roomJid === self.chatRoom.roomJid) {
             self.isRetrievingHistory = false;
             self.chatdIsProcessingHistory = false;
-            self.haveMessages = true;
+            if (
+                typeof(self.expectedMessagesCount) === 'undefined' ||
+                self.expectedMessagesCount === 32
+            ) {
+                // this is an empty/new chat.
+                self.expectedMessagesCount = 0;
+                self.retrievedAllMessages = true;
+            }
+            else if (
+                self.expectedMessagesCount === 32
+            ) {
+                self.haveMessages = true;
+                self.retrievedAllMessages = true;
+            }
+            else if (
+                self.expectedMessagesCount
+            ) {
+                self.haveMessages = true;
+                self.retrievedAllMessages = false;
+            }
 
             if (self.$msgsHistoryLoading && self.$msgsHistoryLoading.state() === 'pending') {
                 self.$msgsHistoryLoading.resolve();
             }
 
-            if (self.expectedMessagesCount > 0) {
-                self.retrievedAllMessages = true;
-            }
             delete self.expectedMessagesCount;
 
             $(self).trigger('onHistoryFinished');
@@ -361,7 +377,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
 
         if (chatRoom && chatRoom.roomJid === self.chatRoom.roomJid) {
             self.isRetrievingHistory = true;
-            self.expectedMessagesCount = eventData.count * -1;
+            self.expectedMessagesCount = Math.abs(eventData.count);
             self.trackDataChange();
         }
     });
@@ -514,6 +530,9 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                         else if (decrypted.type === strongvelope.MESSAGE_TYPES.TRUNCATE) {
                             editedMessage.dialogType = 'truncated';
                             editedMessage.userId = decrypted.sender;
+                            editedMessage.delay = unixtime();
+                            chatRoom.lastActivity = editedMessage.delay;
+                            chatRoom.didInteraction(editedMessage.userId, chatRoom.lastActivity);
                         }
 
                         chatRoom.megaChat.plugins.chatdIntegration._parseMessage(
@@ -768,7 +787,9 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                 }
             }
         };
-        ChatdIntegration._ensureKeysAreLoaded(keys).always(seedKeys);
+        ChatdIntegration._waitForProtocolHandler(chatRoom, function() {
+            ChatdIntegration._ensureKeysAreLoaded(keys).always(seedKeys);
+        });
 
         if (chatRoom.roomJid === self.chatRoom.roomJid) {
             self.trackDataChange();

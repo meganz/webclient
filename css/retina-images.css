@@ -1,3 +1,4 @@
+
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
 .try-new-close {
     background-image: url(../images/mega/close-white-icon@2x.png);
@@ -14,7 +15,7 @@ body.pro:after {
     background-image: url("../images/mega/bitcoin-v7@2x.png");
 }
 .provider-icon {
-    background-image: url(../images/mega/payment-provider-icons-v2@2x.png);
+    background-image: url(../images/mega/payment-provider-icons-v3@2x.png);
     background-size: 20px auto;
 }
 .fm-dialog.cancel-subscription-st2 .blue-success-icon {
@@ -33,25 +34,9 @@ body.pro:after {
     background-image: url(../images/mega/slideshow-sprite@2x.png?v=1);
     background-size: 276px auto;
 }
-.sync-top-logo, .sync-short-block li, .sync-help-center {
-    background-image: url(../images/mega/sync-nw-v3@2x.png);
-    background-size: 168px auto;
-}
-.sync-main-img {
-    background-image: url(../images/mega/img_sync_@2x.png);
-    background-size: 700px auto;
-}
 .top-context-close {
     background-image: url(../images/mega/context-top@2x.png);
     background-size: 27px auto;
-}
-.ff-extension-icon, .ff-extension-button {
-    background-image: url(../images/mega/firefox-sprite@2x.png);
-    background-size: 90px auto;
-}
-.download-megasync-dialog .icon {
-    background-image: url(../images/mega/sync-nw-v3@2x.png);
-    background-size: 168px auto;
 }
 .st-green-note {
     background-image: url(../images/mega/en/start-green-note@2x.png);
@@ -323,24 +308,16 @@ body.pro:after {
     background-image: url(../images/mega/register-info@2x.png);
     background-size: 120px auto;
 }
-.download-dialog-icon, .download-chrome-lnk, a.download-chrome-lnk, .download-user-icon, .new-download-sync-app, .new-download-red-button, .megasync-list-arrow, .megasync-logo, .megasync-table table th span, .megasync-table table td span, .megasync-dropdown span, .megasync-dropdown-link, .camera-bottom-icon, .camera-top-icon, .button.download-button.down-arrow, .button.download-button.to-clouddrive, .download-icon, .download.error-text.na-icon, .download.error-text.cross-icon, .download.error-text.error-icon, .megasync-info-arrow, .megasync-dark-logo, .megasync-icon, .megasync-slider.button, .megasync .toast-icon, .toast-close-button {
+.download-dialog-icon, .download-chrome-lnk, a.download-chrome-lnk, .download-user-icon, .new-download-sync-app, .new-download-red-button, .mega-list-arrow, .megasync-logo, .megasync-table table th span, .megasync-table table td span, .default-dropdown-item.icon, .camera-bottom-icon, .camera-top-icon, .button.download-button.down-arrow, .button.download-button.to-clouddrive, .download-icon, .download.error-text.na-icon, .download.error-text.cross-icon, .download.error-text.error-icon, .megasync-info-arrow, .megasync-dark-logo, .megasync-icon, .megasync-slider.button, .megasync .toast-icon {
     background-image: url(../images/mega/download-sprite-v6@2x.png);
     background-size: 257px auto;
 }
-.active.new-start-arrow-button, .st-red-header, .st-quote-left, .st-quote-right, .st-privacy-tool-icon, .st-membership-icon, .st-devices-icon, .st-os-icons, .st-cloud-icon, .st-mobile-apps-icon, .st-member-ship-right-bl, .st-apps-icon {
-    background-image: url(../images/mega/new-start-full1@2x.png);
-    background-size: 930px auto;
-}
-.green-circle, .blue-circle, .game-circle {
-    background-image: url(../images/mega/rounded-progressbars@2x.png);
-    background-size: 64px auto;
-}
-.top-login-full, .top-login-input-block, .top-login-warning-close, .top-login-warning-icon, .top-login-popup .top-login-warning-bott .checkboxOn, .top-login-popup .top-login-warning-bott .checkboxOff, .top-login-tooltip-arrow, .password-tooltip-arrow, .main-top-info-text, .login-register-input, .register-st2-button, .register-st2-button-arrow, .password-status-icon, .login-notification-icon, .top-login-forgot-pass, .login-forgot-password, .checkboxOn::after, .checkboxOff::after, .contains-value .top-search-clear, .account-history-drop-items.active, .account-warning-icon, .warning-gray-icon, .membership-arrow, .top-login-forgot-pass {
-    background-image: url(../images/mega/top-login-sprite_v6@2x.png);
+.top-login-full, .top-login-input-block, .top-login-warning-close, .top-login-warning-icon, .top-login-popup .top-login-warning-bott .checkboxOn, .top-login-popup .top-login-warning-bott .checkboxOff, .top-login-tooltip-arrow, .password-tooltip-arrow, .login-register-input, .register-st2-button, .register-st2-button-arrow, .password-status-icon, .login-notification-icon, .top-login-forgot-pass, .login-forgot-password, .checkboxOn::after, .checkboxOff::after, .contains-value .top-clear-button, .account-history-drop-items.active, .account-warning-icon, .warning-gray-icon, .membership-arrow, .small-icon.membership, .dropdown-white-arrow, .dropdown-item.tick-item.active::before, .dropdown-item.do-sort.selected i {
+    background-image: url(../images/mega/top-login-sprite_v7@2x.png);
     background-size: 48px auto;
 }
-.reg-success-icon, .reg-st3-save-icon, .reg-st3-membership-icon, .membership-icon, .loginrequired-dialog .fm-notification-icon, .file-status-icon.star, .taken-down .file-status-icon, .taken-down .grid-status-icon, .contact-status-icon.star, .grid-status-icon.star, .linked .data-item-icon, .taken-down .data-item-icon, .toast-icon, .resend-email-button {
-    background-image: url(../images/mega/register-big-sprite-v9@2x.png);
+.reg-success-icon, .reg-st3-save-icon, .file-status-icon.star, .taken-down .file-status-icon, .taken-down .grid-status-icon, .contact-status-icon.star, .grid-status-icon.star, .linked .data-item-icon, .taken-down .data-item-icon, .toast-icon, .resend-email-button, .toast-close-button, .small-icon.green-arrow, .small-icon.blue-arrow, .fm-dialog-close.small {
+    background-image: url(../images/mega/register-big-sprite-v12@2x.png);
     background-size: 200px auto;
 }
 .reg-st5-key-gen, .reg-st5-info-icon {
@@ -359,13 +336,9 @@ body.pro:after {
     background-image: url(../images/mega/browsers-page@2x.png);
     background-size: 892px auto;
 }
-.pro-icons-block, .membership-question-mark span, .membership-date, .membership-st2-select span, .membership-payment-icon, .membership-radio-label, .astropay-dialog .powered-by-astropay {
+.membership-question-mark span, .membership-date, .membership-st2-select span, .membership-payment-icon, .membership-radio-label, .astropay-dialog .powered-by-astropay {
     background-image: url(../images/mega/pro-new-sprite-v8@2x.png);
     background-size: 755px auto;
-}
-.sync-list-txt, .sync-icon, .mobile-icon, .ff-icon, .chrome-icon, .mobile-small-icon, .chrome-bott-icons .ads-top-arrow {
-    background-image: url(../images/mega/mobile-sprite_v7@2x.png);
-    background-size: 836px auto;
 }
 .privacy-company-icon, .privacy-company-bott .st-quote-left, .privacy-company-bott .st-quote-right {
     background-image: url(../images/mega/privacy-sprite@2x.png);
@@ -412,7 +385,7 @@ body.pro:after {
     background-size: 356px auto;
 }
 .loading-info li::after {
-    background-image: url(../images/mega/loading-sprite_v2@2x.png);
+    background-image: url(../images/mega/loading-sprite_v4@2x.png);
     background-size: 222px auto;
 }
 .powered-logo, .powered-arrow {
@@ -427,9 +400,9 @@ body.pro:after {
     background-position: center -50px;
     background-size: 60px auto;
 }
-.fm-empty-search-bg, .fm-empty-messages-bg {
-    background-image: url(../images/mega/empty@2x.png);
-    background-size: 300px auto;
+.empty-icon, .fm-empty-cloud-bg, .fm-empty-folder-bg, .fm-empty-conversations-bg, .fm-empty-incoming-bg, .fm-empty-contacts-bg, .fm-invalid-folder-bg, .fm-empty-folder-link-bg, .fm-empty-trashbin-bg, .fm-empty-transfers-bg, .fm-empty-search-bg, .dialog-empty-icon {
+    background-image: url(../images/mega/empty-sprite_v3@2x.png);
+    background-size: 294px auto;
 }
 .membership-icon-old {
     background-image: url(../images/mega/membership-spite@2x.png);
@@ -443,29 +416,13 @@ body.pro:after {
     background-image: url(../images/mega/dev-point-gray-new.png);
     background-size: 39px auto;
 }
-.radioOn {
-    background-position: 0 2px;
-    background-size: 16px auto;
-}
-.radioOff {
-    background-position: 0 -28px;
-    background-size: 16px auto;
-}
 .fm-bandwidth-icon, .fm-bandwidth-dashed {
     background-image: url(../images/mega/quota-sprite@2x.png);
     background-size: 240px auto;
 }
-.chrome-app-button, .chrome-app-logo, .chrome-app-scr, .chrome-download-button, a.chrome-download-button {
-    background-image: url(../images/mega/chrome-app_v3@2x.png);
-    background-size: 700px auto;
-}
 .chrome-app-button.new-app, .sync-button, .google-play-button, .ios-button, .ff-bott-button, .blackberry-button, .chrome-app-button, .win-phone-button, .products-top-arrow {
     background-image: url(../images/mega/download-buttons-sprite@2x.png);
     background-size: 530px auto;
-}
-.chrome-download-button:hover, a.chrome-download-button:hover {
-    background-image: url(../images/mega/mobile-sprite_v7@2x.png);
-    background-size: 836px auto;
 }
 .backup-download-block, .recover-upload-block, .backup-notification-icon, .restore-uploading-status-icon, .login-register-input.fail, .reset-account-lock-image, .login-register-input.green-tick {
     background-image: url(../images/mega/encr-sprite@2x_v1.png);
@@ -475,12 +432,28 @@ body.pro:after {
     background-image: url(../images/mega/zoom-sprite@2x.png);
     background-size: 160px auto;
 }
-.dropdown-white-arrow, .huge-white-icon, .shared-link.small-icon {
+.huge-white-icon, .shared-link.small-icon {
     background-image: url(../images/mega/chat-static-sprite-v1@2x.png);
     background-size: 68px auto;
 }
-#help2-main .ui-autocomplete .client {
-    background-image: url("../images/mega/help2/welcome_icons@2x.png");
+.small-icon.context, .dropdown-item.contains-submenu::before, .dropdown-colour-item::after, .small-icon.clock {
+    background-image: url(../images/mega/icons-sprite_v3@2x.png);
+    background-size: 262px auto;
+}
+#help2-main .ui-autocomplete .client, #help2-main .ios-desktop-icon, #help2-main .windows-desktop-icon, #help2-main .linux-desktop-icon, #help2-main .webclient-icon {
+    background-image: url(../images/mega/help2/welcome_icons@2x.png);
     background-size: 250px auto;
+}
+.huge-white-icon.achievement, .account.bonuses-icon, .dropdown.transfer-icon, .huge-icon.storage-icon, .semi-small-icon.rocket, .semi-huge-icon.green-tick, .semi-big-icon.blue-cloud, .semi-big-icon.green-speedometer, .achieved .account.progress-indicator, .achievement-complete::after, .big-104px-icon.speedometer, .big-icon.almost-full-storage {
+    background-image: url(../images/mega/account-sprite_v3@2x.png);
+    background-size: 172px auto;
+}
+.huge-icon.achievement {
+    background-image: url(../images/mega/big-achievements@2x.png);
+    background-size: 436px auto;
+}
+.logo, .languages-dialog .show-more-languages .round-arrow span, .top-head .top-icon::before, .notification-txt, .nw-bottom-copyrights, .nw-bottom-social, .top-login-warning-arrow, .main-top-info-text, .new-notification-icon, .feedback-button, .semi-small-icon.grey-mega, .semi-small-icon.yellow-triangle, .tiny-icon.membership-status, .top-menu-item.submenu-item::before, .medium-icon.rocket {
+    background-image: url(../images/mega/top-sprite_v2@2x.png);
+    background-size: 38px auto;
 }
 }

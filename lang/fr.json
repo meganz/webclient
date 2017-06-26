@@ -4264,6 +4264,10 @@
     "16652": "\u00c9chec d'affichage des options de t\u00e9l\u00e9versement. Veuillez ressayer plus tard.",
     "16653": "Pour une exp\u00e9rience compl\u00e8te, t\u00e9l\u00e9chargez note appli ou utilisez ce site sur un ordinateur.",
     "16654": "Ne pas afficher les ic\u00f4nes dans le volet de gauche de l'explorateur de Windows",
+    "16655": "Ouvrir MEGA et se connecter pour continuer",
+    "16656": "Un journal sera cr\u00e9\u00e9 dans la section Hors ligne (MEGAiOS.log). Les journaux peuvent contenir des informations associ\u00e9es \u00e0 votre compte.",
+    "16657": "Cela pourrait \u00eatre caus\u00e9 par les raisons suivantes :- Le lien de dossier a \u00e9t\u00e9 retir\u00e9 \u00e0 cause d'une violation des conditions g\u00e9n\u00e9rales d'utilisation ou de la politique d'utilisation acceptable.- L'URL est invalide. Le lien auquel vous essayez d'acc\u00e9der n'existe pas.- Le lien de dossier a \u00e9t\u00e9 supprim\u00e9 par l'utilisateur.",
+    "16658": "Cela pourrait \u00eatre caus\u00e9 par les raisons suivantes :- Le fichier a \u00e9t\u00e9 retir\u00e9 \u00e0 cause d'une violation des conditions g\u00e9n\u00e9rales d'utilisation ou de la politique d'utilisation acceptable.- L'URL est invalide. Le lien auquel vous essayez d'acc\u00e9der n'existe pas.- Le fichier a \u00e9t\u00e9 supprim\u00e9 par l'utilisateur.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

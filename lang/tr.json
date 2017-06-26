@@ -4264,6 +4264,10 @@
     "16652": "Y\u00fckleme se\u00e7eneklerini g\u00f6sterirken hata olu\u015ftu. L\u00fctfen daha sonra tekrar deneyin.",
     "16653": "T\u00fcm \u00f6zellikleri kullanabilmek i\u00e7in, uygulamam\u0131z\u0131 indirin veya siteyi bilgisayarda g\u00f6r\u00fcnt\u00fcleyin.",
     "16654": "Windows Explorer'\u0131n sol sekmesinde ikon g\u00f6sterme",
+    "16655": "Devam etmek i\u00e7in MEGA'ya giri\u015f yap\u0131n",
+    "16656": "\u00c7evrimd\u0131\u015f\u0131 b\u00f6l\u00fcmde bir g\u00fcnl\u00fck kayd\u0131 olu\u015fturulacakt\u0131r (MEGAiOS.log). G\u00fcnl\u00fck kay\u0131tlar\u0131 hesab\u0131n\u0131zla ilgili bilgiler i\u00e7erebilir.",
+    "16657": "Bunun nedeni a\u015fa\u011f\u0131dakilerden biri olabilir:- Klas\u00f6r linki Hizmet Ko\u015fullar\u0131n\u0131 ihlal etti\u011fi i\u00e7in kald\u0131r\u0131ld\u0131.- Ge\u00e7ersiz URL \u2013 eri\u015fmeye \u00e7al\u0131\u015ft\u0131\u011f\u0131n\u0131z link yok- Klas\u00f6r linki kullan\u0131c\u0131 taraf\u0131ndan kald\u0131r\u0131ld\u0131.",
+    "16658": "Bunun nedeni a\u015fa\u011f\u0131dakilerden biri olabilir:- Dosya Hizmet Ko\u015fullar\u0131n\u0131 ihlal etti\u011fi i\u00e7in kald\u0131r\u0131ld\u0131.- Ge\u00e7ersiz URL \u2013 eri\u015fmeye \u00e7al\u0131\u015ft\u0131\u011f\u0131n\u0131z link yok- Dosya kullan\u0131c\u0131 taraf\u0131ndan kald\u0131r\u0131ld\u0131.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

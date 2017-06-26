@@ -4263,7 +4263,11 @@
     "16651": "Dettagli del contatto non visibili",
     "16652": "Non posso mostrare le opzioni di aggiornamento. Per favore, riprova in seguito.",
     "16653": "Per un'esperienza piena di opzioni, scarica la nostra app o utilizza il nostro sito su un PC.",
-    "16654": "Non mostrare icone nel riquadro sinistro di Internet Explorer",
+    "16654": "Non mostrare icone nel riquadro sinistro di Windows Explorer",
+    "16655": "Apri MEGA e accedi per continuare",
+    "16656": "Un log verr\u00e0 creato nella sezione Offline (MEGAiOS.log). I log possono contenere informazioni relative al tuo account.",
+    "16657": "Questo potrebbe essere causato da una delle seguenti motivazioni:- Il link della cartella \u00e8 stato rimosso a causa di una violazione dei nostri Termini di Servizio.- URL non valido \u2013 il link a cui stai tentando di accedere non esiste.- Il link della cartella \u00e8 stato eliminato dall'utente proprietario del link.",
+    "16658": "Questo potrebbe essere causato da una delle seguenti motivazioni:- Il link del file \u00e8 stato rimosso a causa di una violazione dei nostri Termini di Servizio.- URL non valido \u2013 il link a cui stai tentando di accedere non esiste.- Il link del file \u00e8 stato eliminato dall'utente proprietario del link.",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,

@@ -71,11 +71,14 @@ function init_start() {
 		});
 	}
 	
-	if (u_type > 0)
+	if (document.URL.indexOf('mobile') > -1)
 	{
-		//$('.startpage.try-mega').hide();
-		
-		
+		setTimeout(function()
+		{
+			$('.bottom-page.scroll-block').animate({
+				scrollTop: $(".bottom-page.mobile").offset().top+500
+			}, 800);
+		},1000);
 	}
 }
 

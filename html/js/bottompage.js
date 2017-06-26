@@ -40,7 +40,6 @@ var bottompage = {
             $this.addClass('opened');
             $('.nav-overlay').removeClass('hidden');
             $('.mobile .bottom-page.scroll-block').addClass('overlayed');
-            $('.mobile .bottom-page.scroll-block').removeClass('overlayed');
             $('.pages-nav.nav-button.active').addClass('greyed-out');
             $dropdown.addClass('active');
 

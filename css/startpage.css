@@ -342,8 +342,8 @@
 .mobile.not-logged .startpage .mobile-apps-button {
     display: none;
 }
-.startpage.button-48-height {
-    margin: 0 -20px;
+.logged.mobile .startpage.button-48-height.register  {
+    display: none;
 }
 }
 
@@ -445,5 +445,8 @@
     height: 64px;
     background-position: 5px -777px;
     background-size: 210px auto;
+}
+.mobile.logged .startpage .mobile-apps-button {
+    margin: 0 -20px;
 }
 }

@@ -66,7 +66,6 @@ function init_start() {
 		api_req({"a":"mafu"}, {
 			callback: function(res) {
 				achieve_data=res;
-				console.log(achieve_data);
 				start_achievements(res);
 			}
 		});

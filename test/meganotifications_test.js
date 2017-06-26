@@ -17,9 +17,11 @@ describe("MegaNotifications Unit Test", function() {
         sandbox = sinon.sandbox.create();
         sandbox.stub(window, 'ion', {
             'sound': function() {
-                ion.sound.play = function() {};
+                ion.sound.play = function() {
+                };
                 sinon.spy(ion.sound, 'play');
-                ion.sound.stop = function() {};
+                ion.sound.stop = function() {
+                };
                 sinon.spy(ion.sound, 'stop');
             }
         });
@@ -39,6 +41,10 @@ describe("MegaNotifications Unit Test", function() {
         sandbox.stub(window, 'Favico', function() {
             this.badge = function() {};
             sinon.spy(this, 'badge');
+
+            this.reset = function() {};
+            sinon.spy(this, 'reset');
+
             return this;
         });
 
@@ -121,39 +127,44 @@ describe("MegaNotifications Unit Test", function() {
         expect(n._desktopNotification instanceof Notification).to.eql(true);
 
         expect(megaNotifications.favico instanceof Favico).to.eql(true);
-        expect(megaNotifications.favico.badge.callCount).to.eql(1);
-        expect(megaNotifications.favico.badge.calledWith(1)).to.eql(true);
 
-        expect(typeof(ion.sound.play) !== "undefined").to.eql(true);
-        expect(typeof(ion.sound.stop) !== "undefined").to.eql(true);
+        delay(function() {
+            expect(megaNotifications.favico.badge.callCount).to.eql(1);
+            expect(megaNotifications.favico.badge.calledWith(1)).to.eql(true);
 
-        // when loop is on, .stop will be called before .play()
-        expect(ion.sound.stop.callCount).to.eql(2);
-        expect(ion.sound.stop.calledWith("type1-sound")).to.eql(true);
+            expect(typeof(ion.sound.play) !== "undefined").to.eql(true);
+            expect(typeof(ion.sound.stop) !== "undefined").to.eql(true);
 
-        // play was called
-        expect(ion.sound.play.callCount).to.eql(1);
-        expect(ion.sound.play.calledWith("type1-sound")).to.eql(true);
+            // when loop is on, .stop will be called before .play()
+            expect(ion.sound.stop.callCount).to.eql(2);
+            expect(ion.sound.stop.calledWith("type1-sound")).to.eql(true);
 
-        n.setUnread(false);
+            // play was called
+            expect(ion.sound.play.callCount).to.eql(1);
+            expect(ion.sound.play.calledWith("type1-sound")).to.eql(true);
 
-        expect(ion.sound.stop.callCount).to.eql(3);
-        expect(ion.sound.stop.calledWith("type1-sound")).to.eql(true);
-        expect(megaNotifications.favico.badge.callCount).to.eql(2);
-        expect(megaNotifications.favico.badge.calledWith(0)).to.eql(true);
+            n.setUnread(false);
+            delay(function() {
+
+                expect(ion.sound.stop.callCount).to.eql(3);
+                expect(ion.sound.stop.calledWith("type1-sound")).to.eql(true);
+                expect(megaNotifications.favico.badge.callCount).to.eql(2);
+                expect(megaNotifications.favico.badge.calledWith(0)).to.eql(true);
 
 
-        var wasTriggered = false;
-        megaNotifications.bind("onUnreadChanged", function(e, notif, v) {
-            expect(notif).to.eql(n);
-            expect(v).to.eql(true);
-            wasTriggered = true;
+                var wasTriggered = false;
+                megaNotifications.bind("onUnreadChanged", function(e, notif, v) {
+                    expect(notif).to.eql(n);
+                    expect(v).to.eql(true);
+                    wasTriggered = true;
+                });
+                n.setUnread(true);
+
+                expect(wasTriggered).to.eql(true);
+
+                done();
+            });
         });
-        n.setUnread(true);
-
-        expect(wasTriggered).to.eql(true);
-
-        done();
     });
 
     it("desktop notifications - permission request", function(done) {

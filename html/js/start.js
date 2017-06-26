@@ -2,7 +2,7 @@
 var achieve_data = false;
 
 function init_start() {
-	if (u_type > 1)
+	if (u_type > 0)
 	{
 		$('.startpage.register').text(l[164]);
 		$('.startpage.register').rebind('click', function () {
@@ -17,6 +17,23 @@ function init_start() {
 	else {
 		$('.button-48-height.register').rebind('click', function () {
         loadSubPage('register');
+		});
+		$('.startpage.try-mega').text(l[16535]);
+		$('.startpage.try-mega').rebind('click', function () {
+			if (u_type === false) {
+				// open file manager with ephemeral account
+				u_storage = init_storage(localStorage);
+				loadingDialog.show();
+				u_checklogin({
+					checkloginresult: function(u_ctx, r) {
+						u_type = r;
+						u_checked = true;
+						loadingDialog.hide();
+						loadSubPage('fm');
+					}
+				}, true);
+			}
+			else loadSubPage('fm');
 		});
 	}
 

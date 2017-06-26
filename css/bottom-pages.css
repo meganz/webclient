@@ -106,6 +106,9 @@
     overflow-y: scroll;
     -webkit-overflow-scrolling: touch;
 }
+.mobile .bottom-page.scroll-block.overlayed {
+    overflow: hidden;
+}
 .bottom-page.vertical-centered-bl {
     display: table;
     width: 100%;

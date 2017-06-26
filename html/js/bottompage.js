@@ -39,6 +39,8 @@ var bottompage = {
 
             $this.addClass('opened');
             $('.nav-overlay').removeClass('hidden');
+            $('.mobile .bottom-page.scroll-block').addClass('overlayed');
+            $('.mobile .bottom-page.scroll-block').removeClass('overlayed');
             $('.pages-nav.nav-button.active').addClass('greyed-out');
             $dropdown.addClass('active');
 
@@ -93,6 +95,7 @@ var bottompage = {
 
         function hiddenNavDropdown() {
             $('.nav-overlay').addClass('hidden');
+            $('.mobile .bottom-page.scroll-block').removeClass('overlayed');
             $('.nav-button.compound-lnk.opened').removeClass('opened');
             $('.pages-nav.nav-button.active.greyed-out').removeClass('greyed-out');
             $('.pages-nav.compound-items.active').removeClass('active').removeAttr('style');

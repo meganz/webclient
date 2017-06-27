@@ -80,7 +80,13 @@ function init_start() {
 			}, 800);
 		},1000);
 	}
+		
+	$('.bottom-page.scroll-block.startpage').rebind('scroll.limitcounter',function() {
+		if (page == 'start') start_countLimit = Date.now();
+	});
 }
+
+var start_countLimit = 0;
 
 
 function start_achievements(res)
@@ -132,6 +138,9 @@ var RandomFactorTimestamp = 0;
 var start_Lcd = {};
 
 function start_countUpdate() {
+	
+	
+	
 	if (!start_countUpdate_inflight) startCountRenderData = {'users':'','files':''};
 	start_countUpdate_inflight=true;
 	if (page !== 'start') {
@@ -183,7 +192,10 @@ function start_countUpdate() {
 	}
 	renderCounts(String(Math.round(start_Lcd.users)),'users');
 	renderCounts(String(Math.round(start_Lcd.files)),'files');
-	setTimeout(start_countUpdate,30);
+	var t=30;
+	
+	if (start_countLimit+100 > Date.now()) t=500;
+	setTimeout(start_countUpdate,t);
 	if (start_APIcountdata.timestamp+5000 < Date.now()) start_APIcount();
 }
 /*

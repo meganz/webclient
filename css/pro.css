@@ -914,7 +914,6 @@ div.pro-feature-icon {
     display: inline-block;
     font-family: "source_sans_proregular", Helvetica, Arial, sans-serif;
     overflow: hidden;
-    padding-bottom: 1px;
     text-overflow: ellipsis;
     vertical-align: middle;
     white-space: nowrap;

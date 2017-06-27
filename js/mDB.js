@@ -96,7 +96,7 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
     "use strict";
 
     var fmdb = this;
-    var dbpfx = 'fm9_';
+    var dbpfx = is_extension ? 'fm10_' : 'fm9_'; // XXX: next bump: (fm9 ->) fm11
     var slave = !mBroadcaster.crossTab.master;
 
     fmdb.crashed = false;
@@ -1499,7 +1499,7 @@ Object.defineProperty(self, 'dbfetch', (function() {
 
             var masterPromise = promise;
             if ($.len(inflight)) {
-                masterPromise = MegaPromise.allDone(array_unique(obj_values(inflight)).concat(promise));
+                masterPromise = MegaPromise.allDone(array.unique(obj_values(inflight)).concat(promise));
             }
             // console.warn('fetchsubtree', arguments, p, inflight);
 
@@ -1576,9 +1576,13 @@ Object.defineProperty(self, 'dbfetch', (function() {
 
             var masterPromise = promise;
             /*if ($.len(inflight)) {
-                masterPromise = MegaPromise.allDone(array_unique(obj_values(inflight)).concat(promise));
+             masterPromise = MegaPromise.allDone(array.unique(obj_values(inflight)).concat(promise));
             }
-            else*/ if (!handles.length) {
+             else*/
+            if (!handles.length || !fmdb) {
+                if (d && handles.length) {
+                    console.warn('Unknown nodes: ' + handles);
+                }
                 return MegaPromise.resolve(result);
             }
 

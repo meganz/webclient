@@ -71,14 +71,14 @@ function init_start() {
 		});
 	}
 
-	if (document.URL.indexOf('mobile') > -1)
-	{
-		setTimeout(function()
-		{
-			$('.bottom-page.scroll-block').animate({
-				scrollTop: $(".bottom-page.bott-pad.mobile").offset().top
-			}, 800);
-		},1000);
+	if (getCleanSitePath() === 'mobile') {
+		setTimeout(function() {
+			var offset = $(".bottom-page.bott-pad.mobile").offset();
+
+			if (offset) {
+				$('.bottom-page.scroll-block').animate({scrollTop: offset.top}, 800);
+			}
+		}, 1000);
 	}
 		
 	$('.bottom-page.scroll-block.startpage').rebind('scroll.limitcounter',function() {
@@ -90,13 +90,13 @@ var start_countLimit = 0;
 
 
 function start_achievements(res)
-{	
+{
 	if (res < 0) {
 		$('.bottom-page.white-block.top-pad.achievements').addClass('hidden');
-	}	
+	}
 	else if (res && res.u && res.u[4] && res.u[5] && res.u[3]) {
 		// enable achievements:
-		$('.bottom-page.white-block.top-pad.achievements').removeClass('hidden');	
+		$('.bottom-page.white-block.top-pad.achievements').removeClass('hidden');
 		var gbt = 'GB';
 		if (lang == 'fr') gbt = 'Go';
 		$('.achievements .megasync').html(escapeHTML(l[16632]).replace('[X]','<span class="txt-pad"><span class="big">' + Math.round(res.u[4][0]/1024/1024/1024) + '</span> '+ gbt +'</span>') + '*');

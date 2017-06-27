@@ -155,7 +155,7 @@ var ContactCard = React.createClass({
         var self = this;
 
         var foundKeys = Object.keys(self.props);
-        removeValue(foundKeys, 'dropdowns', true);
+        array.remove(foundKeys, 'dropdowns', true);
 
         var shouldUpdate = undefined;
         foundKeys.forEach(function(k) {
@@ -411,7 +411,7 @@ var ContactPickerWidget = React.createClass({
                                 }
                             }
                             else {
-                                removeValue(selected, contactHash);
+                                array.remove(selected, contactHash);
                                 if (self.props.onSelected) {
                                     self.props.onSelected(selected);
                                 }

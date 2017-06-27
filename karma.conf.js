@@ -55,8 +55,6 @@ module.exports = function(config) {
         // Other.
         'js/vendor/autolinker.js',
         'js/vendor/qrcode.js',
-        'js/vendor/bitcoin-math.js',
-        'js/vendor/db.js',
         'js/vendor/megaLogger.js',
 
         // == Test helpers and test configuration ==
@@ -72,6 +70,7 @@ module.exports = function(config) {
         'nodedec.js',
         'js/utils/browser.js',
         'js/utils/debug.js',
+        'js/utils/conv.js',
         'js/utils/dom.js',
         'js/utils/locale.js',
         'js/utils/pictools.js',

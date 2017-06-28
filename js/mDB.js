@@ -96,7 +96,7 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
     "use strict";
 
     var fmdb = this;
-    var dbpfx = is_extension ? 'fm10_' : 'fm9_'; // XXX: next bump: (fm9 ->) fm11
+    var dbpfx = 'fm11_';
     var slave = !mBroadcaster.crossTab.master;
 
     fmdb.crashed = false;

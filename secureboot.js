@@ -1853,7 +1853,6 @@ else if (!b_u) {
     if (!is_mobile) {
         jsl.push({f:'css/style.css', n: 'style_css', j:2,w:30,c:1,d:1,cache:1});
         jsl.push({f:'js/vendor/megalist.js', n: 'megalist_js', j:1,w:5});
-        jsl.push({f:'js/fm/keyevents.js', n: 'fm_keyevents_js', j:1,w:1});
         jsl.push({f:'js/fm/quickfinder.js', n: 'fm_quickfinder_js', j:1,w:1});
         jsl.push({f:'js/fm/selectionmanager.js', n: 'fm_selectionmanager_js', j:1,w:1});
         jsl.push({f:'js/fm.js', n: 'fm_js', j:1,w:12});

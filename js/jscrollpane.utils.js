@@ -60,8 +60,11 @@ function initAccountScroll(scroll) {
 }
 
 function initGridScrolling() {
-    $('.grid-scrolling-table').jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
-    jScrollFade('.grid-scrolling-table');
+    $('.grid-scrolling-table')
+        .filter(":not(.megaList,.megaListContainer)")
+        .jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
+
+    jScrollFade('.grid-scrolling-table:not(.megaList,.megaListContainer)');
 }
 
 function initSelectScrolling(scrollBlock) {
@@ -70,8 +73,11 @@ function initSelectScrolling(scrollBlock) {
 }
 
 function initFileblocksScrolling() {
-    $('.file-block-scrolling').jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
-    jScrollFade('.file-block-scrolling');
+    $('.file-block-scrolling')
+        .filter(":not(.megaList)")
+        .jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
+
+    jScrollFade('.file-block-scrolling:not(.megaList)');
 }
 
 function initFileblocksScrolling2() {

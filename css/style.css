@@ -6244,11 +6244,11 @@ th.grid-first-th {
     margin: 12px 0 0 12px;
     position: relative;
     cursor: default;
-    -webkit-transition: all 200ms ease-in-out;
-    -moz-transition: all 200ms ease-in-out;
-    -o-transition: all 200ms ease-in-out;
-    -ms-transition: all 200ms ease-in-out;
-    transition: all 200ms ease-in-out;
+    -webkit-transition: box-shadow 200ms ease-in-out, background-color 200ms ease-in-out;
+    -moz-transition: box-shadow 200ms ease-in-out, background-color 200ms ease-in-out;
+    -o-transition: box-shadow 200ms ease-in-out, background-color 200ms ease-in-out;
+    -ms-transition: box-shadow 200ms ease-in-out, background-color 200ms ease-in-out;
+    transition: box-shadow 200ms ease-in-out, background-color 200ms ease-in-out;
     background-color: white;
     text-align: center;
     position: relative;
@@ -14784,7 +14784,7 @@ a.contact-new-button:hover {
 .new-left-menu-block.floating {
     position:fixed;
     top: 46px !important;
-    
+
 }
 .new-right-content-block {
     margin-left: 241px;

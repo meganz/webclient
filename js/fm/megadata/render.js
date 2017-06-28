@@ -66,20 +66,20 @@ MegaData.prototype.renderMain = function(aUpdate) {
  * Helper for M.renderMain
  * @param {Boolean} u Whether we're just updating the list
  */
-MegaData.prototype.rmSetupUI = function(u) {
+MegaData.prototype.rmSetupUI = function(u, refresh) {
     if (this.viewmode === 1) {
         if (this.v.length > 0) {
             var o = $('.fm-blocks-view.fm .file-block-scrolling');
             o.find('div.clear').remove();
             o.append('<div class="clear"></div>');
         }
-        M.addIconUI(u);
+        M.addIconUI(u, refresh);
         if (!u) {
             fm_thumbnails();
         }
     }
     else {
-        M.addGridUIDelayed();
+        M.addGridUIDelayed(refresh);
     }
     Soon(fmtopUI);
 

@@ -993,6 +993,7 @@
                             megaListContainer = this.container.parentNode.parentNode;
                         }
 
+                        console.error(megaListContainer);
                         define(this, 'megaList', new MegaList(megaListContainer, megaListOptions));
                     }
                     else if(aNodeList.length && Object(newnodes).length) {

@@ -305,7 +305,7 @@ var SelectionManager = function($selectable, resume) {
      * Use this to get ALL (multiple!) selected items in the currently visible view/grid.
      */
     this.get_selected = function() {
-        return this.selected_list;
+        return $selected;
     };
 
     /**

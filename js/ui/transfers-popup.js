@@ -2,8 +2,8 @@
  * Ongoing transfers popup dialog
  * Account->Settings->Advanced->Transfers->Tooltip notification
  */
-mega.ui.tpp = (function () {
-    var self = this;
+mega.ui.tpp = function () {
+    "use strict";
 
     var opts = {
         dlg: {
@@ -109,13 +109,21 @@ mega.ui.tpp = (function () {
     };
 
     /**
-     * Shows transfers popup dialog
+     * Set tpp enabled
+     * @param {Boolean} value To enable or not
+     */
+    var setEnabled = function setEnabled(value) {
+        opts.enabled = value;
+    };
+
+    /**
+     * * Shows transfers popup dialog
      */
     var show = function show() {
         var visible = isVisible();
         var enabled = isEnabled();
 
-        if (enabled && !visible && (M.currentdirid !== 'transfers') && M.hasPendingTransfers()) {
+        if (enabled && !visible && M.currentdirid !== 'transfers' && M.hasPendingTransfers()) {
             opts.dlg.$.show(opts.duration);
             setStatus(true);
         }
@@ -228,6 +236,16 @@ mega.ui.tpp = (function () {
     };
 
     /**
+     * Set state to paused for given dl/ul
+     * @param {String} id ul/dl item id
+     * @param {String} blk i.e. ['dl', 'ul']
+     */
+    var pause = function pause(id, blk) {
+        opts.dlg[blk].$.stxt.text('');
+        opts.dlg[blk].$.spd.text(l[1651]);
+    };
+
+    /**
      * Get number of dl/ul bytes for given id
      * @param {String} blk i.e ['dl', 'ul'] download or upload
      * @return {Number} Amount of transfered data
@@ -247,7 +265,7 @@ mega.ui.tpp = (function () {
     };
 
     /**
-     * Calculates avg spped for block
+     * Calculates avg speed for block
      * @param {String} blk i.e. ['dl', 'ul'] download or upload
      * @returns {Number} dl/ul average speed in bytes per second
      */
@@ -322,9 +340,37 @@ mega.ui.tpp = (function () {
         opts.dlg[bl].$.prg.css('width', perc + '%');
         opts.dlg[bl].$.spd.text(l[1042]);
         opts.dlg[bl].$.stxt.text('');
+        opts.dlg[bl].$.ibLeft.text(l[5528]);
         opts.dlg[bl].$.tfi
             .removeClass()
             .addClass('transfer-filetype-icon ' + type + ' file');
+    };
+
+    /**
+     * Shows TPP as soon as file or folder is picked, instant initialization
+     * @param {String} bl Download or upload block i.e. ['dl', 'ul']
+     */
+    var started = function started(bl) {
+        if (!getIndex(bl)) {
+            resetBlock(bl);
+            showBlock(bl);
+            opts.dlg.$.show(opts.duration);
+        }
+    };
+
+    /**
+     * Cleanup all un-necessary elements on instant initialization
+     * @param {String} bl
+     */
+    var resetBlock = function resetBlock(bl) {
+        opts.dlg[bl].$.name.text('');
+        opts.dlg[bl].$.crr.text('');
+        opts.dlg[bl].$.num.text('');
+        opts.dlg[bl].$.prg.css('width', 0 + '%');
+        opts.dlg[bl].$.spd.text(l[1042]);
+        opts.dlg[bl].$.stxt.text('');
+        opts.dlg[bl].$.tfi.removeClass();
+        opts.dlg[bl].$.ibLeft.text('');
     };
 
     /**
@@ -355,10 +401,12 @@ mega.ui.tpp = (function () {
         var isEph = isEphemeral();
 
         // Check if tpp used before, if not force usage
-        if ((typeof fmconfig.tpp === 'undefined') || isEph) {
+        if (typeof fmconfig.tpp === 'undefined' || isEph) {
             mega.config.set('tpp', true);
         }
-
+        else {
+            setEnabled(fmconfig.tpp);
+        }
         // Cache dialog
         opts.dlg.$ = $('.transfer-widget.popup');
         opts.dlg.dl.$ = opts.dlg.$.find('.download');
@@ -373,6 +421,7 @@ mega.ui.tpp = (function () {
             opts.dlg[blk].$.prg = opts.dlg[blk].$.find('.progress span');
             opts.dlg[blk].$.spd = opts.dlg[blk].$.find('.speed').text(l[1042]);
             opts.dlg[blk].$.stxt = opts.dlg[blk].$.find('.speed-txt');
+            opts.dlg[blk].$.ibLeft = opts.dlg[blk].$.find('.info-block.left .of');
             opts.dlg[blk].$.tfi = opts.dlg[blk].$.find('.transfer-filetype-icon');
         }
 
@@ -384,20 +433,16 @@ mega.ui.tpp = (function () {
 
             // Close button, Ongoing Transfers Popup Dialog
             $('.transfer-widget.popup .fm-dialog-close.small').rebind('click.tpp_close', function() {
-                msgDialog('confirmation', '', l[16328], l[16329], function(e) {
-                    if (e) {
-                        mega.config.setn('tpp', false);
-                    }
-                });
+                opts.dlg.$.hide(opts.duration);
             });
         }
     });
 
     mBroadcaster.addListener('fmconfig:tpp', function(value) {
 
-        opts.enabled = value;
+        setEnabled(value);
         if (isEphemeral()) {
-            opts.enabled = true;
+            setEnabled(true);
         }
         var visible = isVisible();
 
@@ -414,6 +459,7 @@ mega.ui.tpp = (function () {
     return {
         show: show,
         hide: hide,
+        pause: pause,
         start: start,
         showBlock: showBlock,
         hideBlock: hideBlock,
@@ -425,7 +471,8 @@ mega.ui.tpp = (function () {
         setTransfered: setTransfered,
         setTime: setTime,
         getTime: getTime,
+        started: started,
         reset: reset
     };
 
-})();// END tpp, transfers popup dialog
+}();// END tpp, transfers popup dialog

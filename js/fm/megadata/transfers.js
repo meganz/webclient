@@ -141,6 +141,8 @@ MegaData.prototype.putToTransferTable = function(node, ttl) {
 MegaData.prototype.addDownload = function(n, z, preview) {
     var args = toArray.apply(null, arguments);
 
+    mega.ui.tpp.started('dl');
+    
     // fetch all nodes needed by M.getNodesSync
     dbfetch.coll(n)
         .always(function() {

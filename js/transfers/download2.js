@@ -1260,9 +1260,11 @@ function fm_tfspause(gid, overquota) {
     if (ASSERT(typeof gid === 'string' && "zdu".indexOf(gid[0]) !== -1, 'Ivalid GID to pause')) {
         if (gid[0] === 'u') {
             ulQueue.pause(gid);
+            mega.ui.tpp.pause(gid, 'ul');
         }
         else {
             dlQueue.pause(gid);
+            mega.ui.tpp.pause(gid, 'dl');
         }
 
         if (page === 'download') {

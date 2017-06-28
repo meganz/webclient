@@ -5328,7 +5328,7 @@ function fm_resize_handler(force) {
         });
 
         if (mega.ui.tpp.isVisible()) {
-            $('.popup.transfer-widget:visible').width($('.fm-left-panel:visible').width() - 8);
+            $('.popup.transfer-widget:visible').width($('.fm-left-panel:visible').width() - 9);
         }
     }
 

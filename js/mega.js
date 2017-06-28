@@ -194,8 +194,7 @@ function sc_fqueuet(scni, packet) {
             }
             else {
                 for (var i = scnodes.length; i--;) {
-                    result += sc_fqueue(scnodes[i].h, packet);
-                    // result += sc_fqueue(scnodes[i].p, packet);
+                    result += sc_fqueue(scnodes[i].p, packet);
                 }
             }
         }
@@ -238,7 +237,7 @@ function sc_fetcher() {
             $.scFetcherRunning = false;
         }
         else {
-            dbfetch.coll(bunch, new MegaPromise())
+            dbfetch.geta(bunch, new MegaPromise())
                 .always(function() {
                     for (var i = bunch.length; i--;) {
                         var h = bunch[i];
@@ -280,14 +279,7 @@ function sc_packet(a) {
     if (!loadfm.fromapi) {
         var inflight = $.len(scfetches);
 
-        if (a.a === 's' || a.a === 's2') {
-            // inbound share for which we will receive the 't'ree next
-            // scloadtnodes = a.o && a.o !== u_handle && a.r !== undefined;
-            scloadtnodes = true;
-        }
-        else if (a.a !== 't') {
-            scloadtnodes = false;
-        }
+        scloadtnodes = true;
 
         switch (a.a) {
             case 's':

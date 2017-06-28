@@ -310,7 +310,7 @@ mBroadcaster.once('startMega', function populate_l() {
     l[501] = l[501].replace('17', '').replace('%', '');
     l[1066] = l[1066].replace('[A]', '<a class="red">').replace('[/A]', '</a>');
     l[1067] = l[1067].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
-    l[1094] = l[1094].replace('[A]', '<a href="/plugin" class="clickurl">').replace('[/A]', '</a>');
+    l[1094] = l[1094].replace('[A]', '<a href="/extensions" class="clickurl">').replace('[/A]', '</a>');
     l[1095] = l[1095].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[1133] = l[1133].replace('[A]',
         '<a href="http://en.wikipedia.org/wiki/Entropy" target="_blank" rel="noopener noreferrer">').replace('[/A]', '</a>');

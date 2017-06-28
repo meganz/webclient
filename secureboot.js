@@ -1352,11 +1352,6 @@ if (m && ((!localStorage.signUpStartedInMobileWeb && page.substr(0, 7) === 'conf
         }
     }
 }
-// jscs:enable
-else if (page === 'android') {
-    document.location = 'https://play.google.com/store/apps/details?id=mega.privacy.android.app'
-                      + '&referrer=meganzmobileapps';
-}
 else if (!b_u) {
     d = window.d || 0;
     jj = window.jj || 0;

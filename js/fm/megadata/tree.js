@@ -160,11 +160,10 @@ MegaData.prototype.buildtree = function _buildtree(n, dialog, stype) {
             }));
         }
 
-        var sortFn = this.getSortByNameFn();
         var sortDirection = (is_mobile) ? 1 : $.sortTreePanel[prefix].dir;
         folders.sort(
             function(a, b) {
-                return sortFn(a, b, sortDirection);
+                return M.compareStrings(a.name, b.name, sortDirection);
             }
         );
 

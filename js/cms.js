@@ -506,6 +506,7 @@ CMS.on('corporate', function()
 {
     $('.new-left-menu-link').rebind('click', function() {
         loadSubPage('corporate/' + $(this).attr('id'));
+        $('.old .fmholder').animate({ scrollTop: 0 }, 0);
     });
     var ctype = getSitePath().substr(11);
     if ($('#' + ctype).length === 1) {
@@ -513,7 +514,6 @@ CMS.on('corporate', function()
         $('.new-right-content-block.' + ctype).removeClass('hidden');
         $('.new-left-menu-link').removeClass('active');
         $('#' + ctype).addClass('active');
-        mainScroll();
     } else {
         $('.new-left-menu-link:first').trigger('click');
     }

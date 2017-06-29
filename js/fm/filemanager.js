@@ -393,7 +393,6 @@ FileManager.prototype.initFileManagerUI = function() {
 
     $('.fm-files-view-icon').rebind('click', function() {
         $.hideContextMenu();
-        M.cacheselect();
 
         if ($(this).hasClass('listing-view')) {
             if (fmconfig.uiviewmode) {
@@ -1209,14 +1208,30 @@ FileManager.prototype.initUIKeyEvents = function() {
             return false;
         }
 
-        var sl = false, s;
+        var sl = false;
+        var s = [];
+        var tempSel;
         if (M.viewmode) {
-            s = $('.file-block.ui-selected');
+            tempSel = $('.file-block.ui-selected');
         }
         else {
-            s = $('.grid-table tr.ui-selected');
+            tempSel = $('.grid-table tr.ui-selected');
         }
         var selPanel = $('.fm-transfers-block tr.ui-selected');
+
+        if (selectionManager && selectionManager.selected_list && selectionManager.selected_list.length > 0) {
+            selectionManager.selected_list.forEach(function (nodeId) {
+                s.push(nodeId);
+            });
+        }
+        else {
+            $.selected = [];
+            tempSel.each(function (i, e) {
+                var id = $(e).attr('id');
+                s.push(id);
+                $.selected.push(id);
+            });
+        }
 
         if (M.chat) {
             return true;
@@ -1277,26 +1292,11 @@ FileManager.prototype.initUIKeyEvents = function() {
         }
         else if (e.keyCode == 46 && s.length > 0 && !$.dialog && M.getNodeRights(M.currentdirid) > 1) {
             // delete
-            $.selected = [];
-            if (selectionManager && selectionManager.selected_list && selectionManager.selected_list.length > 0) {
-                selectionManager.selected_list.each(function (nodeId) {
-                    $.selected.push(nodeId);
-                });
-            }
-            else {
-                s.each(function (i, e) {
-                    $.selected.push($(e).attr('id'));
-                });
-            }
             fmremove();
         }
         else if ((e.keyCode === 46) && (selPanel.length > 0)
             && !$.dialog && M.getNodeRights(M.currentdirid) > 1) {
-            var selected = [];
-            selPanel.each(function() {
-                selected.push($(this).attr('id'));
-            });
-            msgDialog('confirmation', l[1003], "Cancel " + selected.length + " transferences?", false, function(e) {
+            msgDialog('confirmation', l[1003], "Cancel " + s.length + " transferences?", false, function(e) {
 
                 // we should encapsule the click handler
                 // to call a function rather than use this hacking
@@ -1305,17 +1305,15 @@ FileManager.prototype.initUIKeyEvents = function() {
                 }
             });
         }
-        else if (e.keyCode == 13
+        else if (
+            e.keyCode == 13
             && s.length > 0
             && !$.dialog
             && !$.msgDialog
             && !$('.fm-new-folder').hasClass('active')
-            && !$('.top-search-bl').hasClass('active')) {
+            && !$('.top-search-bl').hasClass('active')
+        ) {
 
-            $.selected = [];
-            s.each(function(i, e) {
-                $.selected.push($(e).attr('id'));
-            });
             if ($.selected && $.selected.length > 0) {
                 var n = M.d[$.selected[0]];
                 if (n && n.t) {
@@ -1330,7 +1328,6 @@ FileManager.prototype.initUIKeyEvents = function() {
             }
         }
         else if ((e.keyCode === 13) && ($.dialog === 'share')) {
-
             var share = new mega.Share();
             share.updateNodeShares();
         }
@@ -1372,10 +1369,6 @@ FileManager.prototype.initUIKeyEvents = function() {
             }
         }
         else if ((e.keyCode === 113 /* F2 */) && (s.length > 0) && !$.dialog && M.getNodeRights(M.currentdirid) > 1) {
-            $.selected = [];
-            s.each(function(i, e) {
-                $.selected.push($(e).attr('id'));
-            });
             renameDialog();
         }
         else if (e.keyCode == 65 && e.ctrlKey && !$.dialog) {
@@ -1383,8 +1376,6 @@ FileManager.prototype.initUIKeyEvents = function() {
                 return;
             }
             // ctrl+a/cmd+a - select all
-            // $('.grid-table.fm tr').addClass('ui-selected');
-            // $('.file-block').addClass('ui-selected');
             selectionManager.select_all();
         }
         else if (e.keyCode == 37 && slideshowid) {
@@ -1404,7 +1395,6 @@ FileManager.prototype.initUIKeyEvents = function() {
 
         if (sl && $.selectddUIgrid.indexOf('.grid-scrolling-table') > -1) {
             // if something is selected, scroll to that item
-            // TODO: this may not be needed with the megaList/new SelectionManager
             var jsp = $($.selectddUIgrid).data('jsp');
             if (jsp) {
                 jsp.scrollToElement(sl);
@@ -2134,6 +2124,7 @@ FileManager.prototype.addGridUIDelayed = function(refresh) {
 
 FileManager.prototype.addSelectDragDropUI = function(refresh) {
     "use strict";
+    console.error('addSelectDragDropUI', refresh);
 
     if (this.currentdirid && this.currentdirid.substr(0, 7) === 'account') {
         return false;
@@ -2177,15 +2168,14 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
             $.gridDragging = true;
             $('body').addClass('dragging');
             if (!$(this).hasClass('ui-selected')) {
-                $($.selectddUIgrid + ' ' + $.selectddUIitem).removeClass('ui-selected');
-                $(this).addClass('ui-selected');
+                selectionManager.clear_selection();
+                selectionManager.set_currently_selected($(this).attr('id'));
             }
-            var s = $($.selectddUIgrid + ' .ui-selected'), max = ($(window).height() - 96) / 24, html = [];
-            $.selected = [];
-            s.each(function(i, e) {
-                var id = $(e).attr('id'), n = M.d[id];
+            var max = ($(window).height() - 96) / 24;
+            var html = [];
+            $.selected.forEach(function(id, i) {
+                var n = M.d[id];
                 if (n) {
-                    $.selected.push(id);
                     if (max > i) {
                         html.push(
                             '<div class="transfer-filetype-icon '
@@ -2196,8 +2186,8 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
                     }
                 }
             });
-            if (s.length > max) {
-                $('.dragger-files-number').text(s.length);
+            if ($.selected.length > max) {
+                $('.dragger-files-number').text($.selected.length);
                 $('.dragger-files-number').show();
             }
             $('#draghelper .dragger-content').html(html.join(""));
@@ -2267,6 +2257,9 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
     if (!window.fmShortcuts) {
         window.fmShortcuts = new FMShortcuts();
     }
+
+    console.error('isRefresh:', refresh);
+
     if (!refresh || !window.selectionManager) {
         /**
          * (Re)Init the selectionManager, because the .selectable() is reinitialized and we need to reattach to its
@@ -2274,8 +2267,8 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
          *
          * @type {SelectionManager}
          */
-
-        window.selectionManager = new SelectionManager($ddUIgrid, $.selected && $.selected.length > 0);
+        console.error('new SelMan isRefresh:', refresh);
+        window.selectionManager = new SelectionManager($ddUIgrid, refresh);
         if ($.selected) {
             $.selected.forEach(function(h) {
                 selectionManager.add_to_selection(h);
@@ -2288,8 +2281,9 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
         if ($(this).attr('class').indexOf('ui-selected') == -1) {
             $($.selectddUIgrid + ' ' + $.selectddUIitem).removeClass('ui-selected');
             $(this).addClass('ui-selected');
+            selectionManager.clear_selection();
+            selectionManager.set_currently_selected($(this).attr('id'));
         }
-        M.cacheselect();
         M.searchPath();
         $.hideTopMenu();
         return !!M.contextMenuUI(e, 1);

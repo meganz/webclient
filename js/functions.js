@@ -2707,18 +2707,15 @@ function array_diff(old_arr, new_arr) {
 
 
 (function() {
-    var refreshTimeout;
     /**
      * A function, which would be called on every DOM update (or scroll). This func would implement
      * throttling, so that we won't update the UI components too often.
      *
      */
     var fm_throttled_refresh = function fm_throttled_refresh() {
-
-      delay('fm_throttled_refresh', function() {
-          M.rmSetupUI(false, true);
-          console.error('fm_throttled_refresh disabled because of recursion!');
-      }, 75);
+        delay('fm_throttled_refresh', function() {
+            M.rmSetupUI(false, true);
+        }, 75);
     };
     window.fm_throttled_refresh = fm_throttled_refresh;
 })();

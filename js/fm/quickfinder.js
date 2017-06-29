@@ -5,8 +5,8 @@
  *
  * @param searchable_elements selector/elements a list/selector of elements which should be searched for the user
  * specified key press character
- * @param containers selector/elements a list/selector of containers to which the input field will be centered (the code
- * will dynamically detect and pick the :visible container)
+ * @param containers selector/elements a list/selector of containers to which the input field will be centered
+ * (the code will dynamically detect and pick the :visible container)
  *
  * @returns {*}
  * @constructor
@@ -63,13 +63,35 @@ var QuickFinder = function(searchable_elements, containers) {
 
             $(self).trigger("activated");
 
-            var $found = $(searchable_elements).filter(":visible:istartswith('" + charTyped + "')");
+
+            var foundIds = [];
+
+            charTyped = charTyped.toLowerCase();
+
+            foundIds = M.v.filter(function(v) {
+                var nameStr = "";
+                if (v.name) {
+                    nameStr = v.name;
+                }
+                else if (v.firstName) {
+                    nameStr = v.firstName;
+                }
+                else if (v.m) {
+                    // ipc and opc
+                    nameStr = v.m;
+                }
+
+                if (nameStr[0].toLowerCase() === charTyped) {
+                    return true;
+                }
+            });
 
             if (
                 /* repeat key press, but show start from the first element */
-            (last_key != null && ($found.size() - 1) <= next_idx)
+            (last_key != null && (foundIds.length - 1) <= next_idx)
             ||
-            /* repeat key press is not active, should reset the target idx to always select the first element */
+            /* repeat key press is not active, should reset the target idx to always select the first
+             element */
             (last_key == null)
             ) {
                 next_idx = 0;
@@ -80,28 +102,30 @@ var QuickFinder = function(searchable_elements, containers) {
                 next_idx = 0;
             }
             last_key = charTyped;
+            if (foundIds[next_idx]) {
+                var nextId = SelectionManager.dynamicNodeIdRetriever(foundIds[next_idx]);
+                selectionManager.clear_selection();
+                selectionManager.set_currently_selected(nextId, true);
 
-            $(searchable_elements).parents(".ui-selectee, .ui-draggable").removeClass('ui-selected');
+                if (!M.megaRender.megaList) {
+                    $(searchable_elements).parents(".ui-selectee, .ui-draggable").removeClass('ui-selected');
 
-            var $target_elm = $($found[next_idx]);
+                    var $target_elm = $('#' + nextId);
 
-            $target_elm.parents(".ui-selectee, .ui-draggable").addClass("ui-selected");
+                    $target_elm.parents(".ui-selectee, .ui-draggable").addClass("ui-selected");
 
-            var $jsp = $target_elm.getParentJScrollPane();
-            if ($jsp) {
-                var $scrolled_elm = $target_elm.parent("a");
+                    var $jsp = $target_elm.getParentJScrollPane();
+                    if ($jsp) {
+                        var $scrolled_elm = $target_elm.parent("a");
 
-                if ($scrolled_elm.size() == 0) { // not in icon view, its a list view, search for a tr
-                    $scrolled_elm = $target_elm.parents('tr:first');
+                        if ($scrolled_elm.size() == 0) { // not in icon view, its a list view, search for a tr
+                            $scrolled_elm = $target_elm.parents('tr:first');
+                        }
+                        $jsp.scrollToElement($scrolled_elm);
+                    }
+
+                    $(self).trigger('search');
                 }
-                $jsp.scrollToElement($scrolled_elm);
-            }
-
-            $(self).trigger('search');
-
-            if ($target_elm && $target_elm.size() > 0) {
-                // ^^ DONT stop prop. if there are no found elements.
-                return false;
             }
         }
         else if (charCode >= 33 && charCode <= 36)
@@ -110,27 +134,42 @@ var QuickFinder = function(searchable_elements, containers) {
             if (M.viewmode == 1)
                 e = '.fm-blocks-view.fm';
 
-            if ($(e + ':visible').length)
-            {
-                e = $('.grid-scrolling-table:visible, .file-block-scrolling:visible');
-                var jsp = e.data('jsp');
+            if (M.megaRender && M.megaRender.megaList) {
+                switch (charCode) {
+                    case 33: /* Page Up   */
+                        M.megaRender.megaList.scrollPageUp();
+                        break;
+                    case 34: /* Page Down */
+                        M.megaRender.megaList.scrollPageDown();
+                        break;
+                    case 35: /* End       */
+                        M.megaRender.megaList.scrollToBottom();
+                        break;
+                    case 36: /* Home      */
+                        M.megaRender.megaList.scrollToTop();
+                        break;
+                }
+            }
+            else {
+                if ($(e + ':visible').length) {
+                    e = $('.grid-scrolling-table:visible, .file-block-scrolling:visible');
+                    var jsp = e.data('jsp');
 
-                if (jsp)
-                {
-                    switch (charCode)
-                    {
-                        case 33: /* Page Up   */
-                            jsp.scrollByY(-e.height(), !0);
-                            break;
-                        case 34: /* Page Down */
-                            jsp.scrollByY(e.height(), !0);
-                            break;
-                        case 35: /* End       */
-                            jsp.scrollToBottom(!0);
-                            break;
-                        case 36: /* Home      */
-                            jsp.scrollToY(0, !0);
-                            break;
+                    if (jsp) {
+                        switch (charCode) {
+                            case 33: /* Page Up   */
+                                jsp.scrollByY(-e.height(), !0);
+                                break;
+                            case 34: /* Page Down */
+                                jsp.scrollByY(e.height(), !0);
+                                break;
+                            case 35: /* End       */
+                                jsp.scrollToBottom(!0);
+                                break;
+                            case 36: /* Home      */
+                                jsp.scrollToY(0, !0);
+                                break;
+                        }
                     }
                 }
             }
@@ -169,6 +208,6 @@ var QuickFinder = function(searchable_elements, containers) {
 
 var quickFinder = new QuickFinder(
     '.tranfer-filetype-txt, .file-block-title, td span.contacts-username',
-    '.files-grid-view, .fm-blocks-view.fm, .contacts-grid-table'
+    '.files-grid-view, .fm-blocks-view.fm, .contacts-grid-table, .contacts-blocks-scrolling,' +
+    '.contact-requests-grid, .sent-requests-grid'
 );
-

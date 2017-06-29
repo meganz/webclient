@@ -18,6 +18,9 @@ MegaData.prototype.renderMain = function(aUpdate) {
     }
 
     if (!aUpdate) {
+        if (this.megaRender) {
+            this.megaRender.destroy();
+        }
         this.megaRender = new MegaRender(this.viewmode);
     }
 
@@ -68,11 +71,6 @@ MegaData.prototype.renderMain = function(aUpdate) {
  */
 MegaData.prototype.rmSetupUI = function(u, refresh) {
     if (this.viewmode === 1) {
-        if (this.v.length > 0) {
-            var o = $('.fm-blocks-view.fm .file-block-scrolling');
-            o.find('div.clear').remove();
-            o.append('<div class="clear"></div>');
-        }
         M.addIconUI(u, refresh);
         if (!u) {
             fm_thumbnails();
@@ -97,7 +95,6 @@ MegaData.prototype.rmSetupUI = function(u, refresh) {
         e.preventDefault();
         e.stopPropagation(); // do not treat it as a regular click on the file
         e.currentTarget = target;
-        M.cacheselect();
         M.searchPath();
         if (!$(this).hasClass('active')) {
             M.contextMenuUI(e, 1);
@@ -118,7 +115,6 @@ MegaData.prototype.rmSetupUI = function(u, refresh) {
         e.preventDefault();
         e.stopPropagation(); // do not treat it as a regular click on the file
         e.currentTarget = target;
-        M.cacheselect();
         M.searchPath();
         if (!$(this).hasClass('active')) {
             $(this).addClass('active');
@@ -253,14 +249,6 @@ MegaData.prototype.renderTree = function() {
     return promise;
 };
 
-MegaData.prototype.cacheselect = function() {
-    $.selected = [];
-    $($.selectddUIgrid + ' ' + $.selectddUIitem).each(function(i, o) {
-        if ($(o).hasClass('ui-selected')) {
-            $.selected.push($(o).attr('id'));
-        }
-    });
-};
 
 MegaData.prototype.pathLength = function() {
     var length = $('.fm-right-header .fm-breadcrumbs-block:visible').outerWidth()

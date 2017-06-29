@@ -408,6 +408,8 @@
                 console.time('MegaRender.renderLayout');
             }
 
+            console.error('renderLayout', aUpdate);
+
             if (aNodeList) {
                 this.nodeList = aNodeList;
             }
@@ -932,7 +934,7 @@
              * @param {Object}  aUserData  Any data provided by initializers
              */
             '*': function(aNode, aHandle, aDOMNode, aNodeIndex, aUpdate, aUserData) {
-                if (!DYNLIST_ENABLED) {
+                if (!DYNLIST_ENABLED || !this.megaList) {
                     this.insertDOMNode(aNode, aNodeIndex, aDOMNode, aUpdate);
                 }
             },
@@ -941,7 +943,7 @@
                 getLastInteractionWith(aHandle);
             },
             'cloud-drive': function(aNode, aHandle, aDOMNode, aNodeIndex, aUpdate, aUserData) {
-                if (!DYNLIST_ENABLED) {
+                if (!DYNLIST_ENABLED || !this.megaList) {
                     this.insertDOMNode(aNode, aNodeIndex, aDOMNode, aUpdate, cacheEntry);
                 }
             }
@@ -970,12 +972,13 @@
                         var megaListOptions = {
                             'itemRenderFunction': fm_megalist_node_render,
                             'preserveOrderInDOM': true,
-                            'extraRows': 2,
+                            'extraRows': 1,
                             'onContentUpdated': function () {
                                 fm_throttled_refresh(self.viewmode);
                             },
                             'perfectScrollOptions': {
-                                'handlers': ['click-rail', 'drag-scrollbar', 'wheel', 'touch']
+                                'handlers': ['click-rail', 'drag-scrollbar', 'wheel', 'touch'],
+                                'minScrollbarLength': 20
                             },
                         };
                         var megaListContainer;
@@ -993,7 +996,6 @@
                             megaListContainer = this.container.parentNode.parentNode;
                         }
 
-                        console.error(megaListContainer);
                         define(this, 'megaList', new MegaList(megaListContainer, megaListOptions));
                     }
                     else if(aNodeList.length && Object(newnodes).length) {
@@ -1081,7 +1083,7 @@
                                 foundNodesForAdding = true;
                                 sortedNodeList[k] = v.h;
                                 if (!M.v[k] || M.v[k].h !== v.h) {
-                                    debugger;
+                                    console.error("This should never happen, e.g. !M.v[k] || M.v[k].h !== v.h", v);
                                 }
                             }
 

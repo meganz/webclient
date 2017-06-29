@@ -1367,11 +1367,7 @@ function FMShortcuts() {
 
     var current_operation = null;
 
-    // unbind if already bound.
-    $(window).unbind('keydown.fmshortcuts');
-
-    // bind
-    $(window).bind('keydown.fmshortcuts', function(e) {
+    $(window).rebind('keydown.fmshortcuts', function(e) {
 
         if (!is_fm())
             return true;

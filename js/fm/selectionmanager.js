@@ -305,7 +305,7 @@ var SelectionManager = function($selectable, resume) {
      * Use this to get ALL (multiple!) selected items in the currently visible view/grid.
      */
     this.get_selected = function() {
-        return $selected;
+        return this.selected_list;
     };
 
     /**
@@ -337,18 +337,19 @@ var SelectionManager = function($selectable, resume) {
         // dont do nothing
     });
 
-    // if (localStorage.selectionManagerDebug) {
-    //     var self = this;
-    //     Object.keys(self).forEach(function(k) {
-    //         if (typeof(self[k]) === 'function') {
-    //             var old = self[k];
-    //             self[k] = function () {
-    //                 console.error(k, arguments);
-    //                 return old.apply(this, arguments);
-    //             };
-    //         }
-    //     })
-    // }
+    if (localStorage.selectionManagerDebug) {
+        var self = this;
+        Object.keys(self).forEach(function(k) {
+            if (typeof(self[k]) === 'function') {
+                var old = self[k];
+                self[k] = function () {
+                    console.error(k, arguments);
+                    return old.apply(this, arguments);
+                };
+            }
+        });
+        this.$selectable = $selectable;
+    }
 
     return this;
 };

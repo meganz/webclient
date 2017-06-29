@@ -1035,20 +1035,20 @@
 
                 if (targetIndex === 0) {
                     self.items.unshift(itemId);
-                    console.error('1unshift', itemId);
+                    // console.error('1unshift', itemId);
                 }
                 else {
                     self.items.splice(targetIndex, 0, itemId);
-                    console.error('1splice', targetIndex, itemId);
+                    // console.error('1splice', targetIndex, itemId);
                 }
             }
             else if (itemIndex !== targetIndex) {
                 requiresRerender = true;
                 // delete item from the array
-                console.error('2remove', itemIndex);
+                // console.error('2remove', itemIndex);
                 self.items.splice(itemIndex, 1);
                 // add it back to the new target position
-                console.error('2add', targetIndex);
+                // console.error('2add', targetIndex);
                 self.items.splice(targetIndex, 0, itemId);
             }
         });

@@ -32,8 +32,13 @@
 /*.megaListContainer tr:nth-child(odd) {*/
     /*background-color: rgb(250, 250, 250);*/
 /*}*/
-.ps-scrollbar-x-rail, ps-scrollbar-y-rail {
+.ps-scrollbar-x-rail, .ps-scrollbar-y-rail {
     z-index: 120;
+}
+.megaList .ps-scrollbar-y-rail {
+    margin-top: 2px;
+    margin-bottom: 2px;
+    margin-right: 2px;
 }
 .megaListContainer.shared-folder-content .file-block-scrolling {
     margin-right: 10px;

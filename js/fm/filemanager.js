@@ -532,16 +532,16 @@ FileManager.prototype.initFileManagerUI = function() {
         }
         if (!fmTabState || fmTabState['cloud-drive'].root !== M.RootID) {
             fmTabState = {
-                'cloud-drive': {root: M.RootID, prev: null},
-                'folder-link': {root: M.RootID, prev: null},
-                'shared-with-me': {root: 'shares', prev: null},
-                'conversations': {root: 'chat', prev: null},
-                'contacts': {root: 'contacts', prev: null},
-                'transfers': {root: 'transfers', prev: null},
-                'account': {root: 'account', prev: null},
-                'dashboard': {root: 'dashboard', prev: null},
-                'inbox': {root: M.InboxID, prev: null},
-                'rubbish-bin': {root: M.RubbishID, prev: null}
+                'cloud-drive':     {root: M.RootID,    prev: null},
+                'folder-link':     {root: M.RootID,    prev: null},
+                'shared-with-me':  {root: 'shares',    prev: null},
+                'conversations':   {root: 'chat',      prev: null},
+                'contacts':        {root: 'contacts',  prev: null},
+                'transfers':       {root: 'transfers', prev: null},
+                'account':         {root: 'account',   prev: null},
+                'dashboard':       {root: 'dashboard', prev: null},
+                'inbox':           {root: M.InboxID,   prev: null},
+                'rubbish-bin':     {root: M.RubbishID, prev: null}
             };
         }
 
@@ -552,7 +552,7 @@ FileManager.prototype.initFileManagerUI = function() {
 
         var activeTab = fmTabState[activeClass];
         if (activeTab) {
-            if (activeTab.root === M.currentrootid) {
+            if (activeTab.root === M.currentrootid || activeTab.root === 'chat') {
                 activeTab.prev = M.currentdirid;
                 M.lastActiveTab = activeClass;
             }
@@ -583,6 +583,11 @@ FileManager.prototype.initFileManagerUI = function() {
                 // Clicked on the currently active tab, should open the root (e.g. go back)
                 if (~clickedClass.indexOf(activeClass)) {
                     targetFolder = tab.root;
+
+                    // special case handling for the chat, re-render current conversation
+                    if (tab.root === 'chat' && String(M.currentdirid).substr(0, 5) === 'chat/') {
+                        targetFolder = M.currentdirid;
+                    }
                 }
                 else if (tab.prev && M.d[tab.prev]) {
                     targetFolder = tab.prev;

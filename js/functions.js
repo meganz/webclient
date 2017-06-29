@@ -792,22 +792,6 @@ function oIsFrozen(obj) {
 }
 
 /**
- *  Remove an element from an *array*
- */
-function removeValue(array, value, can_fail) {
-    var idx = array.indexOf(value);
-    if (d) {
-        if (!(can_fail || idx !== -1)) {
-            console.warn('Unable to Remove Value ' + value, value);
-        }
-    }
-    if (idx !== -1) {
-        array.splice(idx, 1);
-    }
-    return idx !== -1;
-}
-
-/**
  * Original: http://stackoverflow.com/questions/7317299/regex-matching-list-of-emoticons-of-various-type
  *
  * @param text
@@ -824,42 +808,6 @@ function unixtimeToTimeString(timestamp) {
         + ":" + addZeroIfLenLessThen(date.getMinutes(), 2);
 }
 
-/**
- * Get an array with unique values
- * @param {Array} arr Array
- */
-function array_unique(arr) {
-    return arr.reduce(function(out, value) {
-        if (out.indexOf(value) < 0) {
-            out.push(value);
-        }
-        return out;
-    }, []);
-}
-
-/**
- * Get a random value from an array
- * @param {Array} arr Array
- */
-function array_random(arr) {
-    return arr[rand(arr.length)];
-}
-
-/**
- * Convert Array to Object
- * @param {Array|String} arr The array
- * @param {*} [value] Optional value to assign to objects
- * @returns {Object}
- */
-function array_toobject(arr, value) {
-    if (!Array.isArray(arr)) {
-        arr = [arr];
-    }
-    return arr.reduce(function(obj, key, idx) {
-        obj[key] = value !== undefined ? value : ((idx | 0) + 1);
-        return obj;
-    }, Object.create(null));
-}
 
 /**
  * Simple method that will convert Mega user ids to base32 strings (that should be used when doing XMPP auth)
@@ -1103,15 +1051,10 @@ function percent_megatitle() {
         t = '';
         $.transferprogress = Object.create(null);
     }
+    megatitle(t);
 
     var d_deg = 360 * x_dl / 100;
     var u_deg = 360 * x_ul / 100;
-
-    updateTransfersSidebarIcon(d_deg, u_deg);
-    megatitle(t);
-}
-
-function updateTransfersSidebarIcon(d_deg, u_deg) {
     var $dl_rchart = $('.transfers .download .nw-fm-chart0.right-c p');
     var $dl_lchart = $('.transfers .download .nw-fm-chart0.left-c p');
     var $ul_rchart = $('.transfers .upload .nw-fm-chart0.right-c p');
@@ -1205,35 +1148,6 @@ function getHtmlElemPos(elem, n) {
         x: xPos,
         y: yPos
     };
-}
-
-var obj_values = function obj_values(obj) {
-    var vals = [];
-
-    Object.keys(obj).forEach(function(memb) {
-        if (typeof obj.hasOwnProperty !== 'function' || obj.hasOwnProperty(memb)) {
-            vals.push(obj[memb]);
-        }
-    });
-
-    return vals;
-};
-
-if (typeof Object.values === 'function') {
-    obj_values = Object.values;
-}
-else {
-    Object.values = obj_values;
-}
-
-function hex2bin(hex) {
-    var bytes = [];
-
-    for (var i = 0; i < hex.length - 1; i += 2) {
-        bytes.push(parseInt(hex.substr(i, 2), 16));
-    }
-
-    return String.fromCharCode.apply(String, bytes);
 }
 
 /**

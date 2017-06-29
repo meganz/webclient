@@ -397,6 +397,8 @@ function init_pro()
         $('.reg-st3-membership-bl.pro' + window.selectedProPlan + ' .membership-pad-bl').trigger('click');
         delete window.selectedProPlan;
     }
+	
+	
 }
 
 

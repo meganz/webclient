@@ -33,7 +33,7 @@ function translate(html) {
             else if (namespace === 'dqq') {
                 // Both of the above
                 l[match] = String(l[localeNum]).replace(/"/g, '&quot;');
-                l[match] = l[match].replace(/'/g, "\\'");
+                l[match] = String(l[match]).replace(/'/g, "\\'");
             }
 
             return l[match];
@@ -310,7 +310,7 @@ mBroadcaster.once('startMega', function populate_l() {
     l[501] = l[501].replace('17', '').replace('%', '');
     l[1066] = l[1066].replace('[A]', '<a class="red">').replace('[/A]', '</a>');
     l[1067] = l[1067].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
-    l[1094] = l[1094].replace('[A]', '<a href="/plugin" class="clickurl">').replace('[/A]', '</a>');
+    l[1094] = l[1094].replace('[A]', '<a href="/extensions" class="clickurl">').replace('[/A]', '</a>');
     l[1095] = l[1095].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[1133] = l[1133].replace('[A]',
         '<a href="http://en.wikipedia.org/wiki/Entropy" target="_blank" rel="noopener noreferrer">').replace('[/A]', '</a>');
@@ -441,6 +441,18 @@ mBroadcaster.once('startMega', function populate_l() {
 	l[16614] = escapeHTML(l[16614])
         .replace('[A]', '<a href="https://www.mozilla.org/thunderbird" target="_blank">')
         .replace('[/A]', '</a>');
+		
+	// carefully replace various strings to adhere to the new pro quotas:
+	// note: in the future we should make such strings used variables.
+	
+	l[16393] = l[16393].replace('4','8');	
+	l[16385] = l[16385].replace('4','8');	
+	l[16359] = l[16359].replace('4096','8192').replace('4','8');
+	l[16358] = l[16358].replace('4096','8192').replace('4','8');	
+	l[16316] = l[16316].replace('4096','8192').replace('4','8');
+	l[16315] = l[16315].replace('4096','8192').replace('4','8');	
+	l[16304] = l[16304].replace('4096','8192').replace('4','8');
+	l[1367] = l[1367].replace('4','8');	
 
     var common = [
         15536, 16106, 16107, 16116, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315,

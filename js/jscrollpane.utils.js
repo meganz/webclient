@@ -204,16 +204,22 @@ function clearScrollPanel(from) {
 function reselect(n) {
     $('.ui-selected').removeClass('ui-selected');
 
-    if (typeof $.selected === 'undefined') {
+    if (!Array.isArray($.selected)) {
         $.selected = [];
     }
+    var ids = $.selected.map(function(h) {
+        if (h && typeof h === 'object') {
+            h = h.h;
+        }
+        return String(h).replace(/[^\w-]/g, '');
+    });
 
-    for (var i in $.selected) {
-        $('#' + $.selected[i]).addClass('ui-selected');
+    for (var i = ids.length; i--;) {
+        $('#' + ids[i]).addClass('ui-selected');
 
         if (n) {
-            $('#' + $.selected[i] + ' .grid-status-icon').addClass('new');
-            $('#' + $.selected[i] + ' .file-status-icon').addClass('new');
+            $('#' + ids[i] + ' .grid-status-icon').addClass('new');
+            $('#' + ids[i] + ' .file-status-icon').addClass('new');
         }
     }
 

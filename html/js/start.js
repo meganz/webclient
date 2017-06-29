@@ -71,26 +71,32 @@ function init_start() {
 		});
 	}
 
-	if (document.URL.indexOf('mobile') > -1)
-	{
-		setTimeout(function()
-		{
-			$('.bottom-page.scroll-block').animate({
-				scrollTop: $(".bottom-page.bott-pad.mobile").offset().top
-			}, 800);
-		},1000);
+	if (getCleanSitePath() === 'mobile') {
+		setTimeout(function() {
+			var offset = $(".bottom-page.bott-pad.mobile").offset();
+
+			if (offset) {
+				$('.bottom-page.scroll-block').animate({scrollTop: offset.top}, 800);
+			}
+		}, 1000);
 	}
+		
+	$('.bottom-page.scroll-block.startpage').rebind('scroll.limitcounter',function() {
+		if (page == 'start') start_countLimit = Date.now();
+	});
 }
+
+var start_countLimit = 0;
 
 
 function start_achievements(res)
-{	
+{
 	if (res < 0) {
 		$('.bottom-page.white-block.top-pad.achievements').addClass('hidden');
-	}	
+	}
 	else if (res && res.u && res.u[4] && res.u[5] && res.u[3]) {
 		// enable achievements:
-		$('.bottom-page.white-block.top-pad.achievements').removeClass('hidden');	
+		$('.bottom-page.white-block.top-pad.achievements').removeClass('hidden');
 		var gbt = 'GB';
 		if (lang == 'fr') gbt = 'Go';
 		$('.achievements .megasync').html(escapeHTML(l[16632]).replace('[X]','<span class="txt-pad"><span class="big">' + Math.round(res.u[4][0]/1024/1024/1024) + '</span> '+ gbt +'</span>') + '*');
@@ -132,6 +138,9 @@ var RandomFactorTimestamp = 0;
 var start_Lcd = {};
 
 function start_countUpdate() {
+	
+	
+	
 	if (!start_countUpdate_inflight) startCountRenderData = {'users':'','files':''};
 	start_countUpdate_inflight=true;
 	if (page !== 'start') {
@@ -183,7 +192,10 @@ function start_countUpdate() {
 	}
 	renderCounts(String(Math.round(start_Lcd.users)),'users');
 	renderCounts(String(Math.round(start_Lcd.files)),'files');
-	setTimeout(start_countUpdate,30);
+	var t=30;
+	
+	if (start_countLimit+100 > Date.now()) t=500;
+	setTimeout(start_countUpdate,t);
 	if (start_APIcountdata.timestamp+5000 < Date.now()) start_APIcount();
 }
 /*

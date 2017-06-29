@@ -166,8 +166,6 @@ var Help = (function() {
                 $this.removeClass('gray-inactive');
             }
         });
-
-        contentChanged();
     }
 
     function patchLinks() {
@@ -292,8 +290,7 @@ var Help = (function() {
 
         function sent($parent) {
             $('.feedback-buttons,.feedback-suggestions-list', $parent).delay(500).fadeOut(500);
-            $parent.find($headFeedBack).delay(1000).fadeIn(500).children('p')
-                .text('Thank you for your feedback.', contentChanged);
+            $parent.find($headFeedBack).delay(1000).fadeIn(500).children('p').text(l[7004]);
         }
 
         $('.feedback-no').rebind('click', function() {
@@ -306,7 +303,7 @@ var Help = (function() {
 
             $this.parent().parent().children($headFeedBack).delay(200).fadeOut(300);
 
-            $this.parent().siblings('.feedback-suggestions-list').delay(500).fadeIn(500, contentChanged);
+            $this.parent().siblings('.feedback-suggestions-list').delay(500).fadeIn(500);
 
             $('.feedback-send').rebind('click', function() {
                 var data = {hash: $this.data('hash')};

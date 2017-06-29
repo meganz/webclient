@@ -467,6 +467,16 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
     var sconly = importNodes > 10;   // true -> new nodes delivered via SC `t` command only
     var ops = {a: 'p', t: t, n: a}; // FIXME: deploy API-side sn check
 
+    var reportError = function copyNodesError(ex) {
+        console.error(ex);
+        loadingDialog.phide();
+
+        // warn the user about something went wrong...
+        msgDialog('warninga', l[135], l[47], String(ex), promise && function() {
+                promise.reject(EINTERNAL);
+            });
+    };
+
     var onCopyNodesDone = function() {
         if (todel && todel.length) {
             M.moveNodes(todel, M.RubbishID, true);
@@ -515,8 +525,15 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
     // FIXME: do this in a worker
     var c = (t || "").length == 11;
     for (var i = a.length; i--;) {
-        a[i].k = c ? base64urlencode(encryptto(t, a32_to_str(a[i].k)))
-            : a32_to_base64(encrypt_key(u_k_aes, a[i].k));
+        try {
+            a[i].k = c
+                ? base64urlencode(encryptto(t, a32_to_str(a[i].k)))
+                : a32_to_base64(encrypt_key(u_k_aes, a[i].k));
+        }
+        catch (ex) {
+            reportError(ex);
+            return promise;
+        }
     }
 
     api_req(ops, {
@@ -1663,7 +1680,7 @@ MegaData.prototype.getSharingUsers = function(nodes, userobj) {
         }
     }
 
-    users = array_unique(users);
+    users = array.unique(users);
 
     if (userobj) {
         users = users.map(function(h) {

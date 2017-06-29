@@ -155,6 +155,7 @@ var sccount = 0;                         // number of actionpackets processed at
 var scfetches = Object.create(null);     // holds pending nodes to be retrieved from fmdb
 var scwaitnodes = Object.create(null);   // supplements scfetches per scqi index
 var nodesinflight = Object.create(null); // number of nodes being processed in the worker for scqi
+var sc_history = [];                     // array holding the history of action-packets
 
 // enqueue nodes needed to process packets
 function sc_fqueue(handle, packet) {
@@ -193,8 +194,7 @@ function sc_fqueuet(scni, packet) {
             }
             else {
                 for (var i = scnodes.length; i--;) {
-                    result += sc_fqueue(scnodes[i].h, packet);
-                    // result += sc_fqueue(scnodes[i].p, packet);
+                    result += sc_fqueue(scnodes[i].p, packet);
                 }
             }
         }
@@ -237,7 +237,7 @@ function sc_fetcher() {
             $.scFetcherRunning = false;
         }
         else {
-            dbfetch.coll(bunch, new MegaPromise())
+            dbfetch.geta(bunch, new MegaPromise())
                 .always(function() {
                     for (var i = bunch.length; i--;) {
                         var h = bunch[i];
@@ -269,19 +269,17 @@ function sc_packet(a) {
         console.debug('sc_packet', loadfm.fromapi, scloadtnodes, a.a, a);
     }
 
+    // record history
+    if (sc_history) {
+        sc_history.push(a.a);
+    }
+
     // check if this packet needs nodes to be present,
     // unless `fromapi` where nodes are placed in memory already as received.
     if (!loadfm.fromapi) {
         var inflight = $.len(scfetches);
 
-        if (a.a === 's' || a.a === 's2') {
-            // inbound share for which we will receive the 't'ree next
-            // scloadtnodes = a.o && a.o !== u_handle && a.r !== undefined;
-            scloadtnodes = true;
-        }
-        else if (a.a !== 't') {
-            scloadtnodes = false;
-        }
+        scloadtnodes = true;
 
         switch (a.a) {
             case 's':
@@ -1720,6 +1718,11 @@ function worker_procmsg(ev) {
 var fmdb;
 var ufsc;
 
+mBroadcaster.once('startMega', function() {
+    // Initialize ufs size cache
+    ufsc = new UFSSizeCache();
+});
+
 function loadfm(force) {
     "use strict";
 
@@ -1790,9 +1793,6 @@ function fetchfm(sn) {
     // we always intially fetch historical actionpactions
     // before showing the filemanager
     initialscfetch = true;
-
-    // ufs size cache
-    ufsc = new UFSSizeCache();
 
     var promise;
     if (is_mobile) {
@@ -1921,7 +1921,11 @@ function dbfetchfm() {
 
                             if (!mBroadcaster.crossTab.master) {
                                 // on a secondary tab, prevent writing to DB once we have read its contents
-                                fmdb.crashed = 'slave';
+                                // XXX: TypeError: Cannot create property 'crashed' on boolean 'false'
+                                // ^^^ how does `fmdb` get set to `false` here ?! :-/
+                                if (fmdb) {
+                                    fmdb.crashed = 'slave';
+                                }
                             }
 
                             // fetch & process new actionpackets
@@ -2833,6 +2837,7 @@ function loadfm_callback(res) {
         // commit transaction and set sn
         setsn(res.sn);
         currsn = res.sn;
+        mega.fcv_fsn = res.sn;
 
         if (res.cr) {
             crypto_procmcr(res.cr);
@@ -3000,7 +3005,7 @@ function loadfm_done(mDBload) {
             // fetch second-level and tree nodes (to show the little arrows in the tree)
             var folders = loadfm.onDemandFolders;
             if (fmconfig.treenodes) {
-                folders = array_unique(folders.concat(Object.keys(fmconfig.treenodes)));
+                folders = array.unique(folders.concat(Object.keys(fmconfig.treenodes)));
             }
 
             for (var i = folders.length; i--;) {

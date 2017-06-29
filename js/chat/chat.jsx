@@ -1599,7 +1599,7 @@ Chat.prototype.getXmppServiceUrl = function(timeout) {
             })
             .done(function(r) {
                 if (r.xmpp && r.xmpp.length > 0) {
-                    var randomHost = array_random(r.xmpp);
+                    var randomHost = array.random(r.xmpp);
                     if (webSocketsSupport) {
                         $promise.resolve("wss://" + randomHost.host + "/ws");
                     }
@@ -1612,7 +1612,7 @@ Chat.prototype.getXmppServiceUrl = function(timeout) {
                     $promise.reject();
                 }
                 else {
-                    var server = array_random(self.options.fallbackXmppServers);
+                    var server = array.random(self.options.fallbackXmppServers);
                     self.logger.error("Got empty list from the load balancing service for xmpp, will fallback to: " + server + ".");
                     if (webSocketsSupport) {
                         server = server.replace("https:", "wss:").replace("/bosh", "/ws");
@@ -1621,7 +1621,7 @@ Chat.prototype.getXmppServiceUrl = function(timeout) {
                 }
             })
             .fail(function() {
-                var server = array_random(self.options.fallbackXmppServers);
+                var server = array.random(self.options.fallbackXmppServers);
                 self.logger.error("Could not connect to load balancing service for xmpp, will fallback to: " + server + ".");
 
                 if (webSocketsSupport) {

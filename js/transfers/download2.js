@@ -1130,7 +1130,7 @@ var dlmanager = {
     },
 
     getCurrentDownloads: function() {
-        return array_unique(dl_queue.filter(isQueueActive).map(dlmanager.getGID));
+        return array.unique(dl_queue.filter(isQueueActive).map(dlmanager.getGID));
     },
 
     getCurrentDownloadsSize: function() {

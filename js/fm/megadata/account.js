@@ -15,6 +15,7 @@ MegaData.prototype.accountData = function(cb, blockui) {
         cb(account);
     }
     else {
+        var uqres = false;
         var mRootID = M.RootID;
 
         if (blockui) {
@@ -50,19 +51,7 @@ MegaData.prototype.accountData = function(cb, blockui) {
                         ctx.account.balance = [['0.00', 'EUR']];
                     }
 
-                    if (!u_attr.p) {
-                        ctx.account.servbw_used = 0;
-
-                        if (res.tah) {
-                            var t = 0;
-
-                            for (var i in res.tah)
-                                t += res.tah[i];
-
-                            ctx.account.downbw_used = t;
-                            ctx.account.bw = res.tal;
-                        }
-                    }
+                    uqres = res;
                 }
             }
         });
@@ -133,16 +122,33 @@ MegaData.prototype.accountData = function(cb, blockui) {
                     }
                 }
 
+                if (!u_attr.p && uqres) {
+                    ctx.account.servbw_used = 0;
+
+                    if (uqres.tah) {
+                        var bwu = 0;
+
+                        for (var w in uqres.tah) {
+                            bwu += uqres.tah[w];
+                        }
+
+                        ctx.account.downbw_used = bwu;
+                        if (uqres.tal) {
+                            ctx.account.bw = uqres.tal;
+                        }
+                    }
+                }
+
                 // Prepare storage footprint stats.
                 var cstrgn = ctx.account.cstrgn = Object(ctx.account.cstrgn);
                 var stats = ctx.account.stats = Object.create(null);
                 var groups = [M.RootID, M.InboxID, M.RubbishID];
-                var root = array_toobject(groups);
+                var root = array.to.object(groups);
                 var exp = Object(M.su.EXP);
 
                 groups = groups.concat(['inshares', 'outshares', 'links']);
                 for (var i = groups.length; i--;) {
-                    stats[groups[i]] = array_toobject(['items', 'bytes', 'files', 'folders'], 0);
+                    stats[groups[i]] = array.to.object(['items', 'bytes', 'files', 'folders'], 0);
                     // stats[groups[i]].nodes = [];
                 }
 

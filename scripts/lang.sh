@@ -5,6 +5,7 @@ currentBranch=$(git rev-parse --abbrev-ref HEAD)
 
 # Checkout the translations branch
 git checkout translations
+git reset --hard origin/translations
 
 # Make sure it's up to date
 git pull
@@ -12,12 +13,23 @@ git pull
 # Change to the lang directory
 cd $(dirname $BASH_SOURCE)/../lang
 
-# Remove all files in the language directory (in case we removed some languages in the code)
-rm *.json
-rm lang.tar.gz
-
 # Fetch the latest translations from Babel
 wget 'https://babel.mega.co.nz/?u=Jq1EXnelOeQpj7UCaBa1&id=fetch&' -O lang.tar.gz
+
+# Check if the fetch failed
+if [ $? -ne 0 ]; then
+
+    # Check out the previous branch again
+    git checkout $currentBranch
+    git status
+
+    echo "There was a problem fetching strings from Babel."
+    echo "The language strings update was aborted and terminal is now returned to the $currentBranch branch."
+    exit 1
+fi
+
+# Remove all files in the language directory (in case we removed some languages in the code)
+rm *.json
 
 # Extract the tar.gz file
 tar xfvz lang.tar.gz
@@ -29,7 +41,7 @@ git add *.json
 git commit -m 'Updated strings from Babel'
 
 # Push it to the translations branch
-git push
+git push -u origin translations
 
 # Check out the previous branch again
 git checkout $currentBranch

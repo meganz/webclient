@@ -1305,6 +1305,10 @@ function fm_tfsresume(gid) {
     if (ASSERT(typeof gid === 'string' && "zdu".indexOf(gid[0]) !== -1, 'Invalid GID to resume')) {
         if (gid[0] === 'u') {
             ulQueue.resume(gid);
+
+            if (page !== 'download') {
+                mega.ui.tpp.resume(gid, 'ul');
+            }
         }
         else {
             var $tr = $('.transfer-table tr#' + gid);
@@ -1324,6 +1328,10 @@ function fm_tfsresume(gid) {
                 return dlmanager.showOverQuotaDialog();
             }
             dlQueue.resume(gid);
+
+            if (page !== 'download') {
+                mega.ui.tpp.resume(gid, 'dl');
+            }
 
             if (page === 'download') {
                 $('.download.status-txt, .download-info .text').text('').removeClass('blue');

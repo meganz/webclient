@@ -12,11 +12,13 @@ mega.ui.tpp = function () {
             enabled: true,
             dl: {
                 $: {},
-                class: '.download'
+                class: '.download',
+                paused: []// ids of paused dl items
             },
             ul: {
                 $: {},
-                class: '.upload'
+                class: '.upload',
+                paused: []// ids of paused ul items
             }
         },
         block: ['dl', 'ul'],
@@ -241,8 +243,47 @@ mega.ui.tpp = function () {
      * @param {String} blk i.e. ['dl', 'ul']
      */
     var pause = function pause(id, blk) {
+        opts.dlg[blk].paused.push(id);
+
         opts.dlg[blk].$.stxt.text('');
         opts.dlg[blk].$.spd.text(l[1651]);
+    };
+
+    /** Remove unpaused gid from queue
+     * @param {String} id ul/dl item id
+     * @param {String} blk i.e. ['dl', 'ul']
+     */
+    var resume = function resume(id, blk) {
+        delete opts.dlg[blk].paused[id];
+    };
+
+    /**
+     * In case that user paused one of items in the dl/ul queue after some time
+     * when all non-paused items dl/ul is finished TPP must be updated
+     * with file name of paused item with appropriate status 'Paused'
+     * @param {Object} queue Item queue
+     * @param {String} blk i.e. ['dl', 'ul']
+     */
+    var statusPaused = function statusPaused(queue, blk) {
+        var index = 0;
+        var name = '';
+        var item = {};
+        var pausedNum = opts.dlg[blk].paused.length;// Number of paused items
+
+        if (pausedNum && pausedNum === Object.keys(GlobalProgress).length) {// Update TPP
+            item = queue[0];
+            name = item.zipid ? item.zipname : item.n;
+
+            index = getIndex(blk);
+            if (index < getTotal(blk)) {
+                setIndex(1, blk);// Increment current index
+            }
+            
+            opts.dlg[blk].$.crr.text(index);
+            opts.dlg[blk].$.stxt.text('');
+            opts.dlg[blk].$.spd.text(l[1651]);
+            opts.dlg[blk].$.name.text(name);// file name
+        }
     };
 
     /**
@@ -460,6 +501,8 @@ mega.ui.tpp = function () {
         show: show,
         hide: hide,
         pause: pause,
+        resume: resume,
+        statusPaused: statusPaused,
         start: start,
         showBlock: showBlock,
         hideBlock: hideBlock,

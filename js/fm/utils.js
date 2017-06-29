@@ -297,7 +297,6 @@ MegaUtils.prototype.resetUploadDownload = function megaUtilsResetUploadDownload(
     }
     else {
         if (page !== 'download') {
-            console.error('Blue Fish');
             mega.ui.tpp.statusPaused(ul_queue, 'ul');
         }
     }
@@ -317,7 +316,6 @@ MegaUtils.prototype.resetUploadDownload = function megaUtilsResetUploadDownload(
     }
     else {
         if (page !== 'download') {
-            console.error('Blue Fish');
             mega.ui.tpp.statusPaused(dl_queue, 'dl');
         }
     }

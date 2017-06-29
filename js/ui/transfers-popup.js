@@ -249,6 +249,10 @@ mega.ui.tpp = function () {
         opts.dlg[blk].$.spd.text(l[1651]);
     };
 
+    var getPaused = function getPaused(blk) {
+        return opts.dlg[blk].paused.length;
+    };
+
     /** Remove unpaused gid from queue
      * @param {String} id ul/dl item id
      * @param {String} blk i.e. ['dl', 'ul']
@@ -257,6 +261,9 @@ mega.ui.tpp = function () {
         delete opts.dlg[blk].paused[id];
     };
 
+    var qItemNum = function qItemNum() {
+        return [];
+    };
     /**
      * In case that user paused one of items in the dl/ul queue after some time
      * when all non-paused items dl/ul is finished TPP must be updated
@@ -268,17 +275,27 @@ mega.ui.tpp = function () {
         var index = 0;
         var name = '';
         var item = {};
+        var qLen = 0;
+        var ulQLen = 0;
+        var len = 0;
+        var glb = JSON.stringify(Object.keys(GlobalProgress));
         var pausedNum = opts.dlg[blk].paused.length;// Number of paused items
 
-        if (pausedNum && pausedNum === Object.keys(GlobalProgress).length) {// Update TPP
+        if (glb) {
+            qLen = glb.length;
+            ulQLen = glb.match(/ul_/g).length;
+            len = blk === 'dl' ? qLen - ulQLen : ulQLen;
+        }
+
+        if (pausedNum && pausedNum === len) {// Update TPP
             item = queue[0];
             name = item.zipid ? item.zipname : item.n;
 
             index = getIndex(blk);
-            if (index < getTotal(blk)) {
-                setIndex(1, blk);// Increment current index
-            }
-            
+            // if (index < getTotal(blk)) {
+            //     setIndex(1, blk);// Increment current index
+            // }
+
             opts.dlg[blk].$.crr.text(index);
             opts.dlg[blk].$.stxt.text('');
             opts.dlg[blk].$.spd.text(l[1651]);
@@ -330,11 +347,18 @@ mega.ui.tpp = function () {
             console.error("FIXME: TypeError: Cannot read property 'css' of undefined");
             return false;
         }
+
+        var index = getIndex(blk);
         var len = getTotal(blk).toString();
-        var index = getIndex(blk).toString();
+        // var index = (getIndex(blk) - getPaused(blk)).toString();
+        var woPaused = index - getPaused(blk);
         var perc = getProgress(blk).toString();
         var avgSpeed = getAvgSpeed(blk);
         var speed;
+
+        if (woPaused > 0) {
+            index = woPaused.toString();
+        }
 
         speed = numOfBytes(avgSpeed, 1);
         opts.dlg[blk].$.prg.css('width', perc + '%');
@@ -354,35 +378,34 @@ mega.ui.tpp = function () {
      * Initialize transfer popup dialogs progress bar, file icon, name, speed,
      * current file index and total number of files in queue of dl or ul block
      * @param {Object} queue Download or upload queue
-     * @param {String} bl i.e. ['dl', 'ul'] download or upload
+     * @param {String} blk i.e. ['dl', 'ul'] download or upload
      */
-    var _init = function _init(queue, bl) {
-        // var dlg = (bl === 'dl') ? '$dlBlock' : '$ulBlock';
+    var _init = function _init(queue, blk) {
         var name = '';
-        var index = getIndex(bl).toString();
-        var total = getTotal(bl).toString();
+        var index = getIndex(blk).toString();
+        var total = getTotal(blk).toString();
         var type = ext[fileext(name)];
-        var perc = getProgress(bl);
+        var perc = getProgress(blk);
 
         if (typeof type === 'undefined') {
             type = ext['*'][0];// general
         }
 
-        if (bl === 'dl') {
+        if (blk === 'dl') {
             name = queue.zipname || queue.n || queue.name;
         }
         else {
             name = queue.name;
         }
 
-        opts.dlg[bl].$.name.text(name);
-        opts.dlg[bl].$.crr.text(index);
-        opts.dlg[bl].$.num.text(total);
-        opts.dlg[bl].$.prg.css('width', perc + '%');
-        opts.dlg[bl].$.spd.text(l[1042]);
-        opts.dlg[bl].$.stxt.text('');
-        opts.dlg[bl].$.ibLeft.text(l[5528]);
-        opts.dlg[bl].$.tfi
+        opts.dlg[blk].$.name.text(name);
+        opts.dlg[blk].$.crr.text(index);
+        opts.dlg[blk].$.num.text(total);
+        opts.dlg[blk].$.prg.css('width', perc + '%');
+        opts.dlg[blk].$.spd.text(l[1042]);
+        opts.dlg[blk].$.stxt.text('');
+        opts.dlg[blk].$.ibLeft.text(l[5528]);
+        opts.dlg[blk].$.tfi
             .removeClass()
             .addClass('transfer-filetype-icon ' + type + ' file');
     };

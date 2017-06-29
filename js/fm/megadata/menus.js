@@ -34,45 +34,39 @@
      * @param {string} id - parent folder handle
      */
     MegaData.prototype.buildSubMenu = function(id) {
-
-        var folders = [],
-            sub, cs, sm, fid, sharedFolder, html;
-        var nodeName = '';
-
-        for (var i in this.c[id]) {
-            if (this.d[i] && this.d[i].t === 1) {
-                folders.push(this.d[i]);
-            }
-        }
+        var cs;
+        var sm;
+        var fid;
+        var sub;
+        var html;
+        var nodeName;
+        var sharedFolder;
+        var tree = Object(M.tree[id]);
+        var folders = obj_values(tree);
 
         // Check existance of sub-menu
         if ($('#csb_' + id + ' > .dropdown-item').length !== folders.length) {
-            // localeCompare is not supported in IE10, >=IE11 only
             // sort by name is default in the tree
             folders.sort(function(a, b) {
-                if (a.name) {
-                    return a.name.localeCompare(b.name);
-                }
+                return M.compareStrings(a.name, b.name, 1);
             });
 
             for (var i in folders) {
-                sub = false;
                 cs = '';
                 sm = '';
+                sub = false;
                 fid = folders[i].h;
 
-                for (var h in this.c[fid]) {
-                    if (this.d[h] && this.d[h].t) {
-                        sub = true;
-                        cs = ' contains-submenu';
-                        sm = '<span class="dropdown body submenu" id="sm_' + fid + '">'
-                            + '<span id="csb_' + fid + '"></span>' + arrow + '</span>';
-                        break;
-                    }
+                if (this.tree[fid]) {
+                    sub = true;
+                    cs = ' contains-submenu';
+                    sm = '<span class="dropdown body submenu" id="sm_' + fid + '">'
+                        + '<span id="csb_' + fid + '"></span>' + arrow + '</span>';
                 }
 
                 sharedFolder = 'folder-item';
-                if (typeof this.d[fid].shares !== 'undefined') {
+                // TODO: fixme
+                if (Object(this.d[fid]).shares) {
                     sharedFolder += ' shared-folder-item';
                 }
 
@@ -80,7 +74,7 @@
                     nodeName = l[8686];
                 }
                 else {
-                    nodeName = this.d[fid].name;
+                    nodeName = folders[i].name;
                 }
 
                 html = '<span class="dropdown-item ' + sharedFolder + cs + '" id="fi_' + fid + '">'

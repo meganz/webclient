@@ -128,7 +128,7 @@ UFSSizeCache.prototype.addTreeNode = function(n, ignoreDB) {
     tmp.tb = n.tb || 0;
     tmp.h = n.h;
     tmp.p = n.p;
-    tmp.f = n.fav ? 1 : 0; // future bitwise usage
+    tmp.xf = n.xf ? n.xf : n.fav ? 1 : 0; // future bitwise usage
 
     if (n.su) {
         tmp.su = n.su;

@@ -160,12 +160,22 @@ MegaData.prototype.buildtree = function _buildtree(n, dialog, stype) {
             }));
         }
 
-        var sortDirection = (is_mobile) ? 1 : $.sortTreePanel[prefix].dir;
-        folders.sort(
-            function(a, b) {
-                return M.compareStrings(a.name, b.name, sortDirection);
-            }
-        );
+        var sortDirection = is_mobile ? 1 : Object($.sortTreePanel[prefix]).dir;
+        var sortFn = function(a, b) {
+            return M.compareStrings(a.name, b.name, sortDirection);
+        };
+        switch (Object($.sortTreePanel[prefix]).by) {
+            case 'fav':
+                sortFn = function(a, b) {
+                    return a.xf & 1 ? -1 * sortDirection : b.xf & 1 ? sortDirection : 0;
+                };
+                break;
+            case 'created':
+                sortFn = function(a, b) {
+                    return (a.ts < b.ts ? -1 : 1) * sortDirection;
+                };
+        }
+        folders.sort(sortFn);
 
         // In case of copy and move dialogs
         if (typeof dialog !== 'undefined') {

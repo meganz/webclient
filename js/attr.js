@@ -393,7 +393,7 @@ var attribCache = false;
             }
             else {
                 if (res === EEXPIRED && useVersion) {
-                    var conflictHandlerId = cacheKey.split("_")[1];
+                    var conflictHandlerId = attribute;
 
                     if (
                         !self._conflictHandlers[conflictHandlerId] ||

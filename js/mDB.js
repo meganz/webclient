@@ -1614,8 +1614,8 @@ Object.defineProperty(self, 'dbfetch', (function() {
 
             var promise = new MegaPromise();
 
-            if (M.h[hash] && M.d[M.h[hash].first]) {
-                promise.resolve(M.d[M.h[hash].first]);
+            if (M.h[hash]) {
+                promise.resolve(M.d[M.h[hash].substr(0, 8)]);
             }
             else {
                 fmdb.getbykey('f', 'c', false, [['c', hash]], 1)
@@ -1623,8 +1623,14 @@ Object.defineProperty(self, 'dbfetch', (function() {
                         var node = r[0];
                         if (node) {
                             // got the hash and a handle it belong to
-                            M.h[hash] = M.h[hash] || Hash();
-                            M.h[hash][node.h] = 1;
+                            if (!M.h[hash]) {
+                                M.h[hash] = node.h + ' ';
+                            }
+                            else {
+                                if (M.h[hash].indexOf(node.h) < 0) {
+                                    M.h[hash] += node.h + ' ';
+                                }
+                            }
 
                             promise.resolve(node);
                         }

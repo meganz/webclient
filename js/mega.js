@@ -1514,9 +1514,13 @@ function emplacenode(node, noc) {
 
         if (node.hash) {
             if (!M.h[node.hash]) {
-                M.h[node.hash] = Hash();
+                M.h[node.hash] = node.h + ' ';
             }
-            M.h[node.hash][node.h] = 1;
+            else {
+                if (M.h[node.hash].indexOf(node.h) < 0) {
+                    M.h[node.hash] += node.h + ' ';
+                }
+            }
         }
     }
     else if (node.t > 1 && node.t < 5) {

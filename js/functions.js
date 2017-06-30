@@ -2620,19 +2620,16 @@ function array_diff(old_arr, new_arr) {
 };
 
 
-(function() {
-    /**
-     * A function, which would be called on every DOM update (or scroll). This func would implement
-     * throttling, so that we won't update the UI components too often.
-     *
-     */
-    var fm_throttled_refresh = function fm_throttled_refresh() {
-        delay('fm_throttled_refresh', function() {
-            M.rmSetupUI(false, true);
-        }, 75);
-    };
-    window.fm_throttled_refresh = fm_throttled_refresh;
-})();
+/**
+ * A function, which would be called on every DOM update (or scroll). This func would implement
+ * throttling, so that we won't update the UI components too often.
+ *
+ */
+function fm_throttled_refresh() {
+    delay('fm_throttled_refresh', function() {
+        M.rmSetupUI(false, true);
+    }, 75);
+}
 
 function fm_megalist_node_render(aHandle) {
     var megaRender = M.megaRender;

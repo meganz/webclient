@@ -128,7 +128,17 @@ UFSSizeCache.prototype.addTreeNode = function(n, ignoreDB) {
     tmp.tb = n.tb || 0;
     tmp.h = n.h;
     tmp.p = n.p;
-    tmp.xf = n.xf ? n.xf : n.fav ? 1 : 0; // future bitwise usage
+    tmp.t = M.IS_TREE;
+
+    if (ignoreDB) {
+        if (n.t & M.IS_TREE) tmp.t = n.t;
+    }
+    else {
+        if (n.fav)                                                   tmp.t |= M.IS_FAV;
+        if (M.su.EXP && M.su.EXP[n.h])                               tmp.t |= M.IS_LINKED;
+        if (M.getNodeShareUsers(n, 'EXP').length || M.ps[n.h])       tmp.t |= M.IS_SHARED;
+        if (M.getNodeShare(n).down === 1)                            tmp.t |= M.IS_TAKENDOWN;
+    }
 
     if (n.su) {
         tmp.su = n.su;

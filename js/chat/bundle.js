@@ -2014,7 +2014,7 @@ React.makeElement = React['createElement'];
 
 	"use strict";
 
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
@@ -6128,7 +6128,7 @@ React.makeElement = React['createElement'];
 	            this.props.onHighlighted([node.h]);
 	        }
 
-	        if (this.props.folderSelectNotAllowed === true && node.t === 1) {
+	        if (this.props.folderSelectNotAllowed === true && node.t) {
 	            this.setState({ 'selected': [] });
 	            this.props.onSelected([]);
 	        } else {
@@ -6142,7 +6142,7 @@ React.makeElement = React['createElement'];
 	        e.stopPropagation();
 	        e.preventDefault();
 
-	        if (node.t === 1) {
+	        if (node.t) {
 
 	            self.setState({ 'selected': [], 'highlighted': [] });
 	            self.props.onSelected([]);
@@ -6171,7 +6171,7 @@ React.makeElement = React['createElement'];
 	                return;
 	            }
 
-	            var isFolder = node.t === 1;
+	            var isFolder = node.t;
 	            var isHighlighted = self.state.highlighted.indexOf(node.h) !== -1;
 
 	            var tooltipElement = null;

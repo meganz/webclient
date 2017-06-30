@@ -1944,30 +1944,28 @@ var exportExpiry = {
 
     /**
      * Returns true in case that any of checked items is taken down, otherwise false
-     * @param {Array|String} nodesId Array of strings nodes ids
+     * @param {Array|String} [nodes] Array of nodes (handles/objects)
      * @returns {Boolean}
      */
-    ExportLink.prototype.isTakenDown = function(nodesId) {
-
-        var self = this;
-        var nodes = nodesId;
-
-        if (nodesId) {
-            if (!Array.isArray(nodesId)) {
-                nodes = [nodesId];
+    ExportLink.prototype.isTakenDown = function(nodes) {
+        if (nodes) {
+            if (!Array.isArray(nodes)) {
+                nodes = [nodes];
             }
         }
         else {
             nodes = self.options.nodesToProcess;
         }
 
-        for (var handle in nodes) {
-            if (nodes.hasOwnProperty(handle)) {
-                handle = nodes[handle];
+        for (var i = nodes.length; i--;) {
+            var node = nodes[i];
 
-                if (M.getNodeShare(handle).down === 1) {
-                    return true;
-                }
+            if (typeof node === 'string') {
+                node = M.getNodeByHandle(node);
+            }
+
+            if (node.t & M.IS_TAKENDOWN || M.getNodeShare(node).down === 1) {
+                return true;
             }
         }
 

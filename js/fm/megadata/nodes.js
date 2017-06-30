@@ -16,7 +16,10 @@
 
         if (fmdb) {
             fmdb.del('f', h);
-            fmdb.del('ph', h);
+
+            if (!this.d[h] || this.d[h].ph) {
+                fmdb.del('ph', h);
+            }
         }
 
         if (this.nn) {
@@ -1378,7 +1381,7 @@ MegaData.prototype._everyTypeFile = function(element, index, array) {
  */
 MegaData.prototype._everyTypeFolder = function(element, index, array) {
     var node = this.getNode(element);
-    return node && node.t === 1;
+    return node && node.t;
 };
 
 /**
@@ -1712,6 +1715,11 @@ MegaData.prototype.nodeShare = function(h, s, ignoreDB) {
             this.d[h].shares = Hash('Shares');
         }
         this.d[h].shares[s.u] = s;
+
+        if (this.d[h].t) {
+            // update tree node flags
+            ufsc.addTreeNode(this.d[h]);
+        }
 
         if (fmdb && !ignoreDB && !pfkey) {
             fmdb.add('s', {o_t: h + '*' + s.u, d: s});

@@ -167,7 +167,7 @@ MegaData.prototype.buildtree = function _buildtree(n, dialog, stype) {
         switch (Object($.sortTreePanel[prefix]).by) {
             case 'fav':
                 sortFn = function(a, b) {
-                    return a.xf & 1 ? -1 * sortDirection : b.xf & 1 ? sortDirection : 0;
+                    return a.t & M.IS_FAV ? -1 * sortDirection : b.t & M.IS_FAV ? sortDirection : 0;
                 };
                 break;
             case 'created':
@@ -232,7 +232,7 @@ MegaData.prototype.buildtree = function _buildtree(n, dialog, stype) {
             if (folders[idx].su || Object(M.c.shares[curItemHandle]).su) {
                 sharedfolder = ' inbound-share';
             }
-            else if (share.isShareExist([curItemHandle], true, true, false)) {
+            else if (folders[idx].t & M.IS_SHARED) {
                 sharedfolder = ' shared-folder';
             }
             else {
@@ -254,8 +254,7 @@ MegaData.prototype.buildtree = function _buildtree(n, dialog, stype) {
             }
             else {
 
-                if (M.getNodeShare(curItemHandle).down === 1) {
-                    // Taken down
+                if (folders[idx].t & M.IS_TAKENDOWN) {
                     titleTooltip.push(l[7705]);
                 }
 
@@ -265,7 +264,7 @@ MegaData.prototype.buildtree = function _buildtree(n, dialog, stype) {
                 }
                 titleTooltip = titleTooltip.map(escapeHTML).join("\n");
 
-                sExportLink = Object(this.su.EXP)[curItemHandle] ? 'linked' : '';
+                sExportLink = folders[idx].t & M.IS_LINKED ? 'linked' : '';
                 arrowIcon = containsc ? 'class="nw-fm-arrow-icon"' : '';
 
                 html = '<li id="' + _li + curItemHandle + '">' +

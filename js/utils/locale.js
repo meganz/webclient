@@ -432,7 +432,7 @@ mBroadcaster.once('startMega', function populate_l() {
             + 'purchases">')
         .replace('[/A3]', '</a>');
     l[16596] = escapeHTML(l[16596])
-        .replace('[A]', '<a class="red" href="mailto:uwp@mega.nz">').replace('[/A]', '</a>');
+        .replace('[A]', '<a class="red" href="mailto:uwp.alpha@mega.nz">').replace('[/A]', '</a>').replace('uwp@', 'uwp.alpha@');
 	l[16598] = escapeHTML(l[16598])
         .replace('[A]', '<a href="https://github.com/meganz/sdk/tree/master/examples/megacmd" target="_blank" class="red">')
         .replace('[/A]', '</a>')

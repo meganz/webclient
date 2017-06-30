@@ -243,13 +243,16 @@ mega.ui.tpp = function () {
      * @param {String} blk i.e. ['dl', 'ul']
      */
     var pause = function pause(id, blk) {
-        opts.dlg[blk].paused.push(id);
+        console.log('tpp.pause');
 
+        opts.dlg[blk].paused.push(id);
         opts.dlg[blk].$.stxt.text('');
         opts.dlg[blk].$.spd.text(l[1651]);
     };
 
     var getPaused = function getPaused(blk) {
+        console.log('tpp.getPaused');
+
         return opts.dlg[blk].paused.length;
     };
 
@@ -258,12 +261,12 @@ mega.ui.tpp = function () {
      * @param {String} blk i.e. ['dl', 'ul']
      */
     var resume = function resume(id, blk) {
-        delete opts.dlg[blk].paused[id];
+        console.log('tpp.resume');
+        var arr = opts.dlg[blk].paused;
+
+        arr.splice($.inArray(id, arr), 1);
     };
 
-    var qItemNum = function qItemNum() {
-        return [];
-    };
     /**
      * In case that user paused one of items in the dl/ul queue after some time
      * when all non-paused items dl/ul is finished TPP must be updated
@@ -272,29 +275,35 @@ mega.ui.tpp = function () {
      * @param {String} blk i.e. ['dl', 'ul']
      */
     var statusPaused = function statusPaused(queue, blk) {
+        console.log('tpp.statusPaused');
         var index = 0;
         var name = '';
         var item = {};
         var qLen = 0;
         var ulQLen = 0;
-        var len = 0;
-        var glb = JSON.stringify(Object.keys(GlobalProgress));
+        var glb = Object.keys(GlobalProgress);
         var pausedNum = opts.dlg[blk].paused.length;// Number of paused items
 
-        if (glb) {
+        if (glb.length) {
             qLen = glb.length;
-            ulQLen = glb.match(/ul_/g).length;
-            len = blk === 'dl' ? qLen - ulQLen : ulQLen;
+            var tmp = glb.match(/ul_/g);
+
+            if (tmp) {
+                ulQLen = tmp.length;
+            }
+
+            dlQLen = ulQLen ? qLen - ulQlen : qLen;
         }
 
-        if (pausedNum && pausedNum === len) {// Update TPP
+        if (pausedNum && pausedNum === qLen) {// Update TPP
             item = queue[0];
             name = item.zipid ? item.zipname : item.n;
+            index = getIndex(blk) + 1;
+            total = getTotal(blk);
 
-            index = getIndex(blk);
-            // if (index < getTotal(blk)) {
-            //     setIndex(1, blk);// Increment current index
-            // }
+            if (index > getTotal(blk)) {
+                index = total;
+            }
 
             opts.dlg[blk].$.crr.text(index);
             opts.dlg[blk].$.stxt.text('');
@@ -350,15 +359,9 @@ mega.ui.tpp = function () {
 
         var index = getIndex(blk);
         var len = getTotal(blk).toString();
-        // var index = (getIndex(blk) - getPaused(blk)).toString();
-        var woPaused = index - getPaused(blk);
         var perc = getProgress(blk).toString();
         var avgSpeed = getAvgSpeed(blk);
         var speed;
-
-        if (woPaused > 0) {
-            index = woPaused.toString();
-        }
 
         speed = numOfBytes(avgSpeed, 1);
         opts.dlg[blk].$.prg.css('width', perc + '%');
@@ -443,8 +446,9 @@ mega.ui.tpp = function () {
      * @param {String} bl i.e. ['dl', 'ul'] download or upload
      */
     var start = function start(queue, bl) {
-        setIndex(1, bl);
-        if (getIndex(bl) === 1) {
+        // setIndex(1, bl);
+        if (!getIndex(bl)) {
+            setIndex(1, bl);
             _init(queue, bl);
             showBlock(bl);
             show();

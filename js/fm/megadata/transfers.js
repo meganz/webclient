@@ -142,7 +142,7 @@ MegaData.prototype.addDownload = function(n, z, preview) {
     var args = toArray.apply(null, arguments);
 
     mega.ui.tpp.started('dl');
-    
+
     // fetch all nodes needed by M.getNodesSync
     dbfetch.coll(n)
         .always(function() {
@@ -584,6 +584,7 @@ MegaData.prototype.dlcomplete = function(dl) {
     }
 
     delay('tfscomplete', function() {
+        mega.ui.tpp.setIndex(1, 'dl');
         M.resetUploadDownload();
         $.tresizer();
     });
@@ -1254,6 +1255,7 @@ MegaData.prototype.ulcomplete = function(ul, h, k) {
     }
     // $.transferHeader();
     delay('tfscomplete', function() {
+        mega.ui.tpp.setIndex(1, 'ul');
         M.resetUploadDownload();
         $.tresizer();
     });

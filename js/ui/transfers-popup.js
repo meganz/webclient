@@ -250,7 +250,7 @@ mega.ui.tpp = function () {
         opts.dlg[blk].$.spd.text(l[1651]);
     };
 
-    var getPaused = function getPaused(blk) {
+    var getPausedNum = function getPausedNum(blk) {
         console.log('tpp.getPaused');
 
         return opts.dlg[blk].paused.length;
@@ -282,7 +282,7 @@ mega.ui.tpp = function () {
         var qLen = 0;
         var ulQLen = 0;
         var glb = Object.keys(GlobalProgress);
-        var pausedNum = opts.dlg[blk].paused.length;// Number of paused items
+        var pausedNum = getPausedNum(blk);// Number of paused items
 
         if (glb.length) {
             qLen = glb.length;

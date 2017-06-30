@@ -584,8 +584,8 @@ MegaData.prototype.dlcomplete = function(dl) {
     }
 
     delay('tfscomplete', function() {
-        mega.ui.tpp.setIndex(1, 'dl');
         M.resetUploadDownload();
+        mega.ui.tpp.setIndex(1, 'dl');
         $.tresizer();
     });
 };
@@ -1255,8 +1255,8 @@ MegaData.prototype.ulcomplete = function(ul, h, k) {
     }
     // $.transferHeader();
     delay('tfscomplete', function() {
-        mega.ui.tpp.setIndex(1, 'ul');
         M.resetUploadDownload();
+        mega.ui.tpp.setIndex(1, 'ul');
         $.tresizer();
     });
 };

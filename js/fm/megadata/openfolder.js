@@ -193,7 +193,7 @@
                 api_req({
                     a: 'fcv',
                     h: this.currentdirid,
-                    v: 1,
+                    v: 2,
                     f: f,
                     d: t,
                     td: n.td,

@@ -690,7 +690,7 @@ var ulmanager = {
             return ulmanager.ulStart(File);
         }
         else if (M.h[uq.hash]) {
-            n = mNode || M.d[M.h[uq.hash].first];
+            n = mNode || M.d[M.h[uq.hash].substr(0, 8)];
             // identical = n;
         }
         if (!n) {
@@ -815,7 +815,7 @@ var ulmanager = {
             promises.push(dbfetch.get(aFile.target, new MegaPromise()));
         }
 
-        if (!M.h[hash] || !M.d[M.h[hash].first]) {
+        if (!M.h[hash] || !M.d[M.h[hash].substr(0, 8)]) {
             promises.push(
                 dbfetch.hash(aFile.hash)
                     .always(function(node) {

@@ -199,7 +199,7 @@ var BrowserEntries = React.createClass({
             this.props.onHighlighted([node.h]);
         }
         // If folder selected
-        if (this.props.folderSelectNotAllowed === true && node.t === 1) {
+        if (this.props.folderSelectNotAllowed === true && node.t) {
             this.setState({'selected': []});
             this.props.onSelected([]);
         } else {
@@ -213,7 +213,7 @@ var BrowserEntries = React.createClass({
         e.stopPropagation();
         e.preventDefault();
 
-        if (node.t === 1) {
+        if (node.t) {
             // expand folder
             self.setState({'selected': [], 'highlighted': []});
             self.props.onSelected([]);
@@ -243,7 +243,7 @@ var BrowserEntries = React.createClass({
                 return;
             }
 
-            var isFolder = node.t === 1;
+            var isFolder = node.t;
             var isHighlighted = self.state.highlighted.indexOf(node.h) !== -1;
 
             var tooltipElement = null;
@@ -453,7 +453,7 @@ var CloudBrowserDialog = React.createClass({
     },
     render: function() {
         var self = this;
-	
+
 	// TODO: @lp show a 'loading' in place of the "empty folder" placeholder while dbfetch'ing nodes
         var entries = self.state.entries || self.getEntries();
 

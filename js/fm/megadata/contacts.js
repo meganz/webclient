@@ -508,23 +508,6 @@ MegaData.prototype.getContacts = function(n) {
     return folders;
 };
 
-MegaData.prototype.getContactByEmail = function(email) {
-    var self = this;
-
-    var found = false;
-
-    self.u.forEach(function(v, k) {
-        if (v.t == 1 && v.name && v.m == email) {
-            found = v;
-            // break
-            return false;
-        }
-    });
-
-    return found;
-};
-
-
 MegaData.prototype.syncUsersFullname = function(userId) {
     var self = this;
 

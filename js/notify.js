@@ -973,7 +973,7 @@ var notify = {
             }
 
             // If folder, increment
-            if (nodes[node].t == 1) {
+            if (nodes[node].t) {
                 folderCount++;
             }
             else {

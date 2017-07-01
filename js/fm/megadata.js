@@ -165,6 +165,13 @@ function MegaData() {
             this[tf[i]] = dummy;
         }
     }
+
+    /** @name M.IS_TREE */
+    /** @name M.IS_FAV */
+    /** @name M.IS_LINKED */
+    /** @name M.IS_SHARED */
+    /** @name M.IS_TAKENDOWN */
+    makeEnum(['TREE', 'FAV', 'LINKED', 'SHARED', 'TAKENDOWN'], 'IS_', this);
 }
 
 MegaData.prototype = new MegaUtils();

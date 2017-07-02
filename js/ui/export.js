@@ -1960,7 +1960,7 @@ var exportExpiry = {
         for (var i = nodes.length; i--;) {
             var node = nodes[i];
 
-            if (typeof node === 'string') {
+            if (typeof node !== 'object') {
                 node = M.getNodeByHandle(node);
             }
 

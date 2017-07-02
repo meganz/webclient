@@ -37,7 +37,6 @@
         var cs;
         var sm;
         var fid;
-        var sub;
         var html;
         var nodeName;
         var sharedFolder;
@@ -51,31 +50,23 @@
                 return M.compareStrings(a.name, b.name, 1);
             });
 
-            for (var i in folders) {
+            for (var i = 0; i < folders.length; i++) {
                 cs = '';
                 sm = '';
-                sub = false;
                 fid = folders[i].h;
 
                 if (this.tree[fid]) {
-                    sub = true;
                     cs = ' contains-submenu';
                     sm = '<span class="dropdown body submenu" id="sm_' + fid + '">'
                         + '<span id="csb_' + fid + '"></span>' + arrow + '</span>';
                 }
 
                 sharedFolder = 'folder-item';
-                // TODO: fixme
-                if (Object(this.d[fid]).shares) {
+                if (folders[i].t & M.IS_SHARED) {
                     sharedFolder += ' shared-folder-item';
                 }
 
-                if (missingkeys[fid]) {
-                    nodeName = l[8686];
-                }
-                else {
-                    nodeName = folders[i].name;
-                }
+                nodeName = missingkeys[fid] ? l[8686] : folders[i].name;
 
                 html = '<span class="dropdown-item ' + sharedFolder + cs + '" id="fi_' + fid + '">'
                     + '<i class="small-icon context ' + sharedFolder + '"></i>'

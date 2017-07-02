@@ -1721,6 +1721,12 @@ MegaData.prototype.nodeShare = function(h, s, ignoreDB) {
         }
         this.d[h].shares[s.u] = s;
 
+        // Maintain special outgoing shares index by user
+        if (!this.su[s.u]) {
+            this.su[s.u] = Object.create(null);
+        }
+        this.su[s.u][h] = 1;
+
         if (this.d[h].t) {
             // update tree node flags
             ufsc.addTreeNode(this.d[h]);
@@ -1748,12 +1754,6 @@ MegaData.prototype.nodeShare = function(h, s, ignoreDB) {
         if (fminitialized) {
             sharedUInode(h);
         }
-
-        // maintain special outgoing shares index by user:
-        if (!this.su[s.u]) {
-            this.su[s.u] = Object.create(null);
-        }
-        this.su[s.u][h] = 1;
     }
     else if (d) {
         console.warn('nodeShare failed for node:', h, s, ignoreDB);

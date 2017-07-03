@@ -670,9 +670,7 @@ function initAddDialogMultiInputPlugin() {
 
     $this.tokenInput(contacts, {
         theme: 'mega',
-        hintText: l[5908],
-        //hintText: '',
-        //placeholder: 'Type in an email or contact',
+        placeholder: l[16528],// Enter an email or MEGA contact name
         searchingText: '',
         noResultsText: '',
         addAvatar: true,
@@ -844,7 +842,6 @@ function contactAddDialog() {
         var $tokenInput = $('#token-input-');
 
         $tokenInput
-            .val('')
             .focus();
     }
 
@@ -931,6 +928,7 @@ function contactAddDialog() {
             topPopupAlign(this, '.add-user-popup');
 
             initTextareaScrolling($('.add-user-textarea textarea'), 39);
+            $('.add-user-popup .token-input-input-token-mega input').focus();
             focusOnInput();
         }
 
@@ -2675,8 +2673,7 @@ function initShareDialogMultiInputPlugin() {
 
         $input.tokenInput(contacts, {
             theme: "mega",
-            hintText: l[5908],
-            // placeholder: "Type in an email or contact",
+            placeholder: l[16528],// Enter an email or MEGA contact name
             searchingText: "",
             noResultsText: "",
             addAvatar: true,

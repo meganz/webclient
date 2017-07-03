@@ -8375,20 +8375,6 @@ color: white;
     top: 4px;
     background-repeat: no-repeat;
 }
-.create-folder-input-bl input::-webkit-input-placeholder, .add-user-popup-input-bl input::-webkit-input-placeholder {
- color:rgba(255,255,255,0.5);
-}
-.create-folder-input-bl input:-moz-placeholder, .add-user-popup-input-bl input:-moz-placeholder {
- color:rgba(255,255,255,0.5);
- opacity: 1;
-}
-.create-folder-input-bl input::-moz-placeholder, .add-user-popup-input-bl input::-moz-placeholder {
- color:rgba(255,255,255,0.5);
- opacity: 1;
-}
-.create-folder-input-bl input:-ms-input-placeholder, .add-user-popup-input-bl input:-ms-input-placeholder {
- color:rgba(255,255,255,0.5);
-}
 .fm-account-input {
     margin: 20px 0 0 0;
 }
@@ -17996,15 +17982,22 @@ ul.token-input-list-mega {
 }
 ul.token-input-list-mega li input, .multiple-input input {
     border: 0;
-    width: 100px;
+    width: auto !important;
+    min-width: 100%;
     padding: 0;
     background-color: transparent;
     font-size: 13px;
     line-height: 18px;
     margin: 0;
-    padding: 6px 3px 4px 3px;
+    padding: 7px 3px 3px 3px;
     -webkit-appearance: caret;
     font-family: 'source_sans_proregular', Arial;
+}
+input#token-input- {
+    color: #999999;
+}
+input#token-input-:focus {
+    color: #EEEEEE;
 }
 li.token-input-token-mega {
     overflow: hidden;
@@ -18077,8 +18070,39 @@ li.token-input-input-token-mega {
     list-style-type: none;
     max-width: 100%;
 }
-li.token-input-input-token-mega input {
-    max-width: 100%;
+li.token-input-input-token-mega:first-child {
+    min-width: 100%;
+}
+.active li.token-input-input-token-mega:first-child {
+    min-width: none;
+}
+.multiple-input input::-webkit-input-placeholder, .create-folder-input-bl input::-webkit-input-placeholder{
+color: #999999 !important;
+}
+.multiple-input input:-moz-placeholder, .create-folder-input-bl input:-moz-placeholder {
+color: #999999 !important;
+ opacity: 1;
+}
+.multiple-input input::-moz-placeholder, .create-folder-input-bl input::-moz-placeholder {
+color: #999999 !important;
+ opacity: 1;
+}
+.multiple-input input:-ms-input-placeholder, .create-folder-input-bl input:-ms-input-placeholder {
+color: #999999 !important;
+}
+.active .multiple-input input::-webkit-input-placeholder, .focused .create-folder-input-bl input::-webkit-input-placeholder, .error .multiple-input input::-webkit-input-placeholder {
+color: rgba(255,255,255,0.9) !important;
+}
+.active .multiple-input input:-moz-placeholder, .focused .create-folder-input-bl input:-moz-placeholder, .error .multiple-input input:-moz-placeholder {
+color: rgba(255,255,255,0.9) !important;
+ opacity: 1;
+}
+.active .multiple-input input::-moz-placeholder, .focused .create-folder-input-bl input::-moz-placeholder, .error .multiple-input input::-moz-placeholder {
+color: rgba(255,255,255,0.9) !important;
+ opacity: 1;
+}
+.active .multiple-input input:-ms-input-placeholder, .focused .create-folder-input-bl input:-ms-input-placeholder, .error .multiple-input input:-ms-input-placeholder {
+color: rgba(255,255,255,0.9) !important;
 }
 div.token-input-dropdown-mega {
     position: absolute;
@@ -18335,6 +18359,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
 }
 .active ul.token-input-list-mega li input, .multiple-input:hover ul.token-input-list-mega li input {
     color: white;
+    min-width: none;
 }
 .import-contacts-link {
     line-height: 24px;

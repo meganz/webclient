@@ -277,31 +277,34 @@ mega.ui.tpp = function () {
     var statusPaused = function statusPaused(queue, blk) {
         console.log('tpp.statusPaused');
         var index = 0;
+        var total = 0;
         var name = '';
         var item = {};
         var qLen = 0;
+        var len = 0;
         var ulQLen = 0;
+        var dlQLen = 0;
         var glb = Object.keys(GlobalProgress);
         var pausedNum = getPausedNum(blk);// Number of paused items
 
         if (glb.length) {
-            qLen = glb.length;
-            var tmp = glb.match(/ul_/g);
+            qLen = glb.length;// Total dl/ul items in queue
+            var tmp = JSON.stringify(glb).match(/ul_/g);
 
             if (tmp) {
-                ulQLen = tmp.length;
+                ulQLen = tmp.length;// Number of uploading items
             }
-
-            dlQLen = ulQLen ? qLen - ulQlen : qLen;
+            dlQLen = qLen - ulQLen;
+            len = blk === 'dl' ? dlQLen : ulQLen;
         }
 
-        if (pausedNum && pausedNum === qLen) {// Update TPP
+        if (pausedNum && pausedNum === len) {// Update TPP
             item = queue[0];
             name = item.zipid ? item.zipname : item.n;
             index = getIndex(blk) + 1;
             total = getTotal(blk);
 
-            if (index > getTotal(blk)) {
+            if (index > total) {
                 index = total;
             }
 
@@ -443,14 +446,16 @@ mega.ui.tpp = function () {
     /**
      * Show tpp popup and dl/ul block
      * @param {Object} queue Download or upload queue
-     * @param {String} bl i.e. ['dl', 'ul'] download or upload
+     * @param {String} blk i.e. ['dl', 'ul'] download or upload
      */
-    var start = function start(queue, bl) {
-        // setIndex(1, bl);
-        if (!getIndex(bl)) {
-            setIndex(1, bl);
-            _init(queue, bl);
-            showBlock(bl);
+    var start = function start(queue, blk) {
+        if (!getIndex(blk)) {
+            setIndex(1, blk);
+        }
+
+        if (getIndex(blk) === 1) {
+            _init(queue, blk);
+            showBlock(blk);
             show();
         }
     };

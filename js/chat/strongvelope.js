@@ -80,6 +80,9 @@ var strongvelope = {};
     /** Size (in bytes) of the user handle. */
     strongvelope.USER_HANDLE_SIZE = 8;
     var USER_HANDLE_SIZE = strongvelope.USER_HANDLE_SIZE;
+
+    /** Map of derived shared keys. */
+    var DERIVED_SHARED_KEYS = {};
     /**
      * "Enumeration" of TLV types used for the chat message transport container.
      *
@@ -903,11 +906,16 @@ var strongvelope = {};
             logger.error('No cached chat key for user: ' + userhandle);
             throw new Error('No cached chat key for user!');
         }
-        var sharedSecret = nacl.scalarMult(
-            asmCrypto.string_to_bytes(this.myPrivCu25519),
-            asmCrypto.string_to_bytes(pubKey));
 
-        return strongvelope.deriveSharedKey(sharedSecret);
+        if (!DERIVED_SHARED_KEYS[userhandle]) {
+            var sharedSecret = nacl.scalarMult(
+                    asmCrypto.string_to_bytes(this.myPrivCu25519),
+                    asmCrypto.string_to_bytes(pubKey)
+                );
+            DERIVED_SHARED_KEYS[userhandle] = strongvelope.deriveSharedKey(sharedSecret);
+        }
+
+        return DERIVED_SHARED_KEYS[userhandle];
     };
 
 
@@ -958,34 +966,6 @@ var strongvelope = {};
 
         var result = asmCrypto.bytes_to_string(cipherBytes);
         return result;
-    };
-    /**
-     * Derives a symmetric key for encrypting a message to a contact.  It is
-     * derived using a Curve25519 key agreement.
-     *
-     * Note: The Curve25519 key cache must already contain the public key of
-     *       the recipient.
-     *
-     * @method
-     * @param userhandle {String}
-     *     Mega user handle for user to send to or receive from.
-     * @return {String}
-     *     Binary string containing a 256 bit symmetric encryption key.
-     * @private
-     */
-    strongvelope.ProtocolHandler.prototype._computeSymmetricKey = function(userhandle) {
-
-        var pubKey = pubCu25519[userhandle];
-        if (!pubKey) {
-            logger.critical('No cached chat key for user!');
-            logger.error('No cached chat key for user: ' + userhandle);
-            throw new Error('No cached chat key for user!');
-        }
-        var sharedSecret = nacl.scalarMult(
-            asmCrypto.string_to_bytes(this.myPrivCu25519),
-            asmCrypto.string_to_bytes(pubKey));
-
-        return strongvelope.deriveSharedKey(sharedSecret);
     };
 
     /**

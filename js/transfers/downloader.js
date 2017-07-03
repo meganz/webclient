@@ -101,7 +101,7 @@ ClassChunk.prototype.abort = function() {
         this.xhr.abort(this.xhr.ABORT_CLEANUP);
     }
     if (this.Progress) {
-        removeValue(this.Progress.working, this, 1);
+        array.remove(this.Progress.working, this, 1);
     }
     delete this.xhr;
 };

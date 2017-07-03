@@ -539,3 +539,35 @@
 .default-white-button.small-square-button i {
     margin: 3px 0 0 0;
 }
+.default-56px-button {
+    display: block;
+    font-size: 18px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    line-height: 55px;
+    color: white;
+    padding: 0 15px;
+    min-width: 203px;
+    height: 56px;
+    text-align: center;
+    cursor: pointer;
+    background-color: rgba(255,51,58,0.8);
+    position: relative;
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    white-space: nowrap;
+}
+.default-56px-button:not(.disabled):hover {
+    background-color: rgba(255,51,58,1);
+}
+.default-56px-button i {
+    margin: 14px 10px 0 0;
+    vertical-align: top;
+}

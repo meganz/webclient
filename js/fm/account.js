@@ -828,6 +828,8 @@ function accountUI() {
                         }
                         else { // success
                             msgDialog('info', l[726], l[725], false, function() {
+                               	var pw_aes = new sjcl.cipher.aes(prepare_key_pw($('#account-confirm-password').val()));
+                            	u_attr.k = a32_to_base64(encrypt_key(pw_aes, u_k));
                                 $passwords.val('');
                             });
                         }

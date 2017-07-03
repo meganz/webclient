@@ -391,7 +391,7 @@
         var fileNodes = [];
 
         $.each(nodes, function(k, v) {
-            if (v.t == 1) {
+            if (v.t) {
                 dirNodes.push(v);
             } else {
                 fileNodes.push(v);

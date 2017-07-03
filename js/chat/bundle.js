@@ -43,15 +43,15 @@ React.makeElement = React['createElement'];
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	__webpack_require__(1);
 	module.exports = __webpack_require__(4);
 
 
-/***/ },
+/***/ }),
 /* 1 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -1240,7 +1240,7 @@ React.makeElement = React['createElement'];
 	            timeout: timeout ? timeout : 10000
 	        }).done(function (r) {
 	            if (r.xmpp && r.xmpp.length > 0) {
-	                var randomHost = array_random(r.xmpp);
+	                var randomHost = array.random(r.xmpp);
 	                if (webSocketsSupport) {
 	                    $promise.resolve("wss://" + randomHost.host + "/ws");
 	                } else {
@@ -1250,7 +1250,7 @@ React.makeElement = React['createElement'];
 	                self.logger.error("GeLB returned no results. Halting.");
 	                $promise.reject();
 	            } else {
-	                var server = array_random(self.options.fallbackXmppServers);
+	                var server = array.random(self.options.fallbackXmppServers);
 	                self.logger.error("Got empty list from the load balancing service for xmpp, will fallback to: " + server + ".");
 	                if (webSocketsSupport) {
 	                    server = server.replace("https:", "wss:").replace("/bosh", "/ws");
@@ -1258,7 +1258,7 @@ React.makeElement = React['createElement'];
 	                $promise.resolve(server);
 	            }
 	        }).fail(function () {
-	            var server = array_random(self.options.fallbackXmppServers);
+	            var server = array.random(self.options.fallbackXmppServers);
 	            self.logger.error("Could not connect to load balancing service for xmpp, will fallback to: " + server + ".");
 
 	            if (webSocketsSupport) {
@@ -1437,21 +1437,21 @@ React.makeElement = React['createElement'];
 	    chatui: chatui
 	};
 
-/***/ },
+/***/ }),
 /* 2 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	module.exports = React;
 
-/***/ },
+/***/ }),
 /* 3 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	module.exports = ReactDOM;
 
-/***/ },
+/***/ }),
 /* 4 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -2008,13 +2008,13 @@ React.makeElement = React['createElement'];
 	    ConversationsApp: ConversationsApp
 	};
 
-/***/ },
+/***/ }),
 /* 5 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
@@ -2251,9 +2251,9 @@ React.makeElement = React['createElement'];
 	    EmojiFormattedContent: EmojiFormattedContent
 	};
 
-/***/ },
+/***/ }),
 /* 6 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var ReactDOM = __webpack_require__(3);
 
@@ -2792,9 +2792,9 @@ React.makeElement = React['createElement'];
 	};
 
 
-/***/ },
+/***/ }),
 /* 7 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -3027,9 +3027,9 @@ React.makeElement = React['createElement'];
 	    PerfectScrollbar: PerfectScrollbar
 	};
 
-/***/ },
+/***/ }),
 /* 8 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -3207,9 +3207,9 @@ React.makeElement = React['createElement'];
 	    Button: Button
 	};
 
-/***/ },
+/***/ }),
 /* 9 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -3505,9 +3505,9 @@ React.makeElement = React['createElement'];
 	    DropdownContactsSelector: DropdownContactsSelector
 	};
 
-/***/ },
+/***/ }),
 /* 10 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -3678,7 +3678,7 @@ React.makeElement = React['createElement'];
 	        var self = this;
 
 	        var foundKeys = Object.keys(self.props);
-	        removeValue(foundKeys, 'dropdowns', true);
+	        array.remove(foundKeys, 'dropdowns', true);
 
 	        var shouldUpdate = undefined;
 	        foundKeys.forEach(function (k) {
@@ -3936,7 +3936,7 @@ React.makeElement = React['createElement'];
 	                                self.props.onSelected(selected);
 	                            }
 	                        } else {
-	                            removeValue(selected, contactHash);
+	                            array.remove(selected, contactHash);
 	                            if (self.props.onSelected) {
 	                                self.props.onSelected(selected);
 	                            }
@@ -4011,9 +4011,9 @@ React.makeElement = React['createElement'];
 	    ContactPresence: ContactPresence
 	};
 
-/***/ },
+/***/ }),
 /* 11 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -4140,7 +4140,7 @@ React.makeElement = React['createElement'];
 	        if (room.isReadOnly()) {}
 	        var excludedParticipants = room.type === "group" ? room.members && Object.keys(room.members).length > 0 ? Object.keys(room.members) : room.getContactParticipants() : room.getContactParticipants();
 
-	        removeValue(excludedParticipants, u_handle, false);
+	        array.remove(excludedParticipants, u_handle, false);
 
 	        var dontShowTruncateButton = false;
 	        if (myPresence === 'offline' || !room.iAmOperator() || room.isReadOnly() || room.messagesBuff.messages.length === 0 || room.messagesBuff.messages.length === 1 && room.messagesBuff.messages.getItem(0).dialogType === "truncated") {
@@ -5915,9 +5915,9 @@ React.makeElement = React['createElement'];
 	    ConversationPanels: ConversationPanels
 	};
 
-/***/ },
+/***/ }),
 /* 12 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -6128,7 +6128,7 @@ React.makeElement = React['createElement'];
 	            this.props.onHighlighted([node.h]);
 	        }
 
-	        if (this.props.folderSelectNotAllowed === true && node.t === 1) {
+	        if (this.props.folderSelectNotAllowed === true && node.t) {
 	            this.setState({ 'selected': [] });
 	            this.props.onSelected([]);
 	        } else {
@@ -6142,7 +6142,7 @@ React.makeElement = React['createElement'];
 	        e.stopPropagation();
 	        e.preventDefault();
 
-	        if (node.t === 1) {
+	        if (node.t) {
 
 	            self.setState({ 'selected': [], 'highlighted': [] });
 	            self.props.onSelected([]);
@@ -6171,7 +6171,7 @@ React.makeElement = React['createElement'];
 	                return;
 	            }
 
-	            var isFolder = node.t === 1;
+	            var isFolder = node.t;
 	            var isHighlighted = self.state.highlighted.indexOf(node.h) !== -1;
 
 	            var tooltipElement = null;
@@ -6742,9 +6742,9 @@ React.makeElement = React['createElement'];
 	    ExtraFooterElement: ExtraFooterElement
 	};
 
-/***/ },
+/***/ }),
 /* 13 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -6939,9 +6939,9 @@ React.makeElement = React['createElement'];
 	    Contents: Contents
 	};
 
-/***/ },
+/***/ }),
 /* 14 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -7008,9 +7008,9 @@ React.makeElement = React['createElement'];
 	    Checkbox: Checkbox
 	};
 
-/***/ },
+/***/ }),
 /* 15 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -7612,9 +7612,9 @@ React.makeElement = React['createElement'];
 	    TypingArea: TypingArea
 	};
 
-/***/ },
+/***/ }),
 /* 16 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -8116,9 +8116,9 @@ React.makeElement = React['createElement'];
 	    DropdownEmojiSelector: DropdownEmojiSelector
 	};
 
-/***/ },
+/***/ }),
 /* 17 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -8242,9 +8242,9 @@ React.makeElement = React['createElement'];
 	    WhosTyping: WhosTyping
 	};
 
-/***/ },
+/***/ }),
 /* 18 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -8278,9 +8278,9 @@ React.makeElement = React['createElement'];
 	    getMessageString: getMessageString
 	};
 
-/***/ },
+/***/ }),
 /* 19 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -8438,7 +8438,7 @@ React.makeElement = React['createElement'];
 
 	        contacts = room.type === "group" ? room.members && Object.keys(room.members).length > 0 ? Object.keys(room.members) : room.getContactParticipantsExceptMe() : room.getContactParticipantsExceptMe();
 
-	        removeValue(contacts, u_handle, true);
+	        array.remove(contacts, u_handle, true);
 
 	        var firstVisibleUserNum = Math.floor(self.props.scrollPositionY / self.props.contactCardHeight);
 	        var visibleUsers = Math.ceil(self.props.scrollHeight / self.props.contactCardHeight);
@@ -8558,9 +8558,9 @@ React.makeElement = React['createElement'];
 	    ParticipantsList: ParticipantsList
 	};
 
-/***/ },
+/***/ }),
 /* 20 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -9508,9 +9508,9 @@ React.makeElement = React['createElement'];
 	    GenericConversationMessage: GenericConversationMessage
 	};
 
-/***/ },
+/***/ }),
 /* 21 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -9618,9 +9618,9 @@ React.makeElement = React['createElement'];
 	    ConversationMessageMixin: ConversationMessageMixin
 	};
 
-/***/ },
+/***/ }),
 /* 22 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -9741,9 +9741,9 @@ React.makeElement = React['createElement'];
 	    AlterParticipantsConversationMessage: AlterParticipantsConversationMessage
 	};
 
-/***/ },
+/***/ }),
 /* 23 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -9830,9 +9830,9 @@ React.makeElement = React['createElement'];
 	    TruncatedMessage: TruncatedMessage
 	};
 
-/***/ },
+/***/ }),
 /* 24 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -9925,9 +9925,9 @@ React.makeElement = React['createElement'];
 	    PrivilegeChange: PrivilegeChange
 	};
 
-/***/ },
+/***/ }),
 /* 25 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -10006,9 +10006,9 @@ React.makeElement = React['createElement'];
 	    TopicChange: TopicChange
 	};
 
-/***/ },
+/***/ }),
 /* 26 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 
@@ -10760,10 +10760,12 @@ React.makeElement = React['createElement'];
 	    $.each(ids, function (k, nodeId) {
 
 	        var node = M.d[nodeId];
+	        var name = M.getNameByHandle(node.u);
+
 	        nodesMeta.push({
 	            'u': node.u,
 	            'email': node.m,
-	            'name': node.firstName && node.lastName ? node.firstName + " " + node.lastName : node.m
+	            'name': name || node.m
 	        });
 	    });
 
@@ -10912,9 +10914,9 @@ React.makeElement = React['createElement'];
 	window.ChatRoom = ChatRoom;
 	module.exports = ChatRoom;
 
-/***/ },
+/***/ }),
 /* 27 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -10942,5 +10944,5 @@ React.makeElement = React['createElement'];
 	    }
 	};
 
-/***/ }
+/***/ })
 /******/ ]);

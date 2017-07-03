@@ -1077,10 +1077,12 @@ ChatRoom.prototype.attachContacts = function(ids) {
     $.each(ids, function(k, nodeId) {
         // TODO: @lp this should be M.u instead of M.d ?
         var node = M.d[nodeId];
+        var name = M.getNameByHandle(node.u);
+
         nodesMeta.push({
             'u': node.u,
             'email': node.m,
-            'name': node.firstName && node.lastName ? node.firstName + " " + node.lastName : node.m
+            'name': name || node.m
         });
     });
 

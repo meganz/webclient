@@ -155,6 +155,7 @@ var sccount = 0;                         // number of actionpackets processed at
 var scfetches = Object.create(null);     // holds pending nodes to be retrieved from fmdb
 var scwaitnodes = Object.create(null);   // supplements scfetches per scqi index
 var nodesinflight = Object.create(null); // number of nodes being processed in the worker for scqi
+var sc_history = [];                     // array holding the history of action-packets
 
 // enqueue nodes needed to process packets
 function sc_fqueue(handle, packet) {
@@ -192,9 +193,11 @@ function sc_fqueuet(scni, packet) {
                 console.error('sc_fqueuet: invalid packet!');
             }
             else {
+                if (d > 1) {
+                    console.debug('sc_fqueuet', scni, packet, clone(scnodes));
+                }
                 for (var i = scnodes.length; i--;) {
-                    result += sc_fqueue(scnodes[i].h, packet);
-                    // result += sc_fqueue(scnodes[i].p, packet);
+                    result += sc_fqueue(scnodes[i].p, packet);
                 }
             }
         }
@@ -237,7 +240,7 @@ function sc_fetcher() {
             $.scFetcherRunning = false;
         }
         else {
-            dbfetch.coll(bunch, new MegaPromise())
+            dbfetch.geta(bunch, new MegaPromise())
                 .always(function() {
                     for (var i = bunch.length; i--;) {
                         var h = bunch[i];
@@ -269,19 +272,17 @@ function sc_packet(a) {
         console.debug('sc_packet', loadfm.fromapi, scloadtnodes, a.a, a);
     }
 
+    // record history
+    if (sc_history) {
+        sc_history.push(a.a);
+    }
+
     // check if this packet needs nodes to be present,
     // unless `fromapi` where nodes are placed in memory already as received.
     if (!loadfm.fromapi) {
         var inflight = $.len(scfetches);
 
-        if (a.a === 's' || a.a === 's2') {
-            // inbound share for which we will receive the 't'ree next
-            // scloadtnodes = a.o && a.o !== u_handle && a.r !== undefined;
-            scloadtnodes = true;
-        }
-        else if (a.a !== 't') {
-            scloadtnodes = false;
-        }
+        scloadtnodes = true;
 
         switch (a.a) {
             case 's':
@@ -767,6 +768,9 @@ scparser.$add('t', function(a, scnodes) {
     }
     if (M.d[rootNode.h]) {
         // skip repetitive notification of (share) nodes
+        if (d) {
+            console.debug('skipping repetitive notification of (share) nodes');
+        }
         return;
     }
 
@@ -1510,9 +1514,13 @@ function emplacenode(node, noc) {
 
         if (node.hash) {
             if (!M.h[node.hash]) {
-                M.h[node.hash] = Hash();
+                M.h[node.hash] = node.h + ' ';
             }
-            M.h[node.hash][node.h] = 1;
+            else {
+                if (M.h[node.hash].indexOf(node.h) < 0) {
+                    M.h[node.hash] += node.h + ' ';
+                }
+            }
         }
     }
     else if (node.t > 1 && node.t < 5) {
@@ -1720,6 +1728,11 @@ function worker_procmsg(ev) {
 var fmdb;
 var ufsc;
 
+mBroadcaster.once('startMega', function() {
+    // Initialize ufs size cache
+    ufsc = new UFSSizeCache();
+});
+
 function loadfm(force) {
     "use strict";
 
@@ -1756,19 +1769,19 @@ function loadfm(force) {
             else {
                 fmdb = FMDB(u_handle, {
                     // channel 0: transactional by _sn update
-                    f   : '&h, p, s, c',    // nodes - handle, parent, size (negative size: type), checksum
-                    s   : '&o_t',           // shares - origin/target; both incoming & outgoing
-                    ok  : '&h',             // ownerkeys for outgoing shares - handle
-                    mk  : '&h',             // missing node keys - handle
-                    u   : '&u',             // users - handle
-                    ph  : '&h',             // exported links - handle
-                    fld : '&h',             // folders - handle
-                    opc : '&p',             // outgoing pending contact - id
-                    ipc : '&p',             // incoming pending contact - id
-                    ps  : '&h_p',           // pending share - handle/id
-                    mcf : '&id',            // chats - id
-                    ua  : '&k',             // user attributes - key (maintained by IndexedBKVStorage)
-                    _sn : '&i',             // sn - fixed index 1
+                    f      : '&h, p, s, c',    // nodes - handle, parent, size (negative size: type), checksum
+                    s      : '&o_t',           // shares - origin/target; both incoming & outgoing
+                    ok     : '&h',             // ownerkeys for outgoing shares - handle
+                    mk     : '&h',             // missing node keys - handle
+                    u      : '&u',             // users - handle
+                    ph     : '&h',             // exported links - handle
+                    tree   : '&h',             // tree folders - handle
+                    opc    : '&p',             // outgoing pending contact - id
+                    ipc    : '&p',             // incoming pending contact - id
+                    ps     : '&h_p',           // pending share - handle/id
+                    mcf    : '&id',            // chats - id
+                    ua     : '&k',             // user attributes - key (maintained by IndexedBKVStorage)
+                    _sn    : '&i',             // sn - fixed index 1
 
                     // channel 1: non-transactional (maintained by IndexedDBKVStorage)
                     chatqueuedmsgs : '&k', // queued chat messages - k
@@ -1790,9 +1803,6 @@ function fetchfm(sn) {
     // we always intially fetch historical actionpactions
     // before showing the filemanager
     initialscfetch = true;
-
-    // ufs size cache
-    ufsc = new UFSSizeCache();
 
     var promise;
     if (is_mobile) {
@@ -1888,7 +1898,7 @@ function dbfetchfm() {
                             opc: processOPC,
                             ipc: processIPC,
                             ps: processPS,
-                            fld: function(r) {
+                            tree: function(r) {
                                 for (var i = r.length; i--;) {
                                     ufsc.addTreeNode(r[i], true);
                                 }
@@ -1921,7 +1931,11 @@ function dbfetchfm() {
 
                             if (!mBroadcaster.crossTab.master) {
                                 // on a secondary tab, prevent writing to DB once we have read its contents
-                                fmdb.crashed = 'slave';
+                                // XXX: TypeError: Cannot create property 'crashed' on boolean 'false'
+                                // ^^^ how does `fmdb` get set to `false` here ?! :-/
+                                if (fmdb) {
+                                    fmdb.crashed = 'slave';
+                                }
                             }
 
                             // fetch & process new actionpackets
@@ -2833,6 +2847,7 @@ function loadfm_callback(res) {
         // commit transaction and set sn
         setsn(res.sn);
         currsn = res.sn;
+        mega.fcv_fsn = res.sn;
 
         if (res.cr) {
             crypto_procmcr(res.cr);
@@ -3000,7 +3015,7 @@ function loadfm_done(mDBload) {
             // fetch second-level and tree nodes (to show the little arrows in the tree)
             var folders = loadfm.onDemandFolders;
             if (fmconfig.treenodes) {
-                folders = array_unique(folders.concat(Object.keys(fmconfig.treenodes)));
+                folders = array.unique(folders.concat(Object.keys(fmconfig.treenodes)));
             }
 
             for (var i = folders.length; i--;) {

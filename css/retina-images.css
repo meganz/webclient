@@ -34,25 +34,9 @@ body.pro:after {
     background-image: url(../images/mega/slideshow-sprite@2x.png?v=1);
     background-size: 276px auto;
 }
-.sync-top-logo, .sync-short-block li, .sync-help-center {
-    background-image: url(../images/mega/sync-nw-v3@2x.png);
-    background-size: 168px auto;
-}
-.sync-main-img {
-    background-image: url(../images/mega/img_sync_@2x.png);
-    background-size: 700px auto;
-}
 .top-context-close {
     background-image: url(../images/mega/context-top@2x.png);
     background-size: 27px auto;
-}
-.ff-extension-icon, .ff-extension-button {
-    background-image: url(../images/mega/firefox-sprite@2x.png);
-    background-size: 90px auto;
-}
-.download-megasync-dialog .icon {
-    background-image: url(../images/mega/sync-nw-v3@2x.png);
-    background-size: 168px auto;
 }
 .st-green-note {
     background-image: url(../images/mega/en/start-green-note@2x.png);
@@ -328,16 +312,12 @@ body.pro:after {
     background-image: url(../images/mega/download-sprite-v6@2x.png);
     background-size: 257px auto;
 }
-.active.new-start-arrow-button, .st-red-header, .st-quote-left, .st-quote-right, .st-privacy-tool-icon, .st-membership-icon, .st-devices-icon, .st-os-icons, .st-cloud-icon, .st-mobile-apps-icon, .st-member-ship-right-bl, .st-apps-icon {
-    background-image: url(../images/mega/new-start-full1@2x.png);
-    background-size: 930px auto;
-}
 .top-login-full, .top-login-input-block, .top-login-warning-close, .top-login-warning-icon, .top-login-popup .top-login-warning-bott .checkboxOn, .top-login-popup .top-login-warning-bott .checkboxOff, .top-login-tooltip-arrow, .password-tooltip-arrow, .login-register-input, .register-st2-button, .register-st2-button-arrow, .password-status-icon, .login-notification-icon, .top-login-forgot-pass, .login-forgot-password, .checkboxOn::after, .checkboxOff::after, .contains-value .top-clear-button, .account-history-drop-items.active, .account-warning-icon, .warning-gray-icon, .membership-arrow, .small-icon.membership, .dropdown-white-arrow, .dropdown-item.tick-item.active::before, .dropdown-item.do-sort.selected i {
     background-image: url(../images/mega/top-login-sprite_v7@2x.png);
     background-size: 48px auto;
 }
-.reg-success-icon, .reg-st3-save-icon, .reg-st3-membership-icon, .membership-icon, .loginrequired-dialog .fm-notification-icon, .file-status-icon.star, .taken-down .file-status-icon, .taken-down .grid-status-icon, .contact-status-icon.star, .grid-status-icon.star, .linked .data-item-icon, .taken-down .data-item-icon, .toast-icon, .resend-email-button, .reg-st3-storage::before, .reg-st3-bandwidth::before, .pro-icon, .pro-bottom-info-header::before, .toast-close-button, .small-icon.green-arrow, .small-icon.blue-arrow, .fm-dialog-close.small {
-    background-image: url(../images/mega/register-big-sprite-v11@2x.png);
+.reg-success-icon, .reg-st3-save-icon, .file-status-icon.star, .taken-down .file-status-icon, .taken-down .grid-status-icon, .contact-status-icon.star, .grid-status-icon.star, .linked .data-item-icon, .taken-down .data-item-icon, .toast-icon, .resend-email-button, .toast-close-button, .small-icon.green-arrow, .small-icon.blue-arrow, .fm-dialog-close.small {
+    background-image: url(../images/mega/register-big-sprite-v12@2x.png);
     background-size: 200px auto;
 }
 .reg-st5-key-gen, .reg-st5-info-icon {
@@ -359,10 +339,6 @@ body.pro:after {
 .membership-question-mark span, .membership-date, .membership-st2-select span, .membership-payment-icon, .membership-radio-label, .astropay-dialog .powered-by-astropay {
     background-image: url(../images/mega/pro-new-sprite-v8@2x.png);
     background-size: 755px auto;
-}
-.sync-list-txt, .sync-icon, .mobile-icon, .ff-icon, .chrome-icon, .mobile-small-icon, .chrome-bott-icons .ads-top-arrow {
-    background-image: url(../images/mega/mobile-sprite_v7@2x.png);
-    background-size: 836px auto;
 }
 .privacy-company-icon, .privacy-company-bott .st-quote-left, .privacy-company-bott .st-quote-right {
     background-image: url(../images/mega/privacy-sprite@2x.png);
@@ -444,17 +420,9 @@ body.pro:after {
     background-image: url(../images/mega/quota-sprite@2x.png);
     background-size: 240px auto;
 }
-.chrome-app-button, .chrome-app-logo, .chrome-app-scr, .chrome-download-button, a.chrome-download-button {
-    background-image: url(../images/mega/chrome-app_v3@2x.png);
-    background-size: 700px auto;
-}
 .chrome-app-button.new-app, .sync-button, .google-play-button, .ios-button, .ff-bott-button, .blackberry-button, .chrome-app-button, .win-phone-button, .products-top-arrow {
     background-image: url(../images/mega/download-buttons-sprite@2x.png);
     background-size: 530px auto;
-}
-.chrome-download-button:hover, a.chrome-download-button:hover {
-    background-image: url(../images/mega/mobile-sprite_v7@2x.png);
-    background-size: 836px auto;
 }
 .backup-download-block, .recover-upload-block, .backup-notification-icon, .restore-uploading-status-icon, .login-register-input.fail, .reset-account-lock-image, .login-register-input.green-tick {
     background-image: url(../images/mega/encr-sprite@2x_v1.png);
@@ -472,7 +440,7 @@ body.pro:after {
     background-image: url(../images/mega/icons-sprite_v3@2x.png);
     background-size: 262px auto;
 }
-#help2-main .ui-autocomplete .client {
+#help2-main .ui-autocomplete .client, #help2-main .ios-desktop-icon, #help2-main .windows-desktop-icon, #help2-main .linux-desktop-icon, #help2-main .webclient-icon {
     background-image: url(../images/mega/help2/welcome_icons@2x.png);
     background-size: 250px auto;
 }
@@ -487,9 +455,5 @@ body.pro:after {
 .logo, .languages-dialog .show-more-languages .round-arrow span, .top-head .top-icon::before, .notification-txt, .nw-bottom-copyrights, .nw-bottom-social, .top-login-warning-arrow, .main-top-info-text, .new-notification-icon, .feedback-button, .semi-small-icon.grey-mega, .semi-small-icon.yellow-triangle, .tiny-icon.membership-status, .top-menu-item.submenu-item::before, .medium-icon.rocket {
     background-image: url(../images/mega/top-sprite_v2@2x.png);
     background-size: 38px auto;
-}
-.megacmd-logo, .medium-icon.down-arrow, .megacmd-icon {
-    background-image: url(../images/mega/megacmd-sprite@2x.png);
-    background-size: 223px auto;
 }
 }

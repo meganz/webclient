@@ -22,11 +22,6 @@ MegaData.prototype.renderMain = function(aUpdate) {
             this.megaRender.destroy();
         }
         this.megaRender = new MegaRender(this.viewmode);
-
-        // this is a re-render, so lets cleanup the selectionManager, so that
-        // `FileManager.prototype.addSelectDragDropUI` would reinitialise it with the new target container.
-        console.error('destroy selectionManager');
-        selectionManager = false;
     }
 
     // cleanupLayout will render an "empty grid" layout if there

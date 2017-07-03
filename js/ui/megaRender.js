@@ -408,8 +408,6 @@
                 console.time('MegaRender.renderLayout');
             }
 
-            console.error('renderLayout', aUpdate);
-
             if (aNodeList) {
                 this.nodeList = aNodeList;
             }
@@ -456,6 +454,7 @@
             if (this.finalize) {
                 this.finalize(aUpdate, aNodeList, initData);
             }
+            this.finalizers['*'].call(this, aUpdate, aNodeList, initData);
 
             if (this.logger) {
                 console.timeEnd('MegaRender.renderLayout');
@@ -1037,6 +1036,39 @@
         /** Renderer finalizers */
         finalizers: freeze({
             /**
+             * A generic finalizer that would be called after the 'section' one finishes.
+             *
+             * @param {Boolean} aUpdate   Whether we're updating the list
+             * @param {Array}   aNodeList The list of ufs-nodes processed
+             * @param {Object}  aUserData  Any data provided by initializers
+             */
+            '*': function(aUpdate, aNodeList, aUserData) {
+                if (!window.fmShortcuts) {
+                    window.fmShortcuts = new FMShortcuts();
+                }
+
+
+                if (!aUpdate) {
+                    /**
+                     * (Re)Init the selectionManager, because the .selectable() is reinitialized and we need to
+                     * reattach to its events.
+                     *
+                     * @type {SelectionManager}
+                     */
+                    window.selectionManager = new SelectionManager(
+                        $(this.container),
+                        $.selected && $.selected.length > 0
+                    );
+
+                    // restore selection if needed
+                    if ($.selected) {
+                        $.selected.forEach(function(h) {
+                            selectionManager.add_to_selection(h);
+                        });
+                    }
+                }
+            },
+            /**
              * @param {Boolean} aUpdate   Whether we're updating the list
              * @param {Array}   aNodeList The list of ufs-nodes processed
              * @param {Object}  aUserData  Any data provided by initializers
@@ -1101,6 +1133,7 @@
             // megaList can be undefined/empty if the current folder had no nodes in it.
             if (DYNLIST_ENABLED && this.megaList) {
                 this.megaList.destroy();
+                window.selectionManager = false;
             }
         },
 

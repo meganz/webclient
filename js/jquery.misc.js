@@ -105,7 +105,6 @@ $.tresizer = function tresizer() {
     if ($.tresizer.last !== -1) {
 
         setTimeout(function tresizer() {
-            console.error('tresizer');
             $.tresizer.last = Date.now();
             $(window).trigger('resize');
         }, 280);

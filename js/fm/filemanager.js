@@ -2129,7 +2129,6 @@ FileManager.prototype.addGridUIDelayed = function(refresh) {
 
 FileManager.prototype.addSelectDragDropUI = function(refresh) {
     "use strict";
-    console.error('addSelectDragDropUI', refresh);
 
     if (this.currentdirid && this.currentdirid.substr(0, 7) === 'account') {
         return false;
@@ -2252,34 +2251,7 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
         }
     });
 
-    /**
-     * (Re)Init the selectionManager, because the .selectable() is reinitialized and we need to reattach to its
-     * events.
-     *
-     * @type {SelectionManager}
-     */
 
-    if (!window.fmShortcuts) {
-        window.fmShortcuts = new FMShortcuts();
-    }
-
-    console.error('isRefresh:', refresh);
-
-    if (!refresh || !window.selectionManager) {
-        /**
-         * (Re)Init the selectionManager, because the .selectable() is reinitialized and we need to reattach to its
-         * events.
-         *
-         * @type {SelectionManager}
-         */
-        console.error('new SelMan isRefresh:', refresh);
-        window.selectionManager = new SelectionManager($ddUIgrid, refresh);
-        if ($.selected) {
-            $.selected.forEach(function(h) {
-                selectionManager.add_to_selection(h);
-            });
-        }
-    }
 
 
     $ddUIitem.rebind('contextmenu', function(e) {

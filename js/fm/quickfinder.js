@@ -131,8 +131,9 @@ var QuickFinder = function(searchable_elements, containers) {
         else if (charCode >= 33 && charCode <= 36)
         {
             var e = '.files-grid-view.fm';
-            if (M.viewmode == 1)
+            if (M.viewmode == 1) {
                 e = '.fm-blocks-view.fm';
+            }
 
             if (M.megaRender && M.megaRender.megaList) {
                 switch (charCode) {

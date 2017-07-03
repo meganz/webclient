@@ -1038,7 +1038,7 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.clearbin-item').rebind('click', function() {
-        doClearbin(true);
+        doClearbin(false);
     });
 
     $(c + '.move-up').rebind('click', function() {

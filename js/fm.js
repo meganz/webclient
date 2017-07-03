@@ -4378,6 +4378,9 @@ function _propertiesDialog(close) {
         $('.properties-context-menu').fadeOut(200);
         $.hideContextMenu();
 
+        // Revert $.selected to an array of handles
+        $.selected = $.selected.map(function(n) { return n.h || n; });
+
         return true;
     }
 

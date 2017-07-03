@@ -1395,6 +1395,7 @@ else if (!b_u) {
                     .replace('chrome://mega/content','..')
                     .replace(/file:.+extensions/,'..fx')
                     .replace(/(?: line \d+ > eval)+/g,' >.eval')
+                    .trim();
             }
             if (__cdumps.length > 3) return false;
 
@@ -1488,6 +1489,7 @@ else if (!b_u) {
                 if (errobj.udata) dump.d = errobj.udata;
                 if (errobj.stack)
                 {
+                    var maxStackLines = 15;
                     var omsg = String(msg).trim();
                     var re = RegExp(
                         omsg.substr(0, 70)
@@ -1498,8 +1500,18 @@ else if (!b_u) {
 
                     dump.s = String(errobj.stack)
                         .replace(omsg, '').replace(re, '')
-                        .split("\n").map(String.trim).filter(String)
-                        .splice(0,15).map(mTrim).join("\n");
+                        .split("\n").map(mTrim).filter(String);
+
+                    for (var idx = 1; idx < dump.s.length; idx++) {
+                        var s = dump.s[idx];
+
+                        if (s.indexOf('@resource:') > 0 || s.indexOf('@jar:') > 0) {
+                            maxStackLines = idx;
+                            break;
+                        }
+                    }
+
+                    dump.s = dump.s.splice(0, maxStackLines).join("\n");
 
                     if (dump.s.indexOf('Unknown script code:') !== -1
                         || dump.s.indexOf('Function code:') !== -1

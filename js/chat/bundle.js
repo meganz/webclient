@@ -6128,7 +6128,7 @@ React.makeElement = React['createElement'];
 	            this.props.onHighlighted([node.h]);
 	        }
 
-	        if (this.props.folderSelectNotAllowed === true && node.t === 1) {
+	        if (this.props.folderSelectNotAllowed === true && node.t) {
 	            this.setState({ 'selected': [] });
 	            this.props.onSelected([]);
 	        } else {
@@ -6142,7 +6142,7 @@ React.makeElement = React['createElement'];
 	        e.stopPropagation();
 	        e.preventDefault();
 
-	        if (node.t === 1) {
+	        if (node.t) {
 
 	            self.setState({ 'selected': [], 'highlighted': [] });
 	            self.props.onSelected([]);
@@ -6171,7 +6171,7 @@ React.makeElement = React['createElement'];
 	                return;
 	            }
 
-	            var isFolder = node.t === 1;
+	            var isFolder = node.t;
 	            var isHighlighted = self.state.highlighted.indexOf(node.h) !== -1;
 
 	            var tooltipElement = null;

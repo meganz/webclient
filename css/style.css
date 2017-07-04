@@ -10648,6 +10648,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
     background-position: right -1288px;
     background-repeat: no-repeat;
     cursor: pointer;
+    display: none;
+}
+.mega-height > .context-top-arrow, .mega-height > .context-bottom-arrow {
+    display:block
 }
 .context-bottom-arrow {
     background-position: right -1228px;

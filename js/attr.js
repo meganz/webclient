@@ -4,7 +4,7 @@
 
 var attribCache = false;
 
-(function _userAttributeHandling(scope) {
+(function _userAttributeHandling(global) {
     "use strict";
 
     var ns = {};
@@ -484,19 +484,16 @@ var attribCache = false;
         return thePromise;
     };
 
-    ns._versions = {};
+    ns._versions = Object.create(null);
+    ns._conflictHandlers = Object.create(null);
 
-    ns._conflictHandlers = {};
     ns.registerConflictHandler = function (attributeName, pub, nonHistoric, mergeFn) {
-        var self = this;
         var attributeId = buildAttribute(attributeName, pub, nonHistoric);
-        if (!self._conflictHandlers[attributeId]) {
-            self._conflictHandlers[attributeId] = [];
-        }
 
-        self._conflictHandlers[attributeId].push(
-            mergeFn
-        );
+        if (!this._conflictHandlers[attributeId]) {
+            this._conflictHandlers[attributeId] = [];
+        }
+        this._conflictHandlers[attributeId].push(mergeFn);
     };
 
     ns.setArrayAttribute = function(attributeName, subkey, value, pub, nonHistoric) {
@@ -582,39 +579,6 @@ var attribCache = false;
         return proxyPromise;
     };
 
-
-    ns.handleUserAttributeActionPackets = function(actionPacket, avatars) {
-        var attrs = actionPacket.ua;
-        var actionPacketUserId = actionPacket.u;
-
-        for (var j in attrs) {
-            if (attrs.hasOwnProperty(j)) {
-                var attributeName = attrs[j];
-
-                // fill version if missing
-                mega.attr.handleVersionFromActionPacket(
-                    actionPacketUserId,
-                    attributeName,
-                    actionPacket.v[j]
-                );
-
-                // handle avatar related action packets (e.g. avatar modified)
-                if (attributeName === '+a') {
-                    avatars.push(actionPacketUserId);
-                }
-                // handle firstname/lastname attributes
-                else if (attributeName === 'firstname' || attributeName === 'lastname') {
-                    attribCache.uaPacketParser(
-                        attributeName,
-                        actionPacketUserId,
-                        true,
-                        actionPacket.v && actionPacket.v[j] ? actionPacket.v[j] : undefined
-                    );
-                }
-            }
-        }
-    };
-
     /**
      * Handle BitMap attributes
      *
@@ -680,21 +644,75 @@ var attribCache = false;
         return res;
     };
 
+    var uaPacketParserHandler = Object.create(null);
+
     /**
-     * Updated the local version cache IF the action packet contains a version
+     * Process action-packet for attribute updates.
      *
-     * @param actionPacketUserId
-     * @param attributeName
-     * @param actionPacketVersion
+     * @param {String}  attrName          Attribute name
+     * @param {String}  userHandle        User handle
+     * @param {Boolean} [ownActionPacket] Whether the action-packet was issued by oneself
+     * @param {String}  [version]         version, as returned by the API
      */
-    ns.handleVersionFromActionPacket = function (actionPacketUserId, attributeName, actionPacketVersion) {
-        if (
-            actionPacketVersion &&
-            !mega.attr._versions[actionPacketUserId + "_" + attributeName]
-        ) {
-            mega.attr._versions[actionPacketUserId + "_" + attributeName] = actionPacketVersion;
-        }
+    ns.uaPacketParser = function uaPacketParser(attrName, userHandle, ownActionPacket, version) {
+        var logger = MegaLogger.getLogger('account');
+        var cacheKey = userHandle + "_" + attrName;
+
+        logger.debug('uaPacketParser: Invalidating cache entry "%s"', cacheKey);
+
+        // XXX: Even if we're using promises here, this is guaranteed to resolve synchronously atm,
+        //      so if this ever changes we'll need to make sure it's properly adapted...
+
+        var removeItemPromise = attribCache.removeItem(cacheKey);
+
+        delete this._versions[cacheKey];
+
+        removeItemPromise
+            .always(function _uaPacketParser() {
+                if (typeof uaPacketParserHandler[attrName] === 'function') {
+                    uaPacketParserHandler[attrName](userHandle);
+                }
+                else if (
+                    (attrName.substr(0, 2) === '+!' || attrName.substr(0, 2) === '^!') &&
+                    attribCache.bitMapsManager.exists(attrName.substr(2))
+                ) {
+                    mega.attr.handleBitMapAttribute(attrName, version);
+                }
+                else if (d > 1) {
+                    logger.debug('uaPacketParser: No handler for "%s"', attrName);
+                }
+            });
+
+        return removeItemPromise;
     };
+
+    mBroadcaster.once('boot_done', function() {
+        uaPacketParserHandler['firstname'] = function(userHandle) {
+            if (M.u[userHandle]) {
+                M.u[userHandle].firstName = M.u[userHandle].lastName = "";
+                M.syncUsersFullname(userHandle);
+            }
+            else {
+                console.warn('uaPacketParser: Unknown user %s handling first/lastname', userHandle);
+            }
+        };
+        uaPacketParserHandler['lastname']    = uaPacketParserHandler['firstname'];
+        uaPacketParserHandler['+a']          = function(userHandle) { M.avatars(userHandle); };
+        uaPacketParserHandler['*!authring']  = function() { authring.getContacts('Ed25519'); };
+        uaPacketParserHandler['*!authRSA']   = function() { authring.getContacts('RSA'); };
+        uaPacketParserHandler['*!authCu255'] = function() { authring.getContacts('Cu25519'); };
+        uaPacketParserHandler['+puEd255']    = function(userHandle) {
+            // pubEd25519 key was updated! force fingerprint regen.
+            delete pubEd25519[userHandle];
+            crypt.getPubEd25519(userHandle);
+        };
+        uaPacketParserHandler['*!fmconfig'] = function() { mega.config.fetch(); };
+
+        if (d) {
+            global._uaPacketParserHandler = uaPacketParserHandler;
+        }
+    });
+
 
     ns.registerConflictHandler("lstint", false, true, function(valObj, index) {
         var remoteValues = valObj.remoteValue;
@@ -747,78 +765,5 @@ var attribCache = false;
     }
     ns = undefined;
 
-})(this);
+})(self);
 
-/**
- * Process action-packet for attribute updates.
- *
- * @param {String}  attrName        Attribute name
- * @param {String}  userHandle      User handle
- * @param {Boolean} ownActionPacket Whether the action-packet was issued by myself
- * @param {String} [version] version, as returned by the API
- */
-function uaPacketParser(attrName, userHandle, ownActionPacket, version) {
-    var logger = MegaLogger.getLogger('account');
-    var cacheKey = userHandle + "_" + attrName;
-
-    logger.debug('uaPacketParser: Invalidating cache entry "%s"', cacheKey);
-
-    var removeItemPromise = attribCache.removeItem(cacheKey);
-
-    if (typeof(mega.attr._versions[userHandle + "_" + attrName]) !== 'undefined') {
-        delete mega.attr._versions[userHandle + "_" + attrName];
-    }
-
-    removeItemPromise
-        .always(function _uaPacketParser() {
-            if (attrName === 'firstname' || attrName === 'lastname') {
-
-                if (M.u[userHandle]) {
-                    M.u[userHandle].firstName = M.u[userHandle].lastName = "";
-                    M.syncUsersFullname(userHandle);
-                }
-                else {
-                    console.warn('uaPacketParser: Unknown user %s handling first/lastname', userHandle);
-                }
-            }
-            else if (ownActionPacket) {
-                // atm only first/last name is processed throguh own-action-packet
-                logger.warn('uaPacketParser: Unexpected attribute "%s"', attrName);
-            }
-            else if (attrName === '+a') {
-                M.avatars(userHandle);
-            }
-            else if (attrName === '*!authring') {
-                authring.getContacts('Ed25519');
-            }
-            else if (attrName === '*!authRSA') {
-                authring.getContacts('RSA');
-            }
-            else if (attrName === '*!authCu255') {
-                authring.getContacts('Cu25519');
-            }
-            else if (attrName === '*!fmconfig') {
-                mega.config.fetch();
-            }
-            else if (attrName === '+puEd255') {
-                // pubEd25519 key was updated!
-                // force fingerprint regen.
-                delete pubEd25519[userHandle];
-                crypt.getPubEd25519(userHandle);
-            }
-            else if (
-                (attrName.substr(0, 2) === '+!' || attrName.substr(0, 2) === '^!') &&
-                attribCache.bitMapsManager.exists(attrName.substr(2))
-            ) {
-                mega.attr.handleBitMapAttribute(
-                    attrName,
-                    version
-                );
-            }
-            else {
-                logger.debug('uaPacketParser: No handler for "%s"', attrName);
-            }
-        });
-
-    return removeItemPromise;
-}

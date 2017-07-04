@@ -10647,7 +10647,6 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
     background-position: center -8343px;
     background-position: right -1288px;
     background-repeat: no-repeat;
-    display: none;
     cursor: pointer;
 }
 .context-bottom-arrow {
@@ -10672,6 +10671,8 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
 .dropdown.body.submenu.mega-height > .context-scrolling-block, .dropdown.files-menu.mega-height > .context-scrolling-block {
     height: 100%;
     overflow: hidden;
+    margin: 0 -8px;
+    padding: 0 8px;
 }
 .dropdown.body.submenu .dropdown-item {
     display: block !important;

@@ -86,7 +86,7 @@ var exportPassword = {
             this.$dialog = $('.export-links-dialog');
 
             // If they are a Pro user, enable the toggle button
-            if (M.isProAccount()) {
+            if (u_attr.p) {
                 this.initPasswordFeatureToggle();
             }
 
@@ -267,7 +267,7 @@ var exportPassword = {
                 var $loader = this.$dialog.find('.estimator-loading-icon').addClass('loading');
 
                 // On completion of loading, hide the loading spinner
-                mega.utils.require('zxcvbn_js')
+                M.require('zxcvbn_js')
                     .done(function() {
                         $loader.removeClass('loading');
                     });
@@ -336,7 +336,7 @@ var exportPassword = {
             var $proButton = this.$dialog.find('.get-pro');
 
             // If they do not have Pro
-            if (!M.isProAccount()) {
+            if (!u_attr.p) {
 
                 // Hide the options initially
                 $extraOptions.addClass('hidden');
@@ -369,7 +369,7 @@ var exportPassword = {
                     $extraOptionsToggle.text(l[9064]);   // Hide options
 
                     // If they are not a Pro user, show the Get Pro button
-                    if (!M.isProAccount()) {
+                    if (!u_attr.p) {
                         $proButton.removeClass('hidden');
                     }
 
@@ -988,7 +988,7 @@ var exportExpiry = {
     init: function() {
 
         // If they are a pro user, enable the expiry toggle button and date picker
-        if (M.isProAccount()) {
+        if (u_attr.p) {
             exportExpiry.initExpiryFeatureToggle();
             exportExpiry.initExpiryDatePicker();
             exportExpiry.prepopulateExpiryDates();
@@ -1347,7 +1347,7 @@ var exportExpiry = {
         $span.text(l[1990]);
 
         // If a browser extension or the new HTML5 native copy/paste is available (Chrome & Firefox)
-        if (is_extension || mega.utils.execCommandUsable()) {
+        if (is_extension || M.execCommandUsable()) {
             if (!is_chrome_firefox) {
                 $('.fm-dialog-chrome-clipboard').removeClass('hidden');
             }
@@ -1364,7 +1364,13 @@ var exportExpiry = {
                     // Put the link/s in an invisible div, highlight the link/s then copy to clipboard using HTML5
                     $('#chromeclipboard').html(links);
                     selectText('chromeclipboard');
-                    success = document.execCommand('copy');
+                    try {
+                        success = document.execCommand('copy');
+                    }
+                    catch (e) {
+                        console.error(e);
+                        success = false;
+                    }
                 }
 
                 if (success) {
@@ -1772,30 +1778,32 @@ var exportExpiry = {
                 console.warn('Missing sharekey for "%s" - relying on s2 to obtain it...', nodeId);
             }
         }
+        // FIXME: check this
 
         // Get all child nodes of root folder with nodeId
-        var childNodes = fm_getnodes(nodeId);
-        childNodes.push(nodeId);
+        M.getNodes(nodeId, true)
+            .always(function(childNodes) {
 
-        var sharePromise = api_setshare(nodeId, [{ u: 'EXP', r: 0 }], childNodes);
-        sharePromise.done(function _sharePromiseDone(result) {
-            if (result.r && result.r[0] === 0) {
+                var sharePromise = api_setshare(nodeId, [{u: 'EXP', r: 0}], childNodes);
+                sharePromise.done(function _sharePromiseDone(result) {
+                    if (result.r && result.r[0] === 0) {
 
-                self._getExportLinkRequest(nodeId);
+                        self._getExportLinkRequest(nodeId);
 
-                if (!self.nodesLeft) {
-                    loadingDialog.hide();
-                }
-            }
-            else {
-                self.logger.warn('_getFolderExportLinkRequest', nodeId, 'Error code: ', result);
-                loadingDialog.hide();
-            }
-        });
-        sharePromise.fail(function _sharePromiseFailed(result) {
-            self.logger.warn('Get folder link failed: ' + result);
-            // XXX: this seem to lack some handling code for this condition
-        });
+                        if (!self.nodesLeft) {
+                            loadingDialog.hide();
+                        }
+                    }
+                    else {
+                        self.logger.warn('_getFolderExportLinkRequest', nodeId, 'Error code: ', result);
+                        loadingDialog.hide();
+                    }
+                });
+                sharePromise.fail(function _sharePromiseFailed(result) {
+                    self.logger.warn('Get folder link failed: ' + result);
+                    // FIXME: this seem to lack some handling code for this condition
+                });
+            });
     };
 
     /**
@@ -1936,30 +1944,28 @@ var exportExpiry = {
 
     /**
      * Returns true in case that any of checked items is taken down, otherwise false
-     * @param {Array} nodesId Array of strings nodes ids
+     * @param {Array|String} [nodes] Array of nodes (handles/objects)
      * @returns {Boolean}
      */
-    ExportLink.prototype.isTakenDown = function(nodesId) {
-
-        var self = this;
-        var nodes = nodesId;
-
-        if (nodesId) {
-            if (!Array.isArray(nodesId)) {
-                nodes = [nodesId];
+    ExportLink.prototype.isTakenDown = function(nodes) {
+        if (nodes) {
+            if (!Array.isArray(nodes)) {
+                nodes = [nodes];
             }
         }
         else {
             nodes = self.options.nodesToProcess;
         }
 
-        for (var handle in nodes) {
-            if (nodes.hasOwnProperty(handle)) {
-                handle = nodes[handle];
+        for (var i = nodes.length; i--;) {
+            var node = nodes[i];
 
-                if (M.getNodeShare(handle).down === 1) {
-                    return true;
-                }
+            if (typeof node !== 'object') {
+                node = M.getNodeByHandle(node);
+            }
+
+            if (node.t & M.IS_TAKENDOWN || M.getNodeShare(node).down === 1) {
+                return true;
             }
         }
 

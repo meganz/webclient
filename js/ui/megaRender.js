@@ -322,7 +322,7 @@
                     $.rmItemsInView = (maxItemsInView | 0);
                 }
 
-                return maxItemsInView || (Math.pow(2, 32) - 1);
+                return maxItemsInView || 200;
             }
         });
 

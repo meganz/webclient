@@ -5,6 +5,7 @@
     padding-bottom: 0;
     padding-left: 0 !important;
     padding-right: 0 !important;
+    position: relative;
 }
 /* Scrollable Search 
 .search-section{
@@ -25,13 +26,16 @@
 */
 /*Colins CSS changes*/
 /* fixed sidebar applied dynamtically with JS */
-.help-home-page .help-background-block {
+.help-background-block {
+    content:'';
     position: absolute;
     display: block;
     width: 100%;
     background-color: #f44;
-    /*background-image: linear-gradient(-180deg, #f4f4f4 70%, #fafafa 100%);*/
     height: 240px;
+    margin-top: 36px;
+    top: 0;
+    left: 0;
 }
 #help2-main .client-heading {
     color: #bbb;
@@ -42,7 +46,6 @@
 #help2-main .search-section-header {
     z-index: 9999;
     top: 48px;
-    position: fixed;
     left: 0;
     right: 0;
     background-color: #fff;
@@ -59,10 +62,11 @@
     position: absolute;
     width: 48px;
     z-index: 99999;
+    top:0;
     right: 0;
     text-align: center;
     margin-right: 36px;
-    margin-top: 20px;
+    margin-top: 68px;
     opacity: 0.7;
     transition-property: opacity;
     -moz-transition-property: opacity; /* Firefox 4 */
@@ -714,6 +718,7 @@
     margin-left: 12%;
     margin-right: 12%;
     padding-top: 20px;
+    padding-bottom: 10px;
     z-index: 999;
     border-top: none;
 }
@@ -745,7 +750,7 @@
     text-decoration: none;
     color: #555;
     display: block;
-    margin-top: -35px;
+    margin-top: 0;
     margin-left: 20px;
     line-height: 22px;
     cursor: pointer;
@@ -765,7 +770,7 @@
 #help2-main .search-section-header .popular-question-list, #help2-main .popular-question-list {
     width: 45%;
     display: block;
-    margin-top: 40px;
+    padding: 18px 0 48px 0;
     float: left;
 }
 #help2-main .search-section-header .popular-question-list:nth-child(2), #help2-main .popular-question-list:nth-child(2) {
@@ -774,28 +779,19 @@
 }
 #help2-main .popular-question-list ul {
     display: block;
-    margin-block-end: 1em;
-    margin-block-start: 1em;
-    padding-inline-start: 00px;
+    padding: 0 0 0 0;
+    margin: 0 0 0 0;
 }
 .help-home-page {
     background-color: #fafafa !important;
-}
-#help2-main .search-section-header .popular-question-items, #help2-main .popular-question-items {
-    -webkit-columns: 1;
-    -moz-columns: 1;
-    columns: 1;
-    column-gap: 30px;
-    -moz-column-gap: 30px;
-    -webkit-column-gap: 30px;
 }
 #help2-main .popular-question-items li {
     font-family: 'source_sans_proregular';
     font-size: 14px;
     color: #555;
-    padding-bottom: 18px;
+    padding-bottom: 0;
     position: relative;
-    margin: 4px 20px 25px 2px;
+    margin: 4px 20px 8px 2px;
 }
 #help2-main .first-support-block {
     border-top: 1px solid #e8e8e8;
@@ -1086,7 +1082,6 @@
     text-overflow: ellipsis;
     max-height: 64px;
     font-size: 13px;
-    max-height: 36px;
     margin-bottom: 1px;
     transition-property: background-color;
     -moz-transition-property: background-color; /* Firefox 4 */
@@ -1251,14 +1246,6 @@
     padding-top: 70px;
     font-size: 36px;
     line-height: 46px;
-}
-#help2-main ul.d-section-items {
-    -webkit-margin-before: 1em;
-    -webkit-margin-after: 1em;
-    -webkit-margin-start: 0;
-    -webkit-margin-end: 0;
-    -webkit-padding-start: 3px;
-    padding-inline-start: 3px;
 }
 #help2-main .d-section-items li {
     color: #666;
@@ -1547,7 +1534,6 @@
     padding-bottom: 0;
     margin-left: 300px;
     height: auto;
-    position: relative;
     margin-top: 50px;
 }
 #help2-main .main-directory-pad {
@@ -2521,6 +2507,7 @@
     -moz-transition-timing-function: ease; /* Firefox 4 */
     -webkit-transition-timing-function: ease; /* Safari and Chrome */
     -o-transition-timing-function: ease; /* Opera */
+    position:absolute;
 }
 #help2-main .device-menu-icon {
     display: inline-block;
@@ -2642,20 +2629,8 @@
 }
 #help2-main .fixed {
     position: fixed;
-    top: 0;
-    margin-top: 90px;
-    transition-property: margin-top;
-    -moz-transition-property: margin-top; /* Firefox 4 */
-    -webkit-transition-property: margin-top; /* Safari and Chrome */
-    -o-transition-property: margin-top; /* Opera */
+    top: 30px !important;
     transition-duration: 0.5s;
-    -moz-transition-duration: 0.5s; /* Firefox 4 */
-    -webkit-transition-duration: 0.5s; /* Safari and Chrome */
-    -o-transition-duration: 0.5s; /* Opera */
-    transition-timing-function: ease;
-    -moz-transition-timing-function: ease; /* Firefox 4 */
-    -webkit-transition-timing-function: ease; /* Safari and Chrome */
-    -o-transition-timing-function: ease; /* Opera */
 }
 #help2-main .header-fixed {
     position: fixed;
@@ -2896,12 +2871,6 @@
         min-width: 320px;
         max-width: 420px;
         width: inherit;
-    }
-    .help-home-page .help-background-block {
-        min-width: 320px;
-        max-width: 420px;
-        width: inherit;
-        height: 300px;
     }
     #help2-main .main-pad-container {
         min-width: 320px;
@@ -3729,4 +3698,14 @@
 }
 .ui-menu.ui-widget.ui-widget-content.ui-autocomplete.ui-front.opened {
     display: block !important;
+}
+#help2-main.search-overlay {
+    width: auto;
+}
+#help2-main.search-overlay .support-go-back, #help2-main.search-overlay .support-search, .search-overlay .search-section, #help2-main.search-overlay .sidebar-menu-container, .search-overlay .support-info-container, .search-overlay .main-title-section {
+    display: none;
+    
+}
+.search-overlay .search-close, #help2-main.search-overlay .search-section-header .popular-question-block, #help2-main.search-overlay .search-section-header {
+    display: block;
 }

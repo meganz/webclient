@@ -527,7 +527,7 @@ MegaDataSortedMap.prototype.push = function(v) {
 
     // if already exist, remove previously stored value (e.g. overwrite...)
     if (self._data[keyVal]) {
-        removeValue(self._sortedVals, keyVal, false);
+        array.remove(self._sortedVals, keyVal, false);
 
         // clean up the defineProperty
         delete self._data[keyVal];
@@ -597,7 +597,7 @@ MegaDataSortedMap.prototype.reorder = function(forced) {
 MegaDataSortedMap.prototype.removeByKey = function(keyValue) {
     var self = this;
     if (self._data[keyValue]) {
-        removeValue(self._sortedVals, keyValue);
+        array.remove(self._sortedVals, keyValue);
         delete self._data[keyValue];
         delete self[keyValue];
         self.reorder();

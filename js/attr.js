@@ -771,10 +771,15 @@ function uaPacketParser(attrName, userHandle, ownActionPacket, version) {
 
     removeItemPromise
         .always(function _uaPacketParser() {
-            if (attrName === 'firstname'
-                || attrName === 'lastname') {
-                M.u[userHandle].firstName = M.u[userHandle].lastName = "";
-                M.syncUsersFullname(userHandle);
+            if (attrName === 'firstname' || attrName === 'lastname') {
+
+                if (M.u[userHandle]) {
+                    M.u[userHandle].firstName = M.u[userHandle].lastName = "";
+                    M.syncUsersFullname(userHandle);
+                }
+                else {
+                    console.warn('uaPacketParser: Unknown user %s handling first/lastname', userHandle);
+                }
             }
             else if (ownActionPacket) {
                 // atm only first/last name is processed throguh own-action-packet
@@ -816,13 +821,4 @@ function uaPacketParser(attrName, userHandle, ownActionPacket, version) {
         });
 
     return removeItemPromise;
-}
-
-
-if (is_karma) {
-    window.M = new MegaData();
-    attribCache = new IndexedDBKVStorage('ua', { murSeed: 0x800F0002 });
-    attribCache.syncNameTimer = {};
-    attribCache.uaPacketParser = uaPacketParser;
-    attribCache.bitMapsManager = new MegaDataBitMapManager();
 }

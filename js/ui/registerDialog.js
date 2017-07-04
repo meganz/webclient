@@ -392,7 +392,7 @@
         if (typeof zxcvbn === 'undefined') {
             $('.login-register-input.password', $dialog).addClass('loading');
 
-            mega.utils.require('zxcvbn_js')
+            M.require('zxcvbn_js')
                 .done(function() {
                     $('.login-register-input.password', $dialog).removeClass('loading');
                     registerpwcheck();

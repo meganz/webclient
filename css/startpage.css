@@ -1,0 +1,452 @@
+.top-grey-gradient, .flip-block {
+    background: #ffffff;
+    background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmYWZhZmEiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+    background: -moz-linear-gradient(top, #ffffff 0%, #fafafa 100%);
+    background: -webkit-linear-gradient(top, #ffffff 0%, #fafafa 100%);
+    background: linear-gradient(to bottom, #ffffff 0%, #fafafa 100%);
+}
+.top-grey-noise {
+    background-image: url(../images/mega/noice-bg@2x.png);
+    background-size: 194px auto;
+    background-repeat: repeat;
+    background-position: center;
+}
+.new-startpage .top-head::after {
+    display: none;
+}
+.startpage.mega-logo {
+    width: 258px;
+    height: 84px;
+    background-image: url(../images/mega/startpage-sprite.png);
+    background-position: -2px -263px;
+    background-repeat: no-repeat;
+    margin: 0 auto;
+}
+.startpage .bottom-page.top-header {
+    color: rgba(0,0,0,0.7);
+    text-align: center;
+    padding: 47px 15px 0 15px;
+}
+.startpage.upload-cloud-icon {
+    background-image: url(../images/mega/startpage-sprite.png);
+    background-position: 7px -388px;
+    background-repeat: no-repeat;
+    width: 110px;
+    height: 110px;
+    margin: 32px auto 0 auto;
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
+    -moz-opacity: 0.8;
+    -khtml-opacity: 0.8;
+    opacity: 0.8;
+    cursor: pointer;
+    display: block;
+}
+.startpage.upload-cloud-icon:hover {
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+    -moz-opacity: 1;
+    -khtml-opacity: 1;
+    opacity: 1;
+}
+.startpage.buttons-block {
+    white-space: nowrap;
+    font-size: 0;
+    padding: 29px 0 61px 0;
+    text-align: center;
+}
+.startpage.button-48-height {
+    height: 48px;
+    font-size: 16px;
+    line-height: 47px;
+    min-width: 220px;
+    margin: 0 8px;
+    padding: 0 15px;
+    display: inline-block;
+    background-color: rgba(102,102,102,0.7);
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    text-align: center;
+    color: white;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    cursor: pointer;
+    font-family: 'montserrat', sans-serif;
+    -webkit-transition: background-color 200ms ease-in-out;
+    -moz-transition: background-color 200ms ease-in-out;
+    -o-transition: background-color 200ms ease-in-out;
+    -ms-transition: background-color 200ms ease-in-out;
+    transition: background-color 200ms ease-in-out;
+}
+.startpage.button-48-height:hover {
+    background-color: rgba(102,102,102,1);
+}
+.startpage.button-48-height.red {
+    background-color: rgba(217,0,7,0.7);
+}
+
+.startpage.button-48-height.red:hover {
+    background-color: rgba(217,0,7,1);
+}
+.startpage.white-question {
+    width: 18px;
+    height: 18px;
+    display: inline-block;
+    vertical-align: top;
+    background-color: white;
+    -moz-border-radius: 100%;
+    -webkit-border-radius: 100%;
+    border-radius: 100%;
+    margin: 15px 0 0 10px;
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
+    -moz-opacity: 0.7;
+    -khtml-opacity: 0.7;
+    opacity: 0.7;
+    background-image: url(../images/mega/startpage-sprite.png);
+    background-position: -55px -3px;
+}
+.startpage.button-48-height:hover i {
+ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+    -moz-opacity: 1;
+    -khtml-opacity: 1;
+    opacity: 1;
+}
+.startpage.medium-icon {
+    width: 66px;
+    height: 66px;
+    margin: 20px auto 12px auto;
+    background-image: url(../images/mega/startpage-sprite.png);
+    background-position: -2px -1115px;
+    background-repeat: no-repeat;
+}
+.startpage.medium-icon.friends {
+    background-position: -102px -1115px;
+}
+.startpage.medium-icon.mobile {
+    background-position: -202px -1115px;
+}
+.startpage.medium-icon.declaration {
+    background-position: -2px -1219px;
+    margin: 27px auto 22px auto;
+}
+.bottom-page.grey-rocket {
+    background-image: url(../images/mega/bottom-page/rocket-bg@2x.png);
+    background-position: center bottom;
+    background-repeat: no-repeat;
+    background-size: 656px auto;
+    height: 418px;
+}
+.bottom-page.grey-rocket span {
+    display: block;
+    font-size: 14px;
+    color: #bcbbb8;
+    text-align: center;
+    padding: 375px 0 0 0;
+}
+.bottom-page.img.mobile-app {
+    max-width: 400px;
+    padding: 37px 31px 50px 1px;
+}
+.bottom-page.img.megasync {
+    max-width: 350px;
+    padding: 32px 0 34px 5px;
+}
+.bottom-page.img.browser {
+    max-width: 143%;
+    width: 853px;
+    padding: 76px 0 94px 0;
+    margin-left: 37px;
+}
+.startpage.counters {
+    padding: 18px 0 12px 0;
+}
+.startpage.flip-wrapper {
+    padding: 12px 0 0 0;
+    font-size: 0;
+    margin: 0 -15px;
+    display: inline-block;
+}
+.flip-block {
+    margin: 2px;
+}
+.flip-block, .flip-bg {
+    width: 24px;
+    height: 35px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
+    -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
+    box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
+    font-size: 28px;
+    line-height: 30px;
+    color: #777777;
+    text-align: right;
+    display: inline-block;
+}
+.flip-bg {
+    -webkit-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
+    -moz-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
+    box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 0 4px;
+    vertical-align: top;
+    background-image: url(../images/mega/startpage-sprite.png);
+    background-position: -243px 14px;
+    background-repeat: no-repeat;
+}
+.flip-div {
+    width: 2px;
+    height: 6px;
+    background-color: #CCCCCC;
+    -moz-border-radius: 1px;
+    -webkit-border-radius: 1px;
+    border-radius: 1px;
+    display: inline-block;
+    margin: 38px -1px 0 -1px;
+    vertical-align: top;
+}
+.startpage.italic-text {
+    font-style: italic;
+    font-size: 18px;
+    line-height: 36px;
+    color: rgba(0,0,0,0.7);
+    max-width: 810px;
+    padding: 0 15px;
+    margin: 0 auto;
+    position: relative;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.startpage.quote-icon {
+    position: absolute;
+    width: 36px;
+    height: 26px;
+    left: 14px;
+    top: -25px;
+    background-image: url(../images/mega/startpage-sprite.png);
+    background-position: -118px -1235px;
+}
+.startpage.quote-icon.close {
+    left: auto;
+    top: auto;
+    bottom: -25px;
+    right: 14px;
+    background-position: -221px -1235px;
+}
+.startpage.declaration-lnk {
+    text-align: center;
+    margin-bottom: -2px;
+}
+.startpage.declaration-lnk a {
+    font-size: 14px;
+    line-height: 20px;
+    display: inline;
+    cursor: pointer;
+    border-bottom: 2px solid #FF333A;
+    padding: 0 10px;
+    color: #FF333A;
+    text-decoration: none;
+    font-family: 'montserrat', 'open_sans', sans-serif;
+}
+.bottom-page.asterisktext {
+    font-size: 14px;
+    color: #bcbbb8;
+    left: 0;
+    margin: 0 0 0 0;
+    padding: 0 15px;
+    visibility: visible;
+    position: absolute;
+    bottom: 83px;
+    width: 100%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.bottom-page.asterisktext.hidden {
+    visibility: hidden;
+    display: block;
+}
+.mobile .startpage.button-48-height {
+    height: 64px;
+    line-height: 63px;
+}
+.mobile .startpage.button-48-height.try-mega, .mobile .startpage.upload-cloud-icon {
+    display: none;
+}
+.mobile .startpage .mobile-apps-button {
+    margin: 0 8px;
+    display: inline-block;
+    vertical-align: top;
+    min-width: 220px;
+}
+.mobile .startpage .mobile-apps-button.ios {
+    background-position: 15px -887px;
+}
+.mobile .startpage .mobile-apps-button.wp {
+    width: 220px;
+    height: 64px;
+    background-position: 5px -777px;
+    background-size: 210px auto;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+}
+.mobile .startpage .mobile-apps-button.hidden {
+    display: none;
+}
+.mobile .startpage .bottom-page.top-header {
+    padding-top: 95px;
+}
+.mobile .startpage.buttons-block {
+    padding: 123px 0 0 0;
+}
+
+@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
+.reg-st3-membership-icon, .membership-icon, .pro-icon, div.pro-feature-icon, .startpage.mega-logo, .startpage.upload-cloud-icon, .bottom-page.scroll-icon, .startpage.white-question, .pages-nav.nav-icon, .bottom-page.big-icon, .startpage.medium-icon, .small-red-link i, .flip-bg, .startpage.quote-icon, .bottom-menu.logo, .loginrequired-dialog .fm-notification-icon, .top-arrow-icon {
+    background-image: url(../images/mega/startpage-sprite@2x.png) !important;
+    background-size: 267px auto;
+}
+}
+
+@media only screen and (max-width: 783px) {
+.startpage.italic-text {
+    max-width: 640px;
+}
+.startpage.counters {
+    padding: 18px 10px 12px 10px;
+}
+.bottom-page.img.mobile-app {
+    max-width: 400px;
+    padding: 46px 2.5% 39px 5%;
+}
+.bottom-page.img.megasync {
+    max-width: 350px;
+    width: 86.1%;
+    padding: 32px 0 34px 8.3%;
+}
+.bottom-page.img.browser {
+    max-width: 163%;
+    width: 853px;
+    padding: 76px 0 94px 0;
+    margin-left: 24px;
+}
+}
+
+@media only screen and (max-width: 583px) {
+.mobile.not-logged .startpage .mobile-apps-button {
+    display: none;
+}
+.logged.mobile .startpage.button-48-height.register  {
+    display: none;
+}
+}
+
+/* Mobile size */
+@media only screen and (max-width: 565px) {
+.startpage .bottom-page.top-header {
+    padding: 44px 0 0 0;
+}
+.startpage.medium-icon {
+    margin: 11px auto 12px auto;
+}
+.bottom-page.grey-rocket {
+    height: 406px;
+}
+.bottom-page.grey-rocket span {
+    padding: 363px 0 0 0;
+}
+.bottom-page.img.mobile-app {
+    padding: 46px 0 39px 6px;
+    width: 95%;
+}
+.bottom-page.img.megasync {
+    width: 81%;
+    padding: 52px 0 30px 6px;
+}
+.bottom-page.img.browser {
+    width: 100%;
+    padding: 85px 10px 55px 10px;
+    margin-left: 0;
+}
+.startpage.flip-wrapper {
+    padding: 12px 0 32px 0;
+    margin: 0 -43px;
+}
+.startpage.italic-text {
+    padding: 0;
+    margin: -14px 0 0 0;
+}
+.startpage.medium-icon.declaration {
+    margin: 23px auto 23px auto;
+}
+.startpage.declaration-lnk {
+    margin: 0 -33px -1px -33px;
+}
+.startpage.declaration-lnk a {
+    padding: 0;
+}
+.startpage.button-48-height.try-mega {
+    display: none;
+}
+.startpage.mega-logo {
+    background-size: 216px auto;
+    background-position: -1px -211px;
+    width: 210px;
+    height: 70px
+}
+.mobile .startpage.buttons-block {
+    padding: 49px 0 11px 0;
+}
+}
+
+@media only screen and (max-height: 758px) {
+.startpage.upload-cloud-icon {
+    margin: 12px auto -20px auto;
+}
+.mobile .startpage .bottom-page.top-header {
+    padding-top: 47px;
+}
+.mobile .startpage.buttons-block {
+    padding: 63px 0 61px 0;
+}
+}
+
+@media only screen and (max-height: 695px) {
+.startpage.upload-cloud-icon {
+    display: none;
+}
+}
+
+@media only screen and (max-height: 640px) {
+.mobile .startpage.buttons-block {
+    padding: 49px 0 11px 0;
+}
+}
+
+@media only screen and (max-height: 570px) {
+.mobile .startpage.buttons-block {
+    padding: 36px 0 45px 0;
+}
+.mobile .startpage .bottom-page.top-header {
+    padding-top: 35px;
+}
+}
+
+
+@media only screen and (max-width: 386px) {
+.mobile-apps-button.wp {
+    width: 220px;
+    height: 64px;
+    background-position: 5px -777px;
+    background-size: 210px auto;
+}
+.mobile.logged .startpage .mobile-apps-button {
+    margin: 0 -20px;
+}
+}

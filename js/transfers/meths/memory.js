@@ -126,7 +126,7 @@
                 dlLinkNode.download = name;
                 dlLinkNode.href = blob_url;
                 dlLinkNode.click();
-                Later(function() {
+                later(function() {
                     myURL.revokeObjectURL(blob_url);
                     blob_url = undefined;
                 });

@@ -183,7 +183,7 @@ function dl_g(res) {
                 return false;
             }
 
-            var filename = fm_safename(fdl_file.n) || 'unknown.bin';
+            var filename = M.getSafeName(fdl_file.n) || 'unknown.bin';
             var filenameLength = filename.length;
 
             fdl_queue_var = {
@@ -197,7 +197,7 @@ function dl_g(res) {
                 onDownloadProgress: dlprogress,
                 onDownloadComplete: dlcomplete,
                 onDownloadStart: dlstart,
-                onDownloadError: M.dlerror,
+                onDownloadError: M.dlerror.bind(M),
                 onBeforeDownloadComplete: function() { }
             };
 
@@ -255,7 +255,7 @@ function dl_g(res) {
         }
         else if (is_mobile) {
             // Load the missing file decryption key dialog for mobile
-            parsepage(pages['fm_mobile']);
+            parsepage(pages['mobile']);
             mobile.decryptionKeyOverlay.show(dlpage_ph, false, key);
             return false;
         }
@@ -617,7 +617,7 @@ function dlcomplete(id)
     }
     else if (a < 2) $('.widget-icon.downloading').addClass('hidden');
     else $('.widget-circle').attr('class','widget-circle percents-0');
-    Soon(mega.utils.resetUploadDownload);
+    Soon(M.resetUploadDownload);
     $('.download.content-block').removeClass('downloading').addClass('download-complete');
     fdl_queue_var = false;
 

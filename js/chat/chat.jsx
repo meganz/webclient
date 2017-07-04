@@ -77,7 +77,7 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
             var $promise;
 
             chatJids.push(megaChat.karere.getBareJid());
-            var resp = megaChat.openChat(chatJids, chatJids.length === 2 ? "private" : "group", 
+            var resp = megaChat.openChat(chatJids, chatJids.length === 2 ? "private" : "group",
                 undefined, undefined, undefined, true);
 
             if (resp instanceof MegaPromise) {
@@ -449,7 +449,7 @@ Chat.prototype.init = function() {
     this.karere.bind("onChatMessage", function() {
         self._onChatMessage.apply(self, arguments);
     });
-    
+
 
     // UI events
     $(document.body).undelegate('.top-user-status-popup .tick-item', 'mousedown.megachat');
@@ -872,7 +872,7 @@ Chat.prototype.destroy = function(isLogout) {
     if (self.is_initialized === false) {
         return;
     }
-    
+
     self.karere.destroying = true;
     self.trigger('onDestroy', [isLogout]);
 
@@ -1134,7 +1134,7 @@ Chat.prototype.reorderContactTree = function() {
     });
 
     folders = M.sortContacts(folders);
-    
+
     var $container = $('#treesub_contacts');
 
     var $prevNode = null;
@@ -1599,7 +1599,7 @@ Chat.prototype.getXmppServiceUrl = function(timeout) {
             })
             .done(function(r) {
                 if (r.xmpp && r.xmpp.length > 0) {
-                    var randomHost = array_random(r.xmpp);
+                    var randomHost = array.random(r.xmpp);
                     if (webSocketsSupport) {
                         $promise.resolve("wss://" + randomHost.host + "/ws");
                     }
@@ -1612,7 +1612,7 @@ Chat.prototype.getXmppServiceUrl = function(timeout) {
                     $promise.reject();
                 }
                 else {
-                    var server = array_random(self.options.fallbackXmppServers);
+                    var server = array.random(self.options.fallbackXmppServers);
                     self.logger.error("Got empty list from the load balancing service for xmpp, will fallback to: " + server + ".");
                     if (webSocketsSupport) {
                         server = server.replace("https:", "wss:").replace("/bosh", "/ws");
@@ -1621,7 +1621,7 @@ Chat.prototype.getXmppServiceUrl = function(timeout) {
                 }
             })
             .fail(function() {
-                var server = array_random(self.options.fallbackXmppServers);
+                var server = array.random(self.options.fallbackXmppServers);
                 self.logger.error("Could not connect to load balancing service for xmpp, will fallback to: " + server + ".");
 
                 if (webSocketsSupport) {
@@ -1661,7 +1661,7 @@ Chat.prototype.renderListing = function() {
     $('.nw-conversations-item').removeClass('selected');
 
 
-    sectionUIopen('conversations');
+    M.onSectionUIOpen('conversations');
 
 
     if (Object.keys(self.chats).length === 0) {
@@ -1681,7 +1681,7 @@ Chat.prototype.renderListing = function() {
 
             var sortedConversations = obj_values(self.chats.toJS());
 
-            sortedConversations.sort(mega.utils.sortObjFn("lastActivity", -1));
+            sortedConversations.sort(M.sortObjFn("lastActivity", -1));
 
             if (sortedConversations.length > 0) {
                 var room = sortedConversations[0];

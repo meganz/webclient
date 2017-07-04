@@ -324,7 +324,7 @@ function init_pro()
             $('.membership-step2 .pro span').html(proPlanName);
 
             // Update header text with plan
-            var $selectedPlanHeader = $('.membership-step2 .main-italic-header.pro');
+            var $selectedPlanHeader = $('.membership-step2 .bottom-page.semibig-header');
             var selectedPlanText = $selectedPlanHeader.html().replace('%1', proPlanName);
             $selectedPlanHeader.html(selectedPlanText);
 
@@ -397,6 +397,8 @@ function init_pro()
         $('.reg-st3-membership-bl.pro' + window.selectedProPlan + ' .membership-pad-bl').trigger('click');
         delete window.selectedProPlan;
     }
+	
+	
 }
 
 
@@ -464,7 +466,6 @@ function pro_next_step(proPlanName) {
 
     $('.membership-step1').addClass('hidden');
     $('.membership-step2').removeClass('hidden');
-    mainScroll();
 
     $('.membership-date .month').text(mon);
     $('.membership-date .day').text(day);
@@ -1293,9 +1294,6 @@ var proPage = {
         $paymentAddressDialog.find('.payment-buy-now').text(subscribeOrPurchase);
         $paymentAddressDialog.find('.payment-note-first.recurring .duration').text(recurringMonthlyOrAnnuallyMessage);
         $paymentAddressDialog.find('.payment-plan-txt .recurring').text(recurringOrNonRecurring);
-
-        // Re-initialise the main page scrolling as extra content could have changed the height
-        mainScroll();
     },
 
     /**

@@ -181,14 +181,27 @@ function registeraccount() {
         rv.email = $('#register-email').val();
         rv.name = rv.first + ' ' + rv.last;
     }
+
+    var signup = sendsignuplink.bind(null, rv.name, rv.email, rv.password, ctx);
+
     if (u_type === 0) {
         // An ephemeral account is registering, save the cloud nodes in case we need to migrate later
         var names = Object.create(null);
         names[M.RootID] = 'ephemeral-account';
-        $.ephNodes = fm_getcopynodes([M.RootID], names);
-        $.ephNodes[0].t = 1; // change RootID's t2 to t1
+
+        M.getCopyNodes([M.RootID], null, names)
+            .done(function(nodes) {
+                if (Array.isArray(nodes) && nodes.length) {
+                    $.ephNodes = nodes;
+                    $.ephNodes[0].t = 1; // change RootID's t2 to t1
+                }
+
+                signup();
+            });
     }
-    sendsignuplink(rv.name, rv.email, rv.password, ctx);
+    else {
+        signup();
+    }
 }
 
 function pageregister() {
@@ -355,7 +368,7 @@ function init_register() {
     if (typeof zxcvbn === 'undefined') {
         $('.login-register-input.password').addClass('loading');
 
-        mega.utils.require('zxcvbn_js')
+        M.require('zxcvbn_js')
             .done(function() {
                 $('.login-register-input.password').removeClass('loading');
                 registerpwcheck();

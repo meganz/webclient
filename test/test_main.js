@@ -32,6 +32,14 @@ describe("Initialization Unit Tests", function() {
 
         _showDebug(sandbox, ['console.log', 'console.error']);
 
+        // turn the `ua` (userAgent) string into an object which holds the browser details
+        try {
+            ua = Object(ua);
+            ua.details = Object.create(browserdetails(ua));
+        }
+        catch (e) {}
+
+        mBroadcaster.sendMessage('boot_done');
         mBroadcaster.sendMessage('startMega');
 
         _hideDebug();

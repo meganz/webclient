@@ -115,7 +115,7 @@ mega.ui.tpp = (function () {
         var visible = isVisible();
         var enabled = isEnabled();
 
-        if (enabled && !visible && (M.currentdirid !== 'transfers') && mega.utils.hasPendingTransfers()) {
+        if (enabled && !visible && (M.currentdirid !== 'transfers') && M.hasPendingTransfers()) {
             opts.dlg.$.show(opts.duration);
             setStatus(true);
         }

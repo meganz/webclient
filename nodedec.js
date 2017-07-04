@@ -244,6 +244,8 @@ function crypto_decryptnode(n) {
         if (missingkeys) crypto_reportmissingkey(n);
     }
 }
+var vkey = {};
+var ckey = {};
 
 // generate attributes block for given node using AES-CBC with MEGA canary
 // (also generates random (folder-type) key if missing)
@@ -275,7 +277,7 @@ function crypto_makeattr(n, nn) {
     if (typeof n.f != 'undefined') ar.f = n.f;
 
     try {
-        ab = str_to_ab('MEGA' + to8(JSON.stringify(ar)));
+        var ab = str_to_ab('MEGA' + to8(JSON.stringify(ar)));
     } catch (e) {
         msgDialog('warningb', l[135], e.message || e);
         throw e;
@@ -364,7 +366,15 @@ function crypto_procattr(n, key) {
         }
     }
     else if (d) {
-        console.debug("Corrupted attributes or key for node " + n.h);
+        ckey[n.h] = 1;
+        if (ckey.t) {
+            clearTimeout(ckey.t);
+        }
+        ckey.t = setTimeout(function() {
+            delete ckey.t;
+            console.debug("Corrupted attributes or key for", Object.keys(ckey));
+            ckey = {};
+        }, 4000);
     }
 }
 

@@ -31,9 +31,9 @@ var megasync = (function() {
     function linuxDropdown(selected) {
 
         var is64    = browserdetails().is64bit;
-        var $dropdown = $('.megasync-dropdown'); 
-        var $select = $dropdown.find('.megasync-scr-pad').empty();
-        var $list   = $dropdown.find('.megasync-dropdown-list');
+        var $dropdown = $('.megasync .megaapp-dropdown'); 
+        var $select = $dropdown.find('.megaapp-scr-pad').empty();
+        var $list   = $dropdown.find('.megaapp-dropdown-list');
         $('.megasync-overlay').addClass('linux');
 
         if (typeof selected !== "function") {
@@ -64,10 +64,10 @@ var megasync = (function() {
             selected($(this));
         });
 
-        $('.main-pad-block').rebind('click.closesyncdropdown', function(e) {
+        $('.bottom-page.scroll-block.megasync').rebind('click.closesyncdropdown', function(e) {
             if ($dropdown.hasClass('active')) {
-                if ($(e.target).parent('.megasync-dropdown').length === 0 &&
-                        !$(e.target).hasClass('megasync-dropdown')) {
+                if ($(e.target).parent('.megaapp-dropdown').length === 0 &&
+                        !$(e.target).hasClass('megaapp-dropdown')) {
                     $dropdown.removeClass('active');
                     $list.addClass('hidden');
                 }
@@ -96,13 +96,13 @@ var megasync = (function() {
      */
     function linuxDropdownResizeHandler() {
 
-        var $main = $('.megasync-dropdown:visible');
-        var $pane = $main.find('.megasync-dropdown-scroll');
+        var $main = $('.megaapp-dropdown:visible');
+        var $pane = $main.find('.megaapp-dropdown-scroll');
         var jsp   = $pane.data('jsp');
-        var $list = $main.find('.megasync-dropdown-list');
+        var $list = $main.find('.megaapp-dropdown-list');
         var $arrow = $main.find('.mega-list-arrow');
         var overlayHeight = $('.megasync-overlay').outerHeight();
-        var listHeight = $main.find('.megasync-scr-pad').outerHeight() + 72;
+        var listHeight = $main.find('.megaapp-scr-pad').outerHeight() + 72;
         var listPosition;
 
         if ($list.length) {
@@ -235,7 +235,7 @@ var megasync = (function() {
             return MegaPromise.reject(ex);
         }
 
-        var promise = mega.utils.xhr({
+        var promise = M.xhr({
             url: megasyncUrl,
             data: args,
             type: 'json'

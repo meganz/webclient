@@ -912,42 +912,6 @@ function ssl_needed() {
     return 1;
 }
 
-function benchmark() {
-    var a = Array(1048577).join('a');
-
-    var ab = str_to_ab(a);
-
-    var ab8 = new Uint8Array(ab);
-
-    var aes = new sjcl.cipher.aes([0, 1, 2, 3]);
-
-    t = new Date().getTime();
-    for (var i = 16; i--;) {
-        encrypt_ab_ctr(aes, ab8, [1, 2], 30000);
-    }
-    t = new Date().getTime() - t;
-
-    logger.info('Measured throughput: ' + (a.length * 16 / 1024) / (t / 1000) + " KB/s");
-}
-
-// compute final MAC from block MACs
-function condenseMacs(macs, key) {
-    var i, aes, mac = [0, 0, 0, 0];
-
-    aes = new sjcl.cipher.aes([key[0], key[1], key[2], key[3]]);
-
-    for (i = 0; i < macs.length; i++) {
-        mac[0] ^= macs[i][0];
-        mac[1] ^= macs[i][1];
-        mac[2] ^= macs[i][2];
-        mac[3] ^= macs[i][3];
-
-        mac = aes.encrypt(mac);
-    }
-
-    return mac;
-}
-
 // convert user-supplied password array
 function prepare_key(a) {
     var i, j, r;
@@ -955,7 +919,7 @@ function prepare_key(a) {
     var pkey = [0x93C467E3, 0x7DB0C7A4, 0xD1BE3F81, 0x0152CB56];
 
     for (j = 0; j < a.length; j += 4) {
-        key = [0, 0, 0, 0];
+        var key = [0, 0, 0, 0];
         for (i = 0; i < 4; i++) {
             if (i + j < a.length) {
                 key[i] = a[i + j];
@@ -1009,231 +973,12 @@ else if (have_ab) {
     };
 }
 
-// encrypt ArrayBuffer in CTR mode, return MAC
-function encrypt_ab_ctr(aes, ab, nonce, pos) {
-    var ctr = [nonce[0], nonce[1], (pos / 0x1000000000) >>> 0, (pos / 0x10) >>> 0];
-    var mac = [ctr[0], ctr[1], ctr[0], ctr[1]];
-
-    var enc, i, j, len, v;
-
-    if (have_ab) {
-        var data0, data1, data2, data3;
-
-        len = ab.buffer.byteLength - 16;
-
-        var v = new DataView(ab.buffer);
-
-        for (i = 0; i < len; i += 16) {
-            data0 = v.getUint32(i, false);
-            data1 = v.getUint32(i + 4, false);
-            data2 = v.getUint32(i + 8, false);
-            data3 = v.getUint32(i + 12, false);
-
-            // compute MAC
-            mac[0] ^= data0;
-            mac[1] ^= data1;
-            mac[2] ^= data2;
-            mac[3] ^= data3;
-            mac = aes.encrypt(mac);
-
-            // encrypt using CTR
-            enc = aes.encrypt(ctr);
-            v.setUint32(i, data0 ^ enc[0], false);
-            v.setUint32(i + 4, data1 ^ enc[1], false);
-            v.setUint32(i + 8, data2 ^ enc[2], false);
-            v.setUint32(i + 12, data3 ^ enc[3], false);
-
-            if (!(++ctr[3])) {
-                ctr[2]++;
-            }
-        }
-
-        if (i < ab.buffer.byteLength) {
-            var fullbuf = new Uint8Array(ab.buffer);
-            var tmpbuf = new ArrayBuffer(16);
-            var tmparray = new Uint8Array(tmpbuf);
-
-            tmparray.set(fullbuf.subarray(i));
-
-            v = new DataView(tmpbuf);
-
-            enc = aes.encrypt(ctr);
-
-            data0 = v.getUint32(0, false);
-            data1 = v.getUint32(4, false);
-            data2 = v.getUint32(8, false);
-            data3 = v.getUint32(12, false);
-
-            mac[0] ^= data0;
-            mac[1] ^= data1;
-            mac[2] ^= data2;
-            mac[3] ^= data3;
-            mac = aes.encrypt(mac);
-
-            enc = aes.encrypt(ctr);
-            v.setUint32(0, data0 ^ enc[0], false);
-            v.setUint32(4, data1 ^ enc[1], false);
-            v.setUint32(8, data2 ^ enc[2], false);
-            v.setUint32(12, data3 ^ enc[3], false);
-
-            fullbuf.set(tmparray.subarray(0, j = fullbuf.length - i), i);
-        }
-    }
-    else {
-        var ab32 = _str_to_a32(ab.buffer);
-
-        len = ab32.length - 3;
-
-        for (i = 0; i < len; i += 4) {
-            mac[0] ^= ab32[i];
-            mac[1] ^= ab32[i + 1];
-            mac[2] ^= ab32[i + 2];
-            mac[3] ^= ab32[i + 3];
-            mac = aes.encrypt(mac);
-
-            enc = aes.encrypt(ctr);
-            ab32[i] ^= enc[0];
-            ab32[i + 1] ^= enc[1];
-            ab32[i + 2] ^= enc[2];
-            ab32[i + 3] ^= enc[3];
-
-            if (!(++ctr[3])) {
-                ctr[2]++;
-            }
-        }
-
-        if (i < ab32.length) {
-            var v = [0, 0, 0, 0];
-
-            for (j = i; j < ab32.length; j++) {
-                v[j - i] = ab32[j];
-            }
-
-            mac[0] ^= v[0];
-            mac[1] ^= v[1];
-            mac[2] ^= v[2];
-            mac[3] ^= v[3];
-            mac = aes.encrypt(mac);
-
-            enc = aes.encrypt(ctr);
-            v[0] ^= enc[0];
-            v[1] ^= enc[1];
-            v[2] ^= enc[2];
-            v[3] ^= enc[3];
-
-            for (j = i; j < ab32.length; j++) {
-                ab32[j] = v[j - i];
-            }
-        }
-
-        ab.buffer = _a32_to_str(ab32, ab.buffer.length);
-    }
-
-    return mac;
-}
-
-function _str_to_a32(b) {
-    var a = Array((b.length + 3) >> 2);
-
-    if (typeof b === 'string') {
-        for (var i = 0; i < b.length; i++) {
-            a[i >> 2] |= (b.charCodeAt(i) & 255) << (24 - (i & 3) * 8);
-        }
-    }
-    else {
-        for (var i = 0; i < b.length; i++) {
-            a[i >> 2] |= b[i] << ((i & 3) * 8);
-        }
-    }
-
-    return a;
-}
-
-function _a32_to_str(a, len) {
-    var b = '';
-
-    for (var i = 0; i < len; i++) {
-        b = b + String.fromCharCode((a[i >> 2] >>> (24 - (i & 3) * 8)) & 255);
-    }
-
-    return b;
-}
-
-function chksum(buf) {
-    var l, c, d;
-
-    if (have_ab) {
-        var ll;
-
-        c = new Uint32Array(3);
-
-        ll = buf.byteLength;
-
-        l = Math.floor(ll / 12);
-
-        ll -= l * 12;
-
-        if (l) {
-            l *= 3;
-            d = new Uint32Array(buf, 0, l);
-
-            while (l) {
-                l -= 3;
-
-                c[0] ^= d[l];
-                c[1] ^= d[l + 1];
-                c[2] ^= d[l + 2];
-            }
-        }
-
-        c = new Uint8Array(c.buffer);
-
-        if (ll) {
-            d = new Uint8Array(buf, buf.byteLength - ll, ll);
-
-            while (ll--) c[ll] ^= d[ll];
-        }
-    }
-    else {
-        c = Array(12);
-
-        for (l = 12; l--;) {
-            c[l] = 0;
-        }
-
-        for (l = buf.length; l--;) {
-            c[l % 12] ^= buf.charCodeAt(l);
-        }
-
-    }
-
-    for (d = '', l = 0; l < 12; l++) {
-        d += String.fromCharCode(c[l]);
-    }
-
-    return d;
-}
-
 // random number between 0 .. n -- based on repeated calls to rc
 function rand(n) {
     var r = new Uint32Array(1);
     asmCrypto.getRandomValues(r);
     return r[0] % n; // <- oops, it's uniformly distributed only when `n` divides 0x100000000
 }
-
-/*
-if (is_chrome_firefox) {
-    var nsIRandomGenerator = Cc["@mozilla.org/security/random-generator;1"]
-        .createInstance(Ci.nsIRandomGenerator);
-
-    var rand = function fx_rand(n) {
-        var r = nsIRandomGenerator.generateRandomBytes(4);
-        r = (r[0] << 24) | (r[1] << 16) | (r[2] << 8) | r[3];
-        if (r<0) r ^= 0x80000000;
-        return r % n; // oops, it's not uniformly distributed
-    };
-}
-*/
 
 function crypto_rsagenkey() {
     var $promise = new MegaPromise();
@@ -1285,129 +1030,6 @@ function crypto_rsagenkey() {
     return $promise;
 }
 
-/* }}} */
-
-// decrypt ArrayBuffer in CTR mode, return MAC
-function decrypt_ab_ctr(aes, ab, nonce, pos) {
-    var ctr = [nonce[0], nonce[1], (pos / 0x1000000000) >>> 0, (pos / 0x10) >>> 0];
-    var mac = [ctr[0], ctr[1], ctr[0], ctr[1]];
-
-    var enc, len, i, j, v;
-
-    if (have_ab) {
-        var data0, data1, data2, data3;
-
-        len = ab.buffer.byteLength - 16; // @@@ -15?
-
-        var v = new DataView(ab.buffer);
-
-        for (i = 0; i < len; i += 16) {
-            enc = aes.encrypt(ctr);
-
-            data0 = v.getUint32(i, false) ^ enc[0];
-            data1 = v.getUint32(i + 4, false) ^ enc[1];
-            data2 = v.getUint32(i + 8, false) ^ enc[2];
-            data3 = v.getUint32(i + 12, false) ^ enc[3];
-
-            v.setUint32(i, data0, false);
-            v.setUint32(i + 4, data1, false);
-            v.setUint32(i + 8, data2, false);
-            v.setUint32(i + 12, data3, false);
-
-            mac[0] ^= data0;
-            mac[1] ^= data1;
-            mac[2] ^= data2;
-            mac[3] ^= data3;
-
-            mac = aes.encrypt(mac);
-
-            if (!(++ctr[3])) {
-                ctr[2]++;
-            }
-        }
-
-        if (i < ab.buffer.byteLength) {
-            var fullbuf = new Uint8Array(ab.buffer);
-            var tmpbuf = new ArrayBuffer(16);
-            var tmparray = new Uint8Array(tmpbuf);
-
-            tmparray.set(fullbuf.subarray(i));
-
-            v = new DataView(tmpbuf);
-
-            enc = aes.encrypt(ctr);
-            data0 = v.getUint32(0, false) ^ enc[0];
-            data1 = v.getUint32(4, false) ^ enc[1];
-            data2 = v.getUint32(8, false) ^ enc[2];
-            data3 = v.getUint32(12, false) ^ enc[3];
-
-            v.setUint32(0, data0, false);
-            v.setUint32(4, data1, false);
-            v.setUint32(8, data2, false);
-            v.setUint32(12, data3, false);
-
-            fullbuf.set(tmparray.subarray(0, j = fullbuf.length - i), i);
-
-            while (j < 16) tmparray[j++] = 0;
-
-            mac[0] ^= v.getUint32(0, false);
-            mac[1] ^= v.getUint32(4, false);
-            mac[2] ^= v.getUint32(8, false);
-            mac[3] ^= v.getUint32(12, false);
-            mac = aes.encrypt(mac);
-        }
-    }
-    else {
-        var ab32 = _str_to_a32(ab.buffer);
-        len = ab32.length - 3;
-
-        for (i = 0; i < len; i += 4) {
-            enc = aes.encrypt(ctr);
-            mac[0] ^= (ab32[i] ^= enc[0]);
-            mac[1] ^= (ab32[i + 1] ^= enc[1]);
-            mac[2] ^= (ab32[i + 2] ^= enc[2]);
-            mac[3] ^= (ab32[i + 3] ^= enc[3]);
-            mac = aes.encrypt(mac);
-
-            if (!(++ctr[3])) {
-                ctr[2]++;
-            }
-        }
-
-        if (i < ab32.length) {
-            var v = [0, 0, 0, 0];
-
-            for (j = i; j < ab32.length; j++) {
-                v[j - i] = ab32[j];
-            }
-
-            enc = aes.encrypt(ctr);
-            v[0] ^= enc[0];
-            v[1] ^= enc[1];
-            v[2] ^= enc[2];
-            v[3] ^= enc[3];
-
-            var j = ab.buffer.length & 15;
-
-            var m = _str_to_a32(Array(j + 1).join(String.fromCharCode(255)) + Array(17 - j).join(String.fromCharCode(0)));
-
-            mac[0] ^= v[0] & m[0];
-            mac[1] ^= v[1] & m[1];
-            mac[2] ^= v[2] & m[2];
-            mac[3] ^= v[3] & m[3];
-            mac = aes.encrypt(mac);
-
-            for (j = i; j < ab32.length; j++) {
-                ab32[j] = v[j - i];
-            }
-        }
-
-        ab.buffer = _a32_to_str(ab32, ab.buffer.length);
-    }
-
-    return mac;
-}
-
 /**
  * Converts a Unicode string to a UTF-8 cleanly encoded string.
  *
@@ -1427,6 +1049,8 @@ var to8 = firefox_boost ? mozTo8 : function (unicode) {
 var apixs = [];
 
 function api_reset() {
+    "use strict";
+
     // user account API interface
     api_init(0, 'cs');
 
@@ -1458,6 +1082,8 @@ function api_esplit(e) {
 }
 
 function api_setsid(sid) {
+    "use strict";
+
     if (sid !== false) {
         watchdog.notify('setsid', sid);
 
@@ -1484,24 +1110,28 @@ function api_setsid(sid) {
     }
 
     apixs[0].sid = sid;
-    apixs[2].sid = pfid ? '' : sid; // omit sid on sc for folderlinks
-    apixs[3].sid = pfid ? '' : sid; // omit sid on sc for folderlinks
+    apixs[2].sid = sid;
+    apixs[3].sid = sid;
     apixs[4].sid = sid;
 }
 
 function api_setfolder(h) {
-    var sid = h = 'n=' + h;
+    "use strict";
+
+    h = 'n=' + h;
 
     if (u_sid) {
-        sid += '&sid=' + u_sid;
+        h += '&sid=' + u_sid;
     }
 
-    apixs[1].sid = sid;
-    apixs[2].sid = h; // omit sid on sc for folderlinks
-    apixs[4].sid = sid;
+    apixs[1].sid = h;
+    apixs[2].sid = h;
+    apixs[4].sid = h;
 }
 
 function stopapi() {
+    "use strict";
+
     for (var i = apixs.length; i--;) {
         api_cancel(apixs[i]);
         apixs[i].cmds = [[], []];
@@ -1510,6 +1140,8 @@ function stopapi() {
 }
 
 function api_cancel(q) {
+    "use strict";
+
     if (q) {
         if (q.xhr) {
             // setting the "cancelled" flag ensures that
@@ -1525,6 +1157,8 @@ function api_cancel(q) {
 }
 
 function api_init(channel, service, split) {
+    "use strict";
+
     if (apixs[channel]) {
         api_cancel(apixs[channel]);
     }
@@ -1550,14 +1184,16 @@ function api_init(channel, service, split) {
 
 // queue request on API channel
 function api_req(request, context, channel) {
-    if (typeof channel == 'undefined') {
+    "use strict";
+
+    if (channel === undefined) {
         channel = 0;
     }
 
     if (d) console.log("API request on " + channel + ": " + JSON.stringify(request));
 
-    if (typeof context == 'undefined') {
-        context = {};
+    if (context === undefined) {
+        context = Object.create(null);
     }
 
     var q = apixs[channel];
@@ -1576,8 +1212,17 @@ function api_req(request, context, channel) {
 // FIXME: check for fetch on !Firefox, not just on Chrome
 var chunked_method = window.chrome ? (self.fetch ? 2 : 0) : -1;
 
+if (typeof Uint8Array.prototype.indexOf !== 'function') {
+    if (d) {
+        console.debug('No chunked method on this browser: ' + ua);
+    }
+    chunked_method = 0;
+}
+
 // this kludge emulates moz-chunked-arraybuffer with XHR-style callbacks
 function chunkedfetch(xhr, uri, postdata) {
+    "use strict";
+
     fetch(uri, { method: 'POST', body: postdata }).then(function(response) {
         var reader = response.body.getReader();
         var evt = { loaded: 0 };
@@ -1610,7 +1255,9 @@ function chunkedfetch(xhr, uri, postdata) {
 
 // send pending API request on channel q
 function api_proc(q) {
-    var logger = MegaLogger.getLogger('crypt');
+    "use strict";
+
+    var logger = d && MegaLogger.getLogger('crypt');
     if (q.setimmediate) {
         clearTimeout(q.setimmediate);
         q.setimmediate = false;
@@ -1624,13 +1271,15 @@ function api_proc(q) {
 
     if (!q.xhr) {
         // we need a real XHR only if we don't use fetch for this channel
-        q.xhr = (!q.split || chunked_method != 2) ? getxhr() : {};
+        q.xhr = (!q.split || chunked_method != 2) ? getxhr() : Object.create(null);
 
         q.xhr.q = q;
 
         q.xhr.onerror = function () {
             if (!this.cancelled) {
-                logger.debug("API request error - retrying");
+                if (logger) {
+                    logger.debug("API request error - retrying");
+                }
                 api_reqerror(q, EAGAIN, this.status);
             }
         };
@@ -1678,7 +1327,7 @@ function api_proc(q) {
 
                     // send incoming live data to splitter
                     // for maximum flexibility, the splitter ctx will be the XHR
-                    if (!this.q.splitter.chunkproc(chunk, false)) {
+                    if (!this.q.splitter.chunkproc(chunk, chunk.length === this.totalBytes)) {
                         // a JSON syntax error occurred: hard reload
                         fm_fullreload(this.q, 'onerror JSON Syntax Error');
                     }
@@ -1707,7 +1356,7 @@ function api_proc(q) {
                         return;
                     }
 
-                    if (d) {
+                    if (d && logger) {
                         if (d > 1 || !window.chrome || String(response).length < 512) {
                             logger.debug('API response: ', response);
                         }
@@ -1725,12 +1374,16 @@ function api_proc(q) {
                         status = true;
                     } catch (e) {
                         // bogus response, try again
-                        logger.debug("Bad JSON data in response: " + response);
+                        if (d) {
+                            logger.debug("Bad JSON data in response: " + response);
+                        }
                         t = EAGAIN;
                     }
                 }
                 else {
-                    logger.debug('API server connection failed (error ' + status + ')');
+                    if (d) {
+                        logger.debug('API server connection failed (error ' + status + ')');
+                    }
                     t = ERATELIMIT;
                 }
 
@@ -1777,20 +1430,27 @@ function api_proc(q) {
 }
 
 function api_send(q) {
-    var logger = MegaLogger.getLogger('crypt');
+    "use strict";
+
+    var logger = d && MegaLogger.getLogger('crypt');
     q.timer = false;
 
-    logger.debug("Sending API request: " + q.rawreq + " to " + q.url);
+    if (q.xhr === false) {
+        if (logger) {
+            logger.debug("API request aborted: " + q.rawreq + " to " + q.url);
+        }
+        return;
+    }
+
+    if (logger) {
+        logger.debug("Sending API request: " + q.rawreq + " to " + q.url);
+    }
 
     // reset number of bytes received and response size
     q.received = 0;
     delete q.xhr.totalBytes;
 
     q.xhr.cancelled = false;
-
-    if (chunked_method === 2 && typeof Uint8Array.prototype.indexOf !== 'function') {
-        chunked_method = 0;
-    }
 
     if (q.split && chunked_method == 2) {
         // use chunked fetch with JSONSplitter input type Uint8Array
@@ -1804,9 +1464,7 @@ function api_send(q) {
         if (q.split) {
             if (chunked_method) {
                 // FIXME: use Fetch API if more efficient than this
-                if (typeof Uint8Array.prototype.indexOf === 'function') {
-                    q.xhr.responseType = 'moz-chunked-arraybuffer';
-                }
+                q.xhr.responseType = 'moz-chunked-arraybuffer';
 
                 // first try? record success
                 if (chunked_method < 0) {
@@ -1826,10 +1484,7 @@ function api_reqerror(q, e, status) {
     if (e == EAGAIN || e == ERATELIMIT) {
         // request failed - retry with exponential backoff
         if (q.backoff) {
-            q.backoff *= 2;
-            if (q.backoff > 1024000) {
-                q.backoff = 1024000;
-            }
+            q.backoff = Math.min(600000, q.backoff << 1);
         }
         else {
             q.backoff = 125+Math.floor(Math.random()*600);
@@ -1866,6 +1521,8 @@ function api_ready(q) {
 var apiFloorCap = 3000;
 
 function api_retry() {
+    "use strict";
+
     for (var i = apixs.length; i--; ) {
         if (apixs[i].timer && apixs[i].backoff > apiFloorCap) {
             clearTimeout(apixs[i].timer);
@@ -1956,7 +1613,7 @@ function api_reportfailure(hostname, callback) {
         if (this.status === 200) {
             failxhr.callback();
         }
-    }
+    };
 
     failxhr.send(hostname);
 }
@@ -1970,6 +1627,8 @@ var waitid = 0;
 var cmsNotifHandler = localStorage.cmsNotificationID || 'Nc4AFJZK';
 
 function stopsc() {
+    "use strict";
+
     if (waitxhr && waitxhr.readyState !== waitxhr.DONE) {
         waitxhr.abort();
         waitxhr = false;
@@ -1983,6 +1642,8 @@ function stopsc() {
 
 // if set, further sn updates are disallowed (the local state has become invalid)
 function setsn(sn) {
+    "use strict";
+
     // update sn in DB, triggering a "commit" of the current "transaction"
     if (fmdb) {
         attribCache.flush();
@@ -1995,6 +1656,8 @@ var initialscfetch;
 
 // last step of the streamed SC response processing
 function sc_residue(sc) {
+    "use strict";
+
     if (sc.sn) {
         // enqueue new sn
         currsn = sc.sn;
@@ -2040,6 +1703,8 @@ var gettingsc;
 // request new actionpackets and stream them to sc_packet() as they come in
 // nodes in t packets are streamed to sc_node()
 function getsc(force) {
+    "use strict";
+
     if (force || !gettingsc) {
         gettingsc = true;
 
@@ -2054,67 +1719,47 @@ function getsc(force) {
 }
 
 function waitsc() {
-    var logger = MegaLogger.getLogger('crypt');
+    "use strict";
+
+    var MAX_WAIT = 300000;
     var newid = ++waitid;
 
-    if (waitxhr && waitxhr.readyState !== waitxhr.DONE) {
-        waitxhr.abort();
-        waitxhr = false;
-    }
+    stopsc();
 
     if (!waitxhr) {
         waitxhr = getxhr();
     }
-
     waitxhr.waitid = newid;
 
-    if (waittimeout) {
-        clearTimeout(waittimeout);
-    }
+    waittimeout = setTimeout(waitsc, MAX_WAIT);
 
-    waittimeout = setTimeout(waitsc, 300000);
-
-    waitxhr.onerror = function () {
-        logger.debug('waitsc.onerror');
+    waitxhr.onerror = function(ev) {
+        if (d) {
+            console.debug('waitsc.onerror', ev);
+        }
 
         if (this.waitid === waitid) {
             clearTimeout(waittimeout);
-            waittimeout = false;
-
-            waitbackoff *= 2;
-            if (waitbackoff > 1024000) {
-                waitbackoff = 1024000;
-            }
+            waitbackoff = Math.min(MAX_WAIT, waitbackoff << 1);
             waittimeout = setTimeout(waitsc, waitbackoff);
         }
     };
 
-    waitxhr.onload = function() {
+    waitxhr.onload = function(ev) {
         if (this.status !== 200) {
-            this.onerror();
-        } else {
-            waitbackoff = 250;
+            this.onerror(ev);
+        }
+        else if (this.waitid === waitid) {
+            stopsc();
 
-            clearTimeout(waittimeout);
-            waittimeout = false;
-
-            if (this.waitid === waitid) {
-                stopsc();
-
-                var t = Date.now() - waitbegin;
-
-                if (t < 1000) {
-                    waitbackoff += waitbackoff;
-                    if (waitbackoff > 256000) {
-                        waitbackoff = 256000;
-                    }
-                }
-                else {
-                    waitbackoff = 250;
-                }
-
-                getsc();
+            if ((Date.now() - waitbegin) < 1000) {
+                waitbackoff = Math.min(MAX_WAIT, waitbackoff << 1);
             }
+            else {
+                waitbackoff = 250;
+            }
+
+            getsc();
         }
     };
 
@@ -2122,6 +1767,18 @@ function waitsc() {
     waitxhr.open('POST', waiturl, true);
     waitxhr.send();
 }
+mBroadcaster.once('startMega', function() {
+    window.addEventListener('online', function(ev) {
+        if (d) {
+            console.info(ev);
+        }
+        api_retry();
+
+        if (waiturl) {
+            waitsc();
+        }
+    });
+});
 
 function api_create_u_k() {
     u_k = Array(4); // static master key, will be stored at the server side encrypted with the master pw
@@ -2265,6 +1922,8 @@ function api_resetkeykey3(res, ctx) {
 // Returns [decrypted master key,verified session ID(,RSA private key)] or false if API error or
 // supplied information incorrect
 function api_getsid(ctx, user, passwordkey, hash) {
+    "use strict";
+
     ctx.callback = api_getsid2;
     ctx.passwordkey = passwordkey;
 
@@ -2423,6 +2082,8 @@ function api_changepw(ctx, passwordkey, masterkey, oldpw, newpw, email) {
  * @return {MegaPromise}
  */
 function api_setattr(n, idtag) {
+    "use strict";
+
     var promise = new MegaPromise();
     var logger = MegaLogger.getLogger('crypt');
 
@@ -2482,7 +2143,7 @@ function api_updateuser(ctx, newuser) {
     res = api_req(newuser, ctx);
 }
 
-var u_pubkeys = {};
+var u_pubkeys = Object.create(null);
 
 /**
  * Query missing keys for the given users.
@@ -2545,7 +2206,6 @@ function api_cachepubkeys(users) {
  *     public key (needs to be obtained/cached beforehand).
  */
 function encryptto(user, data) {
-    var i;
     var pubkey;
 
     if ((pubkey = u_pubkeys[user])) {
@@ -2617,7 +2277,7 @@ function api_setshare1(ctx, params) {
 
     if (params) {
         logger.debug('api_setshare1.extend', params);
-        for (var i in params) {
+        for (i in params) {
             req[i] = params[i];
         }
     }
@@ -2649,6 +2309,7 @@ function api_setshare1(ctx, params) {
         req.cr = crypto_makecr(ctx.sharenodes, [ctx.node], true);
     }
 
+    ctx.backoff = 97;
     ctx.maxretry = 4;
     ctx.ssharekey = ssharekey;
 
@@ -2660,20 +2321,16 @@ function api_setshare1(ctx, params) {
         if (typeof req.s[i].m !== 'undefined') {
             req.s[i].u = req.s[i].m;
         }
+
+        if (d && M.opc[req.s[i].u]) {
+            logger.debug(req.s[i].u + ' is an outgoing pending contact...');
+        }
     }
 
     ctx.req = req;
 
     /** Callback for API interactions. */
     ctx.callback = function (res, ctx) {
-        if (!ctx.maxretry) {
-            masterPromise.reject(res);
-
-            return;
-        }
-
-        ctx.maxretry--;
-
         if (typeof res === 'object') {
             if (res.ok) {
                 logger.debug('Share key clash: Set returned key and try again.');
@@ -2690,34 +2347,31 @@ function api_setshare1(ctx, params) {
                             u_pubkeys[ctx.req.s[i].u]));
                     }
                 }
-                logger.info('Retrying share operation.')
+                logger.info('Retrying share operation.');
                 api_req(ctx.req, ctx);
-
-                return;
             }
             else {
                 logger.info('Share succeeded.');
                 masterPromise.resolve(res);
-
-                return;
             }
         }
+        else if (!--ctx.maxretry || res === EARGS) {
+            logger.error('Share operation failed.', res);
+            masterPromise.reject(res);
+        }
+        else {
+            logger.info('Retrying share operation...');
 
-        logger.info('Retrying share operation.')
-        api_req(ctx.req, ctx);
+            setTimeout(function() {
+                api_req(ctx.req, ctx);
+            }, ctx.backoff <<= 1);
+        }
     };
 
-    logger.info('Invoking share operation.')
+    logger.info('Invoking share operation.');
     api_req(ctx.req, ctx);
 
     return masterPromise;
-}
-
-function api_setshare2(ctx) {
-    api_setshare1(ctx, {
-        e: M.u[u_handle].m,
-        msg: ''
-    });
 }
 
 function crypto_handleauth(h) {
@@ -2725,7 +2379,9 @@ function crypto_handleauth(h) {
 }
 
 function crypto_keyok(n) {
-    return n && typeof n.k == 'object' && n.k.length >= (n.t ? 4 : 8);
+    "use strict";
+
+    return n && typeof n.k === 'object' && n.k.length >= (n.t ? 4 : 8);
 }
 
 function crypto_encodepubkey(pubkey) {
@@ -2851,160 +2507,10 @@ function crypto_rsaencrypt(cleartext, pubkey) {
     return ciphertext;
 }
 
-function is_rawimage(name, ext) {
-    ext = ext || ('' + name).split('.').pop().toUpperCase();
-
-    return (typeof dcraw !== 'undefined') && is_image.raw[ext] && ext;
-}
-
-function is_image(name) {
-    if (name) {
-        if (typeof name === 'object') {
-            if (name.fa && ~name.fa.indexOf(':1*')) {
-                return true;
-            }
-
-            name = name.name;
-        }
-        var ext = ('' + name).split('.').pop().toUpperCase();
-
-        return is_image.def[ext] || is_rawimage(null, ext) || mThumbHandler.has(0, ext);
-    }
-
-    return false;
-}
-
-is_image.def = {
-    'JPG': 1,
-    'JPEG': 1,
-    'GIF': 1,
-    'BMP': 1,
-    'PNG': 1
-};
-
-is_image.raw = {
-    // http://www.sno.phy.queensu.ca/~phil/exiftool/#supported
-    // let raw = {}; for(let tr of document.querySelectorAll('.norm.tight.sm.bm tr'))
-    //   if (tr.childNodes.length > 2 && ~tr.childNodes[2].textContent.indexOf('RAW'))
-    //     raw[tr.childNodes[0].textContent] = tr.childNodes[2].textContent;
-    "3FR": "Hasselblad RAW (TIFF-based)",
-    "ARW": "Sony Alpha RAW (TIFF-based)",
-    "CR2": "Canon RAW 2 (TIFF-based)",
-    "CRW": "Canon RAW Camera Image File Format (CRW spec.)",
-    "CIFF": "Canon RAW Camera Image File Format (CRW spec.)",
-    "CS1": "Sinar CaptureShop 1-shot RAW (PSD-based)",
-    "DCR": "Kodak Digital Camera RAW (TIFF-based)",
-    "DNG": "Digital Negative (TIFF-based)",
-    "ERF": "Epson RAW Format (TIFF-based)",
-    "IIQ": "Phase One Intelligent Image Quality RAW (TIFF-based)",
-    "K25": "Kodak DC25 RAW (TIFF-based)",
-    "KDC": "Kodak Digital Camera RAW (TIFF-based)",
-    "MEF": "Mamiya (RAW) Electronic Format (TIFF-based)",
-    "MOS": "Leaf Camera RAW File",
-    "MRW": "Minolta RAW",
-    "NEF": "Nikon (RAW) Electronic Format (TIFF-based)",
-    "NRW": "Nikon RAW (2) (TIFF-based)",
-    "ORF": "Olympus RAW Format (TIFF-based)",
-    "PEF": "Pentax (RAW) Electronic Format (TIFF-based)",
-    "RAF": "FujiFilm RAW Format",
-    "RAW": "Panasonic RAW (TIFF-based)",
-    "RW2": "Panasonic RAW 2 (TIFF-based)",
-    "RWL": "Leica RAW (TIFF-based)",
-    "SR2": "Sony RAW 2 (TIFF-based)",
-    "SRF": "Sony RAW Format (TIFF-based)",
-    "SRW": "Samsung RAW format (TIFF-based)",
-    "TIF": "Tagged Image File Format",
-    "TIFF": "Tagged Image File Format",
-    "X3F": "Sigma/Foveon RAW"
-};
-
-var mThumbHandler = {
-    sup: {},
-
-    add: function (exts, parser) {
-        exts = exts.split(",");
-        for (var i in exts) {
-            this.sup[exts[i].toUpperCase()] = parser;
-        }
-    },
-
-    has: function (name, ext) {
-        ext = ext || ('' + name).split('.').pop().toUpperCase();
-
-        return this.sup[ext];
-    }
-};
-
-mThumbHandler.add('PSD', function PSDThumbHandler(ab, cb) {
-    // http://www.awaresystems.be/imaging/tiff/tifftags/docs/photoshopthumbnail.html
-    var logger = MegaLogger.getLogger('crypt');
-    var u8 = new Uint8Array(ab),
-        dv = new DataView(ab),
-        len = u8.byteLength,
-        i = 0,
-        result;
-    if (d) {
-        console.time('psd-proc');
-    }
-
-    while (len > i + 12) {
-        if (u8[i] === 0x38 && u8[i + 1] === 0x42 && u8[i + 2] === 0x49 && u8[i + 3] === 0x4d) // 8BIM
-        {
-            var ir = dv.getUint16(i += 4);
-            var ps = dv.getUint8(i += 2) + 1;
-
-            if (ps % 2) {
-                ++ps;
-            }
-            var rl = dv.getUint32(i += ps);
-
-            i += 4;
-            if (len < i + rl) {
-                break;
-            }
-
-            if (ir === 1033 || ir === 1036) {
-                logger.debug('Got thumbnail resource at offset %d with length %d', i, rl);
-
-                i += 28;
-                result = ab.slice(i, i + rl);
-                break;
-            }
-
-            i += rl;
-        }
-        else {
-            ++i;
-        }
-    }
-    if (d) {
-        console.timeEnd('psd-proc');
-    }
-    cb(result);
-});
-
-mThumbHandler.add('SVG', function SVGThumbHandler(ab, cb) {
-    var canvas = document.createElement('canvas');
-    var ctx = canvas.getContext('2d');
-    var image = new Image();
-    image.onload = function () {
-        canvas.height = image.height;
-        canvas.width = image.width;
-        ctx.drawImage(image, 0, 0);
-        cb(dataURLToAB(canvas.toDataURL('image/png')));
-    };
-    image.src = 'data:image/svg+xml;charset=utf-8,'
-        + encodeURIComponent(ab_to_str(ab).replace(/foreignObject|script/g, 'desc'));
-});
-
-if (!window.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop()) | 0) < 56) {
-    delete mThumbHandler.sup.SVG;
-}
-
-var storedattr = {};
-var faxhrs = [];
-var faxhrfail = {};
-var faxhrlastgood = {};
+var storedattr = Object.create(null);
+var faxhrs = Object.create(null);
+var faxhrfail = Object.create(null);
+var faxhrlastgood = Object.create(null);
 
 // data.byteLength & 15 must be 0
 function api_storefileattr(id, type, key, data, ctx) {
@@ -3012,7 +2518,7 @@ function api_storefileattr(id, type, key, data, ctx) {
 
     if (typeof ctx !== 'object') {
         if (!storedattr[id]) {
-            storedattr[id] = {};
+            storedattr[id] = Object.create(null);
         }
 
         if (key) {
@@ -3035,7 +2541,7 @@ function api_storefileattr(id, type, key, data, ctx) {
         ssl: use_ssl
     };
 
-    if (M.d[ctx.handle] && rightsById(ctx.handle) > 1) {
+    if (M.d[ctx.handle] && M.getNodeRights(ctx.handle) > 1) {
         req.h = handle;
     }
 
@@ -3048,7 +2554,7 @@ function api_getfileattr(fa, type, procfa, errfa) {
     var p = {};
     var h = {};
     var k = {};
-    var plain = {}
+    var plain = {};
 
     var re = new RegExp('(\\d+):' + type + '\\*([a-zA-Z0-9-_]+)');
 
@@ -3084,7 +2590,7 @@ function api_getfileattr(fa, type, procfa, errfa) {
             k: k,
             procfa: procfa,
             errfa: errfa,
-            startTime: NOW(),
+            startTime: Date.now(),
             plaintext: plain[n]
         };
         api_req({
@@ -3097,7 +2603,7 @@ function api_getfileattr(fa, type, procfa, errfa) {
 }
 
 function fa_handler(xhr, ctx) {
-    var logger = MegaLogger.getLogger('crypt');
+    var logger = d > 1 && MegaLogger.getLogger('crypt');
     var chunked = ctx.p && fa_handler.chunked;
 
     this.xhr = xhr;
@@ -3118,17 +2624,16 @@ function fa_handler(xhr, ctx) {
                 this.parse = this.moz_parser;
                 this.responseType = 'moz-chunked-arraybuffer';
                 break;
-                /*    case 'Internet Explorer':
+        /*  case 'Internet Explorer':
                 // Doh, all in one go :(
                     this.parse = this.stream_parser;
                     this.responseType = 'ms-stream';
                     this.stream_reader= this.msstream_reader;
-                    break;
-                */
-            case 'xChrome':
+                    break;*/
+        /*  case 'Chrome':
                 this.parse = this.stream_parser;
                 this.responseType = 'stream';
-                break;
+                break;*/
             default:
                 this.setParser('text');
             }
@@ -3147,7 +2652,9 @@ function fa_handler(xhr, ctx) {
         this.done = this.onDone;
     }
 
-    logger.debug('fah type:', this.responseType);
+    if (logger) {
+        logger.debug('fah type:', this.responseType);
+    }
 }
 fa_handler.chunked = true;
 fa_handler.abort = function () {
@@ -3178,7 +2685,7 @@ fa_handler.prototype = {
         logger.debug("Attribute storage successful for faid=" + ctx.id + ", type=" + ctx.type);
 
         if (!storedattr[ctx.id]) {
-            storedattr[ctx.id] = {};
+            storedattr[ctx.id] = Object.create(null);
         }
 
         storedattr[ctx.id][ctx.type] = ab_to_base64(response);
@@ -3356,7 +2863,7 @@ fa_handler.prototype = {
     },
 
     ab_parser: function (response, ev) {
-        var logger = MegaLogger.getLogger('crypt');
+        var logger = d > 1 && MegaLogger.getLogger('crypt');
         if (response instanceof ArrayBuffer) {
             var buffer = new Uint8Array(response),
                 dv = new DataView(response),
@@ -3376,17 +2883,26 @@ fa_handler.prototype = {
 
                 i += 12;
                 if (ctx.h[h] && (k = ctx.k[h])) {
+                    var td;
                     var ts = buffer.subarray(i, p + i);
-                    var td = asmCrypto.AES_CBC.decrypt(ts,
-                        a32_to_ab([k[0] ^ k[4], k[1] ^ k[5], k[2] ^ k[6], k[3] ^ k[7]]), false);
 
-                    ++c;
+                    try {
+                        k = a32_to_ab([k[0] ^ k[4], k[1] ^ k[5], k[2] ^ k[6], k[3] ^ k[7]]);
+                        td = asmCrypto.AES_CBC.decrypt(ts, k, false);
+                        ++c;
+                    }
+                    catch (ex) {
+                        console.warn(ex);
+                        td = 0xDEAD;
+                    }
                     ctx.procfa(ctx, ctx.h[h], td);
                 }
                 i += p;
             }
 
-            logger.debug('ab_parser.r', i, p, !!h, c);
+            if (logger) {
+                logger.debug('ab_parser.r', i, p, !!h, c);
+            }
 
             return i;
         }
@@ -3508,10 +3024,10 @@ function api_faerrlauncher(ctx, host) {
 }
 
 function api_fareq(res, ctx, xhr) {
-    var logger = MegaLogger.getLogger('crypt');
+    var logger = d > 1 && MegaLogger.getLogger('crypt');
     var error = typeof res === 'number' && res || '';
 
-    if (ctx.startTime) {
+    if (ctx.startTime && logger) {
         logger.debug('Reply in %dms for %s', (Date.now() - ctx.startTime), xhr.q.url);
     }
 
@@ -3554,16 +3070,19 @@ function api_fareq(res, ctx, xhr) {
             faxhrs[slot].fa_timeout = ctx.errfa && ctx.errfa.timeout;
             faxhrs[slot].fah = new fa_handler(faxhrs[slot], ctx);
 
-            logger.debug("Using file attribute channel " + slot);
+            if (logger) {
+                logger.debug("Using file attribute channel " + slot);
+            }
 
             faxhrs[slot].onprogress = function (ev) {
+                    if (logger) {
                     logger.debug('fah ' + ev.type, this.readyState, ev.loaded, ev.total,
                             typeof this.response === 'string'
                                 ? this.response.substr(0, 12).split("").map(function (n) {
                                         return (n.charCodeAt(0) & 0xff).toString(16)
                                     }).join(".")
                                 : this.response, ev);
-
+                    }
                     if (this.fa_timeout) {
                         if (this.fart) {
                             clearTimeout(this.fart);
@@ -3607,7 +3126,9 @@ function api_fareq(res, ctx, xhr) {
                         ctx.errfa(id, 1);
                     }
                     else if (!ctx.fabort) {
-                        logger.error('api_fareq', id, this);
+                        if (logger) {
+                            logger.error('api_fareq', id, this);
+                        }
 
                         api_faretry(this.ctx, ETOOERR, this.fa_host);
                     }
@@ -3631,6 +3152,9 @@ function api_fareq(res, ctx, xhr) {
                         if (this.fah.done(ev) || M.chat) {
                             delay('thumbnails', fm_thumbnails, 200);
                         }
+
+                        // no longer reusable to prevent memory leaks...
+                        faxhrs[this.fa_slot] = null;
                     }
                 };
 
@@ -3671,7 +3195,9 @@ function api_fareq(res, ctx, xhr) {
                 if (!faxhrs[slot].fa_timeout) {
                     faxhrs[slot].timeout = 140000;
                     faxhrs[slot].ontimeout = function (e) {
-                        logger.error('api_fareq timeout', e);
+                        if (logger) {
+                            logger.error('api_fareq timeout', e);
+                        }
 
                         if (!faxhrfail[this.fa_host]) {
                             if (!faxhrlastgood[this.fa_host]
@@ -3689,7 +3215,9 @@ function api_fareq(res, ctx, xhr) {
 
                 faxhrs[slot].responseType = faxhrs[slot].fah.responseType;
                 if (faxhrs[slot].responseType !== faxhrs[slot].fah.responseType) {
-                    logger.error('Unsupported responseType', faxhrs[slot].fah.responseType)
+                    if (logger) {
+                        logger.error('Unsupported responseType', faxhrs[slot].fah.responseType)
+                    }
                     faxhrs[slot].fah.setParser('text');
                 }
                 if ("text" === faxhrs[slot].responseType) {
@@ -3713,7 +3241,7 @@ function api_getfa(id) {
             }
         }
     }
-    storedattr[id] = {};
+    storedattr[id] = Object.create(null);
 
     return f.length ? f.join('/') : false;
 }
@@ -3724,8 +3252,6 @@ function api_attachfileattr(node, id) {
     storedattr[id].target = node;
 
     if (fa) {
-        var logger = MegaLogger.getLogger('crypt');
-
         api_req({ a: 'pfa', n: node, fa: fa }, {
             callback: function(res) {
                 if (res === EACCESS) {
@@ -3745,7 +3271,7 @@ function api_pfaerror(handle) {
     }
 
     // Got access denied, store 'f' attr to prevent subsequent attemps
-    if (node && rightsById(node.h) > 1 && node.f !== u_handle) {
+    if (node && M.getNodeRights(node.h) > 1 && node.f !== u_handle) {
         node.f = u_handle;
         return api_setattr(node);
     }
@@ -3842,33 +3368,38 @@ function crypto_procsr(sr) {
                 });
             }
         }
-    }
+    };
 
     ctx.callback(false, ctx);
 }
 
 function api_updfkey(h) {
-    var logger = MegaLogger.getLogger('crypt');
-    var nk = [], k, sn;
-
-    logger.debug('api_updfkey', h);
-
-    if (typeof h != 'string') {
-        sn = h;
+    if (typeof h === 'string') {
+        M.getNodes(h, true).always(api_updfkeysync);
     }
     else {
-        sn = fm_getnodes(h, true);
+        api_updfkeysync(h);
+    }
+}
+function api_updfkeysync(sn) {
+    var logger = d && MegaLogger.getLogger('crypt');
+    var nk     = [];
+
+    if (d) {
+        logger.debug('api_updfkey', sn);
     }
 
     for (var i = sn.length; i--; ) {
-        h = sn[i];
+        var h = sn[i];
         if (M.d[h].u != u_handle && crypto_keyok(M.d[h])) {
             nk.push(h, a32_to_base64(encrypt_key(u_k_aes, M.d[h].k)));
         }
     }
 
     if (nk.length) {
-        logger.debug('api_updfkey.r', nk);
+        if (d) {
+            logger.debug('api_updfkey.r', nk);
+        }
         api_req({
             a: 'k',
             nk: nk
@@ -3876,7 +3407,7 @@ function api_updfkey(h) {
     }
 }
 
-var rsa2aes = {};
+var rsa2aes = Object.create(null);
 
 // check for an RSA node key: need to rewrite to AES for faster subsequent loading.
 function crypto_rsacheck(n) {
@@ -3898,7 +3429,7 @@ function crypto_node_rsa2aes() {
         }
     }
 
-    rsa2aes = {};
+    rsa2aes = Object.create(null);
 
     if (nk.length) {
         api_req({
@@ -3917,8 +3448,8 @@ function crypto_node_rsa2aes() {
 //   decrypt the node without assistance from the share owner
 // FIXME: update missingkeys/sharemissing for all undecryptable nodes whose
 // share path changed (whenever shares are added, removed or nodes are moved)
-var missingkeys = {};   // { node handle : { share handle : true } }
-var sharemissing = {};  // { share handle : { node handle : true } }
+var missingkeys    = Object.create(null);  // { node handle : { share handle : true } }
+var sharemissing   = Object.create(null);  // { share handle : { node handle : true } }
 var newmissingkeys = false;
 
 // whenever a node fails to decrypt, call this.
@@ -3927,7 +3458,7 @@ function crypto_reportmissingkey(n) {
         var change = false;
 
         if (!missingkeys[n.h]) {
-            missingkeys[n.h] = {};
+            missingkeys[n.h] = Object.create(null);
             change = true;
         }
 
@@ -3937,7 +3468,7 @@ function crypto_reportmissingkey(n) {
                 if (!missingkeys[n.h][id]) {
                     missingkeys[n.h][id] = true;
                     if (!sharemissing[id]) {
-                        sharemissing[id] = {};
+                        sharemissing[id] = Object.create(null);
                     }
                     sharemissing[id][n.h] = true;
                     change = true;
@@ -3969,12 +3500,16 @@ function crypto_missingkeysfromdb(r) {
     if (!r.length || !r[0].s) return;
 
     for (var i = r.length; i--; ) {
-        if (!missingkeys[r[i].h]) missingkeys[r[i].h] = {};
+        if (!missingkeys[r[i].h]) {
+            missingkeys[r[i].h] = Object.create(null);
+        }
 
         if (r[i].s) {
             for (var j = r[i].s.length; j--; ) {
                 missingkeys[r[i].h][r[i].s[j]] = true;
-                if (!sharemissing[r[i].s[j]]) sharemissing[r[i].s[j]] = {};
+                if (!sharemissing[r[i].s[j]]) {
+                    sharemissing[r[i].s[j]] = Object.create(null);
+                }
                 sharemissing[r[i].s[j]][r[i].h] = true;
             }
         }
@@ -3998,7 +3533,7 @@ function crypto_keyfixed(h) {
 // successfully decrypted node will be redrawn and marked as no longer missing.
 function crypto_fixmissingkeys(hs) {
     if (hs) {
-        for (h in hs) {
+        for (var h in hs) {
             var n = M.d[h];
 
             if (n && !crypto_keyok(n)) {
@@ -4089,7 +3624,7 @@ function crypto_procmcr(mcr) {
     }
 }
 
-var rsasharekeys = {};
+var rsasharekeys = Object.create(null);
 
 function crypto_share_rsa2aes() {
     var rsr = [],
@@ -4102,7 +3637,7 @@ function crypto_share_rsa2aes() {
         }
     }
 
-    rsasharekeys = {};
+    rsasharekeys = Object.create(null);
 
     if (rsr.length) {
         api_req({
@@ -4161,249 +3696,12 @@ function api_strerror(errno) {
     return "Unknown error (" + errno + ")";
 }
 
-(function __FileFingerprint(scope) {
-
-    var logger = MegaLogger.getLogger('crypt');
-    var CRC_SIZE = 16;
-    var BLOCK_SIZE = CRC_SIZE * 4;
-    var MAX_TSINT = Math.pow(2, 32) - 1;
-
-    function i2s(i) {
-        return String.fromCharCode.call(String,
-            i >> 24 & 0xff,
-            i >> 16 & 0xff,
-            i >> 8 & 0xff,
-            i & 0xff);
-    }
-
-    function serialize(v) {
-        var p = 0,
-            b = [];
-        v = Math.min(MAX_TSINT, parseInt(v));
-        while (v > 0) {
-            b[++p] = String.fromCharCode(v & 0xff);
-            v >>>= 8;
-        }
-        b[0] = String.fromCharCode(p);
-        return b.join("");
-    }
-
-    function makeCRCTable() {
-        var c, crcTable = [];
-
-        for (var n = 0; n < 256; ++n) {
-            c = n;
-
-            for (var k = 0; k < 8; ++k) {
-                c = ((c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1));
-            }
-
-            crcTable[n] = c;
-        }
-
-        return crcTable;
-    }
-
-    function crc32(str, crc, len) {
-        crc = crc ^ (-1);
-
-        for (var i = 0; i < len; ++i) {
-            crc = (crc >>> 8) ^ crc32table[(crc ^ str.charCodeAt(i)) & 0xFF];
-        }
-
-        return (crc ^ (-1)) >>> 0;
-    }
-
-    scope.fingerprint = function (uq_entry, callback) {
-        if (!(uq_entry && uq_entry.name)) {
-            logger.debug('CHECK THIS', 'Unable to generate fingerprint');
-            logger.debug('CHECK THIS', 'Invalid ul_queue entry', JSON.stringify(uq_entry));
-
-            throw new Error('Invalid upload entry for fingerprint');
-        }
-        logger.info('Generating fingerprint for ' + uq_entry.name);
-
-        var size = uq_entry.size;
-        var fr = new FileReader();
-        if (!fr.readAsBinaryString) {
-            fr.ab = 1;
-        }
-
-        crc32table = scope.crc32table || (scope.crc32table = makeCRCTable());
-        if (crc32table[1] !== 0x77073096) {
-            throw new Error('Unexpected CRC32 Table...');
-        }
-
-        var timer;
-        var onTimeout = function(abort) {
-            if (timer) {
-                clearTimeout(timer);
-            }
-            if (!abort) {
-                timer = setTimeout(function() {
-                    ulmanager.logger.warn('Fingerprint timed out, the file is locked or unreadable.');
-                    callback(0xBADF, 0x8052000e);
-                }, 6000);
-            }
-        };
-
-        function Finish(crc) {
-            onTimeout(1);
-            var modtime = (uq_entry.lastModifiedDate || 0) / 1000;
-            callback(base64urlencode(crc + serialize(modtime)), modtime);
-            callback = null;
-        }
-
-        var sfn = uq_entry.slice ? 'slice' : (uq_entry.mozSlice ? 'mozSlice' : 'webkitSlice');
-
-        if (size <= 8192) {
-            var blob = uq_entry[sfn](0, size);
-
-            onTimeout();
-            fr.onload = function (e) {
-                var crc;
-                var data = fr.ab ? ab_to_str(fr.result) : e.target.result;
-
-                if (size <= CRC_SIZE) {
-                    crc = data;
-                    var i = CRC_SIZE - crc.length;
-                    while (i--)
-                        crc += "\x00";
-                }
-                else {
-                    var tmp = [];
-
-                    for (var i = 0; i < 4; i++) {
-                        var begin = parseInt(i * size / 4);
-                        var len = parseInt(((i + 1) * size / 4) - begin);
-
-                        tmp.push(i2s(crc32(data.substr(begin, len), 0, len)));
-                    }
-
-                    crc = tmp.join("");
-                }
-
-                Finish(crc);
-            };
-            if (fr.ab) {
-                fr.readAsArrayBuffer(blob);
-            }
-            else {
-                fr.readAsBinaryString(blob);
-            }
-        }
-        else {
-            var tmp = [],
-                i = 0,
-                m = 4;
-            var blocks = parseInt(8192 / (BLOCK_SIZE * 4));
-
-            var step = function () {
-                if (m === i) {
-                    return Finish(tmp.join(""));
-                }
-
-                var crc = 0,
-                    j = 0;
-                var next = function () {
-                    if (blocks === j) {
-                        tmp.push(i2s(crc));
-                        return step(++i);
-                    }
-                    if (typeof uq_entry[sfn] !== 'function') {
-                        ulmanager.logger.error('"' + sfn + '" is not callable...');
-                        return callback(0xBADF);
-                    }
-                    onTimeout();
-
-                    var offset = parseInt((size - BLOCK_SIZE) * (i * blocks + j) / (4 * blocks - 1));
-                    var blob = uq_entry[sfn](offset, offset + BLOCK_SIZE);
-                    fr.onload = function (e) {
-                        var block = fr.ab ? ab_to_str(fr.result) : e.target.result;
-
-                        crc = crc32(block, crc, BLOCK_SIZE);
-
-                        next(++j);
-                    };
-                    if (fr.ab) {
-                        fr.readAsArrayBuffer(blob);
-                    }
-                    else {
-                        fr.readAsBinaryString(blob);
-                    }
-                };
-                next();
-            };
-            step();
-        }
-    };
-})(this);
-
-(function() {
-    var backgroundNacl = {};
-    backgroundNacl.workers = null;
-    backgroundNacl.requiresWorkersInit = function() {
-        var numberOfWorkers = mega.maxWorkers;
-
-        if (backgroundNacl.workers === null) {
-            backgroundNacl.workers = CreateWorkers('naclworker.js', function(context, e, release) {
-                release(e.data);
-            }, numberOfWorkers);
-        }
-    };
-
-    var x = 0;
-
-    Object.defineProperty(window, 'backgroundNacl', { value: backgroundNacl });
-
-    // create aliases for all (used by us) nacl funcs, that return promises
-    backgroundNacl.sign = {
-        'detached' : {
-            /**
-             * Alias of nacl.sign.detached.verify.
-             *
-             * Note: msg, sig and publicKey should be strings, NOT ArrayBuffers as when using nacl directly.
-             *
-             * @param msg
-             * @param sig
-             * @param publicKey
-             * @returns {MegaPromise}
-             */
-            'verify': function(msg, sig, publicKey) {
-                backgroundNacl.requiresWorkersInit();
-
-                var masterPromise = new MegaPromise();
-
-                backgroundNacl.workers.push(
-                    [
-                        "req" + (x++),
-                        [
-                            "verify", msg, sig, publicKey
-                        ]
-                    ],
-                    function() {
-                        masterPromise.resolve(
-                            arguments[1][0]
-                        );
-                    }
-                );
-
-                return masterPromise;
-            }
-        }
-    };
-
-    mBroadcaster.once('startMega', function _setupBackgroundNacl() {
-        backgroundNacl.requiresWorkersInit();
-    });
-
-})();
-
 // JSON parser/splitter
 // (this is tailored to processing what the API actually generates
 // i.e.: NO whitespace, NO non-numeric/string constants ("null"), etc...)
 // accepts string and Uint8Array input, but not a mixture of the two
 (function() {
+    "use strict";
 
     var JSONSplitter = function json_splitter(filters, ctx, format_uint8array) {
         if (!(this instanceof json_splitter)) {
@@ -4721,7 +4019,7 @@ function api_strerror(errno) {
             }
         }
 
-        return (!this.expectvalue && !this.stack.length) ? 1 : (inputcomplete ? 0 : -1);
+        return (!this.expectvalue && !this.stack.length) ? 1 : (inputcomplete ? (json === false) : -1);
     };
     Object.freeze(JSONSplitter.prototype);
 

@@ -144,7 +144,6 @@
         tokenList: "token-input-list",
         token: "token-input-token",
         tokenDelete: "token-input-delete-token",
-        selectedToken: "selected",
         selectedToken: "token-input-selected-token",
         highlightedToken: "token-input-highlighted-token",
         dropdown: "token-input-dropdown",
@@ -419,9 +418,6 @@
             .focus(function() {
                 if ($(input).data("settings").disabled) {
                     return false;
-                }
-                else if ($(input).data("settings").tokenLimit === null || $(input).data("settings").tokenLimit !== token_count) {
-                    show_dropdown_hint();
                 }
                 if ($(input).data("settings").visibleComma) {
                     var $prevItem = input_token.prev();

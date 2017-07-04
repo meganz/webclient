@@ -109,8 +109,8 @@ MegaData.prototype.rmSetupUI = function(u) {
         }
     });
 
-    $('.file-block .file-settings-icon').rebind('click', function(e) {
-        var target = $(this).parents('.file-block');
+    $('.data-block-view .file-settings-icon').rebind('click', function(e) {
+        var target = $(this).parents('.data-block-view');
         if (target.attr('class').indexOf('ui-selected') == -1) {
             target.parent().find('a').removeClass('ui-selected');
         }

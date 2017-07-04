@@ -868,7 +868,7 @@ MegaData.prototype.onRenameUIUpdate = function(itemHandle, newItemName) {
 
         // DOM update, left and right panel in 'Cloud Drive' tab
         $('.grid-table.fm #' + itemHandle + ' .tranfer-filetype-txt').text(newItemName);
-        $('#' + itemHandle + '.file-block .file-block-title').text(newItemName);
+        $('#' + itemHandle + '.data-block-view .file-block-title').text(newItemName);
 
         // DOM update, left and right panel in "Shared with me' tab
         $('#treea_' + itemHandle + ' span:nth-child(2)').text(newItemName);
@@ -994,7 +994,7 @@ MegaData.prototype.colourLabeling = function(handles, labelId) {
  */
 MegaData.prototype.favouriteDomUpdate = function(node, favState) {
     var $gridView = $('#' + node.h + ' .grid-status-icon');
-    var $blockView = $('#' + node.h + '.file-block .file-status-icon');
+    var $blockView = $('#' + node.h + '.data-block-view .file-status-icon');
 
     if (favState) {// Add favourite
         $gridView.addClass('star');

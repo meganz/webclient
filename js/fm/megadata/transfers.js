@@ -463,14 +463,26 @@ MegaData.prototype.dlprogress = function(id, perc, bl, bt, kbps, dl_queue_num, f
     var bps = kbps * 1000;
     var retime = bps && (bt - bl) / bps;
     var transferDeg = 0;
+    var $overlay = $('.viewer-overlay');
+    var $chart = $overlay.find('.viewer-progress');
+    var deg;
     if (bt) {
         // $.transferprogress[id] = Math.floor(bl/bt*100);
         $.transferprogress[id] = [bl, bt, bps];
         if (!uldl_hold) {
             if (slideshowid == dl_queue[dl_queue_num].id && !previews[slideshowid]) {
-                $('.slideshow-error').addClass('hidden');
-                $('.slideshow-pending').addClass('hidden');
-                $('.slideshow-progress').attr('class', 'slideshow-progress percents-' + perc);
+                $overlay.find('.viewer-error').addClass('hidden');
+                $overlay.find('.viewer-pending').addClass('hidden');
+                
+                deg =  360 * perc / 100;
+                if (deg <= 180) {
+                    $chart.find('.left-chart p').css('transform', 'rotate(' + deg + 'deg)');
+                    $chart.find('.right-chart p').removeAttr('style');
+                }
+                else {
+                    $chart.find('.left-chart p').css('transform', 'rotate(180deg)');
+                    $chart.find('.right-chart p').css('transform', 'rotate(' + (deg - 180) + 'deg)');
+                }
             }
 
             $tr.find('.transfer-status').text(perc + '%');
@@ -525,11 +537,12 @@ MegaData.prototype.dlprogress = function(id, perc, bl, bt, kbps, dl_queue_num, f
 
 MegaData.prototype.dlcomplete = function(dl) {
     var id = dl.id, z = dl.zipid;
+    var $overlay = $('.viewer-overlay');
 
     if (slideshowid == id && !previews[slideshowid]) {
-        $('.slideshow-pending').addClass('hidden');
-        $('.slideshow-error').addClass('hidden');
-        $('.slideshow-progress').attr('class', 'slideshow-progress percents-100');
+        $overlay.find('.viewer-pending').addClass('hidden');
+        $overlay.find('.viewer-error').addClass('hidden');
+        $overlay.find('.viewer-progress p').css('transform', 'rotate(180deg)');
     }
 
     if (z) {
@@ -595,6 +608,7 @@ MegaData.prototype.dlerror = function(dl, error) {
     var x;
     var errorstr;
     var gid = dlmanager.getGID(dl);
+    var $overlay = $('.viewer-overlay');
 
     if (d) {
         dlmanager.logger.error('dlerror', gid, error);
@@ -640,11 +654,11 @@ MegaData.prototype.dlerror = function(dl, error) {
     }
 
     if (window.slideshowid == dl.id && !previews[slideshowid]) {
-        $('.slideshow-image-bl').addClass('hidden');
-        $('.slideshow-pending').addClass('hidden');
-        $('.slideshow-progress').addClass('hidden');
-        $('.slideshow-error').removeClass('hidden');
-        $('.slideshow-error-txt').text(errorstr);
+        $overlay.find('.viewer-image-bl').addClass('hidden');
+        $overlay.find('.viewer-pending').addClass('hidden');
+        $overlay.find('.viewer-progress').addClass('hidden');
+        $overlay.find('.viewer-error').removeClass('hidden');
+        $overlay.find('.viewer-error-txt').text(errorstr);
     }
 
     if (errorstr) {

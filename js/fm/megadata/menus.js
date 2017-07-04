@@ -368,7 +368,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
             return false;
         }
         else if (currNodeClass
-            && (currNodeClass.indexOf('file-block') > -1
+            && (currNodeClass.indexOf('data-block-view') > -1
             || currNodeClass.indexOf('folder') > -1
             || currNodeClass.indexOf('fm-tree-folder') > -1)
             || String(id).length === 8) {

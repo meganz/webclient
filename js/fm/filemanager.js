@@ -996,7 +996,7 @@ FileManager.prototype.initContextUI = function() {
         M.favourite($.selected, newFavState);
 
         if (M.viewmode) {
-            $('.file-block').removeClass('ui-selected');
+            $('.fm-blocks-view .data-block-view').removeClass('ui-selected');
         }
         else {
             $('.grid-table.fm tr').removeClass('ui-selected');
@@ -1216,7 +1216,7 @@ FileManager.prototype.initUIKeyEvents = function() {
 
         var sl = false, s;
         if (M.viewmode) {
-            s = $('.file-block.ui-selected');
+            s = $('.data-block-view.ui-selected');
         }
         else {
             s = $('.grid-table tr.ui-selected');
@@ -1236,8 +1236,10 @@ FileManager.prototype.initUIKeyEvents = function() {
          * other day :)
          */
         if (!$.dialog && !slideshowid && M.viewmode == 1) {
-            var items_per_row = Math.floor($('.file-block').parent().outerWidth() / $('.file-block:first').outerWidth(true));
-            var total_rows = Math.ceil($('.file-block').size() / items_per_row);
+            var items_per_row = Math.floor(
+                $('.data-block-view').parent().outerWidth() / $('.data-block-view:first').outerWidth(true)
+             );
+            var total_rows = Math.ceil($('.data-block-view').size() / items_per_row);
 
             if (e.keyCode == 37) {
                 // left
@@ -1247,11 +1249,11 @@ FileManager.prototype.initUIKeyEvents = function() {
                     s.removeClass("ui-selected");
                 }
                 var $target_element = null;
-                if (current.length > 0 && current.prev(".file-block").length > 0) {
-                    $target_element = current.prev(".file-block");
+                if (current.length > 0 && current.prev('.data-block-view').length > 0) {
+                    $target_element = current.prev('.data-block-view');
                 }
                 else {
-                    $target_element = $('.file-block:last');
+                    $target_element = $('.data-block-view:last');
                 }
                 if ($target_element) {
                     $target_element.addClass('ui-selected');
@@ -1266,14 +1268,14 @@ FileManager.prototype.initUIKeyEvents = function() {
                     s.removeClass("ui-selected");
                 }
                 var $target_element = null;
-                var next = current.next(".file-block");
+                var next = current.next('.data-block-view');
 
                 // clear old selection if no shiftKey
                 if (next.length > 0) {
                     $target_element = next;
                 }
                 else {
-                    $target_element = $('.file-block:first');
+                    $target_element = $('.data-block-view:first');
                 }
                 if ($target_element) {
                     $target_element.addClass('ui-selected');
@@ -1284,7 +1286,7 @@ FileManager.prototype.initUIKeyEvents = function() {
             // up & down
             else if (e.keyCode == 38 || e.keyCode == 40) {
                 var current = selectionManager.get_currently_selected("first"),
-                    current_idx = $.elementInArray(current, $('.file-block')) + 1;
+                    current_idx = $.elementInArray(current, $('.fm-blocks-view .data-block-view')) + 1;
 
                 if (!e.shiftKey) {
                     s.removeClass("ui-selected");
@@ -1305,7 +1307,7 @@ FileManager.prototype.initUIKeyEvents = function() {
 
                 // calc the index of the target element
                 var target_element_num = ((target_row - 1) * items_per_row) + (current_col - 1),
-                    $target = $('.file-block:eq(' + target_element_num + ')');
+                    $target = $('.data-block-view:eq(' + target_element_num + ')');
 
                 $target.addClass("ui-selected");
                 selectionManager.set_currently_selected($target);
@@ -1442,7 +1444,7 @@ FileManager.prototype.initUIKeyEvents = function() {
         }
         else if (e.keyCode == 65 && e.ctrlKey && !$.dialog) {
             $('.grid-table.fm tr').addClass('ui-selected');
-            $('.file-block').addClass('ui-selected');
+            $('.fm-blocks-view .data-block-view').addClass('ui-selected');
         }
         else if (e.keyCode == 37 && slideshowid) {
             slideshow_prev();
@@ -1931,7 +1933,7 @@ FileManager.prototype.addIconUI = function(aQuiet) {
     }
 
     $('.fm-blocks-view, .shared-blocks-view').rebind('contextmenu.blockview', function(e) {
-        $('.file-block').removeClass('ui-selected');
+        $(this).find('.data-block-view').removeClass('ui-selected');
         selectionManager.clear(); // is this required? don't we have a support for a multi-selection context menu?
         $.selected = [];
         $.hideTopMenu();
@@ -2072,14 +2074,14 @@ FileManager.prototype.addGridUI = function() {
     }
 
     $('.fm .grid-table-header th').rebind('contextmenu', function(e) {
-        $('.file-block').removeClass('ui-selected');
+        $('.fm-blocks-view .data-block-view').removeClass('ui-selected');
         $.selected = [];
         $.hideTopMenu();
         return !!M.contextMenuUI(e, 6);
     });
 
     $('.files-grid-view, .fm-empty-cloud, .fm-empty-folder').rebind('contextmenu.fm', function(e) {
-        $('.file-block').removeClass('ui-selected');
+        $('.fm-blocks-view .data-block-view').removeClass('ui-selected');
         $.selected = [];
         $.hideTopMenu();
         return !!M.contextMenuUI(e, 2);

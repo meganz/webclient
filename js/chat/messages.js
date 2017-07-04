@@ -284,6 +284,24 @@ var MessagesBuff = function(chatRoom, chatdInt) {
 
     var chatRoomId = chatRoom.roomJid.split("@")[0];
 
+    chatRoom.rebind('onChatShown.mb', function() {
+        // when the chat was first opened in the UI, try to retrieve more messages to fill the screen
+        if (self.haveMoreHistory() && self.messages.length === Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL) {
+            self.retrieveChatHistory(false);
+        }
+    });
+
+    chatRoom.rebind('onHistoryDecrypted.mb', function() {
+        if (self.haveMoreHistory() && self.messages.length === Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL) {
+            // if there are more messages in history, but there is no "renderable text message" (for the left tree
+            // pane), we will try to retrieve Chatd.MESSAGE_HISTORY_LOAD_COUNT more messages, so that it won't display
+            // an empty chat
+            if (self.getLatestTextMessage() === false) {
+                self.retrieveChatHistory(false);
+            }
+        }
+    });
+
     self.chatd.rebind('onMessageLastSeen.messagesBuff' + chatRoomId, function(e, eventData) {
         var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
 
@@ -335,18 +353,20 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
 
         if (chatRoom.roomJid === self.chatRoom.roomJid) {
+            var requestedMessagesCount = self.requestedMessagesCount || Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL;
+
             self.isRetrievingHistory = false;
             self.chatdIsProcessingHistory = false;
             if (
                 typeof(self.expectedMessagesCount) === 'undefined' ||
-                self.expectedMessagesCount === 32
+                self.expectedMessagesCount === requestedMessagesCount
             ) {
                 // this is an empty/new chat.
                 self.expectedMessagesCount = 0;
                 self.retrievedAllMessages = true;
             }
             else if (
-                self.expectedMessagesCount === 32
+                self.expectedMessagesCount === requestedMessagesCount
             ) {
                 self.haveMessages = true;
                 self.retrievedAllMessages = true;
@@ -363,10 +383,16 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             }
 
             delete self.expectedMessagesCount;
+            delete self.requestedMessagesCount;
 
             $(self).trigger('onHistoryFinished');
 
             self.trackDataChange();
+
+            if (chatRoom.isCurrentlyActive && requestedMessagesCount === Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL) {
+                // chat was active, when initial loading finished...request more messages
+                chatRoom.trigger('onChatShown.mb');
+            }
         }
     });
 
@@ -483,7 +509,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         if (eventData.state === "EDITED" || eventData.state === "TRUNCATED") {
             var timestamp = chatRoom.messagesBuff.messages[eventData.messageId].delay ?
                 chatRoom.messagesBuff.messages[eventData.messageId].delay : unixtime();
-            
+
             var editedMessage = new Message(
                 chatRoom,
                 self,
@@ -539,7 +565,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                             chatRoom,
                             editedMessage
                         );
-                        
+
                         chatRoom.messagesBuff.messages.replace(editedMessage.messageId, editedMessage);
 
                         if (decrypted.type === strongvelope.MESSAGE_TYPES.TRUNCATE) {
@@ -694,7 +720,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             if (foundMessage) {
                 self.removeMessageById(foundMessage.messageId);
             }
-            
+
             var outgoingMessage = new KarereEventObjects.OutgoingMessage(
                     chatRoom.megaChat.getJidFromNodeId(eventData.userId),
                     chatRoom.megaChat.karere.getJid(),
@@ -960,26 +986,29 @@ MessagesBuff.prototype.messagesHistoryIsLoading = function() {
 MessagesBuff.prototype.retrieveChatHistory = function(isInitialRetrivalCall) {
     var self = this;
 
+    var len = isInitialRetrivalCall ? Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL : Chatd.MESSAGE_HISTORY_LOAD_COUNT;
+
     if (self.messagesHistoryIsLoading()) {
         return self.$msgsHistoryLoading;
     }
     else {
+        self.requestedMessagesCount = len;
         self.chatdIsProcessingHistory = true;
         if (!isInitialRetrivalCall) {
-            self._currentHistoryPointer -= 32;
+            self._currentHistoryPointer -= len;
         }
 
         self.$msgsHistoryLoading = new MegaPromise();
         self.chatdInt.retrieveHistory(
             self.chatRoom,
-            -32
+            len * -1
         );
 
         self.trackDataChange();
 
 
         var timeoutPromise = createTimeoutPromise(function() {
-            return self.$msgsHistoryLoading.state() !== 'pending'
+            return self.$msgsHistoryLoading.state() !== 'pending';
         }, 100, 10000)
             .always(function() {
                 self.chatdIsProcessingHistory = false;
@@ -994,7 +1023,7 @@ MessagesBuff.prototype.retrieveChatHistory = function(isInitialRetrivalCall) {
         self.$msgsHistoryLoading.fail(function() {
             self.logger.error("HIST FAILED: ", arguments);
             if (!isInitialRetrivalCall) {
-                self._currentHistoryPointer += 32;
+                self._currentHistoryPointer += len;
             }
         });
 

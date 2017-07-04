@@ -74,7 +74,7 @@ var ChatdIntegration = function(megaChat) {
     megaChat.rebind("onDestroy.chatdInt", function(e) {
         self.chatd.destroyed = true;
     });
-    
+
     $(window).rebind('onChatdChatUpdatedActionPacket.chatdInt', function(e, actionPacket) {
         self.openChatFromApi(actionPacket, false);
     });
@@ -363,7 +363,7 @@ ChatdIntegration.prototype.openChatFromApi = function(actionPacket, isMcf) {
             self._cachedHandlers[roomJid] = chatRoom.protocolHandler;
             chatRoom.destroy(undefined, true);
             chatRoom = false;
-            
+
             if (actionPacket.url) {
                 Soon(finishProcess);
             }
@@ -987,7 +987,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
             delete chatRoom.chatId;
             delete chatRoom.chatShard;
             delete chatRoom.chatdUrl;
-            
+
             if (chatRoom.state === ChatRoom.STATE.READY || chatRoom.state === ChatRoom.STATE.JOINED) {
                 chatRoom.setState(
                     ChatRoom.STATE.JOINING,
@@ -1056,7 +1056,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
             }
         }
     });
-    
+
     if (!chatRoom.messagesBuff) {
         chatRoom.pubCu25519KeyIsMissing = false;
 
@@ -1101,8 +1101,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
         chatRoom.messagesBuff = new MessagesBuff(chatRoom, self);
         $(chatRoom.messagesBuff).rebind('onHistoryFinished.chatd', function() {
             chatRoom.messagesBuff.messages.forEach(function(v, k) {
-
-                if (v.userId && !v.requiresManualRetry) {
+                if (v.userId && !v.requiresManualRetry && !v.decrypted) {
                     var msg = v.getContents ? v.getContents() : v.message;
 
                     chatRoom.notDecryptedBuffer[k] = {
@@ -1133,6 +1132,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
 
             if (hist.length > 0) {
                 var decryptMessages = function() {
+
                     try {
                         // .seed result is not used in here, since it returns false, even when some messages can be
                         // decrypted which in the current case (of tons of cached non encrypted txt msgs in chatd) is
@@ -1200,6 +1200,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                                 }
                                 self._parseMessage(chatRoom, chatRoom.messagesBuff.messages[messageId]);
                                 delete chatRoom.notDecryptedBuffer[messageId];
+                                chatRoom.messagesBuff.messages[messageId].decrypted = true;
                             }
                             else {
                                 delete chatRoom.notDecryptedBuffer[messageId];
@@ -1208,6 +1209,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                     } catch (e) {
                         self.logger.error("Failed to decrypt stuff via strongvelope, uncaught exception: ", e);
                     }
+                    chatRoom.trigger('onHistoryDecrypted');
                 };
 
 
@@ -1365,6 +1367,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                                 chatRoom.messagesBuff.messages[msgObject.messageId].protocol = true;
                             }
                             self._parseMessage(chatRoom, chatRoom.messagesBuff.messages[msgObject.messageId]);
+                            chatRoom.messagesBuff.messages[msgObject.messageId].decrypted = true;
                         } else {
                             self.logger.error('Unknown message type!');
                         }
@@ -1477,7 +1480,7 @@ ChatdIntegration.prototype.join = function(chatRoom) {
     );
 
     self.chatIdToRoomJid[chatRoom.chatId] = chatRoom.roomJid;
-    
+
     self.chatd.join(
         base64urldecode(chatRoom.chatId),
         chatRoom.chatShard,

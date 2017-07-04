@@ -142,6 +142,9 @@ Chatd.MAX_KEEPALIVE_DELAY = 60000;
 Chatd.MESSAGE_EXPIRY = 60*60; // 60*60
 var MESSAGE_EXPIRY = Chatd.MESSAGE_EXPIRY;
 
+Chatd.MESSAGE_HISTORY_LOAD_COUNT = 32;
+Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL = 3;
+
 Chatd.VERSION = 1;
 
 // add a new chatd shard
@@ -486,9 +489,9 @@ Chatd.Shard.prototype.join = function(chatId) {
     if (Object.keys(this.chatd.chatIdMessages[chatId].buf).length === 0) {
         this.cmd(Chatd.Opcode.JOIN, chatId + this.chatd.userId + String.fromCharCode(Chatd.Priv.NOCHANGE));
         // send out `HIST` after a fresh `JOIN`
-        this.cmd(Chatd.Opcode.HIST, chatId + this.chatd.pack32le(-32));
+        this.cmd(Chatd.Opcode.HIST, chatId + this.chatd.pack32le(Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL * -1));
         this.chatd.trigger('onMessagesHistoryRequest', {
-            count: 32,
+            count: Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL,
             chatId: base64urlencode(chatId)
         });
     } else {
@@ -554,7 +557,7 @@ Chatd.Shard.prototype.exec = function(a) {
     for (var i=0;i<cmd.length;i++)
     {
         codestr += cmd[i].charCodeAt(0).toString(16) + " ";
-        
+
     }
     self.logger.debug("Received from chatd: ", codestr);
 
@@ -597,7 +600,7 @@ Chatd.Shard.prototype.exec = function(a) {
                         self.logger.error("Not sure how to handle priv: " + priv +".");
                     }
                 }
-                
+
                 self.chatd.trigger('onMembersUpdated', {
                     userId: userId,
                     chatId: chatId,
@@ -819,7 +822,7 @@ Chatd.Shard.prototype.exec = function(a) {
                     "FATAL: Unknown opCode " + cmd.charCodeAt(0) +
                     ". To stop potential loop-forever case, the next commands in the buffer were rejected!"
                 );
-                // remove the command from the queue, its already processed, 
+                // remove the command from the queue, its already processed,
                 // if this is not done, the code will loop forever
                 cmd = "";
         }
@@ -830,7 +833,7 @@ Chatd.Shard.prototype.exec = function(a) {
                 ". To stop potential loop-forever case, the next commands in the buffer were rejected!"
             );
 
-            // remove the command from the queue, its already processed, if this is not done, 
+            // remove the command from the queue, its already processed, if this is not done,
             // the code will loop forever
             cmd = "";
             break;
@@ -940,7 +943,7 @@ Chatd.Shard.prototype.msg = function(chatId, messages) {
         var type = messageObj.type;
         var cmd = '';
         if (type === Chatd.MsgType.KEY) {// this is key message;
-            cmd = [Chatd.Opcode.NEWKEY, 
+            cmd = [Chatd.Opcode.NEWKEY,
                    chatId + this.chatd.pack32le(keyid) + this.chatd.pack32le(message.length) + message];
         } else if (type === Chatd.MsgType.EDIT) {// this is edit message;
             cmd = [Chatd.Opcode.MSGUPD,
@@ -1070,7 +1073,7 @@ Chatd.Messages.prototype.modify = function(msgnum, message) {
         self.persist(pendingmsgkey);
 
         var messagekey = self.getmessagekey(self.sendingbuf[msgnum][Chatd.MsgField.MSGID], Chatd.MsgType.EDIT);
-        // if there is a pending edit after the pending new message, 
+        // if there is a pending edit after the pending new message,
         // overwrite the pending edit to only keep 1 pending edit.
         if (self.sending[messagekey]) {
             self.sendingbuf[self.sending[messagekey]][Chatd.MsgField.UPDATED] =
@@ -1232,7 +1235,7 @@ Chatd.Messages.prototype.joinrangehist = function(chatId) {
             this.chatd.cmd(Chatd.Opcode.JOINRANGEHIST, chatId,
                 this.buf[low][Chatd.MsgField.MSGID] + this.buf[high][Chatd.MsgField.MSGID]);
             this.chatd.trigger('onMessagesHistoryRequest', {
-                count: 32,
+                count: Chatd.MESSAGE_HISTORY_LOAD_COUNT,
                 chatId: base64urlencode(chatId)
             });
             break;
@@ -1368,9 +1371,9 @@ Chatd.Messages.prototype.reject = function(msgxid, msgid) {
     if (self.sendingbuf[editmsgnum]) {
         var neweditmessagekey = self.getmessagekey(msgid, Chatd.MsgType.EDIT);
         var msgnum = self.getmessagenum(msgid);
-        var neweditkeyid = msgnum ? 
+        var neweditkeyid = msgnum ?
             self.buf[msgnum][Chatd.MsgField.KEYID] : self.sendingbuf[editmsgnum][Chatd.MsgField.KEYID];
-        self.sendingbuf[++self.sendingnum] = 
+        self.sendingbuf[++self.sendingnum] =
             [msgid,
             self.chatd.userId,
             self.sendingbuf[editmsgnum][Chatd.MsgField.TIMESTAMP],
@@ -1560,7 +1563,7 @@ Chatd.Messages.prototype.rejectedit = function(msgid) {
 // key confirmation in message buffer
 Chatd.Messages.prototype.confirmkey = function(keyid) {
     var self = this;
-    // when a key is confirmed, it will remove the key from the sending list, 
+    // when a key is confirmed, it will remove the key from the sending list,
     // and update the keyid of the confirmed key in persistency list,
     // in case that the chat messages are truncated and it will not get the key from chatd after a refresh.
     var firstkeyxkey;
@@ -1754,7 +1757,7 @@ Chatd.Messages.prototype.restore = function() {
                     if (pendingkey ) {
                         v.keyId = tempkeyid;
                     }
-                    // if the message is not an edit or an edit with the original message not in the 
+                    // if the message is not an edit or an edit with the original message not in the
                     // pending list, restore it.
                     var messagekey = self.getmessagekey(v.messageId, v.type);
                     if (!self.sending[messagekey]) {

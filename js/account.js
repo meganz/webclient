@@ -677,7 +677,8 @@ function processEmailChangeActionPacket(ap) {
 
                     $promise.resolve(_lastUserInteractionCache[u_h]);
 
-                    M.u[u_h].ts = parseInt(v.split(":")[1], 10);
+                    // TODO: check why `M.u[u_h]` might not be set...
+                    Object(M.u[u_h]).ts = parseInt(v.split(":")[1], 10);
 
                     $promise.verify();
 
@@ -912,9 +913,6 @@ function processEmailChangeActionPacket(ap) {
         };
 
         for (var key in config) {
-            if (!config.hasOwnProperty(key)) {
-                continue;
-            }
             var value = config[key];
 
             if (!value && value !== 0) {

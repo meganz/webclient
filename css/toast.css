@@ -68,7 +68,7 @@
     left: 15px;
     top: 50%;
     margin: -15px 0 0 0;
-    background-image: url(../images/mega/register-big-sprite-v11.png);
+    background-image: url(../images/mega/register-big-sprite-v12.png);
     background-position: -85px -860px;
 }
 .clipboard .toast-icon {
@@ -113,7 +113,7 @@
     cursor: pointer;
     width: 30px;
     height: 30px;
-    background-image: url(../images/mega/register-big-sprite-v11.png);
+    background-image: url(../images/mega/register-big-sprite-v12.png);
     background-position: 10px -130px;
     background-repeat: no-repeat;
     display: inline-block;
@@ -156,6 +156,7 @@
 }
 .mobile.toast-notification.active {
     opacity: 100;
+    visibility: visible;
 }
 .mobile.toast-notification.top {
 	bottom: initial;

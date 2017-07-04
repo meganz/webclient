@@ -208,7 +208,7 @@ MegaQueue.prototype.pushAll = function(tasks, next, error) {
              */
             return error(task, response);
         }
-        removeValue(tasks, task);
+        array.remove(tasks, task);
         if (tasks.length === 0) {
             next();
         }
@@ -236,7 +236,7 @@ MegaQueue.prototype.run_in_context = function(task) {
             }
             else {
                 this._running--;
-                removeValue(this._pending, task[0]);
+                array.remove(this._pending, task[0]);
                 ASSERT(this._running > -1, 'Queue inconsistency (RIC)');
 
                 var done = task[1] || task[0].onQueueDone;
@@ -369,7 +369,7 @@ MegaQueue.prototype.destroy = function() {
                 this.logger[fn]('The queue "%s" was not empty.', this.qname, this._queue);
             }
 
-            removeValue(MegaQueue.weakRef, this);
+            array.remove(MegaQueue.weakRef, this);
         }
         oDestroy(this);
     }
@@ -472,7 +472,7 @@ TransferQueue.prototype.pause = function(gid) {
             }
             chunk.abort();
             this.pushFirst(chunk);
-            if (removeValue(this._pending, chunk, 1)) {
+            if (array.remove(this._pending, chunk, 1)) {
                 this._running--;
                 ASSERT(this._running > -1, 'Queue inconsistency on pause');
             }

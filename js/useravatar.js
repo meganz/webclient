@@ -49,8 +49,7 @@ var useravatar = (function() {
                 + ', .avatar' + color + ' { background-color: ' + _colors[len] + '; color: ' + _colors[len] + '; }';
         }
 
-        css = mObjectURL([css], 'text/css');
-        mCreateElement('link', { type: 'text/css', rel: 'stylesheet' }, 'head').href = css;
+        mCreateElement('link', { type: 'text/css', rel: 'stylesheet' }, 'head', [css]);
     });
 
     /**

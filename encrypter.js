@@ -35,9 +35,9 @@ onmessage = function(e)
 	}
 	else
 	{
-		var data = new Uint8Array( e.data.buffer || e.data ),
-		heapView = new DataView( heap.buffer );
-		macs = [];
+		var data = new Uint8Array(e.data.buffer || e.data);
+		var heapView = new DataView(heap.buffer);
+		var macs = [];
 
 		for ( var i = 0; i < data.length; i += 0x100000 )
 		{

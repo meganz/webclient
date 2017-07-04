@@ -253,7 +253,7 @@
 
         self.screens.some(function(screen, k) {
             if (screen.screenId === screenId) {
-                removeValue(self.screens, screen);
+                array.remove(self.screens, screen);
                 return true;
             }
         });

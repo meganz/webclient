@@ -84,9 +84,6 @@ var mobile = {
             loadSubPage('register');
             return false;
         });
-
-        // If the Mega icon is clicked go to the home page
-        mobile.initHeaderMegaIcon();
     },
 
     /**
@@ -148,6 +145,35 @@ var mobile = {
 
             return false;
         });
+    },
+
+    /**
+     * Changes the app store badge depending on what device they have
+     */
+    initMobileAppButton: function() {
+
+        var $appStoreButton = $('.download-app, .startpage .mobile-apps-button');
+
+        // Set the link
+        $appStoreButton.attr('href', mobile.downloadOverlay.getStoreLink());
+
+        // If iOS, Windows or Android show the relevant app store badge
+        switch (ua.details.os) {
+
+            case 'iPad':
+            case 'iPhone':
+                $appStoreButton.removeClass('hidden').addClass('ios');
+                break;
+
+            case 'Windows Phone':
+                $appStoreButton.removeClass('hidden').addClass('wp');
+                break;
+
+            default:
+                // Android and others
+                $appStoreButton.removeClass('hidden').addClass('android');
+                break;
+        }
     }
 };
 
@@ -182,9 +208,6 @@ mobile.cloud = {
             // Don't render anything else for now
             return false;
         }
-
-        // Count the number of files in the folders
-        this.countFoldersAndFilesInFolders(false);
 
         // Render the file manager header, folders, files and footer
         this.renderHeader();
@@ -290,9 +313,6 @@ mobile.cloud = {
      */
     countAndUpdateSubFolderTotals: function() {
 
-        // Count the number of files in the folders
-        mobile.cloud.countFoldersAndFilesInFolders(true);
-
         // Loop through current view
         for (var i = 0; i < M.v.length; i++) {
 
@@ -303,14 +323,8 @@ mobile.cloud = {
             // If folder type
             if (nodeType === 1) {
 
-                var numOfFolders = 0;
-                var numOfFiles = 0;
-
-                // Check it is defined for this node, then get the number of folders and files inside the folder
-                if (typeof mobile.cloud.folderAndFileCounts[nodeHandle] !== 'undefined') {
-                    numOfFolders = mobile.cloud.folderAndFileCounts[nodeHandle].folders;
-                    numOfFiles = mobile.cloud.folderAndFileCounts[nodeHandle].files;
-                }
+                var numOfFolders = node.td;
+                var numOfFiles = node.tf;
 
                 // Translate the text for 1 file/folder or x files/folders
                 var foldersWording = (numOfFolders === 1) ? l[834] : l[832].replace('[X]', numOfFolders);
@@ -339,8 +353,8 @@ mobile.cloud = {
         mobile.cloud.renderFooter();
 
         // If in the current folder and this got removed, then we need to go back up and open the parent folder
-        if (M.currentdirid === nodeHandle || isCircular(nodeHandle, M.currentdirid) === true) {
-            parentHandle = parentHandle || Object(M.getNodeByHandle(nodeHandle)).p || RootbyId(nodeHandle);
+        if (M.currentdirid === nodeHandle || M.isCircular(nodeHandle, M.currentdirid) === true) {
+            parentHandle = parentHandle || Object(M.getNodeByHandle(nodeHandle)).p || M.getNodeRoot(nodeHandle);
             M.openFolder(parentHandle);
         }
     },
@@ -491,22 +505,7 @@ mobile.cloud = {
      */
     getFullSizeOfFolder: function() {
 
-        var fileSizesTotal = 0;
-
-        // Loop through all known nodes
-        for (var nodeHandle in M.d) {
-            if (M.d.hasOwnProperty(nodeHandle)) {
-
-                var node = M.d[nodeHandle];
-                var nodeType = node.t;
-                var nodeSize = node.s;
-
-                // If node is a file type, update the total
-                if (nodeType === 0) {
-                    fileSizesTotal += nodeSize;
-                }
-            }
-        }
+        var fileSizesTotal = Object(M.d[M.RootID]).tb;
 
         // Format the text e.g. 3 KB or 3 MB
         var fileSizesTotalFormatted = numOfBytes(fileSizesTotal);
@@ -637,14 +636,8 @@ mobile.cloud = {
     updateFolderTemplate: function($templateSelector, node) {
 
         var nodeHandle = node.h;
-        var numOfFolders = 0;
-        var numOfFiles = 0;
-
-        // Check it is defined for this node, then get the number of folders and files directly inside the folder
-        if (typeof this.folderAndFileCounts[nodeHandle] !== 'undefined') {
-            numOfFolders = this.folderAndFileCounts[nodeHandle].folders;
-            numOfFiles = this.folderAndFileCounts[nodeHandle].files;
-        }
+        var numOfFolders = node.td;
+        var numOfFiles = node.tf;
 
         // Translate the text for 1 file/folder or x files/folders
         var foldersWording = (numOfFolders === 1) ? l[834] : l[832].replace('[X]', numOfFolders);
@@ -674,53 +667,6 @@ mobile.cloud = {
     },
 
     /**
-     * Create a dictionary with the keys of the parent folder handles
-     * and the number of folders and files directly inside that folder
-     * @param {Boolean} forceUpdate If true, forces a recount e.g. after action packets have been received
-     */
-    countFoldersAndFilesInFolders: function(forceUpdate) {
-
-        // Don't count the folders and files every render, only if empty initially and after receiving action packets
-        if (!forceUpdate && (mobile.cloud.folderAndFileCounts !== null)) {
-            return false;
-        }
-
-        var folderAndFileCounts = {};
-
-        // Loop all known nodes
-        for (var nodeHandle in M.d) {
-            if (M.d.hasOwnProperty(nodeHandle)) {
-
-                var node = M.d[nodeHandle];
-                var parentHandle = node.p;
-                var nodeType = node.t;
-
-                // If the key is not set
-                if (typeof folderAndFileCounts[parentHandle] === 'undefined') {
-
-                    // Set the key to the parent handle and us an object to hold the number of folders and files
-                    folderAndFileCounts[parentHandle] = {
-                        folders: 0,
-                        files: 0
-                    };
-                }
-
-                // Increment the total for a folder found with this parent
-                if (nodeType) {
-                    folderAndFileCounts[parentHandle].folders += 1;
-                }
-                else {
-                    // Otherwise increment the total for a file found with this parent
-                    folderAndFileCounts[parentHandle].files += 1;
-                }
-            }
-        }
-
-        // Store for use later
-        mobile.cloud.folderAndFileCounts = folderAndFileCounts;
-    },
-
-    /**
      * Populate the template row for a file
      * @param {Object} $templateSelector The jQuery selector for the template
      * @param {Object} node The node object with values
@@ -734,7 +680,7 @@ mobile.cloud = {
 
         // Use the modified timestamp if available, or the MEGA created timestamp, then format date as 12 January 2016
         var modifiedTimestamp = node.mtime || node.ts;
-        var fileDate = humandate(modifiedTimestamp);
+        var fileDate = time2date(modifiedTimestamp, 2);
 
         // Map the file extension back to the image icon
         var iconName = fileIcon(node);
@@ -1012,7 +958,7 @@ mobile.deleteOverlay = {
         // Get initial overlay details
         var node = M.d[nodeHandle];
         var fileName = node.name;
-        var fileSizeBytes = node.s;
+        var fileSizeBytes = node.s || node.tb;
         var fileSize = numOfBytes(fileSizeBytes);
         var fileSizeFormatted = fileSize.size + ' ' + fileSize.unit;
         var fileIconName = fileIcon(node);
@@ -1113,7 +1059,7 @@ mobile.linkOverlay = {
         // Get initial overlay details
         var node = M.d[nodeHandle];
         var fileName = node.name;
-        var fileSizeBytes = node.s;
+        var fileSizeBytes = node.s || node.tb;
         var fileSize = numOfBytes(fileSizeBytes);
         var fileSizeFormatted = fileSize.size + ' ' + fileSize.unit;
         var fileIconName = fileIcon(node);
@@ -1597,7 +1543,7 @@ mobile.downloadOverlay = {
         this.startTime = new Date().getTime();
 
         // Start download and show progress
-        mega.utils.gfsfetch(nodeHandle, 0, -1, this.showDownloadProgress).always(function(data) {
+        M.gfsfetch(nodeHandle, 0, -1, this.showDownloadProgress).always(function(data) {
 
             mobile.downloadOverlay.showDownloadComplete(data, nodeHandle);
         });
@@ -2088,7 +2034,7 @@ mobile.messageOverlay = {
 
 
 /**
- * Homepage for mobile with login/register functionality
+ * Login functionality
  */
 mobile.signin = {
 
@@ -2113,10 +2059,12 @@ mobile.signin = {
         // Init events
         this.initLoginButton();
         this.initEmailPasswordKeyupEvents();
-
+        
         // Initialise the Remember Me checkbox, top button tabs
         mobile.initTabs('login');
         mobile.initCheckbox('remember-me');
+        mobile.initHeaderMegaIcon();
+        mobile.initMobileAppButton();
     },
 
     /**
@@ -2269,6 +2217,8 @@ mobile.register = {
         // Initialise the login/register tabs and the Agree to Terms of Service checkbox
         mobile.initTabs('register');
         mobile.initCheckbox('confirm-terms');
+        mobile.initHeaderMegaIcon();
+        mobile.initMobileAppButton();
 
         // Activate register button when fields are complete
         this.initKeyupEvents();
@@ -2333,7 +2283,7 @@ mobile.register = {
             var $loader = this.$registerScreen.find('.estimator-loading-icon').addClass('loading');
 
             // On completion of loading, hide the loading spinner
-            mega.utils.require('zxcvbn_js')
+            M.require('zxcvbn_js')
                 .done(function() {
                     $loader.removeClass('loading');
                 });
@@ -2715,86 +2665,6 @@ mobile.register = {
 
 
 /**
- * Home page functionality
- */
-mobile.home = {
-
-    /** jQuery selector for the home screen */
-    $screen: null,
-
-    /**
-     * Shows the home page and initialises functionality
-     */
-    show: function() {
-
-        // Cache selector
-        this.$screen = $('.mobile.homepage');
-
-        // Show the screen
-        this.$screen.removeClass('hidden');
-
-        // Initialise functionality
-        mobile.home.initBottomLinks();
-        mobile.home.initMobileAppButton();
-        mobile.initHeaderMegaIcon();
-        mobile.menu.showAndInit('home');
-    },
-
-    /**
-     * Initialise the Login and Register buttons in the footer of the homepage
-     */
-    initBottomLinks: function() {
-
-        var $loginButton = this.$screen.find('.bottom-link.sign-in');
-        var $registerButton = this.$screen.find('.bottom-link.register');
-
-        // On click/tap, load the login page
-        $loginButton.off('tap').on('tap', function() {
-
-            loadSubPage('login');
-            return false;
-        });
-
-        // On click/tap, load the register page
-        $registerButton.off('tap').on('tap', function() {
-
-            loadSubPage('register');
-            return false;
-        });
-    },
-
-    /**
-     * Changes the app store badge depending on what device they have
-     */
-    initMobileAppButton: function() {
-
-        var $appStoreButton = this.$screen.find('.download-app');
-
-        // Set the link
-        $appStoreButton.attr('href', mobile.downloadOverlay.getStoreLink());
-
-        // If iOS, Windows or Android show the relevant app store badge
-        switch (ua.details.os) {
-
-            case 'iPad':
-            case 'iPhone':
-                $appStoreButton.removeClass('hidden').addClass('ios');
-                break;
-
-            case 'Windows Phone':
-                $appStoreButton.removeClass('hidden').addClass('wp');
-                break;
-
-            default:
-                // Android and others
-                $appStoreButton.removeClass('hidden').addClass('android');
-                break;
-        }
-    }
-};
-
-
-/**
  * The main menu (hamburger icon in top right) which lets the user do various tasks
  */
 mobile.menu = {
@@ -2824,7 +2694,6 @@ mobile.menu = {
         var $homeMenuItem = $mainMenu.find('.menu-button.home');
         var $termsMenuItem = $mainMenu.find('.menu-button.terms-of-service');
         var $logoutMenuItem = $mainMenu.find('.menu-button.logout');
-        var $currentScreen = $mainMenu.find('.menu-button.' + currentScreen);
 
         // Show the menu / hamburger icon
         $menuIcon.removeClass('hidden');
@@ -2857,7 +2726,18 @@ mobile.menu = {
 
         // Add a red bar style to the left of the menu item to indicate this is the current page
         $menuButtons.removeClass('current');
-        $currentScreen.addClass('current');
+
+        // If in the cloud drive, add a red bar next to that button
+        if (currentScreen.indexOf('fm') > -1) {
+            $mainMenu.find('.menu-button.cloud-drive').addClass('current');
+        }
+        else {
+            // Otherwise if it exists, add a red bar to the button matching the current page
+            try {
+                $mainMenu.find('.menu-button.' + currentScreen).addClass('current');
+            }
+            catch (exception) { }
+        }
 
         // On menu button click, show the menu
         $menuIcon.off('tap').on('tap', function() {
@@ -2901,8 +2781,12 @@ mobile.menu = {
         // On the menu's Logout button
         $logoutMenuItem.off('tap').on('tap', function() {
 
+            // Close the menu
+            $mainMenu.removeClass('active');
+            $darkOverlay.addClass('hidden').removeClass('active');
+
             // Log the user out and go back to the login page
-            mega.utils.logout();
+            M.logout();
             loadSubPage('login');
 
             // Show a toast notification
@@ -2965,8 +2849,7 @@ mobile.terms = {
         // Log if they visited the TOS page
         api_req({ a: 'log', e: 99636, m: 'Visited Terms of Service page on mobile webclient' });
 
-        // Init menu and Mega icon
-        mobile.menu.showAndInit('terms-of-service');
+        // Init Mega (M) icon
         mobile.initHeaderMegaIcon();
     }
 };
@@ -3028,10 +2911,8 @@ mobile.upload = {
 /**
  * Some stubs to prevent exceptions in action packet processing because not all files are loaded for mobile
  */
-mega.checkStorageQuota = function() {};
 
 mega.ui.tpp = {
-    megaUtilsResetUploadDownload: function() {},
     reset: function() {},
     setTotalProgress: function() {}
 };
@@ -3055,4 +2936,8 @@ function removeUInode(nodeHandle, parentHandle) {
 }
 
 // Not required for mobile
-function fmtopUI() { }
+function fmtopUI() {}
+function topmenuUI() {}
+function sharedUInode() {}
+function addToMultiInputDropDownList() {}
+function removeFromMultiInputDDL() {}

@@ -10,15 +10,32 @@
          * @memberof fileconflict
          */
         check: function(files, target, op) {
+            var noFileConflicts = !!localStorage.noFileConflicts;
             var promise = new MegaPromise();
             var conflicts = [];
             var result = [];
+
+            var setName = function(file, name) {
+                try {
+                    Object.defineProperty(file, 'name', {
+                        writable: true,
+                        configurable: true,
+                        value: M.getSafeName(name)
+                    });
+                }
+                catch (e) {}
+            };
 
             for (var i = files.length; i--;) {
                 var file = files[i];
 
                 if (typeof file === 'string') {
                     file = clone(M.d[file] || false);
+                }
+
+                if (!file) {
+                    console.warn('Got invalid file...');
+                    continue;
                 }
 
                 try {
@@ -30,16 +47,25 @@
                     continue;
                 }
 
-                if (M.c[target] && !file.path) {
-                    var found = this.getNodeByName(target, fm_safename(file.name), true);
+                var found = null;
+                var nodeTarget = file.target || target;
+                var nodeName = M.getSafeName(file.name);
 
-                    if (found) {
-                        conflicts.push([file, found]);
-                        continue;
-                    }
+                if (M.c[nodeTarget] && !file.t) {
+                    found = this.getNodeByName(nodeTarget, nodeName, true);
                 }
 
-                result.push(file);
+                if (!found) {
+                    found = this.locateFileInUploadQueue(nodeTarget, nodeName);
+                }
+
+                if (found && !noFileConflicts) {
+                    conflicts.push([file, found]);
+                }
+                else {
+                    setName(file, nodeName);
+                    result.push(file);
+                }
             }
 
             var resolve = function() {
@@ -52,11 +78,7 @@
                 var self = this;
                 var save = function(file, name, action, node) {
                     if (file) {
-                        try {
-                            Object.defineProperty(file, 'name', {value: fm_safename(name)});
-                        }
-                        catch (e) {
-                        }
+                        setName(file, name);
 
                         result.push(file);
 
@@ -130,7 +152,7 @@
         prompt: function(op, file, node, remaining, target) {
             var promise = new MegaPromise();
             var $dialog = $('.fm-dialog.duplicate-conflict');
-            var name = fm_safename(file.name);
+            var name = M.getSafeName(file.name);
 
             $('.info-txt-fn', $dialog).safeHTML(escapeHTML(l[16486]).replace('%1', '<strong>' + name + '</strong>'));
 
@@ -188,7 +210,7 @@
             $('.skip-button', $dialog).rebind('click', function() {
                 done(null, 0, 2);
             });
-            $('.cancel-button', $dialog).rebind('click', function() {
+            $('.cancel-button, .fm-dialog-close', $dialog).rebind('click', function() {
                 done(-0xBADF);
             });
 
@@ -268,7 +290,7 @@
             var res;
 
             for (var h in M.c[target]) {
-                var n = M.d[h];
+                var n = M.d[h] || false;
 
                 if (n.name === name) {
 
@@ -284,6 +306,22 @@
             }
 
             return res;
+        },
+
+        /**
+         * Locate file in the upload queue
+         * @param {String} target The target to lookup at
+         * @param {String} name The name to check against
+         * @returns {Object} The queue entry found
+         */
+        locateFileInUploadQueue: function(target, name) {
+            for (var i = ul_queue.length; i--;) {
+                var q = ul_queue[i] || false;
+
+                if (q.target === target && q.name === name) {
+                    return q;
+                }
+            }
         }
     };
 

@@ -1542,7 +1542,7 @@ Chatd.Messages.prototype.discard = function(messagekey, notify) {
     }
 
     self.removefrompersist(messagekey);
-    removeValue(self.sendingList, messagekey);
+    array.remove(self.sendingList, messagekey);
     delete self.sending[messagekey];
     delete self.sendingbuf[num];
     if (self.expired[messagekey]) {
@@ -1625,7 +1625,7 @@ Chatd.Messages.prototype.confirmkey = function(keyid) {
             self.removefrompersist(trivialkeys[keyidmsgid]);
         }
         // remove the key message from the local pending list.
-        removeValue(self.sendingList, firstkeyxkey);
+        array.remove(self.sendingList, firstkeyxkey);
         delete self.sendingbuf[self.sending[firstkeyxkey]];
         delete self.sending[firstkeyxkey];
         self.updatekeyid(keyid);

@@ -1,7 +1,6 @@
 /**
     @module rtcSession
 */
-"use strict"
 
 /**
 

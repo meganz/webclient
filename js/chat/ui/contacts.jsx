@@ -96,7 +96,7 @@ var Avatar = React.createClass({
         if (!contact) {
             return null;
         }
-        
+
         if (!contact.m && contact.email) {
             contact.m = contact.email;
         }
@@ -104,7 +104,7 @@ var Avatar = React.createClass({
         var avatarMeta = useravatar.generateContactAvatarMeta(contact);
 
         var classes = (this.props.className ? this.props.className : 'small-rounded-avatar') + ' ' + contact.u;
-        
+
         var letterClass = 'avatar-letter';
 
         var displayedAvatar;
@@ -155,7 +155,7 @@ var ContactCard = React.createClass({
         var self = this;
 
         var foundKeys = Object.keys(self.props);
-        removeValue(foundKeys, 'dropdowns', true);
+        array.remove(foundKeys, 'dropdowns', true);
 
         var shouldUpdate = undefined;
         foundKeys.forEach(function(k) {
@@ -199,7 +199,7 @@ var ContactCard = React.createClass({
             return null;
         }
 
-        var pres = 
+        var pres =
             (this.props.megaChat ? this.props.megaChat : window.megaChat).xmppPresenceToCssClass(contact.presence);
         var avatarMeta = generateAvatarMeta(contact.u);
 
@@ -358,7 +358,7 @@ var ContactPickerWidget = React.createClass({
                 self.props.megaChat.getJidFromNodeId(v.u)
             );
 
-            if (v.c == 0 || v.u == u_handle) {
+            if (v.c != 1 || v.u == u_handle) {
                 return;
             }
 
@@ -389,15 +389,15 @@ var ContactPickerWidget = React.createClass({
                     className={"contacts-search " + selectedClass}
 
                     onClick={(contact, e) => {
-                        var contactHash = contact.h;
+                        var contactHash = contact.u;
 
                         // differentiate between a click and a double click.
                         if (contactHash === self.lastClicked && (new Date() - self.clickTime) < 500) {
                             // is a double click
                             if (self.props.onSelected) {
-                                self.props.onSelected([contact.h]);
+                                self.props.onSelected([contactHash]);
                             }
-                            self.props.onSelectDone([contact.h]);
+                            self.props.onSelectDone([contactHash]);
                             return;
                         }
                         else {
@@ -405,13 +405,13 @@ var ContactPickerWidget = React.createClass({
 
                             // is a single click
                             if (selected.indexOf(contactHash) === -1) {
-                                selected.push(contact.h);
+                                selected.push(contactHash);
                                 if (self.props.onSelected) {
                                     self.props.onSelected(selected);
                                 }
                             }
                             else {
-                                removeValue(selected, contactHash);
+                                array.remove(selected, contactHash);
                                 if (self.props.onSelected) {
                                     self.props.onSelected(selected);
                                 }

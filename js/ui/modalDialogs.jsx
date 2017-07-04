@@ -199,7 +199,7 @@ var BrowserEntries = React.createClass({
             this.props.onHighlighted([node.h]);
         }
         // If folder selected
-        if (this.props.folderSelectNotAllowed === true && node.t === 1) {
+        if (this.props.folderSelectNotAllowed === true && node.t) {
             this.setState({'selected': []});
             this.props.onSelected([]);
         } else {
@@ -213,7 +213,7 @@ var BrowserEntries = React.createClass({
         e.stopPropagation();
         e.preventDefault();
 
-        if (node.t === 1) {
+        if (node.t) {
             // expand folder
             self.setState({'selected': [], 'highlighted': []});
             self.props.onSelected([]);
@@ -243,7 +243,7 @@ var BrowserEntries = React.createClass({
                 return;
             }
 
-            var isFolder = node.t === 1;
+            var isFolder = node.t;
             var isHighlighted = self.state.highlighted.indexOf(node.h) !== -1;
 
             var tooltipElement = null;
@@ -386,65 +386,53 @@ var CloudBrowserDialog = React.createClass({
     componentDidUpdate: function(prevProps, prevState) {
         if (prevState.currentlyViewedEntry !== this.state.currentlyViewedEntry) {
             this.resizeBreadcrumbs();
+
+            var handle = this.state.currentlyViewedEntry;
+            if (!M.d[handle] || (M.d[handle].t && !M.c[handle])) {
+                var self = this;
+
+                dbfetch.get(handle)
+                    .always(function() {
+                        self.setState({entries: self.getEntries()});
+                    });
+                return;
+            }
         }
+
+        // TODO: @lp check if this is really ok
+        this.setState({entries: null});
     },
     getEntries: function() {
         var self = this;
-        var entries = [];
-
-        obj_values(M.d).forEach(function(v) {
-            if (v.p === self.state.currentlyViewedEntry) {
-                entries.push(v);
-            }
-        });
-        var sortKey;
-        var order = 1;
+        var order = self.state.sortBy[1] === "asc" ? 1 : -1;
+        var entries = Object.keys(M.c[self.state.currentlyViewedEntry] || {}).map(h => M.d[h]);
+        var sortFunc;
 
         if (self.state.sortBy[0] === "name") {
-            sortKey = "name";
+            sortFunc = M.getSortByNameFn();
         }
         else if(self.state.sortBy[0] === "size") {
-            sortKey = "s";
+            sortFunc = M.getSortBySizeFn();
         }
-        else if(self.state.sortBy[0] === "grid-header-star") {
-            sortKey = "fav";
+        else /*if(self.state.sortBy[0] === "grid-header-star")*/ {
+            sortFunc = M.getSortByFavFn();
         }
-
-        order = self.state.sortBy[1] === "asc" ? 1 : -1;
 
         entries.sort(function(a, b) {
-            // compare diff cols by diff methods... (string VS int VS int + undefined)
-            if (sortKey === "name") {
-                return ((a[sortKey] ? a[sortKey] : "").localeCompare(b[sortKey])) * order;
-            }
-            else {
-                var _a = a[sortKey] || 0;
-                var _b = b[sortKey] || 0;
-                if (_a > _b) {
-                    return 1 * order;
-                }
-                if (_a < _b) {
-                    return -1 * order;
-                }
-
-                return 0;
-            }
+            return sortFunc(a, b, order);
         });
 
         // always return first the folders and then the files
-        var files = [];
         var folders = [];
 
-        entries.forEach(function(v) {
-            if(v.t === 1) {
-                folders.push(v);
+        for (var i = entries.length; i--;) {
+            if (entries[i].t) {
+                folders.unshift(entries[i]);
+                entries.splice(i, 1);
             }
-            else if(v.t === 0) {
-                files.push(v);
-            }
-        });
+        }
 
-        return folders.concat(files);
+        return folders.concat(entries);
     },
     onSelected: function(nodes) {
         this.setState({'selected': nodes});
@@ -465,6 +453,9 @@ var CloudBrowserDialog = React.createClass({
     },
     render: function() {
         var self = this;
+
+	// TODO: @lp show a 'loading' in place of the "empty folder" placeholder while dbfetch'ing nodes
+        var entries = self.state.entries || self.getEntries();
 
         var classes = "add-from-cloud " + self.props.className;
 
@@ -499,7 +490,7 @@ var CloudBrowserDialog = React.createClass({
                         self.onHighlighted([]);
                     }}>
                         <span className="right-arrow-bg invisible">
-                            <span>{p.h === M.RootID ? __("Cloud Drive") : p.name}</span>
+                            <span>{p.h === M.RootID ? __(l[164]) : p.name}</span>
                         </span>
                     </a>
                 );
@@ -589,15 +580,15 @@ var CloudBrowserDialog = React.createClass({
                     <tbody>
                     <tr>
                         <BrowserCol id="grid-header-star" sortBy={self.state.sortBy} onClick={self.toggleSortBy} />
-                        <BrowserCol id="name" label={__("Name")} sortBy={self.state.sortBy} onClick={self.toggleSortBy} />
-                        <BrowserCol id="size" label={__("Size")} sortBy={self.state.sortBy} onClick={self.toggleSortBy} />
+                        <BrowserCol id="name" label={__(l[86])} sortBy={self.state.sortBy} onClick={self.toggleSortBy}/>
+                        <BrowserCol id="size" label={__(l[87])} sortBy={self.state.sortBy} onClick={self.toggleSortBy}/>
                     </tr>
                     </tbody>
                 </table>
 
 
                 <BrowserEntries
-                    entries={self.getEntries()}
+                    entries={entries}
                     onExpand={(node) => {
                         self.onSelected([]);
                         self.onHighlighted([]);

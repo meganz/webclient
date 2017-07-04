@@ -43,10 +43,6 @@ PROJECT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__),
                                             os.path.pardir))
 PATH_SPLITTER = re.compile(r'\\|/')
 
-UTF_ALLOWED_FILES = [
-    'js/chat/emojidata/emojis.json'
-]
-
 def get_git_line_sets(base, target):
     """
     Obtains the Git diff between the base and target to identify the lines that
@@ -384,8 +380,8 @@ def reduce_validator(file_line_mapping, **extra):
         an integer containing the number of failed rules.
     """
 
-    exclude = ['vendor', 'asm', 'sjcl', 'dont-deploy']
-    special_chars_exclude = ['secureboot', 'test']
+    exclude = ['vendor', 'asm', 'sjcl', 'dont-deploy', 'secureboot']
+    special_chars_exclude = ['secureboot', 'test', 'emoji']
     logging.info('Analyzing modified files ...')
     result = ['\nValidator output:\n=================']
     warning = 'This is a security product. Do not add unverifiable code to the repository!'
@@ -396,7 +392,7 @@ def reduce_validator(file_line_mapping, **extra):
         file_extension = os.path.splitext(file_path)[-1]
 
         if not any([n in file_path for n in special_chars_exclude]):
-            if file_path not in UTF_ALLOWED_FILES and analyse_files_for_special_chars(file_path, result):
+            if analyse_files_for_special_chars(file_path, result):
                 fatal += 1
                 break
 
@@ -417,6 +413,12 @@ def reduce_validator(file_line_mapping, **extra):
                           .format(file_path, warning))
             continue
 
+        if os.path.getsize(file_path) > 120000:
+            result.append('The file "{}" has turned too big, '
+                          'any new functions must be moved elsewhere.'.format(file_path))
+            continue;
+
+        lines = []
         with open(file_path, 'r') as fd:
             # Check line lengths in file.
             line_number = 0
@@ -435,10 +437,21 @@ def reduce_validator(file_line_mapping, **extra):
                                   .format(file_path, line_number, line_length))
                     break
 
+                lines.append(line.rstrip())
+
                 # Analyse JavaScript files...
                 if file_extension in ['.js', '.jsx']:
                     fatal += inspectjs(file_path, line_number, line, result)
                     continue
+
+        # Further inspect all modifications in a whole instead of per-lines
+        snippet = '\n'.join(lines)
+        # print('>>>>>>>>>>>>>>>>>> {}:{}'.format(file_path, snippet))
+        match = re.search(r'(\w+\s*\(\s*\n\s*[^\s,]{1,12})\s*(?:\n|$)', snippet)
+        if match:
+            fatal += 1
+            result.append('Found non-sensical statement spreaded '
+                'around several lines on file {}:\n{} ...'.format(file_path, match.group(1)))
 
 
     # Add the number of errors and return in a nicely formatted way.

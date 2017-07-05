@@ -231,13 +231,6 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                 self.messages.reorder();
             });
         }
-        else if (msg instanceof KarereEventObjects.OutgoingMessage) {
-            $(msg).rebind("onChange.mbOnPush", function(msg, property, oldVal, newVal) {
-                if (property === "orderValue" || property === "delay") {
-                    self.messages.reorder();
-                }
-            });
-        }
         var res = origPush.call(this, msg);
         if (
             !(
@@ -269,7 +262,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
     var loggerIsEnabled = localStorage['messagesBuffLogger'] === '1';
 
     self.logger = MegaLogger.getLogger(
-        "messagesBuff[" + chatRoom.roomJid.split("@")[0] + "]",
+        "messagesBuff[" + chatRoom.roomId.split("@")[0] + "]",
         {
             minLogLevel: function() {
                 return loggerIsEnabled ? MegaLogger.LEVELS.DEBUG : MegaLogger.LEVELS.ERROR;
@@ -282,7 +275,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
 
     // self._parent = chatRoom;
 
-    var chatRoomId = chatRoom.roomJid.split("@")[0];
+    var chatRoomId = chatRoom.roomId.split("@")[0];
 
     self.chatd.rebind('onMessageLastSeen.messagesBuff' + chatRoomId, function(e, eventData) {
         var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
@@ -292,7 +285,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             return;
         }
 
-        if (chatRoom.roomJid === self.chatRoom.roomJid) {
+        if (chatRoom.roomId === self.chatRoom.roomId) {
             self.lastSeen = eventData.messageId;
             self.trackDataChange();
         }
@@ -305,7 +298,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             return;
         }
 
-        if (chatRoom.roomJid === self.chatRoom.roomJid) {
+        if (chatRoom.roomId === self.chatRoom.roomId) {
             if (eventData.userId === u_handle) {
                 self.joined = true;
                 if (chatRoom.state === ChatRoom.STATE.JOINING) {
@@ -318,7 +311,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
     self.chatd.rebind('onMessageConfirm.messagesBuff' + chatRoomId, function(e, eventData) {
         var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
 
-        if (chatRoom.roomJid === self.chatRoom.roomJid) {
+        if (chatRoom.roomId === self.chatRoom.roomId) {
             self.lastSent = eventData.messageId;
             self.trackDataChange();
         }
@@ -326,7 +319,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
 
     self.chatd.rebind('onMessageLastReceived.messagesBuff' + chatRoomId, function(e, eventData) {
         var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
-        if (chatRoom && chatRoom.roomJid === self.chatRoom.roomJid) {
+        if (chatRoom && chatRoom.roomId === self.chatRoom.roomId) {
             self.setLastReceived(eventData.messageId);
         }
     });
@@ -334,7 +327,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
     self.chatd.rebind('onMessagesHistoryDone.messagesBuff' + chatRoomId, function(e, eventData) {
         var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
 
-        if (chatRoom.roomJid === self.chatRoom.roomJid) {
+        if (chatRoom.roomId === self.chatRoom.roomId) {
             self.isRetrievingHistory = false;
             self.chatdIsProcessingHistory = false;
             if (
@@ -375,7 +368,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
 
         var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
 
-        if (chatRoom && chatRoom.roomJid === self.chatRoom.roomJid) {
+        if (chatRoom && chatRoom.roomId === self.chatRoom.roomId) {
             self.isRetrievingHistory = true;
             self.expectedMessagesCount = Math.abs(eventData.count);
             self.trackDataChange();
@@ -389,7 +382,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             self.logger.warn("Message not found for: ", e, eventData);
             return;
         }
-        if (chatRoom.roomJid === self.chatRoom.roomJid) {
+        if (chatRoom.roomId === self.chatRoom.roomId) {
             self.haveMessages = true;
             self.trackDataChange();
             self.retrieveChatHistory(true);
@@ -399,10 +392,11 @@ var MessagesBuff = function(chatRoom, chatdInt) {
     self.chatd.rebind('onMessageStore.messagesBuff' + chatRoomId, function(e, eventData) {
         var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
 
-        if (chatRoom && chatRoom.roomJid === self.chatRoom.roomJid) {
+        if (chatRoom && chatRoom.roomId === self.chatRoom.roomId) {
             self.haveMessages = true;
 
-            var msgObject = new Message(chatRoom,
+            var msgObject = new Message(
+                chatRoom,
                 self,
                 {
                     'messageId': eventData.messageId,
@@ -461,7 +455,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             return;
         }
 
-        if (chatRoom.roomJid === self.chatRoom.roomJid) {
+        if (chatRoom.roomId === self.chatRoom.roomId) {
             self.haveMessages = true;
 
             if (!self.messages[eventData.messageId]) {
@@ -694,18 +688,25 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             if (foundMessage) {
                 self.removeMessageById(foundMessage.messageId);
             }
-            
-            var outgoingMessage = new KarereEventObjects.OutgoingMessage(
-                    chatRoom.megaChat.getJidFromNodeId(eventData.userId),
-                    chatRoom.megaChat.karere.getJid(),
-                    "groupchat",
-                    "mexp" + eventData.id,
-                    "",
-                    {},
-                    eventData.ts,
-                    Message.STATE.RESTOREDEXPIRED,
-                    chatRoom.roomJid
-                );
+
+
+            var outgoingMessage = new Message(
+                chatRoom,
+                self,
+                {
+
+                    'userId': eventData.userId,
+                    'messageId': eventData.id,
+                    'message': eventData.message,
+                    'textContents': "",
+                    'delay': eventData.ts,
+                    'state': Message.STATE.RESTOREDEXPIRED,
+                    'updated': false,
+                    'deleted': false,
+                    'revoked': false
+                }
+            );
+
             outgoingMessage.internalId = eventData.id;
             outgoingMessage.orderValue = eventData.id;
             outgoingMessage.requiresManualRetry = true;
@@ -726,7 +727,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                         if (typeof(decrypted.payload) === 'undefined' || decrypted.payload === null) {
                             decrypted.payload = "";
                         }
-                        outgoingMessage.contents = decrypted.payload;
+                        outgoingMessage.textContents = decrypted.payload;
                         chatRoom.messagesBuff.messages.push(outgoingMessage);
 
                         chatRoom.megaChat.plugins.chatdIntegration._parseMessage(
@@ -758,7 +759,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
         chatRoom.protocolHandler.setKeyID(eventData.keyxid, eventData.keyid);
 
-        if (chatRoom.roomJid === self.chatRoom.roomJid) {
+        if (chatRoom.roomId === self.chatRoom.roomId) {
             self.trackDataChange();
         }
     });
@@ -791,7 +792,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             ChatdIntegration._ensureKeysAreLoaded(keys).always(seedKeys);
         });
 
-        if (chatRoom.roomJid === self.chatRoom.roomJid) {
+        if (chatRoom.roomId === self.chatRoom.roomId) {
             self.trackDataChange();
         }
     });
@@ -800,7 +801,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
         chatRoom.protocolHandler.setIncludeKey(true);
 
-        if (chatRoom.roomJid === self.chatRoom.roomJid) {
+        if (chatRoom.roomId === self.chatRoom.roomId) {
             self.trackDataChange();
         }
     });
@@ -815,7 +816,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         };
         ChatdIntegration._ensureKeysAreLoaded(keys).always(seedKeys);
 
-        if (chatRoom.roomJid === self.chatRoom.roomJid) {
+        if (chatRoom.roomId === self.chatRoom.roomId) {
             self.trackDataChange();
         }
     });

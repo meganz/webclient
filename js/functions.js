@@ -1274,10 +1274,6 @@ function generateAnonymousReport() {
         report.karereState = '#disabled#';
     }
     else {
-        report.karereState = megaChat.karere.getConnectionState();
-        report.karereCurrentConnRetries = megaChat.karere._connectionRetries;
-        report.myPresence = megaChat.karere.getPresence(megaChat.karere.getJid());
-        report.karereServer = megaChat.karere.connection.service;
         report.numOpenedChats = Object.keys(megaChat.chats).length;
         report.haveRtc = megaChat.rtc ? true : false;
         if (report.haveRtc) {
@@ -1296,11 +1292,11 @@ function generateAnonymousReport() {
             var participants = v.getParticipants();
 
             participants.forEach(function (v, k) {
-                var cc = megaChat.getContactFromJid(v);
+                var cc = M.u[v];
                 if (cc && cc.u && !userAnonMap[cc.u]) {
                     userAnonMap[cc.u] = {
                         anonId: userAnonIdx++ + rand(1000),
-                        pres: megaChat.karere.getPresence(v)
+                        pres: megaChat.getPresence(v)
                     };
                 }
                 participants[k] = cc && cc.u ? userAnonMap[cc.u] : v;
@@ -1326,7 +1322,7 @@ function generateAnonymousReport() {
                     'state': v.state
                 };
 
-                var roomIdx = roomUniqueIdMap[v.room.roomJid];
+                var roomIdx = roomUniqueIdMap[v.room.roomId];
                 if (!roomIdx) {
                     roomUniqueId += 1; // room which was closed, create new tmp id;
                     roomIdx = roomUniqueId;
@@ -1512,16 +1508,13 @@ MegaEvents.prototype.on = function(name, callback) {
 
 
 function constStateToText(enumMap, state) {
-    var txt = false;
-    $.each(enumMap, function(k, v) {
-        if (state == v) {
-            txt = k;
-
-            return false; // break
+    "use strict";
+    for (var k in enumMap) {
+        if (enumMap[k] === state) {
+            return k;
         }
-    });
-
-    return txt === false ? "(not found: " + state + ")" : txt;
+    }
+    return "(not found: " + state + ")";
 };
 
 /**
@@ -1534,6 +1527,9 @@ function constStateToText(enumMap, state) {
  * @throws AssertionError
  */
 function assertStateChange(currentState, newState, allowedStatesMap, enumMap) {
+    "use strict";
+
+    assert(typeof newState !== "undefined", "assertStateChange: Invalid newState");
     var checksAvailable = allowedStatesMap[currentState];
     var allowed = false;
     if (checksAvailable) {

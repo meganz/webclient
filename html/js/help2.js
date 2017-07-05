@@ -115,12 +115,12 @@ var Help = (function() {
     function helpScrollTo(selector) {
         var $target = $(selector);
         if ($target.length) {
-            $('.bottom-page.scroll-block, .old .fmholder').stop().animate({
+            $('.bottom-pages .fmholder').stop().animate({
                 scrollTop: $target.position().top - 20
             }, 1000);
         }
         else if ($('*[data-update="' + selector + '"]').length) {
-            $('.bottom-page.scroll-block, .old .fmholder').stop().animate({
+            $('.bottom-pages .fmholder').stop().animate({
                 scrollTop: $('*[data-update="' + selector + '"]').position().top - 20
             }, 1000);
         }
@@ -417,11 +417,7 @@ var Help = (function() {
         $searchHeader.fadeIn();
         $cloneHeader.fadeOut();
 
-        var $scrollBlock= $('.old .fmholder');
-
-        $scrollBlock.scroll(function() {
-            // TODO: write a cleanup function to be invoked when moving out of the #help section
-
+        $('.bottom-pages .fmholder').rebind('scroll.helpmenu', function() {
             var topPos = $(this).scrollTop();
             if (topPos > 195) {
                 if (topPos + $sideBar.outerHeight() + 115 <= $('.main-mid-pad').outerHeight()) {
@@ -433,6 +429,13 @@ var Help = (function() {
             }
             else {
                 $sideBar.removeAttr('style').removeClass('fixed');
+            }
+
+            if (topPos + $sideBar.outerHeight() + 115 <= $('.main-mid-pad').outerHeight()) {
+                $cloneHeader.css('top', topPos + 60 + 'px').addClass('fixed');
+            }
+            else {
+                $cloneHeader.removeClass('fixed');
             }
 
             <!-- Search header !-->
@@ -784,7 +787,7 @@ var Help = (function() {
             if (!$this.is('.gray-inactive')) {
                 $('.sidebar-menu-link.active').removeClass('active');
                 $this.addClass('active');
-                $('.bottom-page.scroll-block, .old .fmholder').stop().animate({
+                $('.bottom-pages .fmholder').stop().animate({
                     scrollTop: $target.position().top - 20
                 }, 1000);
             }

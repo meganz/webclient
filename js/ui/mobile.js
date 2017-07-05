@@ -1636,10 +1636,10 @@ mobile.downloadOverlay = {
      */
     checkSupportedFile: function(node) {
 
+        var $body = $('body');
         var $openInBrowserButton = this.$overlay.find('.first.dl-browser');
         var $fileTypeUnsupportedMessage = this.$overlay.find('.file-unsupported');
         var $fileSizeUnsupportedMessage = this.$overlay.find('.file-too-large');
-        var $body = $('body');
 
         // Reset state back to default if re-opening the dialog from a previously disabled state
         $openInBrowserButton.removeClass('disabled');
@@ -2059,7 +2059,7 @@ mobile.signin = {
         // Init events
         this.initLoginButton();
         this.initEmailPasswordKeyupEvents();
-        
+
         // Initialise the Remember Me checkbox, top button tabs
         mobile.initTabs('login');
         mobile.initCheckbox('remember-me');
@@ -2679,8 +2679,10 @@ mobile.menu = {
      *                               menu item to indicate this is the current page.
      */
     showAndInit: function(currentScreen) {
+        "use strict";
 
         // Cache selectors
+        var $html = $('html');
         var $menuIcon = $('.mobile.fm-header .menu');
         var $darkOverlay = $('.mobile.dark-overlay');
         var $mainMenu = $('.mobile.main-menu');
@@ -2745,6 +2747,7 @@ mobile.menu = {
         // On menu button click, show the menu
         $menuIcon.off('tap').on('tap', function() {
 
+            $html.addClass('overlayed');
             $mainMenu.addClass('active');
             $darkOverlay.removeClass('hidden').addClass('active');
 
@@ -2754,6 +2757,7 @@ mobile.menu = {
         // On tapping/clicking the dark overlay or menu's close button, close the menu
         $darkOverlay.add($closeIcon).off('tap').on('tap', function() {
 
+            $html.removeClass('overlayed');
             $mainMenu.removeClass('active');
             $darkOverlay.addClass('hidden').removeClass('active');
 
@@ -2764,6 +2768,7 @@ mobile.menu = {
         $cloudMenuItem.off('tap').on('tap', function() {
 
             // Close the menu
+            $html.removeClass('overlayed');
             $mainMenu.removeClass('active');
             $darkOverlay.addClass('hidden').removeClass('active');
 
@@ -2785,6 +2790,7 @@ mobile.menu = {
         $logoutMenuItem.off('tap').on('tap', function() {
 
             // Close the menu
+            $html.removeClass('overlayed');
             $mainMenu.removeClass('active');
             $darkOverlay.addClass('hidden').removeClass('active');
 
@@ -2823,6 +2829,7 @@ mobile.menu = {
         $homeMenuItem.off('tap').on('tap', function() {
 
             // Close the menu
+            $html.removeClass('overlayed');
             $mainMenu.removeClass('active');
             $darkOverlay.addClass('hidden').removeClass('active');
 

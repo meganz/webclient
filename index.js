@@ -120,7 +120,9 @@ function topMenuScroll() {
 }
 
 function scrollMenu() {
-    $('.bottom-page.scroll-block, .old .fmholder').scroll(function() {
+    "use strict";
+
+    $('.bottom-pages .fmholder').rebind('scroll.devmenu', function() {
         if (page === 'doc' || page === 'cpage' || page === 'sdk' || page === 'dev') {
             var $menu = $('.new-left-menu-block');
             var topPos = $(this).scrollTop();
@@ -151,7 +153,7 @@ function topPopupAlign(button, popup, topPos) {
             buttonTopPos;
 
         if ($button.length && $popup.length) {
-            pageWidth = $('body').width();
+            pageWidth = $('.top-head').width();
             $popupArrow.removeAttr('style');
             popupRightPos = pageWidth
                 - $button.offset().left
@@ -237,6 +239,14 @@ function init_page() {
             return;
         }
         $.lastSeenFilelink = getSitePath();
+    }
+
+    // Set class if gbot
+    if (is_bot) {
+        $('html').addClass('gbot');
+    }
+    else {
+        $('html').removeClass('gbot');
     }
 
     if (!u_type) {
@@ -481,9 +491,8 @@ function init_page() {
         }
 
         doRenderCorpPage();
-        bottompage.init();
-        scrollMenu();
         page = 'cpage';
+        bottompage.init();
     }
     else if (page.substr(0, 5) == 'page_') {
         var cpage = decodeURIComponent(page.substr(5, page.length - 2));
@@ -503,6 +512,7 @@ function init_page() {
 
         doRenderCMSPage();
         page = 'cpage';
+        bottompage.init();
         return;
     }
     else if (page.substr(0, 4) == 'blog' && page.length > 4 && page.length < 10) {
@@ -2016,8 +2026,6 @@ function parsepage(pagehtml, pp) {
         pagehtml = pagehtml.replace(/\/#/g, '/' + urlrootfile + '#');
     }
 
-    $('body').addClass('bottom-pages');
-
     var top = parsetopmenu();
     var bmenu = pages['bottom'];
     var bmenu2 = pages['bottom2'];
@@ -2042,8 +2050,12 @@ function parsepage(pagehtml, pp) {
         M.chrome110ZoomLevelNotification();
     });
 
+    $('body').addClass('bottom-pages');
+    $('body, html, .bottom-pages .fmholder').stop().animate({
+        scrollTop: 0
+    }, 0);
     bottompage.init();
-    $('.nw-bottom-block').addClass(lang);
+
     if (typeof M.initUIKeyEvents === 'function') {
         M.initUIKeyEvents();
     }

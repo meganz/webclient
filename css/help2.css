@@ -1523,30 +1523,15 @@
     padding-right: 50px;
 }
 #help2-main .main-content-pad {
-    /*background-color: white;
-  border-top-left-radius: 6px;
-  border-top-right-radius: 6px;
-  bottom: 0;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
-  margin-left: 310px;
-  padding-bottom: 0;
-  padding-left: 50px;
-  padding-right: 50px;*/
     padding-top: 10px;
     width: 614px;
     padding-bottom: 0;
     margin-left: 300px;
     height: auto;
     margin-top: 50px;
+    position: relative;
 }
 #help2-main .main-directory-pad {
-    /*background-color: white;
-  border-top-left-radius: 6px;
-  border-top-right-radius: 6px;
-  padding-left: 50px;
-  padding-right: 50px;
-  bottom: 0;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15);*/
     margin-left: 300px;
     padding-bottom: 0;
     padding-top: 10px;

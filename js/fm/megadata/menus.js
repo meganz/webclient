@@ -230,7 +230,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
             }
         });
 
-        adjustContextMenuPosition(e, m);
+        M.adjustContextMenuPosition(e, m);
 
         M.disableCircularTargets('#fi_');
 
@@ -462,7 +462,7 @@ MegaData.prototype.setContextMenuGetLinkText = function() {
  * @param {jQuery.Event} e jQuery event
  * @param {Object} m Context menu jQuery object
  */
-function adjustContextMenuPosition(e, m) {
+MegaData.prototype.adjustContextMenuPosition = function(e, m) {
     "use strict";
 
     // mouse cursor, returns the coordinates within the application's client area
@@ -581,7 +581,7 @@ MegaData.prototype.reCalcMenuPosition = function(m, x, y, ico) {
             m.addClass('mega-height');
             cmH = wH - TOP_MARGIN * 2;
             m.css({ 'height': wH - TOP_MARGIN * 2 + 'px' });
-            m.on('mousemove', scrollMegaSubMenu);
+            m.on('mousemove', M.scrollMegaSubMenu);
             dPos.y = wH - cmH;
         }
         else {
@@ -653,7 +653,7 @@ MegaData.prototype.reCalcMenuPosition = function(m, x, y, ico) {
             m.addClass('mega-height');
             cmH = wH - TOP_MARGIN * 2;
             m.css({ 'height': wH - TOP_MARGIN * 2 + 'px' });
-            m.on('mousemove', scrollMegaSubMenu);
+            m.on('mousemove', M.scrollMegaSubMenu);
             dPos.y = wH - cmH;
         }
         else {

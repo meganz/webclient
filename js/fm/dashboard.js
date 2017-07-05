@@ -1,4 +1,19 @@
 function dashboardUI() {
+
+    // Prevent ephemeral session to access dashboard via url
+    if (u_type === 0) {
+        msgDialog('confirmation', l[998], 'Dashboard is for registered users only.'
+             + ' ' + l[999], l[1000], function(e) {// l[17126]
+            if (e) {
+                loadSubPage('register');
+                return false;
+            }
+            loadSubPage('fm');
+        });
+
+        return false;
+    }
+
     $('.fm-right-files-block, .section.conversations, .fm-right-account-block').addClass('hidden');
     $('.fm-right-block.dashboard').removeClass('hidden');
 

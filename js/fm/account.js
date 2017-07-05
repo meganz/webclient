@@ -1,4 +1,18 @@
 function accountUI() {
+    "use strict";
+
+    // Prevent ephemeral session to access account settings via url
+    if (u_type === 0) {
+        msgDialog('confirmation', l[998], l[7687] + ' ' + l[999], l[1000], function(e) {
+            if (e) {
+                loadSubPage('register');
+                return false;
+            }
+            loadSubPage('fm');
+        });
+
+        return false;
+    }
 
     $('.fm-account-notifications').removeClass('hidden');
     $('.fm-account-button').removeClass('active');

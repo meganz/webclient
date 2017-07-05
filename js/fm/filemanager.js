@@ -104,6 +104,14 @@ FileManager.prototype.initFileManagerUI = function() {
     $('.fm-dialog-overlay').rebind('click.fm', function() {
         closeDialog();
         $.hideContextMenu();
+
+        // For ephemeral session redirect to 'fm' page
+        // if user clicks overlay instead Yes/No or close icon 'x'
+        // One situation when this is used, is when ephemeral user
+        //  trying to access settings directly via url
+        if (u_type === 0) {
+            loadSubPage('fm');
+        }
     });
     if (folderlink) {
         $('.fm-main').addClass('active-folder-link');
@@ -593,7 +601,12 @@ FileManager.prototype.initFileManagerUI = function() {
 
         if ($(this).hasClass('account') || $(this).hasClass('dashboard')) {
             if (u_type === 0) {
-                ephemeralDialog(l[7687]);
+                if ($(this).hasClass('account')) {
+                    ephemeralDialog(l[7687]);
+                }
+                else {
+                    ephemeralDialog('Dashboard is for registered users only.');// l[17126]
+                }
             }
             else if ($(this).hasClass('dashboard')) {
                 loadSubPage('fm/dashboard');

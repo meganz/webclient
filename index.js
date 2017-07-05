@@ -120,6 +120,8 @@ function topMenuScroll() {
 }
 
 function scrollMenu() {
+    "use strict";
+
     $('.bottom-pages .fmholder').rebind('scroll.devmenu', function() {
         if (page === 'doc' || page === 'cpage' || page === 'sdk' || page === 'dev') {
             var $menu = $('.new-left-menu-block');

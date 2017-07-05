@@ -2678,9 +2678,9 @@ mobile.menu = {
      *                               menu item to indicate this is the current page.
      */
     showAndInit: function(currentScreen) {
+        "use strict";
 
         // Cache selectors
-        var $body = $('body');
         var $html = $('html');
         var $menuIcon = $('.mobile.fm-header .menu');
         var $darkOverlay = $('.mobile.dark-overlay');

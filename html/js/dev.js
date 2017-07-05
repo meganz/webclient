@@ -158,7 +158,7 @@ function dev_init(pp, appkey) {
             }
 
             if ($target.length) {
-                $('.bottom-page.scroll-block, .old .fmholder').stop().animate({
+                $('.bottom-pages .fmholder').stop().animate({
                     scrollTop: $target.position().top - 40
                 }, 1000);
             }

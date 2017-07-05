@@ -5,7 +5,6 @@
     padding-bottom: 0;
     padding-left: 0 !important;
     padding-right: 0 !important;
-    position: relative;
 }
 /* Scrollable Search 
 .search-section{
@@ -740,9 +739,9 @@
     font-size: 14px;
     letter-spacing: 0.2px;
     line-height: 18px;
-    margin-bottom: 22px;
+    margin-bottom: 8px;
     margin-right: 12px;
-    padding-bottom: 22px;
+    padding-bottom: 0;
     position: relative;
     text-align: left;
 }
@@ -918,7 +917,7 @@
 #help2-main .support-section-header-clone {
     top: 50px;
     width: 100%;
-    position: fixed;
+    position: absolute;
     top: 60px;
     left: 0;
     right: 0;
@@ -933,6 +932,10 @@
     user-select: none;
     z-index: 999;
     margin-top: 2px;
+}
+#help2-main .support-section-header-clone.fixed {
+    top: 60px !important;
+    position: fixed;
 }
 #help2-main .support-section-header-clone .support-search-heading {
     color: #666;
@@ -2627,7 +2630,7 @@
 #help2-main .sidebar-menu-container {
     margin-top: 60px;
 }
-#help2-main .fixed {
+#help2-main .sidebar-menu-container.fixed {
     position: fixed;
     top: 30px !important;
     transition-duration: 0.5s;

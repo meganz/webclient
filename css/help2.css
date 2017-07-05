@@ -5,26 +5,8 @@
     padding-bottom: 0;
     padding-left: 0 !important;
     padding-right: 0 !important;
+    position: relative;
 }
-/* Scrollable Search 
-.search-section{
-	display: none;
-	position: fixed;
-	width: 100%;
-	top: 0px;
-	left: 0;
-	height: 240px;
-	/* Rectangle 2567: 
-	background-image: linear-gradient(0deg, rgba(250,250,250,0.88) 0%, #FAFAFA 10%);
-	z-index: 99;
-}*/
-/*
-.search-section .section-title{
-	margin-top: 130px;
-}
-*/
-/*Colins CSS changes*/
-/* fixed sidebar applied dynamtically with JS */
 .help-background-block {
     content:'';
     position: absolute;
@@ -1529,7 +1511,6 @@
     margin-left: 300px;
     height: auto;
     margin-top: 50px;
-    position: relative;
 }
 #help2-main .main-directory-pad {
     margin-left: 300px;

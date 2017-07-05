@@ -298,6 +298,17 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             // an empty chat
             if (self.getLatestTextMessage() === false) {
                 self.retrieveChatHistory(false);
+                return;
+            }
+
+            // if the # of unreads === initial load count of messages, this may mean there are more unread messages
+            // in the history, so retrieve all Chatd.MESSAGE_HISTORY_LOAD_COUNT messages
+            var totalUnreads = 0;
+            self.messages.forEach(function(msg) {
+                totalUnreads += msg.getState() === Message.STATE.NOT_SEEN ? 1 : 0;
+            });
+            if (totalUnreads === Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL) {
+                self.retrieveChatHistory(false);
             }
         }
     });

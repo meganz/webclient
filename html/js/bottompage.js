@@ -8,9 +8,9 @@ var bottompage = {
      */
     init: function() {
         bottompage.initNavButtons();
-        if (page.substr(0,4) == 'help' || page === 'cpage' || page.substr(0, 9) == 'corporate') {
-            $('body').addClass('old'); 
-            scrollMenu();  
+        if (page.substr(0,4) === 'help' || page === 'cpage' || page.substr(0, 9) === 'corporate') {
+            $('body').addClass('old');
+            scrollMenu();
         }
         else {
             $('body').removeClass('old');
@@ -141,7 +141,7 @@ var bottompage = {
             topResize();
         });
 
-        $('.bottom-pages .fmholder').scroll(function() {
+        $('.bottom-pages .fmholder').rebind('scroll.topmenu', function() {
             var $topHeader = $('.top-head');
             var topPos = $(this).scrollTop();
             if (topPos > 300) {

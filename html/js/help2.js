@@ -417,12 +417,7 @@ var Help = (function() {
         $searchHeader.fadeIn();
         $cloneHeader.fadeOut();
 
-
-        var $scrollBlock= $('.bottom-pages .fmholder');
-
-        $scrollBlock.scroll(function() {
-            // TODO: write a cleanup function to be invoked when moving out of the #help section
-
+        $('.bottom-pages .fmholder').rebind('scroll.helpmenu', function() {
             var topPos = $(this).scrollTop();
             if (topPos > 195) {
                 if (topPos + $sideBar.outerHeight() + 115 <= $('.main-mid-pad').outerHeight()) {
@@ -435,13 +430,13 @@ var Help = (function() {
             else {
                 $sideBar.removeAttr('style').removeClass('fixed');
             }
-            
+
             if (topPos + $sideBar.outerHeight() + 115 <= $('.main-mid-pad').outerHeight()) {
-                    $cloneHeader.css('top', topPos + 60 + 'px').addClass('fixed');
-                }
-                else {
-                    $cloneHeader.removeClass('fixed');
-                }
+                $cloneHeader.css('top', topPos + 60 + 'px').addClass('fixed');
+            }
+            else {
+                $cloneHeader.removeClass('fixed');
+            }
 
             <!-- Search header !-->
             if (topPos > 210) {

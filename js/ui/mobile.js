@@ -1636,6 +1636,7 @@ mobile.downloadOverlay = {
      */
     checkSupportedFile: function(node) {
 
+        var $body = $('body');
         var $openInBrowserButton = this.$overlay.find('.first.dl-browser');
         var $fileTypeUnsupportedMessage = this.$overlay.find('.file-unsupported');
         var $fileSizeUnsupportedMessage = this.$overlay.find('.file-too-large');
@@ -2058,7 +2059,7 @@ mobile.signin = {
         // Init events
         this.initLoginButton();
         this.initEmailPasswordKeyupEvents();
-        
+
         // Initialise the Remember Me checkbox, top button tabs
         mobile.initTabs('login');
         mobile.initCheckbox('remember-me');

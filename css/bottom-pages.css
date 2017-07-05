@@ -17,6 +17,7 @@
     color: #FF4D4A;
 }
 body.bottom-pages .fmholder {
+    overflow: hidden;
     overflow-y: auto;
     position: relative;
 }
@@ -1223,6 +1224,7 @@ html.gbot {
     font-size: 14px;
     line-height: 22px;
     text-transform: uppercase;
+    min-height: 22px;
 }
 .bottom-page.big-header.top {
     padding-bottom: 29px;

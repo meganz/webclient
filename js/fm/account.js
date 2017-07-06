@@ -664,6 +664,9 @@ function accountUI() {
         var $cancelButton = $saveBlock.find('.fm-account-cancel');
         var $saveButton = $saveBlock.find('.fm-account-save');
 
+        $('#account-new-password').val('');
+        $('#account-confirm-password').val('');
+
         // Reset change email fields after change
         $newEmail.val('');
         $emailInfoMessage.addClass('hidden');

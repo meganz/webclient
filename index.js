@@ -1372,9 +1372,6 @@ function tooltiplogin() {
                 passwordManager('#form_login_header');
                 u_type = r;
 
-                // Logging to see how many people are signing into the regular site
-                api_req({ a: 'log', e: 99630, m: 'Completed login on regular webclient' });
-
                 if (login_next) {
                     loadSubPage(login_next);
                 }

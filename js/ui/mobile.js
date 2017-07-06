@@ -2174,9 +2174,6 @@ mobile.signin = {
                     // Set the u_type e.g. 3 is fully registered user
                     u_type = result;
 
-                    // Logging to see how many people are signing into the mobile site
-                    api_req({ a: 'log', e: 99629, m: 'Completed login on mobile webclient' });
-
                     // Load the file manager
                     loadSubPage('fm');
                 }

@@ -3611,9 +3611,6 @@ var doProLogin = function($dialog) {
                 $('#login-email', $dialog).val('');
                 u_type = r;
 
-                // Logging to see how many people are signing into the regular site
-                api_req({ a: 'log', e: 99630, m: 'Completed login on regular webclient' });
-
                 init_page();
                 if (pro_package) {
                     var cls = pro_package

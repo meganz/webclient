@@ -41,6 +41,18 @@ function u_login2(ctx, ks) {
             u_storage.privk = base64urlencode(crypto_encodeprivkey(ks[2]));
         }
         u_checklogin(ctx, false);
+
+        // Logging to see how many people are signing
+        onIdle(function() {
+            if (is_mobile) {
+                api_req({a: 'log', e: 99629, m: 'Completed login on mobile webclient'});
+            }
+            else {
+                api_req({a: 'log', e: 99630, m: 'Completed login on regular webclient'});
+            }
+
+            mBroadcaster.sendMessage('login', ks);
+        });
     }
     else {
         ctx.checkloginresult(ctx, false);

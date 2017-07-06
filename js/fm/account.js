@@ -30,12 +30,9 @@ function accountUI() {
 
     M.accountData(function(account) {
         loadingDialog.hide();
+        accountUI.userUIUpdate();
 
-        var perc;
-        var warning;
         var perc_c;
-        var b_exceeded;
-        var s_exceeded;
         var id = getSitePath();
         var pid = String(id).replace('/fm/account/', '');
         var sectionClass;
@@ -1482,36 +1479,6 @@ function accountUI() {
 
     }, 1);
 
-    // Show first name or last name
-    if (u_attr.firstname) {
-        $('.membership-big-txt.name').text(u_attr.firstname + ' ' + u_attr.lastname);
-    }
-    else {
-        $('.membership-big-txt.name').text(u_attr.name);
-    }
-
-    // Show Membership plan
-    $('.fm-tree-panel .small-icon.membership').removeClass('pro1 pro2 pro3 pro4');
-    if (u_attr.p) {
-        // LITE/PRO account
-        var planNum = u_attr.p;
-        var planText = getProPlan(planNum);
-
-        $('.account.membership-plan').text(planText);
-        $('.small-icon.membership').addClass('pro' + planNum);
-    }
-    else {
-        $('.account.membership-plan').text(l[435]);
-    }
-
-    // Show email address
-    if (u_attr.email) {
-        $('.membership-big-txt.email').text(u_attr.email);
-    }
-    else {
-        $('.membership-big-txt.email').hide();
-    }
-
     $('.editprofile').rebind('click', function() {
         loadSubPage('fm/account');
     });
@@ -1764,6 +1731,48 @@ function accountUI() {
     });
     accNotifHandler = undefined;
 }
+
+/**
+ * Update user UI (pro plan, avatar, first/last name, email)
+ */
+accountUI.userUIUpdate = function() {
+    'use strict';
+
+    // Show Membership plan
+    $('.small-icon.membership').removeClass('pro1 pro2 pro3 pro4');
+    if (u_attr.p) {
+        // LITE/PRO account
+        var planNum = u_attr.p;
+        var planText = getProPlan(planNum);
+
+        $('.account.membership-plan').text(planText);
+        $('.small-icon.membership').addClass('pro' + planNum);
+    }
+    else {
+        $('.account.membership-plan').text(l[435]);
+    }
+
+    // update avatar
+    $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', true));
+    $('.fm-avatar').safeHTML(useravatar.contact(u_handle, '', 'div'));
+
+
+    // Show first name or last name
+    if (u_attr.firstname) {
+        $('.membership-big-txt.name').text(u_attr.firstname + ' ' + u_attr.lastname);
+    }
+    else {
+        $('.membership-big-txt.name').text(u_attr.name);
+    }
+
+    // Show email address
+    if (u_attr.email) {
+        $('.membership-big-txt.email').text(u_attr.email);
+    }
+    else {
+        $('.membership-big-txt.email').hide();
+    }
+};
 
 /**
  * Helper function to fill common charts into the dashboard and account sections

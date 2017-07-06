@@ -16,6 +16,7 @@ MegaData.prototype.accountData = function(cb, blockui) {
     }
     else {
         var uqres = false;
+        var pstatus = u_attr.p;
         var mRootID = M.RootID;
 
         if (blockui) {
@@ -120,6 +121,12 @@ MegaData.prototype.accountData = function(cb, blockui) {
                             topmenuUI();
                         }
                     }
+                }
+
+                if (pstatus !== u_attr.p) {
+                    ctx.account.justUpgraded = Date.now();
+
+                    M.checkStorageQuota(2);
                 }
 
                 if (!u_attr.p && uqres) {

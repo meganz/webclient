@@ -242,7 +242,6 @@ function verify_key(key) {
 
 
 function reset_pwcheck() {
-    Soon(mainScroll);
     $('.login-register-input.password').removeClass('weak-password strong-password');
     $('.new-registration').removeClass('good1 good2 good3 good4 good5');
 
@@ -301,8 +300,6 @@ function reset_pwcheck() {
 
 function init_reset_pw() {
     var a = '';
-
-    Soon(mainScroll);
     $('#withkey-password,#withoutkey-password').rebind('focus', function(e) {
         $('.login-register-input.password.first').removeClass('incorrect');
         $('.login-register-input.password.confirm').removeClass('incorrect');

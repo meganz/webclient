@@ -533,16 +533,16 @@ FileManager.prototype.initFileManagerUI = function() {
         }
         if (!fmTabState || fmTabState['cloud-drive'].root !== M.RootID) {
             fmTabState = {
-                'cloud-drive': {root: M.RootID, prev: null},
-                'folder-link': {root: M.RootID, prev: null},
-                'shared-with-me': {root: 'shares', prev: null},
-                'conversations': {root: 'chat', prev: null},
-                'contacts': {root: 'contacts', prev: null},
-                'transfers': {root: 'transfers', prev: null},
-                'account': {root: 'account', prev: null},
-                'dashboard': {root: 'dashboard', prev: null},
-                'inbox': {root: M.InboxID, prev: null},
-                'rubbish-bin': {root: M.RubbishID, prev: null}
+                'cloud-drive':     {root: M.RootID,    prev: null},
+                'folder-link':     {root: M.RootID,    prev: null},
+                'shared-with-me':  {root: 'shares',    prev: null},
+                'conversations':   {root: 'chat',      prev: null},
+                'contacts':        {root: 'contacts',  prev: null},
+                'transfers':       {root: 'transfers', prev: null},
+                'account':         {root: 'account',   prev: null},
+                'dashboard':       {root: 'dashboard', prev: null},
+                'inbox':           {root: M.InboxID,   prev: null},
+                'rubbish-bin':     {root: M.RubbishID, prev: null}
             };
         }
 
@@ -553,7 +553,7 @@ FileManager.prototype.initFileManagerUI = function() {
 
         var activeTab = fmTabState[activeClass];
         if (activeTab) {
-            if (activeTab.root === M.currentrootid) {
+            if (activeTab.root === M.currentrootid || activeTab.root === 'chat') {
                 activeTab.prev = M.currentdirid;
                 M.lastActiveTab = activeClass;
             }
@@ -584,6 +584,11 @@ FileManager.prototype.initFileManagerUI = function() {
                 // Clicked on the currently active tab, should open the root (e.g. go back)
                 if (~clickedClass.indexOf(activeClass)) {
                     targetFolder = tab.root;
+
+                    // special case handling for the chat, re-render current conversation
+                    if (tab.root === 'chat' && String(M.currentdirid).substr(0, 5) === 'chat/') {
+                        targetFolder = M.currentdirid;
+                    }
                 }
                 else if (tab.prev && M.d[tab.prev]) {
                     targetFolder = tab.prev;
@@ -654,6 +659,7 @@ FileManager.prototype.updFileManagerUI = function() {
     var newcontact = false;
     var newpath = false;
     var newshare = false;
+    var selnode;
 
     if (d) {
         console.time('rendernew');
@@ -672,6 +678,11 @@ FileManager.prototype.updFileManagerUI = function() {
         }
         if (newNode.p === this.currentdirid || newNode.h === this.currentdirid) {
             UImain = true;
+
+            if ($.onRenderNewSelectNode === newNode.h) {
+                delete $.onRenderNewSelectNode;
+                selnode = newNode.h;
+            }
         }
         if (!newpath && document.getElementById('path_' + newNode.h)) {
             newpath = true;
@@ -703,6 +714,12 @@ FileManager.prototype.updFileManagerUI = function() {
                 M.sort();
                 M.renderMain(true);
                 // M.renderPath();
+                if (selnode) {
+                    Soon(function() {
+                        $.selected = [selnode];
+                        reselect(1);
+                    });
+                }
                 $.tresizer();
             }
 
@@ -1033,7 +1050,7 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.clearbin-item').rebind('click', function() {
-        doClearbin(true);
+        doClearbin(false);
     });
 
     $(c + '.move-up').rebind('click', function() {

@@ -160,13 +160,22 @@ MegaData.prototype.buildtree = function _buildtree(n, dialog, stype) {
             }));
         }
 
-        var sortFn = this.getSortByNameFn();
-        var sortDirection = (is_mobile) ? 1 : $.sortTreePanel[prefix].dir;
-        folders.sort(
-            function(a, b) {
-                return sortFn(a, b, sortDirection);
-            }
-        );
+        var sortDirection = is_mobile ? 1 : Object($.sortTreePanel[prefix]).dir;
+        var sortFn = function(a, b) {
+            return M.compareStrings(a.name, b.name, sortDirection);
+        };
+        switch (Object($.sortTreePanel[prefix]).by) {
+            case 'fav':
+                sortFn = function(a, b) {
+                    return a.t & M.IS_FAV ? -1 * sortDirection : b.t & M.IS_FAV ? sortDirection : 0;
+                };
+                break;
+            case 'created':
+                sortFn = function(a, b) {
+                    return (a.ts < b.ts ? -1 : 1) * sortDirection;
+                };
+        }
+        folders.sort(sortFn);
 
         // In case of copy and move dialogs
         if (typeof dialog !== 'undefined') {
@@ -223,7 +232,7 @@ MegaData.prototype.buildtree = function _buildtree(n, dialog, stype) {
             if (folders[idx].su || Object(M.c.shares[curItemHandle]).su) {
                 sharedfolder = ' inbound-share';
             }
-            else if (share.isShareExist([curItemHandle], true, true, false)) {
+            else if (folders[idx].t & M.IS_SHARED) {
                 sharedfolder = ' shared-folder';
             }
             else {
@@ -245,8 +254,7 @@ MegaData.prototype.buildtree = function _buildtree(n, dialog, stype) {
             }
             else {
 
-                if (M.getNodeShare(curItemHandle).down === 1) {
-                    // Taken down
+                if (folders[idx].t & M.IS_TAKENDOWN) {
                     titleTooltip.push(l[7705]);
                 }
 
@@ -256,7 +264,7 @@ MegaData.prototype.buildtree = function _buildtree(n, dialog, stype) {
                 }
                 titleTooltip = titleTooltip.map(escapeHTML).join("\n");
 
-                sExportLink = Object(this.su.EXP)[curItemHandle] ? 'linked' : '';
+                sExportLink = folders[idx].t & M.IS_LINKED ? 'linked' : '';
                 arrowIcon = containsc ? 'class="nw-fm-arrow-icon"' : '';
 
                 html = '<li id="' + _li + curItemHandle + '">' +

@@ -76,11 +76,7 @@
             $('.udragger-block').removeClass('drag warning copy download move to-shared to-contacts to-conversations to-rubbish');
             $('.udragger-block').addClass('copy');
         }
-        if (page == 'start') {
-            $('.st-main-cursor,.st-main-info').fadeOut(30);
-            start_over();
-        }
-        else if (e) {
+        if (e) {
             var t = $(e.target);
             $('.nw-fm-tree-item, .nw-contact-item').css('background-color', '');
             $('.ui-selected').removeClass('ui-selected');
@@ -128,8 +124,6 @@
             if (page == 'start'
                     && e && (e.pageX < 6 || e.pageY < 6) && $.dragging && $.dragging + 500 < Date.now()) {
                 $.dragging = false;
-                start_out();
-                $('.st-main-cursor,.st-main-info').fadeIn(30);
             }
         }, 500);
     }
@@ -193,6 +187,15 @@
                 }
                 else {
                     loginDialog();
+
+                    mBroadcaster.once('fm:initialized', function() {
+                        ulQueue.resume();
+                        uldl_hold = false;
+
+                        if (ul_queue.length > 0) {
+                            showTransferToast('u', ul_queue.length);
+                        }
+                    });
                 }
             });
         }
@@ -272,10 +275,6 @@
             if ($('#fmholder').html() == '') {
                 $('#fmholder').html(translate(pages['fm'].replace(/{staticpath}/g, staticpath)));
             }
-            start_out();
-            setTimeout(function() {
-                $('.st-main-cursor,.st-main-info').show();
-            }, 500);
         }
         else {
             $('.nw-fm-tree-item, .nw-contact-item').css('background-color', '');

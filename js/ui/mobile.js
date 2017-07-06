@@ -84,9 +84,6 @@ var mobile = {
             loadSubPage('register');
             return false;
         });
-
-        // If the Mega icon is clicked go to the home page
-        mobile.initHeaderMegaIcon();
     },
 
     /**
@@ -148,6 +145,35 @@ var mobile = {
 
             return false;
         });
+    },
+
+    /**
+     * Changes the app store badge depending on what device they have
+     */
+    initMobileAppButton: function() {
+
+        var $appStoreButton = $('.download-app, .startpage .mobile-apps-button');
+
+        // Set the link
+        $appStoreButton.attr('href', mobile.downloadOverlay.getStoreLink());
+
+        // If iOS, Windows or Android show the relevant app store badge
+        switch (ua.details.os) {
+
+            case 'iPad':
+            case 'iPhone':
+                $appStoreButton.removeClass('hidden').addClass('ios');
+                break;
+
+            case 'Windows Phone':
+                $appStoreButton.removeClass('hidden').addClass('wp');
+                break;
+
+            default:
+                // Android and others
+                $appStoreButton.removeClass('hidden').addClass('android');
+                break;
+        }
     }
 };
 
@@ -1610,10 +1636,10 @@ mobile.downloadOverlay = {
      */
     checkSupportedFile: function(node) {
 
+        var $body = $('body');
         var $openInBrowserButton = this.$overlay.find('.first.dl-browser');
         var $fileTypeUnsupportedMessage = this.$overlay.find('.file-unsupported');
         var $fileSizeUnsupportedMessage = this.$overlay.find('.file-too-large');
-        var $body = $('body');
 
         // Reset state back to default if re-opening the dialog from a previously disabled state
         $openInBrowserButton.removeClass('disabled');
@@ -2008,7 +2034,7 @@ mobile.messageOverlay = {
 
 
 /**
- * Homepage for mobile with login/register functionality
+ * Login functionality
  */
 mobile.signin = {
 
@@ -2037,6 +2063,8 @@ mobile.signin = {
         // Initialise the Remember Me checkbox, top button tabs
         mobile.initTabs('login');
         mobile.initCheckbox('remember-me');
+        mobile.initHeaderMegaIcon();
+        mobile.initMobileAppButton();
     },
 
     /**
@@ -2146,9 +2174,6 @@ mobile.signin = {
                     // Set the u_type e.g. 3 is fully registered user
                     u_type = result;
 
-                    // Logging to see how many people are signing into the mobile site
-                    api_req({ a: 'log', e: 99629, m: 'Completed login on mobile webclient' });
-
                     // Load the file manager
                     loadSubPage('fm');
                 }
@@ -2192,6 +2217,8 @@ mobile.register = {
         // Initialise the login/register tabs and the Agree to Terms of Service checkbox
         mobile.initTabs('register');
         mobile.initCheckbox('confirm-terms');
+        mobile.initHeaderMegaIcon();
+        mobile.initMobileAppButton();
 
         // Activate register button when fields are complete
         this.initKeyupEvents();
@@ -2638,86 +2665,6 @@ mobile.register = {
 
 
 /**
- * Home page functionality
- */
-mobile.home = {
-
-    /** jQuery selector for the home screen */
-    $screen: null,
-
-    /**
-     * Shows the home page and initialises functionality
-     */
-    show: function() {
-
-        // Cache selector
-        this.$screen = $('.mobile.homepage');
-
-        // Show the screen
-        this.$screen.removeClass('hidden');
-
-        // Initialise functionality
-        mobile.home.initBottomLinks();
-        mobile.home.initMobileAppButton();
-        mobile.initHeaderMegaIcon();
-        mobile.menu.showAndInit('home');
-    },
-
-    /**
-     * Initialise the Login and Register buttons in the footer of the homepage
-     */
-    initBottomLinks: function() {
-
-        var $loginButton = this.$screen.find('.bottom-link.sign-in');
-        var $registerButton = this.$screen.find('.bottom-link.register');
-
-        // On click/tap, load the login page
-        $loginButton.off('tap').on('tap', function() {
-
-            loadSubPage('login');
-            return false;
-        });
-
-        // On click/tap, load the register page
-        $registerButton.off('tap').on('tap', function() {
-
-            loadSubPage('register');
-            return false;
-        });
-    },
-
-    /**
-     * Changes the app store badge depending on what device they have
-     */
-    initMobileAppButton: function() {
-
-        var $appStoreButton = this.$screen.find('.download-app');
-
-        // Set the link
-        $appStoreButton.attr('href', mobile.downloadOverlay.getStoreLink());
-
-        // If iOS, Windows or Android show the relevant app store badge
-        switch (ua.details.os) {
-
-            case 'iPad':
-            case 'iPhone':
-                $appStoreButton.removeClass('hidden').addClass('ios');
-                break;
-
-            case 'Windows Phone':
-                $appStoreButton.removeClass('hidden').addClass('wp');
-                break;
-
-            default:
-                // Android and others
-                $appStoreButton.removeClass('hidden').addClass('android');
-                break;
-        }
-    }
-};
-
-
-/**
  * The main menu (hamburger icon in top right) which lets the user do various tasks
  */
 mobile.menu = {
@@ -2729,8 +2676,10 @@ mobile.menu = {
      *                               menu item to indicate this is the current page.
      */
     showAndInit: function(currentScreen) {
+        "use strict";
 
         // Cache selectors
+        var $html = $('html');
         var $menuIcon = $('.mobile.fm-header .menu');
         var $darkOverlay = $('.mobile.dark-overlay');
         var $mainMenu = $('.mobile.main-menu');
@@ -2747,7 +2696,6 @@ mobile.menu = {
         var $homeMenuItem = $mainMenu.find('.menu-button.home');
         var $termsMenuItem = $mainMenu.find('.menu-button.terms-of-service');
         var $logoutMenuItem = $mainMenu.find('.menu-button.logout');
-        var $currentScreen = $mainMenu.find('.menu-button.' + currentScreen);
 
         // Show the menu / hamburger icon
         $menuIcon.removeClass('hidden');
@@ -2780,11 +2728,23 @@ mobile.menu = {
 
         // Add a red bar style to the left of the menu item to indicate this is the current page
         $menuButtons.removeClass('current');
-        $currentScreen.addClass('current');
+
+        // If in the cloud drive, add a red bar next to that button
+        if (currentScreen.indexOf('fm') > -1) {
+            $mainMenu.find('.menu-button.cloud-drive').addClass('current');
+        }
+        else {
+            // Otherwise if it exists, add a red bar to the button matching the current page
+            try {
+                $mainMenu.find('.menu-button.' + currentScreen).addClass('current');
+            }
+            catch (exception) { }
+        }
 
         // On menu button click, show the menu
         $menuIcon.off('tap').on('tap', function() {
 
+            $html.addClass('overlayed');
             $mainMenu.addClass('active');
             $darkOverlay.removeClass('hidden').addClass('active');
 
@@ -2794,6 +2754,7 @@ mobile.menu = {
         // On tapping/clicking the dark overlay or menu's close button, close the menu
         $darkOverlay.add($closeIcon).off('tap').on('tap', function() {
 
+            $html.removeClass('overlayed');
             $mainMenu.removeClass('active');
             $darkOverlay.addClass('hidden').removeClass('active');
 
@@ -2804,6 +2765,7 @@ mobile.menu = {
         $cloudMenuItem.off('tap').on('tap', function() {
 
             // Close the menu
+            $html.removeClass('overlayed');
             $mainMenu.removeClass('active');
             $darkOverlay.addClass('hidden').removeClass('active');
 
@@ -2823,6 +2785,11 @@ mobile.menu = {
 
         // On the menu's Logout button
         $logoutMenuItem.off('tap').on('tap', function() {
+
+            // Close the menu
+            $html.removeClass('overlayed');
+            $mainMenu.removeClass('active');
+            $darkOverlay.addClass('hidden').removeClass('active');
 
             // Log the user out and go back to the login page
             M.logout();
@@ -2859,6 +2826,7 @@ mobile.menu = {
         $homeMenuItem.off('tap').on('tap', function() {
 
             // Close the menu
+            $html.removeClass('overlayed');
             $mainMenu.removeClass('active');
             $darkOverlay.addClass('hidden').removeClass('active');
 
@@ -2888,8 +2856,7 @@ mobile.terms = {
         // Log if they visited the TOS page
         api_req({ a: 'log', e: 99636, m: 'Visited Terms of Service page on mobile webclient' });
 
-        // Init menu and Mega icon
-        mobile.menu.showAndInit('terms-of-service');
+        // Init Mega (M) icon
         mobile.initHeaderMegaIcon();
     }
 };

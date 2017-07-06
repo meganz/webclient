@@ -96,7 +96,7 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
     "use strict";
 
     var fmdb = this;
-    var dbpfx = 'fm9_';
+    var dbpfx = 'fm12_';
     var slave = !mBroadcaster.crossTab.master;
 
     fmdb.crashed = false;
@@ -1499,7 +1499,7 @@ Object.defineProperty(self, 'dbfetch', (function() {
 
             var masterPromise = promise;
             if ($.len(inflight)) {
-                masterPromise = MegaPromise.allDone(array_unique(obj_values(inflight)).concat(promise));
+                masterPromise = MegaPromise.allDone(array.unique(obj_values(inflight)).concat(promise));
             }
             // console.warn('fetchsubtree', arguments, p, inflight);
 
@@ -1576,9 +1576,13 @@ Object.defineProperty(self, 'dbfetch', (function() {
 
             var masterPromise = promise;
             /*if ($.len(inflight)) {
-                masterPromise = MegaPromise.allDone(array_unique(obj_values(inflight)).concat(promise));
+             masterPromise = MegaPromise.allDone(array.unique(obj_values(inflight)).concat(promise));
             }
-            else*/ if (!handles.length) {
+             else*/
+            if (!handles.length || !fmdb) {
+                if (d && handles.length) {
+                    console.warn('Unknown nodes: ' + handles);
+                }
                 return MegaPromise.resolve(result);
             }
 
@@ -1610,8 +1614,8 @@ Object.defineProperty(self, 'dbfetch', (function() {
 
             var promise = new MegaPromise();
 
-            if (M.h[hash] && M.d[M.h[hash].first]) {
-                promise.resolve(M.d[M.h[hash].first]);
+            if (M.h[hash]) {
+                promise.resolve(M.d[M.h[hash].substr(0, 8)]);
             }
             else {
                 fmdb.getbykey('f', 'c', false, [['c', hash]], 1)
@@ -1619,8 +1623,14 @@ Object.defineProperty(self, 'dbfetch', (function() {
                         var node = r[0];
                         if (node) {
                             // got the hash and a handle it belong to
-                            M.h[hash] = M.h[hash] || Hash();
-                            M.h[hash][node.h] = 1;
+                            if (!M.h[hash]) {
+                                M.h[hash] = node.h + ' ';
+                            }
+                            else {
+                                if (M.h[hash].indexOf(node.h) < 0) {
+                                    M.h[hash] += node.h + ' ';
+                                }
+                            }
 
                             promise.resolve(node);
                         }

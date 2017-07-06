@@ -4,33 +4,11 @@
 
 var attribCache = false;
 
-(function _userAttributeHandling(scope) {
+(function _userAttributeHandling(global) {
     "use strict";
 
-    var ACCOUNT_LOGGER_DEBUG = localStorage.accountDebug ? true : false;
-
     var ns = {};
-    var logger = MegaLogger.getLogger('account', {
-        'minLogLevel': function() {
-            if (ACCOUNT_LOGGER_DEBUG) {
-                return MegaLogger.LEVELS.DEBUG;
-            }
-            else {
-                return MegaLogger.LEVELS.WARN;
-            }
-        },
-        'transport': function() {
-            if (ACCOUNT_LOGGER_DEBUG) {
-                var args = toArray.apply(null, arguments);
-                args.shift();
-                return console.error.apply(console, args[0]);
-            }
-            else {
-                return MegaLogger.DEFAULT_OPTIONS.transport.apply(this, arguments);
-            }
-        }
-    });
-
+    var logger = MegaLogger.getLogger('account');
     var ATTRIB_CACHE_NON_CONTACT_EXP_TIME = 2 * 60 * 60;
 
     /**
@@ -189,8 +167,6 @@ var attribCache = false;
                 attribCache.setItem(cacheKey, JSON.stringify([res, exp]));
 
                 if (res.v) {
-                    logger.debug("got new version for ", cacheKey, "from settleFunc (attr.get)", res.v);
-
                     self._versions[cacheKey] = res.v;
                 }
             }
@@ -243,7 +219,6 @@ var attribCache = false;
                             if (res[0].av) {
                                 result = res[0].av;
                                 if (res[0].v) {
-                                    logger.debug("got version from cache", cacheKey, res[0].v);
                                     self._versions[cacheKey] = res[0].v;
                                 }
                             }
@@ -383,8 +358,6 @@ var attribCache = false;
         var settleFunction = function(res) {
             if (typeof res !== 'number') {
                 attribCache.setItem(cacheKey, JSON.stringify([{"av": savedValue, "v": res[attribute]}, 0]));
-                logger.debug("clearing version for: ", cacheKey, "because of .set call");
-
                 delete self._versions[cacheKey];
 
                 logger.info('Setting user attribute "'
@@ -472,9 +445,7 @@ var attribCache = false;
             var version = self._versions[cacheKey];
 
             apiCall['a'] = 'upv';
-
             if (version) {
-                logger.debug('upv attr set2', attribute, savedValue, version);
                 apiCall[attribute] = [
                     savedValue,
                     version
@@ -483,12 +454,10 @@ var attribCache = false;
                 api_req(apiCall, myCtx);
             }
             else {
-                logger.debug('no version found for', attribute, 'retrieving from attr.get (cache/api).');
                 // retrieve version/data from cache or server?
                 self.get(u_handle, attrName, pub, nonHistoric).always(function() {
                     version = self._versions[cacheKey];
 
-                    logger.debug('upv attr set2', attribute, savedValue, version);
                     apiCall['a'] = 'upv';
                     if (version) {
                         apiCall[attribute] = [
@@ -516,19 +485,16 @@ var attribCache = false;
         return thePromise;
     };
 
-    ns._versions = {};
+    ns._versions = Object.create(null);
+    ns._conflictHandlers = Object.create(null);
 
-    ns._conflictHandlers = {};
     ns.registerConflictHandler = function (attributeName, pub, nonHistoric, mergeFn) {
-        var self = this;
         var attributeId = buildAttribute(attributeName, pub, nonHistoric);
-        if (!self._conflictHandlers[attributeId]) {
-            self._conflictHandlers[attributeId] = [];
-        }
 
-        self._conflictHandlers[attributeId].push(
-            mergeFn
-        );
+        if (!this._conflictHandlers[attributeId]) {
+            this._conflictHandlers[attributeId] = [];
+        }
+        this._conflictHandlers[attributeId].push(mergeFn);
     };
 
     /**
@@ -639,9 +605,6 @@ var attribCache = false;
         logger.debug("QueuedSetArrayAttribute executing: ", self.toString());
 
         var _setArrayAttribute = function(r) {
-
-            logger.debug("setting", self.toString(), r);
-
             if (r === EINTERNAL) {
                 r = {};
             }
@@ -659,7 +622,7 @@ var attribCache = false;
             var serializedValue = arr;
 
             proxyPromise.linkDoneAndFailTo(
-                self.attr.set(
+                self.set(
                     self.attributeName,
                     serializedValue,
                     self.pub,
@@ -674,7 +637,6 @@ var attribCache = false;
 
         self.attr.get(u_handle, self.attributeName, self.pub, self.nonHistoric)
             .done(function(r) {
-                logger.debug("QueuedSetArrayAttribute pre-get", self.toString(), r);
                 if (r === -9) {
                     _setArrayAttribute({});
                     proxyPromise.reject(r);
@@ -798,39 +760,6 @@ var attribCache = false;
         return proxyPromise;
     };
 
-
-    ns.handleUserAttributeActionPackets = function(actionPacket, avatars) {
-        var attrs = actionPacket.ua;
-        var actionPacketUserId = actionPacket.u;
-
-        for (var j in attrs) {
-            if (attrs.hasOwnProperty(j)) {
-                var attributeName = attrs[j];
-
-                // fill version if missing
-                mega.attr.handleVersionFromActionPacket(
-                    actionPacketUserId,
-                    attributeName,
-                    actionPacket.v[j]
-                );
-
-                // handle avatar related action packets (e.g. avatar modified)
-                if (attributeName === '+a') {
-                    avatars.push(actionPacketUserId);
-                }
-                // handle firstname/lastname attributes
-                else if (attributeName === 'firstname' || attributeName === 'lastname') {
-                    attribCache.uaPacketParser(
-                        attributeName,
-                        actionPacketUserId,
-                        true,
-                        actionPacket.v && actionPacket.v[j] ? actionPacket.v[j] : undefined
-                    );
-                }
-            }
-        }
-    };
-
     /**
      * Handle BitMap attributes
      *
@@ -896,6 +825,8 @@ var attribCache = false;
         return res;
     };
 
+    var uaPacketParserHandler = Object.create(null);
+
     /**
      * Updated the local version cache IF the action packet contains a version
      *
@@ -912,6 +843,90 @@ var attribCache = false;
             mega.attr._versions[actionPacketUserId + "_" + attributeName] = actionPacketVersion;
         }
     };
+
+    /**
+     * Process action-packet for attribute updates.
+     *
+     * @param actionPacketUserId
+     * @param attributeName
+     * @param actionPacketVersion
+     */
+    ns.handleVersionFromActionPacket = function (actionPacketUserId, attributeName, actionPacketVersion) {
+        if (
+            actionPacketVersion &&
+            !mega.attr._versions[actionPacketUserId + "_" + attributeName]
+        ) {
+            mega.attr._versions[actionPacketUserId + "_" + attributeName] = actionPacketVersion;
+        }
+    };
+
+    /**
+     * Process action-packet for attribute updates.
+     *
+     * @param {String}  attrName          Attribute name
+     * @param {String}  userHandle        User handle
+     * @param {Boolean} [ownActionPacket] Whether the action-packet was issued by oneself
+     * @param {String}  [version]         version, as returned by the API
+     */
+    ns.uaPacketParser = function uaPacketParser(attrName, userHandle, ownActionPacket, version) {
+        var logger = MegaLogger.getLogger('account');
+        var cacheKey = userHandle + "_" + attrName;
+
+        logger.debug('uaPacketParser: Invalidating cache entry "%s"', cacheKey);
+
+        // XXX: Even if we're using promises here, this is guaranteed to resolve synchronously atm,
+        //      so if this ever changes we'll need to make sure it's properly adapted...
+
+        var removeItemPromise = attribCache.removeItem(cacheKey);
+
+        delete this._versions[cacheKey];
+
+        removeItemPromise
+            .always(function _uaPacketParser() {
+                if (typeof uaPacketParserHandler[attrName] === 'function') {
+                    uaPacketParserHandler[attrName](userHandle);
+                }
+                else if (
+                    (attrName.substr(0, 2) === '+!' || attrName.substr(0, 2) === '^!') &&
+                    attribCache.bitMapsManager.exists(attrName.substr(2))
+                ) {
+                    mega.attr.handleBitMapAttribute(attrName, version);
+                }
+                else if (d > 1) {
+                    logger.debug('uaPacketParser: No handler for "%s"', attrName);
+                }
+            });
+
+        return removeItemPromise;
+    };
+
+    mBroadcaster.once('boot_done', function() {
+        uaPacketParserHandler['firstname'] = function(userHandle) {
+            if (M.u[userHandle]) {
+                M.u[userHandle].firstName = M.u[userHandle].lastName = "";
+                M.syncUsersFullname(userHandle);
+            }
+            else {
+                console.warn('uaPacketParser: Unknown user %s handling first/lastname', userHandle);
+            }
+        };
+        uaPacketParserHandler['lastname']    = uaPacketParserHandler['firstname'];
+        uaPacketParserHandler['+a']          = function(userHandle) { M.avatars(userHandle); };
+        uaPacketParserHandler['*!authring']  = function() { authring.getContacts('Ed25519'); };
+        uaPacketParserHandler['*!authRSA']   = function() { authring.getContacts('RSA'); };
+        uaPacketParserHandler['*!authCu255'] = function() { authring.getContacts('Cu25519'); };
+        uaPacketParserHandler['+puEd255']    = function(userHandle) {
+            // pubEd25519 key was updated! force fingerprint regen.
+            delete pubEd25519[userHandle];
+            crypt.getPubEd25519(userHandle);
+        };
+        uaPacketParserHandler['*!fmconfig'] = function() { mega.config.fetch(); };
+
+        if (d) {
+            global._uaPacketParserHandler = uaPacketParserHandler;
+        }
+    });
+
 
     ns.registerConflictHandler("lstint", false, true, function(valObj, index) {
         var remoteValues = valObj.remoteValue;
@@ -947,7 +962,7 @@ var attribCache = false;
             }
         });
 
-        logger.debug("merged: ", valObj.localValue, valObj.remoteValue, valObj.mergedValue);
+        // logger.debug("merged: ", valObj.localValue, valObj.remoteValue, valObj.mergedValue);
 
 
         return true;
@@ -964,73 +979,5 @@ var attribCache = false;
     }
     ns = undefined;
 
-})(this);
+})(self);
 
-/**
- * Process action-packet for attribute updates.
- *
- * @param {String}  attrName        Attribute name
- * @param {String}  userHandle      User handle
- * @param {Boolean} ownActionPacket Whether the action-packet was issued by myself
- * @param {String} [version] version, as returned by the API
- */
-function uaPacketParser(attrName, userHandle, ownActionPacket, version) {
-    var logger = MegaLogger.getLogger('account');
-    var cacheKey = userHandle + "_" + attrName;
-
-    logger.debug('uaPacketParser: Invalidating cache entry "%s"', cacheKey);
-
-    var removeItemPromise = attribCache.removeItem(cacheKey);
-
-    if (typeof(mega.attr._versions[userHandle + "_" + attrName]) !== 'undefined') {
-        delete mega.attr._versions[userHandle + "_" + attrName];
-    }
-
-    removeItemPromise
-        .always(function _uaPacketParser() {
-            if (attrName === 'firstname'
-                || attrName === 'lastname') {
-                M.u[userHandle].firstName = M.u[userHandle].lastName = "";
-                M.syncUsersFullname(userHandle);
-            }
-            else if (ownActionPacket) {
-                // atm only first/last name is processed throguh own-action-packet
-                logger.warn('uaPacketParser: Unexpected attribute "%s"', attrName);
-            }
-            else if (attrName === '+a') {
-                M.avatars(userHandle);
-            }
-            else if (attrName === '*!authring') {
-                authring.getContacts('Ed25519');
-            }
-            else if (attrName === '*!authRSA') {
-                authring.getContacts('RSA');
-            }
-            else if (attrName === '*!authCu255') {
-                authring.getContacts('Cu25519');
-            }
-            else if (attrName === '*!fmconfig') {
-                mega.config.fetch();
-            }
-            else if (attrName === '+puEd255') {
-                // pubEd25519 key was updated!
-                // force fingerprint regen.
-                delete pubEd25519[userHandle];
-                crypt.getPubEd25519(userHandle);
-            }
-            else if (
-                (attrName.substr(0, 2) === '+!' || attrName.substr(0, 2) === '^!') &&
-                attribCache.bitMapsManager.exists(attrName.substr(2))
-            ) {
-                mega.attr.handleBitMapAttribute(
-                    attrName,
-                    version
-                );
-            }
-            else {
-                logger.debug('uaPacketParser: No handler for "%s"', attrName);
-            }
-        });
-
-    return removeItemPromise;
-}

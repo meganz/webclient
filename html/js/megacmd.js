@@ -11,23 +11,25 @@ var osxurl = 'https://mega.nz/MEGAcmdSetup.dmg';
 function cmd_switchOS(os) {
     var url;
     $('.download-megacmd').removeClass('disabled');
-    $('.megacmd-linux:visible').addClass('hidden');
+    $('.megaapp-linux:visible').addClass('hidden');
+    $('.bottom-page.megacmd').removeClass('linux');
 
     if (os === 'windows') {
-        $('.megacmd-button-info').safeHTML(l[12485]);
+        $('.megaapp-button-info').safeHTML(l[12485]);
         url = windowsurl;
     }
     else if (os === 'mac') {
-        $('.megacmd-button-info').safeHTML(l[12487]);
+        $('.megaapp-button-info').safeHTML(l[12487]);
         url = osxurl;
     }
     else if (os === 'linux') {
-        $('.megacmd-button-info').safeHTML(l[12486]);
-        $('.megacmd-linux').removeClass('hidden');
+        $('.megaapp-button-info').safeHTML(l[12486]);
+        $('.megaapp-linux').removeClass('hidden');
+        $('.bottom-page.megacmd').addClass('linux');
         linuxMegacmdDropdown();
     }
 
-    $('.megacmd-button-info a').rebind('click', function(e) {
+    $('.megaapp-button-info a').rebind('click', function(e) {
         if ($(this).hasClass('windows')) {
             cmd_switchOS('windows');
         }
@@ -43,7 +45,6 @@ function cmd_switchOS(os) {
     if (url) {
         initMegacmdDownload(url);
     }
-    mainScroll();
 }
 
 /**
@@ -64,7 +65,7 @@ function initMegacmd() {
         cmd_switchOS('windows');
     }
 
-    $('.megacmd-button-info a').rebind('click', function(e) {
+    $('.megaapp-button-info a').rebind('click', function(e) {
         if ($(this).hasClass('windows')) {
             cmd_switchOS('windows');
         }
@@ -103,9 +104,9 @@ function initMegacmdDownload(url) {
 function linuxMegacmdDropdown() {
 
     var $button = $('.download-megacmd');
-    var $dropdown = $('.megacmd-dropdown'); 
-    var $select = $dropdown.find('.megacmd-scr-pad');
-    var $list = $dropdown.find('.megacmd-dropdown-list');
+    var $dropdown = $('.megaapp-dropdown'); 
+    var $select = $dropdown.find('.megaapp-scr-pad');
+    var $list = $dropdown.find('.megaapp-dropdown-list');
     $button.addClass('disabled');
 
     CMS.get('cmd', function(err, content) {
@@ -137,7 +138,7 @@ function linuxMegacmdDropdown() {
         });
     });
 
-    $('.sync-radio-buttons input').rebind('change', function(e) {
+    $('.bottom-page.radio-buttons input').rebind('change', function(e) {
         var $radio1 = $('#rad1');
         var $radio2 = $('#rad2');
         if ($radio1.parent().hasClass('radioOff')) {
@@ -159,9 +160,9 @@ function linuxMegacmdDropdown() {
     });
 
     // Close Dropdown if another element was clicked
-    $('.main-pad-block').rebind('click.closecmddropdown', function(e) {
+    $('.bottom-page.scroll-block').rebind('click.closecmddropdown', function(e) {
         if ($dropdown.hasClass('active')) {
-            if ($(e.target).parent('.megacmd-dropdown').length === 0 && !$(e.target).hasClass('megacmd-dropdown')) {
+            if ($(e.target).parent('.megaapp-dropdown').length === 0 && !$(e.target).hasClass('megaapp-dropdown')) {
                 $dropdown.removeClass('active');
                 $list.addClass('hidden');
             }
@@ -192,13 +193,13 @@ function linuxMegacmdDropdown() {
  */
 function linuxMegacmdDropdownResizeHandler() {
 
-    var $main = $('.megacmd-dropdown:visible');
-    var $pane = $main.find('.megacmd-dropdown-scroll');
+    var $main = $('.megaapp-dropdown:visible');
+    var $pane = $main.find('.megaapp-dropdown-scroll');
     var jsp   = $pane.data('jsp');
-    var $list = $main.find('.megacmd-dropdown-list');
+    var $list = $main.find('.megaapp-dropdown-list');
     var $arrow = $main.find('.mega-list-arrow');
     var overlayHeight = $('.megasync-overlay').outerHeight();
-    var listHeight = $main.find('.megacmd-scr-pad').outerHeight() + 72;
+    var listHeight = $main.find('.megaapp-scr-pad').outerHeight() + 72;
     var listPosition;
 
     if ($list.length) {

@@ -531,10 +531,10 @@ var attribCache = false;
 
         var proxyPromise = new MegaPromise();
         proxyPromise.always(function() {
-            logger.debug("finished: ", proxyPromise.state(), self.toString());
+            // logger.debug("finished: ", proxyPromise.state(), self.toString());
 
             self.state = QueuedSetArrayAttribute.STATE.DONE;
-            removeValue(self.attr._queuedSetArrayAttributeOps, self);
+            array.remove(self.attr._queuedSetArrayAttributeOps, self);
 
             if (self.attr._queuedSetArrayAttributeOps.length > 0) {
                 // execute now

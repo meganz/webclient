@@ -1025,7 +1025,8 @@ MegaData.prototype.addUpload = function(u, ignoreWarning) {
     var paths = Object.create(null);
 
     if (onChat) {
-        paths['My chat files'] = null;
+        onChat = 'My chat files/' + (M.getNameByHandle(target.substr(5)) || target.substr(5));
+        paths[onChat] = null;
     }
     else {
         for (var i = u.length; i--;) {
@@ -1087,7 +1088,7 @@ MegaData.prototype.addUpload = function(u, ignoreWarning) {
                 var file = u[i];
 
                 if (onChat) {
-                    file.target = paths['My chat files'] || M.RootID;
+                    file.target = paths[onChat] || M.RootID;
                 }
                 else if (paths[file.path]) {
                     file.target = paths[file.path];
@@ -1180,7 +1181,7 @@ MegaData.prototype.ulcomplete = function(ul, h, k) {
 
     if ($.ulBunch && $.ulBunch[ul.chatid]) {
         var ub = $.ulBunch[ul.chatid], p;
-        ub[id] = h;
+        ub[id] = h || -0xBADF;
 
         for (var i in ub) {
             if (ub[i] === 1) {
@@ -1191,11 +1192,14 @@ MegaData.prototype.ulcomplete = function(ul, h, k) {
 
         if (!p) {
             var ul_target = ul.chatid;
-            ub = Object.keys(ub).map(function(m) {
-                return ub[m]
-            });
-            Soon(function() {
-                $(document).trigger('megaulcomplete', [ul_target, ub]);
+            ub = Object.values(ub)
+                .filter(function(m) {
+                    return m !== -0xBADF;
+                });
+            onIdle(function() {
+                if (ub.length) {
+                    $(document).trigger('megaulcomplete', [ul_target, ub]);
+                }
                 delete $.ulBunch[ul_target];
                 if (!$.len($.ulBunch)) {
                     delete $.ulBunch;

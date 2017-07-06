@@ -108,13 +108,22 @@ mBroadcaster.once('startMega', function() {
         var revokeObjectURL = URL.revokeObjectURL;
 
         URL.createObjectURL = function() {
+            var stackIdx = 2;
+            var stack = M.getStack().split('\n');
             var result = createObjectURL.apply(URL, arguments);
+
+            for (var i = stack.length; i--;) {
+                if (stack[i].indexOf('createObjectURL') > 0) {
+                    stackIdx = i;
+                    break;
+                }
+            }
 
             usages[result] = {
                 r: 0,
                 ts: Date.now(),
                 id: MurmurHash3(result, -0x7f000e0),
-                stack: M.getStack().split('\n').splice(2)
+                stack: stack.splice(stackIdx)
             };
 
             return result;

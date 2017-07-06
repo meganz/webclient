@@ -2669,8 +2669,7 @@ else if (!b_u) {
             loginresponse= false;
             boot_done();
         };
-
-        lxhr.open('POST', apipath + 'cs?id=0&sid=' + u_storage.sid + mega.urlParams(), true);
+		lxhr.open('POST', apipath + 'cs?id=0&lang=' + lang + '&sid=' + u_storage.sid + mega.urlParams(), true);
         lxhr.send(JSON.stringify([{'a':'ug'}]));
     }
 

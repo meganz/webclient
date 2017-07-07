@@ -427,7 +427,6 @@ var voucherDialog = {
                 voucherDialog.$dialog.find('#voucher-code-input input').val('');
 
                 // Add the voucher
-                loadingDialog.show();
                 voucherDialog.addVoucher(voucherCode);
             }
         });
@@ -439,16 +438,18 @@ var voucherDialog = {
      */
     addVoucher: function(voucherCode) {
 
+        loadingDialog.show();
+
         // Make API call to add voucher
-        api_req({ a: 'uavr', v: voucherCode },
-        {
-            callback: function(result)
-            {
-                if (typeof result === 'number')
-                {
+        api_req({ a: 'uavr', v: voucherCode }, {
+            callback: function(result) {
+
+                if (typeof result === 'number') {
+
+                    loadingDialog.hide();
+
                     // This voucher has already been redeemed
                     if (result === -11) {
-                        loadingDialog.hide();
                         msgDialog('warninga', l[135], l[714], '', function() {
                             voucherDialog.showBackgroundOverlay();
                         });
@@ -456,14 +457,26 @@ var voucherDialog = {
 
                     // Not a valid voucher code
                     else if (result < 0) {
-                        loadingDialog.hide();
                         msgDialog('warninga', l[135], l[473], '', function() {
                             voucherDialog.showBackgroundOverlay();
                         });
                     }
                     else {
                         // Get the latest account balance and update the price in the dialog
-                        voucherDialog.getLatestBalance();
+                        voucherDialog.getLatestBalance(function() {
+
+                            // Format to 2dp
+                            var balance = pro.propay.proBalance.toFixed(2);
+
+                            // Update dialog details
+                            voucherDialog.$dialog.find('.voucher-account-balance .balance-amount').text(balance);
+                            voucherDialog.changeColourIfSufficientBalance();
+
+                            // Hide voucher input
+                            voucherDialog.$dialog.find('.voucher-redeem-container').show();
+                            voucherDialog.$dialog.find('.purchase-now-container').show();
+                            voucherDialog.$dialog.find('.voucher-input-container').hide();
+                        });
                     }
                 }
             }
@@ -472,35 +485,26 @@ var voucherDialog = {
 
     /**
      * Gets the latest Pro balance from the API
+     * @param {Function} callbackFunction A callback that can be used to continue on or update the UI once up to date
      */
-    getLatestBalance: function() {
+    getLatestBalance: function(callbackFunction) {
 
-        // Flag 'pro: 1' includes pro balance in the response
+        // Flag 'pro: 1' includes the Pro balance in the response
         api_req({ a: 'uq', pro: 1 }, {
             callback : function(result) {
 
-                // Hide loading dialog
-                loadingDialog.hide();
-
                 // If successful result
-                if (typeof result === 'object' && result.balance && result.balance[0]) {
+                if ((typeof result === 'object') && result.balance && result.balance[0]) {
 
-                    // Update the balance
+                    // Convert to a float
                     var balance = parseFloat(result.balance[0][0]);
-                    var balanceString = balance.toFixed(2);
 
-                    // Update for pro.propay.sendPurchaseToApi
+                    // Cache for various uses later on
                     pro.propay.proBalance = balance;
-
-                    // Update dialog details
-                    voucherDialog.$dialog.find('.voucher-account-balance .balance-amount').text(balanceString);
-                    voucherDialog.changeColourIfSufficientBalance();
-
-                    // Hide voucher input
-                    voucherDialog.$dialog.find('.voucher-redeem-container').show();
-                    voucherDialog.$dialog.find('.purchase-now-container').show();
-                    voucherDialog.$dialog.find('.voucher-input-container').hide();
                 }
+
+                // Run the callback
+                callbackFunction();
             }
         });
     },
@@ -538,7 +542,7 @@ var voucherDialog = {
                 voucherDialog.hideDialog();
 
                 // Proceed with payment via account balance
-                pro.proplan.proPaymentMethod = 'pro_prepaid';
+                pro.propay.proPaymentMethod = 'pro_prepaid';
                 pro.propay.sendPurchaseToApi();
             }
         });
@@ -551,8 +555,7 @@ var voucherDialog = {
 
         // Get the selected Pro plan details
         var proNum = pro.propay.selectedProPackage[1];
-        var proPlan = pro.getProPlanName(proNum);
-        var successMessage = l[6962].replace('%1', '<span>' + proPlan + '</span>');
+        var proPlanName = pro.getProPlanName(proNum);
 
         // Hide the loading animation
         pro.propay.hideLoadingOverlay();
@@ -560,7 +563,7 @@ var voucherDialog = {
         // Show the success
         voucherDialog.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
         voucherDialog.$successOverlay.removeClass('hidden');
-        voucherDialog.$successOverlay.find('.payment-result-txt').html(successMessage);
+        voucherDialog.$successOverlay.find('.payment-result-txt .plan-name').text(proPlanName);
 
         // Add click handlers for 'Go to my account' and Close buttons
         voucherDialog.$successOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
@@ -1753,13 +1756,12 @@ var cardDialog = {
 
         // Get the selected Pro plan details
         var proNum = pro.propay.selectedProPackage[1];
-        var proPlan = pro.getProPlanName(proNum);
-        var successMessage = l[6962].replace('%1', '<span>' + proPlan + '</span>');
+        var proPlanName = pro.getProPlanName(proNum);
 
         // Show the success
         cardDialog.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
         cardDialog.$successOverlay.removeClass('hidden');
-        cardDialog.$successOverlay.find('.payment-result-txt').html(successMessage);
+        cardDialog.$successOverlay.find('.payment-result-txt .plan-name').text(proPlanName);
 
         // Add click handlers for 'Go to my account' and Close buttons
         cardDialog.$successOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {

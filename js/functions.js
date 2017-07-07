@@ -1314,8 +1314,7 @@ function generateAnonymousReport() {
         });
 
         if (report.haveRtc) {
-            Object.keys(megaChat.plugins.callManager.callSessions).forEach(function (k) {
-                var v = megaChat.plugins.callManager.callSessions[k];
+            megaChat.plugins.callManager._calls.forEach(function (v, k) {
 
                 var r = {
                     'callStats': v.callStats,

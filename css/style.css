@@ -19489,6 +19489,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     z-index: 1200;
     border: 0;
     background-color: rgba(34,34,34,0.95);
+     -moz-border-radius: 0;
+    -webkit-border-radius: 0;
+    border-radius: 0;
 }
 .feedback-dialog-body {
     text-align: center;

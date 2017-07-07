@@ -206,6 +206,10 @@ MegaData.prototype.accountData = function(cb, blockui) {
 
                 ctx.account.lastupdate = Date.now();
 
+                if (d) {
+                    console.log('stats', JSON.stringify(stats));
+                }
+
                 if (!ctx.account.bw) {
                     ctx.account.bw = 1024 * 1024 * 1024 * 1024 * 1024 * 10;
                 }

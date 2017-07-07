@@ -843,8 +843,8 @@ Object.defineProperty(this, 'mBroadcaster', {
                         console.log('CROSSTAB COMMUNICATION INITIALIZED AS '
                             + (this.master ? 'MASTER':'SLAVE'));
 
-                        console.debug(String(ua));
-                        console.debug(browserdetails(ua).prod + u_handle);
+                        console.log(String(ua));
+                        console.log(browserdetails(ua).prod + u_handle);
                     }
                     cb(this.master);
                     cb = null;

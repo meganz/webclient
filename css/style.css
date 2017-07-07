@@ -19489,6 +19489,9 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     z-index: 1200;
     border: 0;
     background-color: rgba(34,34,34,0.95);
+     -moz-border-radius: 0;
+    -webkit-border-radius: 0;
+    border-radius: 0;
 }
 .feedback-dialog-body {
     text-align: center;
@@ -19628,6 +19631,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
     line-height: 18px;
     text-align: left;
     padding: 15px 0 1px 0;
+    position: relative;
 }
 .feedback-label-txt .radio-txt {
     font-size: 14px;
@@ -19694,6 +19698,11 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
     background-position: 2px -4011px;
     margin: 0 0 0 12px;
     top: -2px;
+}
+.feedback-dialog .membership-question.stats-button {
+    position: absolute;
+    right: 3px;
+    top: 12px;
 }
 .membership-question.stats-button::before {
     content: '\00a0';

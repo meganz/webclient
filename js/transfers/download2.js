@@ -829,7 +829,7 @@ var dlmanager = {
             delay('overquota:uqft', self._overquotaInfo.bind(self), 30000);
 
             if ($(this).hasClass('reg-st3-membership-bl')) {
-                open(getAppBaseUrl() + '#pro_' + $(this).data('payment'));
+                open(getAppBaseUrl() + '#propay_' + $(this).data('payment'));
             }
             else {
                 open(getAppBaseUrl() + '#pro');
@@ -1017,6 +1017,12 @@ var dlmanager = {
         }
 
         api_req({ a: 'log', e: 99617, m: 'qbq' });
+
+        // Add close button handler
+        $dialog.find('.fm-dialog-close').rebind('click.limitedbandwidth', function() {
+            fm_hideoverlay();
+            $dialog.addClass('hidden');
+        });
 
         this._overquotaClickListeners($dialog, flags, res || true);
     },

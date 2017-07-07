@@ -670,9 +670,7 @@ function initAddDialogMultiInputPlugin() {
 
     $this.tokenInput(contacts, {
         theme: 'mega',
-        hintText: l[5908],
-        //hintText: '',
-        //placeholder: 'Type in an email or contact',
+        placeholder: l[16528],// Enter an email or MEGA contact name
         searchingText: '',
         noResultsText: '',
         addAvatar: true,
@@ -844,7 +842,6 @@ function contactAddDialog() {
         var $tokenInput = $('#token-input-');
 
         $tokenInput
-            .val('')
             .focus();
     }
 
@@ -931,6 +928,7 @@ function contactAddDialog() {
             topPopupAlign(this, '.add-user-popup');
 
             initTextareaScrolling($('.add-user-textarea textarea'), 39);
+            $('.add-user-popup .token-input-input-token-mega input').focus();
             focusOnInput();
         }
 
@@ -1207,7 +1205,7 @@ function fmtopUI() {
         }
     }
     $('.fm-clearbin-button').rebind('click', function() {
-        doClearbin(false);
+        doClearbin(true);
     });
 
     // handle the Inbox section use cases
@@ -1247,12 +1245,12 @@ function fmtopUI() {
     }
 }
 
-function doClearbin(selected)
-{
-    msgDialog('clear-bin', l[14], l[15], l[1007], function(e)
-    {
+function doClearbin(all) {
+    "use strict";
+
+    msgDialog('clear-bin', l[14], l[15], l[1007], function(e) {
         if (e) {
-            M.clearRubbish(selected);
+            M.clearRubbish(all);
         }
     });
 }
@@ -2675,8 +2673,7 @@ function initShareDialogMultiInputPlugin() {
 
         $input.tokenInput(contacts, {
             theme: "mega",
-            hintText: l[5908],
-            // placeholder: "Type in an email or contact",
+            placeholder: l[16528],// Enter an email or MEGA contact name
             searchingText: "",
             noResultsText: "",
             addAvatar: true,
@@ -3634,7 +3631,7 @@ function copyDialog() {
                 case 'conversations':
                     var $selectedConv = $('.copy-dialog .nw-conversations-item.selected');
                     closeDialog();
-                    megaChat.chats[$selectedConv.attr('data-room-jid') + "@conference." + megaChat.options.xmppDomain].attachNodes($.selected);
+                    megaChat.chats[$selectedConv.attr('data-room-id') + "@conference." + megaChat.options.xmppDomain].attachNodes($.selected);
                     break;
                 default:
                     break;
@@ -4343,10 +4340,9 @@ function _propertiesDialog(close) {
             var user = users[i];
             var userHandle = user.u || user.p;
             var hidden = i >= MAX_CONTACTS ? 'hidden' : '';
-            var status = M.onlineStatusClass(megaChatIsReady
-                && megaChat.karere.getPresence(megaChat.getJidFromNodeId(userHandle)));
+            var status = megaChatIsReady && megaChat.getPresenceAsCssClass(user.u);
 
-            shareUsersHtml += '<div class="properties-context-item ' + status[1] + ' ' + hidden
+            shareUsersHtml += '<div class="properties-context-item ' + (status ? status : '') + ' ' + hidden
                 + '" data-handle="' + escapeHTML(userHandle) + '">'
                 + '<div class="properties-contact-status"></div>'
                 + '<span>' + escapeHTML(M.getNameByHandle(userHandle)) + '</span>'

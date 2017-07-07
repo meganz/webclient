@@ -659,6 +659,7 @@ FileManager.prototype.updFileManagerUI = function() {
     var newcontact = false;
     var newpath = false;
     var newshare = false;
+    var selnode;
 
     if (d) {
         console.time('rendernew');
@@ -677,6 +678,11 @@ FileManager.prototype.updFileManagerUI = function() {
         }
         if (newNode.p === this.currentdirid || newNode.h === this.currentdirid) {
             UImain = true;
+
+            if ($.onRenderNewSelectNode === newNode.h) {
+                delete $.onRenderNewSelectNode;
+                selnode = newNode.h;
+            }
         }
         if (!newpath && document.getElementById('path_' + newNode.h)) {
             newpath = true;
@@ -708,6 +714,12 @@ FileManager.prototype.updFileManagerUI = function() {
                 M.sort();
                 M.renderMain(true);
                 // M.renderPath();
+                if (selnode) {
+                    Soon(function() {
+                        $.selected = [selnode];
+                        reselect(1);
+                    });
+                }
                 $.tresizer();
             }
 
@@ -1038,7 +1050,7 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.clearbin-item').rebind('click', function() {
-        doClearbin(true);
+        doClearbin(false);
     });
 
     $(c + '.move-up').rebind('click', function() {

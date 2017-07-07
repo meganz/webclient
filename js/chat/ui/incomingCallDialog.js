@@ -178,7 +178,7 @@
         '</div>\n' +
         '<div class="incoming-call-username">\n' +
 		  '<span class="incoming-contact-info">\n' +
-            '<span class="incoming-call-name">Andrei D.</span>\n' +
+            '<span class="incoming-call-name"></span>\n' +
             '<span class="incoming-call-txt">Incoming call...</span>\n' +
           '</span>\n' +
         '</div>\n' +

@@ -103,11 +103,11 @@ function createStatItem(v) {
             width: v(),
             height: v(),
 //            et: v(),
-            el: v(), 
+            el: v(),
             lcpu: v(),
             lbw: v(),
             bwav: v(),
-            gbps: v()            
+            gbps: v()
 		},
         r: {
 			abps: v(),
@@ -141,7 +141,7 @@ function statItemToString(s, name, nest)
 {
     if (nest === undefined)
         nest = 0;
-        
+
     var pad = nest?Array(nest+1).join(' '):'';
 	var ret = name?(pad+'=== '+name+' ===\n'):'';
     var objs = [];
@@ -150,7 +150,7 @@ function statItemToString(s, name, nest)
 	{
         if (k[0] === '_')
             continue;
-            
+
 		var v = s[k];
 		if (((typeof v) != 'object'))
 		{
@@ -241,7 +241,7 @@ statRecProto.onStats = function(rtcStats) {
     var commonStats = this._commonStats;
     var lastSampleIdx = this.lastSampleIdx;
     var samples = this.samples;
-    
+
 	var ts = Date.now() - this._startTs;
     var isFirstSample = lastSampleIdx < 0;
 	var period = (ts-stats.ts)/1000;
@@ -273,7 +273,7 @@ statRecProto.onStats = function(rtcStats) {
 //			vstat.fpsSent = res.stat('googFrameRateOutput'); -- this should be for screen output
             s.width = width;
             s.height = stat('googFrameHeightReceived');
-          
+
 //			res.names().forEach(function(name)
 //			{ console.log('name=', name, 'value=', res.stat(name)); });
 		  }
@@ -312,7 +312,7 @@ statRecProto.onStats = function(rtcStats) {
         {
             if (hadConnItem) //happens if peer is Firefox
                 return;
-            
+
             hadConnItem = true;
             var c = stats.c;
             if (commonStats.rly === undefined) {
@@ -396,7 +396,7 @@ statRecProto.terminate = function(cid) {
             console.error("Common stats property name overlaps with stats property name, not including");
           else
             stats[k] = cmn[k];
-   
+
     return stats;
 }
 
@@ -406,6 +406,7 @@ statRecProto.isRelay = function() {
 };
 
 function stats_getBrowserVersion() {
+    // TODO: for @av - When this is ready, please use for the browser version detection: parseInt(ua.details.version);
     var browser = RTC.browser.charAt(0)+(navigator.userAgent.match(/(Android|iPhone)/i)?'m':'');
     var b = RTC.browser;
     var ua = navigator.userAgent;

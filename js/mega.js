@@ -883,20 +883,45 @@ scparser.$add('se', {
 
 scparser.$add('ua', {
     r: function(a) {
-        // user attributes
-        if (fminitialized) {
+        'use strict';
+
+        if (Array.isArray(a.ua)) {
             var attrs = a.ua;
             var actionPacketUserId = a.u;
 
-            for (var j in attrs) {
+            for (var j = 0; j < attrs.length; j++) {
                 var attributeName = attrs[j];
 
-                attribCache.uaPacketParser(attributeName, actionPacketUserId, false, a.v && a.v[j]);
+                mega.attr.uaPacketParser(attributeName, actionPacketUserId, false, a.v && a.v[j]);
             }
         }
     },
     l: function(a) {
-        mega.attr.handleUserAttributeActionPackets(a, loadavatars);
+        'use strict';
+
+        if (Array.isArray(a.ua)) {
+            var attrs = a.ua;
+            var actionPacketUserId = a.u;
+
+            for (var j = 0; j < attrs.length; j++) {
+                var version = a.v && a.v[j];
+                var attributeName = attrs[j];
+
+                // fill version if missing
+                if (version && !mega.attr._versions[actionPacketUserId + "_" + attributeName]) {
+                    mega.attr._versions[actionPacketUserId + "_" + attributeName] = version;
+                }
+
+                // handle avatar related action packets (e.g. avatar modified)
+                if (attributeName === '+a') {
+                    loadavatars.push(actionPacketUserId);
+                }
+                else if (attributeName === 'firstname' || attributeName === 'lastname') {
+                    // handle firstname/lastname attributes
+                    mega.attr.uaPacketParser(attributeName, actionPacketUserId, true, version);
+                }
+            }
+        }
     }
 });
 
@@ -1033,7 +1058,7 @@ scparser.$add('usc', function() {
 });
 
 scparser.$add('psts', function(a) {
-    proPage.processPaymentReceived(a);
+    pro.processPaymentReceived(a);
 });
 
 scparser.$add('mcc', function(a) {

@@ -1,6 +1,6 @@
 {
     "esversion": 5,
-    "strict": true,
+    "strict": false,
     "browser": true,
     "curly": true,
     "devel": true,
@@ -21,9 +21,9 @@
     "nocomma": true,
     "nonbsp": true,
     "nonew": true,
-    "singleGroups": true,
+    "singleGroups": false,
     "sub": true,
     "typed": true,
-    "unused": true,
+    "unused": false,
     "worker": true
 }

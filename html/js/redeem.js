@@ -210,7 +210,7 @@ var redeem = {
         var bandwidth = redeem.bestPlan[3];
         var numOfMonths = redeem.bestPlan[4];
         var planPrice = redeem.bestPlan[5].split('.');
-        var proName = getProPlan(proNum);
+        var proName = pro.getProPlanName(proNum);
 
         // Get dollars and cents
         var planPriceDollars = planPrice[0];
@@ -362,7 +362,7 @@ var redeem = {
 
         // Get the selected Pro plan details
         var proNum = redeem.bestPlan[1];
-        var proPlan = getProPlan(proNum);
+        var proPlan = pro.getProPlanName(proNum);
 
         // "You successfully upgraded your account to PRO Lite."
         var successMessage = l[6962].replace('%1', '<span>' + proPlan + '</span>');

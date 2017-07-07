@@ -130,19 +130,15 @@ function doConfirm(email, password, callback) {
         }
         else {
             loadingDialog.hide();
-            if (m) {
-                loadingDialog.hide();
-                alert(l[201]);
+
+            if (is_mobile) {
+                mobile.messageOverlay.show(l[201]);
+                $('.mobile.signin-register-block .signin-button').removeClass('loading');
             }
             else {
-                if (is_mobile) {
-                    mobile.messageOverlay.show(l[201]);
-                }
-                else {
-                    $('#login-password2').val('');
-                    $('.login-register-input.password').addClass('incorrect');
-                    msgDialog('warninga', l[135], l[201]);
-                }
+                $('#login-password2').val('');
+                $('.login-register-input.password').addClass('incorrect');
+                msgDialog('warninga', l[135], l[201]);
             }
         }
     }

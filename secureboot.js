@@ -1229,8 +1229,7 @@ if (is_ios) {
  * because the new mobile site is not designed for those yet. Confirm links initiated from the mobile web will continue
  * to be processed by the mobile web.
  */
-if (m && ((!localStorage.signUpStartedInMobileWeb && page.substr(0, 7) === 'confirm') ||
-    page.substr(0, 6) === 'cancel' || page.substr(0, 6) === 'verify' || page.substr(0, 6) === 'fm/ipc' ||
+if (m && (page.substr(0, 6) === 'cancel' || page.substr(0, 6) === 'verify' || page.substr(0, 6) === 'fm/ipc' ||
     page.substr(0, 9) === 'newsignup' || page.substr(0, 7) === 'recover' || page.substr(0, 7) === 'account' ||
     page.substr(0, 4) === 'blog' || page.substr(0, 6) === 'backup')) {
 
@@ -1788,8 +1787,8 @@ else if (!b_u) {
 
     // Common desktop and mobile, bottom pages
     jsl.push({f:'css/bottom-pages.css', n: 'bottom-pages_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/pro.css', n: 'pro_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/bottom-menu.css', n: 'bottom-menu_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/pro.css', n: 'pro_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/startpage.css', n: 'startpage_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'html/start.html', n: 'start', j:0});
     jsl.push({f:'html/js/start.js', n: 'start_js', j:1});
@@ -1869,6 +1868,17 @@ else if (!b_u) {
     jsl.push({f:'js/fm/removenode.js', n: 'fm_removenode_js', j: 1});
     jsl.push({f:'js/fm/ufssizecache.js', n: 'ufssizecache_js', j:1});
 
+    // Pro pages Step 1 (Pro plan) and Step 2 (Pro payment)
+    jsl.push({f:'html/proplan.html', n: 'proplan', j:0});
+    jsl.push({f:'html/propay.html', n: 'propay', j:0});
+    jsl.push({f:'html/js/pro.js', n: 'pro_js', j:1});
+    jsl.push({f:'html/js/proplan.js', n: 'proplan_js', j:1});
+    jsl.push({f:'html/js/propay.js', n: 'propay_js', j:1});
+    jsl.push({f:'html/js/propay-dialogs.js', n: 'propay_js', j:1});
+    jsl.push({f:'js/states-countries.js', n: 'states_countries_js', j:1});
+
+    jsl.push({f:'js/ui/miniui.js', n: 'miniui_js', j:1});
+
     if (!is_mobile) {
         jsl.push({f:'css/style.css', n: 'style_css', j:2,w:30,c:1,d:1,cache:1});
         jsl.push({f:'js/fm.js', n: 'fm_js', j:1,w:12});
@@ -1877,17 +1887,18 @@ else if (!b_u) {
         jsl.push({f:'js/fm/account.js', n: 'fm_account_js', j:1});
         jsl.push({f:'js/fm/fileconflict.js', n: 'fm_fileconflict_js', j:1});
         jsl.push({f:'js/ui/miniui.js', n: 'miniui_js', j:1});
-
         jsl.push({f:'html/key.html', n: 'key', j:0});
-        jsl.push({f:'html/pro.html', n: 'pro', j:0});
-        jsl.push({f:'html/js/pro.js', n: 'pro_js', j:1});
         jsl.push({f:'html/login.html', n: 'login', j:0});
         jsl.push({f:'html/fm.html', n: 'fm', j:0,w:3});
         jsl.push({f:'html/top-login.html', n: 'top-login', j:0});
         jsl.push({f:'js/notify.js', n: 'notify_js', j:1});
         jsl.push({f:'js/popunda.js', n: 'popunda_js', j:1});
         jsl.push({f:'css/user-card.css', n: 'user_card_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/icons.css', n: 'icons_css', j:2,w:5,c:1,d:1,cache:1});
+    }
+
+    jsl.push({f:'css/icons.css', n: 'icons_css', j:2,w:5,c:1,d:1,cache:1});
+
+    if (!is_mobile) {
         jsl.push({f:'css/buttons.css', n: 'buttons_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/dropdowns.css', n: 'dropdowns_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/dialogs.css', n: 'dialogs_css', j:2,w:5,c:1,d:1,cache:1});
@@ -1896,7 +1907,11 @@ else if (!b_u) {
         jsl.push({f:'css/toast.css', n: 'toast_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/data-blocks-view.css', n: 'data_blocks_view_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/help2.css', n: 'help_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j:2,w:5,c:1,d:1,cache:1});
+    }
+
+    jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j:2,w:5,c:1,d:1,cache:1});
+
+    if (!is_mobile) {
         jsl.push({f:'css/vendor/perfect-scrollbar.css', n: 'vendor_ps_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/onboarding.css', n: 'onboarding_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/media-print.css', n: 'media_print_css', j:2,w:5,c:1,d:1,cache:1});

@@ -1058,7 +1058,7 @@ scparser.$add('usc', function() {
 });
 
 scparser.$add('psts', function(a) {
-    proPage.processPaymentReceived(a);
+    pro.processPaymentReceived(a);
 });
 
 scparser.$add('mcc', function(a) {

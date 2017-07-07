@@ -458,7 +458,7 @@ def reduce_validator(file_line_mapping, **extra):
     error_count = len(result) - 1
     if error_count == 0:
         return '', 0
-    result.append('\n{} issues found analizing modified files.'
+    result.append('\n{} issues found analysing modified files.'
                   .format(error_count))
     return '\n\n'.join(result), error_count, fatal
 

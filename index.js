@@ -388,7 +388,7 @@ function init_page() {
     confirmcode = false;
     pwchangecode = false;
 
-    if (page.substr(0, 7) == 'confirm') {
+    if (page.substr(0, 7) === 'confirm') {
         confirmcode = page.replace("confirm", "");
         page = 'confirm';
     }
@@ -412,8 +412,8 @@ function init_page() {
         closeDialog();
     }
 
-    // Do not show this dialog while entering into the downloads page
-    if (page.substr(0, 1) !== '!' && localStorage.awaitingConfirmationAccount) {
+    // Do not show this dialog while entering into the downloads or Pro pages (so they can still choose plan and pay)
+    if ((page.substr(0, 1) !== '!') && (page.substr(0, 3) !== 'pro') && localStorage.awaitingConfirmationAccount) {
         var acc = JSON.parse(localStorage.awaitingConfirmationAccount);
 
         // if visiting a #confirm link, or they confirmed it elsewhere.
@@ -936,6 +936,15 @@ function init_page() {
             loadSubPage('disputenotice');
         });
     }
+    else if (page.substr(0, 6) === 'propay') {
+        if (is_mobile) {
+            parsepage(pages['mobile']);
+        }
+        else {
+            parsepage(pages['propay']);
+        }
+        pro.propay.init();
+    }
     else if (page.substr(0, 3) === 'pro') {
         var tmp = page.split('/uao=');
         if (tmp.length > 1) {
@@ -943,17 +952,18 @@ function init_page() {
             loadSubPage(tmp[0]);
             return;
         }
-        parsepage(pages['pro']);
-        init_pro();
+
+        parsepage(pages['proplan']);
+        pro.proplan.init();
     }
     else if (page.substr(0, 7) === 'payment') {
 
         // Load the Pro page in the background
-        parsepage(pages['pro']);
-        init_pro();
+        parsepage(pages['proplan']);
+        pro.proplan.init();
 
         // Process the return URL from the payment provider and show a success/failure dialog if applicable
-        proPage.processReturnUrlFromProvider(page);
+        pro.proplan.processReturnUrlFromProvider(page);
     }
     else if (page == 'credits') {
         parsepage(pages['credits']);
@@ -1244,13 +1254,16 @@ function init_page() {
     if (typeof alarm !== 'undefined') {
         alarm.siteUpdate.init();
     }
+
     if (!is_mobile) {
         topmenuUI();
     }
     else {
         // Initialise the mobile menu (ToDo: in future use desktop responsive main menu)
+        mobile.initHeaderMegaIcon();
         mobile.menu.showAndInit(page);
     }
+
     loggedout = false;
     flhashchange = false;
 }
@@ -1490,7 +1503,7 @@ function topmenuUI() {
 
             // Set the plan text
             var proNum = u_attr.p;
-            var purchasedPlan = getProPlan(proNum);
+            var purchasedPlan = pro.getProPlanName(proNum);
 
             // Set colour of plan and body class
             var cssClass;

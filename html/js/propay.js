@@ -78,8 +78,12 @@ pro.propay = {
         // Load payment plans
         pro.loadMembershipPlans(function() {
 
-            // Load payment providers
-            pro.propay.loadPaymentGatewayOptions();
+            // Get the user's account balance
+            voucherDialog.getLatestBalance(function() {
+
+                // Load payment providers and do the rest of the rendering
+                pro.propay.loadPaymentGatewayOptions();
+            });
         });
     },
 

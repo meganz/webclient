@@ -318,7 +318,7 @@ var redeem = {
                 var saleId = utsResult;
 
                 // If an error
-                if (typeof saleId == 'number' && saleId < 0) {
+                if (typeof saleId === 'number' && saleId < 0) {
 
                     loadingDialog.hide();
                     alert(l[200]);
@@ -334,7 +334,7 @@ var redeem = {
                         loadingDialog.hide();
 
                         // If an error code
-                        if (typeof utcResult == 'number' && utcResult < 0) {
+                        if (typeof utcResult === 'number' && utcResult < 0) {
 
                             // Insufficient balance, please try again
                             if (utcResult == EOVERQUOTA) {
@@ -362,15 +362,12 @@ var redeem = {
 
         // Get the selected Pro plan details
         var proNum = redeem.bestPlan[1];
-        var proPlan = pro.getProPlanName(proNum);
-
-        // "You successfully upgraded your account to PRO Lite."
-        var successMessage = l[6962].replace('%1', '<span>' + proPlan + '</span>');
+        var proPlanName = pro.getProPlanName(proNum);
 
         // Show the success
         redeem.showBackgroundOverlay();
         redeem.$successOverlay.removeClass('hidden');
-        redeem.$successOverlay.find('.payment-result-txt').html(successMessage);
+        redeem.$successOverlay.find('.payment-result-txt .plan-name').text(proPlanName);
 
         // Add click handlers for 'Go to my account' and Close buttons
         redeem.$successOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {

@@ -10551,6 +10551,15 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=20);
     right: 34px;
 }
 
+/* Hide some dialogs copied to the Pro plan page for mobile only so duplicates are not shown */
+.mobile.fm-dialog-overlay,
+.mobile.payment-result.success,
+.mobile.payment-result.failed,
+.mobile.payment-result.pending.original,
+.mobile.payment-result.pending.alternate {
+    display: none;
+}
+
 @media only screen and (max-width: 1105px) {
 .fm-account-mutliple-bl.bandwidth .membership-notification {
     right: -30px;
@@ -20047,6 +20056,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
     border-radius: 14px;
     margin: -176px 0 0 -240px;
     width: 480px;
+    z-index: 1100;
 }
 .voucher-dialog-body {
     padding: 30px;
@@ -20831,6 +20841,12 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80);
     color: #fff;
     float: left;
     width: 500px;
+}
+.voucher-redeem-dialog .membership-gray-block {
+    height: auto;
+}
+.voucher-redeem-dialog .reg-st3-membership-bl {
+    margin-top: -67px;
 }
 .voucher-redeem-dialog .title-text {
     font-size: 24px;

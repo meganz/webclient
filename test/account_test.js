@@ -258,7 +258,7 @@ describe("account unit test", function() {
                 var theCtx = api_req.args[0][1];
                 sandbox.stub(window, 'd', true);
                 callback('OK', theCtx);
-                assert.strictEqual(ns._logger._log.args[1][0],
+                assert.strictEqual(ns._logger._log.args[0][0],
                                    'Setting user attribute "+puEd255", result: OK');
             });
 
@@ -273,8 +273,8 @@ describe("account unit test", function() {
                 callback('OK', theCtx);
                 assert.strictEqual(myCallback.args[0][0], 'OK');
 
-                assert.strictEqual(ns._logger._log.callCount, 2);
-                assert.strictEqual(ns._logger._log.args[1][0],
+                assert.strictEqual(ns._logger._log.callCount, 1);
+                assert.strictEqual(ns._logger._log.args[0][0],
                                    'Setting user attribute "+puEd255", result: OK');
             });
 
@@ -293,7 +293,7 @@ describe("account unit test", function() {
                 var theCtx = api_req.args[0][1];
                 callback('OK', theCtx);
                 assert.strictEqual(myCallback.args[0][0], 'OK');
-                assert.strictEqual(ns._logger._log.args[1][0],
+                assert.strictEqual(ns._logger._log.args[0][0],
                                    'Setting user attribute "*keyring", result: OK');
             });
 

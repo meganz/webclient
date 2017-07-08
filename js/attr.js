@@ -622,7 +622,7 @@ var attribCache = false;
             var serializedValue = arr;
 
             proxyPromise.linkDoneAndFailTo(
-                self.set(
+                self.attr.set(
                     self.attributeName,
                     serializedValue,
                     self.pub,
@@ -637,22 +637,28 @@ var attribCache = false;
 
         self.attr.get(u_handle, self.attributeName, self.pub, self.nonHistoric)
             .done(function(r) {
-                if (r === -9) {
-                    _setArrayAttribute({});
-                    proxyPromise.reject(r);
-                }
-                else {
-                    try {
+                try {
+                    if (r === -9) {
+                        _setArrayAttribute({});
+                        proxyPromise.reject(r);
+                    }
+                    else {
                         _setArrayAttribute(r);
                     }
-                    catch (e) {
-                        proxyPromise.reject(e, r);
-                    }
+                }
+                catch (e) {
+                    logger.error("QueuedSetArrayAttribute failed, because of exception: ", e);
+                    proxyPromise.reject(e, r);
                 }
             })
             .fail(function(r) {
                 if (r === -9) {
-                    _setArrayAttribute({});
+                    try {
+                        _setArrayAttribute({});
+                    }
+                    catch (e) {
+                        logger.error("QueuedSetArrayAttribute failed, because of exception: ", e);
+                    }
                     proxyPromise.reject(r);
                 }
                 else {

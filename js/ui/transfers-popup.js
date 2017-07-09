@@ -49,8 +49,12 @@ mega.ui.tpp = function () {
      * @param {String} bl i.e. ['dl', 'ul'] download/upload block
      */
     var setTotal = function setTotal(value, bl) {
+        var total = opts.queue[bl].total;
+
         if (value) {
-            opts.queue[bl].total += value;
+            if (value > 0 || value < 0 && total > 1) {
+                opts.queue[bl].total += value;
+            }
         }
         else {
             opts.queue[bl].total = 0;
@@ -204,8 +208,13 @@ mega.ui.tpp = function () {
      * @param {String} block i.e. ['dl', 'ul'] download or upload
      */
     var setIndex = function setIndex(value, block) {
+        var index = opts.queue[block].index;
+        var total = opts.queue[block].total;
+
         if (value) {
-            opts.queue[block].index += value;
+            if (value > 0 && index < total || value < 0 && index > 1) {
+                opts.queue[block].index += value;
+            }
         }
         else {
             opts.queue[block].index = 0;
@@ -381,6 +390,17 @@ mega.ui.tpp = function () {
     };
 
     /**
+     * Updates current and total items in queue for dl/ul
+     * @param {String} blk i.e. ['dl', 'ul'] download or upload
+     */
+    var updateIndexes = function updateIndexes(blk) {
+        var index = getIndex(blk);
+        var tot = getTotal(blk).toString();
+
+        opts.dlg[blk].$.num.text(tot);
+        opts.dlg[blk].$.crr.text(index);
+    };
+    /**
      * Initialize transfer popup dialogs progress bar, file icon, name, speed,
      * current file index and total number of files in queue of dl or ul block
      * @param {Object} queue Download or upload queue
@@ -541,6 +561,7 @@ mega.ui.tpp = function () {
         setTotal: setTotal,
         isVisible: isVisible,
         updateBlock: updateBlock,
+        updateIndexes: updateIndexes,
         setTotalProgress: setTotalProgress,
         setIndex: setIndex,
         setTransfered: setTransfered,

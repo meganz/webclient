@@ -1100,11 +1100,22 @@ FileManager.prototype.initContextUI = function() {
     $(c + '.canceltransfer-item,' + c + '.transfer-clear').rebind('click', function() {
         var $trs = $('.transfer-table tr.ui-selected');
         var toabort = $trs.attrs('id');
+        var blk = 'dl';
+        var queue = dl_queue;
         $trs.remove();
         dlmanager.abort(toabort);
         ulmanager.abort(toabort);
         $.clearTransferPanel();
         fm_tfsupdate();
+
+        if (toabort[0].indexOf('ul_') !== -1) {
+            blk = 'ul';
+            queue = ul_queue;
+        }
+
+        mega.ui.tpp.setTotal(-1, blk);
+        mega.ui.tpp.setIndex(-1, blk);
+        mega.ui.tpp.updateIndexes(blk);
 
         onIdle(function() {
             // XXX: better way to stretch the scrollbar?

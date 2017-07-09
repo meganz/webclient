@@ -1,44 +1,38 @@
 @charset "UTF-8";
-html {
-	height: 100%;
-	font-size: 75%;
-	color: #000;
-	width: 100%;
-	overflow: hidden;
+@font-face {
+    font-family: 'source_sans_prolight';
+    src: url('../fonts/SourceSansPro-Light.eot');
+    src: url('../fonts/SourceSansPro-Light.eot?#iefix') format('embedded-opentype'), url('../fonts/SourceSansPro-Light.woff2') format('woff2'), url('../fonts/SourceSansPro-Light.woff') format('woff'), url('../fonts/SourceSansPro-Light.ttf') format('truetype'), url('../fonts/SourceSansPro-Light.svg#source_sans_prolight') format('svg');
+    font-weight: normal;
+    font-style: normal;
 }
 @font-face {
-	font-family: 'Open Sans';
-	src: url('https://eu.static.mega.co.nz/fonts/opensans-regular-webfont.eot');
-	src: url('https://eu.static.mega.co.nz/fonts/opensans-regular-webfont.eot?#iefix') format('embedded-opentype'), url('https://eu.static.mega.co.nz/fonts/opensans-regular-webfont.woff') format('woff'), url('https://eu.static.mega.co.nz/fonts/opensans-regular-webfont.ttf') format('truetype'), url('https://eu.static.mega.co.nz/fonts/opensans-regular-webfont_v2.svg#open_sansregular') format('svg');
-	font-weight: normal;
-	font-style: normal;
+    font-family: 'source_sans_proregular';
+    src: url('../fonts/SourceSansPro-Regular.eot');
+    src: url('../fonts/SourceSansPro-Regular.eot?#iefix') format('embedded-opentype'), url('../fonts/SourceSansPro-Regular.woff2') format('woff2'), url('../fonts/SourceSansPro-Regular.woff') format('woff'), url('../fonts/SourceSansPro-Regular.ttf') format('truetype'), url('../fonts/SourceSansPro-Regular.svg#source_sans_proregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
 }
 @font-face {
-	font-family: 'Open Sans Semibold';
-	src: url('https://eu.static.mega.co.nz/fonts/opensans-semibold-webfont.eot');
-	src: url('https://eu.static.mega.co.nz/fonts/opensans-semibold-webfont.eot?#iefix') format('embedded-opentype'), url('https://eu.static.mega.co.nz/fonts/opensans-semibold-webfont.woff') format('woff'), url('https://eu.static.mega.co.nz/fonts/opensans-semibold-webfont.ttf') format('truetype'), url('https://eu.static.mega.co.nz/fonts/opensans-semibold-webfont_v2.svg#open_sanssemibold') format('svg');
-	font-weight: normal;
-	font-style: normal;
+    font-family: 'source_sans_prosemibold';
+    src: url('../fonts/SourceSansPro-Semibold.eot');
+    src: url('../fonts/SourceSansPro-Semibold.eot?#iefix') format('embedded-opentype'), url('../fonts/SourceSansPro-Semibold.woff2') format('woff2'), url('../fonts/SourceSansPro-Semibold.woff') format('woff'), url('../fonts/SourceSansPro-Semibold.ttf') format('truetype'), url('../fonts/SourceSansPro-Semibold.svg#source_sans_prosemibold') format('svg');
+    font-weight: normal;
+    font-style: normal;
 }
-@font-face {
-	font-family: "Open Sans Semibold Italic";
-	src: url("https://eu.static.mega.co.nz/fonts/OpenSans-SemiboldItalic_v3.eot?") format("eot"), url("https://eu.static.mega.co.nz/fonts/OpenSans-SemiboldItalic_v3.woff") format("woff"), url("https://eu.static.mega.co.nz/fonts/OpenSans-SemiboldItalic_v3.ttf") format("truetype"), url("https://eu.static.mega.co.nz/fonts/OpenSans-SemiboldItalic_v2.svg#OpenSans-SemiboldItalic") format("svg");
-	font-weight: normal;
-	font-style: normal;
-}
-body {
-	margin: 0;
-	-webkit-text-size-adjust: 100%;
-	font-family: 'Open Sans', Arial, Helvetica, sans-serif;
-	width: 100%;
-	height: 100%;
-	padding: 0;
-	background-position: left top;
-	background-repeat: repeat;
-	overflow: hidden;
+html, body {
+    font-size: 100%;
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    margin: 0px;
+    padding: 0px;
+    width: 100%;
+    height: 100%;
+    font-family: 'source_sans_proregular', sans-serif;
+    position: relative;
 }
 a, a:link, a:visited, a:hover, a:active {
-	font-family: 'Open Sans', Arial, Helvetica, sans-serif;
+	font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
 	outline: none;
 	text-decoration: none;
 }
@@ -225,7 +219,7 @@ img {
 	margin: 60px 0 0 0;
 }
 .bottom-left-link {
-	font-family: 'Open Sans', Arial, Helvetica, sans-serif;
+	font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
 	font-size: 1.5em;
 	line-height: 30px;
 	color: #585858;
@@ -257,7 +251,7 @@ img {
 }
 span.select-txt {
 	padding: 0 26px 0 26px;
-	font-family: 'Open Sans', Arial, Helvetica, sans-serif;
+	font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
 	font-size: 1.5em;
 	line-height: 30px;
 	color: #585858;
@@ -273,7 +267,7 @@ span.select-txt {
 	-moz-opacity: 0;
 	-khtml-opacity: 0;
 	opacity: 0;
-	font-family: 'Open Sans', Arial, Helvetica, sans-serif;
+	font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
 	font-size: 1.1em;
 	line-height: 1.9em;
 	color: #585858;
@@ -581,14 +575,14 @@ span.select-txt {
 	display: block;
 	font-weight: normal;
 	padding: 22px 0 2px 0;
-	font-family: 'Open Sans', Arial;
+	font-family: 'source_sans_proregular', Arial;
 }
 .blog-new-small {
 	color: #999a9c;
 	float: left;
 	font-size: 1.3em;
 	line-height: 30px;
-	font-family: 'Open Sans Semibold', Arial, Helvetica;
+	font-family: 'source_sans_prosemibold', Arial, Helvetica;
 	margin: 0 0 0 0;
 }
 .blog-new-date-div {
@@ -612,15 +606,20 @@ span.select-txt {
 	width: 100%;
 }
 .blog-new-item p, .blog-new-full p {
-	font-family: 'Open Sans', Arial, Helvetica, sans-serif;
+	font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
 	margin: 0;
 	padding: 16px 0 0 281px;
-	font-size: 1.3em;
+	font-size: 1.2em;
 	line-height: 2em;
 	color: #333333;
 }
 .blog-new-item p a, .blog-new-full p a {
 	color: #D22400;
+    word-break: break-word;
+}
+.blog-new-full p img {
+    max-width: 100%;
+    height: auto !important;
 }
 .blog-new-item p span.blog-new-description {
 	display: block;
@@ -652,7 +651,7 @@ p .blog-new-read-more, p a.blog-new-read-more {
 	-moz-box-sizing: border-box;
 	-ms-box-sizing: border-box;
 	box-sizing: border-box;
-	font-family: 'Open Sans', Arial;
+	font-family: 'source_sans_proregular', Arial;
 }
 p a.blog-new-read-more:active {
 	color: white !important;
@@ -662,6 +661,10 @@ p a.blog-new-read-more:active {
 	height: 2px;
 	position: relative;
 	background-color: #eeeeee;
+}
+sup {
+    font-size: inherit;
+    line-height: inherit;
 }
 .ios .blog-new-item p, .another-os .blog-new-item p, .ios .blog-new-full p, .another-os .blog-new-full p, .ios .blog-new-small, .another-os .blog-new-small, .ios .blog-new-full ul li, .ios .sync li, .another-os .blog-new-full ul li, .another-os .sync li {
 	font-size: 1.2em;
@@ -705,7 +708,7 @@ p a.blog-new-read-more:active {
 	font-size: 1.3em;
 	line-height: 2em;
 	padding-top: 18px;
-	font-family: 'Open Sans Semibold', Arial, Helvetica, sans-serif;
+	font-family: 'source_sans_prosemibold', Arial, Helvetica, sans-serif;
 	color: #737376;
 }
 .blog-dev-titles {
@@ -734,11 +737,11 @@ p a.blog-new-read-more:active {
 	padding: 43px 0 25px 0;
 	width: 430px;
 }
-.blog-new-full ul li, .sync li, .affiliate li, .pro li {
+.blog-new-full ul li, .sync li, .affiliate li, .pro li, .blog-new-full ol li {
 	margin: 0;
 	padding: 0 0 18px 20px;
-	font-family: 'Open Sans', Arial, Helvetica, sans-serif;
-	font-size: 1.3em;
+	font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
+	font-size: 1.2em;
 	line-height: 28px;
 	color: #3F4646;
 	text-align: left;
@@ -753,7 +756,7 @@ p a.blog-new-read-more:active {
 }
 .blog-new-full p.strong-paragraph {
 	font-weight: normal;
-	font-family: 'Open Sans Semibold', Arial;
+	font-family: 'source_sans_prosemibold', Arial;
 	color: #3F4646;
 	padding-top: 0;
 	padding-bottom: 20px;
@@ -761,7 +764,7 @@ p a.blog-new-read-more:active {
 }
 .blog-new-full p strong {
 	font-weight: normal;
-	font-family: 'Open Sans Semibold', Arial;
+	font-family: 'source_sans_prosemibold', Arial;
 	color: #3F4646;
 }
 .blog-new-full p .italic-quote {
@@ -777,7 +780,7 @@ p a.blog-new-read-more:active {
 }
 .blog-new-full .blog-dark {
 	color: #131313;
-	font-family: 'Open Sans Semibold', Arial, Helvetica, sans-serif;
+	font-family: 'source_sans_prosemibold', Arial, Helvetica, sans-serif;
 }
 .blog-new-number {
 	width: 24px;
@@ -792,7 +795,7 @@ p a.blog-new-read-more:active {
 	display: block;
 	line-height: 20px;
 	color: #404646;
-	font-family: 'Open Sans', Arial, Helvetica, sans-serif;
+	font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
 	color: #3F4646;
 	font-weight: bold;
 	-moz-border-radius: 100%;
@@ -924,7 +927,7 @@ p a.blog-new-read-more:active {
 .blog-new-num-txt.strong-header {
 	padding: 0 0 20px 0;
 	color: #3F4646;
-	font-family: 'Open Sans Semibold', Arial, Helvetica, sans-serif;
+	font-family: 'source_sans_prosemibold', Arial, Helvetica, sans-serif;
 }
 .blog-new-num-txt .dev-new-input-block {
 	margin: 10px 0 -15px 0;
@@ -1144,7 +1147,7 @@ p.blog-p-left-pad {
 }
 .blog-new-item p {
 	padding: 25px 0 0 0;
-	font-size: 1.3em;
+	font-size: 1.2em;
 	line-height: 2em;
 }
 .blog-new-item p span.blog-new-description {

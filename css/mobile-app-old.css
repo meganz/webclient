@@ -21,7 +21,7 @@
     font-style: normal;
 }
 html, body {
-    font-size: 100%;
+    font-size: 96%;
     -webkit-text-size-adjust: 100%;
     -ms-text-size-adjust: 100%;
     margin: 0px;
@@ -609,7 +609,7 @@ span.select-txt {
 	font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
 	margin: 0;
 	padding: 16px 0 0 281px;
-	font-size: 1.2em;
+	font-size: 1.3em;
 	line-height: 2em;
 	color: #333333;
 }
@@ -667,7 +667,7 @@ sup {
     line-height: inherit;
 }
 .ios .blog-new-item p, .another-os .blog-new-item p, .ios .blog-new-full p, .another-os .blog-new-full p, .ios .blog-new-small, .another-os .blog-new-small, .ios .blog-new-full ul li, .ios .sync li, .another-os .blog-new-full ul li, .another-os .sync li {
-	font-size: 1.2em;
+	font-size: 1.3em;
 }
 .blog div.bottom-menu {
 	margin-top: 0;
@@ -741,7 +741,7 @@ sup {
 	margin: 0;
 	padding: 0 0 18px 20px;
 	font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
-	font-size: 1.2em;
+	font-size: 1.3em;
 	line-height: 28px;
 	color: #3F4646;
 	text-align: left;
@@ -1129,7 +1129,7 @@ p.blog-p-left-pad {
 .ios .blog-new h2, .ios .blog-new .blog-h2, .another-os .blog-new h2, .another-os .blog-new .blog-h2 {
 	font-size: 1.3em;
 }
-.ios .blog-new-item p, .another-os .blog-new-item p, .ios .blog-new-full p, .another-os .blog-new-full p, .ios .blog-new-small, .another-os .blog-new-small, .ios .blog-new-full ul li, .ios .sync li, .another-os .blog-new-full ul li, .another-os .sync li {
+.ios .blog-new-item p, .another-os .blog-new-item p, .ios .blog-new-full p, .another-os .blog-new-full p, .ios .blog-new-small, .another-os .blog-new-small, .ios .blog-new-full ul li, .ios .sync li, .another-os .blog-new-full ul li, .another-os .sync li, .blog-new-full ol li {
 	font-size: 1.1em;
 }
 .ios .blog-new-item, .another-os .blog-new-item {
@@ -1147,7 +1147,7 @@ p.blog-p-left-pad {
 }
 .blog-new-item p {
 	padding: 25px 0 0 0;
-	font-size: 1.2em;
+	font-size: 1.3em;
 	line-height: 2em;
 }
 .blog-new-item p span.blog-new-description {

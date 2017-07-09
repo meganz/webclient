@@ -1813,6 +1813,9 @@ div.pro-feature-icon {
     padding: 50px 0;
     text-align: center;
 }
+.mobile .bottom-page.top-info {
+    padding: 70px 0 50px 0;
+}
 .bottom-page.top-info .big-header {
     padding-top: 0;
 }

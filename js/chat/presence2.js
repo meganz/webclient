@@ -359,11 +359,6 @@ UserPresence.prototype.reconnect = function presence_reconnect(self) {
                             var presence = u[p + 1] & 0xf;
                             var isWebrtcFlag = u[p + 1] & 0x80;
 
-                            var userBin = base64urldecode(user);
-                            if (!this.up.peers[userBin]) {
-                                this.up.peers[userBin] = true;
-                            }
-
                             if (this.up.peerstatuscb) {
                                 this.up.peerstatuscb(
                                     user,
@@ -484,6 +479,9 @@ UserPresence.prototype.addremovepeers = function presence_addremovepeers(peers, 
         else if (!del && !this.peers[u]) {
             this.peers[u] = true;
             delta += u;
+        }
+        else {
+            this.logger.error("not sure how to handle addremovepeers(", peers, del, ");");
         }
     }
 

@@ -316,7 +316,7 @@ SharedLocalKVStorage.prototype.eachPrefixItem = function __SLKVEachItem(prefix, 
                             promise.resolve();
                         })
                         .fail(function(err) {
-                            self.logger.error("eachPrefixItem -> getItem", prefix, "failed");
+                            self.logger.warn("eachPrefixItem -> getItem", prefix, "failed");
                             promise.reject(err);
                         });
                 });

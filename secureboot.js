@@ -843,8 +843,8 @@ Object.defineProperty(this, 'mBroadcaster', {
                         console.log('CROSSTAB COMMUNICATION INITIALIZED AS '
                             + (this.master ? 'MASTER':'SLAVE'));
 
-                        console.debug(String(ua));
-                        console.debug(browserdetails(ua).prod + u_handle);
+                        console.log(String(ua));
+                        console.log(browserdetails(ua).prod + u_handle);
                     }
                     cb(this.master);
                     cb = null;
@@ -1229,8 +1229,7 @@ if (is_ios) {
  * because the new mobile site is not designed for those yet. Confirm links initiated from the mobile web will continue
  * to be processed by the mobile web.
  */
-if (m && ((!localStorage.signUpStartedInMobileWeb && page.substr(0, 7) === 'confirm') ||
-    page.substr(0, 6) === 'cancel' || page.substr(0, 6) === 'verify' || page.substr(0, 6) === 'fm/ipc' ||
+if (m && (page.substr(0, 6) === 'cancel' || page.substr(0, 6) === 'verify' || page.substr(0, 6) === 'fm/ipc' ||
     page.substr(0, 9) === 'newsignup' || page.substr(0, 7) === 'recover' || page.substr(0, 7) === 'account' ||
     page.substr(0, 4) === 'blog' || page.substr(0, 6) === 'backup')) {
 
@@ -1788,8 +1787,8 @@ else if (!b_u) {
 
     // Common desktop and mobile, bottom pages
     jsl.push({f:'css/bottom-pages.css', n: 'bottom-pages_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/pro.css', n: 'pro_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/bottom-menu.css', n: 'bottom-menu_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/pro.css', n: 'pro_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/startpage.css', n: 'startpage_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'html/start.html', n: 'start', j:0});
     jsl.push({f:'html/js/start.js', n: 'start_js', j:1});
@@ -1869,6 +1868,17 @@ else if (!b_u) {
     jsl.push({f:'js/fm/removenode.js', n: 'fm_removenode_js', j: 1});
     jsl.push({f:'js/fm/ufssizecache.js', n: 'ufssizecache_js', j:1});
 
+    // Pro pages Step 1 (Pro plan) and Step 2 (Pro payment)
+    jsl.push({f:'html/proplan.html', n: 'proplan', j:0});
+    jsl.push({f:'html/propay.html', n: 'propay', j:0});
+    jsl.push({f:'html/js/pro.js', n: 'pro_js', j:1});
+    jsl.push({f:'html/js/proplan.js', n: 'proplan_js', j:1});
+    jsl.push({f:'html/js/propay.js', n: 'propay_js', j:1});
+    jsl.push({f:'html/js/propay-dialogs.js', n: 'propay_js', j:1});
+    jsl.push({f:'js/states-countries.js', n: 'states_countries_js', j:1});
+
+    jsl.push({f:'js/ui/miniui.js', n: 'miniui_js', j:1});
+
     if (!is_mobile) {
         jsl.push({f:'css/style.css', n: 'style_css', j:2,w:30,c:1,d:1,cache:1});
         jsl.push({f:'js/fm.js', n: 'fm_js', j:1,w:12});
@@ -1877,17 +1887,18 @@ else if (!b_u) {
         jsl.push({f:'js/fm/account.js', n: 'fm_account_js', j:1});
         jsl.push({f:'js/fm/fileconflict.js', n: 'fm_fileconflict_js', j:1});
         jsl.push({f:'js/ui/miniui.js', n: 'miniui_js', j:1});
-
         jsl.push({f:'html/key.html', n: 'key', j:0});
-        jsl.push({f:'html/pro.html', n: 'pro', j:0});
-        jsl.push({f:'html/js/pro.js', n: 'pro_js', j:1});
         jsl.push({f:'html/login.html', n: 'login', j:0});
         jsl.push({f:'html/fm.html', n: 'fm', j:0,w:3});
         jsl.push({f:'html/top-login.html', n: 'top-login', j:0});
         jsl.push({f:'js/notify.js', n: 'notify_js', j:1});
         jsl.push({f:'js/popunda.js', n: 'popunda_js', j:1});
         jsl.push({f:'css/user-card.css', n: 'user_card_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/icons.css', n: 'icons_css', j:2,w:5,c:1,d:1,cache:1});
+    }
+
+    jsl.push({f:'css/icons.css', n: 'icons_css', j:2,w:5,c:1,d:1,cache:1});
+
+    if (!is_mobile) {
         jsl.push({f:'css/buttons.css', n: 'buttons_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/dropdowns.css', n: 'dropdowns_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/dialogs.css', n: 'dialogs_css', j:2,w:5,c:1,d:1,cache:1});
@@ -1896,7 +1907,11 @@ else if (!b_u) {
         jsl.push({f:'css/toast.css', n: 'toast_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/data-blocks-view.css', n: 'data_blocks_view_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/help2.css', n: 'help_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j:2,w:5,c:1,d:1,cache:1});
+    }
+
+    jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j:2,w:5,c:1,d:1,cache:1});
+
+    if (!is_mobile) {
         jsl.push({f:'css/vendor/perfect-scrollbar.css', n: 'vendor_ps_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/onboarding.css', n: 'onboarding_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/media-print.css', n: 'media_print_css', j:2,w:5,c:1,d:1,cache:1});
@@ -2053,20 +2068,21 @@ else if (!b_u) {
             /* chat related js */
             'react_js': {f:'js/vendor/react.js', n: 'react_js', j:1},
             'reactdom_js': {f:'js/vendor/react-dom.js', n: 'reactdom_js', j:1},
+            'appactivityhandler_js': {f:'js/appActivityHandler.js', n: 'appactivityhandler_js', j:1},
+            'keepalive_js': {f:'js/keepAlive.js', n: 'keepalive_js', j:1},
             'meganotifications_js': {f:'js/megaNotifications.js', n: 'meganotifications_js', j:1},
             'twemoji_js': {f:'js/vendor/twemoji.noutf.js', n: 'twemoji_js', j:1},
             'ionsound_js': {f:'js/vendor/ion.sound.js', n: 'ionsound_js', j:1},
             'favico_js': {f:'js/vendor/favico.js', n: 'favico_js', j:1},
             'autolinker_js': {f:'js/vendor/autolinker.js', n: 'autolinker_js', j:1},
             'strongvelope_js': {f:'js/chat/strongvelope.js', n: 'strongvelope_js', j:1},
-            'strophejingleadapt_js': {f:'js/vendor/chat/strophe.jingle.adapter.js', n: 'strophejingleadapt_js', j:1},
+            'adapter_js': {f:'js/vendor/chat/adapter.js', n: 'adapter_js', j:1},
+            'megawebrtcadapt_js': {f:'js/chat/webrtcAdapter.js', n: 'megawebrtcadapt_js', j:1},
             'rtcstats_js': {f:'js/chat/rtcStats.js', n: 'rtcstats_js', j:1},
-            'rtcsession_js': {f:'js/chat/rtcSession.js', n: 'rtcsession_js', j:1},
+            'webrtc_js': {f:'js/chat/webrtc.js', n: 'webrtc_js', j:1},
+            'webrtcimpl_js': {f:'js/chat/webrtcImpl.js', n: 'webrtcimpl_js', j:1},
             'strophelight_js': {f:'js/vendor/chat/strophe.light.js', n: 'strophelight_js', j:1},
             'strophedisco_js': {f:'js/vendor/chat/strophe.disco.js', n: 'strophedisco_js', j:1},
-            'strophejingle_js': {f:'js/vendor/chat/strophe.jingle.js', n: 'strophejingle_js', j:1},
-            'strophejinglesess_js': {f:'js/vendor/chat/strophe.jingle.session.js', n: 'strophejinglesess_js', j:1},
-            'strophejinglesdp_js': {f:'js/vendor/chat/strophe.jingle.sdp.js', n: 'strophejinglesdp_js', j:1},
             'strophemuc_js': {f:'js/vendor/chat/strophe.muc.js', n: 'strophemuc_js', j:1},
             'stropheroster_js': {f:'js/vendor/chat/strophe.roster.js', n: 'stropheroster_js', j:1},
             'wildemitter_js': {f:'js/vendor/chat/wildemitter.patched.js', n: 'wildemitter_js', j:1},
@@ -2075,7 +2091,6 @@ else if (!b_u) {
             'chatd_js': {f:'js/chat/chatd.js', n: 'chatd_js', j:1},
             'incomingcalldialog_js': {f:'js/chat/ui/incomingCallDialog.js', n: 'incomingcalldialog_js', j:1},
             'chatdInt_js': {f:'js/chat/plugins/chatdIntegration.js', n: 'chatdInt_js', j:1},
-            'karerePing_js': {f:'js/chat/plugins/karerePing.js', n: 'karerePing_js', j:1},
             'callManager_js': {f:'js/chat/plugins/callManager.js', n: 'callManager_js', j:1},
             'urlFilter_js': {f:'js/chat/plugins/urlFilter.js', n: 'urlFilter_js', j:1},
             'emoticonShortcutsFilter_js': {f:'js/chat/plugins/emoticonShortcutsFilter.js', n: 'emoticonShortcutsFilter_js', j:1},
@@ -2084,9 +2099,7 @@ else if (!b_u) {
             'callfeedback_js': {f:'js/chat/plugins/callFeedback.js', n: 'callfeedback_js', j:1},
             'persistedTypeArea_js': {f:'js/chat/plugins/persistedTypeArea.js', n: 'persistedTypeArea_js', j:1, w:1},
             'presencedIntegration_js': {f:'js/chat/plugins/presencedIntegration.js', n: 'presInt_js', j:1, w:1},
-            'keo_js': {f:'js/chat/karereEventObjects.js', n: 'keo_js', j:1},
             'crm_js': {f:'js/connectionRetryManager.js', n: 'crm_js', j:1},
-            'karere_js': {f:'js/chat/karere.js', n: 'karere_js', j:1},
             'chat_messages_Js': {f:'js/chat/messages.js', n: 'chat_messages_Js', j:1},
             'presence2_js': {f:'js/chat/presence2.js', n: 'presence2_js', j:1},
             'chat_react_minified_js': {f:'js/chat/bundle.js', n: 'chat_react_minified_js', j:1}
@@ -2669,8 +2682,7 @@ else if (!b_u) {
             loginresponse= false;
             boot_done();
         };
-
-        lxhr.open('POST', apipath + 'cs?id=0&sid=' + u_storage.sid + mega.urlParams(), true);
+		lxhr.open('POST', apipath + 'cs?id=0&lang=' + lang + '&sid=' + u_storage.sid + mega.urlParams(), true);
         lxhr.send(JSON.stringify([{'a':'ug'}]));
     }
 

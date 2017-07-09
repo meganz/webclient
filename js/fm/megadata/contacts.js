@@ -34,13 +34,16 @@ MegaData.prototype.contactstatus = function(h, wantTimeStamp) {
 };
 
 MegaData.prototype.onlineStatusClass = function(os) {
-    if (os === 'dnd') {
+    if (os === 4 || os === 'dnd') {
+        // UserPresence.PRESENCE.DND
         return [l[5925], 'busy'];
     }
-    else if (os === 'away') {
+    else if (os === 2 || os === 'away') {
+        // UserPresence.PRESENCE.AWAY
         return [l[5924], 'away'];
     }
-    else if ((os === 'chat') || (os === 'available')) {
+    else if (os === 3 || os === 'chat' || os === 'available') {
+        // UserPresence.PRESENCE.ONLINE
         return [l[5923], 'online'];
     }
     else {
@@ -50,33 +53,20 @@ MegaData.prototype.onlineStatusClass = function(os) {
 
 MegaData.prototype.onlineStatusEvent = function(u, status) {
     if (u && megaChatIsReady) {
-        console.error('onlineStatusEvent', u.u, status);
         var e = $('.ustatus.' + u.u);
         if (e.length > 0) {
             $(e).removeClass('offline online busy away');
             $(e).addClass(this.onlineStatusClass(status)[1]);
         }
+        e = $('#contact_' + u.u);
+        if (e.length > 0) {
+            $(e).removeClass('offline online busy away');
+            $(e).addClass(this.onlineStatusClass(status)[1]);
+        }
 
-        var e = $('.fm-chat-user-status.' + u.u);
+        e = $('.fm-chat-user-status.' + u.u);
         if (e.length > 0) {
             $(e).safeHTML(this.onlineStatusClass(status)[0]);
-        }
-
-        if (
-            typeof $.sortTreePanel !== 'undefined' &&
-            typeof $.sortTreePanel.contacts !== 'undefined' &&
-            $.sortTreePanel.contacts.by === 'status'
-        ) {
-            // we need to resort
-            this.contacts();
-        }
-
-        if (getSitePath() === "/fm/" + u.u) {
-            // re-render the contact view page if the presence had changed
-            M.addContactUI();
-        }
-        if (u && u.u === u_handle) {
-            megaChat.renderMyStatus();
         }
     }
 };
@@ -770,33 +760,22 @@ MegaData.prototype.delPS = function(pcrId, nodeId) {
  *
  */
 MegaData.prototype.checkInviteContactPrerequisites = function(email) {
-    var TIME_FRAME = 60 * 60 * 24 * 14;// 14 days in seconds
+    "use strict";
 
     // Check pending invitations
     var opc = M.opc;
     for (var i in opc) {
         if (this.opc[i].m === email) {
-//                if (opc[i].rts + TIME_FRAME <= Math.floor(new Date().getTime() / 1000)) {
             return 0;
-//                }
-            // return -12;
         }
     }
-
-    // Check incoming invitations
-    // This part of code is not necessary case server handle mutial
-    // invitation and automatically translates invites into actual contacts
-//        var ipc = M.ipc;
-//        for (var i in ipc) {
-//            if (M.ipc[i].m === email) {
-//                return -10;
-//            }
-//        }
 
     // Check active contacts
     var result = 0;
     M.u.forEach(function(v, k) {
-        if (v.m === email && v.c !== 0) {
+
+        // Invite all except full contact users
+        if (v.m === email && v.c === 1) {
             result = -2;
             return false; // break;
         }

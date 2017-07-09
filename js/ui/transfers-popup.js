@@ -307,7 +307,7 @@ mega.ui.tpp = function () {
             len = blk === 'dl' ? dlQLen : ulQLen;
         }
 
-        if (pausedNum && pausedNum === len) {// Update TPP
+        if (pausedNum && pausedNum >= len) {// Update TPP
             item = queue[0];
             name = item.zipid ? item.zipname : item.n;
             index = getIndex(blk) + 1;
@@ -487,6 +487,7 @@ mega.ui.tpp = function () {
         setTotal(0, blk);
         setTotalProgress(0, blk);
         setTransfered(-1, 0, blk);
+        opts.dlg[blk].paused = [];
     };
 
     mBroadcaster.addListener('fm:initialized', function() {

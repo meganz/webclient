@@ -650,7 +650,7 @@ Chatd.Shard.prototype.join = function(chatId) {
     if (Object.keys(chat.buf).length === 0) {
         this.cmd(Chatd.Opcode.JOIN, chatId + this.chatd.userId + String.fromCharCode(Chatd.Priv.NOCHANGE));
         // send out `HIST` after a fresh `JOIN`
-        this.cmd(Chatd.Opcode.HIST, chatId + this.chatd.pack32le(Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL * -1));
+        this.cmd(Chatd.Opcode.HIST, chatId + Chatd.pack32le(Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL * -1));
         this.chatd.trigger('onMessagesHistoryRequest', {
             count: Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL,
             chatId: base64urlencode(chatId)

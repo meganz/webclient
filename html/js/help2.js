@@ -114,12 +114,15 @@ var Help = (function() {
 
     function helpScrollTo(selector) {
         var $target = $(selector);
+        var $dataTarget = $('*[data-update="' + selector + '"]');
         if ($target.length) {
+            selectMenuItem($target);
             $('.bottom-pages .fmholder').stop().animate({
                 scrollTop: $target.position().top - 20
             }, 1000);
         }
-        else if ($('*[data-update="' + selector + '"]').length) {
+        else if ($dataTarget.length) {
+            selectMenuItem($dataTarget);
             $('.bottom-pages .fmholder').stop().animate({
                 scrollTop: $('*[data-update="' + selector + '"]').position().top - 20
             }, 1000);
@@ -785,6 +788,7 @@ var Help = (function() {
             var $target = $($(this).data('to'));
 
             if (!$this.is('.gray-inactive')) {
+                selectMenuItem($target);
                 $('.sidebar-menu-link.active').removeClass('active');
                 $this.addClass('active');
                 $('.bottom-pages .fmholder').stop().animate({

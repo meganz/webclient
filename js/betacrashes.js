@@ -60,7 +60,7 @@ if (false) {
 
             if (typeof megaChat !== 'undefined') {
                 report.karereState = megaChat.karere.getConnectionState();
-                report.myPresence = megaChat.getPresence(megaChat.karere.getJid());
+                report.myPresence = megaChat.karere.getPresence(megaChat.karere.getJid());
                 report.karereServer = megaChat.karere.connection.service;
                 report.numOpenedChats = Object.keys(megaChat.chats).length;
 
@@ -68,7 +68,7 @@ if (false) {
 
                 megaChat.chats.forEach(function (v) {
                     var participants = v.getParticipants();
-                    var k = v.roomId;
+                    var k = v.roomJid;
 
                     participants.forEach(function (v, k) {
                         var cc = megaChat.getContactFromJid(v);

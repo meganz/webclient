@@ -136,14 +136,20 @@ var GenericConversationMessage = React.createClass({
         }
 
         // if this is a text msg.
-        if (message instanceof Message) {
+        if (
+            (message instanceof KarereEventObjects.IncomingMessage) ||
+            (message instanceof KarereEventObjects.OutgoingMessage) ||
+            (message instanceof KarereEventObjects.IncomingPrivateMessage) ||
+            (message instanceof Message)
+
+        ) {
             // Convert ot HTML and pass it to plugins to do their magic on styling the message if needed.
             if (message.messageHtml) {
                 message.messageHtml = message.messageHtml;
             }
             else {
                 message.messageHtml = htmlentities(
-                    message.textContents
+                    message.getContents ? message.getContents() : message.textContents
                 ).replace(/\n/gi, "<br/>");
             }
 
@@ -162,6 +168,7 @@ var GenericConversationMessage = React.createClass({
 
             if (
                 (message instanceof Message) ||
+                (message instanceof KarereEventObjects.OutgoingMessage) ||
                 (typeof(message.userId) !== 'undefined' && message.userId === u_handle)
             ) {
                 if (
@@ -250,7 +257,7 @@ var GenericConversationMessage = React.createClass({
                 displayName = contact;
             }
 
-            var textContents = message.textContents;
+            var textContents = message.getContents ? message.getContents() : message.textContents;
 
             if (textContents.substr && textContents.substr(0, 1) === Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT) {
                 if (textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT) {
@@ -259,7 +266,6 @@ var GenericConversationMessage = React.createClass({
                     try {
                         var attachmentMeta = JSON.parse(textContents);
                     } catch(e) {
-                        debugger;
                         return null;
                     }
 
@@ -371,7 +377,6 @@ var GenericConversationMessage = React.createClass({
                         }
                         else {
                             // else if (attachmentMetaInfo.revoked) { ... don't show revoked files
-                            debugger;
                             return;
                         }
 
@@ -674,7 +679,12 @@ var GenericConversationMessage = React.createClass({
             }
             else {
                 // this is a text message.
-                if (message.textContents === "") {
+                if (message instanceof KarereEventObjects.OutgoingMessage) {
+                    if (message.contents === "") {
+                        message.deleted = true;
+                    }
+                }
+                else if (message.textContents === "") {
                     message.deleted = true;
                 }
                 var messageActionButtons = null;
@@ -728,7 +738,7 @@ var GenericConversationMessage = React.createClass({
 
                 var messageDisplayBlock;
                 if (self.state.editing === true) {
-                    var msgContents = message.textContents;
+                    var msgContents = message.textContents ? message.textContents : message.contents;
                     msgContents = megaChat.plugins.emoticonsFilter.fromUtfToShort(msgContents);
 
                     messageDisplayBlock = <TypingAreaUI.TypingArea
@@ -748,10 +758,10 @@ var GenericConversationMessage = React.createClass({
                             if (self.props.onEditDone) {
                                 Soon(function() {
                                     var tmpMessageObj = {
-                                        'textContents': messageContents
+                                        'contents': messageContents
                                     };
                                     megaChat.plugins.emoticonsFilter.processOutgoingMessage({}, tmpMessageObj);
-                                    self.props.onEditDone(tmpMessageObj.textContents);
+                                    self.props.onEditDone(tmpMessageObj.contents);
                                     self.forceUpdate();
                                 });
                             }

@@ -776,12 +776,12 @@
                     }
 
                     if (this.chatIsReady) {
-                        var contact = M.u[props.userHandle];
-                        if (contact) {
-                            props.onlineStatus = M.onlineStatusClass(
-                                contact.presence ? contact.presence : "unavailable"
-                            );
+                        props.onlineStatus = M.onlineStatusClass(aNode.presence ? aNode.presence : "unavailable");
+
+                        if (props.onlineStatus) {
+                            props.classNames.push(props.onlineStatus[1]);
                         }
+
                     }
 
                     if (aExtendedInfo !== false) {
@@ -820,7 +820,7 @@
                 }
 
                 if (this.chatIsReady) {
-                    props.onlineStatus = M.onlineStatusClass(aNode.presence ? aNode.presence : false);
+                    props.onlineStatus = M.onlineStatusClass(aNode.presence ? aNode.presence : "unavailable");
 
                     if (props.onlineStatus) {
                         props.classNames.push(props.onlineStatus[1]);

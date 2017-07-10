@@ -81,7 +81,7 @@ describe("chat messages unit test", function () {
 
 
         fakeChatRoom = {
-            "roomId": "test1@conf.example.com",
+            'roomJid': "test1@conf.example.com",
             'chatId': "chatdId1"
         };
 

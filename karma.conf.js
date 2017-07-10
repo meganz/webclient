@@ -40,7 +40,18 @@ module.exports = function(config) {
         'js/vendor/favico.js',
         'js/vendor/notification.js',
         'js/vendor/moment.js',
-
+        // Chat libraries.
+        'js/vendor/chat/strophe.jingle.adapter.js',
+        'js/vendor/chat/strophe.light.js',
+        'js/vendor/chat/strophe.disco.js',
+        'js/vendor/chat/strophe.jingle.js',
+        'js/vendor/chat/strophe.jingle.session.js',
+        'js/vendor/chat/strophe.jingle.sdp.js',
+        'js/vendor/chat/strophe.muc.js',
+        'js/vendor/chat/strophe.roster.js',
+        'js/vendor/chat/wildemitter.patched.js',
+        'js/vendor/chat/hark.patched.js',
+        'js/vendor/chat/base32.js',
         // Other.
         'js/vendor/autolinker.js',
         'js/vendor/qrcode.js',
@@ -125,8 +136,6 @@ module.exports = function(config) {
         'js/vendor/avatar.js',
         'js/vendor/int64.js',
         'js/cms.js',
-        'js/appActivityHandler.js',
-        'js/keepAlive.js',
         // Google Import Contacts
         'js/gContacts.js',
 
@@ -145,12 +154,16 @@ module.exports = function(config) {
 
         // Our chat code.
         'js/chat/strongvelope.js',
+        'js/chat/rtcStats.js',
+        'js/chat/rtcSession.js',
         'js/chat/plugins/urlFilter.js',
         'js/chat/plugins/emoticonShortcutsFilter.js',
         'js/chat/plugins/emoticonsFilter.js',
         'js/chat/plugins/chatNotifications.js',
         'js/chat/plugins/callFeedback.js',
         'js/chat/plugins/callManager.js',
+        'js/chat/karereEventObjects.js',
+        'js/chat/karere.js',
         'js/chat/messages.js',
         'js/chat/ui/incomingCallDialog.js',
 

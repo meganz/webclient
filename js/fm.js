@@ -3631,7 +3631,7 @@ function copyDialog() {
                 case 'conversations':
                     var $selectedConv = $('.copy-dialog .nw-conversations-item.selected');
                     closeDialog();
-                    megaChat.chats[$selectedConv.attr('data-room-id') + "@conference." + megaChat.options.xmppDomain].attachNodes($.selected);
+                    megaChat.chats[$selectedConv.attr('data-room-jid') + "@conference." + megaChat.options.xmppDomain].attachNodes($.selected);
                     break;
                 default:
                     break;
@@ -4340,9 +4340,10 @@ function _propertiesDialog(close) {
             var user = users[i];
             var userHandle = user.u || user.p;
             var hidden = i >= MAX_CONTACTS ? 'hidden' : '';
-            var status = megaChatIsReady && megaChat.getPresenceAsCssClass(user.u);
+            var status = M.onlineStatusClass(megaChatIsReady
+                && megaChat.karere.getPresence(megaChat.getJidFromNodeId(userHandle)));
 
-            shareUsersHtml += '<div class="properties-context-item ' + (status ? status : '') + ' ' + hidden
+            shareUsersHtml += '<div class="properties-context-item ' + status[1] + ' ' + hidden
                 + '" data-handle="' + escapeHTML(userHandle) + '">'
                 + '<div class="properties-contact-status"></div>'
                 + '<span>' + escapeHTML(M.getNameByHandle(userHandle)) + '</span>'

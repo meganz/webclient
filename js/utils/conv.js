@@ -166,24 +166,6 @@
     };
 
     /**
-     * Like array.remove, but would clone the array and return the array with the `val` removed (if exists)
-     *
-     * @param {Array} arr
-     * @param {String|Number} val
-     * @returns {Array}
-     */
-    array.filterNonMatching = function(arr, val) {
-        "use strict";
-        var arrWithoutVal = clone(arr);
-        arrWithoutVal.splice($.inArray(val, arrWithoutVal), 1);
-        return arrWithoutVal;
-    };
-
-
-
-
-
-    /**
      * Array helper functions.
      * @name array
      */

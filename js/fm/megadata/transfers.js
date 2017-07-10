@@ -141,6 +141,8 @@ MegaData.prototype.putToTransferTable = function(node, ttl) {
 MegaData.prototype.addDownload = function(n, z, preview) {
     var args = toArray.apply(null, arguments);
 
+    mega.ui.tpp.started('dl');
+
     // fetch all nodes needed by M.getNodesSync
     dbfetch.coll(n)
         .always(function() {
@@ -583,6 +585,7 @@ MegaData.prototype.dlcomplete = function(dl) {
 
     delay('tfscomplete', function() {
         M.resetUploadDownload();
+        mega.ui.tpp.setIndex(1, 'dl');
         $.tresizer();
     });
 };
@@ -1259,6 +1262,7 @@ MegaData.prototype.ulcomplete = function(ul, h, k) {
     // $.transferHeader();
     delay('tfscomplete', function() {
         M.resetUploadDownload();
+        mega.ui.tpp.setIndex(1, 'ul');
         $.tresizer();
     });
 };

@@ -295,6 +295,11 @@ MegaUtils.prototype.resetUploadDownload = function megaUtilsResetUploadDownload(
             mega.ui.tpp.reset('ul');
         }
     }
+    else {
+        if (page !== 'download') {
+            mega.ui.tpp.statusPaused(ul_queue, 'ul');
+        }
+    }
     if (!dl_queue.some(isQueueActive)) {
         dl_queue = new DownloadQueue();
         dlmanager.isDownloading = false;
@@ -307,6 +312,11 @@ MegaUtils.prototype.resetUploadDownload = function megaUtilsResetUploadDownload(
 
         if (page !== 'download') {
             mega.ui.tpp.reset('dl');
+        }
+    }
+    else {
+        if (page !== 'download') {
+            mega.ui.tpp.statusPaused(dl_queue, 'dl');
         }
     }
 

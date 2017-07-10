@@ -758,7 +758,7 @@ var strongvelope = {};
                         // Decrypt message key(s).
                         var encryptedKey =
                             (isOwnMessage &&
-                            (parsedMessage.keys[keyIndex].length >= _RSA_ENCRYPTION_THRESHOLD)) ? 
+                            (parsedMessage.keys[keyIndex].length >= _RSA_ENCRYPTION_THRESHOLD)) ?
                                 parsedMessage.ownKey : parsedMessage.keys[keyIndex];
 
                         var decryptedKeys = this._legacyDecryptKeysFor( encryptedKey,
@@ -1492,7 +1492,7 @@ var strongvelope = {};
                                                          senderKeys);
 
         // Am I part of this chat?
-        // TODO: In future it should update participants based on chatd server's 
+        // TODO: In future it should update participants based on chatd server's
         // requests rather than incoming messages.
         if (parsedMessage.excludeParticipants.indexOf(this.ownHandle) >= 0) {
             logger.info('I have been excluded from this chat, cannot read message.');
@@ -1832,7 +1832,7 @@ var strongvelope = {};
 
         if (!this.participantKeys[this.ownHandle][tempkeyid]) {
             throw new Error('No cached chat key for given key id!');
-        }  
+        }
         this.participantKeys[this.ownHandle][newkeyid] = this.participantKeys[this.ownHandle][tempkeyid];
         this.keyId = newkeyid;
     };

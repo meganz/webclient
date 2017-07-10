@@ -1106,6 +1106,11 @@ FileManager.prototype.initContextUI = function() {
         $.clearTransferPanel();
         fm_tfsupdate();
 
+        var blk = toabort[0].indexOf('ul_') !== -1 ? 'ul' : 'dl';
+        mega.ui.tpp.setTotal(-1, blk);
+        // mega.ui.tpp.setIndex(-1, blk);
+        mega.ui.tpp.updateIndexes(blk);
+
         onIdle(function() {
             // XXX: better way to stretch the scrollbar?
             $(window).trigger('resize');

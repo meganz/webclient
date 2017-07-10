@@ -176,6 +176,9 @@ Chatd.KEEPALIVE_PING_INTERVAL = 25000;
 Chatd.MESSAGE_EXPIRY = 60 * 60; // 60*60
 var MESSAGE_EXPIRY = Chatd.MESSAGE_EXPIRY;
 
+Chatd.MESSAGE_HISTORY_LOAD_COUNT = 32;
+Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL = 3;
+
 Chatd.VERSION = 1;
 
 // add a new chatd shard
@@ -647,9 +650,9 @@ Chatd.Shard.prototype.join = function(chatId) {
     if (Object.keys(chat.buf).length === 0) {
         this.cmd(Chatd.Opcode.JOIN, chatId + this.chatd.userId + String.fromCharCode(Chatd.Priv.NOCHANGE));
         // send out `HIST` after a fresh `JOIN`
-        this.cmd(Chatd.Opcode.HIST, chatId + Chatd.pack32le(-32));
+        this.cmd(Chatd.Opcode.HIST, chatId + Chatd.pack32le(Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL * -1));
         this.chatd.trigger('onMessagesHistoryRequest', {
-            count: 32,
+            count: Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL,
             chatId: base64urlencode(chatId)
         });
     } else {
@@ -692,6 +695,16 @@ Chatd.Shard.prototype.exec = function(a) {
     }
 
     var len;
+    var newmsg;
+
+    var codestr = '';
+    for (var i=0;i<cmd.length;i++)
+    {
+        codestr += cmd[i].charCodeAt(0).toString(16) + " ";
+
+    }
+    self.logger.debug("Received from chatd: ", codestr);
+
     while (cmd.length) {
         var opcode = cmd.charCodeAt(0);
         switch (opcode) {
@@ -1444,7 +1457,7 @@ Chatd.Messages.prototype.joinrangehist = function(chatId) {
             this.chatd.cmd(Chatd.Opcode.JOINRANGEHIST, chatId,
                 this.buf[low][Chatd.MsgField.MSGID] + this.buf[high][Chatd.MsgField.MSGID]);
             this.chatd.trigger('onMessagesHistoryRequest', {
-                count: 32,
+                count: Chatd.MESSAGE_HISTORY_LOAD_COUNT,
                 chatId: base64urlencode(chatId)
             });
             break;

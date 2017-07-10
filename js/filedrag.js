@@ -378,6 +378,7 @@
                     u.push(f);
                 }
             }
+            mega.ui.tpp.started('ul');
             addupload(u);
             if (page == 'start') {
                 start_upload();

@@ -397,6 +397,7 @@ var Help = (function() {
         var $cloneHeader = $(".support-section-header-clone", $container);
         var $closeIcon = $(".close-icon", $container);
         var $getStartTitle = $(".getstart-title-section", $container);
+        var $elements = $('.updateSelected:visible', $container);
         var timer;
 
         // Arrow Animation for Go back block
@@ -426,7 +427,8 @@ var Help = (function() {
 
             if ($current.length === 0) {
                 selectMenuItem($elements.eq(0), $current);
-            } else {
+            }
+            else {
                 var $new = getVisibleElement(topPos, [$current.prev(), $current, $current.next()]);
                 if ($new && $new !== $current) {
                     selectMenuItem($new, $current);

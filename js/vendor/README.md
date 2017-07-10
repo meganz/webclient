@@ -166,19 +166,6 @@ Unless otherwise noted, they were released under a [MIT License].
 > make check
 > ```
 
----
-[chat/adapter.js]: Shim to insulate apps from spec changes and prefix differences (WebRTC related polyfill)
-
-> NB: We had to fork the project and remove the UTF characters from twemoji.js, so we are using the repo:
-> https://github.com/meganz/adapter
-> 
-> ```bash
-> git clone https://github.com/webrtc/adapter
-> cd release
-> open adapter.js
-> search & replace any utf character with ""
-> ```
----
 
 ---
 [chat/base32.js]: A fork of agnoster/base32-js
@@ -235,4 +222,3 @@ Unless otherwise noted, they were released under a [MIT License].
 [zxcvbn.js]: <https://github.com/dropbox/zxcvbn/tree/1.0.1>
 [chat/strophe.light.js]: <https://github.com/strophe/strophejs>
 [chat/base32.js]: <https://github.com/lpetrov/base32-js>
-[chat/adapter.js]: <https://github.com/webrtc/adapter>

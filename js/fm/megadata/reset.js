@@ -23,9 +23,7 @@ MegaData.prototype.reset = function() {
                 ) {
                     M.contacts(); // we need to resort
                 }
-                else if (M.currentdirid && M.u[M.currentdirid]) {
-                    M.contacts(); // we need to resort
-                }
+
                 if (getSitePath() === "/fm/contacts") {
                     // re-render the contact view page if the presence had changed
                     M.openFolder('contacts', true);

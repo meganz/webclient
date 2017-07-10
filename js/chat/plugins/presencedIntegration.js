@@ -1,5 +1,5 @@
 /**
- * Presenced integration
+ * Presenced integration and sync with XMPP
  *
  *
  * @param megaChat
@@ -50,8 +50,8 @@ var PresencedIntegration = function(megaChat) {
     self._is_webrtc = {};
     self._presence = {};
 
-    megaChat.unbind("onInit.presencedIntegration");
-    megaChat.bind("onInit.presencedIntegration", function() {
+    megaChat.unbind("onInit.karerePing");
+    megaChat.bind("onInit.karerePing", function(e) {
         // auto disable if the current connection is not to a websocket.
         self.init();
     });
@@ -60,7 +60,6 @@ var PresencedIntegration = function(megaChat) {
         if (handle === u_handle) {
             megaChat.renderMyStatus();
         }
-        M.onlineStatusEvent(M.u[handle], presence);
     });
 
     return self;
@@ -213,6 +212,50 @@ PresencedIntegration.prototype._updateuicb = function presencedIntegration_updat
 
     self._presence[u_handle] = presence;
 
+    var status;
+    if (presence === UserPresence.PRESENCE.OFFLINE) {
+        status = 'offline';
+    }
+    else if (presence === UserPresence.PRESENCE.AWAY) {
+        status = 'away';
+    }
+    else if (presence === UserPresence.PRESENCE.DND) {
+        status = 'dnd';
+    }
+    else if (presence === UserPresence.PRESENCE.ONLINE) {
+        status = 'available';
+    }
+    else {
+        status = 'unavailable';
+    }
+
+    // sync presenced -> xmpp
+    var xmppPresence = megaChat.karere.getPresence(megaChat.karere.getJid());
+    var targetKarerePresence = false;
+
+    if (status === 'away' && xmppPresence !== 'away') {
+        targetKarerePresence = Karere.PRESENCE.AWAY;
+    }
+    else if (status === 'dnd' && xmppPresence !== 'dnd') {
+        targetKarerePresence = Karere.PRESENCE.BUSY;
+
+    }
+    else if (status === 'available' && xmppPresence !== 'available') {
+        targetKarerePresence = Karere.PRESENCE.ONLINE;
+    }
+
+    if (targetKarerePresence) {
+        if (!xmppPresence) {
+            megaChat.karere.connectionRetryManager.requiresConnection()
+                .then(function() {
+                    megaChat.karere.setPresence(targetKarerePresence);
+                });
+        }
+        else {
+            megaChat.karere.setPresence(targetKarerePresence);
+        }
+    }
+
     if (self.getAutoaway()) {
         self._initAutoawayEvents();
     }
@@ -243,9 +286,26 @@ PresencedIntegration.prototype._peerstatuscb = function(user_hash, presence, isW
     self._is_webrtc[user_hash] = isWebrtcFlag;
 
     var contact = M.u[user_hash];
+    var status;
+    if (presence === UserPresence.PRESENCE.OFFLINE) {
+        status = 'offline';
+    }
+    else if (presence === UserPresence.PRESENCE.AWAY) {
+        status = 'away';
+    }
+    else if (presence === UserPresence.PRESENCE.DND) {
+        status = 'dnd';
+    }
+    else if (presence === UserPresence.PRESENCE.ONLINE) {
+        status = 'available';
+    }
+    else {
+        status = 'unavailable';
+    }
+
 
     if (contact) {
-        contact.presence = presence;
+        contact.presence = status;
     }
     else {
         // unknown contact, add it to the contact list.
@@ -259,7 +319,7 @@ PresencedIntegration.prototype._peerstatuscb = function(user_hash, presence, isW
             })
         );
         contact = M.u[user_hash];
-        contact.presence = presence;
+        contact.presence = status;
         M.syncUsersFullname(user_hash);
     }
 
@@ -342,12 +402,6 @@ PresencedIntegration.prototype.removeContact = function(u_h) {
     this._peerstatuscb(u_h, UserPresence.PRESENCE.OFFLINE, false);
 };
 
-/**
- * Retrieve presence
- *
- * @param u_h {String} user's handle or empty for own presence
- * @returns {Number|undefined} UserPresence.PRESENCE.* or undefined for offline/unknown presence
- */
 PresencedIntegration.prototype.getPresence = function(u_h) {
     if (!u_h) {
         u_h = u_handle;
@@ -394,8 +448,6 @@ PresencedIntegration.prototype.getMyPresenceSetting = function() {
  * This method would return the actual presence of the current user, e.g. even if he had set his presence to ONLINE,
  * but he is right now offline (connection issue, etc) this method would return OFFLINE (the opposite of what
  * .getMyPresenceSetting() does).
- *
- * @returns {Number|undefined} UserPresence.PRESENCE.* or undefined for offline/unknown presence
  */
 PresencedIntegration.prototype.getMyPresence = function() {
     if (!this.megaChat.userPresence) {

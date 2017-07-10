@@ -42,7 +42,7 @@ function shallowEqual(objA, objB) {
 window.shallowEqual = shallowEqual;
 
 var MAX_ALLOWED_DEBOUNCED_UPDATES = 1;
-var DEBOUNCED_UPDATE_TIMEOUT = 60;
+var DEBOUNCED_UPDATE_TIMEOUT = 40;
 var REENABLE_UPDATES_AFTER_TIMEOUT = 300;
 
 var MAX_TRACK_CHANGES_RECURSIVE_DEPTH = 1;

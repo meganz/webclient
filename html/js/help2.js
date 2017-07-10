@@ -422,6 +422,17 @@ var Help = (function() {
 
         $('.bottom-pages .fmholder').rebind('scroll.helpmenu', function() {
             var topPos = $(this).scrollTop();
+            var $current = $($('.updateSelected.current')[0]);
+
+            if ($current.length === 0) {
+                selectMenuItem($elements.eq(0), $current);
+            } else {
+                var $new = getVisibleElement(topPos, [$current.prev(), $current, $current.next()]);
+                if ($new && $new !== $current) {
+                    selectMenuItem($new, $current);
+                }
+            }
+
             if (topPos > 195) {
                 if (topPos + $sideBar.outerHeight() + 115 <= $('.main-mid-pad').outerHeight()) {
                     $sideBar.css('top', topPos + 30 + 'px').addClass('fixed');

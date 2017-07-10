@@ -1015,6 +1015,13 @@ function init_page() {
         parsepage(pages['copyrightnotice']);
         copyright.init_cn();
     }
+
+    // Temp page to set a localStorage variable on a mobile device and test app registrations on the live domain
+    else if (page === 'enablemobtestflag') {
+        localStorage.signUpStartedInMobileWeb = '1';
+        loadSubPage('start');
+        return false;
+    }
     else if (dlid) {
         page = 'download';
         if (typeof fdl_queue_var !== 'undefined') {

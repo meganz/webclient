@@ -141,8 +141,6 @@ MegaData.prototype.putToTransferTable = function(node, ttl) {
 MegaData.prototype.addDownload = function(n, z, preview) {
     var args = toArray.apply(null, arguments);
 
-    mega.ui.tpp.started('dl');
-
     // fetch all nodes needed by M.getNodesSync
     dbfetch.coll(n)
         .always(function() {
@@ -406,6 +404,7 @@ MegaData.prototype.onDownloadAdded = function(added, isPaused, isZIP, zipSize) {
         $('.transfer-pause-icon').removeClass('disabled');
         $('.transfer-clear-completed').removeClass('disabled');
         $('.transfer-clear-all-icon').removeClass('disabled');
+        mega.ui.tpp.started('dl');
     }
 };
 
@@ -1021,6 +1020,7 @@ MegaData.prototype.addUpload = function(u, ignoreWarning) {
             $('.transfer-pause-icon').removeClass('disabled');
             $('.transfer-clear-completed').removeClass('disabled');
             $('.transfer-clear-all-icon').removeClass('disabled');
+            mega.ui.tpp.started('ul');
         }
     }.bind(this);
 

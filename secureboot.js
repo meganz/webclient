@@ -1225,12 +1225,10 @@ if (is_ios) {
 
 /**
  * Some legacy secureboot mobile code that has been refactored to keep just the blog working and also redirect to the
- * app if any confirm, cancel, verify, fm/ipc, newsignup, recover, account or backup links are clicked in the app
- * because the new mobile site is not designed for those yet. Confirm links initiated from the mobile web will continue
- * to be processed by the mobile web.
+ * app if any cancel, verify, fm/ipc, newsignup, recover, account or backup links are clicked in the app
+ * because the new mobile site is not designed for those yet.
  */
-if (m && ((!localStorage.signUpStartedInMobileWeb && page.substr(0, 7) === 'confirm') ||
-    page.substr(0, 6) === 'cancel' || page.substr(0, 6) === 'verify' || page.substr(0, 6) === 'fm/ipc' ||
+if (m && (page.substr(0, 6) === 'cancel' || page.substr(0, 6) === 'verify' || page.substr(0, 6) === 'fm/ipc' ||
     page.substr(0, 9) === 'newsignup' || page.substr(0, 7) === 'recover' || page.substr(0, 7) === 'account' ||
     page.substr(0, 4) === 'blog' || page.substr(0, 6) === 'backup')) {
 

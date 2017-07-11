@@ -1266,11 +1266,9 @@ function fm_tfspause(gid, overquota) {
     if (ASSERT(typeof gid === 'string' && "zdu".indexOf(gid[0]) !== -1, 'Ivalid GID to pause')) {
         if (gid[0] === 'u') {
             ulQueue.pause(gid);
-            mega.ui.tpp.pause(gid, 'ul');
         }
         else {
             dlQueue.pause(gid);
-            mega.ui.tpp.pause(gid, 'dl');
         }
 
         if (page === 'download') {
@@ -1301,6 +1299,8 @@ function fm_tfspause(gid, overquota) {
                 $tr.removeClass('transfer-error');
                 $tr.find('.transfer-status').text(l[7227]);
             }
+
+            mega.ui.tpp.pause(gid, gid[0] === 'u' ? 'ul' : 'dl');
         }
         return true;
     }

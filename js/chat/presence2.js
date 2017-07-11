@@ -493,7 +493,7 @@ UserPresence.prototype.addremovepeers = function presence_addremovepeers(peers, 
 UserPresence.prototype.sendstring = function presence_sendstring(s) {
     if (!this.s || this.s.readyState !== 1) {
         console.error("Called UserPresence.sendstring when offline.");
-        return;
+        return false;
     }
 
     var u = new Uint8Array(s.length);
@@ -513,7 +513,15 @@ UserPresence.prototype.sendstring = function presence_sendstring(s) {
         );
     }
 
-    this.s.send(u);
+    try {
+        this.s.send(u);
+    }
+    catch (e) {
+        if (d) {
+            console.warn("UserPresence.sendstring -> socket.send failed, because of exception: ", e);
+        }
+        return false;
+    }
 };
 
 // must be called with the binary representation of the userid delta

@@ -168,8 +168,11 @@
 
         $(document).bind('ps-scroll-y.ps' + this._generateEventNamespace(), function(e) {
             if (self._isUserScroll === true && self.$listContainer.is(e.target)) {
+                console.log('scrollPosOnScroll:', e.target.scrollTop);
+                console.time('ps-scroll-y');
                 self.trigger('onUserScroll', e);
                 self._onScroll(e);
+                console.timeEnd('ps-scroll-y');
             }
         });
     };

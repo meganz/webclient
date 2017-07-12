@@ -591,7 +591,15 @@ else {
         page = document.location.pathname;
     }
     page = getCleanSitePath(page);
-    history.replaceState({subpage: page}, "", '/' + page);
+	// put try block around it to allow the page to be rendered in Google cache
+	try
+	{
+		history.replaceState({subpage: page}, "", '/' + page);
+	}
+	catch(e)
+	{
+		console.log('Probably Google Cache?');
+	}
 }
 
 

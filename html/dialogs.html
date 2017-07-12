@@ -1365,6 +1365,7 @@
     </div>
 </div>
 
+<!-- Register/Login required dialog for desktop !-->
 <div class="fm-dialog loginrequired-dialog hidden">
     <div class="fm-dialog-header">
         <div class="fm-dialog-title"><span>[$14]</span></div>
@@ -1386,7 +1387,6 @@
         <div class="clear"></div>
     </div>
 </div>
-
 
 <div class="fm-dialog fm-mega-dialog feedback-dialog hidden">
     <div class="overlay-close">
@@ -1713,59 +1713,6 @@
     <div class="payment-animation-pad">
         <img class="payment-animation" alt="" />
         <div class="payment-animation-txt">[$6960]</div>
-    </div>
-</div>
-
-<div class="payment-result success hidden">
-    <div class="payment-close">
-        <div class="payment-close-icon"></div>
-        <span></span>
-    </div>
-    <div class="payment-result-pad">
-        <div class="payment-result-header">[$6961]!</div>
-        <div class="payment-result-txt">[$6962]</div>
-        <div class="payment-result-icon"></div>
-        <div class="payment-result-button">[$6690]</div>
-    </div>
-</div>
-
-<div class="payment-result failed hidden">
-    <div class="payment-close">
-        <div class="payment-close-icon"></div>
-        <span></span>
-    </div>
-    <div class="payment-result-pad">
-        <div class="payment-result-header">[$6949]</div>
-        <div class="payment-result-txt">[$6950]</div>
-        <div class="payment-result-icon"></div>
-        <div class="payment-result-button">[$1472]</div>
-    </div>
-</div>
-
-<!-- Pending confirmation -->
-<div class="payment-result pending original hidden">
-    <div class="payment-close">
-        <div class="payment-close-icon"></div>
-        <span></span>
-    </div>
-    <div class="payment-result-pad">
-        <div class="payment-result-header">[$7983]</div>
-        <div class="payment-result-txt">[$8755]</div>
-        <div class="payment-result-icon"></div>
-        <div class="payment-result-button">[$6690]</div>
-    </div>
-</div>
-
-<div class="payment-result pending alternate hidden">
-    <div class="payment-close">
-        <div class="payment-close-icon"></div>
-        <span></span>
-    </div>
-    <div class="payment-result-pad">
-        <div class="payment-result-header">[$7983]</div>
-        <div class="payment-result-txt">[$10636]</div>
-        <div class="payment-result-icon"></div>
-        <div class="payment-result-button">[$6690]</div>
     </div>
 </div>
 
@@ -2518,7 +2465,7 @@
 
         <div class="plan-blocks step1-block">
             <div class="dialog transfer-plans">
-                <div class="reg-st3-membership-bl pro4 selected" data-payment="lite">
+                <div class="reg-st3-membership-bl pro4 selected" data-payment="4">
                     <div class="membership-pad-bl">
                         <div class="reg-st3-bott-title title">[$6234]</div>
                         <div class="membership-gray-block">
@@ -3454,73 +3401,58 @@
     </div>
 </div>
 
-<div class="viewer-overlay hidden">
-    <div class="viewer-body">
-        <div class="viewer-top-bl">
-            <div class="viewer-filename"></div>
-            <div class="viewer-button right close">
-                <i class="medium-icon icons-img close"></i>
-            </div>
-            <div class="viewer-button right getlink">
-                <i class="medium-icon icons-img chain"></i>
-            </div>
-            <div class="viewer-button right download">
-                <i class="medium-icon icons-img arrow-in-circle"></i>
-            </div>
-            <div class="viewer-button right favourite">
-                <i class="medium-icon icons-img heart"></i>
-            </div>
-            <div class="clear"></div>
-        </div>
-        
-        <div class="viewer-image-bl hidden">
-            <img alt="" />
-        </div>
-        
-        <div class="viewer-pending hidden">
-            <div class="bounce1"></div>
-            <div class="bounce2"></div>
-            <div class="bounce3"></div>
-        </div>
+<!-- Payment success dialog -->
+<div class="payment-result success hidden">
+    <div class="payment-close">
+        <div class="payment-close-icon"></div>
+        <span></span>
+    </div>
+    <div class="payment-result-pad">
+        <div class="payment-result-header">[$6961]!</div>
+        <div class="payment-result-txt">[$6962]</div>
+        <div class="payment-result-icon"></div>
+        <div class="payment-result-button">[$6690]</div>
+    </div>
+</div>
 
-        <div class="viewer-error hidden">
-            <div class="viewer-error-header">
-                [$135]
-            </div>
-            <div class="viewer-error-txt">
-            </div>
-            <div class="viewer-error-buttons">
-                <div class="viewer-button viewer-refresh">
-                    <i class="medium-icon icons-img refresh"></i>
-                    [$85]
-                </div>
-                <div class="viewer-button viewer-error-close">
-                    <i class="medium-icon icons-img close"></i>
-                    [$1898]
-                </div>
-            </div>
-        </div>
-        
-        <div class="viewer-progress hidden">
-            <ul>
-                <li class="nw-fm-chart0 right-c"><p><span></span></p></li>
-                <li class="nw-fm-chart0 left-c"><p><span></span></p></li>
-            </ul>
-        </div>
-        
-        <div class="viewer-mid-button prev"></div>
-        <div class="viewer-mid-button next"></div>
-        
-        <div class="viewer-bottom-bl">
-            <div class="viewer-images-num hidden">
-                <span class="first">0</span>
-                [$5528]
-                <span class="last">0</span>
-            </div>
-            <div class="viewer-button right fullscreen">
-                <i class="medium-icon icons-img fullscreen"></i>
-            </div>
-            <div class="clear"></div>
-        </div>
+<!-- Payment failure dialog -->
+<div class="payment-result failed hidden">
+    <div class="payment-close">
+        <div class="payment-close-icon"></div>
+        <span></span>
+    </div>
+    <div class="payment-result-pad">
+        <div class="payment-result-header">[$6949]</div>
+        <div class="payment-result-txt">[$6950]</div>
+        <div class="payment-result-icon"></div>
+        <div class="payment-result-button">[$1472]</div>
+    </div>
+</div>
+
+<!-- Pending confirmation -->
+<div class="payment-result pending original hidden">
+    <div class="payment-close">
+        <div class="payment-close-icon"></div>
+        <span></span>
+    </div>
+    <div class="payment-result-pad">
+        <div class="payment-result-header">[$7983]</div>
+        <div class="payment-result-txt">[$8755]</div>
+        <div class="payment-result-icon"></div>
+        <div class="payment-result-button">[$6690]</div>
+    </div>
+</div>
+
+<!-- Payment confirmation pending (alternative) -->
+<div class="payment-result pending alternate hidden">
+    <div class="payment-close">
+        <div class="payment-close-icon"></div>
+        <span></span>
+    </div>
+    <div class="payment-result-pad">
+        <div class="payment-result-header">[$7983]</div>
+        <div class="payment-result-txt">[$10636]</div>
+        <div class="payment-result-icon"></div>
+        <div class="payment-result-button">[$6690]</div>
     </div>
 </div>

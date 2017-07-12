@@ -120,7 +120,9 @@ function topMenuScroll() {
 }
 
 function scrollMenu() {
-    $('.bottom-page.scroll-block, .old .fmholder').scroll(function() {
+    "use strict";
+
+    $('.bottom-pages .fmholder').rebind('scroll.devmenu', function() {
         if (page === 'doc' || page === 'cpage' || page === 'sdk' || page === 'dev') {
             var $menu = $('.new-left-menu-block');
             var topPos = $(this).scrollTop();
@@ -151,7 +153,7 @@ function topPopupAlign(button, popup, topPos) {
             buttonTopPos;
 
         if ($button.length && $popup.length) {
-            pageWidth = $('body').width();
+            pageWidth = $('.top-head').width();
             $popupArrow.removeAttr('style');
             popupRightPos = pageWidth
                 - $button.offset().left
@@ -237,6 +239,14 @@ function init_page() {
             return;
         }
         $.lastSeenFilelink = getSitePath();
+    }
+
+    // Set class if gbot
+    if (is_bot) {
+        $('html').addClass('gbot');
+    }
+    else {
+        $('html').removeClass('gbot');
     }
 
     if (!u_type) {
@@ -378,7 +388,7 @@ function init_page() {
     confirmcode = false;
     pwchangecode = false;
 
-    if (page.substr(0, 7) == 'confirm') {
+    if (page.substr(0, 7) === 'confirm') {
         confirmcode = page.replace("confirm", "");
         page = 'confirm';
     }
@@ -402,8 +412,8 @@ function init_page() {
         closeDialog();
     }
 
-    // Do not show this dialog while entering into the downloads page
-    if (page.substr(0, 1) !== '!' && localStorage.awaitingConfirmationAccount) {
+    // Do not show this dialog while entering into the downloads or Pro pages (so they can still choose plan and pay)
+    if ((page.substr(0, 1) !== '!') && (page.substr(0, 3) !== 'pro') && localStorage.awaitingConfirmationAccount) {
         var acc = JSON.parse(localStorage.awaitingConfirmationAccount);
 
         // if visiting a #confirm link, or they confirmed it elsewhere.
@@ -481,9 +491,8 @@ function init_page() {
         }
 
         doRenderCorpPage();
-        bottompage.init();
-        scrollMenu();
         page = 'cpage';
+        bottompage.init();
     }
     else if (page.substr(0, 5) == 'page_') {
         var cpage = decodeURIComponent(page.substr(5, page.length - 2));
@@ -503,6 +512,7 @@ function init_page() {
 
         doRenderCMSPage();
         page = 'cpage';
+        bottompage.init();
         return;
     }
     else if (page.substr(0, 4) == 'blog' && page.length > 4 && page.length < 10) {
@@ -926,6 +936,15 @@ function init_page() {
             loadSubPage('disputenotice');
         });
     }
+    else if (page.substr(0, 6) === 'propay') {
+        if (is_mobile) {
+            parsepage(pages['mobile']);
+        }
+        else {
+            parsepage(pages['propay']);
+        }
+        pro.propay.init();
+    }
     else if (page.substr(0, 3) === 'pro') {
         var tmp = page.split('/uao=');
         if (tmp.length > 1) {
@@ -933,17 +952,18 @@ function init_page() {
             loadSubPage(tmp[0]);
             return;
         }
-        parsepage(pages['pro']);
-        init_pro();
+
+        parsepage(pages['proplan']);
+        pro.proplan.init();
     }
     else if (page.substr(0, 7) === 'payment') {
 
         // Load the Pro page in the background
-        parsepage(pages['pro']);
-        init_pro();
+        parsepage(pages['proplan']);
+        pro.proplan.init();
 
         // Process the return URL from the payment provider and show a success/failure dialog if applicable
-        proPage.processReturnUrlFromProvider(page);
+        pro.proplan.processReturnUrlFromProvider(page);
     }
     else if (page == 'credits') {
         parsepage(pages['credits']);
@@ -1234,13 +1254,16 @@ function init_page() {
     if (typeof alarm !== 'undefined') {
         alarm.siteUpdate.init();
     }
+
     if (!is_mobile) {
         topmenuUI();
     }
     else {
         // Initialise the mobile menu (ToDo: in future use desktop responsive main menu)
+        mobile.initHeaderMegaIcon();
         mobile.menu.showAndInit(page);
     }
+
     loggedout = false;
     flhashchange = false;
 }
@@ -1362,9 +1385,6 @@ function tooltiplogin() {
                 passwordManager('#form_login_header');
                 u_type = r;
 
-                // Logging to see how many people are signing into the regular site
-                api_req({ a: 'log', e: 99630, m: 'Completed login on regular webclient' });
-
                 if (login_next) {
                     loadSubPage(login_next);
                 }
@@ -1483,7 +1503,7 @@ function topmenuUI() {
 
             // Set the plan text
             var proNum = u_attr.p;
-            var purchasedPlan = getProPlan(proNum);
+            var purchasedPlan = pro.getProPlanName(proNum);
 
             // Set colour of plan and body class
             var cssClass;
@@ -2016,8 +2036,6 @@ function parsepage(pagehtml, pp) {
         pagehtml = pagehtml.replace(/\/#/g, '/' + urlrootfile + '#');
     }
 
-    $('body').addClass('bottom-pages');
-
     var top = parsetopmenu();
     var bmenu = pages['bottom'];
     var bmenu2 = pages['bottom2'];
@@ -2042,8 +2060,12 @@ function parsepage(pagehtml, pp) {
         M.chrome110ZoomLevelNotification();
     });
 
+    $('body').addClass('bottom-pages');
+    $('body, html, .bottom-pages .fmholder').stop().animate({
+        scrollTop: 0
+    }, 0);
     bottompage.init();
-    $('.nw-bottom-block').addClass(lang);
+
     if (typeof M.initUIKeyEvents === 'function') {
         M.initUIKeyEvents();
     }
@@ -2162,7 +2184,5 @@ window.onunload = function() {
 mBroadcaster.once('boot_done', function() {
     M = new MegaData();
     attribCache = new IndexedDBKVStorage('ua', {murSeed: 0x800F0002});
-    attribCache.syncNameTimer = {};
-    attribCache.uaPacketParser = uaPacketParser;
     attribCache.bitMapsManager = new MegaDataBitMapManager();
 });

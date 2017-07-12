@@ -30,12 +30,9 @@ function accountUI() {
 
     M.accountData(function(account) {
         loadingDialog.hide();
+        accountUI.userUIUpdate();
 
-        var perc;
-        var warning;
         var perc_c;
-        var b_exceeded;
-        var s_exceeded;
         var id = getSitePath();
         var pid = String(id).replace('/fm/account/', '');
         var sectionClass;
@@ -152,7 +149,7 @@ function accountUI() {
 
             // LITE/PRO account
             var planNum = u_attr.p;
-            var planText = getProPlan(planNum);
+            var planText = pro.getProPlanName(planNum);
 
             $('.account.plan-info.accounttype span').text(planText);
             $('.small-icon.membership').addClass('pro' + planNum);
@@ -186,7 +183,7 @@ function accountUI() {
                 var $cancelSubscriptionButton = $buttons.find('.btn-cancel-sub');
                 var $achievementsButton = $buttons.find('.btn-achievements').addClass('hidden');
 
-                // If Apple or Google subscription (see getGatewayName function for codes)
+                // If Apple or Google subscription (see pro.getPaymentGatewayName function for codes)
                 if ((gatewayId === 2) || (gatewayId === 3)) {
 
                     // Tell them they need to cancel their plan off-site and don't show the feedback dialog
@@ -523,7 +520,7 @@ function accountUI() {
 
             // Set payment method
             var paymentMethodId = purchaseTransaction[4];
-            var paymentMethod = getGatewayName(paymentMethodId).displayName;
+            var paymentMethod = pro.getPaymentGatewayName(paymentMethodId).displayName;
 
             // Set Date/Time, Item (plan purchased), Amount, Payment Method
             var dateTime = time2date(purchaseTransaction[1]);
@@ -531,7 +528,7 @@ function accountUI() {
             var proNum = purchaseTransaction[5];
             var numOfMonths = purchaseTransaction[6];
             var monthWording = (numOfMonths == 1) ? l[931] : 'months';  // Todo: l[6788] when generated
-            var item = getProPlan(proNum) + ' (' + numOfMonths + ' ' + monthWording + ')';
+            var item = pro.getProPlanName(proNum) + ' (' + numOfMonths + ' ' + monthWording + ')';
 
             // Render table row
             html += '<tr>'
@@ -1482,36 +1479,6 @@ function accountUI() {
 
     }, 1);
 
-    // Show first name or last name
-    if (u_attr.firstname) {
-        $('.membership-big-txt.name').text(u_attr.firstname + ' ' + u_attr.lastname);
-    }
-    else {
-        $('.membership-big-txt.name').text(u_attr.name);
-    }
-
-    // Show Membership plan
-    $('.fm-tree-panel .small-icon.membership').removeClass('pro1 pro2 pro3 pro4');
-    if (u_attr.p) {
-        // LITE/PRO account
-        var planNum = u_attr.p;
-        var planText = getProPlan(planNum);
-
-        $('.account.membership-plan').text(planText);
-        $('.small-icon.membership').addClass('pro' + planNum);
-    }
-    else {
-        $('.account.membership-plan').text(l[435]);
-    }
-
-    // Show email address
-    if (u_attr.email) {
-        $('.membership-big-txt.email').text(u_attr.email);
-    }
-    else {
-        $('.membership-big-txt.email').hide();
-    }
-
     $('.editprofile').rebind('click', function() {
         loadSubPage('fm/account');
     });
@@ -1531,7 +1498,7 @@ function accountUI() {
 
             // Get payment method name
             var paymentMethodId = purchaseTransaction[4];
-            var paymentMethod = getGatewayName(paymentMethodId).name;
+            var paymentMethod = pro.getPaymentGatewayName(paymentMethodId).name;
 
             // If they have paid with iTunes or Google Play in the past
             if ((paymentMethod === 'apple') || (paymentMethod === 'google')) {
@@ -1764,6 +1731,48 @@ function accountUI() {
     });
     accNotifHandler = undefined;
 }
+
+/**
+ * Update user UI (pro plan, avatar, first/last name, email)
+ */
+accountUI.userUIUpdate = function() {
+    'use strict';
+
+    // Show Membership plan
+    $('.small-icon.membership').removeClass('pro1 pro2 pro3 pro4');
+    if (u_attr.p) {
+        // LITE/PRO account
+        var planNum = u_attr.p;
+        var planText = pro.getProPlanName(planNum);
+
+        $('.account.membership-plan').text(planText);
+        $('.small-icon.membership').addClass('pro' + planNum);
+    }
+    else {
+        $('.account.membership-plan').text(l[435]);
+    }
+
+    // update avatar
+    $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', true));
+    $('.fm-avatar').safeHTML(useravatar.contact(u_handle, '', 'div'));
+
+
+    // Show first name or last name
+    if (u_attr.firstname) {
+        $('.membership-big-txt.name').text(u_attr.firstname + ' ' + u_attr.lastname);
+    }
+    else {
+        $('.membership-big-txt.name').text(u_attr.name);
+    }
+
+    // Show email address
+    if (u_attr.email) {
+        $('.membership-big-txt.email').text(u_attr.email);
+    }
+    else {
+        $('.membership-big-txt.email').hide();
+    }
+};
 
 /**
  * Helper function to fill common charts into the dashboard and account sections

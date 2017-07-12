@@ -261,7 +261,7 @@ MegaData.prototype.clearRubbish = function(all) {
 
     if (all) {
         // Completely empty rubbish
-        selids = Object.keys(this.c[M.RubbishID]);
+        selids = Object.keys(this.c[M.RubbishID] || {});
     }
     else {
         // Remove only selected items, not all at once

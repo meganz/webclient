@@ -5405,9 +5405,7 @@ function fm_resize_handler(force) {
             'margin-left': ($('.fm-left-panel:visible').width() + $('.nw-fm-left-icons-panel').width()) + "px"
         });
 
-        if (mega.ui.tpp.isVisible()) {
-            $('.popup.transfer-widget:visible').width($('.fm-left-panel:visible').width() - 8);
-        }
+        $('.popup.transfer-widget').width($('.fm-left-panel:visible').width() - 9);
     }
 
     if (M.currentrootid === 'shares') {

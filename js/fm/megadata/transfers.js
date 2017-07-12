@@ -404,7 +404,10 @@ MegaData.prototype.onDownloadAdded = function(added, isPaused, isZIP, zipSize) {
         $('.transfer-pause-icon').removeClass('disabled');
         $('.transfer-clear-completed').removeClass('disabled');
         $('.transfer-clear-all-icon').removeClass('disabled');
-        mega.ui.tpp.started('dl');
+
+        M.onFileManagerReady(function() {
+            mega.ui.tpp.started('dl');
+        });
     }
 };
 

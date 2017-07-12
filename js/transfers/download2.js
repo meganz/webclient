@@ -1300,7 +1300,10 @@ function fm_tfspause(gid, overquota) {
                 $tr.find('.transfer-status').text(l[7227]);
             }
 
-            mega.ui.tpp.pause(gid, gid[0] === 'u' ? 'ul' : 'dl');
+            if (fminitialized) {
+                // FIXME: do not rely on cached DOM nodes and just queue the paused state for transfers
+                mega.ui.tpp.pause(gid, gid[0] === 'u' ? 'ul' : 'dl');
+            }
         }
         return true;
     }

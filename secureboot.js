@@ -1660,10 +1660,8 @@ else if (!b_u) {
         var langCodeVariant = null;
 
         // If a search bot, they may set the URL as e.g. mega.nz/pro?es so get the language from that
-		
         if (is_bot && locationSearchParams !== '') {
             userLang = locationSearchParams.replace('?', '');
-			console.log(userLang);
         }
         else {
             // Otherwise get the user's preferred language in their browser settings

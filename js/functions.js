@@ -171,6 +171,7 @@ function ellipsis(text, location, maxCharacters) {
 }
 
 function megatitle(nperc) {
+	return;
     if (!nperc) {
         nperc = '';
     }
@@ -181,8 +182,8 @@ function megatitle(nperc) {
     else {
         a = '';
     }
-    if (document.title !== a + 'MEGA' + nperc) {
-        document.title = a + 'MEGA' + nperc;
+    if (document.title !== a + mega_title + nperc) {
+        document.title = a + mega_title + nperc;
     }
 }
 

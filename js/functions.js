@@ -171,6 +171,7 @@ function ellipsis(text, location, maxCharacters) {
 }
 
 function megatitle(nperc) {
+	return;
     if (!nperc) {
         nperc = '';
     }
@@ -181,8 +182,8 @@ function megatitle(nperc) {
     else {
         a = '';
     }
-    if (document.title !== a + 'MEGA' + nperc) {
-        document.title = a + 'MEGA' + nperc;
+    if (document.title !== a + mega_title + nperc) {
+        document.title = a + mega_title + nperc;
     }
 }
 
@@ -792,22 +793,6 @@ function oIsFrozen(obj) {
 }
 
 /**
- *  Remove an element from an *array*
- */
-function removeValue(array, value, can_fail) {
-    var idx = array.indexOf(value);
-    if (d) {
-        if (!(can_fail || idx !== -1)) {
-            console.warn('Unable to Remove Value ' + value, value);
-        }
-    }
-    if (idx !== -1) {
-        array.splice(idx, 1);
-    }
-    return idx !== -1;
-}
-
-/**
  * Original: http://stackoverflow.com/questions/7317299/regex-matching-list-of-emoticons-of-various-type
  *
  * @param text
@@ -824,42 +809,6 @@ function unixtimeToTimeString(timestamp) {
         + ":" + addZeroIfLenLessThen(date.getMinutes(), 2);
 }
 
-/**
- * Get an array with unique values
- * @param {Array} arr Array
- */
-function array_unique(arr) {
-    return arr.reduce(function(out, value) {
-        if (out.indexOf(value) < 0) {
-            out.push(value);
-        }
-        return out;
-    }, []);
-}
-
-/**
- * Get a random value from an array
- * @param {Array} arr Array
- */
-function array_random(arr) {
-    return arr[rand(arr.length)];
-}
-
-/**
- * Convert Array to Object
- * @param {Array|String} arr The array
- * @param {*} [value] Optional value to assign to objects
- * @returns {Object}
- */
-function array_toobject(arr, value) {
-    if (!Array.isArray(arr)) {
-        arr = [arr];
-    }
-    return arr.reduce(function(obj, key, idx) {
-        obj[key] = value !== undefined ? value : ((idx | 0) + 1);
-        return obj;
-    }, Object.create(null));
-}
 
 /**
  * Simple method that will convert Mega user ids to base32 strings (that should be used when doing XMPP auth)
@@ -1103,15 +1052,10 @@ function percent_megatitle() {
         t = '';
         $.transferprogress = Object.create(null);
     }
+    megatitle(t);
 
     var d_deg = 360 * x_dl / 100;
     var u_deg = 360 * x_ul / 100;
-
-    updateTransfersSidebarIcon(d_deg, u_deg);
-    megatitle(t);
-}
-
-function updateTransfersSidebarIcon(d_deg, u_deg) {
     var $dl_rchart = $('.transfers .download .nw-fm-chart0.right-c p');
     var $dl_lchart = $('.transfers .download .nw-fm-chart0.left-c p');
     var $ul_rchart = $('.transfers .upload .nw-fm-chart0.right-c p');
@@ -1205,35 +1149,6 @@ function getHtmlElemPos(elem, n) {
         x: xPos,
         y: yPos
     };
-}
-
-var obj_values = function obj_values(obj) {
-    var vals = [];
-
-    Object.keys(obj).forEach(function(memb) {
-        if (typeof obj.hasOwnProperty !== 'function' || obj.hasOwnProperty(memb)) {
-            vals.push(obj[memb]);
-        }
-    });
-
-    return vals;
-};
-
-if (typeof Object.values === 'function') {
-    obj_values = Object.values;
-}
-else {
-    Object.values = obj_values;
-}
-
-function hex2bin(hex) {
-    var bytes = [];
-
-    for (var i = 0; i < hex.length - 1; i += 2) {
-        bytes.push(parseInt(hex.substr(i, 2), 16));
-    }
-
-    return String.fromCharCode.apply(String, bytes);
 }
 
 /**
@@ -2471,147 +2386,6 @@ if (typeof sjcl !== 'undefined') {
     };
 })(window);
 
-/**
- * Get a string for the payment plan number
- * @param {Number} planNum The plan number e.g. 1, 2, 3, 4
- * @returns {String} The plan name i.e. PRO I, PRO II, PRO III, LITE
- */
-function getProPlan(planNum) {
-
-    switch (planNum) {
-        case 1:
-            return l[5819];     // PRO I
-        case 2:
-            return l[6125];     // PRO II
-        case 3:
-            return l[6126];     // PRO III
-        case 4:
-            return l[6234];     // LITE
-        default:
-            return l[435];      // FREE
-    }
-}
-
-/**
- * Returns the name of the gateway / payment provider and display name. The API will only
- * return the gateway ID which is unique on the API and will not change.
- *
- * @param {Number} gatewayId The number of the gateway/provider from the API
- * @returns {Object} Returns an object with two keys, the 'name' which is a unique string
- *                   for the provider which can be used for displaying icons etc, and the
- *                   'displayName' which is the translated name for that provider (however
- *                   company names are not translated).
- */
-function getGatewayName(gatewayId, gatewayOpt) {
-
-    var gateways = {
-        0: {
-            name: 'voucher',
-            displayName: l[487]     // Voucher code
-        },
-        1: {
-            name: 'paypal',
-            displayName: l[1233]    // PayPal
-        },
-        2: {
-            name: 'apple',
-            displayName: 'Apple'
-        },
-        3: {
-            name: 'google',
-            displayName: 'Google'
-        },
-        4: {
-            name: 'bitcoin',
-            displayName: l[6802]    // Bitcoin
-        },
-        5: {
-            name: 'dynamicpay',
-            displayName: l[7109]    // UnionPay
-        },
-        6: {
-            name: 'fortumo',
-            displayName: l[7219] + ' (' + l[7110] + ')'    // Mobile (Fortumo)
-        },
-        7: {
-            name: 'stripe',
-            displayName: l[7111]    // Credit Card
-        },
-        8: {
-            name: 'perfunctio',
-            displayName: l[7111]    // Credit Card
-        },
-        9: {
-            name: 'infobip',
-            displayName: l[7219] + ' (Centilli)'    // Mobile (Centilli)
-        },
-        10: {
-            name: 'paysafecard',
-            displayName: 'paysafecard'
-        },
-        11: {
-            name: 'astropay',
-            displayName: 'AstroPay'
-        },
-        12: {
-            name: 'reserved',
-            displayName: 'reserved' // TBD
-        },
-        13: {
-            name: 'windowsphone',
-            displayName: l[8660]    // Windows Phone
-        },
-        14: {
-            name: 'tpay',
-            displayName: l[7219] + ' (T-Pay)'       // Mobile (T-Pay)
-        },
-        15: {
-            name: 'directreseller',
-            displayName: l[6952]    // Credit card
-        },
-        16: {
-            name: 'ecp',                    // E-Comprocessing
-            displayName: l[6952] + ' (ECP)' // Credit card (ECP)
-        },
-        17: {
-            name: 'sabadell',
-            displayName: 'Sabadell'
-        },
-        999: {
-            name: 'wiretransfer',
-            displayName: l[6198]    // Wire transfer
-        }
-    };
-
-    // If the gateway option information was provided we can improve the default naming in some cases
-    if (typeof gatewayOpt !== 'undefined') {
-        if (typeof gateways[gatewayId] !== 'undefined') {
-            // Subgateways should always take their subgateway name from the API if provided
-            gateways[gatewayId].name =
-                (gatewayOpt.type === 'subgateway') ? gatewayOpt.gatewayName : gateways[gatewayId].name;
-
-            // Direct reseller still requires the translation from above to be in its name
-            if (gatewayId === 15 && gatewayOpt.type !== 'subgateway') {
-                gateways[gatewayId].displayName = gateways[gatewayId].displayName + " " + gatewayOpt.displayName;
-            }
-            else {
-                gateways[gatewayId].displayName =
-                    (gatewayOpt.type === 'subgateway') ? gatewayOpt.displayName : gateways[gatewayId].displayName;
-            }
-        }
-    }
-
-    // If the gateway exists, return it
-    if (typeof gateways[gatewayId] !== 'undefined') {
-        return gateways[gatewayId];
-    }
-
-    // Otherwise return a placeholder for currently unknown ones
-    return {
-        name: 'unknown',
-        displayName: 'Unknown'
-    };
-}
 
 // Constructs an extensible hashmap-like class...
 function Hash(a, b, c, d) {

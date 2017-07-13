@@ -1417,6 +1417,7 @@
     </div>
 </div>
 
+<!-- Register/Login required dialog for desktop !-->
 <div class="fm-dialog loginrequired-dialog hidden">
     <div class="fm-dialog-header">
         <div class="fm-dialog-title"><span>[$14]</span></div>
@@ -1438,7 +1439,6 @@
         <div class="clear"></div>
     </div>
 </div>
-
 
 <div class="fm-dialog fm-mega-dialog feedback-dialog hidden">
     <div class="overlay-close">
@@ -1765,59 +1765,6 @@
     <div class="payment-animation-pad">
         <img class="payment-animation" alt="" />
         <div class="payment-animation-txt">[$6960]</div>
-    </div>
-</div>
-
-<div class="payment-result success hidden">
-    <div class="payment-close">
-        <div class="payment-close-icon"></div>
-        <span></span>
-    </div>
-    <div class="payment-result-pad">
-        <div class="payment-result-header">[$6961]!</div>
-        <div class="payment-result-txt">[$6962]</div>
-        <div class="payment-result-icon"></div>
-        <div class="payment-result-button">[$6690]</div>
-    </div>
-</div>
-
-<div class="payment-result failed hidden">
-    <div class="payment-close">
-        <div class="payment-close-icon"></div>
-        <span></span>
-    </div>
-    <div class="payment-result-pad">
-        <div class="payment-result-header">[$6949]</div>
-        <div class="payment-result-txt">[$6950]</div>
-        <div class="payment-result-icon"></div>
-        <div class="payment-result-button">[$1472]</div>
-    </div>
-</div>
-
-<!-- Pending confirmation -->
-<div class="payment-result pending original hidden">
-    <div class="payment-close">
-        <div class="payment-close-icon"></div>
-        <span></span>
-    </div>
-    <div class="payment-result-pad">
-        <div class="payment-result-header">[$7983]</div>
-        <div class="payment-result-txt">[$8755]</div>
-        <div class="payment-result-icon"></div>
-        <div class="payment-result-button">[$6690]</div>
-    </div>
-</div>
-
-<div class="payment-result pending alternate hidden">
-    <div class="payment-close">
-        <div class="payment-close-icon"></div>
-        <span></span>
-    </div>
-    <div class="payment-result-pad">
-        <div class="payment-result-header">[$7983]</div>
-        <div class="payment-result-txt">[$10636]</div>
-        <div class="payment-result-icon"></div>
-        <div class="payment-result-button">[$6690]</div>
     </div>
 </div>
 
@@ -2570,7 +2517,7 @@
 
         <div class="plan-blocks step1-block">
             <div class="dialog transfer-plans">
-                <div class="reg-st3-membership-bl pro4 selected" data-payment="lite">
+                <div class="reg-st3-membership-bl pro4 selected" data-payment="4">
                     <div class="membership-pad-bl">
                         <div class="reg-st3-bott-title title">[$6234]</div>
                         <div class="membership-gray-block">
@@ -2598,7 +2545,7 @@
                         </div>
                         <div class="reg-st3-storage">
                             <div class="pro-feature-icon"></div>
-                            <div class="reg-st3-big-txt">500 <span>GB</span></div>
+                            <div class="reg-st3-big-txt">1 <span>TB</span></div>
                             <div class="reg-st3-mid-txt">[$495]</div>
                             <div class="clear"></div>
                         </div>
@@ -2618,13 +2565,13 @@
                         </div>
                         <div class="reg-st3-storage">
                             <div class="pro-feature-icon"></div>
-                            <div class="reg-st3-big-txt">2 <span>TB</span></div>
+                            <div class="reg-st3-big-txt">4 <span>TB</span></div>
                             <div class="reg-st3-mid-txt">[$495]</div>
                             <div class="clear"></div>
                         </div>
                         <div class="reg-st3-bandwidth">
                             <div class="pro-feature-icon bandwidth"></div>
-                            <div class="reg-st3-big-txt">4 <span>TB</span></div>
+                            <div class="reg-st3-big-txt">8 <span>TB</span></div>
                             <div class="reg-st3-mid-txt">[$16120]</div>
                             <div class="clear"></div>
                         </div>
@@ -2638,13 +2585,13 @@
                         </div>
                         <div class="reg-st3-storage">
                             <div class="pro-feature-icon"></div>
-                            <div class="reg-st3-big-txt">4 <span>TB</span></div>
+                            <div class="reg-st3-big-txt">8 <span>TB</span></div>
                             <div class="reg-st3-mid-txt">[$495]</div>
                             <div class="clear"></div>
                         </div>
                         <div class="reg-st3-bandwidth">
                             <div class="pro-feature-icon bandwidth"></div>
-                            <div class="reg-st3-big-txt">8 <span>TB</span></div>
+                            <div class="reg-st3-big-txt">16 <span>TB</span></div>
                             <div class="reg-st3-mid-txt">[$16120]</div>
                             <div class="clear"></div>
                         </div>
@@ -3503,5 +3450,61 @@
     </div>
     <div class="fm-notifications-bottom">
         <div class="fm-purchase-voucher default-grey-button"><span>[$457]</span></div>
+    </div>
+</div>
+
+<!-- Payment success dialog -->
+<div class="payment-result success hidden">
+    <div class="payment-close">
+        <div class="payment-close-icon"></div>
+        <span></span>
+    </div>
+    <div class="payment-result-pad">
+        <div class="payment-result-header">[$6961]!</div>
+        <div class="payment-result-txt">[$6962]</div>
+        <div class="payment-result-icon"></div>
+        <div class="payment-result-button">[$6690]</div>
+    </div>
+</div>
+
+<!-- Payment failure dialog -->
+<div class="payment-result failed hidden">
+    <div class="payment-close">
+        <div class="payment-close-icon"></div>
+        <span></span>
+    </div>
+    <div class="payment-result-pad">
+        <div class="payment-result-header">[$6949]</div>
+        <div class="payment-result-txt">[$6950]</div>
+        <div class="payment-result-icon"></div>
+        <div class="payment-result-button">[$1472]</div>
+    </div>
+</div>
+
+<!-- Pending confirmation -->
+<div class="payment-result pending original hidden">
+    <div class="payment-close">
+        <div class="payment-close-icon"></div>
+        <span></span>
+    </div>
+    <div class="payment-result-pad">
+        <div class="payment-result-header">[$7983]</div>
+        <div class="payment-result-txt">[$8755]</div>
+        <div class="payment-result-icon"></div>
+        <div class="payment-result-button">[$6690]</div>
+    </div>
+</div>
+
+<!-- Payment confirmation pending (alternative) -->
+<div class="payment-result pending alternate hidden">
+    <div class="payment-close">
+        <div class="payment-close-icon"></div>
+        <span></span>
+    </div>
+    <div class="payment-result-pad">
+        <div class="payment-result-header">[$7983]</div>
+        <div class="payment-result-txt">[$10636]</div>
+        <div class="payment-result-icon"></div>
+        <div class="payment-result-button">[$6690]</div>
     </div>
 </div>

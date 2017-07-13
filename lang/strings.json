@@ -12620,7 +12620,7 @@
         "context": "A warning for serious infringers who have had their accounts suspended. This is shown to them during login in a dialog."
     },
     "8604": {
-        "text": "This gives you 500 GB of storage space and 2 TB of transfer quota per month for one year.",
+        "text": "This gives you 1 TB of storage space and 2 TB of transfer quota per month for one year.",
         "context": "A description of the in-app purchase for the PRO I annual plan (only one year and no recurring subscription) in the Windows Phone store."
     },
     "8605": {
@@ -12628,7 +12628,7 @@
         "context": "Title of the in-app purchase for the PRO I annual plan in the Windows Phone store. This gives them only one year and no subscription."
     },
     "8606": {
-        "text": "This gives you 500 GB of storage space and 2 TB of transfer quota for one month.",
+        "text": "This gives you 1 TB of storage space and 2 TB of transfer quota for one month.",
         "context": "A description of the in-app purchase for the PRO I monthly plan (only one month and no subscription) in the Windows Phone store."
     },
     "8607": {
@@ -12636,7 +12636,7 @@
         "context": "Title of the in-app purchase for the PRO 1 monthly plan in the Windows Phone store. This gives them only one month and no subscription."
     },
     "8608": {
-        "text": "This gives you 2 TB of storage space and 4 TB of transfer quota per month for one year.",
+        "text": "This gives you 4 TB of storage space and 8 TB of transfer quota per month for one year.",
         "context": "A description of the in-app purchase for the PRO II annual plan (only one year and no recurring subscription) in the Windows Phone store."
     },
     "8609": {
@@ -12644,7 +12644,7 @@
         "context": "Title of the in-app purchase for the PRO II annual plan in the Windows Phone store. This gives them only one year and no subscription."
     },
     "8610": {
-        "text": "This gives you 2 TB of storage space and 4 TB of transfer quota for one month.",
+        "text": "This gives you 4 TB of storage space and 8 TB of transfer quota for one month.",
         "context": "A description of the in-app purchase for the PRO II monthly plan (only one month and no subscription) in the Windows Phone store."
     },
     "8611": {
@@ -12652,7 +12652,7 @@
         "context": "Title of the in-app purchase for the PRO II monthly plan in the Windows Phone store. This gives them only one month and no subscription."
     },
     "8612": {
-        "text": "This gives you 4 TB of storage space and 8 TB of transfer quota per month for one year.",
+        "text": "This gives you 8 TB of storage space and 16 TB of transfer quota per month for one year.",
         "context": "A description of the in-app purchase for the PRO III annual plan (only one year and no recurring subscription) in the Windows Phone store."
     },
     "8613": {
@@ -12660,7 +12660,7 @@
         "context": "Title of the in-app purchase for the PRO III annual plan in the Windows Phone store. This gives them only one year and no subscription."
     },
     "8614": {
-        "text": "This gives you 4 TB of storage space and 8 TB of transfer quota for one month.",
+        "text": "This gives you 8 TB of storage space and 16 TB of transfer quota for one month.",
         "context": "A description of the in-app purchase for the PRO III monthly plan (only one month and no subscription) in the Windows Phone store."
     },
     "8615": {
@@ -16023,10 +16023,6 @@
         "text": "Inside the app you can upgrade your storage space and transfer quota with a monthly or yearly subscription.",
         "context": "Paragraph 4 of the general description of MEGA which is shown on the app stores in Android, iOS and Windows Phone."
     },
-    "16372": {
-        "text": "PRO LITE subscription: \u20ac4.99 (US$4.99) per month or \u20ac49.99 (US$49.99) per year gives you 200 GB of storage space and 1 TB of transfer quota per month.\r\nPRO I subscription: \u20ac9.99 (US$9.99) per month or \u20ac99.99 (US$99.99) per year gives you 500 GB of storage space and 2 TB of transfer quota per month.\r\nPRO II subscription: \u20ac19.99 (US$19.99) per month or \u20ac199.99 (US$199.99) per year gives you 2 TB of storage space and 4 TB of transfer quota per month.\r\nPRO III subscription: \u20ac29.99 (US$29.99) per month or \u20ac299.99 (US$299.99) per year gives you 4 TB of storage space and 8 TB of transfer quota per month.",
-        "context": "Paragraph 5 of the general description of MEGA which is shown on the apps stores in Android, iOS and Windows Phone. Please keep the multiple line format."
-    },
     "16373": {
         "text": "For more info, please check our website:\r\nMobile - https:\/\/mega.nz\/mobile_terms.html - https:\/\/mega.nz\/mobile_privacy.html\r\nDesktop - https:\/\/mega.nz\/",
         "context": "Paragraph 6 of the general description of MEGA which is shown on the app stores in Android, iOS and Windows Phone. Please keep the multiple line format."
@@ -17074,5 +17070,17 @@
     "16658": {
         "text": "This could be due to the following reasons:\r\n- The file has been removed because of a ToS\/AUP violation.\r\n- Invalid URL \u2013 the link you are trying to access does not exist.\r\n- The file has been deleted by the user.",
         "context": "An error message which is shown when you open a file link and it's no longer available. It explains the reasons that could be causing it."
+    },
+    "16659": {
+        "text": "Show me away after 1 minute of inactivity",
+        "context": "Footer text to explain the meaning of the functionaly 'Auto-away' of your chat status."
+    },
+    "16660": {
+        "text": "PRO LITE subscription: \u20ac4.99 (US$4.99) per month or \u20ac49.99 (US$49.99) per year gives you 200 GB of storage space and 1 TB of transfer quota per month.\r\nPRO I subscription: \u20ac9.99 (US$9.99) per month or \u20ac99.99 (US$99.99) per year gives you 1 TB of storage space and 2 TB of transfer quota per month.\r\nPRO II subscription: \u20ac19.99 (US$19.99) per month or \u20ac199.99 (US$199.99) per year gives you 4 TB of storage space and 8 TB of transfer quota per month.\r\nPRO III subscription: \u20ac29.99 (US$29.99) per month or \u20ac299.99 (US$299.99) per year gives you 8 TB of storage space and 16 TB of transfer quota per month.",
+        "context": "Paragraph 5 of the general description of MEGA which is shown on the apps stores in Android, iOS and Windows Phone. Please keep the multiple line format."
+    },
+    "16664": {
+        "text": "The new password must be different from the old one.",
+        "context": "A message on an error dialog which is shown when a user tries to change their account password but the new password is the same as the old one."
     }
 }

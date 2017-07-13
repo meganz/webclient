@@ -41,6 +41,18 @@ function u_login2(ctx, ks) {
             u_storage.privk = base64urlencode(crypto_encodeprivkey(ks[2]));
         }
         u_checklogin(ctx, false);
+
+        // Logging to see how many people are signing
+        onIdle(function() {
+            if (is_mobile) {
+                api_req({a: 'log', e: 99629, m: 'Completed login on mobile webclient'});
+            }
+            else {
+                api_req({a: 'log', e: 99630, m: 'Completed login on regular webclient'});
+            }
+
+            mBroadcaster.sendMessage('login', ks);
+        });
     }
     else {
         ctx.checkloginresult(ctx, false);
@@ -694,7 +706,7 @@ function processEmailChangeActionPacket(ap) {
                         u_h,
                         _lastUserInteractionCache[u_h],
                         false,
-                        false
+                        true
                     );
 
                     $promise.verify();
@@ -795,16 +807,6 @@ function processEmailChangeActionPacket(ap) {
             return _lastUserInteractionPromiseCache[u_h];
         }
         else if (_lastUserInteractionCache[u_h]) {
-            if (megaChatIsReady) {
-                var chatRoom = megaChat.getPrivateRoom(u_h);
-
-                if (chatRoom) {
-                    var newActivity = parseInt(_lastUserInteractionCache[u_h].split(":")[1], 10);
-                    if (newActivity > chatRoom.lastActivity) {
-                        chatRoom.lastActivity = newActivity;
-                    }
-                }
-            }
             $promise.resolve(_lastUserInteractionCache[u_h]);
         }
         else if (

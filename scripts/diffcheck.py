@@ -418,6 +418,7 @@ def reduce_validator(file_line_mapping, **extra):
                           'any new functions must be moved elsewhere.'.format(file_path))
             continue;
 
+        lines = []
         with open(file_path, 'r') as fd:
             # Check line lengths in file.
             line_number = 0
@@ -436,17 +437,28 @@ def reduce_validator(file_line_mapping, **extra):
                                   .format(file_path, line_number, line_length))
                     break
 
+                lines.append(line.rstrip())
+
                 # Analyse JavaScript files...
                 if file_extension in ['.js', '.jsx']:
                     fatal += inspectjs(file_path, line_number, line, result)
                     continue
+
+        # Further inspect all modifications in a whole instead of per-lines
+        snippet = '\n'.join(lines)
+        # print('>>>>>>>>>>>>>>>>>> {}:{}'.format(file_path, snippet))
+        match = re.search(r'(\w+\s*\(\s*\n\s*[^\s,]{1,12})\s*(?:\n|$)', snippet)
+        if match:
+            fatal += 1
+            result.append('Found non-sensical statement spreaded '
+                'around several lines on file {}:\n{} ...'.format(file_path, match.group(1)))
 
 
     # Add the number of errors and return in a nicely formatted way.
     error_count = len(result) - 1
     if error_count == 0:
         return '', 0
-    result.append('\n{} issues found analizing modified files.'
+    result.append('\n{} issues found analysing modified files.'
                   .format(error_count))
     return '\n\n'.join(result), error_count, fatal
 

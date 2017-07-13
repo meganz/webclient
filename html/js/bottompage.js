@@ -8,8 +8,9 @@ var bottompage = {
      */
     init: function() {
         bottompage.initNavButtons();
-        if (page.substr(0,4) == 'help' || page === 'cpage' || page.substr(0, 9) == 'corporate') {
-            $('body').addClass('old');   
+        if (page.substr(0, 4) === 'help' || page === 'cpage' || page.substr(0, 9) === 'corporate') {
+            $('body').addClass('old');
+            scrollMenu();
         }
         else {
             $('body').removeClass('old');
@@ -48,7 +49,8 @@ var bottompage = {
                 var leftPos;
                 var topPos;
                 var thisLeftPos = $this.offset().left + $this.outerWidth()/2;
-                var thisTopPos = $this.offset().top;
+                var thisTopPos = $this.offset().top -
+                    (window.scrollY || window.pageYOffset || document.body.scrollTop);
                 var browserWidth = $('body').outerWidth();
 
                 if (browserWidth >= 655) {
@@ -85,6 +87,10 @@ var bottompage = {
             }
 
             navDropdownPos();
+            
+            $('body, html').rebind('touchmove.bodyscroll', function () {
+                hiddenNavDropdown();
+            });
 
             $(window).rebind('resize.navdropdown', function (e) {
                 navDropdownPos();
@@ -96,6 +102,7 @@ var bottompage = {
             $('.nav-button.compound-lnk.opened').removeClass('opened');
             $('.pages-nav.nav-button.active.greyed-out').removeClass('greyed-out');
             $('.pages-nav.compound-items.active').removeClass('active').removeAttr('style');
+            $('body, html').unbind('touchmove.bodyscroll');
             $(window).unbind('resize.navdropdown');
         }
 
@@ -119,6 +126,7 @@ var bottompage = {
     },
 
     initFloatingTop: function() {
+
         function topResize() {
             var $topHeader = $('.bottom-page .top-head, .old .top-head');
             if ($topHeader.hasClass('floating')) {
@@ -133,8 +141,8 @@ var bottompage = {
             topResize();
         });
 
-        $('.bottom-page.scroll-block, .old .fmholder').scroll(function() {
-            var $topHeader = $(this).find('.top-head');
+        $('.bottom-pages .fmholder').rebind('scroll.topmenu', function() {
+            var $topHeader = $('.top-head');
             var topPos = $(this).scrollTop();
             if (topPos > 300) {
                 $topHeader.addClass('floating');

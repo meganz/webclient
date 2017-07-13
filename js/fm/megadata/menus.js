@@ -34,54 +34,39 @@
      * @param {string} id - parent folder handle
      */
     MegaData.prototype.buildSubMenu = function(id) {
-
-        var folders = [],
-            sub, cs, sm, fid, sharedFolder, html;
-        var nodeName = '';
-
-        for (var i in this.c[id]) {
-            if (this.d[i] && this.d[i].t === 1) {
-                folders.push(this.d[i]);
-            }
-        }
+        var cs;
+        var sm;
+        var fid;
+        var html;
+        var nodeName;
+        var sharedFolder;
+        var tree = Object(M.tree[id]);
+        var folders = obj_values(tree);
 
         // Check existance of sub-menu
         if ($('#csb_' + id + ' > .dropdown-item').length !== folders.length) {
-            // localeCompare is not supported in IE10, >=IE11 only
             // sort by name is default in the tree
             folders.sort(function(a, b) {
-                if (a.name) {
-                    return a.name.localeCompare(b.name);
-                }
+                return M.compareStrings(a.name, b.name, 1);
             });
 
-            for (var i in folders) {
-                sub = false;
+            for (var i = 0; i < folders.length; i++) {
                 cs = '';
                 sm = '';
                 fid = folders[i].h;
 
-                for (var h in this.c[fid]) {
-                    if (this.d[h] && this.d[h].t) {
-                        sub = true;
-                        cs = ' contains-submenu';
-                        sm = '<span class="dropdown body submenu" id="sm_' + fid + '">'
-                            + '<span id="csb_' + fid + '"></span>' + arrow + '</span>';
-                        break;
-                    }
+                if (this.tree[fid]) {
+                    cs = ' contains-submenu';
+                    sm = '<span class="dropdown body submenu" id="sm_' + fid + '">'
+                        + '<span id="csb_' + fid + '"></span>' + arrow + '</span>';
                 }
 
                 sharedFolder = 'folder-item';
-                if (typeof this.d[fid].shares !== 'undefined') {
+                if (folders[i].t & M.IS_SHARED) {
                     sharedFolder += ' shared-folder-item';
                 }
 
-                if (missingkeys[fid]) {
-                    nodeName = l[8686];
-                }
-                else {
-                    nodeName = this.d[fid].name;
-                }
+                nodeName = missingkeys[fid] ? l[8686] : folders[i].name;
 
                 html = '<span class="dropdown-item ' + sharedFolder + cs + '" id="fi_' + fid + '">'
                     + '<i class="small-icon context ' + sharedFolder + '"></i>'
@@ -117,38 +102,11 @@ MegaData.prototype.menuItems = function menuItems() {
 MegaData.prototype.menuItemsSync = function menuItemsSync() {
     "use strict";
 
-    var selItem,
-        items = Object.create(null),
-        share = {},
-        exportLink = {},
-        isTakenDown = false,
-        hasExportLink = false,
-        sourceRoot = M.getNodeRoot($.selected[0]);
+    var items = Object.create(null);
+    var selNode = M.d[$.selected[0]] || false;
+    var sourceRoot = M.getNodeRoot($.selected[0]);
 
-    // Show Rename action in case that only one item is selected
-    if (($.selected.length === 1) && (M.getNodeRights($.selected[0]) > 1)) {
-        items['.rename-item'] = 1;
-    }
-
-    if (((Object.keys($.selected)).length < 2)
-        && (M.getNodeRights($.selected[0]) > 1)) {
-
-        items['.add-star-item'] = 1;
-
-        if (M.isFavourite($.selected)) {
-            $('.add-star-item').safeHTML('<i class="small-icon context broken-heart"></i>@@', l[5872]);
-        }
-        else {
-            $('.add-star-item').safeHTML('<i class="small-icon context heart"/></i>@@', l[5871]);
-        }
-
-        items['.colour-label-items'] = 1;
-        M.colourLabelcmUpdate(M.d[$.selected[0]]);
-    }
-
-    selItem = M.d[$.selected[0]];
-
-    if (selItem && selItem.su && !M.d[selItem.p]) {
+    if (selNode && selNode.su && !M.d[selNode.p]) {
         items['.removeshare-item'] = 1;
     }
     else if (M.getNodeRights($.selected[0]) > 1) {
@@ -156,9 +114,9 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
         items['.remove-item'] = 1;
     }
 
-    if (selItem && $.selected.length === 1) {
-        if (selItem.t) {
-            if (M.currentdirid !== selItem.h) {
+    if (selNode && $.selected.length === 1) {
+        if (selNode.t) {
+            if (M.currentdirid !== selNode.h) {
                 items['.open-item'] = 1;
             }
 
@@ -166,8 +124,23 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
                 items['.sh4r1ng-item'] = 1;
             }
         }
-        else if (is_image(selItem)) {
+        else if (is_image(selNode)) {
             items['.preview-item'] = 1;
+        }
+
+        if (M.getNodeRights(selNode.h) > 1) {
+            items['.rename-item'] = 1;
+            items['.add-star-item'] = 1;
+            items['.colour-label-items'] = 1;
+
+            if (M.isFavourite(selNode.h)) {
+                $('.add-star-item').safeHTML('<i class="small-icon context broken-heart"></i>@@', l[5872]);
+            }
+            else {
+                $('.add-star-item').safeHTML('<i class="small-icon context heart"/></i>@@', l[5871]);
+            }
+
+            M.colourLabelcmUpdate(selNode);
         }
     }
 
@@ -175,15 +148,15 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
         items['.move-item'] = 1;
         items['.getlink-item'] = 1;
 
-        share = new mega.Share();
-        hasExportLink = share.hasExportLink($.selected);
+        var cl = new mega.Share();
+        var hasExportLink = cl.hasExportLink($.selected);
 
         if (hasExportLink) {
             items['.removelink-item'] = true;
         }
 
-        exportLink = new mega.Share.ExportLink();
-        isTakenDown = exportLink.isTakenDown($.selected);
+        cl = new mega.Share.ExportLink();
+        var isTakenDown = cl.isTakenDown($.selected);
 
         // If any of selected items is taken down remove actions from context menu
         if (isTakenDown) {
@@ -194,12 +167,11 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
             delete items['.colour-label-items'];
         }
     }
-
     else if (sourceRoot === M.RubbishID && !folderlink) {
         items['.move-item'] = 1;
     }
 
-    if (selItem) {
+    if (selNode) {
         items['.download-item'] = 1;
         items['.zipdownload-item'] = 1;
         items['.copy-item'] = 1;

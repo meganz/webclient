@@ -2,8 +2,9 @@
  * CSS for the desktop and mobile toast notifications
  */
 .toast-notification {
-    width: 507px;
-    position: absolute;
+    width: 100%;
+    max-width: 507px;
+    position: fixed;
     bottom: 8px;
     left: 50%;
     margin: 0 0 -72px -253px;

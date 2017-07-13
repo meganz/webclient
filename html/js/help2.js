@@ -114,13 +114,16 @@ var Help = (function() {
 
     function helpScrollTo(selector) {
         var $target = $(selector);
+        var $dataTarget = $('*[data-update="' + selector + '"]');
         if ($target.length) {
-            $('.bottom-page.scroll-block, .old .fmholder').stop().animate({
+            selectMenuItem($target);
+            $('.bottom-pages .fmholder').stop().animate({
                 scrollTop: $target.position().top - 20
             }, 1000);
         }
-        else if ($('*[data-update="' + selector + '"]').length) {
-            $('.bottom-page.scroll-block, .old .fmholder').stop().animate({
+        else if ($dataTarget.length) {
+            selectMenuItem($dataTarget);
+            $('.bottom-pages .fmholder').stop().animate({
                 scrollTop: $('*[data-update="' + selector + '"]').position().top - 20
             }, 1000);
         }
@@ -166,8 +169,6 @@ var Help = (function() {
                 $this.removeClass('gray-inactive');
             }
         });
-
-        contentChanged();
     }
 
     function patchLinks() {
@@ -292,8 +293,7 @@ var Help = (function() {
 
         function sent($parent) {
             $('.feedback-buttons,.feedback-suggestions-list', $parent).delay(500).fadeOut(500);
-            $parent.find($headFeedBack).delay(1000).fadeIn(500).children('p')
-                .text('Thank you for your feedback.', contentChanged);
+            $parent.find($headFeedBack).delay(1000).fadeIn(500).children('p').text(l[7004]);
         }
 
         $('.feedback-no').rebind('click', function() {
@@ -306,7 +306,7 @@ var Help = (function() {
 
             $this.parent().parent().children($headFeedBack).delay(200).fadeOut(300);
 
-            $this.parent().siblings('.feedback-suggestions-list').delay(500).fadeIn(500, contentChanged);
+            $this.parent().siblings('.feedback-suggestions-list').delay(500).fadeIn(500);
 
             $('.feedback-send').rebind('click', function() {
                 var data = {hash: $this.data('hash')};
@@ -397,6 +397,7 @@ var Help = (function() {
         var $cloneHeader = $(".support-section-header-clone", $container);
         var $closeIcon = $(".close-icon", $container);
         var $getStartTitle = $(".getstart-title-section", $container);
+        var $elements = $('.updateSelected:visible', $container);
         var timer;
 
         // Arrow Animation for Go back block
@@ -420,12 +421,20 @@ var Help = (function() {
         $searchHeader.fadeIn();
         $cloneHeader.fadeOut();
 
-        var $scrollBlock= $('.old .fmholder');
-
-        $scrollBlock.scroll(function() {
-            // TODO: write a cleanup function to be invoked when moving out of the #help section
-
+        $('.bottom-pages .fmholder').rebind('scroll.helpmenu', function() {
             var topPos = $(this).scrollTop();
+            var $current = $($('.updateSelected.current')[0]);
+
+            if ($current.length === 0) {
+                selectMenuItem($elements.eq(0), $current);
+            }
+            else {
+                var $new = getVisibleElement(topPos, [$current.prev(), $current, $current.next()]);
+                if ($new && $new !== $current) {
+                    selectMenuItem($new, $current);
+                }
+            }
+
             if (topPos > 195) {
                 if (topPos + $sideBar.outerHeight() + 115 <= $('.main-mid-pad').outerHeight()) {
                     $sideBar.css('top', topPos + 30 + 'px').addClass('fixed');
@@ -436,6 +445,13 @@ var Help = (function() {
             }
             else {
                 $sideBar.removeAttr('style').removeClass('fixed');
+            }
+
+            if (topPos + $sideBar.outerHeight() + 115 <= $('.main-mid-pad').outerHeight()) {
+                $cloneHeader.css('top', topPos + 60 + 'px').addClass('fixed');
+            }
+            else {
+                $cloneHeader.removeClass('fixed');
             }
 
             <!-- Search header !-->
@@ -785,9 +801,10 @@ var Help = (function() {
             var $target = $($(this).data('to'));
 
             if (!$this.is('.gray-inactive')) {
+                selectMenuItem($target);
                 $('.sidebar-menu-link.active').removeClass('active');
                 $this.addClass('active');
-                $('.bottom-page.scroll-block, .old .fmholder').stop().animate({
+                $('.bottom-pages .fmholder').stop().animate({
                     scrollTop: $target.position().top - 20
                 }, 1000);
             }

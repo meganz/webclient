@@ -4,7 +4,7 @@
 
 var attribCache = false;
 
-(function _userAttributeHandling(scope) {
+(function _userAttributeHandling(global) {
     "use strict";
 
     var ns = {};
@@ -366,7 +366,7 @@ var attribCache = false;
             }
             else {
                 if (res === EEXPIRED && useVersion) {
-                    var conflictHandlerId = cacheKey.split("_")[1];
+                    var conflictHandlerId = attribute;
 
                     if (
                         !self._conflictHandlers[conflictHandlerId] ||
@@ -374,6 +374,7 @@ var attribCache = false;
                     ) {
                         logger.error('Server returned version conflict for attribute "'
                             + attribute + '", result: ' + res + ', local version:', self._versions[cacheKey]);
+                        thePromise.reject(res);
                     }
                     else {
                         // ensure that this attr's value is not cached and up-to-date.
@@ -484,45 +485,148 @@ var attribCache = false;
         return thePromise;
     };
 
-    ns._versions = {};
+    ns._versions = Object.create(null);
+    ns._conflictHandlers = Object.create(null);
 
-    ns._conflictHandlers = {};
     ns.registerConflictHandler = function (attributeName, pub, nonHistoric, mergeFn) {
-        var self = this;
         var attributeId = buildAttribute(attributeName, pub, nonHistoric);
-        if (!self._conflictHandlers[attributeId]) {
-            self._conflictHandlers[attributeId] = [];
-        }
 
-        self._conflictHandlers[attributeId].push(
-            mergeFn
-        );
+        if (!this._conflictHandlers[attributeId]) {
+            this._conflictHandlers[attributeId] = [];
+        }
+        this._conflictHandlers[attributeId].push(mergeFn);
     };
 
-    ns.setArrayAttribute = function(attributeName, subkey, value, pub, nonHistoric) {
+    /**
+     * An internal list of queued setArrayAttribute operations
+     *
+     * @type {Array}
+     * @private
+     */
+    ns._queuedSetArrayAttributeOps = [];
+
+
+    /**
+     * QueuedSetArrayAttribute is used to represent an instance of a "set" op in an queue of QueuedSetArrayAttribute's.
+     * Every QueuedSetArrayAttribute can contain multiple changes to multiple keys.
+     * This is done transparently in mega.attr.setArrayAttribute.
+     *
+     * @private
+     * @param {String} attr - see mega.attr.setArrayAttribute
+     * @param {String} attributeName see mega.attr.setArrayAttribute
+     * @param {String} k initial k to be changed
+     * @param {String} v initial value to be used for the change
+     * @param {String} pub see mega.attr.setArrayAttribute
+     * @param {String} nonHistoric see mega.attr.setArrayAttribute
+     * @constructor
+     */
+    var QueuedSetArrayAttribute = function(attr, attributeName, k, v, pub, nonHistoric) {
         var self = this;
+        self.attr = attr;
+        self.attributeName = attributeName;
+        self.pub = pub;
+        self.nonHistoric = nonHistoric;
+        self.ops = [];
+        self.state = QueuedSetArrayAttribute.STATE.QUEUED;
 
         var proxyPromise = new MegaPromise();
+        proxyPromise.always(function() {
+            // logger.debug("finished: ", proxyPromise.state(), self.toString());
+
+            self.state = QueuedSetArrayAttribute.STATE.DONE;
+            array.remove(self.attr._queuedSetArrayAttributeOps, self);
+
+            if (self.attr._queuedSetArrayAttributeOps.length > 0) {
+                // execute now
+                self.attr._nextQueuedSetArrayAttributeOp();
+            }
+        });
+
+        self.queueSubOp(k, v);
+
+        self.promise = proxyPromise;
+        self.attr._queuedSetArrayAttributeOps.push(self);
+        if (self.attr._queuedSetArrayAttributeOps.length === 1) {
+            // execute now
+            self.attr._nextQueuedSetArrayAttributeOp();
+        }
+    };
+
+    QueuedSetArrayAttribute.STATE = {
+        'QUEUED': 1,
+        'EXECUTING': 2,
+        'DONE': 3
+    };
+
+    /**
+     * Internal method, that is used for adding subOps, e.g. an QueuedSetArrayAttribute can contain multiple
+     * changes to a key.
+     *
+     * @private
+     * @param {String} k
+     * @param {String} v
+     */
+    QueuedSetArrayAttribute.prototype.queueSubOp = function(k, v) {
+        var self = this;
+        self.ops.push([k, v]);
+        logger.debug("QueuedSetArrayAttribute queued sub op", k, v, self.toString());
+    };
+
+    /**
+     * Debugging purposes only
+     *
+     * @returns {String}
+     */
+    QueuedSetArrayAttribute.prototype.toString = function() {
+        var self = this;
+
+        var setOps = [];
+
+        self.ops.forEach(function(entry) {
+            setOps.push(entry[0] + "=" + entry[1]);
+        });
+
+        return "QueuedSetArrayAttribute: " + buildAttribute(self.attributeName, self.pub, self.nonHistoric) + "(" +
+            setOps.join(",")
+            + ")";
+    };
+
+    /**
+     * Execute this QueuedSetArrayAttribute changes and send them to the server.
+     *
+     * @returns {MegaPromise|*}
+     */
+    QueuedSetArrayAttribute.prototype.exec = function() {
+        var self = this;
+
+        var proxyPromise = self.promise;
+        self.state = QueuedSetArrayAttribute.STATE.EXECUTING;
+
+        logger.debug("QueuedSetArrayAttribute executing: ", self.toString());
 
         var _setArrayAttribute = function(r) {
             if (r === EINTERNAL) {
                 r = {};
             }
             else if (typeof r === 'number') {
-                logger.error("Found number value for attribute: ", attributeName, " when trying to use it as" +
+                logger.error("Found number value for attribute: ", self.attributeName, " when trying to use it as " +
                     "attribute array. Halting .setArrayAttribute");
-                return MegaPromise.reject(r);
+                proxyPromise.reject(r);
+                return;
             }
             var arr = r ? r : {};
-            arr[subkey] = value;
+            self.ops.forEach(function(entry) {
+                arr[entry[0]] = entry[1];
+            });
+
             var serializedValue = arr;
 
             proxyPromise.linkDoneAndFailTo(
-                self.set(
-                    attributeName,
+                self.attr.set(
+                    self.attributeName,
                     serializedValue,
-                    pub,
-                    nonHistoric,
+                    self.pub,
+                    self.nonHistoric,
                     undefined,
                     undefined,
                     undefined,
@@ -531,24 +635,30 @@ var attribCache = false;
             );
         };
 
-        self.get(u_handle, attributeName, pub, nonHistoric)
+        self.attr.get(u_handle, self.attributeName, self.pub, self.nonHistoric)
             .done(function(r) {
-                if (r === -9) {
-                    _setArrayAttribute({});
-                    proxyPromise.reject(r);
-                }
-                else {
-                    try {
+                try {
+                    if (r === -9) {
+                        _setArrayAttribute({});
+                        proxyPromise.reject(r);
+                    }
+                    else {
                         _setArrayAttribute(r);
                     }
-                    catch (e) {
-                        proxyPromise.reject(e, r);
-                    }
+                }
+                catch (e) {
+                    logger.error("QueuedSetArrayAttribute failed, because of exception: ", e);
+                    proxyPromise.reject(e, r);
                 }
             })
             .fail(function(r) {
                 if (r === -9) {
-                    _setArrayAttribute({});
+                    try {
+                        _setArrayAttribute({});
+                    }
+                    catch (e) {
+                        logger.error("QueuedSetArrayAttribute failed, because of exception: ", e);
+                    }
                     proxyPromise.reject(r);
                 }
                 else {
@@ -559,6 +669,80 @@ var attribCache = false;
         return proxyPromise;
     };
 
+    /**
+     * Try to execute next op, if such is available.
+     *
+     * @type {Function}
+     * @private
+     */
+    ns._nextQueuedSetArrayAttributeOp = SoonFc(function() {
+        var self = this;
+        var found = false;
+        self._queuedSetArrayAttributeOps.forEach(function(op) {
+            if (!found && op.state === QueuedSetArrayAttribute.STATE.QUEUED) {
+                found = op;
+            }
+        });
+
+        if (found) {
+            found.exec();
+        }
+    }, 75);
+
+
+    ns.QueuedSetArrayAttribute = QueuedSetArrayAttribute;
+
+    /**
+     * Update the value (value) of a specific key (subkey) in an "array attribute".
+     * Important note: `setArrayAttribtues` are cleverly throttled to not flood the API, but also, while being queued,
+     * multiple .setArrayAttribute('a', ...) -> .setArrayAttribute('a', ...), etc, may be executed in one single API
+     * call.
+     * For the developer, this is going to be transparently handled, since any .setArrayAttribute returns a promise and
+     * that promise would be synced with the internal queueing mechanism, so the only thing he/she needs to take care
+     * is eventually define a proper execution flow using promises.
+     *
+     * @param {String} attributeName see mega.attr.set
+     * @param {String} subkey generic
+     * @param {String} value generic
+     * @param {Integer|undefined|false} pub  see mega.attr.set
+     * @param {Integer|undefined|false} nonHistoric  see mega.attr.set
+     * @returns {MegaPromise|*}
+     */
+    ns.setArrayAttribute = function(attributeName, subkey, value, pub, nonHistoric) {
+        var self = this;
+        var found = false;
+        self._queuedSetArrayAttributeOps.forEach(function(op) {
+            if (
+                !found &&
+                op.state === QueuedSetArrayAttribute.STATE.QUEUED &&
+                op.attributeName === attributeName &&
+                op.pub === pub &&
+                op.nonHistoric === nonHistoric
+            ) {
+                found = op;
+            }
+        });
+
+        if (found && found.state === QueuedSetArrayAttribute.STATE.QUEUED) {
+            found.queueSubOp(subkey, value);
+            return found.promise;
+        }
+        else {
+            var op = new QueuedSetArrayAttribute(self, attributeName, subkey, value, pub, nonHistoric);
+            return op.promise;
+        }
+    };
+
+    /**
+     * Get a specific `subkey`'s value from an "array attribute"
+     *
+     * @param {String} userId see mega.attr.get
+     * @param {String} attributeName the actual attribtue name
+     * @param {String} subkey the actual subkey stored in that array attribute
+     * @param {Integer|undefined|false} pub see mega.attr.get
+     * @param {Integer|undefined|false} nonHistoric see mega.attr.get
+     * @returns {MegaPromise}
+     */
     ns.getArrayAttribute = function(userId, attributeName, subkey, pub, nonHistoric) {
         var self = this;
 
@@ -580,39 +764,6 @@ var attribCache = false;
         proxyPromise.linkFailTo($getPromise);
 
         return proxyPromise;
-    };
-
-
-    ns.handleUserAttributeActionPackets = function(actionPacket, avatars) {
-        var attrs = actionPacket.ua;
-        var actionPacketUserId = actionPacket.u;
-
-        for (var j in attrs) {
-            if (attrs.hasOwnProperty(j)) {
-                var attributeName = attrs[j];
-
-                // fill version if missing
-                mega.attr.handleVersionFromActionPacket(
-                    actionPacketUserId,
-                    attributeName,
-                    actionPacket.v[j]
-                );
-
-                // handle avatar related action packets (e.g. avatar modified)
-                if (attributeName === '+a') {
-                    avatars.push(actionPacketUserId);
-                }
-                // handle firstname/lastname attributes
-                else if (attributeName === 'firstname' || attributeName === 'lastname') {
-                    attribCache.uaPacketParser(
-                        attributeName,
-                        actionPacketUserId,
-                        true,
-                        actionPacket.v && actionPacket.v[j] ? actionPacket.v[j] : undefined
-                    );
-                }
-            }
-        }
     };
 
     /**
@@ -680,8 +831,27 @@ var attribCache = false;
         return res;
     };
 
+    var uaPacketParserHandler = Object.create(null);
+
     /**
      * Updated the local version cache IF the action packet contains a version
+     *
+     * @param actionPacketUserId
+     * @param attributeName
+     * @param actionPacketVersion
+     */
+    ns.handleVersionFromActionPacket = function (actionPacketUserId, attributeName, actionPacketVersion) {
+        if (
+            actionPacketVersion &&
+            !mega.attr._versions[actionPacketUserId + "_" + attributeName]
+        ) {
+            logger.debug("Got new version from ap: ", actionPacketUserId + "_" + attributeName, actionPacketVersion);
+            mega.attr._versions[actionPacketUserId + "_" + attributeName] = actionPacketVersion;
+        }
+    };
+
+    /**
+     * Process action-packet for attribute updates.
      *
      * @param actionPacketUserId
      * @param attributeName
@@ -695,6 +865,74 @@ var attribCache = false;
             mega.attr._versions[actionPacketUserId + "_" + attributeName] = actionPacketVersion;
         }
     };
+
+    /**
+     * Process action-packet for attribute updates.
+     *
+     * @param {String}  attrName          Attribute name
+     * @param {String}  userHandle        User handle
+     * @param {Boolean} [ownActionPacket] Whether the action-packet was issued by oneself
+     * @param {String}  [version]         version, as returned by the API
+     */
+    ns.uaPacketParser = function uaPacketParser(attrName, userHandle, ownActionPacket, version) {
+        var logger = MegaLogger.getLogger('account');
+        var cacheKey = userHandle + "_" + attrName;
+
+        logger.debug('uaPacketParser: Invalidating cache entry "%s"', cacheKey);
+
+        // XXX: Even if we're using promises here, this is guaranteed to resolve synchronously atm,
+        //      so if this ever changes we'll need to make sure it's properly adapted...
+
+        var removeItemPromise = attribCache.removeItem(cacheKey);
+
+        delete this._versions[cacheKey];
+
+        removeItemPromise
+            .always(function _uaPacketParser() {
+                if (typeof uaPacketParserHandler[attrName] === 'function') {
+                    uaPacketParserHandler[attrName](userHandle);
+                }
+                else if (
+                    (attrName.substr(0, 2) === '+!' || attrName.substr(0, 2) === '^!') &&
+                    attribCache.bitMapsManager.exists(attrName.substr(2))
+                ) {
+                    mega.attr.handleBitMapAttribute(attrName, version);
+                }
+                else if (d > 1) {
+                    logger.debug('uaPacketParser: No handler for "%s"', attrName);
+                }
+            });
+
+        return removeItemPromise;
+    };
+
+    mBroadcaster.once('boot_done', function() {
+        uaPacketParserHandler['firstname'] = function(userHandle) {
+            if (M.u[userHandle]) {
+                M.u[userHandle].firstName = M.u[userHandle].lastName = "";
+                M.syncUsersFullname(userHandle);
+            }
+            else {
+                console.warn('uaPacketParser: Unknown user %s handling first/lastname', userHandle);
+            }
+        };
+        uaPacketParserHandler['lastname']    = uaPacketParserHandler['firstname'];
+        uaPacketParserHandler['+a']          = function(userHandle) { M.avatars(userHandle); };
+        uaPacketParserHandler['*!authring']  = function() { authring.getContacts('Ed25519'); };
+        uaPacketParserHandler['*!authRSA']   = function() { authring.getContacts('RSA'); };
+        uaPacketParserHandler['*!authCu255'] = function() { authring.getContacts('Cu25519'); };
+        uaPacketParserHandler['+puEd255']    = function(userHandle) {
+            // pubEd25519 key was updated! force fingerprint regen.
+            delete pubEd25519[userHandle];
+            crypt.getPubEd25519(userHandle);
+        };
+        uaPacketParserHandler['*!fmconfig'] = function() { mega.config.fetch(); };
+
+        if (d) {
+            global._uaPacketParserHandler = uaPacketParserHandler;
+        }
+    });
+
 
     ns.registerConflictHandler("lstint", false, true, function(valObj, index) {
         var remoteValues = valObj.remoteValue;
@@ -730,7 +968,7 @@ var attribCache = false;
             }
         });
 
-        // console.error("merged: ", valObj.localValue, valObj.remoteValue, valObj.mergedValue);
+        // logger.debug("merged: ", valObj.localValue, valObj.remoteValue, valObj.mergedValue);
 
 
         return true;
@@ -747,73 +985,5 @@ var attribCache = false;
     }
     ns = undefined;
 
-})(this);
+})(self);
 
-/**
- * Process action-packet for attribute updates.
- *
- * @param {String}  attrName        Attribute name
- * @param {String}  userHandle      User handle
- * @param {Boolean} ownActionPacket Whether the action-packet was issued by myself
- * @param {String} [version] version, as returned by the API
- */
-function uaPacketParser(attrName, userHandle, ownActionPacket, version) {
-    var logger = MegaLogger.getLogger('account');
-    var cacheKey = userHandle + "_" + attrName;
-
-    logger.debug('uaPacketParser: Invalidating cache entry "%s"', cacheKey);
-
-    var removeItemPromise = attribCache.removeItem(cacheKey);
-
-    if (typeof(mega.attr._versions[userHandle + "_" + attrName]) !== 'undefined') {
-        delete mega.attr._versions[userHandle + "_" + attrName];
-    }
-
-    removeItemPromise
-        .always(function _uaPacketParser() {
-            if (attrName === 'firstname'
-                || attrName === 'lastname') {
-                M.u[userHandle].firstName = M.u[userHandle].lastName = "";
-                M.syncUsersFullname(userHandle);
-            }
-            else if (ownActionPacket) {
-                // atm only first/last name is processed throguh own-action-packet
-                logger.warn('uaPacketParser: Unexpected attribute "%s"', attrName);
-            }
-            else if (attrName === '+a') {
-                M.avatars(userHandle);
-            }
-            else if (attrName === '*!authring') {
-                authring.getContacts('Ed25519');
-            }
-            else if (attrName === '*!authRSA') {
-                authring.getContacts('RSA');
-            }
-            else if (attrName === '*!authCu255') {
-                authring.getContacts('Cu25519');
-            }
-            else if (attrName === '*!fmconfig') {
-                mega.config.fetch();
-            }
-            else if (attrName === '+puEd255') {
-                // pubEd25519 key was updated!
-                // force fingerprint regen.
-                delete pubEd25519[userHandle];
-                crypt.getPubEd25519(userHandle);
-            }
-            else if (
-                (attrName.substr(0, 2) === '+!' || attrName.substr(0, 2) === '^!') &&
-                attribCache.bitMapsManager.exists(attrName.substr(2))
-            ) {
-                mega.attr.handleBitMapAttribute(
-                    attrName,
-                    version
-                );
-            }
-            else {
-                logger.debug('uaPacketParser: No handler for "%s"', attrName);
-            }
-        });
-
-    return removeItemPromise;
-}

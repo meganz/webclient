@@ -7,25 +7,6 @@
     padding-right: 0 !important;
     position: relative;
 }
-/* Scrollable Search 
-.search-section{
-	display: none;
-	position: fixed;
-	width: 100%;
-	top: 0px;
-	left: 0;
-	height: 240px;
-	/* Rectangle 2567: 
-	background-image: linear-gradient(0deg, rgba(250,250,250,0.88) 0%, #FAFAFA 10%);
-	z-index: 99;
-}*/
-/*
-.search-section .section-title{
-	margin-top: 130px;
-}
-*/
-/*Colins CSS changes*/
-/* fixed sidebar applied dynamtically with JS */
 .help-background-block {
     content:'';
     position: absolute;
@@ -740,9 +721,9 @@
     font-size: 14px;
     letter-spacing: 0.2px;
     line-height: 18px;
-    margin-bottom: 22px;
+    margin-bottom: 8px;
     margin-right: 12px;
-    padding-bottom: 22px;
+    padding-bottom: 0;
     position: relative;
     text-align: left;
 }
@@ -750,7 +731,7 @@
     text-decoration: none;
     color: #555;
     display: block;
-    margin-top: -35px;
+    margin-top: 0;
     margin-left: 20px;
     line-height: 22px;
     cursor: pointer;
@@ -770,7 +751,7 @@
 #help2-main .search-section-header .popular-question-list, #help2-main .popular-question-list {
     width: 45%;
     display: block;
-    margin-top: 40px;
+    padding: 18px 0 48px 0;
     float: left;
 }
 #help2-main .search-section-header .popular-question-list:nth-child(2), #help2-main .popular-question-list:nth-child(2) {
@@ -779,28 +760,19 @@
 }
 #help2-main .popular-question-list ul {
     display: block;
-    margin-block-end: 1em;
-    margin-block-start: 1em;
-    padding-inline-start: 00px;
+    padding: 0 0 0 0;
+    margin: 0 0 0 0;
 }
 .help-home-page {
     background-color: #fafafa !important;
-}
-#help2-main .search-section-header .popular-question-items, #help2-main .popular-question-items {
-    -webkit-columns: 1;
-    -moz-columns: 1;
-    columns: 1;
-    column-gap: 30px;
-    -moz-column-gap: 30px;
-    -webkit-column-gap: 30px;
 }
 #help2-main .popular-question-items li {
     font-family: 'source_sans_proregular';
     font-size: 14px;
     color: #555;
-    padding-bottom: 18px;
+    padding-bottom: 0;
     position: relative;
-    margin: 4px 20px 25px 2px;
+    margin: 4px 20px 8px 2px;
 }
 #help2-main .first-support-block {
     border-top: 1px solid #e8e8e8;
@@ -927,7 +899,7 @@
 #help2-main .support-section-header-clone {
     top: 50px;
     width: 100%;
-    position: fixed;
+    position: absolute;
     top: 60px;
     left: 0;
     right: 0;
@@ -942,6 +914,10 @@
     user-select: none;
     z-index: 999;
     margin-top: 2px;
+}
+#help2-main .support-section-header-clone.fixed {
+    top: 60px !important;
+    position: fixed;
 }
 #help2-main .support-section-header-clone .support-search-heading {
     color: #666;
@@ -1256,14 +1232,6 @@
     font-size: 36px;
     line-height: 46px;
 }
-#help2-main ul.d-section-items {
-    -webkit-margin-before: 1em;
-    -webkit-margin-after: 1em;
-    -webkit-margin-start: 0;
-    -webkit-margin-end: 0;
-    -webkit-padding-start: 3px;
-    padding-inline-start: 3px;
-}
 #help2-main .d-section-items li {
     color: #666;
     display: inline-block;
@@ -1537,15 +1505,6 @@
     padding-right: 50px;
 }
 #help2-main .main-content-pad {
-    /*background-color: white;
-  border-top-left-radius: 6px;
-  border-top-right-radius: 6px;
-  bottom: 0;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
-  margin-left: 310px;
-  padding-bottom: 0;
-  padding-left: 50px;
-  padding-right: 50px;*/
     padding-top: 10px;
     width: 614px;
     padding-bottom: 0;
@@ -1554,13 +1513,6 @@
     margin-top: 50px;
 }
 #help2-main .main-directory-pad {
-    /*background-color: white;
-  border-top-left-radius: 6px;
-  border-top-right-radius: 6px;
-  padding-left: 50px;
-  padding-right: 50px;
-  bottom: 0;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15);*/
     margin-left: 300px;
     padding-bottom: 0;
     padding-top: 10px;
@@ -2644,7 +2596,7 @@
 #help2-main .sidebar-menu-container {
     margin-top: 60px;
 }
-#help2-main .fixed {
+#help2-main .sidebar-menu-container.fixed {
     position: fixed;
     top: 30px !important;
     transition-duration: 0.5s;

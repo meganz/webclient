@@ -280,6 +280,7 @@ div.pro-popular-txt {
     float: left;
     padding-left: 50px;
     width: 644px;
+    font-size: 14px;
 }
 .membership-date {
     float: left;
@@ -913,7 +914,6 @@ div.pro-feature-icon {
     display: inline-block;
     font-family: "source_sans_proregular", Helvetica, Arial, sans-serif;
     overflow: hidden;
-    padding-bottom: 1px;
     text-overflow: ellipsis;
     vertical-align: middle;
     white-space: nowrap;
@@ -1812,6 +1812,9 @@ div.pro-feature-icon {
 .bottom-page.top-info {
     padding: 50px 0;
     text-align: center;
+}
+.mobile .bottom-page.top-info {
+    padding: 70px 0 50px 0;
 }
 .bottom-page.top-info .big-header {
     padding-top: 0;

@@ -70,14 +70,14 @@
                     });
 
 
-                    delay('notifFavicoUpd', function() {
-                        var badge = count > 9 ? "9+" : count;
-                        if (self._lastBadgeCounter !== badge) {
+                    var badge = count > 9 ? "9+" : count;
+                    if (self._lastBadgeCounter !== badge) {
+                        delay('notifFavicoUpd', function () {
+                            self.favico.reset();
                             self.favico.badge(badge);
-                            self._lastBadgeCounter = badge;
-                        }
-                    });
-
+                        });
+                        self._lastBadgeCounter = badge;
+                    }
                 });
         }
 

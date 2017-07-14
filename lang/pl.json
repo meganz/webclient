@@ -4270,6 +4270,9 @@
     "16659": "Ustaw \"Z dala od komputera\"  po 1 minucie nieaktywno\u015bci",
     "16660": "Subkrypcja PRO LITE: \u20ac4.99 (US$4.99) miesi\u0119cznie lub \u20ac49.99 (US$49.99) rocznie otrzymasz 200 GB przestrzeni na pliki oraz 1 TB na transfer danych miesi\u0119cznie.Subkrypcja PRO I: \u20ac9.99 (US$9.99) miesi\u0119cznie lub \u20ac99.99 (US$99.99) rocznie otrzymasz 1 TB przestrzeni na pliki oraz 2 TB na transfer danych miesi\u0119cznie.Subkrypcja PRO II: \u20ac19.99 (US$19.99) miesi\u0119cznie lub \u20ac199.99 (US$199.99) rocznie otrzymasz 4 TB przestrzeni na pliki oraz 8 TB na transfer danych miesi\u0119cznie.Subkrypcja PRO III: \u20ac29.99 (US$29.99) miesi\u0119cznie lub \u20ac299.99 (US$299.99) rocznie otrzymasz 8 TB przestrzeni na pliki oraz 16 TB na transfer danych miesi\u0119cznie.",
     "16664": "Nowe has\u0142o musi by\u0107 inne od poprzednich.",
+    "16665": "The destination folder is synced and you already have a file inside it with the same name (%1). If you continue the upload, the previous file will be overwritten. Are you sure?",
+    "16666": "Used quota for the last %1 hours: %2",
+    "16667": "Back to PRO Plans",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4531,6 +4534,7 @@
         "cancel-subscription-dialog-message": 16501,
         "public-links": 16516,
         "save-amount": 16649,
-        "for-full-featured-experience": 16653
+        "for-full-featured-experience": 16653,
+        "back-to-plans": 16667
     }
 }

@@ -95,7 +95,7 @@ function init_start() {
 			var offset = $(".bottom-page.bott-pad.mobile").offset();
 
 			if (offset) {
-				$('.bottom-page.scroll-block').animate({scrollTop: offset.top}, 800);
+				$('#startholder').animate({scrollTop: offset.top}, 800);
 			}
 		}, 1000);
 	}

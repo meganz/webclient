@@ -3620,7 +3620,7 @@
     "9086": "Purchase failed or cancelled",
     "9087": "Your MEGA subscription purchase has succeeded.",
     "9088": "Purchase succeeded",
-    "9089": "Your puchase of a MEGA subscription has not passed validation at our licence server. On restart of this app we will retry to validate your subscription licences. Please contact MEGA support if the error continues.",
+    "9089": "Your purchase of a MEGA subscription has not passed validation at our licence server. On restart of this app we will retry to validate your subscription licences. Please contact MEGA support if the error continues.",
     "9090": "Purchase validation failed",
     "9091": "Validating...",
     "9092": "In app purchase",
@@ -4270,6 +4270,9 @@
     "16659": "Show me away after 1 minute of inactivity",
     "16660": "PRO LITE subscription: \u20ac4.99 (US$4.99) per month or \u20ac49.99 (US$49.99) per year gives you 200 GB of storage space and 1 TB of transfer quota per month.PRO I subscription: \u20ac9.99 (US$9.99) per month or \u20ac99.99 (US$99.99) per year gives you 1 TB of storage space and 2 TB of transfer quota per month.PRO II subscription: \u20ac19.99 (US$19.99) per month or \u20ac199.99 (US$199.99) per year gives you 4 TB of storage space and 8 TB of transfer quota per month.PRO III subscription: \u20ac29.99 (US$29.99) per month or \u20ac299.99 (US$299.99) per year gives you 8 TB of storage space and 16 TB of transfer quota per month.",
     "16664": "The new password must be different from the old one.",
+    "16665": "The destination folder is synced and you already have a file inside it with the same name (%1). If you continue the upload, the previous file will be overwritten. Are you sure?",
+    "16666": "Used quota for the last %1 hours: %2",
+    "16667": "Back to PRO Plans",
     "alias": {
         "shared-with-me": 5589,
         "quota-share-error": 8435,
@@ -4531,6 +4534,7 @@
         "cancel-subscription-dialog-message": 16501,
         "public-links": 16516,
         "save-amount": 16649,
-        "for-full-featured-experience": 16653
+        "for-full-featured-experience": 16653,
+        "back-to-plans": 16667
     }
 }

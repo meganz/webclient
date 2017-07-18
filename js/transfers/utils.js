@@ -12,9 +12,9 @@ function setTransferStatus(dl, status, ethrow, lock) {
         text = text.substr(0, 48) + "\u2026";
     }
     if (page === 'download') {
-        $('.download.error-icon').text(text);
-        $('.download.error-icon').removeClass('hidden');
-        $('.download.icons-block').addClass('hidden');
+        $('.download.error-text').text(text);
+        $('.download.error-text').removeClass('hidden');
+        $('.download.main-transfer-info').addClass('hidden');
     }
     else {
         $('.transfer-table #' + id + ' td:eq(5)')

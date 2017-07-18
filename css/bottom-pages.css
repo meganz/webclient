@@ -58,18 +58,13 @@ html.gbot {
     -ms-transition: background-color 200ms ease-in-out, top 600ms ease-in-out;
     transition: background-color 200ms ease-in-out, top 600ms ease-in-out;
 }
-.bottom-page:not(.download) .top-head::after {
+.bottom-page .top-head::after {
     display: none;
 }
-/* Download */
-.bottom-page.download .top-head {
-    background-color: white;
-}
-/* end of Download */
 
 .bottom-page .top-head.floating {
     background-color: white;
-    box-shadow: 0 1px 0 0 rgba(0,62,80,0.15);
+    box-shadow: 0 1px 0 0 rgba(0,0,0,0.1);
     position: fixed;
     top: -38px;
 }

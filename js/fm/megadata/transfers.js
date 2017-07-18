@@ -663,15 +663,15 @@ MegaData.prototype.dlerror = function(dl, error) {
              */
             if (page === 'download') {
                 if (error === EOVERQUOTA) {
-                    $('.download-info.time-txt .text').text('');
-                    $('.download-info.speed-txt .text').text('');
-                    $('.download.pause-button').addClass('active');
-                    $('.download.info-block').addClass('overquota');
+                    $('.download.eta-block span').text('');
+                    $('.download.speed-block span').text('');
+                    $('.download .pause-transfer').addClass('active');
+                    $('.download.error-text').addClass('overquota');
                 }
                 else {
-                    $('.download.error-icon').text(errorstr);
-                    $('.download.error-icon').removeClass('hidden');
-                    $('.download.icons-block').addClass('hidden');
+                    $('.download.error-text').text(errorstr);
+                    $('.download.error-text').removeClass('hidden overquota');
+                    $('.download.main-transfer-info').addClass('hidden');
                 }
             }
             else {

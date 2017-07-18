@@ -126,11 +126,19 @@ var bottompage = {
     },
 
     initFloatingTop: function() {
+        var topHeader;
+
+        if (page === 'download') {
+            topHeader = '.download.top-bar';
+        }
+        else {
+            topHeader = '.bottom-page .top-head, .old .top-head';
+        }
 
         function topResize() {
-            var $topHeader = $('.bottom-page .top-head, .old .top-head');
+            var $topHeader = $(topHeader);
             if ($topHeader.hasClass('floating')) {
-                $topHeader.width($topHeader.next().outerWidth());
+                $topHeader.width($topHeader.parent().outerWidth());
             }
             else {
                 $topHeader.removeAttr('style');
@@ -142,7 +150,7 @@ var bottompage = {
         });
 
         $('.bottom-pages .fmholder').rebind('scroll.topmenu', function() {
-            var $topHeader = $('.top-head');
+            var $topHeader = $(topHeader);
             var topPos = $(this).scrollTop();
             if (topPos > 300) {
                 $topHeader.addClass('floating');

@@ -702,7 +702,7 @@ var dlmanager = {
         }
 
         if (page === 'download') {
-            $('.download.info-block').removeClass('overquota');
+            $('.download.error-text').removeClass('overquota');
         }
         else {
             $('#' + ids.join(',#'))
@@ -1272,12 +1272,13 @@ function fm_tfspause(gid, overquota) {
 
         if (page === 'download') {
             if (overquota === true) {
-                $('.download.info-block').addClass('overquota');
-                $('.download.status-txt, .download-info .text').safeHTML(l[1673]).removeClass('blue');
+                $('.download.error-text').addClass('overquota');
             }
-            else {
-                $('.download.status-txt, .download-info .text').safeHTML(l[1651]).addClass('blue');
-            }
+            $('.download .pause-transfer span').text(l[9118]);
+            $('.download.scroll-block').addClass('paused');
+            $('.download.eta-block span').text('');
+            $('.download.speed-block .dark-numbers').text('');
+            $('.download.speed-block .light-txt').text(l[1651]).addClass('small');
         }
         else {
             var $tr = $('.transfer-table tr#' + gid);
@@ -1322,11 +1323,12 @@ function fm_tfsresume(gid) {
             var $tr = $('.transfer-table tr#' + gid);
 
             if (page === 'download'
-                    && $('.download.info-block').hasClass('overquota')
+                    && $('.download.error-text').hasClass('overquota')
                     || $tr.find('.transfer-status').hasClass('overquota')) {
 
                 if (page === 'download') {
-                    $('.download.pause-button').addClass('active');
+                    $('.download .pause-transfer').addClass('active');
+                    $('.download.scroll-block').addClass('paused');
                 }
 
                 if (dlmanager.isOverFreeQuota) {
@@ -1342,7 +1344,9 @@ function fm_tfsresume(gid) {
             }
 
             if (page === 'download') {
-                $('.download.status-txt, .download-info .text').text('').removeClass('blue');
+                $('.download .pause-transfer span').text(l[9112]);
+                $('.download.scroll-block').removeClass('paused');
+                $('.download.speed-block .light-txt').text('').removeClass('small');
             }
             else {
                 $tr.removeClass('transfer-paused');

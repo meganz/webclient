@@ -308,8 +308,8 @@ body.pro:after {
     background-image: url(../images/mega/register-info@2x.png);
     background-size: 120px auto;
 }
-.download-dialog-icon, .download-chrome-lnk, a.download-chrome-lnk, .download-user-icon, .new-download-sync-app, .new-download-red-button, .mega-list-arrow, .megasync-logo, .megasync-table table th span, .megasync-table table td span, .default-dropdown-item.icon, .camera-bottom-icon, .camera-top-icon, .button.download-button.down-arrow, .button.download-button.to-clouddrive, .download-icon, .download.error-text.na-icon, .download.error-text.cross-icon, .download.error-text.error-icon, .megasync-info-arrow, .megasync-dark-logo, .megasync-icon, .megasync-slider.button, .megasync .toast-icon {
-    background-image: url(../images/mega/download-sprite-v6@2x.png);
+.download-dialog-icon, .download-chrome-lnk, a.download-chrome-lnk, .download-user-icon, .new-download-sync-app, .new-download-red-button, .mega-list-arrow, .megasync-logo, .megasync-table table th span, .megasync-table table td span, .default-dropdown-item.icon, .camera-bottom-icon, .camera-top-icon, .button.download-button.down-arrow, .button.download-button.to-clouddrive, .download-icon, .download.error-text.na-icon, .download.error-text.cross-icon, .download.error-text.error-icon, .megasync-info-arrow, .megasync-dark-logo, .megasync-icon, .megasync-slider.button, .megasync .toast-icon, .download.file-icon-wrap {
+    background-image: url(../images/mega/download-sprite-v7@2x.png);
     background-size: 257px auto;
 }
 .top-login-full, .top-login-input-block, .top-login-warning-close, .top-login-warning-icon, .top-login-popup .top-login-warning-bott .checkboxOn, .top-login-popup .top-login-warning-bott .checkboxOff, .top-login-tooltip-arrow, .password-tooltip-arrow, .login-register-input, .register-st2-button, .register-st2-button-arrow, .password-status-icon, .login-notification-icon, .top-login-forgot-pass, .login-forgot-password, .checkboxOn::after, .checkboxOff::after, .contains-value .top-clear-button, .account-history-drop-items.active, .account-warning-icon, .warning-gray-icon, .membership-arrow, .small-icon.membership, .dropdown-white-arrow, .dropdown-item.tick-item.active::before, .dropdown-item.do-sort.selected i {
@@ -436,8 +436,8 @@ body.pro:after {
     background-image: url(../images/mega/chat-static-sprite-v1@2x.png);
     background-size: 68px auto;
 }
-.small-icon.context, .dropdown-item.contains-submenu::before, .dropdown-colour-item::after, .small-icon.clock {
-    background-image: url(../images/mega/icons-sprite_v4@2x.png);
+.small-icon.context, .dropdown-item.contains-submenu::before, .dropdown-colour-item::after, .small-icon.clock, i.icons-sprite {
+    background-image: url(../images/mega/icons-sprite_v5@2x.png);
     background-size: 262px auto;
 }
 #help2-main .ui-autocomplete .client, #help2-main .ios-desktop-icon, #help2-main .windows-desktop-icon, #help2-main .linux-desktop-icon, #help2-main .webclient-icon {
@@ -452,7 +452,7 @@ body.pro:after {
     background-image: url(../images/mega/big-achievements@2x.png);
     background-size: 436px auto;
 }
-.logo, .languages-dialog .show-more-languages .round-arrow span, .top-head .top-icon::before, .notification-txt, .nw-bottom-copyrights, .nw-bottom-social, .top-login-warning-arrow, .main-top-info-text, .new-notification-icon, .feedback-button, .semi-small-icon.grey-mega, .semi-small-icon.yellow-triangle, .tiny-icon.membership-status, .top-menu-item.submenu-item::before, .medium-icon.rocket {
+.logo, .languages-dialog .show-more-languages .round-arrow span, .top-head .top-icon::before, .main-top.top-icon::before, .notification-txt, .nw-bottom-copyrights, .nw-bottom-social, .top-login-warning-arrow, .main-top-info-text, .new-notification-icon, .feedback-button, .semi-small-icon.grey-mega, .semi-small-icon.yellow-triangle, .tiny-icon.membership-status, .top-menu-item.submenu-item::before, .medium-icon.rocket {
     background-image: url(../images/mega/top-sprite_v2@2x.png);
     background-size: 38px auto;
 }

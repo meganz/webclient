@@ -71,11 +71,11 @@ def get_git_line_sets(base, target):
     file_line_mapping = collections.defaultdict(set)
     current_file = None
     for line in diff:
-        if line.startswith('+++'):
+        if line.startswith('+++ '):
             # Line giving target file.
             for_file = line.split()[1]
             current_file = tuple(re.split(PATH_SPLITTER, for_file[2:]))
-        elif line.startswith('@@'):
+        elif line.startswith('@@ '):
             # Line giving alteration line range of diff fragment.
             target_lines = line.split()[2].split(',')
             start_line = int(target_lines[0])
